@@ -2,12 +2,14 @@
 
 package org.podval.moon;
 
-import junit.framework.*;
+import org.junit.Test;
+import org.junit.Assert;
 
 
-public class TestAngle extends TestCase {
+public class TestAngle {
 
-    public void testAngle() {
+    @Test
+    public void angleTest() {
         testFromValue(5, 34);
         testFromValue(54, 34);
         testFromValue(154, 59);
@@ -17,7 +19,7 @@ public class TestAngle extends TestCase {
 
     private void testFromValue(int degrees, int minutes) {
         Angle angle = new Angle(degrees, minutes);
-        assertEquals(degrees, angle.getDegrees());
-        assertEquals(minutes, angle.getMinutes());
+        Assert.assertEquals(degrees, angle.getDegrees());
+        Assert.assertEquals(minutes, angle.getMinutes());
     }
 }

@@ -9,6 +9,7 @@ public class MoonMnasHaMaslul implements Function<Angle, Angle> {
     }
 
 
+    @Override
     public Angle apply(Angle maslul) {
         return null;
     }
