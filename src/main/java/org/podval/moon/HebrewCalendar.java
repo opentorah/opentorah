@@ -16,14 +16,9 @@ public final class HebrewCalendar {
     public static final long LUNAR_MONTH = 29 * DAY + 12 * HOUR + 793;
 
 
-    // Molad of the year of creation:
-    // BeHaRaD: 5 hours 204 parts at night of the second day of creation (KN 6:8)
-    //   (876 haloqim (48 minutes 40 secods) before midnight on the epoch)
+    // Molad of the year of Creation:
+    // BeHaRaD: 5 hours 204 parts at night of the second day of Creation (KN 6:8)
     public static final long FIRST_MOLAD = -5*DAY + (1*DAY + 5*HOUR + 204);
-
-    // Molad of the next year: WeYaD: Friday, 14 hours
-    //   (8AM the morning of the creation of Adam and Eve)
-//    public static final long XXX_MOLAD = 14 * 1080;
 
 
     public static final boolean[] IS_LEAP = new boolean[19];
@@ -64,11 +59,11 @@ public final class HebrewCalendar {
 
 
 
-    public static final int MONTH_IN_MENTONIC_CYCLE = MONTH_BEFORE_YEAR[20];
+    public static final int MONTH_IN_19_YEAR_CYCLE = MONTH_BEFORE_YEAR[20];
 
 
     public static long moladTime(int year, int month) {
-        int moladNumber = (year / 19) * MONTH_IN_MENTONIC_CYCLE + MONTH_BEFORE_YEAR[year % 19] + (month - 1);
+        int moladNumber = (year / 19) * MONTH_IN_19_YEAR_CYCLE + MONTH_BEFORE_YEAR[year % 19] + (month - 1);
         return FIRST_MOLAD + LUNAR_MONTH * moladNumber;
     }
 
