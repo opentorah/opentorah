@@ -180,22 +180,54 @@ public final class JewishCalendar {
     };
 
 
-    public static int daysInMonth(final int year, final YearKind yearKind, final int number) {
-        int correctedNumber = number;
+    public static int daysInMonth(final int year, final YearKind yearKind, final int month) {
+        int correctedMonth = correctedMonth(year, month);
 
-        if (!isLeap(year) && (correctedNumber >= 5)) {
-            correctedNumber++;
-        }
-        int result = DAYS_IN_MONTH[correctedNumber-1];
-        if ((correctedNumber == 2) && (yearKind == YearKind.LACKING)) {
+        int result = DAYS_IN_MONTH[correctedMonth-1];
+        if ((correctedMonth == 2) && (yearKind == YearKind.LACKING)) {
             result--;
-        } else if ((correctedNumber == 1) && (yearKind == YearKind.FULL)) {
+        } else if ((correctedMonth == 1) && (yearKind == YearKind.FULL)) {
             result++;
         }
 
         return result;
     }
 
+
+    private static final String[] MONTH_NAME = {
+        "Tishri",
+        "MarHeshvan",
+        "Kislev",
+        "Tevet",
+        "Shevat",
+        "Adar I",
+        "Adar [II]",
+        "Nissan",
+        "Iyyar",
+        "Sivan",
+        "Tammuz",
+        "Av",
+        "Elul"
+    };
+
+
+    public static String monthName(final int year, final int month) {
+        int correctedMonth = correctedMonth(year, month);
+        String result = MONTH_NAME[correctedMonth];
+        if ((correctedMonth == 6) && isLeap(year)) {
+            result += " II";
+        }
+        return result;
+    }
+
+
+    private static int correctedMonth(final int year, final int month) {
+        int result = month;
+        if (!isLeap(year) && (result >= 5)) {
+            result++;
+        }
+        return result;
+    }
 
     public static int daysBeforeMonth(final int year, final int month) {
         int result = 0;
@@ -241,17 +273,50 @@ public final class JewishCalendar {
     }
 
 
-    public static int daysFromYearMonthDay(final int year, final int month, final int day) {
+    public static int daysFromDate(final int year, final int month, final int day) {
         return dayOfRoshHaShono(year) + daysBeforeMonth(year, month) + day - 1;
     }
 
 
+    public static int daysFromDate(final JewishDate date) {
+        return daysFromDate(date.getYear(), date.getMonth(), date.getDay());
+    }
+
+
+    public static JewishDate dateFromDays(final int days) {
+        // @todo
+        int year = (4 * days / (4 * 365 + 1));
+        while (true) {
+            if (dayOfRoshHaShono(year+1) > days) {
+                break;
+            }
+            year++;
+        }
+
+        final YearKind yearKind = yearKind(year);
+        int daysInYear = days - dayOfRoshHaShono(year);
+
+        int month = 1;
+        while (true) {
+            int daysInMonth = daysInMonth(year, yearKind, month);
+            if (daysInYear < daysInMonth) {
+                break;
+            }
+            daysInYear -= daysInMonth;
+            month++;
+        }
+
+        return new JewishDate(year, month, daysInYear);
+    }
+
+
     public static void main(final String[] args) {
-        final long molad = molad(5769, 1);
-        final int days = daysFromParts(molad);
-        System.out.println(
-            "Molad on " + dayOfTheWeek(days) +
-            " at " + minutesFromParts(molad) + " min " +
-            " and " + partsFromParts(molad) + " parts");
+//        final long molad = molad(5769, 1);
+//        final int days = daysFromParts(molad);
+//        System.out.println(
+//            "Molad on " + dayOfTheWeek(days) +
+//            " at " + minutesFromParts(molad) + " min " +
+//            " and " + partsFromParts(molad) + " parts");
+        System.out.println(new JewishDate(1, 1, 1));
     }
 }

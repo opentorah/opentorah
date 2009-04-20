@@ -6,19 +6,11 @@ public final class JewishDate {
 //    public enum Month { Tishrei, MarHeshvan, Kislev, Tevet, Shevat, Adar, Adar2, Nissan, Iyar, Sivan, Tamuz, Av, Elul }
 
 
-
-
-    public static JewishDate createFromDays(final int days) {
-        return new JewishDate(0, 0, 0, days, 0, 0, 0);
-    }
-
-
     public static JewishDate createFromParts(final long allParts) {
         return new JewishDate(
             0,
             0,
             0,
-            JewishCalendar.daysFromParts(allParts),
             JewishCalendar.hoursFromParts(allParts),
             JewishCalendar.minutesFromParts(allParts),
             JewishCalendar.partsFromParts(allParts));
@@ -28,8 +20,16 @@ public final class JewishDate {
     public JewishDate(
         final int year,
         final int month,
+        final int day)
+    {
+        this(year, month, day, 0, 0, 0);
+    }
+
+
+    public JewishDate(
+        final int year,
+        final int month,
         final int day,
-        final int days,
         final int hours,
         final int minutes,
         final long parts)
@@ -37,7 +37,6 @@ public final class JewishDate {
         this.year = year;
         this.month = month;
         this.day = day;
-        this.days = days;
         this.hours = hours;
         this.minutes = minutes;
         this.parts = parts;
@@ -45,29 +44,17 @@ public final class JewishDate {
 
 
     public int getYear() {
-        possiblyCalculateDate();
         return year;
     }
 
 
     public int getMonth() {
-        possiblyCalculateDate();
         return month;
     }
 
 
     public int getDay() {
-        possiblyCalculateDate();
         return day;
-    }
-
-
-    public int getDays() {
-        if ((days == 0) && !isDateEmpty()) {
-            days = calculateDays();
-        }
-
-        return days;
     }
 
 
@@ -86,36 +73,18 @@ public final class JewishDate {
     }
 
 
-    private void possiblyCalculateDate() {
-        if (isDateEmpty() && (days != 0)) {
-            calculateDate();
-        }
-    }
-
-
-    private boolean isDateEmpty() {
-        return (year == 0);
-    }
-
-
     public JewishDate getDate() {
-        return new JewishDate(getYear(), getMonth(), getDay(), getDays(), 0, 0, 0);
+        return new JewishDate(getYear(), getMonth(), getDay(), 0, 0, 0);
     }
 
 
     public JewishDate getTime() {
-        return new JewishDate(0, 0, 0, 0, getHours(), getMinutes(), getParts());
+        return new JewishDate(0, 0, 0, getHours(), getMinutes(), getParts());
     }
 
 
-    private void calculateDate() {
-        // @todo
-    }
-
-
-    private int calculateDays() {
-        // @todo !!!
-        return 0;
+    public String toString() {
+        return JewishCalendar.monthName(getYear(), getMonth()) + " " + getDay() + ", " + getYear();
     }
 
 
@@ -126,9 +95,6 @@ public final class JewishDate {
 
 
     private final int day;
-
-
-    private /*final*/ int days;
 
 
     private final int hours;
