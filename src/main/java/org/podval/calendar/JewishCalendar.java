@@ -3,46 +3,6 @@ package org.podval.calendar;
 
 public final class JewishCalendar {
 
-    public static long PARTS_IN_HOUR = 1080;
-
-
-    public static int MINUTES_IN_HOUR = 60;
-
-
-    public static final long PARTS_IN_MINUTE = PARTS_IN_HOUR / MINUTES_IN_HOUR;
-
-
-    public static final int HOURS_IN_DAY = 24;
-
-
-    public static final long PARTS_IN_DAY = HOURS_IN_DAY * PARTS_IN_HOUR;
-
-
-    public static int daysFromParts(final long parts) {
-        return (int) (parts / PARTS_IN_DAY);
-    }
-
-
-    public static int hoursFromParts(final long parts) {
-        return (int) ((parts % PARTS_IN_DAY) / PARTS_IN_HOUR);
-    }
-
-
-    public static int minutesFromParts(final long parts) {
-        return (int) ((parts % PARTS_IN_HOUR) / PARTS_IN_MINUTE);
-    }
-
-
-    public static int partsFromParts(final long parts) {
-        return (int) (parts % PARTS_IN_MINUTE);
-    }
-
-
-    public static int hoursMinutesAndPartsFromParts(final long parts) {
-        return (int) (parts % PARTS_IN_DAY);
-    }
-
-
     public static int dayOfTheWeek(final int days) {
         return (int) ((days + 5) % 7 + 1);
     }
@@ -104,43 +64,33 @@ public final class JewishCalendar {
     public static final int MONTHS_IN_CYCLE = monthsBeforeYearInCycle(YEARS_IN_CYCLE+1);
 
 
-    // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3 )
-    public static final long LUNAR_MONTH = 29 * PARTS_IN_DAY + 12 * PARTS_IN_HOUR + 793;
-
-
-    // Molad of the year of Creation:
-    // BeHaRaD: 5 hours 204 parts at night of the second day of Creation (KH 6:8)
-    // Our epoch is the 6th day, creation of Man, the first Rosh HaShono
-    public static final long FIRST_MOLAD = -5*PARTS_IN_DAY + (1*PARTS_IN_DAY + 5*PARTS_IN_HOUR + 204);
-
-
     public static long molad(final int year, final int month) {
         final int monthsInPreviousCycles = (cycleNumber(year)-1) * MONTHS_IN_CYCLE;
         final int monthInPreviousYears = monthsBeforeYearInCycle(yearInCycle(year));
         final int moladNumber = monthsInPreviousCycles + monthInPreviousYears + (month - 1);
-        return FIRST_MOLAD + LUNAR_MONTH * moladNumber;
+        return Units.FIRST_MOLAD + Units.LUNAR_MONTH * moladNumber;
     }
 
 
     public static int dayOfRoshHaShono(final int year) {
         final long molad = molad(year, 1);
-        int result = daysFromParts(molad);
+        int result = Units.daysFromParts(molad);
 
         final int moladDayOfTheWeek = dayOfTheWeek(result);
         if (isADU(moladDayOfTheWeek)) {
             // KH 7:1
             result++;
-        } else if (hoursFromParts(molad) >= 18) {
+        } else if (Units.hoursFromParts(molad) >= 18) {
             // KH 7:2
             result++;
             if (isADU(moladDayOfTheWeek % 7 + 1)) {
                 // KH 7:3
                 result++;
             }
-        } else if ((moladDayOfTheWeek == 3) && !isLeap(year) && notEarlierInTheDayThan(molad, 9, 240)) {
+        } else if ((moladDayOfTheWeek == 3) && !isLeap(year) && Units.notEarlierInTheDayThan(molad, 9, 240)) {
             // KH 7:4
             result += 2;
-        } else if ((moladDayOfTheWeek == 2) && isLeap(year-1) && notEarlierInTheDayThan(molad, 15, 589)) {
+        } else if ((moladDayOfTheWeek == 2) && isLeap(year-1) && Units.notEarlierInTheDayThan(molad, 15, 589)) {
             // KH 7:5
             result += 1;
         }
@@ -154,91 +104,6 @@ public final class JewishCalendar {
     }
 
 
-    private static boolean notEarlierInTheDayThan(final long molad, final int hour, final int parts) {
-        return hoursMinutesAndPartsFromParts(molad) >= hour * PARTS_IN_HOUR + parts;
-    }
-
-
-    public enum YearKind { LACKING, ORDERLY, FULL }
-
-
-    // KH 8:5,6
-    private static final int[] DAYS_IN_MONTH = {
-        30, // Tishri
-        29, // MarHeshvan // or 30
-        30, // Kislev     // or 29
-        29, // Tevet
-        30, // Shevat
-        30, // Adar I
-        29, // Adar [II]
-        30, // Nissan
-        29, // Iyyar
-        30, // Sivan
-        29, // Tammuz
-        30, // Av
-        29  // Elul
-    };
-
-
-    public static int daysInMonth(final int year, final YearKind yearKind, final int month) {
-        int correctedMonth = correctedMonth(year, month);
-
-        int result = DAYS_IN_MONTH[correctedMonth-1];
-        if ((correctedMonth == 2) && (yearKind == YearKind.LACKING)) {
-            result--;
-        } else if ((correctedMonth == 1) && (yearKind == YearKind.FULL)) {
-            result++;
-        }
-
-        return result;
-    }
-
-
-    private static final String[] MONTH_NAME = {
-        "Tishri",
-        "MarHeshvan",
-        "Kislev",
-        "Tevet",
-        "Shevat",
-        "Adar I",
-        "Adar [II]",
-        "Nissan",
-        "Iyyar",
-        "Sivan",
-        "Tammuz",
-        "Av",
-        "Elul"
-    };
-
-
-    public static String monthName(final int year, final int month) {
-        int correctedMonth = correctedMonth(year, month);
-        String result = MONTH_NAME[correctedMonth];
-        if ((correctedMonth == 6) && isLeap(year)) {
-            result += " II";
-        }
-        return result;
-    }
-
-
-    private static int correctedMonth(final int year, final int month) {
-        int result = month;
-        if (!isLeap(year) && (result >= 5)) {
-            result++;
-        }
-        return result;
-    }
-
-    public static int daysBeforeMonth(final int year, final int month) {
-        int result = 0;
-        final YearKind yearKind = yearKind(year);
-        for (int m = 1; m <month; m++) {
-            result += daysInMonth(year, yearKind, m);
-        }
-        return result;
-    }
-
-
     // KH 8:7,8
     public static YearKind yearKind(final int year) {
         final YearKind result;
@@ -249,9 +114,9 @@ public final class JewishCalendar {
 
         if (!isLeap(year)) {
             if (difference == 2) {
-                result = YearKind.LACKING;
+                result = YearKind.SHORT;
             } else if (difference == 3) {
-                result = YearKind.ORDERLY;
+                result = YearKind.REGULAR;
             } else if (difference == 4) {
                 result = YearKind.FULL;
             } else {
@@ -259,9 +124,9 @@ public final class JewishCalendar {
             }
         } else {
             if (difference == 4) {
-                result = YearKind.LACKING;
+                result = YearKind.SHORT;
             } else if (difference == 5) {
-                result = YearKind.ORDERLY;
+                result = YearKind.REGULAR;
             } else if (difference == 6) {
                 result = YearKind.FULL;
             } else {
@@ -273,8 +138,15 @@ public final class JewishCalendar {
     }
 
 
-    public static int daysFromDate(final int year, final int month, final int day) {
-        return dayOfRoshHaShono(year) + daysBeforeMonth(year, month) + day - 1;
+    public static int daysFromDate(final int year, final JewishMonth month, final int day) {
+        int daysBeforeMonth = 0;
+        for (final Month m : getMonths(year)) {
+            if (m.month == month) {
+                break;
+            }
+            daysBeforeMonth += m.days;
+        }
+        return dayOfRoshHaShono(year) + daysBeforeMonth + day - 1;
     }
 
 
@@ -284,7 +156,6 @@ public final class JewishCalendar {
 
 
     public static JewishDate dateFromDays(final int days) {
-        // @todo
         int year = (4 * days / (4 * 365 + 1));
         while (true) {
             if (dayOfRoshHaShono(year+1) > days) {
@@ -293,20 +164,24 @@ public final class JewishCalendar {
             year++;
         }
 
-        final YearKind yearKind = yearKind(year);
         int daysInYear = days - dayOfRoshHaShono(year);
 
-        int month = 1;
-        while (true) {
-            int daysInMonth = daysInMonth(year, yearKind, month);
+        Month month = null;
+        for (final Month m : getMonths(year)) {
+            final int daysInMonth = m.days;
             if (daysInYear < daysInMonth) {
+                month = m;
                 break;
             }
             daysInYear -= daysInMonth;
-            month++;
         }
 
-        return new JewishDate(year, month, daysInYear);
+        return new JewishDate(year, month.month, daysInYear);
+    }
+
+
+    private static Month[] getMonths(final int year) {
+        return Months.getMonths(isLeap(year), yearKind(year));
     }
 
 
@@ -317,6 +192,6 @@ public final class JewishCalendar {
 //            "Molad on " + dayOfTheWeek(days) +
 //            " at " + minutesFromParts(molad) + " min " +
 //            " and " + partsFromParts(molad) + " parts");
-        System.out.println(new JewishDate(1, 1, 1));
+        System.out.println(new JewishDate(1, JewishMonth.Tishri, 1));
     }
 }

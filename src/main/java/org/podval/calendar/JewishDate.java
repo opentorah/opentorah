@@ -3,23 +3,20 @@ package org.podval.calendar;
 
 public final class JewishDate {
 
-//    public enum Month { Tishrei, MarHeshvan, Kislev, Tevet, Shevat, Adar, Adar2, Nissan, Iyar, Sivan, Tamuz, Av, Elul }
-
-
     public static JewishDate createFromParts(final long allParts) {
         return new JewishDate(
             0,
+            null,
             0,
-            0,
-            JewishCalendar.hoursFromParts(allParts),
-            JewishCalendar.minutesFromParts(allParts),
-            JewishCalendar.partsFromParts(allParts));
+            Units.hoursFromParts(allParts),
+            Units.minutesFromParts(allParts),
+            Units.partsFromParts(allParts));
     }
 
 
     public JewishDate(
         final int year,
-        final int month,
+        final JewishMonth month,
         final int day)
     {
         this(year, month, day, 0, 0, 0);
@@ -28,7 +25,7 @@ public final class JewishDate {
 
     public JewishDate(
         final int year,
-        final int month,
+        final JewishMonth month,
         final int day,
         final int hours,
         final int minutes,
@@ -48,7 +45,7 @@ public final class JewishDate {
     }
 
 
-    public int getMonth() {
+    public JewishMonth getMonth() {
         return month;
     }
 
@@ -79,19 +76,20 @@ public final class JewishDate {
 
 
     public JewishDate getTime() {
-        return new JewishDate(0, 0, 0, getHours(), getMinutes(), getParts());
+        return new JewishDate(0, null, 0, getHours(), getMinutes(), getParts());
     }
 
 
+    @Override
     public String toString() {
-        return JewishCalendar.monthName(getYear(), getMonth()) + " " + getDay() + ", " + getYear();
+        return getMonth() + " " + getDay() + ", " + getYear();
     }
 
 
     private final int year;
 
 
-    private final int month;
+    private final JewishMonth month;
 
 
     private final int day;
