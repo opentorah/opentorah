@@ -16,7 +16,7 @@ public final class JewishDate {
 
     public JewishDate(
         final int year,
-        final JewishMonth month,
+        final Month month,
         final int day)
     {
         this(year, month, day, 0, 0, 0);
@@ -25,7 +25,7 @@ public final class JewishDate {
 
     public JewishDate(
         final int year,
-        final JewishMonth month,
+        final Month month,
         final int day,
         final int hours,
         final int minutes,
@@ -45,7 +45,7 @@ public final class JewishDate {
     }
 
 
-    public JewishMonth getMonth() {
+    public Month getMonth() {
         return month;
     }
 
@@ -89,7 +89,7 @@ public final class JewishDate {
     private final int year;
 
 
-    private final JewishMonth month;
+    private final Month month;
 
 
     private final int day;

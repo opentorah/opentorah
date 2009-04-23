@@ -10,6 +10,12 @@ public final class Month {
     }
 
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
+
     public final JewishMonth month;
 
 

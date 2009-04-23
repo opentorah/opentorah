@@ -8,65 +8,9 @@ public final class JewishCalendar {
     }
 
 
-    public static final int YEARS_IN_CYCLE = 19;
-
-
-    private static final boolean[] IS_LEAP = new boolean[YEARS_IN_CYCLE];
-
-
-    static {
-        IS_LEAP[3] = true;
-        IS_LEAP[6] = true;
-        IS_LEAP[8] = true;
-        IS_LEAP[11] = true;
-        IS_LEAP[14] = true;
-        IS_LEAP[17] = true;
-        IS_LEAP[0] = true; // 19th year
-    }
-
-
-    public static boolean isLeap(final int year) {
-        return IS_LEAP[yearInCycle(year)];
-    }
-
-
-    public static int cycleNumber(final int year) {
-        return year / YEARS_IN_CYCLE + 1;
-    }
-
-
-    public static int yearInCycle(final int year) {
-        return year % YEARS_IN_CYCLE;
-    }
-
-
-    public static int monthsInYear(final int year) {
-        return isLeap(year) ? 13 : 12;
-    }
-
-
-    private static final int[] MONTHS_BEFORE_YEAR_IN_CYCLE = new int[YEARS_IN_CYCLE+1];
-
-
-    static {
-        MONTHS_BEFORE_YEAR_IN_CYCLE[0] = 0;
-        for (int year = 1; year <= YEARS_IN_CYCLE; year++) {
-            MONTHS_BEFORE_YEAR_IN_CYCLE[year] = MONTHS_BEFORE_YEAR_IN_CYCLE[year-1] + monthsInYear(year-1);
-        }
-    }
-
-
-    public static int monthsBeforeYearInCycle(final int yearInCycle) {
-        return MONTHS_BEFORE_YEAR_IN_CYCLE[yearInCycle-1];
-    }
-
-
-    public static final int MONTHS_IN_CYCLE = monthsBeforeYearInCycle(YEARS_IN_CYCLE+1);
-
-
     public static long molad(final int year, final int month) {
-        final int monthsInPreviousCycles = (cycleNumber(year)-1) * MONTHS_IN_CYCLE;
-        final int monthInPreviousYears = monthsBeforeYearInCycle(yearInCycle(year));
+        final int monthsInPreviousCycles = (Years.cycleNumber(year)-1) * Years.MONTHS_IN_CYCLE;
+        final int monthInPreviousYears = Years.monthsBeforeYearInCycle(Years.yearInCycle(year));
         final int moladNumber = monthsInPreviousCycles + monthInPreviousYears + (month - 1);
         return Units.FIRST_MOLAD + Units.LUNAR_MONTH * moladNumber;
     }
@@ -87,10 +31,10 @@ public final class JewishCalendar {
                 // KH 7:3
                 result++;
             }
-        } else if ((moladDayOfTheWeek == 3) && !isLeap(year) && Units.notEarlierInTheDayThan(molad, 9, 240)) {
+        } else if ((moladDayOfTheWeek == 3) && !Years.isLeap(year) && Units.notEarlierInTheDayThan(molad, 9, 240)) {
             // KH 7:4
             result += 2;
-        } else if ((moladDayOfTheWeek == 2) && isLeap(year-1) && Units.notEarlierInTheDayThan(molad, 15, 589)) {
+        } else if ((moladDayOfTheWeek == 2) && Years.isLeap(year-1) && Units.notEarlierInTheDayThan(molad, 15, 589)) {
             // KH 7:5
             result += 1;
         }
@@ -112,7 +56,7 @@ public final class JewishCalendar {
         final int nextRoshHaShono = dayOfRoshHaShono(year+1);
         final int difference = dayOfTheWeek(nextRoshHaShono) - dayOfTheWeek(roshHaShono) - 1;
 
-        if (!isLeap(year)) {
+        if (!Years.isLeap(year)) {
             if (difference == 2) {
                 result = YearKind.SHORT;
             } else if (difference == 3) {
@@ -138,14 +82,48 @@ public final class JewishCalendar {
     }
 
 
-    public static int daysFromDate(final int year, final JewishMonth month, final int day) {
+    public static JewishDate dateFromDate(final int year, final JewishMonth monthName, final int day) {
+        final boolean isLeap = Years.isLeap(year);
+
+        if (isLeap) {
+            if (monthName == JewishMonth.Adar) {
+                throw new IllegalArgumentException("No Adar in a leap year");
+            }
+        } else {
+            if ((monthName == JewishMonth.AdarI) || (monthName == JewishMonth.AdarII)) {
+                throw new IllegalArgumentException("No numbered Adar in a non-leap year");
+            }
+        }
+
+        Month month = null;
+        for (final Month m : getMonths(year)) {
+            if (m.month == monthName) {
+                month = m;
+                break;
+            }
+        }
+
+        if (day < 1) {
+            throw new IllegalArgumentException("Day number must be no less than 1");
+        }
+
+        if (day > month.days) {
+            throw new IllegalArgumentException("No such day in the month");
+        }
+
+        return new JewishDate(year, month, day);
+    }
+
+
+    public static int daysFromDate(final int year, final Month month, final int day) {
         int daysBeforeMonth = 0;
         for (final Month m : getMonths(year)) {
-            if (m.month == month) {
+            if (m == month) {
                 break;
             }
             daysBeforeMonth += m.days;
         }
+
         return dayOfRoshHaShono(year) + daysBeforeMonth + day - 1;
     }
 
@@ -176,12 +154,12 @@ public final class JewishCalendar {
             daysInYear -= daysInMonth;
         }
 
-        return new JewishDate(year, month.month, daysInYear);
+        return new JewishDate(year, month, daysInYear);
     }
 
 
     private static Month[] getMonths(final int year) {
-        return Months.getMonths(isLeap(year), yearKind(year));
+        return Months.getMonths(Years.isLeap(year), yearKind(year));
     }
 
 
@@ -192,6 +170,6 @@ public final class JewishCalendar {
 //            "Molad on " + dayOfTheWeek(days) +
 //            " at " + minutesFromParts(molad) + " min " +
 //            " and " + partsFromParts(molad) + " parts");
-        System.out.println(new JewishDate(1, JewishMonth.Tishri, 1));
+        System.out.println(dateFromDate(1, JewishMonth.Tishri, 1));
     }
 }
