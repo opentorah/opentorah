@@ -86,6 +86,14 @@ public final class JewishDate {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof JewishDate)) return false;
+        final JewishDate other = (JewishDate) o;
+        return (getYear() == other.getYear()) && (getMonth() == other.getMonth()) && (getDay() == other.getDay());
+    }
+
+
     private final int year;
 
 

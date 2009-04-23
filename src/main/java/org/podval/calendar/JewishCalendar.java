@@ -54,24 +54,26 @@ public final class JewishCalendar {
 
         final int roshHaShono = dayOfRoshHaShono(year);
         final int nextRoshHaShono = dayOfRoshHaShono(year+1);
-        final int difference = dayOfTheWeek(nextRoshHaShono) - dayOfTheWeek(roshHaShono) - 1;
+        final int daysDifference = nextRoshHaShono - roshHaShono;
+        final int dayOfTheWeekDifference = (daysDifference - 1) % 7;
+//        final int dayOfTheWeekDifference = dayOfTheWeek(nextRoshHaShono) - dayOfTheWeek(roshHaShono) - 2;
 
         if (!Years.isLeap(year)) {
-            if (difference == 2) {
+            if (dayOfTheWeekDifference == 2) {
                 result = YearKind.SHORT;
-            } else if (difference == 3) {
+            } else if (dayOfTheWeekDifference == 3) {
                 result = YearKind.REGULAR;
-            } else if (difference == 4) {
+            } else if (dayOfTheWeekDifference == 4) {
                 result = YearKind.FULL;
             } else {
                 throw new Error();
             }
         } else {
-            if (difference == 4) {
+            if (dayOfTheWeekDifference == 4) {
                 result = YearKind.SHORT;
-            } else if (difference == 5) {
+            } else if (dayOfTheWeekDifference == 5) {
                 result = YearKind.REGULAR;
-            } else if (difference == 6) {
+            } else if (dayOfTheWeekDifference == 6) {
                 result = YearKind.FULL;
             } else {
                 throw new Error();
@@ -154,7 +156,7 @@ public final class JewishCalendar {
             daysInYear -= daysInMonth;
         }
 
-        return new JewishDate(year, month, daysInYear);
+        return new JewishDate(year, month, daysInYear+1);
     }
 
 
