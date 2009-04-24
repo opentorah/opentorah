@@ -58,4 +58,63 @@ public final class Years {
 
 
     public static final int MONTHS_IN_CYCLE = monthsBeforeYearInCycle(YEARS_IN_CYCLE+1);
+
+
+    public static long molad(final int year, final int month) {
+        final int monthsInPreviousCycles = (cycleNumber(year)-1) * MONTHS_IN_CYCLE;
+        final int monthInPreviousYears = monthsBeforeYearInCycle(yearInCycle(year));
+        final int moladNumber = monthsInPreviousCycles + monthInPreviousYears + (month - 1);
+        return Days.FIRST_MOLAD + Days.LUNAR_MONTH * moladNumber;
+    }
+
+
+    public static int dayOfRoshHaShono(final int year) {
+        final long molad = molad(year, 1);
+        int result = Days.daysFromParts(molad);
+
+        final int moladDayOfTheWeek = Days.dayOfTheWeek(result);
+        if (isADU(moladDayOfTheWeek)) {
+            // KH 7:1
+            result++;
+        } else if (Days.hoursFromParts(molad) >= 18) {
+            // KH 7:2
+            result++;
+            if (isADU(moladDayOfTheWeek % 7 + 1)) {
+                // KH 7:3
+                result++;
+            }
+        } else if ((moladDayOfTheWeek == 3) && !Years.isLeap(year) && Days.notEarlierInTheDayThan(molad, 9, 240)) {
+            // KH 7:4
+            result += 2;
+        } else if ((moladDayOfTheWeek == 2) && Years.isLeap(year-1) && Days.notEarlierInTheDayThan(molad, 15, 589)) {
+            // KH 7:5
+            result += 1;
+        }
+
+        return result;
+    }
+
+
+    private static boolean isADU(final int dayOfTheWeek) {
+        return (dayOfTheWeek == 1) || (dayOfTheWeek == 4) || (dayOfTheWeek == 6);
+    }
+
+
+    public static int yearLength(final int year) {
+        return dayOfRoshHaShono(year+1) - dayOfRoshHaShono(year);
+    }
+
+
+    public static int yearDayIsIn(final int days) {
+        int result = (4 * days / (4 * 365 + 1));
+
+        while (true) {
+            if (dayOfRoshHaShono(result + 1) > days) {
+                break;
+            }
+            result++;
+        }
+
+        return result;
+    }
 }

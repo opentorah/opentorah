@@ -8,9 +8,9 @@ public final class JewishDate {
             0,
             null,
             0,
-            Units.hoursFromParts(allParts),
-            Units.minutesFromParts(allParts),
-            Units.partsFromParts(allParts));
+            Days.hoursFromParts(allParts),
+            Days.minutesFromParts(allParts),
+            Days.partsFromParts(allParts));
     }
 
 
@@ -91,6 +91,19 @@ public final class JewishDate {
         if (!(o instanceof JewishDate)) return false;
         final JewishDate other = (JewishDate) o;
         return (getYear() == other.getYear()) && (getMonth() == other.getMonth()) && (getDay() == other.getDay());
+    }
+
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 89 * hash + this.year;
+        hash = 89 * hash + (this.month != null ? this.month.hashCode() : 0);
+        hash = 89 * hash + this.day;
+        hash = 89 * hash + this.hours;
+        hash = 89 * hash + this.minutes;
+        hash = 89 * hash + (int) (this.parts ^ (this.parts >>> 32));
+        return hash;
     }
 
 

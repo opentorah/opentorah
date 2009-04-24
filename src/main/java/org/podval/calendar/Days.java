@@ -1,7 +1,7 @@
 package org.podval.calendar;
 
 
-public final class Units {
+public final class Days {
 
     public static long PARTS_IN_HOUR = 1080;
 
@@ -55,5 +55,10 @@ public final class Units {
 
     public static boolean notEarlierInTheDayThan(final long when, final int hour, final int parts) {
         return hoursMinutesAndPartsFromParts(when) >= hour * PARTS_IN_HOUR + parts;
+    }
+
+
+    public static int dayOfTheWeek(final int days) {
+        return (int) ((days + 5) % 7 + 1);
     }
 }

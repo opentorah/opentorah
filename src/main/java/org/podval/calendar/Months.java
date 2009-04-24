@@ -122,21 +122,26 @@ public class Months {
     };
 
 
-    public static Month[] getMonths(final boolean isLeap, final YearKind yearKind) {
-        Month[] result = null;
+    // KH 8:7,8
+    public static Month[] getMonths(final int year) {
+        final int yearLength = Years.yearLength(year);
 
-        if (!isLeap) {
-            switch (yearKind) {
-            case SHORT: result = NORMAL_SHORT_YEAR; break;
-            case REGULAR: result = NORMAL_REGULAR_YEAR; break;
-            case FULL: result = NORMAL_FULL_YEAR; break;
-            }
+        final Month[] result;
+
+        if (yearLength == 355) {
+            result = NORMAL_FULL_YEAR;
+        } else if (yearLength == 354) {
+            result = NORMAL_REGULAR_YEAR;
+        } else if (yearLength == 353) {
+            result = NORMAL_SHORT_YEAR;
+        } else if (yearLength == 385) {
+            result = LEAP_FULL_YEAR;
+        } else if (yearLength == 384) {
+            result = LEAP_REGULAR_YEAR;
+        } else if (yearLength == 383) {
+            result = LEAP_SHORT_YEAR;
         } else {
-            switch (yearKind) {
-            case SHORT: result = LEAP_SHORT_YEAR; break;
-            case REGULAR: result = LEAP_REGULAR_YEAR; break;
-            case FULL: result = LEAP_FULL_YEAR; break;
-            }
+            throw new Error("Bug in year length calculations!");
         }
 
         return result;
