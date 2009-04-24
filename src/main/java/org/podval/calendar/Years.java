@@ -69,6 +69,10 @@ public final class Years {
 
 
     public static int dayOfRoshHaShono(final int year) {
+        if (year == 1) {
+            return 1;
+        }
+
         final long molad = molad(year, 1);
         int result = Days.daysFromParts(molad);
 

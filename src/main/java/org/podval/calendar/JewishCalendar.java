@@ -30,7 +30,10 @@ public final class JewishCalendar {
     }
 
 
-    public static int daysFromDate(final int year, final Month month, final int day) {
+    public static int daysFromDate(final JewishDate date) {
+        final int year = date.getYear();
+        final Month month = date.getMonth();
+
         int daysBeforeMonth = 0;
         for (final Month m : Months.getMonths(year)) {
             if (m == month) {
@@ -39,12 +42,7 @@ public final class JewishCalendar {
             daysBeforeMonth += m.days;
         }
 
-        return Years.dayOfRoshHaShono(year) + daysBeforeMonth + day - 1;
-    }
-
-
-    public static int daysFromDate(final JewishDate date) {
-        return daysFromDate(date.getYear(), date.getMonth(), date.getDay());
+        return Years.dayOfRoshHaShono(year) + daysBeforeMonth + date.getDay() - 1;
     }
 
 
