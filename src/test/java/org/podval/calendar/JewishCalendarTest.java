@@ -6,6 +6,9 @@ import org.junit.Assert;
 
 public class JewishCalendarTest {
 
+    private static final JewishCalendar jewishCalendar = Calendar.getJewish();
+
+
 //    @Test
     public void date2days2date() {
         date2days2date(1, JewishMonth.Tishri, 1);
@@ -15,8 +18,8 @@ public class JewishCalendarTest {
 
 
     private void date2days2date(final int year, final JewishMonth month, final int day) {
-        final JewishDate date = JewishCalendar.dateFromDate(year, month, day);
-        Assert.assertEquals(date, JewishCalendar.dateFromDays(JewishCalendar.daysFromDate(date)));
+        final Date date = jewishCalendar.dateFromDate(year, month, day);
+        Assert.assertEquals(date, jewishCalendar.dateFromDays(jewishCalendar.daysFromDate(date)));
     }
 
 
@@ -34,7 +37,7 @@ public class JewishCalendarTest {
 
 
     private void days2date2days(final int days) {
-        Assert.assertEquals(days, JewishCalendar.daysFromDate(JewishCalendar.dateFromDays(days)));
+        Assert.assertEquals(days, jewishCalendar.daysFromDate(jewishCalendar.dateFromDays(days)));
     }
 
 
@@ -45,7 +48,7 @@ public class JewishCalendarTest {
 
 
     private void date2days(final int days, final int year, final JewishMonth month, final int day) {
-        Assert.assertEquals(days, JewishCalendar.daysFromDate(JewishCalendar.dateFromDate(year, month, day)));
+        Assert.assertEquals(days, jewishCalendar.daysFromDate(jewishCalendar.dateFromDate(year, month, day)));
     }
 
 
@@ -56,6 +59,6 @@ public class JewishCalendarTest {
 
 
     private void days2date(final int days, final int year, final JewishMonth month, final int day) {
-        Assert.assertEquals(JewishCalendar.dateFromDays(days), JewishCalendar.dateFromDate(year, month, day));
+        Assert.assertEquals(jewishCalendar.dateFromDays(days), jewishCalendar.dateFromDate(year, month, day));
     }
 }

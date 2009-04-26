@@ -3,11 +3,14 @@ package org.podval.calendar;
 
 public class BirkatHahama {
 
-    public static final int FIRST = JewishCalendar.daysFromDate(JewishCalendar.dateFromDate(1, JewishMonth.Nissan, 4));
+    private static JewishCalendar jewishCalendar = Calendar.getJewish();
 
 
-    public static JewishDate dateFromNumber(final int number) {
-        return JewishCalendar.dateFromDays(FIRST + number * (28 * 365 + 7));
+    public static final int FIRST = jewishCalendar.daysFromDate(jewishCalendar.dateFromDate(1, JewishMonth.Nissan, 4));
+
+
+    public static Date dateFromNumber(final int number) {
+        return jewishCalendar.dateFromDays(FIRST + number * (28 * 365 + 7));
     }
 
 
