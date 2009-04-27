@@ -6,7 +6,11 @@
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>calendar</name>
-    <url>http://maven.apache.org</url>
+    <url>http://calendar.podval.org</url>
+    <ciManagement>
+        <system>hudson</system>
+        <url>http://calendar.podval.org/hudson/job/calendar/</url>
+    </ciManagement>
     <build>
         <plugins>
             <plugin>
