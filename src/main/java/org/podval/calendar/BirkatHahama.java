@@ -43,9 +43,11 @@ public final class BirkatHahama {
 
     private void tabulateMonth(final String name, final int[] month) {
         System.out.println(name);
-        System.out.println("||Day||Times||");
+        System.out.println("||Day||Times||Histogram||");
         for (int day = 1; day <= 30; day++) {
-            System.out.println("||" + day + "||" + month[day] + "||");
+            final int number = month[day];
+            final String stars = (number == 0) ? "" : "*************************".substring(0, number);
+            System.out.println("||" + day + "||" + number + "||" + stars + "||");
         }
     }
 
