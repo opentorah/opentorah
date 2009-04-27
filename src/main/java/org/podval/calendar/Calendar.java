@@ -8,8 +8,16 @@ public abstract class Calendar<M> {
     private static final JewishCalendar jewishCalendar = new JewishCalendar();
 
 
+    private static final GregorianCalendar gregorianCalendar = new GregorianCalendar();
+
+
     public static JewishCalendar getJewish() {
         return jewishCalendar;
+    }
+
+
+    public static GregorianCalendar getGregorian() {
+        return gregorianCalendar;
     }
 
 

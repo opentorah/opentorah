@@ -34,7 +34,7 @@ public class Date<M> {
 
     @Override
     public String toString() {
-        return getMonth() + " " + getDay() + ", " + getYear();
+        return getYear() + " " + getMonth() + " " + getDay();
     }
 
 

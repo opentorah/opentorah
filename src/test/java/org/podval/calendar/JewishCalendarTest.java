@@ -9,7 +9,7 @@ public class JewishCalendarTest {
     private static final JewishCalendar jewishCalendar = Calendar.getJewish();
 
 
-//    @Test
+    @Test
     public void date2days2date() {
         date2days2date(1, JewishMonth.Tishri, 1);
         date2days2date(5768, JewishMonth.AdarII, 28);
@@ -23,9 +23,9 @@ public class JewishCalendarTest {
     }
 
 
-//    @Test
+    @Test
     public void days2date2days() {
-        days2date2days(1);
+        days2date2days(6);
         days2date2days(28);
         days2date2days(29);
         days2date2days(30);

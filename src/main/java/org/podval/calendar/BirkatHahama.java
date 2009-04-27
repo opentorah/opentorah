@@ -1,37 +1,57 @@
 package org.podval.calendar;
 
 
-public class BirkatHahama {
+public final class BirkatHahama {
 
-    private static JewishCalendar jewishCalendar = Calendar.getJewish();
-
-
-    public static final int FIRST = jewishCalendar.dateFromDate(1, JewishMonth.Nissan, 4).getDays();
+    public final int FIRST = Calendar.getJewish().dateFromDate(1, JewishMonth.Adar, 21).getDays();
 
 
-    public static Date dateFromNumber(final int number) {
-        return jewishCalendar.dateFromDays(FIRST + number * (28 * 365 + 7));
+    public Date<JewishMonth> getDate(final int number) {
+        return Calendar.getJewish().dateFromDays(FIRST + number * (28 * 365 + 7));
+    }
+
+
+    public void print() {
+        System.out.println("||Cycle||Jewish||Secular||");
+        for (int cycle = 0; cycle <= 214; cycle++) {
+            final Date<JewishMonth> jDate = getDate(cycle);
+            final Date<GregorianMonth> gDate = Calendar.getGregorian().dateFromDays(jDate.getDays());
+            System.out.println("||" + cycle + "||" + jDate + "||" + gDate + "||");
+        }
+    }
+
+
+    public void tabulate() {
+        final int[] adar = new int[31];
+        final int[] nissan = new int[31];
+
+        for (int cycle = 0; cycle <= 214; cycle++) {
+            final Date<JewishMonth> date = getDate(cycle);
+            if ((date.getMonth().month == JewishMonth.Adar) || (date.getMonth().month == JewishMonth.AdarII)) {
+                adar[date.getDay()]++;
+            } else if (date.getMonth().month == JewishMonth.Nissan) {
+                nissan[date.getDay()]++;
+            } else {
+                throw new Error();
+            }
+        }
+
+        tabulateMonth("Adar", adar);
+        tabulateMonth("Nissan", nissan);
+    }
+
+
+    private void tabulateMonth(final String name, final int[] month) {
+        System.out.println(name);
+        System.out.println("||Day||Times||");
+        for (int day = 1; day <= 30; day++) {
+            System.out.println("||" + day + "||" + month[day] + "||");
+        }
     }
 
 
     public static void main(final String[] args) {
-        System.out.println(dateFromNumber(203));
-        System.out.println(dateFromNumber(204));
-        System.out.println(dateFromNumber(205));
-        System.out.println(dateFromNumber(206));
-
-//        int days = 0;
-//        for (int y = 1; y <= 6000; y++) {
-//            int nextDays = jewishCalendar.daysFromParts(jewishCalendar.molad(y, 1));
-//            if (nextDays < days) {
-//                System.out.print("***** Offending year: " + y);
-//                break;
-//            }
-/////            System.out.println("Molad of year " + y + " on day " + days);
-//            days = nextDays;
-//        }
-
-//        System.out.println(jewishCalendar.molad(19, 1));
-//        System.out.println(jewishCalendar.molad(20, 1));
+        new BirkatHahama().print();
+        new BirkatHahama().tabulate();
     }
 }
