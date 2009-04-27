@@ -1,17 +1,12 @@
 package org.podval.calendar;
 
+import java.util.List;
 
 public final class GregorianCalendar extends Calendar<GregorianMonth> {
 
     @Override
     public int epoch() {
         return 1373427;
-    }
-
-
-    @Override
-    public int epochDayOfTheWeek() {
-        return 3; // @todo
     }
 
 
@@ -29,7 +24,7 @@ public final class GregorianCalendar extends Calendar<GregorianMonth> {
 
 
     @Override
-    public Month<GregorianMonth>[] getMonths(final int year) {
+    public List<Month<GregorianMonth>> getMonths(final int year) {
         throw new UnsupportedOperationException();
     }
 

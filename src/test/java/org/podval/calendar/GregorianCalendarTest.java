@@ -22,9 +22,5 @@ public class GregorianCalendarTest {
         final JewishMonth jMonth,
         final int jDay)
     {
-        final Date date = new Date(year-1900, month+1, day);
-        final JewishDate jDate = JewishCalendar.dateFromDate(jYear, jMonth, jDay);
-        final JewishDate cDate = JewishCalendar.dateFromDays(GregorianCalendar.daysFromDate(date));
-        Assert.assertEquals(jDate, cDate);
     }
 }

@@ -3,10 +3,17 @@ package org.podval.calendar;
 
 public class Date<M> {
 
-    public Date(final int year, final Month<M> month, final int day) {
+    public Date(final Calendar<M> calendar, final int days, final int year, final Month<M> month, final int day) {
+        this.calendar = calendar;
+        this.days = days;
         this.year = year;
         this.month = month;
         this.day = day;
+    }
+
+
+    public int getDays() {
+        return days;
     }
 
 
@@ -36,18 +43,22 @@ public class Date<M> {
         if (!(o instanceof Date)) return false;
         final Date other = (Date) o;
 
-        return (getYear() == other.getYear()) && getMonth().equals(other.getMonth()) && (getDay() == other.getDay());
+        return (getDays() == other.getDays());
     }
 
 
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 61 * hash + this.year;
-        hash = 61 * hash + (this.month != null ? this.month.hashCode() : 0);
-        hash = 61 * hash + this.day;
+        hash = 61 * hash + getDays();
         return hash;
     }
+
+
+    private final Calendar<M> calendar;
+
+
+    private final int days;
 
 
     private final int year;

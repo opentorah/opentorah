@@ -1,5 +1,7 @@
 package org.podval.calendar;
 
+import java.util.List;
+
 
 public abstract class Calendar<M> {
 
@@ -13,11 +15,13 @@ public abstract class Calendar<M> {
 
     public final Date dateFromDate(final int year, final M monthName, final int day) {
         Month<M> month = null;
+        int daysBeforeMonth = 0;
         for (final Month<M> m : getMonths(year)) {
             if (m.month == monthName) {
                 month = m;
                 break;
             }
+            daysBeforeMonth += m.days;
         }
 
         if (month == null) {
@@ -32,34 +36,18 @@ public abstract class Calendar<M> {
             throw new IllegalArgumentException("No such day in the month");
         }
 
-        return new Date<M>(year, month, day);
-    }
+        final int days = epoch() + daysInYearsBeforeYear(year) + daysBeforeMonth + day;
 
-
-    public final int daysFromDate(final Date<M> date) {
-        final int year = date.getYear();
-        return epoch() + daysInYearsBeforeYear(year) + daysBeforeMonth(year, date.getMonth()) + date.getDay() - 1;
-    }
-
-
-    public final int daysBeforeMonth(final int year, final Month<M> month) {
-        int result = 0;
-
-        for (final Month<M> m : getMonths(year)) {
-            if (m == month) {
-                break;
-            }
-            result += m.days;
-        }
-
-        return result;
+        return new Date<M>(this, days, year, month, day);
     }
 
 
     public final Date<M> dateFromDays(final int days) {
-        final int year = yearDayIsIn(days);
+        final int daysOfEpoch = days - epoch();
 
-        int daysInYear = days - daysInYearsBeforeYear(year);
+        final int year = yearDayIsIn(daysOfEpoch);
+
+        int daysInYear = daysOfEpoch - daysInYearsBeforeYear(year);
 
         Month<M> month = null;
         for (final Month<M> m : getMonths(year)) {
@@ -71,19 +59,16 @@ public abstract class Calendar<M> {
             daysInYear -= daysInMonth;
         }
 
-        return new Date(year, month, daysInYear+1);
+        return new Date(this, days, year, month, daysInYear+1);
     }
 
 
     public final int dayOfTheWeek(final int days) {
-        return (int) ((days + epochDayOfTheWeek()) % 7 + 1);
+        return (int) (days % 7 + 1);
     }
 
 
     public abstract int epoch();
-
-
-    public abstract int epochDayOfTheWeek();
 
 
     protected abstract int daysInYearsBeforeYear(final int year);
@@ -92,7 +77,7 @@ public abstract class Calendar<M> {
     protected abstract int yearDayIsIn(final int days);
 
 
-    public abstract Month<M>[] getMonths(final int year);
+    public abstract List<Month<M>> getMonths(final int year);
 
 
     protected abstract void monthNotFound(final int year, final M monthName);

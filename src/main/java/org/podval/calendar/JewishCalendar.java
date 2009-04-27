@@ -1,5 +1,8 @@
 package org.podval.calendar;
 
+import java.util.List;
+import java.util.LinkedList;
+
 
 public final class JewishCalendar extends Calendar<JewishMonth> {
 
@@ -17,17 +20,91 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
         for (int year = 2; year <= YEARS_IN_CYCLE+1; year++) {
             monthsBeforeYearInCycle[year] = monthsBeforeYearInCycle[year-1] + monthsInYear(year-1);
         }
+        MONTHS_IN_CYCLE = monthsBeforeYearInCycle[YEARS_IN_CYCLE+1];
+
+        // KH 8:5,6
+
+        addMonthToAllYears(new Month(JewishMonth.Tishri, "Tishri", 30));
+
+        final Month<JewishMonth> MarHeshvanShort = new Month(JewishMonth.MarHeshvan, "MarHeshvan", 29);
+        final Month<JewishMonth> MarHeshvanFull = new Month(JewishMonth.MarHeshvan, "MarHeshvan", 30);
+        final Month<JewishMonth> KislevShort = new Month(JewishMonth.Kislev, "Kislev", 29);
+        final Month<JewishMonth> KislevFull = new Month(JewishMonth.Kislev, "Kislev", 30);
+
+        shortNormalYear.add(MarHeshvanShort);
+        shortNormalYear.add(KislevShort);
+        shortLeapYear.add(MarHeshvanShort);
+        shortLeapYear.add(KislevShort);
+
+        regularNormalYear.add(MarHeshvanShort);
+        regularNormalYear.add(KislevFull);
+        regularLeapYear.add(MarHeshvanShort);
+        regularLeapYear.add(KislevFull);
+
+        fullNormalYear.add(MarHeshvanFull);
+        fullNormalYear.add(KislevFull);
+        fullLeapYear.add(MarHeshvanFull);
+        fullLeapYear.add(KislevFull);
+
+        addMonthToAllYears(new Month(JewishMonth.Tevet, "Tevet", 29));
+        addMonthToAllYears(new Month(JewishMonth.Shevat, "Shevat", 30));
+
+        final Month<JewishMonth> AdarI = new Month(JewishMonth.AdarI, "Adar I", 30);
+        final Month<JewishMonth> Adar = new Month(JewishMonth.Adar, "Adar", 29);
+        final Month<JewishMonth> AdarII = new Month(JewishMonth.AdarII, "Adar II", 29);
+
+        shortNormalYear.add(Adar);
+        regularNormalYear.add(Adar);
+        fullNormalYear.add(Adar);
+
+        shortLeapYear.add(AdarI);
+        shortLeapYear.add(AdarII);
+        regularLeapYear.add(AdarI);
+        regularLeapYear.add(AdarII);
+        fullLeapYear.add(AdarI);
+        fullLeapYear.add(AdarII);
+
+        addMonthToAllYears(new Month(JewishMonth.Nissan, "Nissan", 30));
+        addMonthToAllYears(new Month(JewishMonth.Iyyar, "Iyyar", 29));
+        addMonthToAllYears(new Month(JewishMonth.Sivan, "Sivan", 30));
+        addMonthToAllYears(new Month(JewishMonth.Tammuz, "Tammuz", 29));
+        addMonthToAllYears(new Month(JewishMonth.Av, "Av", 30));
+        addMonthToAllYears(new Month(JewishMonth.Elul, "Elul", 29));
+    }
+
+
+
+    private void addMonthToAllYears(final Month<JewishMonth> month) {
+        shortNormalYear.add(month);
+        regularNormalYear.add(month);
+        fullNormalYear.add(month);
+        shortLeapYear.add(month);
+        regularLeapYear.add(month);
+        fullLeapYear.add(month);
+    }
+
+
+    private final List<Month<JewishMonth>> shortNormalYear = new LinkedList<Month<JewishMonth>>();
+    private final List<Month<JewishMonth>> regularNormalYear = new LinkedList<Month<JewishMonth>>();
+    private final List<Month<JewishMonth>> fullNormalYear = new LinkedList<Month<JewishMonth>>();
+    private final List<Month<JewishMonth>> shortLeapYear = new LinkedList<Month<JewishMonth>>();
+    private final List<Month<JewishMonth>> regularLeapYear = new LinkedList<Month<JewishMonth>>();
+    private final List<Month<JewishMonth>> fullLeapYear = new LinkedList<Month<JewishMonth>>();
+
+
+    private final int[] monthsBeforeYearInCycle = new int[YEARS_IN_CYCLE+2];
+
+
+    public final int MONTHS_IN_CYCLE;
+
+
+    public int monthsBeforeYearInCycle(final int yearInCycle) {
+        return monthsBeforeYearInCycle[(yearInCycle == 0) ? YEARS_IN_CYCLE : yearInCycle];
     }
 
 
     @Override
     public int epoch() {
-        return 0;
-    }
-
-
-    @Override
-    public int epochDayOfTheWeek() {
         return 5;
     }
 
@@ -43,7 +120,8 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
         int result = (4 * days / (4 * 365 + 1));
 
         while (true) {
-            if (dayOfRoshHaShono(result + 1) > days) {
+            final int dayOfNextRoshHaShono = dayOfRoshHaShono(result + 1);
+            if (dayOfNextRoshHaShono > days) {
                 break;
             }
             result++;
@@ -53,68 +131,12 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
     }
 
 
-    // KH 8:5,6
-
-    private final Month Tishri = new Month(JewishMonth.Tishri, "Tishri", 30);
-    private final Month MarHeshvanShort = new Month(JewishMonth.MarHeshvan, "MarHeshvan", 29);
-    private final Month MarHeshvanFull = new Month(JewishMonth.MarHeshvan, "MarHeshvan", 30);
-    private final Month KislevShort = new Month(JewishMonth.Kislev, "Kislev", 29);
-    private final Month KislevFull = new Month(JewishMonth.Kislev, "Kislev", 30);
-    private final Month Tevet = new Month(JewishMonth.Tevet, "Tevet", 29);
-    private final Month Shevat = new Month(JewishMonth.Shevat, "Shevat", 30);
-    private final Month AdarI = new Month(JewishMonth.AdarI, "Adar I", 30);
-    private final Month Adar = new Month(JewishMonth.Adar, "Adar", 29);
-    private final Month AdarII = new Month(JewishMonth.AdarII, "Adar II", 29);
-    private final Month Nissan = new Month(JewishMonth.Nissan, "Nissan", 30);
-    private final Month Iyyar = new Month(JewishMonth.Iyyar, "Iyyar", 29);
-    private final Month Sivan = new Month(JewishMonth.Sivan, "Sivan", 30);
-    private final Month Tammuz = new Month(JewishMonth.Tammuz, "Tammuz", 29);
-    private final Month Av = new Month(JewishMonth.Av, "Av", 30);
-    private final Month Elul= new Month(JewishMonth.Elul, "Elul", 29);
-
-
-    private final Month[] shortNormalYear = {
-        Tishri, MarHeshvanShort, KislevShort, Tevet, Shevat, Adar,
-        Nissan, Iyyar, Sivan, Tammuz, Av, Elul
-    };
-
-
-    private final Month[] regularNormalYear = {
-        Tishri, MarHeshvanShort, KislevFull, Tevet, Shevat, Adar,
-        Nissan, Iyyar, Sivan, Tammuz, Av, Elul
-    };
-
-
-    private final Month[] fullNormalYear = {
-        Tishri, MarHeshvanFull, KislevFull, Tevet, Shevat, Adar,
-        Nissan, Iyyar, Sivan, Tammuz, Av, Elul
-    };
-
-
-    private final Month[] shortLeapYear = {
-        Tishri, MarHeshvanShort, KislevShort, Tevet, Shevat, AdarI, AdarII,
-        Nissan, Iyyar, Sivan, Tammuz, Av, Elul
-    };
-
-
-    private final Month[] regularLeapYear = {
-        Tishri, MarHeshvanShort, KislevFull, Tevet, Shevat, AdarI, AdarII,
-        Nissan, Iyyar, Sivan, Tammuz, Av, Elul
-    };
-
-
-    private final Month[] fullLeapYear = {
-        Tishri, MarHeshvanFull, KislevFull, Tevet, Shevat, AdarI, AdarII,
-        Nissan, Iyyar, Sivan, Tammuz, Av, Elul
-    };
-
-
     // KH 8:7,8
     @Override
-    public Month<JewishMonth>[] getMonths(final int year) {
+    public List<Month<JewishMonth>> getMonths(final int year) {
         final int yearLength = yearLength(year);
 
-        final Month[] result;
+        final List<Month<JewishMonth>> result;
 
         if (yearLength == 355) {
             result = fullNormalYear;
@@ -129,7 +151,7 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
         } else if (yearLength == 383) {
             result = shortLeapYear;
         } else {
-            throw new Error("Bug in year length calculations!");
+            throw new Error("Bug in year length calculations: year " + year + " has length " + yearLength + "!");
         }
 
         return result;
@@ -196,32 +218,16 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
     }
 
 
-    private final int[] monthsBeforeYearInCycle = new int[YEARS_IN_CYCLE+2];
-
-
-    public final int MONTHS_IN_CYCLE = monthsBeforeYearInCycle(YEARS_IN_CYCLE+1);
-
-
     public long molad(final int year, final int month) {
-        final int monthsInPreviousCycles = (cycleNumber(year)-1) * MONTHS_IN_CYCLE;
+        final int monthsInPreviousCycles = ((year-1)/ YEARS_IN_CYCLE) * MONTHS_IN_CYCLE;
         final int monthInPreviousYears = monthsBeforeYearInCycle(yearInCycle(year));
         final int moladNumber = monthsInPreviousCycles + monthInPreviousYears + (month - 1);
-        return FIRST_MOLAD + LUNAR_MONTH * moladNumber;
-    }
-
-
-    public int cycleNumber(final int year) {
-        return year / YEARS_IN_CYCLE + 1;
+        return FIRST_MOLAD + LUNAR_MONTH * (long) moladNumber;
     }
 
 
     public int yearInCycle(final int year) {
         return year % YEARS_IN_CYCLE;
-    }
-
-
-    public int monthsBeforeYearInCycle(final int yearInCycle) {
-        return monthsBeforeYearInCycle[yearInCycle];
     }
 
 
@@ -247,7 +253,7 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
     // Molad of the year of Creation:
     // BeHaRaD: 5 hours 204 parts at night of the second day of Creation (KH 6:8)
     // Our epoch is the 6th day, creation of Man, the first Rosh HaShono
-    public static final long FIRST_MOLAD = -5*PARTS_IN_DAY + (1*PARTS_IN_DAY + 5*PARTS_IN_HOUR + 204);
+    public static final long FIRST_MOLAD = 1*PARTS_IN_DAY + 5*PARTS_IN_HOUR + 204;
 
 
     public int daysFromParts(final long parts) {
