@@ -3,7 +3,14 @@ package org.podval.calendar;
 
 public final class BirkatHahama {
 
-    public final int FIRST = Calendar.getJewish().dateFromDate(1, JewishMonth.Adar, 21).getDays();
+    public final int FIRST = Calendar.getJewish().dateFromDate(1, JewishMonth.Adar, 22).getDays();
+
+
+    // KH 9:3
+    public final long FIRST_TKUFAS_NISSAN = Calendar.getJewish().molad(1, 7)
+        - 7*JewishCalendar.PARTS_IN_DAY
+        - 9*JewishCalendar.PARTS_IN_HOUR
+        - 642;
 
 
     public Date<JewishMonth> getDate(final int number) {
@@ -22,7 +29,7 @@ public final class BirkatHahama {
 
 
     public void tabulate() {
-        final int[] adar = new int[31];
+        final int[] adar = new int[30];
         final int[] nissan = new int[31];
 
         for (int cycle = 0; cycle <= 214; cycle++) {
@@ -36,24 +43,31 @@ public final class BirkatHahama {
             }
         }
 
-        tabulateMonth("Adar", adar);
-        tabulateMonth("Nissan", nissan);
+        System.out.println("||Day||Times||Histogram||");
+        tabulateMonth("Adar", adar, 10, 29);
+        tabulateMonth("Nissan", nissan, 1, 26);
     }
 
 
-    private void tabulateMonth(final String name, final int[] month) {
-        System.out.println(name);
-        System.out.println("||Day||Times||Histogram||");
-        for (int day = 1; day <= 30; day++) {
+    private void tabulateMonth(final String name, final int[] month, final int from, final int to) {
+        for (int day = from; day <= to; day++) {
             final int number = month[day];
             final String stars = (number == 0) ? "" : "*************************".substring(0, number);
-            System.out.println("||" + day + "||" + number + "||" + stars + "||");
+            System.out.println("||" + name + " " + day + "||" + number + "||" + stars + "||");
         }
     }
 
 
     public static void main(final String[] args) {
-        new BirkatHahama().print();
-        new BirkatHahama().tabulate();
+//        new BirkatHahama().print();
+//        System.out.println();
+//        new BirkatHahama().tabulate();
+//        System.out.println(new BirkatHahama().FIRST);
+//        System.out.println(Calendar.getJewish().dateFromDays(175));
+//        System.out.println(Calendar.getJewish().daysFromParts(new BirkatHahama().FIRST_TKUFAS_NISSAN));
+//        System.out.println(Calendar.getJewish().dateFromDays(171));
+        System.out.println(Calendar.getJewish().dateFromDays(5));
+//        System.out.println(Calendar.getJewish().dateFromDays(4));
+//        System.out.println(Calendar.getJewish().dateFromDays(3));
     }
 }

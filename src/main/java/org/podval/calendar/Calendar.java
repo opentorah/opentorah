@@ -67,7 +67,7 @@ public abstract class Calendar<M> {
             daysInYear -= daysInMonth;
         }
 
-        return new Date(this, days, year, month, daysInYear+1);
+        return new Date(this, days, year, month, daysInYear);
     }
 
 
