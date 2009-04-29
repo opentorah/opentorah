@@ -58,6 +58,13 @@ public final class BirkatHahama {
     }
 
 
+    private void moladTable(final int year) {
+        for (int m = 1; m <= Calendar.getJewish().monthsInYear(year); m++) {
+            System.out.println("Molad " + year + " " + m + " = " + Calendar.getJewish().moladDate(year, m));
+        }
+    }
+
+
     public static void main(final String[] args) {
 //        new BirkatHahama().print();
 //        System.out.println();
@@ -66,8 +73,10 @@ public final class BirkatHahama {
 //        System.out.println(Calendar.getJewish().dateFromDays(175));
 //        System.out.println(Calendar.getJewish().daysFromParts(new BirkatHahama().FIRST_TKUFAS_NISSAN));
 //        System.out.println(Calendar.getJewish().dateFromDays(171));
-        System.out.println(Calendar.getJewish().dateFromDays(5));
+//        System.out.println(Calendar.getJewish().dateFromDays(5));
 //        System.out.println(Calendar.getJewish().dateFromDays(4));
 //        System.out.println(Calendar.getJewish().dateFromDays(3));
+
+        new BirkatHahama().moladTable(5769);
     }
 }

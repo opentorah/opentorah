@@ -226,6 +226,11 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
     }
 
 
+    public Date<JewishMonth> moladDate(final int year, final int month) {
+        return dateFromParts(molad(year, month));
+    }
+
+
     public int yearInCycle(final int year) {
         return year % YEARS_IN_CYCLE;
     }
@@ -256,22 +261,22 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
     public static final long FIRST_MOLAD = 1*PARTS_IN_DAY + 5*PARTS_IN_HOUR + 204;
 
 
-    public int daysFromParts(final long parts) {
+    public static int daysFromParts(final long parts) {
         return (int) (parts / PARTS_IN_DAY);
     }
 
 
-    public int hoursFromParts(final long parts) {
+    public static int hoursFromParts(final long parts) {
         return (int) ((parts % PARTS_IN_DAY) / PARTS_IN_HOUR);
     }
 
 
-    public int minutesFromParts(final long parts) {
+    public static int minutesFromParts(final long parts) {
         return (int) ((parts % PARTS_IN_HOUR) / PARTS_IN_MINUTE);
     }
 
 
-    public int partsFromParts(final long parts) {
+    public static int partsFromParts(final long parts) {
         return (int) (parts % PARTS_IN_MINUTE);
     }
 

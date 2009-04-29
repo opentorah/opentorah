@@ -51,6 +51,13 @@ public abstract class Calendar<M> {
 
 
     public final Date<M> dateFromDays(final int days) {
+        return dateFromParts(days*JewishCalendar.PARTS_IN_DAY);
+    }
+
+
+    public final Date<M> dateFromParts(final long parts) {
+        final int days = JewishCalendar.daysFromParts(parts);
+
         final int daysOfEpoch = days - epoch();
 
         final int year = yearDayIsIn(daysOfEpoch);
