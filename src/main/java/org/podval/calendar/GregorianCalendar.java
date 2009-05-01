@@ -39,7 +39,7 @@ public final class GregorianCalendar extends Calendar<GregorianMonth> {
 
     @Override
     public int epoch() {
-        return 1373433;
+        return 1373429;
     }
 
 
@@ -47,22 +47,6 @@ public final class GregorianCalendar extends Calendar<GregorianMonth> {
     protected int daysInYearsBeforeYear(final int year) {
         final int y = year-1;
         return 365 * y + y/4 - y/100 + y/400;
-    }
-
-
-    @Override
-    protected int yearDayIsIn(final int days) {
-        int result = days / 365;
-
-        while (true) {
-            final int daysBeforeNextYear = daysInYearsBeforeYear(result + 1);
-            if (daysBeforeNextYear > days) {
-                break;
-            }
-            result++;
-        }
-
-        return result;
     }
 
 

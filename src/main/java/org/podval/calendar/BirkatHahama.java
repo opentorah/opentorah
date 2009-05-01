@@ -3,14 +3,14 @@ package org.podval.calendar;
 
 public final class BirkatHahama {
 
-    public final int FIRST = Calendar.getJewish().dateFromDate(1, JewishMonth.Adar, 22).getDays();
-
-
     // KH 9:3
     public final long FIRST_TKUFAS_NISSAN = Calendar.getJewish().molad(1, 7)
         - 7*JewishCalendar.PARTS_IN_DAY
         - 9*JewishCalendar.PARTS_IN_HOUR
         - 642;
+
+
+    public final int FIRST = JewishCalendar.daysFromParts(FIRST_TKUFAS_NISSAN);
 
 
     public Date<JewishMonth> getDate(final int number) {
@@ -58,25 +58,9 @@ public final class BirkatHahama {
     }
 
 
-    private void moladTable(final int year) {
-        for (int m = 1; m <= Calendar.getJewish().monthsInYear(year); m++) {
-            System.out.println("Molad " + year + " " + m + " = " + Calendar.getJewish().moladDate(year, m));
-        }
-    }
-
-
     public static void main(final String[] args) {
-//        new BirkatHahama().print();
+        new BirkatHahama().print();
 //        System.out.println();
 //        new BirkatHahama().tabulate();
-//        System.out.println(new BirkatHahama().FIRST);
-//        System.out.println(Calendar.getJewish().dateFromDays(175));
-//        System.out.println(Calendar.getJewish().daysFromParts(new BirkatHahama().FIRST_TKUFAS_NISSAN));
-//        System.out.println(Calendar.getJewish().dateFromDays(171));
-//        System.out.println(Calendar.getJewish().dateFromDays(5));
-//        System.out.println(Calendar.getJewish().dateFromDays(4));
-//        System.out.println(Calendar.getJewish().dateFromDays(3));
-
-        new BirkatHahama().moladTable(5769);
     }
 }

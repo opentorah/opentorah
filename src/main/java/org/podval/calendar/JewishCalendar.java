@@ -13,7 +13,7 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
         isLeap[11] = true;
         isLeap[14] = true;
         isLeap[17] = true;
-        isLeap[0] = true; // 19th year
+        isLeap[19] = true; // 19th year
 
         monthsBeforeYearInCycle[0] = 0;
         monthsBeforeYearInCycle[1] = 0;
@@ -99,35 +99,19 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
 
 
     public int monthsBeforeYearInCycle(final int yearInCycle) {
-        return monthsBeforeYearInCycle[(yearInCycle == 0) ? YEARS_IN_CYCLE : yearInCycle];
+        return monthsBeforeYearInCycle[yearInCycle];
     }
 
 
     @Override
     public int epoch() {
-        return 5;
+        return 0;
     }
 
 
     @Override
     protected int daysInYearsBeforeYear(final int year) {
-        return dayOfRoshHaShono(year)-1;
-    }
-
-
-    @Override
-    protected int yearDayIsIn(final int days) {
-        int result = (4 * days / (4 * 365 + 1));
-
-        while (true) {
-            final int dayOfNextRoshHaShono = dayOfRoshHaShono(result + 1);
-            if (dayOfNextRoshHaShono > days) {
-                break;
-            }
-            result++;
-        }
-
-        return result;
+        return dayOfRoshHaShono(year);
     }
 
 
@@ -202,10 +186,16 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
         return (dayOfTheWeek == 1) || (dayOfTheWeek == 4) || (dayOfTheWeek == 6);
     }
 
+
+    public boolean notEarlierInTheDayThan(final long when, final int hour, final int parts) {
+        return hoursMinutesAndPartsFromParts(when) >= hour * PARTS_IN_HOUR + parts;
+    }
+
+
     public static final int YEARS_IN_CYCLE = 19;
 
 
-    private final boolean[] isLeap = new boolean[YEARS_IN_CYCLE];
+    private final boolean[] isLeap = new boolean[YEARS_IN_CYCLE+1];
 
 
     public boolean isLeap(final int year) {
@@ -218,21 +208,16 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
     }
 
 
-    public long molad(final int year, final int month) {
-        final int monthsInPreviousCycles = ((year-1)/ YEARS_IN_CYCLE) * MONTHS_IN_CYCLE;
-        final int monthInPreviousYears = monthsBeforeYearInCycle(yearInCycle(year));
-        final int moladNumber = monthsInPreviousCycles + monthInPreviousYears + (month - 1);
-        return FIRST_MOLAD + LUNAR_MONTH * (long) moladNumber;
-    }
-
-
-    public Date<JewishMonth> moladDate(final int year, final int month) {
-        return dateFromParts(molad(year, month));
-    }
-
-
     public int yearInCycle(final int year) {
-        return year % YEARS_IN_CYCLE;
+        final int result = year % YEARS_IN_CYCLE;
+        return (result == 0) ? YEARS_IN_CYCLE : result;
+    }
+
+
+    public int cycleNumber(final int year) {
+        return (year > 0) ?
+            (year-1)/ YEARS_IN_CYCLE + 1 :
+            year/ YEARS_IN_CYCLE;
     }
 
 
@@ -249,16 +234,6 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
 
 
     public static final long PARTS_IN_DAY = HOURS_IN_DAY * PARTS_IN_HOUR;
-
-
-    // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3 )
-    public static final long LUNAR_MONTH = 29 * PARTS_IN_DAY + 12 * PARTS_IN_HOUR + 793;
-
-
-    // Molad of the year of Creation:
-    // BeHaRaD: 5 hours 204 parts at night of the second day of Creation (KH 6:8)
-    // Our epoch is the 6th day, creation of Man, the first Rosh HaShono
-    public static final long FIRST_MOLAD = 1*PARTS_IN_DAY + 5*PARTS_IN_HOUR + 204;
 
 
     public static int daysFromParts(final long parts) {
@@ -286,7 +261,29 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
     }
 
 
-    public boolean notEarlierInTheDayThan(final long when, final int hour, final int parts) {
-        return hoursMinutesAndPartsFromParts(when) >= hour * PARTS_IN_HOUR + parts;
+    // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3 )
+    public static final long LUNAR_MONTH = 29 * PARTS_IN_DAY + 12 * PARTS_IN_HOUR + 793;
+
+
+    // Molad of the year of Creation:
+    // BeHaRaD: 5 hours 204 parts at night of the second day of Creation (KH 6:8)
+    // Our epoch is the 6th day, creation of Man, the first Rosh HaShono
+    public static final long FIRST_MOLAD = 1*PARTS_IN_DAY + 5*PARTS_IN_HOUR + 204;
+
+
+    public long molad(final int year, final int month) {
+        return FIRST_MOLAD + LUNAR_MONTH * moladNumber(year, month);
+    }
+
+
+    public int moladNumber(int year, final int month) {
+        final int monthsInPreviousCycles = (cycleNumber(year)-1) * MONTHS_IN_CYCLE;
+        final int monthInPreviousYears = monthsBeforeYearInCycle(yearInCycle(year));
+        return monthsInPreviousCycles + monthInPreviousYears + (month - 1);
+    }
+
+
+    public Date<JewishMonth> moladDate(final int year, final int month) {
+        return dateFromParts(molad(year, month));
     }
 }

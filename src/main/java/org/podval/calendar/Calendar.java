@@ -44,7 +44,7 @@ public abstract class Calendar<M> {
             throw new IllegalArgumentException("No such day in the month");
         }
 
-        final int days = epoch() + daysInYearsBeforeYear(year) + daysBeforeMonth + day;
+        final int days = epoch() + daysInYearsBeforeYear(year) + daysBeforeMonth + day - 1;
 
         return new Date<M>(this, days, year, month, day);
     }
@@ -58,11 +58,9 @@ public abstract class Calendar<M> {
     public final Date<M> dateFromParts(final long parts) {
         final int days = JewishCalendar.daysFromParts(parts);
 
-        final int daysOfEpoch = days - epoch();
+        final int year = yearDayIsIn(days);
 
-        final int year = yearDayIsIn(daysOfEpoch);
-
-        int daysInYear = daysOfEpoch - daysInYearsBeforeYear(year);
+        int daysInYear = days - daysInYearsBeforeYear(year) - epoch();
 
         Month<M> month = null;
         for (final Month<M> m : getMonths(year)) {
@@ -74,11 +72,26 @@ public abstract class Calendar<M> {
             daysInYear -= daysInMonth;
         }
 
-        return new Date(this, days, year, month, daysInYear);
+        return new Date(this, days, year, month, daysInYear+1);
     }
 
 
-    public final int dayOfTheWeek(final int days) {
+    private int yearDayIsIn(final int days) {
+        int result = (4 * days / (4 * 365 + 1)) - 1;
+
+        while (true) {
+            final int daysBeforeNextYear = daysInYearsBeforeYear(result + 1);
+            if (daysBeforeNextYear > days) {
+                break;
+            }
+            result++;
+        }
+
+        return result;
+    }
+
+
+    public static final int dayOfTheWeek(final int days) {
         return (int) (days % 7 + 1);
     }
 
@@ -87,9 +100,6 @@ public abstract class Calendar<M> {
 
 
     protected abstract int daysInYearsBeforeYear(final int year);
-
-
-    protected abstract int yearDayIsIn(final int days);
 
 
     public abstract List<Month<M>> getMonths(final int year);
