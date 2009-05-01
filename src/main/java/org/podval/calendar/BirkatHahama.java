@@ -3,18 +3,8 @@ package org.podval.calendar;
 
 public final class BirkatHahama {
 
-    // KH 9:3
-    public final long FIRST_TKUFAS_NISSAN = Calendar.getJewish().molad(1, 7)
-        - 7*JewishCalendar.PARTS_IN_DAY
-        - 9*JewishCalendar.PARTS_IN_HOUR
-        - 642;
-
-
-    public final int FIRST = JewishCalendar.daysFromParts(FIRST_TKUFAS_NISSAN);
-
-
     public Date<JewishMonth> getDate(final int number) {
-        return Calendar.getJewish().dateFromDays(FIRST + number * (28 * 365 + 7));
+        return Calendar.getJewish().tkufasNissanShmuel(number*28+1);
     }
 
 

@@ -262,13 +262,13 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
 
 
     // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3 )
-    public static final long LUNAR_MONTH = 29 * PARTS_IN_DAY + 12 * PARTS_IN_HOUR + 793;
+    public static final long LUNAR_MONTH = partsFromDate(29, 12, 793);
 
 
     // Molad of the year of Creation:
     // BeHaRaD: 5 hours 204 parts at night of the second day of Creation (KH 6:8)
     // Our epoch is the 6th day, creation of Man, the first Rosh HaShono
-    public static final long FIRST_MOLAD = 1*PARTS_IN_DAY + 5*PARTS_IN_HOUR + 204;
+    public static final long FIRST_MOLAD = partsFromDate(1, 5, 204);
 
 
     public long molad(final int year, final int month) {
@@ -285,5 +285,25 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
 
     public Date<JewishMonth> moladDate(final int year, final int month) {
         return dateFromParts(molad(year, month));
+    }
+
+
+    // KH 9:3
+    public final long FIRST_TKUFAS_NISSAN = molad(1, 7) - partsFromDate(7, 9, 642);
+
+
+    public final long YEAR_OF_SHMUEL = partsFromDate(365, 6, 0);
+
+
+    public Date<JewishMonth> tkufasNissanShmuel(final int year) {
+        return dateFromParts(FIRST_TKUFAS_NISSAN + (year-1)*YEAR_OF_SHMUEL);
+    }
+
+
+    public final int FIRST = JewishCalendar.daysFromParts(FIRST_TKUFAS_NISSAN);
+
+
+    public static long partsFromDate(final int days, final int hours, final int parts) {
+        return days*PARTS_IN_DAY + hours*PARTS_IN_HOUR + parts;
     }
 }
