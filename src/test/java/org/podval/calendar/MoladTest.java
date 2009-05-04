@@ -37,52 +37,61 @@ public class MoladTest {
 
     @Test
     public void moladNumbers() {
-        moladNumber(1, 2, 1);
-        moladNumber(1, 1, 0);
-        moladNumber(0, 13, -1);
-        moladNumber(0, 12, -2);
+        moladNumber(1, 1, JewishMonth.MarHeshvan);
+        moladNumber(0, 1, JewishMonth.Tishri);
+        moladNumber(-1, 0, JewishMonth.Elul);
+        moladNumber(-2, 0, JewishMonth.Av);
     }
 
 
-    private void moladNumber(final int year, final int month, final int number) {
+    private void moladNumber(final int number, final int year, final JewishMonth month) {
         Assert.assertEquals(number, Calendar.getJewish().moladNumber(year, month));
     }
 
 
     @Test
     public void table5769() {
-        molad(5769, 1, 3, true , 1, 58, 13);
-        molad(5769, 2, 4, false, 2, 42, 14);
-        molad(5769, 3, 6, true, 3, 26, 15);
-    }
-
-
-    private void moladTable(final int year) {
-        for (int m = 1; m <= Calendar.getJewish().monthsInYear(year); m++) {
-            System.out.println("Molad " + year + " " + m + " = " + Calendar.getJewish().moladDate(year, m));
-        }
+        molad(5769, JewishMonth.Tishri, 3, JewishMonth.Tishri, 1, 2008, GregorianMonth.September, 30, 1, true, 58, 13);
+        molad(5769, JewishMonth.MarHeshvan, 4, JewishMonth.Tishri, 30, 2008, GregorianMonth.October, 29, 2, false, 42, 14);
+        molad(5769, JewishMonth.Kislev, 6, JewishMonth.Kislev, 1, 2008, GregorianMonth.November, 28, 3, true, 26, 15);
     }
 
 
     public void molad(
         final int year,
-        final int month,
-        final int dayOfTheWeek,
-        final boolean am,
-        final int hour,
-        final int minute,
-        final int parts)
-    {
-        final long molad = Calendar.getJewish().molad(year, month);
-        final int days = JewishCalendar.daysFromParts(molad);
-        final int cDayOfTheWeek = JewishCalendar.dayOfTheWeek(days);
-        final int cHour = JewishCalendar.hoursFromParts(molad);
-        final int cMinute = JewishCalendar.minutesFromParts(molad);
-        final int cParts = JewishCalendar.partsFromParts(molad);
+        final JewishMonth month,
 
-        Assert.assertEquals(dayOfTheWeek, cDayOfTheWeek);
-        Assert.assertEquals(hour + (am ? 6 : 18), cHour);
-        Assert.assertEquals(minute, cMinute);
-        Assert.assertEquals(parts, cParts);
+        final int dayOfTheWeek,
+
+        final JewishMonth jMonth,
+        final int jDay,
+
+        final int gYear,
+        final GregorianMonth gMonth,
+        final int gDay,
+        final int hour,
+        final boolean am,
+        final int minute,
+        final int parts
+        )
+    {
+        final Date mDate = Calendar.getJewish().moladDate(year, month);
+        Assert.assertEquals(dayOfTheWeek, mDate.getDayOfTheWeek());
+
+        Assert.assertEquals(jMonth, mDate.getMonth().month);
+        Assert.assertEquals(jDay, mDate.getDay());
+
+        final Date gDate = Calendar.getGregorian()
+            .dateFromDate(gYear, gMonth, gDay)
+            .setTime(hour + (am ? 0 : 12), minute, parts);
+
+        Assert.assertEquals(gDate, mDate.toGregorian());
     }
+
+
+//    private void moladTable(final int year) {
+//        for (int m = 1; m <= Calendar.getJewish().monthsInYear(year); m++) {
+//            System.out.println("Molad " + year + " " + m + " = " + Calendar.getJewish().moladDate(year, m));
+//        }
+//    }
 }

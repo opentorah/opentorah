@@ -40,6 +40,11 @@ public class Date<M> {
     }
 
 
+    public int getDayOfTheWeek() {
+        return Calendar.dayOfTheWeek(getDays());
+    }
+
+
     public int getYear() {
         return year;
     }
@@ -55,9 +60,63 @@ public class Date<M> {
     }
 
 
+    public int getHour() {
+        return hour;
+    }
+
+
+    public int getMinute() {
+        return minute;
+    }
+
+
+    public int getParts() {
+        return parts;
+    }
+
+
+    public Date setTime(final int hour, final int minute, final int parts) {
+        return new Date(calendar, getDays(), getYear(), getMonth(), getDay(), hour, minute, parts);
+    }
+
+
+    public Date getDate() {
+        return new Date(calendar, getDays(), getYear(), getMonth(), getDay(), 0, 0, 0);
+    }
+
+
+    public Date getTime() {
+        return new Date(calendar, 0, 0, null, 0, getHour(), getMinute(), getParts());
+    }
+
+
+    public Date toGregorian() {
+        if (!(getMonth().month instanceof JewishMonth)) {
+            throw new IllegalArgumentException();
+        }
+
+        boolean isAfterMidnight = getHour() >= 6;
+        return Calendar.getGregorian()
+            .dateFromDays(getDays() + (isAfterMidnight ? 1 : 0))
+            .setTime(getHour() + (isAfterMidnight ? -6 : +18), getMinute(), getParts());
+    }
+
+
+    public Date toJewish() {
+        if (!(getMonth().month instanceof GregorianMonth)) {
+            throw new IllegalArgumentException();
+        }
+
+        boolean isAfterShkia = getHour() >= 18;
+        return Calendar.getJewish()
+            .dateFromDays(getDays() + (isAfterShkia ? 0 : -1))
+            .setTime(getHour() + (isAfterShkia ? -18 : +6), getMinute(), getParts());
+    }
+
+
     @Override
     public String toString() {
-        return getYear() + " " + getMonth() + " " + getDay();
+        return getYear() + " " + getMonth() + " " + getDay() + " " + getHour() + ":" + getMinute() + ":" + getParts();
     }
 
 
@@ -66,9 +125,11 @@ public class Date<M> {
         if (!(o instanceof Date)) return false;
 
         final Date other = (Date) o;
-        return (getMonth().month.getClass().isAssignableFrom(other.getMonth().month.getClass())) ?
-            (getYear() == other.getYear()) && (getMonth() == getMonth()) && (getDay() == other.getDay()) :
-            (getDays() == other.getDays());
+        if (!getMonth().month.getClass().isAssignableFrom(other.getMonth().month.getClass())) {
+            throw new IllegalArgumentException("Dates must be of the same type");
+        }
+
+        return (getYear() == other.getYear()) && (getMonth() == getMonth()) && (getDay() == other.getDay());
     }
 
 

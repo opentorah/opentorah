@@ -4,7 +4,7 @@ package org.podval.calendar;
 public final class BirkatHahama {
 
     public Date<JewishMonth> getDate(final int number) {
-        return Calendar.getJewish().tkufasNissanShmuel(number*28+1);
+        return Calendar.getJewish().birkasHachama(number);
     }
 
 

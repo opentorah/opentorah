@@ -156,7 +156,7 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
 
 
     public int dayOfRoshHaShono(final int year) {
-        final long molad = molad(year, 1);
+        final long molad = molad(year, JewishMonth.Tishri);
         int result = daysFromParts(molad);
 
         final int moladDayOfTheWeek = dayOfTheWeek(result);
@@ -205,6 +205,44 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
 
     public int monthsInYear(final int year) {
         return isLeap(year) ? 13 : 12;
+    }
+
+
+    public int monthNumber(final int year, final JewishMonth month) {
+        int result;
+
+        switch (month) {
+        case Tishri: result = 1; break;
+        case MarHeshvan: result = 2; break;
+        case Kislev: result = 3; break;
+        case Tevet: result = 4; break;
+        case Shevat: result = 5; break;
+        case Adar: result = 6; break;
+        case AdarI: result = 6; break;
+        case AdarII: result = 7; break;
+        case Nissan: result = 7; break;
+        case Iyyar: result = 8; break;
+        case Sivan: result = 9; break;
+        case Tammuz: result = 10; break;
+        case Av: result = 11; break;
+        case Elul: result = 12; break;
+        default: throw new IllegalArgumentException();
+        }
+
+        if (isLeap(year)) {
+            if (month == JewishMonth.Adar) {
+                throw new IllegalArgumentException();
+            }
+            if ((result >= 7) && (month != JewishMonth.AdarII)) {
+                result++;
+            }
+        } else {
+            if ((month == JewishMonth.AdarI) || (month == JewishMonth.AdarII)) {
+                throw new IllegalArgumentException();
+            }
+        }
+
+        return result;
     }
 
 
@@ -271,32 +309,34 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
     public static final long FIRST_MOLAD = partsFromDate(1, 5, 204);
 
 
-    public long molad(final int year, final int month) {
+    public long molad(final int year, final JewishMonth month) {
         return FIRST_MOLAD + LUNAR_MONTH * moladNumber(year, month);
     }
 
 
-    public int moladNumber(int year, final int month) {
+    public int moladNumber(int year, final JewishMonth month) {
+        final int monthNumber = monthNumber(year, month);
         final int monthsInPreviousCycles = (cycleNumber(year)-1) * MONTHS_IN_CYCLE;
         final int monthInPreviousYears = monthsBeforeYearInCycle(yearInCycle(year));
-        return monthsInPreviousCycles + monthInPreviousYears + (month - 1);
+        return monthsInPreviousCycles + monthInPreviousYears + (monthNumber - 1);
     }
 
 
-    public Date<JewishMonth> moladDate(final int year, final int month) {
+    public Date<JewishMonth> moladDate(final int year, final JewishMonth month) {
         return dateFromParts(molad(year, month));
     }
 
 
     // KH 9:3
-    public final long FIRST_TKUFAS_NISSAN = molad(1, 7) - partsFromDate(7, 9, 642);
+    public final long FIRST_TKUFAS_NISSAN = molad(1, JewishMonth.Nissan) - partsFromDate(7, 9, 642);
 
 
     public final long YEAR_OF_SHMUEL = partsFromDate(365, 6, 0);
 
 
-    public Date<JewishMonth> tkufasNissanShmuel(final int year) {
-        return dateFromParts(FIRST_TKUFAS_NISSAN + (year-1)*YEAR_OF_SHMUEL);
+    public Date<JewishMonth> birkasHachama(final int cycle) {
+        // Since Birkas HaChama is said in the morning, we add 12 hours to the time of the equinox
+        return dateFromParts(FIRST_TKUFAS_NISSAN + 28*cycle*YEAR_OF_SHMUEL + 12*PARTS_IN_HOUR);
     }
 
 

@@ -8,6 +8,8 @@ public class BirkatHahamaTest {
 
     @Test
     public void birkatHahamaWikipedia() {
+        // From http://en.wikipedia.org/wiki/Birkat_HaHammah#Occurrences_of_Birkat_Hachama
+
         cycle(202, 5657, JewishMonth.Nissan, 5, 1897, GregorianMonth.April, 7);
         cycle(203, 5685, JewishMonth.Nissan, 14, 1925, GregorianMonth.April, 8);
         cycle(204, 5713, JewishMonth.Nissan, 23, 1953, GregorianMonth.April, 8);
@@ -31,12 +33,11 @@ public class BirkatHahamaTest {
         final GregorianMonth gMonth,
         final int gDay)
     {
-        final Date<JewishMonth> tDate = Calendar.getJewish().tkufasNissanShmuel(28*number+1);
+        final Date<JewishMonth> tDate = Calendar.getJewish().birkasHachama(number);
         final Date<JewishMonth> jDate = Calendar.getJewish().dateFromDate(jYear, jMonth, jDay);
-        final Date<JewishMonth> gDate = Calendar.getGregorian().dateFromDate(gYear, gMonth, gDay);
-        Assert.assertEquals(jDate, tDate);
-        // @todo check the Gregorian date
-//        Assert.assertEquals(gDate, Calendar.getGregorian().dateFromDays(tDate.getDays()));
+        final Date<JewishMonth> gDate = Calendar.getGregorian().dateFromDate(gYear, gMonth, gDay).setTime(18, 0, 0);
         Assert.assertEquals(4, Calendar.dayOfTheWeek(tDate.getDays()));
+        Assert.assertEquals(jDate, tDate);
+        Assert.assertEquals(gDate, tDate.toGregorian());
     }
 }

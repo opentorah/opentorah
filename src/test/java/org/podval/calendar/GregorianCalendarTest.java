@@ -21,8 +21,9 @@ public class GregorianCalendarTest {
         final JewishMonth jMonth,
         final int jDay)
     {
-        final Date gDate = Calendar.getGregorian().dateFromDate(gYear, gMonth, gDay);
-        final Date jDate = Calendar.getJewish().dateFromDate(jYear, jMonth, jDay);
-        Assert.assertEquals(gDate, jDate);
+        final Date gDate = Calendar.getGregorian().dateFromDate(gYear, gMonth, gDay).setTime(12, 0, 0);
+        final Date jDate = Calendar.getJewish().dateFromDate(jYear, jMonth, jDay).setTime(18, 0, 0);
+        Assert.assertEquals(gDate, jDate.toGregorian());
+        Assert.assertEquals(jDate, gDate.toJewish());
     }
 }

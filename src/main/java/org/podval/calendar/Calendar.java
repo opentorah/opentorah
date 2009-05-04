@@ -51,14 +51,7 @@ public abstract class Calendar<M> {
 
 
     public final Date<M> dateFromDays(final int days) {
-        return dateFromParts(days*JewishCalendar.PARTS_IN_DAY);
-    }
-
-
-    public final Date<M> dateFromParts(final long parts) {
-        final int days = JewishCalendar.daysFromParts(parts);
-
-        final int year = yearDayIsIn(days);
+        final int year = yearDayIsIn(days-epoch());
 
         int daysInYear = days - daysInYearsBeforeYear(year) - epoch();
 
@@ -73,6 +66,16 @@ public abstract class Calendar<M> {
         }
 
         return new Date(this, days, year, month, daysInYear+1);
+    }
+
+
+    public final Date<M> dateFromParts(final long parts) {
+        final int days = JewishCalendar.daysFromParts(parts);
+        return dateFromDays(days).setTime(
+            JewishCalendar.hoursFromParts(parts),
+            JewishCalendar.minutesFromParts(parts),
+            JewishCalendar.partsFromParts(parts)
+        );
     }
 
 
