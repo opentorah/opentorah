@@ -6,6 +6,14 @@ import java.util.List;
 
 public final class GregorianCalendar extends Calendar<GregorianMonth> {
 
+    private static final GregorianCalendar INSTANCE = new GregorianCalendar();
+
+
+    public static GregorianCalendar getInstance() {
+        return INSTANCE;
+    }
+
+
     public GregorianCalendar() {
         addMonth(new Month<GregorianMonth>(GregorianMonth.January, "January", 31));
 

@@ -6,7 +6,49 @@ import java.util.LinkedList;
 
 public final class JewishCalendar extends Calendar<JewishMonth> {
 
-    public JewishCalendar() {
+    private static final JewishCalendar INSTANCE = new JewishCalendar();
+
+
+    public static JewishCalendar getInstance() {
+        return INSTANCE;
+    }
+
+
+    public static long PARTS_IN_HOUR = 1080;
+
+
+    public static int MINUTES_IN_HOUR = 60;
+
+
+    public static final long PARTS_IN_MINUTE = PARTS_IN_HOUR / MINUTES_IN_HOUR;
+
+
+    public static final int HOURS_IN_DAY = 24;
+
+
+    public static final long PARTS_IN_DAY = HOURS_IN_DAY * PARTS_IN_HOUR;
+
+
+    public static final int YEARS_IN_CYCLE = 19;
+
+
+    public static int yearInCycle(final int year) {
+        final int result = year % YEARS_IN_CYCLE;
+        return (result == 0) ? YEARS_IN_CYCLE : result;
+    }
+
+
+    public static int cycleNumber(final int year) {
+        return (year > 0) ?
+            (year-1)/ YEARS_IN_CYCLE + 1 :
+            year/ YEARS_IN_CYCLE;
+    }
+
+
+    private static final boolean[] isLeap = new boolean[YEARS_IN_CYCLE+1];
+
+
+    static {
         isLeap[3] = true;
         isLeap[6] = true;
         isLeap[8] = true;
@@ -14,14 +56,40 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
         isLeap[14] = true;
         isLeap[17] = true;
         isLeap[19] = true; // 19th year
+    }
 
+
+    public static boolean isLeap(final int year) {
+        return isLeap[yearInCycle(year)];
+    }
+
+
+    public static int monthsInYear(final int year) {
+        return isLeap(year) ? 13 : 12;
+    }
+
+
+    private static final int[] monthsBeforeYearInCycle = new int[YEARS_IN_CYCLE+2];
+
+
+    static {
         monthsBeforeYearInCycle[0] = 0;
         monthsBeforeYearInCycle[1] = 0;
         for (int year = 2; year <= YEARS_IN_CYCLE+1; year++) {
             monthsBeforeYearInCycle[year] = monthsBeforeYearInCycle[year-1] + monthsInYear(year-1);
         }
-        MONTHS_IN_CYCLE = monthsBeforeYearInCycle[YEARS_IN_CYCLE+1];
+    }
 
+
+    public static int monthsBeforeYearInCycle(final int yearInCycle) {
+        return monthsBeforeYearInCycle[yearInCycle];
+    }
+
+
+    public static final int MONTHS_IN_CYCLE = monthsBeforeYearInCycle[YEARS_IN_CYCLE+1];
+
+
+    public JewishCalendar() {
         // KH 8:5,6
 
         addMonthToAllYears(new Month(JewishMonth.Tishri, "Tishri", 30));
@@ -90,17 +158,6 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
     private final List<Month<JewishMonth>> shortLeapYear = new LinkedList<Month<JewishMonth>>();
     private final List<Month<JewishMonth>> regularLeapYear = new LinkedList<Month<JewishMonth>>();
     private final List<Month<JewishMonth>> fullLeapYear = new LinkedList<Month<JewishMonth>>();
-
-
-    private final int[] monthsBeforeYearInCycle = new int[YEARS_IN_CYCLE+2];
-
-
-    public final int MONTHS_IN_CYCLE;
-
-
-    public int monthsBeforeYearInCycle(final int yearInCycle) {
-        return monthsBeforeYearInCycle[yearInCycle];
-    }
 
 
     @Override
@@ -192,22 +249,6 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
     }
 
 
-    public static final int YEARS_IN_CYCLE = 19;
-
-
-    private final boolean[] isLeap = new boolean[YEARS_IN_CYCLE+1];
-
-
-    public boolean isLeap(final int year) {
-        return isLeap[yearInCycle(year)];
-    }
-
-
-    public int monthsInYear(final int year) {
-        return isLeap(year) ? 13 : 12;
-    }
-
-
     public int monthNumber(final int year, final JewishMonth month) {
         int result;
 
@@ -246,34 +287,6 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
     }
 
 
-    public int yearInCycle(final int year) {
-        final int result = year % YEARS_IN_CYCLE;
-        return (result == 0) ? YEARS_IN_CYCLE : result;
-    }
-
-
-    public int cycleNumber(final int year) {
-        return (year > 0) ?
-            (year-1)/ YEARS_IN_CYCLE + 1 :
-            year/ YEARS_IN_CYCLE;
-    }
-
-
-    public static long PARTS_IN_HOUR = 1080;
-
-
-    public static int MINUTES_IN_HOUR = 60;
-
-
-    public static final long PARTS_IN_MINUTE = PARTS_IN_HOUR / MINUTES_IN_HOUR;
-
-
-    public static final int HOURS_IN_DAY = 24;
-
-
-    public static final long PARTS_IN_DAY = HOURS_IN_DAY * PARTS_IN_HOUR;
-
-
     public static int daysFromParts(final long parts) {
         return (int) (parts / PARTS_IN_DAY);
     }
@@ -294,7 +307,7 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
     }
 
 
-    public int hoursMinutesAndPartsFromParts(final long parts) {
+    public static int hoursMinutesAndPartsFromParts(final long parts) {
         return (int) (parts % PARTS_IN_DAY);
     }
 
@@ -328,19 +341,28 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
 
 
     // KH 9:3
-    public final long FIRST_TKUFAS_NISSAN = molad(1, JewishMonth.Nissan) - partsFromDate(7, 9, 642);
+// @todo if this is uncommented, I get NPE during construction...
+//    public final long FIRST_TKUFAS_NISSAN = molad(1, JewishMonth.Nissan) - partsFromDate(7, 9, 642);
+    private long firstTkufasNissan() {
+        return molad(1, JewishMonth.Nissan) - partsFromDate(7, 9, 642);
+    }
 
 
-    public final long YEAR_OF_SHMUEL = partsFromDate(365, 6, 0);
+    public static final long YEAR_OF_SHMUEL = partsFromDate(365, 6, 0);
+
+
+    public final long YEAR_OF_RAV_ADA = MONTHS_IN_CYCLE*LUNAR_MONTH/19;
 
 
     public Date<JewishMonth> birkasHachama(final int cycle) {
         // Since Birkas HaChama is said in the morning, we add 12 hours to the time of the equinox
-        return dateFromParts(FIRST_TKUFAS_NISSAN + 28*cycle*YEAR_OF_SHMUEL + 12*PARTS_IN_HOUR);
+        return dateFromParts(firstTkufasNissan() + 28*cycle*YEAR_OF_SHMUEL + 12*PARTS_IN_HOUR);
     }
 
 
-    public final int FIRST = JewishCalendar.daysFromParts(FIRST_TKUFAS_NISSAN);
+    public Date<JewishMonth> tkufasNissan(final int year) {
+        return dateFromParts(firstTkufasNissan() + (year-1)*YEAR_OF_RAV_ADA);
+    }
 
 
     public static long partsFromDate(final int days, final int hours, final int parts) {

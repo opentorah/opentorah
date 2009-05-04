@@ -3,16 +3,11 @@ package org.podval.calendar;
 
 public final class BirkatHahama {
 
-    public Date<JewishMonth> getDate(final int number) {
-        return Calendar.getJewish().birkasHachama(number);
-    }
-
-
     public void print() {
         System.out.println("||Cycle||Jewish||Secular||");
         for (int cycle = 0; cycle <= 214; cycle++) {
-            final Date<JewishMonth> jDate = getDate(cycle);
-            final Date<GregorianMonth> gDate = Calendar.getGregorian().dateFromDays(jDate.getDays());
+            final Date<JewishMonth> jDate = JewishCalendar.getInstance().birkasHachama(cycle);
+            final Date<GregorianMonth> gDate = GregorianCalendar.getInstance().dateFromDays(jDate.getDays());
             System.out.println("||" + cycle + "||" + jDate + "||" + gDate + "||");
         }
     }
@@ -23,7 +18,7 @@ public final class BirkatHahama {
         final int[] nissan = new int[31];
 
         for (int cycle = 0; cycle <= 214; cycle++) {
-            final Date<JewishMonth> date = getDate(cycle);
+            final Date<JewishMonth> date = JewishCalendar.getInstance().birkasHachama(cycle);
             if ((date.getMonth().month == JewishMonth.Adar) || (date.getMonth().month == JewishMonth.AdarII)) {
                 adar[date.getDay()]++;
             } else if (date.getMonth().month == JewishMonth.Nissan) {
@@ -51,6 +46,6 @@ public final class BirkatHahama {
     public static void main(final String[] args) {
         new BirkatHahama().print();
 //        System.out.println();
-//        new BirkatHahama().tabulate();
+        new BirkatHahama().tabulate();
     }
 }

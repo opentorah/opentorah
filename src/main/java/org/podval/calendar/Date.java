@@ -3,19 +3,26 @@ package org.podval.calendar;
 
 public class Date<M> {
 
+    public static Date create(final int year, final Object month, final int day) {
+        final Calendar calendar = (month instanceof JewishMonth) ?
+            JewishCalendar.getInstance() :
+            GregorianCalendar.getInstance();
+
+        return calendar.dateFromDate(year, month, day);
+    }
+
+
     public Date(
-        final Calendar<M> calendar,
         final int days,
         final int year,
         final Month<M> month,
         final int day)
     {
-        this(calendar, days, year, month, day, 0, 0, 0);
+        this(days, year, month, day, 0, 0, 0);
     }
 
 
     public Date(
-        final Calendar<M> calendar,
         final int days,
         final int year,
         final Month<M> month,
@@ -24,7 +31,6 @@ public class Date<M> {
         final int minute,
         final int parts)
     {
-        this.calendar = calendar;
         this.days = days;
         this.year = year;
         this.month = month;
@@ -76,17 +82,17 @@ public class Date<M> {
 
 
     public Date setTime(final int hour, final int minute, final int parts) {
-        return new Date(calendar, getDays(), getYear(), getMonth(), getDay(), hour, minute, parts);
+        return new Date(getDays(), getYear(), getMonth(), getDay(), hour, minute, parts);
     }
 
 
     public Date getDate() {
-        return new Date(calendar, getDays(), getYear(), getMonth(), getDay(), 0, 0, 0);
+        return new Date(getDays(), getYear(), getMonth(), getDay(), 0, 0, 0);
     }
 
 
     public Date getTime() {
-        return new Date(calendar, 0, 0, null, 0, getHour(), getMinute(), getParts());
+        return new Date(0, 0, null, 0, getHour(), getMinute(), getParts());
     }
 
 
@@ -96,9 +102,9 @@ public class Date<M> {
         }
 
         boolean isAfterMidnight = getHour() >= 6;
-        return Calendar.getGregorian()
+        return GregorianCalendar.getInstance()
             .dateFromDays(getDays() + (isAfterMidnight ? 1 : 0))
-            .setTime(getHour() + (isAfterMidnight ? -6 : +18), getMinute(), getParts());
+            .setTime((getHour()-6) % 24, getMinute(), getParts());
     }
 
 
@@ -108,9 +114,9 @@ public class Date<M> {
         }
 
         boolean isAfterShkia = getHour() >= 18;
-        return Calendar.getJewish()
+        return JewishCalendar.getInstance()
             .dateFromDays(getDays() + (isAfterShkia ? 0 : -1))
-            .setTime(getHour() + (isAfterShkia ? -18 : +6), getMinute(), getParts());
+            .setTime((getHour()+6) % 24, getMinute(), getParts());
     }
 
 
@@ -139,9 +145,6 @@ public class Date<M> {
         hash = 37 * hash + this.days;
         return hash;
     }
-
-
-    private final Calendar<M> calendar;
 
 
     private final int days;

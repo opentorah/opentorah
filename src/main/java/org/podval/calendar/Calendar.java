@@ -5,22 +5,6 @@ import java.util.List;
 
 public abstract class Calendar<M> {
 
-    private static final JewishCalendar jewishCalendar = new JewishCalendar();
-
-
-    private static final GregorianCalendar gregorianCalendar = new GregorianCalendar();
-
-
-    public static JewishCalendar getJewish() {
-        return jewishCalendar;
-    }
-
-
-    public static GregorianCalendar getGregorian() {
-        return gregorianCalendar;
-    }
-
-
     public final Date dateFromDate(final int year, final M monthName, final int day) {
         Month<M> month = null;
         int daysBeforeMonth = 0;
@@ -46,7 +30,7 @@ public abstract class Calendar<M> {
 
         final int days = epoch() + daysInYearsBeforeYear(year) + daysBeforeMonth + day - 1;
 
-        return new Date<M>(this, days, year, month, day);
+        return new Date<M>(days, year, month, day);
     }
 
 
@@ -65,7 +49,7 @@ public abstract class Calendar<M> {
             daysInYear -= daysInMonth;
         }
 
-        return new Date(this, days, year, month, daysInYear+1);
+        return new Date(days, year, month, daysInYear+1);
     }
 
 

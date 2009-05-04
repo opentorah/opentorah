@@ -33,11 +33,11 @@ public class BirkatHahamaTest {
         final GregorianMonth gMonth,
         final int gDay)
     {
-        final Date<JewishMonth> tDate = Calendar.getJewish().birkasHachama(number);
-        final Date<JewishMonth> jDate = Calendar.getJewish().dateFromDate(jYear, jMonth, jDay);
-        final Date<JewishMonth> gDate = Calendar.getGregorian().dateFromDate(gYear, gMonth, gDay).setTime(18, 0, 0);
-        Assert.assertEquals(4, Calendar.dayOfTheWeek(tDate.getDays()));
+        final Date<JewishMonth> tDate = JewishCalendar.getInstance().birkasHachama(number);
+        final Date<JewishMonth> jDate = Date.create(jYear, jMonth, jDay);
+        final Date<JewishMonth> gDate = Date.create(gYear, gMonth, gDay).setTime(18, 0, 0);
         Assert.assertEquals(jDate, tDate);
         Assert.assertEquals(gDate, tDate.toGregorian());
+        Assert.assertEquals(4, Calendar.dayOfTheWeek(tDate.getDays()));
     }
 }

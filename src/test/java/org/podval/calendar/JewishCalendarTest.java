@@ -6,9 +6,6 @@ import org.junit.Assert;
 
 public class JewishCalendarTest {
 
-    private static final JewishCalendar jewishCalendar = Calendar.getJewish();
-
-
     @Test
     public void date2days2date() {
         date2days2date(1, JewishMonth.Tishri, 1);
@@ -18,8 +15,8 @@ public class JewishCalendarTest {
 
 
     private void date2days2date(final int year, final JewishMonth month, final int day) {
-        final Date<JewishMonth> fromDate = jewishCalendar.dateFromDate(year, month, day);
-        final Date<JewishMonth> fromDays = jewishCalendar.dateFromDays(fromDate.getDays());
+        final Date<JewishMonth> fromDate = Date.create(year, month, day);
+        final Date<JewishMonth> fromDays = JewishCalendar.getInstance().dateFromDays(fromDate.getDays());
         Assert.assertEquals(fromDate, fromDays);
     }
 
@@ -32,8 +29,8 @@ public class JewishCalendarTest {
 
 
     private void date2days(final int days, final int year, final JewishMonth month, final int day) {
-        final Date<JewishMonth> fromDays = jewishCalendar.dateFromDays(days);
-        final Date<JewishMonth> fromDate = jewishCalendar.dateFromDate(year, month, day);
+        final Date<JewishMonth> fromDays = JewishCalendar.getInstance().dateFromDays(days);
+        final Date<JewishMonth> fromDate = Date.create(year, month, day);
         Assert.assertEquals(days, fromDate.getDays());
         Assert.assertEquals(fromDays, fromDate);
     }
