@@ -54,11 +54,11 @@ public abstract class Calendar<M> {
 
 
     public final Date<M> dateFromParts(final long parts) {
-        final int days = JewishCalendar.daysFromParts(parts);
+        final int days = daysFromParts(parts);
         return dateFromDays(days).setTime(
-            JewishCalendar.hoursFromParts(parts),
-            JewishCalendar.minutesFromParts(parts),
-            JewishCalendar.partsFromParts(parts)
+            hoursFromParts(parts),
+            minutesFromParts(parts),
+            partsFromParts(parts)
         );
     }
 
@@ -75,6 +75,41 @@ public abstract class Calendar<M> {
         }
 
         return result;
+    }
+
+
+    public static long PARTS_IN_HOUR = 1080;
+
+
+    public static int MINUTES_IN_HOUR = 60;
+
+
+    public static final long PARTS_IN_MINUTE = PARTS_IN_HOUR / MINUTES_IN_HOUR;
+
+
+    public static final int HOURS_IN_DAY = 24;
+
+
+    public static final long PARTS_IN_DAY = HOURS_IN_DAY * PARTS_IN_HOUR;
+
+
+    public static int daysFromParts(final long parts) {
+        return (int) (parts / PARTS_IN_DAY);
+    }
+
+
+    public static int hoursFromParts(final long parts) {
+        return (int) ((parts % PARTS_IN_DAY) / PARTS_IN_HOUR);
+    }
+
+
+    public static int minutesFromParts(final long parts) {
+        return (int) ((parts % PARTS_IN_HOUR) / PARTS_IN_MINUTE);
+    }
+
+
+    public static int partsFromParts(final long parts) {
+        return (int) (parts % PARTS_IN_MINUTE);
     }
 
 
