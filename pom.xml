@@ -7,11 +7,52 @@
     <version>1.0-SNAPSHOT</version>
     <name>calendar</name>
     <url>http://calendar.podval.org</url>
+
+    <licenses>
+      <license>
+        <name>Apache 2</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        <distribution>repo</distribution>
+        <comments>A business-friendly OSS license</comments>
+      </license>
+    </licenses>
+
+    <organization>
+      <name>Podval</name>
+      <url>http://www.podval.org</url>
+    </organization>
+
+    <developers>
+      <developer>
+        <id>dub</id>
+        <name>Leonid Dubinsky</name>
+        <email>dub@podval.org</email>
+        <url>http://dub.podval.org</url>
+        <organization>Podval</organization>
+        <organizationUrl>http://www.podval.org</organizationUrl>
+        <roles>
+          <role>developer</role>
+        </roles>
+        <timezone>-5</timezone>
+      </developer>
+    </developers>
+
     <ciManagement>
         <system>hudson</system>
         <url>http://calendar.podval.org/hudson/job/calendar/</url>
     </ciManagement>
+
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>2.0.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -23,17 +64,24 @@
                     <showWarnings>true</showWarnings>
                 </configuration>
             </plugin>
-            <!--
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <configuration>
-                    <outputDirectory>${basedir}/target/surefire-reports</outputDirectory>
-                </configuration>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>2.0.1</version>
             </plugin>
-            -->
         </plugins>
     </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>2.0.1</version>
+            </plugin>
+        </plugins>
+    </reporting>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>

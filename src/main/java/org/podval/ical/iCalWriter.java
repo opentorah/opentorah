@@ -11,14 +11,14 @@ public final class iCalWriter {
     }
 
 
-    public void beginCalendar(final String prodId) {
+    public void beginCalendar(final String prodId, final String name, final String description) {
         println("BEGIN", "VCALENDAR");
         println("PRODID", prodId);
         println("VERSION", "2.0");
         println("CALSCALE", "GREGORIAN");
         println("METHOD", "PUBLISH");
-/////        println("X-WR-CALNAME", "Jewish Calendar");
-/////        println("X-WR-CALDESC", "Jewish Dates and Stuff");
+        println("X-WR-CALNAME", name);
+        println("X-WR-CALDESC", description);
     }
 
 
@@ -31,13 +31,20 @@ public final class iCalWriter {
         println("BEGIN", "VEVENT");
         println("CATEGORIES", "Holidays");
         println("CLASS", "PUBLIC");
-        println("SUMMARY", "sklfjsflkj");
-        println("TRANSP", "TRANSPARENT");
+        println("SUMMARY", "sklfjsflkj"); // Same as Google Title
+        println("TRANSP", "TRANSPARENT"); // "OPAQUE"
         println("URL;VALUE=URI", "http://lwhjsdgfjhf");
         println("DTSTAMP", "2061121T044202Z");
         println("UID", "asdhjgd-wjks=-f");
         println("DTSTART;VALUE=DATE", "20070203");
-        println("DURATION", "P1D");
+        println("DTEND;VALUE=DATE", "20070204");
+/////        println("DURATION", "P1D");
+        println("STATUS", "CONFIRMED");
+    }
+
+
+    public void addGoggleContent() {
+        // HTML only
     }
 
 
