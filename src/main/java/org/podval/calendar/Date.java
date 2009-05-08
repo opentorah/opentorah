@@ -12,6 +12,7 @@ public class Date<M> {
     }
 
 
+    // @todo Make JewishDate and GregorianDate subtypes.
     public Date(
         final int days,
         final int year,
@@ -22,7 +23,7 @@ public class Date<M> {
     }
 
 
-    public Date(
+    private Date(
         final int days,
         final int year,
         final Month<M> month,

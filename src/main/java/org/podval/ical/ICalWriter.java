@@ -8,9 +8,9 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 
-public final class iCalWriter {
+public final class ICalWriter {
 
-    public iCalWriter(final OutputStream os) {
+    public ICalWriter(final OutputStream os) {
         this.out = new PrintStream(os);
     }
 
@@ -34,6 +34,11 @@ public final class iCalWriter {
 
     public void endCalendar() {
         println("END", "VCALENDAR");
+    }
+
+
+    public void beginEvent() {
+        beginEvent(true);
     }
 
 
