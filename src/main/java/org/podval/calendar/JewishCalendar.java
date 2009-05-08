@@ -184,6 +184,14 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
 
 
     @Override
+    public List<Month<JewishMonth>> getMonthsSimple(final int year) {
+        return (isLeap(year)) ?
+            regularLeapYear :
+            regularNormalYear;
+    }
+
+
+    @Override
     protected void monthNotFound(final int year, final JewishMonth monthName) {
         throw new IllegalArgumentException((monthName == JewishMonth.Adar) ?
             "No Adar in a leap year" :
@@ -230,29 +238,6 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
 
     public boolean notEarlierInTheDayThan(final long when, final int hour, final int parts) {
         return hoursMinutesAndPartsFromParts(when) >= hour * PARTS_IN_HOUR + parts;
-    }
-
-
-    public int monthNumber(final int year, final JewishMonth month) {
-        final List<Month<JewishMonth>> months = (isLeap(year)) ?
-            regularLeapYear :
-            regularNormalYear;
-
-        boolean found = false;
-        int result = 1;
-        for (final Month<JewishMonth> m : months) {
-            if (m.month == month) {
-                found = true;
-                break;
-            }
-            result++;
-        }
-
-        if (!found) {
-            monthNotFound(year, month);
-        }
-
-        return result;
     }
 
 

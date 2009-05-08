@@ -53,6 +53,25 @@ public abstract class Calendar<M> {
     }
 
 
+    public final int monthNumber(final int year, final M month) {
+        boolean found = false;
+        int result = 1;
+        for (final Month<M> m : getMonthsSimple(year)) {
+            if (m.month == month) {
+                found = true;
+                break;
+            }
+            result++;
+        }
+
+        if (!found) {
+            monthNotFound(year, month);
+        }
+
+        return result;
+    }
+
+
     public final Date<M> dateFromParts(final long parts) {
         final int days = daysFromParts(parts);
         return dateFromDays(days).setTime(
@@ -125,6 +144,9 @@ public abstract class Calendar<M> {
 
 
     public abstract List<Month<M>> getMonths(final int year);
+
+
+    public abstract List<Month<M>> getMonthsSimple(final int year);
 
 
     protected abstract void monthNotFound(final int year, final M monthName);

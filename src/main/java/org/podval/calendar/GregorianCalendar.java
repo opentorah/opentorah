@@ -64,6 +64,12 @@ public final class GregorianCalendar extends Calendar<GregorianMonth> {
     }
 
 
+    @Override
+    public List<Month<GregorianMonth>> getMonthsSimple(final int year) {
+        return getMonths(year);
+    }
+
+
     public boolean isLeap(final int year) {
         return (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0));
     }
