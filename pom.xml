@@ -4,47 +4,81 @@
     <groupId>org.podval</groupId>
     <artifactId>calendar</artifactId>
     <name>Jewish Calendar</name>
-    <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
     <url>http://calendar.podval.org</url>
 
     <licenses>
-      <license>
-        <name>Apache 2</name>
-        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        <distribution>repo</distribution>
-        <comments>A business-friendly OSS license</comments>
-      </license>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
     </licenses>
 
     <organization>
-      <name>Podval</name>
-      <url>http://www.podval.org</url>
+        <name>Podval Group</name>
+        <url>http://www.podval.org</url>
     </organization>
 
     <developers>
-      <developer>
-        <id>dub</id>
-        <name>Leonid Dubinsky</name>
-        <email>dub@podval.org</email>
-        <url>http://dub.podval.org</url>
-        <organization>Podval</organization>
-        <organizationUrl>http://www.podval.org</organizationUrl>
-        <roles>
-          <role>developer</role>
-        </roles>
-        <timezone>-5</timezone>
-      </developer>
+        <developer>
+            <id>dub</id>
+            <name>Leonid Dubinsky</name>
+            <email>dub@podval.org</email>
+            <url>http://dub.podval.org</url>
+            <organization>Podval Group</organization>
+            <organizationUrl>http://www.podval.org</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>-5</timezone>
+        </developer>
     </developers>
 
     <ciManagement>
         <system>hudson</system>
-        <url>http://calendar.podval.org/hudson/job/calendar/</url>
+        <url>http://www.dub.podval.org/hudson/job/calendar/</url>
     </ciManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>podval-thirdparty</id>
+            <name>Podval 3rd Party</name>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+            <url>http://www.dub.podval.org/nexus/content/repositories/thirdparty/</url>
+        </repository>
+
+        <repository>
+            <id>podval-snapshots</id>
+            <name>Podval Snapshots</name>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+            <url>http://www.dub.podval.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+
+        <repository>
+            <id>podval-releases</id>
+            <name>Podval Releases</name>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+            <url>http://www.dub.podval.org/nexus/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>podval</id>
+            <name>snapshots</name>
+            <url>http://www.dub.podval.org/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <build>
         <plugins>
@@ -58,85 +92,22 @@
                     <showWarnings>true</showWarnings>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
     <dependencies>
         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.5</version>
+            <version>4.6</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <configuration>
-                    <xmlOutput>true</xmlOutput>
-                    <!--
-                    <xmlOutput>true|false</xmlOutput>
-                    <xmlOutputDirectory>directory location of findbugs xdoc xml report</xmlOutputDirectory>
-                    <threshold>High|Normal|Low|Exp|Ignore</threshold>
-                    <effort>Min|Default|Max</effort>
-                    <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
-                    <includeFilterFile>findbugs-include.xml</includeFilterFile>
-                    <visitors>FindDeadLocalStores,UnreadFields</visitors>
-                    <omitVisitors>FindDeadLocalStores,UnreadFields</omitVisitors>
-                    <onlyAnalyze>org.codehaus.mojo.findbugs.*</onlyAnalyze>
-                    <pluginList>/libs/fb-contrib/fb-contrib-2.8.0.jar</pluginList>
-                    <debug>true|false</debug>
-                    <relaxed>true|false</relaxed>
-                    <findbugsXmlOutput>true|false</findbugsXmlOutput>
-                    <findbugsXmlOutputDirectory>directory location of findbugs legact xml format report</findbugsXmlOutputDirectory>
-                    -->
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <configuration>
-                    <linkXref>true</linkXref>
-                    <sourceEncoding>utf-8</sourceEncoding>
-                    <minimumTokens>100</minimumTokens>
-                    <targetJdk>1.6</targetJdk>
-                    <excludes>
-                        <exclude>**/*Bean.java</exclude>
-                        <exclude>**/generated/*.java</exclude>
-                    </excludes>
-                    <excludeRoots>
-                        <excludeRoot>target/generated-sources/stubs</excludeRoot>
-                    </excludeRoots>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <configLocation>checkstyle-config.xml</configLocation>
-                    <!--
-                        <enableRulesSummary>false</enableRulesSummary>
-                        ...
-                        <configLocation>checkstyle.xml</configLocation>
-                        <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
-                        <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
-                   -->
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
 </project>

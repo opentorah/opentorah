@@ -88,13 +88,19 @@ public final class ICalWriter {
 //    }
 
 
-    public void addGoggleContent() {
-//X-GOOGLE-CALENDAR-CONTENT-TITLE:Independence Day
-//X-GOOGLE-CALENDAR-CONTENT-ICON:http://www.google.com/calendar/images/google-holiday.gif
-//X-GOOGLE-CALENDAR-CONTENT-URL:http://www.google.com/logos/july4th06.gif
-//X-GOOGLE-CALENDAR-CONTENT-TYPE:image/gif
-//X-GOOGLE-CALENDAR-CONTENT-WIDTH:276
-//X-GOOGLE-CALENDAR-CONTENT-HEIGHT:120
+    public void addGoggleContent(
+        final String title,
+        final String icon,
+        final String url,
+        final int width,
+        final int height)
+    {
+        println("X-GOOGLE-CALENDAR-CONTENT-TITLE", title);
+        println("X-GOOGLE-CALENDAR-CONTENT-ICON", icon);
+        println("X-GOOGLE-CALENDAR-CONTENT-URL", url);
+        println("X-GOOGLE-CALENDAR-CONTENT-TYPE", "text/html"); // can be image/*
+        println("X-GOOGLE-CALENDAR-CONTENT-WIDTH", Integer.toString(width));
+        println("X-GOOGLE-CALENDAR-CONTENT-HEIGHT", Integer.toString(height));
     }
 
 

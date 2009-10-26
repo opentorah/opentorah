@@ -50,13 +50,19 @@ public final class ICalGenerator {
     }
 
 
+    private static final String ICON_URL = "http://calendar.podval.org/icon.gif";
+
+
     private void writeDay(final Date<GregorianMonth> gDate) {
         final Date<JewishMonth> jDate = gDate.toJewish();
-        final String summary = monthName(jDate.getMonth().month) + " " + jDate.getDay();
+        final String monthName = monthName(jDate.getMonth().month);
+        final String summary = monthName + " " + jDate.getDay();
+        final String url = "http://calendar.podval.org/day/" + jDate.getYear() + "/" + jDate.getMonth().name + "/" + jDate.getDay();
 
         out.beginEvent();
         out.writeSummary(summary);
         out.writeFullDayDuration(gDate);
+        out.addGoggleContent(summary, ICON_URL, url, 200, 200);
         out.endEvent();
     }
 
