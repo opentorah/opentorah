@@ -15,8 +15,8 @@ public class JewishCalendarTest {
 
 
     private void date2days2date(final int year, final JewishMonth month, final int day) {
-        final Date<JewishMonth> fromDate = Date.create(year, month, day);
-        final Date<JewishMonth> fromDays = JewishCalendar.getInstance().dateFromDays(fromDate.getDays());
+        final JewishDate fromDate = JewishDate.create(year, month, day);
+        final JewishDate fromDays = JewishCalendar.getInstance().dateFromDays(fromDate.getDays());
         Assert.assertEquals(fromDate, fromDays);
     }
 
@@ -29,8 +29,8 @@ public class JewishCalendarTest {
 
 
     private void date2days(final int days, final int year, final JewishMonth month, final int day) {
-        final Date<JewishMonth> fromDays = JewishCalendar.getInstance().dateFromDays(days);
-        final Date<JewishMonth> fromDate = Date.create(year, month, day);
+        final JewishDate fromDays = JewishCalendar.getInstance().dateFromDays(days);
+        final JewishDate fromDate = JewishDate.create(year, month, day);
         Assert.assertEquals(days, fromDate.getDays());
         Assert.assertEquals(fromDays, fromDate);
     }

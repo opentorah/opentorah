@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.LinkedList;
 
 
-public final class JewishCalendar extends Calendar<JewishMonth> {
+public final class JewishCalendar extends Calendar<JewishMonth, JewishDate> {
 
     private static final JewishCalendar INSTANCE = new JewishCalendar();
 
@@ -261,7 +261,7 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
     public static final long FIRST_MOLAD = partsFromDate(1, 5, 204);
 
 
-    public Date<JewishMonth> moladDate(final int year, final JewishMonth month) {
+    public JewishDate moladDate(final int year, final JewishMonth month) {
         return dateFromParts(molad(year, month));
     }
 
@@ -276,5 +276,11 @@ public final class JewishCalendar extends Calendar<JewishMonth> {
         final int monthsInPreviousCycles = (cycleNumber(year)-1) * MONTHS_IN_CYCLE;
         final int monthInPreviousYears = monthsBeforeYearInCycle(yearInCycle(year));
         return monthsInPreviousCycles + monthInPreviousYears + (monthNumber - 1);
+    }
+
+
+    @Override
+    protected JewishDate createDate(final int days, final int year, final Month<JewishMonth> month, final int day) {
+        return new JewishDate(days, year, month, day);
     }
 }

@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.junit.Assert;
 
 
-
 public class GregorianCalendarTest {
 
     @Test
@@ -21,8 +20,8 @@ public class GregorianCalendarTest {
         final JewishMonth jMonth,
         final int jDay)
     {
-        final Date gDate = Date.create(gYear, gMonth, gDay).setTime(12, 0, 0);
-        final Date jDate = Date.create(jYear, jMonth, jDay).setTime(18, 0, 0);
+        final GregorianDate gDate = GregorianDate.create(gYear, gMonth, gDay).setTime(12, 0, 0);
+        final JewishDate jDate = JewishDate.create(jYear, jMonth, jDay).setTime(18, 0, 0);
         Assert.assertEquals(gDate, jDate.toGregorian());
         Assert.assertEquals(jDate, gDate.toJewish());
     }

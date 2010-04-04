@@ -1,19 +1,9 @@
 package org.podval.calendar;
 
 
-public class Date<M> {
+public abstract class Date<M, D extends Date<M, D>> {
 
-    public static Date create(final int year, final Object month, final int day) {
-        final Calendar calendar = (month instanceof JewishMonth) ?
-            JewishCalendar.getInstance() :
-            GregorianCalendar.getInstance();
-
-        return calendar.dateFromDate(year, month, day);
-    }
-
-
-    // @todo Make JewishDate and GregorianDate subtypes.
-    public Date(
+    protected Date(
         final int days,
         final int year,
         final Month<M> month,
@@ -23,7 +13,7 @@ public class Date<M> {
     }
 
 
-    private Date(
+    protected Date(
         final int days,
         final int year,
         final Month<M> month,
@@ -82,43 +72,22 @@ public class Date<M> {
     }
 
 
-    public Date setTime(final int hour, final int minute, final int parts) {
-        return new Date(getDays(), getYear(), getMonth(), getDay(), hour, minute, parts);
+    public D setTime(final int hour, final int minute, final int parts) {
+        return create(getDays(), getYear(), getMonth(), getDay(), hour, minute, parts);
     }
 
 
-    public Date getDate() {
-        return new Date(getDays(), getYear(), getMonth(), getDay(), 0, 0, 0);
+    public D getDate() {
+        return create(getDays(), getYear(), getMonth(), getDay(), 0, 0, 0);
     }
 
 
-    public Date getTime() {
-        return new Date(0, 0, null, 0, getHour(), getMinute(), getParts());
+    public D getTime() {
+        return create(0, 0, null, 0, getHour(), getMinute(), getParts());
     }
 
 
-    public Date toGregorian() {
-        if (!(getMonth().month instanceof JewishMonth)) {
-            throw new IllegalArgumentException();
-        }
-
-        boolean isAfterMidnight = getHour() >= 6;
-        return GregorianCalendar.getInstance()
-            .dateFromDays(getDays() + (isAfterMidnight ? 1 : 0))
-            .setTime((getHour()-6) % 24, getMinute(), getParts());
-    }
-
-
-    public Date toJewish() {
-        if (!(getMonth().month instanceof GregorianMonth)) {
-            throw new IllegalArgumentException();
-        }
-
-        boolean isAfterShkia = getHour() >= 18;
-        return JewishCalendar.getInstance()
-            .dateFromDays(getDays() + (isAfterShkia ? 0 : -1))
-            .setTime((getHour()+6) % 24, getMinute(), getParts());
-    }
+    protected abstract D create(final int days, final int year, final Month<M> month, final int day, final int hour, final int minute, final int parts);
 
 
     @Override

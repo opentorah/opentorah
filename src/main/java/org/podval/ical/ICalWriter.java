@@ -1,7 +1,6 @@
 package org.podval.ical;
 
-import org.podval.calendar.Date;
-import org.podval.calendar.GregorianMonth;
+import org.podval.calendar.GregorianDate;
 import org.podval.calendar.GregorianCalendar;
 
 import java.io.OutputStream;
@@ -40,7 +39,7 @@ public final class ICalWriter {
     public void beginEvent() {
         beginEvent(true);
     }
-
+final
 
     public void beginEvent(final boolean transparent) {
         println("BEGIN", "VEVENT");
@@ -55,14 +54,14 @@ public final class ICalWriter {
     }
 
 
-    public void writeFullDayDuration(final Date<GregorianMonth> date) {
+    public void writeFullDayDuration(final GregorianDate date) {
         println("DTSTART;VALUE=DATE", toString(date));
 /////        println("DTEND;VALUE=DATE", toString(date.next()));
         println("DURATION", "P1D");
     }
 
 
-    private String toString(final Date<GregorianMonth> date) {
+    private String toString(final GregorianDate date) {
         final StringBuffer result = new StringBuffer();
         result.append(date.getYear());
         append2digits(result, GregorianCalendar.getInstance().monthNumber(date.getYear(), date.getMonth().month));
@@ -109,14 +108,14 @@ public final class ICalWriter {
     }
 
 
-    private final void println(final String name, final String value) {
+    private void println(final String name, final String value) {
         out.print(name);
         out.print(":");
         out.println(value);
     }
 
 
-    private final void println(final String line) {
+    private void println(final String line) {
         out.println(line);
     }
 

@@ -77,13 +77,13 @@ public class MoladTest {
         final int parts
         )
     {
-        final Date mDate = JewishCalendar.getInstance().moladDate(year, month);
+        final JewishDate mDate = JewishCalendar.getInstance().moladDate(year, month);
         Assert.assertEquals(dayOfTheWeek, mDate.getDayOfTheWeek());
 
         Assert.assertEquals(jMonth, mDate.getMonth().month);
         Assert.assertEquals(jDay, mDate.getDay());
 
-        final Date gDate = Date.create(gYear, gMonth, gDay)
+        final GregorianDate gDate = GregorianDate.create(gYear, gMonth, gDay)
             .setTime(hour + (am ? 0 : 12), minute, parts);
 
         Assert.assertEquals(gDate, mDate.toGregorian());

@@ -18,10 +18,11 @@
 package org.podval.ical;
 
 import java.io.FileOutputStream;
-import org.podval.calendar.Date;
 import org.podval.calendar.GregorianCalendar;
+import org.podval.calendar.GregorianDate;
 import org.podval.calendar.GregorianMonth;
 import org.podval.calendar.JewishMonth;
+import org.podval.calendar.JewishDate;
 
 import java.io.OutputStream;
 
@@ -36,7 +37,7 @@ public final class ICalGenerator {
     private void writeYear(final int year) {
         out.beginCalendar("-//Podval Group//NONSGML Jewish Calendar//EN", "Jewish Dates", "Jewish Dates, Events and Schedules");
 
-        Date<GregorianMonth> gDate = Date.create(year, GregorianMonth.January, 1);
+        GregorianDate gDate = GregorianDate.create(year, GregorianMonth.January, 1);
         while (true) {
             writeDay(gDate);
 
@@ -53,8 +54,8 @@ public final class ICalGenerator {
     private static final String ICON_URL = "http://calendar.podval.org/icon.gif";
 
 
-    private void writeDay(final Date<GregorianMonth> gDate) {
-        final Date<JewishMonth> jDate = gDate.toJewish();
+    private void writeDay(final GregorianDate gDate) {
+        final JewishDate jDate = gDate.toJewish();
         final String monthName = monthName(jDate.getMonth().month);
         final String summary = monthName + " " + jDate.getDay();
         final String url = "http://calendar.podval.org/day/" + jDate.getYear() + "/" + jDate.getMonth().name + "/" + jDate.getDay();

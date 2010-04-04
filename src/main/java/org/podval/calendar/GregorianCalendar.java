@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-public final class GregorianCalendar extends Calendar<GregorianMonth> {
+public final class GregorianCalendar extends Calendar<GregorianMonth, GregorianDate> {
 
     private static final GregorianCalendar INSTANCE = new GregorianCalendar();
 
@@ -78,5 +78,11 @@ public final class GregorianCalendar extends Calendar<GregorianMonth> {
     @Override
     protected void monthNotFound(final int year, final GregorianMonth monthName) {
         throw new Error("?");
+    }
+
+
+    @Override
+    protected final GregorianDate createDate(final int days, final int year, final Month<GregorianMonth> month, final int day) {
+        return new GregorianDate(days, year, month, day);
     }
 }

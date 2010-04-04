@@ -3,9 +3,9 @@ package org.podval.calendar;
 import java.util.List;
 
 
-public abstract class Calendar<M> {
+public abstract class Calendar<M, D extends Date<M,D>> {
 
-    public final Date dateFromDate(final int year, final M monthName, final int day) {
+    public final D dateFromDate(final int year, final M monthName, final int day) {
         Month<M> month = null;
         int daysBeforeMonth = 0;
         for (final Month<M> m : getMonths(year)) {
@@ -30,11 +30,14 @@ public abstract class Calendar<M> {
 
         final int days = epoch() + daysInYearsBeforeYear(year) + daysBeforeMonth + day - 1;
 
-        return new Date<M>(days, year, month, day);
+        return createDate(days, year, month, day);
     }
 
 
-    public final Date<M> dateFromDays(final int days) {
+    protected abstract D createDate(final int days, final int year, final Month<M> month, final int day);
+
+
+    public final D dateFromDays(final int days) {
         final int year = yearDayIsIn(days-epoch());
 
         int daysInYear = days - daysInYearsBeforeYear(year) - epoch();
@@ -49,7 +52,7 @@ public abstract class Calendar<M> {
             daysInYear -= daysInMonth;
         }
 
-        return new Date(days, year, month, daysInYear+1);
+        return createDate(days, year, month, daysInYear+1);
     }
 
 
@@ -72,7 +75,7 @@ public abstract class Calendar<M> {
     }
 
 
-    public final Date<M> dateFromParts(final long parts) {
+    public final D dateFromParts(final long parts) {
         final int days = daysFromParts(parts);
         return dateFromDays(days).setTime(
             hoursFromParts(parts),
@@ -97,10 +100,10 @@ public abstract class Calendar<M> {
     }
 
 
-    public static long PARTS_IN_HOUR = 1080;
+    public static final long PARTS_IN_HOUR = 1080;
 
 
-    public static int MINUTES_IN_HOUR = 60;
+    public static final int MINUTES_IN_HOUR = 60;
 
 
     public static final long PARTS_IN_MINUTE = PARTS_IN_HOUR / MINUTES_IN_HOUR;
@@ -132,7 +135,7 @@ public abstract class Calendar<M> {
     }
 
 
-    public static final int dayOfTheWeek(final int days) {
+    public static int dayOfTheWeek(final int days) {
         return (int) (days % 7 + 1);
     }
 

@@ -33,9 +33,9 @@ public class BirkatHahamaTest {
         final GregorianMonth gMonth,
         final int gDay)
     {
-        final Date<JewishMonth> tDate = Tkufos.birkasHachama(number);
-        final Date<JewishMonth> jDate = Date.create(jYear, jMonth, jDay);
-        final Date<JewishMonth> gDate = Date.create(gYear, gMonth, gDay).setTime(18, 0, 0);
+        final JewishDate tDate = Tkufos.birkasHachama(number);
+        final JewishDate jDate = JewishDate.create(jYear, jMonth, jDay);
+        final GregorianDate gDate = GregorianDate.create(gYear, gMonth, gDay).setTime(18, 0, 0);
         Assert.assertEquals(jDate, tDate);
         Assert.assertEquals(gDate, tDate.toGregorian());
         Assert.assertEquals(4, Calendar.dayOfTheWeek(tDate.getDays()));

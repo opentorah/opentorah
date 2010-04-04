@@ -17,13 +17,13 @@ public final class Tkufos {
     public static final long YEAR_OF_RAV_ADA = JewishCalendar.MONTHS_IN_CYCLE*JewishCalendar.LUNAR_MONTH/19;
 
 
-    public static Date<JewishMonth> birkasHachama(final int cycle) {
+    public static JewishDate birkasHachama(final int cycle) {
         // Since Birkas HaChama is said in the morning, we add 12 hours to the time of the equinox
         return JewishCalendar.getInstance().dateFromParts(firstTkufasNissan() + 28*cycle*YEAR_OF_SHMUEL + 12*JewishCalendar.PARTS_IN_HOUR);
     }
 
 
-    public static Date<JewishMonth> tkufasNissan(final int year) {
+    public static JewishDate tkufasNissan(final int year) {
         return JewishCalendar.getInstance(). dateFromParts(firstTkufasNissan() + (year-1)*YEAR_OF_RAV_ADA);
     }
 }
