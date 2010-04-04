@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.podval</groupId>
-    <artifactId>calendar</artifactId>
+    <artifactId>calendar-parent</artifactId>
     <name>Jewish Calendar</name>
     <version>1.0-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>pom</packaging>
     <url>http://calendar.podval.org</url>
 
     <licenses>
@@ -95,19 +95,30 @@
         </plugins>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
-        </dependency>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>2.5</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
+    <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
+            <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <modules>
+        <module>dates</module>
+        <module>features</module>
+        <module>ical</module>
+        <module>app-servlet</module>
+        <module>moon</module>
+    </modules>
 </project>
