@@ -1,0 +1,179 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.podval</groupId>
+    <artifactId>judaica-parent</artifactId>
+    <name>Digital Judaica</name>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+
+    <url>http://judaica.podval.org/</url>
+
+    <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <organization>
+      <name>Podval Group</name>
+      <url>http://www.podval.org</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <id>dub</id>
+            <name>Leonid Dubinsky</name>
+            <email>dub@podval.org</email>
+            <url>http://dub.podval.org</url>
+            <organization>Podval</organization>
+            <organizationUrl>http://www.podval.org</organizationUrl>
+            <roles>
+              <role>developer</role>
+            </roles>
+            <timezone>-5</timezone>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:hg:http://judaica.podval.org/hg/judaica/</connection>
+        <developerConnection>scm:hg:https://judaica.podval.org/hg/judaica/</developerConnection>
+        <tag>HEAD</tag>
+        <url>http://judaica.podval.org/hg/judaica/</url>
+    </scm>
+<!--
+    <issueManagement>
+        <system>Jira</system>
+        <url>http://code.google.com/p/podval-xquery/issues/list</url>
+    </issueManagement>
+-->
+    <ciManagement>
+        <system>hudson</system>
+        <url>http://judaica.podval.org/hudson/job/judaica/</url>
+    </ciManagement>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <scala.version>2.8.0</scala.version>
+    </properties>
+ 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>scala-tools.org</id>
+            <name>Scala-tools repository</name>
+            <url>http://scala-tools.org/repo-releases</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <repositories>
+        <repository>
+            <id>podval-thirdparty</id>
+            <name>Podval 3rd Party</name>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+            <url>http://www.dub.podval.org/nexus/content/repositories/thirdparty/</url>
+        </repository>
+
+        <repository>
+            <id>podval-snapshots</id>
+            <name>Podval Snapshots</name>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+            <url>http://www.dub.podval.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+
+        <repository>
+            <id>podval-releases</id>
+            <name>Podval Releases</name>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+            <url>http://www.dub.podval.org/nexus/content/repositories/releases/</url>
+        </repository>
+
+        <repository>
+            <id>scala-tools.org</id>
+            <name>Scala-tools Maven2 Repository</name>
+            <url>http://scala-tools.org/repo-releases</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>podval</id>
+            <name>snapshots</name>
+            <url>http://www.dub.podval.org/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scala-test-compile</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                    <sendJavaToScalac>false</sendJavaToScalac>
+                    <args>
+                        <arg>-target:jvm-1.5</arg>
+                        <arg>-g:vars</arg>
+                        <arg>-make:transitivenocp</arg>
+                        <arg>-dependencyfile</arg>
+                        <arg>${project.build.directory}/.scala_dependencies</arg>
+                    </args>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <modules>
+        <module>importers</module>
+        <module>view</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
+ 
