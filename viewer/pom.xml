@@ -9,6 +9,6 @@
     </parent>
 
     <artifactId>judaica-viewer</artifactId>
-    <name>View</name>
+    <name>Viewer</name>
     <packaging>jar</packaging>
 </project>

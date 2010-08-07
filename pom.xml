@@ -132,7 +132,7 @@
                 </executions>
                 <configuration>
                     <scalaVersion>${scala.version}</scalaVersion>
-                    <sendJavaToScalac>false</sendJavaToScalac>
+                    <sendJavaToScalac>true</sendJavaToScalac>
                     <args>
                         <arg>-target:jvm-1.5</arg>
                         <arg>-g:vars</arg>
@@ -158,7 +158,7 @@
 
     <modules>
         <module>importers</module>
-        <module>view</module>
+        <module>viewer</module>
     </modules>
 
     <dependencies>

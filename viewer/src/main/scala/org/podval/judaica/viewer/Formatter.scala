@@ -22,25 +22,61 @@ import scala.xml.Node
 
 object Formatter {
 
-    def format(nodes: Seq[Node], what: String): Seq[Node] = {
+    def format(nodes: Seq[Node], what: String): Seq[Node] =
+      format(nodes, what, "")
+
+
+    def format(nodes: Seq[Node], what: String, name: String): Seq[Node] = {
         for (node <- nodes) yield {
-            if (Util.isDiv(node)) {
-                <div class="{Util.getType(node)}">
-                    {format(node.child, what)}
-                </div>                
-            } else if (Util.isDivType(node, what)) {
-                format(node)
+            if (!Util.isDiv(node)) {
+                formatNonStructural(node)
             } else {
-                null
+                // name span
+
+                val newName = (if (name.isEmpty) name else name + "-") + Util.getName(node)
+
+                <div class={Util.getType(node)}>{
+                    if (Util.isDivType(node, what)) {
+                        formatTable(node, newName)
+                    } else {
+                        format(node.child, what, newName)
+                    }
+                }
+                </div>
             }
         }
     }
 
 
-    private def format(node: Node): Node = {
-        <table>{
-        for (row <- node.chil)
+    private def formatTable(node: Node, name: String) = {
+       <table>
+           {node.child.map(formatRow)}
+       </table>
+   }
+
+
+    private def formatRow(node: Node): Seq[Node] = {
+        if (node.label != "merge") {
+            throw new IllegalArgumentException("Not a 'merge'!")
         }
-        </table>
+
+        <tr>
+          {node.child.map(formatCell)}
+        </tr>
     }
+
+
+    private def formatCell(node: Node) = {
+        // @todo handle app...
+        if (node.label != "word") {
+            throw new IllegalArgumentException("Unknown merged tag " + node.label)
+        }
+
+        <td>{node.text}</td>  
+    }
+
+
+    private def formatNonStructural(node: Node) = {
+        null
+    }  
 }

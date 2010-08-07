@@ -23,18 +23,20 @@ import scala.xml.{XML, PrettyPrinter, Utility}
 object Main {
 
     def main(args: Array[String]) {
-        val viewer = new tanach.Viewer(
-            new Text("/var/www/sites/hg.judaica/projects/texts/Tanach/jerusalem/Genesis.xml"),
-            new Text("/var/www/sites/hg.judaica/projects/texts/Tanach/toronto/Genesis.xml")
-        )
+//        val viewer = new tanach.Viewer(
+//            new Text("/var/www/sites/hg.judaica/projects/texts/Tanach/jerusalem/Genesis.xml"),
+//            new Text("/var/www/sites/hg.judaica/projects/texts/Tanach/toronto/Genesis.xml")
+//        )
 
-        val xml = viewer.merge()
-//        val j = loadFile("/home/dub/projects/scala/xml/src/main/resources/j.xml")
-//        val t = loadFile("/home/dub/projects/scala/xml/src/main/resources/t.xml")
-//
-//        val xml = Merger.merge(j, t, List("book", "chapter", "verse"))
-//
-//        println(new PrettyPrinter(80, 4).formatNodes(xml));
+//        val xml = viewer.merge()
+        val j = loadFile("/tmp/j.xml")
+        val t = loadFile("/tmp/t.xml")
+
+        val merged = Merger.merge(j, t, List("book", "chapter", "verse"))
+        val trimmed = merged.flatMap(Utility.trimProper(_))
+        val xml = Formatter.format(trimmed, "verse")
+
+        println(new PrettyPrinter(80, 4).formatNodes(xml));
     }
 
 
