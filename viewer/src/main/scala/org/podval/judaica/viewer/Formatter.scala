@@ -20,63 +20,91 @@ package org.podval.judaica.viewer
 import scala.xml.Node
 
 
-object Formatter {
+class Formatter(
+    texts: Seq[TextDescriptor],
+    what: String,
+    formatNonStructural: Node => Node,
+    formatContent: Node => Seq[Node],
+    formatEditable: Node => String)
+{
+    def format(nodes: Seq[Node]): Seq[Node] = {
+        format(nodes, "")
+    }
 
-    def format(nodes: Seq[Node], what: String): Seq[Node] =
-      format(nodes, what, "")
 
-
-    def format(nodes: Seq[Node], what: String, name: String): Seq[Node] = {
+    private def format(nodes: Seq[Node], name: String): Seq[Node] = {
         for (node <- nodes) yield {
             if (!Util.isDiv(node)) {
                 formatNonStructural(node)
             } else {
-                // name span
-
-                val newName = (if (name.isEmpty) name else name + "-") + Util.getName(node)
-
-                <div class={Util.getType(node)}>{
-                    if (Util.isDivType(node, what)) {
-                        formatTable(node, newName)
-                    } else {
-                        format(node.child, what, newName)
-                    }
-                }
-                </div>
+                formatStructurally(node, name)
             }
         }
     }
 
 
+    private def formatStructurally(node: Node, name: String) = {
+        val type_ = Util.getType(node)
+        val name_ = Util.getName(node)
+        val newName = name + "-" + type_ + "-" + name_
+        
+        <div class={type_}>
+            <span class={type_ +"-name"}>{name_}</span>
+            {
+                if (Util.isDivType(node, what)) {
+                    formatTable(node, newName)
+                } else {
+                    format(node.child, newName)
+                }
+            }
+        </div>
+    }
+
+
     private def formatTable(node: Node, name: String) = {
-       <table>
-           {node.child.map(formatRow)}
-       </table>
-   }
+        <table>
+            <tr>
+            {
+                for (text <- texts) yield {
+                    <td><span class ="text-name">{text.name}</span></td>
+                }
+            }
+            </tr>
+            {
+                var numRow = 0
+                for (row <- node.child) yield {
+                    if (row.label != "merge") {
+                        throw new IllegalArgumentException("Not a 'merge'!")
+                    }
 
+                    val content = row.child
 
-    private def formatRow(node: Node): Seq[Node] = {
-        if (node.label != "merge") {
-            throw new IllegalArgumentException("Not a 'merge'!")
-        }
+                    if (content.size != texts.size) {
+                        throw new IllegalArgumentException("Wrong length")
+                    }
 
-        <tr>
-          {node.child.map(formatCell)}
-        </tr>
+                    numRow += 1
+                    <tr>
+                    {
+                        content.zip(texts).map(formatCell(name + "-" + numRow))
+                    }
+                    </tr>
+                }
+            }
+        </table>
     }
 
 
-    private def formatCell(node: Node) = {
-        // @todo handle app...
-        if (node.label != "word") {
-            throw new IllegalArgumentException("Unknown merged tag " + node.label)
-        }
-
-        <td>{node.text}</td>  
+    private def formatCell(name: String)(cell: Pair[Node, TextDescriptor]) = {
+        val node = cell._1
+        val text = cell._2
+        <td>{
+                if (!text.edit) {
+                    formatContent(node)
+                } else {
+                    val inputName = "edit-" + text.name + name
+                    <input type="text" name={inputName} value={formatEditable(node)}/>
+                }
+        }</td>  
     }
-
-
-    private def formatNonStructural(node: Node) = {
-        null
-    }  
 }

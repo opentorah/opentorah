@@ -22,6 +22,7 @@ import scala.xml.{Node, Elem}
 
 object Merger {
 
+    // @todo handle multiple "others"
     def merge(main: Seq[Node], others: Seq[Node], divTypes: Seq[String]) = {
         if (!divTypes.isEmpty) {
             mergeStructurally(main, others, divTypes)
@@ -62,10 +63,7 @@ object Merger {
         for (child <- main) yield {
             val otherChild = doGetNext(othersIterator)
 
-            <merge>
-                {child}
-                {otherChild}
-            </merge>
+            <merge>{child}{otherChild}</merge>
         }
     }
 

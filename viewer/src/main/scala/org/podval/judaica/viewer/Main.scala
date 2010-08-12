@@ -17,7 +17,7 @@
 
 package org.podval.judaica.viewer
 
-import scala.xml.{XML, PrettyPrinter, Utility}
+import scala.xml.{XML, PrettyPrinter, Utility, Node}
 
 
 object Main {
@@ -33,8 +33,17 @@ object Main {
         val t = loadFile("/tmp/t.xml")
 
         val merged = Merger.merge(j, t, List("book", "chapter", "verse"))
-        val trimmed = merged.flatMap(Utility.trimProper(_))
-        val xml = Formatter.format(trimmed, "verse")
+
+// @todo blog about the spaces in Scala's XML literals if curly braces are not flush with the tags!
+//        val trimmed = merged.flatMap(Utility.trimProper(_))
+
+        val xml = new Formatter(
+            List(new TextDescriptor("jerusalem", false), new TextDescriptor("toronto", true)),
+            "verse",
+            _ => null,
+            (node: Node) => scala.xml.Text(node.text),
+            (node: Node) => node.text
+        ).format(merged)
 
         println(new PrettyPrinter(80, 4).formatNodes(xml));
     }
