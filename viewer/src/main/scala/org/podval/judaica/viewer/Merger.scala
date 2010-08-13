@@ -20,10 +20,15 @@ package org.podval.judaica.viewer
 import scala.xml.{Node, Elem}
 
 
-object Merger {
+final class Merger(divTypes: Seq[String]) {
 
     // @todo handle multiple "others"
-    def merge(main: Seq[Node], others: Seq[Node], divTypes: Seq[String]) = {
+    def merge(main: Text, others: Seq[Text]): Seq[Node] = {
+        merge(main.getXml(), others.head.getXml(), divTypes)
+    }
+
+
+    private def merge(main: Seq[Node], others: Seq[Node], divTypes: Seq[String]): Seq[Node] = {
         if (!divTypes.isEmpty) {
             mergeStructurally(main, others, divTypes)
         } else {

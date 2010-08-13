@@ -19,57 +19,74 @@ package org.podval.judaica.viewer
 
 import scala.xml.Node
 
+import scala.collection.mutable.Stack
+
 
 class Formatter(
-    texts: Seq[TextDescriptor],
-    what: String,
-    formatNonStructural: Node => Node,
-    formatContent: Node => Seq[Node],
-    formatEditable: Node => String)
+    format: TextFormat,
+    selectionDivType: String,
+    texts: Seq[Text],
+    nodes: Seq[Node])
 {
-    def format(nodes: Seq[Node]): Seq[Node] = {
-        format(nodes, "")
+    val context = new Stack[Node]()
+
+
+    def format(postUrl: String): Seq[Node] = {
+        <form action={postUrl} method="post">
+            {format(nodes)}
+            <input type="submit" value="Submit"/>
+        </form>
     }
 
 
-    private def format(nodes: Seq[Node], name: String): Seq[Node] = {
+    private def format(nodes: Seq[Node]): Seq[Node] = {
         for (node <- nodes) yield {
             if (!Util.isDiv(node)) {
-                formatNonStructural(node)
+                format.formatNonStructural(node)
             } else {
-                formatStructurally(node, name)
+                formatStructurally(node)
             }
         }
     }
 
 
-    private def formatStructurally(node: Node, name: String) = {
-        val type_ = Util.getType(node)
-        val name_ = Util.getName(node)
-        val newName = name + "-" + type_ + "-" + name_
-        
-        <div class={type_}>
-            <span class={type_ +"-name"}>{name_}</span>
-            {
-                if (Util.isDivType(node, what)) {
-                    formatTable(node, newName)
-                } else {
-                    format(node.child, newName)
+    private def formatStructurally(node: Node) = {
+        context.push(node)
+
+        val result =
+            <div class={Util.getType(node)}>
+                {nameSpan(node)}
+                {
+                    if (Util.isDivType(node, format.getMergeDivType())) {
+                        formatTable(node)
+                    } else {
+                        format(node.child)
+                    }
                 }
-            }
-        </div>
+            </div>
+        
+        context.pop()
+
+        result
     }
 
 
-    private def formatTable(node: Node, name: String) = {
+    private def nameSpan(node: Node): Seq[Node] = nameSpan(Util.getType(node), Util.getName(node))
+
+
+    private def nameSpan(type_ : String, name: String) =
+        <span class={type_ +"-name"}>{name}</span>
+
+
+    private def formatTable(node: Node) = {
+        val divName = nameFromContext()
+
         <table>
-            <tr>
-            {
+            <tr>{
                 for (text <- texts) yield {
-                    <td><span class ="text-name">{text.name}</span></td>
+                    <td>{nameSpan("text", text.getName())}</td>
                 }
-            }
-            </tr>
+            }</tr>
             {
                 var numRow = 0
                 for (row <- node.child) yield {
@@ -84,27 +101,34 @@ class Formatter(
                     }
 
                     numRow += 1
-                    <tr>
-                    {
-                        content.zip(texts).map(formatCell(name + "-" + numRow))
-                    }
-                    </tr>
+                    <tr>{
+                        content.zip(texts).map(formatCell(divName + "-" + numRow))
+                    }</tr>
                 }
             }
         </table>
     }
 
 
-    private def formatCell(name: String)(cell: Pair[Node, TextDescriptor]) = {
+    private def nameFromContext() = {
+        context
+          .reverse
+          .dropWhile(node => Util.getType(node) != selectionDivType)
+          .map(node => Util.getType(node) + "-" + Util.getName(node))
+          .mkString("-")
+    }
+
+
+    private def formatCell(name: String)(cell: Pair[Node, Text]) = {
         val node = cell._1
         val text = cell._2
         <td>{
-                if (!text.edit) {
-                    formatContent(node)
-                } else {
-                    val inputName = "edit-" + text.name + name
-                    <input type="text" name={inputName} value={formatEditable(node)}/>
-                }
+            if (!text.isEdit()) {
+                format.formatContent(node)
+            } else {
+                val inputName = "edit-" + text.getName() + "-" + name
+                <input type="text" name={inputName} value={format.formatEditable(node)}/>
+            }
         }</td>  
     }
 }

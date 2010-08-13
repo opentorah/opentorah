@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.podval</groupId>
-        <artifactId>judaica-parent</artifactId>
+        <groupId>org.podval.judaica</groupId>
+        <artifactId>parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>judaica-viewer</artifactId>
+    <artifactId>viewer</artifactId>
     <name>Viewer</name>
     <packaging>jar</packaging>
 </project>

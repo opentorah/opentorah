@@ -20,15 +20,11 @@ package org.podval.judaica.viewer
 import scala.xml.Node
 
 
-abstract class Text {
-
-    // @todo use property syntax?
-    def getName(): String
-
-
-    // @todo use property syntax?
-    def isEdit(): Boolean
-
-
-    def getXml(): Seq[Node]
+class TextFormat(
+    val divTypes: Seq[String],
+    val formatNonStructural: Node => Node,
+    val formatContent: Node => Seq[Node],
+    val formatEditable: Node => String)
+{
+    final def getMergeDivType() = divTypes.last 
 }

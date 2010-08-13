@@ -17,37 +17,34 @@
 
 package org.podval.judaica.viewer
 
-import scala.xml.{XML, PrettyPrinter, Utility, Node}
+import scala.xml.PrettyPrinter
+
+import org.podval.judaica.viewer.tanach.TanachTextFormat
 
 
 object Main {
 
-    def main(args: Array[String]) {
-//        val viewer = new tanach.Viewer(
-//            new Text("/var/www/sites/hg.judaica/projects/texts/Tanach/jerusalem/Genesis.xml"),
-//            new Text("/var/www/sites/hg.judaica/projects/texts/Tanach/toronto/Genesis.xml")
-//        )
-
-//        val xml = viewer.merge()
-        val j = loadFile("/tmp/j.xml")
-        val t = loadFile("/tmp/t.xml")
-
-        val merged = Merger.merge(j, t, List("book", "chapter", "verse"))
-
-// @todo blog about the spaces in Scala's XML literals if curly braces are not flush with the tags!
-//        val trimmed = merged.flatMap(Utility.trimProper(_))
-
-        val xml = new Formatter(
-            List(new TextDescriptor("jerusalem", false), new TextDescriptor("toronto", true)),
-            "verse",
-            _ => null,
-            (node: Node) => scala.xml.Text(node.text),
-            (node: Node) => node.text
-        ).format(merged)
-
-        println(new PrettyPrinter(80, 4).formatNodes(xml));
+    def main(args: Array[String]) = {
+        new PrettyPrinter(100,2).formatNodes(doIt("/judaica/"))
     }
 
 
-    private def loadFile(path: String) = Utility.trimProper(XML.loadFile(path))
+    def doIt(postUrl: String) = {
+//            new Text("/var/www/sites/hg.judaica/projects/texts/Tanach/jerusalem/Genesis.xml"),
+//            new Text("/var/www/sites/hg.judaica/projects/texts/Tanach/toronto/Genesis.xml")
+
+        new Viewer(
+            new TanachTextFormat(),
+            "chapter",
+            List(
+                new TextDescriptor("jerusalem", false, "/tmp/j.xml"),
+                new TextDescriptor("toronto", true, "/tmp/t.xml")
+            )
+        ).format(postUrl)
+ 
+// @todo blog about the spaces in Scala's XML literals if curly braces are not flush with the tags!
+//        val trimmed = merged.flatMap(Utility.trimProper(_))
+//        
+// Also, about utility of the Seq[Node] writer...
+    }
 }

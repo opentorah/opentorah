@@ -15,20 +15,17 @@
  * under the License.
  */
 
-package org.podval.judaica.viewer
+package org.podval.judaica.viewer.tanach
+
+import org.podval.judaica.viewer.TextFormat
 
 import scala.xml.Node
 
 
-abstract class Text {
-
-    // @todo use property syntax?
-    def getName(): String
-
-
-    // @todo use property syntax?
-    def isEdit(): Boolean
-
-
-    def getXml(): Seq[Node]
+final class TanachTextFormat extends TextFormat(
+    List("book", "chapter", "verse"),
+    _ => null,
+    (node: Node) => scala.xml.Text(node.text),
+    (node: Node) => node.text
+) {
 }

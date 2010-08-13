@@ -15,19 +15,27 @@
  * under the License.
  */
 
-package org.podval.judaica.viewer.tanach
+package org.podval.judaica.viewer
 
-import org.podval.judaica.viewer.Text
-
-
-class Viewer(texts: Text*) {
-
-    def merge() = {
-        
-    }
+import scala.xml.Node
 
 
-    def mergeVerse(chapter: Int, verse: Int) = {
-        
+final class Viewer(
+    format: TextFormat,
+    selectionDivType: String,
+    texts: Seq[Text])
+{
+    private val merger = new Merger(format.divTypes)
+
+
+    def format(postUrl: String): Seq[Node] = {
+        val merged = merger.merge(texts.head, texts.tail)
+
+// @todo blog about the spaces in Scala's XML literals if curly braces are not flush with the tags!
+//        val trimmed = merged.flatMap(Utility.trimProper(_))
+
+        val formatter = new Formatter(format, selectionDivType, texts, merged)
+
+        formatter.format(postUrl)
     }
 }
