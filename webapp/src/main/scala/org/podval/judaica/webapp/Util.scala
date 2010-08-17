@@ -17,20 +17,9 @@
 
 package org.podval.judaica.webapp
 
+import scala.xml.Node
 
 object Util {
-
-    def toPairs(form: MultivaluedMap[String, String]): Set[Pair[String, String]] = {
-        for (entry <- form.entrySet) yield {
-            val name: String = entry.getKey()
-            val values = entry.getValue()
-            if (values.size > 1) {
-                
-            }
-
-            new Pair(name, values(0))
-        }
-    }
 
 
     def toHtml(baseUrl: String, body: Seq[Node]): Seq[Node] = {
@@ -39,7 +28,7 @@ object Util {
                 <link href={baseUrl + "style.css"} rel="stylesheet" type="text/css"/>
             </head>
             <body>
-                {what}
+                {body}
             </body>
         </html>
     }

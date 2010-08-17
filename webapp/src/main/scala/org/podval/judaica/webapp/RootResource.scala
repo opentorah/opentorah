@@ -17,7 +17,8 @@
 
 package org.podval.judaica.webapp
 
-import org.podval.judaica.viewer.Main
+import org.podval.judaica.viewer.{Viewer, TextDescriptor}
+import org.podval.judaica.viewer.tanach.TanachTextFormat
 
 import javax.ws.rs.{Path, GET, POST, Produces, Consumes}
 import javax.ws.rs.core.{Context, UriInfo, MultivaluedMap}
@@ -30,20 +31,35 @@ import java.io.File
 @Path("/")
 final class RootResource {
 
+//            new Text("/var/www/sites/hg.judaica/projects/texts/Tanach/jerusalem/Genesis.xml"),
+//            new Text("/var/www/sites/hg.judaica/projects/texts/Tanach/toronto/Genesis.xml")
+
+    val viewer = new Viewer(
+            new TanachTextFormat(),
+            "chapter",
+            List(
+                new TextDescriptor("jerusalem", false, "/tmp/j.xml"),
+                new TextDescriptor("toronto", true, "/tmp/t.xml")
+            )
+        )
+ 
+// @todo blog about the spaces in Scala's XML literals if curly braces are not flush with the tags!
+//        val trimmed = merged.flatMap(Utility.trimProper(_))
+//        
+// Also, about utility of the Seq[Node] writer...
+
     @GET
     @Produces(Array("text/html"))
     def get(@Context uri: UriInfo) = {
         val baseUrl: String = uri.getBaseUri().toString
-        Util.toHtml(baseUrl, Main.doIt(baseUrl))
+        Util.toHtml(baseUrl, viewer.get(baseUrl))
     }
 
 
     @POST
     @Consumes(Array("application/x-www-form-urlencoded"))
     @Produces(Array("text/plain"))
-    def post(@Context form: MultivaluedMap[String, String]) = {
-        Util.toPairs(form).toString
-    }
+    def post(@Context form: MultivaluedMap[String, String]) = viewer.put(asMap(form).asInstanceOf[Map[String, List[String]]])
 
 
     @GET

@@ -20,13 +20,7 @@ package org.podval.judaica.viewer
 import scala.xml.{Node, XML, Utility}
 
 
-final class TextDescriptor(name: String, isEdit: Boolean, path: String) extends Text {
-
-    def getName() = name
-
-
-    def isEdit() = isEdit
-
+final class TextDescriptor(val name: String, val isEdit: Boolean, path: String) extends Text {
 
     def getXml() = getXml(path)
 

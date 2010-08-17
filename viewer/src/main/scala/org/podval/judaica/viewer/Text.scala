@@ -22,12 +22,10 @@ import scala.xml.Node
 
 abstract class Text {
 
-    // @todo use property syntax?
-    def getName(): String
+    def name: String
 
 
-    // @todo use property syntax?
-    def isEdit(): Boolean
+    def isEdit: Boolean
 
 
     def getXml(): Seq[Node]

@@ -28,14 +28,29 @@ final class Viewer(
     private val merger = new Merger(format.divTypes)
 
 
-    def format(postUrl: String): Seq[Node] = {
+    def get(postUrl: String): Seq[Node] = {
         val merged = merger.merge(texts.head, texts.tail)
-
-// @todo blog about the spaces in Scala's XML literals if curly braces are not flush with the tags!
-//        val trimmed = merged.flatMap(Utility.trimProper(_))
 
         val formatter = new Formatter(format, selectionDivType, texts, merged)
 
         formatter.format(postUrl)
+    }
+
+
+    def put(form : Map[String, List[String]]): String = {
+        unique(form).toString
+    }
+
+
+    private def unique(form: Map[String, List[String]]): Map[String, String] = {
+        for (entry <- form) yield {
+            val name = entry._1
+            val values = entry._2
+            if (values.size > 1) {
+                
+            }
+
+            name -> values(0)
+        }
     }
 }

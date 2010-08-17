@@ -28,56 +28,37 @@ final class Merger(divTypes: Seq[String]) {
     }
 
 
-    private def merge(main: Seq[Node], others: Seq[Node], divTypes: Seq[String]): Seq[Node] = {
-        if (!divTypes.isEmpty) {
-            mergeStructurally(main, others, divTypes)
-        } else {
-            mergePositionally(main, others)
+    private def merge(main: Seq[Node], others: Seq[Node], divTypes: Seq[String]): Seq[Node] =
+        divTypes match {
+        case List(divType, remainingDivTypes) =>
+            for (Pair(child, otherChild) <- zipOrElse(main, others.filter(Selector.isDivType(divType)))) yield
+                mergeStructurally(child, otherChild, divType, remainingDivTypes)
+        case Nil =>
+            for (Pair(child, otherChild) <- zipOrElse(main, others)) yield
+                <merge>{child}{otherChild}</merge>
         }
-    }
 
 
-    private def mergeStructurally(main: Seq[Node], others: Seq[Node], divTypes: Seq[String]): Seq[Node] = {
-        val divType = divTypes.head
-
-        val othersIterator = others.filter(Util.isDivType(_, divType)).iterator
-
-        for (child <- main) yield {
-            if (!Util.isDivType(child, divType)) child else {
-                val otherChild = doGetNext(othersIterator)
-
-                if (Util.getName(child) != Util.getName(otherChild)) {
-                    throw new IllegalArgumentException("Different names!")
-                }
-
-                Elem(
-                    child.namespace,
-                    child.label,
-                    child.attributes,
-                    child.scope,
-                    merge(child.child, otherChild.child, divTypes.tail): _*
-                )
+    private def mergeStructurally(child: Node, otherChild: Node, divType: String, divTypes: Seq[String]) = {
+        if (!Selector.isDivType(divType)(child)) child else {
+            if (Selector.getName(child) != Selector.getName(otherChild)) {
+                throw new IllegalArgumentException("Different names!")
             }
+            
+            Elem(
+                child.namespace,
+                child.label,
+                child.attributes,
+                child.scope,
+                merge(child.child, otherChild.child, divTypes.tail): _*
+            )
         }
     }
 
 
-    private def mergePositionally(main: Seq[Node], others: Seq[Node]): Seq[Node] = {
-        val othersIterator = others.iterator
-
-        for (child <- main) yield {
-            val otherChild = doGetNext(othersIterator)
-
-            <merge>{child}{otherChild}</merge>
-        }
-    }
-
-
-    private def doGetNext(iterator: Iterator[Node]) = {
-        if (!iterator.hasNext) {
-            throw new IllegalArgumentException("Premature end of the othersIterator")
-        }
-
-        iterator.next
+    private def zipOrElse[A,B](left: Seq[A], right: Seq[B]): Seq[(A,B)] = {
+        if (left.size != right.size) throw new IllegalArgumentException("Wrong lengths")
+ 
+        left.zip(right)
     }
 }

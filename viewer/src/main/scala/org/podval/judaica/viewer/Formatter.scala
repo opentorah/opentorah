@@ -41,23 +41,22 @@ class Formatter(
 
     private def format(nodes: Seq[Node]): Seq[Node] = {
         for (node <- nodes) yield {
-            if (!Util.isDiv(node)) {
-                format.formatNonStructural(node)
-            } else {
-                formatStructurally(node)
+            Selector.maybeFromXml(node) match {
+            case None => format.formatNonStructural(node)
+            case Some(selector) => formatStructurally(selector, node)
             }
         }
     }
 
 
-    private def formatStructurally(node: Node) = {
+    private def formatStructurally(selector: Selector, node: Node) = {
         context.push(node)
 
         val result =
-            <div class={Util.getType(node)}>
-                {nameSpan(node)}
+            <div class={selector.what}>
+                {selector.toNameSpan}
                 {
-                    if (Util.isDivType(node, format.getMergeDivType())) {
+                    if (selector.what == format.getMergeDivType()) {
                         formatTable(node)
                     } else {
                         format(node.child)
@@ -71,25 +70,17 @@ class Formatter(
     }
 
 
-    private def nameSpan(node: Node): Seq[Node] = nameSpan(Util.getType(node), Util.getName(node))
-
-
-    private def nameSpan(type_ : String, name: String) =
-        <span class={type_ +"-name"}>{name}</span>
-
-
     private def formatTable(node: Node) = {
         val divName = nameFromContext()
 
         <table>
             <tr>{
                 for (text <- texts) yield {
-                    <td>{nameSpan("text", text.getName())}</td>
+                    <td>{new Selector("text", text.name).toNameSpan}</td>
                 }
             }</tr>
             {
-                var numRow = 0
-                for (row <- node.child) yield {
+                for (Pair(row,numRow) <- node.child.zipWithIndex) yield {
                     if (row.label != "merge") {
                         throw new IllegalArgumentException("Not a 'merge'!")
                     }
@@ -100,9 +91,8 @@ class Formatter(
                         throw new IllegalArgumentException("Wrong length")
                     }
 
-                    numRow += 1
                     <tr>{
-                        content.zip(texts).map(formatCell(divName + "-" + numRow))
+                        content.zip(texts).map(formatCell(divName + "-" + (numRow+1)))
                     }</tr>
                 }
             }
@@ -111,11 +101,8 @@ class Formatter(
 
 
     private def nameFromContext() = {
-        context
-          .reverse
-          .dropWhile(node => Util.getType(node) != selectionDivType)
-          .map(node => Util.getType(node) + "-" + Util.getName(node))
-          .mkString("-")
+        Selector.toName(context.reverse.map(Selector.fromXml)
+          .dropWhile(selector => selector.what != selectionDivType))
     }
 
 
@@ -123,10 +110,10 @@ class Formatter(
         val node = cell._1
         val text = cell._2
         <td>{
-            if (!text.isEdit()) {
+            if (!text.isEdit) {
                 format.formatContent(node)
             } else {
-                val inputName = "edit-" + text.getName() + "-" + name
+                val inputName = "edit-" + text.name + "-" + name
                 <input type="text" name={inputName} value={format.formatEditable(node)}/>
             }
         }</td>  
