@@ -42,19 +42,18 @@ final class Viewer(
 
 
     private def merge(main: Seq[Node], others: Seq[Node], divTypes: Seq[String]): Seq[Node] = {
-        divTypes match {
-        case List(divType, remainingDivTypes @ _*) =>
-            zipOrElse(main, others.filter(Selector.isDivType(divType))).map(
-                {case (child, otherChild) => mergeStructurally(child, otherChild, divType, remainingDivTypes)})
-                
-        case Nil =>
+        if (divTypes.isEmpty) {
             zipOrElse(main, others).map(
                 {case (child, otherChild) => <merge>{child}{otherChild}</merge>})
+        } else {
+            val divType = divTypes.head
+            zipOrElse(main, others.filter(Selector.isDivType(divType))).map(
+                {case (child, otherChild) => merge(child, otherChild, divType, divTypes.tail)})
         }
     }
 
 
-    private def mergeStructurally(child: Node, otherChild: Node, divType: String, remainingDivTypes: Seq[String]) = {
+    private def merge(child: Node, otherChild: Node, divType: String, remainingDivTypes: Seq[String]): Node = {
         if (!Selector.isDivType(divType)(child)) child else {
             if (Selector.getName(child) != Selector.getName(otherChild)) {
                 throw new IllegalArgumentException("Different names!")
@@ -88,24 +87,27 @@ final class Viewer(
 
     private def format(nodes: Seq[Node], context: Seq[Node]): Seq[Node] = {
         for (node <- nodes) yield {
-            Selector.maybeFromXml(node) match {
-            case None => format.formatNonStructural(node)
-            case Some(selector) => formatStructurally(selector, node, context)
+            val maybeSelector = Selector.maybeFromXml(node)
+
+            if (maybeSelector.isDefined) {
+                format.formatNonStructural(node)
+            } else {
+                format(maybeSelector.get, node, context)
             }
         }
     }
 
 
-    private def formatStructurally(selector: Selector, node: Node, context: Seq[Node]) = {
+    private def format(selector: Selector, node: Node, context: Seq[Node]): Node = {
         val newContext = context :+ node
 
         <div class={selector.what}>
             {selector.toNameSpan}
             {
-                if (selector.what == format.getMergeDivType()) {
-                    formatTable(node, newContext)
-                } else {
+                if (selector.what != format.getMergeDivType()) {
                     format(node.child, newContext)
+                } else {
+                    formatTable(node, newContext)
                 }
             }
         </div>

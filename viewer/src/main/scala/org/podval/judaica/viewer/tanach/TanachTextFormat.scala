@@ -22,10 +22,16 @@ import org.podval.judaica.viewer.TextFormat
 import scala.xml.Node
 
 
-final class TanachTextFormat extends TextFormat(
-    List("book", "chapter", "verse"),
-    _ => null,
-    (node: Node) => scala.xml.Text(node.text),
-    (node: Node) => node.text
-) {
+final class TanachTextFormat extends TextFormat {
+
+    val divTypes = List("book", "chapter", "verse")
+
+
+    def formatNonStructural: Node => Node = _ => null
+
+
+    def formatContent: Node => Seq[Node] = (node: Node) => scala.xml.Text(node.text)
+
+
+    def formatEditable: Node => String = (node: Node) => node.text
 }

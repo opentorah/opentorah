@@ -21,7 +21,6 @@ import scala.xml.Node
 
 object Util {
 
-
     def toHtml(baseUrl: String, body: Seq[Node]): Seq[Node] = {
         <html>
             <head>

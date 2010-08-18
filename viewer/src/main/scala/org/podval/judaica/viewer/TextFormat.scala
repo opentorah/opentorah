@@ -20,11 +20,19 @@ package org.podval.judaica.viewer
 import scala.xml.Node
 
 
-class TextFormat(
-    val divTypes: Seq[String],
-    val formatNonStructural: Node => Node,
-    val formatContent: Node => Seq[Node],
-    val formatEditable: Node => String)
-{
+abstract class TextFormat {
+
+    val divTypes: Seq[String]
+
+
+    def formatNonStructural: Node => Node
+
+
+    def formatContent: Node => Seq[Node]
+
+
+    def formatEditable: Node => String
+
+
     final def getMergeDivType() = divTypes.last 
 }
