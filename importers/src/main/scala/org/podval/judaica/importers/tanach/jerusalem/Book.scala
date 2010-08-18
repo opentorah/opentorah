@@ -32,24 +32,18 @@ class Book(inputFile: File, outputFile: File) {
 
         val xml =
             <div type="book" n={bookName}>{
-            var chapterNumber = 0
-            for (line <- lines
-                 if !line.isEmpty
-                 if !isChapter(line)
-            ) yield {
-                chapterNumber += 1
-                <div type="chapter" n={chapterNumber.toString}>{
-                var verseNumber = 0;
-                for (verse <- dropStuckChapter(line.split(":").map(_.trim()))) yield {
-                    verseNumber += 1
-                    new Verse(verse, verseNumber).parse()
+                lines.filter(!_.isEmpty).filter(!isChapter(_)).zipWithIndex.map({
+                    case (line, chapterNumber) =>
+                        <div type="chapter" n={chapterNumber.toString}>{
+                            dropStuckChapter(line.split(":").map(_.trim())).zipWithIndex.map({
+                                case (verse, verseNumber) => new Verse(verse, verseNumber).parse()
+                            })
+                        }
+                        </div>
+                    })
                 }
-                }
-                </div>
-            }
-            }
             </div>
-
+        
 //        insertBreaks(pipeline, outName);
 
         print(xml);
