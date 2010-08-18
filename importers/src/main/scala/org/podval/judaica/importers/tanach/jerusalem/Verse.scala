@@ -158,7 +158,7 @@ class Verse(var line: String, number: Int) {
     private def consumeBracketed(): String = {
         if (line.startsWith("[")) {
             val index = line.indexOf("]")
-            consumeToIndex(index+1).drop(1)
+            consumeToIndex(index+1).drop(1) // @todo tail()?
         } else {
             null
         }

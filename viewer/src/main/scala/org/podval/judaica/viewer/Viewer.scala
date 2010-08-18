@@ -17,7 +17,7 @@
 
 package org.podval.judaica.viewer
 
-import scala.xml.Node
+import scala.xml.{Node, Elem}
 
 
 final class Viewer(
@@ -25,15 +25,8 @@ final class Viewer(
     selectionDivType: String,
     texts: Seq[Text])
 {
-    private val merger = new Merger(format.divTypes)
-
-
     def get(postUrl: String): Seq[Node] = {
-        val merged = merger.merge(texts.head, texts.tail)
-
-        val formatter = new Formatter(format, selectionDivType, texts, merged)
-
-        formatter.format(postUrl)
+        format(postUrl, merge(texts.head, texts.tail))
     }
 
 
@@ -42,15 +35,134 @@ final class Viewer(
     }
 
 
+    // @todo handle multiple "others"
+    private def merge(main: Text, others: Seq[Text]): Seq[Node] = {
+        merge(main.getXml(), others.head.getXml(), format.divTypes)
+    }
+
+
+    private def merge(main: Seq[Node], others: Seq[Node], divTypes: Seq[String]): Seq[Node] = {
+        divTypes match {
+        case List(divType, remainingDivTypes @ _*) =>
+            zipOrElse(main, others.filter(Selector.isDivType(divType))).map(
+                {case (child, otherChild) => mergeStructurally(child, otherChild, divType, remainingDivTypes)})
+                
+        case Nil =>
+            zipOrElse(main, others).map(
+                {case (child, otherChild) => <merge>{child}{otherChild}</merge>})
+        }
+    }
+
+
+    private def mergeStructurally(child: Node, otherChild: Node, divType: String, remainingDivTypes: Seq[String]) = {
+        if (!Selector.isDivType(divType)(child)) child else {
+            if (Selector.getName(child) != Selector.getName(otherChild)) {
+                throw new IllegalArgumentException("Different names!")
+            }
+            
+            Elem(
+                child.namespace,
+                child.label,
+                child.attributes,
+                child.scope,
+                merge(child.child, otherChild.child, remainingDivTypes): _*
+            )
+        }
+    }
+
+
+    private def zipOrElse[A,B](left: Seq[A], right: Seq[B]): Seq[(A,B)] = {
+        if (left.size != right.size) throw new IllegalArgumentException("Wrong lengths")
+ 
+        left.zip(right)
+    }
+
+
+    private def format(postUrl: String, nodes: Seq[Node]): Seq[Node] = {
+        <form action={postUrl} method="post">
+            {format(nodes, Seq())}
+            <input type="submit" value="Submit"/>
+        </form>
+    }
+
+
+    private def format(nodes: Seq[Node], context: Seq[Node]): Seq[Node] = {
+        for (node <- nodes) yield {
+            Selector.maybeFromXml(node) match {
+            case None => format.formatNonStructural(node)
+            case Some(selector) => formatStructurally(selector, node, context)
+            }
+        }
+    }
+
+
+    private def formatStructurally(selector: Selector, node: Node, context: Seq[Node]) = {
+        val newContext = context :+ node
+
+        <div class={selector.what}>
+            {selector.toNameSpan}
+            {
+                if (selector.what == format.getMergeDivType()) {
+                    formatTable(node, newContext)
+                } else {
+                    format(node.child, newContext)
+                }
+            }
+        </div>
+    }
+
+
+    private def formatTable(node: Node, context: Seq[Node]) = {
+        val divName = nameFromContext(context)
+
+        <table>
+            <tr>{
+                texts.map(text => <td>{new Selector("text", text.name).toNameSpan}</td>)
+            }</tr>
+            {
+                node.child.zipWithIndex.map({case (row,numRow) =>
+                    if (row.label != "merge") {
+                        throw new IllegalArgumentException("Not a 'merge'!")
+                    }
+
+                    val content = row.child
+
+                    if (content.size != texts.size) {
+                        throw new IllegalArgumentException("Wrong length")
+                    }
+
+                    val rowName = divName + "-" + (numRow+1)
+
+                    <tr>{
+                        content.zip(texts).map({case (node, text) =>
+                            <td>{
+                                if (!text.isEdit) {
+                                    format.formatContent(node)
+                                } else {
+                                    val inputName = "edit-" + text.name + "-" + rowName
+                                    <input type="text" name={inputName} value={format.formatEditable(node)}/>
+                                }
+                            }</td>  
+                        })
+                    }</tr>
+                })
+            }
+        </table>
+    }
+
+
+    private def nameFromContext(context: Seq[Node]) = {
+        Selector.toName(context.map(Selector.fromXml).dropWhile(_.what != selectionDivType))
+    }
+
+
     private def unique(form: Map[String, List[String]]): Map[String, String] = {
-        for (entry <- form) yield {
-            val name = entry._1
-            val values = entry._2
+        form.map({ case (name, values) =>
             if (values.size > 1) {
                 
             }
 
             name -> values(0)
-        }
+        })
     }
 }
