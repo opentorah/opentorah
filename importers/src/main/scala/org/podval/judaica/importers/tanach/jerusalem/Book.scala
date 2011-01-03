@@ -17,26 +17,34 @@
 
 package org.podval.judaica.importers.tanach.jerusalem
 
-import scala.xml.{Elem, PrettyPrinter}
+import org.podval.judaica.importers.AlefBeth
+
+import scala.xml.{Elem, PrettyPrinter, XML, Node}
 
 import scala.io.Source
 
 import java.io.{File, FileWriter, PrintWriter}
 
 
-class Book(inputFile: File, outputFile: File) {
+class Book(inputFile: File, metadataFile: File, outputFile: File) {
 
     def run() {
         val lines = Source.fromFile(inputFile, "UTF-16BE").getLines().map(_.trim)
         val bookName = lines.next()
+        val metadata = XML.loadFile(metadataFile) \\ "meta" \\ "_"
 
         val xml =
             <div type="book" n={bookName}>{
                 lines.filter(!_.isEmpty).filter(!isChapter(_)).zipWithIndex.map({
-                    case (line, chapterNumber) =>
+                    case (line, chapterNumberFrom0) =>
+                        val chapterNumber = chapterNumberFrom0+1
+                        val chapterMetadata = metadata.filter(e => (e \ "@chapter").text == chapterNumber.toString)
                         <div type="chapter" n={chapterNumber.toString}>{
-                            dropStuckChapter(line.split(":").map(_.trim())).zipWithIndex.map({
-                                case (verse, verseNumber) => new Verse(verse, verseNumber).parse()
+                            dropStuckChapter(line.split(":").map(_.trim)).zipWithIndex.map({
+                                case (verse, verseNumberFrom0) =>
+                                    val verseNumber = verseNumberFrom0+1
+                                    val verseMetadata = chapterMetadata.filter(e => (e \ "@verse").text == verseNumber.toString)
+                                    new Verse(verse, verseNumber, processMetadata(verseMetadata)).parse()
                             })
                         }
                         </div>
@@ -44,8 +52,6 @@ class Book(inputFile: File, outputFile: File) {
                 }
             </div>
         
-//        insertBreaks(pipeline, outName);
-
         print(xml);
     }
 
@@ -54,8 +60,17 @@ class Book(inputFile: File, outputFile: File) {
         if (isChapter(what.last)) what.dropRight(1) else what
 
 
+    private val PEREK = AlefBeth.PEI + AlefBeth.RESH + AlefBeth.QOF
+
+
     private def isChapter(line: String): Boolean = {
-        line.startsWith("פרק"); // @todo alefbeth
+        line.startsWith(PEREK);
+    }
+
+
+    private def processMetadata(what: Seq[Node]): Seq[Node] = {
+        // TODO!
+        what
     }
 
 

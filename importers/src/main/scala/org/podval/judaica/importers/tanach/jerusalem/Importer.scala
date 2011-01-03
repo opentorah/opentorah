@@ -20,20 +20,21 @@ package org.podval.judaica.importers.tanach.jerusalem
 import java.io.File
 
 
-class Importer(inputDirectory: String, outputDirectory: String) {
+class Importer(inputDirectory: String, metadataDirectory: String, outputDirectory: String) {
 
     def run() {
         importBook("bereishis", "Genesis");
-        importBook("shemos", "Exodus");
-        importBook("vayikro", "Leviticus");
-        importBook("bamidbor", "Numbers");
-        importBook("devorim", "Deuteronomy");
+//        importBook("shemos", "Exodus");
+//        importBook("vayikro", "Leviticus");
+//        importBook("bamidbor", "Numbers");
+//        importBook("devorim", "Deuteronomy");
     }
 
 
     private def importBook(inputName: String, outputName: String) {
         val xml = new Book(
             new File(inputDirectory, inputName+".txt"),
+            new File(metadataDirectory, outputName+".xml"),
             new File(outputDirectory, outputName+".xml")
         ).run();
     }

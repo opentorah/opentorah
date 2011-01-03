@@ -17,33 +17,39 @@
 
 package org.podval.judaica.importers.tanach.jerusalem
 
-import scala.xml.{Elem, Text, Node, NodeBuffer}
+import org.podval.judaica.importers.AlefBeth
+
+import scala.xml.{Elem, Text, Node, NodeBuffer, NodeSeq}
 
 
-class Verse(var line: String, number: Int) {
+class Verse(var line: String, number: Int, metadata: NodeSeq) {
 
-    private val SAMEH = "\u05E1"
-
-
-    private val PEI = "\u05E4"
+    private val PEI3 = AlefBeth.PEI + " " + AlefBeth.PEI + " " + AlefBeth.PEI
 
 
-    private val PEI3 = PEI + " " + PEI + " " + PEI
+    private val SAMEH3 = AlefBeth.SAMEH + " " + AlefBeth.SAMEH + " " + AlefBeth.SAMEH
 
 
-    private val SAMEH3 = SAMEH + " " + SAMEH + " " + SAMEH
+    private val HAZI =
+        AlefBeth.HET +
+        AlefBeth.TSADI +
+        AlefBeth.YOD +
+        " " +
+        AlefBeth.HE +
+        AlefBeth.SAMEH +
+        AlefBeth.PEI +
+        AlefBeth.RESH +
+        " " +
+        AlefBeth.BET +
+        AlefBeth.PEI +
+        AlefBeth.SAMEH +
+        AlefBeth.VAV +
+        AlefBeth.QOF +
+        AlefBeth.YOD +
+        AlefBeth.MEM_SOFIT
 
 
-    private val HAZI = "חצי הספר בפסוקים" // @todo alefbeth
-
-
-    private val HAZAK = "חזק" // @todo alefbeth
-
-
-    private val MAKAF = "־" // @todo alefbeth
-
-
-    private val PIPE = "|" // @todo alefbeth
+    private val HAZAK = AlefBeth.HET + AlefBeth.ZAYIN + AlefBeth.QOF
 
 
     def parse(): Seq[Node] = {
@@ -61,6 +67,8 @@ class Verse(var line: String, number: Int) {
 
         if (!line.isEmpty) {
             consumeToSpace()
+
+            result.appendAll(metadata)
 
             result +=
                 <div type="verse" n={number.toString}>
@@ -80,14 +88,14 @@ class Verse(var line: String, number: Int) {
             parsha = "open"
             big = true
         } else
-        if (consume(PEI)) {
+        if (consume(AlefBeth.PEI)) {
             parsha = "open"
         } else
         if (consume(SAMEH3)) {
             parsha = "closed"
             big = true
         } else
-        if (consume(SAMEH)) {
+        if (consume(AlefBeth.SAMEH)) {
             parsha = "closed"
         }
 
@@ -128,7 +136,7 @@ class Verse(var line: String, number: Int) {
 
     private def processWord(): Elem = {
         val spaceIndex = line.indexOf(" ")
-        val makafIndex = line.indexOf(MAKAF)
+        val makafIndex = line.indexOf(AlefBeth.MAQAF)
 
         def isFirst(one: Int, two: Int) = (one != -1) && ((two == -1) || (two > one))
         val isSpace = isFirst(spaceIndex, makafIndex)
@@ -141,10 +149,10 @@ class Verse(var line: String, number: Int) {
             consume(" ")
         } else
         if (isMakaf) {
-            consume(MAKAF)
+          consume(AlefBeth.MAQAF)
         }
 
-        val isPasek = consume(PIPE)
+        val isPasek = consume(AlefBeth.PASEQ)
 
         <word makaf={booleanAttribute(isMakaf)} pasek={booleanAttribute(isPasek)}>{word}</word>
     }
