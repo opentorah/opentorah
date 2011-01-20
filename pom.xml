@@ -46,6 +46,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <modules>
+        <module>dates</module>
+        <module>features</module>
+        <module>ical</module>
+        <module>app-servlet</module>
+        <module>moon</module>
+    </modules>
+
     <repositories>
         <repository>
             <id>podval-thirdparty</id>
@@ -109,16 +117,8 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <version>4.8.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <modules>
-        <module>dates</module>
-        <module>features</module>
-        <module>ical</module>
-        <module>app-servlet</module>
-        <module>moon</module>
-    </modules>
 </project>
