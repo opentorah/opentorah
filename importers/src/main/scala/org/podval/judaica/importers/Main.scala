@@ -21,7 +21,7 @@ package org.podval.judaica.importers
 object Main {
 
     def main(args: Array[String]) {
-        new tanach.jerusalem.Importer(
+        new tanach.jerusalem.JerusalemTanachImporter(
             "/home/dub/projects-judaica/imports/Tanach/jerusalem",
             "/home/dub/projects-judaica/metadata/meta",
             "/tmp/xxx"
