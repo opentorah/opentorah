@@ -17,7 +17,7 @@
 
 package org.podval.judaica.importers.tanach
 
-import scala.xml.{XML, Node, PrettyPrinter}
+import scala.xml.{Node, PrettyPrinter}
 
 import java.io.{File, PrintWriter, FileWriter}
 
@@ -26,17 +26,12 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String) {
 
     protected final def importBook(inputName: String, outputName: String) {
         val xml = parseBook(new File(inputDirectory, inputName+".txt"))
-        val result = addBreaks(getBreaks(outputName), xml)
-        print(result, new File(outputDirectory, outputName+".xml"))
+        //val result = addBreaks(Breaks.get(outputName), xml)
+//        print(result, new File(outputDirectory, outputName+".xml"))
     }
 
 
     protected def parseBook(inputFile: File): Node;
-
-
-    private def getBreaks(name: String): Node = {
-        XML.load(getClass.getResourceAsStream(name + ".xml"))
-    }
 
 
     private def addBreaks(breaks: Node, xml: Node): Node = xml

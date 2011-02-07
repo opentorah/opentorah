@@ -17,22 +17,41 @@
 
 package org.podval.judaica.importers.tanach
 
-import scala.xml.{XML, Source, Elem}
+import scala.xml.{XML, Node, Utility}
 
-import java.io.File
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 
 object Breaks {
 
-    def get(file: File) = {
-        val xml: Elem = XML.load(Source.fromFile(file))
-        for (child <- xml.child) {
-          Console.out.println(child.attribute("chapter"))
+    def get(name: String): Map[String, Map[String, Seq[Node]]] = {
+        val result = mutable.Map.empty[String, mutable.Map[String, ListBuffer[Node]]]
+
+        val xml = Utility.trimProper(XML.load(getClass.getResourceAsStream(name + ".xml")))
+
+        for (child <- xml(0).child) {
+            val chapter = (child \ "@chapter").text
+            val verse = (child \ "@verse").text
+
+            if (!result.contains(chapter)) {
+                result(chapter) = scala.collection.mutable.Map.empty[String, ListBuffer[Node]]
+            }
+            val verses = result(chapter)
+
+            if (!verses.contains(verse)) {
+                verses(verse) = ListBuffer.empty[Node]
+            }
+            val breaks = verses(verse)
+
+            breaks += child
         }
+
+        Map.empty[String, Map[String, Seq[Node]]] ++ result
     }
 
 
     def main(args: Array[String]) {
-        get(new File("/home/dub/projects-judaica/metadata/meta", "Genesis.xml"))
+        Console.println(get("Genesis"))
     }
 }
