@@ -17,7 +17,22 @@
 
 package org.podval.judaica.importers.tanach
 
+import scala.xml.{XML, Source, Elem}
 
-object Metadata {
+import java.io.File
 
+
+object Breaks {
+
+    def get(file: File) = {
+        val xml: Elem = XML.load(Source.fromFile(file))
+        for (child <- xml.child) {
+          Console.out.println(child.attribute("chapter"))
+        }
+    }
+
+
+    def main(args: Array[String]) {
+        get(new File("/home/dub/projects-judaica/metadata/meta", "Genesis.xml"))
+    }
 }

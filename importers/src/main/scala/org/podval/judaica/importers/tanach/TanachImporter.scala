@@ -17,16 +17,16 @@
 
 package org.podval.judaica.importers.tanach
 
-import scala.xml.{Node, PrettyPrinter}
+import scala.xml.{XML, Node, PrettyPrinter}
 
 import java.io.{File, PrintWriter, FileWriter}
 
 
-abstract class TanachImporter(inputDirectory: String, metadataDirectory: String, outputDirectory: String) {
+abstract class TanachImporter(inputDirectory: String, outputDirectory: String) {
 
     protected final def importBook(inputName: String, outputName: String) {
         val xml = parseBook(new File(inputDirectory, inputName+".txt"))
-        val result = addMetadata(new File(metadataDirectory, outputName+".xml"), xml)
+        val result = addBreaks(getBreaks(outputName), xml)
         print(result, new File(outputDirectory, outputName+".xml"))
     }
 
@@ -34,7 +34,12 @@ abstract class TanachImporter(inputDirectory: String, metadataDirectory: String,
     protected def parseBook(inputFile: File): Node;
 
 
-    private def addMetadata(metadataFile: File, xml: Node): Node = xml
+    private def getBreaks(name: String): Node = {
+        XML.load(getClass.getResourceAsStream(name + ".xml"))
+    }
+
+
+    private def addBreaks(breaks: Node, xml: Node): Node = xml
 
 
     private def print(xml: Node, outputFile: File) {

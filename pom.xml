@@ -58,48 +58,10 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.version>2.8.0</scala.version>
+        <scala.version>2.8.1</scala.version>
     </properties>
  
-    <pluginRepositories>
-        <pluginRepository>
-            <id>scala-tools.org</id>
-            <name>Scala-tools repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </pluginRepository>
-    </pluginRepositories>
-
     <repositories>
-        <repository>
-            <id>podval-thirdparty</id>
-            <name>Podval 3rd Party</name>
-            <releases><enabled>true</enabled></releases>
-            <snapshots><enabled>false</enabled></snapshots>
-            <url>http://www.dub.podval.org/nexus/content/repositories/thirdparty/</url>
-        </repository>
-
-        <repository>
-            <id>podval-snapshots</id>
-            <name>Podval Snapshots</name>
-            <releases><enabled>false</enabled></releases>
-            <snapshots><enabled>true</enabled></snapshots>
-            <url>http://www.dub.podval.org/nexus/content/repositories/snapshots/</url>
-        </repository>
-
-        <repository>
-            <id>podval-releases</id>
-            <name>Podval Releases</name>
-            <releases><enabled>true</enabled></releases>
-            <snapshots><enabled>false</enabled></snapshots>
-            <url>http://www.dub.podval.org/nexus/content/repositories/releases/</url>
-        </repository>
-
-        <repository>
-            <id>scala-tools.org</id>
-            <name>Scala-tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </repository>
-
         <repository>
             <id>java.net2</id>
             <name>Repository hosting the jee6 artifacts</name>
@@ -107,19 +69,12 @@
         </repository>
     </repositories>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>podval</id>
-            <name>snapshots</name>
-            <url>http://www.dub.podval.org/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <build>
         <plugins>
             <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
+                <version>2.15.0</version>
                 <executions>
                     <execution>
                         <phase>process-resources</phase>
@@ -152,7 +107,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.1</version>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -167,7 +122,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.1-beta-1</version>
+                    <version>2.1.1</version>
                     <configuration>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
                     </configuration>
@@ -192,7 +147,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <version>4.8.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -202,7 +157,7 @@
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-server</artifactId>
-                <version>1.3</version>
+                <version>1.5</version>
             </dependency>            
         </dependencies>
     </dependencyManagement>

@@ -26,7 +26,7 @@ import scala.io.Source
 import java.io.File
 
 
-class JerusalemTanachImporter(inputDirectory: String, metadataDirectory: String, outputDirectory: String) extends TanachImporter(inputDirectory, metadataDirectory, outputDirectory)  {
+class JerusalemTanachImporter(inputDirectory: String, outputDirectory: String) extends TanachImporter(inputDirectory, outputDirectory)  {
 
     def run() {
         importBook("bereishis", "Genesis");
