@@ -21,9 +21,16 @@ package org.podval.judaica.importers
 object Main {
 
     def main(args: Array[String]) {
-        new tanach.jerusalem.JerusalemTanachImporter(
-            "/home/dub/projects-judaica/imports/Tanach/jerusalem",
+//        new tanach.jerusalem.JerusalemTanachImporter(
+//            "/home/dub/projects-judaica/imports/Tanach/jerusalem",
+//            "/tmp/xxx"
+//        )
+        new chabad.ChabadImporter(
+            // There is stuff one level up also
+            "/mnt/data/www.chabadlibrary.org/books2/",
             "/tmp/xxx"
-        ).run()
+
+        )
+        .run()
     }
 }

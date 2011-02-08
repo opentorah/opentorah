@@ -25,7 +25,7 @@ import scala.collection.mutable.ListBuffer
 
 object Breaks {
 
-    def get(name: String): Map[String, Map[String, Seq[Node]]] = {
+    def get(name: String)/*: Map[String, Map[String, Seq[Node]]]*/ = {
         val result = mutable.Map.empty[String, mutable.Map[String, ListBuffer[Node]]]
 
         val xml = Utility.trimProper(XML.load(getClass.getResourceAsStream(name + ".xml")))
@@ -47,7 +47,7 @@ object Breaks {
             breaks += child
         }
 
-        Map.empty[String, Map[String, Seq[Node]]] ++ result
+        /* TODO Turn immutable Map.empty[String, Map[String, ListBuffer[Node]]] ++ */ result
     }
 
 
