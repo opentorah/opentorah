@@ -17,8 +17,7 @@
 
 package org.podval.judaica.importers.chabad
 
-import scala.xml.{Node, Elem, XML}
-import scala.xml.factory.XMLLoader
+import scala.xml.{Node, XML}
 
 import org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl
 
@@ -31,18 +30,24 @@ class ChabadImporter(inputDirectory: String, outputDirectory: String) {
     }
 
 
-    private def parseBook(inputName: String, outputName: String) {
-        val indexXml = load(inputName + "/index.htm")
-        <div type="book">{
-//            xml.declareNamespace("html", "http://www.w3.org/1999/xhtml");
-            (indexXml \\ "html:table" \\ "html:a" \ "@href").map(_.text).zipWithIndex.map {
+    private def parseBook(path: String, outputName: String) {
+        <div type="book">{ // TODO name
+            (load(path + "index.htm") \\ "html:table" \\ "html:a" \ "@href").map(_.text).zipWithIndex.map {
                 case (href, chapterNumberFrom0) =>
                     <div type="chapter" n={(chapterNumberFrom0+1).toString()}>{
-                        val chapterPath = getBaseDirectory(path) + getFilename(href);
-                        parseChapter(load(chapterPath));
+                        parseChapter(path + getFilename(href));
                     }</div>
             }
         }</div>
+    }
+
+
+    private def parseChapter(path: String) {
+        val xml = load(path);
+        val body = xml \ "html:html" \"html:frameset" \ "html:noframes" \ "html:body"
+//
+// TODO bind namespace?
+//            xml.declareNamespace("html", "http://www.w3.org/1999/xhtml");
     }
 
 
