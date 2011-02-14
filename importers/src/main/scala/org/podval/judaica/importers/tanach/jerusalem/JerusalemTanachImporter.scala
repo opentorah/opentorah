@@ -15,10 +15,9 @@
  * under the License.
  */
 
-package org.podval.judaica.importers.tanach.jerusalem
-
-import org.podval.judaica.importers.AlefBeth
-import org.podval.judaica.importers.tanach.TanachImporter
+package org.podval.judaica.importers
+package tanach
+package jerusalem
 
 import scala.xml.{Node, Elem, Text, NodeBuffer}
 
@@ -26,7 +25,7 @@ import scala.io.Source
 import java.io.File
 
 
-class JerusalemTanachImporter(inputDirectory: String, outputDirectory: String) extends TanachImporter(inputDirectory, outputDirectory)  {
+final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: String) extends TanachImporter(inputDirectory, outputDirectory)  {
 
     def run() {
         importBook("bereishis", "Genesis");
@@ -37,7 +36,7 @@ class JerusalemTanachImporter(inputDirectory: String, outputDirectory: String) e
     }
 
 
-    protected def parseBook(inputFile: File): Node = {
+    def parseBook(inputFile: File): Node = {
         val lines = Source.fromFile(inputFile, "UTF-16BE").getLines().map(_.trim)
         val bookName = lines.next()
 
