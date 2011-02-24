@@ -18,7 +18,7 @@
 package org.podval.judaica.importers
 package chabad
 
-import scala.xml.Node
+import scala.xml.{Node, Utility}
 
 import java.io.File
 
@@ -34,26 +34,26 @@ object ChabadImporter {
     }
 }
 
+
 class ChabadImporter(inputDirectory: String, outputDirectory: String) extends Importer(inputDirectory, outputDirectory) {
 
-
-     def getInputExtension() : String = "htm"
+    def getInputExtension() : String = "htm"
 
 
     def getStylesheet(): String = "chabad.css"
 
 
     def parseBook(file: File): Node = {
-        val index = TagSoupXmlLoader.get().loadFile(file)
+        val index = load(file)
 
-        val path = getFileBase(file)
+        val directory = file.getParentFile
 
         // TODO name
         <div type="book">{
             parseIndex(index).zipWithIndex.map {
                 case (name, chapterNumberFrom0) =>
                     <div type="chapter" n={(chapterNumberFrom0+1).toString()}>{
-                        parseChapter(path + name);
+                        parseChapter(new File(directory, name));
                     }</div>
             }
         }</div>
@@ -64,23 +64,52 @@ class ChabadImporter(inputDirectory: String, outputDirectory: String) extends Im
         index \\ "table" \\ "@href" map(_.text) map(getFileName)
 
 
-    private def parseChapter(path: String) =
-        (loadFile(path) \\ "body" \ "_")
-        .filter { e => Set("bodytext", "hagoho").contains((e \ "@class").text) }
-        .filter { case <p/> => false case _ => true }
+    private def parseChapter(file: File) = {
+        val raw: Seq[Node] =
+            // get all elements of the <body>
+            (load(file) \\ "body" \ "_")
+            // filter only elements with content
+            .filter { e => Set("bodytext", "hagoho").contains((e \ "@class").text) }
+            // remove empty <p>s
+            .filter { case <p/> => false case _ => true }
+            // remove "hagoho" title
+            .filter { case <div><b>{_*}</b></div> => false case _ => true}
+
+        split[Node](raw, { case <p><span>{_*}</span>{_*}</p> => false case _ => true})
+        .map(p => <p>{p map parseParagraphChunk}</p>)
+    }
 
 
-    private def getFileBase(file: File): String = getFileBase(file.getAbsolutePath)
+    private def parseParagraphChunk(n: Node) = n match {
+        case <div>{t @ _*}</div> => <note>{t}</note>
+        case <p>{t @ _*}</p> => t map parseTextChunk
+    }
 
 
-    private def getFileBase(path: String): String = path.substring(0, path.lastIndexOf("/")+1)
+    private def parseTextChunk(n: Node) = n match {
+        case <span>{t @ _*}</span> => t
+        case t => t
+    }
+
+
+    def split[A](s: Seq[A], p: (A) => Boolean): Seq[Seq[A]] =
+      if (s.isEmpty) Nil else split1(s.head, s.tail, p)
+// For some reason, case-based approach results in MatchError!
+//      s match {
+//        case Nil => Nil
+//        case h :: xs => split1(h, xs, p)
+//    }
+
+
+    def split1[A](h: A, s: Seq[A], p: (A) => Boolean) = s span p match { // lift ~
+        case (ns, xs) => Seq(Seq(h) ++ ns) ++ split(xs, p)
+    }
+
+
+    private def load(file: File): Node = Utility.trim(TagSoupXmlLoader.get().loadFile(file))
 
 
     private def getFileName(path: String): String = path.substring(path.lastIndexOf("/")+1)
-
-
-    private def loadFile(path: String): Node =
-        TagSoupXmlLoader.get().loadFile(new File(path))
 
 
 //    <!-- select interesting elements -->
