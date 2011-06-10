@@ -17,10 +17,7 @@
 
 package org.podval.judaica.importers.tanach
 
-import scala.xml.{Node, PrettyPrinter}
-
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import scala.xml.{XML, Node, Utility, PrettyPrinter}
 
 import java.io.{File, PrintWriter, FileWriter}
 
@@ -29,7 +26,8 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String) {
 
     protected final def importBook(inputName: String, outputName: String) {
         val xml = parseBook(new File(inputDirectory, inputName+".txt"))
-        val result = addBreaks(Breaks.get(outputName), xml)
+        val breaks = getBreaks(outputName)
+        val result = addBreaks(breaks, xml)
         print(result, new File(outputDirectory, outputName+".xml"))
     }
 
@@ -37,7 +35,17 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String) {
     protected def parseBook(inputFile: File): Node;
 
 
-    private def addBreaks(breaks: mutable.Map[String, mutable.Map[String, ListBuffer[Node]]], xml: Node): Node = {
+    private def getBreaks(name: String): Map[String, Map[String, Seq[Node]]] = {
+        val xml = Utility.trimProper(XML.load(getClass.getResourceAsStream(name + ".xml")))(0).child
+
+        xml.groupBy(getAttribute("@chapter")).mapValues(_.groupBy(getAttribute("@verse")))
+    }
+
+
+    private def getAttribute(name: String)(node: Node) = (node \ name).text
+
+
+    private def addBreaks(breaks: Map[String, Map[String, Seq[Node]]], xml: Node): Node = {
         xml
     }
 

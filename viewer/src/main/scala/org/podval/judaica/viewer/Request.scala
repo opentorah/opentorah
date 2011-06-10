@@ -20,13 +20,13 @@ package org.podval.judaica.viewer
 
 final class Request(
     val text: String,
-    val book: String,
-    val editions: Seq[Edition])
+    val book: String/*,
+    val editions: Seq[Edition]*/)
 {
 
 }
 
 
-final class Edition(val name: String, val isEdit: Boolean) {
-    
-}
+//final class Edition(val name: String, val isEdit: Boolean) {
+//    
+//}

@@ -42,7 +42,7 @@ class JerusalemTanachImporter(inputDirectory: String, outputDirectory: String) e
         val bookName = lines.next()
 
         <div type="book" n={bookName}>{
-            lines.filter(!_.isEmpty).filter(!isChapter(_)).zipWithIndex.map({
+            lines.filterNot(_.isEmpty).filterNot(isChapter).zipWithIndex.map({
                 case (line, chapterNumberFrom0) =>
                     <div type="chapter" n={(chapterNumberFrom0+1).toString}>{
                         dropStuckChapter(line.split(":").map(_.trim)).zipWithIndex.map({
@@ -101,8 +101,8 @@ class JerusalemTanachImporter(inputDirectory: String, outputDirectory: String) e
         val result = new NodeBuffer()
 
         val parsha = processParsha(line)
-        if (parsha != null) {
-            result += parsha
+        if (parsha.isDefined) {
+            result += parsha.get
         }
 
         line.consume(HAZI)
@@ -110,6 +110,7 @@ class JerusalemTanachImporter(inputDirectory: String, outputDirectory: String) e
 
         line.consumeBracketed()
 
+        // TODO: if the line *is* empty, we skip a posuk number?!
         if (!line.isEmpty) {
             line.consumeToSpace()
 
@@ -123,28 +124,26 @@ class JerusalemTanachImporter(inputDirectory: String, outputDirectory: String) e
     }
 
 
-    private def processParsha(line: Line): Node = {
-        var parsha: String = null
+    private def processParsha(line: Line): Option[Node] = {
+        var parsha: Option[String] = None
         var big = false
 
         if (line.consume(PEI3)) {
-            parsha = "open"
+            parsha = Some("open")
             big = true
         } else
         if (line.consume(AlefBeth.PEI)) {
-            parsha = "open"
+            parsha = Some("open")
         } else
         if (line.consume(SAMEH3)) {
-            parsha = "closed"
+            parsha = Some("closed")
             big = true
         } else
         if (line.consume(AlefBeth.SAMEH)) {
-            parsha = "closed"
+            parsha = Some("closed")
         }
 
-        if (parsha == null) null else {
-            <parsha type={parsha} big={booleanAttribute(big)}/>
-        }
+        parsha.map((n: String) => <parsha type={n} big={booleanAttribute(big)}/>)
     }
 
 
@@ -201,7 +200,5 @@ class JerusalemTanachImporter(inputDirectory: String, outputDirectory: String) e
     }
 
 
-    private def booleanAttribute(value: Boolean) = {
-        if (value) Some(Text("true")) else None
-    }
+    private def booleanAttribute(value: Boolean) = if (value) Some(Text("true")) else None
 }

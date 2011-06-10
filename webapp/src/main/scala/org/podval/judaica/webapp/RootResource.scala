@@ -23,7 +23,7 @@ import org.podval.judaica.viewer.tanach.TanachTextFormat
 import javax.ws.rs.{Path, GET, POST, Produces, Consumes}
 import javax.ws.rs.core.{Context, UriInfo, MultivaluedMap}
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConversions.mapAsScalaMap
 
 import java.io.File
 
@@ -59,7 +59,7 @@ final class RootResource {
     @POST
     @Consumes(Array("application/x-www-form-urlencoded"))
     @Produces(Array("text/plain"))
-    def post(@Context form: MultivaluedMap[String, String]) = viewer.put(asMap(form).asInstanceOf[Map[String, List[String]]])
+    def post(@Context form: MultivaluedMap[String, String]) = viewer.put(mapAsScalaMap(form).asInstanceOf[Map[String, List[String]]])
 
 
     @GET

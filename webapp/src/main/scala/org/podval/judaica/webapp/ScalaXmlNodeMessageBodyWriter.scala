@@ -19,7 +19,7 @@ package org.podval.judaica.webapp
 
 import java.io.OutputStream
 
-import java.lang.{String, Class}
+import java.lang.Class
 import java.lang.reflect.Type
 import java.lang.annotation.Annotation
  
