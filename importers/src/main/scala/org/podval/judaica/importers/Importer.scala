@@ -59,16 +59,16 @@ abstract class Importer(inputDirectoryPath: String, outputDirectoryPath: String)
     }
 
 
-    def getInputExtension() : String
+    protected def getInputExtension() : String
 
 
-    def getStylesheet(): String
+    protected def getStylesheet(): String
 
 
-    def parseBook(file: File): Node
+    protected def parseBook(file: File): Node
 
 
-    def processBook(xml: Node, outputName: String): Node = {
+    protected def processBook(xml: Node, outputName: String): Node = {
         xml
     }
 }
