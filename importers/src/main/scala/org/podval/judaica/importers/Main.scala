@@ -25,12 +25,5 @@ object Main {
 //            "/home/dub/projects-judaica/imports/Tanach/jerusalem",
 //            "/tmp/xxx"
 //        )
-        new chabad.ChabadImporter(
-            // There is stuff one level up also
-            "/mnt/data/www.chabadlibrary.org/books2/",
-            "/tmp/xxx"
-
-        )
-        .run()
     }
 }

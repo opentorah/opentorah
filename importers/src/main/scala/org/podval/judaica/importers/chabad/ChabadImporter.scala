@@ -15,65 +15,103 @@
  *  under the License.
  */
 
-package org.podval.judaica.importers.chabad
+package org.podval.judaica.importers
+package chabad
 
-import scala.xml.{Node, XML}
+import scala.xml.{Node, Utility}
 
-import org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl
-
-
-class ChabadImporter(inputDirectory: String, outputDirectory: String) {
+import java.io.File
 
 
-    def run() {
-        parseBook("adhaz/tanya/1", "Tanya1");
+object ChabadImporter {
+
+    def main(args: Array[String]) {
+        val importer = new ChabadImporter(
+            "/mnt/data/www.chabadlibrary.org/books2/",
+            "/var/www/sites/app.judaica/site/raw/")
+
+        importer.importBook("adhaz/tanya/1/index", "Tanya1");
     }
+}
 
 
-    private def parseBook(path: String, outputName: String) {
-        <div type="book">{ // TODO name
-            (load(path + "index.htm") \\ "html:table" \\ "html:a" \ "@href").map(_.text).zipWithIndex.map {
-                case (href, chapterNumberFrom0) =>
+class ChabadImporter(inputDirectory: String, outputDirectory: String) extends Importer(inputDirectory, outputDirectory) {
+
+    def getInputExtension() : String = "htm"
+
+
+    def getStylesheet(): String = "chabad.css"
+
+
+    def parseBook(file: File): Node = {
+        val index = load(file)
+
+        val directory = file.getParentFile
+
+        // TODO name
+        <div type="book">{
+            parseIndex(index).zipWithIndex.map {
+                case (name, chapterNumberFrom0) =>
                     <div type="chapter" n={(chapterNumberFrom0+1).toString()}>{
-                        parseChapter(path + getFilename(href));
+                        parseChapter(new File(directory, name));
                     }</div>
             }
         }</div>
     }
 
 
-    private def parseChapter(path: String) {
-        val xml = load(path);
-        val body = xml \ "html:html" \"html:frameset" \ "html:noframes" \ "html:body"
-//
-// TODO bind namespace?
-//            xml.declareNamespace("html", "http://www.w3.org/1999/xhtml");
+    private def parseIndex(index: Node): Seq[String] =
+        index \\ "table" \\ "@href" map(_.text) map(getFileName)
+
+
+    private def parseChapter(file: File) = {
+        val raw: Seq[Node] =
+            // get all elements of the <body>
+            (load(file) \\ "body" \ "_")
+            // filter only elements with content
+            .filter { e => Set("bodytext", "hagoho").contains((e \ "@class").text) }
+            // remove empty <p>s
+            .filter { case <p/> => false case _ => true }
+            // remove "hagoho" title
+            .filter { case <div><b>{_*}</b></div> => false case _ => true}
+
+        split[Node](raw, { case <p><span>{_*}</span>{_*}</p> => false case _ => true})
+        .map(p => <p>{p map parseParagraphChunk}</p>)
     }
 
 
-    private def getBaseDirectory(path: String) {
-        val slash = path.lastIndexOf("/")
-        path.substring(0, slash+1)
+    private def parseParagraphChunk(n: Node) = n match {
+        case <div>{t @ _*}</div> => <note>{t}</note>
+        case <p>{t @ _*}</p> => t map parseTextChunk
     }
 
 
-    private def getFilename(path: String) {
-        val slash = path.lastIndexOf("/")
-        path.substring(slash+1);
+    private def parseTextChunk(n: Node) = n match {
+        case <span>{t @ _*}</span> => t
+        case t => t
     }
 
 
-    private def load(path: String): Node = {
-        XML.withSAXParser(new SAXFactoryImpl().newSAXParser()).loadFile(path)
+    def split[A](s: Seq[A], p: (A) => Boolean): Seq[Seq[A]] =
+      if (s.isEmpty) Nil else split1(s.head, s.tail, p)
+// For some reason, case-based approach results in MatchError!
+//      s match {
+//        case Nil => Nil
+//        case h :: xs => split1(h, xs, p)
+//    }
+
+
+    def split1[A](h: A, s: Seq[A], p: (A) => Boolean) = s span p match { // lift ~
+        case (ns, xs) => Seq(Seq(h) ++ ns) ++ split(xs, p)
     }
 
-//    <xsl:template match="@*|*" mode="#default main-text side-notes ">
-//        <xsl:copy>
-//            <xsl:apply-templates select="@*|node()"/>
-//        </xsl:copy>
-//    </xsl:template>
-//
-//
+
+    private def load(file: File): Node = Utility.trim(TagSoupXmlLoader.get().loadFile(file))
+
+
+    private def getFileName(path: String): String = path.substring(path.lastIndexOf("/")+1)
+
+
 //    <!-- select interesting elements -->
 //    <!-- @todo join paragraphs split by a note -->
 //    <!-- @todo deal with parentheses -->

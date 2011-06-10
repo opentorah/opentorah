@@ -15,14 +15,15 @@
  *  under the License.
  */
 
-package org.podval.judaica.importers.tanach
+package org.podval.judaica.importers
+package tanach
 
 import scala.xml.{XML, Node, Utility, PrettyPrinter}
 
-import java.io.{File, PrintWriter, FileWriter}
 
+abstract class TanachImporter(inputDirectory: String, outputDirectory: String) extends Importer(inputDirectory, outputDirectory) {
 
-abstract class TanachImporter(inputDirectory: String, outputDirectory: String) {
+    def getInputExtension() : String = "txt"
 
     protected final def importBook(inputName: String, outputName: String) {
         val xml = parseBook(new File(inputDirectory, inputName+".txt"))
@@ -30,6 +31,14 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String) {
         val result = addBreaks(breaks, xml)
         print(result, new File(outputDirectory, outputName+".xml"))
     }
+
+
+    def getStylesheet(): String = "tanach.css"
+
+
+//    override def processBook(xml: Node, outputName: String): Node = {
+//        addBreaks(Breaks.get(outputName), xml)
+//    }
 
 
     protected def parseBook(inputFile: File): Node;
@@ -47,13 +56,5 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String) {
 
     private def addBreaks(breaks: Map[String, Map[String, Seq[Node]]], xml: Node): Node = {
         xml
-    }
-
-
-    private def print(xml: Node, outputFile: File) {
-        val pretty = new PrettyPrinter(100, 4).format(xml);
-        val out = new PrintWriter(new FileWriter(outputFile))
-        out.println(pretty)
-        out.close()
     }
 }
