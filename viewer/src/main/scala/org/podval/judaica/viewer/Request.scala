@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 dub.
+ *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,10 @@ package org.podval.judaica.viewer
 
 
 final class Request(
-    val text: String,
-    val book: String/*,
-    val editions: Seq[Edition]*/)
+    val contextPath: String,
+    val servletPath: String,
+    val pathInfo: String,
+    val query: Map[String, Seq[String]])
 {
-
+    val basePath = contextPath + servletPath
 }
-
-
-//final class Edition(val name: String, val isEdit: Boolean) {
-//    
-//}
