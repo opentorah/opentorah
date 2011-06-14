@@ -8,20 +8,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>importers</artifactId>
-    <name>Importers</name>
+    <artifactId>common</artifactId>
+    <name>Common</name>
     <packaging>jar</packaging>
-
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.ccil.cowan.tagsoup</groupId>
-            <artifactId>tagsoup</artifactId>
-        </dependency>
-    </dependencies>
 </project>

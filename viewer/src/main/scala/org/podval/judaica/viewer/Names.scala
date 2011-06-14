@@ -18,22 +18,21 @@ package org.podval.judaica.viewer
 
 import scala.xml.Node
 
-
-class Books {
-
-    def get(request: Request): Node = {
-        toHtml(request.contextPath, <p>Herehere!</p>)
-    }
+import org.podval.judaica.common.Xml
 
 
-    private def toHtml(baseUrl: String, body: Seq[Node]): Node = {
-        <html>
-            <head>
-                <link href={baseUrl + "style.css"} rel="stylesheet" type="text/css"/>
-            </head>
-            <body>
-                {body}
-            </body>
-        </html>
-    }
+class Names(names: Seq[Name]) {
+
+    def hasName(name: String): Boolean = names.exists(_.name == name)
+
+
+    def getByLang(lang: String): Option[Name] = names.find(_.lang == lang)
+}
+
+
+
+object Names {
+
+    def apply(xml: Node): Names =
+        new Names(Xml.oneChild(xml, "names").child.map(Name(_)))
 }

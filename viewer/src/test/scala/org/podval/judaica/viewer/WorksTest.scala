@@ -16,24 +16,23 @@
 
 package org.podval.judaica.viewer
 
-import scala.xml.Node
+import org.junit.Test
+import org.junit.Assert._
+
+import java.io.File
 
 
-class Books {
+class WorksTest {
 
-    def get(request: Request): Node = {
-        toHtml(request.contextPath, <p>Herehere!</p>)
-    }
+    private val sourceDirectory = new File(System.getProperty("project.build.sourceDirectory"))
 
 
-    private def toHtml(baseUrl: String, body: Seq[Node]): Node = {
-        <html>
-            <head>
-                <link href={baseUrl + "style.css"} rel="stylesheet" type="text/css"/>
-            </head>
-            <body>
-                {body}
-            </body>
-        </html>
-    }
+    private val resourcesDirectory = new File(sourceDirectory.getParent, "resources/org/podval/judaica/viewer/")
+
+
+    private val works = Works(resourcesDirectory)
+
+
+    @Test
+    def findChumash = assertTrue(works.getByName("Chumash").isDefined)
 }

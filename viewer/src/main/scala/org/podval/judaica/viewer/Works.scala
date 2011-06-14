@@ -16,24 +16,28 @@
 
 package org.podval.judaica.viewer
 
-import scala.xml.Node
+import java.io.File
 
 
-class Books {
+class Works(works: Seq[Work]) {
 
-    def get(request: Request): Node = {
-        toHtml(request.contextPath, <p>Herehere!</p>)
-    }
+    def getByName(name: String): Option[Work] = get.find(_.hasName(name))
 
 
-    private def toHtml(baseUrl: String, body: Seq[Node]): Node = {
-        <html>
-            <head>
-                <link href={baseUrl + "style.css"} rel="stylesheet" type="text/css"/>
-            </head>
-            <body>
-                {body}
-            </body>
-        </html>
+    def get: Seq[Work] = works
+}
+
+
+
+object Works {
+
+    def apply(directory: File): Works = {
+        if (!directory.isDirectory) {
+            throw new IllegalArgumentException("Not a directory: " + directory)
+        }
+
+        val works = directory.listFiles().toSeq.filter(_.getName.endsWith(".xml")).map(Work(_))
+
+        new Works(works)
     }
 }

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta>
-  <div type="week" n="ויקרא" chapter="1" verse="1"></div>
+  <div type="week" n="ויקרא" chapter="1" verse="1"/>
 
-  <day number="1" chapter="1" verse="1"></day>
-  <day number="2" chapter="1" verse="14"></day>
-  <day number="3" chapter="2" verse="7"></day>
-  <day number="4" chapter="3" verse="1"></day>
-  <day number="5" chapter="4" verse="1"></day>
-  <day number="6" chapter="4" verse="27"></day>
-  <day number="7" chapter="5" verse="11"></day>
-  <maftir chapter="5" verse="24"></maftir>
+  <day number="1" chapter="1" verse="1"/>
+  <day number="2" chapter="1" verse="14"/>
+  <day number="3" chapter="2" verse="7"/>
+  <day number="4" chapter="3" verse="1"/>
+  <day number="5" chapter="4" verse="1"/>
+  <day number="6" chapter="4" verse="27"/>
+  <day number="7" chapter="5" verse="11"/>
+  <maftir chapter="5" verse="24"/>
 
-  <div type="week" n="צו" chapter="6" verse="1"></div>
+  <div type="week" n="צו" chapter="6" verse="1"/><
 
   <day number="1" chapter="6" verse="1"></day>
   <day number="2" chapter="6" verse="12"></day>
@@ -22,7 +22,7 @@
   <day number="7" chapter="8" verse="30"></day>
   <maftir chapter="8" verse="33"></maftir>
 
-  <div type="week" n="שמיני" chapter="9" verse="1"></div>
+  <div type="week" n="שמיני" chapter="9" verse="1"/>
 
   <day number="1" chapter="9" verse="1"></day>
   <day number="2" chapter="9" verse="17"></day>
@@ -110,4 +110,3 @@
   <day number="7" chapter="27" verse="29"></day>
   <maftir chapter="27" verse="32"></maftir>
 </meta>
-

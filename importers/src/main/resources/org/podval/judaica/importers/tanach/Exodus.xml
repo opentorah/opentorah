@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta>
 
-  <week chapter="1" verse="1">
-    <hebrewname>שמות</hebrewname>
-    <name>Shemos</name>
-  </week>
+  <div type="weeke" chapter="1" verse="1" n="שמות"/>
 
   <day number="1" chapter="1" verse="1"/>
   <day number="2" chapter="1" verse="18"/>
@@ -16,10 +13,7 @@
   <maftir chapter="5" verse="22"/>
 
 
-  <week chapter="6" verse="2">
-    <hebrewname>וארא</hebrewname>
-    <name></name>
-  </week>
+  <div type="week" chapter="6" verse="2" n="וארא"/>
   
   <day number="1" chapter="6" verse="2"/>
   <day number="2" chapter="6" verse="14"/>
@@ -31,10 +25,7 @@
   <maftir chapter="9" verse="33"/>
 
   
-  <week chapter="10" verse="1">
-    <hebrewname>בא</hebrewname>
-    <name></name>
-  </week>
+  <div type="week" chapter="10" verse="1" n="בא"/>
   
   <day number="1" chapter="10" verse="1"/>
   <day number="2" chapter="10" verse="12"/>
@@ -45,11 +36,8 @@
   <day number="7" chapter="13" verse="1"/>
   <maftir chapter="13" verse="14"/>
   
-  
-  <week chapter="13" verse="17">
-    <hebrewname>בשלח</hebrewname>
-    <name></name>
-  </week>
+
+  <div type="week" chapter="13" verse="17" n="בשלח"/>
   
   <day number="1" chapter="13" verse="17"/>
   <day number="2" chapter="14" verse="9"/>
@@ -61,10 +49,7 @@
   <maftir chapter="17" verse="14"/>
   
   
-  <week chapter="18" verse="1">
-    <hebrewname>יתרו</hebrewname>
-    <name></name>
-  </week>
+  <div type="week" chapter="18" verse="1" n="יתרו"/>
 
   <day number="1" chapter="18" verse="1"/>
   <day number="2" chapter="18" verse="13"/>
@@ -76,10 +61,7 @@
   <maftir chapter="20" verse="19"/>
 
 
-  <week chapter="21" verse="1">
-    <hebrewname>משפטימ</hebrewname>
-    <name></name>
-  </week>
+  <div type="week" chapter="21" verse="1" n="משפטימ"/>
   
   <day number="1" chapter="21" verse="1"/>
   <day number="2" chapter="21" verse="20"/>
@@ -91,10 +73,7 @@
   <maftir chapter="24" verse="15"/>
 
 
-  <week chapter="25" verse="1">
-    <hebrewname>תרומה</hebrewname>
-    <name></name>
-  </week>
+  <div type="week" chapter="25" verse="1" n="תרומה"/>
   
   <day number="1" chapter="25" verse="1"/>
   <day number="2" chapter="25" verse="17"/>
@@ -106,10 +85,7 @@
   <maftir chapter="27" verse="17"/>
 
 
-  <week chapter="27" verse="20">
-    <hebrewname>תצוה</hebrewname>
-    <name></name>
-  </week>
+  <div type="week" chapter="27" verse="20" n="תצוה"/>
 
   <day number="1" chapter="27" verse="20"/>
   <day number="2" chapter="28" verse="13"/>
@@ -121,10 +97,7 @@
   <maftir chapter="30" verse="8"/>
 
 
-  <week chapter="30" verse="22">
-    <hebrewname>כי תשא</hebrewname>
-    <name></name>
-  </week>
+  <div type="week" chapter="30" verse="22" n="כי תשא"/>
 
   <day number="1" chapter="30" verse="11"/>
   <day number="2" chapter="31" verse="18"/>
@@ -136,10 +109,7 @@
   <maftir chapter="34" verse="33"/>
 
 
-  <week chapter="35" verse="1">
-    <hebrewname>ויקהל</hebrewname>
-    <name></name>
-  </week>
+  <div type="week" chapter="35" verse="1" n="ויקהל"/>
 
   <day number="1" chapter="35" verse="1"/>
   <day number="2" chapter="35" verse="21"/>
@@ -151,10 +121,7 @@
   <maftir chapter="38" verse="18"/>
 
 
-  <week chapter="38" verse="21">
-    <hebrewname>פקודי</hebrewname>
-    <name></name>
-  </week>
+  <div type="week" chapter="38" verse="21" n="פקודי"/>
 
   <day number="1" chapter="38" verse="21"/>
   <day number="2" chapter="39" verse="2" whentogether="5"/>
@@ -166,4 +133,3 @@
   <maftir chapter="40" verse="34"/>
 
 </meta>
-

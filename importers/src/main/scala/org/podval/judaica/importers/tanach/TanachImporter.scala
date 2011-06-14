@@ -18,7 +18,9 @@
 package org.podval.judaica.importers
 package tanach
 
-import scala.xml.{XML, Node, Utility}
+import org.podval.judaica.common.Xml.{loadResource, getAttribute}
+
+import scala.xml.Node
 
 import java.io.File
 
@@ -35,23 +37,19 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String) e
 
 
     protected final override def processBook(xml: Node, outputName: String): Node = {
-        val breaks = getBreaks(outputName)
+        val breaks =
+            loadResource(getClass, outputName, "meta").
+            child.groupBy(getAttribute("@chapter")).
+            mapValues(_.groupBy(getAttribute("@verse")))
+
         val result = addBreaks(breaks, xml)
+
         result
     }
 
 
-    private def getBreaks(name: String): Map[String, Map[String, Seq[Node]]] = {
-        val xml = Utility.trimProper(XML.load(getClass.getResourceAsStream(name + ".xml")))(0).child
-
-        xml.groupBy(getAttribute("@chapter")).mapValues(_.groupBy(getAttribute("@verse")))
-    }
-
-
-    private def getAttribute(name: String)(node: Node) = (node \ name).text
-
-
     private def addBreaks(breaks: Map[String, Map[String, Seq[Node]]], xml: Node): Node = {
+        // TODO
         xml
     }
 }

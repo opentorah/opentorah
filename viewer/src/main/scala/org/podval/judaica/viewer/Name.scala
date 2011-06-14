@@ -16,24 +16,24 @@
 
 package org.podval.judaica.viewer
 
-import scala.xml.Node
+import scala.xml.{Node, Elem}
+
+import org.podval.judaica.common.Xml.{check, getAttribute}
 
 
-class Books {
-
-    def get(request: Request): Node = {
-        toHtml(request.contextPath, <p>Herehere!</p>)
-    }
+class Name(val name: String, val lang: String, val isTransliterated: Boolean) {
+}
 
 
-    private def toHtml(baseUrl: String, body: Seq[Node]): Node = {
-        <html>
-            <head>
-                <link href={baseUrl + "style.css"} rel="stylesheet" type="text/css"/>
-            </head>
-            <body>
-                {body}
-            </body>
-        </html>
+object Name {
+
+    def apply(node: Node): Name = {
+        check(node.asInstanceOf[Elem], "name")
+
+        new Name(
+            getAttribute("name")(node),
+            getAttribute("lang")(node),
+            getAttribute("isTransliterated")(node) == "true"
+        )
     }
 }
