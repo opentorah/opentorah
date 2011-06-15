@@ -19,12 +19,15 @@ package org.podval.judaica.viewer
 import java.io.File
 
 
-class Works(works: Seq[Work]) {
+final class Works(works: Seq[Work]) {
 
     def getByName(name: String): Option[Work] = get.find(_.hasName(name))
 
 
     def get: Seq[Work] = works
+
+
+    override def toString: String = "Works: " + get.mkString("[", ", ", "]")
 }
 
 

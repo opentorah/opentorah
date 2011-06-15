@@ -21,12 +21,15 @@ import scala.xml.Node
 import org.podval.judaica.common.Xml
 
 
-class Names(names: Seq[Name]) {
+final class Names(names: Seq[Name]) {
 
     def hasName(name: String): Boolean = names.exists(_.name == name)
 
 
     def getByLang(lang: String): Option[Name] = names.find(_.lang == lang)
+
+
+    override def toString: String = "Names: " + names.mkString("[", ", ", "]")
 }
 
 

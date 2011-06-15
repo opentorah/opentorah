@@ -21,7 +21,9 @@ import scala.xml.{Node, Elem}
 import org.podval.judaica.common.Xml.{check, getAttribute}
 
 
-class Name(val name: String, val lang: String, val isTransliterated: Boolean) {
+final class Name(val name: String, val lang: String, val isTransliterated: Boolean) {
+
+    override def toString: String = "Name: " + name + "(" + lang + ", " + isTransliterated +  ")"
 }
 
 

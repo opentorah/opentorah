@@ -21,9 +21,12 @@ import org.podval.judaica.common.Xml
 import java.io.File
 
 
-class Work(names: Names, directory: String) {
+final class Work(names: Names, directory: String) {
 
     def hasName(name: String): Boolean = names.hasName(name)
+
+
+    override def toString: String = "Work (" + directory + ") " + names
 }
 
 
@@ -33,7 +36,6 @@ object Work {
     def apply(file: File): Work = {
         val xml = Xml.loadFile(file, "work")
 
-        Console.println("in Work.apply()")
         new Work(
             Names(xml),
             Xml.getAttribute("directory")(xml)

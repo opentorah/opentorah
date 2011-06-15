@@ -23,7 +23,7 @@ import java.io.File
 
 object Xml {
 
-    def getAttribute(name: String)(node: Node) = (node \ name).text
+    def getAttribute(name: String)(node: Node) = (node \ ("@" + name)).text
 
 
     def oneChild(node: Node, name: String): Node = {
