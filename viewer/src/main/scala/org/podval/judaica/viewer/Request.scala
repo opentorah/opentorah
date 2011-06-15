@@ -17,6 +17,8 @@
 
 package org.podval.judaica.viewer
 
+import scala.collection.mutable.Queue
+
 
 final class Request(
     val contextPath: String,
@@ -25,4 +27,15 @@ final class Request(
     val query: Map[String, Seq[String]])
 {
     val basePath = contextPath + servletPath
+
+    private val path: Queue[String] = Queue(pathInfo.split("/").filterNot(_.isEmpty): _*)
+
+
+    def peekPath: String = path.head
+
+
+    def popPath: String = path.dequeue
+
+
+    def isPathEmpty: Boolean = path.isEmpty
 }

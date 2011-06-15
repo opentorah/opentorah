@@ -30,7 +30,7 @@ import scala.collection.JavaConversions.mapAsScalaMap
 import scala.xml.{Node, PrettyPrinter}
 
 
-class BooksServlet extends HttpServlet {
+final class BooksServlet extends HttpServlet {
 
     private val books = new Books
 
@@ -54,7 +54,7 @@ class BooksServlet extends HttpServlet {
 
     private def parseRequest(request: HttpServletRequest): Request =
         new Request(
-            request.getContextPath,
+            emptyIfNull(request.getContextPath),
             request.getServletPath,
             request.getPathInfo,
             parseQuery(request)
@@ -62,12 +62,13 @@ class BooksServlet extends HttpServlet {
 
 
     private def parseQuery(request: HttpServletRequest): Map[String, Seq[String]] = {
-        val queryString = request.getQueryString
-        val queryStringNonNull = if (queryString == null) "" else queryString
+        val queryString = emptyIfNull(request.getQueryString)
         Map[String, Seq[String]]() ++
-        (mapAsScalaMap(HttpUtils.parseQueryString(queryStringNonNull).asInstanceOf[Hashtable[String, Array[String]]]).
-        mapValues(_.toSeq))
+            (mapAsScalaMap(HttpUtils.parseQueryString(queryString).asInstanceOf[Hashtable[String, Array[String]]]).mapValues(_.toSeq))
     }
+
+
+    private def emptyIfNull(what: String): String = if (what == null) "" else what
 
 
     private def write(nodes: Node, out: OutputStream) {

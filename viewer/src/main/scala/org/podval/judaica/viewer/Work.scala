@@ -21,10 +21,7 @@ import org.podval.judaica.common.Xml
 import java.io.File
 
 
-final class Work(names: Names, directory: String) {
-
-    def hasName(name: String): Boolean = names.hasName(name)
-
+final class Work(val names: Names, directory: String) {
 
     override def toString: String = "Work (" + directory + ") " + names
 }

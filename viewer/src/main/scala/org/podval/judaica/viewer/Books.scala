@@ -21,8 +21,49 @@ import scala.xml.Node
 
 class Books {
 
+    private val works = Works()
+
+
     def get(request: Request): Node = {
-        toHtml(request.contextPath, <p>Herehere!</p>)
+
+        def getAllWorks: Seq[Node] = {
+            <h1>All Works</h1>
+            <table>{
+                works.get.map(work =>
+                    {
+                        val nameO = work.names.getByLang("en")
+                        val name = if (nameO.isDefined) nameO.get else work.names.getDefault
+                        <tr>
+                            <td>
+                                <a href={request.basePath + "/" + work.names.getDefault.name}>{name.name}</a>
+                            </td>
+                        </tr>
+                    }
+                )
+            }</table>
+        }
+
+
+        def getWork(name: String): Seq[Node] = {
+            val workO = works.getByName(name)
+
+            if (workO.isEmpty) {
+                throw new IllegalArgumentException("Not found: " + name) // TODO use NotFoundException for this!
+            }
+
+            val work = workO.get
+
+            <h1>{work.names.getDefault.name}</h1>
+        }
+
+
+        <html>
+            <head>
+            </head>
+            <body>{
+                if (request.isPathEmpty) getAllWorks else getWork(request.popPath)
+            }</body>
+        </html>
     }
 
 

@@ -21,7 +21,7 @@ import java.io.File
 
 final class Works(works: Seq[Work]) {
 
-    def getByName(name: String): Option[Work] = get.find(_.hasName(name))
+    def getByName(name: String): Option[Work] = get.find(_.names.hasName(name))
 
 
     def get: Seq[Work] = works
@@ -33,6 +33,9 @@ final class Works(works: Seq[Work]) {
 
 
 object Works {
+
+    def apply(directoryPath: String): Works = apply(new File(directoryPath))
+
 
     def apply(directory: File): Works = {
         if (!directory.isDirectory) {

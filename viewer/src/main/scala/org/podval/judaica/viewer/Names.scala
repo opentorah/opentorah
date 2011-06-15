@@ -29,6 +29,9 @@ final class Names(names: Seq[Name]) {
     def getByLang(lang: String): Option[Name] = names.find(_.lang == lang)
 
 
+    def getDefault: Name = names(0)
+
+
     override def toString: String = "Names: " + names.mkString("[", ", ", "]")
 }
 
