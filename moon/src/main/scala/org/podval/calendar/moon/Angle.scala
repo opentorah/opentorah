@@ -17,7 +17,7 @@
 package org.podval.calendar.moon
 
 
-// TODO ordering; equals
+// TODO ordering
 // TODO conversion tests
 class Angle(
     val degrees: Int,
@@ -46,6 +46,17 @@ class Angle(
     }
 
 
+    // TODO: install this as equality!
+    def ==(other: Angle): Boolean =
+        (degrees == other.degrees) &&
+        (minutes == other.minutes) &&
+        (seconds == other.seconds) &&
+        (thirds == other.thirds) &&
+        (fourths == other.fourths) &&
+        (fifths == other.fifths) &&
+        (sixths == other.sixths)
+
+    
     def +(other: Angle): Angle = Angle(
         degrees + other.degrees,
         minutes + other.minutes,
@@ -99,23 +110,14 @@ class Angle(
     def toRadians() = scala.math.toRadians(toDegrees())
 
 
-    private val SIXTY = 60.toDouble
-    private val MINUTES = SIXTY
-    private val SECONDS = MINUTES*SIXTY
-    private val THIRDS  = SECONDS*SIXTY
-    private val FOURTHS = THIRDS*SIXTY
-    private val FIFTHS  = FOURTHS*SIXTY
-    private val SIXTHS  = FIFTHS*SIXTY
-
-
     def toDegrees(): Double =
         degrees +
-        minutes/MINUTES +
-        seconds/SECONDS +
-        thirds /THIRDS +
-        fourths/FOURTHS +
-        fifths /FIFTHS +
-        sixths /SIXTHS
+        minutes/Angle.MINUTES +
+        seconds/Angle.SECONDS +
+        thirds /Angle.THIRDS +
+        fourths/Angle.FOURTHS +
+        fifths /Angle.FIFTHS +
+        sixths /Angle.SIXTHS
 }
 
 
@@ -184,16 +186,35 @@ object Angle {
 
 
     private val SIXTY = 60.toDouble
+    private val MINUTES = SIXTY
+    private val SECONDS = MINUTES*SIXTY
+    private val THIRDS  = SECONDS*SIXTY
+    private val FOURTHS = THIRDS*SIXTY
+    private val FIFTHS  = FOURTHS*SIXTY
+    private val SIXTHS  = FIFTHS*SIXTY
 
 
     def fromDegrees(value: Double): Angle = {
-        val degrees = scala.math.floor(value)
-        val minutes = scala.math.floor((value-degrees)*SIXTY)
-        val seconds = scala.math.floor((value-degrees-minutes)*SIXTY)
-        val thirds  = scala.math.floor((value-degrees-minutes-seconds)*SIXTY)
-        val fourths = scala.math.floor((value-degrees-minutes-seconds-thirds)*SIXTY)
-        val fifths  = scala.math.floor((value-degrees-minutes-seconds-thirds-fourths)*SIXTY)
-        val sixths  = scala.math.round((value-degrees-minutes-seconds-thirds-fourths-fifths)*SIXTY)
+        var leftover = value
+        val degrees = scala.math.floor(leftover)
+        leftover -= degrees
+
+        val minutes = scala.math.floor(leftover*MINUTES)
+        leftover -= minutes/MINUTES
+
+        val seconds = scala.math.floor(leftover*SECONDS)
+        leftover -= seconds/SECONDS
+
+        val thirds  = scala.math.floor(leftover*THIRDS)
+        leftover -= thirds/THIRDS
+
+        val fourths = scala.math.floor(leftover*FOURTHS)
+        leftover -= fourths/FOURTHS
+
+        val fifths  = scala.math.floor(leftover*FIFTHS)
+        leftover -= fifths/FIFTHS
+
+        val sixths  = scala.math.round(leftover*SIXTHS)
 
         Angle(
             degrees.toInt,
@@ -203,5 +224,13 @@ object Angle {
             fourths.toInt,
             fifths.toInt,
             sixths.toInt)
+    }
+
+
+    def main(args: Array[String]): Unit = {
+        val angle = Angle(5, 34)
+        val value = angle.toDegrees()
+        val angle_ = Angle.fromDegrees(value)
+        println(angle + "=" + value + "->" + angle_)
     }
 }
