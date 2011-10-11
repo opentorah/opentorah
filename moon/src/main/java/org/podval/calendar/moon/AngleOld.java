@@ -3,27 +3,27 @@
 package org.podval.calendar.moon;
 
 
-public final class Angle {
+public final class AngleOld {
 
     public static final double RADIANS_TO_DEGREES = 360.0/(2*Math.PI);
 
 
-    public static Angle fromRadians(double value) {
-        return new Angle(value*RADIANS_TO_DEGREES);
+    public static AngleOld fromRadians(double value) {
+        return new AngleOld(value*RADIANS_TO_DEGREES);
     }
 
 
-    public static Angle asin(double value) {
+    public static AngleOld asin(double value) {
         return fromRadians(Math.asin(value));
     }
 
 
-    public Angle(int degrees, int minutes) {
+    public AngleOld(int degrees, int minutes) {
         this(degrees + minutes / 60f);
     }
 
 
-    public Angle(double value) {
+    public AngleOld(double value) {
         this.value = value;
     }
 

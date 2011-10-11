@@ -37,11 +37,6 @@
         </developer>
     </developers>
 
-    <ciManagement>
-        <system>hudson</system>
-        <url>http://www.dub.podval.org/hudson/job/calendar/</url>
-    </ciManagement>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -54,50 +49,50 @@
         <module>moon</module>
     </modules>
 
-    <repositories>
-        <repository>
-            <id>podval-thirdparty</id>
-            <name>Podval 3rd Party</name>
-            <releases><enabled>true</enabled></releases>
-            <snapshots><enabled>false</enabled></snapshots>
-            <url>http://www.dub.podval.org/nexus/content/repositories/thirdparty/</url>
-        </repository>
-
-        <repository>
-            <id>podval-snapshots</id>
-            <name>Podval Snapshots</name>
-            <releases><enabled>false</enabled></releases>
-            <snapshots><enabled>true</enabled></snapshots>
-            <url>http://www.dub.podval.org/nexus/content/repositories/snapshots/</url>
-        </repository>
-
-        <repository>
-            <id>podval-releases</id>
-            <name>Podval Releases</name>
-            <releases><enabled>true</enabled></releases>
-            <snapshots><enabled>false</enabled></snapshots>
-            <url>http://www.dub.podval.org/nexus/content/repositories/releases/</url>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>podval</id>
-            <name>snapshots</name>
-            <url>http://www.dub.podval.org/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <version>2.15.2</version>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scala-test-compile</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                    <sendJavaToScalac>true</sendJavaToScalac>
+                    <args>
+                        <arg>-target:jvm-1.5</arg>
+                        <arg>-g:vars</arg>
+                        <arg>-deprecation</arg>
+                        <arg>-dependencyfile</arg>
+                        <arg>${project.build.directory}/.scala_dependencies</arg>
+                    </args>
                 </configuration>
             </plugin>
         </plugins>
@@ -117,8 +112,14 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.2</version>
+            <version>4.10</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.9.1</version>
         </dependency>
     </dependencies>
 </project>

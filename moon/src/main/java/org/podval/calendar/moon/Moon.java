@@ -15,26 +15,26 @@ import java.util.LinkedHashMap;
 public final class Moon {
 
     /* Numbers as they are printed in Chapter 15 Haloha 6 */
-    private static final Map<Angle, Angle> PRINTED = new LinkedHashMap<Angle,Angle>();
+    private static final Map<AngleOld, AngleOld> PRINTED = new LinkedHashMap<AngleOld,AngleOld>();
 
     static {
-        PRINTED.put(new Angle( 10), new Angle(0, 50));
-        PRINTED.put(new Angle( 20), new Angle(1, 38));
-        PRINTED.put(new Angle( 30), new Angle(2, 24));
-        PRINTED.put(new Angle( 40), new Angle(3,  6));
-        PRINTED.put(new Angle( 50), new Angle(3, 44));
-        PRINTED.put(new Angle( 60), new Angle(4, 16));
-        PRINTED.put(new Angle( 70), new Angle(4, 41));
-        PRINTED.put(new Angle( 80), new Angle(5,  0));
-        PRINTED.put(new Angle( 90), new Angle(5,  5));
-        PRINTED.put(new Angle(100), new Angle(5,  8));
-        PRINTED.put(new Angle(110), new Angle(4, 59));
-        PRINTED.put(new Angle(120), new Angle(4, 20));
-        PRINTED.put(new Angle(130), new Angle(4, 14));
-        PRINTED.put(new Angle(140), new Angle(3, 33));
-        PRINTED.put(new Angle(150), new Angle(3, 48));
-        PRINTED.put(new Angle(160), new Angle(1, 56));
-        PRINTED.put(new Angle(170), new Angle(1, 59));
+        PRINTED.put(new AngleOld( 10), new AngleOld(0, 50));
+        PRINTED.put(new AngleOld( 20), new AngleOld(1, 38));
+        PRINTED.put(new AngleOld( 30), new AngleOld(2, 24));
+        PRINTED.put(new AngleOld( 40), new AngleOld(3,  6));
+        PRINTED.put(new AngleOld( 50), new AngleOld(3, 44));
+        PRINTED.put(new AngleOld( 60), new AngleOld(4, 16));
+        PRINTED.put(new AngleOld( 70), new AngleOld(4, 41));
+        PRINTED.put(new AngleOld( 80), new AngleOld(5,  0));
+        PRINTED.put(new AngleOld( 90), new AngleOld(5,  5));
+        PRINTED.put(new AngleOld(100), new AngleOld(5,  8));
+        PRINTED.put(new AngleOld(110), new AngleOld(4, 59));
+        PRINTED.put(new AngleOld(120), new AngleOld(4, 20));
+        PRINTED.put(new AngleOld(130), new AngleOld(4, 14));
+        PRINTED.put(new AngleOld(140), new AngleOld(3, 33));
+        PRINTED.put(new AngleOld(150), new AngleOld(3, 48));
+        PRINTED.put(new AngleOld(160), new AngleOld(1, 56));
+        PRINTED.put(new AngleOld(170), new AngleOld(1, 59));
     }
 
 
@@ -42,20 +42,20 @@ public final class Moon {
     }
 
 
-    private static Angle mnas(Angle maslul, double e) {
-        return Angle.asin(maslul.sin()/Math.sqrt(e*e + 2*e*maslul.cos() + 1));
+    private static AngleOld mnas(AngleOld maslul, double e) {
+        return AngleOld.asin(maslul.sin()/Math.sqrt(e*e + 2*e*maslul.cos() + 1));
     }
 
 
-    private static double e(Angle maslul, Angle mnas) {
+    private static double e(AngleOld maslul, AngleOld mnas) {
         return maslul.sin()/mnas.sin()*Math.abs(mnas.cos())-maslul.cos();
     }
 
 
     public static void main(String[] args) {
         double totale = 0.0;
-        for (Angle maslul : PRINTED.keySet()) {
-            Angle mnas = PRINTED.get(maslul);
+        for (AngleOld maslul : PRINTED.keySet()) {
+            AngleOld mnas = PRINTED.get(maslul);
             double e = e(maslul, mnas);
             e = round(e, 2);
 
