@@ -17,16 +17,15 @@
 package org.podval.calendar.moon
 
 
-// TODO ordering
-// TODO conversion tests
-class Angle(
+// TODO switch to List-of-positions representation
+final class Angle(
     val degrees: Int,
     val minutes: Int,
     val seconds: Int,
     val thirds: Int,
     val fourths: Int,
     val fifths: Int,
-    val sixths: Int)
+    val sixths: Int) extends Ordered[Angle]
 {
     checkRange(degrees, 360)
     checkRange(minutes)
@@ -46,17 +45,46 @@ class Angle(
     }
 
 
-    // TODO: install this as equality!
-    def ==(other: Angle): Boolean =
-        (degrees == other.degrees) &&
-        (minutes == other.minutes) &&
-        (seconds == other.seconds) &&
-        (thirds == other.thirds) &&
-        (fourths == other.fourths) &&
-        (fifths == other.fifths) &&
-        (sixths == other.sixths)
+    override def equals(other: Any): Boolean = other match {
+        case that: Angle => 
+            (degrees == that.degrees) &&
+            (minutes == that.minutes) &&
+            (seconds == that.seconds) &&
+            (thirds == that.thirds) &&
+            (fourths == that.fourths) &&
+            (fifths == that.fifths) &&
+            (sixths == that.sixths)
+        case _ => false
+    }
 
-    
+
+    override def hashCode =
+        41*(41*(41*(41*(41*(41*(41+degrees)+minutes)+seconds)+thirds)+fourths)+fifths)+sixths
+
+
+    override def compare(that: Angle) = {
+        var result = degrees.compare(that.degrees)
+        if (result != 0) result else {
+            result = minutes.compare(that.minutes)
+            if (result != 0) result else {
+                result = seconds.compare(seconds)
+                if (result != 0) result else {
+                    result = thirds.compare(that.thirds)
+                    if (result != 0) result else {
+                        result = fourths.compare(that.fourths)
+                        if (result != 0) result else {
+                            result = fifths.compare(that.fifths)
+                            if (result != 0) result else {
+                                sixths.compare(that.sixths)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     def +(other: Angle): Angle = Angle(
         degrees + other.degrees,
         minutes + other.minutes,
@@ -84,6 +112,13 @@ class Angle(
             degrees,
             minutes,
             seconds + carry(thirds+carry(fourths+carry(fifths+carry(sixths))))
+        )
+
+
+    def roundToMinutes(): Angle =
+        Angle(
+            degrees,
+            minutes + carry(seconds + carry(thirds+carry(fourths+carry(fifths+carry(sixths)))))
         )
 
 

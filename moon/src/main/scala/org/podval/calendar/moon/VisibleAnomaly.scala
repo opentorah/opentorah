@@ -16,6 +16,7 @@
 
 package org.podval.calendar.moon
 
+import scala.collection.immutable.TreeMap
 
 object VisibleAnomaly {
 
@@ -26,7 +27,8 @@ object VisibleAnomaly {
 */
 
     /* Numbers as they are printed in Chapter 15 Law 6 */
-    val PRINTED = Map(
+    // TODO sort by maslul
+    val MISPRINTED = TreeMap(
         Angle( 10) -> Angle(0, 50),
         Angle( 20) -> Angle(1, 38),
         Angle( 30) -> Angle(2, 24),
@@ -47,6 +49,13 @@ object VisibleAnomaly {
     )
 
 
+    val CORRECT = MISPRINTED ++ TreeMap(
+        Angle(120) -> Angle(4, 40),
+        Angle(150) -> Angle(2, 48),
+        Angle(170) -> Angle(0, 59)
+    )
+
+
     def mnasfrome(maslul: Angle, e: Double): Angle =
         Angle.asin(maslul.sin()/scala.math.sqrt(e*e + 2*e*maslul.cos() + 1))
 
@@ -55,33 +64,7 @@ object VisibleAnomaly {
         maslul.sin()/mnas.sin()*scala.math.abs(mnas.cos())-maslul.cos()
 
 
-    def main(args: Array[String]) {
-        var totale: Double = 0.0
-        for (row <- PRINTED) {
-            val maslul: Angle = row._1
-            val mnas: Angle = row._2
-
-            val e: Double = round(efrommnas(maslul, mnas), 2)
-
-            var line: String = maslul + ": " + mnas + "  " + e + " " + mnasfrome(maslul, 11.1).roundToSeconds
-
-            val correcte: Double =
-                if (maslul.degrees == 120) 11.10 else
-                if (maslul.degrees == 150) 11.1 else
-                if (maslul.degrees == 170) 11.1 else
-                    0.0
-
-            if (correcte != 0.0) {
-                line += "  " + correcte + " " + mnasfrome(maslul, correcte)
-            } else {
-                totale += e
-            }
-
-            println(line)
-        }
-
-        println("Average e= " + (totale/(17-3)) + " corrected average= " + (totale+3*11.1)/17);
-    }
+    def efrommnasround(maslul: Angle, mnas: Angle): Double = round(efrommnas(maslul, mnas), 2)
 
 
     private def round(value: Double, digits: Int): Double = {
