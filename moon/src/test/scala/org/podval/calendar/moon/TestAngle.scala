@@ -23,17 +23,34 @@ import org.junit.Assert
 class TestAngle {
 
     @Test
-    def angleTest() {
-        testFromValue(5, 34);
-        testFromValue(54, 34);
-        testFromValue(154, 59);
-        testFromValue(254, 0);
+    def construction() {
+        construction(5, 34)
+        construction(54, 34)
+        construction(154, 59)
+        construction(254, 0)
     }
 
 
-    private def testFromValue(degrees: Int, minutes: Int) {
+    private def construction(degrees: Int, minutes: Int) {
         val angle = Angle(degrees, minutes)
-        Assert.assertEquals(degrees, angle.degrees);
-        Assert.assertEquals(minutes, angle.minutes);
+        Assert.assertEquals(degrees, angle.degrees)
+        Assert.assertEquals(minutes, angle.minutes)
+    }
+
+
+    @Test
+    def conversion() {
+        conversion(5, 34)
+        conversion(54, 34)
+        conversion(154, 59)
+        conversion(254, 0)
+    }
+
+
+    private def conversion(degrees: Int, minutes: Int) {
+        val angle = Angle(degrees, minutes)
+        val value = angle.toDegrees()
+        val angle_ = Angle.fromDegrees(value)
+        Assert.assertEquals(angle, angle_)
     }
 }
