@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//W3C//DTD MathML 2.0//EN" "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd">
+<?xml-model href="http://www.oxygenxml.com/docbook/xml/5.0/rng/dbmathmlsvg.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<article xmlns="http://docbook.org/ns/docbook">
+    <title>Rambam on Astronomical Calendar</title>
+    <section>
+        <title>Lunar Theory</title>
+        <section>
+            <title>Chapter 14</title>
+            <section>
+                <title>Law 1</title>
+                <para>
+                    The moon has two mean movements.
+                    The moon itself rotates on a small circle that does not surround all of the Earth.
+                    Moon's movement on that small circle is called mean
+                    lunar anomaly (אמצע המסלול).
+                    The small circle (epicycle) itself rotates on a big circle (deferent) that surrounds the Earth.
+                    The mean movement of the small circle on the big circle that surrounds the Earth is called
+                    mean lunar longitude (אמצע הירח).
+                </para>
+            </section>
+            <section>
+                <title>Law 2</title>
+                <para>
+                    Movement in mean lunar longitude in one day is 13°10′35″
+                    <footnote><para>This is part of Law 1.</para></footnote>.
+                </para>
+
+                <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
+
+                <informaltable frame="all">
+                    <tgroup cols="3">
+                        <thead>
+                            <row>
+                                <entry>days</entry>
+                                <entry>printed</entry>
+                                <entry>calculated</entry>
+                            </row>
+                        </thead>
+                        <tbody>
+                            <row>
+                                <entry align="right">10</entry>
+                                <entry>131°45′50″</entry>
+                                <entry>131°45′50″</entry>
+                            </row>
+                            <row>
+                                <entry align="right">100</entry>
+                                <entry>237°38′23″</entry>
+                                <entry>237°38′20″</entry>
+                            </row>
+                            <row>
+                                <entry align="right">1000</entry>
+                                <entry>216°23′50″</entry>
+                                <entry>216°23′20″</entry>
+                            </row>
+                            <row>
+                                <entry align="right">10000</entry>
+                                <entry>3°58′20″<footnote><para>Here: ‘nimzes’ instead of ‘nimzo’.</para></footnote></entry>
+                                <entry>3°53′20″</entry>
+                            </row>
+                            <row>
+                                <entry align="right">29</entry>
+                                <entry>22°6′56″</entry>
+                                <entry>22°6′55″</entry>
+                            </row>
+                            <row>
+                                <entry align="right">354<footnote><para>'ordered' year; see Law 12:1.</para></footnote></entry>
+                                <entry>344°26′43″</entry>
+                                <entry>344°26′30″</entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </informaltable>
+
+                <para>
+                    And in this way you can calculate it for any number of days and years that you want.
+                </para>
+            </section>
+
+            <section>
+                <title>Law 3</title>
+                <para>
+                    Change in lunar anomaly in one day is 13°3′54″.
+                </para>
+                <para>
+                    For longer periods, (remainder) of the movement in mean lunar anomaly is:
+                </para>
+
+                <informaltable frame="all">
+                    <tgroup cols="3">
+                        <thead>
+                            <row>
+                                <entry>days</entry>
+                                <entry>printed</entry>
+                                <entry>calculated</entry>
+                            </row>
+                        </thead>
+                        <tbody>
+                            <row>
+                                <entry align="right">10</entry>
+                                <entry>130°39′0″</entry>
+                                <entry>130°39′0″</entry>
+                            </row>
+                            <row>
+                                <entry align="right">100</entry>
+                                <entry>226°29′53″</entry>
+                                <entry>226°30′0″</entry>
+                            </row>
+                            <row>
+                                <entry align="right">1000</entry>
+                                <entry>104°58′50″</entry>
+                                <entry>105°0′0″</entry>
+                            </row>
+                            <row>
+                                <entry align="right">10000</entry>
+                                <entry>329°48′20″</entry>
+                                <entry>330°0′0″</entry>
+                            </row>
+                            <row>
+                                <entry align="right">29</entry>
+                                <entry>18°53′4″</entry>
+                                <entry>18°53′6″</entry>
+                            </row>
+                            <row>
+                                <entry align="right">354
+                                    <footnote><para>'ordered' year; see Law 12:1.</para></footnote>
+                                    <footnote><para>This is part of Law 4.</para></footnote>
+                                </entry>
+                                <entry>305°0′13″</entry>
+                                <entry>305°0′36″</entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </informaltable>
+            </section>
+            <section>
+                <title>Law 4</title>
+                <para>
+                    In the beginning of the night to Thursday that is the epoch [TODO: link to definition]
+                    for these calculations, mean lunar longitude was 1°14′43″ into the constellation of Ram.
+                    And mean lunar anomaly on the epoch was 84°28′42″.
+                    Now that you know rate of movement in the mean lunar longitude and its value on the epoch
+                    to which you add, you'll calculate mean lunar longitude on any day that you want the same
+                    way as you did for the mean solar longitude.
+                </para>
+            </section>
+            <section>
+                <title>Law 5</title>
+                <para> After you calculate mean lunar longitude at the
+                    beginning of the night that you want, contemplate the sun and figure out which
+                    constellation (zodiac) is it in <footnote><para>This is part of Law 4.</para></footnote>.
+                    [This is the correction of the mean lunar longitude depending on
+                    the mean solar longitude:]
+                </para>
+                <informaltable frame="all">
+                    <tgroup cols="4">
+                        <thead>
+                            <row>
+                                <entry>Solar Longitude on the Zodiac</entry>
+                                <entry>from</entry>
+                                <entry>to, not including<footnote><para>My feeling about the word usage in the original.</para></footnote></entry>
+                                <entry>Lunar longitudecorrection</entry>
+                            </row>
+                        </thead>
+                        <tbody>
+                            <row>
+                                <entry>middle of Pisces-middle of Taurus
+                                    <footnote><para>See Chapter 11, Law 7 on the start of Jewish Zodiac.</para></footnote>
+                                </entry>
+                                <entry>315°</entry>
+                                <entry>15°</entry>
+                                <entry>0°</entry>
+                            </row>
+                            <row>
+                                <entry>middle of Taurus-beginning of Gemini</entry>
+                                <entry>15°</entry>
+                                <entry>30°</entry>
+                                <entry>0°15′</entry>
+                            </row>
+                            <row>
+                                <entry>beginning of Gemini-beginning of Leo</entry>
+                                <entry>30°</entry>
+                                <entry>90°</entry>
+                                <entry>0°15′</entry>
+                            </row>
+                            <row>
+                                <entry>beginning of Leo-middle of Virgo</entry>
+                                <entry>90°</entry>
+                                <entry>135°</entry>
+                                <entry>0°15′</entry>
+                            </row>
+                            <row>
+                                <entry>middle of Virgo-middle of Libra</entry>
+                                <entry>135°</entry>
+                                <entry>165°</entry>
+                                <entry>0°</entry>
+                            </row>
+                            <row>
+                                <entry>middle of Libra-beginning of Sagittarius</entry>
+                                <entry>165°</entry>
+                                <entry>210°</entry>
+                                <entry>-0°15′</entry>
+                            </row>
+                            <row>
+                                <entry>beginning of Sagittarius-beginning of Aquarius</entry>
+                                <entry>210°</entry>
+                                <entry>270°</entry>
+                                <entry>-0°30′</entry>
+                            </row>
+                            <row>
+                                <entry>beginning of Aquarius-middle of Pisces</entry>
+                                <entry>270°</entry>
+                                <entry>315°</entry>
+                                <entry>-0°15′</entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </informaltable>
+            </section>
+            <section>
+                <title>Law 6</title>
+                <para>
+                    The value of mean [lunar longitude] after you add to it or subtract from it or leave it as 
+                    it is - that is mean lunar longitude approximately a third of an hour after sunset on the
+                    date you are calculating it for. And this is what is called 'mean lunar longitude during observation time'.
+                </para>
+            </section>
+        </section>
+        <section>
+            <title>Chapter 15</title>
+            <section>
+                <title>Law 1</title>
+                <para>
+                    To find true longitude of the moon on a specific day:
+                    First, calculate mean lunar longitude during observation time of the desired night.
+                    Also, calculate mean lunar anomaly and mean solar longitude for the same time.
+                    Then, subtract mean solar longitude from the mean lunar longitude and double the result.
+                    This value is called 'doubled distance'.
+                </para>
+            </section>
+            <section>
+                <title>Law 2</title>
+                <para>
+                    We already stipulated that all the calculations in these chapters are for one purpose only:
+                    to know if the moon is visible. And it is not possible for this double distance during the night of
+                    observation when the moon is indeed visible to be outside of the interval from 5° to 62°.
+                    It cannot be more - nor less.
+                </para>
+            </section>
+
+            <section>
+                <title>Law 3</title>
+                <para>
+                    In this light, contemplate this doubled distance.
+                    Here is a table of mean lunar anomaly corrections depending on the value of the
+                    doubled distance:
+                </para>
+
+                <informaltable frame="all">
+                    <tgroup cols="2">
+                        <thead>
+                            <row>
+                                <entry>doubled distance</entry>
+                                <entry>correction of the mean anomaly</entry>
+                            </row>
+                        </thead>
+                        <tbody>
+                            <row>
+                                <entry>~5° {0-5?}</entry>
+                                <entry>0</entry>
+                            </row>
+                            <row>
+                                <entry>6°-11°</entry>
+                                <entry>1°</entry>
+                            </row>
+                            <row>
+                                <entry>12°-18°</entry>
+                                <entry>2°</entry>
+                            </row>
+                            <row>
+                                <entry>19°-24°</entry>
+                                <entry>3°</entry>
+                            </row>
+                            <row>
+                                <entry>25°-31°</entry>
+                                <entry>4°</entry>
+                            </row>
+                            <row>
+                                <entry>32°-83°</entry>
+                                <entry>5°</entry>
+                            </row>
+                            <row>
+                                <entry>39°-45°</entry>
+                                <entry>6°</entry>
+                            </row>
+                            <row>
+                                <entry>46°-51°</entry>
+                                <entry>7°</entry>
+                            </row>
+                            <row>
+                                <entry>52°-59°</entry>
+                                <entry>8°</entry>
+                            </row>
+                            <row>
+                                <entry>60°-63°</entry>
+                                <entry>9°</entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </informaltable>
+                <para>
+                    Result of adding this correction to the mean lunar anomaly is called 'corrected lunar anomaly'.
+                </para>
+                <para role="notes">
+                    Rambam does not describe the model behind this correction. 
+                    Because the models Rambam did describe until now are the same as Ptolemy's models
+                    (including numerical parameters), and because this correction is determined by the (doubled)
+                    sun-moon elongation, just like Ptolemy's "improved" model of the moon ("the crank"),
+                    I assume that that model was used to calculate this correction. We'll see how does the curve fit.
+                </para>
+                <para role="notes">
+                    TODO: Derive the formula! Make the diagram! Make another diagram - for the "simple" model!
+                    {How come the fact that sun and moon move in different plains does not affect this calculation?}
+                </para>
+                <para role="notes">
+                    It seems that Rambam treats "the crank" as just a calculation device - otherwise,
+                    table giving visible anomaly from the corrected anomaly should take into account changes in the
+                    earth-moon distance depending on the elongation - and it does not!
+                    Maybe that is why he does not describe the model behind this correction.
+                    And maybe this is why Rambam reiterates - in Law 2 - that only the observability of the new moon
+                    needs to be calculated correctly. {How did Ptolemy calculate visible anomaly?}
+                </para>
+            </section>
+            <section>
+                <title>Law 4</title>
+                <para>
+                    Afterwards, see how many degrees is corrected lunar anomaly.
+                    If it is less than 180°, subtract mnas of this corrected anomaly from the mean moon at the
+                    observation time. An if corrected lunar anomaly is is more than 180° but less than 360°,
+                    add mnas of this corrected anomaly to the mean moon at the observation time.
+                    And mean moon after you add to it or subtract from it is the true location of the Moon at
+                    the observation time.
+                </para>
+            </section>
+            <section>
+                <title>Law 5</title>
+                <para>
+                    You should know that if the corrected anomaly is 180° or 360°, it does not have a mona,
+                    so mean moon at the observation time is also true location.
+                </para>
+            </section>
+
+            <section xml:id="l15-6">
+                <title>Law 6</title>
+                <para>
+                    What is the value of the visible
+                    anomaly for a given value of the corrected anomaly?
+                </para>
+                <para role="notes"> Formulae: R - radius of the big circle; r - radius of the small
+                    circle; e = R/r. A little trigonometry, and we get: visible anomaly =
+                    arctg(sin(corrected anomaly)/(cos(corrected anomaly) + e)) and: e = ctg(visible
+                    anomaly)*sin(corrected anomaly) - cos(corrected anomaly) </para>
+                <para role="notes">TODO: Make the diagram! TODO: put this in its proper place... </para>
+                <para role="notes"> A column giving
+                    the value of e was added...
+                </para>
+
+                <informaltable frame="all">
+                    <tgroup cols="3">
+                        <thead>
+                            <row>
+                                <entry>corrected anomaly</entry>
+                                <entry>visible anomaly</entry>
+                                <entry>e</entry>
+                            </row>
+                        </thead>
+                        <tbody>
+                            <row>
+                                <entry>10°</entry>
+                                <entry>50′</entry>
+                                <entry>10.95</entry>
+                            </row>
+                            <row>
+                                <entry>20°</entry>
+                                <entry>1°38′</entry>
+                                <entry>11.05</entry>
+                            </row>
+                            <row>
+                                <entry>30°</entry>
+                                <entry>2°24′</entry>
+                                <entry>11.06</entry>
+                            </row>
+                            <row>
+                                <entry>40°</entry>
+                                <entry>3°6′</entry>
+                                <entry>11.1</entry>
+                            </row>
+                            <row>
+                                <entry>50°</entry>
+                                <entry>3°44′</entry>
+                                <entry>11.1</entry>
+                            </row>
+                            <row>
+                                <entry>60°</entry>
+                                <entry>4°16′</entry>
+                                <entry>11.11</entry>
+                            </row>
+                            <row>
+                                <entry>70°</entry>
+                                <entry>4°41′</entry>
+                                <entry>11.13</entry>
+                            </row>
+                            <row>
+                                <entry>80°</entry>
+                                <entry>5°0′</entry>
+                                <entry>11.08</entry>
+                            </row>
+                            <row>
+                                <entry>90°</entry>
+                                <entry>5°5′</entry>
+                                <entry>11.24</entry>
+                            </row>
+                            <row>
+                                <entry>100°</entry>
+                                <entry>5°8′</entry>
+                                <entry>11.14</entry>
+                            </row>
+                            <row>
+                                <entry>110°</entry>
+                                <entry>4°59′</entry>
+                                <entry>11.12</entry>
+                            </row>
+                            <row>
+                                <entry>120°</entry>
+                                <entry>4°20′</entry>
+                                <entry>11.93</entry>
+                            </row>
+                            <row>
+                                <entry>130°</entry>
+                                <entry>4°14′</entry>
+                                <entry>10.99</entry>
+                            </row>
+                            <row>
+                                <entry>140°</entry>
+                                <entry>3°33′</entry>
+                                <entry>11.13</entry>
+                            </row>
+                            <row>
+                                <entry>150°</entry>
+                                <entry>3°48′</entry>
+                                <entry>8.39</entry>
+                            </row>
+                            <row>
+                                <entry>160°</entry>
+                                <entry>1°56′</entry>
+                                <entry>11.07</entry>
+                            </row>
+                            <row>
+                                <entry>170°</entry>
+                                <entry>1°59′</entry>
+                                <entry>6.0</entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </informaltable>
+
+                <para role="notes">
+                    It is clear that values for 150° and 170° are misprinted: they are bigger than the one before them
+                    when they should be smaller. Value for 120° is also misprinted, but it is less obvious.
+                </para>
+                <para role="notes">
+                    Calculations show that for the precision up to a minute, it is sufficient to know e to up to the second
+                    digit after the dot.
+                    Look at the value of e, and the misprints become obvious: value of e for them is way out of range it is in
+                    for the rest of them.
+                </para>
+                <para role="notes">
+                    TODO Range of e - graph. Range of possible values for each based on the range of e.
+                    This is transcription error: one letter; extra word... Probable correct values.
+                </para>
+                <para role="notes">
+                    This is how different sources treat the often misprinted values:
+                </para>
+                
+                <informaltable frame="all">
+                    <tgroup cols="4">
+                        <thead>
+                            <row>
+                                <entry>Edition</entry>
+                                <entry>120°</entry>
+                                <entry>150°</entry>
+                                <entry>170°</entry>
+                            </row>
+                        </thead>
+                        <tbody>
+                            <row>
+                                <entry>[Romm]</entry>
+                                <entry>incorrect</entry>
+                                <entry>incorrect</entry>
+                                <entry>incorrect</entry>
+                            </row>
+                            <row>
+                                <entry>[Eshkol]</entry>
+                                <entry>incorrect</entry>
+                                <entry>incorrect</entry>
+                                <entry>incorrect</entry>
+                            </row>
+                            <row>
+                                <entry>[LaAm]</entry>
+                                <entry>corrected in the notes</entry>
+                                <entry>incorrect</entry>
+                                <entry>incorrect</entry>
+                            </row>
+                            <row>
+                                <entry>[Kapach]
+                                    <footnote>
+                                        <para>
+                                            It is not clear how did authoritative Yemenite texts acquire the same misprints
+                                            as in the ashkenazic editions.
+                                        </para>
+                                    </footnote>
+                                </entry>
+                                <entry>incorrect</entry>
+                                <entry>corrected in the notes</entry>
+                                <entry>corrected in the notes</entry>
+                            </row>
+                            <row>
+                                <entry>[Aruch]</entry>
+                                <entry>incorrect</entry>
+                                <entry>corrected in the notes</entry>
+                                <entry>corrected in the notes</entry>
+                            </row>
+                            <row>
+                                <entry>[Frenkel]</entry>
+                                <entry>correct and noted</entry>
+                                <entry>correct and noted</entry>
+                                <entry>correct and noted</entry>
+                            </row>
+                            <row>
+                                <entry>[Keller]</entry>
+                                <entry>not given</entry>
+                                <entry>not given</entry>
+                                <entry>not given</entry>
+                            </row>
+                            <row>
+                                <entry>[Losh]
+                                    <footnote>
+                                        <para>
+                                            Reprints the text and does not correct any of the misprints - surpising for a textbook
+                                            on the subject (even introductory).
+                                            TODO: Link to the scans of the appropriate pages - with the stuff highlighted.
+                                        </para>
+                                    </footnote>
+                                </entry>
+                                <entry>incorrect</entry>
+                                <entry>incorrect</entry>
+                                <entry>incorrect</entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </informaltable>
+            </section>
+        </section>
+    </section>
+</article>
