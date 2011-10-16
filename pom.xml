@@ -47,6 +47,7 @@
         <module>ical</module>
         <module>app-servlet</module>
         <module>moon</module>
+        <module>paper</module>
     </modules>
 
     <build>
