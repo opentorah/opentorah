@@ -29,7 +29,7 @@ final class AngleNg(val degrees: Int, val more: List[Int]) extends Ordered[Angle
 
 
     override def equals(other: Any): Boolean = other match {
-        case that: AngleNg => zip(that) forall (p => p._1 == p._2) // TODO 'lift' ==
+        case that: AngleNg => zip(that) forall lift(_==_)
         case _ => false
     }
 
@@ -37,17 +37,16 @@ final class AngleNg(val degrees: Int, val more: List[Int]) extends Ordered[Angle
     override def hashCode = ((41+degrees) /: more) ((v,x) => 41*v+x)
 
 
-    override def compare(that: AngleNg) =
-        zip(that).map(p => p._1.compare(p._2)).find(_ != 0).getOrElse(0) // TODO 'lift' compare
+    override def compare(that: AngleNg) = zip(that) map lift(_.compare(_)) find(_!= 0) getOrElse(0)
 
 
-    def +(other: AngleNg): AngleNg = AngleNg(zip(other) map (p => p._1 + p._2)) // TODO 'lift' +
+    def +(other: AngleNg): AngleNg = AngleNg(zip(other) map lift(_+_))
 
 
-    private def zip(that: AngleNg) = (degrees, that.degrees) :: (more zipAll (that.more, 0, 0))
+    private def lift[A, B, C](op: (A, B) => C): (Tuple2[A, B] => C) = p => op(p._1, p._2)
 
 
-    def *(n: Int): AngleNg = AngleNg(n*degrees, more map (n * _))
+    def *(n: Int): AngleNg = AngleNg(asDigits map (n*_))
 
 
     def roundToSeconds(): AngleNg = roundTo(2)
@@ -66,24 +65,30 @@ final class AngleNg(val degrees: Int, val more: List[Int]) extends Ordered[Angle
     }
 
 
-    private def carry(value: Int): Int = if (value >= 30) 1 else 0
+    def precision = more.length
 
 
     // TODO: use symbols: ° ′ ″ ‴
     // TODO: padding
-    override def toString: String = (degrees :: more).mkString("(", ", ", ")")
+    override def toString: String = asDigits.mkString("(", ", ", ")")
 
 
-    def sin(): Double = scala.math.sin(toRadians())
+    private def zip(that: AngleNg) = asDigits zipAll (that.asDigits, 0, 0)
 
 
-    def cos(): Double = scala.math.cos(toRadians())
+    def asDigits: List[Int] = degrees :: more
 
 
-    def toRadians() = scala.math.toRadians(toDegrees())
+    def sin(): Double = scala.math.sin(toRadians)
 
 
-    def toDegrees(): Double = ((degrees, 1.0) /: more)((s, x) => s match {case (v, q) => val q_ = q/60.0; (v+x/q_, q_)})
+    def cos(): Double = scala.math.cos(toRadians)
+
+
+    def toRadians: Double = scala.math.toRadians(toDegrees)
+
+
+    def toDegrees: Double = ((degrees.toDouble, 1.0) /: more)((s, x) => s match {case (v, q) => val q_ = q/60.0; (v+x/q_, q_)})._1
 }
 
 
@@ -96,18 +101,14 @@ object AngleNg {
 
 
     def apply(degrees: Int, more: List[Int]): AngleNg = {
-        val digits = ((degrees :: more) :\ (0, List()))
-            ((x, s) => s match {case (c,r) =>
-                val x_ = x+c
-                (x_ / 60,  x_ :: r)
-            })
+        val digits = ((degrees :: more) :\ (0, List[Int]()))((x, s) => s match {case (c, r) => val x_ = x+c; (x_ / 60,  x_ :: r)})._2
 
         def toRange(range: Int)(what: Int): Int = {
             val result = what % range
             if (result >= 0) result else result+range
         }
 
-        new Angle(toRange(digits.head, 360), digits.tail map toRange(60))
+        new AngleNg(toRange(360)(digits.head), digits.tail map toRange(60))
     }
 
 
