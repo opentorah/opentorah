@@ -46,7 +46,7 @@ final class AngleNg(val degrees: Int, val more: List[Int]) extends Ordered[Angle
     private def lift[A, B, C](op: (A, B) => C): (Tuple2[A, B] => C) = p => op(p._1, p._2)
 
 
-    def *(n: Int): AngleNg = AngleNg(asDigits map (n*_))
+    def *(n: Int): AngleNg = AngleNg(toDigits map (n*_))
 
 
     def roundToSeconds(): AngleNg = roundTo(2)
@@ -70,13 +70,13 @@ final class AngleNg(val degrees: Int, val more: List[Int]) extends Ordered[Angle
 
     // TODO: use symbols: ° ′ ″ ‴
     // TODO: padding
-    override def toString: String = asDigits.mkString("(", ", ", ")")
+    override def toString: String = toDigits.mkString("(", ", ", ")")
 
 
-    private def zip(that: AngleNg) = asDigits zipAll (that.asDigits, 0, 0)
+    private def zip(that: AngleNg) = toDigits zipAll (that.toDigits, 0, 0)
 
 
-    def asDigits: List[Int] = degrees :: more
+    def toDigits: List[Int] = degrees :: more
 
 
     def sin(): Double = scala.math.sin(toRadians)
@@ -101,6 +101,7 @@ object AngleNg {
 
 
     def apply(degrees: Int, more: List[Int]): AngleNg = {
+        println("degrees=" + degrees + "; more= " + more.mkString(","))
         val digits = ((degrees :: more) :\ (0, List[Int]()))((x, s) => s match {case (c, r) => val x_ = x+c; (x_ / 60,  x_ :: r)})._2
 
         def toRange(range: Int)(what: Int): Int = {
@@ -113,10 +114,10 @@ object AngleNg {
 
 
 
-    def asin(value: Double): AngleNg = fromRadians(scala.math.asin(value))
+    def asin(value: Double, precision: Int): AngleNg = fromRadians(scala.math.asin(value), precision)
 
 
-    def fromRadians(value: Double): AngleNg = fromDegrees(scala.math.toDegrees(value))
+    def fromRadians(value: Double, precision: Int): AngleNg = fromDegrees(scala.math.toDegrees(value), precision)
 
 
     private val SIXTY = 60.toDouble
@@ -128,7 +129,7 @@ object AngleNg {
     private val SIXTHS  = FIFTHS*SIXTY
 
 
-    def fromDegrees(value: Double, n: Int): AngleNg = {
+    def fromDegrees(value: Double, precision: Int): AngleNg = {
         var leftover = value
         val degrees = scala.math.floor(leftover)
         leftover -= degrees
@@ -163,8 +164,8 @@ object AngleNg {
 
     def main(args: Array[String]): Unit = {
         val angle = AngleNg(5, 34)
-        val value = angle.toDegrees()
-        val angle_ = AngleNg.fromDegrees(value)
+        val value = angle.toDegrees
+        val angle_ = AngleNg.fromDegrees(value, 1)
         println(angle + "=" + value + "->" + angle_)
     }
 }

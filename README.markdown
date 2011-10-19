@@ -22,7 +22,7 @@ formulas from it were not used directly.
 I want to do certain things with the astronomical calendar as described by Rambam
 in Chapters 11-19:
 
-* [translate](https://docs.google.com/leaf?id=0B5KkfPXr7KENNGY2MTEyNDEtNGI4My00NzVkLTlmMWQtYTA1OTdkNmZmOTU5&hl=en_US) relevant chapters into English
+* [translate](http://www.dub.podval.org/calendar/) relevant chapters into English
 * verify Rambam's rounding decisions
 * reconstruct models that Rambam uses, in contemporary (ancient Greek?) terminology and notation
 * describe the models with diagrams and formulae
