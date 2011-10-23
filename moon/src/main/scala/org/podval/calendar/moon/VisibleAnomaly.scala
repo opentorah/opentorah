@@ -57,7 +57,7 @@ object VisibleAnomaly {
 
 
     def mnasfrome(maslul: Angle, e: Double): Angle =
-        Angle.asin(maslul.sin()/scala.math.sqrt(e*e + 2*e*maslul.cos() + 1))
+        Angle.asin(maslul.sin()/scala.math.sqrt(e*e + 2*e*maslul.cos() + 1), 1)
 
 
     def efrommnas(maslul: Angle, mnas: Angle): Double =

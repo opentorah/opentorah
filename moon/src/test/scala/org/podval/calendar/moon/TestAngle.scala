@@ -49,8 +49,8 @@ class TestAngle {
 
     private def conversion(degrees: Int, minutes: Int) {
         val angle = Angle(degrees, minutes)
-        val value = angle.toDegrees()
-        val angle_ = Angle.fromDegrees(value)
+        val value = angle.toDegrees
+        val angle_ = Angle.fromDegrees(value, 2)
         Assert.assertEquals(angle, angle_)
     }
 }

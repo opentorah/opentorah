@@ -17,255 +17,131 @@
 package org.podval.calendar.moon
 
 
-// TODO switch to List-of-positions representation
-final class Angle(
-    val degrees: Int,
-    val minutes: Int,
-    val seconds: Int,
-    val thirds: Int,
-    val fourths: Int,
-    val fifths: Int,
-    val sixths: Int) extends Ordered[Angle]
-{
-    checkRange(degrees, 360)
-    checkRange(minutes)
-    checkRange(seconds)
-    checkRange(thirds)
-    checkRange(fourths)
-    checkRange(fifths)
-    checkRange(sixths)
+final class Angle(val degrees: Int, val more: List[Int]) extends Ordered[Angle] {
+    checkRange(360)(degrees)
+    more.foreach(checkRange(60))
 
-
-    private def checkRange(value: Int): Unit = checkRange(value, 60)
-
-
-    private def checkRange(value: Int, range: Int): Unit = {
+    private def checkRange(range: Int)(value: Int): Unit = {
         if (value < 0) throw new IllegalArgumentException("can not be negative")
         if (value >= range) throw new IllegalArgumentException("can not be bigger than " + range)
     }
 
 
+    def minutes = more(0)
+
+
+    def seconds = more(1)
+
+
     override def equals(other: Any): Boolean = other match {
-        case that: Angle => 
-            (degrees == that.degrees) &&
-            (minutes == that.minutes) &&
-            (seconds == that.seconds) &&
-            (thirds == that.thirds) &&
-            (fourths == that.fourths) &&
-            (fifths == that.fifths) &&
-            (sixths == that.sixths)
+        case that: Angle => zip(that) forall lift(_==_)
         case _ => false
     }
 
 
-    override def hashCode =
-        41*(41*(41*(41*(41*(41*(41+degrees)+minutes)+seconds)+thirds)+fourths)+fifths)+sixths
+    override def hashCode = ((41+degrees) /: more) ((v,x) => 41*v+x)
 
 
-    override def compare(that: Angle) = {
-        var result = degrees.compare(that.degrees)
-        if (result != 0) result else {
-            result = minutes.compare(that.minutes)
-            if (result != 0) result else {
-                result = seconds.compare(seconds)
-                if (result != 0) result else {
-                    result = thirds.compare(that.thirds)
-                    if (result != 0) result else {
-                        result = fourths.compare(that.fourths)
-                        if (result != 0) result else {
-                            result = fifths.compare(that.fifths)
-                            if (result != 0) result else {
-                                sixths.compare(that.sixths)
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    override def compare(that: Angle) = zip(that) map lift(_.compare(_)) find(_!= 0) getOrElse(0)
+
+
+    def +(other: Angle): Angle = Angle(zip(other) map lift(_+_))
+
+
+    private def lift[A, B, C](op: (A, B) => C): (Tuple2[A, B] => C) = p => op(p._1, p._2)
+
+
+    def *(n: Int): Angle = Angle(toDigits map (n*_))
+
+
+    def roundToSeconds(): Angle = roundTo(2)
+
+
+    def roundToMinutes(): Angle = roundTo(1)
+
+
+    def roundTo(n: Int): Angle = {
+        if (n < 0) throw new IllegalArgumentException()
+
+        val (more_, toRound) = more splitAt n
+        val carry = (toRound :\ 0)((x, c) => if (x + c >= 30) 1 else 0)
+
+        Angle(degrees, more_.init :+ (more.last + carry))
     }
 
 
-    def +(other: Angle): Angle = Angle(
-        degrees + other.degrees,
-        minutes + other.minutes,
-        seconds + other.seconds,
-        thirds + other.thirds,
-        fourths + other.fourths,
-        fifths + other.fifths,
-        sixths + other.sixths
-    )
+    def length = more.length
 
 
-    def *(n: Int): Angle = Angle(
-        n*degrees,
-        n*minutes,
-        n*seconds,
-        n*thirds,
-        n*fourths,
-        n*fifths,
-        n*sixths
-    )
+    // TODO: use symbols: ° ′ ″ ‴
+    // TODO: padding
+    override def toString: String = toDigits.mkString("(", ", ", ")")
 
 
-    def roundToSeconds(): Angle =
-        Angle(
-            degrees,
-            minutes,
-            seconds + carry(thirds+carry(fourths+carry(fifths+carry(sixths))))
-        )
+    private def zip(that: Angle) = toDigits zipAll (that.toDigits, 0, 0)
 
 
-    def roundToMinutes(): Angle =
-        Angle(
-            degrees,
-            minutes + carry(seconds + carry(thirds+carry(fourths+carry(fifths+carry(sixths)))))
-        )
+    def toDigits: List[Int] = degrees :: more
 
 
-    private def carry(value: Int): Int = if (value >= 30) 1 else 0
+    def sin(): Double = scala.math.sin(toRadians)
 
 
-    override def toString: String =
-      // TODO padding?
-      degrees + "°" +
-      minutes + "′" +
-      seconds + "″" +
-      (if ((thirds == 0) && (fourths == 0) && (fifths == 0) && (sixths == 0)) "" else thirds + "‴") +
-      (if ((fourths == 0) && (fifths == 0) && (sixths == 0)) "" else fourths + "″″") +
-      (if ((fifths == 0) && (sixths == 0)) "" else fifths + "‴″") +
-      (if (sixths == 0) "" else sixths + "‴‴")
+    def cos(): Double = scala.math.cos(toRadians)
 
 
-    def sin(): Double = scala.math.sin(toRadians())
+    def toRadians: Double = scala.math.toRadians(toDegrees)
 
 
-    def cos(): Double = scala.math.cos(toRadians())
-
-
-    def toRadians() = scala.math.toRadians(toDegrees())
-
-
-    def toDegrees(): Double =
-        degrees +
-        minutes/Angle.MINUTES +
-        seconds/Angle.SECONDS +
-        thirds /Angle.THIRDS +
-        fourths/Angle.FOURTHS +
-        fifths /Angle.FIFTHS +
-        sixths /Angle.SIXTHS
+    def toDegrees: Double = degrees + ((more zip Angle.QUOTIENTS) map lift(_/_)).sum
 }
 
 
 object Angle {
 
-    def apply(degrees: Int): Angle =
-        apply(degrees, 0)
+    // In Haskell, this'd be a lazy infinite list;
+    // In Scala, it has to be finite, and we do not need more than Almagest is using.
+    val MAX_LENGTH = 6
+    val QUOTIENTS = (1 to MAX_LENGTH) map (n => scala.math.pow(60.0, n))
 
 
-    def apply(degrees: Int, minutes: Int): Angle =
-        apply(degrees, minutes, 0)
+    def apply(degrees: Int, more: Int*): Angle = apply(degrees, more.toList)
 
 
-    def apply(degrees: Int, minutes: Int, seconds: Int): Angle =
-        apply(degrees, minutes, seconds, 0)
+    def apply(all: List[Int]): Angle = apply(all.head, all.tail)
 
 
-    def apply(degrees: Int, minutes: Int, seconds: Int, thirds: Int): Angle =
-        apply(degrees, minutes, seconds, thirds, 0)
+    def apply(degrees: Int, more: List[Int]): Angle = {
+        val digits = ((degrees :: more) :\ (0, List[Int]()))((x, s) => s match {case (c, r) => val x_ = x+c; (x_ / 60,  x_ :: r)})._2
 
+        def toRange(range: Int)(what: Int): Int = {
+            val result = what % range
+            if (result >= 0) result else result+range
+        }
 
-    def apply(degrees: Int, minutes: Int, seconds: Int, thirds: Int, fourths: Int): Angle =
-        apply(degrees, minutes, seconds, thirds, fourths, 0)
-
-
-    def apply(degrees: Int, minutes: Int, seconds: Int, thirds: Int, fourths: Int, fifths: Int): Angle =
-        apply(degrees, minutes, seconds, thirds, fourths, fifths, 0)
-
-
-    def apply(degrees: Int, minutes: Int, seconds: Int, thirds: Int, fourths: Int, fifths: Int, sixths: Int): Angle = {
-        val fifths_  = carry(fifths, sixths)
-        val fourths_ = carry(fourths, fifths_)
-        val thirds_  = carry(thirds , fourths_)
-        val seconds_ = carry(seconds, thirds_)
-        val minutes_ = carry(minutes, seconds_)
-        val degrees_ = carry(degrees, minutes_)
-
-        new Angle(
-            toRange(degrees_, 360),
-            toRange(minutes_),
-            toRange(seconds_),
-            toRange(thirds_),
-            toRange(fourths_),
-            toRange(fifths_),
-            toRange(sixths)
-        )
+        new Angle(toRange(360)(digits.head), digits.tail map toRange(60))
     }
 
 
-    private def carry(big: Int, small: Int): Int = big + (small / 60)
+
+    def asin(value: Double, length: Int): Angle = fromRadians(scala.math.asin(value), length)
 
 
-    private def toRange(what: Int): Int = toRange(what, 60)
-        
-
-    private def toRange(what: Int, range: Int): Int = {
-        val result = what % range
-        if (result >= 0) result else result+range
-    }
+    def fromRadians(value: Double, length: Int): Angle = fromDegrees(scala.math.toDegrees(value), length)
 
 
-    def asin(value: Double): Angle = fromRadians(scala.math.asin(value))
-
-
-    def fromRadians(value: Double): Angle = fromDegrees(scala.math.toDegrees(value))
-
-
-    private val SIXTY = 60.toDouble
-    private val MINUTES = SIXTY
-    private val SECONDS = MINUTES*SIXTY
-    private val THIRDS  = SECONDS*SIXTY
-    private val FOURTHS = THIRDS*SIXTY
-    private val FIFTHS  = FOURTHS*SIXTY
-    private val SIXTHS  = FIFTHS*SIXTY
-
-
-    def fromDegrees(value: Double): Angle = {
-        var leftover = value
-        val degrees = scala.math.floor(leftover)
-        leftover -= degrees
-
-        val minutes = scala.math.floor(leftover*MINUTES)
-        leftover -= minutes/MINUTES
-
-        val seconds = scala.math.floor(leftover*SECONDS)
-        leftover -= seconds/SECONDS
-
-        val thirds  = scala.math.floor(leftover*THIRDS)
-        leftover -= thirds/THIRDS
-
-        val fourths = scala.math.floor(leftover*FOURTHS)
-        leftover -= fourths/FOURTHS
-
-        val fifths  = scala.math.floor(leftover*FIFTHS)
-        leftover -= fifths/FIFTHS
-
-        val sixths  = scala.math.round(leftover*SIXTHS)
-
-        Angle(
-            degrees.toInt,
-            minutes.toInt,
-            seconds.toInt,
-            thirds.toInt,
-            fourths.toInt,
-            fifths.toInt,
-            sixths.toInt)
+    def fromDegrees(value: Double, length: Int): Angle = {
+        val digits = value +: ((QUOTIENTS take length) map (q => (value % (60.0/q))/(1/q)))
+        Angle((digits.init map (scala.math.floor(_).toInt)).toList :+ scala.math.round(digits.last).toInt)
     }
 
 
     def main(args: Array[String]): Unit = {
         val angle = Angle(5, 34)
-        val value = angle.toDegrees()
-        val angle_ = Angle.fromDegrees(value)
-        println(angle + "=" + value + "->" + angle_)
+        println("angle= " + angle)
+        val value = angle.toDegrees
+        println("value= "+ value)
+        val angle_ = Angle.fromDegrees(value, 1)
+        println("angle_" + angle_)
     }
 }
