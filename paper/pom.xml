@@ -11,7 +11,7 @@
 
     <artifactId>calendar-paper</artifactId>
     <name>Rambam on Calendar Paper</name>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <build>
         <plugins>

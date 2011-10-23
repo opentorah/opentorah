@@ -34,39 +34,32 @@
                             <row>
                                 <entry>days</entry>
                                 <entry>printed</entry>
-                                <entry>calculated</entry>
                             </row>
                         </thead>
                         <tbody>
                             <row>
                                 <entry align="right">10</entry>
                                 <entry>131°45′50″</entry>
-                                <entry>131°45′50″</entry>
                             </row>
                             <row>
                                 <entry align="right">100</entry>
                                 <entry>237°38′23″</entry>
-                                <entry>237°38′20″</entry>
                             </row>
                             <row>
                                 <entry align="right">1000</entry>
                                 <entry>216°23′50″</entry>
-                                <entry>216°23′20″</entry>
                             </row>
                             <row>
                                 <entry align="right">10000</entry>
                                 <entry>3°58′20″<footnote><para>Here: ‘nimzes’ instead of ‘nimzo’.</para></footnote></entry>
-                                <entry>3°53′20″</entry>
                             </row>
                             <row>
                                 <entry align="right">29</entry>
                                 <entry>22°6′56″</entry>
-                                <entry>22°6′55″</entry>
                             </row>
                             <row>
                                 <entry align="right">354<footnote><para>'ordered' year; see Law 12:1.</para></footnote></entry>
                                 <entry>344°26′43″</entry>
-                                <entry>344°26′30″</entry>
                             </row>
                         </tbody>
                     </tgroup>
@@ -74,6 +67,80 @@
 
                 <para>
                     And in this way you can calculate it for any number of days and years that you want.
+                </para>
+
+                <para role="notes">
+                    Calculations show that the numbers Rambam gives are not reproducible
+                    by multiplying the daily motion by appropriate number of days.
+                    Below, the table is expanded with the results of calculations
+                    based on Rambam's rounded value, and on longer (but smaller!) value given
+                    in Almagest IV 3 (H278). 
+                    (Almagest also gives the value for 10 days - and for many other periods
+                    that are not in our table :))
+                </para>
+
+                <informaltable frame="all">
+                    <tgroup cols="4">
+                        <thead>
+                            <row>
+                                <entry>days</entry>
+                                <entry>printed</entry>
+                                <entry>calculated</entry>
+                                <entry>Almagest</entry>
+                            </row>
+                        </thead>
+                        <tbody>
+                            <row>
+                                <entry align="right">1</entry>
+                                <entry>13°10′35″</entry>
+                                <entry></entry>
+                                <entry>13;10,34,58,33,30,30°</entry>
+                            </row>
+                            <row>
+                                <entry align="right">10</entry>
+                                <entry>131°45′50″</entry>
+                                <entry>131°45′50″</entry>
+                                <entry>131;45,49,45,35,5,0°</entry>
+                            </row>
+                            <row>
+                                <entry align="right">100</entry>
+                                <entry>237°38′23″</entry>
+                                <entry>237°38′20″</entry>
+                                <entry>237;38,17,35,50,50,0°</entry>
+                            </row>
+                            <row>
+                                <entry align="right">1000</entry>
+                                <entry>216°23′50″</entry>
+                                <entry>216°23′20″</entry>
+                                <entry>216;22,55,58,28,20,0°</entry>
+                            </row>
+                            <row>
+                                <entry align="right">10000</entry>
+                                <entry>3°58′20″</entry>
+                                <entry>3°53′20″</entry>
+                                <entry>3;49,19,44,43,20,0°</entry>
+                            </row>
+                            <row>
+                                <entry align="right">29</entry>
+                                <entry>22°6′56″</entry>
+                                <entry>22°6′55″</entry>
+                                <entry>22;6,54,18,11,44,30°</entry>
+                            </row>
+                            <row>
+                                <entry align="right">354</entry>
+                                <entry>344°26′43″</entry>
+                                <entry>344°26′30″</entry>
+                                <entry>344;26,21,29,41,57,0°</entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </informaltable>
+
+                <para role="notes">
+                    It is not clear how Rambam obtained the values he gives;
+                    calculations with the longer daily motion value given
+                    by Almagest are even further from Rambam's values than
+                    calculations with his daily motion value (no surprises here)...
                 </para>
             </section>
 
@@ -562,4 +629,242 @@
             </section>
         </section>
     </section>
+
+    <bibliography>
+        <bibliodiv>
+            <title>Laws of Sanctification of the Moon by Rambam</title>
+            <biblioentry>
+                <author><personname>Rambam</personname></author>
+                <title>Mishne Torah</title>
+                <publisher>
+                    <publishername>Widow and Brothers Romm</publishername>
+                </publisher>
+            </biblioentry>
+            <biblioentry>
+                <author><personname>Rambam</personname></author>
+                <title>Mishne Torah</title>
+                <edition>LaAm</edition>
+            </biblioentry>
+            <biblioentry>
+                <author><personname>Rambam</personname></author>
+                <title>Mishne Torah</title>
+                <publisher>
+                    <publishername>Eshkol</publishername>
+                </publisher>
+                <pubdate>1987</pubdate>
+            </biblioentry>
+            <biblioentry>
+                <author><personname>Rambam</personname></author>
+                <title>Mishne Torah</title>
+                <editor><personname>
+                    <honorific>Rabbi</honorific>
+                    <surname>Kapach</surname>
+                </personname></editor>
+            </biblioentry>
+            <biblioentry>
+                <author><personname>Rambam</personname></author>
+                <title>Mishne Torah</title>
+                <editor><personname>
+                    <honorific>Rabbi</honorific>
+                    <surname>Frenkel</surname>
+                </personname></editor>
+            </biblioentry>
+            <biblioentry>
+                <author><personname>Rambam</personname></author>
+                <title>Mishne Torah</title>
+                <edition>Rambam HaAruch</edition>
+                <editor><personname>
+                    <honorific>Rabbi</honorific>
+                    <firstname>Y</firstname>
+                    <surname>Bluming</surname>
+                </personname></editor>
+                <pubdate>2005</pubdate>
+            </biblioentry>
+            <biblioentry>
+                <author><personname>Rambam</personname></author>
+                <title>Mishne Torah</title>
+                <publisher>
+                    <publishername>Yale</publishername>
+                </publisher>
+            </biblioentry>
+            <biblioentry>
+                <author><personname>Rambam</personname></author>
+                <title>Mishne Torah</title>
+                <editor><personname>
+                    <honorific>Rabbi</honorific>
+                    <surname>Touger</surname>
+                </personname></editor>
+            </biblioentry>
+        </bibliodiv>
+
+        <bibliodiv>
+            <title>Jewish Writings on Calendar</title>
+            <biblioentry>
+                <author><personname><surname>Losh</surname></personname></author>
+            </biblioentry>
+            <biblioentry>
+                <author><personname><surname>Keller</surname></personname></author>
+            </biblioentry>
+        </bibliodiv>
+
+        <bibliodiv>
+            <title>Greeks on Astronomy</title>
+            <biblioentry>
+                <title>The Exact Sciences in Antiquity</title>
+                <author><personname>
+                    <firstname>Otto</firstname>
+                    <surname>Neugebauer</surname>
+                </personname></author>
+                <publisher>
+                    <publishername>Dover Publications</publishername>
+                </publisher>
+                <pubdate>1969</pubdate>
+                <biblioid class="uri">http://isbn.nu/0486223329</biblioid>
+            </biblioentry>
+            <biblioentry>
+                <title>Theories of the World from Antiquity to the Copernican Revolution</title>
+                <author><personname>
+                    <firstname>Michael</firstname>
+                    <othername>J</othername>
+                    <surname>Crowe</surname>
+                </personname></author>
+                <publisher>
+                    <publishername>Dover Publications</publishername>
+                </publisher>
+                <pubdate>2001</pubdate>
+                <biblioid class="uri">http://isbn.nu/0486414442</biblioid>
+            </biblioentry>
+            <biblioentry>
+                <title>The History &amp; Practice of Ancient Astronomy</title>
+                <author><personname>
+                    <firstname>James</firstname>
+                    <surname>Evans</surname>
+                </personname></author>
+                <publisher>
+                    <publishername>Oxford University Press</publishername>
+                </publisher>
+                <pubdate>1998</pubdate>
+                <biblioid class="uri">http://isbn.nu/0195095391</biblioid>
+            </biblioentry>
+            <biblioentry>
+                <title>Early Astronomy</title>
+                <author><personname>
+                    <firstname>Hugh</firstname>
+                    <surname>Thurston</surname>
+                </personname></author>
+                <publisher>
+                    <publishername>Springer Verlag</publishername>
+                </publisher>
+                <pubdate>1996</pubdate>
+                <biblioid class="uri">http://isbn.nu/0387948228</biblioid>
+            </biblioentry>
+            <biblioentry>
+                <title>Ptolemy's Almagest</title>
+                <author role="translator"><personname>
+                    <othername>G. J.</othername>
+                    <surname>Toomer</surname>
+                </personname></author>
+                <publisher>
+                    <publishername>Princeton University Press</publishername>
+                </publisher>
+                <pubdate>1998</pubdate>
+                <biblioid class="uri">http://isbn.nu/0691002606</biblioid>
+            </biblioentry>
+            <biblioentry>
+                <title>Campanus of Novara &amp; Medieval Planetary Theory</title>
+                <authorgroup>
+                    <author><personname>
+                        <othername>G. J.</othername>
+                        <surname>Toomer</surname>
+                        <lineage>Jr</lineage>
+                    </personname></author>
+                    <author><personname>
+                        <firstname>Francis</firstname>
+                        <othername>S</othername>
+                        <surname>Benjamin</surname>
+                    </personname></author>
+                </authorgroup>
+                <publisher>
+                    <publishername>University of Wisconsin Press</publishername>
+                </publisher>
+                <pubdate>1972</pubdate>
+                <biblioid class="uri">http://isbn.nu/029905960X</biblioid>
+            </biblioentry>
+        </bibliodiv>
+
+        <bibliodiv>
+            <biblioentry>
+                <title>Astronomical Algorithms</title>
+                <author><personname>
+                    <firstname>Jean</firstname>
+                    <surname>Meeus</surname>
+                </personname></author>
+                <publisher>
+                    <publishername>Willmann-Bell</publishername>
+                </publisher>
+                <pubdate>1998</pubdate>
+                <biblioid class="uri">http://isbn.nu/0943396611</biblioid>
+            </biblioentry>
+            
+            <biblioentry>
+                <title>Astronomy on the Personal Computer</title>
+                <authorgroup>
+                    <author><personname>
+                        <firstname>Oliver</firstname>
+                        <surname>Montenbruck</surname>
+                    </personname></author>
+                    <author><personname>
+                        <firstname>Thomas</firstname>
+                        <surname>Pfleger</surname>
+                    </personname></author>
+                </authorgroup>
+                <publisher>
+                    <publishername>Springer Verlag</publishername>
+                </publisher>
+                <pubdate>2000</pubdate>
+                <biblioid class="uri">http://isbn.nu/3540672214</biblioid>
+            </biblioentry>
+            
+            <biblioentry>
+                <title>Calendrical Calculations: The Millennium Edition</title>
+                <authorgroup>
+                    <author><personname>
+                        <firstname>Nachum</firstname>
+                        <surname>Dershowitz</surname>
+                    </personname></author>
+                    <author><personname>
+                        <firstname>Edward</firstname>
+                        <othername>M</othername>
+                        <surname>Reingold</surname>
+                    </personname></author>
+                </authorgroup>
+                <publisher>
+                    <publishername>Cambridge University Press</publishername>
+                </publisher>
+                <pubdate>2001</pubdate>
+                <biblioid class="uri">http://isbn.nu/0521777526</biblioid>
+            </biblioentry>
+
+            <biblioentry>
+                <title>Solar System Dynamics</title>
+                <authorgroup>
+                    <author><personname>
+                        <firstname>S</firstname>
+                        <othername>F</othername>
+                        <surname>Dermott</surname>
+                    </personname></author>
+                    <author><personname>
+                        <firstname>Carl</firstname>
+                        <othername>D</othername>
+                        <surname>Murray</surname>
+                    </personname></author>
+                </authorgroup>
+                <publisher>
+                    <publishername>Cambridge University Press</publishername>
+                </publisher>
+                <pubdate>2000</pubdate>
+                <biblioid class="uri">http://isbn.nu/0521575974</biblioid>
+            </biblioentry>
+        </bibliodiv>
+    </bibliography>
 </article>
