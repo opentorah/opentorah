@@ -131,17 +131,7 @@ object Angle {
 
 
     def fromDegrees(value: Double, length: Int): Angle = {
-        val digits = value +: ((QUOTIENTS take length) map (q => (value % (60.0/q))/(1/q)))
+        val digits = value +: ((QUOTIENTS take length) map (q => (value % (60.0/q))/(1.0/q)))
         Angle((digits.init map (scala.math.floor(_).toInt)).toList :+ scala.math.round(digits.last).toInt)
-    }
-
-
-    def main(args: Array[String]): Unit = {
-        val angle = Angle(5, 34)
-        println("angle= " + angle)
-        val value = angle.toDegrees
-        println("value= "+ value)
-        val angle_ = Angle.fromDegrees(value, 1)
-        println("angle_" + angle_)
     }
 }
