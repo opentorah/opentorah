@@ -27,10 +27,13 @@ final class Angle(val degrees: Int, val more: List[Int]) extends Ordered[Angle] 
     }
 
 
-    def minutes = more(0)
+    def minutes = if (length >= 1) more(0) else 0
 
 
-    def seconds = more(1)
+    def seconds = if (length >= 2) more(1) else 0
+
+
+    def thirds = if (length >= 3) more(2) else 0
 
 
     override def equals(other: Any): Boolean = other match {
@@ -46,6 +49,9 @@ final class Angle(val degrees: Int, val more: List[Int]) extends Ordered[Angle] 
 
 
     def +(other: Angle): Angle = Angle(zip(other) map lift(_+_))
+
+
+    def -(other: Angle): Angle = Angle(zip(other) map lift(_-_))
 
 
     private def lift[A, B, C](op: (A, B) => C): (Tuple2[A, B] => C) = p => op(p._1, p._2)
@@ -75,7 +81,9 @@ final class Angle(val degrees: Int, val more: List[Int]) extends Ordered[Angle] 
 
     // TODO: use symbols: ° ′ ″ ‴
     // TODO: padding
-    override def toString: String = toDigits.mkString("(", ", ", ")")
+    override def toString: String =
+        if (length <= 3) degrees + "°" + minutes + "′" + seconds + "″" + thirds + "‴"
+        else degrees + ";" + more.mkString(",") + "°"
 
 
     private def zip(that: Angle) = toDigits zipAll (that.toDigits, 0, 0)
