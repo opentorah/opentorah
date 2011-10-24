@@ -9,18 +9,25 @@
             <title>Chapter 14</title>
             <section>
                 <title>Law 1</title>
+                <subtitle>Two Movements of the Moon</subtitle>
                 <para>
+                    TODO: (sub)titles of laws should be in the table of contents.
+                    TODO: Honorifics in bibliography has a dot after it!
+                    TODO: Edition in bibliography is printed lonly.
+                    TODO: Specify san-serif font with Hebrew.
+                    TODO: Why are degrees numbers hanging?
                     The moon has two mean movements.
                     The moon itself rotates on a small circle that does not surround all of the Earth.
-                    Moon's movement on that small circle is called mean
-                    lunar anomaly (אמצע המסלול).
+                    Moon's movement on that small circle is called <glossterm>mean
+                    lunar anomaly</glossterm> (אמצע המסלול).
                     The small circle (epicycle) itself rotates on a big circle (deferent) that surrounds the Earth.
                     The mean movement of the small circle on the big circle that surrounds the Earth is called
-                    mean lunar longitude (אמצע הירח).
+                    <glossterm>mean lunar longitude</glossterm> (אמצע הירח).
                 </para>
             </section>
             <section>
                 <title>Law 2</title>
+                <subtitle>Movement in the Mean Lunar Longitude</subtitle>
                 <para>
                     Movement in mean lunar longitude in one day is 13°10′35″
                     <footnote><para>This is part of Law 1.</para></footnote>.
@@ -29,7 +36,7 @@
                 <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
 
                 <informaltable frame="all">
-                    <tgroup cols="3">
+                    <tgroup cols="2">
                         <thead>
                             <row>
                                 <entry>days</entry>
@@ -70,11 +77,21 @@
                 </para>
 
                 <para role="notes">
-                    Calculations show that the numbers Rambam gives are not reproducible
-                    by multiplying the daily motion by appropriate number of days.
+                    It is not clear how Rambam obtained the values he gives.
+                    When value of the movement in one day given by Rambam is
+                    multiplied by 29, 100 etc., the result is smaller than that of Rambam.
+                    TODO: check!
+                </para>
+                <para role="notes">
+                    Moreover, the value of the movement of the mean lunar longitude in one day given by
+                    <biblioref linkend="Almagest"/> IV 3 (H278)
+                    (which, rounded to seconds, becomes Rambam's value) is even smaller, so Rambam's
+                    numbers can not be explained by performing calculations with the long value from
+                    Almagest and then rounding the results.
+                </para>
+                <para role="notes">
                     Below, the table is expanded with the results of calculations
-                    based on Rambam's rounded value, and on longer (but smaller!) value given
-                    in Almagest IV 3 (H278). 
+                    based on Rambam's value, and on Almagest's. 
                     (Almagest also gives the value for 10 days - and for many other periods
                     that are not in our table :))
                 </para>
@@ -85,15 +102,15 @@
                             <row>
                                 <entry>days</entry>
                                 <entry>printed</entry>
-                                <entry>calculated</entry>
-                                <entry>Almagest</entry>
+                                <entry>multiplied: Rambam</entry>
+                                <entry>multiplied: Almagest</entry>
                             </row>
                         </thead>
                         <tbody>
                             <row>
                                 <entry align="right">1</entry>
                                 <entry>13°10′35″</entry>
-                                <entry></entry>
+                                <entry>13°10′35″</entry>
                                 <entry>13;10,34,58,33,30,30°</entry>
                             </row>
                             <row>
@@ -135,58 +152,46 @@
                         </tbody>
                     </tgroup>
                 </informaltable>
-
-                <para role="notes">
-                    It is not clear how Rambam obtained the values he gives;
-                    calculations with the longer daily motion value given
-                    by Almagest are even further from Rambam's values than
-                    calculations with his daily motion value (no surprises here)...
-                </para>
             </section>
 
             <section>
                 <title>Law 3</title>
+                <subtitle>Movement in the Mean Lunar Anomaly</subtitle>
                 <para>
-                    Change in lunar anomaly in one day is 13°3′54″.
+                    Movement in mean lunar anomaly in one day is 13°3′54″.
                 </para>
                 <para>
                     For longer periods, (remainder) of the movement in mean lunar anomaly is:
                 </para>
 
                 <informaltable frame="all">
-                    <tgroup cols="3">
+                    <tgroup cols="2">
                         <thead>
                             <row>
                                 <entry>days</entry>
                                 <entry>printed</entry>
-                                <entry>calculated</entry>
                             </row>
                         </thead>
                         <tbody>
                             <row>
                                 <entry align="right">10</entry>
                                 <entry>130°39′0″</entry>
-                                <entry>130°39′0″</entry>
                             </row>
                             <row>
                                 <entry align="right">100</entry>
                                 <entry>226°29′53″</entry>
-                                <entry>226°30′0″</entry>
                             </row>
                             <row>
                                 <entry align="right">1000</entry>
                                 <entry>104°58′50″</entry>
-                                <entry>105°0′0″</entry>
                             </row>
                             <row>
                                 <entry align="right">10000</entry>
                                 <entry>329°48′20″</entry>
-                                <entry>330°0′0″</entry>
                             </row>
                             <row>
                                 <entry align="right">29</entry>
                                 <entry>18°53′4″</entry>
-                                <entry>18°53′6″</entry>
                             </row>
                             <row>
                                 <entry align="right">354
@@ -194,25 +199,105 @@
                                     <footnote><para>This is part of Law 4.</para></footnote>
                                 </entry>
                                 <entry>305°0′13″</entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </informaltable>
+
+
+                <para role="notes">
+                    It is not clear how Rambam obtained the values he gives.
+                    When value of the movement in one day given by Rambam is
+                    multiplied by 29, 100 etc., the result is bigger than what Rambam says!
+                    TODO: check!
+                </para>
+                <para role="notes">
+                    Although the value of the movement of the mean lunar anomaly in one day given by
+                    <biblioref linkend="Almagest"/> IV 3 (H278)
+                    (which, rounded to seconds, becomes Rambam's value) is smaller, it is not sall enough,
+                    and Rambam's
+                    numbers can not be explained by performing calculations with the long value from
+                    Almagest and then rounding the results.
+                </para>
+                <para role="notes">
+                    Below, the table is expanded with the results of calculations
+                    based on Rambam's value, and on Almagest's. 
+                    (Almagest also gives the value for 10 days - and for many other periods
+                    that are not in our table :))
+                </para>
+
+                <informaltable frame="all">
+                    <tgroup cols="4">
+                        <thead>
+                            <row>
+                                <entry>days</entry>
+                                <entry>printed</entry>
+                                <entry>multiplied: Rambam</entry>
+                                <entry>multiplied: Almagest</entry>
+                            </row>
+                        </thead>
+                        <tbody>
+                            <row>
+                                <entry align="right">1</entry>
+                                <entry>13°3′54″</entry>
+                                <entry>13°3′54″</entry>
+                                <entry>13;3,53,56,17,51,59°</entry>
+                            </row>
+                            <row>
+                                <entry align="right">10</entry>
+                                <entry>130°39′0″</entry>
+                                <entry>130°39′0″</entry>
+                                <entry>130;38,59,22,58,39,50°</entry>
+                            </row>
+                            <row>
+                                <entry align="right">100</entry>
+                                <entry>226°29′53″</entry>
+                                <entry>226°30′0″</entry>
+                                <entry>226;29,53,49,46,38,20°</entry>
+                            </row>
+                            <row>
+                                <entry align="right">1000</entry>
+                                <entry>104°58′50″</entry>
+                                <entry>105°0′0″</entry>
+                                <entry>104;58,58,17,46,23,20°</entry>
+                            </row>
+                            <row>
+                                <entry align="right">10000</entry>
+                                <entry>329°48′20″</entry>
+                                <entry>330°0′0″</entry>
+                                <entry>329;49,42,57,43,53,20°</entry>
+                            </row>
+                            <row>
+                                <entry align="right">29</entry>
+                                <entry>18°53′4″</entry>
+                                <entry>18°53′6″</entry>
+                                <entry>18;53,4,12,38,7,31°</entry>
+                            </row>
+                            <row>
+                                <entry align="right">354</entry>
+                                <entry>305°0′13″</entry>
                                 <entry>305°0′36″</entry>
+                                <entry>305;0,14,9,24,42,6°</entry>
                             </row>
                         </tbody>
                     </tgroup>
                 </informaltable>
             </section>
+
             <section>
                 <title>Law 4</title>
+                <subtitle>position of the Moon on the Epoch</subtitle>
                 <para>
                     In the beginning of the night to Thursday that is the epoch [TODO: link to definition]
                     for these calculations, mean lunar longitude was 1°14′43″ into the constellation of Ram.
                     And mean lunar anomaly on the epoch was 84°28′42″.
                     Now that you know rate of movement in the mean lunar longitude and its value on the epoch
                     to which you add, you'll calculate mean lunar longitude on any day that you want the same
-                    way as you did for the mean solar longitude.
+                    way as you did for the mean solar longitude. TODO: reference
                 </para>
             </section>
             <section>
-                <title>Law 5</title>
+                <title>Law 5,6</title>
                 <para> After you calculate mean lunar longitude at the
                     beginning of the night that you want, contemplate the sun and figure out which
                     constellation (zodiac) is it in <footnote><para>This is part of Law 4.</para></footnote>.
@@ -226,7 +311,7 @@
                                 <entry>Solar Longitude on the Zodiac</entry>
                                 <entry>from</entry>
                                 <entry>to, not including<footnote><para>My feeling about the word usage in the original.</para></footnote></entry>
-                                <entry>Lunar longitudecorrection</entry>
+                                <entry>Lunar longitude correction</entry>
                             </row>
                         </thead>
                         <tbody>
@@ -283,43 +368,47 @@
                         </tbody>
                     </tgroup>
                 </informaltable>
-            </section>
-            <section>
-                <title>Law 6</title>
+                <para role="notes">
+                    TODO: Compare with 11:9, about Dli... Something is off!
+                </para>
                 <para>
-                    The value of mean [lunar longitude] after you add to it or subtract from it or leave it as 
+                    The value of mean [lunar longitude]
+                    after you add to it or subtract from it or leave it as 
                     it is - that is mean lunar longitude approximately a third of an hour after sunset on the
-                    date you are calculating it for. And this is what is called 'mean lunar longitude during observation time'.
+                    date you are calculating it for. And this is what is called 
+                    <glossterm>mean lunar longitude at observation time</glossterm>.
+                    <footnote><para>This is Law 6.</para></footnote>
                 </para>
             </section>
         </section>
+
         <section>
             <title>Chapter 15</title>
             <section>
                 <title>Law 1</title>
+                <subtitle>Doubled Distance</subtitle>
                 <para>
-                    To find true longitude of the moon on a specific day:
+                    To find true lunar longitude (הירח האמיתי) on a specific day:
                     First, calculate mean lunar longitude during observation time of the desired night.
                     Also, calculate mean lunar anomaly and mean solar longitude for the same time.
                     Then, subtract mean solar longitude from the mean lunar longitude and double the result.
-                    This value is called 'doubled distance'.
+                    This value is called <glossterm>doubled distance</glossterm> (מרחק הכפול).
                 </para>
             </section>
             <section>
-                <title>Law 2</title>
+                <title>Law 2,3</title>
+                <subtitle>Correction of the Mean Anomaly</subtitle>
                 <para>
                     We already stipulated that all the calculations in these chapters are for one purpose only:
                     to know if the moon is visible. And it is not possible for this double distance during the night of
                     observation when the moon is indeed visible to be outside of the interval from 5° to 62°.
                     It cannot be more - nor less.
+                    <footnote><para>This is Law 2.</para></footnote>
                 </para>
-            </section>
 
-            <section>
-                <title>Law 3</title>
                 <para>
                     In this light, contemplate this doubled distance.
-                    Here is a table of mean lunar anomaly corrections depending on the value of the
+                    This is the correction of mean lunar anomaly depending on the
                     doubled distance:
                 </para>
 
@@ -333,8 +422,8 @@
                         </thead>
                         <tbody>
                             <row>
-                                <entry>~5° {0-5?}</entry>
-                                <entry>0</entry>
+                                <entry>~5°</entry>
+                                <entry>0°</entry>
                             </row>
                             <row>
                                 <entry>6°-11°</entry>
@@ -353,7 +442,7 @@
                                 <entry>4°</entry>
                             </row>
                             <row>
-                                <entry>32°-83°</entry>
+                                <entry>32°-38°</entry>
                                 <entry>5°</entry>
                             </row>
                             <row>
@@ -376,60 +465,168 @@
                     </tgroup>
                 </informaltable>
                 <para>
-                    Result of adding this correction to the mean lunar anomaly is called 'corrected lunar anomaly'.
+                    Result of adding this correction (TODO: mnas?!) to the mean lunar anomaly is
+                    called <glossterm>corrected lunar anomaly</glossterm> (מסלול הנכון).
                 </para>
                 <para role="notes">
                     Rambam does not describe the model behind this correction. 
-                    Because the models Rambam did describe until now are the same as Ptolemy's models
-                    (including numerical parameters), and because this correction is determined by the (doubled)
-                    sun-moon elongation, just like Ptolemy's "improved" model of the moon ("the crank"),
-                    I assume that that model was used to calculate this correction. We'll see how does the curve fit.
+                    Because the models Rambam did describe until now are the same
+                    as Almagest's models
+                    (including numerical parameters), and because this correction
+                    is determined by the (doubled)
+                    sun-moon elongation, just like Almagest's "improved" model of
+                    the moon ("the crank"),
+                    I assume that that model was used to calculate this correction.
+                    TODO: describe the model!
                 </para>
                 <para role="notes">
-                    TODO: Derive the formula! Make the diagram! Make another diagram - for the "simple" model!
-                    {How come the fact that sun and moon move in different plains does not affect this calculation?}
+                    TODO: Derive the formula! Make the diagram!
+                    TODO: How come the fact that sun and moon move in different
+                    plains does not affect this calculation?
                 </para>
                 <para role="notes">
-                    It seems that Rambam treats "the crank" as just a calculation device - otherwise,
-                    table giving visible anomaly from the corrected anomaly should take into account changes in the
+                    It seems that Rambam treats "the crank" as just a calculation
+                    device - otherwise,
+                    table giving visible anomaly from the corrected anomaly should
+                    take into account changes in the
                     earth-moon distance depending on the elongation - and it does not!
                     Maybe that is why he does not describe the model behind this correction.
                     And maybe this is why Rambam reiterates - in Law 2 - that only the observability of the new moon
-                    needs to be calculated correctly. {How did Ptolemy calculate visible anomaly?}
-                </para>
-            </section>
-            <section>
-                <title>Law 4</title>
-                <para>
-                    Afterwards, see how many degrees is corrected lunar anomaly.
-                    If it is less than 180°, subtract mnas of this corrected anomaly from the mean moon at the
-                    observation time. An if corrected lunar anomaly is is more than 180° but less than 360°,
-                    add mnas of this corrected anomaly to the mean moon at the observation time.
-                    And mean moon after you add to it or subtract from it is the true location of the Moon at
-                    the observation time.
-                </para>
-            </section>
-            <section>
-                <title>Law 5</title>
-                <para>
-                    You should know that if the corrected anomaly is 180° or 360°, it does not have a mona,
-                    so mean moon at the observation time is also true location.
+                    needs to be calculated correctly.
+                    TODO: How does Almagest calculate visible anomaly?
                 </para>
             </section>
 
-            <section xml:id="l15-6">
-                <title>Law 6</title>
-                <para>
+            <section>
+                <title>Law 4,5,6</title>
+                <subtitle>Visible Anomaly</subtitle>
+
+                <para xml:id="l15-4">
+                    Afterwards, see how many degrees is corrected lunar anomaly.
+                    If it is less than 180°, subtract mnas of this corrected anomaly
+                    from the mean lunar longitude the
+                    observation time. An if corrected lunar anomaly is more than
+                    180° but less than 360°,
+                    add mnas of this corrected anomaly to the mean lunar longitude
+                    the observation time.
+                    And mean lunar longitude after you add to it or subtract from
+                    it is the true lunar longitude at the observation time.
+                    <footnote><para>This is Law 4.</para></footnote>
+                </para>
+
+                <para xml:id="l15-5">
+                    You should know that if the corrected anomaly is 180° or 360°,
+                    it does not have a mona (TODO: visible anomaly?),
+                    so mean lunar longitude at the observation time is also true longitude.
+                    <footnote><para>This is Law 5.</para></footnote>
+                </para>
+
+                <para xml:id="l15-6">
                     What is the value of the visible
                     anomaly for a given value of the corrected anomaly?
                 </para>
+
+                <informaltable frame="all">
+                    <tgroup cols="2">
+                        <thead>
+                            <row>
+                                <entry>corrected anomaly</entry>
+                                <entry>visible anomaly</entry>
+                            </row>
+                        </thead>
+                        <tbody>
+                            <row>
+                                <entry>10°</entry>
+                                <entry>50′</entry>
+                            </row>
+                            <row>
+                                <entry>20°</entry>
+                                <entry>1°38′</entry>
+                            </row>
+                            <row>
+                                <entry>30°</entry>
+                                <entry>2°24′</entry>
+                            </row>
+                            <row>
+                                <entry>40°</entry>
+                                <entry>3°6′</entry>
+                            </row>
+                            <row>
+                                <entry>50°</entry>
+                                <entry>3°44′</entry>
+                            </row>
+                            <row>
+                                <entry>60°</entry>
+                                <entry>4°16′</entry>
+                            </row>
+                            <row>
+                                <entry>70°</entry>
+                                <entry>4°41′</entry>
+                            </row>
+                            <row>
+                                <entry>80°</entry>
+                                <entry>5°0′</entry>
+                            </row>
+                            <row>
+                                <entry>90°</entry>
+                                <entry>5°5′</entry>
+                            </row>
+                            <row>
+                                <entry>100°</entry>
+                                <entry>5°8′</entry>
+                            </row>
+                            <row>
+                                <entry>110°</entry>
+                                <entry>4°59′</entry>
+                            </row>
+                            <row>
+                                <entry>120°</entry>
+                                <entry>4°20′</entry>
+                            </row>
+                            <row>
+                                <entry>130°</entry>
+                                <entry>4°14′</entry>
+                            </row>
+                            <row>
+                                <entry>140°</entry>
+                                <entry>3°33′</entry>
+                            </row>
+                            <row>
+                                <entry>150°</entry>
+                                <entry>3°48′</entry>
+                            </row>
+                            <row>
+                                <entry>160°</entry>
+                                <entry>1°56′</entry>
+                            </row>
+                            <row>
+                                <entry>170°</entry>
+                                <entry>1°59′</entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </informaltable>
+
                 <para role="notes"> Formulae: R - radius of the big circle; r - radius of the small
                     circle; e = R/r. A little trigonometry, and we get: visible anomaly =
                     arctg(sin(corrected anomaly)/(cos(corrected anomaly) + e)) and: e = ctg(visible
                     anomaly)*sin(corrected anomaly) - cos(corrected anomaly) </para>
-                <para role="notes">TODO: Make the diagram! TODO: put this in its proper place... </para>
-                <para role="notes"> A column giving
-                    the value of e was added...
+                
+                <para role="notes">TODO: Make the diagram! Here?</para>
+
+                <para role="notes">
+                    It is clear that values for 150° and 170° are misprinted: they are bigger than the one before them
+                    when they should be smaller. Value for 120° is also misprinted, but it is less obvious.
+                </para>
+                
+                <para role="notes">
+                    Calculations show that for the precision up to a minute,
+                    it is sufficient to know e to up to the second
+                    digit after the dot.
+                    Below, a column giving the value of e was added to the table.
+                    Look at the value of e, and the misprints become obvious:
+                    value of e for them is way out of range it is in
+                    for the rest of them.
                 </para>
 
                 <informaltable frame="all">
@@ -532,19 +729,10 @@
                 </informaltable>
 
                 <para role="notes">
-                    It is clear that values for 150° and 170° are misprinted: they are bigger than the one before them
-                    when they should be smaller. Value for 120° is also misprinted, but it is less obvious.
-                </para>
-                <para role="notes">
-                    Calculations show that for the precision up to a minute, it is sufficient to know e to up to the second
-                    digit after the dot.
-                    Look at the value of e, and the misprints become obvious: value of e for them is way out of range it is in
-                    for the rest of them.
-                </para>
-                <para role="notes">
                     TODO Range of e - graph. Range of possible values for each based on the range of e.
                     This is transcription error: one letter; extra word... Probable correct values.
                 </para>
+
                 <para role="notes">
                     This is how different sources treat the often misprinted values:
                 </para>
@@ -561,25 +749,25 @@
                         </thead>
                         <tbody>
                             <row>
-                                <entry>[Romm]</entry>
+                                <entry><biblioref linkend="Vilno"/></entry>
                                 <entry>incorrect</entry>
                                 <entry>incorrect</entry>
                                 <entry>incorrect</entry>
                             </row>
                             <row>
-                                <entry>[Eshkol]</entry>
+                                <entry><biblioref linkend="Eshkol"/></entry>
                                 <entry>incorrect</entry>
                                 <entry>incorrect</entry>
                                 <entry>incorrect</entry>
                             </row>
                             <row>
-                                <entry>[LaAm]</entry>
+                                <entry><biblioref linkend="LaAm"/></entry>
                                 <entry>corrected in the notes</entry>
                                 <entry>incorrect</entry>
                                 <entry>incorrect</entry>
                             </row>
                             <row>
-                                <entry>[Kapach]
+                                <entry><biblioref linkend="Kapach"/>
                                     <footnote>
                                         <para>
                                             It is not clear how did authoritative Yemenite texts acquire the same misprints
@@ -592,25 +780,25 @@
                                 <entry>corrected in the notes</entry>
                             </row>
                             <row>
-                                <entry>[Aruch]</entry>
+                                <entry><biblioref linkend="Bluming"/></entry>
                                 <entry>incorrect</entry>
                                 <entry>corrected in the notes</entry>
                                 <entry>corrected in the notes</entry>
                             </row>
                             <row>
-                                <entry>[Frenkel]</entry>
+                                <entry><biblioref linkend="Frenkel"/></entry>
                                 <entry>correct and noted</entry>
                                 <entry>correct and noted</entry>
                                 <entry>correct and noted</entry>
                             </row>
                             <row>
-                                <entry>[Keller]</entry>
+                                <entry><biblioref linkend="Keller"/></entry>
                                 <entry>not given</entry>
                                 <entry>not given</entry>
                                 <entry>not given</entry>
                             </row>
                             <row>
-                                <entry>[Losh]
+                                <entry><biblioref linkend="Losh"/>
                                     <footnote>
                                         <para>
                                             Reprints the text and does not correct any of the misprints - surpising for a textbook
@@ -633,19 +821,22 @@
     <bibliography>
         <bibliodiv>
             <title>Laws of Sanctification of the Moon by Rambam</title>
-            <biblioentry>
+
+            <biblioentry xml:id="Vilno" xreflabel="Vilno">
                 <author><personname>Rambam</personname></author>
                 <title>Mishne Torah</title>
                 <publisher>
                     <publishername>Widow and Brothers Romm</publishername>
                 </publisher>
             </biblioentry>
-            <biblioentry>
+
+            <biblioentry xml:id="LaAm" xreflabel="Rambam LaAm">
                 <author><personname>Rambam</personname></author>
                 <title>Mishne Torah</title>
-                <edition>LaAm</edition>
+                <edition>Rambam LaAm</edition>
             </biblioentry>
-            <biblioentry>
+
+            <biblioentry xml:id="Eshkol" xreflabel="Eshkol">
                 <author><personname>Rambam</personname></author>
                 <title>Mishne Torah</title>
                 <publisher>
@@ -653,7 +844,8 @@
                 </publisher>
                 <pubdate>1987</pubdate>
             </biblioentry>
-            <biblioentry>
+
+            <biblioentry xml:id="Kapach" xreflabel="Kapach">
                 <author><personname>Rambam</personname></author>
                 <title>Mishne Torah</title>
                 <editor><personname>
@@ -661,7 +853,8 @@
                     <surname>Kapach</surname>
                 </personname></editor>
             </biblioentry>
-            <biblioentry>
+
+            <biblioentry xml:id="Frenkel" xreflabel="Frenkel">
                 <author><personname>Rambam</personname></author>
                 <title>Mishne Torah</title>
                 <editor><personname>
@@ -669,7 +862,8 @@
                     <surname>Frenkel</surname>
                 </personname></editor>
             </biblioentry>
-            <biblioentry>
+
+            <biblioentry xml:id="Bluming" xreflabel="Bluming">
                 <author><personname>Rambam</personname></author>
                 <title>Mishne Torah</title>
                 <edition>Rambam HaAruch</edition>
@@ -680,14 +874,16 @@
                 </personname></editor>
                 <pubdate>2005</pubdate>
             </biblioentry>
-            <biblioentry>
+
+            <biblioentry xml:id="Yale" xreflabel="Yale">
                 <author><personname>Rambam</personname></author>
                 <title>Mishne Torah</title>
                 <publisher>
                     <publishername>Yale</publishername>
                 </publisher>
             </biblioentry>
-            <biblioentry>
+
+            <biblioentry xml:id="Touger" xreflabel="Touger">
                 <author><personname>Rambam</personname></author>
                 <title>Mishne Torah</title>
                 <editor><personname>
@@ -699,42 +895,68 @@
 
         <bibliodiv>
             <title>Jewish Writings on Calendar</title>
-            <biblioentry>
-                <author><personname><surname>Losh</surname></personname></author>
+
+            <biblioentry xml:id="Losh" xreflabel="Losh">
+                <title>Sefer HaTchunah LeMatchil</title>
+                <author><personname>
+                    <firstname>Yosef Yitzchok</firstname>
+                    <surname>Losh</surname>
+                </personname></author>
+                <pubdate>1988</pubdate>
             </biblioentry>
-            <biblioentry>
-                <author><personname><surname>Keller</surname></personname></author>
+
+            <biblioentry xml:id="Keller" xreflabel="Keller">
+                <title>Tchunat HaShamaim</title>
+                <author><personname>
+                    <firstname>Yosef Yitzchok</firstname>
+                    <surname>Keller</surname>
+                </personname></author>
+                <pubdate>1988</pubdate>
+            </biblioentry>
+
+            <biblioentry xml:id="Glitzenshtein" xreflabel="Glitzenshtein">
+                <title>Kidush HaChodesh LeHaRambam</title>
+                <author><personname>
+                    <firstname>Menachem Mendel</firstname>
+                    <surname>Glitzenshtein</surname>
+                </personname></author>
+                <pubdate>1993</pubdate>
             </biblioentry>
         </bibliodiv>
 
         <bibliodiv>
             <title>Greeks on Astronomy</title>
-            <biblioentry>
+
+            <biblioentry xml:id="Neugebauer" xreflabel="Neugebauer">
                 <title>The Exact Sciences in Antiquity</title>
                 <author><personname>
                     <firstname>Otto</firstname>
                     <surname>Neugebauer</surname>
                 </personname></author>
+                <edition>2nd</edition>
                 <publisher>
                     <publishername>Dover Publications</publishername>
                 </publisher>
                 <pubdate>1969</pubdate>
                 <biblioid class="uri">http://isbn.nu/0486223329</biblioid>
             </biblioentry>
-            <biblioentry>
+
+            <biblioentry xml:id="Crowe" xreflabel="Crowe">
                 <title>Theories of the World from Antiquity to the Copernican Revolution</title>
                 <author><personname>
                     <firstname>Michael</firstname>
-                    <othername>J</othername>
+                    <othername>J.</othername>
                     <surname>Crowe</surname>
                 </personname></author>
+                <edition>2nd</edition>
                 <publisher>
                     <publishername>Dover Publications</publishername>
                 </publisher>
                 <pubdate>2001</pubdate>
                 <biblioid class="uri">http://isbn.nu/0486414442</biblioid>
             </biblioentry>
-            <biblioentry>
+
+            <biblioentry xml:id="Evans" xreflabel="Evans">
                 <title>The History &amp; Practice of Ancient Astronomy</title>
                 <author><personname>
                     <firstname>James</firstname>
@@ -746,7 +968,8 @@
                 <pubdate>1998</pubdate>
                 <biblioid class="uri">http://isbn.nu/0195095391</biblioid>
             </biblioentry>
-            <biblioentry>
+
+            <biblioentry xml:id="Thurston" xreflabel="Thurston">
                 <title>Early Astronomy</title>
                 <author><personname>
                     <firstname>Hugh</firstname>
@@ -758,10 +981,11 @@
                 <pubdate>1996</pubdate>
                 <biblioid class="uri">http://isbn.nu/0387948228</biblioid>
             </biblioentry>
-            <biblioentry>
+
+            <biblioentry xml:id="Almagest" xreflabel="Almagest">
                 <title>Ptolemy's Almagest</title>
                 <author role="translator"><personname>
-                    <othername>G. J.</othername>
+                    <firstname>G. J.</firstname>
                     <surname>Toomer</surname>
                 </personname></author>
                 <publisher>
@@ -770,17 +994,18 @@
                 <pubdate>1998</pubdate>
                 <biblioid class="uri">http://isbn.nu/0691002606</biblioid>
             </biblioentry>
-            <biblioentry>
+
+            <biblioentry xml:id="Campanus" xreflabel="Campanus">
                 <title>Campanus of Novara &amp; Medieval Planetary Theory</title>
                 <authorgroup>
                     <author><personname>
-                        <othername>G. J.</othername>
+                        <firstname>G. J.</firstname>
                         <surname>Toomer</surname>
                         <lineage>Jr</lineage>
                     </personname></author>
                     <author><personname>
                         <firstname>Francis</firstname>
-                        <othername>S</othername>
+                        <othername>S.</othername>
                         <surname>Benjamin</surname>
                     </personname></author>
                 </authorgroup>
@@ -793,12 +1018,15 @@
         </bibliodiv>
 
         <bibliodiv>
-            <biblioentry>
+            <title>Contemporary Models</title>
+
+            <biblioentry xml:id="Meeus" xreflabel="Meeus">
                 <title>Astronomical Algorithms</title>
                 <author><personname>
                     <firstname>Jean</firstname>
                     <surname>Meeus</surname>
                 </personname></author>
+                <edition>2nd</edition>
                 <publisher>
                     <publishername>Willmann-Bell</publishername>
                 </publisher>
@@ -806,7 +1034,7 @@
                 <biblioid class="uri">http://isbn.nu/0943396611</biblioid>
             </biblioentry>
             
-            <biblioentry>
+            <biblioentry xml:id="Montenbruck" xreflabel="Montenbruck">
                 <title>Astronomy on the Personal Computer</title>
                 <authorgroup>
                     <author><personname>
@@ -818,6 +1046,7 @@
                         <surname>Pfleger</surname>
                     </personname></author>
                 </authorgroup>
+                <edition>4th</edition>
                 <publisher>
                     <publishername>Springer Verlag</publishername>
                 </publisher>
@@ -825,8 +1054,8 @@
                 <biblioid class="uri">http://isbn.nu/3540672214</biblioid>
             </biblioentry>
             
-            <biblioentry>
-                <title>Calendrical Calculations: The Millennium Edition</title>
+            <biblioentry xml:id="Dershowitz" xreflabel="Dershowitz">
+                <title>Calendrical Calculations</title>
                 <authorgroup>
                     <author><personname>
                         <firstname>Nachum</firstname>
@@ -834,28 +1063,29 @@
                     </personname></author>
                     <author><personname>
                         <firstname>Edward</firstname>
-                        <othername>M</othername>
+                        <othername>M.</othername>
                         <surname>Reingold</surname>
                     </personname></author>
                 </authorgroup>
+                <edition>3rd</edition>
                 <publisher>
                     <publishername>Cambridge University Press</publishername>
                 </publisher>
-                <pubdate>2001</pubdate>
-                <biblioid class="uri">http://isbn.nu/0521777526</biblioid>
+                <pubdate>2008</pubdate>
+                <biblioid class="uri">http://isbn.nu/0521702386</biblioid>
             </biblioentry>
 
-            <biblioentry>
+            <biblioentry xml:id="Dermott" xreflabel="Dermott">
                 <title>Solar System Dynamics</title>
                 <authorgroup>
                     <author><personname>
-                        <firstname>S</firstname>
-                        <othername>F</othername>
+                        <firstname>S.</firstname>
+                        <othername>F.</othername>
                         <surname>Dermott</surname>
                     </personname></author>
                     <author><personname>
                         <firstname>Carl</firstname>
-                        <othername>D</othername>
+                        <othername>D.</othername>
                         <surname>Murray</surname>
                     </personname></author>
                 </authorgroup>
