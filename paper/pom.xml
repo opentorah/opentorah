@@ -13,6 +13,11 @@
     <name>Rambam on Calendar Paper</name>
     <packaging>jar</packaging>
 
+    <properties>
+        <fontsDirectory>/usr/share/fonts/liberation/</fontsDirectory>
+        <fontMetricsDirectory>${basedir}/target/fonts/</fontMetricsDirectory>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -41,19 +46,42 @@
                 </executions>
                 <configuration>
                     <includes>moon.xml</includes>
-                    <!--
-                    TODO: did not work out with non-italics characters...
+
                     <bodyFontFamily>LiberationSans</bodyFontFamily>
+                    <tocSectionDepth>4</tocSectionDepth>
+
                     <fonts>
                         <font>
                             <name>LiberationSans</name>
-                            <style>sans</style>
+                            <style>normal</style>
                             <weight>normal</weight>
-                            <embedFile>${basedir}/src/fonts/LiberationSans-Regular.ttf</embedFile>
-                            <metricsFile>${basedir}/target/fonts/LiberationSans-Regular-metrics.xml</metricsFile>
+                            <embedFile>${fontsDirectory}/LiberationSans-Regular.ttf</embedFile>
+                            <metricsFile>${fontMetricsDirectory}/LiberationSans-Regular-metrics.xml</metricsFile>
+                        </font>
+                        <font>
+                            <name>LiberationSans</name>
+                            <style>normal</style>
+                            <weight>bold</weight>
+                            <embedFile>${fontsDirectory}/LiberationSans-Bold.ttf</embedFile>
+                            <metricsFile>${fontMetricsDirectory}/LiberationSans-Bold-metrics.xml</metricsFile>
+                        </font>
+                        <font>
+                            <name>LiberationSans</name>
+                            <style>italic</style>
+                            <weight>normal</weight>
+                            <embedFile>${fontsDirectory}/LiberationSans-Italic.ttf</embedFile>
+                            <metricsFile>${fontMetricsDirectory}/LiberationSans-Italic-metrics.xml</metricsFile>
+                        </font>
+                        <font>
+                            <name>LiberationSans</name>
+                            <style>italic</style>
+                            <weight>bold</weight>
+                            <embedFile>${fontsDirectory}/LiberationSans-BoldItalic.ttf</embedFile>
+                            <metricsFile>${fontMetricsDirectory}/LiberationSans-BoldItalic-metrics.xml</metricsFile>
                         </font>
                     </fonts>
-                    -->
+
+                    <xincludeSupported>true</xincludeSupported>
                 </configuration>
             </plugin>
 
@@ -68,6 +96,8 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
+                            <sourceDirectory>${fontsDirectory}</sourceDirectory>
+                            <targetDirectory>${fontMetricsDirectory}</targetDirectory>
                             <ansi>true</ansi>
                         </configuration>
                     </execution>
