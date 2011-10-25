@@ -8,26 +8,16 @@
         <section>
             <title>Chapter 14</title>
             <section>
-                <title>Law 1</title>
-                <subtitle>Two Movements of the Moon</subtitle>
-                <para>
-                    TODO: (sub)titles of laws should be in the table of contents.
-                    TODO: Honorifics in bibliography has a dot after it!
-                    TODO: Edition in bibliography is printed lonly.
-                    TODO: Specify san-serif font with Hebrew.
-                    TODO: Why are degrees numbers hanging?
-                    The moon has two mean movements.
-                    The moon itself rotates on a small circle that does not surround all of the Earth.
-                    Moon's movement on that small circle is called <glossterm>mean
-                    lunar anomaly</glossterm> (אמצע המסלול).
-                    The small circle (epicycle) itself rotates on a big circle (deferent) that surrounds the Earth.
-                    The mean movement of the small circle on the big circle that surrounds the Earth is called
-                    <glossterm>mean lunar longitude</glossterm> (אמצע הירח).
-                </para>
+                <title>Law 1: Two Movements of the Moon</title>
+                <para>The moon has two mean movements. The moon itself rotates on a small circle
+                    that does not surround all of the Earth. Moon's movement on that small circle is
+                    called <glossterm>mean lunar anomaly</glossterm> (אמצע המסלול). The small circle
+                    (epicycle) itself rotates on a big circle (deferent) that surrounds the Earth.
+                    The mean movement of the small circle on the big circle that surrounds the Earth
+                    is called <glossterm>mean lunar longitude</glossterm> (אמצע הירח). </para>
             </section>
             <section>
-                <title>Law 2</title>
-                <subtitle>Movement in the Mean Lunar Longitude</subtitle>
+                <title>Law 2: Movement in the Mean Lunar Longitude</title>
                 <para>
                     Movement in mean lunar longitude in one day is 13°10′35″
                     <footnote><para>This is part of Law 1.</para></footnote>.
@@ -76,12 +66,9 @@
                     And in this way you can calculate it for any number of days and years that you want.
                 </para>
 
-                <para role="notes">
-                    It is not clear how Rambam obtained the values he gives.
-                    When value of the movement in one day given by Rambam is
-                    multiplied by 29, 100 etc., the result is smaller than that of Rambam.
-                    TODO: check!
-                </para>
+                <para role="notes"> It is not clear how Rambam arrived the values he gives. When
+                    value of the movement in one day given by Rambam is multiplied by 29, 100 etc.,
+                    the result is smaller than that of Rambam. TODO: check! </para>
                 <para role="notes">
                     Moreover, the value of the movement of the mean lunar longitude in one day given by
                     <biblioref linkend="Almagest"/> IV 3 (H278)
@@ -155,8 +142,7 @@
             </section>
 
             <section>
-                <title>Law 3</title>
-                <subtitle>Movement in the Mean Lunar Anomaly</subtitle>
+                <title>Law 3: Movement in the Mean Lunar Anomaly</title>
                 <para>
                     Movement in mean lunar anomaly in one day is 13°3′54″.
                 </para>
@@ -214,7 +200,7 @@
                 <para role="notes">
                     Although the value of the movement of the mean lunar anomaly in one day given by
                     <biblioref linkend="Almagest"/> IV 3 (H278)
-                    (which, rounded to seconds, becomes Rambam's value) is smaller, it is not sall enough,
+                    (which, rounded to seconds, becomes Rambam's value) is smaller, it is not small enough,
                     and Rambam's
                     numbers can not be explained by performing calculations with the long value from
                     Almagest and then rounding the results.
@@ -285,8 +271,7 @@
             </section>
 
             <section>
-                <title>Law 4</title>
-                <subtitle>position of the Moon on the Epoch</subtitle>
+                <title>Law 4: Position of the Moon on the Epoch</title>
                 <para>
                     In the beginning of the night to Thursday that is the epoch [TODO: link to definition]
                     for these calculations, mean lunar longitude was 1°14′43″ into the constellation of Ram.
@@ -297,9 +282,9 @@
                 </para>
             </section>
             <section>
-                <title>Law 5,6</title>
+                <title>Law 5,6: Mean Lunar Longitude at Observation Time</title>
                 <para> After you calculate mean lunar longitude at the
-                    beginning of the night that you want, contemplate the sun and figure out which
+                    beginning of the night that you want, contemplate the sun (TODO: longitude?) and figure out which
                     constellation (zodiac) is it in <footnote><para>This is part of Law 4.</para></footnote>.
                     [This is the correction of the mean lunar longitude depending on
                     the mean solar longitude:]
@@ -385,8 +370,7 @@
         <section>
             <title>Chapter 15</title>
             <section>
-                <title>Law 1</title>
-                <subtitle>Doubled Distance</subtitle>
+                <title>Law 1: Doubled Distance</title>
                 <para>
                     To find true lunar longitude (הירח האמיתי) on a specific day:
                     First, calculate mean lunar longitude during observation time of the desired night.
@@ -396,8 +380,7 @@
                 </para>
             </section>
             <section>
-                <title>Law 2,3</title>
-                <subtitle>Correction of the Mean Anomaly</subtitle>
+                <title>Law 2,3: Corrected Mean Anomaly (Elongation (TODO: ?))</title>
                 <para>
                     We already stipulated that all the calculations in these chapters are for one purpose only:
                     to know if the moon is visible. And it is not possible for this double distance during the night of
@@ -406,11 +389,8 @@
                     <footnote><para>This is Law 2.</para></footnote>
                 </para>
 
-                <para>
-                    In this light, contemplate this doubled distance.
-                    This is the correction of mean lunar anomaly depending on the
-                    doubled distance:
-                </para>
+                <para> A correction that depends on the doubled distance is added to the mean lunar
+                    anomaly, giving  <glossterm>corrected lunar anomaly</glossterm> (מסלול הנכון): </para>
 
                 <informaltable frame="all">
                     <tgroup cols="2">
@@ -464,10 +444,7 @@
                         </tbody>
                     </tgroup>
                 </informaltable>
-                <para>
-                    Result of adding this correction (TODO: mnas?!) to the mean lunar anomaly is
-                    called <glossterm>corrected lunar anomaly</glossterm> (מסלול הנכון).
-                </para>
+
                 <para role="notes">
                     Rambam does not describe the model behind this correction. 
                     Because the models Rambam did describe until now are the same
@@ -498,26 +475,23 @@
             </section>
 
             <section>
-                <title>Law 4,5,6</title>
-                <subtitle>Visible Anomaly</subtitle>
+                <title>Law 4,5,6: True Lunar Longitude</title>
 
-                <para xml:id="l15-4">
-                    Afterwards, see how many degrees is corrected lunar anomaly.
-                    If it is less than 180°, subtract mnas of this corrected anomaly
-                    from the mean lunar longitude the
-                    observation time. An if corrected lunar anomaly is more than
-                    180° but less than 360°,
-                    add mnas of this corrected anomaly to the mean lunar longitude
-                    the observation time.
-                    And mean lunar longitude after you add to it or subtract from
-                    it is the true lunar longitude at the observation time.
-                    <footnote><para>This is Law 4.</para></footnote>
+                <para xml:id="l15-4"> Then, see how many degrees is corrected lunar anomaly. If it
+                    is less than 180°, subtract visible anomaly of this corrected anomaly from the
+                    mean lunar longitude the observation time. And if corrected lunar anomaly is
+                    more than 180° but less than 360°, add visible anomaly of this corrected anomaly
+                    to the mean lunar longitude the observation time. And mean lunar longitude after
+                    you add to it or subtract from it is the 
+                    <glossterm>true lunar longitude at the observation time</glossterm>.
+                    <footnote>
+                        <para>This is Law 4.</para>
+                    </footnote>
                 </para>
 
                 <para xml:id="l15-5">
-                    You should know that if the corrected anomaly is 180° or 360°,
-                    it does not have a mona (TODO: visible anomaly?),
-                    so mean lunar longitude at the observation time is also true longitude.
+                    If the corrected anomaly is 180° or 360°, there is no visible anomaly,
+                    so mean lunar longitude at observation time is also true longitude.
                     <footnote><para>This is Law 5.</para></footnote>
                 </para>
 
@@ -815,6 +789,13 @@
                     </tgroup>
                 </informaltable>
             </section>
+            <section>
+                <title>Law 7,8,9:</title>
+                <para>
+                    TODO!!!
+                </para>
+            </section>
+                
         </section>
     </section>
 
@@ -921,6 +902,15 @@
                     <surname>Glitzenshtein</surname>
                 </personname></author>
                 <pubdate>1993</pubdate>
+            </biblioentry>
+
+            <biblioentry xml:id="Tzikuni" xreflabel="Tzikuni">
+                <title>הזון שמים (Hazon Shamaim)</title>
+                <author><personname>
+                    <firstname>Eitan</firstname>
+                    <surname>Tzikuni</surname>
+                </personname></author>
+                <pubdate>2001</pubdate>
             </biblioentry>
         </bibliodiv>
 
