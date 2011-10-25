@@ -53,4 +53,10 @@ class TestAngle {
         val angle_ = Angle.fromDegrees(value, 2)
         Assert.assertEquals(angle, angle_)
     }
+
+
+    @Test
+    def rounding() {
+        Assert.assertEquals(Angle(104,58,50), Angle(104,58,50,16,39,59,43).roundToSeconds)
+    }
 }

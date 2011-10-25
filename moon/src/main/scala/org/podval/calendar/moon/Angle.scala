@@ -72,7 +72,7 @@ final class Angle(val degrees: Int, val more: List[Int]) extends Ordered[Angle] 
         val (more_, toRound) = more splitAt n
         val carry = (toRound :\ 0)((x, c) => if (x + c >= 30) 1 else 0)
 
-        Angle(degrees, more_.init :+ (more.last + carry))
+        Angle(degrees, more_.init :+ (more_.last + carry))
     }
 
 

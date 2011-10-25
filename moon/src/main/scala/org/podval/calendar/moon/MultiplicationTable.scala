@@ -16,31 +16,29 @@
 
 package org.podval.calendar.moon
 
-import scala.collection.immutable.TreeMap
+
+trait MultiplicationTable {
+
+    val PRINTED: Map[Int, Angle]
 
 
-object MoonMeanAnomaly extends MultiplicationTable {
-
-    val PRINTED = TreeMap(
-        10    -> Angle(130, 39, 0),
-        100   -> Angle(226, 29, 53),
-        1000  -> Angle(104, 58, 50),
-        10000 -> Angle(329, 48, 20),
-        29    -> Angle(18, 53, 4),
-        354   -> Angle(305, 0, 13)
-    )
+    val Rambam: Angle
 
 
-    val Rambam = Angle(13,3,54)
+    val RambamExact: Angle
 
 
-    val Almagest = Angle(13,3,53,56,17,51,59)
+    def print() {
+        for ((days, angle) <- PRINTED) {
+            val exact = Angle.fromDegrees(exactify(Rambam, days, angle), 6)
+            println(days + ":" + angle + ":" + RambamExact*days + ":" + exact)
+        }
+    }
 
 
-    val RambamExact = Angle(13,3,53,55,49)
-
-
-    def main(args: Array[String]) {
-        print()
+    def exactify(approximate: Angle, days: Int, angle: Angle): Double = {
+        val daysForFullRotation = 360.0/approximate.toDegrees
+        val fullRotations = scala.math.floor(days/daysForFullRotation).toInt
+        (360.0*fullRotations+angle.toDegrees)/days
     }
 }
