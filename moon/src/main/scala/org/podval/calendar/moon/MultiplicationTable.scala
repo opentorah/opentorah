@@ -17,21 +17,22 @@
 package org.podval.calendar.moon
 
 
-trait MultiplicationTable {
+class MultiplicationTable(val angles: Map[Int, Angle]) {
 
-    val PRINTED: Map[Int, Angle]
-
-
-    val Rambam: Angle
+    val approximate: Angle = angles(1)
 
 
-    val RambamExact: Angle
+    val exactInDegrees: Double = exactify(approximate, 10000, angles(10000))
+
+
+    val exact = Angle.fromDegrees(exactInDegrees, 6)
 
 
     def print() {
-        for ((days, angle) <- PRINTED) {
-            val exact = Angle.fromDegrees(exactify(Rambam, days, angle), 6)
-            println(days + ":" + angle + ":" + RambamExact*days + ":" + exact)
+        for (days <- List(1, 10, 100, 1000, 10000, 29, 354)) {
+            val angle = angles(days)
+            val exacter = Angle.fromDegrees(exactify(approximate, days, angle), 6)
+            println(days + ":" + angle + ":" + exact*days + ":" + exacter)
         }
     }
 
@@ -40,5 +41,10 @@ trait MultiplicationTable {
         val daysForFullRotation = 360.0/approximate.toDegrees
         val fullRotations = scala.math.floor(days/daysForFullRotation).toInt
         (360.0*fullRotations+angle.toDegrees)/days
+    }
+
+
+    def main(args: Array[String]) {
+        print()
     }
 }

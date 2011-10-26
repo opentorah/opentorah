@@ -82,8 +82,10 @@ final class Angle(val degrees: Int, val more: List[Int]) extends Ordered[Angle] 
     // TODO: use symbols: ° ′ ″ ‴
     // TODO: padding
     override def toString: String =
-        if (length <= 3) degrees + "°" + minutes + "′" + seconds + "″" + thirds + "‴"
-        else degrees + ";" + more.mkString(",") + "°"
+        if (length <= 3)
+            degrees + "°" + (if (length < 1) "" else minutes + "′" + (if (length < 2) "" else seconds + "″" + (if (length < 3) "" else thirds + "‴")))
+        else
+            degrees + ";" + more.mkString(",") + "°"
 
 
     private def zip(that: Angle) = toDigits zipAll (that.toDigits, 0, 0)

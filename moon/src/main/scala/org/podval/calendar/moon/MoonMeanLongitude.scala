@@ -16,31 +16,22 @@
 
 package org.podval.calendar.moon
 
-import scala.collection.immutable.TreeMap
+
+object MoonMeanLongitude extends MultiplicationTable(Map(
+    1     -> Angle(13,10,35),
+    10    -> Angle(131, 45, 50),
+    100   -> Angle(237, 38, 23),
+    1000  -> Angle(216, 23, 50),
+    10000 -> Angle(3, 58, 20),
+    29    -> Angle(22, 6, 56),
+    354   -> Angle(344, 26, 43)
+)) {
+
+//    val RambamExact = Angle(13,10,35,1,48,1)
 
 
-object MoonMeanLongitude extends MultiplicationTable {
-
-    val PRINTED = TreeMap(
-        10    -> Angle(131, 45, 50),
-        100   -> Angle(237, 38, 23),
-        1000  -> Angle(216, 23, 50),
-        10000 -> Angle(3, 58, 20),
-        29    -> Angle(22, 6, 56),
-        354   -> Angle(344, 26, 43)
-    )
+//    val RambamExcatInDegrees = 13.176397222222223
 
 
-    val Rambam = Angle(13,10,35)
-
-
-    val Almagest = Angle(13,10,34,58,33,30,30)
-
-
-    val RambamExact = Angle(13,10,35,1,48,1)
-
-
-    def main(args: Array[String]) {
-        print()
-    }
+//    val Almagest = Angle(13,10,34,58,33,30,30)
 }
