@@ -28,7 +28,7 @@ class MultiplicationTable(val angles: Map[Int, Angle]) {
     val exact = Angle.fromDegrees(exactInDegrees, 6)
 
 
-    def print() {
+    final def print() {
         for (days <- List(1, 10, 100, 1000, 10000, 29, 354)) {
             val angle = angles(days)
             val exacter = Angle.fromDegrees(exactify(approximate, days, angle), 6)
@@ -37,14 +37,29 @@ class MultiplicationTable(val angles: Map[Int, Angle]) {
     }
 
 
+    def write(writer: TableWriter) {
+        writer.addColumn("days")
+        writer.addColumn("approximate")
+        writer.addColumn("exact")
+        writer.addColumn("reverse")
+
+        for (days <- List(1, 10, 100, 1000, 10000, 29, 354)) {
+            val angle = angles(days)
+            val exacter = Angle.fromDegrees(exactify(approximate, days, angle), 6)
+            writer.startRow
+            writer.value(days)
+            writer.value(angle)
+            writer.value(exact*days)
+            writer.value(exacter)
+        }
+
+        writer.endTable
+    }
+
+
     def exactify(approximate: Angle, days: Int, angle: Angle): Double = {
         val daysForFullRotation = 360.0/approximate.toDegrees
         val fullRotations = scala.math.floor(days/daysForFullRotation).toInt
         (360.0*fullRotations+angle.toDegrees)/days
-    }
-
-
-    def main(args: Array[String]) {
-        print()
     }
 }

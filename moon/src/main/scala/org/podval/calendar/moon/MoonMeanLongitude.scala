@@ -27,11 +27,16 @@ object MoonMeanLongitude extends MultiplicationTable(Map(
     354   -> Angle(344, 26, 43)
 )) {
 
-//    val RambamExact = Angle(13,10,35,1,48,1)
-
-
-//    val RambamExcatInDegrees = 13.176397222222223
+//    val exact = Angle(13,10,35,1,48,1)
+//    val exactInDegrees = 13.176397222222223
 
 
 //    val Almagest = Angle(13,10,34,58,33,30,30)
+
+
+    def main(args: Array[String]) {
+        
+        println("exact= " + exactInDegrees + ":" + exact)
+//        print()
+    }
 }
