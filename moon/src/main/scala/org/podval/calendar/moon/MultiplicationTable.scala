@@ -28,24 +28,16 @@ class MultiplicationTable(val angles: Map[Int, Angle]) {
     val exact = Angle.fromDegrees(exactInDegrees, 6)
 
 
-    final def print() {
-        for (days <- List(1, 10, 100, 1000, 10000, 29, 354)) {
-            val angle = angles(days)
-            val exacter = Angle.fromDegrees(exactify(approximate, days, angle), 6)
-            println(days + ":" + angle + ":" + exact*days + ":" + exacter)
-        }
-    }
-
-
     def write(writer: TableWriter) {
         writer.addColumn("days")
         writer.addColumn("approximate")
         writer.addColumn("exact")
-        writer.addColumn("reverse")
+        writer.addColumn("from approximate")
 
         for (days <- List(1, 10, 100, 1000, 10000, 29, 354)) {
             val angle = angles(days)
             val exacter = Angle.fromDegrees(exactify(approximate, days, angle), 6)
+
             writer.startRow
             writer.value(days)
             writer.value(angle)

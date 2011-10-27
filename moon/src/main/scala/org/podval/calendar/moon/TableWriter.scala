@@ -45,6 +45,8 @@ trait TableWriter {
 
         startTable
 
+        writeColumnHeader(name)
+
         columnNames += name
     }
 
@@ -72,7 +74,7 @@ trait TableWriter {
         checkNotDone
 
         if (rowsStarted) {
-            if (columnNumber != numberOfColumns-1)
+            if (columnNumber != numberOfColumns)
                 throw new IllegalStateException("Not at end of row")
 
             writeEndRow

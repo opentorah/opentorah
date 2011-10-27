@@ -19,31 +19,31 @@ package org.podval.calendar.moon
 
 final class TextTableWriter extends TableWriter {
 
-    protected override def writeStartTable = write("|")
+    override protected def writeStartTable = write("|")
 
 
-    protected override def writeColumnHeader(name: String) {
+    override protected def writeColumnHeader(name: String) {
         write(name)
         write("|")
     }
 
 
-    protected override def writeHeaderEnd = writeln()
+    override protected def writeHeaderEnd = writeln()
 
 
-    protected override def writeStartRow = write("|")
+    override protected def writeStartRow = write("|")
 
 
-    protected override def writeValue(value: String) {
+    override protected def writeValue(value: String) {
         write(value)
         write("|")
     }
 
 
-    protected override def writeEndRow = writeln()
+    override protected def writeEndRow = writeln()
 
 
-    protected override def writeEndTable = {}
+    override protected def writeEndTable = {}
 
 
     private def write(what: Any) {
