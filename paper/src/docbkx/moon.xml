@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE article PUBLIC "-//W3C//DTD MathML 2.0//EN" "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd">
 <?xml-model href="http://www.oxygenxml.com/docbook/xml/5.0/rng/dbmathmlsvg.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<article xmlns="http://docbook.org/ns/docbook">
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">
     <title>Rambam on Astronomical Calendar</title>
     <section>
         <title>Lunar Theory</title>
@@ -16,6 +16,7 @@
                     The mean movement of the small circle on the big circle that surrounds the Earth
                     is called <glossterm>mean lunar longitude</glossterm> (אמצע הירח). </para>
             </section>
+
             <section>
                 <title>Law 2: Movement in the Mean Lunar Longitude</title>
                 <para>
@@ -25,7 +26,7 @@
 
                 <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
 
-                <informaltable frame="all">
+                <informaltable xml:id="t-14-2-1" frame="all">
                     <tgroup cols="2">
                         <thead>
                             <row>
@@ -68,7 +69,7 @@
 
                 <para role="notes"> It is not clear how Rambam arrived the values he gives. When
                     value of the movement in one day given by Rambam is multiplied by 29, 100 etc.,
-                    the result is smaller than that of Rambam. TODO: check! </para>
+                    the result is smaller than that of Rambam.</para>
                 <para role="notes">
                     Moreover, the value of the movement of the mean lunar longitude in one day given by
                     <biblioref linkend="Almagest"/> IV 3 (H278)
@@ -77,20 +78,21 @@
                     Almagest and then rounding the results.
                 </para>
                 <para role="notes">
-                    Below, the table is expanded with the results of calculations
-                    based on Rambam's value, and on Almagest's. 
-                    (Almagest also gives the value for 10 days - and for many other periods
-                    that are not in our table :))
+                    Below, the table is expanded with the:
+                    calculations based on Rambam's value,
+                    reconstruction of the movement in one day from the printed data,
+                    and calculation based on the most "precise" reconstructed value - that for 10000 days.
                 </para>
-
+                
                 <informaltable frame="all">
-                    <tgroup cols="4">
+                    <tgroup cols="5">
                         <thead>
                             <row>
                                 <entry>days</entry>
                                 <entry>printed</entry>
-                                <entry>multiplied: Rambam</entry>
-                                <entry>multiplied: Almagest</entry>
+                                <entry>multiplied</entry>
+                                <entry>reconstructed movement in 1 day</entry>
+                                <entry>calculated from movement in 10000 days</entry>
                             </row>
                         </thead>
                         <tbody>
@@ -98,47 +100,60 @@
                                 <entry align="right">1</entry>
                                 <entry>13°10′35″</entry>
                                 <entry>13°10′35″</entry>
-                                <entry>13;10,34,58,33,30,30°</entry>
+                                <entry>13;10,35,0,1,0,0°</entry>
+                                <entry>13;10,35,1,48,1,0°</entry>
                             </row>
                             <row>
                                 <entry align="right">10</entry>
                                 <entry>131°45′50″</entry>
                                 <entry>131°45′50″</entry>
-                                <entry>131;45,49,45,35,5,0°</entry>
+                                <entry>13;10,35,0,1,0,0°</entry>
+                                <entry>131;45,50,18,0,10,0°</entry>
                             </row>
                             <row>
                                 <entry align="right">100</entry>
                                 <entry>237°38′23″</entry>
                                 <entry>237°38′20″</entry>
-                                <entry>237;38,17,35,50,50,0°</entry>
+                                <entry>13;10,35,1,48,1,0°</entry>
+                                <entry>237;38,23,0,1,40,0°</entry>
                             </row>
                             <row>
                                 <entry align="right">1000</entry>
                                 <entry>216°23′50″</entry>
                                 <entry>216°23′20″</entry>
-                                <entry>216;22,55,58,28,20,0°</entry>
+                                <entry>13;10,35,1,48,1,0°</entry>
+                                <entry>216;23,50,0,16,40,0°</entry>
                             </row>
                             <row>
                                 <entry align="right">10000</entry>
                                 <entry>3°58′20″</entry>
                                 <entry>3°53′20″</entry>
-                                <entry>3;49,19,44,43,20,0°</entry>
+                                <entry>13;10,35,1,48,1,0°</entry>
+                                <entry>3;58,20,2,46,40,0°</entry>
                             </row>
                             <row>
                                 <entry align="right">29</entry>
                                 <entry>22°6′56″</entry>
                                 <entry>22°6′55″</entry>
-                                <entry>22;6,54,18,11,44,30°</entry>
+                                <entry>13;10,35,2,4,8,17°</entry>
+                                <entry>22;6,55,52,12,29,0°</entry>
                             </row>
                             <row>
                                 <entry align="right">354</entry>
                                 <entry>344°26′43″</entry>
                                 <entry>344°26′30″</entry>
-                                <entry>344;26,21,29,41,57,0°</entry>
+                                <entry>13;10,35,2,12,12,12°</entry>
+                                <entry>344;26,40,37,17,54,0°</entry>
                             </row>
                         </tbody>
                     </tgroup>
                 </informaltable>
+
+                <para>
+                    Values of the movement in one day apparently used by Rambam, if rounded to the seconds, all give the "official" Rambam's value.
+                    Values calculated from the value reconstructed from the printed 10000 days movement, if rounded, produce the values Rambam published -
+                    except for 354 days movement, which remains unexplained TODO!
+                </para>
             </section>
 
             <section>
@@ -195,7 +210,6 @@
                     It is not clear how Rambam obtained the values he gives.
                     When value of the movement in one day given by Rambam is
                     multiplied by 29, 100 etc., the result is bigger than what Rambam says!
-                    TODO: check!
                 </para>
                 <para role="notes">
                     Although the value of the movement of the mean lunar anomaly in one day given by
@@ -206,20 +220,23 @@
                     Almagest and then rounding the results.
                 </para>
                 <para role="notes">
-                    Below, the table is expanded with the results of calculations
-                    based on Rambam's value, and on Almagest's. 
-                    (Almagest also gives the value for 10 days - and for many other periods
-                    that are not in our table :))
+                    Below, the table is expanded with the:
+                    calculations based on Rambam's value,
+                    calculations based on Almagest's value,
+                    reconstruction of the movement in one day from the printed data,
+                    and calculation based on the most "precise" reconstructed value - that for 10000 days.
                 </para>
-
+                
                 <informaltable frame="all">
-                    <tgroup cols="4">
+                    <tgroup cols="6">
                         <thead>
                             <row>
                                 <entry>days</entry>
                                 <entry>printed</entry>
                                 <entry>multiplied: Rambam</entry>
                                 <entry>multiplied: Almagest</entry>
+                                <entry>reconstructed movement in 1 day</entry>
+                                <entry>calculated from movement in 10000 days</entry>
                             </row>
                         </thead>
                         <tbody>
@@ -228,46 +245,64 @@
                                 <entry>13°3′54″</entry>
                                 <entry>13°3′54″</entry>
                                 <entry>13;3,53,56,17,51,59°</entry>
+                                <entry>13;3,54,0,0,0,0°</entry>
+                                <entry>13;3,53,55,49,0,0°</entry>
                             </row>
                             <row>
                                 <entry align="right">10</entry>
                                 <entry>130°39′0″</entry>
                                 <entry>130°39′0″</entry>
                                 <entry>130;38,59,22,58,39,50°</entry>
+                                <entry>13;3,54,0,0,0,0°</entry>
+                                <entry>130;38,59,18,10,0,0°</entry>
                             </row>
                             <row>
                                 <entry align="right">100</entry>
                                 <entry>226°29′53″</entry>
                                 <entry>226°30′0″</entry>
                                 <entry>226;29,53,49,46,38,20°</entry>
+                                <entry>13;3,53,55,49,0,0°</entry>
+                                <entry>226;29,53,1,40,0,0°</entry>
                             </row>
                             <row>
                                 <entry align="right">1000</entry>
                                 <entry>104°58′50″</entry>
                                 <entry>105°0′0″</entry>
                                 <entry>104;58,58,17,46,23,20°</entry>
+                                <entry>13;3,53,55,49,0,0°</entry>
+                                <entry>104;58,50,16,40,0,0°</entry>
                             </row>
                             <row>
                                 <entry align="right">10000</entry>
                                 <entry>329°48′20″</entry>
                                 <entry>330°0′0″</entry>
                                 <entry>329;49,42,57,43,53,20°</entry>
+                                <entry>13;3,53,55,49,0,0°</entry>
+                                <entry>329;48,22,46,40,0,0°</entry>
                             </row>
                             <row>
                                 <entry align="right">29</entry>
                                 <entry>18°53′4″</entry>
                                 <entry>18°53′6″</entry>
                                 <entry>18;53,4,12,38,7,31°</entry>
+                                <entry>13;3,53,55,51,43,27°</entry>
+                                <entry>18;53,3,58,41,0,0°</entry>
                             </row>
                             <row>
                                 <entry align="right">354</entry>
                                 <entry>305°0′13″</entry>
                                 <entry>305°0′36″</entry>
                                 <entry>305;0,14,9,24,42,6°</entry>
+                                <entry>13;3,53,56,6,6,6°</entry>
+                                <entry>305;0,11,19,6,0,0°</entry>
                             </row>
                         </tbody>
                     </tgroup>
                 </informaltable>
+
+                <para>
+                    Here, everything is worse than in 14:2 TODO!!!
+                </para>
             </section>
 
             <section>
