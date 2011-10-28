@@ -45,6 +45,8 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <xincludeSupported>true</xincludeSupported>
+
                     <includes>moon.xml</includes>
 
                     <bodyFontFamily>LiberationSans</bodyFontFamily>
@@ -80,8 +82,6 @@
                             <metricsFile>${fontMetricsDirectory}/LiberationSans-BoldItalic-metrics.xml</metricsFile>
                         </font>
                     </fonts>
-
-                    <xincludeSupported>true</xincludeSupported>
                 </configuration>
             </plugin>
 

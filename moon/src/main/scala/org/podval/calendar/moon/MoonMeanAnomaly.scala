@@ -34,6 +34,6 @@ object MoonMeanAnomaly extends MultiplicationTable(Map(
 
 
     def main(args: Array[String]) {
-        write(new HtmlTableWriter)
+        write(new TextTableWriter)
     }
 }

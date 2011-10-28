@@ -35,8 +35,6 @@ object MoonMeanLongitude extends MultiplicationTable(Map(
 
 
     def main(args: Array[String]) {
-        
-        println("exact= " + exactInDegrees + ":" + exact)
-//        print()
+        write(new TextTableWriter)
     }
 }
