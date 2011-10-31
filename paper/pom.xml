@@ -18,8 +18,55 @@
         <fontMetricsDirectory>${basedir}/target/fonts/</fontMetricsDirectory>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>calendar-moon</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
+            <plugin>
+                <groupId>com.agilejava.docbkx</groupId>
+                <artifactId>docbkx-fop-support</artifactId>
+                <version>2.0.13</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${fontsDirectory}</sourceDirectory>
+                            <targetDirectory>${fontMetricsDirectory}</targetDirectory>
+                            <ansi>true</ansi>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>org.podval.calendar.moon.DayTables</mainClass>
+                    <arguments>
+                        <argument>${basedir}/target/tables</argument>
+                    </arguments>
+                </configuration>            
+            </plugin>
+
             <plugin>
                 <groupId>com.agilejava.docbkx</groupId>
                 <artifactId>docbkx-maven-plugin</artifactId>
@@ -83,25 +130,6 @@
                         </font>
                     </fonts>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>com.agilejava.docbkx</groupId>
-                <artifactId>docbkx-fop-support</artifactId>
-                <version>2.0.13</version>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirectory>${fontsDirectory}</sourceDirectory>
-                            <targetDirectory>${fontMetricsDirectory}</targetDirectory>
-                            <ansi>true</ansi>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

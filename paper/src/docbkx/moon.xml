@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE article PUBLIC "-//W3C//DTD MathML 2.0//EN" "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd">
 <?xml-model href="http://www.oxygenxml.com/docbook/xml/5.0/rng/dbmathmlsvg.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<article xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude">
     <title>Rambam on Astronomical Calendar</title>
     <section>
         <title>Lunar Theory</title>
@@ -26,47 +26,16 @@
 
                 <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
 
-                <informaltable xml:id="t-14-2-1" frame="all">
-                    <tgroup cols="2">
-                        <thead>
-                            <row>
-                                <entry>days</entry>
-                                <entry>printed</entry>
-                            </row>
-                        </thead>
-                        <tbody>
-                            <row>
-                                <entry align="right">10</entry>
-                                <entry>131°45′50″</entry>
-                            </row>
-                            <row>
-                                <entry align="right">100</entry>
-                                <entry>237°38′23″</entry>
-                            </row>
-                            <row>
-                                <entry align="right">1000</entry>
-                                <entry>216°23′50″</entry>
-                            </row>
-                            <row>
-                                <entry align="right">10000</entry>
-                                <entry>3°58′20″<footnote><para>Here: ‘nimzes’ instead of ‘nimzo’.</para></footnote></entry>
-                            </row>
-                            <row>
-                                <entry align="right">29</entry>
-                                <entry>22°6′56″</entry>
-                            </row>
-                            <row>
-                                <entry align="right">354<footnote><para>'ordered' year; see Law 12:1.</para></footnote></entry>
-                                <entry>344°26′43″</entry>
-                            </row>
-                        </tbody>
-                    </tgroup>
-                </informaltable>
+                <xi:include href="../../target/tables/mml-original.xml"/>
 
                 <para>
                     And in this way you can calculate it for any number of days and years that you want.
                 </para>
 
+                <para role="notes">
+                    Rambam uses ‘nimzes’ instead of ‘nimzo’ for 10000 days. Also, Rambam says
+                    "'ordered' year"; it was rendered as 254 in accordance with see Law 12:1.
+                </para>
                 <para role="notes"> It is not clear how Rambam arrived the values he gives. When
                     value of the movement in one day given by Rambam is multiplied by 29, 100 etc.,
                     the result is smaller than that of Rambam.</para>

@@ -16,36 +16,42 @@
 
 package org.podval.calendar.moon
 
-
-final class TableWithSuffix[A](val suffix: String, val table: Table[A])
+import java.io.{PrintStream, File, FileOutputStream}
 
 
 object DayTables {
 
-    def tables(data: Map[Int, Angle]) = {
+    def tables(name: String, data: Map[Int, Angle]) = {
         val days = new Column("days", "n", (days: Int) => days)
         val value = new Column("value", "v(n)", (days: Int) => data(days))
         val calculated = new Column("calculated", "v(1)*n", (days: Int) => data(1)*days)
 
         List(
-            table("original", days, value),
-            table("calculated", days, value, calculated)
+            table(name, "original", days, value),
+            table(name, "calculated", days, value, calculated)
         )
     }
     
 
-    private def table(suffix: String, columns: Column[Int]*) =
-        new TableWithSuffix[Int](suffix, new Table[Int](columns.toList, DayTablesData.Order))
+    private def table(name: String, suffix: String, columns: Column[Int]*) =
+        new Table[Int](name+"-"+suffix, columns.toList, DayTablesData.Order)
 
 
-    def write[A](path: String, name: String, tables: List[TableWithSuffix[A]]) {
-        for (t <- tables) {
-            t.table.writeHtml(path + name + "-" + t.suffix + ".html")
+    def write[A](directory: File, tables: List[Table[A]]) {
+        for (table <- tables) {
+            table.writeHtml(open(directory, table.name, "html"))
+            table.writeDocBook(open(directory, table.name, "xml"))
         }
     }
 
 
+    private def open(directory: File, name: String, extension: String): PrintStream =
+        new PrintStream(new FileOutputStream(new File(directory, name+"."+extension)))
+
+
     def main(args: Array[String]) {
-        write("/tmp/xxx/", "mml", tables(DayTablesData.moonMeanLongitude))
+        val directory = new File(args(0))
+        directory.mkdir
+        write(directory, tables("mml", DayTablesData.moonMeanLongitude))
     }
 }
