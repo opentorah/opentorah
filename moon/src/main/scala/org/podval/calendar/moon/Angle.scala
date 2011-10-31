@@ -60,6 +60,13 @@ final class Angle(val degrees: Int, val more: List[Int]) extends Ordered[Angle] 
     def *(n: Int): Angle = Angle(toDigits map (n*_))
 
 
+    def exactify(days: Int, angle: Angle): Double = {
+        val fullDays = 360.0/this.toDegrees
+        val fullRotations = scala.math.floor(days/fullDays).toInt
+        (360.0*fullRotations+angle.toDegrees)/days
+    }
+
+
     def roundToSeconds(): Angle = roundTo(2)
 
 
@@ -79,13 +86,11 @@ final class Angle(val degrees: Int, val more: List[Int]) extends Ordered[Angle] 
     def length = more.length
 
 
-    // TODO: use symbols: ° ′ ″ ‴
     // TODO: padding
-    override def toString: String =
-        if (length <= 3)
-            degrees + "°" + (if (length < 1) "" else minutes + "′" + (if (length < 2) "" else seconds + "″" + (if (length < 3) "" else thirds + "‴")))
-        else
-            degrees + ";" + more.mkString(",") + "°"
+    override def toString(): String = {
+        val tokens = toDigits map (_.toString) zip Angle.SIGNS flatMap (p => List(p._1, p._2))
+        (if (length <= 3) tokens else tokens.init) mkString
+    }
 
 
     private def zip(that: Angle) = toDigits zipAll (that.toDigits, 0, 0)
@@ -113,6 +118,9 @@ object Angle {
     // In Scala, it has to be finite, and we do not need more than Almagest is using.
     val MAX_LENGTH = 6
     val QUOTIENTS = (1 to MAX_LENGTH) map (n => scala.math.pow(60.0, n))
+
+
+    val SIGNS = List("°", "′", "″", "‴") ++ List().padTo(MAX_LENGTH-3, ", ")
 
 
     def apply(degrees: Int, more: Int*): Angle = apply(degrees, more.toList)
