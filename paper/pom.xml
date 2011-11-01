@@ -93,6 +93,7 @@
                 </executions>
                 <configuration>
                     <xincludeSupported>true</xincludeSupported>
+                    <generatedSourceDirectory>${basedir}/target/tables</generatedSourceDirectory>
 
                     <includes>moon.xml</includes>
 

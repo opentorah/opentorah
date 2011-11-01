@@ -22,13 +22,20 @@ import java.io.{PrintStream, File, FileOutputStream}
 object DayTables {
 
     def tables(name: String, data: Map[Int, Angle]) = {
+        def exactify(days: Int) = Angle.exactify(data(1), days, data(days))
+        def reconstruct(days: Int) = Angle.fromDegrees(exactify(days), 6)
+
         val days = new Column("days", "n", (days: Int) => days)
         val value = new Column("value", "v(n)", (days: Int) => data(days))
         val calculated = new Column("calculated", "v(1)*n", (days: Int) => data(1)*days)
+        val reconstructed = new Column("reconstructed 1-day movement", "r(n)", reconstruct)
+        val recalculated = new Column("recalculated", "r(10000)*n", (days: Int) => reconstruct(10000)*days)
 
         List(
             table(name, "original", days, value),
-            table(name, "calculated", days, value, calculated)
+            table(name, "calculated", days, value, calculated),
+            table(name, "reconstructed", days, value, reconstructed),
+            table(name, "recalculated", days, value, recalculated)
         )
     }
     
@@ -52,6 +59,8 @@ object DayTables {
     def main(args: Array[String]) {
         val directory = new File(args(0))
         directory.mkdir
+
         write(directory, tables("mml", DayTablesData.moonMeanLongitude))
+        write(directory, tables("mma", DayTablesData.moonMeanAnomaly))
     }
 }

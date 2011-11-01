@@ -60,13 +60,6 @@ final class Angle(val degrees: Int, val more: List[Int]) extends Ordered[Angle] 
     def *(n: Int): Angle = Angle(toDigits map (n*_))
 
 
-    def exactify(days: Int, angle: Angle): Double = {
-        val fullDays = 360.0/this.toDegrees
-        val fullRotations = scala.math.floor(days/fullDays).toInt
-        (360.0*fullRotations+angle.toDegrees)/days
-    }
-
-
     def roundToSeconds(): Angle = roundTo(2)
 
 
@@ -114,9 +107,9 @@ final class Angle(val degrees: Int, val more: List[Int]) extends Ordered[Angle] 
 
 object Angle {
 
-    // In Haskell, this'd be a lazy infinite list;
-    // In Scala, it has to be finite, and we do not need more than Almagest is using.
-    val MAX_LENGTH = 6
+    // In Haskell, this'd be a lazy infinite list; in Scala, it has to be finite.
+    // I thought that we do not need more than Almagest is using, but it seems that we might...
+    val MAX_LENGTH = 100
     val QUOTIENTS = (1 to MAX_LENGTH) map (n => scala.math.pow(60.0, n))
 
 
@@ -151,5 +144,12 @@ object Angle {
     def fromDegrees(value: Double, length: Int): Angle = {
         val digits = value +: ((QUOTIENTS take length) map (q => (value % (60.0/q))/(1.0/q)))
         Angle((digits.init map (scala.math.floor(_).toInt)).toList :+ scala.math.round(digits.last).toInt)
+    }
+
+
+    def exactify(approximate: Angle, days: Int, angle: Angle): Double = {
+        val fullDays = 360.0/approximate.toDegrees
+        val fullRotations = scala.math.floor(days/fullDays).toInt
+        (360.0*fullRotations+angle.toDegrees)/days
     }
 }

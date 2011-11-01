@@ -38,7 +38,11 @@
                 </para>
                 <para role="notes"> It is not clear how Rambam arrived the values he gives. When
                     value of the movement in one day given by Rambam is multiplied by 29, 100 etc.,
-                    the result is smaller than that of Rambam.</para>
+                    the result is smaller than that of Rambam.
+                    The following table compares printed and calculated values:</para>
+
+                <xi:include href="../../target/tables/mml-calculated.xml"/>
+
                 <para role="notes">
                     Moreover, the value of the movement of the mean lunar longitude in one day given by
                     <biblioref linkend="Almagest"/> IV 3 (H278)
@@ -46,77 +50,18 @@
                     numbers can not be explained by performing calculations with the long value from
                     Almagest and then rounding the results.
                 </para>
+
                 <para role="notes">
-                    Below, the table is expanded with the:
-                    calculations based on Rambam's value,
-                    reconstruction of the movement in one day from the printed data,
-                    and calculation based on the most "precise" reconstructed value - that for 10000 days.
+                    From the printed values it is possible to reconstruct the value of the
+                    movement in mean lunar longitude in one day that Rambam used to calculate each of them:</para>
+
+                <xi:include href="../../target/tables/mml-reconstructed.xml"/>
+
+                <para role="notes">
+                    Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
                 </para>
                 
-                <informaltable frame="all">
-                    <tgroup cols="5">
-                        <thead>
-                            <row>
-                                <entry>days</entry>
-                                <entry>printed</entry>
-                                <entry>multiplied</entry>
-                                <entry>reconstructed movement in 1 day</entry>
-                                <entry>calculated from movement in 10000 days</entry>
-                            </row>
-                        </thead>
-                        <tbody>
-                            <row>
-                                <entry align="right">1</entry>
-                                <entry>13°10′35″</entry>
-                                <entry>13°10′35″</entry>
-                                <entry>13;10,35,0,1,0,0°</entry>
-                                <entry>13;10,35,1,48,1,0°</entry>
-                            </row>
-                            <row>
-                                <entry align="right">10</entry>
-                                <entry>131°45′50″</entry>
-                                <entry>131°45′50″</entry>
-                                <entry>13;10,35,0,1,0,0°</entry>
-                                <entry>131;45,50,18,0,10,0°</entry>
-                            </row>
-                            <row>
-                                <entry align="right">100</entry>
-                                <entry>237°38′23″</entry>
-                                <entry>237°38′20″</entry>
-                                <entry>13;10,35,1,48,1,0°</entry>
-                                <entry>237;38,23,0,1,40,0°</entry>
-                            </row>
-                            <row>
-                                <entry align="right">1000</entry>
-                                <entry>216°23′50″</entry>
-                                <entry>216°23′20″</entry>
-                                <entry>13;10,35,1,48,1,0°</entry>
-                                <entry>216;23,50,0,16,40,0°</entry>
-                            </row>
-                            <row>
-                                <entry align="right">10000</entry>
-                                <entry>3°58′20″</entry>
-                                <entry>3°53′20″</entry>
-                                <entry>13;10,35,1,48,1,0°</entry>
-                                <entry>3;58,20,2,46,40,0°</entry>
-                            </row>
-                            <row>
-                                <entry align="right">29</entry>
-                                <entry>22°6′56″</entry>
-                                <entry>22°6′55″</entry>
-                                <entry>13;10,35,2,4,8,17°</entry>
-                                <entry>22;6,55,52,12,29,0°</entry>
-                            </row>
-                            <row>
-                                <entry align="right">354</entry>
-                                <entry>344°26′43″</entry>
-                                <entry>344°26′30″</entry>
-                                <entry>13;10,35,2,12,12,12°</entry>
-                                <entry>344;26,40,37,17,54,0°</entry>
-                            </row>
-                        </tbody>
-                    </tgroup>
-                </informaltable>
+                <xi:include href="../../target/tables/mml-recalculated.xml"/>
 
                 <para>
                     Values of the movement in one day apparently used by Rambam, if rounded to the seconds, all give the "official" Rambam's value.
@@ -134,141 +79,49 @@
                     For longer periods, (remainder) of the movement in mean lunar anomaly is:
                 </para>
 
-                <informaltable frame="all">
-                    <tgroup cols="2">
-                        <thead>
-                            <row>
-                                <entry>days</entry>
-                                <entry>printed</entry>
-                            </row>
-                        </thead>
-                        <tbody>
-                            <row>
-                                <entry align="right">10</entry>
-                                <entry>130°39′0″</entry>
-                            </row>
-                            <row>
-                                <entry align="right">100</entry>
-                                <entry>226°29′53″</entry>
-                            </row>
-                            <row>
-                                <entry align="right">1000</entry>
-                                <entry>104°58′50″</entry>
-                            </row>
-                            <row>
-                                <entry align="right">10000</entry>
-                                <entry>329°48′20″</entry>
-                            </row>
-                            <row>
-                                <entry align="right">29</entry>
-                                <entry>18°53′4″</entry>
-                            </row>
-                            <row>
-                                <entry align="right">354
-                                    <footnote><para>'ordered' year; see Law 12:1.</para></footnote>
-                                    <footnote><para>This is part of Law 4.</para></footnote>
-                                </entry>
-                                <entry>305°0′13″</entry>
-                            </row>
-                        </tbody>
-                    </tgroup>
-                </informaltable>
+                <xi:include href="../../target/tables/mma-original.xml"/>
 
+                <para role="notes">
+                    Rambam says "'ordered' year"; it was rendered as 254 in accordance with see Law 12:1.
+                    Also, this value is actually given in Law 4.
+                </para>
 
                 <para role="notes">
                     It is not clear how Rambam obtained the values he gives.
                     When value of the movement in one day given by Rambam is
                     multiplied by 29, 100 etc., the result is bigger than what Rambam says!
+                    The following table compares printed and calculated values:
                 </para>
+                
+                <xi:include href="../../target/tables/mma-calculated.xml"/>
+
                 <para role="notes">
                     Although the value of the movement of the mean lunar anomaly in one day given by
                     <biblioref linkend="Almagest"/> IV 3 (H278)
                     (which, rounded to seconds, becomes Rambam's value) is smaller, it is not small enough,
                     and Rambam's
                     numbers can not be explained by performing calculations with the long value from
-                    Almagest and then rounding the results.
+                    Almagest and then rounding the results (TODO: table).
                 </para>
+
                 <para role="notes">
-                    Below, the table is expanded with the:
-                    calculations based on Rambam's value,
-                    calculations based on Almagest's value,
-                    reconstruction of the movement in one day from the printed data,
-                    and calculation based on the most "precise" reconstructed value - that for 10000 days.
+                    From the printed values it is possible to reconstruct the value of the
+                    movement in mean lunar anomaly in one day that Rambam used to calculate each of them:</para>
+                
+                <xi:include href="../../target/tables/mma-reconstructed.xml"/>
+                
+                <para role="notes">
+                    Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
                 </para>
                 
-                <informaltable frame="all">
-                    <tgroup cols="6">
-                        <thead>
-                            <row>
-                                <entry>days</entry>
-                                <entry>printed</entry>
-                                <entry>multiplied: Rambam</entry>
-                                <entry>multiplied: Almagest</entry>
-                                <entry>reconstructed movement in 1 day</entry>
-                                <entry>calculated from movement in 10000 days</entry>
-                            </row>
-                        </thead>
-                        <tbody>
-                            <row>
-                                <entry align="right">1</entry>
-                                <entry>13°3′54″</entry>
-                                <entry>13°3′54″</entry>
-                                <entry>13;3,53,56,17,51,59°</entry>
-                                <entry>13;3,54,0,0,0,0°</entry>
-                                <entry>13;3,53,55,49,0,0°</entry>
-                            </row>
-                            <row>
-                                <entry align="right">10</entry>
-                                <entry>130°39′0″</entry>
-                                <entry>130°39′0″</entry>
-                                <entry>130;38,59,22,58,39,50°</entry>
-                                <entry>13;3,54,0,0,0,0°</entry>
-                                <entry>130;38,59,18,10,0,0°</entry>
-                            </row>
-                            <row>
-                                <entry align="right">100</entry>
-                                <entry>226°29′53″</entry>
-                                <entry>226°30′0″</entry>
-                                <entry>226;29,53,49,46,38,20°</entry>
-                                <entry>13;3,53,55,49,0,0°</entry>
-                                <entry>226;29,53,1,40,0,0°</entry>
-                            </row>
-                            <row>
-                                <entry align="right">1000</entry>
-                                <entry>104°58′50″</entry>
-                                <entry>105°0′0″</entry>
-                                <entry>104;58,58,17,46,23,20°</entry>
-                                <entry>13;3,53,55,49,0,0°</entry>
-                                <entry>104;58,50,16,40,0,0°</entry>
-                            </row>
-                            <row>
-                                <entry align="right">10000</entry>
-                                <entry>329°48′20″</entry>
-                                <entry>330°0′0″</entry>
-                                <entry>329;49,42,57,43,53,20°</entry>
-                                <entry>13;3,53,55,49,0,0°</entry>
-                                <entry>329;48,22,46,40,0,0°</entry>
-                            </row>
-                            <row>
-                                <entry align="right">29</entry>
-                                <entry>18°53′4″</entry>
-                                <entry>18°53′6″</entry>
-                                <entry>18;53,4,12,38,7,31°</entry>
-                                <entry>13;3,53,55,51,43,27°</entry>
-                                <entry>18;53,3,58,41,0,0°</entry>
-                            </row>
-                            <row>
-                                <entry align="right">354</entry>
-                                <entry>305°0′13″</entry>
-                                <entry>305°0′36″</entry>
-                                <entry>305;0,14,9,24,42,6°</entry>
-                                <entry>13;3,53,56,6,6,6°</entry>
-                                <entry>305;0,11,19,6,0,0°</entry>
-                            </row>
-                        </tbody>
-                    </tgroup>
-                </informaltable>
-
+                <xi:include href="../../target/tables/mma-recalculated.xml"/>
+                
+                <para>
+                    Values of the movement in one day apparently used by Rambam, if rounded to the seconds, all give the "official" Rambam's value.
+                    Values calculated from the value reconstructed from the printed 10000 days movement, if rounded, produce the values Rambam published -
+                    except for 354 days movement, which remains unexplained TODO!
+                </para>
+                
                 <para>
                     Here, everything is worse than in 14:2 TODO!!!
                 </para>
