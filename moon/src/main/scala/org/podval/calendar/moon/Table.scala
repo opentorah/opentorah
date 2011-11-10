@@ -17,13 +17,25 @@
 package org.podval.calendar.moon
 
 import scala.xml.PrettyPrinter
-import java.io.PrintStream
+import java.io.{File, FileOutputStream, PrintStream}
 
 
 final class Column[A](val heading: String, val subheading: String, val f: A => Any)
 
 
-final class Table[A](val name: String, columns: List[Column[A]], rows: List[A]) {
+final class PreTable[A](suffix: String, columns: Column[A]*) {
+
+    def toTable(name: String, rows: List[A]): Table[A] =
+        new Table(name, this.suffix, this.columns.toList, rows)
+}
+
+
+final class Table[A](name: String, columns: List[Column[A]], rows: List[A]) {
+
+    def this(name: String, suffix: String, columns: List[Column[A]], rows: List[A]) {
+        this(name+"-"+suffix, columns, rows)
+    }
+
 
     private def toHtml = {
         <html>
@@ -56,8 +68,6 @@ final class Table[A](val name: String, columns: List[Column[A]], rows: List[A]) 
 
 
     private def toDocBook =
-//        <section xmlns="http://docbook.org/ns/docbook" version="5.0">
-//            <title>{name}</title>
             <informaltable xmlns="http://docbook.org/ns/docbook" version="5.0" frame="all" xml:id={name}>
                 <tgroup cols={columns.length.toString}>
                     <thead>
@@ -76,17 +86,26 @@ final class Table[A](val name: String, columns: List[Column[A]], rows: List[A]) 
                     }</tbody>
                 </tgroup>
             </informaltable>
-//        </section>
 
 
-    def writeHtml(out: PrintStream) {
+    def write[A](directory: File) {
+        writeHtml(open(directory, name, "html"))
+        writeDocBook(open(directory, name, "xml"))
+    }
+
+
+    private def open(directory: File, name: String, extension: String): PrintStream =
+        new PrintStream(new FileOutputStream(new File(directory, name+"."+extension)))
+
+
+    private def writeHtml(out: PrintStream) {
         val what = new PrettyPrinter(80, 2).format(toHtml)
         out.print(what)
         out.println()
     }
 
 
-    def writeDocBook(out: PrintStream) {
+    private def writeDocBook(out: PrintStream) {
         out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
         val what = new PrettyPrinter(80, 2).format(toDocBook)
         out.print(what)

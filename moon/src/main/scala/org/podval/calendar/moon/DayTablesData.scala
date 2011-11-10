@@ -19,13 +19,15 @@ package org.podval.calendar.moon
 
 object DayTablesData {
 
-    val Order = List(1, 10, 100, 1000, 10000, 29, 354)
+    type Days = Int
+
+    val Order = List[Days](1, 10, 100, 1000, 10000, 29, 354)
 
 
 //    val exact = Angle(13,10,35,1,48,1)
 //    val exactInDegrees = 13.176397222222223
 //    val Almagest = Angle(13,10,34,58,33,30,30)
-    val moonMeanLongitude = Map(
+    val moonMeanLongitude = List[(Days, Angle)](
         1     -> Angle(13,10,35),
         10    -> Angle(131, 45, 50),
         100   -> Angle(237, 38, 23),
@@ -38,7 +40,7 @@ object DayTablesData {
 
 //    val RambamExact = Angle(13,3,53,55,49)
 //    val Almagest = Angle(13,3,53,56,17,51,59)
-    val moonMeanAnomaly = Map(
+    val moonMeanAnomaly = List[(Days, Angle)](
         1     -> Angle(13,3,54),
         10    -> Angle(130, 39, 0),
         100   -> Angle(226, 29, 53),

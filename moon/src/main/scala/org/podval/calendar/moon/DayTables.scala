@@ -16,12 +16,12 @@
 
 package org.podval.calendar.moon
 
-import java.io.{PrintStream, File, FileOutputStream}
+import java.io.File
 
 
 object DayTables {
 
-    def tables(name: String, data: Map[Int, Angle]) = {
+    private def dayTables(data: Map[Int, Angle]) = {
         def exactify(days: Int) = Angle.exactify(data(1), days, data(days))
         def reconstruct(days: Int) = Angle.fromDegrees(exactify(days), 6)
 
@@ -32,35 +32,26 @@ object DayTables {
         val recalculated = new Column("recalculated", "r(10000)*n", (days: Int) => reconstruct(10000)*days)
 
         List(
-            table(name, "original", days, value),
-            table(name, "calculated", days, value, calculated),
-            table(name, "reconstructed", days, value, reconstructed),
-            table(name, "recalculated", days, value, recalculated)
+            new PreTable("original", days, value),
+            new PreTable("calculated", days, value, calculated),
+            new PreTable("reconstructed", days, value, reconstructed),
+            new PreTable("recalculated", days, value, recalculated)
         )
     }
-    
-
-    private def table(name: String, suffix: String, columns: Column[Int]*) =
-        new Table[Int](name+"-"+suffix, columns.toList, DayTablesData.Order)
 
 
-    def write[A](directory: File, tables: List[Table[A]]) {
-        for (table <- tables) {
-            table.writeHtml(open(directory, table.name, "html"))
-            table.writeDocBook(open(directory, table.name, "xml"))
-        }
-    }
+    private def tables[A,B](name: String, dataList: List[(A, B)], f: (Map[A, B]) => List[PreTable[A]]) =
+        f(Map(dataList: _*)) map (_.toTable(name, dataList map (_._1)))
 
 
-    private def open(directory: File, name: String, extension: String): PrintStream =
-        new PrintStream(new FileOutputStream(new File(directory, name+"."+extension)))
+    private def allTables = 
+        tables("mml", DayTablesData.moonMeanLongitude, dayTables) ++
+        tables("mma", DayTablesData.moonMeanAnomaly, dayTables)
 
 
     def main(args: Array[String]) {
-        val directory = new File(args(0))
+        val directory = new File(if (!args.isEmpty) args(0) else "/tmp/xxx/tables/")
         directory.mkdir
-
-        write(directory, tables("mml", DayTablesData.moonMeanLongitude))
-        write(directory, tables("mma", DayTablesData.moonMeanAnomaly))
+        allTables foreach (_.write(directory))
     }
 }
