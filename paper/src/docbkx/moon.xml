@@ -3,12 +3,36 @@
 <?xml-model href="http://www.oxygenxml.com/docbook/xml/5.0/rng/dbmathmlsvg.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude">
     <title>Rambam on Astronomical Calendar</title>
+
+    <acknowledgements>
+        <para>
+            Mordechai Goldin - for providing offics space and computer equipment when I, as a Yeshiva student, had neither.
+        </para>
+        <para>
+            Ilia Pomansky - for encouraging this work at the early stages, in 1991.             
+        </para>
+        <para>
+            My wife Nina - for listening to my wild ideas, patience, and helping with math. 
+        </para>
+        <para>
+            Dr. Michael Partensky - for encouragement and advise.
+        </para>
+        <para>
+            Peter Offman - for asking questions that prodded me into action in 2011, after years of hiatus.
+        </para>
+        <para>
+            Aron Matskin - for a discussion on his visit with us on Rosh Chodesh Mar Cheshvan 5772.
+        </para>
+        
+    </acknowledgements>
+
     <section>
         <title>Lunar Theory</title>
         <section>
             <title>Chapter 14</title>
             <section>
                 <title>Law 1: Two Movements of the Moon</title>
+
                 <para>The moon has two mean movements. The moon itself rotates on a small circle
                     that does not surround all of the Earth. Moon's movement on that small circle is
                     called <glossterm>mean lunar anomaly</glossterm> (אמצע המסלול). The small circle
@@ -19,6 +43,7 @@
 
             <section>
                 <title>Law 2: Movement in the Mean Lunar Longitude</title>
+
                 <para>
                     Movement in mean lunar longitude in one day is 13°10′35″
                     <footnote><para>This is part of Law 1.</para></footnote>.
@@ -32,42 +57,45 @@
                     And in this way you can calculate it for any number of days and years that you want.
                 </para>
 
-                <para role="notes">
-                    Rambam uses ‘nimzes’ instead of ‘nimzo’ for 10000 days. Also, Rambam says
-                    "'ordered' year"; it was rendered as 254 in accordance with see Law 12:1.
-                </para>
-                <para role="notes"> It is not clear how Rambam arrived the values he gives. When
-                    value of the movement in one day given by Rambam is multiplied by 29, 100 etc.,
-                    the result is smaller than that of Rambam.
-                    The following table compares printed and calculated values:</para>
+                <section>
+                    <title>Discussion</title>
+                    <para>
+                        Rambam uses ‘nimzes’ instead of ‘nimzo’ for 10000 days. Also, Rambam says
+                        "'ordered' year"; it was rendered as 254 in accordance with see Law 12:1.
+                    </para>
+                    <para> It is not clear how Rambam arrived the values he gives. When
+                        value of the movement in one day given by Rambam is multiplied by 29, 100 etc.,
+                        the result is smaller than that of Rambam.
+                        The following table compares printed and calculated values:</para>
 
-                <xi:include href="../../target/tables/mml-calculated.xml"/>
+                    <xi:include href="../../target/tables/mml-calculated.xml"/>
 
-                <para role="notes">
-                    Moreover, the value of the movement of the mean lunar longitude in one day given by
-                    <biblioref linkend="Almagest"/> IV 3 (H278)
-                    (which, rounded to seconds, becomes Rambam's value) is even smaller, so Rambam's
-                    numbers can not be explained by performing calculations with the long value from
-                    Almagest and then rounding the results.
-                </para>
+                    <para>
+                        Moreover, the value of the movement of the mean lunar longitude in one day given by
+                        <biblioref linkend="Almagest"/> IV 3 (H278)
+                        (which, rounded to seconds, becomes Rambam's value) is even smaller, so Rambam's
+                        numbers can not be explained by performing calculations with the long value from
+                        Almagest and then rounding the results.
+                    </para>
 
-                <para role="notes">
-                    From the printed values it is possible to reconstruct the value of the
-                    movement in mean lunar longitude in one day that Rambam used to calculate each of them:</para>
+                    <para>
+                        From the printed values it is possible to reconstruct the value of the
+                        movement in mean lunar longitude in one day that Rambam used to calculate each of them:</para>
 
-                <xi:include href="../../target/tables/mml-reconstructed.xml"/>
+                    <xi:include href="../../target/tables/mml-reconstructed.xml"/>
 
-                <para role="notes">
-                    Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
-                </para>
+                    <para>
+                        Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
+                    </para>
                 
-                <xi:include href="../../target/tables/mml-recalculated.xml"/>
+                    <xi:include href="../../target/tables/mml-recalculated.xml"/>
 
-                <para>
-                    Values of the movement in one day apparently used by Rambam, if rounded to the seconds, all give the "official" Rambam's value.
-                    Values calculated from the value reconstructed from the printed 10000 days movement, if rounded, produce the values Rambam published -
-                    except for 354 days movement, which remains unexplained TODO!
-                </para>
+                    <para>
+                        Values of the movement in one day apparently used by Rambam, if rounded to the seconds, all give the "official" Rambam's value.
+                        Values calculated from the value reconstructed from the printed 10000 days movement, if rounded, produce the values Rambam published -
+                        except for 354 days movement, which remains unexplained TODO!
+                    </para>
+                </section>
             </section>
 
             <section>
@@ -81,54 +109,58 @@
 
                 <xi:include href="../../target/tables/mma-original.xml"/>
 
-                <para role="notes">
-                    Rambam says "'ordered' year"; it was rendered as 254 in accordance with see Law 12:1.
-                    Also, this value is actually given in Law 4.
-                </para>
+                <section>
+                    <title>Discussion</title>
+                    <para>
+                        Rambam says "'ordered' year"; it was rendered as 254 in accordance with see Law 12:1.
+                        Also, this value is actually given in Law 4.
+                    </para>
 
-                <para role="notes">
-                    It is not clear how Rambam obtained the values he gives.
-                    When value of the movement in one day given by Rambam is
-                    multiplied by 29, 100 etc., the result is bigger than what Rambam says!
-                    The following table compares printed and calculated values:
-                </para>
+                    <para>
+                        It is not clear how Rambam obtained the values he gives.
+                        When value of the movement in one day given by Rambam is
+                        multiplied by 29, 100 etc., the result is bigger than what Rambam says!
+                        The following table compares printed and calculated values:
+                    </para>
                 
-                <xi:include href="../../target/tables/mma-calculated.xml"/>
+                    <xi:include href="../../target/tables/mma-calculated.xml"/>
 
-                <para role="notes">
-                    Although the value of the movement of the mean lunar anomaly in one day given by
-                    <biblioref linkend="Almagest"/> IV 3 (H278)
-                    (which, rounded to seconds, becomes Rambam's value) is smaller, it is not small enough,
-                    and Rambam's
-                    numbers can not be explained by performing calculations with the long value from
-                    Almagest and then rounding the results (TODO: table).
-                </para>
+                    <para>
+                        Although the value of the movement of the mean lunar anomaly in one day given by
+                        <biblioref linkend="Almagest"/> IV 3 (H278)
+                        (which, rounded to seconds, becomes Rambam's value) is smaller, it is not small enough,
+                        and Rambam's
+                        numbers can not be explained by performing calculations with the long value from
+                        Almagest and then rounding the results (TODO: table).
+                    </para>
 
-                <para role="notes">
-                    From the printed values it is possible to reconstruct the value of the
-                    movement in mean lunar anomaly in one day that Rambam used to calculate each of them:</para>
+                    <para>
+                        From the printed values it is possible to reconstruct the value of the
+                        movement in mean lunar anomaly in one day that Rambam used to calculate each of them:</para>
                 
-                <xi:include href="../../target/tables/mma-reconstructed.xml"/>
+                    <xi:include href="../../target/tables/mma-reconstructed.xml"/>
                 
-                <para role="notes">
-                    Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
-                </para>
+                    <para>
+                        Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
+                    </para>
                 
-                <xi:include href="../../target/tables/mma-recalculated.xml"/>
+                    <xi:include href="../../target/tables/mma-recalculated.xml"/>
+
+                    <para>
+                        Values of the movement in one day apparently used by Rambam, if rounded to the seconds, all give the "official" Rambam's value.
+                        Values calculated from the value reconstructed from the printed 10000 days movement, if rounded, produce the values Rambam published -
+                        except for 354 days movement, which remains unexplained TODO!
+                    </para>
                 
-                <para>
-                    Values of the movement in one day apparently used by Rambam, if rounded to the seconds, all give the "official" Rambam's value.
-                    Values calculated from the value reconstructed from the printed 10000 days movement, if rounded, produce the values Rambam published -
-                    except for 354 days movement, which remains unexplained TODO!
-                </para>
-                
-                <para>
-                    Here, everything is worse than in 14:2 TODO!!!
-                </para>
+                    <para>
+                        Here, everything is worse than in 14:2 TODO!!!
+                    </para>
+                </section>
             </section>
 
             <section>
                 <title>Law 4: Position of the Moon on the Epoch</title>
+
                 <para>
                     In the beginning of the night to Thursday that is the epoch [TODO: link to definition]
                     for these calculations, mean lunar longitude was 1°14′43″ into the constellation of Ram.
@@ -138,14 +170,17 @@
                     way as you did for the mean solar longitude. TODO: reference
                 </para>
             </section>
+
             <section>
                 <title>Law 5,6: Mean Lunar Longitude at Observation Time</title>
+
                 <para> After you calculate mean lunar longitude at the
                     beginning of the night that you want, contemplate the sun (TODO: longitude?) and figure out which
                     constellation (zodiac) is it in <footnote><para>This is part of Law 4.</para></footnote>.
                     [This is the correction of the mean lunar longitude depending on
                     the mean solar longitude:]
                 </para>
+
                 <informaltable frame="all">
                     <tgroup cols="4">
                         <thead>
@@ -210,9 +245,11 @@
                         </tbody>
                     </tgroup>
                 </informaltable>
-                <para role="notes">
+
+                <para>
                     TODO: Compare with 11:9, about Dli... Something is off!
                 </para>
+
                 <para>
                     The value of mean [lunar longitude]
                     after you add to it or subtract from it or leave it as 
@@ -226,8 +263,10 @@
 
         <section>
             <title>Chapter 15</title>
+
             <section>
                 <title>Law 1: Doubled Distance</title>
+
                 <para>
                     To find true lunar longitude (הירח האמיתי) on a specific day:
                     First, calculate mean lunar longitude during observation time of the desired night.
@@ -236,8 +275,10 @@
                     This value is called <glossterm>doubled distance</glossterm> (מרחק הכפול).
                 </para>
             </section>
+
             <section>
                 <title>Law 2,3: Corrected Mean Anomaly (Elongation (TODO: ?))</title>
+
                 <para>
                     We already stipulated that all the calculations in these chapters are for one purpose only:
                     to know if the moon is visible. And it is not possible for this double distance during the night of
@@ -302,33 +343,36 @@
                     </tgroup>
                 </informaltable>
 
-                <para role="notes">
-                    Rambam does not describe the model behind this correction. 
-                    Because the models Rambam did describe until now are the same
-                    as Almagest's models
-                    (including numerical parameters), and because this correction
-                    is determined by the (doubled)
-                    sun-moon elongation, just like Almagest's "improved" model of
-                    the moon ("the crank"),
-                    I assume that that model was used to calculate this correction.
-                    TODO: describe the model!
-                </para>
-                <para role="notes">
-                    TODO: Derive the formula! Make the diagram!
-                    TODO: How come the fact that sun and moon move in different
-                    plains does not affect this calculation?
-                </para>
-                <para role="notes">
-                    It seems that Rambam treats "the crank" as just a calculation
-                    device - otherwise,
-                    table giving visible anomaly from the corrected anomaly should
-                    take into account changes in the
-                    earth-moon distance depending on the elongation - and it does not!
-                    Maybe that is why he does not describe the model behind this correction.
-                    And maybe this is why Rambam reiterates - in Law 2 - that only the observability of the new moon
-                    needs to be calculated correctly.
-                    TODO: How does Almagest calculate visible anomaly?
-                </para>
+                <section>
+                    <title>Discussion</title>
+                    <para>
+                        Rambam does not describe the model behind this correction. 
+                        Because the models Rambam did describe until now are the same
+                        as Almagest's models
+                        (including numerical parameters), and because this correction
+                        is determined by the (doubled)
+                        sun-moon elongation, just like Almagest's "improved" model of
+                        the moon ("the crank"),
+                        I assume that that model was used to calculate this correction.
+                        TODO: describe the model!
+                    </para>
+                    <para>
+                        TODO: Derive the formula! Make the diagram!
+                        TODO: How come the fact that sun and moon move in different
+                        plains does not affect this calculation?
+                    </para>
+                    <para>
+                        It seems that Rambam treats "the crank" as just a calculation
+                        device - otherwise,
+                        table giving visible anomaly from the corrected anomaly should
+                        take into account changes in the
+                        earth-moon distance depending on the elongation - and it does not!
+                        Maybe that is why he does not describe the model behind this correction.
+                        And maybe this is why Rambam reiterates - in Law 2 - that only the observability of the new moon
+                        needs to be calculated correctly.
+                        TODO: How does Almagest calculate visible anomaly?
+                    </para>
+                </section>
             </section>
 
             <section>
@@ -341,9 +385,7 @@
                     to the mean lunar longitude the observation time. And mean lunar longitude after
                     you add to it or subtract from it is the 
                     <glossterm>true lunar longitude at the observation time</glossterm>.
-                    <footnote>
-                        <para>This is Law 4.</para>
-                    </footnote>
+                    <footnote><para>This is Law 4.</para></footnote>
                 </para>
 
                 <para xml:id="l15-5">
@@ -357,302 +399,228 @@
                     anomaly for a given value of the corrected anomaly?
                 </para>
 
-                <informaltable frame="all">
-                    <tgroup cols="2">
-                        <thead>
-                            <row>
-                                <entry>corrected anomaly</entry>
-                                <entry>visible anomaly</entry>
-                            </row>
-                        </thead>
-                        <tbody>
-                            <row>
-                                <entry>10°</entry>
-                                <entry>50′</entry>
-                            </row>
-                            <row>
-                                <entry>20°</entry>
-                                <entry>1°38′</entry>
-                            </row>
-                            <row>
-                                <entry>30°</entry>
-                                <entry>2°24′</entry>
-                            </row>
-                            <row>
-                                <entry>40°</entry>
-                                <entry>3°6′</entry>
-                            </row>
-                            <row>
-                                <entry>50°</entry>
-                                <entry>3°44′</entry>
-                            </row>
-                            <row>
-                                <entry>60°</entry>
-                                <entry>4°16′</entry>
-                            </row>
-                            <row>
-                                <entry>70°</entry>
-                                <entry>4°41′</entry>
-                            </row>
-                            <row>
-                                <entry>80°</entry>
-                                <entry>5°0′</entry>
-                            </row>
-                            <row>
-                                <entry>90°</entry>
-                                <entry>5°5′</entry>
-                            </row>
-                            <row>
-                                <entry>100°</entry>
-                                <entry>5°8′</entry>
-                            </row>
-                            <row>
-                                <entry>110°</entry>
-                                <entry>4°59′</entry>
-                            </row>
-                            <row>
-                                <entry>120°</entry>
-                                <entry>4°20′</entry>
-                            </row>
-                            <row>
-                                <entry>130°</entry>
-                                <entry>4°14′</entry>
-                            </row>
-                            <row>
-                                <entry>140°</entry>
-                                <entry>3°33′</entry>
-                            </row>
-                            <row>
-                                <entry>150°</entry>
-                                <entry>3°48′</entry>
-                            </row>
-                            <row>
-                                <entry>160°</entry>
-                                <entry>1°56′</entry>
-                            </row>
-                            <row>
-                                <entry>170°</entry>
-                                <entry>1°59′</entry>
-                            </row>
-                        </tbody>
-                    </tgroup>
-                </informaltable>
+                <xi:include href="../../target/tables/mva-original.xml"/>
 
-                <para role="notes"> Formulae: R - radius of the big circle; r - radius of the small
-                    circle; e = R/r. A little trigonometry, and we get: visible anomaly =
-                    arctg(sin(corrected anomaly)/(cos(corrected anomaly) + e)) and: e = ctg(visible
-                    anomaly)*sin(corrected anomaly) - cos(corrected anomaly) </para>
+                <section>
+                    <title>Discussion</title>
+                    <para> Formulae: R - radius of the big circle; r - radius of the small
+                        circle; e = R/r. A little trigonometry, and we get: visible anomaly =
+                        arctg(sin(corrected anomaly)/(cos(corrected anomaly) + e)) and: e = ctg(visible
+                        anomaly)*sin(corrected anomaly) - cos(corrected anomaly) </para>
                 
-                <para role="notes">TODO: Make the diagram! Here?</para>
+                    <para>TODO: Make the diagram! Here?</para>
 
-                <para role="notes">
-                    It is clear that values for 150° and 170° are misprinted: they are bigger than the one before them
-                    when they should be smaller. Value for 120° is also misprinted, but it is less obvious.
-                </para>
+                    <para>
+                        It is clear that values for 150° and 170° are misprinted: they are bigger than the one before them
+                        when they should be smaller. Value for 120° is also misprinted, but it is less obvious.
+                    </para>
                 
-                <para role="notes">
-                    Calculations show that for the precision up to a minute,
-                    it is sufficient to know e to up to the second
-                    digit after the dot.
-                    Below, a column giving the value of e was added to the table.
-                    Look at the value of e, and the misprints become obvious:
-                    value of e for them is way out of range it is in
-                    for the rest of them.
-                </para>
+                    <para>
+                        Calculations show that for the precision up to a minute,
+                        it is sufficient to know e to up to the second
+                        digit after the dot.
+                        Below, a column giving the value of e was added to the table.
+                        Look at the value of e, and the misprints become obvious:
+                        value of e for them is way out of range it is in
+                        for the rest of them.
+                    </para>
 
-                <informaltable frame="all">
-                    <tgroup cols="3">
-                        <thead>
-                            <row>
-                                <entry>corrected anomaly</entry>
-                                <entry>visible anomaly</entry>
-                                <entry>e</entry>
-                            </row>
-                        </thead>
-                        <tbody>
-                            <row>
-                                <entry>10°</entry>
-                                <entry>50′</entry>
-                                <entry>10.95</entry>
-                            </row>
-                            <row>
-                                <entry>20°</entry>
-                                <entry>1°38′</entry>
-                                <entry>11.05</entry>
-                            </row>
-                            <row>
-                                <entry>30°</entry>
-                                <entry>2°24′</entry>
-                                <entry>11.06</entry>
-                            </row>
-                            <row>
-                                <entry>40°</entry>
-                                <entry>3°6′</entry>
-                                <entry>11.1</entry>
-                            </row>
-                            <row>
-                                <entry>50°</entry>
-                                <entry>3°44′</entry>
-                                <entry>11.1</entry>
-                            </row>
-                            <row>
-                                <entry>60°</entry>
-                                <entry>4°16′</entry>
-                                <entry>11.11</entry>
-                            </row>
-                            <row>
-                                <entry>70°</entry>
-                                <entry>4°41′</entry>
-                                <entry>11.13</entry>
-                            </row>
-                            <row>
-                                <entry>80°</entry>
-                                <entry>5°0′</entry>
-                                <entry>11.08</entry>
-                            </row>
-                            <row>
-                                <entry>90°</entry>
-                                <entry>5°5′</entry>
-                                <entry>11.24</entry>
-                            </row>
-                            <row>
-                                <entry>100°</entry>
-                                <entry>5°8′</entry>
-                                <entry>11.14</entry>
-                            </row>
-                            <row>
-                                <entry>110°</entry>
-                                <entry>4°59′</entry>
-                                <entry>11.12</entry>
-                            </row>
-                            <row>
-                                <entry>120°</entry>
-                                <entry>4°20′</entry>
-                                <entry>11.93</entry>
-                            </row>
-                            <row>
-                                <entry>130°</entry>
-                                <entry>4°14′</entry>
-                                <entry>10.99</entry>
-                            </row>
-                            <row>
-                                <entry>140°</entry>
-                                <entry>3°33′</entry>
-                                <entry>11.13</entry>
-                            </row>
-                            <row>
-                                <entry>150°</entry>
-                                <entry>3°48′</entry>
-                                <entry>8.39</entry>
-                            </row>
-                            <row>
-                                <entry>160°</entry>
-                                <entry>1°56′</entry>
-                                <entry>11.07</entry>
-                            </row>
-                            <row>
-                                <entry>170°</entry>
-                                <entry>1°59′</entry>
-                                <entry>6.0</entry>
-                            </row>
-                        </tbody>
-                    </tgroup>
-                </informaltable>
+                    <informaltable frame="all">
+                        <tgroup cols="3">
+                            <thead>
+                                <row>
+                                    <entry>corrected anomaly</entry>
+                                    <entry>visible anomaly</entry>
+                                    <entry>e</entry>
+                                </row>
+                            </thead>
+                            <tbody>
+                                <row>
+                                    <entry>10°</entry>
+                                    <entry>50′</entry>
+                                    <entry>10.95</entry>
+                                </row>
+                                <row>
+                                    <entry>20°</entry>
+                                    <entry>1°38′</entry>
+                                    <entry>11.05</entry>
+                                </row>
+                                <row>
+                                    <entry>30°</entry>
+                                    <entry>2°24′</entry>
+                                    <entry>11.06</entry>
+                                </row>
+                                <row>
+                                    <entry>40°</entry>
+                                    <entry>3°6′</entry>
+                                    <entry>11.1</entry>
+                                </row>
+                                <row>
+                                    <entry>50°</entry>
+                                    <entry>3°44′</entry>
+                                    <entry>11.1</entry>
+                                </row>
+                                <row>
+                                    <entry>60°</entry>
+                                    <entry>4°16′</entry>
+                                    <entry>11.11</entry>
+                                </row>
+                                <row>
+                                    <entry>70°</entry>
+                                    <entry>4°41′</entry>
+                                    <entry>11.13</entry>
+                                </row>
+                                <row>
+                                    <entry>80°</entry>
+                                    <entry>5°0′</entry>
+                                    <entry>11.08</entry>
+                                </row>
+                                <row>
+                                    <entry>90°</entry>
+                                    <entry>5°5′</entry>
+                                    <entry>11.24</entry>
+                                </row>
+                                <row>
+                                    <entry>100°</entry>
+                                    <entry>5°8′</entry>
+                                    <entry>11.14</entry>
+                                </row>
+                                <row>
+                                    <entry>110°</entry>
+                                    <entry>4°59′</entry>
+                                    <entry>11.12</entry>
+                                </row>
+                                <row>
+                                    <entry>120°</entry>
+                                    <entry>4°20′</entry>
+                                    <entry>11.93</entry>
+                                </row>
+                                <row>
+                                    <entry>130°</entry>
+                                    <entry>4°14′</entry>
+                                    <entry>10.99</entry>
+                                </row>
+                                <row>
+                                    <entry>140°</entry>
+                                    <entry>3°33′</entry>
+                                    <entry>11.13</entry>
+                                </row>
+                                <row>
+                                    <entry>150°</entry>
+                                    <entry>3°48′</entry>
+                                    <entry>8.39</entry>
+                                </row>
+                                <row>
+                                    <entry>160°</entry>
+                                    <entry>1°56′</entry>
+                                    <entry>11.07</entry>
+                                </row>
+                                <row>
+                                    <entry>170°</entry>
+                                    <entry>1°59′</entry>
+                                    <entry>6.0</entry>
+                                </row>
+                            </tbody>
+                        </tgroup>
+                    </informaltable>
 
-                <para role="notes">
-                    TODO Range of e - graph. Range of possible values for each based on the range of e.
-                    This is transcription error: one letter; extra word... Probable correct values.
-                </para>
+                    <xi:include href="../../target/tables/mva-withe.xml"/>
+                    
+                    <para>
+                        TODO Range of e - graph. Range of possible values for each based on the range of e.
+                        This is transcription error: one letter; extra word... Probable correct values.
+                    </para>
 
-                <para role="notes">
-                    This is how different sources treat the often misprinted values:
-                </para>
+                    <para>
+                        This is how different sources treat the often misprinted values:
+                    </para>
                 
-                <informaltable frame="all">
-                    <tgroup cols="4">
-                        <thead>
-                            <row>
-                                <entry>Edition</entry>
-                                <entry>120°</entry>
-                                <entry>150°</entry>
-                                <entry>170°</entry>
-                            </row>
-                        </thead>
-                        <tbody>
-                            <row>
-                                <entry><biblioref linkend="Vilno"/></entry>
-                                <entry>incorrect</entry>
-                                <entry>incorrect</entry>
-                                <entry>incorrect</entry>
-                            </row>
-                            <row>
-                                <entry><biblioref linkend="Eshkol"/></entry>
-                                <entry>incorrect</entry>
-                                <entry>incorrect</entry>
-                                <entry>incorrect</entry>
-                            </row>
-                            <row>
-                                <entry><biblioref linkend="LaAm"/></entry>
-                                <entry>corrected in the notes</entry>
-                                <entry>incorrect</entry>
-                                <entry>incorrect</entry>
-                            </row>
-                            <row>
-                                <entry><biblioref linkend="Kapach"/>
-                                    <footnote>
-                                        <para>
-                                            It is not clear how did authoritative Yemenite texts acquire the same misprints
-                                            as in the ashkenazic editions.
-                                        </para>
-                                    </footnote>
-                                </entry>
-                                <entry>incorrect</entry>
-                                <entry>corrected in the notes</entry>
-                                <entry>corrected in the notes</entry>
-                            </row>
-                            <row>
-                                <entry><biblioref linkend="Bluming"/></entry>
-                                <entry>incorrect</entry>
-                                <entry>corrected in the notes</entry>
-                                <entry>corrected in the notes</entry>
-                            </row>
-                            <row>
-                                <entry><biblioref linkend="Frenkel"/></entry>
-                                <entry>correct and noted</entry>
-                                <entry>correct and noted</entry>
-                                <entry>correct and noted</entry>
-                            </row>
-                            <row>
-                                <entry><biblioref linkend="Keller"/></entry>
-                                <entry>not given</entry>
-                                <entry>not given</entry>
-                                <entry>not given</entry>
-                            </row>
-                            <row>
-                                <entry><biblioref linkend="Losh"/>
-                                    <footnote>
-                                        <para>
-                                            Reprints the text and does not correct any of the misprints - surpising for a textbook
-                                            on the subject (even introductory).
-                                            TODO: Link to the scans of the appropriate pages - with the stuff highlighted.
-                                        </para>
-                                    </footnote>
-                                </entry>
-                                <entry>incorrect</entry>
-                                <entry>incorrect</entry>
-                                <entry>incorrect</entry>
-                            </row>
-                        </tbody>
-                    </tgroup>
-                </informaltable>
+                    <informaltable frame="all">
+                        <tgroup cols="4">
+                            <thead>
+                                <row>
+                                    <entry>Edition</entry>
+                                    <entry>120°</entry>
+                                    <entry>150°</entry>
+                                    <entry>170°</entry>
+                                </row>
+                            </thead>
+                            <tbody>
+                                <row>
+                                    <entry><biblioref linkend="Vilno"/></entry>
+                                    <entry>incorrect</entry>
+                                    <entry>incorrect</entry>
+                                    <entry>incorrect</entry>
+                                </row>
+                                <row>
+                                    <entry><biblioref linkend="Eshkol"/></entry>
+                                    <entry>incorrect</entry>
+                                    <entry>incorrect</entry>
+                                    <entry>incorrect</entry>
+                                </row>
+                                <row>
+                                    <entry><biblioref linkend="LaAm"/></entry>
+                                    <entry>corrected in the notes</entry>
+                                    <entry>incorrect</entry>
+                                    <entry>incorrect</entry>
+                                </row>
+                                <row>
+                                    <entry><biblioref linkend="Kapach"/>
+                                        <footnote>
+                                            <para>
+                                                It is not clear how did authoritative Yemenite texts acquire the same misprints
+                                                as in the ashkenazic editions.
+                                            </para>
+                                        </footnote>
+                                    </entry>
+                                    <entry>incorrect</entry>
+                                    <entry>corrected in the notes</entry>
+                                    <entry>corrected in the notes</entry>
+                                </row>
+                                <row>
+                                    <entry><biblioref linkend="Bluming"/></entry>
+                                    <entry>incorrect</entry>
+                                    <entry>corrected in the notes</entry>
+                                    <entry>corrected in the notes</entry>
+                                </row>
+                                <row>
+                                    <entry><biblioref linkend="Frenkel"/></entry>
+                                    <entry>correct and noted</entry>
+                                    <entry>correct and noted</entry>
+                                    <entry>correct and noted</entry>
+                                </row>
+                                <row>
+                                    <entry><biblioref linkend="Keller"/></entry>
+                                    <entry>not given</entry>
+                                    <entry>not given</entry>
+                                    <entry>not given</entry>
+                                </row>
+                                <row>
+                                    <entry><biblioref linkend="Losh"/>
+                                        <footnote>
+                                            <para>
+                                                Reprints the text and does not correct any of the misprints - surpising for a textbook
+                                                on the subject (even introductory).
+                                                TODO: Link to the scans of the appropriate pages - with the stuff highlighted.
+                                            </para>
+                                        </footnote>
+                                    </entry>
+                                    <entry>incorrect</entry>
+                                    <entry>incorrect</entry>
+                                    <entry>incorrect</entry>
+                                </row>
+                            </tbody>
+                        </tgroup>
+                    </informaltable>
+                </section>                    
             </section>
+
             <section>
                 <title>Law 7,8,9:</title>
                 <para>
                     TODO!!!
                 </para>
             </section>
-                
         </section>
     </section>
 
