@@ -21,8 +21,6 @@ object TablesData {
 
     type Days = Int
 
-    val Order = List[Days](1, 10, 100, 1000, 10000, 29, 354)
-
 
 //    val exact = Angle(13,10,35,1,48,1)
 //    val exactInDegrees = 13.176397222222223
@@ -35,6 +33,18 @@ object TablesData {
         10000 -> Angle(3, 58, 20),
         29    -> Angle(22, 6, 56),
         354   -> Angle(344, 26, 43)
+    )
+
+
+    val MoonLongitudeCorrection = List[(String, Angle, Angle)](
+        ("middle of Taurus"        , Angle( 15), Angle(0)),
+        ("beginning of Gemini"     , Angle( 30), Angle(0, 15)),
+        ("beginning of Leo"        , Angle( 90), Angle(0, 15)),
+        ("middle of Virgo"         , Angle(135), Angle(0, 15)),
+        ("middle of Libra"         , Angle(165), Angle(0)),
+        ("beginning of Sagittarius", Angle(210), Angle(0, -15)),
+        ("beginning of Aquarius"   , Angle(270), Angle(0, -30)),
+        ("middle of Pisces"        , Angle(315), Angle(0, -15))
     )
 
 
@@ -52,22 +62,22 @@ object TablesData {
 
 
     val MoonVisibleAnomaly = List[(Angle, Angle)](
-        (Angle(10), Angle(0, 50)),
-        (Angle(20), Angle(1,38)),
-        (Angle(30), Angle(2,24)),
-        (Angle(40), Angle(3,6)),
-        (Angle(50), Angle(3,44)),
-        (Angle(60), Angle(4,16)),
-        (Angle(70), Angle(4,41)),
-        (Angle(80), Angle(5,0)),
-        (Angle(90), Angle(5,5)),
-        (Angle(100), Angle(5,8)),
-        (Angle(110), Angle(4,59)),
-        (Angle(120), Angle(4,20)),
-        (Angle(130), Angle(4,14)),
-        (Angle(140), Angle(3,33)),
-        (Angle(150), Angle(3,48)),
-        (Angle(160), Angle(1,56)),
-        (Angle(170), Angle(1,59))
+        Angle(10) -> Angle(0,50),
+        Angle(20) -> Angle(1,38),
+        Angle(30) -> Angle(2,24),
+        Angle(40) -> Angle(3,6),
+        Angle(50) -> Angle(3,44),
+        Angle(60) -> Angle(4,16),
+        Angle(70) -> Angle(4,41),
+        Angle(80) -> Angle(5,0),
+        Angle(90) -> Angle(5,5),
+        Angle(100) -> Angle(5,8),
+        Angle(110) -> Angle(4,59),
+        Angle(120) -> Angle(4,20),
+        Angle(130) -> Angle(4,14),
+        Angle(140) -> Angle(3,33),
+        Angle(150) -> Angle(3,48),
+        Angle(160) -> Angle(1,56),
+        Angle(170) -> Angle(1,59)
     )
 }

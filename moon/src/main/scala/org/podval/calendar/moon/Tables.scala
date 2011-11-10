@@ -16,6 +16,9 @@
 
 package org.podval.calendar.moon
 
+import scala.math.{sin, cos, tan, round}
+
+
 import java.io.File
 
 
@@ -41,11 +44,22 @@ object Tables {
 
 
     private def mvaTables(data: Map[Angle, Angle]) = {
-        val cma = new Column("corrected anomaly", "cma", (a: Angle) => a)
-        val vma = new Column("visible anomaly", "vma", (a: Angle) => data(a))
+        def e(a: Angle, v: Angle) = {
+            val ar = a.toRadians
+            val vr = v.toRadians
+
+            val e = 1/tan(vr)*sin(ar)-cos(ar)
+
+            round(e*100)/100.0
+        }
+
+        val mca = new Column("corrected anomaly", "mca", (a: Angle) => a)
+        val mva = new Column("visible anomaly", "mva", (a: Angle) => data(a))
+        val calculatee = new Column("e", "", (a: Angle) => e(a, data(a)))
 
         List(
-            new PreTable("original", cma, vma)
+            new PreTable("original", mca, mva),
+            new PreTable("withe", mca, mva, calculatee)
         )
     }
     
