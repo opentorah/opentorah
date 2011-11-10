@@ -19,7 +19,7 @@ package org.podval.calendar.moon
 import java.io.File
 
 
-object DayTables {
+object Tables {
 
     private def dayTables(data: Map[Int, Angle]) = {
         def exactify(days: Int) = Angle.exactify(data(1), days, data(days))
@@ -40,13 +40,24 @@ object DayTables {
     }
 
 
+    private def mvaTables(data: Map[Angle, Angle]) = {
+        val cma = new Column("corrected anomaly", "cma", (a: Angle) => a)
+        val vma = new Column("visible anomaly", "vma", (a: Angle) => data(a))
+
+        List(
+            new PreTable("original", cma, vma)
+        )
+    }
+    
+
     private def tables[A,B](name: String, dataList: List[(A, B)], f: (Map[A, B]) => List[PreTable[A]]) =
         f(Map(dataList: _*)) map (_.toTable(name, dataList map (_._1)))
 
 
     private def allTables = 
-        tables("mml", DayTablesData.moonMeanLongitude, dayTables) ++
-        tables("mma", DayTablesData.moonMeanAnomaly, dayTables)
+        tables("mml", TablesData.MoonMeanLongitude, dayTables) ++
+        tables("mma", TablesData.MoonMeanAnomaly, dayTables) ++
+        tables("mva", TablesData.MoonVisibleAnomaly, mvaTables)
 
 
     def main(args: Array[String]) {

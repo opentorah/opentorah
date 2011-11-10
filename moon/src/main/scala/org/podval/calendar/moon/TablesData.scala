@@ -17,7 +17,7 @@
 package org.podval.calendar.moon
 
 
-object DayTablesData {
+object TablesData {
 
     type Days = Int
 
@@ -27,7 +27,7 @@ object DayTablesData {
 //    val exact = Angle(13,10,35,1,48,1)
 //    val exactInDegrees = 13.176397222222223
 //    val Almagest = Angle(13,10,34,58,33,30,30)
-    val moonMeanLongitude = List[(Days, Angle)](
+    val MoonMeanLongitude = List[(Days, Angle)](
         1     -> Angle(13,10,35),
         10    -> Angle(131, 45, 50),
         100   -> Angle(237, 38, 23),
@@ -40,7 +40,7 @@ object DayTablesData {
 
 //    val RambamExact = Angle(13,3,53,55,49)
 //    val Almagest = Angle(13,3,53,56,17,51,59)
-    val moonMeanAnomaly = List[(Days, Angle)](
+    val MoonMeanAnomaly = List[(Days, Angle)](
         1     -> Angle(13,3,54),
         10    -> Angle(130, 39, 0),
         100   -> Angle(226, 29, 53),
@@ -48,5 +48,26 @@ object DayTablesData {
         10000 -> Angle(329, 48, 20),
         29    -> Angle(18, 53, 4),
         354   -> Angle(305, 0, 13)
+    )
+
+
+    val MoonVisibleAnomaly = List[(Angle, Angle)](
+        (Angle(10), Angle(0, 50)),
+        (Angle(20), Angle(1,38)),
+        (Angle(30), Angle(2,24)),
+        (Angle(40), Angle(3,6)),
+        (Angle(50), Angle(3,44)),
+        (Angle(60), Angle(4,16)),
+        (Angle(70), Angle(4,41)),
+        (Angle(80), Angle(5,0)),
+        (Angle(90), Angle(5,5)),
+        (Angle(100), Angle(5,8)),
+        (Angle(110), Angle(4,59)),
+        (Angle(120), Angle(4,20)),
+        (Angle(130), Angle(4,14)),
+        (Angle(140), Angle(3,33)),
+        (Angle(150), Angle(3,48)),
+        (Angle(160), Angle(1,56)),
+        (Angle(170), Angle(1,59))
     )
 }
