@@ -1,19 +1,7 @@
 package org.podval.calendar.dates;
 
-import java.util.LinkedList;
-import java.util.List;
-
 
 public final class GregorianCalendar {
-//
-//    private static final GregorianCalendar INSTANCE = new GregorianCalendar();
-//
-//
-//    public static GregorianCalendar getInstance() {
-//        return INSTANCE;
-//    }
-//
-//
 //    public GregorianCalendar() {
 //        addMonth(new Month<GregorianMonth>(GregorianMonth.January, "January", 31));
 //
@@ -33,17 +21,6 @@ public final class GregorianCalendar {
 //    }
 //
 //
-//    private void addMonth(final Month<GregorianMonth> month) {
-//        normalMonths.add(month);
-//        leapMonths.add(month);
-//    }
-//
-//
-//    private final List<Month<GregorianMonth>> normalMonths = new LinkedList<Month<GregorianMonth>>();
-//
-//
-//    private final List<Month<GregorianMonth>> leapMonths = new LinkedList<Month<GregorianMonth>>();
-//
 //
 //    @Override
 //    public int epoch() {
@@ -58,18 +35,6 @@ public final class GregorianCalendar {
 //    }
 //
 //
-//    @Override
-//    public List<Month<GregorianMonth>> getMonths(final int year) {
-//        return (isLeap(year)) ? leapMonths : normalMonths;
-//    }
-//
-//
-//    @Override
-//    public List<Month<GregorianMonth>> getMonthsSimple(final int year) {
-//        return getMonths(year);
-//    }
-//
-//
 //    public boolean isLeap(final int year) {
 //        return (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0));
 //    }
@@ -78,11 +43,5 @@ public final class GregorianCalendar {
 //    @Override
 //    protected void monthNotFound(final int year, final GregorianMonth monthName) {
 //        throw new Error("?");
-//    }
-//
-//
-//    @Override
-//    protected final GregorianDate createDate(final int days, final int year, final Month<GregorianMonth> month, final int day) {
-//        return new GregorianDate(days, year, month, day);
 //    }
 }

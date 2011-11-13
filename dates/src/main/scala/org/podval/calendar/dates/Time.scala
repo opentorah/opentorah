@@ -17,90 +17,67 @@
 package org.podval.calendar.dates
 
 
-final class Time(
-    val days: Int,
-    val hours: Int,
-    val parts: Int)
-{
-    require(0 <= days)
-    require(0 <= hours && hours < 24)
-    require(0 <= parts && parts < 1080)
+final class Time(val hours: Int, val parts: Int) {
 
-
-    def minutes: Int = parts / 18
-
-
-    def partsOfMinute = parts % 18
-
-
-    def day = if ((hours == 0) && (parts == 0)) days else days+1
-
-
-    def dayOfWeek = Time.dayOfTheWeek(day)
+    require(0 <= hours && hours < Time.HoursPerDay)
+    require(0 <= parts && parts < Time.PartsPerHour)
 
 
     override def equals(other: Any): Boolean = other match {
-        case that: Time =>
-            (days == that.days) && (hours == that.hours) && (parts == that.parts)
+        case that: Time => (hours == that.hours) && (parts == that.parts)
         case _ => false
     }
 
 
-    override def hashCode = 41*(41*(41+days)+hours)+parts
+    override def hashCode = 41*hours+parts
 
 
-    override def toString: String = days + "d" + hours + "h" + parts + "p"
-
-
-    def toMinutesString: String = days + "d" + hours + "h" + minutes + "m" + partsOfMinute + "p"
-
-
-//    override def compare(that: Angle) = zip(that) map lift(_.compare(_)) find(_!= 0) getOrElse(0)
-
-
-    def notEarlierInTheDayThan(hours: Int, parts: Int) =
+    // TODO redo through '<=' ...
+    def notEarlierThan(hours: Int, parts: Int) =
         (this.hours > hours) || ((this.hours == hours) && (this.parts >= parts))
 
 
-    def +(other: Time) = Time(days+other.days, hours+other.hours, parts+other.parts)
+    def isZero = (hours == 0) && (parts == 0)
 
 
-    def *(n: Int) = Time(days*n, hours*n, parts*n)
+    def minutes: Int = parts / Time.PartsPerMinute
+
+
+    def partsOfMinute = parts % Time.PartsPerMinute
+
+
+    override def toString: String = hours + "h" + parts + "p"
+
+
+    def toMinutesString: String = hours + "h" + minutes + "m" + partsOfMinute + "p"
 }
 
 
 object Time {
 
-    def dayOfTheWeek(day: Int) = ((day-1) % 7) + 1
+    val HoursPerDay = 24
 
 
-    def apply(
-        days: Int = 0,
-        hours: Int = 0,
-        parts: Int = 0) =
-{
-    require(0 <= days)
-    require(0 <= hours)
-    require(0 <= parts)
+    require(HoursPerDay % 2 == 0)
 
-    val hours_ = hours + parts/1080
-    
-    new Time(days + hours_ / 24, hours_ % 24, parts % 1080)
-}
-    
-    
-//    def toJewishTime: Moment =
-//        val (newDays, newHours) =
-//            if (hours >= 18) (days+1, hours-18) else (days, hours+6)
-//
-//        Moment(newDays, Flavour.Secular, newHours, minutes, seconds)
-//    }
-//
-//
-//    def toSecularTime: Moment =
-//        val (newDays, newHours) =
-//            if (hours < 6) (days-1, hours+18) else (days, hours-6)
-//
-//        Moment(newDays, Flavour.Secular, newHours, minutes, seconds)
-//    }
+
+    val PartsPerHour = 1080
+
+
+    val MinutesPerHour = 60
+
+
+    require(PartsPerHour % MinutesPerHour == 0)
+
+
+    val PartsPerMinute = PartsPerHour / MinutesPerHour
+
+
+    def apply(hours: Int, parts: Int) = new Time(hours, parts)
+
+
+    def ofNight(hours: Int, parts: Int) = Time(hours, parts)
+
+
+    def ofDay(hours: Int, parts: Int) = Time(hours + HoursPerDay/2, parts)
 }

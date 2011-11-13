@@ -1,10 +1,9 @@
 package org.podval.calendar.dates;
 
-import org.junit.Test;
-import org.junit.Assert;
+import org.junit.{Test, Assert}
 
 
-public class JewishCalendarTest {
+final class DatesTest {
 
 //    @Test
 //    public void date2days2date() {
