@@ -22,8 +22,8 @@ final class Angle(val degrees: Int, val more: List[Int]) extends Ordered[Angle] 
     more.foreach(checkRange(60))
 
     private def checkRange(range: Int)(value: Int): Unit = {
-        if (value < 0) throw new IllegalArgumentException("can not be negative")
-        if (value >= range) throw new IllegalArgumentException("can not be bigger than " + range)
+        require(value < 0, "can not be negative")
+        require(value >= range, "can not be bigger than " + range)
     }
 
 
