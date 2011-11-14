@@ -41,12 +41,16 @@ object Months {
     }
 
 
-    private val months: Map[(YearKind, Boolean), List[Descriptor]] = Map(pairs: _*)
+    private def months(year: Year): List[Descriptor] = Months(year.isLeap)(year.kind)
 
 
-    private def pairs = for (isLeap <- List(true, false); kind <- YearKind.values) yield ((kind, isLeap) -> mkMonths(kind, isLeap))
+    private val Months: Map[Boolean, Map[YearKind, List[Descriptor]]] =
+        Map(List(true, false).map(isLeap =>
+            isLeap -> Map(YearKind.values.toSeq.map(kind => kind -> mkMonths(kind, isLeap)): _*)
+        ): _*)
 
 
+    // TODO: add daysBefore; move Month.startDayInYear here; i,plement Day.month using this...
     private def mkMonths(kind: YearKind, isLeap: Boolean): List[Descriptor] =
         List(
             Descriptor(Tishrei, 30),
@@ -67,7 +71,4 @@ object Months {
             Descriptor(Av, 30),
             Descriptor(Elul, 29)
         )
-
-
-    private def months(year: Year): List[Descriptor] = months((year.kind, year.isLeap))
 }

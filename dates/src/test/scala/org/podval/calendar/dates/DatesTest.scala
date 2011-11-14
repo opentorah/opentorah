@@ -8,8 +8,11 @@ final class DatesTest {
     @Test
     def dayOfWeek {
         val day = Year(5772).month(MonthName.Marheshvan).day(24)
-        println(day.month.numberInYear)
+        println(day.number)
+        println(day.dayOfWeek)
         Assert.assertEquals(2, day.dayOfWeek)
+
+        println(day.month.numberInYear)
     }
 //    @Test
 //    public void date2days2date() {

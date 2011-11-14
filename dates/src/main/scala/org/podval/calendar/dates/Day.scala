@@ -16,8 +16,6 @@
 
 package org.podval.calendar.dates
 
-import MonthName.MonthName
-
 
 final class Day(val number: Int) {
 
@@ -39,7 +37,7 @@ final class Day(val number: Int) {
     def dayOfWeek: Int = ((number - 1) % 7) + 1
 
 
-    lazy val year: Year = {
+    def year: Year = {
         val yearForSureBefore = (4 * number / (4 * 365 + 1)) - 1
         var result = Year(yearForSureBefore)
         require(result.dayOfRoshHaShono.number < number)
@@ -48,7 +46,7 @@ final class Day(val number: Int) {
     }
 
 
-    lazy val month: Month = year.month(number - year.monthsBefore)
+    def month: Month = year.month(number - year.monthsBefore)
 
 
     def next: Day = Day(number + 1)

@@ -40,7 +40,7 @@ final class Month(val number: Int) {
     def numberInCycle: Int = ((number - 1) % Year.MonthsInCycle) + 1
 
 
-    def year: Year = Year(cycle, Year.yearMonthIsInCycle(numberInCycle))
+    def year: Year = Year(this)
 
 
     def numberInYear: Int = numberInCycle - year.monthsBeforeInCycle
@@ -52,6 +52,7 @@ final class Month(val number: Int) {
     }
 
 
+    // TODO move to Months
     def startDayInYear: Int = (for (month <- (1 to numberInYear-1)) yield year.month(month).length).sum
 
 
@@ -66,7 +67,6 @@ final class Month(val number: Int) {
 }
 
 
-// TODO move out into MonthName
 object Month {
 
     // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3 )

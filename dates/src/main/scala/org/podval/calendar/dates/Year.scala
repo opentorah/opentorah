@@ -51,9 +51,7 @@ final class Year(val number: Int) {
     def monthsBeforeInCycle: Int = Year.MonthsBeforeYearInCycle(numberInCycle-1)
 
     
-    // First year was 0 month long!
-    def monthsBefore: Int =
-        Year.MonthsInCycle*(cycle-1) + monthsBeforeInCycle// - Year.lengthInMonth(1)
+    def monthsBefore: Int = Year.MonthsInCycle*(cycle-1) + monthsBeforeInCycle
 
 
     def month(numberInYear: Int): Month = {
@@ -77,7 +75,7 @@ final class Year(val number: Int) {
         else if (time.notEarlierThan(18, 0)) {
             if (!Year.isAdu(day.next)) day.next /* KH 7:2 */ else day.next.next /* KH 7:3 */
         }
-        else if ((day.dayOfWeek == 3) && time.notEarlierThan(9, 204) && !this.isLeap) day.next.next /* KH 7:4 */
+        else if ((day.dayOfWeek == 3) && time.notEarlierThan( 9, 204) && !this.isLeap) day.next.next /* KH 7:4 */
         else if ((day.dayOfWeek == 2) && time.notEarlierThan(15, 589) && this.prev.isLeap) day.next /* KH 7:5 */
         else day
     }
@@ -113,25 +111,19 @@ final class Year(val number: Int) {
 
 object Year {
 
-    val YearsInCycle = 19;
+    private val YearsInCycle = 19;
 
 
-    val LeapYears = List(3, 6, 8, 11, 14, 17, 19)
+    private val LeapYears = List(3, 6, 8, 11, 14, 17, 19)
 
 
-    val MonthsInNonLeapYear = 12
+    private val MonthsInNonLeapYear = 12
 
 
-    val MonthsInLeapYear = MonthsInNonLeapYear+1
+    private val MonthsInLeapYear = MonthsInNonLeapYear + 1
 
 
-    // TODO require(0 < _ < YearsInCycle)
-
-
-    def yearMonthIsInCycle(number: Int): Int = MonthsBeforeYearInCycle.count(_ < number)
-
-
-    private val MonthsBeforeYearInCycle = (1 to (YearsInCycle+1)) map {numberInCycle =>
+    private val MonthsBeforeYearInCycle = (1 to (YearsInCycle + 1)) map {numberInCycle =>
         val leapYearsBeforeInCycle = LeapYears.count(_ < numberInCycle)
         leapYearsBeforeInCycle*MonthsInLeapYear + (numberInCycle - 1 - leapYearsBeforeInCycle)*MonthsInNonLeapYear
     }
@@ -149,5 +141,9 @@ object Year {
     def apply(number: Int): Year = new Year(number)
 
 
-    def apply(cycle: Int, numberInCycle: Int): Year = Year((cycle-1)*YearsInCycle + numberInCycle)
+    def apply(month: Month): Year = {
+        val yearsBeforeCycle = (month.cycle - 1)*YearsInCycle
+        val yearMonthIsInCycle = MonthsBeforeYearInCycle.count(_ < month.numberInCycle)
+        Year(yearsBeforeCycle + yearMonthIsInCycle)
+    }
 }
