@@ -16,6 +16,8 @@
 
 package org.podval.calendar.dates
 
+import MonthName.MonthName
+
 
 final class Year(val number: Int) {
 
@@ -34,52 +36,33 @@ final class Year(val number: Int) {
     override def toString: String = number.toString
 
 
-    def cycle: Int = Year.cycle(number)
+    def cycle: Int = ((number - 1) / Year.YearsInCycle) + 1
 
 
-    def numberInCycle: Int = Year.numberInCycle(number)
+    def numberInCycle: Int = ((number - 1) % Year.YearsInCycle) + 1
 
 
-    def isLeap: Boolean = Year.isLeapYearInCycle(numberInCycle)
+    def isLeap: Boolean = Year.LeapYears.contains(numberInCycle)
 
 
-    def lengthInMonth = Year.lengthInMonth(numberInCycle)
+    def lengthInMonths = if (isLeap) Year.MonthsInLeapYear else Year.MonthsInNonLeapYear
 
 
-    // TODO do I need to take into account the first cycle here also?
-    def monthsBeforeInCycle: Int = Year.monthsBeforeYearInCycle(numberInCycle)
+    def monthsBeforeInCycle: Int = Year.MonthsBeforeYearInCycle(numberInCycle-1)
 
     
-    // First year woth 0 month long!
+    // First year was 0 month long!
     def monthsBefore: Int =
         Year.MonthsInCycle*(cycle-1) + monthsBeforeInCycle// - Year.lengthInMonth(1)
 
 
-    def month(month: Int): Month = Month(this, month)
-
-
-    private val LeapYearMonths = List(Month.Name.AdarI, Month.Name.AdarII)
-
-
-    private val NonLeapYearMonths = List(Month.Name.Adar)
-
-
-    // TODO consolidate into Month?
-    def month(name: Month.Name.Type): Month = {
-        val numberInYear =
-            if (!isLeap) {
-                require(!(LeapYearMonths contains name))
-                name.id + 1
-            } else {
-                require(!(NonLeapYearMonths contains name))
-                if (name == Month.Name.AdarI) 6
-                else if (name == Month.Name.AdarII) 7
-                else if (name.id > 5) name.id + 2
-                else name.id + 1
-            }
-
-        month(numberInYear)
+    def month(numberInYear: Int): Month = {
+        require(0 < numberInYear && numberInYear <= lengthInMonths)
+        Month(monthsBefore + numberInYear)
     }
+
+
+    def month(name: MonthName): Month = month(Months.numberInYear(this, name))
 
 
     def length() = next.dayOfRoshHaShono.number - dayOfRoshHaShono.number
@@ -101,20 +84,21 @@ final class Year(val number: Int) {
 
 
     // KH 8:7,8
-    def kind: Year.Kind.Type = {
+    def kind: YearKind.YearKind = {
         val length = this.length
 
         def impossible = new IllegalArgumentException("Impossible year length " + length + " for " + this)
 
+        import YearKind._
         if (!isLeap) {
-            if (length == 353) Year.Kind.Short else
-            if (length == 354) Year.Kind.Regular else
-            if (length == 355) Year.Kind.Full else
+            if (length == 353) Short else
+            if (length == 354) Regular else
+            if (length == 355) Full else
                 throw impossible
         } else {
-            if (length == 383) Year.Kind.Short else
-            if (length == 384) Year.Kind.Regular else
-            if (length == 385) Year.Kind.Full else
+            if (length == 383) Short else
+            if (length == 384) Regular else
+            if (length == 385) Full else
                 throw impossible
         }
     }
@@ -135,66 +119,31 @@ object Year {
     val LeapYears = List(3, 6, 8, 11, 14, 17, 19)
 
 
-    val LeapYearsInCycle = LeapYears.length
-
-
-    val NonLeapYearsInCycle = YearsInCycle - LeapYearsInCycle
-
-
     val MonthsInNonLeapYear = 12
 
 
     val MonthsInLeapYear = MonthsInNonLeapYear+1
 
 
-    def cycle(number: Int): Int = ((number - 1) / YearsInCycle) + 1
-
-
-    def numberInCycle(number: Int): Int = ((number - 1) % YearsInCycle) + 1
-
-
     // TODO require(0 < _ < YearsInCycle)
 
 
-    def isLeapYearInCycle(numberInCycle: Int) = LeapYears.contains(numberInCycle)
+    def yearMonthIsInCycle(number: Int): Int = MonthsBeforeYearInCycle.count(_ < number)
 
 
-    def lengthInMonth(numberInCycle: Int) = if (isLeapYearInCycle(numberInCycle)) Year.MonthsInLeapYear else Year.MonthsInNonLeapYear
-
-
-    def leapYearsBeforeInCycle(numberInCycle: Int): Int = LeapYears.count(_ < numberInCycle)
-
-
-    def nonLeapYearsBeforeInCycle(numberInCycle: Int): Int = numberInCycle - 1 - leapYearsBeforeInCycle(numberInCycle)
-
-
-    def monthsBeforeYearInCycle(numberInCycle: Int): Int =
-        leapYearsBeforeInCycle(numberInCycle)*MonthsInLeapYear +
-        nonLeapYearsBeforeInCycle(numberInCycle)*MonthsInNonLeapYear
-
-
-    val MonthsBeforeYearInCycle = (1 to (YearsInCycle+1)) map (monthsBeforeYearInCycle(_))
+    private val MonthsBeforeYearInCycle = (1 to (YearsInCycle+1)) map {numberInCycle =>
+        val leapYearsBeforeInCycle = LeapYears.count(_ < numberInCycle)
+        leapYearsBeforeInCycle*MonthsInLeapYear + (numberInCycle - 1 - leapYearsBeforeInCycle)*MonthsInNonLeapYear
+    }
 
 
     val MonthsInCycle = MonthsBeforeYearInCycle.last
-
-
-    def yearMonthIsInCycle(number: Int): Int = MonthsBeforeYearInCycle.count(_ < number)
 
 
     private val Adu = List(1, 4, 6)
 
 
     private def isAdu(day: Day) = Adu.contains(day.dayOfWeek)
-
-
-    object Kind extends Enumeration {
-
-        type Type = Value
-
-
-        val Short, Regular, Full = Value 
-    }
 
 
     def apply(number: Int): Year = new Year(number)

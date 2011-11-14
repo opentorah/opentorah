@@ -16,19 +16,13 @@
 
 package org.podval.calendar.dates
 
-import org.junit.{Test, Assert}
+
+object MonthName extends Enumeration {
+
+    type MonthName = Value 
 
 
-final class YearTest {
-
-    private val years = (1 to 6000) map (Year(_))
-
-
-    @Test
-    def kind() = years foreach (_.kind)
-
-
-    @Test
-    def month = for (year <- years; month <- (1 to year.lengthInMonths))
-        Assert.assertEquals(year, year.month(month).year)
+    val Tishrei, Marheshvan, Kislev, Teves, Shvat, Adar,
+        Nisan, Iyar, Sivan, Tammuz, Av, Elul, 
+        AdarI, AdarII = Value
 }

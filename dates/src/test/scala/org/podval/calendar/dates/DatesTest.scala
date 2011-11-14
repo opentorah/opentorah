@@ -7,7 +7,8 @@ final class DatesTest {
 
     @Test
     def dayOfWeek {
-        val day = Day(5772, Month.Name.Marheshvan, 24)
+        val day = Year(5772).month(MonthName.Marheshvan).day(24)
+        println(day.month.numberInYear)
         Assert.assertEquals(2, day.dayOfWeek)
     }
 //    @Test

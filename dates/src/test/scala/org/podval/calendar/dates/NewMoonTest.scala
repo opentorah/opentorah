@@ -3,7 +3,7 @@ package org.podval.calendar.dates;
 import org.junit.{Test, Assert}
 
 
-final class NewmoonTest {
+final class NewMoonTest {
 
 //    @Test
 //    public void table5769() {

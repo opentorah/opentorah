@@ -16,6 +16,8 @@
 
 package org.podval.calendar.dates
 
+import MonthName.MonthName
+
 
 final class Day(val number: Int) {
 
@@ -59,10 +61,4 @@ final class Day(val number: Int) {
 object Day {
 
     def apply(number: Int): Day = new Day(number)
-
-
-    def apply(year: Int, month: Int, day: Int): Day = Year(year).month(month).day(day)
-
-
-    def apply(year: Int, name: Month.Name.Type, day: Int): Day = Year(year).month(name).day(day)
 }

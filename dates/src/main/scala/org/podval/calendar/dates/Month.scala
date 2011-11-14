@@ -40,7 +40,7 @@ final class Month(val number: Int) {
     def numberInCycle: Int = ((number - 1) % Year.MonthsInCycle) + 1
 
 
-    lazy val year: Year = Year(cycle, Year.yearMonthIsInCycle(numberInCycle))
+    def year: Year = Year(cycle, Year.yearMonthIsInCycle(numberInCycle))
 
 
     def numberInYear: Int = numberInCycle - year.monthsBeforeInCycle
@@ -58,37 +58,11 @@ final class Month(val number: Int) {
     def newMoon: Moment = Month.FirstNewMoon + Month.MeanLunarPeriod*(number-1) 
 
 
-    def name: Month.Name.Type = {
-        val n = numberInYear-1
-        if (!year.isLeap) Month.Name(n) else {
-            if (n > Month.Name.Nisan.id) Month.Name(n-1) else
-            if (n == Month.Name.Adar.id) Month.Name.AdarI else
-            if (n == Month.Name.Nisan.id) Month.Name.AdarII else
-                Month.Name(n)
-        }
-    }
+    def name: MonthName.MonthName = Months.name(this)
 
 
     // KH 8:5,6
-    def length: Int = {
-        val name = this.name
-
-        if (name == Month.Name.Marheshvan) {
-            year.kind match {
-            case Year.Kind.Short => 29 
-            case Year.Kind.Regular => 29 
-            case Year.Kind.Full => 30 
-            }
-        } else
-        if (name == Month.Name.Kislev) {
-            year.kind match {
-            case Year.Kind.Short => 29 
-            case Year.Kind.Regular => 30 
-            case Year.Kind.Full => 30 
-            }
-        } else
-            Month.lengths(name)
-    }
+    def length: Int = Months.length(this)
 }
 
 
@@ -104,43 +78,7 @@ object Month {
     val FirstNewMoon = Moment(Day(2), Time.ofNight(5, 204))
 
 
-    object Name extends Enumeration {
-
-        type Type = Value 
-
-
-        val Tishrei, Marheshvan, Kislev, Teves, Shvat, Adar,
-            Nisan, Iyar, Sivan, Tammuz, Av, Elul, 
-            AdarI, AdarII = Value
-    }
-
-
-    private val lengths = Map(
-        Name.Tishrei -> 30,
-        Name.Teves -> 29,
-        Name.Shvat -> 30,
-        Name.Adar -> 29,
-        Name.AdarI -> 30,
-        Name.AdarII -> 29,
-        Name.Nisan -> 30,
-        Name.Iyar -> 29,
-        Name.Sivan -> 30,
-        Name.Tammuz -> 29,
-        Name.Av -> 30,
-        Name.Elul -> 29
-    )
-
-
     def apply(number: Int): Month = new Month(number)
-
-
-    def apply(year: Year, month: Int): Month = {
-        require(0 < month && month <= year.lengthInMonth)
-        Month(year.monthsBefore + month)
-    }
-
-
-    def apply(year: Int, name: Month.Name.Type): Month = Year(year).month(name)
 
 
     def main(args: Array[String]) {
