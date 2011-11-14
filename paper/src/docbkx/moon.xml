@@ -15,6 +15,9 @@
             My wife Nina - for listening to my wild ideas, patience, and helping with math. 
         </para>
         <para>
+            My daughter Menucha Rochel - for assistance with the translation.
+        </para>
+        <para>
             Dr. Michael Partensky - for encouragement and advise.
         </para>
         <para>
@@ -27,9 +30,113 @@
     </acknowledgements>
 
     <section>
+        <title>Solar Theory</title>
+
+        <section>
+            <title>Chapter 12</title>
+
+            <section>
+                <title>Law 1</title>
+
+                <para>
+                    Mean movement of the Sun in one day (that is, twenty four hours) is 59′8″.
+                    
+                </para>
+
+                <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
+                
+                <xi:include href="../../target/tables/sml-original.xml"/>
+                
+                <para>
+                    And in this way you can calculate it for any number of days and years that you want.
+                    And so if you want to calculate movement in 2, 3, 4 - up to 10 days - you can do it.
+                    And so if you want to calculate movement in 20, 30, 40 - up to 100 days - you can do it.
+                    And it is obvious that once you know the movement in one day.
+                    Regular lunar year is 354 days.
+                </para>
+
+                <para>
+                    Between two consequitive nights of observation there is 29 full days.
+                    Between night of observation of a given month and the night of observation of the same month next year
+                    is in a regular year - or one day more.
+                    Our goal in all these calculations is solely to determine visibility of the moon.
+                </para>
+            </section>
+
+            <section>
+                <title>Law 2</title>
+
+                <para>
+                    There is a point on the Sun's orbit (and on orbits of the other 7 planets)
+                    where Sun is the highest above Earth. This point of the Sun's orbit (and so for other planets,
+                    except for the moon) rotates with constant speed. Movement of this point is approximately
+                    1° every 70 years. This point is called Sun's apogee (gva hashemesh).
+                </para>
+
+                <para>
+                    We already said that the epoch that our calculations are based on is beginning of the
+                    night of the fifth day that is 3rd of Nisan of the year 4938 from the Creation.
+                    And mean longitude of the Sun was at the epoch 7°3′32″ in the constelation of Ram (tele).
+                    And apogee of the Sun was 26°45′8″ in the constellation of Twins.
+                </para>
+            </section>
+        </section>
+
+        <section>
+            <title>Chapter 13</title>
+            
+            <section>
+                <title>Law 1</title>
+            </section>
+            
+            <section>
+                <title>Law 2</title>
+            </section>
+            
+            <section>
+                <title>Law 3</title>
+            </section>
+            
+            <section>
+                <title>Law 4</title>
+            </section>
+            
+            <section>
+                <title>Law 5</title>
+            </section>
+            
+            <section>
+                <title>Law 6</title>
+            </section>
+            
+            <section>
+                <title>Law 7</title>
+            </section>
+            
+            <section>
+                <title>Law 8</title>
+            </section>
+            
+            <section>
+                <title>Law 9</title>
+            </section>
+            
+            <section>
+                <title>Law 10</title>
+            </section>
+            
+            <section>
+                <title>Law 11</title>
+            </section>
+        </section>
+    </section>
+
+    <section>
         <title>Lunar Theory</title>
+
         <section>
             <title>Chapter 14</title>
+
             <section>
                 <title>Law 1: Two Movements of the Moon</title>
 
