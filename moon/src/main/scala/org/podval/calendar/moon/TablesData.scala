@@ -21,6 +21,26 @@ object TablesData {
 
     type Days = Int
 
+    val SunMeanLongitude = List[(Days, Angle)](
+        1     -> Angle(  0, 59,  8),
+        10    -> Angle(  9, 51, 23),
+        100   -> Angle( 98, 33, 53), 
+        1000  -> Angle(265, 38, 50), // remainder
+        10000 -> Angle(136, 28, 20),
+        29    -> Angle( 28, 35,  1),
+        354   -> Angle(348, 55, 15)
+    )
+
+
+    val SunApogee = List[(Days, Angle)](
+        10    -> Angle(0,  0,  1, 30),
+        100   -> Angle(0,  0, 15),
+        1000  -> Angle(0,  2, 30),
+        10000 -> Angle(0, 25),
+        29    -> Angle(0,  0,  4), // TODO: veod!
+        354   -> Angle(0,  0, 53)
+    )
+
 
 //    val exact = Angle(13,10,35,1,48,1)
 //    val exactInDegrees = 13.176397222222223
