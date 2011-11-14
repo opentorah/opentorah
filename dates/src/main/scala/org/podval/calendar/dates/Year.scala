@@ -31,6 +31,9 @@ final class Year(val number: Int) {
     override def hashCode = number
 
 
+    override def toString: String = number.toString
+
+
     def cycle: Int = Year.cycle(number)
 
 
@@ -43,38 +46,56 @@ final class Year(val number: Int) {
     def lengthInMonth = Year.lengthInMonth(numberInCycle)
 
 
-    def monthsBeforeInCycle: Int = {
-        val result = Year.monthsBeforeYearInCycle(numberInCycle)
-        // First year woth 0 month long!
-        if (cycle == 1) result - Year.lengthInMonth(1) else result
-    }
+    // TODO do I need to take into account the first cycle here also?
+    def monthsBeforeInCycle: Int = Year.monthsBeforeYearInCycle(numberInCycle)
 
     
-    // TODO do I need to take into account the first cycle here also?
-    def monthsBefore: Int = Year.MonthsInCycle*(cycle-1) + monthsBeforeInCycle
+    // First year woth 0 month long!
+    def monthsBefore: Int =
+        Year.MonthsInCycle*(cycle-1) + monthsBeforeInCycle// - Year.lengthInMonth(1)
 
 
     def month(month: Int): Month = Month(this, month)
 
 
-    def length() = Year(number+1).dayOfRoshHaShono.number - dayOfRoshHaShono.number
+    private val LeapYearMonths = List(Month.Name.AdarI, Month.Name.AdarII)
+
+
+    private val NonLeapYearMonths = List(Month.Name.Adar)
+
+
+    // TODO consolidate into Month?
+    def month(name: Month.Name.Type): Month = {
+        val numberInYear =
+            if (!isLeap) {
+                require(!(LeapYearMonths contains name))
+                name.id + 1
+            } else {
+                require(!(NonLeapYearMonths contains name))
+                if (name == Month.Name.AdarI) 6
+                else if (name == Month.Name.AdarII) 7
+                else if (name.id > 5) name.id + 2
+                else name.id + 1
+            }
+
+        month(numberInYear)
+    }
+
+
+    def length() = next.dayOfRoshHaShono.number - dayOfRoshHaShono.number
 
 
     def dayOfRoshHaShono: Day = {
         val newMoon = month(1).newMoon
         val day = newMoon.day
+        val time = newMoon.time
 
         if (Year.isAdu(day)) day.next // KH 7:1
-        else if (newMoon.time.notEarlierThan(18, 0)) {
-            val delayed = day.next
-            if (!Year.isAdu(delayed))
-            delayed /* KH 7:2 */ else
-            delayed.next /* KH 7:3 */
+        else if (time.notEarlierThan(18, 0)) {
+            if (!Year.isAdu(day.next)) day.next /* KH 7:2 */ else day.next.next /* KH 7:3 */
         }
-        else if ((day.dayOfWeek == 3) && newMoon.time.notEarlierThan(9, 240) &&
-            !this.isLeap) day.next.next /* KH 7:4 */
-        else if ((day.dayOfWeek == 2) && newMoon.time.notEarlierThan(15, 589) &&
-            this.next.isLeap) day.next /* KH 7:5 */
+        else if ((day.dayOfWeek == 3) && time.notEarlierThan(9, 204) && !this.isLeap) day.next.next /* KH 7:4 */
+        else if ((day.dayOfWeek == 2) && time.notEarlierThan(15, 589) && this.prev.isLeap) day.next /* KH 7:5 */
         else day
     }
 
@@ -126,10 +147,10 @@ object Year {
     val MonthsInLeapYear = MonthsInNonLeapYear+1
 
 
-    def cycle(number: Int): Int = (number / YearsInCycle) + 1
+    def cycle(number: Int): Int = ((number - 1) / YearsInCycle) + 1
 
 
-    def numberInCycle(number: Int): Int = number % YearsInCycle
+    def numberInCycle(number: Int): Int = ((number - 1) % YearsInCycle) + 1
 
 
     // TODO require(0 < _ < YearsInCycle)

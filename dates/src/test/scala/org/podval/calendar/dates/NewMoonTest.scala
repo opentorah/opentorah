@@ -6,49 +6,6 @@ import org.junit.{Test, Assert}
 final class NewmoonTest {
 
 //    @Test
-//    public void cycleNumbers() {
-//        cycleNumber(1, 1);
-//        cycleNumber(2, 1);
-//        cycleNumber(18, 1);
-//        cycleNumber(19, 1);
-//        cycleNumber(20, 2);
-//        cycleNumber(37, 2);
-//        cycleNumber(38, 2);
-//        cycleNumber(39, 3);
-//
-//        cycleNumber(0, 0);
-//        cycleNumber(-1, 0);
-//        cycleNumber(-2, 0);
-//        cycleNumber(-18, 0);
-//
-//        cycleNumber(-19, -1);
-//        cycleNumber(-20, -1);
-//        cycleNumber(-37, -1);
-//        cycleNumber(-38, -2);
-//        cycleNumber(-39, -2);
-//    }
-//
-//
-//    private void cycleNumber(final int year, final int cycle) {
-//        Assert.assertEquals(cycle, JewishCalendar.getInstance().cycleNumber(year));
-//    }
-//
-//
-//    @Test
-//    public void moladNumbers() {
-//        moladNumber(1, 1, JewishMonth.MarHeshvan);
-//        moladNumber(0, 1, JewishMonth.Tishri);
-//        moladNumber(-1, 0, JewishMonth.Elul);
-//        moladNumber(-2, 0, JewishMonth.Av);
-//    }
-//
-//
-//    private void moladNumber(final int number, final int year, final JewishMonth month) {
-//        Assert.assertEquals(number, JewishCalendar.getInstance().moladNumber(year, month));
-//    }
-//
-//
-//    @Test
 //    public void table5769() {
 //        // From http://www.chabad.org/library/article_cdo/aid/216238/jewish/Molad-Times.htm
 //

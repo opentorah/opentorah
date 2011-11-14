@@ -31,7 +31,10 @@ final class Day(val number: Int) {
     override def hashCode = number
 
 
-    def dayOfWeek: Int = ((number-1) % 7) + 1
+    override def toString: String = number.toString
+
+
+    def dayOfWeek: Int = ((number - 1) % 7) + 1
 
 
     lazy val year: Year = {
@@ -55,5 +58,11 @@ final class Day(val number: Int) {
 
 object Day {
 
-    def apply(number: Int) = new Day(number)
+    def apply(number: Int): Day = new Day(number)
+
+
+    def apply(year: Int, month: Int, day: Int): Day = Year(year).month(month).day(day)
+
+
+    def apply(year: Int, name: Month.Name.Type, day: Int): Day = Year(year).month(name).day(day)
 }

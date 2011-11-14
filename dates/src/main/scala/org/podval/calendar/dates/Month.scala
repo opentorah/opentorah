@@ -31,16 +31,28 @@ final class Month(val number: Int) {
     override def hashCode = number
 
 
-    def cycle: Int = (number / Year.MonthsInCycle) + 1
+    override def toString: String = number.toString
 
 
-    def numberInCycle: Int = number % Year.MonthsInCycle
+    def cycle: Int = ((number - 1) / Year.MonthsInCycle) + 1
+
+
+    def numberInCycle: Int = ((number - 1) % Year.MonthsInCycle) + 1
 
 
     lazy val year: Year = Year(cycle, Year.yearMonthIsInCycle(numberInCycle))
 
 
     def numberInYear: Int = numberInCycle - year.monthsBeforeInCycle
+
+
+    def day(day: Int): Day = {
+        require (0 < day && day <= length)
+        Day(year.dayOfRoshHaShono.number + startDayInYear + day -1)
+    }
+
+
+    def startDayInYear: Int = (for (month <- (1 to numberInYear-1)) yield year.month(month).length).sum
 
 
     def newMoon: Moment = Month.FirstNewMoon + Month.MeanLunarPeriod*(number-1) 
@@ -80,6 +92,7 @@ final class Month(val number: Int) {
 }
 
 
+// TODO move out into MonthName
 object Month {
 
     // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3 )
@@ -121,11 +134,17 @@ object Month {
     def apply(number: Int): Month = new Month(number)
 
 
-    def apply(year: Year, month: Int): Month = Month(year.monthsBefore + month)
+    def apply(year: Year, month: Int): Month = {
+        require(0 < month && month <= year.lengthInMonth)
+        Month(year.monthsBefore + month)
+    }
+
+
+    def apply(year: Int, name: Month.Name.Type): Month = Year(year).month(name)
 
 
     def main(args: Array[String]) {
-        println(Year(   2).month(1).newMoon.toMinutesString)
+        println(Year(   1).month(1).newMoon.toMinutesString)
         println(Year(5772).month(2).newMoon.toMinutesString)
         println(Year(5772).month(3).newMoon.toMinutesString)
         println(Year(5772).month(4).newMoon.toMinutesString)

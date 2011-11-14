@@ -38,10 +38,4 @@ public final class GregorianCalendar {
 //    public boolean isLeap(final int year) {
 //        return (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0));
 //    }
-//
-//
-//    @Override
-//    protected void monthNotFound(final int year, final GregorianMonth monthName) {
-//        throw new Error("?");
-//    }
 }

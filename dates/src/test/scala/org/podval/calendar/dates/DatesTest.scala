@@ -5,6 +5,11 @@ import org.junit.{Test, Assert}
 
 final class DatesTest {
 
+    @Test
+    def dayOfWeek {
+        val day = Day(5772, Month.Name.Marheshvan, 24)
+        Assert.assertEquals(2, day.dayOfWeek)
+    }
 //    @Test
 //    public void date2days2date() {
 //        date2days2date(1, JewishMonth.Tishri, 1);
