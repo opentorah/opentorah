@@ -70,7 +70,7 @@ final class Year(val number: Int) {
     def monthsBeforeInCycle: Int = Year.MonthsBeforeYearInCycle(numberInCycle - 1)
 
 
-    def length() = next.firstDay - firstDay
+    def length() = next.firstDay - this.firstDay
 
 
     def firstDay: Int = {
@@ -79,18 +79,18 @@ final class Year(val number: Int) {
         val time = newMoon.time
 
         if (Year.isAdu(day)) day.next // KH 7:1
-        else if (time.notEarlierThan(18, 0)) {
+        else if (time >= Time(18, 0)) {
             if (!Year.isAdu(day.next)) day.next /* KH 7:2 */ else day.next.next /* KH 7:3 */
         }
-        else if ((day.dayOfWeek == 3) && time.notEarlierThan( 9, 204) && !this.isLeap) day.next.next /* KH 7:4 */
-        else if ((day.dayOfWeek == 2) && time.notEarlierThan(15, 589) && this.prev.isLeap) day.next /* KH 7:5 */
+        else if ((day.dayOfWeek == 3) && time >= Time( 9, 204) && !this.isLeap) day.next.next /* KH 7:4 */
+        else if ((day.dayOfWeek == 2) && time >= Time(15, 589) && this.prev.isLeap) day.next /* KH 7:5 */
         else day
     }.number
 
 
     // KH 8:7,8
    def kind: YearKind = {
-        val daysOverShort = (length - (if (isLeap) 383 else 353))
+        val daysOverShort = length - (if (isLeap) 383 else 353)
 
         daysOverShort match {
         case 0 => Short

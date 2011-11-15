@@ -34,7 +34,7 @@ final class Day(val number: Int) {
     override def toString: String = number.toString
 
 
-    def dayOfWeek: Int = ((number - 1) % 7) + 1
+    def dayOfWeek: Int = ((number - 1) % 7) + 1 // TODO: what was the day of the week of the first day of the first year?
 
 
     def dayOfMonth: Int = number - month.firstDay + 1
@@ -49,13 +49,22 @@ final class Day(val number: Int) {
     def month: Month = year.monthOfDay(dayOfYear)
 
 
-    // TODO add time[OfXXX]() methods here!
-
-
     def next: Day = Day(number + 1)
 
 
     def prev: Day = Day(number - 1)
+
+
+    def moment(time: Time): Moment = Moment(number - 1, time)
+
+
+    def moment(hours: Int, parts: Int): Moment = moment(Time(hours, parts))
+
+
+    def momentOfNight(hours: Int, parts: Int): Moment = moment(Time.ofNight(hours, parts))
+
+
+    def momentOfDay(hours: Int, parts: Int): Moment = moment(Time.ofDay(hours, parts))
 }
 
 

@@ -48,4 +48,22 @@ final class Secular {
 //    public boolean isLeap(final int year) {
 //        return (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0));
 //    }
+
+
+
+// TODO
+//    def toJewishTime: Moment =
+//        val (newDays, newHours) =
+//            if (hours >= 18) (days+1, hours-18) else (days, hours+6)
+//
+//        Moment(newDays, Flavour.Secular, newHours, minutes, seconds)
+//    }
+//
+//
+//    def toSecularTime: Moment =
+//        val (newDays, newHours) =
+//            if (hours < 6) (days-1, hours+18) else (days, hours-6)
+//
+//        Moment(newDays, Flavour.Secular, newHours, minutes, seconds)
+//    }
 }

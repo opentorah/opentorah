@@ -77,7 +77,7 @@ object Month {
 
     // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2):
     // BeHaRaD: 5 hours 204 parts at night of the second day of Creation (KH 6:8)
-    val FirstNewMoon = Moment(Day(2), Time.ofNight(5, 204))
+    val FirstNewMoon = Day(2).momentOfNight(5, 204)
 
 
     def apply(number: Int): Month = new Month(number)

@@ -17,14 +17,14 @@
 package org.podval.calendar.dates
 
 
-final class Time(val hours: Int, val parts: Int) {
+final class Time private (val hours: Int, val parts: Int) extends Ordered[Time] {
 
     require(0 <= hours && hours < Time.HoursPerDay)
     require(0 <= parts && parts < Time.PartsPerHour)
 
 
     override def equals(other: Any): Boolean = other match {
-        case that: Time => (hours == that.hours) && (parts == that.parts)
+        case that: Time => this.allParts == that.allParts
         case _ => false
     }
 
@@ -32,12 +32,13 @@ final class Time(val hours: Int, val parts: Int) {
     override def hashCode = 41*hours+parts
 
 
-    // TODO redo through '<=' ...
-    def notEarlierThan(hours: Int, parts: Int) =
-        (this.hours > hours) || ((this.hours == hours) && (this.parts >= parts))
+    override def compare(that: Time) = this.allParts - that.allParts
 
 
     def isZero = (hours == 0) && (parts == 0)
+
+
+    def allParts = hours*Time.PartsPerHour + parts
 
 
     def minutes: Int = parts / Time.PartsPerMinute
@@ -61,6 +62,9 @@ object Time {
     require(HoursPerDay % 2 == 0)
 
 
+    val HoursPerHalfDay = HoursPerDay / 2
+
+
     val PartsPerHour = 1080
 
 
@@ -76,8 +80,14 @@ object Time {
     def apply(hours: Int, parts: Int) = new Time(hours, parts)
 
 
-    def ofNight(hours: Int, parts: Int) = Time(hours, parts)
+    def ofNight(hours: Int, parts: Int) = {
+        require(hours < HoursPerHalfDay)
+        Time(hours, parts)
+    }
 
 
-    def ofDay(hours: Int, parts: Int) = Time(hours + HoursPerDay/2, parts)
+    def ofDay(hours: Int, parts: Int) = {
+        require(hours < HoursPerHalfDay)
+        Time(hours + HoursPerHalfDay, parts)
+    }
 }

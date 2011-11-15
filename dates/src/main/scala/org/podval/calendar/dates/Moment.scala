@@ -19,7 +19,7 @@ package org.podval.calendar.dates
 
 final class Moment(val days: Int, val time: Time) {
 
-    def day: Day = Day(days+1)
+    def day: Day = Day(days + 1)
 
 
     override def equals(other: Any): Boolean = other match {
@@ -35,8 +35,6 @@ final class Moment(val days: Int, val time: Time) {
 
 
     def toMinutesString: String = days.toString + "d" + time.toMinutesString
-
-//    override def compare(that: Angle) = zip(that) map lift(_.compare(_)) find(_!= 0) getOrElse(0)
 
 
     def +(other: Moment) = Moment(
@@ -74,27 +72,5 @@ object Moment {
     }
     
 
-    def apply(day: Day, hours: Int, parts: Int): Moment = Moment(day.number-1, hours, parts)
-
-
-    def apply(day: Day, time: Time): Moment = Moment(day.number-1, time)
-
-
     def apply(days: Int, time: Time) = new Moment(days, time)
-
-
-//    def toJewishTime: Moment =
-//        val (newDays, newHours) =
-//            if (hours >= 18) (days+1, hours-18) else (days, hours+6)
-//
-//        Moment(newDays, Flavour.Secular, newHours, minutes, seconds)
-//    }
-//
-//
-//    def toSecularTime: Moment =
-//        val (newDays, newHours) =
-//            if (hours < 6) (days-1, hours+18) else (days, hours-6)
-//
-//        Moment(newDays, Flavour.Secular, newHours, minutes, seconds)
-//    }
 }
