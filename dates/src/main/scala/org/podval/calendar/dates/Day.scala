@@ -37,16 +37,19 @@ final class Day(val number: Int) {
     def dayOfWeek: Int = ((number - 1) % 7) + 1
 
 
-    def year: Year = {
-        val yearForSureBefore = (4 * number / (4 * 365 + 1)) - 1
-        var result = Year(yearForSureBefore)
-        require(result.dayOfRoshHaShono.number < number)
-        while (result.next.dayOfRoshHaShono.number > number) result = result.next
-        result
-    }
+    def dayOfMonth: Int = number - month.firstDay + 1
 
 
-    def month: Month = year.month(number - year.monthsBefore)
+    def dayOfYear: Int = number - year.firstDay + 1
+
+
+    def year: Year = Year(this)
+
+
+    def month: Month = year.monthOfDay(dayOfYear)
+
+
+    // TODO add time[OfXXX]() methods here!
 
 
     def next: Day = Day(number + 1)

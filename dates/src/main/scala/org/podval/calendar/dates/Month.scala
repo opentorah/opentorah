@@ -48,22 +48,24 @@ final class Month(val number: Int) {
 
     def day(day: Int): Day = {
         require (0 < day && day <= length)
-        Day(year.dayOfRoshHaShono.number + startDayInYear + day -1)
+        Day(firstDay + day - 1)
     }
 
 
-    // TODO move to Months
-    def startDayInYear: Int = (for (month <- (1 to numberInYear-1)) yield year.month(month).length).sum
+    def firstDay: Int = year.firstDay + descriptor.daysBefore
 
 
     def newMoon: Moment = Month.FirstNewMoon + Month.MeanLunarPeriod*(number-1) 
 
 
-    def name: MonthName.MonthName = Months.name(this)
+    def name: MonthName.MonthName = descriptor.name
 
 
     // KH 8:5,6
-    def length: Int = Months.length(this)
+    def length: Int = descriptor.length
+
+
+    private def descriptor = year.months(numberInYear - 1)
 }
 
 
@@ -73,7 +75,7 @@ object Month {
     val MeanLunarPeriod = Moment(29, 12, 793)
 
 
-    // Molad of the year of Creation:
+    // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2):
     // BeHaRaD: 5 hours 204 parts at night of the second day of Creation (KH 6:8)
     val FirstNewMoon = Moment(Day(2), Time.ofNight(5, 204))
 
@@ -82,6 +84,7 @@ object Month {
 
 
     def main(args: Array[String]) {
+        // TODO move into a test
         println(Year(   1).month(1).newMoon.toMinutesString)
         println(Year(5772).month(2).newMoon.toMinutesString)
         println(Year(5772).month(3).newMoon.toMinutesString)

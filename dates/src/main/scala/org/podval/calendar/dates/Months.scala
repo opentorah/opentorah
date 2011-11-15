@@ -22,26 +22,10 @@ import YearKind._
 
 object Months {
 
-    def name(month: Month): MonthName = months(month.year)(month.numberInYear-1).name
+    final class Descriptor(val name: MonthName, val length: Int, val daysBefore: Int)
 
 
-    // KH 8:5,6
-    def length(month: Month): Int =  months(month.year)(month.numberInYear-1).length
-
-
-    def numberInYear(year: Year, name: MonthName): Int = months(year).indexWhere(_.name == name) + 1
-
-
-    private final class Descriptor(val name: MonthName, val length: Int)
-
-
-    private object Descriptor {
-
-        def apply(name: MonthName, length: Int) = new Descriptor(name, length)
-    }
-
-
-    private def months(year: Year): List[Descriptor] = Months(year.isLeap)(year.kind)
+    def months(year: Year): List[Descriptor] = Months(year.isLeap)(year.kind)
 
 
     private val Months: Map[Boolean, Map[YearKind, List[Descriptor]]] =
@@ -50,25 +34,33 @@ object Months {
         ): _*)
 
 
-    // TODO: add daysBefore; move Month.startDayInYear here; i,plement Day.month using this...
-    private def mkMonths(kind: YearKind, isLeap: Boolean): List[Descriptor] =
+    private def mkMonths(kind: YearKind, isLeap: Boolean): List[Descriptor] = {
+        val namesAndLengths = this.namesAndLengths(kind, isLeap)
+        val (names, lengths) = namesAndLengths unzip
+        val daysBefore = lengths.scanLeft(0)(_ + _).init
+        val x = namesAndLengths zip daysBefore
+        x map (m => new Descriptor(m._1._1, m._1._2, m._2))
+    }
+
+
+    private def namesAndLengths(kind: YearKind, isLeap: Boolean) =
         List(
-            Descriptor(Tishrei, 30),
-            Descriptor(Marheshvan, if (kind == Full) 30 else 29),
-            Descriptor(Kislev, if (kind == Short) 29 else 30),
-            Descriptor(Teves, 29),
-            Descriptor(Shvat, 30)
+            (Tishrei, 30),
+            (Marheshvan, if (kind == Full) 30 else 29),
+            (Kislev, if (kind == Short) 29 else 30),
+            (Teves, 29),
+            (Shvat, 30)
         ) ++
         (if (!isLeap)
-            List(Descriptor(Adar, 29)) else
-            List(Descriptor(AdarI, 30), Descriptor(AdarII, 30))
+            List((Adar, 29)) else
+            List((AdarI, 30), (AdarII, 30))
         ) ++
         List(
-            Descriptor(Nisan, 30),
-            Descriptor(Iyar, 29),
-            Descriptor(Sivan, 30),
-            Descriptor(Tammuz, 29),
-            Descriptor(Av, 30),
-            Descriptor(Elul, 29)
+            (Nisan, 30),
+            (Iyar, 29),
+            (Sivan, 30),
+            (Tammuz, 29),
+            (Av, 30),
+            (Elul, 29)
         )
 }

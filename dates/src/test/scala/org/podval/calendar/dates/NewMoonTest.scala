@@ -5,6 +5,10 @@ import org.junit.{Test, Assert}
 
 final class NewMoonTest {
 
+    @Test
+    def dummy = {}
+
+
 //    @Test
 //    public void table5769() {
 //        // From http://www.chabad.org/library/article_cdo/aid/216238/jewish/Molad-Times.htm
