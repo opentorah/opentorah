@@ -9,6 +9,16 @@ final class NewMoonTest {
     def dummy = {}
 
 
+    @Test
+    def when2011() {
+        // TODO
+        println(Year(   1).month(1).newMoon.toMinutesString)
+        println(Year(5772).month(2).newMoon.toMinutesString)
+        println(Year(5772).month(3).newMoon.toMinutesString)
+        println(Year(5772).month(4).newMoon.toMinutesString)
+    }
+
+
 //    @Test
 //    public void table5769() {
 //        // From http://www.chabad.org/library/article_cdo/aid/216238/jewish/Molad-Times.htm

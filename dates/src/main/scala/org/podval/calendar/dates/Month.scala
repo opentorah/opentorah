@@ -17,7 +17,7 @@
 package org.podval.calendar.dates
 
 
-final class Month(val number: Int) {
+final class Month private (val number: Int) extends Ordered[Month]{
 
     require(0 < number)
 
@@ -29,6 +29,9 @@ final class Month(val number: Int) {
 
 
     override def hashCode = number
+
+
+    override def compare(that: Month) = this.number - that.number
 
 
     override def toString: String = number.toString
@@ -58,7 +61,7 @@ final class Month(val number: Int) {
     def newMoon: Moment = Month.FirstNewMoon + Month.MeanLunarPeriod*(number-1) 
 
 
-    def name: MonthName.MonthName = descriptor.name
+    def name: Month.Name.MonthName = descriptor.name
 
 
     // KH 8:5,6
@@ -71,23 +74,62 @@ final class Month(val number: Int) {
 
 object Month {
 
+    object Name extends Enumeration {
+
+        type MonthName = Value 
+
+
+        val Tishrei, Marheshvan, Kislev, Teves, Shvat, Adar,
+            Nisan, Iyar, Sivan, Tammuz, Av, Elul, 
+            AdarI, AdarII = Value
+    }
+
+
+    final class Descriptor(val name: Name.MonthName, val length: Int, val daysBefore: Int)
+
+
+    def months(kind: Year.Kind.YearKind, isLeap: Boolean): List[Descriptor] = {
+        val namesAndLengths = this.namesAndLengths(kind, isLeap)
+        val (names, lengths) = namesAndLengths unzip
+        val daysBefore = lengths.scanLeft(0)(_ + _).init
+        (namesAndLengths zip daysBefore) map (m => new Descriptor(m._1._1, m._1._2, m._2))
+    }
+
+
+    private def namesAndLengths(kind: Year.Kind.YearKind, isLeap: Boolean) = {
+        import Year.Kind._
+        import Name._
+
+        List(
+            (Tishrei, 30),
+            (Marheshvan, if (kind == Full) 30 else 29),
+            (Kislev, if (kind == Short) 29 else 30),
+            (Teves, 29),
+            (Shvat, 30)
+        ) ++
+        (if (!isLeap)
+            List((Adar, 29)) else
+            List((AdarI, 30), (AdarII, 30))
+        ) ++
+        List(
+            (Nisan, 30),
+            (Iyar, 29),
+            (Sivan, 30),
+            (Tammuz, 29),
+            (Av, 30),
+            (Elul, 29)
+        )
+    }
+
+
     // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3 )
     val MeanLunarPeriod = Moment(29, 12, 793)
 
 
     // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2):
-    // BeHaRaD: 5 hours 204 parts at night of the second day of Creation (KH 6:8)
+    // BeHaRaD: 5 hours 204 parts at night of the second day (KH 6:8)
     val FirstNewMoon = Day(2).momentOfNight(5, 204)
 
 
     def apply(number: Int): Month = new Month(number)
-
-
-    def main(args: Array[String]) {
-        // TODO move into a test
-        println(Year(   1).month(1).newMoon.toMinutesString)
-        println(Year(5772).month(2).newMoon.toMinutesString)
-        println(Year(5772).month(3).newMoon.toMinutesString)
-        println(Year(5772).month(4).newMoon.toMinutesString)
-    }
 }

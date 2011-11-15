@@ -16,11 +16,8 @@
 
 package org.podval.calendar.dates
 
-import MonthName.MonthName
-import YearKind._
 
-
-final class Year(val number: Int) {
+final class Year private (val number: Int) extends Ordered[Year] {
 
     require(0 < number)
 
@@ -32,6 +29,9 @@ final class Year(val number: Int) {
 
 
     override def hashCode = number
+
+
+    override def compare(that: Year) = this.number - that.number
 
 
     override def toString: String = number.toString
@@ -55,7 +55,7 @@ final class Year(val number: Int) {
     }
 
 
-    def month(name: MonthName): Month = month(months.indexWhere(_.name == name) + 1)
+    def month(name: Month.Name.MonthName): Month = month(months.indexWhere(_.name == name) + 1)
 
 
     def monthOfDay(numberInYear: Int): Month = {
@@ -70,7 +70,7 @@ final class Year(val number: Int) {
     def monthsBeforeInCycle: Int = Year.MonthsBeforeYearInCycle(numberInCycle - 1)
 
 
-    def length() = next.firstDay - this.firstDay
+    def length = next.firstDay - this.firstDay
 
 
     def firstDay: Int = {
@@ -89,8 +89,10 @@ final class Year(val number: Int) {
 
 
     // KH 8:7,8
-   def kind: YearKind = {
+    def kind: Year.Kind.YearKind = {
         val daysOverShort = length - (if (isLeap) 383 else 353)
+
+        import Year.Kind._
 
         daysOverShort match {
         case 0 => Short
@@ -101,7 +103,7 @@ final class Year(val number: Int) {
     }
 
 
-    def months = Months.months(this)
+    def months: List[Month.Descriptor] = Year.Months(this.isLeap)(this.kind)
 
 
     def next: Year = Year(number + 1)
@@ -141,6 +143,23 @@ object Year {
 
 
     private def isAdu(day: Day) = Adu.contains(day.dayOfWeek)
+
+
+    object Kind extends Enumeration {
+    
+        type YearKind = Value
+    
+    
+        val Short, Regular, Full = Value 
+    }
+
+
+    private val Months: Map[Boolean, Map[Kind.YearKind, List[Month.Descriptor]]] =
+        Map(List(true, false).map(isLeap =>
+            isLeap -> Map(Kind.values.toSeq.map(kind =>
+                kind -> Month.months(kind, isLeap)
+            ): _*)
+        ): _*)
 
 
     def apply(number: Int): Year = new Year(number)

@@ -17,7 +17,7 @@
 package org.podval.calendar.dates
 
 
-final class Moment(val days: Int, val time: Time) {
+final class Moment private (val days: Int, val time: Time) extends Ordered[Moment] {
 
     def day: Day = Day(days + 1)
 
@@ -29,6 +29,12 @@ final class Moment(val days: Int, val time: Time) {
 
 
     override def hashCode = 41*days.hashCode + time.hashCode
+
+
+    override def compare(that: Moment) = {
+        val result = this.days.compare(that.days)
+        if (result == 0) this.time.compare(that.time) else 0
+    }
 
 
     override def toString: String = days.toString + "d" + time.toString

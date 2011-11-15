@@ -17,7 +17,7 @@
 package org.podval.calendar.dates
 
 
-final class Day(val number: Int) {
+final class Day private (val number: Int) extends Ordered[Day] {
 
     require(0 < number)
 
@@ -29,6 +29,9 @@ final class Day(val number: Int) {
 
 
     override def hashCode = number
+
+
+    override def compare(that: Day) = this.number - that.number
 
 
     override def toString: String = number.toString
