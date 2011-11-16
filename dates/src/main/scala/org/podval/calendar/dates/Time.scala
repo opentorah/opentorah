@@ -80,13 +80,13 @@ object Time {
     def apply(hours: Int, parts: Int) = new Time(hours, parts)
 
 
-    def ofNight(hours: Int, parts: Int) = {
+    def nightTime(hours: Int, parts: Int) = {
         require(hours < HoursPerHalfDay)
         Time(hours, parts)
     }
 
 
-    def ofDay(hours: Int, parts: Int) = {
+    def dayTime(hours: Int, parts: Int) = {
         require(hours < HoursPerHalfDay)
         Time(hours + HoursPerHalfDay, parts)
     }

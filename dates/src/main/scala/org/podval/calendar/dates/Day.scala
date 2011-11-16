@@ -37,6 +37,7 @@ final class Day private (val number: Int) extends Ordered[Day] {
     override def toString: String = number.toString
 
 
+    // TODO give names to constants
     def dayOfWeek: Int = ((number - 1) % 7) + 1 // TODO: what was the day of the week of the first day of the first year?
 
 
@@ -49,7 +50,7 @@ final class Day private (val number: Int) extends Ordered[Day] {
     def year: Year = Year(this)
 
 
-    def month: Month = year.monthOfDay(dayOfYear)
+    def month: Month = year.month(this)
 
 
     def next: Day = Day(number + 1)
@@ -58,16 +59,16 @@ final class Day private (val number: Int) extends Ordered[Day] {
     def prev: Day = Day(number - 1)
 
 
-    def moment(time: Time): Moment = Moment(number - 1, time)
+    def time(time: Time): Moment = Moment(number - 1, time)
 
 
-    def moment(hours: Int, parts: Int): Moment = moment(Time(hours, parts))
+    def time(hours: Int, parts: Int): Moment = time(Time(hours, parts))
 
 
-    def momentOfNight(hours: Int, parts: Int): Moment = moment(Time.ofNight(hours, parts))
+    def nightTime(hours: Int, parts: Int): Moment = time(Time.nightTime(hours, parts))
 
 
-    def momentOfDay(hours: Int, parts: Int): Moment = moment(Time.ofDay(hours, parts))
+    def dayTime(hours: Int, parts: Int): Moment = time(Time.dayTime(hours, parts))
 }
 
 

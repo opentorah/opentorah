@@ -46,7 +46,7 @@ final class Month private (val number: Int) extends Ordered[Month]{
     def year: Year = Year(this)
 
 
-    def numberInYear: Int = numberInCycle - year.monthsBeforeInCycle
+    def numberInYear: Int = numberInCycle - year.firstMonthInCycle + 1
 
 
     def day(day: Int): Day = {
@@ -58,9 +58,6 @@ final class Month private (val number: Int) extends Ordered[Month]{
     def firstDay: Int = year.firstDay + descriptor.daysBefore
 
 
-    def newMoon: Moment = Month.FirstNewMoon + Month.MeanLunarPeriod*(number-1) 
-
-
     def name: Month.Name.MonthName = descriptor.name
 
 
@@ -68,7 +65,10 @@ final class Month private (val number: Int) extends Ordered[Month]{
     def length: Int = descriptor.length
 
 
-    private def descriptor = year.months(numberInYear - 1)
+    private def descriptor = Month.months(year)(numberInYear - 1)
+
+
+    def newMoon: Moment = Month.FirstNewMoon + Month.MeanLunarPeriod*(number-1) 
 }
 
 
@@ -88,7 +88,18 @@ object Month {
     final class Descriptor(val name: Name.MonthName, val length: Int, val daysBefore: Int)
 
 
-    def months(kind: Year.Kind.YearKind, isLeap: Boolean): List[Descriptor] = {
+    def months(year: Year): List[Descriptor] = Months(year.isLeap)(year.kind)
+
+
+    private val Months: Map[Boolean, Map[Year.Kind.YearKind, List[Descriptor]]] =
+        Map(List(true, false).map(isLeap =>
+            isLeap -> Map(Year.Kind.values.toSeq.map(kind =>
+                kind -> months(kind, isLeap)
+            ): _*)
+        ): _*)
+
+
+    private def months(kind: Year.Kind.YearKind, isLeap: Boolean): List[Descriptor] = {
         val namesAndLengths = this.namesAndLengths(kind, isLeap)
         val (names, lengths) = namesAndLengths unzip
         val daysBefore = lengths.scanLeft(0)(_ + _).init
@@ -128,7 +139,7 @@ object Month {
 
     // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2):
     // BeHaRaD: 5 hours 204 parts at night of the second day (KH 6:8)
-    val FirstNewMoon = Day(2).momentOfNight(5, 204)
+    val FirstNewMoon = Day(2).nightTime(5, 204)
 
 
     def apply(number: Int): Month = new Month(number)

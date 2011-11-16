@@ -51,28 +51,29 @@ final class Year private (val number: Int) extends Ordered[Year] {
 
     def month(numberInYear: Int): Month = {
         require(0 < numberInYear && numberInYear <= lengthInMonths)
-        Month(monthsBefore + numberInYear)
+        Month(firstMonth + numberInYear - 1)
     }
 
 
     def month(name: Month.Name.MonthName): Month = month(months.indexWhere(_.name == name) + 1)
 
 
-    def monthOfDay(numberInYear: Int): Month = {
-        require(0 < numberInYear && numberInYear <= length)
-        month(months.count(_.daysBefore < numberInYear))
+    def month(day: Day): Month = {
+        require(0 < day.dayOfYear && day.dayOfYear <= lengthInDays)
+        month(months.count(_.daysBefore < day.dayOfYear))
     }
 
 
-    def monthsBefore: Int = Year.MonthsInCycle*(cycle - 1) + monthsBeforeInCycle
+    def firstMonth: Int = Year.MonthsInCycle*(cycle - 1) + firstMonthInCycle
 
 
-    def monthsBeforeInCycle: Int = Year.MonthsBeforeYearInCycle(numberInCycle - 1)
+    def firstMonthInCycle: Int = Year.MonthsBeforeYearInCycle(numberInCycle - 1) + 1
 
 
-    def length = next.firstDay - this.firstDay
+    def lengthInDays = next.firstDay - this.firstDay
 
 
+    // TODO give names to constants
     def firstDay: Int = {
         val newMoon = month(1).newMoon
         val day = newMoon.day
@@ -90,7 +91,7 @@ final class Year private (val number: Int) extends Ordered[Year] {
 
     // KH 8:7,8
     def kind: Year.Kind.YearKind = {
-        val daysOverShort = length - (if (isLeap) 383 else 353)
+        val daysOverShort = lengthInDays - (if (isLeap) 383 else 353)
 
         import Year.Kind._
 
@@ -98,12 +99,12 @@ final class Year private (val number: Int) extends Ordered[Year] {
         case 0 => Short
         case 1 => Regular
         case 2 => Full
-        case _ => throw new IllegalArgumentException("Impossible year length " + length + " for " + this)
+        case _ => throw new IllegalArgumentException("Impossible year length " + lengthInDays + " for " + this)
         }
     }
 
 
-    def months: List[Month.Descriptor] = Year.Months(this.isLeap)(this.kind)
+    def months: List[Month.Descriptor] = Month.months(this)
 
 
     def next: Year = Year(number + 1)
@@ -115,7 +116,7 @@ final class Year private (val number: Int) extends Ordered[Year] {
 
 object Year {
 
-    private val YearsInCycle = 19;
+    private val YearsInCycle = 19
 
 
     private val LeapYears = List(3, 6, 8, 11, 14, 17, 19)
@@ -133,7 +134,7 @@ object Year {
     private val MonthsInLeapYear = MonthsInNonLeapYear + 1
 
 
-    private val MonthsBeforeYearInCycle = ((1 to YearsInCycle) map (lengthInMonths(_))).scanLeft (0)(_ + _)
+    private val MonthsBeforeYearInCycle = ((1 to YearsInCycle) map (lengthInMonths(_))).scanLeft(0)(_ + _)
 
 
     val MonthsInCycle = MonthsBeforeYearInCycle.last
@@ -154,14 +155,6 @@ object Year {
     }
 
 
-    private val Months: Map[Boolean, Map[Kind.YearKind, List[Month.Descriptor]]] =
-        Map(List(true, false).map(isLeap =>
-            isLeap -> Map(Kind.values.toSeq.map(kind =>
-                kind -> Month.months(kind, isLeap)
-            ): _*)
-        ): _*)
-
-
     def apply(number: Int): Year = new Year(number)
 
 
@@ -173,8 +166,9 @@ object Year {
 
 
     def apply(day: Day): Year = {
-        val yearForSureBefore = (4 * day.number / (4 * 365 + 1)) - 1
-        var result = Year(scala.math.max(1, yearForSureBefore))
+        // TODO give names to constants
+        val yearForSureNotAfter = (4 * day.number / (4 * 365 + 1)) - 1
+        var result = Year(scala.math.max(1, yearForSureNotAfter))
         require(result.firstDay <= day.number)
         while (result.next.firstDay <= day.number) result = result.next
         result
