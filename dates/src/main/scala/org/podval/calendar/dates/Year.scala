@@ -104,7 +104,7 @@ final class Year private (val number: Int) extends Ordered[Year] {
     }
 
 
-    def months: List[Month.Descriptor] = Month.months(this)
+    def months: List[Month.Descriptor] = Year.months(this)
 
 
     def next: Year = Year(number + 1)
@@ -152,6 +152,51 @@ object Year {
     
     
         val Short, Regular, Full = Value 
+    }
+
+
+    def months(year: Year): List[Month.Descriptor] = Months(year.isLeap)(year.kind)
+
+
+    private val Months: Map[Boolean, Map[Kind.YearKind, List[Month.Descriptor]]] =
+        Map(List(true, false).map(isLeap =>
+            isLeap -> Map(Year.Kind.values.toSeq.map(kind =>
+                kind -> months(kind, isLeap)
+            ): _*)
+        ): _*)
+
+
+    private def months(kind: Kind.YearKind, isLeap: Boolean): List[Month.Descriptor] = {
+        val namesAndLengths = this.namesAndLengths(kind, isLeap)
+        val (names, lengths) = namesAndLengths unzip
+        val daysBefore = lengths.scanLeft(0)(_ + _).init
+        (namesAndLengths zip daysBefore) map (m => new Month.Descriptor(m._1._1, m._1._2, m._2))
+    }
+
+
+    private def namesAndLengths(kind: Kind.YearKind, isLeap: Boolean) = {
+        import Kind._
+        import Month.Name._
+
+        List(
+            (Tishrei, 30),
+            (Marheshvan, if (kind == Full) 30 else 29),
+            (Kislev, if (kind == Short) 29 else 30),
+            (Teves, 29),
+            (Shvat, 30)
+        ) ++
+        (if (!isLeap)
+            List((Adar, 29)) else
+            List((AdarI, 30), (AdarII, 30))
+        ) ++
+        List(
+            (Nisan, 30),
+            (Iyar, 29),
+            (Sivan, 30),
+            (Tammuz, 29),
+            (Av, 30),
+            (Elul, 29)
+        )
     }
 
 

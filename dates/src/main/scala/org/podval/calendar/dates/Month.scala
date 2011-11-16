@@ -65,7 +65,7 @@ final class Month private (val number: Int) extends Ordered[Month]{
     def length: Int = descriptor.length
 
 
-    private def descriptor = Month.months(year)(numberInYear - 1)
+    private def descriptor = year.months(numberInYear - 1)
 
 
     def newMoon: Moment = Month.FirstNewMoon + Month.MeanLunarPeriod*(number-1) 
@@ -86,51 +86,6 @@ object Month {
 
 
     final class Descriptor(val name: Name.MonthName, val length: Int, val daysBefore: Int)
-
-
-    def months(year: Year): List[Descriptor] = Months(year.isLeap)(year.kind)
-
-
-    private val Months: Map[Boolean, Map[Year.Kind.YearKind, List[Descriptor]]] =
-        Map(List(true, false).map(isLeap =>
-            isLeap -> Map(Year.Kind.values.toSeq.map(kind =>
-                kind -> months(kind, isLeap)
-            ): _*)
-        ): _*)
-
-
-    private def months(kind: Year.Kind.YearKind, isLeap: Boolean): List[Descriptor] = {
-        val namesAndLengths = this.namesAndLengths(kind, isLeap)
-        val (names, lengths) = namesAndLengths unzip
-        val daysBefore = lengths.scanLeft(0)(_ + _).init
-        (namesAndLengths zip daysBefore) map (m => new Descriptor(m._1._1, m._1._2, m._2))
-    }
-
-
-    private def namesAndLengths(kind: Year.Kind.YearKind, isLeap: Boolean) = {
-        import Year.Kind._
-        import Name._
-
-        List(
-            (Tishrei, 30),
-            (Marheshvan, if (kind == Full) 30 else 29),
-            (Kislev, if (kind == Short) 29 else 30),
-            (Teves, 29),
-            (Shvat, 30)
-        ) ++
-        (if (!isLeap)
-            List((Adar, 29)) else
-            List((AdarI, 30), (AdarII, 30))
-        ) ++
-        List(
-            (Nisan, 30),
-            (Iyar, 29),
-            (Sivan, 30),
-            (Tammuz, 29),
-            (Av, 30),
-            (Elul, 29)
-        )
-    }
 
 
     // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3 )
