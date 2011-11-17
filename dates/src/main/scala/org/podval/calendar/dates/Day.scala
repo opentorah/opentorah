@@ -17,24 +17,9 @@
 package org.podval.calendar.dates
 
 
-final class Day private (val number: Int) extends Ordered[Day] {
+final class Day private (number: Int) extends Numbered[Day](number) {
 
     require(0 < number)
-
-
-    override def equals(other: Any): Boolean = other match {
-        case that: Day => (number == that.number)
-        case _ => false
-    }
-
-
-    override def hashCode = number
-
-
-    override def compare(that: Day) = this.number - that.number
-
-
-    override def toString: String = number.toString
 
 
     // TODO give names to constants

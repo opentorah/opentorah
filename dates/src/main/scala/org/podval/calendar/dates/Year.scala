@@ -17,24 +17,9 @@
 package org.podval.calendar.dates
 
 
-final class Year private (val number: Int) extends Ordered[Year] {
+final class Year private (number: Int) extends Numbered[Year](number) with Ordered[Year] {
 
     require(0 < number)
-
-
-    override def equals(other: Any): Boolean = other match {
-        case that: Year => (number == that.number)
-        case _ => false
-    }
-
-
-    override def hashCode = number
-
-
-    override def compare(that: Year) = this.number - that.number
-
-
-    override def toString: String = number.toString
 
 
     def cycle: Int = ((number - 1) / Year.YearsInCycle) + 1

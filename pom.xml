@@ -43,7 +43,6 @@
 
     <modules>
         <module>dates</module>
-        <module>features</module>
         <module>ical</module>
         <module>app-servlet</module>
         <module>moon</module>

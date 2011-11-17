@@ -16,40 +16,7 @@
 
 package org.podval.calendar.dates
 
-
-final class Secular {
-
-//(January, 31)
-//(February, 28) (February, 29)
-//(March", 31)
-//(April", 30)
-//(May", 31)
-//(June", 30)
-//(July", 31)
-//(August", 31)
-//(September", 30)
-//(October", 31)
-//(November", 30)
-//(December", 31)
-//
-//    @Override
-//    public int epoch() {
-//        return 1373430;
-//    }
-//
-//
-//    @Override
-//    protected int daysInYearsBeforeYear(final int year) {
-//        final int y = year-1;
-//        return 365 * y + y/4 - y/100 + y/400;
-//    }
-//
-//
-//    public boolean isLeap(final int year) {
-//        return (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0));
-//    }
-
-
+class MomentG {
 
 // TODO
 //    def toJewishTime: Moment =
