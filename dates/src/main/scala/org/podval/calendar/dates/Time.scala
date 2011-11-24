@@ -17,77 +17,22 @@
 package org.podval.calendar.dates
 
 
-final class Time private (val hours: Int, val parts: Int) extends Ordered[Time] {
-
-    require(0 <= hours && hours < Time.HoursPerDay)
-    require(0 <= parts && parts < Time.PartsPerHour)
-
-
-    override def equals(other: Any): Boolean = other match {
-        case that: Time => this.allParts == that.allParts
-        case _ => false
-    }
-
-
-    override def hashCode = 41*hours+parts
-
-
-    override def compare(that: Time) = this.allParts - that.allParts
-
-
-    def isZero = (hours == 0) && (parts == 0)
-
-
-    def allParts = hours*Time.PartsPerHour + parts
-
-
-    def minutes: Int = parts / Time.PartsPerMinute
-
-
-    def partsOfMinute = parts % Time.PartsPerMinute
-
-
-    override def toString: String = hours + "h" + parts + "p"
-
-
-    def toMinutesString: String = hours + "h" + minutes + "m" + partsOfMinute + "p"
-}
+final class Time private (hours: Int, parts: Int) extends TimeT(hours, parts)
 
 
 object Time {
-
-    val HoursPerDay = 24
-
-
-    require(HoursPerDay % 2 == 0)
-
-
-    val HoursPerHalfDay = HoursPerDay / 2
-
-
-    val PartsPerHour = 1080
-
-
-    val MinutesPerHour = 60
-
-
-    require(PartsPerHour % MinutesPerHour == 0)
-
-
-    val PartsPerMinute = PartsPerHour / MinutesPerHour
-
 
     def apply(hours: Int, parts: Int) = new Time(hours, parts)
 
 
     def nightTime(hours: Int, parts: Int) = {
-        require(hours < HoursPerHalfDay)
+        require(hours < TimeT.HoursPerHalfDay)
         Time(hours, parts)
     }
 
 
     def dayTime(hours: Int, parts: Int) = {
-        require(hours < HoursPerHalfDay)
-        Time(hours + HoursPerHalfDay, parts)
+        require(hours < TimeT.HoursPerHalfDay)
+        Time(hours + TimeT.HoursPerHalfDay, parts)
     }
 }

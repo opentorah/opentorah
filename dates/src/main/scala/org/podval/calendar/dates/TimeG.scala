@@ -16,6 +16,23 @@
 
 package org.podval.calendar.dates
 
-class TimeG {
 
+final class TimeG private (hours: Int, parts: Int) extends TimeT(hours, parts)
+
+
+object TimeG {
+
+    def apply(hours: Int, parts: Int) = new TimeG(hours, parts)
+
+
+    def morningTime(hours: Int, parts: Int) = {
+        require(hours < TimeT.HoursPerHalfDay)
+        TimeG(hours, parts)
+    }
+
+
+    def afternoonTime(hours: Int, parts: Int) = {
+        require(hours < TimeT.HoursPerHalfDay)
+        TimeG(hours + TimeT.HoursPerHalfDay, parts)
+    }
 }

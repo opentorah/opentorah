@@ -16,7 +16,47 @@
 
 package org.podval.calendar.dates
 
-class MonthG {
+class MonthG private (number: Int) extends Numbered[Month](number) {
+
+    def year: YearG = YearG(this)
+
+
+    def numberInYear: Int = number - year.firstMonth + 1
+
+
+    def day(day: Int): DayG = {
+        require (0 < day && day <= length)
+        DayG(firstDay + day - 1)
+    }
+
+
+    def firstDay: Int = year.firstDay + descriptor.daysBefore
+
+
+    def name: MonthG.Name.MonthName = descriptor.name
+
+
+    def length: Int = descriptor.length
+
+
+    private def descriptor = year.months(numberInYear - 1)
+}
+
+
+object MonthG {
+
+    object Name extends Enumeration {
+
+        type MonthName = Value 
+
+
+        val January, February, March, April, May, June,
+            July, August, September, October, November, December = Value
+    }
+
 
     final class Descriptor(val name: Name.MonthName, val length: Int, val daysBefore: Int)
+
+
+    def apply(number: Int): MonthG = new MonthG(number)
 }

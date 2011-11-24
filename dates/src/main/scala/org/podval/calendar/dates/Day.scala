@@ -22,8 +22,7 @@ final class Day private (number: Int) extends Numbered[Day](number) {
     require(0 < number)
 
 
-    // TODO give names to constants
-    def dayOfWeek: Int = ((number - 1) % 7) + 1 // TODO: what was the day of the week of the first day of the first year?
+    def dayOfWeek: Int = Day.dayOfWeek(number)
 
 
     def dayOfMonth: Int = number - month.firstDay + 1
@@ -54,10 +53,23 @@ final class Day private (number: Int) extends Numbered[Day](number) {
 
 
     def dayTime(hours: Int, parts: Int): Moment = time(Time.dayTime(hours, parts))
+
+
+    def toFullString: String = year + " " + month.name + " " + dayOfMonth 
 }
 
 
 object Day {
+
+    // It seems that first day of the first year was Sunday.
+    val FirstDayDayOfWeek = 1
+
+
+    val DaysPerWeek = 7
+
+
+    def dayOfWeek(day: Int): Int = ((day + FirstDayDayOfWeek - 1 - 1) % DaysPerWeek) + 1
+
 
     def apply(number: Int): Day = new Day(number)
 }

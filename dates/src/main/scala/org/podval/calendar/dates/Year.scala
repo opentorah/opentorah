@@ -17,7 +17,7 @@
 package org.podval.calendar.dates
 
 
-final class Year private (number: Int) extends Numbered[Year](number) with Ordered[Year] {
+final class Year private (number: Int) extends Numbered[Year](number) {
 
     require(0 < number)
 

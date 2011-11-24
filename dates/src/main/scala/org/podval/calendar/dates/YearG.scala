@@ -17,12 +17,20 @@
 package org.podval.calendar.dates
 
 
-final class YearG private(number: Int) extends Numbered[YearG](number) with Ordered[YearG] {
+final class YearG private(number: Int) extends Numbered[YearG](number) {
 
+    // TODO give names to constants?
     def isLeap: Boolean = (number % 4 == 0) && ((number % 100 != 0) || (number % 400 == 0))
 
 
-    def lengthInMonths = 12
+    def firstDay: Int =
+        YearG.DaysInNonLeapYear * (number - 1) + (number - 1)/4 - (number - 1)/100 + (number - 1)/400 + 1
+
+
+    def lengthInMonths = YearG.MonthsInYear
+
+
+    def firstMonth: Int = YearG.MonthsInYear*(number - 1) + 1
 
 
     def lengthInDays = if (isLeap) YearG.DaysInLeapYear else YearG.DaysInNonLeapYear
@@ -37,24 +45,26 @@ final class YearG private(number: Int) extends Numbered[YearG](number) with Orde
     def month(name: MonthG.Name.MonthName): MonthG = month(months.indexWhere(_.name == name) + 1)
 
 
-    def month(day: DayG): Month = {
+    def month(day: DayG): MonthG = {
         require(0 < day.dayOfYear && day.dayOfYear <= lengthInDays)
         month(months.count(_.daysBefore < day.dayOfYear))
     }
 
-//
-//
-//
 
-//    @Override
-//    protected int daysInYearsBeforeYear(final int year) {
-//        final int y = year-1;
-//        return 365 * y + y/4 - y/100 + y/400;
-//    }
+    def months: List[MonthG.Descriptor] = YearG.months(this)
+
+
+    def next: YearG = YearG(number + 1)
+
+
+    def prev: YearG = YearG(number - 1)
 }
 
 
 object YearG {
+
+    val MonthsInYear = 12
+
 
     val DaysInNonLeapYear = 365
 
@@ -66,52 +76,49 @@ object YearG {
 
 
     private val Months: Map[Boolean, List[MonthG.Descriptor]] =
-        Map(List(true, false).map(isLeap => months(isLeap)))
+        Map(List(true, false).map(isLeap => isLeap -> months(isLeap)): _*)
 
     
-
-    private def months(kind: Kind.YearKind, isLeap: Boolean): List[Month.Descriptor] = {
-        val namesAndLengths = this.namesAndLengths(kind, isLeap)
+    private def months(isLeap: Boolean): List[MonthG.Descriptor] = {
+        val namesAndLengths = this.namesAndLengths(isLeap)
         val (names, lengths) = namesAndLengths unzip
         val daysBefore = lengths.scanLeft(0)(_ + _).init
-        (namesAndLengths zip daysBefore) map (m => new Month.Descriptor(m._1._1, m._1._2, m._2))
+        (namesAndLengths zip daysBefore) map (m => new MonthG.Descriptor(m._1._1, m._1._2, m._2))
     }
 
 
-    private def namesAndLengths(kind: Kind.YearKind, isLeap: Boolean) = {
-        import Kind._
-        import Month.Name._
+    private def namesAndLengths(isLeap: Boolean) = {
+        import MonthG.Name._
 
         List(
-            (Tishrei, 30),
-            (Marheshvan, if (kind == Full) 30 else 29),
-            (Kislev, if (kind == Short) 29 else 30),
-            (Teves, 29),
-            (Shvat, 30)
-        ) ++
-        (if (!isLeap)
-            List((Adar, 29)) else
-            List((AdarI, 30), (AdarII, 30))
-        ) ++
-        List(
-            (Nisan, 30),
-            (Iyar, 29),
-            (Sivan, 30),
-            (Tammuz, 29),
-            (Av, 30),
-            (Elul, 29)
+            (January, 31),
+            (February, if (isLeap) 29 else 28),
+            (March, 31),
+            (April, 30),
+            (May, 31),
+            (June, 30),
+            (July, 31),
+            (August, 31),
+            (September, 30),
+            (October, 31),
+            (November, 30),
+            (December, 31)
         )
     }
-//(January, 31)
-//(February, 28) (February, 29)
-//(March", 31)
-//(April", 30)
-//(May", 31)
-//(June", 30)
-//(July", 31)
-//(August", 31)
-//(September", 30)
-//(October", 31)
-//(November", 30)
-//(December", 31)
+
+
+    def apply(number: Int): YearG = new YearG(number)
+
+
+    def apply(month: MonthG): YearG = YearG((month.number - 1) / MonthsInYear +1)
+
+
+    def apply(day: DayG): YearG = {
+        // TODO give names to constants
+        val yearForSureNotAfter = (4 * day.number / (4 * 365 + 1)) - 1
+        var result = YearG(yearForSureNotAfter) // Year(scala.math.max(1, yearForSureNotAfter))
+        require(result.firstDay <= day.number)
+        while (result.next.firstDay <= day.number) result = result.next
+        result
+    }
 }

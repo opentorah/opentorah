@@ -16,21 +16,51 @@
 
 package org.podval.calendar.dates
 
-class MomentG {
 
-// TODO
-//    def toJewishTime: Moment =
-//        val (newDays, newHours) =
-//            if (hours >= 18) (days+1, hours-18) else (days, hours+6)
-//
-//        Moment(newDays, Flavour.Secular, newHours, minutes, seconds)
-//    }
-//
-//
-//    def toSecularTime: Moment =
-//        val (newDays, newHours) =
-//            if (hours < 6) (days-1, hours+18) else (days, hours-6)
-//
-//        Moment(newDays, Flavour.Secular, newHours, minutes, seconds)
-//    }
+final class MomentG private (days: Int, time: TimeG) extends MomentT[TimeG, MomentG](days, time) {
+
+    def day: DayG = DayG(days + 1)
+
+
+    def create(days: Int, hours: Int, parts: Int): MomentG = MomentG(days, TimeG(hours, parts))
+
+
+    def toJewish: Moment = {
+        val hours = time.hours
+
+        val (newDay, newHours) =
+            if (hours >= MomentG.JewishDayStartHours)
+                (day.next, hours - MomentG.JewishDayStartHours) else
+                (day     , hours + MomentG.JewishDayLeftHours)
+
+        newDay.toJewish.time(newHours, time.parts)
+    }
+
+
+    def toFullString: String = day.toFullString + " " + time.toFullString
+}
+
+
+object MomentG {
+
+    val JewishDayStartHours = 18
+
+
+    val JewishDayLeftHours = TimeT.HoursPerDay - JewishDayStartHours
+
+
+    def apply(days: Int, time: TimeG) = new MomentG(days, time)
+
+
+    def fromJewish(moment: Moment): MomentG = {
+        val day = moment.day
+        val hours = moment.time.hours
+
+        val (newDay, newHours) =
+            if (hours < MomentG.JewishDayLeftHours)
+                (day.prev, hours + MomentG.JewishDayStartHours) else
+                (day     , hours - MomentG.JewishDayLeftHours)
+
+        DayG.fromJewish(newDay).time(newHours, moment.time.parts)
+    }
 }
