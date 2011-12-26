@@ -26,8 +26,54 @@
         <para>
             Aron Matskin - for a discussion on his visit with us on Rosh Chodesh Mar Cheshvan 5772.
         </para>
+        <para>
+            Rabbi Chaim Prus - for causing me to investigate which number does the year of Creation has - 0 or 1.
+        </para>
         
     </acknowledgements>
+
+    <section>
+        <title>Introduction</title>
+
+        <para>Rambam gives algorithmic description of two calendars: fixed (arithmetic) and astronomical.
+            Both calendars are described in the form ready to be implemented, but the reasons for the calculation steps
+        are not always given. Especially for the astronomical calendar, the following questions arise:
+        Where do the numbers come from?
+        What are the models - and the formulae resulting from them - that reproduce the numbers?
+        Sometimes Rambam describes the models, so only the formulae need to be recosntructed; sometimes the models are
+        not described, so both the models and the formulae need to be reconstructed.
+        </para>
+    </section>
+
+    <section>
+        <title>Goals</title>
+        <itemizedlist>
+            <listitem><para>Translate appropriate chapters of Rambam into English.
+              The translation does not have to be literal; literal translations are already available (TODO).
+              The goal of our translation is to make the text complete and accessible for collaboration
+              by people not proficient enough in Hebrew.</para></listitem>
+            <listitem><para>Reconstruct the models and formulae implied in the text.</para></listitem>
+            <listitem><para>Implement the algorithms.</para></listitem>
+            <listitem><para>Relate Rambam's models to contemporary astronomical models.</para></listitem>
+        </itemizedlist>
+    </section>
+
+    <section>
+        <title>History</title>
+        <para>In TODO, The Rebbe instructed the Jews to learn Rambam every day.
+        As a result, in 1991 (TODO) I encountered
+        calendar chapters of Rambam, decided to reconstruct the models beind the calculations described in them,
+        and discovered mistakes in the text of one of the laws (TODO). The results were published in TODO.
+        Some of the readers were appaled that someone dares to correct the text of Rambam!
+        My point was that the text as published contains mistakes that need to be corrected.
+        Indeed, Frenkel edition (that was already published at the time) corrects all of the mistakes I did.        
+        Indeed, they were already corrected by Hazon Ish in his commentary on Rambam - but I did not know it then.</para>
+        <para>In 2005, during a visit to Israel, I talked about the subject with Rabbi Michael Koretz.</para>
+        <para>In 2008 (TODO) I acquired a pile of books on the subject and started looking into it;
+        I also experimented with web publication of the work.</para>
+        <para>In 2009 I coded some of the algorithms to look into then circulating rumors pertaining to the dates of Birkhat HaHamah.</para>
+        <para>In 2011 I realized that the work needs to be pusblished before it finished - so that others could help finish it ;)</para>
+    </section>
 
     <section>
         <title>Solar Theory</title>
