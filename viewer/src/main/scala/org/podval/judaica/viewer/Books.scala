@@ -18,10 +18,15 @@ package org.podval.judaica.viewer
 
 import scala.xml.Node
 
+import org.fusesource.scalate.TemplateEngine
+
 
 class Books {
 
-    private val works = Works()
+    private val works = Works("/home/dub/code/podval-judaica/viewer/src/main/resources/org/podval/judaica/viewer/")
+
+
+    private val engine = new TemplateEngine
 
 
     def get(request: Request): Node = {

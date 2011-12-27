@@ -26,6 +26,12 @@
                     </systemProperties>
                 </configuration>
             </plugin>
+
+            <!-- Precompile Scalate templates -->
+            <plugin>
+                <groupId>org.fusesource.scalate</groupId>
+                <artifactId>maven-scalate-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
 
@@ -34,6 +40,22 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fusesource.scalate</groupId>
+            <artifactId>scalate-core</artifactId>
+        </dependency>
+
+        <!-- TODO this is only here while I work on the Scalate integration -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>            
+
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-compiler</artifactId>
         </dependency>
     </dependencies>
 </project>

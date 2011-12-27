@@ -4,10 +4,28 @@
         <servlet-name>Books Servlet</servlet-name>
         <servlet-class>org.podval.judaica.webapp.BooksServlet</servlet-class>
     </servlet>
+
     <servlet-mapping>
         <servlet-name>Books Servlet</servlet-name>
         <url-pattern>/books/*</url-pattern>
     </servlet-mapping>
+
+
+    <!--
+    I can not use Jersey since I process URL's pathInfo myself, resolving its components
+    step-by-step. For the same reason I can not really use Scalate filter, so I need to invoke
+    Scala directly...
+
+    <filter>
+        <filter-name>TemplateEngineFilter</filter-name>
+        <filter-class>org.fusesource.scalate.servlet.TemplateEngineFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>TemplateEngineFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    -->
 
     <session-config>
         <session-timeout>30</session-timeout>
