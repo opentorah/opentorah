@@ -1,0 +1,1807 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//W3C//DTD MathML 2.0//EN" "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd">
+<?xml-model href="http://www.oxygenxml.com/docbook/xml/5.0/rng/dbmathmlsvg.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<article xmlns="http://docbook.org/ns/docbook" version="5.0"
+    xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude">
+    <title>Digital Judaica Done Right</title>
+
+    <section>
+        <title>Introduction</title>
+
+        <section>
+            <title>What is this About?</title>
+
+            <para>We want to have a computer environment that supports and facilitates study and
+                research of Jewish Orthodox texts. (Most of the technological pieces that we need to
+                develop are not at all specific to Jewish Orthodox Texts. On the other hand, desire
+                to facilitate study of such texts is our primary motivation.)</para>
+            <para>This "dream system" will record various information about the texts and support
+                doing interesting things with them.</para>
+            <para>On the text level, we want to allow marking up names of people and places, index
+                entries, logical structure of statements, user-defined tags and the like. On the
+                structural level: allow capturing of multiple structures of the same text, for
+                example - chapter/verse and pages of a printed edition. On the intra-text level:
+                record links from one text to another with their types and other metadata, and
+                support link reversal.</para>
+            <para>It should be possible to print any text with glosses formatted nicely.</para>
+            <para>The system should be accessible through a clean, even minimalist, but powerful
+                web-based interface. Mass participation - proofreading of the texts, marking them
+                up, clarifying the cross-references and such - should be very much supported.</para>
+        </section>
+
+        <section>
+            <title>History</title>
+            <para>Initial conversations in this area took place in 1992-1994, between Leonid
+                Dubinsky and Baruch Gorkin. Most of the requirements were understood then, but not
+                the need for universal web-availability and crowd-sourcing: access to the Internet
+                was not what it is now.</para>
+            <para>We realized that a standard approach to text markup has to be used, and settled on
+                SGML (XML did not yet exist).</para>
+            <para>In the summer of 2006, discussions restarted between Dubinsky and Gorkin.
+                Crowd-sourcing and potential commercialization were discussed. In the Fall of 2006,
+                Michoel Koritz joined in. </para>
+        </section>
+
+        <section>
+            <title>Format</title>
+            <para>Some of the research notes, discussion items and conclusions related to this
+                project were captured and published on the project's web site.</para>
+            <para>Standard XML formats for text publishing were tried: DocBook and TEI. Since the
+                format that is likely to be used for the storage of the texts themselves is TEI, we
+                wanted to use TEI as the format for publishing the project papers too. This turned
+                out to be impractical, since there is no convenient way to edit TEI document over
+                the web using wiki-like interface. It seems that some people tried creating packages
+                with such functionality, but nothing is being developed now. There is the DocBook
+                Wiki, but it's approach to section editing leaves much to be desired, and anyway,
+                TEI and not DocBook is our preferred format. Also, the machinery for turning TEI
+                into PDF had some <link
+                    xlink:href="http://listserv.brown.edu/archives/cgi-bin/wa?A2=ind0712&amp;L=TEI-L&amp;T=0&amp;F=&amp;S=&amp;P=63"
+                    >issues</link>.</para>
+            <para>We then published in a form of wiki pages - some of them in Russian. A blog was
+                deemed an appropriate format, since it captures a sense of development in time,
+                allows comments and, hopefully, encourages smaller, but more frequent publication
+                :)</para>
+            <para>As part of this project, we need to develop technology for web-based editing of
+                big texts with rich markup and complex structure. When we have it, we'll use it for
+                publishing our papers, so this is not the final format ;)</para>
+            <para>Onward!</para>
+        </section>
+    </section>
+
+    <section>
+        <title>What do we want? (The Dream)</title>
+        <section>
+            <title>Аннотация</title>
+            <para>Пора сформулировать, наконец, в письменном виде требования и подходы, и начать
+                что-то делать.</para>
+        </section>
+        <section>
+            <title>Введение</title>
+            <para>Мы хотим хранить тексты в формате (Раздел 2), вмещающем всю информацию, нужную для
+                поддержки интересных операций (Раздел 3) с текстами. Интерфейс (Раздел 5) должен
+                завораживать своей минималистической правильностью, и главное - система должна быть
+                построена вокруг кооперации (Раздел 6), в духе современных веяний. В частности,
+                подключить народ к работе системы необходимо как можно раньше ("build it and they
+                will come").</para>
+        </section>
+
+        <section>
+            <title>Что надо хранить</title>
+            <section>
+                <title>Текст</title>
+                <para>Надо хранить тексты на разных языках, некоторые из которых пишутся справа
+                    налево. В некоторых текстах на иврите будут огласовки, а то и кантиляция.</para>
+                <para>Бывают также "особые" буквы (уменьшенные, увеличенные, перевернутые), и надо
+                    их отметить.</para>
+                <para>Надо хранить фотографии рукописей или просканированные страницы книг.
+                    Возможно, и аудио- и видео- материалы.</para>
+            </section>
+            <section>
+                <title>Аннотации</title>
+                <para>Надо уметь отмечать textual features, то есть выделять и выявлять информацию,
+                    содержащуюся в тексте:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>Имена людей</para>
+                    </listitem>
+                    <listitem>
+                        <para>Названия мест</para>
+                    </listitem>
+                    <listitem>
+                        <para>Начальные слова комментариев</para>
+                    </listitem>
+                    <listitem>
+                        <para>Авторов высказываний</para>
+                    </listitem>
+                    <listitem>
+                        <para>Метод вывода в высказывания Талмуда</para>
+                    </listitem>
+                    <listitem>
+                        <para>Фразы, под которыми ссылки на этот фрагмент входят в индекс</para>
+                    </listitem>
+                </itemizedlist>
+                <para>Надо также уметь ассоциировать метаинформацию с фрагментами текста:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>На какой стадии вычитки находится фрагмент</para>
+                    </listitem>
+                    <listitem>
+                        <para>"Таги"</para>
+                    </listitem>
+                </itemizedlist>
+            </section>
+
+            <section>
+                <title>Иерархическая структура</title>
+                <para>Надо хранить иерархическую структуру текстов, используемую, в частности, для
+                    ссылок. Примеры: Текст Структура Танах книга, глава, стих Хумаш недельный раздел
+                    Хумаш парша (тип которой - открытая или закрытая - тоже надо хранить) Раши на
+                    Танах книга, глава, стих, комментарий Мишна трактат, глава, мишна Талмуд
+                    трактат, лист/сторона Талмуд трактат, глава, высказывание Рамбам [книга,] законы
+                    о, закон [, предложение] Шулхан Арух раздел, симан, сеиф[, сеиф котон]</para>
+                <para>Надо уметь хранить границы страниц, например, Талмуда, причем иногда - для
+                    нескольких изданий одного и того же текста. Возможность хранить границы строк
+                    тоже может пригодиться.</para>
+                <para>У одного текста может быть несколько иерархических структур (глава/стих и
+                    парша в Хумаше; страница и высказывание в Талмуде). Разные структуры могут быть
+                    "несовместимыми": парша может кончиться посреди стиха, а недельный раздел -
+                    посреди главы. Страницы в разных изданиях начинаются в разных местах, часто -
+                    посреди предложения.</para>
+            </section>
+            <section>
+                <title>Ссылки</title>
+                <para>Тексты ссылаются друг на друга. Ссылка соединяет отрезок или точку одного
+                    текста с отрезком или точкой другого.</para>
+                <para>Ссылки могут быть внешними по отношению к текстам, ими соединяемым. Например,
+                    список параллельных мест в Талмуде или источников Шулхан Аруха Альтер Ребе.
+                    Толдос...</para>
+                <para>Бывают разныe типы ссылок:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>начало комментирует конец</para>
+                    </listitem>
+                    <listitem>
+                        <para>начало приводит доказательство/иллюстрирует концом</para>
+                    </listitem>
+                    <listitem>
+                        <para>начало транскрибирует конец</para>
+                    </listitem>
+                </itemizedlist>
+                <para>"Сила" ссылки.</para>
+            </section>
+            <section>
+                <title>Самокоррекции</title>
+                <para>Тип ссылки, обрабатывающийся системой особым образом - коррекция.</para>
+                <para>Тексты могут корректировать другие тексты (Раши - Талмуд) или сами себя
+                    (Талмуд - цитаты из древних приведенные в нем). Текст может корректировать и
+                    ссылки, и структуру (разбиение на халохос в Рамбаме).</para>
+            </section>
+            <section>
+                <title>Авторство</title>
+                <para>Надо хранить много версий ("изданий") одного текста. Например,
+                    коррекции/выверки/впечатка фрагментов некоего текста одним пользователем - это
+                    "издание" (версия).</para>
+            </section>
+        </section>
+        <section>
+            <title>Что надо уметь</title>
+            <section>
+                <title>История изменений (XXX подход?)</title>
+                <para>Как source control system - слишком сложно. Нам бы что-нибудь попроще и
+                    постандартней...</para>
+                <para>It seems that branching and merging are necessary.</para>
+            </section>
+            <section>
+                <title>Програмный интерфейс</title>
+                <para>Всё, что можно сделать через интерфейс пользователя, должна быть возможность
+                    сделать и через програмный интерфейс тоже.</para>
+                <para>Доступ и изменения в различных форматах.</para>
+                <para>Add/change. Add/change metadata.</para>
+                <para>Look into AtomPub, WebDav and distributed source control - say,
+                    Mercurial.</para>
+            </section>
+            <section>
+                <title>Текстовый редактор</title>
+                <para>С текстами должно быть можно работать в текстовом редакторе.</para>
+            </section>
+            <section>
+                <title>Обращение ссылок</title>
+                <para>Надо уметь обращать ссылки, т.е. перечислить, какие ссылки кончаются в
+                    указанном интервале.</para>
+            </section>
+            <section>
+                <title>Язык запросов</title>
+                <para> TODO </para>
+            </section>
+            <section>
+                <title>Текстовый поиск</title>
+                <para>Должен быть доступен текстовый поиск - с учетом структуры текстов и грамматики
+                    - и всякие другие поиски. Например:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>по ключевым словам</para>
+                    </listitem>
+                    <listitem>
+                        <para>все упоминания некоего города</para>
+                    </listitem>
+                    <listitem>
+                        <para>все высказывания определенного автора</para>
+                    </listitem>
+                    <listitem>
+                        <para>по титулу</para>
+                    </listitem>
+                    <listitem>
+                        <para>по разным языкам</para>
+                    </listitem>
+                    <listitem>
+                        <para>по последним добавлениям</para>
+                    </listitem>
+                    <listitem>
+                        <para>по группам пользователей</para>
+                    </listitem>
+                    <listitem>
+                        <para>близкие по "народному мнению"</para>
+                    </listitem>
+                    <listitem>
+                        <para>по "народному рейтингу"</para>
+                    </listitem>
+                </itemizedlist>
+                <para>Вот статья про поиск в анотированном тексте: [78]</para>
+            </section>
+            <section>
+                <title>Параллельные структуры</title>
+                <para>У некоторых текстов структуры паралельны хотя ни один не является коментарием
+                    другого. Например:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>перевод и оригинал</para>
+                    </listitem>
+                    <listitem>
+                        <para>разные издания одного текста</para>
+                    </listitem>
+                    <listitem>
+                        <para>Шулхан Арух Алтер Ребе и большой Шулхан Арух</para>
+                    </listitem>
+                </itemizedlist>
+                <para>Надо уметь сочетать тексты с параллельной структурой по этой структуре.
+                    Например, в виде подстрочного перевода.</para>
+                <para>Надо уметь ссылаться на набор текстов с параллельной структурой. Такие ссылки
+                    разрешаются на тот или иной конкретный текст (издание; язык; наличие огласовок)
+                    в зависимости от предпочтений пользователя.</para>
+            </section>
+            <section>
+                <title>Авторство</title>
+                <para>XXX "А от имени Б". То же - с пользовательскими текстами. Собственные
+                    комментарии - тоже тексты. XXX Как и обсуждения.</para>
+                <para>(Хумаш издания Кетер) по версии Васи; ((Рамбам глазами Роша) издания Ромм) по
+                    врсии Пети.</para>
+                <para>Разница между версиями текста - тоже текст; текст с выделенными
+                    разночтениями.</para>
+            </section>
+            <section>
+                <title>Печать</title>
+                <para>Печать набора связанных текстов</para>
+            </section>
+        </section>
+        <section>
+            <title>Индивидуализация</title>
+            <itemizedlist>
+                <listitem>
+                    <para>Личная программа учебы</para>
+                </listitem>
+                <listitem>
+                    <para>Дневные уроки - с записью "долгов"</para>
+                </listitem>
+                <listitem>
+                    <para>Создание собственной подборки текстов как на основе выборки из
+                        комментариев так и из результатов поиска</para>
+                </listitem>
+                <listitem>
+                    <para>Возможность компоновать выборки, сохранить их в памяти, распечатать</para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section>
+            <title>Интерфейс</title>
+            <para>Передвижение по текстам - горизонтальное и через таги (смысловое); поиск; выбор
+                "фокуса": даф/сугъя; заметки: внести/просмотреть мои; недельная глава, последние и
+                ближайшие шиурим, прошлые поиски юзера, последние поступления и т.д. От текста
+                переход на соседние логические единицы текста, комментарии к нему (к выделенному
+                юзером отрывку), поднятие к комментируемум им тексту, переводы и варианты. Список
+                просмотренных сегодня текстов. "рабочий стол": выбранные тексты и большой лист для
+                записей юзера - план урока или хидуш (конспект проведенной работы). Google
+                    Notebook. <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FJotSpace&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdlkbaz_k-FWYut3UF5pxNxNgDV0w"
+                    >JotSpace</link>.</para>
+            <para>Отец семейства хочет подготовить субботний разговор. Мы помним его любимых
+                комментаторов , ему они предложены на "столе", при желании он находит дополнительные
+                материалы на "полке", вытаскивает понравившиеся на лист, возможно добавляет список
+                вопросов для детей. Текст и добавления идут в одном потоке</para>
+            <para>Подготовка драши к событию. Юзер выбирает из списка (бар мицва, бат мицва, брит,
+                сиюм ...) события, затем из другого списка - шиурим ему подходяшие (недельная глава,
+                Тания, Рамбам, ближайшие праздники) и на основе этого выбора он получает набор
+                текстов.</para>
+            <para>Kроме побора текстов в формате "форума" может понадобиться например снимок листа
+                Гемары.</para>
+            <para>Для урока в ешиве тихонит учитель может захотеть добавить виде-аудиоматериалы и
+                разные картинки. (При обращени к внешним материалам надо продумать политику
+                цензурирования, чтобы досов не спугнуть)</para>
+            <para>Презентации.</para>
+        </section>
+        <section>
+            <title>Кооперация</title>
+            <section>
+                <title>Основное: всё</title>
+                <para>Впечатывание текстов</para>
+                <para>Выверка текстов: Wikipedia, Wikisource, Distributed Proofreaders</para>
+                <para>Разметка текстов</para>
+                <para>Провязка текстов</para>
+                <para>Аннотирование</para>
+                <para>Новые стили подачи информации (XProc/XQuery/XSLT)</para>
+                <para>Новые стили печати</para>
+            </section>
+            <section>
+                <title>Разное</title>
+                <para>Дистанционность (web)</para>
+                <para>Интеграция с блогами</para>
+                <para>Wikipedia</para>
+                <para>Live Journal</para>
+                <para>Del.icio.us</para>
+                <para>Digital libraries</para>
+                <para>Юристы</para>
+                <para>Форумы для обсуждения: Wikipedia</para>
+                <para>Защита от саботажа: Wikipedia</para>
+                <para>Citizendium [64]</para>
+                <para><link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fmany.corante.com%2Farchives%2F2006%2F09%2F18%2Flarry_sanger_citizendium_and_the_problem_of_expertise.php&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfNIgXDko9UUL0Dq1mQc5PMiVY_Og"
+                        >http://many.corante.com/archives/2006/09/18/larry_sanger_citizendium_and_the_problem_of_expertise.php</link></para>
+                <para><link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fmany.corante.com%2Farchives%2F2006%2F09%2F20%2Flarry_sanger_on_me_on_citizendium.php&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdYJAwDoMj16E9wRNcfP_x3cp6fBg"
+                        >http://many.corante.com/archives/2006/09/20/larry_sanger_on_me_on_citizendium.php</link></para>
+                <para>Уровни пользователей по репутации/возможностям (анонимный, зарегистрированный,
+                    редактор)</para>
+                <para>Редактор, сотвори редактора</para>
+            </section>
+        </section>
+        <section>
+            <title>Комерциализуемость/Привлекательность</title>
+            <section>
+                <title>Чувство вины</title>
+                <para>Наша система должна стать частью еврейской культуры. Бохур, не взявший шефства
+                    над листом талмуда или главой ришона станет изгоем. С издательством, не
+                    подарившим нам 10 электронных текстов никто не будет иметь дела. Все спонсоры
+                    будут наши - у нас видно всему свету. Заповедь о написании Торы выполнять ходить
+                    будут к нам. Хаскомос давать будут через нас. Хидушим печатать будут у нас - как
+                    физики в arXivе.</para>
+                <para>Увековечивание себя (или других людей) на страницах проекта.</para>
+            </section>
+            <section>
+                <title>Градуированные платные услуги</title>
+                <para>Предоставление дополнительных услуг за деньги. Например, хорошая печать. Или -
+                    доступ к "супервыверенным" текстам.</para>
+            </section>
+            <section>
+                <title>Google</title>
+                <para>Индивидуализация: GData.</para>
+                <para>Сканы.</para>
+                <para>Хорошо бы - их хостинг.</para>
+                <para>Ещё лучше - за их деньги.</para>
+            </section>
+            <section>
+                <title>Разное</title>
+                <para>Ксюхина идея: Юристы как рынок для серьезных денег?</para>
+                <para>Патент</para>
+                <para>Довесок к бумажной книге</para>
+            </section>
+        </section>
+        <section>
+            <title>Связаные разработки</title>
+            <para>TODO</para>
+        </section>
+        <section>
+            <title>Открытые вопросы</title>
+            <section>
+                <title>Имя домена</title>
+                <para>Как назвать? Кориц предложил два: <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FOpenTorah&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfjSpVkpt991iYVPNQQJP8e07hRig"
+                        >OpenTorah</link> и "Торат Моше".</para>
+            </section>
+            <section>
+                <title>Источники</title>
+                <para>[1] The Responsa storage and retrieval system-whither?. Aviezri Fraenkel. 1997
+                        . <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.wisdom.weizmann.ac.il%2F%257Efraenkel%2FPapers%2Ftrs.ps&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfO1ugwLBcrK9Z6Ay5dyT_G9Zy0Eg"
+                        >http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/trs.ps</link> (Hebrew: <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.wisdom.weizmann.ac.il%2F%257Efraenkel%2FPapers%2Fpha.ps&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfkY1pJtATiPCTJJGkx_6azc71yQQ"
+                        >http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/pha.ps</link>) .</para>
+                <para>[2] The Cathedral and the Bazaar. Eric S. Raymond. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.catb.org%2F%257Eesr%2Fwritings%2Fhomesteading%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcT5e8kLRcyuCWxL5EFK0dRBvoQkQ"
+                        >http://www.catb.org/~esr/writings/homesteading/</link> .</para>
+                <para>[3] Ontology is overrated. Clay Shirky. 2005. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.shirky.com%2Fwritings%2Fontology_overrated.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcyTw0uRm5WkUdpR9C43wMwtfs9FQ"
+                        >http://www.shirky.com/writings/ontology_overrated.html</link> .</para>
+                <para>[4] Distributed Proofreaders. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.pgdp.net%2Fc%2Fdefault.php&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdsiMKJ8Alb91T2PCFPkDxOoZqaGg"
+                        >http://www.pgdp.net/c/default.php</link> .</para>
+                <para>[5] TEI Lite Tutorial. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.tei-c.org%2FLite%2Fteiu5_split_en.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcf1uRMGaif3UlEbb4HODSGwWKGpw"
+                        >http://www.tei-c.org/Lite/teiu5_split_en.html</link> .</para>
+                <para>[6] TEI P5. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.tei-c.org%2Frelease%2Fdoc%2Ftei-p5-doc%2Fhtml%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcltNifjHPK4m9V6zitCu-GOkLuWQ"
+                        >http://www.tei-c.org/release/doc/tei-p5-doc/html/</link> .</para>
+                <para>[7] TEI CE. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.tei-c.org%2FActivities%2FCE%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzc7JButxVcRjiVNusevLwzGuDPq5A"
+                        >http://www.tei-c.org/Activities/CE/</link> .</para>
+                <para>[8] TEI Overlap. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.tei-c.org%2FActivities%2FSIG%2FOverlap%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzf4YNmHqsw67ik8fYfCVG_Gq0CMcA"
+                        >http://www.tei-c.org/Activities/SIG/Overlap/</link> .</para>
+                <para>[9] TEI WD. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.tei-c.org%2Frelease%2Fdoc%2Ftei-p5-doc%2Fhtml%2FWD.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEze8Kk0xYrPQ5NxOTuDf8oEAkGhJNw"
+                        >http://www.tei-c.org/release/doc/tei-p5-doc/html/WD.html</link> .</para>
+                <para>[10] TEI NH. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.tei-c.org%2Frelease%2Fdoc%2Ftei-p5-doc%2Fhtml%2FNH.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcbNEuGf52vqRqFnkGUn0McQ-Xs1Q"
+                        >http://www.tei-c.org/release/doc/tei-p5-doc/html/NH.html</link> .</para>
+                <para>[11] TEI I18N. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.tei-c.org%2FI18N%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfcSdm8OBszHmkp6Jp89e4o4H9Blg"
+                        >http://www.tei-c.org/I18N/</link> .</para>
+                <para>[12] TEI Roma. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Ftei.oucs.ox.ac.uk%2FRoma%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEze5EamlcORqw85hNvvwG6oIE_kwAg"
+                        >http://tei.oucs.ox.ac.uk/Roma/</link> .</para>
+                <para>[13] ?. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.w3.org%2FPeople%2Fcmsmcq%2F2000%2Fpoddp2000.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzeMWTELG9xjrB6CrG4AVAG_n6CL1A"
+                        >http://www.w3.org/People/cmsmcq/2000/poddp2000.html</link> .</para>
+                <para>[14] ?. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.mulberrytech.com%2FExtreme%2FProceedings%2Fhtml%2F2004%2FDeRose01%2FEML2004DeRose01.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfo06Vs6YaI0RuIpxofnkU_ugCQSA"
+                        >http://www.mulberrytech.com/Extreme/Proceedings/html/2004/DeRose01/EML2004DeRose01.html</link> .</para>
+                <para>[15] ?. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.idealliance.org%2Fpapers%2Fextreme%2FProceedings%2Fhtml%2F2005%2FBauman01%2FEML2005Bauman01.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzf4qfKXycqJC4VSQA6vNIqyIrI4hA"
+                        >http://www.idealliance.org/papers/extreme/Proceedings/html/2005/Bauman01/EML2005Bauman01.html</link> .</para>
+                <para>[16] ?. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.tei-c.org.uk%2Fwiki%2Findex.php%2FSIG%3AOverlap&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzc6ZsP7k2NiXWXD-SgbuF6Xmqb9Rw"
+                        >http://www.tei-c.org.uk/wiki/index.php/SIG:Overlap</link> .</para>
+                <para>[17] ?. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.tei-c.org%2Fwiki%2Findex.php%2FTalk%3ASIG%3AOverlap&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfKLS5PvoN_no46yqhSUIPgSnttJw"
+                        >http://www.tei-c.org/wiki/index.php/Talk:SIG:Overlap</link> .</para>
+                <para>[18] ?. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.tei-c.org%2FTalks%2FOUCS%2F2005-02%2Ftalk-access.pdf&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfXjVF3M-RwBuxrKp1MIVnhk6-4Yg"
+                        >http://www.tei-c.org/Talks/OUCS/2005-02/talk-access.pdf</link> .</para>
+                <para>[19] Subversion. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fsubversion.tigris.org%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdCCxVct6R7YUU11HR-JqQzEzVTbw"
+                        >http://subversion.tigris.org/</link> .</para>
+                <para>[20] eXist XML database.</para>
+                <para>cfdbdfbfb <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fexist.sourceforge.net%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfmL1kznoJXaGOP-F00GhZyq8Gjow"
+                        >http://exist.sourceforge.net/</link> .</para>
+                <para>[41] JXHTMLEDIT. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.tecnick.com%2Fpublic%2Fcode%2Fcp_dpage.php%3Faiocp_dp%3Djxhtmledit&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcTo_eouGyitdQjSY4JDrTbq2f3SQ"
+                        >http://www.tecnick.com/public/code/cp_dpage.php?aiocp_dp=jxhtmledit</link> .</para>
+                <para>[42] Syntext Serna. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.syntext.com%2Fproducts%2Fserna%2Findex.htm&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzeMp-LtIBaVmtqYbmagykueD7k63Q"
+                        >http://www.syntext.com/products/serna/index.htm</link> .</para>
+                <para>[43] Stylus Studio. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.stylusstudio.com%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfFKkPHmBxtcI92RrumHRA6ztNtSQ"
+                        >http://www.stylusstudio.com/</link> .</para>
+                <para>[44] ALTOVA xmlspy. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.altova.com%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzeX83Vo7WApl0DAz1T4pWJ87kTPxA"
+                        >http://www.altova.com/</link> .</para>
+                <para>[45] oXygen. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.oxygenxml.com%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdi8ugbz9HzEsnkQzivgoblvr6-Tg"
+                        >http://www.oxygenxml.com/</link> .</para>
+                <para>[46] Exchanger XML. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.exchangerxml.com%2Feditor%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcE3TS0csVfsnn-8Ga0vivpBPRsww"
+                        >http://www.exchangerxml.com/editor/</link> .</para>
+                <para>[47] editix. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.editix.com%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzeVIguo-cvRAlPIJeJu5JDLiUanIg"
+                        >http://www.editix.com/</link> .</para>
+                <para>[48] topologi. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.topologi.com%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzc1UOGajiJ8pivgq7nQvgRu_d74xw"
+                        >http://www.topologi.com/</link> .</para>
+                <para>[49] Ajax. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fen.wikipedia.org%2Fwiki%2FAJAX&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcjAJlNRzAAyfWmPmb1rW8JrYknsg"
+                        >http://en.wikipedia.org/wiki/AJAX</link> .</para>
+                <para>[50] Applets ?. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjroller.com%2Fpage%2Ftackline%3Fentry%3Dusing_applets_in_place_of&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfoCifhuyt33gczL7rLXDpfL2U41Q"
+                        >http://jroller.com/page/tackline?entry=using_applets_in_place_of</link> .</para>
+                <para>[51] Applets ?. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fweblogs.java.net%2Fblog%2Fchet%2Fapplet-jax%2FYapplet.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzf4hHuvViXyuNsLm1c6TkPC-NWGdQ"
+                        >http://weblogs.java.net/blog/chet/applet-jax/Yapplet.html</link> .</para>
+                <para>[52] Thank God - Java EE Is Not Like Ajax. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.coachwei.com%2Fblog%2F_archives%2F2006%2F9%2F27%2F2367882.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdom51gCteN4ajtxsme4NKVRtcoWg"
+                        >http://www.coachwei.com/blog/_archives/2006/9/27/2367882.html</link> .</para>
+                <para>[53] Unicode. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.unicode.org%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfAR01ciLfBHMMuuKGrlUCaVVA4tA"
+                        >http://www.unicode.org/</link> .</para>
+                <para>[54] Unicode. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.w3.org%2FInternational%2Farticles%2Finline-bidi-markup%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzeA_DGO2MRvjFjcPH7ix8LLwYxf2g"
+                        >http://www.w3.org/International/articles/inline-bidi-markup/</link> .</para>
+                <para>[55] XML. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.xml.com%2Faxml%2Ftestaxml.htm&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdgnev0AfNe2lNZkKsdDRDFzImJWA"
+                        >http://www.xml.com/axml/testaxml.htm</link> .</para>
+                <para>[57] XLink. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.xml.com%2Fpub%2Fa%2F2002%2F03%2F13%2Fxlink.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcgzPmqR33GkGBKNX8E69J-UP6_Gg"
+                        >http://www.xml.com/pub/a/2002/03/13/xlink.html</link> .</para>
+                <para>[58] Wikipedia: Tim Bray. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fen.wikipedia.org%2Fwiki%2FTim_Bray&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzekc4fiUXfK7leyKtuSsKLeUJwjrQ"
+                        >http://en.wikipedia.org/wiki/Tim_Bray</link> .</para>
+                <para>[59] <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.w3.org%2FPeople%2Fcmsmcq%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfCiliO5qUmrSe3f374yfRdmLPGJw"
+                        >http://www.w3.org/People/cmsmcq/</link> .</para>
+                <para>[60] Theological Markup Language. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.ccel.org%2FThML%2FThML1.04.htm&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzd38PfKW-HzFDrzS-Fjor7wMbpM4A"
+                        >http://www.ccel.org/ThML/ThML1.04.htm</link> .</para>
+                <para>[61] Tanakh ML. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Ftanakhml2.alacartejava.net%2Fcocoon%2Ftanakhml%2Findex.htm&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdhvbO_fiI5Co2syHakpRLe4ELTng"
+                        >http://tanakhml2.alacartejava.net/cocoon/tanakhml/index.htm</link> .</para>
+                <para>[62] Open Scripture Information Standard. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fen.wikipedia.org%2Fwiki%2FOpen_Scripture_Information_Standard&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcUwSGnt9sxVKc7XGH2j3ggG9lj7A"
+                        >http://en.wikipedia.org/wiki/Open_Scripture_Information_Standard</link> .</para>
+                <para>[63] Project Gutenberg. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.gutenberg.org%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzf1KK2bAibi850w05tnMYWh9DuxLg"
+                        >http://www.gutenberg.org</link> .</para>
+                <para>[64] Citizendium. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.citizendium.org%2Fcfa.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcV_sCea0EC0Ww1TD4lS495jsHZSw"
+                        >http://www.citizendium.org/cfa.html</link> .</para>
+                <para>[65] No new XML languages. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.tbray.org%2Fongoing%2FWhen%2F200x%2F2006%2F01%2F08%2FNo-New-XML-Languages&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdQDFHUTXRAF0wDBCxJy6FZCFAGWg"
+                        >http://www.tbray.org/ongoing/When/200x/2006/01/08/No-New-XML-Languages</link> .</para>
+                <para>[66] <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.unicode.org%2Fcharts%2FPDF%2FU0100.pdf&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcW4sAjYV8AqI6_kcG99NRhPDsVkA"
+                        >http://www.unicode.org/charts/PDF/U0100.pdf</link> .</para>
+                <para>[67] <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.unicode.org%2Fcharts%2FPDF%2FU0590.pdf&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzccJGAhccbasyCSKTYvi8qa2YoCIQ"
+                        >http://www.unicode.org/charts/PDF/U0590.pdf</link> .</para>
+                <para>[70] Topic Maps. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fen.wikipedia.org%2Fwiki%2FTopic_map&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdCfjzRYkC1iWpkiSKU1sB4orq_og"
+                        >http://en.wikipedia.org/wiki/Topic_map</link> .</para>
+                <para>[71] ?. <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.ontopia.net%2Ftopicmaps%2Fmaterials%2Ftmrdf.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcY5rwuzP_fJR8KDFcg-xbGr2BmKg"
+                        >http://www.ontopia.net/topicmaps/materials/tmrdf.html</link> .</para>
+                <para>[78] Information retrieval from annotated texts. A.S. Fraenkel. S.T. Klein. J.
+                    Amer. Soc. for Information Sciences. 50. 1999. 845–854. "<link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.wisdom.weizmann.ac.il%2F%257Efraenkel%2FPapers%2Fannot.ps&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdMkgHR96uFm61AX5cRjoAiTgExDg"
+                        >http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/annot.ps</link>" .
+                    Тексты</para>
+                <para>[90] <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fscripts.sil.org%2Fcms%2Fscripts%2Fpage.php%3Fsite_id%3Dnrsi%26item_id%3DXSEM&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzd7t0vhmMWow47dGaZragSTaEmYPg"
+                        >http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;item_id=XSEM</link> .</para>
+                <para>[94] <link
+                        xlink:href="http://www.google.com/url?q=http%3A%2F%2Fbooks.chabadlibrary.org%2Fdefault.aspx&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdAilWHp37intnjSaC63bf19iYOkw"
+                        >http://books.chabadlibrary.org/default.aspx</link> . </para>
+                <para>[1] пример того как из внешним образом аннотированного текста в XMLе можно
+                    получить HTML</para>
+            </section>
+        </section>
+    </section>
+
+    <section>
+        <title>Implementation</title>
+        <section>
+            <title>Approach</title>
+            <section>
+                <title>О стандартах</title>
+                <para>Если есть стандарт, то ясно, что лучше использовать его, чем своё,
+                    доморощенное. Выгода от этого понятна: стандарт поддерживается всеми (или
+                    многими), а доморощенное - никем; программы, понимающие стандарт, используются
+                    широко и отлажены лучше, чем будут отлажены доморощенные (которые ещё и писать
+                    придется); люди про стандарт слышали и знают, как с ним работать и т.д. Но
+                    главное - сам стандарт, будучи результатом чудовищного количества труда
+                    специалистов, как правило "отлажен" лучше, чем любая частная разработка.</para>
+                <para>Бывает, что стандарт "не прижился". Тогда многие из выгод от его использования
+                    пропадают. Но если в какой-то области есть "прижившийся" стандарт, понятно, что
+                    игнорировать его очень глупо. Несмотря на то, что из-за "комитетности"
+                    разработки многих стандартов в них случаются компромисы, а из-за длительности
+                    процесса стандартизации "последнее слово" в них может быть и не отражено.</para>
+            </section>
+            <section>
+                <title>Тексты на разных языках, справа на лево, с кантиляцией...</title>
+                <para>Ясно, что тексты должны храниться в Unicode [53]. Придумывать свою кодировку
+                    неразумно.</para>
+                <para>Ясно, что тексты должны храниться в XMLе [55] [1] , несмотря на то, что он не
+                    рассчитан на представление нескольких структур одного текста (см. ниже). Тем не
+                    менее, придумывать свой, "улучшенный" XML неразумно.</para>
+            </section>
+            <section>
+                <title>TEI</title>
+                <para>Один из авторов XMLа, Тим Брай [58], велит не изобретать своих форматов XMLа,
+                    а воспользоваться одним из пяти "основных" [65]. В области представления в XMLе
+                    "гуманитарных" (извините за выражение) текстов есть стандарт (не включённый
+                    Браем в число "основных"): рекомендации TEI (Инициатива Кодировки Текстов) [6].
+                    Долгие годы его разработку возглавлял другой из авторов XMLа - Майкл
+                    Сперберг-Маккуин [59]. Ясно, что надо им воспользоваться.</para>
+                <para>(С другой стороны, хорошо бы понять, почему многие им не пользуются или
+                    пользуются лишь частично: Theological Markup Language [60], TanakhML [61], Open
+                    Scripture [62], Project Gutenberg [63].)</para>
+            </section>
+            <section>
+                <title>Особые буквы</title>
+                <para>В наших текстах могут быть особые буквы (Раздел 2.1). В TEI вопросами
+                    кодировки особых букв занималась специальная рабочая группа [7]. Им посвящена
+                    глава рекомендаций [9].</para>
+            </section>
+            <section>
+                <title>Аннотации</title>
+                <para>Аннотации - место, имя ... - в TEI есть.</para>
+            </section>
+            <section>
+                <title>Перекрывающиеся структуры</title>
+                <para>Наши тексты могут иметь несколько перекрывающихся иерархических структур
+                    (Раздел 2.3). Причем это касается не только Танаха или текстов с многими
+                    изданиями и границами страниц. Один из фундаментальных вопросов, на которые
+                    должно уметь отвечать наше текстохранилище, это "какие тексты ссылаются на
+                    данный". Ответ на такой вопрос видится мне как интересующий нас текст в который
+                    добавлены "обратные" ссылки на тексты, на него ссылающиеся. Но "концы" ссылок -
+                    которые теперь стали "началами" обратных ссылок - это фрагменты нашего текста, и
+                    они запросто могут перекрываться.</para>
+                <para>Какое-нибудь решение этой проблемы можно придумать не сходя с места. Возможно,
+                    даже несколько. Но продумать их во всех деталях, попробовать на практике,
+                    сравнить и т.д. займёт годы. Люди, занимающиеся TEI [6], их уже потратили,
+                    уделили этому вопросу главу Рекомендаций [10], организовали рабочую группу [8],
+                    и продолжают тратить: [13] [14] [15] [16] [17] .</para>
+            </section>
+            <section>
+                <title>Справа на лево XXX програмный интерфейс?</title>
+                <para>Наши тексты пишутся в основном на иврите, арамейском и идише - справа на лево
+                    (Раздел 2.1). Таги TEI (и всех известных мне XML-форматов) пишутся по-английски
+                    и, естественно, слева на право. Хорошо известно как представить двунаправленный
+                    документ в XHTMLе так, чтобы все шло в нужную сторону, и чтобы при этом не
+                    использовались невидимые символы Unicodа, меняющие направление текста [54]. Нам,
+                    однако, надо облегчить редактирование наших текстов в текстовом редакторе
+                    (возможно, понимающем XML). Если таги пишутся не в том направлении, что текст,
+                    такое редактирование практически, на мой взгляд, нереально. А без использования
+                    невидимых символов изменения направления - невозможно.</para>
+                <para>Упражнение: используя ваш любимый редактор, введите таги посука &lt;verse&gt;
+                    и &lt;/verse&gt;, а потом напечатайте между ними посук на иврите. Не столкнулись
+                    ли вы с неожиданностями? Например, не меняется ли направление текста когда вы
+                    вводите пробел рядом с угловой скобкой обрамляющей таг? Не вводятся ли при этом
+                    слова в обратном порядке? К какому слову посука ближе отркывающий таг - к
+                    первому или к последнему?</para>
+                <para>Я не уверен, что если сами таги будут на иврите, то все проблемы ввода текста
+                    исчезнут - но я уверен, что хуже не станет. Есть ещё одна причина хотеть, чтобы
+                    таги были на иврите: многие наши потребители и участники английского не знают, и
+                    даже в пределах набора тагов TEI узнавать его не захотят - и я их понимаю. Было
+                    бы неправильно лишить возможности серьёзной обтаговки именно тех, кто на неё
+                    больше всех способен. А серьёзная обтаговка возможна только в текстовом
+                    редакторе: не только потому, что часто это удобнее, чем всевозможные
+                    web-интерфейсы, но и потому, что web-интерфейса, поддерживающего все таги TEI
+                    нам не написать. А в серьёзной работе очень многие из них нужны.</para>
+                <para>Казалось бы, если таги в наших текстах будут на иврите, то это уже не TEI? Не
+                    тут то было! TEIвцы начали работать над интернализацией: хотят сделать свою
+                    штуковину доступной неанглоязычным [11]. Вообще, у них в последней версии - P5 -
+                    пользователь может адаптировать схему, которую генерирует программа ROMA [12],
+                    на свою ситуацию.</para>
+                <para>В любом случае, мы можем хранить тексты в TEI, но позволять доставать их в
+                    другом формате, менять и засовывать обратно. Многие так и делают. Так мы можем,
+                    например, ввести структурные таги, более уместные в конкретных текстах, чем
+                    довольно общие структурные таги TEI.</para>
+            </section>
+            <section>
+                <title>Ссылки</title>
+                <para>Наибольшее беспокойство у меня вызывают ссылки. Они в TEI могут оказаться
+                    недостаточно мощными и гибкими. Нам, похоже, просто XLink (XPointer?) [57] не
+                    подойдёт: надо посмотреть на Topic Maps [70] и RDF [71].</para>
+            </section>
+            <section>
+                <title>Редакторы XMLа</title>
+                <para>Наш web-интерфейс должен поддерживать довольно серьёзное редактирование
+                    документов на XML. Редакторы такого рода существуют. Например: JXHTMLEDIT [41]
+                    (для HTMLа), Syntext Serna [42] (коммерческий). Однако, как ни крути, а надо
+                    мочь редактировать наши тексты (XML, TEI) в нормальном редакторе Раздел 3.3
+                    тоже. Я слышал много хорошего про Stylus Studio [43] и ALTOVA xmlspy [44] - оба
+                    только для Windows. Есть несколько написаных на Javе - и потому работающих
+                    везде: oXygen [45], Exchanger XML [46], editix [47], Topologi [48]. Мне из них
+                    настолько больше понравился Oxygen, что я его купил.</para>
+            </section>
+            <section>
+                <title>Интерфейс</title>
+                <para>{Browser} {Tabs}</para>
+                <para>Сейчас моден AJAX [49]. Я предпочел бы его избежать при возможности, а для
+                    динамизьма воспользоваться какими-нибудь невидимыми Javaвскими аплетами [50]
+                    [51], что ли... Вот интереснейшая заметка [52] о проблемах с AJAXом. Написана
+                    она человеком, который подобными штуками занимается уже лет 10.</para>
+            </section>
+        </section>
+        <section>
+            <title>Technology</title>
+            <section>
+                <title>XML Databases</title>
+                <para>It is possible to store the texts as XML files in the file system and use XSLT
+                    (as implemented by Saxon) to select requested pieces and transform them into
+                    presentation form. Indeed, I'll have a copy of all the texts in simple XML files
+                    anyway, since I need to check the texts into a revision-control system.</para>
+                <para>It seems likely, though, that I'll need to store the texts (also) in an XML
+                    database. Here are some requirements that make me think so:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>Access parts of documents in response to a query</para>
+                    </listitem>
+                    <listitem>
+                        <para>Fetch fragments of the documents referenced from a given one</para>
+                    </listitem>
+                    <listitem>
+                        <para>Find documents referencing a given one (link reversal)</para>
+                    </listitem>
+                    <listitem>
+                        <para>Full text search</para>
+                    </listitem>
+                </itemizedlist>
+                <para>Only first of these requirements can realistically be satisfied without some
+                    indexes. On the other hand, only first two are trivially satisfied by an XML
+                    database (like Exist). Integration between Lucene text indexing package and
+                    Exist needs to be looked into. As for link reversal, we'll probably have to
+                    write the indexer and accessor ourselves...</para>
+                <para>It is clear that a query language to be used is <link
+                        xlink:href="http://isbn.nu/0321180607">XQuery</link>. It is a nice,
+                    functional, non-statically-typed language, that have recently acquired update
+                    and text search capabilities. (XXX)</para>
+                <para>TEIвцы тоже согласны, что надо пользоваться XMLьными базами данных и XQuery
+                    [18].</para>
+                <para>Информацию о различных XMLьных базах данных приводит <link
+                        xlink:href="http://www.rpbourret.com/">? Bourret</link>. Некоторые
+                    бесплатные базы данных для XMLа:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para><link xlink:href="http://exist-db.org/">eXist</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.sleepycat.com/products/bdbxml.html"
+                                >Berkeley DB XML</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://modis.ispras.ru/sedna/index.htm"
+                            >Sedna</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.eecs.umich.edu/db/timber"
+                            >Timber</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://xqzone.marklogic.com/"
+                            >MarkLogic</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://lucene.apache.org/">Lucene</link></para>
+                    </listitem>
+                </itemizedlist>
+            </section>
+            <section>
+                <title>XQuery</title>
+                <para>Some use XQuery as the (almost) only implementation language for the
+                    application (e.g., <link xlink:href="http://judaica.podval.org/moin/AtomicWiki"
+                        >AtomicWiki</link>). XQuery *is* a functional language. But XQuery does not
+                    have static typesystem or exception processing. I will use Java (or Scala) as my
+                    main implementation language, and XQJ to access XQuery/XSLT processors.</para>
+            </section>
+            <section>
+                <title>XML and Java</title>
+                <para>There are APIs for</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>parsing: javax.xml.parsers</para>
+                    </listitem>
+                    <listitem>
+                        <para>XSLT: javax.xml.transform</para>
+                    </listitem>
+                    <listitem>
+                        <para>XPath: javax.xml.xpath</para>
+                    </listitem>
+                    <listitem>
+                        <para>XQuery (XQJ): java.xml.query</para>
+                    </listitem>
+                </itemizedlist>
+                <para>javax.xml.xpath only supports XPath version 1</para>
+                <para>It seems that I can do pipelines using XQJ.</para>
+            </section>
+            <section>
+                <title>XML Pipelines</title>
+                <itemizedlist>
+                    <listitem>
+                        <para><link xlink:href="http://cocoon.apache.org/">Cocoon</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link
+                                xlink:href="http://moinmo.in/FeatureRequests/PipelineArchitecture"
+                                >Pipelines</link></para>
+                    </listitem>
+                    <listitem>
+                        <para>XProc</para>
+                    </listitem>
+                    <listitem>
+                        <para><link
+                                xlink:href="http://fgeorges.blogspot.com/2008/10/poor-mans-calabash-integeration-into.html"
+                                >Calabash</link></para>
+                    </listitem>
+                </itemizedlist>
+                <para>Пока что я обнаружил только две системы текстохранилищ ориентированных на TEI:
+                    Versioning Machine <link xlink:href="http://mith2.umd.edu/products/ver-mach/"
+                        >Versioning Machine</link> и <link
+                        xlink:href="http://teipublisher.sourceforge.net/docs/index.php"
+                        >&lt;teiPublisher&gt;</link>. Обе делали одни и те же люди - <link
+                        xlink:href="http://www.greenstone.org/cgi-bin/library">Susan
+                        Schreibman</link> и Amit Kumar, и обе заглохли. Вторая даже использовала
+                    eXist.</para>
+                <para>Нам надо хранить не только сам документ, но и историю его изменений: кто,
+                    когда и что. Это даёт возможность вернуться к любому состоянию, посмотреть
+                    историю, заблокировать слишком быстрое изменение текста и т.д. Дя этого надо
+                    прирастить к базе данных готовую version control system (XXX не очевидно), а
+                    именно - <link xlink:href="http://judaica.podval.org/moin/SubVersion"
+                        >SubVersion</link>? Hg?.</para>
+                <para>К текстохранилищу должен быть доступ через сетевые протоколы, а не только
+                    через web-интерфейс. Програмный доступ к текстохранилищу должен быть возможен
+                    разный: через</para>
+                <itemizedlist>
+                    <listitem>
+                        <para><link xlink:href="http://www.webdav.org/">WebDAV</link></para>
+                    </listitem>
+                    <listitem>
+                        <para>REST</para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://en.wikipedia.org/wiki/SOAP"
+                            >SOAP</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://en.wikipedia.org/wiki/XML-RPC"
+                            >XML-RPC</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://xmldb-org.sourceforge.net/"
+                            >XML:DB</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://en.wikipedia.org/wiki/RSS_%28file_format%29"
+                                >RSS</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://en.wikipedia.org/wiki/Atom_%28standard%29"
+                                >Atom</link></para>
+                    </listitem>
+                    <listitem>
+                        <para>SubVersion/Hg<itemizedlist>
+                                <listitem>
+                                    <para>Индексация ссылок и меток</para>
+                                </listitem>
+                                <listitem>
+                                    <para>Импорт (Хумаш) и прямое использование (сканы) внешних
+                                        ресурсов</para>
+                                </listitem>
+                                <listitem>
+                                    <para><link xlink:href="http://www.w3.org/2001/Annotea/"
+                                            >Annotea</link></para>
+                                </listitem>
+                                <listitem>
+                                    <para>Collate/Anastasia</para>
+                                </listitem>
+                            </itemizedlist></para>
+                    </listitem>
+                </itemizedlist>
+            </section>
+            <section>
+                <title>WebDAV</title>
+                <para/>
+            </section>
+            <section>
+                <title>XML and Wiki</title>
+                <itemizedlist>
+                    <listitem>
+                        <para><link xlink:href="http://code.google.com/p/atomicwiki"
+                                >AtomicWiki</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://code.google.com/p/wikimodel"
+                            >WikiModel</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://wikimodel.sourceforge.net/"
+                            >WikiModel</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://moinmo.in/XmlWiki">XmlWiki</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.usemod.com/cgi-bin/mb.pl?WikiXmlDtd"
+                                >WikiXmlDtd</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://doc-book.sourceforge.net/homepage"
+                                >DocBookWiki</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.cecc.com.au/cb_pages/publishing.php"
+                                >Single Source Publishing</link></para>
+                    </listitem>
+                </itemizedlist>
+            </section>
+            <section>
+                <title>Java Content Reporitory</title>
+                <para>Добавив к текстохранилищу интерфейс (и кое-что ещё :)), получаем Content
+                    Repository System.</para>
+                <para>Есть стандарт в области доступа к хранилищу из Javы: JSR 170. Это может быть
+                    интересно для нас - а может и не быть. Кстати, в разработке этого стандарта
+                    активное участие принимал Рой Филдинг, автор известной <link
+                        xlink:href="http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_2_3"
+                        >диссертации</link> про <link
+                        xlink:href="http://rest.blueoxen.net/cgi-bin/wiki.pl?FrontPage"
+                    >REST</link> и один из архитекторов Интернета - а в настоящий момент, архитектор
+                    в компании <link xlink:href="http://www.day.com/site/en/index.html">Day</link>,
+                    продающей такое хранилище :). Есть бесплатная реализация: Apache
+                    Jackrabbit.</para>
+                <para>How do I return XML documents as XQJ-valued properties? My stuff is going to
+                    be stored in XML database (or a bunch of files processed by Saxon). I can not
+                    present them as files (because they may not be) that need to be parsed
+                    (especially when they are already parsed and indexed). So my only (standard)
+                    choice to glue the low-level store to Java is XQJ.</para>
+                <para>How do I project one hierarchy on top of another in JCR? Let's say I store
+                    files with texts in the repository. I need to expose the result (both through
+                    WebDAV and locally) as a hierarchy where I can drill into the documents'
+                    hierarchical structure (chapter, paragraph etc). I will do it through XQuery
+                    (likely XPath, but running within XQuery engine). Also, there may be multiple
+                    such structures, and before drilling in I will need to turn main structure into
+                    an alternative one using XSLT. I'd like the *external* view to have the same JCR
+                    API.</para>
+                <itemizedlist>
+                    <listitem>
+                        <para><link
+                                xlink:href="http://en.wikipedia.org/wiki/Content_repository_API_for_Java"
+                                >At Wikipedia</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link
+                                xlink:href="http://www.theserverside.com/tt/articles/article.tss?l=JCRPract"
+                                >A Practitioner's Perspective</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://jcp.org/en/jsr/detail?id=170">JSR
+                            170</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link
+                                xlink:href="http://www.onjava.com/pub/a/onjava/2006/10/04/what-is-java-content-repository.html"
+                                >What is Java Content Repository?</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://jcp.org/en/jsr/detail?id=283">JSR
+                            283</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link
+                                xlink:href="http://www.infoq.com/news/2007/07/java-content-repository-2"
+                                >Version 2</link></para>
+                    </listitem>
+                </itemizedlist>
+                <para>Примеры:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para><link xlink:href="http://jackrabbit.apache.org/index.html">Apache
+                                Jackrabbit</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://lenya.apache.org/">Apache Lenya</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://incubator.apache.org/graffito/">Apache
+                                Graffito</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.opencms.org/opencms/en/"
+                            >OpenCMS</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.dspace.org/">DSpace</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.fedora.info/">Fedora</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.greenstone.org/cgi-bin/library"
+                                >Greenstone</link></para>
+                    </listitem>
+                </itemizedlist>
+            </section>
+            <section>
+                <title>Content management Systems</title>
+                <itemizedlist>
+                    <listitem>
+                        <para><link
+                                xlink:href="http://java-source.net/open-source/content-managment-systems"
+                                >A list</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.day.com/site/en/index.html"
+                                >http://www.day.com/site/en/index.html</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.outerthought.com/en/products/daisy"
+                                >Daisy</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://cocoondev.org/daisy">Daisy</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://lenya.apache.org/">Apache Lenya</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://forrest.apache.org/">Apache
+                            Forrest</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://incubator.apache.org/graffito">Apache
+                                Graffito</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.opencms.org/opencms/en"
+                            >OpenCMS</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.dspace.org/">DSpace</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.alfresco.com/">Alfresco</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.magnolia-cms.com/">Magnolia</link></para>
+                    </listitem>
+                </itemizedlist>
+            </section>
+            <section>
+                <title>XForms</title>
+                <itemizedlist>
+                    <listitem>
+                        <para><link xlink:href="http://chiba.sourceforge.net/">Chiba</link></para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://www.orbeon.com/">Orbeon Forms</link></para>
+                    </listitem>
+                    <listitem>
+                        <para>Firefox Extension</para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://judaica.podval.org/moin/FormFaces"
+                                >FormFaces</link></para>
+                    </listitem>
+                </itemizedlist>
+                <para>Tagsoup</para>
+            </section>
+            <section>
+                <title>URLs</title>
+                <para>XPointer in the URI, not in the fragment! No delimiters, just URI parts -
+                    which can be implicit (not "chapter=3", but "chapters/3", or just "3")! Editions
+                    in the URI ("Chumash/boston+toronto/Genesis")! Metadata ("about"), raw XML etc.
+                    - in the URI, not as query parameter ("Genesis/about", "chaters/1/raw")! More
+                    URI promotion: natural references ("Genesis/2:1", "Genesis 2:1")! Intervals
+                    ("Genesis/2:1-3")! Concatenation ("Genesis/2:1-3;5") probably shouldn't be done
+                    through URIs!</para>
+                <para>Books URIs:</para>
+                <para>/books/Tanach/editions/.../[parts/.../]books/.../[weeks/...]/chapters/.../verses/...</para>
+                <para>editions: a | a+b (side-by-side) | a-b (differences)</para>
+                <para>parts: Torah | Neviim | Ksuvim</para>
+                <para>books: Genesis | Ionah | ... (appropriate for part if present)</para>
+                <para>weeks: Genesis | Noah | ...</para>
+                <para>chapters: n | m-n</para>
+                <para>verses: n | m-n (can be present only if one chapter is selected)</para>
+                <para>Alternative names may be used.</para>
+                <para>URL may be truncated.</para>
+                <para>Parts of the URL may be implied - and need to be derived.</para>
+            </section>
+            <section>
+                <title>Metadata</title>
+                <para>Metadata is used to:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>guide navigation</para>
+                    </listitem>
+                    <listitem>
+                        <para>provide listings and names</para>
+                    </listitem>
+                    <listitem>
+                        <para>create classifications (links)</para>
+                    </listitem>
+                    <listitem>
+                        <para>stitch together data directories</para>
+                    </listitem>
+                    <listitem>
+                        <para>store application-specific metadata</para>
+                    </listitem>
+                </itemizedlist>
+                <para>Some of the data in it has to be duplicated in the text document (for
+                    self-containment, *and* for non-position-based navigation).</para>
+                <para>We need to be able to handle things like "Chumash/books/Genesis/weeks" and
+                    "Chumash/weeks" with one metadata document...</para>
+                <para>Locators for the navigational steps can be: - subdirectory/file - element
+                    XPATH - milestone XPATH</para>
+                <para>1) I need to be able to provide a list of selectors (book name/ chapter #/
+                    verse# etc.) on any level.</para>
+                <para>2) A selector can have multiple names, which I do not want to duplicate (and
+                    maintain) in each edition of the text. So, selector names have to be part of the
+                    metadata.</para>
+                <para>3) A text can have multiple structures.They are important for the metadata
+                    also. Restructuring of the text is done by XSLT. It seems logical to use the
+                    same for the restructuring of the metadata.</para>
+
+                <para>It follows that the metadata needs to be processable as XML (and have format
+                    similar to the texts). Do I also need it to be processable (in part) as Java
+                    objects (using JAXB) - is not clear.</para>
+                <para>We are going to use milestones [?] to represent multiple structures.</para>
+                <para>&lt;book n="Genesis"&gt;</para>
+                <para>    &lt;chapter n="1"&gt;</para>
+                <para>        &lt;week n="Genesis" milestone="begin"/&gt;</para>
+                <para>        &lt;paragraph type="open" milestone="begin"/&gt;</para>
+                <para>        &lt;verse n="1"&gt;</para>
+                <para>        ....</para>
+                <para>        &lt;/verse&gt;</para>
+                <para>    &lt;/chapter&gt;</para>
+                <para>    ...</para>
+                <para>    &lt;chapter n="6"&gt;</para>
+                <para>        &lt;verse n="1"&gt;</para>
+                <para>        ...</para>
+                <para>        &lt;week n="Noach" milestone="begin"/&gt;</para>
+                <para>        &lt;verse n=".."&gt;</para>
+                <para>        ...</para>
+                <para>    &lt;/chapter&gt;</para>
+                <para>&lt;/book&gt;</para>
+            </section>
+            <section>
+                <title>Tanach Markup</title>
+                <para>What are the TEI-appropriate tags for Tanach?How do we represent the paragraph
+                    in the middle of the verse?</para>
+                <para>Super-Wiki</para>
+                <para>Wiki with multiple formats =&gt; function reversal (TEI-&gt;HTML; edit;
+                    back)...</para>
+                <para>Wiki page rename and links correction - if the wiki itself is in an XML
+                    database (like <link xlink:href="http://judaica.podval.org/moin/AtomicWiki"
+                        >AtomicWiki</link>) *with* our link-reversal index, wouldn't it be easier?
+                    History will be kept by the revision-control system...</para>
+                <para>Navigation:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>expand/contract viewport</para>
+                    </listitem>
+                    <listitem>
+                        <para>move viewport</para>
+                    </listitem>
+                    <listitem>
+                        <para>switch to a different structure preserving focus (from "lesson" to
+                            "chapter" in Tanya, for instance)</para>
+                    </listitem>
+                    <listitem>
+                        <para>switch to a different edition / look around at editions</para>
+                    </listitem>
+                </itemizedlist>
+            </section>
+            <section>
+                <title>Internal Wiki Markup</title>
+                <para>&lt;section level="" milestone=""/&gt; 1 2 3 4 start</para>
+                <para>&lt;list type=""&gt; bullets numbers</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>&lt;item&gt;</para>
+                    </listitem>
+                </itemizedlist>
+                <para>&lt;table&gt;</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>&lt;row&gt;</para>
+                        <itemizedlist>
+                            <listitem>
+                                <para>&lt;item&gt;</para>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+                <para>&lt;paragraph&gt;</para>
+                <para>&lt;blockquote&gt;</para>
+                <para>&lt;line&gt;</para>
+                <para>&lt;style type=""&gt; emphasize bold italics underline strikethrough</para>
+                <para>&lt;anchor id=""&gt;</para>
+                <para>&lt;wikiLink relative="" reference=""&gt;</para>
+                <para>&lt;interWikiLink name="" refererence=""&gt;</para>
+                <para>&lt;urlLink reference=""&gt;</para>
+                <para>&lt;include&gt; image?</para>
+            </section>
+            <section>
+                <title>Notes</title>
+                <para><link xlink:href="http://comments.gmane.org/gmane.text.tei.general/7031"
+                        >crowd-sourcing TEI files</link></para>
+                <para>Web-based IDE with WebDAV's versioning</para>
+            </section>
+            <section>
+                <title>BUGS</title>
+                <para>Upstream:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para><link
+                                xlink:href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=2056090&amp;group_id=17691&amp;atid=117691"
+                                >http://sourceforge.net/tracker/index.php?func=detail&amp;aid=2056090&amp;group_id=17691&amp;atid=117691</link> exist
+                            resolve-url</para>
+                    </listitem>
+                    <listitem>
+                        <para><link xlink:href="http://xmlroff.org/ticket/131"
+                                >http://xmlroff.org/ticket/131</link> xmlroff tables (fixed)</para>
+                    </listitem>
+                </itemizedlist>
+                <para>Sebastian:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>File a bug against FO stylesheets (title, table of contents).</para>
+                    </listitem>
+                    <listitem>
+                        <para>File a bug about reference shape consistency.</para>
+                    </listitem>
+                    <listitem>
+                        <para>File a bug about use of @name for reference.</para>
+                    </listitem>
+                </itemizedlist>
+                <para>Saxon, Tomcat and relative URIs for the stylesheets. XQuery Server Pages (and
+                    eXist).</para>
+                <para>space before a word that has read/write annotations (Psalm 60)</para>
+                <para>Styles of biblio references.</para>
+                <para>Google SSO. GData. RSS/Atom - second edition? Hacking...?</para>
+                <para>Start working on XSLT: Genesis -&gt; FO</para>
+                <para>leningrad-import:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>remove stylesheet link</para>
+                    </listitem>
+                    <listitem>
+                        <para>add TEI P5 All declaration; namespace(s)</para>
+                    </listitem>
+                    <listitem>
+                        <para>makaf</para>
+                    </listitem>
+                </itemizedlist>
+                <para>XProc</para>
+                <para>Discussions as text.</para>
+                <para>Convince CiteULike to make their XHTML really XHTML, or at least - well-formed
+                    XML. Better - parse RIS.</para>
+            </section>
+        </section>
+
+    </section>
+
+    <section>
+        <title>Typesetting classic Jewish texts</title>
+        <section>
+            <title>Font Formats</title>
+            <para>The problem: <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.tanach.us%2FTanach.xml%23Installation&amp;sa=D&amp;sntz=1&amp;usg=AFrqEze6OJXw4KQOu_mWRfYYw9y_P90UAg"
+                    >http://www.tanach.us/Tanach.xml#Installation</link>.</para>
+            <para>To show on screen (and print) acceptably texts with vowel points and cantillation
+                (and without them), we need good fonts. It would be nice to be able to force the
+                browser to show a page using a specified font, and there is even a declaration for
+                that in CSS (XXX), but it is not universally supported by modern browsers/operating
+                systems, so the user will need to install a decent font if he is not satisfied with
+                the quality of the preinstalled ones. Font installation is easy, but we need to
+                provide the fonts to install.</para>
+            <para>We need to be able to install fonts in cross-platform formats.</para>
+            <para>It happens that there are both a vowel and a cantillation sign under a letter
+                (vowel is printed first in such cases (XXX)). How can we make sure that vowel and
+                cantillation sign do not overlap?</para>
+            <para>Apple developed font format that allows inclusion (in form of tables) of
+                instructions about combining glyphs. This format used to be called GX, and is now
+                called AAT - Apple Advanced Typography [1]. It is currently supported only on MacOS
+                (there are plans to support it in <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FHurfBuzz&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzca6P7bxv1gxFWndTSQ7BEjkIZEew"
+                    >HurfBuzz</link> in the future (XXX)), so we can not use it.</para>
+            <para>SIL International is developing AAT replacement for Windows - Graphite [2]. This
+                format allows inclusion into the font of a program in a special language. This
+                program then chooses and places glyphs. This format is supported on Windows and
+                Linux, but requires installation of programs in addition' to fonts, so we can not
+                use it.</para>
+        </section>
+        <section>
+            <title>TrueType, Type1 and history of OpenType</title>
+            <para>Microsoft and Apple developed <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FOpenType&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzd4qisGvbCYT_UWQt4qMy9z_LJyxA"
+                    >OpenType</link> format [3]. This format has various tables and is more
+                expressive than Type1 and <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FTrueType&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzec0W30TsVJ1VoQSUuhrZ7Icp7qGg"
+                    >TrueType</link>, but less expressive than AAT. Applications rely on a platform
+                library to render text well for a complex writing system (like ours) - or do it
+                themselves. On windows, Uniscribe [4] is such a library. We need to find out, how
+                well it really supports, as they said, "the use of kerning for adding space to bases
+                with diacritics (Nikud or Teamin)". On Linux, this is done by Pango [5], and it, it
+                seems, does not deal with cantillation at all - just with consonants and vowels [6];
+                we need to contact them, find out what the situation is and possibly change it.
+                Firefox (the only program that we care about) uses Pango, which works on Windows
+                (via Uniscribe), and on MacOS.</para>
+        </section>
+        <section>
+            <title>Font Rendering</title>
+            <para>Firefox: Pango everywhere?</para>
+            <para><link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FFreeDesktop&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfV073gmGJ6mzP8tOMhSnvJsKIWFQ"
+                    >FreeDesktop</link> <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.freedesktop.org%2Fwiki%2FTextLayout&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfuPUJmktcuokjfDNPgIXXxp1_65g"
+                    >Text Layout Working Group</link></para>
+            <para>Fedora <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Ffedoraproject.org%2Fwiki%2FSIGs%2FFonts&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcVi2GTcBjvwvmSys4PtLootC1c5g"
+                    >Fonts SIG</link> <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Ffedoraproject.org%2Fwiki%2FSIGs%2FFonts%2FQA&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzeamlG_oyrVD0TM5K24GyGRSTw-nQ"
+                    >QA</link></para>
+            <para><link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FHurfBuzz&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzca6P7bxv1gxFWndTSQ7BEjkIZEew"
+                    >HurfBuzz</link></para>
+            <para><link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fcairographics.org%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdQogeaKBD4IFnmWj93pYlq_0ed5w"
+                    >Cairo</link> graphics</para>
+            <para><link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FTextLayout&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdpW3gsa64-Ay77ifF7Be2lcmDD8Q"
+                    >TextLayout</link> <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Flive.gnome.org%2FBoston2006%2FTextLayout%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdGB71i8mzt7U_KECh-B-AVJIQsEQ"
+                    >2006</link> <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.freedesktop.org%2Fwiki%2FTextLayout2007&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcmA0GKh6_551YJn6IhsDVSJ1cRIQ"
+                    >2007</link></para>
+            <para><link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fopenfontlibrary.org%2Fwiki%2FKnowledge_Resources&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcwVSYX2TNI00cvKazkt8TUGQcPPg"
+                    >Open Font Library Wiki</link></para>
+        </section>
+        <section>
+            <title>Fonts</title>
+            <itemizedlist>
+                <listitem>
+                    <para>SIL Ezra</para>
+                </listitem>
+                <listitem>
+                    <para>Cardon?</para>
+                </listitem>
+                <listitem>
+                    <para>Gorkin?!</para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section>
+            <title>Glyph Layout with Vowels and Cantillation</title>
+            <para>XXX's algorithm.</para>
+            <para>Gorkin's algorithm.</para>
+            <para>There is a book on fonts: <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.amazon.com%2FFonts-Encodings-Yannis-Haralambous%2Fdp%2F0596102429&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcQglT0FKIBsoupUoCVzohH2ny1Jw"
+                    >Fonts &amp; Encodings</link> by Yannis Haralambous. Despite the raving <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.oreillynet.com%2Fxml%2Fblog%2F2007%2F10%2Ffonts_encodings_by_yannis_hara.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzeTYWR0k5DLYFDcbifkiImZSlYu7w"
+                    >review</link>, I was underwhelmed by it. I wanted to find out if it is possible
+                to encode the vowel/cantillation placement logic into an<link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FOpenType&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzd4qisGvbCYT_UWQt4qMy9z_LJyxA"
+                    >OpenType</link> font - and did not find the answer in the book.</para>
+            <para>Which is not really surprising, since the book's author is also the author of
+                Omega project (Unicode in TeX), about which a very informative <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.valdyas.org%2Flinguistics%2Fprinting_unicode.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzch7HZDmXEXgqZOAZvdmciF5P2OfA"
+                    >text</link> about printing Unicode in 2002 says:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>However, Omega is very much a failure. Its creators have been guided by
+                        Principles. They were conscious of the Desirability of Flexibility. They
+                        Knew about the Demands of Fine Typesetting of Complex Scripts. ... You
+                        cannot run to the manual, because the manual is a very interesting piece of
+                        academic prose about the difficulty of the task, but useless for a mere
+                        user.</para>
+                </listitem>
+            </itemizedlist>
+            <para>I did find out about a useful tool for OpenType font jobs: <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.letterror.com%2Fcode%2Fttx%2Findex.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcmj8ViehO2iBCEGuP2xkxnSsMYgQ"
+                    >TTX</link>.</para>
+            <para>Does kerning work through vowels?</para>
+        </section>
+        <section>
+            <title>People</title>
+            <para/>
+        </section>
+        <section>
+            <title>Intermediate Format</title>
+            <para>Repeatability and hand-finishing: contradictory requirements?</para>
+        </section>
+        <section>
+            <title>PDF generation</title>
+            <para/>
+        </section>
+        <section>
+            <title>XSL-FO engines</title>
+            <para>For real typesetting of a tree of texts we'll need to generate our own PDF anyway.
+                For typesetting papers and other project documentation, almost anything will
+                work.</para>
+            <para>For typesetting of the Hebrew text with vowel points and cantillation, we
+                have:</para>
+            <section>
+                <title>FOP</title>
+                <para>No support for OpenType fonts</para>
+            </section>
+            <section>
+                <title><link xlink:href="http://www.renderx.com/RenderX">XEP</link></title>
+                <para>Ignores OpenType GPOS/GSUB table, so useless for typesetting Tanach. Attempts
+                    to contact support for clarifications failed.</para>
+            </section>
+            <section>
+                <title><link xlink:href="http://xmlroff.org/">xmlroff</link></title>
+                <itemizedlist>
+                    <listitem>
+                        <para>Does not support regions other than main.</para>
+                    </listitem>
+                    <listitem>
+                        <para>Excellent with OpenType (uses Pango).</para>
+                    </listitem>
+                    <listitem>
+                        <para>Excellent support (see <link
+                                xlink:href="http://www.google.com/url?q=http%3A%2F%2Fxmlroff.org%2Fticket%2F131&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfP-A895GC_hNCMjo7O51EdUzycGw"
+                                >http://xmlroff.org/ticket/131</link> for an example)</para>
+                    </listitem>
+                    <listitem>
+                        <para>There seems to be some issue with embedding the fonts and display on
+                            MacOS/Windows.</para>
+                    </listitem>
+                </itemizedlist>
+            </section>
+            <section>
+                <title>passivetex</title>
+                <para>antennahouse and other commercial::No breaks for non-profit</para>
+            </section>
+        </section>
+        <section>
+            <title>Notes</title>
+            <para>По слухам, Pango отрабатывает кантиляцию правильно. Может быть, всё зависит от
+                шрифта? Например, Ezra SIL. Обсудить с персом, нужна ли поддержка от Pango, или
+                достаточно средств <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FOpenType&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzd4qisGvbCYT_UWQt4qMy9z_LJyxA"
+                    >OpenType</link>?</para>
+            <para><link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FInDesign&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzf_At4_iD7c2h7gOxy5YCYgs8oPBA"
+                    >InDesign</link> and <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Favondale.typepad.com%2Findesignupdate%2F2005%2F08%2Fwhat_the_heck_i.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcaSxWQhIYc_s1kxLzzcN2rk-a3SQ"
+                    >INX</link> - something to think about in the context of <link
+                    xlink:href="http://www.google.com/url?q=http%3A%2F%2F2007.xmlconference.org%2Fpublic%2Fschedule%2Fdetail%2F249&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcw4FtVzmkEiiTOACrfDffZ9twIrw"
+                    >Outside-In XML Publishing</link></para>
+            <para>"Typesetting Hebrew Cantillation".</para>
+        </section>
+        <section>
+            <title>Bibliography</title>
+            <orderedlist>
+                <listitem>
+                    <para>AAT (Apple) &lt;<link
+                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fdeveloper.apple.com%2Ffonts%2FTTRefMan%2FRM06%2FChap6AATIntro.html%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcgcLo_IoMTi8eRgViGYHEcQ-H4Cw"
+                            >http://developer.apple.com/fonts/TTRefMan/RM06/Chap6AATIntro.html&gt;</link>.</para>
+                </listitem>
+                <listitem>
+                    <para>Graphite (SIL) &lt;<link
+                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fscripts.sil.org%2Fcms%2Fscripts%2Fpage.php%3Fsite_id%3Dnrsi%26item_id%3DGraphiteFAQ%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzd_7Wja6UnLQhoRwC0nJvhvXPT3tw"
+                            >http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;item_id=GraphiteFAQ&gt;</link>.</para>
+                </listitem>
+                <listitem>
+                    <para>OpenType (Wikipedia) &lt;<link
+                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fen.wikipedia.org%2Fwiki%2FOpenType%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEze0QYMRzh7_WB3V2c6s1P308Yz3zQ"
+                            >http://en.wikipedia.org/wiki/OpenType&gt;</link>.</para>
+                </listitem>
+                <listitem>
+                    <para>Uniscribe (Microsoft) &lt;<link
+                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.microsoft.com%2Ftypography%2Fotfntdev%2Fhebrewot%2Ffeatures.aspx%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzf8NrL9ucGzGVJqPB0aVRSJgzJ-QA"
+                            >http://www.microsoft.com/typography/otfntdev/hebrewot/features.aspx&gt;</link>.</para>
+                </listitem>
+                <listitem>
+                    <para>Pango &lt;<link
+                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.pango.org%2F%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcJK-5dIj97cOdGNdZIcaH7gQO8oA"
+                            >http://www.pango.org/&gt;</link>.</para>
+                </listitem>
+                <listitem>
+                    <para>Pango Hebrew &lt;<link
+                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fcvs.gnome.org%2Fviewcvs%2Fpango%2Fmodules%2Fhebrew%2Fhebrew-shaper.c%3Fview%3Dmarkup%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzd3L0kPyJT3kvdlCWOO1FFnBWBNyw"
+                            >http://cvs.gnome.org/viewcvs/pango/modules/hebrew/hebrew-shaper.c?view=markup&gt;</link>.</para>
+                </listitem>
+                <listitem>
+                    <para>XSL-FO (Wikipedia) &lt;<link
+                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fen.wikipedia.org%2Fwiki%2FXSL-FO%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdXKRlPDEALdWOlgIyk5ATzvZQD6g"
+                            >http://en.wikipedia.org/wiki/XSL-FO&gt;</link>.</para>
+                </listitem>
+                <listitem>
+                    <para>Anvil Toolkit (Dave Pawson) &lt;<link
+                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.dpawson.co.uk%2Fnodesets%2Fentries%2F070709.html%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzea3DjIXYlxdhbCzXn-n2yt1-wCOA"
+                            >http://www.dpawson.co.uk/nodesets/entries/070709.html&gt;</link>.</para>
+                </listitem>
+                <listitem>
+                    <para>Prince &lt;<link
+                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.princexml.com%253e%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzeLS_Uicn__KI32422MiNMi0OVl4g"
+                            >http://www.princexml.com&gt;</link>.</para>
+                </listitem>
+                <listitem>
+                    <para>Google Books PDF &lt;<link
+                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.imperialviolet.org%2Fbinary%2Fgoogle-books-pdf.pdf%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfc80ekDlUupaHt2ttLt8Vl08-pZA"
+                            >http://www.imperialviolet.org/binary/google-books-pdf.pdf&gt;</link>.</para>
+                </listitem>
+                <listitem>
+                    <para>HarfBuzz &lt;<link
+                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.freedesktop.org%2Fwiki%2FSoftware%2FHarfBuzz%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcQupUnhpehP7FNkIqNF6cSJw4CEw"
+                            >http://www.freedesktop.org/wiki/Software/HarfBuzz&gt;</link></para>
+                </listitem>
+            </orderedlist>
+            <para>Leonid Dubinsky. Date: 9-10 Kislev 5768</para>
+        </section>
+    </section>
+    <section>
+        <title>Laying out classic Jewish texts</title>
+        <para>It is natural for a user, after researching with our system, to desire to print
+            selected texts and fragments for personal - or group - study away from a computer. Such
+            printouts are one-use artifacts. It is clear that ability to produce such printouts must
+            be present in the system from the beginning. The question is: how good the
+            typographically does it need to be?</para>
+        <para>We need to format a tree of texts: main one, commentaries of it, commentaries on
+            commentaries etc. It is known about each piece of commentaries what is it commenting on.
+            All the font metrics are also known: glyph sizes, what is haging how low and what is
+            sticking up and how high. Result needs to be readable and (is it a separate
+            requirement?) beatyfull.</para>
+        <para>To format "like in a book", we need to optimize the following contradicting
+            constraints (the list is probably incomplete):</para>
+        <itemizedlist>
+            <listitem>
+                <para>the page must be fully covered with print</para>
+            </listitem>
+            <listitem>
+                <para>comment must to start on the same page where what it comments on is</para>
+            </listitem>
+            <listitem>
+                <para>comment must end on the page it started</para>
+            </listitem>
+        </itemizedlist>
+        <para>Koritz says that we do not need to print books, but "leaflets" instead: text with
+            comments that fit on one page. In the "forum format", whatever that means.</para>
+        <para>Gorkin says that printing "like in the book" of the multi-layered text is extremely
+            challenging typographically, and thus very interesting, but design of the overall
+            interface of the system is even more interesting - and difficult. And more importants.
+            Also, what exactly are the requirements for the printing facility, and what is their
+            order of importance, will become clear only in the process of using the system. So,
+            initially printing needs to be acceptable, but primitive - we do not have resources to
+            do fancy stuff from the beginning.</para>
+        <para>Dubinsky says that the format that will "grow" from the use of the system, will turn
+            out to be a familiar to us all format "like in the book", or so close to it, that a
+            solution for one will fit the other; that good leaflet is not easier to print than a
+            book; and that ability to print familiar "book-like" format is neccessary for the
+            psychological comfort of the users. But he also agrees that features and interface of
+            the system are more important.</para>
+        <para>Thus, everybody agrees that initial printing facility will be "primitive". Gorkin does
+            not want to expend any effort to even find out how primitive. Dubinsky would like to see
+            something acceptable. Nothing of the sort has been found so far. XSL-FO [7] is
+            insufficiently expressive for our problem - even version 1.1, it seems.</para>
+        <para>Beyond Pretty-Printing: <link xlink:href="http://lambda-the-ultimate.org/node/2419"
+                >Galley</link> Concepts in Document Formatting Combinators</para>
+        <para><link xlink:href="http://www.it.usyd.edu.au/~jeff/nonpareil/">Nonpareil</link></para>
+        <para><link xlink:href="http://www.lowagie.com/iText/">iText</link></para>
+        <para>
+            <link xlink:href="http://www.w3.org/TR/2008/WD-xslfo20-req-20080326/">XSL-FO 2.0
+                Requirements</link></para>
+    </section>
+
+    <section>
+        <title>Sources of Free Texts</title>
+        <section>
+            <title>Jumping points</title>
+            <itemizedlist>
+                <listitem>
+                    <para>Wikipedia <link xlink:href="http://en.wikipedia.org/wiki/Torah_database"
+                            >Torah database</link> - done</para>
+                </listitem>
+                <listitem>
+                    <para>Wikisource <link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%90%D7%A8%D7%95%D7%9F_%D7%94%D7%A1%D7%A4%D7%A8%D7%99%D7%9D_%D7%94%D7%99%D7%94%D7%95%D7%93%D7%99"
+                            >Judaica Bookshelf</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://psychomystic.blogspot.com/search/label/Torah%20Online%20Links%20Database"
+                            >psychomystic</link> links - done</para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://chabadlibrary.org/books/">Chabad
+                        Library</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.sichoskodesh.com/">Sichos
+                        Kodesh</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.otzar770.com/">Otzar 770</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.hebrewbooks.org/"
+                        >hebrewbooks.org</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.chabadlibrarybooks.com/"
+                            >chabadlibrarybooks.com</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.seforimonline.org/">Seforim
+                        Online</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.hebrew.grimoar.cz/">Grimoar</link> -
+                        Kabbalah</para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.jewishcontent.org/"
+                        >jewishcontent.org</link> - for PDAs</para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.torahtexts.org/">Torah Texts</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://chassidus.ru/rambam/index.php"
+                            >chassidus.ru</link> - broken (<link
+                            xlink:href="http://www.hassidout.org/hassidout/Textes_Kodech/Kabbalah/index.php-rootid=103.htm"
+                            >?</link>)</para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.halachabrura.org/alephlink.htm">Halacha
+                            Brura</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.jnul.huji.ac.il/dl/books/html/bk_sub.htm"
+                            >Digitized Book Repository (JNUL)</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://judaica.podval.org/moin/%3F">Otzar
+                            HaHochma</link></para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section>
+            <title>Texts</title>
+            <itemizedlist>
+                <listitem>
+                    <para><link xlink:href="http://www.tanach.us/Tanach.xml">Tanach (Leningrad
+                            Codex)</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://chaver.com/Mishnah/TheMishnah.htm"
+                        >Mishna</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://cal1.cn.huc.edu/index.htm">Targumim</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.tsel.org/torah/midrashraba/index.html"
+                            >Midrash Raba</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.tsel.org/torah/tanhuma/index.html">Midrash
+                            Tanhuma</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.tsel.org/torah/yalkutsh/index.html">Yalkut
+                            Shimoni</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.tsel.org/torah/avotrnatan/index.html">Ovos
+                            DeRabi Noson</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.daat.ac.il/daat/mahshevt/kitsur/tohen.htm"
+                            >Sefer HaHareidim</link></para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section>
+            <title>Wikisource</title>
+            <itemizedlist>
+                <listitem>
+                    <para>... and <link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%A9%D7%99%D7%97%D7%AA_%D7%95%D7%99%D7%A7%D7%99%D7%98%D7%A7%D7%A1%D7%98:%D7%95%D7%99%D7%A7%D7%99%D7%98%D7%A7%D7%A1%D7%98_%D7%95%D7%9E%D7%9B%D7%95%D7%9F_%D7%9E%D7%9E%D7%A8%D7%90"
+                            >Mechon Mamre</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://he.wikisource.org/wiki/%D7%9E%D7%A7%D7%A8%D7%90"
+                            >Tanach</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%9E%D7%A7%D7%A8%D7%90%D7%95%D7%AA_%D7%92%D7%93%D7%95%D7%9C%D7%95%D7%AA"
+                            >Mikraot Gdolot</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%AA%D7%A8%D7%92%D7%95%D7%9D"
+                            >Targumim</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%A0%D7%94"
+                            >Mishna</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%AA%D7%95%D7%A1%D7%A4%D7%AA%D7%90"
+                            >Tosefta</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%9E%D7%A1%D7%9B%D7%AA%D7%95%D7%AA_%D7%A7%D7%98%D7%A0%D7%95%D7%AA"
+                            >Masechtos Ktanos</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%9E%D7%9B%D7%99%D7%9C%D7%AA%D7%90"
+                            >Mechilta</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://he.wikisource.org/wiki/%D7%A1%D7%A4%D7%A8%D7%90"
+                            >Sifro</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://he.wikisource.org/wiki/%D7%A1%D7%A4%D7%A8%D7%99"
+                            >Sifri</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%9E%D7%93%D7%A8%D7%A9_%D7%A8%D7%91%D7%94"
+                            >Midrash Rabba</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%AA%D7%9C%D7%9E%D7%95%D7%93_%D7%91%D7%91%D7%9C%D7%99"
+                            >Talmud Bavli</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%AA%D7%9C%D7%9E%D7%95%D7%93_%D7%99%D7%A8%D7%95%D7%A9%D7%9C%D7%9E%D7%99"
+                            >Talmud Yerushalmi</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://he.wikisource.org/wiki/%D7%A8%D7%99%22%D7%A3"
+                            >Rif</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%A0%D7%94_%D7%AA%D7%95%D7%A8%D7%94"
+                            >Rambam</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%90%D7%A8%D7%91%D7%A2%D7%94_%D7%98%D7%95%D7%A8%D7%99%D7%9D"
+                            >Tur</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%A9%D7%95%D7%9C%D7%97%D7%9F_%D7%A2%D7%A8%D7%95%D7%9A"
+                            >Shulchan Oruch</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%A7%D7%99%D7%A6%D7%95%D7%A8_%D7%A9%D7%95%D7%9C%D7%97%D7%9F_%D7%A2%D7%A8%D7%95%D7%9A"
+                            >Kitzur</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%A2%D7%A8%D7%95%D7%9A_%D7%94%D7%A9%D7%95%D7%9C%D7%97%D7%9F"
+                            >Oruch HaShulchan</link> <link
+                            xlink:href="http://he.wikisource.org/wiki/AHS:OCH">and?</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%A9%D7%95%D7%9C%D7%97%D7%9F_%D7%A2%D7%A8%D7%95%D7%9A_%D7%94%D7%A8%D7%91"
+                            >Shulchan Oruch HaRav</link></para>
+                </listitem>
+                <listitem>
+                    <para><link
+                            xlink:href="http://he.wikisource.org/wiki/%D7%A1%D7%99%D7%93%D7%95%D7%A8_%D7%AA%D7%95%D7%A8%D7%94_%D7%90%D7%95%D7%A8"
+                            >Siddur Tora Or</link></para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section>
+            <title>Texts in English</title>
+            <itemizedlist>
+                <listitem>
+                    <para>Babylonian Talmud: <link
+                            xlink:href="http://www.come-and-hear.com/talmud/index.html"
+                            >Soncino</link> <link
+                            xlink:href="http://www.sacred-texts.com/jud/talmud.htm"
+                        >Rodkinson</link></para>
+                </listitem>
+                <listitem>
+                    <para>The <link xlink:href="http://www.sacred-texts.com/jud/gfp/index.htm">Guide
+                            for the Perplexed</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.torah.org/advanced/shulchan-aruch/">Shulchan
+                            Aruch</link></para>
+                </listitem>
+                <listitem>
+                    <para><link xlink:href="http://www.geocities.com/yona_n.geo/kizzur/">Kizzur
+                            Shulchan Oruch</link></para>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </section>
+</article>

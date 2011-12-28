@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>importers</artifactId>
-    <name>Importers</name>
+    <name>Judaica Importers</name>
     <packaging>jar</packaging>
 
     <dependencies>

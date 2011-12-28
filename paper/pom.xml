@@ -1,0 +1,105 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.podval.judaica</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>paper</artifactId>
+    <name>Judaica Paper</name>
+    <packaging>jar</packaging>
+
+    <properties>
+        <fontsDirectory>/usr/share/fonts/liberation/</fontsDirectory>
+        <fontMetricsDirectory>${basedir}/target/fonts/</fontMetricsDirectory>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.agilejava.docbkx</groupId>
+                <artifactId>docbkx-fop-support</artifactId>
+                <version>2.0.13</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${fontsDirectory}</sourceDirectory>
+                            <targetDirectory>${fontMetricsDirectory}</targetDirectory>
+                            <ansi>true</ansi>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.agilejava.docbkx</groupId>
+                <artifactId>docbkx-maven-plugin</artifactId>
+                <version>2.0.13</version>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sf.docbook</groupId>
+                        <artifactId>docbook-xml</artifactId>
+                        <version>5.0-all</version>
+                        <classifier>resources</classifier>
+                        <type>zip</type>
+                        <scope>runtime</scope>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-html</goal>
+                            <goal>generate-pdf</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>judaica.xml</includes>
+
+                    <bodyFontFamily>LiberationSans</bodyFontFamily>
+                    <tocSectionDepth>4</tocSectionDepth>
+
+                    <fonts>
+                        <font>
+                            <name>LiberationSans</name>
+                            <style>normal</style>
+                            <weight>normal</weight>
+                            <embedFile>${fontsDirectory}/LiberationSans-Regular.ttf</embedFile>
+                            <metricsFile>${fontMetricsDirectory}/LiberationSans-Regular-metrics.xml</metricsFile>
+                        </font>
+                        <font>
+                            <name>LiberationSans</name>
+                            <style>normal</style>
+                            <weight>bold</weight>
+                            <embedFile>${fontsDirectory}/LiberationSans-Bold.ttf</embedFile>
+                            <metricsFile>${fontMetricsDirectory}/LiberationSans-Bold-metrics.xml</metricsFile>
+                        </font>
+                        <font>
+                            <name>LiberationSans</name>
+                            <style>italic</style>
+                            <weight>normal</weight>
+                            <embedFile>${fontsDirectory}/LiberationSans-Italic.ttf</embedFile>
+                            <metricsFile>${fontMetricsDirectory}/LiberationSans-Italic-metrics.xml</metricsFile>
+                        </font>
+                        <font>
+                            <name>LiberationSans</name>
+                            <style>italic</style>
+                            <weight>bold</weight>
+                            <embedFile>${fontsDirectory}/LiberationSans-BoldItalic.ttf</embedFile>
+                            <metricsFile>${fontMetricsDirectory}/LiberationSans-BoldItalic-metrics.xml</metricsFile>
+                        </font>
+                    </fonts>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

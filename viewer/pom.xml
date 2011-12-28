@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>viewer</artifactId>
-    <name>Viewer</name>
+    <name>Judaica Viewer</name>
     <packaging>jar</packaging>
 
     <build>

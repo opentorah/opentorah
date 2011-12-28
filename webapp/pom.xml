@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>webapp</artifactId>
-    <name>Web Application</name>
+    <name>Judaica Web Application</name>
     <packaging>war</packaging>
 
     <build>

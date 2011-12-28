@@ -9,6 +9,6 @@
     </parent>
 
     <artifactId>common</artifactId>
-    <name>Common</name>
+    <name>Judaica Common Code</name>
     <packaging>jar</packaging>
 </project>
