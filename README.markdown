@@ -1,16 +1,17 @@
 #Digital Judaica Done Right :)
 
 ##What is this?
-[Writings](ttp://www.dub.podval.org/judaica/) on the subject.
+[Writings](http://www.dub.podval.org/judaica/) on the subject.
 
 ##For developers
 * source [repository](https://github.com/dubinsky/podval-judaica)
-* continuous integration job
+* continuous integration [job](https://podval.ci.cloudbees.com/job/judaica/)
 * [blog](http://blog.judaica.podval.org/) (empty)
 * [mailing list](https://groups.google.com/forum/#!forum/podval-judaica) (empty)
 
 ##For users
 Text Viewer (nothing right now :()
+
 [SBL font](http://www.sbl-site.org/educational/BiblicalFonts_SBLHebrew.aspx) is needed for viewing Tanach
 
 ##Technologies Used
@@ -18,7 +19,7 @@ Text Viewer (nothing right now :()
 * Servlet container: Apache [Tomcat](http://tomcat.apache.org/)
 * Web server: Apache [Httpd](http://httpd.apache.org/) ![Httpd](http://httpd.apache.org/favicon.ico)
 * Java/Scala Integrated Development Environment: [NetBeans](http://www.netbeans.org/) ![NetBeans](http://www.netbeans.org/favicon.ico)
-* XML Integrated Development Environment: <[oXygen](http://www.oxygenxml.com/) ![oXygen](http://www.oxygenxml.com/favicon.ico)
+* XML Integrated Development Environment: [oXygen](http://www.oxygenxml.com/) ![oXygen](http://www.oxygenxml.com/favicon.ico)
 * [XML data base](http://en.wikipedia.org/wiki/XML_database): [Exist](http://exist.sourceforge.net/)
 * [XSLT](http://en.wikipedia.org/wiki/XSL_Transformations) and [XQuery](http://en.wikipedia.org/wiki/XQuery) engine: [Saxon](http://www.saxonica.com/) ![Saxon](http://www.saxonica.com/favicon.ico)
 * [XSL-FO](http://en.wikipedia.org/wiki/XSL_Formatting_Objects) rendering engine: [xmlroff](http://xmlroff.org/) ![xmlroff](http://xmlroff.org/chrome/site/xmlroff-icon.gif)
