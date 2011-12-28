@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.podval</groupId>
-        <artifactId>calendar-parent</artifactId>
+        <groupId>org.podval.calendar</groupId>
+        <artifactId>parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>calendar-moon</artifactId>
+    <artifactId>moon</artifactId>
     <name>Moon Calculations</name>
     <packaging>jar</packaging>
 </project>

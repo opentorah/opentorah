@@ -18,6 +18,12 @@ final class NewMoonTest {
         println(Year(5772).month(4).newMoon.toMinutesString)
     }
 
+  /*
+   * New Moons
+   * 5771 Elul     28   23: 8:14   2011 Sep 28 17: 8:14
+   * 5772 Tishrei   1   11:52:15   2011 Oct 28  5:52:15
+   * 5772 Cheshvan 29   
+   */
 
 //    @Test
 //    public void table5769() {
