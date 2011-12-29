@@ -1262,15 +1262,14 @@
         <title>Typesetting classic Jewish texts</title>
         <section>
             <title>Font Formats</title>
-            <para>The problem: <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.tanach.us%2FTanach.xml%23Installation&amp;sa=D&amp;sntz=1&amp;usg=AFrqEze6OJXw4KQOu_mWRfYYw9y_P90UAg"
+            <para>The problem: <link xlink:href="http://www.tanach.us/Tanach.xml#Intallation"
                     >http://www.tanach.us/Tanach.xml#Installation</link>.</para>
             <para>To show on screen (and print) acceptably texts with vowel points and cantillation
                 (and without them), we need good fonts. It would be nice to be able to force the
                 browser to show a page using a specified font, and there is even a declaration for
-                that in CSS (XXX), but it is not universally supported by modern browsers/operating
+                that in CSS (TODO), but it is not universally supported by modern browsers/operating
                 systems, so the user will need to install a decent font if he is not satisfied with
-                the quality of the preinstalled ones. Font installation is easy, but we need to
+                the quality of the pre-installed ones. Font installation is easy, but we need to
                 provide the fonts to install.</para>
             <para>We need to be able to install fonts in cross-platform formats.</para>
             <para>It happens that there are both a vowel and a cantillation sign under a letter
@@ -1280,8 +1279,8 @@
                 instructions about combining glyphs. This format used to be called GX, and is now
                 called AAT - Apple Advanced Typography [1]. It is currently supported only on MacOS
                 (there are plans to support it in <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FHurfBuzz&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzca6P7bxv1gxFWndTSQ7BEjkIZEew"
-                    >HurfBuzz</link> in the future (XXX)), so we can not use it.</para>
+                    xlink:href="http://freedesktop.org/wiki/Software/HarfBuzz">HurfBuzz</link> in
+                the future (TODO)), so we can not use it.</para>
             <para>SIL International is developing AAT replacement for Windows - Graphite [2]. This
                 format allows inclusion into the font of a program in a special language. This
                 program then chooses and places glyphs. This format is supported on Windows and
@@ -1291,10 +1290,10 @@
         <section>
             <title>TrueType, Type1 and history of OpenType</title>
             <para>Microsoft and Apple developed <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FOpenType&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzd4qisGvbCYT_UWQt4qMy9z_LJyxA"
+                xlink:href="http://www.microsoft.com/typography/default.mspx"
                     >OpenType</link> format [3]. This format has various tables and is more
                 expressive than Type1 and <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FTrueType&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzec0W30TsVJ1VoQSUuhrZ7Icp7qGg"
+                    xlink:href="http://en.wikipedia.org/wiki/TrueType"
                     >TrueType</link>, but less expressive than AAT. Applications rely on a platform
                 library to render text well for a complex writing system (like ours) - or do it
                 themselves. On windows, Uniscribe [4] is such a library. We need to find out, how
@@ -1308,32 +1307,20 @@
         <section>
             <title>Font Rendering</title>
             <para>Firefox: Pango everywhere?</para>
-            <para><link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FFreeDesktop&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfV073gmGJ6mzP8tOMhSnvJsKIWFQ"
-                    >FreeDesktop</link> <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.freedesktop.org%2Fwiki%2FTextLayout&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfuPUJmktcuokjfDNPgIXXxp1_65g"
-                    >Text Layout Working Group</link></para>
-            <para>Fedora <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Ffedoraproject.org%2Fwiki%2FSIGs%2FFonts&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcVi2GTcBjvwvmSys4PtLootC1c5g"
-                    >Fonts SIG</link> <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Ffedoraproject.org%2Fwiki%2FSIGs%2FFonts%2FQA&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzeamlG_oyrVD0TM5K24GyGRSTw-nQ"
+            <para><link xlink:href="http://www.freedesktop.org/">FreeDesktop</link> <link
+                    xlink:href="http://www.freedesktop.org/wiki/TextLayout">Text Layout Working
+                    Group</link></para>
+            <para>Fedora <link xlink:href="http://fedoraproject.org/wiki/SIGs/Fonts">Fonts
+                    SIG</link> <link xlink:href="http://fedoraproject.org/wiki/SIGs/Fonts/QA"
                     >QA</link></para>
-            <para><link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FHurfBuzz&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzca6P7bxv1gxFWndTSQ7BEjkIZEew"
-                    >HurfBuzz</link></para>
-            <para><link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fcairographics.org%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdQogeaKBD4IFnmWj93pYlq_0ed5w"
-                    >Cairo</link> graphics</para>
-            <para><link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FTextLayout&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdpW3gsa64-Ay77ifF7Be2lcmDD8Q"
-                    >TextLayout</link> <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Flive.gnome.org%2FBoston2006%2FTextLayout%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdGB71i8mzt7U_KECh-B-AVJIQsEQ"
-                    >2006</link> <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.freedesktop.org%2Fwiki%2FTextLayout2007&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcmA0GKh6_551YJn6IhsDVSJ1cRIQ"
-                    >2007</link></para>
-            <para><link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fopenfontlibrary.org%2Fwiki%2FKnowledge_Resources&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcwVSYX2TNI00cvKazkt8TUGQcPPg"
-                    >Open Font Library Wiki</link></para>
+            <para><link xlink:href="http://freedesktop.org/wiki/Software/HarfBuzz"
+                >HurfBuzz</link></para>
+            <para><link xlink:href="http://Fcairographics.org/">Cairo</link> graphics</para>
+            <para><link xlink:href="http://freedesktop.org/wiki/TextLayout">TextLayout</link> <link
+                    xlink:href="http://live.gnome.org/Boston2006/TextLayout/">2006</link> <link
+                    xlink:href="http://www.freedesktop.org/wiki/TextLayout2007/">2007</link></para>
+            <para><link xlink:href="http://openfontlibrary.org/wiki/Knowledge_Resources">Open Font
+                    Library Wiki</link></para>
         </section>
         <section>
             <title>Fonts</title>
@@ -1351,19 +1338,19 @@
         </section>
         <section>
             <title>Glyph Layout with Vowels and Cantillation</title>
-            <para>XXX's algorithm.</para>
+            <para>TODO XXX's algorithm.</para>
             <para>Gorkin's algorithm.</para>
             <para>There is a book on fonts: <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.amazon.com%2FFonts-Encodings-Yannis-Haralambous%2Fdp%2F0596102429&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcQglT0FKIBsoupUoCVzohH2ny1Jw"
+                    xlink:href="http://www.amazon.com/Fonts-Encodings-Yannis-Haralambous/dp/0596102429"
                     >Fonts &amp; Encodings</link> by Yannis Haralambous. Despite the raving <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.oreillynet.com%2Fxml%2Fblog%2F2007%2F10%2Ffonts_encodings_by_yannis_hara.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzeTYWR0k5DLYFDcbifkiImZSlYu7w"
+                    xlink:href="http://www.oreillynet.com/xml/blog/2007/10/fonts_encodings_by_yannis_hara.html"
                     >review</link>, I was underwhelmed by it. I wanted to find out if it is possible
                 to encode the vowel/cantillation placement logic into an<link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FOpenType&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzd4qisGvbCYT_UWQt4qMy9z_LJyxA"
-                    >OpenType</link> font - and did not find the answer in the book.</para>
+                    xlink:href="http://en.wikipedia.org/wiki/OpenType">OpenType</link> font - and
+                did not find the answer in the book.</para>
             <para>Which is not really surprising, since the book's author is also the author of
                 Omega project (Unicode in TeX), about which a very informative <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.valdyas.org%2Flinguistics%2Fprinting_unicode.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzch7HZDmXEXgqZOAZvdmciF5P2OfA"
+                    xlink:href="http://Fwww.valdyas.org/linguistics/printing_unicode.html"
                     >text</link> about printing Unicode in 2002 says:</para>
             <itemizedlist>
                 <listitem>
@@ -1376,8 +1363,7 @@
                 </listitem>
             </itemizedlist>
             <para>I did find out about a useful tool for OpenType font jobs: <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.letterror.com%2Fcode%2Fttx%2Findex.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcmj8ViehO2iBCEGuP2xkxnSsMYgQ"
-                    >TTX</link>.</para>
+                    xlink:href="http://www.letterror.com/code/ttx/index.html">TTX</link>.</para>
             <para>Does kerning work through vowels?</para>
         </section>
         <section>
@@ -1419,7 +1405,7 @@
                     </listitem>
                     <listitem>
                         <para>Excellent support (see <link
-                                xlink:href="http://www.google.com/url?q=http%3A%2F%2Fxmlroff.org%2Fticket%2F131&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfP-A895GC_hNCMjo7O51EdUzycGw"
+                                xlink:href="http://xmlroff.org/ticket/131"
                                 >http://xmlroff.org/ticket/131</link> for an example)</para>
                     </listitem>
                     <listitem>
@@ -1437,16 +1423,14 @@
             <title>Notes</title>
             <para>По слухам, Pango отрабатывает кантиляцию правильно. Может быть, всё зависит от
                 шрифта? Например, Ezra SIL. Обсудить с персом, нужна ли поддержка от Pango, или
-                достаточно средств <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FOpenType&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzd4qisGvbCYT_UWQt4qMy9z_LJyxA"
+                достаточно средств <link xlink:href="http://en.wikipedia.org/wiki/OpenType"
                     >OpenType</link>?</para>
-            <para><link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Fjudaica.podval.org%2Fmoin%2FInDesign&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzf_At4_iD7c2h7gOxy5YCYgs8oPBA"
+            <para><link xlink:href="http://en.wikipedia.org/wiki/Adobe_InDesign"
                     >InDesign</link> and <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2Favondale.typepad.com%2Findesignupdate%2F2005%2F08%2Fwhat_the_heck_i.html&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcaSxWQhIYc_s1kxLzzcN2rk-a3SQ"
+                    xlink:href="http://avondale.typepad.com/indesignupdate/2005/08/what_the_heck_i.html"
                     >INX</link> - something to think about in the context of <link
-                    xlink:href="http://www.google.com/url?q=http%3A%2F%2F2007.xmlconference.org%2Fpublic%2Fschedule%2Fdetail%2F249&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcw4FtVzmkEiiTOACrfDffZ9twIrw"
-                    >Outside-In XML Publishing</link></para>
+                    xlink:href="http://2007.xmlconference.org/public/schedule/detail/249">Outside-In
+                    XML Publishing</link></para>
             <para>"Typesetting Hebrew Cantillation".</para>
         </section>
         <section>
@@ -1454,63 +1438,62 @@
             <orderedlist>
                 <listitem>
                     <para>AAT (Apple) &lt;<link
-                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fdeveloper.apple.com%2Ffonts%2FTTRefMan%2FRM06%2FChap6AATIntro.html%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcgcLo_IoMTi8eRgViGYHEcQ-H4Cw"
-                            >http://developer.apple.com/fonts/TTRefMan/RM06/Chap6AATIntro.html&gt;</link>.</para>
+                            xlink:href="http://developer.apple.com/fonts/TTRefMan/RM06/Chap6AATIntro.html"
+                            >http://developer.apple.com/fonts/TTRefMan/RM06/Chap6AATIntro.html</link>.</para>
                 </listitem>
                 <listitem>
                     <para>Graphite (SIL) &lt;<link
-                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fscripts.sil.org%2Fcms%2Fscripts%2Fpage.php%3Fsite_id%3Dnrsi%26item_id%3DGraphiteFAQ%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzd_7Wja6UnLQhoRwC0nJvhvXPT3tw"
-                            >http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;item_id=GraphiteFAQ&gt;</link>.</para>
+                            xlink:href="http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;item_id=GraphiteFAQ"
+                            >http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;item_id=GraphiteFAQ</link>.</para>
                 </listitem>
                 <listitem>
                     <para>OpenType (Wikipedia) &lt;<link
-                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fen.wikipedia.org%2Fwiki%2FOpenType%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEze0QYMRzh7_WB3V2c6s1P308Yz3zQ"
-                            >http://en.wikipedia.org/wiki/OpenType&gt;</link>.</para>
+                            xlink:href="http://en.wikipedia.org/wiki/OpenType"
+                            >http://en.wikipedia.org/wiki/OpenType</link>.</para>
                 </listitem>
                 <listitem>
                     <para>Uniscribe (Microsoft) &lt;<link
-                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.microsoft.com%2Ftypography%2Fotfntdev%2Fhebrewot%2Ffeatures.aspx%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzf8NrL9ucGzGVJqPB0aVRSJgzJ-QA"
-                            >http://www.microsoft.com/typography/otfntdev/hebrewot/features.aspx&gt;</link>.</para>
+                            xlink:href="http://www.microsoft.com/typography/otfntdev/hebrewot/features.aspx"
+                            >http://www.microsoft.com/typography/otfntdev/hebrewot/features.aspx</link>.</para>
                 </listitem>
                 <listitem>
-                    <para>Pango &lt;<link
-                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.pango.org%2F%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcJK-5dIj97cOdGNdZIcaH7gQO8oA"
-                            >http://www.pango.org/&gt;</link>.</para>
+                    <para>Pango &lt;<link xlink:href="http://www.pango.org/"
+                            >http://www.pango.org/</link>.</para>
                 </listitem>
                 <listitem>
                     <para>Pango Hebrew &lt;<link
-                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fcvs.gnome.org%2Fviewcvs%2Fpango%2Fmodules%2Fhebrew%2Fhebrew-shaper.c%3Fview%3Dmarkup%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzd3L0kPyJT3kvdlCWOO1FFnBWBNyw"
-                            >http://cvs.gnome.org/viewcvs/pango/modules/hebrew/hebrew-shaper.c?view=markup&gt;</link>.</para>
+                            xlink:href="http://cvs.gnome.org/viewcvs/pango/modules/hebrew/hebrew-shaper.c?view=markup"
+                            >http://cvs.gnome.org/viewcvs/pango/modules/hebrew/hebrew-shaper.c?view=markup</link>.</para>
                 </listitem>
                 <listitem>
                     <para>XSL-FO (Wikipedia) &lt;<link
-                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fen.wikipedia.org%2Fwiki%2FXSL-FO%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzdXKRlPDEALdWOlgIyk5ATzvZQD6g"
-                            >http://en.wikipedia.org/wiki/XSL-FO&gt;</link>.</para>
+                            xlink:href="http://en.wikipedia.org/wiki/XSL-FO"
+                            >http://en.wikipedia.org/wiki/XSL-FO</link>.</para>
                 </listitem>
                 <listitem>
                     <para>Anvil Toolkit (Dave Pawson) &lt;<link
-                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.dpawson.co.uk%2Fnodesets%2Fentries%2F070709.html%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzea3DjIXYlxdhbCzXn-n2yt1-wCOA"
-                            >http://www.dpawson.co.uk/nodesets/entries/070709.html&gt;</link>.</para>
+                            xlink:href="http://www.dpawson.co.uk/nodesets/entries/070709.html"
+                            >http://www.dpawson.co.uk/nodesets/entries/070709.html</link>.</para>
                 </listitem>
                 <listitem>
-                    <para>Prince &lt;<link
-                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.princexml.com%253e%2F&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzeLS_Uicn__KI32422MiNMi0OVl4g"
-                            >http://www.princexml.com&gt;</link>.</para>
+                    <para>Prince &lt;<link xlink:href="http://www.princexml.com"
+                            >http://www.princexml.com</link>.</para>
                 </listitem>
                 <listitem>
                     <para>Google Books PDF &lt;<link
-                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.imperialviolet.org%2Fbinary%2Fgoogle-books-pdf.pdf%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzfc80ekDlUupaHt2ttLt8Vl08-pZA"
-                            >http://www.imperialviolet.org/binary/google-books-pdf.pdf&gt;</link>.</para>
+                            xlink:href="http://www.imperialviolet.org/binary/google-books-pdf.pdf"
+                            >http://www.imperialviolet.org/binary/google-books-pdf.pdf</link>.</para>
                 </listitem>
                 <listitem>
                     <para>HarfBuzz &lt;<link
-                            xlink:href="http://www.google.com/url?q=http%3A%2F%2Fwww.freedesktop.org%2Fwiki%2FSoftware%2FHarfBuzz%253E&amp;sa=D&amp;sntz=1&amp;usg=AFrqEzcQupUnhpehP7FNkIqNF6cSJw4CEw"
-                            >http://www.freedesktop.org/wiki/Software/HarfBuzz&gt;</link></para>
+                            xlink:href="http://www.freedesktop.org/wiki/Software/HarfBuzz"
+                            >http://www.freedesktop.org/wiki/Software/HarfBuzz</link></para>
                 </listitem>
             </orderedlist>
             <para>Leonid Dubinsky. Date: 9-10 Kislev 5768</para>
         </section>
     </section>
+
     <section>
         <title>Laying out classic Jewish texts</title>
         <para>It is natural for a user, after researching with our system, to desire to print
@@ -1530,7 +1513,7 @@
                 <para>the page must be fully covered with print</para>
             </listitem>
             <listitem>
-                <para>comment must to start on the same page where what it comments on is</para>
+                <para>comment must start on the same page where what it comments on is</para>
             </listitem>
             <listitem>
                 <para>comment must end on the page it started</para>
@@ -1555,13 +1538,11 @@
             not want to expend any effort to even find out how primitive. Dubinsky would like to see
             something acceptable. Nothing of the sort has been found so far. XSL-FO [7] is
             insufficiently expressive for our problem - even version 1.1, it seems.</para>
-        <para>Beyond Pretty-Printing: <link xlink:href="http://lambda-the-ultimate.org/node/2419"
+        <para>Beyond Pretty-Printing: <link xlink:href="http://lambda-the-ultimate.org/node/2419"
                 >Galley</link> Concepts in Document Formatting Combinators</para>
         <para><link xlink:href="http://www.it.usyd.edu.au/~jeff/nonpareil/">Nonpareil</link></para>
         <para><link xlink:href="http://www.lowagie.com/iText/">iText</link></para>
-        <para>
-            <link xlink:href="http://www.w3.org/TR/2008/WD-xslfo20-req-20080326/">XSL-FO 2.0
-                Requirements</link></para>
+        <para><link xlink:href="http://www.w3.org/TR/2008/WD-xslfo20-req-20080326/">XSL-FO 2.0 Requirements</link></para>
     </section>
 
     <section>
@@ -1581,7 +1562,7 @@
                 <listitem>
                     <para><link
                             xlink:href="http://psychomystic.blogspot.com/search/label/Torah%20Online%20Links%20Database"
-                            >psychomystic</link> links - done</para>
+                            >psychomystic</link> links - done - closed access</para>
                 </listitem>
                 <listitem>
                     <para><link xlink:href="http://chabadlibrary.org/books/">Chabad
@@ -1589,7 +1570,7 @@
                 </listitem>
                 <listitem>
                     <para><link xlink:href="http://www.sichoskodesh.com/">Sichos
-                        Kodesh</link></para>
+                        Kodesh</link> - empty</para>
                 </listitem>
                 <listitem>
                     <para><link xlink:href="http://www.otzar770.com/">Otzar 770</link></para>
@@ -1619,9 +1600,7 @@
                 </listitem>
                 <listitem>
                     <para><link xlink:href="http://chassidus.ru/rambam/index.php"
-                            >chassidus.ru</link> - broken (<link
-                            xlink:href="http://www.hassidout.org/hassidout/Textes_Kodech/Kabbalah/index.php-rootid=103.htm"
-                            >?</link>)</para>
+                            >chassidus.ru</link> - broken</para>
                 </listitem>
                 <listitem>
                     <para><link xlink:href="http://www.halachabrura.org/alephlink.htm">Halacha
@@ -1629,10 +1608,10 @@
                 </listitem>
                 <listitem>
                     <para><link xlink:href="http://www.jnul.huji.ac.il/dl/books/html/bk_sub.htm"
-                            >Digitized Book Repository (JNUL)</link></para>
+                            >Digitized Book Repository (JNUL)</link> - broken</para>
                 </listitem>
                 <listitem>
-                    <para><link xlink:href="http://judaica.podval.org/moin/%3F">Otzar
+                    <para><link xlink:href="http://www.otzar.org/otzaren/indexeng.asp">Otzar
                             HaHochma</link></para>
                 </listitem>
             </itemizedlist>
@@ -1796,10 +1775,6 @@
                 <listitem>
                     <para><link xlink:href="http://www.torah.org/advanced/shulchan-aruch/">Shulchan
                             Aruch</link></para>
-                </listitem>
-                <listitem>
-                    <para><link xlink:href="http://www.geocities.com/yona_n.geo/kizzur/">Kizzur
-                            Shulchan Oruch</link></para>
                 </listitem>
             </itemizedlist>
         </section>
