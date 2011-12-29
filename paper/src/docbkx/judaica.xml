@@ -1245,32 +1245,31 @@
                 cantillation sign do not overlap?</para>
             <para>Apple developed font format that allows inclusion (in form of tables) of
                 instructions about combining glyphs. This format used to be called GX, and is now
-                called AAT - Apple Advanced Typography [1]. It is currently supported only on MacOS
-                (there are plans to support it in <link
-                    xlink:href="http://freedesktop.org/wiki/Software/HarfBuzz">HurfBuzz</link> in
-                the future (TODO)), so we can not use it.</para>
-            <para>SIL International is developing AAT replacement for Windows - Graphite [2]. This
-                format allows inclusion into the font of a program in a special language. This
-                program then chooses and places glyphs. This format is supported on Windows and
-                Linux, but requires installation of programs in addition' to fonts, so we can not
-                use it.</para>
+                called AAT - Apple Advanced Typography <biblioref linkend="AAT"/>. It is currently
+                supported only on MacOS (there are plans to support it in HarfBuzz <biblioref
+                    linkend="HarfBuzz"/> in the future (TODO)), so we can not use it.</para>
+            <para>SIL International is developing AAT replacement for Windows - Graphite <biblioref
+                    linkend="Graphite"/>. This format allows inclusion into the font of a program in
+                a special language. This program then chooses and places glyphs. This format is
+                supported on Windows and Linux, but requires installation of programs in addition'
+                to fonts, so we can not use it.</para>
         </section>
         <section>
             <title>TrueType, Type1 and history of OpenType</title>
             <para>Microsoft and Apple developed <link
-                xlink:href="http://www.microsoft.com/typography/default.mspx"
-                    >OpenType</link> format [3]. This format has various tables and is more
-                expressive than Type1 and <link
-                    xlink:href="http://en.wikipedia.org/wiki/TrueType"
+                    xlink:href="http://www.microsoft.com/typography/default.mspx"
+                >OpenType</link> format [3]. This format has various tables and is more expressive
+                than Type1 and <link xlink:href="http://en.wikipedia.org/wiki/TrueType"
                     >TrueType</link>, but less expressive than AAT. Applications rely on a platform
                 library to render text well for a complex writing system (like ours) - or do it
-                themselves. On windows, Uniscribe [4] is such a library. We need to find out, how
-                well it really supports, as they said, "the use of kerning for adding space to bases
-                with diacritics (Nikud or Teamin)". On Linux, this is done by Pango [5], and it, it
-                seems, does not deal with cantillation at all - just with consonants and vowels [6];
-                we need to contact them, find out what the situation is and possibly change it.
-                Firefox (the only program that we care about) uses Pango, which works on Windows
-                (via Uniscribe), and on MacOS.</para>
+                themselves. On windows, Uniscribe <biblioref linkend="Uniscribe"/> is such a
+                library. We need to find out, how well it really supports, as they said, "the use of
+                kerning for adding space to bases with diacritics (Nikud or Teamin)". On Linux, this
+                is done by Pango <biblioref linkend="Pango"/>, and it, it seems, does not deal with
+                cantillation at all - just with consonants and vowels [6]; we need to contact them,
+                find out what the situation is and possibly change it. Firefox (the only program
+                that we care about) uses Pango, which works on Windows (via Uniscribe), and on
+                MacOS.</para>
         </section>
         <section>
             <title>Font Rendering</title>
@@ -1403,7 +1402,8 @@
         </section>
 
         <bibliography>
-            <biblioentry xreflabel="AAT">
+            <biblioentry xml:id="AAT" xreflabel="AAT">
+                <title>Apple Advanced Typography</title>
                 <abbrev>AAT</abbrev>
                 <author>
                     <orgname>Apple</orgname>
@@ -1411,7 +1411,7 @@
                 <biblioid class="uri"
                     >http://developer.apple.com/fonts/TTRefMan/RM06/Chap6AATIntro.html</biblioid>
             </biblioentry>
-            <biblioentry xreflabel="Graphite">
+            <biblioentry xml:id="Graphite" xreflabel="Graphite">
                 <title>Graphite</title>
                 <author>
                     <orgname>SIL</orgname>
@@ -1419,14 +1419,14 @@
                 <biblioid class="uri"
                     >http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;item_id=GraphiteFAQ</biblioid>
             </biblioentry>
-            <biblioentry xreflabel="OpenType">
+            <biblioentry xml:id="OpenType" xreflabel="OpenType">
                 <title>OpenType</title>
                 <author>
                     <orgname>Wikipedia</orgname>
                 </author>
                 <biblioid class="uri">http://en.wikipedia.org/wiki/OpenType</biblioid>
             </biblioentry>
-            <biblioentry xreflabel="Uniscribe">
+            <biblioentry xml:id="Uniscribe" xreflabel="Uniscribe">
                 <title>Uniscribe</title>
                 <author>
                     <orgname>Microsoft</orgname>
@@ -1434,22 +1434,22 @@
                 <biblioid class="uri">
                     http://www.microsoft.com/typography/otfntdev/hebrewot/features.aspx</biblioid>
             </biblioentry>
-            <biblioentry xreflabel="Pango">
+            <biblioentry xml:id="Pango" xreflabel="Pango">
                 <title>Pango</title>
                 <biblioid class="uri">http://www.pango.org/</biblioid>
             </biblioentry>
-            <biblioentry xreflabel="PangoH">
+            <biblioentry xml:id="PangoH" xreflabel="PangoH">
                 <title>Pango Hebrew</title>
                 <biblioid>http://cvs.gnome.org/viewcvs/pango/modules/hebrew/hebrew-shaper.c?view=markup</biblioid>
             </biblioentry>
-            <biblioentry xreflabel="XSL-FO">
+            <biblioentry xml:id="XSL-FO" xreflabel="XSL-FO">
                 <title>XSL-FO</title>
                 <author>
                     <orgname>Wikipedia</orgname>
                 </author>
                 <biblioid class="uri">http://en.wikipedia.org/wiki/XSL-FO</biblioid>
             </biblioentry>
-            <biblioentry xreflabel="Anvil">
+            <biblioentry xml:id="Anvil" xreflabel="Anvil">
                 <title>Anvil Toolkit</title>
                 <author>
                     <personname>Dave Pawson</personname>
@@ -1457,16 +1457,16 @@
                 <biblioid class="uri"
                     >http://www.dpawson.co.uk/nodesets/entries/070709.html</biblioid>
             </biblioentry>
-            <biblioentry xreflabel="Prince">
+            <biblioentry xml:id="Prince" xreflabel="Prince">
                 <title>Prince</title>
                 <biblioid class="uri">http://www.princexml.com"</biblioid>
             </biblioentry>
-            <biblioentry xreflabel="GoogleBooks">
+            <biblioentry xml:id="GoogleBooks" xreflabel="GoogleBooks">
                 <title>Google Books PDF</title>
                 <biblioid class="uri"
                     >http://www.imperialviolet.org/binary/google-books-pdf.pdf</biblioid>
             </biblioentry>
-            <biblioentry xreflabel="HarfBuzz">
+            <biblioentry xml:id="HarfBuzz" xreflabel="HarfBuzz">
                 <title>HarfBuzz</title>
                 <biblioid class="uri">http://www.freedesktop.org/wiki/Software/HarfBuzz</biblioid>
             </biblioentry>
