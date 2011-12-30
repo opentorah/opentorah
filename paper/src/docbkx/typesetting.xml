@@ -82,8 +82,7 @@
         <para>Fedora <link xlink:href="http://fedoraproject.org/wiki/SIGs/Fonts">Fonts
                 SIG</link> <link xlink:href="http://fedoraproject.org/wiki/SIGs/Fonts/QA"
             >QA</link></para>
-        <para><link xlink:href="http://freedesktop.org/wiki/Software/HarfBuzz"
-            >HurfBuzz</link></para>
+        <para>HurfBuzz <biblioref linkend="HarfBuzz"/></para>
         <para><link xlink:href="http://cairographics.org/">Cairo</link> graphics</para>
         <para><link xlink:href="http://freedesktop.org/wiki/TextLayout">TextLayout</link> <link
                 xlink:href="http://live.gnome.org/Boston2006/TextLayout/">2006</link> <link
@@ -260,7 +259,7 @@
         </biblioentry>
         <biblioentry xml:id="Prince">
             <title>Prince</title>
-            <biblioid class="uri">http://www.princexml.com"</biblioid>
+            <biblioid class="uri">http://www.princexml.com</biblioid>
         </biblioentry>
         <biblioentry xml:id="GoogleBooks">
             <title>Google Books PDF</title>
