@@ -22,7 +22,6 @@
             <plugin>
                 <groupId>com.agilejava.docbkx</groupId>
                 <artifactId>docbkx-fop-support</artifactId>
-                <version>2.0.13</version>
                 <executions>
                     <execution>
                         <phase>generate-resources</phase>
@@ -41,7 +40,6 @@
             <plugin>
                 <groupId>com.agilejava.docbkx</groupId>
                 <artifactId>docbkx-maven-plugin</artifactId>
-                <version>2.0.13</version>
 
                 <dependencies>
                     <dependency>
@@ -63,7 +61,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <includes>judaica.xml</includes>
+                    <includes>*.xml</includes>
+
+                    <chunkedOutput>true</chunkedOutput>
 
                     <bodyFontFamily>LiberationSans</bodyFontFamily>
                     <tocSectionDepth>4</tocSectionDepth>
