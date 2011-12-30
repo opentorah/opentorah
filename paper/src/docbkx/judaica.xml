@@ -4,6 +4,7 @@
 
 <article xmlns="http://docbook.org/ns/docbook" version="5.0"
     xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude">
+
     <title>Digital Judaica Done Right</title>
 
     <section>
@@ -311,9 +312,7 @@
                 юзером отрывку), поднятие к комментируемум им тексту, переводы и варианты. Список
                 просмотренных сегодня текстов. "рабочий стол": выбранные тексты и большой лист для
                 записей юзера - план урока или хидуш (конспект проведенной работы). Google
-                    Notebook. <link
-                        xlink:href="http://www.jotspace.com/"
-                    >JotSpace</link>.</para>
+                    Notebook. <link xlink:href="http://www.jotspace.com/">JotSpace</link>.</para>
             <para>Отец семейства хочет подготовить субботний разговор. Мы помним его любимых
                 комментаторов , ему они предложены на "столе", при желании он находит дополнительные
                 материалы на "полке", вытаскивает понравившиеся на лист, возможно добавляет список
@@ -406,129 +405,131 @@
                 <para>Как назвать? Кориц предложил два: OpenTorah и "Торат Моше".</para>
             </section>
         </section>
-        <section>
-            <title>Источники</title>
-            <para>[1] The Responsa storage and retrieval system-whither?. Aviezri Fraenkel. 1997
-                    . <link xlink:href="http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/trs.ps"
-                    >http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/trs.ps</link> (Hebrew: <link
-                    xlink:href="http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/pha.ps"
-                    >http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/pha.ps</link>) .</para>
-            <para>[2] The Cathedral and the Bazaar. Eric S. Raymond. <link
-                    xlink:href="http://www.catb.org/~esr/writings/homesteading"
-                    >http://www.catb.org/~esr/writings/homesteading/</link> .</para>
-            <para>[3] Ontology is overrated. Clay Shirky. 2005. <link
+        <bibliography>
+            <title>Sources</title>
+            <biblioentry xml:id="Fraenkel97">
+                <title>The Responsa storage and retrieval system-whither?.</title>
+                <author><personname><firstname>Aviezri</firstname><surname>Fraenkel</surname></personname></author>
+                <date>1997</date>
+                <biblioid class="uri">http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/trs.ps</biblioid>
+                <biblioid class="uri">http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/pha.ps</biblioid>
+            </biblioentry>
+            <biblioentry xml:id="CAB"><title>The Cathedral and the Bazaar</title>
+                <author><personname><firstname>Eric</firstname><othername>S</othername><surname>Raymond</surname></personname> </author>
+                <biblioid class="uri">http://www.catb.org/~esr/writings/homesteading</biblioid>
+            <biblioentry>[3] Ontology is overrated. Clay Shirky. 2005. <link
                     xlink:href="http://www.shirky.com/writings/ontology_overrated.html"
-                    >http://www.shirky.com/writings/ontology_overrated.html</link> .</para>
-            <para>[4] Distributed Proofreaders. <link xlink:href="http://www.pgdp.net/c/default.php"
-                    >http://www.pgdp.net/c/default.php</link> .</para>
-            <para>[5] TEI Lite Tutorial. <link
+                    >http://www.shirky.com/writings/ontology_overrated.html</link> .</biblioentry>
+            <biblioentry>[4] Distributed Proofreaders. <link xlink:href="http://www.pgdp.net/c/default.php"
+                    >http://www.pgdp.net/c/default.php</link> .</biblioentry>
+            <biblioentry>[5] TEI Lite Tutorial. <link
                     xlink:href="http://www.tei-c.org/Lite/teiu5_split_en.html"
-                    >http://www.tei-c.org/Lite/teiu5_split_en.html</link> .</para>
-            <para>[6] TEI P5. <link xlink:href="http://www.tei-c.org/release/doc/tei-p5-doc/html/"
-                    >http://www.tei-c.org/release/doc/tei-p5-doc/html/</link> .</para>
-            <para>[7] TEI CE. <link xlink:href="http://www.tei-c.org/Activities/CE/"
-                    >http://www.tei-c.org/Activities/CE/</link> .</para>
-            <para>[8] TEI Overlap. <link xlink:href="http://www.tei-c.org/Activities/SIG/Overlap/"
-                    >http://www.tei-c.org/Activities/SIG/Overlap/</link> .</para>
-            <para>[9] TEI WD. <link
+                    >http://www.tei-c.org/Lite/teiu5_split_en.html</link> .</biblioentry>
+            <biblioentry>[6] TEI P5. <link xlink:href="http://www.tei-c.org/release/doc/tei-p5-doc/html/"
+                    >http://www.tei-c.org/release/doc/tei-p5-doc/html/</link> .</biblioentry>
+            <biblioentry>[7] TEI CE. <link xlink:href="http://www.tei-c.org/Activities/CE/"
+                    >http://www.tei-c.org/Activities/CE/</link> .</biblioentry>
+            <biblioentry>[8] TEI Overlap. <link xlink:href="http://www.tei-c.org/Activities/SIG/Overlap/"
+                    >http://www.tei-c.org/Activities/SIG/Overlap/</link> .</biblioentry>
+            <biblioentry>[9] TEI WD. <link
                     xlink:href="http://www.tei-c.org/release/doc/tei-p5-doc/html/WD.html"
-                    >http://www.tei-c.org/release/doc/tei-p5-doc/html/WD.html</link> .</para>
-            <para>[10] TEI NH. <link
+                    >http://www.tei-c.org/release/doc/tei-p5-doc/html/WD.html</link> .</biblioentry>
+            <biblioentry>[10] TEI NH. <link
                     xlink:href="http://www.tei-c.org/release/doc/tei-p5-doc/html/NH.html"
-                    >http://www.tei-c.org/release/doc/tei-p5-doc/html/NH.html</link> .</para>
-            <para>[11] TEI I18N. <link xlink:href="http://www.tei-c.org/I18N/"
-                    >http://www.tei-c.org/I18N/</link> .</para>
-            <para>[12] TEI Roma. <link xlink:href="http://tei.oucs.ox.ac.uk/Roma/"
-                    >http://tei.oucs.ox.ac.uk/Roma/</link> .</para>
-            <para>[13] ?. <link xlink:href="http://www.w3.org/People/cmsmcq/2000/poddp2000.html"
-                    >http://www.w3.org/People/cmsmcq/2000/poddp2000.html</link> .</para>
-            <para>[14] ?. <link
+                    >http://www.tei-c.org/release/doc/tei-p5-doc/html/NH.html</link> .</biblioentry>
+            <biblioentry>[11] TEI I18N. <link xlink:href="http://www.tei-c.org/I18N/"
+                    >http://www.tei-c.org/I18N/</link> .</biblioentry>
+            <biblioentry>[12] TEI Roma. <link xlink:href="http://tei.oucs.ox.ac.uk/Roma/"
+                    >http://tei.oucs.ox.ac.uk/Roma/</link> .</biblioentry>
+            <biblioentry>[13] ?. <link xlink:href="http://www.w3.org/People/cmsmcq/2000/poddp2000.html"
+                    >http://www.w3.org/People/cmsmcq/2000/poddp2000.html</link> .</biblioentry>
+            <biblioentry>[14] ?. <link
                     xlink:href="http://www.mulberrytech.com/Extreme/Proceedings/html/2004/DeRose01/EML2004DeRose01.html"
-                    >http://www.mulberrytech.com/Extreme/Proceedings/html/2004/DeRose01/EML2004DeRose01.html</link> .</para>
-            <para>[15] ?. <link
+                    >http://www.mulberrytech.com/Extreme/Proceedings/html/2004/DeRose01/EML2004DeRose01.html</link> .</biblioentry>
+            <biblioentry>[15] ?. <link
                     xlink:href="http://www.idealliance.org/papers/extreme/Proceedings/html/2005/Bauman01/EML2005Bauman01.html"
-                    >http://www.idealliance.org/papers/extreme/Proceedings/html/2005/Bauman01/EML2005Bauman01.html</link> .</para>
-            <para>[16] ?. <link xlink:href="http://www.tei-c.org.uk/wiki/index.php/SIG:Overlap"
-                    >http://www.tei-c.org.uk/wiki/index.php/SIG:Overlap</link> .</para>
-            <para>[17] ?. <link xlink:href="http://www.tei-c.org/wiki/index.php/Talk:SIG:Overlap"
-                    >http://www.tei-c.org/wiki/index.php/Talk:SIG:Overlap</link> .</para>
-            <para>[18] ?. <link xlink:href="http://www.tei-c.org/Talks/OUCS/2005-02/talk-access.pdf"
-                    >http://www.tei-c.org/Talks/OUCS/2005-02/talk-access.pdf</link> .</para>
-            <para>[19] Subversion. <link xlink:href="http://subversion.tigris.org/"
-                    >http://subversion.tigris.org/</link> .</para>
-            <para>[20] eXist XML database. <link xlink:href="http://exist.sourceforge.net"
-                    >http://exist.sourceforge.net/</link> .</para>
-            <para>[41] JXHTMLEDIT. <link
+                    >http://www.idealliance.org/papers/extreme/Proceedings/html/2005/Bauman01/EML2005Bauman01.html</link> .</biblioentry>
+            <biblioentry>[16] ?. <link xlink:href="http://www.tei-c.org.uk/wiki/index.php/SIG:Overlap"
+                    >http://www.tei-c.org.uk/wiki/index.php/SIG:Overlap</link> .</biblioentry>
+            <biblioentry>[17] ?. <link xlink:href="http://www.tei-c.org/wiki/index.php/Talk:SIG:Overlap"
+                    >http://www.tei-c.org/wiki/index.php/Talk:SIG:Overlap</link> .</biblioentry>
+            <biblioentry>[18] ?. <link xlink:href="http://www.tei-c.org/Talks/OUCS/2005-02/talk-access.pdf"
+                    >http://www.tei-c.org/Talks/OUCS/2005-02/talk-access.pdf</link> .</biblioentry>
+            <biblioentry>[19] Subversion. <link xlink:href="http://subversion.tigris.org/"
+                    >http://subversion.tigris.org/</link> .</biblioentry>
+            <biblioentry>[20] eXist XML database. <link xlink:href="http://exist.sourceforge.net"
+                    >http://exist.sourceforge.net/</link> .</biblioentry>
+            <biblioentry>[41] JXHTMLEDIT. <link
                     xlink:href="http://www.tecnick.com/public/code/cp_dpage.php?aiocp_dp=jxhtmledit"
-                    >http://www.tecnick.com/public/code/cp_dpage.php?aiocp_dp=jxhtmledit</link> .</para>
-            <para>[42] Syntext Serna. <link
+                    >http://www.tecnick.com/public/code/cp_dpage.php?aiocp_dp=jxhtmledit</link> .</biblioentry>
+            <biblioentry>[42] Syntext Serna. <link
                     xlink:href="http://www.syntext.com/products/serna/index.htm"
-                    >http://www.syntext.com/products/serna/index.htm</link> .</para>
-            <para>[43] Stylus Studio. <link xlink:href="http://www.stylusstudio.com/"
-                    >http://www.stylusstudio.com/</link> .</para>
-            <para>[44] ALTOVA xmlspy. <link xlink:href="http://www.altova.com/"
-                    >http://www.altova.com/</link> .</para>
-            <para>[45] oXygen. <link xlink:href="http://www.oxygenxml.com/"
-                    >http://www.oxygenxml.com/</link> .</para>
-            <para>[46] Exchanger XML. <link xlink:href="http://www.exchangerxml.com/editor/"
-                    >http://www.exchangerxml.com/editor/</link> .</para>
-            <para>[47] editix. <link xlink:href="http://www.editix.com/"
-                    >http://www.editix.com/</link> .</para>
-            <para>[48] topologi. <link xlink:href="http://www.topologi.com"
-                    >http://www.topologi.com/</link> .</para>
-            <para>[49] Ajax. <link xlink:href="http://en.wikipedia.org/wiki/AJAX"
-                    >http://en.wikipedia.org/wiki/AJAX</link> .</para>
-            <para>[50] Applets ?. <link
+                    >http://www.syntext.com/products/serna/index.htm</link> .</biblioentry>
+            <biblioentry>[43] Stylus Studio. <link xlink:href="http://www.stylusstudio.com/"
+                    >http://www.stylusstudio.com/</link> .</biblioentry>
+            <biblioentry>[44] ALTOVA xmlspy. <link xlink:href="http://www.altova.com/"
+                    >http://www.altova.com/</link> .</biblioentry>
+            <biblioentry>[45] oXygen. <link xlink:href="http://www.oxygenxml.com/"
+                    >http://www.oxygenxml.com/</link> .</biblioentry>
+            <biblioentry>[46] Exchanger XML. <link xlink:href="http://www.exchangerxml.com/editor/"
+                    >http://www.exchangerxml.com/editor/</link> .</biblioentry>
+            <biblioentry>[47] editix. <link xlink:href="http://www.editix.com/"
+                    >http://www.editix.com/</link> .</biblioentry>
+            <biblioentry>[48] topologi. <link xlink:href="http://www.topologi.com"
+                    >http://www.topologi.com/</link> .</biblioentry>
+            <biblioentry>[49] Ajax. <link xlink:href="http://en.wikipedia.org/wiki/AJAX"
+                    >http://en.wikipedia.org/wiki/AJAX</link> .</biblioentry>
+            <biblioentry>[50] Applets ?. <link
                     xlink:href="http://jroller.com/page/tackline?entry=using_applets_in_place_of"
-                    >http://jroller.com/page/tackline?entry=using_applets_in_place_of</link> .</para>
-            <para>[51] Applets ?. <link
+                    >http://jroller.com/page/tackline?entry=using_applets_in_place_of</link> .</biblioentry>
+            <biblioentry>[51] Applets ?. <link
                     xlink:href="http://weblogs.java.net/blog/chet/applet-jax/Yapplet.html"
-                    >http://weblogs.java.net/blog/chet/applet-jax/Yapplet.html</link> .</para>
-            <para>[52] Thank God - Java EE Is Not Like Ajax. <link
+                    >http://weblogs.java.net/blog/chet/applet-jax/Yapplet.html</link> .</biblioentry>
+            <biblioentry>[52] Thank God - Java EE Is Not Like Ajax. <link
                     xlink:href="http://www.coachwei.com/blog/_archives/2006/9/27/2367882.html"
-                    >http://www.coachwei.com/blog/_archives/2006/9/27/2367882.html</link> .</para>
-            <para>[53] Unicode. <link xlink:href="http://www.unicode.org/"
-                    >http://www.unicode.org/</link> .</para>
-            <para>[54] Unicode. <link
+                    >http://www.coachwei.com/blog/_archives/2006/9/27/2367882.html</link> .</biblioentry>
+            <biblioentry>[53] Unicode. <link xlink:href="http://www.unicode.org/"
+                    >http://www.unicode.org/</link> .</biblioentry>
+            <biblioentry>[54] Unicode. <link
                     xlink:href="http://www.w3.org/International/articles/inline-bidi-markup/"
-                    >http://www.w3.org/International/articles/inline-bidi-markup/</link> .</para>
-            <para>[55] XML. <link xlink:href="http://www.xml.com/axml/testaxml.htm"
-                    >http://www.xml.com/axml/testaxml.htm</link> .</para>
-            <para>[57] XLink. <link xlink:href="http://www.xml.com/pub/a/2002/03/13/xlink.html"
-                    >http://www.xml.com/pub/a/2002/03/13/xlink.html</link> .</para>
-            <para>[58] Wikipedia: Tim Bray. <link xlink:href="http://en.wikipedia.org/wiki/Tim_Bray"
-                    >http://en.wikipedia.org/wiki/Tim_Bray</link> .</para>
-            <para>[59] <link xlink:href="http://www.w3.org/People/cmsmcq/"
-                    >http://www.w3.org/People/cmsmcq/</link> .</para>
-            <para>[60] Theological Markup Language. <link
+                    >http://www.w3.org/International/articles/inline-bidi-markup/</link> .</biblioentry>
+            <biblioentry>[55] XML. <link xlink:href="http://www.xml.com/axml/testaxml.htm"
+                    >http://www.xml.com/axml/testaxml.htm</link> .</biblioentry>
+            <biblioentry>[57] XLink. <link xlink:href="http://www.xml.com/pub/a/2002/03/13/xlink.html"
+                    >http://www.xml.com/pub/a/2002/03/13/xlink.html</link> .</biblioentry>
+            <biblioentry>[58] Wikipedia: Tim Bray. <link xlink:href="http://en.wikipedia.org/wiki/Tim_Bray"
+                    >http://en.wikipedia.org/wiki/Tim_Bray</link> .</biblioentry>
+            <biblioentry>[59] <link xlink:href="http://www.w3.org/People/cmsmcq/"
+                    >http://www.w3.org/People/cmsmcq/</link> .</biblioentry>
+            <biblioentry>[60] Theological Markup Language. <link
                     xlink:href="http://www.ccel.org/ThML/ThML1.04.htm"
-                    >http://www.ccel.org/ThML/ThML1.04.htm</link> .</para>
-            <para>[61] Tanakh ML. <link
+                    >http://www.ccel.org/ThML/ThML1.04.htm</link> .</biblioentry>
+            <biblioentry>[61] Tanakh ML. <link
                     xlink:href="http://tanakhml2.alacartejava.net/cocoon/tanakhml/index.htm"
-                    >http://tanakhml2.alacartejava.net/cocoon/tanakhml/index.htm</link> .</para>
-            <para>[62] Open Scripture Information Standard. <link
+                    >http://tanakhml2.alacartejava.net/cocoon/tanakhml/index.htm</link> .</biblioentry>
+            <biblioentry>[62] Open Scripture Information Standard. <link
                     xlink:href="http://en.wikipedia.org/wiki/Open_Scripture_Information_Standard"
-                    >http://en.wikipedia.org/wiki/Open_Scripture_Information_Standard</link> .</para>
-            <para>[63] Project Gutenberg. <link xlink:href="http://www.gutenberg.org"
-                    >http://www.gutenberg.org</link> .</para>
-            <para>[64] Citizendium. <link xlink:href="http://www.citizendium.org/cfa.html"
-                    >http://www.citizendium.org/cfa.html</link> .</para>
-            <para>[65] No new XML languages. <link
+                    >http://en.wikipedia.org/wiki/Open_Scripture_Information_Standard</link> .</biblioentry>
+            <biblioentry>[63] Project Gutenberg. <link xlink:href="http://www.gutenberg.org"
+                    >http://www.gutenberg.org</link> .</biblioentry>
+            <biblioentry>[64] Citizendium. <link xlink:href="http://www.citizendium.org/cfa.html"
+                    >http://www.citizendium.org/cfa.html</link> .</biblioentry>
+            <biblioentry>[65] No new XML languages. <link
                     xlink:href="http://www.tbray.org/ongoing/When/200x/2006/01/08/No-New-XML-Languages"
-                    >http://www.tbray.org/ongoing/When/200x/2006/01/08/No-New-XML-Languages</link> .</para>
-            <para>[66] <link xlink:href="http://www.unicode.org/charts/PDF/U0100.pdf"
-                    >http://www.unicode.org/charts/PDF/U0100.pdf</link> .</para>
-            <para>[67] <link xlink:href="http://www.unicode.org/charts/PDF/U0590.pdf"
-                    >http://www.unicode.org/charts/PDF/U0590.pdf</link> .</para>
-            <para>[70] Topic Maps. <link xlink:href="http://en.wikipedia.org/wiki/Topic_map"
-                    >http://en.wikipedia.org/wiki/Topic_map</link> .</para>
-            <para>[71] ?. <link xlink:href="http://www.ontopia.net/topicmaps/materials/tmrdf.html"
-                    >http://www.ontopia.net/topicmaps/materials/tmrdf.html</link> .</para>
-            <para>[78] Information retrieval from annotated texts. A.S. Fraenkel. S.T. Klein. J.
+                    >http://www.tbray.org/ongoing/When/200x/2006/01/08/No-New-XML-Languages</link> .</biblioentry>
+            <biblioentry>[66] <link xlink:href="http://www.unicode.org/charts/PDF/U0100.pdf"
+                    >http://www.unicode.org/charts/PDF/U0100.pdf</link> .</biblioentry>
+            <biblioentry>[67] <link xlink:href="http://www.unicode.org/charts/PDF/U0590.pdf"
+                    >http://www.unicode.org/charts/PDF/U0590.pdf</link> .</biblioentry>
+            <biblioentry>[70] Topic Maps. <link xlink:href="http://en.wikipedia.org/wiki/Topic_map"
+                    >http://en.wikipedia.org/wiki/Topic_map</link> .</biblioentry>
+            <biblioentry>[71] ?. <link xlink:href="http://www.ontopia.net/topicmaps/materials/tmrdf.html"
+                    >http://www.ontopia.net/topicmaps/materials/tmrdf.html</link> .</biblioentry>
+            <biblioentry>[78] Information retrieval from annotated texts. A.S. Fraenkel. S.T. Klein. J.
                 Amer. Soc. for Information Sciences. 50. 1999. 845–854. "<link
                     xlink:href="http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/annot.ps"
                     >http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/annot.ps</link>" .
-                Тексты</para>
+                Тексты</biblioentry>
             <para>[90] <link
                     xlink:href="http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;item_id=XSEM"
                     >http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;item_id=XSEM</link> .</para>
@@ -536,7 +537,7 @@
                     >http://books.chabadlibrary.org/default.aspx</link> . </para>
             <para>[1] пример того как из внешним образом аннотированного текста в XMLе можно
                 получить HTML</para>
-        </section>
+        </bibliography>
     </section>
 
     <section>
@@ -1271,7 +1272,8 @@
                 >Galley</link> Concepts in Document Formatting Combinators</para>
         <para><link xlink:href="http://www.it.usyd.edu.au/~jeff/nonpareil/">Nonpareil</link></para>
         <para><link xlink:href="http://www.lowagie.com/iText/">iText</link></para>
-        <para><link xlink:href="http://www.w3.org/TR/2008/WD-xslfo20-req-20080326/">XSL-FO 2.0 Requirements</link></para>
+        <para><link xlink:href="http://www.w3.org/TR/2008/WD-xslfo20-req-20080326/">XSL-FO 2.0
+                Requirements</link></para>
     </section>
 
     <section>
@@ -1298,8 +1300,8 @@
                         Library</link></para>
                 </listitem>
                 <listitem>
-                    <para><link xlink:href="http://www.sichoskodesh.com/">Sichos
-                        Kodesh</link> - empty</para>
+                    <para><link xlink:href="http://www.sichoskodesh.com/">Sichos Kodesh</link> -
+                        empty</para>
                 </listitem>
                 <listitem>
                     <para><link xlink:href="http://www.otzar770.com/">Otzar 770</link></para>
