@@ -417,9 +417,16 @@
             <biblioentry xml:id="CAB"><title>The Cathedral and the Bazaar</title>
                 <author><personname><firstname>Eric</firstname><othername>S</othername><surname>Raymond</surname></personname> </author>
                 <biblioid class="uri">http://www.catb.org/~esr/writings/homesteading</biblioid>
-            <biblioentry>[3] Ontology is overrated. Clay Shirky. 2005. <link
-                    xlink:href="http://www.shirky.com/writings/ontology_overrated.html"
-                    >http://www.shirky.com/writings/ontology_overrated.html</link> .</biblioentry>
+            </biblioentry>
+            <biblioentry xml:id="Ontology">
+                <title>Ontology is overrated</title>
+                <author>
+                    <personname><firstname>Clay</firstname><surname>Shirky</surname></personname>
+                </author>
+                <date>2005</date>
+                <biblioid class="uri"
+                    >http://www.shirky.com/writings/ontology_overrated.html</biblioid>
+            </biblioentry>
             <biblioentry>[4] Distributed Proofreaders. <link xlink:href="http://www.pgdp.net/c/default.php"
                     >http://www.pgdp.net/c/default.php</link> .</biblioentry>
             <biblioentry>[5] TEI Lite Tutorial. <link
