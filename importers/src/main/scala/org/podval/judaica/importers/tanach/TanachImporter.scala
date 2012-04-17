@@ -22,15 +22,18 @@ import org.podval.judaica.common.Xml.{loadResource, getAttribute}
 
 import scala.xml.Node
 
-import java.io.File
-
 
 abstract class TanachImporter(inputDirectory: String, outputDirectory: String) extends Importer(inputDirectory, outputDirectory) {
 
-    protected final def getStylesheet(): String = "tanach.css"
+    final def run {
+        output2inputName foreach { case (inputName, outputName) => importBook(inputName, outputName) }
+    }
 
 
-    protected def parseBook(inputFile: File): Node;
+    protected def output2inputName: Map[String, String]
+  
+
+    protected final override def getStylesheet = "tanach.css"
 
 
     protected final override def processBook(xml: Node, outputName: String): Node = {

@@ -31,10 +31,10 @@ abstract class Importer(inputDirectoryPath: String, outputDirectoryPath: String)
 
 
     final def importBook(inputName: String, outputName: String) {
-        val inFile = new File(inputDirectory, inputName+"." + getInputExtension())
+        val inFile = new File(inputDirectory, inputName + "." + getInputExtension)
         val xml = parseBook(inFile)
         val result = processBook(xml, outputName)
-        val html = wrapInHtml(result);
+        val html = wrapInHtml(result)
         print(html, new File(outputDirectory, outputName + ".html")) // CSS only works with ".html", not ".xml"!
     }
 
@@ -42,7 +42,7 @@ abstract class Importer(inputDirectoryPath: String, outputDirectoryPath: String)
     private def wrapInHtml(what: Node) = {
         <html>
             <head>
-              <link rel="stylesheet" type="text/css" href={"/css/" + getStylesheet()}/>
+              <link rel="stylesheet" type="text/css" href={"/css/" + getStylesheet}/>
             </head>
             <body>
               {what}
@@ -53,22 +53,20 @@ abstract class Importer(inputDirectoryPath: String, outputDirectoryPath: String)
 
     private def print(xml: Node, outFile: File) {
         val out = new PrintWriter(new FileWriter(outFile))
-        val pretty = new PrettyPrinter(100, 4).format(xml);
+        val pretty = new PrettyPrinter(100, 4).format(xml)
         out.println("<!DOCTYPE html>\n" + pretty)
         out.close()
     }
 
 
-    protected def getInputExtension() : String
+    protected def getInputExtension: String
 
 
-    protected def getStylesheet(): String
+    protected def getStylesheet: String
 
 
     protected def parseBook(file: File): Node
 
 
-    protected def processBook(xml: Node, outputName: String): Node = {
-        xml
-    }
+    protected def processBook(xml: Node, outputName: String): Node = xml
 }

@@ -19,7 +19,7 @@ package org.podval.judaica.importers
 package tanach
 package jerusalem
 
-import scala.xml.{Node, Elem, Text, NodeBuffer}
+import scala.xml.{Node, Text, NodeBuffer}
 
 import scala.io.Source
 import java.io.File
@@ -28,19 +28,19 @@ import java.io.File
 final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: String)
     extends TanachImporter(inputDirectory, outputDirectory)
 {
-    protected final /*?*/ def getInputExtension() : String = "txt"
+    protected /*?*/ def getInputExtension: String = "txt"
 
 
-    def run() {
-        importBook("bereishis", "Genesis");
-//        importBook("shemos", "Exodus");
-//        importBook("vayikro", "Leviticus");
-//        importBook("bamidbor", "Numbers");
-//        importBook("devorim", "Deuteronomy");
-    }
+    protected override def output2inputName: Map[String, String] = Map(
+        "bereishis" -> "Genesis",
+        "shemos" -> "Exodus",
+        "vayikro" -> "Leviticus",
+        "bamidbor" -> "Numbers",
+        "devorim" -> "Deuteronomy"
+    )
 
 
-    def parseBook(inputFile: File): Node = {
+    protected override def parseBook(inputFile: File): Node = {
         val lines = Source.fromFile(inputFile, "UTF-16BE").getLines().map(_.trim)
         val bookName = lines.next()
 
@@ -66,9 +66,7 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
     private val PEREK = AlefBeth.PEI + AlefBeth.RESH + AlefBeth.QOF
 
 
-    private def isChapter(line: String): Boolean = {
-        line.startsWith(PEREK);
-    }
+    private def isChapter(line: String): Boolean = line.startsWith(PEREK)
 
 
     private val PEI3 = AlefBeth.PEI + " " + AlefBeth.PEI + " " + AlefBeth.PEI
@@ -104,7 +102,7 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
 
         val line = new Line(verse)
 
-    val parsha = processParsha(line)
+        val parsha = processParsha(line)
         if (parsha.isDefined) {
             result += parsha.get
         }
@@ -180,7 +178,7 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
     }
 
 
-    private def processWord(line: Line): Elem = {
+    private def processWord(line: Line): Node = {
         val spaceIndex = line.indexOf(" ")
         val makafIndex = line.indexOf(AlefBeth.MAQAF)
 

@@ -26,6 +26,6 @@ object Main {
             "/tmp/xxx"
         )
 
-        importer.run()
+        importer.run
   }
 }
