@@ -27,9 +27,6 @@ import java.io.File
 
 abstract class TanachImporter(inputDirectory: String, outputDirectory: String) extends Importer(inputDirectory, outputDirectory) {
 
-    protected final /*?*/ def getInputExtension() : String = "txt"
-
-
     protected final def getStylesheet(): String = "tanach.css"
 
 
@@ -38,9 +35,9 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String) e
 
     protected final override def processBook(xml: Node, outputName: String): Node = {
         val breaks =
-            loadResource(getClass, outputName, "meta").
-            child.groupBy(getAttribute("@chapter")).
-            mapValues(_.groupBy(getAttribute("@verse")))
+            loadResource(classOf[TanachImporter], outputName, "meta").child
+            .groupBy(getAttribute("chapter"))
+            .mapValues(_.groupBy(getAttribute("verse")))
 
         val result = addBreaks(breaks, xml)
 
@@ -49,7 +46,7 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String) e
 
 
     private def addBreaks(breaks: Map[String, Map[String, Seq[Node]]], xml: Node): Node = {
-        // TODO
+        // TODO intersperse breaks with the contents
         xml
     }
 }

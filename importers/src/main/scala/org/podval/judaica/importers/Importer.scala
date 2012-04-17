@@ -35,7 +35,7 @@ abstract class Importer(inputDirectoryPath: String, outputDirectoryPath: String)
         val xml = parseBook(inFile)
         val result = processBook(xml, outputName)
         val html = wrapInHtml(result);
-        print(html, new File(outputDirectory, outputName+".html")) // CSS only works with ".html", not ".xml"!
+        print(html, new File(outputDirectory, outputName + ".html")) // CSS only works with ".html", not ".xml"!
     }
 
 
