@@ -45,16 +45,15 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
         val bookName = lines.next()
 
         <div type="book" n={bookName}>{
-            lines.filterNot(_.isEmpty).filterNot(isChapter).zipWithIndex.map({
+            lines.filterNot(_.isEmpty).filterNot(isChapter).zipWithIndex.map {
                 case (line, chapterNumberFrom0) =>
                     <div type="chapter" n={(chapterNumberFrom0+1).toString}>{
-                        dropStuckChapter(line.split(":").map(_.trim)).zipWithIndex.map({
-                            case (verse, verseNumberFrom0) =>
-                                parseVerse(new Line(verse), verseNumberFrom0+1)
-                        })
+                        dropStuckChapter(line.split(":").map(_.trim)).zipWithIndex.map {
+                            case (verse, verseNumberFrom0) => parseVerse(verse, verseNumberFrom0+1)
+                        }
                     }
                     </div>
-                })
+                }
             }
         </div>
     }
@@ -100,10 +99,12 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
     private val HAZAK = AlefBeth.HET + AlefBeth.ZAYIN + AlefBeth.QOF
 
 
-    private def parseVerse(line: Line, number: Int): Seq[Node] = {
+    private def parseVerse(verse: String, number: Int): Seq[Node] = {
         val result = new NodeBuffer()
 
-        val parsha = processParsha(line)
+        val line = new Line(verse)
+
+    val parsha = processParsha(line)
         if (parsha.isDefined) {
             result += parsha.get
         }
