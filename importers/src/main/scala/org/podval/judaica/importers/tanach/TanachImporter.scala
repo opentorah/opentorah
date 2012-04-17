@@ -23,7 +23,9 @@ import org.podval.judaica.common.Xml.{loadResource, getAttribute}
 import scala.xml.Node
 
 
-abstract class TanachImporter(inputDirectory: String, outputDirectory: String) extends Importer(inputDirectory, outputDirectory) {
+abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
+    extends Importer(inputDirectory, outputDirectory)
+{
 
     final def run {
         output2inputName foreach { case (inputName, outputName) => importBook(inputName, outputName) }
