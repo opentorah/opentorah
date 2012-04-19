@@ -46,23 +46,19 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
             .mapValues(_.groupBy(getAttribute("verse")))
 
         xml match { case b =>
-            if (!isDiv(b, "book")) b else {
-                replaceChildren(b, b.child map { c =>
-                    if (!isDiv(c, "chapter")) c else {
-                        val chapterBreaks = breaks.getOrElse(getAttribute(c, "n"), Map())
+            if (!isDiv(b, "book")) b else { replaceChildren(b, b.child map { c =>
+                if (!isDiv(c, "chapter")) c else { replaceChildren(c, c.child flatMap { v =>
+                    val verseBreaks: Seq[Node] =
+                        if (!isDiv(v, "verse"))
+                            Seq[Node]()
+                        else
+                            breaks
+                            .getOrElse(getAttribute(c, "n"), Map[String, Seq[Node]]())
+                            .getOrElse(getAttribute(v, "n"), Seq[Node]())
 
-                        replaceChildren(c, c.child flatMap { v =>
-                            val verseBreaks: Seq[Node] =
-                                if (!isDiv(v, "verse"))
-                                    Seq[Node]()
-                                else
-                                    chapterBreaks.getOrElse(getAttribute(v, "n"), Seq[Node]())
-
-                            verseBreaks ++ Seq(v)
-                        })
-                    }
-                })
-            }
+                    verseBreaks ++ Seq(v)
+                })}
+            })}
         }
     }
 
