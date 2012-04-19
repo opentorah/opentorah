@@ -40,7 +40,7 @@ class ChabadImporter(inputDirectory: String, outputDirectory: String) extends Im
     def getInputExtension() : String = "htm"
 
 
-    def getStylesheet(): String = "chabad.css"
+    def getStylesheet(): String = "chabad"
 
 
     def parseBook(file: File): Node = {

@@ -158,7 +158,7 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
             val alternate = line.consumeBracketed()
 
             val element =
-                if (alternate == null) {
+                if (alternate.isEmpty) {
                     wordElement
                 } else {
                     <app>
@@ -166,7 +166,7 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
                             {wordElement}
                          </rdg>
                          <rdg type="read">
-                             <word>{alternate}</word>
+                             <word>{alternate.get}</word>
                          </rdg>
                     </app>
                 }
@@ -174,7 +174,7 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
             result += element
         }
 
-        return result
+        result
     }
 
 

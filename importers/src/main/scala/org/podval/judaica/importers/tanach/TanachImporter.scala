@@ -20,7 +20,7 @@ package tanach
 
 import org.podval.judaica.common.Xml.{loadResource, getAttribute}
 
-import scala.xml.Node
+import scala.xml.{Node, Elem}
 
 
 abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
@@ -35,23 +35,42 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
     protected def output2inputName: Map[String, String]
   
 
-    protected final override def getStylesheet = "tanach.css"
+    protected final override def getStylesheet = "tanach"
 
 
     protected final override def processBook(xml: Node, outputName: String): Node = {
         val breaks =
-            loadResource(classOf[TanachImporter], outputName, "meta").child
+            loadResource(classOf[TanachImporter], outputName, "meta")
+            .child
             .groupBy(getAttribute("chapter"))
             .mapValues(_.groupBy(getAttribute("verse")))
 
-        val result = addBreaks(breaks, xml)
+        xml match { case b =>
+            if (!isDiv(b, "book")) b else {
+                replaceChildren(b, b.child map { c =>
+                    if (!isDiv(c, "chapter")) c else {
+                        val chapterBreaks = breaks.getOrElse(getAttribute(c, "n"), Map())
 
-        result
+                        replaceChildren(c, c.child flatMap { v =>
+                            val verseBreaks: Seq[Node] =
+                                if (!isDiv(v, "verse"))
+                                    Seq[Node]()
+                                else
+                                    chapterBreaks.getOrElse(getAttribute(v, "n"), Seq[Node]())
+
+                            verseBreaks ++ Seq(v)
+                        })
+                    }
+                })
+            }
+        }
     }
 
 
-    private def addBreaks(breaks: Map[String, Map[String, Seq[Node]]], xml: Node): Node = {
-        // TODO intersperse breaks with the contents
-        xml
-    }
+    def isDiv(node: Node, divType: String): Boolean =
+        node.isInstanceOf[Elem] && node.asInstanceOf[Elem].label == "div" && (getAttribute(node, "type") == divType)
+
+
+    def replaceChildren(node: Node, children: Seq[Node]): Elem =
+        node.asInstanceOf[Elem].copy(child = children)
 }

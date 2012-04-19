@@ -42,7 +42,7 @@ abstract class Importer(inputDirectoryPath: String, outputDirectoryPath: String)
     private def wrapInHtml(what: Node) = {
         <html>
             <head>
-              <link rel="stylesheet" type="text/css" href={"/css/" + getStylesheet}/>
+              <link rel="stylesheet" type="text/css" href={"/css/" + getStylesheet + ".css"}/>
             </head>
             <body>
               {what}

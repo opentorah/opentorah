@@ -34,12 +34,12 @@ final class Line(var line: String) {
     }
 
 
-    def consumeBracketed(): String = {
+    def consumeBracketed(): Option[String] = {
         if (line.startsWith("[")) {
             val index = line.indexOf("]")
-            consumeToIndex(index+1).drop(1) // @todo tail()?
+            Some(consumeToIndex(index+1).drop(1))
         } else {
-            null
+            None
         }
     }
 

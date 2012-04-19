@@ -26,6 +26,9 @@ object Xml {
     def getAttribute(name: String)(node: Node) = (node \ ("@" + name)).text
 
 
+    def getAttribute(node: Node, name: String) = (node \ ("@" + name)).text
+
+
     def oneChild(node: Node, name: String): Node = {
         val children = node \ name
 
