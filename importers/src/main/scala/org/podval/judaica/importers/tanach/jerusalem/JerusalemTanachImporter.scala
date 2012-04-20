@@ -24,6 +24,8 @@ import scala.xml.{Node, Text, NodeBuffer}
 import scala.io.Source
 import java.io.File
 
+import org.podval.judaica.common.Xml.booleanAttribute
+
 
 final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: String)
     extends TanachImporter(inputDirectory, outputDirectory)
@@ -102,10 +104,7 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
 
         val line = new Line(verse)
 
-        val parsha = processParsha(line)
-        if (parsha.isDefined) {
-            result += parsha.get
-        }
+        result ++= processParsha(line)
 
         line.consume(HAZI)
         line.consume(HAZAK)
@@ -127,25 +126,21 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
 
 
     private def processParsha(line: Line): Option[Node] = {
-        var parsha: Option[String] = None
-        var big = false
-
-        if (line.consume(PEI3)) {
-            parsha = Some("open")
-            big = true
+        (if (line.consume(PEI3)) {
+            Some(("open", true))
         } else
         if (line.consume(AlefBeth.PEI)) {
-            parsha = Some("open")
+            Some(("open", false))
         } else
         if (line.consume(SAMEH3)) {
-            parsha = Some("closed")
-            big = true
+            Some(("closed", true))
         } else
         if (line.consume(AlefBeth.SAMEH)) {
-            parsha = Some("closed")
-        }
-
-        parsha.map((n: String) => <parsha type={n} big={booleanAttribute(big)}/>)
+            Some(("closed", false))
+        } else {
+            None
+        })
+        .map { case (kind, big) => <parsha type={kind} big={booleanAttribute(big)}/>}
     }
 
 
@@ -193,14 +188,11 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
             line.consume(" ")
         } else
         if (isMakaf) {
-          line.consume(AlefBeth.MAQAF)
+            line.consume(AlefBeth.MAQAF)
         }
 
         val isPasek = line.consume(AlefBeth.PASEQ)
 
         <word makaf={booleanAttribute(isMakaf)} pasek={booleanAttribute(isPasek)}>{word}</word>
     }
-
-
-    private def booleanAttribute(value: Boolean) = if (value) Some(Text("true")) else None
 }

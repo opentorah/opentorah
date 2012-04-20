@@ -16,7 +16,7 @@
 
 package org.podval.judaica.common
 
-import scala.xml.{XML, Node, Elem, Utility}
+import scala.xml.{XML, Node, Elem, Text, Utility}
 
 import java.io.File
 
@@ -27,6 +27,9 @@ object Xml {
 
 
     def getAttribute(node: Node, name: String): String = getAttribute(name)(node)
+
+
+    def booleanAttribute(value: Boolean) = if (value) Some(Text("true")) else None
 
 
     def oneChild(node: Node, name: String): Node = {
