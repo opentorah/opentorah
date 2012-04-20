@@ -45,28 +45,38 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
             .groupBy(getAttribute("chapter"))
             .mapValues(_.groupBy(getAttribute("verse")))
 
-        xml match { case b =>
-            if (!isDiv(b, "book")) b else { replaceChildren(b, b.child map { c =>
-                if (!isDiv(c, "chapter")) c else { replaceChildren(c, c.child flatMap { v =>
-                    val verseBreaks: Seq[Node] =
-                        if (!isDiv(v, "verse"))
-                            Seq[Node]()
-                        else
-                            breaks
-                            .getOrElse(getAttribute(c, "n"), Map[String, Seq[Node]]())
-                            .getOrElse(getAttribute(v, "n"), Seq[Node]())
-
-                    verseBreaks ++ Seq(v)
-                })}
+        transformDiv(xml, "book") { flatMapChildren(_, {
+            transformDiv(_, "chapter") { chapter => flatMapChildren(chapter, {
+                transformDiv(_, "verse") { verse =>
+                    breaks
+                    .getOrElse(getAttribute(chapter, "n"), Map.empty)
+                    .getOrElse(getAttribute(verse, "n"), Seq.empty) ++
+                    verse
+                }
             })}
-        }
+        })}(0)
     }
+//        xml match { case book =>
+//            if (!isDiv(book, "book")) book else { flatMapChildren(book, { chapter =>
+//                if (!isDiv(chapter, "chapter")) chapter else { flatMapChildren(chapter, { verse =>
+//                    if (!isDiv(verse, "verse")) verse else {
+//                        breaks
+//                        .getOrElse(getAttribute(chapter, "n"), Map.empty)
+//                        .getOrElse(getAttribute(verse, "n"), Seq.empty) ++
+//                        verse
+//                    }
+//                })}
+//            })}
+//        }
 
 
     def isDiv(node: Node, divType: String): Boolean =
         node.isInstanceOf[Elem] && node.asInstanceOf[Elem].label == "div" && (getAttribute(node, "type") == divType)
 
 
-    def replaceChildren(node: Node, children: Seq[Node]): Elem =
-        node.asInstanceOf[Elem].copy(child = children)
+    def transformDiv(node: Node, divType: String)(f: Node => Seq[Node]) =
+        if (!isDiv(node, divType)) node else f(node)
+
+    def flatMapChildren(node: Node, f: Node => Seq[Node]): Elem =
+        node.asInstanceOf[Elem].copy(child = node.child flatMap f)
 }
