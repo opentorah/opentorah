@@ -5,4 +5,113 @@
         <name name="Chumash" lang="en" isTransliterated="true"/>
         <name name="Хумаш" lang="ru" isTransliterated="true"/>
     </names>
+
+    <!-- Often, structure of different parts is the same (Chumash);
+         Sometimes, it is not (Tania: Perek/Igeres)...
+         Here - the universal part.
+         
+         Sometimes, there are 2 root structures...
+         How to represent this?
+
+         What if I want to encode day structure here also.
+         How can I express points of that structure in termas of the chapter-and-verse one?
+    -->
+    <selectors>
+        <selector name="book" div-type="book">
+            <names>
+                <name name="book" lang="en"/>
+                <name name="sefer" lang="en" isTransliterated="true"/>
+                <name name="книга" lang="ru" isTransliterated="true"/>
+            </names>
+
+            <selectors>
+                <selector>week</selector>
+                <selector>chapter</selector>
+            </selectors>
+        </selector>
+
+        <selector name="week">
+            <names>
+                <name name="week" lang="en"/>
+                <name name="weekly portion" lang="en"/>
+                <name name="sidra" lang="en" isTransliterated="true"/>
+                <name name="parsha" lang="en" isTransliterated="true"/>
+                <name name="недельный раздел" lang="ru" isTransliterated="true"/>
+            </names>
+            <selectors>
+                <selector>chapter</selector>
+            </selectors>
+        </selector>
+
+        <selector name="chapter" numeric="true">
+            <names>
+                <name name="chapter" lang="en"/>
+                <name name="perek" lang="en" isTransliterated="true"/>
+                <name name="глава" lang="ru" isTransliterated="true"/>
+            </names>
+            <selectors>
+                <selector>verse</selector>
+            </selectors>
+        </selector>
+
+        <selector name="verse" numeric="true">
+            <names>
+                <name name="verse" lang="en"/>
+                <name name="posuk" lang="en" isTransliterated="true"/>
+                <name name="стих" lang="ru" isTransliterated="true"/>
+                <name name="предложение" lang="ru" isTransliterated="true"/>
+            </names>
+        </selector>
+    </selectors>
+
+    <structure>
+        <selector name="book">
+            <value file="Genesis">
+                <names>
+                    <name name="Genesis" lang="en"/>
+                    <name name="Bereishis" lang="en" isTransliterated="true"/>
+                </names>
+                <selector name="week">
+                    <value div-name="בראשית">
+                        <names>
+                            <name name="Bereishis" lang="en" isTransliterated="true"/>
+                        </names>
+                    </value>
+                    <value>
+                        <names>
+                            <name name="Noah" lang="en" isTransliterated="true"/>
+                        </names>
+                    </value>
+                </selector>
+            </value>
+
+            <value file="Exodus">
+                <names>
+                    <name name="Exodus" lang="en"/>
+                    <name name="Shemos" lang="en" isTransliterated="true"/>
+                </names>
+            </value>
+
+            <value file="Leviticus">
+                <names>
+                    <name name="Leviticus" lang="en"/>
+                    <name name="Vayikro" lang="en" isTransliterated="true"/>
+                </names>
+            </value>
+
+            <value file="Numbers">
+                <names>
+                    <name name="Numbers" lang="en"/>
+                    <name name="Bamidbor" lang="en" isTransliterated="true"/>
+                </names>
+            </value>
+
+            <value file="Deuteronomy">
+                <names>
+                    <name name="Deuteronomy" lang="en"/>
+                    <name name="Devorim" lang="en" isTransliterated="true"/>
+                </names>
+            </value>
+        </selector>
+    </structure>
 </work>

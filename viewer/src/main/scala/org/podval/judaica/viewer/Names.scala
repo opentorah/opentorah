@@ -18,27 +18,28 @@ package org.podval.judaica.viewer
 
 import scala.xml.Node
 
-import org.podval.judaica.common.Xml
+import org.podval.judaica.common.Xml.oneChild
 
 
 final class Names(names: Seq[Name]) {
 
-    def hasName(name: String): Boolean = names.exists(_.name == name)
+  def hasName(name: String): Boolean = names.exists(_.name == name)
 
 
-    def getByLang(lang: String): Option[Name] = names.find(_.lang == lang)
+  def getByLang(lang: String): Option[Name] = names.find(_.lang == lang)
 
 
-    def getDefault: Name = names(0)
+  def getDefault: Name = names(0)
 
 
-    override def toString: String = "Names: " + names.mkString("[", ", ", "]")
+  override def toString: String = "Names: " + names.mkString("[", ", ", "]")
 }
 
 
 
 object Names {
 
-    def apply(xml: Node): Names =
-        new Names(Xml.oneChild(xml, "names").child.map(Name(_)))
+    def apply(node: Node): Names = {
+      new Names(oneChild(node, "names").child.map(Name(_)))
+    }
 }

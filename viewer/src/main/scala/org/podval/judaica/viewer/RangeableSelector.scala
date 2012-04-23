@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
+ * Copyright 2012 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,14 @@
 
 package org.podval.judaica.viewer
 
-import scala.xml.{Node, Elem}
 
-import org.podval.judaica.common.Xml.{check, getAttribute}
+trait RangeableSelector extends Selector {
 
-
-final class Name(val name: String, val lang: String, val isTransliterated: Boolean) {
-
-    override def toString: String = "Name: " + name + "(" + lang + ", " + isTransliterated +  ")"
-}
+  final override def isRangeable: Boolean = true
 
 
-object Name {
+  def first(selection: Selection): String
 
-    def apply(node: Node): Name = {
-        check(node.asInstanceOf[Elem], "name")
 
-        new Name(
-            getAttribute(node, "name"),
-            getAttribute(node, "lang"),
-            getAttribute(node, "isTransliterated") == "true"
-        )
-    }
+  def last(selection: Selection): String
 }

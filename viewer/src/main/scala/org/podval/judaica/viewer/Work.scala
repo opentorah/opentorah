@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
+ * Copyright 2012 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,25 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.common.Xml
+import org.podval.judaica.common.Xml.{loadFile, getAttribute}
 
 import java.io.File
 
 
-final class Work(val names: Names, directory: String) {
+final class Work private(val names: Names, val directory: String) {
 
-    override def toString: String = "Work (" + directory + ") " + names
+  override def toString: String = "Work (" + directory + ") " + names
 }
-
 
 
 object Work {
 
-    def apply(file: File): Work = {
-        val xml = Xml.loadFile(file, "work")
+  def load(file: File): Work = {
+    val node = loadFile(file, "work")
 
-        new Work(
-            Names(xml),
-            Xml.getAttribute("directory")(xml)
-        )
-    }
+    new Work(
+      Names(node),
+      getAttribute(node, "directory")
+    )
+  }
 }

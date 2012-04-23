@@ -16,7 +16,7 @@
 
 package org.podval.judaica.webapp
 
-import org.podval.judaica.viewer.{Books, Request}
+import org.podval.judaica.viewer.{Request}
 
 import javax.servlet.ServletException
 import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse, HttpUtils}
@@ -32,7 +32,7 @@ import scala.xml.{Node, PrettyPrinter}
 
 final class BooksServlet extends HttpServlet {
 
-    private val books = new Books
+//    private val books = new Books
 
 
     @throws(classOf[ServletException])
@@ -40,10 +40,10 @@ final class BooksServlet extends HttpServlet {
     protected override def doGet(httpRequest: HttpServletRequest, response: HttpServletResponse) {
         val request = parseRequest(httpRequest)
 
-        val result = books.get(request)
+//        val result = books.get(request)
 
         // TODO: prettyprint only if requested through query parameter!
-        write(result, response.getOutputStream)
+//        write(result, response.getOutputStream)
     }
 
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
+ * Copyright 2012 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,49 +12,30 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * under the License.
  */
 
 package org.podval.judaica.viewer
 
-import scala.xml.Node
+
+trait Selector {
+
+  def names: Names
 
 
-final class Selector(val what: String, val name: String) {
-
-    def toName: String =
-        what + "-" + name
+  def selectors: Seq[Selector]
 
 
-    def toNameSpan: Node =
-        <span class={what +"-name"}>{name}</span>
-}
+  def list(selection: Selection): Seq[Names]
 
 
-object Selector {
-
-    def maybeFromXml(xml: Node): Option[Selector] =
-        if (!isDiv(xml)) None else Some(fromXml(xml))
+  def select(selection: Selection, value: String): Selection
 
 
-    def fromXml(xml: Node): Selector = {
-        if (!isDiv(xml)) throw new IllegalArgumentException("Not a div!")
-
-        new Selector(getType(xml), getName(xml))
-    }
+  def isTerminal: Boolean
 
 
-    def isDivType(what: String)(node: Node) = isDiv(node) && (getType(node) == what)
+  def isRangeable: Boolean
 
 
-    private def getType(node: Node) = (node \ "@type").text
-
-
-    def getName(node: Node) = (node \ "@n").text
-
-
-    private def isDiv(node: Node) = (node.label == "div")
-
-
-    def toName(selectors: Seq[Selector]): String = selectors.map(_.toName).mkString("-")
+  final def asRangeable: RangeableSelector = this.asInstanceOf[RangeableSelector]
 }

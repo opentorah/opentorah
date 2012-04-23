@@ -28,10 +28,12 @@
             </plugin>
 
             <!-- Precompile Scalate templates -->
+            <!--
             <plugin>
                 <groupId>org.fusesource.scalate</groupId>
                 <artifactId>maven-scalate-plugin</artifactId>
             </plugin>
+            -->
         </plugins>
     </build>
 
@@ -40,11 +42,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.fusesource.scalate</groupId>
-            <artifactId>scalate-core</artifactId>
         </dependency>
 
         <!-- TODO this is only here while I work on the Scalate integration -->

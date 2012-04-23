@@ -30,6 +30,12 @@ import scala.xml.{Node, Elem}
  * Sometimes, there are more than one translation (or one is elucidation of the other).
  * Sometimes, translation has an explanation attached (in Hirshl's original - parens and quotes are used).
  * It is desirable to be prompted with translation of the given word that were already entered - in an overridable way.
+ * 
+ * URL encoding request:
+ * SEL: selection part - sequence of bindings between selectors and values
+ * separator *structure*
+ * STR: structure selection part - sequence of selectors
+ * suffix: *content* or *selectors*
  */
 
 final class Viewer
