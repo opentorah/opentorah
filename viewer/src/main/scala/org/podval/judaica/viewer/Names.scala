@@ -21,25 +21,28 @@ import scala.xml.Node
 import org.podval.judaica.common.Xml.oneChild
 
 
-final class Names(names: Seq[Name]) {
+final class Names(val names: Seq[Name]) {
 
-  def hasName(name: String): Boolean = names.exists(_.name == name)
-
-
-  def getByLang(lang: String): Option[Name] = names.find(_.lang == lang)
+  def find(name: String): Option[Name] = names.find(_.name == name)
 
 
-  def getDefault: Name = names(0)
+  def has(name: String): Boolean = find(name).isDefined
 
 
-  override def toString: String = "Names: " + names.mkString("[", ", ", "]")
+  def byLang(lang: String): Option[Name] = names.find(_.lang == lang)
+
+
+  def default: Name = names(0)
+
+
+  override def toString: String = "Names: " + names
 }
 
 
 
 object Names {
-
-    def apply(node: Node): Names = {
-      new Names(oneChild(node, "names").child.map(Name(_)))
-    }
+  
+  def apply(node: Node): Names = {
+    new Names(oneChild(node, "names").child.map(Name(_)))
+  }
 }

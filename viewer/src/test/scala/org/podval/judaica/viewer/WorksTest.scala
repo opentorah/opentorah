@@ -30,7 +30,7 @@ class WorksTest {
     private val resourcesDirectory = new File(sourceDirectory.getParent, "resources/org/podval/judaica/viewer/")
 
 
-    private val works = Works.load(resourcesDirectory)
+    private val works = Works(resourcesDirectory)
 
 
     @Test

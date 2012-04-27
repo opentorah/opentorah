@@ -16,25 +16,11 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.common.Xml.{loadFile, getAttribute}
 
-import java.io.File
+trait Work extends Named {
 
-
-final class Work private(val names: Names, val directory: String) {
-
-  override def toString: String = "Work (" + directory + ") " + names
-}
+  def editions: Set[Edition]
 
 
-object Work {
-
-  def load(file: File): Work = {
-    val node = loadFile(file, "work")
-
-    new Work(
-      Names(node),
-      getAttribute(node, "directory")
-    )
-  }
+  def defaultEdition: Edition
 }

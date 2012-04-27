@@ -17,7 +17,7 @@
 package org.podval.judaica.viewer
 
 
-trait NonRangeableSelector extends Selector {
+trait Named {
 
-  final override def isRangeable: Boolean = false
+  def names: Names
 }

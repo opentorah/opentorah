@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
+ * Copyright 2012 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,27 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * under the License.
  */
 
 package org.podval.judaica.viewer
 
-import scala.xml.Node
+
+trait Edition extends Named {
+
+  def work: WorkImpl
 
 
-abstract class TextFormat {
-
-    val divTypes: Seq[String]
-
-
-    def formatNonStructural: Node => Node
-
-
-    def formatContent: Node => Seq[Node]
-
-
-    def formatEditable: Node => String
-
-
-    final def getMergeDivType() = divTypes.last 
+  def root: Selection
 }

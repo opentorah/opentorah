@@ -17,13 +17,22 @@
 package org.podval.judaica.viewer
 
 
-trait RangeableSelector extends Selector {
+trait NonRootSelection extends Selection {
 
-  final override def isRangeable: Boolean = true
-
-
-  def first(selection: Selection): String
+  final override def isRoot: Boolean = false
 
 
-  def last(selection: Selection): String
+  final override def parent: Option[Selector] = Some(parent_)
+
+
+  val parent_ : Selector
+
+
+  final override def parentValue: Option[String] = Some(parentValue_)
+
+
+  val parentValue_ : String
+
+
+  override val edition: Edition = parent.get.parent.edition
 }

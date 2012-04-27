@@ -17,7 +17,22 @@
 package org.podval.judaica.viewer
 
 
-trait Selection {
+trait Selection extends Named {
 
-  def structure: Selector
+  def isRoot: Boolean
+
+
+  def parent: Option[Selector]
+
+
+  def parentValue: Option[String]
+
+
+  def edition: Edition
+
+
+  def structures: Set[Selector]
+
+
+  def defaultStructure: Selector
 }

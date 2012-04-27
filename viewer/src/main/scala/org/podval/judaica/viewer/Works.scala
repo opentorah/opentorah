@@ -19,12 +19,12 @@ package org.podval.judaica.viewer
 import java.io.File
 
 
-final class Works private(works: Seq[Work]) {
+final class Works private(works: Seq[WorkImpl]) {
 
-  def getByName(name: String): Option[Work] = get.find(_.names.hasName(name))
+  def getByName(name: String): Option[WorkImpl] = get.find(_.names.has(name))
 
 
-  def get: Seq[Work] = works
+  def get: Seq[WorkImpl] = works
 
 
   override def toString: String = "Works: " + get.mkString("[", ", ", "]")
@@ -33,15 +33,15 @@ final class Works private(works: Seq[Work]) {
 
 object Works {
 
-  def load(directoryPath: String): Works = load(new File(directoryPath))
+  def apply(directoryPath: String): Works = apply(new File(directoryPath))
 
 
-  def load(directory: File): Works = {
+  def apply(directory: File): Works = {
     if (!directory.isDirectory) {
         throw new IllegalArgumentException("Not a directory: " + directory)
     }
 
-    val works = directory.listFiles().filter(_.getName.endsWith(".xml")).map(Work.load(_))
+    val works = directory.listFiles().filter(_.getName.endsWith(".xml")).map(WorkImpl(_))
 
     new Works(works)
   }

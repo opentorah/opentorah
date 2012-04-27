@@ -22,20 +22,21 @@ import org.podval.judaica.common.Xml.{check, getAttribute}
 
 
 final class Name(val name: String, val lang: String, val isTransliterated: Boolean) {
-
-    override def toString: String = "Name: " + name + "(" + lang + ", " + isTransliterated +  ")"
+  
+  override def toString: String =
+    "Name: " + name + " (" + lang + (if (!isTransliterated) "" else ", " + isTransliterated) +  ")"
 }
 
 
 object Name {
-
-    def apply(node: Node): Name = {
-        check(node.asInstanceOf[Elem], "name")
-
-        new Name(
-            getAttribute(node, "name"),
-            getAttribute(node, "lang"),
-            getAttribute(node, "isTransliterated") == "true"
-        )
-    }
+  
+  def apply(node: Node): Name = {
+    check(node.asInstanceOf[Elem], "name")
+    
+    new Name(
+      getAttribute(node, "name"),
+      getAttribute(node, "lang"),
+      getAttribute(node, "isTransliterated") == "true"
+    )
+  }
 }

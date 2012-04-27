@@ -17,10 +17,16 @@
 package org.podval.judaica.viewer
 
 
-trait TerminalSelector extends Selector {
+trait RootSelection extends Selection {
 
-  final override def isTerminal: Boolean = true
+  final override def isRoot: Boolean = true
 
-  
-  final override def selectors: Seq[Selector] = Seq()
+
+  final override def parent: Option[Selector] = None
+
+
+  final override def parentValue: Option[String] = None
+
+
+  override val edition: Edition
 }

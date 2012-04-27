@@ -17,25 +17,13 @@
 package org.podval.judaica.viewer
 
 
-trait Selector {
+trait Selector extends Named {
 
-  def names: Names
-
-
-  def selectors: Seq[Selector]
+  def parent: Selection
 
 
-  def list(selection: Selection): Seq[Names]
+  def list: Seq[Selection]
 
 
-  def select(selection: Selection, value: String): Selection
-
-
-  def isTerminal: Boolean
-
-
-  def isRangeable: Boolean
-
-
-  final def asRangeable: RangeableSelector = this.asInstanceOf[RangeableSelector]
+  def select(value: String): Selection
 }

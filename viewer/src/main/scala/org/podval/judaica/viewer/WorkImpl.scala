@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
+ * Copyright 2012 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,26 +12,32 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * under the License.
  */
 
-package org.podval.judaica.viewer.tanach
+package org.podval.judaica.viewer
 
-import org.podval.judaica.viewer.TextFormat
+import org.podval.judaica.common.Xml.{loadFile, getAttribute}
 
-import scala.xml.Node
-
-
-final class TanachTextFormat extends TextFormat {
-
-    val divTypes = List("book", "chapter", "verse")
+import java.io.File
 
 
-    def formatNonStructural: Node => Node = _ => null
+final class WorkImpl private(
+  override val names: Names,
+  val directory: String) extends Work
+{
+
+  override def toString: String = "Work (" + directory + ") " + names
+}
 
 
-    def formatContent: Node => Seq[Node] = (node: Node) => scala.xml.Text(node.text)
+object WorkImpl {
 
+  def apply(file: File): WorkImpl = {
+    val node = loadFile(file, "work")
 
-    def formatEditable: Node => String = (node: Node) => node.text
+    new WorkImpl(
+      Names(node),
+      getAttribute(node, "directory")
+    )
+  }
 }
