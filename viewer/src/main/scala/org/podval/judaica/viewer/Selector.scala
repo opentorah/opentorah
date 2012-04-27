@@ -18,12 +18,4 @@ package org.podval.judaica.viewer
 
 
 trait Selector extends Named {
-
-  def parent: Selection
-
-
-  def list: Seq[Selection]
-
-
-  def select(value: String): Selection
 }

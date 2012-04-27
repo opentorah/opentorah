@@ -22,10 +22,7 @@ trait RootSelection extends Selection {
   final override def isRoot: Boolean = true
 
 
-  final override def parent: Option[Selector] = None
-
-
-  final override def parentValue: Option[String] = None
+  final override def parent: Option[Selection] = None
 
 
   override val edition: Edition

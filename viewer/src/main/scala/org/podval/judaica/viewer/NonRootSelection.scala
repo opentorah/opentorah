@@ -22,17 +22,11 @@ trait NonRootSelection extends Selection {
   final override def isRoot: Boolean = false
 
 
-  final override def parent: Option[Selector] = Some(parent_)
+  final override def parent: Option[Selection] = Some(parent_)
 
 
-  val parent_ : Selector
+  val parent_ : Selection
 
 
-  final override def parentValue: Option[String] = Some(parentValue_)
-
-
-  val parentValue_ : String
-
-
-  override val edition: Edition = parent.get.parent.edition
+  override val edition: Edition = parent.get.edition
 }

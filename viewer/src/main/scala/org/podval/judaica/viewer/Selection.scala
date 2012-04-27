@@ -17,22 +17,30 @@
 package org.podval.judaica.viewer
 
 
+// TODO Ranges: if they are Selections, are they still Named?
+// TODO What about consequtively-named children? 
 trait Selection extends Named {
 
   def isRoot: Boolean
 
 
-  def parent: Option[Selector]
-
-
-  def parentValue: Option[String]
+  def parent: Option[Selection]
 
 
   def edition: Edition
 
 
+  def structure: Selector
+
+
+  def children: Seq[Selection]
+
+
+  def child(value: String): Selection
+
+
   def structures: Set[Selector]
 
 
-  def defaultStructure: Selector
+  def restructure(structure: Selector): Selection
 }
