@@ -31,7 +31,19 @@ import scala.xml.{Node, Elem}
  * Sometimes, translation has an explanation attached (in Hirshl's original - parens and quotes are used).
  * It is desirable to be prompted with translation of the given word that were already entered - in an overridable way.
  * 
- * URL encoding request:
+ * We need rich Scala objects to describe Work, Edition, Structure, file locations, etc.
+ * File locations: inherited; file, directory, suffix.
+ * Range selections: Genesis/1:1
+ * 
+ * Nestedness of the structures: explicit or discovered? book/chapter. book/week, day only in a week...
+ * Main structure: used for references; files stored in.
+ * Maftir - a mark, not a division.
+ * Week - contained in a book; not in a chapter...
+ * 
+ * XML language to read them from, spread over multiple files.
+ * Separate "Names" definitions?
+ * 
+ * URL encoding of the requests.
  * SEL: selection part - sequence of bindings between selectors and values
  * separator *structure*
  * STR: structure selection part - sequence of selectors
