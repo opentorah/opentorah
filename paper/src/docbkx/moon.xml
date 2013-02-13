@@ -6,7 +6,7 @@
 
     <acknowledgements>
         <para>
-            Mordechai Goldin - for providing offics space and computer equipment when I, as a Yeshiva student, had neither.
+            Mordechai Goldin - for providing office space and computer equipment when I, as a Yeshiva student, had neither.
         </para>
         <para>
             Ilia Pomansky - for encouraging this work at the early stages, in 1991.             
@@ -29,7 +29,6 @@
         <para>
             Rabbi Chaim Prus - for causing me to investigate which number does the year of Creation has - 0 or 1.
         </para>
-        
     </acknowledgements>
 
     <section>
@@ -40,7 +39,7 @@
         are not always given. Especially for the astronomical calendar, the following questions arise:
         Where do the numbers come from?
         What are the models - and the formulae resulting from them - that reproduce the numbers?
-        Sometimes Rambam describes the models, so only the formulae need to be recosntructed; sometimes the models are
+        Sometimes Rambam describes the models, so only the formulae need to be reconstructed; sometimes the models are
         not described, so both the models and the formulae need to be reconstructed.
         </para>
     </section>
@@ -62,17 +61,17 @@
         <title>History</title>
         <para>In TODO, The Rebbe instructed the Jews to learn Rambam every day.
         As a result, in 1991 (TODO) I encountered
-        calendar chapters of Rambam, decided to reconstruct the models beind the calculations described in them,
+        calendar chapters of Rambam, decided to reconstruct the models behind the calculations described in them,
         and discovered mistakes in the text of one of the laws (TODO). The results were published in TODO.
-        Some of the readers were appaled that someone dares to correct the text of Rambam!
+        Some of the readers were appalled that someone dares to correct the text of Rambam!
         My point was that the text as published contains mistakes that need to be corrected.
         Indeed, Frenkel edition (that was already published at the time) corrects all of the mistakes I did.        
-        Indeed, they were already corrected by Hazon Ish in his commentary on Rambam - but I did not know it then.</para>
+        In fact, they were already corrected by Hazon Ish in his commentary on Rambam - but I did not know it then.</para>
         <para>In 2005, during a visit to Israel, I talked about the subject with Rabbi Michael Koretz.</para>
         <para>In 2008 (TODO) I acquired a pile of books on the subject and started looking into it;
         I also experimented with web publication of the work.</para>
         <para>In 2009 I coded some of the algorithms to look into then circulating rumors pertaining to the dates of Birkhat HaHamah.</para>
-        <para>In 2011 I realized that the work needs to be pusblished before it finished - so that others could help finish it ;)</para>
+        <para>In 2011 I realized that the work needs to be published before it finished - so that others could help finish it ;)</para>
     </section>
 
     <section>
@@ -102,7 +101,7 @@
                 </para>
 
                 <para>
-                    Between two consequitive nights of observation there is 29 full days.
+                    Between two consecutive nights of observation there is 29 full days.
                     Between night of observation of a given month and the night of observation of the same month next year
                     is in a regular year - or one day more.
                     Our goal in all these calculations is solely to determine visibility of the moon.
