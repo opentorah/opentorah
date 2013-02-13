@@ -153,7 +153,7 @@ object Year {
 
     private def months(kind: Kind.YearKind, isLeap: Boolean): List[Month.Descriptor] = {
         val namesAndLengths = this.namesAndLengths(kind, isLeap)
-        val (names, lengths) = namesAndLengths unzip
+        val (names, lengths) = namesAndLengths.unzip
         val daysBefore = lengths.scanLeft(0)(_ + _).init
         (namesAndLengths zip daysBefore) map (m => new Month.Descriptor(m._1._1, m._1._2, m._2))
     }

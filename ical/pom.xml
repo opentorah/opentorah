@@ -3,19 +3,21 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.podval.calendar</groupId>
-        <artifactId>parent</artifactId>
+        <groupId>org.podval</groupId>
+        <artifactId>calendar</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ical</artifactId>
+    <groupId>org.podval.calendar</groupId>
+    <artifactId>org.podval.calendar.ical</artifactId>
+
     <name>ICal Generation</name>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>dates</artifactId>
+            <groupId>org.podval.calendar</groupId>
+            <artifactId>org.podval.calendar.dates</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

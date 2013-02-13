@@ -35,10 +35,10 @@ object Tables {
         val recalculated = new Column("recalculated", "r(10000)*n", (days: Int) => reconstruct(10000)*days)
 
         List(
-            new PreTable("original", days, value),
-            new PreTable("calculated", days, value, calculated),
-            new PreTable("reconstructed", days, value, reconstructed),
-            new PreTable("recalculated", days, value, recalculated)
+            new Columns("original", days, value),
+            new Columns("calculated", days, value, calculated),
+            new Columns("reconstructed", days, value, reconstructed),
+            new Columns("recalculated", days, value, recalculated)
         )
     }
 
@@ -58,14 +58,14 @@ object Tables {
         val calculatee = new Column("e", "", (a: Angle) => e(a, data(a)))
 
         List(
-            new PreTable("original", mca, mva),
-            new PreTable("withe", mca, mva, calculatee)
+            new Columns("original", mca, mva),
+            new Columns("withe", mca, mva, calculatee)
         )
     }
     
 
-    private def tables[A,B](name: String, dataList: List[(A, B)], f: (Map[A, B]) => List[PreTable[A]]) =
-        f(Map(dataList: _*)) map (_.toTable(name, dataList map (_._1)))
+    private def tables[A,B](name: String, dataList: List[(A, B)], f: (Map[A, B]) => List[Columns[A]]) =
+        f(Map(dataList: _*)) map (_.tabulate(name, dataList map (_._1)))
 
 
     private def allTables = 

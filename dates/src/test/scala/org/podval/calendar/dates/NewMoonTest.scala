@@ -12,10 +12,10 @@ final class NewMoonTest {
     @Test
     def when2011() {
         // TODO
-        println(Year(   1).month(1).newMoon.toMinutesString)
-        println(Year(5772).month(2).newMoon.toMinutesString)
-        println(Year(5772).month(3).newMoon.toMinutesString)
-        println(Year(5772).month(4).newMoon.toMinutesString)
+        println(Year(   1).month(1).newMoon.toFullString)
+        println(Year(5772).month(2).newMoon.toFullString)
+        println(Year(5772).month(3).newMoon.toFullString)
+        println(Year(5772).month(4).newMoon.toFullString)
     }
 
   /*

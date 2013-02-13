@@ -17,91 +17,91 @@
 package org.podval.calendar.moon
 
 
-final class Angle(val degrees: Int, val more: List[Int]) extends Ordered[Angle] {
-    checkRange(360)(degrees)
-    more.foreach(checkRange(60))
+final class Angle(val degrees: Int, more: List[Int]) extends Ordered[Angle] {
+  checkRange(360)(degrees)
+  more.foreach(checkRange(60))
 
-    private def checkRange(range: Int)(value: Int): Unit = {
-        require(value < 0, "can not be negative")
-        require(value >= range, "can not be bigger than " + range)
-    }
-
-
-    def minutes = if (length >= 1) more(0) else 0
+  private[this] def checkRange(range: Int)(value: Int) {
+    require(value >= 0, "must be non-negative")
+    require(value < range, "must be less than " + range)
+  }
 
 
-    def seconds = if (length >= 2) more(1) else 0
+  def length = more.length
 
 
-    def thirds = if (length >= 3) more(2) else 0
+  def digits: List[Int] = degrees :: more
 
 
-    override def equals(other: Any): Boolean = other match {
-        case that: Angle => zip(that) forall lift(_==_)
-        case _ => false
-    }
+  def minutes = if (length >= 1) more(0) else 0
 
 
-    override def hashCode = ((41+degrees) /: more) ((v,x) => 41*v+x)
+  def seconds = if (length >= 2) more(1) else 0
 
 
-    override def compare(that: Angle) = zip(that) map lift(_.compare(_)) find(_!= 0) getOrElse(0)
+  def thirds = if (length >= 3) more(2) else 0
 
 
-    def +(other: Angle): Angle = Angle(zip(other) map lift(_+_))
+  override def equals(other: Any): Boolean = other match {
+    case that: Angle => zip(that) forall lift(_==_)
+    case _ => false
+  }
 
 
-    def -(other: Angle): Angle = Angle(zip(other) map lift(_-_))
+  override def hashCode = ((41+degrees) /: more) ((v,x) => 41*v+x)
 
 
-    private def lift[A, B, C](op: (A, B) => C): (Tuple2[A, B] => C) = p => op(p._1, p._2)
+  override def compare(that: Angle) = zip(that) map lift(_.compare(_)) find(_!= 0) getOrElse(0)
 
 
-    def *(n: Int): Angle = Angle(toDigits map (n*_))
+  def +(other: Angle): Angle = Angle(zip(other) map lift(_+_))
 
 
-    def roundToSeconds(): Angle = roundTo(2)
+  def -(other: Angle): Angle = Angle(zip(other) map lift(_-_))
 
 
-    def roundToMinutes(): Angle = roundTo(1)
+  def *(n: Int): Angle = Angle(digits map (n*_))
 
 
-    def roundTo(n: Int): Angle = {
-        if (n < 0) throw new IllegalArgumentException()
-
-        val (more_, toRound) = more splitAt n
-        val carry = (toRound :\ 0)((x, c) => if (x + c >= 30) 1 else 0)
-
-        Angle(degrees, more_.init :+ (more_.last + carry))
-    }
+  private[this] def zip(that: Angle) = digits zipAll (that.digits, 0, 0)
 
 
-    def length = more.length
+  private[this] def lift[A, B, C](op: (A, B) => C): (Tuple2[A, B] => C) = p => op(p._1, p._2)
 
 
-    // TODO: padding
-    override def toString(): String = {
-        val tokens = toDigits map (_.toString) zip Angle.SIGNS flatMap (p => List(p._1, p._2))
-        (if (length <= 3) tokens else tokens.init) mkString
-    }
+  def roundToSeconds(): Angle = roundTo(2)
 
 
-    private def zip(that: Angle) = toDigits zipAll (that.toDigits, 0, 0)
+  def roundToMinutes(): Angle = roundTo(1)
 
 
-    def toDigits: List[Int] = degrees :: more
+  def roundTo(n: Int): Angle = {
+    require(n >= 0)
+
+    val (more_, toRound) = more splitAt n
+    val carry = (toRound :\ 0)((x, c) => if (x + c >= 30) 1 else 0)
+
+    Angle(degrees, more_.init :+ (more_.last + carry))
+  }
 
 
-    def sin(): Double = scala.math.sin(toRadians)
+  // TODO: padding
+  override def toString: String = {
+    val tokens = digits map (_.toString) zip Angle.SIGNS flatMap (p => List(p._1, p._2))
+    (if (length <= 3) tokens else tokens.init).mkString
+  }
 
 
-    def cos(): Double = scala.math.cos(toRadians)
+  def sin(): Double = scala.math.sin(toRadians)
 
 
-    def toRadians: Double = scala.math.toRadians(toDegrees)
+  def cos(): Double = scala.math.cos(toRadians)
 
 
-    def toDegrees: Double = degrees + ((more zip Angle.QUOTIENTS) map lift(_/_)).sum
+  def toRadians: Double = scala.math.toRadians(toDegrees)
+
+
+  def toDegrees: Double = degrees + ((more zip Angle.QUOTIENTS) map lift(_/_)).sum
 }
 
 
