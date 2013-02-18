@@ -28,20 +28,13 @@
     <dependencies>
         <dependency>
             <groupId>org.podval.calendar</groupId>
-            <artifactId>org.podval.calendar.moon</artifactId>
+            <artifactId>org.podval.calendar.astronomical</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!--
-            <plugin>
-                <groupId>com.agilejava.docbkx</groupId>
-                <artifactId>docbkx-fop-support</artifactId>
-            </plugin>
-            -->
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -54,7 +47,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>org.podval.calendar.moon.Tables</mainClass>
+                    <mainClass>org.podval.calendar.astronomical.Tables</mainClass>
                     <arguments>
                         <argument>${basedir}/target/tables</argument>
                     </arguments>
