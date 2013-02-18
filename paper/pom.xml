@@ -13,7 +13,17 @@
     <artifactId>org.podval.calendar.paper</artifactId>
 
     <name>Rambam on Calendar Paper</name>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
+
+    <properties>
+        <!-- Looks like docbkx-fop-support plugin, which generates the metrix files,
+             by default looks for "${fontsDirectory}/fileName" pattern in the configuration of the docbkx-maven-plugin!
+             If the variable is called differently, build fails.
+             If it does not point to a directory with the font files, build fails (differently ;)).
+        -->
+        <fontsDirectory>/usr/share/fonts/google-croscore/</fontsDirectory>
+        <fontMetricsDirectory>${basedir}/target/fonts/</fontMetricsDirectory>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -25,10 +35,12 @@
 
     <build>
         <plugins>
+            <!--
             <plugin>
                 <groupId>com.agilejava.docbkx</groupId>
                 <artifactId>docbkx-fop-support</artifactId>
             </plugin>
+            -->
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -57,41 +69,12 @@
                     <xincludeSupported>true</xincludeSupported>
                     <generatedSourceDirectory>${basedir}/target/tables</generatedSourceDirectory>
 
-                    <includes>moon.xml</includes>
+                    <includes>paper.xml</includes>
 
-                    <bodyFontFamily>LiberationSans</bodyFontFamily>
+                    <bodyFontFamily>DejaVuSans</bodyFontFamily>
                     <tocSectionDepth>4</tocSectionDepth>
 
-                    <fonts>
-                        <font>
-                            <name>LiberationSans</name>
-                            <style>normal</style>
-                            <weight>normal</weight>
-                            <embedFile>${fontsDirectory}/LiberationSans-Regular.ttf</embedFile>
-                            <metricsFile>${fontMetricsDirectory}/LiberationSans-Regular-metrics.xml</metricsFile>
-                        </font>
-                        <font>
-                            <name>LiberationSans</name>
-                            <style>normal</style>
-                            <weight>bold</weight>
-                            <embedFile>${fontsDirectory}/LiberationSans-Bold.ttf</embedFile>
-                            <metricsFile>${fontMetricsDirectory}/LiberationSans-Bold-metrics.xml</metricsFile>
-                        </font>
-                        <font>
-                            <name>LiberationSans</name>
-                            <style>italic</style>
-                            <weight>normal</weight>
-                            <embedFile>${fontsDirectory}/LiberationSans-Italic.ttf</embedFile>
-                            <metricsFile>${fontMetricsDirectory}/LiberationSans-Italic-metrics.xml</metricsFile>
-                        </font>
-                        <font>
-                            <name>LiberationSans</name>
-                            <style>italic</style>
-                            <weight>bold</weight>
-                            <embedFile>${fontsDirectory}/LiberationSans-BoldItalic.ttf</embedFile>
-                            <metricsFile>${fontMetricsDirectory}/LiberationSans-BoldItalic-metrics.xml</metricsFile>
-                        </font>
-                    </fonts>
+                    <externalFOPConfiguration>src/main/resources/fop.xconf</externalFOPConfiguration>
                 </configuration>
             </plugin>
         </plugins>

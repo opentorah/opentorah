@@ -68,15 +68,19 @@ object Tables {
         f(Map(dataList: _*)) map (_.tabulate(name, dataList map (_._1)))
 
 
-    private def allTables = 
+    private def allTables =
+        tables("sml", TablesData.SunMeanLongitude, dayTables) ++
         tables("mml", TablesData.MoonMeanLongitude, dayTables) ++
         tables("mma", TablesData.MoonMeanAnomaly, dayTables) ++
-        tables("mva", TablesData.MoonVisibleAnomaly, mvaTables)
+        tables("mva", sort(VisibleAnomaly.CORRECT), mvaTables)
+
+
+    private[this] def sort[A <: Ordered[A], B](map: Map[A, B]): List[(A, B)] = map.toList.sortWith((l, r) => (l._1 < r._1))
 
 
     def main(args: Array[String]) {
         val directory = new File(if (!args.isEmpty) args(0) else "/tmp/xxx/tables/")
-        directory.mkdir
+        directory.mkdirs
         allTables foreach (_.write(directory))
     }
 }

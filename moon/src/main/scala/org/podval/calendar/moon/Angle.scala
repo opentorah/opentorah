@@ -113,7 +113,7 @@ object Angle {
     val QUOTIENTS = (1 to MAX_LENGTH) map (n => scala.math.pow(60.0, n))
 
 
-    val SIGNS = List("°", "′", "″", "‴") ++ List().padTo(MAX_LENGTH-3, ", ")
+    val SIGNS = List("°", "′", "″", "‴") ++ List().padTo(MAX_LENGTH-3, ",")
 
 
     def apply(degrees: Int, more: Int*): Angle = apply(degrees, more.toList)

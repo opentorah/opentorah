@@ -79,25 +79,4 @@ object TablesData {
         29    -> Angle(18, 53, 4),
         354   -> Angle(305, 0, 13)
     )
-
-
-    val MoonVisibleAnomaly = List[(Angle, Angle)](
-        Angle(10) -> Angle(0,50),
-        Angle(20) -> Angle(1,38),
-        Angle(30) -> Angle(2,24),
-        Angle(40) -> Angle(3,6),
-        Angle(50) -> Angle(3,44),
-        Angle(60) -> Angle(4,16),
-        Angle(70) -> Angle(4,41),
-        Angle(80) -> Angle(5,0),
-        Angle(90) -> Angle(5,5),
-        Angle(100) -> Angle(5,8),
-        Angle(110) -> Angle(4,59),
-        Angle(120) -> Angle(4,20),
-        Angle(130) -> Angle(4,14),
-        Angle(140) -> Angle(3,33),
-        Angle(150) -> Angle(3,48),
-        Angle(160) -> Angle(1,56),
-        Angle(170) -> Angle(1,59)
-    )
 }
