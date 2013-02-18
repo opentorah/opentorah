@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package org.podval.calendar.moon
-
+package org.podval.calendar.astronomical.angle
 
 final class Angle(val degrees: Int, more: List[Int]) extends Ordered[Angle] {
   checkRange(360)(degrees)

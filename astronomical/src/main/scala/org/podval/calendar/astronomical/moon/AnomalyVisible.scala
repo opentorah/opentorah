@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Podval Group.
+ * Copyright 2011-2013 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package org.podval.calendar.moon
+package org.podval.calendar.astronomical.moon
 
 import scala.collection.immutable.Map
+import org.podval.calendar.astronomical.angle.Angle
 
 
-object VisibleAnomaly {
-
-/*
-   120  4 20'       (4 40')
-   150  3 48'       (2 48')
-   170  1 59'         (59')
-*/
+object AnomalyVisible {
 
     /* Numbers as they are printed in Chapter 15 Law 6 */
-    // TODO sort by maslul
     val MISPRINTED = Map[Angle, Angle](
         Angle( 10) -> Angle(0, 50),
         Angle( 20) -> Angle(1, 38),

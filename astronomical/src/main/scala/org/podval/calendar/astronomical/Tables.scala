@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Podval Group.
+ * Copyright 2011-2013 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.podval.calendar.moon
+package org.podval.calendar.astronomical
+
+import org.podval.calendar.astronomical.angle.Angle
 
 import scala.math.{sin, cos, tan, round}
-
 
 import java.io.File
 
@@ -69,10 +70,10 @@ object Tables {
 
 
     private def allTables =
-        tables("sml", TablesData.SunMeanLongitude, dayTables) ++
-        tables("mml", TablesData.MoonMeanLongitude, dayTables) ++
-        tables("mma", TablesData.MoonMeanAnomaly, dayTables) ++
-        tables("mva", sort(VisibleAnomaly.CORRECT), mvaTables)
+        tables("sml", sun.LongitudeMean.VALUES, dayTables) ++
+        tables("mml", moon.LongitudeMean.VALUES, dayTables) ++
+        tables("mma", moon.AnomalyMean.VALUES, dayTables) ++
+        tables("mva", sort(moon.AnomalyVisible.CORRECT), mvaTables)
 
 
     private[this] def sort[A <: Ordered[A], B](map: Map[A, B]): List[(A, B)] = map.toList.sortWith((l, r) => (l._1 < r._1))

@@ -9,7 +9,7 @@
     </parent>
 
     <groupId>org.podval.calendar</groupId>
-    <artifactId>org.podval.calendar.moon</artifactId>
+    <artifactId>org.podval.calendar.astronomical</artifactId>
 
     <name>Moon Calculations</name>
     <packaging>jar</packaging>

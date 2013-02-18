@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Podval Group.
+ * Copyright 2011-2013 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package org.podval.calendar.moon
+package org.podval.calendar.astronomical.moon
 
 import org.junit.Test
 import org.junit.Assert
+import org.podval.calendar.astronomical.angle.Angle
 
 
-class TestVisibleAnomaly {
+class AnomalyVisibleTest {
 
     @Test
     def misprinted() {
-        test(VisibleAnomaly.MISPRINTED)
+        test(AnomalyVisible.MISPRINTED)
     }
 
 
     @Test
     def correct() {
-        test(VisibleAnomaly.CORRECT)
+        test(AnomalyVisible.CORRECT)
     }
 
 
@@ -38,8 +39,8 @@ class TestVisibleAnomaly {
         for (row <- table) {
             val maslul: Angle = row._1
             val mnas: Angle = row._2
-            val e: Double = VisibleAnomaly.efrommnasround(maslul, mnas)
-            val mnas_ = VisibleAnomaly.mnasfrome(maslul, e).roundToMinutes
+            val e: Double = AnomalyVisible.efrommnasround(maslul, mnas)
+            val mnas_ = AnomalyVisible.mnasfrome(maslul, e).roundToMinutes
 
             Assert.assertEquals(mnas, mnas_)
         }

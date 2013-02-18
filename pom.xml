@@ -58,7 +58,7 @@
         <module>dates</module>
         <module>ical</module>
         <module>app-servlet</module>
-        <module>moon</module>
+        <module>astronomical</module>
         <module>sun</module>
         <module>paper</module>
     </modules>
