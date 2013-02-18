@@ -1,183 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE article PUBLIC "-//W3C//DTD MathML 2.0//EN" "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd">
+<?xml-model href="http://docbook.org/xml/5.0/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.0/rng/docbook.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://www.oxygenxml.com/docbook/xml/5.0/rng/dbmathmlsvg.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-    <title>Rambam on Astronomical Calendar</title>
-
-    <acknowledgements>
-        <para>
-            Mordechai Goldin - for providing office space and computer equipment when I, as a Yeshiva student, had neither.
-        </para>
-        <para>
-            Ilia Pomansky - for encouraging this work at the early stages, in 1991.             
-        </para>
-        <para>
-            My wife Nina - for listening to my wild ideas, patience, and helping with math. 
-        </para>
-        <para>
-            My daughter Menucha Rochel - for assistance with the translation.
-        </para>
-        <para>
-            Dr. Michael Partensky - for encouragement and advise.
-        </para>
-        <para>
-            Peter Offman - for asking questions that prodded me into action in 2011, after years of hiatus.
-        </para>
-        <para>
-            Aron Matskin - for a discussion on his visit with us on Rosh Chodesh Mar Cheshvan 5772.
-        </para>
-        <para>
-            Rabbi Chaim Prus - for causing me to investigate which number does the year of Creation has - 0 or 1.
-        </para>
-    </acknowledgements>
-
-    <section>
-        <title>Introduction</title>
-
-        <para>Rambam gives algorithmic description of two calendars: fixed (arithmetic) and astronomical.
-            Both calendars are described in the form ready to be implemented, but the reasons for the calculation steps
-        are not always given. Especially for the astronomical calendar, the following questions arise:
-        Where do the numbers come from?
-        What are the models - and the formulae resulting from them - that reproduce the numbers?
-        Sometimes Rambam describes the models, so only the formulae need to be reconstructed; sometimes the models are
-        not described, so both the models and the formulae need to be reconstructed.
-        </para>
-    </section>
-
-    <section>
-        <title>Goals</title>
-        <itemizedlist>
-            <listitem><para>Translate appropriate chapters of Rambam into English.
-              The translation does not have to be literal; literal translations are already available (TODO).
-              The goal of our translation is to make the text complete and accessible for collaboration
-              by people not proficient enough in Hebrew.</para></listitem>
-            <listitem><para>Reconstruct the models and formulae implied in the text.</para></listitem>
-            <listitem><para>Implement the algorithms.</para></listitem>
-            <listitem><para>Relate Rambam's models to contemporary astronomical models.</para></listitem>
-        </itemizedlist>
-    </section>
-
-    <section>
-        <title>History</title>
-        <para>In TODO, The Rebbe instructed the Jews to learn Rambam every day.
-        As a result, in 1991 (TODO) I encountered
-        calendar chapters of Rambam, decided to reconstruct the models behind the calculations described in them,
-        and discovered mistakes in the text of one of the laws (TODO). The results were published in TODO.
-        Some of the readers were appalled that someone dares to correct the text of Rambam!
-        My point was that the text as published contains mistakes that need to be corrected.
-        Indeed, Frenkel edition (that was already published at the time) corrects all of the mistakes I did.        
-        In fact, they were already corrected by Hazon Ish in his commentary on Rambam - but I did not know it then.</para>
-        <para>In 2005, during a visit to Israel, I talked about the subject with Rabbi Michael Koretz.</para>
-        <para>In 2008 (TODO) I acquired a pile of books on the subject and started looking into it;
-        I also experimented with web publication of the work.</para>
-        <para>In 2009 I coded some of the algorithms to look into then circulating rumors pertaining to the dates of Birkhat HaHamah.</para>
-        <para>In 2011 I realized that the work needs to be published before it finished - so that others could help finish it ;)</para>
-    </section>
-
-    <section>
-        <title>Solar Theory</title>
-
-        <section>
-            <title>Chapter 12</title>
-
-            <section>
-                <title>Law 1</title>
-
-                <para>
-                    Mean movement of the Sun in one day (that is, twenty four hours) is 59′8″.
-                    
-                </para>
-
-                <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
-                
-                <xi:include href="../../target/tables/sml-original.xml"/>
-                
-                <para>
-                    And in this way you can calculate it for any number of days and years that you want.
-                    And so if you want to calculate movement in 2, 3, 4 - up to 10 days - you can do it.
-                    And so if you want to calculate movement in 20, 30, 40 - up to 100 days - you can do it.
-                    And it is obvious that once you know the movement in one day.
-                    Regular lunar year is 354 days.
-                </para>
-
-                <para>
-                    Between two consecutive nights of observation there is 29 full days.
-                    Between night of observation of a given month and the night of observation of the same month next year
-                    is in a regular year - or one day more.
-                    Our goal in all these calculations is solely to determine visibility of the moon.
-                </para>
-            </section>
-
-            <section>
-                <title>Law 2</title>
-
-                <para>
-                    There is a point on the Sun's orbit (and on orbits of the other 7 planets)
-                    where Sun is the highest above Earth. This point of the Sun's orbit (and so for other planets,
-                    except for the moon) rotates with constant speed. Movement of this point is approximately
-                    1° every 70 years. This point is called Sun's apogee (gva hashemesh).
-                </para>
-
-                <para>
-                    We already said that the epoch that our calculations are based on is beginning of the
-                    night of the fifth day that is 3rd of Nisan of the year 4938 from the Creation.
-                    And mean longitude of the Sun was at the epoch 7°3′32″ in the constelation of Ram (tele).
-                    And apogee of the Sun was 26°45′8″ in the constellation of Twins.
-                </para>
-            </section>
-        </section>
-
-        <section>
-            <title>Chapter 13</title>
-            
-            <section>
-                <title>Law 1</title>
-            </section>
-            
-            <section>
-                <title>Law 2</title>
-            </section>
-            
-            <section>
-                <title>Law 3</title>
-            </section>
-            
-            <section>
-                <title>Law 4</title>
-            </section>
-            
-            <section>
-                <title>Law 5</title>
-            </section>
-            
-            <section>
-                <title>Law 6</title>
-            </section>
-            
-            <section>
-                <title>Law 7</title>
-            </section>
-            
-            <section>
-                <title>Law 8</title>
-            </section>
-            
-            <section>
-                <title>Law 9</title>
-            </section>
-            
-            <section>
-                <title>Law 10</title>
-            </section>
-            
-            <section>
-                <title>Law 11</title>
-            </section>
-        </section>
-    </section>
-
-    <section>
-        <title>Lunar Theory</title>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+    <title>Lunar Theory</title>
 
         <section>
             <title>Chapter 14</title>
@@ -187,7 +13,7 @@
 
                 <para>The moon has two mean movements. The moon itself rotates on a small circle
                     that does not surround all of the Earth. Moon's movement on that small circle is
-                    called <glossterm>mean lunar anomaly</glossterm> (אמצע המסלול). The small circle
+                    called <glossterm linkend="mla-term">mean lunar anomaly</glossterm> (אמצע המסלול). The small circle
                     (epicycle) itself rotates on a big circle (deferent) that surrounds the Earth.
                     The mean movement of the small circle on the big circle that surrounds the Earth
                     is called <glossterm>mean lunar longitude</glossterm> (אמצע הירח). </para>
@@ -555,10 +381,31 @@
 
                 <section>
                     <title>Discussion</title>
-                    <para> Formulae: R - radius of the big circle; r - radius of the small
-                        circle; e = R/r. A little trigonometry, and we get: visible anomaly =
-                        arctg(sin(corrected anomaly)/(cos(corrected anomaly) + e)) and: e = ctg(visible
-                        anomaly)*sin(corrected anomaly) - cos(corrected anomaly) </para>
+                    <para> Formulae: <equation>
+                            <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                                <apply>
+                                    <arctan/>
+                                    <apply>
+                                        <divide/>
+                                        <apply>
+                                            <sin/>
+                                            <mi>α</mi>
+                                        </apply>
+                                        <apply>
+                                            <plus/>
+                                            <apply>
+                                                <cos/>
+                                                <mi>α</mi>
+                                            </apply>
+                                            <mi>ε</mi>
+                                        </apply>
+                                    </apply>
+                                </apply>
+                            </math>
+                        </equation> R - radius of the big circle; r - radius of the small circle; e
+                        = R/r. A little trigonometry, and we get: visible anomaly =
+                        arctg(sin(corrected anomaly)/(cos(corrected anomaly) + e)) and: e =
+                        ctg(visible anomaly)*sin(corrected anomaly) - cos(corrected anomaly) </para>
                 
                     <para>TODO: Make the diagram! Here?</para>
 
@@ -676,293 +523,3 @@
             </section>
         </section>
     </section>
-
-    <bibliography>
-        <bibliodiv>
-            <title>Laws of Sanctification of the Moon by Rambam</title>
-
-            <biblioentry xml:id="Vilno" xreflabel="Vilno">
-                <author><personname>Rambam</personname></author>
-                <title>Mishne Torah</title>
-                <publisher>
-                    <publishername>Widow and Brothers Romm</publishername>
-                </publisher>
-            </biblioentry>
-
-            <biblioentry xml:id="LaAm" xreflabel="Rambam LaAm">
-                <author><personname>Rambam</personname></author>
-                <title>Mishne Torah</title>
-                <edition>Rambam LaAm</edition>
-            </biblioentry>
-
-            <biblioentry xml:id="Eshkol" xreflabel="Eshkol">
-                <author><personname>Rambam</personname></author>
-                <title>Mishne Torah</title>
-                <publisher>
-                    <publishername>Eshkol</publishername>
-                </publisher>
-                <pubdate>1987</pubdate>
-            </biblioentry>
-
-            <biblioentry xml:id="Kapach" xreflabel="Kapach">
-                <author><personname>Rambam</personname></author>
-                <title>Mishne Torah</title>
-                <editor><personname>
-                    <honorific>Rabbi</honorific>
-                    <surname>Kapach</surname>
-                </personname></editor>
-            </biblioentry>
-
-            <biblioentry xml:id="Frenkel" xreflabel="Frenkel">
-                <author><personname>Rambam</personname></author>
-                <title>Mishne Torah</title>
-                <editor><personname>
-                    <honorific>Rabbi</honorific>
-                    <surname>Frenkel</surname>
-                </personname></editor>
-            </biblioentry>
-
-            <biblioentry xml:id="Bluming" xreflabel="Bluming">
-                <author><personname>Rambam</personname></author>
-                <title>Mishne Torah</title>
-                <edition>Rambam HaAruch</edition>
-                <editor><personname>
-                    <honorific>Rabbi</honorific>
-                    <firstname>Y</firstname>
-                    <surname>Bluming</surname>
-                </personname></editor>
-                <pubdate>2005</pubdate>
-            </biblioentry>
-
-            <biblioentry xml:id="Yale" xreflabel="Yale">
-                <author><personname>Rambam</personname></author>
-                <title>Mishne Torah</title>
-                <publisher>
-                    <publishername>Yale</publishername>
-                </publisher>
-            </biblioentry>
-
-            <biblioentry xml:id="Touger" xreflabel="Touger">
-                <author><personname>Rambam</personname></author>
-                <title>Mishne Torah</title>
-                <editor><personname>
-                    <honorific>Rabbi</honorific>
-                    <surname>Touger</surname>
-                </personname></editor>
-            </biblioentry>
-        </bibliodiv>
-
-        <bibliodiv>
-            <title>Jewish Writings on Calendar</title>
-
-            <biblioentry xml:id="Losh" xreflabel="Losh">
-                <title>Sefer HaTchunah LeMatchil</title>
-                <author><personname>
-                    <firstname>Yosef Yitzchok</firstname>
-                    <surname>Losh</surname>
-                </personname></author>
-                <pubdate>1988</pubdate>
-            </biblioentry>
-
-            <biblioentry xml:id="Keller" xreflabel="Keller">
-                <title>Tchunat HaShamaim</title>
-                <author><personname>
-                    <firstname>Yosef Yitzchok</firstname>
-                    <surname>Keller</surname>
-                </personname></author>
-                <pubdate>1988</pubdate>
-            </biblioentry>
-
-            <biblioentry xml:id="Glitzenshtein" xreflabel="Glitzenshtein">
-                <title>Kidush HaChodesh LeHaRambam</title>
-                <author><personname>
-                    <firstname>Menachem Mendel</firstname>
-                    <surname>Glitzenshtein</surname>
-                </personname></author>
-                <pubdate>1993</pubdate>
-            </biblioentry>
-
-            <biblioentry xml:id="Tzikuni" xreflabel="Tzikuni">
-                <title>הזון שמים (Hazon Shamaim)</title>
-                <author><personname>
-                    <firstname>Eitan</firstname>
-                    <surname>Tzikuni</surname>
-                </personname></author>
-                <pubdate>2001</pubdate>
-            </biblioentry>
-        </bibliodiv>
-
-        <bibliodiv>
-            <title>Greeks on Astronomy</title>
-
-            <biblioentry xml:id="Neugebauer" xreflabel="Neugebauer">
-                <title>The Exact Sciences in Antiquity</title>
-                <author><personname>
-                    <firstname>Otto</firstname>
-                    <surname>Neugebauer</surname>
-                </personname></author>
-                <edition>2nd</edition>
-                <publisher>
-                    <publishername>Dover Publications</publishername>
-                </publisher>
-                <pubdate>1969</pubdate>
-                <biblioid class="uri">http://isbn.nu/0486223329</biblioid>
-            </biblioentry>
-
-            <biblioentry xml:id="Crowe" xreflabel="Crowe">
-                <title>Theories of the World from Antiquity to the Copernican Revolution</title>
-                <author><personname>
-                    <firstname>Michael</firstname>
-                    <othername>J.</othername>
-                    <surname>Crowe</surname>
-                </personname></author>
-                <edition>2nd</edition>
-                <publisher>
-                    <publishername>Dover Publications</publishername>
-                </publisher>
-                <pubdate>2001</pubdate>
-                <biblioid class="uri">http://isbn.nu/0486414442</biblioid>
-            </biblioentry>
-
-            <biblioentry xml:id="Evans" xreflabel="Evans">
-                <title>The History &amp; Practice of Ancient Astronomy</title>
-                <author><personname>
-                    <firstname>James</firstname>
-                    <surname>Evans</surname>
-                </personname></author>
-                <publisher>
-                    <publishername>Oxford University Press</publishername>
-                </publisher>
-                <pubdate>1998</pubdate>
-                <biblioid class="uri">http://isbn.nu/0195095391</biblioid>
-            </biblioentry>
-
-            <biblioentry xml:id="Thurston" xreflabel="Thurston">
-                <title>Early Astronomy</title>
-                <author><personname>
-                    <firstname>Hugh</firstname>
-                    <surname>Thurston</surname>
-                </personname></author>
-                <publisher>
-                    <publishername>Springer Verlag</publishername>
-                </publisher>
-                <pubdate>1996</pubdate>
-                <biblioid class="uri">http://isbn.nu/0387948228</biblioid>
-            </biblioentry>
-
-            <biblioentry xml:id="Almagest" xreflabel="Almagest">
-                <title>Ptolemy's Almagest</title>
-                <author role="translator"><personname>
-                    <firstname>G. J.</firstname>
-                    <surname>Toomer</surname>
-                </personname></author>
-                <publisher>
-                    <publishername>Princeton University Press</publishername>
-                </publisher>
-                <pubdate>1998</pubdate>
-                <biblioid class="uri">http://isbn.nu/0691002606</biblioid>
-            </biblioentry>
-
-            <biblioentry xml:id="Campanus" xreflabel="Campanus">
-                <title>Campanus of Novara &amp; Medieval Planetary Theory</title>
-                <authorgroup>
-                    <author><personname>
-                        <firstname>G. J.</firstname>
-                        <surname>Toomer</surname>
-                        <lineage>Jr</lineage>
-                    </personname></author>
-                    <author><personname>
-                        <firstname>Francis</firstname>
-                        <othername>S.</othername>
-                        <surname>Benjamin</surname>
-                    </personname></author>
-                </authorgroup>
-                <publisher>
-                    <publishername>University of Wisconsin Press</publishername>
-                </publisher>
-                <pubdate>1972</pubdate>
-                <biblioid class="uri">http://isbn.nu/029905960X</biblioid>
-            </biblioentry>
-        </bibliodiv>
-
-        <bibliodiv>
-            <title>Contemporary Models</title>
-
-            <biblioentry xml:id="Meeus" xreflabel="Meeus">
-                <title>Astronomical Algorithms</title>
-                <author><personname>
-                    <firstname>Jean</firstname>
-                    <surname>Meeus</surname>
-                </personname></author>
-                <edition>2nd</edition>
-                <publisher>
-                    <publishername>Willmann-Bell</publishername>
-                </publisher>
-                <pubdate>1998</pubdate>
-                <biblioid class="uri">http://isbn.nu/0943396611</biblioid>
-            </biblioentry>
-            
-            <biblioentry xml:id="Montenbruck" xreflabel="Montenbruck">
-                <title>Astronomy on the Personal Computer</title>
-                <authorgroup>
-                    <author><personname>
-                        <firstname>Oliver</firstname>
-                        <surname>Montenbruck</surname>
-                    </personname></author>
-                    <author><personname>
-                        <firstname>Thomas</firstname>
-                        <surname>Pfleger</surname>
-                    </personname></author>
-                </authorgroup>
-                <edition>4th</edition>
-                <publisher>
-                    <publishername>Springer Verlag</publishername>
-                </publisher>
-                <pubdate>2000</pubdate>
-                <biblioid class="uri">http://isbn.nu/3540672214</biblioid>
-            </biblioentry>
-            
-            <biblioentry xml:id="Dershowitz" xreflabel="Dershowitz">
-                <title>Calendrical Calculations</title>
-                <authorgroup>
-                    <author><personname>
-                        <firstname>Nachum</firstname>
-                        <surname>Dershowitz</surname>
-                    </personname></author>
-                    <author><personname>
-                        <firstname>Edward</firstname>
-                        <othername>M.</othername>
-                        <surname>Reingold</surname>
-                    </personname></author>
-                </authorgroup>
-                <edition>3rd</edition>
-                <publisher>
-                    <publishername>Cambridge University Press</publishername>
-                </publisher>
-                <pubdate>2008</pubdate>
-                <biblioid class="uri">http://isbn.nu/0521702386</biblioid>
-            </biblioentry>
-
-            <biblioentry xml:id="Dermott" xreflabel="Dermott">
-                <title>Solar System Dynamics</title>
-                <authorgroup>
-                    <author><personname>
-                        <firstname>S.</firstname>
-                        <othername>F.</othername>
-                        <surname>Dermott</surname>
-                    </personname></author>
-                    <author><personname>
-                        <firstname>Carl</firstname>
-                        <othername>D.</othername>
-                        <surname>Murray</surname>
-                    </personname></author>
-                </authorgroup>
-                <publisher>
-                    <publishername>Cambridge University Press</publishername>
-                </publisher>
-                <pubdate>2000</pubdate>
-                <biblioid class="uri">http://isbn.nu/0521575974</biblioid>
-            </biblioentry>
-        </bibliodiv>
-    </bibliography>
-</article>
