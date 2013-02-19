@@ -22,7 +22,7 @@ import org.podval.calendar.astronomy.DayData
 
 object Apogee extends DayData {
 
-  override val values = Map[Days, Angle](
+  override val value = Map[Days, Angle](
     10    -> Angle(0,  0,  1, 30),
     100   -> Angle(0,  0, 15),
     1000  -> Angle(0,  2, 30),
@@ -32,5 +32,5 @@ object Apogee extends DayData {
   )
 
 
-  override val almagest = Angle(0) // TODO
+  override val almagestValue = Angle(0) // TODO
 }

@@ -22,7 +22,7 @@ import org.podval.calendar.astronomy.DayData
 
 object AnomalyMean extends DayData {
 
-  override val values = Map[Days, Angle](
+  override val value = Map[Days, Angle](
     1     -> Angle(13,3,54),
     10    -> Angle(130, 39, 0),
     100   -> Angle(226, 29, 53),
@@ -36,5 +36,5 @@ object AnomalyMean extends DayData {
   val exact_ = Angle(13,3,53,55,49)
 
 
-  override val almagest = Angle(13,3,53,56,17,51,59)
+  override val almagestValue = Angle(13,3,53,56,17,51,59)
 }

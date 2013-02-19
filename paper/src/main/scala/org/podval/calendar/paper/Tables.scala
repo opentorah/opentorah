@@ -29,23 +29,25 @@ object Tables {
   private def dayTables(name: String, data: DayData) = {
 
     val tables = {
-      val days = Column("days", "n", (days: Int) => days)
-      val value = Column("value", "v(n)", (days: Int) => data.values(days))
-      val calculated = Column("calculated", "v(1)*n", (days: Int) => data.value*days)
-      val reconstructed = Column("reconstructed 1-day movement", "r(n)", (days: Int) => data.exactify(days))
-      val recalculated = Column("recalculated", "r(10000)*n", (days: Int) => data.exact*days)
-      val almagest = Column("Alamgest", "*n", (days: Int) => data.almagest*days)
+      val days = Column[Int]("days", "n", (days: Int) => days)
+      val value = Column("value", "v(n)", data.value)
+      val calculated = Column("calculated", "v(1)*n", data.calculated)
+      val reconstructed = Column("reconstructed 1-day movement", "r(n)", data.reconstructed)
+      val recalculated = Column("recalculated", "r(10000)*n", data.recalculated)
+      val recalculated10 = Column("recalculated", "r(10000)*n", data.recalculated10)
+      val almagest = Column("Alamgest", "*n", data.almagest)
 
       List(
         new Columns("original", days, value),
         new Columns("calculated", days, value, calculated),
         new Columns("reconstructed", days, value, reconstructed),
         new Columns("recalculated", days, value, recalculated),
+        new Columns("recalculated10", days, value, recalculated10),
         new Columns("almagest", days, value, almagest)
       )
     }
 
-    tables map (_.tabulate(name, data.values.map(_._1).toList.sorted))
+    tables map (_.tabulate(name, data.keys))
   }
 
 

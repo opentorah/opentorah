@@ -46,13 +46,11 @@
 
                 <xi:include href="../../target/tables/sml-calculated.xml"/>
 
-                <para>
-                    Although the value of the movement of the mean solar longitude in one day given by
-                    <biblioref linkend="Almagest"/> III 1 (H209)
-                    (which, rounded to seconds, becomes Rambam's value) is bigger, it is not big enough,
-                    and Rambam's numbers can not be explained by performing calculations with the long value from Almagest
-                    and then rounding the results.
-                </para>
+                <para> Although the value of the movement of the mean solar longitude in one day
+                    given by <biblioref linkend="Almagest"/> III 1 (H209) (which, rounded to
+                    seconds, becomes Rambam's value) is bigger, it is not big enough, and Rambam's
+                    numbers (for more than 10 days) can not be explained by performing calculations
+                    with the long value from Almagest and then rounding the results. </para>
                 
                 <xi:include href="../../target/tables/sml-almagest.xml"/>
 
@@ -67,12 +65,13 @@
                 </para>
                 
                 <xi:include href="../../target/tables/sml-recalculated.xml"/>
+                <xi:include href="../../target/tables/sml-recalculated10.xml"/>
                 
-                <para>
-                    Values of the movement in one day apparently used by Rambam, if rounded to the seconds, all give the "official" Rambam's value.
-                    Values calculated from the value reconstructed from the printed 10000 days movement, if rounded, produce the values Rambam
-                    published - except for 29 days, 354 days, and 10000 days which we use to calculate the exact value that Rambam used! TODO!
-                </para>
+                <para> Values of the movement in one day apparently used by Rambam, if rounded to
+                    the seconds, give the "official" Rambam's value. Values calculated from the
+                    value reconstructed from the printed 10000 days movement, if rounded, produce
+                    the values Rambam published - except for 29 days, 354 days, and 10000 days which
+                    we use to calculate the exact value that Rambam used! TODO! </para>
             </section>
         </section>
         

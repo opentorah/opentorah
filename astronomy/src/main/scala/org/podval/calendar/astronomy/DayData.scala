@@ -24,20 +24,38 @@ trait DayData {
   type Days = Int
 
 
-  val values: Map[Days, Angle]
+  val value: Map[Days, Angle]
 
 
-  final def value = values(1)
+  final def keys = value.keys.toList.sorted
 
 
-  final def exact = exactify(10000)
+  final def rambamValue = value(1)
 
 
-  def exactify(n: Days) = Angle.fromDegrees(exactify10(n), 6) // 6 60-digits
+  final def calculated(days: Days) = rambamValue*days
 
 
-  def exactify10(n: Days) = Angle.exactify(value, n, values(n))
+  final def exact = reconstructed(10000)
 
 
-  val almagest: Angle
+  final def exact10 = reconstructed10(10000)
+
+
+  final def reconstructed(days: Days) = Angle.fromDegrees(reconstructed10(days), 6) // 6 60-digits
+
+
+  final def reconstructed10(days: Days) = Angle.exactify(rambamValue, days, value(days))
+
+
+  final def recalculated(days: Days) = exact*days
+
+
+  final def recalculated10(days: Days) = Angle.fromDegrees(exact10*days, 6)
+
+
+  val almagestValue: Angle
+
+
+  final def almagest(days: Days) = almagestValue*days
 }

@@ -16,29 +16,21 @@
 
 package org.podval.calendar.astronomy.angle
 
-final class Angle(val degrees: Int, more: List[Int]) extends Ordered[Angle] {
-  checkRange(360)(degrees)
-  more.foreach(checkRange(60))
+final class Angle(val digits: List[Int]) extends Ordered[Angle] {
+  require(!digits.isEmpty)
 
-  private[this] def checkRange(range: Int)(value: Int) {
-    require(value >= 0, "must be non-negative")
-    require(value < range, "must be less than " + range)
+  (digits zip Angle.RANGES) foreach { case (digit, range) =>
+    require(digit >= 0, "must be non-negative")
+    require(digit < range, "must be less than " + range)
   }
 
+  def length = digits.length-1
 
-  def length = more.length
-
-
-  def digits: List[Int] = degrees :: more
-
-
-  def minutes = if (length >= 1) more(0) else 0
-
-
-  def seconds = if (length >= 2) more(1) else 0
-
-
-  def thirds = if (length >= 3) more(2) else 0
+  def degrees = digits.head
+  def more = digits.tail
+  def minutes = if (length >= 1) digits(1) else 0
+  def seconds = if (length >= 2) digits(2) else 0
+  def thirds  = if (length >= 3) digits(3) else 0
 
 
   override def equals(other: Any): Boolean = other match {
@@ -47,7 +39,7 @@ final class Angle(val degrees: Int, more: List[Int]) extends Ordered[Angle] {
   }
 
 
-  override def hashCode = ((41+degrees) /: more) ((v,x) => 41*v+x)
+  override def hashCode = (73 /: digits) ((v,x) => 41*v+x)
 
 
   override def compare(that: Angle) = zip(that) map lift(_.compare(_)) find(_!= 0) getOrElse(0)
@@ -80,7 +72,7 @@ final class Angle(val degrees: Int, more: List[Int]) extends Ordered[Angle] {
     val (more_, toRound) = more splitAt n
     val carry = (toRound :\ 0)((x, c) => if (x + c >= 30) 1 else 0)
 
-    Angle(degrees, more_.init :+ (more_.last + carry))
+    Angle(degrees +: more_.init :+ (more_.last + carry))
   }
 
 
@@ -106,49 +98,51 @@ final class Angle(val degrees: Int, more: List[Int]) extends Ordered[Angle] {
 
 object Angle {
 
-    // In Haskell, this'd be a lazy infinite list; in Scala, it has to be finite.
-    // I thought that we do not need more than Almagest is using, but it seems that we might...
-    val MAX_LENGTH = 100
-    val QUOTIENTS = (1 to MAX_LENGTH) map (n => scala.math.pow(60.0, n))
+  // In Haskell, this'd be a lazy infinite list; in Scala, it has to be finite.
+  // I thought that we do not need more than Almagest is using, but it seems that we might...
+  val MAX_LENGTH = 100
+  val QUOTIENTS = ((1 to MAX_LENGTH) map (n => scala.math.pow(60.0, n)))
+  val RANGES = 360 :: List().padTo(MAX_LENGTH-1, 60)
 
 
-    val SIGNS = List("°", "′", "″", "‴") ++ List().padTo(MAX_LENGTH-3, ",")
+  val SIGNS = List("°", "′", "″", "‴") ++ List().padTo(MAX_LENGTH-3, ",")
 
 
-    def apply(degrees: Int, more: Int*): Angle = apply(degrees, more.toList)
+  def apply(degrees: Int, more: Int*): Angle = apply(degrees, more.toList)
 
 
-    def apply(all: List[Int]): Angle = apply(all.head, all.tail)
+  def apply(degrees: Int, more: List[Int]): Angle = apply(degrees :: more)
 
 
-    def apply(degrees: Int, more: List[Int]): Angle = {
-        val digits = ((degrees :: more) :\ (0, List[Int]()))((x, s) => s match {case (c, r) => val x_ = x+c; (x_ / 60,  x_ :: r)})._2
-
-        def toRange(range: Int)(what: Int): Int = {
-            val result = what % range
-            if (result >= 0) result else result+range
-        }
-
-        new Angle(toRange(360)(digits.head), digits.tail map toRange(60))
+  def apply(digits: List[Int]): Angle = {
+    def step(a: (Int, Int), s: (Int, List[Int])) = {
+      val (digit, range) = a
+      val (carry, result) = s
+      val v = digit + carry
+      val (quotient, reminder) = (v / range, v % range)
+      val (carry_, digit_) = if (v >= 0) (quotient, reminder) else (quotient-1, reminder+range)
+      (carry_, digit_ :: result)
     }
 
+    new Angle(((digits zip RANGES) :\ (0, List[Int]()))(step)._2)
+  }
 
 
-    def asin(value: Double, length: Int): Angle = fromRadians(scala.math.asin(value), length)
+  def asin(value: Double, length: Int): Angle = fromRadians(scala.math.asin(value), length)
 
 
-    def fromRadians(value: Double, length: Int): Angle = fromDegrees(scala.math.toDegrees(value), length)
+  def fromRadians(value: Double, length: Int): Angle = fromDegrees(scala.math.toDegrees(value), length)
 
 
-    def fromDegrees(value: Double, length: Int): Angle = {
-        val digits = value +: ((QUOTIENTS take length) map (q => (value % (60.0/q))/(1.0/q)))
-        Angle((digits.init map (scala.math.floor(_).toInt)).toList :+ scala.math.round(digits.last).toInt)
-    }
+  def fromDegrees(value: Double, length: Int): Angle = {
+    val digits = value +: ((QUOTIENTS take length) map (q => (value % (60.0/q))/(1.0/q)))
+    Angle((digits.init map (scala.math.floor(_).toInt)).toList :+ scala.math.round(digits.last).toInt)
+  }
 
 
-    def exactify(approximate: Angle, days: Int, angle: Angle): Double = {
-        val fullDays = 360.0/approximate.toDegrees
-        val fullRotations = scala.math.floor(days/fullDays).toInt
-        (360.0*fullRotations+angle.toDegrees)/days
-    }
+  def exactify(approximate: Angle, days: Int, angle: Angle): Double = {
+    val fullDays = 360.0/approximate.toDegrees
+    val fullRotations = scala.math.floor(days/fullDays).toInt
+    (360.0*fullRotations+angle.toDegrees)/days
+  }
 }
