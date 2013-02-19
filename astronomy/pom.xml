@@ -11,6 +11,6 @@
     <groupId>org.podval.calendar</groupId>
     <artifactId>org.podval.calendar.astronomy</artifactId>
 
-    <name>Moon Calculations</name>
+    <name>Astronomical Calculations</name>
     <packaging>jar</packaging>
 </project>
