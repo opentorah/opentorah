@@ -70,6 +70,7 @@ final class Table[A](name: String, columns: Seq[Column[A]], rows: List[A]) {
 
 
   def write(directory: File) {
+    println("writing table " + name)
     writeHtml(open(directory, name, "html"))
     writeDocBook(open(directory, name, "xml"))
   }

@@ -22,7 +22,7 @@ import org.podval.calendar.astronomy.angle.Angle
 
 object AnomalyVisible {
 
-    /* Numbers as they are printed in Chapter 15 Law 6 */
+    /* Numbers as they are printed in Law 15:6 */
     val MISPRINTED = Map[Angle, Angle](
         Angle( 10) -> Angle(0, 50),
         Angle( 20) -> Angle(1, 38),
@@ -44,7 +44,7 @@ object AnomalyVisible {
     )
 
 
-    val CORRECT = MISPRINTED ++ Map[Angle, Angle](
+    val VALUES = MISPRINTED ++ Map[Angle, Angle](
         Angle(120) -> Angle(4, 40),
         Angle(150) -> Angle(2, 48),
         Angle(170) -> Angle(0, 59)

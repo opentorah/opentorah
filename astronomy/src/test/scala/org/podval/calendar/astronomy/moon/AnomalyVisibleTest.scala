@@ -31,7 +31,7 @@ class AnomalyVisibleTest {
 
     @Test
     def correct() {
-        test(AnomalyVisible.CORRECT)
+        test(AnomalyVisible.VALUES)
     }
 
 

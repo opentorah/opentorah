@@ -17,16 +17,12 @@
 package org.podval.calendar.astronomy.moon
 
 import org.podval.calendar.astronomy.angle.Angle
+import org.podval.calendar.astronomy.DayData
 
 
-object AnomalyMean {
+object AnomalyMean extends DayData {
 
-  type Days = Int
-
-
-  //    val RambamExact = Angle(13,3,53,55,49)
-  //    val Almagest = Angle(13,3,53,56,17,51,59)
-  val VALUES = List[(Days, Angle)](
+  override val values = Map[Days, Angle](
     1     -> Angle(13,3,54),
     10    -> Angle(130, 39, 0),
     100   -> Angle(226, 29, 53),
@@ -35,4 +31,10 @@ object AnomalyMean {
     29    -> Angle(18, 53, 4),
     354   -> Angle(305, 0, 13)
   )
+
+
+  val exact_ = Angle(13,3,53,55,49)
+
+
+  override val almagest = Angle(13,3,53,56,17,51,59)
 }
