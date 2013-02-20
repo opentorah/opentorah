@@ -16,6 +16,8 @@
 
 package org.podval.calendar.astronomy.sun
 
+import org.podval.calendar.astronomy.angle.Angle
+
 import org.junit.Test
 import org.junit.Assert
 
@@ -31,14 +33,14 @@ class LongitudeMeanTest {
 
   @Test
   def almagestRoundsToRambam {
-    Assert.assertEquals(LongitudeMean.rambamValue, LongitudeMean.almagestValue.roundToSeconds)
+    Assert.assertEquals(LongitudeMean.rambamValue, Angle.roundToSeconds(LongitudeMean.almagestValue))
   }
 
 
   @Test
   def almagestRoundedLessThenPrinted {
     LongitudeMean.keys.foreach{(days: Int) => Assert.assertTrue(days + "days", (days <= 10) ||
-      (LongitudeMean.almagest(days).roundToSeconds < LongitudeMean.value(days)))}
+      (Angle.roundToSeconds(LongitudeMean.almagest(days)) < LongitudeMean.value(days)))}
   }
 
 

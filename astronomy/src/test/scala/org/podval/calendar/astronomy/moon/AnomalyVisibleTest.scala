@@ -41,7 +41,7 @@ class AnomalyVisibleTest {
             val maslul: Angle = row._1
             val mnas: Angle = row._2
             val e: Double = AnomalyVisible.efrommnasround(maslul, mnas)
-            val mnas_ = AnomalyVisible.mnasfrome(maslul, e).roundToMinutes
+            val mnas_ = Angle.roundToMinutes(AnomalyVisible.mnasfrome(maslul, e))
 
             Assert.assertEquals(mnas, mnas_)
         }

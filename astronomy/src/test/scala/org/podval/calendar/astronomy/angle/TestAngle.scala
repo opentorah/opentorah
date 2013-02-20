@@ -57,6 +57,6 @@ class TestAngle {
 
     @Test
     def rounding() {
-        Assert.assertEquals(Angle(104,58,50), Angle(104,58,50,16,39,59,43).roundToSeconds)
+        Assert.assertEquals(Angle(104,58,50), Angle.roundToSeconds(Angle(104,58,50,16,39,59,43)))
     }
 }

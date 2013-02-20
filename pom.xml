@@ -51,6 +51,9 @@
             <id>typesafe</id>
             <name>Typesafe Repository</name>
             <url>http://repo.typesafe.com/typesafe/releases/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
@@ -163,6 +166,15 @@
                             <version>4.3.1</version>
                             <scope>runtime</scope>
                         </dependency>
+
+                        <!-- FOP does not handle MathML; jEuclid is supposed to, but seems
+                        dead, jeuclid-fop is not available through Maven, and iy targets obsolete FOP 0.95 :(
+                        <dependency>
+                            <groupId>net.sourceforge.jeuclid</groupId>
+                            <artifactId>jeuclid-fop</artifactId>
+                            <version>3.1.9</version>
+                        </dependency>
+                        -->
                     </dependencies>
 
                     <executions>

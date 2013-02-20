@@ -16,6 +16,7 @@
 
 package org.podval.calendar.astronomy.angle
 
+
 final class Angle(val digits: List[Int]) extends Ordered[Angle] {
   require(!digits.isEmpty)
 
@@ -24,10 +25,9 @@ final class Angle(val digits: List[Int]) extends Ordered[Angle] {
     require(digit < range, "must be less than " + range)
   }
 
-  def length = digits.length-1
-
   def degrees = digits.head
   def more = digits.tail
+  def length = digits.length-1
   def minutes = if (length >= 1) digits(1) else 0
   def seconds = if (length >= 2) digits(2) else 0
   def thirds  = if (length >= 3) digits(3) else 0
@@ -57,23 +57,8 @@ final class Angle(val digits: List[Int]) extends Ordered[Angle] {
   private[this] def zip(that: Angle) = digits zipAll (that.digits, 0, 0)
 
 
-  private[this] def lift[A, B, C](op: (A, B) => C): (Tuple2[A, B] => C) = p => op(p._1, p._2)
-
-
-  def roundToSeconds(): Angle = roundTo(2)
-
-
-  def roundToMinutes(): Angle = roundTo(1)
-
-
-  def roundTo(n: Int): Angle = {
-    require(n >= 0)
-
-    val (more_, toRound) = more splitAt n
-    val carry = (toRound :\ 0)((x, c) => if (x + c >= 30) 1 else 0)
-
-    Angle(degrees +: more_.init :+ (more_.last + carry))
-  }
+  // XXX use f.tupled instead!!!
+  private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = p => op(p._1, p._2)
 
 
   // TODO: padding
@@ -81,12 +66,6 @@ final class Angle(val digits: List[Int]) extends Ordered[Angle] {
     val tokens = digits map (_.toString) zip Angle.SIGNS flatMap (p => List(p._1, p._2))
     (if (length <= 3) tokens else tokens.init).mkString
   }
-
-
-  def sin(): Double = scala.math.sin(toRadians)
-
-
-  def cos(): Double = scala.math.cos(toRadians)
 
 
   def toRadians: Double = scala.math.toRadians(toDegrees)
@@ -98,6 +77,12 @@ final class Angle(val digits: List[Int]) extends Ordered[Angle] {
 
 object Angle {
 
+  import scala.language.implicitConversions
+
+
+  implicit def angleToRadians(angle: Angle): Double = angle.toRadians
+
+
   // In Haskell, this'd be a lazy infinite list; in Scala, it has to be finite.
   // I thought that we do not need more than Almagest is using, but it seems that we might...
   val MAX_LENGTH = 100
@@ -108,10 +93,7 @@ object Angle {
   val SIGNS = List("°", "′", "″", "‴") ++ List().padTo(MAX_LENGTH-3, ",")
 
 
-  def apply(degrees: Int, more: Int*): Angle = apply(degrees, more.toList)
-
-
-  def apply(degrees: Int, more: List[Int]): Angle = apply(degrees :: more)
+  def apply(degrees: Int, more: Int*): Angle = apply(degrees :: more.toList)
 
 
   def apply(digits: List[Int]): Angle = {
@@ -128,15 +110,28 @@ object Angle {
   }
 
 
-  def asin(value: Double, length: Int): Angle = fromRadians(scala.math.asin(value), length)
-
-
   def fromRadians(value: Double, length: Int): Angle = fromDegrees(scala.math.toDegrees(value), length)
 
 
   def fromDegrees(value: Double, length: Int): Angle = {
     val digits = value +: ((QUOTIENTS take length) map (q => (value % (60.0/q))/(1.0/q)))
     Angle((digits.init map (scala.math.floor(_).toInt)).toList :+ scala.math.round(digits.last).toInt)
+  }
+
+
+  def roundToSeconds(angle: Angle): Angle = roundTo(angle, 2)
+
+
+  def roundToMinutes(angle: Angle): Angle = roundTo(angle, 1)
+
+
+  def roundTo(angle: Angle, n: Int): Angle = {
+    require(n >= 0)
+
+    val (more_, toRound) = angle.more splitAt n
+    val carry = (toRound :\ 0)((x, c) => if (x + c >= 30) 1 else 0)
+
+    Angle(angle.degrees +: more_.init :+ (more_.last + carry))
   }
 
 

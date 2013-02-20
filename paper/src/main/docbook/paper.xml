@@ -386,5 +386,35 @@
                 <biblioid class="uri">http://isbn.nu/0521575974</biblioid>
             </biblioentry>
         </bibliodiv>
+
+        <bibliodiv>
+            <title>On Jewish Calendar</title>
+
+            <biblioentry>
+                <title>Understanding the Jewish Calendar</title>
+                <author><personname>
+                    <firstname>Nathan</firstname>
+                    <surname>Bushwick</surname>
+                </personname></author>
+                <publisher>
+                    <publishername>Moznaim</publishername>
+                </publisher>
+                <pubdate>February 1, 1989</pubdate>
+                <biblioid class="uri">http://isbn.nu/0940118173</biblioid>
+            </biblioentry>
+
+            <biblioentry>
+                <title>The Hebrew Calendar</title>
+                <author><personname>
+                    <honorific>Dr</honorific>
+                    <firstname>Irv</firstname>
+                    <surname>Bromberg</surname>
+                </personname></author>
+                <publisher>
+                    <publishername>University of Toronto, Canada</publishername>
+                </publisher>
+                <biblioid class="uri">http://www.sym454.org/hebrew</biblioid>
+            </biblioentry>
+        </bibliodiv>
     </bibliography>
 </article>

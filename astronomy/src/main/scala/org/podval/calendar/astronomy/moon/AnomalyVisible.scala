@@ -18,6 +18,7 @@ package org.podval.calendar.astronomy.moon
 
 import scala.collection.immutable.Map
 import org.podval.calendar.astronomy.angle.Angle
+import scala.math.{sin, cos, asin, sqrt, abs, pow, round}
 
 
 object AnomalyVisible {
@@ -51,19 +52,17 @@ object AnomalyVisible {
     )
 
 
-    def mnasfrome(maslul: Angle, e: Double): Angle =
-        Angle.asin(maslul.sin()/scala.math.sqrt(e*e + 2*e*maslul.cos() + 1), 1)
+    def mnasfrome(maslul: Angle, e: Double): Angle =  Angle.fromRadians(asin(sin(maslul)/sqrt(e*e + 2*e*cos(maslul) + 1)), 1)
 
 
-    def efrommnas(maslul: Angle, mnas: Angle): Double =
-        maslul.sin()/mnas.sin()*scala.math.abs(mnas.cos())-maslul.cos()
+    def efrommnas(maslul: Angle, mnas: Angle): Double = sin(maslul)/sin(mnas)*abs(cos(mnas))-cos(maslul)
 
 
-    def efrommnasround(maslul: Angle, mnas: Angle): Double = round(efrommnas(maslul, mnas), 2)
+    def efrommnasround(maslul: Angle, mnas: Angle): Double = roundTo(efrommnas(maslul, mnas), 2)
 
 
-    private def round(value: Double, digits: Int): Double = {
-        val quotient = scala.math.pow(10, digits)
-        scala.math.round(value*quotient)/quotient
+    private def roundTo(value: Double, digits: Int): Double = {
+        val quotient = pow(10, digits)
+        round(value*quotient)/quotient
     }
 }
