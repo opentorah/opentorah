@@ -15,6 +15,10 @@
 
     <name>Rambam on Calendar Paper</name>
 
+    <properties>
+        <tables.directory>${project.build.directory}/tables</tables.directory>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.podval.calendar</groupId>
@@ -39,7 +43,7 @@
                 <configuration>
                     <mainClass>org.podval.calendar.paper.Tables</mainClass>
                     <arguments>
-                        <argument>${project.build.directory}/tables</argument>
+                        <argument>${tables.directory}</argument>
                     </arguments>
                 </configuration>            
             </plugin>
@@ -49,15 +53,34 @@
                 <artifactId>docbkx-maven-plugin</artifactId>
 
                 <configuration>
-                    <xincludeSupported>true</xincludeSupported>
-                    <generatedSourceDirectory>${basedir}/target/tables</generatedSourceDirectory>
+                    <sourceDirectory>src/main/docbook</sourceDirectory>
+                    <targetDirectory>${project.build.directory}/docbook</targetDirectory>
 
                     <includes>paper.xml</includes>
+
+                    <xincludeSupported>true</xincludeSupported>
+                    <generatedSourceDirectory>${tables.directory}</generatedSourceDirectory>
 
                     <bodyFontFamily>DejaVuSans</bodyFontFamily>
                     <tocSectionDepth>4</tocSectionDepth>
 
+                    <chunkedOutput>true</chunkedOutput>
+                    <chunkerOutputEncoding>UTF-8</chunkerOutputEncoding>
+                    <chunkerOutputIndent>yes</chunkerOutputIndent>
+
                     <externalFOPConfiguration>src/main/resources/fop.xconf</externalFOPConfiguration>
+
+                    <entities>
+                        <entity>
+                            <name>version</name>
+                            <value>${project.version}</value>
+                        </entity>
+                        <!-- I'd rather use an entity &tables-directory; in my DocBook, but how do I tell oXygen that it is "../../../target/tables" ?! -->
+                        <entity>
+                            <name>tables-directory</name>
+                            <value>${tables.directory}</value>
+                        </entity>
+                    </entities>
                 </configuration>
             </plugin>
         </plugins>
