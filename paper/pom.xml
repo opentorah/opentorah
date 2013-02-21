@@ -62,11 +62,28 @@
                     <generatedSourceDirectory>${tables.directory}</generatedSourceDirectory>
 
                     <bodyFontFamily>DejaVuSans</bodyFontFamily>
+                    <titleFontFamily>DejaVuSerif</titleFontFamily>
+                    <monospaceFontFamily>DejaVuMono</monospaceFontFamily>
+
                     <tocSectionDepth>4</tocSectionDepth>
+
+                    <!-- Common -->
+                    <partAutolabel>yes</partAutolabel>
+                    <chapterAutolabel>yes</chapterAutolabel>
+                    <sectionAutolabel>yes</sectionAutolabel>
+                    <sectionAutolabelMaxDepth>6</sectionAutolabelMaxDepth>
+                    <appendixAutolabel>yes</appendixAutolabel>
+
+                    <!-- HTML -->
+                    <paraPropagatesStyle>yes</paraPropagatesStyle> <!-- "role" attribute on "para" will become "class" in HTML -->
 
                     <chunkedOutput>true</chunkedOutput>
                     <chunkerOutputEncoding>UTF-8</chunkerOutputEncoding>
                     <chunkerOutputIndent>yes</chunkerOutputIndent>
+
+                    <!-- PDF -->
+                    <insertXrefPageNumber>yes</insertXrefPageNumber>
+                    <doubleSided>yes</doubleSided>
 
                     <externalFOPConfiguration>src/main/resources/fop.xconf</externalFOPConfiguration>
 

@@ -2,7 +2,7 @@
 <?xml-model href="http://docbook.org/xml/5.0/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <?xml-model href="http://docbook.org/xml/5.0/rng/docbook.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://www.oxygenxml.com/docbook/xml/5.0/rng/dbmathmlsvg.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:base="../../../target/tables/">
     <title>Lunar Theory</title>
 
         <section>
@@ -29,7 +29,7 @@
 
                 <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
 
-                <xi:include href="../../../target/tables/mml-original.xml"/>
+                <xi:include href="mml-original.xml"/>
 
                 <para>
                     And in this way you can calculate it for any number of days and years that you want.
@@ -47,7 +47,7 @@
                         the result is smaller than that of Rambam.
                         The following table compares printed and calculated values:</para>
 
-                    <xi:include href="../../../target/tables/mml-calculated.xml"/>
+                    <xi:include href="mml-calculated.xml"/>
 
                     <para>
                         Moreover, the value of the movement of the mean lunar longitude in one day given by
@@ -61,13 +61,13 @@
                         From the printed values it is possible to reconstruct the value of the
                         movement in mean lunar longitude in one day that Rambam used to calculate each of them:</para>
 
-                    <xi:include href="../../../target/tables/mml-reconstructed.xml"/>
+                    <xi:include href="mml-reconstructed.xml"/>
 
                     <para>
                         Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
                     </para>
                 
-                    <xi:include href="../../../target/tables/mml-recalculated.xml"/>
+                    <xi:include href="mml-recalculated.xml"/>
 
                     <para>
                         Values of the movement in one day apparently used by Rambam, if rounded to the seconds, all give the "official" Rambam's value.
@@ -86,7 +86,7 @@
                     For longer periods, (remainder) of the movement in mean lunar anomaly is:
                 </para>
 
-                <xi:include href="../../../target/tables/mma-original.xml"/>
+                <xi:include href="mma-original.xml"/>
 
                 <section>
                     <title>Discussion</title>
@@ -102,7 +102,7 @@
                         The following table compares printed and calculated values:
                     </para>
                 
-                    <xi:include href="../../../target/tables/mma-calculated.xml"/>
+                    <xi:include href="mma-calculated.xml"/>
 
                     <para>
                         Although the value of the movement of the mean lunar anomaly in one day given by
@@ -117,13 +117,13 @@
                         From the printed values it is possible to reconstruct the value of the
                         movement in mean lunar anomaly in one day that Rambam used to calculate each of them:</para>
                 
-                    <xi:include href="../../../target/tables/mma-reconstructed.xml"/>
+                    <xi:include href="mma-reconstructed.xml"/>
                 
                     <para>
                         Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
                     </para>
                 
-                    <xi:include href="../../../target/tables/mma-recalculated.xml"/>
+                    <xi:include href="mma-recalculated.xml"/>
 
                     <para>
                         Values of the movement in one day apparently used by Rambam, if rounded to the seconds, all give the "official" Rambam's value.
@@ -378,7 +378,7 @@
                     anomaly for a given value of the corrected anomaly?
                 </para>
 
-                <xi:include href="../../../target/tables/mva-original.xml"/>
+                <xi:include href="mva-original.xml"/>
 
                 <section>
                     <title>Discussion</title>
@@ -431,7 +431,7 @@
                         for the rest of them.
                     </para>
 
-                    <xi:include href="../../../target/tables/mva-withe.xml"/>
+                    <xi:include href="mva-withe.xml"/>
                     
                     <para>
                         TODO Range of e - graph. Range of possible values for each based on the range of e.
