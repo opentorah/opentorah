@@ -24,7 +24,7 @@ class TimeT protected (val hours: Int, val parts: Int) extends Ordered[TimeT] {
 
 
     final override def equals(other: Any): Boolean = other match {
-        case that: Time => this.allParts == that.allParts
+        case that: TimeT => this.allParts == that.allParts
         case _ => false
     }
 

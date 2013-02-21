@@ -60,7 +60,6 @@
     <modules>
         <module>dates</module>
         <module>ical</module>
-        <module>app-servlet</module>
         <module>astronomy</module>
         <module>paper</module>
     </modules>

@@ -2,8 +2,7 @@
 <?xml-model href="http://docbook.org/xml/5.0/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <?xml-model href="http://docbook.org/xml/5.0/rng/docbook.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://www.oxygenxml.com/docbook/xml/5.0/rng/dbmathmlsvg.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:base="../../../target/tables/">
     <title>Solar Theory</title>
     
     <section>
@@ -19,7 +18,7 @@
             
             <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
             
-            <xi:include href="../../../target/tables/sml-original.xml"/>
+            <xi:include href="sml-original.xml"/>
             
             <para>
                 And in this way you can calculate it for any number of days and years that you want.
@@ -44,7 +43,7 @@
                     smaller than that of Rambam. The following table compares printed and calculated
                     values:</para>
 
-                <xi:include href="../../../target/tables/sml-calculated.xml"/>
+                <xi:include href="sml-calculated.xml"/>
 
                 <para> Although the value of the movement of the mean solar longitude in one day
                     given by <biblioref linkend="Almagest"/> III 1 (H209) (which, rounded to
@@ -52,20 +51,20 @@
                     numbers (for more than 10 days) can not be explained by performing calculations
                     with the long value from Almagest and then rounding the results. </para>
                 
-                <xi:include href="../../../target/tables/sml-almagest.xml"/>
+                <xi:include href="sml-almagest.xml"/>
 
                 <para>
                     From the printed values it is possible to reconstruct the value of the
                     movement in mean solar longitude in one day that Rambam used to calculate each of them:</para>
                 
-                <xi:include href="../../../target/tables/sml-reconstructed.xml"/>
+                <xi:include href="sml-reconstructed.xml"/>
                 
                 <para>
                     Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
                 </para>
                 
-                <xi:include href="../../../target/tables/sml-recalculated.xml"/>
-                <xi:include href="../../../target/tables/sml-recalculated10.xml"/>
+                <xi:include href="sml-recalculated.xml"/>
+                <xi:include href="sml-recalculated10.xml"/>
                 
                 <para> Values of the movement in one day apparently used by Rambam, if rounded to
                     the seconds, give the "official" Rambam's value. Values calculated from the
