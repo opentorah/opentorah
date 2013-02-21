@@ -19,19 +19,19 @@ package org.podval.calendar.dates
 
 trait CalendarBase {
 
-  type Y <: YearBase
+  type Year <: YearBase
 
 
-  type M <: MonthBase
+  type Month <: MonthBase
 
 
-  type D <: DayBase
+  type Day <: DayBase
 
 
-  type O <: MomentBase
+  type Moment <: MomentBase
 
 
-  type T <: TimeBase
+  type Time <: TimeBase
 
 
   type MonthName
@@ -39,19 +39,19 @@ trait CalendarBase {
 
   trait Creator {
 
-    def year(number: Int): Y
+    def year(number: Int): Year
 
 
-    def month(number: Int): M
+    def month(number: Int): Month
 
 
-    def day(number: Int): D
+    def day(number: Int): Day
 
 
-    def moment(day: Int, time: T): O
+    def moment(day: Int, time: Time): Moment
 
 
-    def time(hours: Int, parts: Int): T
+    def time(hours: Int, parts: Int): Time
   }
 
 
@@ -63,10 +63,10 @@ trait CalendarBase {
 
   abstract class YearBase(number: Int) extends Numbered[YearBase](number) {
 
-    final def next: Y = creator.year(number + 1)
+    final def next: Year = creator.year(number + 1)
 
 
-    final def prev: Y = creator.year(number - 1)
+    final def prev: Year = creator.year(number - 1)
 
 
     def isLeap: Boolean
@@ -84,16 +84,16 @@ trait CalendarBase {
     def lengthInMonths: Int
 
 
-    final def month(numberInYear: Int): M = {
+    final def month(numberInYear /* XXX name monthOfYear, like others? */: Int): Month = {
       require(0 < numberInYear && numberInYear <= lengthInMonths)
       creator.month(firstMonth + numberInYear - 1)
     }
 
 
-    final def month(name: MonthName): M = month(months.indexWhere(_.name == name) + 1)
+    final def month(name: MonthName): Month = month(months.indexWhere(_.name == name) + 1)
 
 
-    final def month(day: D): M = {
+    final def month(day: Day): Month = {
       require(0 < day.dayOfYear && day.dayOfYear <= lengthInDays)
       month(months.count(_.daysBefore < day.dayOfYear))
     }
@@ -106,13 +106,22 @@ trait CalendarBase {
 
   abstract class MonthBase(number: Int) extends Numbered[MonthBase](number) {
 
-    def year: Y
+    require(0 < number)
+
+
+    final def next: Month = creator.month(number + 1)
+
+
+    final def prev: Month = creator.month(number - 1)
+
+
+    def year: Year
 
 
     def numberInYear: Int
 
 
-    final def day(day: Int): D = {
+    final def day(day: Int): Day = {
       require (0 < day && day <= length)
       creator.day(firstDay + day - 1)
     }
@@ -131,18 +140,18 @@ trait CalendarBase {
   }
 
 
-  abstract class DayBase(number: Int) extends Numbered[DayBase](number) {
+  abstract class DayBase(number: Int) extends Numbered[DayBase](number) { this: Day =>
 
     require(0 < number)
 
 
-    final def next: D = creator.day(number + 1)
+    final def next: Day = creator.day(number + 1)
 
 
-    final def prev: D = creator.day(number - 1)
+    final def prev: Day = creator.day(number - 1)
 
 
-    def dayOfWeek: Int
+    def dayOfWeek: Int // XXX implement and make final!
 
 
     final def dayOfMonth: Int = number - month.firstDay + 1
@@ -151,23 +160,23 @@ trait CalendarBase {
     final def dayOfYear: Int = number - year.firstDay + 1
 
 
-    def year: Y
+    def year: Year
 
 
-    /* XXX final*/ def month: M // XXX = year.month(this)
+    final def month: Month = year.month(this)
 
 
-    final def time(time: T): O = creator.moment(number - 1, time)
+    final def time(time: Time): Moment = creator.moment(number - 1, time)
 
 
-    final def time(hours: Int, parts: Int): O = time(creator.time(hours, parts))
+    final def time(hours: Int, parts: Int): Moment = time(creator.time(hours, parts))
 
 
     final def toFullString: String = year + " " + month.name + " " + dayOfMonth
   }
 
 
-  abstract class MomentBase(val days: Int, val time: T) extends Ordered[MomentBase] {
+  abstract class MomentBase(val days: Int, val time: Time) extends Ordered[MomentBase] {
 
     final override def equals(other: Any): Boolean = other match {
       case that: MomentBase => (days == that.days) && (time == that.time)
@@ -184,37 +193,41 @@ trait CalendarBase {
     }
 
 
-    final def day: D = creator.day(days+1)
+    final def day: Day = creator.day(days+1)
 
 
-    final override def toString: String = (days + 1) + " " + time.toString
+    final override def toString: String = (days+1) /* XXX day? */ + " " + time.toString
 
 
     final def toFullString: String = day.toFullString + " " + time.toFullString
 
 
-    final def +(other: O) = normalize(
+    final def +(other: Moment) = normalize(
       days + other.days,
       time.hours + other.time.hours,
       time.parts + other.time.parts
     )
 
 
-    final def *(n: Int): O = normalize(
+    final def *(n: Int): Moment = normalize(
       days * n,
       time.hours * n,
       time.parts * n
     )
 
 
-    private[this] def normalize(days: Int, hours: Int, parts: Int): O = {
+    private[this] def normalize(days: Int, hours: Int, parts: Int): Moment = {
       require(0 <= days)
       require(0 <= hours)
       require(0 <= parts)
 
       val hours_ = hours + parts / TimeBase.PartsPerHour
 
-      creator.moment(days + hours_ / TimeBase.HoursPerDay, creator.time(hours_ % TimeBase.HoursPerDay, parts % TimeBase.PartsPerHour))
+      creator.moment(
+        days + hours_ / TimeBase.HoursPerDay,
+        creator.time(
+          hours_ % TimeBase.HoursPerDay,
+          parts % TimeBase.PartsPerHour))
     }
   }
 
@@ -240,7 +253,7 @@ trait CalendarBase {
     final def isZero = (hours == 0) && (parts == 0)
 
 
-    final def allParts = hours*TimeBase.PartsPerHour + parts
+    final def allParts /* XXX toParts? asParts? */ = hours*TimeBase.PartsPerHour + parts
 
 
     final def minutes: Int = parts / TimeBase.PartsPerMinute

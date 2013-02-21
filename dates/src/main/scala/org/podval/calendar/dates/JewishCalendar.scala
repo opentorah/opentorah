@@ -18,21 +18,6 @@ package org.podval.calendar.dates
 
 trait JewishCalendar extends CalendarBase {
 
-  type Y = Year
-
-
-  type M = Month
-
-
-  type D = Day
-
-
-  type O = Moment
-
-
-  type T = Time
-
-
   sealed trait MonthName
   case object Tishrei    extends MonthName
   case object Marheshvan extends MonthName
@@ -58,7 +43,7 @@ trait JewishCalendar extends CalendarBase {
   case object Full    extends YearKind
 
 
-  val creator: Creator = new Creator {
+  override val creator: Creator = new Creator {
 
     def year(number: Int): Year = Year(number)
 
@@ -236,7 +221,7 @@ trait JewishCalendar extends CalendarBase {
     require(0 < number)
 
 
-    override def year: Y = Year(this)
+    override def year: Year = Year(this)
 
 
     override def numberInYear: Int = numberInCycle - year.firstMonthInCycle + 1
@@ -273,10 +258,7 @@ trait JewishCalendar extends CalendarBase {
     override def dayOfWeek: Int = Day.dayOfWeek(number)
 
 
-    override def year: Y = Year(this)
-
-
-    override /* XXX final*/ def month: M = year.month(this) // XXX = year.month(this)
+    override def year: Year = Year(this)
 
 
     def nightTime(hours: Int, parts: Int): Moment = time(Time.nightTime(hours, parts))
@@ -302,7 +284,7 @@ trait JewishCalendar extends CalendarBase {
   }
 
 
-  final class Moment private(days: Int, time: T) extends MomentBase(days, time)
+  final class Moment private(days: Int, time: Time) extends MomentBase(days, time)
 
 
   object Moment {
