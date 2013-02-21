@@ -43,25 +43,7 @@ trait JewishCalendar extends CalendarBase {
   case object Full    extends YearKind
 
 
-  override val creator: Creator = new Creator {
-
-    def year(number: Int): Year = Year(number)
-
-
-    def month(number: Int): Month = Month(number)
-
-
-    def day(number: Int): Day = Day(number)
-
-
-    def moment(day: Int, time: Time): Moment = Moment(day, time)
-
-
-    def time(hours: Int, parts: Int): Time = Time(hours, parts)
-  }
-
-
-  final class Year private (number: Int) extends YearBase(number) {
+  final class Year(number: Int) extends YearBase(number) {
 
     require(0 < number)
 
@@ -94,9 +76,6 @@ trait JewishCalendar extends CalendarBase {
     override def lengthInMonths: Int = Year.lengthInMonths(numberInCycle)
 
 
-    override def months: List[MonthDescriptor] = Year.months(this)
-
-
     def cycle: Int = ((number - 1) / Year.YearsInCycle) + 1
 
 
@@ -120,7 +99,27 @@ trait JewishCalendar extends CalendarBase {
   }
 
 
-  object Year {
+  object Year extends YearCompanion {
+
+    override def apply(number: Int): Year = new Year(number)
+
+
+    override def apply(month: Month): Year = {
+      val yearsBeforeCycle = (month.cycle - 1)*YearsInCycle
+      val yearMonthIsInCycle = MonthsBeforeYearInCycle.count(_ < month.numberInCycle)
+      Year(yearsBeforeCycle + yearMonthIsInCycle)
+    }
+
+
+    override def apply(day: Day): Year = {
+      // TODO give names to constants
+      val yearForSureNotAfter = (4 * day.number / (4 * 365 + 1)) - 1
+      var result = Year(scala.math.max(1, yearForSureNotAfter))
+      require(result.firstDay <= day.number)
+      while (result.next.firstDay <= day.number) result = result.next
+      result
+    }
+
 
     private val YearsInCycle = 19
 
@@ -152,15 +151,28 @@ trait JewishCalendar extends CalendarBase {
     private def isAdu(day: Day) = Adu.contains(day.dayOfWeek)
 
 
-    def months(year: Year): List[MonthDescriptor] = null // XXX XXXXX Months(year.isLeap)(year.kind)
+    def months(year: Year): List[MonthDescriptor] = {
+      val kind = year.kind
+      val isLeap = year.isLeap
+
+      (kind, isLeap) match {
+        case (Short, false) => shortMonths
+        case (Short, true) => shortLeapMonths
+        case (Regular, false) => regularMonths
+        case (Regular, true) => regularLeapMonths
+        case (Full, false) => fullMonths
+        case (Full, true) => fullLeapMonths
+      }
+    }
 
 
-    private val Months = //: Map[Boolean, Map[YearKind, List[MonthDescriptor]]] =
-      Map(Seq(true, false).map(isLeap =>
-        isLeap -> Map(Seq(Short, Regular, Full).map(kind =>
-          kind -> months(kind, isLeap)
-        ): _*)
-      ): _*)
+    // XXX redo using a Map[(kind, isLeap), Seq[MonthDescriptor]]?
+    private val shortMonths: List[MonthDescriptor] = months(Short, false)
+    private val shortLeapMonths: List[MonthDescriptor] = months(Short, true)
+    private val regularMonths: List[MonthDescriptor] = months(Regular, false)
+    private val regularLeapMonths: List[MonthDescriptor] = months(Regular, true)
+    private val fullMonths: List[MonthDescriptor] = months(Full, false)
+    private val fullLeapMonths: List[MonthDescriptor] = months(Full, true)
 
 
     private def months(kind: YearKind, isLeap: Boolean): List[MonthDescriptor] = {
@@ -172,7 +184,6 @@ trait JewishCalendar extends CalendarBase {
 
 
     private def namesAndLengths(kind: YearKind, isLeap: Boolean) = {
-
       List(
         (Tishrei, 30),
         (Marheshvan, if (kind == Full) 30 else 29),
@@ -193,30 +204,13 @@ trait JewishCalendar extends CalendarBase {
           (Elul, 29)
         )
     }
-
-
-    def apply(number: Int): Year = new Year(number)
-
-
-    def apply(month: Month): Year = {
-      val yearsBeforeCycle = (month.cycle - 1)*YearsInCycle
-      val yearMonthIsInCycle = MonthsBeforeYearInCycle.count(_ < month.numberInCycle)
-      Year(yearsBeforeCycle + yearMonthIsInCycle)
-    }
-
-
-    def apply(day: Day): Year = {
-      // TODO give names to constants
-      val yearForSureNotAfter = (4 * day.number / (4 * 365 + 1)) - 1
-      var result = Year(scala.math.max(1, yearForSureNotAfter))
-      require(result.firstDay <= day.number)
-      while (result.next.firstDay <= day.number) result = result.next
-      result
-    }
   }
 
 
-  final class Month private (number: Int) extends MonthBase(number) {
+  override protected val yearCompanion = Year
+
+
+  final class Month(number: Int) extends MonthBase(number) {
 
     require(0 < number)
 
@@ -238,7 +232,10 @@ trait JewishCalendar extends CalendarBase {
   }
 
 
-  object Month {
+  object Month extends MonthCompanion {
+
+    override def apply(number: Int): Month = new Month(number)
+
 
     // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3 )
     val MeanLunarPeriod = Day(30).time(12, 793)
@@ -247,13 +244,13 @@ trait JewishCalendar extends CalendarBase {
     // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2):
     // BeHaRaD: 5 hours 204 parts at night of the second day (KH 6:8)
     val FirstNewMoon = Day(2).nightTime(5, 204)
-
-
-    def apply(number: Int): Month = new Month(number)
   }
 
 
-  final class Day private (number: Int) extends DayBase(number) {
+  override protected val monthCompanion = Month
+
+
+  final class Day(number: Int) extends DayBase(number) {
 
     override def dayOfWeek: Int = Day.dayOfWeek(number)
 
@@ -268,37 +265,36 @@ trait JewishCalendar extends CalendarBase {
   }
 
 
-  object Day {
+  object Day extends DayCompanion {
 
-    // It seems that first day of the first year was Sunday.
-    val FirstDayDayOfWeek = 1
-
-
-    val DaysPerWeek = 7
+    override def apply(number: Int): Day = new Day(number)
 
 
     def dayOfWeek(day: Int): Int = ((day + FirstDayDayOfWeek - 1 - 1) % DaysPerWeek) + 1
-
-
-    def apply(number: Int): Day = new Day(number)
   }
 
 
-  final class Moment private(days: Int, time: Time) extends MomentBase(days, time)
+  override protected val dayCompanion = Day
 
 
-  object Moment {
+  final class Moment(days: Int, time: Time) extends MomentBase(days, time)
 
-    def apply(days: Int, time: Time): Moment = new Moment(days, time)
+
+  object Moment extends MomentCompanion {
+
+    override def apply(days: Int, time: Time): Moment = new Moment(days, time)
   }
 
 
-  final class Time private (hours: Int, parts: Int) extends TimeBase(hours, parts)
+  override protected val momentCompanion = Moment
 
 
-  object Time {
+  final class Time(hours: Int, parts: Int) extends TimeBase(hours, parts)
 
-    def apply(hours: Int, parts: Int) = new Time(hours, parts)
+
+  object Time extends TimeCompanion {
+
+    override def apply(hours: Int, parts: Int) = new Time(hours, parts)
 
 
     def nightTime(hours: Int, parts: Int) = {
@@ -312,4 +308,7 @@ trait JewishCalendar extends CalendarBase {
       Time(hours + TimeT.HoursPerHalfDay, parts)
     }
   }
+
+
+  override protected val timeCompanion = Time
 }

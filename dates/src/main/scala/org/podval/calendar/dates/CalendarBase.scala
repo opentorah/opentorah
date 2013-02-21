@@ -19,6 +19,7 @@ package org.podval.calendar.dates
 
 trait CalendarBase {
 
+  // Instead of "Y" here and type Y = Year in the subtrait, I use "Year" here and just define "Year" in the subtrate. Beaty!
   type Year <: YearBase
 
 
@@ -37,36 +38,15 @@ trait CalendarBase {
   type MonthName
 
 
-  trait Creator {
-
-    def year(number: Int): Year
-
-
-    def month(number: Int): Month
-
-
-    def day(number: Int): Day
-
-
-    def moment(day: Int, time: Time): Moment
-
-
-    def time(hours: Int, parts: Int): Time
-  }
-
-
-  val creator: Creator
-
-
   final class MonthDescriptor(val name: MonthName, val length: Int, val daysBefore: Int)
 
 
-  abstract class YearBase(number: Int) extends Numbered[YearBase](number) {
+  abstract class YearBase(number: Int) extends Numbered[YearBase](number) { self: Year =>
 
-    final def next: Year = creator.year(number + 1)
+    final def next: Year = yearCompanion(number + 1)
 
 
-    final def prev: Year = creator.year(number - 1)
+    final def prev: Year = yearCompanion(number - 1)
 
 
     def isLeap: Boolean
@@ -86,7 +66,7 @@ trait CalendarBase {
 
     final def month(numberInYear /* XXX name monthOfYear, like others? */: Int): Month = {
       require(0 < numberInYear && numberInYear <= lengthInMonths)
-      creator.month(firstMonth + numberInYear - 1)
+      monthCompanion(firstMonth + numberInYear - 1)
     }
 
 
@@ -99,20 +79,37 @@ trait CalendarBase {
     }
 
 
-    def months: List[MonthDescriptor]
+    final def months: List[MonthDescriptor] = yearCompanion.months(this)
   }
 
 
+  protected abstract class YearCompanion {
 
-  abstract class MonthBase(number: Int) extends Numbered[MonthBase](number) {
+    def apply(number: Int): Year
+
+
+    def apply(month: Month): Year
+
+
+    def apply(day: Day): Year
+
+
+    def months(year: Year): List[MonthDescriptor]
+  }
+
+
+  protected val yearCompanion: YearCompanion
+
+
+  abstract class MonthBase(number: Int) extends Numbered[MonthBase](number) { self: Month =>
 
     require(0 < number)
 
 
-    final def next: Month = creator.month(number + 1)
+    final def next: Month = monthCompanion(number + 1)
 
 
-    final def prev: Month = creator.month(number - 1)
+    final def prev: Month = monthCompanion(number - 1)
 
 
     def year: Year
@@ -123,7 +120,7 @@ trait CalendarBase {
 
     final def day(day: Int): Day = {
       require (0 < day && day <= length)
-      creator.day(firstDay + day - 1)
+      dayCompanion(firstDay + day - 1)
     }
 
 
@@ -140,18 +137,27 @@ trait CalendarBase {
   }
 
 
+  protected abstract class MonthCompanion {
+
+    def apply(number: Int): Month
+  }
+
+
+  protected val monthCompanion: MonthCompanion
+
+
   abstract class DayBase(number: Int) extends Numbered[DayBase](number) { this: Day =>
 
     require(0 < number)
 
 
-    final def next: Day = creator.day(number + 1)
+    final def next: Day = dayCompanion(number + 1)
 
 
-    final def prev: Day = creator.day(number - 1)
+    final def prev: Day = dayCompanion(number - 1)
 
 
-    def dayOfWeek: Int // XXX implement and make final!
+    def dayOfWeek: Int
 
 
     final def dayOfMonth: Int = number - month.firstDay + 1
@@ -166,17 +172,33 @@ trait CalendarBase {
     final def month: Month = year.month(this)
 
 
-    final def time(time: Time): Moment = creator.moment(number - 1, time)
+    final def time(time: Time): Moment = momentCompanion(number - 1, time)
 
 
-    final def time(hours: Int, parts: Int): Moment = time(creator.time(hours, parts))
+    final def time(hours: Int, parts: Int): Moment = time(timeCompanion(hours, parts))
 
 
     final def toFullString: String = year + " " + month.name + " " + dayOfMonth
   }
 
 
-  abstract class MomentBase(val days: Int, val time: Time) extends Ordered[MomentBase] {
+  protected abstract class DayCompanion {
+
+    def apply(number: Int): Day
+
+
+    // It seems that first day of the first year was Sunday.
+    val FirstDayDayOfWeek = 1
+
+
+    val DaysPerWeek = 7
+  }
+
+
+  protected val dayCompanion: DayCompanion
+
+
+  abstract class MomentBase(val days: Int, val time: Time) extends Ordered[MomentBase] { self: Moment =>
 
     final override def equals(other: Any): Boolean = other match {
       case that: MomentBase => (days == that.days) && (time == that.time)
@@ -193,7 +215,7 @@ trait CalendarBase {
     }
 
 
-    final def day: Day = creator.day(days+1)
+    final def day: Day = dayCompanion(days+1)
 
 
     final override def toString: String = (days+1) /* XXX day? */ + " " + time.toString
@@ -221,21 +243,30 @@ trait CalendarBase {
       require(0 <= hours)
       require(0 <= parts)
 
-      val hours_ = hours + parts / TimeBase.PartsPerHour
+      val hours_ = hours + parts / timeCompanion.PartsPerHour
 
-      creator.moment(
-        days + hours_ / TimeBase.HoursPerDay,
-        creator.time(
-          hours_ % TimeBase.HoursPerDay,
-          parts % TimeBase.PartsPerHour))
+      momentCompanion(
+        days + hours_ / timeCompanion.HoursPerDay,
+        timeCompanion(
+          hours_ % timeCompanion.HoursPerDay,
+          parts % timeCompanion.PartsPerHour))
     }
   }
 
 
-  abstract class TimeBase(val hours: Int, val parts: Int) extends Ordered[TimeBase] {
+  protected abstract class MomentCompanion {
 
-    require(0 <= hours && hours < TimeBase.HoursPerDay)
-    require(0 <= parts && parts < TimeBase.PartsPerHour)
+    def apply(days: Int, time: Time): Moment
+  }
+
+
+  protected val momentCompanion: MomentCompanion
+
+
+  abstract class TimeBase(val hours: Int, val parts: Int) extends Ordered[TimeBase] { self: Time =>
+
+    require(0 <= hours && hours < timeCompanion.HoursPerDay)
+    require(0 <= parts && parts < timeCompanion.PartsPerHour)
 
 
     final override def equals(other: Any): Boolean = other match {
@@ -253,13 +284,13 @@ trait CalendarBase {
     final def isZero = (hours == 0) && (parts == 0)
 
 
-    final def allParts /* XXX toParts? asParts? */ = hours*TimeBase.PartsPerHour + parts
+    final def allParts /* XXX toParts? asParts? */ = hours*timeCompanion.PartsPerHour + parts
 
 
-    final def minutes: Int = parts / TimeBase.PartsPerMinute
+    final def minutes: Int = parts / timeCompanion.PartsPerMinute
 
 
-    final def partsOfMinute = parts % TimeBase.PartsPerMinute
+    final def partsOfMinute = parts % timeCompanion.PartsPerMinute
 
 
     final override def toString: String = hours + "h" + parts + "p"
@@ -269,8 +300,12 @@ trait CalendarBase {
   }
 
 
-  object TimeBase {
+  protected abstract class TimeCompanion {
 
+    def apply(hours: Int, parts: Int): Time
+
+
+    // XXX move those into a separate object?
     val HoursPerDay = 24
 
 
@@ -291,4 +326,7 @@ trait CalendarBase {
 
     val PartsPerMinute = PartsPerHour / MinutesPerHour
   }
+
+
+  protected val timeCompanion: TimeCompanion
 }
