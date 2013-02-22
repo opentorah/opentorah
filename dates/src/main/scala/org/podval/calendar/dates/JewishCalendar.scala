@@ -1,5 +1,3 @@
-package org.podval.calendar.dates
-
 /*
  * Copyright 2011-2013 Podval Group.
  *
@@ -16,31 +14,23 @@ package org.podval.calendar.dates
  * limitations under the License.
  */
 
-trait JewishCalendar extends CalendarBase {
+package org.podval.calendar.dates
+
+
+object JewishCalendar extends CalendarBase {
+
+  // XXX assignments of the companion objects have to happen early on, but even this is not sufficient!
+  // I found that I need to assign JewishCalendar to a val to trigger its initialization - or I end up with a null for the Year companion object!
+  override protected val timeCompanion = Time
+  override protected val momentCompanion = Moment
+  override protected val dayCompanion = Day
+  override protected val monthCompanion = Month
+  override protected val yearCompanion = Year
 
   sealed trait MonthName
-  case object Tishrei    extends MonthName
-  case object Marheshvan extends MonthName
-  case object Kislev     extends MonthName
-  case object Teves      extends MonthName
-  case object Shvat      extends MonthName
-  case object Adar       extends MonthName
-  case object Nisan      extends MonthName
-  case object Iyar       extends MonthName
-  case object Sivan      extends MonthName
-  case object Tammuz     extends MonthName
-  case object Av         extends MonthName
-  case object Elul       extends MonthName
-  case object AdarI      extends MonthName
-  case object AdarII     extends MonthName
 
 
-  // XXX Rename "ShortYear" etc.
-  // XXX Why did I fail to put this into the Year object?
   sealed trait YearKind
-  case object Short   extends YearKind
-  case object Regular extends YearKind
-  case object Full    extends YearKind
 
 
   final class Year(number: Int) extends YearBase(number) {
@@ -90,9 +80,9 @@ trait JewishCalendar extends CalendarBase {
       val daysOverShort = lengthInDays - (if (isLeap) 383 else 353)
 
       daysOverShort match {
-        case 0 => Short
-        case 1 => Regular
-        case 2 => Full
+        case 0 => Year.Short
+        case 1 => Year.Regular
+        case 2 => Year.Full
         case _ => throw new IllegalArgumentException("Impossible year length " + lengthInDays + " for " + this)
       }
     }
@@ -121,6 +111,11 @@ trait JewishCalendar extends CalendarBase {
     }
 
 
+    case object Short   extends YearKind
+    case object Regular extends YearKind
+    case object Full    extends YearKind
+
+
     private val YearsInCycle = 19
 
 
@@ -145,13 +140,13 @@ trait JewishCalendar extends CalendarBase {
     val MonthsInCycle = MonthsBeforeYearInCycle.last
 
 
-    private val Adu = List(1, 4, 6)
+    private val Adu = Set(1, 4, 6)
 
 
     private def isAdu(day: Day) = Adu.contains(day.dayOfWeek)
 
 
-    def months(year: Year): List[MonthDescriptor] = {
+    override def months(year: Year): List[MonthDescriptor] = {
       val kind = year.kind
       val isLeap = year.isLeap
 
@@ -165,6 +160,12 @@ trait JewishCalendar extends CalendarBase {
       }
     }
 
+    // XXX
+//    private val Months: Map[(YearKind,Boolean), List[MonthDescriptor]] =
+//      Map(
+//      for (kind <- Seq(Short, Regular, Full); isLeap <- Seq(false, true)) yield (kind, isLeap) -> months(kind, isLeap)
+//        : _*
+//      )
 
     // XXX redo using a Map[(kind, isLeap), Seq[MonthDescriptor]]?
     private val shortMonths: List[MonthDescriptor] = months(Short, false)
@@ -185,38 +186,26 @@ trait JewishCalendar extends CalendarBase {
 
     private def namesAndLengths(kind: YearKind, isLeap: Boolean) = {
       List(
-        (Tishrei, 30),
-        (Marheshvan, if (kind == Full) 30 else 29),
-        (Kislev, if (kind == Short) 29 else 30),
-        (Teves, 29),
-        (Shvat, 30)
+        (Month.Tishrei, 30),
+        (Month.Marheshvan, if (kind == Full) 30 else 29),
+        (Month.Kislev, if (kind == Short) 29 else 30),
+        (Month.Teves, 29),
+        (Month.Shvat, 30)
       ) ++
-        (if (!isLeap)
-          List((Adar, 29)) else
-          List((AdarI, 30), (AdarII, 30))
-          ) ++
-        List(
-          (Nisan, 30),
-          (Iyar, 29),
-          (Sivan, 30),
-          (Tammuz, 29),
-          (Av, 30),
-          (Elul, 29)
-        )
+      (if (!isLeap) List((Month.Adar, 29)) else List((Month.AdarI, 30), (Month.AdarII, 30))) ++
+      List(
+        (Month.Nisan, 30),
+        (Month.Iyar, 29),
+        (Month.Sivan, 30),
+        (Month.Tammuz, 29),
+        (Month.Av, 30),
+        (Month.Elul, 29)
+      )
     }
   }
 
 
-  override protected val yearCompanion = Year
-
-
   final class Month(number: Int) extends MonthBase(number) {
-
-    require(0 < number)
-
-
-    override def year: Year = Year(this)
-
 
     override def numberInYear: Int = numberInCycle - year.firstMonthInCycle + 1
 
@@ -228,13 +217,28 @@ trait JewishCalendar extends CalendarBase {
 
 
     def newMoon: Moment = Month.FirstNewMoon + Month.MeanLunarPeriod*(number-1)
-
   }
 
 
   object Month extends MonthCompanion {
 
     override def apply(number: Int): Month = new Month(number)
+
+
+    case object Tishrei    extends MonthName
+    case object Marheshvan extends MonthName
+    case object Kislev     extends MonthName
+    case object Teves      extends MonthName
+    case object Shvat      extends MonthName
+    case object Adar       extends MonthName
+    case object Nisan      extends MonthName
+    case object Iyar       extends MonthName
+    case object Sivan      extends MonthName
+    case object Tammuz     extends MonthName
+    case object Av         extends MonthName
+    case object Elul       extends MonthName
+    case object AdarI      extends MonthName
+    case object AdarII     extends MonthName
 
 
     // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3 )
@@ -247,16 +251,7 @@ trait JewishCalendar extends CalendarBase {
   }
 
 
-  override protected val monthCompanion = Month
-
-
   final class Day(number: Int) extends DayBase(number) {
-
-    override def dayOfWeek: Int = Day.dayOfWeek(number)
-
-
-    override def year: Year = Year(this)
-
 
     def nightTime(hours: Int, parts: Int): Moment = time(Time.nightTime(hours, parts))
 
@@ -270,11 +265,9 @@ trait JewishCalendar extends CalendarBase {
     override def apply(number: Int): Day = new Day(number)
 
 
-    def dayOfWeek(day: Int): Int = ((day + FirstDayDayOfWeek - 1 - 1) % DaysPerWeek) + 1
+    // It seems that first day of the first year was Sunday.
+    override val FirstDayDayOfWeek = 1
   }
-
-
-  override protected val dayCompanion = Day
 
 
   final class Moment(days: Int, time: Time) extends MomentBase(days, time)
@@ -286,9 +279,6 @@ trait JewishCalendar extends CalendarBase {
   }
 
 
-  override protected val momentCompanion = Moment
-
-
   final class Time(hours: Int, parts: Int) extends TimeBase(hours, parts)
 
 
@@ -298,17 +288,14 @@ trait JewishCalendar extends CalendarBase {
 
 
     def nightTime(hours: Int, parts: Int) = {
-      require(hours < TimeT.HoursPerHalfDay)
+      require(hours < Constants.HoursPerHalfDay)
       Time(hours, parts)
     }
 
 
     def dayTime(hours: Int, parts: Int) = {
-      require(hours < TimeT.HoursPerHalfDay)
-      Time(hours + TimeT.HoursPerHalfDay, parts)
+      require(hours < Constants.HoursPerHalfDay)
+      Time(hours + Constants.HoursPerHalfDay, parts)
     }
   }
-
-
-  override protected val timeCompanion = Time
 }

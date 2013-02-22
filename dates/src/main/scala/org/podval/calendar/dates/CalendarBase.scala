@@ -17,9 +17,10 @@
 package org.podval.calendar.dates
 
 
-trait CalendarBase {
+abstract class CalendarBase {
 
-  // Instead of "Y" here and type Y = Year in the subtrait, I use "Year" here and just define "Year" in the subtrate. Beaty!
+  // Instead of "Y" here and type Y = Year in the sub-trait, I use "Year" here and just define "Year" in the sub-trate. Beaty!
+
   type Year <: YearBase
 
 
@@ -112,7 +113,7 @@ trait CalendarBase {
     final def prev: Month = monthCompanion(number - 1)
 
 
-    def year: Year
+    final def year: Year = yearCompanion(this)
 
 
     def numberInYear: Int
@@ -157,7 +158,8 @@ trait CalendarBase {
     final def prev: Day = dayCompanion(number - 1)
 
 
-    def dayOfWeek: Int
+    final def dayOfWeek: Int = ((number + dayCompanion.FirstDayDayOfWeek - 1 - 1) % dayCompanion.DaysPerWeek) + 1
+
 
 
     final def dayOfMonth: Int = number - month.firstDay + 1
@@ -166,7 +168,7 @@ trait CalendarBase {
     final def dayOfYear: Int = number - year.firstDay + 1
 
 
-    def year: Year
+    final def year: Year = yearCompanion(this)
 
 
     final def month: Month = year.month(this)
@@ -188,7 +190,7 @@ trait CalendarBase {
 
 
     // It seems that first day of the first year was Sunday.
-    val FirstDayDayOfWeek = 1
+    val FirstDayDayOfWeek: Int
 
 
     val DaysPerWeek = 7
@@ -218,7 +220,7 @@ trait CalendarBase {
     final def day: Day = dayCompanion(days+1)
 
 
-    final override def toString: String = (days+1) /* XXX day? */ + " " + time.toString
+    final override def toString: String = day + " " + time.toString
 
 
     final def toFullString: String = day.toFullString + " " + time.toFullString
@@ -243,13 +245,13 @@ trait CalendarBase {
       require(0 <= hours)
       require(0 <= parts)
 
-      val hours_ = hours + parts / timeCompanion.PartsPerHour
+      val hours_ = hours + parts / Constants.PartsPerHour
 
       momentCompanion(
-        days + hours_ / timeCompanion.HoursPerDay,
+        days + hours_ / Constants.HoursPerDay,
         timeCompanion(
-          hours_ % timeCompanion.HoursPerDay,
-          parts % timeCompanion.PartsPerHour))
+          hours_ % Constants.HoursPerDay,
+          parts % Constants.PartsPerHour))
     }
   }
 
@@ -265,8 +267,8 @@ trait CalendarBase {
 
   abstract class TimeBase(val hours: Int, val parts: Int) extends Ordered[TimeBase] { self: Time =>
 
-    require(0 <= hours && hours < timeCompanion.HoursPerDay)
-    require(0 <= parts && parts < timeCompanion.PartsPerHour)
+    require(0 <= hours && hours < Constants.HoursPerDay)
+    require(0 <= parts && parts < Constants.PartsPerHour)
 
 
     final override def equals(other: Any): Boolean = other match {
@@ -284,13 +286,13 @@ trait CalendarBase {
     final def isZero = (hours == 0) && (parts == 0)
 
 
-    final def allParts /* XXX toParts? asParts? */ = hours*timeCompanion.PartsPerHour + parts
+    final def allParts /* XXX toParts? asParts? */ = hours*Constants.PartsPerHour + parts
 
 
-    final def minutes: Int = parts / timeCompanion.PartsPerMinute
+    final def minutes: Int = parts / Constants.PartsPerMinute
 
 
-    final def partsOfMinute = parts % timeCompanion.PartsPerMinute
+    final def partsOfMinute = parts % Constants.PartsPerMinute
 
 
     final override def toString: String = hours + "h" + parts + "p"
@@ -303,28 +305,6 @@ trait CalendarBase {
   protected abstract class TimeCompanion {
 
     def apply(hours: Int, parts: Int): Time
-
-
-    // XXX move those into a separate object?
-    val HoursPerDay = 24
-
-
-    require(HoursPerDay % 2 == 0)
-
-
-    val HoursPerHalfDay = HoursPerDay / 2
-
-
-    val PartsPerHour = 1080
-
-
-    val MinutesPerHour = 60
-
-
-    require(PartsPerHour % MinutesPerHour == 0)
-
-
-    val PartsPerMinute = PartsPerHour / MinutesPerHour
   }
 
 

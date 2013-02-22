@@ -18,6 +18,8 @@ package org.podval.calendar.dates
 
 import org.junit.{Test, Assert}
 
+import JewishCalendar.Year
+
 
 final class YearTest {
 

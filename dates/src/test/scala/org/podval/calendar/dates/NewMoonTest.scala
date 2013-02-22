@@ -2,6 +2,7 @@ package org.podval.calendar.dates;
 
 import org.junit.{Test, Assert}
 
+import JewishCalendar.Year
 
 final class NewMoonTest {
 
@@ -35,25 +36,7 @@ final class NewMoonTest {
 //    }
 //
 //
-//    public void molad(
-//        final int year,
-//        final JewishMonth month,
-//
-//        final int dayOfTheWeek,
-//
-//        final JewishMonth jMonth,
-//        final int jDay,
-//
-//        final int gYear,
-//        final GregorianMonth gMonth,
-//        final int gDay,
-//        final int hour,
-//        final boolean am,
-//        final int minute,
-//        final int parts
-//        )
-//    {
-//        final JewishDate mDate = JewishCalendar.getInstance().moladDate(year, month);
+//        moladDate(year, month);
 //        Assert.assertEquals(dayOfTheWeek, mDate.getDayOfTheWeek());
 //
 //        Assert.assertEquals(jMonth, mDate.getMonth().month);
@@ -63,12 +46,5 @@ final class NewMoonTest {
 //            .setTime(hour + (am ? 0 : 12), minute, parts);
 //
 //        Assert.assertEquals(gDate, mDate.toGregorian());
-//    }
-
-
-//    private void moladTable(final int year) {
-//        for (int m = 1; m <= Calendar.getJewish().monthsInYear(year); m++) {
-//            System.out.println("Molad " + year + " " + m + " = " + Calendar.getJewish().moladDate(year, m));
-//        }
 //    }
 }

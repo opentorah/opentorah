@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Podval Group.
+ * Copyright 2011-2013 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,25 @@
 package org.podval.calendar.dates
 
 
-final class Moment private (days: Int, time: Time) extends MomentT[Time, Moment](days, time) {
+object Constants {
 
-    def day: Day = Day(days + 1)
-
-
-    def create(days: Int, hours: Int, parts: Int) = Moment(days, Time(hours, parts))
+  val HoursPerDay = 24
 
 
-    def toFullString: String = day.toFullString + " " + time.toFullString
-}
+  require(HoursPerDay % 2 == 0)
 
 
-object Moment {
+  val HoursPerHalfDay = HoursPerDay / 2
 
-    def apply(days: Int, time: Time): Moment = new Moment(days, time)
+
+  val PartsPerHour = 1080
+
+
+  val MinutesPerHour = 60
+
+
+  require(PartsPerHour % MinutesPerHour == 0)
+
+
+  val PartsPerMinute = PartsPerHour / MinutesPerHour
 }
