@@ -119,7 +119,7 @@ object JewishCalendar extends CalendarBase {
     private val YearsInCycle = 19
 
 
-    private val LeapYears = List(3, 6, 8, 11, 14, 17, 19)
+    private val LeapYears = Set(3, 6, 8, 11, 14, 17, 19)
 
 
     private def isLeap(numberInCycle: Int) = LeapYears.contains(numberInCycle)
@@ -265,8 +265,7 @@ object JewishCalendar extends CalendarBase {
     override def apply(number: Int): Day = new Day(number)
 
 
-    // It seems that first day of the first year was Sunday.
-    override val FirstDayDayOfWeek = 1
+    override val FirstDayDayOfWeek = Constants.FirstDayDayOfWeekJewish
   }
 
 

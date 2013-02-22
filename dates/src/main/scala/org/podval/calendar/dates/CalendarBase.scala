@@ -158,7 +158,7 @@ abstract class CalendarBase {
     final def prev: Day = dayCompanion(number - 1)
 
 
-    final def dayOfWeek: Int = ((number + dayCompanion.FirstDayDayOfWeek - 1 - 1) % dayCompanion.DaysPerWeek) + 1
+    final def dayOfWeek: Int = ((number + dayCompanion.FirstDayDayOfWeek - 1 - 1) % Constants.DaysPerWeek) + 1
 
 
 
@@ -189,11 +189,7 @@ abstract class CalendarBase {
     def apply(number: Int): Day
 
 
-    // It seems that first day of the first year was Sunday.
     val FirstDayDayOfWeek: Int
-
-
-    val DaysPerWeek = 7
   }
 
 

@@ -19,9 +19,6 @@ package org.podval.calendar.dates
 
 object Conversions {
 
-  val GregorianEpoch = 1373429
-
-
   val JewishDayStartHours = 18
 
 
@@ -40,8 +37,8 @@ object Conversions {
   }
 
 
-  def fromJewish(day: JewishCalendar   .Day): GregorianCalendar.Day = GregorianCalendar.Day(day.number - GregorianEpoch)
+  def fromJewish(day: JewishCalendar   .Day): GregorianCalendar.Day = GregorianCalendar.Day(day.number - Constants.GregorianEpoch)
 
 
-  def toJewish  (day: GregorianCalendar.Day): JewishCalendar   .Day = JewishCalendar   .Day(day.number + GregorianEpoch)
+  def toJewish  (day: GregorianCalendar.Day): JewishCalendar   .Day = JewishCalendar   .Day(day.number + Constants.GregorianEpoch)
 }

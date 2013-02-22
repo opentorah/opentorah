@@ -153,8 +153,7 @@ object GregorianCalendar extends CalendarBase {
     override def apply(number: Int): Day = new Day(number)
 
 
-    // XXX what was the first day of the first year?
-    val FirstDayDayOfWeek = 1
+    val FirstDayDayOfWeek = Constants.FirstDayDayOfWeekGregorian
   }
 
 
@@ -184,5 +183,6 @@ object GregorianCalendar extends CalendarBase {
     def afternoonTime(hours: Int, parts: Int) = {
       require(hours < Constants.HoursPerHalfDay)
       Time(hours + Constants.HoursPerHalfDay, parts)
-    }  }
+    }
+  }
 }

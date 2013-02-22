@@ -19,6 +19,9 @@ package org.podval.calendar.dates
 
 object Constants {
 
+  val DaysPerWeek = 7
+
+
   val HoursPerDay = 24
 
 
@@ -38,4 +41,14 @@ object Constants {
 
 
   val PartsPerMinute = PartsPerHour / MinutesPerHour
+
+
+  // It seems that first day of the first year was Sunday.
+  val FirstDayDayOfWeekJewish = 1
+
+
+  val FirstDayDayOfWeekGregorian = 1 // XXX calculate
+
+
+  val GregorianEpoch = 1373429
 }
