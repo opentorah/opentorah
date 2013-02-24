@@ -2,7 +2,7 @@ package org.podval.calendar.dates;
 
 import org.junit.{Before, Test, Assert}
 
-import JewishCalendar.{Year, MonthName}
+import JewishCalendar.{Year, Day, MonthName}
 import JewishCalendar.Month.{Tishrei, Marheshvan, AdarII, Nisan}
 
 
@@ -16,8 +16,8 @@ final class DatesTest {
 
   @Test
   def dayOfWeek {
-    Assert.assertEquals(6, Year(   2).month(Tishrei   ).day( 1).dayOfWeek)
-    Assert.assertEquals(2, Year(5772).month(Marheshvan).day(24).dayOfWeek)
+    Assert.assertEquals(6, Day(   2, Tishrei   ,  1).dayOfWeek)
+    Assert.assertEquals(2, Day(5772, Marheshvan, 24).dayOfWeek)
   }
 
 

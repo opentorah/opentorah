@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Podval Group.
+ * Copyright 2011-2013 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,14 @@
 
 package org.podval.calendar.dates
 
-import org.junit.{Test, Assert}
 
-import JewishCalendar.Year
+object GregorianCalendarConstants {
 
-
-final class YearTest {
-
-    private val years = (1 to 6000) map (Year(_))
+  val MonthsInYear = 12
 
 
-    @Test
-    def kind = years foreach (_.kind)
+  val DaysInNonLeapYear = 365
 
 
-    @Test
-    def month = for (year <- years; month <- (1 to year.lengthInMonths))
-        Assert.assertEquals(year, year.month(month).year)
+  val DaysInLeapYear = DaysInNonLeapYear + 1
 }

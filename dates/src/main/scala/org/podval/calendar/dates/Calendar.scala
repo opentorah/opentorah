@@ -17,7 +17,7 @@
 package org.podval.calendar.dates
 
 
-abstract class CalendarBase {
+abstract class Calendar {
 
   // Instead of "Y" here and type Y = Year in the sub-trait, I use "Year" here and just define "Year" in the sub-trate. Beaty!
 
@@ -36,21 +36,23 @@ abstract class CalendarBase {
   type Time <: TimeBase
 
 
+  // XXX submerge in Month
   type MonthName
+
+
+  // XXX submerge in Year
+  type YearCharacter
 
 
   final class MonthDescriptor(val name: MonthName, val length: Int, val daysBefore: Int)
 
 
-  abstract class YearBase(number: Int) extends Numbered[YearBase](number) { self: Year =>
+  abstract class YearBase(number: Int) extends Numbered[Year](number) { self: Year =>
 
     final def next: Year = yearCompanion(number + 1)
 
 
     final def prev: Year = yearCompanion(number - 1)
-
-
-    def isLeap: Boolean
 
 
     def firstDay: Int
@@ -63,6 +65,9 @@ abstract class CalendarBase {
 
 
     def lengthInMonths: Int
+
+
+    def character: YearCharacter
 
 
     final def month(numberInYear /* XXX name monthOfYear, like others? */: Int): Month = {
@@ -80,7 +85,7 @@ abstract class CalendarBase {
     }
 
 
-    final def months: List[MonthDescriptor] = yearCompanion.months(this)
+    final def months: List[MonthDescriptor] = yearCompanion.Months(this.character)
   }
 
 
@@ -92,17 +97,42 @@ abstract class CalendarBase {
     def apply(month: Month): Year
 
 
-    def apply(day: Day): Year
+    final def apply(day: Day): Year = {
+      // XXX give names to constants
+      val startingYear = (4 * day.number / (4 * 365 + 1)) - 1
+      var result = apply(if (areYearsPositive) scala.math.max(1, startingYear) else startingYear)
+      require(result.firstDay <= day.number)
+      while (result.next.firstDay <= day.number) result = result.next
+      result
+    }
 
 
-    def months(year: Year): List[MonthDescriptor]
+    protected def areYearsPositive: Boolean
+
+
+    val Months: Map[YearCharacter, List[MonthDescriptor]] =
+      Map((for (character <- characters) yield character -> monthsGenerator(character)): _*)
+
+
+    protected def characters: Seq[YearCharacter]
+
+
+    private def monthsGenerator(character: YearCharacter): List[MonthDescriptor] = {
+      val namesAndLengths = this.namesAndLengths(character)
+      val (_, lengths) = namesAndLengths.unzip
+      val daysBefore = lengths.scanLeft(0)(_ + _).init
+      (namesAndLengths zip daysBefore) map (m => new MonthDescriptor(m._1._1, m._1._2, m._2))
+    }
+
+
+    protected def namesAndLengths(character: YearCharacter): List[(MonthName, Int)]
   }
 
 
   protected val yearCompanion: YearCompanion
 
 
-  abstract class MonthBase(number: Int) extends Numbered[MonthBase](number) { self: Month =>
+  abstract class MonthBase(number: Int) extends Numbered[Month](number) { self: Month =>
 
     require(0 < number)
 
@@ -141,13 +171,16 @@ abstract class CalendarBase {
   protected abstract class MonthCompanion {
 
     def apply(number: Int): Month
+
+
+    def apply(year: Int, monthInYear: Int): Month = yearCompanion(year).month(monthInYear)
   }
 
 
   protected val monthCompanion: MonthCompanion
 
 
-  abstract class DayBase(number: Int) extends Numbered[DayBase](number) { this: Day =>
+  abstract class DayBase(number: Int) extends Numbered[Day](number) { this: Day =>
 
     require(0 < number)
 
@@ -159,7 +192,6 @@ abstract class CalendarBase {
 
 
     final def dayOfWeek: Int = ((number + dayCompanion.FirstDayDayOfWeek - 1 - 1) % Constants.DaysPerWeek) + 1
-
 
 
     final def dayOfMonth: Int = number - month.firstDay + 1
@@ -189,6 +221,9 @@ abstract class CalendarBase {
     def apply(number: Int): Day
 
 
+    def apply(year: Int, month: MonthName, day: Int): Day = yearCompanion(year).month(month).day(day)
+
+
     val FirstDayDayOfWeek: Int
   }
 
@@ -196,10 +231,10 @@ abstract class CalendarBase {
   protected val dayCompanion: DayCompanion
 
 
-  abstract class MomentBase(val days: Int, val time: Time) extends Ordered[MomentBase] { self: Moment =>
+  abstract class MomentBase(val days: Int, val time: Time) extends Ordered[Moment] { self: Moment =>
 
     final override def equals(other: Any): Boolean = other match {
-      case that: MomentBase => (days == that.days) && (time == that.time)
+      case that: Moment => (days == that.days) && (time == that.time)
       case _ => false
     }
 
@@ -207,7 +242,7 @@ abstract class CalendarBase {
     final override def hashCode = 41 * days.hashCode + time.hashCode
 
 
-    final override def compare(that: MomentBase) = {
+    final override def compare(that: Moment) = {
       val result = this.days.compare(that.days)
       if (result == 0) this.time.compare(that.time) else result
     }
@@ -261,14 +296,14 @@ abstract class CalendarBase {
   protected val momentCompanion: MomentCompanion
 
 
-  abstract class TimeBase(val hours: Int, val parts: Int) extends Ordered[TimeBase] { self: Time =>
+  abstract class TimeBase(val hours: Int, val parts: Int) extends Ordered[Time] { self: Time =>
 
     require(0 <= hours && hours < Constants.HoursPerDay)
     require(0 <= parts && parts < Constants.PartsPerHour)
 
 
     final override def equals(other: Any): Boolean = other match {
-      case that: TimeBase => this.allParts == that.allParts
+      case that: Time => this.allParts == that.allParts
       case _ => false
     }
 
@@ -276,7 +311,7 @@ abstract class CalendarBase {
     final override def hashCode = 41*hours+parts
 
 
-    final override def compare(that: TimeBase) = this.allParts - that.allParts
+    final override def compare(that: Time) = this.allParts - that.allParts
 
 
     final def isZero = (hours == 0) && (parts == 0)

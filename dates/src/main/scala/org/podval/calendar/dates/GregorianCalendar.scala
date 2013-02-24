@@ -17,7 +17,7 @@
 package org.podval.calendar.dates
 
 
-object GregorianCalendar extends CalendarBase {
+object GregorianCalendar extends Calendar {
 
   // XXX assignments of the companion objects have to happen early on, but even this is not sufficient!
   // I found that I need to assign JewishCalendar to a val to trigger its initialization - or I end up with a null for the Year companion object!
@@ -27,7 +27,11 @@ object GregorianCalendar extends CalendarBase {
   override protected val monthCompanion = Month
   override protected val yearCompanion = Year
 
+
   sealed trait MonthName
+
+
+  type YearCharacter = Boolean
 
 
   final class Year(number: Int) extends YearBase(number) {
@@ -35,20 +39,23 @@ object GregorianCalendar extends CalendarBase {
 //    require(0 < number)
 
     // TODO give names to constants?
-    override def isLeap: Boolean = (number % 4 == 0) && ((number % 100 != 0) || (number % 400 == 0))
+    def isLeap: Boolean = (number % 4 == 0) && ((number % 100 != 0) || (number % 400 == 0))
 
 
     override def firstDay: Int =
-      Year.DaysInNonLeapYear * (number - 1) + (number - 1)/4 - (number - 1)/100 + (number - 1)/400 + 1
+      GregorianCalendarConstants.DaysInNonLeapYear * (number - 1) + (number - 1)/4 - (number - 1)/100 + (number - 1)/400 + 1
 
 
-    override def lengthInDays = if (isLeap) Year.DaysInLeapYear else Year.DaysInNonLeapYear
+    override def lengthInDays = if (isLeap) GregorianCalendarConstants.DaysInLeapYear else GregorianCalendarConstants.DaysInNonLeapYear
 
 
-    override def firstMonth: Int = Year.MonthsInYear*(number - 1) + 1
+    override def firstMonth: Int = GregorianCalendarConstants.MonthsInYear*(number - 1) + 1
 
 
-    def lengthInMonths = Year.MonthsInYear
+    def lengthInMonths = GregorianCalendarConstants.MonthsInYear
+
+
+    override def character: YearCharacter = isLeap
   }
 
 
@@ -57,44 +64,16 @@ object GregorianCalendar extends CalendarBase {
     override def apply(number: Int): Year = new Year(number)
 
 
-    override def apply(month: Month): Year = Year((month.number - 1) / MonthsInYear +1)
+    override def apply(month: Month): Year = Year((month.number - 1) / GregorianCalendarConstants.MonthsInYear +1)
 
 
-    override def apply(day: Day): Year = {
-      // TODO give names to constants
-      val yearForSureNotAfter = (4 * day.number / (4 * 365 + 1)) - 1
-      var result = Year(yearForSureNotAfter) // Year(scala.math.max(1, yearForSureNotAfter))
-      require(result.firstDay <= day.number)
-      while (result.next.firstDay <= day.number) result = result.next
-      result
-    }
+    protected override def areYearsPositive: Boolean = false
 
 
-    val MonthsInYear = 12
+    protected override def characters: Seq[YearCharacter] = Seq(true, false)
 
 
-    val DaysInNonLeapYear = 365
-
-
-    val DaysInLeapYear = DaysInNonLeapYear + 1
-
-
-    override def months(year: Year): List[MonthDescriptor] = Months(year.isLeap)
-
-
-    private val Months: Map[Boolean, List[MonthDescriptor]] =
-      Map(Seq(true, false).map(isLeap => isLeap -> months(isLeap)): _*)
-
-
-    private def months(isLeap: Boolean): List[MonthDescriptor] = {
-      val namesAndLengths = this.namesAndLengths(isLeap)
-      val (names, lengths) = namesAndLengths.unzip
-      val daysBefore = lengths.scanLeft(0)(_ + _).init
-      (namesAndLengths zip daysBefore) map (m => new MonthDescriptor(m._1._1, m._1._2, m._2))
-    }
-
-
-    private def namesAndLengths(isLeap: Boolean) = {
+    protected override def namesAndLengths(isLeap: Boolean): List[(MonthName, Int)] = {
       List(
         (Month.January, 31),
         (Month.February, if (isLeap) 29 else 28),
@@ -153,7 +132,7 @@ object GregorianCalendar extends CalendarBase {
     override def apply(number: Int): Day = new Day(number)
 
 
-    val FirstDayDayOfWeek = Constants.FirstDayDayOfWeekGregorian
+    override val FirstDayDayOfWeek = Constants.FirstDayDayOfWeekGregorian
   }
 
 

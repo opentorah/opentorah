@@ -17,7 +17,7 @@
 package org.podval.calendar.dates
 
 
-object JewishCalendar extends CalendarBase {
+object JewishCalendar extends Calendar {
 
   // XXX assignments of the companion objects have to happen early on, but even this is not sufficient!
   // I found that I need to assign JewishCalendar to a val to trigger its initialization - or I end up with a null for the Year companion object!
@@ -27,10 +27,12 @@ object JewishCalendar extends CalendarBase {
   override protected val monthCompanion = Month
   override protected val yearCompanion = Year
 
+
+  // XXX toString?!
   sealed trait MonthName
 
 
-  sealed trait YearKind
+  type YearCharacter = (Boolean, Year.Kind)
 
 
   final class Year(number: Int) extends YearBase(number) {
@@ -38,18 +40,21 @@ object JewishCalendar extends CalendarBase {
     require(0 < number)
 
 
-    override def isLeap: Boolean = Year.isLeap(numberInCycle)
+    def isLeap: Boolean = JewishCalendarConstants.isLeap(numberInCycle)
 
 
     // TODO give names to constants
     override def firstDay: Int = {
+      val Adu = Set(1, 4, 6)
+      def isAdu(day: Day) = Adu.contains(day.dayOfWeek)
+
       val newMoon = month(1).newMoon
       val day = newMoon.day
       val time = newMoon.time
 
-      if (Year.isAdu(day)) day.next // KH 7:1
+      if (isAdu(day)) day.next // KH 7:1
       else if (time >= Time(18, 0)) {
-        if (!Year.isAdu(day.next)) day.next /* KH 7:2 */ else day.next.next /* KH 7:3 */
+        if (!isAdu(day.next)) day.next /* KH 7:2 */ else day.next.next /* KH 7:3 */
       }
       else if ((day.dayOfWeek == 3) && time >= Time( 9, 204) && !this.isLeap) day.next.next /* KH 7:4 */
       else if ((day.dayOfWeek == 2) && time >= Time(15, 589) && this.prev.isLeap) day.next /* KH 7:5 */
@@ -60,23 +65,26 @@ object JewishCalendar extends CalendarBase {
     override def lengthInDays: Int = next.firstDay - this.firstDay
 
 
-    override def firstMonth: Int = Year.MonthsInCycle*(cycle - 1) + firstMonthInCycle
+    override def firstMonth: Int = JewishCalendarConstants.MonthsInCycle*(cycle - 1) + firstMonthInCycle
 
 
-    override def lengthInMonths: Int = Year.lengthInMonths(numberInCycle)
+    override def lengthInMonths: Int = JewishCalendarConstants.lengthInMonths(numberInCycle)
 
 
-    def cycle: Int = ((number - 1) / Year.YearsInCycle) + 1
+    def cycle: Int = ((number - 1) / JewishCalendarConstants.YearsInCycle) + 1
 
 
-    def numberInCycle: Int = ((number - 1) % Year.YearsInCycle) + 1
+    def numberInCycle: Int = ((number - 1) % JewishCalendarConstants.YearsInCycle) + 1
 
 
-    def firstMonthInCycle: Int = Year.MonthsBeforeYearInCycle(numberInCycle - 1) + 1
+    def firstMonthInCycle: Int = JewishCalendarConstants.MonthsBeforeYearInCycle(numberInCycle - 1) + 1
+
+
+    override def character: YearCharacter = (isLeap, kind)
 
 
     // KH 8:7,8
-    def kind: YearKind = {
+    def kind: Year.Kind = {
       val daysOverShort = lengthInDays - (if (isLeap) 383 else 353)
 
       daysOverShort match {
@@ -95,112 +103,42 @@ object JewishCalendar extends CalendarBase {
 
 
     override def apply(month: Month): Year = {
-      val yearsBeforeCycle = (month.cycle - 1)*YearsInCycle
-      val yearMonthIsInCycle = MonthsBeforeYearInCycle.count(_ < month.numberInCycle)
+      val yearsBeforeCycle = (month.cycle - 1)*JewishCalendarConstants.YearsInCycle
+      val yearMonthIsInCycle = JewishCalendarConstants.MonthsBeforeYearInCycle.count(_ < month.numberInCycle)
       Year(yearsBeforeCycle + yearMonthIsInCycle)
     }
 
 
-    override def apply(day: Day): Year = {
-      // TODO give names to constants
-      val yearForSureNotAfter = (4 * day.number / (4 * 365 + 1)) - 1
-      var result = Year(scala.math.max(1, yearForSureNotAfter))
-      require(result.firstDay <= day.number)
-      while (result.next.firstDay <= day.number) result = result.next
-      result
-    }
+    protected override def areYearsPositive: Boolean = true
 
 
-    case object Short   extends YearKind
-    case object Regular extends YearKind
-    case object Full    extends YearKind
+    sealed trait Kind
+    case object Short   extends Kind
+    case object Regular extends Kind
+    case object Full    extends Kind
 
 
-    private val YearsInCycle = 19
+    protected override def characters: Seq[YearCharacter] =
+      for (isLeap <- Seq(true, false); kind <- Seq(Year.Short, Year.Regular, Year.Full)) yield (isLeap, kind)
 
 
-    private val LeapYears = Set(3, 6, 8, 11, 14, 17, 19)
-
-
-    private def isLeap(numberInCycle: Int) = LeapYears.contains(numberInCycle)
-
-
-    private def lengthInMonths(numberInCycle: Int): Int = if (isLeap(numberInCycle)) MonthsInLeapYear else MonthsInNonLeapYear
-
-
-    private val MonthsInNonLeapYear = 12
-
-
-    private val MonthsInLeapYear = MonthsInNonLeapYear + 1
-
-
-    private val MonthsBeforeYearInCycle = ((1 to YearsInCycle) map (lengthInMonths(_))).scanLeft(0)(_ + _)
-
-
-    val MonthsInCycle = MonthsBeforeYearInCycle.last
-
-
-    private val Adu = Set(1, 4, 6)
-
-
-    private def isAdu(day: Day) = Adu.contains(day.dayOfWeek)
-
-
-    override def months(year: Year): List[MonthDescriptor] = {
-      val kind = year.kind
-      val isLeap = year.isLeap
-
-      (kind, isLeap) match {
-        case (Short, false) => shortMonths
-        case (Short, true) => shortLeapMonths
-        case (Regular, false) => regularMonths
-        case (Regular, true) => regularLeapMonths
-        case (Full, false) => fullMonths
-        case (Full, true) => fullLeapMonths
-      }
-    }
-
-    // XXX
-//    private val Months: Map[(YearKind,Boolean), List[MonthDescriptor]] =
-//      Map(
-//      for (kind <- Seq(Short, Regular, Full); isLeap <- Seq(false, true)) yield (kind, isLeap) -> months(kind, isLeap)
-//        : _*
-//      )
-
-    // XXX redo using a Map[(kind, isLeap), Seq[MonthDescriptor]]?
-    private val shortMonths: List[MonthDescriptor] = months(Short, false)
-    private val shortLeapMonths: List[MonthDescriptor] = months(Short, true)
-    private val regularMonths: List[MonthDescriptor] = months(Regular, false)
-    private val regularLeapMonths: List[MonthDescriptor] = months(Regular, true)
-    private val fullMonths: List[MonthDescriptor] = months(Full, false)
-    private val fullLeapMonths: List[MonthDescriptor] = months(Full, true)
-
-
-    private def months(kind: YearKind, isLeap: Boolean): List[MonthDescriptor] = {
-      val namesAndLengths = this.namesAndLengths(kind, isLeap)
-      val (names, lengths) = namesAndLengths.unzip
-      val daysBefore = lengths.scanLeft(0)(_ + _).init
-      (namesAndLengths zip daysBefore) map (m => new MonthDescriptor(m._1._1, m._1._2, m._2))
-    }
-
-
-    private def namesAndLengths(kind: YearKind, isLeap: Boolean) = {
+    protected override def namesAndLengths(character: YearCharacter): List[(MonthName, Int)] = character match { case (isLeap: Boolean, kind: Year.Kind) =>
       List(
         (Month.Tishrei, 30),
-        (Month.Marheshvan, if (kind == Full) 30 else 29),
-        (Month.Kislev, if (kind == Short) 29 else 30),
+        (Month.Marheshvan, if (kind == Year.Full) 30 else 29),
+        (Month.Kislev, if (kind == Year.Short) 29 else 30),
         (Month.Teves, 29),
         (Month.Shvat, 30)
       ) ++
-      (if (!isLeap) List((Month.Adar, 29)) else List((Month.AdarI, 30), (Month.AdarII, 30))) ++
-      List(
-        (Month.Nisan, 30),
-        (Month.Iyar, 29),
-        (Month.Sivan, 30),
-        (Month.Tammuz, 29),
-        (Month.Av, 30),
-        (Month.Elul, 29)
-      )
+        (if (!isLeap) List((Month.Adar, 29)) else List((Month.AdarI, 30), (Month.AdarII, 30))) ++
+        List(
+          (Month.Nisan, 30),
+          (Month.Iyar, 29),
+          (Month.Sivan, 30),
+          (Month.Tammuz, 29),
+          (Month.Av, 30),
+          (Month.Elul, 29)
+        )
     }
   }
 
@@ -210,10 +148,10 @@ object JewishCalendar extends CalendarBase {
     override def numberInYear: Int = numberInCycle - year.firstMonthInCycle + 1
 
 
-    def cycle: Int = ((number - 1) / Year.MonthsInCycle) + 1
+    def cycle: Int = ((number - 1) / JewishCalendarConstants.MonthsInCycle) + 1
 
 
-    def numberInCycle: Int = ((number - 1) % Year.MonthsInCycle) + 1
+    def numberInCycle: Int = ((number - 1) % JewishCalendarConstants.MonthsInCycle) + 1
 
 
     def newMoon: Moment = Month.FirstNewMoon + Month.MeanLunarPeriod*(number-1)
@@ -241,13 +179,13 @@ object JewishCalendar extends CalendarBase {
     case object AdarII     extends MonthName
 
 
-    // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3 )
-    val MeanLunarPeriod = Day(30).time(12, 793)
+    // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3)
+    private val MeanLunarPeriod = Day(30).time(12, 793)
 
 
     // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2):
     // BeHaRaD: 5 hours 204 parts at night of the second day (KH 6:8)
-    val FirstNewMoon = Day(2).nightTime(5, 204)
+    private val FirstNewMoon = Day(2).nightTime(5, 204)
   }
 
 

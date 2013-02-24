@@ -1,10 +1,15 @@
 package org.podval.calendar.dates;
 
-import org.junit.{Test, Assert}
+import org.junit.{Test, Assert, Before}
 
-import JewishCalendar.Year
+import JewishCalendar.Month
 
 final class NewMoonTest {
+
+  @Before
+  def triggerInitializationOfTheJewishCalendar {
+    val x = JewishCalendar
+  }
 
     @Test
     def dummy = {}
@@ -13,10 +18,10 @@ final class NewMoonTest {
     @Test
     def when2011() {
         // TODO
-        println(Year(   1).month(1).newMoon.toFullString)
-        println(Year(5772).month(2).newMoon.toFullString)
-        println(Year(5772).month(3).newMoon.toFullString)
-        println(Year(5772).month(4).newMoon.toFullString)
+        println(Month(   1, 1).newMoon.toFullString)
+        println(Month(5772, 2).newMoon.toFullString)
+        println(Month(5772, 3).newMoon.toFullString)
+        println(Month(5772, 4).newMoon.toFullString)
     }
 
   /*
