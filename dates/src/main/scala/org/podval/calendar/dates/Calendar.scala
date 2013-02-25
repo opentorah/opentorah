@@ -36,15 +36,12 @@ abstract class Calendar {
   type Time <: TimeBase
 
 
-  // XXX submerge in Month
-  type MonthName
-
-
   // XXX submerge in Year
   type YearCharacter
 
 
-  final class MonthDescriptor(val name: MonthName, val length: Int, val daysBefore: Int)
+  // XXX submerge
+  final class MonthDescriptor(val name: monthCompanion.Name, val length: Int, val daysBefore: Int)
 
 
   abstract class YearBase(number: Int) extends Numbered[Year](number) { self: Year =>
@@ -76,7 +73,7 @@ abstract class Calendar {
     }
 
 
-    final def month(name: MonthName): Month = month(months.indexWhere(_.name == name) + 1)
+    final def month(name: monthCompanion.Name): Month = month(months.indexWhere(_.name == name) + 1)
 
 
     final def month(day: Day): Month = {
@@ -125,7 +122,7 @@ abstract class Calendar {
     }
 
 
-    protected def namesAndLengths(character: YearCharacter): List[(MonthName, Int)]
+    protected def namesAndLengths(character: YearCharacter): List[(monthCompanion.Name, Int)]
   }
 
 
@@ -158,7 +155,7 @@ abstract class Calendar {
     final def firstDay: Int = year.firstDay + descriptor.daysBefore
 
 
-    final def name: MonthName = descriptor.name
+    final def name: monthCompanion.Name = descriptor.name
 
 
     final def length: Int = descriptor.length
@@ -169,6 +166,9 @@ abstract class Calendar {
 
 
   protected abstract class MonthCompanion {
+
+    type Name
+
 
     def apply(number: Int): Month
 
@@ -221,7 +221,7 @@ abstract class Calendar {
     def apply(number: Int): Day
 
 
-    def apply(year: Int, month: MonthName, day: Int): Day = yearCompanion(year).month(month).day(day)
+    def apply(year: Int, month: monthCompanion.Name, day: Int): Day = yearCompanion(year).month(month).day(day)
 
 
     val FirstDayDayOfWeek: Int

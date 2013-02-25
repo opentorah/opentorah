@@ -2,7 +2,7 @@ package org.podval.calendar.dates;
 
 import org.junit.{Before, Test, Assert}
 
-import JewishCalendar.{Year, Day, MonthName}
+import JewishCalendar.{Year, Day, Month}
 import JewishCalendar.Month.{Tishrei, Marheshvan, AdarII, Nisan}
 
 
@@ -31,7 +31,7 @@ final class DatesTest {
   }
 
 
-  private def date2days2date(yearNumber: Int, monthName: MonthName, dayNumber: Int) {
+  private def date2days2date(yearNumber: Int, monthName: Month.Name, dayNumber: Int) {
     val year = Year(yearNumber)
     Assert.assertEquals(yearNumber, year.number)
 

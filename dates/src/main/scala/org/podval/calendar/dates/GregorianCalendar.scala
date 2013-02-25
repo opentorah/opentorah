@@ -28,9 +28,6 @@ object GregorianCalendar extends Calendar {
   override protected val yearCompanion = Year
 
 
-  sealed trait MonthName
-
-
   type YearCharacter = Boolean
 
 
@@ -73,7 +70,7 @@ object GregorianCalendar extends Calendar {
     protected override def characters: Seq[YearCharacter] = Seq(true, false)
 
 
-    protected override def namesAndLengths(isLeap: Boolean): List[(MonthName, Int)] = {
+    protected override def namesAndLengths(isLeap: Boolean): List[(Month.Name, Int)] = {
       List(
         (Month.January, 31),
         (Month.February, if (isLeap) 29 else 28),
@@ -103,18 +100,19 @@ object GregorianCalendar extends Calendar {
     override def apply(number: Int): Month = new Month(number)
 
 
-    case object January   extends MonthName
-    case object February  extends MonthName
-    case object March     extends MonthName
-    case object April     extends MonthName
-    case object May       extends MonthName
-    case object June      extends MonthName
-    case object July      extends MonthName
-    case object August    extends MonthName
-    case object September extends MonthName
-    case object October   extends MonthName
-    case object November  extends MonthName
-    case object December  extends MonthName
+    sealed trait Name
+    case object January   extends Name
+    case object February  extends Name
+    case object March     extends Name
+    case object April     extends Name
+    case object May       extends Name
+    case object June      extends Name
+    case object July      extends Name
+    case object August    extends Name
+    case object September extends Name
+    case object October   extends Name
+    case object November  extends Name
+    case object December  extends Name
   }
 
 

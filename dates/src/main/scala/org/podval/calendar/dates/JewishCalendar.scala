@@ -28,10 +28,6 @@ object JewishCalendar extends Calendar {
   override protected val yearCompanion = Year
 
 
-  // XXX toString?!
-  sealed trait MonthName
-
-
   type YearCharacter = (Boolean, Year.Kind)
 
 
@@ -122,7 +118,7 @@ object JewishCalendar extends Calendar {
       for (isLeap <- Seq(true, false); kind <- Seq(Year.Short, Year.Regular, Year.Full)) yield (isLeap, kind)
 
 
-    protected override def namesAndLengths(character: YearCharacter): List[(MonthName, Int)] = character match { case (isLeap: Boolean, kind: Year.Kind) =>
+    protected override def namesAndLengths(character: YearCharacter): List[(Month.Name, Int)] = character match { case (isLeap: Boolean, kind: Year.Kind) =>
       List(
         (Month.Tishrei, 30),
         (Month.Marheshvan, if (kind == Year.Full) 30 else 29),
@@ -163,20 +159,22 @@ object JewishCalendar extends Calendar {
     override def apply(number: Int): Month = new Month(number)
 
 
-    case object Tishrei    extends MonthName
-    case object Marheshvan extends MonthName
-    case object Kislev     extends MonthName
-    case object Teves      extends MonthName
-    case object Shvat      extends MonthName
-    case object Adar       extends MonthName
-    case object Nisan      extends MonthName
-    case object Iyar       extends MonthName
-    case object Sivan      extends MonthName
-    case object Tammuz     extends MonthName
-    case object Av         extends MonthName
-    case object Elul       extends MonthName
-    case object AdarI      extends MonthName
-    case object AdarII     extends MonthName
+    // XXX toString?!
+    sealed trait Name
+    case object Tishrei    extends Name
+    case object Marheshvan extends Name
+    case object Kislev     extends Name
+    case object Teves      extends Name
+    case object Shvat      extends Name
+    case object Adar       extends Name
+    case object Nisan      extends Name
+    case object Iyar       extends Name
+    case object Sivan      extends Name
+    case object Tammuz     extends Name
+    case object Av         extends Name
+    case object Elul       extends Name
+    case object AdarI      extends Name
+    case object AdarII     extends Name
 
 
     // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3)
