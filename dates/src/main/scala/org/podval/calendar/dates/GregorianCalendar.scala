@@ -31,25 +31,15 @@ object GregorianCalendar extends Calendar {
   type YearCharacter = Boolean
 
 
+  protected override val helper: GregorianCalendarHelper.type = GregorianCalendarHelper
+
+
   final class Year(number: Int) extends YearBase(number) {
 
-//    require(0 < number)
-
-    // TODO give names to constants?
-    def isLeap: Boolean = (number % 4 == 0) && ((number % 100 != 0) || (number % 400 == 0))
+    override def firstDay: Int = helper.firstDay(number)
 
 
-    override def firstDay: Int =
-      GregorianCalendarConstants.DaysInNonLeapYear * (number - 1) + (number - 1)/4 - (number - 1)/100 + (number - 1)/400 + 1
-
-
-    override def lengthInDays = if (isLeap) GregorianCalendarConstants.DaysInLeapYear else GregorianCalendarConstants.DaysInNonLeapYear
-
-
-    override def firstMonth: Int = GregorianCalendarConstants.MonthsInYear*(number - 1) + 1
-
-
-    def lengthInMonths = GregorianCalendarConstants.MonthsInYear
+    override def lengthInDays = helper.lengthInDays(number)
 
 
     override def character: YearCharacter = isLeap
@@ -59,9 +49,6 @@ object GregorianCalendar extends Calendar {
   object Year extends YearCompanion {
 
     override def apply(number: Int): Year = new Year(number)
-
-
-    override def apply(month: Month): Year = Year((month.number - 1) / GregorianCalendarConstants.MonthsInYear +1)
 
 
     protected override def areYearsPositive: Boolean = false
@@ -89,10 +76,7 @@ object GregorianCalendar extends Calendar {
   }
 
 
-  final class Month(number: Int) extends MonthBase(number) {
-
-    override def numberInYear: Int = number - year.firstMonth + 1
-  }
+  final class Month(number: Int) extends MonthBase(number)
 
 
   object Month extends MonthCompanion {
@@ -100,19 +84,23 @@ object GregorianCalendar extends Calendar {
     override def apply(number: Int): Month = new Month(number)
 
 
-    sealed trait Name
-    case object January   extends Name
-    case object February  extends Name
-    case object March     extends Name
-    case object April     extends Name
-    case object May       extends Name
-    case object June      extends Name
-    case object July      extends Name
-    case object August    extends Name
-    case object September extends Name
-    case object October   extends Name
-    case object November  extends Name
-    case object December  extends Name
+    sealed class Name(name: String) {
+
+      final override def toString: String = name
+    }
+
+    case object January   extends Name("January")
+    case object February  extends Name("February")
+    case object March     extends Name("March")
+    case object April     extends Name("April")
+    case object May       extends Name("May")
+    case object June      extends Name("June")
+    case object July      extends Name("July")
+    case object August    extends Name("August")
+    case object September extends Name("September")
+    case object October   extends Name("October")
+    case object November  extends Name("November")
+    case object December  extends Name("December")
   }
 
 
@@ -128,9 +116,6 @@ object GregorianCalendar extends Calendar {
   object Day extends DayCompanion {
 
     override def apply(number: Int): Day = new Day(number)
-
-
-    override val FirstDayDayOfWeek = Constants.FirstDayDayOfWeekGregorian
   }
 
 
@@ -152,14 +137,14 @@ object GregorianCalendar extends Calendar {
 
 
     def morningTime(hours: Int, parts: Int) = {
-      require(hours < Constants.HoursPerHalfDay)
+      require(hours < CalendarHelper.hoursPerHalfDay)
       Time(hours, parts)
     }
 
 
     def afternoonTime(hours: Int, parts: Int) = {
-      require(hours < Constants.HoursPerHalfDay)
-      Time(hours + Constants.HoursPerHalfDay, parts)
+      require(hours < CalendarHelper.hoursPerHalfDay)
+      Time(hours + CalendarHelper.hoursPerHalfDay, parts)
     }
   }
 }

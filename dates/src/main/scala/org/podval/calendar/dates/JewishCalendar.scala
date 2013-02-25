@@ -31,18 +31,17 @@ object JewishCalendar extends Calendar {
   type YearCharacter = (Boolean, Year.Kind)
 
 
+  protected override val helper: JewishCalendarHelper.type = JewishCalendarHelper
+
+
   final class Year(number: Int) extends YearBase(number) {
 
     require(0 < number)
 
 
-    def isLeap: Boolean = JewishCalendarConstants.isLeap(numberInCycle)
-
-
     // TODO give names to constants
     override def firstDay: Int = {
-      val Adu = Set(1, 4, 6)
-      def isAdu(day: Day) = Adu.contains(day.dayOfWeek)
+      def isAdu(day: Day) = yearCompanion.Adu.contains(day.dayOfWeek)
 
       val newMoon = month(1).newMoon
       val day = newMoon.day
@@ -52,8 +51,8 @@ object JewishCalendar extends Calendar {
       else if (time >= Time(18, 0)) {
         if (!isAdu(day.next)) day.next /* KH 7:2 */ else day.next.next /* KH 7:3 */
       }
-      else if ((day.dayOfWeek == 3) && time >= Time( 9, 204) && !this.isLeap) day.next.next /* KH 7:4 */
-      else if ((day.dayOfWeek == 2) && time >= Time(15, 589) && this.prev.isLeap) day.next /* KH 7:5 */
+      else if ((day.dayOfWeek == 3) && time >= Time( 9, 204) && !this     .isLeap) day.next.next /* KH 7:4 */
+      else if ((day.dayOfWeek == 2) && time >= Time(15, 589) &&  this.prev.isLeap) day.next /* KH 7:5 */
       else day
     }.number
 
@@ -61,19 +60,10 @@ object JewishCalendar extends Calendar {
     override def lengthInDays: Int = next.firstDay - this.firstDay
 
 
-    override def firstMonth: Int = JewishCalendarConstants.MonthsInCycle*(cycle - 1) + firstMonthInCycle
+    def cycle: Int = helper.cycle(number)
 
 
-    override def lengthInMonths: Int = JewishCalendarConstants.lengthInMonths(numberInCycle)
-
-
-    def cycle: Int = ((number - 1) / JewishCalendarConstants.YearsInCycle) + 1
-
-
-    def numberInCycle: Int = ((number - 1) % JewishCalendarConstants.YearsInCycle) + 1
-
-
-    def firstMonthInCycle: Int = JewishCalendarConstants.MonthsBeforeYearInCycle(numberInCycle - 1) + 1
+    def numberInCycle: Int = helper.numberInCycle(number)
 
 
     override def character: YearCharacter = (isLeap, kind)
@@ -96,13 +86,6 @@ object JewishCalendar extends Calendar {
   object Year extends YearCompanion {
 
     override def apply(number: Int): Year = new Year(number)
-
-
-    override def apply(month: Month): Year = {
-      val yearsBeforeCycle = (month.cycle - 1)*JewishCalendarConstants.YearsInCycle
-      val yearMonthIsInCycle = JewishCalendarConstants.MonthsBeforeYearInCycle.count(_ < month.numberInCycle)
-      Year(yearsBeforeCycle + yearMonthIsInCycle)
-    }
 
 
     protected override def areYearsPositive: Boolean = true
@@ -136,19 +119,13 @@ object JewishCalendar extends Calendar {
           (Month.Elul, 29)
         )
     }
+
+
+    private val Adu = Set(1, 4, 6)
   }
 
 
   final class Month(number: Int) extends MonthBase(number) {
-
-    override def numberInYear: Int = numberInCycle - year.firstMonthInCycle + 1
-
-
-    def cycle: Int = ((number - 1) / JewishCalendarConstants.MonthsInCycle) + 1
-
-
-    def numberInCycle: Int = ((number - 1) % JewishCalendarConstants.MonthsInCycle) + 1
-
 
     def newMoon: Moment = Month.FirstNewMoon + Month.MeanLunarPeriod*(number-1)
   }
@@ -160,21 +137,25 @@ object JewishCalendar extends Calendar {
 
 
     // XXX toString?!
-    sealed trait Name
-    case object Tishrei    extends Name
-    case object Marheshvan extends Name
-    case object Kislev     extends Name
-    case object Teves      extends Name
-    case object Shvat      extends Name
-    case object Adar       extends Name
-    case object Nisan      extends Name
-    case object Iyar       extends Name
-    case object Sivan      extends Name
-    case object Tammuz     extends Name
-    case object Av         extends Name
-    case object Elul       extends Name
-    case object AdarI      extends Name
-    case object AdarII     extends Name
+    sealed class Name(name: String) {
+
+      final override def toString: String = name
+    }
+
+    case object Tishrei    extends Name("Tishrei")
+    case object Marheshvan extends Name("Marheshvan")
+    case object Kislev     extends Name("Kislev")
+    case object Teves      extends Name("Teves")
+    case object Shvat      extends Name("Shvat")
+    case object Adar       extends Name("Adar")
+    case object Nisan      extends Name("Nisan")
+    case object Iyar       extends Name("Iyar")
+    case object Sivan      extends Name("Sivan")
+    case object Tammuz     extends Name("Tammuz")
+    case object Av         extends Name("Av")
+    case object Elul       extends Name("Elul")
+    case object AdarI      extends Name("Adar I")
+    case object AdarII     extends Name("Adar II")
 
 
     // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3)
@@ -199,9 +180,6 @@ object JewishCalendar extends Calendar {
   object Day extends DayCompanion {
 
     override def apply(number: Int): Day = new Day(number)
-
-
-    override val FirstDayDayOfWeek = Constants.FirstDayDayOfWeekJewish
   }
 
 
@@ -223,14 +201,14 @@ object JewishCalendar extends Calendar {
 
 
     def nightTime(hours: Int, parts: Int) = {
-      require(hours < Constants.HoursPerHalfDay)
+      require(hours < CalendarHelper.hoursPerHalfDay)
       Time(hours, parts)
     }
 
 
     def dayTime(hours: Int, parts: Int) = {
-      require(hours < Constants.HoursPerHalfDay)
-      Time(hours + Constants.HoursPerHalfDay, parts)
+      require(hours < CalendarHelper.hoursPerHalfDay)
+      Time(hours + CalendarHelper.hoursPerHalfDay, parts)
     }
   }
 }
