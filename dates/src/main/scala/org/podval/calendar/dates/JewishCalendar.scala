@@ -136,7 +136,6 @@ object JewishCalendar extends Calendar {
     override def apply(number: Int): Month = new Month(number)
 
 
-    // XXX toString?!
     sealed class Name(name: String) {
 
       final override def toString: String = name
@@ -178,6 +177,23 @@ object JewishCalendar extends Calendar {
 
 
   object Day extends DayCompanion {
+
+    sealed class Name(name: String) {
+
+      final override def toString: String = name
+    }
+
+    case object Rishon   extends Name("Rishon")
+    case object Sheni    extends Name("Sheni")
+    case object Shlishi  extends Name("Shlishi")
+    case object Rvii     extends Name("Rvii")
+    case object Chamishi extends Name("Chamishi")
+    case object Shishi   extends Name("Shishi")
+    case object Shabbos  extends Name("Shabbos")
+
+
+    def names: Seq[dayCompanion.Name] = Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi, Shabbos)
+
 
     override def apply(number: Int): Day = new Day(number)
   }

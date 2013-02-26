@@ -115,6 +115,23 @@ object GregorianCalendar extends Calendar {
 
   object Day extends DayCompanion {
 
+    sealed class Name(name: String) {
+
+      final override def toString: String = name
+    }
+
+    case object Sunday    extends Name("Sunday")
+    case object Monday    extends Name("Monday")
+    case object Tuesday   extends Name("Tuesday")
+    case object Wednesday extends Name("Wednesday")
+    case object Thursday  extends Name("Thursday")
+    case object Friday    extends Name("Friday")
+    case object Saturday  extends Name("Saturday")
+
+
+    def names: Seq[dayCompanion.Name] = Seq(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+
+
     override def apply(number: Int): Day = new Day(number)
   }
 

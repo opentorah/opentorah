@@ -179,7 +179,7 @@ abstract class Calendar {
     def apply(number: Int): Month
 
 
-    def apply(year: Int, monthInYear: Int): Month = yearCompanion(year).month(monthInYear)
+    final def apply(year: Int, monthInYear: Int): Month = yearCompanion(year).month(monthInYear)
   }
 
 
@@ -198,6 +198,9 @@ abstract class Calendar {
 
 
     final def dayOfWeek: Int = helper.dayOfWeek(number)
+
+
+    final def name: dayCompanion.Name = dayCompanion.names(dayOfWeek)
 
 
     final def dayOfMonth: Int = number - month.firstDay + 1
@@ -224,10 +227,19 @@ abstract class Calendar {
 
   protected abstract class DayCompanion {
 
+    type Name
+
+
+    def names: Seq[dayCompanion.Name]
+
+
     def apply(number: Int): Day
 
 
-    def apply(year: Int, month: monthCompanion.Name, day: Int): Day = yearCompanion(year).month(month).day(day)
+    final def apply(year: Int, month: monthCompanion.Name, day: Int): Day = yearCompanion(year).month(month).day(day)
+
+
+    final def apply(year: Int, month: Int, day: Int): Day = yearCompanion(year).month(month).day(day)
   }
 
 
@@ -311,7 +323,7 @@ abstract class Calendar {
     }
 
 
-    final override def hashCode = 41*hours+parts
+    final override def hashCode = 41 * hours + parts
 
 
     final override def compare(that: Time) = this.allParts - that.allParts
