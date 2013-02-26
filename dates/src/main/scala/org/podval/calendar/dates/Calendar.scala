@@ -36,14 +36,6 @@ abstract class Calendar {
   type Time <: TimeBase
 
 
-  // XXX submerge in Year
-  type YearCharacter
-
-
-  // XXX submerge
-  final class MonthDescriptor(val name: monthCompanion.Name, val length: Int, val daysBefore: Int)
-
-
   protected val helper: CalendarHelper
 
 
@@ -67,13 +59,13 @@ abstract class Calendar {
     def lengthInMonths: Int = helper.lengthInMonths(number)
 
 
-    def character: YearCharacter
+    def character: yearCompanion.Character
 
 
     def isLeap: Boolean = helper.isLeap(number)
 
 
-    final def month(numberInYear /* XXX name monthOfYear, like others? */: Int): Month = {
+    final def month(numberInYear: Int): Month = {
       require(0 < numberInYear && numberInYear <= lengthInMonths)
       monthCompanion(firstMonth + numberInYear - 1)
     }
@@ -83,27 +75,29 @@ abstract class Calendar {
 
 
     final def month(day: Day): Month = {
-      require(0 < day.dayOfYear && day.dayOfYear <= lengthInDays)
-      month(months.count(_.daysBefore < day.dayOfYear))
+      require(0 < day.numberInYear && day.numberInYear <= lengthInDays)
+      month(months.count(_.daysBefore < day.numberInYear))
     }
 
 
-    final def months: List[MonthDescriptor] = yearCompanion.Months(this.character)
+    final def months: List[monthCompanion.Descriptor] = yearCompanion.Months(this.character)
   }
 
 
   protected abstract class YearCompanion {
 
+    type Character
+
+
     def apply(number: Int): Year
 
 
-    final  def apply(month: Month): Year = apply(helper.yearNumberOfMonth(month.number))
+    final  def apply(month: Month): Year = apply(helper.yearNumber(month.number))
 
 
     final def apply(day: Day): Year = {
-      // XXX give names to constants
-      val startingYear = (4 * day.number / (4 * 365 + 1)) - 1
-      var result = apply(if (areYearsPositive) scala.math.max(1, startingYear) else startingYear)
+      val yearForSureBefore = CalendarHelper.yearForSureBefore(day.number)
+      var result = apply(if (areYearsPositive) scala.math.max(1, yearForSureBefore) else yearForSureBefore)
       require(result.firstDay <= day.number)
       while (result.next.firstDay <= day.number) result = result.next
       result
@@ -113,22 +107,22 @@ abstract class Calendar {
     protected def areYearsPositive: Boolean
 
 
-    val Months: Map[YearCharacter, List[MonthDescriptor]] =
+    val Months: Map[yearCompanion.Character, List[monthCompanion.Descriptor]] =
       Map((for (character <- characters) yield character -> monthsGenerator(character)): _*)
 
 
-    protected def characters: Seq[YearCharacter]
+    protected def characters: Seq[yearCompanion.Character]
 
 
-    private def monthsGenerator(character: YearCharacter): List[MonthDescriptor] = {
+    private def monthsGenerator(character: yearCompanion.Character): List[monthCompanion.Descriptor] = {
       val namesAndLengths = this.namesAndLengths(character)
       val (_, lengths) = namesAndLengths.unzip
       val daysBefore = lengths.scanLeft(0)(_ + _).init
-      (namesAndLengths zip daysBefore) map (m => new MonthDescriptor(m._1._1, m._1._2, m._2))
+      (namesAndLengths zip daysBefore) map (m => new monthCompanion.Descriptor(m._1._1, m._1._2, m._2))
     }
 
 
-    protected def namesAndLengths(character: YearCharacter): List[(monthCompanion.Name, Int)]
+    protected def namesAndLengths(character: yearCompanion.Character): List[(monthCompanion.Name, Int)]
   }
 
 
@@ -149,7 +143,7 @@ abstract class Calendar {
     final def year: Year = yearCompanion(this)
 
 
-    final def numberInYear: Int = helper.numberInYearOfMonth(number)
+    final def numberInYear: Int = helper.numberInYear(number)
 
 
     final def day(day: Int): Day = {
@@ -176,6 +170,9 @@ abstract class Calendar {
     type Name
 
 
+    final class Descriptor(val name: monthCompanion.Name, val length: Int, val daysBefore: Int)
+
+
     def apply(number: Int): Month
 
 
@@ -197,16 +194,16 @@ abstract class Calendar {
     final def prev: Day = dayCompanion(number - 1)
 
 
-    final def dayOfWeek: Int = helper.dayOfWeek(number)
+    final def numberInWeek: Int = helper.numberInWeek(number)
 
 
-    final def name: dayCompanion.Name = dayCompanion.names(dayOfWeek)
+    final def name: dayCompanion.Name = dayCompanion.names(numberInWeek - 1)
 
 
-    final def dayOfMonth: Int = number - month.firstDay + 1
+    final def numberInMonth: Int = number - month.firstDay + 1
 
 
-    final def dayOfYear: Int = number - year.firstDay + 1
+    final def numberInYear: Int = number - year.firstDay + 1
 
 
     final def year: Year = yearCompanion(this)
@@ -221,7 +218,7 @@ abstract class Calendar {
     final def time(hours: Int, parts: Int): Moment = time(timeCompanion(hours, parts))
 
 
-    final def toFullString: String = year + " " + month.name + " " + dayOfMonth
+    final def toFullString: String = year + " " + month.name + " " + numberInMonth
   }
 
 
@@ -263,7 +260,7 @@ abstract class Calendar {
     }
 
 
-    final def day: Day = dayCompanion(days+1)
+    final def day: Day = dayCompanion(days + 1)
 
 
     final override def toString: String = day + " " + time.toString

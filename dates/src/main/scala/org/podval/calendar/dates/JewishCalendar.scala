@@ -28,9 +28,6 @@ object JewishCalendar extends Calendar {
   override protected val yearCompanion = Year
 
 
-  type YearCharacter = (Boolean, Year.Kind)
-
-
   protected override val helper: JewishCalendarHelper.type = JewishCalendarHelper
 
 
@@ -41,18 +38,16 @@ object JewishCalendar extends Calendar {
 
     // TODO give names to constants
     override def firstDay: Int = {
-      def isAdu(day: Day) = yearCompanion.Adu.contains(day.dayOfWeek)
-
       val newMoon = month(1).newMoon
       val day = newMoon.day
       val time = newMoon.time
 
-      if (isAdu(day)) day.next // KH 7:1
+      if (Year.isAdu(day.name)) day.next // KH 7:1
       else if (time >= Time(18, 0)) {
-        if (!isAdu(day.next)) day.next /* KH 7:2 */ else day.next.next /* KH 7:3 */
+        if (!Year.isAdu(day.next.name)) day.next /* KH 7:2 */ else day.next.next /* KH 7:3 */
       }
-      else if ((day.dayOfWeek == 3) && time >= Time( 9, 204) && !this     .isLeap) day.next.next /* KH 7:4 */
-      else if ((day.dayOfWeek == 2) && time >= Time(15, 589) &&  this.prev.isLeap) day.next /* KH 7:5 */
+      else if ((day.name == Day.Shlishi) && time >= Time( 9, 204) && !this     .isLeap) day.next.next /* KH 7:4 */
+      else if ((day.name == Day.Sheni  ) && time >= Time(15, 589) &&  this.prev.isLeap) day.next /* KH 7:5 */
       else day
     }.number
 
@@ -66,7 +61,7 @@ object JewishCalendar extends Calendar {
     def numberInCycle: Int = helper.numberInCycle(number)
 
 
-    override def character: YearCharacter = (isLeap, kind)
+    override def character: yearCompanion.Character = (isLeap, kind)
 
 
     // KH 8:7,8
@@ -85,6 +80,9 @@ object JewishCalendar extends Calendar {
 
   object Year extends YearCompanion {
 
+    type Character = (Boolean, Year.Kind)
+
+
     override def apply(number: Int): Year = new Year(number)
 
 
@@ -97,11 +95,11 @@ object JewishCalendar extends Calendar {
     case object Full    extends Kind
 
 
-    protected override def characters: Seq[YearCharacter] =
+    protected override def characters: Seq[yearCompanion.Character] =
       for (isLeap <- Seq(true, false); kind <- Seq(Year.Short, Year.Regular, Year.Full)) yield (isLeap, kind)
 
 
-    protected override def namesAndLengths(character: YearCharacter): List[(Month.Name, Int)] = character match { case (isLeap: Boolean, kind: Year.Kind) =>
+    protected override def namesAndLengths(character: yearCompanion.Character): List[(Month.Name, Int)] = character match { case (isLeap: Boolean, kind: Year.Kind) =>
       List(
         (Month.Tishrei, 30),
         (Month.Marheshvan, if (kind == Year.Full) 30 else 29),
@@ -121,7 +119,10 @@ object JewishCalendar extends Calendar {
     }
 
 
-    private val Adu = Set(1, 4, 6)
+    private val adu: Set[Day.Name] = Set(Day.Rishon, Day.Rvii, Day.Shishi)
+
+
+    private def isAdu(dayName: Day.Name) = adu.contains(dayName)
   }
 
 

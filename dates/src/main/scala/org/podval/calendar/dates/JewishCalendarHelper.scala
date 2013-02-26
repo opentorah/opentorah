@@ -20,7 +20,7 @@ package org.podval.calendar.dates
 object JewishCalendarHelper extends CalendarHelper {
 
   // It seems that first day of the first year was Sunday.
-  override val firstDayDayOfWeek: Int = 1
+  override val firstDayNumberInWeek: Int = 1
 
 
   private val yearsInCycle = 19
@@ -56,7 +56,7 @@ object JewishCalendarHelper extends CalendarHelper {
   def numberInCycle(yearNumber: Int): Int = ((yearNumber - 1) % yearsInCycle) + 1
 
 
-  override def yearNumberOfMonth(monthNumber: Int): Int = {
+  override def yearNumber(monthNumber: Int): Int = {
     val cycleOfMonth = ((monthNumber - 1) / monthsInCycle) + 1
     val yearsBeforeCycle = (cycleOfMonth - 1) * yearsInCycle
     val yearMonthIsInCycle = monthsBeforeYearInCycle.count(_ < numberInCycleOfMonth(monthNumber))
@@ -64,7 +64,7 @@ object JewishCalendarHelper extends CalendarHelper {
   }
 
 
-  override def numberInYearOfMonth(monthNumber: Int): Int = numberInCycleOfMonth(monthNumber) - firstMonthInCycle(yearNumberOfMonth(monthNumber)) + 1
+  override def numberInYear(monthNumber: Int): Int = numberInCycleOfMonth(monthNumber) - firstMonthInCycle(yearNumber(monthNumber)) + 1
 
 
   private def firstMonthInCycle(yearNumber: Int): Int = monthsBeforeYearInCycle(numberInCycle(yearNumber) - 1) + 1

@@ -20,10 +20,10 @@ package org.podval.calendar.dates
 trait CalendarHelper {
 
 
-  val firstDayDayOfWeek: Int
+  val firstDayNumberInWeek: Int
 
 
-  final def dayOfWeek(dayNumber: Int): Int = ((dayNumber + firstDayDayOfWeek - 1 - 1) % CalendarHelper.daysPerWeek) + 1
+  final def numberInWeek(dayNumber: Int): Int = ((dayNumber + firstDayNumberInWeek - 1 - 1) % CalendarHelper.daysPerWeek) + 1
 
 
   def isLeap(yearNumber: Int): Boolean
@@ -35,10 +35,10 @@ trait CalendarHelper {
   def lengthInMonths(yearNumber: Int): Int
 
 
-  def yearNumberOfMonth(monthNumber: Int): Int
+  def yearNumber(monthNumber: Int): Int
 
 
-  def numberInYearOfMonth(monthNumber: Int): Int
+  def numberInYear(monthNumber: Int): Int
 }
 
 
@@ -65,4 +65,8 @@ object CalendarHelper {
 
 
   val daysPerWeek: Int = 7
+
+
+  // XXX give names to constants
+  def yearForSureBefore(dayNumber: Int): Int = (4 * dayNumber / (4 * 365 + 1)) - 1
 }

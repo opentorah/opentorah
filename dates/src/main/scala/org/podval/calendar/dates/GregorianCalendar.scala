@@ -28,9 +28,6 @@ object GregorianCalendar extends Calendar {
   override protected val yearCompanion = Year
 
 
-  type YearCharacter = Boolean
-
-
   protected override val helper: GregorianCalendarHelper.type = GregorianCalendarHelper
 
 
@@ -42,11 +39,14 @@ object GregorianCalendar extends Calendar {
     override def lengthInDays = helper.lengthInDays(number)
 
 
-    override def character: YearCharacter = isLeap
+    override def character: yearCompanion.Character = isLeap
   }
 
 
   object Year extends YearCompanion {
+
+    type Character = Boolean
+
 
     override def apply(number: Int): Year = new Year(number)
 
@@ -54,7 +54,7 @@ object GregorianCalendar extends Calendar {
     protected override def areYearsPositive: Boolean = false
 
 
-    protected override def characters: Seq[YearCharacter] = Seq(true, false)
+    protected override def characters: Seq[yearCompanion.Character] = Seq(true, false)
 
 
     protected override def namesAndLengths(isLeap: Boolean): List[(Month.Name, Int)] = {

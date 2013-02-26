@@ -1,55 +1,42 @@
 package org.podval.calendar.dates;
 
-import org.junit.{Test, Assert, Before}
+import org.junit.{Test, Assert}
 
-import JewishCalendar.Month
+import JewishCalendar.{Month => jm, Day => jd}
+import GregorianCalendar.{Month => gm}
+
 
 final class NewMoonTest {
 
-  @Before
-  def triggerInitializationOfTheJewishCalendar {
-    val x = JewishCalendar
+  val x = JewishCalendar
+  val y = GregorianCalendar
+
+
+  @Test
+  def newMoons {
+    // From http://www.chabad.org/library/article_cdo/aid/216238/jewish/Molad-Times.htm
+    //
+    newMoon(5769, jm.Tishrei   , jd.Shlishi, 5769, jm.Tishrei,  1, 2008, gm.September, 30,  1, 58, 13)
+    newMoon(5769, jm.Marheshvan, jd.Rvii   , 5769, jm.Tishrei, 30, 2008, gm.October  , 29,  2, 42, 14)
+    newMoon(5769, jm.Kislev    , jd.Shishi , 5769, jm.Kislev ,  1, 2008, gm.November , 28,  3, 26, 15)
+    newMoon(5771, jm.Elul      , jd.Sheni  , 5771, jm.Av     , 28, 2011, gm.September, 28, 17,  8, 14) // XXX day of the week?
+    newMoon(5772, jm.Tishrei   , jd.Shlishi, 5772, jm.Tishrei, 28, 2011, gm.October  , 28,  5, 52, 15) // XXX day of the week?
   }
 
-    @Test
-    def dummy = {}
 
 
-    @Test
-    def when2011() {
-        // TODO
-        println(Month(   1, 1).newMoon.toFullString)
-        println(Month(5772, 2).newMoon.toFullString)
-        println(Month(5772, 3).newMoon.toFullString)
-        println(Month(5772, 4).newMoon.toFullString)
-    }
+  def newMoon(moladYear: Int, moladMonth: jm.Name, dayOfWeek: jd.Name,
+              year: Int, month: jm.Name, day: Int,
+              yearG: Int, monthG: gm.Name, dayG: Int,
+              hours: Int, minutes: Int, parts: Int)
+  {
+    val molad = JewishCalendar.Year(moladYear).month(moladMonth).newMoon
+    Assert.assertEquals(dayOfWeek, molad.day.name)
 
-  /*
-   * New Moons
-   * 5771 Elul     28   23: 8:14   2011 Sep 28 17: 8:14
-   * 5772 Tishrei   1   11:52:15   2011 Oct 28  5:52:15
-   * 5772 Cheshvan 29   
-   */
-
-//    @Test
-//    public void table5769() {
-//        // From http://www.chabad.org/library/article_cdo/aid/216238/jewish/Molad-Times.htm
-//
-//        molad(5769, JewishMonth.Tishri, 3, JewishMonth.Tishri, 1, 2008, GregorianMonth.September, 30, 1, true, 58, 13);
-//        molad(5769, JewishMonth.MarHeshvan, 4, JewishMonth.Tishri, 30, 2008, GregorianMonth.October, 29, 2, false, 42, 14);
-//        molad(5769, JewishMonth.Kislev, 6, JewishMonth.Kislev, 1, 2008, GregorianMonth.November, 28, 3, true, 26, 15);
-//    }
-//
-//
-//        moladDate(year, month);
-//        Assert.assertEquals(dayOfTheWeek, mDate.getDayOfTheWeek());
-//
-//        Assert.assertEquals(jMonth, mDate.getMonth().month);
-//        Assert.assertEquals(jDay, mDate.getDay());
-//
-//        final GregorianDate gDate = GregorianDate.create(gYear, gMonth, gDay)
-//            .setTime(hour + (am ? 0 : 12), minute, parts);
-//
-//        Assert.assertEquals(gDate, mDate.toGregorian());
-//    }
+    Assert.assertEquals(JewishCalendar.Day(year, month, day), molad.day)
+    // XXX conversion of Moments!!!
+//    val moladG = Conversions.fromJewish(molad)
+    // XXX time with minutes!
+    val dateG = GregorianCalendar.Day(yearG, monthG, dayG).time(hours, minutes*18+parts)
+  }
 }

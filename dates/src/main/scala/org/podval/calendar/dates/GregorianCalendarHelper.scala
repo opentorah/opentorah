@@ -22,7 +22,8 @@ object GregorianCalendarHelper extends CalendarHelper {
   val epoch = 1373429
 
 
-  override val firstDayDayOfWeek = 1 // XXX calculate from the epoch and Jewish...
+  override val firstDayNumberInWeek =
+    (((JewishCalendarHelper.firstDayNumberInWeek - 1) + (epoch % CalendarHelper.daysPerWeek)) % CalendarHelper.daysPerWeek) + 1
 
 
   private val monthsInYear = 12
@@ -51,8 +52,8 @@ object GregorianCalendarHelper extends CalendarHelper {
   override def lengthInMonths(yearNumber: Int): Int = monthsInYear
 
 
-  override def yearNumberOfMonth(monthNumber: Int): Int = (monthNumber - 1) / monthsInYear + 1
+  override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / monthsInYear + 1
 
 
-  override def numberInYearOfMonth(monthNumber: Int): Int =  monthNumber - firstMonth(yearNumberOfMonth(monthNumber)) + 1
+  override def numberInYear(monthNumber: Int): Int =  monthNumber - firstMonth(yearNumber(monthNumber)) + 1
 }
