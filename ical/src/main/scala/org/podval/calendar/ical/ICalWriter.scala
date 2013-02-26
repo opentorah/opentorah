@@ -1,124 +1,121 @@
-package org.podval.calendar.ical;
+/*
+ *  Copyright 2009-2013 dub.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *  under the License.
+ */
 
-//import org.podval.calendar.dates.GregorianDate;
-//import org.podval.calendar.dates.GregorianCalendar;
+package org.podval.calendar.ical
 
-import java.io.OutputStream;
-import java.io.PrintStream;
+import org.podval.calendar.dates.GregorianCalendar.Day
+
+import java.io.{OutputStream, PrintStream}
 
 
-public final class ICalWriter {
+final class ICalWriter(os: OutputStream) {
 
-//    public ICalWriter(final OutputStream os) {
-//        this.out = new PrintStream(os);
-//    }
-//
-//
-//    public void beginCalendar(final String prodId, final String name, final String description) {
-//        println("BEGIN", "VCALENDAR");
-//        println("PRODID", prodId);
-//        println("VERSION", "2.0");
-//        println("CALSCALE", "GREGORIAN");
-//        println("METHOD", "PUBLISH");
-//
-//        if (name != null) {
-//            println("X-WR-CALNAME", name);
-//        }
-//
-//        if (description != null) {
-//            println("X-WR-CALDESC", description);
-//        }
-//    }
-//
-//
-//    public void endCalendar() {
-//        println("END", "VCALENDAR");
-//    }
-//
-//
-//    public void beginEvent() {
-//        beginEvent(true);
-//    }
-//final
-//
-//    public void beginEvent(final boolean transparent) {
-//        println("BEGIN", "VEVENT");
-//        println("CLASS", "PUBLIC");
-//        println("STATUS", "CONFIRMED");
-//        println("TRANSP", transparent ? "TRANSPARENT" : "OPAQUE");
-//    }
-//
-//
-//    public void writeSummary(final String summary) {
-//        println("SUMMARY", summary);
-//    }
-//
-//
-//    public void writeFullDayDuration(final GregorianDate date) {
-//        println("DTSTART;VALUE=DATE", toString(date));
-///////        println("DTEND;VALUE=DATE", toString(date.next()));
-//        println("DURATION", "P1D");
-//    }
-//
-//
-//    private String toString(final GregorianDate date) {
-//        final StringBuffer result = new StringBuffer();
-//        result.append(date.getYear());
-//        append2digits(result, GregorianCalendar.getInstance().monthNumber(date.getYear(), date.getMonth().month));
-//        append2digits(result, date.getDay());
-//
-//        return result.toString();
-//    }
-//
-//
-//    private void append2digits(final StringBuffer buf, final int what) {
-//        if (what < 10) {
-//            buf.append("0");
-//        }
-//        buf.append(what);
-//    }
-//
-//
+  val out = new PrintStream(os)
+
+
+  def beginCalendar(prodId: String, name: String, description: String) {
+    println("BEGIN", "VCALENDAR")
+    println("PRODID", prodId)
+    println("VERSION", "2.0")
+    println("CALSCALE", "GREGORIAN")
+    println("METHOD", "PUBLISH")
+
+    if (name != null) {
+      println("X-WR-CALNAME", name)
+    }
+
+    if (description != null) {
+      println("X-WR-CALDESC", description)
+    }
+  }
+
+
+  def endCalendar = println("END", "VCALENDAR")
+
+
+  def beginEvent: Unit = beginEvent(true)
+
+
+  def beginEvent(transparent: Boolean): Unit = {
+      println("BEGIN", "VEVENT")
+      println("CLASS", "PUBLIC")
+      println("STATUS", "CONFIRMED")
+      println("TRANSP", if (transparent) "TRANSPARENT" else "OPAQUE")
+  }
+
+
+  def writeSummary(summary: String) = println("SUMMARY", summary)
+
+
+  def writeFullDayDuration(day: Day) {
+    println("DTSTART;VALUE=DATE", toString(day))
+/////    println("DTEND;VALUE=DATE", toString(day.next))
+    println("DURATION", "P1D")
+  }
+
+
+  private def toString(day: Day): String = {
+    val result = new StringBuffer()
+
+    result.append(day.year.number)
+    result.append(pad2digits(day.month.numberInYear))
+    result.append(pad2digits(day.numberInMonth))
+
+    result.toString
+  }
+
+
+  private def pad2digits(what: Int): String = (if (what < 10) "0" else "") + what
+
+
 ////    public void beginEvent() {
 ////        println("CATEGORIES", "Holidays");
 ////        println("URL;VALUE=URI", "http://lwhjsdgfjhf");
 ////        println("DTSTAMP", "2061121T044202Z");
 ////        println("UID", "asdhjgd-wjks=-f");
 ////    }
-//
-//
-//    public void addGoggleContent(
-//        final String title,
-//        final String icon,
-//        final String url,
-//        final int width,
-//        final int height)
-//    {
-//        println("X-GOOGLE-CALENDAR-CONTENT-TITLE", title);
-//        println("X-GOOGLE-CALENDAR-CONTENT-ICON", icon);
-//        println("X-GOOGLE-CALENDAR-CONTENT-URL", url);
-//        println("X-GOOGLE-CALENDAR-CONTENT-TYPE", "text/html"); // can be image/*
-//        println("X-GOOGLE-CALENDAR-CONTENT-WIDTH", Integer.toString(width));
-//        println("X-GOOGLE-CALENDAR-CONTENT-HEIGHT", Integer.toString(height));
-//    }
-//
-//
-//    public void endEvent() {
-//        println("END", "VEVENT");
-//    }
-//
-//
-//    private void println(final String name, final String value) {
-//        out.print(name);
-//        out.print(":");
-//        out.println(value);
-//    }
-//
-//
-//    private void println(final String line) {
-//        out.println(line);
-//    }
-//
-//
-//    private final PrintStream out;
+
+
+  def addGoggleContent(
+      title: String,
+      icon: String,
+      url: String,
+      width: Int,
+      height: Int)
+  {
+      println("X-GOOGLE-CALENDAR-CONTENT-TITLE" , title)
+      println("X-GOOGLE-CALENDAR-CONTENT-ICON"  , icon)
+      println("X-GOOGLE-CALENDAR-CONTENT-URL"   , url)
+      println("X-GOOGLE-CALENDAR-CONTENT-TYPE"  , "text/html") // can be image/*
+      println("X-GOOGLE-CALENDAR-CONTENT-WIDTH" , width.toString)
+      println("X-GOOGLE-CALENDAR-CONTENT-HEIGHT", height.toString)
+  }
+
+
+  def endEvent = println("END", "VEVENT")
+
+
+  private def println(name: String, value: String) {
+    out.print(name)
+    out.print(":")
+    out.println(value)
+  }
+
+  private def println(line: String) {
+    out.println(line)
+  }
 }

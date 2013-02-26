@@ -1,5 +1,5 @@
 /*
- *  Copyright 2009 dub.
+ *  Copyright 2009-2013 dub.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,83 +17,77 @@
 
 package org.podval.calendar.ical;
 
-import java.io.FileOutputStream;
-//import org.podval.calendar.dates.GregorianCalendar;
-//import org.podval.calendar.dates.GregorianDate;
-//import org.podval.calendar.dates.GregorianMonth;
-//import org.podval.calendar.dates.JewishMonth;
-//import org.podval.calendar.dates.JewishDate;
+import org.podval.calendar.dates.{JewishCalendar, GregorianCalendar, Conversions}
 
-import java.io.OutputStream;
+import java.io.{OutputStream, FileOutputStream}
 
 
-public final class ICalGenerator {
+final class ICalGenerator private(os: OutputStream) {
 
-//    private ICalGenerator(final OutputStream os) {
-//        this.out = new ICalWriter(os);
-//    }
-//
-//
-//    private void writeYear(final int year) {
-//        out.beginCalendar("-//Podval Group//NONSGML Jewish Calendar//EN", "Jewish Dates", "Jewish Dates, Events and Schedules");
-//
-//        GregorianDate gDate = GregorianDate.create(year, GregorianMonth.January, 1);
-//        while (true) {
-//            writeDay(gDate);
-//
-//            gDate = GregorianCalendar.getInstance().dateFromDays(gDate.getDays()+1);
-//            if (gDate.getYear() != year) {
-//                break;
-//            }
-//        }
-//
-//        out.endCalendar();
-//    }
-//
-//
-//    private static final String ICON_URL = "http://calendar.podval.org/icon.gif";
-//
-//
-//    private void writeDay(final GregorianDate gDate) {
-//        final JewishDate jDate = gDate.toJewish();
-//        final String monthName = monthName(jDate.getMonth().month);
-//        final String summary = monthName + " " + jDate.getDay();
-//        final String url = "http://calendar.podval.org/day/" + jDate.getYear() + "/" + jDate.getMonth().name + "/" + jDate.getDay();
-//
-//        out.beginEvent();
-//        out.writeSummary(summary);
-//        out.writeFullDayDuration(gDate);
-//        out.addGoggleContent(summary, ICON_URL, url, 200, 200);
-//        out.endEvent();
-//    }
-//
-//
-//    private String monthName(final JewishMonth month) {
-//        String result = null;
-//        switch (month) {
-//        case Tishri: result = "Тишрей"; break;
-//        case MarHeshvan: result = "Мар-Хешван"; break;
-//        case Kislev: result = "Кислев"; break;
-//        case Tevet: result = "Тевес"; break;
-//        case Shevat: result = "Шват"; break;
-//        case Adar: result = "Адар"; break;
-//        case AdarI: result = "Адар I"; break;
-//        case AdarII: result = "Адар II"; break;
-//        case Nissan: result = "Нисан"; break;
-//        case Iyyar: result = "Ияр"; break;
-//        case Sivan: result = "Сиван"; break;
-//        case Tammuz: result = "Таммуз"; break;
-//        case Av: result = "Ав"; break;
-//        case Elul: result = "Элул"; break;
-//        }
-//        return result;
-//    }
-//
-//
-//    public static void main(final String[] args) throws Exception {
-//        new ICalGenerator(new FileOutputStream("/tmp/jc.ics")).writeYear(2009);
-//    }
-//
-//
-//    private final ICalWriter out;
+  val out = new ICalWriter(os)
+
+
+  private def writeYear(year: Int) {
+      out.beginCalendar("-//Podval Group//NONSGML Jewish Calendar//EN", "Jewish Dates", "Jewish Dates, Events and Schedules")
+
+      var dayG = GregorianCalendar.Day(year, 1, 1)
+      while (dayG.year.number == year) {
+        writeDay(dayG)
+        dayG = dayG.next
+      }
+
+      out.endCalendar
+  }
+
+
+  private def writeDay(dayG: GregorianCalendar.Day) {
+    val dayJ = Conversions.toJewish(dayG)
+    val monthName = toMonthName(dayJ.month.name)
+    val dayNumber = dayJ.numberInMonth
+    val summary = monthName + " " + dayNumber
+    val url = ICalGenerator.daysUrl + dayJ.year.number + "/" + monthName + "/" + dayNumber
+
+    out.beginEvent
+    out.writeSummary(summary)
+    out.writeFullDayDuration(dayG)
+    out.addGoggleContent(summary, ICalGenerator.iconUrl, url, 200, 200)
+    out.endEvent
+  }
+
+
+  private def toMonthName(month: JewishCalendar.Month.Name): String = {
+    import JewishCalendar.Month._
+    month match {
+      case Tishrei   => "Тишрей"
+      case Marheshvan=> "Мар-Хешван"
+      case Kislev    => "Кислев"
+      case Teves     => "Тевес"
+      case Shvat     => "Шват"
+      case Adar      => "Адар"
+      case AdarI     => "Адар I"
+      case AdarII    => "Адар II"
+      case Nisan     => "Нисан"
+      case Iyar      => "Ияр"
+      case Sivan     => "Сиван"
+      case Tammuz    => "Таммуз"
+      case Av        => "Ав"
+      case Elul      => "Элул"
+    }
+  }
+}
+
+
+object ICalGenerator {
+
+  val baseUrl = "http://calendar.podval.org/"
+  val daysUrl = baseUrl + "day/"
+  val iconUrl = baseUrl + "icon.gif"
+
+
+  def main(args: Array[String]) {
+    val x = JewishCalendar /// XXX shit...
+    val y = GregorianCalendar
+
+    new ICalGenerator(new FileOutputStream("/tmp/jc.ics")).writeYear(2013)
+  }
 }
