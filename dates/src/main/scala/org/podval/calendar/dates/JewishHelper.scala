@@ -17,7 +17,7 @@
 package org.podval.calendar.dates
 
 
-object JewishCalendarHelper extends CalendarHelper {
+object JewishHelper extends Helper {
 
   // It seems that first day of the first year was Sunday.
   override val firstDayNumberInWeek: Int = 1
@@ -27,12 +27,6 @@ object JewishCalendarHelper extends CalendarHelper {
 
 
   private val leapYears = Set(3, 6, 8, 11, 14, 17, 19)
-
-
-  private val monthsInNonLeapYear = 12
-
-
-  private val monthsInLeapYear = monthsInNonLeapYear + 1
 
 
   private val monthsBeforeYearInCycle = ((1 to yearsInCycle) map (lengthInMonths(_))).scanLeft(0)(_ + _)
@@ -47,7 +41,7 @@ object JewishCalendarHelper extends CalendarHelper {
   override def firstMonth(yearNumber: Int): Int = monthsInCycle*(cycle(yearNumber) - 1) + firstMonthInCycle(yearNumber)
 
 
-  override def lengthInMonths(yearNumber: Int): Int = if (isLeap(yearNumber)) monthsInLeapYear else monthsInNonLeapYear
+  override def lengthInMonths(yearNumber: Int): Int = if (isLeap(yearNumber)) 12 else 13
 
 
   def cycle(yearNumber: Int): Int = ((yearNumber - 1) / yearsInCycle) + 1

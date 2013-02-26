@@ -17,22 +17,19 @@
 package org.podval.calendar.dates
 
 
-object GregorianCalendarHelper extends CalendarHelper {
+object GregorianHelper extends Helper {
 
   val epoch = 1373429
 
 
   override val firstDayNumberInWeek =
-    (((JewishCalendarHelper.firstDayNumberInWeek - 1) + (epoch % CalendarHelper.daysPerWeek)) % CalendarHelper.daysPerWeek) + 1
+    (((JewishHelper.firstDayNumberInWeek - 1) + (epoch % Helper.daysPerWeek)) % Helper.daysPerWeek) + 1
 
 
   private val monthsInYear = 12
 
 
   private val daysInNonLeapYear = 365
-
-
-  private val daysInLeapYear = daysInNonLeapYear + 1
 
 
   // TODO give names to constants?
@@ -43,7 +40,7 @@ object GregorianCalendarHelper extends CalendarHelper {
   def firstDay(yearNumber: Int): Int = daysInNonLeapYear * (yearNumber - 1) + (yearNumber - 1)/4 - (yearNumber - 1)/100 + (yearNumber - 1)/400 + 1
 
 
-  def lengthInDays(yearNumber: Int): Int = if (isLeap(yearNumber)) daysInLeapYear else daysInNonLeapYear
+  def lengthInDays(yearNumber: Int): Int = if (isLeap(yearNumber)) daysInNonLeapYear + 1 else daysInNonLeapYear
 
 
   override def firstMonth(yearNumber: Int): Int = monthsInYear*(yearNumber - 1) + 1

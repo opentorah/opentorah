@@ -17,7 +17,7 @@
 
 package org.podval.calendar.ical;
 
-import org.podval.calendar.dates.{JewishCalendar, GregorianCalendar, Conversions}
+import org.podval.calendar.dates.{Jewish, Gregorian, Conversions}
 
 import java.io.{OutputStream, FileOutputStream}
 
@@ -30,7 +30,7 @@ final class ICalGenerator private(os: OutputStream) {
   private def writeYear(year: Int) {
       out.beginCalendar("-//Podval Group//NONSGML Jewish Calendar//EN", "Jewish Dates", "Jewish Dates, Events and Schedules")
 
-      var dayG = GregorianCalendar.Day(year, 1, 1)
+      var dayG = Gregorian.Day(year, 1, 1)
       while (dayG.year.number == year) {
         writeDay(dayG)
         dayG = dayG.next
@@ -40,7 +40,7 @@ final class ICalGenerator private(os: OutputStream) {
   }
 
 
-  private def writeDay(dayG: GregorianCalendar.Day) {
+  private def writeDay(dayG: Gregorian.Day) {
     val dayJ = Conversions.toJewish(dayG)
     val monthName = toMonthName(dayJ.month.name)
     val dayNumber = dayJ.numberInMonth
@@ -55,8 +55,8 @@ final class ICalGenerator private(os: OutputStream) {
   }
 
 
-  private def toMonthName(month: JewishCalendar.Month.Name): String = {
-    import JewishCalendar.Month._
+  private def toMonthName(month: Jewish.Month.Name): String = {
+    import Jewish.Month._
     month match {
       case Tishrei   => "Тишрей"
       case Marheshvan=> "Мар-Хешван"
@@ -85,8 +85,8 @@ object ICalGenerator {
 
 
   def main(args: Array[String]) {
-    val x = JewishCalendar /// XXX shit...
-    val y = GregorianCalendar
+    val x = Jewish /// XXX why do I need to do this?!
+    val y = Gregorian
 
     new ICalGenerator(new FileOutputStream("/tmp/jc.ics")).writeYear(2013)
   }

@@ -19,26 +19,45 @@ package org.podval.calendar.dates
 
 object Conversions {
 
-  private val jewishDayStartHours = 18
+
+  //  Jewish  :   6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0  1  2  3  4  5  6
+  //  Georgian:  |0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0
 
 
-  private val jewishDayLeftHours = CalendarHelper.hoursPerDay - jewishDayStartHours
+  // XXX move to helpers
+  private val jewishDayStartHours   = 18
 
 
-  def toJewish(moment: GregorianCalendar.Moment): JewishCalendar.Moment = {
+  // XXX move to helpers
+  private val georgianDayStartHours = Helper.hoursPerDay - jewishDayStartHours
+
+
+  def toJewish(moment: Gregorian.Moment): Jewish.Moment = {
     val hours = moment.time.hours
 
     val (newDay, newHours) =
       if (hours >= jewishDayStartHours)
         (moment.day.next, hours - jewishDayStartHours) else
-        (moment.day     , hours + jewishDayLeftHours)
+        (moment.day     , hours + georgianDayStartHours)
 
     toJewish(newDay).time(newHours, moment.time.parts)
   }
 
 
-  def fromJewish(day: JewishCalendar   .Day): GregorianCalendar.Day = GregorianCalendar.Day(day.number - GregorianCalendarHelper.epoch)
+  def fromJewish(moment: Jewish.Moment): Gregorian.Moment = {
+    val hours = moment.time.hours
+
+    val (newDay, newHours) =
+      if (hours < georgianDayStartHours)
+        (moment.day.prev, hours + jewishDayStartHours) else
+        (moment.day     , hours - georgianDayStartHours)
+
+    fromJewish(newDay).time(newHours, moment.time.parts)
+  }
 
 
-  def toJewish  (day: GregorianCalendar.Day): JewishCalendar   .Day = JewishCalendar   .Day(day.number + GregorianCalendarHelper.epoch)
+  def fromJewish(day: Jewish   .Day): Gregorian.Day = Gregorian.Day(day.number - GregorianHelper.epoch)
+
+
+  def toJewish  (day: Gregorian.Day): Jewish   .Day = Jewish   .Day(day.number + GregorianHelper.epoch)
 }

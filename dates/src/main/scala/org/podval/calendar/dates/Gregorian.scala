@@ -17,7 +17,7 @@
 package org.podval.calendar.dates
 
 
-object GregorianCalendar extends Calendar {
+object Gregorian extends Calendar {
 
   // XXX assignments of the companion objects have to happen early on, but even this is not sufficient!
   // I found that I need to assign JewishCalendar to a val to trigger its initialization - or I end up with a null for the Year companion object!
@@ -28,7 +28,7 @@ object GregorianCalendar extends Calendar {
   override protected val yearCompanion = Year
 
 
-  protected override val helper: GregorianCalendarHelper.type = GregorianCalendarHelper
+  protected override val helper: GregorianHelper.type = GregorianHelper
 
 
   final class Year(number: Int) extends YearBase(number) {
@@ -154,14 +154,14 @@ object GregorianCalendar extends Calendar {
 
 
     def morningTime(hours: Int, parts: Int) = {
-      require(hours < CalendarHelper.hoursPerHalfDay)
+      require(hours < Helper.hoursPerHalfDay)
       Time(hours, parts)
     }
 
 
     def afternoonTime(hours: Int, parts: Int) = {
-      require(hours < CalendarHelper.hoursPerHalfDay)
-      Time(hours + CalendarHelper.hoursPerHalfDay, parts)
+      require(hours < Helper.hoursPerHalfDay)
+      Time(hours + Helper.hoursPerHalfDay, parts)
     }
   }
 }

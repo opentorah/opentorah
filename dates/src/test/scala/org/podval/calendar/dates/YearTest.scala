@@ -18,15 +18,13 @@ package org.podval.calendar.dates
 
 import org.junit.{Before, Test, Assert}
 
-import JewishCalendar.Year
-
 
 final class YearTest {
 
-  private val x = JewishCalendar
+  private val x = Jewish
 
 
-  private val years = (1 to 6000) map (Year(_))
+  private val years = (1 to 6000) map (Jewish.Year(_))
 
 
   @Test

@@ -2,13 +2,13 @@ package org.podval.calendar.dates;
 
 import org.junit.{Test, Assert}
 
-import JewishCalendar.{Year, Day, Month}
-import JewishCalendar.Month.{Tishrei, Marheshvan, AdarII, Nisan}
+import Jewish.{Year, Day, Month}
+import Month._
 
 
 final class DatesTest {
 
-  val x = JewishCalendar
+  val x = Jewish
 
 
   @Test
@@ -21,11 +21,11 @@ final class DatesTest {
 
   @Test
   def date2days2date() {
-    val x = JewishCalendar
-    date2days2date(1   , Tishrei,  1);
-    date2days2date(2   , Tishrei,  1);
-    date2days2date(5768, AdarII , 28);
-    date2days2date(5769, Nisan  , 14);
+    val x = Jewish
+    date2days2date(1   , Tishrei,  1)
+    date2days2date(2   , Tishrei,  1)
+    date2days2date(5768, AdarII , 28)
+    date2days2date(5769, Nisan  , 14)
   }
 
 
@@ -37,6 +37,7 @@ final class DatesTest {
     Assert.assertEquals(monthName, month.name)
 
     val day = month.day(dayNumber)
+
     Assert.assertEquals(year, day.year)
     Assert.assertEquals(month, day.month)
     Assert.assertEquals(dayNumber, day.numberInMonth)

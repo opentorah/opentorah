@@ -17,13 +17,13 @@
 package org.podval.calendar.dates
 
 
-trait CalendarHelper {
+trait Helper {
 
 
   val firstDayNumberInWeek: Int
 
 
-  final def numberInWeek(dayNumber: Int): Int = ((dayNumber + firstDayNumberInWeek - 1 - 1) % CalendarHelper.daysPerWeek) + 1
+  final def numberInWeek(dayNumber: Int): Int = ((dayNumber + firstDayNumberInWeek - 1 - 1) % Helper.daysPerWeek) + 1
 
 
   def isLeap(yearNumber: Int): Boolean
@@ -43,7 +43,7 @@ trait CalendarHelper {
 
 
 
-object CalendarHelper {
+object Helper {
 
   val hoursPerDay = 24
 
