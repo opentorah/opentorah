@@ -247,22 +247,7 @@ abstract class Calendar {
   protected val dayCompanion: DayCompanion
 
 
-  abstract class MomentBase(val days: Int, val time: Time) extends Ordered[Moment] { self: Moment =>
-
-    final override def equals(other: Any): Boolean = other match {
-      case that: Moment => (days == that.days) && (time == that.time)
-      case _ => false
-    }
-
-
-    final override def hashCode = 41 * days.hashCode + time.hashCode
-
-
-    final override def compare(that: Moment) = {
-      val result = this.days.compare(that.days)
-      if (result == 0) this.time.compare(that.time) else result
-    }
-
+  abstract class MomentBase(days: Int, time: Time) extends MomentBasePre[Time, Moment](days, time) { self: Moment =>
 
     final def day: Day = dayCompanion(days + 1)
 
@@ -273,40 +258,7 @@ abstract class Calendar {
     final def toFullString: String = day.toFullString + " " + time.toFullString
 
 
-    final def +(other: Moment) = normalize(
-      days + other.days,
-      time.hours + other.time.hours,
-      time.parts + other.time.parts
-    )
-
-
-    final def -(other: Moment) = normalize(
-      days - other.days,
-      time.hours - other.time.hours,
-      time.parts - other.time.parts
-    )
-
-
-    final def *(n: Int): Moment = normalize(
-      days * n,
-      time.hours * n,
-      time.parts * n
-    )
-
-
-    private[this] def normalize(days: Int, hours: Int, parts: Int): Moment = {
-      require(0 <= days)
-      require(0 <= hours)
-      require(0 <= parts)
-
-      val hours_ = hours + parts / Helper.partsPerHour
-
-      momentCompanion(
-        days + hours_ / Helper.hoursPerDay,
-        timeCompanion(
-          hours_ % Helper.hoursPerDay,
-          parts % Helper.partsPerHour))
-    }
+    final protected override def create(days: Int, hours: Int, parts: Int): Moment = momentCompanion(days, timeCompanion(hours, parts))
   }
 
 
