@@ -55,19 +55,20 @@ object Gregorian extends Calendar {
 
 
     protected override def namesAndLengths(isLeap: Boolean): List[(Month.Name, Int)] = {
+      import Month._
       List(
-        (Month.January, 31),
-        (Month.February, if (isLeap) 29 else 28),
-        (Month.March, 31),
-        (Month.April, 30),
-        (Month.May, 31),
-        (Month.June, 30),
-        (Month.July, 31),
-        (Month.August, 31),
-        (Month.September, 30),
-        (Month.October, 31),
-        (Month.November, 30),
-        (Month.December, 31)
+        (January, 31),
+        (February, if (isLeap) 29 else 28),
+        (March, 31),
+        (April, 30),
+        (May, 31),
+        (June, 30),
+        (July, 31),
+        (August, 31),
+        (September, 30),
+        (October, 31),
+        (November, 30),
+        (December, 31)
       )
     }
   }
@@ -81,10 +82,7 @@ object Gregorian extends Calendar {
     override def apply(number: Int): Month = new Month(number)
 
 
-    sealed class Name(name: String) {
-
-      final override def toString: String = name
-    }
+    sealed class Name(name: String) extends Named(name)
 
     case object January   extends Name("January")
     case object February  extends Name("February")
@@ -112,10 +110,7 @@ object Gregorian extends Calendar {
 
   object Day extends DayCompanion {
 
-    sealed class Name(name: String) {
-
-      final override def toString: String = name
-    }
+    sealed class Name(name: String) extends Named(name)
 
     case object Sunday    extends Name("Sunday")
     case object Monday    extends Name("Monday")
@@ -133,16 +128,10 @@ object Gregorian extends Calendar {
   }
 
 
-  final class Moment(days: Int, time: Time) extends MomentBase(days, time)
-
-
   object Moment extends MomentCompanion {
 
     override def apply(days: Int, time: Time): Moment = new Moment(days, time)
   }
-
-
-  final class Time(hours: Int, parts: Int) extends TimeBase[Time](hours, parts)
 
 
   object Time extends TimeCompanion {

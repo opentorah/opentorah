@@ -17,7 +17,7 @@
 package org.podval.calendar.dates
 
 
-abstract class MomentBasePre[Time <: TimeBase[Time], Moment <: MomentBasePre[Time, Moment]](val days: Int, val time: Time)
+abstract class MomentBase[Time <: TimeBase[Time], Moment <: MomentBase[Time, Moment]](val days: Int, val time: Time)
   extends Ordered[Moment] { self: Moment =>
 
   final override def equals(other: Any): Boolean = other match {

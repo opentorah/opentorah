@@ -30,12 +30,6 @@ abstract class Calendar {
   type Day <: DayBase
 
 
-  type Moment <: MomentBase
-
-
-  type Time <: TimeBase[Time]
-
-
   protected val helper: Helper
 
 
@@ -247,18 +241,18 @@ abstract class Calendar {
   protected val dayCompanion: DayCompanion
 
 
-  abstract class MomentBase(days: Int, time: Time) extends MomentBasePre[Time, Moment](days, time) { self: Moment =>
+  final class Moment(days: Int, time: Time) extends MomentBase[Time, Moment](days, time) { self: Moment =>
 
-    final def day: Day = dayCompanion(days + 1)
-
-
-    final override def toString: String = day + " " + time.toString
+    def day: Day = dayCompanion(days + 1)
 
 
-    final def toFullString: String = day.toFullString + " " + time.toFullString
+    override def toString: String = day + " " + time
 
 
-    final protected override def create(days: Int, hours: Int, parts: Int): Moment = momentCompanion(days, timeCompanion(hours, parts))
+    def toFullString: String = day.toFullString + " " + time.toFullString
+
+
+    protected override def create(days: Int, hours: Int, parts: Int): Moment = momentCompanion(days, timeCompanion(hours, parts))
   }
 
 
@@ -269,6 +263,9 @@ abstract class Calendar {
 
 
   protected val momentCompanion: MomentCompanion
+
+
+  final class Time(hours: Int, parts: Int) extends TimeBase[Time](hours, parts)
 
 
   protected abstract class TimeCompanion {

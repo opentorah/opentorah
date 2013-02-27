@@ -93,26 +93,30 @@ object Jewish extends Calendar {
 
 
     protected override def characters: Seq[yearCompanion.Character] =
-      for (isLeap <- Seq(true, false); kind <- Seq(Year.Short, Year.Regular, Year.Full)) yield (isLeap, kind)
+      for (isLeap <- Seq(true, false); kind <- Seq(Short, Regular, Full)) yield (isLeap, kind)
 
 
-    protected override def namesAndLengths(character: yearCompanion.Character): List[(Month.Name, Int)] = character match { case (isLeap: Boolean, kind: Year.Kind) =>
-      List(
-        (Month.Tishrei, 30),
-        (Month.Marheshvan, if (kind == Year.Full) 30 else 29),
-        (Month.Kislev, if (kind == Year.Short) 29 else 30),
-        (Month.Teves, 29),
-        (Month.Shvat, 30)
-      ) ++
-        (if (!isLeap) List((Month.Adar, 29)) else List((Month.AdarI, 30), (Month.AdarII, 30))) ++
+    protected override def namesAndLengths(character: yearCompanion.Character): List[(Month.Name, Int)] = {
+      import Month._
+
+      character match { case (isLeap: Boolean, kind: Kind) =>
         List(
-          (Month.Nisan, 30),
-          (Month.Iyar, 29),
-          (Month.Sivan, 30),
-          (Month.Tammuz, 29),
-          (Month.Av, 30),
-          (Month.Elul, 29)
+          (Tishrei, 30),
+          (Marheshvan, if (kind == Full) 30 else 29),
+          (Kislev, if (kind == Short) 29 else 30),
+          (Teves, 29),
+          (Shvat, 30)
+        ) ++
+        (if (!isLeap) List((Adar, 29)) else List((AdarI, 30), (AdarII, 30))) ++
+        List(
+          (Nisan, 30),
+          (Iyar, 29),
+          (Sivan, 30),
+          (Tammuz, 29),
+          (Av, 30),
+          (Elul, 29)
         )
+      }
     }
 
 
@@ -134,10 +138,7 @@ object Jewish extends Calendar {
     override def apply(number: Int): Month = new Month(number)
 
 
-    sealed class Name(name: String) {
-
-      final override def toString: String = name
-    }
+    sealed class Name(name: String) extends Named(name)
 
     case object Tishrei    extends Name("Tishrei")
     case object Marheshvan extends Name("Marheshvan")
@@ -176,10 +177,7 @@ object Jewish extends Calendar {
 
   object Day extends DayCompanion {
 
-    sealed class Name(name: String) {
-
-      final override def toString: String = name
-    }
+    sealed class Name(name: String) extends Named(name)
 
     case object Rishon   extends Name("Rishon")
     case object Sheni    extends Name("Sheni")
@@ -197,16 +195,10 @@ object Jewish extends Calendar {
   }
 
 
-  final class Moment(days: Int, time: Time) extends MomentBase(days, time)
-
-
   object Moment extends MomentCompanion {
 
     override def apply(days: Int, time: Time): Moment = new Moment(days, time)
   }
-
-
-  final class Time(hours: Int, parts: Int) extends TimeBase[Time](hours, parts)
 
 
   object Time extends TimeCompanion {
