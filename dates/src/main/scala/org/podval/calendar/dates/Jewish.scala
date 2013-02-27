@@ -66,7 +66,6 @@ object Jewish extends Calendar {
 
     // KH 8:7,8
     def kind: Year.Kind = {
-      // XXX move to helper
       val daysOverShort = lengthInDays - (if (isLeap) 383 else 353)
 
       daysOverShort match {
@@ -85,9 +84,6 @@ object Jewish extends Calendar {
 
 
     override def apply(number: Int): Year = new Year(number)
-
-
-    protected override def areYearsPositive: Boolean = true
 
 
     sealed trait Kind
@@ -210,7 +206,7 @@ object Jewish extends Calendar {
   }
 
 
-  final class Time(hours: Int, parts: Int) extends TimeBase(hours, parts)
+  final class Time(hours: Int, parts: Int) extends TimeBase[Time](hours, parts)
 
 
   object Time extends TimeCompanion {

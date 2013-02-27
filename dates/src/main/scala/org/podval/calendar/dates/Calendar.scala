@@ -33,7 +33,7 @@ abstract class Calendar {
   type Moment <: MomentBase
 
 
-  type Time <: TimeBase
+  type Time <: TimeBase[Time]
 
 
   protected val helper: Helper
@@ -56,13 +56,13 @@ abstract class Calendar {
     final def firstMonth: Int = helper.firstMonth(number)
 
 
-    def lengthInMonths: Int = helper.lengthInMonths(number)
+    final def lengthInMonths: Int = helper.lengthInMonths(number)
 
 
     def character: yearCompanion.Character
 
 
-    def isLeap: Boolean = helper.isLeap(number)
+    final def isLeap: Boolean = helper.isLeap(number)
 
 
     final def month(numberInYear: Int): Month = {
@@ -70,15 +70,15 @@ abstract class Calendar {
       monthCompanion(firstMonth + numberInYear - 1)
     }
 
+    final def month(name: monthCompanion.Name): Month = month(months.indexWhere(_.name == name) + 1)
+
+
     final def monthForDay(day: Int) = {
       require(0 < day && day <= lengthInDays)
       month(months.count(_.daysBefore < day))
     }
 
-    final def month(name: monthCompanion.Name): Month = month(months.indexWhere(_.name == name) + 1)
-
-
-    final def months: List[monthCompanion.Descriptor] = yearCompanion.Months(this.character)
+    final def months: List[monthCompanion.Descriptor] = yearCompanion.months(this.character)
   }
 
 
@@ -94,18 +94,14 @@ abstract class Calendar {
 
 
     final def apply(day: Day): Year = {
-      val yearForSureBefore = Helper.yearForSureBefore(day.number)
-      var result = apply(if (areYearsPositive) scala.math.max(1, yearForSureBefore) else yearForSureBefore)
+      var result = apply(helper.yearForSureBefore(day.number))
       require(result.firstDay <= day.number)
       while (result.next.firstDay <= day.number) result = result.next
       result
     }
 
 
-    protected def areYearsPositive: Boolean
-
-
-    val Months: Map[yearCompanion.Character, List[monthCompanion.Descriptor]] =
+    val months: Map[yearCompanion.Character, List[monthCompanion.Descriptor]] =
       Map((for (character <- characters) yield character -> monthsGenerator(character)): _*)
 
 
@@ -180,28 +176,6 @@ abstract class Calendar {
 
   protected val monthCompanion: MonthCompanion
 
-
-
-  // XXX Introduce methods common for Day and Moment?
-  private trait DayLike {
-//
-//    final def year: Year = yearCompanion(this)
-//
-//
-//    final def month: Month = year.monthForDay(numberInYear)
-//
-//
-//    final def numberInYear: Int = number - year.firstDay + 1
-//
-//
-//    final def numberInMonth: Int = number - month.firstDay + 1
-//
-//
-//    final def numberInWeek: Int = helper.numberInWeek(number)
-//
-//
-//    final def name: dayCompanion.Name = dayCompanion.names(numberInWeek - 1)
-  }
 
 
   abstract class DayBase(number: Int) extends Numbered[Day](number) { this: Day =>
@@ -343,43 +317,6 @@ abstract class Calendar {
 
 
   protected val momentCompanion: MomentCompanion
-
-
-  abstract class TimeBase(val hours: Int, val parts: Int) extends Ordered[Time] { self: Time =>
-
-    require(0 <= hours && hours < Helper.hoursPerDay)
-    require(0 <= parts && parts < Helper.partsPerHour)
-
-
-    final override def equals(other: Any): Boolean = other match {
-      case that: Time => this.allParts == that.allParts
-      case _ => false
-    }
-
-
-    final override def hashCode = 41 * hours + parts
-
-
-    final override def compare(that: Time) = this.allParts - that.allParts
-
-
-    final def isZero = (hours == 0) && (parts == 0)
-
-
-    final def allParts /* XXX toParts? asParts? */ = hours * Helper.partsPerHour + parts
-
-
-    final def minutes: Int = parts / Helper.partsPerMinute
-
-
-    final def partsOfMinute = parts % Helper.partsPerMinute
-
-
-    final override def toString: String = hours + "h" + parts + "p"
-
-
-    final def toFullString: String = hours + ":" + minutes + ":" + partsOfMinute
-  }
 
 
   protected abstract class TimeCompanion {

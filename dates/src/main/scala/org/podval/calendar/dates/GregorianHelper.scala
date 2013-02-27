@@ -34,6 +34,9 @@ object GregorianHelper extends Helper {
 
   // TODO give names to constants?
 
+  override def areYearsPositive: Boolean = false
+
+
   override def isLeap(yearNumber: Int): Boolean = (yearNumber % 4 == 0) && ((yearNumber % 100 != 0) || (yearNumber % 400 == 0))
 
 

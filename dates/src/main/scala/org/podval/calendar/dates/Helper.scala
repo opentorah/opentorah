@@ -19,11 +19,20 @@ package org.podval.calendar.dates
 
 trait Helper {
 
-
   val firstDayNumberInWeek: Int
 
 
   final def numberInWeek(dayNumber: Int): Int = ((dayNumber + firstDayNumberInWeek - 1 - 1) % Helper.daysPerWeek) + 1
+
+
+  def areYearsPositive: Boolean
+
+
+  // XXX give names to constants
+  final def yearForSureBefore(dayNumber: Int): Int =  {
+    val result = (4 * dayNumber / (4 * 365 + 1)) - 1
+    if (areYearsPositive) scala.math.max(1, result) else result
+  }
 
 
   def isLeap(yearNumber: Int): Boolean
@@ -65,8 +74,4 @@ object Helper {
 
 
   val daysPerWeek: Int = 7
-
-
-  // XXX give names to constants
-  def yearForSureBefore(dayNumber: Int): Int = (4 * dayNumber / (4 * 365 + 1)) - 1
 }

@@ -51,9 +51,6 @@ object Gregorian extends Calendar {
     override def apply(number: Int): Year = new Year(number)
 
 
-    protected override def areYearsPositive: Boolean = false
-
-
     protected override def characters: Seq[yearCompanion.Character] = Seq(true, false)
 
 
@@ -145,7 +142,7 @@ object Gregorian extends Calendar {
   }
 
 
-  final class Time(hours: Int, parts: Int) extends TimeBase(hours, parts)
+  final class Time(hours: Int, parts: Int) extends TimeBase[Time](hours, parts)
 
 
   object Time extends TimeCompanion {
