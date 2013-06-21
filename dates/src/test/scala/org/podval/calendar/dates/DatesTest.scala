@@ -1,26 +1,43 @@
+/*
+ * Copyright 2011-2013 Podval Group.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.podval.calendar.dates;
 
-import org.junit.{Test, Assert}
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.FunSuite
 
 import Jewish.{Year, Day, Month}
 import Month._
 
 
-final class DatesTest {
+@RunWith(classOf[JUnitRunner])
+final class DatesTest extends FunSuite {
 
   val x = Jewish
 
 
-  @Test
-  def dayOfWeek {
+  test("known dates should fall on known days of the week") {
     // XXX ???
 //    Assert.assertEquals(6, Day(   2, Tishrei   ,  1).numberInWeek)
-    Assert.assertEquals(2, Day(5772, Marheshvan, 24).numberInWeek)
+    expectResult(Day.Sheni)(Day(5772, Marheshvan, 24).name)
   }
 
 
-  @Test
-  def date2days2date() {
+  test("conversions from date to days and back should end where they started") {
     val x = Jewish
     date2days2date(1   , Tishrei,  1)
     date2days2date(2   , Tishrei,  1)
@@ -31,15 +48,15 @@ final class DatesTest {
 
   private def date2days2date(yearNumber: Int, monthName: Month.Name, dayNumber: Int) {
     val year = Year(yearNumber)
-    Assert.assertEquals(yearNumber, year.number)
+    expectResult(yearNumber)(year.number)
 
     val month = year.month(monthName)
-    Assert.assertEquals(monthName, month.name)
+    expectResult(monthName)(month.name)
 
     val day = month.day(dayNumber)
 
-    Assert.assertEquals(year, day.year)
-    Assert.assertEquals(month, day.month)
-    Assert.assertEquals(dayNumber, day.numberInMonth)
+    expectResult(year)(day.year)
+    expectResult(month)(day.month)
+    expectResult(dayNumber)(day.numberInMonth)
   }
 }

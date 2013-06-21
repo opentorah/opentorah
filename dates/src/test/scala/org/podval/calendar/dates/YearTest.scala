@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Podval Group.
+ * Copyright 2011-2013 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,13 @@
 
 package org.podval.calendar.dates
 
-import org.junit.{Before, Test, Assert}
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.FunSuite
 
 
-final class YearTest {
+@RunWith(classOf[JUnitRunner])
+final class YearTest extends FunSuite {
 
   private val x = Jewish
 
@@ -27,11 +30,13 @@ final class YearTest {
   private val years = (1 to 6000) map (Jewish.Year(_))
 
 
-  @Test
-  def kind = years foreach (_.kind)
+  test("All Jewish years should have a valid kind") {
+    years foreach (_.kind)
+  }
 
 
-  @Test
-  def month = for (year <- years; month <- (1 to year.lengthInMonths))
-    Assert.assertEquals(year, year.month(month).year)
+  test("Year of the month of a year should be the year we started from") {
+    for (year <- years; month <- (1 to year.lengthInMonths))
+      expectResult(year)(year.month(month).year)
+  }
 }

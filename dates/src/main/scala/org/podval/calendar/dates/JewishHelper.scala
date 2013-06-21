@@ -19,7 +19,8 @@ package org.podval.calendar.dates
 
 object JewishHelper extends Helper {
 
-  // It seems that first day of the first year was Sunday.
+  // It seems that first day of the first year was Sunday; molad - BaHaRad.
+  // Second year - friday; molad - 8 in the morning.
   override val firstDayNumberInWeek: Int = 1
 
 
