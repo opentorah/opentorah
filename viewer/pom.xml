@@ -12,6 +12,7 @@
     <name>Judaica Viewer</name>
     <packaging>jar</packaging>
 
+    <!-- Why?!
     <build>
         <plugins>
             <plugin>
@@ -26,33 +27,15 @@
                     </systemProperties>
                 </configuration>
             </plugin>
-
-            <!-- Precompile Scalate templates -->
-            <!--
-            <plugin>
-                <groupId>org.fusesource.scalate</groupId>
-                <artifactId>maven-scalate-plugin</artifactId>
-            </plugin>
-            -->
         </plugins>
     </build>
+    -->
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <!-- TODO this is only here while I work on the Scalate integration -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>            
-
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-compiler</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -29,7 +29,7 @@ import scala.xml.{Node, Elem}
  * Sometimes, more than one word need to be translated (=> attribute "span" in internal representation?).
  * Sometimes, there are more than one translation (or one is elucidation of the other).
  * Sometimes, translation has an explanation attached (in Hirshl's original - parens and quotes are used).
- * It is desirable to be prompted with translation of the given word that were already entered - in an overridable way.
+ * It is desirable to be prompted with translation of the given word that were already entered - in an overridable way (attribute "auto").
  * 
  * We need rich Scala objects to describe Work, Edition, Structure, file locations, etc.
  * File locations: inherited; file, directory, suffix.

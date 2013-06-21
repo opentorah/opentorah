@@ -27,10 +27,10 @@ object ChabadImporter {
 
     def main(args: Array[String]) {
         val importer = new ChabadImporter(
-            "/mnt/data/www.chabadlibrary.org/books2/",
-            "/var/www/sites/app.judaica/site/raw/")
+            "/home/dub/code/judaica/imports/Chabad/",
+            "/home/dub/code/judaica/texts/Chabad/")
 
-        importer.importBook("adhaz/tanya/1/index", "Tanya1");
+        importer.importBook("Tanya/1/index", "Tanya/1");
     }
 }
 
@@ -40,7 +40,7 @@ class ChabadImporter(inputDirectory: String, outputDirectory: String) extends Im
     def getInputExtension() : String = "htm"
 
 
-    def getStylesheet(): String = "chabad"
+    def getStylesheet(): String = "../Chabad"
 
 
     def parseBook(file: File): Node = {
@@ -116,109 +116,11 @@ class ChabadImporter(inputDirectory: String, outputDirectory: String) extends Im
 //    <!-- @todo join paragraphs split by a note -->
 //    <!-- @todo deal with parentheses -->
 //    <!-- @todo introduce corrections (e.g., in chapter 51 of Tanya, the kind of the note is wrong) -->
-//    <xsl:template match="/">
-//        <xsl:variable name="selected">
-//            <xsl:apply-templates select="./html:html/html:frameset/html:noframes/html:body/*" mode="select"/>
-//        </xsl:variable>
-//
-//        <xsl:variable name="grouped">
-//            <xsl:for-each-group select="$selected/*" group-adjacent="if (self::note) then 0 else position()">
-//                <xsl:choose>
-//                    <xsl:when test="current-grouping-key() eq 0">
-//                        <note type="side">
-//                            <xsl:copy-of select="for $n in current-group() return $n/node()"/>
-//                        </note>
-//                    </xsl:when>
-//                    <xsl:otherwise>
-//                        <xsl:copy-of select="current-group()"/>
-//                    </xsl:otherwise>
-//                </xsl:choose>
-//            </xsl:for-each-group>
-//        </xsl:variable>
-//
-//        <xsl:variable name="lined">
-//            <xsl:apply-templates select="$grouped" mode="lines"/>
-//        </xsl:variable>
-//
-//        <xsl:copy-of select="$lined"/>
-//    </xsl:template>
-//
-//
-//    <!--                          -->
-//    <!-- skip uninteresting stuff -->
-//    <!--                          -->
-//
-//
-//    <!-- main text -->
-//    <xsl:template match="html:p[@class eq 'bodytext']" mode="select">
-//        <xsl:variable name="content">
-//            <xsl:apply-templates mode="main-text"/>
-//        </xsl:variable>
-//
-//        <!-- I want to skip empty "p" elements, and this is the only test that I know that works... -->
-//        <xsl:if test="string($content) ne ''">
-//            <p>
-//                <xsl:copy-of select="$content"/>
-//            </p>
-//        </xsl:if>
-//    </xsl:template>
-//
-//
-//    <!-- side note -->
-//    <xsl:template match="html:div[@class eq 'hagoho']" mode="select">
-//        <note>
-//            <xsl:apply-templates mode="side-note"/>
-//        </note>
-//    </xsl:template>
-//
-//
-//    <!-- skip everything else -->
-//    <xsl:template match="@*|*" mode="select"/>
-//
 //
 //    <!-- peel off the 'span' (in the beginning of a paragraph) -->
-//    <xsl:template match="html:span[@class eq 'cup']" mode="main-text">
-//        <xsl:apply-templates/>
-//    </xsl:template>
-//
 //
 //    <!-- Editorial note -->
 //    <xsl:template match="html:b" mode="main-text">
-//        <note type="editorial">
-//            <xsl:apply-templates/>
-//        </note>
-//    </xsl:template>
-//
-//
 //    <!-- In the beginning of a side-note (only?) there may be a title -->
-//    <xsl:template match="html:b" mode="side-note">
-//        <p type="title">
-//            <xsl:apply-templates/>
-//        </p>
-//    </xsl:template>
-//
-//
-//    <!--                             -->
 //    <!-- break paragraphs into lines -->
-//    <!--                             -->
-//
-//
-//    <xsl:template match="@*|*" mode="lines">
-//        <xsl:copy>
-//            <xsl:apply-templates select="@*|node()" mode="#current"/>
-//        </xsl:copy>
-//    </xsl:template>
-//
-//
-//    <xsl:template match="text()" mode="lines">
-//        <xsl:variable name="no-colon" select="replace(., ':', '')"/>
-//        <xsl:analyze-string select="$no-colon" regex="\.">
-//            <xsl:matching-substring>
-//                <dot/>
-//            </xsl:matching-substring>
-//            <xsl:non-matching-substring>
-//                <xsl:copy-of select="."/>
-//            </xsl:non-matching-substring>
-//        </xsl:analyze-string>
-//    </xsl:template>
 }

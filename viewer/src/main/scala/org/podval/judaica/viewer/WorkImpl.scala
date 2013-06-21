@@ -26,6 +26,12 @@ final class WorkImpl private(
   val directory: String) extends Work
 {
 
+  override def editions: Set[Edition] = throw new UnsupportedOperationException // XXX
+
+
+  def defaultEdition: Edition = throw new UnsupportedOperationException // XXX
+
+
   override def toString: String = "Work (" + directory + ") " + names
 }
 
