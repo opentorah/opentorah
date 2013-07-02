@@ -41,7 +41,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.version>2.10.0</scala.version>
+        <scala.version>2.10.2</scala.version>
         <scala.major.version>2.10</scala.major.version>
     </properties>
 
@@ -70,7 +70,7 @@
                 <plugin>
                     <groupId>net.alchim31.maven</groupId>
                     <artifactId>scala-maven-plugin</artifactId>
-                    <version>3.1.4</version>
+                    <version>3.1.5</version>
                     <executions>
                         <execution>
                             <id>scala-compile-first</id>
@@ -160,6 +160,12 @@
                             <artifactId>avalon-framework-api</artifactId>
                             <version>4.3.1</version>
                             <scope>runtime</scope>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>net.sourceforge.jeuclid</groupId>
+                            <artifactId>jeuclid-core</artifactId>
+                            <version>3.1.9</version>
                         </dependency>
 
                         <!-- FOP does not handle MathML; jEuclid is supposed to, but seems

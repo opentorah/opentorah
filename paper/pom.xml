@@ -56,7 +56,7 @@
                     <sourceDirectory>src/main/docbook</sourceDirectory>
                     <targetDirectory>${project.build.directory}/docbook</targetDirectory>
 
-                    <includes>paper.xml</includes>
+                    <includes>calendar.xml</includes>
 
                     <xincludeSupported>true</xincludeSupported>
                     <generatedSourceDirectory>${tables.directory}</generatedSourceDirectory>
