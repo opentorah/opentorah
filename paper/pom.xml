@@ -3,12 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.podval.judaica</groupId>
-        <artifactId>parent</artifactId>
+        <groupId>org.podval</groupId>
+        <artifactId>judaica</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>paper</artifactId>
+    <groupId>org.podval.judaica</groupId>
+    <artifactId>org.podval.judaica.paper</artifactId>
     <name>Judaica Paper</name>
     <packaging>jar</packaging>
 
