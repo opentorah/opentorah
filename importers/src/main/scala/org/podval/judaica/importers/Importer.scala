@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 
 package org.podval.judaica.importers
 
-import scala.xml.{Node, PrettyPrinter}
+import org.podval.judaica.common.Xml
 
-import java.io.{File, FileWriter, PrintWriter}
+import scala.xml.Node
+
+import java.io.File
 
 
 abstract class Importer(inputDirectoryPath: String, outputDirectoryPath: String) {
@@ -34,35 +36,11 @@ abstract class Importer(inputDirectoryPath: String, outputDirectoryPath: String)
         val inFile = new File(inputDirectory, inputName + "." + getInputExtension)
         val xml = parseBook(inFile)
         val result = processBook(xml, outputName)
-        val html = wrapInHtml(result)
-        print(html, new File(outputDirectory, outputName + ".html")) // CSS only works with ".html", not ".xml"!
-    }
-
-
-    private def wrapInHtml(what: Node) = {
-        <html>
-            <head>
-              <link rel="stylesheet" type="text/css" href={getStylesheet + ".css"}/>
-            </head>
-            <body>
-              {what}
-            </body>
-        </html>
-    }
-
-
-    private def print(xml: Node, outFile: File) {
-        val out = new PrintWriter(new FileWriter(outFile))
-        val pretty = new PrettyPrinter(100, 4).format(xml)
-        out.println("<!DOCTYPE html>\n" + pretty)
-        out.close()
+        Xml.print(result, new File(outputDirectory, outputName + ".xml"))
     }
 
 
     protected def getInputExtension: String
-
-
-    protected def getStylesheet: String
 
 
     protected def parseBook(file: File): Node

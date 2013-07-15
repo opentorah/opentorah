@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,180 +19,188 @@ package org.podval.judaica.importers
 package tanach
 package jerusalem
 
-import scala.xml.{Node, Text, NodeBuffer}
+import scala.xml.{Node, NodeBuffer}
 
 import scala.io.Source
 import java.io.File
 
 import org.podval.judaica.common.Xml.booleanAttribute
+import org.podval.judaica.common.AlefBeth
+
+
+object JerusalemTanachImporter {
+
+  def main(args: Array[String]) {
+    val importer = new JerusalemTanachImporter(
+      "/home/dub/Code/judaica/imports/Tanach/jerusalem",
+      "/tmp/xxx"
+    )
+
+    importer.run
+  }
+}
+
 
 
 final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: String)
-    extends TanachImporter(inputDirectory, outputDirectory)
+  extends TanachImporter(inputDirectory, outputDirectory)
 {
-    protected /*?*/ def getInputExtension: String = "txt"
+  protected override def getInputExtension: String = "txt"
 
 
-    protected override def output2inputName: Map[String, String] = Map(
-        "bereishis" -> "Genesis",
-        "shemos" -> "Exodus",
-        "vayikro" -> "Leviticus",
-        "bamidbor" -> "Numbers",
-        "devorim" -> "Deuteronomy"
-    )
+  protected override def output2inputName: Map[String, String] = Map(
+    "bereishis" -> "Genesis",
+    "shemos" -> "Exodus",
+    "vayikro" -> "Leviticus",
+    "bamidbor" -> "Numbers",
+    "devorim" -> "Deuteronomy"
+  )
 
 
-    protected override def parseBook(inputFile: File): Node = {
-        val lines = Source.fromFile(inputFile, "UTF-16BE").getLines().map(_.trim)
-        val bookName = lines.next()
+  protected override def parseBook(inputFile: File): Node = {
+    val lines = Source.fromFile(inputFile, "UTF-16BE").getLines().map(_.trim)
+    val bookName = lines.next.trim
 
-        <div type="book" n={bookName}>{
-            lines.filterNot(_.isEmpty).filterNot(isChapter).zipWithIndex.map {
-                case (line, chapterNumberFrom0) =>
-                    <div type="chapter" n={(chapterNumberFrom0+1).toString}>{
-                        dropStuckChapter(line.split(":").map(_.trim)).zipWithIndex.map {
-                            case (verse, verseNumberFrom0) => parseVerse(verse, verseNumberFrom0+1)
-                        }
-                    }
-                    </div>
-                }
+    <div type="book" n={bookName}>{
+      lines.filterNot(_.isEmpty).filterNot(isChapter).zipWithIndex.map {
+        case (line, chapterNumberFrom0) =>
+          <div type="chapter" n={(chapterNumberFrom0+1).toString}>{
+            dropStuckChapter(line.split(":").map(_.trim)).zipWithIndex.map {
+              case (verse, verseNumberFrom0) => parseVerse(verse, verseNumberFrom0+1)
             }
+          }
         </div>
+      }
     }
+    </div>
+  }
 
 
-    private def dropStuckChapter(what: Seq[String]) =
-        if (isChapter(what.last)) what.dropRight(1) else what
+  private def dropStuckChapter(what: Seq[String]) =
+    if (isChapter(what.last)) what.dropRight(1) else what
 
 
-    private val PEREK = AlefBeth.PEI + AlefBeth.RESH + AlefBeth.QOF
+  private val PEREK = AlefBeth.PEI + AlefBeth.RESH + AlefBeth.QOF
 
 
-    private def isChapter(line: String): Boolean = line.startsWith(PEREK)
+  private def isChapter(line: String): Boolean = line.startsWith(PEREK)
 
 
-    private val PEI3 = AlefBeth.PEI + " " + AlefBeth.PEI + " " + AlefBeth.PEI
+  private val PEI3 = AlefBeth.PEI + " " + AlefBeth.PEI + " " + AlefBeth.PEI
 
 
-    private val SAMEH3 = AlefBeth.SAMEH + " " + AlefBeth.SAMEH + " " + AlefBeth.SAMEH
+  private val SAMEH3 = AlefBeth.SAMEH + " " + AlefBeth.SAMEH + " " + AlefBeth.SAMEH
 
 
-    private val HAZI =
-        AlefBeth.HET +
-        AlefBeth.TSADI +
-        AlefBeth.YOD +
-        " " +
-        AlefBeth.HE +
-        AlefBeth.SAMEH +
-        AlefBeth.PEI +
-        AlefBeth.RESH +
-        " " +
-        AlefBeth.BET +
-        AlefBeth.PEI +
-        AlefBeth.SAMEH +
-        AlefBeth.VAV +
-        AlefBeth.QOF +
-        AlefBeth.YOD +
-        AlefBeth.MEM_SOFIT
+  private val HAZI =
+    AlefBeth.HET +
+    AlefBeth.TSADI +
+    AlefBeth.YOD +
+    " " +
+    AlefBeth.HE +
+    AlefBeth.SAMEH +
+    AlefBeth.PEI +
+    AlefBeth.RESH +
+    " " +
+    AlefBeth.BET +
+    AlefBeth.PEI +
+    AlefBeth.SAMEH +
+    AlefBeth.VAV +
+    AlefBeth.QOF +
+    AlefBeth.YOD +
+    AlefBeth.MEM_SOFIT
 
 
-    private val HAZAK = AlefBeth.HET + AlefBeth.ZAYIN + AlefBeth.QOF
+  private val HAZAK = AlefBeth.HET + AlefBeth.ZAYIN + AlefBeth.QOF
 
 
-    private def parseVerse(verse: String, number: Int): Seq[Node] = {
-        val result = new NodeBuffer()
+  private def parseVerse(verse: String, number: Int): Seq[Node] = {
+    val result = new NodeBuffer()
 
-        val line = new Line(verse)
+    val line = new Line(verse)
 
-        result ++= processParsha(line)
+    result ++= processParsha(line)
 
-        line.consume(HAZI)
-        line.consume(HAZAK)
+    line.consume(HAZI)
+    line.consume(HAZAK)
 
-        line.consumeBracketed()
+    line.consumeBracketed()
 
-        // TODO: if the line *is* empty, we skip a posuk number?!
-        if (!line.isEmpty) {
-            line.consumeToSpace()
+    // TODO: if the line *is* empty, we skip a posuk number?!
+    if (!line.isEmpty) {
+      line.consumeToSpace()
 
-            result +=
-                <div type="verse" n={number.toString}>
-                    {processWords(line)}
-                </div>
-        }
+      result +=
+        <div type="verse" n={number.toString}>
+          {processWords(line)}
+        </div>
+      }
 
-        result
+      result
     }
 
 
     private def processParsha(line: Line): Option[Node] = {
-        (if (line.consume(PEI3)) {
-            Some(("open", true))
-        } else
-        if (line.consume(AlefBeth.PEI)) {
-            Some(("open", false))
-        } else
-        if (line.consume(SAMEH3)) {
-            Some(("closed", true))
-        } else
-        if (line.consume(AlefBeth.SAMEH)) {
-            Some(("closed", false))
+      def parsha(open: Boolean, big: Boolean) = Some(<parsha open={booleanAttribute(open)} big={booleanAttribute(big)}/>)
+
+      if (line.consume(PEI3)          ) parsha(true , true ) else
+      if (line.consume(AlefBeth.PEI)  ) parsha(true , false) else
+      if (line.consume(SAMEH3)        ) parsha(false, true ) else
+      if (line.consume(AlefBeth.SAMEH)) parsha(false, false) else
+        None
+    }
+
+
+  private def processWords(line: Line): Seq[Node] = {
+    val result = new NodeBuffer()
+
+    while (!line.isEmpty) {
+      val wordElement = processWord(line)
+
+      val alternate = line.consumeBracketed()
+
+      val element =
+        if (alternate.isEmpty) {
+          wordElement
         } else {
-            None
-        })
-        .map { case (kind, big) => <parsha type={kind} big={booleanAttribute(big)}/>}
-    }
-
-
-    private def processWords(line: Line): Seq[Node] = {
-        val result = new NodeBuffer()
-
-        while (!line.isEmpty) {
-            val wordElement = processWord(line)
-
-            val alternate = line.consumeBracketed()
-
-            val element =
-                if (alternate.isEmpty) {
-                    wordElement
-                } else {
-                    <app>
-                        <rdg type="write">
-                            {wordElement}
-                         </rdg>
-                         <rdg type="read">
-                             <word>{alternate.get}</word>
-                         </rdg>
-                    </app>
-                }
-
-            result += element
+          <app>
+            <rdg type="write">
+              {wordElement}
+            </rdg>
+            <rdg type="read">
+               <word>{alternate.get}</word>
+            </rdg>
+          </app>
         }
 
-        result
+      result += element
     }
 
+    result
+  }
 
-    private def processWord(line: Line): Node = {
-        val spaceIndex = line.indexOf(" ")
-        val makafIndex = line.indexOf(AlefBeth.MAQAF)
 
-        def isFirst(one: Int, two: Int) = (one != -1) && ((two == -1) || (two > one))
-        val isSpace = isFirst(spaceIndex, makafIndex)
-        val isMakaf = isFirst(makafIndex, spaceIndex)
+  private def processWord(line: Line): Node = {
+    val spaceIndex = line.indexOf(" ")
+    val makafIndex = line.indexOf(AlefBeth.MAQAF)
 
-        val index = if (isSpace) spaceIndex else if (isMakaf) makafIndex else line.size
-        val word = line.consumeToIndex(index)
+    def isFirst(one: Int, two: Int) = (one != -1) && ((two == -1) || (two > one))
+    val isSpace = isFirst(spaceIndex, makafIndex)
+    val isMakaf = isFirst(makafIndex, spaceIndex)
 
-        if (isSpace) {
-            line.consume(" ")
-        } else
-        if (isMakaf) {
-            line.consume(AlefBeth.MAQAF)
-        }
+    val index = if (isSpace) spaceIndex else if (isMakaf) makafIndex else line.size
+    val word = line.consumeToIndex(index)
 
-        val isPasek = line.consume(AlefBeth.PASEQ)
-
-        <word makaf={booleanAttribute(isMakaf)} pasek={booleanAttribute(isPasek)}>{word}</word>
+    if (isSpace) {
+      line.consume(" ")
+    } else
+    if (isMakaf) {
+      line.consume(AlefBeth.MAQAF)
     }
+
+    // TODO they are not removed!!!
+    val isPasek = line.consume(AlefBeth.PASEQ)
+
+    <word makaf={booleanAttribute(isMakaf)} pasek={booleanAttribute(isPasek)}>{word}</word>
+  }
 }

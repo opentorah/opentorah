@@ -2,14 +2,14 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.podval.judaica</groupId>
-    <artifactId>parent</artifactId>
+    <groupId>org.podval</groupId>
+    <artifactId>judaica</artifactId>
     <name>Digital Judaica</name>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
 
     <prerequisites>
-        <maven>3.0.4</maven>
+        <maven>3.0.5</maven>
     </prerequisites>
 
     <url>http://judaica.podval.org/</url>
@@ -63,9 +63,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.version>2.10.1</scala.version>
+        <scala.version>2.10.2</scala.version>
         <scala.major.version>2.10</scala.major.version>
-        <jersey.version>2.0-rc1</jersey.version>
+        <jersey.version>2.0</jersey.version>
     </properties>
  
     <build>
@@ -74,7 +74,7 @@
                 <plugin>
                     <groupId>net.alchim31.maven</groupId>
                     <artifactId>scala-maven-plugin</artifactId>
-                    <version>3.1.4</version>
+                    <version>3.1.5</version>
                     <executions>
                         <execution>
                             <id>scala-compile-first</id>

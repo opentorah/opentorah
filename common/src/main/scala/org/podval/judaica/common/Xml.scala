@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,50 +17,83 @@
 package org.podval.judaica.common
 
 
-import scala.xml.{XML, Node, Elem, Text, Utility}
+import scala.xml.{Node, Elem, Text, XML, Utility, PrettyPrinter}
 
-import java.io.File
+import java.io.{FileWriter, PrintWriter, File}
+import scala.Some
 
 
 object Xml {
 
-    def getAttribute(name: String)(node: Node): String = (node \ ("@" + name)).text
+  def isDiv(node: Node): Boolean = node.isInstanceOf[Elem] && node.asInstanceOf[Elem].label == "div"
 
 
-    def getAttribute(node: Node, name: String): String = getAttribute(name)(node)
+  def isDiv(node: Node, divType: String): Boolean = isDiv(node) && (getType(node) == divType)
 
 
-    def booleanAttribute(value: Boolean) = if (value) Some(Text("true")) else None
+  def getType(node: Node) = getAttribute(node, "type")
 
 
-    def oneChild(node: Node, name: String): Node = {
-        val children = node \ name
+  def getAttribute(name: String)(node: Node): String = (node \ ("@" + name)).text
 
-        if (children.size == 0) {
-            throw new IllegalArgumentException("No child with name " + name)
-        }
 
-        if (children.size > 1) {
-            throw new IllegalArgumentException("To many children with name " + name)
-        }
+  def getAttribute(node: Node, name: String): String = getAttribute(name)(node)
 
-        children(0)
+
+  def booleanAttribute(value: Boolean) = if (value) Some(Text("true")) else None
+
+
+  def oneChild(node: Node, name: String): Node = {
+    val children = node \ name
+
+    if (children.size == 0) {
+      throw new IllegalArgumentException("No child with name " + name)
     }
 
+    if (children.size > 1) {
+      throw new IllegalArgumentException("To many children with name " + name)
+    }
 
-    def loadResource(clazz: Class[_], name: String, tag: String): Elem =
-        open(XML.load(clazz.getResourceAsStream(name + ".xml")), tag)
-
-
-    def loadFile(file: File, tag: String): Elem =
-        open(XML.loadFile(file), tag)
-
-
-    private def open(what: Node, tag: String): Elem =
-        check(Utility.trimProper(what)(0).asInstanceOf[Elem], tag)
+    children(0)
+  }
 
 
-    def check(elem: Elem, tag: String): Elem =
-        if (elem.label == tag) elem
-        else throw new IllegalArgumentException("Expected tag " + tag + " but got " + elem.label)
+  def loadResource(clazz: Class[_], name: String, tag: String): Elem =
+    open(XML.load(clazz.getResourceAsStream(name + ".xml")), tag)
+
+
+  def loadFile(file: File, tag: String): Elem = open(XML.loadFile(file), tag)
+
+
+  def loadFile(file: File): Elem = XML.loadFile(file)
+
+
+  private def open(what: Node, tag: String): Elem =
+    check(Utility.trimProper(what)(0).asInstanceOf[Elem], tag)
+
+
+  def check(elem: Elem, tag: String): Elem =
+    if (elem.label == tag) elem
+    else throw new IllegalArgumentException("Expected tag " + tag + " but got " + elem.label)
+
+
+  def wrapInHtml(stylesheet: String, what: Node) = {
+    <html>
+      <head>
+        <link rel="stylesheet" type="text/css" href={stylesheet + ".css"}/>
+      </head>
+      <body class="hebrew">
+        {what}
+      </body>
+    </html>
+  }
+
+
+  def print(xml: Node, outFile: File) {
+    val out = new PrintWriter(new FileWriter(outFile))
+    val pretty = new PrettyPrinter(100, 4).format(xml)
+    // TODO        out.println("<!DOCTYPE html>\n" + pretty)
+    out.println(pretty)
+    out.close()
+  }
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,43 +20,43 @@ package org.podval.judaica.importers.tanach.jerusalem
 
 final class Line(var line: String) {
 
-    def isEmpty = line.isEmpty
+  def isEmpty = line.isEmpty
 
 
-    def size = line.size
+  def size = line.size
 
 
-    def indexOf(what: String) = line.indexOf(what)
+  def indexOf(what: String) = line.indexOf(what)
 
 
-    def consumeToSpace(): String = {
-        consumeToIndex(line.indexOf(" "))
+  def consumeToSpace(): String = {
+    consumeToIndex(line.indexOf(" "))
+  }
+
+
+  def consumeBracketed(): Option[String] = {
+    if (line.startsWith("[")) {
+      val index = line.indexOf("]")
+      Some(consumeToIndex(index+1).drop(1))
+    } else {
+      None
     }
+  }
 
 
-    def consumeBracketed(): Option[String] = {
-        if (line.startsWith("[")) {
-            val index = line.indexOf("]")
-            Some(consumeToIndex(index+1).drop(1))
-        } else {
-            None
-        }
+  def consume(what: String): Boolean = {
+    val result = line.startsWith(what)
+    if (result) {
+      consumeToIndex(what.length())
     }
+    result
+  }
 
 
-    def consume(what: String): Boolean = {
-        val result = line.startsWith(what)
-        if (result) {
-            consumeToIndex(what.length())
-        }
-        result
-    }
-
-
-    def consumeToIndex(index: Int): String = {
-        val result = line.take(index)
-        // @todo get rid of the trim?
-        line = line.drop(index).trim()
-        result
-    }
+  def consumeToIndex(index: Int): String = {
+    val result = line.take(index)
+    // @todo get rid of the trim?
+    line = line.drop(index).trim()
+    result
+  }
 }

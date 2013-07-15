@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@
 package org.podval.judaica.importers
 package tanach
 
-import org.podval.judaica.common.Xml.{loadResource, getAttribute}
+import org.podval.judaica.common.Xml
+import Xml.getAttribute
 
 import scala.xml.{Node, Elem}
 
@@ -27,56 +28,45 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
     extends Importer(inputDirectory, outputDirectory)
 {
 
-    final def run {
-        output2inputName foreach { case (inputName, outputName) => importBook(inputName, outputName) }
-    }
+  final def run {
+    output2inputName foreach { case (inputName, outputName) => importBook(inputName, outputName) }
+  }
 
 
-    protected def output2inputName: Map[String, String]
-  
-
-    protected final override def getStylesheet = "tanach"
+  protected def output2inputName: Map[String, String]
 
 
-    protected final override def processBook(xml: Node, outputName: String): Node = {
-        val breaks =
-            loadResource(classOf[TanachImporter], outputName, "meta")
-            .child
-            .groupBy(getAttribute("chapter"))
-            .mapValues(_.groupBy(getAttribute("verse")))
+  protected final override def processBook(xml: Node, outputName: String): Node = {
+    val breaks =
+      Xml.loadResource(classOf[TanachImporter], outputName, "meta")
+        .child
+        .groupBy(getAttribute("chapter"))
+        .mapValues(_.groupBy(getAttribute("verse"))) // TODO drop coordinates here with .mapValues?
 
-        transformDiv(xml, "book") { flatMapChildren(_, {
-            transformDiv(_, "chapter") { chapter => flatMapChildren(chapter, {
-                transformDiv(_, "verse") { verse =>
-                    breaks
-                    .getOrElse(getAttribute(chapter, "n"), Map.empty)
-                    .getOrElse(getAttribute(verse, "n"), Seq.empty) ++
-                    verse
-                }
-            })}
-        })}(0)
-    }
-//        xml match { case book =>
-//            if (!isDiv(book, "book")) book else { flatMapChildren(book, { chapter =>
-//                if (!isDiv(chapter, "chapter")) chapter else { flatMapChildren(chapter, { verse =>
-//                    if (!isDiv(verse, "verse")) verse else {
-//                        breaks
-//                        .getOrElse(getAttribute(chapter, "n"), Map.empty)
-//                        .getOrElse(getAttribute(verse, "n"), Seq.empty) ++
-//                        verse
-//                    }
-//                })}
-//            })}
-//        }
+    transformDiv(xml, "book") { flatMapChildren(_, {
+      transformDiv(_, "chapter") { chapter => flatMapChildren(chapter, {
+        transformDiv(_, "verse") { verse =>
+          breaks
+          .getOrElse(getAttribute(chapter, "n"), Map.empty)
+          .getOrElse(getAttribute(verse, "n"), Seq.empty)
+          .map (dropCoordinates(_)) ++
+          verse
+        }
+      })}
+    })}(0)
+  }
 
 
-    def isDiv(node: Node, divType: String): Boolean =
-        node.isInstanceOf[Elem] && node.asInstanceOf[Elem].label == "div" && (getAttribute(node, "type") == divType)
+  private def transformDiv(node: Node, divType: String)(f: Node => Seq[Node]) =
+    if (!Xml.isDiv(node, divType)) node else f(node)
 
 
-    def transformDiv(node: Node, divType: String)(f: Node => Seq[Node]) =
-        if (!isDiv(node, divType)) node else f(node)
+  private def flatMapChildren(node: Node, f: Node => Seq[Node]): Elem =
+    node.asInstanceOf[Elem].copy(child = node.child flatMap f)
 
-    def flatMapChildren(node: Node, f: Node => Seq[Node]): Elem =
-        node.asInstanceOf[Elem].copy(child = node.child flatMap f)
+
+  private def dropCoordinates(break: Node): Node = {
+    // TODO drom "chapter" and "verse" attributes
+    break
+  }
 }

@@ -3,12 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.podval.judaica</groupId>
-        <artifactId>parent</artifactId>
+        <groupId>org.podval</groupId>
+        <artifactId>judaica</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>webapp</artifactId>
+    <groupId>org.podval.judaica</groupId>
+    <artifactId>org.podval.webapp</artifactId>
     <name>Judaica Web Application</name>
     <packaging>war</packaging>
 
@@ -24,7 +25,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>viewer</artifactId>
+            <artifactId>org.podval.judaica.viewer</artifactId>
             <version>${project.version}</version>
         </dependency>
 
