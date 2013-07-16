@@ -37,11 +37,11 @@ object Main {
   }
 
 
-  private def transform(xml: Node): Node = {
+  private def transform(xml: Elem): Elem = {
     if (Xml.isDiv(xml)) {
       val type_ = Xml.getType(xml)
       val n = Xml.getAttribute(xml, "n").trim
-      val children: Seq[Elem] = xml.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
+      val children: Seq[Elem] = Xml.elems(xml)
       // TODO copy ALL attributes!!!
 
       <div type={type_} n={n}>
@@ -54,11 +54,12 @@ object Main {
   }
 
 
-  def name(type_ : String, n: String, xml: Node): String = {
-    if ((type_ == "chapter") || (type_ == "verse")) HebrewNumber.fromInt(n.toInt) else
-    if (type_ == "day") "[" + HebrewNumber.ordinal(n.toInt) + "]" else
-    if (type_ == "paragraph") { if (Xml.getBooleanAttribute(xml, "open")) AlefBeth.PEI else AlefBeth.SAMEH } else
-      n
+  def name(type_ : String, n: String, xml: Elem): String = type_ match {
+    case "chapter" => HebrewNumbers.fromInt(n.toInt)
+    case "verse" => HebrewNumbers.fromInt(n.toInt)
+    case "day" => "[" + HebrewNumbers.ordinal(n.toInt) + "]"
+    case "paragraph" => if (Xml.getBooleanAttribute(xml, "open")) AlefBeth.PEI else AlefBeth.SAMEH
+    case _ => n
   }
 
 
@@ -68,65 +69,4 @@ object Main {
   def transformWord(word: Elem): Seq[Node] = {
     word
   }
-}
-
-
-object HebrewNumber {
-
-  import AlefBeth._
-  val units = Array(ALEF, BET, GIMEL, DALET, HE, VAV, ZAYIN, HET, TET)
-  val decades = Array(YOD, KAF, LAMED, MEM, NUN, SAMEH, AYIN, PEI, TSADI)
-  val hundreds = Array(QOF, RESH, SHIN, TAV)
-
-
-  def fromInt(n: Int): String = {
-    require (n > 0)
-    require (n <= 500)
-
-    val result = new StringBuilder
-    var remainder = n
-
-    if (remainder >= 100) {
-      result.append(hundreds((remainder / 100) - 1))
-      remainder = remainder % 100
-    }
-
-    if (remainder == 15) {
-      result.append(TET)
-      result.append(VAV)
-    } else
-
-    if (remainder == 16) {
-      result.append(TET)
-      result.append(ZAYIN)
-    } else {
-
-      if (remainder >= 10) {
-        result.append(decades((remainder / 10) - 1))
-        remainder = remainder % 10
-      }
-
-      if (remainder >= 1) {
-        result.append(units(remainder - 1))
-      }
-    }
-
-    result.toString
-  }
-
-
-  import AlefBeth._
-
-  val ordinals: Array[String] = Array(
-    RESH + ALEF + SHIN + VAV + NUN_SOFIT,
-    SHIN + NUN + YOD,
-    SHIN + LAMED + YOD + SHIN + YOD,
-    RESH + BET + YOD + AYIN + YOD,
-    HET + MEM + YOD + SHIN + YOD,
-    SHIN + SHIN + YOD,
-    SHIN + BET + YOD + AYIN + YOD
-  )
-
-
-  def ordinal(n: Int): String = ordinals(n - 1)
 }

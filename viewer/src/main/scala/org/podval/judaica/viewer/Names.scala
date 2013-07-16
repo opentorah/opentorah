@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.podval.judaica.viewer
 
-import scala.xml.Node
+import scala.xml.Elem
 
-import org.podval.judaica.common.Xml.oneChild
+import org.podval.judaica.common.Xml
 
 
 final class Names(val names: Seq[Name]) {
@@ -42,7 +42,7 @@ final class Names(val names: Seq[Name]) {
 
 object Names {
   
-  def apply(node: Node): Names = {
-    new Names(oneChild(node, "names").child.map(Name(_)))
+  def apply(node: Elem): Names = {
+    new Names(Xml.elems(Xml.oneChild(node, "names")).map(Name(_)))
   }
 }

@@ -38,18 +38,16 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
 
   protected final override def processBook(xml: Node, outputName: String): Node = {
     val breaks =
-      Xml.loadResource(classOf[TanachImporter], outputName, "meta")
-        .child
+      Xml.elems(Xml.loadResource(classOf[TanachImporter], outputName, "meta"))
         .groupBy(getAttribute("chapter"))
-        .mapValues(_.groupBy(getAttribute("verse"))) // TODO drop coordinates here with .mapValues?
+        .mapValues(_.groupBy(getAttribute("verse")).mapValues(_.map(dropChapterAndVerse)))
 
     transformDiv(xml, "book") { flatMapChildren(_, {
       transformDiv(_, "chapter") { chapter => flatMapChildren(chapter, {
         transformDiv(_, "verse") { verse =>
           breaks
-          .getOrElse(getAttribute(chapter, "n"), Map.empty)
-          .getOrElse(getAttribute(verse, "n"), Seq.empty)
-          .map (dropCoordinates(_)) ++
+          .getOrElse(getAttribute(chapter.asInstanceOf[Elem], "n"), Map.empty)   // TODO get rid of the cast!!!
+          .getOrElse(getAttribute(verse.asInstanceOf[Elem], "n"), Seq.empty) ++  // TODO get rid of the cast!!!
           verse
         }
       })}
@@ -58,15 +56,15 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
 
 
   private def transformDiv(node: Node, divType: String)(f: Node => Seq[Node]) =
-    if (!Xml.isDiv(node, divType)) node else f(node)
+    if (!Xml.isDiv(node.asInstanceOf[Elem], divType)) node else f(node)  // TODO get rid of the cast!!!
 
 
   private def flatMapChildren(node: Node, f: Node => Seq[Node]): Elem =
-    node.asInstanceOf[Elem].copy(child = node.child flatMap f)
+    node.asInstanceOf[Elem].copy(child = Xml.elems(node) flatMap f)
 
 
-  private def dropCoordinates(break: Node): Node = {
-    // TODO drom "chapter" and "verse" attributes
-    break
+  private def dropChapterAndVerse(break: Node): Node = {
+    val elem = break.asInstanceOf[Elem]
+    elem.copy(attributes = elem.attributes.filter(a => (a.key != "chapter") && (a.key != "verse")))
   }
 }

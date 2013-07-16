@@ -28,37 +28,37 @@ object Xml {
   def isDiv(node: Node): Boolean = node.isInstanceOf[Elem] && node.asInstanceOf[Elem].label == "div"
 
 
-  def isDiv(node: Node, divType: String): Boolean = isDiv(node) && (getType(node) == divType)
+  def isDiv(node: Elem, divType: String): Boolean = isDiv(node) && (getType(node) == divType)
 
 
-  def getType(node: Node) = getAttribute(node, "type")
+  def getType(node: Elem) = getAttribute(node, "type")
 
 
-  def getAttribute(name: String)(node: Node): String = (node \ ("@" + name)).text
+  def getAttribute(name: String)(node: Elem): String = (node \ ("@" + name)).text
 
 
-  def getAttribute(node: Node, name: String): String = getAttribute(name)(node)
+  def getAttribute(node: Elem, name: String): String = getAttribute(name)(node)
 
 
-  def getBooleanAttribute(node: Node, name: String): Boolean = getAttribute(node, name) == "true"
+  def getBooleanAttribute(node: Elem, name: String): Boolean = getAttribute(node, name) == "true"
 
 
   def booleanAttribute(value: Boolean) = if (value) Some(Text("true")) else None
 
 
-  def oneChild(node: Node, name: String): Node = {
+  def oneChild(node: Node, name: String): Elem = {
     val children = node \ name
 
-    if (children.size == 0) {
-      throw new IllegalArgumentException("No child with name " + name)
-    }
+    require(children.size > 0, "No child with name " + name)
+    require(children.size == 1, "To many children with name " + name)
 
-    if (children.size > 1) {
-      throw new IllegalArgumentException("To many children with name " + name)
-    }
-
-    children(0)
+    val result = children(0)
+    require(result.isInstanceOf[Elem])
+    result.asInstanceOf[Elem]
   }
+
+
+  def elems(xml: Node): Seq[Elem] = xml.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
 
   def loadResource(clazz: Class[_], name: String, tag: String): Elem =

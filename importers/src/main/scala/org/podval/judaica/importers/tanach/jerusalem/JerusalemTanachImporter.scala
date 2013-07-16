@@ -19,10 +19,12 @@ package org.podval.judaica.importers
 package tanach
 package jerusalem
 
-import scala.xml.{Node, NodeBuffer}
+import scala.xml.Elem
 
 import scala.io.Source
 import java.io.File
+
+import scala.collection.mutable.ArrayBuffer
 
 import org.podval.judaica.common.Xml.booleanAttribute
 import org.podval.judaica.common.AlefBeth
@@ -88,16 +90,20 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
   )
 
 
-  protected override def parseBook(inputFile: File): Node = {
+  protected override def parseBook(inputFile: File): Elem = {
+    def dropStuckChapter(what: Seq[String]) = if (isChapter(what.last)) what.dropRight(1) else what
+    def isChapter(line: String): Boolean = line.startsWith(JerusalemTanachImporter.PEREK)
+
     val lines = Source.fromFile(inputFile, "UTF-16BE").getLines().map(_.trim)
     val bookName = lines.next.trim
 
     <div type="book" n={bookName}>{
       lines.filterNot(_.isEmpty).filterNot(isChapter).zipWithIndex.map {
-        case (line, chapterNumberFrom0) =>
+        case (chapter, chapterNumberFrom0) =>
           <div type="chapter" n={(chapterNumberFrom0+1).toString}>{
-            dropStuckChapter(line.split(":").map(_.trim)).zipWithIndex.map {
-              case (verse, verseNumberFrom0) => parseVerse(verse, verseNumberFrom0+1)
+            dropStuckChapter(chapter.split(":").map(_.trim)).zipWithIndex.map {
+              case (verse, verseNumberFrom0) =>
+                parseVerse(verse, verseNumberFrom0+1)
             }
           }
         </div>
@@ -107,14 +113,8 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
   }
 
 
-  private def dropStuckChapter(what: Seq[String]) = if (isChapter(what.last)) what.dropRight(1) else what
-
-
-  private def isChapter(line: String): Boolean = line.startsWith(JerusalemTanachImporter.PEREK)
-
-
-  private def parseVerse(verse: String, number: Int): Seq[Node] = {
-    val result = new NodeBuffer()
+  private def parseVerse(verse: String, number: Int): Seq[Elem] = {
+    val result = new ArrayBuffer[Elem]
 
     val line = new Line(verse)
 
@@ -139,7 +139,7 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
     }
 
 
-    private def processParsha(line: Line): Option[Node] = {
+    private def processParsha(line: Line): Option[Elem] = {
       def parsha(open: Boolean, big: Boolean) = Some(<div type="paragraph" open={booleanAttribute(open)} big={booleanAttribute(big)}/>)
 
       if (line.consume(JerusalemTanachImporter.PEI3)          ) parsha(true , true ) else
@@ -150,8 +150,8 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
     }
 
 
-  private def processWords(line: Line): Seq[Node] = {
-    val result = new NodeBuffer()
+  private def processWords(line: Line): Seq[Elem] = {
+    val result = new ArrayBuffer[Elem]
 
     while (!line.isEmpty) {
       val wordElement = processWord(line)
@@ -179,7 +179,7 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
   }
 
 
-  private def processWord(line: Line): Node = {
+  private def processWord(line: Line): Elem = {
     val spaceIndex = line.indexOf(" ")
     val makafIndex = line.indexOf(AlefBeth.MAQAF)
 
