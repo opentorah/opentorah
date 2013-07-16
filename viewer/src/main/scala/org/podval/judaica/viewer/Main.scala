@@ -16,9 +16,11 @@
 
 package org.podval.judaica.viewer
 
-import java.io.File
 import org.podval.judaica.common.{AlefBeth, Xml}
-import scala.xml.{NodeBuffer, Node, Elem}
+
+import java.io.File
+
+import scala.xml.{Node, Elem, Text}
 
 
 /*
@@ -31,20 +33,20 @@ object Main {
   def main(args: Array[String]) {
     val xml = Xml.loadFile(new File("/tmp/xxx/Genesis.xml"))
     val output = new File("/tmp/xxx/Genesis.html")
-    Xml.print(Xml.wrapInHtml("tanach", addNames(xml)), output)
+    Xml.print(Xml.wrapInHtml("tanach", transform(xml)), output)
   }
 
 
-  private def addNames(xml: Node): Node = {
+  private def transform(xml: Node): Node = {
     if (Xml.isDiv(xml)) {
       val type_ = Xml.getType(xml)
       val n = Xml.getAttribute(xml, "n").trim
-      val num = isNumeric(type_)
-      val name = if (num) HebrewNumber.fromInt(n.toInt) else n
+      val children: Seq[Elem] = xml.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
+      // TODO copy ALL attributes!!!
 
       <div type={type_} n={n}>
-        <span class={type_ + "-" + (if (num) "number" else "name")}>{name}</span>
-        {xml.child.filter(_.isInstanceOf[Elem]).map(addNames(_))}
+        <span class="name" type={type_}>{name(type_, n, xml)}</span>
+        { if (type_ == "verse") transformVerse(children) else children.map(transform(_)) }
       </div>
     } else {
       xml
@@ -52,7 +54,20 @@ object Main {
   }
 
 
-  def isNumeric(type_ : String): Boolean = (type_ == "chapter") || (type_ == "verse")
+  def name(type_ : String, n: String, xml: Node): String = {
+    if ((type_ == "chapter") || (type_ == "verse")) HebrewNumber.fromInt(n.toInt) else
+    if (type_ == "day") "[" + HebrewNumber.ordinal(n.toInt) + "]" else
+    if (type_ == "paragraph") { if (Xml.getBooleanAttribute(xml, "open")) AlefBeth.PEI else AlefBeth.SAMEH } else
+      n
+  }
+
+
+  def transformVerse(words: Seq[Elem]): Seq[Node] = (words flatMap transformWord) ++ Text(AlefBeth.SOF_PASUQ)
+
+
+  def transformWord(word: Elem): Seq[Node] = {
+    word
+  }
 }
 
 
@@ -98,4 +113,20 @@ object HebrewNumber {
 
     result.toString
   }
+
+
+  import AlefBeth._
+
+  val ordinals: Array[String] = Array(
+    RESH + ALEF + SHIN + VAV + NUN_SOFIT,
+    SHIN + NUN + YOD,
+    SHIN + LAMED + YOD + SHIN + YOD,
+    RESH + BET + YOD + AYIN + YOD,
+    HET + MEM + YOD + SHIN + YOD,
+    SHIN + SHIN + YOD,
+    SHIN + BET + YOD + AYIN + YOD
+  )
+
+
+  def ordinal(n: Int): String = ordinals(n - 1)
 }

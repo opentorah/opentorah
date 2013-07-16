@@ -40,6 +40,9 @@ object Xml {
   def getAttribute(node: Node, name: String): String = getAttribute(name)(node)
 
 
+  def getBooleanAttribute(node: Node, name: String): Boolean = getAttribute(node, name) == "true"
+
+
   def booleanAttribute(value: Boolean) = if (value) Some(Text("true")) else None
 
 

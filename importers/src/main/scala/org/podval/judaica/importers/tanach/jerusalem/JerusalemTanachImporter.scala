@@ -38,6 +38,37 @@ object JerusalemTanachImporter {
 
     importer.run
   }
+
+
+  val PEREK = AlefBeth.PEI + AlefBeth.RESH + AlefBeth.QOF
+
+
+  val PEI3 = AlefBeth.PEI + " " + AlefBeth.PEI + " " + AlefBeth.PEI
+
+
+  val SAMEH3 = AlefBeth.SAMEH + " " + AlefBeth.SAMEH + " " + AlefBeth.SAMEH
+
+
+  val HAZI =
+    AlefBeth.HET +
+      AlefBeth.TSADI +
+      AlefBeth.YOD +
+      " " +
+      AlefBeth.HE +
+      AlefBeth.SAMEH +
+      AlefBeth.PEI +
+      AlefBeth.RESH +
+      " " +
+      AlefBeth.BET +
+      AlefBeth.PEI +
+      AlefBeth.SAMEH +
+      AlefBeth.VAV +
+      AlefBeth.QOF +
+      AlefBeth.YOD +
+      AlefBeth.MEM_SOFIT
+
+
+  val HAZAK = AlefBeth.HET + AlefBeth.ZAYIN + AlefBeth.QOF
 }
 
 
@@ -76,42 +107,10 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
   }
 
 
-  private def dropStuckChapter(what: Seq[String]) =
-    if (isChapter(what.last)) what.dropRight(1) else what
+  private def dropStuckChapter(what: Seq[String]) = if (isChapter(what.last)) what.dropRight(1) else what
 
 
-  private val PEREK = AlefBeth.PEI + AlefBeth.RESH + AlefBeth.QOF
-
-
-  private def isChapter(line: String): Boolean = line.startsWith(PEREK)
-
-
-  private val PEI3 = AlefBeth.PEI + " " + AlefBeth.PEI + " " + AlefBeth.PEI
-
-
-  private val SAMEH3 = AlefBeth.SAMEH + " " + AlefBeth.SAMEH + " " + AlefBeth.SAMEH
-
-
-  private val HAZI =
-    AlefBeth.HET +
-    AlefBeth.TSADI +
-    AlefBeth.YOD +
-    " " +
-    AlefBeth.HE +
-    AlefBeth.SAMEH +
-    AlefBeth.PEI +
-    AlefBeth.RESH +
-    " " +
-    AlefBeth.BET +
-    AlefBeth.PEI +
-    AlefBeth.SAMEH +
-    AlefBeth.VAV +
-    AlefBeth.QOF +
-    AlefBeth.YOD +
-    AlefBeth.MEM_SOFIT
-
-
-  private val HAZAK = AlefBeth.HET + AlefBeth.ZAYIN + AlefBeth.QOF
+  private def isChapter(line: String): Boolean = line.startsWith(JerusalemTanachImporter.PEREK)
 
 
   private def parseVerse(verse: String, number: Int): Seq[Node] = {
@@ -121,8 +120,8 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
 
     result ++= processParsha(line)
 
-    line.consume(HAZI)
-    line.consume(HAZAK)
+    line.consume(JerusalemTanachImporter.HAZI)
+    line.consume(JerusalemTanachImporter.HAZAK)
 
     line.consumeBracketed()
 
@@ -141,12 +140,12 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
 
 
     private def processParsha(line: Line): Option[Node] = {
-      def parsha(open: Boolean, big: Boolean) = Some(<parsha open={booleanAttribute(open)} big={booleanAttribute(big)}/>)
+      def parsha(open: Boolean, big: Boolean) = Some(<div type="paragraph" open={booleanAttribute(open)} big={booleanAttribute(big)}/>)
 
-      if (line.consume(PEI3)          ) parsha(true , true ) else
-      if (line.consume(AlefBeth.PEI)  ) parsha(true , false) else
-      if (line.consume(SAMEH3)        ) parsha(false, true ) else
-      if (line.consume(AlefBeth.SAMEH)) parsha(false, false) else
+      if (line.consume(JerusalemTanachImporter.PEI3)          ) parsha(true , true ) else
+      if (line.consume(AlefBeth.PEI)                          ) parsha(true , false) else
+      if (line.consume(JerusalemTanachImporter.SAMEH3)        ) parsha(false, true ) else
+      if (line.consume(AlefBeth.SAMEH)                        ) parsha(false, false) else
         None
     }
 
@@ -198,8 +197,7 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
       line.consume(AlefBeth.MAQAF)
     }
 
-    // TODO they are not removed!!!
-    val isPasek = line.consume(AlefBeth.PASEQ)
+    val isPasek = line.consume(AlefBeth.PIPE)
 
     <word makaf={booleanAttribute(isMakaf)} pasek={booleanAttribute(isPasek)}>{word}</word>
   }
