@@ -16,7 +16,7 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.{Div, Word, AlefBeth, Xml, Load, App}
+import org.podval.judaica.xml.{Div, Word, AlefBeth, Xml, Load, App, Paragraph}
 
 import org.podval.judaica.html
 import html.{Span, Html}
@@ -34,55 +34,54 @@ import scala.xml.Elem
 object Main {
 
   def main(args: Array[String]) {
-    val xml = Load.loadFile(new File("/tmp/xxx/Genesis.xml"))
-    val output = new File("/tmp/xxx/Genesis.html")
-    Xml.print(Html("tanach", transform(xml)), output)
+    val xml = Load.loadFile(new File("/home/dub/Code/judaica/tmp/Genesis.xml"))
+    val output = new File("/home/dub/Code/judaica/tmp/Genesis.html")
+    Xml.print(Html("tanach", transformBook(xml)), output)
+  }
+
+  // TODO make transform metadata-driven: divs allowed within a div; empty div -> name; name-conversion functions...
+
+
+  private def transformBook(elem: Elem): Elem = elem match {
+    case Div("book", n, children) => div("book", n, children.map(transformChapter))
   }
 
 
-  private def transform(elem: Elem): Elem = {
-    def div(type_ : String, name: String, contents: Seq[Elem]) = html.Div(type_, html.Name(name, type_) +: contents )
-
-    elem match {
-      case e@Div(type_, n, children) =>
-        // TODO merge with "name()"!
-        // TODO Avoid unneeded divs; what attributes for the remaining?
-        div(type_,
-          name(type_, n, elem),
-          (if (type_ == "verse") transformVerse(children) else children.map(transform(_)))
-        )
-      case e => e
-    }
+  private def transformChapter(elem: Elem): Elem = elem match {
+    case Div("chapter", n, children) => div("chapter", HebrewNumbers.fromInt(n.toInt), children.map(transformChapterElement))
   }
 
 
-  def name(type_ : String, n: String, xml: Elem): String = type_ match {
-    case "chapter" => HebrewNumbers.fromInt(n.toInt)
-    case "verse" => HebrewNumbers.fromInt(n.toInt)
-    case "day" => "[" + HebrewNumbers.ordinal(n.toInt) + "]"
-    case "paragraph" => if (Xml.getBooleanAttribute(xml, "open")) AlefBeth.PEI else AlefBeth.SAMEH
-    case "book" => n
-    case "week" => n
-    case "maftir" => n
-    case n => n // TODO get rid of!
+  private def transformChapterElement(elem: Elem): Elem = elem match {
+    case Div("verse", n, children) => div("verse", HebrewNumbers.fromInt(n.toInt),
+      children.flatMap(transformVerseElement) :+ Span(AlefBeth.SOF_PASUQ, "sofpasuk")
+    )
+
+    case Div("week", n, _) => html.Name("week", n)
+    case Div("day", n, _) => html.Name("day", "[" + HebrewNumbers.ordinal(n.toInt) + "]")
+    case Div("maftir", _, _) => html.Name("maftir", "[" + HebrewNumbers.maftir + "]")
+    case e@Paragraph(_, _) => transformParagraph(e)
   }
 
 
-  def transformVerse(words: Seq[Elem]): Seq[Elem] =
-    (words flatMap transformVerseElement) :+ Span(AlefBeth.SOF_PASUQ, "sofpasuk")
-
-
-  def transformVerseElement(elem: Elem): Seq[Elem] = elem match {
+  private def transformVerseElement(elem: Elem): Seq[Elem] = elem match {
+    case e@Paragraph(_, _) => Seq(transformParagraph(e))
     case e@Word(_, _, _) => transformWord(e)
-    case App(read, write) => transformWord(read) :+ Span("[" + write + "]")
-    case e@Div(_, _, _) => Seq(transform(e))
-    case e => Seq(e)
+    case App(read, write) => transformWord(read) :+ Span("[" + write + "]", "write")
+  }
+
+
+  private def transformParagraph(elem: Elem): Elem = elem match {
+    case Paragraph(open, big) => html.Name("paragraph", if (open) AlefBeth.PEI else AlefBeth.SAMEH)
   }
 
 
   def transformWord(elem: Elem): Seq[Elem] = elem match {
-    case Word(text, hasMakaf,hasPasek) =>
+    case Word(text, hasMakaf, hasPasek) =>
       Seq(Span(text + (if (hasMakaf) AlefBeth.MAQAF else ""), "word")) ++
-      (if (hasPasek) Seq(Span(AlefBeth.PASEQ, "pasek")) else Seq())
+        (if (hasPasek) Seq(Span(AlefBeth.PASEQ, "pasek")) else Seq())
   }
+
+
+  def div(type_ : String, name: String, contents: Seq[Elem]) = html.Div(type_, html.Name(type_, name) +: contents )
 }

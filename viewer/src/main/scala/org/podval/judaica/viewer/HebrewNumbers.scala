@@ -77,4 +77,7 @@ object HebrewNumbers {
 
 
   def ordinal(n: Int): String = ordinals(n - 1)
+
+
+  val maftir: String = MEM + PEI + TET + YOD + RESH
 }

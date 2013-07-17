@@ -22,5 +22,5 @@ import scala.xml.Elem
 
 object Name {
 
-  def apply(text: String, type_ : String = null): Elem = Span(text, "name", type_)
+  def apply(type_ : String, text: String): Elem = Span(text, "name", type_)
 }

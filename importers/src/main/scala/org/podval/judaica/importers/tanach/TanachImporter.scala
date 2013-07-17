@@ -69,7 +69,7 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
 
 
   private def dropChapterAndVerse(break: Elem): Elem =
-    break.copy(attributes = break.attributes.filter(a => TanachImporter.chapterAndVerse.contains(a.key)))
+    break.copy(attributes = break.attributes.filter(a => !TanachImporter.chapterAndVerse.contains(a.key)))
 }
 
 

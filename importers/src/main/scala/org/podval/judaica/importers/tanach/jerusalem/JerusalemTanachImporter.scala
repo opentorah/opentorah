@@ -34,7 +34,7 @@ object JerusalemTanachImporter {
   def main(args: Array[String]) {
     val importer = new JerusalemTanachImporter(
       "/home/dub/Code/judaica/imports/Tanach/jerusalem",
-      "/tmp/xxx"
+      "/home/dub/Code/judaica/tmp"
     )
 
     importer.run

@@ -22,6 +22,7 @@ import scala.xml.Elem
 
 object Span {
 
+  // TODO reshuffle the parameters?
   def apply(text: String, class_ : String = null, type_ : String = null): Elem =
     <span class={class_} type={type_}>{text}</span>
 }
