@@ -30,4 +30,17 @@ object App {
         {read}
       </rdg>
     </app>
+
+
+  def unapply(elem: Elem): Option[(Elem, String)] = {
+    if (elem.label != "app") None else {
+      val readings: Seq[Elem] = (elem \ "rdg").map(_.asInstanceOf[Elem])
+      val read = readings.find(Xml.getAttribute(_, "type") ==  "read")
+      val write = readings.find(Xml.getAttribute(_, "type") == "write")
+      Some((
+        Xml.oneChild(read.get, "div"),
+        Xml.oneChild(write.get, "div").text
+      ))
+    }
+  }
 }

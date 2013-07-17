@@ -16,8 +16,10 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.{Div, Word, AlefBeth, Xml, Load}
-import org.podval.judaica.html.{Span, Html}
+import org.podval.judaica.xml.{Div, Word, AlefBeth, Xml, Load, App}
+
+import org.podval.judaica.html
+import html.{Span, Html}
 
 import java.io.File
 
@@ -38,18 +40,19 @@ object Main {
   }
 
 
-  private def transform(elem: Elem): Elem = elem match {
-    case e@Div(type_) =>
-      val n = Xml.getAttribute(elem, "n").trim
-      val children: Seq[Elem] = Xml.elems(elem)
-      // TODO rework to DivHtml
-      // TODO Avoid unneded divs
-      // TODO copy ALL attributes?
-      <div type={type_} n={n}>
-        { Span(name(type_, n, elem), "name", type_) }
-        { if (type_ == "verse") transformVerse(children) else children.map(transform(_)) }
-      </div>
-    case e => e
+  private def transform(elem: Elem): Elem = {
+    def div(type_ : String, name: String, contents: Seq[Elem]) = html.Div(type_, html.Name(name, type_) +: contents )
+
+    elem match {
+      case e@Div(type_, n, children) =>
+        // TODO merge with "name()"!
+        // TODO Avoid unneeded divs; what attributes for the remaining?
+        div(type_,
+          name(type_, n, elem),
+          (if (type_ == "verse") transformVerse(children) else children.map(transform(_)))
+        )
+      case e => e
+    }
   }
 
 
@@ -58,7 +61,10 @@ object Main {
     case "verse" => HebrewNumbers.fromInt(n.toInt)
     case "day" => "[" + HebrewNumbers.ordinal(n.toInt) + "]"
     case "paragraph" => if (Xml.getBooleanAttribute(xml, "open")) AlefBeth.PEI else AlefBeth.SAMEH
-    case _ => n
+    case "book" => n
+    case "week" => n
+    case "maftir" => n
+    case n => n // TODO get rid of!
   }
 
 
@@ -68,18 +74,9 @@ object Main {
 
   def transformVerseElement(elem: Elem): Seq[Elem] = elem match {
     case e@Word(_, _, _) => transformWord(e)
-    case e@Div("app") => transformApp(e)
-    case e@Div(_) => Seq(transform(e))
+    case App(read, write) => transformWord(read) :+ Span("[" + write + "]")
+    case e@Div(_, _, _) => Seq(transform(e))
     case e => Seq(e)
-  }
-
-
-  def transformApp(elem: Elem): Seq[Elem] = {
-    // TODO add App.unapply and use it!
-    val readings: Seq[Elem] = (elem \ "rdg").map(_.asInstanceOf[Elem])
-    val read = readings.find(Xml.isDiv(_, "read")).get
-    val write = readings.find(Xml.isDiv(_, "write")).get
-    transformWord(Xml.oneChild(read, "div")) :+ Span("[" + Xml.oneChild(write, "div").text + "]")
   }
 
 

@@ -26,6 +26,10 @@ object Div {
     <div type={type_} n={n}>{contents}</div>
 
 
-  def unapply(elem: Elem): Option[String] =
-    if (elem.label == "div") Some(Xml.getAttribute(elem, "type")) else None
+  def unapply(elem: Elem): Option[(String, String, Seq[Elem])] =
+    if (elem.label == "div") Some((
+      Xml.getAttribute(elem, "type"),
+      Xml.getAttribute(elem, "n"),
+      Xml.elems(elem)
+    )) else None
 }

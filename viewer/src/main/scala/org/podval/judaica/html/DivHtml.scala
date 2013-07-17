@@ -20,8 +20,7 @@ package org.podval.judaica.html
 import scala.xml.Elem
 
 
-object DivHtml {
+object Div {
 
-  def apply(class_ : String, contents: Seq[Elem]): Elem =
-    <div class={class_}>{contents}</div>
+  def apply(class_ : String, contents: Seq[Elem]): Elem = <div class={class_}>{contents}</div>
 }

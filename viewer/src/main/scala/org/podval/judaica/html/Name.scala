@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,12 @@
  * under the License.
  */
 
-package org.podval.judaica.xml
+package org.podval.judaica.html
 
 import scala.xml.Elem
 
 
-object Word {
+object Name {
 
-  // TODO "word" shouldn't be a "div" in TEI, should it?
-  def apply(text: String, hasMakaf: Boolean = false, hasPasek: Boolean = false): Elem =
-    <div type="word" makaf={Xml.booleanAttribute(hasMakaf)} pasek={Xml.booleanAttribute(hasPasek)}>{text}</div>
-
-
-  def unapply(elem: Elem): Option[(String, Boolean, Boolean)] = elem match {
-    case e@Div("word", _, _) => Some((
-        e.text,
-        Xml.getBooleanAttribute(e, "makaf"),
-        Xml.getBooleanAttribute(e, "pasek")
-      ))
-    case _ => None
-  }
+  def apply(text: String, type_ : String = null): Elem = Span(text, "name", type_)
 }

@@ -43,14 +43,15 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
         .groupBy(getAttribute("chapter"))
         .mapValues(_.groupBy(getAttribute("verse")).mapValues(_.map(dropChapterAndVerse)))
 
-    transformDiv(xml, "book") { flatMapChildren(_, {
-      transformDiv(_, "chapter") { chapter => flatMapChildren(chapter, {
+    transformDiv(xml, "book") { book: Elem => flatMapChildren(book, {
+      transformDiv(_, "chapter") { chapter: Elem => flatMapChildren(chapter, {
         transformDiv(_, "verse") { verse =>
           val prefixBreaks: Seq[Elem] = breaks
             .getOrElse(getAttribute(chapter, "n"), Map.empty)
             .getOrElse(getAttribute(verse, "n"), Seq.empty)
 
-          val result: Seq[Elem] = prefixBreaks ++ Seq[Elem](verse)
+          val result: Seq[Elem] = prefixBreaks :+ verse
+
           result
         }
       })}
@@ -59,7 +60,7 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
 
 
   private def transformDiv(elem: Elem, divType: String)(f: Elem => Seq[Node]): Seq[Node] = elem match {
-    case e@Div(divType) => f(e)
+    case e@Div(divType, _, _) => f(e)
     case e => Seq(elem)
   }
 

@@ -19,14 +19,14 @@ package org.podval.judaica.importers
 package tanach
 package jerusalem
 
+import org.podval.judaica.xml.{AlefBeth, Word, Div, Paragraph, App}
+
 import scala.xml.Elem
 
 import scala.io.Source
 import java.io.File
 
 import scala.collection.mutable.ArrayBuffer
-
-import org.podval.judaica.xml.{AlefBeth, Word, Div, Paragraph, App}
 
 
 object JerusalemTanachImporter {
@@ -96,19 +96,15 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
     val lines = Source.fromFile(inputFile, "UTF-16BE").getLines().map(_.trim)
     val bookName = lines.next.trim
 
-    // TODO use Div
-    <div type="book" n={bookName}>{
-      lines.filterNot(_.isEmpty).filterNot(isChapter).zipWithIndex.map {
-        case (chapter, chapterNumberFrom0) =>
-          Div("chapter", (chapterNumberFrom0+1).toString,
-            dropStuckChapter(chapter.split(":").map(_.trim)).zipWithIndex.flatMap {
-              case (verse, verseNumberFrom0) =>
-                parseVerse(verse, verseNumberFrom0+1)
-            }
-          )
-      }
-    }
-    </div>
+    Div("book", bookName, lines.filterNot(_.isEmpty).filterNot(isChapter).toSeq.zipWithIndex.map {
+      case (chapter, chapterNumberFrom0) =>
+        Div("chapter", (chapterNumberFrom0+1).toString,
+          dropStuckChapter(chapter.split(":").map(_.trim)).zipWithIndex.flatMap {
+            case (verse, verseNumberFrom0) =>
+              parseVerse(verse, verseNumberFrom0+1)
+          }
+        )
+    })
   }
 
 
@@ -143,15 +139,12 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
   }
 
 
+  // No unfold() in Scala...
   private def processWords(line: Line): Seq[Elem] = {
     val result = new ArrayBuffer[Elem]
 
-    // TODO unfold?
     while (!line.isEmpty) {
-      val wordElement = processWord(line)
-      val alternate = line.consumeBracketed()
-      val element = if (alternate.isEmpty) wordElement else App(wordElement, alternate.get)
-      result += element
+      result += processWord(line)
     }
 
     result
@@ -178,6 +171,10 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
 
     val isPasek = line.consume(AlefBeth.PIPE)
 
-    Word(word, isMakaf, isPasek)
+    val wordElement = Word(word, isMakaf, isPasek)
+
+    val alternate = line.consumeBracketed() // TODO strip the vowels off?
+
+    if (alternate.isEmpty) wordElement else App(wordElement, alternate.get)
   }
 }
