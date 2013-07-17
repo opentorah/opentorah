@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 package org.podval.judaica.importers
 package chabad
 
-import scala.xml.{Node, Utility}
+import scala.xml.{Elem, Node, Utility}
 
 import java.io.File
 
@@ -43,7 +43,7 @@ class ChabadImporter(inputDirectory: String, outputDirectory: String) extends Im
     def getStylesheet(): String = "../Chabad"
 
 
-    def parseBook(file: File): Node = {
+    def parseBook(file: File): Elem = {
         val index = load(file)
 
         val directory = file.getParentFile

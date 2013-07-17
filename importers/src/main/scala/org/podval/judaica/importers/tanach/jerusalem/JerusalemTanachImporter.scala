@@ -118,7 +118,7 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
 
     val line = new Line(verse)
 
-    result ++= processParsha(line)
+    result ++= processParagraph(line)
 
     line.consume(JerusalemTanachImporter.HAZI)
     line.consume(JerusalemTanachImporter.HAZAK)
@@ -139,13 +139,14 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
     }
 
 
-    private def processParsha(line: Line): Option[Elem] = {
-      def parsha(open: Boolean, big: Boolean) = Some(<div type="paragraph" open={booleanAttribute(open)} big={booleanAttribute(big)}/>)
+    private def processParagraph(line: Line): Option[Elem] = {
+      def paragraph(open: Boolean, big: Boolean) =
+        Some(<div type="paragraph" open={booleanAttribute(open)} big={booleanAttribute(big)}/>)
 
-      if (line.consume(JerusalemTanachImporter.PEI3)          ) parsha(true , true ) else
-      if (line.consume(AlefBeth.PEI)                          ) parsha(true , false) else
-      if (line.consume(JerusalemTanachImporter.SAMEH3)        ) parsha(false, true ) else
-      if (line.consume(AlefBeth.SAMEH)                        ) parsha(false, false) else
+      if (line.consume(JerusalemTanachImporter.PEI3)  ) paragraph(true , true ) else
+      if (line.consume(AlefBeth.PEI)                  ) paragraph(true , false) else
+      if (line.consume(JerusalemTanachImporter.SAMEH3)) paragraph(false, true ) else
+      if (line.consume(AlefBeth.SAMEH)                ) paragraph(false, false) else
         None
     }
 
@@ -167,7 +168,7 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
               {wordElement}
             </rdg>
             <rdg type="read">
-               <word>{alternate.get}</word>
+              {mkWord(alternate.get, false, false)}
             </rdg>
           </app>
         }
@@ -199,6 +200,11 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
 
     val isPasek = line.consume(AlefBeth.PIPE)
 
-    <word makaf={booleanAttribute(isMakaf)} pasek={booleanAttribute(isPasek)}>{word}</word>
+    mkWord(word, isMakaf, isPasek)
+  }
+
+
+  private def mkWord(word: String, hasMakaf: Boolean, hasPasek: Boolean): Elem = {
+    <div type="word" makaf={booleanAttribute(hasMakaf)} pasek={booleanAttribute(hasPasek)}>{word}</div>
   }
 }

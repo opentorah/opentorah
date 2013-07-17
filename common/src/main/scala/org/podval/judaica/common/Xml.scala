@@ -17,7 +17,7 @@
 package org.podval.judaica.common
 
 
-import scala.xml.{Node, Elem, Text, XML, Utility, PrettyPrinter}
+import scala.xml.{Elem, Text, XML, Utility, PrettyPrinter}
 
 import java.io.{FileWriter, PrintWriter, File}
 import scala.Some
@@ -25,29 +25,29 @@ import scala.Some
 
 object Xml {
 
-  def isDiv(node: Node): Boolean = node.isInstanceOf[Elem] && node.asInstanceOf[Elem].label == "div"
+  def isDiv(elem: Elem): Boolean = elem.label == "div"
 
 
-  def isDiv(node: Elem, divType: String): Boolean = isDiv(node) && (getType(node) == divType)
+  def isDiv(elem: Elem, divType: String): Boolean = isDiv(elem) && (getType(elem) == divType)
 
 
-  def getType(node: Elem) = getAttribute(node, "type")
+  def getType(elem: Elem) = getAttribute(elem, "type")
 
 
-  def getAttribute(name: String)(node: Elem): String = (node \ ("@" + name)).text
+  def getAttribute(name: String)(elem: Elem): String = (elem \ ("@" + name)).text
 
 
-  def getAttribute(node: Elem, name: String): String = getAttribute(name)(node)
+  def getAttribute(elem: Elem, name: String): String = getAttribute(name)(elem)
 
 
-  def getBooleanAttribute(node: Elem, name: String): Boolean = getAttribute(node, name) == "true"
+  def getBooleanAttribute(elem: Elem, name: String): Boolean = getAttribute(elem, name) == "true"
 
 
   def booleanAttribute(value: Boolean) = if (value) Some(Text("true")) else None
 
 
-  def oneChild(node: Node, name: String): Elem = {
-    val children = node \ name
+  def oneChild(elem: Elem, name: String): Elem = {
+    val children = elem \ name
 
     require(children.size > 0, "No child with name " + name)
     require(children.size == 1, "To many children with name " + name)
@@ -58,7 +58,7 @@ object Xml {
   }
 
 
-  def elems(xml: Node): Seq[Elem] = xml.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
+  def elems(elem: Elem): Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
 
   def loadResource(clazz: Class[_], name: String, tag: String): Elem =
@@ -71,7 +71,7 @@ object Xml {
   def loadFile(file: File): Elem = XML.loadFile(file)
 
 
-  private def open(what: Node, tag: String): Elem =
+  private def open(what: Elem, tag: String): Elem =
     check(Utility.trimProper(what)(0).asInstanceOf[Elem], tag)
 
 
@@ -80,7 +80,7 @@ object Xml {
     else throw new IllegalArgumentException("Expected tag " + tag + " but got " + elem.label)
 
 
-  def wrapInHtml(stylesheet: String, what: Node) = {
+  def wrapInHtml(stylesheet: String, what: Elem) = {
     <html>
       <head>
         <link rel="stylesheet" type="text/css" href={stylesheet + ".css"}/>
@@ -92,7 +92,7 @@ object Xml {
   }
 
 
-  def print(xml: Node, outFile: File) {
+  def print(xml: Elem, outFile: File) {
     val out = new PrintWriter(new FileWriter(outFile))
     val pretty = new PrettyPrinter(100, 4).format(xml)
     // TODO        out.println("<!DOCTYPE html>\n" + pretty)

@@ -19,7 +19,7 @@ package org.podval.judaica.importers
 
 import org.podval.judaica.common.Xml
 
-import scala.xml.Node
+import scala.xml.Elem
 
 import java.io.File
 
@@ -43,8 +43,8 @@ abstract class Importer(inputDirectoryPath: String, outputDirectoryPath: String)
     protected def getInputExtension: String
 
 
-    protected def parseBook(file: File): Node
+    protected def parseBook(file: File): Elem
 
 
-    protected def processBook(xml: Node, outputName: String): Node = xml
+    protected def processBook(xml: Elem, outputName: String): Elem = xml
 }

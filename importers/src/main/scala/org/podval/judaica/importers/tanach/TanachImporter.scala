@@ -36,7 +36,7 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
   protected def output2inputName: Map[String, String]
 
 
-  protected final override def processBook(xml: Node, outputName: String): Node = {
+  protected final override def processBook(xml: Elem, outputName: String): Elem = {
     val breaks =
       Xml.elems(Xml.loadResource(classOf[TanachImporter], outputName, "meta"))
         .groupBy(getAttribute("chapter"))
@@ -45,26 +45,32 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
     transformDiv(xml, "book") { flatMapChildren(_, {
       transformDiv(_, "chapter") { chapter => flatMapChildren(chapter, {
         transformDiv(_, "verse") { verse =>
-          breaks
-          .getOrElse(getAttribute(chapter.asInstanceOf[Elem], "n"), Map.empty)   // TODO get rid of the cast!!!
-          .getOrElse(getAttribute(verse.asInstanceOf[Elem], "n"), Seq.empty) ++  // TODO get rid of the cast!!!
-          verse
+          val prefixBreaks: Seq[Elem] = breaks
+            .getOrElse(getAttribute(chapter, "n"), Map.empty)
+            .getOrElse(getAttribute(verse, "n"), Seq.empty)
+
+          val result: Seq[Elem] = prefixBreaks ++ Seq[Elem](verse)
+          result
         }
       })}
-    })}(0)
+    })}(0).asInstanceOf[Elem]   // TODO get rid of the cast!!!
   }
 
 
-  private def transformDiv(node: Node, divType: String)(f: Node => Seq[Node]) =
-    if (!Xml.isDiv(node.asInstanceOf[Elem], divType)) node else f(node)  // TODO get rid of the cast!!!
-
-
-  private def flatMapChildren(node: Node, f: Node => Seq[Node]): Elem =
-    node.asInstanceOf[Elem].copy(child = Xml.elems(node) flatMap f)
-
-
-  private def dropChapterAndVerse(break: Node): Node = {
-    val elem = break.asInstanceOf[Elem]
-    elem.copy(attributes = elem.attributes.filter(a => (a.key != "chapter") && (a.key != "verse")))
+  private def transformDiv(elem: Elem, divType: String)(f: Elem => Seq[Node]): Seq[Node] = {
+    if (!Xml.isDiv(elem, divType)) Seq(elem) else f(elem)
   }
+
+
+  private def flatMapChildren(elem: Elem, f: Elem => Seq[Node]): Elem = elem.copy(child = Xml.elems(elem) flatMap f)
+
+
+  private def dropChapterAndVerse(break: Elem): Elem =
+    break.copy(attributes = break.attributes.filter(a => TanachImporter.chapterAndVerse.contains(a.key)))
+}
+
+
+object TanachImporter {
+
+  val chapterAndVerse = Set("chapter", "verse")
 }

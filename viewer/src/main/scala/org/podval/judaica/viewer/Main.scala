@@ -20,7 +20,9 @@ import org.podval.judaica.common.{AlefBeth, Xml}
 
 import java.io.File
 
-import scala.xml.{Node, Elem, Text}
+import scala.xml.{Elem, Text}
+
+import scala.collection.mutable.ArrayBuffer
 
 
 /*
@@ -37,19 +39,19 @@ object Main {
   }
 
 
-  private def transform(xml: Elem): Elem = {
-    if (Xml.isDiv(xml)) {
-      val type_ = Xml.getType(xml)
-      val n = Xml.getAttribute(xml, "n").trim
-      val children: Seq[Elem] = Xml.elems(xml)
+  private def transform(elem: Elem): Elem = {
+    if (Xml.isDiv(elem)) {
+      val type_ = Xml.getType(elem)
+      val n = Xml.getAttribute(elem, "n").trim
+      val children: Seq[Elem] = Xml.elems(elem)
       // TODO copy ALL attributes!!!
 
       <div type={type_} n={n}>
-        <span class="name" type={type_}>{name(type_, n, xml)}</span>
+        <span class="name" type={type_}>{name(type_, n, elem)}</span>
         { if (type_ == "verse") transformVerse(children) else children.map(transform(_)) }
       </div>
     } else {
-      xml
+      elem
     }
   }
 
@@ -63,10 +65,45 @@ object Main {
   }
 
 
-  def transformVerse(words: Seq[Elem]): Seq[Node] = (words flatMap transformWord) ++ Text(AlefBeth.SOF_PASUQ)
+  def transformVerse(words: Seq[Elem]): Seq[Elem] =
+    (words flatMap transformVerseElement) ++
+    Seq(<span class="sofpasuk">{AlefBeth.SOF_PASUQ}</span>)
 
 
-  def transformWord(word: Elem): Seq[Node] = {
-    word
+  def transformVerseElement(elem: Elem): Seq[Elem] = {
+    if (Xml.isDiv(elem)) {
+      Xml.getType(elem) match {
+        case "word" => transformWord(elem)
+        case "app" => transformApp(elem)
+        case _ => Seq(transform(elem))
+      }
+    } else {
+      Seq(elem)
+    }
+  }
+
+
+  def transformApp(elem: Elem): Seq[Elem] = {
+    val readings: Seq[Elem] = (elem \ "rdg").map(_.asInstanceOf[Elem])
+    val read = readings.find(Xml.isDiv(_, "read")).get
+    val write = readings.find(Xml.isDiv(_, "write")).get
+    transformWord(Xml.oneChild(read, "div")) ++
+    Seq(<span>[{Xml.oneChild(write, "div").text}]</span>)
+  }
+
+
+  def transformWord(elem: Elem): Seq[Elem] = {
+    val hasMakaf = Xml.getBooleanAttribute(elem, "makaf")
+    val hasPasek = Xml.getBooleanAttribute(elem, "pasek")
+    val text = elem.text
+
+    var result = new ArrayBuffer[Elem]
+    result +=
+      <span class="word">{text + (if (hasMakaf) AlefBeth.MAQAF else "")}</span>
+
+    if (hasPasek) result +=
+      <span class="pasek">{Text(AlefBeth.PASEQ)}</span>
+
+    result
   }
 }

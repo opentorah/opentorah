@@ -37,7 +37,9 @@ final class Line(var line: String) {
   def consumeBracketed(): Option[String] = {
     if (line.startsWith("[")) {
       val index = line.indexOf("]")
-      Some(consumeToIndex(index+1).drop(1))
+      val bracketed = consumeToIndex(index+1)
+      val result = bracketed.drop(1).dropRight(1)
+      Some(result)
     } else {
       None
     }
