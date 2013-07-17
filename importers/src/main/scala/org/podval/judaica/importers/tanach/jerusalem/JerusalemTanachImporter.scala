@@ -26,8 +26,7 @@ import java.io.File
 
 import scala.collection.mutable.ArrayBuffer
 
-import org.podval.judaica.common.Xml.booleanAttribute
-import org.podval.judaica.common.AlefBeth
+import org.podval.judaica.xml.{AlefBeth, Word, Div, Paragraph, App}
 
 
 object JerusalemTanachImporter {
@@ -97,16 +96,16 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
     val lines = Source.fromFile(inputFile, "UTF-16BE").getLines().map(_.trim)
     val bookName = lines.next.trim
 
+    // TODO use Div
     <div type="book" n={bookName}>{
       lines.filterNot(_.isEmpty).filterNot(isChapter).zipWithIndex.map {
         case (chapter, chapterNumberFrom0) =>
-          <div type="chapter" n={(chapterNumberFrom0+1).toString}>{
-            dropStuckChapter(chapter.split(":").map(_.trim)).zipWithIndex.map {
+          Div("chapter", (chapterNumberFrom0+1).toString,
+            dropStuckChapter(chapter.split(":").map(_.trim)).zipWithIndex.flatMap {
               case (verse, verseNumberFrom0) =>
                 parseVerse(verse, verseNumberFrom0+1)
             }
-          }
-        </div>
+          )
       }
     }
     </div>
@@ -128,51 +127,30 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
     // TODO: if the line *is* empty, we skip a posuk number?!
     if (!line.isEmpty) {
       line.consumeToSpace()
-
-      result +=
-        <div type="verse" n={number.toString}>
-          {processWords(line)}
-        </div>
-      }
-
-      result
+      result += Div("verse", number.toString, processWords(line))
     }
 
+    result
+  }
 
-    private def processParagraph(line: Line): Option[Elem] = {
-      def paragraph(open: Boolean, big: Boolean) =
-        Some(<div type="paragraph" open={booleanAttribute(open)} big={booleanAttribute(big)}/>)
 
-      if (line.consume(JerusalemTanachImporter.PEI3)  ) paragraph(true , true ) else
-      if (line.consume(AlefBeth.PEI)                  ) paragraph(true , false) else
-      if (line.consume(JerusalemTanachImporter.SAMEH3)) paragraph(false, true ) else
-      if (line.consume(AlefBeth.SAMEH)                ) paragraph(false, false) else
-        None
-    }
+  private def processParagraph(line: Line): Option[Elem] = {
+    if (line.consume(JerusalemTanachImporter.PEI3)  ) Some(Paragraph(true , true )) else
+    if (line.consume(AlefBeth.PEI)                  ) Some(Paragraph(true , false)) else
+    if (line.consume(JerusalemTanachImporter.SAMEH3)) Some(Paragraph(false, true )) else
+    if (line.consume(AlefBeth.SAMEH)                ) Some(Paragraph(false, false)) else
+      None
+  }
 
 
   private def processWords(line: Line): Seq[Elem] = {
     val result = new ArrayBuffer[Elem]
 
+    // TODO unfold?
     while (!line.isEmpty) {
       val wordElement = processWord(line)
-
       val alternate = line.consumeBracketed()
-
-      val element =
-        if (alternate.isEmpty) {
-          wordElement
-        } else {
-          <app>
-            <rdg type="write">
-              {wordElement}
-            </rdg>
-            <rdg type="read">
-              {mkWord(alternate.get, false, false)}
-            </rdg>
-          </app>
-        }
-
+      val element = if (alternate.isEmpty) wordElement else App(wordElement, alternate.get)
       result += element
     }
 
@@ -200,11 +178,6 @@ final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: Str
 
     val isPasek = line.consume(AlefBeth.PIPE)
 
-    mkWord(word, isMakaf, isPasek)
-  }
-
-
-  private def mkWord(word: String, hasMakaf: Boolean, hasPasek: Boolean): Elem = {
-    <div type="word" makaf={booleanAttribute(hasMakaf)} pasek={booleanAttribute(hasPasek)}>{word}</div>
+    Word(word, isMakaf, isPasek)
   }
 }

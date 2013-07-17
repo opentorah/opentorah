@@ -18,7 +18,7 @@
 package org.podval.judaica.importers
 package tanach
 
-import org.podval.judaica.common.Xml
+import org.podval.judaica.xml.{Xml, Div, Load}
 import Xml.getAttribute
 
 import scala.xml.{Node, Elem}
@@ -37,8 +37,9 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
 
 
   protected final override def processBook(xml: Elem, outputName: String): Elem = {
+    // TODO write a merge function - and reformat the metadata accordingly?
     val breaks =
-      Xml.elems(Xml.loadResource(classOf[TanachImporter], outputName, "meta"))
+      Xml.elems(Load.loadResource(classOf[TanachImporter], outputName, "meta"))
         .groupBy(getAttribute("chapter"))
         .mapValues(_.groupBy(getAttribute("verse")).mapValues(_.map(dropChapterAndVerse)))
 
@@ -57,8 +58,9 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
   }
 
 
-  private def transformDiv(elem: Elem, divType: String)(f: Elem => Seq[Node]): Seq[Node] = {
-    if (!Xml.isDiv(elem, divType)) Seq(elem) else f(elem)
+  private def transformDiv(elem: Elem, divType: String)(f: Elem => Seq[Node]): Seq[Node] = elem match {
+    case e@Div(divType) => f(e)
+    case e => Seq(elem)
   }
 
 

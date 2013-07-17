@@ -12,37 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * under the License.
  */
 
-package org.podval.judaica.viewer
+package org.podval.judaica.html
 
 import scala.xml.Elem
 
-import org.podval.judaica.xml.Xml
 
+object Span {
 
-final class Names(val names: Seq[Name]) {
-
-  def find(name: String): Option[Name] = names.find(_.name == name)
-
-
-  def has(name: String): Boolean = find(name).isDefined
-
-
-  def byLang(lang: String): Option[Name] = names.find(_.lang == lang)
-
-
-  def default: Name = names(0)
-
-
-  override def toString: String = "Names: " + names
-}
-
-
-
-object Names {
-  
-  def apply(node: Elem): Names = {
-    new Names(Xml.elems(Xml.oneChild(node, "names")).map(Name(_)))
-  }
+  def apply(text: String, class_ : String = null, type_ : String = null): Elem =
+    <span class={class_} type={type_}>{text}</span>
 }

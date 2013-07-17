@@ -9,6 +9,7 @@
     </parent>
 
     <groupId>org.podval.judaica</groupId>
+    <!-- TODO rename to 'xml'? -->
     <artifactId>org.podval.judaica.common</artifactId>
     <name>Judaica Common Code</name>
     <packaging>jar</packaging>

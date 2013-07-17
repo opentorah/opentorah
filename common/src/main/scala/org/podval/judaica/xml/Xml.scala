@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package org.podval.judaica.common
+package org.podval.judaica.xml
 
 
 import scala.xml.{Elem, Text, XML, Utility, PrettyPrinter}
 
 import java.io.{FileWriter, PrintWriter, File}
-import scala.Some
 
 
 object Xml {
 
-  def isDiv(elem: Elem): Boolean = elem.label == "div"
-
-
-  def isDiv(elem: Elem, divType: String): Boolean = isDiv(elem) && (getType(elem) == divType)
-
-
-  def getType(elem: Elem) = getAttribute(elem, "type")
+  def isDiv(elem: Elem, divType: String): Boolean = (elem.label == "div") && (getAttribute(elem, "type") == divType)
 
 
   def getAttribute(name: String)(elem: Elem): String = (elem \ ("@" + name)).text
@@ -61,34 +54,9 @@ object Xml {
   def elems(elem: Elem): Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
 
-  def loadResource(clazz: Class[_], name: String, tag: String): Elem =
-    open(XML.load(clazz.getResourceAsStream(name + ".xml")), tag)
-
-
-  def loadFile(file: File, tag: String): Elem = open(XML.loadFile(file), tag)
-
-
-  def loadFile(file: File): Elem = XML.loadFile(file)
-
-
-  private def open(what: Elem, tag: String): Elem =
-    check(Utility.trimProper(what)(0).asInstanceOf[Elem], tag)
-
-
-  def check(elem: Elem, tag: String): Elem =
-    if (elem.label == tag) elem
-    else throw new IllegalArgumentException("Expected tag " + tag + " but got " + elem.label)
-
-
-  def wrapInHtml(stylesheet: String, what: Elem) = {
-    <html>
-      <head>
-        <link rel="stylesheet" type="text/css" href={stylesheet + ".css"}/>
-      </head>
-      <body class="hebrew">
-        {what}
-      </body>
-    </html>
+  def check(elem: Elem, tag: String): Elem = {
+    require(elem.label == tag, "Expected tag " + tag + " but got " + elem.label)
+    elem
   }
 
 

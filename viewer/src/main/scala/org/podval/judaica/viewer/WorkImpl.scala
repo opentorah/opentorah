@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Podval Group.
+ * Copyright 2012-2013 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.common.Xml.{loadFile, getAttribute}
+import org.podval.judaica.xml.{Xml, Load}
 
 import java.io.File
 
@@ -39,11 +39,11 @@ final class WorkImpl private(
 object WorkImpl {
 
   def apply(file: File): WorkImpl = {
-    val node = loadFile(file, "work")
+    val node = Load.loadFile(file, "work")
 
     new WorkImpl(
       Names(node),
-      getAttribute(node, "directory")
+      Xml.getAttribute(node, "directory")
     )
   }
 }

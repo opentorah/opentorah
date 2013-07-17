@@ -18,7 +18,8 @@ package org.podval.judaica.viewer
 
 import scala.xml.Elem
 
-import org.podval.judaica.common.Xml.{check, getAttribute}
+import org.podval.judaica.xml.Xml
+import Xml.getAttribute
 
 
 final class Name(val name: String, val lang: String, val isTransliterated: Boolean) {
@@ -31,7 +32,7 @@ final class Name(val name: String, val lang: String, val isTransliterated: Boole
 object Name {
   
   def apply(node: Elem): Name = {
-    check(node.asInstanceOf[Elem], "name")
+    Xml.check(node.asInstanceOf[Elem], "name")
     
     new Name(
       getAttribute(node, "name"),

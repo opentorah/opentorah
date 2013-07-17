@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.podval.judaica.common
+package org.podval.judaica.xml
 
 object AlefBeth {
 
