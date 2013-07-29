@@ -19,8 +19,8 @@ package org.podval.judaica.importers
 package tanach
 
 import org.podval.judaica.xml.{Xml, Div, Load}
-import Xml.getAttribute
 
+import Xml.getAttribute
 import scala.xml.{Node, Elem}
 
 

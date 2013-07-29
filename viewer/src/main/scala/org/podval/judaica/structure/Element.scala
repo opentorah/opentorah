@@ -17,8 +17,6 @@
 
 package org.podval.judaica.structure
 
-import org.podval.judaica.xml.Xml
-
 import scala.xml.Elem
 
 
@@ -28,55 +26,4 @@ abstract class Element {
 
 
   def display(elem: Elem): Seq[Elem]
-}
-
-
-
-class DivElement(type_ : String, nameClassSuffix: Option[String] = Some("name"))(children: Element*) extends Element {
-
-  final override def recognizes(elem: Elem): Boolean = (elem.label == "div") && (Xml.getAttribute(elem, "type") == type_)
-
-
-  override def display(elem: Elem): Seq[Elem] = if (isEmpty) prefix(elem) else Seq(displayDiv(elem))
-
-
-  final def displayDiv(elem: Elem): Elem = {
-    val result = prefix(elem) ++ Xml.elems(elem).flatMap(e => findChild(e).display(e)) ++ suffix(elem)
-    <div class={type_}>{result}</div>
-  }
-
-
-  protected def prefix(elem: Elem): Seq[Elem] = nameSpan(displayName(Xml.getAttribute(elem, "n"))).toSeq
-
-
-  protected final def nameSpan(name: Option[String]): Option[Elem] = name.map(n => <span class={nameClass}>{n}</span>)
-
-
-  private val nameClass = if (nameClassSuffix.isDefined) type_ + "-" + nameClassSuffix.get else type_
-
-
-  private[this] def isEmpty: Boolean = children.isEmpty
-
-
-  private[this] def findChild(elem: Elem): Element = {
-    val result = children.find(_.recognizes(elem))
-    if (result.isEmpty) throw new NoSuchElementException("Children of " + this + " do not recognize " + elem)
-    result.get
-  }
-
-
-  protected def displayName(n: String): Option[String] = Some(n)
-
-
-  protected def suffix(elem: Elem): Seq[Elem] = Seq.empty
-
-
-  override def toString: String = "DivElement " + type_
-}
-
-
-
-abstract class NonDivElement(final val label: String) extends Element {
-
-  final override def recognizes(elem: Elem): Boolean = (elem.label == label)
 }
