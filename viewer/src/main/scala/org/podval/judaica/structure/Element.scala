@@ -32,45 +32,46 @@ abstract class Element {
 
 
 
-abstract class DivElement(val type_ : String, children: Element*) extends Element {
+class DivElement(type_ : String, nameClassSuffix: Option[String] = Some("name"))(children: Element*) extends Element {
 
   final override def recognizes(elem: Elem): Boolean = (elem.label == "div") && (Xml.getAttribute(elem, "type") == type_)
 
 
-  final override def display(elem: Elem): Seq[Elem] = Seq(displayDiv(elem))
+  override def display(elem: Elem): Seq[Elem] = if (isEmpty) prefix(elem) else Seq(displayDiv(elem))
 
 
   final def displayDiv(elem: Elem): Elem = {
-    val name: Option[Elem] = if (isNameNumeric) {
-      displayName(Xml.getAttribute(elem, "n")).map(n => <span class={type_ + "number"}>{n}</span>)
-    } else {
-      Some(<span class={type_ + "name"}></span>)
-    }
-
-    if (isEmpty) {
-      name.get
-    } else {
-      val contents: Seq[Elem] = Xml.elems(elem).flatMap(e => findChild(e).display(e))
-      val result = name ++ contents ++ suffix
-
-      <div class={type_}>{result}</div>
-    }
+    val result = prefix(elem) ++ Xml.elems(elem).flatMap(e => findChild(e).display(e)) ++ suffix(elem)
+    <div class={type_}>{result}</div>
   }
+
+
+  protected def prefix(elem: Elem): Seq[Elem] = nameSpan(displayName(Xml.getAttribute(elem, "n"))).toSeq
+
+
+  protected final def nameSpan(name: Option[String]): Option[Elem] = name.map(n => <span class={nameClass}>{n}</span>)
+
+
+  private val nameClass = if (nameClassSuffix.isDefined) type_ + "-" + nameClassSuffix.get else type_
 
 
   private[this] def isEmpty: Boolean = children.isEmpty
 
 
-  private[this] def findChild(elem: Elem): Element = children.find(_.recognizes(elem)).get
+  private[this] def findChild(elem: Elem): Element = {
+    val result = children.find(_.recognizes(elem))
+    if (result.isEmpty) throw new NoSuchElementException("Children of " + this + " do not recognize " + elem)
+    result.get
+  }
 
 
-  def isNameNumeric: Boolean
+  protected def displayName(n: String): Option[String] = Some(n)
 
 
-  def displayName(n: String): Option[String]
+  protected def suffix(elem: Elem): Seq[Elem] = Seq.empty
 
 
-  def suffix: Seq[Elem] = Seq.empty
+  override def toString: String = "DivElement " + type_
 }
 
 

@@ -36,7 +36,9 @@ object Main {
   def main(args: Array[String]) {
     val xml = Load.loadFile(new File("/home/dub/Code/judaica/tmp/Genesis.xml"))
     val output = new File("/home/dub/Code/judaica/tmp/Genesis.html")
-    Xml.print(Html("tanach", transformBook(xml)), output)
+//    val result = transformBook(xml)
+    val result = TanachStructure.book.displayDiv(xml)
+    Xml.print(Html("tanach", result), output)
   }
 
   // TODO make transform metadata-driven: divs allowed within a div; empty div -> name; name-conversion functions...
