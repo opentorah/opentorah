@@ -20,10 +20,20 @@ package org.podval.judaica.structure
 import scala.xml.Elem
 
 
-abstract class Element {
+abstract class ElementDisplayer {
 
   def recognizes(elem: Elem): Boolean
 
 
-  def display(elem: Elem): Seq[Elem]
+  def display(elem: Elem, displayers: Set[ElementDisplayer]): Seq[Elem]
+}
+
+
+object ElementDisplayer {
+
+  def find(elem: Elem, displayers: Set[ElementDisplayer]): ElementDisplayer = {
+    val result = displayers.find(_.recognizes(elem))
+    if (result.isEmpty) throw new NoSuchElementException("No displayer for " + elem)
+    result.get
+  }
 }

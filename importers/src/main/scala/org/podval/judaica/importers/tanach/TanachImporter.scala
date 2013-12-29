@@ -35,6 +35,7 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
 
   protected def output2inputName: Map[String, String]
 
+  // TODO use <head> insead of @n for names of divisions?
 
   protected final override def processBook(xml: Elem, outputName: String): Elem = {
     // TODO write a merge function - and reformat the metadata accordingly?

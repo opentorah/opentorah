@@ -14,7 +14,7 @@
          How to represent this?
 
          What if I want to encode day structure here also.
-         How can I express points of that structure in termas of the chapter-and-verse one?
+         How can I express points of that structure in terms of the chapter-and-verse one?
     -->
     <selectors>
         <selector name="book" div-type="book">

@@ -17,7 +17,7 @@
 package org.podval.judaica.xml
 
 
-import scala.xml.{Elem, Text, XML, Utility, PrettyPrinter}
+import scala.xml.{Node, Elem, Text, XML, Utility, PrettyPrinter}
 
 import java.io.{FileWriter, PrintWriter, File}
 
@@ -25,6 +25,12 @@ import java.io.{FileWriter, PrintWriter, File}
 object Xml {
 
   def isDiv(elem: Elem, divType: String): Boolean = (elem.label == "div") && (getAttribute(elem, "type") == divType)
+
+
+  def getAttributeOption(name: String)(elem: Elem): Option[String] = {
+    val result: Seq[Node] = (elem \ ("@" + name))
+    if (result.isEmpty) None else Some(result.text)
+  }
 
 
   def getAttribute(name: String)(elem: Elem): String = (elem \ ("@" + name)).text
@@ -63,6 +69,7 @@ object Xml {
   def print(xml: Elem, outFile: File) {
     val out = new PrintWriter(new FileWriter(outFile))
     val pretty = new PrettyPrinter(100, 4).format(xml)
+    // TODO when outputting XML, include <xml> header?
     // TODO        out.println("<!DOCTYPE html>\n" + pretty)
     out.println(pretty)
     out.close()
