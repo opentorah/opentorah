@@ -17,8 +17,7 @@
 
 package org.podval.judaica.structure
 
-import org.podval.judaica.xml.{AlefBeth, Paragraph, Word, App}
-import org.podval.judaica.html.Html
+import org.podval.judaica.xml.{AlefBeth, Paragraph, Word, App, Html}
 
 import scala.xml.Elem
 

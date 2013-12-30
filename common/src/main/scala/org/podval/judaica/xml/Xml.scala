@@ -17,7 +17,7 @@
 package org.podval.judaica.xml
 
 
-import scala.xml.{Node, Elem, Text, XML, Utility, PrettyPrinter}
+import scala.xml.{Node, Elem, Text, XML, PrettyPrinter}
 
 import java.io.{FileWriter, PrintWriter, File}
 
@@ -27,6 +27,7 @@ object Xml {
   def isDiv(elem: Elem, divType: String): Boolean = (elem.label == "div") && (getAttribute(elem, "type") == divType)
 
 
+  // TODO introduce some sanity into parameter lists
   def getAttributeOption(name: String)(elem: Elem): Option[String] = {
     val result: Seq[Node] = (elem \ ("@" + name))
     if (result.isEmpty) None else Some(result.text)

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<edition directory="toronto">
-    <names>
-        <name name="Toronto" lang="en"/>
-        <name name="Taich" lang="en" isTransliterated="true"/>
-        <name name="Тайч" lang="ru" isTransliterated="true"/>
-    </names>
-</edition>

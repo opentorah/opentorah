@@ -17,8 +17,7 @@
 
 package org.podval.judaica.structure
 
-import org.podval.judaica.xml.Xml
-import org.podval.judaica.html.Html
+import org.podval.judaica.xml.{Xml, Html}
 
 import scala.xml.Elem
 
