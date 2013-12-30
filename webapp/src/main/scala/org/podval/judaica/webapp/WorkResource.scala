@@ -17,40 +17,34 @@
 package org.podval.judaica.webapp
 
 import javax.ws.rs.{NotFoundException, PathParam, GET, Path}
-import javax.ws.rs.core.{Context, UriInfo}
+import javax.ws.rs.core.{UriInfo, Context}
+import org.podval.judaica.viewer.Work
 import org.podval.judaica.xml.Html
-import org.podval.judaica.viewer.Works
-import java.io.File
 
 
-@Path("/")
-class RootResource {
+class WorkResource(work: Work) {
 
   @GET
-  def hello = "HELLO!"
+  def hello = work.toString  // TODO Metadata!
 
 
-  @Path("works")
+  @Path("editions")
   @GET
-  def works(@Context uriInfo: UriInfo) = {
+  def editions(@Context uriInfo: UriInfo) = {
     // TODO do a nice, styled table
-    val links = Works.instance.get.map { work =>
-      val name = work.names.default.name
-      val uri = uriInfo.getAbsolutePathBuilder.path(name).path("editions").build() // TODO reuse a constant...
+    val links = work.editions.map{ edition =>
+      val name = edition.names.default.name
+      val uri = uriInfo.getAbsolutePathBuilder.path(name).build()
       <a href={uri.toString} >{name}</a>
     }
-    Html.html("/judaica/judaica", links)  // TODO judaica/judaica?!!!
+    Html.html("/judaica/judaica", links)   // TODO !!!
   }
 
 
-  @Path("judaica.css")
-  def css = new File(Works.textsDirectory, "judaica.css")
-
-
-  @Path("works/{work}")
-  def work(@PathParam("work") name: String) = {
-    val work = Works.instance.getByName(name)
-    if (work.isEmpty) throw new NotFoundException("work " + name)
-    new WorkResource(work.get)
+  @Path("editions/{edition}")
+  def edition(@PathParam("edition") name: String) = {
+    val edition = work.getEditionByName(name)
+    if (edition.isEmpty) throw new NotFoundException("edition " + name)
+    new EditionResource(edition.get)
   }
 }

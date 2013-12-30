@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Podval Group.
+ * Copyright 2012-2013 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,21 @@
 
 package org.podval.judaica.viewer
 
-
-trait Edition extends Named {
-
-  def work: WorkImpl
+import org.podval.judaica.xml.Load
+import java.io.File
 
 
-  def root: Selection
+class Edition private(val work: Work, override val names: Names) extends Named {
+
+//  def root: Selection
+}
+
+
+
+object Edition {
+
+  def apply(work: Work, file: File): Edition = {
+    val xml = Load.loadFile(file, "edition")
+    new Edition(work, Names(xml))
+  }
 }

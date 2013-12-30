@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,30 +19,34 @@ package org.podval.judaica.viewer
 import java.io.File
 
 
-final class Works private(works: Seq[WorkImpl]) {
+final class Works private(works: Seq[Work]) {
 
-  def getByName(name: String): Option[WorkImpl] = get.find(_.names.has(name))
+  def getByName(name: String): Option[Work] = get.find(_.names.has(name))
 
 
-  def get: Seq[WorkImpl] = works
+  def get: Seq[Work] = works
 
 
   override def toString: String = "Works: " + get.mkString("[", ", ", "]")
 }
 
 
+
 object Works {
 
-  def apply(directoryPath: String): Works = apply(new File(directoryPath))
-
-
-  def apply(directory: File): Works = {
+  private def apply(directory: File): Works = {
     if (!directory.isDirectory) {
         throw new IllegalArgumentException("Not a directory: " + directory)
     }
 
-    val works = directory.listFiles().filter(_.getName.endsWith(".xml")).map(WorkImpl(_))
+    val works = directory.listFiles().filter(_.getName.endsWith(".xml")).map(Work(_))
 
     new Works(works)
   }
+
+
+  val textsDirectory = new File("/home/dub/Code/judaica/texts/")
+
+
+  val instance = apply(textsDirectory)
 }

@@ -16,8 +16,8 @@
 
 package org.podval.judaica.webapp
 
-import javax.ws.rs.{PathParam, GET, Path}
+import org.podval.judaica.viewer.Edition
 
 
-class BookResource {
+class EditionResource(edition: Edition) {
 }

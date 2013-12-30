@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Podval Group.
+ * Copyright 2012-2013 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,37 @@
 
 package org.podval.judaica.viewer
 
-
-trait Work extends Named {
-
-  def editions: Set[Edition]
+import java.io.File
+import org.podval.judaica.xml.{Xml, Load}
 
 
-  def defaultEdition: Edition
+final class Work private(override val names: Names, val directory: File, defaultEditionName: Option[String]) extends Named {
+
+  lazy val editions: Seq[Edition] = directory.listFiles().filter(_.getName.endsWith(".xml")).map(Edition(this, _))
+
+
+  def getEditionByName(name: String): Option[Edition] = editions.find(_.names.has(name))
+
+
+  def defaultEdition: Option[Edition] = defaultEditionName flatMap  (getEditionByName(_))
+
+
+  override def toString: String = "Work (" + directory + ") " + names
+}
+
+
+
+object Work {
+
+  def apply(file: File): Work = {
+    val xml = Load.loadFile(file, "work")
+    val directoryName = Xml.getAttributeOption("directory")(xml).getOrElse(file.getName.dropRight(".xml".length))  // TODO centralize ".xml" processing...
+    val directory = new File(file.getParentFile, directoryName)
+
+    if (!directory.isDirectory) {
+      throw new IllegalArgumentException("Not a directory: " + directory)
+    }
+
+    new Work(Names(xml), directory, Xml.getAttributeOption("defaultEdition")(xml))
+  }
 }

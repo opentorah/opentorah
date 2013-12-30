@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,23 @@
 package org.podval.judaica.viewer
 
 import org.junit.Test
-import org.junit.Assert._
-
-import java.io.File
+import org.junit.Assert.{assertTrue, assertEquals}
 
 
 class WorksTest {
 
-    private val sourceDirectory = new File(System.getProperty("project.build.sourceDirectory"))
+  @Test
+  def findChumash = assertTrue(Works.instance.getByName("Хумаш").isDefined)
 
 
-    private val resourcesDirectory = new File(sourceDirectory.getParent, "resources/org/podval/judaica/viewer/")
+  @Test
+  def findTanach = assertTrue(Works.instance.getByName("Tanach").isDefined)
 
 
-    private val works = Works(resourcesDirectory)
+  @Test
+  def defaultName = assertEquals("Tanach", Works.instance.getByName("Хумаш").get.names.default.name)
 
 
-    @Test
-    def findChumash = assertTrue(works.getByName("Chumash").isDefined)
+  @Test
+  def directory = assertEquals("Tanach", Works.instance.getByName("Хумаш").get.directory)
 }

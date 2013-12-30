@@ -10,7 +10,10 @@
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>jersey.config.server.provider.classnames</param-name>
-            <param-value>org.podval.judaica.webapp.RootResource</param-value>
+            <param-value>
+                org.podval.judaica.webapp.RootResource,
+                org.podval.judaica.webapp.ScalaXmlNodeMessageBodyWriter
+            </param-value>
         </init-param>
     </servlet>
 
