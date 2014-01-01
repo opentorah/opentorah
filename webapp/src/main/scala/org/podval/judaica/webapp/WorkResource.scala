@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2013-2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package org.podval.judaica.webapp
 import org.podval.judaica.viewer.Work
 import org.podval.judaica.xml.Html
 
-import javax.ws.rs.{NotFoundException, PathParam, GET, Path}
+import javax.ws.rs.{PathParam, GET, Path}
 import javax.ws.rs.core.{UriInfo, Context}
 
 
@@ -42,11 +42,7 @@ class WorkResource(work: Work) {
 
 
   @Path("editions/{edition}")
-  def edition(@PathParam("edition") name: String) = {
-    val edition = work.getEditionByName(name)
-    if (edition.isEmpty) throw new NotFoundException("edition " + name)
-    new EditionResource(edition.get)
-  }
+  def edition(@PathParam("edition") name: String) = new EditionResource(Existence.verify(work.getEditionByName(name), name, "edition"))
 
 
   // TODO handle skipped "editions" - use default edition

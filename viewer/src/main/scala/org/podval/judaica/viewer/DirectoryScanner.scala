@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 Leonid Dubinsky <dub@podval.org>.
+ * Copyright 2012-2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,16 @@
 
 package org.podval.judaica.viewer
 
+import org.podval.judaica.xml.Load
+
+import scala.xml.Elem
+
 import java.io.File
 
 
 final class DirectoryScanner(directory: File) {
 
-  case class DescribedDirectory(name: String, directory: File, metadata: File)
+  case class DescribedDirectory(name: String, directory: File, metadata: Elem)
 
 
   require(directory.isDirectory)
@@ -31,14 +35,19 @@ final class DirectoryScanner(directory: File) {
     for {
       subdirectory <- directory.listFiles.toSet.filter(_.isDirectory)
       name = subdirectory.getName
-      metadataInParent = new File(directory, name + ".xml")
-      metadataInSubdirectory = new File(subdirectory, "index.xml")
-      if (metadataInParent.exists || metadataInSubdirectory.exists)
-    } yield DescribedDirectory(
-        name,
-        subdirectory,
-        if (metadataInSubdirectory.exists) metadataInSubdirectory else metadataInParent
-    )
+      file = DirectoryScanner.metadataFile(name, directory, subdirectory)
+      if file.isDefined
+      metadata = Load.loadFile(file.get, "index")
+    } yield DescribedDirectory(name, subdirectory, metadata)
+}
 
-  // TODO sanity checks - including reading the metadata
+
+object DirectoryScanner {
+
+  def metadataFile(name: String, directory: File, subdirectory: File): Option[File] = {
+    val metadataFileInParent = new File(directory, name + ".xml")
+    val metadataFileInSubdirectory = new File(subdirectory, "index.xml")
+    if (!metadataFileInParent.exists && !metadataFileInSubdirectory.exists) None else
+    Some(if (metadataFileInSubdirectory.exists) metadataFileInSubdirectory else metadataFileInParent)
+  }
 }

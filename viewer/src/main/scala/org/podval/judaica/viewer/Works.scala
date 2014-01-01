@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,21 +27,8 @@ object Works {
   val textsDirectory = new File("/home/dub/Code/judaica/texts/")
 
 
-  private var works: Option[Set[Work]] = None
+  lazy val works: Set[Work] = new DirectoryScanner(textsDirectory).describedDirectories.map(d => new Work(d.name, d.metadata, d.directory))
 
 
-  def getByName(name: String): Option[Work] = Names.byName(name, get)
-
-
-  def get: Set[Work] = {
-    if (works.isEmpty) load(textsDirectory)
-
-    works.get
-  }
-
-
-  def load(directory: File) {
-    works = Some(new DirectoryScanner(directory).describedDirectories.map(d =>
-      Work(d.name, d.metadata, d.directory)))
-  }
+  def getByName(name: String): Option[Work] = Names.byName(name, works)
 }

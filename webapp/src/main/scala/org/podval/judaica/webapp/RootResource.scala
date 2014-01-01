@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2013-2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package org.podval.judaica.webapp
 import org.podval.judaica.xml.Html
 import org.podval.judaica.viewer.Works
 
-import javax.ws.rs.{NotFoundException, PathParam, GET, Path}
+import javax.ws.rs.{PathParam, GET, Path}
 import javax.ws.rs.core.{Context, UriInfo}
 
 import scala.xml.Elem
@@ -37,7 +37,7 @@ class RootResource {
   @Path("works")
   @GET
   def works(@Context uriInfo: UriInfo) = {
-    val table: Elem = Table.build(Works.get, uriInfo.getAbsolutePathBuilder, Some("editions")) // TODO reuse a constant...
+    val table: Elem = Table.build(Works.works, uriInfo.getAbsolutePathBuilder, Some("editions"))
     val stylesheet = uriInfo.getBaseUriBuilder.path("judaica").build().toString
     Html.html(stylesheet, table)
   }
@@ -48,9 +48,5 @@ class RootResource {
 
 
   @Path("works/{work}")
-  def work(@PathParam("work") name: String) = {
-    val work = Works.getByName(name)
-    if (work.isEmpty) throw new NotFoundException("work " + name)
-    new WorkResource(work.get)
-  }
+  def work(@PathParam("work") name: String) = new WorkResource(Existence.verify(Works.getByName(name), name, "work"))
 }

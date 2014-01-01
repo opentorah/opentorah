@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.podval.judaica.viewer
+package org.podval.judaica.webapp
 
-import scala.xml.Elem
-
-import java.io.File
+import javax.ws.rs.NotFoundException
 
 
-class Edition(val work: Work, name: String, metadata: Elem, directory: File) extends Named {
+object Existence {
 
-  override val names = Names(name, metadata)
-
+  def verify[T](value: Option[T], name: String, what: String): T = {
+    if (value.isEmpty) throw new NotFoundException(what + " " + name)
+    value.get
+  }
 }

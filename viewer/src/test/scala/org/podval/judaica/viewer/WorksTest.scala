@@ -37,4 +37,8 @@ class WorksTest {
 
   @Test
   def directory = assertEquals("Tanach", Works.getByName("Хумаш").get.directory.getName)
+
+
+  @Test
+  def findTorontoEdition = assertTrue(Works.getByName("Tanach").get.getEditionByName("Toronto").isDefined)
 }
