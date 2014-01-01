@@ -16,10 +16,14 @@
 
 package org.podval.judaica.webapp
 
-import javax.ws.rs.{NotFoundException, PathParam, GET, Path}
-import javax.ws.rs.core.{Context, UriInfo}
 import org.podval.judaica.xml.Html
 import org.podval.judaica.viewer.Works
+
+import javax.ws.rs.{NotFoundException, PathParam, GET, Path}
+import javax.ws.rs.core.{Context, UriInfo}
+
+import scala.xml.Elem
+
 import java.io.File
 
 
@@ -33,13 +37,9 @@ class RootResource {
   @Path("works")
   @GET
   def works(@Context uriInfo: UriInfo) = {
-    // TODO do a nice, styled table
-    val links = Works.instance.get.map { work =>
-      val name = work.names.default.name
-      val uri = uriInfo.getAbsolutePathBuilder.path(name).path("editions").build() // TODO reuse a constant...
-      <a href={uri.toString} >{name}</a>
-    }
-    Html.html("/judaica/judaica", links)  // TODO judaica/judaica?!!!
+    val table: Elem = Table.build(Works.get, uriInfo.getAbsolutePathBuilder, Some("editions")) // TODO reuse a constant...
+    val stylesheet = uriInfo.getBaseUriBuilder.path("judaica").build().toString
+    Html.html(stylesheet, table)
   }
 
 
@@ -49,7 +49,7 @@ class RootResource {
 
   @Path("works/{work}")
   def work(@PathParam("work") name: String) = {
-    val work = Works.instance.getByName(name)
+    val work = Works.getByName(name)
     if (work.isEmpty) throw new NotFoundException("work " + name)
     new WorkResource(work.get)
   }

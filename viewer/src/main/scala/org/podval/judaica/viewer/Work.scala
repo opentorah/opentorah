@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 Podval Group.
+ * Copyright 2012-2013 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,28 @@
 
 package org.podval.judaica.viewer
 
-import java.io.File
 import org.podval.judaica.xml.{Xml, Load}
 
-
-final class Work private(override val names: Names, val directory: File, defaultEditionName: Option[String]) extends Named {
-
-  lazy val editions: Seq[Edition] = directory.listFiles().filter(_.getName.endsWith(".xml")).map(Edition(this, _))
+import java.io.File
+import scala.xml.Elem
 
 
-  def getEditionByName(name: String): Option[Edition] = editions.find(_.names.has(name))
+final class Work private(name: String, metadata: Elem, val directory: File) extends Named {
+
+  override val names = Names(name, metadata)
 
 
-  def defaultEdition: Option[Edition] = defaultEditionName flatMap  (getEditionByName(_))
+  private[this] val defaultEditionName = Xml.getAttributeOption("defaultEdition")(metadata)
+
+
+  lazy val editions = new DirectoryScanner(directory).describedDirectories.map(d =>
+    Edition(this, d.name, d.metadata, d.directory))
+
+
+  def getEditionByName(name: String): Option[Edition] = Names.byName(name, editions)
+
+
+  def defaultEdition: Option[Edition] = defaultEditionName flatMap (getEditionByName(_))
 
 
   override def toString: String = "Work (" + directory + ") " + names
@@ -38,15 +47,5 @@ final class Work private(override val names: Names, val directory: File, default
 
 object Work {
 
-  def apply(file: File): Work = {
-    val xml = Load.loadFile(file, "work")
-    val directoryName = Xml.getAttributeOption("directory")(xml).getOrElse(file.getName.dropRight(".xml".length))  // TODO centralize ".xml" processing...
-    val directory = new File(file.getParentFile, directoryName)
-
-    if (!directory.isDirectory) {
-      throw new IllegalArgumentException("Not a directory: " + directory)
-    }
-
-    new Work(Names(xml), directory, Xml.getAttributeOption("defaultEdition")(xml))
-  }
+  def apply(name: String, metadata: File, directory: File): Work = new Work(name, Load.loadFile(metadata, "work"), directory)
 }

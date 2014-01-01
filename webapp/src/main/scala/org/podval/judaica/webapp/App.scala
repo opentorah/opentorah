@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2013 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-package org.podval.judaica.viewer
+package org.podval.judaica.webapp
+
+import javax.ws.rs.core.Application
+
+import scala.collection.JavaConversions.setAsJavaSet
 
 
-trait Selector extends Named {
+final class App extends Application {
+
+  override def getClasses: java.util.Set[Class[_]] = setAsJavaSet(Set(
+    classOf[RootResource],
+    classOf[ScalaXmlNodeMessageBodyWriter]
+  ))
 }

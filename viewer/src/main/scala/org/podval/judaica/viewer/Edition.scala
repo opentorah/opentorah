@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 Podval Group.
+ * Copyright 2012-2013 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,15 @@
 package org.podval.judaica.viewer
 
 import org.podval.judaica.xml.Load
+
+import scala.xml.Elem
+
 import java.io.File
 
 
-class Edition private(val work: Work, override val names: Names) extends Named {
+class Edition private(val work: Work, name: String, metadata: Elem, directory: File) extends Named {
+
+  override val names = Names(name, metadata)
 
 //  def root: Selection
 }
@@ -29,8 +34,6 @@ class Edition private(val work: Work, override val names: Names) extends Named {
 
 object Edition {
 
-  def apply(work: Work, file: File): Edition = {
-    val xml = Load.loadFile(file, "edition")
-    new Edition(work, Names(xml))
-  }
+  def apply(work: Work, name: String, metadata: File, directory: File): Edition =
+    new Edition(work, name, Load.loadFile(metadata, "edition"), directory)
 }

@@ -15,11 +15,9 @@
  * under the License.
  */
 
-package org.podval.judaica.structure
+package org.podval.judaica.xml
 
-import org.podval.judaica.xml.AlefBeth._
-
-import scala.Array
+import AlefBeth._
 
 
 object HebrewNumbers {

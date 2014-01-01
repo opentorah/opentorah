@@ -23,6 +23,8 @@ import scala.xml.Elem
 
 import java.io.File
 
+// TODO use <head> for the non-numeric names of the divs?
+// TODO processing is harder - but merging is easier?
 
 abstract class Importer(inputDirectoryPath: String, outputDirectoryPath: String) {
 

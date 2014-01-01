@@ -17,7 +17,7 @@
 
 package org.podval.judaica.structure
 
-import org.podval.judaica.xml.{Xml, Html}
+import org.podval.judaica.xml.{HebrewNumbers, Xml, Html}
 
 import scala.xml.Elem
 

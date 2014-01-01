@@ -16,10 +16,11 @@
 
 package org.podval.judaica.webapp
 
-import javax.ws.rs.{NotFoundException, PathParam, GET, Path}
-import javax.ws.rs.core.{UriInfo, Context}
 import org.podval.judaica.viewer.Work
 import org.podval.judaica.xml.Html
+
+import javax.ws.rs.{NotFoundException, PathParam, GET, Path}
+import javax.ws.rs.core.{UriInfo, Context}
 
 
 class WorkResource(work: Work) {
@@ -28,16 +29,15 @@ class WorkResource(work: Work) {
   def hello = work.toString  // TODO Metadata!
 
 
+  // TODO I can handle synonyms: {editions} and {editions}/{edition}, and look up the first component - but do I want to?
+
+
   @Path("editions")
   @GET
   def editions(@Context uriInfo: UriInfo) = {
-    // TODO do a nice, styled table
-    val links = work.editions.map{ edition =>
-      val name = edition.names.default.name
-      val uri = uriInfo.getAbsolutePathBuilder.path(name).build()
-      <a href={uri.toString} >{name}</a>
-    }
-    Html.html("/judaica/judaica", links)   // TODO !!!
+    val table = Table.build(work.editions, uriInfo.getAbsolutePathBuilder, None)
+    val stylesheet = uriInfo.getBaseUriBuilder.path("judaica").build().toString
+    Html.html(stylesheet, table)
   }
 
 
@@ -47,4 +47,9 @@ class WorkResource(work: Work) {
     if (edition.isEmpty) throw new NotFoundException("edition " + name)
     new EditionResource(edition.get)
   }
+
+
+  // TODO handle skipped "editions" - use default edition
+
+  // TODO introduce some kind of parameter to distinguish request for the book and its structure; use it here to retrieve metadata?
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2013 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,18 @@
  * limitations under the License.
  */
 
-package org.podval.judaica.viewer
+package org.podval.judaica.webapp;
+
+import javax.ws.rs.core.UriBuilder;
 
 
-trait Selector extends Named {
+public class UriBuilderCloner {
+
+    /*
+    Scala compiler (10.2) does not like UriBuilder.clone: thinks that the method is protected...
+    Hence - this little piece of Java :)
+     */
+    public static UriBuilder copy(final UriBuilder what) {
+        return what.clone();
+    }
 }

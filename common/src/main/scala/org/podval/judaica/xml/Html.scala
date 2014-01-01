@@ -22,7 +22,10 @@ import scala.xml.{Elem, Text}
 
 object Html {
 
-  def html(stylesheet: String, what: Seq[Elem]) =
+  def html(stylesheet: String, what: Elem): Elem = html(stylesheet, Seq(what))
+
+
+  def html(stylesheet: String, what: Seq[Elem]): Elem =
     <html>
       <head>
         <link rel="stylesheet" type="text/css" href={stylesheet + ".css"}/>

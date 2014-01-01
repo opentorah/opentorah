@@ -20,20 +20,21 @@ import org.junit.Test
 import org.junit.Assert.{assertTrue, assertEquals}
 
 
+// TODO switch to ScalaTest!
 class WorksTest {
 
   @Test
-  def findChumash = assertTrue(Works.instance.getByName("Хумаш").isDefined)
+  def findChumash = assertTrue(Works.getByName("Хумаш").isDefined)
 
 
   @Test
-  def findTanach = assertTrue(Works.instance.getByName("Tanach").isDefined)
+  def findTanach = assertTrue(Works.getByName("Tanach").isDefined)
 
 
   @Test
-  def defaultName = assertEquals("Tanach", Works.instance.getByName("Хумаш").get.names.default.name)
+  def defaultName = assertEquals("Tanach", Works.getByName("Хумаш").get.names.default.name)
 
 
   @Test
-  def directory = assertEquals("Tanach", Works.instance.getByName("Хумаш").get.directory)
+  def directory = assertEquals("Tanach", Works.getByName("Хумаш").get.directory.getName)
 }

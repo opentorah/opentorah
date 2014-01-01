@@ -21,9 +21,18 @@ import scala.xml.Elem
 import org.podval.judaica.xml.Xml
 
 
-final class Names(val names: Seq[Name]) {
+final class Names(name: String, xml: Elem) {
 
-  def find(name: String): Option[Name] = names.find(_.name == name)
+  private[this] val rawNames: Seq[Name] = Xml.elems(Xml.oneChild(xml, "names")).map(Name(_))
+
+
+  val names: Seq[Name] = if (find(name, rawNames).isDefined) rawNames else (new Name(name, "en", false) +: rawNames)
+
+
+  def find(name: String): Option[Name] = find(name, names)
+
+
+  private[this] def find(name: String, names: Seq[Name]): Option[Name] = names.find(_.name == name)
 
 
   def has(name: String): Boolean = find(name).isDefined
@@ -42,7 +51,8 @@ final class Names(val names: Seq[Name]) {
 
 object Names {
   
-  def apply(node: Elem): Names = {
-    new Names(Xml.elems(Xml.oneChild(node, "names")).map(Name(_)))
-  }
+  def apply(name: String, xml: Elem): Names = new Names(name: String, xml)
+
+
+  def byName[T <: Named](name: String, where: Set[T]): Option[T] = where.find(_.names.has(name))
 }

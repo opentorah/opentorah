@@ -19,34 +19,29 @@ package org.podval.judaica.viewer
 import java.io.File
 
 
-final class Works private(works: Seq[Work]) {
-
-  def getByName(name: String): Option[Work] = get.find(_.names.has(name))
-
-
-  def get: Seq[Work] = works
-
-
-  override def toString: String = "Works: " + get.mkString("[", ", ", "]")
-}
-
+// TODO do weak references and lazy (re-)load!!!
 
 
 object Works {
 
-  private def apply(directory: File): Works = {
-    if (!directory.isDirectory) {
-        throw new IllegalArgumentException("Not a directory: " + directory)
-    }
-
-    val works = directory.listFiles().filter(_.getName.endsWith(".xml")).map(Work(_))
-
-    new Works(works)
-  }
-
-
   val textsDirectory = new File("/home/dub/Code/judaica/texts/")
 
 
-  val instance = apply(textsDirectory)
+  private var works: Option[Set[Work]] = None
+
+
+  def getByName(name: String): Option[Work] = Names.byName(name, get)
+
+
+  def get: Set[Work] = {
+    if (works.isEmpty) load(textsDirectory)
+
+    works.get
+  }
+
+
+  def load(directory: File) {
+    works = Some(new DirectoryScanner(directory).describedDirectories.map(d =>
+      Work(d.name, d.metadata, d.directory)))
+  }
 }
