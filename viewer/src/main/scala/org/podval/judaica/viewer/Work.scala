@@ -28,10 +28,13 @@ final class Work(name: String, metadata: Elem, val directory: File) extends Name
   override val names = Names(name, metadata)
 
 
-  private[this] val defaultEditionName = Xml.getAttributeOption("defaultEdition")(metadata)
+  val structures: Structures = new Structures(metadata)
 
 
-  lazy val editions = new DirectoryScanner(directory).describedDirectories.map(d => new Edition(this, d.name, d.metadata, d.directory))
+  private[this] val defaultEditionName = Xml.getAttributeOption(metadata, "defaultEdition")
+
+
+  lazy val editions = DirectoryScanner.describedDirectories(directory).map(d => new Edition(this, d.name, d.metadata, d.directory))
 
 
   def getEditionByName(name: String): Option[Edition] = Names.byName(name, editions)

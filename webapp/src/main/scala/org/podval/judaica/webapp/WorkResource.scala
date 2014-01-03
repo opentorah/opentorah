@@ -26,7 +26,7 @@ import javax.ws.rs.core.{UriInfo, Context}
 class WorkResource(work: Work) {
 
   @GET
-  def hello = work.toString  // TODO Metadata!
+  def raw = work.toString  // TODO Metadata!
 
 
   // TODO I can handle synonyms: {editions} and {editions}/{edition}, and look up the first component - but do I want to?
@@ -35,7 +35,7 @@ class WorkResource(work: Work) {
   @Path("editions")
   @GET
   def editions(@Context uriInfo: UriInfo) = {
-    val table = Table.build(work.editions, uriInfo.getAbsolutePathBuilder, None)
+    val table = Table.build(work.editions.toSeq, uriInfo.getAbsolutePathBuilder, None)
     val stylesheet = uriInfo.getBaseUriBuilder.path("judaica").build().toString
     Html.html(stylesheet, table)
   }
@@ -47,5 +47,5 @@ class WorkResource(work: Work) {
 
   // TODO handle skipped "editions" - use default edition
 
-  // TODO introduce some kind of parameter to distinguish request for the book and its structure; use it here to retrieve metadata?
+  // TODO introduce some kind of parameter to distinguish request for the book and its display; use it here to retrieve metadata?
 }

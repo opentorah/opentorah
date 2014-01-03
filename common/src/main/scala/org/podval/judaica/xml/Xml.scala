@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,20 +27,22 @@ object Xml {
   def isDiv(elem: Elem, divType: String): Boolean = (elem.label == "div") && (getAttribute(elem, "type") == divType)
 
 
-  // TODO introduce some sanity into parameter lists
-  def getAttributeOption(name: String)(elem: Elem): Option[String] = {
+  def getAttributeOption(elem: Elem, name: String): Option[String] = {
     val result: Seq[Node] = (elem \ ("@" + name))
     if (result.isEmpty) None else Some(result.text)
   }
 
 
-  def getAttribute(name: String)(elem: Elem): String = (elem \ ("@" + name)).text
+  def getAttribute(elem: Elem, name: String): String = getAttributeOption(elem, name).get
 
 
-  def getAttribute(elem: Elem, name: String): String = getAttribute(name)(elem)
+  def getAttribute(name: String)(elem: Elem): String = getAttribute(elem, name)
 
 
-  def getBooleanAttribute(elem: Elem, name: String): Boolean = getAttribute(elem, name) == "true"
+  def getBooleanAttribute(elem: Elem, name: String): Boolean = {
+    val value = getAttributeOption(elem, name)
+    value.isDefined && (value.get == "true")
+  }
 
 
   def booleanAttribute(value: Boolean) = if (value) Some(Text("true")) else None
@@ -61,8 +63,15 @@ object Xml {
   def elems(elem: Elem): Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
 
-  def check(elem: Elem, tag: String): Elem = {
-    require(elem.label == tag, "Expected tag " + tag + " but got " + elem.label)
+  def elems(elem: Elem, name: String): Seq[Elem] = {
+    val result = elems(elem)
+    result.foreach(check(_, name))
+    result
+  }
+
+
+  def check(elem: Elem, name: String): Elem = {
+    require(elem.label == name, "Expected name " + name + " but got " + elem.label)
     elem
   }
 

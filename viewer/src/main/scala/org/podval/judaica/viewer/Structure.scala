@@ -16,14 +16,25 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml
+import org.podval.judaica.xml.Xml.{oneChild, elems, getAttribute}
 
 import scala.xml.Elem
 
-import java.io.File
+
+final class Structures(xml: Elem) {
+
+  val structures: Seq[Structure] = elems(oneChild(xml, "structures"), "structure").map(new Structure(_))
 
 
-class Parts(metadata: Elem, directory: File) {
-  val type_ : String = Xml.getAttribute(metadata, "type")
+  def find(name: String): Option[Structure] = structures.find(_.type_ == name)
+}
 
+
+
+final class Structure(xml: Elem) {
+
+  val type_ : String = getAttribute(xml, "type")
+
+
+  val divs: Seq[Div] = elems(xml, "div").map { div => new Div(Names(div)) } // TODO why don't () work? _?
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,18 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * under the License.
  */
 
-package org.podval.judaica.viewer
+package org.podval.judaica.display
+
+import scala.xml.Elem
 
 
-trait RootSelection extends Selection {
+abstract class NonDivElementDisplayer(final val label: String) extends ElementDisplayer {
 
-  final override def isRoot: Boolean = true
-
-
-  final override def parent: Option[Selection] = None
-
-
-  override val edition: Edition
+  final override def recognizes(elem: Elem): Boolean = (elem.label == label)
 }

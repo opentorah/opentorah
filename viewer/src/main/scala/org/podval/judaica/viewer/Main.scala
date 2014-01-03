@@ -17,7 +17,7 @@
 package org.podval.judaica.viewer
 
 import org.podval.judaica.xml.{Xml, Load, Html}
-import org.podval.judaica.structure.{ElementDisplayer, TanachDisplayers}
+import org.podval.judaica.display.{ElementDisplayer, TanachDisplayers}
 
 import java.io.File
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,28 +16,69 @@
 
 package org.podval.judaica.viewer
 
+import org.podval.judaica.xml.Xml.{getAttribute, getBooleanAttribute, oneChild, elems}
+
 import scala.xml.Elem
 
-import org.podval.judaica.xml.Xml
-import Xml.getAttribute
 
+trait Named {
 
-final class Name(val name: String, val lang: String, val isTransliterated: Boolean) {
-  
-  override def toString: String =
-    "Name: " + name + " (" + lang + (if (!isTransliterated) "" else ", " + isTransliterated) +  ")"
+  def names: Names
 }
 
 
-object Name {
-  
-  def apply(node: Elem): Name = {
-    Xml.check(node.asInstanceOf[Elem], "name")
-    
-    new Name(
-      getAttribute(node, "name"),
-      getAttribute(node, "lang"),
-      getAttribute(node, "isTransliterated") == "true"
-    )
-  }
+
+final class Names(name: Option[String], xml: Elem) {
+
+  private[this] val rawNames: Seq[Name] = elems(oneChild(xml, "names"), "name").map(new Name(_))
+
+
+  val names: Seq[Name] =
+    if (name.isDefined && !find(name.get, rawNames).isDefined) (new Name(name.get, "en", false) +: rawNames) else rawNames
+
+
+  def find(name: String): Option[Name] = find(name, names)
+
+
+  private[this] def find(name: String, names: Seq[Name]): Option[Name] = names.find(_.name == name)
+
+
+  def has(name: String): Boolean = find(name).isDefined
+
+
+  def byLang(lang: String): Option[Name] = names.find(_.lang == lang)
+
+
+  def default: Name = names(0)
+
+
+  override def toString: String = "Names: " + names
+}
+
+
+
+object Names {
+
+  def apply(name: String, xml: Elem): Names = new Names(Some(name), xml)
+
+
+  def apply(xml: Elem): Names = new Names(None, xml)
+
+
+  def byName[T <: Named](name: String, where: Set[T]): Option[T] = where.find(_.names.has(name))
+}
+
+
+
+final class Name(val name: String, val lang: String, val isTransliterated: Boolean) {
+
+  def this(xml: Elem) = this(
+    getAttribute(xml, "name"),
+    getAttribute(xml, "lang"),
+    getBooleanAttribute(xml, "isTransliterated")
+  )
+
+
+  override def toString: String =
+    "Name: " + name + " (" + lang + (if (!isTransliterated) "" else ", " + isTransliterated) +  ")"
 }

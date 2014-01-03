@@ -44,3 +44,32 @@ trait Selection extends Named {
 
   def restructure(structure: Selector): Selection
 }
+
+
+
+trait RootSelection extends Selection {
+
+  final override def isRoot: Boolean = true
+
+
+  final override def parent: Option[Selection] = None
+
+
+  override val edition: Edition
+}
+
+
+
+trait NonRootSelection extends Selection {
+
+  final override def isRoot: Boolean = false
+
+
+  final override def parent: Option[Selection] = Some(parent_)
+
+
+  val parent_ : Selection
+
+
+  override val edition: Edition = parent.get.edition
+}

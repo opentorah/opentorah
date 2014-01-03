@@ -25,4 +25,6 @@ class Edition(val work: Work, name: String, metadata: Elem, directory: File) ext
 
   override val names = Names(name, metadata)
 
+
+  lazy val storage: Storage = new RootDirectoryStorage(this, metadata, directory)
 }

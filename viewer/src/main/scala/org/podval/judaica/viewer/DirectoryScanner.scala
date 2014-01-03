@@ -23,31 +23,28 @@ import scala.xml.Elem
 import java.io.File
 
 
-final class DirectoryScanner(directory: File) {
+object DirectoryScanner {
 
   case class DescribedDirectory(name: String, directory: File, metadata: Elem)
 
 
-  require(directory.isDirectory)
+  def describedDirectories(directory: File): Set[DescribedDirectory] = {
+    require(directory.isDirectory)
+
+    directory.listFiles.toSet.filter(_.isDirectory).map { subdirectory =>
+      val name = subdirectory.getName
+      metadata(name, directory, subdirectory) map (DescribedDirectory(name, subdirectory, _))
+    }.flatten
+  }
 
 
-  val describedDirectories: Set[DescribedDirectory] =
-    for {
-      subdirectory <- directory.listFiles.toSet.filter(_.isDirectory)
-      name = subdirectory.getName
-      file = DirectoryScanner.metadataFile(name, directory, subdirectory)
-      if file.isDefined
-      metadata = Load.loadFile(file.get, "index")
-    } yield DescribedDirectory(name, subdirectory, metadata)
-}
-
-
-object DirectoryScanner {
-
-  def metadataFile(name: String, directory: File, subdirectory: File): Option[File] = {
+  def metadata(name: String, directory: File, subdirectory: File): Option[Elem] = {
     val metadataFileInParent = new File(directory, name + ".xml")
     val metadataFileInSubdirectory = new File(subdirectory, "index.xml")
-    if (!metadataFileInParent.exists && !metadataFileInSubdirectory.exists) None else
-    Some(if (metadataFileInSubdirectory.exists) metadataFileInSubdirectory else metadataFileInParent)
+    if (!metadataFileInParent.exists && !metadataFileInSubdirectory.exists) None else {
+      val file = if (metadataFileInSubdirectory.exists) metadataFileInSubdirectory else metadataFileInParent
+      val metadata = Load.loadFile(file, "index")
+      Some(metadata)
+    }
   }
 }

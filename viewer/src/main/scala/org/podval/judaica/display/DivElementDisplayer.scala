@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2013-2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * under the License.
  */
 
-package org.podval.judaica.structure
+package org.podval.judaica.display
 
 import org.podval.judaica.xml.{HebrewNumbers, Xml, Html}
 
@@ -29,7 +29,7 @@ class DivElementDisplayer(type_ : String) extends ElementDisplayer {
 
   override def display(elem: Elem, displayers: Set[ElementDisplayer]): Seq[Elem] = {
     // TODO redo with for comprehension
-    val nOption = Xml.getAttributeOption("n")(elem)
+    val nOption = Xml.getAttributeOption(elem, "n")
     val nameOption: Option[Elem] = if (nOption.isEmpty) None else {
       val n = nOption.get
       val name = if (!isNumeric) displayName(n) else {

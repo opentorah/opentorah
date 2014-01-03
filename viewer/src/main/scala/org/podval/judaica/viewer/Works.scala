@@ -27,8 +27,8 @@ object Works {
   val textsDirectory = new File("/home/dub/Code/judaica/texts/")
 
 
-  lazy val works: Set[Work] = new DirectoryScanner(textsDirectory).describedDirectories.map(d => new Work(d.name, d.metadata, d.directory))
+  lazy val works: Set[Work] = DirectoryScanner.describedDirectories(textsDirectory).map(d => new Work(d.name, d.metadata, d.directory))
 
 
-  def getByName(name: String): Option[Work] = Names.byName(name, works)
+  def getWorkByName(name: String): Option[Work] = Names.byName(name, works)
 }

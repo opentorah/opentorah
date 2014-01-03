@@ -26,18 +26,19 @@ import scala.xml.Elem
 
 import java.io.File
 
+// TODO declare content-types produced; produce both XML and HTML
 
 @Path("/")
 class RootResource {
 
   @GET
-  def hello = "HELLO!"
+  def raw = "HELLO!"
 
 
   @Path("works")
   @GET
   def works(@Context uriInfo: UriInfo) = {
-    val table: Elem = Table.build(Works.works, uriInfo.getAbsolutePathBuilder, Some("editions"))
+    val table: Elem = Table.build(Works.works.toSeq, uriInfo.getAbsolutePathBuilder, Some("editions"))
     val stylesheet = uriInfo.getBaseUriBuilder.path("judaica").build().toString
     Html.html(stylesheet, table)
   }
@@ -48,5 +49,5 @@ class RootResource {
 
 
   @Path("works/{work}")
-  def work(@PathParam("work") name: String) = new WorkResource(Existence.verify(Works.getByName(name), name, "work"))
+  def work(@PathParam("work") name: String) = new WorkResource(Existence.verify(Works.getWorkByName(name), name, "work"))
 }

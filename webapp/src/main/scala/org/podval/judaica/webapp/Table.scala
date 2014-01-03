@@ -23,7 +23,7 @@ import javax.ws.rs.core.UriBuilder
 
 object Table {
 
-  def build[T <: Named](data: Set[T], uriBuilder: UriBuilder, suffix: Option[String]): Elem =
+  def build[T <: Named](data: Seq[T], uriBuilder: UriBuilder, suffix: Option[String]): Elem =
     <table>{
       data.map { named =>
         val name = named.names.default.name

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,5 @@
 package org.podval.judaica.viewer
 
 
-trait NonRootSelection extends Selection {
-
-  final override def isRoot: Boolean = false
-
-
-  final override def parent: Option[Selection] = Some(parent_)
-
-
-  val parent_ : Selection
-
-
-  override val edition: Edition = parent.get.edition
+final class Div(override val names: Names) extends Named {
 }

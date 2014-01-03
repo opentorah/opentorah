@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * under the License.
  */
 
-package org.podval.judaica.structure
+package org.podval.judaica.display
 
 import org.podval.judaica.xml.{AlefBeth, Paragraph, Word, App, Html}
 
@@ -70,7 +70,7 @@ object TanachDisplayers {
 
 
   val maftir = new DivElementDisplayer("maftir") {
-    // TODO I really shouldn't be overriding displayContent: what if "maftir" is a populated div in the current structure?!
+    // TODO I really shouldn't be overriding displayContent: what if "maftir" is a populated div in the current display?!
     override def displayContent(elem: Elem): Seq[Elem] = Seq(Html.span("maftir", MAFTIR))
 
   }
