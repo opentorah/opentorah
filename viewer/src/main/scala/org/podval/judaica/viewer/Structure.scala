@@ -16,25 +16,35 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml.{oneChild, elems, getAttribute}
+import org.podval.judaica.xml.Xml
 
 import scala.xml.Elem
 
 
-final class Structures(xml: Elem) {
+final class Structures(selectors: Selectors, xml: Elem) {
 
-  val structures: Seq[Structure] = elems(oneChild(xml, "structures"), "structure").map(new Structure(_))
+  val structures: Seq[Structure] = Xml.elems(xml, "structures", "structure", required = false).map(new Structure(selectors, _))
 
 
-  def find(name: String): Option[Structure] = structures.find(_.type_ == name)
+  def byName(name: String): Option[Structure] = structures.find(_.selector.names.has(name))
 }
 
 
 
-final class Structure(xml: Elem) {
+final class Structure(selectors: Selectors, xml: Elem) extends ByName[Div] {
 
-  val type_ : String = getAttribute(xml, "type")
+  val selector: Selector = selectors.byName(Xml.getAttribute(xml, "type")).get
 
 
-  val divs: Seq[Div] = elems(xml, "div").map { div => new Div(Names(div)) } // TODO why don't () work? _?
+  val named: Seq[Div] = Xml.elems(xml, "div").map(new Div(selectors, _))
+}
+
+
+
+final class Div(selectors: Selectors, xml: Elem) extends Named {
+
+  override val names: Names = Names(xml)
+
+
+  val structures = new Structures(selectors, xml)
 }

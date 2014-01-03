@@ -28,10 +28,10 @@ object DirectoryScanner {
   case class DescribedDirectory(name: String, directory: File, metadata: Elem)
 
 
-  def describedDirectories(directory: File): Set[DescribedDirectory] = {
+  def describedDirectories(directory: File): Seq[DescribedDirectory] = {
     require(directory.isDirectory)
 
-    directory.listFiles.toSet.filter(_.isDirectory).map { subdirectory =>
+    directory.listFiles.toSeq.filter(_.isDirectory).map { subdirectory =>
       val name = subdirectory.getName
       metadata(name, directory, subdirectory) map (DescribedDirectory(name, subdirectory, _))
     }.flatten

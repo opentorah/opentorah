@@ -106,11 +106,11 @@ abstract class DirectoryStorage(metadata: Elem, directory: File) extends Storage
   val structureType : String = Xml.getAttribute(structureXml, "type")
 
 
-  val structure: Structure = root.edition.work.structures.find(structureType).get
+  val structure: Structure = root.edition.work.structures.byName(structureType).get
 
   // TODO allow overrides ? val overrides = Xml.elems(structure) ... Xml.check(override, "file")
 
-  val files: Seq[Storage] = structure.divs.map { div =>
+  val files: Seq[Storage] = structure.named.map { div =>
     // TODO handle ".xml" files, not just directories!
     val fileCandidate = new File(directory, div.names.default.name + ".xml")
     val directoryCandidate = new File(directory, div.names.default.name)

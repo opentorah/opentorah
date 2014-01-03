@@ -17,7 +17,7 @@
 package org.podval.judaica.webapp
 
 import org.podval.judaica.xml.Html
-import org.podval.judaica.viewer.Works
+import org.podval.judaica.viewer.{Edition, Work, Works}
 
 import javax.ws.rs.{PathParam, GET, Path}
 import javax.ws.rs.core.{Context, UriInfo}
@@ -26,28 +26,76 @@ import scala.xml.Elem
 
 import java.io.File
 
+
 // TODO declare content-types produced; produce both XML and HTML
+// TODO I can handle synonyms: {editions} and {editions}/{edition}, and look up the first component - but do I want to?
+// TODO where do I show TEI metadata?
 
 @Path("/")
 class RootResource {
 
   @GET
-  def raw = "HELLO!"
+  def root = "HELLO!"
 
 
-  @Path("works")
   @GET
+  @Path("/judaica.css")
+  def css = new File(Works.textsDirectory, "judaica.css")
+
+
+  @GET
+  @Path("/works")
   def works(@Context uriInfo: UriInfo) = {
-    val table: Elem = Table.build(Works.works.toSeq, uriInfo.getAbsolutePathBuilder, Some("editions"))
+    val table: Elem = Table.build(Works.named, uriInfo.getAbsolutePathBuilder, Some("editions"))
     val stylesheet = uriInfo.getBaseUriBuilder.path("judaica").build().toString
     Html.html(stylesheet, table)
   }
 
 
-  @Path("judaica.css")
-  def css = new File(Works.textsDirectory, "judaica.css")
+  @GET
+  @Path("/works/{work}")
+  def work(@PathParam("work") workName: String): String = {
+    val work = getWork(workName)
+    // TODO Metadata!
+    work.toString
+  }
 
 
-  @Path("works/{work}")
-  def work(@PathParam("work") name: String) = new WorkResource(Existence.verify(Works.getWorkByName(name), name, "work"))
+  @GET
+  @Path("/works/{work}/editions")
+  def editions(@PathParam("work") workName: String, @Context uriInfo: UriInfo) = {
+    val work = getWork(workName)
+    val table = Table.build(work.editions.named, uriInfo.getAbsolutePathBuilder, None)
+    // TODO cascade to the Work's stylesheet if it exists...
+    val stylesheet = "/judaica" // TODO uriInfo.getBaseUriBuilder.path("judaica").build().toString
+    Html.html(stylesheet, table)
+  }
+
+
+  // TODO handle skipped "editions" - use default edition
+
+
+//  @GET
+//  @Path("/works/{work}/editions/{edition}")
+//  def edition(@PathParam("work") workName: String, @PathParam("edition") editionName: String) = {
+//    val edition = getEdition(workName, editionName)
+//    // TODO Metadata!
+//    edition.toString
+//  }
+
+
+  @Path("/works/{work}/editions/{edition}")
+  def selection(@PathParam("work") workName: String, @PathParam("edition") editionName: String, @PathParam("selection") selectionKey: String) = {
+    val edition = getEdition(workName, editionName)
+    new SelectionResource(edition)
+  }
+
+
+  private[this] def getWork(name: String): Work = Existence.verify(Works.byName(name), name, "work")
+
+
+  private[this] def getEdition(workName: String, editionName: String): Edition = getEdition(getWork(workName), editionName)
+
+
+  private[this] def getEdition(work: Work, name: String): Edition = Existence.verify(work.editions.byName(name), name, "edition")
 }

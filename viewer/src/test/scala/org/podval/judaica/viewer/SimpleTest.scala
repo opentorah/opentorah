@@ -24,30 +24,34 @@ import org.junit.Assert.{assertTrue, assertEquals}
 class SimpleTest {
 
   @Test
-  def findChumash = assertTrue(Works.getWorkByName("Хумаш").isDefined)
+  def findChumash = assertTrue(Works.byName("Хумаш").isDefined)
 
 
   @Test
-  def findTanach = assertTrue(Works.getWorkByName("Tanach").isDefined)
+  def findTanach = assertTrue(Works.byName("Tanach").isDefined)
 
 
   @Test
-  def defaultName = assertEquals("Tanach", Works.getWorkByName("Хумаш").get.names.default.name)
+  def bookSelector = assertTrue(Works.byName("Tanach").get.selectors.byName("book").isDefined)
 
 
   @Test
-  def directory = assertEquals("Tanach", Works.getWorkByName("Хумаш").get.directory.getName)
+  def defaultName = assertEquals("Tanach", Works.byName("Хумаш").get.names.default.name)
 
 
   @Test
-  def findTorontoEdition = assertTrue(Works.getWorkByName("Tanach").get.getEditionByName("Toronto").isDefined)
+  def directory = assertEquals("Tanach", Works.byName("Хумаш").get.directory.getName)
+
+
+  @Test
+  def findTorontoEdition = assertTrue(Works.byName("Tanach").get.editions.byName("Toronto").isDefined)
 
 
   @Test
   def JerusalemEditionStorage = {
-    val storage = Works.getWorkByName("Tanach").get.getEditionByName("Jerusalem").get.storage
+    val storage = Works.byName("Tanach").get.editions.byName("Jerusalem").get.storage
     assertTrue(storage.isDirectory)
-    assertEquals("book", storage.asDirectory.structure.type_)
+    assertEquals("book", storage.asDirectory.structure.selector.names.default.name)
     assertEquals(5, storage.asDirectory.files.length)
     val file0 = storage.asDirectory.files(0)
     assertTrue(file0.isFile)

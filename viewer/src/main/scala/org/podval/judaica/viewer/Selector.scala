@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Leonid Dubinsky <dub@podval.org>.
+ * Copyright 2012-2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,24 @@
 
 package org.podval.judaica.viewer
 
+import org.podval.judaica.xml.Xml
 
-trait Selector extends Named {
+import scala.xml.Elem
+
+
+final class Selectors(xml: Elem) extends ByName[Selector] {
+
+  override val named: Seq[Selector] = Xml.elems(xml, "selectors", "selector").map(new Selector(_))
+
+
+  // TODO make a second pass, parsing allowed sub-selectors!!!
+}
+
+
+final class Selector(xml: Elem) extends Named {
+
+  override val names: Names = Names(xml)
+
+
+  val isNumeric: Boolean = Xml.getBooleanAttribute(xml, "isNumeric")
 }

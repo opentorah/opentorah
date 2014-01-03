@@ -48,15 +48,23 @@ object Xml {
   def booleanAttribute(value: Boolean) = if (value) Some(Text("true")) else None
 
 
-  def oneChild(elem: Elem, name: String): Elem = {
+  def oneChild(elem: Elem, name: String): Elem = oneOptionalChild(elem, name, true).get
+
+
+  def oneOptionalChild(elem: Elem, name: String, required: Boolean = true): Option[Elem] = {
     val children = elem \ name
 
-    require(children.size > 0, "No child with name " + name)
-    require(children.size == 1, "To many children with name " + name)
+    require(children.size <= 1, "To many children with name " + name)
 
-    val result = children(0)
-    require(result.isInstanceOf[Elem])
-    result.asInstanceOf[Elem]
+    if (required) require(children.size > 0, "No child with name " + name)
+
+    if (children.isEmpty) None else Some(children(0).asInstanceOf[Elem])
+  }
+
+
+  def elems(elem: Elem, plural: String, singular: String, required: Boolean = true): Seq[Elem] = {
+    val child = oneOptionalChild(elem, plural, required)
+    if (child.isEmpty) Seq.empty else elems(child.get, singular)
   }
 
 

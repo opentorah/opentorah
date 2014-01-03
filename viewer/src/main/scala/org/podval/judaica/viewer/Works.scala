@@ -22,13 +22,11 @@ import java.io.File
 // TODO do weak references and lazy (re-)load!!!
 
 
-object Works {
+object Works extends ByName[Work] {
 
   val textsDirectory = new File("/home/dub/Code/judaica/texts/")
 
 
-  lazy val works: Set[Work] = DirectoryScanner.describedDirectories(textsDirectory).map(d => new Work(d.name, d.metadata, d.directory))
-
-
-  def getWorkByName(name: String): Option[Work] = Names.byName(name, works)
+  override lazy val named: Seq[Work] =
+    DirectoryScanner.describedDirectories(textsDirectory).map(d => new Work(d.name, d.metadata, d.directory))
 }

@@ -21,6 +21,14 @@ import scala.xml.Elem
 import java.io.File
 
 
+final class Editions(work: Work) extends ByName[Edition] {
+
+  override val named =
+    DirectoryScanner.describedDirectories(work.directory).map(d => new Edition(work, d.name, d.metadata, d.directory))
+}
+
+
+
 class Edition(val work: Work, name: String, metadata: Elem, directory: File) extends Named {
 
   override val names = Names(name, metadata)

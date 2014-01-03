@@ -25,24 +25,33 @@ import javax.ws.rs.core.{UriInfo, Context}
 
 class SelectionResource(edition: Edition) {
 
-  @Path("{structure}")
   @GET
-  def structure(@PathParam("structure") structureName: String, @Context uriInfo: UriInfo) = {
-    val table = Table.build(getStructure(structureName).divs, uriInfo.getAbsolutePathBuilder, None)
+  @Path("/")
+  def metadata = {
+    // TODO Metadata!
+    edition.toString
+  }
+
+
+  @GET
+  @Path("/{selector}")
+  def structure(@PathParam("selector") selectorName: String, @Context uriInfo: UriInfo) = {
+    val table = Table.build(getStructure(selectorName).named, uriInfo.getAbsolutePathBuilder, None)
     val stylesheet = uriInfo.getBaseUriBuilder.path("judaica").build().toString
     Html.html(stylesheet, table)
   }
 
 
-  @Path("{structure}/{name}")
-  def selection(@PathParam("structure") structureName: String, @PathParam("name") name: String) = {
-    val structure = getStructure(structureName)
-    val div = Existence.verify(Names.byName(name, structure.divs.toSet), name, structure.type_)
+  @GET
+  @Path("/{selector}/{name}")
+  def selection(@PathParam("selector") selectorName: String, @PathParam("name") name: String) = {
+    val structure = getStructure(selectorName)
+    val div = Existence.verify(structure.byName(name), name, structure.selector.names.default.name)
     // TODO introduce some kind of parameter to distinguish request for the book and its display; use it here to retrieve metadata?
 /////    val content = edition.storage.content(structure.type_, name)
     "QQ!"
   }
 
 
-  private[this] def getStructure(name: String) = Existence.verify(edition.work.structures.find(name), name, "structure")
+  private[this] def getStructure(name: String) = Existence.verify(edition.work.structures.byName(name), name, "structure")
 }
