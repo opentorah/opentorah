@@ -16,7 +16,7 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml
+import org.podval.judaica.xml.Xml.XmlOps
 
 import scala.xml.Elem
 
@@ -28,13 +28,13 @@ final class Work(name: String, metadata: Elem, val directory: File) extends Name
   override val names = Names(name, metadata)
 
 
-  val selectors: Selectors = new Selectors(metadata)
+  val selectors: Selectors = Selectors(metadata)
 
 
   val structures: Structures = new Structures(selectors, metadata)
 
 
-  private[this] val defaultEditionName = Xml.getAttributeOption(metadata, "defaultEdition")
+  private[this] val defaultEditionName = metadata.getAttributeOption("defaultEdition")
 
 
   lazy val editions = new Editions(this)

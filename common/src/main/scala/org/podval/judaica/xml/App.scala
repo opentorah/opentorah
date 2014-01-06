@@ -17,7 +17,10 @@
 
 package org.podval.judaica.xml
 
+import Xml.XmlOps
+
 import scala.xml.Elem
+
 
 object App {
 
@@ -35,11 +38,11 @@ object App {
   def unapply(elem: Elem): Option[(Elem, String)] = {
     if (elem.label != "app") None else {
       val readings: Seq[Elem] = (elem \ "rdg").map(_.asInstanceOf[Elem])
-      val read = readings.find(Xml.getAttribute(_, "type") ==  "read")
-      val write = readings.find(Xml.getAttribute(_, "type") == "write")
+      val read = readings.find(_.getAttribute("type") ==  "read")
+      val write = readings.find(_.getAttribute("type") == "write")
       Some((
-        Xml.oneChild(read.get, "div"),
-        Xml.oneChild(write.get, "div").text
+        read.get.oneChild("div"),
+        write.get.oneChild("div").text
       ))
     }
   }

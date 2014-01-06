@@ -17,11 +17,12 @@
 
 package org.podval.judaica.importers
 
-import org.podval.judaica.xml.Xml
+import org.podval.judaica.xml.Xml.XmlOps
 
 import scala.xml.Elem
 
 import java.io.File
+
 
 // TODO use <head> for the non-numeric names of the divs?
 // TODO processing is harder - but merging is easier?
@@ -38,7 +39,8 @@ abstract class Importer(inputDirectoryPath: String, outputDirectoryPath: String)
         val inFile = new File(inputDirectory, inputName + "." + getInputExtension)
         val xml = parseBook(inFile)
         val result = processBook(xml, outputName)
-        Xml.print(result, new File(outputDirectory, outputName + ".xml"))
+        val outFile = new File(outputDirectory, outputName + ".xml")
+        result.print(outFile)
     }
 
 

@@ -17,6 +17,7 @@
 
 package org.podval.judaica.xml
 
+import Xml.XmlOps
 import scala.xml.{Utility, XML, Elem}
 
 import java.io.File
@@ -34,6 +35,5 @@ object Load {
   def loadFile(file: File): Elem = XML.loadFile(file)
 
 
-  private def open(what: Elem, tag: String): Elem =
-    Xml.check(Utility.trimProper(what)(0).asInstanceOf[Elem], tag)
+  private def open(what: Elem, tag: String): Elem = Utility.trimProper(what)(0).asInstanceOf[Elem].check(tag)
 }

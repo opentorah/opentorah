@@ -17,6 +17,8 @@
 
 package org.podval.judaica.xml
 
+import Xml.XmlOps
+
 import scala.xml.Elem
 
 
@@ -30,8 +32,8 @@ object Word {
   def unapply(elem: Elem): Option[(String, Boolean, Boolean)] = elem match {
     case e@Div("word", _, _) => Some((
         e.text,
-        Xml.getBooleanAttribute(e, "makaf"),
-        Xml.getBooleanAttribute(e, "pasek")
+        e.getBooleanAttribute("makaf"),
+        e.getBooleanAttribute("pasek")
       ))
     case _ => None
   }

@@ -16,7 +16,7 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml
+import org.podval.judaica.xml.Xml.XmlOps
 
 import scala.xml.Elem
 
@@ -41,7 +41,7 @@ trait ByName[T <: Named] {
 final class Names(name: Option[String], xml: Elem) {
 
   val names: Seq[Name] = {
-    val rawNames: Seq[Name] = Xml.elems(xml, "names", "name").map(new Name(_))
+    val rawNames: Seq[Name] = xml.elems("names", "name").map(new Name(_))
     if (name.isDefined && !find(name.get, rawNames).isDefined) (new Name(name.get, "en", false) +: rawNames) else rawNames
   }
 
@@ -79,9 +79,9 @@ object Names {
 final class Name(val name: String, val lang: String, val isTransliterated: Boolean) {
 
   def this(xml: Elem) = this(
-    Xml.getAttribute(xml, "name"),
-    Xml.getAttribute(xml, "lang"),
-    Xml.getBooleanAttribute(xml, "isTransliterated")
+    xml.getAttribute("name"),
+    xml.getAttribute("lang"),
+    xml.getBooleanAttribute("isTransliterated")
   )
 
 

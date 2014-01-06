@@ -17,6 +17,7 @@
 package org.podval.judaica.viewer
 
 import org.podval.judaica.xml.{Xml, Load, Html}
+import Xml.XmlOps
 import org.podval.judaica.display.{ElementDisplayer, TanachDisplayers}
 
 import java.io.File
@@ -36,6 +37,6 @@ object Main {
     val output = new File("/home/dub/Code/judaica/tmp/Genesis.html")
 //    val result = TanachStructure.book.displayDiv(xml, Set.empty)
     val result = ElementDisplayer.find(xml, TanachDisplayers.displayers).display(xml, TanachDisplayers.displayers)
-    Xml.print(Html.html("tanach", result), output)
+    Html.html("tanach", result).print(output)
   }
 }

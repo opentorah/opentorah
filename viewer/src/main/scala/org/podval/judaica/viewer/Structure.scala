@@ -16,14 +16,14 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml
+import org.podval.judaica.xml.Xml.XmlOps
 
 import scala.xml.Elem
 
 
 final class Structures(selectors: Selectors, xml: Elem) {
 
-  val structures: Seq[Structure] = Xml.elems(xml, "structures", "structure", required = false).map(new Structure(selectors, _))
+  val structures: Seq[Structure] = xml.elems("structures", "structure", required = false).map(new Structure(selectors, _))
 
 
   def byName(name: String): Option[Structure] = structures.find(_.selector.names.has(name))
@@ -33,10 +33,10 @@ final class Structures(selectors: Selectors, xml: Elem) {
 
 final class Structure(selectors: Selectors, xml: Elem) extends ByName[Div] {
 
-  val selector: Selector = selectors.byName(Xml.getAttribute(xml, "type")).get
+  val selector: Selector = selectors.byName(xml.getAttribute("type")).get
 
 
-  val named: Seq[Div] = Xml.elems(xml, "div").map(new Div(selectors, _))
+  val named: Seq[Div] = xml.elems("div").map(new Div(selectors, _))
 }
 
 

@@ -20,7 +20,8 @@ package tanach
 
 import org.podval.judaica.xml.{Xml, Div, Load}
 
-import Xml.getAttribute
+import Xml.XmlOps
+
 import scala.xml.{Node, Elem}
 
 
@@ -40,16 +41,16 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
   protected final override def processBook(xml: Elem, outputName: String): Elem = {
     // TODO write a merge function - and reformat the metadata accordingly?
     val breaks =
-      Xml.elems(Load.loadResource(classOf[TanachImporter], outputName, "meta"))
-        .groupBy(getAttribute("chapter"))
-        .mapValues(_.groupBy(getAttribute("verse")).mapValues(_.map(dropChapterAndVerse)))
+      Load.loadResource(classOf[TanachImporter], outputName, "meta").elems
+        .groupBy(_.getAttribute("chapter"))
+        .mapValues(_.groupBy(_.getAttribute("verse")).mapValues(_.map(dropChapterAndVerse)))
 
     transformDiv(xml, "book") { book: Elem => flatMapChildren(book, {
       transformDiv(_, "chapter") { chapter: Elem => flatMapChildren(chapter, {
         transformDiv(_, "verse") { verse =>
           val prefixBreaks: Seq[Elem] = breaks
-            .getOrElse(getAttribute(chapter, "n"), Map.empty)
-            .getOrElse(getAttribute(verse, "n"), Seq.empty)
+            .getOrElse(chapter.getAttribute("n"), Map.empty)
+            .getOrElse(verse.getAttribute("n"), Seq.empty)
 
           val result: Seq[Elem] = prefixBreaks :+ verse
 
@@ -66,7 +67,7 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
   }
 
 
-  private def flatMapChildren(elem: Elem, f: Elem => Seq[Node]): Elem = elem.copy(child = Xml.elems(elem) flatMap f)
+  private def flatMapChildren(elem: Elem, f: Elem => Seq[Node]): Elem = elem.copy(child = elem.elems flatMap f)
 
 
   private def dropChapterAndVerse(break: Elem): Elem =

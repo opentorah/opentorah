@@ -17,19 +17,20 @@
 
 package org.podval.judaica.display
 
-import org.podval.judaica.xml.{HebrewNumbers, Xml, Html}
+import org.podval.judaica.xml.{HebrewNumbers, Html}
+import org.podval.judaica.xml.Xml.XmlOps
 
 import scala.xml.Elem
 
 
 class DivElementDisplayer(type_ : String) extends ElementDisplayer {
 
-  final override def recognizes(elem: Elem): Boolean = (elem.label == "div") && (Xml.getAttribute(elem, "type") == type_)
+  final override def recognizes(elem: Elem): Boolean = (elem.label == "div") && (elem.getAttribute("type") == type_)
 
 
   override def display(elem: Elem, displayers: Set[ElementDisplayer]): Seq[Elem] = {
     // TODO redo with for comprehension
-    val nOption = Xml.getAttributeOption(elem, "n")
+    val nOption = elem.getAttributeOption("n")
     val nameOption: Option[Elem] = if (nOption.isEmpty) None else {
       val n = nOption.get
       val name = if (!isNumeric) displayName(n) else {
@@ -40,7 +41,7 @@ class DivElementDisplayer(type_ : String) extends ElementDisplayer {
       Some(Html.span(nameClass, name))
     }
 
-    val children: Seq[Elem] = Xml.elems(elem)
+    val children: Seq[Elem] = elem.elems
 
     val content: Seq[Elem] =
       if (!children.isEmpty) children.flatMap(e => ElementDisplayer.find(e, displayers).display(e, displayers))

@@ -17,6 +17,8 @@
 
 package org.podval.judaica.xml
 
+import Xml.XmlOps
+
 import scala.xml.Elem
 
 
@@ -28,8 +30,8 @@ object Paragraph {
 
   def unapply(elem: Elem): Option[(Boolean, Boolean)] = elem match {
       case e@Div("paragraph", _, _) => Some((
-        Xml.getBooleanAttribute(e, "open"),
-        Xml.getBooleanAttribute(e, "big")
+        e.getBooleanAttribute("open"),
+        e.getBooleanAttribute("big")
         ))
       case _ => None
     }

@@ -16,7 +16,7 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml
+import org.podval.judaica.xml.Xml.XmlOps
 
 import scala.xml.Elem
 
@@ -100,10 +100,10 @@ abstract class DirectoryStorage(metadata: Elem, directory: File) extends Storage
   override def asFile: FileStorage = throw new ClassCastException
 
 
-  val structureXml = Xml.oneChild(metadata, "structure")
+  val structureXml = metadata.oneChild("structure")
 
 
-  val structureType : String = Xml.getAttribute(structureXml, "type")
+  val structureType : String = structureXml.getAttribute("type")
 
 
   val structure: Structure = root.edition.work.structures.byName(structureType).get

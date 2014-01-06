@@ -17,79 +17,81 @@
 package org.podval.judaica.xml
 
 
-import scala.xml.{Node, Elem, Text, XML, PrettyPrinter}
+import scala.xml.{Node, Elem, Text, PrettyPrinter}
 
 import java.io.{FileWriter, PrintWriter, File}
 
 
 object Xml {
 
-  def isDiv(elem: Elem, divType: String): Boolean = (elem.label == "div") && (getAttribute(elem, "type") == divType)
+  implicit class XmlOps(elem: Elem) {
+
+    def elems(plural: String, singular: String, required: Boolean = true): Seq[Elem] = {
+      val child = oneOptionalChild(plural, required)
+      if (child.isEmpty) Seq.empty else child.get.elems(singular)
+    }
 
 
-  def getAttributeOption(elem: Elem, name: String): Option[String] = {
-    val result: Seq[Node] = (elem \ ("@" + name))
-    if (result.isEmpty) None else Some(result.text)
+    def elems(name: String): Seq[Elem] = {
+      val result = elem.elems
+      result.foreach(_.check(name))
+      result
+    }
+
+
+    def elems: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
+
+
+    def getAttribute(name: String): String = getAttributeOption(name).get
+
+
+    def getBooleanAttribute(name: String): Boolean = {
+      val value = getAttributeOption(name)
+      value.isDefined && (value.get == "true")
+    }
+
+
+    def getAttributeOption(name: String): Option[String] = {
+      val result: Seq[Node] = (elem \ ("@" + name))
+      if (result.isEmpty) None else Some(result.text)
+    }
+
+
+    def oneChild(name: String): Elem = oneOptionalChild(name, true).get
+
+
+    def oneOptionalChild(name: String, required: Boolean = true): Option[Elem] = {
+      val children = elem \ name
+
+      require(children.size <= 1, "To many children with name " + name)
+
+      if (required) require(children.size > 0, "No child with name " + name)
+
+      if (children.isEmpty) None else Some(children(0).asInstanceOf[Elem])
+    }
+
+
+    def check(name: String): Elem = {
+      require(elem.label == name, "Expected name " + name + " but got " + elem.label)
+      elem
+    }
+
+
+    def isDiv(divType: String): Boolean = (elem.label == "div") && (elem.getAttribute("type") == divType)
+
+
+    def print(outFile: File) {
+      val out = new PrintWriter(new FileWriter(outFile))
+      val pretty = new PrettyPrinter(100, 4).format(elem)
+      // TODO when outputting XML, include <xml> header?
+      // TODO        out.println("<!DOCTYPE html>\n" + pretty)
+      out.println(pretty)
+      out.close()
+    }
   }
 
 
-  def getAttribute(elem: Elem, name: String): String = getAttributeOption(elem, name).get
-
-
-  def getAttribute(name: String)(elem: Elem): String = getAttribute(elem, name)
-
-
-  def getBooleanAttribute(elem: Elem, name: String): Boolean = {
-    val value = getAttributeOption(elem, name)
-    value.isDefined && (value.get == "true")
-  }
 
 
   def booleanAttribute(value: Boolean) = if (value) Some(Text("true")) else None
-
-
-  def oneChild(elem: Elem, name: String): Elem = oneOptionalChild(elem, name, true).get
-
-
-  def oneOptionalChild(elem: Elem, name: String, required: Boolean = true): Option[Elem] = {
-    val children = elem \ name
-
-    require(children.size <= 1, "To many children with name " + name)
-
-    if (required) require(children.size > 0, "No child with name " + name)
-
-    if (children.isEmpty) None else Some(children(0).asInstanceOf[Elem])
-  }
-
-
-  def elems(elem: Elem, plural: String, singular: String, required: Boolean = true): Seq[Elem] = {
-    val child = oneOptionalChild(elem, plural, required)
-    if (child.isEmpty) Seq.empty else elems(child.get, singular)
-  }
-
-
-  def elems(elem: Elem): Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
-
-
-  def elems(elem: Elem, name: String): Seq[Elem] = {
-    val result = elems(elem)
-    result.foreach(check(_, name))
-    result
-  }
-
-
-  def check(elem: Elem, name: String): Elem = {
-    require(elem.label == name, "Expected name " + name + " but got " + elem.label)
-    elem
-  }
-
-
-  def print(xml: Elem, outFile: File) {
-    val out = new PrintWriter(new FileWriter(outFile))
-    val pretty = new PrettyPrinter(100, 4).format(xml)
-    // TODO when outputting XML, include <xml> header?
-    // TODO        out.println("<!DOCTYPE html>\n" + pretty)
-    out.println(pretty)
-    out.close()
-  }
 }

@@ -17,6 +17,8 @@
 
 package org.podval.judaica.xml
 
+import Xml.XmlOps
+
 import scala.xml.Elem
 
 
@@ -28,8 +30,8 @@ object Div {
 
   def unapply(elem: Elem): Option[(String, String, Seq[Elem])] =
     if (elem.label == "div") Some((
-      Xml.getAttribute(elem, "type"),
-      Xml.getAttribute(elem, "n"),
-      Xml.elems(elem)
+      elem.getAttribute("type"),
+      elem.getAttribute("n"),
+      elem.elems
     )) else None
 }

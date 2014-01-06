@@ -32,7 +32,11 @@ class SimpleTest {
 
 
   @Test
-  def bookSelector = assertTrue(Works.byName("Tanach").get.selectors.byName("book").isDefined)
+  def bookSelector = {
+    val book = Works.byName("Tanach").get.selectors.byName("book")
+    assertTrue(book.isDefined)
+    assertEquals(Set("chapter", "week"), book.get.selectors.map(_.names.default.name))
+  }
 
 
   @Test
@@ -48,7 +52,7 @@ class SimpleTest {
 
 
   @Test
-  def JerusalemEditionStorage = {
+  def jerusalemEditionStorage = {
     val storage = Works.byName("Tanach").get.editions.byName("Jerusalem").get.storage
     assertTrue(storage.isDirectory)
     assertEquals("book", storage.asDirectory.structure.selector.names.default.name)
