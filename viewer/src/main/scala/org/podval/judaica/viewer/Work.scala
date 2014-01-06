@@ -40,7 +40,7 @@ final class Work(name: String, metadata: Elem, val directory: File) extends Name
   lazy val editions = new Editions(this)
 
 
-  def defaultEdition: Option[Edition] = defaultEditionName flatMap (editions.byName(_))
+  def defaultEdition: Option[Edition] = defaultEditionName flatMap (editions.byName)
 
 
   override def toString: String = "Work (" + directory + ") " + names
