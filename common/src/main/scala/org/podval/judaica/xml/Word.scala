@@ -32,8 +32,8 @@ object Word {
   def unapply(elem: Elem): Option[(String, Boolean, Boolean)] = elem match {
     case e@Div("word", _, _) => Some((
         e.text,
-        e.getBooleanAttribute("makaf"),
-        e.getBooleanAttribute("pasek")
+        e.booleanAttribute("makaf"),
+        e.booleanAttribute("pasek")
       ))
     case _ => None
   }

@@ -81,7 +81,7 @@ final class Name(val name: String, val lang: String, val isTransliterated: Boole
   def this(xml: Elem) = this(
     xml.getAttribute("name"),
     xml.getAttribute("lang"),
-    xml.getBooleanAttribute("isTransliterated")
+    xml.booleanAttribute("isTransliterated")
   )
 
 

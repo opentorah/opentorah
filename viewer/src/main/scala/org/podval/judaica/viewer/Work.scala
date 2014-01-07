@@ -23,6 +23,20 @@ import scala.xml.Elem
 import java.io.File
 
 
+// TODO do weak references and lazy (re-)load!!!
+
+
+object Works extends ByName[Work] {
+
+  val textsDirectory = new File("/home/dub/Code/judaica/texts/")
+
+
+  override lazy val named: Seq[Work] =
+    DirectoryScanner.describedDirectories(textsDirectory).map(d => new Work(d.name, d.metadata, d.directory))
+}
+
+
+
 final class Work(name: String, metadata: Elem, val directory: File) extends Named {
 
   override val names = Names(name, metadata)
@@ -34,7 +48,7 @@ final class Work(name: String, metadata: Elem, val directory: File) extends Name
   val structures: Structures = new Structures(selectors, metadata)
 
 
-  private[this] val defaultEditionName = metadata.getAttributeOption("defaultEdition")
+  private[this] val defaultEditionName = metadata.attributeOption("defaultEdition")
 
 
   lazy val editions = new Editions(this)

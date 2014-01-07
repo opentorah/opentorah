@@ -61,5 +61,5 @@ object Selectors {
 
 final class Selector(override val names: Names, val selectors: Set[Selector], xml: Elem) extends Named {
 
-  val isNumeric: Boolean = xml.getBooleanAttribute("isNumeric")
+  val isNumeric: Boolean = xml.booleanAttribute("isNumeric")
 }

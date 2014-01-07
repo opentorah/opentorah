@@ -30,8 +30,8 @@ object Paragraph {
 
   def unapply(elem: Elem): Option[(Boolean, Boolean)] = elem match {
       case e@Div("paragraph", _, _) => Some((
-        e.getBooleanAttribute("open"),
-        e.getBooleanAttribute("big")
+        e.booleanAttribute("open"),
+        e.booleanAttribute("big")
         ))
       case _ => None
     }

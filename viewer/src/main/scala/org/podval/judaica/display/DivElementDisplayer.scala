@@ -30,7 +30,7 @@ class DivElementDisplayer(type_ : String) extends ElementDisplayer {
 
   override def display(elem: Elem, displayers: Set[ElementDisplayer]): Seq[Elem] = {
     // TODO redo with for comprehension
-    val nOption = elem.getAttributeOption("n")
+    val nOption = elem.attributeOption("n")
     val nameOption: Option[Elem] = if (nOption.isEmpty) None else {
       val n = nOption.get
       val name = if (!isNumeric) displayName(n) else {

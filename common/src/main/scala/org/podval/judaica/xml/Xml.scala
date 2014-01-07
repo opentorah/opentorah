@@ -42,16 +42,16 @@ object Xml {
     def elems: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
 
-    def getAttribute(name: String): String = getAttributeOption(name).get
+    def getAttribute(name: String): String = attributeOption(name).get
 
 
-    def getBooleanAttribute(name: String): Boolean = {
-      val value = getAttributeOption(name)
+    def booleanAttribute(name: String): Boolean = {
+      val value = attributeOption(name)
       value.isDefined && (value.get == "true")
     }
 
 
-    def getAttributeOption(name: String): Option[String] = {
+    def attributeOption(name: String): Option[String] = {
       val result: Seq[Node] = (elem \ ("@" + name))
       if (result.isEmpty) None else Some(result.text)
     }
@@ -60,7 +60,7 @@ object Xml {
     def oneChild(name: String): Elem = oneOptionalChild(name, true).get
 
 
-    def oneOptionalChild(name: String, required: Boolean = true): Option[Elem] = {
+    private[this] def oneOptionalChild(name: String, required: Boolean = true): Option[Elem] = {
       val children = elem \ name
 
       require(children.size <= 1, "To many children with name " + name)
@@ -77,7 +77,7 @@ object Xml {
     }
 
 
-    def isDiv(divType: String): Boolean = (elem.label == "div") && (elem.getAttribute("type") == divType)
+    def isDiv(divType: String): Boolean = (elem.label == "div") && (elem.attribute("type") == divType)
 
 
     def print(outFile: File) {
