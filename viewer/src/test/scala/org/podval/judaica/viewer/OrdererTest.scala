@@ -25,7 +25,7 @@ final class OrdererTest {
   @Test
   def empty {
     val arcs: Map[String, Set[String]] = Map.empty
-    val resultEither = Orderer.order(arcs)
+    val resultEither = Orderer.orderSets(arcs)
     assertTrue(resultEither.isRight)
     val result = resultEither.right.get
     assertTrue(result.isEmpty)
@@ -35,7 +35,7 @@ final class OrdererTest {
   @Test
   def one {
     val arcs: Map[String, Set[String]] = Map("one" -> Set.empty)
-    val resultEither = Orderer.order(arcs)
+    val resultEither = Orderer.orderSets(arcs)
     assertTrue(resultEither.isRight)
     val result = resultEither.right.get
     assertEquals(result, Seq("one"))
@@ -45,7 +45,7 @@ final class OrdererTest {
   @Test
   def cycleOfOne {
     val arcs: Map[String, Set[String]] = Map("one" -> Set("one"))
-    val resultEither = Orderer.order(arcs)
+    val resultEither = Orderer.orderSets(arcs)
     assertTrue(resultEither.isLeft)
     val result = resultEither.left.get
     assertEquals(result, Set("one"))
@@ -55,7 +55,7 @@ final class OrdererTest {
   @Test
   def two {
     val arcs: Map[String, Set[String]] = Map("two" -> Set("one"), "one" -> Set.empty)
-    val resultEither = Orderer.order(arcs)
+    val resultEither = Orderer.orderSets(arcs)
     assertTrue(resultEither.isRight)
     val result = resultEither.right.get
     assertEquals(result, Seq("one", "two"))
@@ -65,7 +65,7 @@ final class OrdererTest {
   @Test
   def cycleOfTwo {
     val arcs: Map[String, Set[String]] = Map("two" -> Set("one"), "one" -> Set("two"))
-    val resultEither = Orderer.order(arcs)
+    val resultEither = Orderer.orderSets(arcs)
     assertTrue(resultEither.isLeft)
     val result = resultEither.left.get
     assertEquals(result, Set("one", "two"))
@@ -82,7 +82,7 @@ final class OrdererTest {
       "day" -> Set("verse"),
       "word" -> Set.empty
     )
-    val resultEither = Orderer.order(arcs)
+    val resultEither = Orderer.orderSets(arcs)
     assertTrue(resultEither.isRight)
     val result = resultEither.right.get
     assertTrue(result.startsWith(Seq("word", "verse")))

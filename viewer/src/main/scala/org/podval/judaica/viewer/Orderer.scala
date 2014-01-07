@@ -19,31 +19,37 @@ package org.podval.judaica.viewer
 
 object Orderer {
 
-  def order[K](arcs: Map[K, Set[K]]): Either[Set[K], Seq[K]] = order(arcs.keySet, arcs)
+  // TODO is there a superclass for Set and Seq that has "--" - so that I can have one entry point here for both?
+
+
+  def order[K](arcs: Map[K, Seq[K]]): Either[Set[K], Seq[K]] = orderSets(arcs.mapValues(_.toSet))
+
+
+  def orderSets[K](arcs: Map[K, Set[K]]): Either[Set[K], Seq[K]] = order(arcs.keySet, arcs)
 
 
   def order[K](roots: Set[K], arcs: K => Set[K]): Either[Set[K], Seq[K]] = {
 
     def close(root: K): Set[K] = {
-      def closeStep(acc: Set[K], next: Set[K]): Set[K] = {
+      def close(acc: Set[K], next: Set[K]): Set[K] = {
         val add: Set[K] = next -- acc
-        if (add.isEmpty) acc else closeStep(acc ++ add, add flatMap arcs)
+        if (add.isEmpty) acc else close(acc ++ add, add flatMap arcs)
       }
 
-      closeStep(Set.empty, arcs(root))
+      close(Set.empty, arcs(root))
     }
 
 
     def order(reachable: Map[K, Set[K]]): Seq[K] = {
-      def orderStep(acc: Seq[K], left: Set[K]): Seq[K] = {
+      def order(acc: Seq[K], left: Set[K]): Seq[K] = {
         if (left.isEmpty) acc else {
           val next = left.filter(reachable(_).subsetOf(acc.toSet))
           require(!next.isEmpty)
-          orderStep(acc ++ next, left -- next)
+          order(acc ++ next, left -- next)
         }
       }
 
-      orderStep(Seq.empty, reachable.keys.toSet)
+      order(Seq.empty, reachable.keys.toSet)
     }
 
 

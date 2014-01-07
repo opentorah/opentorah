@@ -24,6 +24,7 @@ import scala.xml.Elem
 final class Selectors private(override val named: Seq[Selector]) extends ByName[Selector]
 
 
+// TODO better "compilation" error messages...
 
 object Selectors {
 
@@ -32,8 +33,8 @@ object Selectors {
     val names2xml: Map[Names, Elem] = xmls.map(xml => Names(xml) -> xml).toMap
     val names = names2xml.keySet
 
-    val names2selectors: Map[Names, Set[Names]] = names2xml.mapValues { selectorXml: Elem =>
-      selectorXml.elems("selectors", "selector", required = false).toSet.map { subselectorXml: Elem =>
+    val names2selectors: Map[Names, Seq[Names]] = names2xml.mapValues { selectorXml: Elem =>
+      selectorXml.elems("selectors", "selector", required = false).map { subselectorXml: Elem =>
         val name = subselectorXml.getAttribute("name")
         names.find(_.has(name)).get
       }
@@ -45,8 +46,16 @@ object Selectors {
     def build(acc: Seq[Selector], names2selector: Map[Names, Selector], left: Seq[Names]): Seq[Selector] =
       if (left.isEmpty) acc else {
         val names = left.head
-        val selectors: Set[Selector] = names2selectors(names).map(names2selector)
-        val selector: Selector = new Selector(names, selectors, names2xml(names))
+        val selectors = new Selectors(names2selectors(names).map(names2selector))
+        val xml = names2xml(names)
+        val isNumbered: Boolean = xml.booleanAttribute("isNumbered")
+
+        val selector: Selector =
+          if (isNumbered)
+            new NumberedSelector(names, selectors)
+          else
+            new NamedSelector(names, selectors)
+
         build(acc :+ selector, names2selector.updated(selector.names, selector), left.tail)
       }
 
@@ -59,7 +68,21 @@ object Selectors {
 
 
 
-final class Selector(override val names: Names, val selectors: Set[Selector], xml: Elem) extends Named {
+abstract class Selector(override val names: Names, val selectors: Selectors) extends Named {
 
-  val isNumeric: Boolean = xml.booleanAttribute("isNumeric")
+  def isNumbered: Boolean
+}
+
+
+
+final class NumberedSelector(names: Names, selectors: Selectors) extends Selector(names, selectors) {
+
+  override def isNumbered: Boolean = true
+}
+
+
+
+final class NamedSelector(names: Names, selectors: Selectors) extends Selector(names, selectors) {
+
+  override def isNumbered: Boolean = false
 }

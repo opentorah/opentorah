@@ -17,7 +17,7 @@
 package org.podval.judaica.viewer
 
 import org.junit.Test
-import org.junit.Assert.{assertTrue, assertEquals}
+import org.junit.Assert.{assertTrue, assertFalse, assertEquals}
 
 
 // TODO switch to ScalaTest!
@@ -33,9 +33,21 @@ class SimpleTest {
 
   @Test
   def bookSelector = {
-    val book = Works.byName("Tanach").get.selectors.byName("book")
-    assertTrue(book.isDefined)
-    assertEquals(Set("chapter", "week"), book.get.selectors.map(_.names.default.name))
+    val bookOption = Works.byName("Tanach").get.selectors.byName("book")
+    assertTrue(bookOption.isDefined)
+    val book = bookOption.get
+    assertEquals(Set("chapter", "week"), book.selectors.named.map(_.names.default.name).toSet)
+    assertFalse(book.isNumbered)
+  }
+
+
+  @Test
+  def chapterSelector = {
+    val chapterOption = Works.byName("Tanach").get.selectors.byName("book").get.selectors.byName("chapter")
+    assertTrue(chapterOption.isDefined)
+    val chapter = chapterOption.get
+    assertEquals(Set("verse"), chapter.selectors.named.map(_.names.default.name).toSet)
+    assertTrue(chapter.isNumbered)
   }
 
 
