@@ -45,16 +45,10 @@ final class Work(name: String, metadata: Elem, val directory: File) extends Name
   val selectors: Selectors = Selectors(metadata)
 
 
-  val structures: Structures = new Structures(selectors, metadata)
-
-
-  private[this] val defaultEditionName = metadata.attributeOption("defaultEdition")
+  val structures: Structures = Structures(selectors, metadata.oneChild("structures"))  // TODO make structures optional?
 
 
   lazy val editions = new Editions(this)
-
-
-  def defaultEdition: Option[Edition] = defaultEditionName flatMap (editions.byName)
 
 
   override def toString: String = "Work (" + directory + ") " + names

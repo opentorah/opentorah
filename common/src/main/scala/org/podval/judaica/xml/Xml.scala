@@ -39,10 +39,16 @@ object Xml {
     }
 
 
+    def elemsFilter(name: String): Seq[Elem] = elem.elems.filter(_.label == name)
+
+
     def elems: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
 
     def getAttribute(name: String): String = attributeOption(name).get
+
+
+    def getIntAttribute(name: String): Int = getAttribute(name).toInt
 
 
     def booleanAttribute(name: String): Boolean = {

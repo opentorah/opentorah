@@ -17,74 +17,67 @@
 package org.podval.judaica.viewer
 
 import org.junit.Test
-import org.junit.Assert.{assertTrue, assertEquals}
+import org.junit.Assert.{assertTrue, assertFalse, assertEquals}
 
 
 final class OrdererTest {
 
   @Test
   def empty {
-    val arcs: Map[String, Set[String]] = Map.empty
-    val resultEither = Orderer.orderSets(arcs)
-    assertTrue(resultEither.isRight)
-    val result = resultEither.right.get
+    val arcs: Map[String, Seq[String]] = Map.empty
+    val reachable = Orderer.close(arcs)
+    assertTrue(Orderer.inCycles(reachable).isEmpty)
+    val result = Orderer.order(reachable)
     assertTrue(result.isEmpty)
   }
 
 
   @Test
   def one {
-    val arcs: Map[String, Set[String]] = Map("one" -> Set.empty)
-    val resultEither = Orderer.orderSets(arcs)
-    assertTrue(resultEither.isRight)
-    val result = resultEither.right.get
-    assertEquals(result, Seq("one"))
+    val arcs: Map[String, Seq[String]] = Map("one" -> Seq.empty)
+    val reachable = Orderer.close(arcs)
+    assertTrue(Orderer.inCycles(reachable).isEmpty)
+    assertEquals(Seq("one"), Orderer.order(reachable))
   }
 
 
   @Test
   def cycleOfOne {
-    val arcs: Map[String, Set[String]] = Map("one" -> Set("one"))
-    val resultEither = Orderer.orderSets(arcs)
-    assertTrue(resultEither.isLeft)
-    val result = resultEither.left.get
-    assertEquals(result, Set("one"))
+    val arcs: Map[String, Seq[String]] = Map("one" -> Seq("one"))
+    assertEquals(Set("one"), Orderer.inCycles(Orderer.close(arcs)))
   }
 
 
   @Test
   def two {
-    val arcs: Map[String, Set[String]] = Map("two" -> Set("one"), "one" -> Set.empty)
-    val resultEither = Orderer.orderSets(arcs)
-    assertTrue(resultEither.isRight)
-    val result = resultEither.right.get
-    assertEquals(result, Seq("one", "two"))
+    val arcs: Map[String, Seq[String]] = Map("two" -> Seq("one"), "one" -> Seq.empty)
+    val reachable = Orderer.close(arcs)
+    assertTrue(Orderer.inCycles(reachable).isEmpty)
+    assertEquals(Seq("one", "two"), Orderer.order(reachable))
   }
 
 
   @Test
   def cycleOfTwo {
-    val arcs: Map[String, Set[String]] = Map("two" -> Set("one"), "one" -> Set("two"))
-    val resultEither = Orderer.orderSets(arcs)
-    assertTrue(resultEither.isLeft)
-    val result = resultEither.left.get
-    assertEquals(result, Set("one", "two"))
+    val arcs: Map[String, Seq[String]] = Map("two" -> Seq("one"), "one" -> Seq("two"))
+    assertEquals(Set("one", "two"), Orderer.inCycles(Orderer.close(arcs)))
   }
+
 
   @Test
   def chumash {
-    val arcs: Map[String, Set[String]] = Map(
-      "work" -> Set("book"),
-      "book" -> Set("chapter", "week"),
-      "chapter" -> Set("verse"),
-      "verse" -> Set("word"),
-      "week" -> Set("day", "chapter"),
-      "day" -> Set("verse"),
-      "word" -> Set.empty
+    val arcs: Map[String, Seq[String]] = Map(
+      "work" -> Seq("book"),
+      "book" -> Seq("chapter", "week"),
+      "chapter" -> Seq("verse"),
+      "verse" -> Seq("word"),
+      "week" -> Seq("day", "chapter"),
+      "day" -> Seq("verse"),
+      "word" -> Seq.empty
     )
-    val resultEither = Orderer.orderSets(arcs)
-    assertTrue(resultEither.isRight)
-    val result = resultEither.right.get
+    val reachable = Orderer.close(arcs)
+    assertTrue(Orderer.inCycles(reachable).isEmpty)
+    val result = Orderer.order(reachable)
     assertTrue(result.startsWith(Seq("word", "verse")))
     assertTrue(result.endsWith(Seq("book", "work")))
   }

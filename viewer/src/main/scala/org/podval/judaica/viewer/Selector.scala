@@ -24,14 +24,54 @@ import scala.xml.Elem
 final class Selectors private(override val named: Seq[Selector]) extends ByName[Selector]
 
 
-// TODO better "compilation" error messages...
+abstract class Selector(override val names: Names, val selectors: Selectors) extends Named {
 
+  def isNumbered: Boolean
+
+
+  def asNumbered: NumberedSelector
+
+
+  def asNamed: NamedSelector
+}
+
+
+
+final class NumberedSelector(names: Names, selectors: Selectors) extends Selector(names, selectors) {
+
+  override def isNumbered: Boolean = true
+
+
+  override def asNumbered: NumberedSelector = this
+
+
+  override def asNamed: NamedSelector = throw new ClassCastException
+}
+
+
+
+final class NamedSelector(names: Names, selectors: Selectors) extends Selector(names, selectors) {
+
+  override def isNumbered: Boolean = false
+
+
+  override def asNumbered: NumberedSelector =  throw new ClassCastException
+
+
+  override def asNamed: NamedSelector = this
+}
+
+
+
+// TODO better "compilation" error messages...
 object Selectors {
 
   def apply(xml: Elem): Selectors = {
     val xmls = xml.elems("selectors", "selector")
     val names2xml: Map[Names, Elem] = xmls.map(xml => Names(xml) -> xml).toMap
     val names = names2xml.keySet
+
+    // TODO calculate roots!
 
     val names2selectors: Map[Names, Seq[Names]] = names2xml.mapValues { selectorXml: Elem =>
       selectorXml.elems("selectors", "selector", required = false).map { subselectorXml: Elem =>
@@ -40,7 +80,11 @@ object Selectors {
       }
     }
 
-    val ordered: Seq[Names] = Orderer.order(names2selectors).right.get
+    val ordered: Seq[Names] = {
+      val reachable = Orderer.close(names2selectors)
+      require(Orderer.inCycles(reachable).isEmpty)
+      Orderer.order(reachable) // TODO filter out only the roots
+    }
 
 
     def build(acc: Seq[Selector], names2selector: Map[Names, Selector], left: Seq[Names]): Seq[Selector] =
@@ -62,27 +106,8 @@ object Selectors {
 
     val selectors: Seq[Selector] = build(Seq.empty, Map.empty, ordered)
 
+    // TODO can I somehow figure out - or mark? - top-level selectors? Only they should go into the result...
+
     new Selectors(selectors)
   }
-}
-
-
-
-abstract class Selector(override val names: Names, val selectors: Selectors) extends Named {
-
-  def isNumbered: Boolean
-}
-
-
-
-final class NumberedSelector(names: Names, selectors: Selectors) extends Selector(names, selectors) {
-
-  override def isNumbered: Boolean = true
-}
-
-
-
-final class NamedSelector(names: Names, selectors: Selectors) extends Selector(names, selectors) {
-
-  override def isNumbered: Boolean = false
 }

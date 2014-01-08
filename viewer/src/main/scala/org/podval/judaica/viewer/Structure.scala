@@ -21,30 +21,69 @@ import org.podval.judaica.xml.Xml.XmlOps
 import scala.xml.Elem
 
 
-final class Structures(selectors: Selectors, xml: Elem) {
-
-  val structures: Seq[Structure] = xml.elems("structures", "structure", required = false).map(new Structure(selectors, _))
-
+final class Structures private(val structures: Seq[Structure]) {
 
   def byName(name: String): Option[Structure] = structures.find(_.selector.names.has(name))
 }
 
 
 
-final class Structure(selectors: Selectors, xml: Elem) extends ByName[Div] {
-
-  val selector: Selector = selectors.byName(xml.getAttribute("type")).get
+abstract class Structure(val selector: Selector, val divs: Seq[Div])
 
 
-  val named: Seq[Div] = xml.elems("div").map(new Div(selectors, _))
+final class NamedStructure(override val selector: NamedSelector, override val divs: Seq[NamedDiv]) extends Structure(selector, divs) with ByName[NamedDiv] {
+
+  override def named = divs
+}
+
+
+final class NumberedStructure(override val selector: NumberedSelector, override val divs: Seq[NumberedDiv]) extends Structure(selector, divs) {  // TODO something with known length, not Seq...
 }
 
 
 
-final class Div(selectors: Selectors, xml: Elem) extends Named {
+abstract class Div(val structures: Structures)
 
-  override val names: Names = Names(xml)
+final class NumberedDiv(val number: Int, structures: Structures) extends Div(structures)
+
+final class NamedDiv(override val names: Names, structures: Structures) extends Div(structures) with Named
 
 
-  val structures = new Structures(selectors, xml)
+
+object Structures {
+
+  def apply(selectors: Selectors, xml: Elem): Structures = parseStructures(selectors, xml)
+
+
+  private def parseStructures(selectors: Selectors, xml: Elem): Structures = {
+    val structures = xml.elemsFilter("selector").map(parseStructure(selectors, _))
+    new Structures(structures)
+  }
+
+
+  private def parseStructure(selectors: Selectors, xml: Elem): Structure = {
+    val selector: Selector = selectors.byName(xml.getAttribute("name")).get
+
+    def parseDivs[T <: Div](f: (Selectors, Elem) => T): Seq[T] = xml.elems("div").map(f(selector.selectors, _))
+
+    if (selector.isNumbered) {
+      new NumberedStructure(selector.asNumbered, parseDivs(parseNumberedDiv))
+    } else {
+      new NamedStructure(selector.asNamed, parseDivs(parseNamedDiv))
+    }
+  }
+
+
+  private def parseNamedDiv(selectors: Selectors, xml: Elem): NamedDiv = {
+    val structures = parseStructures(selectors, xml)
+    val names = Names(xml)
+    new NamedDiv(names, structures)
+  }
+
+
+  private def parseNumberedDiv(selectors: Selectors, xml: Elem): NumberedDiv = {
+    val structures = parseStructures(selectors, xml)
+    val n = xml.getIntAttribute("n")
+    new NumberedDiv(n, structures)
+  }
 }

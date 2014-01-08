@@ -110,18 +110,24 @@ abstract class DirectoryStorage(metadata: Elem, directory: File) extends Storage
 
   // TODO allow overrides ? val overrides = Xml.elems(structure) ... Xml.check(override, "file")
 
-  val files: Seq[Storage] = structure.named.map { div =>
-    // TODO handle ".xml" files, not just directories!
-    val fileCandidate = new File(directory, div.names.default.name + ".xml")
-    val directoryCandidate = new File(directory, div.names.default.name)
-    require((fileCandidate.exists || directoryCandidate.exists) && !(fileCandidate.exists && directoryCandidate.exists))
-    val file = if (fileCandidate.exists) fileCandidate else directoryCandidate
+  val files: Seq[Storage] = {
+    val names = if (structure.selector.isNumbered)
+      structure.asInstanceOf[NumberedStructure].divs.map(_.number.toString)
+    else
+      structure.asInstanceOf[NamedStructure].divs.map(_.names.default.name)
 
-    if (file.isFile) {
-      new FileStorage(this, file)
-    } else {
-      val metadata = DirectoryScanner.metadata(file.getName, directory, file).get
-      new NonRootDirectoryStorage(this, metadata, file)
+    names map { name =>
+      val fileCandidate = new File(directory, name + ".xml")
+      val directoryCandidate = new File(directory, name)
+      require((fileCandidate.exists || directoryCandidate.exists) && !(fileCandidate.exists && directoryCandidate.exists))
+      val file = if (fileCandidate.exists) fileCandidate else directoryCandidate
+
+      if (file.isFile) {
+        new FileStorage(this, file)
+      } else {
+        val metadata = DirectoryScanner.metadata(file.getName, directory, file).get
+        new NonRootDirectoryStorage(this, metadata, file)
+      }
     }
   }
 }

@@ -19,17 +19,10 @@ package org.podval.judaica.viewer
 
 object Orderer {
 
-  // TODO is there a superclass for Set and Seq that has "--" - so that I can have one entry point here for both?
+  def close[K](arcs: Map[K, Seq[K]]): Map[K, Set[K]] = close(arcs.keySet, arcs.mapValues(_.toSet))
 
 
-  def order[K](arcs: Map[K, Seq[K]]): Either[Set[K], Seq[K]] = orderSets(arcs.mapValues(_.toSet))
-
-
-  def orderSets[K](arcs: Map[K, Set[K]]): Either[Set[K], Seq[K]] = order(arcs.keySet, arcs)
-
-
-  def order[K](roots: Set[K], arcs: K => Set[K]): Either[Set[K], Seq[K]] = {
-
+  def close[K](roots: Set[K], arcs: K => Set[K]): Map[K, Set[K]] = {
     def close(root: K): Set[K] = {
       def close(acc: Set[K], next: Set[K]): Set[K] = {
         val add: Set[K] = next -- acc
@@ -39,26 +32,25 @@ object Orderer {
       close(Set.empty, arcs(root))
     }
 
+    roots.map(root => (root -> close(root))).toMap
+  }
 
-    def order(reachable: Map[K, Set[K]]): Seq[K] = {
-      def order(acc: Seq[K], left: Set[K]): Seq[K] = {
-        if (left.isEmpty) acc else {
-          val next = left.filter(reachable(_).subsetOf(acc.toSet))
-          require(!next.isEmpty)
-          order(acc ++ next, left -- next)
-        }
+
+  def inCycles[K](reachable: Map[K, Set[K]]): Set[K] = {
+    def cycled: Map[K, Set[K]] = reachable.filter { case (k, c) => c.contains(k) }
+    cycled.map(_._1).toSet
+  }
+
+
+  def order[K](reachable: Map[K, Set[K]]): Seq[K] = {
+    def order(acc: Seq[K], left: Set[K]): Seq[K] = {
+      if (left.isEmpty) acc else {
+        val next = left.filter(reachable(_).subsetOf(acc.toSet))
+        require(!next.isEmpty)
+        order(acc ++ next, left -- next)
       }
-
-      order(Seq.empty, reachable.keys.toSet)
     }
 
-
-    val reachable: Map[K, Set[K]] = roots.map(r => (r -> close(r))).toMap
-
-    val cycled: Map[K, Set[K]] = reachable.filter { case (k, c) => c.contains(k) }
-
-    val inCycles: Set[K] = cycled.map(_._1).toSet
-
-    if (inCycles.isEmpty) Right(order(reachable)) else Left(inCycles)
+    order(Seq.empty, reachable.keys.toSet)
   }
 }
