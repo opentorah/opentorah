@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>org.podval.judaica.common</artifactId>
+            <artifactId>org.podval.judaica.viewer</artifactId>
             <version>${project.version}</version>
         </dependency>
 

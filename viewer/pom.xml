@@ -12,12 +12,4 @@
     <artifactId>org.podval.judaica.viewer</artifactId>
     <name>Judaica Viewer</name>
     <packaging>jar</packaging>
-
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>org.podval.judaica.common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
 </project>
