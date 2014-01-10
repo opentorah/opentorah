@@ -57,7 +57,7 @@ final class DirectoryStorage(structures: Seq[Structure], metadata: Elem, directo
 
   val files: Seq[Storage] = {
     structure.divs map { div =>
-      val name = if (structure.selector.isNumbered) div.asNumbered.number.toString else div.asNamed.names.default.name
+      val name = div.id
       val fileCandidate = new File(directory, name + ".xml")
       val directoryCandidate = new File(directory, name)
       require((fileCandidate.exists || directoryCandidate.exists), s"One of the files $fileCandidate or $directoryCandidate must exist")

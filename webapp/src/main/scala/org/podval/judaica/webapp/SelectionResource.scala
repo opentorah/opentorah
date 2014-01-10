@@ -17,7 +17,7 @@
 package org.podval.judaica.webapp
 
 import org.podval.judaica.xml.Html
-import org.podval.judaica.viewer.{Edition, Names}
+import org.podval.judaica.viewer.{Structure, Edition, Div}
 
 import javax.ws.rs.{PathParam, GET, Path}
 import javax.ws.rs.core.{UriInfo, Context}
@@ -36,7 +36,7 @@ class SelectionResource(edition: Edition) {
   @GET
   @Path("/{selector}")
   def structure(@PathParam("selector") selectorName: String, @Context uriInfo: UriInfo) = {
-    val table = Table.build(getStructure(selectorName).named, uriInfo.getAbsolutePathBuilder, None)
+    val table = Table.build(getStructure(selectorName).divs, (div: Div) => div.id, uriInfo.getAbsolutePathBuilder, None)
     val stylesheet = uriInfo.getBaseUriBuilder.path("judaica").build().toString
     Html.html(stylesheet, table)
   }
@@ -46,12 +46,12 @@ class SelectionResource(edition: Edition) {
   @Path("/{selector}/{name}")
   def selection(@PathParam("selector") selectorName: String, @PathParam("name") name: String) = {
     val structure = getStructure(selectorName)
-    val div = Existence.verify(structure.byName(name), name, structure.selector.names.default.name)
+//    val div = Existence.verify(structure.byName(name), name, structure.names.default.name)
     // TODO introduce some kind of parameter to distinguish request for the book and its display; use it here to retrieve metadata?
 /////    val content = edition.storage.content(structure.type_, name)
     "QQ!"
   }
 
 
-  private[this] def getStructure(name: String) = Existence.verify(edition.work.structures.byName(name), name, "structure")
+  private[this] def getStructure(name: String): Structure = Existence.verify(edition.work.structureByName(name), name, "structure")
 }

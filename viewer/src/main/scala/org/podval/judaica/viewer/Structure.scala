@@ -40,6 +40,8 @@ abstract class Div(val selectors: Seq[Selector], val structures: Seq[Structure])
   def isNumbered: Boolean
   def asNumbered: NumberedDiv
   def asNamed: NamedDiv
+
+  def id: String
 }
 
 
@@ -73,15 +75,18 @@ final class NamedSelector(names: Names, selectors: Seq[Selector]) extends Select
 
 
 final class NumberedDiv(val number: Int, selectors: Seq[Selector], structures: Seq[Structure]) extends Div(selectors, structures) {
-  def isNumbered: Boolean = true
-  def asNumbered: NumberedDiv = this
-  def asNamed: NamedDiv = throw new ClassCastException
+  override def isNumbered: Boolean = true
+  override def asNumbered: NumberedDiv = this
+  override def asNamed: NamedDiv = throw new ClassCastException
 
+  override def id: String = number.toString
 }
 
 
 final class NamedDiv(override val names: Names, selectors: Seq[Selector], structures: Seq[Structure]) extends Div(selectors, structures) with Named {
-  def isNumbered: Boolean = false
-  def asNumbered: NumberedDiv = throw new ClassCastException
-  def asNamed: NamedDiv = this
+  override def isNumbered: Boolean = false
+  override def asNumbered: NumberedDiv = throw new ClassCastException
+  override def asNamed: NamedDiv = this
+
+  override def id: String = names.default.name
 }

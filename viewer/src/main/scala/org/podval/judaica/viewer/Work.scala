@@ -27,11 +27,12 @@ object Works {
   val textsDirectory = new File("/home/dub/Code/judaica/texts/")
 
 
-  val works: Soft[Seq[Work]] =
+  def works: Seq[Work] = works_.get
+  private[this] val works_ : Soft[Seq[Work]] =
     Soft(DirectoryScanner.describedDirectories(textsDirectory).map(d => new Work(d.name, d.directory, d.index)))
 
 
-  def workByName(name: String): Option[Work] = Names.find(works(), name)
+  def workByName(name: String): Option[Work] = Names.find(works, name)
 }
 
 

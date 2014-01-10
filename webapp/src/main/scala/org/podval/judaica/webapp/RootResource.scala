@@ -46,7 +46,7 @@ class RootResource {
   @GET
   @Path("/works")
   def works(@Context uriInfo: UriInfo) = {
-    val table: Elem = Table.build(Works.named, uriInfo.getAbsolutePathBuilder, Some("editions"))
+    val table: Elem = Table.build(Works.works, (work: Work) => work.names.default.name, uriInfo.getAbsolutePathBuilder, Some("editions"))
     val stylesheet = uriInfo.getBaseUriBuilder.path("judaica").build().toString
     Html.html(stylesheet, table)
   }
@@ -65,7 +65,7 @@ class RootResource {
   @Path("/works/{work}/editions")
   def editions(@PathParam("work") workName: String, @Context uriInfo: UriInfo) = {
     val work = getWork(workName)
-    val table = Table.build(work.editions.named, uriInfo.getAbsolutePathBuilder, None)
+    val table = Table.build(work.editions, (edition: Edition) => edition.names.default.name, uriInfo.getAbsolutePathBuilder, None)
     // TODO cascade to the Work's stylesheet if it exists...
     val stylesheet = "/judaica" // TODO uriInfo.getBaseUriBuilder.path("judaica").build().toString
     Html.html(stylesheet, table)
@@ -75,15 +75,6 @@ class RootResource {
   // TODO handle skipped "editions" - use default edition
 
 
-//  @GET
-//  @Path("/works/{work}/editions/{edition}")
-//  def edition(@PathParam("work") workName: String, @PathParam("edition") editionName: String) = {
-//    val edition = getEdition(workName, editionName)
-//    // TODO Metadata!
-//    edition.toString
-//  }
-
-
   @Path("/works/{work}/editions/{edition}")
   def selection(@PathParam("work") workName: String, @PathParam("edition") editionName: String, @PathParam("selection") selectionKey: String) = {
     val edition = getEdition(workName, editionName)
@@ -91,11 +82,11 @@ class RootResource {
   }
 
 
-  private[this] def getWork(name: String): Work = Existence.verify(Works.byName(name), name, "work")
+  private[this] def getWork(name: String): Work = Existence.verify(Works.workByName(name), name, "work")
 
 
   private[this] def getEdition(workName: String, editionName: String): Edition = getEdition(getWork(workName), editionName)
 
 
-  private[this] def getEdition(work: Work, name: String): Edition = Existence.verify(work.editions.byName(name), name, "edition")
+  private[this] def getEdition(work: Work, name: String): Edition = Existence.verify(work.editionByName(name), name, "edition")
 }

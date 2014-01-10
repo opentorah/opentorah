@@ -23,10 +23,10 @@ import javax.ws.rs.core.UriBuilder
 
 object Table {
 
-  def build[T <: Named](data: Seq[T], uriBuilder: UriBuilder, suffix: Option[String]): Elem =
+  def build[T](data: Seq[T], nameColumn: T => String, uriBuilder: UriBuilder, suffix: Option[String]): Elem =
     <table>{
-      data.map { named =>
-        val name = named.names.default.name
+      data.map { d =>
+        val name = nameColumn(d)
         val beforeSuffix = UriBuilderCloner.copy(uriBuilder).path(name)
         val uri = (if (suffix.isEmpty) beforeSuffix else beforeSuffix.path(suffix.get)).build()
 
