@@ -29,6 +29,10 @@ object Load {
     open(XML.load(clazz.getResourceAsStream(name + ".xml")), tag)
 
 
+  // TODO do a little caching? With Soft...
+  def loadMetadata(file: File): Elem = loadFile(file, "index")
+
+
   def loadFile(file: File, tag: String): Elem = open(XML.loadFile(file), tag)
 
 

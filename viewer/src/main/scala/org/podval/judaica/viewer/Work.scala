@@ -16,40 +16,63 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml.XmlOps
 
+import org.podval.judaica.xml.Load
 import scala.xml.Elem
-
 import java.io.File
 
 
-// TODO do weak references and lazy (re-)load!!!
-
-
-object Works extends ByName[Work] {
+object Works {
 
   val textsDirectory = new File("/home/dub/Code/judaica/texts/")
 
 
-  override lazy val named: Seq[Work] =
-    DirectoryScanner.describedDirectories(textsDirectory).map(d => new Work(d.name, d.metadata, d.directory))
+  val works: Soft[Seq[Work]] =
+    Soft(DirectoryScanner.describedDirectories(textsDirectory).map(d => new Work(d.name, d.directory, d.index)))
+
+
+  def workByName(name: String): Option[Work] = Names.find(works(), name)
 }
 
 
 
-final class Work(name: String, metadata: Elem, val directory: File) extends Named {
+final class Work(name: String, val directory: File, index: File) extends Named {
 
-  override val names = Names(name, metadata)
-
-
-  val selectors: Selectors = Selectors(metadata)
+  override val names: Names = Names(/*name,*/ metadata) // TODO eliminate addition of the name
 
 
-  val structures: Structures = Structures(selectors, metadata.oneChild("structures"))  // TODO make structures optional?
+  def selectors: Seq[Selector] = selectors_.get
+  def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
+  private[this] val selectors_ : Soft[Seq[Selector]] = Soft(Parser.parseSelectors(Seq.empty, metadata))
 
 
-  lazy val editions = new Editions(this)
+  def structures: Seq[Structure] = structures_.get
+  def structureByName(name: String): Option[Structure] = Names.find(structures, name)
+  private[this] val structures_ : Soft[Seq[Structure]] = Soft(Parser.parseStructures(selectors, metadata))
+
+
+  def editions: Seq[Edition] = editions_.get
+  def editionByName(name: String): Option[Edition] = Names.find(editions, name)
+  private[this] val editions_ : Soft[Seq[Edition]] =
+    Soft(DirectoryScanner.describedDirectories(directory).map(d => new Edition(this, d.name, d.directory, d.index)))
+
+
+  private[this] def metadata: Elem = Load.loadMetadata(index)
 
 
   override def toString: String = "Work (" + directory + ") " + names
+}
+
+
+
+final class Edition(val work: Work, name: String, directory: File, index: File) extends Named {
+
+  override val names: Names = Names(/*name,*/ metadata) // TODO eliminate addition of the name
+
+
+  def storage: Storage = storage_.get
+  private[this] val storage_ : Soft[Storage] = Soft(new DirectoryStorage(work.structures, metadata, directory))
+
+
+  private[this] def metadata: Elem = Load.loadMetadata(index)
 }

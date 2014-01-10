@@ -21,69 +21,67 @@ import org.podval.judaica.xml.Xml.XmlOps
 import scala.xml.Elem
 
 
-final class Structures private(val structures: Seq[Structure]) {
+abstract class Structure(val selector: Selector, val divs: Seq[Div]) extends Named {
 
-  def byName(name: String): Option[Structure] = structures.find(_.selector.names.has(name))
+  final override def names = selector.names
+}
+
+
+abstract class Selector(override val names: Names, val selectors: Seq[Selector]) extends Named {
+  def isNumbered: Boolean
+  def asNumbered: NumberedSelector
+  def asNamed: NamedSelector
+
+  def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
+}
+
+
+abstract class Div(val selectors: Seq[Selector], val structures: Seq[Structure]) {
+  def isNumbered: Boolean
+  def asNumbered: NumberedDiv
+  def asNamed: NamedDiv
 }
 
 
 
-abstract class Structure(val selector: Selector, val divs: Seq[Div])
+final class NamedStructure(
+  override val selector: NamedSelector,
+  override val divs: Seq[NamedDiv]) extends Structure(selector, divs)
 
 
-final class NamedStructure(override val selector: NamedSelector, override val divs: Seq[NamedDiv]) extends Structure(selector, divs) with ByName[NamedDiv] {
-
-  override def named = divs
+final class NumberedStructure(
+  override val selector: NumberedSelector,
+  override val divs: Seq[NumberedDiv]) extends Structure(selector, divs)   // TODO something with known length, not Seq...
+{
 }
 
 
-final class NumberedStructure(override val selector: NumberedSelector, override val divs: Seq[NumberedDiv]) extends Structure(selector, divs) {  // TODO something with known length, not Seq...
+
+final class NumberedSelector(names: Names, selectors: Seq[Selector]) extends Selector(names, selectors) {
+  override def isNumbered: Boolean = true
+  override def asNumbered: NumberedSelector = this
+  override def asNamed: NamedSelector = throw new ClassCastException
+}
+
+
+final class NamedSelector(names: Names, selectors: Seq[Selector]) extends Selector(names, selectors) {
+  override def isNumbered: Boolean = false
+  override def asNumbered: NumberedSelector = throw new ClassCastException
+  override def asNamed: NamedSelector = this
 }
 
 
 
-abstract class Div(val structures: Structures)
+final class NumberedDiv(val number: Int, selectors: Seq[Selector], structures: Seq[Structure]) extends Div(selectors, structures) {
+  def isNumbered: Boolean = true
+  def asNumbered: NumberedDiv = this
+  def asNamed: NamedDiv = throw new ClassCastException
 
-final class NumberedDiv(val number: Int, structures: Structures) extends Div(structures)
-
-final class NamedDiv(override val names: Names, structures: Structures) extends Div(structures) with Named
-
-
-
-object Structures {
-
-  def apply(selectors: Selectors, xml: Elem): Structures = parseStructures(selectors, xml)
+}
 
 
-  private def parseStructures(selectors: Selectors, xml: Elem): Structures = {
-    val structures = xml.elemsFilter("selector").map(parseStructure(selectors, _))
-    new Structures(structures)
-  }
-
-
-  private def parseStructure(selectors: Selectors, xml: Elem): Structure = {
-    val selector: Selector = selectors.byName(xml.getAttribute("name")).get
-
-    def parseDivs[T <: Div](f: (Selectors, Elem) => T): Seq[T] = xml.elems("div").map(f(selector.selectors, _))
-
-    if (selector.isNumbered) {
-      new NumberedStructure(selector.asNumbered, parseDivs(parseNumberedDiv))
-    } else {
-      new NamedStructure(selector.asNamed, parseDivs(parseNamedDiv))
-    }
-  }
-
-
-  private def parseNamedDiv(selectors: Selectors, xml: Elem): NamedDiv = {
-    val structures = parseStructures(selectors, xml)
-    val names = Names(xml)
-    new NamedDiv(names, structures)
-  }
-
-
-  private def parseNumberedDiv(selectors: Selectors, xml: Elem): NumberedDiv = {
-    val structures = parseStructures(selectors, xml)
-    val n = xml.getIntAttribute("n")
-    new NumberedDiv(n, structures)
-  }
+final class NamedDiv(override val names: Names, selectors: Seq[Selector], structures: Seq[Structure]) extends Div(selectors, structures) with Named {
+  def isNumbered: Boolean = false
+  def asNumbered: NumberedDiv = throw new ClassCastException
+  def asNamed: NamedDiv = this
 }

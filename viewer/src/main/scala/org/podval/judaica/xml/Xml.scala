@@ -98,6 +98,5 @@ object Xml {
 
 
 
-
   def booleanAttribute(value: Boolean) = if (value) Some(Text("true")) else None
 }

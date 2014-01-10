@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,27 @@
 
 package org.podval.judaica.viewer
 
-import scala.xml.Elem
 
-import java.io.File
+final class Soft[T] private(gen: => T) {
+
+  private[this] var cache = new java.lang.ref.SoftReference(null.asInstanceOf[T])
 
 
-final class Editions(work: Work) extends ByName[Edition] {
+  def apply(): T = {
+    val value = cache.get
+    if (value != null) value else {
+      cache = new java.lang.ref.SoftReference(gen)
+      cache.get
+    }
+  }
 
-  override val named =
-    DirectoryScanner.describedDirectories(work.directory).map(d => new Edition(work, d.name, d.metadata, d.directory))
+
+  def get: T = apply()
 }
 
 
 
-class Edition(val work: Work, name: String, metadata: Elem, directory: File) extends Named {
+object Soft {
 
-  override val names = Names(name, metadata)
-
-
-  lazy val storage: Storage = new RootDirectoryStorage(this, metadata, directory)
+  def apply[T](gen: => T) = new Soft(gen)
 }

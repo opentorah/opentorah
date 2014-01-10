@@ -28,28 +28,41 @@ trait Named {
 
 
 
-trait ByName[T <: Named] {
+final class Name(val name: String, val lang: String, val isTransliterated: Boolean) {
 
-  def named: Seq[T]
-
-
-  final def byName(name: String): Option[T] = named.find(_.names.has(name))
+  override def toString: String =
+    "Name: " + name + " (" + lang + (if (!isTransliterated) "" else ", " + isTransliterated) +  ")"
 }
 
 
 
-final class Names(name: Option[String], xml: Elem) {
+object Name {
+
+  def apply(xml: Elem) = new Name(
+    xml.getAttribute("name"),
+    xml.getAttribute("lang"),
+    xml.booleanAttribute("isTransliterated")
+  )
+}
+
+
+
+// TODO factor the parsing out
+final class Names(name: Option[String], xml: Elem, canBeEmpty: Boolean) {
 
   val names: Seq[Name] = {
-    val rawNames: Seq[Name] = xml.elems("names", "name").map(new Name(_))
-    if (name.isDefined && !find(name.get, rawNames).isDefined) (new Name(name.get, "en", false) +: rawNames) else rawNames
+    val rawNames: Seq[Name] = xml.elemsFilter("name").map(Name(_))
+    val isEmpty = rawNames.isEmpty
+    require(canBeEmpty || !isEmpty, "No names found")
+    // TODO can this adding of the name be eliminated?
+    if (!isEmpty && name.isDefined && !find(rawNames, name.get).isDefined) (new Name(name.get, "en", false) +: rawNames) else rawNames
   }
 
 
-  def find(name: String): Option[Name] = find(name, names)
+  def find(name: String): Option[Name] = find(names, name)
 
 
-  private[this] def find(name: String, names: Seq[Name]): Option[Name] = names.find(_.name == name)
+  private[this] def find(names: Seq[Name], name: String): Option[Name] = names.find(_.name == name)
 
 
   def has(name: String): Boolean = find(name).isDefined
@@ -61,6 +74,9 @@ final class Names(name: Option[String], xml: Elem) {
   def default: Name = names(0)
 
 
+  def isEmpty: Boolean = names.isEmpty
+
+
   override def toString: String = "Names: " + names
 }
 
@@ -68,23 +84,11 @@ final class Names(name: Option[String], xml: Elem) {
 
 object Names {
 
-  def apply(name: String, xml: Elem): Names = new Names(Some(name), xml)
+//  def apply(name: String, xml: Elem, canBeEmpty: Boolean = false): Names = new Names(Some(name), xml, canBeEmpty)
 
 
-  def apply(xml: Elem): Names = new Names(None, xml)
-}
+  def apply(xml: Elem, canBeEmpty: Boolean = false): Names = new Names(None, xml, canBeEmpty)
 
 
-
-final class Name(val name: String, val lang: String, val isTransliterated: Boolean) {
-
-  def this(xml: Elem) = this(
-    xml.getAttribute("name"),
-    xml.getAttribute("lang"),
-    xml.booleanAttribute("isTransliterated")
-  )
-
-
-  override def toString: String =
-    "Name: " + name + " (" + lang + (if (!isTransliterated) "" else ", " + isTransliterated) +  ")"
+  def find[T <: Named](nameds: Seq[T], name: String): Option[T] = nameds.find(_.names.has(name))
 }

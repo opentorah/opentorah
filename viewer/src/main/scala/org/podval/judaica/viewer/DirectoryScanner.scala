@@ -18,14 +18,12 @@ package org.podval.judaica.viewer
 
 import org.podval.judaica.xml.Load
 
-import scala.xml.Elem
-
 import java.io.File
 
 
 object DirectoryScanner {
 
-  case class DescribedDirectory(name: String, directory: File, metadata: Elem)
+  case class DescribedDirectory(name: String, directory: File, index: File)
 
 
   def describedDirectories(directory: File): Seq[DescribedDirectory] = {
@@ -38,13 +36,12 @@ object DirectoryScanner {
   }
 
 
-  def metadata(name: String, directory: File, subdirectory: File): Option[Elem] = {
+  def metadata(name: String, directory: File, subdirectory: File): Option[File] = {
     val metadataFileInParent = new File(directory, name + ".xml")
     val metadataFileInSubdirectory = new File(subdirectory, "index.xml")
     if (!metadataFileInParent.exists && !metadataFileInSubdirectory.exists) None else {
       val file = if (metadataFileInSubdirectory.exists) metadataFileInSubdirectory else metadataFileInParent
-      val metadata = Load.loadFile(file, "index")
-      Some(metadata)
+      Some(file)
     }
   }
 }

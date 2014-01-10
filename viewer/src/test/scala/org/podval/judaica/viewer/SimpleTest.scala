@@ -24,48 +24,48 @@ import org.junit.Assert.{assertTrue, assertFalse, assertEquals}
 class SimpleTest {
 
   @Test
-  def findChumash = assertTrue(Works.byName("Хумаш").isDefined)
+  def findChumash = assertTrue(Works.workByName("Хумаш").isDefined)
 
 
   @Test
-  def findTanach = assertTrue(Works.byName("Tanach").isDefined)
+  def findTanach = assertTrue(Works.workByName("Tanach").isDefined)
 
 
   @Test
   def bookSelector = {
-    val bookOption = Works.byName("Tanach").get.selectors.byName("book")
+    val bookOption = Works.workByName("Tanach").get.selectorByName("book")
     assertTrue(bookOption.isDefined)
     val book = bookOption.get
-    assertEquals(Set("chapter", "week"), book.selectors.named.map(_.names.default.name).toSet)
+    assertEquals(Set("chapter", "week"), book.selectors.map(_.names.default.name).toSet)
     assertFalse(book.isNumbered)
   }
 
 
   @Test
   def chapterSelector = {
-    val chapterOption = Works.byName("Tanach").get.selectors.byName("book").get.selectors.byName("chapter")
+    val chapterOption = Works.workByName("Tanach").get.selectorByName("book").get.selectorByName("chapter")
     assertTrue(chapterOption.isDefined)
     val chapter = chapterOption.get
-    assertEquals(Set("verse"), chapter.selectors.named.map(_.names.default.name).toSet)
+    assertEquals(Set("verse"), chapter.selectors.map(_.names.default.name).toSet)
     assertTrue(chapter.isNumbered)
   }
 
 
   @Test
-  def defaultName = assertEquals("Tanach", Works.byName("Хумаш").get.names.default.name)
+  def defaultName = assertEquals("Tanach", Works.workByName("Хумаш").get.names.default.name)
 
 
   @Test
-  def directory = assertEquals("Tanach", Works.byName("Хумаш").get.directory.getName)
+  def directory = assertEquals("Tanach", Works.workByName("Хумаш").get.directory.getName)
 
 
   @Test
-  def findTorontoEdition = assertTrue(Works.byName("Tanach").get.editions.byName("Toronto").isDefined)
+  def findTorontoEdition = assertTrue(Works.workByName("Tanach").get.editionByName("Toronto").isDefined)
 
 
   @Test
   def jerusalemEditionStorage = {
-    val storage = Works.byName("Tanach").get.editions.byName("Jerusalem").get.storage
+    val storage = Works.workByName("Tanach").get.editionByName("Jerusalem").get.storage
     assertTrue(storage.isDirectory)
     assertEquals("book", storage.asDirectory.structure.selector.names.default.name)
     assertEquals(5, storage.asDirectory.files.length)
