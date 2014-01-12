@@ -16,7 +16,7 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml.XmlOps
+import org.podval.judaica.xml.Xml.Ops
 
 import scala.xml.Elem
 
@@ -48,15 +48,9 @@ object Name {
 
 
 // TODO factor the parsing out
-final class Names(name: Option[String], xml: Elem, canBeEmpty: Boolean) {
+final class Names(xml: Elem, canBeEmpty: Boolean) {
 
-  val names: Seq[Name] = {
-    val rawNames: Seq[Name] = xml.elemsFilter("name").map(Name(_))
-    val isEmpty = rawNames.isEmpty
-    require(canBeEmpty || !isEmpty, "No names found")
-    // TODO can this adding of the name be eliminated?
-    if (!isEmpty && name.isDefined && !find(rawNames, name.get).isDefined) (new Name(name.get, "en", false) +: rawNames) else rawNames
-  }
+  val names: Seq[Name] = Existence.verify(xml.elemsFilter("name").map(Name(_)), "names")
 
 
   def find(name: String): Option[Name] = find(names, name)
@@ -87,7 +81,7 @@ object Names {
 //  def apply(name: String, xml: Elem, canBeEmpty: Boolean = false): Names = new Names(Some(name), xml, canBeEmpty)
 
 
-  def apply(xml: Elem, canBeEmpty: Boolean = false): Names = new Names(None, xml, canBeEmpty)
+  def apply(xml: Elem, canBeEmpty: Boolean = false): Names = new Names(xml, canBeEmpty)
 
 
   def find[T <: Named](nameds: Seq[T], name: String): Option[T] = nameds.find(_.names.has(name))

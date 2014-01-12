@@ -24,7 +24,7 @@ import java.io.{FileWriter, PrintWriter, File}
 
 object Xml {
 
-  implicit class XmlOps(elem: Elem) {
+  implicit class Ops(elem: Elem) {
 
     def elems(plural: String, singular: String, required: Boolean = true): Seq[Elem] = {
       val child = oneOptionalChild(plural, required)

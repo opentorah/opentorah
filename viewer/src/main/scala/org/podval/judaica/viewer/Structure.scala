@@ -16,8 +16,7 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml.XmlOps
-
+import org.podval.judaica.xml.Xml.Ops
 import scala.xml.Elem
 
 
@@ -25,25 +24,6 @@ abstract class Structure(val selector: Selector, val divs: Seq[Div]) extends Nam
 
   final override def names = selector.names
 }
-
-
-abstract class Selector(override val names: Names, val selectors: Seq[Selector]) extends Named {
-  def isNumbered: Boolean
-  def asNumbered: NumberedSelector
-  def asNamed: NamedSelector
-
-  def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
-}
-
-
-abstract class Div(val selectors: Seq[Selector], val structures: Seq[Structure]) {
-  def isNumbered: Boolean
-  def asNumbered: NumberedDiv
-  def asNamed: NamedDiv
-
-  def id: String
-}
-
 
 
 final class NamedStructure(
@@ -54,39 +34,28 @@ final class NamedStructure(
 final class NumberedStructure(
   override val selector: NumberedSelector,
   override val divs: Seq[NumberedDiv]) extends Structure(selector, divs)   // TODO something with known length, not Seq...
-{
-}
 
 
+object Structure {
 
-final class NumberedSelector(names: Names, selectors: Seq[Selector]) extends Selector(names, selectors) {
-  override def isNumbered: Boolean = true
-  override def asNumbered: NumberedSelector = this
-  override def asNamed: NamedSelector = throw new ClassCastException
-}
+  def parseStructures(selectors: Seq[Selector], xmls: Elem): Seq[Structure] = xmls.elemsFilter("structure").map(parseStructure(selectors, _))
 
 
-final class NamedSelector(names: Names, selectors: Seq[Selector]) extends Selector(names, selectors) {
-  override def isNumbered: Boolean = false
-  override def asNumbered: NumberedSelector = throw new ClassCastException
-  override def asNamed: NamedSelector = this
-}
+  private def parseStructure(selectors: Seq[Selector], xml: Elem): Structure = {
+    val selectorName = xml.getAttribute("selector")
+    val selector = Existence.verify(Names.find(selectors, selectorName), selectorName, "selector")
+    val uncles = selectors.takeWhile(_ != selector)
 
+    val divXmls = xml.elemsFilter("div")
 
-
-final class NumberedDiv(val number: Int, selectors: Seq[Selector], structures: Seq[Structure]) extends Div(selectors, structures) {
-  override def isNumbered: Boolean = true
-  override def asNumbered: NumberedDiv = this
-  override def asNamed: NamedDiv = throw new ClassCastException
-
-  override def id: String = number.toString
-}
-
-
-final class NamedDiv(override val names: Names, selectors: Seq[Selector], structures: Seq[Structure]) extends Div(selectors, structures) with Named {
-  override def isNumbered: Boolean = false
-  override def asNumbered: NumberedDiv = throw new ClassCastException
-  override def asNamed: NamedDiv = this
-
-  override def id: String = names.default.name
+    if (selector.isNumbered) {
+      val numberedSelector = selector.asNumbered
+      val divs = divXmls.zipWithIndex.map { case (xml, num) => Div.numbered(uncles, numberedSelector, num+1, xml) }
+      new NumberedStructure(numberedSelector, divs)
+    } else {
+      val namedSelector = selector.asNamed
+      val divs = divXmls.map(Div.named(uncles, namedSelector, _))
+      new NamedStructure(namedSelector, divs)
+    }
+  }
 }

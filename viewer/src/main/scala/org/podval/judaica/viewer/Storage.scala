@@ -16,12 +16,12 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml.XmlOps
+import org.podval.judaica.xml.Xml.Ops
+import org.podval.judaica.xml.XmlFile
 
 import scala.xml.Elem
 
 import java.io.File
-import org.podval.judaica.xml.Load
 
 
 // TODO factor the parsing out
@@ -68,7 +68,7 @@ final class DirectoryStorage(structures: Seq[Structure], metadata: Elem, directo
         new FileStorage(file)
       } else {
         val metadataFile = DirectoryScanner.metadata(file.getName, directory, file).get
-        val metadata = Load.loadMetadata(metadataFile)
+        val metadata = XmlFile.loadMetadata(metadataFile)
         new DirectoryStorage(div.structures, metadata, file)
       }
     }

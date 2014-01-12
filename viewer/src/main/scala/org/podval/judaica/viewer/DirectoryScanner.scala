@@ -16,7 +16,7 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Load
+import org.podval.judaica.xml.XmlFile
 
 import java.io.File
 

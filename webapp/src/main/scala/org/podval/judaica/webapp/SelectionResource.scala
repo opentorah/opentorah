@@ -26,7 +26,7 @@ import javax.ws.rs.core.{UriInfo, Context}
 class SelectionResource(edition: Edition) {
 
   @GET
-  @Path("/")
+//  @Path("/")
   def metadata = {
     // TODO Metadata!
     edition.toString

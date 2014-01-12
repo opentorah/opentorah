@@ -18,9 +18,9 @@
 package org.podval.judaica.importers
 package tanach
 
-import org.podval.judaica.xml.{Xml, Div, Load}
+import org.podval.judaica.xml.{Xml, Div, XmlFile}
 
-import Xml.XmlOps
+import Xml.Ops
 
 import scala.xml.{Node, Elem}
 
@@ -41,7 +41,7 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
   protected final override def processBook(xml: Elem, outputName: String): Elem = {
     // TODO write a merge function - and reformat the metadata accordingly?
     val breaks =
-      Load.loadResource(classOf[TanachImporter], outputName, "meta").elems
+      XmlFile.loadResource(classOf[TanachImporter], outputName, "meta").elems
         .groupBy(_.getAttribute("chapter"))
         .mapValues(_.groupBy(_.getAttribute("verse")).mapValues(_.map(dropChapterAndVerse)))
 

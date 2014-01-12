@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013 Leonid Dubinsky <dub@podval.org>.
+ * Copyright 2012-2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,26 +12,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * under the License.
  */
 
-package org.podval.judaica.xml
-
-import Xml.Ops
-
-import scala.xml.Elem
+package org.podval.judaica.viewer
 
 
-object Div {
-
-  def apply(type_ : String, n : String, contents: Seq[Elem]): Elem =
-    <div type={type_} n={n}>{contents}</div>
+class Editions(val work: Work) {
+}
 
 
-  def unapply(elem: Elem): Option[(String, String, Seq[Elem])] =
-    if (elem.label == "div") Some((
-      elem.getAttribute("type"),
-      elem.getAttribute("n"),
-      elem.elems
-    )) else None
+class NoEditions(work: Work) extends Editions(work) {
+}
+
+
+class LinearEditions(work: Work, val editions: Seq[Edition]) extends Editions(work) {
+}
+
+
+class DiffEdition(work: Work, val edition1: Edition, val edition2: Edition) extends Editions(work) {
+}
+
+
+class SingeEdition(work: Work, val edition: Edition) extends Editions(work) {
 }

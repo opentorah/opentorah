@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,26 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * under the License.
  */
 
-package org.podval.judaica.xml
-
-import Xml.Ops
-
-import scala.xml.Elem
+package org.podval.judaica.viewer
 
 
-object Div {
+object Existence {
 
-  def apply(type_ : String, n : String, contents: Seq[Elem]): Elem =
-    <div type={type_} n={n}>{contents}</div>
+  def verify[T](value: Option[T], name: String, what: String): T = {
+    require(!value.isEmpty, s"$what $name does not exist")
+    value.get
+  }
 
 
-  def unapply(elem: Elem): Option[(String, String, Seq[Elem])] =
-    if (elem.label == "div") Some((
-      elem.getAttribute("type"),
-      elem.getAttribute("n"),
-      elem.elems
-    )) else None
+  def verify[T](value: Seq[T], what: String): Seq[T] = {
+    require(!value.isEmpty, s"$what does not exist")
+    value
+  }
 }

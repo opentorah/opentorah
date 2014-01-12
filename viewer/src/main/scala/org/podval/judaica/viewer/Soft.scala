@@ -19,6 +19,7 @@ package org.podval.judaica.viewer
 
 final class Soft[T] private(gen: => T) {
 
+  // TODO switch to weak references, after all (and rename the class to something generic...)?
   private[this] var cache = new java.lang.ref.SoftReference(null.asInstanceOf[T])
 
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2013-2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,27 +17,34 @@
 
 package org.podval.judaica.xml
 
-import Xml.XmlOps
+import Xml.Ops
 import scala.xml.{Utility, XML, Elem}
-
+import scala.collection.mutable.WeakHashMap
 import java.io.File
 
 
-object Load {
+object XmlFile {
 
   def loadResource(clazz: Class[_], name: String, tag: String): Elem =
     open(XML.load(clazz.getResourceAsStream(name + ".xml")), tag)
 
 
-  // TODO do a little caching? With Soft...
-  def loadMetadata(file: File): Elem = loadFile(file, "index")
+  def loadMetadata(file: File): Elem = load(file, "index")
 
 
-  def loadFile(file: File, tag: String): Elem = open(XML.loadFile(file), tag)
+  def load(file: File, tag: String): Elem = open(load(file), tag)
 
 
-  def loadFile(file: File): Elem = XML.loadFile(file)
+  def load(file: File): Elem = {
+    if (!cache.contains(file)) {
+      cache.put(file, XML.loadFile(file))
+    }
+    cache(file)
+  }
 
 
   private def open(what: Elem, tag: String): Elem = Utility.trimProper(what)(0).asInstanceOf[Elem].check(tag)
+
+
+  private[this] val cache: WeakHashMap[File, Elem] = new WeakHashMap[File, Elem]
 }

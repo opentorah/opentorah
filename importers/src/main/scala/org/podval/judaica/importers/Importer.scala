@@ -17,7 +17,7 @@
 
 package org.podval.judaica.importers
 
-import org.podval.judaica.xml.Xml.XmlOps
+import org.podval.judaica.xml.Xml.Ops
 
 import scala.xml.Elem
 
