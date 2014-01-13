@@ -89,7 +89,7 @@ object SelectionResource {
 
 
   val structuresColumn: LinkColumn[Structure] = new SimpleLinkColumn[Structure]("Structure") {
-    override def text(structure: Structure): String = structure.names.default.name
+    override def text(structure: Structure): String = structure.defaultName
   }
 
 
@@ -98,7 +98,7 @@ object SelectionResource {
       queryParam("showContent", true: java.lang.Boolean).
       queryParam("contentFormat", text(format))
 
-    override def text(format: Seq[Selector]): String = format.map(_.names.default.name).mkString("/")
+    override def text(format: Seq[Selector]): String = format.map(_.defaultName).mkString("/")
   }
 
 

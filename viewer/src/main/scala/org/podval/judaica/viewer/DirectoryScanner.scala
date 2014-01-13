@@ -16,32 +16,18 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.XmlFile
-
 import java.io.File
 
 
 object DirectoryScanner {
 
-  case class DescribedDirectory(name: String, directory: File, index: File)
-
-
-  def describedDirectories(directory: File): Seq[DescribedDirectory] = {
+  def apply[T](directory: File, f: (File, File) => T): Seq[T] = {
     require(directory.isDirectory)
 
-    directory.listFiles.toSeq.filter(_.isDirectory).map { subdirectory =>
-      val name = subdirectory.getName
-      metadata(name, directory, subdirectory) map (DescribedDirectory(name, subdirectory, _))
-    }.flatten
-  }
-
-
-  def metadata(name: String, directory: File, subdirectory: File): Option[File] = {
-    val metadataFileInParent = new File(directory, name + ".xml")
-    val metadataFileInSubdirectory = new File(subdirectory, "index.xml")
-    if (!metadataFileInParent.exists && !metadataFileInSubdirectory.exists) None else {
-      val file = if (metadataFileInSubdirectory.exists) metadataFileInSubdirectory else metadataFileInParent
-      Some(file)
-    }
+    for {
+      subdirectory <- directory.listFiles.toSeq.filter(_.isDirectory)
+      file = new File(subdirectory, "index.xml")
+      if (file.exists)
+    } yield f(subdirectory, file)
   }
 }

@@ -120,11 +120,11 @@ object RootResource {
 
   val worksColumn: LinkColumn[Work] = new LinkColumn[Work]("Works") {
     override def link(work: Work, uriBuilder: UriBuilder): UriBuilder = uriBuilder.path(text(work)).path("editions")
-    override def text(work: Work): String = work.names.default.name
+    override def text(work: Work): String = work.defaultName
   }
 
 
   val editionsColumn: LinkColumn[Edition] = new SimpleLinkColumn[Edition]("Editions") {
-    override def text(edition: Edition): String = edition.names.default.name
+    override def text(edition: Edition): String = edition.defaultName
   }
 }

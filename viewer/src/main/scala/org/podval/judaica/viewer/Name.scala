@@ -24,6 +24,9 @@ import scala.xml.Elem
 trait Named {
 
   def names: Names
+
+
+  final def defaultName: String = names.default.name
 }
 
 

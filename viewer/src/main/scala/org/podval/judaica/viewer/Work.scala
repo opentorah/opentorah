@@ -16,7 +16,6 @@
 
 package org.podval.judaica.viewer
 
-
 import org.podval.judaica.xml.XmlFile
 import scala.xml.Elem
 import java.io.File
@@ -28,8 +27,7 @@ object Works {
 
 
   def works: Seq[Work] = works_.get
-  private[this] val works_ : Soft[Seq[Work]] =
-    Soft(DirectoryScanner.describedDirectories(textsDirectory).map(d => new Work(d.name, d.directory, d.index)))
+  private[this] val works_ = LazyLoad(DirectoryScanner(textsDirectory, new Work(_, _)))
 
 
   def workByName(name: String): Option[Work] = Names.find(works, name)
@@ -37,25 +35,24 @@ object Works {
 
 
 
-final class Work(name: String, val directory: File, index: File) extends Named with Selectors with Structures {
+final class Work(val directory: File, index: File) extends Named with Selectors with Structures {
 
   override val names: Names = Names(metadata)
 
 
   override def selectors: Seq[Selector] = selectors_.get
   override def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
-  private[this] val selectors_ : Soft[Seq[Selector]] = Soft(Exists(Selector.parseSelectors(Seq.empty, metadata), "selectors"))
+  private[this] val selectors_ = LazyLoad(Exists(Selector.parseSelectors(Seq.empty, metadata), "selectors"))
 
 
   override def structures: Seq[Structure] = structures_.get
   override def structureByName(name: String): Option[Structure] = Names.find(structures, name)
-  private[this] val structures_ : Soft[Seq[Structure]] = Soft(Exists(Structure.parseStructures(selectors, metadata), "structures"))
+  private[this] val structures_  = LazyLoad(Exists(Structure.parseStructures(index, selectors, metadata), "structures"))
 
 
   def editions: Seq[Edition] = editions_.get
   def editionByName(name: String): Option[Edition] = Names.find(editions, name)
-  private[this] val editions_ : Soft[Seq[Edition]] =
-    Soft(DirectoryScanner.describedDirectories(directory).map(d => new Edition(this, d.name, d.directory, d.index)))
+  private[this] val editions_ = LazyLoad(DirectoryScanner(directory, new Edition(this, _, _)))
 
 
   private[this] def metadata: Elem = XmlFile.loadMetadata(index)
@@ -66,13 +63,13 @@ final class Work(name: String, val directory: File, index: File) extends Named w
 
 
 
-final class Edition(val work: Work, name: String, directory: File, index: File) extends Named {
+final class Edition(val work: Work, directory: File, index: File) extends Named {
 
   override val names: Names = Names(metadata)
 
 
   def storage: Storage = storage_.get
-  private[this] val storage_ : Soft[Storage] = Soft(new DirectoryStorage(work.structures, metadata, directory))
+  private[this] val storage_ = LazyLoad(new DirectoryStorage(work.structures, metadata, directory))
 
 
   private[this] def metadata: Elem = XmlFile.loadMetadata(index)

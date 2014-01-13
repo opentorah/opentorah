@@ -16,8 +16,13 @@
 
 package org.podval.judaica.viewer
 
+import java.io.File
+
 
 object Exists {
+
+  def apply[T <: Named](value: Seq[T], name: String, what: String): T = apply(Names.find(value, name), name, what)
+
 
   def apply[T](value: Option[T], name: String, what: String): T = {
     require(!value.isEmpty, s"$what $name does not exist")
@@ -28,5 +33,11 @@ object Exists {
   def apply[T](value: Seq[T], what: String): Seq[T] = {
     require(!value.isEmpty, s"$what does not exist")
     value
+  }
+
+
+  def apply(file: File): File = {
+    require(file.exists, s"$file does not exist")
+    file
   }
 }

@@ -20,23 +20,25 @@ import org.podval.judaica.xml.Xml.Ops
 import scala.xml.Elem
 
 
-abstract class Selector(override val names: Names, val selectors: Seq[Selector]) extends Named with Selectors {
+abstract class Selector(siblings: Seq[Selector], xml: Elem) extends Named with Selectors {
   def isNumbered: Boolean
   def asNumbered: NumberedSelector
   def asNamed: NamedSelector
 
+  override val names = Names(xml)
+  override val selectors = Selector.parseSelectors(siblings, xml)
   override def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
 }
 
 
-final class NumberedSelector(names: Names, selectors: Seq[Selector]) extends Selector(names, selectors) {
+final class NumberedSelector(siblings: Seq[Selector], xml: Elem) extends Selector(siblings, xml) {
   override def isNumbered: Boolean = true
   override def asNumbered: NumberedSelector = this
   override def asNamed: NamedSelector = throw new ClassCastException
 }
 
 
-final class NamedSelector(names: Names, selectors: Seq[Selector]) extends Selector(names, selectors) {
+final class NamedSelector(siblings: Seq[Selector], xml: Elem) extends Selector(siblings, xml) {
   override def isNumbered: Boolean = false
   override def asNumbered: NumberedSelector = throw new ClassCastException
   override def asNamed: NamedSelector = this
@@ -68,18 +70,12 @@ object Selector {
     val nameOption = xml.attributeOption("name")
     if (nameOption.isDefined) {
       // A reference to a previously defined Selector
-      val name = nameOption.get
-      val result = Names.find(uncles, name)
-      require(result.isDefined, s"Selector $name not found")
-      result.get
+      Exists(uncles, nameOption.get, "selector")
     } else {
-      val names = Names(xml)
-      val selectors = parseSelectors(siblings, xml)
-      val isNumbered = xml.booleanAttribute("isNumbered")
-      if (isNumbered)
-        new NumberedSelector(names, selectors)
+      if (xml.booleanAttribute("isNumbered"))
+        new NumberedSelector(siblings, xml)
       else
-        new NamedSelector(names, selectors)
+        new NamedSelector(siblings, xml)
     }
   }
 }

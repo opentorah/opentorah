@@ -17,9 +17,9 @@
 package org.podval.judaica.viewer
 
 
-final class Soft[T] private(gen: => T) {
+final class LazyLoad[T] private(gen: => T) {
 
-  // TODO switch to weak references, after all (and rename the class to something generic...)?
+  // TODO switch to weak references, after all?
   private[this] var cache = new java.lang.ref.SoftReference(null.asInstanceOf[T])
 
 
@@ -37,7 +37,7 @@ final class Soft[T] private(gen: => T) {
 
 
 
-object Soft {
+object LazyLoad {
 
-  def apply[T](gen: => T) = new Soft(gen)
+  def apply[T](gen: => T) = new LazyLoad(gen)
 }

@@ -67,8 +67,7 @@ final class DirectoryStorage(structures: Seq[Structure], metadata: Elem, directo
       if (file.isFile) {
         new FileStorage(file)
       } else {
-        val metadataFile = DirectoryScanner.metadata(file.getName, directory, file).get
-        val metadata = XmlFile.loadMetadata(metadataFile)
+        val metadataFile = Exists(new File(file, "index.xml"))
         new DirectoryStorage(div.structures, metadata, file)
       }
     }
