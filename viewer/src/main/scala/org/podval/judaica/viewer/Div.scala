@@ -54,7 +54,16 @@ final class NamedDiv(override val names: Names, selectors: Seq[Selector], struct
 
 object Div {
 
-  def numbered(uncles: Seq[Selector], selector: NumberedSelector, number: Int, xml: Elem): NumberedDiv = {
+  def namedDivs(selector: NamedSelector, uncles: Seq[Selector], xml: Elem): Seq[NamedDiv] = {
+    xml.elemsFilter("div").map(named(uncles, selector, _))
+  }
+
+
+  def numberedDivs(selector: NumberedSelector, uncles: Seq[Selector], xml: Elem): Seq[NumberedDiv] =
+    xml.elemsFilter("div").zipWithIndex.map { case (xml, num) => numbered(uncles, selector, num+1, xml) }
+
+
+  private[this] def numbered(uncles: Seq[Selector], selector: NumberedSelector, number: Int, xml: Elem): NumberedDiv = {
     val names = Names(xml, canBeEmpty = true)
     require(names.isEmpty, "Numbered Div can not have names")
 
@@ -70,7 +79,7 @@ object Div {
   }
 
 
-  def named(uncles: Seq[Selector], selector: NamedSelector, xml: Elem): NamedDiv = {
+  private[this] def named(uncles: Seq[Selector], selector: NamedSelector, xml: Elem): NamedDiv = {
     val names = Names(xml)
 
     val nOption = xml.attributeOption("n")
