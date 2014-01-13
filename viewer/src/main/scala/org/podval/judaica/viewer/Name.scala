@@ -50,7 +50,7 @@ object Name {
 // TODO factor the parsing out
 final class Names(xml: Elem, canBeEmpty: Boolean) {
 
-  val names: Seq[Name] = Existence.verify(xml.elemsFilter("name").map(Name(_)), "names")
+  val names: Seq[Name] = Exists(xml.elemsFilter("name").map(Name(_)), "names")
 
 
   def find(name: String): Option[Name] = find(names, name)

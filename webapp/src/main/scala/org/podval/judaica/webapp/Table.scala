@@ -16,25 +16,51 @@
 
 package org.podval.judaica.webapp
 
-import org.podval.judaica.viewer.{Works, Named}
-import scala.xml.Elem
-import javax.ws.rs.core.UriBuilder
+import javax.ws.rs.core.{UriInfo, UriBuilder}
+import scala.xml.{Text, Node, Elem}
+
+
+abstract class Column[T](val name: String) {
+  def apply(value: T, uriBuilder: UriBuilder): Node
+}
+
+
+abstract class TextColumn[T](name: String) extends Column[T](name){
+  final override def apply(value: T, uriBuilder: UriBuilder): Node = Text(text(value))
+  def text(value: T): String
+}
+
+
+abstract class LinkColumn[T](name: String) extends Column[T](name) {
+  final override def apply(value: T, uriBuilder: UriBuilder): Node = <a href={link(value, uriBuilder).build().toString}>{text(value)}</a>
+  def link(value: T, uriBuilder: UriBuilder): UriBuilder
+  def text(value: T): String
+}
+
+
+abstract class SimpleLinkColumn[T](name: String) extends LinkColumn[T](name) {
+  final override def link(value: T, uriBuilder: UriBuilder): UriBuilder = uriBuilder.path(text(value))
+}
+
 
 
 object Table {
 
-  def build[T](data: Seq[T], nameColumn: T => String, uriBuilder: UriBuilder, suffix: Option[String]): Elem =
-    <table>{
-      data.map { d =>
-        val name = nameColumn(d)
-        val beforeSuffix = UriBuilderCloner.copy(uriBuilder).path(name)
-        val uri = (if (suffix.isEmpty) beforeSuffix else beforeSuffix.path(suffix.get)).build()
-
-        <tr>
-          <td>
-            <a href={uri.toString} >{name}</a>
-          </td>
+  def apply[T](data: Seq[T], uriInfo: UriInfo, columns: Column[T]*): Elem = {
+    val uriBuilder = uriInfo.getAbsolutePathBuilder
+    <table>
+      <thead>
+        <tr>{columns.map { column =>
+          <th>{column.name}</th>
+        }}
         </tr>
-      }
-    }</table>
+      </thead>
+      { data.map { value =>
+        <tr>{columns.map { column =>
+          <td>{column(value, UriBuilderCloner.copy(uriBuilder))}</td>
+        }}
+        </tr>
+      }}
+    </table>
+  }
 }

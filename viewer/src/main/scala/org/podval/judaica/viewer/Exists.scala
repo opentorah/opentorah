@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,16 @@
 package org.podval.judaica.viewer
 
 
-sealed class Editions(val work: Work)
-class NoEditions(work: Work) extends Editions(work)
-class LinearEditions(work: Work, val editions: Seq[Edition]) extends Editions(work)
-class DiffEdition(work: Work, val edition1: Edition, val edition2: Edition) extends Editions(work)
-class SingleEdition(work: Work, val edition: Edition) extends Editions(work)
+object Exists {
+
+  def apply[T](value: Option[T], name: String, what: String): T = {
+    require(!value.isEmpty, s"$what $name does not exist")
+    value.get
+  }
+
+
+  def apply[T](value: Seq[T], what: String): Seq[T] = {
+    require(!value.isEmpty, s"$what does not exist")
+    value
+  }
+}

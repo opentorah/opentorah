@@ -20,12 +20,12 @@ import org.podval.judaica.xml.Xml.Ops
 import scala.xml.Elem
 
 
-abstract class Selector(override val names: Names, val selectors: Seq[Selector]) extends Named {
+abstract class Selector(override val names: Names, val selectors: Seq[Selector]) extends Named with Selectors {
   def isNumbered: Boolean
   def asNumbered: NumberedSelector
   def asNamed: NamedSelector
 
-  def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
+  override def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
 }
 
 
@@ -41,6 +41,21 @@ final class NamedSelector(names: Names, selectors: Seq[Selector]) extends Select
   override def asNumbered: NumberedSelector = throw new ClassCastException
   override def asNamed: NamedSelector = this
 }
+
+
+trait Selectors {
+
+  def selectors: Seq[Selector]
+
+
+  def selectorByName(name: String): Option[Selector]
+
+
+  def deepStructures: Seq[Seq[Selector]] =
+    if (selectors.isEmpty) Seq(Nil) else
+    selectors.flatMap(selector => selector.deepStructures.map (ds => selector +: ds))
+}
+
 
 
 object Selector {

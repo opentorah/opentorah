@@ -63,6 +63,13 @@ class SimpleTest {
   def findTorontoEdition = assertTrue(Works.workByName("Tanach").get.editionByName("Toronto").isDefined)
 
 
+//  @Test
+//  def deepStructureChumash = {
+//    val formats: Seq[Seq[Selector]] = Works.workByName("Хумаш").get.deepStructures
+//    formats.map(_.map(_.names.default.name).mkString("/")).foreach(println)
+//  }
+
+
   @Test
   def jerusalemEditionStorage = {
     val storage = Works.workByName("Tanach").get.editionByName("Jerusalem").get.storage

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,29 +15,9 @@
  * under the License.
  */
 
-package org.podval.judaica.xml
-
-import scala.xml.{Elem, Text}
+package org.podval.judaica.viewer
 
 
-object Html {
+class Path {
 
-  def html(stylesheet: String, what: Elem): Elem = html(stylesheet, Seq(what))
-
-
-  def html(stylesheet: String, what: Seq[Elem]): Elem =
-    <html>
-      <head>
-        <link rel="stylesheet" type="text/css" href={stylesheet + ".css"}/>
-      </head>
-      <body class="hebrew">
-        {what}
-      </body>
-    </html>
-
-
-  def span(class_ : String, text: String): Elem = <span class={class_}>{text}</span>
-
-
-  def text(what: String) = Text(what)
 }

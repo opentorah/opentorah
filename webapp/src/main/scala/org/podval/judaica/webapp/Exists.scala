@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package org.podval.judaica.viewer
+package org.podval.judaica.webapp
+
+import javax.ws.rs.NotFoundException
 
 
-object Existence {
+object Exists {
 
-  def verify[T](value: Option[T], name: String, what: String): T = {
-    require(!value.isEmpty, s"$what $name does not exist")
+  def apply[T](value: Option[T], name: String, what: String): T = {
+    if (value.isEmpty) throw new NotFoundException(what + " " + name)
     value.get
-  }
-
-
-  def verify[T](value: Seq[T], what: String): Seq[T] = {
-    require(!value.isEmpty, s"$what does not exist")
-    value
   }
 }

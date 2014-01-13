@@ -20,7 +20,11 @@ import org.podval.judaica.xml.Xml.Ops
 import scala.xml.Elem
 
 
-abstract class Div(val selectors: Seq[Selector], val structures: Seq[Structure]) {
+abstract class Div(override val selectors: Seq[Selector], val structures: Seq[Structure]) extends Structures {
+
+  override def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
+  override def structureByName(name: String): Option[Structure] = Names.find(structures, name)
+
   def isNumbered: Boolean
   def asNumbered: NumberedDiv
   def asNamed: NamedDiv
@@ -83,6 +87,7 @@ object Div {
     val selectors: Seq[Selector] = Selector.parseSelectors(uncles, xml)
     val effectiveSelectors = selector.selectors ++ selectors
     val structures: Seq[Structure] =  Structure.parseStructures(effectiveSelectors, xml)
+    // TODO complete the list of structures - even if some of them are empty!
     (path, selectors, structures)
   }
 }

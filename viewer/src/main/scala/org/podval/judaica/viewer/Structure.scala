@@ -23,17 +23,46 @@ import scala.xml.Elem
 abstract class Structure(val selector: Selector, val divs: Seq[Div]) extends Named {
 
   final override def names = selector.names
+  final def isNumbered: Boolean = selector.isNumbered
+
+  def asNumbered: NumberedStructure
+  def asNamed: NamedStructure
+
+  final def length: Int = divs.length
+
+  final def divByNumber(number: Int): Option[Div] = if ((number < 1) || (number > length)) None else Some(divs(number))
 }
 
 
 final class NamedStructure(
   override val selector: NamedSelector,
   override val divs: Seq[NamedDiv]) extends Structure(selector, divs)
+{
+  def asNumbered: NumberedStructure = throw new ClassCastException
+  def asNamed: NamedStructure = this
+
+  def divByName(name: String): Option[NamedDiv] = Names.find(divs, name)
+}
 
 
 final class NumberedStructure(
   override val selector: NumberedSelector,
   override val divs: Seq[NumberedDiv]) extends Structure(selector, divs)   // TODO something with known length, not Seq...
+{
+  def asNumbered: NumberedStructure = this
+  def asNamed: NamedStructure = throw new ClassCastException
+}
+
+
+
+trait Structures extends Selectors {
+
+  def structures: Seq[Structure]
+
+
+  def structureByName(name: String): Option[Structure]
+}
+
 
 
 object Structure {
@@ -43,7 +72,7 @@ object Structure {
 
   private def parseStructure(selectors: Seq[Selector], xml: Elem): Structure = {
     val selectorName = xml.getAttribute("selector")
-    val selector = Existence.verify(Names.find(selectors, selectorName), selectorName, "selector")
+    val selector = Exists(Names.find(selectors, selectorName), selectorName, "selector")
     val uncles = selectors.takeWhile(_ != selector)
 
     val divXmls = xml.elemsFilter("div")

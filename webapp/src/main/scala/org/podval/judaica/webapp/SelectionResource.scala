@@ -16,42 +16,93 @@
 
 package org.podval.judaica.webapp
 
-import org.podval.judaica.xml.Html
-import org.podval.judaica.viewer.{Structure, Edition, Div}
+import org.podval.judaica.viewer.{Structures, Structure, Editions, Div, Selector}
 
-import javax.ws.rs.{PathParam, GET, Path}
-import javax.ws.rs.core.{UriInfo, Context}
+import javax.ws.rs.{GET, Path, PathParam, QueryParam}
+import javax.ws.rs.core.{UriBuilder, UriInfo, Context}
 
 
-class SelectionResource(edition: Edition) {
+class SelectionResource(editions: Editions, structures: Structures) {
+
+  import SelectionResource._
+
 
   @GET
-//  @Path("/")
-  def metadata = {
-    // TODO Metadata!
-    edition.toString
+  def structuresOrContent(
+    @QueryParam("showContent") showContent: Boolean,
+    @Context uriInfo: UriInfo) =
+  {
+    if (!showContent) {
+      Html(uriInfo, Some(editions.work),
+        <div>
+          {Table(structures.structures, uriInfo, structuresColumn)}
+          {Table(structures.deepStructures, uriInfo, contentColumn)}
+        </div>
+      )
+    } else {
+      // TODO show content, finally!
+      "***** Content View is not yet implemented! *****"
+    }
   }
 
 
   @GET
   @Path("/{selector}")
-  def structure(@PathParam("selector") selectorName: String, @Context uriInfo: UriInfo) = {
-    val table = Table.build(getStructure(selectorName).divs, (div: Div) => div.id, uriInfo.getAbsolutePathBuilder, None)
-    val stylesheet = uriInfo.getBaseUriBuilder.path("judaica").build().toString
-    Html.html(stylesheet, table)
+  def divs(
+    @PathParam("selector") selectorName: String,
+    @Context uriInfo: UriInfo) =
+  {
+    val structure = getStructure(structures, selectorName)
+    Html(uriInfo, Some(editions.work), Table(structure.divs, uriInfo, divsColumn))
   }
 
 
-  @GET
-  @Path("/{selector}/{name}")
-  def selection(@PathParam("selector") selectorName: String, @PathParam("name") name: String) = {
-    val structure = getStructure(selectorName)
-//    val div = Existence.verify(structure.byName(name), name, structure.names.default.name)
-    // TODO introduce some kind of parameter to distinguish request for the book and its display; use it here to retrieve metadata?
-/////    val content = edition.storage.content(structure.type_, name)
-    "QQ!"
+  @Path("/{selector}/{div}")
+  def div(
+    @PathParam("selector") selectorName: String,
+    @PathParam("div") divName: String,
+    @QueryParam("showContent") showContent: Boolean,
+    @Context uriInfo: UriInfo) =
+  {
+    val structure = getStructure(structures, selectorName)
+    val div: Div = Exists(getDiv(structure, divName), divName, "div")
+    new SelectionResource(editions, div)
+  }
+}
+
+
+
+object SelectionResource {
+
+  private def getStructure(structures: Structures, name: String): Structure =
+    Exists(structures.structureByName(name), name, "structure")
+
+
+  private def getDiv(structure: Structure, divName: String): Option[Div] = {
+    if (structure.isNumbered) {
+      val divNumber = divName.toInt // TODO format errors
+      structure.divByNumber(divNumber)
+    } else {
+      structure.asNamed.divByName(divName)
+    }
   }
 
 
-  private[this] def getStructure(name: String): Structure = Existence.verify(edition.work.structureByName(name), name, "structure")
+  val structuresColumn: LinkColumn[Structure] = new SimpleLinkColumn[Structure]("Structure") {
+    override def text(structure: Structure): String = structure.names.default.name
+  }
+
+
+  val contentColumn: LinkColumn[Seq[Selector]] = new LinkColumn[Seq[Selector]]("Content Format") {
+    override def link(format: Seq[Selector], uriBuilder: UriBuilder): UriBuilder = uriBuilder.
+      queryParam("showContent", true: java.lang.Boolean).
+      queryParam("contentFormat", text(format))
+
+    override def text(format: Seq[Selector]): String = format.map(_.names.default.name).mkString("/")
+  }
+
+
+  val divsColumn: LinkColumn[Div] = new SimpleLinkColumn[Div]("Divisions") {
+    override def text(div: Div): String = div.id
+  }
 }

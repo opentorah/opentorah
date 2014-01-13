@@ -37,19 +37,19 @@ object Works {
 
 
 
-final class Work(name: String, val directory: File, index: File) extends Named {
+final class Work(name: String, val directory: File, index: File) extends Named with Selectors with Structures {
 
   override val names: Names = Names(metadata)
 
 
-  def selectors: Seq[Selector] = selectors_.get
-  def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
-  private[this] val selectors_ : Soft[Seq[Selector]] = Soft(Existence.verify(Selector.parseSelectors(Seq.empty, metadata), "selectors"))
+  override def selectors: Seq[Selector] = selectors_.get
+  override def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
+  private[this] val selectors_ : Soft[Seq[Selector]] = Soft(Exists(Selector.parseSelectors(Seq.empty, metadata), "selectors"))
 
 
-  def structures: Seq[Structure] = structures_.get
-  def structureByName(name: String): Option[Structure] = Names.find(structures, name)
-  private[this] val structures_ : Soft[Seq[Structure]] = Soft(Existence.verify(Structure.parseStructures(selectors, metadata), "structures"))
+  override def structures: Seq[Structure] = structures_.get
+  override def structureByName(name: String): Option[Structure] = Names.find(structures, name)
+  private[this] val structures_ : Soft[Seq[Structure]] = Soft(Exists(Structure.parseStructures(selectors, metadata), "structures"))
 
 
   def editions: Seq[Edition] = editions_.get

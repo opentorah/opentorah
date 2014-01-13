@@ -12,17 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * under the License.
  */
 
-package org.podval.judaica.webapp
+package org.podval.judaica.display
 
-import javax.ws.rs.NotFoundException
+import scala.xml.{Text, Elem}
 
 
-object Existence {
+object Html {
 
-  def verify[T](value: Option[T], name: String, what: String): T = {
-    if (value.isEmpty) throw new NotFoundException(what + " " + name)
-    value.get
-  }
+  def span(class_ : String, text: String): Elem = <span class={class_}>{text}</span>
+
+
+  def text(what: String) = Text(what)
 }

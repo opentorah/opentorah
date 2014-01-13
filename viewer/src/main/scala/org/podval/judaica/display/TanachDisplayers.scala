@@ -17,7 +17,7 @@
 
 package org.podval.judaica.display
 
-import org.podval.judaica.xml.{AlefBeth, Paragraph, Word, App, Html}
+import org.podval.judaica.xml.{AlefBeth, Paragraph, Word, App}
 
 import scala.xml.Elem
 

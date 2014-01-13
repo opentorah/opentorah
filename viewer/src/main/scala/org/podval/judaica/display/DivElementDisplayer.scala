@@ -17,7 +17,7 @@
 
 package org.podval.judaica.display
 
-import org.podval.judaica.xml.{HebrewNumbers, Html}
+import org.podval.judaica.xml.HebrewNumbers
 import org.podval.judaica.xml.Xml.Ops
 
 import scala.xml.Elem

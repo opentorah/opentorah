@@ -16,13 +16,10 @@
 
 package org.podval.judaica.webapp
 
-import org.podval.judaica.xml.Html
-import org.podval.judaica.viewer.{Edition, Work, Works}
+import org.podval.judaica.viewer.{Works, Work, Editions, Edition, NoEditions, SingleEdition, LinearEditions}
 
-import javax.ws.rs.{PathParam, GET, Path}
-import javax.ws.rs.core.{Context, UriInfo}
-
-import scala.xml.Elem
+import javax.ws.rs.{GET, PathParam, Path}
+import javax.ws.rs.core.{UriBuilder, Context, UriInfo}
 
 import java.io.File
 
@@ -34,30 +31,47 @@ import java.io.File
 @Path("/")
 class RootResource {
 
-  @GET
-  def root = "HELLO!"
+  import RootResource._
 
 
   @GET
-  @Path("/judaica.css")
-  def css = new File(Works.textsDirectory, "judaica.css")
+  def root(@Context uriInfo: UriInfo) = {
+    val html =
+      <div>
+        <p>Welcome to the Judaica Viewer!</p>
+        <p>List of available<a href={uriInfo.getAbsolutePathBuilder.path("works").build().toString}>works</a></p>
+      </div>
+    Html(uriInfo, None, html)
+  }
 
 
   @GET
   @Path("/works")
   def works(@Context uriInfo: UriInfo) = {
-    val table: Elem = Table.build(Works.works, (work: Work) => work.names.default.name, uriInfo.getAbsolutePathBuilder, Some("editions"))
-    val stylesheet = uriInfo.getBaseUriBuilder.path("judaica").build().toString
-    Html.html(stylesheet, table)
+    Html(uriInfo, None, Table(Works.works, uriInfo, worksColumn))
+  }
+
+
+  @GET
+  @Path("/works/stylesheet.css")
+  def mainStylesheet = {
+    new File(Works.textsDirectory, "stylesheet.css")
   }
 
 
   @GET
   @Path("/works/{work}")
-  def work(@PathParam("work") workName: String): String = {
+  def work(@PathParam("work") workName: String) = {
     val work = getWork(workName)
-    // TODO Metadata!
-    work.toString
+    new SelectionResource(new NoEditions(work), work)
+  }
+
+
+  @GET
+  @Path("/works/{work}/stylesheet.css")
+  def workStylesheet(@PathParam("work") workName: String) = {
+    val work = getWork(workName)
+    new File(work.directory, "stylesheet.css")
   }
 
 
@@ -65,10 +79,7 @@ class RootResource {
   @Path("/works/{work}/editions")
   def editions(@PathParam("work") workName: String, @Context uriInfo: UriInfo) = {
     val work = getWork(workName)
-    val table = Table.build(work.editions, (edition: Edition) => edition.names.default.name, uriInfo.getAbsolutePathBuilder, None)
-    // TODO cascade to the Work's stylesheet if it exists...
-    val stylesheet = "/judaica" // TODO uriInfo.getBaseUriBuilder.path("judaica").build().toString
-    Html.html(stylesheet, table)
+    Html(uriInfo, Some(work), Table(work.editions, uriInfo, editionsColumn))
   }
 
 
@@ -76,17 +87,44 @@ class RootResource {
 
 
   @Path("/works/{work}/editions/{edition}")
-  def selection(@PathParam("work") workName: String, @PathParam("edition") editionName: String, @PathParam("selection") selectionKey: String) = {
-    val edition = getEdition(workName, editionName)
-    new SelectionResource(edition)
+  def selection(
+    @PathParam("work") workName: String,
+    @PathParam("edition") editionName: String,
+    @PathParam("selection") selectionKey: String) =
+  {
+    val work = getWork(workName)
+    new SelectionResource(getEditions(work, editionName), work)
+  }
+}
+
+
+object RootResource {
+
+  private def getWork(name: String): Work = Exists(Works.workByName(name), name, "work")
+
+
+  private def getEditions(work: Work, editionNames: String): Editions = {
+    if (editionNames.contains('+')) {
+      val names: Seq[String] = editionNames.split('+')
+      new LinearEditions(work, names.map(getEdition(work, _)))
+      // TODO diff view
+      //    } else if (editionNames.contains('-')) {
+    } else {
+      new SingleEdition(work, getEdition(work, editionNames))
+    }
   }
 
 
-  private[this] def getWork(name: String): Work = Existence.verify(Works.workByName(name), name, "work")
+  private def getEdition(work: Work, name: String): Edition = Exists(work.editionByName(name), name, "edition")
 
 
-  private[this] def getEdition(workName: String, editionName: String): Edition = getEdition(getWork(workName), editionName)
+  val worksColumn: LinkColumn[Work] = new LinkColumn[Work]("Works") {
+    override def link(work: Work, uriBuilder: UriBuilder): UriBuilder = uriBuilder.path(text(work)).path("editions")
+    override def text(work: Work): String = work.names.default.name
+  }
 
 
-  private[this] def getEdition(work: Work, name: String): Edition = Existence.verify(work.editionByName(name), name, "edition")
+  val editionsColumn: LinkColumn[Edition] = new SimpleLinkColumn[Edition]("Editions") {
+    override def text(edition: Edition): String = edition.names.default.name
+  }
 }
