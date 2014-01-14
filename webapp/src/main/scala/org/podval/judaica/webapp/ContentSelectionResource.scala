@@ -57,7 +57,7 @@ class ContentSelectionResource(selection: ContentSelection) {
 
   @Path("/{selector}")
   def selector(@PathParam("selector") selectorName: String) =
-    new StructureSelectionResource(selection.getStructure(selectorName))
+    new StructureSelectionResource(selection.structure(selectorName))
 }
 
 

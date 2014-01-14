@@ -27,13 +27,11 @@ final class StructureSelectionResource(selection: StructureSelection) {
 
 
   @GET
-  def divs(@Context uriInfo: UriInfo) =
-    Html(uriInfo, Some(selection.work),
-      Table(selection.structure.divs, uriInfo, divsColumn))
+  def divs(@Context uriInfo: UriInfo) = Html(uriInfo, Some(selection.work), Table(selection.divs, uriInfo, divsColumn))
 
 
   @Path("/{div}")
-  def div(@PathParam("div") divName: String) = new ContentSelectionResource(selection.getDiv(divName))
+  def div(@PathParam("div") divName: String) = new ContentSelectionResource(selection.div(divName))
 }
 
 

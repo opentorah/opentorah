@@ -24,18 +24,20 @@ final class ContentSelection(work: Work, editions: Editions, path: Seq[Div]) ext
 
   def structures: Structures = if (path.isEmpty) work else path.last
 
-  def getStructure(name: String): StructureSelection = new StructureSelection(work, editions, path, structures.getStructureByName(name))
+  def structure(name: String): StructureSelection = new StructureSelection(work, editions, path, structures.getStructureByName(name))
 
-  def div(structureName: String, divName: String): ContentSelection = getStructure(structureName).getDiv(divName)
+  def div(structureName: String, divName: String): ContentSelection = structure(structureName).div(divName)
 }
 
 
-final class StructureSelection(work: Work, editions: Editions, path: Seq[Div], val structure: Structure) extends Selection(work, editions, path) {
+final class StructureSelection(work: Work, editions: Editions, path: Seq[Div], structure: Structure) extends Selection(work, editions, path) {
 
-  def getDiv(name: String): ContentSelection = {
+  def divs: Seq[Div] = structure.divs
+
+
+  def div(name: String): ContentSelection = {
     val div: Div = if (structure.isNumbered) {
-      val number = name.toInt // TODO format errors
-      structure.getDivByNumber(number)
+      structure.getDivByNumber(name.toInt) // TODO format errors
     } else {
       structure.asNamed.getDivByName(name)
     }
