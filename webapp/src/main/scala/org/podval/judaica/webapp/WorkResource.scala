@@ -27,7 +27,7 @@ final class WorkResource(work: Work) {
 
 
   @GET
-  @Produces("text/css")
+  @Produces(Array("text/css"))
   @Path("/stylesheet.css")
   def stylesheet = work.stylesheet
 

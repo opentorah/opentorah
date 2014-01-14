@@ -28,7 +28,7 @@ final class WorksResource {
 
 
   @GET
-  @Produces(MediaType.TEXT_HTML)
+  @Produces(Array(MediaType.TEXT_HTML))
   def works(@Context uriInfo: UriInfo) = Html(uriInfo, Table(Works.works, uriInfo, worksColumn))
 
 
@@ -38,7 +38,7 @@ final class WorksResource {
 
   @GET
   @Path("/stylesheet.css")
-  @Produces("text/css")
+  @Produces(Array("text/css"))
   def stylesheet = Works.stylesheet
 }
 

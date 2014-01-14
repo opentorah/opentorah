@@ -28,7 +28,7 @@ import javax.ws.rs.core.{MediaType, Context, UriInfo}
 final class RootResource {
 
   @GET
-  @Produces(MediaType.APPLICATION_XML)
+  @Produces(Array(MediaType.TEXT_HTML))
   def root(@Context uriInfo: UriInfo) = {
     val html =
       <div>

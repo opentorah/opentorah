@@ -121,6 +121,7 @@ trait Structures extends Selectors {
 object Structure {
 
   // TODO verify that all structures allowed by the selectors are present!
+  // TODO make sure that they are retrievable, too - for instance, week/chapter!
   def parseStructures(parsingFile: File, selectors: Seq[Selector], xmls: Elem): Seq[Structure] =
     xmls.elemsFilter("structure").map(parseStructure(parsingFile, selectors, _))
 

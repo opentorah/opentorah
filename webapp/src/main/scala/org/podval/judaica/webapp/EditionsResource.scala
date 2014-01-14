@@ -27,7 +27,7 @@ final class EditionsResource(work: Work) {
 
 
   @GET
-  @Produces(MediaType.TEXT_HTML)
+  @Produces(Array(MediaType.TEXT_HTML))
   def editions(@Context uriInfo: UriInfo) = Html(uriInfo, Table(work.editions, uriInfo, editionsColumn))
 
 
@@ -37,7 +37,7 @@ final class EditionsResource(work: Work) {
 
   @GET
   @Path("/{edition}/stylesheet.css")
-  @Produces("text/css")
+  @Produces(Array("text/css"))
   def stylesheet(@PathParam("edition") editionName: String) = work.getEditionByName(editionName).stylesheet
 }
 

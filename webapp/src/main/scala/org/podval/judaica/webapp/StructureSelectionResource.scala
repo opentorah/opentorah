@@ -36,7 +36,7 @@ class StructureSelectionResource(selection: StructureSelection) {
 
 
   @GET
-  @Produces(MediaType.TEXT_HTML)
+  @Produces(Array(MediaType.TEXT_HTML))
   def structure(@Context uriInfo: UriInfo) = Html(uriInfo,
       <div>
         {Table(selection.structures.structures, uriInfo, structuresColumn)}

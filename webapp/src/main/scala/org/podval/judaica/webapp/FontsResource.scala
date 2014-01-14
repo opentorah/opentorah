@@ -28,6 +28,6 @@ final class FontsResource {
 
   @GET
   @Path("{font}")
-  @Produces(MediaType.APPLICATION_OCTET_STREAM)
+  @Produces(Array(MediaType.APPLICATION_OCTET_STREAM))
   def font(@PathParam("font") name: String) = new File(new File(Works.directory, "fonts"), name)
 }

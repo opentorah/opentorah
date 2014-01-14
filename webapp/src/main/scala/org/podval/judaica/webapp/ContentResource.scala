@@ -27,12 +27,12 @@ import scala.xml.Elem
 final class ContentResource(selection: StructureSelection) {
 
   @GET
-  @Produces(MediaType.APPLICATION_XML)
+  @Produces(Array(MediaType.APPLICATION_XML))
   def xml(@QueryParam("contentFormat") format: String): Elem = selection.xmlContent(format)
 
 
   @GET
-  @Produces(MediaType.TEXT_HTML)
+  @Produces(Array(MediaType.TEXT_HTML))
   def html(@QueryParam("contentFormat") format: String, @Context uriInfo: UriInfo): Elem =
     Html(uriInfo, selection, selection.htmlContent(format))
 }

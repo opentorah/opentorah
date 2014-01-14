@@ -28,7 +28,7 @@ import java.io.File
 
 object Html {
 
-  def apply(uriInfo: UriInfo, what: Elem): Elem = apply(uriInfo, Seq(mainStylesheet(uriInfo)), what)
+  def apply(uriInfo: UriInfo, what: Elem): Elem = apply(uriInfo, Seq(mainStylesheet), what)
 
 
   def apply(uriInfo: UriInfo, selection: Selection, what: Elem): Elem = {

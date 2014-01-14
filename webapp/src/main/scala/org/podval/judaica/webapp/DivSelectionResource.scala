@@ -27,7 +27,7 @@ final class DivSelectionResource(selection: DivSelection) {
 
 
   @GET
-  @Produces(MediaType.TEXT_HTML)
+  @Produces(Array(MediaType.TEXT_HTML))
   def divs(@Context uriInfo: UriInfo) = Html(uriInfo, Table(selection.divs, uriInfo, divsColumn))
 
 
