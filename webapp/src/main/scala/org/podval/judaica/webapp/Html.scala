@@ -17,48 +17,54 @@
 
 package org.podval.judaica.webapp
 
-import org.podval.judaica.viewer.Work
+import org.podval.judaica.viewer.{Works, Selection, Edition, Work}
+
+import javax.ws.rs.core.{UriBuilder, UriInfo}
+
 import scala.xml.Elem
-import javax.ws.rs.core.UriInfo
+
 import java.io.File
 
 
 object Html {
 
-  def apply(uriInfo: UriInfo, workOption: Option[Work], what: Elem): Elem = {
-    val mainStylesheet: String = uriInfo.getBaseUriBuilder.
-      path("works").
-      path("stylesheet.css").
-      build().toString
+  def apply(uriInfo: UriInfo, what: Elem): Elem = apply(uriInfo, Seq(mainStylesheet(uriInfo)), what)
 
-    val workStylesheet: Option[String] = {
-      if (workOption.isEmpty) None else {
-        val work = workOption.get
-        val file = new File(work.directory, "stylesheet.css")
-        if (!file.exists) None else {
-          val uri: String = uriInfo.getBaseUriBuilder.
-            path("works").
-            path(work.names.default.name).
-            path("stylesheet.css").
-            build().toString
 
-          Some(uri)
-        }
-      }
-    }
+  def apply(uriInfo: UriInfo, selection: Selection, what: Elem): Elem = {
+    val stylesheets = Seq(mainStylesheet, workStylesheetUri(selection.work)) ++
+      selection.editions.editions.map(editionStylesheetUri(_))
 
-    // TODO add the Edition stylesheet (different fonts for different languages etc.)
+    apply(uriInfo, stylesheets, what)
+  }
+
+
+  def apply(uriInfo: UriInfo, stylesheetOptions: Seq[Option[UriBuilder => UriBuilder]], what: Elem): Elem = {
+    val stylesheets: Seq[String] =
+      stylesheetOptions.flatten.map(f => f(uriInfo.getBaseUriBuilder).path("stylesheet.xml").build().toString)
 
     <html>
       <head>
-        <link rel="stylesheet" type="text/css" href={mainStylesheet}/>
-        {if (workStylesheet.isDefined)
-          <link rel="stylesheet" type="text/css" href={workStylesheet.get}/>
-        }
+        {stylesheets.map(uri => <link rel="stylesheet" type="text/css" href={uri}/>)}
       </head>
       <body>
         {what}
       </body>
     </html>
   }
+
+
+  private def mainStylesheet: Option[UriBuilder => UriBuilder] =
+    ifExists(Works.stylesheet, _.path("works"))
+
+
+  private def workStylesheetUri(work: Work): Option[UriBuilder => UriBuilder] =
+    ifExists(work.stylesheet, _.path("works").path(work.defaultName))
+
+
+  private def editionStylesheetUri(edition: Edition): Option[UriBuilder => UriBuilder] =
+    ifExists(edition.stylesheet, _.path("works").path(edition.work.defaultName).path("editions").path(edition.defaultName))
+
+
+  private def ifExists[T](file: File, what: T): Option[T] = if (file.exists) Some(what) else None
 }

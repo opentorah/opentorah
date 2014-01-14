@@ -16,22 +16,30 @@
 
 package org.podval.judaica.webapp
 
-import org.podval.judaica.viewer.{Work, Selection}
-import javax.ws.rs.{Produces, Path, GET}
+import org.podval.judaica.viewer.{Div, DivSelection}
+import javax.ws.rs.{Produces, Path, GET, PathParam}
+import javax.ws.rs.core.{MediaType, Context, UriInfo}
 
 
-final class WorkResource(work: Work) {
+final class DivSelectionResource(selection: DivSelection) {
 
-  @Path("/")
-  def content = new StructureSelectionResource(Selection(work))
+  import DivSelectionResource._
 
 
   @GET
-  @Produces("text/css")
-  @Path("/stylesheet.css")
-  def stylesheet = work.stylesheet
+  @Produces(MediaType.TEXT_HTML)
+  def divs(@Context uriInfo: UriInfo) = Html(uriInfo, Table(selection.divs, uriInfo, divsColumn))
 
 
-  @Path("/editions")
-  def editions = new EditionsResource(work)
+  @Path("/{div}")
+  def div(@PathParam("div") divName: String) = new StructureSelectionResource(selection.div(divName))
+}
+
+
+
+object DivSelectionResource {
+
+  val divsColumn: LinkColumn[Div] = new SimpleLinkColumn[Div]("Divisions") {
+    override def text(div: Div): String = div.id
+  }
 }

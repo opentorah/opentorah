@@ -18,16 +18,33 @@ package org.podval.judaica.viewer
 
 
 sealed trait Editions {
+
+  def editions: Seq[Edition]
+
   def isNo: Boolean = false
 }
 
 object NoEditions extends Editions {
+
+  override def editions: Seq[Edition] = Seq.empty
+
   override def isNo: Boolean = true
 }
 
-final class LinearEditions(val editions: Seq[Edition]) extends Editions
-final class DiffEdition(val edition1: Edition, val edition2: Edition) extends Editions
-final class SingleEdition(val edition: Edition) extends Editions
+
+final class LinearEditions(override val editions: Seq[Edition]) extends Editions
+
+
+final class DiffEdition(val edition1: Edition, val edition2: Edition) extends Editions {
+
+  override def editions: Seq[Edition] = Seq(edition1, edition2)
+}
+
+
+final class SingleEdition(val edition: Edition) extends Editions {
+
+  override def editions: Seq[Edition] = Seq(edition)
+}
 
 
 

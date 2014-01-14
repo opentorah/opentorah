@@ -26,8 +26,8 @@ abstract class Div(val structure: Structure, parsingFile: File, uncles: Seq[Sele
   // TODO parse the Path
 /////  val path = xml.attributeOption("path")
   val localSelectors: Seq[Selector] = Selector.parseSelectors(uncles, xml)
-  override val selectors = structure.selector.selectors ++ localSelectors
-  override val structures: Seq[Structure] =  Structure.parseStructures(parsingFile, selectors, xml)
+  override val selectors: Seq[Selector] = structure.selector.selectors ++ localSelectors
+  override val structures: Seq[Structure] = Structure.parseStructures(parsingFile, selectors, xml)
   // TODO complete the list of structures - even if some of them are empty!
 
   override def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
@@ -64,7 +64,7 @@ final class NumberedDiv(structure: NumberedStructure, parsingFile: File, uncles:
     val nOption = xml.attributeOption("n")
     if (nOption.isDefined) {
       val nvalue = xml.getIntAttribute("n")
-      require(nvalue == number, s"Div $number has attribute n set to $nvalue")
+      if (nvalue != number) throw new ViewerException(s"Div $number has attribute n set to $nvalue")
     }
   }
 

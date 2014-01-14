@@ -16,18 +16,19 @@
 
 package org.podval.judaica.webapp
 
-import javax.ws.rs.{GET, Path}
-import javax.ws.rs.core.{Context, UriInfo}
+import javax.ws.rs.{Produces, GET, Path}
+import javax.ws.rs.core.{MediaType, Context, UriInfo}
 
 
-// TODO declare content-types produced; produce both XML and HTML
 // TODO I can handle synonyms: {editions} and {editions}/{edition}, and look up the first component - but do I want to?
 // TODO where do I show TEI metadata?
+// TODO introduce "interface language" - and select the names accordingly ("lang=en" etc.)
 
 @Path("/")
 final class RootResource {
 
   @GET
+  @Produces(MediaType.APPLICATION_XML)
   def root(@Context uriInfo: UriInfo) = {
     val html =
       <div>
@@ -35,10 +36,14 @@ final class RootResource {
         <p>List of available<a href={uriInfo.getAbsolutePathBuilder.path("works").build().toString}>works</a></p>
       </div>
 
-    Html(uriInfo, None, html)
+    Html(uriInfo, html)
   }
 
 
   @Path("/works")
   def works = new WorksResource
+
+
+  @Path("/fonts")
+  def fonts = new FontsResource
 }

@@ -14,30 +14,20 @@
  * limitations under the License.
  */
 
-package org.podval.judaica.viewer
+package org.podval.judaica.webapp
+
+import org.podval.judaica.viewer.Works
+
+import javax.ws.rs.{Produces, GET, PathParam, Path}
+import javax.ws.rs.core.MediaType
 
 import java.io.File
 
 
-object Exists {
+final class FontsResource {
 
-  def apply[T <: Named](value: Seq[T], name: String, what: String): T = apply(Names.find(value, name), name, what)
-
-
-  def apply[T](value: Option[T], name: String, what: String): T = {
-    if (value.isEmpty) throw new NotFoundException(what, name)
-    value.get
-  }
-
-
-  def apply[T](value: Seq[T], what: String): Seq[T] = {
-    if (value.isEmpty) throw new NotFoundException(what, "?")
-    value
-  }
-
-
-  def apply(file: File): File = {
-    if (!file.exists) throw new NotFoundException("file", file.getName)
-    file
-  }
+  @GET
+  @Path("{font}")
+  @Produces(MediaType.APPLICATION_OCTET_STREAM)
+  def font(@PathParam("font") name: String) = new File(new File(Works.directory, "fonts"), name)
 }

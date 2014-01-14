@@ -16,29 +16,53 @@
 
 package org.podval.judaica.webapp
 
-import org.podval.judaica.viewer.{Div, StructureSelection}
-import javax.ws.rs.{Path, GET, PathParam}
-import javax.ws.rs.core.{Context, UriInfo}
+import org.podval.judaica.viewer.{Structure, Selector, StructureSelection}
+
+import javax.ws.rs.{Produces, GET, Path, PathParam}
+import javax.ws.rs.core.{MediaType, UriBuilder, UriInfo, Context}
 
 
-final class StructureSelectionResource(selection: StructureSelection) {
+class StructureSelectionResource(selection: StructureSelection) {
 
   import StructureSelectionResource._
 
 
+  @Path("/content")
+  def content = new ContentResource(selection)
+
+
+  @Path("/{selector}")
+  def selector(@PathParam("selector") selectorName: String) = new DivSelectionResource(selection.structure(selectorName))
+
+
   @GET
-  def divs(@Context uriInfo: UriInfo) = Html(uriInfo, Some(selection.work), Table(selection.divs, uriInfo, divsColumn))
-
-
-  @Path("/{div}")
-  def div(@PathParam("div") divName: String) = new ContentSelectionResource(selection.div(divName))
+  @Produces(MediaType.TEXT_HTML)
+  def structure(@Context uriInfo: UriInfo) = Html(uriInfo,
+      <div>
+        {Table(selection.structures.structures, uriInfo, structuresColumn)}
+        {Table(selection.structures.deepStructures, uriInfo, contentColumn)}
+        {if (selection.editions.isNo) {
+        val editionsUri = uriInfo.getBaseUriBuilder.path("works").path(selection.work.defaultName).path("editions").build().toString
+        <p>List of available <a href={editionsUri}>editions</a></p>
+      }}
+      </div>
+    )
 }
 
 
 
 object StructureSelectionResource {
 
-  val divsColumn: LinkColumn[Div] = new SimpleLinkColumn[Div]("Divisions") {
-    override def text(div: Div): String = div.id
+  val structuresColumn: LinkColumn[Structure] = new SimpleLinkColumn[Structure]("Structure") {
+    override def text(structure: Structure): String = structure.defaultName
+  }
+
+
+  val contentColumn: LinkColumn[Seq[Selector]] = new LinkColumn[Seq[Selector]]("Content Format") {
+    override def link(format: Seq[Selector], uriBuilder: UriBuilder): UriBuilder = uriBuilder.
+      path("content").
+      queryParam("contentFormat", text(format))
+
+    override def text(format: Seq[Selector]): String = format.map(_.defaultName).mkString("/")
   }
 }

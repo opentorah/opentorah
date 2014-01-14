@@ -23,15 +23,16 @@ import java.io.File
 
 object Works {
 
-  val textsDirectory = new File("/home/dub/Code/judaica/texts/")
-
+  val directory = new File("/home/dub/Code/judaica/texts/")
 
   def works: Seq[Work] = works_.get
-  private[this] val works_ = LazyLoad(DirectoryScanner(textsDirectory, new Work(_, _)))
+  private[this] val works_ = LazyLoad(DirectoryScanner(directory, new Work(_, _)))
 
 
   def workByName(name: String): Option[Work] = Names.find(works, name)
   def getWorkByName(name: String): Work = Exists(workByName(name), name, "work")
+
+  def stylesheet: File = new File(directory, "stylesheet.css")
 }
 
 
@@ -51,6 +52,7 @@ final class Work(val directory: File, index: File) extends Named with Selectors 
   private[this] val structures_ = LazyLoad(Exists(Structure.parseStructures(index, selectors, metadata), "structures"))
 
 
+  // TODO handle situation when only one edition is present - allow to not put it into a subdirectory?
   def editions: Seq[Edition] = editions_.get
   def editionByName(name: String): Option[Edition] = Names.find(editions, name)
   def getEditionByName(name: String): Edition = Exists(editions, name, "edition")
@@ -58,6 +60,9 @@ final class Work(val directory: File, index: File) extends Named with Selectors 
 
 
   private[this] def metadata: Elem = XmlFile.loadMetadata(index)
+
+
+  def stylesheet: File = new File(directory, "stylesheet.css")
 
 
   override def toString: String = "Work (" + directory + ") " + names
@@ -76,4 +81,7 @@ final class Edition(val work: Work, directory: File, index: File) extends Named 
 
 
   private[this] def metadata: Elem = XmlFile.loadMetadata(index)
+
+
+  def stylesheet: File = new File(directory, "stylesheet.css")
 }

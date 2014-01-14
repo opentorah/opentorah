@@ -17,9 +17,9 @@
 package org.podval.judaica.webapp
 
 import org.podval.judaica.viewer.{Work, Works}
-import javax.ws.rs.{PathParam, Path, GET}
-import javax.ws.rs.core.{UriBuilder, UriInfo, Context}
-import java.io.File
+
+import javax.ws.rs.{Produces, PathParam, Path, GET}
+import javax.ws.rs.core.{MediaType, UriBuilder, UriInfo, Context}
 
 
 final class WorksResource {
@@ -28,16 +28,18 @@ final class WorksResource {
 
 
   @GET
-  def works(@Context uriInfo: UriInfo) = Html(uriInfo, None, Table(Works.works, uriInfo, worksColumn))
-
-
-  @GET
-  @Path("/stylesheet.css")
-  def stylesheet = new File(Works.textsDirectory, "stylesheet.css")
+  @Produces(MediaType.TEXT_HTML)
+  def works(@Context uriInfo: UriInfo) = Html(uriInfo, Table(Works.works, uriInfo, worksColumn))
 
 
   @Path("{work}")
   def work(@PathParam("work") name: String) = new WorkResource(Works.getWorkByName(name))
+
+
+  @GET
+  @Path("/stylesheet.css")
+  @Produces("text/css")
+  def stylesheet = Works.stylesheet
 }
 
 

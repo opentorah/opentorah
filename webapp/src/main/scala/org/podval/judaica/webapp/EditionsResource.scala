@@ -17,8 +17,8 @@
 package org.podval.judaica.webapp
 
 import org.podval.judaica.viewer.{Work, Edition, Editions, Selection}
-import javax.ws.rs.{PathParam, Path, GET}
-import javax.ws.rs.core.{UriInfo, Context}
+import javax.ws.rs.{Produces, PathParam, Path, GET}
+import javax.ws.rs.core.{MediaType, UriInfo, Context}
 
 
 final class EditionsResource(work: Work) {
@@ -27,15 +27,18 @@ final class EditionsResource(work: Work) {
 
 
   @GET
-  def editions(@Context uriInfo: UriInfo) =
-    Html(uriInfo, Some(work), Table(work.editions, uriInfo, editionsColumn))
+  @Produces(MediaType.TEXT_HTML)
+  def editions(@Context uriInfo: UriInfo) = Html(uriInfo, Table(work.editions, uriInfo, editionsColumn))
 
 
-  // TODO handle skipped "editions" - use default edition
+  @Path("{editions}")
+  def selection(@PathParam("editions") editionNames: String) = new StructureSelectionResource(Selection(work, editionNames))
 
 
-  @Path("{edition}")
-  def selection(@PathParam("edition") editionNames: String) = new ContentSelectionResource(Selection(work, editionNames))
+  @GET
+  @Path("/{edition}/stylesheet.css")
+  @Produces("text/css")
+  def stylesheet(@PathParam("edition") editionName: String) = work.getEditionByName(editionName).stylesheet
 }
 
 

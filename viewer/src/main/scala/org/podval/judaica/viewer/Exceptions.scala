@@ -19,25 +19,11 @@ package org.podval.judaica.viewer
 import java.io.File
 
 
-object Exists {
-
-  def apply[T <: Named](value: Seq[T], name: String, what: String): T = apply(Names.find(value, name), name, what)
+class ViewerException(message: String) extends Exception(message)
 
 
-  def apply[T](value: Option[T], name: String, what: String): T = {
-    if (value.isEmpty) throw new NotFoundException(what, name)
-    value.get
-  }
+class NotFoundException(what: String, name: String) extends ViewerException(s"$what $name not found")
 
 
-  def apply[T](value: Seq[T], what: String): Seq[T] = {
-    if (value.isEmpty) throw new NotFoundException(what, "?")
-    value
-  }
 
-
-  def apply(file: File): File = {
-    if (!file.exists) throw new NotFoundException("file", file.getName)
-    file
-  }
-}
+class ParseException(file: File, cause: ViewerException) extends Exception

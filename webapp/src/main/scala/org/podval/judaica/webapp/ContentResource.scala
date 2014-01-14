@@ -14,30 +14,25 @@
  * limitations under the License.
  */
 
-package org.podval.judaica.viewer
+package org.podval.judaica.webapp
 
-import java.io.File
+import org.podval.judaica.viewer.StructureSelection
 
+import javax.ws.rs.{Produces, QueryParam, GET}
+import javax.ws.rs.core.{UriInfo, Context, MediaType}
 
-object Exists {
-
-  def apply[T <: Named](value: Seq[T], name: String, what: String): T = apply(Names.find(value, name), name, what)
-
-
-  def apply[T](value: Option[T], name: String, what: String): T = {
-    if (value.isEmpty) throw new NotFoundException(what, name)
-    value.get
-  }
+import scala.xml.Elem
 
 
-  def apply[T](value: Seq[T], what: String): Seq[T] = {
-    if (value.isEmpty) throw new NotFoundException(what, "?")
-    value
-  }
+final class ContentResource(selection: StructureSelection) {
+
+  @GET
+  @Produces(MediaType.APPLICATION_XML)
+  def xml(@QueryParam("contentFormat") format: String): Elem = selection.xmlContent(format)
 
 
-  def apply(file: File): File = {
-    if (!file.exists) throw new NotFoundException("file", file.getName)
-    file
-  }
+  @GET
+  @Produces(MediaType.TEXT_HTML)
+  def html(@QueryParam("contentFormat") format: String, @Context uriInfo: UriInfo): Elem =
+    Html(uriInfo, selection, selection.htmlContent(format))
 }

@@ -20,40 +20,45 @@ package org.podval.judaica.viewer
 class Selection(val work: Work, val editions: Editions, val path: Seq[Div])
 
 
-final class ContentSelection(work: Work, editions: Editions, path: Seq[Div]) extends Selection(work, editions, path) {
+final class StructureSelection(work: Work, editions: Editions, path: Seq[Div]) extends Selection(work, editions, path) {
 
   def structures: Structures = if (path.isEmpty) work else path.last
 
-  def structure(name: String): StructureSelection = new StructureSelection(work, editions, path, structures.getStructureByName(name))
+  def structure(name: String): DivSelection = new DivSelection(work, editions, path, structures.getStructureByName(name))
 
-  def div(structureName: String, divName: String): ContentSelection = structure(structureName).div(divName)
+  def div(structureName: String, divName: String): StructureSelection = structure(structureName).div(divName)
+
+  def xmlContent(format: String) = throw new UnsupportedOperationException // TODO
+
+  def htmlContent(format: String) = throw new UnsupportedOperationException // TODO
 }
 
 
-final class StructureSelection(work: Work, editions: Editions, path: Seq[Div], structure: Structure) extends Selection(work, editions, path) {
+final class DivSelection(work: Work, editions: Editions, path: Seq[Div], structure: Structure) extends Selection(work, editions, path) {
 
   def divs: Seq[Div] = structure.divs
 
 
-  def div(name: String): ContentSelection = {
+  def div(name: String): StructureSelection = {
+    // TODO handle selecting named structure by number!
     val div: Div = if (structure.isNumbered) {
       structure.getDivByNumber(name.toInt) // TODO format errors
     } else {
       structure.asNamed.getDivByName(name)
     }
 
-    new ContentSelection(work, editions, path :+ div)
+    new StructureSelection(work, editions, path :+ div)
   }
 }
 
 
 object Selection {
 
-  def apply(work: Work): ContentSelection = apply(work, NoEditions)
+  def apply(work: Work): StructureSelection = apply(work, NoEditions)
 
 
-  def apply(work: Work, editionNames: String): ContentSelection = apply(work, Editions(work, editionNames))
+  def apply(work: Work, editionNames: String): StructureSelection = apply(work, Editions(work, editionNames))
 
 
-  def apply(work: Work, editions: Editions): ContentSelection = new ContentSelection(work, editions, Seq.empty)
+  def apply(work: Work, editions: Editions): StructureSelection = new StructureSelection(work, editions, Seq.empty)
 }

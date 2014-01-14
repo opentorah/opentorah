@@ -53,9 +53,13 @@ trait Selectors {
   def selectorByName(name: String): Option[Selector]
 
 
+  // TODO some sanity: deepStructure/format etc.
   def deepStructures: Seq[Seq[Selector]] =
     if (selectors.isEmpty) Seq(Nil) else
     selectors.flatMap(selector => selector.deepStructures.map (ds => selector +: ds))
+
+
+  // TODO add "descendants" - and use it in parseSelectors, to accommodate "day/chapter"
 }
 
 
