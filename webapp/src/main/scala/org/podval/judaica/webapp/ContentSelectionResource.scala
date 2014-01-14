@@ -16,15 +16,15 @@
 
 package org.podval.judaica.webapp
 
-import org.podval.judaica.viewer.{Structures, Structure, Editions, Div, Selector}
+import org.podval.judaica.viewer.{Structure, Selector, ContentSelection}
 
 import javax.ws.rs.{GET, Path, PathParam, QueryParam}
 import javax.ws.rs.core.{UriBuilder, UriInfo, Context}
 
 
-class SelectionResource(editions: Editions, structures: Structures) {
+class ContentSelectionResource(selection: ContentSelection) {
 
-  import SelectionResource._
+  import ContentSelectionResource._
 
 
   @GET
@@ -32,11 +32,16 @@ class SelectionResource(editions: Editions, structures: Structures) {
     @QueryParam("showContent") showContent: Boolean,
     @Context uriInfo: UriInfo) =
   {
-    if (!showContent) {
-      Html(uriInfo, Some(editions.work),
+    if (!showContent || selection.editions.isNo) {
+      // TODO remove duplication: in the column, here and in the Html (edition stylesheet)
+      Html(uriInfo, Some(selection.work),
         <div>
-          {Table(structures.structures, uriInfo, structuresColumn)}
-          {Table(structures.deepStructures, uriInfo, contentColumn)}
+          {Table(selection.structures.structures, uriInfo, structuresColumn)}
+          {Table(selection.structures.deepStructures, uriInfo, contentColumn)}
+          {if (selection.editions.isNo) {
+            val editionsUri = uriInfo.getBaseUriBuilder.path("works").path(selection.work.defaultName).path("editions").build().toString
+            <p>List of available <a href={editionsUri}>editions</a></p>
+          }}
         </div>
       )
     } else {
@@ -46,47 +51,14 @@ class SelectionResource(editions: Editions, structures: Structures) {
   }
 
 
-  @GET
   @Path("/{selector}")
-  def divs(
-    @PathParam("selector") selectorName: String,
-    @Context uriInfo: UriInfo) =
-  {
-    val structure = getStructure(structures, selectorName)
-    Html(uriInfo, Some(editions.work), Table(structure.divs, uriInfo, divsColumn))
-  }
-
-
-  @Path("/{selector}/{div}")
-  def div(
-    @PathParam("selector") selectorName: String,
-    @PathParam("div") divName: String,
-    @QueryParam("showContent") showContent: Boolean,
-    @Context uriInfo: UriInfo) =
-  {
-    val structure = getStructure(structures, selectorName)
-    val div: Div = Exists(getDiv(structure, divName), divName, "div")
-    new SelectionResource(editions, div)
-  }
+  def selector(@PathParam("selector") selectorName: String) =
+    new StructureSelectionResource(selection.getStructure(selectorName))
 }
 
 
 
-object SelectionResource {
-
-  private def getStructure(structures: Structures, name: String): Structure =
-    Exists(structures.structureByName(name), name, "structure")
-
-
-  private def getDiv(structure: Structure, divName: String): Option[Div] = {
-    if (structure.isNumbered) {
-      val divNumber = divName.toInt // TODO format errors
-      structure.divByNumber(divNumber)
-    } else {
-      structure.asNamed.divByName(divName)
-    }
-  }
-
+object ContentSelectionResource {
 
   val structuresColumn: LinkColumn[Structure] = new SimpleLinkColumn[Structure]("Structure") {
     override def text(structure: Structure): String = structure.defaultName
@@ -99,10 +71,5 @@ object SelectionResource {
       queryParam("contentFormat", text(format))
 
     override def text(format: Seq[Selector]): String = format.map(_.defaultName).mkString("/")
-  }
-
-
-  val divsColumn: LinkColumn[Div] = new SimpleLinkColumn[Div]("Divisions") {
-    override def text(div: Div): String = div.id
   }
 }

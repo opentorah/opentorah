@@ -16,13 +16,22 @@
 
 package org.podval.judaica.webapp
 
-import javax.ws.rs.NotFoundException
+import org.podval.judaica.viewer.{Work, Selection}
+import javax.ws.rs.{Path, GET}
+import java.io.File
 
 
-object Exists {
+final class WorkResource(work: Work) {
 
-  def apply[T](value: Option[T], name: String, what: String): T = {
-    if (value.isEmpty) throw new NotFoundException(what + " " + name)
-    value.get
-  }
+  @Path("/")
+  def content = new ContentSelectionResource(Selection(work))
+
+
+  @GET
+  @Path("/stylesheet.css")
+  def stylesheet = new File(work.directory, "stylesheet.css")
+
+
+  @Path("/editions")
+  def editions = new EditionsResource(work)
 }

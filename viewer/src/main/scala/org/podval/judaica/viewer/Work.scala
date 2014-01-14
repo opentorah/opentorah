@@ -31,6 +31,7 @@ object Works {
 
 
   def workByName(name: String): Option[Work] = Names.find(works, name)
+  def getWorkByName(name: String): Work = Exists(workByName(name), name, "work")
 }
 
 
@@ -47,11 +48,12 @@ final class Work(val directory: File, index: File) extends Named with Selectors 
 
   override def structures: Seq[Structure] = structures_.get
   override def structureByName(name: String): Option[Structure] = Names.find(structures, name)
-  private[this] val structures_  = LazyLoad(Exists(Structure.parseStructures(index, selectors, metadata), "structures"))
+  private[this] val structures_ = LazyLoad(Exists(Structure.parseStructures(index, selectors, metadata), "structures"))
 
 
   def editions: Seq[Edition] = editions_.get
   def editionByName(name: String): Option[Edition] = Names.find(editions, name)
+  def getEditionByName(name: String): Edition = Exists(editions, name, "edition")
   private[this] val editions_ = LazyLoad(DirectoryScanner(directory, new Edition(this, _, _)))
 
 
@@ -67,6 +69,7 @@ final class Edition(val work: Work, directory: File, index: File) extends Named 
 
   override val names: Names = Names(metadata)
 
+  // TODO add language attribute
 
   def storage: Storage = storage_.get
   private[this] val storage_ = LazyLoad(new DirectoryStorage(work.structures, metadata, directory))

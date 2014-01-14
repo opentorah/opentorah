@@ -21,15 +21,14 @@ import scala.xml.Elem
 import java.io.File
 
 
-abstract class Div(parsingFile: File, uncles: Seq[Selector], selector: Selector, xml: Elem) extends Structures {
+abstract class Div(val structure: Structure, parsingFile: File, uncles: Seq[Selector], xml: Elem) extends Structures {
 
   // TODO parse the Path
 /////  val path = xml.attributeOption("path")
-  override val selectors: Seq[Selector] = Selector.parseSelectors(uncles, xml)
-  val effectiveSelectors = selector.selectors ++ selectors
-  override val structures: Seq[Structure] =  Structure.parseStructures(parsingFile, effectiveSelectors, xml)
+  val localSelectors: Seq[Selector] = Selector.parseSelectors(uncles, xml)
+  override val selectors = structure.selector.selectors ++ localSelectors
+  override val structures: Seq[Structure] =  Structure.parseStructures(parsingFile, selectors, xml)
   // TODO complete the list of structures - even if some of them are empty!
-
 
   override def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
   override def structureByName(name: String): Option[Structure] = Names.find(structures, name)
@@ -42,28 +41,8 @@ abstract class Div(parsingFile: File, uncles: Seq[Selector], selector: Selector,
 }
 
 
-final class NumberedDiv(parsingFile: File, uncles: Seq[Selector], selector: NumberedSelector, val number: Int, xml: Elem)
-  extends Div(parsingFile, uncles, selector, xml)
-{
-  {
-    val nOption = xml.attributeOption("n")
-    if (nOption.isDefined) {
-      val nvalue = xml.getIntAttribute("n")
-      require(nvalue == number, s"Div $number has attribute n set to $nvalue")
-    }
-  }
-
-
-  override def isNumbered: Boolean = true
-  override def asNumbered: NumberedDiv = this
-  override def asNamed: NamedDiv = throw new ClassCastException
-
-  override def id: String = number.toString
-}
-
-
-final class NamedDiv(parsingFile: File, uncles: Seq[Selector], selector: NamedSelector, xml: Elem)
-  extends Div(parsingFile, uncles, selector, xml) with Named
+final class NamedDiv(structure: NamedStructure, parsingFile: File, uncles: Seq[Selector], xml: Elem)
+  extends Div(structure, parsingFile, uncles, xml) with Named
 {
   override val names = Names(xml)
 
@@ -71,17 +50,27 @@ final class NamedDiv(parsingFile: File, uncles: Seq[Selector], selector: NamedSe
   override def asNumbered: NumberedDiv = throw new ClassCastException
   override def asNamed: NamedDiv = this
 
-  override def id: String = names.default.name
+  override def id: String = defaultName
 }
 
 
 
-object Div {
+final class NumberedDiv(structure: NumberedStructure, parsingFile: File, uncles: Seq[Selector], val number: Int, xml: Elem)
+  extends Div(structure, parsingFile, uncles, xml)
+{
+  checkNumber
 
-  def namedDivs(parsingFile: File, selector: NamedSelector, uncles: Seq[Selector], xml: Elem): Seq[NamedDiv] =
-    xml.elemsFilter("div").map(xml => new NamedDiv(parsingFile, uncles, selector, xml))
+  private[this] def checkNumber {
+    val nOption = xml.attributeOption("n")
+    if (nOption.isDefined) {
+      val nvalue = xml.getIntAttribute("n")
+      require(nvalue == number, s"Div $number has attribute n set to $nvalue")
+    }
+  }
 
+  override def isNumbered: Boolean = true
+  override def asNumbered: NumberedDiv = this
+  override def asNamed: NamedDiv = throw new ClassCastException
 
-  def numberedDivs(parsingFile: File, selector: NumberedSelector, uncles: Seq[Selector], xml: Elem): Seq[NumberedDiv] =
-    xml.elemsFilter("div").zipWithIndex.map { case (xml, num) => new NumberedDiv(parsingFile, uncles, selector, num+1, xml) }
+  override def id: String = number.toString
 }

@@ -48,10 +48,7 @@ final class DirectoryStorage(structures: Seq[Structure], metadata: Elem, directo
   override def asFile: FileStorage = throw new ClassCastException
 
   val storageXml = metadata.oneChild("storage")
-  val structureName : String = storageXml.getAttribute("structure")
-  val structureOption: Option[Structure] = Names.find(structures, structureName)
-  require(structureOption.isDefined, s"Structure $structureName not found")
-  val structure = structureOption.get
+  val structure = Exists(structures, storageXml.getAttribute("structure"), "structure")
 
   // TODO allow overrides ? val overrides = Xml.elems(structure) ... Xml.check(override, "file")
 

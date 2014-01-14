@@ -33,6 +33,9 @@ abstract class Structure(val selector: Selector) extends Named {
   final def length: Int = divs.length
 
   final def divByNumber(number: Int): Option[Div] = if ((number < 1) || (number > length)) None else Some(divs(number))
+  final def getDivByNumber(number: Int): Div = Exists(divByNumber(number), number.toString, "div")
+
+  protected final def divs(xml: Elem): Seq[Elem] = xml.elemsFilter("div")
 }
 
 
@@ -43,6 +46,10 @@ abstract class NamedStructure(override val selector: NamedSelector) extends Stru
   override def divs: Seq[NamedDiv]
 
   final def divByName(name: String): Option[NamedDiv] = Names.find(divs, name)
+  final def getDivByName(name: String): NamedDiv = Exists(divs, name, "div")
+
+  protected final def parseDivs(parsingFile: File, uncles: Seq[Selector], xml: Elem): Seq[NamedDiv] =
+    divs(xml).map(xml => new NamedDiv(this, parsingFile, uncles, xml))
 }
 
 
@@ -54,7 +61,7 @@ final class NamedParsedStructure(
   uncles: Seq[Selector],
   xml: Elem) extends NamedStructure(selector)
 {
-  override val divs: Seq[NamedDiv] = Div.namedDivs(parsingFile, selector, uncles, xml)
+  override val divs: Seq[NamedDiv] = parseDivs(parsingFile, uncles, xml)
 }
 
 
@@ -64,7 +71,7 @@ final class NamedLazyStructure(
   file: File) extends NamedStructure(selector)
 {
   override def divs: Seq[NamedDiv] = divs_.get
-  private[this] val divs_ = LazyLoad(Div.namedDivs(file, selector, uncles, xml))
+  private[this] val divs_ = LazyLoad(parseDivs(file, uncles, xml))
   private[this] def xml: Elem = XmlFile.load(file, "structure")
 }
 
@@ -75,6 +82,9 @@ abstract class NumberedStructure(override val selector: NumberedSelector) extend
   final override def asNamed: NamedStructure = throw new ClassCastException
 
   override def divs: Seq[NumberedDiv]
+
+  protected final def parseDivs(parsingFile: File, uncles: Seq[Selector], xml: Elem): Seq[NumberedDiv] =
+    divs(xml).zipWithIndex.map { case (xml, num) => new NumberedDiv(this, parsingFile, uncles, num+1, xml) }
 }
 
 
@@ -84,7 +94,7 @@ final class NumberedParsedStructure(
   uncles: Seq[Selector],
   xml: Elem) extends NumberedStructure(selector)
 {
-  override val divs: Seq[NumberedDiv] = Div.numberedDivs(parsingFile, selector, uncles, xml)
+  override val divs: Seq[NumberedDiv] = parseDivs(parsingFile, uncles, xml)
 }
 
 
@@ -94,7 +104,7 @@ final class NumberedLazyStructure(
   file: File) extends NumberedStructure(selector)
 {
   override def divs: Seq[NumberedDiv] = divs_.get
-  private[this] val divs_ = LazyLoad(Div.numberedDivs(file, selector, uncles, metadata))
+  private[this] val divs_ = LazyLoad(parseDivs(file, uncles, metadata))
   private[this] def metadata: Elem = XmlFile.load(file, "structure")
 }
 
@@ -103,6 +113,7 @@ final class NumberedLazyStructure(
 trait Structures extends Selectors {
   def structures: Seq[Structure]
   def structureByName(name: String): Option[Structure]
+  def getStructureByName(name: String): Structure = Exists(structureByName(name), name, "structure")
 }
 
 

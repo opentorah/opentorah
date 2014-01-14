@@ -47,6 +47,8 @@ object Html {
       }
     }
 
+    // TODO add the Edition stylesheet (different fonts for different languages etc.)
+
     <html>
       <head>
         <link rel="stylesheet" type="text/css" href={mainStylesheet}/>

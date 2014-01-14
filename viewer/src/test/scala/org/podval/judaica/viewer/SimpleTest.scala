@@ -33,48 +33,56 @@ class SimpleTest {
 
   @Test
   def bookSelector = {
-    val bookOption = Works.workByName("Tanach").get.selectorByName("book")
+    val bookOption = Works.getWorkByName("Tanach").selectorByName("book")
     assertTrue(bookOption.isDefined)
     val book = bookOption.get
-    assertEquals(Set("chapter", "week"), book.selectors.map(_.names.default.name).toSet)
+    assertEquals(Set("chapter", "week"), book.selectors.map(_.defaultName).toSet)
     assertFalse(book.isNumbered)
   }
 
 
   @Test
   def chapterSelector = {
-    val chapterOption = Works.workByName("Tanach").get.selectorByName("book").get.selectorByName("chapter")
+    val chapterOption = Works.getWorkByName("Tanach").selectorByName("book").get.selectorByName("chapter")
     assertTrue(chapterOption.isDefined)
     val chapter = chapterOption.get
-    assertEquals(Set("verse"), chapter.selectors.map(_.names.default.name).toSet)
+    assertEquals(Set("verse"), chapter.selectors.map(_.defaultName).toSet)
     assertTrue(chapter.isNumbered)
   }
 
 
   @Test
-  def defaultName = assertEquals("Tanach", Works.workByName("Хумаш").get.names.default.name)
+  def defaultName = assertEquals("Tanach", Works.getWorkByName("Хумаш").defaultName)
 
 
   @Test
-  def directory = assertEquals("Tanach", Works.workByName("Хумаш").get.directory.getName)
+  def directory = assertEquals("Tanach", Works.getWorkByName("Хумаш").directory.getName)
 
 
   @Test
-  def findTorontoEdition = assertTrue(Works.workByName("Tanach").get.editionByName("Toronto").isDefined)
+  def findTorontoEdition = assertTrue(Works.getWorkByName("Tanach").editionByName("Toronto").isDefined)
 
 
-//  @Test
-//  def deepStructureChumash = {
-//    val formats: Seq[Seq[Selector]] = Works.workByName("Хумаш").get.deepStructures
-//    formats.map(_.map(_.names.default.name).mkString("/")).foreach(println)
-//  }
+  @Test
+  def deepStructureChumash = {
+    val formats: Seq[Seq[Selector]] = Works.getWorkByName("Хумаш").deepStructures
+    formats.map(_.map(_.defaultName).mkString("/")).foreach(println)
+  }
+
+
+  @Test
+  def deepStructureGenesis = {
+    val selection = Selection(Works.getWorkByName("Хумаш")).div("book", "Genesis")
+    val formats: Seq[Seq[Selector]] = selection.structures.deepStructures
+    formats.map(_.map(_.defaultName).mkString("/")).foreach(println)
+  }
 
 
   @Test
   def jerusalemEditionStorage = {
-    val storage = Works.workByName("Tanach").get.editionByName("Jerusalem").get.storage
+    val storage = Works.getWorkByName("Tanach").getEditionByName("Jerusalem").storage
     assertTrue(storage.isDirectory)
-    assertEquals("book", storage.asDirectory.structure.selector.names.default.name)
+    assertEquals("book", storage.asDirectory.structure.selector.defaultName)
     assertEquals(5, storage.asDirectory.files.length)
     val file0 = storage.asDirectory.files(0)
     assertTrue(file0.isFile)

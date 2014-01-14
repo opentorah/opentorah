@@ -17,8 +17,32 @@
 package org.podval.judaica.viewer
 
 
-sealed class Editions(val work: Work)
-class NoEditions(work: Work) extends Editions(work)
-class LinearEditions(work: Work, val editions: Seq[Edition]) extends Editions(work)
-class DiffEdition(work: Work, val edition1: Edition, val edition2: Edition) extends Editions(work)
-class SingleEdition(work: Work, val edition: Edition) extends Editions(work)
+sealed trait Editions {
+  def isNo: Boolean = false
+}
+
+object NoEditions extends Editions {
+  override def isNo: Boolean = true
+}
+
+final class LinearEditions(val editions: Seq[Edition]) extends Editions
+final class DiffEdition(val edition1: Edition, val edition2: Edition) extends Editions
+final class SingleEdition(val edition: Edition) extends Editions
+
+
+
+object Editions {
+
+  // TODO for more precise error reporting - exceptions and exception mapper?
+
+  def apply(work: Work, editionNames: String): Editions = {
+    if (editionNames.contains('+')) {
+      val names: Seq[String] = editionNames.split('+')
+      new LinearEditions(names.map(work.getEditionByName(_)))
+      // TODO diff view
+      //    } else if (editionNames.contains('-')) {
+    } else {
+      new SingleEdition(work.getEditionByName(editionNames))
+    }
+  }
+}
