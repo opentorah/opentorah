@@ -30,24 +30,28 @@ class ContentSelectionResource(selection: ContentSelection) {
   @GET
   def structuresOrContent(
     @QueryParam("showContent") showContent: Boolean,
+    @QueryParam("contentFormat") format: String,
     @Context uriInfo: UriInfo) =
-  {
-    if (!showContent || selection.editions.isNo) {
-      // TODO remove duplication: in the column, here and in the Html (edition stylesheet)
-      Html(uriInfo, Some(selection.work),
-        <div>
-          {Table(selection.structures.structures, uriInfo, structuresColumn)}
-          {Table(selection.structures.deepStructures, uriInfo, contentColumn)}
-          {if (selection.editions.isNo) {
-            val editionsUri = uriInfo.getBaseUriBuilder.path("works").path(selection.work.defaultName).path("editions").build().toString
-            <p>List of available <a href={editionsUri}>editions</a></p>
-          }}
-        </div>
-      )
-    } else {
-      // TODO show content, finally!
-      "***** Content View is not yet implemented! *****"
-    }
+    if (!showContent || selection.editions.isNo) structure(uriInfo) else content(format, uriInfo)
+
+
+  // TODO remove duplication: in the column, here and in the Html (edition stylesheet)
+  private[this] def structure(uriInfo: UriInfo) = Html(uriInfo, Some(selection.work),
+      <div>
+        {Table(selection.structures.structures, uriInfo, structuresColumn)}
+        {Table(selection.structures.deepStructures, uriInfo, contentColumn)}
+        {if (selection.editions.isNo) {
+        val editionsUri = uriInfo.getBaseUriBuilder.path("works").path(selection.work.defaultName).path("editions").build().toString
+        <p>List of available <a href={editionsUri}>editions</a></p>
+      }}
+      </div>
+    )
+
+
+  private[this] def content(format: String, uriInfo: UriInfo) = {
+    // TODO show content, finally!
+    // TODO thread the "format" here
+    "***** Content View is not yet implemented! *****"
   }
 
 
