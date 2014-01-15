@@ -21,11 +21,11 @@ import scala.xml.Elem
 import java.io.File
 
 
-abstract class Div(val structure: Structure, parsingFile: File, uncles: Seq[Selector], xml: Elem) extends Structures {
+abstract class Div(val structure: Structure, parsingFile: File, knownSelectors: Set[Selector], xml: Elem) extends Structures {
 
   // TODO parse the Path
 /////  val path = xml.attributeOption("path")
-  val localSelectors: Seq[Selector] = Selector.parseSelectors(uncles, xml)
+  val localSelectors: Seq[Selector] = Selector.parseSelectors(knownSelectors, xml)
   override val selectors: Seq[Selector] = structure.selector.selectors ++ localSelectors
   override val structures: Seq[Structure] = Structure.parseStructures(parsingFile, selectors, xml)
 
@@ -40,8 +40,8 @@ abstract class Div(val structure: Structure, parsingFile: File, uncles: Seq[Sele
 }
 
 
-final class NamedDiv(structure: NamedStructure, parsingFile: File, uncles: Seq[Selector], xml: Elem)
-  extends Div(structure, parsingFile, uncles, xml) with Named
+final class NamedDiv(structure: NamedStructure, parsingFile: File, knownSelectors: Set[Selector], xml: Elem)
+  extends Div(structure, parsingFile, knownSelectors, xml) with Named
 {
   override val names = Names(xml)
 
@@ -54,8 +54,8 @@ final class NamedDiv(structure: NamedStructure, parsingFile: File, uncles: Seq[S
 
 
 
-final class NumberedDiv(structure: NumberedStructure, parsingFile: File, uncles: Seq[Selector], val number: Int, xml: Elem)
-  extends Div(structure, parsingFile, uncles, xml)
+final class NumberedDiv(structure: NumberedStructure, parsingFile: File, knownSelectors: Set[Selector], val number: Int, xml: Elem)
+  extends Div(structure, parsingFile, knownSelectors, xml)
 {
   checkNumber
 

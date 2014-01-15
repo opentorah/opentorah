@@ -20,25 +20,25 @@ import org.podval.judaica.xml.Xml.Ops
 import scala.xml.Elem
 
 
-abstract class Selector(siblings: Seq[Selector], xml: Elem) extends Named with Selectors {
+abstract class Selector(known: Set[Selector], xml: Elem) extends Named with Selectors {
   def isNumbered: Boolean
   def asNumbered: NumberedSelector
   def asNamed: NamedSelector
 
   override val names = Names(xml)
-  override val selectors = Selector.parseSelectors(siblings, xml)
+  override val selectors = Selector.parseSelectors(known, xml)
   override def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
 }
 
 
-final class NumberedSelector(siblings: Seq[Selector], xml: Elem) extends Selector(siblings, xml) {
+final class NumberedSelector(known: Set[Selector], xml: Elem) extends Selector(known, xml) {
   override def isNumbered: Boolean = true
   override def asNumbered: NumberedSelector = this
   override def asNamed: NamedSelector = throw new ClassCastException
 }
 
 
-final class NamedSelector(siblings: Seq[Selector], xml: Elem) extends Selector(siblings, xml) {
+final class NamedSelector(known: Set[Selector], xml: Elem) extends Selector(known, xml) {
   override def isNumbered: Boolean = false
   override def asNumbered: NumberedSelector = throw new ClassCastException
   override def asNamed: NamedSelector = this
@@ -56,6 +56,33 @@ trait Selectors {
   def deepStructures: Seq[Seq[Selector]] =
     if (selectors.isEmpty) Seq(Nil) else
     selectors.flatMap(selector => selector.deepStructures.map (ds => selector +: ds))
+}
+
+
+
+object Selector {
+
+  // TODO make readable :)
+  def parseSelectors(known: Set[Selector], xmls: Elem): Seq[Selector] =
+    xmls.elemsFilter("selector").foldLeft((known, Seq.empty[Selector])) {
+      case ((known, siblings), xml) =>
+        val selector = parseSelector(known, xml)
+        (descendants(known, Set(selector)) , siblings :+ selector)
+    }._2
+
+
+  private def parseSelector(known: Set[Selector], xml: Elem): Selector = {
+    val nameOption = xml.attributeOption("name")
+    if (nameOption.isDefined) {
+      // A reference to a previously defined Selector
+      Exists(known.toSeq, nameOption.get, "selector") // TODO remove toSeq...
+    } else {
+      if (xml.booleanAttribute("isNumbered"))
+        new NumberedSelector(known, xml)
+      else
+        new NamedSelector(known, xml)
+    }
+  }
 
 
   def descendants(next: Set[Selector]): Set[Selector] = descendants(Set.empty, next)
@@ -66,30 +93,6 @@ trait Selectors {
     if (add.isEmpty) result else {
       val children: Set[Selector] = add.flatMap(_.selectors)
       descendants(result ++ next, children)
-    }
-  }
-}
-
-
-
-object Selector {
-
-  // TODO use "descendants" it in parseSelectors, to accommodate "day/chapter"
-
-  def parseSelectors(uncles: Seq[Selector], xmls: Elem): Seq[Selector] =
-    xmls.elemsFilter("selector").foldLeft(Seq.empty[Selector])((siblings, xml) => siblings :+ parseSelector(uncles, siblings, xml))
-
-
-  private def parseSelector(uncles: Seq[Selector], siblings: Seq[Selector], xml: Elem): Selector = {
-    val nameOption = xml.attributeOption("name")
-    if (nameOption.isDefined) {
-      // A reference to a previously defined Selector
-      Exists(uncles, nameOption.get, "selector")
-    } else {
-      if (xml.booleanAttribute("isNumbered"))
-        new NumberedSelector(siblings, xml)
-      else
-        new NamedSelector(siblings, xml)
     }
   }
 }

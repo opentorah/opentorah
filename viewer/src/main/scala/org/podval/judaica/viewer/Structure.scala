@@ -50,9 +50,9 @@ abstract class NamedStructure(override val selector: NamedSelector) extends Stru
   final def divByName(name: String): Option[NamedDiv] = Names.find(divs, name)
   final def getDivByName(name: String): NamedDiv = Exists(divs, name, "div")
 
-  protected final def parseDivs(parsingFile: File, uncles: Seq[Selector], xml: Elem): Seq[NamedDiv] =
+  protected final def parseDivs(parsingFile: File, knownSelectors: Set[Selector], xml: Elem): Seq[NamedDiv] =
     withFile(parsingFile)
-    { divs(xml).map(xml => new NamedDiv(this, parsingFile, uncles, xml)) }
+    { divs(xml).map(xml => new NamedDiv(this, parsingFile, knownSelectors, xml)) }
 }
 
 
@@ -60,20 +60,20 @@ abstract class NamedStructure(override val selector: NamedSelector) extends Stru
 final class NamedParsedStructure(
   parsingFile: File,
   selector: NamedSelector,
-  uncles: Seq[Selector],
+  knownSelectors: Set[Selector],
   xml: Elem) extends NamedStructure(selector)
 {
-  override val divs: Seq[NamedDiv] = parseDivs(parsingFile, uncles, xml)
+  override val divs: Seq[NamedDiv] = parseDivs(parsingFile, knownSelectors, xml)
 }
 
 
 final class NamedLazyStructure(
   selector: NamedSelector,
-  uncles: Seq[Selector],
+  knownSelectors: Set[Selector],
   file: File) extends NamedStructure(selector)
 {
   override def divs: Seq[NamedDiv] = divs_.get
-  private[this] val divs_ = LazyLoad(parseDivs(file, uncles, xml))
+  private[this] val divs_ = LazyLoad(parseDivs(file, knownSelectors, xml))
   private[this] def xml: Elem = XmlFile.load(file, "structure")
 }
 
@@ -85,29 +85,29 @@ abstract class NumberedStructure(override val selector: NumberedSelector) extend
 
   override def divs: Seq[NumberedDiv]
 
-  protected final def parseDivs(parsingFile: File, uncles: Seq[Selector], xml: Elem): Seq[NumberedDiv] =
+  protected final def parseDivs(parsingFile: File, knownSelectors: Set[Selector], xml: Elem): Seq[NumberedDiv] =
     withFile(parsingFile)
-    { divs(xml).zipWithIndex.map { case (xml, num) => new NumberedDiv(this, parsingFile, uncles, num+1, xml) } }
+    { divs(xml).zipWithIndex.map { case (xml, num) => new NumberedDiv(this, parsingFile, knownSelectors, num+1, xml) } }
 }
 
 
 final class NumberedParsedStructure(
   parsingFile: File,
   selector: NumberedSelector,
-  uncles: Seq[Selector],
+  knownSelectors: Set[Selector],
   xml: Elem) extends NumberedStructure(selector)
 {
-  override val divs: Seq[NumberedDiv] = parseDivs(parsingFile, uncles, xml)
+  override val divs: Seq[NumberedDiv] = parseDivs(parsingFile, knownSelectors, xml)
 }
 
 
 final class NumberedLazyStructure(
   selector: NumberedSelector,
-  uncles: Seq[Selector],
+  knownSelectors: Set[Selector],
   file: File) extends NumberedStructure(selector)
 {
   override def divs: Seq[NumberedDiv] = divs_.get
-  private[this] val divs_ = LazyLoad(parseDivs(file, uncles, metadata))
+  private[this] val divs_ = LazyLoad(parseDivs(file, knownSelectors, metadata))
   private[this] def metadata: Elem = XmlFile.load(file, "structure")
 }
 
@@ -135,20 +135,21 @@ object Structure {
   private def parseStructure(parsingFile: File, selectors: Seq[Selector], xml: Elem): Structure = {
     val selector = Exists(selectors, xml.getAttribute("selector"), "selector")
     val uncles = selectors.takeWhile(_ != selector)
+    val knownSelectors = Selector.descendants(uncles.toSet)
 
     val fileOption = xml.attributeOption("file")
     if (fileOption.isEmpty) {
       if (selector.isNumbered) {
-        new NumberedParsedStructure(parsingFile, selector.asNumbered, uncles, xml)
+        new NumberedParsedStructure(parsingFile, selector.asNumbered, knownSelectors, xml)
       } else {
-        new NamedParsedStructure(parsingFile, selector.asNamed, uncles, xml)
+        new NamedParsedStructure(parsingFile, selector.asNamed, knownSelectors, xml)
       }
     } else {
       val file = new File(parsingFile.getParentFile, fileOption.get)
       if (selector.isNumbered) {
-        new NumberedLazyStructure(selector.asNumbered, uncles, file)
+        new NumberedLazyStructure(selector.asNumbered, knownSelectors, file)
       } else {
-        new NamedLazyStructure(selector.asNamed, uncles, file)
+        new NamedLazyStructure(selector.asNamed, knownSelectors, file)
       }
     }
   }
