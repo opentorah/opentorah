@@ -16,8 +16,8 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.XmlFile
-import scala.xml.Elem
+import ParseException.withMetadataFile
+
 import java.io.File
 
 
@@ -39,17 +39,17 @@ object Works {
 
 final class Work(val directory: File, index: File) extends Named with Selectors with Structures {
 
-  override val names: Names = Names(metadata)
+  override val names: Names = withMetadataFile(index)(Names(_))
 
 
   override def selectors: Seq[Selector] = selectors_.get
   override def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
-  private[this] val selectors_ = LazyLoad(Exists(Selector.parseSelectors(Seq.empty, metadata), "selectors"))
+  private[this] val selectors_ = LazyLoad(withMetadataFile(index)(xml => Exists(Selector.parseSelectors(Seq.empty, xml), "selectors")))
 
 
   override def structures: Seq[Structure] = structures_.get
   override def structureByName(name: String): Option[Structure] = Names.find(structures, name)
-  private[this] val structures_ = LazyLoad(Exists(Structure.parseStructures(index, selectors, metadata), "structures"))
+  private[this] val structures_ = LazyLoad(withMetadataFile(index)(xml => Exists(Structure.parseStructures(index, selectors, xml), "structures")))
 
 
   // TODO handle situation when only one edition is present - allow to not put it into a subdirectory?
@@ -57,9 +57,6 @@ final class Work(val directory: File, index: File) extends Named with Selectors 
   def editionByName(name: String): Option[Edition] = Names.find(editions, name)
   def getEditionByName(name: String): Edition = Exists(editions, name, "edition")
   private[this] val editions_ = LazyLoad(DirectoryScanner(directory, new Edition(this, _, _)))
-
-
-  private[this] def metadata: Elem = XmlFile.loadMetadata(index)
 
 
   def stylesheet: File = new File(directory, "stylesheet.css")
@@ -72,15 +69,12 @@ final class Work(val directory: File, index: File) extends Named with Selectors 
 
 final class Edition(val work: Work, directory: File, index: File) extends Named {
 
-  override val names: Names = Names(metadata)
+  override val names: Names = withMetadataFile(index)(Names(_))
 
   // TODO add language attribute
 
   def storage: Storage = storage_.get
-  private[this] val storage_ = LazyLoad(new DirectoryStorage(work.structures, metadata, directory))
-
-
-  private[this] def metadata: Elem = XmlFile.loadMetadata(index)
+  private[this] val storage_ = LazyLoad(withMetadataFile(index)(new DirectoryStorage(work.structures, _, directory)))
 
 
   def stylesheet: File = new File(directory, "stylesheet.css")

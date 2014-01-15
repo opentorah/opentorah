@@ -16,6 +16,8 @@
 
 package org.podval.judaica.viewer
 
+import org.podval.judaica.xml.XmlFile
+import scala.xml.Elem
 import java.io.File
 
 
@@ -25,5 +27,19 @@ class ViewerException(message: String) extends Exception(message)
 class NotFoundException(what: String, name: String) extends ViewerException(s"$what $name not found")
 
 
-
 class ParseException(file: File, cause: ViewerException) extends Exception
+
+
+
+object ParseException {
+
+  def withMetadataFile[T](file: File)(body: Elem => T): T = withFile(file)(body(XmlFile.loadMetadata(file)))
+
+
+  def withFile[T](file: File)(body: => T): T =
+    try {
+      body
+    } catch {
+      case e: ViewerException => throw new ParseException(file, e)
+    }
+}

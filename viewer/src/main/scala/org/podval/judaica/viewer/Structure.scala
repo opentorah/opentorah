@@ -18,6 +18,8 @@ package org.podval.judaica.viewer
 
 import org.podval.judaica.xml.Xml.Ops
 import org.podval.judaica.xml.XmlFile
+import ParseException.withFile
+
 import scala.xml.Elem
 import java.io.File
 
@@ -49,11 +51,11 @@ abstract class NamedStructure(override val selector: NamedSelector) extends Stru
   final def getDivByName(name: String): NamedDiv = Exists(divs, name, "div")
 
   protected final def parseDivs(parsingFile: File, uncles: Seq[Selector], xml: Elem): Seq[NamedDiv] =
-    divs(xml).map(xml => new NamedDiv(this, parsingFile, uncles, xml))
+    withFile(parsingFile)
+    { divs(xml).map(xml => new NamedDiv(this, parsingFile, uncles, xml)) }
 }
 
 
-// TODO something with known length, not Seq...
 
 final class NamedParsedStructure(
   parsingFile: File,
@@ -84,7 +86,8 @@ abstract class NumberedStructure(override val selector: NumberedSelector) extend
   override def divs: Seq[NumberedDiv]
 
   protected final def parseDivs(parsingFile: File, uncles: Seq[Selector], xml: Elem): Seq[NumberedDiv] =
-    divs(xml).zipWithIndex.map { case (xml, num) => new NumberedDiv(this, parsingFile, uncles, num+1, xml) }
+    withFile(parsingFile)
+    { divs(xml).zipWithIndex.map { case (xml, num) => new NumberedDiv(this, parsingFile, uncles, num+1, xml) } }
 }
 
 
@@ -120,10 +123,13 @@ trait Structures extends Selectors {
 
 object Structure {
 
-  // TODO verify that all structures allowed by the selectors are present!
-  // TODO make sure that they are retrievable, too - for instance, week/chapter!
-  def parseStructures(parsingFile: File, selectors: Seq[Selector], xmls: Elem): Seq[Structure] =
-    xmls.elemsFilter("structure").map(parseStructure(parsingFile, selectors, _))
+  def parseStructures(parsingFile: File, selectors: Seq[Selector], xmls: Elem): Seq[Structure] = {
+    val structures = xmls.elemsFilter("structure").map(parseStructure(parsingFile, selectors, _))
+    // TODO verify that all structures requested by the selectors are present; some allowed structers need to be calculated...
+    // TODO make sure that they are retrievable, too - for instance, week/chapter!
+///    selectors.foreach(selector => Exists(structures, selector.defaultName, "structures"))
+    structures
+  }
 
 
   private def parseStructure(parsingFile: File, selectors: Seq[Selector], xml: Elem): Structure = {

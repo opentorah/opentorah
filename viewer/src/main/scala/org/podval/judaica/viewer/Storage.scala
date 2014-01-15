@@ -17,14 +17,12 @@
 package org.podval.judaica.viewer
 
 import org.podval.judaica.xml.Xml.Ops
-import org.podval.judaica.xml.XmlFile
 
 import scala.xml.Elem
 
 import java.io.File
 
 
-// TODO factor the parsing out
 sealed trait Storage {
   def isDirectory: Boolean
   def isFile: Boolean
@@ -57,13 +55,14 @@ final class DirectoryStorage(structures: Seq[Structure], metadata: Elem, directo
       val name = div.id
       val fileCandidate = new File(directory, name + ".xml")
       val directoryCandidate = new File(directory, name)
-      require((fileCandidate.exists || directoryCandidate.exists), s"One of the files $fileCandidate or $directoryCandidate must exist")
-      require(!(fileCandidate.exists && directoryCandidate.exists), s"Only one of the files $fileCandidate or $directoryCandidate must exist")
+      if (!fileCandidate.exists && !directoryCandidate.exists) throw new ViewerException(s"One of the files $fileCandidate or $directoryCandidate must exist")
+      if (fileCandidate.exists && directoryCandidate.exists) throw new ViewerException(s"Only one of the files $fileCandidate or $directoryCandidate must exist")
       val file = if (fileCandidate.exists) fileCandidate else directoryCandidate
 
       if (file.isFile) {
         new FileStorage(file)
       } else {
+        // TODO not used?! Surround with withFile(){} - once it becomes used :)
         val metadataFile = Exists(new File(file, "index.xml"))
         new DirectoryStorage(div.structures, metadata, file)
       }

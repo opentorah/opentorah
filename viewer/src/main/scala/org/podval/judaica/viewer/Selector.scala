@@ -53,18 +53,28 @@ trait Selectors {
   def selectorByName(name: String): Option[Selector]
 
 
-  // TODO some sanity: deepStructure/format etc.
   def deepStructures: Seq[Seq[Selector]] =
     if (selectors.isEmpty) Seq(Nil) else
     selectors.flatMap(selector => selector.deepStructures.map (ds => selector +: ds))
 
 
-  // TODO add "descendants" - and use it in parseSelectors, to accommodate "day/chapter"
+  def descendants(next: Set[Selector]): Set[Selector] = descendants(Set.empty, next)
+
+
+  def descendants(result: Set[Selector], next: Set[Selector]): Set[Selector] = {
+    val add = next -- result
+    if (add.isEmpty) result else {
+      val children: Set[Selector] = add.flatMap(_.selectors)
+      descendants(result ++ next, children)
+    }
+  }
 }
 
 
 
 object Selector {
+
+  // TODO use "descendants" it in parseSelectors, to accommodate "day/chapter"
 
   def parseSelectors(uncles: Seq[Selector], xmls: Elem): Seq[Selector] =
     xmls.elemsFilter("selector").foldLeft(Seq.empty[Selector])((siblings, xml) => siblings :+ parseSelector(uncles, siblings, xml))

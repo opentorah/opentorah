@@ -28,7 +28,6 @@ abstract class Div(val structure: Structure, parsingFile: File, uncles: Seq[Sele
   val localSelectors: Seq[Selector] = Selector.parseSelectors(uncles, xml)
   override val selectors: Seq[Selector] = structure.selector.selectors ++ localSelectors
   override val structures: Seq[Structure] = Structure.parseStructures(parsingFile, selectors, xml)
-  // TODO complete the list of structures - even if some of them are empty!
 
   override def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
   override def structureByName(name: String): Option[Structure] = Names.find(structures, name)

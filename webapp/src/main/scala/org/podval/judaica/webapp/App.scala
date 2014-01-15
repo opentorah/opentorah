@@ -23,6 +23,8 @@ import scala.collection.JavaConversions.setAsJavaSet
 
 final class App extends Application {
 
+  // TODO install ExceptionMappers for ViewerException and ParseException
+
   override def getClasses: java.util.Set[Class[_]] = setAsJavaSet(Set(
     classOf[RootResource],
     classOf[ScalaXmlNodeMessageBodyWriter]

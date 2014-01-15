@@ -50,11 +50,7 @@ object Name {
 
 
 
-// TODO factor the parsing out
-final class Names(xml: Elem, canBeEmpty: Boolean) {
-
-  val names: Seq[Name] = Exists(xml.elemsFilter("name").map(Name(_)), "names")
-
+final class Names(val names: Seq[Name]) {
 
   def find(name: String): Option[Name] = find(names, name)
 
@@ -84,7 +80,10 @@ object Names {
 //  def apply(name: String, xml: Elem, canBeEmpty: Boolean = false): Names = new Names(Some(name), xml, canBeEmpty)
 
 
-  def apply(xml: Elem, canBeEmpty: Boolean = false): Names = new Names(xml, canBeEmpty)
+  def apply(xml: Elem): Names = {
+    val names: Seq[Name] = Exists(xml.elemsFilter("name").map(Name(_)), "names")
+    new Names(names)
+  }
 
 
   def find[T <: Named](nameds: Seq[T], name: String): Option[T] = nameds.find(_.names.has(name))
