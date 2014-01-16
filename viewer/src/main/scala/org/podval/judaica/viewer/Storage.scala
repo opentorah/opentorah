@@ -28,44 +28,58 @@ sealed trait Storage {
   def isFile: Boolean
   def asDirectory: DirectoryStorage
   def asFile: FileStorage
+
+  def content(path: Seq[Div], format: Seq[Selector]): Elem
 }
 
+
+
+final class DirectoryStorage private(structures: Seq[Structure], xml: Elem, directory: File) extends Storage {
+  override def isDirectory: Boolean = true
+  override def isFile: Boolean = false
+  override def asDirectory: DirectoryStorage = this
+  override def asFile: FileStorage = throw new ClassCastException
+
+  // TODO allow overrides ? val overrides = Xml.elems(structure) ... Xml.check(override, "file")
+
+  val structure: Structure = Names.doFind(structures, xml.getAttribute("structure"), "structure")
+  val fileFormat = structure.selector.parseFormat(xml.attributeOption("format"))
+
+  val files: Map[Div, Storage] = structure.divs.map { div =>  (div, forDiv(div)) }.toMap
+
+
+  private[this] def forDiv(div: Div): Storage = {
+    val fileCandidate = new File(directory, div.id + ".xml")
+    val directoryCandidate = new File(directory, div.id)
+    if (fileCandidate.exists && directoryCandidate.exists) throw new ViewerException(s"Only one of the files $fileCandidate or $directoryCandidate must exist")
+
+    if (fileCandidate.exists) {
+      if (!fileCandidate.isFile) throw new ViewerException(s"$fileCandidate must be a file")
+      new FileStorage(fileCandidate)
+    } else if (directoryCandidate.exists) {
+      if (!directoryCandidate.isDirectory) throw new ViewerException(s"$fileCandidate must be a directory")
+      ParseException.withMetadataFile(Exists(new File(directoryCandidate, "index.xml")))(DirectoryStorage(div.structures, _, directoryCandidate))
+    } else {
+      throw new ViewerException(s"One of the files $fileCandidate or $directoryCandidate must exist")
+    }
+  }
+
+
+  override def content(path: Seq[Div], format: Seq[Selector]): Elem = ???
+}
+
+
+object DirectoryStorage {
+
+  def apply(structures: Seq[Structure], xml: Elem, directory: File): DirectoryStorage =
+    new DirectoryStorage(structures, xml.oneChild("storage"), directory)
+}
 
 final class FileStorage(val file: File) extends Storage {
   override def isDirectory: Boolean = false
   override def isFile: Boolean = true
   override def asDirectory: DirectoryStorage = throw new ClassCastException
   override def asFile: FileStorage = this
-}
 
-
-final class DirectoryStorage(structures: Seq[Structure], metadata: Elem, directory: File) extends Storage {
-  override def isDirectory: Boolean = true
-  override def isFile: Boolean = false
-  override def asDirectory: DirectoryStorage = this
-  override def asFile: FileStorage = throw new ClassCastException
-
-  val storageXml = metadata.oneChild("storage")
-  val structure = Exists(structures, storageXml.getAttribute("structure"), "structure")
-
-  // TODO allow overrides ? val overrides = Xml.elems(structure) ... Xml.check(override, "file")
-
-  val files: Seq[Storage] = {
-    structure.divs map { div =>
-      val name = div.id
-      val fileCandidate = new File(directory, name + ".xml")
-      val directoryCandidate = new File(directory, name)
-      if (!fileCandidate.exists && !directoryCandidate.exists) throw new ViewerException(s"One of the files $fileCandidate or $directoryCandidate must exist")
-      if (fileCandidate.exists && directoryCandidate.exists) throw new ViewerException(s"Only one of the files $fileCandidate or $directoryCandidate must exist")
-      val file = if (fileCandidate.exists) fileCandidate else directoryCandidate
-
-      if (file.isFile) {
-        new FileStorage(file)
-      } else {
-        // TODO not used?! Surround with withFile(){} - once it becomes used :)
-        val metadataFile = Exists(new File(file, "index.xml"))
-        new DirectoryStorage(div.structures, metadata, file)
-      }
-    }
-  }
+  override def content(path: Seq[Div], format: Seq[Selector]): Elem = ???
 }

@@ -40,7 +40,7 @@ class StructureSelectionResource(selection: StructureSelection) {
   def structure(@Context uriInfo: UriInfo) = Html(uriInfo,
       <div>
         {Table(selection.structures.structures, uriInfo, structuresColumn)}
-        {Table(selection.structures.deepStructures, uriInfo, contentColumn)}
+        {Table(selection.structures.formats, uriInfo, contentColumn)}
         {if (selection.editions.isNo) {
         val editionsUri = uriInfo.getBaseUriBuilder.path("works").path(selection.work.defaultName).path("editions").build().toString
         <p>List of available <a href={editionsUri}>editions</a></p>

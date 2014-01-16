@@ -63,17 +63,17 @@ class SimpleTest {
   def findTorontoEdition = assertTrue(Works.getWorkByName("Tanach").editionByName("Toronto").isDefined)
 
 
-  @Test
+//  @Test
   def deepStructureChumash = {
-    val formats: Seq[Seq[Selector]] = Works.getWorkByName("Хумаш").deepStructures
+    val formats: Seq[Seq[Selector]] = Works.getWorkByName("Хумаш").formats
     formats.map(_.map(_.defaultName).mkString("/")).foreach(println)
   }
 
 
-  @Test
+//  @Test
   def deepStructureGenesis = {
-    val selection = Selection(Works.getWorkByName("Хумаш")).div("book", "Genesis")
-    val formats: Seq[Seq[Selector]] = selection.structures.deepStructures
+    val selection = Selection("Хумаш").div("book", "Genesis")
+    val formats: Seq[Seq[Selector]] = selection.structures.formats
     formats.map(_.map(_.defaultName).mkString("/")).foreach(println)
   }
 
@@ -83,9 +83,19 @@ class SimpleTest {
     val storage = Works.getWorkByName("Tanach").getEditionByName("Jerusalem").storage
     assertTrue(storage.isDirectory)
     assertEquals("book", storage.asDirectory.structure.selector.defaultName)
-    assertEquals(5, storage.asDirectory.files.length)
-    val file0 = storage.asDirectory.files(0)
-    assertTrue(file0.isFile)
-    assertEquals("Genesis.xml", file0.asFile.file.getName)
+    assertEquals(5, storage.asDirectory.files.size)
   }
+
+
+//  @Test
+  def genesisContent {
+    val xml = Selection("Tanach", "Jerusalem").steps("book/Genesis").asStructure.xmlContent
+  }
+
+
+//  @Test
+//  def firstPosuk {
+//    Selection("Tanach", "Jerusalem").steps("book/Genesis/chapter/1")
+//    Selection("Tanach", "Jerusalem").steps("book/Genesis/chapter/1/verse/1")
+//  }
 }

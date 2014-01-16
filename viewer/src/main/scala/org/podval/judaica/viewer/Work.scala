@@ -18,6 +18,7 @@ package org.podval.judaica.viewer
 
 import ParseException.withMetadataFile
 
+import scala.xml.Elem
 import java.io.File
 
 
@@ -30,7 +31,7 @@ object Works {
 
 
   def workByName(name: String): Option[Work] = Names.find(works, name)
-  def getWorkByName(name: String): Work = Exists(workByName(name), name, "work")
+  def getWorkByName(name: String): Work = Names.doFind(works, name, "work")
 
   def stylesheet: File = new File(directory, "stylesheet.css")
 }
@@ -55,7 +56,7 @@ final class Work(val directory: File, index: File) extends Named with Selectors 
   // TODO handle situation when only one edition is present - allow to not put it into a subdirectory?
   def editions: Seq[Edition] = editions_.get
   def editionByName(name: String): Option[Edition] = Names.find(editions, name)
-  def getEditionByName(name: String): Edition = Exists(editions, name, "edition")
+  def getEditionByName(name: String): Edition = Names.doFind(editions, name, "edition")
   private[this] val editions_ = LazyLoad(DirectoryScanner(directory, new Edition(this, _, _)))
 
 
@@ -74,8 +75,11 @@ final class Edition(val work: Work, directory: File, index: File) extends Named 
   // TODO add language attribute
 
   def storage: Storage = storage_.get
-  private[this] val storage_ = LazyLoad(withMetadataFile(index)(new DirectoryStorage(work.structures, _, directory)))
+  private[this] val storage_ = LazyLoad(withMetadataFile(index)(DirectoryStorage(work.structures, _, directory)))
 
 
   def stylesheet: File = new File(directory, "stylesheet.css")
+
+
+  def content(path: Seq[Div], format: Seq[Selector]): Elem = storage.content(path, format)
 }

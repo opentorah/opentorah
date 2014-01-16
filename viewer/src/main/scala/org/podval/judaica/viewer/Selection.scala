@@ -16,6 +16,8 @@
 
 package org.podval.judaica.viewer
 
+import scala.xml.Elem
+
 
 abstract class Selection(val work: Work, val editions: Editions, val path: Seq[Div]) {
 
@@ -47,9 +49,27 @@ final class StructureSelection(work: Work, editions: Editions, path: Seq[Div]) e
 
   def div(structureName: String, divName: String): StructureSelection = structure(structureName).div(divName)
 
-  def xmlContent(format: String) = throw new UnsupportedOperationException // TODO
+  def xmlContent: Elem = content(None, false)
+  def xmlContent(format: String): Elem = content(Some(format), false)
 
-  def htmlContent(format: String) = throw new UnsupportedOperationException // TODO
+  def htmlContent: Elem = content(None, true)
+  def htmlContent(format: String): Elem = content(Some(format), true)
+
+
+  def content(formatOption: Option[String], isHtml: Boolean): Elem =
+    content(structures.parseFormat(formatOption), isHtml)
+
+
+  def content(format: Seq[Selector], isHtml: Boolean): Elem = {
+    val result = content(format)
+    if (isHtml) toHtml(result) else result
+  }
+
+
+  def content(format: Seq[Selector]): Elem = editions.content(path, format)
+
+
+  def toHtml(xml: Elem): Elem = ???
 }
 
 
@@ -83,6 +103,8 @@ final class DivSelection(work: Work, editions: Editions, path: Seq[Div], structu
 
 
 object Selection {
+
+  def apply(workName: String): StructureSelection = apply(Works.getWorkByName(workName))
 
   def apply(work: Work): StructureSelection = apply(work, NoEditions)
 

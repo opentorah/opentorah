@@ -87,4 +87,7 @@ object Names {
 
 
   def find[T <: Named](nameds: Seq[T], name: String): Option[T] = nameds.find(_.names.has(name))
+
+
+  def doFind[T <: Named](nameds: Seq[T], name: String, what: String): T = Exists(find(nameds, name), name, what)
 }

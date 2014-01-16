@@ -21,18 +21,20 @@ import org.podval.judaica.xml.XmlFile
 import ParseException.withFile
 
 import scala.xml.Elem
+
 import java.io.File
 
 
 abstract class Structure(val selector: Selector) extends Named {
   final override def names = selector.names
   final def isNumbered: Boolean = selector.isNumbered
+  final def isNamed: Boolean = selector.isNamed
 
   def asNumbered: NumberedStructure
   def asNamed: NamedStructure
 
   def divs: Seq[Div]
-  final def length: Int = divs.length
+  final def length: Int = divs.length // TODO for numbered, length can be supplied in the index file; parse it!
 
   final def divByNumber(number: Int): Option[Div] = if ((number < 1) || (number > length)) None else Some(divs(number))
   final def getDivByNumber(number: Int): Div = Exists(divByNumber(number), number.toString, "div")
@@ -48,7 +50,7 @@ abstract class NamedStructure(override val selector: NamedSelector) extends Stru
   override def divs: Seq[NamedDiv]
 
   final def divByName(name: String): Option[NamedDiv] = Names.find(divs, name)
-  final def getDivByName(name: String): NamedDiv = Exists(divs, name, "div")
+  final def getDivByName(name: String): NamedDiv = Names.doFind(divs, name, "div")
 
   protected final def parseDivs(parsingFile: File, knownSelectors: Set[Selector], xml: Elem): Seq[NamedDiv] =
     withFile(parsingFile)
@@ -125,7 +127,7 @@ object Structure {
 
   def parseStructures(parsingFile: File, selectors: Seq[Selector], xmls: Elem): Seq[Structure] = {
     val structures = xmls.elemsFilter("structure").map(parseStructure(parsingFile, selectors, _))
-    // TODO verify that all structures requested by the selectors are present; some allowed structers need to be calculated...
+    // TODO verify that all structures requested by the selectors are present; some allowed structures need to be calculated...
     // TODO make sure that they are retrievable, too - for instance, week/chapter!
 ///    selectors.foreach(selector => Exists(structures, selector.defaultName, "structures"))
     structures
@@ -133,24 +135,24 @@ object Structure {
 
 
   private def parseStructure(parsingFile: File, selectors: Seq[Selector], xml: Elem): Structure = {
-    val selector = Exists(selectors, xml.getAttribute("selector"), "selector")
+    val selector = Names.doFind(selectors, xml.getAttribute("selector"), "selector")
     val uncles = selectors.takeWhile(_ != selector)
+    // TODO the set is not big enough! Should start from the top, to accommodate old uncles...
+    // TODO check that the cycles are actually prevented by all this...
     val knownSelectors = Selector.descendants(uncles.toSet)
 
-    val fileOption = xml.attributeOption("file")
-    if (fileOption.isEmpty) {
-      if (selector.isNumbered) {
+    xml.attributeOption("file").fold {
+      if (selector.isNumbered)
         new NumberedParsedStructure(parsingFile, selector.asNumbered, knownSelectors, xml)
-      } else {
+      else
         new NamedParsedStructure(parsingFile, selector.asNamed, knownSelectors, xml)
-      }
-    } else {
-      val file = new File(parsingFile.getParentFile, fileOption.get)
-      if (selector.isNumbered) {
-        new NumberedLazyStructure(selector.asNumbered, knownSelectors, file)
-      } else {
-        new NamedLazyStructure(selector.asNamed, knownSelectors, file)
-      }
+    }{
+      fileName: String =>
+        val file: File = new File(parsingFile.getParentFile, fileName)
+        if (selector.isNumbered)
+          new NumberedLazyStructure(selector.asNumbered, knownSelectors, file)
+        else
+          new NamedLazyStructure(selector.asNamed, knownSelectors, file)
     }
   }
 }

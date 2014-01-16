@@ -21,9 +21,6 @@ import java.io.File
 
 object Exists {
 
-  def apply[T <: Named](value: Seq[T], name: String, what: String): T = apply(Names.find(value, name), name, what)
-
-
   def apply[T](value: Option[T], name: String, what: String): T = {
     if (value.isEmpty) throw new NotFoundException(what, name)
     value.get
