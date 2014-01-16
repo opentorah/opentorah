@@ -44,12 +44,10 @@ final class Work(val directory: File, index: File) extends Named with Selectors 
 
 
   override def selectors: Seq[Selector] = selectors_.get
-  override def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
-  private[this] val selectors_ = LazyLoad(withMetadataFile(index)(xml => Exists(Selector.parseSelectors(Set.empty, xml), "selectors")))
+  private[this] val selectors_ = LazyLoad(withMetadataFile(index)(xml => Exists(Selectors.parse(Set.empty, xml), "selectors")))
 
 
   override def structures: Seq[Structure] = structures_.get
-  override def structureByName(name: String): Option[Structure] = Names.find(structures, name)
   private[this] val structures_ = LazyLoad(withMetadataFile(index)(xml => Exists(Structure.parseStructures(index, selectors, xml), "structures")))
 
 

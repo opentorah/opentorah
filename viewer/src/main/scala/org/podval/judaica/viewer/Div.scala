@@ -25,12 +25,9 @@ abstract class Div(val structure: Structure, parsingFile: File, knownSelectors: 
 
   // TODO parse the Path
 /////  val path = xml.attributeOption("path")
-  val localSelectors: Seq[Selector] = Selector.parseSelectors(knownSelectors, xml)
+  val localSelectors: Seq[Selector] = Selectors.parse(knownSelectors, xml)
   override val selectors: Seq[Selector] = structure.selector.selectors ++ localSelectors
   override val structures: Seq[Structure] = Structure.parseStructures(parsingFile, selectors, xml)
-
-  override def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
-  override def structureByName(name: String): Option[Structure] = Names.find(structures, name)
 
   def isNumbered: Boolean
   def asNumbered: NumberedDiv

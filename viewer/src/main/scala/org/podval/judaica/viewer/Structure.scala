@@ -27,6 +27,7 @@ import java.io.File
 
 abstract class Structure(val selector: Selector) extends Named {
   final override def names = selector.names
+
   final def isNumbered: Boolean = selector.isNumbered
   final def isNamed: Boolean = selector.isNamed
 
@@ -110,15 +111,21 @@ final class NumberedLazyStructure(
 {
   override def divs: Seq[NumberedDiv] = divs_.get
   private[this] val divs_ = LazyLoad(parseDivs(file, knownSelectors, metadata))
+  // TODO unify structure file format with that of the index; open (and verify) the structure element in the lazy ones
   private[this] def metadata: Elem = XmlFile.load(file, "structure")
 }
 
 
 
 trait Structures extends Selectors {
+
   def structures: Seq[Structure]
-  def structureByName(name: String): Option[Structure]
-  def getStructureByName(name: String): Structure = Exists(structureByName(name), name, "structure")
+
+
+  final def structureByName(name: String): Option[Structure] = Names.find(structures, name)
+
+
+  final def getStructureByName(name: String): Structure = Names.doFind(structures, name, "structure")
 }
 
 
@@ -136,10 +143,7 @@ object Structure {
 
   private def parseStructure(parsingFile: File, selectors: Seq[Selector], xml: Elem): Structure = {
     val selector = Names.doFind(selectors, xml.getAttribute("selector"), "selector")
-    val uncles = selectors.takeWhile(_ != selector)
-    // TODO the set is not big enough! Should start from the top, to accommodate old uncles...
-    // TODO check that the cycles are actually prevented by all this...
-    val knownSelectors = Selector.descendants(uncles.toSet)
+    val knownSelectors = cousins(selectors, selector)
 
     xml.attributeOption("file").fold {
       if (selector.isNumbered)
@@ -154,5 +158,13 @@ object Structure {
         else
           new NamedLazyStructure(selector.asNamed, knownSelectors, file)
     }
+  }
+
+
+  private def cousins(selectors: Seq[Selector], selector: Selector): Set[Selector] = {
+    // TODO the set is not big enough! Should start from the top, to accommodate old uncles...
+    // TODO check that the cycles are actually prevented by all this...
+    val uncles = selectors.takeWhile(_ != selector)
+    Selectors.descendants(uncles.toSet)
   }
 }

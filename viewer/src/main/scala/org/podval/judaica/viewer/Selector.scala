@@ -28,8 +28,7 @@ abstract class Selector(knownSelectors: Set[Selector], xml: Elem) extends Named 
   def asNamed: NamedSelector
 
   final override val names = Names(xml)
-  final override val selectors = Selector.parseSelectors(knownSelectors, xml)
-  final override def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
+  final override val selectors = Selectors.parse(knownSelectors, xml)
 }
 
 
@@ -53,13 +52,19 @@ trait Selectors {
 
 
   def selectors: Seq[Selector]
-  def selectorByName(name: String): Option[Selector]
-  def getSelectorByName(name: String): Selector = Exists(selectorByName(name), name, "selector")
-  final def defaultSelector: Selector = selectors.head
 
 
-  final def defaultFormat: Format =
-    if (selectors.isEmpty) Nil else defaultSelector +: defaultSelector.defaultFormat
+  final def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
+
+
+  final def getSelectorByName(name: String): Selector = Names.doFind(selectors, name, "selector")
+
+
+  final def dominantSelector: Selector = selectors.head
+
+
+  final def dominantFormat: Format =
+    if (selectors.isEmpty) Nil else dominantSelector +: dominantSelector.dominantFormat
 
 
   final def formats: Seq[Format] =
@@ -67,53 +72,38 @@ trait Selectors {
     selectors.flatMap(selector => selector.formats.map (selector +: _))
 
 
-  final def parseFormat(formatOption: Option[String]): Format = formatOption.fold(defaultFormat)(parseFormat)
+  final def parseFormat(formatOption: Option[String]): Format = formatOption.fold(dominantFormat)(parseFormat)
 
 
-  final def parseFormat(format: String): Format = {
-    def parseFormat(selectors: Selectors, names: Seq[String]): Format = names match {
-      case Nil => Nil
-      case name :: names =>
-        val selector = selectors.getSelectorByName(name)
-        selector +: parseFormat(selector, names)
-    }
-
-    parseFormat(this, format.split("/"))
-  }
+  final def parseFormat(format: String): Format =
+    Parse.sequence[String, Selectors, Selector](_.getSelectorByName(_)) ((selectors, selector) => selector) (this, format.split("/"))
 }
 
 
 
-object Selector {
+object Selectors {
 
-  // TODO make more readable?
-  def parseSelectors(knownSelectors: Set[Selector], xml: Elem): Seq[Selector] = {
-    def parseSelectors(knownSelectors: Set[Selector], xmls: Seq[Elem]): Seq[Selector] = xmls match {
-      case Nil => Nil
-      case xml :: xmls =>
-        val selector = parseSelector(knownSelectors, xml)
-        val newKnowSelectors = descendants(knownSelectors, Set(selector))
-        selector +: parseSelectors(newKnowSelectors, xmls)
-    }
-
-    parseSelectors(knownSelectors, xml.elemsFilter("selector"))
-  }
+  def parse(knownSelectors: Set[Selector], xml: Elem): Seq[Selector] =
+    Parse.sequence[Elem, Set[Selector], Selector](parseSelector)(descendantsOfOne)(knownSelectors, xml.elemsFilter("selector"))
 
 
   private def parseSelector(knownSelectors: Set[Selector], xml: Elem): Selector = {
-    xml.attributeOption("name").fold {
+    def newSelector =
       if (xml.booleanAttribute("isNumbered"))
         new NumberedSelector(knownSelectors, xml)
       else
         new NamedSelector(knownSelectors, xml)
-    }{
-      // A reference to a previously defined Selector
-      Names.doFind(knownSelectors.toSeq, _, "selector") // TODO remove toSeq...
-    }
+
+    def referenceToKnownSelector(name: String) = Names.doFind(knownSelectors, name, "selector")
+
+    xml.attributeOption("name").fold(newSelector)(referenceToKnownSelector)
   }
 
 
   def descendants(next: Set[Selector]): Set[Selector] = descendants(Set.empty, next)
+
+
+  private def descendantsOfOne(result: Set[Selector], next: Selector): Set[Selector] = descendants(result, Set(next))
 
 
   private def descendants(result: Set[Selector], next: Set[Selector]): Set[Selector] = {
