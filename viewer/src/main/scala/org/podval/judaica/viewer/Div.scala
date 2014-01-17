@@ -57,9 +57,7 @@ final class NumberedDiv(structure: NumberedStructure, parsingFile: File, knownSe
   checkNumber
 
   private[this] def checkNumber {
-    val nOption = xml.attributeOption("n")
-    if (nOption.isDefined) {
-      val nvalue = xml.getIntAttribute("n")
+    xml.intAttributeOption("n").foreach { nvalue =>
       if (nvalue != number) throw new ViewerException(s"Div $number has attribute n set to $nvalue")
     }
   }

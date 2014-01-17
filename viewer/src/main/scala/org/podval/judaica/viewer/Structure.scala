@@ -17,15 +17,14 @@
 package org.podval.judaica.viewer
 
 import org.podval.judaica.xml.Xml.Ops
-import org.podval.judaica.xml.XmlFile
-import ParseException.withFile
+import ParseException.withMetadataFile
 
 import scala.xml.Elem
 
 import java.io.File
 
 
-abstract class Structure(val selector: Selector) extends Named {
+abstract class Structure(val selector: Selector, xml: Elem) extends Named {
   final override def names = selector.names
 
   final def isNumbered: Boolean = selector.isNumbered
@@ -34,17 +33,37 @@ abstract class Structure(val selector: Selector) extends Named {
   def asNumbered: NumberedStructure
   def asNamed: NamedStructure
 
+
+  final def isTerminal: Boolean = selector.isTerminal
+
+
   def divs: Seq[Div]
-  final def length: Int = divs.length // TODO for numbered, length can be supplied in the index file; parse it!
+
+
+  final def length: Int = lengthOption.getOrElse(divs.length)
+  private[this] val lengthOption: Option[Int] = xml.intAttributeOption("length")
 
   final def divByNumber(number: Int): Option[Div] = if ((number < 1) || (number > length)) None else Some(divs(number))
   final def getDivByNumber(number: Int): Div = Exists(divByNumber(number), number.toString, "div")
+
+
+  protected final def open(xml: Elem): Elem = {
+    val result = xml.oneChild("structure")
+    // TODO check that this is the correct structure :)
+    result
+  }
+
+
+  // TODO check that named or non-dominant structure is fully defined
+  protected final def checkLength[T <: Div](divs: Seq[T]): Seq[T] =
+    if (lengthOption.isDefined && lengthOption.get != divs.length) throw new ViewerException(s"Wrong length") else divs
+
 
   protected final def divs(xml: Elem): Seq[Elem] = xml.elemsFilter("div")
 }
 
 
-abstract class NamedStructure(override val selector: NamedSelector) extends Structure(selector) {
+abstract class NamedStructure(override val selector: NamedSelector, xml: Elem) extends Structure(selector, xml) {
   final override def asNumbered: NumberedStructure = throw new ClassCastException
   final override def asNamed: NamedStructure = this
 
@@ -54,8 +73,7 @@ abstract class NamedStructure(override val selector: NamedSelector) extends Stru
   final def getDivByName(name: String): NamedDiv = Names.doFind(divs, name, "div")
 
   protected final def parseDivs(parsingFile: File, knownSelectors: Set[Selector], xml: Elem): Seq[NamedDiv] =
-    withFile(parsingFile)
-    { divs(xml).map(xml => new NamedDiv(this, parsingFile, knownSelectors, xml)) }
+    checkLength(divs(xml).map(xml => new NamedDiv(this, parsingFile, knownSelectors, xml)))
 }
 
 
@@ -64,7 +82,7 @@ final class NamedParsedStructure(
   parsingFile: File,
   selector: NamedSelector,
   knownSelectors: Set[Selector],
-  xml: Elem) extends NamedStructure(selector)
+  xml: Elem) extends NamedStructure(selector, xml)
 {
   override val divs: Seq[NamedDiv] = parseDivs(parsingFile, knownSelectors, xml)
 }
@@ -73,24 +91,23 @@ final class NamedParsedStructure(
 final class NamedLazyStructure(
   selector: NamedSelector,
   knownSelectors: Set[Selector],
-  file: File) extends NamedStructure(selector)
+  xml: Elem,
+  file: File) extends NamedStructure(selector, xml)
 {
   override def divs: Seq[NamedDiv] = divs_.get
-  private[this] val divs_ = LazyLoad(parseDivs(file, knownSelectors, xml))
-  private[this] def xml: Elem = XmlFile.load(file, "structure")
+  private[this] val divs_ = LazyLoad(withMetadataFile(file)(xml => parseDivs(file, knownSelectors, open(xml))))
 }
 
 
 
-abstract class NumberedStructure(override val selector: NumberedSelector) extends Structure(selector) {
+abstract class NumberedStructure(override val selector: NumberedSelector, xml: Elem) extends Structure(selector, xml) {
   final override def asNumbered: NumberedStructure = this
   final override def asNamed: NamedStructure = throw new ClassCastException
 
   override def divs: Seq[NumberedDiv]
 
   protected final def parseDivs(parsingFile: File, knownSelectors: Set[Selector], xml: Elem): Seq[NumberedDiv] =
-    withFile(parsingFile)
-    { divs(xml).zipWithIndex.map { case (xml, num) => new NumberedDiv(this, parsingFile, knownSelectors, num+1, xml) } }
+    checkLength(divs(xml).zipWithIndex.map { case (xml, num) => new NumberedDiv(this, parsingFile, knownSelectors, num+1, xml) })
 }
 
 
@@ -98,7 +115,7 @@ final class NumberedParsedStructure(
   parsingFile: File,
   selector: NumberedSelector,
   knownSelectors: Set[Selector],
-  xml: Elem) extends NumberedStructure(selector)
+  xml: Elem) extends NumberedStructure(selector, xml)
 {
   override val divs: Seq[NumberedDiv] = parseDivs(parsingFile, knownSelectors, xml)
 }
@@ -107,12 +124,11 @@ final class NumberedParsedStructure(
 final class NumberedLazyStructure(
   selector: NumberedSelector,
   knownSelectors: Set[Selector],
-  file: File) extends NumberedStructure(selector)
+  xml: Elem,
+  file: File) extends NumberedStructure(selector, xml)
 {
   override def divs: Seq[NumberedDiv] = divs_.get
-  private[this] val divs_ = LazyLoad(parseDivs(file, knownSelectors, metadata))
-  // TODO unify structure file format with that of the index; open (and verify) the structure element in the lazy ones
-  private[this] def metadata: Elem = XmlFile.load(file, "structure")
+  private[this] val divs_ = LazyLoad(withMetadataFile(file)(xml => parseDivs(file, knownSelectors, open(xml))))
 }
 
 
@@ -154,9 +170,9 @@ object Structure {
       fileName: String =>
         val file: File = new File(parsingFile.getParentFile, fileName)
         if (selector.isNumbered)
-          new NumberedLazyStructure(selector.asNumbered, knownSelectors, file)
+          new NumberedLazyStructure(selector.asNumbered, knownSelectors, xml, file)
         else
-          new NamedLazyStructure(selector.asNamed, knownSelectors, file)
+          new NamedLazyStructure(selector.asNamed, knownSelectors, xml, file)
     }
   }
 

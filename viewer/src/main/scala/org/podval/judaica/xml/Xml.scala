@@ -20,16 +20,15 @@ package org.podval.judaica.xml
 import scala.xml.{Node, Elem, Text, PrettyPrinter}
 
 import java.io.{FileWriter, PrintWriter, File}
+import org.podval.judaica.viewer.ViewerException
 
 
 object Xml {
 
   implicit class Ops(elem: Elem) {
 
-    def elems(plural: String, singular: String, required: Boolean = true): Seq[Elem] = {
-      val child = oneOptionalChild(plural, required)
-      if (child.isEmpty) Seq.empty else child.get.elems(singular)
-    }
+    def elems(plural: String, singular: String, required: Boolean = true): Seq[Elem] =
+      oneOptionalChild(plural, required).map(_.elems(singular)).getOrElse(Seq.empty)
 
 
     def elems(name: String): Seq[Elem] = {
@@ -45,21 +44,26 @@ object Xml {
     def elems: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
 
-    def getAttribute(name: String): String = attributeOption(name).get
-
-
-    def getIntAttribute(name: String): Int = getAttribute(name).toInt
-
-
-    def booleanAttribute(name: String): Boolean = {
-      val value = attributeOption(name)
-      value.isDefined && (value.get == "true")
-    }
+    def getAttribute(name: String): String = attributeOption(name).getOrElse(throw new ViewerException(s"No attribute $name"))
 
 
     def attributeOption(name: String): Option[String] = {
       val result: Seq[Node] = (elem \ ("@" + name))
       if (result.isEmpty) None else Some(result.text)
+    }
+
+
+    def intAttributeOption(name: String): Option[Int] = attributeOption(name).map { value =>
+      try { value.toInt } catch { case e: NumberFormatException => throw new ViewerException(s"$value is not a number", e)}
+    }
+
+
+    def intAttribute(name: String): Int = intAttributeOption(name).getOrElse(throw new ViewerException(s"No attribute $name"))
+
+
+    def booleanAttribute(name: String): Boolean = {
+      val value = attributeOption(name)
+      value.isDefined && (value.get == "true")
     }
 
 
@@ -69,16 +73,15 @@ object Xml {
     private[this] def oneOptionalChild(name: String, required: Boolean = true): Option[Elem] = {
       val children = elem \ name
 
-      require(children.size <= 1, "To many children with name " + name)
-
-      if (required) require(children.size > 0, "No child with name " + name)
+      if (children.size > 1) throw new ViewerException(s"To many children with name $name")
+      if (required && children.isEmpty) throw new ViewerException(s"No child with name $name")
 
       if (children.isEmpty) None else Some(children(0).asInstanceOf[Elem])
     }
 
 
     def check(name: String): Elem = {
-      require(elem.label == name, "Expected name " + name + " but got " + elem.label)
+      if (elem.label != name) throw new ViewerException(s"Expected name $name but got $elem.label")
       elem
     }
 

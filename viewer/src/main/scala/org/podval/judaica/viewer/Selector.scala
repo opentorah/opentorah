@@ -29,6 +29,8 @@ abstract class Selector(knownSelectors: Set[Selector], xml: Elem) extends Named 
 
   final override val names = Names(xml)
   final override val selectors = Selectors.parse(knownSelectors, xml)
+
+  final def isTerminal: Boolean = selectors.isEmpty
 }
 
 

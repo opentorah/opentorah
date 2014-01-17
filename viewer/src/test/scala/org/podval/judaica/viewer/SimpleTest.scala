@@ -63,15 +63,21 @@ class SimpleTest {
   def findTorontoEdition = assertTrue(Works.getWorkByName("Tanach").editionByName("Toronto").isDefined)
 
 
+  @Test
+  def genesisWeekStructure {
+    Selection("Chumash").steps("book/Genesis/week").asDiv.div("Genesis")
+  }
+
+
 //  @Test
-  def deepStructureChumash = {
+  def chumashFormats = {
     val formats: Seq[Seq[Selector]] = Works.getWorkByName("Хумаш").formats
     formats.map(_.map(_.defaultName).mkString("/")).foreach(println)
   }
 
 
 //  @Test
-  def deepStructureGenesis = {
+  def genesisFormats = {
     val selection = Selection("Хумаш").div("book", "Genesis")
     val formats: Seq[Seq[Selector]] = selection.structures.formats
     formats.map(_.map(_.defaultName).mkString("/")).foreach(println)

@@ -19,15 +19,9 @@ package org.podval.judaica.viewer
 
 object Parse {
 
-  def sequence[X, K, T](f : (K, X) => T)(n: (K, T) => K)(known: K, rest: Seq[X]): Seq[T] = {
-    def parse(known: K, rest: Seq[X]): Seq[T] = rest match {
-      case Nil => Nil
-      case x :: xs =>
-        val result: T = f(known, x)
-        val nextKnown: K = n(known, result)
-        result +: parse(nextKnown, xs)
-    }
-
-    parse(known, rest)
-  }
+  def sequence[X, C, T](f : (C, X) => T)(n: (C, T) => C)(context: C, xs: Seq[X]): Seq[T] =
+    xs.foldLeft((Seq.empty[T], context)) { case ((result, context), x) =>
+        val one = f(context, x)
+        (result :+ one, n(context, one))
+    }._1
 }
