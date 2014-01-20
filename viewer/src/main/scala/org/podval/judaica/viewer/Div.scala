@@ -22,7 +22,11 @@ import Selector.ParsingContext
 import scala.xml.Elem
 
 
+// TODO introduce dominant/non-dominant Structure, so that the Work is covered too...
 abstract class Div(context: ParsingContext, val structure: Structure, xml: Elem) extends Structures with Ordered[Div] {
+
+  def isDominant: Boolean
+  def asDominant: DominantDiv
 
   private[this] val localSelectors: Seq[Selector] = Selector.parse(context.knownSelectors, xml)
 
@@ -39,6 +43,10 @@ abstract class Div(context: ParsingContext, val structure: Structure, xml: Elem)
 
 
 trait DominantDiv { self : Div =>
+
+  def isDominant: Boolean = true
+  def asDominant: DominantDiv = this
+
 
   val dominantStructure: Structure
 
@@ -65,6 +73,10 @@ trait DominantDiv { self : Div =>
 
 
 trait NonDominantDiv { self: Div =>
+
+  def isDominant: Boolean = false
+  def asDominant: DominantDiv = throw new ViewerException(s"$this is not a dominant Div")
+
 
   val path: Selection.Path
 

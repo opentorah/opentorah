@@ -147,6 +147,7 @@ final class NumberedParsedStructure(context: ParsingContext, selector: NumberedS
   extends NumberedStructure(selector, xml)
 {
 
+  // TODO check that the Paths for the non-dominant structure are properly ordered; same for Named
   override val divs: Seq[NumberedDiv] = parseDivs(context, xml)
 }
 

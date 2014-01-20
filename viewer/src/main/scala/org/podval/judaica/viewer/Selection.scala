@@ -26,12 +26,16 @@ abstract class Selection(val work: Work, val editions: Editions, val path: Selec
   def asStructure: StructureSelection
   def asDiv: DivSelection
 
+  def structure: Structure
+
   def select(name: String): Selection
+  def selectDominant(name: String): Selection
 
   def selectDiv(div: Div): StructureSelection = new StructureSelection(work, editions, path :+ div)
 
 
   def selectPath(what: String): Selection = what.split("/").foldLeft(this)(_.select(_))
+  def selectDominantPath(what: String): Selection = what.split("/").foldLeft(this)(_.selectDominant(_))
 }
 
 
@@ -43,17 +47,28 @@ final class StructureSelection(work: Work, editions: Editions, path: Seq[Div]) e
   override def asStructure: StructureSelection = this
   override def asDiv: DivSelection = throw new ClassCastException
 
-
   def structures: Structures = if (path.isEmpty) work else path.last
-
+  override def structure: Structure = path.last.structure
 
   override def select(name: String): DivSelection = selectStructure(name)
   def selectStructure(name: String): DivSelection = selectStructure(structures.getSelectorByName(name))
   def selectStructure(selector: Selector): DivSelection = selectStructure(structures.getStructure(selector))
   def selectStructure(structure: Structure): DivSelection = new DivSelection(work, editions, path, structure)
 
+  override def selectDominant(name: String): DivSelection = selectDominantStructure(name)
+  def selectDominantStructure(name: String): DivSelection = selectDominantStructure(structures.getSelectorByName(name))
+  def selectDominantStructure(selector: Selector): DivSelection = {
+    if (!structures.isDominantSelector(selector)) throw new ViewerException(s"Selector $selector is not dominant")
+    selectStructure(if (path.isEmpty) structures.getStructure(selector) else path.last.asDominant.dominantStructure)
+  }
 
-  def parseDominantPath(path: String): Selection.Path = Seq.empty  // TODO implement; check that isStructure
+
+  def parseDominantPath(path: String): Selection.Path = {
+    val target = selectDominantPath(path)
+    if (!target.isStructure) throw new ViewerException(s"Path $path ended with a Div selection")
+    if (!target.structure.selector.isTerminal) throw new ViewerException(s"Path $path is incomplete")
+    target.path.drop(this.path.length)
+  }
 
 
   def xmlContent: Elem = content(None, false)
@@ -82,7 +97,7 @@ final class StructureSelection(work: Work, editions: Editions, path: Seq[Div]) e
 
 
 
-final class DivSelection(work: Work, editions: Editions, path: Seq[Div], structure: Structure) extends Selection(work, editions, path) {
+final class DivSelection(work: Work, editions: Editions, path: Seq[Div], override val structure: Structure) extends Selection(work, editions, path) {
 
   override def isStructure: Boolean = false
   override def isDiv: Boolean = true
@@ -94,6 +109,7 @@ final class DivSelection(work: Work, editions: Editions, path: Seq[Div], structu
 
 
   override def select(name: String): StructureSelection = selectDiv(name)
+  override def selectDominant(name: String): StructureSelection = selectDiv(name)
 
 
   def selectDiv(name: String): StructureSelection = {
