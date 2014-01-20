@@ -22,7 +22,7 @@ import Selector.ParsingContext
 import scala.xml.Elem
 
 
-abstract class Div(context: ParsingContext, val structure: Structure, xml: Elem) extends Structures {
+abstract class Div(context: ParsingContext, val structure: Structure, xml: Elem) extends Structures with Ordered[Div] {
 
   private[this] val localSelectors: Seq[Selector] = Selector.parse(context.knownSelectors, xml)
 
@@ -31,6 +31,9 @@ abstract class Div(context: ParsingContext, val structure: Structure, xml: Elem)
 
 
   def id: String
+
+
+  final override def compare(that: Div): Int = structure.compare(this, that)
 }
 
 

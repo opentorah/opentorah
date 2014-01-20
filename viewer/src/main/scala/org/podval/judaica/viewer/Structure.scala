@@ -25,7 +25,7 @@ import scala.xml.Elem
 import java.io.File
 
 
-abstract class Structure(val selector: Selector, xml: Elem) extends Named {
+abstract class Structure(val selector: Selector, xml: Elem) extends Named with Ordering[Div] {
 
   final override def names = selector.names
 
@@ -52,6 +52,13 @@ abstract class Structure(val selector: Selector, xml: Elem) extends Named {
 
 
   private[this] val lengthOption: Option[Int] = xml.intAttributeOption("length")
+
+
+  final override def compare(x: Div, y: Div): Int = {
+    require(x.structure == this && y.structure == this)
+    require(divs.contains(x) && divs.contains(y))
+    divs.indexOf(x) - divs.indexOf(y)
+  }
 
 
   final def divByNumber(number: Int): Option[Div] = if ((number < 1) || (number > length)) None else Some(divs(number))
