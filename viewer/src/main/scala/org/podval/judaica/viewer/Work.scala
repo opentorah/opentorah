@@ -19,6 +19,7 @@ package org.podval.judaica.viewer
 import ParseException.withMetadataFile
 
 import scala.xml.Elem
+
 import java.io.File
 
 
@@ -38,7 +39,7 @@ object Works {
 
 
 
-final class Work(val directory: File, index: File) extends Named with Selectors with Structures {
+final class Work(val directory: File, index: File) extends Named with Structures {
 
   override val names: Names = withMetadataFile(index)(Names(_))
 
@@ -47,8 +48,18 @@ final class Work(val directory: File, index: File) extends Named with Selectors 
   private[this] val selectors_ = LazyLoad(withMetadataFile(index)(xml => Exists(Selectors.parse(Set.empty, xml), "selectors")))
 
 
-  override def structures: Seq[Structure] = structures_.get
-  private[this] val structures_ = LazyLoad(withMetadataFile(index)(xml => Exists(Structure.parseStructures(index, selectors, xml), "structures")))
+  override def structures: Map[Selector, Structure] = structures_.get
+
+
+  private[this] val structures_ = LazyLoad(withMetadataFile(index){ xml =>
+    val context = Structure.ParsingContext(
+      isDominant = true,
+      dominantParentSelection = Selection(this),
+      parsingFile = index,
+      knownSelectors = Set.empty)
+
+    parseStructures(context, xml)
+  })
 
 
   // TODO handle situation when only one edition is present - allow to not put it into a subdirectory?
@@ -73,7 +84,7 @@ final class Edition(val work: Work, directory: File, index: File) extends Named 
   // TODO add language attribute
 
   def storage: Storage = storage_.get
-  private[this] val storage_ = LazyLoad(withMetadataFile(index)(DirectoryStorage(work.structures, _, directory)))
+  private[this] val storage_ = LazyLoad(withMetadataFile(index)(DirectoryStorage(work, _, directory)))
 
 
   def stylesheet: File = new File(directory, "stylesheet.css")

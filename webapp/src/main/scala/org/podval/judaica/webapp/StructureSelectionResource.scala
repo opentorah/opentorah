@@ -32,14 +32,14 @@ class StructureSelectionResource(selection: StructureSelection) {
 
 
   @Path("/{selector}")
-  def selector(@PathParam("selector") selectorName: String) = new DivSelectionResource(selection.structure(selectorName))
+  def selector(@PathParam("selector") selectorName: String) = new DivSelectionResource(selection.selectStructure(selectorName))
 
 
   @GET
   @Produces(Array(MediaType.TEXT_HTML))
   def structure(@Context uriInfo: UriInfo) = Html(uriInfo,
       <div>
-        {Table(selection.structures.structures, uriInfo, structuresColumn)}
+        {Table(selection.structures.structures.values, uriInfo, structuresColumn)}
         {Table(selection.structures.formats, uriInfo, contentColumn)}
         {if (selection.editions.isNo) {
         val editionsUri = uriInfo.getBaseUriBuilder.path("works").path(selection.work.defaultName).path("editions").build().toString

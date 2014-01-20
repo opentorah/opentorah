@@ -19,16 +19,19 @@ package org.podval.judaica.viewer
 import scala.xml.Elem
 
 
-abstract class Selection(val work: Work, val editions: Editions, val path: Seq[Div]) {
+abstract class Selection(val work: Work, val editions: Editions, val path: Selection.Path) {
 
   def isStructure: Boolean
   def isDiv: Boolean
   def asStructure: StructureSelection
   def asDiv: DivSelection
 
-  def step(name: String): Selection
+  def select(name: String): Selection
 
-  def steps(what: String): Selection = what.split("/").foldLeft(this)(_.step(_))
+  def selectDiv(div: Div): StructureSelection = new StructureSelection(work, editions, path :+ div)
+
+
+  def selectPath(what: String): Selection = what.split("/").foldLeft(this)(_.select(_))
 }
 
 
@@ -43,14 +46,19 @@ final class StructureSelection(work: Work, editions: Editions, path: Seq[Div]) e
 
   def structures: Structures = if (path.isEmpty) work else path.last
 
-  def structure(name: String): DivSelection = new DivSelection(work, editions, path, structures.getStructureByName(name))
 
-  override def step(name: String): DivSelection = structure(name)
+  override def select(name: String): DivSelection = selectStructure(name)
+  def selectStructure(name: String): DivSelection = selectStructure(structures.getSelectorByName(name))
+  def selectStructure(selector: Selector): DivSelection = selectStructure(structures.getStructure(selector))
+  def selectStructure(structure: Structure): DivSelection = new DivSelection(work, editions, path, structure)
 
-  def div(structureName: String, divName: String): StructureSelection = structure(structureName).div(divName)
+
+  def parseDominantPath(path: String): Selection.Path = Seq.empty  // TODO implement; check that isStructure
+
 
   def xmlContent: Elem = content(None, false)
   def xmlContent(format: String): Elem = content(Some(format), false)
+
 
   def htmlContent: Elem = content(None, true)
   def htmlContent(format: String): Elem = content(Some(format), true)
@@ -69,7 +77,7 @@ final class StructureSelection(work: Work, editions: Editions, path: Seq[Div]) e
   def content(format: Seq[Selector]): Elem = editions.content(path, format)
 
 
-  def toHtml(xml: Elem): Elem = ???
+  def toHtml(xml: Elem): Elem = ??? // TODO
 }
 
 
@@ -85,7 +93,10 @@ final class DivSelection(work: Work, editions: Editions, path: Seq[Div], structu
   def divs: Seq[Div] = structure.divs
 
 
-  def div(name: String): StructureSelection = {
+  override def select(name: String): StructureSelection = selectDiv(name)
+
+
+  def selectDiv(name: String): StructureSelection = {
     val numberOption: Option[Int] = try { Some(name.toInt) } catch { case e: NumberFormatException => None }
 
     val div: Div =
@@ -93,16 +104,16 @@ final class DivSelection(work: Work, editions: Editions, path: Seq[Div], structu
       if (structure.isNumbered) throw new ViewerException(s"$name is not a number") else
       structure.asNamed.getDivByName(name)
 
-    new StructureSelection(work, editions, path :+ div)
+    selectDiv(div)
   }
-
-
-  override def step(name: String): StructureSelection = div(name)
 }
 
 
 
 object Selection {
+
+  type Path = Seq[Div]
+
 
   def apply(workName: String): StructureSelection = apply(Works.getWorkByName(workName))
 

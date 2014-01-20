@@ -46,7 +46,7 @@ abstract class SimpleLinkColumn[T](name: String) extends LinkColumn[T](name) {
 
 object Table {
 
-  def apply[T](data: Seq[T], uriInfo: UriInfo, columns: Column[T]*): Elem = {
+  def apply[T](data: Traversable[T], uriInfo: UriInfo, columns: Column[T]*): Elem = {
     val uriBuilder = uriInfo.getAbsolutePathBuilder
     <table>
       <thead>

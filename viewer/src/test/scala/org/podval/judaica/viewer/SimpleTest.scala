@@ -65,7 +65,7 @@ class SimpleTest {
 
   @Test
   def genesisWeekStructure {
-    Selection("Chumash").steps("book/Genesis/week").asDiv.div("Genesis")
+    Selection("Chumash").selectPath("book/Genesis/week").asDiv.selectDiv("Genesis")
   }
 
 
@@ -78,7 +78,7 @@ class SimpleTest {
 
 //  @Test
   def genesisFormats = {
-    val selection = Selection("Хумаш").div("book", "Genesis")
+    val selection = Selection("Хумаш").selectPath("book/Genesis").asStructure
     val formats: Seq[Seq[Selector]] = selection.structures.formats
     formats.map(_.map(_.defaultName).mkString("/")).foreach(println)
   }
@@ -95,7 +95,7 @@ class SimpleTest {
 
 //  @Test
   def genesisContent {
-    val xml = Selection("Tanach", "Jerusalem").steps("book/Genesis").asStructure.xmlContent
+    val xml = Selection("Tanach", "Jerusalem").selectPath("book/Genesis").asStructure.xmlContent
   }
 
 

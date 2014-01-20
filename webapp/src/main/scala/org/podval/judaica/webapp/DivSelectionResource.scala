@@ -32,7 +32,7 @@ final class DivSelectionResource(selection: DivSelection) {
 
 
   @Path("/{div}")
-  def div(@PathParam("div") divName: String) = new StructureSelectionResource(selection.div(divName))
+  def div(@PathParam("div") divName: String) = new StructureSelectionResource(selection.selectDiv(divName))
 }
 
 

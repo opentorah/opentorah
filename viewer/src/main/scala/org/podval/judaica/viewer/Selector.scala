@@ -20,6 +20,8 @@ import org.podval.judaica.xml.Xml.Ops
 
 import scala.xml.Elem
 
+import java.io.File
+
 
 abstract class Selector(knownSelectors: Set[Selector], xml: Elem) extends Named with Selectors {
   def isNumbered: Boolean
@@ -65,8 +67,57 @@ trait Selectors {
   final def dominantSelector: Selector = selectors.head
 
 
+  final def isDominantSelector(selector: Selector): Boolean = selector == dominantSelector
+
+
   final def dominantFormat: Format =
     if (selectors.isEmpty) Nil else dominantSelector +: dominantSelector.dominantFormat
+
+
+  final def parseStructures(context: Structure.ParsingContext, xml: Elem): Map[Selector, Structure] =
+    parseStructures(context, preParseStructures(xml))
+
+
+  // TODO verify that all structures requested by the selectors are present; some allowed structures need to be calculated...
+  // TODO make sure that they are retrievable, too - for instance, week/chapter!
+  ///    selectors.foreach(selector => Exists(structures, selector.defaultName, "structures"))
+  final def parseStructures(context: Structure.ParsingContext, xmls: Structure.Xmls): Map[Selector, Structure] =
+    for ((selector, xml) <- xmls) yield selector->parseStructure(context, selector, xml)
+
+
+  final def preParseStructures(xmls: Elem): Structure.Xmls =
+    xmls.elemsFilter("structure").map(xml => getSelectorByName(xml.getAttribute("selector")) -> xml).toMap
+
+
+  def parseStructure(context: Structure.ParsingContext, selector: Selector, xml: Elem): Structure = {
+    val nextContext = context.copy(
+      isDominant = context.isDominant && isDominantSelector(selector),
+      knownSelectors = cousins(selector))
+
+    xml.attributeOption("file").fold {
+      if (selector.isNumbered)
+        new NumberedParsedStructure(context, selector.asNumbered, xml)
+      else
+        new NamedParsedStructure(context, selector.asNamed, xml)
+    }{
+      fileName: String =>
+        val nextParsingFile: File = new File(context.parsingFile.getParentFile, fileName)
+        val realNextContext = nextContext.copy(parsingFile = nextParsingFile)
+
+        if (selector.isNumbered)
+          new NumberedLazyStructure(realNextContext, selector.asNumbered, xml)
+        else
+          new NamedLazyStructure(realNextContext, selector.asNamed, xml)
+    }
+  }
+
+
+  private def cousins(selector: Selector): Set[Selector] = {
+    // TODO the set is not big enough! Should start from the top, to accommodate old uncles...
+    // TODO check that the cycles are actually prevented by all this...
+    val uncles = selectors.takeWhile(_ != selector)
+    Selectors.descendants(uncles.toSet)
+  }
 
 
   final def formats: Seq[Format] =

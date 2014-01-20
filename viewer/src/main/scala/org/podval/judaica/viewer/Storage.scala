@@ -34,7 +34,7 @@ sealed trait Storage {
 
 
 
-final class DirectoryStorage private(structures: Seq[Structure], xml: Elem, directory: File) extends Storage {
+final class DirectoryStorage private(structures: Structures, xml: Elem, directory: File) extends Storage {
   override def isDirectory: Boolean = true
   override def isFile: Boolean = false
   override def asDirectory: DirectoryStorage = this
@@ -42,7 +42,8 @@ final class DirectoryStorage private(structures: Seq[Structure], xml: Elem, dire
 
   // TODO allow overrides ? val overrides = Xml.elems(structure) ... Xml.check(override, "file")
 
-  val structure: Structure = Names.doFind(structures, xml.getAttribute("structure"), "structure")
+  val selector: Selector = structures.getSelectorByName(xml.getAttribute("structure"))
+  val structure = structures.getStructure(selector)
   val fileFormat = structure.selector.parseFormat(xml.attributeOption("format"))
 
   val files: Map[Div, Storage] = structure.divs.map { div =>  (div, forDiv(div)) }.toMap
@@ -58,7 +59,7 @@ final class DirectoryStorage private(structures: Seq[Structure], xml: Elem, dire
       new FileStorage(fileCandidate)
     } else if (directoryCandidate.exists) {
       if (!directoryCandidate.isDirectory) throw new ViewerException(s"$fileCandidate must be a directory")
-      ParseException.withMetadataFile(Exists(new File(directoryCandidate, "index.xml")))(DirectoryStorage(div.structures, _, directoryCandidate))
+      ParseException.withMetadataFile(Exists(new File(directoryCandidate, "index.xml")))(DirectoryStorage(div, _, directoryCandidate))
     } else {
       throw new ViewerException(s"One of the files $fileCandidate or $directoryCandidate must exist")
     }
@@ -71,7 +72,7 @@ final class DirectoryStorage private(structures: Seq[Structure], xml: Elem, dire
 
 object DirectoryStorage {
 
-  def apply(structures: Seq[Structure], xml: Elem, directory: File): DirectoryStorage =
+  def apply(structures: Structures, xml: Elem, directory: File): DirectoryStorage =
     new DirectoryStorage(structures, xml.oneChild("storage"), directory)
 }
 
