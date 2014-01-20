@@ -17,6 +17,7 @@
 package org.podval.judaica.viewer
 
 import org.podval.judaica.xml.Xml.Ops
+import Selector.ParsingContext
 import ParseException.withMetadataFile
 
 import scala.xml.Elem
@@ -59,9 +60,6 @@ abstract class Structure(val selector: Selector, xml: Elem) extends Named {
   final def getDivByNumber(number: Int): Div = Exists(divByNumber(number), number.toString, "div")
 
 
-  final def preParseStructures(xml: Elem): Structure.Xmls = selector.preParseStructures(xml)
-
-
   protected final def open(xml: Elem): Elem = {
     val result = xml.oneChild("structure")
     // TODO check that this is the correct structure :)
@@ -96,13 +94,13 @@ abstract class NamedStructure(override val selector: NamedSelector, xml: Elem) e
   final def getDivByName(name: String): NamedDiv = Names.doFind(divs, name, "div")
 
 
-  protected final def parseDivs(context: Structure.ParsingContext, xml: Elem): Seq[NamedDiv] =
+  protected final def parseDivs(context: ParsingContext, xml: Elem): Seq[NamedDiv] =
     checkLength(divs(xml).map(xml => NamedDiv(context, this, xml)))
 }
 
 
 
-final class NamedParsedStructure(context: Structure.ParsingContext, selector: NamedSelector, xml: Elem)
+final class NamedParsedStructure(context: ParsingContext, selector: NamedSelector, xml: Elem)
   extends NamedStructure(selector, xml)
 {
   override val divs: Seq[NamedDiv] = parseDivs(context, xml)
@@ -110,7 +108,7 @@ final class NamedParsedStructure(context: Structure.ParsingContext, selector: Na
 
 
 
-final class NamedLazyStructure(context: Structure.ParsingContext, selector: NamedSelector, xml: Elem)
+final class NamedLazyStructure(context: ParsingContext, selector: NamedSelector, xml: Elem)
   extends NamedStructure(selector, xml)
 {
   override def divs: Seq[NamedDiv] = divs_.get
@@ -132,13 +130,13 @@ abstract class NumberedStructure(override val selector: NumberedSelector, xml: E
   override def divs: Seq[NumberedDiv]
 
 
-  protected final def parseDivs(context: Structure.ParsingContext, xml: Elem): Seq[NumberedDiv] =
+  protected final def parseDivs(context: ParsingContext, xml: Elem): Seq[NumberedDiv] =
     checkLength(divs(xml).zipWithIndex.map { case (xml, num) => NumberedDiv(context, this, num+1, xml) })
 }
 
 
 
-final class NumberedParsedStructure(context: Structure.ParsingContext, selector: NumberedSelector, xml: Elem)
+final class NumberedParsedStructure(context: ParsingContext, selector: NumberedSelector, xml: Elem)
   extends NumberedStructure(selector, xml)
 {
 
@@ -147,7 +145,7 @@ final class NumberedParsedStructure(context: Structure.ParsingContext, selector:
 
 
 
-final class NumberedLazyStructure(context: Structure.ParsingContext, selector: NumberedSelector, xml: Elem)
+final class NumberedLazyStructure(context: ParsingContext, selector: NumberedSelector, xml: Elem)
   extends NumberedStructure(selector, xml)
 {
   override def divs: Seq[NumberedDiv] = divs_.get
@@ -164,20 +162,4 @@ trait Structures extends Selectors {
 
 
   final def getStructure(selector: Selector): Structure = structures(selector)
-}
-
-
-
-object Structure {
-
-  case class ParsingContext(
-    isDominant: Boolean,
-    dominantParentSelection: StructureSelection,
-    parsingFile: File,
-    knownSelectors: Set[Selector]
-  )
-
-
-
-  type Xmls = Map[Selector, Elem]
 }

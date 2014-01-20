@@ -22,6 +22,8 @@ import scala.xml.Elem
 
 import java.io.File
 
+import Selector.ParsingContext
+
 
 abstract class Selector(knownSelectors: Set[Selector], xml: Elem) extends Named with Selectors {
   def isNumbered: Boolean
@@ -30,9 +32,40 @@ abstract class Selector(knownSelectors: Set[Selector], xml: Elem) extends Named 
   def asNamed: NamedSelector
 
   final override val names = Names(xml)
-  final override val selectors = Selectors.parse(knownSelectors, xml)
+  final override val selectors = Selector.parse(knownSelectors, xml)
 
   final def isTerminal: Boolean = selectors.isEmpty
+
+
+  def parseStructure(context: ParsingContext, selectors: Selectors, xml: Elem): Structure = {
+    val nextContext = context.copy(
+      isDominant = context.isDominant && selectors.isDominantSelector(this),
+      knownSelectors = cousins(selectors))
+
+    xml.attributeOption("file").fold {
+      if (isNumbered)
+        new NumberedParsedStructure(context, asNumbered, xml)
+      else
+        new NamedParsedStructure(context, asNamed, xml)
+    }{
+      fileName: String =>
+        val nextParsingFile: File = new File(context.parsingFile.getParentFile, fileName)
+        val realNextContext = nextContext.copy(parsingFile = nextParsingFile)
+
+        if (isNumbered)
+          new NumberedLazyStructure(realNextContext, asNumbered, xml)
+        else
+          new NamedLazyStructure(realNextContext, asNamed, xml)
+    }
+  }
+
+
+  private def cousins(selectors: Selectors): Set[Selector] = {
+    // TODO the set is not big enough! Should start from the top, to accommodate old uncles...
+    // TODO check that the cycles are actually prevented by all this...
+    val uncles = selectors.selectors.takeWhile(_ != this)
+    Selector.descendants(uncles.toSet)
+  }
 }
 
 
@@ -48,6 +81,54 @@ final class NamedSelector(knownSelectors: Set[Selector], xml: Elem) extends Sele
   override def asNumbered: NumberedSelector = throw new ClassCastException
   override def asNamed: NamedSelector = this
 }
+
+
+
+object Selector {
+
+  case class ParsingContext(
+     isDominant: Boolean,
+     dominantParentSelection: StructureSelection,
+     parsingFile: File,
+     knownSelectors: Set[Selector]
+  )
+
+
+  type Xmls = Map[Selector, Elem]
+
+
+  def descendants(next: Set[Selector]): Set[Selector] = descendants(Set.empty, next)
+
+
+  private def descendantsOfOne(result: Set[Selector], next: Selector): Set[Selector] = descendants(result, Set(next))
+
+
+  private def descendants(result: Set[Selector], next: Set[Selector]): Set[Selector] = {
+    val add = next -- result
+    if (add.isEmpty) result else {
+      val children: Set[Selector] = add.flatMap(_.selectors)
+      descendants(result ++ next, children)
+    }
+  }
+
+
+  def parse(knownSelectors: Set[Selector], xml: Elem): Seq[Selector] =
+    Parse.sequence[Elem, Set[Selector], Selector](parseSelector)(descendantsOfOne)(knownSelectors, xml.elemsFilter("selector"))
+
+
+  private def parseSelector(knownSelectors: Set[Selector], xml: Elem): Selector = {
+    def newSelector =
+      if (xml.booleanAttribute("isNumbered"))
+        new NumberedSelector(knownSelectors, xml)
+      else
+        new NamedSelector(knownSelectors, xml)
+
+    def referenceToKnownSelector(name: String) = Names.doFind(knownSelectors, name, "selector")
+
+    xml.attributeOption("name").fold(newSelector)(referenceToKnownSelector)
+  }
+}
+
 
 
 trait Selectors {
@@ -74,50 +155,19 @@ trait Selectors {
     if (selectors.isEmpty) Nil else dominantSelector +: dominantSelector.dominantFormat
 
 
-  final def parseStructures(context: Structure.ParsingContext, xml: Elem): Map[Selector, Structure] =
+  final def parseStructures(context: ParsingContext, xml: Elem): Map[Selector, Structure] =
     parseStructures(context, preParseStructures(xml))
 
 
   // TODO verify that all structures requested by the selectors are present; some allowed structures need to be calculated...
   // TODO make sure that they are retrievable, too - for instance, week/chapter!
   ///    selectors.foreach(selector => Exists(structures, selector.defaultName, "structures"))
-  final def parseStructures(context: Structure.ParsingContext, xmls: Structure.Xmls): Map[Selector, Structure] =
-    for ((selector, xml) <- xmls) yield selector->parseStructure(context, selector, xml)
+  final def parseStructures(context: ParsingContext, xmls: Selector.Xmls): Map[Selector, Structure] =
+    for ((selector, xml) <- xmls) yield selector -> selector.parseStructure(context, this, xml)
 
 
-  final def preParseStructures(xmls: Elem): Structure.Xmls =
+  final def preParseStructures(xmls: Elem): Selector.Xmls =
     xmls.elemsFilter("structure").map(xml => getSelectorByName(xml.getAttribute("selector")) -> xml).toMap
-
-
-  def parseStructure(context: Structure.ParsingContext, selector: Selector, xml: Elem): Structure = {
-    val nextContext = context.copy(
-      isDominant = context.isDominant && isDominantSelector(selector),
-      knownSelectors = cousins(selector))
-
-    xml.attributeOption("file").fold {
-      if (selector.isNumbered)
-        new NumberedParsedStructure(context, selector.asNumbered, xml)
-      else
-        new NamedParsedStructure(context, selector.asNamed, xml)
-    }{
-      fileName: String =>
-        val nextParsingFile: File = new File(context.parsingFile.getParentFile, fileName)
-        val realNextContext = nextContext.copy(parsingFile = nextParsingFile)
-
-        if (selector.isNumbered)
-          new NumberedLazyStructure(realNextContext, selector.asNumbered, xml)
-        else
-          new NamedLazyStructure(realNextContext, selector.asNamed, xml)
-    }
-  }
-
-
-  private def cousins(selector: Selector): Set[Selector] = {
-    // TODO the set is not big enough! Should start from the top, to accommodate old uncles...
-    // TODO check that the cycles are actually prevented by all this...
-    val uncles = selectors.takeWhile(_ != selector)
-    Selectors.descendants(uncles.toSet)
-  }
 
 
   final def formats: Seq[Format] =
@@ -130,40 +180,4 @@ trait Selectors {
 
   final def parseFormat(format: String): Format =
     Parse.sequence[String, Selectors, Selector](_.getSelectorByName(_)) ((selectors, selector) => selector) (this, format.split("/"))
-}
-
-
-
-object Selectors {
-
-  def parse(knownSelectors: Set[Selector], xml: Elem): Seq[Selector] =
-    Parse.sequence[Elem, Set[Selector], Selector](parseSelector)(descendantsOfOne)(knownSelectors, xml.elemsFilter("selector"))
-
-
-  private def parseSelector(knownSelectors: Set[Selector], xml: Elem): Selector = {
-    def newSelector =
-      if (xml.booleanAttribute("isNumbered"))
-        new NumberedSelector(knownSelectors, xml)
-      else
-        new NamedSelector(knownSelectors, xml)
-
-    def referenceToKnownSelector(name: String) = Names.doFind(knownSelectors, name, "selector")
-
-    xml.attributeOption("name").fold(newSelector)(referenceToKnownSelector)
-  }
-
-
-  def descendants(next: Set[Selector]): Set[Selector] = descendants(Set.empty, next)
-
-
-  private def descendantsOfOne(result: Set[Selector], next: Selector): Set[Selector] = descendants(result, Set(next))
-
-
-  private def descendants(result: Set[Selector], next: Set[Selector]): Set[Selector] = {
-    val add = next -- result
-    if (add.isEmpty) result else {
-      val children: Set[Selector] = add.flatMap(_.selectors)
-      descendants(result ++ next, children)
-    }
-  }
 }
