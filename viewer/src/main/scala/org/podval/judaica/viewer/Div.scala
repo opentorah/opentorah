@@ -22,6 +22,7 @@ import Selector.ParsingContext
 import scala.xml.Elem
 
 
+// TODO I am generating terminal Divs; should define equals method on them so that things work :)
 // TODO introduce dominant/non-dominant Structure, so that the Work is covered too...
 abstract class Div(context: ParsingContext, val structure: Structure, xml: Elem) extends Structures with Ordered[Div] {
 
@@ -54,7 +55,7 @@ trait DominantDiv { self : Div =>
   final def parseDominantStructure(context: ParsingContext, xml: Elem): Structure = {
     val dominantXml = structure.selector.preParseStructures(xml).get(dominantSelector)
     if (dominantXml.isEmpty) throw new ViewerException(s"No dominant structure for $this")
-    dominantSelector.parseStructure(context, this, dominantXml.get)
+    dominantSelector.parseStructure(adjustContext(context), this, dominantXml.get)
   }
 
 

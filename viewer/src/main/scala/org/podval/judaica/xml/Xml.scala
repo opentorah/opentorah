@@ -16,11 +16,13 @@
 
 package org.podval.judaica.xml
 
-
 import scala.xml.{Node, Elem, Text, PrettyPrinter}
 
-import java.io.{FileWriter, PrintWriter, File}
+import java.io.{File, OutputStream, Writer, FileWriter, OutputStreamWriter, PrintWriter}
+
+// TODO eliminate this dependency
 import org.podval.judaica.viewer.ViewerException
+import scala.Some
 
 
 object Xml {
@@ -89,8 +91,11 @@ object Xml {
     def isDiv(divType: String): Boolean = (elem.label == "div") && (elem.attribute("type") == divType)
 
 
-    def print(outFile: File) {
-      val out = new PrintWriter(new FileWriter(outFile))
+    def print(outStream: OutputStream): Unit = print(new OutputStreamWriter(outStream))
+    def print(outFile: File): Unit = print(new FileWriter(outFile))
+
+    def print(writer: Writer) {
+      val out = new PrintWriter(writer)
       val pretty = new PrettyPrinter(100, 4).format(elem)
       // TODO when outputting XML, include <xml> header?
       // TODO        out.println("<!DOCTYPE html>\n" + pretty)

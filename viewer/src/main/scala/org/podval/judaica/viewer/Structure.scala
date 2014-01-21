@@ -22,8 +22,6 @@ import ParseException.withMetadataFile
 
 import scala.xml.Elem
 
-import java.io.File
-
 
 abstract class Structure(val selector: Selector, xml: Elem) extends Named with Ordering[Div] {
 
@@ -61,7 +59,14 @@ abstract class Structure(val selector: Selector, xml: Elem) extends Named with O
   }
 
 
-  final def divByNumber(number: Int): Option[Div] = if ((number < 1) || (number > length)) None else Some(divs(number))
+  final def divByNumber(number: Int): Option[Div] = {
+    if ((number < 1) || (number > length)) None else {
+      if (number <= divs.length) Some(divs(number-1)) else {
+        // TODO generated Div
+        /*if (isNumbered && selector.isTerminal) Some() else */ None
+      }
+    }
+  }
 
 
   final def getDivByNumber(number: Int): Div = Exists(divByNumber(number), number.toString, "div")
@@ -75,8 +80,14 @@ abstract class Structure(val selector: Selector, xml: Elem) extends Named with O
 
 
   // TODO check that named or non-dominant structure is fully defined
-  protected final def checkLength[T <: Div](divs: Seq[T]): Seq[T] =
-    if (lengthOption.isDefined && lengthOption.get != divs.length) throw new ViewerException(s"Wrong length") else divs
+  // TODO maybe structure for the terminal selectors shouldn't be *allowed*, not just allowed to be omitted...
+  // TODO length should really be supplied fo rthe terminal structure!
+  protected final def checkLength[T <: Div](divs: Seq[T]): Seq[T] = {
+    if (!selector.isTerminal && lengthOption.isDefined && lengthOption.get != divs.length)
+      throw new ViewerException(s"Wrong length: expected ${lengthOption.get} but got ${divs.length}")
+
+    divs
+  }
 
 
   protected final def divs(xml: Elem): Seq[Elem] = xml.elemsFilter("div")

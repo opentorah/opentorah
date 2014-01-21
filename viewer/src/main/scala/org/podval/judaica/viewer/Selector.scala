@@ -133,7 +133,7 @@ object Selector {
 
 trait Selectors {
 
-  type Format = Seq[Selector]
+  import Selectors.Format
 
 
   def selectors: Seq[Selector]
@@ -180,4 +180,11 @@ trait Selectors {
 
   final def parseFormat(format: String): Format =
     Parse.sequence[String, Selectors, Selector](_.getSelectorByName(_)) ((selectors, selector) => selector) (this, format.split("/"))
+}
+
+
+
+object Selectors {
+
+  type Format = Seq[Selector]
 }

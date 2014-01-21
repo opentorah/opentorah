@@ -16,10 +16,12 @@
 
 package org.podval.judaica.viewer
 
+import Selection.Path
+
 import scala.xml.Elem
 
 
-abstract class Selection(val work: Work, val editions: Editions, val path: Selection.Path) {
+abstract class Selection(val work: Work, val editions: Editions, val path: Path) {
 
   def isStructure: Boolean
   def isDiv: Boolean
@@ -40,7 +42,7 @@ abstract class Selection(val work: Work, val editions: Editions, val path: Selec
 
 
 
-final class StructureSelection(work: Work, editions: Editions, path: Seq[Div]) extends Selection(work, editions, path) {
+final class StructureSelection(work: Work, editions: Editions, path: Path) extends Selection(work, editions, path) {
 
   override def isStructure: Boolean = true
   override def isDiv: Boolean = false
@@ -63,7 +65,7 @@ final class StructureSelection(work: Work, editions: Editions, path: Seq[Div]) e
   }
 
 
-  def parseDominantPath(path: String): Selection.Path = {
+  def parseDominantPath(path: String): Path = {
     val target = selectDominantPath(path)
     if (!target.isStructure) throw new ViewerException(s"Path $path ended with a Div selection")
     if (!target.structure.selector.isTerminal) throw new ViewerException(s"Path $path is incomplete")
@@ -71,11 +73,11 @@ final class StructureSelection(work: Work, editions: Editions, path: Seq[Div]) e
   }
 
 
-  def xmlContent: Elem = content(None, false)
+  def xmlContent: Elem = content(formatOption = None, isHtml = false)
   def xmlContent(format: String): Elem = content(Some(format), false)
 
 
-  def htmlContent: Elem = content(None, true)
+  def htmlContent: Elem = content(formatOption = None, isHtml = true)
   def htmlContent(format: String): Elem = content(Some(format), true)
 
 
@@ -97,7 +99,7 @@ final class StructureSelection(work: Work, editions: Editions, path: Seq[Div]) e
 
 
 
-final class DivSelection(work: Work, editions: Editions, path: Seq[Div], override val structure: Structure) extends Selection(work, editions, path) {
+final class DivSelection(work: Work, editions: Editions, path: Path, override val structure: Structure) extends Selection(work, editions, path) {
 
   override def isStructure: Boolean = false
   override def isDiv: Boolean = true

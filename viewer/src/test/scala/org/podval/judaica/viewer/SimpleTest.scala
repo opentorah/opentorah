@@ -16,6 +16,7 @@
 
 package org.podval.judaica.viewer
 
+import org.podval.judaica.xml.Xml.Ops
 import org.junit.Test
 import org.junit.Assert.{assertTrue, assertFalse, assertEquals}
 
@@ -89,13 +90,21 @@ class SimpleTest {
     val storage = Works.getWorkByName("Tanach").getEditionByName("Jerusalem").storage
     assertTrue(storage.isDirectory)
     assertEquals("book", storage.asDirectory.structure.selector.defaultName)
-    assertEquals(5, storage.asDirectory.files.size)
+    assertEquals(5, storage.asDirectory.storage.size)
   }
 
 
 //  @Test
   def genesisContent {
-    val xml = Selection("Tanach", "Jerusalem").selectPath("book/Genesis").asStructure.xmlContent
+    val xml = Selection("Tanach", "Jerusalem").selectPath("book/Deuteronomy").asStructure.xmlContent
+    val chapters = xml.oneChild("div").elemsFilter("div").filter(_.attributeOption("type") == Some("chapter"))
+    println(s"""<structure selector="chapter" length="${chapters.length}">""")
+    for (chapter <- chapters) {
+      val n = chapter.getAttribute("n")
+      val verses = chapter.elemsFilter("div").filter(_.attributeOption("type") == Some("verse"))
+      println(s"""    <div n="$n"><structure selector="verse" length="${verses.length}"></structure></div>""")
+    }
+    println("</structure>")
   }
 
 

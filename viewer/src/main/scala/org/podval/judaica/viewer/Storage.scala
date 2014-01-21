@@ -17,6 +17,7 @@
 package org.podval.judaica.viewer
 
 import org.podval.judaica.xml.Xml.Ops
+import org.podval.judaica.xml.XmlFile
 
 import scala.xml.Elem
 
@@ -29,7 +30,7 @@ sealed trait Storage {
   def asDirectory: DirectoryStorage
   def asFile: FileStorage
 
-  def content(path: Seq[Div], format: Seq[Selector]): Elem
+  def content(path: Selection.Path, format: Selectors.Format): Elem
 }
 
 
@@ -46,7 +47,7 @@ final class DirectoryStorage private(structures: Structures, xml: Elem, director
   val structure = structures.getStructure(selector)
   val fileFormat = structure.selector.parseFormat(xml.attributeOption("format"))
 
-  val files: Map[Div, Storage] = structure.divs.map { div =>  (div, forDiv(div)) }.toMap
+  val storage: Map[Div, Storage] = structure.divs.map { div =>  (div, forDiv(div)) }.toMap
 
 
   private[this] def forDiv(div: Div): Storage = {
@@ -66,7 +67,18 @@ final class DirectoryStorage private(structures: Structures, xml: Elem, director
   }
 
 
-  override def content(path: Seq[Div], format: Seq[Selector]): Elem = ???
+  override def content(path: Selection.Path, format: Selectors.Format): Elem = {
+    val rawContent: Seq[Elem] = if (path.isEmpty) {
+      structure.divs.map(div => storage(div).content(path, format))
+    } else {
+      val leadingDiv = path.head
+      val leadingStructure = leadingDiv.structure
+      if (leadingStructure != structure) throw new ViewerException(s"Restructuring from $structure to $leadingStructure isn't yet supported")
+      Seq(storage(leadingDiv).content(path.tail, format))
+    }
+
+    <div type={structure.selector.defaultName}>{rawContent}</div>
+  }
 }
 
 
@@ -76,11 +88,13 @@ object DirectoryStorage {
     new DirectoryStorage(structures, xml.oneChild("storage"), directory)
 }
 
+
+
 final class FileStorage(val file: File) extends Storage {
   override def isDirectory: Boolean = false
   override def isFile: Boolean = true
   override def asDirectory: DirectoryStorage = throw new ClassCastException
   override def asFile: FileStorage = this
 
-  override def content(path: Seq[Div], format: Seq[Selector]): Elem = ???
+  override def content(path: Selection.Path, format: Selectors.Format): Elem = XmlFile.load(file)
 }
