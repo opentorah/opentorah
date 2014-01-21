@@ -24,15 +24,15 @@ import scala.xml.Elem
 
 // TODO I am generating terminal Divs; should define equals method on them so that things work :)
 // TODO introduce dominant/non-dominant Structure, so that the Work is covered too...
-abstract class Div(context: ParsingContext, val structure: Structure, xml: Elem) extends Structures with Ordered[Div] {
+trait Div extends Structures with Ordered[Div] {
 
   def isDominant: Boolean
+
+
   def asDominant: DominantDiv
 
-  private[this] val localSelectors: Seq[Selector] = Selector.parse(context.knownSelectors, xml)
 
-
-  override def selectors: Seq[Selector] = structure.selector.selectors ++ localSelectors
+  def structure: Structure
 
 
   def id: String
@@ -43,13 +43,30 @@ abstract class Div(context: ParsingContext, val structure: Structure, xml: Elem)
 
 
 
+trait NamedDiv extends Div with Named {
+
+  final override def id: String = defaultName
+}
+
+
+
+trait NumberedDiv extends Div {
+
+  val number: Int
+
+
+  final override def id: String = number.toString
+}
+
+
+
 trait DominantDiv { self : Div =>
 
   def isDominant: Boolean = true
   def asDominant: DominantDiv = this
 
 
-  val dominantStructure: Structure
+  def dominantStructure: Structure
 
 
   final def parseDominantStructure(context: ParsingContext, xml: Elem): Structure = {
@@ -91,19 +108,39 @@ trait NonDominantDiv { self: Div =>
 
 
 
-abstract class NamedDiv(context: ParsingContext, structure: NamedStructure, xml: Elem)
-  extends Div(context, structure, xml) with Named
+final class GeneratedTerminalDominantNumberedDiv(override val structure: Structure, override val number: Int)
+  extends Div with DominantDiv with NumberedDiv
+{
+  override def selectors: Seq[Selector] = Seq.empty
+  override def structures: Map[Selector, Structure] = Map.empty
+  override def dominantStructure: Structure = throw new UnsupportedOperationException
+}
+
+
+
+abstract class ParseableDiv(context: ParsingContext, override val structure: Structure, xml: Elem) extends Div {
+
+  def isDominant: Boolean
+  def asDominant: DominantDiv
+
+  private[this] val localSelectors: Seq[Selector] = Selector.parse(context.knownSelectors, xml)
+
+
+  override def selectors: Seq[Selector] = structure.selector.selectors ++ localSelectors
+}
+
+
+
+abstract class ParseableNamedDiv(context: ParsingContext, structure: NamedStructure, xml: Elem)
+  extends ParseableDiv(context, structure, xml) with NamedDiv
 {
   override final val names = Names(xml)
-
-
-  override final def id: String = defaultName
 }
 
 
 
 final class DominantNamedDiv(context: ParsingContext, structure: NamedStructure, xml: Elem)
-  extends NamedDiv(context, structure, xml) with DominantDiv
+  extends ParseableNamedDiv(context, structure, xml) with DominantDiv
 {
   override val dominantStructure = parseDominantStructure(context, xml)
 
@@ -114,7 +151,7 @@ final class DominantNamedDiv(context: ParsingContext, structure: NamedStructure,
 
 
 final class NonDominantNamedDiv(context: ParsingContext, structure: NamedStructure, xml: Elem)
-  extends NamedDiv(context, structure, xml) with NonDominantDiv
+  extends ParseableNamedDiv(context, structure, xml) with NonDominantDiv
 {
   override val path = parsePath(context.dominantParentSelection, xml)
 
@@ -136,8 +173,8 @@ object NamedDiv {
 
 
 
-abstract class NumberedDiv(context: ParsingContext, structure: NumberedStructure, val number: Int, xml: Elem)
-  extends Div(context, structure, xml)
+abstract class ParseableNumberedDiv(context: ParsingContext, structure: NumberedStructure, override val number: Int, xml: Elem)
+  extends ParseableDiv(context, structure, xml) with NumberedDiv
 {
   checkNumber
 
@@ -146,14 +183,12 @@ abstract class NumberedDiv(context: ParsingContext, structure: NumberedStructure
       if (nvalue != number) throw new ViewerException(s"Div $number has attribute n set to $nvalue")
     }
   }
-
-  final override def id: String = number.toString
 }
 
 
 
 final class DominantNumberedDiv(context: ParsingContext, structure: NumberedStructure, number: Int, xml: Elem)
-  extends NumberedDiv(context, structure, number, xml) with DominantDiv
+  extends ParseableNumberedDiv(context, structure, number, xml) with DominantDiv
 {
   override val dominantStructure = parseDominantStructure(context, xml)
 
@@ -164,7 +199,7 @@ final class DominantNumberedDiv(context: ParsingContext, structure: NumberedStru
 
 
 final class NonDominantNumberedDiv(context: ParsingContext, structure: NumberedStructure, number: Int, xml: Elem)
-  extends NumberedDiv(context, structure, number, xml) with NonDominantDiv
+  extends ParseableNumberedDiv(context, structure, number, xml) with NonDominantDiv
 {
   override val path = parsePath(context.dominantParentSelection, xml)
 

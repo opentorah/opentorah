@@ -94,23 +94,27 @@ class SimpleTest {
   }
 
 
-//  @Test
-  def genesisContent {
-    val xml = Selection("Tanach", "Jerusalem").selectPath("book/Deuteronomy").asStructure.xmlContent
-    val chapters = xml.oneChild("div").elemsFilter("div").filter(_.attributeOption("type") == Some("chapter"))
-    println(s"""<structure selector="chapter" length="${chapters.length}">""")
-    for (chapter <- chapters) {
-      val n = chapter.getAttribute("n")
-      val verses = chapter.elemsFilter("div").filter(_.attributeOption("type") == Some("verse"))
-      println(s"""    <div n="$n"><structure selector="verse" length="${verses.length}"></structure></div>""")
-    }
-    println("</structure>")
+  @Test
+  def ChumashContent {
+    val result = Selection("Tanach", "Jerusalem").xmlContent
   }
 
 
-//  @Test
-//  def firstPosuk {
-//    Selection("Tanach", "Jerusalem").steps("book/Genesis/chapter/1")
-//    Selection("Tanach", "Jerusalem").steps("book/Genesis/chapter/1/verse/1")
-//  }
+  @Test
+  def GenesisContent {
+    val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis").asStructure.xmlContent
+  }
+
+
+  @Test
+  def Genesis1Content {
+    val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis/chapter/1").asStructure.xmlContent
+  }
+
+
+  @Test
+  def Genesis1_1Content {
+    val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis/chapter/1/verse/1").asStructure.xmlContent
+    result.print(System.out)
+  }
 }

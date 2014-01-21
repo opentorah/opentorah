@@ -94,7 +94,7 @@ final class StructureSelection(work: Work, editions: Editions, path: Path) exten
   def content(format: Seq[Selector]): Elem = editions.content(path, format)
 
 
-  def toHtml(xml: Elem): Elem = ??? // TODO
+  def toHtml(xml: Elem): Elem = xml // TODO
 }
 
 

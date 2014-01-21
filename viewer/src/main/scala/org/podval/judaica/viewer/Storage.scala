@@ -77,7 +77,7 @@ final class DirectoryStorage private(structures: Structures, xml: Elem, director
       Seq(storage(leadingDiv).content(path.tail, format))
     }
 
-    <div type={structure.selector.defaultName}>{rawContent}</div>
+    <div type={structure.defaultName}>{rawContent}</div>
   }
 }
 
@@ -96,5 +96,24 @@ final class FileStorage(val file: File) extends Storage {
   override def asDirectory: DirectoryStorage = throw new ClassCastException
   override def asFile: FileStorage = this
 
-  override def content(path: Selection.Path, format: Selectors.Format): Elem = XmlFile.load(file)
+  override def content(path: Selection.Path, format: Selectors.Format): Elem = {
+    content(XmlFile.load(file), path, format)
+  }
+
+
+  private[this] def content(xml: Elem, path: Selection.Path, format: Selectors.Format): Elem = {
+    // TODO process format - and compare with the file format :)
+    if (path.isEmpty) xml else {
+      val div = path.head
+      // TODO at the last step, elements preceding the selected div which are not of the same selector should be retrieved also...
+      val selection = select(xml.elems, div)
+      val result = content(selection, path.tail, format)
+      xml.copy(child = result)
+    }
+  }
+
+
+  private[this] def select(xml: Seq[Elem], div: Div): Elem = {
+    xml.find(e => (e.label == "div") && (e.getAttribute("type") == div.structure.defaultName) && (e.getAttribute("n") == div.id)).get
+  }
 }

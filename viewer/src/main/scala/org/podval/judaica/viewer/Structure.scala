@@ -62,8 +62,8 @@ abstract class Structure(val selector: Selector, xml: Elem) extends Named with O
   final def divByNumber(number: Int): Option[Div] = {
     if ((number < 1) || (number > length)) None else {
       if (number <= divs.length) Some(divs(number-1)) else {
-        // TODO generated Div
-        /*if (isNumbered && selector.isTerminal) Some() else */ None
+        // TODO check that this is a dominant structure - or rely on the (not yet implemented) checks during parsing that the structures are complete :)
+        if (isNumbered && selector.isTerminal) Some(new GeneratedTerminalDominantNumberedDiv(this, number)) else None
       }
     }
   }
