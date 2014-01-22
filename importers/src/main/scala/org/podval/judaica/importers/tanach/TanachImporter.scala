@@ -19,15 +19,14 @@ package org.podval.judaica.importers
 package tanach
 
 import org.podval.judaica.xml.{Xml, Div, XmlFile}
+import org.podval.judaica.viewer.Edition
 
 import Xml.Ops
 
 import scala.xml.{Node, Elem}
 
 
-abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
-    extends Importer(inputDirectory, outputDirectory)
-{
+abstract class TanachImporter(inputDirectory: String, edition: Edition) extends Importer(inputDirectory, edition) {
 
   final def run {
     output2inputName foreach { case (inputName, outputName) => importBook(inputName, outputName) }
@@ -36,7 +35,7 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
 
   protected def output2inputName: Map[String, String]
 
-  // TODO use <head> insead of @n for names of divisions?
+  // TODO use <head> instead of @n for names of divisions?
 
   protected final override def processBook(xml: Elem, outputName: String): Elem = {
     // TODO write a merge function - and reformat the metadata accordingly?
@@ -53,7 +52,6 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
             .getOrElse(verse.getAttribute("n"), Seq.empty)
 
           val result: Seq[Elem] = prefixBreaks :+ verse
-
           result
         }
       })}
@@ -61,9 +59,9 @@ abstract class TanachImporter(inputDirectory: String, outputDirectory: String)
   }
 
 
-  private def transformDiv(elem: Elem, divType: String)(f: Elem => Seq[Node]): Seq[Node] = elem match {
-    case e@Div(divType, _, _) => f(e)
-    case e => Seq(elem)
+  private def transformDiv(elem: Elem, divType: String)(f: Elem => Seq[Node]): Seq[Node] = {
+    val recognized = (elem.label == "div") && (elem.getAttribute("type") == divType)
+    if (recognized) f(elem) else Seq(elem)
   }
 
 

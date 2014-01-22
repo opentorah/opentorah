@@ -112,9 +112,9 @@ class SimpleTest {
   }
 
 
-  @Test
-  def Genesis1_1Content {
-    val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis/chapter/1/verse/1").asStructure.xmlContent
-    result.print(System.out)
-  }
+//  @Test
+//  def Genesis1_1Content {
+//    val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis/chapter/1/verse/1").asStructure.xmlContent
+//    result.print(System.out)
+//  }
 }

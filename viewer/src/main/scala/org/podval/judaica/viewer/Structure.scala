@@ -16,14 +16,23 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml.Ops
-import Selector.ParsingContext
-import ParseException.withMetadataFile
-
-import scala.xml.Elem
+import java.io.File
 
 
-abstract class Structure(val selector: Selector, xml: Elem) extends Named with Ordering[Div] {
+trait Structures extends Selectors {
+
+  def structures: Map[Selector, Structure]
+
+
+  final def getStructure(selector: Selector): Structure = structures(selector)
+}
+
+
+
+trait Structure extends Named with Ordering[Div] {
+
+  val selector: Selector
+
 
   final override def names = selector.names
 
@@ -49,7 +58,7 @@ abstract class Structure(val selector: Selector, xml: Elem) extends Named with O
   final def length: Int = lengthOption.getOrElse(divs.length)
 
 
-  private[this] val lengthOption: Option[Int] = xml.intAttributeOption("length")
+  protected val lengthOption: Option[Int]
 
 
   final override def compare(x: Div, y: Div): Int = {
@@ -72,13 +81,6 @@ abstract class Structure(val selector: Selector, xml: Elem) extends Named with O
   final def getDivByNumber(number: Int): Div = Exists(divByNumber(number), number.toString, "div")
 
 
-  protected final def open(xml: Elem): Elem = {
-    val result = xml.oneChild("structure")
-    // TODO check that this is the correct structure :)
-    result
-  }
-
-
   // TODO check that named or non-dominant structure is fully defined
   // TODO maybe structure for the terminal selectors shouldn't be *allowed*, not just allowed to be omitted...
   // TODO length should really be supplied fo rthe terminal structure!
@@ -88,14 +90,14 @@ abstract class Structure(val selector: Selector, xml: Elem) extends Named with O
 
     divs
   }
-
-
-  protected final def divs(xml: Elem): Seq[Elem] = xml.elemsFilter("div")
 }
 
 
 
-abstract class NamedStructure(override val selector: NamedSelector, xml: Elem) extends Structure(selector, xml) {
+trait NamedStructure extends Structure {
+
+  override val selector: NamedSelector
+
 
   final override def asNumbered: NumberedStructure = throw new ClassCastException
 
@@ -110,34 +112,14 @@ abstract class NamedStructure(override val selector: NamedSelector, xml: Elem) e
 
 
   final def getDivByName(name: String): NamedDiv = Names.doFind(divs, name, "div")
-
-
-  protected final def parseDivs(context: ParsingContext, xml: Elem): Seq[NamedDiv] =
-    checkLength(divs(xml).map(xml => NamedDiv(context, this, xml)))
 }
 
 
 
-final class NamedParsedStructure(context: ParsingContext, selector: NamedSelector, xml: Elem)
-  extends NamedStructure(selector, xml)
-{
-  override val divs: Seq[NamedDiv] = parseDivs(context, xml)
-}
+trait NumberedStructure extends Structure {
 
+  override val selector: NumberedSelector
 
-
-final class NamedLazyStructure(context: ParsingContext, selector: NamedSelector, xml: Elem)
-  extends NamedStructure(selector, xml)
-{
-  override def divs: Seq[NamedDiv] = divs_.get
-
-
-  private[this] val divs_ = LazyLoad(withMetadataFile(context.parsingFile)(xml => parseDivs(context, open(xml))))
-}
-
-
-
-abstract class NumberedStructure(override val selector: NumberedSelector, xml: Elem) extends Structure(selector, xml) {
 
   final override def asNumbered: NumberedStructure = this
 
@@ -146,39 +128,120 @@ abstract class NumberedStructure(override val selector: NumberedSelector, xml: E
 
 
   override def divs: Seq[NumberedDiv]
-
-
-  protected final def parseDivs(context: ParsingContext, xml: Elem): Seq[NumberedDiv] =
-    checkLength(divs(xml).zipWithIndex.map { case (xml, num) => NumberedDiv(context, this, num+1, xml) })
 }
 
 
 
-final class NumberedParsedStructure(context: ParsingContext, selector: NumberedSelector, xml: Elem)
-  extends NumberedStructure(selector, xml)
-{
 
-  // TODO check that the Paths for the non-dominant structure are properly ordered; same for Named
-  override val divs: Seq[NumberedDiv] = parseDivs(context, xml)
-}
+object StructureParser {
 
+  import org.podval.judaica.xml.Xml.Ops
+  import Selector.ParsingContext
+  import ParseException.withMetadataFile
 
-
-final class NumberedLazyStructure(context: ParsingContext, selector: NumberedSelector, xml: Elem)
-  extends NumberedStructure(selector, xml)
-{
-  override def divs: Seq[NumberedDiv] = divs_.get
+  import scala.xml.Elem
 
 
-  private[this] val divs_ = LazyLoad(withMetadataFile(context.parsingFile)(xml => parseDivs(context, open(xml))))
-}
+  private abstract class ParseableStructure(override val selector: Selector, xml: Elem) extends Structure {
+
+    protected final override val lengthOption: Option[Int] = xml.intAttributeOption("length")
+
+
+    protected final def open(xml: Elem): Elem = {
+      val result = xml.oneChild("structure")
+      // TODO check that this is the correct structure :)
+      result
+    }
+
+
+    protected final def divs(xml: Elem): Seq[Elem] = xml.elemsFilter("div")
+  }
 
 
 
-trait Structures extends Selectors {
+  private abstract class ParsedNamedStructure(override val selector: NamedSelector, xml: Elem)
+    extends ParseableStructure(selector, xml) with NamedStructure
+  {
+    protected final def parseDivs(context: ParsingContext, xml: Elem): Seq[NamedDiv] =
+      checkLength(divs(xml).map(xml => DivParser.parseNamed(context, this, xml)))
+  }
 
-  def structures: Map[Selector, Structure]
 
 
-  final def getStructure(selector: Selector): Structure = structures(selector)
+  private final class NamedParsedStructure(context: ParsingContext, selector: NamedSelector, xml: Elem)
+    extends ParsedNamedStructure(selector, xml)
+  {
+    override val divs: Seq[NamedDiv] = parseDivs(context, xml)
+  }
+
+
+
+  private final class NamedLazyStructure(context: ParsingContext, selector: NamedSelector, xml: Elem)
+    extends ParsedNamedStructure(selector, xml)
+  {
+    override def divs: Seq[NamedDiv] = divs_.get
+
+
+    private[this] val divs_ = LazyLoad(withMetadataFile(context.parsingFile)(xml => parseDivs(context, open(xml))))
+  }
+
+
+
+  private abstract class ParseableNumberedStructure(override val selector: NumberedSelector, xml: Elem)
+    extends ParseableStructure(selector, xml) with NumberedStructure
+  {
+    protected final def parseDivs(context: ParsingContext, xml: Elem): Seq[NumberedDiv] =
+      checkLength(divs(xml).zipWithIndex.map { case (xml, num) => DivParser.parseNumbered(context, this, num+1, xml) })
+  }
+
+
+
+  private final class NumberedParsedStructure(context: ParsingContext, selector: NumberedSelector, xml: Elem)
+    extends ParseableNumberedStructure(selector, xml)
+  {
+    // TODO check that the Paths for the non-dominant structure are properly ordered; same for Named
+    override val divs: Seq[NumberedDiv] = parseDivs(context, xml)
+  }
+
+
+
+  private final class NumberedLazyStructure(context: ParsingContext, selector: NumberedSelector, xml: Elem)
+    extends ParseableNumberedStructure(selector, xml)
+  {
+    override def divs: Seq[NumberedDiv] = divs_.get
+
+
+    private[this] val divs_ = LazyLoad(withMetadataFile(context.parsingFile)(xml => parseDivs(context, open(xml))))
+  }
+
+
+  def parseStructure(context: ParsingContext, selector: Selector, selectors: Selectors, xml: Elem): Structure = {
+    val nextContext = context.copy(
+      isDominant = context.isDominant && selectors.isDominantSelector(selector),
+      knownSelectors = cousins(selector, selectors))
+
+    xml.attributeOption("file").fold {
+      if (selector.isNumbered)
+        new NumberedParsedStructure(context, selector.asNumbered, xml)
+      else
+        new NamedParsedStructure(context, selector.asNamed, xml)
+    }{
+      fileName: String =>
+        val nextParsingFile: File = new File(context.parsingFile.getParentFile, fileName)
+        val realNextContext = nextContext.copy(parsingFile = nextParsingFile)
+
+        if (selector.isNumbered)
+          new NumberedLazyStructure(realNextContext, selector.asNumbered, xml)
+        else
+          new NamedLazyStructure(realNextContext, selector.asNamed, xml)
+    }
+  }
+
+
+  private def cousins(selector: Selector, selectors: Selectors): Set[Selector] = {
+    // TODO the set is not big enough! Should start from the top, to accommodate old uncles...
+    // TODO check that the cycles are actually prevented by all this...
+    val uncles = selectors.selectors.takeWhile(_ != selector)
+    Selector.descendants(uncles.toSet)
+  }
 }

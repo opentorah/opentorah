@@ -28,10 +28,10 @@ object Div {
     <div type={type_} n={n}>{contents}</div>
 
 
-  def unapply(elem: Elem): Option[(String, String, Seq[Elem])] =
+  def unapply(elem: Elem): Option[(String, Option[String], Seq[Elem])] =
     if (elem.label == "div") Some((
       elem.getAttribute("type"),
-      elem.getAttribute("n"),
+      elem.attributeOption("n"),
       elem.elems
     )) else None
 }

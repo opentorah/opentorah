@@ -20,11 +20,14 @@ package tanach
 package jerusalem
 
 import org.podval.judaica.xml.{AlefBeth, Word, Div, Paragraph, App}
+import org.podval.judaica.viewer.Works
 
 import scala.xml.Elem
 
 import scala.io.Source
+
 import java.io.File
+
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -32,10 +35,7 @@ import scala.collection.mutable.ArrayBuffer
 object JerusalemTanachImporter {
 
   def main(args: Array[String]) {
-    val importer = new JerusalemTanachImporter(
-      "/home/dub/Code/judaica/imports/Tanach/jerusalem",
-      "/home/dub/Code/judaica/texts/Tanach/Jerusalem"
-    )
+    val importer = new JerusalemTanachImporter("/home/dub/Code/judaica/imports/Tanach/jerusalem")
 
     importer.run
   }
@@ -74,8 +74,8 @@ object JerusalemTanachImporter {
 
 
 
-final class JerusalemTanachImporter(inputDirectory: String, outputDirectory: String)
-  extends TanachImporter(inputDirectory, outputDirectory)
+final class JerusalemTanachImporter(inputDirectory: String)
+  extends TanachImporter(inputDirectory, Works.getWorkByName("Tanach").getEditionByName("Jerusalem"))
 {
   protected override def getInputExtension: String = "txt"
 

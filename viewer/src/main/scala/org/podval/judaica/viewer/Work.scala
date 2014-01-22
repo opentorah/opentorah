@@ -79,7 +79,7 @@ final class Work(val directory: File, index: File) extends Named with Structures
 
 
 
-final class Edition(val work: Work, directory: File, index: File) extends Named {
+final class Edition(val work: Work, val directory: File, index: File) extends Named {
 
   override val names: Names = withMetadataFile(index)(Names(_))
 

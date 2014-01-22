@@ -21,21 +21,20 @@ package chabad
 import scala.xml.{Elem, Node, Utility}
 
 import java.io.File
+import org.podval.judaica.viewer.Edition
 
 
 object ChabadImporter {
 
     def main(args: Array[String]) {
-        val importer = new ChabadImporter(
-            "/home/dub/code/judaica/imports/Chabad/",
-            "/home/dub/code/judaica/texts/Chabad/")
+        val importer = new ChabadImporter("/home/dub/code/judaica/imports/Chabad/", null) // TODO
 
         importer.importBook("Tanya/1/index", "Tanya/1");
     }
 }
 
 
-class ChabadImporter(inputDirectory: String, outputDirectory: String) extends Importer(inputDirectory, outputDirectory) {
+class ChabadImporter(inputDirectory: String, edition: Edition) extends Importer(inputDirectory, edition) {
 
     def getInputExtension() : String = "htm"
 

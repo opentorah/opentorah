@@ -35,37 +35,6 @@ abstract class Selector(knownSelectors: Set[Selector], xml: Elem) extends Named 
   final override val selectors = Selector.parse(knownSelectors, xml)
 
   final def isTerminal: Boolean = selectors.isEmpty
-
-
-  def parseStructure(context: ParsingContext, selectors: Selectors, xml: Elem): Structure = {
-    val nextContext = context.copy(
-      isDominant = context.isDominant && selectors.isDominantSelector(this),
-      knownSelectors = cousins(selectors))
-
-    xml.attributeOption("file").fold {
-      if (isNumbered)
-        new NumberedParsedStructure(context, asNumbered, xml)
-      else
-        new NamedParsedStructure(context, asNamed, xml)
-    }{
-      fileName: String =>
-        val nextParsingFile: File = new File(context.parsingFile.getParentFile, fileName)
-        val realNextContext = nextContext.copy(parsingFile = nextParsingFile)
-
-        if (isNumbered)
-          new NumberedLazyStructure(realNextContext, asNumbered, xml)
-        else
-          new NamedLazyStructure(realNextContext, asNamed, xml)
-    }
-  }
-
-
-  private def cousins(selectors: Selectors): Set[Selector] = {
-    // TODO the set is not big enough! Should start from the top, to accommodate old uncles...
-    // TODO check that the cycles are actually prevented by all this...
-    val uncles = selectors.selectors.takeWhile(_ != this)
-    Selector.descendants(uncles.toSet)
-  }
 }
 
 
@@ -163,7 +132,7 @@ trait Selectors {
   // TODO make sure that they are retrievable, too - for instance, week/chapter!
   ///    selectors.foreach(selector => Exists(structures, selector.defaultName, "structures"))
   final def parseStructures(context: ParsingContext, xmls: Selector.Xmls): Map[Selector, Structure] =
-    for ((selector, xml) <- xmls) yield selector -> selector.parseStructure(context, this, xml)
+    for ((selector, xml) <- xmls) yield selector -> StructureParser.parseStructure(context, selector, this, xml)
 
 
   final def preParseStructures(xmls: Elem): Selector.Xmls =
