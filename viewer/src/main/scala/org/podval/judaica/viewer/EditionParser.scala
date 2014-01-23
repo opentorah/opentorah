@@ -12,10 +12,10 @@ object EditionParser {
     override val names: Names = withMetadataFile(index)(Names(_))
 
 
-    def storage: Storage = storage_.get
+    def storage: DirectoryStorage = storage_.get
 
 
-    private[this] val storage_ = LazyLoad(withMetadataFile(index)(DirectoryStorage(work, _, directory)))
+    private[this] val storage_ = LazyLoad(withMetadataFile(index)(StorageParser.parseDirectoryStorage(work, _, directory)))
   }
 
 

@@ -56,6 +56,18 @@ trait Structure extends Named with Ordering[Div] {
   }
 
 
+  final def divById(id: String): Option[Div] = {
+    val numberOption: Option[Int] = try { Some(id.toInt) } catch { case e: NumberFormatException => None }
+
+    numberOption.fold {
+      if (isNumbered) throw new ViewerException(s"$id is not a number")
+      asNamed.divByName(id) : Option[Div]
+    } {
+      divByNumber
+    }
+  }
+
+
   final def divByNumber(number: Int): Option[Div] = {
     if ((number < 1) || (number > length)) None else {
       if (number <= divs.length) Some(divs(number-1)) else {

@@ -19,8 +19,6 @@ package org.podval.judaica.viewer
 import org.podval.judaica.xml.XmlFile
 import org.podval.judaica.xml.Xml.Ops
 
-import Content.{prependAttribute, toXmlSeq}
-
 import scala.xml.{Node, Elem, MetaData, Text, UnprefixedAttribute, TopScope}
 
 import java.io.File
@@ -29,11 +27,14 @@ import java.io.File
 trait Content
 
 
+
 // TODO Div with <head> and a collection of prefix divs
 final case class DivContent(sort: String, n: Option[String], attributes: MetaData, head: Option[String], children: Seq[Content]) extends Content
 
 
+
 final case class AppContent(readings: Map[String, Seq[Content]]) extends Content
+
 
 
 final case class TextContent(text: String) extends Content
@@ -115,15 +116,12 @@ object Content {
     <app>{for ((sort, reading) <- app.readings) yield <rdg type={sort}>{toXmlSeq(reading)}</rdg>}</app>
 
 
-  def prependAttribute(name: String, value: String, attributes: MetaData): MetaData = prependAttribute(name, Some(value), attributes)
+  def prependAttribute(name: String, value: String, attributes: MetaData): MetaData =
+    prependAttribute(name, Some(value), attributes)
 
 
   def prependAttribute(name: String, value: Option[String], attributes: MetaData): MetaData =
     value.fold(attributes)(v => new UnprefixedAttribute(name, Seq(Text(v)), attributes))
-
-
-
-  // TOD extract .xml method into toXml(Content); use case etc.
 }
 
 
@@ -131,11 +129,12 @@ object Content {
 object Main {
 
   def main(args: Array[String]) {
-    val edition = Works.getWorkByName("Chumash").getEditionByName("Jerusalem")
-    val file = new File(edition.directory, "Genesis.xml")
+    val file = Works.getWorkByName("Chumash").getEditionByName("Jerusalem").storage.storage("Genesis").asFile.file
     val xml = XmlFile.load(file)
     val content = Content.fromXml(xml).get
     val reXml = Content.toXml(content).asInstanceOf[Elem]
-    reXml.print(new File(edition.directory, "out.xml"))
+    val outFile = new File(file.getParentFile, "out.xml")
+    println(s"Output File=$outFile")
+    reXml.print(outFile)
   }
 }

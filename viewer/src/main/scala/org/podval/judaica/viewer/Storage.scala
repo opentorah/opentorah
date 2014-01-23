@@ -34,41 +34,32 @@ sealed trait Storage {
 }
 
 
-// TODO segregate parsing
+trait DirectoryStorage extends Storage {
 
-final class DirectoryStorage private(structures: Structures, xml: Elem, directory: File) extends Storage {
-  override def isDirectory: Boolean = true
-  override def isFile: Boolean = false
-  override def asDirectory: DirectoryStorage = this
-  override def asFile: FileStorage = throw new ClassCastException
+  final override def isDirectory: Boolean = true
+  final override def isFile: Boolean = false
+  final override def asDirectory: DirectoryStorage = this
+  final override def asFile: FileStorage = throw new ClassCastException
+
+
+  val directory: File
+
 
   // TODO allow overrides ? val overrides = Xml.elems(structure) ... Xml.check(override, "file")
 
-  val selector: Selector = structures.getSelectorByName(xml.getAttribute("structure"))
-  val structure = structures.getStructure(selector)
-  val fileFormat = structure.selector.parseFormat(xml.attributeOption("format"))
-
-  val storage: Map[Div, Storage] = structure.divs.map { div =>  (div, forDiv(div)) }.toMap
+  val structure: Structure
 
 
-  private[this] def forDiv(div: Div): Storage = {
-    val fileCandidate = new File(directory, div.id + ".xml")
-    val directoryCandidate = new File(directory, div.id)
-    if (fileCandidate.exists && directoryCandidate.exists) throw new ViewerException(s"Only one of the files $fileCandidate or $directoryCandidate must exist")
-
-    if (fileCandidate.exists) {
-      if (!fileCandidate.isFile) throw new ViewerException(s"$fileCandidate must be a file")
-      new FileStorage(fileCandidate)
-    } else if (directoryCandidate.exists) {
-      if (!directoryCandidate.isDirectory) throw new ViewerException(s"$fileCandidate must be a directory")
-      ParseException.withMetadataFile(Exists(new File(directoryCandidate, "index.xml")))(DirectoryStorage(div, _, directoryCandidate))
-    } else {
-      throw new ViewerException(s"One of the files $fileCandidate or $directoryCandidate must exist")
-    }
-  }
+  val fileFormat: Selector.Format
 
 
-  override def content(path: Selection.Path, format: Selector.Format): Elem = {
+  val storage: Map[Div, Storage]
+
+
+  final def storage(id: String): Storage = storage(structure.divById(id).get)
+
+
+  final override def content(path: Selection.Path, format: Selector.Format): Elem = {
     val rawContent: Seq[Elem] = if (path.isEmpty) {
       structure.divs.map(div => storage(div).content(path, format))
     } else {
@@ -83,21 +74,19 @@ final class DirectoryStorage private(structures: Structures, xml: Elem, director
 }
 
 
-object DirectoryStorage {
 
-  def apply(structures: Structures, xml: Elem, directory: File): DirectoryStorage =
-    new DirectoryStorage(structures, xml.oneChild("storage"), directory)
-}
+trait FileStorage extends Storage {
+
+  final override def isDirectory: Boolean = false
+  final override def isFile: Boolean = true
+  final override def asDirectory: DirectoryStorage = throw new ClassCastException
+  final override def asFile: FileStorage = this
 
 
+  val file: File
 
-final class FileStorage(val file: File) extends Storage {
-  override def isDirectory: Boolean = false
-  override def isFile: Boolean = true
-  override def asDirectory: DirectoryStorage = throw new ClassCastException
-  override def asFile: FileStorage = this
 
-  override def content(path: Selection.Path, format: Selector.Format): Elem = {
+  final override def content(path: Selection.Path, format: Selector.Format): Elem = {
     content(XmlFile.load(file), path, format)
   }
 

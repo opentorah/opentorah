@@ -114,16 +114,7 @@ final class DivSelection(work: Work, editions: Editions, path: Path, override va
   override def selectDominant(name: String): StructureSelection = selectDiv(name)
 
 
-  def selectDiv(name: String): StructureSelection = {
-    val numberOption: Option[Int] = try { Some(name.toInt) } catch { case e: NumberFormatException => None }
-
-    val div: Div =
-      if (numberOption.isDefined) structure.getDivByNumber(numberOption.get) else
-      if (structure.isNumbered) throw new ViewerException(s"$name is not a number") else
-      structure.asNamed.getDivByName(name)
-
-    selectDiv(div)
-  }
+  def selectDiv(name: String): StructureSelection = selectDiv(Exists(structure.divById(name), name, "id"))
 }
 
 

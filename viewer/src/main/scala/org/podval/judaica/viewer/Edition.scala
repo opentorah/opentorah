@@ -19,7 +19,7 @@ trait Edition extends Named {
   // TODO add language attribute
 
 
-  def storage: Storage
+  def storage: DirectoryStorage
 
 
   final def stylesheet: File = new File(directory, "stylesheet.css")
