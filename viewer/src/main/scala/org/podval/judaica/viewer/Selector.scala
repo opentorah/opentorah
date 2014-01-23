@@ -16,144 +16,65 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml.Ops
 
-import scala.xml.Elem
+trait Selector extends Named with Selectors {
 
-import java.io.File
-
-import Selector.ParsingContext
-
-
-abstract class Selector(knownSelectors: Set[Selector], xml: Elem) extends Named with Selectors {
   def isNumbered: Boolean
-  final def isNamed: Boolean = !isNumbered 
+
+
+  final def isNamed: Boolean = !isNumbered
+
+
   def asNumbered: NumberedSelector
+
+
   def asNamed: NamedSelector
 
-  final override val names = Names(xml)
-  final override val selectors = Selector.parse(knownSelectors, xml)
 
   final def isTerminal: Boolean = selectors.isEmpty
 }
 
 
-final class NumberedSelector(knownSelectors: Set[Selector], xml: Elem) extends Selector(knownSelectors, xml) {
-  override def isNumbered: Boolean = true
-  override def asNumbered: NumberedSelector = this
-  override def asNamed: NamedSelector = throw new ClassCastException
+
+trait NumberedSelector extends Selector {
+
+  final override def isNumbered: Boolean = true
+
+
+  final override def asNumbered: NumberedSelector = this
+
+
+  final override def asNamed: NamedSelector = throw new ClassCastException
 }
 
 
-final class NamedSelector(knownSelectors: Set[Selector], xml: Elem) extends Selector(knownSelectors, xml) {
-  override def isNumbered: Boolean = false
-  override def asNumbered: NumberedSelector = throw new ClassCastException
-  override def asNamed: NamedSelector = this
+
+trait NamedSelector extends Selector {
+
+  final override def isNumbered: Boolean = false
+
+
+  final override def asNumbered: NumberedSelector = throw new ClassCastException
+
+
+  final override def asNamed: NamedSelector = this
 }
 
 
 
 object Selector {
 
-  case class ParsingContext(
-     isDominant: Boolean,
-     dominantParentSelection: StructureSelection,
-     parsingFile: File,
-     knownSelectors: Set[Selector]
-  )
-
-
-  type Xmls = Map[Selector, Elem]
+  type Format = Seq[Selector]
 
 
   def descendants(next: Set[Selector]): Set[Selector] = descendants(Set.empty, next)
 
 
-  private def descendantsOfOne(result: Set[Selector], next: Selector): Set[Selector] = descendants(result, Set(next))
-
-
-  private def descendants(result: Set[Selector], next: Set[Selector]): Set[Selector] = {
+  def descendants(result: Set[Selector], next: Set[Selector]): Set[Selector] = {
     val add = next -- result
     if (add.isEmpty) result else {
       val children: Set[Selector] = add.flatMap(_.selectors)
       descendants(result ++ next, children)
     }
   }
-
-
-  def parse(knownSelectors: Set[Selector], xml: Elem): Seq[Selector] =
-    Parse.sequence[Elem, Set[Selector], Selector](parseSelector)(descendantsOfOne)(knownSelectors, xml.elemsFilter("selector"))
-
-
-  private def parseSelector(knownSelectors: Set[Selector], xml: Elem): Selector = {
-    def newSelector =
-      if (xml.booleanAttribute("isNumbered"))
-        new NumberedSelector(knownSelectors, xml)
-      else
-        new NamedSelector(knownSelectors, xml)
-
-    def referenceToKnownSelector(name: String) = Names.doFind(knownSelectors, name, "selector")
-
-    xml.attributeOption("name").fold(newSelector)(referenceToKnownSelector)
-  }
-}
-
-
-
-trait Selectors {
-
-  import Selectors.Format
-
-
-  def selectors: Seq[Selector]
-
-
-  final def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
-
-
-  final def getSelectorByName(name: String): Selector = Names.doFind(selectors, name, "selector")
-
-
-  final def dominantSelector: Selector = selectors.head
-
-
-  final def isDominantSelector(selector: Selector): Boolean = selector == dominantSelector
-
-
-  final def dominantFormat: Format =
-    if (selectors.isEmpty) Nil else dominantSelector +: dominantSelector.dominantFormat
-
-
-  final def parseStructures(context: ParsingContext, xml: Elem): Map[Selector, Structure] =
-    parseStructures(context, preParseStructures(xml))
-
-
-  // TODO verify that all structures requested by the selectors are present; some allowed structures need to be calculated...
-  // TODO make sure that they are retrievable, too - for instance, week/chapter!
-  ///    selectors.foreach(selector => Exists(structures, selector.defaultName, "structures"))
-  final def parseStructures(context: ParsingContext, xmls: Selector.Xmls): Map[Selector, Structure] =
-    for ((selector, xml) <- xmls) yield selector -> StructureParser.parseStructure(context, selector, this, xml)
-
-
-  final def preParseStructures(xmls: Elem): Selector.Xmls =
-    xmls.elemsFilter("structure").map(xml => getSelectorByName(xml.getAttribute("selector")) -> xml).toMap
-
-
-  final def formats: Seq[Format] =
-    if (selectors.isEmpty) Seq(Nil) else
-    selectors.flatMap(selector => selector.formats.map (selector +: _))
-
-
-  final def parseFormat(formatOption: Option[String]): Format = formatOption.fold(dominantFormat)(parseFormat)
-
-
-  final def parseFormat(format: String): Format =
-    Parse.sequence[String, Selectors, Selector](_.getSelectorByName(_)) ((selectors, selector) => selector) (this, format.split("/"))
-}
-
-
-
-object Selectors {
-
-  type Format = Seq[Selector]
 }

@@ -19,32 +19,22 @@ package org.podval.judaica.viewer
 import java.io.File
 
 
-// TODO introduce dominant/non-dominant Structure, so that the Work is covered too...
-trait Work extends Named with Structures {
+object Works {
 
-  val directory: File
-
-
-  override def names: Names
+  val directory = new File("/home/dub/Code/judaica/texts/")
 
 
-  override def selectors: Seq[Selector]
+  def works: Seq[Work] = works_.get
 
 
-  override def structures: Map[Selector, Structure]
+  private[this] val works_ = LazyLoad(DirectoryScanner(directory, WorkParser.parseWork))
 
 
-  def editions: Seq[Edition]
+  def workByName(name: String): Option[Work] = Names.find(works, name)
 
 
-  final def editionByName(name: String): Option[Edition] = Names.find(editions, name)
+  def getWorkByName(name: String): Work = Names.doFind(works, name, "work")
 
 
-  final def getEditionByName(name: String): Edition = Names.doFind(editions, name, "edition")
-
-
-  final def stylesheet: File = new File(directory, "stylesheet.css")
-
-
-  final override def toString: String = "Work (" + directory + ") " + names
+  def stylesheet: File = new File(directory, "stylesheet.css")
 }

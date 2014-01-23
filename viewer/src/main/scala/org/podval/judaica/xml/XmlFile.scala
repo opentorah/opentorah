@@ -37,13 +37,13 @@ object XmlFile {
 
   def load(file: File): Elem = {
     if (!cache.contains(file)) {
-      cache.put(file, XML.loadFile(file))
+      cache.put(file, Utility.trimProper(XML.loadFile(file)).asInstanceOf[Elem])
     }
     cache(file)
   }
 
 
-  private def open(what: Elem, tag: String): Elem = Utility.trimProper(what)(0).asInstanceOf[Elem].check(tag)
+  private def open(what: Elem, tag: String): Elem = what/*(0).asInstanceOf[Elem].*/check(tag)
 
 
   private[this] val cache: WeakHashMap[File, Elem] = new WeakHashMap[File, Elem]

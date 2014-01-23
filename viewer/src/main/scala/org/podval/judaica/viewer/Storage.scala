@@ -30,10 +30,11 @@ sealed trait Storage {
   def asDirectory: DirectoryStorage
   def asFile: FileStorage
 
-  def content(path: Selection.Path, format: Selectors.Format): Elem
+  def content(path: Selection.Path, format: Selector.Format): Elem
 }
 
 
+// TODO segregate parsing
 
 final class DirectoryStorage private(structures: Structures, xml: Elem, directory: File) extends Storage {
   override def isDirectory: Boolean = true
@@ -67,7 +68,7 @@ final class DirectoryStorage private(structures: Structures, xml: Elem, director
   }
 
 
-  override def content(path: Selection.Path, format: Selectors.Format): Elem = {
+  override def content(path: Selection.Path, format: Selector.Format): Elem = {
     val rawContent: Seq[Elem] = if (path.isEmpty) {
       structure.divs.map(div => storage(div).content(path, format))
     } else {
@@ -96,12 +97,12 @@ final class FileStorage(val file: File) extends Storage {
   override def asDirectory: DirectoryStorage = throw new ClassCastException
   override def asFile: FileStorage = this
 
-  override def content(path: Selection.Path, format: Selectors.Format): Elem = {
+  override def content(path: Selection.Path, format: Selector.Format): Elem = {
     content(XmlFile.load(file), path, format)
   }
 
 
-  private[this] def content(xml: Elem, path: Selection.Path, format: Selectors.Format): Elem = {
+  private[this] def content(xml: Elem, path: Selection.Path, format: Selector.Format): Elem = {
     // TODO process format - and compare with the file format :)
     if (path.isEmpty) xml else {
       val div = path.head
