@@ -16,8 +16,8 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.XmlFile
-import org.podval.judaica.xml.Xml.Ops
+import org.podval.judaica.xml.{Xml, XmlFile}
+import Xml.Ops
 
 import scala.xml.{Node, Elem, MetaData, Text, UnprefixedAttribute, TopScope}
 
@@ -122,6 +122,10 @@ object Content {
 
   def prependAttribute(name: String, value: Option[String], attributes: MetaData): MetaData =
     value.fold(attributes)(v => new UnprefixedAttribute(name, Seq(Text(v)), attributes))
+
+
+  def prependAttribute(name: String, value: Boolean, attributes: MetaData): MetaData =
+    if (!value) attributes else new UnprefixedAttribute(name, Seq(Text("true")), attributes)
 }
 
 
@@ -135,6 +139,6 @@ object Main {
     val reXml = Content.toXml(content).asInstanceOf[Elem]
     val outFile = new File(file.getParentFile, "out.xml")
     println(s"Output File=$outFile")
-    reXml.print(outFile)
+    Xml.print(reXml, outFile)
   }
 }

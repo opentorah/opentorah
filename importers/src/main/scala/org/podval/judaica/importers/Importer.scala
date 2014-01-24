@@ -17,10 +17,8 @@
 
 package org.podval.judaica.importers
 
-import org.podval.judaica.xml.Xml.Ops
-import org.podval.judaica.viewer.Edition
-
-import scala.xml.Elem
+import org.podval.judaica.viewer.{Works, Edition, Content}
+import org.podval.judaica.xml.Xml
 
 import java.io.File
 
@@ -28,25 +26,28 @@ import java.io.File
 // TODO switch to using Edition/Storage-based paths
 // TODO produce Content, not XML!
 // TODO mark-up, do not replace (paragraph, aliya/maftir, sofpasuk, makaf, pasek, brackets around aliya, brackets around kri,)
-abstract class Importer(inputDirectoryPath: String, val edition: Edition) {
+abstract class Importer(inputDirectoryPath: String, workName: String, editionName: String) {
 
-    private val inputDirectory = new File(inputDirectoryPath)
-
-
-    final def importBook(inputName: String, outputName: String) {
-        val inFile = new File(inputDirectory, inputName + "." + getInputExtension)
-        val xml = parseBook(inFile)
-        val result = processBook(xml, outputName)
-        val outputFile = edition.storage.storage(outputName).asFile.file
-        result.print(outputFile)
-    }
+  private val inputDirectory = new File(inputDirectoryPath)
 
 
-    protected def getInputExtension: String
+  protected val edition: Edition = Works.getWorkByName(workName).getEditionByName(editionName)
 
 
-    protected def parseBook(file: File): Elem
+  final def importBook(inputName: String, outputName: String) {
+    val inFile = new File(inputDirectory, inputName + "." + getInputExtension)
+    val content = parseBook(inFile)
+    val result = processBook(content, edition, outputName)
+    val outputFile = edition.storage.storage(outputName).asFile.file
+    Xml.print(Content.toXml(result), outputFile)
+  }
 
 
-    protected def processBook(xml: Elem, outputName: String): Elem = xml
+  protected def getInputExtension: String
+
+
+  protected def parseBook(file: File): Content
+
+
+  protected def processBook(content: Content, edition: Edition, outputName: String): Content = content
 }

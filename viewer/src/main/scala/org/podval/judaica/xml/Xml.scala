@@ -89,22 +89,19 @@ object Xml {
 
 
     def isDiv(divType: String): Boolean = (elem.label == "div") && (elem.attribute("type") == divType)
-
-
-    def print(outStream: OutputStream): Unit = print(new OutputStreamWriter(outStream))
-    def print(outFile: File): Unit = print(new FileWriter(outFile))
-
-    def print(writer: Writer) {
-      val out = new PrintWriter(writer)
-      val pretty = new PrettyPrinter(100, 4).format(elem)
-      // TODO when outputting XML, include <xml> header?
-      // TODO        out.println("<!DOCTYPE html>\n" + pretty)
-      out.println(pretty)
-      out.close()
-    }
   }
 
 
 
-  def booleanAttribute(value: Boolean) = if (value) Some(Text("true")) else None
+  def print(xml: Node, outStream: OutputStream): Unit = print(xml, new OutputStreamWriter(outStream))
+  def print(xml: Node, outFile: File): Unit = print(xml, new FileWriter(outFile))
+
+  def print(xml: Node, writer: Writer) {
+    val out = new PrintWriter(writer)
+    val pretty = new PrettyPrinter(100, 4).format(xml)
+    // TODO when outputting XML, include <xml> header?
+    // TODO        out.println("<!DOCTYPE html>\n" + pretty)
+    out.println(pretty)
+    out.close()
+  }
 }

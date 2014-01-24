@@ -19,17 +19,16 @@ package org.podval.judaica.importers
 package tanach
 package jerusalem
 
-import org.podval.judaica.xml.{AlefBeth, Word, Div, Paragraph, App}
-import org.podval.judaica.viewer.Works
+import org.podval.judaica.xml.AlefBeth
+import org.podval.judaica.viewer.{Content, DivContent, TextContent, AppContent}
+import Content.prependAttribute
 
-import scala.xml.Elem
-
+import scala.collection.mutable.ArrayBuffer
+import scala.xml.{MetaData, Node}
 import scala.io.Source
 
 import java.io.File
 
-
-import scala.collection.mutable.ArrayBuffer
 
 
 object JerusalemTanachImporter {
@@ -75,7 +74,7 @@ object JerusalemTanachImporter {
 
 
 final class JerusalemTanachImporter(inputDirectory: String)
-  extends TanachImporter(inputDirectory, Works.getWorkByName("Tanach").getEditionByName("Jerusalem"))
+  extends TanachImporter(inputDirectory, "Tanach", "Jerusalem")
 {
   protected override def getInputExtension: String = "txt"
 
@@ -89,16 +88,16 @@ final class JerusalemTanachImporter(inputDirectory: String)
   )
 
 
-  protected override def parseBook(inputFile: File): Elem = {
+  protected override def parseBook(inputFile: File): Content = {
     def dropStuckChapter(what: Seq[String]) = if (isChapter(what.last)) what.dropRight(1) else what
     def isChapter(line: String): Boolean = line.startsWith(JerusalemTanachImporter.PEREK)
 
     val lines = Source.fromFile(inputFile, "UTF-16BE").getLines().map(_.trim)
     val bookName = lines.next.trim
 
-    Div("book", bookName, lines.filterNot(_.isEmpty).filterNot(isChapter).toSeq.zipWithIndex.map {
+    DivContent("book", Some(bookName), Node.NoAttributes, None, lines.filterNot(_.isEmpty).filterNot(isChapter).toSeq.zipWithIndex.map {
       case (chapter, chapterNumberFrom0) =>
-        Div("chapter", (chapterNumberFrom0+1).toString,
+        DivContent("chapter", Some((chapterNumberFrom0+1).toString), Node.NoAttributes, None,
           dropStuckChapter(chapter.split(":").map(_.trim)).zipWithIndex.flatMap {
             case (verse, verseNumberFrom0) =>
               parseVerse(verse, verseNumberFrom0+1)
@@ -108,8 +107,8 @@ final class JerusalemTanachImporter(inputDirectory: String)
   }
 
 
-  private def parseVerse(verse: String, number: Int): Seq[Elem] = {
-    val result = new ArrayBuffer[Elem]
+  private def parseVerse(verse: String, number: Int): Seq[Content] = {
+    val result = new ArrayBuffer[Content]
 
     val line = new Line(verse)
 
@@ -123,35 +122,50 @@ final class JerusalemTanachImporter(inputDirectory: String)
     // TODO: if the line *is* empty, we skip a posuk number?!
     if (!line.isEmpty) {
       line.consumeToSpace()
-      result += Div("verse", number.toString, processWords(line))
+      result += DivContent("verse", Some(number.toString), Node.NoAttributes, None, processWords(line))
     }
+
+    result += TextContent(AlefBeth.SOF_PASUQ)
 
     result
   }
 
 
-  private def processParagraph(line: Line): Option[Elem] = {
-    if (line.consume(JerusalemTanachImporter.PEI3)  ) Some(Paragraph(true , true )) else
-    if (line.consume(AlefBeth.PEI)                  ) Some(Paragraph(true , false)) else
-    if (line.consume(JerusalemTanachImporter.SAMEH3)) Some(Paragraph(false, true )) else
-    if (line.consume(AlefBeth.SAMEH)                ) Some(Paragraph(false, false)) else
+  private def processParagraph(line: Line): Option[Content] = {
+    def paragraph(open: Boolean, big: Boolean, head: String): DivContent =
+      DivContent(
+        "paragraph",
+        None,
+        prependAttribute("open", open, prependAttribute("big", big, Node.NoAttributes)),
+        Some(head),
+        Seq.empty
+      )
+
+    if (line.consume(JerusalemTanachImporter.PEI3)  ) Some(paragraph(true , true , JerusalemTanachImporter.PEI3)) else
+    if (line.consume(AlefBeth.PEI)                  ) Some(paragraph(true , false, AlefBeth.PEI)) else
+    if (line.consume(JerusalemTanachImporter.SAMEH3)) Some(paragraph(false, true , JerusalemTanachImporter.SAMEH3)) else
+    if (line.consume(AlefBeth.SAMEH)                ) Some(paragraph(false, false, AlefBeth.SAMEH)) else
       None
   }
 
 
   // No unfold() in Scala...
-  private def processWords(line: Line): Seq[Elem] = {
-    val result = new ArrayBuffer[Elem]
+  private def processWords(line: Line): Seq[Content] = {
+    val result = new ArrayBuffer[Seq[Content]]
 
     while (!line.isEmpty) {
       result += processWord(line)
     }
 
-    result
+    result.flatten
   }
 
 
-  private def processWord(line: Line): Elem = {
+  private def processWord(line: Line): Seq[Content] = {
+    def word(text: String, attributes: MetaData): DivContent =
+      DivContent("word", None, attributes, None, Seq(TextContent(text)))
+
+
     val spaceIndex = line.indexOf(" ")
     val makafIndex = line.indexOf(AlefBeth.MAQAF)
 
@@ -159,22 +173,27 @@ final class JerusalemTanachImporter(inputDirectory: String)
     val isSpace = isFirst(spaceIndex, makafIndex)
     val isMakaf = isFirst(makafIndex, spaceIndex)
 
-    val index = if (isSpace) spaceIndex else if (isMakaf) makafIndex else line.size
-    val word = line.consumeToIndex(index)
+    val index = if (isSpace) spaceIndex else if (isMakaf) makafIndex+1 else line.size
+    val text = line.consumeToIndex(index)
 
     if (isSpace) {
       line.consume(" ")
-    } else
-    if (isMakaf) {
-      line.consume(AlefBeth.MAQAF)
     }
 
     val isPasek = line.consume(AlefBeth.PIPE)
 
-    val wordElement = Word(word, isMakaf, isPasek)
+    // TODO "word" shouldn't be a "div" in TEI, should it?
+    val wordContent = word(text, prependAttribute("makaf", isMakaf, Node.NoAttributes))
 
     val alternate = line.consumeBracketed() // TODO strip the vowels off?
 
-    if (alternate.isEmpty) wordElement else App(wordElement, alternate.get)
+    val withAlternate =
+      if (alternate.isEmpty) wordContent
+      else AppContent(Map(
+        "read" -> Seq(wordContent),
+        "write" -> Seq(word(alternate.get, Node.NoAttributes))
+      ))
+
+    if (!isPasek) Seq(withAlternate) else Seq(withAlternate, TextContent(AlefBeth.PASEQ))
   }
 }

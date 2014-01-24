@@ -18,16 +18,12 @@
 package org.podval.judaica.importers
 package tanach
 
-import org.podval.judaica.xml.{Xml, Div, XmlFile}
-import org.podval.judaica.viewer.Edition
-
-import Xml.Ops
-
-import scala.xml.{Node, Elem}
+import org.podval.judaica.viewer.{Content, Edition}
 
 
-abstract class TanachImporter(inputDirectory: String, edition: Edition) extends Importer(inputDirectory, edition) {
-
+abstract class TanachImporter(inputDirectory: String, workName: String, editionName: String)
+  extends Importer(inputDirectory, workName, editionName)
+{
   final def run {
     output2inputName foreach { case (inputName, outputName) => importBook(inputName, outputName) }
   }
@@ -38,43 +34,45 @@ abstract class TanachImporter(inputDirectory: String, edition: Edition) extends 
 
   // TODO use <head> instead of @n for names of divisions?
 
-  protected final override def processBook(xml: Elem, outputName: String): Elem = {
-    // TODO write a merge function - and reformat the metadata accordingly?
-    val breaks =
-      XmlFile.loadResource(classOf[TanachImporter], outputName, "meta").elems
-        .groupBy(_.getAttribute("chapter"))
-        .mapValues(_.groupBy(_.getAttribute("verse")).mapValues(_.map(dropChapterAndVerse)))
-
-    transformDiv(xml, "book") { book: Elem => flatMapChildren(book, {
-      transformDiv(_, "chapter") { chapter: Elem => flatMapChildren(chapter, {
-        transformDiv(_, "verse") { verse =>
-          val prefixBreaks: Seq[Elem] = breaks
-            .getOrElse(chapter.getAttribute("n"), Map.empty)
-            .getOrElse(verse.getAttribute("n"), Seq.empty)
-
-          val result: Seq[Elem] = prefixBreaks :+ verse
-          result
-        }
-      })}
-    })}(0).asInstanceOf[Elem]   // TODO get rid of the cast!!!
+  protected final override def processBook(content: Content, edition: Edition, outputName: String): Content = {
+    // TODO
+    content
+//    // TODO write a merge function - and reformat the metadata accordingly?
+//    val breaks =
+//      XmlFile.loadResource(classOf[TanachImporter], outputName, "meta").elems
+//        .groupBy(_.getAttribute("chapter"))
+//        .mapValues(_.groupBy(_.getAttribute("verse")).mapValues(_.map(dropChapterAndVerse)))
+//
+//    transformDiv(xml, "book") { book: Elem => flatMapChildren(book, {
+//      transformDiv(_, "chapter") { chapter: Elem => flatMapChildren(chapter, {
+//        transformDiv(_, "verse") { verse =>
+//          val prefixBreaks: Seq[Elem] = breaks
+//            .getOrElse(chapter.getAttribute("n"), Map.empty)
+//            .getOrElse(verse.getAttribute("n"), Seq.empty)
+//
+//          val result: Seq[Elem] = prefixBreaks :+ verse
+//          result
+//        }
+//      })}
+//    })}(0).asInstanceOf[Elem]   // TODO get rid of the cast!!!
   }
 
 
-  private def transformDiv(elem: Elem, divType: String)(f: Elem => Seq[Node]): Seq[Node] = {
-    val recognized = (elem.label == "div") && (elem.getAttribute("type") == divType)
-    if (recognized) f(elem) else Seq(elem)
-  }
-
-
-  private def flatMapChildren(elem: Elem, f: Elem => Seq[Node]): Elem = elem.copy(child = elem.elems flatMap f)
-
-
-  private def dropChapterAndVerse(break: Elem): Elem =
-    break.copy(attributes = break.attributes.filter(a => !TanachImporter.chapterAndVerse.contains(a.key)))
+//  private def transformDiv(elem: Elem, divType: String)(f: Elem => Seq[Node]): Seq[Node] = {
+//    val recognized = (elem.label == "div") && (elem.getAttribute("type") == divType)
+//    if (recognized) f(elem) else Seq(elem)
+//  }
+//
+//
+//  private def flatMapChildren(elem: Elem, f: Elem => Seq[Node]): Elem = elem.copy(child = elem.elems flatMap f)
+//
+//
+//  private def dropChapterAndVerse(break: Elem): Elem =
+//    break.copy(attributes = break.attributes.filter(a => !TanachImporter.chapterAndVerse.contains(a.key)))
 }
 
 
-object TanachImporter {
-
-  val chapterAndVerse = Set("chapter", "verse")
-}
+//object TanachImporter {
+//
+//  val chapterAndVerse = Set("chapter", "verse")
+//}
