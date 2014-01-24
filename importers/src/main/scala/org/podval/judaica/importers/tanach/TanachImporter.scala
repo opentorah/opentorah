@@ -35,6 +35,7 @@ abstract class TanachImporter(inputDirectory: String, edition: Edition) extends 
 
   protected def output2inputName: Map[String, String]
 
+
   // TODO use <head> instead of @n for names of divisions?
 
   protected final override def processBook(xml: Elem, outputName: String): Elem = {

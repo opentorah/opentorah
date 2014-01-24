@@ -25,23 +25,20 @@ import scala.xml.Elem
 import java.io.File
 
 
-// TODO use <head> for the non-numeric names of the divs?
-// TODO processing is harder - but merging is easier?
-
+// TODO switch to using Edition/Storage-based paths
+// TODO produce Content, not XML!
+// TODO mark-up, do not replace (paragraph, aliya/maftir, sofpasuk, makaf, pasek, brackets around aliya, brackets around kri,)
 abstract class Importer(inputDirectoryPath: String, val edition: Edition) {
 
     private val inputDirectory = new File(inputDirectoryPath)
-
-
-    private val outputDirectory = edition.directory
 
 
     final def importBook(inputName: String, outputName: String) {
         val inFile = new File(inputDirectory, inputName + "." + getInputExtension)
         val xml = parseBook(inFile)
         val result = processBook(xml, outputName)
-        val outFile = new File(outputDirectory, outputName + ".xml")
-        result.print(outFile)
+        val outputFile = edition.storage.storage(outputName).asFile.file
+        result.print(outputFile)
     }
 
 

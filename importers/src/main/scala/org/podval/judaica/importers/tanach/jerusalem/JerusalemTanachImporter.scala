@@ -81,11 +81,11 @@ final class JerusalemTanachImporter(inputDirectory: String)
 
 
   protected override def output2inputName: Map[String, String] = Map(
-    "bereishis" -> "Genesis",
+    "bereishis" -> "Genesis"/*,
     "shemos" -> "Exodus",
     "vayikro" -> "Leviticus",
     "bamidbor" -> "Numbers",
-    "devorim" -> "Deuteronomy"
+    "devorim" -> "Deuteronomy"*/
   )
 
 

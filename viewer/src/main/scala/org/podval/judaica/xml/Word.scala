@@ -27,14 +27,4 @@ object Word {
   // TODO "word" shouldn't be a "div" in TEI, should it?
   def apply(text: String, hasMakaf: Boolean = false, hasPasek: Boolean = false): Elem =
     <div type="word" makaf={Xml.booleanAttribute(hasMakaf)} pasek={Xml.booleanAttribute(hasPasek)}>{text}</div>
-
-
-  def unapply(elem: Elem): Option[(String, Boolean, Boolean)] = elem match {
-    case e@Div("word", _, _) => Some((
-        e.text,
-        e.booleanAttribute("makaf"),
-        e.booleanAttribute("pasek")
-      ))
-    case _ => None
-  }
 }

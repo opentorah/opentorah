@@ -26,13 +26,4 @@ object Paragraph {
 
   def apply(open: Boolean, big: Boolean) =
     <div type="paragraph" open={Xml.booleanAttribute(open)} big={Xml.booleanAttribute(big)}/>
-
-
-  def unapply(elem: Elem): Option[(Boolean, Boolean)] = elem match {
-      case e@Div("paragraph", _, _) => Some((
-        e.booleanAttribute("open"),
-        e.booleanAttribute("big")
-        ))
-      case _ => None
-    }
 }

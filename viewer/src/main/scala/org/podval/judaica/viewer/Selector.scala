@@ -17,6 +17,7 @@
 package org.podval.judaica.viewer
 
 
+// TODO add "isNamePartOfHead"
 trait Selector extends Named with Selectors {
 
   def isNumbered: Boolean
@@ -36,6 +37,7 @@ trait Selector extends Named with Selectors {
 
 
 
+// TODO add "isSpelledOut"; introduce number speller for a language
 trait NumberedSelector extends Selector {
 
   final override def isNumbered: Boolean = true

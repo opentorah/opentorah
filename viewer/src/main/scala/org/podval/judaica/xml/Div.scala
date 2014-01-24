@@ -26,12 +26,4 @@ object Div {
 
   def apply(type_ : String, n : String, contents: Seq[Elem]): Elem =
     <div type={type_} n={n}>{contents}</div>
-
-
-  def unapply(elem: Elem): Option[(String, Option[String], Seq[Elem])] =
-    if (elem.label == "div") Some((
-      elem.getAttribute("type"),
-      elem.attributeOption("n"),
-      elem.elems
-    )) else None
 }
