@@ -20,26 +20,10 @@ import org.podval.judaica.xml.Xml.Ops
 
 import scala.xml.Elem
 
-import java.io.File
-
 
 object SelectorParser {
 
-  case class ParsingContext(
-    isDominant: Boolean,
-    dominantParentSelection: StructureSelection,
-    parsingFile: File,
-    knownSelectors: Set[Selector]
-  )
-
-
-  private abstract class ParseableSelector(knownSelectors: Set[Selector], xml: Elem) extends Selector {
-
-    final override val names = Names(xml)
-
-
-    final override val selectors = parseSelectors(knownSelectors, xml)
-  }
+  private abstract class ParsedSelector(override val names: Names, override val selectors: Seq[Selector]) extends Selector
 
 
 
@@ -51,11 +35,15 @@ object SelectorParser {
 
 
   private def parseSelector(knownSelectors: Set[Selector], xml: Elem): Selector = {
-    def newSelector: Selector =
+    def newSelector: Selector = {
+      val names = Names(xml)
+      val selectors = parseSelectors(knownSelectors, xml)
+
       if (xml.booleanAttribute("isNumbered"))
-        new ParseableSelector(knownSelectors, xml) with NumberedSelector
+        new ParsedSelector(names, selectors) with NumberedSelector
       else
-        new ParseableSelector(knownSelectors, xml) with NamedSelector
+        new ParsedSelector(names, selectors) with NamedSelector
+    }
 
     def referenceToKnownSelector(name: String) = Names.doFind(knownSelectors, name, "selector")
 

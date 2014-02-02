@@ -18,8 +18,6 @@ package org.podval.judaica.viewer
 
 import Selection.Path
 
-import scala.xml.Elem
-
 
 abstract class Selection(val work: Work, val editions: Editions, val path: Path) {
 
@@ -73,28 +71,28 @@ final class StructureSelection(work: Work, editions: Editions, path: Path) exten
   }
 
 
-  def xmlContent: Elem = content(formatOption = None, isHtml = false)
-  def xmlContent(format: String): Elem = content(Some(format), false)
+  def xmlContent: Content = content(formatOption = None, isHtml = false)
+  def xmlContent(format: String): Content = content(Some(format), false)
 
 
-  def htmlContent: Elem = content(formatOption = None, isHtml = true)
-  def htmlContent(format: String): Elem = content(Some(format), true)
+  def htmlContent: Content = content(formatOption = None, isHtml = true)
+  def htmlContent(format: String): Content = content(Some(format), true)
 
 
-  def content(formatOption: Option[String], isHtml: Boolean): Elem =
+  def content(formatOption: Option[String], isHtml: Boolean): Content =
     content(structures.parseFormat(formatOption), isHtml)
 
 
-  def content(format: Seq[Selector], isHtml: Boolean): Elem = {
+  def content(format: Seq[Selector], isHtml: Boolean): Content = {
     val result = content(format)
     if (isHtml) toHtml(result) else result
   }
 
 
-  def content(format: Seq[Selector]): Elem = editions.content(path, format)
+  def content(format: Seq[Selector]): Content = editions.content(path, format)
 
 
-  def toHtml(xml: Elem): Elem = xml // TODO
+  def toHtml(xml: Content): Content = xml // TODO
 }
 
 

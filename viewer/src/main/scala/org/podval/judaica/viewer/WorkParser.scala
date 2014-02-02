@@ -23,7 +23,7 @@ import java.io.File
 
 object WorkParser {
 
-  private final class ParseableWork(override val directory: File, index: File) extends Work {
+  private final class ParsedWork(override val directory: File, index: File) extends Work {
 
     override val names: Names = withMetadataFile(index)(Names(_))
 
@@ -34,18 +34,23 @@ object WorkParser {
     private[this] val selectors_ = LazyLoad(withMetadataFile(index)(xml => Exists(SelectorParser.parseSelectors(Set.empty, xml), "selectors")))
 
 
+    override def dominantStructure: Structure = dominantStructure_.get
+
+
+    private[this] val dominantStructure_ = LazyLoad(withMetadataFile(index){ xml =>  DivParser.parseDominantStructure(context, this, xml) })
+
+
     override def structures: Map[Selector, Structure] = structures_.get
 
 
-    private[this] val structures_ = LazyLoad(withMetadataFile(index){ xml =>
-      val context = SelectorParser.ParsingContext(
-        isDominant = true,
-        dominantParentSelection = Selection(this),
-        parsingFile = index,
-        knownSelectors = Set.empty)
+    private[this] val structures_ = LazyLoad(withMetadataFile(index){ xml =>  DivParser.parseNonDominantStructures(context, this, xml) })
 
-      DivParser.parseStructures(context, this, xml)
-    })
+
+    private[this] val context = StructureParser.ParsingContext(
+      isDominant = true,
+      dominantParentSelection = Selection(this),
+      parsingFile = index,
+      knownSelectors = Set.empty)
 
 
     override def editions: Seq[Edition] = editions_.get
@@ -55,5 +60,5 @@ object WorkParser {
   }
 
 
-  def parseWork(directory: File, index: File): Work = new ParseableWork(directory, index)
+  def parseWork(directory: File, index: File): Work = new ParsedWork(directory, index)
 }

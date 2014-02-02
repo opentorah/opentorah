@@ -20,7 +20,6 @@ object AlefBeth {
 
     val MAQAF       = "\u05BE"
     val PASEQ       = "\u05C0"
-    val PIPE        = "|"
     val SOF_PASUQ   = "\u05C3"
 
     val ALEF        = "\u05D0"

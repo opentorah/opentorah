@@ -180,7 +180,7 @@ final class JerusalemTanachImporter(inputDirectory: String)
       line.consume(" ")
     }
 
-    val isPasek = line.consume(AlefBeth.PIPE)
+    val isPasek = line.consume("|")
 
     // TODO "word" shouldn't be a "div" in TEI, should it?
     val wordContent = word(text, prependAttribute("makaf", isMakaf, Node.NoAttributes))

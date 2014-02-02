@@ -17,49 +17,14 @@
 package org.podval.judaica.viewer
 
 import org.podval.judaica.xml.Xml.Ops
-import SelectorParser.ParsingContext
+import StructureParser.ParsingContext
 
 import scala.xml.Elem
 
 
 object DivParser {
 
-  private trait ParseableDominantDiv extends DominantDiv {
-
-    protected final def parseDominantStructure(context: ParsingContext, xml: Elem): Structure = {
-      val dominantXml = preParseStructures(structure.selector, xml).get(dominantSelector)
-      if (dominantXml.isEmpty) throw new ViewerException(s"No dominant structure for $this")
-      StructureParser.parseStructure(adjustContext(context), dominantSelector, this, dominantXml.get)
-    }
-
-
-    protected final def parseNonDominantStructures(context: ParsingContext, xml: Elem): Map[Selector, Structure] =
-      parseStructures(
-        adjustContext(context),
-        this,
-        preParseStructures(structure.selector, xml) - dominantSelector
-      ) +
-        (dominantSelector -> dominantStructure)
-
-
-    private[this] def adjustContext(context: ParsingContext): ParsingContext =
-      context.copy(dominantParentSelection = context.dominantParentSelection.selectDiv(this))
-  }
-
-
-
-  private trait ParseableNonDominantDiv extends NonDominantDiv {
-
-    protected def parsePath(dominantParentSelection: StructureSelection, xml: Elem): Selection.Path = {
-      val pathOption = xml.attributeOption("path")
-      if (pathOption.isEmpty) throw new ViewerException(s"Div $id of the non-dominant structure must have a path")
-      dominantParentSelection.parseDominantPath(pathOption.get)
-    }
-  }
-
-
-
-  private abstract class ParseableDiv(context: ParsingContext, override val structure: Structure, xml: Elem) extends Div {
+  private abstract class ParsedDiv(context: ParsingContext, override val structure: Structure, xml: Elem) extends Div {
 
     private[this] val localSelectors: Seq[Selector] = SelectorParser.parseSelectors(context.knownSelectors, xml)
 
@@ -69,8 +34,8 @@ object DivParser {
 
 
 
-  private abstract class ParseableNamedDiv(context: ParsingContext, structure: NamedStructure, xml: Elem)
-    extends ParseableDiv(context, structure, xml) with NamedDiv
+  private abstract class ParsedNamedDiv(context: ParsingContext, structure: NamedStructure, xml: Elem)
+    extends ParsedDiv(context, structure, xml) with NamedDiv
   {
     override final val names = Names(xml)
   }
@@ -78,18 +43,18 @@ object DivParser {
 
 
   private final class DominantNamedDiv(context: ParsingContext, structure: NamedStructure, xml: Elem)
-    extends ParseableNamedDiv(context, structure, xml) with ParseableDominantDiv
+    extends ParsedNamedDiv(context, structure, xml) with DominantDiv
   {
-    override val dominantStructure = parseDominantStructure(context, xml)
+    override val dominantStructure = parseDominantStructure(context, this, xml)
 
 
-    override val structures = parseNonDominantStructures(context, xml)
+    override val structures = parseNonDominantStructures(context, this, xml)
   }
 
 
 
   private final class NonDominantNamedDiv(context: ParsingContext, structure: NamedStructure, xml: Elem)
-    extends ParseableNamedDiv(context, structure, xml) with ParseableNonDominantDiv
+    extends ParsedNamedDiv(context, structure, xml) with NonDominantDiv
   {
     override val path = parsePath(context.dominantParentSelection, xml)
 
@@ -107,8 +72,8 @@ object DivParser {
 
 
 
-  private abstract class ParseableNumberedDiv(context: ParsingContext, structure: NumberedStructure, override val number: Int, xml: Elem)
-    extends ParseableDiv(context, structure, xml) with NumberedDiv
+  private abstract class ParsedNumberedDiv(context: ParsingContext, structure: NumberedStructure, override val number: Int, xml: Elem)
+    extends ParsedDiv(context, structure, xml) with NumberedDiv
   {
     xml.intAttributeOption("n").foreach { nvalue =>
       if (nvalue != number) throw new ViewerException(s"Div $number has attribute n set to $nvalue")
@@ -118,18 +83,18 @@ object DivParser {
 
 
   private final class DominantNumberedDiv(context: ParsingContext, structure: NumberedStructure, number: Int, xml: Elem)
-    extends ParseableNumberedDiv(context, structure, number, xml) with ParseableDominantDiv
+    extends ParsedNumberedDiv(context, structure, number, xml) with DominantDiv
   {
-    override val dominantStructure = parseDominantStructure(context, xml)
+    override val dominantStructure = parseDominantStructure(context, this, xml)
 
 
-    override val structures = parseNonDominantStructures(context, xml)
+    override val structures = parseNonDominantStructures(context, this, xml)
   }
 
 
 
   private final class NonDominantNumberedDiv(context: ParsingContext, structure: NumberedStructure, number: Int, xml: Elem)
-    extends ParseableNumberedDiv(context, structure, number, xml) with ParseableNonDominantDiv
+    extends ParsedNumberedDiv(context, structure, number, xml) with NonDominantDiv
   {
     override val path = parsePath(context.dominantParentSelection, xml)
 
@@ -149,7 +114,27 @@ object DivParser {
   private type Xmls = Map[Selector, Elem]
 
 
-  def parseStructures(context: SelectorParser.ParsingContext, selectors: Selectors, xml: Elem): Map[Selector, Structure] =
+  def parseDominantStructure(context: ParsingContext, div: DominantDiv, xml: Elem): Structure = {
+    val dominantXml = preParseStructures(div.asInstanceOf[Selectors], xml).get(div.dominantSelector)
+    if (dominantXml.isEmpty) throw new ViewerException(s"No dominant structure for $div")
+    StructureParser.parseStructure(adjustContext(context, div), div.dominantSelector, div.asInstanceOf[Selectors], dominantXml.get)
+  }
+
+
+  def parseNonDominantStructures(context: ParsingContext, div: DominantDiv, xml: Elem): Map[Selector, Structure] =
+    parseStructures(
+      adjustContext(context, div),
+      div.asInstanceOf[Selectors],
+      preParseStructures(div.asInstanceOf[Selectors], xml) - div.dominantSelector
+    ) +
+      (div.dominantSelector -> div.dominantStructure)
+
+
+  def adjustContext(context: ParsingContext, div: Div): ParsingContext =
+    context.copy(dominantParentSelection = context.dominantParentSelection.selectDiv(div))
+
+
+  def parseStructures(context: ParsingContext, selectors: Selectors, xml: Elem): Map[Selector, Structure] =
     parseStructures(context, selectors, preParseStructures(selectors, xml))
 
 
@@ -160,6 +145,13 @@ object DivParser {
   // TODO verify that all structures requested by the selectors are present; some allowed structures need to be calculated...
   // TODO make sure that they are retrievable, too - for instance, week/chapter!
   ///    selectors.foreach(selector => Exists(structures, selector.defaultName, "structures"))
-  private def parseStructures(context: SelectorParser.ParsingContext, selectors: Selectors, xmls: Xmls): Map[Selector, Structure] =
+  private def parseStructures(context: ParsingContext, selectors: Selectors, xmls: Xmls): Map[Selector, Structure] =
     for ((selector, xml) <- xmls) yield selector -> StructureParser.parseStructure(context, selector, selectors, xml)
+
+
+  def parsePath(dominantParentSelection: StructureSelection, xml: Elem): Selection.Path = {
+    val pathOption = xml.attributeOption("path")
+    if (pathOption.isEmpty) throw new ViewerException(s"Div of the non-dominant structure must have a path")
+    dominantParentSelection.parseDominantPath(pathOption.get)
+  }
 }

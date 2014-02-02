@@ -16,14 +16,12 @@
 
 package org.podval.judaica.viewer
 
-import scala.xml.Elem
-
 
 sealed trait Editions {
   def editions: Seq[Edition]
   def isNo: Boolean = false
 
-  def content(path: Seq[Div], format: Seq[Selector]): Elem
+  def content(path: Seq[Div], format: Seq[Selector]): Content
 }
 
 
@@ -31,29 +29,29 @@ object NoEditions extends Editions {
   override def editions: Seq[Edition] = Seq.empty
   override def isNo: Boolean = true
 
-  override def content(path: Seq[Div], format: Seq[Selector]): Elem =
+  override def content(path: Seq[Div], format: Seq[Selector]): Content =
     throw new ViewerException("Edition is required for content retrieval!")
 }
 
 
 final class LinearEditions(override val editions: Seq[Edition]) extends Editions {
-  override def content(path: Seq[Div], format: Seq[Selector]): Elem =
+  override def content(path: Seq[Div], format: Seq[Selector]): Content =
     merge(editions.map(edition => (edition, edition.content(path, format))))
 
-  def merge(contents: Seq[(Edition, Elem)]): Elem = ???
+  def merge(contents: Seq[(Edition, Content)]): Content = ???
 }
 
 
 final class DiffEdition(val edition1: Edition, val edition2: Edition) extends Editions {
   override def editions: Seq[Edition] = Seq(edition1, edition2)
-  override def content(path: Seq[Div], format: Seq[Selector]): Elem = ???
+  override def content(path: Seq[Div], format: Seq[Selector]): Content = ???
 }
 
 
 final class SingleEdition(val edition: Edition) extends Editions {
   override def editions: Seq[Edition] = Seq(edition)
 
-  override def content(path: Seq[Div], format: Seq[Selector]): Elem = edition.content(path, format)
+  override def content(path: Seq[Div], format: Seq[Selector]): Content = edition.content(path, format)
 }
 
 

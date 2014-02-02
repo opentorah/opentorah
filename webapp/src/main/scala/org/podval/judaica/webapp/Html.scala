@@ -26,6 +26,9 @@ import scala.xml.Elem
 import java.io.File
 
 
+// TODO I only use Html as a wrapper for XML so that I can associate stylesheets with it;
+// how about using processing instruction <?xml-stylesheet type="text/css" href="mytest.css"?> OR
+// HTTP headers? Maybe I do not even need the Node writer then?
 object Html {
 
   def apply(uriInfo: UriInfo, what: Elem): Elem = apply(uriInfo, Seq(mainStylesheet), what)

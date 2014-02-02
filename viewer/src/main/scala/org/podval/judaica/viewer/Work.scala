@@ -19,8 +19,10 @@ package org.podval.judaica.viewer
 import java.io.File
 
 
-// TODO introduce dominant/non-dominant Structure, so that the Work is covered too...
-trait Work extends Named with Structures {
+trait Work extends NamedDiv with DominantDiv {
+
+  final override val structure: Structure = WorksStructure
+
 
   val directory: File
 
@@ -47,4 +49,25 @@ trait Work extends Named with Structures {
 
 
   final override def toString: String = "Work (" + directory + ") " + names
+}
+
+
+object WorkSelector extends NamedSelector {
+
+  override val names: Names = new Names(Seq(new Name("wors", "en", isTransliterated = false)))
+
+
+  override val selectors: Seq[Selector] = Seq.empty
+}
+
+
+object WorksStructure extends NamedStructure {
+
+  override val selector: NamedSelector = WorkSelector
+
+
+  override val divs: Seq[NamedDiv] = Seq.empty // Or maybe the work we are dealing with?
+
+
+  protected val lengthOption: Option[Int] = None
 }

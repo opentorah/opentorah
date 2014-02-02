@@ -1,6 +1,5 @@
 package org.podval.judaica.viewer
 
-import scala.xml.Elem
 
 import java.io.File
 
@@ -25,5 +24,5 @@ trait Edition extends Named {
   final def stylesheet: File = new File(directory, "stylesheet.css")
 
 
-  final def content(path: Seq[Div], format: Seq[Selector]): Elem = storage.content(path, format)
+  final def content(path: Selection.Path, format: Selector.Format): Content = storage.content(path, format)
 }
