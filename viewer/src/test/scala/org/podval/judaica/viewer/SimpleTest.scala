@@ -80,7 +80,7 @@ class SimpleTest {
 //  @Test
   def genesisFormats = {
     val selection = Selection("Хумаш").selectPath("book/Genesis").asStructure
-    val formats: Seq[Seq[Selector]] = selection.structures.formats
+    val formats: Seq[Seq[Selector]] = selection.lastDiv.formats
     formats.map(_.map(_.defaultName).mkString("/")).foreach(println)
   }
 

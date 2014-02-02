@@ -47,19 +47,19 @@ final class StructureSelection(work: Work, editions: Editions, path: Path) exten
   override def asStructure: StructureSelection = this
   override def asDiv: DivSelection = throw new ClassCastException
 
-  def structures: Structures = if (path.isEmpty) work else path.last
+  def lastDiv: Div = if (path.isEmpty) work else path.last
   override def structure: Structure = path.last.structure
 
   override def select(name: String): DivSelection = selectStructure(name)
-  def selectStructure(name: String): DivSelection = selectStructure(structures.getSelectorByName(name))
-  def selectStructure(selector: Selector): DivSelection = selectStructure(structures.getStructure(selector))
+  def selectStructure(name: String): DivSelection = selectStructure(lastDiv.getSelectorByName(name))
+  def selectStructure(selector: Selector): DivSelection = selectStructure(lastDiv.getStructure(selector))
   def selectStructure(structure: Structure): DivSelection = new DivSelection(work, editions, path, structure)
 
   override def selectDominant(name: String): DivSelection = selectDominantStructure(name)
-  def selectDominantStructure(name: String): DivSelection = selectDominantStructure(structures.getSelectorByName(name))
+  def selectDominantStructure(name: String): DivSelection = selectDominantStructure(lastDiv.getSelectorByName(name))
   def selectDominantStructure(selector: Selector): DivSelection = {
-    if (!structures.isDominantSelector(selector)) throw new ViewerException(s"Selector $selector is not dominant")
-    selectStructure(if (path.isEmpty) structures.getStructure(selector) else path.last.asDominant.dominantStructure)
+    if (!lastDiv.isDominantSelector(selector)) throw new ViewerException(s"Selector $selector is not dominant")
+    selectStructure(if (path.isEmpty) lastDiv.getStructure(selector) else path.last.asDominant.dominantStructure)
   }
 
 
@@ -80,7 +80,7 @@ final class StructureSelection(work: Work, editions: Editions, path: Path) exten
 
 
   def content(formatOption: Option[String], isHtml: Boolean): Content =
-    content(structures.parseFormat(formatOption), isHtml)
+    content(lastDiv.parseFormat(formatOption), isHtml)
 
 
   def content(format: Seq[Selector], isHtml: Boolean): Content = {

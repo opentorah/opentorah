@@ -37,11 +37,11 @@ object StorageParser {
 
 
 
-  def parseDirectoryStorage(structures: Structures, xml0: Elem, directory: File): DirectoryStorage = {
+  def parseDirectoryStorage(div: Div, xml0: Elem, directory: File): DirectoryStorage = {
     val xml = xml0.oneChild("storage")
 
-    val selector: Selector = structures.getSelectorByName(xml.getAttribute("structure"))
-    val structure = structures.getStructure(selector)
+    val selector: Selector = div.getSelectorByName(xml.getAttribute("structure"))
+    val structure = div.getStructure(selector)
     val fileFormat = structure.selector.parseFormat(xml.attributeOption("format"))
     val storage: Map[Div, Storage] = structure.divs.map { div =>  (div, forDiv(directory, div)) }.toMap
 

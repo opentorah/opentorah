@@ -18,7 +18,13 @@ package org.podval.judaica.viewer
 
 
 // TODO I am generating terminal Divs; should define equals method on them so that things work :)
-trait Div extends Structures with Ordered[Div] {
+trait Div extends Selectors with Ordered[Div] {
+
+  def structures: Map[Selector, Structure]
+
+
+  final def getStructure(selector: Selector): Structure = structures(selector)
+
 
   def isDominant: Boolean
 
@@ -80,9 +86,8 @@ trait NonDominantDiv extends Div {
 
 
 
-final class GeneratedTerminalDominantNumberedDiv(override val structure: Structure, override val number: Int)
-  extends Div with DominantDiv with NumberedDiv
-{
+trait TerminalDominantDiv extends DominantDiv {
+
   final override def selectors: Seq[Selector] = Seq.empty
 
 
@@ -91,3 +96,8 @@ final class GeneratedTerminalDominantNumberedDiv(override val structure: Structu
 
   final override def dominantStructure: Structure = throw new UnsupportedOperationException
 }
+
+
+
+final class GeneratedTerminalDominantNumberedDiv(override val structure: Structure, override val number: Int)
+  extends TerminalDominantDiv with NumberedDiv

@@ -52,6 +52,7 @@ trait Work extends NamedDiv with DominantDiv {
 }
 
 
+
 object WorkSelector extends NamedSelector {
 
   override val names: Names = new Names(Seq(new Name("wors", "en", isTransliterated = false)))
@@ -59,6 +60,7 @@ object WorkSelector extends NamedSelector {
 
   override val selectors: Seq[Selector] = Seq.empty
 }
+
 
 
 object WorksStructure extends NamedStructure {
