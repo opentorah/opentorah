@@ -16,13 +16,9 @@
 
 package org.podval.judaica.xml
 
-import scala.xml.{Node, Elem, Text, PrettyPrinter}
-
-import java.io.{File, OutputStream, Writer, FileWriter, OutputStreamWriter, PrintWriter}
-
-// TODO eliminate this dependency
 import org.podval.judaica.viewer.ViewerException
-import scala.Some
+import scala.xml.{Node, Elem, PrettyPrinter}
+import java.io.{File, OutputStream, Writer, FileWriter, OutputStreamWriter, PrintWriter}
 
 
 object Xml {
@@ -98,10 +94,12 @@ object Xml {
 
   def print(xml: Node, writer: Writer) {
     val out = new PrintWriter(writer)
-    val pretty = new PrettyPrinter(100, 4).format(xml)
+    val pretty = prettyPrinter.format(xml)
     // TODO when outputting XML, include <xml> header?
-    // TODO        out.println("<!DOCTYPE html>\n" + pretty)
     out.println(pretty)
     out.close()
   }
+
+
+  val prettyPrinter = new PrettyPrinter(120, 4)
 }

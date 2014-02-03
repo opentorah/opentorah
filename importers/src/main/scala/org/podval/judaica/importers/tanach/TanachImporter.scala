@@ -32,12 +32,9 @@ abstract class TanachImporter(inputDirectory: String, workName: String, editionN
   protected def output2inputName: Map[String, String]
 
 
-  // TODO use <head> instead of @n for names of divisions?
-
   protected final override def processBook(content: Content, edition: Edition, outputName: String): Content = {
     // TODO
     content
-//    // TODO write a merge function - and reformat the metadata accordingly?
 //    val breaks =
 //      XmlFile.loadResource(classOf[TanachImporter], outputName, "meta").elems
 //        .groupBy(_.getAttribute("chapter"))
@@ -54,7 +51,7 @@ abstract class TanachImporter(inputDirectory: String, workName: String, editionN
 //          result
 //        }
 //      })}
-//    })}(0).asInstanceOf[Elem]   // TODO get rid of the cast!!!
+//    })}(0).asInstanceOf[Elem]
   }
 
 

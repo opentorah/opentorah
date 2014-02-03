@@ -20,10 +20,10 @@ package org.podval.judaica.viewer
 // TODO I am generating terminal Divs; should define equals method on them so that things work :)
 trait Div extends Selectors with Ordered[Div] {
 
-  def structures: Map[Selector, Structure]
+  def structures: Map[Selector, NonRootStructure]
 
 
-  final def getStructure(selector: Selector): Structure = structures(selector)
+  final def getStructure(selector: Selector): NonRootStructure = structures(selector)
 
 
   def isDominant: Boolean
@@ -71,7 +71,7 @@ trait DominantDiv extends Div {
   final override def asDominant: DominantDiv = this
 
 
-  def dominantStructure: Structure
+  def dominantStructure: NonRootStructure
 }
 
 
@@ -94,10 +94,10 @@ trait TerminalDominantDiv extends DominantDiv {
   final override def selectors: Seq[Selector] = Seq.empty
 
 
-  final override def structures: Map[Selector, Structure] = Map.empty
+  final override def structures: Map[Selector, NonRootStructure] = Map.empty
 
 
-  final override def dominantStructure: Structure = throw new UnsupportedOperationException
+  final override def dominantStructure: NonRootStructure = throw new UnsupportedOperationException
 }
 
 

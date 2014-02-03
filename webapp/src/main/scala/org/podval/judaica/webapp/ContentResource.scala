@@ -16,23 +16,32 @@
 
 package org.podval.judaica.webapp
 
-import org.podval.judaica.viewer.StructureSelection
+import org.podval.judaica.viewer.{StructureSelection, Content}
+import org.podval.judaica.xml.Xml
 
 import javax.ws.rs.{Produces, QueryParam, GET}
 import javax.ws.rs.core.{UriInfo, Context, MediaType}
-
-import scala.xml.Elem
 
 
 final class ContentResource(selection: StructureSelection) {
 
   @GET
   @Produces(Array(MediaType.APPLICATION_XML))
-  def xml(@QueryParam("contentFormat") format: String): Elem = selection.xmlContent(format)
+  def xml(@QueryParam("contentFormat") format: String, @Context uriInfo: UriInfo): String = {
+    val xml = Content.toXmlNode(selection.content(Option.apply(format)))
+    val styleSheets = StyleSheets.get(selection, uriInfo)
 
+    // Link HTTP Headres are not supported by Chrome; I have to resort to processing instructions to associate stylesheets with my XML...
+//    val links = styleSheets.map(u => Link.fromUri(u).rel("stylesheet").`type`("text/css").build())
+//    val result = Response.ok(xml).links(links: _*)
+//    result.build()
 
-  @GET
-  @Produces(Array(MediaType.TEXT_HTML))
-  def html(@QueryParam("contentFormat") format: String, @Context uriInfo: UriInfo): Elem =
-    Html(uriInfo, selection, selection.htmlContent(format))
+    val result = new StringBuilder
+
+    styleSheets.foreach(s => result.append(s"""<?xml-stylesheet href="${s.toString}" type="text/css"?>\n"""))
+    result.append(Xml.prettyPrinter.format(xml))
+    result.append("\n")
+
+    result.toString
+  }
 }

@@ -18,6 +18,7 @@ package org.podval.judaica.viewer
 
 import org.junit.Test
 import org.junit.Assert.{assertTrue, assertFalse, assertEquals}
+import org.podval.judaica.xml.Xml
 
 
 // TODO switch to ScalaTest!
@@ -108,12 +109,13 @@ class SimpleTest {
   @Test
   def Genesis1Content {
     val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis/chapter/1").asStructure.content(None)
+    Xml.print(Content.toXmlNode(result), System.out)
   }
 
 
-//  @Test
-//  def Genesis1_1Content {
-//    val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis/chapter/1/verse/1").asStructure.xmlContent
-//    result.print(System.out)
-//  }
+  @Test
+  def Genesis1_1Content {
+    val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis/chapter/1/verse/1").asStructure.content(None)
+    Xml.print(Content.toXmlNode(result), System.out)
+  }
 }

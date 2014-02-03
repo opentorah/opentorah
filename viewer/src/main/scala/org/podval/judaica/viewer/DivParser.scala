@@ -114,14 +114,14 @@ object DivParser {
   private type Xmls = Map[Selector, Elem]
 
 
-  def parseDominantStructure(context: ParsingContext, div: DominantDiv, xml: Elem): Structure = {
+  def parseDominantStructure(context: ParsingContext, div: DominantDiv, xml: Elem): NonRootStructure = {
     val dominantXml = preParseStructures(div.asInstanceOf[Selectors], xml).get(div.dominantSelector)
     if (dominantXml.isEmpty) throw new ViewerException(s"No dominant structure for $div")
     StructureParser.parseStructure(div, adjustContext(context, div), div.dominantSelector, dominantXml.get)
   }
 
 
-  def parseNonDominantStructures(context: ParsingContext, div: DominantDiv, xml: Elem): Map[Selector, Structure] =
+  def parseNonDominantStructures(context: ParsingContext, div: DominantDiv, xml: Elem): Map[Selector, NonRootStructure] =
     parseStructures(
       adjustContext(context, div),
       div,
@@ -134,7 +134,7 @@ object DivParser {
     context.copy(dominantParentSelection = context.dominantParentSelection.selectDiv(div))
 
 
-  private def parseStructures(context: ParsingContext, div: Div, xml: Elem): Map[Selector, Structure] =
+  private def parseStructures(context: ParsingContext, div: Div, xml: Elem): Map[Selector, NonRootStructure] =
     parseStructures(context, div, preParseStructures(div, xml))
 
 
@@ -145,7 +145,7 @@ object DivParser {
   // TODO verify that all structures requested by the selectors are present; some allowed structures need to be calculated...
   // TODO make sure that they are retrievable, too - for instance, week/chapter!
   ///    selectors.foreach(selector => Exists(structures, selector.defaultName, "structures"))
-  private def parseStructures(context: ParsingContext, div: Div, xmls: Xmls): Map[Selector, Structure] =
+  private def parseStructures(context: ParsingContext, div: Div, xmls: Xmls): Map[Selector, NonRootStructure] =
     for ((selector, xml) <- xmls) yield selector -> StructureParser.parseStructure(div, context, selector, xml)
 
 

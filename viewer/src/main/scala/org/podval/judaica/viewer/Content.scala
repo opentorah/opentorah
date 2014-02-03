@@ -28,8 +28,14 @@ trait Content
 
 
 
-// TODO Div with <head> and a collection of prefix divs
-final case class DivContent(sort: String, n: Option[String], attributes: MetaData, head: Option[String], children: Seq[Content]) extends Content
+final case class DivContent(
+  prefix: Seq[Content],
+  sort: String,
+  n: Option[String],
+  attributes: MetaData,
+  head: Option[String],
+  children: Seq[Content]
+) extends Content
 
 
 
@@ -45,35 +51,9 @@ final case class ElemContent(elem: Elem) extends Content
 
 
 
-object Content {
+object DivContent {
 
-  private def fromXmlSeq(xmls: Seq[Node]): Seq[Content] = xmls.map(fromXml).flatten
-
-
-  private def toXmlSeq(contents: Seq[Content]) = contents.map(toXml(_))
-
-
-  def fromXml(xml: Node): Option[Content] = xml match {
-    case xml: Text => Some(TextContent(xml.text))
-    case xml: Elem => Some(
-      xml.label match {
-        case "div" => divFromXml(xml)
-        case "app" => appFromXml(xml)
-        case _ =>  println(s"Unrecognized Element ${xml.label}"); ElemContent(xml)
-      })
-    case _ => None
-  }
-
-
-  def toXml(content: Content): Node = content match {
-    case text: TextContent => Text(text.text)
-    case div: DivContent => divToXml(div)
-    case app: AppContent => appToXml(app)
-    case elem: ElemContent => elem.elem
-  }
-
-
-  private def divFromXml(xml: Elem): DivContent = {
+  def fromXml(xml: Elem): DivContent = {
     val sortOption = xml.attributeOption("type")
     if (sortOption.isEmpty) throw new ViewerException(s"No type for a div")
 
@@ -85,23 +65,124 @@ object Content {
 
     val head: Option[String] = if (!hasHead) None else Some(xml.child.head.text)
 
-    val children: Seq[Content] = fromXmlSeq(if (!hasHead) xml.child else xml.child.tail)
+    val children: Seq[Content] = Content.fromXmlSeq(if (!hasHead) xml.child else xml.child.tail)
 
-    DivContent(sort, n, attributes, head, children)
+    DivContent(Seq.empty, sort, n, attributes, head, children)
   }
 
 
-  private def divToXml(div: DivContent): Node = {
-    val headElemOption = div.head.map(head => <head>{head}</head>)
-    val childrenNodes = headElemOption.toSeq ++ toXmlSeq(div.children)
+  def toXml(div: DivContent): Seq[Node] = {
+    val prefixNodes = Content.toXmlSeq(div.prefix)
 
-    Elem(
-      null,
-      "div",
-      prependAttribute("type", div.sort, prependAttribute("n", div.n, div.attributes)),
-      TopScope,
-      true,
-      childrenNodes: _*)
+    val headElemOption = div.head.map(head => <head>{head}</head>)
+
+    val childrenNodes = headElemOption.toSeq ++ Content.toXmlSeq(div.children)
+
+    prefixNodes :+
+      Elem(
+        null,
+        "div",
+        prependAttribute("type", div.sort, prependAttribute("n", div.n, div.attributes)),
+        TopScope,
+        true,
+        childrenNodes: _*)
+  }
+
+
+  def prependAttribute(name: String, value: String, attributes: MetaData): MetaData =
+    prependAttribute(name, Some(value), attributes)
+
+
+  def prependAttribute(name: String, value: Option[String], attributes: MetaData): MetaData =
+    value.fold(attributes)(v => new UnprefixedAttribute(name, Seq(Text(v)), attributes))
+
+
+  def prependAttribute(name: String, value: Boolean, attributes: MetaData): MetaData =
+    if (!value) attributes else new UnprefixedAttribute(name, Seq(Text("true")), attributes)
+
+
+  def select(file: File, path: Div.Path, format: Selector.Format): Content = select(fromXml(XmlFile.load(file)), path, format)
+
+
+  def select(content: DivContent, path: Div.Path, format: Selector.Format): Content =
+    if (path.isEmpty) reformat(content, format) else {
+      val contentStructure = guessStructure(content)
+      val selectionStructure = path.head.structure.defaultName
+      if (selectionStructure != contentStructure) throw new ViewerException(s"Restructuring from $contentStructure to $selectionStructure isn't yet supported")
+      val groupped: DivContent = group(content, selectionStructure)
+      val sub: DivContent = select(groupped, path.head)
+      val subSelect = select(sub, path.tail, format)
+      groupped.copy(children = Seq(subSelect))
+    }
+
+
+  def guessStructure(content: DivContent): String = {
+    val nonEmptyDiv = content.children.find(c => c.isInstanceOf[DivContent] && !c.asInstanceOf[DivContent].children.isEmpty)
+    if (nonEmptyDiv.isEmpty) throw new ViewerException(s"Can't guess structure")
+    nonEmptyDiv.get.asInstanceOf[DivContent].sort
+  }
+
+
+  def group(content: DivContent, sort: String): DivContent = content.copy(children = group(content.children, sort))
+
+
+  def group(children: Seq[Content], sort: String): Seq[Content] = if (children.isEmpty) Seq.empty else {
+    val (prefix, rest) = children.span(c => !(c.isInstanceOf[DivContent] && (c.asInstanceOf[DivContent].sort == sort)))
+    if (rest.isEmpty) {
+      // Enclosing Div's trailer :)
+      prefix
+    } else {
+      val div: DivContent = rest.head.asInstanceOf[DivContent]
+      val grouppedDiv = div.copy(prefix = prefix)
+      grouppedDiv +: group(rest.tail, sort)
+    }
+  }
+
+
+  def select(content: DivContent, div: Div): DivContent = {
+    val result = content.children.find(c => c.isInstanceOf[DivContent] && (c.asInstanceOf[DivContent].n == Some(div.id)))
+    if (result.isEmpty) throw new ViewerException(s"Child not found")
+    result.get.asInstanceOf[DivContent]
+  }
+
+
+  def reformat(content: DivContent, format: Selector.Format): DivContent = content // TODO implement
+}
+
+
+
+object Content {
+
+  def fromXmlSeq(xmls: Seq[Node]): Seq[Content] = xmls.map(fromXml).flatten
+
+
+  def toXmlSeq(contents: Seq[Content]): Seq[Node] = contents.flatMap(toXml(_))
+
+
+  def fromXml(xml: Node): Option[Content] = xml match {
+    case xml: Text => Some(TextContent(xml.text))
+    case xml: Elem => Some(
+      xml.label match {
+        case "div" => DivContent.fromXml(xml)
+        case "app" => appFromXml(xml)
+        case _ =>  println(s"Unrecognized Element ${xml.label}"); ElemContent(xml)
+      })
+    case _ => None
+  }
+
+
+  def toXmlNode(content: Content): Elem = {
+    val result = toXml(content)
+    if (result.size != 1) throw new ViewerException(s"Must be exactly one Node")
+    result.head.asInstanceOf[Elem]
+  }
+
+
+  def toXml(content: Content): Seq[Node] = content match {
+    case text: TextContent => Seq(Text(text.text))
+    case div: DivContent => DivContent.toXml(div)
+    case app: AppContent => Seq(appToXml(app))
+    case elem: ElemContent => Seq(elem.elem)
   }
 
 
@@ -116,16 +197,16 @@ object Content {
     <app>{for ((sort, reading) <- app.readings) yield <rdg type={sort}>{toXmlSeq(reading)}</rdg>}</app>
 
 
-  def prependAttribute(name: String, value: String, attributes: MetaData): MetaData =
-    prependAttribute(name, Some(value), attributes)
-
-
-  def prependAttribute(name: String, value: Option[String], attributes: MetaData): MetaData =
-    value.fold(attributes)(v => new UnprefixedAttribute(name, Seq(Text(v)), attributes))
-
-
-  def prependAttribute(name: String, value: Boolean, attributes: MetaData): MetaData =
-    if (!value) attributes else new UnprefixedAttribute(name, Seq(Text("true")), attributes)
+  def textElem(name: String, text: String): ElemContent = {
+    ElemContent(Elem(
+      null,
+      name,
+      Node.NoAttributes,
+      TopScope,
+      true,
+      Text(text)
+    ))
+  }
 }
 
 
@@ -135,7 +216,7 @@ object Main {
   def main(args: Array[String]) {
     val file = Works.getWorkByName("Chumash").getEditionByName("Jerusalem").storage.storage("Genesis").asFile.file
     val xml = XmlFile.load(file)
-    val content = Content.fromXml(xml).get
+    val content = DivContent.fromXml(xml)
     val reXml = Content.toXml(content).asInstanceOf[Elem]
     val outFile = new File(file.getParentFile, "out.xml")
     println(s"Output File=$outFile")

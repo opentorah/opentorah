@@ -25,15 +25,14 @@ import java.io.File
 
 object StorageParser {
 
-  private final class ParseableDirectoryStorage(
+  private final class ParsedDirectoryStorage(
     override val directory: File,
-    override val structure: Structure,
-    override val fileFormat: Selector.Format,
+    override val structure: NonRootStructure,
     override val storage: Map[Div, Storage]) extends DirectoryStorage
 
 
 
-  private final class ParseableFileStorage(override val file: File) extends FileStorage
+  private final class ParsedFileStorage(override val file: File) extends FileStorage
 
 
 
@@ -41,14 +40,12 @@ object StorageParser {
     val xml = xml0.oneChild("storage")
 
     val selector: Selector = div.getSelectorByName(xml.getAttribute("structure"))
-    val structure = div.getStructure(selector)
-    val fileFormat = structure.selector.parseFormat(xml.attributeOption("format"))
+    val structure: NonRootStructure = div.getStructure(selector)
     val storage: Map[Div, Storage] = structure.divs.map { div =>  (div, forDiv(directory, div)) }.toMap
 
-    new ParseableDirectoryStorage(
+    new ParsedDirectoryStorage(
       directory,
       structure,
-      fileFormat,
       storage)
   }
 
@@ -60,10 +57,12 @@ object StorageParser {
 
     if (fileCandidate.exists) {
       if (!fileCandidate.isFile) throw new ViewerException(s"$fileCandidate must be a file")
-      new ParseableFileStorage(fileCandidate)
+      new ParsedFileStorage(fileCandidate)
+
     } else if (directoryCandidate.exists) {
       if (!directoryCandidate.isDirectory) throw new ViewerException(s"$fileCandidate must be a directory")
       ParseException.withMetadataFile(Exists(new File(directoryCandidate, "index.xml")))(parseDirectoryStorage(div, _, directoryCandidate))
+
     } else {
       throw new ViewerException(s"One of the files $fileCandidate or $directoryCandidate must exist")
     }

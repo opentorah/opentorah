@@ -39,8 +39,9 @@ class StructureSelectionResource(selection: StructureSelection) {
   @Produces(Array(MediaType.TEXT_HTML))
   def structure(@Context uriInfo: UriInfo) = Html(uriInfo,
       <div>
-        {Table(selection.structures.structures.values, uriInfo, structuresColumn)}
-        {Table(selection.structures.formats, uriInfo, contentColumn)}
+        // TODO make sure the dominant structure is first :)
+        {Table(selection.div.structures.values, uriInfo, structuresColumn)}
+        {Table(selection.div.formats, uriInfo, contentColumn)}
         {if (selection.editions.isNo) {
         val editionsUri = uriInfo.getBaseUriBuilder.path("works").path(selection.work.defaultName).path("editions").build().toString
         <p>List of available <a href={editionsUri}>editions</a></p>

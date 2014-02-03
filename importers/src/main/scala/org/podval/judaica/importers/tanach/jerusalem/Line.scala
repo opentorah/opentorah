@@ -57,7 +57,6 @@ final class Line(var line: String) {
 
   def consumeToIndex(index: Int): String = {
     val result = line.take(index)
-    // TODO get rid of the trim?
     line = line.drop(index).trim()
     result
   }

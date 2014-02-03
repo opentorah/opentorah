@@ -16,15 +16,17 @@
 
 package org.podval.judaica.webapp
 
-import java.io.OutputStream
-import java.lang.annotation.Annotation
-import java.lang.Class
-import java.lang.reflect.Type
+import org.podval.judaica.xml.Xml
 
 import javax.ws.rs.core.{MultivaluedMap, MediaType}
 import javax.ws.rs.ext.{MessageBodyWriter, Provider}
 
-import scala.xml.{Node, PrettyPrinter}
+import scala.xml.Node
+
+import java.io.OutputStream
+import java.lang.annotation.Annotation
+import java.lang.Class
+import java.lang.reflect.Type
 
 
 @Provider
@@ -60,11 +62,8 @@ class ScalaXmlNodeMessageBodyWriter extends MessageBodyWriter[Node] {
     stringObjectMultivaluedMap: MultivaluedMap[String, Object],
     outputStream: OutputStream) : Unit =
   {
-    var answer = prettyPrinter.format(nodes)
+    var answer: String = Xml.prettyPrinter.format(nodes)
     outputStream.write(answer.getBytes())
     outputStream.write('\n')
   }
-
-
-  private val prettyPrinter = new PrettyPrinter(120, 4)
 }

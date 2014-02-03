@@ -47,4 +47,7 @@ object XmlFile {
 
 
   private[this] val cache: WeakHashMap[File, Elem] = new WeakHashMap[File, Elem]
+
+
+  // TODO Introduce "release" method?
 }

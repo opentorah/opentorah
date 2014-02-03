@@ -17,57 +17,25 @@
 
 package org.podval.judaica.webapp
 
-import org.podval.judaica.viewer.{Works, Selection, Edition, Work}
-
-import javax.ws.rs.core.{UriBuilder, UriInfo}
+import javax.ws.rs.core.UriInfo
 
 import scala.xml.Elem
+import java.net.URI
 
-import java.io.File
 
-
-// TODO I only use Html as a wrapper for XML so that I can associate stylesheets with it;
-// how about using processing instruction <?xml-stylesheet type="text/css" href="mytest.css"?> OR
-// HTTP headers? Maybe I do not even need the Node writer then?
 object Html {
 
-  def apply(uriInfo: UriInfo, what: Elem): Elem = apply(uriInfo, Seq(mainStylesheet), what)
+  def apply(uriInfo: UriInfo, what: Elem): Elem = apply(uriInfo, StyleSheets.get(uriInfo), what)
 
 
-  def apply(uriInfo: UriInfo, selection: Selection, what: Elem): Elem = {
-    val stylesheets = Seq(mainStylesheet, workStylesheetUri(selection.work)) ++
-      selection.editions.editions.map(editionStylesheetUri(_))
-
-    apply(uriInfo, stylesheets, what)
-  }
-
-
-  def apply(uriInfo: UriInfo, stylesheetOptions: Seq[Option[UriBuilder => UriBuilder]], what: Elem): Elem = {
-    val stylesheets: Seq[String] =
-      stylesheetOptions.flatten.map(f => f(uriInfo.getBaseUriBuilder).path("stylesheet.xml").build().toString)
-
+  private def apply(uriInfo: UriInfo, stylesheets: Seq[URI], what: Elem): Elem = {
     <html>
       <head>
-        {stylesheets.map(uri => <link rel="stylesheet" type="text/css" href={uri}/>)}
+        {stylesheets.map(uri => <link rel="stylesheet" type="text/css" href={uri.toString}/>)}
       </head>
       <body>
         {what}
       </body>
     </html>
   }
-
-
-  private def mainStylesheet: Option[UriBuilder => UriBuilder] =
-    ifExists(Works.stylesheet, _.path("works"))
-
-
-  private def workStylesheetUri(work: Work): Option[UriBuilder => UriBuilder] =
-    ifExists(work.stylesheet, _.path("works").path(work.defaultName))
-
-
-  private def editionStylesheetUri(edition: Edition): Option[UriBuilder => UriBuilder] =
-    ifExists(edition.stylesheet, _.path("works").path(edition.work.defaultName).path("editions").path(edition.defaultName))
-
-
-  private def ifExists[T](file: File, what: T): Option[T] = if (file.exists) Some(what) else None
 }

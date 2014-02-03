@@ -34,13 +34,13 @@ object WorkParser {
     private[this] val selectors_ = LazyLoad(withMetadataFile(index)(xml => Exists(SelectorParser.parseSelectors(Set.empty, xml), "selectors")))
 
 
-    override def dominantStructure: Structure = dominantStructure_.get
+    override def dominantStructure: NonRootStructure = dominantStructure_.get
 
 
     private[this] val dominantStructure_ = LazyLoad(withMetadataFile(index){ xml =>  DivParser.parseDominantStructure(context, this, xml) })
 
 
-    override def structures: Map[Selector, Structure] = structures_.get
+    override def structures: Map[Selector, NonRootStructure] = structures_.get
 
 
     private[this] val structures_ = LazyLoad(withMetadataFile(index){ xml =>  DivParser.parseNonDominantStructures(context, this, xml) })

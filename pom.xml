@@ -44,18 +44,16 @@
     </developers>
 
     <scm>
-        <!-- TODO Point to GitHub instead! -->
-        <connection>scm:hg:http://judaica.podval.org/hg/judaica/</connection>
-        <developerConnection>scm:hg:https://judaica.podval.org/hg/judaica/</developerConnection>
-        <tag>HEAD</tag>
-        <url>http://judaica.podval.org/hg/judaica/</url>
+        <url>https://github.com/dubinsky/podval-judaica</url>
+        <connection>scm:git:git@github.com:dubinsky/podval-judaica.git</connection>
+        <developerConnection>scm:git:git@github.com:dubinsky/podval-judaica.git</developerConnection>
     </scm>
-<!--
+
     <issueManagement>
-        <system>Jira</system>
-        <url>http://code.google.com/p/podval-xquery/issues/list</url>
+        <system>GitHub Issues</system>
+        <url>https://github.com/dubinsky/podval-judaica/issues</url>
     </issueManagement>
--->
+
     <ciManagement>
         <system>hudson</system>
         <url>http://judaica.podval.org/hudson/job/judaica/</url>
@@ -98,7 +96,7 @@
                         <args>
                             <arg>-unchecked</arg>
                             <arg>-deprecation</arg>
-                            <!--
+                            <!-- TODO
                             Disabled because of
                             https://issues.scala-lang.org/browse/SI-6123
                             pending a fix

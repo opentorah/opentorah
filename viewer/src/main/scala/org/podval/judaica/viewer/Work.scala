@@ -33,7 +33,7 @@ trait Work extends NamedDiv with DominantDiv {
   override def selectors: Seq[Selector]
 
 
-  override def structures: Map[Selector, Structure]
+  override def structures: Map[Selector, NonRootStructure]
 
 
   def editions: Seq[Edition]
@@ -55,7 +55,7 @@ trait Work extends NamedDiv with DominantDiv {
 
 object WorkSelector extends NamedSelector {
 
-  override val names: Names = new Names(Seq(new Name("wors", "en", isTransliterated = false)))
+  override val names: Names = new Names(Seq(new Name("work", "en", isTransliterated = false)))
 
 
   override val selectors: Seq[Selector] = Seq.empty

@@ -23,9 +23,6 @@ import org.podval.judaica.xml.Xml
 import java.io.File
 
 
-// TODO switch to using Edition/Storage-based paths
-// TODO produce Content, not XML!
-// TODO mark-up, do not replace (paragraph, aliya/maftir, sofpasuk, makaf, pasek, brackets around aliya, brackets around kri,)
 abstract class Importer(inputDirectoryPath: String, workName: String, editionName: String) {
 
   private val inputDirectory = new File(inputDirectoryPath)
@@ -39,7 +36,7 @@ abstract class Importer(inputDirectoryPath: String, workName: String, editionNam
     val content = parseBook(inFile)
     val result = processBook(content, edition, outputName)
     val outputFile = edition.storage.storage(outputName).asFile.file
-    Xml.print(Content.toXml(result), outputFile)
+    Xml.print(Content.toXmlNode(result), outputFile)
   }
 
 

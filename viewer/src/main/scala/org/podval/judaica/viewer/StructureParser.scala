@@ -24,11 +24,6 @@ import scala.xml.Elem
 import java.io.File
 
 
-// TODO I think I can avoid passing around object that are not completely parsed by introducing temporary objects
-// that provide access methods to the information that was already parsed...
-// If this is cleaned and can be made to work everywhere, is XmlFile cache is still useful?
-// (by the way, shouldn't be "release" method introduced on it?)
-
 object StructureParser {
 
   case class ParsingContext(
@@ -102,7 +97,7 @@ object StructureParser {
   }
 
 
-  def parseStructure(div: Div, context: ParsingContext, selector: Selector, xml: Elem): Structure = {
+  def parseStructure(div: Div, context: ParsingContext, selector: Selector, xml: Elem): NonRootStructure = {
     val lengthOption: Option[Int] = xml.intAttributeOption("length")
 
     val nextContext = context.copy(

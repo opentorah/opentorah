@@ -44,12 +44,7 @@ trait DirectoryStorage extends Storage {
   val directory: File
 
 
-  // TODO allow overrides ? val overrides = Xml.elems(structure) ... Xml.check(override, "file")
-
-  val structure: Structure
-
-
-  val fileFormat: Selector.Format
+  val structure: NonRootStructure
 
 
   val storage: Map[Div, Storage]
@@ -59,16 +54,26 @@ trait DirectoryStorage extends Storage {
 
 
   final override def content(path: Div.Path, format: Selector.Format): Content = {
-    val contents: Seq[Content] = if (path.isEmpty) {
-      structure.divs.map(div => storage(div).content(path, format))
-    } else {
-      val leadingDiv = path.head
-      val leadingStructure = leadingDiv.structure
-      if (leadingStructure != structure) throw new ViewerException(s"Restructuring from $structure to $leadingStructure isn't yet supported")
-      Seq(storage(leadingDiv).content(path.tail, format))
-    }
+    val contents: Seq[Content] =
+      if (path.isEmpty) {
+        structure.divs.map(div => storage(div).content(path, format))
 
-    DivContent(structure.defaultName, None, Node.NoAttributes, None, contents)
+      } else {
+        val leadingDiv = path.head
+        val leadingStructure = leadingDiv.structure
+        if (leadingStructure != structure) throw new ViewerException(s"Restructuring from $structure to $leadingStructure isn't yet supported")
+        Seq(storage(leadingDiv).content(path.tail, format))
+      }
+
+    val parentDiv = structure.parentDiv
+
+    DivContent(
+      Seq.empty,
+      parentDiv.structure.defaultName,
+      Some(parentDiv.id),
+      Node.NoAttributes,
+      Some(parentDiv.id),
+      contents)
   }
 }
 
@@ -85,11 +90,5 @@ trait FileStorage extends Storage {
   val file: File
 
 
-  final override def content(path: Div.Path, format: Selector.Format): Content = {
-    val content = Content.fromXml(XmlFile.load(file))
-    // TODO process format - and compare with the file format :)
-    // TODO at the last step, elements preceding the selected div which are not of the same selector should be retrieved also...
-    ???
-//    Content.select(content, path, format)
-  }
+  final override def content(path: Div.Path, format: Selector.Format): Content = DivContent.select(file, path, format)
 }
