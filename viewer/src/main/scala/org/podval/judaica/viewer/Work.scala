@@ -68,6 +68,12 @@ object WorksStructure extends NamedStructure {
   override val selector: NamedSelector = WorkSelector
 
 
+  override def isRoot: Boolean = true
+
+
+  override def asNonRoot: NonRootStructure = throw new UnsupportedOperationException
+
+
   override val divs: Seq[NamedDiv] = Seq.empty // Or maybe the work we are dealing with?
 
 

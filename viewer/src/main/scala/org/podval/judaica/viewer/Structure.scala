@@ -25,6 +25,12 @@ trait Structure extends Named with Ordering[Div] {
   final override def names = selector.names
 
 
+  def isRoot: Boolean
+
+
+  def asNonRoot: NonRootStructure
+
+
   final def isNumbered: Boolean = selector.isNumbered
 
 
@@ -79,6 +85,19 @@ trait Structure extends Named with Ordering[Div] {
 
 
   final def getDivByNumber(number: Int): Div = Exists(divByNumber(number), number.toString, "div")
+}
+
+
+
+trait NonRootStructure extends Structure {
+
+  final override def isRoot: Boolean = false
+
+
+  final override def asNonRoot: NonRootStructure = this
+
+
+  val parentDiv: Div
 }
 
 

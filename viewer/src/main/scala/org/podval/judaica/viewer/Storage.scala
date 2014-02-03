@@ -29,7 +29,7 @@ sealed trait Storage {
   def asDirectory: DirectoryStorage
   def asFile: FileStorage
 
-  def content(path: Selection.Path, format: Selector.Format): Content
+  def content(path: Div.Path, format: Selector.Format): Content
 }
 
 
@@ -58,7 +58,7 @@ trait DirectoryStorage extends Storage {
   final def storage(id: String): Storage = storage(structure.divById(id).get)
 
 
-  final override def content(path: Selection.Path, format: Selector.Format): Content = {
+  final override def content(path: Div.Path, format: Selector.Format): Content = {
     val contents: Seq[Content] = if (path.isEmpty) {
       structure.divs.map(div => storage(div).content(path, format))
     } else {
@@ -85,7 +85,7 @@ trait FileStorage extends Storage {
   val file: File
 
 
-  final override def content(path: Selection.Path, format: Selector.Format): Content = {
+  final override def content(path: Div.Path, format: Selector.Format): Content = {
     val content = Content.fromXml(XmlFile.load(file))
     // TODO process format - and compare with the file format :)
     // TODO at the last step, elements preceding the selected div which are not of the same selector should be retrieved also...

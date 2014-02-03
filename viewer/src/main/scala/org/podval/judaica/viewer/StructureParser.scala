@@ -40,13 +40,14 @@ object StructureParser {
 
 
   private abstract class ParsedStructure(
-    protected final override val lengthOption: Option[Int],
-    xml: Elem) extends Structure
+    final override val parentDiv: Div,
+    protected final override val lengthOption: Option[Int]
+  ) extends NonRootStructure
 
 
 
-  private abstract class ParsedNamedStructure(final override val selector: NamedSelector, lengthOption: Option[Int], xml: Elem)
-    extends ParsedStructure(lengthOption, xml) with NamedStructure
+  private abstract class ParsedNamedStructure(div: Div, final override val selector: NamedSelector, lengthOption: Option[Int], xml: Elem)
+    extends ParsedStructure(div, lengthOption) with NamedStructure
   {
     protected final def parseDivs(context: ParsingContext, xml: Elem): Seq[NamedDiv] =
       checkLength(selector, lengthOption, divXmls(xml).map(xml => DivParser.parseNamed(context, this, xml)))
@@ -54,16 +55,16 @@ object StructureParser {
 
 
 
-  private final class EagerNamedStructure(context: ParsingContext, selector: NamedSelector, lengthOption: Option[Int], xml: Elem)
-    extends ParsedNamedStructure(selector, lengthOption, xml)
+  private final class EagerNamedStructure(div: Div, context: ParsingContext, selector: NamedSelector, lengthOption: Option[Int], xml: Elem)
+    extends ParsedNamedStructure(div, selector, lengthOption, xml)
   {
     override val divs: Seq[NamedDiv] = parseDivs(context, xml)
   }
 
 
 
-  private final class LazyNamedStructure(context: ParsingContext, selector: NamedSelector, lengthOption: Option[Int], xml: Elem)
-    extends ParsedNamedStructure(selector, lengthOption, xml)
+  private final class LazyNamedStructure(div: Div, context: ParsingContext, selector: NamedSelector, lengthOption: Option[Int], xml: Elem)
+    extends ParsedNamedStructure(div, selector, lengthOption, xml)
   {
     override def divs: Seq[NamedDiv] = divs_.get
 
@@ -73,8 +74,8 @@ object StructureParser {
 
 
 
-  private abstract class ParsedNumberedStructure(final override val selector: NumberedSelector, lengthOption: Option[Int], xml: Elem)
-    extends ParsedStructure(lengthOption, xml) with NumberedStructure
+  private abstract class ParsedNumberedStructure(div: Div, final override val selector: NumberedSelector, lengthOption: Option[Int], xml: Elem)
+    extends ParsedStructure(div, lengthOption) with NumberedStructure
   {
     protected final def parseDivs(context: ParsingContext, xml: Elem): Seq[NumberedDiv] =
       checkLength(selector, lengthOption, divXmls(xml).zipWithIndex.map { case (xml, num) => DivParser.parseNumbered(context, this, num+1, xml) })
@@ -82,8 +83,8 @@ object StructureParser {
 
 
 
-  private final class EagerNumberedStructure(context: ParsingContext, selector: NumberedSelector, lengthOption: Option[Int], xml: Elem)
-    extends ParsedNumberedStructure(selector, lengthOption, xml)
+  private final class EagerNumberedStructure(div: Div, context: ParsingContext, selector: NumberedSelector, lengthOption: Option[Int], xml: Elem)
+    extends ParsedNumberedStructure(div, selector, lengthOption, xml)
   {
     // TODO check that the Paths for the non-dominant structure are properly ordered; same for Named
     override val divs: Seq[NumberedDiv] = parseDivs(context, xml)
@@ -91,8 +92,8 @@ object StructureParser {
 
 
 
-  private final class LazyNumberedStructure(context: ParsingContext, selector: NumberedSelector, lengthOption: Option[Int], xml: Elem)
-    extends ParsedNumberedStructure(selector, lengthOption, xml)
+  private final class LazyNumberedStructure(div: Div, context: ParsingContext, selector: NumberedSelector, lengthOption: Option[Int], xml: Elem)
+    extends ParsedNumberedStructure(div, selector, lengthOption, xml)
   {
     override def divs: Seq[NumberedDiv] = divs_.get
 
@@ -101,18 +102,18 @@ object StructureParser {
   }
 
 
-  def parseStructure(context: ParsingContext, selector: Selector, selectors: Selectors, xml: Elem): Structure = {
+  def parseStructure(div: Div, context: ParsingContext, selector: Selector, xml: Elem): Structure = {
     val lengthOption: Option[Int] = xml.intAttributeOption("length")
 
     val nextContext = context.copy(
-      isDominant = context.isDominant && selectors.isDominantSelector(selector),
-      knownSelectors = cousins(selector, selectors))
+      isDominant = context.isDominant && div.isDominantSelector(selector),
+      knownSelectors = cousins(selector, div))
 
     xml.attributeOption("file").fold {
       if (selector.isNumbered)
-        new EagerNumberedStructure(context, selector.asNumbered, lengthOption, xml)
+        new EagerNumberedStructure(div, context, selector.asNumbered, lengthOption, xml)
       else
-        new EagerNamedStructure(context, selector.asNamed, lengthOption, xml)
+        new EagerNamedStructure(div, context, selector.asNamed, lengthOption, xml)
     }{
       fileName: String =>
         import java.io.File
@@ -121,9 +122,9 @@ object StructureParser {
         val realNextContext = nextContext.copy(parsingFile = nextParsingFile)
 
         if (selector.isNumbered)
-          new LazyNumberedStructure(realNextContext, selector.asNumbered, lengthOption, xml)
+          new LazyNumberedStructure(div, realNextContext, selector.asNumbered, lengthOption, xml)
         else
-          new LazyNamedStructure(realNextContext, selector.asNamed, lengthOption, xml)
+          new LazyNamedStructure(div, realNextContext, selector.asNamed, lengthOption, xml)
     }
   }
 

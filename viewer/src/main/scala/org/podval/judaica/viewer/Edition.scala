@@ -24,5 +24,5 @@ trait Edition extends Named {
   final def stylesheet: File = new File(directory, "stylesheet.css")
 
 
-  final def content(path: Selection.Path, format: Selector.Format): Content = storage.content(path, format)
+  final def content(div: Div, format: Selector.Format): Content = storage.content(div.path, format)
 }

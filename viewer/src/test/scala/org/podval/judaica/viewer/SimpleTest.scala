@@ -16,7 +16,6 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml.Ops
 import org.junit.Test
 import org.junit.Assert.{assertTrue, assertFalse, assertEquals}
 
@@ -80,7 +79,7 @@ class SimpleTest {
 //  @Test
   def genesisFormats = {
     val selection = Selection("Хумаш").selectPath("book/Genesis").asStructure
-    val formats: Seq[Seq[Selector]] = selection.lastDiv.formats
+    val formats: Seq[Seq[Selector]] = selection.div.formats
     formats.map(_.map(_.defaultName).mkString("/")).foreach(println)
   }
 
@@ -96,19 +95,19 @@ class SimpleTest {
 
   @Test
   def ChumashContent {
-    val result = Selection("Tanach", "Jerusalem").xmlContent
+    val result = Selection("Tanach", "Jerusalem").content(None)
   }
 
 
   @Test
   def GenesisContent {
-    val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis").asStructure.xmlContent
+    val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis").asStructure.content(None)
   }
 
 
   @Test
   def Genesis1Content {
-    val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis/chapter/1").asStructure.xmlContent
+    val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis/chapter/1").asStructure.content(None)
   }
 
 

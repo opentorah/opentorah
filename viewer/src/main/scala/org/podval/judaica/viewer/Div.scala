@@ -39,6 +39,9 @@ trait Div extends Selectors with Ordered[Div] {
 
 
   final override def compare(that: Div): Int = structure.compare(this, that)
+
+
+  final def path: Div.Path = (if (structure.isRoot) Seq.empty else structure.asNonRoot.parentDiv.path) :+ this
 }
 
 
@@ -81,7 +84,7 @@ trait NonDominantDiv extends Div {
   final override def asDominant: DominantDiv = throw new ViewerException(s"$this is not a dominant Div")
 
 
-  val path: Selection.Path
+  val dominantAnchor: Div
 }
 
 
@@ -101,3 +104,10 @@ trait TerminalDominantDiv extends DominantDiv {
 
 final class GeneratedTerminalDominantNumberedDiv(override val structure: Structure, override val number: Int)
   extends TerminalDominantDiv with NumberedDiv
+
+
+
+object Div {
+
+  type Path = Seq[Div]
+}
