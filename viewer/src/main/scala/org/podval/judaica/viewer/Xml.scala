@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package org.podval.judaica.xml
+package org.podval.judaica.viewer
 
-import org.podval.judaica.viewer.ViewerException
 import scala.xml.{Node, Elem, PrettyPrinter}
 import java.io.{File, OutputStream, Writer, FileWriter, OutputStreamWriter, PrintWriter}
 

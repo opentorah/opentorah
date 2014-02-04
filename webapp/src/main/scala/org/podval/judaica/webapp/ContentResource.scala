@@ -16,8 +16,7 @@
 
 package org.podval.judaica.webapp
 
-import org.podval.judaica.viewer.{StructureSelection, Content}
-import org.podval.judaica.xml.Xml
+import org.podval.judaica.viewer.{Xml, StructureSelection, Content}
 
 import javax.ws.rs.{Produces, QueryParam, GET}
 import javax.ws.rs.core.{UriInfo, Context, MediaType}

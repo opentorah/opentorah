@@ -16,8 +16,7 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml.Ops
-import org.podval.judaica.xml.XmlFile
+import Xml.Ops
 import scala.xml.{Elem, Node, MetaData, UnprefixedAttribute, TopScope, Text}
 import java.io.File
 

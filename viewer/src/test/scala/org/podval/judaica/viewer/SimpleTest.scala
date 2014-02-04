@@ -18,7 +18,6 @@ package org.podval.judaica.viewer
 
 import org.junit.Test
 import org.junit.Assert.{assertTrue, assertFalse, assertEquals}
-import org.podval.judaica.xml.Xml
 
 
 // TODO switch to ScalaTest!

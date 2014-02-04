@@ -1,7 +1,7 @@
 package org.podval.judaica.viewer
 
 import org.podval.judaica.viewer.ParseException.withMetadataFile
-import org.podval.judaica.xml.Xml.Ops
+import Xml.Ops
 
 import java.io.File
 

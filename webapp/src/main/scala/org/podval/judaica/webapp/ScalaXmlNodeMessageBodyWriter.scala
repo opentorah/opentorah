@@ -16,10 +16,11 @@
 
 package org.podval.judaica.webapp
 
-import org.podval.judaica.xml.Xml
 
 import javax.ws.rs.core.{MultivaluedMap, MediaType}
 import javax.ws.rs.ext.{MessageBodyWriter, Provider}
+
+import org.podval.judaica.viewer.Xml
 
 import scala.xml.Node
 

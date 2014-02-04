@@ -17,8 +17,7 @@
 
 package org.podval.judaica.importers
 
-import org.podval.judaica.viewer.{DivContent, Works, Edition, Content}
-import org.podval.judaica.xml.Xml
+import org.podval.judaica.viewer.{DivContent, Works, Edition, Content, Xml}
 
 import java.io.File
 

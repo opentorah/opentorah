@@ -15,7 +15,7 @@
  * under the License.
  */
 
-package org.podval.judaica.xml
+package org.podval.judaica.viewer
 
 import Xml.Ops
 import scala.xml.{Utility, XML, Elem}

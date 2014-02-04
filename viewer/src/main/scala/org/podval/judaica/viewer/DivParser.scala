@@ -16,7 +16,7 @@
 
 package org.podval.judaica.viewer
 
-import org.podval.judaica.xml.Xml.Ops
+import Xml.Ops
 import StructureParser.ParsingContext
 
 import scala.xml.Elem
