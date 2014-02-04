@@ -38,6 +38,9 @@ trait Div extends Selectors with Ordered[Div] {
   def id: String
 
 
+  def name(lang: Language): String
+
+
   final override def compare(that: Div): Int = structure.compare(this, that)
 
 
@@ -48,17 +51,29 @@ trait Div extends Selectors with Ordered[Div] {
 
 trait NamedDiv extends Div with Named {
 
+  override def structure: NamedStructure
+
+
   final override def id: String = defaultName
+
+
+  final override def name(lang: Language): String = structure.selector.divName(lang, this)
 }
 
 
 
 trait NumberedDiv extends Div {
 
+  override def structure: NumberedStructure
+
+
   val number: Int
 
 
   final override def id: String = number.toString
+
+
+  final override def name(lang: Language): String = structure.selector.divName(lang, this)
 }
 
 
@@ -102,7 +117,7 @@ trait TerminalDominantDiv extends DominantDiv {
 
 
 
-final class GeneratedTerminalDominantNumberedDiv(override val structure: Structure, override val number: Int)
+final class GeneratedTerminalDominantNumberedDiv(override val structure: NumberedStructure, override val number: Int)
   extends TerminalDominantDiv with NumberedDiv
 
 

@@ -53,7 +53,7 @@ trait DirectoryStorage extends Storage {
   final def storage(id: String): Storage = storage(structure.divById(id).get)
 
 
-  final override def content(path: Div.Path, format: Selector.Format): Content = {
+  final override def content(path: Div.Path, format: Selector.Format): DivContent = {
     val contents: Seq[Content] =
       if (path.isEmpty) {
         structure.divs.map(div => storage(div).content(path, format))
@@ -68,11 +68,10 @@ trait DirectoryStorage extends Storage {
     val parentDiv = structure.parentDiv
 
     DivContent(
-      Seq.empty,
       parentDiv.structure.defaultName,
       Some(parentDiv.id),
       Node.NoAttributes,
-      Some(parentDiv.id),
+      None,
       contents)
   }
 }

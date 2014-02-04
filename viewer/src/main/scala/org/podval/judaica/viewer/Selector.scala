@@ -17,8 +17,26 @@
 package org.podval.judaica.viewer
 
 
-// TODO add "isNamePartOfHead"
 trait Selector extends Named with Selectors {
+
+  /**
+   * To include the name of the selector in the <head> element of the corresponding <div> or not?
+   * For example, for chapters, the <head> contains "Chapter number", but for verses - just the number.
+   *
+   * @return
+   */
+  def isNameIncludedInHead: Boolean
+
+
+  /**
+   * What goes before the name of the Div in the <head>.
+   * For example, names of aliyos are in brackets: "[third aliya]".
+   *
+   * @return
+   */
+  def headPrefix: Option[String]
+  def headSuffix: Option[String]
+
 
   def isNumbered: Boolean
 
@@ -33,11 +51,18 @@ trait Selector extends Named with Selectors {
 
 
   final def isTerminal: Boolean = selectors.isEmpty
+
+
+  final def name(lang: Language, divName: String): String = {
+    val nameNameOption = if (isNameIncludedInHead) names.byLang(lang) else None
+    headPrefix.getOrElse("") +
+    (if (nameNameOption.isDefined) lang.name(nameNameOption.get.name, divName) else divName) +
+    headSuffix.getOrElse("")
+  }
 }
 
 
 
-// TODO add "isSpelledOut"; introduce number speller for a language
 trait NumberedSelector extends Selector {
 
   final override def isNumbered: Boolean = true
@@ -47,6 +72,19 @@ trait NumberedSelector extends Selector {
 
 
   final override def asNamed: NamedSelector = throw new ClassCastException
+
+
+  /**
+   * Present the number as number - or as words?
+   * For example, foe chapters and verses it is just a number, but for aliyos - words ("first").
+   *
+   * @return
+   */
+  def isSpelledOut: Boolean
+
+
+  final def divName(lang: Language, div: NumberedDiv): String =
+    name(lang, (if (isSpelledOut) lang.numberToSpelledOutString _ else lang.numberToString _)(div.number))
 }
 
 
@@ -60,6 +98,12 @@ trait NamedSelector extends Selector {
 
 
   final override def asNamed: NamedSelector = this
+
+
+  final def divName(lang: Language, div: NamedDiv): String = {
+    val nameOption = div.names.byLang(lang)
+    name(lang, if (nameOption.isDefined) nameOption.get.name else "")
+  }
 }
 
 

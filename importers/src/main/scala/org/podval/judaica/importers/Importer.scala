@@ -17,7 +17,7 @@
 
 package org.podval.judaica.importers
 
-import org.podval.judaica.viewer.{Works, Edition, Content}
+import org.podval.judaica.viewer.{DivContent, Works, Edition, Content}
 import org.podval.judaica.xml.Xml
 
 import java.io.File
@@ -33,7 +33,7 @@ abstract class Importer(inputDirectoryPath: String, workName: String, editionNam
 
   final def importBook(inputName: String, outputName: String) {
     val inFile = new File(inputDirectory, inputName + "." + getInputExtension)
-    val content = parseBook(inFile)
+    val content = parseBook(inFile, outputName)
     val result = processBook(content, edition, outputName)
     val outputFile = edition.storage.storage(outputName).asFile.file
     Xml.print(Content.toXmlNode(result), outputFile)
@@ -43,8 +43,8 @@ abstract class Importer(inputDirectoryPath: String, workName: String, editionNam
   protected def getInputExtension: String
 
 
-  protected def parseBook(file: File): Content
+  protected def parseBook(file: File, outputName: String): DivContent
 
 
-  protected def processBook(content: Content, edition: Edition, outputName: String): Content = content
+  protected def processBook(content: DivContent, edition: Edition, outputName: String): DivContent = content
 }

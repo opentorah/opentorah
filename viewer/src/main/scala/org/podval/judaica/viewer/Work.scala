@@ -21,7 +21,7 @@ import java.io.File
 
 trait Work extends NamedDiv with DominantDiv {
 
-  final override val structure: Structure = WorksStructure
+  final override val structure: NamedStructure = WorksStructure
 
 
   val directory: File
@@ -56,6 +56,15 @@ trait Work extends NamedDiv with DominantDiv {
 object WorkSelector extends NamedSelector {
 
   override val names: Names = new Names(Seq(new Name("work", "en", isTransliterated = false)))
+
+
+  override val isNameIncludedInHead: Boolean = false
+
+
+  override val headPrefix: Option[String] = None
+
+
+  override val headSuffix: Option[String] = None
 
 
   override val selectors: Seq[Selector] = Seq.empty

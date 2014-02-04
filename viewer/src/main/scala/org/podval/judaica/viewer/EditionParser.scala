@@ -1,17 +1,20 @@
 package org.podval.judaica.viewer
 
 import org.podval.judaica.viewer.ParseException.withMetadataFile
+import org.podval.judaica.xml.Xml.Ops
 
 import java.io.File
 
 
 object EditionParser {
 
-  private final class ParseableEdition(override val work: Work, override val directory: File, index: File) extends Edition {
-
-    override val names: Names = withMetadataFile(index)(Names(_))
-
-
+  private final class ParseableEdition(
+    override val work: Work,
+    override val names: Names,
+    override val language: String,
+    override val directory: File,
+    index: File) extends Edition
+  {
     def storage: DirectoryStorage = storage_.get
 
 
@@ -19,5 +22,12 @@ object EditionParser {
   }
 
 
-  def parseEdition(work: Work, directory: File, index: File): Edition = new ParseableEdition(work, directory, index)
+
+  def parseEdition(work: Work, directory: File, index: File): Edition = {
+    withMetadataFile(index) { xml =>
+      val names = Names(xml)
+      val language = xml.attributeOption("language").getOrElse("he")
+      new ParseableEdition(work, names, language, directory, index)
+    }
+  }
 }

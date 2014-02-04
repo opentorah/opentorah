@@ -61,7 +61,7 @@ final class Names(val names: Seq[Name]) {
   def has(name: String): Boolean = find(name).isDefined
 
 
-  def byLang(lang: String): Option[Name] = names.find(_.lang == lang)
+  def byLang(lang: Language): Option[Name] = names.find(_.lang == lang.name)
 
 
   def default: Name = names(0)

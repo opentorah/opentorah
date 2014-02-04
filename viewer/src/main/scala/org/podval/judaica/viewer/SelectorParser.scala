@@ -23,7 +23,12 @@ import scala.xml.Elem
 
 object SelectorParser {
 
-  private abstract class ParsedSelector(override val names: Names, override val selectors: Seq[Selector]) extends Selector
+  private abstract class ParsedSelector(
+    final override val names: Names,
+    final override val isNameIncludedInHead: Boolean,
+    final override val headPrefix: Option[String],
+    final override val headSuffix: Option[String],
+    final override val selectors: Seq[Selector]) extends Selector
 
 
 
@@ -37,12 +42,18 @@ object SelectorParser {
   private def parseSelector(knownSelectors: Set[Selector], xml: Elem): Selector = {
     def newSelector: Selector = {
       val names = Names(xml)
+      val isNameIncludedInHead = xml.booleanAttribute("isNameIncludedInHead")
+      val headPrefix = xml.attributeOption("headPrefix")
+      val headSuffix = xml.attributeOption("headSuffix")
       val selectors = parseSelectors(knownSelectors, xml)
 
-      if (xml.booleanAttribute("isNumbered"))
-        new ParsedSelector(names, selectors) with NumberedSelector
-      else
-        new ParsedSelector(names, selectors) with NamedSelector
+      if (xml.booleanAttribute("isNumbered")) {
+        new ParsedSelector(names, isNameIncludedInHead, headPrefix, headSuffix, selectors) with NumberedSelector {
+          override val isSpelledOut = xml.booleanAttribute("isSpelledOut")
+        }
+
+      } else
+        new ParsedSelector(names, isNameIncludedInHead, headPrefix, headSuffix, selectors) with NamedSelector
     }
 
     def referenceToKnownSelector(name: String) = Names.doFind(knownSelectors, name, "selector")

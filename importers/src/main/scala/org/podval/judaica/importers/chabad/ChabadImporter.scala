@@ -21,7 +21,7 @@ package chabad
 import scala.xml.{Elem, Node, Utility}
 
 import java.io.File
-import org.podval.judaica.viewer.{Content, Edition}
+import org.podval.judaica.viewer.{DivContent, Content, Edition}
 
 
 object ChabadImporter {
@@ -39,7 +39,7 @@ class ChabadImporter(inputDirectory: String, workName: String) extends Importer(
     def getInputExtension() : String = "htm"
 
 
-    def parseBook(file: File): Content = {
+    def parseBook(file: File, outputName: String): DivContent = {
         val index = load(file)
 
         val directory = file.getParentFile

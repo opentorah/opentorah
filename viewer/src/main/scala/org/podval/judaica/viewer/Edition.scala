@@ -15,7 +15,7 @@ trait Edition extends Named {
   override val names: Names
 
 
-  // TODO add language attribute
+  val language: String
 
 
   def storage: DirectoryStorage
@@ -24,5 +24,9 @@ trait Edition extends Named {
   final def stylesheet: File = new File(directory, "stylesheet.css")
 
 
-  final def content(div: Div, format: Selector.Format): Content = storage.content(div.path.tail, format)
+  final def content(div: Div, format: Selector.Format): Content = {
+    val unbound = storage.content(div.path.tail, format)
+    val bound = DivContent.bindWithThis(unbound, div.path.head, Languages.get(language))
+    bound
+  }
 }

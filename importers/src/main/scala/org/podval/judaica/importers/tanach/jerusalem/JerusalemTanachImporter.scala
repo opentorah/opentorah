@@ -15,12 +15,11 @@
  * under the License.
  */
 
-package org.podval.judaica.importers
-package tanach
-package jerusalem
+package org.podval.judaica.importers.tanach.jerusalem
 
-import org.podval.judaica.xml.{HebrewNumbers, AlefBeth}
-import org.podval.judaica.viewer.{Content, DivContent, TextContent, AppContent}
+import org.podval.judaica.importers.tanach.TanachImporter
+
+import org.podval.judaica.viewer.{Content, SpanContent, AppContent, TextContent, DivContent, HebrewLanguage}
 import DivContent.prependAttribute
 
 import scala.collection.mutable.ArrayBuffer
@@ -28,7 +27,6 @@ import scala.xml.{MetaData, Node}
 import scala.io.Source
 
 import java.io.File
-
 
 
 object JerusalemTanachImporter {
@@ -40,38 +38,38 @@ object JerusalemTanachImporter {
   }
 
 
-  val SEFER = AlefBeth.SAMEH + AlefBeth.PEI + AlefBeth.RESH
+  val SEFER = HebrewLanguage.SAMEH + HebrewLanguage.PEI + HebrewLanguage.RESH
 
 
-  val PEREK = AlefBeth.PEI + AlefBeth.RESH + AlefBeth.QOF
+  val PEREK = HebrewLanguage.PEI + HebrewLanguage.RESH + HebrewLanguage.QOF
 
 
-  val PEI3 = AlefBeth.PEI + " " + AlefBeth.PEI + " " + AlefBeth.PEI
+  val PEI3 = HebrewLanguage.PEI + " " + HebrewLanguage.PEI + " " + HebrewLanguage.PEI
 
 
-  val SAMEH3 = AlefBeth.SAMEH + " " + AlefBeth.SAMEH + " " + AlefBeth.SAMEH
+  val SAMEH3 = HebrewLanguage.SAMEH + " " + HebrewLanguage.SAMEH + " " + HebrewLanguage.SAMEH
 
 
   val HAZI =
-    AlefBeth.HET +
-      AlefBeth.TSADI +
-      AlefBeth.YOD +
-      " " +
-      AlefBeth.HE +
-      AlefBeth.SAMEH +
-      AlefBeth.PEI +
-      AlefBeth.RESH +
-      " " +
-      AlefBeth.BET +
-      AlefBeth.PEI +
-      AlefBeth.SAMEH +
-      AlefBeth.VAV +
-      AlefBeth.QOF +
-      AlefBeth.YOD +
-      AlefBeth.MEM_SOFIT
+    HebrewLanguage.HET +
+    HebrewLanguage.TSADI +
+    HebrewLanguage.YOD +
+    " " +
+    HebrewLanguage.HE +
+    HebrewLanguage.SAMEH +
+    HebrewLanguage.PEI +
+    HebrewLanguage.RESH +
+    " " +
+    HebrewLanguage.BET +
+    HebrewLanguage.PEI +
+    HebrewLanguage.SAMEH +
+    HebrewLanguage.VAV +
+    HebrewLanguage.QOF +
+    HebrewLanguage.YOD +
+    HebrewLanguage.MEM_SOFIT
 
 
-  val HAZAK = AlefBeth.HET + AlefBeth.ZAYIN + AlefBeth.QOF
+  val HAZAK = HebrewLanguage.HET + HebrewLanguage.ZAYIN + HebrewLanguage.QOF
 }
 
 
@@ -96,28 +94,27 @@ final class JerusalemTanachImporter(inputDirectory: String)
   // TODO sofpasuk character looks wrong...
   // TODO add language markers on the elements (after the Divs are bound and Content is retrieved by language)
 
-  protected override def parseBook(inputFile: File): Content = {
+  protected override def parseBook(inputFile: File, outputName: String): DivContent = {
     def dropStuckChapter(what: Seq[String]) = if (isChapter(what.last)) what.dropRight(1) else what
     def isChapter(line: String): Boolean = line.startsWith(JerusalemTanachImporter.PEREK)
 
     val lines = Source.fromFile(inputFile, "UTF-16BE").getLines().map(_.trim)
-    val bookName = lines.next.trim
+    val bookNameFromFile = lines.next.trim  // has some crap at the end of the name
+    val bookName = outputName
 
     DivContent(
-      Seq.empty,
       "book",
       Some(bookName),
       Node.NoAttributes,
-      Some(JerusalemTanachImporter.SEFER + " " + bookName),
+      None,
       lines.filterNot(_.isEmpty).filterNot(isChapter).toSeq.zipWithIndex.map {
         case (chapter, chapterNumberFrom0) =>
           val chapterNumber = chapterNumberFrom0 + 1
           DivContent(
-            Seq.empty,
             "chapter",
             Some(chapterNumber.toString),
             Node.NoAttributes,
-            Some(JerusalemTanachImporter.PEREK + " " + HebrewNumbers.fromInt(chapterNumber)),
+            None,
             dropStuckChapter(chapter.split(":").map(_.trim)).zipWithIndex.flatMap {
               case (verse, verseNumberFrom0) =>
                 parseVerse(verse, verseNumberFrom0+1)
@@ -143,12 +140,11 @@ final class JerusalemTanachImporter(inputDirectory: String)
     if (!line.isEmpty) {
       line.consumeToSpace()
       result += DivContent(
-        Seq.empty,
         "verse",
         Some(number.toString),
         Node.NoAttributes,
-        Some(HebrewNumbers.fromInt(number)),
-        processWords(line) :+ Content.textElem("sofpasuk", AlefBeth.SOF_PASUQ)
+        None,
+        processWords(line) :+ SpanContent("sofpasuk", HebrewLanguage.SOF_PASUQ)
       )
     } else {
       println(s"*** skipping empty line; verse number $number ***")
@@ -161,7 +157,6 @@ final class JerusalemTanachImporter(inputDirectory: String)
   private def processParagraph(line: Line): Option[Content] = {
     def paragraph(open: Boolean, big: Boolean, head: String): DivContent =
       DivContent(
-        Seq.empty,
         "paragraph",
         None,
         prependAttribute("open", open, prependAttribute("big", big, Node.NoAttributes)),
@@ -170,9 +165,9 @@ final class JerusalemTanachImporter(inputDirectory: String)
       )
 
     if (line.consume(JerusalemTanachImporter.PEI3)  ) Some(paragraph(true , true , JerusalemTanachImporter.PEI3)) else
-    if (line.consume(AlefBeth.PEI)                  ) Some(paragraph(true , false, AlefBeth.PEI)) else
+    if (line.consume(HebrewLanguage.PEI)            ) Some(paragraph(true , false, HebrewLanguage.PEI)) else
     if (line.consume(JerusalemTanachImporter.SAMEH3)) Some(paragraph(false, true , JerusalemTanachImporter.SAMEH3)) else
-    if (line.consume(AlefBeth.SAMEH)                ) Some(paragraph(false, false, AlefBeth.SAMEH)) else
+    if (line.consume(HebrewLanguage.SAMEH)          ) Some(paragraph(false, false, HebrewLanguage.SAMEH)) else
       None
   }
 
@@ -191,11 +186,11 @@ final class JerusalemTanachImporter(inputDirectory: String)
 
   private def processWord(line: Line): Seq[Content] = {
     def word(text: String, attributes: MetaData): DivContent =
-      DivContent(Seq.empty, "word", None, attributes, None, Seq(TextContent(text)))
+      DivContent("word", None, attributes, None, Seq(TextContent(text)))
 
 
     val spaceIndex = line.indexOf(" ")
-    val makafIndex = line.indexOf(AlefBeth.MAQAF)
+    val makafIndex = line.indexOf(HebrewLanguage.MAQAF)
 
     def isFirst(one: Int, two: Int) = (one != -1) && ((two == -1) || (two > one))
     val isSpace = isFirst(spaceIndex, makafIndex)
@@ -218,11 +213,11 @@ final class JerusalemTanachImporter(inputDirectory: String)
     val withAlternate =
       if (alternate.isEmpty) wordContent
       else AppContent(Map(
-        "read" -> Seq(wordContent),
         // TODO strip the vowels off?
-        "write" -> Seq(word("[" + alternate.get + "]", Node.NoAttributes))
+        "write" -> Seq(wordContent),
+        "read" -> Seq(word("[" + alternate.get + "]", Node.NoAttributes))
       ))
 
-    if (!isPasek) Seq(withAlternate) else Seq(withAlternate, Content.textElem("pasek", AlefBeth.PASEQ))
+    if (!isPasek) Seq(withAlternate) else Seq(withAlternate, SpanContent("pasek", HebrewLanguage.PASEQ))
   }
 }

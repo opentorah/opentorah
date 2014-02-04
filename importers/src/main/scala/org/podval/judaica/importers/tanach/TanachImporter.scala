@@ -18,7 +18,7 @@
 package org.podval.judaica.importers
 package tanach
 
-import org.podval.judaica.viewer.{Content, Edition}
+import org.podval.judaica.viewer.{HebrewLanguage, DivContent, Content, Edition}
 
 
 abstract class TanachImporter(inputDirectory: String, workName: String, editionName: String)
@@ -32,9 +32,16 @@ abstract class TanachImporter(inputDirectory: String, workName: String, editionN
   protected def output2inputName: Map[String, String]
 
 
-  protected final override def processBook(content: Content, edition: Edition, outputName: String): Content = {
+  protected final override def processBook(content: DivContent, edition: Edition, outputName: String): DivContent = {
     // TODO
-    content
+
+    val boundContent = DivContent.bind(content, edition.work, HebrewLanguage)
+
+
+    // Non-dominant structures
+
+    boundContent
+//    content
 //    val breaks =
 //      XmlFile.loadResource(classOf[TanachImporter], outputName, "meta").elems
 //        .groupBy(_.getAttribute("chapter"))

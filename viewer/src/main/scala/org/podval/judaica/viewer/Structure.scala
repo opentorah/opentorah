@@ -78,13 +78,16 @@ trait Structure extends Named with Ordering[Div] {
     if ((number < 1) || (number > length)) None else {
       if (number <= divs.length) Some(divs(number-1)) else {
         // TODO check that this is a dominant structure - or rely on the (not yet implemented) checks during parsing that the structures are complete :)
-        if (isNumbered && selector.isTerminal) Some(new GeneratedTerminalDominantNumberedDiv(this, number)) else None
+        if (isNumbered && selector.isTerminal) Some(new GeneratedTerminalDominantNumberedDiv(this.asNumbered, number)) else None
       }
     }
   }
 
 
   final def getDivByNumber(number: Int): Div = Exists(divByNumber(number), number.toString, "div")
+
+
+  final override def toString: String = s"Structure $defaultName[$length]"
 }
 
 

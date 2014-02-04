@@ -24,7 +24,7 @@ import scala.xml.Elem
 
 object DivParser {
 
-  private abstract class ParsedDiv(context: ParsingContext, override val structure: Structure, xml: Elem) extends Div {
+  private abstract class ParsedDiv(context: ParsingContext, xml: Elem) extends Div {
 
     private[this] val localSelectors: Seq[Selector] = SelectorParser.parseSelectors(context.knownSelectors, xml)
 
@@ -34,8 +34,8 @@ object DivParser {
 
 
 
-  private abstract class ParsedNamedDiv(context: ParsingContext, structure: NamedStructure, xml: Elem)
-    extends ParsedDiv(context, structure, xml) with NamedDiv
+  private abstract class ParsedNamedDiv(context: ParsingContext, override val structure: NamedStructure, xml: Elem)
+    extends ParsedDiv(context, xml) with NamedDiv
   {
     override final val names = Names(xml)
   }
@@ -72,8 +72,8 @@ object DivParser {
 
 
 
-  private abstract class ParsedNumberedDiv(context: ParsingContext, structure: NumberedStructure, override val number: Int, xml: Elem)
-    extends ParsedDiv(context, structure, xml) with NumberedDiv
+  private abstract class ParsedNumberedDiv(context: ParsingContext, override val structure: NumberedStructure, override val number: Int, xml: Elem)
+    extends ParsedDiv(context, xml) with NumberedDiv
   {
     xml.intAttributeOption("n").foreach { nvalue =>
       if (nvalue != number) throw new ViewerException(s"Div $number has attribute n set to $nvalue")
