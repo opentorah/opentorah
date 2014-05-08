@@ -31,6 +31,11 @@ abstract class Calendar {
   protected val helper: Helper
 
 
+
+  /**
+   *
+   * @param number
+   */
   abstract class YearBase(number: Int) extends Numbered[Year](number) { self: Year =>
 
     final def next: Year = yearCompanion(number + 1)
@@ -74,6 +79,10 @@ abstract class Calendar {
   }
 
 
+
+  /**
+   *
+   */
   protected abstract class YearCompanion {
 
     type Character
@@ -115,6 +124,11 @@ abstract class Calendar {
   protected val yearCompanion: YearCompanion
 
 
+
+  /**
+   *
+   * @param number
+   */
   abstract class MonthBase(number: Int) extends Numbered[Month](number) { self: Month =>
 
     require(0 < number)
@@ -151,6 +165,10 @@ abstract class Calendar {
   }
 
 
+
+  /**
+   *
+   */
   protected abstract class MonthCompanion {
 
     type Name
@@ -170,6 +188,10 @@ abstract class Calendar {
 
 
 
+  /**
+   *
+   * @param number
+   */
   abstract class DayBase(number: Int) extends Numbered[Day](number) { this: Day =>
 
     require(0 < number)
@@ -218,6 +240,10 @@ abstract class Calendar {
   }
 
 
+
+  /**
+   *
+   */
   protected abstract class DayCompanion {
 
     type Name
@@ -239,6 +265,12 @@ abstract class Calendar {
   protected val dayCompanion: DayCompanion
 
 
+
+  /**
+   *
+   * @param days
+   * @param time
+   */
   final class Moment(days: Int, time: Time) extends MomentBase[Time, Moment](days, time) { self: Moment =>
 
     def day: Day = dayCompanion(days + 1)
@@ -254,6 +286,10 @@ abstract class Calendar {
   }
 
 
+
+  /**
+   *
+   */
   protected abstract class MomentCompanion {
 
     def apply(days: Int, time: Time): Moment
@@ -263,9 +299,19 @@ abstract class Calendar {
   protected val momentCompanion: MomentCompanion
 
 
+
+  /**
+   *
+   * @param hours
+   * @param parts
+   */
   final class Time(hours: Int, parts: Int) extends TimeBase[Time](hours, parts)
 
 
+
+  /**
+   *
+   */
   protected abstract class TimeCompanion {
 
     def apply(hours: Int, parts: Int): Time
