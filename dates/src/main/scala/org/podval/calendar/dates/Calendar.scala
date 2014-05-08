@@ -221,7 +221,7 @@ abstract class Calendar {
     final def numberInMonth: Int = number - month.firstDay + 1
 
 
-    final def numberInWeek: Int = helper.numberInWeek(number)
+    final def numberInWeek: Int = Calendar.this.numberInWeek(number)
 
 
     final def name: dayCompanion.Name = dayCompanion.names(numberInWeek - 1)
@@ -239,6 +239,12 @@ abstract class Calendar {
     final def toFullString: String = year + " " + month.name + " " + numberInMonth
   }
 
+
+
+  protected val firstDayNumberInWeek: Int
+
+
+  final private[this] def numberInWeek(dayNumber: Int): Int = ((dayNumber + firstDayNumberInWeek - 1 - 1) % Helper.daysPerWeek) + 1
 
 
   /**

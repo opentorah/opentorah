@@ -108,6 +108,13 @@ object Gregorian extends Calendar {
   }
 
 
+  val epoch = 1373429
+
+
+  protected override val firstDayNumberInWeek =
+    (((Jewish.firstDayNumberInWeek - 1) + (epoch % Helper.daysPerWeek)) % Helper.daysPerWeek) + 1
+
+
   object Day extends DayCompanion {
 
     sealed class Name(name: String) extends Named(name)

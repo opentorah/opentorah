@@ -175,6 +175,11 @@ object Jewish extends Calendar {
   }
 
 
+  // It seems that first day of the first year was Sunday; molad - BaHaRad.
+  // Second year - friday; molad - 8 in the morning.
+  override val firstDayNumberInWeek: Int = 1
+
+
   object Day extends DayCompanion {
 
     sealed class Name(name: String) extends Named(name)

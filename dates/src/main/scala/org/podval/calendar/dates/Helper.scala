@@ -19,12 +19,6 @@ package org.podval.calendar.dates
 
 trait Helper {
 
-  val firstDayNumberInWeek: Int
-
-
-  final def numberInWeek(dayNumber: Int): Int = ((dayNumber + firstDayNumberInWeek - 1 - 1) % Helper.daysPerWeek) + 1
-
-
   def areYearsPositive: Boolean
 
 
