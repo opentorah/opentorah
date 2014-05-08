@@ -20,13 +20,21 @@ package org.podval.calendar.dates
 object Conversions {
 
 
+  // TODO Unify with the other use of 18?
+  //  Jewish  :   6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0  1  2  3  4  5  6
+  //  Georgian:  |0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0
+  val jewishDayStartHours = 18
+
+  val gregorianDayStartHours = Calendar.hoursPerDay - jewishDayStartHours
+
+
   def toJewish(moment: Gregorian.Moment): Jewish.Moment = {
     val hours = moment.time.hours
 
     val (newDay, newHours) =
-      if (hours >= JewishHelper.dayStartHours)
-        (moment.day.next, hours - JewishHelper   .dayStartHours) else
-        (moment.day     , hours + GregorianHelper.dayStartHours)
+      if (hours >= jewishDayStartHours)
+        (moment.day.next, hours - jewishDayStartHours) else
+        (moment.day     , hours + gregorianDayStartHours)
 
     toJewish(newDay).time(newHours, moment.time.parts)
   }
@@ -36,9 +44,9 @@ object Conversions {
     val hours = moment.time.hours
 
     val (newDay, newHours) =
-      if (hours < GregorianHelper.dayStartHours)
-        (moment.day.prev, hours + JewishHelper.dayStartHours) else
-        (moment.day     , hours - GregorianHelper.dayStartHours)
+      if (hours < gregorianDayStartHours)
+        (moment.day.prev, hours + jewishDayStartHours) else
+        (moment.day     , hours - gregorianDayStartHours)
 
     fromJewish(newDay).time(newHours, moment.time.parts)
   }

@@ -28,9 +28,6 @@ abstract class Calendar {
   type Day <: DayBase
 
 
-  protected val helper: Helper
-
-
 
   /**
    *
@@ -50,10 +47,10 @@ abstract class Calendar {
     def lengthInDays: Int
 
 
-    final def firstMonth: Int = helper.firstMonth(number)
+    final def firstMonth: Int = yearCompanion.firstMonth(number)
 
 
-    final def lengthInMonths: Int = helper.lengthInMonths(number)
+    final def lengthInMonths: Int = yearCompanion.lengthInMonths(number)
 
 
     def character: yearCompanion.Character
@@ -91,7 +88,7 @@ abstract class Calendar {
     def apply(number: Int): Year
 
 
-    final  def apply(month: Month): Year = apply(helper.yearNumber(month.number))
+    final  def apply(month: Month): Year = apply(monthCompanion.yearNumber(month.number))
 
 
     final def apply(day: Day): Year = {
@@ -131,6 +128,12 @@ abstract class Calendar {
 
 
     def isLeap(yearNumber: Int): Boolean
+
+
+    def firstMonth(yearNumber: Int): Int
+
+
+    def lengthInMonths(yearNumber: Int): Int
   }
 
 
@@ -156,7 +159,7 @@ abstract class Calendar {
     final def year: Year = yearCompanion(this)
 
 
-    final def numberInYear: Int = helper.numberInYear(number)
+    final def numberInYear: Int = monthCompanion.numberInYear(number)
 
 
     final def day(day: Int): Day = {
@@ -194,6 +197,12 @@ abstract class Calendar {
 
 
     final def apply(year: Int, monthInYear: Int): Month = yearCompanion(year).month(monthInYear)
+
+
+    def yearNumber(monthNumber: Int): Int
+
+
+    def numberInYear(monthNumber: Int): Int
   }
 
 
@@ -274,7 +283,7 @@ abstract class Calendar {
     final def apply(year: Int, month: Int, day: Int): Day = yearCompanion(year).month(month).day(day)
 
 
-    final def numberInWeek(dayNumber: Int): Int = ((dayNumber + firstDayNumberInWeek - 1 - 1) % Helper.daysPerWeek) + 1
+    final def numberInWeek(dayNumber: Int): Int = ((dayNumber + firstDayNumberInWeek - 1 - 1) % Calendar.daysPerWeek) + 1
 
 
     val firstDayNumberInWeek: Int
@@ -333,10 +342,10 @@ abstract class Calendar {
       require(0 <= hours)
       require(0 <= parts)
 
-      val hours_ = hours + parts / Helper.partsPerHour
-      val daysN = days + hours_ / Helper.hoursPerDay
-      val hoursN = hours_ % Helper.hoursPerDay
-      val partsN = parts % Helper.partsPerHour
+      val hours_ = hours + parts / Calendar.partsPerHour
+      val daysN = days + hours_ / Calendar.hoursPerDay
+      val hoursN = hours_ % Calendar.hoursPerDay
+      val partsN = parts % Calendar.partsPerHour
 
       create(daysN, hoursN, partsN)
     }
@@ -376,8 +385,8 @@ abstract class Calendar {
    */
   final class Time(val hours: Int, val parts: Int) extends Ordered[Time] {
 
-    require(0 <= hours && hours < Helper.hoursPerDay)
-    require(0 <= parts && parts < Helper.partsPerHour)
+    require(0 <= hours && hours < Calendar.hoursPerDay)
+    require(0 <= parts && parts < Calendar.partsPerHour)
 
 
     override def equals(other: Any): Boolean = other match {
@@ -395,13 +404,13 @@ abstract class Calendar {
     def isZero = (hours == 0) && (parts == 0)
 
 
-    def allParts /* TODO toParts? asParts? */ = hours * Helper.partsPerHour + parts
+    def allParts /* TODO toParts? asParts? */ = hours * Calendar.partsPerHour + parts
 
 
-    def minutes: Int = parts / Helper.partsPerMinute
+    def minutes: Int = parts / Calendar.partsPerMinute
 
 
-    def partsOfMinute = parts % Helper.partsPerMinute
+    def partsOfMinute = parts % Calendar.partsPerMinute
 
 
     override def toString: String = hours + "h" + parts + "p"
@@ -420,9 +429,35 @@ abstract class Calendar {
     def apply(hours: Int, parts: Int): Time
 
 
-    final def apply(hours: Int, minutes: Int, parts: Int): Time = apply(hours, minutes * Helper.partsPerMinute + parts)
+    final def apply(hours: Int, minutes: Int, parts: Int): Time = apply(hours, minutes * Calendar.partsPerMinute + parts)
   }
 
 
   protected val timeCompanion: TimeCompanion
+}
+
+
+
+
+object Calendar {
+    val hoursPerDay = 24
+
+    require(hoursPerDay % 2 == 0)
+
+
+    val hoursPerHalfDay = hoursPerDay / 2
+
+
+    val partsPerHour = 1080
+
+
+    val minutesPerHour = 60
+
+    require(partsPerHour % minutesPerHour == 0)
+
+
+    val partsPerMinute = partsPerHour / minutesPerHour
+
+
+    val daysPerWeek: Int = 7
 }

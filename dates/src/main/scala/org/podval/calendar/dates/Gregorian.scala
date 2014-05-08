@@ -28,15 +28,12 @@ object Gregorian extends Calendar {
   override protected val yearCompanion = Year
 
 
-  protected override val helper: GregorianHelper.type = GregorianHelper
-
-
   final class Year(number: Int) extends YearBase(number) {
 
-    override def firstDay: Int = helper.firstDay(number)
+    override def firstDay: Int = yearCompanion.firstDay(number)
 
 
-    override def lengthInDays = helper.lengthInDays(number)
+    override def lengthInDays = yearCompanion.lengthInDays(number)
 
 
     override def character: yearCompanion.Character = isLeap
@@ -80,6 +77,24 @@ object Gregorian extends Calendar {
     // TODO give names to constants?
 
     override def isLeap(yearNumber: Int): Boolean = (yearNumber % 4 == 0) && ((yearNumber % 100 != 0) || (yearNumber % 400 == 0))
+
+
+    override def firstMonth(yearNumber: Int): Int = monthsInYear*(yearNumber - 1) + 1
+
+
+    override def lengthInMonths(yearNumber: Int): Int = monthsInYear
+
+
+    val monthsInYear = 12
+
+
+    private val daysInNonLeapYear = 365
+
+
+    def firstDay(yearNumber: Int): Int = daysInNonLeapYear * (yearNumber - 1) + (yearNumber - 1)/4 - (yearNumber - 1)/100 + (yearNumber - 1)/400 + 1
+
+
+    def lengthInDays(yearNumber: Int): Int = if (Gregorian.Year.isLeap(yearNumber)) daysInNonLeapYear + 1 else daysInNonLeapYear
   }
 
 
@@ -105,6 +120,12 @@ object Gregorian extends Calendar {
     case object October   extends Name("October")
     case object November  extends Name("November")
     case object December  extends Name("December")
+
+
+    override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Gregorian.Year.monthsInYear + 1
+
+
+    override def numberInYear(monthNumber: Int): Int =  monthNumber - Gregorian.Year.firstMonth(yearNumber(monthNumber)) + 1
   }
 
 
@@ -140,7 +161,7 @@ object Gregorian extends Calendar {
 
 
     override val firstDayNumberInWeek =
-      (((Jewish.Day.firstDayNumberInWeek - 1) + (epoch % Helper.daysPerWeek)) % Helper.daysPerWeek) + 1
+      (((Jewish.Day.firstDayNumberInWeek - 1) + (epoch % Calendar.daysPerWeek)) % Calendar.daysPerWeek) + 1
   }
 
 
@@ -156,14 +177,14 @@ object Gregorian extends Calendar {
 
 
     def morningTime(hours: Int, parts: Int) = {
-      require(hours < Helper.hoursPerHalfDay)
+      require(hours < Calendar.hoursPerHalfDay)
       Time(hours, parts)
     }
 
 
     def afternoonTime(hours: Int, parts: Int) = {
-      require(hours < Helper.hoursPerHalfDay)
-      Time(hours + Helper.hoursPerHalfDay, parts)
+      require(hours < Calendar.hoursPerHalfDay)
+      Time(hours + Calendar.hoursPerHalfDay, parts)
     }
   }
 }

@@ -28,9 +28,6 @@ object Jewish extends Calendar {
   override protected val yearCompanion = Year
 
 
-  protected override val helper: JewishHelper.type = JewishHelper
-
-
   final class Year(number: Int) extends YearBase(number) {
 
     require(0 < number)
@@ -55,10 +52,10 @@ object Jewish extends Calendar {
     override def lengthInDays: Int = next.firstDay - this.firstDay
 
 
-    def cycle: Int = helper.cycle(number)
+    def cycle: Int = yearCompanion.cycle(number)
 
 
-    def numberInCycle: Int = helper.numberInCycle(number)
+    def numberInCycle: Int = yearCompanion.numberInCycle(number)
 
 
     override def character: yearCompanion.Character = (isLeap, kind)
@@ -133,8 +130,33 @@ object Jewish extends Calendar {
     private[this] val leapYears = Set(3, 6, 8, 11, 14, 17, 19)
 
 
-    override def isLeap(yearNumber: Int) = leapYears.contains(JewishHelper.numberInCycle(yearNumber))
+    override def isLeap(yearNumber: Int) = leapYears.contains(numberInCycle(yearNumber))
+
+
+    override def firstMonth(yearNumber: Int): Int = monthsInCycle*(cycle(yearNumber) - 1) + firstMonthInCycle(yearNumber)
+
+
+    override def lengthInMonths(yearNumber: Int): Int = if (isLeap(yearNumber)) 13 else 12
+
+
+    val yearsInCycle = 19
+
+
+    val monthsBeforeYearInCycle = ((1 to yearsInCycle) map (lengthInMonths(_))).scanLeft(0)(_ + _)
+
+
+    val monthsInCycle = monthsBeforeYearInCycle.last
+
+
+    def firstMonthInCycle(yearNumber: Int): Int = monthsBeforeYearInCycle(numberInCycle(yearNumber) - 1) + 1
+
+
+    def numberInCycle(yearNumber: Int): Int = ((yearNumber - 1) % yearsInCycle) + 1
+
+
+    def cycle(yearNumber: Int): Int = ((yearNumber - 1) / yearsInCycle) + 1
   }
+
 
 
   final class Month(number: Int) extends MonthBase(number) {
@@ -173,6 +195,20 @@ object Jewish extends Calendar {
     // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2):
     // BeHaRaD: 5 hours 204 parts at night of the second day (KH 6:8)
     private val FirstNewMoon = Day(2).nightTime(5, 204)
+
+
+    override def yearNumber(monthNumber: Int): Int = {
+      val cycleOfMonth = ((monthNumber - 1) / yearCompanion.monthsInCycle) + 1
+      val yearsBeforeCycle = (cycleOfMonth - 1) * yearCompanion.yearsInCycle
+      val yearMonthIsInCycle = yearCompanion.monthsBeforeYearInCycle.count(_ < numberInCycleOfMonth(monthNumber))
+      yearsBeforeCycle + yearMonthIsInCycle
+    }
+
+
+    override def numberInYear(monthNumber: Int): Int = numberInCycleOfMonth(monthNumber) - yearCompanion.firstMonthInCycle(yearNumber(monthNumber)) + 1
+
+
+    private def numberInCycleOfMonth(monthNumber: Int): Int = ((monthNumber - 1) % yearCompanion.monthsInCycle) + 1
   }
 
 
@@ -223,14 +259,14 @@ object Jewish extends Calendar {
 
 
     def nightTime(hours: Int, parts: Int) = {
-      require(hours < Helper.hoursPerHalfDay)
+      require(hours < Calendar.hoursPerHalfDay)
       Time(hours, parts)
     }
 
 
     def dayTime(hours: Int, parts: Int) = {
-      require(hours < Helper.hoursPerHalfDay)
-      Time(hours + Helper.hoursPerHalfDay, parts)
+      require(hours < Calendar.hoursPerHalfDay)
+      Time(hours + Calendar.hoursPerHalfDay, parts)
     }
   }
 }
