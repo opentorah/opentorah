@@ -22,22 +22,16 @@ object JewishHelper extends Helper {
   private val yearsInCycle = 19
 
 
-  private val leapYears = Set(3, 6, 8, 11, 14, 17, 19)
-
-
   private val monthsBeforeYearInCycle = ((1 to yearsInCycle) map (lengthInMonths(_))).scanLeft(0)(_ + _)
 
 
   private val monthsInCycle = monthsBeforeYearInCycle.last
 
 
-  override def isLeap(yearNumber: Int) = leapYears.contains(numberInCycle(yearNumber))
-
-
   override def firstMonth(yearNumber: Int): Int = monthsInCycle*(cycle(yearNumber) - 1) + firstMonthInCycle(yearNumber)
 
 
-  override def lengthInMonths(yearNumber: Int): Int = if (isLeap(yearNumber)) 13 else 12
+  override def lengthInMonths(yearNumber: Int): Int = if (Jewish.Year.isLeap(yearNumber)) 13 else 12
 
 
   def cycle(yearNumber: Int): Int = ((yearNumber - 1) / yearsInCycle) + 1
@@ -63,6 +57,7 @@ object JewishHelper extends Helper {
   private def numberInCycleOfMonth(monthNumber: Int): Int = ((monthNumber - 1) % monthsInCycle) + 1
 
 
+  // TODO return to conversions? Unify with the other use of 18?
   //  Jewish  :   6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0  1  2  3  4  5  6
   //  Georgian:  |0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0
   override val dayStartHours = 18

@@ -75,6 +75,11 @@ object Gregorian extends Calendar {
 
 
     protected override def areYearsPositive: Boolean = false
+
+
+    // TODO give names to constants?
+
+    override def isLeap(yearNumber: Int): Boolean = (yearNumber % 4 == 0) && ((yearNumber % 100 != 0) || (yearNumber % 400 == 0))
   }
 
 

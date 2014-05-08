@@ -128,6 +128,12 @@ object Jewish extends Calendar {
 
 
     protected override def areYearsPositive: Boolean = true
+
+
+    private[this] val leapYears = Set(3, 6, 8, 11, 14, 17, 19)
+
+
+    override def isLeap(yearNumber: Int) = leapYears.contains(JewishHelper.numberInCycle(yearNumber))
   }
 
 

@@ -19,9 +19,6 @@ package org.podval.calendar.dates
 
 trait Helper {
 
-  def isLeap(yearNumber: Int): Boolean
-
-
   def firstMonth(yearNumber: Int): Int
 
 

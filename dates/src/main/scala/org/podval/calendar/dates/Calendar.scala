@@ -59,7 +59,7 @@ abstract class Calendar {
     def character: yearCompanion.Character
 
 
-    final def isLeap: Boolean = helper.isLeap(number)
+    final def isLeap: Boolean = yearCompanion.isLeap(number)
 
 
     final def month(numberInYear: Int): Month = {
@@ -128,6 +128,9 @@ abstract class Calendar {
       val result = (4 * dayNumber / (4 * 365 + 1)) - 1
       if (areYearsPositive) scala.math.max(1, result) else result
     }
+
+
+    def isLeap(yearNumber: Int): Boolean
   }
 
 
@@ -231,7 +234,7 @@ abstract class Calendar {
     final def numberInMonth: Int = number - month.firstDay + 1
 
 
-    final def numberInWeek: Int = ((number + dayCompanion.firstDayNumberInWeek - 1 - 1) % Helper.daysPerWeek) + 1
+    final def numberInWeek: Int = dayCompanion.numberInWeek(number)
 
 
     final def name: dayCompanion.Name = dayCompanion.names(numberInWeek - 1)
@@ -269,6 +272,9 @@ abstract class Calendar {
 
 
     final def apply(year: Int, month: Int, day: Int): Day = yearCompanion(year).month(month).day(day)
+
+
+    final def numberInWeek(dayNumber: Int): Int = ((dayNumber + firstDayNumberInWeek - 1 - 1) % Helper.daysPerWeek) + 1
 
 
     val firstDayNumberInWeek: Int
