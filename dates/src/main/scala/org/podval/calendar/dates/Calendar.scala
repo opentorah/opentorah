@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Podval Group.
+ * Copyright 2011-2014 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@ package org.podval.calendar.dates
 
 
 abstract class Calendar {
-
-  // Instead of "Y" here and type Y = Year in the sub-trait, I use "Year" here and just define "Year" in the sub-trate. Beaty!
 
   type Year <: YearBase
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Podval Group.
+ * Copyright 2011-2014 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,6 @@ final class YearTest extends FunSuite {
 
   test("Year of the month of a year should be the year we started from") {
     for (year <- years; month <- (1 to year.lengthInMonths))
-      expectResult(year)(year.month(month).year)
+      assertResult(year)(year.month(month).year)
   }
 }

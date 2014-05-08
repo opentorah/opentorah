@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Podval Group.
+ * Copyright 2011-2014 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,11 +62,11 @@ final class NewMoonTest extends FunSuite {
     val dateG = Gregorian.Day(yearG, monthG, dayG).time(hours, minutes, parts)
     val molad = Jewish.Year(moladYear).month(moladMonth).newMoon
 
-    expectResult(dayOfWeek)(molad.day.name)
+    assertResult(dayOfWeek)(molad.day.name)
 
-    expectResult(dayJ)(Conversions.toJewish(dateG).day)
-    expectResult(dayJ)(molad.day)
+    assertResult(dayJ)(Conversions.toJewish(dateG).day)
+    assertResult(dayJ)(molad.day)
 
-    expectResult(dateG)(Conversions.fromJewish(molad))
+    assertResult(dateG)(Conversions.fromJewish(molad))
   }
 }

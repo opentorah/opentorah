@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Podval Group.
+ * Copyright 2011-2014 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ final class DatesTest extends FunSuite {
   test("known dates should fall on known days of the week") {
     // XXX ???
 //    Assert.assertEquals(6, Day(   2, Tishrei   ,  1).numberInWeek)
-    expectResult(Day.Sheni)(Day(5772, Marheshvan, 24).name)
+    assertResult(Day.Sheni)(Day(5772, Marheshvan, 24).name)
   }
 
 
@@ -48,15 +48,15 @@ final class DatesTest extends FunSuite {
 
   private def date2days2date(yearNumber: Int, monthName: Month.Name, dayNumber: Int) {
     val year = Year(yearNumber)
-    expectResult(yearNumber)(year.number)
+    assertResult(yearNumber)(year.number)
 
     val month = year.month(monthName)
-    expectResult(monthName)(month.name)
+    assertResult(monthName)(month.name)
 
     val day = month.day(dayNumber)
 
-    expectResult(year)(day.year)
-    expectResult(month)(day.month)
-    expectResult(dayNumber)(day.numberInMonth)
+    assertResult(year)(day.year)
+    assertResult(month)(day.month)
+    assertResult(dayNumber)(day.numberInMonth)
   }
 }
