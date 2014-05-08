@@ -69,4 +69,7 @@ object JewishHelper extends Helper {
 
 
   private def numberInCycleOfMonth(monthNumber: Int): Int = ((monthNumber - 1) % monthsInCycle) + 1
+
+
+  override val dayStartHours = 18
 }

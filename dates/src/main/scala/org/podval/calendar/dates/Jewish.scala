@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Podval Group.
+ * Copyright 2011-2014 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package org.podval.calendar.dates
 
 object Jewish extends Calendar {
 
-  // XXX assignments of the companion objects have to happen early on, but even this is not sufficient!
+  // TODO assignments of the companion objects have to happen early on, but even this is not sufficient!
   // I found that I need to assign JewishCalendar to a val to trigger its initialization - or I end up with a null for the Year companion object!
   override protected val timeCompanion = Time
   override protected val momentCompanion = Moment

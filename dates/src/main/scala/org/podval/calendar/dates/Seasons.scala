@@ -18,9 +18,9 @@ package org.podval.calendar.dates
 
 
 final class Seasons {
-  // XXX Where and when was the Sun created? Does this jibe with Rambam's epoch?
-  // XXX Which day of the week (+1/-1) was the Giving of the Law? (Sema)
-  // XXX Rambam's epoch - two days after molad?! (Petya Ofman)
+  // TODO Where and when was the Sun created? Does this jibe with Rambam's epoch?
+  // TODO Which day of the week (+1/-1) was the Giving of the Law? (Sema)
+  // TODO Rambam's epoch - two days after molad?! (Petya Ofman)
   // KH 9:3
 //    public final long FIRST_TKUFAS_NISSAN = molad(1, JewishMonth.Nissan) - partsFromDate(7, 9, 642);
 //    public static final long YEAR_OF_SHMUEL = JewishCalendar.partsFromDate(365, 6, 0);

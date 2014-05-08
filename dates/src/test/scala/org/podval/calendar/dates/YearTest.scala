@@ -18,24 +18,24 @@ package org.podval.calendar.dates
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.FunSuite
+import org.scalatest.FlatSpec
 
 
 @RunWith(classOf[JUnitRunner])
-final class YearTest extends FunSuite {
+final class YearTest extends FlatSpec {
 
-  private val x = Jewish
+  val x = Jewish // TODO without this, I get NullPointerException :(
 
 
   private val years = (1 to 6000) map (Jewish.Year(_))
 
 
-  test("All Jewish years should have a valid kind") {
+  "A Jewish year" should "have a valid kind" in {
     years foreach (_.kind)
   }
 
 
-  test("Year of the month of a year should be the year we started from") {
+  it should "belong to the year it was retrieved from" in {
     for (year <- years; month <- (1 to year.lengthInMonths))
       assertResult(year)(year.month(month).year)
   }

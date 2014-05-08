@@ -18,27 +18,23 @@ package org.podval.calendar.dates;
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.FunSuite
+import org.scalatest.FlatSpec
 
 import Jewish.{Year, Day, Month}
 import Month._
 
 
 @RunWith(classOf[JUnitRunner])
-final class DatesTest extends FunSuite {
+final class DatesTest extends FlatSpec {
 
-  val x = Jewish
+  "known dates" should "have correct day of the week" in {
+    val x = Jewish // TODO without this, I get ExceptionInInitializerError :(
 
-
-  test("known dates should fall on known days of the week") {
-    // XXX ???
-//    Assert.assertEquals(6, Day(   2, Tishrei   ,  1).numberInWeek)
     assertResult(Day.Sheni)(Day(5772, Marheshvan, 24).name)
   }
 
 
-  test("conversions from date to days and back should end where they started") {
-    val x = Jewish
+  "conversions from date to days and back" should "end where they started" in {
     date2days2date(1   , Tishrei,  1)
     date2days2date(2   , Tishrei,  1)
     date2days2date(5768, AdarII , 28)

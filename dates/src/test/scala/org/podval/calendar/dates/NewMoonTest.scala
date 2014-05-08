@@ -18,7 +18,7 @@ package org.podval.calendar.dates
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.FunSuite
+import org.scalatest.FlatSpec
 
 import Jewish.Month._
 import Gregorian.Month._
@@ -26,13 +26,13 @@ import Jewish.Day._
 
 
 @RunWith(classOf[JUnitRunner])
-final class NewMoonTest extends FunSuite {
+final class NewMoonTest extends FlatSpec {
 
   val x = Jewish
   val y = Gregorian
 
 
-  test("known new moons should be where the printed tables put them") {
+  "new moons from the printed tables" should "calculate correctly" in {
     // see http://www.owen0001.host-ed.me/cal/moladot.php
 
     // year and month for the molad; jewish date; georgian date; georgian time
@@ -53,7 +53,7 @@ final class NewMoonTest extends FunSuite {
 
 
 
-  def newMoon(moladYear: Int, moladMonth: Jewish.Month.Name, dayOfWeek: Jewish.Day.Name,
+  private def newMoon(moladYear: Int, moladMonth: Jewish.Month.Name, dayOfWeek: Jewish.Day.Name,
               year: Int, month: Jewish.Month.Name, day: Int,
               yearG: Int, monthG: Gregorian.Month.Name, dayG: Int,
               hours: Int, minutes: Int, parts: Int)

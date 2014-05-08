@@ -56,4 +56,7 @@ object GregorianHelper extends Helper {
 
 
   override def numberInYear(monthNumber: Int): Int =  monthNumber - firstMonth(yearNumber(monthNumber)) + 1
+
+
+  override val dayStartHours = Helper.hoursPerDay - JewishHelper.dayStartHours
 }

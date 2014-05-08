@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Podval Group.
+ * Copyright 2011-2014 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ trait Helper {
   def areYearsPositive: Boolean
 
 
-  // XXX give names to constants
+  // TODO give names to constants
   final def yearForSureBefore(dayNumber: Int): Int =  {
     val result = (4 * dayNumber / (4 * 365 + 1)) - 1
     if (areYearsPositive) scala.math.max(1, result) else result
@@ -48,6 +48,9 @@ trait Helper {
 
 
   def numberInYear(monthNumber: Int): Int
+
+
+  val dayStartHours: Int
 }
 
 

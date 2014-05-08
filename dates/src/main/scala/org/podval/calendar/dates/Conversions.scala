@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Podval Group.
+ * Copyright 2011-2014 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,21 +24,13 @@ object Conversions {
   //  Georgian:  |0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0
 
 
-  // XXX move to helpers
-  private val jewishDayStartHours   = 18
-
-
-  // XXX move to helpers
-  private val georgianDayStartHours = Helper.hoursPerDay - jewishDayStartHours
-
-
   def toJewish(moment: Gregorian.Moment): Jewish.Moment = {
     val hours = moment.time.hours
 
     val (newDay, newHours) =
-      if (hours >= jewishDayStartHours)
-        (moment.day.next, hours - jewishDayStartHours) else
-        (moment.day     , hours + georgianDayStartHours)
+      if (hours >= JewishHelper.dayStartHours)
+        (moment.day.next, hours - JewishHelper   .dayStartHours) else
+        (moment.day     , hours + GregorianHelper.dayStartHours)
 
     toJewish(newDay).time(newHours, moment.time.parts)
   }
@@ -48,9 +40,9 @@ object Conversions {
     val hours = moment.time.hours
 
     val (newDay, newHours) =
-      if (hours < georgianDayStartHours)
-        (moment.day.prev, hours + jewishDayStartHours) else
-        (moment.day     , hours - georgianDayStartHours)
+      if (hours < GregorianHelper.dayStartHours)
+        (moment.day.prev, hours + JewishHelper.dayStartHours) else
+        (moment.day     , hours - GregorianHelper.dayStartHours)
 
     fromJewish(newDay).time(newHours, moment.time.parts)
   }
