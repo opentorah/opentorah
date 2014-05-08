@@ -95,7 +95,7 @@ abstract class Calendar {
 
 
     final def apply(day: Day): Year = {
-      var result = apply(helper.yearForSureBefore(day.number))
+      var result = apply(yearForSureBefore(day.number))
       require(result.firstDay <= day.number)
       while (result.next.firstDay <= day.number) result = result.next
       result
@@ -118,6 +118,16 @@ abstract class Calendar {
 
 
     protected def namesAndLengths(character: yearCompanion.Character): List[(monthCompanion.Name, Int)]
+
+
+    protected def areYearsPositive: Boolean
+
+
+    // TODO give names to constants
+    final def yearForSureBefore(dayNumber: Int): Int =  {
+      val result = (4 * dayNumber / (4 * 365 + 1)) - 1
+      if (areYearsPositive) scala.math.max(1, result) else result
+    }
   }
 
 
@@ -221,7 +231,7 @@ abstract class Calendar {
     final def numberInMonth: Int = number - month.firstDay + 1
 
 
-    final def numberInWeek: Int = Calendar.this.numberInWeek(number)
+    final def numberInWeek: Int = ((number + dayCompanion.firstDayNumberInWeek - 1 - 1) % Helper.daysPerWeek) + 1
 
 
     final def name: dayCompanion.Name = dayCompanion.names(numberInWeek - 1)
@@ -239,12 +249,6 @@ abstract class Calendar {
     final def toFullString: String = year + " " + month.name + " " + numberInMonth
   }
 
-
-
-  protected val firstDayNumberInWeek: Int
-
-
-  final private[this] def numberInWeek(dayNumber: Int): Int = ((dayNumber + firstDayNumberInWeek - 1 - 1) % Helper.daysPerWeek) + 1
 
 
   /**
@@ -265,6 +269,9 @@ abstract class Calendar {
 
 
     final def apply(year: Int, month: Int, day: Int): Day = yearCompanion(year).month(month).day(day)
+
+
+    val firstDayNumberInWeek: Int
   }
 
 

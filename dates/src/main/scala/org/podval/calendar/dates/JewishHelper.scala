@@ -31,9 +31,6 @@ object JewishHelper extends Helper {
   private val monthsInCycle = monthsBeforeYearInCycle.last
 
 
-  override def areYearsPositive: Boolean = true
-
-
   override def isLeap(yearNumber: Int) = leapYears.contains(numberInCycle(yearNumber))
 
 

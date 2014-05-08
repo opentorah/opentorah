@@ -44,8 +44,8 @@ object Conversions {
   }
 
 
-  def fromJewish(day: Jewish   .Day): Gregorian.Day = Gregorian.Day(day.number - Gregorian.epoch)
+  def fromJewish(day: Jewish   .Day): Gregorian.Day = Gregorian.Day(day.number - Gregorian.Day.epoch)
 
 
-  def toJewish  (day: Gregorian.Day): Jewish   .Day = Jewish   .Day(day.number + Gregorian.epoch)
+  def toJewish  (day: Gregorian.Day): Jewish   .Day = Jewish   .Day(day.number + Gregorian.Day.epoch)
 }

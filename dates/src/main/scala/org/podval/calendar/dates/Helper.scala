@@ -19,16 +19,6 @@ package org.podval.calendar.dates
 
 trait Helper {
 
-  def areYearsPositive: Boolean
-
-
-  // TODO give names to constants
-  final def yearForSureBefore(dayNumber: Int): Int =  {
-    val result = (4 * dayNumber / (4 * 365 + 1)) - 1
-    if (areYearsPositive) scala.math.max(1, result) else result
-  }
-
-
   def isLeap(yearNumber: Int): Boolean
 
 

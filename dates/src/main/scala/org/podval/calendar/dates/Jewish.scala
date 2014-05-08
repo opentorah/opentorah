@@ -78,6 +78,7 @@ object Jewish extends Calendar {
   }
 
 
+
   object Year extends YearCompanion {
 
     type Character = (Boolean, Year.Kind)
@@ -124,6 +125,9 @@ object Jewish extends Calendar {
 
 
     private def isAdu(dayName: Day.Name) = adu.contains(dayName)
+
+
+    protected override def areYearsPositive: Boolean = true
   }
 
 
@@ -175,10 +179,6 @@ object Jewish extends Calendar {
   }
 
 
-  // It seems that first day of the first year was Sunday; molad - BaHaRad.
-  // Second year - friday; molad - 8 in the morning.
-  override val firstDayNumberInWeek: Int = 1
-
 
   object Day extends DayCompanion {
 
@@ -197,6 +197,11 @@ object Jewish extends Calendar {
 
 
     override def apply(number: Int): Day = new Day(number)
+
+
+    // It seems that first day of the first year was Sunday; molad - BaHaRad.
+    // Second year - friday; molad - 8 in the morning.
+    override val firstDayNumberInWeek: Int = 1
   }
 
 
