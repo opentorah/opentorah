@@ -64,6 +64,7 @@ abstract class Calendar {
       monthCompanion(firstMonth + numberInYear - 1)
     }
 
+
     final def month(name: monthCompanion.Name): Month = month(months.indexWhere(_.name == name) + 1)
 
 
@@ -114,6 +115,7 @@ abstract class Calendar {
     }
 
 
+    // TODO rename "months..."
     protected def namesAndLengths(character: Character): List[(monthCompanion.Name, Int)]
 
 
@@ -121,6 +123,7 @@ abstract class Calendar {
 
 
     // TODO give names to constants
+    // TODO rename "years..."; review the calculations
     final def yearForSureBefore(dayNumber: Int): Int =  {
       val result = (4 * dayNumber / (4 * 365 + 1)) - 1
       if (areYearsPositive) scala.math.max(1, result) else result
@@ -190,7 +193,7 @@ abstract class Calendar {
     type Name
 
 
-    final class Descriptor(val name: monthCompanion.Name, val length: Int, val daysBefore: Int)
+    final class Descriptor(val name: Name, val length: Int, val daysBefore: Int)
 
 
     def apply(number: Int): Month
@@ -440,6 +443,7 @@ abstract class Calendar {
 
 
 object Calendar {
+
     val hoursPerDay = 24
 
     require(hoursPerDay % 2 == 0)
