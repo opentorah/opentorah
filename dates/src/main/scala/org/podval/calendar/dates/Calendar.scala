@@ -369,13 +369,13 @@ abstract class Calendar {
   /**
    *
    */
-  protected abstract class MomentCompanionBase {
+  protected abstract class MomentCompanion {
 
     def apply(days: Int, time: Time): Moment
   }
 
 
-  protected val Moment: MomentCompanionBase
+  protected val Moment: MomentCompanion
 
 
 
@@ -425,7 +425,7 @@ abstract class Calendar {
   /**
    *
    */
-  protected abstract class TimeCompanionBase {
+  protected abstract class TimeCompanion {
 
     def apply(hours: Int, parts: Int): Time
 
@@ -434,7 +434,7 @@ abstract class Calendar {
   }
 
 
-  protected val Time: TimeCompanionBase
+  protected val Time: TimeCompanion
 }
 
 

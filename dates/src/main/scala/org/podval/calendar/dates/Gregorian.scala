@@ -165,13 +165,13 @@ object Gregorian extends Calendar {
   }
 
 
-  object Moment extends MomentCompanionBase {
+  object Moment extends MomentCompanion {
 
     override def apply(days: Int, time: Time): Moment = new Moment(days, time)
   }
 
 
-  object Time extends TimeCompanionBase {
+  object Time extends TimeCompanion {
 
     override def apply(hours: Int, parts: Int) = new Time(hours, parts)
 
