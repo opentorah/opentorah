@@ -253,10 +253,10 @@ abstract class Calendar {
     final def time(time: Time): Moment = momentCompanion(number - 1, time)
 
 
-    final def time(hours: Int, parts: Int): Moment = time(timeCompanion(hours, parts))
+    final def time(hours: Int, parts: Int): Moment = time(Time(hours, parts))
 
 
-    final def time(hours: Int, minutes: Int, parts: Int): Moment = time(timeCompanion(hours, minutes, parts))
+    final def time(hours: Int, minutes: Int, parts: Int): Moment = time(Time(hours, minutes, parts))
 
 
     final def toFullString: String = year + " " + month.name + " " + numberInMonth
@@ -352,7 +352,7 @@ abstract class Calendar {
     }
 
 
-    protected def create(days: Int, hours: Int, parts: Int): Moment = momentCompanion(days, timeCompanion(hours, parts))
+    protected def create(days: Int, hours: Int, parts: Int): Moment = momentCompanion(days, Time(hours, parts))
 
 
     def day: Day = dayCompanion(days + 1)
@@ -434,7 +434,7 @@ abstract class Calendar {
   }
 
 
-  protected val timeCompanion: TimeCompanionBase
+  protected val Time: TimeCompanionBase
 }
 
 

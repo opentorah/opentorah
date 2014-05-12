@@ -21,7 +21,6 @@ object Gregorian extends Calendar {
 
   // TODO assignments of the companion objects have to happen early on, but even this is not sufficient!
   // I found that I need to assign JewishCalendar to a val to trigger its initialization - or I end up with a null for the Year companion object!
-  override protected val timeCompanion = Time
   override protected val momentCompanion = Moment
   override protected val dayCompanion = Day
   override protected val monthCompanion = Month
