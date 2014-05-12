@@ -25,23 +25,22 @@ object Gregorian extends Calendar {
   override protected val momentCompanion = Moment
   override protected val dayCompanion = Day
   override protected val monthCompanion = Month
-  override protected val yearCompanion = Year
 
 
   final class Year(number: Int) extends YearBase(number) {
 
-    override def firstDay: Int = yearCompanion.firstDay(number)
+    override def firstDay: Int = Year.firstDay(number)
 
 
-    override def lengthInDays = yearCompanion.lengthInDays(number)
+    override def lengthInDays = Year.lengthInDays(number)
 
 
-    override def character: yearCompanion.Character = isLeap
+    override def character: Year.Character = isLeap
   }
 
 
 
-  object Year extends YearCompanion {
+  final class YearCompanion extends YearCompanionBase {
 
     type Character = Boolean
 
@@ -49,7 +48,7 @@ object Gregorian extends Calendar {
     override def apply(number: Int): Year = new Year(number)
 
 
-    protected override def characters: Seq[yearCompanion.Character] = Seq(true, false)
+    protected override def characters: Seq[Year.Character] = Seq(true, false)
 
 
     protected override def namesAndLengths(isLeap: Boolean): List[(Month.Name, Int)] = {
@@ -98,10 +97,13 @@ object Gregorian extends Calendar {
   }
 
 
+  val Year = new YearCompanion
+
+
   final class Month(number: Int) extends MonthBase(number)
 
 
-  object Month extends MonthCompanion {
+  object Month extends MonthCompanionBase {
 
     override def apply(number: Int): Month = new Month(number)
 
@@ -138,7 +140,7 @@ object Gregorian extends Calendar {
   }
 
 
-  object Day extends DayCompanion {
+  object Day extends DayCompanionBase {
 
     sealed class Name(name: String) extends Named(name)
 
@@ -165,13 +167,13 @@ object Gregorian extends Calendar {
   }
 
 
-  object Moment extends MomentCompanion {
+  object Moment extends MomentCompanionBase {
 
     override def apply(days: Int, time: Time): Moment = new Moment(days, time)
   }
 
 
-  object Time extends TimeCompanion {
+  object Time extends TimeCompanionBase {
 
     override def apply(hours: Int, parts: Int) = new Time(hours, parts)
 

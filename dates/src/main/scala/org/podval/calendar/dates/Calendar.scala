@@ -35,10 +35,10 @@ abstract class Calendar {
    */
   abstract class YearBase(number: Int) extends Numbered[Year](number) { self: Year =>
 
-    final def next: Year = yearCompanion(number + 1)
+    final def next: Year = Year(number + 1)
 
 
-    final def prev: Year = yearCompanion(number - 1)
+    final def prev: Year = Year(number - 1)
 
 
     def firstDay: Int
@@ -47,16 +47,16 @@ abstract class Calendar {
     def lengthInDays: Int
 
 
-    final def firstMonth: Int = yearCompanion.firstMonth(number)
+    final def firstMonth: Int = Year.firstMonth(number)
 
 
-    final def lengthInMonths: Int = yearCompanion.lengthInMonths(number)
+    final def lengthInMonths: Int = Year.lengthInMonths(number)
 
 
-    def character: yearCompanion.Character
+    def character: Year.Character
 
 
-    final def isLeap: Boolean = yearCompanion.isLeap(number)
+    final def isLeap: Boolean = Year.isLeap(number)
 
 
     final def month(numberInYear: Int): Month = {
@@ -72,7 +72,7 @@ abstract class Calendar {
       month(months.count(_.daysBefore < day))
     }
 
-    final def months: List[monthCompanion.Descriptor] = yearCompanion.months(this.character)
+    final def months: List[monthCompanion.Descriptor] = Year.months(this.character)
   }
 
 
@@ -80,7 +80,7 @@ abstract class Calendar {
   /**
    *
    */
-  protected abstract class YearCompanion {
+  protected abstract class YearCompanionBase {
 
     type Character
 
@@ -99,14 +99,14 @@ abstract class Calendar {
     }
 
 
-    val months: Map[yearCompanion.Character, List[monthCompanion.Descriptor]] =
+    val months: Map[Character, List[monthCompanion.Descriptor]] =
       Map((for (character <- characters) yield character -> monthsGenerator(character)): _*)
 
 
-    protected def characters: Seq[yearCompanion.Character]
+    protected def characters: Seq[Character]
 
 
-    private def monthsGenerator(character: yearCompanion.Character): List[monthCompanion.Descriptor] = {
+    private def monthsGenerator(character: Character): List[monthCompanion.Descriptor] = {
       val namesAndLengths = this.namesAndLengths(character)
       val (_, lengths) = namesAndLengths.unzip
       val daysBefore = lengths.scanLeft(0)(_ + _).init
@@ -114,7 +114,7 @@ abstract class Calendar {
     }
 
 
-    protected def namesAndLengths(character: yearCompanion.Character): List[(monthCompanion.Name, Int)]
+    protected def namesAndLengths(character: Character): List[(monthCompanion.Name, Int)]
 
 
     protected def areYearsPositive: Boolean
@@ -137,7 +137,8 @@ abstract class Calendar {
   }
 
 
-  protected val yearCompanion: YearCompanion
+  // TODO I'd like this to be called "Year", but can't override a val with the object :(
+  protected val Year: YearCompanionBase
 
 
 
@@ -156,7 +157,7 @@ abstract class Calendar {
     final def prev: Month = monthCompanion(number - 1)
 
 
-    final def year: Year = yearCompanion(this)
+    final def year: Year = Year(this)
 
 
     final def numberInYear: Int = monthCompanion.numberInYear(number)
@@ -185,7 +186,7 @@ abstract class Calendar {
   /**
    *
    */
-  protected abstract class MonthCompanion {
+  protected abstract class MonthCompanionBase {
 
     type Name
 
@@ -196,7 +197,7 @@ abstract class Calendar {
     def apply(number: Int): Month
 
 
-    final def apply(year: Int, monthInYear: Int): Month = yearCompanion(year).month(monthInYear)
+    final def apply(year: Int, monthInYear: Int): Month = Year(year).month(monthInYear)
 
 
     def yearNumber(monthNumber: Int): Int
@@ -206,7 +207,7 @@ abstract class Calendar {
   }
 
 
-  protected val monthCompanion: MonthCompanion
+  protected val monthCompanion: MonthCompanionBase
 
 
 
@@ -231,7 +232,7 @@ abstract class Calendar {
     final def -(change: Int) = dayCompanion(number - change)
 
 
-    final def year: Year = yearCompanion(this)
+    final def year: Year = Year(this)
 
 
     final def month: Month = year.monthForDay(numberInYear)
@@ -266,7 +267,7 @@ abstract class Calendar {
   /**
    *
    */
-  protected abstract class DayCompanion {
+  protected abstract class DayCompanionBase {
 
     type Name
 
@@ -277,10 +278,10 @@ abstract class Calendar {
     def apply(number: Int): Day
 
 
-    final def apply(year: Int, month: monthCompanion.Name, day: Int): Day = yearCompanion(year).month(month).day(day)
+    final def apply(year: Int, month: monthCompanion.Name, day: Int): Day = Year(year).month(month).day(day)
 
 
-    final def apply(year: Int, month: Int, day: Int): Day = yearCompanion(year).month(month).day(day)
+    final def apply(year: Int, month: Int, day: Int): Day = Year(year).month(month).day(day)
 
 
     final def numberInWeek(dayNumber: Int): Int = ((dayNumber + firstDayNumberInWeek - 1 - 1) % Calendar.daysPerWeek) + 1
@@ -290,7 +291,7 @@ abstract class Calendar {
   }
 
 
-  protected val dayCompanion: DayCompanion
+  protected val dayCompanion: DayCompanionBase
 
 
 
@@ -368,13 +369,13 @@ abstract class Calendar {
   /**
    *
    */
-  protected abstract class MomentCompanion {
+  protected abstract class MomentCompanionBase {
 
     def apply(days: Int, time: Time): Moment
   }
 
 
-  protected val momentCompanion: MomentCompanion
+  protected val momentCompanion: MomentCompanionBase
 
 
 
@@ -424,7 +425,7 @@ abstract class Calendar {
   /**
    *
    */
-  protected abstract class TimeCompanion {
+  protected abstract class TimeCompanionBase {
 
     def apply(hours: Int, parts: Int): Time
 
@@ -433,7 +434,7 @@ abstract class Calendar {
   }
 
 
-  protected val timeCompanion: TimeCompanion
+  protected val timeCompanion: TimeCompanionBase
 }
 
 

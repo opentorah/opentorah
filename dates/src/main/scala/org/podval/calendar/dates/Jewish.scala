@@ -25,7 +25,6 @@ object Jewish extends Calendar {
   override protected val momentCompanion = Moment
   override protected val dayCompanion = Day
   override protected val monthCompanion = Month
-  override protected val yearCompanion = Year
 
 
   final class Year(number: Int) extends YearBase(number) {
@@ -52,13 +51,13 @@ object Jewish extends Calendar {
     override def lengthInDays: Int = next.firstDay - this.firstDay
 
 
-    def cycle: Int = yearCompanion.cycle(number)
+    def cycle: Int = Year.cycle(number)
 
 
-    def numberInCycle: Int = yearCompanion.numberInCycle(number)
+    def numberInCycle: Int = Year.numberInCycle(number)
 
 
-    override def character: yearCompanion.Character = (isLeap, kind)
+    override def character: Year.Character = (isLeap, kind)
 
 
     // KH 8:7,8
@@ -76,13 +75,7 @@ object Jewish extends Calendar {
 
 
 
-  object Year extends YearCompanion {
-
-    type Character = (Boolean, Year.Kind)
-
-
-    override def apply(number: Int): Year = new Year(number)
-
+  final class YearCompanion extends YearCompanionBase {
 
     sealed trait Kind
     case object Short   extends Kind
@@ -90,11 +83,17 @@ object Jewish extends Calendar {
     case object Full    extends Kind
 
 
-    protected override def characters: Seq[yearCompanion.Character] =
+    type Character = (Boolean, Kind)
+
+
+    override def apply(number: Int): Year = new Year(number)
+
+
+    protected override def characters: Seq[Character] =
       for (isLeap <- Seq(true, false); kind <- Seq(Short, Regular, Full)) yield (isLeap, kind)
 
 
-    protected override def namesAndLengths(character: yearCompanion.Character): List[(Month.Name, Int)] = {
+    protected override def namesAndLengths(character: Character): List[(Month.Name, Int)] = {
       import Month._
 
       character match { case (isLeap: Boolean, kind: Kind) =>
@@ -121,7 +120,7 @@ object Jewish extends Calendar {
     private val adu: Set[Day.Name] = Set(Day.Rishon, Day.Rvii, Day.Shishi)
 
 
-    private def isAdu(dayName: Day.Name) = adu.contains(dayName)
+    def isAdu(dayName: Day.Name) = adu.contains(dayName)
 
 
     protected override def areYearsPositive: Boolean = true
@@ -159,13 +158,16 @@ object Jewish extends Calendar {
 
 
 
+  val Year = new YearCompanion
+
+
   final class Month(number: Int) extends MonthBase(number) {
 
     def newMoon: Moment = Month.FirstNewMoon + Month.MeanLunarPeriod*(number-1)
   }
 
 
-  object Month extends MonthCompanion {
+  object Month extends MonthCompanionBase {
 
     override def apply(number: Int): Month = new Month(number)
 
@@ -198,17 +200,17 @@ object Jewish extends Calendar {
 
 
     override def yearNumber(monthNumber: Int): Int = {
-      val cycleOfMonth = ((monthNumber - 1) / yearCompanion.monthsInCycle) + 1
-      val yearsBeforeCycle = (cycleOfMonth - 1) * yearCompanion.yearsInCycle
-      val yearMonthIsInCycle = yearCompanion.monthsBeforeYearInCycle.count(_ < numberInCycleOfMonth(monthNumber))
+      val cycleOfMonth = ((monthNumber - 1) / Year.monthsInCycle) + 1
+      val yearsBeforeCycle = (cycleOfMonth - 1) * Year.yearsInCycle
+      val yearMonthIsInCycle = Year.monthsBeforeYearInCycle.count(_ < numberInCycleOfMonth(monthNumber))
       yearsBeforeCycle + yearMonthIsInCycle
     }
 
 
-    override def numberInYear(monthNumber: Int): Int = numberInCycleOfMonth(monthNumber) - yearCompanion.firstMonthInCycle(yearNumber(monthNumber)) + 1
+    override def numberInYear(monthNumber: Int): Int = numberInCycleOfMonth(monthNumber) - Year.firstMonthInCycle(yearNumber(monthNumber)) + 1
 
 
-    private def numberInCycleOfMonth(monthNumber: Int): Int = ((monthNumber - 1) % yearCompanion.monthsInCycle) + 1
+    private def numberInCycleOfMonth(monthNumber: Int): Int = ((monthNumber - 1) % Year.monthsInCycle) + 1
   }
 
 
@@ -222,7 +224,7 @@ object Jewish extends Calendar {
 
 
 
-  object Day extends DayCompanion {
+  object Day extends DayCompanionBase {
 
     sealed class Name(name: String) extends Named(name)
 
@@ -247,13 +249,13 @@ object Jewish extends Calendar {
   }
 
 
-  object Moment extends MomentCompanion {
+  object Moment extends MomentCompanionBase {
 
     override def apply(days: Int, time: Time): Moment = new Moment(days, time)
   }
 
 
-  object Time extends TimeCompanion {
+  object Time extends TimeCompanionBase {
 
     override def apply(hours: Int, parts: Int) = new Time(hours, parts)
 
