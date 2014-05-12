@@ -72,7 +72,7 @@ abstract class Calendar {
       month(months.count(_.daysBefore < day))
     }
 
-    final def months: List[monthCompanion.Descriptor] = Year.months(this.character)
+    final def months: List[monthCompanion.Descriptor] = Year.months(character)
   }
 
 
@@ -137,8 +137,7 @@ abstract class Calendar {
   }
 
 
-  // TODO I'd like this to be called "Year", but can't override a val with the object :(
-  protected val Year: YearCompanionBase
+  val Year: YearCompanionBase
 
 
 
@@ -207,7 +206,7 @@ abstract class Calendar {
   }
 
 
-  protected val monthCompanion: MonthCompanionBase
+  val monthCompanion: MonthCompanionBase
 
 
 

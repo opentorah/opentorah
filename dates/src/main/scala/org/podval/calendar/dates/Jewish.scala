@@ -19,9 +19,7 @@ package org.podval.calendar.dates
 
 object Jewish extends Calendar {
 
-  // TODO assignments of the companion objects have to happen early on, but even this is not sufficient!
-  // I found that I need to assign JewishCalendar to a val to trigger its initialization - or I end up with a null for the Year companion object!
-  override protected val monthCompanion = Month
+  // TODO I found that I need to assign JewishCalendar to a val to trigger its initialization - or I end up with a null for the Year companion object!
 
 
   final class Year(number: Int) extends YearBase(number) {
@@ -209,6 +207,9 @@ object Jewish extends Calendar {
 
     private def numberInCycleOfMonth(monthNumber: Int): Int = ((monthNumber - 1) % Year.monthsInCycle) + 1
   }
+
+
+  override val monthCompanion = Month
 
 
   final class Day(number: Int) extends DayBase(number) {
