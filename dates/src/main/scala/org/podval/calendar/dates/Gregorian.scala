@@ -137,7 +137,7 @@ object Gregorian extends Calendar {
   }
 
 
-  object Day extends DayCompanionBase {
+  object Day extends DayCompanion {
 
     sealed class Name(name: String) extends Named(name)
 

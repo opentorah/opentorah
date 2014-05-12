@@ -267,7 +267,7 @@ abstract class Calendar {
   /**
    *
    */
-  protected abstract class DayCompanionBase {
+  protected abstract class DayCompanion {
 
     type Name
 
@@ -291,7 +291,7 @@ abstract class Calendar {
   }
 
 
-  val Day: DayCompanionBase
+  val Day: DayCompanion
 
 
 
