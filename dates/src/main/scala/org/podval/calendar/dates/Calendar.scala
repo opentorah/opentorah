@@ -250,7 +250,7 @@ abstract class Calendar {
     final def name: dayCompanion.Name = dayCompanion.names(numberInWeek - 1)
 
 
-    final def time(time: Time): Moment = momentCompanion(number - 1, time)
+    final def time(time: Time): Moment = Moment(number - 1, time)
 
 
     final def time(hours: Int, parts: Int): Moment = time(Time(hours, parts))
@@ -352,7 +352,7 @@ abstract class Calendar {
     }
 
 
-    protected def create(days: Int, hours: Int, parts: Int): Moment = momentCompanion(days, Time(hours, parts))
+    protected def create(days: Int, hours: Int, parts: Int): Moment = Moment(days, Time(hours, parts))
 
 
     def day: Day = dayCompanion(days + 1)
@@ -375,7 +375,7 @@ abstract class Calendar {
   }
 
 
-  protected val momentCompanion: MomentCompanionBase
+  protected val Moment: MomentCompanionBase
 
 
 
