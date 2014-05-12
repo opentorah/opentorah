@@ -21,7 +21,6 @@ object Jewish extends Calendar {
 
   // TODO assignments of the companion objects have to happen early on, but even this is not sufficient!
   // I found that I need to assign JewishCalendar to a val to trigger its initialization - or I end up with a null for the Year companion object!
-  override protected val dayCompanion = Day
   override protected val monthCompanion = Month
 
 
@@ -235,7 +234,7 @@ object Jewish extends Calendar {
     case object Shabbos  extends Name("Shabbos")
 
 
-    def names: Seq[dayCompanion.Name] = Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi, Shabbos)
+    def names: Seq[Name] = Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi, Shabbos)
 
 
     override def apply(number: Int): Day = new Day(number)

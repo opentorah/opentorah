@@ -165,7 +165,7 @@ abstract class Calendar {
 
     final def day(day: Int): Day = {
       require (0 < day && day <= length)
-      dayCompanion(firstDay + day - 1)
+      Day(firstDay + day - 1)
     }
 
 
@@ -220,16 +220,16 @@ abstract class Calendar {
     require(0 < number)
 
 
-    final def next: Day = dayCompanion(number + 1)
+    final def next: Day = Day(number + 1)
 
 
-    final def prev: Day = dayCompanion(number - 1)
+    final def prev: Day = Day(number - 1)
 
 
-    final def +(change: Int) = dayCompanion(number + change)
+    final def +(change: Int) = Day(number + change)
 
 
-    final def -(change: Int) = dayCompanion(number - change)
+    final def -(change: Int) = Day(number - change)
 
 
     final def year: Year = Year(this)
@@ -244,10 +244,10 @@ abstract class Calendar {
     final def numberInMonth: Int = number - month.firstDay + 1
 
 
-    final def numberInWeek: Int = dayCompanion.numberInWeek(number)
+    final def numberInWeek: Int = Day.numberInWeek(number)
 
 
-    final def name: dayCompanion.Name = dayCompanion.names(numberInWeek - 1)
+    final def name: Day.Name = Day.names(numberInWeek - 1)
 
 
     final def time(time: Time): Moment = Moment(number - 1, time)
@@ -272,7 +272,7 @@ abstract class Calendar {
     type Name
 
 
-    def names: Seq[dayCompanion.Name]
+    def names: Seq[Name]
 
 
     def apply(number: Int): Day
@@ -291,7 +291,7 @@ abstract class Calendar {
   }
 
 
-  protected val dayCompanion: DayCompanionBase
+  val Day: DayCompanionBase
 
 
 
@@ -355,7 +355,7 @@ abstract class Calendar {
     protected def create(days: Int, hours: Int, parts: Int): Moment = Moment(days, Time(hours, parts))
 
 
-    def day: Day = dayCompanion(days + 1)
+    def day: Day = Day(days + 1)
 
 
     override def toString: String = day + " " + time
