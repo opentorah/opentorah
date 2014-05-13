@@ -61,7 +61,7 @@ abstract class Calendar {
 
     final def month(numberInYear: Int): Month = {
       require(0 < numberInYear && numberInYear <= lengthInMonths)
-      monthCompanion(firstMonth + numberInYear - 1)
+      Month(firstMonth + numberInYear - 1)
     }
 
 
@@ -89,7 +89,7 @@ abstract class Calendar {
     def apply(number: Int): Year
 
 
-    final  def apply(month: Month): Year = apply(monthCompanion.yearNumber(month.number))
+    final  def apply(month: Month): Year = apply(Month.yearNumber(month.number))
 
 
     final def apply(day: Day): Year = {
@@ -153,16 +153,16 @@ abstract class Calendar {
     require(0 < number)
 
 
-    final def next: Month = monthCompanion(number + 1)
+    final def next: Month = Month(number + 1)
 
 
-    final def prev: Month = monthCompanion(number - 1)
+    final def prev: Month = Month(number - 1)
 
 
     final def year: Year = Year(this)
 
 
-    final def numberInYear: Int = monthCompanion.numberInYear(number)
+    final def numberInYear: Int = Month.numberInYear(number)
 
 
     final def day(day: Int): Day = {
@@ -209,6 +209,7 @@ abstract class Calendar {
   }
 
 
+  val Month: MonthCompanionBase
   val monthCompanion: MonthCompanionBase
 
 
