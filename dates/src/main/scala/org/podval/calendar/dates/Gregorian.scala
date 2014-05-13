@@ -98,7 +98,7 @@ object Gregorian extends Calendar {
   final class Month(number: Int) extends MonthBase(number)
 
 
-  object Month extends MonthCompanionBase {
+  class MonthCompanion extends MonthCompanionBase {
 
     override def apply(number: Int): Month = new Month(number)
 
@@ -124,6 +124,9 @@ object Gregorian extends Calendar {
 
     override def numberInYear(monthNumber: Int): Int =  monthNumber - Gregorian.Year.firstMonth(yearNumber(monthNumber)) + 1
   }
+
+
+  object Month extends MonthCompanion
 
 
   override val monthCompanion = Month

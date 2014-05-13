@@ -162,7 +162,7 @@ object Jewish extends Calendar {
   }
 
 
-  object Month extends MonthCompanionBase {
+  class MonthCompanion extends MonthCompanionBase {
 
     override def apply(number: Int): Month = new Month(number)
 
@@ -186,12 +186,12 @@ object Jewish extends Calendar {
 
 
     // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3)
-    private val MeanLunarPeriod = Day(30).time(12, 793)
+    val MeanLunarPeriod = Day(30).time(12, 793)
 
 
     // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2):
     // BeHaRaD: 5 hours 204 parts at night of the second day (KH 6:8)
-    private val FirstNewMoon = Day(2).nightTime(5, 204)
+    val FirstNewMoon = Day(2).nightTime(5, 204)
 
 
     override def yearNumber(monthNumber: Int): Int = {
@@ -207,6 +207,9 @@ object Jewish extends Calendar {
 
     private def numberInCycleOfMonth(monthNumber: Int): Int = ((monthNumber - 1) % Year.monthsInCycle) + 1
   }
+
+
+  object Month extends MonthCompanion
 
 
   override val monthCompanion = Month
