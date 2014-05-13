@@ -100,14 +100,14 @@ abstract class Calendar {
     }
 
 
-    val months: Map[Character, List[monthCompanion.Descriptor]] =
+    val months: Map[Year.Character, List[monthCompanion.Descriptor]] =
       Map((for (character <- characters) yield character -> monthsGenerator(character)): _*)
 
 
-    protected def characters: Seq[Character]
+    protected def characters: Seq[Year.Character]
 
 
-    private def monthsGenerator(character: Character): List[monthCompanion.Descriptor] = {
+    private def monthsGenerator(character: Year.Character): List[monthCompanion.Descriptor] = {
       val namesAndLengths = this.namesAndLengths(character)
       val (_, lengths) = namesAndLengths.unzip
       val daysBefore = lengths.scanLeft(0)(_ + _).init
@@ -116,7 +116,7 @@ abstract class Calendar {
 
 
     // TODO rename "months..."
-    protected def namesAndLengths(character: Character): List[(monthCompanion.Name, Int)]
+    protected def namesAndLengths(character: Year.Character): List[(monthCompanion.Name, Int)]
 
 
     protected def areYearsPositive: Boolean

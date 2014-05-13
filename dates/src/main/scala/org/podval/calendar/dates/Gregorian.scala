@@ -46,7 +46,7 @@ object Gregorian extends Calendar {
     protected override def characters: Seq[Year.Character] = Seq(true, false)
 
 
-    protected override def namesAndLengths(isLeap: Boolean): List[(Month.Name, Int)] = {
+    protected override def namesAndLengths(isLeap: Year.Character): List[(Month.Name, Int)] = {
       import Month._
       List(
         (January, 31),

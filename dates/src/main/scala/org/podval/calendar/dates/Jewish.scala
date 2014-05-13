@@ -73,25 +73,25 @@ object Jewish extends Calendar {
   final class YearCompanion extends YearCompanionBase {
 
     sealed trait Kind
-    case object Short   extends Kind
-    case object Regular extends Kind
-    case object Full    extends Kind
+    case object Short   extends Year.Kind
+    case object Regular extends Year.Kind
+    case object Full    extends Year.Kind
 
 
-    type Character = (Boolean, Kind)
+    type Character = (Boolean, Year.Kind)
 
 
     override def apply(number: Int): Year = new Year(number)
 
 
-    protected override def characters: Seq[Character] =
+    protected override def characters: Seq[Year.Character] =
       for (isLeap <- Seq(true, false); kind <- Seq(Short, Regular, Full)) yield (isLeap, kind)
 
 
-    protected override def namesAndLengths(character: Character): List[(Month.Name, Int)] = {
+    protected override def namesAndLengths(character: Year.Character): List[(Month.Name, Int)] = {
       import Month._
 
-      character match { case (isLeap: Boolean, kind: Kind) =>
+      character match { case (isLeap: Boolean, kind: Year.Kind) =>
         List(
           (Tishrei, 30),
           (Marheshvan, if (kind == Full) 30 else 29),
