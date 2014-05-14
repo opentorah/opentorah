@@ -88,25 +88,28 @@ object Jewish extends Calendar {
       for (isLeap <- Seq(true, false); kind <- Seq(Short, Regular, Full)) yield (isLeap, kind)
 
 
-    protected override def namesAndLengths(character: Year.Character): List[(Month.Name, Int)] = {
+    protected override def namesAndLengths(character: Year.Character): List[MonthNameAndLength] = {
       import Month._
 
       character match { case (isLeap: Boolean, kind: Year.Kind) =>
         List(
-          (Tishrei, 30),
-          (Marheshvan, if (kind == Full) 30 else 29),
-          (Kislev, if (kind == Short) 29 else 30),
-          (Teves, 29),
-          (Shvat, 30)
+          MonthNameAndLength(Tishrei, 30),
+          MonthNameAndLength(Marheshvan, if (kind == Full) 30 else 29),
+          MonthNameAndLength(Kislev, if (kind == Short) 29 else 30),
+          MonthNameAndLength(Teves, 29),
+          MonthNameAndLength(Shvat, 30)
         ) ++
-        (if (!isLeap) List((Adar, 29)) else List((AdarI, 30), (AdarII, 30))) ++
+        (if (!isLeap)
+          List(MonthNameAndLength(Adar, 29))
+        else
+          List(MonthNameAndLength(AdarI, 30), MonthNameAndLength(AdarII, 30))) ++
         List(
-          (Nisan, 30),
-          (Iyar, 29),
-          (Sivan, 30),
-          (Tammuz, 29),
-          (Av, 30),
-          (Elul, 29)
+          MonthNameAndLength(Nisan, 30),
+          MonthNameAndLength(Iyar, 29),
+          MonthNameAndLength(Sivan, 30),
+          MonthNameAndLength(Tammuz, 29),
+          MonthNameAndLength(Av, 30),
+          MonthNameAndLength(Elul, 29)
         )
       }
     }

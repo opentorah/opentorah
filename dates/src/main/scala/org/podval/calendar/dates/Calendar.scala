@@ -109,14 +109,15 @@ abstract class Calendar {
 
     private def monthsGenerator(character: Year.Character): List[MonthDescriptor] = {
       val namesAndLengths = this.namesAndLengths(character)
-      val (_, lengths) = namesAndLengths.unzip
-      val daysBefore = lengths.scanLeft(0)(_ + _).init
-      (namesAndLengths zip daysBefore) map (m => new MonthDescriptor(m._1._1, m._1._2, m._2))
+      val daysBefore = namesAndLengths.map(_.length).scanLeft(0)(_ + _).init
+      namesAndLengths zip daysBefore map { case (nameAndLength, daysBefore) =>
+        new MonthDescriptor(nameAndLength.name, nameAndLength.length, daysBefore)
+      }
     }
 
 
     // TODO rename "months..."
-    protected def namesAndLengths(character: Year.Character): List[(monthCompanion.Name, Int)]
+    protected def namesAndLengths(character: Year.Character): List[MonthNameAndLength]
 
 
     protected def areYearsPositive: Boolean
@@ -207,8 +208,8 @@ abstract class Calendar {
 
 
   // TODO shove it back into the Month somehow?
-  final class MonthNameAndLength(val name: monthCompanion.Name, val length: Int)
-  final class MonthDescriptor   (val name: monthCompanion.Name, val length: Int, val daysBefore: Int)
+  final case class MonthNameAndLength(name: monthCompanion.Name, length: Int)
+  final      class MonthDescriptor   (val name: monthCompanion.Name, val length: Int, val daysBefore: Int)
 
 
   val Month: MonthCompanionBase
