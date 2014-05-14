@@ -215,8 +215,6 @@ object Jewish extends Calendar {
   object Month extends MonthCompanion
 
 
-  override val monthCompanion = Month
-
 
   final class Day(number: Int) extends DayBase(number) {
 

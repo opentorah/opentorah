@@ -65,7 +65,7 @@ abstract class Calendar {
     }
 
 
-    final def month(name: monthCompanion.Name): Month = month(months.indexWhere(_.name == name) + 1)
+    final def month(name: Month.Name): Month = month(months.indexWhere(_.name == name) + 1)
 
 
     final def monthForDay(day: Int) = {
@@ -175,7 +175,7 @@ abstract class Calendar {
     final def firstDay: Int = year.firstDay + descriptor.daysBefore
 
 
-    final def name: monthCompanion.Name = descriptor.name
+    final def name: Month.Name = descriptor.name
 
 
     final def length: Int = descriptor.length
@@ -208,12 +208,11 @@ abstract class Calendar {
 
 
   // TODO shove it back into the Month somehow?
-  final case class MonthNameAndLength(name: monthCompanion.Name, length: Int)
-  final      class MonthDescriptor   (val name: monthCompanion.Name, val length: Int, val daysBefore: Int)
+  final case class MonthNameAndLength(name: Month.Name, length: Int)
+  final      class MonthDescriptor   (val name: Month.Name, val length: Int, val daysBefore: Int)
 
 
   val Month: MonthCompanionBase
-  val monthCompanion: MonthCompanionBase
 
 
 
@@ -284,7 +283,7 @@ abstract class Calendar {
     def apply(number: Int): Day
 
 
-    final def apply(year: Int, month: monthCompanion.Name, day: Int): Day = Year(year).month(month).day(day)
+    final def apply(year: Int, month: Month.Name, day: Int): Day = Year(year).month(month).day(day)
 
 
     final def apply(year: Int, month: Int, day: Int): Day = Year(year).month(month).day(day)
