@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Podval Group.
+ * Copyright 2011-2014 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,30 @@
 
 package org.podval.calendar.dates
 
+import Jewish._
 
-final class Seasons {
+
+object Seasons {
   // TODO Where and when was the Sun created? Does this jibe with Rambam's epoch?
   // TODO Which day of the week (+1/-1) was the Giving of the Law? (Sema)
   // TODO Rambam's epoch - two days after molad?! (Petya Ofman)
+
   // KH 9:3
-//    public final long FIRST_TKUFAS_NISSAN = molad(1, JewishMonth.Nissan) - partsFromDate(7, 9, 642);
-//    public static final long YEAR_OF_SHMUEL = JewishCalendar.partsFromDate(365, 6, 0);
-//    public static final long YEAR_OF_RAV_ADA = JewishCalendar.MONTHS_IN_CYCLE*JewishCalendar.LUNAR_MONTH/19;
-//
-//    public static JewishDate birkasHachama(final int cycle) {
-//        // Since Birkas HaChama is said in the morning, we add 12 hours to the time of the equinox
-//        return JewishCalendar.getInstance().dateFromParts(firstTkufasNissan() + 28*cycle*YEAR_OF_SHMUEL + 12*JewishCalendar.PARTS_IN_HOUR);
-//    }
-//
-//
-//    public static JewishDate tkufasNissan(final int year) {
-//        return JewishCalendar.getInstance(). dateFromParts(firstTkufasNissan() + (year-1)*YEAR_OF_RAV_ADA);
-//    }
+
+  // TODO add convenience methods to clean this up
+
+  val FirstTkufasNissanInParts: Int = (Year(1).month(Month.Nisan).newMoon - Moment(0, Time(7, 9, 642))).asParts
+
+
+  val YearOfShmuelInParts: Int = Moment(365, Time(6, 0)).asParts
+
+
+  val YearOfRavAdaInParts = Year.monthsInCycle*Month.MeanLunarPeriodInParts/19;
+
+
+  // Since Birkas HaChama is said in the morning, we add 12 hours to the time of the equinox
+//  def birkasHachama(cycle: Int) = Moment(0, 12, FirstTkufasNissanInParts + 28*cycle*YearOfShmuelInParts)
+
+
+//  def tkufasNissan(year: Int) = Moment(0, 0, FirstTkufasNissanInParts + (year-1)*YearOfRavAdaInParts)
 }

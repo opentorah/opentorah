@@ -186,6 +186,7 @@ object Jewish extends Calendar {
 
     // Mean lunar period: 29 days 12 hours 793 parts (KH 6:3)
     val MeanLunarPeriod = Day(30).time(12, 793)
+    val MeanLunarPeriodInParts: Int = MeanLunarPeriod.asParts
 
 
     // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2):

@@ -339,6 +339,9 @@ abstract class Calendar {
     }
 
 
+    def asParts = days * Calendar.partsPerDay + time.asParts
+
+
     def +(other: Moment) = normalize(
       days + other.days,
       time.hours + other.time.hours,
@@ -482,6 +485,8 @@ object Calendar {
 
     val partsPerMinute = partsPerHour / minutesPerHour
 
+
+    val partsPerDay = hoursPerDay * partsPerHour
 
     val daysPerWeek: Int = 7
 }

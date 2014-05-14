@@ -102,12 +102,7 @@
                         <args>
                             <arg>-unchecked</arg>
                             <arg>-deprecation</arg>
-                            <!-- TODO
-                            Disabled because of
-                            https://issues.scala-lang.org/browse/SI-6123
-                            pending a fix
                             <arg>-explaintypes</arg>
-                            -->
                             <arg>-feature</arg>
                         </args>
                     </configuration>
