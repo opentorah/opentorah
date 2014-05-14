@@ -165,7 +165,7 @@ object Jewish extends Calendar {
   }
 
 
-  class MonthCompanion extends MonthCompanionBase {
+  object Month extends MonthCompanionBase {
 
     override def apply(number: Int): Month = new Month(number)
 
@@ -210,9 +210,6 @@ object Jewish extends Calendar {
 
     private def numberInCycleOfMonth(monthNumber: Int): Int = ((monthNumber - 1) % Year.monthsInCycle) + 1
   }
-
-
-  object Month extends MonthCompanion
 
 
 
