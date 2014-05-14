@@ -24,9 +24,6 @@ import org.scalatest.FlatSpec
 @RunWith(classOf[JUnitRunner])
 final class YearTest extends FlatSpec {
 
-  val x = Jewish // TODO without this, I get NullPointerException :(
-
-
   private val years = (1 to 6000) map (Jewish.Year(_))
 
 

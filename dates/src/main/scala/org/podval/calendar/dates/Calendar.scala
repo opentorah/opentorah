@@ -17,6 +17,27 @@
 package org.podval.calendar.dates
 
 
+/* TODO
+  There are things that I do not yet understand about Scala's approach to family polymorphism.
+
+  o Is this a "cake"?
+  o Is there any way to regain the ability to split the code into files?
+
+  o When I put MonthDescriptor inside Mont companion, types do not match; when it is outside, they do, although it
+    references a type from the companion (Month.Name).
+
+  o In derived Calendars, many companion vals are overridden by objects, but "override object" is not legal Scala.
+
+  o If Year is done as class and an instance assigned to the overridden val, it works; if it is done as an
+    override object, I get compiler errors:
+
+        overriding method character in class YearBase of type => org.podval.calendar.dates.Jewish.Year.Character;
+        method character has incompatible type
+          override def character: Year.Character = (isLeap, kind)
+
+  o Derived Calendars are objects, but unless I do things like val x = Jewish, I used to get initialization errors!
+    Which now went away for some reason! Maybe, because I took MonthDescriptor out of the Month companion!
+ */
 abstract class Calendar {
 
   type Year <: YearBase
@@ -93,7 +114,7 @@ abstract class Calendar {
 
 
     final def apply(day: Day): Year = {
-      var result = apply(yearForSureBefore(day.number))
+      var result = apply(yearsForSureBefore(day.number))
       require(result.firstDay <= day.number)
       while (result.next.firstDay <= day.number) result = result.next
       result
@@ -108,7 +129,7 @@ abstract class Calendar {
 
 
     private def monthsGenerator(character: Year.Character): List[MonthDescriptor] = {
-      val namesAndLengths = this.namesAndLengths(character)
+      val namesAndLengths = this.monthNamesAndLengths(character)
       val daysBefore = namesAndLengths.map(_.length).scanLeft(0)(_ + _).init
       namesAndLengths zip daysBefore map { case (nameAndLength, daysBefore) =>
         new MonthDescriptor(nameAndLength.name, nameAndLength.length, daysBefore)
@@ -116,16 +137,13 @@ abstract class Calendar {
     }
 
 
-    // TODO rename "months..."
-    protected def namesAndLengths(character: Year.Character): List[MonthNameAndLength]
+    protected def monthNamesAndLengths(character: Year.Character): List[MonthNameAndLength]
 
 
     protected def areYearsPositive: Boolean
 
 
-    // TODO give names to constants
-    // TODO rename "years..."; review the calculations
-    final def yearForSureBefore(dayNumber: Int): Int =  {
+    final def yearsForSureBefore(dayNumber: Int): Int =  {
       val result = (4 * dayNumber / (4 * 365 + 1)) - 1
       if (areYearsPositive) scala.math.max(1, result) else result
     }
@@ -189,7 +207,7 @@ abstract class Calendar {
   /**
    *
    */
-  protected abstract class MonthCompanionBase {
+  protected abstract class MonthCompanion {
 
     type Name
 
@@ -207,12 +225,11 @@ abstract class Calendar {
   }
 
 
-  // TODO shove it back into the Month somehow?
   final case class MonthNameAndLength(name: Month.Name, length: Int)
   final      class MonthDescriptor   (val name: Month.Name, val length: Int, val daysBefore: Int)
 
 
-  val Month: MonthCompanionBase
+  val Month: MonthCompanion
 
 
 
@@ -396,7 +413,7 @@ abstract class Calendar {
 
 
     override def equals(other: Any): Boolean = other match {
-      case that: Time => this.allParts == that.allParts
+      case that: Time => this.asParts == that.asParts
       case _ => false
     }
 
@@ -404,13 +421,13 @@ abstract class Calendar {
     override def hashCode = 41 * hours + parts
 
 
-    override def compare(that: Time) = this.allParts - that.allParts
+    override def compare(that: Time) = this.asParts - that.asParts
 
 
     def isZero = (hours == 0) && (parts == 0)
 
 
-    def allParts /* TODO toParts? asParts? */ = hours * Calendar.partsPerHour + parts
+    def asParts = hours * Calendar.partsPerHour + parts
 
 
     def minutes: Int = parts / Calendar.partsPerMinute

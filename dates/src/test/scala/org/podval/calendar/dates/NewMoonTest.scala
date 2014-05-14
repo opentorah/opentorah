@@ -28,10 +28,6 @@ import Jewish.Day._
 @RunWith(classOf[JUnitRunner])
 final class NewMoonTest extends FlatSpec {
 
-  val x = Jewish
-  val y = Gregorian
-
-
   "new moons from the printed tables" should "calculate correctly" in {
     // see http://www.owen0001.host-ed.me/cal/moladot.php
 

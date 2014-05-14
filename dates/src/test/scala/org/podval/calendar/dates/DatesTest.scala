@@ -28,8 +28,6 @@ import Month._
 final class DatesTest extends FlatSpec {
 
   "known dates" should "have correct day of the week" in {
-    val x = Jewish // TODO without this, I get ExceptionInInitializerError :(
-
     assertResult(Day.Sheni)(Day(5772, Marheshvan, 24).name)
   }
 

@@ -19,9 +19,6 @@ package org.podval.calendar.dates
 
 object Gregorian extends Calendar {
 
-  // TODO I found that I need to assign JewishCalendar to a val to trigger its initialization - or I end up with a null for the Year companion object!
-
-
   final class Year(number: Int) extends YearBase(number) {
 
     override def firstDay: Int = Year.firstDay(number)
@@ -46,29 +43,27 @@ object Gregorian extends Calendar {
     protected override def characters: Seq[Year.Character] = Seq(true, false)
 
 
-    protected override def namesAndLengths(isLeap: Year.Character): List[MonthNameAndLength] = {
+    protected override def monthNamesAndLengths(isLeap: Year.Character): List[MonthNameAndLength] = {
       import Month._
       List(
-        MonthNameAndLength(January, 31),
-        MonthNameAndLength(February, if (isLeap) 29 else 28),
-        MonthNameAndLength(March, 31),
-        MonthNameAndLength(April, 30),
-        MonthNameAndLength(May, 31),
-        MonthNameAndLength(June, 30),
-        MonthNameAndLength(July, 31),
-        MonthNameAndLength(August, 31),
+        MonthNameAndLength(January  , 31),
+        MonthNameAndLength(February , if (isLeap) 29 else 28),
+        MonthNameAndLength(March    , 31),
+        MonthNameAndLength(April    , 30),
+        MonthNameAndLength(May      , 31),
+        MonthNameAndLength(June     , 30),
+        MonthNameAndLength(July     , 31),
+        MonthNameAndLength(August   , 31),
         MonthNameAndLength(September, 30),
-        MonthNameAndLength(October, 31),
-        MonthNameAndLength(November, 30),
-        MonthNameAndLength(December, 31)
+        MonthNameAndLength(October  , 31),
+        MonthNameAndLength(November , 30),
+        MonthNameAndLength(December , 31)
       )
     }
 
 
     protected override def areYearsPositive: Boolean = false
 
-
-    // TODO give names to constants?
 
     override def isLeap(yearNumber: Int): Boolean = (yearNumber % 4 == 0) && ((yearNumber % 100 != 0) || (yearNumber % 400 == 0))
 
@@ -98,7 +93,7 @@ object Gregorian extends Calendar {
   final class Month(number: Int) extends MonthBase(number)
 
 
-  object Month extends MonthCompanionBase {
+  object Month extends MonthCompanion {
 
     override def apply(number: Int): Month = new Month(number)
 

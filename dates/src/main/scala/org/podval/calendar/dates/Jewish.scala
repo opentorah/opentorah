@@ -19,15 +19,11 @@ package org.podval.calendar.dates
 
 object Jewish extends Calendar {
 
-  // TODO I found that I need to assign JewishCalendar to a val to trigger its initialization - or I end up with a null for the Year companion object!
-
-
   final class Year(number: Int) extends YearBase(number) {
 
     require(0 < number)
 
 
-    // TODO give names to constants
     override def firstDay: Int = {
       val newMoon = month(1).newMoon
       val day = newMoon.day
@@ -88,7 +84,7 @@ object Jewish extends Calendar {
       for (isLeap <- Seq(true, false); kind <- Seq(Short, Regular, Full)) yield (isLeap, kind)
 
 
-    protected override def namesAndLengths(character: Year.Character): List[MonthNameAndLength] = {
+    protected override def monthNamesAndLengths(character: Year.Character): List[MonthNameAndLength] = {
       import Month._
 
       character match { case (isLeap: Boolean, kind: Year.Kind) =>
@@ -165,7 +161,7 @@ object Jewish extends Calendar {
   }
 
 
-  object Month extends MonthCompanionBase {
+  object Month extends MonthCompanion {
 
     override def apply(number: Int): Month = new Month(number)
 
