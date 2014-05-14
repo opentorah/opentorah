@@ -207,7 +207,8 @@ abstract class Calendar {
 
 
   // TODO shove it back into the Month somehow?
-  final class MonthDescriptor(val name: monthCompanion.Name, val length: Int, val daysBefore: Int)
+  final class MonthNameAndLength(val name: monthCompanion.Name, val length: Int)
+  final class MonthDescriptor   (val name: monthCompanion.Name, val length: Int, val daysBefore: Int)
 
 
   val Month: MonthCompanionBase
