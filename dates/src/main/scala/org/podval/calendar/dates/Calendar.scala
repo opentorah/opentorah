@@ -73,7 +73,7 @@ abstract class Calendar {
       month(months.count(_.daysBefore < day))
     }
 
-    final def months: List[monthCompanion.Descriptor] = Year.months(character)
+    final def months: List[MonthDescriptor] = Year.months(character)
   }
 
 
@@ -100,18 +100,18 @@ abstract class Calendar {
     }
 
 
-    val months: Map[Year.Character, List[monthCompanion.Descriptor]] =
+    val months: Map[Year.Character, List[MonthDescriptor]] =
       Map((for (character <- characters) yield character -> monthsGenerator(character)): _*)
 
 
     protected def characters: Seq[Year.Character]
 
 
-    private def monthsGenerator(character: Year.Character): List[monthCompanion.Descriptor] = {
+    private def monthsGenerator(character: Year.Character): List[MonthDescriptor] = {
       val namesAndLengths = this.namesAndLengths(character)
       val (_, lengths) = namesAndLengths.unzip
       val daysBefore = lengths.scanLeft(0)(_ + _).init
-      (namesAndLengths zip daysBefore) map (m => new monthCompanion.Descriptor(m._1._1, m._1._2, m._2))
+      (namesAndLengths zip daysBefore) map (m => new MonthDescriptor(m._1._1, m._1._2, m._2))
     }
 
 
@@ -193,9 +193,6 @@ abstract class Calendar {
     type Name
 
 
-    final class Descriptor(val name: Name, val length: Int, val daysBefore: Int)
-
-
     def apply(number: Int): Month
 
 
@@ -207,6 +204,10 @@ abstract class Calendar {
 
     def numberInYear(monthNumber: Int): Int
   }
+
+
+  // TODO shove it back into the Month somehow?
+  final class MonthDescriptor(val name: monthCompanion.Name, val length: Int, val daysBefore: Int)
 
 
   val Month: MonthCompanionBase
