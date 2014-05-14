@@ -128,8 +128,8 @@ abstract class Calendar {
     protected def characters: Seq[Year.Character]
 
 
-    private def monthsGenerator(character: Year.Character): List[MonthDescriptor] = {
-      val namesAndLengths = this.monthNamesAndLengths(character)
+    private[this] def monthsGenerator(character: Year.Character): List[MonthDescriptor] = {
+      val namesAndLengths = monthNamesAndLengths(character)
       val daysBefore = namesAndLengths.map(_.length).scanLeft(0)(_ + _).init
       namesAndLengths zip daysBefore map { case (nameAndLength, daysBefore) =>
         new MonthDescriptor(nameAndLength.name, nameAndLength.length, daysBefore)
@@ -143,7 +143,7 @@ abstract class Calendar {
     protected def areYearsPositive: Boolean
 
 
-    final def yearsForSureBefore(dayNumber: Int): Int =  {
+    private[this] final def yearsForSureBefore(dayNumber: Int): Int =  {
       val result = (4 * dayNumber / (4 * 365 + 1)) - 1
       if (areYearsPositive) scala.math.max(1, result) else result
     }
@@ -225,7 +225,10 @@ abstract class Calendar {
   }
 
 
+
   final case class MonthNameAndLength(name: Month.Name, length: Int)
+
+
   final      class MonthDescriptor   (val name: Month.Name, val length: Int, val daysBefore: Int)
 
 
@@ -272,12 +275,10 @@ abstract class Calendar {
     final def name: Day.Name = Day.names(numberInWeek - 1)
 
 
-    final def time(time: Time): Moment = Moment(number - 1, time)
+    final def time(time: Time): Moment = Moment(number - 1, time)  // TODO make intervals and this -1 more intuitive!
 
 
-    final def time(hours: Int, parts: Int): Moment = time(Time(hours, parts))
-
-
+    // TODO replace with more obvious .hours().parts()
     final def time(hours: Int, minutes: Int, parts: Int): Moment = time(Time(hours, minutes, parts))
 
 
@@ -342,42 +343,28 @@ abstract class Calendar {
     def asParts = days * Calendar.partsPerDay + time.asParts
 
 
-    def +(other: Moment) = normalize(
+    def +(other: Moment) = Moment(
       days + other.days,
       time.hours + other.time.hours,
       time.parts + other.time.parts
     )
 
 
-    def -(other: Moment) = normalize(
+    def -(other: Moment) = Moment(
       days - other.days,
       time.hours - other.time.hours,
       time.parts - other.time.parts
     )
 
 
-    def *(n: Int): Moment = normalize(
+    def *(n: Int): Moment = Moment(
       days * n,
       time.hours * n,
       time.parts * n
     )
 
 
-    private[this] def normalize(days: Int, hours: Int, parts: Int): Moment = {
-      require(0 <= days)
-      require(0 <= hours)
-      require(0 <= parts)
-
-      val hours_ = hours + parts / Calendar.partsPerHour
-      val daysN = days + hours_ / Calendar.hoursPerDay
-      val hoursN = hours_ % Calendar.hoursPerDay
-      val partsN = parts % Calendar.partsPerHour
-
-      create(daysN, hoursN, partsN)
-    }
-
-
-    protected def create(days: Int, hours: Int, parts: Int): Moment = Moment(days, Time(hours, parts))
+    def /(n: Int): Moment = Moment(0, 0, asParts / n)
 
 
     def day: Day = Day(days + 1)
@@ -397,6 +384,29 @@ abstract class Calendar {
   protected abstract class MomentCompanion {
 
     def apply(days: Int, time: Time): Moment
+
+
+    def apply(day: Day, hours: Int, minutes: Int, parts: Int): Moment = Moment(day.number - 1, hours, minutes, parts)
+
+
+    def apply(day: Day, hours: Int, parts: Int): Moment = Moment(day.number - 1, hours, parts)
+
+
+    def apply(days: Int, hours: Int, minutes: Int, parts: Int): Moment = Moment(days, hours, minutes * Calendar.partsPerMinute + parts)
+
+
+    def apply(days: Int, hours: Int = 0, parts: Int = 0): Moment = {
+      require(0 <= days)
+      require(0 <= hours)
+      require(0 <= parts)
+
+      val hours_ = hours + parts / Calendar.partsPerHour
+      val daysN = days + hours_ / Calendar.hoursPerDay
+      val hoursN = hours_ % Calendar.hoursPerDay
+      val partsN = parts % Calendar.partsPerHour
+
+      Moment(daysN, Time(hoursN, partsN))
+    }
   }
 
 
@@ -409,6 +419,7 @@ abstract class Calendar {
    * @param hours  till this Time
    * @param parts  of the hour till this Time
    */
+  // TODO dissolve?
   final class Time(val hours: Int, val parts: Int) extends Ordered[Time] {
 
     require(0 <= hours && hours < Calendar.hoursPerDay)
@@ -455,7 +466,7 @@ abstract class Calendar {
     def apply(hours: Int, parts: Int): Time
 
 
-    final def apply(hours: Int, minutes: Int, parts: Int): Time = apply(hours, minutes * Calendar.partsPerMinute + parts)
+    final def apply(hours: Int, minutes: Int, parts: Int): Time = Time(hours, minutes * Calendar.partsPerMinute + parts)
   }
 
 

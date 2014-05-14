@@ -35,7 +35,7 @@ object Conversions {
         (moment.day.next, hours - jewishDayStartHours) else
         (moment.day     , hours + gregorianDayStartHours)
 
-    toJewish(newDay).time(newHours, moment.time.parts)
+    Jewish.Moment(toJewish(newDay), newHours, moment.time.parts)
   }
 
 
@@ -47,7 +47,7 @@ object Conversions {
         (moment.day.prev, hours + jewishDayStartHours) else
         (moment.day     , hours - gregorianDayStartHours)
 
-    fromJewish(newDay).time(newHours, moment.time.parts)
+    Gregorian.Moment(fromJewish(newDay), newHours, moment.time.parts)
   }
 
 
