@@ -59,10 +59,12 @@ final class NewMoonTest extends FlatSpec {
     val molad = Jewish.Year(moladYear).month(moladMonth).newMoon
 
     assertResult(dayOfWeek)(molad.day.name)
-
-    assertResult(dayJ)(Conversions.toJewish(dateG).day)
     assertResult(dayJ)(molad.day)
 
-    assertResult(dateG)(Conversions.fromJewish(molad))
+    val dateJ = Conversions.toJewish(dateG)
+    assertResult(dayJ)(dateJ.day)
+
+    val moladG = Conversions.fromJewish(molad)
+    assertResult(dateG)(moladG)
   }
 }

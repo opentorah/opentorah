@@ -28,26 +28,28 @@ object Conversions {
 
 
   def toJewish(moment: Gregorian.Moment): Jewish.Moment = {
-    val hours = moment.time.hours
+    val hours = moment.hours
 
     val (newDay, newHours) =
       if (hours >= jewishDayStartHours)
         (moment.day.next, hours - jewishDayStartHours) else
         (moment.day     , hours + gregorianDayStartHours)
 
-    Jewish.Moment(toJewish(newDay), newHours, moment.time.parts)
+    // TODO clean up
+    Jewish.Moment(toJewish(newDay), newHours, moment.minutes, moment.parts)
   }
 
 
   def fromJewish(moment: Jewish.Moment): Gregorian.Moment = {
-    val hours = moment.time.hours
+    val hours = moment.hours
 
     val (newDay, newHours) =
       if (hours < gregorianDayStartHours)
         (moment.day.prev, hours + jewishDayStartHours) else
         (moment.day     , hours - gregorianDayStartHours)
 
-    Gregorian.Moment(fromJewish(newDay), newHours, moment.time.parts)
+    // TODO clean up
+    Gregorian.Moment(fromJewish(newDay), newHours, moment.minutes, moment.parts)
   }
 
 

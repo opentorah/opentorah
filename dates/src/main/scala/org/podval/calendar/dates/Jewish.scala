@@ -24,17 +24,18 @@ object Jewish extends Calendar {
     require(0 < number)
 
 
+    // TODO name the constants and externalize the checks
     override def firstDay: Int = {
       val newMoon = month(1).newMoon
       val day = newMoon.day
       val time = newMoon.time
 
       if (Year.isAdu(day.name)) day.next // KH 7:1
-      else if (time >= Time(18, 0)) {
+      else if (time >= Moment(hours = 18, parts = 0)) {
         if (!Year.isAdu(day.next.name)) day.next /* KH 7:2 */ else day.next.next /* KH 7:3 */
       }
-      else if ((day.name == Day.Shlishi) && time >= Time( 9, 204) && !this     .isLeap) day.next.next /* KH 7:4 */
-      else if ((day.name == Day.Sheni  ) && time >= Time(15, 589) &&  this.prev.isLeap) day.next /* KH 7:5 */
+      else if ((day.name == Day.Shlishi) && time >= Moment(hours =  9, parts = 204) && !this     .isLeap) day.next.next /* KH 7:4 */
+      else if ((day.name == Day.Sheni  ) && time >= Moment(hours = 15, parts = 589) &&  this.prev.isLeap) day.next /* KH 7:5 */
       else day
     }.number
 
@@ -185,7 +186,7 @@ object Jewish extends Calendar {
 
 
     // KH 6:3
-    val MeanLunarPeriod = Moment(29, 12, 793)
+    val MeanLunarPeriod = Moment(29, 12, 0, 793)
 
 
     // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2):
@@ -211,10 +212,18 @@ object Jewish extends Calendar {
 
   final class Day(number: Int) extends DayBase(number) {
 
-    def nightTime(hours: Int, parts: Int): Moment = time(Time.nightTime(hours, parts))
+    def nightTime(hours: Int, parts: Int): Moment = {
+      require(hours < Calendar.hoursPerHalfDay)
+      // TODO add minutes parameter; enforce limits (in the callee)
+      time(hours, 0, parts)
+    }
 
 
-    def dayTime(hours: Int, parts: Int): Moment = time(Time.dayTime(hours, parts))
+    def dayTime(hours: Int, parts: Int): Moment = {
+      require(hours < Calendar.hoursPerHalfDay)
+      // TODO add minutes parameter; enforce limits (in the callee)
+      time(hours + Calendar.hoursPerHalfDay, 0, parts)
+    }
   }
 
 
@@ -246,24 +255,6 @@ object Jewish extends Calendar {
 
   object Moment extends MomentCompanion {
 
-    override def apply(days: Int, time: Time): Moment = new Moment(days, time)
-  }
-
-
-  object Time extends TimeCompanion {
-
-    override def apply(hours: Int, parts: Int) = new Time(hours, parts)
-
-
-    def nightTime(hours: Int, parts: Int) = {
-      require(hours < Calendar.hoursPerHalfDay)
-      Time(hours, parts)
-    }
-
-
-    def dayTime(hours: Int, parts: Int) = {
-      require(hours < Calendar.hoursPerHalfDay)
-      Time(hours + Calendar.hoursPerHalfDay, parts)
-    }
+    override def apply(inParts: Long): Moment = new Moment(inParts)
   }
 }

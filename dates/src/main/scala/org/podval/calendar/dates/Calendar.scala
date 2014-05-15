@@ -275,11 +275,7 @@ abstract class Calendar {
     final def name: Day.Name = Day.names(numberInWeek - 1)
 
 
-    final def time(time: Time): Moment = Moment(number - 1, time)  // TODO make intervals and this -1 more intuitive!
-
-
-    // TODO replace with more obvious .hours().parts()
-    final def time(hours: Int, minutes: Int, parts: Int): Moment = time(Time(hours, minutes, parts))
+    final def time(hours: Int = 0, minutes: Int = 0, parts: Int = 0): Moment = Moment(this, hours, minutes, parts)
 
 
     final def toFullString: String = year + " " + month.name + " " + numberInMonth
@@ -317,63 +313,52 @@ abstract class Calendar {
   val Day: DayCompanion
 
 
-
   /**
    *
-   * @param days  till this Moment
-   * @param time  of the day
+   * @param inParts
    */
-  final class Moment(val days: Int, val time: Time) extends Ordered[Moment] {
+  final class Moment(val inParts: Long) extends Ordered[Moment] {
+
+    def days: Int = (inParts / Calendar.partsPerDay).toInt
+    def hours: Int = ((inParts % Calendar.partsPerDay) / Calendar.partsPerHour).toInt
+    def minutes: Int = ((inParts % Calendar.partsPerHour) / Calendar.partsPerMinute).toInt
+    def parts: Int = (inParts % Calendar.partsPerMinute).toInt
+    def partsWithMinutes: Int = (inParts % Calendar.partsPerHour).toInt // TODO clean up parts, inParts, partsWithMinutes...
+
+    def time: Moment = Moment(inParts % Calendar.partsPerDay)
+
 
     override def equals(other: Any): Boolean = other match {
-      case that: Moment => (days == that.days) && (time == that.time)
+      case that: Moment => (inParts == that.inParts)
       case _ => false
     }
 
 
-    override def hashCode = 41 * days.hashCode + time.hashCode
+    override def hashCode = 41 * inParts.hashCode
 
 
-    override def compare(that: Moment) = {
-      val result = this.days.compare(that.days)
-      if (result == 0) this.time.compare(that.time) else result
-    }
+    override def compare(that: Moment) = this.inParts.compare(that.inParts)
 
 
-    def asParts = days * Calendar.partsPerDay + time.asParts
+    def +(other: Moment) = Moment(inParts + other.inParts)
 
 
-    def +(other: Moment) = Moment(
-      days + other.days,
-      time.hours + other.time.hours,
-      time.parts + other.time.parts
-    )
+    def -(other: Moment) = Moment(inParts - other.inParts)
 
 
-    def -(other: Moment) = Moment(
-      days - other.days,
-      time.hours - other.time.hours,
-      time.parts - other.time.parts
-    )
+    def *(n: Int): Moment = Moment(inParts * n)
 
 
-    def *(n: Int): Moment = Moment(
-      days * n,
-      time.hours * n,
-      time.parts * n
-    )
-
-
-    def /(n: Int): Moment = Moment(0, 0, asParts / n)
+    def /(n: Int): Moment = Moment(inParts / n)
 
 
     def day: Day = Day(days + 1)
 
 
-    override def toString: String = day + " " + time
+    override def toString: String = days + ":" + hours + ":" + minutes + ":" + parts
 
 
-    def toFullString: String = day.toFullString + " " + time.toFullString
+    // TODO  def toFullString: String = day.toFullString + " " + time.toFullString
   }
 
 
@@ -383,94 +368,31 @@ abstract class Calendar {
    */
   protected abstract class MomentCompanion {
 
-    def apply(days: Int, time: Time): Moment
+    def apply(inParts: Long): Moment
 
 
-    def apply(day: Day, hours: Int, minutes: Int, parts: Int): Moment = Moment(day.number - 1, hours, minutes, parts)
+    // TODO why can't I have default parameters here also?
+    def apply(day: Day, hours: Int, minutes: Int, parts: Int): Moment =
+      Moment(day.number - 1, hours, minutes, parts)
 
 
-    def apply(day: Day, hours: Int, parts: Int): Moment = Moment(day.number - 1, hours, parts)
+    def apply(days: Int = 0, hours: Int = 0, minutes: Int = 0, parts: Int = 0): Moment = {
+      require(days >= 0)
+      require(hours >= 0)
+      require(minutes >= 0)
+      require(parts >= 0)
 
-
-    def apply(days: Int, hours: Int, minutes: Int, parts: Int): Moment = Moment(days, hours, minutes * Calendar.partsPerMinute + parts)
-
-
-    def apply(days: Int, hours: Int = 0, parts: Int = 0): Moment = {
-      require(0 <= days)
-      require(0 <= hours)
-      require(0 <= parts)
-
-      val hours_ = hours + parts / Calendar.partsPerHour
-      val daysN = days + hours_ / Calendar.hoursPerDay
-      val hoursN = hours_ % Calendar.hoursPerDay
-      val partsN = parts % Calendar.partsPerHour
-
-      Moment(daysN, Time(hoursN, partsN))
+      Moment(
+        days * Calendar.partsPerDay.toLong +  // To force long multiplication
+        hours * Calendar.partsPerHour +
+        minutes * Calendar.partsPerMinute +
+        parts
+      )
     }
   }
 
 
   protected val Moment: MomentCompanion
-
-
-
-  /**
-   *
-   * @param hours  till this Time
-   * @param parts  of the hour till this Time
-   */
-  // TODO dissolve?
-  final class Time(val hours: Int, val parts: Int) extends Ordered[Time] {
-
-    require(0 <= hours && hours < Calendar.hoursPerDay)
-    require(0 <= parts && parts < Calendar.partsPerHour)
-
-
-    override def equals(other: Any): Boolean = other match {
-      case that: Time => this.asParts == that.asParts
-      case _ => false
-    }
-
-
-    override def hashCode = 41 * hours + parts
-
-
-    override def compare(that: Time) = this.asParts - that.asParts
-
-
-    def isZero = (hours == 0) && (parts == 0)
-
-
-    def asParts = hours * Calendar.partsPerHour + parts
-
-
-    def minutes: Int = parts / Calendar.partsPerMinute
-
-
-    def partsOfMinute = parts % Calendar.partsPerMinute
-
-
-    override def toString: String = hours + "h" + parts + "p"
-
-
-    def toFullString: String = hours + ":" + minutes + ":" + partsOfMinute
-  }
-
-
-
-  /**
-   *
-   */
-  protected abstract class TimeCompanion {
-
-    def apply(hours: Int, parts: Int): Time
-
-
-    final def apply(hours: Int, minutes: Int, parts: Int): Time = Time(hours, minutes * Calendar.partsPerMinute + parts)
-  }
-
-
-  protected val Time: TimeCompanion
 }
 
 
@@ -478,6 +400,7 @@ abstract class Calendar {
 
 object Calendar {
 
+  // TODO move into Moment?
     val hoursPerDay = 24
 
     require(hoursPerDay % 2 == 0)
