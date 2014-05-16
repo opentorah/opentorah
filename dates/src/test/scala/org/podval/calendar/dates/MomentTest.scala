@@ -20,7 +20,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FlatSpec
 
-import Jewish.{Moment, Day, Month}
+import Jewish.{Moment, Day, Month, day}
 
 
 @RunWith(classOf[JUnitRunner])
@@ -32,7 +32,7 @@ final class MomentTest extends FlatSpec {
     components2moment2components( 0, 15, 589)
     components2moment2components(29, 12, 793)
 
-    assert(Day(2).nightTime(5, 204) == Moment(1, 5, 0, 204))
+    assert(day(2).nightHours(5).parts(204) == Moment(1, 5, 0, 204))
   }
 
 

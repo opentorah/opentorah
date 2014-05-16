@@ -122,21 +122,7 @@ object Gregorian extends Calendar {
 
 
 
-  final class Day(number: Int) extends DayBase(number) {
-
-    def morningTime(hours: Int, parts: Int): Moment = {
-      require(hours < Calendar.hoursPerHalfDay)
-      // TODO add minutes parameter; enforce limits (in the callee)
-      time(hours, 0, parts)
-    }
-
-
-    def afternoonTime(hours: Int, parts: Int): Moment = {
-      require(hours < Calendar.hoursPerHalfDay)
-      // TODO add minutes parameter; enforce limits (in the callee)
-      time(hours + Calendar.hoursPerHalfDay, 0, parts)
-    }
-  }
+  final class Day(number: Int) extends DayBase(number)
 
 
   object Day extends DayCompanion {
@@ -162,7 +148,16 @@ object Gregorian extends Calendar {
 
 
     override val firstDayNumberInWeek =
-      (((Jewish.Day.firstDayNumberInWeek - 1) + (epoch % Calendar.daysPerWeek)) % Calendar.daysPerWeek) + 1
+      (((Jewish.Day.firstDayNumberInWeek - 1) + (epoch % daysPerWeek)) % daysPerWeek) + 1
+  }
+
+
+  final class Moment(inParts: Long) extends MomentBase(inParts) {
+
+    def morningHours(value: Int): Moment = firstHalfHours(value)
+
+
+    def afternoonHours(value: Int): Moment = secondHalfHours(value)
   }
 
 

@@ -49,12 +49,14 @@ abstract class Calendar {
   type Day <: DayBase
 
 
+  type Moment <: MomentBase
+
 
   /**
    *
    * @param number  of the Year
    */
-  abstract class YearBase(number: Int) extends Numbered[Year](number) { self: Year =>
+  protected abstract class YearBase(number: Int) extends Numbered[Year](number) { self: Year =>
 
     final def next: Year = Year(number + 1)
 
@@ -167,7 +169,7 @@ abstract class Calendar {
    *
    * @param number  of the Month
    */
-  abstract class MonthBase(number: Int) extends Numbered[Month](number) { self: Month =>
+  protected abstract class MonthBase(number: Int) extends Numbered[Month](number) { self: Month =>
 
     require(0 < number)
 
@@ -226,10 +228,10 @@ abstract class Calendar {
 
 
 
-  final case class MonthNameAndLength(name: Month.Name, length: Int)
+  protected final case class MonthNameAndLength(name: Month.Name, length: Int)
 
 
-  final      class MonthDescriptor   (val name: Month.Name, val length: Int, val daysBefore: Int)
+  protected final      class MonthDescriptor   (val name: Month.Name, val length: Int, val daysBefore: Int)
 
 
   val Month: MonthCompanion
@@ -240,7 +242,7 @@ abstract class Calendar {
    *
    * @param number  of the Day
    */
-  abstract class DayBase(number: Int) extends Numbered[Day](number) { this: Day =>
+  protected abstract class DayBase(number: Int) extends Numbered[Day](number) { this: Day =>
 
     require(0 < number)
 
@@ -291,6 +293,9 @@ abstract class Calendar {
     type Name
 
 
+    val daysPerWeek: Int = 7
+
+
     def names: Seq[Name]
 
 
@@ -303,92 +308,101 @@ abstract class Calendar {
     final def apply(year: Int, month: Int, day: Int): Day = Year(year).month(month).day(day)
 
 
-    final def numberInWeek(dayNumber: Int): Int = ((dayNumber + firstDayNumberInWeek - 1 - 1) % Calendar.daysPerWeek) + 1
+    final def numberInWeek(dayNumber: Int): Int = ((dayNumber + firstDayNumberInWeek - 1 - 1) % daysPerWeek) + 1
 
 
     val firstDayNumberInWeek: Int
   }
 
 
+
   val Day: DayCompanion
+
+
+  final def day(number: Int): Moment = Day(number).time()
+
+
+  final def days(number: Int): Moment = Moment(days = number)
 
 
   /**
    *
    * @param inParts
    */
-  final class Moment(val inParts: Long) extends Ordered[Moment] {
+  protected abstract class MomentBase(val inParts: Long) extends Ordered[Moment] {
+
+    import Moment._
 
     require(inParts >= 0)
 
 
-    def days: Int = (inParts / Calendar.partsPerDay).toInt
+    final def days: Int = (inParts / partsPerDay).toInt
 
 
-    def hours: Int = ((inParts % Calendar.partsPerDay) / Calendar.partsPerHour).toInt
+    final def hours: Int = ((inParts % partsPerDay) / partsPerHour).toInt
 
 
-    def hours(value: Int): Moment = Moment(days, value, minutes, parts)
+    final def hours(value: Int): Moment = Moment(days, value, minutes, parts)
 
 
-    def firstHalfHours(value: Int): Moment = {
-      require(0 <= hours && hours < Calendar.hoursPerHalfDay)
+    final def firstHalfHours(value: Int): Moment = {
+      require(0 <= hours && hours < hoursPerHalfDay)
       hours(value)
     }
 
 
-    def secondHalfHours(value: Int): Moment = {
-      require(0 <= value && value < Calendar.hoursPerHalfDay)
-      hours(value + Calendar.hoursPerHalfDay)
+    final def secondHalfHours(value: Int): Moment = {
+      require(0 <= value && value < hoursPerHalfDay)
+      hours(value + hoursPerHalfDay)
     }
 
 
-    def minutes: Int = ((inParts % Calendar.partsPerHour) / Calendar.partsPerMinute).toInt
+    final def minutes: Int = ((inParts % partsPerHour) / partsPerMinute).toInt
 
 
-    def minutes(value: Int): Moment = Moment(days, hours, value, parts)
+    final def minutes(value: Int): Moment = Moment(days, hours, value, parts)
 
 
-    def parts: Int = (inParts % Calendar.partsPerMinute).toInt
+    final def parts: Int = (inParts % partsPerMinute).toInt
 
 
-    def parts(value: Int): Moment = Moment(days, hours, minutes, value)
+    final def parts(value: Int): Moment = Moment(days, hours, minutes, value)
 
 
-    def partsWithMinutes: Int = (inParts % Calendar.partsPerHour).toInt
+    final def partsWithMinutes: Int = (inParts % partsPerHour).toInt
 
 
-    def time: Moment = Moment(inParts % Calendar.partsPerDay)
+    final def time: Moment = Moment(inParts % partsPerDay)
 
 
-    override def equals(other: Any): Boolean = other match {
+    final override def equals(other: Any): Boolean = other match {
       case that: Moment => (inParts == that.inParts)
       case _ => false
     }
 
 
-    override def hashCode = 41 * inParts.hashCode
+    final override def hashCode = 41 * inParts.hashCode
 
 
-    override def compare(that: Moment) = this.inParts.compare(that.inParts)
+    final override def compare(that: Moment) = this.inParts.compare(that.inParts)
 
 
-    def +(other: Moment) = Moment(inParts + other.inParts)
+    final def +(other: Moment) = Moment(inParts + other.inParts)
 
 
-    def -(other: Moment) = Moment(inParts - other.inParts)
+    final def -(other: Moment) = Moment(inParts - other.inParts)
 
 
-    def *(n: Int): Moment = Moment(inParts * n)
+    final def *(n: Int): Moment = Moment(inParts * n)
 
 
-    def /(n: Int): Moment = Moment(inParts / n)
+    final def /(n: Int): Moment = Moment(inParts / n)
 
 
-    def day: Day = Day(days + 1)
+    final def day: Day = Day(days + 1)
 
 
-    override def toString: String = days + ":" + hours + ":" + minutes + ":" + parts
+    final override def toString: String = days + ":" + hours + ":" + minutes + ":" + parts
 
 
     // TODO  def toFullString: String = day.toFullString + " " + time.toFullString
@@ -400,6 +414,29 @@ abstract class Calendar {
    *
    */
   protected abstract class MomentCompanion {
+
+    val hoursPerDay = 24
+
+
+    require(hoursPerDay % 2 == 0)
+
+
+    val hoursPerHalfDay = hoursPerDay / 2
+
+
+    val partsPerHour = 1080
+
+
+    val minutesPerHour = 60
+
+    require(partsPerHour % minutesPerHour == 0)
+
+
+    val partsPerDay = hoursPerDay * partsPerHour
+
+
+    val partsPerMinute = partsPerHour / minutesPerHour
+
 
     def apply(inParts: Long): Moment
 
@@ -416,9 +453,9 @@ abstract class Calendar {
       require(parts >= 0)
 
       Moment(
-        days * Calendar.partsPerDay.toLong +  // To force long multiplication
-        hours * Calendar.partsPerHour +
-        minutes * Calendar.partsPerMinute +
+        days * partsPerDay.toLong +  // To force long multiplication
+        hours * partsPerHour +
+        minutes * partsPerMinute +
         parts
       )
     }
@@ -426,34 +463,4 @@ abstract class Calendar {
 
 
   protected val Moment: MomentCompanion
-}
-
-
-
-
-object Calendar {
-
-  // TODO move into Moment?
-    val hoursPerDay = 24
-
-    require(hoursPerDay % 2 == 0)
-
-
-    val hoursPerHalfDay = hoursPerDay / 2
-
-
-    val partsPerHour = 1080
-
-
-    val minutesPerHour = 60
-
-    require(partsPerHour % minutesPerHour == 0)
-
-
-    val partsPerMinute = partsPerHour / minutesPerHour
-
-
-    val partsPerDay = hoursPerDay * partsPerHour
-
-    val daysPerWeek: Int = 7
 }

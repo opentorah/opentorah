@@ -24,18 +24,18 @@ object Jewish extends Calendar {
     require(0 < number)
 
 
-    // TODO name the constants and externalize the checks
+    // TODO externalize the checks
     override def firstDay: Int = {
       val newMoon = month(1).newMoon
       val day = newMoon.day
       val time = newMoon.time
 
       if (Year.isAdu(day.name)) day.next // KH 7:1
-      else if (time >= Moment(hours = 18, parts = 0)) {
+      else if (time >= Year.firstCorrection) {
         if (!Year.isAdu(day.next.name)) day.next /* KH 7:2 */ else day.next.next /* KH 7:3 */
       }
-      else if ((day.name == Day.Shlishi) && time >= Moment(hours =  9, parts = 204) && !this     .isLeap) day.next.next /* KH 7:4 */
-      else if ((day.name == Day.Sheni  ) && time >= Moment(hours = 15, parts = 589) &&  this.prev.isLeap) day.next /* KH 7:5 */
+      else if ((day.name == Day.Shlishi) && time >= Year.secondCorrection && !this     .isLeap) day.next.next /* KH 7:4 */
+      else if ((day.name == Day.Sheni  ) && time >= Year.thirdCorrection  &&  this.prev.isLeap) day.next /* KH 7:5 */
       else day
     }.number
 
@@ -90,23 +90,23 @@ object Jewish extends Calendar {
 
       character match { case (isLeap: Boolean, kind: Year.Kind) =>
         List(
-          MonthNameAndLength(Tishrei, 30),
+          MonthNameAndLength(Tishrei   , 30),
           MonthNameAndLength(Marheshvan, if (kind == Full) 30 else 29),
-          MonthNameAndLength(Kislev, if (kind == Short) 29 else 30),
-          MonthNameAndLength(Teves, 29),
-          MonthNameAndLength(Shvat, 30)
+          MonthNameAndLength(Kislev    , if (kind == Short) 29 else 30),
+          MonthNameAndLength(Teves     , 29),
+          MonthNameAndLength(Shvat     , 30)
         ) ++
         (if (!isLeap)
           List(MonthNameAndLength(Adar, 29))
         else
           List(MonthNameAndLength(AdarI, 30), MonthNameAndLength(AdarII, 30))) ++
         List(
-          MonthNameAndLength(Nisan, 30),
-          MonthNameAndLength(Iyar, 29),
-          MonthNameAndLength(Sivan, 30),
+          MonthNameAndLength(Nisan , 30),
+          MonthNameAndLength(Iyar  , 29),
+          MonthNameAndLength(Sivan , 30),
           MonthNameAndLength(Tammuz, 29),
-          MonthNameAndLength(Av, 30),
-          MonthNameAndLength(Elul, 29)
+          MonthNameAndLength(Av    , 30),
+          MonthNameAndLength(Elul  , 29)
         )
       }
     }
@@ -149,6 +149,13 @@ object Jewish extends Calendar {
 
 
     def cycle(yearNumber: Int): Int = ((yearNumber - 1) / yearsInCycle) + 1
+
+
+    // TODO meaningful names
+    // TODO introduce hours(), to obviate days(0)?
+    val firstCorrection = days(0).hours(18) // KH 7:1
+    val secondCorrection = days(0).hours(9).parts(204) // KH 7:4
+    val thirdCorrection = days(0).hours(15).parts(589) // KH 7:5
   }
 
 
@@ -186,12 +193,11 @@ object Jewish extends Calendar {
 
 
     // KH 6:3
-    val MeanLunarPeriod = Moment(29, 12, 0, 793)
+    val MeanLunarPeriod = days(29).hours(12).parts(793)
 
 
-    // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2):
-    // BeHaRaD: 5 hours 204 parts at night of the second day (KH 6:8)
-    val FirstNewMoon = Day(2).nightTime(5, 204)
+    // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2): BeHaRaD: (KH 6:8)
+    val FirstNewMoon = day(2).nightHours(5).parts(204)
 
 
     override def yearNumber(monthNumber: Int): Int = {
@@ -210,21 +216,7 @@ object Jewish extends Calendar {
 
 
 
-  final class Day(number: Int) extends DayBase(number) {
-
-    def nightTime(hours: Int, parts: Int): Moment = {
-      require(hours < Calendar.hoursPerHalfDay)
-      // TODO add minutes parameter; enforce limits (in the callee)
-      time(hours, 0, parts)
-    }
-
-
-    def dayTime(hours: Int, parts: Int): Moment = {
-      require(hours < Calendar.hoursPerHalfDay)
-      // TODO add minutes parameter; enforce limits (in the callee)
-      time(hours + Calendar.hoursPerHalfDay, 0, parts)
-    }
-  }
+  final class Day(number: Int) extends DayBase(number)
 
 
 
@@ -250,6 +242,15 @@ object Jewish extends Calendar {
     // It seems that first day of the first year was Sunday; molad - BaHaRad.
     // Second year - friday; molad - 8 in the morning.
     override val firstDayNumberInWeek: Int = 1
+  }
+
+
+  final class Moment(inParts: Long) extends MomentBase(inParts) {
+
+    def nightHours(value: Int): Moment = firstHalfHours(value)
+
+
+    def dayHours(value: Int): Moment = secondHalfHours(value)
   }
 
 
