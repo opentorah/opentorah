@@ -201,7 +201,7 @@ abstract class Calendar {
     final def length: Int = descriptor.length
 
 
-    private def descriptor = year.months(numberInYear - 1)
+    private[this] def descriptor = year.months(numberInYear - 1)
   }
 
 
@@ -323,6 +323,10 @@ abstract class Calendar {
 
 
   final def days(number: Int): Moment = Moment(days = number)
+
+
+  final def hours(number: Int): Moment = days(0).hours(number)
+
 
 
   /**

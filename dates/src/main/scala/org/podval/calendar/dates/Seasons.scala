@@ -31,14 +31,14 @@ object Seasons {
   val FirstTkufasNissan = Year(1).month(Month.Nisan).newMoon - Moment(0, 7, 9, 642)
 
 
-  val YearOfShmuel = Moment(365, 6)
+  val YearOfShmuel = days(365) + hours(6)
 
 
   val YearOfRavAda = Month.MeanLunarPeriod * Year.monthsInCycle / 19
 
 
   // Since Birkas HaChama is said in the morning, we add 12 hours to the time of the equinox
-  def birkasHachama(cycle: Int) = FirstTkufasNissan + YearOfShmuel * 28 * cycle + Moment(0, 12)
+  def birkasHachama(cycle: Int) = FirstTkufasNissan + YearOfShmuel * 28 * cycle + hours(12)
 
 
   def tkufasNissan(year: Int) = FirstTkufasNissan + YearOfRavAda * (year-1)

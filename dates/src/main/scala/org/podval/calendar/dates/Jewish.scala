@@ -152,10 +152,9 @@ object Jewish extends Calendar {
 
 
     // TODO meaningful names
-    // TODO introduce hours(), to obviate days(0)?
-    val firstCorrection = days(0).hours(18) // KH 7:1
-    val secondCorrection = days(0).hours(9).parts(204) // KH 7:4
-    val thirdCorrection = days(0).hours(15).parts(589) // KH 7:5
+    val firstCorrection  = hours(18) // KH 7:1
+    val secondCorrection = hours(9).parts(204) // KH 7:4
+    val thirdCorrection  = hours(15).parts(589) // KH 7:5
   }
 
 
