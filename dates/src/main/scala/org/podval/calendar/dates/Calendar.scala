@@ -319,11 +319,44 @@ abstract class Calendar {
    */
   final class Moment(val inParts: Long) extends Ordered[Moment] {
 
+    require(inParts >= 0)
+
+
     def days: Int = (inParts / Calendar.partsPerDay).toInt
+
+
     def hours: Int = ((inParts % Calendar.partsPerDay) / Calendar.partsPerHour).toInt
+
+
+    def hours(value: Int): Moment = Moment(days, value, minutes, parts)
+
+
+    def firstHalfHours(value: Int): Moment = {
+      require(0 <= hours && hours < Calendar.hoursPerHalfDay)
+      hours(value)
+    }
+
+
+    def secondHalfHours(value: Int): Moment = {
+      require(0 <= value && value < Calendar.hoursPerHalfDay)
+      hours(value + Calendar.hoursPerHalfDay)
+    }
+
+
     def minutes: Int = ((inParts % Calendar.partsPerHour) / Calendar.partsPerMinute).toInt
+
+
+    def minutes(value: Int): Moment = Moment(days, hours, value, parts)
+
+
     def parts: Int = (inParts % Calendar.partsPerMinute).toInt
-    def partsWithMinutes: Int = (inParts % Calendar.partsPerHour).toInt // TODO clean up parts, inParts, partsWithMinutes...
+
+
+    def parts(value: Int): Moment = Moment(days, hours, minutes, value)
+
+
+    def partsWithMinutes: Int = (inParts % Calendar.partsPerHour).toInt
+
 
     def time: Moment = Moment(inParts % Calendar.partsPerDay)
 
