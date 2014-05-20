@@ -19,27 +19,38 @@ package org.podval.calendar.dates
 import Jewish._
 
 
+// TODO Where and when was the Sun created? Does this jibe with Rambam's epoch?
+// TODO Which day of the week (+1/-1) was the Giving of the Law? (Sema)
+// TODO Rambam's epoch - two days after molad?! (Petya Ofman)
+// TODO Rename/dissolve?
+// TODO angular speed of the moon = 360 / (1/tropical month + 1/solar year)
 object Seasons {
-  // TODO Where and when was the Sun created? Does this jibe with Rambam's epoch?
-  // TODO Which day of the week (+1/-1) was the Giving of the Law? (Sema)
-  // TODO Rambam's epoch - two days after molad?! (Petya Ofman)
 
   // KH 9:3
 
   // TODO add convenience methods to clean this up
 
-  val FirstTkufasNissan = Year(1).month(Month.Nisan).newMoon - Moment(0, 7, 9, 642)
+  val firstTkufasNissan = Year(1).month(Month.Nisan).newMoon - days(7).hours(9).parts(642)  // KH 9:3
 
 
-  val YearOfShmuel = days(365) + hours(6)
+  val yearOfShmuel = days(365) + hours(6)
 
 
-  val YearOfRavAda = Month.MeanLunarPeriod * Year.monthsInCycle / 19
+  // TODO up to moments; 1 part = 76 moments
+  val yearOfRavAda = Month.meanLunarPeriod * Year.monthsInCycle / 19
+
+
+  // Sun enters Teleh  KH 9:3
+//  def tkufasNissan(year: Int) = firstTkufasNissan + yearOfRavAda * (year-1)
+  def tkufasNissan(year: Int) = firstTkufasNissan + yearOfShmuel * (year-1)
+
+
+  // Tkufas Tammuz - Sartan; Tishrei - Moznaim; Teves - Gdi.  KH 9:3
+
+
+
 
 
   // Since Birkas HaChama is said in the morning, we add 12 hours to the time of the equinox
-  def birkasHachama(cycle: Int) = FirstTkufasNissan + YearOfShmuel * 28 * cycle + hours(12)
-
-
-  def tkufasNissan(year: Int) = FirstTkufasNissan + YearOfRavAda * (year-1)
+  def birkasHachama(cycle: Int) = firstTkufasNissan + yearOfShmuel * 28 * cycle + hours(12)
 }

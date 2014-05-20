@@ -63,6 +63,9 @@ object Jewish extends Calendar {
         case _ => throw new IllegalArgumentException("Impossible year length " + lengthInDays + " for " + this)
       }
     }
+
+
+    def newMoon: Moment = month(1).newMoon
   }
 
 
@@ -121,7 +124,7 @@ object Jewish extends Calendar {
     protected override def areYearsPositive: Boolean = true
 
 
-    private[this] val leapYears = Set(3, 6, 8, 11, 14, 17, 19)
+    private[this] val leapYears = Set(3, 6, 8, 11, 14, 17, 19) // TODO calculate Menton's cycle in the paper
 
 
     override def isLeap(yearNumber: Int) = leapYears.contains(numberInCycle(yearNumber))
@@ -164,7 +167,7 @@ object Jewish extends Calendar {
 
   final class Month(number: Int) extends MonthBase(number) {
 
-    def newMoon: Moment = Month.FirstNewMoon + Month.MeanLunarPeriod*(number-1)
+    def newMoon: Moment = Month.firstNewMoon + Month.meanLunarPeriod*(number-1)
   }
 
 
@@ -192,11 +195,11 @@ object Jewish extends Calendar {
 
 
     // KH 6:3
-    val MeanLunarPeriod = days(29).hours(12).parts(793)
+    val meanLunarPeriod = days(29).hours(12).parts(793)  // TODO how is this really called? tropical?
 
 
     // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2): BeHaRaD: (KH 6:8)
-    val FirstNewMoon = day(2).nightHours(5).parts(204)
+    val firstNewMoon = day(2).nightHours(5).parts(204)
 
 
     override def yearNumber(monthNumber: Int): Int = {

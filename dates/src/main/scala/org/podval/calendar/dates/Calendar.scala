@@ -403,10 +403,14 @@ abstract class Calendar {
     final def /(n: Int): Moment = Moment(inParts / n)
 
 
+    final def %(n: Int): Moment = Moment(inParts % n)
+
+
     final def day: Day = Day(days + 1)
 
 
-    final override def toString: String = days + ":" + hours + ":" + minutes + ":" + parts
+    final override def toString: String = days + "d" + hours + "h" + partsWithMinutes + "p"
+//    final override def toString: String = days + "d" + hours + "h" + minutes + "m" + parts + "p"
 
 
     // TODO  def toFullString: String = day.toFullString + " " + time.toFullString

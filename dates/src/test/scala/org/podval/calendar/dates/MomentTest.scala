@@ -16,14 +16,12 @@
 
 package org.podval.calendar.dates;
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.FlatSpec
 
 import Jewish.{Moment, Day, Month, day}
 
 
-@RunWith(classOf[JUnitRunner])
+@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class MomentTest extends FlatSpec {
 
   "Moment components" should "be correct" in {
