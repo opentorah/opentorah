@@ -31,5 +31,5 @@ abstract class Numbered[T <: Numbered[T]](val number: Int) extends Ordered[T] {
     final override def compare(that: T) = this.number - that.number
 
 
-    final override def toString: String = number.toString
+    override def toString: String = number.toString
 }

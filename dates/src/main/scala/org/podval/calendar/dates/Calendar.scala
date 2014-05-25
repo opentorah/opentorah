@@ -64,6 +64,12 @@ abstract class Calendar {
     final def prev: Year = Year(number - 1)
 
 
+    final def +(change: Int) = Year(number + change)
+
+
+    final def -(change: Int) = Year(number - change)
+
+
     def firstDay: Int
 
 
@@ -180,6 +186,12 @@ abstract class Calendar {
     final def prev: Month = Month(number - 1)
 
 
+    final def +(change: Int) = Month(number + change)
+
+
+    final def -(change: Int) = Month(number - change)
+
+
     final def year: Year = Year(this)
 
 
@@ -280,7 +292,7 @@ abstract class Calendar {
     final def time(hours: Int = 0, minutes: Int = 0, parts: Int = 0): Moment = Moment(this, hours, minutes, parts)
 
 
-    final def toFullString: String = year + " " + month.name + " " + numberInMonth
+    final override def toString: String = year + " " + month.name + " " + numberInMonth
   }
 
 
@@ -333,11 +345,12 @@ abstract class Calendar {
    *
    * @param inParts
    */
-  protected abstract class MomentBase(val inParts: Long) extends Ordered[Moment] {
-
-    import Moment._
+  protected abstract class MomentBase(val negative: Boolean, val inParts: Long) extends Ordered[Moment] {
 
     require(inParts >= 0)
+
+
+    final def inSignedParts = if (negative) - inParts else inParts
 
 
     final def days: Int = (inParts / Units.partsPerDay).toInt
@@ -380,40 +393,62 @@ abstract class Calendar {
 
 
     final override def equals(other: Any): Boolean = other match {
-      case that: Moment => (inParts == that.inParts)
+      case that: Moment => (inSignedParts == that.inSignedParts)
       case _ => false
     }
 
 
-    final override def hashCode = 41 * inParts.hashCode
+    final override def hashCode = 41 * inParts.hashCode + negative.hashCode
 
 
-    final override def compare(that: Moment) = this.inParts.compare(that.inParts)
+    final override def compare(that: Moment): Int = this.inSignedParts.compare(that.inSignedParts)
 
 
-    final def +(other: Moment) = Moment(inParts + other.inParts)
+    final def +(other: Moment) = Moment(inSignedParts + other.inSignedParts)
 
 
-    final def -(other: Moment) = Moment(inParts - other.inParts)
+    final def -(other: Moment) = Moment(inSignedParts - other.inSignedParts)
 
 
-    final def *(n: Int): Moment = Moment(inParts * n)
+    final def *(n: Int): Moment = Moment(inSignedParts * n)
 
 
-    final def /(n: Int): Moment = Moment(inParts / n)
+    final def /(n: Int): Moment = Moment(inSignedParts / n)
 
 
-    final def %(n: Int): Moment = Moment(inParts % n)
+    final def %(n: Int): Moment = Moment(inParts % n) // TODO does this work with negatives? If yes, do I need "negative"?
+
+
+    final def /(that: Moment): Double = this.inParts.toDouble / that.inParts.toDouble
 
 
     final def day: Day = Day(days + 1)
 
 
-    final override def toString: String = days + "d" + hours + "h" + partsWithMinutes + "p"
-//    final override def toString: String = days + "d" + hours + "h" + minutes + "m" + parts + "p"
+    final override def toString: String = {
+      val sign = if (negative) "-" else ""
+
+      if (partsWithMinutes != 0)
+        sign + days + "d" + hours + "h" + partsWithMinutes + "p" else
+      if (hours != 0)
+        sign + days + "d" + hours + "h"
+      else
+        sign + days + "d"
+    }
 
 
-    // TODO  def toFullString: String = day.toFullString + " " + time.toFullString
+    final def toMinuteString: String = {
+      val sign = if (negative) "-" else ""
+
+      if (parts != 0)
+        sign + days + "d" + hours + "h" + minutes + "m" + parts + "p" else
+      if (minutes != 0)
+        sign + days + "d" + hours + "h" + minutes + "m" else
+      if (hours != 0)
+        sign + days + "d" + hours + "h"
+      else
+        sign + days + "d"
+    }
   }
 
 
@@ -423,7 +458,10 @@ abstract class Calendar {
    */
   protected abstract class MomentCompanion {
 
-    def apply(inParts: Long): Moment
+    final def apply(inParts: Long): Moment = Moment(inParts < 0, Math.abs(inParts))
+
+
+    def apply(negative: Boolean, inParts: Long): Moment
 
 
     // TODO why can't I have default parameters here also?
@@ -463,6 +501,7 @@ abstract class Calendar {
 
 
     val minutesPerHour = 60
+
 
     require(partsPerHour % minutesPerHour == 0)
 

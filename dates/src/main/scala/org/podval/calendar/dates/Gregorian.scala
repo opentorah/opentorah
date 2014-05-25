@@ -152,7 +152,7 @@ object Gregorian extends Calendar {
   }
 
 
-  final class Moment(inParts: Long) extends MomentBase(inParts) {
+  final class Moment(negative: Boolean, inParts: Long) extends MomentBase(negative, inParts) {
 
     def morningHours(value: Int): Moment = firstHalfHours(value)
 
@@ -163,6 +163,6 @@ object Gregorian extends Calendar {
 
   object Moment extends MomentCompanion {
 
-    override def apply(inParts: Long): Moment = new Moment(inParts)
+    override def apply(negative: Boolean, inParts: Long): Moment = new Moment(negative, inParts)
   }
 }
