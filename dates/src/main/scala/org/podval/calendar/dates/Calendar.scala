@@ -340,43 +340,43 @@ abstract class Calendar {
     require(inParts >= 0)
 
 
-    final def days: Int = (inParts / partsPerDay).toInt
+    final def days: Int = (inParts / Units.partsPerDay).toInt
 
 
-    final def hours: Int = ((inParts % partsPerDay) / partsPerHour).toInt
+    final def hours: Int = ((inParts % Units.partsPerDay) / Units.partsPerHour).toInt
 
 
     final def hours(value: Int): Moment = Moment(days, value, minutes, parts)
 
 
     final def firstHalfHours(value: Int): Moment = {
-      require(0 <= hours && hours < hoursPerHalfDay)
+      require(0 <= hours && hours < Units.hoursPerHalfDay)
       hours(value)
     }
 
 
     final def secondHalfHours(value: Int): Moment = {
-      require(0 <= value && value < hoursPerHalfDay)
-      hours(value + hoursPerHalfDay)
+      require(0 <= value && value < Units.hoursPerHalfDay)
+      hours(value + Units.hoursPerHalfDay)
     }
 
 
-    final def minutes: Int = ((inParts % partsPerHour) / partsPerMinute).toInt
+    final def minutes: Int = ((inParts % Units.partsPerHour) / Units.partsPerMinute).toInt
 
 
     final def minutes(value: Int): Moment = Moment(days, hours, value, parts)
 
 
-    final def parts: Int = (inParts % partsPerMinute).toInt
+    final def parts: Int = (inParts % Units.partsPerMinute).toInt
 
 
     final def parts(value: Int): Moment = Moment(days, hours, minutes, value)
 
 
-    final def partsWithMinutes: Int = (inParts % partsPerHour).toInt
+    final def partsWithMinutes: Int = (inParts % Units.partsPerHour).toInt
 
 
-    final def time: Moment = Moment(inParts % partsPerDay)
+    final def time: Moment = Moment(inParts % Units.partsPerDay)
 
 
     final override def equals(other: Any): Boolean = other match {
@@ -423,6 +423,33 @@ abstract class Calendar {
    */
   protected abstract class MomentCompanion {
 
+    def apply(inParts: Long): Moment
+
+
+    // TODO why can't I have default parameters here also?
+    def apply(day: Day, hours: Int, minutes: Int, parts: Int): Moment =
+      Moment(day.number - 1, hours, minutes, parts)
+
+
+    def apply(days: Int = 0, hours: Int = 0, minutes: Int = 0, parts: Int = 0): Moment = {
+      require(days >= 0)
+      require(hours >= 0)
+      require(minutes >= 0)
+      require(parts >= 0)
+
+      Moment(
+        days * Units.partsPerDay.toLong +  // To force long multiplication
+        hours * Units.partsPerHour +
+        minutes * Units.partsPerMinute +
+        parts
+      )
+    }
+  }
+
+
+
+  object Units {
+
     val hoursPerDay = 24
 
 
@@ -444,29 +471,6 @@ abstract class Calendar {
 
 
     val partsPerMinute = partsPerHour / minutesPerHour
-
-
-    def apply(inParts: Long): Moment
-
-
-    // TODO why can't I have default parameters here also?
-    def apply(day: Day, hours: Int, minutes: Int, parts: Int): Moment =
-      Moment(day.number - 1, hours, minutes, parts)
-
-
-    def apply(days: Int = 0, hours: Int = 0, minutes: Int = 0, parts: Int = 0): Moment = {
-      require(days >= 0)
-      require(hours >= 0)
-      require(minutes >= 0)
-      require(parts >= 0)
-
-      Moment(
-        days * partsPerDay.toLong +  // To force long multiplication
-        hours * partsPerHour +
-        minutes * partsPerMinute +
-        parts
-      )
-    }
   }
 
 

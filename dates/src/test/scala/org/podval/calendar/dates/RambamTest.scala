@@ -31,8 +31,8 @@ class RambamTest extends FlatSpec {
     val j = Jewish // WTF?!
 
     // KH 6:2
-    assert(Moment.hoursPerDay == 24)
-    assert(Moment.partsPerHour == 1080)
+    assert(Units.hoursPerDay == 24)
+    assert(Units.partsPerHour == 1080)
   }
 
 
