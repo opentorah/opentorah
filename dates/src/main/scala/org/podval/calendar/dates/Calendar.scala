@@ -340,26 +340,26 @@ abstract class Calendar {
   final def hours(number: Int): Moment = days(0).hours(number)
 
 
-
   /**
    *
-   * @param inParts
+   * @param negative
+   * @param inMoments
    */
-  protected abstract class MomentBase(val negative: Boolean, val inParts: Long) extends Ordered[Moment] {
+  protected abstract class MomentBase(val negative: Boolean, val inMoments: Long) extends Ordered[Moment] {
 
-    require(inParts >= 0)
-
-
-    final def inSignedParts = if (negative) - inParts else inParts
+    require(inMoments >= 0)
 
 
-    final def days: Int = (inParts / Units.partsPerDay).toInt
+    final def inSignedMoments = if (negative) - inMoments else inMoments
 
 
-    final def hours: Int = ((inParts % Units.partsPerDay) / Units.partsPerHour).toInt
+    final def days: Int = (inMoments / Units.momentPerDay).toInt
 
 
-    final def hours(value: Int): Moment = Moment(days, value, minutes, parts)
+    final def hours: Int = ((inMoments % Units.momentPerDay) / Units.momentsPerHour).toInt
+
+
+    final def hours(value: Int): Moment = Moment(days, value, minutes, parts, moments)
 
 
     final def firstHalfHours(value: Int): Moment = {
@@ -374,52 +374,58 @@ abstract class Calendar {
     }
 
 
-    final def minutes: Int = ((inParts % Units.partsPerHour) / Units.partsPerMinute).toInt
+    final def minutes: Int = ((inMoments % Units.momentsPerHour) / Units.momentsPerMinute).toInt
 
 
-    final def minutes(value: Int): Moment = Moment(days, hours, value, parts)
+    final def minutes(value: Int): Moment = Moment(days, hours, value, parts, moments)
 
 
-    final def parts: Int = (inParts % Units.partsPerMinute).toInt
+    final def parts: Int = ((inMoments % Units.momentsPerMinute) / Units.momentsPerPart).toInt
 
 
-    final def parts(value: Int): Moment = Moment(days, hours, minutes, value)
+    final def parts(value: Int): Moment = Moment(days, hours, minutes, value, moments)
 
 
-    final def partsWithMinutes: Int = (inParts % Units.partsPerHour).toInt
+    final def partsWithMinutes: Int = ((inMoments % Units.momentsPerHour) / Units.momentsPerPart).toInt
 
 
-    final def time: Moment = Moment(inParts % Units.partsPerDay)
+    final def moments: Int = (inMoments % Units.momentsPerPart).toInt
+
+
+    final def moments(value: Int): Moment = Moment(days, hours, minutes, parts, value)
+
+
+    final def time: Moment = Moment(inMoments % Units.momentPerDay)
 
 
     final override def equals(other: Any): Boolean = other match {
-      case that: Moment => (inSignedParts == that.inSignedParts)
+      case that: Moment => (inSignedMoments == that.inSignedMoments)
       case _ => false
     }
 
 
-    final override def hashCode = 41 * inParts.hashCode + negative.hashCode
+    final override def hashCode = 41 * inSignedMoments.hashCode
 
 
-    final override def compare(that: Moment): Int = this.inSignedParts.compare(that.inSignedParts)
+    final override def compare(that: Moment): Int = this.inSignedMoments.compare(that.inSignedMoments)
 
 
-    final def +(other: Moment) = Moment(inSignedParts + other.inSignedParts)
+    final def +(other: Moment) = Moment(inSignedMoments + other.inSignedMoments)
 
 
-    final def -(other: Moment) = Moment(inSignedParts - other.inSignedParts)
+    final def -(other: Moment) = Moment(inSignedMoments - other.inSignedMoments)
 
 
-    final def *(n: Int): Moment = Moment(inSignedParts * n)
+    final def *(n: Int): Moment = Moment(inSignedMoments * n)
 
 
-    final def /(n: Int): Moment = Moment(inSignedParts / n)
+    final def /(n: Int): Moment = Moment(inSignedMoments / n)
 
 
-    final def %(n: Int): Moment = Moment(inParts % n) // TODO does this work with negatives? If yes, do I need "negative"?
+    final def %(n: Int): Moment = Moment(inMoments % n) // TODO does this work with negatives? If yes, do I need "negative"?
 
 
-    final def /(that: Moment): Double = this.inParts.toDouble / that.inParts.toDouble
+    final def /(that: Moment): Double = this.inSignedMoments.toDouble / that.inSignedMoments.toDouble
 
 
     final def day: Day = Day(days + 1)
@@ -428,6 +434,8 @@ abstract class Calendar {
     final override def toString: String = {
       val sign = if (negative) "-" else ""
 
+      if (moments != 0)
+        sign + days + "d" + hours + "h" + partsWithMinutes + "p" + moments + "m" else
       if (partsWithMinutes != 0)
         sign + days + "d" + hours + "h" + partsWithMinutes + "p" else
       if (hours != 0)
@@ -440,6 +448,8 @@ abstract class Calendar {
     final def toMinuteString: String = {
       val sign = if (negative) "-" else ""
 
+      if (moments != 0)
+        sign + days + "d" + hours + "h" + minutes + "m" + parts + "p" + moments + "m" else
       if (parts != 0)
         sign + days + "d" + hours + "h" + minutes + "m" + parts + "p" else
       if (minutes != 0)
@@ -469,17 +479,19 @@ abstract class Calendar {
       Moment(day.number - 1, hours, minutes, parts)
 
 
-    def apply(days: Int = 0, hours: Int = 0, minutes: Int = 0, parts: Int = 0): Moment = {
+    def apply(days: Int = 0, hours: Int = 0, minutes: Int = 0, parts: Int = 0, moments: Int = 0): Moment = {
       require(days >= 0)
       require(hours >= 0)
       require(minutes >= 0)
       require(parts >= 0)
+      require(moments >= 0)
 
       Moment(
-        days * Units.partsPerDay.toLong +  // To force long multiplication
-        hours * Units.partsPerHour +
-        minutes * Units.partsPerMinute +
-        parts
+        days * Units.momentPerDay.toLong +  // To force long multiplication
+        hours * Units.momentsPerHour +
+        minutes * Units.momentsPerMinute +
+        parts * Units.momentsPerPart +
+        moments
       )
     }
   }
@@ -510,6 +522,18 @@ abstract class Calendar {
 
 
     val partsPerMinute = partsPerHour / minutesPerHour
+
+
+    val momentsPerPart = 76
+
+
+    val momentsPerHour = partsPerHour * momentsPerPart
+
+
+    val momentPerDay = partsPerDay * momentsPerPart
+
+
+    val momentsPerMinute = partsPerMinute * momentsPerPart
   }
 
 

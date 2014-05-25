@@ -48,10 +48,23 @@ class RambamTest extends FlatSpec {
 
     assert(year2newMoon - Month.meanLunarPeriod*12 == year1newMoon)
 
+  }
+
+
+  "molad Nisan example" should "be correct" in {
     // TODO KH 6:7
-//    val firstMoladNissan = Year(2).month(Month.Nisan).newMoon
-//    assert(firstMoladNissan.day.name == Day.Rishon)
-//    assert(firstMoladNissan.time == hours(17).parts(107))
+    val rambamTime = hours(17).parts(107)
+
+    val years = for {
+      number <- (1 to 6000)
+      year = Year(number)
+      moladNisan = year.month(Month.Nisan).newMoon
+      if (moladNisan.time == rambamTime)
+    //    assert(firstMoladNissan.day.name == Day.Rishon)
+    //    assert(firstMoladNissan.time == hours(17).parts(107))
+    } yield year
+
+    println(years)
   }
 
 
@@ -67,7 +80,7 @@ class RambamTest extends FlatSpec {
     assert(Seasons.yearOfShmuel == days(365).hours(6))
 
 
-    val week = days(7).inParts.toInt
+    val week = days(7).inMoments.toInt
 
     // KH 6:5
     assert(Month.meanLunarPeriod%week == days(1).hours(12).parts(793))
@@ -77,6 +90,8 @@ class RambamTest extends FlatSpec {
 
     // KH 6:10
     assert(Seasons.yearOfShmuel*19 - Month.meanLunarPeriod*(12*12+7*13) == hours(1).parts(485))
+    assert(Seasons.yearOfRavAda*19 - Month.meanLunarPeriod*(12*12+7*13) == hours(0).parts(  0))
+    // TODO Year of Rav Ada == ...
   }
 
 
