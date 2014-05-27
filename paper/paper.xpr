@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project version="14.2">
+<project version="16.0">
     <meta>
         <filters directoryPatterns="" filePatterns="" positiveFilePatterns="" showHiddenFiles="false"/>
         <options>
-            <serialized version="14.2" xml:space="preserve">
-                <map>
+            <serialized version="16.0" xml:space="preserve">
+                <serializableOrderedMap>
                     <entry>
                         <String>validation.scenarios</String>
                         <validationScenario-array/>
                     </entry>
-                </map>
+                </serializableOrderedMap>
             </serialized>
         </options>
     </meta>
     <projectTree name="paper.xpr">
-        <file name="src/main/docbook/lunar-theory.xml"/>
-        <file name="src/main/docbook/paper.xml"/>
-        <file name="src/main/docbook/solar-theory.xml"/>
+        <folder path="src/main/docbook/"/>
     </projectTree>
 </project>

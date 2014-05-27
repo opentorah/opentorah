@@ -431,7 +431,13 @@ abstract class Calendar {
     final def day: Day = Day(days + 1)
 
 
-    final override def toString: String = {
+    final override def toString = toDateString
+
+
+    final def toDateString: String = day.toString + " " + time.toMinuteString
+
+
+    final def toPartsString: String = {
       val sign = if (negative) "-" else ""
 
       if (moments != 0)
