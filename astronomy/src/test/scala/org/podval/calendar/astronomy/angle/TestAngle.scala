@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Podval Group.
+ * Copyright 2011-2014 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,47 +16,50 @@
 
 package org.podval.calendar.astronomy.angle
 
-import org.junit.Test
-import org.junit.Assert
+import org.scalatest.FlatSpec
 
 
-class TestAngle {
+@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
+class TestAngle extends FlatSpec {
 
-    @Test
-    def construction() {
-        construction(5, 34)
-        construction(54, 34)
-        construction(154, 59)
-        construction(254, 0)
-    }
+    behavior of "Angle"
 
+    it should "construct properly" in {
 
-    private def construction(degrees: Int, minutes: Int) {
+      def construction(degrees: Int, minutes: Int) {
         val angle = Angle(degrees, minutes)
-        Assert.assertEquals(degrees, angle.degrees)
-        Assert.assertEquals(minutes, angle.minutes)
+        assertResult(degrees)(angle.degrees)
+        assertResult(minutes)(angle.minutes)
+      }
+
+
+      construction(  5, 34)
+      construction( 54, 34)
+      construction(154, 59)
+      construction(254,  0)
     }
 
 
-    @Test
-    def conversion() {
-        conversion(5, 34)
-        conversion(54, 34)
-        conversion(154, 59)
-        conversion(254, 0)
-    }
+    it should "convert properly" in {
 
-
-    private def conversion(degrees: Int, minutes: Int) {
+      def conversion(degrees: Int, minutes: Int) {
         val angle = Angle(degrees, minutes)
         val value = angle.toDegrees
         val angle_ = Angle.fromDegrees(value, 2)
-        Assert.assertEquals(angle, angle_)
+        assert(angle == angle_)
+      }
+
+      conversion(5, 34)
+      conversion(54, 34)
+      conversion(154, 59)
+      conversion(254, 0)
     }
 
 
-    @Test
-    def rounding() {
-        Assert.assertEquals(Angle(104,58,50), Angle.roundToSeconds(Angle(104,58,50,16,39,59,43)))
+    it should "round properly" in{
+        assertResult(Angle(104,58,50))(Angle.roundToSeconds(Angle(104,58,50,16,39,59,43)))
     }
+
+
+  // TODO add tests for negativity
 }

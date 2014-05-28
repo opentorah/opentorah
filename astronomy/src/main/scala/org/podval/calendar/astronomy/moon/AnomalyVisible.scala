@@ -52,7 +52,10 @@ object AnomalyVisible {
     )
 
 
-    def mnasfrome(maslul: Angle, e: Double): Angle =  Angle.fromRadians(asin(sin(maslul)/sqrt(e*e + 2*e*cos(maslul) + 1)), 1)
+    def mnasfrome(maslul: Angle, e: Double): Angle = {
+      val inRadians = asin(sin(maslul)/sqrt(e*e + 2*e*cos(maslul) + 1))
+      Angle.fromRadians(inRadians, 1)
+    }
 
 
     def efrommnas(maslul: Angle, mnas: Angle): Double = sin(maslul)/sin(mnas)*abs(cos(mnas))-cos(maslul)

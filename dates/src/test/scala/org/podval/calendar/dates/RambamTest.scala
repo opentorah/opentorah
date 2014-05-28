@@ -64,7 +64,7 @@ class RambamTest extends FlatSpec {
     //    assert(firstMoladNissan.time == hours(17).parts(107))
     } yield year
 
-    println(years)
+    // println(years)
   }
 
 

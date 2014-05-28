@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Podval Group.
+ * Copyright 2011-2014 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,34 +16,34 @@
 
 package org.podval.calendar.astronomy.moon
 
-import org.junit.Test
-import org.junit.Assert
+import org.scalatest.FlatSpec
 
 import org.podval.calendar.astronomy.angle.Angle
 
 
-class AnomalyVisibleTest {
+@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
+class AnomalyVisibleTest extends FlatSpec {
 
-    @Test
-    def misprinted() {
-        test(AnomalyVisible.MISPRINTED)
+  behavior of "Anomaly"
+
+  it should "be correctly misprinted :)" in {
+    test(AnomalyVisible.MISPRINTED)
+  }
+
+
+  it should "be correct" in {
+    test(AnomalyVisible.VALUES)
+  }
+
+
+  private def test(table: Map[Angle, Angle]) = {
+    for (row <- table) {
+      val (maslul, mnas) = row
+      val e: Double = AnomalyVisible.efrommnasround(maslul, mnas)
+      val mnasfrome = AnomalyVisible.mnasfrome(maslul, e)
+      val mnas_ = Angle.roundToMinutes(mnasfrome)
+
+      assert(mnas == mnas_)
     }
-
-
-    @Test
-    def correct() {
-        test(AnomalyVisible.VALUES)
-    }
-
-
-    private def test(table: Map[Angle, Angle]) = {
-        for (row <- table) {
-            val maslul: Angle = row._1
-            val mnas: Angle = row._2
-            val e: Double = AnomalyVisible.efrommnasround(maslul, mnas)
-            val mnas_ = Angle.roundToMinutes(AnomalyVisible.mnasfrome(maslul, e))
-
-            Assert.assertEquals(mnas, mnas_)
-        }
-    }
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Podval Group.
+ * Copyright 2011-2014 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,42 +18,37 @@ package org.podval.calendar.astronomy.sun
 
 import org.podval.calendar.astronomy.angle.Angle
 
-import org.junit.Test
-import org.junit.Assert
+import org.scalatest.FlatSpec
 
 
-class LongitudeMeanTest {
+@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
+class LongitudeMeanTest extends FlatSpec {
 
-  @Test
-  def calculatedLessThenPrinted {
-    LongitudeMean.keys.foreach{(days: Int) => Assert.assertTrue(days + "days", (days == 1) ||
+  behavior of "Mean Longitude"
+
+  it should "calculate to less than printed" in {
+    LongitudeMean.keys.foreach{(days: Int) => assert((days == 1) ||
       (LongitudeMean.calculated(days) < LongitudeMean.value(days)))}
   }
 
 
-  @Test
-  def almagestRoundsToRambam {
-    Assert.assertEquals(LongitudeMean.rambamValue, Angle.roundToSeconds(LongitudeMean.almagestValue))
+  it should "be what Almagest rounds to" in {
+    assertResult(LongitudeMean.rambamValue)(Angle.roundToSeconds(LongitudeMean.almagestValue))
   }
 
 
-  @Test
-  def almagestRoundedLessThenPrinted {
-    LongitudeMean.keys.foreach{(days: Int) => Assert.assertTrue(days + "days", (days <= 10) ||
+  it should "round from Almagest to less than printed" in {
+    LongitudeMean.keys.foreach{(days: Int) => assert((days <= 10) ||
       (Angle.roundToSeconds(LongitudeMean.almagest(days)) < LongitudeMean.value(days)))}
   }
 
 
-  @Test
-  def calculate29 {
-    Assert.assertEquals(LongitudeMean.value(29),
-      LongitudeMean.value(10)*3-LongitudeMean.value(1))
+  it should "calculate for 29 days in two steps" in {
+    assertResult(LongitudeMean.value(29))(LongitudeMean.value(10)*3-LongitudeMean.value(1))
   }
 
 
-  //@Test
-  def calculate354 {
-    Assert.assertEquals(LongitudeMean.value(354),
-      LongitudeMean.value(100)*3+LongitudeMean.value(10)*5+LongitudeMean.value(1)*4)
+  it should "calculate correctly for the regular year" ignore {
+    assertResult(LongitudeMean.value(354))(LongitudeMean.value(100)*3+LongitudeMean.value(10)*5+LongitudeMean.value(1)*4)
   }
 }
