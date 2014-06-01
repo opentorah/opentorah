@@ -18,7 +18,11 @@ package org.podval.calendar.astronomy.angle
 import org.podval.calendar.dates.{NumberCompanion, Number}
 
 
-final class Angle(negative: Boolean, digits: List[Int]) extends { override val Number = Angle} with Number(negative, digits) {
+final class Angle(negative: Boolean, digits: List[Int]) extends {
+
+  override val Number = Angle
+
+} with Number(negative, digits) {
 
   def degrees: Int = head
   def minutes = digit(1)
@@ -34,7 +38,13 @@ final class Angle(negative: Boolean, digits: List[Int]) extends { override val N
 
 
 
-object Angle extends NumberCompanion {
+object Angle extends {
+
+  private val MAX_LENGTH = 100
+
+  override val ranges: List[Int] = List.empty.padTo(MAX_LENGTH-1, 60)
+
+} with NumberCompanion {
 
   import scala.language.implicitConversions
 
@@ -45,16 +55,7 @@ object Angle extends NumberCompanion {
   override type T = Angle
 
 
-  private val MAX_LENGTH = 100
-
-
   override val headRange: Option[Int] = Some(360)
-
-
-  override val ranges: List[Int] = List.empty.padTo(MAX_LENGTH-1, 60)
-
-
-  override val quotients: List[Double] = ((1 to MAX_LENGTH) map (n => math.pow(60.0, n))).toList
 
 
   override val signs: List[String] = List("°", "′", "″", "‴") ++ List.empty.padTo(MAX_LENGTH-3, ",")
@@ -66,7 +67,7 @@ object Angle extends NumberCompanion {
   def fromRadians(value: Double, length: Int): Angle = fromDegrees(math.toDegrees(value), length)
 
 
-  def fromDegrees(value: Double) = fromDouble(value)
+  def fromDegrees(value: Double, length: Int) = fromDouble(value, length)
 
 
   def roundToSeconds(angle: Angle): Angle = roundTo(angle, 2)

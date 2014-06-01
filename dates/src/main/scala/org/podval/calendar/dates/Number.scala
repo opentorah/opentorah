@@ -15,7 +15,7 @@ package org.podval.calendar.dates
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-abstract class Number(val negative: Boolean, val digits: List[Int]) extends Ordered[Number] { // TODO Number.T
+abstract class Number(val negative: Boolean, val digits: List[Int]) extends Ordered[Number] {
 
   val Number: NumberCompanion
 
@@ -73,14 +73,14 @@ abstract class Number(val negative: Boolean, val digits: List[Int]) extends Orde
   final def *(n: Int): Number.T = Number(negative, digits map (n*_))
 
 
-  final def toDouble: Double = (if (negative) -1 else +1) * (head + ((tail zip Number.quotients) map lift(_/_)).sum)
+  final def toDouble: Double = (if (negative) -1 else +1) * (head + ((tail zip Number.divisors) map lift(_/_)).sum)
 
 
   private[this] def zip(that: Number) = digits zipAll (that.digits, 0, 0)
 
 
-  // TODO use f.tupled instead!!!
-  private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = p => op(p._1, p._2)
+  // TODO why can't I inline .tupled?
+  private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = op.tupled
 
 
   // TODO: padding
@@ -104,13 +104,18 @@ abstract class NumberCompanion {
   val ranges: List[Int]
 
 
-  val quotients: List[Double]
+  ranges.foreach { range =>
+    require(range > 0)
+    require(range % 2 == 0)
+  }
+
+
+  final val divisors: List[Double] = ranges.inits.toList.reverse.tail.map { upto: List[Int] => upto.fold(1)(_*_).toDouble }
 
 
   val signs: List[String]
 
 
-  // TODO who uses this?
   final def apply(head: Int, tail: Int*): T = apply(head :: tail.toList)
 
 
@@ -147,12 +152,14 @@ abstract class NumberCompanion {
   protected def create(negative: Boolean, digits: List[Int]): T
 
 
-  def fromDouble(value: Double, length: Int): T = {
+  final def fromDouble(value: Double, length: Int): T = {
     val negative = value < 0
     val absValue = if (!negative) value else - value
 
-    // TODO !!! use real ranges!
-    val digits = absValue +: ((quotients take length) map (q => (absValue % (60.0/q))/(1.0/q)))
+    val digits = absValue +: ((((1.0d :: divisors.init) zip  divisors) take length) map { case (previous, current) =>
+      (absValue % (1.0d/previous)) / (1.0d/current)
+    })
+
     apply(negative, (digits.init map (math.floor(_).toInt)).toList :+ math.round(digits.last).toInt)
   }
 
@@ -161,14 +168,14 @@ abstract class NumberCompanion {
     require(n >= 0)
 
     val (more_, toRound) = what.tail splitAt n
-    val more__ = {
+    val tail_ = {
       if (more_.isEmpty) more_ else {
-        // TODO use real ranges!!!
-        val carry = (toRound :\ 0)((x, c) => if (x + c >= 30) 1 else 0)
+        val toRoundWithRange = toRound zip divisors.drop(n)
+        val carry = (toRoundWithRange :\ 0) { case ((x, range), c) => if (x + c >= range/2) 1 else 0 }
         more_.init :+ (more_.last + carry)
       }
     }
 
-    apply(what.negative, what.head +: more__)
+    apply(what.negative, what.head +: tail_)
   }
 }
