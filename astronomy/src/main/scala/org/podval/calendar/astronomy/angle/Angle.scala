@@ -102,6 +102,7 @@ object Angle {
   val SIGNS = List("°", "′", "″", "‴") ++ List().padTo(MAX_LENGTH-3, ",")
 
 
+  // TODO who uses this?
   def apply(degrees: Int, more: Int*): Angle = Angle(degrees :: more.toList)
 
 
