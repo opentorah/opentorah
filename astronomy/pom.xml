@@ -13,4 +13,12 @@
 
     <name>Astronomical Calculations</name>
     <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.podval.calendar</groupId>
+            <artifactId>org.podval.calendar.dates</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>

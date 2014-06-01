@@ -15,7 +15,7 @@ package org.podval.calendar.dates
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-abstract class Number(val negative: Boolean, val digits: List[Int]) extends Ordered[Number] {
+abstract class Number(val negative: Boolean, val digits: List[Int]) extends Ordered[Number] { // TODO Number.T
 
   val Number: NumberCompanion
 
@@ -23,11 +23,11 @@ abstract class Number(val negative: Boolean, val digits: List[Int]) extends Orde
   // Ensure that digits are within appropriate ranges
   digits.foreach(digit => require(digit >= 0, "must be non-negative"))
 
-  if (headRange.isDefined) {
-    require(head < headRange.get, "must be less than " + headRange.get)
+  if (Number.headRange.isDefined) {
+    require(head < Number.headRange.get, "must be less than " + Number.headRange.get)
   }
 
-  (tail zip ranges) foreach { case (digit, range) =>
+  (tail zip Number.ranges) foreach { case (digit, range) =>
     require(digit < range, "must be less than " + range)
   }
 
@@ -42,12 +42,6 @@ abstract class Number(val negative: Boolean, val digits: List[Int]) extends Orde
 
 
   final def digit(n: Int): Int = if (length >= n) digits(n) else 0
-
-
-  private[this] final def headRange: Option[Int] = Number.headRange
-
-
-  private[this] final def ranges: List[Int] = Number.ranges
 
 
   // TODO check won't work because of the erasure :(
@@ -70,13 +64,16 @@ abstract class Number(val negative: Boolean, val digits: List[Int]) extends Orde
   }
 
 
-  def +(that: Number.T): Number.T = Number(negative, zip(that) map lift(_+_))
+  final def +(that: Number.T): Number.T = Number(negative, zip(that) map lift(_+_))
 
 
-  def -(that: Number.T): Number.T = Number(negative, zip(that) map lift(_-_))
+  final def -(that: Number.T): Number.T = Number(negative, zip(that) map lift(_-_))
 
 
-  def *(n: Int): Number.T = Number(negative, digits map (n*_))
+  final def *(n: Int): Number.T = Number(negative, digits map (n*_))
+
+
+  final def toDouble: Double = (if (negative) -1 else +1) * (head + ((tail zip Number.quotients) map lift(_/_)).sum)
 
 
   private[this] def zip(that: Number) = digits zipAll (that.digits, 0, 0)
@@ -87,7 +84,7 @@ abstract class Number(val negative: Boolean, val digits: List[Int]) extends Orde
 
 
   // TODO: padding
-  override def toString: String = {
+  final override def toString: String = {
     val tokens = digits map (_.toString) zip Number.signs flatMap (p => List(p._1, p._2))
     val result = (if (length <= 3) tokens else tokens.init).mkString
     (if (negative) "-" else "") + result
@@ -101,15 +98,19 @@ abstract class NumberCompanion {
   type T <: Number
 
 
-  def headRange: Option[Int]
+  val headRange: Option[Int]
 
 
-  def ranges: List[Int]
+  val ranges: List[Int]
 
 
-  def signs: List[String]
+  val quotients: List[Double]
 
 
+  val signs: List[String]
+
+
+  // TODO who uses this?
   final def apply(head: Int, tail: Int*): T = apply(head :: tail.toList)
 
 
@@ -146,7 +147,17 @@ abstract class NumberCompanion {
   protected def create(negative: Boolean, digits: List[Int]): T
 
 
-  def roundTo(what: T, n: Int): T = {
+  def fromDouble(value: Double, length: Int): T = {
+    val negative = value < 0
+    val absValue = if (!negative) value else - value
+
+    // TODO !!! use real ranges!
+    val digits = absValue +: ((quotients take length) map (q => (absValue % (60.0/q))/(1.0/q)))
+    apply(negative, (digits.init map (math.floor(_).toInt)).toList :+ math.round(digits.last).toInt)
+  }
+
+
+  final def roundTo(what: T, n: Int): T = {
     require(n >= 0)
 
     val (more_, toRound) = what.tail splitAt n
