@@ -87,8 +87,6 @@ object Gregorian extends Calendar {
   }
 
 
-  val Year = new YearCompanion
-
 
   final class Month(number: Int) extends MonthBase(number)
 
@@ -152,7 +150,7 @@ object Gregorian extends Calendar {
   }
 
 
-  final class Moment(negative: Boolean, inParts: Long) extends MomentBase(negative, inParts) {
+  final class Moment(negative: Boolean, digits: List[Int]) extends MomentBase(negative, digits) {
 
     def morningHours(value: Int): Moment = firstHalfHours(value)
 
@@ -163,6 +161,12 @@ object Gregorian extends Calendar {
 
   object Moment extends MomentCompanion {
 
-    override def apply(negative: Boolean, inParts: Long): Moment = new Moment(negative, inParts)
+    protected override def create(negative: Boolean, digits: List[Int]): Moment = new Moment(negative, digits)
   }
+
+
+  override val Number = Moment
+
+
+  override val Year = new YearCompanion
 }

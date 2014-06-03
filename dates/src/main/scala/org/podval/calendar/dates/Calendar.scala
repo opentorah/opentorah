@@ -23,7 +23,7 @@ package org.podval.calendar.dates
   o Is this a "cake"?
   o Is there any way to regain the ability to split the code into files?
 
-  o When I put MonthDescriptor inside Mont companion, types do not match; when it is outside, they do, although it
+  o When I put MonthDescriptor inside Month companion, types do not match; when it is outside, they do, although it
     references a type from the companion (Month.Name).
 
   o In derived Calendars, many companion vals are overridden by objects, but "override object" is not legal Scala.
@@ -37,8 +37,11 @@ package org.podval.calendar.dates
 
   o Derived Calendars are objects, but unless I do things like val x = Jewish, I used to get initialization errors!
     Which now went away for some reason! Maybe, because I took MonthDescriptor out of the Month companion!
+    Well, it didn't go away completely!
+    What a mess!
  */
-abstract class Calendar {
+// TODO dualize Interval and Moment
+abstract class Calendar extends Numbers {
 
   type Year <: YearBase
 
@@ -50,6 +53,10 @@ abstract class Calendar {
 
 
   type Moment <: MomentBase
+
+
+  type Number = Moment
+
 
 
   /**
@@ -289,7 +296,7 @@ abstract class Calendar {
     final def name: Day.Name = Day.names(numberInWeek - 1)
 
 
-    final def time(hours: Int = 0, minutes: Int = 0, parts: Int = 0): Moment = Moment(this, hours, minutes, parts)
+    final def toMoment: Moment = Moment(number - 1)
 
 
     final override def toString: String = year + " " + month.name + " " + numberInMonth
@@ -331,35 +338,28 @@ abstract class Calendar {
   val Day: DayCompanion
 
 
-  final def day(number: Int): Moment = Day(number).time()
+  final def day(number: Int): Moment = days(number-1)
 
 
-  final def days(number: Int): Moment = Moment(days = number)
+  final def days(number: Int): Moment = Moment(List(number))
 
 
   final def hours(number: Int): Moment = days(0).hours(number)
 
 
-  /**
-   *
-   * @param negative
-   * @param inMoments
-   */
-  protected abstract class MomentBase(val negative: Boolean, val inMoments: Long) extends Ordered[Moment] {
 
-    require(inMoments >= 0)
+  protected abstract class MomentBase(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) {
+
+    final def days: Int = head
 
 
-    final def inSignedMoments = if (negative) - inMoments else inMoments
+    final def days(value: Int): Moment = digit(0, value)
 
 
-    final def days: Int = (inMoments / Units.momentPerDay).toInt
+    final def hours: Int = digit(1)
 
 
-    final def hours: Int = ((inMoments % Units.momentPerDay) / Units.momentsPerHour).toInt
-
-
-    final def hours(value: Int): Moment = Moment(days, value, minutes, parts, moments)
+    final def hours(value: Int): Moment = digit(1, value)
 
 
     final def firstHalfHours(value: Int): Moment = {
@@ -374,97 +374,37 @@ abstract class Calendar {
     }
 
 
-    final def minutes: Int = ((inMoments % Units.momentsPerHour) / Units.momentsPerMinute).toInt
+    final def parts: Int = digit(2)
 
 
-    final def minutes(value: Int): Moment = Moment(days, hours, value, parts, moments)
+    final def parts(value: Int): Moment = digit(2, value)
 
 
-    final def parts: Int = ((inMoments % Units.momentsPerMinute) / Units.momentsPerPart).toInt
+    final def minutes: Int = parts / Units.partsPerMinute
 
 
-    final def parts(value: Int): Moment = Moment(days, hours, minutes, value, moments)
+    final def minutes(value: Int): Moment = parts(value*Units.partsPerMinute+partsWithoutMinutes)
 
 
-    final def partsWithMinutes: Int = ((inMoments % Units.momentsPerHour) / Units.momentsPerPart).toInt
+    final def partsWithoutMinutes: Int = parts % Units.partsPerMinute
 
 
-    final def moments: Int = (inMoments % Units.momentsPerPart).toInt
+    final def partsWithoutMinutes(value: Int): Moment = parts(minutes*Units.partsPerMinute+value)
 
 
-    final def moments(value: Int): Moment = Moment(days, hours, minutes, parts, value)
+    final def moments: Int = digit(3)
 
 
-    final def time: Moment = Moment(inMoments % Units.momentPerDay)
+    final def moments(value: Int): Moment = digit(3, value)
 
 
-    final override def equals(other: Any): Boolean = other match {
-      case that: Moment => (inSignedMoments == that.inSignedMoments)
-      case _ => false
-    }
-
-
-    final override def hashCode = 41 * inSignedMoments.hashCode
-
-
-    final override def compare(that: Moment): Int = this.inSignedMoments.compare(that.inSignedMoments)
-
-
-    final def +(other: Moment) = Moment(inSignedMoments + other.inSignedMoments)
-
-
-    final def -(other: Moment) = Moment(inSignedMoments - other.inSignedMoments)
-
-
-    final def *(n: Int): Moment = Moment(inSignedMoments * n)
-
-
-    final def /(n: Int): Moment = Moment(inSignedMoments / n)
-
-
-    final def %(n: Int): Moment = Moment(inMoments % n) // TODO does this work with negatives? If yes, do I need "negative"?
-
-
-    final def /(that: Moment): Double = this.inSignedMoments.toDouble / that.inSignedMoments.toDouble
+    final def time: Moment = days(0)
 
 
     final def day: Day = Day(days + 1)
 
 
-    final override def toString = toDateString
-
-
-    final def toDateString: String = day.toString + " " + time.toMinuteString
-
-
-    final def toPartsString: String = {
-      val sign = if (negative) "-" else ""
-
-      if (moments != 0)
-        sign + days + "d" + hours + "h" + partsWithMinutes + "p" + moments + "m" else
-      if (partsWithMinutes != 0)
-        sign + days + "d" + hours + "h" + partsWithMinutes + "p" else
-      if (hours != 0)
-        sign + days + "d" + hours + "h"
-      else
-        sign + days + "d"
-    }
-
-
-    final def toMinuteString: String = {
-      val sign = if (negative) "-" else ""
-
-      if (moments != 0)
-        sign + days + "d" + hours + "h" + minutes + "m" + parts + "p" + moments + "m" else
-      if (parts != 0)
-        sign + days + "d" + hours + "h" + minutes + "m" + parts + "p" else
-      if (minutes != 0)
-        sign + days + "d" + hours + "h" + minutes + "m" else
-      if (hours != 0)
-        sign + days + "d" + hours + "h"
-      else
-        sign + days + "d"
-    }
+    // TODO more toString variants...
   }
 
 
@@ -472,34 +412,19 @@ abstract class Calendar {
   /**
    *
    */
-  protected abstract class MomentCompanion {
+  protected abstract class MomentCompanion extends {
 
-    final def apply(inParts: Long): Moment = Moment(inParts < 0, Math.abs(inParts))
+    override val ranges: List[Int] = List(Units.hoursPerDay, Units.partsPerHour, Units.momentsPerPart)
 
+  } with NumberCompanion {
 
-    def apply(negative: Boolean, inParts: Long): Moment
-
-
-    // TODO why can't I have default parameters here also?
-    def apply(day: Day, hours: Int, minutes: Int, parts: Int): Moment =
-      Moment(day.number - 1, hours, minutes, parts)
+    override val headRange: Option[Int] = None
 
 
-    def apply(days: Int = 0, hours: Int = 0, minutes: Int = 0, parts: Int = 0, moments: Int = 0): Moment = {
-      require(days >= 0)
-      require(hours >= 0)
-      require(minutes >= 0)
-      require(parts >= 0)
-      require(moments >= 0)
+    override val signs: List[String] = List("d", "h", "p", "m")
 
-      Moment(
-        days * Units.momentPerDay.toLong +  // To force long multiplication
-        hours * Units.momentsPerHour +
-        minutes * Units.momentsPerMinute +
-        parts * Units.momentsPerPart +
-        moments
-      )
-    }
+
+    protected def create(negative: Boolean, digits: List[Int]): Moment
   }
 
 
@@ -518,28 +443,16 @@ abstract class Calendar {
     val partsPerHour = 1080
 
 
-    val minutesPerHour = 60
+    private val minutesPerHour = 60
 
 
     require(partsPerHour % minutesPerHour == 0)
-
-
-    val partsPerDay = hoursPerDay * partsPerHour
 
 
     val partsPerMinute = partsPerHour / minutesPerHour
 
 
     val momentsPerPart = 76
-
-
-    val momentsPerHour = partsPerHour * momentsPerPart
-
-
-    val momentPerDay = partsPerDay * momentsPerPart
-
-
-    val momentsPerMinute = partsPerMinute * momentsPerPart
   }
 
 

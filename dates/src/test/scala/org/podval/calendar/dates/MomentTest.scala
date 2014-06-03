@@ -25,21 +25,23 @@ import Jewish.{Moment, Day, Month, day}
 final class MomentTest extends FlatSpec {
 
   "Moment components" should "be correct" in {
+    val j = Jewish
+
     components2moment2components( 0, 18,   0)
     components2moment2components( 0,  9, 204)
     components2moment2components( 0, 15, 589)
     components2moment2components(29, 12, 793)
 
-    assert(day(2).nightHours(5).parts(204) == Moment(1, 5, 0, 204))
+    assert(day(2).nightHours(5).parts(204) == Moment(1, 5, 204))
   }
 
 
   private def components2moment2components(days: Int, hours: Int, parts: Int) {
-    val moment = Moment(days, hours, 0, parts)
+    val moment = Moment(days, hours, parts)
 
     assertResult(days)(moment.days)
     assertResult(days)(moment.day.number - 1)
     assertResult(hours)(moment.hours)
-    assertResult(parts)(moment.partsWithMinutes)
+    assertResult(parts)(moment.parts)
   }
 }

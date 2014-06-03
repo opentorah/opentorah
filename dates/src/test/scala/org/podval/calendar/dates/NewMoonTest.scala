@@ -53,7 +53,7 @@ final class NewMoonTest extends FlatSpec {
               hours: Int, minutes: Int, parts: Int)
   {
     val dayJ = Jewish.Day(year, month, day)
-    val dateG = Gregorian.Day(yearG, monthG, dayG).time(hours, minutes, parts)
+    val dateG = Gregorian.Day(yearG, monthG, dayG).toMoment.hours(hours).minutes(minutes).partsWithoutMinutes(parts)
     val molad = Jewish.Year(moladYear).month(moladMonth).newMoon
 
     assertResult(dayOfWeek)(molad.day.name)

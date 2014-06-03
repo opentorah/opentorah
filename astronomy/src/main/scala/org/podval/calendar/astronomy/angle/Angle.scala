@@ -15,19 +15,37 @@
  */
 package org.podval.calendar.astronomy.angle
 
-import org.podval.calendar.dates.{NumberCompanion, Number}
+import org.podval.calendar.dates.{NumberCompanion, NumberBase}
 
 
 final class Angle(negative: Boolean, digits: List[Int]) extends {
 
   override val Number = Angle
 
-} with Number(negative, digits) {
+} with NumberBase(negative, digits) {
 
   def degrees: Int = head
+
+
+  def degrees(value: Int): Angle = digit(0, value)
+
+
   def minutes = digit(1)
+
+
+  def minutes(value: Int): Angle = digit(1, value)
+
+
   def seconds = digit(2)
+
+
+  def seconds(value: Int): Angle = digit(2, value)
+
+
   def thirds  = digit(3)
+
+
+  def thirds(value: Int): Angle = digit(3, value)
 
 
   def toRadians: Double = math.toRadians(toDegrees)
