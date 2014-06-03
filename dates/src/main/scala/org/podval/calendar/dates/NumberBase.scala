@@ -73,12 +73,14 @@ trait Numbers {
     }
 
 
-    final def +(that: Number): Number = {
-      Number(negative, zip(that) map lift(_ + _))
-    }
+    final def +(that: Number): Number = Number(this.negative,
+      zip(that) map lift (if (this.negative == that.negative) (_ + _) else (_ - _))
+    )
 
 
-    final def -(that: Number): Number = Number(negative, zip(that) map lift(_ - _))
+    final def -(that: Number): Number =  Number(this.negative,
+      zip(that) map lift (if (this.negative == that.negative) (_ - _) else (_ + _))
+    )
 
 
     final def *(n: Int): Number = Number(negative, digits map (n * _))
@@ -154,35 +156,42 @@ trait Numbers {
     final def apply(head: Int, tail: Int*): Number = apply(head :: tail.toList)
 
 
-    final def apply(digits: List[Int]): Number = {
-      // TODO collapse into the next one with sign=+1
-      val negative = digits.head < 0
-      val absDigits = if (!negative) digits else ((-digits.head) :: digits.tail)
-      apply(negative, absDigits)
-    }
+    final def apply(digits: List[Int]): Number = apply(false, digits)
 
 
     final def apply(negative: Boolean, digits: List[Int]): Number = {
+
       def step(elem: (Int, Int), acc: (Int, List[Int])) = {
         val (digit, range) = elem
         val (carry, result) = acc
-        val v = digit + carry
-        val (quotient, reminder) = (v / range, v % range)
-        val (carry_, digit_) = if (v >= 0) (quotient, reminder) else (quotient - 1, reminder + range)
+        val value = digit + carry
+        val (quotient, reminder) = (value / range, value % range)
+        val (carry_, digit_) = if (value >= 0) (quotient, reminder) else (quotient - 1, reminder + range)
+
         (carry_, digit_ :: result)
       }
 
-      val (headCarry, carriedTail) = ((digits.tail zip ranges) :\(0, List.empty[Int]))(step)
+      def headStep(head: Int, headCarry: Int): (Boolean, Int) = {
+        val value = head + headCarry
 
-      val v = digits.head + headCarry
+        val carriedHead = if (headRange.isEmpty) value else {
+          val result = value % headRange.get
+          if (value >= 0) result else result + headRange.get
+        }
 
-      val carriedHead = if (headRange.isEmpty) v
-      else {
-        val result = v % headRange.get
-        if (v >= 0) result else result + headRange.get // TODO maybe the overall "negative" needs to be corrected?
+        val carriedNegative = carriedHead < 0
+        val newHead = if (!carriedNegative) carriedHead else -carriedHead
+
+        (carriedNegative, newHead)
       }
 
-      create(negative, carriedHead :: carriedTail)
+
+      val (headCarry, carriedTail) = ((digits.tail zip ranges) :\(0, List.empty[Int]))(step)
+      val (carriedNegative, newHead) = headStep(digits.head, headCarry)
+
+      val newNegative = if (negative) !carriedNegative else carriedNegative
+
+      create(newNegative, newHead :: carriedTail)
     }
 
 
