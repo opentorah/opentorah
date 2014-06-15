@@ -14,30 +14,18 @@
  * limitations under the License.
  */
 
-package org.podval.calendar.dates;
+package org.podval.calendar.dates
 
 import org.scalatest.FlatSpec
 
-import TimeNumberSystem.interval
+import Jewish._
 
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-final class MomentTest extends FlatSpec {
+class IntervalTest extends FlatSpec {
 
-  "Moment components" should "be correct" in {
-    components2moment2components( 0, 18,   0)
-    components2moment2components( 0,  9, 204)
-    components2moment2components( 0, 15, 589)
-    components2moment2components(29, 12, 793)
-    components2moment2components( 1,  5, 204)
-  }
-
-
-  private def components2moment2components(days: Int, hours: Int, parts: Int) {
-    val moment = interval.days(days).hours(hours).parts(parts)
-
-    assertResult(days)(moment.days)
-    assertResult(hours)(moment.hours)
-    assertResult(parts)(moment.parts)
+  "division for the year of Rav Ada" should "be correct" in {
+    val yearOfRavAda = Year.cycleLength / Year.yearsInCycle
+    println(yearOfRavAda)
   }
 }

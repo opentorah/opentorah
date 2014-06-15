@@ -16,6 +16,8 @@
 
 package org.podval.calendar.dates
 
+import TimeNumberSystem.TimeInterval
+
 
 /* TODO
   There are things that I do not yet understand about Scala's approach to family polymorphism.
@@ -41,7 +43,7 @@ package org.podval.calendar.dates
     What a mess!
  */
 // TODO dualize Interval and Moment
-abstract class Calendar extends Numbers {
+abstract class Calendar {
 
   type Year <: YearBase
 
@@ -53,9 +55,6 @@ abstract class Calendar extends Numbers {
 
 
   type Moment <: MomentBase
-
-
-  type Number = Moment
 
 
 
@@ -296,7 +295,7 @@ abstract class Calendar extends Numbers {
     final def name: Day.Name = Day.names(numberInWeek - 1)
 
 
-    final def toMoment: Moment = Moment(number - 1)
+    final def toMoment: Moment = Moment().days(number - 1)
 
 
     final override def toString: String = year + " " + month.name + " " + numberInMonth
@@ -338,73 +337,35 @@ abstract class Calendar extends Numbers {
   val Day: DayCompanion
 
 
-  final def day(number: Int): Moment = days(number-1)
+
+  class MomentBase(negative: Boolean, digits: List[Int]) extends TimeNumberSystem.TimeNumber(negative, digits) with Ordered[Moment] {
+
+    protected type SelfType = Moment
 
 
-  final def days(number: Int): Moment = Moment(List(number))
+    protected def selfCreator = Moment.apply _
 
 
-  final def hours(number: Int): Moment = days(0).hours(number)
+    final override def compare(that: Moment): Int = compare_(that)
 
 
-
-  protected abstract class MomentBase(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) {
-
-    final def days: Int = head
+    final override def equals(other: Any): Boolean =
+      if (!other.isInstanceOf[Moment]) false else equals_(other.asInstanceOf[Moment])
 
 
-    final def days(value: Int): Moment = digit(0, value)
+    final def +(that: TimeInterval): Moment = super.plus(that)(selfCreator)
 
 
-    final def hours: Int = digit(1)
+    final def -(that: TimeInterval): Moment = super.minus(that)(selfCreator)
 
 
-    final def hours(value: Int): Moment = digit(1, value)
-
-
-    final def firstHalfHours(value: Int): Moment = {
-      require(0 <= hours && hours < Units.hoursPerHalfDay)
-      hours(value)
-    }
-
-
-    final def secondHalfHours(value: Int): Moment = {
-      require(0 <= value && value < Units.hoursPerHalfDay)
-      hours(value + Units.hoursPerHalfDay)
-    }
-
-
-    final def parts: Int = digit(2)
-
-
-    final def parts(value: Int): Moment = digit(2, value)
-
-
-    final def minutes: Int = parts / Units.partsPerMinute
-
-
-    final def minutes(value: Int): Moment = parts(value*Units.partsPerMinute+partsWithoutMinutes)
-
-
-    final def partsWithoutMinutes: Int = parts % Units.partsPerMinute
-
-
-    final def partsWithoutMinutes(value: Int): Moment = parts(minutes*Units.partsPerMinute+value)
-
-
-    final def moments: Int = digit(3)
-
-
-    final def moments(value: Int): Moment = digit(3, value)
-
-
-    final def time: Moment = days(0)
+    final def -(that: Moment): TimeInterval = super.minus(that)(TimeInterval.creator)
 
 
     final def day: Day = Day(days + 1)
 
 
-    // TODO more toString variants...
+    final def time: TimeInterval = TimeInterval(false, days(0).digits)
   }
 
 
@@ -412,49 +373,20 @@ abstract class Calendar extends Numbers {
   /**
    *
    */
-  protected abstract class MomentCompanion extends {
+  protected abstract class MomentCompanion {
 
-    override val ranges: List[Int] = List(Units.hoursPerDay, Units.partsPerHour, Units.momentsPerPart)
-
-  } with NumberCompanion {
-
-    override val headRange: Option[Int] = None
+    def apply(negative: Boolean, digits: List[Int]): Moment
 
 
-    override val signs: List[String] = List("d", "h", "p", "m")
-
-
-    protected def create(negative: Boolean, digits: List[Int]): Moment
+    def apply(): Moment = apply(false, List(0))
   }
 
 
-
-  object Units {
-
-    val hoursPerDay = 24
+  val Moment: MomentCompanion
 
 
-    require(hoursPerDay % 2 == 0)
+  val interval = TimeNumberSystem.interval
 
 
-    val hoursPerHalfDay = hoursPerDay / 2
-
-
-    val partsPerHour = 1080
-
-
-    private val minutesPerHour = 60
-
-
-    require(partsPerHour % minutesPerHour == 0)
-
-
-    val partsPerMinute = partsPerHour / minutesPerHour
-
-
-    val momentsPerPart = 76
-  }
-
-
-  protected val Moment: MomentCompanion
+  val week: TimeInterval = interval.days(7)
 }

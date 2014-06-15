@@ -16,6 +16,8 @@
 
 package org.podval.calendar.dates
 
+import org.podval.calendar.dates.TimeNumberSystem.TimeInterval
+
 
 object Jewish extends Calendar {
 
@@ -133,16 +135,31 @@ object Jewish extends Calendar {
     override def firstMonth(yearNumber: Int): Int = monthsInCycle*(cycle(yearNumber) - 1) + firstMonthInCycle(yearNumber)
 
 
-    override def lengthInMonths(yearNumber: Int): Int = if (isLeap(yearNumber)) 13 else 12
+    override def lengthInMonths(yearNumber: Int): Int = lengthInMonths(isLeap(yearNumber))
+
+
+    def normal: TimeInterval = Month.meanLunarPeriod*lengthInMonths(false)
+
+
+    def leap: TimeInterval = Month.meanLunarPeriod*lengthInMonths(true)
+
+
+    def lengthInMonths(isLeap: Boolean): Int = if (isLeap) 13 else 12
 
 
     val yearsInCycle = 19
+
+
+    val leapYearsInCycle = leapYears.size
 
 
     val monthsBeforeYearInCycle = ((1 to yearsInCycle) map (lengthInMonths(_))).scanLeft(0)(_ + _)
 
 
     val monthsInCycle = monthsBeforeYearInCycle.last
+
+
+    val cycleLength: TimeInterval = Month.meanLunarPeriod * monthsInCycle
 
 
     def firstMonthInCycle(yearNumber: Int): Int = monthsBeforeYearInCycle(numberInCycle(yearNumber) - 1) + 1
@@ -155,9 +172,9 @@ object Jewish extends Calendar {
 
 
     // TODO meaningful names
-    val firstCorrection  = hours(18) // KH 7:1
-    val secondCorrection = hours(9).parts(204) // KH 7:4
-    val thirdCorrection  = hours(15).parts(589) // KH 7:5
+    val firstCorrection  = interval.hours(18) // KH 7:1
+    val secondCorrection = interval.hours(9).parts(204) // KH 7:4
+    val thirdCorrection  = interval.hours(15).parts(589) // KH 7:5
   }
 
 
@@ -192,11 +209,11 @@ object Jewish extends Calendar {
 
 
     // KH 6:3
-    val meanLunarPeriod = days(29).hours(12).parts(793)  // TODO how is this really called? tropical?
+    val meanLunarPeriod = interval.days(29).hours(12).parts(793)  // TODO how is this really called? tropical?
 
 
     // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2): BeHaRaD: (KH 6:8)
-    val firstNewMoon = day(2).nightHours(5).parts(204)
+    val firstNewMoon = Moment().day(2).nightHours(5).parts(204)
 
 
     override def yearNumber(monthNumber: Int): Int = {
@@ -255,11 +272,8 @@ object Jewish extends Calendar {
 
   object Moment extends MomentCompanion {
 
-    protected override def create(negative: Boolean, digits: List[Int]): Moment = new Moment(negative, digits)
+    override def apply(negative: Boolean, digits: List[Int]): Moment = new Moment(negative, digits)
   }
-
-
-  override val Number = Moment
 
 
   override val Year = new YearCompanion

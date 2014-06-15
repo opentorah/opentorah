@@ -15,7 +15,7 @@
  */
 package org.podval.calendar.astronomy.angle
 
-import org.podval.calendar.dates.{NumberCompanion, NumberBase}
+import org.podval.calendar.dates.{NumberSystem, NumberBase}
 
 
 final class Angle(negative: Boolean, digits: List[Int]) extends {
@@ -62,7 +62,7 @@ object Angle extends {
 
   override val ranges: List[Int] = List.empty.padTo(MAX_LENGTH-1, 60)
 
-} with NumberCompanion {
+} with NumberSystem {
 
   import scala.language.implicitConversions
 

@@ -30,14 +30,13 @@ object Seasons {
 
   // TODO add convenience methods to clean this up
 
-  val firstTkufasNissan = Year(1).month(Month.Nisan).newMoon - days(7).hours(9).parts(642)  // KH 9:3
+  val firstTkufasNissan = Year(1).month(Month.Nisan).newMoon - interval.days(7).hours(9).parts(642)  // KH 9:3
 
 
-  val yearOfShmuel = days(365) + hours(6)
+  val yearOfShmuel = interval.days(365).hours(6)
 
 
-  // TODO up to moments; 1 part = 76 moments
-  val yearOfRavAda = Month.meanLunarPeriod * Year.monthsInCycle / 19
+  val yearOfRavAda = Year.cycleLength / Year.yearsInCycle
 
 
   // Sun enters Teleh  KH 9:3
@@ -56,7 +55,7 @@ object Seasons {
   // Only 27 days in Adar and Nissan have have the sanctification of the Sun happen on them at least once.
   // It never happens on Passover.
   // It happens more often than on the Passover Eve on 7 days.
-  def birkasHachama(cycle: Int) = firstTkufasNissan + yearOfShmuel * 28 * cycle + hours(12)
+  def birkasHachama(cycle: Int) = firstTkufasNissan + yearOfShmuel * 28 * cycle + interval.hours(12)
 
 
   def main(args: Array[String]) {

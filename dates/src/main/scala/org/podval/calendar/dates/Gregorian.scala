@@ -161,11 +161,8 @@ object Gregorian extends Calendar {
 
   object Moment extends MomentCompanion {
 
-    protected override def create(negative: Boolean, digits: List[Int]): Moment = new Moment(negative, digits)
+    override def apply(negative: Boolean, digits: List[Int]): Moment = new Moment(negative, digits)
   }
-
-
-  override val Number = Moment
 
 
   override val Year = new YearCompanion
