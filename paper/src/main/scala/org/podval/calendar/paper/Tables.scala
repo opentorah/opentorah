@@ -16,7 +16,7 @@
 
 package org.podval.calendar.paper
 
-import org.podval.calendar.astronomy.angle.Angle
+import org.podval.calendar.astronomy.angle.AngleNumberSystem.Angle
 import org.podval.calendar.astronomy.{DayData, moon, sun}
 
 import scala.math.{sin, cos, tan, round}
