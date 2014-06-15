@@ -86,8 +86,8 @@ trait NumberSystem {
     private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = op.tupled
 
 
-    final def toDouble(value: Number): Double =
-      (if (value.negative) -1 else +1) * (value.head + ((value.tail zip divisors) map lift(_ / _)).sum)
+    final def toDouble: Double =
+      (if (negative) -1 else +1) * (head + ((tail zip divisors) map lift(_ / _)).sum)
 
 
     final def roundTo(n: Int): SelfType = {

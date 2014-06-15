@@ -18,6 +18,8 @@ package org.podval.calendar.astronomy.angle
 
 import org.scalatest.FlatSpec
 
+import AngleNumberSystem.Angle
+
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TestAngle extends FlatSpec {
@@ -56,8 +58,8 @@ class TestAngle extends FlatSpec {
     }
 
 
-    it should "round properly" in{
-        assertResult(Angle(104,58,50))(Angle.roundToSeconds(Angle(104,58,50,16,39,59,43)))
+    it should "round properly" in {
+        assertResult(Angle(104,58,50))(Angle(104,58,50,16,39,59,43).roundToSeconds)
     }
 
 

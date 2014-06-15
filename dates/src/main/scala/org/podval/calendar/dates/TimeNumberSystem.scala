@@ -31,6 +31,9 @@ object TimeNumberSystem extends {
 
   protected override val ranges: List[Int] = List(hoursPerDay, partsPerHour, momentsPerPart)
 
+
+  protected override val headRange: Option[Int] = None
+
 } with NumberSystem {
 
   require(hoursPerDay % 2 == 0)
@@ -46,9 +49,6 @@ object TimeNumberSystem extends {
 
 
   val partsPerMinute = partsPerHour / minutesPerHour
-
-
-  protected override val headRange: Option[Int] = None
 
 
 
@@ -126,8 +126,6 @@ object TimeNumberSystem extends {
       if (!other.isInstanceOf[TimeInterval]) false else equals_(other.asInstanceOf[TimeInterval])
   }
 
-
-  def interval: TimeInterval = TimeInterval(false, List(0))
 
 
   object TimeInterval {

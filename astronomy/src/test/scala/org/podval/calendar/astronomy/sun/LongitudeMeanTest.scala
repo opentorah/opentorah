@@ -16,7 +16,7 @@
 
 package org.podval.calendar.astronomy.sun
 
-import org.podval.calendar.astronomy.angle.Angle
+import org.podval.calendar.astronomy.angle.AngleNumberSystem.Angle
 
 import org.scalatest.FlatSpec
 
@@ -33,13 +33,13 @@ class LongitudeMeanTest extends FlatSpec {
 
 
   it should "be what Almagest rounds to" in {
-    assertResult(LongitudeMean.rambamValue)(Angle.roundToSeconds(LongitudeMean.almagestValue))
+    assertResult(LongitudeMean.rambamValue)(LongitudeMean.almagestValue.roundToSeconds)
   }
 
 
   it should "round from Almagest to less than printed" in {
     LongitudeMean.keys.foreach{(days: Int) => assert((days <= 10) ||
-      (Angle.roundToSeconds(LongitudeMean.almagest(days)) < LongitudeMean.value(days)))}
+      (LongitudeMean.almagest(days).roundToSeconds < LongitudeMean.value(days)))}
   }
 
 

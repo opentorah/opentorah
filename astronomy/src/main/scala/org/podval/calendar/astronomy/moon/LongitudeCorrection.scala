@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Podval Group.
+ * Copyright 2011-2014 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.podval.calendar.astronomy.moon
 
-import org.podval.calendar.astronomy.angle.Angle
+import org.podval.calendar.astronomy.angle.AngleNumberSystem.Angle
 
 
 object LongitudeCorrection {

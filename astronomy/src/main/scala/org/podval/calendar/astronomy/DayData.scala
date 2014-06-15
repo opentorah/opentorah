@@ -16,7 +16,7 @@
 
 package org.podval.calendar.astronomy
 
-import angle.Angle
+import angle.AngleNumberSystem.Angle
 
 
 trait DayData {

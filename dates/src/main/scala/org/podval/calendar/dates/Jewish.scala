@@ -213,7 +213,7 @@ object Jewish extends Calendar {
 
 
     // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2): BeHaRaD: (KH 6:8)
-    val firstNewMoon = Moment().day(2).nightHours(5).parts(204)
+    val firstNewMoon = moment.day(2).nightHours(5).parts(204)
 
 
     override def yearNumber(monthNumber: Int): Int = {

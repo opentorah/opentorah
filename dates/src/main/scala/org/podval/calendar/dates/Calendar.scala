@@ -295,7 +295,7 @@ abstract class Calendar {
     final def name: Day.Name = Day.names(numberInWeek - 1)
 
 
-    final def toMoment: Moment = Moment().days(number - 1)
+    final def toMoment: Moment = moment.days(number - 1)
 
 
     final override def toString: String = year + " " + month.name + " " + numberInMonth
@@ -376,17 +376,17 @@ abstract class Calendar {
   protected abstract class MomentCompanion {
 
     def apply(negative: Boolean, digits: List[Int]): Moment
-
-
-    def apply(): Moment = apply(false, List(0))
   }
 
 
   val Moment: MomentCompanion
 
 
-  val interval = TimeNumberSystem.interval
+  final def moment: Moment = Moment(false, List(0))  // TODO This is def and not a val to make initialization possible
 
 
-  val week: TimeInterval = interval.days(7)
+  final val interval: TimeInterval = TimeInterval(false, List(0))
+
+
+  final val week: TimeInterval = interval.days(7)
 }

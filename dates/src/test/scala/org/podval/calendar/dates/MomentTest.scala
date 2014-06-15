@@ -18,7 +18,7 @@ package org.podval.calendar.dates;
 
 import org.scalatest.FlatSpec
 
-import TimeNumberSystem.interval
+import Jewish.interval
 
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])

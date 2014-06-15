@@ -25,6 +25,11 @@
             <artifactId>org.podval.calendar.astronomy</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.scala-lang.modules</groupId>
+            <artifactId>scala-xml_${scala.major.version}</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
