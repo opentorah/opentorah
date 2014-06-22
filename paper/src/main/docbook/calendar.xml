@@ -48,37 +48,36 @@
             please forive me: the omission is not intentional. </para>
         <itemizedlist mark="opencircle">
             <listitem>
-                <para>
-                    <personname><firstname>Mordechai</firstname><surname>Goldin</surname></personname> - for providing office space and computer equipment when I, as a Yeshiva
+                <para><personname><firstname>Mordechai</firstname><surname>Goldin</surname></personname> - for providing office space and computer equipment when I, as a Yeshiva
                     student, had neither. </para>
             </listitem>
             <listitem>
-                <para>
-                    <personname><firstname>Ilia</firstname><surname>Pomansky</surname></personname> - for encouraging this work at the early stages, in 1991. </para>
+                <para><personname><firstname>Ilia</firstname><surname>Pomansky</surname></personname> - for encouraging this work at the early stages, in 1991. </para>
             </listitem>
             <listitem>
-                <para> My wife Nina - for listening to my wild ideas, patience, and helping with math. </para>
+                <para>My wife Nina - for listening to my wild ideas, for her patience, and for help with math.</para>
             </listitem>
             <listitem>
-                <para> My daughter Menucha Rochel - for assistance with the translation.</para>
+                <para>My daughter Menucha Rochel - for assistance with the translation.</para>
             </listitem>
             <listitem>
                 <para>Rabbi Michael Koretz - for interesting descussions and help in obtaining texts on the subject.</para>
             </listitem>
             <listitem>
-                <para> Dr. Michael Partensky - for encouragement and advise. </para>
+                <para>Dr. Michael Partensky - for encouragement and advise. </para>
             </listitem>
             <listitem>
-                <para> Peter Ofman - for asking questions that prodded me to revive this project in 2011, after years of hiatus. </para>
+                <para>Peter Ofman - for asking questions that prodded me to revive this project in 2011, after years of hiatus. </para>
             </listitem>
             <listitem>
-                <para> Aron Matskin - for a discussion during his visit on Rosh Chodesh Mar Cheshvan 5772. </para>
+                <para>Aron Matskin - for a discussion during his visit on Rosh Chodesh Mar Cheshvan 5772. </para>
             </listitem>
             <listitem>
-                <para> Rabbi Chaim Prus - for causing me to investigate which number does the year of Creation has - 0 or 1. </para>
+                <para>Rabbi Chaim Prus - for causing me to investigate which number does the year of Creation has - 0 or 1. </para>
             </listitem>
         </itemizedlist>
     </section>
+    <!-- How to distinguish Rambam from me? Get rid of "discussion"! Maybe just give all translation up front? -->
     <xi:include href="solar-theory.xml"/>
     <xi:include href="lunar-theory.xml"/>
     <glossary>
@@ -99,7 +98,7 @@
                 </author>
                 <title>Mishne Torah</title>
                 <publisher>
-                    <publishername>Widow and Brothers Romm</publishername>
+                    <publishername>Widov and Brothers Romm</publishername>
                 </publisher>
             </biblioentry>
             <biblioentry xml:id="LaAm" xreflabel="Rambam LaAm">
@@ -188,7 +187,7 @@
                 </editor>
             </biblioentry>
             <biblioentry xml:id="HazonIsh">
-                <author>Hazon Ish</author>
+                <author><personname>Hazon Ish</personname></author>
             </biblioentry>
         </bibliodiv>
         <bibliodiv>
@@ -353,15 +352,15 @@
             </biblioentry>
             <biblioentry>
                 <title>Ancient Planetary Model Animations</title>
-                <biblioid class="uti">http://people.sc.fsu.edu/~dduke/models</biblioid>
+                <biblioid class="uri">http://people.sc.fsu.edu/~dduke/models</biblioid>
             </biblioentry>
             <biblioentry>
                 <title>A Modern Almagest: An updated version of Ptolemy's Almagest</title>
-                <biblioid class="uti">http://farside.ph.utexas.edu/Books/Syntaxis/Syntaxis.html</biblioid>
+                <biblioid class="uri">http://farside.ph.utexas.edu/Books/Syntaxis/Syntaxis.html</biblioid>
             </biblioentry>
             <biblioentry>
                 <title>Summary of Ptolemaic Astronomy</title>
-                <biblioid class="uti">http://www.clas.ufl.edu/users/ufhatch/HIS-SCI-STUDY-GUIDE/0034_summaryPtolemiacAstron.html</biblioid>
+                <biblioid class="uri">http://www.clas.ufl.edu/users/ufhatch/HIS-SCI-STUDY-GUIDE/0034_summaryPtolemiacAstron.html</biblioid>
             </biblioentry>
         </bibliodiv>
         <bibliodiv>
@@ -529,11 +528,11 @@
                 <biblioid class="uri">http://isbn.nu/0872030261</biblioid>
             </biblioentry>
             <biblioentry>
-                <author>Belenkiy</author>
+                <author><personname>Belenkiy</personname></author>
                 <biblioid class="uri">http://u.cs.biu.ac.il/~belenka/calendar.html</biblioid>
             </biblioentry>
             <biblioentry>
-                <author>Bromberg</author>
+                <author><personname>Bromberg</personname></author>
                 <biblioid class="uri">http://individual.utoronto.ca/kalendis/</biblioid>
             </biblioentry>
             <biblioentry>

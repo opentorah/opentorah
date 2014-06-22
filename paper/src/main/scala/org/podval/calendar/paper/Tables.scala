@@ -34,7 +34,7 @@ object Tables {
       val calculated = Column("calculated", "v(1)*n", data.calculated)
       val reconstructed = Column("reconstructed 1-day movement", "r(n)", data.reconstructed)
       val recalculated = Column("recalculated", "r(10000)*n", data.recalculated)
-      val recalculated10 = Column("recalculated", "r(10000)*n", data.recalculated10)
+      val recalculated10 = Column("recalculated", "r(10)*n", data.recalculated10)
       val almagest = Column("Alamgest", "*n", data.almagest)
 
       List(
