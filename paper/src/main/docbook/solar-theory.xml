@@ -60,14 +60,11 @@
                 <xi:include href="sml-reconstructed.xml"/>
 
                 <para>
-                    <biblioref linkend="Tzikuni"/> (p. XXX) gives the algorithm of such reconstruction: add to the remainder
-                    as many times 365 as there were full rotations in given time period, and then divide.
-                    It also gives a value reconstructed from the printed values for 10,000, 1000 and 100 days: 59′8.33″,
-                    or 0.9856472 degrees, and the current "scientific" value of 0.9856473 degrees.
-                    It seems that origins of the Rambam's value were questioned by his commentators, including "Pirush".
-                    Value that can be derived from the tradition that 19 years = 6939 days 16 hours and 595 parts is 0.9856348.
-                    This algorithm can be modified to produce an interval of possible values, taking into account precision
-                    of the numbers.</para>
+                    <biblioref linkend="Tzikuni"/> (p. XXX) gives the algorithm of such reconstruction: add to the remainder as many times 360 as there were full rotations in given
+                    time period, and then divide. It also gives a value reconstructed from the printed values for 10,000, 1000 and 100 days: 59′8.33″, or 0.9856472 degrees, and the
+                    current "scientific" value of 0.9856473 degrees. It seems that origins of the Rambam's value were questioned by his commentators, including "Pirush". Value that
+                    can be derived from the tradition that 19 years = 6939 days 16 hours and 595 parts is 0.9856348. This algorithm can be modified to produce an interval of
+                    possible values, taking into account precision of the numbers.</para>
 
                 <para>
                     Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
@@ -82,7 +79,7 @@
                     the values Rambam published - except for 29 days, 354 days, and 10000 days which
                     we use to calculate the exact value that Rambam used! TODO! </para>
 
-                <para><biblioref linkend="Tzikuni"/> quotes Rambam's value for 354 days as 348°55′15″, but calcu;ated value
+                <para><biblioref linkend="Tzikuni"/> quotes Rambam's value for 354 days as 348°55′15″, but calculated value
                     as 348°55′9″, and notes that this "requires a little thought".</para>
             </section>
         </section>
@@ -111,46 +108,57 @@
         
         <section>
             <title>Law 1</title>
+            <para></para>
         </section>
         
         <section>
             <title>Law 2</title>
+            <para></para>
         </section>
         
         <section>
             <title>Law 3</title>
+            <para></para>
         </section>
         
         <section>
             <title>Law 4</title>
+            <para></para>
         </section>
         
         <section>
             <title>Law 5</title>
+            <para></para>
         </section>
         
         <section>
             <title>Law 6</title>
+            <para></para>
         </section>
         
         <section>
             <title>Law 7</title>
+            <para></para>
         </section>
         
         <section>
             <title>Law 8</title>
+            <para></para>
         </section>
         
         <section>
             <title>Law 9</title>
+            <para></para>
         </section>
         
         <section>
             <title>Law 10</title>
+            <para></para>
         </section>
         
         <section>
             <title>Law 11</title>
+            <para></para>
         </section>
     </section>
 </section>

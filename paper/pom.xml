@@ -87,6 +87,10 @@
                     <chunkerOutputIndent>yes</chunkerOutputIndent>
 
                     <!-- PDF -->
+                    <!-- TODO Even with the customization, section titles do not render (incorrect font?); but in Oxygen, they do - once the fonts are set... -->
+                    <!-- TODO Switch to publican? -->
+                    <foCustomization>src/main/docbook/customization.xsl</foCustomization>
+
                     <insertXrefPageNumber>yes</insertXrefPageNumber>
                     <doubleSided>yes</doubleSided>
 

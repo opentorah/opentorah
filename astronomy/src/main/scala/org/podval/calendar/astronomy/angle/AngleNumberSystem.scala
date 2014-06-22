@@ -34,7 +34,7 @@ object AngleNumberSystem extends {
 
 } with NumberSystem {
 
-
+  // TODO *n returns wrong type!!! Can't apply roundToSeconds etc!
   final class Angle(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) with ScalarNumber with Ordered[Angle] {
 
     protected override type SelfType = Angle

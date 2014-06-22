@@ -14,9 +14,14 @@
                 <para>The moon has two mean movements. The moon itself rotates on a small circle
                     that does not surround all of the Earth. Moon's movement on that small circle is
                     called <glossterm linkend="mla-term">mean lunar anomaly</glossterm> (אמצע המסלול). The small circle
-                    (epicycle) itself rotates on a big circle (deferent) that surrounds the Earth.
-                    The mean movement of the small circle on the big circle that surrounds the Earth
-                    is called <glossterm>mean lunar longitude</glossterm> (אמצע הירח). </para>
+                    (epicycle TODO link to Wikipedia) itself rotates on a big circle (deferent TODO link to Wikipedia)
+                    that encircles the Earth.
+                    The mean movement of the small circle on the big circle that encircles the Earth
+                    is called movement of the <glossterm>mean lunar longitude</glossterm> (אמצע הירח). </para>
+
+                <para>Note: The first is "mean" - because it is corrected by the second, giving "true"?
+                    Why is the second "mean"? Because of the effects of the sun?</para>
+                <para>Note: Wrom what and in which direction are the angles measured?</para>
             </section>
 
             <section>
@@ -141,7 +146,7 @@
                 <title>Law 4: Position of the Moon on the Epoch</title>
 
                 <para>
-                    In the beginning of the night to Thursday that is the epoch [TODO: link to definition]
+                    In the beginning of the night to Thursday that is the epoch (TODO measured from what? Chapter 11?) [TODO: link to definition]
                     for these calculations, mean lunar longitude was 1°14′43″ into the constellation of Ram.
                     And mean lunar anomaly on the epoch was 84°28′42″.
                     Now that you know rate of movement in the mean lunar longitude and its value on the epoch
@@ -166,14 +171,14 @@
                             <row>
                                 <entry>Solar Longitude on the Zodiac</entry>
                                 <entry>from</entry>
-                                <entry>to, not including<footnote><para>My feeling about the word usage in the original.</para></footnote></entry>
+                                <entry>to, not including<footnote><para>My understanding of the word usage in the original.</para></footnote></entry>
                                 <entry>Lunar longitude correction</entry>
                             </row>
                         </thead>
                         <tbody>
                             <row>
                                 <entry>middle of Pisces-middle of Taurus
-                                    <footnote><para>See Chapter 11, Law 7 on the start of Jewish Zodiac.</para></footnote>
+                                    <footnote><para>See Chapter 11, Law 7 on the start of Jewish Zodiac. (TODO reference)</para></footnote>
                                 </entry>
                                 <entry>315°</entry>
                                 <entry>15°</entry>
@@ -385,6 +390,7 @@
                     <para> Formulae: <equation>
                         <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                             <!-- Browsers (and MathJax) do not support Content MathML, so I have to settle for presentation... -->
+                            <!-- TODO doesn't show in the DocBook PDF! -->
                             <mrow>
                                 <msup>
                                     <mi>tan</mi>

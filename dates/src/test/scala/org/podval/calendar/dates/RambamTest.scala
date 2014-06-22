@@ -77,7 +77,7 @@ class RambamTest extends FlatSpec {
 
     // KH 6:4
     assert(Year.normal == interval.days(354).hours(8).parts(876))
-    assert(Seasons.yearOfShmuel == interval.days(365).hours(6))
+    assert(Sun.yearOfShmuel == interval.days(365).hours(6))
 
 
     // KH 6:5
@@ -87,20 +87,20 @@ class RambamTest extends FlatSpec {
 
 
     // KH 6:10; 9:1
-    assert(Seasons.yearOfShmuel == interval.days(365).hours(6))
-    assert(Seasons.yearOfShmuel*Year.yearsInCycle - Year.cycleLength == interval.hours(1).parts(485))
+    assert(Sun.yearOfShmuel == interval.days(365).hours(6))
+    assert(Sun.yearOfShmuel*Year.yearsInCycle - Year.cycleLength == interval.hours(1).parts(485))
 
 
     // KH 10:1
-    assert(Seasons.yearOfRavAda == interval.days(365).hours(5).parts(997).moments(48))
-    assert(Seasons.yearOfRavAda*Year.yearsInCycle - Year.cycleLength == interval)
+    assert(Sun.yearOfRavAda == interval.days(365).hours(5).parts(997).moments(48))
+    assert(Sun.yearOfRavAda*Year.yearsInCycle - Year.cycleLength == interval)
   }
 
 
   "tkufos" should "be correct" in {
-    assert(Year(1).month(Month.Nisan).newMoon - Seasons.tkufasNissan(1) == interval.days(7).hours(9).parts(642))
+    assert(Year(1).month(Month.Nisan).newMoon - Sun.tkufasNissan(1) == interval.days(7).hours(9).parts(642))
 
-    val vernalEquinox4930 = Seasons.tkufasNissan(4930)
+    val vernalEquinox4930 = Sun.tkufasNissan(4930)
     assert(vernalEquinox4930.day.name == Day.Chamishi)
     assert(vernalEquinox4930.time == interval.hours(6))
   }

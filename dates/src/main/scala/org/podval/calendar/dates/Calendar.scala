@@ -42,7 +42,6 @@ import TimeNumberSystem.TimeInterval
     Well, it didn't go away completely!
     What a mess!
  */
-// TODO dualize Interval and Moment
 abstract class Calendar {
 
   type Year <: YearBase
@@ -382,7 +381,7 @@ abstract class Calendar {
   val Moment: MomentCompanion
 
 
-  final def moment: Moment = Moment(false, List(0))  // TODO This is def and not a val to make initialization possible
+  final def moment: Moment = Moment(false, List(0))  // This is def and not a val to make initialization possible
 
 
   final val interval: TimeInterval = TimeInterval(false, List(0))

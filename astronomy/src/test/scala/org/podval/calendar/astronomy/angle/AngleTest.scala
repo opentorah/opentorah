@@ -22,7 +22,7 @@ import AngleNumberSystem.Angle
 
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class TestAngle extends FlatSpec {
+class AngleTest extends FlatSpec {
 
     behavior of "Angle"
 

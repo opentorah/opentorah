@@ -20,6 +20,29 @@ trait NumberSystem {
   type Creator[T <: Number] = (Boolean, List[Int]) => T
 
 
+  protected val signs: List[String]
+
+
+  protected val headRange: Option[Int]
+
+
+  protected val ranges: List[Int]
+
+
+  ranges.foreach { range =>
+    require(range > 0)
+    require(range % 2 == 0)
+  }
+
+  require(signs.length == (ranges.length + 1))
+
+
+  final def maxLength = ranges.length
+
+
+  private[this] val divisors: List[Double] = ranges.inits.toList.reverse.tail.map { upto: List[Int] => upto.fold(1)(_ * _).toDouble}
+
+
 
   trait Number {
 
@@ -44,11 +67,14 @@ trait NumberSystem {
     final def length: Int = tail.length
 
 
-    final def digit(n: Int): Int = if (length >= n) digits(n) else 0
+    final def digit(n: Int): Int = {
+      require(0 <= n && n <= maxLength)
+      if (length >= n) digits(n) else 0
+    }
 
 
     final def digit(n: Int, value: Int): SelfType = {
-      // TODO check that n is not more than max length
+      require(0 <= n && n <= maxLength)
       create(negative, digits.padTo(n + 1, 0).updated(n, value))(selfCreator)
     }
 
@@ -58,7 +84,7 @@ trait NumberSystem {
 
     protected final def compare_(that: SelfType) = {
       if (this.negative == that.negative) {
-        val result = zip(that) map lift(_.compare(_)) find (_ != 0) getOrElse (0)
+        val result = zip(that) map lift(_.compare(_)) find (_ != 0) getOrElse(0)
         if (!this.negative) result else -result
       } else {
         if (!that.negative) +1 else -1
@@ -69,14 +95,18 @@ trait NumberSystem {
     protected final def equals_(that: SelfType): Boolean = compare_(that) == 0
 
 
-    final def plus[T <: Number](that: Number)(creator: Creator[T]): T = {
-      val operation: (Int, Int) => Int = if (this.negative == that.negative) (_ + _) else (_ - _)
-      create(negative, zip(that).map(lift(operation)))(creator)
+    final def plus[T <: Number](that: Number)(creator: Creator[T]): T = plusMinus(false, that)(creator)
+
+
+    final def minus[T <: Number](that: Number)(creator: Creator[T]): T = plusMinus(true, that)(creator)
+
+
+    private[this] final def plusMinus[T <: Number](operationNegation: Boolean, that: Number)(creator: Creator[T]): T = {
+      val sameSign = this.negative == that.negative
+      val operationSelector = if (operationNegation) !sameSign else sameSign
+      val operation: (Int, Int) => Int = if (operationSelector) _ + _ else _ - _
+      create(negative, zip(that).map(operation.tupled))(creator)
     }
-
-
-    final def minus[T <: Number](that: Number)(creator: Creator[T]): T =
-      create(negative, zip(that).map(lift (if (this.negative == that.negative) (_ - _) else (_ + _))))(creator)
 
 
     private[this] def zip(that: Number): List[(Int, Int)] = this.digits zipAll(that.digits, 0, 0)
@@ -90,6 +120,7 @@ trait NumberSystem {
       (if (negative) -1 else +1) * (head + ((tail zip divisors) map lift(_ / _)).sum)
 
 
+    // TODO add rounding tests
     final def roundTo(n: Int): SelfType = {
       require(n >= 0)
 
@@ -97,7 +128,7 @@ trait NumberSystem {
       val tail_ = {
         if (more_.isEmpty) more_
         else {
-          val toRoundWithRange = toRound zip divisors.drop(n)
+          val toRoundWithRange = toRound zip ranges.drop(n)
           val carry = (toRoundWithRange :\ 0) { case ((x, range), c) => if (x + c >= range / 2) 1 else 0}
           more_.init :+ (more_.last + carry)
         }
@@ -110,7 +141,7 @@ trait NumberSystem {
     // TODO: padding; cutting off 0; more flavours...
     protected final def toSignedString: String = {
       val tokens = digits map (_.toString) zip signs flatMap (p => List(p._1, p._2))
-      val result = (if (length <= 3) tokens else tokens.init).mkString   // TODO chop off 0s!
+      val result = (if (length <= 3) tokens else tokens.init).mkString
       (if (negative) "-" else "") + result
     }
 
@@ -184,35 +215,15 @@ trait NumberSystem {
 
 
     final def %(that: SelfType): SelfType = this.minus(that * (this / that))(selfCreator)
+
+
+    // TODO add multiplication (and division, and reminder) on the ScalarNumber from another NumberSystem!
   }
 
 
 
   abstract class NumberBase(override val negative: Boolean, override val digits: List[Int]) extends Number
 
-
-
-  protected val signs: List[String]
-
-
-  protected val headRange: Option[Int]
-
-
-  protected val ranges: List[Int]
-
-
-  ranges.foreach { range =>
-    require(range > 0)
-    require(range % 2 == 0)
-  }
-
-  require(signs.length == (ranges.length + 1))
-
-
-  final def maxLength = ranges.length
-
-
-  private[this] val divisors: List[Double] = ranges.inits.toList.reverse.tail.map { upto: List[Int] => upto.fold(1)(_ * _).toDouble}
 
 
   final def fromDouble[T <: Number](value: Double, length: Int)(creator: Creator[T]): T = {
