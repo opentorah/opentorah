@@ -17,7 +17,19 @@ package org.podval.calendar.dates
  */
 trait NumberSystem {
 
-  type Creator[T <: Number] = (Boolean, List[Int]) => T
+  protected type Creator[T <: Number] = (Boolean, List[Int]) => T
+
+
+  protected type Point <: PointBase
+
+
+  protected val pointCreator: Creator[Point]
+
+
+  protected type Interval <: IntervalBase
+
+
+  protected val intervalCreator: Creator[Interval]
 
 
   protected val signs: List[String]
@@ -37,7 +49,7 @@ trait NumberSystem {
   require(signs.length == (ranges.length + 1))
 
 
-  final def maxLength = ranges.length
+  protected final def maxLength = ranges.length
 
 
   private[this] val divisors: List[Double] = ranges.inits.toList.reverse.tail.map { upto: List[Int] => upto.fold(1)(_ * _).toDouble}
@@ -49,7 +61,23 @@ trait NumberSystem {
     protected type SelfType <: Number
 
 
-    protected def selfCreator: Creator[SelfType]
+    protected val selfCreator: Creator[SelfType]
+
+
+    final override def hashCode = (73 /: digits)((v, x) => 41 * v + x) + negative.hashCode
+
+
+    protected final def compare_(that: Number) = {
+      if (this.negative == that.negative) {
+        val result = zip(that) map lift(_.compare(_)) find (_ != 0) getOrElse(0)
+        if (!this.negative) result else -result
+      } else {
+        if (!that.negative) +1 else -1
+      }
+    }
+
+
+    protected final def equals_(that: Number): Boolean = compare_(that) == 0
 
 
     def negative: Boolean
@@ -79,26 +107,10 @@ trait NumberSystem {
     }
 
 
-    final override def hashCode = (73 /: digits)((v, x) => 41 * v + x) + negative.hashCode
+    protected final def plus[T <: Number](that: Number)(creator: Creator[T]): T = plusMinus(false, that)(creator)
 
 
-    protected final def compare_(that: SelfType) = {
-      if (this.negative == that.negative) {
-        val result = zip(that) map lift(_.compare(_)) find (_ != 0) getOrElse(0)
-        if (!this.negative) result else -result
-      } else {
-        if (!that.negative) +1 else -1
-      }
-    }
-
-
-    protected final def equals_(that: SelfType): Boolean = compare_(that) == 0
-
-
-    final def plus[T <: Number](that: Number)(creator: Creator[T]): T = plusMinus(false, that)(creator)
-
-
-    final def minus[T <: Number](that: Number)(creator: Creator[T]): T = plusMinus(true, that)(creator)
+    protected final def minus[T <: Number](that: Number)(creator: Creator[T]): T = plusMinus(true, that)(creator)
 
 
     private[this] final def plusMinus[T <: Number](operationNegation: Boolean, that: Number)(creator: Creator[T]): T = {
@@ -107,13 +119,6 @@ trait NumberSystem {
       val operation: (Int, Int) => Int = if (operationSelector) _ + _ else _ - _
       create(negative, zip(that).map(operation.tupled))(creator)
     }
-
-
-    private[this] def zip(that: Number): List[(Int, Int)] = this.digits zipAll(that.digits, 0, 0)
-
-
-    // TODO why can't I inline .tupled?
-    private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = op.tupled
 
 
     final def toDouble: Double =
@@ -147,25 +152,68 @@ trait NumberSystem {
 
 
     override def toString: String = toSignedString
+
+
+    private[this] def zip(that: Number): List[(Int, Int)] = this.digits zipAll(that.digits, 0, 0)
+
+
+    // TODO why can't I inline .tupled?
+    private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = op.tupled
   }
 
 
 
-  trait ScalarNumber extends Number {
+  trait PointBase extends Number with Ordered[Point] {
 
-    protected type SelfType <: ScalarNumber
-
-
-    final def +(that: SelfType): SelfType = plus(that)(selfCreator)
+    protected override type SelfType = Point
 
 
-    final def -(that: SelfType): SelfType = minus(that)(selfCreator)
+    protected override val selfCreator: Creator[Point] = pointCreator
 
 
-    final def *(n: Int): SelfType = create(negative, digits map (n * _))(selfCreator)
+    final def compare(that: Point) = compare_(that)
 
 
-    final def /(n: Int): SelfType = {
+    final override def equals(other: Any): Boolean =
+      if (!other.isInstanceOf[Point]) false else equals_(other.asInstanceOf[Point])
+
+
+    final def +(that: Interval): Point = plus(that)(pointCreator)
+
+
+    final def -(that: Interval): Point = minus(that)(pointCreator)
+
+
+    final def -(that: Point): Interval = minus(that)(intervalCreator)
+  }
+
+
+
+  trait IntervalBase extends Number with Ordered[Interval] {
+
+    protected override type SelfType = Interval
+
+
+    protected override val selfCreator: Creator[Interval] = intervalCreator
+
+
+    final def compare(that: Interval) = compare_(that)
+
+
+    final override def equals(other: Any): Boolean =
+      if (!other.isInstanceOf[Interval]) false else equals_(other.asInstanceOf[Interval])
+
+
+    final def +(that: Interval): Interval = plus(that)(intervalCreator)
+
+
+    final def -(that: Interval): Interval = minus(that)(intervalCreator)
+
+
+    final def *(n: Int): Interval = create(negative, digits map (n * _))(intervalCreator)
+
+
+    final def /(n: Int): Interval = {
 
       def step(acc: (List[Int], Int), elem: (Int, Int)) = {
         val (digit, range) = elem
@@ -190,14 +238,14 @@ trait NumberSystem {
       val (newDigits, lastCarry) = ((digits.init zip (0 :: ranges.init)).foldLeft(List.empty[Int], 0))(step)
       val lastDigit = lastStep(digits.last, lastCarry, ranges.last)
 
-      create(negative, newDigits :+ lastDigit)(selfCreator)
+      create(negative, newDigits :+ lastDigit)(intervalCreator)
     }
 
 
-    final def %(n: Int): SelfType = this.minus((this / n) * n)(selfCreator)
+    final def %(n: Int): Interval = this - ((this / n) * n)
 
 
-    final def /(that: SelfType): Int = {
+    final def /(that: Interval): Int = {
       // TODO deal with negativity
       // TODO faster?
       var result = 0
@@ -205,7 +253,7 @@ trait NumberSystem {
       var subtractee = this
 
       do {
-        subtractee = subtractee.minus(that)(selfCreator)
+        subtractee = subtractee - that
         done = subtractee.negative
         if (!done) result += 1
       } while (!done)
@@ -214,7 +262,7 @@ trait NumberSystem {
     }
 
 
-    final def %(that: SelfType): SelfType = this.minus(that * (this / that))(selfCreator)
+    final def %(that: Interval): Interval = this - (that * (this / that))
 
 
     // TODO add multiplication (and division, and reminder) on the ScalarNumber from another NumberSystem!

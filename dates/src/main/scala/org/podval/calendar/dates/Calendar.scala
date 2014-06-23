@@ -16,9 +16,6 @@
 
 package org.podval.calendar.dates
 
-import TimeNumberSystem.TimeInterval
-
-
 /* TODO
   There are things that I do not yet understand about Scala's approach to family polymorphism.
 
@@ -337,34 +334,26 @@ abstract class Calendar {
 
 
 
-  class MomentBase(negative: Boolean, digits: List[Int]) extends TimeNumberSystem.TimeNumber(negative, digits) with Ordered[Moment] {
+  object numberSystem extends TimeNumberSystem {
 
-    protected type SelfType = Moment
-
-
-    protected def selfCreator = Moment.apply _
+    protected override type Point = Moment
 
 
-    final override def compare(that: Moment): Int = compare_(that)
+    protected val pointCreator: Creator[Moment] = Moment.apply
+  }
 
 
-    final override def equals(other: Any): Boolean =
-      if (!other.isInstanceOf[Moment]) false else equals_(other.asInstanceOf[Moment])
+
+  type TimeInterval = numberSystem.TimeInterval
 
 
-    final def +(that: TimeInterval): Moment = super.plus(that)(selfCreator)
 
-
-    final def -(that: TimeInterval): Moment = super.minus(that)(selfCreator)
-
-
-    final def -(that: Moment): TimeInterval = super.minus(that)(TimeInterval.creator)
-
+  class MomentBase(negative: Boolean, digits: List[Int]) extends numberSystem.TimePoint(negative, digits) {
 
     final def day: Day = Day(days + 1)
 
 
-    final def time: TimeInterval = TimeInterval(false, days(0).digits)
+    final def time: TimeInterval = numberSystem.TimeInterval(false, days(0).digits)
   }
 
 
@@ -381,10 +370,11 @@ abstract class Calendar {
   val Moment: MomentCompanion
 
 
+
   final def moment: Moment = Moment(false, List(0))  // This is def and not a val to make initialization possible
 
 
-  final val interval: TimeInterval = TimeInterval(false, List(0))
+  final val interval: TimeInterval = numberSystem.TimeInterval(false, List(0))
 
 
   final val week: TimeInterval = interval.days(7)

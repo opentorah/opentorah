@@ -16,8 +16,6 @@
 
 package org.podval.calendar.dates
 
-import org.podval.calendar.dates.TimeNumberSystem.TimeInterval
-
 
 object Jewish extends Calendar {
 

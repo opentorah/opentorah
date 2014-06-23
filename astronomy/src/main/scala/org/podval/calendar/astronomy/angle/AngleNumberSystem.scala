@@ -24,60 +24,59 @@ object AngleNumberSystem extends {
   private val max_length = 10
 
 
-  override val signs: List[String] = List("°", "′", "″", "‴") ++ List.empty.padTo(max_length - 4, ",")
+  protected override val signs: List[String] = List("°", "′", "″", "‴") ++ List.empty.padTo(max_length - 4, ",")
 
 
-  override val ranges: List[Int] = List.empty.padTo(max_length - 1, 60)
+  protected override val ranges: List[Int] = List.empty.padTo(max_length - 1, 60)
 
 
   protected override val headRange: Option[Int] = Some(360)
 
 } with NumberSystem {
 
-  // TODO *n returns wrong type!!! Can't apply roundToSeconds etc!
-  final class Angle(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) with ScalarNumber with Ordered[Angle] {
-
-    protected override type SelfType = Angle
+  protected final override type Interval = Angle
 
 
-    protected override def selfCreator = Angle.creator
+  protected final override val intervalCreator: Creator[Interval] = Angle.apply
 
 
-    final override def compare(that: Angle): Int = compare_(that)
+  protected final override type Point = AnglePoint
 
 
-    final override def equals(other: Any): Boolean =
-      if (!other.isInstanceOf[Angle]) false else equals_(other.asInstanceOf[Angle])
+  protected final override val pointCreator: Creator[Point] = AnglePoint.apply
 
+
+
+  trait AngleNumber extends Number {
 
     def degrees: Int = head
 
 
-    def degrees(value: Int): Angle = digit(0, value)
+    def degrees(value: Int): SelfType = digit(0, value)
 
 
     def minutes = digit(1)
 
 
-    def minutes(value: Int): Angle = digit(1, value)
+    def minutes(value: Int): SelfType = digit(1, value)
 
 
-    def roundToMinutes: Angle = roundTo(1)
+    def roundToMinutes: SelfType = roundTo(1)
 
 
     def seconds = digit(2)
 
 
-    def seconds(value: Int): Angle = digit(2, value)
+    def seconds(value: Int): SelfType = digit(2, value)
 
 
-    def roundToSeconds: Angle = roundTo(2)
+    def roundToSeconds: SelfType = roundTo(2)
 
 
     def thirds  = digit(3)
 
 
-    def thirds(value: Int): Angle = digit(3, value)
+    def thirds(value: Int): SelfType = digit(3, value)
 
 
     def toRadians: Double = math.toRadians(toDegrees)
@@ -88,15 +87,25 @@ object AngleNumberSystem extends {
 
 
 
-  object Angle extends {
+  protected final class AnglePoint(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) with AngleNumber with PointBase
+
+
+  protected object AnglePoint {
+
+    def apply(negative: Boolean, digits: List[Int]): AnglePoint = new AnglePoint(negative, digits)
+  }
+
+
+  final class Angle(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) with AngleNumber with IntervalBase
+
+
+
+  object Angle {
 
     def apply(digits: Int*): Angle = new Angle(false, digits.toList)
 
 
     def apply(negative: Boolean, digits: List[Int]): Angle = new Angle(negative, digits)
-
-
-    val creator: Creator[Angle] = apply _
 
 
     import scala.language.implicitConversions
@@ -108,7 +117,7 @@ object AngleNumberSystem extends {
     def fromRadians(value: Double, length: Int): Angle = fromDegrees(math.toDegrees(value), length)
 
 
-    def fromDegrees(value: Double, length: Int): Angle = fromDouble(value, length)(creator)
+    def fromDegrees(value: Double, length: Int): Angle = fromDouble(value, length)(intervalCreator)
 
 
     def exactify(approximate: Angle, days: Int, angle: Angle): Double = {

@@ -15,31 +15,31 @@ package org.podval.calendar.dates
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-object TimeNumberSystem extends {
+abstract class TimeNumberSystem extends {
 
-  val hoursPerDay = 24
-
-
-  val partsPerHour = 1080
+  final val hoursPerDay = 24
 
 
-  val momentsPerPart = 76
+  final val partsPerHour = 1080
 
 
-  protected override val signs: List[String] = List("d", "h", "p", "m")
+  final val momentsPerPart = 76
 
 
-  protected override val ranges: List[Int] = List(hoursPerDay, partsPerHour, momentsPerPart)
+  protected final override val signs: List[String] = List("d", "h", "p", "m")
 
 
-  protected override val headRange: Option[Int] = None
+  protected final override val ranges: List[Int] = List(hoursPerDay, partsPerHour, momentsPerPart)
+
+
+  protected final override val headRange: Option[Int] = None
 
 } with NumberSystem {
 
   require(hoursPerDay % 2 == 0)
 
 
-  val hoursPerHalfDay = hoursPerDay / 2
+  final val hoursPerHalfDay = hoursPerDay / 2
 
 
   private val minutesPerHour = 60
@@ -48,11 +48,17 @@ object TimeNumberSystem extends {
   require(partsPerHour % minutesPerHour == 0)
 
 
-  val partsPerMinute = partsPerHour / minutesPerHour
+  final val partsPerMinute = partsPerHour / minutesPerHour
+
+
+  protected final override type Interval = TimeInterval
+
+
+  protected final override val intervalCreator: Creator[Interval] = TimeInterval.apply _
 
 
 
-  trait TimeNumberBase extends Number {
+  trait TimeNumber extends Number {
 
     final def days: Int = head
 
@@ -70,14 +76,14 @@ object TimeNumberSystem extends {
 
 
     final def firstHalfHours(value: Int): SelfType = {
-      require(0 <= hours && hours < TimeNumberSystem.hoursPerHalfDay)
+      require(0 <= hours && hours < hoursPerHalfDay)
       hours(value)
     }
 
 
     final def secondHalfHours(value: Int): SelfType = {
-      require(0 <= value && value < TimeNumberSystem.hoursPerHalfDay)
-      hours(value + TimeNumberSystem.hoursPerHalfDay)
+      require(0 <= value && value < hoursPerHalfDay)
+      hours(value + hoursPerHalfDay)
     }
 
 
@@ -87,16 +93,16 @@ object TimeNumberSystem extends {
     final def parts(value: Int): SelfType = digit(2, value)
 
 
-    final def minutes: Int = parts / TimeNumberSystem.partsPerMinute
+    final def minutes: Int = parts / partsPerMinute
 
 
-    final def minutes(value: Int): SelfType = parts(value*TimeNumberSystem.partsPerMinute+partsWithoutMinutes)
+    final def minutes(value: Int): SelfType = parts(value*partsPerMinute+partsWithoutMinutes)
 
 
-    final def partsWithoutMinutes: Int = parts % TimeNumberSystem.partsPerMinute
+    final def partsWithoutMinutes: Int = parts % partsPerMinute
 
 
-    final def partsWithoutMinutes(value: Int): SelfType = parts(minutes*TimeNumberSystem.partsPerMinute+value)
+    final def partsWithoutMinutes(value: Int): SelfType = parts(minutes*partsPerMinute+value)
 
 
     final def moments: Int = digit(3)
@@ -107,32 +113,16 @@ object TimeNumberSystem extends {
 
 
 
-  abstract class TimeNumber(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) with TimeNumberBase
+  abstract class TimePoint(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) with TimeNumber with PointBase
 
 
 
-  final class TimeInterval(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) with TimeNumberBase with ScalarNumber with Ordered[TimeInterval] {
-
-    protected override type SelfType = TimeInterval
-
-
-    protected override def selfCreator = TimeInterval.creator
-
-
-    final override def compare(that: TimeInterval): Int = compare_(that)
-
-
-    final override def equals(other: Any): Boolean =
-      if (!other.isInstanceOf[TimeInterval]) false else equals_(other.asInstanceOf[TimeInterval])
-  }
+  final class TimeInterval(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) with TimeNumber with IntervalBase
 
 
 
   object TimeInterval {
 
     def apply(negative: Boolean, digits: List[Int]): TimeInterval = new TimeInterval(negative, digits)
-
-
-    val creator: Creator[TimeInterval] = apply _
   }
 }

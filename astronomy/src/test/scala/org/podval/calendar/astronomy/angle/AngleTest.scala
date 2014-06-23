@@ -59,7 +59,11 @@ class AngleTest extends FlatSpec {
 
 
     it should "round properly" in {
-        assertResult(Angle(104,58,50))(Angle(104,58,50,16,39,59,43).roundToSeconds)
+      assertResult(Angle(104, 58, 50))(Angle(104, 58, 50, 16, 39, 59, 43).roundToSeconds)
+
+      val a: Angle = Angle(0, 15, 15)
+      val a2: Angle = a*2
+      assertResult(Angle(0, 31))(a2.roundToMinutes)
     }
 
 
