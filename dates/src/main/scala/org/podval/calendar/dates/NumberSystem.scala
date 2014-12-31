@@ -35,6 +35,7 @@ trait NumberSystem {
   protected val signs: List[String]
 
 
+  // TODO abstract the headRange-related behaviour into methods; make the calls to them explicit.
   protected val headRange: Option[Int]
 
 
@@ -266,6 +267,21 @@ trait NumberSystem {
 
 
     // TODO add multiplication (and division, and reminder) on the ScalarNumber from another NumberSystem!
+    // How to formulate the type of "Number from some NumberSystem"?
+
+    final def digitsWithRangesForMultiplication: List[(Int, Int)] = digits zip (1 :: ranges)
+
+
+    final def *(that: NumberSystem#IntervalBase): Interval = {
+      val z = create(false, List(0))(intervalCreator)
+
+      def step(elem: (Int, Int), acc: Interval): Interval = {
+        val (digit, range) = elem
+        (acc + this*digit)/range
+      }
+
+      that.digitsWithRangesForMultiplication.foldRight(z)(step)
+    }
   }
 
 

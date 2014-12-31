@@ -10,26 +10,11 @@
                         <scenarioAssociation-array>
                             <scenarioAssociation>
                                 <field name="url">
-                                    <String>src/main/docbook/calendar.xml</String>
+                                    <String>src/main/docbook/translation.xml</String>
                                 </field>
                                 <field name="scenarioIds">
                                     <list>
-                                        <String>DocBook PDF - Copy</String>
-                                    </list>
-                                </field>
-                                <field name="scenarioTypes">
-                                    <list>
-                                        <String>XSL</String>
-                                    </list>
-                                </field>
-                            </scenarioAssociation>
-                            <scenarioAssociation>
-                                <field name="url">
-                                    <String>src/main/docbook/solar-theory.xml</String>
-                                </field>
-                                <field name="scenarioIds">
-                                    <list>
-                                        <String>DocBook PDF - Copy</String>
+                                        <String>DocBook PDF - Customized</String>
                                     </list>
                                 </field>
                                 <field name="scenarioTypes">
@@ -48,7 +33,7 @@
                                     <null/>
                                 </field>
                                 <field name="name">
-                                    <String>DocBook PDF - Copy</String>
+                                    <String>DocBook PDF - Customized</String>
                                 </field>
                                 <field name="baseURL">
                                     <String></String>

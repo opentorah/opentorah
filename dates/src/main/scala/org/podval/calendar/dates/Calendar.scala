@@ -36,8 +36,7 @@ package org.podval.calendar.dates
 
   o Derived Calendars are objects, but unless I do things like val x = Jewish, I used to get initialization errors!
     Which now went away for some reason! Maybe, because I took MonthDescriptor out of the Month companion!
-    Well, it didn't go away completely!
-    What a mess!
+    Well, it didn't go away completely! What a mess!
  */
 abstract class Calendar {
 

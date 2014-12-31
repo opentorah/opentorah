@@ -87,13 +87,15 @@ object AngleNumberSystem extends {
 
 
 
-  protected final class AnglePoint(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) with AngleNumber with PointBase
+  final class AnglePoint(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) with AngleNumber with PointBase
 
 
-  protected object AnglePoint {
+
+  object AnglePoint {
 
     def apply(negative: Boolean, digits: List[Int]): AnglePoint = new AnglePoint(negative, digits)
   }
+
 
 
   final class Angle(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) with AngleNumber with IntervalBase

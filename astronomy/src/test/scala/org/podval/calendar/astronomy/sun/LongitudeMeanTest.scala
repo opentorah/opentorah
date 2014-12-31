@@ -15,8 +15,8 @@
  */
 
 package org.podval.calendar.astronomy.sun
-
 import org.podval.calendar.astronomy.angle.AngleNumberSystem.Angle
+import org.podval.calendar.dates.Sun
 
 import org.scalatest.FlatSpec
 
@@ -50,5 +50,11 @@ class LongitudeMeanTest extends FlatSpec {
 
   it should "calculate correctly for the regular year" ignore {
     assertResult(LongitudeMean.value(354))(LongitudeMean.value(100)*3+LongitudeMean.value(10)*5+LongitudeMean.value(1)*4)
+  }
+
+
+  it should "make a full circle in a year" in {
+    println(LongitudeMean.exact_ * Sun.yearOfRavAda)
+    println(LongitudeMean.exact_ * Sun.yearOfShmuel)
   }
 }

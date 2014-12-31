@@ -54,7 +54,7 @@ abstract class TimeNumberSystem extends {
   protected final override type Interval = TimeInterval
 
 
-  protected final override val intervalCreator: Creator[Interval] = TimeInterval.apply _
+  protected final override val intervalCreator: Creator[Interval] = TimeInterval.apply
 
 
 
