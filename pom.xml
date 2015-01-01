@@ -99,7 +99,7 @@
                             <!-- TODO
                             Disabled because of
                             https://issues.scala-lang.org/browse/SI-6123
-                            pending a fix
+                            pending a fix in Scala 2.11
                             <arg>-explaintypes</arg>
                             -->
                             <arg>-feature</arg>

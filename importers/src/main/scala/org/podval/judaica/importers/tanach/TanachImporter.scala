@@ -33,12 +33,10 @@ abstract class TanachImporter(inputDirectory: String, workName: String, editionN
 
 
   protected final override def processBook(content: DivContent, edition: Edition, outputName: String): DivContent = {
-    // TODO
-
     val boundContent = DivContent.bind(content, edition.work, HebrewLanguage)
 
 
-    // Non-dominant structures
+    // TODO Insert non-dominant structures
 
     boundContent
 //    content

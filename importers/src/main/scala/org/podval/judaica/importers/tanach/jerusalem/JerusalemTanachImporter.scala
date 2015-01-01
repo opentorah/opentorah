@@ -89,11 +89,6 @@ final class JerusalemTanachImporter(inputDirectory: String)
   )
 
 
-  // TODO Divs should be bound, and names generated from the metadata...
-  // TODO wrap pasek and sofpasuk into something recognized by CSS...
-  // TODO sofpasuk character looks wrong...
-  // TODO add language markers on the elements (after the Divs are bound and Content is retrieved by language)
-
   protected override def parseBook(inputFile: File, outputName: String): DivContent = {
     def dropStuckChapter(what: Seq[String]) = if (isChapter(what.last)) what.dropRight(1) else what
     def isChapter(line: String): Boolean = line.startsWith(JerusalemTanachImporter.PEREK)

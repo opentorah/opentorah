@@ -41,11 +41,7 @@ trait Selectors {
 
 
   final def formats: Seq[Format] =
-    if (selectors.isEmpty) Seq(Nil) else
-      selectors.flatMap(selector => selector.formats.map (selector +: _))
-
-
-  // TODO segregate into some kind of a parser object...
+    if (selectors.isEmpty) Seq(Nil) else selectors.flatMap(selector => selector.formats.map (selector +: _))
 
 
   final def parseFormat(formatOption: Option[String]): Format = formatOption.fold(dominantFormat)(parseFormat)
