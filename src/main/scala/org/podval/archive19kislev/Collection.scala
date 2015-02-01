@@ -87,7 +87,7 @@ final class Collection(val directoryName: String, val title: String) {
               {Document.indexTableHeader}
             </thead>
             <tbody>
-              {documents.map(_.indexTableRow)}
+              {documents.flatMap(_.indexTableRows)}
             </tbody>
           </table>
 

@@ -11,7 +11,7 @@ final class Document(xml: Elem, val name: String) {
   private[this] val fileDesc: Elem = teiHeader.oneChild("fileDesc")
   private[this] val titleStmt: Elem = fileDesc.oneChild("titleStmt")
 
-  val (title: Option[String], subTitle: Option[String]) = extractTitles(titleStmt)
+  val (partTitle: Option[String], title: Option[String], subTitle: Option[String]) = extractTitles(titleStmt)
 
   val author: Option[String] = optionize(titleStmt.oneChild("author").text)
 
@@ -26,11 +26,12 @@ final class Document(xml: Elem, val name: String) {
   val content: Seq[Elem] = tei.oneChild("text").oneChild("body").elems
 
 
-  private[this] def extractTitles(titleStmt: Elem): (Option[String], Option[String]) = {
+  private[this] def extractTitles(titleStmt: Elem): (Option[String], Option[String], Option[String]) = {
     val titles = titleStmt.elemsFilter("title")
+    val partTitle = titles.find(_.getAttribute("type") == "part").map(_.text)
     val mainTitle = titles.find(_.getAttribute("type") == "main").map(_.text).flatMap(optionize)
     val subTitle = titles.find(_.getAttribute("type") == "sub").map(_.text)
-    (mainTitle, subTitle)
+    (partTitle, mainTitle, subTitle)
   }
 
 
@@ -50,7 +51,19 @@ final class Document(xml: Elem, val name: String) {
   }
 
 
-  def indexTableRow: Elem = {
+  def indexTableRows: Seq[Elem] = {
+    (if (partTitle.isDefined) Seq(partRow) else Seq.empty) ++ Seq(documentRow)
+  }
+
+
+  private[this] def partRow: Elem = {
+    <tr>
+      <td class="part-title" colspan="6">{partTitle.get}</td>
+    </tr>
+  }
+
+
+  private[this] def documentRow: Elem = {
     <tr>
       <td>{title.getOrElse("?")}</td>
       <td>{date.getOrElse("")}</td>

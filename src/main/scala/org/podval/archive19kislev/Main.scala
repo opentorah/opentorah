@@ -7,7 +7,7 @@ object Main {
     val dubnovCollection = new Collection("dubnov", "Дубнов")
     dubnovCollection.writeIndex()
 
-//    val archiveCollection = new Collection("archive", "Архив 19 Кислева")
-//    archiveCollection.writeIndex()
+    val archiveCollection = new Collection("archive", "Архив 19 Кислева")
+    archiveCollection.writeIndex()
   }
 }
