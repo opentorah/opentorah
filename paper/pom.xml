@@ -1,4 +1,3 @@
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -17,6 +16,21 @@
 
     <properties>
         <tables.directory>${project.build.directory}/tables</tables.directory>
+
+        <!-- Input directories -->
+        <xsl.directory>src/main/xsl</xsl.directory>
+        <css.directory>src/main/css</css.directory>
+        <images.directory>src/main/images</images.directory>
+
+        <!-- Output directories -->
+        <docbkx.output.directory>${project.build.directory}/docbkx</docbkx.output.directory>
+        <docbkx.pdf.output.directory>${docbkx.output.directory}/pdf</docbkx.pdf.output.directory>
+        <docbkx.html.output.directory>${docbkx.output.directory}/html</docbkx.html.output.directory>
+        <docbkx.epub.output.directory>${docbkx.output.directory}/epub/expanded</docbkx.epub.output.directory>
+
+        <!-- Fonts -->
+        <body.font.family>sans-serif</body.font.family>
+        <body.font.master>14</body.font.master>
     </properties>
 
     <dependencies>
@@ -59,48 +73,17 @@
 
                 <configuration>
                     <sourceDirectory>src/main/docbook</sourceDirectory>
-                    <targetDirectory>${project.build.directory}/docbook</targetDirectory>
-
                     <includes>calendar.xml</includes>
 
                     <xincludeSupported>true</xincludeSupported>
                     <generatedSourceDirectory>${tables.directory}</generatedSourceDirectory>
-
-                    <bodyFontFamily>DejaVuSans</bodyFontFamily>
-                    <titleFontFamily>DejaVuSerif</titleFontFamily>
-                    <monospaceFontFamily>DejaVuMono</monospaceFontFamily>
-
-                    <tocSectionDepth>4</tocSectionDepth>
-
-                    <!-- Common -->
-                    <partAutolabel>yes</partAutolabel>
-                    <chapterAutolabel>yes</chapterAutolabel>
-                    <sectionAutolabel>yes</sectionAutolabel>
-                    <sectionAutolabelMaxDepth>6</sectionAutolabelMaxDepth>
-                    <appendixAutolabel>yes</appendixAutolabel>
-
-                    <!-- HTML -->
-                    <paraPropagatesStyle>yes</paraPropagatesStyle> <!-- "role" attribute on "para" will become "class" in HTML -->
-
-                    <chunkedOutput>true</chunkedOutput>
-                    <chunkerOutputEncoding>UTF-8</chunkerOutputEncoding>
-                    <chunkerOutputIndent>yes</chunkerOutputIndent>
-
-                    <!-- PDF -->
-                    <!-- TODO Even with the customization, section titles do not render (incorrect font?); but in Oxygen, they do - once the fonts are set... -->
-                    <!-- TODO Switch to publican? -->
-                    <foCustomization>src/main/docbook/customization.xsl</foCustomization>
-
-                    <insertXrefPageNumber>yes</insertXrefPageNumber>
-                    <doubleSided>yes</doubleSided>
-
-                    <externalFOPConfiguration>src/main/resources/fop.xconf</externalFOPConfiguration>
 
                     <entities>
                         <entity>
                             <name>version</name>
                             <value>${project.version}</value>
                         </entity>
+
                         <!-- I'd rather use an entity &tables-directory; in my DocBook, but how do I tell oXygen that it is "../../../target/tables" ?! -->
                         <entity>
                             <name>tables-directory</name>
@@ -108,6 +91,90 @@
                         </entity>
                     </entities>
                 </configuration>
+
+                <executions>
+                    <execution>
+                        <id>pdf</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>generate-pdf</goal>
+                        </goals>
+                        <configuration>
+                            <targetDirectory>${docbkx.pdf.output.directory}</targetDirectory>
+                            <foCustomization>${xsl.directory}/pdf.xsl</foCustomization>
+
+                            <!-- Fonts -->
+                            <bodyFontFamily>${body.font.family}</bodyFontFamily>
+                            <bodyFontMaster>${body.font.master}</bodyFontMaster>
+
+                            <!-- Images -->
+                            <imgSrcPath>${basedir}/src/main/images/</imgSrcPath>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>html</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>generate-html</goal>
+                        </goals>
+                        <configuration>
+                            <targetDirectory>${docbkx.html.output.directory}</targetDirectory>
+                            <htmlCustomization>${xsl.directory}/html.xsl</htmlCustomization>
+
+                            <!-- CSS -->
+                            <htmlStylesheet>css/docbook.css</htmlStylesheet>
+
+                            <!-- Images -->
+                            <imgSrcPath>images/</imgSrcPath>
+
+                            <preProcess>
+                                <copy todir="${docbkx.html.output.directory}/css" filtering="true">
+                                    <fileset dir="${css.directory}"/>
+                                    <!-- Fonts (via filtering) -->
+                                    <filterset>
+                                        <filter token="body.font.family" value="${body.font.family}"/>
+                                    </filterset>
+                                </copy>
+                                <copy todir="${docbkx.html.output.directory}/images">
+                                    <fileset dir="${images.directory}"/>
+                                </copy>
+                            </preProcess>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>epub</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>generate-epub</goal>
+                        </goals>
+
+                        <configuration>
+                            <targetDirectory>${docbkx.epub.output.directory}</targetDirectory>
+                            <epubCustomization>${xsl.directory}/epub.xsl</epubCustomization>
+
+                            <!-- CSS -->
+                            <htmlStylesheet>css/docbook.css</htmlStylesheet>
+
+                            <!-- Images -->
+                            <imgSrcPath>images/</imgSrcPath>
+
+                            <preProcess>
+                                <copy todir="${docbkx.epub.output.directory}/css" filtering="true">
+                                    <fileset dir="${css.directory}"/>
+                                    <!-- Fonts (via filtering) -->
+                                    <filterset>
+                                        <filter token="body.font.family" value="${body.font.family}"/>
+                                    </filterset>
+                                </copy>
+                                <copy todir="${docbkx.epub.output.directory}/images">
+                                    <fileset dir="${images.directory}"/>
+                                </copy>
+                            </preProcess>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
