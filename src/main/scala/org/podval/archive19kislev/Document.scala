@@ -27,10 +27,12 @@ final class Document(xml: Elem, val name: String) {
 
 
   private[this] def extractTitles(titleStmt: Elem): (Option[String], Option[String], Option[String]) = {
+    def text(e: Elem): String =   (e.child map (_.text)).mkString(" ")
+
     val titles = titleStmt.elemsFilter("title")
-    val partTitle = titles.find(_.getAttribute("type") == "part").map(_.text)
-    val mainTitle = titles.find(_.getAttribute("type") == "main").map(_.text).flatMap(optionize)
-    val subTitle = titles.find(_.getAttribute("type") == "sub").map(_.text)
+    val partTitle = titles.find(_.getAttribute("type") == "part").map(text(_))
+    val mainTitle = titles.find(_.getAttribute("type") == "main").map(text(_)).flatMap(optionize)
+    val subTitle = titles.find(_.getAttribute("type") == "sub").map(text(_))
     (partTitle, mainTitle, subTitle)
   }
 
