@@ -5,7 +5,7 @@
     exclude-result-prefixes="xs"
     version="1.0">
 
-    <xsl:import href="/usr/share/sgml/docbook/xsl-ns-stylesheets/fo/docbook.xsl"/>
+    <xsl:import href="urn:docbkx:stylesheet"/>
 
     <xsl:import href="common.xsl"/>
     
