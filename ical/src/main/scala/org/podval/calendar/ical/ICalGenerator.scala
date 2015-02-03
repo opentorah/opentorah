@@ -1,5 +1,5 @@
 /*
- *  Copyright 2009-2013 dub.
+ *  Copyright 2009-2015 dub.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -24,55 +24,38 @@ import java.io.{OutputStream, FileOutputStream}
 
 final class ICalGenerator private(os: OutputStream) {
 
+  import ICal._
+  import ICalGenerator.{daysUrl, iconUrl}
+
   val out = new ICalWriter(os)
 
 
   private def writeYear(year: Int) {
-      out.beginCalendar("-//Podval Group//NONSGML Jewish Calendar//EN", "Jewish Dates", "Jewish Dates, Events and Schedules")
+    out.print(beginCalendar("-//Podval Group//NONSGML Jewish Calendar//EN", Some("Jewish Dates"), Some("Jewish Dates, Events and Schedules")))
 
-      var dayG = Gregorian.Day(year, 1, 1)
-      while (dayG.year.number == year) {
-        writeDay(dayG)
-        dayG = dayG.next
-      }
-
-      out.endCalendar
-  }
-
-
-  private def writeDay(dayG: Gregorian.Day) {
-    val dayJ = Conversions.toJewish(dayG)
-    val monthName = toMonthName(dayJ.month.name)
-    val dayNumber = dayJ.numberInMonth
-    val summary = monthName + " " + dayNumber
-    val url = ICalGenerator.daysUrl + dayJ.year.number + "/" + monthName + "/" + dayNumber
-
-    out.beginEvent
-    out.writeSummary(summary)
-    out.writeFullDayDuration(dayG)
-    out.addGoggleContent(summary, ICalGenerator.iconUrl, url, 200, 200)
-    out.endEvent
-  }
-
-
-  private def toMonthName(month: Jewish.Month.Name): String = {
-    import Jewish.Month._
-    month match {
-      case Tishrei   => "Тишрей"
-      case Marheshvan=> "Мар-Хешван"
-      case Kislev    => "Кислев"
-      case Teves     => "Тевес"
-      case Shvat     => "Шват"
-      case Adar      => "Адар"
-      case AdarI     => "Адар I"
-      case AdarII    => "Адар II"
-      case Nisan     => "Нисан"
-      case Iyar      => "Ияр"
-      case Sivan     => "Сиван"
-      case Tammuz    => "Таммуз"
-      case Av        => "Ав"
-      case Elul      => "Элул"
+    var dayG = Gregorian.Day(year, 1, 1)
+    while (dayG.year.number == year) {
+      out.print(day(dayG))
+      dayG = dayG.next
     }
+
+    out.print(endCalendar)
+  }
+
+
+  private def day(dayG: Gregorian.Day): Properties = {
+    val dayJ = Conversions.toJewish(dayG)
+    val monthName: String = dayJ.month.name.name
+    val dayNumber = dayJ.numberInMonth
+    val summaryText = monthName + " " + dayNumber
+    val url = daysUrl + dayJ.year.number + "/" + monthName + "/" + dayNumber
+
+    val result: Properties =
+      summary(summaryText) ++
+      fullDayDuration(dayG) ++
+      googleContent(summaryText, iconUrl, url, 200, 200)
+
+    event(true, result)
   }
 }
 

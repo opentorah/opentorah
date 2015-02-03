@@ -188,7 +188,7 @@ object Jewish extends Calendar {
     override def apply(number: Int): Month = new Month(number)
 
 
-    sealed class Name(name: String) extends Named(name)
+    sealed class Name(val name: String) extends Named(name)
 
     case object Tishrei    extends Name("Tishrei")
     case object Marheshvan extends Name("Marheshvan")
