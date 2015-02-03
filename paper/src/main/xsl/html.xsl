@@ -5,7 +5,7 @@
     exclude-result-prefixes="xs"
     version="1.0">
 
-    <xsl:import href="/usr/share/sgml/docbook/xsl-ns-stylesheets/html/chunk.xsl"/>
+    <xsl:import href="urn:docbkx:stylesheet/chunk.xsl"/>
 
     <xsl:import href="common-html.xsl"/>
 </xsl:stylesheet>
