@@ -1,6 +1,3 @@
-#Jewish Calendar
-(Understanding the ignored for fun and schar.)
-
 ##Goals
 
 I want to be able to do various things with the fixed Jewish calendar:
@@ -10,8 +7,6 @@ I want to be able to do various things with the fixed Jewish calendar:
 * list [dates of Birchas Hachamo](https://docs.google.com/document/d/1hpPZ0LYU3p8a-LJRXEqzXig-VQthkQ_MkaY79PMqr-Y/edit?hl=en_US)
 * calculate haftorah and tora reading schedule
 * calculate schedule of learning Rambam
-* calculate halachic times for a day (zmanim)
-* integrate with the Google Calendar
 * automate vestos calculations
 
 For my needs, the best source of information on the Jewish Calendar turned out
@@ -19,40 +14,11 @@ to be Rambam, the Laws of the Sanctification of the Moon, Chapters 6-10.
 The book "Calendrical Calculations" was also interesting, but algorithms and
 formulas from it were not used directly.
 
-I want to do certain things with the astronomical calendar as described by Rambam
-in Chapters 11-19:
-
-* translate relevant chapters into English
-* verify Rambam's rounding decisions
-* reconstruct models that Rambam uses, in contemporary (ancient Greek?) terminology and notation
-* describe the models with diagrams and formulae
-* verify the numbers given by Rambam against his models
-* extract Rambam's criteria of visibility of the new moon
-* see how Rambam's calculations of the moon visibility correspond to the current models
-
-
-###Early Jewish Years
-
-Jewish years before the adoption of the fixed calendar were structured by the Bes Din.
-I'd like to have an official record of what they were. Rabbi Hai Gaon? Seder Olam?
-
-###Zmanim
-
-There is an Android application; it references some kind of an "engine".
-Mushinsky knows something too.
 
 ###Joda Time
 
 As a good open-source citizen I probably should integrate my implementation of
 the Jewish calendar into [Joda Time](http://joda-time.sourceforge.net/) or
 [JSR 130](http://jcp.org/en/jsr/detail?id=310) (although the latter is inactive,
-the article [New Java Date and Time API](http://today.java.net/pub/a/today/2008/09/18/jsr-310-new-java-date-time-api.html) notwithstanding). 
-
-###Google Calendar Integration
-
-* [iCalendar](http://en.wikipedia.org/wiki/ICalendar)
-* [iCalendar RFC](http://tools.ietf.org/html/rfc2445)
-* [Revised iCalendar RFC](http://tools.ietf.org/html/draft-ietf-calsify-rfc2445bis-08)
-* [iCal4j](http://ical4j.sourceforge.net/introduction.html)
-* [Publish web content events in iCalendar format](http://www.google.com/support/calendar/bin/answer.py?hl=en&answer=48526)
-* [GData Java library](http://code.google.com/apis/gdata/client-java.html)
+the article [New Java Date and Time API](http://today.java.net/pub/a/today/2008/09/18/jsr-310-new-java-date-time-api.html)
+notwithstanding). 

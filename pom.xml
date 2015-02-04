@@ -10,7 +10,7 @@
     <artifactId>org.podval.calendar.dates</artifactId>
     <version>1.0-SNAPSHOT</version>
   
-    <name>Jewish Dates</name>
+    <name>Jewish Calendar Dates</name>
     <packaging>jar</packaging>
 
     <url>http://www.jewish-calendar.org</url>
