@@ -31,7 +31,7 @@ final class YearTest extends FlatSpec {
 
 
   it should "belong to the year it was retrieved from" in {
-    for (year <- years; month <- (1 to year.lengthInMonths))
+    for (year <- years; month <- 1 to year.lengthInMonths)
       assertResult(year)(year.month(month).year)
   }
 }

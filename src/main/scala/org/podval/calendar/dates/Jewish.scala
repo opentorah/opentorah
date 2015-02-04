@@ -151,7 +151,7 @@ object Jewish extends Calendar {
     val leapYearsInCycle = leapYears.size
 
 
-    val monthsBeforeYearInCycle = ((1 to yearsInCycle) map (lengthInMonths(_))).scanLeft(0)(_ + _)
+    val monthsBeforeYearInCycle = ((1 to yearsInCycle) map lengthInMonths).scanLeft(0)(_ + _)
 
 
     val monthsInCycle = monthsBeforeYearInCycle.last

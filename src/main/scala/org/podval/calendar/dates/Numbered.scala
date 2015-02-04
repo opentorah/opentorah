@@ -20,7 +20,7 @@ package org.podval.calendar.dates
 abstract class Numbered[T <: Numbered[T]](val number: Int) extends Ordered[T] {
 
     final override def equals(other: Any): Boolean = other match {
-        case that: Numbered[_] => (number == that.number)
+        case that: Numbered[_] => number == that.number
         case _ => false
     }
 

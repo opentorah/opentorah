@@ -1,7 +1,7 @@
 package org.podval.calendar.dates
 
 /*
- * Copyright 2014 Podval Group.
+ * Copyright 2014-2015 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ trait NumberSystem {
 
     protected final def compare_(that: Number) = {
       if (this.negative == that.negative) {
-        val result = zip(that) map lift(_.compare(_)) find (_ != 0) getOrElse(0)
+        val result = zip(that) map lift(_.compare(_)) find (_ != 0) getOrElse 0
         if (!this.negative) result else -result
       } else {
         if (!that.negative) +1 else -1
@@ -176,6 +176,7 @@ trait NumberSystem {
 
 
     final override def equals(other: Any): Boolean =
+      // TODO deal with the "erasure" warning
       if (!other.isInstanceOf[Point]) false else equals_(other.asInstanceOf[Point])
 
 
@@ -202,6 +203,7 @@ trait NumberSystem {
 
 
     final override def equals(other: Any): Boolean =
+      // TODO deal with the "erasure" warning
       if (!other.isInstanceOf[Interval]) false else equals_(other.asInstanceOf[Interval])
 
 
@@ -236,7 +238,7 @@ trait NumberSystem {
 
 
       val digits = this.digits.padTo(maxLength+1, 0)
-      val (newDigits, lastCarry) = ((digits.init zip (0 :: ranges.init)).foldLeft(List.empty[Int], 0))(step)
+      val (newDigits, lastCarry) = (digits.init zip (0 :: ranges.init)).foldLeft(List.empty[Int], 0)(step)
       val lastDigit = lastStep(digits.last, lastCarry, ranges.last)
 
       create(negative, newDigits :+ lastDigit)(intervalCreator)

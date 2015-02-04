@@ -56,10 +56,10 @@ class RambamTest extends FlatSpec {
     val rambamTime = interval.hours(17).parts(107)
 
     val years = for {
-      number <- (1 to 6000)
+      number <- 1 to 6000
       year = Year(number)
       moladNisan = year.month(Month.Nisan).newMoon
-      if (moladNisan.time == rambamTime)
+      if moladNisan.time == rambamTime
     //    assert(firstMoladNissan.day.name == Day.Rishon)
     //    assert(firstMoladNissan.time == hours(17).parts(107))
     } yield year
