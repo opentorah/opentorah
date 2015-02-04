@@ -15,7 +15,7 @@
  *  under the License.
  */
 
-package org.podval.calendar.ical;
+package org.podval.calendar.ical
 
 import org.podval.calendar.dates.{Jewish, Gregorian, Conversions}
 
@@ -31,9 +31,13 @@ final class ICalGenerator private(os: OutputStream) {
 
 
   private def writeYear(year: Int) {
-    out.print(beginCalendar("-//Podval Group//NONSGML Jewish Calendar//EN", Some("Jewish Dates"), Some("Jewish Dates, Events and Schedules")))
+    out.print(beginCalendar(
+      "-//Podval Group//NONSGML Jewish Calendar//EN",
+      Some("Jewish Dates"),
+      Some("Jewish Dates, Events and Schedules")
+    ))
 
-    var dayG = Gregorian.Day(year, 1, 1)
+    var dayG = Gregorian.Year(year).month(Gregorian.Month.January).day(1)
     while (dayG.year.number == year) {
       out.print(day(dayG))
       dayG = dayG.next

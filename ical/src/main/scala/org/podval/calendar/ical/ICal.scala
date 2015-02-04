@@ -40,8 +40,8 @@ object ICal {
       "CALSCALE" -> "GREGORIAN",
       "METHOD"   -> "PUBLISH"
     ) ++
-      name       .map("X-WR-CALNAME" -> _) ++
-      description.map("X-WR-CALDESC" -> _)
+    name       .map("X-WR-CALNAME" -> _) ++
+    description.map("X-WR-CALDESC" -> _)
   }
 
 
