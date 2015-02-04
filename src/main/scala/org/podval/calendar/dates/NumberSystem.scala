@@ -35,10 +35,6 @@ trait NumberSystem {
   protected val signs: List[String]
 
 
-  // TODO abstract the headRange-related behaviour into methods; make the calls to them explicit.
-  protected val headRange: Option[Int]
-
-
   protected val ranges: List[Int]
 
 
@@ -317,13 +313,7 @@ trait NumberSystem {
     }
 
     def headStep(head: Int, headCarry: Int): (Boolean, Int) = {
-      val value = head + headCarry
-
-      val carriedHead = if (headRange.isEmpty) value else {
-        val result = value % headRange.get
-        if (value >= 0) result else result + headRange.get
-      }
-
+      val carriedHead = correctHeadDigit(head + headCarry)
       val carriedNegative = carriedHead < 0
       val newHead = if (!carriedNegative) carriedHead else -carriedHead
 
@@ -340,9 +330,7 @@ trait NumberSystem {
     // Ensure that digits are within appropriate ranges
     newDigits.foreach(digit => require(digit >= 0, "must be non-negative"))
 
-    if (headRange.isDefined) {
-      require(newHead < headRange.get, "must be less than " + headRange.get)
-    }
+    checkHeadDigit(newHead)
 
     (newTail zip ranges) foreach { case (digit, range) =>
       require(digit < range, "must be less than " + range)
@@ -350,4 +338,10 @@ trait NumberSystem {
 
     creator(newNegative, newDigits)
   }
+
+
+  def checkHeadDigit(value: Int): Unit
+
+
+  def correctHeadDigit(value: Int): Int
 }

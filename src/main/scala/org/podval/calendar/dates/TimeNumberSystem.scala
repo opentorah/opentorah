@@ -31,10 +31,7 @@ abstract class TimeNumberSystem extends {
 
   protected final override val ranges: List[Int] = List(hoursPerDay, partsPerHour, momentsPerPart)
 
-
-  protected final override val headRange: Option[Int] = None
-
-} with NumberSystem {
+} with NotRangedHeadDigitNumberSystem {
 
   require(hoursPerDay % 2 == 0)
 
