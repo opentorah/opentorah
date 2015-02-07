@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Podval Group.
+ * Copyright 2011-2015 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,20 +24,37 @@ object Jewish extends Calendar {
     require(0 < number)
 
 
-    // TODO externalize the checks
-    override def firstDay: Int = {
-      val newMoon = month(1).newMoon
-      val day = newMoon.day
-      val time = newMoon.time
+    def newMoon: Moment = month(1).newMoon
 
-      if (Year.isAdu(day.name)) day.next // KH 7:1
-      else if (time >= Year.firstCorrection) {
-        if (!Year.isAdu(day.next.name)) day.next /* KH 7:2 */ else day.next.next /* KH 7:3 */
-      }
-      else if ((day.name == Day.Shlishi) && time >= Year.secondCorrection && !this     .isLeap) day.next.next /* KH 7:4 */
-      else if ((day.name == Day.Sheni  ) && time >= Year.thirdCorrection  &&  this.prev.isLeap) day.next /* KH 7:5 */
-      else day
-    }.number
+
+    override def firstDay: Int = {
+      val correction =
+        if (isAduCorrected) 1
+        else if (isFirstCorrected) (1 + (if (isFirstAduCorrected) 1 /* KH 7:3 */ else 0 /* KH 7:2 */))
+        else if (isSecondCorrected) 2  /* KH 7:4 */
+        else if (isThirdCorrected ) 1  /* KH 7:5 */
+        else 0
+
+      newMoon.day.number + correction
+    }
+
+
+    def isAduCorrected: Boolean = Year.isAdu(newMoon.day)  // KH 7:1
+
+
+    def isFirstCorrected: Boolean = !isAduCorrected && (newMoon.time >= Year.firstCorrection)
+
+
+    def isFirstAduCorrected: Boolean = isFirstCorrected && Year.isAdu(newMoon.day.next)
+
+
+    def isSecondCorrected: Boolean = !isAduCorrected && !isFirstCorrected &&
+      ((newMoon.day.name == Day.Shlishi) && newMoon.time >= Year.secondCorrection && !this.isLeap)
+
+
+    // This is not defined for yer 0 - and doesn't apply :)
+    def isThirdCorrected: Boolean = !isAduCorrected && !isFirstCorrected && !isSecondCorrected &&
+      ((newMoon.day.name == Day.Sheni) && newMoon.time >= Year.thirdCorrection && this.prev.isLeap)
 
 
     override def lengthInDays: Int = next.firstDay - this.firstDay
@@ -63,9 +80,6 @@ object Jewish extends Calendar {
         case _ => throw new IllegalArgumentException("Impossible year length " + lengthInDays + " for " + this)
       }
     }
-
-
-    def newMoon: Moment = month(1).newMoon
   }
 
 
@@ -118,7 +132,7 @@ object Jewish extends Calendar {
     private val adu: Set[Day.Name] = Set(Day.Rishon, Day.Rvii, Day.Shishi)
 
 
-    def isAdu(dayName: Day.Name) = adu.contains(dayName)
+    def isAdu(day: Day) = adu.contains(day.name)
 
 
     protected override def areYearsPositive: Boolean = true
