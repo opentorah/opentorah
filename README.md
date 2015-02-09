@@ -15,7 +15,7 @@ The book "Calendrical Calculations" was also interesting, but algorithms and
 formulas from it were not used directly.
 
 
-###Joda Time
+##Joda Time
 
 As a good open-source citizen I probably should integrate my implementation of
 the Jewish calendar into [Joda Time](http://joda-time.sourceforge.net/) or
