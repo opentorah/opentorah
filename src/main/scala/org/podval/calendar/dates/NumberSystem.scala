@@ -104,10 +104,10 @@ trait NumberSystem {
     }
 
 
-    protected final def plus[T <: Number](that: Number)(creator: Creator[T]): T = plusMinus(false, that)(creator)
+    protected final def plus[T <: Number](that: Number)(creator: Creator[T]): T = plusMinus(operationNegation = false, that)(creator)
 
 
-    protected final def minus[T <: Number](that: Number)(creator: Creator[T]): T = plusMinus(true, that)(creator)
+    protected final def minus[T <: Number](that: Number)(creator: Creator[T]): T = plusMinus(operationNegation = true, that)(creator)
 
 
     private[this] final def plusMinus[T <: Number](operationNegation: Boolean, that: Number)(creator: Creator[T]): T = {
@@ -271,7 +271,7 @@ trait NumberSystem {
 
 
     final def *(that: NumberSystem#IntervalBase): Interval = {
-      val z = create(false, List(0))(intervalCreator)
+      val z = create(negative = false, List(0))(intervalCreator)
 
       def step(elem: (Int, Int), acc: Interval): Interval = {
         val (digit, range) = elem

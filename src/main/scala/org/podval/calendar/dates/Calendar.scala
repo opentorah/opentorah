@@ -139,8 +139,8 @@ abstract class Calendar {
 
     private[this] def monthsGenerator(character: Year.Character): List[MonthDescriptor] = {
       val namesAndLengths = monthNamesAndLengths(character)
-      val daysBefore = namesAndLengths.map(_.length).scanLeft(0)(_ + _).init
-      namesAndLengths zip daysBefore map { case (nameAndLength, daysBefore) =>
+      val daysesBefore = namesAndLengths.map(_.length).scanLeft(0)(_ + _).init
+      namesAndLengths zip daysesBefore map { case (nameAndLength, daysBefore) =>
         new MonthDescriptor(nameAndLength.name, nameAndLength.length, daysBefore)
       }
     }
@@ -352,7 +352,7 @@ abstract class Calendar {
     final def day: Day = Day(days + 1)
 
 
-    final def time: TimeInterval = numberSystem.TimeInterval(false, days(0).digits)
+    final def time: TimeInterval = numberSystem.TimeInterval(negative = false, days(0).digits)
   }
 
 
@@ -370,10 +370,10 @@ abstract class Calendar {
 
 
 
-  final def moment: Moment = Moment(false, List(0))  // This is def and not a val to make initialization possible
+  final def moment: Moment = Moment(negative = false, List(0))  // This is def and not a val to make initialization possible
 
 
-  final val interval: TimeInterval = numberSystem.TimeInterval(false, List(0))
+  final val interval: TimeInterval = numberSystem.TimeInterval(negative = false, List(0))
 
 
   final val week: TimeInterval = interval.days(7)

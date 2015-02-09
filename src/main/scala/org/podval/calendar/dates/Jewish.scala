@@ -30,7 +30,7 @@ object Jewish extends Calendar {
     override def firstDay: Int = {
       val correction =
         if (isAduCorrected) 1
-        else if (isFirstCorrected) (1 + (if (isFirstAduCorrected) 1 /* KH 7:3 */ else 0 /* KH 7:2 */))
+        else if (isFirstCorrected) 1 + (if (isFirstAduCorrected) 1 /* KH 7:3 */ else 0 /* KH 7:2 */)
         else if (isSecondCorrected) 2  /* KH 7:4 */
         else if (isThirdCorrected ) 1  /* KH 7:5 */
         else 0
@@ -150,10 +150,10 @@ object Jewish extends Calendar {
     override def lengthInMonths(yearNumber: Int): Int = lengthInMonths(isLeap(yearNumber))
 
 
-    def normal: TimeInterval = Month.meanLunarPeriod*lengthInMonths(false)
+    def normal: TimeInterval = Month.meanLunarPeriod*lengthInMonths(isLeap = false)
 
 
-    def leap: TimeInterval = Month.meanLunarPeriod*lengthInMonths(true)
+    def leap: TimeInterval = Month.meanLunarPeriod*lengthInMonths(isLeap = true)
 
 
     def lengthInMonths(isLeap: Boolean): Int = if (isLeap) 13 else 12
