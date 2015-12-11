@@ -21,7 +21,7 @@ object Gregorian extends Calendar {
 
   final class Year(number: Int) extends YearBase(number) {
 
-    override def firstDay: Int = Year.firstDay(number)
+    override def firstDayNumber: Int = Year.firstDay(number)
 
 
     override def lengthInDays = Year.lengthInDays(number)

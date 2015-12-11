@@ -27,7 +27,7 @@ object Jewish extends Calendar {
     def newMoon: Moment = month(1).newMoon
 
 
-    override def firstDay: Int = {
+    override def firstDayNumber: Int = {
       val correction =
         if (isAduCorrected) 1
         else if (isFirstCorrected) 1 + (if (isFirstAduCorrected) 1 /* KH 7:3 */ else 0 /* KH 7:2 */)
@@ -57,7 +57,7 @@ object Jewish extends Calendar {
       ((newMoon.day.name == Day.Sheni) && newMoon.time >= Year.thirdCorrection && this.prev.isLeap)
 
 
-    override def lengthInDays: Int = next.firstDay - this.firstDay
+    override def lengthInDays: Int = next.firstDayNumber - this.firstDayNumber
 
 
     def cycle: Int = Year.cycle(number)
@@ -102,6 +102,7 @@ object Jewish extends Calendar {
       for (isLeap <- Seq(true, false); kind <- Seq(Short, Regular, Full)) yield (isLeap, kind)
 
 
+    // KH 8:5-6
     protected override def monthNamesAndLengths(character: Year.Character): List[MonthNameAndLength] = {
       import Month._
 
@@ -116,7 +117,7 @@ object Jewish extends Calendar {
         (if (!isLeap)
           List(MonthNameAndLength(Adar, 29))
         else
-          List(MonthNameAndLength(AdarI, 30), MonthNameAndLength(AdarII, 30))) ++
+          List(MonthNameAndLength(AdarI, 30), MonthNameAndLength(AdarII, 29))) ++
         List(
           MonthNameAndLength(Nisan , 30),
           MonthNameAndLength(Iyar  , 29),
@@ -205,12 +206,12 @@ object Jewish extends Calendar {
     sealed class Name(val name: String) extends Named(name)
 
     case object Tishrei    extends Name("Tishrei")
-    case object Marheshvan extends Name("Marheshvan")
+    case object Marheshvan extends Name("Marcheshvan")
     case object Kislev     extends Name("Kislev")
     case object Teves      extends Name("Teves")
-    case object Shvat      extends Name("Shvat")
+    case object Shvat      extends Name("Shevat")
     case object Adar       extends Name("Adar")
-    case object Nisan      extends Name("Nisan")
+    case object Nisan      extends Name("Nissan")
     case object Iyar       extends Name("Iyar")
     case object Sivan      extends Name("Sivan")
     case object Tammuz     extends Name("Tammuz")

@@ -59,6 +59,12 @@ abstract class Calendar {
    */
   protected abstract class YearBase(number: Int) extends Numbered[Year](number) { self: Year =>
 
+    def character: Year.Character
+
+
+    final def isLeap: Boolean = Year.isLeap(number)
+
+
     final def next: Year = Year(number + 1)
 
 
@@ -71,39 +77,52 @@ abstract class Calendar {
     final def -(change: Int) = Year(number - change)
 
 
-    def firstDay: Int
+    final def firstDay: Day = firstMonth.firstDay
+
+
+    final def lastDay: Day = lastMonth.lastDay
+
+
+    def firstDayNumber: Int
 
 
     def lengthInDays: Int
 
 
-    final def firstMonth: Int = Year.firstMonth(number)
+    final def days: Seq[Day] = months.flatMap(_.days)
+
+
+    final def firstMonth: Month = month(1)
+
+
+    final def lastMonth: Month = month(lengthInMonths)
+
+
+    final def firstMonthNumber: Int = Year.firstMonth(number)
 
 
     final def lengthInMonths: Int = Year.lengthInMonths(number)
 
 
-    def character: Year.Character
-
-
-    final def isLeap: Boolean = Year.isLeap(number)
+    final def months: Seq[Month] = (1 to lengthInMonths).map(month)
 
 
     final def month(numberInYear: Int): Month = {
       require(0 < numberInYear && numberInYear <= lengthInMonths)
-      Month(firstMonth + numberInYear - 1)
+      Month(firstMonthNumber + numberInYear - 1)
     }
 
 
-    final def month(name: Month.Name): Month = month(months.indexWhere(_.name == name) + 1)
+    final def month(name: Month.Name): Month = month(monthDescriptors.indexWhere(_.name == name) + 1)
 
 
     final def monthForDay(day: Int) = {
       require(0 < day && day <= lengthInDays)
-      month(months.count(_.daysBefore < day))
+      month(monthDescriptors.count(_.daysBefore < day))
     }
 
-    final def months: List[MonthDescriptor] = Year.months(character)
+
+    final def monthDescriptors: List[MonthDescriptor] = Year.monthDescriptors(character)
   }
 
 
@@ -124,13 +143,13 @@ abstract class Calendar {
 
     final def apply(day: Day): Year = {
       var result = apply(yearsForSureBefore(day.number))
-      require(result.firstDay <= day.number)
-      while (result.next.firstDay <= day.number) result = result.next
+      require(result.firstDayNumber <= day.number)
+      while (result.next.firstDayNumber <= day.number) result = result.next
       result
     }
 
 
-    val months: Map[Year.Character, List[MonthDescriptor]] =
+    val monthDescriptors: Map[Year.Character, List[MonthDescriptor]] =
       Map((for (character <- characters) yield character -> monthsGenerator(character)): _*)
 
 
@@ -199,13 +218,22 @@ abstract class Calendar {
     final def numberInYear: Int = Month.numberInYear(number)
 
 
-    final def day(day: Int): Day = {
-      require (0 < day && day <= length)
-      Day(firstDay + day - 1)
+    final def firstDayNumber: Int = year.firstDayNumber + descriptor.daysBefore
+
+
+    final def firstDay: Day = day(1)
+
+
+    final def lastDay: Day = day(length)
+
+
+    final def days: Seq[Day] = (1 to length).map(day)
+
+
+    final def day(numberInMonth: Int): Day = {
+      require (0 < numberInMonth && numberInMonth <= length)
+      Day(firstDayNumber + numberInMonth - 1)
     }
-
-
-    final def firstDay: Int = year.firstDay + descriptor.daysBefore
 
 
     final def name: Month.Name = descriptor.name
@@ -214,7 +242,7 @@ abstract class Calendar {
     final def length: Int = descriptor.length
 
 
-    private[this] def descriptor = year.months(numberInYear - 1)
+    private[this] def descriptor = year.monthDescriptors(numberInYear - 1)
   }
 
 
@@ -278,10 +306,10 @@ abstract class Calendar {
     final def month: Month = year.monthForDay(numberInYear)
 
 
-    final def numberInYear: Int = number - year.firstDay + 1
+    final def numberInYear: Int = number - year.firstDayNumber + 1
 
 
-    final def numberInMonth: Int = number - month.firstDay + 1
+    final def numberInMonth: Int = number - month.firstDayNumber + 1
 
 
     final def numberInWeek: Int = Day.numberInWeek(number)

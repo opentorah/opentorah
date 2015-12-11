@@ -49,7 +49,7 @@ trait NumberSystem {
   protected final def maxLength = ranges.length
 
 
-  private[this] val divisors: List[Double] = ranges.inits.toList.reverse.tail.map { upto: List[Int] => upto.fold(1)(_ * _).toDouble}
+  private[this] val divisors: List[Double] = ranges.inits.toList.reverse.tail.map(_.product.toDouble)
 
 
 
@@ -296,7 +296,7 @@ trait NumberSystem {
       (absValue % (1.0d / previous)) / (1.0d / current)
     })
 
-    create(negative, (digits.init map (math.floor(_).toInt)).toList :+ math.round(digits.last).toInt)(creator)
+    create(negative, (digits.init map (math.floor(_).toInt)) :+ math.round(digits.last).toInt)(creator)
   }
 
 
