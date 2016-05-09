@@ -17,6 +17,7 @@
 package org.podval.calendar.dates
 
 
+// TODO add a check that length of the year and total length of the months are the same
 object Jewish extends Calendar {
 
   final class Year(number: Int) extends YearBase(number) {
