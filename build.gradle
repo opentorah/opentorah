@@ -1,0 +1,82 @@
+apply plugin: 'idea'
+apply plugin: 'scala'
+apply plugin: 'maven'
+
+idea {
+  project {
+    jdkName = '1.8'
+    vcs = 'Git'
+  }
+
+  module {
+    excludeDirs += [
+      file('.idea'),
+      file('gradle')
+    ]
+  }
+}
+
+group = 'org.podval.calendar'
+jar.baseName = 'org.podval.calendar.dates'
+version = '1.0-SNAPSHOT'
+
+repositories {
+  jcenter()
+}
+
+def scalaVersion      = '2.12.2'
+def scalaVersionMajor = '2.12'
+
+dependencies {
+  zinc 'com.typesafe.zinc:zinc:0.3.13'
+  compile "org.scala-lang:scala-library:$scalaVersion"
+  testCompile 'junit:junit:4.12', "org.scalatest:scalatest_${scalaVersionMajor}:3.0.3"
+}
+
+// TODO add GIT link
+def pomConfig = {
+  description 'Jewish Calendar Dates.'
+  licenses {
+    license {
+      name = 'The Apache Software License, Version 2.0'
+      url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+      distribution 'repo'
+      comments 'A business-friendly OSS license'
+    }
+  }
+  organization {
+    name 'Podval Group'
+    url 'http://www.podval.org'
+  }
+  developers {
+    developer {
+      id 'dub'
+      name 'Leonid Dubinsky'
+      email 'dub@podval.org'
+      url 'http:dub.podval.org'
+      organization 'Podval Group'
+      organizationUrl 'http://www.podval.org'
+      roles {
+        role 'developer'
+      }
+      timezone '-5'
+    }
+  }
+}
+
+test {
+  testLogging { showStandardStreams = true }
+}
+
+install {
+  repositories.mavenInstaller {
+    pom.project pomConfig
+  }
+}
+
+uploadArchives {
+  repositories.mavenDeployer {
+//    repository(...)
+    pom.project pomConfig
+  }
+}
