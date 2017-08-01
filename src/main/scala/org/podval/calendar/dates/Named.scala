@@ -16,8 +16,6 @@
 
 package org.podval.calendar.dates
 
-
 class Named(name: String) {
-
   final override def toString: String = name
 }

@@ -26,9 +26,7 @@ object Rambam {
 
   val numberOfLessons = 339
 
-
   val firstLessonDay: Int = Year(5775).month(Month.Kislev).day(23).number
-
 
   def lessonForDay(day: Day): Int = {
     val distance = day.number - firstLessonDay + 50*numberOfLessons // % misbehaves on negatives :)
@@ -36,7 +34,6 @@ object Rambam {
   }
 
   private trait Formatter {
-
     def formatLesson(
       dayNumberInMonth: Int,
       gMonthNumber: Int,
@@ -44,44 +41,37 @@ object Rambam {
       lesson: Int
     ): String
 
-
     def formatLine(line: String): String
-
 
     def numColumns: Int
   }
 
   private val wideFormatter = new Formatter {
-    def formatLesson(
+    override def formatLesson(
       dayNumberInMonth: Int,
       gMonthNumber: Int,
       gDayNumberInMonth: Int,
       lesson: Int
     ): String = f"$dayNumberInMonth%2d ($gMonthNumber%2d/$gDayNumberInMonth%2d) $lesson%3d"
 
+    override def formatLine(line: String): String = f"$line%-14s"
 
-    def formatLine(line: String): String = f"$line%-14s"
-
-
-    def numColumns: Int = 4
+    override def numColumns: Int = 4
   }
 
 
   private val narrowFormatter = new Formatter {
-    def formatLesson(
+    override def formatLesson(
       dayNumberInMonth: Int,
       gMonthNumber: Int,
       gDayNumberInMonth: Int,
       lesson: Int
     ): String = f"$dayNumberInMonth%2d $lesson%3d"
 
+    override def formatLine(line: String): String = f"${line.take(6)}%-6s"
 
-    def formatLine(line: String): String = f"${line.take(6)}%-6s"
-
-
-    def numColumns: Int = 8
+    override def numColumns: Int = 8
   }
-
 
   def scheduleYear(formatter: Formatter, year: Year): Iterator[String] = {
     def scheduleMonth(month: Month): Seq[String] = {
@@ -108,10 +98,8 @@ object Rambam {
     year.months.sliding(formatter.numColumns, formatter.numColumns).map(scheduleMonths).flatten
   }
 
-  def printSchedule(formatter: Formatter)(numYear: Int): Unit = {
-    scheduleYear(formatter, Year(numYear)).foreach(println(_))
-  }
-
+  def printSchedule(formatter: Formatter)(numYear: Int): Unit =
+    scheduleYear(formatter, Year(numYear)).foreach(println)
 
   def main(args: Array[String]): Unit = printSchedule(narrowFormatter)(5776)
 }
