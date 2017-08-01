@@ -24,7 +24,7 @@ object Gregorian extends Calendar {
     override def firstDayNumber: Int = Year.firstDay(number)
 
 
-    override def lengthInDays = Year.lengthInDays(number)
+    override def lengthInDays: Int = Year.lengthInDays(number)
 
 
     override def character: Year.Character = isLeap
@@ -145,7 +145,7 @@ object Gregorian extends Calendar {
     val epoch = 1373429
 
 
-    override val firstDayNumberInWeek =
+    override val firstDayNumberInWeek: Int =
       (((Jewish.Day.firstDayNumberInWeek - 1) + (epoch % daysPerWeek)) % daysPerWeek) + 1
   }
 

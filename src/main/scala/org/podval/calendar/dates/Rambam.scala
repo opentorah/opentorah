@@ -27,7 +27,7 @@ object Rambam {
   val numberOfLessons = 339
 
 
-  val firstLessonDay = Year(5775).month(Month.Kislev).day(23).number
+  val firstLessonDay: Int = Year(5775).month(Month.Kislev).day(23).number
 
 
   def lessonForDay(day: Day): Int = {
