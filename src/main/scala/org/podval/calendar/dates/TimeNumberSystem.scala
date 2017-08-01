@@ -37,7 +37,7 @@ abstract class TimeNumberSystem extends {
   require(hoursPerDay % 2 == 0)
 
 
-  final val hoursPerHalfDay = hoursPerDay / 2
+  final val hoursPerHalfDay: Int = hoursPerDay / 2
 
 
   private val minutesPerHour = 60
@@ -46,7 +46,7 @@ abstract class TimeNumberSystem extends {
   require(partsPerHour % minutesPerHour == 0)
 
 
-  final val partsPerMinute = partsPerHour / minutesPerHour
+  final val partsPerMinute: Int = partsPerHour / minutesPerHour
 
 
   protected final override type Interval = TimeInterval
