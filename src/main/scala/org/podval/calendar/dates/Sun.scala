@@ -16,19 +16,17 @@
 
 package org.podval.calendar.dates
 
-import org.podval.calendar.dates.Jewish._
-
-
 // TODO Where and when was the Sun created? Does this jibe with Rambam's epoch?
 // TODO Which day of the week (+1/-1) was the Giving of the Law? (Sema)
 // TODO Rambam's epoch - two days after molad?! (Petya Ofman)
 // TODO angular speed of the moon = 360 / (1/tropical month + 1/solar year)
 object Sun {
+  import org.podval.calendar.dates.Jewish.{interval, Year, Month}
 
   val yearOfShmuel = interval.days(365).hours(6)
 
 
-  val yearOfRavAda = Year.cycleLength / Year.yearsInCycle
+  val yearOfRavAda: Jewish.TimeInterval = Year.cycleLength / Year.yearsInCycle
 
 
   // KH 9:3
