@@ -15,7 +15,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
    *
    * @param number  of the Year
    */
-  protected abstract class YearBase(number: Int)
+  abstract class YearBase(number: Int)
     extends Numbered[Year](number) with CalendarMember[C]
   { this: Year =>
     def character: YearCharacter
@@ -75,7 +75,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   /**
    *
    */
-  protected abstract class YearCompanionBase {
+  abstract class YearCompanionBase {
     def apply(number: Int): Year
 
     final  def apply(month: Month): Year = apply(Month.yearNumber(month.number))
@@ -124,9 +124,9 @@ trait Calendar[C <: Calendar[C]] { this: C =>
    *
    * @param number  of the Month
    */
-  protected abstract class MonthBase(number: Int)
+  abstract class MonthBase(number: Int)
     extends Numbered[Month](number) with CalendarMember[C]
-  { self: Month =>
+  { this: Month =>
     require(0 < number)
 
     final def next: Month = Month(number + 1)
@@ -168,7 +168,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   /**
    *
    */
-  protected abstract class MonthCompanion {
+  abstract class MonthCompanion {
     def apply(number: Int): Month
 
     final def apply(year: Int, monthInYear: Int): Month = Year(year).month(monthInYear)
@@ -179,10 +179,10 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   }
 
 
-  protected final case class MonthNameAndLength(name: MonthName, length: Int)
+  final case class MonthNameAndLength(name: MonthName, length: Int)
 
 
-  protected final      class MonthDescriptor   (val name: MonthName, val length: Int, val daysBefore: Int)
+  final      class MonthDescriptor   (val name: MonthName, val length: Int, val daysBefore: Int)
 
 
   val Month: MonthCompanion
@@ -196,7 +196,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   /**
    *
    */
-  protected abstract class DayCompanion {
+  abstract class DayCompanion {
     val daysPerWeek: Int = 7
 
     def names: Seq[DayName]
@@ -238,7 +238,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   /**
    *
    */
-  protected abstract class MomentCompanion {
+  abstract class MomentCompanion {
     def apply(negative: Boolean, digits: List[Int]): Moment
   }
 

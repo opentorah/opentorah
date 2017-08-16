@@ -50,9 +50,9 @@ class Gregorian private() extends Calendar[Gregorian] {
 
     override def lengthInMonths(yearNumber: Int): Int = monthsInYear
 
-    val monthsInYear = 12
+    val monthsInYear: Int = 12
 
-    private val daysInNonLeapYear = 365
+    private val daysInNonLeapYear: Int = 365
 
     def firstDay(yearNumber: Int): Int = daysInNonLeapYear * (yearNumber - 1) + (yearNumber - 1)/4 - (yearNumber - 1)/100 + (yearNumber - 1)/400 + 1
 
@@ -111,7 +111,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
     override def apply(number: Int): Day = new Day(number)
 
-    val epoch = 1373429
+    val epoch: Int = 1373429
 
     override val firstDayNumberInWeek: Int =
       (((Jewish.Day.firstDayNumberInWeek - 1) + (epoch % daysPerWeek)) % daysPerWeek) + 1
@@ -131,7 +131,7 @@ class Gregorian private() extends Calendar[Gregorian] {
     override def apply(negative: Boolean, digits: List[Int]): Moment = new Moment(negative, digits)
   }
 
-  override val Year = new YearCompanion
+  override val Year: YearCompanion = new YearCompanion
 }
 
 

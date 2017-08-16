@@ -60,6 +60,7 @@ class Jewish private() extends Calendar[Jewish] {
   }
 
   sealed trait YearKind
+
   object YearKind {
     case object Short extends YearKind
     case object Regular extends YearKind
@@ -110,7 +111,8 @@ class Jewish private() extends Calendar[Jewish] {
 
     protected override def areYearsPositive: Boolean = true
 
-    private[this] val leapYears = Set(3, 6, 8, 11, 14, 17, 19) // TODO calculate Meton's cycle in the paper
+    private[this] val leapYears: Set[Int] =
+      Set(3, 6, 8, 11, 14, 17, 19) // TODO calculate Meton's cycle in the paper
 
     override def isLeap(yearNumber: Int): Boolean = leapYears.contains(numberInCycle(yearNumber))
 
@@ -124,17 +126,19 @@ class Jewish private() extends Calendar[Jewish] {
 
     def lengthInMonths(isLeap: Boolean): Int = if (isLeap) 13 else 12
 
-    val yearsInCycle = 19
+    val yearsInCycle: Int = 19
 
     val leapYearsInCycle: Int = leapYears.size
 
-    val monthsBeforeYearInCycle = ((1 to yearsInCycle) map lengthInMonths).scanLeft(0)(_ + _)
+    val monthsBeforeYearInCycle: Seq[Int] =
+      ((1 to yearsInCycle) map lengthInMonths).scanLeft(0)(_ + _)
 
     val monthsInCycle: Int = monthsBeforeYearInCycle.last
 
     val cycleLength: TimeInterval = Month.meanLunarPeriod * monthsInCycle
 
-    def firstMonthInCycle(yearNumber: Int): Int = monthsBeforeYearInCycle(numberInCycle(yearNumber) - 1) + 1
+    def firstMonthInCycle(yearNumber: Int): Int =
+      monthsBeforeYearInCycle(numberInCycle(yearNumber) - 1) + 1
 
     def numberInCycle(yearNumber: Int): Int = ((yearNumber - 1) % yearsInCycle) + 1
 
