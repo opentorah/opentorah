@@ -10,9 +10,6 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   type Moment <: MomentBase
 
-  trait CalendarMember[C <: Calendar[C]] {
-    def calendar: C
-  }
 
   /**
    *
