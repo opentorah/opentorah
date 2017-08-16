@@ -16,7 +16,7 @@
 
 package org.podval.calendar.dates
 
-abstract class Calendar {
+trait Calendar[C <: Calendar[C]] { this: C =>
 
   type Year <: YearBase
 

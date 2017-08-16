@@ -1,24 +1,7 @@
-/*
- * Copyright 2011-2015 Podval Group.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.podval.calendar.dates
 
-
 // TODO add a check that length of the year and total length of the months are the same
-object Jewish extends Calendar {
+class Jewish private() extends Calendar[Jewish] {
 
   final class Year(number: Int) extends YearBase(number) {
     require(0 < number)
@@ -240,5 +223,8 @@ object Jewish extends Calendar {
     override def apply(negative: Boolean, digits: List[Int]): Moment = new Moment(negative, digits)
   }
 
-  override val Year = new YearCompanion
+  final override val Year = new YearCompanion
 }
+
+
+object Jewish extends Jewish
