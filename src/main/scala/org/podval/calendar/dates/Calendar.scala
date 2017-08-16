@@ -210,6 +210,10 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
     final def numberInWeek: Int = Day.numberInWeek(number)
 
+    // TODO if DayBase is split into separate file (and parameterized with [C <: Calendar[C]]),
+    // type of the name() method becomes `calendar.Day.Name`, causing compilation error:
+    //   stable identifier required, but DayBase.this.calendar.Day found.
+    // Conclusion: Day.Name type has to be moved into the Calendar itself first :(
     final def name: Day.Name = Day.names(numberInWeek - 1)
 
     final def toMoment: Moment = moment.days(number - 1)
