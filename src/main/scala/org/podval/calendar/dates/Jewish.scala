@@ -103,9 +103,9 @@ class Jewish private() extends Calendar[Jewish] {
       }
     }
 
-    private val adu: Set[DayName] = Set(DayName.Rishon, DayName.Rvii, DayName.Shishi)
+    private val adu: Set[Jewish#DayName] = Set(DayName.Rishon, DayName.Rvii, DayName.Shishi)
 
-    def isAdu(day: Day): Boolean = adu.contains(day.name)
+    def isAdu(day: Jewish#Day): Boolean = adu.contains(day.name)
 
     protected override def areYearsPositive: Boolean = true
 
@@ -195,7 +195,7 @@ class Jewish private() extends Calendar[Jewish] {
 
 
   final class Day(number: Int)
-    extends DayBase(number) with JewishCalendarMember
+    extends DayBase[Jewish](number) with JewishCalendarMember
 
   sealed class DayName(name: String) extends Named(name)
 

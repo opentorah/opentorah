@@ -89,7 +89,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
 
   final class Day(number: Int)
-    extends DayBase(number) with GregorianCalendarMember
+    extends DayBase[Gregorian](number) with GregorianCalendarMember
 
   sealed class DayName(name: String) extends Named(name)
 

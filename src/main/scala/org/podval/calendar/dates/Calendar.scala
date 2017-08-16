@@ -6,7 +6,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   type Month <: MonthBase
 
-  type Day <: DayBase
+  type Day <: DayBase[C]
 
   type Moment <: MomentBase
 
@@ -76,7 +76,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
     final  def apply(month: Month): Year = apply(Month.yearNumber(month.number))
 
-    final def apply(day: Day): Year = {
+    final def apply(day: C#Day): Year = {
       var result = apply(yearsForSureBefore(day.number))
       require(result.firstDayNumber <= day.number)
       while (result.next.firstDayNumber <= day.number) result = result.next
@@ -181,45 +181,6 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
 
   val Month: MonthCompanion
-
-
-  /**
-   *
-   * @param number  of the Day
-   */
-  protected abstract class DayBase(number: Int)
-    extends Numbered[Day](number) with CalendarMember[C]
-  { this: Day =>
-    require(0 < number)
-
-    final def next: Day = Day(number + 1)
-
-    final def prev: Day = Day(number - 1)
-
-    final def +(change: Int) = Day(number + change)
-
-    final def -(change: Int) = Day(number - change)
-
-    final def year: Year = Year(this)
-
-    final def month: Month = year.monthForDay(numberInYear)
-
-    final def numberInYear: Int = number - year.firstDayNumber + 1
-
-    final def numberInMonth: Int = number - month.firstDayNumber + 1
-
-    final def numberInWeek: Int = Day.numberInWeek(number)
-
-    // TODO if DayBase is split into separate file (and parameterized with [C <: Calendar[C]]),
-    // type of the name() method becomes `calendar.Day.Name`, causing compilation error:
-    //   stable identifier required, but DayBase.this.calendar.Day found.
-    // Conclusion: Day.Name type has to be moved into the Calendar itself first :(
-    final def name: DayName = Day.names(numberInWeek - 1)
-
-    final def toMoment: Moment = moment.days(number - 1)
-
-    final override def toString: String = year + " " + month.name + " " + numberInMonth
-  }
 
 
   // TODO make this a Enum - and use its `values()` method in DayCompanion.name
