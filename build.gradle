@@ -24,7 +24,7 @@ repositories {
   jcenter()
 }
 
-def scalaVersion      = '2.12.2'
+def scalaVersion      = '2.12.3'
 def scalaVersionMajor = '2.12'
 
 dependencies {

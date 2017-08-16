@@ -16,28 +16,6 @@
 
 package org.podval.calendar.dates
 
-/* TODO
-  There are things that I do not yet understand about Scala's approach to family polymorphism.
-
-  o Is this a "cake"?
-  o Is there any way to regain the ability to split the code into files?
-
-  o When I put MonthDescriptor inside Month companion, types do not match; when it is outside, they do, although it
-    references a type from the companion (Month.Name).
-
-  o In derived Calendars, many companion vals are overridden by objects, but "override object" is not legal Scala.
-
-  o If Year is done as class and an instance assigned to the overridden val, it works; if it is done as an
-    override object, I get compiler errors:
-
-        overriding method character in class YearBase of type => org.podval.calendar.dates.Jewish.Year.Character;
-        method character has incompatible type
-          override def character: Year.Character = (isLeap, kind)
-
-  o Derived Calendars are objects, but unless I do things like val x = Jewish, I used to get initialization errors!
-    Which now went away for some reason! Maybe, because I took MonthDescriptor out of the Month companion!
-    Well, it didn't go away completely! What a mess!
- */
 abstract class Calendar {
 
   type Year <: YearBase
@@ -126,6 +104,7 @@ abstract class Calendar {
 
     private[this] def monthsGenerator(character: Year.Character): List[MonthDescriptor] = {
       val namesAndLengths = monthNamesAndLengths(character)
+      // TODO dayses?
       val daysesBefore = namesAndLengths.map(_.length).scanLeft(0)(_ + _).init
       namesAndLengths zip daysesBefore map { case (nameAndLength, daysBefore) =>
         new MonthDescriptor(nameAndLength.name, nameAndLength.length, daysBefore)

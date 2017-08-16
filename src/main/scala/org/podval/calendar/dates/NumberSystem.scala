@@ -70,6 +70,7 @@ trait NumberSystem {
 
     final def tail: List[Int] = digits.tail
 
+    // TODO is this correct - or should it be `digits.length`?
     final def length: Int = tail.length
 
     final def digit(n: Int): Int = {
