@@ -25,7 +25,7 @@ class Gregorian private() extends Calendar[Gregorian] {
     protected override def characters: Seq[YearCharacter] = Seq(true, false)
 
     protected override def monthNamesAndLengths(isLeap: YearCharacter): List[MonthNameAndLength] = {
-      import Month._
+      import MonthName._
       List(
         MonthNameAndLength(January  , 31),
         MonthNameAndLength(February , if (isLeap) 29 else 28),
@@ -63,24 +63,25 @@ class Gregorian private() extends Calendar[Gregorian] {
   final class Month(number: Int)
     extends MonthBase(number) with GregorianCalendarMember
 
+  sealed class MonthName(name: String) extends Named(name)
+
+  object MonthName {
+    case object January extends MonthName("January")
+    case object February extends MonthName("February")
+    case object March extends MonthName("March")
+    case object April extends MonthName("April")
+    case object May extends MonthName("May")
+    case object June extends MonthName("June")
+    case object July extends MonthName("July")
+    case object August extends MonthName("August")
+    case object September extends MonthName("September")
+    case object October extends MonthName("October")
+    case object November extends MonthName("November")
+    case object December extends MonthName("December")
+  }
 
   object Month extends MonthCompanion {
     override def apply(number: Int): Month = new Month(number)
-
-    sealed class Name(name: String) extends Named(name)
-
-    case object January   extends Name("January")
-    case object February  extends Name("February")
-    case object March     extends Name("March")
-    case object April     extends Name("April")
-    case object May       extends Name("May")
-    case object June      extends Name("June")
-    case object July      extends Name("July")
-    case object August    extends Name("August")
-    case object September extends Name("September")
-    case object October   extends Name("October")
-    case object November  extends Name("November")
-    case object December  extends Name("December")
 
     override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Gregorian.Year.monthsInYear + 1
 
@@ -101,14 +102,12 @@ class Gregorian private() extends Calendar[Gregorian] {
     case object Thursday extends DayName("Thursday")
     case object Friday extends DayName("Friday")
     case object Saturday extends DayName("Saturday")
+
+    val values: Seq[DayName] = Seq(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
   }
 
   object Day extends DayCompanion {
-    // TODO move into DayName object? Generalize it to an Enum?
-    override def names: Seq[DayName] = {
-      import DayName._
-      Seq(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
-    }
+    override def names: Seq[DayName] = DayName.values
 
     override def apply(number: Int): Day = new Day(number)
 

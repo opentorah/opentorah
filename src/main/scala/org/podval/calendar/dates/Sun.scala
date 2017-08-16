@@ -1,19 +1,3 @@
-/*
- * Copyright 2011-2014 Podval Group.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.podval.calendar.dates
 
 // TODO Where and when was the Sun created? Does this jibe with Rambam's epoch?
@@ -21,17 +5,17 @@ package org.podval.calendar.dates
 // TODO Rambam's epoch - two days after molad?! (Petya Ofman)
 // TODO angular speed of the moon = 360 / (1/tropical month + 1/solar year)
 object Sun {
-  import org.podval.calendar.dates.Jewish.{interval, Year, Month}
+  import org.podval.calendar.dates.Jewish.{interval, Year, MonthName, TimeInterval}
 
   val yearOfShmuel = interval.days(365).hours(6)
 
 
-  val yearOfRavAda: Jewish.TimeInterval = Year.cycleLength / Year.yearsInCycle
+  val yearOfRavAda: TimeInterval = Year.cycleLength / Year.yearsInCycle
 
 
   // KH 9:3
 
-  val firstTkufasNissan = Year(1).month(Month.Nisan).newMoon - interval.days(7).hours(9).parts(642)  // KH 9:3
+  val firstTkufasNissan = Year(1).month(MonthName.Nisan).newMoon - interval.days(7).hours(9).parts(642)  // KH 9:3
 
 
   // Sun enters Teleh  KH 9:3

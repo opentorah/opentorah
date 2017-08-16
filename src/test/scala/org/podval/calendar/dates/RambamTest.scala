@@ -1,23 +1,6 @@
-/*
- * Copyright 2014 Podval Group.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.podval.calendar.dates
 
 import org.scalatest.FlatSpec
-
 import Jewish._
 
 
@@ -39,11 +22,11 @@ class RambamTest extends FlatSpec {
   "first two years' new moons" should "be correct" in {
     // KH 6:8
     val year1newMoon = Year(1).newMoon
-    assert(year1newMoon.day.name == Jewish.DayName.Sheni)
+    assert(year1newMoon.day.name == DayName.Sheni)
     assert(year1newMoon.time == interval.hours(5).parts(204))
 
     val year2newMoon = Year(2).newMoon
-    assert(year2newMoon.day.name == Jewish.DayName.Shishi)
+    assert(year2newMoon.day.name == DayName.Shishi)
     assert(year2newMoon.time == interval.hours(14))
 
     assert(year2newMoon - Month.meanLunarPeriod*12 == year1newMoon)
@@ -58,7 +41,7 @@ class RambamTest extends FlatSpec {
     val years = for {
       number <- 1 to 6000
       year = Year(number)
-      moladNisan = year.month(Month.Nisan).newMoon
+      moladNisan = year.month(MonthName.Nisan).newMoon
       if moladNisan.time == rambamTime
     //    assert(firstMoladNissan.day.name == Day.Rishon)
     //    assert(firstMoladNissan.time == hours(17).parts(107))
@@ -98,10 +81,10 @@ class RambamTest extends FlatSpec {
 
 
   "tkufos" should "be correct" in {
-    assert(Year(1).month(Month.Nisan).newMoon - Sun.tkufasNissan(1) == interval.days(7).hours(9).parts(642))
+    assert(Year(1).month(MonthName.Nisan).newMoon - Sun.tkufasNissan(1) == interval.days(7).hours(9).parts(642))
 
     val vernalEquinox4930 = Sun.tkufasNissan(4930)
-    assert(vernalEquinox4930.day.name == Jewish.DayName.Chamishi)
+    assert(vernalEquinox4930.day.name == DayName.Chamishi)
     assert(vernalEquinox4930.time == interval.hours(6))
   }
 }

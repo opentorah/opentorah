@@ -1,32 +1,16 @@
-/*
- * Copyright 2011-2015 Podval Group.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.podval.calendar.dates
 
 import org.scalatest.FlatSpec
 
-import Jewish.{Year, Day, Month}
-import Month._
+import Jewish.{Year, Day, DayName, MonthName}
+import MonthName._
 
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class DatesTest extends FlatSpec {
 
   "known dates" should "have correct day of the week" in {
-    assertResult(Jewish.DayName.Sheni)(Day(5772, Marheshvan, 24).name)
+    assertResult(DayName.Sheni)(Day(5772, Marheshvan, 24).name)
   }
 
 
@@ -38,7 +22,7 @@ final class DatesTest extends FlatSpec {
   }
 
 
-  private def date2days2date(yearNumber: Int, monthName: Month.Name, dayNumber: Int) {
+  private def date2days2date(yearNumber: Int, monthName: MonthName, dayNumber: Int) {
     val year = Year(yearNumber)
     assertResult(yearNumber)(year.number)
 

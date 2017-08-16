@@ -59,7 +59,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
     // type of the month() method parameter becomes `calendar.Month.Name`, causing compilation error
     // (stable identifier required).
     // Conclusion: Month.Name type has to be moved into the Calendar itself first :(
-    final def month(name: Month.Name): Month = month(monthDescriptors.indexWhere(_.name == name) + 1)
+    final def month(name: MonthName): Month = month(monthDescriptors.indexWhere(_.name == name) + 1)
 
     final def monthForDay(day: Int): Month = {
       require(0 < day && day <= lengthInDays)
@@ -154,7 +154,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
       Day(firstDayNumber + numberInMonth - 1)
     }
 
-    final def name: Month.Name = descriptor.name
+    final def name: MonthName = descriptor.name
 
     final def length: Int = descriptor.length
 
@@ -162,12 +162,13 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   }
 
 
+  type MonthName
+
+
   /**
    *
    */
   protected abstract class MonthCompanion {
-    type Name
-
     def apply(number: Int): Month
 
     final def apply(year: Int, monthInYear: Int): Month = Year(year).month(monthInYear)
@@ -178,10 +179,10 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   }
 
 
-  protected final case class MonthNameAndLength(name: Month.Name, length: Int)
+  protected final case class MonthNameAndLength(name: MonthName, length: Int)
 
 
-  protected final      class MonthDescriptor   (val name: Month.Name, val length: Int, val daysBefore: Int)
+  protected final      class MonthDescriptor   (val name: MonthName, val length: Int, val daysBefore: Int)
 
 
   val Month: MonthCompanion
@@ -202,7 +203,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
     def apply(number: Int): Day
 
-    final def apply(year: Int, month: Month.Name, day: Int): Day = Year(year).month(month).day(day)
+    final def apply(year: Int, month: MonthName, day: Int): Day = Year(year).month(month).day(day)
 
     final def apply(year: Int, month: Int, day: Int): Day = Year(year).month(month).day(day)
 

@@ -1,26 +1,10 @@
-/*
- * Copyright 2011-2014 Podval Group.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.podval.calendar.dates
 
 import org.scalatest.FlatSpec
 
-import Jewish.Month._
-import Gregorian.Month._
-import Jewish.Day._
+import Jewish.MonthName._
+import Gregorian.MonthName._
+import Jewish.DayName._
 
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
@@ -30,8 +14,6 @@ final class NewMoonTest extends FlatSpec {
     // see http://www.owen0001.host-ed.me/cal/moladot.php
 
     // year and month for the molad; jewish date; georgian date; georgian time
-    import Jewish.DayName._
-
     newMoon(5769, Tishrei   , Shlishi ,  5769, Tishrei,  1,  2008, September, 30,  1, 58, 13)
     newMoon(5769, Marheshvan, Rvii    ,  5769, Tishrei, 30,  2008, October  , 29, 14, 42, 14)
     newMoon(5769, Kislev    , Shishi  ,  5769, Kislev ,  1,  2008, November , 28,  3, 26, 15)
@@ -49,9 +31,9 @@ final class NewMoonTest extends FlatSpec {
 
 
 
-  private def newMoon(moladYear: Int, moladMonth: Jewish.Month.Name, dayOfWeek: Jewish.DayName,
-              year: Int, month: Jewish.Month.Name, day: Int,
-              yearG: Int, monthG: Gregorian.Month.Name, dayG: Int,
+  private def newMoon(moladYear: Int, moladMonth: Jewish.MonthName, dayOfWeek: Jewish.DayName,
+              year: Int, month: Jewish.MonthName, day: Int,
+              yearG: Int, monthG: Gregorian.MonthName, dayG: Int,
               hours: Int, minutes: Int, parts: Int)
   {
     val dayJ = Jewish.Day(year, month, day)

@@ -26,7 +26,7 @@ object Rambam {
 
   val numberOfLessons = 339
 
-  val firstLessonDay: Int = Year(5775).month(Month.Kislev).day(23).number
+  val firstLessonDay: Int = Year(5775).month(Jewish.MonthName.Kislev).day(23).number
 
   def lessonForDay(day: Day): Int = {
     val distance = day.number - firstLessonDay + 50*numberOfLessons // % misbehaves on negatives :)

@@ -79,7 +79,7 @@ class Jewish private() extends Calendar[Jewish] {
 
     // KH 8:5-6
     protected override def monthNamesAndLengths(character: YearCharacter): List[MonthNameAndLength] = {
-      import Month._
+      import MonthName._
 
       character match { case (isLeap: Boolean, kind: YearKind) =>
         List(
@@ -154,27 +154,27 @@ class Jewish private() extends Calendar[Jewish] {
   }
 
 
+  sealed class MonthName(val name: String) extends Named(name)
+
+  object MonthName {
+    case object Tishrei extends MonthName("Tishrei")
+    case object Marheshvan extends MonthName("Marcheshvan")
+    case object Kislev extends MonthName("Kislev")
+    case object Teves extends MonthName("Teves")
+    case object Shvat extends MonthName("Shevat")
+    case object Adar extends MonthName("Adar")
+    case object Nisan extends MonthName("Nissan")
+    case object Iyar extends MonthName("Iyar")
+    case object Sivan extends MonthName("Sivan")
+    case object Tammuz extends MonthName("Tammuz")
+    case object Av extends MonthName("Av")
+    case object Elul extends MonthName("Elul")
+    case object AdarI extends MonthName("Adar I")
+    case object AdarII extends MonthName("Adar II")
+  }
+
   object Month extends MonthCompanion {
     override def apply(number: Int): Month = new Month(number)
-
-
-    sealed class Name(val name: String) extends Named(name)
-
-    case object Tishrei    extends Name("Tishrei")
-    case object Marheshvan extends Name("Marcheshvan")
-    case object Kislev     extends Name("Kislev")
-    case object Teves      extends Name("Teves")
-    case object Shvat      extends Name("Shevat")
-    case object Adar       extends Name("Adar")
-    case object Nisan      extends Name("Nissan")
-    case object Iyar       extends Name("Iyar")
-    case object Sivan      extends Name("Sivan")
-    case object Tammuz     extends Name("Tammuz")
-    case object Av         extends Name("Av")
-    case object Elul       extends Name("Elul")
-    case object AdarI      extends Name("Adar I")
-    case object AdarII     extends Name("Adar II")
-
 
     // KH 6:3
     val meanLunarPeriod = interval.days(29).hours(12).parts(793)  // TODO how is this really called? tropical?
@@ -208,14 +208,12 @@ class Jewish private() extends Calendar[Jewish] {
     case object Chamishi extends DayName("Chamishi")
     case object Shishi extends DayName("Shishi")
     case object Shabbos extends DayName("Shabbos")
+
+    val values: Seq[DayName] = Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi, Shabbos)
   }
 
   object Day extends DayCompanion {
-    // TODO move into DayName object? Generalize it to an Enum?
-    override def names: Seq[DayName] = {
-      import DayName._
-      Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi, Shabbos)
-    }
+    override def names: Seq[DayName] = DayName.values
 
     override def apply(number: Int): Day = new Day(number)
 
