@@ -214,7 +214,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
     // type of the name() method becomes `calendar.Day.Name`, causing compilation error:
     //   stable identifier required, but DayBase.this.calendar.Day found.
     // Conclusion: Day.Name type has to be moved into the Calendar itself first :(
-    final def name: Day.Name = Day.names(numberInWeek - 1)
+    final def name: DayName = Day.names(numberInWeek - 1)
 
     final def toMoment: Moment = moment.days(number - 1)
 
@@ -222,15 +222,18 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   }
 
 
+  // TODO make this a Enum - and use its `values()` method in DayCompanion.name
+  //   (which will then become `final`)?
+  type DayName
+
+
   /**
    *
    */
   protected abstract class DayCompanion {
-    type Name
-
     val daysPerWeek: Int = 7
 
-    def names: Seq[Name]
+    def names: Seq[DayName]
 
     def apply(number: Int): Day
 

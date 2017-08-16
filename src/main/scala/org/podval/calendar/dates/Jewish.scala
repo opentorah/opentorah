@@ -32,11 +32,11 @@ class Jewish private() extends Calendar[Jewish] {
     def isFirstAduCorrected: Boolean = isFirstCorrected && Year.isAdu(newMoon.day.next)
 
     def isSecondCorrected: Boolean = !isAduCorrected && !isFirstCorrected &&
-      ((newMoon.day.name == Day.Shlishi) && newMoon.time >= Year.secondCorrection && !this.isLeap)
+      ((newMoon.day.name == DayName.Shlishi) && newMoon.time >= Year.secondCorrection && !this.isLeap)
 
     // This is not defined for yer 0 - and doesn't apply :)
     def isThirdCorrected: Boolean = !isAduCorrected && !isFirstCorrected && !isSecondCorrected &&
-      ((newMoon.day.name == Day.Sheni) && newMoon.time >= Year.thirdCorrection && this.prev.isLeap)
+      ((newMoon.day.name == DayName.Sheni) && newMoon.time >= Year.thirdCorrection && this.prev.isLeap)
 
     override def lengthInDays: Int = next.firstDayNumber - this.firstDayNumber
 
@@ -103,7 +103,7 @@ class Jewish private() extends Calendar[Jewish] {
       }
     }
 
-    private val adu: Set[Day.Name] = Set(Day.Rishon, Day.Rvii, Day.Shishi)
+    private val adu: Set[DayName] = Set(DayName.Rishon, DayName.Rvii, DayName.Shishi)
 
     def isAdu(day: Day): Boolean = adu.contains(day.name)
 
@@ -197,21 +197,24 @@ class Jewish private() extends Calendar[Jewish] {
   final class Day(number: Int)
     extends DayBase(number) with JewishCalendarMember
 
+  sealed class DayName(name: String) extends Named(name)
+
+  object DayName {
+    case object Rishon extends DayName("Rishon")
+    case object Sheni extends DayName("Sheni")
+    case object Shlishi extends DayName("Shlishi")
+    case object Rvii extends DayName("Rvii")
+    case object Chamishi extends DayName("Chamishi")
+    case object Shishi extends DayName("Shishi")
+    case object Shabbos extends DayName("Shabbos")
+  }
 
   object Day extends DayCompanion {
-
-    sealed class Name(name: String) extends Named(name)
-
-    case object Rishon   extends Name("Rishon")
-    case object Sheni    extends Name("Sheni")
-    case object Shlishi  extends Name("Shlishi")
-    case object Rvii     extends Name("Rvii")
-    case object Chamishi extends Name("Chamishi")
-    case object Shishi   extends Name("Shishi")
-    case object Shabbos  extends Name("Shabbos")
-
-
-    def names: Seq[Name] = Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi, Shabbos)
+    // TODO move into DayName object? Generalize it to an Enum?
+    override def names: Seq[DayName] = {
+      import DayName._
+      Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi, Shabbos)
+    }
 
     override def apply(number: Int): Day = new Day(number)
 

@@ -30,6 +30,7 @@ final class NewMoonTest extends FlatSpec {
     // see http://www.owen0001.host-ed.me/cal/moladot.php
 
     // year and month for the molad; jewish date; georgian date; georgian time
+    import Jewish.DayName._
 
     newMoon(5769, Tishrei   , Shlishi ,  5769, Tishrei,  1,  2008, September, 30,  1, 58, 13)
     newMoon(5769, Marheshvan, Rvii    ,  5769, Tishrei, 30,  2008, October  , 29, 14, 42, 14)
@@ -48,7 +49,7 @@ final class NewMoonTest extends FlatSpec {
 
 
 
-  private def newMoon(moladYear: Int, moladMonth: Jewish.Month.Name, dayOfWeek: Jewish.Day.Name,
+  private def newMoon(moladYear: Int, moladMonth: Jewish.Month.Name, dayOfWeek: Jewish.DayName,
               year: Int, month: Jewish.Month.Name, day: Int,
               yearG: Int, monthG: Gregorian.Month.Name, dayG: Int,
               hours: Int, minutes: Int, parts: Int)

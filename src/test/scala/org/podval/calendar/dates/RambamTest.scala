@@ -39,11 +39,11 @@ class RambamTest extends FlatSpec {
   "first two years' new moons" should "be correct" in {
     // KH 6:8
     val year1newMoon = Year(1).newMoon
-    assert(year1newMoon.day.name == Day.Sheni)
+    assert(year1newMoon.day.name == Jewish.DayName.Sheni)
     assert(year1newMoon.time == interval.hours(5).parts(204))
 
     val year2newMoon = Year(2).newMoon
-    assert(year2newMoon.day.name == Day.Shishi)
+    assert(year2newMoon.day.name == Jewish.DayName.Shishi)
     assert(year2newMoon.time == interval.hours(14))
 
     assert(year2newMoon - Month.meanLunarPeriod*12 == year1newMoon)
@@ -101,7 +101,7 @@ class RambamTest extends FlatSpec {
     assert(Year(1).month(Month.Nisan).newMoon - Sun.tkufasNissan(1) == interval.days(7).hours(9).parts(642))
 
     val vernalEquinox4930 = Sun.tkufasNissan(4930)
-    assert(vernalEquinox4930.day.name == Day.Chamishi)
+    assert(vernalEquinox4930.day.name == Jewish.DayName.Chamishi)
     assert(vernalEquinox4930.time == interval.hours(6))
   }
 }

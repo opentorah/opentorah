@@ -91,20 +91,24 @@ class Gregorian private() extends Calendar[Gregorian] {
   final class Day(number: Int)
     extends DayBase(number) with GregorianCalendarMember
 
+  sealed class DayName(name: String) extends Named(name)
+
+  object DayName {
+    case object Sunday extends DayName("Sunday")
+    case object Monday extends DayName("Monday")
+    case object Tuesday extends DayName("Tuesday")
+    case object Wednesday extends DayName("Wednesday")
+    case object Thursday extends DayName("Thursday")
+    case object Friday extends DayName("Friday")
+    case object Saturday extends DayName("Saturday")
+  }
 
   object Day extends DayCompanion {
-
-    sealed class Name(name: String) extends Named(name)
-
-    case object Sunday    extends Name("Sunday")
-    case object Monday    extends Name("Monday")
-    case object Tuesday   extends Name("Tuesday")
-    case object Wednesday extends Name("Wednesday")
-    case object Thursday  extends Name("Thursday")
-    case object Friday    extends Name("Friday")
-    case object Saturday  extends Name("Saturday")
-
-    def names: Seq[Name] = Seq(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+    // TODO move into DayName object? Generalize it to an Enum?
+    override def names: Seq[DayName] = {
+      import DayName._
+      Seq(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+    }
 
     override def apply(number: Int): Day = new Day(number)
 

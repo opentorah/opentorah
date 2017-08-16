@@ -26,7 +26,7 @@ import Month._
 final class DatesTest extends FlatSpec {
 
   "known dates" should "have correct day of the week" in {
-    assertResult(Day.Sheni)(Day(5772, Marheshvan, 24).name)
+    assertResult(Jewish.DayName.Sheni)(Day(5772, Marheshvan, 24).name)
   }
 
 
