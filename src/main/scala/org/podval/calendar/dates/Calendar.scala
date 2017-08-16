@@ -55,6 +55,10 @@ trait Calendar[C <: Calendar[C]] { this: C =>
       Month(firstMonthNumber + numberInYear - 1)
     }
 
+    // TODO if YearBase is split into separate file (and parameterized with [C <: Calendar[C]]),
+    // type of the month() method parameter becomes `calendar.Month.Name`, causing compilation error
+    // (stable identifier required).
+    // Conclusion: Month.Name type has to be moved into the Calendar itself first :(
     final def month(name: Month.Name): Month = month(monthDescriptors.indexWhere(_.name == name) + 1)
 
     final def monthForDay(day: Int): Month = {
