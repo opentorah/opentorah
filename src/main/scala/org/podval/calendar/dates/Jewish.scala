@@ -44,47 +44,48 @@ class Jewish private() extends Calendar[Jewish] {
 
     def numberInCycle: Int = Year.numberInCycle(number)
 
-    override def character: Year.Character = (isLeap, kind)
+    override def character: YearCharacter = (isLeap, kind)
 
     // KH 8:7,8
-    def kind: Year.Kind = {
+    def kind: YearKind = {
       val daysOverShort = lengthInDays - (if (isLeap) 383 else 353)
 
       daysOverShort match {
-        case 0 => Year.Short
-        case 1 => Year.Regular
-        case 2 => Year.Full
+        case 0 => YearKind.Short
+        case 1 => YearKind.Regular
+        case 2 => YearKind.Full
         case _ => throw new IllegalArgumentException("Impossible year length " + lengthInDays + " for " + this)
       }
     }
   }
 
+  sealed trait YearKind
+  object YearKind {
+    case object Short extends YearKind
+    case object Regular extends YearKind
+    case object Full extends YearKind
+
+    val values: Seq[YearKind] = Seq(Short, Regular, Full)
+  }
+
+  override type YearCharacter = (Boolean, YearKind)
 
   final class YearCompanion extends YearCompanionBase {
 
-    sealed trait Kind
-    case object Short   extends Year.Kind
-    case object Regular extends Year.Kind
-    case object Full    extends Year.Kind
-
-
-    type Character = (Boolean, Year.Kind)
-
-
     override def apply(number: Int): Year = new Year(number)
 
-    protected override def characters: Seq[Year.Character] =
-      for (isLeap <- Seq(true, false); kind <- Seq(Short, Regular, Full)) yield (isLeap, kind)
+    protected override def characters: Seq[YearCharacter] =
+      for (isLeap <- Seq(true, false); kind <- YearKind.values) yield (isLeap, kind)
 
     // KH 8:5-6
-    protected override def monthNamesAndLengths(character: Year.Character): List[MonthNameAndLength] = {
+    protected override def monthNamesAndLengths(character: YearCharacter): List[MonthNameAndLength] = {
       import Month._
 
-      character match { case (isLeap: Boolean, kind: Year.Kind) =>
+      character match { case (isLeap: Boolean, kind: YearKind) =>
         List(
           MonthNameAndLength(Tishrei   , 30),
-          MonthNameAndLength(Marheshvan, if (kind == Full) 30 else 29),
-          MonthNameAndLength(Kislev    , if (kind == Short) 29 else 30),
+          MonthNameAndLength(Marheshvan, if (kind == YearKind.Full) 30 else 29),
+          MonthNameAndLength(Kislev    , if (kind == YearKind.Short) 29 else 30),
           MonthNameAndLength(Teves     , 29),
           MonthNameAndLength(Shvat     , 30)
         ) ++

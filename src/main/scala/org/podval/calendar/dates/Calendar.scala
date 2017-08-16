@@ -18,7 +18,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   protected abstract class YearBase(number: Int)
     extends Numbered[Year](number) with CalendarMember[C]
   { this: Year =>
-    def character: Year.Character
+    def character: YearCharacter
 
     final def isLeap: Boolean = Year.isLeap(number)
 
@@ -66,12 +66,12 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   }
 
 
+  type YearCharacter
+
   /**
    *
    */
   protected abstract class YearCompanionBase {
-    type Character
-
     def apply(number: Int): Year
 
     final  def apply(month: Month): Year = apply(Month.yearNumber(month.number))
@@ -83,12 +83,12 @@ trait Calendar[C <: Calendar[C]] { this: C =>
       result
     }
 
-    val monthDescriptors: Map[Year.Character, List[MonthDescriptor]] =
+    val monthDescriptors: Map[YearCharacter, List[MonthDescriptor]] =
       Map((for (character <- characters) yield character -> monthsGenerator(character)): _*)
 
-    protected def characters: Seq[Year.Character]
+    protected def characters: Seq[YearCharacter]
 
-    private[this] def monthsGenerator(character: Year.Character): List[MonthDescriptor] = {
+    private[this] def monthsGenerator(character: YearCharacter): List[MonthDescriptor] = {
       val namesAndLengths = monthNamesAndLengths(character)
       // TODO dayses?
       val daysesBefore = namesAndLengths.map(_.length).scanLeft(0)(_ + _).init
@@ -97,7 +97,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
       }
     }
 
-    protected def monthNamesAndLengths(character: Year.Character): List[MonthNameAndLength]
+    protected def monthNamesAndLengths(character: YearCharacter): List[MonthNameAndLength]
 
     protected def areYearsPositive: Boolean
 

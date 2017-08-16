@@ -13,18 +13,18 @@ class Gregorian private() extends Calendar[Gregorian] {
 
     override def lengthInDays: Int = Year.lengthInDays(number)
 
-    override def character: Year.Character = isLeap
+    override def character: YearCharacter = isLeap
   }
 
 
-  final class YearCompanion extends YearCompanionBase {
-    type Character = Boolean
+  override type YearCharacter = Boolean
 
+  final class YearCompanion extends YearCompanionBase {
     override def apply(number: Int): Year = new Year(number)
 
-    protected override def characters: Seq[Year.Character] = Seq(true, false)
+    protected override def characters: Seq[YearCharacter] = Seq(true, false)
 
-    protected override def monthNamesAndLengths(isLeap: Year.Character): List[MonthNameAndLength] = {
+    protected override def monthNamesAndLengths(isLeap: YearCharacter): List[MonthNameAndLength] = {
       import Month._
       List(
         MonthNameAndLength(January  , 31),
