@@ -2,7 +2,13 @@ package org.podval.calendar.dates
 
 class Gregorian private() extends Calendar[Gregorian] {
 
-  final class Year(number: Int) extends YearBase(number) {
+  trait GregorianCalendarMember extends CalendarMember[Gregorian] {
+    final override def calendar: Gregorian = Gregorian.this
+  }
+
+  final class Year(number: Int)
+    extends YearBase(number) with GregorianCalendarMember
+  {
     override def firstDayNumber: Int = Year.firstDay(number)
 
     override def lengthInDays: Int = Year.lengthInDays(number)
@@ -54,7 +60,8 @@ class Gregorian private() extends Calendar[Gregorian] {
   }
 
 
-  final class Month(number: Int) extends MonthBase(number)
+  final class Month(number: Int)
+    extends MonthBase(number) with GregorianCalendarMember
 
 
   object Month extends MonthCompanion {
@@ -81,7 +88,8 @@ class Gregorian private() extends Calendar[Gregorian] {
   }
 
 
-  final class Day(number: Int) extends DayBase(number)
+  final class Day(number: Int)
+    extends DayBase(number) with GregorianCalendarMember
 
 
   object Day extends DayCompanion {
@@ -107,7 +115,9 @@ class Gregorian private() extends Calendar[Gregorian] {
   }
 
 
-  final class Moment(negative: Boolean, digits: List[Int]) extends MomentBase(negative, digits) {
+  final class Moment(negative: Boolean, digits: List[Int])
+    extends MomentBase(negative, digits) with GregorianCalendarMember
+  {
     def morningHours(value: Int): Moment = firstHalfHours(value)
 
     def afternoonHours(value: Int): Moment = secondHalfHours(value)

@@ -10,12 +10,17 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   type Moment <: MomentBase
 
+  trait CalendarMember[C <: Calendar[C]] {
+    def calendar: C
+  }
 
   /**
    *
    * @param number  of the Year
    */
-  protected abstract class YearBase(number: Int) extends Numbered[Year](number) { this: Year =>
+  protected abstract class YearBase(number: Int)
+    extends Numbered[Year](number) with CalendarMember[C]
+  { this: Year =>
     def character: Year.Character
 
     final def isLeap: Boolean = Year.isLeap(number)
@@ -118,7 +123,9 @@ trait Calendar[C <: Calendar[C]] { this: C =>
    *
    * @param number  of the Month
    */
-  protected abstract class MonthBase(number: Int) extends Numbered[Month](number) { self: Month =>
+  protected abstract class MonthBase(number: Int)
+    extends Numbered[Month](number) with CalendarMember[C]
+  { self: Month =>
     require(0 < number)
 
     final def next: Month = Month(number + 1)
@@ -183,7 +190,9 @@ trait Calendar[C <: Calendar[C]] { this: C =>
    *
    * @param number  of the Day
    */
-  protected abstract class DayBase(number: Int) extends Numbered[Day](number) { this: Day =>
+  protected abstract class DayBase(number: Int)
+    extends Numbered[Day](number) with CalendarMember[C]
+  { this: Day =>
     require(0 < number)
 
     final def next: Day = Day(number + 1)
@@ -247,7 +256,9 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   type TimeInterval = numberSystem.TimeInterval
 
 
-  class MomentBase(negative: Boolean, digits: List[Int]) extends numberSystem.TimePoint(negative, digits) {
+  abstract class MomentBase(negative: Boolean, digits: List[Int])
+    extends numberSystem.TimePoint(negative, digits) with CalendarMember[C]
+  {
     final def day: Day = Day(days + 1)
 
     final def time: TimeInterval = numberSystem.TimeInterval(negative = false, days(0).digits)

@@ -3,7 +3,13 @@ package org.podval.calendar.dates
 // TODO add a check that length of the year and total length of the months are the same
 class Jewish private() extends Calendar[Jewish] {
 
-  final class Year(number: Int) extends YearBase(number) {
+  trait JewishCalendarMember extends CalendarMember[Jewish] {
+    final override def calendar: Jewish = Jewish.this
+  }
+
+  final class Year(number: Int)
+    extends YearBase(number) with JewishCalendarMember
+  {
     require(0 < number)
 
     def newMoon: Moment = month(1).newMoon
@@ -140,7 +146,9 @@ class Jewish private() extends Calendar[Jewish] {
   }
 
 
-  final class Month(number: Int) extends MonthBase(number) {
+  final class Month(number: Int)
+    extends MonthBase(number) with JewishCalendarMember
+  {
     def newMoon: Moment = Month.firstNewMoon + Month.meanLunarPeriod*(number-1)
   }
 
@@ -186,7 +194,8 @@ class Jewish private() extends Calendar[Jewish] {
   }
 
 
-  final class Day(number: Int) extends DayBase(number)
+  final class Day(number: Int)
+    extends DayBase(number) with JewishCalendarMember
 
 
   object Day extends DayCompanion {
@@ -212,7 +221,9 @@ class Jewish private() extends Calendar[Jewish] {
   }
 
 
-  final class Moment(negative: Boolean, digits: List[Int]) extends MomentBase(negative, digits) {
+  final class Moment(negative: Boolean, digits: List[Int])
+    extends MomentBase(negative, digits) with JewishCalendarMember
+  {
     def nightHours(value: Int): Moment = firstHalfHours(value)
 
     def dayHours(value: Int): Moment = secondHalfHours(value)
