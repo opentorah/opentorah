@@ -107,16 +107,18 @@ class Gregorian private() extends Calendar[Gregorian] {
     new GregorianDayCompanion with GregorianCalendarMember
 
 
-  final class Moment(negative: Boolean, digits: List[Int])
+  abstract class GregorianMoment(negative: Boolean, digits: List[Int])
     extends MomentBase(negative, digits) with GregorianCalendarMember
-  {
+  { this: Moment =>
     final def morningHours(value: Int): Moment = firstHalfHours(value)
 
     final def afternoonHours(value: Int): Moment = secondHalfHours(value)
   }
 
+  final override type Moment = GregorianMoment
+
   final override def createMoment(negative: Boolean, digits: List[Int]): Moment =
-    new Moment(negative, digits)
+    new GregorianMoment(negative, digits) with GregorianCalendarMember
 
   object Moment extends MomentCompanion with GregorianCalendarMember
 }
