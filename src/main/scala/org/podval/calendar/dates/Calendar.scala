@@ -228,7 +228,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   abstract class MomentBase(negative: Boolean, digits: List[Int])
     extends numberSystem.TimePoint(negative, digits) with CalendarMember[C]
-  {
+  { this: Moment =>
     final def day: Day = Day(days + 1)
 
     final def time: TimeInterval = numberSystem.TimeInterval(negative = false, days(0).digits)

@@ -29,6 +29,8 @@ abstract class TimeNumberSystem extends {
   protected final override val ranges: List[Int] = List(hoursPerDay, partsPerHour, momentsPerPart)
 
 } with NotRangedHeadDigitNumberSystem {
+  protected type Point <: TimePoint
+
   require(hoursPerDay % 2 == 0)
 
   final val hoursPerHalfDay: Int = hoursPerDay / 2
@@ -44,49 +46,58 @@ abstract class TimeNumberSystem extends {
   protected final override val intervalCreator: Creator[Interval] = TimeInterval.apply
 
 
-  trait TimeNumber extends Number {
+  trait TimeNumber[N <: TimeNumber[N]] extends Number[N] { this: N =>
     final def days: Int = head
 
-    final def days(value: Int): SelfType = digit(0, value)
+    final def days(value: Int): N = digit(0, value)
 
-    final def day(number: Int): SelfType = days(number-1)
+    final def day(number: Int): N = days(number-1)
 
     final def hours: Int = digit(1)
 
-    final def hours(value: Int): SelfType = digit(1, value)
+    final def hours(value: Int): N = digit(1, value)
 
-    final def firstHalfHours(value: Int): SelfType = {
+    final def firstHalfHours(value: Int): N = {
       require(0 <= hours && hours < hoursPerHalfDay)
       hours(value)
     }
 
-    final def secondHalfHours(value: Int): SelfType = {
+    final def secondHalfHours(value: Int): N = {
       require(0 <= value && value < hoursPerHalfDay)
       hours(value + hoursPerHalfDay)
     }
 
     final def parts: Int = digit(2)
 
-    final def parts(value: Int): SelfType = digit(2, value)
+    final def parts(value: Int): N = digit(2, value)
 
     final def minutes: Int = parts / partsPerMinute
 
-    final def minutes(value: Int): SelfType = parts(value*partsPerMinute+partsWithoutMinutes)
+    final def minutes(value: Int): N = parts(value*partsPerMinute+partsWithoutMinutes)
 
     final def partsWithoutMinutes: Int = parts % partsPerMinute
 
-    final def partsWithoutMinutes(value: Int): SelfType = parts(minutes*partsPerMinute+value)
+    final def partsWithoutMinutes(value: Int): N = parts(minutes*partsPerMinute+value)
 
     final def moments: Int = digit(3)
 
-    final def moments(value: Int): SelfType = digit(3, value)
+    final def moments(value: Int): N = digit(3, value)
   }
 
 
-  abstract class TimePoint(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) with TimeNumber with PointBase
+  abstract class TimePoint(negative: Boolean, digits: List[Int])
+    extends NumberBase[Point](negative, digits)
+    with TimeNumber[Point]
+    with PointBase
+  {
+    this: Point =>
+  }
 
 
-  final class TimeInterval(negative: Boolean, digits: List[Int]) extends NumberBase(negative, digits) with TimeNumber with IntervalBase
+  final class TimeInterval(negative: Boolean, digits: List[Int])
+    extends NumberBase[TimeInterval](negative, digits)
+    with TimeNumber[TimeInterval]
+    with IntervalBase
 
 
   object TimeInterval {

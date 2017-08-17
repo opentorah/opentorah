@@ -1,23 +1,9 @@
 package org.podval.calendar.dates
 
-/*
- * Copyright 2014-2015 Podval Group.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// TODO rename createXXX to mkXXX or newXXX; XXXCreator as createXXX.
 trait NumberSystem {
 
-  protected type Creator[T <: Number] = (Boolean, List[Int]) => T
+  protected type Creator[T <: Number[T]] = (Boolean, List[Int]) => T
 
   protected type Point <: PointBase
 
@@ -43,24 +29,9 @@ trait NumberSystem {
   private[this] val divisors: List[Double] = ranges.inits.toList.reverse.tail.map(_.product.toDouble)
 
 
-  trait Number {
+  trait Number[N <: Number[N]] extends Ordered[N] { this: N =>
 
-    protected type SelfType <: Number
-
-    protected val selfCreator: Creator[SelfType]
-
-    final override def hashCode: Int = (73 /: digits)((v, x) => 41 * v + x) + negative.hashCode
-
-    protected final def compare_(that: Number): Int = {
-      if (this.negative == that.negative) {
-        val result = zip(that) map lift(_.compare(_)) find (_ != 0) getOrElse 0
-        if (!this.negative) result else -result
-      } else {
-        if (!that.negative) +1 else -1
-      }
-    }
-
-    protected final def equals_(that: Number): Boolean = compare_(that) == 0
+    protected val selfCreator: Creator[N]
 
     def negative: Boolean
 
@@ -78,16 +49,16 @@ trait NumberSystem {
       if (length >= n) digits(n) else 0
     }
 
-    final def digit(n: Int, value: Int): SelfType = {
+    final def digit(n: Int, value: Int): N = {
       require(0 <= n && n <= maxLength)
       create(negative, digits.padTo(n + 1, 0).updated(n, value))(selfCreator)
     }
 
-    protected final def plus[T <: Number](that: Number)(creator: Creator[T]): T = plusMinus(operationNegation = false, that)(creator)
+    protected final def plus[T <: Number[T]](that: Number[_])(creator: Creator[T]): T = plusMinus(operationNegation = false, that)(creator)
 
-    protected final def minus[T <: Number](that: Number)(creator: Creator[T]): T = plusMinus(operationNegation = true, that)(creator)
+    protected final def minus[T <: Number[T]](that: Number[_])(creator: Creator[T]): T = plusMinus(operationNegation = true, that)(creator)
 
-    private[this] final def plusMinus[T <: Number](operationNegation: Boolean, that: Number)(creator: Creator[T]): T = {
+    private[this] final def plusMinus[T <: Number[T]](operationNegation: Boolean, that: Number[_])(creator: Creator[T]): T = {
       val sameSign = this.negative == that.negative
       val operationSelector = if (operationNegation) !sameSign else sameSign
       val operation: (Int, Int) => Int = if (operationSelector) _ + _ else _ - _
@@ -98,7 +69,7 @@ trait NumberSystem {
       (if (negative) -1 else +1) * (head + ((tail zip divisors) map lift(_ / _)).sum)
 
     // TODO add rounding tests
-    final def roundTo(n: Int): SelfType = {
+    final def roundTo(n: Int): N = {
       require(n >= 0)
 
       val (more_, toRound) = tail splitAt n
@@ -114,6 +85,11 @@ trait NumberSystem {
       create(negative, head +: tail_)(selfCreator)
     }
 
+    private[this] def zip(that: Number[_]): List[(Int, Int)] = this.digits zipAll(that.digits, 0, 0)
+
+    // TODO why can't I inline .tupled?
+    private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = op.tupled
+
     // TODO: padding; cutting off 0; more flavours...
     protected final def toSignedString: String = {
       val tokens = digits map (_.toString) zip signs flatMap (p => List(p._1, p._2))
@@ -123,24 +99,27 @@ trait NumberSystem {
 
     override def toString: String = toSignedString
 
-    private[this] def zip(that: Number): List[(Int, Int)] = this.digits zipAll(that.digits, 0, 0)
+    final override def hashCode: Int = (73 /: digits)((v, x) => 41 * v + x) + negative.hashCode
 
-    // TODO why can't I inline .tupled?
-    private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = op.tupled
+    final def compare(that: N): Int = {
+      if (this.negative == that.negative) {
+        val result = zip(that) map lift(_.compare(_)) find (_ != 0) getOrElse 0
+        if (!this.negative) result else -result
+      } else {
+        if (!that.negative) +1 else -1
+      }
+    }
+
+    final override def equals(other: Any): Boolean =
+    // TODO deal with the "erasure" warning
+      if (!other.isInstanceOf[N]) false else compare(other.asInstanceOf[N]) == 0
+
   }
 
 
-  trait PointBase extends Number with Ordered[Point] {
-
-    protected override type SelfType = Point
+  trait PointBase extends Number[Point] { this: Point =>
 
     protected override val selfCreator: Creator[Point] = pointCreator
-
-    final def compare(that: Point): Int = compare_(that)
-
-    final override def equals(other: Any): Boolean =
-      // TODO deal with the "erasure" warning
-      if (!other.isInstanceOf[Point]) false else equals_(other.asInstanceOf[Point])
 
     final def +(that: Interval): Point = plus(that)(pointCreator)
 
@@ -151,17 +130,9 @@ trait NumberSystem {
 
 
 
-  trait IntervalBase extends Number with Ordered[Interval] {
-
-    protected override type SelfType = Interval
+  trait IntervalBase extends Number[Interval] { this: Interval =>
 
     protected override val selfCreator: Creator[Interval] = intervalCreator
-
-    final def compare(that: Interval): Int = compare_(that)
-
-    final override def equals(other: Any): Boolean =
-      // TODO deal with the "erasure" warning
-      if (!other.isInstanceOf[Interval]) false else equals_(other.asInstanceOf[Interval])
 
     final def +(that: Interval): Interval = plus(that)(intervalCreator)
 
@@ -233,10 +204,11 @@ trait NumberSystem {
   }
 
 
-  abstract class NumberBase(override val negative: Boolean, override val digits: List[Int]) extends Number
+  abstract class NumberBase[N <: Number[N]](override val negative: Boolean, override val digits: List[Int])
+    extends Number[N] { this: N => }
 
 
-  final def fromDouble[T <: Number](value: Double, length: Int)(creator: Creator[T]): T = {
+  final def fromDouble[T <: Number[T]](value: Double, length: Int)(creator: Creator[T]): T = {
     val negative = value < 0
     val absValue = if (!negative) value else -value
 
@@ -247,7 +219,7 @@ trait NumberSystem {
     create(negative, (digits.init map (math.floor(_).toInt)) :+ math.round(digits.last).toInt)(creator)
   }
 
-  final def create[T <: Number](negative: Boolean, digits: List[Int])(creator: Creator[T]): T = {
+  final def create[T <: Number[T]](negative: Boolean, digits: List[Int])(creator: Creator[T]): T = {
     def step(elem: (Int, Int), acc: (Int, List[Int])) = {
       val (digit, range) = elem
       val (carry, result) = acc
