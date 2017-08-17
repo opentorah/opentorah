@@ -1,7 +1,6 @@
 package org.podval.calendar.dates
 
 import org.podval.calendar.jewish.Jewish
-import Jewish._
 
 
 /**
@@ -11,7 +10,7 @@ object Rambam {
 
   val numberOfLessons = 339
 
-  val firstLessonDay: Int = Year(5775).month(Jewish.MonthName.Kislev).day(23).number
+  val firstLessonDay: Int = Jewish.Year(5775).month(Jewish.MonthName.Kislev).day(23).number
 
   def lessonForDay(day: Jewish#Day): Int = {
     val distance = day.number - firstLessonDay + 50*numberOfLessons // % misbehaves on negatives :)
@@ -58,8 +57,8 @@ object Rambam {
     override def numColumns: Int = 8
   }
 
-  def scheduleYear(formatter: Formatter, year: Year): Iterator[String] = {
-    def scheduleMonth(month: Month): Seq[String] = {
+  def scheduleYear(formatter: Formatter, year: Jewish#Year): Iterator[String] = {
+    def scheduleMonth(month: Jewish#Month): Seq[String] = {
       val lessons = for {
         day <- month.days
         gDay = Conversions.fromJewish(day)
@@ -74,7 +73,7 @@ object Rambam {
       result.map(formatter.formatLine)
     }
 
-    def scheduleMonths(months: Seq[Month]): Seq[String] = {
+    def scheduleMonths(months: Seq[Jewish#Month]): Seq[String] = {
       def combine(what: Seq[String]): String = what.reduce((acc: String, r: String) => acc ++ "    " ++ r)
       val schedules: Seq[Seq[String]] = months.map(scheduleMonth)
       schedules.transpose.map(combine) ++ Seq("")
@@ -84,7 +83,7 @@ object Rambam {
   }
 
   def printSchedule(formatter: Formatter)(numYear: Int): Unit =
-    scheduleYear(formatter, Year(numYear)).foreach(println)
+    scheduleYear(formatter, Jewish.Year(numYear)).foreach(println)
 
   def main(args: Array[String]): Unit = printSchedule(narrowFormatter)(5776)
 }

@@ -6,7 +6,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   type Year <: YearBase
 
-  def createYear(number: Int): Year
+  def createYear(number: Int): C#Year
 
   type Month <: MonthBase[C]
 
@@ -32,9 +32,9 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
     final def isLeap: Boolean = Year.isLeap(number)
 
-    final def next: Year = Year(number + 1)
+    final def next: C#Year = Year(number + 1)
 
-    final def prev: Year = Year(number - 1)
+    final def prev: C#Year = Year(number - 1)
 
     final def +(change: Int) = Year(number + change)
 
@@ -83,11 +83,11 @@ trait Calendar[C <: Calendar[C]] { this: C =>
    *
    */
   abstract class YearCompanion extends CalendarMember[C] {
-    final def apply(number: Int): Year = createYear(number)
+    final def apply(number: Int): C#Year = createYear(number)
 
-    final def apply(month: C#Month): Year = apply(Month.yearNumber(month.number))
+    final def apply(month: C#Month): C#Year = apply(Month.yearNumber(month.number))
 
-    final def apply(day: C#Day): Year = {
+    final def apply(day: C#Day): C#Year = {
       var result = apply(yearsForSureBefore(day.number))
       require(result.firstDayNumber <= day.number)
       while (result.next.firstDayNumber <= day.number) result = result.next
@@ -136,7 +136,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   abstract class MonthCompanion extends CalendarMember[C] {
     final def apply(number: Int): Month = createMonth(number)
 
-    final def apply(year: Int, monthInYear: Int): Month = Year(year).month(monthInYear)
+    final def apply(year: Int, monthInYear: Int): C#Month = Year(year).month(monthInYear)
 
     def yearNumber(monthNumber: Int): Int
 
