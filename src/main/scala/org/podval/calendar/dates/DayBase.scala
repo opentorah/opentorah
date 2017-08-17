@@ -27,10 +27,6 @@ protected abstract class DayBase[C <: Calendar[C]](number: Int)
 
   final def numberInWeek: Int = calendar.Day.numberInWeek(number)
 
-  // TODO if DayBase is split into separate file (and parameterized with [C <: Calendar[C]]),
-  // type of the name() method becomes `calendar.Day.Name`, causing compilation error:
-  //   stable identifier required, but DayBase.this.calendar.Day found.
-  // Conclusion: Day.Name type has to be moved into the Calendar itself first :(
   final def name: C#DayName = calendar.Day.names(numberInWeek - 1)
 
   final def toMoment: C#Moment = calendar.moment.days(number - 1)
