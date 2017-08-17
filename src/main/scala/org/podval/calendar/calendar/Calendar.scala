@@ -14,11 +14,12 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   type MonthName
 
+  // TODO attemp to prefix Month with C# leads to compilation errors with newMoon...
   def createMonth(number: Int): Month
 
   type Day <: DayBase[C]
 
-  def createDay(number: Int): Day
+  def createDay(number: Int): C#Day
 
   // TODO make this a Enum - and use its `values()` method in DayCompanion.name
   //   (which will then become `final`)?
