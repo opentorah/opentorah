@@ -1,7 +1,6 @@
 package org.podval.calendar.gregorian
 
 import org.podval.calendar.calendar._
-import org.podval.calendar.util.Named
 
 class Gregorian private() extends Calendar[Gregorian] {
 
@@ -63,28 +62,17 @@ class Gregorian private() extends Calendar[Gregorian] {
   }
 
 
-  final class Month(number: Int)
-    extends MonthBase[Gregorian](number) with GregorianCalendarMember
+  final override type Month = GregorianMonth
 
-  sealed class MonthName(name: String) extends Named(name)
+  final def createMonth(number: Int): Month = new GregorianMonth(number) with GregorianCalendarMember
 
-  object MonthName {
-    case object January extends MonthName("January")
-    case object February extends MonthName("February")
-    case object March extends MonthName("March")
-    case object April extends MonthName("April")
-    case object May extends MonthName("May")
-    case object June extends MonthName("June")
-    case object July extends MonthName("July")
-    case object August extends MonthName("August")
-    case object September extends MonthName("September")
-    case object October extends MonthName("October")
-    case object November extends MonthName("November")
-    case object December extends MonthName("December")
-  }
+  final override type MonthName = GregorianMonthName
+
+  // TODO stick it into the Month companion???
+  val MonthName: GregorianMonthName.type = GregorianMonthName
 
   object Month extends MonthCompanion {
-    override def apply(number: Int): Month = new Month(number)
+    override def apply(number: Int): Month = createMonth(number)
 
     override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Gregorian.Year.monthsInYear + 1
 
@@ -92,7 +80,7 @@ class Gregorian private() extends Calendar[Gregorian] {
   }
 
 
-  override type Day = GregorianDay
+  final override type Day = GregorianDay
 
   final def createDay(number: Int): Day = new GregorianDay(number) with GregorianCalendarMember
 
