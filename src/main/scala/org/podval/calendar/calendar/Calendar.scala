@@ -107,7 +107,9 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   abstract class YearCompanion extends CalendarMember[C] {
     final def apply(number: Int): C#Year = createYear(number)
 
-    final def apply(month: C#Month): C#Year = apply(Month.yearNumber(month.number))
+    final def apply(month: C#Month): C#Year =
+      // TODO possibly initialization-breaking call
+      apply(calendar.Month.yearNumber(month.number))
 
     final def apply(day: C#Day): C#Year = {
       var result = apply(yearsForSureBefore(day.number))
@@ -155,7 +157,8 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   abstract class MonthCompanion extends CalendarMember[C] {
     final def apply(number: Int): Month = createMonth(number)
 
-    final def apply(year: Int, monthInYear: Int): C#Month = Year(year).month(monthInYear)
+    final def apply(year: Int, monthInYear: Int): C#Month =
+      calendar.createYear(year).month(monthInYear)
 
     def yearNumber(monthNumber: Int): Int
 
