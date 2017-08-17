@@ -11,9 +11,9 @@ abstract class MonthBase[C <: Calendar[C]](number: Int)
 { this: C#Month =>
   require(0 < number)
 
-  final def next: C#Month = calendar.Month(number + 1)
+  final def next: C#Month = this + 1
 
-  final def prev: C#Month = calendar.Month(number - 1)
+  final def prev: C#Month = this - 1
 
   final def +(change: Int) = calendar.Month(number + change)
 

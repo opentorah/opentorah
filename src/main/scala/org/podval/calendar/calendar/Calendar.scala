@@ -38,7 +38,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
     final override def createInterval(raw: RawNumber): Interval = new TimeInterval(raw)
 
     // TODO if I call Moment.apply() here it screws up the initialization order!!!
-    final override def createPoint(raw: RawNumber): Point = createMoment(raw)
+    final override def createPoint(raw: RawNumber): Point = Calendar.this.createMoment(raw)
   }
 
   type TimeInterval = numberSystem.TimeInterval
