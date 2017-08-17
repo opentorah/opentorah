@@ -230,9 +230,10 @@ class Jewish private() extends Calendar[Jewish] {
   final override def createMoment(raw: RawNumber): Moment =
     new JewishMoment(raw) with JewishCalendarMember
 
-  // TODO if this is done with `abstract class` / `final override val`,
-  // tests fail (initialization issues?)!
-  object Moment extends MomentCompanion with JewishCalendarMember
+  abstract class JewishMomentCompanion extends MomentCompanion
+
+  final override val Moment: JewishMomentCompanion =
+    new JewishMomentCompanion with JewishCalendarMember
 }
 
 
