@@ -71,7 +71,7 @@ class Jewish private() extends Calendar[Jewish] {
 
   override type YearCharacter = (Boolean, YearKind)
 
-  final class YearCompanion extends YearCompanionBase {
+  object Year extends YearCompanion {
 
     override def apply(number: Int): Year = new Year(number)
 
@@ -239,8 +239,6 @@ class Jewish private() extends Calendar[Jewish] {
   object Moment extends MomentCompanion {
     override def apply(negative: Boolean, digits: List[Int]): Moment = new Moment(negative, digits)
   }
-
-  final override val Year = new YearCompanion
 }
 
 

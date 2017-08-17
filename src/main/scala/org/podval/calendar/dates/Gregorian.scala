@@ -19,7 +19,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   override type YearCharacter = Boolean
 
-  final class YearCompanion extends YearCompanionBase {
+  object Year extends YearCompanion {
     override def apply(number: Int): Year = new Year(number)
 
     protected override def characters: Seq[YearCharacter] = Seq(true, false)
@@ -130,8 +130,6 @@ class Gregorian private() extends Calendar[Gregorian] {
   object Moment extends MomentCompanion {
     override def apply(negative: Boolean, digits: List[Int]): Moment = new Moment(negative, digits)
   }
-
-  override val Year: YearCompanion = new YearCompanion
 }
 
 

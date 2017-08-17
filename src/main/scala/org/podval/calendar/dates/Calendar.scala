@@ -71,7 +71,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   /**
    *
    */
-  abstract class YearCompanionBase {
+  abstract class YearCompanion {
     def apply(number: Int): Year
 
     final  def apply(month: C#Month): Year = apply(Month.yearNumber(month.number))
@@ -113,7 +113,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
     def lengthInMonths(yearNumber: Int): Int
   }
 
-  val Year: YearCompanionBase
+  val Year: YearCompanion
 
 
   type MonthName
