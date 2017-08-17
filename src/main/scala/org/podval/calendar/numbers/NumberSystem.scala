@@ -84,15 +84,15 @@ trait NumberSystem {
   }
 
 
-  trait Number[N <: Number[N]] extends Ordered[N] { this: N =>
+  abstract class Number[N <: Number[N]](raw: RawNumber) extends Ordered[N] { this: N =>
     protected final def newPoint(raw: RawNumber): Point = NumberSystem.this.newPoint(raw)
     protected final def newInterval(raw: RawNumber): Interval = NumberSystem.this.newInterval(raw)
 
     protected def newN(negative: Boolean, digits: List[Int]): N
 
-    def negative: Boolean
+    final def negative: Boolean = raw._1
 
-    def digits: List[Int]
+    final def digits: List[Int] = raw._2
 
     final def head: Int = digits.head
 
@@ -174,7 +174,7 @@ trait NumberSystem {
   }
 
 
-  trait PointBase extends Number[Point] { this: Point =>
+  class PointBase(raw: RawNumber) extends Number[Point](raw) { this: Point =>
     protected final override def newN(negative: Boolean, digits: List[Int]): Point =
       newPoint(negative, digits)
 
@@ -186,7 +186,7 @@ trait NumberSystem {
   }
 
 
-  trait IntervalBase extends Number[Interval] { this: Interval =>
+  class IntervalBase(raw: RawNumber) extends Number[Interval](raw) { this: Interval =>
     protected final override def newN(negative: Boolean, digits: List[Int]): Interval =
       newInterval(negative, digits)
 
@@ -258,10 +258,6 @@ trait NumberSystem {
       that.digitsWithRangesForMultiplication.foldRight(z)(step)
     }
   }
-
-
-  abstract class NumberBase[N <: Number[N]](override val negative: Boolean, override val digits: List[Int])
-    extends Number[N] { this: N => }
 }
 
 

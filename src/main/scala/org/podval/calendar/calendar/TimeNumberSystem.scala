@@ -89,18 +89,14 @@ abstract class TimeNumberSystem extends {
 
 
   abstract class TimePoint(negative: Boolean, digits: List[Int])
-    extends NumberBase[Point](negative, digits)
-    with TimeNumber[Point]
-    with PointBase
+    extends PointBase(negative, digits) with TimeNumber[Point]
   {
     this: Point =>
   }
 
 
   final class TimeInterval(negative: Boolean, digits: List[Int])
-    extends NumberBase[TimeInterval](negative, digits)
-    with TimeNumber[TimeInterval]
-    with IntervalBase
+    extends IntervalBase(negative, digits) with TimeNumber[TimeInterval]
 
 
   object TimeInterval {
