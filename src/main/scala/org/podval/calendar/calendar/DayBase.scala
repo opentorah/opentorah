@@ -1,4 +1,4 @@
-package org.podval.calendar.dates
+package org.podval.calendar.calendar
 
 import org.podval.calendar.util.Numbered
 
@@ -6,14 +6,14 @@ import org.podval.calendar.util.Numbered
   *
   * @param number  of the Day
   */
-protected abstract class DayBase[C <: Calendar[C]](number: Int)
+abstract class DayBase[C <: Calendar[C]](number: Int)
   extends Numbered[C#Day](number) with CalendarMember[C]
 { this: C#Day =>
   require(0 < number)
 
-  final def next: C#Day = calendar.Day(number + 1)
+  final def next: C#Day = this + 1
 
-  final def prev: C#Day = calendar.Day(number - 1)
+  final def prev: C#Day = this - 1
 
   final def +(change: Int) = calendar.Day(number + change)
 

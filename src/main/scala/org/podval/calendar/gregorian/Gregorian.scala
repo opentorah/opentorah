@@ -1,5 +1,7 @@
-package org.podval.calendar.dates
+package org.podval.calendar.gregorian
 
+import org.podval.calendar.calendar._
+import org.podval.calendar.jewish.Jewish
 import org.podval.calendar.util.Named
 
 class Gregorian private() extends Calendar[Gregorian] {

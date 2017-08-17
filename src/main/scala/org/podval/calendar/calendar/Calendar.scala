@@ -1,4 +1,4 @@
-package org.podval.calendar.dates
+package org.podval.calendar.calendar
 
 import org.podval.calendar.util.Numbered
 

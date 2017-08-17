@@ -1,11 +1,13 @@
-package org.podval.calendar.dates
+package org.podval.calendar
 
 import org.scalatest.FlatSpec
 
+import jewish.Jewish
 import Jewish.MonthName._
-import Gregorian.MonthName._
 import Jewish.DayName._
-
+import gregorian.Gregorian
+import Gregorian.MonthName._
+import dates.Conversions
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class NewMoonTest extends FlatSpec {

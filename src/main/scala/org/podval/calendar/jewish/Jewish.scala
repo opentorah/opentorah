@@ -1,5 +1,6 @@
-package org.podval.calendar.dates
+package org.podval.calendar.jewish
 
+import org.podval.calendar.calendar._
 import org.podval.calendar.util.Named
 
 // TODO add a check that length of the year and total length of the months are the same

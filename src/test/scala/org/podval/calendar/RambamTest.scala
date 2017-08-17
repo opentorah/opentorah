@@ -1,8 +1,9 @@
-package org.podval.calendar.dates
+package org.podval.calendar
 
 import org.scalatest.FlatSpec
+import jewish.Jewish
 import Jewish._
-
+import dates.Sun
 
 /**
  * Tests based on the statements from the text itself.

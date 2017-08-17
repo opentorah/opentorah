@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.podval.calendar.dates
+package org.podval.calendar.calendar
 
 import org.podval.calendar.numbers.NotRangedHeadDigitNumberSystem
 
