@@ -152,7 +152,7 @@ class Jewish private() extends Calendar[Jewish] {
 
 
   final class Month(number: Int)
-    extends MonthBase(number) with JewishCalendarMember
+    extends MonthBase[Jewish](number) with JewishCalendarMember
   {
     def newMoon: Moment = Month.firstNewMoon + Month.meanLunarPeriod*(number-1)
   }

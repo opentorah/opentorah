@@ -61,7 +61,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
 
   final class Month(number: Int)
-    extends MonthBase(number) with GregorianCalendarMember
+    extends MonthBase[Gregorian](number) with GregorianCalendarMember
 
   sealed class MonthName(name: String) extends Named(name)
 
