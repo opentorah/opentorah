@@ -45,8 +45,7 @@ abstract class TimeNumberSystem extends {
 
   protected final override type Interval = TimeInterval
 
-  // TODO there should be more uniformity between createXXX, createN and constuctors.
-  protected def createInterval(raw: RawNumber): Interval = new TimeInterval(raw._1, raw._2)
+  protected def createInterval(raw: RawNumber): Interval = new TimeInterval(raw)
 
 
   trait TimeNumber[N <: TimeNumber[N]] extends Number[N] { this: N =>
@@ -95,8 +94,8 @@ abstract class TimeNumberSystem extends {
   }
 
 
-  final class TimeInterval(negative: Boolean, digits: List[Int])
-    extends IntervalBase(negative, digits) with TimeNumber[TimeInterval]
+  final class TimeInterval(raw: RawNumber)
+    extends IntervalBase(raw) with TimeNumber[TimeInterval]
 
 
   object TimeInterval {
