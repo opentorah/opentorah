@@ -26,8 +26,8 @@ trait Calendar[C <: Calendar[C]] { this: C =>
    * @param number  of the Year
    */
   abstract class YearBase(number: Int)
-    extends Numbered[Year](number) with CalendarMember[C]
-  { this: Year =>
+    extends Numbered[C#Year](number) with CalendarMember[C]
+  { this: C#Year =>
     def character: YearCharacter
 
     final def isLeap: Boolean = Year.isLeap(number)
@@ -50,25 +50,25 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
     final def days: Seq[C#Day] = months.flatMap(_.days)
 
-    final def firstMonth: Month = month(1)
+    final def firstMonth: C#Month = month(1)
 
-    final def lastMonth: Month = month(lengthInMonths)
+    final def lastMonth: C#Month = month(lengthInMonths)
 
     final def firstMonthNumber: Int = Year.firstMonth(number)
 
     final def lengthInMonths: Int = Year.lengthInMonths(number)
 
-    final def months: Seq[Month] = (1 to lengthInMonths).map(month)
+    final def months: Seq[C#Month] = (1 to lengthInMonths).map(month)
 
     final def month(numberInYear: Int): Month = {
       require(0 < numberInYear && numberInYear <= lengthInMonths)
       Month(firstMonthNumber + numberInYear - 1)
     }
 
-    final def month(name: C#MonthName): Month =
+    final def month(name: C#MonthName): C#Month =
       month(monthDescriptors.indexWhere(_.name == name) + 1)
 
-    final def monthForDay(day: Int): Month = {
+    final def monthForDay(day: Int): C#Month = {
       require(0 < day && day <= lengthInDays)
       month(monthDescriptors.count(_.daysBefore < day))
     }
@@ -94,12 +94,12 @@ trait Calendar[C <: Calendar[C]] { this: C =>
       result
     }
 
-    val monthDescriptors: Map[YearCharacter, List[MonthDescriptor]] =
+    val monthDescriptors: Map[C#YearCharacter, List[MonthDescriptor]] =
       Map((for (character <- characters) yield character -> monthsGenerator(character)): _*)
 
-    protected def characters: Seq[YearCharacter]
+    protected def characters: Seq[C#YearCharacter]
 
-    private[this] def monthsGenerator(character: YearCharacter): List[MonthDescriptor] = {
+    private[this] def monthsGenerator(character: C#YearCharacter): List[MonthDescriptor] = {
       val namesAndLengths = monthNamesAndLengths(character)
       // TODO dayses?
       val daysesBefore = namesAndLengths.map(_.length).scanLeft(0)(_ + _).init
@@ -108,7 +108,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
       }
     }
 
-    protected def monthNamesAndLengths(character: YearCharacter): List[MonthNameAndLength]
+    protected def monthNamesAndLengths(character: C#YearCharacter): List[MonthNameAndLength]
 
     protected def areYearsPositive: Boolean
 
