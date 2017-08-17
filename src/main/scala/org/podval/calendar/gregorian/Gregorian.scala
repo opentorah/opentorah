@@ -1,6 +1,7 @@
 package org.podval.calendar.gregorian
 
 import org.podval.calendar.calendar._
+import org.podval.calendar.numbers.NumberSystem.RawNumber
 
 class Gregorian private() extends Calendar[Gregorian] {
 
@@ -108,8 +109,8 @@ class Gregorian private() extends Calendar[Gregorian] {
     new GregorianDayCompanion with GregorianCalendarMember
 
 
-  abstract class GregorianMoment(negative: Boolean, digits: List[Int])
-    extends MomentBase(negative, digits) with GregorianCalendarMember
+  abstract class GregorianMoment(raw: RawNumber)
+    extends MomentBase(raw) with GregorianCalendarMember
       // TODO prefix with C# when feasible...
   { this: Moment =>
     final def morningHours(value: Int): Moment = firstHalfHours(value)
@@ -119,8 +120,8 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type Moment = GregorianMoment
 
-  final override def createMoment(negative: Boolean, digits: List[Int]): Moment =
-    new GregorianMoment(negative, digits) with GregorianCalendarMember
+  final override def createMoment(raw: RawNumber): Moment =
+    new GregorianMoment(raw) with GregorianCalendarMember
 
   abstract class GregorianMomentCompanion extends MomentCompanion
 

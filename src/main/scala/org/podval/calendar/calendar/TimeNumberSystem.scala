@@ -87,18 +87,18 @@ abstract class TimeNumberSystem extends {
   }
 
 
-  abstract class TimePoint(negative: Boolean, digits: List[Int])
-    extends PointBase(negative, digits) with TimeNumber[Point]
-  {
+  abstract class TimePoint(raw: RawNumber) extends PointBase(raw) with TimeNumber[Point] {
     this: Point =>
   }
 
 
-  final class TimeInterval(raw: RawNumber)
-    extends IntervalBase(raw) with TimeNumber[TimeInterval]
+  final class TimeInterval(raw: RawNumber) extends IntervalBase(raw) with TimeNumber[TimeInterval] {
+    this: Interval =>
+  }
 
 
   object TimeInterval {
-    def apply(negative: Boolean, digits: List[Int]): TimeInterval = new TimeInterval(negative, digits)
+    def apply(negative: Boolean, digits: List[Int]): TimeInterval =
+      new TimeInterval(negative, digits)
   }
 }

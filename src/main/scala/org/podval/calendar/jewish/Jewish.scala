@@ -1,6 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.calendar._
+import org.podval.calendar.numbers.NumberSystem.RawNumber
 
 // TODO add a check that length of the year and total length of the months are the same
 class Jewish private() extends Calendar[Jewish] {
@@ -218,9 +219,7 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override val Day: JewishDayCompanion = new JewishDayCompanion with JewishCalendarMember
 
-  abstract class JewishMoment(negative: Boolean, digits: List[Int])
-    extends MomentBase(negative, digits)
-  {
+  abstract class JewishMoment(raw: RawNumber) extends MomentBase(raw) {
     final def nightHours(value: Int): Moment = firstHalfHours(value)
 
     final def dayHours(value: Int): Moment = secondHalfHours(value)
@@ -228,8 +227,8 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Moment = JewishMoment
 
-  final override def createMoment(negative: Boolean, digits: List[Int]): Moment =
-    new JewishMoment(negative, digits) with JewishCalendarMember
+  final override def createMoment(raw: RawNumber): Moment =
+    new JewishMoment(raw) with JewishCalendarMember
 
   // TODO if this is done with `abstract class` / `final override val`,
   // tests fail (initialization issues?)!

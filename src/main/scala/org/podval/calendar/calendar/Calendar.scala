@@ -29,7 +29,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   type Moment <: MomentBase
 
   // TODO attempt to prefix Moment with C# leads to compilation errors with newMoon...
-  def createMoment(negative: Boolean, digits: List[Int]): Moment
+  def createMoment(raw: RawNumber): Moment
 
 
   /**
@@ -165,15 +165,16 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   object numberSystem extends TimeNumberSystem {
     protected override type Point = Moment
 
-    protected def createPoint(raw: RawNumber): Point = Moment.apply(raw._1, raw._2)
+    // TODO if I call Moment.apply() here it screws up the initialization order!!!
+    protected def createPoint(raw: RawNumber): Point = createMoment(raw)
   }
 
 
   type TimeInterval = numberSystem.TimeInterval
 
 
-  abstract class MomentBase(negative: Boolean, digits: List[Int])
-    extends numberSystem.TimePoint(negative, digits) with CalendarMember[C]
+  abstract class MomentBase(raw: RawNumber)
+    extends numberSystem.TimePoint(raw) with CalendarMember[C]
   { this: Moment =>
     final def day: C#Day = Day(days + 1)
 
@@ -185,14 +186,14 @@ trait Calendar[C <: Calendar[C]] { this: C =>
    *
    */
   abstract class MomentCompanion extends CalendarMember[C] {
-    final def apply(negative: Boolean, digits: List[Int]): Moment = createMoment(negative, digits)
+    final def apply(raw: RawNumber): Moment = createMoment(raw)
   }
 
 
   val Moment: MomentCompanion
 
   // TODO This is def and not a val to make initialization possible
-  final def moment: Moment = Moment(negative = false, List(0))
+  final def moment: Moment = Moment(false, List(0))
 
   final val interval: TimeInterval = numberSystem.TimeInterval(negative = false, List(0))
 
