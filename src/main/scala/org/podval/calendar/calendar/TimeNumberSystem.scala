@@ -1,18 +1,3 @@
-/*
- * Copyright 2014-2015 Podval Group.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.podval.calendar.calendar
 
 import org.podval.calendar.numbers.NotRangedHeadDigitNumberSystem
@@ -31,8 +16,6 @@ abstract class TimeNumberSystem extends {
   protected final override val ranges: List[Int] = List(hoursPerDay, partsPerHour, momentsPerPart)
 
 } with NotRangedHeadDigitNumberSystem {
-  protected type Point <: TimePoint
-
   require(hoursPerDay % 2 == 0)
 
   final val hoursPerHalfDay: Int = hoursPerDay / 2
@@ -43,10 +26,19 @@ abstract class TimeNumberSystem extends {
 
   final val partsPerMinute: Int = partsPerHour / minutesPerHour
 
+  protected type Point <: TimePoint
+
+  abstract class TimePoint(raw: RawNumber) extends PointBase(raw) with TimeNumber[Point] {
+    this: Point =>
+  }
+
   protected final override type Interval = TimeInterval
 
-  protected def createInterval(raw: RawNumber): Interval = new TimeInterval(raw)
+  def createInterval(raw: RawNumber): Interval = new TimeInterval(raw)
 
+  final class TimeInterval(raw: RawNumber) extends IntervalBase(raw) with TimeNumber[TimeInterval] {
+    this: Interval =>
+  }
 
   trait TimeNumber[N <: TimeNumber[N]] extends Number[N] { this: N =>
     final def days: Int = head
@@ -84,20 +76,5 @@ abstract class TimeNumberSystem extends {
     final def moments: Int = digit(3)
 
     final def moments(value: Int): N = digit(3, value)
-  }
-
-
-  abstract class TimePoint(raw: RawNumber) extends PointBase(raw) with TimeNumber[Point] {
-    this: Point =>
-  }
-
-
-  final class TimeInterval(raw: RawNumber) extends IntervalBase(raw) with TimeNumber[TimeInterval] {
-    this: Interval =>
-  }
-
-
-  object TimeInterval {
-    final def apply(raw: RawNumber): TimeInterval = new TimeInterval(raw)
   }
 }
