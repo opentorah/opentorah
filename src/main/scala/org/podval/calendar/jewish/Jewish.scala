@@ -216,6 +216,8 @@ class Jewish private() extends Calendar[Jewish] {
   final override def createMoment(negative: Boolean, digits: List[Int]): Moment =
     new JewishMoment(negative, digits) with JewishCalendarMember
 
+  // TODO if this is done with `abstract class` / `final override val`,
+  // tests fail (initialization issues?)!
   object Moment extends MomentCompanion with JewishCalendarMember
 }
 
