@@ -34,8 +34,6 @@ abstract class TimeNumberSystem extends {
 
   final override type Interval = TimeInterval
 
-  def createInterval(raw: RawNumber): Interval = new TimeInterval(raw)
-
   final class TimeInterval(raw: RawNumber) extends IntervalBase(raw) with TimeNumber[TimeInterval] {
     this: Interval =>
   }

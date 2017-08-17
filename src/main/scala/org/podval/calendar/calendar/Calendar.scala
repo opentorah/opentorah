@@ -165,6 +165,8 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   object numberSystem extends TimeNumberSystem {
     final override type Point = Moment
 
+    final override def createInterval(raw: RawNumber): Interval = new TimeInterval(raw)
+
     // TODO if I call Moment.apply() here it screws up the initialization order!!!
     final override def createPoint(raw: RawNumber): Point = createMoment(raw)
   }
