@@ -172,6 +172,8 @@ class Jewish private() extends Calendar[Jewish] {
   // TODO stick it into the Month companion???
   val MonthName: JewishMonthName.type = JewishMonthName
 
+  // TODO if this is done with `abstract class` / `final override val`,
+  // tests fail (initialization issues?)!
   object Month extends MonthCompanion with JewishCalendarMember {
     // KH 6:3
     val meanLunarPeriod = interval.days(29).hours(12).parts(793)  // TODO how is this really called? tropical?
