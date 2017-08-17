@@ -1,5 +1,6 @@
 package org.podval.calendar.calendar
 
+import org.podval.calendar.numbers.NumberSystem.RawNumber
 import org.podval.calendar.util.Numbered
 
 trait Calendar[C <: Calendar[C]] { this: C =>
@@ -164,7 +165,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   object numberSystem extends TimeNumberSystem {
     protected override type Point = Moment
 
-    protected val pointCreator: Creator[Moment] = Moment.apply
+    protected def createPoint(raw: RawNumber): Point = Moment.apply(raw._1, raw._2)
   }
 
 

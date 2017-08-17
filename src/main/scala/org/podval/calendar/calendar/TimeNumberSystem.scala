@@ -16,6 +16,7 @@
 package org.podval.calendar.calendar
 
 import org.podval.calendar.numbers.NotRangedHeadDigitNumberSystem
+import org.podval.calendar.numbers.NumberSystem.RawNumber
 
 abstract class TimeNumberSystem extends {
 
@@ -44,7 +45,8 @@ abstract class TimeNumberSystem extends {
 
   protected final override type Interval = TimeInterval
 
-  protected final override val intervalCreator: Creator[Interval] = TimeInterval.apply
+  // TODO there should be more uniformity between createXXX, createN and constuctors.
+  protected def createInterval(raw: RawNumber): Interval = new TimeInterval(raw._1, raw._2)
 
 
   trait TimeNumber[N <: TimeNumber[N]] extends Number[N] { this: N =>
