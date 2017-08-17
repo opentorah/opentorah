@@ -88,7 +88,7 @@ trait NumberSystem {
     protected final def newPoint(raw: RawNumber): Point = NumberSystem.this.newPoint(raw)
     protected final def newInterval(raw: RawNumber): Interval = NumberSystem.this.newInterval(raw)
 
-    protected def newN(negative: Boolean, digits: List[Int]): N
+    protected def newN(raw: RawNumber): N
 
     final def negative: Boolean = raw._1
 
@@ -175,8 +175,7 @@ trait NumberSystem {
 
 
   class PointBase(raw: RawNumber) extends Number[Point](raw) { this: Point =>
-    protected final override def newN(negative: Boolean, digits: List[Int]): Point =
-      newPoint(negative, digits)
+    protected final override def newN(raw: RawNumber): Point = newPoint(raw)
 
     final def +(that: Interval): Point = newPoint(plus(that))
 
@@ -187,8 +186,7 @@ trait NumberSystem {
 
 
   class IntervalBase(raw: RawNumber) extends Number[Interval](raw) { this: Interval =>
-    protected final override def newN(negative: Boolean, digits: List[Int]): Interval =
-      newInterval(negative, digits)
+    protected final override def newN(raw: RawNumber): Interval =  newInterval(raw)
 
     final def +(that: Interval): Interval = newInterval(plus(that))
 

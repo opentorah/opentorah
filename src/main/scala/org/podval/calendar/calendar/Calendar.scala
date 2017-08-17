@@ -178,7 +178,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   { this: Moment =>
     final def day: C#Day = Day(days + 1)
 
-    final def time: TimeInterval = numberSystem.TimeInterval(negative = false, days(0).digits)
+    final def time: TimeInterval = numberSystem.TimeInterval(false, days(0).digits)
   }
 
 
@@ -195,7 +195,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   // TODO This is def and not a val to make initialization possible
   final def moment: Moment = Moment(false, List(0))
 
-  final val interval: TimeInterval = numberSystem.TimeInterval(negative = false, List(0))
+  final val interval: TimeInterval = numberSystem.TimeInterval(false, List(0))
 
   final val week: TimeInterval = interval.days(7)
 }

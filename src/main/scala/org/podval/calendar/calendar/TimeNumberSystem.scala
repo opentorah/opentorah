@@ -98,7 +98,6 @@ abstract class TimeNumberSystem extends {
 
 
   object TimeInterval {
-    def apply(negative: Boolean, digits: List[Int]): TimeInterval =
-      new TimeInterval(negative, digits)
+    final def apply(raw: RawNumber): TimeInterval = new TimeInterval(raw)
   }
 }
