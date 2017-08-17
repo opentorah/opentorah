@@ -192,10 +192,11 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   val Moment: MomentCompanion
 
-  // TODO This is def and not a val to make initialization possible
-  final def moment: Moment = Moment(false, List(0))
+  // TODO if this calls Moment.apply(), it needs to (?) be a def or else initialization fails...
+  final val moment: Moment = createMoment(false, List(0))
 
   final val interval: TimeInterval = numberSystem.createInterval(false, List(0))
 
+  // TODO using Day.daysPerWeek will probably break initialization too...
   final val week: TimeInterval = interval.days(7)
 }
