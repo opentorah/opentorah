@@ -33,6 +33,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   object numberSystem extends TimeNumberSystem {
     final override type Point = Moment
+    final override type Interval = TimeInterval
 
     final override def createInterval(raw: RawNumber): Interval = new TimeInterval(raw)
 

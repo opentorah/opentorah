@@ -32,9 +32,10 @@ abstract class TimeNumberSystem extends {
     this: Point =>
   }
 
-  final override type Interval = TimeInterval
+  type Interval <: TimeInterval
 
-  final class TimeInterval(raw: RawNumber) extends IntervalBase(raw) with TimeNumber[TimeInterval] {
+  // TODO make abstract just like TimePoint?
+  final class TimeInterval(raw: RawNumber) extends IntervalBase(raw) with TimeNumber[Interval] {
     this: Interval =>
   }
 
