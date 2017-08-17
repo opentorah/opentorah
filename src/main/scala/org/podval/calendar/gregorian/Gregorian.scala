@@ -1,7 +1,6 @@
 package org.podval.calendar.gregorian
 
 import org.podval.calendar.calendar._
-import org.podval.calendar.jewish.Jewish
 import org.podval.calendar.util.Named
 
 class Gregorian private() extends Calendar[Gregorian] {
@@ -97,30 +96,12 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final def createDay(number: Int): Day = new GregorianDay(number) with GregorianCalendarMember
 
-  sealed class DayName(name: String) extends Named(name)
+  override type DayName = GregorianDayName
 
-  object DayName {
-    case object Sunday extends DayName("Sunday")
-    case object Monday extends DayName("Monday")
-    case object Tuesday extends DayName("Tuesday")
-    case object Wednesday extends DayName("Wednesday")
-    case object Thursday extends DayName("Thursday")
-    case object Friday extends DayName("Friday")
-    case object Saturday extends DayName("Saturday")
+  // TODO stick it into the Day companion???
+  val DayName: GregorianDayName.type = GregorianDayName
 
-    val values: Seq[DayName] = Seq(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
-  }
-
-  object Day extends DayCompanion[Gregorian] with GregorianCalendarMember {
-    override def names: Seq[Gregorian#DayName] = DayName.values
-
-    override def apply(number: Int): Gregorian#Day = calendar.createDay(number)
-
-    val epoch: Int = 1373429
-
-    override val firstDayNumberInWeek: Int =
-      (((Jewish.Day.firstDayNumberInWeek - 1) + (epoch % daysPerWeek)) % daysPerWeek) + 1
-  }
+  override val Day: GregorianDayCompanion = new GregorianDayCompanion with GregorianCalendarMember
 
 
   final class Moment(negative: Boolean, digits: List[Int])
