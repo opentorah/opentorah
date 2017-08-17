@@ -65,7 +65,8 @@ trait Calendar[C <: Calendar[C]] { this: C =>
       Month(firstMonthNumber + numberInYear - 1)
     }
 
-    final def month(name: C#MonthName): Month = month(monthDescriptors.indexWhere(_.name == name) + 1)
+    final def month(name: C#MonthName): Month =
+      month(monthDescriptors.indexWhere(_.name == name) + 1)
 
     final def monthForDay(day: Int): Month = {
       require(0 < day && day <= lengthInDays)
@@ -188,7 +189,8 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   val Moment: MomentCompanion
 
-  final def moment: Moment = Moment(negative = false, List(0))  // This is def and not a val to make initialization possible
+  // This is def and not a val to make initialization possible
+  final def moment: Moment = Moment(negative = false, List(0))
 
   final val interval: TimeInterval = numberSystem.TimeInterval(negative = false, List(0))
 
