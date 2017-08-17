@@ -216,7 +216,7 @@ class Jewish private() extends Calendar[Jewish] {
     val values: Seq[DayName] = Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi, Shabbos)
   }
 
-  object Day extends DayCompanion {
+  object Day extends DayCompanion[Jewish] with JewishCalendarMember {
     override def names: Seq[DayName] = DayName.values
 
     override def apply(number: Int): Day = new Day(number)

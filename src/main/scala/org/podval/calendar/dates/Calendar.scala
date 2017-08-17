@@ -55,7 +55,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
       Month(firstMonthNumber + numberInYear - 1)
     }
 
-    final def month(name: MonthName): Month = month(monthDescriptors.indexWhere(_.name == name) + 1)
+    final def month(name: C#MonthName): Month = month(monthDescriptors.indexWhere(_.name == name) + 1)
 
     final def monthForDay(day: Int): Month = {
       require(0 < day && day <= lengthInDays)
@@ -146,28 +146,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   //   (which will then become `final`)?
   type DayName
 
-
-  /**
-   *
-   */
-  abstract class DayCompanion {
-    val daysPerWeek: Int = 7
-
-    def names: Seq[DayName]
-
-    def apply(number: Int): Day
-
-    final def apply(year: Int, month: MonthName, day: Int): C#Day = Year(year).month(month).day(day)
-
-    final def apply(year: Int, month: Int, day: Int): C#Day = Year(year).month(month).day(day)
-
-    final def numberInWeek(dayNumber: Int): Int = ((dayNumber + firstDayNumberInWeek - 1 - 1) % daysPerWeek) + 1
-
-    val firstDayNumberInWeek: Int
-  }
-
-
-  val Day: DayCompanion
+  val Day: DayCompanion[C]
 
 
   object numberSystem extends TimeNumberSystem {
@@ -183,7 +162,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   abstract class MomentBase(negative: Boolean, digits: List[Int])
     extends numberSystem.TimePoint(negative, digits) with CalendarMember[C]
   { this: Moment =>
-    final def day: Day = Day(days + 1)
+    final def day: C#Day = Day(days + 1)
 
     final def time: TimeInterval = numberSystem.TimeInterval(negative = false, days(0).digits)
   }

@@ -106,7 +106,7 @@ class Gregorian private() extends Calendar[Gregorian] {
     val values: Seq[DayName] = Seq(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
   }
 
-  object Day extends DayCompanion {
+  object Day extends DayCompanion[Gregorian] with GregorianCalendarMember {
     override def names: Seq[DayName] = DayName.values
 
     override def apply(number: Int): Day = new Day(number)
