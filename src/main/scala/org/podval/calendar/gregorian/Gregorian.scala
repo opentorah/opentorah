@@ -110,6 +110,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   abstract class GregorianMoment(negative: Boolean, digits: List[Int])
     extends MomentBase(negative, digits) with GregorianCalendarMember
+      // TODO prefix with C# when feasible...
   { this: Moment =>
     final def morningHours(value: Int): Moment = firstHalfHours(value)
 
