@@ -18,6 +18,7 @@ class Jewish private() extends Calendar[Jewish] {
     //   type mismatch;
     //   found   : Jewish.this.numberSystem.TimeInterval
     //   required: _1.numberSystem.TimeInterval where val _1: org.podval.calendar.jewish.Jewish
+    // I think I need to derive Calendar from NumberSystem...
     final def newMoon: Moment = month(1).newMoon
 
     final override def firstDayNumber: Int = {
