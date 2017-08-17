@@ -8,24 +8,27 @@ class Gregorian private() extends Calendar[Gregorian] {
     final override def calendar: Gregorian = Gregorian.this
   }
 
-  final class Year(number: Int)
-    extends YearBase(number) with GregorianCalendarMember
-  {
-    override def firstDayNumber: Int = Year.firstDay(number)
+  abstract class GregorianYear(number: Int) extends YearBase(number) { this: Year =>
+    final override def firstDayNumber: Int = Year.firstDay(number)
 
-    override def lengthInDays: Int = Year.lengthInDays(number)
+    final override def lengthInDays: Int = Year.lengthInDays(number)
 
-    override def character: YearCharacter = isLeap
+    final override def character: YearCharacter = isLeap
   }
 
-  final override def createYear(number: Int): Year = new Year(number)
+  final override type Year = GregorianYear
+
+  final override def createYear(number: Int): Year =
+    new GregorianYear(number) with GregorianCalendarMember
 
   final override type YearCharacter = Boolean
 
-  object Year extends YearCompanion {
-    protected override def characters: Seq[YearCharacter] = Seq(true, false)
+  final override val Year: GregorianYearCompanion = new GregorianYearCompanion with GregorianCalendarMember
 
-    protected override def monthNamesAndLengths(isLeap: YearCharacter): List[MonthNameAndLength] = {
+  abstract class GregorianYearCompanion extends YearCompanion {
+    protected final override def characters: Seq[YearCharacter] = Seq(true, false)
+
+    protected final override def monthNamesAndLengths(isLeap: YearCharacter): List[MonthNameAndLength] = {
       import MonthName._
       List(
         MonthNameAndLength(January  , 31),
@@ -43,27 +46,33 @@ class Gregorian private() extends Calendar[Gregorian] {
       )
     }
 
-    protected override def areYearsPositive: Boolean = false
+    protected final override def areYearsPositive: Boolean = false
 
-    override def isLeap(yearNumber: Int): Boolean = (yearNumber % 4 == 0) && ((yearNumber % 100 != 0) || (yearNumber % 400 == 0))
+    final override def isLeap(yearNumber: Int): Boolean =
+      (yearNumber % 4 == 0) && ((yearNumber % 100 != 0) || (yearNumber % 400 == 0))
 
-    override def firstMonth(yearNumber: Int): Int = monthsInYear*(yearNumber - 1) + 1
+    final override def firstMonth(yearNumber: Int): Int =
+      monthsInYear*(yearNumber - 1) + 1
 
-    override def lengthInMonths(yearNumber: Int): Int = monthsInYear
+    final override def lengthInMonths(yearNumber: Int): Int = monthsInYear
 
     val monthsInYear: Int = 12
 
     private val daysInNonLeapYear: Int = 365
 
-    def firstDay(yearNumber: Int): Int = daysInNonLeapYear * (yearNumber - 1) + (yearNumber - 1)/4 - (yearNumber - 1)/100 + (yearNumber - 1)/400 + 1
+    def firstDay(yearNumber: Int): Int =
+      daysInNonLeapYear * (yearNumber - 1) + (yearNumber - 1)/4 - (yearNumber - 1)/100 +
+        (yearNumber - 1)/400 + 1
 
-    def lengthInDays(yearNumber: Int): Int = if (Gregorian.Year.isLeap(yearNumber)) daysInNonLeapYear + 1 else daysInNonLeapYear
+    def lengthInDays(yearNumber: Int): Int =
+      if (Year.isLeap(yearNumber)) daysInNonLeapYear + 1 else daysInNonLeapYear
   }
 
 
   final override type Month = GregorianMonth
 
-  final override def createMonth(number: Int): Month = new GregorianMonth(number) with GregorianCalendarMember
+  final override def createMonth(number: Int): Month =
+    new GregorianMonth(number) with GregorianCalendarMember
 
   final override type MonthName = GregorianMonthName
 
@@ -71,22 +80,26 @@ class Gregorian private() extends Calendar[Gregorian] {
   val MonthName: GregorianMonthName.type = GregorianMonthName
 
   object Month extends MonthCompanion {
-    override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Gregorian.Year.monthsInYear + 1
+    override def yearNumber(monthNumber: Int): Int =
+      (monthNumber - 1) / Gregorian.Year.monthsInYear + 1
 
-    override def numberInYear(monthNumber: Int): Int =  monthNumber - Gregorian.Year.firstMonth(yearNumber(monthNumber)) + 1
+    override def numberInYear(monthNumber: Int): Int =
+      monthNumber - Gregorian.Year.firstMonth(yearNumber(monthNumber)) + 1
   }
 
 
   final override type Day = GregorianDay
 
-  final override def createDay(number: Int): Day = new GregorianDay(number) with GregorianCalendarMember
+  final override def createDay(number: Int): Day =
+    new GregorianDay(number) with GregorianCalendarMember
 
   final override type DayName = GregorianDayName
 
   // TODO stick it into the Day companion???
   val DayName: GregorianDayName.type = GregorianDayName
 
-  final override val Day: GregorianDayCompanion = new GregorianDayCompanion with GregorianCalendarMember
+  final override val Day: GregorianDayCompanion =
+    new GregorianDayCompanion with GregorianCalendarMember
 
 
   final class Moment(negative: Boolean, digits: List[Int])
