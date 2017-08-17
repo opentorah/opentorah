@@ -203,16 +203,18 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override val Day: JewishDayCompanion = new JewishDayCompanion with JewishCalendarMember
 
-  final class Moment(negative: Boolean, digits: List[Int])
-    extends MomentBase(negative, digits) with JewishCalendarMember
+  abstract class JewishMoment(negative: Boolean, digits: List[Int])
+    extends MomentBase(negative, digits)
   {
     def nightHours(value: Int): Moment = firstHalfHours(value)
 
     def dayHours(value: Int): Moment = secondHalfHours(value)
   }
 
+  final override type Moment = JewishMoment
+
   final override def createMoment(negative: Boolean, digits: List[Int]): Moment =
-    new Moment(negative, digits)
+    new JewishMoment(negative, digits) with JewishCalendarMember
 
   object Moment extends MomentCompanion with JewishCalendarMember
 }
