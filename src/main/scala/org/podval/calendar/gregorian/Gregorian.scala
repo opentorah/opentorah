@@ -93,8 +93,13 @@ class Gregorian private() extends Calendar[Gregorian] {
   }
 
 
-  final class Day(number: Int)
-    extends DayBase[Gregorian](number) with GregorianCalendarMember
+  override type Day = GregorianDay
+
+  final def createDay(number: Int): Day = new GregorianDay(number) with GregorianCalendarMember
+
+  abstract class GregorianDay(number: Int) extends DayBase[Gregorian](number) {
+    this: Day =>
+  }
 
   sealed class DayName(name: String) extends Named(name)
 
@@ -113,7 +118,7 @@ class Gregorian private() extends Calendar[Gregorian] {
   object Day extends DayCompanion[Gregorian] with GregorianCalendarMember {
     override def names: Seq[DayName] = DayName.values
 
-    override def apply(number: Int): Day = new Day(number)
+    override def apply(number: Int): Gregorian#Day = calendar.createDay(number)
 
     val epoch: Int = 1373429
 

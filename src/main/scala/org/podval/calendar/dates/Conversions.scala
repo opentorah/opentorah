@@ -33,7 +33,7 @@ object Conversions {
     fromJewish(newDay).toMoment.hours(newHours).parts(moment.parts)
   }
 
-  def fromJewish(day: Jewish   #Day): Gregorian.Day = Gregorian.Day(day.number - Gregorian.Day.epoch)
+  def fromJewish(day: Jewish   #Day): Gregorian#Day = Gregorian.Day(day.number - Gregorian.Day.epoch)
 
   def toJewish  (day: Gregorian#Day): Jewish   .Day = Jewish   .Day(day.number + Gregorian.Day.epoch)
 }
