@@ -8,17 +8,17 @@ class Gregorian private() extends Calendar[Gregorian] {
     final override def calendar: Gregorian = Gregorian.this
   }
 
-  abstract class GregorianYear(number: Int) extends YearBase(number) { this: Year =>
+  abstract class GregorianYear(number: Int) extends YearBase(number) { this: Gregorian#Year =>
     final override def firstDayNumber: Int = Year.firstDay(number)
 
     final override def lengthInDays: Int = Year.lengthInDays(number)
 
-    final override def character: YearCharacter = isLeap
+    final override def character: Gregorian#YearCharacter = isLeap
   }
 
   final override type Year = GregorianYear
 
-  final override def createYear(number: Int): Year =
+  final override def createYear(number: Int): Gregorian#Year =
     new GregorianYear(number) with GregorianCalendarMember
 
   final override type YearCharacter = Boolean
@@ -27,9 +27,10 @@ class Gregorian private() extends Calendar[Gregorian] {
     new GregorianYearCompanion with GregorianCalendarMember
 
   abstract class GregorianYearCompanion extends YearCompanion {
-    protected final override def characters: Seq[YearCharacter] = Seq(true, false)
+    protected final override def characters: Seq[Gregorian#YearCharacter] =
+      Seq(true, false)
 
-    protected final override def monthNamesAndLengths(isLeap: YearCharacter):
+    protected final override def monthNamesAndLengths(isLeap: Gregorian#YearCharacter):
       List[MonthNameAndLength] =
     {
       import MonthName._
@@ -74,7 +75,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type Month = GregorianMonth
 
-  final override def createMonth(number: Int): Month =
+  final override def createMonth(number: Int): Gregorian#Month =
     new GregorianMonth(number) with GregorianCalendarMember
 
   final override type MonthName = GregorianMonthName
@@ -95,7 +96,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type Day = GregorianDay
 
-  final override def createDay(number: Int): Day =
+  final override def createDay(number: Int): Gregorian#Day =
     new GregorianDay(number) with GregorianCalendarMember
 
   final override type DayName = GregorianDayName
