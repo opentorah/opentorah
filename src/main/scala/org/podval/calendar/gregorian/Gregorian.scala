@@ -79,7 +79,7 @@ class Gregorian private() extends Calendar[Gregorian] {
   // TODO stick it into the Month companion???
   val MonthName: GregorianMonthName.type = GregorianMonthName
 
-  object Month extends MonthCompanion {
+  object Month extends MonthCompanion with GregorianCalendarMember {
     override def yearNumber(monthNumber: Int): Int =
       (monthNumber - 1) / Gregorian.Year.monthsInYear + 1
 
@@ -113,7 +113,7 @@ class Gregorian private() extends Calendar[Gregorian] {
   final override def createMoment(negative: Boolean, digits: List[Int]): Moment =
     new Moment(negative, digits)
 
-  object Moment extends MomentCompanion
+  object Moment extends MomentCompanion with GregorianCalendarMember
 }
 
 

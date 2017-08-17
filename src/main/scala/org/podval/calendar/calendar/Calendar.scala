@@ -132,7 +132,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   /**
    *
    */
-  abstract class MonthCompanion {
+  abstract class MonthCompanion extends CalendarMember[C] {
     final def apply(number: Int): Month = createMonth(number)
 
     final def apply(year: Int, monthInYear: Int): Month = Year(year).month(monthInYear)
@@ -181,7 +181,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   /**
    *
    */
-  abstract class MomentCompanion {
+  abstract class MomentCompanion extends CalendarMember[C] {
     final def apply(negative: Boolean, digits: List[Int]): Moment = createMoment(negative, digits)
   }
 

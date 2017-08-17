@@ -69,15 +69,10 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override def createYear(number: Int): Year = new Year(number)
 
-  sealed trait YearKind
+  final type YearKind = JewishYearKind
 
-  object YearKind {
-    case object Short extends YearKind
-    case object Regular extends YearKind
-    case object Full extends YearKind
-
-    val values: Seq[YearKind] = Seq(Short, Regular, Full)
-  }
+  // TODO stick this into the Year companion?
+  final val YearKind: JewishYearKind.type = JewishYearKind
 
   final override type YearCharacter = (Boolean, YearKind)
 
@@ -177,7 +172,7 @@ class Jewish private() extends Calendar[Jewish] {
   // TODO stick it into the Month companion???
   val MonthName: JewishMonthName.type = JewishMonthName
 
-  object Month extends MonthCompanion {
+  object Month extends MonthCompanion with JewishCalendarMember {
     // KH 6:3
     val meanLunarPeriod = interval.days(29).hours(12).parts(793)  // TODO how is this really called? tropical?
 
@@ -219,7 +214,7 @@ class Jewish private() extends Calendar[Jewish] {
   final override def createMoment(negative: Boolean, digits: List[Int]): Moment =
     new Moment(negative, digits)
 
-  object Moment extends MomentCompanion
+  object Moment extends MomentCompanion with JewishCalendarMember
 }
 
 
