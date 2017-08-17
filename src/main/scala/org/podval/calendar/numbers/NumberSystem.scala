@@ -1,4 +1,4 @@
-package org.podval.calendar.dates
+package org.podval.calendar.numbers
 
 // TODO rename createXXX to mkXXX or newXXX; XXXCreator as createXXX.
 trait NumberSystem {

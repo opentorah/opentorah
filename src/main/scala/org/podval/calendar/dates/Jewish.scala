@@ -1,5 +1,7 @@
 package org.podval.calendar.dates
 
+import org.podval.calendar.util.Named
+
 // TODO add a check that length of the year and total length of the months are the same
 class Jewish private() extends Calendar[Jewish] {
 

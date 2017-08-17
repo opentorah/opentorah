@@ -1,5 +1,7 @@
 package org.podval.calendar.dates
 
+import org.podval.calendar.util.Numbered
+
 trait Calendar[C <: Calendar[C]] { this: C =>
 
   type Year <: YearBase

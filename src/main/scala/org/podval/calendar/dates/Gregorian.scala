@@ -1,5 +1,7 @@
 package org.podval.calendar.dates
 
+import org.podval.calendar.util.Named
+
 class Gregorian private() extends Calendar[Gregorian] {
 
   trait GregorianCalendarMember extends CalendarMember[Gregorian] {

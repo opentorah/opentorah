@@ -15,6 +15,7 @@
  */
 package org.podval.calendar.dates
 
+import org.podval.calendar.numbers.NotRangedHeadDigitNumberSystem
 
 abstract class TimeNumberSystem extends {
 
