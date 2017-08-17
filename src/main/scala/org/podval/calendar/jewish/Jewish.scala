@@ -67,6 +67,8 @@ class Jewish private() extends Calendar[Jewish] {
     }
   }
 
+  final override def createYear(number: Int): Year = new Year(number)
+
   sealed trait YearKind
 
   object YearKind {
@@ -80,9 +82,6 @@ class Jewish private() extends Calendar[Jewish] {
   final override type YearCharacter = (Boolean, YearKind)
 
   object Year extends YearCompanion {
-
-    override def apply(number: Int): Year = new Year(number)
-
     protected override def characters: Seq[YearCharacter] =
       for (isLeap <- Seq(true, false); kind <- YearKind.values) yield (isLeap, kind)
 
@@ -214,10 +213,10 @@ class Jewish private() extends Calendar[Jewish] {
     def dayHours(value: Int): Moment = secondHalfHours(value)
   }
 
+  final override def createMoment(negative: Boolean, digits: List[Int]): Moment =
+    new Moment(negative, digits)
 
-  object Moment extends MomentCompanion {
-    override def apply(negative: Boolean, digits: List[Int]): Moment = new Moment(negative, digits)
-  }
+  object Moment extends MomentCompanion
 }
 
 

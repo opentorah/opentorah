@@ -18,12 +18,11 @@ class Gregorian private() extends Calendar[Gregorian] {
     override def character: YearCharacter = isLeap
   }
 
+  final override def createYear(number: Int): Year = new Year(number)
 
   final override type YearCharacter = Boolean
 
   object Year extends YearCompanion {
-    override def apply(number: Int): Year = new Year(number)
-
     protected override def characters: Seq[YearCharacter] = Seq(true, false)
 
     protected override def monthNamesAndLengths(isLeap: YearCharacter): List[MonthNameAndLength] = {
@@ -98,10 +97,10 @@ class Gregorian private() extends Calendar[Gregorian] {
     def afternoonHours(value: Int): Moment = secondHalfHours(value)
   }
 
+  final override def createMoment(negative: Boolean, digits: List[Int]): Moment =
+    new Moment(negative, digits)
 
-  object Moment extends MomentCompanion {
-    override def apply(negative: Boolean, digits: List[Int]): Moment = new Moment(negative, digits)
-  }
+  object Moment extends MomentCompanion
 }
 
 

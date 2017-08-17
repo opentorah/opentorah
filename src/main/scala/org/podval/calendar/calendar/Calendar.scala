@@ -6,6 +6,8 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   type Year <: YearBase
 
+  def createYear(number: Int): Year
+
   type Month <: MonthBase[C]
 
   def createMonth(number: Int): Month
@@ -15,6 +17,8 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   def createDay(number: Int): Day
 
   type Moment <: MomentBase
+
+  def createMoment(negative: Boolean, digits: List[Int]): Moment
 
 
   /**
@@ -78,9 +82,9 @@ trait Calendar[C <: Calendar[C]] { this: C =>
    *
    */
   abstract class YearCompanion {
-    def apply(number: Int): Year
+    final def apply(number: Int): Year = createYear(number)
 
-    final  def apply(month: C#Month): Year = apply(Month.yearNumber(month.number))
+    final def apply(month: C#Month): Year = apply(Month.yearNumber(month.number))
 
     final def apply(day: C#Day): Year = {
       var result = apply(yearsForSureBefore(day.number))
@@ -178,7 +182,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
    *
    */
   abstract class MomentCompanion {
-    def apply(negative: Boolean, digits: List[Int]): Moment
+    final def apply(negative: Boolean, digits: List[Int]): Moment = createMoment(negative, digits)
   }
 
 
