@@ -4,6 +4,8 @@ import org.podval.calendar.numbers.NotRangedHeadDigitNumberSystem
 import org.podval.calendar.numbers.NumberSystem.RawNumber
 
 abstract class TimeNumberSystem extends {
+  // NumberSystem's constructor uses ranges and signs in require() calls,
+  // so they need to be initialized early.
 
   final val hoursPerDay = 24
 
@@ -11,9 +13,9 @@ abstract class TimeNumberSystem extends {
 
   final val momentsPerPart = 76
 
-  final override val signs: List[String] = List("d", "h", "p", "m")
-
   final override val ranges: List[Int] = List(hoursPerDay, partsPerHour, momentsPerPart)
+
+  final override val signs: List[String] = List("d", "h", "p", "m")
 
 } with NotRangedHeadDigitNumberSystem {
   require(hoursPerDay % 2 == 0)

@@ -15,8 +15,6 @@ trait NumberSystem {
 
   def createInterval(raw: RawNumber): Interval
 
-  val signs: List[String]
-
   val ranges: List[Int]
 
   ranges.foreach { range =>
@@ -24,12 +22,15 @@ trait NumberSystem {
     require(range % 2 == 0)
   }
 
+  val signs: List[String]
+
   require(signs.length == (ranges.length + 1))
 
   val maxLength: Int = ranges.length
 
   val divisors: List[Double] = ranges.inits.toList.reverse.tail.map(_.product.toDouble)
 
+  // TODO move into the companion object by adding `ranges` parameter?
   private final def normalize(raw: RawNumber): RawNumber = {
     def step(elem: (Int, Int), acc: (Int, List[Int])) = {
       val (digit, range) = elem
@@ -72,6 +73,7 @@ trait NumberSystem {
 
   def correctHeadDigit(value: Int): Int
 
+  // TODO this can also move into the companion object.
   final def fromDouble(value: Double, length: Int): RawNumber = {
     val negative = value < 0
     val absValue = if (!negative) value else -value
@@ -88,6 +90,7 @@ trait NumberSystem {
     protected final def newPoint(raw: RawNumber): Point = NumberSystem.this.newPoint(raw)
     protected final def newInterval(raw: RawNumber): Interval = NumberSystem.this.newInterval(raw)
 
+    // TODO rename?
     protected def newN(raw: RawNumber): N
 
     final def negative: Boolean = raw._1
@@ -111,11 +114,7 @@ trait NumberSystem {
       newN(negative, digits.padTo(n + 1, 0).updated(n, value))
     }
 
-    protected final def plus(that: Number[_]): RawNumber = plusMinus(operationNegation = false, that)
-
-    protected final def minus(that: Number[_]): RawNumber = plusMinus(operationNegation = true, that)
-
-    private[this] final def plusMinus(operationNegation: Boolean, that: Number[_]): RawNumber = {
+    protected final def plusMinus(operationNegation: Boolean, that: Number[_]): RawNumber = {
       val sameSign = this.negative == that.negative
       val operationSelector = if (operationNegation) !sameSign else sameSign
       val operation: (Int, Int) => Int = if (operationSelector) _ + _ else _ - _
@@ -177,20 +176,22 @@ trait NumberSystem {
   class PointBase(raw: RawNumber) extends Number[Point](raw) { this: Point =>
     protected final override def newN(raw: RawNumber): Point = newPoint(raw)
 
-    final def +(that: Interval): Point = newPoint(plus(that))
+    final def +(that: Interval): Point = newPoint(plusMinus(operationNegation = false, that))
 
-    final def -(that: Interval): Point = newPoint(minus(that))
+    final def -(that: Interval): Point = newPoint(plusMinus(operationNegation = true, that))
 
-    final def -(that: Point): Interval = newInterval(minus(that))
+    final def -(that: Point): Interval = newInterval(plusMinus(operationNegation = true, that))
   }
 
 
   class IntervalBase(raw: RawNumber) extends Number[Interval](raw) { this: Interval =>
     protected final override def newN(raw: RawNumber): Interval =  newInterval(raw)
 
-    final def +(that: Interval): Interval = newInterval(plus(that))
+    final def +(that: Interval): Interval = newInterval(plusMinus(operationNegation = false, that))
 
-    final def -(that: Interval): Interval = newInterval(minus(that))
+    final def -(that: Interval): Interval = newInterval(plusMinus(operationNegation = true, that))
+
+    final def +(that: Point): Point = newPoint(plusMinus(operationNegation = false, that))
 
     final def *(n: Int): Interval = newInterval(negative, digits map (n * _))
 
