@@ -1,7 +1,6 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.calendar._
-import org.podval.calendar.util.Named
 
 // TODO add a check that length of the year and total length of the months are the same
 class Jewish private() extends Calendar[Jewish] {
@@ -72,7 +71,7 @@ class Jewish private() extends Calendar[Jewish] {
     val values: Seq[YearKind] = Seq(Short, Regular, Full)
   }
 
-  override type YearCharacter = (Boolean, YearKind)
+  final override type YearCharacter = (Boolean, YearKind)
 
   object Year extends YearCompanion {
 
@@ -153,36 +152,22 @@ class Jewish private() extends Calendar[Jewish] {
     val thirdCorrection  = interval.hours(15).parts(589) // KH 7:5
   }
 
+  final override type Month = JewishMonth
 
-  final class Month(number: Int)
-    extends MonthBase[Jewish](number) with JewishCalendarMember
-  {
+  final override def createMonth(number: Int): Month = new JewishMonth(number) with JewishCalendarMember
+
+  abstract class JewishMonth(number: Int) extends MonthBase[Jewish](number)
+  { this: Month =>
     def newMoon: Moment = Month.firstNewMoon + Month.meanLunarPeriod*(number-1)
   }
 
 
-  sealed class MonthName(val name: String) extends Named(name)
+  final override type MonthName = JewishMonthName
 
-  object MonthName {
-    case object Tishrei extends MonthName("Tishrei")
-    case object Marheshvan extends MonthName("Marcheshvan")
-    case object Kislev extends MonthName("Kislev")
-    case object Teves extends MonthName("Teves")
-    case object Shvat extends MonthName("Shevat")
-    case object Adar extends MonthName("Adar")
-    case object Nisan extends MonthName("Nissan")
-    case object Iyar extends MonthName("Iyar")
-    case object Sivan extends MonthName("Sivan")
-    case object Tammuz extends MonthName("Tammuz")
-    case object Av extends MonthName("Av")
-    case object Elul extends MonthName("Elul")
-    case object AdarI extends MonthName("Adar I")
-    case object AdarII extends MonthName("Adar II")
-  }
+  // TODO stick it into the Month companion???
+  val MonthName: JewishMonthName.type = JewishMonthName
 
   object Month extends MonthCompanion {
-    override def apply(number: Int): Month = new Month(number)
-
     // KH 6:3
     val meanLunarPeriod = interval.days(29).hours(12).parts(793)  // TODO how is this really called? tropical?
 
@@ -202,33 +187,16 @@ class Jewish private() extends Calendar[Jewish] {
   }
 
 
-  final class Day(number: Int)
-    extends DayBase[Jewish](number) with JewishCalendarMember
+  final override type Day = JewishDay
 
-  sealed class DayName(name: String) extends Named(name)
+  final override def createDay(number: Int): Day = new JewishDay(number) with JewishCalendarMember
 
-  object DayName {
-    case object Rishon extends DayName("Rishon")
-    case object Sheni extends DayName("Sheni")
-    case object Shlishi extends DayName("Shlishi")
-    case object Rvii extends DayName("Rvii")
-    case object Chamishi extends DayName("Chamishi")
-    case object Shishi extends DayName("Shishi")
-    case object Shabbos extends DayName("Shabbos")
+  final override type DayName = JewishDayName
 
-    val values: Seq[DayName] = Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi, Shabbos)
-  }
+  // TODO stick it into the Day companion???
+  val DayName: JewishDayName.type = JewishDayName
 
-  object Day extends DayCompanion[Jewish] with JewishCalendarMember {
-    override def names: Seq[DayName] = DayName.values
-
-    override def apply(number: Int): Day = new Day(number)
-
-    // It seems that first day of the first year was Sunday; molad - BaHaRad.
-    // Second year - friday; molad - 8 in the morning.
-    override val firstDayNumberInWeek: Int = 1
-  }
-
+  final override val Day: JewishDayCompanion = new JewishDayCompanion with JewishCalendarMember
 
   final class Moment(negative: Boolean, digits: List[Int])
     extends MomentBase(negative, digits) with JewishCalendarMember

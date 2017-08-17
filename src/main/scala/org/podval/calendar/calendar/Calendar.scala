@@ -8,7 +8,11 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   type Month <: MonthBase[C]
 
+  def createMonth(number: Int): Month
+
   type Day <: DayBase[C]
+
+  def createDay(number: Int): Day
 
   type Moment <: MomentBase
 
@@ -125,7 +129,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
    *
    */
   abstract class MonthCompanion {
-    def apply(number: Int): Month
+    final def apply(number: Int): Month = createMonth(number)
 
     final def apply(year: Int, monthInYear: Int): Month = Year(year).month(monthInYear)
 

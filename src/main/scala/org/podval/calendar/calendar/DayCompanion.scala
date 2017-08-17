@@ -8,7 +8,7 @@ abstract class DayCompanion[C <: Calendar[C]] extends CalendarMember[C] {
 
   def names: Seq[C#DayName]
 
-  def apply(number: Int): C#Day
+  final def apply(number: Int): C#Day = calendar.createDay(number)
 
   final def apply(year: Int, month: C#MonthName, day: Int): C#Day =
     calendar.Year(year).month(month).day(day)

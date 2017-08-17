@@ -19,7 +19,7 @@ class Gregorian private() extends Calendar[Gregorian] {
   }
 
 
-  override type YearCharacter = Boolean
+  final override type YearCharacter = Boolean
 
   object Year extends YearCompanion {
     override def apply(number: Int): Year = new Year(number)
@@ -64,7 +64,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type Month = GregorianMonth
 
-  final def createMonth(number: Int): Month = new GregorianMonth(number) with GregorianCalendarMember
+  final override def createMonth(number: Int): Month = new GregorianMonth(number) with GregorianCalendarMember
 
   final override type MonthName = GregorianMonthName
 
@@ -72,8 +72,6 @@ class Gregorian private() extends Calendar[Gregorian] {
   val MonthName: GregorianMonthName.type = GregorianMonthName
 
   object Month extends MonthCompanion {
-    override def apply(number: Int): Month = createMonth(number)
-
     override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Gregorian.Year.monthsInYear + 1
 
     override def numberInYear(monthNumber: Int): Int =  monthNumber - Gregorian.Year.firstMonth(yearNumber(monthNumber)) + 1
@@ -82,14 +80,14 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type Day = GregorianDay
 
-  final def createDay(number: Int): Day = new GregorianDay(number) with GregorianCalendarMember
+  final override def createDay(number: Int): Day = new GregorianDay(number) with GregorianCalendarMember
 
-  override type DayName = GregorianDayName
+  final override type DayName = GregorianDayName
 
   // TODO stick it into the Day companion???
   val DayName: GregorianDayName.type = GregorianDayName
 
-  override val Day: GregorianDayCompanion = new GregorianDayCompanion with GregorianCalendarMember
+  final override val Day: GregorianDayCompanion = new GregorianDayCompanion with GregorianCalendarMember
 
 
   final class Moment(negative: Boolean, digits: List[Int])
