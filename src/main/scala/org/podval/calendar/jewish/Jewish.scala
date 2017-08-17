@@ -14,6 +14,12 @@ class Jewish private() extends Calendar[Jewish] {
   {
     require(0 < number)
 
+    // TODO the moment I change the type of newMoon from Moment to Jewish#Moment,
+    // which I need to do to split this thing,
+    // I get error for all three corrections:
+    //   type mismatch;
+    //   found   : Jewish.this.numberSystem.TimeInterval
+    //   required: _1.numberSystem.TimeInterval where val _1: org.podval.calendar.jewish.Jewish
     def newMoon: Moment = month(1).newMoon
 
     override def firstDayNumber: Int = {
