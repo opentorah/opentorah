@@ -189,7 +189,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   val Moment: MomentCompanion
 
-  // This is def and not a val to make initialization possible
+  // TODO This is def and not a val to make initialization possible
   final def moment: Moment = Moment(negative = false, List(0))
 
   final val interval: TimeInterval = numberSystem.TimeInterval(negative = false, List(0))
