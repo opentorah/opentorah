@@ -163,10 +163,10 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
 
   object numberSystem extends TimeNumberSystem {
-    protected override type Point = Moment
+    final override type Point = Moment
 
     // TODO if I call Moment.apply() here it screws up the initialization order!!!
-    protected def createPoint(raw: RawNumber): Point = createMoment(raw)
+    final override def createPoint(raw: RawNumber): Point = createMoment(raw)
   }
 
 

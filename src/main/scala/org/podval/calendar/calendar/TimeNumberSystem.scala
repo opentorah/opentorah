@@ -11,28 +11,28 @@ abstract class TimeNumberSystem extends {
 
   final val momentsPerPart = 76
 
-  protected final override val signs: List[String] = List("d", "h", "p", "m")
+  final override val signs: List[String] = List("d", "h", "p", "m")
 
-  protected final override val ranges: List[Int] = List(hoursPerDay, partsPerHour, momentsPerPart)
+  final override val ranges: List[Int] = List(hoursPerDay, partsPerHour, momentsPerPart)
 
 } with NotRangedHeadDigitNumberSystem {
   require(hoursPerDay % 2 == 0)
 
   final val hoursPerHalfDay: Int = hoursPerDay / 2
 
-  private val minutesPerHour = 60
+  final val minutesPerHour = 60
 
   require(partsPerHour % minutesPerHour == 0)
 
   final val partsPerMinute: Int = partsPerHour / minutesPerHour
 
-  protected type Point <: TimePoint
+  type Point <: TimePoint
 
   abstract class TimePoint(raw: RawNumber) extends PointBase(raw) with TimeNumber[Point] {
     this: Point =>
   }
 
-  protected final override type Interval = TimeInterval
+  final override type Interval = TimeInterval
 
   def createInterval(raw: RawNumber): Interval = new TimeInterval(raw)
 

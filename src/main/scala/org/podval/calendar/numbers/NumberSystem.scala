@@ -3,21 +3,21 @@ package org.podval.calendar.numbers
 trait NumberSystem {
   import NumberSystem.RawNumber
 
-  protected type Point <: PointBase
+  type Point <: PointBase
 
   final def newPoint(raw: RawNumber): Point = createPoint(normalize(raw))
 
-  protected def createPoint(raw: RawNumber): Point
+  def createPoint(raw: RawNumber): Point
 
-  protected type Interval <: IntervalBase
+  type Interval <: IntervalBase
 
   final def newInterval(raw: RawNumber): Interval = createInterval(normalize(raw))
 
-  protected def createInterval(raw: RawNumber): Interval
+  def createInterval(raw: RawNumber): Interval
 
-  protected val signs: List[String]
+  val signs: List[String]
 
-  protected val ranges: List[Int]
+  val ranges: List[Int]
 
   ranges.foreach { range =>
     require(range > 0)
