@@ -8,13 +8,21 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   def createYear(number: Int): C#Year
 
+  type YearCharacter
+
   type Month <: MonthBase[C]
+
+  type MonthName
 
   def createMonth(number: Int): Month
 
   type Day <: DayBase[C]
 
   def createDay(number: Int): Day
+
+  // TODO make this a Enum - and use its `values()` method in DayCompanion.name
+  //   (which will then become `final`)?
+  type DayName
 
   type Moment <: MomentBase
 
@@ -28,7 +36,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   abstract class YearBase(number: Int)
     extends Numbered[C#Year](number) with CalendarMember[C]
   { this: C#Year =>
-    def character: YearCharacter
+    def character: C#YearCharacter
 
     final def isLeap: Boolean = Year.isLeap(number)
 
@@ -76,8 +84,6 @@ trait Calendar[C <: Calendar[C]] { this: C =>
     final def monthDescriptors: List[MonthDescriptor] = Year.monthDescriptors(character)
   }
 
-
-  type YearCharacter
 
   /**
    *
@@ -127,9 +133,6 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   val Year: YearCompanion
 
 
-  type MonthName
-
-
   /**
    *
    */
@@ -152,10 +155,6 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   val Month: MonthCompanion
 
-
-  // TODO make this a Enum - and use its `values()` method in DayCompanion.name
-  //   (which will then become `final`)?
-  type DayName
 
   val Day: DayCompanion[C]
 
