@@ -27,6 +27,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   type Moment <: MomentBase
 
+  // TODO attempt to prefix Moment with C# leads to compilation errors with newMoon...
   def createMoment(negative: Boolean, digits: List[Int]): Moment
 
 
