@@ -156,8 +156,10 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override def createMonth(number: Int): Month = new JewishMonth(number) with JewishCalendarMember
 
-  abstract class JewishMonth(number: Int) extends MonthBase[Jewish](number)
-  { this: Month =>
+  abstract class JewishMonth(number: Int) extends MonthBase[Jewish](number) { this: Jewish#Month =>
+    // TODO before I can split this out, I need to change return type of the next method to C#Moment;
+    // that leads to compilation errors for the 3 corrections - and so do the attempts to
+    // split out Calendar.Year etc...
     def newMoon: Moment = Month.firstNewMoon + Month.meanLunarPeriod*(number-1)
   }
 
