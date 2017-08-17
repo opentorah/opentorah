@@ -14,7 +14,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   type MonthName
 
-  // TODO attemp to prefix Month with C# leads to compilation errors with newMoon...
+  // TODO attempt to prefix Month with C# leads to compilation errors with newMoon...
   def createMonth(number: Int): Month
 
   type Day <: DayBase[C]
@@ -41,9 +41,9 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
     final def isLeap: Boolean = Year.isLeap(number)
 
-    final def next: C#Year = Year(number + 1)
+    final def next: C#Year = this + 1
 
-    final def prev: C#Year = Year(number - 1)
+    final def prev: C#Year = this - 1
 
     final def +(change: Int) = Year(number + change)
 
