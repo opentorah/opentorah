@@ -31,6 +31,18 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   // TODO attempt to prefix Moment with C# leads to compilation errors with newMoon...
   def createMoment(raw: RawNumber): Moment
 
+  object numberSystem extends TimeNumberSystem {
+    final override type Point = Moment
+
+    final override def createInterval(raw: RawNumber): Interval = new TimeInterval(raw)
+
+    // TODO if I call Moment.apply() here it screws up the initialization order!!!
+    final override def createPoint(raw: RawNumber): Point = createMoment(raw)
+  }
+
+  type TimeInterval = numberSystem.TimeInterval
+
+  final def createInterval(raw: RawNumber): TimeInterval = numberSystem.createInterval(raw)
 
   /**
    *
@@ -162,25 +174,12 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   val Day: DayCompanion[C]
 
 
-  object numberSystem extends TimeNumberSystem {
-    final override type Point = Moment
-
-    final override def createInterval(raw: RawNumber): Interval = new TimeInterval(raw)
-
-    // TODO if I call Moment.apply() here it screws up the initialization order!!!
-    final override def createPoint(raw: RawNumber): Point = createMoment(raw)
-  }
-
-
-  type TimeInterval = numberSystem.TimeInterval
-
-
   abstract class MomentBase(raw: RawNumber)
     extends numberSystem.TimePoint(raw) with CalendarMember[C]
   { this: Moment =>
     final def day: C#Day = Day(days + 1)
 
-    final def time: TimeInterval = numberSystem.createInterval(false, days(0).digits)
+    final def time: TimeInterval = createInterval(false, days(0).digits)
   }
 
 
@@ -197,7 +196,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   // TODO if this calls Moment.apply(), it needs to (?) be a def or else initialization fails...
   final val moment: Moment = createMoment(false, List(0))
 
-  final val interval: TimeInterval = numberSystem.createInterval(false, List(0))
+  final val interval: TimeInterval = createInterval(false, List(0))
 
   // TODO using Day.daysPerWeek will probably break initialization too...
   final val week: TimeInterval = interval.days(7)
