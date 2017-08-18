@@ -134,6 +134,7 @@ class Jewish private() extends Calendar[Jewish] {
 
     final override def lengthInMonths(yearNumber: Int): Int = lengthInMonths(isLeap(yearNumber))
 
+    // TODO parameterless defs aren't vals so that initialization works :)
     final def normal: TimeInterval = Month.meanLunarPeriod*lengthInMonths(isLeap = false)
 
     final def leap: TimeInterval = Month.meanLunarPeriod*lengthInMonths(isLeap = true)
@@ -149,7 +150,7 @@ class Jewish private() extends Calendar[Jewish] {
 
     final val monthsInCycle: Int = monthsBeforeYearInCycle.last
 
-    final val cycleLength: TimeInterval = Month.meanLunarPeriod * monthsInCycle
+    final def cycleLength: TimeInterval = Month.meanLunarPeriod * monthsInCycle
 
     final def firstMonthInCycle(yearNumber: Int): Int =
       monthsBeforeYearInCycle(numberInCycle(yearNumber) - 1) + 1
@@ -181,9 +182,7 @@ class Jewish private() extends Calendar[Jewish] {
   // TODO stick it into the Month companion???
   final val MonthName: JewishMonthName.type = JewishMonthName
 
-  // TODO if this is done with `abstract class` / `final override val`,
-  // tests fail (initialization issues?)!
-  object Month extends MonthCompanion with JewishCalendarMember {
+  abstract class JewishMonthCompanion extends MonthCompanion {
     // KH 6:3
     // TODO how is this really called? tropical?
     final val meanLunarPeriod = interval.days(29).hours(12).parts(793)
@@ -207,6 +206,8 @@ class Jewish private() extends Calendar[Jewish] {
       ((monthNumber - 1) % Year.monthsInCycle) + 1
   }
 
+  final override val Month: JewishMonthCompanion =
+    new JewishMonthCompanion with JewishCalendarMember
 
   final override type Day = JewishDay
 
