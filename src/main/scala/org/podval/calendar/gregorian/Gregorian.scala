@@ -32,22 +32,25 @@ class Gregorian private() extends Calendar[Gregorian] {
       Seq(true, false)
 
     protected final override def monthNamesAndLengths(isLeap: Gregorian#YearCharacter):
-      List[MonthNameAndLength] =
+      List[Gregorian#MonthNameAndLength] =
     {
-      import MonthName._
+      def create(name: Gregorian#MonthName, length: Int): Gregorian#MonthNameAndLength =
+        calendar.createMonthNameAndLength(name, length)
+
+      import Gregorian.MonthName._
       List(
-        MonthNameAndLength(January  , 31),
-        MonthNameAndLength(February , if (isLeap) 29 else 28),
-        MonthNameAndLength(March    , 31),
-        MonthNameAndLength(April    , 30),
-        MonthNameAndLength(May      , 31),
-        MonthNameAndLength(June     , 30),
-        MonthNameAndLength(July     , 31),
-        MonthNameAndLength(August   , 31),
-        MonthNameAndLength(September, 30),
-        MonthNameAndLength(October  , 31),
-        MonthNameAndLength(November , 30),
-        MonthNameAndLength(December , 31)
+        create(January  , 31),
+        create(February , if (isLeap) 29 else 28),
+        create(March    , 31),
+        create(April    , 30),
+        create(May      , 31),
+        create(June     , 30),
+        create(July     , 31),
+        create(August   , 31),
+        create(September, 30),
+        create(October  , 31),
+        create(November , 30),
+        create(December , 31)
       )
     }
 
