@@ -15,7 +15,6 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   type MonthName
 
-  // TODO attempt to prefix Month with C# leads to compilation errors with newMoon...
   def createMonth(number: Int): Month
 
   type Day <: DayBase[C]
@@ -28,7 +27,6 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   type Moment <: MomentBase
 
-  // TODO attempt to prefix Moment with C# leads to compilation errors with newMoon...
   def createMoment(raw: RawNumber): Moment
 
   object numberSystem extends TimeNumberSystem {
@@ -37,7 +35,6 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
     final override def createInterval(raw: RawNumber): Interval = new TimeInterval(raw)
 
-    // TODO if I call Moment.apply() here it screws up the initialization order!!!
     final override def createPoint(raw: RawNumber): Point = Calendar.this.createMoment(raw)
   }
 
@@ -121,16 +118,20 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   final class MonthNameAndLength(val name: C#MonthName, val length: Int)
 
-  final def createMonthNameAndLength(name: C#MonthName, length: Int): C#MonthNameAndLength =
+
+  final def createMonthNameAndLength(name: C#MonthName, length: Int):
+  C#MonthNameAndLength =
     new MonthNameAndLength(name, length)
+
 
   final class MonthDescriptor(val name: C#MonthName, val length: Int, val daysBefore: Int)
 
-  final def createMonthDescriptor(name: C#MonthName, length: Int, daysBefore: Int): C#MonthDescriptor =
+
+  final def createMonthDescriptor(name: C#MonthName, length: Int, daysBefore: Int):
+  C#MonthDescriptor =
     new MonthDescriptor(name, length, daysBefore)
 
   val Month: MonthCompanion
-
 
   val Day: DayCompanion[C]
 
@@ -146,7 +147,6 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   val Moment: MomentCompanion[C]
 
-  // TODO if this calls Moment.apply(), it needs to (?) be a def or else initialization fails...
   final val moment: Moment = createMoment(false, List(0))
 
   final val interval: TimeInterval = createInterval(false, List(0))
