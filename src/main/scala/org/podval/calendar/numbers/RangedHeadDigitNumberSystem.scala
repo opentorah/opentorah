@@ -1,6 +1,6 @@
 package org.podval.calendar.numbers
 
-trait RangedHeadDigitNumberSystem extends NumberSystem {
+trait RangedHeadDigitNumberSystem[S <: NumberSystem[S]] extends NumberSystem[S] { this: S =>
 
   def headRange: Int
 

@@ -1,6 +1,6 @@
 package org.podval.calendar.numbers
 
-trait NumberSystem {
+trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   import NumberSystem.RawNumber
 
   type Point <: PointBase
@@ -246,7 +246,7 @@ trait NumberSystem {
 
     final def digitsWithRangesForMultiplication: List[(Int, Int)] = digits zip (1 :: ranges)
 
-    final def *(that: NumberSystem#IntervalBase): Interval = {
+    final def *[T <: NumberSystem[_]](that: T#IntervalBase): Interval = {
       val z = newInterval(false, List(0))
 
       def step(elem: (Int, Int), acc: Interval): Interval = {

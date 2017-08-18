@@ -3,6 +3,8 @@ package org.podval.calendar.calendar
 import org.podval.calendar.numbers.NotRangedHeadDigitNumberSystem
 import org.podval.calendar.numbers.NumberSystem.RawNumber
 
+// TODO before I can derive Calendar from this, it has to sprout a type parameter
+// [S <: TimeNumberSytem[S]]...
 abstract class TimeNumberSystem extends {
   // TODO NumberSystem's constructor uses ranges and signs in require() calls,
   // so they need to be initialized early - but even without the require() calls
@@ -18,7 +20,7 @@ abstract class TimeNumberSystem extends {
 
   final override val signs: List[String] = List("d", "h", "p", "m")
 
-} with NotRangedHeadDigitNumberSystem {
+} with NotRangedHeadDigitNumberSystem[TimeNumberSystem] {
   require(hoursPerDay % 2 == 0)
 
   final val hoursPerHalfDay: Int = hoursPerDay / 2
