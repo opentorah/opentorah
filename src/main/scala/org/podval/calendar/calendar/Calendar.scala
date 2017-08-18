@@ -40,6 +40,12 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   def createMoment(raw: RawNumber): Moment // TODO prefix
 
+  // If this is done as class/val, I get errors:
+  //
+  // overriding type Point in class TimeNumberSystem with bounds <: CalendarNumberSystem.this.TimePoint;
+  // overriding type Point in trait NumberSystem with bounds <: CalendarNumberSystem.this.PointBase;
+  // type Point has incompatible type
+  // final override type Point = Moment
   object numberSystem extends TimeNumberSystem {
     final override type Point = Moment
     final override type Interval = TimeInterval
