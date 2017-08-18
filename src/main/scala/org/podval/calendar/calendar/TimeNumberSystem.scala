@@ -4,8 +4,9 @@ import org.podval.calendar.numbers.NotRangedHeadDigitNumberSystem
 import org.podval.calendar.numbers.NumberSystem.RawNumber
 
 abstract class TimeNumberSystem extends {
-  // NumberSystem's constructor uses ranges and signs in require() calls,
-  // so they need to be initialized early.
+  // TODO NumberSystem's constructor uses ranges and signs in require() calls,
+  // so they need to be initialized early - but even without the require() calls
+  // initialization order requires this :(
 
   final val hoursPerDay = 24
 
