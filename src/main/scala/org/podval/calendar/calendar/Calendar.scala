@@ -128,7 +128,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
       // TODO dayses?
       val daysesBefore = namesAndLengths.map(_.length).scanLeft(0)(_ + _).init
       namesAndLengths zip daysesBefore map { case (nameAndLength, daysBefore) =>
-        new MonthDescriptor(nameAndLength.name, nameAndLength.length, daysBefore)
+        createMonthDescriptor(nameAndLength.name, nameAndLength.length, daysBefore)
       }
     }
 
@@ -169,8 +169,10 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   final case class MonthNameAndLength(name: MonthName, length: Int)
 
 
-  final      class MonthDescriptor   (val name: MonthName, val length: Int, val daysBefore: Int)
+  final class MonthDescriptor(val name: MonthName, val length: Int, val daysBefore: Int)
 
+  final def createMonthDescriptor(name: MonthName, length: Int, daysBefore: Int): MonthDescriptor =
+    new MonthDescriptor(name, length, daysBefore)
 
   val Month: MonthCompanion
 
