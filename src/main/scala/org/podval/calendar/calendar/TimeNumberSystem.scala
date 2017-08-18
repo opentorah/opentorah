@@ -33,18 +33,18 @@ abstract class TimeNumberSystem extends {
 
   type Point <: TimePoint
 
-  abstract class TimePoint(raw: RawNumber) extends PointBase(raw) with TimeNumber[Point] {
+  abstract class TimePoint(raw: RawNumber) extends PointBase[TimeNumberSystem](raw) with TimeNumber[Point] {
     this: Point =>
   }
 
   type Interval <: TimeInterval
 
   // TODO make abstract just like TimePoint?
-  final class TimeInterval(raw: RawNumber) extends IntervalBase(raw) with TimeNumber[Interval] {
+  final class TimeInterval(raw: RawNumber) extends IntervalBase[TimeNumberSystem](raw) with TimeNumber[Interval] {
     this: Interval =>
   }
 
-  trait TimeNumber[N <: TimeNumber[N]] extends Number[N] { this: N =>
+  trait TimeNumber[N <: TimeNumber[N]] extends Number[TimeNumberSystem, N] { this: N =>
     final def days: Int = head
 
     final def days(value: Int): N = digit(0, value)

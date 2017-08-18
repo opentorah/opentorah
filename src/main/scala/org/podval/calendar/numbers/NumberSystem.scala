@@ -1,15 +1,15 @@
 package org.podval.calendar.numbers
 
 trait NumberSystem[S <: NumberSystem[S]] { this: S =>
-  import NumberSystem.RawNumber
+  import NumberSystem.{RawNumber, BasicNumber}
 
-  type Point <: PointBase
+  type Point <: PointBase[S]
 
   final def newPoint(raw: RawNumber): Point = createPoint(normalize(raw))
 
   def createPoint(raw: RawNumber): Point
 
-  type Interval <: IntervalBase
+  type Interval <: IntervalBase[S]
 
   final def newInterval(raw: RawNumber): Interval = createInterval(normalize(raw))
 
@@ -86,16 +86,21 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   }
 
 
-  abstract class Number[N <: Number[N]](raw: RawNumber) extends Ordered[N] { this: N =>
-    protected final def newPoint(raw: RawNumber): Point = NumberSystem.this.newPoint(raw)
-    protected final def newInterval(raw: RawNumber): Interval = NumberSystem.this.newInterval(raw)
+  // TODO once this is split into a separate file, rename T to S (it is T now to avoid shadowing)
+  abstract class Number[T <: NumberSystem[T], +N <: Number[T, N]](raw: RawNumber)
+    extends BasicNumber with Ordered[N]
+  { this: N =>
+    def numberSystem: T
+
+    protected final def newPoint(raw: RawNumber): T#Point = numberSystem.newPoint(raw)
+    protected final def newInterval(raw: RawNumber): T#Interval = numberSystem.newInterval(raw)
 
     // TODO rename?
     protected def newN(raw: RawNumber): N
 
-    final def negative: Boolean = raw._1
+    final override def negative: Boolean = raw._1
 
-    final def digits: List[Int] = raw._2
+    final override def digits: List[Int] = raw._2
 
     final def head: Int = digits.head
 
@@ -114,7 +119,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
       newN(negative, digits.padTo(n + 1, 0).updated(n, value))
     }
 
-    protected final def plusMinus(operationNegation: Boolean, that: Number[_]): RawNumber = {
+    protected final def plusMinus(operationNegation: Boolean, that: BasicNumber): RawNumber = {
       val sameSign = this.negative == that.negative
       val operationSelector = if (operationNegation) !sameSign else sameSign
       val operation: (Int, Int) => Int = if (operationSelector) _ + _ else _ - _
@@ -141,7 +146,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     final def toDouble: Double =
       (if (negative) -1 else +1) * (head + ((tail zip divisors) map lift(_ / _)).sum)
 
-    private[this] def zip(that: Number[_]): List[(Int, Int)] = this.digits zipAll(that.digits, 0, 0)
+    private[this] def zip(that: BasicNumber): List[(Int, Int)] = this.digits zipAll(that.digits, 0, 0)
 
     // TODO why can't I inline .tupled?
     private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = op.tupled
@@ -173,29 +178,29 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   }
 
 
-  class PointBase(raw: RawNumber) extends Number[Point](raw) { this: Point =>
-    protected final override def newN(raw: RawNumber): Point = newPoint(raw)
+  abstract class PointBase[T <: NumberSystem[T]](raw: RawNumber) extends Number[T, T#Point](raw) { this: T#Point =>
+    protected final override def newN(raw: RawNumber): T#Point = newPoint(raw)
 
-    final def +(that: Interval): Point = newPoint(plusMinus(operationNegation = false, that))
+    final def +(that: T#Interval): T#Point = newPoint(plusMinus(operationNegation = false, that))
 
-    final def -(that: Interval): Point = newPoint(plusMinus(operationNegation = true, that))
+    final def -(that: T#Interval): T#Point = newPoint(plusMinus(operationNegation = true, that))
 
-    final def -(that: Point): Interval = newInterval(plusMinus(operationNegation = true, that))
+    final def -(that: T#Point): T#Interval = newInterval(plusMinus(operationNegation = true, that))
   }
 
 
-  class IntervalBase(raw: RawNumber) extends Number[Interval](raw) { this: Interval =>
-    protected final override def newN(raw: RawNumber): Interval =  newInterval(raw)
+  abstract class IntervalBase[T <: NumberSystem[T]](raw: RawNumber) extends Number[T, T#Interval](raw) { this: T#Interval =>
+    protected final override def newN(raw: RawNumber): T#Interval =  newInterval(raw)
 
-    final def +(that: Interval): Interval = newInterval(plusMinus(operationNegation = false, that))
+    final def +(that: T#Interval): T#Interval = newInterval(plusMinus(operationNegation = false, that))
 
-    final def -(that: Interval): Interval = newInterval(plusMinus(operationNegation = true, that))
+    final def -(that: T#Interval): T#Interval = newInterval(plusMinus(operationNegation = true, that))
 
-    final def +(that: Point): Point = newPoint(plusMinus(operationNegation = false, that))
+    final def +(that: T#Point): T#Point = newPoint(plusMinus(operationNegation = false, that))
 
-    final def *(n: Int): Interval = newInterval(negative, digits map (n * _))
+    final def *(n: Int): T#Interval = newInterval(negative, digits map (n * _))
 
-    final def /(n: Int): Interval = {
+    final def /(n: Int): T#Interval = {
       def step(acc: (List[Int], Int), elem: (Int, Int)) = {
         val (digit, range) = elem
         val (result, carry) = acc
@@ -221,9 +226,9 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
       newInterval(negative, newDigits :+ lastDigit)
     }
 
-    final def %(n: Int): Interval = this - ((this / n) * n)
+    final def %(n: Int): T#Interval = this - ((this / n) * n)
 
-    final def /(that: Interval): Int = {
+    final def /(that: T#Interval): Int = {
       // TODO deal with negativity
       // TODO faster?
       var result = 0
@@ -239,17 +244,17 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
       result
     }
 
-    final def %(that: Interval): Interval = this - (that * (this / that))
+    final def %(that: T#Interval): T#Interval = this - (that * (this / that))
 
     // TODO add multiplication (and division, and reminder) on the ScalarNumber from another NumberSystem!
     // How to formulate the type of "Number from some NumberSystem"?
 
     final def digitsWithRangesForMultiplication: List[(Int, Int)] = digits zip (1 :: ranges)
 
-    final def *[T <: NumberSystem[_]](that: T#Interval): Interval = {
+    final def *[X <: NumberSystem[X]](that: X#Interval): T#Interval = {
       val z = newInterval(false, List(0))
 
-      def step(elem: (Int, Int), acc: Interval): Interval = {
+      def step(elem: (Int, Int), acc: T#Interval): T#Interval = {
         val (digit, range) = elem
         (acc + this*digit)/range
       }
@@ -262,4 +267,13 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
 object NumberSystem {
   type RawNumber = (Boolean, List[Int])
+
+  // TODO I only introduced this because I couldn't figure out how to type plusMinus() and zip()
+  // so that the calls to them compile :(
+  // (I tried things like X <: Number[T, X] etc...)
+  // It should go away!
+  trait BasicNumber {
+    def negative: Boolean
+    def digits: List[Int]
+  }
 }
