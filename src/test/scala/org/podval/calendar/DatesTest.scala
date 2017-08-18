@@ -2,15 +2,15 @@ package org.podval.calendar
 
 import org.scalatest.FlatSpec
 
-import jewish.Jewish.{Year, Day, DayName, MonthName}
-import MonthName._
+import jewish.Jewish.{Year, Day, Month, MonthName}
+import Month.Name._
 
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class DatesTest extends FlatSpec {
 
   "known dates" should "have correct day of the week" in {
-    assertResult(DayName.Sheni)(Day(5772, Marheshvan, 24).name)
+    assertResult(Day.Name.Sheni)(Day(5772, Marheshvan, 24).name)
   }
 
 

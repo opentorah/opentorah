@@ -3,10 +3,10 @@ package org.podval.calendar
 import org.scalatest.FlatSpec
 
 import jewish.Jewish
-import Jewish.MonthName._
-import Jewish.DayName._
+import Jewish.Month.Name._
+import Jewish.Day.Name._
 import gregorian.Gregorian
-import Gregorian.MonthName._
+import Gregorian.Month.Name._
 import dates.Conversions
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
