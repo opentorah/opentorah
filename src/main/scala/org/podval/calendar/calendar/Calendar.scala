@@ -51,15 +51,15 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   { this: C#Year =>
     def character: C#YearCharacter
 
-    final def isLeap: Boolean = Year.isLeap(number)
+    final def isLeap: Boolean = calendar.Year.isLeap(number)
 
     final def next: C#Year = this + 1
 
     final def prev: C#Year = this - 1
 
-    final def +(change: Int) = Year(number + change)
+    final def +(change: Int): C#Year = calendar.Year(number + change)
 
-    final def -(change: Int) = Year(number - change)
+    final def -(change: Int): C#Year = calendar.Year(number - change)
 
     final def firstDay: C#Day = firstMonth.firstDay
 
@@ -75,12 +75,13 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
     final def lastMonth: C#Month = month(lengthInMonths)
 
-    final def firstMonthNumber: Int = Year.firstMonth(number)
+    final def firstMonthNumber: Int = calendar.Year.firstMonth(number)
 
-    final def lengthInMonths: Int = Year.lengthInMonths(number)
+    final def lengthInMonths: Int = calendar.Year.lengthInMonths(number)
 
     final def months: Seq[C#Month] = (1 to lengthInMonths).map(month)
 
+    // TODO the last to prefix with C#, but newMoon issue resists...
     final def month(numberInYear: Int): Month = {
       require(0 < numberInYear && numberInYear <= lengthInMonths)
       Month(firstMonthNumber + numberInYear - 1)
@@ -94,7 +95,8 @@ trait Calendar[C <: Calendar[C]] { this: C =>
       month(monthDescriptors.count(_.daysBefore < day))
     }
 
-    final def monthDescriptors: List[C#MonthDescriptor] = Year.monthDescriptors(character)
+    final def monthDescriptors: List[C#MonthDescriptor] =
+      calendar.Year.monthDescriptors(character)
   }
 
 
