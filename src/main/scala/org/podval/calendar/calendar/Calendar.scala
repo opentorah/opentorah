@@ -11,11 +11,25 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   type YearCharacter
 
+  val Year: YearCompanion[C]
+
   type Month <: MonthBase[C]
 
   type MonthName
 
   def createMonth(number: Int): C#Month
+
+  type MonthNameAndLength = MonthNameAndLengthBase[C]
+
+  final def createMonthNameAndLength(name: C#MonthName, length: Int):
+  C#MonthNameAndLength = new MonthNameAndLengthBase(name, length)
+
+  type MonthDescriptor = MonthDescriptorBase[C]
+
+  final def createMonthDescriptor(name: C#MonthName, length: Int, daysBefore: Int):
+  C#MonthDescriptor = new MonthDescriptorBase(name, length, daysBefore)
+
+  val Month: MonthCompanion[C]
 
   type Day <: DayBase[C]
 
@@ -24,6 +38,8 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
   // TODO make this a Enum - and use its `values()` method in DayCompanion.name
   //   (which will then become `final`)?
   type DayName
+
+  val Day: DayCompanion[C]
 
   type Moment <: MomentBase[C]
 
@@ -39,26 +55,6 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
     new TimeInterval[C](raw) { this: C#Interval =>
       final override def numberSystem: C = Calendar.this
     }
-
-  val Year: YearCompanion[C]
-
-  // TODO split out
-  final class MonthNameAndLength(val name: C#MonthName, val length: Int)
-
-  final def createMonthNameAndLength(name: C#MonthName, length: Int):
-  C#MonthNameAndLength =
-    new MonthNameAndLength(name, length)
-
-  // TODO split out
-  final class MonthDescriptor(val name: C#MonthName, val length: Int, val daysBefore: Int)
-
-  final def createMonthDescriptor(name: C#MonthName, length: Int, daysBefore: Int):
-  C#MonthDescriptor =
-    new MonthDescriptor(name, length, daysBefore)
-
-  val Month: MonthCompanion[C]
-
-  val Day: DayCompanion[C]
 
   val Moment: MomentCompanion[C]
 

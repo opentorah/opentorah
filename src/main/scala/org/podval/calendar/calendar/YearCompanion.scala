@@ -7,7 +7,6 @@ abstract class YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
   final def apply(number: Int): C#Year = calendar.createYear(number)
 
   final def apply(month: C#Month): C#Year =
-  // TODO possibly initialization-breaking call
     apply(calendar.Month.yearNumber(month.number))
 
   final def apply(day: C#Day): C#Year = {
@@ -35,6 +34,7 @@ abstract class YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
 
   protected def areYearsPositive: Boolean
 
+  // TODO centralize the constants (in a Gregorian companion object?).
   private[this] final def yearsForSureBefore(dayNumber: Int): Int =  {
     val result = (4 * dayNumber / (4 * 365 + 1)) - 1
     if (areYearsPositive) scala.math.max(1, result) else result
