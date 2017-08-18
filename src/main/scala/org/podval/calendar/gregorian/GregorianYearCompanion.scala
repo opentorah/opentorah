@@ -7,7 +7,7 @@ abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
     Seq(true, false)
 
   protected final override def monthNamesAndLengths(isLeap: Gregorian#YearCharacter):
-  List[Gregorian#MonthNameAndLength] =
+    List[Gregorian#MonthNameAndLength] =
   {
     def create(name: Gregorian#MonthName, length: Int): Gregorian#MonthNameAndLength =
       calendar.createMonthNameAndLength(name, length)

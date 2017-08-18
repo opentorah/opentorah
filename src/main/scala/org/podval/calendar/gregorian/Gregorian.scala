@@ -9,15 +9,6 @@ class Gregorian private() extends Calendar[Gregorian] {
     final override def calendar: Gregorian = Gregorian.this
   }
 
-  abstract class GregorianYear(number: Int) extends YearBase[Gregorian](number) { this: Gregorian#Year =>
-    final override def firstDayNumber: Int = Year.firstDay(number)
-
-    final override def lengthInDays: Int = Year.lengthInDays(number)
-
-    final override def character: Gregorian#YearCharacter = isLeap
-  }
-
-
   final override type Year = GregorianYear
 
   final override def createYear(number: Int): Gregorian#Year =
@@ -38,16 +29,6 @@ class Gregorian private() extends Calendar[Gregorian] {
   // TODO stick it into the Month companion???
   val MonthName: GregorianMonthName.type = GregorianMonthName
 
-
-  abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
-    final override def yearNumber(monthNumber: Int): Int =
-      (monthNumber - 1) / Gregorian.Year.monthsInYear + 1
-
-    final override def numberInYear(monthNumber: Int): Int =
-      monthNumber - Gregorian.Year.firstMonth(yearNumber(monthNumber)) + 1
-  }
-
-
   final override val Month: GregorianMonthCompanion =
     new GregorianMonthCompanion with GregorianCalendarMember
 
@@ -63,16 +44,6 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override val Day: GregorianDayCompanion =
     new GregorianDayCompanion with GregorianCalendarMember
-
-
-  abstract class GregorianMoment(raw: RawNumber)
-    extends MomentBase[Gregorian](raw)
-  { this: Gregorian#Moment =>
-    final def morningHours(value: Int): Gregorian#Moment = firstHalfHours(value)
-
-    final def afternoonHours(value: Int): Gregorian#Moment = secondHalfHours(value)
-  }
-
 
   final override type Moment = GregorianMoment
 

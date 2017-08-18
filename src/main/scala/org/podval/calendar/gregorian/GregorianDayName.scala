@@ -13,5 +13,6 @@ object GregorianDayName {
   case object Friday extends GregorianDayName("Friday")
   case object Saturday extends GregorianDayName("Saturday")
 
-  val values: Seq[GregorianDayName] = Seq(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+  val values: Seq[GregorianDayName] =
+    Seq(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
 }
