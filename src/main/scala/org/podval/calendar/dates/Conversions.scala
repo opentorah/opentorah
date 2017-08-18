@@ -1,5 +1,6 @@
 package org.podval.calendar.dates
 
+// TODO find and remove (by centralization) a link between the 2 calendars...
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.Jewish
 
@@ -11,7 +12,7 @@ object Conversions {
 
   val gregorianDayStartHours: Int = Jewish.hoursPerDay - jewishDayStartHours
 
-  def toJewish(moment: Gregorian#Moment): Jewish#Moment = {
+  def toJewish(moment: Gregorian.Moment): Jewish.Moment = {
     val hours = moment.hours
 
     val (newDay, newHours) =
@@ -22,7 +23,7 @@ object Conversions {
     toJewish(newDay).toMoment.hours(newHours).parts(moment.parts)
   }
 
-  def fromJewish(moment: Jewish#Moment): Gregorian#Moment = {
+  def fromJewish(moment: Jewish.Moment): Gregorian.Moment = {
     val hours = moment.hours
 
     val (newDay, newHours) =
@@ -33,7 +34,7 @@ object Conversions {
     fromJewish(newDay).toMoment.hours(newHours).parts(moment.parts)
   }
 
-  def fromJewish(day: Jewish   #Day): Gregorian#Day = Gregorian.Day(day.number - Gregorian.Day.epoch)
+  def fromJewish(day: Jewish   .Day): Gregorian.Day = Gregorian.Day(day.number - Gregorian.Day.epoch)
 
-  def toJewish  (day: Gregorian#Day): Jewish   .Day = Jewish   .Day(day.number + Gregorian.Day.epoch)
+  def toJewish  (day: Gregorian.Day): Jewish   .Day = Jewish   .Day(day.number + Gregorian.Day.epoch)
 }
