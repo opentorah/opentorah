@@ -128,7 +128,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
       // TODO dayses?
       val daysesBefore = namesAndLengths.map(_.length).scanLeft(0)(_ + _).init
       namesAndLengths zip daysesBefore map { case (nameAndLength, daysBefore) =>
-        createMonthDescriptor(nameAndLength.name, nameAndLength.length, daysBefore)
+        calendar.createMonthDescriptor(nameAndLength.name, nameAndLength.length, daysBefore)
       }
     }
 
