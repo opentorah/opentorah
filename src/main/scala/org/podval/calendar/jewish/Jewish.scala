@@ -10,7 +10,7 @@ class Jewish private() extends Calendar[Jewish] {
     final override def calendar: Jewish = Jewish.this
   }
 
-  abstract class JewishYear(number: Int) extends YearBase(number) { this: Jewish#Year =>
+  abstract class JewishYear(number: Int) extends YearBase[Jewish](number) { this: Jewish#Year =>
     require(0 < number)
 
     // TODO the moment I change the type of newMoon from Moment to Jewish#Moment,
@@ -105,7 +105,7 @@ class Jewish private() extends Calendar[Jewish] {
   // TODO stick it into the Month companion???
   final val MonthName: JewishMonthName.type = JewishMonthName
 
-  abstract class JewishMonthCompanion extends MonthCompanion {
+  abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
     // KH 6:3
     // TODO how is this really called? tropical?
     final val meanLunarPeriod = interval.days(29).hours(12).parts(793)

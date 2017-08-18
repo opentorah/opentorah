@@ -9,7 +9,7 @@ class Gregorian private() extends Calendar[Gregorian] {
     final override def calendar: Gregorian = Gregorian.this
   }
 
-  abstract class GregorianYear(number: Int) extends YearBase(number) { this: Gregorian#Year =>
+  abstract class GregorianYear(number: Int) extends YearBase[Gregorian](number) { this: Gregorian#Year =>
     final override def firstDayNumber: Int = Year.firstDay(number)
 
     final override def lengthInDays: Int = Year.lengthInDays(number)
@@ -39,7 +39,7 @@ class Gregorian private() extends Calendar[Gregorian] {
   val MonthName: GregorianMonthName.type = GregorianMonthName
 
 
-  abstract class GregorianMonthCompanion extends MonthCompanion {
+  abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
     final override def yearNumber(monthNumber: Int): Int =
       (monthNumber - 1) / Gregorian.Year.monthsInYear + 1
 
