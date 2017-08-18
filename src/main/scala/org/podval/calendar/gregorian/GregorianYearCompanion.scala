@@ -9,23 +9,20 @@ abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
   protected final override def monthNamesAndLengths(isLeap: Gregorian#YearCharacter):
     List[Gregorian#MonthNameAndLength] =
   {
-    def create(name: Gregorian#MonthName, length: Int): Gregorian#MonthNameAndLength =
-      calendar.createMonthNameAndLength(name, length)
-
     import Gregorian.Month.Name._
     List(
-      create(January  , 31),
-      create(February , if (isLeap) 29 else 28),
-      create(March    , 31),
-      create(April    , 30),
-      create(May      , 31),
-      create(June     , 30),
-      create(July     , 31),
-      create(August   , 31),
-      create(September, 30),
-      create(October  , 31),
-      create(November , 30),
-      create(December , 31)
+      createMonthNameAndLength(January  , 31),
+      createMonthNameAndLength(February , if (isLeap) 29 else 28),
+      createMonthNameAndLength(March    , 31),
+      createMonthNameAndLength(April    , 30),
+      createMonthNameAndLength(May      , 31),
+      createMonthNameAndLength(June     , 30),
+      createMonthNameAndLength(July     , 31),
+      createMonthNameAndLength(August   , 31),
+      createMonthNameAndLength(September, 30),
+      createMonthNameAndLength(October  , 31),
+      createMonthNameAndLength(November , 30),
+      createMonthNameAndLength(December , 31)
     )
   }
 
@@ -39,7 +36,7 @@ abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
 
   final override def lengthInMonths(yearNumber: Int): Int = monthsInYear
 
-  val monthsInYear: Int = 12
+  final val monthsInYear: Int = 12
 
   private val daysInNonLeapYear: Int = 365
 

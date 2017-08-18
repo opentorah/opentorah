@@ -13,28 +13,25 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
   protected final override def monthNamesAndLengths(character: YearCharacter):
   List[MonthNameAndLength] =
   {
-    def create(name: MonthName, length: Int): MonthNameAndLength =
-      calendar.createMonthNameAndLength(name, length)
-
     character match { case (isLeap: Boolean, kind: YearKind) =>
       List(
-        create(Tishrei   , 30),
-        create(Marheshvan, if (kind == calendar.YearKind.Full) 30 else 29),
-        create(Kislev    , if (kind == calendar.YearKind.Short) 29 else 30),
-        create(Teves     , 29),
-        create(Shvat     , 30)
+        createMonthNameAndLength(Tishrei   , 30),
+        createMonthNameAndLength(Marheshvan, if (kind == calendar.YearKind.Full) 30 else 29),
+        createMonthNameAndLength(Kislev    , if (kind == calendar.YearKind.Short) 29 else 30),
+        createMonthNameAndLength(Teves     , 29),
+        createMonthNameAndLength(Shvat     , 30)
       ) ++
         (if (!isLeap)
-          List(create(Adar, 29))
+          List(createMonthNameAndLength(Adar, 29))
         else
-          List(create(AdarI, 30), create(AdarII, 29))) ++
+          List(createMonthNameAndLength(AdarI, 30), createMonthNameAndLength(AdarII, 29))) ++
         List(
-          create(Nisan , 30),
-          create(Iyar  , 29),
-          create(Sivan , 30),
-          create(Tammuz, 29),
-          create(Av    , 30),
-          create(Elul  , 29)
+          createMonthNameAndLength(Nisan , 30),
+          createMonthNameAndLength(Iyar  , 29),
+          createMonthNameAndLength(Sivan , 30),
+          createMonthNameAndLength(Tammuz, 29),
+          createMonthNameAndLength(Av    , 30),
+          createMonthNameAndLength(Elul  , 29)
         )
     }
   }

@@ -26,11 +26,15 @@ abstract class YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
     // TODO dayses?
     val daysesBefore = namesAndLengths.map(_.length).scanLeft(0)(_ + _).init
     namesAndLengths zip daysesBefore map { case (nameAndLength, daysBefore) =>
-      calendar.createMonthDescriptor(nameAndLength.name, nameAndLength.length, daysBefore)
+      new MonthDescriptorBase(nameAndLength.name, nameAndLength.length, daysBefore)
     }
   }
 
   protected def monthNamesAndLengths(character: C#YearCharacter): List[C#MonthNameAndLength]
+
+  // TODO scope inside MonthCompanion
+  protected final def createMonthNameAndLength(name: C#MonthName, length: Int):
+    C#MonthNameAndLength = new MonthNameAndLengthBase(name, length)
 
   protected def areYearsPositive: Boolean
 

@@ -9,27 +9,23 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   def createYear(number: Int): C#Year
 
+  // TODO scope inside YearCompanion?
   type YearCharacter
 
   val Year: YearCompanion[C]
 
   type Month <: MonthBase[C]
 
+  // TODO scope inside MonthCompanion?
   type MonthName
 
   def createMonth(number: Int): C#Month
 
+  // TODO scope inside MonthCompanion?
   type MonthNameAndLength = MonthNameAndLengthBase[C]
 
-  // TODO scope inside MonthCompanion
-  final def createMonthNameAndLength(name: C#MonthName, length: Int):
-  C#MonthNameAndLength = new MonthNameAndLengthBase(name, length)
-
+  // TODO scope inside MonthCompanion?
   type MonthDescriptor = MonthDescriptorBase[C]
-
-  // TODO scope inside MonthCompanion
-  final def createMonthDescriptor(name: C#MonthName, length: Int, daysBefore: Int):
-  C#MonthDescriptor = new MonthDescriptorBase(name, length, daysBefore)
 
   val Month: MonthCompanion[C]
 
@@ -37,6 +33,7 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   def createDay(number: Int): C#Day
 
+  // TODO scope inside DayCompanion?
   // TODO make this a Enum - and use its `values()` method in DayCompanion.name
   //   (which will then become `final`)?
   type DayName
