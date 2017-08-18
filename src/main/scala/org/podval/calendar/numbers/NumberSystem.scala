@@ -246,7 +246,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
     final def digitsWithRangesForMultiplication: List[(Int, Int)] = digits zip (1 :: ranges)
 
-    final def *[T <: NumberSystem[_]](that: T#IntervalBase): Interval = {
+    final def *[T <: NumberSystem[_]](that: T#Interval): Interval = {
       val z = newInterval(false, List(0))
 
       def step(elem: (Int, Int), acc: Interval): Interval = {
