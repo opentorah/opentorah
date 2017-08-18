@@ -6,7 +6,7 @@ import org.podval.calendar.jewish.Jewish
 abstract class GregorianDayCompanion extends DayCompanion[Gregorian] {
   final val Name: GregorianDayName.type = GregorianDayName
 
-  final override def names: Seq[Gregorian#DayName] = Name.values
+  final override def names: Seq[Gregorian.DayName] = Name.values
 
   final val epoch: Int = 1373429
 

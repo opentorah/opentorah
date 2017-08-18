@@ -11,7 +11,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type Year = GregorianYear
 
-  final override def createYear(number: Int): Gregorian#Year =
+  final override def createYear(number: Int): Gregorian.Year =
     new GregorianYear(number) with GregorianCalendarMember
 
   final override type YearCharacter = Boolean
@@ -21,7 +21,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type Month = GregorianMonth
 
-  final override def createMonth(number: Int): Gregorian#Month =
+  final override def createMonth(number: Int): Gregorian.Month =
     new GregorianMonth(number) with GregorianCalendarMember
 
   final override type MonthName = GregorianMonthName
@@ -31,7 +31,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type Day = GregorianDay
 
-  final override def createDay(number: Int): Gregorian#Day =
+  final override def createDay(number: Int): Gregorian.Day =
     new GregorianDay(number) with GregorianCalendarMember
 
   final override type DayName = GregorianDayName
@@ -41,7 +41,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type Moment = GregorianMoment
 
-  final override def createMoment(raw: RawNumber): Gregorian#Moment =
+  final override def createMoment(raw: RawNumber): Gregorian.Moment =
     new GregorianMoment(raw) with GregorianCalendarMember {
       final override def numberSystem: Gregorian = Gregorian.this
     }

@@ -2,10 +2,10 @@ package org.podval.calendar.jewish
 
 import org.podval.calendar.calendar.YearBase
 
-abstract class JewishYear(number: Int) extends YearBase[Jewish](number) { this: Jewish#Year =>
+abstract class JewishYear(number: Int) extends YearBase[Jewish](number) { this: Jewish.Year =>
   require(0 < number)
 
-  final def newMoon: Jewish#Moment = month(1).newMoon
+  final def newMoon: Jewish.Moment = month(1).newMoon
 
   final override def firstDayNumber: Int = {
     val correction =
@@ -44,10 +44,10 @@ abstract class JewishYear(number: Int) extends YearBase[Jewish](number) { this: 
 
   final def numberInCycle: Int = calendar.Year.numberInCycle(number)
 
-  final override def character: Jewish#YearCharacter = (isLeap, kind)
+  final override def character: Jewish.YearCharacter = (isLeap, kind)
 
   // KH 8:7,8
-  final def kind: Jewish#YearKind = {
+  final def kind: Jewish.YearKind = {
     val daysOverShort = lengthInDays - (if (isLeap) 383 else 353)
 
     daysOverShort match {

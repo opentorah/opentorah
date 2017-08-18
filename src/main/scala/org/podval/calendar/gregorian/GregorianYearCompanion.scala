@@ -3,11 +3,11 @@ package org.podval.calendar.gregorian
 import org.podval.calendar.calendar.YearCompanion
 
 abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
-  protected final override def characters: Seq[Gregorian#YearCharacter] =
+  protected final override def characters: Seq[Gregorian.YearCharacter] =
     Seq(true, false)
 
-  protected final override def monthNamesAndLengths(isLeap: Gregorian#YearCharacter):
-    List[Gregorian#MonthNameAndLength] =
+  protected final override def monthNamesAndLengths(isLeap: Gregorian.YearCharacter):
+    List[Gregorian.MonthNameAndLength] =
   {
     import Gregorian.Month.Name._
     List(
