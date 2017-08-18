@@ -5,7 +5,7 @@ import org.podval.calendar.numbers.NumberSystem.RawNumber
 
 // TODO before I can derive Calendar from this, it has to sprout a type parameter
 // [S <: TimeNumberSytem[S]]...
-abstract class TimeNumberSystem extends {
+abstract class TimeNumberSystem[S <: TimeNumberSystem[S]] extends {
   // TODO NumberSystem's constructor uses ranges and signs in require() calls,
   // so they need to be initialized early - but even without the require() calls
   // initialization order requires this :(
@@ -20,7 +20,7 @@ abstract class TimeNumberSystem extends {
 
   final override val signs: List[String] = List("d", "h", "p", "m")
 
-} with NotRangedHeadDigitNumberSystem[TimeNumberSystem] {
+} with NotRangedHeadDigitNumberSystem[S] { this: S =>
   require(hoursPerDay % 2 == 0)
 
   final val hoursPerHalfDay: Int = hoursPerDay / 2
@@ -31,20 +31,25 @@ abstract class TimeNumberSystem extends {
 
   final val partsPerMinute: Int = partsPerHour / minutesPerHour
 
-  type Point <: TimePoint
+  type Point <: TimePoint[S]
 
-  abstract class TimePoint(raw: RawNumber) extends PointBase[TimeNumberSystem](raw) with TimeNumber[Point] {
-    this: Point =>
+  abstract class TimePoint[T <: TimeNumberSystem[T]](raw: RawNumber)
+    extends PointBase[T](raw) with TimeNumber[T, T#Point] {
+    this: T#Point =>
   }
 
-  type Interval <: TimeInterval
+  type Interval <: TimeInterval[S]
 
   // TODO make abstract just like TimePoint?
-  final class TimeInterval(raw: RawNumber) extends IntervalBase[TimeNumberSystem](raw) with TimeNumber[Interval] {
-    this: Interval =>
+  abstract class TimeInterval[T <: TimeNumberSystem[T]](raw: RawNumber)
+    extends IntervalBase[T](raw) with TimeNumber[T, T#Interval] {
+    this: T#Interval =>
   }
 
-  trait TimeNumber[N <: TimeNumber[N]] extends Number[TimeNumberSystem, N] { this: N =>
+  // TODO if N <: TimeNumber[T, N], I get compiler error;
+  // if I change it to T#TimeNumber[T, N] - which is what I want,
+  //  and which I did in Number - I get compiler crash!!!
+  trait TimeNumber[T <: TimeNumberSystem[T], N <: TimeNumber[T, N]] extends Number[T, N] { this: N =>
     final def days: Int = head
 
     final def days(value: Int): N = digit(0, value)

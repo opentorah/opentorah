@@ -5,12 +5,13 @@ package org.podval.calendar.dates
 // TODO Rambam's epoch - two days after molad?! (Petya Ofman)
 // TODO angular speed of the moon = 360 / (1/tropical month + 1/solar year)
 object Sun {
-  import org.podval.calendar.jewish.Jewish.{interval, Year, MonthName, TimeInterval}
+  import org.podval.calendar.jewish.Jewish
+  import Jewish.{interval, Year, MonthName}
 
   val yearOfShmuel = interval.days(365).hours(6)
 
 
-  val yearOfRavAda: TimeInterval = Year.cycleLength / Year.yearsInCycle
+  val yearOfRavAda: Jewish#Interval = Year.cycleLength / Year.yearsInCycle
 
 
   // KH 9:3

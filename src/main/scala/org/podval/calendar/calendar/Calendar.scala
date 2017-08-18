@@ -3,7 +3,7 @@ package org.podval.calendar.calendar
 import org.podval.calendar.numbers.NumberSystem.RawNumber
 import org.podval.calendar.util.Numbered
 
-trait Calendar[C <: Calendar[C]] { this: C =>
+trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   type Year <: YearBase
 
@@ -15,7 +15,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   type MonthName
 
-  def createMonth(number: Int): Month // TODO prefix
+  def createMonth(number: Int): C#Month
 
   type Day <: DayBase[C]
 
@@ -36,29 +36,17 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   // the error persists. I may still have to unify the abstract types, since `type A = B`
   // doesn't help, but there is a different reason for the error...
 
-  type Moment <: MomentBase
+  type Moment <: MomentBase[C]
+  final override type Point = Moment
 
-  def createMoment(raw: RawNumber): Moment // TODO prefix
+  def createMoment(raw: RawNumber): C#Moment
+  final override def createPoint(raw: RawNumber): C#Point = Calendar.this.createMoment(raw)
 
-  // If this is done as class/val, I get errors:
-  //
-  // overriding type Point in class TimeNumberSystem with bounds <: CalendarNumberSystem.this.TimePoint;
-  // overriding type Point in trait NumberSystem with bounds <: CalendarNumberSystem.this.PointBase;
-  // type Point has incompatible type
-  // final override type Point = Moment
-  object numberSystem extends TimeNumberSystem {
-    final override type Point = Moment
-    final override type Interval = TimeInterval
+  final override type Interval = TimeInterval[C]
 
-    final override def createInterval(raw: RawNumber): Interval = new TimeInterval(raw)
-
-    final override def createPoint(raw: RawNumber): Point = Calendar.this.createMoment(raw)
+  final override def createInterval(raw: RawNumber): Interval = new TimeInterval[C](raw) { this: C#Interval =>
+    final override def numberSystem: C = Calendar.this
   }
-
-  type TimeInterval = numberSystem.TimeInterval
-
-  // TODO prefix
-  final def createInterval(raw: RawNumber): TimeInterval = numberSystem.createInterval(raw)
 
   /**
    *
@@ -99,8 +87,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
     final def months: Seq[C#Month] = (1 to lengthInMonths).map(month)
 
-    // TODO prefix
-    final def month(numberInYear: Int): Month = {
+    final def month(numberInYear: Int): C#Month = {
       require(0 < numberInYear && numberInYear <= lengthInMonths)
       Month(firstMonthNumber + numberInYear - 1)
     }
@@ -125,7 +112,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
    *
    */
   abstract class MonthCompanion extends CalendarMember[C] {
-    final def apply(number: Int): Month = createMonth(number) // TODO prefix
+    final def apply(number: Int): C#Month = createMonth(number)
 
     final def apply(year: Int, monthInYear: Int): C#Month =
       calendar.createYear(year).month(monthInYear)
@@ -156,21 +143,20 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   val Day: DayCompanion[C]
 
 
-  abstract class MomentBase(raw: RawNumber)
-    extends numberSystem.TimePoint(raw) with CalendarMember[C]
-  { this: Moment => // TODO prefix
-    final def day: C#Day = Day(days + 1)
+  abstract class MomentBase[T <: Calendar[T]](raw: RawNumber) extends TimePoint[T](raw) with CalendarMember[T]
+  { this: T#Moment =>
+    final def day: T#Day = calendar.createDay(days + 1)
 
-    final def time: TimeInterval = createInterval(false, days(0).digits) // TODO prefix
+    final def time: T#Interval = calendar.createInterval(false, days(0).digits)
   }
 
 
   val Moment: MomentCompanion[C]
 
-  final val moment: Moment = createMoment(false, List(0)) // TODO prefix
+  final val moment: C#Moment = createMoment(false, List(0))
 
-  final val interval: TimeInterval = createInterval(false, List(0)) // TODO prefix
+  final val interval: C#Interval = createInterval(false, List(0))
 
   // TODO using Day.daysPerWeek will probably break initialization too...
-  final val week: TimeInterval = interval.days(7) // TODO prefix
+  final val week: C#Interval = interval.days(7)
 }

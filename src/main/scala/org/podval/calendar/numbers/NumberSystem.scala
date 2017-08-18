@@ -5,15 +5,15 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   type Point <: PointBase[S]
 
-  final def newPoint(raw: RawNumber): Point = createPoint(normalize(raw))
+  final def newPoint(raw: RawNumber): S#Point = createPoint(normalize(raw))
 
-  def createPoint(raw: RawNumber): Point
+  def createPoint(raw: RawNumber): S#Point
 
   type Interval <: IntervalBase[S]
 
-  final def newInterval(raw: RawNumber): Interval = createInterval(normalize(raw))
+  final def newInterval(raw: RawNumber): S#Interval = createInterval(normalize(raw))
 
-  def createInterval(raw: RawNumber): Interval
+  def createInterval(raw: RawNumber): S#Interval
 
   val ranges: List[Int]
 
@@ -87,7 +87,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
 
   // TODO once this is split into a separate file, rename T to S (it is T now to avoid shadowing)
-  abstract class Number[T <: NumberSystem[T], +N <: Number[T, N]](raw: RawNumber)
+  abstract class Number[T <: NumberSystem[T], N <: T#Number[T, N]](raw: RawNumber)
     extends BasicNumber with Ordered[N]
   { this: N =>
     def numberSystem: T

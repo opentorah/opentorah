@@ -10,7 +10,7 @@ class Jewish private() extends Calendar[Jewish] {
     final override def calendar: Jewish = Jewish.this
   }
 
-  abstract class JewishYear(number: Int) extends YearBase(number) { this: Year => // TODO prefix
+  abstract class JewishYear(number: Int) extends YearBase(number) { this: Jewish#Year =>
     require(0 < number)
 
     // TODO the moment I change the type of newMoon from Moment to Jewish#Moment,
@@ -20,7 +20,7 @@ class Jewish private() extends Calendar[Jewish] {
     //   found   : Jewish.this.numberSystem.TimeInterval
     //   required: _1.numberSystem.TimeInterval where val _1: org.podval.calendar.jewish.Jewish
     // I think I need to derive Calendar from NumberSystem...
-    final def newMoon: Moment = month(1).newMoon // TODO prefix
+    final def newMoon: Jewish#Moment = month(1).newMoon
 
     final override def firstDayNumber: Int = {
       val correction =
@@ -140,11 +140,11 @@ class Jewish private() extends Calendar[Jewish] {
     final override def lengthInMonths(yearNumber: Int): Int = lengthInMonths(isLeap(yearNumber))
 
     // TODO parameterless defs aren't vals so that initialization works :)
-    final def normal: TimeInterval =
-      Month.meanLunarPeriod*lengthInMonths(isLeap = false) // TODO prefix
+    final def normal: Jewish#Interval =
+      Month.meanLunarPeriod*lengthInMonths(isLeap = false)
 
-    final def leap: TimeInterval =
-      Month.meanLunarPeriod*lengthInMonths(isLeap = true) // TODO prefix
+    final def leap: Jewish#Interval =
+      Month.meanLunarPeriod*lengthInMonths(isLeap = true)
 
     final def lengthInMonths(isLeap: Boolean): Int = if (isLeap) 13 else 12
 
@@ -157,7 +157,7 @@ class Jewish private() extends Calendar[Jewish] {
 
     final val monthsInCycle: Int = monthsBeforeYearInCycle.last
 
-    final def cycleLength: TimeInterval = Month.meanLunarPeriod * monthsInCycle // TODO prefix
+    final def cycleLength: Jewish#Interval = Month.meanLunarPeriod * monthsInCycle
 
     final def firstMonthInCycle(yearNumber: Int): Int =
       monthsBeforeYearInCycle(numberInCycle(yearNumber) - 1) + 1
@@ -174,15 +174,14 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Month = JewishMonth
 
-  final override def createMonth(number: Int): Month = // TODO prefix
+  final override def createMonth(number: Int): Jewish#Month =
     new JewishMonth(number) with JewishCalendarMember
 
   abstract class JewishMonth(number: Int) extends MonthBase[Jewish](number) { this: Jewish#Month =>
     // TODO before I can split this out, I need to change return type of the next method to C#Moment;
     // that leads to compilation errors for the 3 corrections - and so do the attempts to
     // split out Calendar.Year etc...
-    // TODO prefix
-    final def newMoon: Moment = Month.firstNewMoon + Month.meanLunarPeriod*(number-1)
+    final def newMoon: Jewish#Moment = Month.firstNewMoon + Month.meanLunarPeriod*(number-1)
   }
 
 
@@ -230,16 +229,18 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override val Day: JewishDayCompanion = new JewishDayCompanion with JewishCalendarMember
 
-  abstract class JewishMoment(raw: RawNumber) extends MomentBase(raw) {
-    final def nightHours(value: Int): Moment = firstHalfHours(value) // TODO prefix
+  abstract class JewishMoment(raw: RawNumber) extends MomentBase[Jewish](raw) {
+    final def nightHours(value: Int): Jewish#Moment = firstHalfHours(value)
 
-    final def dayHours(value: Int): Moment = secondHalfHours(value) // TODO prefix
+    final def dayHours(value: Int): Jewish#Moment = secondHalfHours(value)
   }
 
   final override type Moment = JewishMoment
 
-  final override def createMoment(raw: RawNumber): Moment = // TODO prefix
-    new JewishMoment(raw) with JewishCalendarMember
+  final override def createMoment(raw: RawNumber): Jewish#Moment =
+    new JewishMoment(raw) with JewishCalendarMember {
+      final override def numberSystem:  Jewish = Jewish.this
+    }
 
   final override val Moment: JewishMomentCompanion =
     new JewishMomentCompanion with JewishCalendarMember
