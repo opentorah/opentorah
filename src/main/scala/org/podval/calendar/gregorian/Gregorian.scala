@@ -27,7 +27,7 @@ class Gregorian private() extends Calendar[Gregorian] {
   final override val Year: GregorianYearCompanion =
     new GregorianYearCompanion with GregorianCalendarMember
 
-  abstract class GregorianYearCompanion extends YearCompanion {
+  abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
     protected final override def characters: Seq[Gregorian#YearCharacter] =
       Seq(true, false)
 

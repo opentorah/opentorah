@@ -86,7 +86,7 @@ class Jewish private() extends Calendar[Jewish] {
   final override val Year: JewishYearCompanion =
     new JewishYearCompanion with JewishCalendarMember
 
-  abstract class JewishYearCompanion extends YearCompanion {
+  abstract class JewishYearCompanion extends YearCompanion[Jewish] {
     protected final override def characters: Seq[YearCharacter] =
       for (isLeap <- Seq(true, false); kind <- YearKind.values) yield (isLeap, kind)
 
