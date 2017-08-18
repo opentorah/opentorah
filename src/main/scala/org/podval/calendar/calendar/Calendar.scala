@@ -1,6 +1,7 @@
 package org.podval.calendar.calendar
 
 import org.podval.calendar.numbers.NumberSystem.RawNumber
+import org.podval.calendar.time.{TimeInterval, TimeNumberSystem, TimePoint}
 import org.podval.calendar.util.Numbered
 
 trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
@@ -24,17 +25,6 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
   // TODO make this a Enum - and use its `values()` method in DayCompanion.name
   //   (which will then become `final`)?
   type DayName
-
-  // When Calendar inherits from TimeNumberSystem, I get an error in Sun.scala:
-  //   overloaded method value - with alternatives:
-  //   ((that: _1.JewishMoment)_1.TimeInterval) forSome { val _1: org.podval.calendar.jewish.Jewish } <and>
-  //   ((that: _1.TimeInterval)_1.JewishMoment) forSome { val _1: org.podval.calendar.jewish.Jewish }
-  //   cannot be applied to (org.podval.calendar.jewish.Jewish.Interval)
-  //   val firstTkufasNissan = Year(1).month(MonthName.Nisan).newMoon - interval.days(7).hours(9).parts(642)  // KH 9:3
-  //
-  // Even if I replace abstract types Moment with Point and TimeInterval with Interval,
-  // the error persists. I may still have to unify the abstract types, since `type A = B`
-  // doesn't help, but there is a different reason for the error...
 
   type Moment <: MomentBase[C]
   final override type Point = Moment
