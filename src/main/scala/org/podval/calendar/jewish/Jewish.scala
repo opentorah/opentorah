@@ -10,7 +10,7 @@ class Jewish private() extends Calendar[Jewish] {
     final override def calendar: Jewish = Jewish.this
   }
 
-  abstract class JewishYear(number: Int) extends YearBase(number) { this: Year =>
+  abstract class JewishYear(number: Int) extends YearBase(number) { this: Year => // TODO prefix
     require(0 < number)
 
     // TODO the moment I change the type of newMoon from Moment to Jewish#Moment,
@@ -20,7 +20,7 @@ class Jewish private() extends Calendar[Jewish] {
     //   found   : Jewish.this.numberSystem.TimeInterval
     //   required: _1.numberSystem.TimeInterval where val _1: org.podval.calendar.jewish.Jewish
     // I think I need to derive Calendar from NumberSystem...
-    final def newMoon: Moment = month(1).newMoon
+    final def newMoon: Moment = month(1).newMoon // TODO prefix
 
     final override def firstDayNumber: Int = {
       val correction =
@@ -55,7 +55,7 @@ class Jewish private() extends Calendar[Jewish] {
 
     final def numberInCycle: Int = Year.numberInCycle(number)
 
-    final override def character: YearCharacter = (isLeap, kind)
+    final override def character: YearCharacter = (isLeap, kind) // TODO prefix
 
     // KH 8:7,8
     final def kind: YearKind = {
@@ -73,7 +73,7 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Year = JewishYear
 
-  final override def createYear(number: Int): Year =
+  final override def createYear(number: Int): Year = // TODO prefix
     new JewishYear(number) with JewishCalendarMember
 
   final type YearKind = JewishYearKind
@@ -140,9 +140,9 @@ class Jewish private() extends Calendar[Jewish] {
     final override def lengthInMonths(yearNumber: Int): Int = lengthInMonths(isLeap(yearNumber))
 
     // TODO parameterless defs aren't vals so that initialization works :)
-    final def normal: TimeInterval = Month.meanLunarPeriod*lengthInMonths(isLeap = false)
+    final def normal: TimeInterval = Month.meanLunarPeriod*lengthInMonths(isLeap = false) // TODO prefix
 
-    final def leap: TimeInterval = Month.meanLunarPeriod*lengthInMonths(isLeap = true)
+    final def leap: TimeInterval = Month.meanLunarPeriod*lengthInMonths(isLeap = true) // TODO prefix
 
     final def lengthInMonths(isLeap: Boolean): Int = if (isLeap) 13 else 12
 
@@ -155,7 +155,7 @@ class Jewish private() extends Calendar[Jewish] {
 
     final val monthsInCycle: Int = monthsBeforeYearInCycle.last
 
-    final def cycleLength: TimeInterval = Month.meanLunarPeriod * monthsInCycle
+    final def cycleLength: TimeInterval = Month.meanLunarPeriod * monthsInCycle // TODO prefix
 
     final def firstMonthInCycle(yearNumber: Int): Int =
       monthsBeforeYearInCycle(numberInCycle(yearNumber) - 1) + 1
@@ -172,12 +172,14 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Month = JewishMonth
 
-  final override def createMonth(number: Int): Month = new JewishMonth(number) with JewishCalendarMember
+  final override def createMonth(number: Int): Month = // TODO prefix
+    new JewishMonth(number) with JewishCalendarMember
 
   abstract class JewishMonth(number: Int) extends MonthBase[Jewish](number) { this: Jewish#Month =>
     // TODO before I can split this out, I need to change return type of the next method to C#Moment;
     // that leads to compilation errors for the 3 corrections - and so do the attempts to
     // split out Calendar.Year etc...
+    // TODO prefix
     final def newMoon: Moment = Month.firstNewMoon + Month.meanLunarPeriod*(number-1)
   }
 
@@ -216,7 +218,8 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Day = JewishDay
 
-  final override def createDay(number: Int): Day = new JewishDay(number) with JewishCalendarMember
+  final override def createDay(number: Int): Day = // TODO prefix
+    new JewishDay(number) with JewishCalendarMember
 
   final override type DayName = JewishDayName
 
@@ -226,14 +229,14 @@ class Jewish private() extends Calendar[Jewish] {
   final override val Day: JewishDayCompanion = new JewishDayCompanion with JewishCalendarMember
 
   abstract class JewishMoment(raw: RawNumber) extends MomentBase(raw) {
-    final def nightHours(value: Int): Moment = firstHalfHours(value)
+    final def nightHours(value: Int): Moment = firstHalfHours(value) // TODO prefix
 
-    final def dayHours(value: Int): Moment = secondHalfHours(value)
+    final def dayHours(value: Int): Moment = secondHalfHours(value) // TODO prefix
   }
 
   final override type Moment = JewishMoment
 
-  final override def createMoment(raw: RawNumber): Moment =
+  final override def createMoment(raw: RawNumber): Moment = // TODO prefix
     new JewishMoment(raw) with JewishCalendarMember
 
   final override val Moment: JewishMomentCompanion =

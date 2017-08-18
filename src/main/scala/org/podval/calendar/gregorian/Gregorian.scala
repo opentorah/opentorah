@@ -68,19 +68,19 @@ class Gregorian private() extends Calendar[Gregorian] {
   abstract class GregorianMoment(raw: RawNumber)
     extends MomentBase(raw) with GregorianCalendarMember
       // TODO prefix with C# when feasible...
-  { this: Moment =>
-    final def morningHours(value: Int): Moment = firstHalfHours(value)
+  { this: Moment => // TODO prefix
+    final def morningHours(value: Int): Moment = firstHalfHours(value) // TODO prefix
 
-    final def afternoonHours(value: Int): Moment = secondHalfHours(value)
+    final def afternoonHours(value: Int): Moment = secondHalfHours(value) // TODO prefix
   }
 
 
   final override type Moment = GregorianMoment
 
-  final override def createMoment(raw: RawNumber): Moment =
+  final override def createMoment(raw: RawNumber): Moment = // TODO prefix
     new GregorianMoment(raw) with GregorianCalendarMember
 
-  final override val Moment: GregorianMomentCompanion =
+  final override val Moment: GregorianMomentCompanion = // TODO prefix
     new GregorianMomentCompanion with GregorianCalendarMember
 }
 

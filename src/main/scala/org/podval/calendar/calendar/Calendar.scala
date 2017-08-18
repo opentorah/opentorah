@@ -15,7 +15,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   type MonthName
 
-  def createMonth(number: Int): Month
+  def createMonth(number: Int): Month // TODO prefix
 
   type Day <: DayBase[C]
 
@@ -25,9 +25,20 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   //   (which will then become `final`)?
   type DayName
 
+  // When Calendar inherits from TimeNumberSystem, I get an error in Sun.scala:
+  //   overloaded method value - with alternatives:
+  //   ((that: _1.JewishMoment)_1.TimeInterval) forSome { val _1: org.podval.calendar.jewish.Jewish } <and>
+  //   ((that: _1.TimeInterval)_1.JewishMoment) forSome { val _1: org.podval.calendar.jewish.Jewish }
+  //   cannot be applied to (org.podval.calendar.jewish.Jewish.Interval)
+  //   val firstTkufasNissan = Year(1).month(MonthName.Nisan).newMoon - interval.days(7).hours(9).parts(642)  // KH 9:3
+  //
+  // Even if I replace abstract types Moment with Point and TimeInterval with Interval,
+  // the error persists. I may still have to unify the abstract types, since `type A = B`
+  // doesn't help, but there is a different reason for the error...
+
   type Moment <: MomentBase
 
-  def createMoment(raw: RawNumber): Moment
+  def createMoment(raw: RawNumber): Moment // TODO prefix
 
   object numberSystem extends TimeNumberSystem {
     final override type Point = Moment
@@ -40,6 +51,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   type TimeInterval = numberSystem.TimeInterval
 
+  // TODO prefix
   final def createInterval(raw: RawNumber): TimeInterval = numberSystem.createInterval(raw)
 
   /**
@@ -81,7 +93,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
     final def months: Seq[C#Month] = (1 to lengthInMonths).map(month)
 
-    // TODO the last to prefix with C#, but newMoon issue resists...
+    // TODO prefix
     final def month(numberInYear: Int): Month = {
       require(0 < numberInYear && numberInYear <= lengthInMonths)
       Month(firstMonthNumber + numberInYear - 1)
@@ -107,7 +119,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
    *
    */
   abstract class MonthCompanion extends CalendarMember[C] {
-    final def apply(number: Int): Month = createMonth(number)
+    final def apply(number: Int): Month = createMonth(number) // TODO prefix
 
     final def apply(year: Int, monthInYear: Int): C#Month =
       calendar.createYear(year).month(monthInYear)
@@ -140,19 +152,19 @@ trait Calendar[C <: Calendar[C]] { this: C =>
 
   abstract class MomentBase(raw: RawNumber)
     extends numberSystem.TimePoint(raw) with CalendarMember[C]
-  { this: Moment =>
+  { this: Moment => // TODO prefix
     final def day: C#Day = Day(days + 1)
 
-    final def time: TimeInterval = createInterval(false, days(0).digits)
+    final def time: TimeInterval = createInterval(false, days(0).digits) // TODO prefix
   }
 
 
   val Moment: MomentCompanion[C]
 
-  final val moment: Moment = createMoment(false, List(0))
+  final val moment: Moment = createMoment(false, List(0)) // TODO prefix
 
-  final val interval: TimeInterval = createInterval(false, List(0))
+  final val interval: TimeInterval = createInterval(false, List(0)) // TODO prefix
 
   // TODO using Day.daysPerWeek will probably break initialization too...
-  final val week: TimeInterval = interval.days(7)
+  final val week: TimeInterval = interval.days(7) // TODO prefix
 }
