@@ -2,11 +2,7 @@ package org.podval.calendar.time
 
 import org.podval.calendar.numbers.Number
 
-// TODO when this and Number are inside their familty type (and not split):
-// if N <: TimeNumber[T, N], I get compiler error;
-// if I change it to T#TimeNumber[T, N] - which is what I want,
-//  and which I did in Number - I get compiler crash!!!
-trait TimeNumber[T <: TimeNumberSystem[T], N <: TimeNumber[T, N]] extends Number[T, N] { this: N =>
+trait TimeNumber[S <: TimeNumberSystem[S], N <: TimeNumber[S, N]] extends Number[S, N] { this: N =>
   private[this] def hoursPerHalfDay = numberSystem.hoursPerHalfDay
   private[this] def partsPerMinute = numberSystem.partsPerMinute
 
