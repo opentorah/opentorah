@@ -187,15 +187,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   }
 
 
-  /**
-   *
-   */
-  abstract class MomentCompanion extends CalendarMember[C] {
-    final def apply(raw: RawNumber): C#Moment = calendar.createMoment(raw)
-  }
-
-
-  val Moment: MomentCompanion
+  val Moment: MomentCompanion[C]
 
   // TODO if this calls Moment.apply(), it needs to (?) be a def or else initialization fails...
   final val moment: Moment = createMoment(false, List(0))

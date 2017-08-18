@@ -231,7 +231,7 @@ class Jewish private() extends Calendar[Jewish] {
   final override def createMoment(raw: RawNumber): Moment =
     new JewishMoment(raw) with JewishCalendarMember
 
-  abstract class JewishMomentCompanion extends MomentCompanion
+  abstract class JewishMomentCompanion extends MomentCompanion[Jewish]
 
   final override val Moment: JewishMomentCompanion =
     new JewishMomentCompanion with JewishCalendarMember

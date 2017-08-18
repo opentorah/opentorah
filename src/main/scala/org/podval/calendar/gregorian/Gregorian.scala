@@ -123,7 +123,7 @@ class Gregorian private() extends Calendar[Gregorian] {
   final override def createMoment(raw: RawNumber): Moment =
     new GregorianMoment(raw) with GregorianCalendarMember
 
-  abstract class GregorianMomentCompanion extends MomentCompanion
+  abstract class GregorianMomentCompanion extends MomentCompanion[Gregorian]
 
   final override val Moment: GregorianMomentCompanion =
     new GregorianMomentCompanion with GregorianCalendarMember
