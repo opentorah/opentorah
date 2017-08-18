@@ -33,13 +33,15 @@ final class NewMoonTest extends FlatSpec {
 
 
 
-  private def newMoon(moladYear: Int, moladMonth: Jewish.MonthName, dayOfWeek: Jewish.DayName,
-              year: Int, month: Jewish.MonthName, day: Int,
-              yearG: Int, monthG: Gregorian.MonthName, dayG: Int,
-              hours: Int, minutes: Int, parts: Int)
+  private def newMoon(
+    moladYear: Int, moladMonth: Jewish.MonthName, dayOfWeek: Jewish.DayName,
+    year: Int, month: Jewish.MonthName, day: Int,
+    yearG: Int, monthG: Gregorian.MonthName, dayG: Int,
+    hours: Int, minutes: Int, parts: Int)
   {
     val dayJ = Jewish.Day(year, month, day)
-    val dateG = Gregorian.Day(yearG, monthG, dayG).toMoment.hours(hours).minutes(minutes).partsWithoutMinutes(parts)
+    val dateG = Gregorian.Day(yearG, monthG, dayG).toMoment.
+      hours(hours).minutes(minutes).partsWithoutMinutes(parts)
     val molad = Jewish.Year(moladYear).month(moladMonth).newMoon
 
     assertResult(dayOfWeek)(molad.day.name)
