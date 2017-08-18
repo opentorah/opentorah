@@ -66,8 +66,8 @@ class Gregorian private() extends Calendar[Gregorian] {
 
 
   abstract class GregorianMoment(raw: RawNumber)
-    extends MomentBase[Gregorian](raw) with GregorianCalendarMember
-  { // this: Gregorian#Moment =>  TODO prefix
+    extends MomentBase[Gregorian](raw)
+  { this: Gregorian#Moment =>
     final def morningHours(value: Int): Gregorian#Moment = firstHalfHours(value)
 
     final def afternoonHours(value: Int): Gregorian#Moment = secondHalfHours(value)
