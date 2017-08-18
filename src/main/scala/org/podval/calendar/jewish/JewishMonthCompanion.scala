@@ -3,6 +3,8 @@ package org.podval.calendar.jewish
 import org.podval.calendar.calendar.MonthCompanion
 
 abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
+  final val Name: JewishMonthName.type = JewishMonthName
+
   // KH 6:3
   // TODO how is this really called? tropical?
   final val meanLunarPeriod = calendar.interval.days(29).hours(12).parts(793)

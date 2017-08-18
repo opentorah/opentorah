@@ -6,7 +6,7 @@ package org.podval.calendar.dates
 // TODO angular speed of the moon = 360 / (1/tropical month + 1/solar year)
 object Sun {
   import org.podval.calendar.jewish.Jewish
-  import Jewish.{interval, Year, MonthName, Interval, Moment}
+  import Jewish.{interval, Year, Month, Interval, Moment}
 
   val yearOfShmuel: Interval = interval.days(365).hours(6)
 
@@ -14,7 +14,7 @@ object Sun {
 
   // KH 9:3
   val firstTkufasNissan: Moment =
-    Year(1).month(MonthName.Nisan).newMoon - interval.days(7).hours(9).parts(642)  // KH 9:3
+    Year(1).month(Month.Name.Nisan).newMoon - interval.days(7).hours(9).parts(642)  // KH 9:3
 
   // Sun enters Teleh  KH 9:3
   //  def tkufasNissan(year: Int) = firstTkufasNissan + yearOfRavAda * (year-1)

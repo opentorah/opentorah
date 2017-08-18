@@ -1,6 +1,6 @@
 package org.podval.calendar.dates
 
-import org.podval.calendar.jewish.Jewish.{Year, MonthName, Month, Day}
+import org.podval.calendar.jewish.Jewish.{Year, Month, Day}
 
 
 /**
@@ -10,7 +10,7 @@ object Rambam {
 
   val numberOfLessons: Int = 339
 
-  val firstLessonDay: Int = Year(5775).month(MonthName.Kislev).day(23).number
+  val firstLessonDay: Int = Year(5775).month(Month.Name.Kislev).day(23).number
 
   def lessonForDay(day: Day): Int = {
     val distance = day.number - firstLessonDay + 50*numberOfLessons // % misbehaves on negatives :)

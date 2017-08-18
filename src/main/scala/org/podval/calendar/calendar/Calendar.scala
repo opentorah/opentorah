@@ -21,11 +21,13 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   type MonthNameAndLength = MonthNameAndLengthBase[C]
 
+  // TODO scope inside MonthCompanion
   final def createMonthNameAndLength(name: C#MonthName, length: Int):
   C#MonthNameAndLength = new MonthNameAndLengthBase(name, length)
 
   type MonthDescriptor = MonthDescriptorBase[C]
 
+  // TODO scope inside MonthCompanion
   final def createMonthDescriptor(name: C#MonthName, length: Int, daysBefore: Int):
   C#MonthDescriptor = new MonthDescriptorBase(name, length, daysBefore)
 

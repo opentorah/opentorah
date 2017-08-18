@@ -32,9 +32,6 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type MonthName = JewishMonthName
 
-  // TODO stick it into the Month companion???
-  final val MonthName: JewishMonthName.type = JewishMonthName
-
   final override val Month: JewishMonthCompanion =
     new JewishMonthCompanion with JewishCalendarMember
 
@@ -44,9 +41,6 @@ class Jewish private() extends Calendar[Jewish] {
     new JewishDay(number) with JewishCalendarMember
 
   final override type DayName = JewishDayName
-
-  // TODO stick it into the Day companion???
-  val DayName: JewishDayName.type = JewishDayName
 
   final override val Day: JewishDayCompanion = new JewishDayCompanion with JewishCalendarMember
 

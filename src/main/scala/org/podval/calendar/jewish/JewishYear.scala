@@ -27,14 +27,14 @@ abstract class JewishYear(number: Int) extends YearBase[Jewish](number) { this: 
     isFirstCorrected && calendar.Year.isAdu(newMoon.day.next)
 
   final def isSecondCorrected: Boolean = !isAduCorrected && !isFirstCorrected &&
-    (newMoon.day.name == calendar.DayName.Shlishi) &&
+    (newMoon.day.name == calendar.Day.Name.Shlishi) &&
     (newMoon.time >= calendar.Year.secondCorrection) &&
     !this.isLeap
 
   // This is not defined for yer 0 - and doesn't apply :)
   final def isThirdCorrected: Boolean = !isAduCorrected && !isFirstCorrected &&
     !isSecondCorrected &&
-    (newMoon.day.name == calendar.DayName.Sheni) &&
+    (newMoon.day.name == calendar.Day.Name.Sheni) &&
     (newMoon.time >= calendar.Year.thirdCorrection) &&
     this.prev.isLeap
 

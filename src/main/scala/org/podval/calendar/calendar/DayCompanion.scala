@@ -4,6 +4,8 @@ package org.podval.calendar.calendar
   *
   */
 abstract class DayCompanion[C <: Calendar[C]] extends CalendarMember[C] {
+  // TODO is this possible: val Name: C#DayName?
+
   val daysPerWeek: Int = 7
 
   def names: Seq[C#DayName]

@@ -12,7 +12,7 @@ abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
     def create(name: Gregorian#MonthName, length: Int): Gregorian#MonthNameAndLength =
       calendar.createMonthNameAndLength(name, length)
 
-    import Gregorian.MonthName._
+    import Gregorian.Month.Name._
     List(
       create(January  , 31),
       create(February , if (isLeap) 29 else 28),

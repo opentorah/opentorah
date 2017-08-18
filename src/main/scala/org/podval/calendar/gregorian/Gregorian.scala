@@ -26,9 +26,6 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type MonthName = GregorianMonthName
 
-  // TODO stick it into the Month companion???
-  val MonthName: GregorianMonthName.type = GregorianMonthName
-
   final override val Month: GregorianMonthCompanion =
     new GregorianMonthCompanion with GregorianCalendarMember
 
@@ -38,9 +35,6 @@ class Gregorian private() extends Calendar[Gregorian] {
     new GregorianDay(number) with GregorianCalendarMember
 
   final override type DayName = GregorianDayName
-
-  // TODO stick it into the Day companion???
-  final val DayName: GregorianDayName.type = GregorianDayName
 
   final override val Day: GregorianDayCompanion =
     new GregorianDayCompanion with GregorianCalendarMember
