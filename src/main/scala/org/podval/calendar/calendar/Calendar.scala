@@ -166,12 +166,12 @@ trait Calendar[C <: Calendar[C]] { this: C =>
   }
 
 
-  final case class MonthNameAndLength(name: MonthName, length: Int)
+  final case class MonthNameAndLength(name: C#MonthName, length: Int)
 
 
-  final class MonthDescriptor(val name: MonthName, val length: Int, val daysBefore: Int)
+  final class MonthDescriptor(val name: C#MonthName, val length: Int, val daysBefore: Int)
 
-  final def createMonthDescriptor(name: MonthName, length: Int, daysBefore: Int): C#MonthDescriptor =
+  final def createMonthDescriptor(name: C#MonthName, length: Int, daysBefore: Int): C#MonthDescriptor =
     new MonthDescriptor(name, length, daysBefore)
 
   val Month: MonthCompanion
