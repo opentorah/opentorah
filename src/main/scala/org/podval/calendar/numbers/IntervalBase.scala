@@ -2,18 +2,20 @@ package org.podval.calendar.numbers
 
 import org.podval.calendar.numbers.NumberSystem.RawNumber
 
-abstract class IntervalBase[T <: NumberSystem[T]](raw: RawNumber) extends Number[T, T#Interval](raw) { this: T#Interval =>
-  protected final override def newN(raw: RawNumber): T#Interval =  newInterval(raw)
+abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
+  extends Number[S, S#Interval](raw)
+{ this: S#Interval =>
+  protected final override def newN(raw: RawNumber): S#Interval =  newInterval(raw)
 
-  final def +(that: T#Interval): T#Interval = newInterval(plusMinus(operationNegation = false, that))
+  final def +(that: S#Interval): S#Interval = newInterval(add(negate = false, that))
 
-  final def -(that: T#Interval): T#Interval = newInterval(plusMinus(operationNegation = true, that))
+  final def -(that: S#Interval): S#Interval = newInterval(add(negate = true, that))
 
-  final def +(that: T#Point): T#Point = newPoint(plusMinus(operationNegation = false, that))
+  final def +(that: S#Point): S#Point = newPoint(add(negate = false, that))
 
-  final def *(n: Int): T#Interval = newInterval(negative, digits map (n * _))
+  final def *(n: Int): S#Interval = newInterval(negative, digits map (n * _))
 
-  final def /(n: Int): T#Interval = {
+  final def /(n: Int): S#Interval = {
     def step(acc: (List[Int], Int), elem: (Int, Int)) = {
       val (digit, range) = elem
       val (result, carry) = acc
@@ -32,16 +34,17 @@ abstract class IntervalBase[T <: NumberSystem[T]](raw: RawNumber) extends Number
       if (roundUp) quotient+1 else quotient
     }
 
-    val digits = this.digits.padTo(maxLength+1, 0)
-    val (newDigits, lastCarry) = (digits.init zip (0 :: ranges.init)).foldLeft(List.empty[Int], 0)(step)
-    val lastDigit = lastStep(digits.last, lastCarry, ranges.last)
+    val digits = this.digits.padTo(numberSystem.maxLength + 1, 0)
+    val (newDigits, lastCarry) = (digits.init zip (0 :: numberSystem.ranges.init)).
+      foldLeft(List.empty[Int], 0)(step)
+    val lastDigit = lastStep(digits.last, lastCarry, numberSystem.ranges.last)
 
     newInterval(negative, newDigits :+ lastDigit)
   }
 
-  final def %(n: Int): T#Interval = this - ((this / n) * n)
+  final def %(n: Int): S#Interval = this - ((this / n) * n)
 
-  final def /(that: T#Interval): Int = {
+  final def /(that: S#Interval): Int = {
     // TODO deal with negativity
     // TODO faster?
     var result = 0
@@ -57,17 +60,17 @@ abstract class IntervalBase[T <: NumberSystem[T]](raw: RawNumber) extends Number
     result
   }
 
-  final def %(that: T#Interval): T#Interval = this - (that * (this / that))
+  final def %(that: S#Interval): S#Interval = this - (that * (this / that))
 
-  // TODO add multiplication (and division, and reminder) on the ScalarNumber from another NumberSystem!
-  // How to formulate the type of "Number from some NumberSystem"?
+  // TODO add multiplication (and division, and %) on the ScalarNumber from another NumberSystem!
 
-  final def digitsWithRangesForMultiplication: List[(Int, Int)] = digits zip (1 :: ranges)
+  final def digitsWithRangesForMultiplication: List[(Int, Int)] =
+    digits zip (1 :: numberSystem.ranges)
 
-  final def *[X <: NumberSystem[X]](that: X#Interval): T#Interval = {
+  final def *[T <: NumberSystem[T]](that: T#Interval): S#Interval = {
     val z = newInterval(false, List(0))
 
-    def step(elem: (Int, Int), acc: T#Interval): T#Interval = {
+    def step(elem: (Int, Int), acc: S#Interval): S#Interval = {
       val (digit, range) = elem
       (acc + this*digit)/range
     }
