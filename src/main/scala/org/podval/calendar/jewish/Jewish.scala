@@ -55,7 +55,7 @@ class Jewish private() extends Calendar[Jewish] {
 
     final def numberInCycle: Int = Year.numberInCycle(number)
 
-    final override def character: YearCharacter = (isLeap, kind) // TODO prefix
+    final override def character: Jewish#YearCharacter = (isLeap, kind)
 
     // KH 8:7,8
     final def kind: YearKind = {
@@ -73,7 +73,7 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Year = JewishYear
 
-  final override def createYear(number: Int): Year = // TODO prefix
+  final override def createYear(number: Int): Jewish#Year =
     new JewishYear(number) with JewishCalendarMember
 
   final type YearKind = JewishYearKind
@@ -140,9 +140,11 @@ class Jewish private() extends Calendar[Jewish] {
     final override def lengthInMonths(yearNumber: Int): Int = lengthInMonths(isLeap(yearNumber))
 
     // TODO parameterless defs aren't vals so that initialization works :)
-    final def normal: TimeInterval = Month.meanLunarPeriod*lengthInMonths(isLeap = false) // TODO prefix
+    final def normal: TimeInterval =
+      Month.meanLunarPeriod*lengthInMonths(isLeap = false) // TODO prefix
 
-    final def leap: TimeInterval = Month.meanLunarPeriod*lengthInMonths(isLeap = true) // TODO prefix
+    final def leap: TimeInterval =
+      Month.meanLunarPeriod*lengthInMonths(isLeap = true) // TODO prefix
 
     final def lengthInMonths(isLeap: Boolean): Int = if (isLeap) 13 else 12
 
@@ -218,7 +220,7 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Day = JewishDay
 
-  final override def createDay(number: Int): Day = // TODO prefix
+  final override def createDay(number: Int): Jewish#Day =
     new JewishDay(number) with JewishCalendarMember
 
   final override type DayName = JewishDayName
