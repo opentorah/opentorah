@@ -132,7 +132,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
       }
     }
 
-    protected def monthNamesAndLengths(character: C#YearCharacter): List[MonthNameAndLength]
+    protected def monthNamesAndLengths(character: C#YearCharacter): List[C#MonthNameAndLength]
 
     protected def areYearsPositive: Boolean
 
