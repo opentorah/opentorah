@@ -105,7 +105,7 @@ trait Calendar[C <: Calendar[C]] { this: C =>
    *
    */
   abstract class YearCompanion extends CalendarMember[C] {
-    final def apply(number: Int): C#Year = createYear(number)
+    final def apply(number: Int): C#Year = calendar.createYear(number)
 
     final def apply(month: C#Month): C#Year =
       // TODO possibly initialization-breaking call
