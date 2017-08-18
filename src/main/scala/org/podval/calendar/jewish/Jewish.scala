@@ -87,22 +87,22 @@ class Jewish private() extends Calendar[Jewish] {
     new JewishYearCompanion with JewishCalendarMember
 
   abstract class JewishYearCompanion extends YearCompanion[Jewish] {
-    protected final override def characters: Seq[YearCharacter] =
+    protected final override def characters: Seq[Jewish#YearCharacter] =
       for (isLeap <- Seq(true, false); kind <- YearKind.values) yield (isLeap, kind)
 
     // KH 8:5-6
-    protected final override def monthNamesAndLengths(character: YearCharacter):
+    protected final override def monthNamesAndLengths(character: Jewish#YearCharacter):
       List[Jewish#MonthNameAndLength] =
     {
       def create(name: Jewish#MonthName, length: Int): Jewish#MonthNameAndLength =
         calendar.createMonthNameAndLength(name, length)
 
       import Jewish.MonthName._
-      character match { case (isLeap: Boolean, kind: YearKind) =>
+      character match { case (isLeap: Boolean, kind: Jewish#YearKind) =>
         List(
           create(Tishrei   , 30),
-          create(Marheshvan, if (kind == YearKind.Full) 30 else 29),
-          create(Kislev    , if (kind == YearKind.Short) 29 else 30),
+          create(Marheshvan, if (kind == Jewish.YearKind.Full) 30 else 29),
+          create(Kislev    , if (kind == Jewish.YearKind.Short) 29 else 30),
           create(Teves     , 29),
           create(Shvat     , 30)
         ) ++
@@ -121,7 +121,8 @@ class Jewish private() extends Calendar[Jewish] {
       }
     }
 
-    private val adu: Set[Jewish#DayName] = Set(DayName.Rishon, DayName.Rvii, DayName.Shishi)
+    private val adu: Set[Jewish#DayName] =
+      Set(Jewish.DayName.Rishon, Jewish.DayName.Rvii, Jewish.DayName.Shishi)
 
     final def isAdu(day: Jewish#Day): Boolean = adu.contains(day.name)
 
