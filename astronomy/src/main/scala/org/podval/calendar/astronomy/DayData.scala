@@ -1,7 +1,7 @@
 package org.podval.calendar.astronomy
 
 import angle.AngleNumberSystem.Angle
-import org.podval.calendar.astronomy.angle.Angle
+import org.podval.calendar.astronomy.angle.AngleNumberSystem.Angle
 
 
 /*

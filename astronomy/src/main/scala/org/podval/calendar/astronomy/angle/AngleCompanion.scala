@@ -1,5 +1,7 @@
 package org.podval.calendar.astronomy.angle
 
+import AngleNumberSystem.Angle
+
 class AngleCompanion {
   final def apply(digits: Int*): Angle = apply(negative = false, digits.toList)
 

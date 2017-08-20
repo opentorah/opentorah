@@ -17,7 +17,9 @@ class AngleNumberSystem extends {
   final override val headRange: Int = 360
 
 } with RangedHeadDigitNumberSystem[AngleNumberSystem] {
-  final override type Interval = Angle
+  final override type Interval = AngleBase
+
+  final type Angle = Interval
 
   final override def createInterval(raw: RawNumber): Angle = new Angle(raw) {
     final override def numberSystem: AngleNumberSystem = AngleNumberSystem.this
@@ -25,7 +27,9 @@ class AngleNumberSystem extends {
 
   final object Angle extends AngleCompanion
 
-  final override type Point = AnglePoint
+  final override type Point = AnglePointBase
+
+  final type AnglePoint = Point
 
   final override def createPoint(raw: RawNumber): AnglePoint = new AnglePoint(raw) {
     final override def numberSystem: AngleNumberSystem = AngleNumberSystem.this
