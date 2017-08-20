@@ -1,8 +1,8 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.calendar.MonthBase
+import Jewish.{Month, Moment}
 
-abstract class JewishMonth(number: Int) extends MonthBase[Jewish](number) { this: Jewish.Month =>
-  final def newMoon: Jewish.Moment =
-    calendar.Month.firstNewMoon + calendar.Month.meanLunarPeriod*(number-1)
+abstract class JewishMonth(number: Int) extends MonthBase[Jewish](number) {
+  final def newMoon: Moment = Month.firstNewMoon + Month.meanLunarPeriod*(number-1)
 }

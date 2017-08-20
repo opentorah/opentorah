@@ -1,6 +1,6 @@
 package org.podval.calendar.jewish
 
-import org.podval.calendar.calendar._
+import org.podval.calendar.calendar.{Calendar, CalendarMember}
 import org.podval.calendar.numbers.NumberSystem.RawNumber
 
 // TODO add a check that length of the year and total length of the months are the same
@@ -12,7 +12,7 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Year = JewishYear
 
-  final override def createYear(number: Int): Jewish.Year =
+  final override def createYear(number: Int): Year =
     new JewishYear(number) with JewishCalendarMember
 
   final override type YearCharacter = (Boolean, Year.Kind)
@@ -21,17 +21,16 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Month = JewishMonth
 
-  final override def createMonth(number: Int): Jewish.Month =
+  final override def createMonth(number: Int): Month =
     new JewishMonth(number) with JewishCalendarMember
 
-  // TODO eliminate
   final override type MonthName = Month.Name
 
   final override object Month extends JewishMonthCompanion with JewishCalendarMember
 
   final override type Day = JewishDay
 
-  final override def createDay(number: Int): Jewish.Day =
+  final override def createDay(number: Int): Day =
     new JewishDay(number) with JewishCalendarMember
 
   final override type DayName = Day.Name
@@ -40,7 +39,7 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Moment = JewishMoment
 
-  final override def createMoment(raw: RawNumber): Jewish.Moment =
+  final override def createMoment(raw: RawNumber): Moment =
     new JewishMoment(raw) with JewishCalendarMember {
       final override def numberSystem:  Jewish = Jewish.this
     }
