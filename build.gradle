@@ -28,6 +28,8 @@ allprojects {
 def scalaVersion      = '2.12.3'
 def scalaVersionMajor = '2.12'
 
+// TODO default dependencies for all projects?
+
 ext.lib = [
   zinc      : 'com.typesafe.zinc:zinc:0.3.13',
   scala     : "org.scala-lang:scala-library:$scalaVersion",
@@ -114,6 +116,20 @@ project(':astronomy') {
   dependencies {
     zinc lib.zinc
     compile lib.scala, project(':numbers'), project(':dates')
+    testImplementation lib.junit, lib.scalaTest
+  }
+
+  test {
+    testLogging { showStandardStreams = true }
+  }
+}
+
+project(':ical') {
+  apply plugin: 'scala'
+
+  dependencies {
+    zinc lib.zinc
+    compile lib.scala, project(':dates')
     testImplementation lib.junit, lib.scalaTest
   }
 
