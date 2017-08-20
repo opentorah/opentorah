@@ -1,7 +1,7 @@
 package org.podval.calendar.calendar
 
 import org.podval.calendar.numbers.NumberSystem.RawNumber
-import org.podval.calendar.time.{TimeInterval, TimeNumberSystem}
+import org.podval.calendar.time.{TimeIntervalBase, TimeNumberSystem}
 
 trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
@@ -48,10 +48,12 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   final override def createPoint(raw: RawNumber): C#Point = createMoment(raw)
 
-  final override type Interval = TimeInterval[C]
+  final override type Interval = TimeIntervalBase[C]
 
-  final override def createInterval(raw: RawNumber): Interval =
-    new TimeInterval[C](raw) { this: C#Interval =>
+  final type TimeInterval = Interval
+
+  final override def createInterval(raw: RawNumber): TimeInterval =
+    new TimeIntervalBase[C](raw) { this: C#TimeInterval =>
       final override def numberSystem: C = Calendar.this
     }
 
@@ -59,8 +61,8 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   final val moment: C#Moment = createMoment(false, List(0))
 
-  final val interval: C#Interval = createInterval(false, List(0))
+  final val interval: C#TimeInterval = createInterval(false, List(0))
 
   // TODO using Day.daysPerWeek will probably break initialization too...
-  final val week: C#Interval = interval.days(7)
+  final val week: C#TimeInterval = interval.days(7)
 }

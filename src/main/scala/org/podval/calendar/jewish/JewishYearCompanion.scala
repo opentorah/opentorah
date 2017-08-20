@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.calendar.YearCompanion
-import Jewish.{Month, Day, Interval, interval, YearCharacter, MonthNameAndLength}
+import Jewish.{Month, Day, TimeInterval, interval, YearCharacter, MonthNameAndLength}
 import Day.Name._
 import Month.Name._
 
@@ -57,9 +57,9 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
 
   final override def lengthInMonths(yearNumber: Int): Int = lengthInMonths(isLeap(yearNumber))
 
-  final val normal: Interval = Month.meanLunarPeriod*lengthInMonths(isLeap = false)
+  final val normal: TimeInterval = Month.meanLunarPeriod*lengthInMonths(isLeap = false)
 
-  final val leap: Interval = Month.meanLunarPeriod*lengthInMonths(isLeap = true)
+  final val leap: TimeInterval = Month.meanLunarPeriod*lengthInMonths(isLeap = true)
 
   final def lengthInMonths(isLeap: Boolean): Int = if (isLeap) 13 else 12
 
@@ -72,7 +72,7 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
 
   final val monthsInCycle: Int = monthsBeforeYearInCycle.last
 
-  final val cycleLength: Interval = Month.meanLunarPeriod * monthsInCycle
+  final val cycleLength: TimeInterval = Month.meanLunarPeriod * monthsInCycle
 
   final def firstMonthInCycle(yearNumber: Int): Int =
     monthsBeforeYearInCycle(numberInCycle(yearNumber) - 1) + 1
@@ -82,9 +82,9 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
   final def cycle(yearNumber: Int): Int = ((yearNumber - 1) / yearsInCycle) + 1
 
   // TODO meaningful names
-  final val firstCorrection: Interval  = interval.hours(18) // KH 7:1
-  final val secondCorrection: Interval = interval.hours(9).parts(204) // KH 7:4
-  final val thirdCorrection: Interval  = interval.hours(15).parts(589) // KH 7:5
+  final val firstCorrection: TimeInterval  = interval.hours(18) // KH 7:1
+  final val secondCorrection: TimeInterval = interval.hours(9).parts(204) // KH 7:4
+  final val thirdCorrection: TimeInterval  = interval.hours(15).parts(589) // KH 7:5
 }
 
 

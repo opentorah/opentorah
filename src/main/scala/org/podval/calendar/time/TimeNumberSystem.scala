@@ -28,7 +28,7 @@ abstract class TimeNumberSystem[S <: TimeNumberSystem[S]] extends {
 
   final val partsPerMinute: Int = partsPerHour / minutesPerHour
 
-  type Point <: TimePoint[S]
+  type Point <: TimePointBase[S]
 
-  type Interval <: TimeInterval[S]
+  type Interval <: TimeIntervalBase[S]
 }
