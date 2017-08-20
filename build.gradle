@@ -66,13 +66,27 @@ def pomConfig = {
   }
 }
 
+project(':numbers') {
+  apply plugin: 'scala'
+
+  dependencies {
+    zinc lib.zinc
+    compile lib.scala
+    testImplementation lib.junit, lib.scalaTest
+  }
+
+  test {
+    testLogging { showStandardStreams = true }
+  }
+}
+
 project(':dates') {
   apply plugin: 'scala'
   apply plugin: 'maven'
 
   dependencies {
     zinc lib.zinc
-    compile lib.scala
+    compile lib.scala, project(':numbers')
     testImplementation lib.junit, lib.scalaTest
   }
 
@@ -99,7 +113,7 @@ project(':astronomy') {
 
   dependencies {
     zinc lib.zinc
-    compile lib.scala
+    compile lib.scala, project(':numbers')
     testImplementation lib.junit, lib.scalaTest
   }
 

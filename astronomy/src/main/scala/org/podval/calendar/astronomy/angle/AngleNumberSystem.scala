@@ -1,25 +1,10 @@
-/*
- * Copyright 2011-2014 Podval Group.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.podval.calendar.astronomy.angle
 
-import org.podval.calendar.dates.RangedHeadDigitNumberSystem
+import org.podval.calendar.numbers.NumberSystem.RawNumber
+import org.podval.calendar.numbers.RangedHeadDigitNumberSystem
 
 
-object AngleNumberSystem extends {
+class AngleNumberSystem extends {
 
   private val max_length = 10
 
@@ -30,20 +15,20 @@ object AngleNumberSystem extends {
   protected override val ranges: List[Int] = List.empty.padTo(max_length - 1, 60)
 
 
-  final override def headRange: Int = 360
+  final override val headRange: Int = 360
 
-} with NumberSystem {
+} with RangedHeadDigitNumberSystem[AngleNumberSystem] {
 
   protected final override type Interval = Angle
 
 
-  protected final override val intervalCreator: Creator[Interval] = Angle.apply
+  final override def createPoint(raw: RawNumber): Angle = new Angle(raw)
 
 
   protected final override type Point = AnglePoint
 
 
-  protected final override val pointCreator: Creator[Point] = AnglePoint.apply
+  final override def createPoint(raw: RawNumber): AnglePoint = new AnglePoint(raw)
 
 
 
@@ -93,7 +78,7 @@ object AngleNumberSystem extends {
 
   object AnglePoint {
 
-    def apply(negative: Boolean, digits: List[Int]): AnglePoint = new AnglePoint(negative, digits)
+    def apply(negative: Boolean, digits: List[Int]): AnglePoint = createPoint(negative, digits)
   }
 
 
@@ -107,7 +92,7 @@ object AngleNumberSystem extends {
     def apply(digits: Int*): Angle = new Angle(false, digits.toList)
 
 
-    def apply(negative: Boolean, digits: List[Int]): Angle = new Angle(negative, digits)
+    def apply(negative: Boolean, digits: List[Int]): Angle = createInterval(raw)
 
 
     import scala.language.implicitConversions
@@ -119,7 +104,7 @@ object AngleNumberSystem extends {
     def fromRadians(value: Double, length: Int): Angle = fromDegrees(math.toDegrees(value), length)
 
 
-    def fromDegrees(value: Double, length: Int): Angle = fromDouble(value, length)(intervalCreator)
+    def fromDegrees(value: Double, length: Int): Angle = fromDouble(value, length)
 
 
     def exactify(approximate: Angle, days: Int, angle: Angle): Double = {
@@ -129,3 +114,6 @@ object AngleNumberSystem extends {
     }
   }
 }
+
+
+object AngleNumberSystem extends AngleNumberSystem
