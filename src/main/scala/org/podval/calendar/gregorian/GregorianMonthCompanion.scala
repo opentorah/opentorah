@@ -5,6 +5,18 @@ import org.podval.calendar.util.Named
 import Gregorian.Year
 
 abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
+  final type Name = GregorianMonthCompanion.Name
+
+  final val Name: GregorianMonthCompanion.Name.type = GregorianMonthCompanion.Name
+
+  final override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Year.monthsInYear + 1
+
+  final override def numberInYear(monthNumber: Int): Int =
+    monthNumber - Year.firstMonth(yearNumber(monthNumber)) + 1
+}
+
+
+object GregorianMonthCompanion {
   sealed class Name(name: String) extends Named(name)
 
   object Name {
@@ -21,9 +33,4 @@ abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
     case object November extends Name("November")
     case object December extends Name("December")
   }
-
-  final override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Year.monthsInYear + 1
-
-  final override def numberInYear(monthNumber: Int): Int =
-    monthNumber - Year.firstMonth(yearNumber(monthNumber)) + 1
 }
