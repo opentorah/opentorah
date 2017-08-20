@@ -6,9 +6,9 @@ import Day.Name._
 import Month.Name._
 
 abstract class JewishYearCompanion extends YearCompanion[Jewish] {
-  final type Kind = JewishYearKind
+  final type Kind = JewishYearCompanion.Kind
 
-  final val Kind: JewishYearKind.type = JewishYearKind
+  final val Kind: JewishYearCompanion.Kind.type = JewishYearCompanion.Kind
 
   protected final override def characters: Seq[YearCharacter] =
     for (isLeap <- Seq(true, false); kind <- Kind.values) yield (isLeap, kind)
@@ -86,4 +86,17 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
   final val firstCorrection: Interval  = interval.hours(18) // KH 7:1
   final val secondCorrection: Interval = interval.hours(9).parts(204) // KH 7:4
   final val thirdCorrection: Interval  = interval.hours(15).parts(589) // KH 7:5
+}
+
+
+object JewishYearCompanion {
+  sealed trait Kind
+
+  object Kind {
+    case object Short extends Kind
+    case object Regular extends Kind
+    case object Full extends Kind
+
+    val values: Seq[Kind] = Seq(Short, Regular, Full)
+  }
 }
