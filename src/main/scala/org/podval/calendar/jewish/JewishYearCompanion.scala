@@ -17,11 +17,11 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
   protected final override def monthNamesAndLengths(character: YearCharacter):
   List[MonthNameAndLength] =
   {
-    character match { case (isLeap: Boolean, kind: Year.Kind) =>
+    character match { case (isLeap: Boolean, kind: Kind) =>
       List(
         createMonthNameAndLength(Tishrei   , 30),
-        createMonthNameAndLength(Marheshvan, if (kind == Year.Kind.Full) 30 else 29),
-        createMonthNameAndLength(Kislev    , if (kind == Year.Kind.Short) 29 else 30),
+        createMonthNameAndLength(Marheshvan, if (kind == Kind.Full) 30 else 29),
+        createMonthNameAndLength(Kislev    , if (kind == Kind.Short) 29 else 30),
         createMonthNameAndLength(Teves     , 29),
         createMonthNameAndLength(Shvat     , 30)
       ) ++
@@ -83,7 +83,7 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
   final def cycle(yearNumber: Int): Int = ((yearNumber - 1) / yearsInCycle) + 1
 
   // TODO meaningful names
-  final val firstCorrection  = interval.hours(18) // KH 7:1
-  final val secondCorrection = interval.hours(9).parts(204) // KH 7:4
-  final val thirdCorrection  = interval.hours(15).parts(589) // KH 7:5
+  final val firstCorrection: Interval  = interval.hours(18) // KH 7:1
+  final val secondCorrection: Interval = interval.hours(9).parts(204) // KH 7:4
+  final val thirdCorrection: Interval  = interval.hours(15).parts(589) // KH 7:5
 }
