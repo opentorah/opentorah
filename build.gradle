@@ -1,6 +1,4 @@
 apply plugin: 'idea'
-apply plugin: 'scala'
-apply plugin: 'maven'
 
 idea {
   project {
@@ -16,22 +14,26 @@ idea {
   }
 }
 
-group = 'org.podval.calendar'
-jar.baseName = 'org.podval.calendar.dates'
-version = '1.0-SNAPSHOT'
+//jar.baseName = 'org.podval.calendar.dates'
 
-repositories {
-  jcenter()
+allprojects {
+  repositories {
+    jcenter()
+  }
+
+  group = 'org.podval.calendar'
+  version = '1.0-SNAPSHOT'
 }
 
 def scalaVersion      = '2.12.3'
 def scalaVersionMajor = '2.12'
 
-dependencies {
-  zinc 'com.typesafe.zinc:zinc:0.3.13'
-  compile "org.scala-lang:scala-library:$scalaVersion"
-  testCompile 'junit:junit:4.12', "org.scalatest:scalatest_${scalaVersionMajor}:3.0.3"
-}
+ext.lib = [
+  zinc      : 'com.typesafe.zinc:zinc:0.3.13',
+  scala     : "org.scala-lang:scala-library:$scalaVersion",
+  junit     : 'junit:junit:4.12',
+  scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.3"
+]
 
 // TODO add GIT link
 def pomConfig = {
@@ -64,19 +66,44 @@ def pomConfig = {
   }
 }
 
-test {
-  testLogging { showStandardStreams = true }
-}
+project(':dates') {
+  apply plugin: 'scala'
+  apply plugin: 'maven'
 
-install {
-  repositories.mavenInstaller {
-    pom.project pomConfig
+  dependencies {
+    zinc lib.zinc
+    compile lib.scala
+    testImplementation lib.junit, lib.scalaTest
+  }
+
+  test {
+    testLogging { showStandardStreams = true }
+  }
+
+  install {
+    repositories.mavenInstaller {
+      pom.project pomConfig
+    }
+  }
+
+  uploadArchives {
+    repositories.mavenDeployer {
+//    repository(...)
+      pom.project pomConfig
+    }
   }
 }
 
-uploadArchives {
-  repositories.mavenDeployer {
-//    repository(...)
-    pom.project pomConfig
+project(':astronomy') {
+  apply plugin: 'scala'
+
+  dependencies {
+    zinc lib.zinc
+    compile lib.scala
+    testImplementation lib.junit, lib.scalaTest
+  }
+
+  test {
+    testLogging { showStandardStreams = true }
   }
 }

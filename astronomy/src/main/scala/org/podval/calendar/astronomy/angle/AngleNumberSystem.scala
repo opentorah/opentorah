@@ -16,7 +16,7 @@
 
 package org.podval.calendar.astronomy.angle
 
-import org.podval.calendar.dates.NumberSystem
+import org.podval.calendar.dates.RangedHeadDigitNumberSystem
 
 
 object AngleNumberSystem extends {
@@ -30,7 +30,7 @@ object AngleNumberSystem extends {
   protected override val ranges: List[Int] = List.empty.padTo(max_length - 1, 60)
 
 
-  protected override val headRange: Option[Int] = Some(360)
+  final override def headRange: Int = 360
 
 } with NumberSystem {
 
