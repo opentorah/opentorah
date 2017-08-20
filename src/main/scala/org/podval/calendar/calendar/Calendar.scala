@@ -35,7 +35,7 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   // TODO scope inside DayCompanion?
   // TODO make this a Enum - and use its `values()` method in DayCompanion.name
-  //   (which will then become `final`)?
+  //   (which will then become `final`); also define val Name: X...
   type DayName
 
   val Day: DayCompanion[C]

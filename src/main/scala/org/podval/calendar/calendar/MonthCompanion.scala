@@ -4,8 +4,6 @@ package org.podval.calendar.calendar
   *
   */
 abstract class MonthCompanion[C <: Calendar[C]] extends CalendarMember[C] {
-  // TODO is this possible: val Name: C#MonthName?
-
   final def apply(number: Int): C#Month =
     calendar.createMonth(number)
 

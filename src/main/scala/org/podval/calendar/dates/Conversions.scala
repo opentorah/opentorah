@@ -1,6 +1,5 @@
 package org.podval.calendar.dates
 
-// TODO find and remove (by centralization) a link between the 2 calendars...
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.Jewish
 
