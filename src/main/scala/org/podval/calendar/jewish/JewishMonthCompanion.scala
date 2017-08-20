@@ -1,9 +1,27 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.calendar.MonthCompanion
+import org.podval.calendar.util.Named
 
 abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
-  final val Name: JewishMonthName.type = JewishMonthName
+  sealed class Name(val name: String) extends Named(name)
+
+  object Name {
+    case object Tishrei extends Name("Tishrei")
+    case object Marheshvan extends Name("Marcheshvan")
+    case object Kislev extends Name("Kislev")
+    case object Teves extends Name("Teves")
+    case object Shvat extends Name("Shevat")
+    case object Adar extends Name("Adar")
+    case object Nisan extends Name("Nissan")
+    case object Iyar extends Name("Iyar")
+    case object Sivan extends Name("Sivan")
+    case object Tammuz extends Name("Tammuz")
+    case object Av extends Name("Av")
+    case object Elul extends Name("Elul")
+    case object AdarI extends Name("Adar I")
+    case object AdarII extends Name("Adar II")
+  }
 
   // KH 6:3
   // TODO how is this really called? tropical?

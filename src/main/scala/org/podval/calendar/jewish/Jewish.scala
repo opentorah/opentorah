@@ -22,18 +22,17 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type YearCharacter = (Boolean, YearKind)
 
-  final override val Year: JewishYearCompanion =
-    new JewishYearCompanion with JewishCalendarMember
+  final override object Year extends JewishYearCompanion with JewishCalendarMember
 
   final override type Month = JewishMonth
 
   final override def createMonth(number: Int): Jewish.Month =
     new JewishMonth(number) with JewishCalendarMember
 
-  final override type MonthName = JewishMonthName
+  // TODO eliminate
+  final override type MonthName = Month.Name
 
-  final override val Month: JewishMonthCompanion =
-    new JewishMonthCompanion with JewishCalendarMember
+  final override object Month extends JewishMonthCompanion with JewishCalendarMember
 
   final override type Day = JewishDay
 
@@ -42,7 +41,7 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type DayName = JewishDayName
 
-  final override val Day: JewishDayCompanion = new JewishDayCompanion with JewishCalendarMember
+  final override object Day extends JewishDayCompanion with JewishCalendarMember
 
   final override type Moment = JewishMoment
 
@@ -51,8 +50,7 @@ class Jewish private() extends Calendar[Jewish] {
       final override def numberSystem:  Jewish = Jewish.this
     }
 
-  final override val Moment: JewishMomentCompanion =
-    new JewishMomentCompanion with JewishCalendarMember
+  final override object Moment extends JewishMomentCompanion with JewishCalendarMember
 }
 
 

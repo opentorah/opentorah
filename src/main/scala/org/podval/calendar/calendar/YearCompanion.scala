@@ -16,7 +16,7 @@ abstract class YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
     result
   }
 
-  val monthDescriptors: Map[C#YearCharacter, List[C#MonthDescriptor]] =
+  lazy val monthDescriptors: Map[C#YearCharacter, List[C#MonthDescriptor]] =
     Map((for (character <- characters) yield character -> monthsGenerator(character)): _*)
 
   protected def characters: Seq[C#YearCharacter]

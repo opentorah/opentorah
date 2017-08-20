@@ -24,7 +24,8 @@ class Gregorian private() extends Calendar[Gregorian] {
   final override def createMonth(number: Int): Gregorian.Month =
     new GregorianMonth(number) with GregorianCalendarMember
 
-  final override type MonthName = GregorianMonthName
+  // TODO eliminate
+  final override type MonthName = Month.Name
 
   final override val Month: GregorianMonthCompanion =
     new GregorianMonthCompanion with GregorianCalendarMember
