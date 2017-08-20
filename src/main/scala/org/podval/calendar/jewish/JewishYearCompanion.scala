@@ -1,23 +1,27 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.calendar.YearCompanion
-import Jewish._
+import Jewish._ // TODO {Year, Month, Day, Interval, interval, YearCharacter, MonthNameAndLength}
 import Day.Name._
 import Month.Name._
 
 abstract class JewishYearCompanion extends YearCompanion[Jewish] {
+  final type Kind = JewishYearKind
+
+  final val Kind: JewishYearKind.type = JewishYearKind
+
   protected final override def characters: Seq[YearCharacter] =
-    for (isLeap <- Seq(true, false); kind <- calendar.YearKind.values) yield (isLeap, kind)
+    for (isLeap <- Seq(true, false); kind <- Kind.values) yield (isLeap, kind)
 
   // KH 8:5-6
   protected final override def monthNamesAndLengths(character: YearCharacter):
   List[MonthNameAndLength] =
   {
-    character match { case (isLeap: Boolean, kind: YearKind) =>
+    character match { case (isLeap: Boolean, kind: Year.Kind) =>
       List(
         createMonthNameAndLength(Tishrei   , 30),
-        createMonthNameAndLength(Marheshvan, if (kind == calendar.YearKind.Full) 30 else 29),
-        createMonthNameAndLength(Kislev    , if (kind == calendar.YearKind.Short) 29 else 30),
+        createMonthNameAndLength(Marheshvan, if (kind == Year.Kind.Full) 30 else 29),
+        createMonthNameAndLength(Kislev    , if (kind == Year.Kind.Short) 29 else 30),
         createMonthNameAndLength(Teves     , 29),
         createMonthNameAndLength(Shvat     , 30)
       ) ++
@@ -36,7 +40,7 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
     }
   }
 
-  private val adu: Set[DayName] = Set(Rishon, Rvii, Shishi)
+  private val adu: Set[Day.Name] = Set(Rishon, Rvii, Shishi)
 
   final def isAdu(day: Day): Boolean = adu.contains(day.name)
 
@@ -54,11 +58,9 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
   final override def lengthInMonths(yearNumber: Int): Int = lengthInMonths(isLeap(yearNumber))
 
   // TODO parameterless defs aren't vals so that initialization works :)
-  final def normal: Interval =
-    calendar.Month.meanLunarPeriod*lengthInMonths(isLeap = false)
+  final def normal: Interval = Month.meanLunarPeriod*lengthInMonths(isLeap = false)
 
-  final def leap: Interval =
-    calendar.Month.meanLunarPeriod*lengthInMonths(isLeap = true)
+  final def leap: Interval = Month.meanLunarPeriod*lengthInMonths(isLeap = true)
 
   final def lengthInMonths(isLeap: Boolean): Int = if (isLeap) 13 else 12
 
@@ -71,7 +73,7 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
 
   final val monthsInCycle: Int = monthsBeforeYearInCycle.last
 
-  final def cycleLength: Interval = calendar.Month.meanLunarPeriod * monthsInCycle
+  final def cycleLength: Interval = Month.meanLunarPeriod * monthsInCycle
 
   final def firstMonthInCycle(yearNumber: Int): Int =
     monthsBeforeYearInCycle(numberInCycle(yearNumber) - 1) + 1
@@ -81,7 +83,7 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
   final def cycle(yearNumber: Int): Int = ((yearNumber - 1) / yearsInCycle) + 1
 
   // TODO meaningful names
-  final val firstCorrection  = calendar.interval.hours(18) // KH 7:1
-  final val secondCorrection = calendar.interval.hours(9).parts(204) // KH 7:4
-  final val thirdCorrection  = calendar.interval.hours(15).parts(589) // KH 7:5
+  final val firstCorrection  = interval.hours(18) // KH 7:1
+  final val secondCorrection = interval.hours(9).parts(204) // KH 7:4
+  final val thirdCorrection  = interval.hours(15).parts(589) // KH 7:5
 }

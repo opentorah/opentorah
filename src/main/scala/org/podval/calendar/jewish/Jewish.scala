@@ -15,7 +15,8 @@ class Jewish private() extends Calendar[Jewish] {
   final override def createYear(number: Int): Jewish.Year =
     new JewishYear(number) with JewishCalendarMember
 
-  final type YearKind = JewishYearKind
+  // TODO eliminate
+  final type YearKind = Year.Kind
 
   // TODO stick this into the Year companion?
   final val YearKind: JewishYearKind.type = JewishYearKind

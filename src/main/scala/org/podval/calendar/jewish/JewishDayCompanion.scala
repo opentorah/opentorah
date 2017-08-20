@@ -3,6 +3,8 @@ package org.podval.calendar.jewish
 import org.podval.calendar.calendar.DayCompanion
 
 abstract class JewishDayCompanion extends DayCompanion[Jewish] {
+  final type Name = JewishDayName
+
   final val Name: JewishDayName.type = JewishDayName
 
   final override def names: Seq[Jewish.DayName] = Name.values
