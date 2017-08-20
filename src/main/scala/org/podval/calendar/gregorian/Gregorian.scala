@@ -16,8 +16,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type YearCharacter = Boolean
 
-  final override val Year: GregorianYearCompanion =
-    new GregorianYearCompanion with GregorianCalendarMember
+  final override object Year extends GregorianYearCompanion with GregorianCalendarMember
 
   final override type Month = GregorianMonth
 
@@ -27,8 +26,7 @@ class Gregorian private() extends Calendar[Gregorian] {
   // TODO eliminate
   final override type MonthName = Month.Name
 
-  final override val Month: GregorianMonthCompanion =
-    new GregorianMonthCompanion with GregorianCalendarMember
+  final override object Month extends GregorianMonthCompanion with GregorianCalendarMember
 
   final override type Day = GregorianDay
 
@@ -37,8 +35,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type DayName = GregorianDayName
 
-  final override val Day: GregorianDayCompanion =
-    new GregorianDayCompanion with GregorianCalendarMember
+  final override object Day extends GregorianDayCompanion with GregorianCalendarMember
 
   final override type Moment = GregorianMoment
 
@@ -47,8 +44,7 @@ class Gregorian private() extends Calendar[Gregorian] {
       final override def numberSystem: Gregorian = Gregorian.this
     }
 
-  final override val Moment: GregorianMomentCompanion =
-    new GregorianMomentCompanion with GregorianCalendarMember
+  final override object Moment extends GregorianMomentCompanion with GregorianCalendarMember
 }
 
 
