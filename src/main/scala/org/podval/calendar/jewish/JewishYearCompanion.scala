@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.calendar.YearCompanion
-import Jewish._ // TODO {Year, Month, Day, Interval, interval, YearCharacter, MonthNameAndLength}
+import Jewish.{Month, Day, Interval, interval, YearCharacter, MonthNameAndLength}
 import Day.Name._
 import Month.Name._
 
@@ -57,10 +57,9 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
 
   final override def lengthInMonths(yearNumber: Int): Int = lengthInMonths(isLeap(yearNumber))
 
-  // TODO parameterless defs aren't vals so that initialization works :)
-  final def normal: Interval = Month.meanLunarPeriod*lengthInMonths(isLeap = false)
+  final val normal: Interval = Month.meanLunarPeriod*lengthInMonths(isLeap = false)
 
-  final def leap: Interval = Month.meanLunarPeriod*lengthInMonths(isLeap = true)
+  final val leap: Interval = Month.meanLunarPeriod*lengthInMonths(isLeap = true)
 
   final def lengthInMonths(isLeap: Boolean): Int = if (isLeap) 13 else 12
 
@@ -73,7 +72,7 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
 
   final val monthsInCycle: Int = monthsBeforeYearInCycle.last
 
-  final def cycleLength: Interval = Month.meanLunarPeriod * monthsInCycle
+  final val cycleLength: Interval = Month.meanLunarPeriod * monthsInCycle
 
   final def firstMonthInCycle(yearNumber: Int): Int =
     monthsBeforeYearInCycle(numberInCycle(yearNumber) - 1) + 1
