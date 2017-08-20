@@ -113,7 +113,7 @@ project(':astronomy') {
 
   dependencies {
     zinc lib.zinc
-    compile lib.scala, project(':numbers')
+    compile lib.scala, project(':numbers'), project(':dates')
     testImplementation lib.junit, lib.scalaTest
   }
 

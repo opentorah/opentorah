@@ -18,13 +18,11 @@ class AngleTest extends FlatSpec {
         assertResult(minutes)(angle.minutes)
       }
 
-
       construction(  5, 34)
       construction( 54, 34)
       construction(154, 59)
       construction(254,  0)
     }
-
 
     it should "convert properly" in {
 
@@ -41,7 +39,6 @@ class AngleTest extends FlatSpec {
       conversion(254, 0)
     }
 
-
     it should "round properly" in {
       assertResult(Angle(104, 58, 50))(Angle(104, 58, 50, 16, 39, 59, 43).roundToSeconds)
 
@@ -49,7 +46,6 @@ class AngleTest extends FlatSpec {
       val a2: Angle = a*2
       assertResult(Angle(0, 31))(a2.roundToMinutes)
     }
-
 
   // TODO add tests for negativity
 }
