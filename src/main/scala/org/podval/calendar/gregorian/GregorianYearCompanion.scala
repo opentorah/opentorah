@@ -1,15 +1,16 @@
 package org.podval.calendar.gregorian
 
 import org.podval.calendar.calendar.YearCompanion
+import Gregorian.{Year, YearCharacter, MonthNameAndLength}
+import Gregorian.Month.Name._
 
 abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
-  protected final override def characters: Seq[Gregorian.YearCharacter] =
+  protected final override def characters: Seq[YearCharacter] =
     Seq(true, false)
 
-  protected final override def monthNamesAndLengths(isLeap: Gregorian.YearCharacter):
-    List[Gregorian.MonthNameAndLength] =
+  protected final override def monthNamesAndLengths(isLeap: YearCharacter):
+    List[MonthNameAndLength] =
   {
-    import Gregorian.Month.Name._
     List(
       createMonthNameAndLength(January  , 31),
       createMonthNameAndLength(February , if (isLeap) 29 else 28),
@@ -45,5 +46,5 @@ abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
       (yearNumber - 1)/400 + 1
 
   final def lengthInDays(yearNumber: Int): Int =
-    if (calendar.Year.isLeap(yearNumber)) daysInNonLeapYear + 1 else daysInNonLeapYear
+    if (Year.isLeap(yearNumber)) daysInNonLeapYear + 1 else daysInNonLeapYear
 }

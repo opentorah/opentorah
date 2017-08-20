@@ -10,6 +10,7 @@ abstract class GregorianDayCompanion extends DayCompanion[Gregorian] {
 
   final val epoch: Int = 1373429
 
+  // TODO eliminate link to Jewish
   final override val firstDayNumberInWeek: Int =
     (((Jewish.Day.firstDayNumberInWeek - 1) + (epoch % daysPerWeek)) % daysPerWeek) + 1
 }
