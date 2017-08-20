@@ -33,7 +33,8 @@ class Gregorian private() extends Calendar[Gregorian] {
   final override def createDay(number: Int): Gregorian.Day =
     new GregorianDay(number) with GregorianCalendarMember
 
-  final override type DayName = GregorianDayName
+  // TODO eliminate
+  final override type DayName = Day.Name
 
   final override object Day extends GregorianDayCompanion with GregorianCalendarMember
 
