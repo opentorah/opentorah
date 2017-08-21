@@ -3,6 +3,7 @@ package org.podval.calendar.calendar
 import org.podval.calendar.numbers.NumberSystem.RawNumber
 import org.podval.calendar.time.{TimeIntervalBase, TimeNumberSystem}
 
+// TODO push packages "calendar", "jewish", "gregorian", "time" into "dates"...
 trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   type Year <: YearBase[C]
