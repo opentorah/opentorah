@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy.sun
 import org.podval.calendar.dates.Sun
-import org.podval.calendar.jewish.Jewish
+import org.podval.calendar.dates.jewish.Jewish
 import org.scalatest.FlatSpec
 
 

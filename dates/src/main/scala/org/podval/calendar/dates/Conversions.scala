@@ -1,7 +1,7 @@
 package org.podval.calendar.dates
 
-import org.podval.calendar.gregorian.Gregorian
-import org.podval.calendar.jewish.Jewish
+import org.podval.calendar.dates.gregorian.Gregorian
+import org.podval.calendar.dates.jewish.Jewish
 
 object Conversions {
 

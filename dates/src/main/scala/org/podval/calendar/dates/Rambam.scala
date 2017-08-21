@@ -1,6 +1,6 @@
 package org.podval.calendar.dates
 
-import org.podval.calendar.jewish.Jewish.{Year, Month, Day}
+import org.podval.calendar.dates.jewish.Jewish.{Year, Month, Day}
 
 
 /**
