@@ -1,5 +1,5 @@
 #sudo: false
-#language: scala
+language: scala
 #scala: 2.12.3
 jdk: oraclejdk8
 before_cache:
@@ -10,5 +10,5 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 script:
- - radle -v
+ - gradle -v
  - gradle build
