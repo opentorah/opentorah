@@ -1,6 +1,6 @@
 #sudo: false
 language: scala
-#scala: 2.12.3
+scala: 2.12.3
 jdk: oraclejdk8
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -10,5 +10,4 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 script:
- - gradle -v
- - gradle build
+ # - ./gradlew build
