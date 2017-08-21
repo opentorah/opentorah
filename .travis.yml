@@ -9,4 +9,6 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-script: gradle build
+script:
+ - radle -v
+ - gradle build
