@@ -30,7 +30,6 @@ class RambamTest extends FlatSpec {
     assert(year2newMoon.time == interval.hours(14))
 
     assert(year2newMoon - Month.meanLunarPeriod*12 == year1newMoon)
-
   }
 
 

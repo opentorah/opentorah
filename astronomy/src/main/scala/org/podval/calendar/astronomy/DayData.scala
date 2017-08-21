@@ -1,7 +1,6 @@
 package org.podval.calendar.astronomy
 
 import angle.AngleNumberSystem.Angle
-import org.podval.calendar.astronomy.angle.AngleNumberSystem.Angle
 
 
 /*
@@ -24,25 +23,26 @@ trait DayData {
 
   val value: Map[Days, Angle]
 
-  final def keys = value.keys.toList.sorted
+  final def keys: List[Days] = value.keys.toList.sorted
 
   final def rambamValue = value(1)
 
-  final def calculated(days: Days) = rambamValue*days
+  final def calculated(days: Days): Angle = rambamValue*days
 
-  final def exact = reconstructed(10000)
+  final def exact: Angle = reconstructed(10000)
 
-  final def exact10 = reconstructed10(10000)
+  final def exact10: Double = reconstructed10(10000)
 
-  final def reconstructed(days: Days) = Angle.fromDegrees(reconstructed10(days), 6) // 6 60-digits
+  final def reconstructed(days: Days): Angle =
+    Angle.fromDegrees(reconstructed10(days), 6) // 6 60-digits
 
-  final def reconstructed10(days: Days) = Angle.exactify(rambamValue, days, value(days))
+  final def reconstructed10(days: Days): Double = Angle.exactify(rambamValue, days, value(days))
 
-  final def recalculated(days: Days) = exact*days
+  final def recalculated(days: Days): Angle = exact*days
 
-  final def recalculated10(days: Days) = Angle.fromDegrees(exact10*days, 6)
+  final def recalculated10(days: Days): Angle = Angle.fromDegrees(exact10*days, 6)
 
   val almagestValue: Angle
 
-  final def almagest(days: Days) = almagestValue*days
+  final def almagest(days: Days): Angle = almagestValue*days
 }
