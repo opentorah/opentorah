@@ -39,4 +39,8 @@ class AngleNumberSystem extends {
 }
 
 
-object AngleNumberSystem extends AngleNumberSystem
+object AngleNumberSystem extends AngleNumberSystem {
+  import scala.language.implicitConversions
+
+  implicit def angleToRadians(angle: Angle): Double = angle.toRadians
+}

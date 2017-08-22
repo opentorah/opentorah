@@ -20,9 +20,3 @@ class AngleCompanion {
     (360.0*fullRotations+angle.toDegrees)/days
   }
 }
-
-object AngleCompanion {
-  import scala.language.implicitConversions
-
-  implicit def angleToRadians(angle: Angle): Double = angle.toRadians
-}

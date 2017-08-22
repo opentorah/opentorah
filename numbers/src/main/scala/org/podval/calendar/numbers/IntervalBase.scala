@@ -13,6 +13,8 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
 
   final def +(that: S#Point): S#Point = newPoint(add(negate = false, that))
 
+  // TODO -(Point)?
+
   final def *(n: Int): S#Interval = newInterval(negative, digits map (n * _))
 
   final def /(n: Int): S#Interval = {
@@ -62,7 +64,7 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
 
   final def %(that: S#Interval): S#Interval = this - (that * (this / that))
 
-  // TODO add multiplication (and division, and %) on the ScalarNumber from another NumberSystem!
+  // TODO add multiplication (and division, and %) on Intervals from another NumberSystem!
 
   final def digitsWithRangesForMultiplication: List[(Int, Int)] =
     digits zip (1 :: numberSystem.ranges)
