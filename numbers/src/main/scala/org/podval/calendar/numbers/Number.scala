@@ -48,7 +48,9 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
     val tail_ = {
       if (more_.isEmpty) more_
       else {
-        val toRoundWithRange = toRound zip numberSystem.ranges.drop(n)
+        val toRoundWithRange = toRound.zipWithIndex.map {
+          case (digit, position) => (digit, numberSystem.range(n+position))
+        }
         val carry =
           (toRoundWithRange :\ 0) { case ((x, range), c) => if (x + c >= range / 2) 1 else 0}
         more_.init :+ (more_.last + carry)
