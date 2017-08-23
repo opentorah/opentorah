@@ -25,8 +25,9 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   def headSign: String
 
-  // TODO make this a partial function?
-  def sign(position: Int): Option[String]
+  val signPartial: PartialFunction[Int, String]
+
+  def sign(position: Int): Option[String] = signPartial.lift(position)
 
   // TODO rename "multiplier"
   final def divisor(position: Int): Int /*TODO BigInt*/ = (1 to position).map(range).product
