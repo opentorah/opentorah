@@ -79,10 +79,10 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   // TODO: padding; cutting off 0; more flavours...
   protected final def toSignedString: String = {
     // TODO detect and drop default "sign" after the last digit.
-    val tokens = digits.zipWithIndex.flatMap {
+    val result = List(head.toString, numberSystem.headSign) ++ tail.zipWithIndex.flatMap {
       case (digit, position) => List(digit.toString, numberSystem.sign(position))
     }
-    (if (negative) "-" else "") + tokens.mkString
+    (if (negative) "-" else "") + result.mkString
   }
 
   override def toString: String = toSignedString

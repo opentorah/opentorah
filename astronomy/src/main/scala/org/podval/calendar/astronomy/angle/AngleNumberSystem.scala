@@ -27,15 +27,16 @@ trait AngleNumberSystem extends RangedHeadDigitNumberSystem[AngleNumberSystem] {
 
   final override def maxLength: Int = 9
 
-  final override val headRange: Int = 360
+  final override def headRange: Int = 360
 
   final override def range(position: Int): Int = 60
 
+  final override def headSign: String = "°"
+
   final override def sign(position: Int): String = position match {
-    case 0 => "°"
-    case 1 => "′"
-    case 2 => "″"
-    case 3 => "‴"
+    case 0 => "′"
+    case 1 => "″"
+    case 2 => "‴"
     case _ => ","
   }
 }

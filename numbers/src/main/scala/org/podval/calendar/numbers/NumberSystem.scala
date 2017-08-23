@@ -21,13 +21,15 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     * @param position
     * @return positive, even number
     */
-  // TODO range(n) is for digit (n+1), but sign(n) is for digit(n)!
   def range(position: Int): Int
+
+  def headSign: String
 
   // TODO return Option so that we can detect the last and drop it -
   // and replace Nothing with "," in the middle.
   def sign(position: Int): String
 
+  // TODO rename "multiplier"
   final def divisor(position: Int): Int /*TODO BigInt*/ = (1 to position).map(range).product
 
   // TODO eliminate

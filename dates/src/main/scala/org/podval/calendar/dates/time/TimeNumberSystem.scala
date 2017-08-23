@@ -33,10 +33,11 @@ abstract class TimeNumberSystem[S <: TimeNumberSystem[S]]
     case 2 => momentsPerPart
   }
 
+  final override def headSign: String = "d"
+
   final override def sign(position: Int): String = position match {
-    case 0 => "d"
-    case 1 => "h"
-    case 2 => "p"
-    case 3 => "m"
+    case 0 => "h"
+    case 1 => "p"
+    case 2 => "m"
   }
 }
