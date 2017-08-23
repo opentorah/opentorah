@@ -33,11 +33,11 @@ trait AngleNumberSystem extends RangedHeadDigitNumberSystem[AngleNumberSystem] {
 
   final override def headSign: String = "°"
 
-  final override def sign(position: Int): String = position match {
-    case 0 => "′"
-    case 1 => "″"
-    case 2 => "‴"
-    case _ => ","
+  final override def sign(position: Int): Option[String] = position match {
+    case 0 => Some("′")
+    case 1 => Some("″")
+    case 2 => Some("‴")
+    case _ => None
   }
 }
 

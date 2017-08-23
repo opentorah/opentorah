@@ -35,9 +35,10 @@ abstract class TimeNumberSystem[S <: TimeNumberSystem[S]]
 
   final override def headSign: String = "d"
 
-  final override def sign(position: Int): String = position match {
-    case 0 => "h"
-    case 1 => "p"
-    case 2 => "m"
+  final override def sign(position: Int): Option[String] = position match {
+    case 0 => Some("h")
+    case 1 => Some("p")
+    case 2 => Some("m")
+    case _ => None
   }
 }
