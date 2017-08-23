@@ -42,7 +42,7 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
         case (digit, position) => (digit, numberSystem.range(position))
       })
         .foldLeft(List.empty[Int], 0)(step)
-    val lastDigit = lastStep(digits.last, lastCarry, numberSystem.ranges.last)
+    val lastDigit = lastStep(digits.last, lastCarry, numberSystem.range(digits.length-2)) // TODO -1?
 
     newInterval(negative, newDigits :+ lastDigit)
   }
