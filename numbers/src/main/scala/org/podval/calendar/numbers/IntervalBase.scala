@@ -36,7 +36,7 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
       if (roundUp) quotient+1 else quotient
     }
 
-    val digits = this.digits.padTo(numberSystem.maxLength + 1, 0)
+    val digits = this.digits.padTo(this.digits.length+1, 0) // TODO remove padTo(); add length?
     val (newDigits, lastCarry) =
       ((digits.head, 0) +:  digits.tail.init.zipWithIndex.map {
         case (digit, position) => (digit, numberSystem.range(position))

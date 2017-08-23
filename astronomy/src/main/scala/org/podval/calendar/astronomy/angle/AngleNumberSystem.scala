@@ -25,8 +25,6 @@ trait AngleNumberSystem extends RangedHeadDigitNumberSystem[AngleNumberSystem] {
 
   final object AnglePoint extends AnglePointCompanion
 
-  final override def maxLength: Int = 9
-
   final override def headRange: Int = 360
 
   final override def range(position: Int): Int = 60

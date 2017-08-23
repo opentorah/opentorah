@@ -31,9 +31,6 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   // TODO rename "multiplier"
   final def divisor(position: Int): Int /*TODO BigInt*/ = (1 to position).map(range).product
 
-  // TODO eliminate
-  def maxLength: Int
-
   def checkHeadDigit(value: Int): Unit
 
   def correctHeadDigit(value: Int): Int

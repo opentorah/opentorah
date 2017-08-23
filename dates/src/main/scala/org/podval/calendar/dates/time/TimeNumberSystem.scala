@@ -25,8 +25,6 @@ abstract class TimeNumberSystem[S <: TimeNumberSystem[S]]
 
   final val partsPerMinute: Int = partsPerHour / minutesPerHour
 
-  final override def maxLength: Int = 3
-
   final override def range(position: Int): Int = position match {
     case 0 => hoursPerDay
     case 1 => partsPerHour
