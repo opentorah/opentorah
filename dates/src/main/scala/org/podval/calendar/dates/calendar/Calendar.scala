@@ -9,22 +9,18 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   def createYear(number: Int): C#Year
 
-  // TODO scope inside YearCompanion?
   type YearCharacter
 
   val Year: YearCompanion[C]
 
   type Month <: MonthBase[C]
 
-  // TODO scope inside MonthCompanion?
   type MonthName
 
   def createMonth(number: Int): C#Month
 
-  // TODO scope inside MonthCompanion?
   type MonthNameAndLength = MonthNameAndLengthBase[C]
 
-  // TODO scope inside MonthCompanion?
   type MonthDescriptor = MonthDescriptorBase[C]
 
   val Month: MonthCompanion[C]
@@ -33,9 +29,6 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   def createDay(number: Int): C#Day
 
-  // TODO scope inside DayCompanion?
-  // TODO make this a Enum - and use its `values()` method in DayCompanion.name
-  //   (which will then become `final`); also define val Name: X...
   type DayName
 
   val Day: DayCompanion[C]
@@ -63,6 +56,10 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   final val interval: C#TimeInterval = createInterval(false, List(0))
 
-  // TODO using Day.daysPerWeek will probably break initialization too...
-  final val week: C#TimeInterval = interval.days(7)
+  final val week: C#TimeInterval = interval.days(Calendar.daysPerWeek)
+}
+
+
+object Calendar {
+  final val daysPerWeek: Int = 7
 }

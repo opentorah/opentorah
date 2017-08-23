@@ -54,7 +54,6 @@ abstract class YearBase[C <: Calendar[C]](number: Int)
     month(monthDescriptors.count(_.daysBefore < day))
   }
 
-  // TODO this needs to move into YearCompanion for any chance to eliminate YearCharacter?
   final def monthDescriptors: List[C#MonthDescriptor] =
     calendar.Year.monthDescriptors(character)
 }

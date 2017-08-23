@@ -1,5 +1,6 @@
 package org.podval.calendar.dates.gregorian
 
+import org.podval.calendar.dates.calendar.Calendar.daysPerWeek
 import org.podval.calendar.dates.calendar.DayCompanion
 import org.podval.calendar.dates.jewish.Jewish
 import org.podval.calendar.util.Named

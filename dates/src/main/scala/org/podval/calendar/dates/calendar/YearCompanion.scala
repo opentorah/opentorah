@@ -16,7 +16,7 @@ abstract class YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
     result
   }
 
-  // TODO lazy to make initialization work
+  // lazy to make initialization work
   lazy val monthDescriptors: Map[C#YearCharacter, List[C#MonthDescriptor]] =
     Map((for (character <- characters) yield character -> monthsGenerator(character)): _*)
 
@@ -33,13 +33,11 @@ abstract class YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
 
   protected def monthNamesAndLengths(character: C#YearCharacter): List[C#MonthNameAndLength]
 
-  // TODO scope inside MonthCompanion
   protected final def createMonthNameAndLength(name: C#MonthName, length: Int):
     C#MonthNameAndLength = new MonthNameAndLengthBase(name, length)
 
   protected def areYearsPositive: Boolean
 
-  // TODO centralize the constants (in a Gregorian companion object?).
   private[this] final def yearsForSureBefore(dayNumber: Int): Int =  {
     val result = (4 * dayNumber / (4 * 365 + 1)) - 1
     if (areYearsPositive) scala.math.max(1, result) else result

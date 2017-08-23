@@ -6,7 +6,7 @@ import org.podval.calendar.numbers.RangedHeadDigitNumberSystem
 
 class AngleNumberSystem extends {
 
-  // TODO rename
+  // TODO rename - override maxLength?
   private val max_length = 10
 
   final override val signs: List[String] =

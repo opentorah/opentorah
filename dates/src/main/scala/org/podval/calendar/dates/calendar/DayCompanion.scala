@@ -1,11 +1,11 @@
 package org.podval.calendar.dates.calendar
 
+import Calendar.daysPerWeek
+
 /**
   *
   */
 abstract class DayCompanion[C <: Calendar[C]] extends CalendarMember[C] {
-  val daysPerWeek: Int = 7
-
   def names: Seq[C#DayName]
 
   final def apply(number: Int): C#Day = calendar.createDay(number)
