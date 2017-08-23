@@ -16,16 +16,13 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   def createInterval(raw: RawNumber): S#Interval
 
-  // TODO replace with range()
-  val ranges: List[Int]
-
-  final def range(position: Int): Int = ranges(position)
-
-  // TODO move to comments
-  ranges.foreach { range =>
-    require(range > 0)
-    require(range % 2 == 0)
-  }
+  /**
+    *
+    * @param position
+    * @return positive, even number
+    */
+  // TODO range(n) is for digit (n+1), but sign(n) is for digit(n)!
+  def range(position: Int): Int
 
   // TODO return Option so that we can detect the last and drop it -
   // and replace Nothing with "," in the middle.
@@ -34,7 +31,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   final def divisor(position: Int): Int /*TODO BigInt*/ = (1 to position).map(range).product
 
   // TODO eliminate
-  val maxLength: Int = ranges.length
+  def maxLength: Int
 
   def checkHeadDigit(value: Int): Unit
 

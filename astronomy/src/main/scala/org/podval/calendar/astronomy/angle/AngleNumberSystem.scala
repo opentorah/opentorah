@@ -4,16 +4,7 @@ import org.podval.calendar.numbers.NumberSystem.RawNumber
 import org.podval.calendar.numbers.RangedHeadDigitNumberSystem
 
 
-class AngleNumberSystem extends {
-
-  // TODO rename - override maxLength?
-  private val max_length = 10
-
-  final override val ranges: List[Int] = List.empty.padTo(max_length - 1, 60)
-
-  final override val headRange: Int = 360
-
-} with RangedHeadDigitNumberSystem[AngleNumberSystem] {
+trait AngleNumberSystem extends RangedHeadDigitNumberSystem[AngleNumberSystem] {
   final override type Interval = AngleBase
 
   final type Angle = Interval
@@ -33,6 +24,12 @@ class AngleNumberSystem extends {
   }
 
   final object AnglePoint extends AnglePointCompanion
+
+  final override def maxLength: Int = 9
+
+  final override val headRange: Int = 360
+
+  final override def range(position: Int): Int = 60
 
   final override def sign(position: Int): String = position match {
     case 0 => "°"
