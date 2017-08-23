@@ -67,7 +67,8 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
   // TODO add multiplication (and division, and %) on Intervals from another NumberSystem!
 
   final def digitsWithRangesForMultiplication: List[(Int, Int)] =
-    digits zip (1 :: numberSystem.ranges)
+    (head, 1) +:
+      tail.zipWithIndex.map { case (digit, position) =>  (digit, numberSystem.range(position)) }
 
   final def *[T <: NumberSystem[T]](that: T#Interval): S#Interval = {
     val z = newInterval(false, List(0))
