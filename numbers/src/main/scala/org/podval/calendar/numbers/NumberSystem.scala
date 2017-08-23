@@ -23,9 +23,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     require(range % 2 == 0)
   }
 
-  val signs: List[String]
-
-  require(signs.length == (ranges.length + 1))
+  def sign(position: Int): String
 
   val maxLength: Int = ranges.length
 

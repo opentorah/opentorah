@@ -15,9 +15,14 @@ abstract class TimeNumberSystem[S <: TimeNumberSystem[S]] extends {
 
   final override val ranges: List[Int] = List(hoursPerDay, partsPerHour, momentsPerPart)
 
-  final override val signs: List[String] = List("d", "h", "p", "m")
-
 } with NotRangedHeadDigitNumberSystem[S] { this: S =>
+  final override def sign(position: Int): String = position match {
+    case 0 => "d"
+    case 1 => "h"
+    case 2 => "p"
+    case 3 => "m"
+  }
+
   require(hoursPerDay % 2 == 0)
 
   final val hoursPerHalfDay: Int = hoursPerDay / 2
