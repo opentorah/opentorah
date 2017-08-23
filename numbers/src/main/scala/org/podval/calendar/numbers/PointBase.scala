@@ -5,7 +5,7 @@ import org.podval.calendar.numbers.NumberSystem.RawNumber
 abstract class PointBase[S <: NumberSystem[S]](raw: RawNumber)
   extends Number[S, S#Point](raw)
 { this: S#Point =>
-  protected final override def newN(raw: RawNumber): S#Point = newPoint(raw)
+  protected final override def newNumber(raw: RawNumber): S#Point = newPoint(raw)
 
   final def +(that: S#Interval): S#Point = newPoint(add(negate = false, that))
 

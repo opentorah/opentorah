@@ -9,8 +9,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   protected final def newPoint(raw: RawNumber): S#Point = numberSystem.newPoint(raw)
   protected final def newInterval(raw: RawNumber): S#Interval = numberSystem.newInterval(raw)
 
-  // TODO rename?
-  protected def newN(raw: RawNumber): N
+  protected def newNumber(raw: RawNumber): N
 
   final def negative: Boolean = raw._1
 
@@ -20,18 +19,12 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
 
   final def tail: List[Int] = digits.tail
 
-  // TODO is this correct - or should it be `digits.length`?
   final def length: Int = tail.length
 
-  final def digit(n: Int): Int = {
-    require(0 <= n && n <= numberSystem.maxLength)
-    if (length >= n) digits(n) else 0
-  }
+  final def digit(n: Int): Int = if (length >= n) digits(n) else 0
 
-  final def digit(n: Int, value: Int): N = {
-    require(0 <= n && n <= numberSystem.maxLength)
-    newN(negative, digits.padTo(n + 1, 0).updated(n, value))
-  }
+  final def digit(n: Int, value: Int): N =
+    newNumber(negative, digits.padTo(n + 1, 0).updated(n, value))
 
   protected final def add(negate: Boolean, that: Number[S, _]): RawNumber = {
     val sameSign = this.negative == that.negative
@@ -57,7 +50,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
       }
     }
 
-    newN(negative, head +: tail_)
+    newNumber(negative, head +: tail_)
   }
 
   // TODO rework for BigInt divisors.
@@ -95,7 +88,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
 
   final def compare(that: N): Int = {
     if (this.negative == that.negative) {
-      val result = zip(that) map lift(_.compare(_)) find (_ != 0) getOrElse 0
+      val result = zip(that).map(lift(_ compare _)).find (_ != 0) getOrElse 0
       if (!this.negative) result else -result
     } else {
       if (!that.negative) +1 else -1

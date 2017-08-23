@@ -5,7 +5,7 @@ import org.podval.calendar.numbers.NumberSystem.RawNumber
 abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
   extends Number[S, S#Interval](raw)
 { this: S#Interval =>
-  protected final override def newN(raw: RawNumber): S#Interval =  newInterval(raw)
+  protected final override def newNumber(raw: RawNumber): S#Interval =  newInterval(raw)
 
   final def +(that: S#Interval): S#Interval = newInterval(add(negate = false, that))
 
