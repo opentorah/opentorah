@@ -42,9 +42,10 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   private final def normalize(raw: RawNumber): RawNumber = {
     def step(elem: (Int, Int), acc: (Int, List[Int])) = {
-      val (digit, range) = elem
+      val (digit, position) = elem
       val (carry, result) = acc
       val value = digit + carry
+      val range = this.range(position)
       val (quotient, reminder) = (value / range, value % range)
       val (carry_, digit_) =
         if (value >= 0) (quotient, reminder)
@@ -62,7 +63,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     }
 
     val (negative, digits) = raw
-    val (headCarry, newTail) = ((digits.tail zip ranges) :\(0, List.empty[Int]))(step)
+    val (headCarry, newTail) = (digits.tail.zipWithIndex :\(0, List.empty[Int]))(step)
     val (carriedNegative, newHead) = headStep(digits.head, headCarry)
 
     val newNegative = if (negative) !carriedNegative else carriedNegative
@@ -73,8 +74,9 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
     checkHeadDigit(newHead)
 
-    (newTail zip ranges) foreach { case (digit, range) =>
-      require(digit < range, "must be less than " + range)
+    newTail.zipWithIndex.foreach { case (digit, position) =>
+      val range = this.range(position)
+      require(digit < range, s"$digit must be less than $range")
     }
 
     (newNegative, newDigits)
@@ -84,10 +86,9 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     val negative = value < 0
     val absValue = if (!negative) value else -value
 
-    val digits = absValue +:
-      (1 to length).toList.map (
-        position => (absValue % (1.0d / divisor(position-1))) / (1.0d / divisor(position))
-      )
+    val digits = absValue +: (1 to length).toList.map (
+      position => (absValue % (1.0d / divisor(position-1))) / (1.0d / divisor(position))
+    )
 
     (negative, (digits.init map (math.floor(_).toInt)) :+ math.round(digits.last).toInt)
   }
