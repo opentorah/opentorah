@@ -37,8 +37,11 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
     }
 
     val digits = this.digits.padTo(numberSystem.maxLength + 1, 0)
-    val (newDigits, lastCarry) = (digits.init zip (0 :: numberSystem.ranges.init)).
-      foldLeft(List.empty[Int], 0)(step)
+    val (newDigits, lastCarry) =
+      ((digits.head, 0) +:  digits.tail.init.zipWithIndex.map {
+        case (digit, position) => (digit, numberSystem.range(position))
+      })
+        .foldLeft(List.empty[Int], 0)(step)
     val lastDigit = lastStep(digits.last, lastCarry, numberSystem.ranges.last)
 
     newInterval(negative, newDigits :+ lastDigit)
