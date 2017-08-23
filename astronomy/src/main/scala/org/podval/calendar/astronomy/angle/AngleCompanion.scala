@@ -6,7 +6,7 @@ class AngleCompanion {
   final def apply(digits: Int*): Angle = apply(negative = false, digits.toList)
 
   final def apply(negative: Boolean, digits: List[Int]): Angle =
-    AngleNumberSystem.createInterval(negative, digits)
+    AngleNumberSystem.newInterval(negative, digits)
 
   final def fromRadians(value: Double, length: Int): Angle =
     fromDegrees(math.toDegrees(value), length)
