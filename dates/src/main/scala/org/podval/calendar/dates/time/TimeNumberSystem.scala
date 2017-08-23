@@ -6,6 +6,7 @@ abstract class TimeNumberSystem[S <: TimeNumberSystem[S]] extends {
   // TODO NumberSystem's constructor uses ranges and signs in require() calls,
   // so they need to be initialized early - but even without the require() calls
   // initialization order requires this :(
+  // TODO get rid of the early initialization!
 
   final val hoursPerDay = 24
 

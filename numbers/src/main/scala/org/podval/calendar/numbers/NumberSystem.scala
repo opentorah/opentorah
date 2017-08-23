@@ -16,18 +16,25 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   def createInterval(raw: RawNumber): S#Interval
 
+  // TODO replace with range()
   val ranges: List[Int]
 
+  final def range(position: Int): Int = ranges(position)
+
+  // TODO move to comments
   ranges.foreach { range =>
     require(range > 0)
     require(range % 2 == 0)
   }
 
+  // TODO return Option so that we can detect the last and drop it -
+  // and replace Nothing with "," in the middle.
   def sign(position: Int): String
 
-  val maxLength: Int = ranges.length
+  final def divisor(position: Int): Int /*TODO BigInt*/ = (1 to position).map(range).product
 
-  val divisors: List[Double] = ranges.inits.toList.reverse.tail.map(_.product.toDouble)
+  // TODO eliminate
+  val maxLength: Int = ranges.length
 
   def checkHeadDigit(value: Int): Unit
 
@@ -77,9 +84,10 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     val negative = value < 0
     val absValue = if (!negative) value else -value
 
-    val digits = absValue +: ((((1.0d :: divisors.init) zip divisors) take length) map {
-      case (previous, current) => (absValue % (1.0d / previous)) / (1.0d / current)
-    })
+    val digits = absValue +:
+      (1 to length).toList.map (
+        position => (absValue % (1.0d / divisor(position-1))) / (1.0d / divisor(position))
+      )
 
     (negative, (digits.init map (math.floor(_).toInt)) :+ math.round(digits.last).toInt)
   }

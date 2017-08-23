@@ -19,8 +19,7 @@ class AnomalyVisibleTest extends FlatSpec {
   }
 
   private def test(table: Map[Angle, Angle]): Unit = {
-    for (row <- table) {
-      val (maslul, mnas) = row
+    for ((maslul, mnas) <- table) {
       val e: Double = AnomalyVisible.efrommnasround(maslul, mnas)
       val mnasfrome = AnomalyVisible.mnasfrome(maslul, e)
       val mnas_ = mnasfrome.roundToMinutes

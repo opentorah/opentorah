@@ -58,8 +58,15 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
     newN(negative, head +: tail_)
   }
 
-  final def toDouble: Double =
-    (if (negative) -1 else +1) * (head + ((tail zip numberSystem.divisors) map lift(_ / _)).sum)
+  // TODO rework for BigInt divisors.
+  final def toDouble: Double = {
+    val result =
+      digits.zipWithIndex.map { case (digit, position) =>
+        digit.toDouble / numberSystem.divisor(position).toDouble
+      }
+
+    (if (negative) -1 else +1) * result.sum
+  }
 
   private[this] def zip(that: Number[S, _]): List[(Int, Int)] =
     this.digits zipAll(that.digits, 0, 0)
@@ -71,7 +78,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   protected final def toSignedString: String = {
     // TODO detect and drop default "sign" after the last digit.
     val tokens = digits.zipWithIndex.flatMap {
-      case (digit, index) => List(digit.toString, numberSystem.sign(index))
+      case (digit, position) => List(digit.toString, numberSystem.sign(position))
     }
     (if (negative) "-" else "") + tokens.mkString
   }
