@@ -9,7 +9,7 @@ trait AngleNumberSystem extends RangedHeadDigitNumberSystem[AngleNumberSystem] {
 
   final type Angle = Interval
 
-  final override def createInterval(raw: RawNumber): Angle = new Angle(raw) {
+  protected final override def createInterval(raw: RawNumber): Angle = new Angle(raw) {
     final override def numberSystem: AngleNumberSystem = AngleNumberSystem.this
   }
 
@@ -19,7 +19,7 @@ trait AngleNumberSystem extends RangedHeadDigitNumberSystem[AngleNumberSystem] {
 
   final type AnglePoint = Point
 
-  final override def createPoint(raw: RawNumber): AnglePoint = new AnglePoint(raw) {
+  protected final override def createPoint(raw: RawNumber): AnglePoint = new AnglePoint(raw) {
     final override def numberSystem: AngleNumberSystem = AngleNumberSystem.this
   }
 

@@ -8,13 +8,13 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   final def newPoint(raw: RawNumber): S#Point = createPoint(normalize(raw))
 
-  def createPoint(raw: RawNumber): S#Point
+  protected def createPoint(raw: RawNumber): S#Point
 
   type Interval <: IntervalBase[S]
 
   final def newInterval(raw: RawNumber): S#Interval = createInterval(normalize(raw))
 
-  def createInterval(raw: RawNumber): S#Interval
+  protected def createInterval(raw: RawNumber): S#Interval
 
   /**
     *
@@ -66,7 +66,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     val newDigits = newHead :: newTail
 
     // Ensure that digits are within appropriate ranges
-    newDigits.foreach(digit => require(digit >= 0, "must be non-negative"))
+    newDigits.foreach(digit => require(digit >= 0, s"$digit must be non-negative"))
 
     checkHeadDigit(newHead)
 

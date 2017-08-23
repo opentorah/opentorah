@@ -39,13 +39,13 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   def createMoment(raw: RawNumber): C#Moment
 
-  final override def createPoint(raw: RawNumber): C#Point = createMoment(raw)
+  protected final override def createPoint(raw: RawNumber): C#Point = createMoment(raw)
 
   final override type Interval = TimeIntervalBase[C]
 
   final type TimeInterval = Interval
 
-  final override def createInterval(raw: RawNumber): TimeInterval =
+  protected final override def createInterval(raw: RawNumber): TimeInterval =
     new TimeIntervalBase[C](raw) { this: C#TimeInterval =>
       final override def numberSystem: C = Calendar.this
     }
