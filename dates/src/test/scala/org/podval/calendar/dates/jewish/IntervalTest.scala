@@ -8,7 +8,7 @@ import Jewish.Year
 class IntervalTest extends FlatSpec {
 
   "division for the year of Rav Ada" should "be correct" in {
-    val yearOfRavAda = Year.cycleLength / Year.yearsInCycle
+    val yearOfRavAda = Year.cycleLength / (Year.yearsInCycle, 2)
     // TODO compare with values from Sun.scala?
     println(yearOfRavAda)
   }

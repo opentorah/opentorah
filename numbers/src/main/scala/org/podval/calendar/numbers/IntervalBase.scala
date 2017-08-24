@@ -18,7 +18,7 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
 
   final def *(n: Int): S#Interval = newInterval(negative, digits map (n * _))
 
-  final def /(n: Int): S#Interval = {
+  final def /(n: Int, length: Int): S#Interval = {
     def divide(digit: Int, range: Int, carry: Int): (Int, Int, Int) = {
       val value: Int = digit + carry*range
       (value, value / n, value % n)
@@ -38,18 +38,19 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
       if (roundUp) quotient+1 else quotient
     }
 
+    // TODO do NOT assume that length > this.length()
     val digits = this.digits.padTo(this.digits.length+1, 0) // TODO remove padTo(); add length?
     val (newDigits, lastCarry) =
-      ((digits.head, 0) +:  digits.tail.init.zipWithIndex.map {
+      ((digits.head, 0) +:  tail.padTo(length-1, 0).zipWithIndex.map { // TODO zipWithRanges...
         case (digit, position) => (digit, numberSystem.range(position))
       })
         .foldLeft(List.empty[Int], 0)(step)
-    val lastDigit = lastStep(digits.last, numberSystem.range(digits.length-2), lastCarry) // TODO -1?
-
+    val lastDigit =
+      lastStep(0, numberSystem.range(length), lastCarry)
     newInterval(negative, newDigits :+ lastDigit)
   }
 
-  final def %(n: Int): S#Interval = this - ((this / n) * n)
+  final def %(n: Int, length: Int): S#Interval = this - ((this / (n, length)) * n)
 
   final def /(that: S#Interval): Int = {
     // TODO deal with negativity
@@ -75,12 +76,13 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
     (head, 1) +:
       tail.zipWithIndex.map { case (digit, position) =>  (digit, numberSystem.range(position)) }
 
-  final def *[T <: NumberSystem[T]](that: T#Interval): S#Interval = {
+  // TODO rework with conversion to BigRationals...
+  final def *[T <: NumberSystem[T]](that: T#Interval, length: Int): S#Interval = {
     val z = newInterval(false, List(0))
 
     def step(elem: (Int, Int), acc: S#Interval): S#Interval = {
       val (digit, range) = elem
-      (acc + this*digit)/range
+      (acc + this*digit)/ (range, length)
     }
 
     that.digitsWithRangesForMultiplication.foldRight(z)(step)
