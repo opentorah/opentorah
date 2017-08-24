@@ -1,6 +1,6 @@
 package org.podval.calendar.numbers
 
-import org.podval.calendar.numbers.NumberSystem.RawNumber
+import NumberSystem.RawNumber
 
 abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) extends Ordered[N]
 { this: N =>
@@ -13,7 +13,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
 
   final def negative: Boolean = raw._1
 
-  final def sign: Int = if (negative) -1 else +1
+  final def signum: Int = NumberSystem.signum(negative)
 
   final def digits: List[Int] = raw._2
 
@@ -64,7 +64,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
         digit.toDouble / numberSystem.multiplier(position).toDouble
       }
 
-    sign * result.sum
+    signum * result.sum
   }
 
   private[this] def zip(that: Number[S, _]): List[(Int, Int)] =
@@ -76,10 +76,10 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   // TODO: padding; cutting off 0; more flavours...
   protected final def toSignedString: String = {
     val digitsWithSigns: List[(Int, Option[String])] = tail.zipWithIndex.map {
-      case (digit, position) => (digit, numberSystem.suffix(position))
+      case (digit, position) => (digit, numberSystem.sign(position))
     }
     val result: List[String] =
-      (head + numberSystem.headSuffix) +:
+      (head + numberSystem.headSign) +:
       digitsWithSigns.init.map { case (digit, sign) => digit + sign.getOrElse(",")} :+
       { val (digit, sign) = digitsWithSigns.last; digit + sign.getOrElse("") }
 
@@ -94,7 +94,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
     val result =
       if (this.negative != that.negative) 1
       else zip(that).map(lift(_ compare _)).find (_ != 0) getOrElse 0
-    sign * result
+    signum * result
   }
 
   final override def equals(other: Any): Boolean =

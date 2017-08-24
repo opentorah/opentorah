@@ -15,9 +15,9 @@ trait TimeNumberSystem[S <: TimeNumberSystem[S]]
     case 2 => TimeNumberSystem.momentsPerPart
   }
 
-  final override def headSuffix: String = "d"
+  final override def headSign: String = "d"
 
-  final override val suffixPartial: PartialFunction[Int, String] = {
+  final override val signPartial: PartialFunction[Int, String] = {
     case 0 => "h"
     case 1 => "p"
     case 2 => "m"

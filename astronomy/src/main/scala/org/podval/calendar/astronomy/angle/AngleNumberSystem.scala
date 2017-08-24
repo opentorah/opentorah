@@ -29,9 +29,9 @@ trait AngleNumberSystem extends RangedHeadDigitNumberSystem[AngleNumberSystem] {
 
   final override def range(position: Int): Int = 60
 
-  final override def headSuffix: String = "°"
+  final override def headSign: String = "°"
 
-  final override val suffixPartial: PartialFunction[Int, String] = {
+  final override val signPartial: PartialFunction[Int, String] = {
     case 0 => "′"
     case 1 => "″"
     case 2 => "‴"
