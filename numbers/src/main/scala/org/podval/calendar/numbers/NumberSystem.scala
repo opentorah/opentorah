@@ -23,14 +23,13 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     */
   def range(position: Int): Int
 
-  def headSign: String
+  def headSuffix: String
 
-  val signPartial: PartialFunction[Int, String]
+  val suffixPartial: PartialFunction[Int, String]
 
-  def sign(position: Int): Option[String] = signPartial.lift(position)
+  def suffix(position: Int): Option[String] = suffixPartial.lift(position)
 
-  // TODO rename "multiplier"
-  final def divisor(position: Int): Int /*TODO BigInt*/ = (1 to position).map(range).product
+  final def multiplier(position: Int): Int /*TODO BigInt*/ = (1 to position).map(range).product
 
   def checkHeadDigit(value: Int): Unit
 
@@ -83,7 +82,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     val absValue = if (!negative) value else -value
 
     val digits = absValue +: (1 to length).toList.map (
-      position => (absValue % (1.0d / divisor(position-1))) / (1.0d / divisor(position))
+      position => (absValue % (1.0d / multiplier(position-1))) / (1.0d / multiplier(position))
     )
 
     (negative, (digits.init map (math.floor(_).toInt)) :+ math.round(digits.last).toInt)

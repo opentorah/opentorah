@@ -13,26 +13,28 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
 
   final def +(that: S#Point): S#Point = newPoint(add(negate = false, that))
 
-  // TODO -(Point)?
+  // TODO is this meaningful?
+  final def -(that: S#Point): S#Point = newPoint(add(negate = true, that))
 
   final def *(n: Int): S#Interval = newInterval(negative, digits map (n * _))
 
   final def /(n: Int): S#Interval = {
-    def step(acc: (List[Int], Int), elem: (Int, Int)) = {
-      val (digit, range) = elem
-      val (result, carry) = acc
-      val value = digit + carry*range
-      val (quotient, reminder) = (value / n, value % n)
+    def divide(digit: Int, range: Int, carry: Int): (Int, Int, Int) = {
+      val value: Int = digit + carry*range
+      (value, value / n, value % n)
+    }
 
+    def step(acc: (List[Int], Int), elem: (Int, Int)): (List[Int], Int) = {
+      val (digit: Int, range: Int) = elem
+      val (result: List[Int], carry: Int) = acc
+      val (value: Int, quotient: Int, reminder: Int) = divide(digit, range, carry)
       (result :+ quotient, reminder)
     }
 
-    def lastStep(last: Int, lastCarry: Int, lastRange: Int): Int = {
-      val value = last + lastCarry*lastRange
-      val (quotient, reminder) = (value / n, value % n)
-
-      val roundUp = ((n % 2 == 0) && (reminder >= n / 2)) || ((n % 2 == 1) && (reminder > n / 2))
-
+    def lastStep(digit: Int, range: Int, carry: Int): Int = {
+      val (value: Int, quotient: Int, reminder: Int) = divide(digit, range, carry)
+      val roundUp: Boolean =
+        ((n % 2 == 0) && (reminder >= n / 2)) || ((n % 2 == 1) && (reminder > n / 2))
       if (roundUp) quotient+1 else quotient
     }
 
@@ -42,7 +44,7 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
         case (digit, position) => (digit, numberSystem.range(position))
       })
         .foldLeft(List.empty[Int], 0)(step)
-    val lastDigit = lastStep(digits.last, lastCarry, numberSystem.range(digits.length-2)) // TODO -1?
+    val lastDigit = lastStep(digits.last, numberSystem.range(digits.length-2), lastCarry) // TODO -1?
 
     newInterval(negative, newDigits :+ lastDigit)
   }

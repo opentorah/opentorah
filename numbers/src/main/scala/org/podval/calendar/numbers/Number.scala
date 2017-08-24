@@ -13,6 +13,8 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
 
   final def negative: Boolean = raw._1
 
+  final def sign: Int = if (negative) -1 else +1
+
   final def digits: List[Int] = raw._2
 
   final def head: Int = digits.head
@@ -25,6 +27,8 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
 
   final def digit(n: Int, value: Int): N =
     newNumber(negative, digits.padTo(n + 1, 0).updated(n, value))
+
+  final def unary_- : N = newNumber(!negative, digits)
 
   protected final def add(negate: Boolean, that: Number[S, _]): RawNumber = {
     val sameSign = this.negative == that.negative
@@ -57,10 +61,10 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   final def toDouble: Double = {
     val result =
       digits.zipWithIndex.map { case (digit, position) =>
-        digit.toDouble / numberSystem.divisor(position).toDouble
+        digit.toDouble / numberSystem.multiplier(position).toDouble
       }
 
-    (if (negative) -1 else +1) * result.sum
+    sign * result.sum
   }
 
   private[this] def zip(that: Number[S, _]): List[(Int, Int)] =
@@ -72,10 +76,10 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   // TODO: padding; cutting off 0; more flavours...
   protected final def toSignedString: String = {
     val digitsWithSigns: List[(Int, Option[String])] = tail.zipWithIndex.map {
-      case (digit, position) => (digit, numberSystem.sign(position))
+      case (digit, position) => (digit, numberSystem.suffix(position))
     }
     val result: List[String] =
-      (head + numberSystem.headSign) +:
+      (head + numberSystem.headSuffix) +:
       digitsWithSigns.init.map { case (digit, sign) => digit + sign.getOrElse(",")} :+
       { val (digit, sign) = digitsWithSigns.last; digit + sign.getOrElse("") }
 
@@ -87,12 +91,10 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   final override def hashCode: Int = (73 /: digits)((v, x) => 41 * v + x) + negative.hashCode
 
   final def compare(that: N): Int = {
-    if (this.negative == that.negative) {
-      val result = zip(that).map(lift(_ compare _)).find (_ != 0) getOrElse 0
-      if (!this.negative) result else -result
-    } else {
-      if (!that.negative) +1 else -1
-    }
+    val result =
+      if (this.negative != that.negative) 1
+      else zip(that).map(lift(_ compare _)).find (_ != 0) getOrElse 0
+    sign * result
   }
 
   final override def equals(other: Any): Boolean =

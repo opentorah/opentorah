@@ -8,5 +8,5 @@ abstract class MomentBase[C <: Calendar[C]](raw: RawNumber)
 { this: C#Moment =>
   final def day: C#Day = calendar.createDay(days + 1)
 
-  final def time: C#TimeInterval = calendar.createInterval(false, days(0).digits)
+  final def time: C#TimeInterval = calendar.newInterval(false, days(0).digits)
 }
