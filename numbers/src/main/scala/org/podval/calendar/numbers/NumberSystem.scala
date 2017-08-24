@@ -74,7 +74,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
       require(digit < range, s"$digit must be less than $range")
     }
 
-    (newNegative, newDigits)
+    (newNegative, newDigits.reverse.dropWhile(_ == 0).reverse) // no dropWhileRight :)
   }
 
   final def fromDouble(value: Double, length: Int): RawNumber = {

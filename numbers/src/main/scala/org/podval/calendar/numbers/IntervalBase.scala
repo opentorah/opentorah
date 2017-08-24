@@ -39,14 +39,13 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
     }
 
     // TODO do NOT assume that length > this.length()
-    val digits = this.digits.padTo(this.digits.length+1, 0) // TODO remove padTo(); add length?
     val (newDigits, lastCarry) =
       ((digits.head, 0) +:  tail.padTo(length-1, 0).zipWithIndex.map { // TODO zipWithRanges...
         case (digit, position) => (digit, numberSystem.range(position))
       })
         .foldLeft(List.empty[Int], 0)(step)
     val lastDigit =
-      lastStep(0, numberSystem.range(length), lastCarry)
+      lastStep(0, numberSystem.range(length-1), lastCarry)
     newInterval(negative, newDigits :+ lastDigit)
   }
 
