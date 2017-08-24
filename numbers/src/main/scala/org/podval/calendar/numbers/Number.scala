@@ -31,8 +31,8 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   final def unary_- : N = newNumber(!negative, digits)
 
   protected final def add(negate: Boolean, that: Number[S, _]): RawNumber = {
-    val sameSign = this.negative == that.negative
-    val operationSelector = if (negate) !sameSign else sameSign
+    val sameSign: Boolean = this.negative == that.negative
+    val operationSelector: Boolean = if (negate) !sameSign else sameSign
     val operation: (Int, Int) => Int = if (operationSelector) _ + _ else _ - _
     (negative, zip(that).map(operation.tupled))
   }
@@ -58,14 +58,9 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   }
 
   // TODO rework for BigInt divisors.
-  final def toDouble: Double = {
-    val result =
-      digits.zipWithIndex.map { case (digit, position) =>
-        digit.toDouble / numberSystem.multiplier(position).toDouble
-      }
-
-    signum * result.sum
-  }
+  final def toDouble: Double = signum * digits.zipWithIndex.map { case (digit, position) =>
+    digit.toDouble / numberSystem.multiplier(position).toDouble
+  }.sum
 
   private[this] def zip(that: Number[S, _]): List[(Int, Int)] =
     this.digits zipAll(that.digits, 0, 0)
@@ -91,7 +86,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   final override def hashCode: Int = (73 /: digits)((v, x) => 41 * v + x) + negative.hashCode
 
   final def compare(that: N): Int = {
-    val result =
+    val result: Int =
       if (this.negative != that.negative) 1
       else zip(that).map(lift(_ compare _)).find (_ != 0) getOrElse 0
     signum * result

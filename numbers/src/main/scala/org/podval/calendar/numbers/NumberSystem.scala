@@ -80,9 +80,11 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   final def fromDouble(value: Double, length: Int): RawNumber = {
     val negative: Boolean = value < 0
     val absValue: Double = signum(negative) * value
-    val digits: List[Double] = absValue +: (1 to length+1).toList.map (
-      position => (absValue % (1.0d / multiplier(position-1))) / (1.0d / multiplier(position))
-    )
+    val digits: List[Double] = absValue +: (1 to length+1).toList.map { position =>
+      val previousDivisor = 1.0d / multiplier(position - 1)
+      val currentDivisor  = 1.0d / multiplier(position)
+      (absValue % previousDivisor) / currentDivisor
+    }
     val roundedDigits: List[Double] = digits.init.map(math.floor) :+ math.rint(digits.last)
     (negative, roundedDigits.map(_.toInt))
   }
