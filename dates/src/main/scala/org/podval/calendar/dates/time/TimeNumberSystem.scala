@@ -2,8 +2,7 @@ package org.podval.calendar.dates.time
 
 import org.podval.calendar.numbers.NotRangedHeadDigitNumberSystem
 
-// TODO turn into a trait (without compilation errors)?
-abstract class TimeNumberSystem[S <: TimeNumberSystem[S]]
+trait TimeNumberSystem[S <: TimeNumberSystem[S]]
   extends NotRangedHeadDigitNumberSystem[S]
 { this: S =>
   type Point <: TimePointBase[S]

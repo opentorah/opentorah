@@ -23,7 +23,8 @@ class RambamTest extends FlatSpec {
   }
 
   "molad Nisan example" should "be correct" ignore {
-    // TODO KH 6:7
+    // TODO test fails!
+    // KH 6:7
     val rambamTime = interval.hours(17).parts(107)
 
     val years = for {

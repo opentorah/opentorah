@@ -24,9 +24,8 @@ abstract class YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
 
   private[this] def monthsGenerator(character: C#YearCharacter): List[C#MonthDescriptor] = {
     val namesAndLengths = monthNamesAndLengths(character)
-    // TODO dayses?
-    val daysesBefore = namesAndLengths.map(_.length).scanLeft(0)(_ + _).init
-    namesAndLengths zip daysesBefore map { case (nameAndLength, daysBefore) =>
+    val daysBeforeForMonth: List[Int] = namesAndLengths.map(_.length).scanLeft(0)(_ + _).init
+    namesAndLengths zip daysBeforeForMonth map { case (nameAndLength, daysBefore) =>
       new MonthDescriptorBase(nameAndLength.name, nameAndLength.length, daysBefore)
     }
   }

@@ -3,7 +3,6 @@ package org.podval.calendar.dates.jewish
 import org.podval.calendar.dates.calendar.{Calendar, CalendarMember}
 import org.podval.calendar.numbers.NumberSystem.RawNumber
 
-// TODO add a check that length of the year and total length of the months are the same
 class Jewish private() extends Calendar[Jewish] {
 
   trait JewishCalendarMember extends CalendarMember[Jewish] {

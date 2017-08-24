@@ -31,10 +31,6 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   final def multiplier(position: Int): Int /*TODO BigInt*/ = (1 to position).map(range).product
 
-  def checkHeadDigit(value: Int): Unit
-
-  def correctHeadDigit(value: Int): Int
-
   private final def normalize(raw: RawNumber): RawNumber = {
     def step(elem: (Int, Int), acc: (Int, List[Int])) = {
       val (digit, position) = elem
@@ -69,13 +65,18 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
     checkHeadDigit(newHead)
 
-    newTail.zipWithIndex.foreach { case (digit, position) =>
-      val range = this.range(position)
-      require(digit < range, s"$digit must be less than $range")
-    }
+    zipWithRanges(newTail).foreach
+      { case (digit, range) => require(digit < range, s"$digit must be less than $range") }
 
     (newNegative, newDigits.reverse.dropWhile(_ == 0).reverse) // no dropWhileRight :)
   }
+
+  def checkHeadDigit(value: Int): Unit
+
+  def correctHeadDigit(value: Int): Int
+
+  final def zipWithRanges(tail: List[Int]): List[(Int, Int)] =
+    tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
 
   final def fromDouble(value: Double, length: Int): RawNumber = {
     val negative = value < 0

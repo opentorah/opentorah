@@ -40,10 +40,8 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
 
     // TODO do NOT assume that length > this.length()
     val (newDigits, lastCarry) =
-      ((digits.head, 0) +:  tail.padTo(length-1, 0).zipWithIndex.map { // TODO zipWithRanges...
-        case (digit, position) => (digit, numberSystem.range(position))
-      })
-        .foldLeft(List.empty[Int], 0)(step)
+      ((digits.head, 0) +:  numberSystem.zipWithRanges(tail.padTo(length-1, 0)))
+      .foldLeft(List.empty[Int], 0)(step)
     val lastDigit =
       lastStep(0, numberSystem.range(length-1), lastCarry)
     newInterval(negative, newDigits :+ lastDigit)
@@ -72,8 +70,7 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
   // TODO add multiplication (and division, and %) on Intervals from another NumberSystem!
 
   final def digitsWithRangesForMultiplication: List[(Int, Int)] =
-    (head, 1) +:
-      tail.zipWithIndex.map { case (digit, position) =>  (digit, numberSystem.range(position)) }
+    (head, 1) +: numberSystem.zipWithRanges(tail)
 
   // TODO rework with conversion to BigRationals...
   final def *[T <: NumberSystem[T]](that: T#Interval, length: Int): S#Interval = {
