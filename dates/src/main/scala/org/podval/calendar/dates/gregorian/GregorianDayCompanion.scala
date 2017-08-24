@@ -1,8 +1,7 @@
 package org.podval.calendar.dates.gregorian
 
-import org.podval.calendar.dates.calendar.Calendar.daysPerWeek
+import org.podval.calendar.dates.calendar.Calendar.firstDayNumberInWeekGregorian
 import org.podval.calendar.dates.calendar.DayCompanion
-import org.podval.calendar.dates.jewish.Jewish
 import org.podval.calendar.util.Named
 
 abstract class GregorianDayCompanion extends DayCompanion[Gregorian] {
@@ -12,11 +11,7 @@ abstract class GregorianDayCompanion extends DayCompanion[Gregorian] {
 
   final override def names: Seq[Name] = Name.values
 
-  final val epoch: Int = 1373429
-
-  // TODO eliminate link to Jewish
-  final override val firstDayNumberInWeek: Int =
-    (((Jewish.Day.firstDayNumberInWeek - 1) + (epoch % daysPerWeek)) % daysPerWeek) + 1
+  final override val firstDayNumberInWeek: Int = firstDayNumberInWeekGregorian
 }
 
 

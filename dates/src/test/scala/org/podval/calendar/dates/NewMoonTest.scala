@@ -1,6 +1,7 @@
 package org.podval.calendar.dates
 
 import org.scalatest.FlatSpec
+import calendar.Calendar
 import gregorian.Gregorian
 import Gregorian.Month.Name._
 import jewish.Jewish
@@ -27,7 +28,7 @@ final class NewMoonTest extends FlatSpec {
     newMoon(5773, Nisan     , Shlishi ,  5773, Nisan  ,  1,  2013, March    , 12,  6, 21, 14)
   }
 
-  "new moons from the printed tables for Tishrey 5775" should "calculate correctly" ignore {
+  "new moons from the printed tables for Tishrei 5775" should "calculate correctly" ignore {
     // TODO Elul 28?!
     newMoon(5772, Tishrei   , Shlishi ,  5771, Elul   , 27,  2011, September, 27, 17,  8, 14)
   }
@@ -46,10 +47,10 @@ final class NewMoonTest extends FlatSpec {
     assertResult(dayOfWeek)(molad.day.name)
     assertResult(dayJ)(molad.day)
 
-    val dateJ = Conversions.toJewish(dateG)
+    val dateJ = Calendar.toJewish(dateG)
     assertResult(dayJ)(dateJ.day)
 
-    val moladG = Conversions.fromJewish(molad)
+    val moladG = Calendar.fromJewish(molad)
     assertResult(dateG)(moladG)
   }
 }

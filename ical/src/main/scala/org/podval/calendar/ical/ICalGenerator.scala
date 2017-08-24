@@ -1,10 +1,9 @@
 package org.podval.calendar.ical
 
-import org.podval.calendar.dates.jewish.Jewish
+import java.io.{FileOutputStream, OutputStream}
+import org.podval.calendar.dates.calendar.Calendar
 import org.podval.calendar.dates.gregorian.Gregorian
-import org.podval.calendar.dates.Conversions
-
-import java.io.{OutputStream, FileOutputStream}
+import org.podval.calendar.dates.jewish.Jewish
 
 
 final class ICalGenerator private(os: OutputStream) {
@@ -30,7 +29,7 @@ final class ICalGenerator private(os: OutputStream) {
   }
 
   private def day(dayG: Gregorian.Day): Properties = {
-    val dayJ = Conversions.toJewish(dayG)
+    val dayJ = Calendar.toJewish(dayG)
     val monthName: String = dayJ.month.name.name
     val dayNumber = dayJ.numberInMonth
     val summaryText = monthName + " " + dayNumber
@@ -53,7 +52,7 @@ object ICalGenerator {
 
 
   def main(args: Array[String]) {
-    val x = Jewish /// XXX why do I need to do this?!
+    val x = Jewish /// TODO why do I need to do this?!
     val y = Gregorian
 
     new ICalGenerator(new FileOutputStream("/tmp/jc.ics")).writeYear(2013)

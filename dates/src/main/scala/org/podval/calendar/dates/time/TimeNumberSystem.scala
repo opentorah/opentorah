@@ -10,25 +10,10 @@ abstract class TimeNumberSystem[S <: TimeNumberSystem[S]]
 
   type Interval <: TimeIntervalBase[S]
 
-  final val hoursPerDay = 24
-  require(hoursPerDay % 2 == 0)
-
-  final val partsPerHour = 1080
-
-  final val momentsPerPart = 76
-
-  final val hoursPerHalfDay: Int = hoursPerDay / 2
-
-  final val minutesPerHour = 60
-
-  require(partsPerHour % minutesPerHour == 0)
-
-  final val partsPerMinute: Int = partsPerHour / minutesPerHour
-
   final override def range(position: Int): Int = position match {
-    case 0 => hoursPerDay
-    case 1 => partsPerHour
-    case 2 => momentsPerPart
+    case 0 => TimeNumberSystem.hoursPerDay
+    case 1 => TimeNumberSystem.partsPerHour
+    case 2 => TimeNumberSystem.momentsPerPart
   }
 
   final override def headSuffix: String = "d"
@@ -38,4 +23,21 @@ abstract class TimeNumberSystem[S <: TimeNumberSystem[S]]
     case 1 => "p"
     case 2 => "m"
   }
+}
+
+
+object TimeNumberSystem {
+  final val hoursPerDay = 24
+  require(hoursPerDay % 2 == 0)
+
+  final val hoursPerHalfDay: Int = hoursPerDay / 2
+
+  final val partsPerHour = 1080
+
+  final val momentsPerPart = 76
+
+  final val minutesPerHour = 60
+  require(partsPerHour % minutesPerHour == 0)
+
+  final val partsPerMinute: Int = partsPerHour / minutesPerHour
 }

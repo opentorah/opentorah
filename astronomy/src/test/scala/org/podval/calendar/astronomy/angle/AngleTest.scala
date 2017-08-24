@@ -11,7 +11,6 @@ class AngleTest extends FlatSpec {
   behavior of "Angle"
 
   it should "construct properly" in {
-
     def construction(degrees: Int, minutes: Int) {
       val angle = Angle(degrees, minutes)
       assertResult(degrees)(angle.degrees)
@@ -25,7 +24,6 @@ class AngleTest extends FlatSpec {
   }
 
   it should "convert properly" in {
-
     def conversion(degrees: Int, minutes: Int) {
       val angle = Angle(degrees, minutes)
       assert(angle == Angle.fromDegrees(angle.toDegrees, 2))

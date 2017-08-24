@@ -1,7 +1,7 @@
 package org.podval.calendar.astronomy.sun
-import org.podval.calendar.dates.Sun
-import org.podval.calendar.dates.jewish.Jewish
+
 import org.scalatest.FlatSpec
+import org.podval.calendar.dates.jewish.{Jewish, Sun}
 
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
@@ -29,6 +29,7 @@ class LongitudeMeanTest extends FlatSpec {
 
   it should "calculate correctly for the regular year" ignore {
     assertResult(LongitudeMean.value(354))(LongitudeMean.value(100)*3+LongitudeMean.value(10)*5+LongitudeMean.value(1)*4)
+    // TODO what is the result of direct multiplication on 354?
   }
 
   it should "make a full circle in a year" in {

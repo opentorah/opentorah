@@ -1,8 +1,7 @@
-package org.podval.calendar.dates
+package org.podval.calendar.dates.jewish
 
 import org.scalatest.FlatSpec
-import jewish.Jewish
-import Jewish._
+import Jewish.{Year, Month, Day, interval, week}
 
 /**
  * Tests based on the statements from the text itself.
@@ -10,25 +9,17 @@ import Jewish._
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class RambamTest extends FlatSpec {
 
-  "time units" should "be correct" in {
-    val j = Jewish // WTF?!
-
-    // KH 6:2
-    assert(hoursPerDay == 24)
-    assert(partsPerHour == 1080)
-  }
-
   "first two years' new moons" should "be correct" in {
     // KH 6:8
     val year1newMoon = Year(1).newMoon
-    assert(year1newMoon.day.name == Day.Name.Sheni)
-    assert(year1newMoon.time == interval.hours(5).parts(204))
+    assertResult(Day.Name.Sheni)(year1newMoon.day.name)
+    assertResult(interval.hours(5).parts(204))(year1newMoon.time)
 
     val year2newMoon = Year(2).newMoon
-    assert(year2newMoon.day.name == Day.Name.Shishi)
-    assert(year2newMoon.time == interval.hours(14))
+    assertResult(Day.Name.Shishi)(year2newMoon.day.name)
+    assertResult(interval.hours(14))(year2newMoon.time)
 
-    assert(year2newMoon - Month.meanLunarPeriod*12 == year1newMoon)
+    assertResult(year1newMoon)(year2newMoon - Month.meanLunarPeriod*12)
   }
 
   "molad Nisan example" should "be correct" ignore {

@@ -1,6 +1,7 @@
-package org.podval.calendar.dates
+package org.podval.calendar.dates.jewish
 
-import org.podval.calendar.dates.jewish.Jewish.{Year, Month, Day}
+import org.podval.calendar.dates.calendar.Calendar
+import Jewish.{Day, Month, Year}
 
 
 /**
@@ -43,7 +44,6 @@ object Rambam {
     override def numColumns: Int = 4
   }
 
-
   private val narrowFormatter = new Formatter {
     override def formatLesson(
       dayNumberInMonth: Int,
@@ -61,7 +61,7 @@ object Rambam {
     def scheduleMonth(month: Month): Seq[String] = {
       val lessons = for {
         day <- month.days
-        gDay = Conversions.fromJewish(day)
+        gDay = Calendar.fromJewish(day)
       } yield formatter.formatLesson(
         day.numberInMonth,
         gDay.month.numberInYear,

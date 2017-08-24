@@ -1,6 +1,6 @@
 package org.podval.calendar.dates.jewish
 
-import org.podval.calendar.dates.calendar.DayCompanion
+import org.podval.calendar.dates.calendar.{Calendar, DayCompanion}
 import org.podval.calendar.util.Named
 
 abstract class JewishDayCompanion extends DayCompanion[Jewish] {
@@ -10,9 +10,7 @@ abstract class JewishDayCompanion extends DayCompanion[Jewish] {
 
   final override def names: Seq[Name] = Name.values
 
-  // It seems that first day of the first year was Sunday; molad - BaHaRad.
-  // Second year - friday; molad - 8 in the morning.
-  final override val firstDayNumberInWeek: Int = 1
+  final override val firstDayNumberInWeek: Int = Calendar.firstDayNumberInWeekJewish
 }
 
 
