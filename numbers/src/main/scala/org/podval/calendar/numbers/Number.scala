@@ -23,10 +23,10 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
 
   final def length: Int = tail.length
 
-  final def digit(n: Int): Int = if (length >= n) digits(n) else 0
+  final def digit(position: Int): Int = if (length >= position) digits(position) else 0
 
-  final def digit(n: Int, value: Int): N =
-    newNumber(negative, digits.padTo(n + 1, 0).updated(n, value))
+  final def digit(position: Int, value: Int): N =
+    newNumber(negative, digits.padTo(position + 1, 0).updated(position, value))
 
   final def unary_- : N = newNumber(!negative, digits)
 
@@ -38,15 +38,14 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   }
 
   // TODO add rounding tests
-  final def roundTo(n: Int): N = {
-    require(n >= 0)
+  final def roundTo(length: Int): N = {
+    require(length >= 0)
 
-    val (more_, toRound) = tail splitAt n
+    val (more_, toRound) = tail splitAt length
     val tail_ = {
-      if (more_.isEmpty) more_
-      else {
+      if (more_.isEmpty) more_ else {
         val toRoundWithRange = toRound.zipWithIndex.map {
-          case (digit, position) => (digit, numberSystem.range(n+position))
+          case (digit, position) => (digit, numberSystem.range(length+position))
         }
         val carry =
           (toRoundWithRange :\ 0) { case ((x, range), c) => if (x + c >= range / 2) 1 else 0}
@@ -57,9 +56,8 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
     newNumber(negative, head +: tail_)
   }
 
-  // TODO rework for BigInt divisors.
   final def toDouble: Double = signum * digits.zipWithIndex.map { case (digit, position) =>
-    digit.toDouble / numberSystem.multiplier(position).toDouble
+    digit.toDouble / numberSystem.multiplier(position).bigInteger.longValueExact()
   }.sum
 
   private[this] def zip(that: Number[S, _]): List[(Int, Int)] =
@@ -68,15 +66,25 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   // TODO why can't I inline .tupled?
   private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = op.tupled
 
-  // TODO: padding; cutting off 0; more flavours...
+  final def toRational: BigRational = {
+    val (numerator: BigInt, denominator: BigInt) =
+      numberSystem.zipWithRanges(tail).foldLeft((BigInt(head), BigInt(1))) {
+        case ((numerator: BigInt, denominator: BigInt), (digit: Int, range: Int)) =>
+          (numerator*range + digit, denominator*range)
+      }
+    BigRational(negative, numerator, denominator)
+  }
+
+  // TODO: padding with 0 to a given length
   protected final def toSignedString: String = {
     val digitsWithSigns: List[(Int, Option[String])] = tail.zipWithIndex.map {
       case (digit, position) => (digit, numberSystem.sign(position))
     }
-    val result: List[String] =
-      (head + numberSystem.headSign) +:
+    val tailResult: List[String] = if (digitsWithSigns.isEmpty) List.empty else
       digitsWithSigns.init.map { case (digit, sign) => digit + sign.getOrElse(",")} :+
-      { val (digit, sign) = digitsWithSigns.last; digit + sign.getOrElse("") }
+        { val (digit, sign) = digitsWithSigns.last; digit + sign.getOrElse("") }
+
+    val result: List[String] = (head + numberSystem.headSign) +: tailResult
 
     (if (negative) "-" else "") + result.mkString
   }
@@ -95,5 +103,4 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   final override def equals(other: Any): Boolean =
     // TODO deal with the "erasure" warning; compare numberSystem...
     if (!other.isInstanceOf[N]) false else compare(other.asInstanceOf[N]) == 0
-
 }

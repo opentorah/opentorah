@@ -18,7 +18,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   /**
     *
-    * @param position
+    * @param position within the tail
     * @return positive, even number
     */
   def range(position: Int): Int
@@ -29,8 +29,15 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   def sign(position: Int): Option[String] = signPartial.lift(position)
 
-  // TODO position == 0 means "head", not the first digit of the "tail"...
-  final def multiplier(position: Int): Int /*TODO BigInt*/ = (1 to position).map(range).product
+  /**
+    *
+    * @param position is from the head (where it is 1); first digit in the tail is position 1
+    * @return
+    */
+  // TODO where I need to divide by a multiplier, I convert it to a long (with possible
+  // ArithmeticException) - because I do not know how to divide by a BigInt :)
+  final def multiplier(position: Int): BigInt =
+    (1 to position).map(position => BigInt(range(position-1))).product
 
   private final def normalize(raw: RawNumber): RawNumber = {
     def step(elem: (Int, Int), acc: (Int, List[Int])) = {
@@ -81,8 +88,8 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     val negative: Boolean = value < 0
     val absValue: Double = signum(negative) * value
     val digits: List[Double] = absValue +: (1 to length+1).toList.map { position =>
-      val previousDivisor = 1.0d / multiplier(position - 1)
-      val currentDivisor  = 1.0d / multiplier(position)
+      val previousDivisor = 1.0d / multiplier(position - 1).bigInteger.longValueExact()
+      val currentDivisor  = 1.0d / multiplier(position    ).bigInteger.longValueExact()
       (absValue % previousDivisor) / currentDivisor
     }
     val roundedDigits: List[Double] = digits.init.map(math.floor) :+ math.rint(digits.last)
