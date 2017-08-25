@@ -14,11 +14,11 @@ final class BigRational private(
     (whole, fraction)
   }
 
+  private def isNotLessThanHalf: Boolean = (numerator / denominator).floatValue >= 0.5f
+
   def *(multiplier: Int): BigRational = BigRational(negative, numerator*multiplier, denominator)
 
   def isZero: Boolean = numerator == 0
-
-  def isNotLessThanHalf: Boolean = (numerator / denominator).floatValue >= 0.5f
 
   override def toString: String =
     (if (negative) "-" else "") + numerator.toString + "/" + denominator.toString
@@ -44,4 +44,7 @@ object BigRational {
 
   final def apply(numerator: BigInt, denominator: BigInt): BigRational =
     apply(negative = false, numerator, denominator)
+
+  def round(what: (Int, BigRational)): Int =
+    what._1 + (if (what._2.isNotLessThanHalf) 1 else 0)
 }

@@ -86,30 +86,41 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
 
   final def fromRational(value: BigRational, length: Int): RawNumber = {
-    def round(what: BigRational): Int = if (what.isNotLessThanHalf) 1 else 0
+    def wholeAndFraction(what: BigRational): (Int, BigRational) =
+      what.wholeAndFraction
+
+    def round(what: (Int, BigRational)): Int = BigRational.round(what)
+
+    val negative = value.negative
 
     val (digits: List[(Int, BigRational)], lastDigit: (Int, BigRational))  =
       (0 until length).toList.map(range)
-      .foldLeft((List.empty[(Int, BigRational)], value.wholeAndFraction)) {
+      .foldLeft((List.empty[(Int, BigRational)], wholeAndFraction(value))) {
         case ((acc, (digit: Int, reminder: BigRational)), range: Int) =>
-          (acc :+ (digit, reminder), (reminder*range).wholeAndFraction)
+          (acc :+ (digit, reminder), wholeAndFraction(reminder*range))
       }
-    val (lastDigitRaw: Int, lastReminder: BigRational) = lastDigit
-    val result: List[Int] = digits.map(_._1) :+ (lastDigitRaw + round(lastReminder))
-    (value.negative, result)
+    (negative, digits.map(_._1) :+ round(lastDigit))
   }
 
-  // TODO redo in the stype of fromRational(), without multiplier()s
-  final def fromDouble(value: Double, length: Int): RawNumber = {
-    val negative: Boolean = value < 0
-    val absValue: Double = signum(negative) * value
-    val digits: List[Double] = absValue +: (1 to length).toList.map { position =>
-      val previousDivisor = 1.0d / multiplier(position - 1).bigInteger.longValueExact()
-      val currentDivisor  = 1.0d / multiplier(position    ).bigInteger.longValueExact()
-      (absValue % previousDivisor) / currentDivisor
+  final def fromDouble(signedValue: Double, length: Int): RawNumber = {
+    def wholeAndFraction(what: Double): (Int, Double) = {
+      val whole: Double = math.floor(what)
+      val fraction: Double = what - whole
+      (whole.toInt, fraction)
     }
-    val roundedDigits: List[Double] = digits.init.map(math.floor) :+ math.rint(digits.last)
-    (negative, roundedDigits.map(_.toInt))
+
+    def round(what: (Int, Double)): Int = what._1 + math.round(what._2).toInt
+
+    val negative: Boolean = signedValue < 0
+    val value: Double = signum(negative) * signedValue
+
+    val (digits: List[(Int, Double)], lastDigit: (Int, Double))  =
+      (0 until length).toList.map(range)
+      .foldLeft((List.empty[(Int, Double)], wholeAndFraction(value))) {
+        case ((acc, (digit: Int, reminder: Double)), range: Int) =>
+          (acc :+ (digit, reminder), wholeAndFraction(reminder*range))
+      }
+    (negative, digits.map(_._1) :+ round(lastDigit))
   }
 }
 
