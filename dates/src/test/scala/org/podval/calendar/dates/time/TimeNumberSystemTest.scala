@@ -6,17 +6,12 @@ import org.scalatest.FlatSpec
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class TimeNumberSystemTest extends FlatSpec {
 
-  "ranges and multipliers" should "be correct" in {
-    import SimpleTimeNumberSystem.{range, multiplier}
+  "ranges" should "be correct" in {
+    import SimpleTimeNumberSystem.range
 
     assertResult(  24)(range(0))
     assertResult(1080)(range(1))
     assertResult(  76)(range(2))
-
-    assertResult(1           )(multiplier(0))
-    assertResult(1*24        )(multiplier(1))
-    assertResult(1*24*1080   )(multiplier(2))
-    assertResult(1*24*1080*76)(multiplier(3))
   }
 
   "toRational()" should "be correct" in {

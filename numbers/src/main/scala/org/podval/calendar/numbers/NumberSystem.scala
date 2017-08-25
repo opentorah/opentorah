@@ -29,17 +29,6 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   def sign(position: Int): Option[String] = signPartial.lift(position)
 
-  /**
-    *
-    * @param position is from the head (where it is 1); first digit in the tail is position 1
-    * @return
-    */
-  // TODO where I need to divide by a multiplier, I convert it to a long (with possible
-  // ArithmeticException) - because I do not know how to divide by a BigInt :)
-  // TODO remove multiplier and ensure that ranges are multiplied as BigInts
-  final def multiplier(position: Int): BigInt =
-    (1 to position).map(position => BigInt(range(position-1))).product
-
   private final def normalize(raw: RawNumber): RawNumber = {
     def step(elem: (Int, Int), acc: (Int, List[Int])) = {
       val (digit, position) = elem
