@@ -85,22 +85,14 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   final def zipWithRanges(tail: List[Int]): List[(Int, Int)] =
     tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
 
-  final def fromRational(value: BigRational, length: Int): RawNumber = {
-    def wholeAndFraction(what: BigRational): (Int, BigRational) =
-      what.wholeAndFraction
-
-    def round(what: (Int, BigRational)): Int = BigRational.round(what)
-
-    val negative = value.negative
-
-    val (digits: List[(Int, BigRational)], lastDigit: (Int, BigRational))  =
-      (0 until length).toList.map(range)
-      .foldLeft((List.empty[(Int, BigRational)], wholeAndFraction(value))) {
-        case ((acc, (digit: Int, reminder: BigRational)), range: Int) =>
-          (acc :+ (digit, reminder), wholeAndFraction(reminder*range))
-      }
-    (negative, digits.map(_._1) :+ round(lastDigit))
-  }
+  final def fromRational(value: BigRational, length: Int): RawNumber =
+    (value.negative, from[BigRational](
+      value,
+      length,
+      _.wholeAndFraction,
+      _ * _,
+      BigRational.round
+    ))
 
   final def fromDouble(signedValue: Double, length: Int): RawNumber = {
     def wholeAndFraction(what: Double): (Int, Double) = {
@@ -109,18 +101,34 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
       (whole.toInt, fraction)
     }
 
-    def round(what: (Int, Double)): Int = what._1 + math.round(what._2).toInt
+    def round(whole: Int, fraction: Double): Int = whole + math.round(fraction).toInt
 
     val negative: Boolean = signedValue < 0
-    val value: Double = signum(negative) * signedValue
+    (negative, from[Double](
+      signum(negative) * signedValue,
+      length,
+      wholeAndFraction,
+      _ * _,
+      round
+    ))
+  }
 
-    val (digits: List[(Int, Double)], lastDigit: (Int, Double))  =
+  // This is an instance of a specialized unfold with an initiatot, unfolder and terminator
+  // (but we don't have even a simple unfold in the standard library)
+  final def from[T](
+    value: T,
+    length: Int,
+    wholeAndFraction: T => (Int, T),
+    mult: (T, Int) => T,
+    round: (Int, T) => Int): List[Int] =
+  {
+    val (digits: List[(Int, T)], lastDigit: (Int, T))  =
       (0 until length).toList.map(range)
-      .foldLeft((List.empty[(Int, Double)], wholeAndFraction(value))) {
-        case ((acc, (digit: Int, reminder: Double)), range: Int) =>
-          (acc :+ (digit, reminder), wholeAndFraction(reminder*range))
-      }
-    (negative, digits.map(_._1) :+ round(lastDigit))
+        .foldLeft((List.empty[(Int, T)], wholeAndFraction(value))) {
+          case ((acc, (digit: Int, reminder: T)), range: Int) =>
+            (acc :+ (digit, reminder), wholeAndFraction(mult(reminder, range)))
+        }
+    digits.map(_._1) :+ round(lastDigit._1, lastDigit._2)
   }
 }
 

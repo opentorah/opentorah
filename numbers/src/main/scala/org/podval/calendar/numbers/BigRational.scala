@@ -45,6 +45,6 @@ object BigRational {
   final def apply(numerator: BigInt, denominator: BigInt): BigRational =
     apply(negative = false, numerator, denominator)
 
-  def round(what: (Int, BigRational)): Int =
-    what._1 + (if (what._2.isNotLessThanHalf) 1 else 0)
+  def round(whole: Int, fraction: BigRational): Int =
+    whole + (if (fraction.isNotLessThanHalf) 1 else 0)
 }
