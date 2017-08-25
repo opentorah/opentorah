@@ -86,20 +86,17 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
 
   final def fromRational(value: BigRational, length: Int): RawNumber = {
-    val negative: Boolean = value.negative
+    def round(what: BigRational): Int = if (what.isNotLessThanHalf) 1 else 0
 
-    val digits: List[(Int, BigRational)] =
-      (0 until length).toList.map(range).foldLeft(List(value.wholeAndFraction)) {
-        case (acc, range: Int) =>
-          val (previousDigit: Int, previousReminder: BigRational) = acc.last
-          val (digit        : Int, reminder        : BigRational) =
-            (previousReminder*range).wholeAndFraction
-          acc :+ (digit, reminder)
+    val (digits: List[(Int, BigRational)], lastDigit: (Int, BigRational))  =
+      (0 until length).toList.map(range)
+      .foldLeft((List.empty[(Int, BigRational)], value.wholeAndFraction)) {
+        case ((acc, (digit: Int, reminder: BigRational)), range: Int) =>
+          (acc :+ (digit, reminder), (reminder*range).wholeAndFraction)
       }
-    val (lastDigitRaw: Int, lastReminder: BigRational) = digits.last
-    val lastDigit: Int = lastDigitRaw + (if (lastReminder.isNotLessThanHalf) 1 else 0)
-    val result: List[Int] = digits.init.map(_._1) :+ lastDigit
-    (negative, result)
+    val (lastDigitRaw: Int, lastReminder: BigRational) = lastDigit
+    val result: List[Int] = digits.map(_._1) :+ (lastDigitRaw + round(lastReminder))
+    (value.negative, result)
   }
 
   // TODO redo in the stype of fromRational(), without multiplier()s
