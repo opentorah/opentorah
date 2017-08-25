@@ -94,7 +94,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
       BigRational.round
     ))
 
-  final def fromDouble(signedValue: Double, length: Int): RawNumber = {
+  final def fromDouble(value: Double, length: Int): RawNumber = {
     def wholeAndFraction(what: Double): (Int, Double) = {
       val whole: Double = math.floor(what)
       val fraction: Double = what - whole
@@ -103,9 +103,8 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
     def round(whole: Int, fraction: Double): Int = whole + math.round(fraction).toInt
 
-    val negative: Boolean = signedValue < 0
-    (negative, from[Double](
-      signum(negative) * signedValue,
+    (value < 0.0d, from[Double](
+      math.abs(value),
       length,
       wholeAndFraction,
       _ * _,
@@ -122,13 +121,13 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     mult: (T, Int) => T,
     round: (Int, T) => Int): List[Int] =
   {
-    val (digits: List[(Int, T)], lastDigit: (Int, T))  =
+    val (digits: List[(Int, T)], (lastDigit: Int, lastReminder: T))  =
       (0 until length).toList.map(range)
         .foldLeft((List.empty[(Int, T)], wholeAndFraction(value))) {
           case ((acc, (digit: Int, reminder: T)), range: Int) =>
             (acc :+ (digit, reminder), wholeAndFraction(mult(reminder, range)))
         }
-    digits.map(_._1) :+ round(lastDigit._1, lastDigit._2)
+    digits.map(_._1) :+ round(lastDigit, lastReminder)
   }
 }
 

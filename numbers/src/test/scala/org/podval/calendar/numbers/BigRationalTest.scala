@@ -4,6 +4,8 @@ import org.scalatest.FlatSpec
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class BigRationalTest extends FlatSpec {
+  // TODO add real tests
+
   "whole()" should "be correct" in {
     val days: Int = 1
     val hours: Int = 2

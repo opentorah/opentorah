@@ -57,18 +57,25 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   }
 
   final def toRational: BigRational = {
-    val (numerator: BigInt, denominator: BigInt) =
-      numberSystem.zipWithRanges(tail).foldLeft((BigInt(head), BigInt(1))) {
-        case ((numerator: BigInt, denominator: BigInt), (digit: Int, range: Int)) =>
-          (numerator*range + digit, denominator*range)
-      }
-    BigRational(negative, numerator, denominator)
+    def forDigit(digit: Int, denominator: BigInt): BigRational =
+      BigRational(digit, denominator)
+    to[BigRational](forDigit, _ + _).setNegative(negative)
   }
 
-  final def toDouble: Double = signum * digits.zipWithIndex.map { case (digit, position) =>
-    // TODO redo with fold instead of multipliers...
-    digit.toDouble / numberSystem.multiplier(position).bigInteger.longValueExact()
-  }.sum
+  final def toDouble: Double = {
+    def forDigit(digit: Int, denominator: BigInt): Double =
+      digit.toDouble/denominator.bigInteger.longValueExact()
+    to[Double](forDigit, _ + _) * signum
+  }
+
+  private[this] final def to[T](forDigit: (Int, BigInt) => T, plus: (T, T) => T): T = {
+    val zeroDenominator: BigInt = BigInt(1)
+    numberSystem.zipWithRanges(tail).foldLeft((forDigit(head, zeroDenominator), zeroDenominator)) {
+      case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>
+        val newDenominator: BigInt = denominator*range
+        (plus(acc, forDigit(digit, newDenominator)), newDenominator)
+    }._1
+  }
 
   private[this] def zip(that: Number[S, _]): List[(Int, Int)] =
     this.digits zipAll(that.digits, 0, 0)
