@@ -38,4 +38,16 @@ final class TimeNumberSystemTest extends FlatSpec {
     assertResult("3d5h4p1m")(moments.toString)
     assertResult(BigRational(((3*24+5)*1080+4)*76+1, 1*24*1080*76))(moments.toRational)
   }
+
+  "fromRational()" should "be correct" in {
+    import SimpleTimeNumberSystem.{Interval, fromRational, newInterval}
+
+    def test(value: Interval): Unit =
+      assertResult(value)(newInterval(fromRational(value.toRational, 3)))
+
+    test(newInterval(false, List(3)))
+    test(newInterval(false, List(3, 5)))
+    test(newInterval(false, List(3, 5, 4)))
+    test(newInterval(false, List(3, 5, 4, 1)))
+  }
 }

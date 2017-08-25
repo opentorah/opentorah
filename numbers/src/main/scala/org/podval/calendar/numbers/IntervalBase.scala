@@ -18,7 +18,8 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
 
   final def *(n: Int): S#Interval = newInterval(negative, digits map (n * _))
 
-  final def /(n: Int, length: Int): S#Interval = {
+  // TODO use maxLength instead of suggestedLength with 0 as default...
+  final def /(n: Int, suggestedLength: Int = 0): S#Interval = {
     def divide(digit: Int, range: Int, carry: Int): (Int, Int, Int) = {
       val value: Int = digit + carry*range
       (value, value / n, value % n)
@@ -38,15 +39,17 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
       if (roundUp) quotient+1 else quotient
     }
 
-    // TODO do NOT assume that length > this.length()
+    val realLength: Int = Math.max(length, suggestedLength)
+
     val (newDigits, lastCarry) =
-      ((digits.head, 0) +:  numberSystem.zipWithRanges(tail.padTo(length-1, 0)))
+      ((digits.head, 0) +:  numberSystem.zipWithRanges(tail.padTo(realLength-1, 0))) // centralize padTo()
       .foldLeft(List.empty[Int], 0)(step)
     val lastDigit =
-      lastStep(0, numberSystem.range(length-1), lastCarry)
+      lastStep(0, numberSystem.range(realLength-1), lastCarry)
     newInterval(negative, newDigits :+ lastDigit)
   }
 
+  // TODO do the suggested/real length thing
   final def %(n: Int, length: Int): S#Interval = this - ((this / (n, length)) * n)
 
   final def /(that: S#Interval): Int = {
@@ -73,6 +76,7 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
     (head, 1) +: numberSystem.zipWithRanges(tail)
 
   // TODO rework with conversion to BigRationals...
+  // TODO do the suggested/real length thing
   final def *[T <: NumberSystem[T]](that: T#Interval, length: Int): S#Interval = {
     val z = newInterval(false, List(0))
 

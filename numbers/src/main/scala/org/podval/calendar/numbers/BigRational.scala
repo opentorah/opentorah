@@ -8,6 +8,18 @@ final class BigRational private(
   require(numerator  .signum >= 0)
   require(denominator.signum >= 0)
 
+  def wholeAndFraction: (Int, BigRational) = {
+    val whole: Int = (numerator / denominator).bigInteger.intValueExact
+    val fraction: BigRational = BigRational(negative, numerator - whole*denominator, denominator)
+    (whole, fraction)
+  }
+
+  def *(multiplier: Int): BigRational = BigRational(negative, numerator*multiplier, denominator)
+
+  def isZero: Boolean = numerator == 0
+
+  def isNotLessThanHalf: Boolean = (numerator / denominator).floatValue >= 0.5f
+
   override def toString: String =
     (if (negative) "-" else "") + numerator.toString + "/" + denominator.toString
 
@@ -25,9 +37,11 @@ final class BigRational private(
 
 
 object BigRational {
-  final def apply(negative: Boolean, numerator: BigInt, denominator: BigInt): BigRational =
-    new BigRational(negative, numerator, denominator)
+  final def apply(negative: Boolean, numerator: BigInt, denominator: BigInt): BigRational = {
+    val gcd: BigInt = numerator.gcd(denominator)
+    new BigRational(negative, numerator / gcd, denominator / gcd)
+  }
 
   final def apply(numerator: BigInt, denominator: BigInt): BigRational =
-    apply(false, numerator, denominator)
+    apply(negative = false, numerator, denominator)
 }

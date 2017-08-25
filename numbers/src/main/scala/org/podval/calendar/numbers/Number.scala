@@ -56,16 +56,6 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
     newNumber(negative, head +: tail_)
   }
 
-  final def toDouble: Double = signum * digits.zipWithIndex.map { case (digit, position) =>
-    digit.toDouble / numberSystem.multiplier(position).bigInteger.longValueExact()
-  }.sum
-
-  private[this] def zip(that: Number[S, _]): List[(Int, Int)] =
-    this.digits zipAll(that.digits, 0, 0)
-
-  // TODO why can't I inline .tupled?
-  private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = op.tupled
-
   final def toRational: BigRational = {
     val (numerator: BigInt, denominator: BigInt) =
       numberSystem.zipWithRanges(tail).foldLeft((BigInt(head), BigInt(1))) {
@@ -74,6 +64,17 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
       }
     BigRational(negative, numerator, denominator)
   }
+
+  final def toDouble: Double = signum * digits.zipWithIndex.map { case (digit, position) =>
+    // TODO redo with fold instead of multipliers...
+    digit.toDouble / numberSystem.multiplier(position).bigInteger.longValueExact()
+  }.sum
+
+  private[this] def zip(that: Number[S, _]): List[(Int, Int)] =
+    this.digits zipAll(that.digits, 0, 0)
+
+  // TODO why can't I inline .tupled?
+  private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = op.tupled
 
   // TODO: padding with 0 to a given length
   protected final def toSignedString: String = {

@@ -36,6 +36,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     */
   // TODO where I need to divide by a multiplier, I convert it to a long (with possible
   // ArithmeticException) - because I do not know how to divide by a BigInt :)
+  // TODO remove multiplier and ensure that ranges are multiplied as BigInts
   final def multiplier(position: Int): BigInt =
     (1 to position).map(position => BigInt(range(position-1))).product
 
@@ -84,10 +85,28 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   final def zipWithRanges(tail: List[Int]): List[(Int, Int)] =
     tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
 
+  final def fromRational(value: BigRational, length: Int): RawNumber = {
+    val negative: Boolean = value.negative
+
+    val digits: List[(Int, BigRational)] =
+      (0 until length).toList.map(range).foldLeft(List(value.wholeAndFraction)) {
+        case (acc, range: Int) =>
+          val (previousDigit: Int, previousReminder: BigRational) = acc.last
+          val (digit        : Int, reminder        : BigRational) =
+            (previousReminder*range).wholeAndFraction
+          acc :+ (digit, reminder)
+      }
+    val (lastDigitRaw: Int, lastReminder: BigRational) = digits.last
+    val lastDigit: Int = lastDigitRaw + (if (lastReminder.isNotLessThanHalf) 1 else 0)
+    val result: List[Int] = digits.init.map(_._1) :+ lastDigit
+    (negative, result)
+  }
+
+  // TODO redo in the stype of fromRational(), without multiplier()s
   final def fromDouble(value: Double, length: Int): RawNumber = {
     val negative: Boolean = value < 0
     val absValue: Double = signum(negative) * value
-    val digits: List[Double] = absValue +: (1 to length+1).toList.map { position =>
+    val digits: List[Double] = absValue +: (1 to length).toList.map { position =>
       val previousDivisor = 1.0d / multiplier(position - 1).bigInteger.longValueExact()
       val currentDivisor  = 1.0d / multiplier(position    ).bigInteger.longValueExact()
       (absValue % previousDivisor) / currentDivisor
