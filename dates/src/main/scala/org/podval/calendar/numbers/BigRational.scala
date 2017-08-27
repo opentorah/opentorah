@@ -2,7 +2,7 @@ package org.podval.calendar.numbers
 
 final class BigRational private(
   val negative: Boolean,
-  val numerator: BigInt,
+  val numerator: BigInt, // TODO make signed and eliminate "negative"
   val denominator: BigInt) extends Comparable[BigRational] with Ordered[BigRational]
 {
   def signum: Int = if (numerator == 0) 0 else NumberSystem.signum(negative)
@@ -45,8 +45,7 @@ final class BigRational private(
     (whole, fraction)
   }
 
-  override def toString: String =
-    (if (negative) "-" else "") + numerator.toString + "/" + denominator.toString
+  override def toString: String = signedNumerator.toShort + "/" + denominator.toString
 
   override def compare(that: BigRational): Int =
     (this.signedNumerator*that.denominator).compareTo(that.signedNumerator*this.denominator)
@@ -75,6 +74,8 @@ object BigRational {
   val zero: BigRational = new BigRational(negative = false, 0, 1)
 
   val oneHalf: BigRational = BigRational(1, 2)
+
+  val one: BigRational = BigRational(1, 1)
 
   final def apply(negative: Boolean, numerator: BigInt, denominator: BigInt): BigRational = {
     if (denominator < 0) throw new ArithmeticException(s"Negative denominator $denominator")

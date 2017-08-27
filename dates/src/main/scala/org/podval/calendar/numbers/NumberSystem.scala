@@ -105,7 +105,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   // This is an instance of a specialized unfold with an initiatot, unfolder and terminator
   // (but we don't have even a simple unfold in the standard library)
-  final def from[T](
+  private[this] final def from[T](
     value: T,
     length: Int,
     wholeAndFraction: T => (Int, T),
