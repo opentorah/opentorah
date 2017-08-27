@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import angle.AngleNumberSystem.Angle
+import org.podval.calendar.angle.AngleNumberSystem.Angle
 
 
 /*

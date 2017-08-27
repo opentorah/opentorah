@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy.moon
 
-import org.podval.calendar.astronomy.angle.AngleNumberSystem.Angle
+import org.podval.calendar.angle.AngleNumberSystem.Angle
 
 
 object LongitudeCorrection {

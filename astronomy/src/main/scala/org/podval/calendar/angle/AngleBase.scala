@@ -1,4 +1,4 @@
-package org.podval.calendar.astronomy.angle
+package org.podval.calendar.angle
 
 import org.podval.calendar.numbers.IntervalBase
 import org.podval.calendar.numbers.NumberSystem.RawNumber
