@@ -16,7 +16,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   protected def createInterval(raw: RawNumber): S#Interval
 
-  // TODO introduce defaultLength...
+  val defaultLength: Int
 
   /**
     *
@@ -76,7 +76,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   final def zipWithRanges(tail: List[Int]): List[(Int, Int)] =
     tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
 
-  final def fromRational(value: BigRational, length: Int): RawNumber =
+  final def fromRational(value: BigRational, length: Int = defaultLength): RawNumber =
     (value < BigRational.zero, from[BigRational](
       value.abs,
       length,
@@ -85,7 +85,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
       BigRational.round
     ))
 
-  final def fromDouble(value: Double, length: Int): RawNumber = {
+  final def fromDouble(value: Double, length: Int = defaultLength): RawNumber = {
     def wholeAndFraction(what: Double): (Int, Double) = {
       val whole: Double = math.floor(what)
       val fraction: Double = what - whole

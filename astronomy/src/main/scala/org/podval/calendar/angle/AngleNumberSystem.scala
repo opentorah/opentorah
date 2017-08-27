@@ -36,6 +36,8 @@ trait AngleNumberSystem extends RangedHeadDigitNumberSystem[AngleNumberSystem] {
     case 1 => "″"
     case 2 => "‴"
   }
+
+  final override val defaultLength: Int = 3
 }
 
 

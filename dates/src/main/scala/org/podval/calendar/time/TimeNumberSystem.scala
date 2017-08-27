@@ -22,6 +22,8 @@ trait TimeNumberSystem[S <: TimeNumberSystem[S]]
     case 1 => "p"
     case 2 => "m"
   }
+
+  final override val defaultLength: Int = 3
 }
 
 

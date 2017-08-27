@@ -105,7 +105,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
     val result: Int =
       if (this.negative != that.negative) 1
       else zip(that).map(lift(_ compare _)).find (_ != 0) getOrElse 0
-    signum * result
+    result * signum
   }
 
   final override def equals(other: Any): Boolean =
