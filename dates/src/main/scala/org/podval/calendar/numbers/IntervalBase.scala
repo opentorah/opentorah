@@ -18,37 +18,8 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
 
   final def *(n: Int): S#Interval = newInterval(negative, digits map (n * _))
 
-  // TODO use maxLength instead of suggestedLength with 0 as default...
-  // TODO redo via Rational!
-  final def /(n: Int, suggestedLength: Int = 0): S#Interval = {
-    def divide(digit: Int, range: Int, carry: Int): (Int, Int, Int) = {
-      val value: Int = digit + carry*range
-      (value, value / n, value % n)
-    }
-
-    def step(acc: (List[Int], Int), elem: (Int, Int)): (List[Int], Int) = {
-      val (digit: Int, range: Int) = elem
-      val (result: List[Int], carry: Int) = acc
-      val (value: Int, quotient: Int, reminder: Int) = divide(digit, range, carry)
-      (result :+ quotient, reminder)
-    }
-
-    def lastStep(digit: Int, range: Int, carry: Int): Int = {
-      val (value: Int, quotient: Int, reminder: Int) = divide(digit, range, carry)
-      val roundUp: Boolean =
-        ((n % 2 == 0) && (reminder >= n / 2)) || ((n % 2 == 1) && (reminder > n / 2))
-      if (roundUp) quotient+1 else quotient
-    }
-
-    val realLength: Int = Math.max(length, suggestedLength)
-
-    val (newDigits, lastCarry) =
-      ((digits.head, 0) +:  numberSystem.zipWithRanges(tail.padTo(realLength-1, 0))) // centralize padTo()
-      .foldLeft(List.empty[Int], 0)(step)
-    val lastDigit =
-      lastStep(0, numberSystem.range(realLength-1), lastCarry)
-    newInterval(negative, newDigits :+ lastDigit)
-  }
+  final def /(n: Int, length: Int): S#Interval =
+    newInterval(numberSystem.fromRational(toRational / n, length))
 
   // TODO do the suggested/real length thing
   // TODO redo via Rational!
