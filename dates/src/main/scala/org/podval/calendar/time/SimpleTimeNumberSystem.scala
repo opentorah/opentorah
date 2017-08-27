@@ -2,6 +2,7 @@ package org.podval.calendar.time
 
 import org.podval.calendar.numbers.NumberSystem.RawNumber
 
+// TODO "lift" tests to Calendar and eliminate?
 // This exists so that TimeNumberSystem could be tested stand-alone.
 // TODO add "companion" objects Interval etc.
 class SimpleTimeNumberSystem extends TimeNumberSystem[SimpleTimeNumberSystem] {

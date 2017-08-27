@@ -61,8 +61,8 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     zipWithRanges(newTail).foreach
       { case (digit, range) => require(digit < range, s"$digit must be less than $range") }
 
-    // Drop trailing zeros; use reverse() since there is no dropWhileRight :)
-    val resultDigits = newDigits.reverse.dropWhile(_ == 0).reverse
+    // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
+    val resultDigits = newDigits.head +: newDigits.tail.reverse.dropWhile(_ == 0).reverse
 
     (newNegative, resultDigits)
   }
@@ -76,7 +76,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   final def fromRational(value: BigRational, length: Int): RawNumber =
     (value.negative, from[BigRational](
-      value,
+      value.abs,
       length,
       _.wholeAndFraction,
       _ * _,

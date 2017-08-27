@@ -13,7 +13,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
 
   final def negative: Boolean = raw._1
 
-  final def signum: Int = NumberSystem.signum(negative)
+  final def signum: Int = if ((length == 0) && (head == 0)) 0 else NumberSystem.signum(negative)
 
   final def digits: List[Int] = raw._2
 

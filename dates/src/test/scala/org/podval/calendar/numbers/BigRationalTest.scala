@@ -4,7 +4,7 @@ import org.scalatest.FlatSpec
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class BigRationalTest extends FlatSpec {
-  // TODO add real tests
+  // TODO add tests for comparison, equality, +, - ...
 
   "whole()" should "be correct" in {
     val days: Int = 1
@@ -20,6 +20,6 @@ final class BigRationalTest extends FlatSpec {
 
     val (partsO: Int, remainder: BigRational) = (remainderp*1080).wholeAndFraction
     assertResult(parts)(partsO)
-    assertResult(true)(remainder.isZero)
+    assertResult(true)(remainder == 0)
   }
 }
