@@ -7,6 +7,8 @@ final class BigRational private(
 {
   def signum: Int = if (numerator == 0) 0 else NumberSystem.signum(negative)
 
+  def signedNumerator: BigInt = signum*numerator
+
   def abs: BigRational = setNegative(false)
 
   def unary_- : BigRational = setNegative(!negative)
@@ -17,7 +19,7 @@ final class BigRational private(
 
   def +(that: BigRational): BigRational = {
     val numerator: BigInt =
-      this.signum*this.numerator*that.denominator+that.signum*that.numerator*this.denominator
+      this.signedNumerator*that.denominator+that.signedNumerator*this.denominator
     BigRational(numerator < 0, numerator.abs, this.denominator*that.denominator)
   }
 
@@ -46,14 +48,8 @@ final class BigRational private(
   override def toString: String =
     (if (negative) "-" else "") + numerator.toString + "/" + denominator.toString
 
-  override def compare(that: BigRational): Int = {
-    (this.signum, that.signum) match {
-      case ( 1,  1) => (this.numerator*that.denominator).compareTo(this.denominator*that.numerator)
-      case (-1, -1) => -this.abs.compareTo(that.abs)
-      case ( 0,  s) => -s
-      case ( s,  _) =>  s
-    }
-  }
+  override def compare(that: BigRational): Int =
+    (this.signedNumerator*that.denominator).compareTo(that.signedNumerator*this.denominator)
 
   override def equals(other: Any): Boolean = other match {
     case that: BigRational =>

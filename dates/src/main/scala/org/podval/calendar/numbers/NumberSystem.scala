@@ -16,6 +16,8 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   protected def createInterval(raw: RawNumber): S#Interval
 
+  // TODO introduce defaultLength...
+
   /**
     *
     * @param position within the tail
