@@ -34,8 +34,8 @@ class LongitudeMeanTest extends FlatSpec {
 
   it should "make a full circle in a year" in {
     // TODO why isn't the NumberSystem type parameter inferred?
-    println(LongitudeMean.exact_ *[Jewish] (Sun.yearOfRavAda, 3))
+    println(LongitudeMean.exact_ *[Jewish] Sun.yearOfRavAda)
     // TODO why does this seem to be a *better* approximation?! Imprecise operations?
-    println(LongitudeMean.exact_ *[Jewish] (Sun.yearOfShmuel, 3))
+    println(LongitudeMean.exact_ *[Jewish] Sun.yearOfShmuel)
   }
 }

@@ -16,6 +16,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   protected def createInterval(raw: RawNumber): S#Interval
 
+  // TODO use it for all operations, including + and -, to guide which overflow digit to round.
   val defaultLength: Int
 
   /**

@@ -38,7 +38,7 @@ final class TimeNumberSystemTest extends FlatSpec {
     import SimpleTimeNumberSystem.{Interval, fromRational, newInterval}
 
     def test(value: Interval): Unit =
-      assertResult(value)(newInterval(fromRational(value.toRational, 3)))
+      assertResult(value)(newInterval(fromRational(value.toRational)))
 
     test(newInterval(false, List(3)))
     test(newInterval(false, List(3, 5)))
