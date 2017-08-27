@@ -1,7 +1,7 @@
 package org.podval.calendar.dates.jewish
 
 import org.scalatest.FlatSpec
-import org.podval.calendar.dates.time.TimeNumberSystem.{hoursPerDay, partsPerHour}
+import org.podval.calendar.time.TimeNumberSystem.{hoursPerDay, partsPerHour}
 import Jewish.{Year, Month, Day, interval, week}
 
 /**

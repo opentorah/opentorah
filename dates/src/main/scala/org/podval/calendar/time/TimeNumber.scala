@@ -1,4 +1,4 @@
-package org.podval.calendar.dates.time
+package org.podval.calendar.time
 
 import TimeNumberSystem.{hoursPerHalfDay, partsPerMinute}
 import org.podval.calendar.numbers.Number

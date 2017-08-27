@@ -2,8 +2,8 @@ package org.podval.calendar.dates.calendar
 
 import org.podval.calendar.dates.gregorian.Gregorian
 import org.podval.calendar.dates.jewish.Jewish
-import org.podval.calendar.dates.time.TimeNumberSystem.hoursPerDay
-import org.podval.calendar.dates.time.{TimeIntervalBase, TimeNumberSystem}
+import org.podval.calendar.time.TimeNumberSystem.hoursPerDay
+import org.podval.calendar.time.{TimeIntervalBase, TimeNumberSystem}
 import org.podval.calendar.numbers.NumberSystem.RawNumber
 
 trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>

@@ -1,4 +1,4 @@
-package org.podval.calendar.dates.time
+package org.podval.calendar.time
 
 import org.podval.calendar.numbers.IntervalBase
 import org.podval.calendar.numbers.NumberSystem.RawNumber
