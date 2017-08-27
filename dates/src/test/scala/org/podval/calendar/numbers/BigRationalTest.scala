@@ -5,12 +5,12 @@ import BigRational.{zero, oneHalf, one}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class BigRationalTest extends FlatSpec {
-  val minusThreeHalfs: BigRational = BigRational(negative = true, 3, 2)
+  val minusThreeHalfs: BigRational = BigRational(-3, 2)
 
-  "BigRational.apply()" should "throw correct exceptions" in {
+  "BigRational.apply()" should "be correct" in {
     assertThrows[ArithmeticException](BigRational(1, 0))
-    assertThrows[ArithmeticException](BigRational(-1, 1))
-    assertThrows[ArithmeticException](BigRational(1, -1))
+    assertResult(-one)(BigRational(-1, 1))
+    assertResult(-one)(BigRational(1, -1))
   }
 
   "toString()" should "be correct" in {
@@ -33,8 +33,8 @@ final class BigRationalTest extends FlatSpec {
 
   "unary_-()" should "be correct" in {
     assertResult(zero)(-zero)
-    assertResult(BigRational(negative = true, 1, 2))(-oneHalf)
-    assertResult(BigRational(negative = false, 3, 2))(minusThreeHalfs.abs)
+    assertResult(BigRational(-1, 2))(-oneHalf)
+    assertResult(BigRational(3, 2))(minusThreeHalfs.abs)
   }
 
   "+()" should "be correct" in {
@@ -50,7 +50,7 @@ final class BigRationalTest extends FlatSpec {
   "invert()" should "be correct" in {
     assertThrows[ArithmeticException](zero.invert)
     assertResult(one+one)(oneHalf.invert)
-    assertResult(BigRational(negative = true, 2, 3))(minusThreeHalfs.invert)
+    assertResult(BigRational(-2, 3))(minusThreeHalfs.invert)
   }
 
   "*(Int)" should "be correct" in {
@@ -62,13 +62,13 @@ final class BigRationalTest extends FlatSpec {
   "*(BigRational)" should "be correct" in {
     assertResult(zero)(zero*zero)
     assertResult(one/4)(oneHalf*oneHalf)
-    assertResult(BigRational(negative = true, 3, 4))(minusThreeHalfs*oneHalf)
+    assertResult(BigRational(-3, 4))(minusThreeHalfs*oneHalf)
   }
 
   "/(Int)" should "be correct" in {
     assertResult(zero)(zero/3)
-    assertResult(BigRational(negative = true, 1, 4))(oneHalf/(-2))
-    assertResult(BigRational(negative = true, 3, 4))(minusThreeHalfs/2)
+    assertResult(BigRational(-1, 4))(oneHalf/(-2))
+    assertResult(BigRational(-3, 4))(minusThreeHalfs/2)
   }
 
   "/(BigRational)" should "be correct" in {
@@ -95,6 +95,7 @@ final class BigRationalTest extends FlatSpec {
 
     assertResult((0, zero))(zero.wholeAndFraction)
     assertResult((0, oneHalf))(oneHalf.wholeAndFraction)
+
 // TODO    assertResult((-1, -oneHalf))(minusThreeHalfs.wholeAndFraction)
   }
 

@@ -77,7 +77,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
 
   final def fromRational(value: BigRational, length: Int): RawNumber =
-    (value.negative, from[BigRational](
+    (value < BigRational.zero, from[BigRational](
       value.abs,
       length,
       _.wholeAndFraction,

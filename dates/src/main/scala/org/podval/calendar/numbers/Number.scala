@@ -59,7 +59,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
   final def toRational: BigRational = {
     def forDigit(digit: Int, denominator: BigInt): BigRational =
       BigRational(digit, denominator)
-    to[BigRational](forDigit, _ + _).setNegative(negative)
+    to[BigRational](forDigit, _ + _) * signum
   }
 
   final def toDouble: Double = {
@@ -68,7 +68,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
     to[Double](forDigit, _ + _) * signum
   }
 
-  private[this] final def to[T](forDigit: (Int, BigInt) => T, plus: (T, T) => T): T = {
+  private[this] final def to[T](forDigit /* rename digitTo */: (Int, BigInt) => T, plus: (T, T) => T): T = {
     val zeroDenominator: BigInt = BigInt(1)
     numberSystem.zipWithRanges(tail).foldLeft((forDigit(head, zeroDenominator), zeroDenominator)) {
       case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>
