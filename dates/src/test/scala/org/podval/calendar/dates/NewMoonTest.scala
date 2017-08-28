@@ -28,8 +28,8 @@ final class NewMoonTest extends FlatSpec {
     newMoon(5773, Nisan     , Shlishi ,  5773, Nisan  ,  1,  2013, March    , 12,  6, 21, 14)
   }
 
-  "new moons from the printed tables for Tishrei 5775" should "calculate correctly" ignore {
-    // TODO test fails! Elul 28?!
+  "new moons from the printed tables for Tishrei 5772" should "calculate correctly" ignore {
+    // TODO test fails! Elul 28?! Check the whole year 5771!
     newMoon(5772, Tishrei   , Shlishi ,  5771, Elul   , 27,  2011, September, 27, 17,  8, 14)
   }
 

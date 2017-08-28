@@ -2,7 +2,7 @@ package org.podval.calendar.dates.jewish
 
 import Jewish.{interval, Year, Month, TimeInterval, Moment}
 
-
+// TODO add Zodiac class
 // TODO Where and when was the Sun created? Does this jibe with Rambam's epoch?
 // TODO Which day of the week (+1/-1) was the Giving of the Law? (Sema)
 // TODO Rambam's epoch - two days after molad?! (Petya Ofman)

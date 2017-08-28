@@ -81,6 +81,7 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
 
   final def cycle(yearNumber: Int): Int = ((yearNumber - 1) / yearsInCycle) + 1
 
+  // TODO package RoshHaShonoh calculations into a class
   // TODO meaningful names
   final val firstCorrection: TimeInterval  = interval.hours(18) // KH 7:1
   final val secondCorrection: TimeInterval = interval.hours(9).parts(204) // KH 7:4

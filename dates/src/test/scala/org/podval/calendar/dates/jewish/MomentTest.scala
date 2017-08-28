@@ -18,7 +18,7 @@ final class MomentTest extends FlatSpec {
   private def test(days: Int, hours: Int, parts: Int) {
     val moment = interval.days(days).hours(hours).parts(parts)
 
-    assertResult(days)(moment.days)
+    assertResult(days )(moment.days)
     assertResult(hours)(moment.hours)
     assertResult(parts)(moment.parts)
   }

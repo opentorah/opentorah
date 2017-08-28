@@ -1,8 +1,7 @@
 package org.podval.calendar.numbers
 
-final class BigRational private(
-  val numerator: BigInt,
-  val denominator: BigInt) extends Comparable[BigRational] with Ordered[BigRational]
+final case class BigRational private(numerator: BigInt, denominator: BigInt)
+  extends Comparable[BigRational] with Ordered[BigRational]
 {
   def signum: Int = numerator.signum
 
