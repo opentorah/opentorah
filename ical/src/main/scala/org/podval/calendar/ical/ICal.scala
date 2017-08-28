@@ -1,6 +1,6 @@
 package org.podval.calendar.ical
 
-import org.podval.calendar.dates.gregorian.Gregorian.Day
+import org.podval.calendar.gregorian.Gregorian.Day
 
 import java.io.PrintStream
 

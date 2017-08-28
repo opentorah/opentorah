@@ -1,7 +1,7 @@
 package org.podval.calendar.astronomy.sun
 
 import org.scalatest.FlatSpec
-import org.podval.calendar.dates.jewish.{Jewish, Sun}
+import org.podval.calendar.jewish.{Jewish, Sun}
 
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])

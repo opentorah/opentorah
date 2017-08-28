@@ -1,10 +1,9 @@
 package org.podval.calendar.dates
 
 import org.scalatest.FlatSpec
-import calendar.Calendar
-import gregorian.Gregorian
+import org.podval.calendar.gregorian.Gregorian
 import Gregorian.Month.Name._
-import jewish.Jewish
+import org.podval.calendar.jewish.Jewish
 import Jewish.Day.Name._
 import Jewish.Month.Name._
 

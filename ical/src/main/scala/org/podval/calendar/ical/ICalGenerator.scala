@@ -1,9 +1,9 @@
 package org.podval.calendar.ical
 
 import java.io.{FileOutputStream, OutputStream}
-import org.podval.calendar.dates.calendar.Calendar
-import org.podval.calendar.dates.gregorian.Gregorian
-import org.podval.calendar.dates.jewish.Jewish
+import org.podval.calendar.dates.Calendar
+import org.podval.calendar.gregorian.Gregorian
+import org.podval.calendar.jewish.Jewish
 
 
 final class ICalGenerator private(os: OutputStream) {
