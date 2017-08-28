@@ -63,6 +63,8 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
 
   final def lengthInMonths(isLeap: Boolean): Int = if (isLeap) 13 else 12
 
+  // TODO move into Cycle?
+
   final val yearsInCycle: Int = 19
 
   final val leapYearsInCycle: Int = leapYears.size

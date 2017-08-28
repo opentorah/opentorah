@@ -111,7 +111,7 @@ project(':astronomy') {
   }
 }
 
-project(':ical') {
+project(':generate') {
   apply plugin: 'scala'
 
   dependencies {

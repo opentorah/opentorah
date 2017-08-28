@@ -15,13 +15,15 @@ object Sun {
   // TODO do I need the length here?
   val yearOfRavAda: TimeInterval = Year.cycleLength / (Year.yearsInCycle, 3)
 
+  // KH 6:8
+  val firstMoladNisan: Moment = Year(1).month(Month.Name.Nisan).newMoon
+
   // KH 9:3
-  val firstTkufasNissan: Moment =
-    Year(1).month(Month.Name.Nisan).newMoon - interval.days(7).hours(9).parts(642)  // KH 9:3
+  val firstTkufasNisan: Moment = firstMoladNisan - interval.days(7).hours(9).parts(642)
 
   // Sun enters Teleh  KH 9:3
   // TODO flavours:  def tkufasNissan(year: Int): Moment = firstTkufasNissan + yearOfRavAda * (year-1)
-  def tkufasNissan(year: Int): Moment = firstTkufasNissan + yearOfShmuel * (year-1)
+  def tkufasNisan(year: Int): Moment = firstTkufasNisan + yearOfShmuel * (year-1)
 
 
   // TODO Tkufas Tammuz - Sartan; Tishrei - Moznaim; Teves - Gdi.  KH 9:3
@@ -33,5 +35,5 @@ object Sun {
   // It never happens on Passover.
   // It happens more often than on the Passover Eve on 7 days.
   def birkasHachama(cycle: Int): Moment =
-    firstTkufasNissan + yearOfShmuel * 28 * cycle + interval.hours(12)
+    firstTkufasNisan + yearOfShmuel * 28 * cycle + interval.hours(12)
 }

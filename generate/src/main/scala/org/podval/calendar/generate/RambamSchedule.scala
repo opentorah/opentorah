@@ -1,23 +1,14 @@
-package org.podval.calendar.jewish
+package org.podval.calendar.generate
 
 import org.podval.calendar.dates.Calendar
-import Jewish.{Day, Month, Year}
+import org.podval.calendar.jewish.RambamSchedule.lessonNumber
+import org.podval.calendar.jewish.Jewish.{Month, Year}
 
 
 /**
  * Generate Rambam study schedule for Sefer HaMitzvos
  */
-// TODO move into a separate package
-object Rambam {
-
-  val numberOfLessons: Int = 339
-
-  val firstLessonDay: Int = Year(5775).month(Month.Name.Kislev).day(23).number
-
-  def lessonForDay(day: Day): Int = {
-    val distance = day.number - firstLessonDay + 50*numberOfLessons // % misbehaves on negatives :)
-    distance % numberOfLessons + 1
-  }
+object RambamSchedule {
 
   private trait Formatter {
     def formatLesson(
@@ -67,7 +58,7 @@ object Rambam {
         day.numberInMonth,
         gDay.month.numberInYear,
         gDay.numberInMonth,
-        lessonForDay(day)
+        lessonNumber(day)
       )
 
       val result = month.name.toString +: (if (lessons.size == 30) lessons else lessons ++ Seq(""))
