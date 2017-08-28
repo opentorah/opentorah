@@ -27,9 +27,9 @@ class LongitudeMeanTest extends FlatSpec {
     assertResult(LongitudeMean.value(29))(LongitudeMean.value(10)*3-LongitudeMean.value(1))
   }
 
-  it should "calculate correctly for the regular year" ignore {
-    assertResult(LongitudeMean.value(354))(LongitudeMean.value(100)*3+LongitudeMean.value(10)*5+LongitudeMean.value(1)*4)
+  it should "calculate correctly for the regular year" ignore { // TODO test fails!
     // TODO what is the result of direct multiplication on 354?
+    assertResult(LongitudeMean.value(354))(LongitudeMean.value(100)*3+LongitudeMean.value(10)*5+LongitudeMean.value(1)*4)
   }
 
   it should "make a full circle in a year" in {
