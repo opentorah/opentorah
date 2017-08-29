@@ -46,7 +46,7 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
 
   protected final override def areYearsPositive: Boolean = true
 
-  private[this] val leapYears: Set[Int] =
+  final val leapYears: Set[Int] =
     Set(3, 6, 8, 11, 14, 17, 19) // TODO calculate Meton's cycle in the paper
 
   final override def isLeap(yearNumber: Int): Boolean =

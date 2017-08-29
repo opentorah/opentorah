@@ -1,5 +1,12 @@
 package org.podval.calendar.numbers
 
+
+// TODO Implement `Numeric`? Rename to `Rational`?
+/**
+  * TODO
+  * @param numerator
+  * @param denominator
+  */
 final case class BigRational private(numerator: BigInt, denominator: BigInt)
   extends Comparable[BigRational] with Ordered[BigRational]
 {
