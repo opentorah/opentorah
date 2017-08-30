@@ -44,20 +44,20 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   protected final override def createPoint(raw: RawNumber): C#Point = createMoment(raw)
 
+  val Moment: MomentCompanion[C]
+
   final override type Interval = TimeIntervalBase[C]
 
   final type TimeInterval = Interval
 
-  protected final override def createInterval(raw: RawNumber): TimeInterval =
+  final override def createInterval(raw: RawNumber): TimeInterval =
     new TimeIntervalBase[C](raw) { this: C#TimeInterval =>
       final override def numberSystem: C = Calendar.this
     }
 
-  val Moment: MomentCompanion[C]
-
-  // TODO embed as apply() in companions...
-  final val moment: C#Moment = createMoment(false, List(0))
-  final val interval: C#TimeInterval = createInterval(false, List(0))
+  object TimeInterval extends TimeIntervalCompanion[C] {
+    final override def calendar: C = Calendar.this
+  }
 }
 
 

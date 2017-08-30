@@ -1,6 +1,6 @@
 package org.podval.calendar.jewish
 
-import Jewish.{Moment, interval}
+import Jewish.{Moment, TimeInterval}
 import Sun.yearOfShmuel
 
 // TODO Where and when was the Sun created? Does this jibe with Rambam's epoch?
@@ -12,5 +12,5 @@ object SunCycle {
   // It never happens on Passover.
   // It happens more often than on the Passover Eve on 7 days.
   def birkasHachama(cycle: Int): Moment =
-    Seasons.Shmuel.firstTkufasNisan + yearOfShmuel * 28 * cycle + interval.hours(12)
+    Seasons.Shmuel.firstTkufasNisan + yearOfShmuel * 28 * cycle + TimeInterval().hours(12)
 }

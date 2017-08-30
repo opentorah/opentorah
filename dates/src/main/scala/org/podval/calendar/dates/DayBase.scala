@@ -31,7 +31,7 @@ abstract class DayBase[C <: Calendar[C]](number: Int)
 
   final def name: C#DayName = calendar.Day.names(numberInWeek - 1)
 
-  final def toMoment: C#Moment = calendar.moment.days(number - 1)
+  final def toMoment: C#Moment = calendar.Moment().days(number - 1)
 
   final override def toString: String = year + " " + month.name + " " + numberInMonth
 }

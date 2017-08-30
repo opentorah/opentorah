@@ -2,7 +2,7 @@ package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.MonthCompanion
 import org.podval.calendar.util.Named
-import Jewish.{Moment, TimeInterval, Year, interval, moment}
+import Jewish.{Moment, TimeInterval, Year}
 
 abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
   final type Name = JewishMonthCompanion.Name
@@ -11,11 +11,11 @@ abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
 
   // KH 6:3
   // TODO how is this really called? tropical?
-  final val meanLunarPeriod: TimeInterval = interval.days(29).hours(12).parts(793)
+  final val meanLunarPeriod: TimeInterval = TimeInterval().days(29).hours(12).parts(793)
 
   // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2):
   // BeHaRaD: (KH 6:8)
-  final val firstNewMoon: Moment = moment.day(2).nightHours(5).parts(204)
+  final val firstNewMoon: Moment = Moment().day(2).nightHours(5).parts(204)
 
   final override def yearNumber(monthNumber: Int): Int = {
     val cycleOfMonth = ((monthNumber - 1) / Year.monthsInCycle) + 1

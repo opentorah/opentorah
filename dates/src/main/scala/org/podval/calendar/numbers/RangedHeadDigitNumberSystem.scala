@@ -10,4 +10,8 @@ trait RangedHeadDigitNumberSystem[S <: NumberSystem[S]] extends NumberSystem[S] 
     val result = value % headRange
     if (value >= 0) result else result + headRange
   }
+
+  // TODO add operations to convert a number to/from positive/minimal representation.
+
+  // TODO tweak equals() so that -15 degrees and +345 degrees are equals!
 }

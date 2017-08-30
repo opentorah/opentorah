@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.YearCompanion
-import Jewish.{Day, Month, MonthNameAndLength, TimeInterval, YearCharacter, interval}
+import Jewish.{Day, Month, MonthNameAndLength, TimeInterval, YearCharacter}
 import Day.Name._
 import Month.Name._
 
@@ -85,13 +85,13 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
 
   // TODO package RoshHaShonoh calculations into a class
   // TODO are there meaningful names for these things?
-  final val firstCorrection: TimeInterval  = interval.hours(18) // KH 7:1
-  final val secondCorrection: TimeInterval = interval.hours(9).parts(204) // KH 7:4
+  final val firstCorrection: TimeInterval  = TimeInterval().hours(18) // KH 7:1
+  final val secondCorrection: TimeInterval = TimeInterval().hours(9).parts(204) // KH 7:4
 
   // KH 7:5
   // TODO this can be calculated based on the maximum length of a year and
   // the first correction; do it!
-  final val thirdCorrection: TimeInterval  = interval.hours(15).parts(589)
+  final val thirdCorrection: TimeInterval  = TimeInterval().hours(15).parts(589)
 }
 
 

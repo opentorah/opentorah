@@ -1,6 +1,6 @@
 package org.podval.calendar.jewish
 
-import Jewish.{Year, Moment, TimeInterval, interval}
+import Jewish.{Year, Month, Moment, TimeInterval}
 
 // tkufos KH 9:3, 10:3
 abstract class Seasons {
@@ -31,19 +31,23 @@ abstract class Seasons {
 
   def yearLength: TimeInterval
 
-  final def firstTkufasNisan: Moment = Sun.firstMoladNisan - firstTkufasNisanBeforeFirstMoladNisan
+  final def firstTkufasNisan: Moment =
+    Seasons.firstMoladNisan - firstTkufasNisanBeforeFirstMoladNisan
 
   val firstTkufasNisanBeforeFirstMoladNisan: TimeInterval
 }
 
 
 object Seasons {
+  // KH 6:8
+  val firstMoladNisan: Moment = Year(1).month(Month.Name.Nisan).newMoon
+
   object Shmuel extends Seasons {
     final override def yearLength: TimeInterval = Sun.yearOfShmuel
 
     // KH 9:3
     final override val firstTkufasNisanBeforeFirstMoladNisan: TimeInterval =
-      interval.days(7).hours(9).parts(642)
+      TimeInterval().days(7).hours(9).parts(642)
   }
 
   object RavAda extends Seasons {
@@ -54,6 +58,6 @@ object Seasons {
     // Analyze the difference in historic periods...
     // KH 10:3
     final override val firstTkufasNisanBeforeFirstMoladNisan: TimeInterval =
-      interval.hours(9).parts(642)
+      TimeInterval().hours(9).parts(642)
   }
 }
