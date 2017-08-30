@@ -11,5 +11,5 @@ object Sun {
   val yearOfShmuel: TimeInterval = TimeInterval().days(365).hours(6)
 
   // KH 10:1
-  val yearOfRavAda: TimeInterval = Year.cycleLength / Year.yearsInCycle
+  val yearOfRavAda: TimeInterval = Cycle.cycleLength / Cycle.yearsInCycle
 }

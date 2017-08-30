@@ -46,42 +46,15 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
 
   protected final override def areYearsPositive: Boolean = true
 
-  final val leapYears: Set[Int] =
-    Set(3, 6, 8, 11, 14, 17, 19) // TODO calculate Meton's cycle in the paper
+  final override def isLeap(yearNumber: Int): Boolean = Cycle.isLeap(yearNumber)
 
-  final override def isLeap(yearNumber: Int): Boolean =
-    leapYears.contains(numberInCycle(yearNumber))
+  final override def firstMonth(yearNumber: Int): Int = Cycle.firstMonth(yearNumber)
 
-  final override def firstMonth(yearNumber: Int): Int =
-    monthsInCycle*(cycle(yearNumber) - 1) + firstMonthInCycle(yearNumber)
+  final override def lengthInMonths(yearNumber: Int): Int = Cycle.lengthInMonths(yearNumber)
 
-  final override def lengthInMonths(yearNumber: Int): Int = lengthInMonths(isLeap(yearNumber))
+  final val normal: TimeInterval = Month.meanLunarPeriod*Cycle.lengthInMonths(isLeap = false)
 
-  final val normal: TimeInterval = Month.meanLunarPeriod*lengthInMonths(isLeap = false)
-
-  final val leap: TimeInterval = Month.meanLunarPeriod*lengthInMonths(isLeap = true)
-
-  final def lengthInMonths(isLeap: Boolean): Int = if (isLeap) 13 else 12
-
-  // TODO move into Cycle?
-
-  final val yearsInCycle: Int = 19
-
-  final val leapYearsInCycle: Int = leapYears.size
-
-  final val monthsBeforeYearInCycle: Seq[Int] =
-    ((1 to yearsInCycle) map lengthInMonths).scanLeft(0)(_ + _)
-
-  final val monthsInCycle: Int = monthsBeforeYearInCycle.last
-
-  final val cycleLength: TimeInterval = Month.meanLunarPeriod * monthsInCycle
-
-  final def firstMonthInCycle(yearNumber: Int): Int =
-    monthsBeforeYearInCycle(numberInCycle(yearNumber) - 1) + 1
-
-  final def numberInCycle(yearNumber: Int): Int = ((yearNumber - 1) % yearsInCycle) + 1
-
-  final def cycle(yearNumber: Int): Int = ((yearNumber - 1) / yearsInCycle) + 1
+  final val leap: TimeInterval = Month.meanLunarPeriod*Cycle.lengthInMonths(isLeap = true)
 
   // TODO package RoshHaShonoh calculations into a class
   // TODO are there meaningful names for these things?

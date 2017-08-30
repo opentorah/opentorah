@@ -2,7 +2,7 @@ package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.MonthCompanion
 import org.podval.calendar.util.Named
-import Jewish.{Moment, TimeInterval, Year}
+import Jewish.{Moment, TimeInterval}
 
 abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
   final type Name = JewishMonthCompanion.Name
@@ -10,26 +10,16 @@ abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
   final val Name: JewishMonthCompanion.Name.type = JewishMonthCompanion.Name
 
   // KH 6:3
-  // TODO how is this really called? tropical?
+  // TODO how is this really called? tropical? Move out of here (to Moon?).
   final val meanLunarPeriod: TimeInterval = TimeInterval().days(29).hours(12).parts(793)
 
   // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2):
   // BeHaRaD: (KH 6:8)
   final val firstNewMoon: Moment = Moment().day(2).nightHours(5).parts(204)
 
-  final override def yearNumber(monthNumber: Int): Int = {
-    val cycleOfMonth = ((monthNumber - 1) / Year.monthsInCycle) + 1
-    val yearsBeforeCycle = (cycleOfMonth - 1) * Year.yearsInCycle
-    val yearMonthIsInCycle =
-      Year.monthsBeforeYearInCycle.count(_ < numberInCycleOfMonth(monthNumber))
-    yearsBeforeCycle + yearMonthIsInCycle
-  }
+  final override def yearNumber(monthNumber: Int): Int = Cycle.yearNumber(monthNumber)
 
-  final override def numberInYear(monthNumber: Int): Int =
-    numberInCycleOfMonth(monthNumber) - Year.firstMonthInCycle(yearNumber(monthNumber)) + 1
-
-  private def numberInCycleOfMonth(monthNumber: Int): Int =
-    ((monthNumber - 1) % Year.monthsInCycle) + 1
+  final override def numberInYear(monthNumber: Int): Int = Cycle.numberInYear(monthNumber)
 }
 
 

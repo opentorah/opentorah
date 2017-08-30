@@ -74,17 +74,18 @@ class TextTest extends FlatSpec {
   }
 
   "year of Shmuel" should "be as in KH 6:10; 9:1-2" in {
-    assertResult(19)(Year.yearsInCycle)
-    assertResult( 7)(Year.leapYearsInCycle)
+    assertResult(19)(Cycle.yearsInCycle)
+    assertResult( 7)(Cycle.leapYearsInCycle)
     assertResult(TimeInterval().days(365).hours(6))(yearOfShmuel)
-    assertResult(Year.normal*12 + Year.leap*7)(Year.cycleLength)
-    assertResult(TimeInterval().hours(1).parts(485))(yearOfShmuel*Year.yearsInCycle - Year.cycleLength)
+    assertResult(Year.normal*12 + Year.leap*7)(Cycle.cycleLength)
+    assertResult(TimeInterval().hours(1).parts(485))(
+      yearOfShmuel*Cycle.yearsInCycle - Cycle.cycleLength)
     // KH 9:2
     assertResult(TimeInterval().days(91).hours(7).parts(partsPerHour/2))(Seasons.Shmuel.seasonLength)
   }
 
   "leap years" should "be as in KH 6:11" in {
-    assertResult(Set(3, 6, 8, 11, 14, 17, 19))(Year.leapYears)
+    assertResult(Set(3, 6, 8, 11, 14, 17, 19))(Cycle.leapYears)
   }
 
   "cycle remainder" should "be as in KH 6:12" in {
@@ -151,7 +152,7 @@ class TextTest extends FlatSpec {
   "year of RavAda" should "be as in KH 10:1-2" in {
     assertResult(TimeInterval().days(365).hours(5).parts(997).moments(48))(yearOfRavAda)
     assertResult(TimeInterval().days(10).hours(21).parts(121).moments(48))(yearOfRavAda - Year.normal)
-    assertResult(TimeInterval())(yearOfRavAda*Year.yearsInCycle - Year.cycleLength)
+    assertResult(TimeInterval())(yearOfRavAda*Cycle.yearsInCycle - Cycle.cycleLength)
     // KH 10:2
     assertResult(TimeInterval().days(91).hours(7).parts(519).moments(31))(Seasons.RavAda.seasonLength)
   }

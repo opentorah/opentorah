@@ -46,10 +46,6 @@ abstract class JewishYear(number: Int) extends YearBase[Jewish](number) {
 
   final override def lengthInDays: Int = next.firstDayNumber - this.firstDayNumber
 
-  final def cycle: Int = Year.cycle(number)
-
-  final def numberInCycle: Int = Year.numberInCycle(number)
-
   final override def character: YearCharacter = (isLeap, kind)
 
   // KH 8:7-8
