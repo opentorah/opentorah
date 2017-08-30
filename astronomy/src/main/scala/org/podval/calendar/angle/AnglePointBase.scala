@@ -1,7 +1,7 @@
 package org.podval.calendar.angle
 
 import org.podval.calendar.numbers.NumberSystem.RawNumber
-import org.podval.calendar.numbers.PointBase
+import org.podval.calendar.numbers.RangedHeadDigitPointBase
 
 abstract class AnglePointBase(raw: RawNumber)
-  extends PointBase[AngleNumberSystem](raw) with AngleNumber[AnglePointBase]
+  extends RangedHeadDigitPointBase[AngleNumberSystem](raw) with AngleNumber[AnglePointBase]

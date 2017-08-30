@@ -99,14 +99,17 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) e
 
   override def toString: String = toSignedString
 
-  final override def hashCode: Int = (73 /: digits)((v, x) => 41 * v + x) + negative.hashCode
+  // This needs to be overridden for the RangedHeadDigitNumber, so it isn't final.
+  override def hashCode: Int = digitsHashCode
 
-  final def compare(that: N): Int = {
-    val result: Int =
-      if (this.negative != that.negative) 1
-      else zip(that).map(lift(_ compare _)).find (_ != 0) getOrElse 0
-    result * signum
-  }
+  final def digitsHashCode: Int = (73 /: digits)((v, x) => 41 * v + x) + negative.hashCode
+
+  // This needs to be overridden for the RangedHeadDigitNumber, so it isn't final.
+  def compare(that: N): Int =
+    (if (this.negative != that.negative) 1 else compareDigits(that)) * signum
+
+  final def compareDigits(that: N): Int =
+    zip(that).map(lift(_ compare _)).find (_ != 0) getOrElse 0
 
   final override def equals(other: Any): Boolean =
     // TODO deal with the "erasure" warning; compare numberSystem...

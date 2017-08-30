@@ -1,8 +1,9 @@
 package org.podval.calendar.angle
 
-import org.podval.calendar.numbers.Number
+import org.podval.calendar.numbers.RangedHeadDigitNumber
 
-trait AngleNumber[N <: AngleNumber[N]] extends Number[AngleNumberSystem, N] { this: N =>
+trait AngleNumber[N <: AngleNumber[N]] extends RangedHeadDigitNumber[AngleNumberSystem, N]
+{ this: N =>
   def degrees: Int = head
 
   def degrees(value: Int): N = digit(0, value)

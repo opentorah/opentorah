@@ -10,7 +10,7 @@ class AngleTest extends FlatSpec {
 
   behavior of "Angle"
 
-  it should "construct properly" in {
+  it should "construct correctly" in {
     def construction(degrees: Int, minutes: Int) {
       val angle = Angle(degrees, minutes)
       assertResult(degrees)(angle.degrees)
@@ -23,7 +23,7 @@ class AngleTest extends FlatSpec {
     construction(254,  0)
   }
 
-  it should "convert properly" in {
+  it should "convert correctly" in {
     def conversion(degrees: Int, minutes: Int) {
       val angle = Angle(degrees, minutes)
       assert(angle == Angle.fromDegrees(angle.toDegrees, 2))
@@ -35,10 +35,15 @@ class AngleTest extends FlatSpec {
     conversion(254, 0)
   }
 
-  it should "round properly" in {
+  it should "round correctly" in {
     assertResult(Angle(104, 58, 50))(Angle(104, 58, 50, 16, 39, 59, 43).roundToSeconds)
     assertResult(Angle(0, 31))((Angle(0, 15, 15)*2).roundToMinutes)
   }
 
   // TODO add tests for negativity
+
+  it should "compare correctly" in {
+    assertResult(Angle(15))(Angle(15))
+    assertResult(Angle(15))(Angle(negative = true, 345))
+  }
 }
