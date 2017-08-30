@@ -40,8 +40,8 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
     }
   }
 
+  // KH 7:1
   private val adu: Set[Day.Name] = Set(Rishon, Rvii, Shishi)
-
   final def isAdu(day: Day): Boolean = adu.contains(day.name)
 
   protected final override def areYearsPositive: Boolean = true
@@ -84,16 +84,20 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
   final def cycle(yearNumber: Int): Int = ((yearNumber - 1) / yearsInCycle) + 1
 
   // TODO package RoshHaShonoh calculations into a class
-  // TODO meaningful names
+  // TODO are there meaningful names for these things?
   final val firstCorrection: TimeInterval  = interval.hours(18) // KH 7:1
   final val secondCorrection: TimeInterval = interval.hours(9).parts(204) // KH 7:4
-  final val thirdCorrection: TimeInterval  = interval.hours(15).parts(589) // KH 7:5
+
+  // KH 7:5
+  // TODO this can be calculated based on the maximum length of a year and
+  // the first correction; do it!
+  final val thirdCorrection: TimeInterval  = interval.hours(15).parts(589)
 }
 
 
 object JewishYearCompanion {
+  // KH 8:6
   sealed trait Kind
-
   object Kind {
     case object Short extends Kind
     case object Regular extends Kind

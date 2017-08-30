@@ -55,11 +55,9 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   val Moment: MomentCompanion[C]
 
+  // TODO embed as apply() in companions...
   final val moment: C#Moment = createMoment(false, List(0))
-
   final val interval: C#TimeInterval = createInterval(false, List(0))
-
-  final val week: C#TimeInterval = interval.days(Calendar.daysPerWeek)
 }
 
 

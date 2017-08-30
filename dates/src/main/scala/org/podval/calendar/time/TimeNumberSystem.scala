@@ -37,7 +37,7 @@ object TimeNumberSystem {
 
   final val momentsPerPart = 76
 
-  final val minutesPerHour = 60
+  final val minutesPerHour = 60 // KH 10:1
   require(partsPerHour % minutesPerHour == 0)
 
   final val partsPerMinute: Int = partsPerHour / minutesPerHour

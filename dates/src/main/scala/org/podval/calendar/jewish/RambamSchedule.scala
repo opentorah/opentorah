@@ -2,6 +2,7 @@ package org.podval.calendar.jewish
 
 import Jewish.{Year, Month, Day}
 
+// TODO move into "generate" - after formatters are split out over there :)
 object RambamSchedule {
   final val numberOfLessons: Int = 339
 
