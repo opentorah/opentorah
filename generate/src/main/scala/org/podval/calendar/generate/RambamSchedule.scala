@@ -1,82 +1,24 @@
 package org.podval.calendar.generate
 
-import org.podval.calendar.dates.Calendar
-import org.podval.calendar.jewish.RambamSchedule.lessonNumber
-import org.podval.calendar.jewish.Jewish.{Month, Year}
+import org.podval.calendar.jewish.Jewish.{Year, Month, Day}
 
 
 /**
  * Generate Rambam study schedule for Sefer HaMitzvos
  */
 object RambamSchedule {
+  final val numberOfLessons: Int = 339
 
-  private trait Formatter {
-    def formatLesson(
-      dayNumberInMonth: Int,
-      gMonthNumber: Int,
-      gDayNumberInMonth: Int,
-      lesson: Int
-    ): String
+  final val firstLessonDay: Day = Year(5775).month(Month.Name.Kislev).day(23)
 
-    def formatLine(line: String): String
-
-    def numColumns: Int
-  }
-
-  private val wideFormatter = new Formatter {
-    override def formatLesson(
-      dayNumberInMonth: Int,
-      gMonthNumber: Int,
-      gDayNumberInMonth: Int,
-      lesson: Int
-    ): String = f"$dayNumberInMonth%2d ($gMonthNumber%2d/$gDayNumberInMonth%2d) $lesson%3d"
-
-    override def formatLine(line: String): String = f"$line%-14s"
-
-    override def numColumns: Int = 4
-  }
-
-  private val narrowFormatter = new Formatter {
-    override def formatLesson(
-      dayNumberInMonth: Int,
-      gMonthNumber: Int,
-      gDayNumberInMonth: Int,
-      lesson: Int
-    ): String = f"$dayNumberInMonth%2d $lesson%3d"
-
-    override def formatLine(line: String): String = f"${line.take(6)}%-6s"
-
-    override def numColumns: Int = 8
-  }
-
-  def scheduleYear(formatter: Formatter, year: Year): Iterator[String] = {
-    def scheduleMonth(month: Month): Seq[String] = {
-      val lessons = for {
-        day <- month.days
-        gDay = Calendar.fromJewish(day)
-      } yield formatter.formatLesson(
-        day.numberInMonth,
-        gDay.month.numberInYear,
-        gDay.numberInMonth,
-        lessonNumber(day)
-      )
-
-      val result = month.name.toString +: (if (lessons.size == 30) lessons else lessons ++ Seq(""))
-      result.map(formatter.formatLine)
-    }
-
-    def scheduleMonths(months: Seq[Month]): Seq[String] = {
-      def combine(what: Seq[String]): String =
-        what.reduce((acc: String, r: String) => acc ++ "    " ++ r)
-      val schedules: Seq[Seq[String]] = months.map(scheduleMonth)
-      schedules.transpose.map(combine) ++ Seq("")
-    }
-
-    year.months.sliding(formatter.numColumns, formatter.numColumns).map(scheduleMonths).flatten
+  final def lessonNumber(day: Day): Int = {
+    // % misbehaves on negatives :)
+    val distance = day.number - firstLessonDay.number + 50 * numberOfLessons
+    distance % numberOfLessons + 1
   }
 
   def printSchedule(formatter: Formatter)(numYear: Int): Unit =
-    scheduleYear(formatter, Year(numYear)).foreach(println)
+    Schedule.scheduleYear(Year(numYear), (day: Day) => lessonNumber(day).toString, formatter).foreach(println)
 
-  def main(args: Array[String]): Unit = printSchedule(narrowFormatter)(5777)
+  def main(args: Array[String]): Unit = printSchedule(Formatter.narrow)(5777)
 }

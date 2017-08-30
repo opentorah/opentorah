@@ -1,6 +1,6 @@
 package org.podval.calendar.time
 
-import TimeNumberSystem.{hoursPerHalfDay, partsPerMinute}
+import TimeNumberSystem.{hoursPerHalfDay, partsPerHalfHour, partsPerMinute}
 import org.podval.calendar.numbers.Number
 
 trait TimeNumber[S <: TimeNumberSystem[S], N <: TimeNumber[S, N]] extends Number[S, N] { this: N =>
@@ -27,6 +27,8 @@ trait TimeNumber[S <: TimeNumberSystem[S], N <: TimeNumber[S, N]] extends Number
   final def parts: Int = digit(2)
 
   final def parts(value: Int): N = digit(2, value)
+
+  final def halfHour: N = parts(partsPerHalfHour)
 
   final def minutes: Int = parts / partsPerMinute
 

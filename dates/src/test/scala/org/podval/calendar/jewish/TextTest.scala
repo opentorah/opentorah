@@ -2,10 +2,11 @@ package org.podval.calendar.jewish
 
 import org.scalatest.FlatSpec
 import org.podval.calendar.time.TimeNumberSystem.{hoursPerDay, hoursPerHalfDay, partsPerHour}
+import org.podval.calendar.dates.Calendar
 import Jewish.{Day, Moment, Month, Year, TimeInterval}
 import Sun.{yearOfShmuel, yearOfRavAda}
-import Month.meanLunarPeriod
-import org.podval.calendar.dates.Calendar
+import JewishMonthCompanion.meanLunarPeriod
+import JewishYearCompanion.{normalYear, leapYear}
 
 /**
  * Tests based on the statements from the text itself.
@@ -32,25 +33,26 @@ class TextTest extends FlatSpec {
   }
 
   "year lengths" should "be as in KH 6:4" in {
-    assertResult(Year.normal)(meanLunarPeriod*12)
-    assertResult(TimeInterval().days(354).hours( 8).parts(876))(Year.normal)
+    assertResult(normalYear)(meanLunarPeriod*12)
+    assertResult(TimeInterval().days(354).hours( 8).parts(876))(normalYear)
 
-    assertResult(Year.leap)(meanLunarPeriod*13)
-    assertResult(TimeInterval().days(383).hours(21).parts(589))(Year.leap)
+    assertResult(leapYear)(meanLunarPeriod*13)
+    assertResult(TimeInterval().days(383).hours(21).parts(589))(leapYear)
 
     // (see also KH 9:1, 10:6)
     assertResult(TimeInterval().days(365).hours(6))(yearOfShmuel)
-    assertResult(TimeInterval().days(10).hours(21).parts(204))(yearOfShmuel - Year.normal)
+    assertResult(TimeInterval().days(10).hours(21).parts(204))(yearOfShmuel - normalYear)
   }
 
   "weekly reminders of month and year" should "be as in KH 6:5" in {
     assertResult(TimeInterval().days(1).hours(12).parts(793))(meanLunarPeriod % week)
-    assertResult(TimeInterval().days(4).hours( 8).parts(876))(Year.normal     % week)
-    assertResult(TimeInterval().days(5).hours(21).parts(589))(Year.leap       % week)
+    assertResult(TimeInterval().days(4).hours( 8).parts(876))(normalYear      % week)
+    assertResult(TimeInterval().days(5).hours(21).parts(589))(leapYear        % week)
   }
 
   "molad Nisan example from KH 6:7" should "be correct" in {
-    // Rambam doesn't give the year; the only year with molad Nisan on the time he gives is 5066,
+    // TODO Rambam doesn't give the year;
+    // the only year with molad Nisan on the time he gives is 5066,
     // but day of the week is Rvii instead of Rishon :(
     val year: Year = Year(5066)
     val moladNisan: Moment = year.month(Month.Name.Nisan).newMoon
@@ -70,18 +72,18 @@ class TextTest extends FlatSpec {
     assertResult(Day.Name.Shishi)(year2newMoon.day.name)
     assertResult(TimeInterval().hours(14))(year2newMoon.time)
 
-    assertResult(year1newMoon)(year2newMoon - Month.meanLunarPeriod*12)
+    assertResult(year1newMoon)(year2newMoon - meanLunarPeriod*12)
   }
 
   "year of Shmuel" should "be as in KH 6:10; 9:1-2" in {
     assertResult(19)(Cycle.yearsInCycle)
     assertResult( 7)(Cycle.leapYearsInCycle)
     assertResult(TimeInterval().days(365).hours(6))(yearOfShmuel)
-    assertResult(Year.normal*12 + Year.leap*7)(Cycle.cycleLength)
+    assertResult(normalYear*12 + leapYear*7)(Cycle.cycleLength)
     assertResult(TimeInterval().hours(1).parts(485))(
       yearOfShmuel*Cycle.yearsInCycle - Cycle.cycleLength)
     // KH 9:2
-    assertResult(TimeInterval().days(91).hours(7).parts(partsPerHour/2))(Seasons.Shmuel.seasonLength)
+    assertResult(TimeInterval().days(91).hours(7).halfHour)(Seasons.Shmuel.seasonLength)
   }
 
   "leap years" should "be as in KH 6:11" in {
@@ -131,7 +133,7 @@ class TextTest extends FlatSpec {
 
     val tkufasTammuz = Seasons.Shmuel.tkufasTammuz(year)
     assertResult(Day.Name.Chamishi)(tkufasTammuz.day.name)
-    assertResult(TimeInterval().hours(13).parts(partsPerHour/2))(tkufasTammuz.time)
+    assertResult(TimeInterval().hours(13).halfHour)(tkufasTammuz.time)
 
     val tkufasTishrei = Seasons.Shmuel.tkufasTishrei(year)
     assertResult(Day.Name.Chamishi)(tkufasTishrei.day.name)
@@ -139,22 +141,22 @@ class TextTest extends FlatSpec {
 
     val tkufasTeves = Seasons.Shmuel.tkufasTeves(year)
     assertResult(Day.Name.Shishi)(tkufasTeves.day.name)
-    assertResult(TimeInterval().hours(4).parts(partsPerHour/2))(tkufasTeves.time)
+    assertResult(TimeInterval().hours(4).halfHour)(tkufasTeves.time)
 
     val nextTkufasNisan = Seasons.Shmuel.tkufasNisan(year+1)
     assertResult(Day.Name.Shishi)(nextTkufasNisan.day.name)
     assertResult(TimeInterval().hours(12))(nextTkufasNisan.time)
 
-    // TODO add "halfHour" as an alias for parts(partsPerHpur/2)?
     // TODO more tests from KH 9:6-8
   }
 
   "year of RavAda" should "be as in KH 10:1-2" in {
     assertResult(TimeInterval().days(365).hours(5).parts(997).moments(48))(yearOfRavAda)
-    assertResult(TimeInterval().days(10).hours(21).parts(121).moments(48))(yearOfRavAda - Year.normal)
+    assertResult(TimeInterval().days(10).hours(21).parts(121).moments(48))(yearOfRavAda - normalYear)
     assertResult(TimeInterval())(yearOfRavAda*Cycle.yearsInCycle - Cycle.cycleLength)
     // KH 10:2
-    assertResult(TimeInterval().days(91).hours(7).parts(519).moments(31))(Seasons.RavAda.seasonLength)
+    assertResult(TimeInterval().days(91).hours(7).parts(519).moments(31))(
+      Seasons.RavAda.seasonLength)
   }
 
   "first tkufas Nisan for RavAda" should "as in KH 10:3-4" in {
@@ -164,5 +166,5 @@ class TextTest extends FlatSpec {
     assertResult(Day.Name.Rvii)(Seasons.RavAda.firstTkufasNisan.day.name)
   }
 
-  // TODO KH 10:7 test that real vernal equinox is approximately two days before the mean one
+  // TODO KH 10:7 check that real vernal equinox is approximately two days before the mean one
 }

@@ -35,6 +35,8 @@ object TimeNumberSystem {
 
   final val partsPerHour = 1080
 
+  final val partsPerHalfHour: Int = partsPerHour / 2
+
   final val momentsPerPart = 76
 
   final val minutesPerHour = 60 // KH 10:1
