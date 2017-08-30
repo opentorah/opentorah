@@ -4,8 +4,8 @@ import org.scalatest.FlatSpec
 import org.podval.calendar.time.TimeNumberSystem.{hoursPerDay, hoursPerHalfDay, partsPerHour}
 import org.podval.calendar.dates.Calendar
 import Jewish.{Day, Moment, Month, Year, TimeInterval}
+import Moon.meanLunarPeriod
 import Sun.{yearOfShmuel, yearOfRavAda}
-import JewishMonthCompanion.meanLunarPeriod
 import JewishYearCompanion.{normalYear, leapYear}
 
 /**

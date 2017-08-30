@@ -61,8 +61,8 @@ object JewishYearCompanion {
     val values: Seq[Kind] = Seq(Short, Regular, Full)
   }
 
-  final val normalYear: TimeInterval = JewishMonthCompanion.meanLunarPeriod*Cycle.yearLengthInMonths(isLeap = false)
-  final val leapYear: TimeInterval = JewishMonthCompanion.meanLunarPeriod*Cycle.yearLengthInMonths(isLeap = true)
+  final val normalYear: TimeInterval = Moon.meanLunarPeriod*Cycle.yearLengthInMonths(isLeap = false)
+  final val leapYear: TimeInterval = Moon.meanLunarPeriod*Cycle.yearLengthInMonths(isLeap = true)
 
   // TODO package RoshHaShonoh calculations into a class
 
