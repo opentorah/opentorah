@@ -66,8 +66,9 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
     // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
     val resultDigits = newDigits.head +: newDigits.tail.reverse.dropWhile(_ == 0).reverse
-
-    (newNegative, resultDigits)
+    // Treat -0 as 0
+    val resultNegative = if ((newDigits.length == 1) && (newDigits.head == 0)) false else newNegative
+    (resultNegative, resultDigits)
   }
 
   def checkHeadDigit(value: Int): Unit

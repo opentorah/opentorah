@@ -1,7 +1,7 @@
 package org.podval.calendar.angle
 
 import org.podval.calendar.numbers.NumberSystem.RawNumber
-import org.podval.calendar.numbers.RangedHeadDigitNumberSystem
+import org.podval.calendar.numbers.{NumberSystemMember, PointCompanionBase, RangedHeadDigitNumberSystem}
 
 
 trait AngleNumberSystem extends RangedHeadDigitNumberSystem[AngleNumberSystem] {
@@ -9,21 +9,23 @@ trait AngleNumberSystem extends RangedHeadDigitNumberSystem[AngleNumberSystem] {
 
   final type Angle = Interval
 
-  protected final override def createInterval(raw: RawNumber): Angle = new Angle(raw) {
+  trait AngleNumberSystemMember extends NumberSystemMember[AngleNumberSystem] {
     final override def numberSystem: AngleNumberSystem = AngleNumberSystem.this
   }
 
-  final object Angle extends AngleCompanion
+  protected final override def createInterval(raw: RawNumber): Angle =
+    new Angle(raw) with AngleNumberSystemMember
+
+  final object Angle extends AngleCompanion with AngleNumberSystemMember
 
   final override type Point = AnglePointBase
 
   final type AnglePoint = Point
 
-  protected final override def createPoint(raw: RawNumber): AnglePoint = new AnglePoint(raw) {
-    final override def numberSystem: AngleNumberSystem = AngleNumberSystem.this
-  }
+  protected final override def createPoint(raw: RawNumber): AnglePoint =
+    new AnglePoint(raw) with AngleNumberSystemMember
 
-  final object AnglePoint extends AnglePointCompanion
+  final object AnglePoint extends PointCompanionBase[AngleNumberSystem] with AngleNumberSystemMember
 
   final override def headRange: Int = 360
 

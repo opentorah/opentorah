@@ -1,12 +1,10 @@
 package org.podval.calendar.angle
 
 import AngleNumberSystem.Angle
+import org.podval.calendar.numbers.IntervalCompanionBase
 
-class AngleCompanion {
-  final def apply(digits: Int*): Angle = apply(negative = false, digits: _*)
-
-  final def apply(negative: Boolean, digits: Int*): Angle =
-    AngleNumberSystem.newInterval(negative, digits.toList)
+abstract class AngleCompanion extends IntervalCompanionBase[AngleNumberSystem] {
+  // TODO move the methods and eliminate?
 
   final def fromRadians(value: Double, length: Int): Angle =
     fromDegrees(math.toDegrees(value), length)

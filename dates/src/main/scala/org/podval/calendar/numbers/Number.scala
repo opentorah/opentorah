@@ -2,10 +2,9 @@ package org.podval.calendar.numbers
 
 import NumberSystem.RawNumber
 
-abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber) extends Ordered[N]
+abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber)
+  extends Ordered[N] with NumberSystemMember[S]
 { this: N =>
-  def numberSystem: S
-
   protected final def newPoint(raw: RawNumber): S#Point = numberSystem.newPoint(raw)
   protected final def newInterval(raw: RawNumber): S#Interval = numberSystem.newInterval(raw)
 

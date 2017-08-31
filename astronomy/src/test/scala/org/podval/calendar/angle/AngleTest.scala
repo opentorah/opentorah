@@ -43,6 +43,7 @@ class AngleTest extends FlatSpec {
   // TODO add tests for negativity
 
   it should "compare correctly" in {
+    assertResult(Angle(negative = false, 0, 0, 0))(Angle(negative = true, 0))
     assertResult(Angle(15))(Angle(15))
     assertResult(Angle(15))(Angle(negative = true, 345))
   }
