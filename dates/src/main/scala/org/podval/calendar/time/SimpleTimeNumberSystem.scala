@@ -11,9 +11,9 @@ class SimpleTimeNumberSystem extends TimeNumberSystem[SimpleTimeNumberSystem] {
   trait SimpleTimeNumberSystemMember extends NumberSystemMember[SimpleTimeNumberSystem] {
     final override def numberSystem: SimpleTimeNumberSystem = SimpleTimeNumberSystem.this
   }
-  final override def createPoint(raw: RawNumber): TimePointBase[SimpleTimeNumberSystem] =
+  final override protected def createPoint(raw: RawNumber): TimePointBase[SimpleTimeNumberSystem] =
     new TimePointBase[SimpleTimeNumberSystem](raw) with SimpleTimeNumberSystemMember
-  final override def createInterval(raw: RawNumber): TimeIntervalBase[SimpleTimeNumberSystem] =
+  final override protected def createInterval(raw: RawNumber): TimeIntervalBase[SimpleTimeNumberSystem] =
     new TimeIntervalBase[SimpleTimeNumberSystem](raw) with SimpleTimeNumberSystemMember
   final object Interval extends IntervalCompanionBase[SimpleTimeNumberSystem] with SimpleTimeNumberSystemMember
   final object Point extends PointCompanionBase[SimpleTimeNumberSystem] with SimpleTimeNumberSystemMember
