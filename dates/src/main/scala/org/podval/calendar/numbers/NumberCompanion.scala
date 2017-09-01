@@ -3,10 +3,7 @@ package org.podval.calendar.numbers
 import NumberSystem.{RawNumber, signum}
 
 trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSystemMember[S] {
-  // TODO unify with apply(raw)
-  def newNumber(raw: RawNumber): N
-
-  final def apply(raw: RawNumber): N = newNumber(raw)
+  def apply(raw: RawNumber): N
 
   final def apply(negative: Boolean, digits: Int*): N =
     apply((negative, (if (digits.nonEmpty) digits else Seq(0)).toList))
@@ -14,13 +11,13 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
   final def apply(digits: Int*): N = apply(negative = false, digits: _*)
 
   final def fromRational(value: BigRational, length: Int = numberSystem.defaultLength): N =
-    newNumber(value < BigRational.zero, from[BigRational](
+    apply((value < BigRational.zero, from[BigRational](
       value.abs,
       length,
       _.wholeAndFraction,
       _ * _,
       BigRational.round
-    ))
+    )))
 
   final def fromDouble(value: Double, length: Int = numberSystem.defaultLength): N = {
     def wholeAndFraction(what: Double): (Int, Double) = {
@@ -31,13 +28,13 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
 
     def round(whole: Int, fraction: Double): Int = whole + math.round(fraction).toInt
 
-    newNumber(value < 0.0d, from[Double](
+    apply((value < 0.0d, from[Double](
       math.abs(value),
       length,
       wholeAndFraction,
       _ * _,
       round
-    ))
+    )))
   }
 
   // This is an instance of a specialized unfold with an initiator, unfolder and terminator
