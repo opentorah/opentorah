@@ -50,4 +50,6 @@ class Jewish private() extends Calendar[Jewish] {
 }
 
 
-object Jewish extends Jewish
+object Jewish extends Jewish {
+  val week: TimeInterval = Interval().days(7)
+}
