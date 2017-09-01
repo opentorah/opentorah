@@ -5,10 +5,6 @@ import NumberSystem.RawNumber
 abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber)
   extends Ordered[N] with NumberSystemMember[S]
 { this: N =>
-  // TODO eliminate these two
-  protected final def newPoint(raw: RawNumber): S#Point = numberSystem.newPoint(raw)
-  protected final def newInterval(raw: RawNumber): S#Interval = numberSystem.newInterval(raw)
-
   protected def newNumber(raw: RawNumber): N
 
   final def negative: Boolean = raw._1
@@ -68,7 +64,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber)
     to[Double](forDigit, _ + _) * signum
   }
 
-  private[this] final def to[T](forDigit /* rename digitTo */: (Int, BigInt) => T, plus: (T, T) => T): T = {
+  private[this] final def to[T](forDigit /* TODO rename digitTo */: (Int, BigInt) => T, plus: (T, T) => T): T = {
     val zeroDenominator: BigInt = BigInt(1)
     numberSystem.zipWithRanges(tail).foldLeft((forDigit(head, zeroDenominator), zeroDenominator)) {
       case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>

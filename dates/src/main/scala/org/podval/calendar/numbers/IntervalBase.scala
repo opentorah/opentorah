@@ -5,15 +5,15 @@ import org.podval.calendar.numbers.NumberSystem.RawNumber
 abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
   extends Number[S, S#Interval](raw)
 { this: S#Interval =>
-  protected final override def newNumber(raw: RawNumber): S#Interval =  newInterval(raw)
+  protected final override def newNumber(raw: RawNumber): S#Interval =  numberSystem.newInterval(raw)
 
   private[this] def defaultLength: Int = numberSystem.defaultLength
 
-  final def +(that: S#Interval): S#Interval = newInterval(add(negate = false, that))
+  final def +(that: S#Interval): S#Interval = newNumber(add(negate = false, that))
 
-  final def -(that: S#Interval): S#Interval = newInterval(add(negate = true, that))
+  final def -(that: S#Interval): S#Interval = newNumber(add(negate = true, that))
 
-  final def *(n: Int): S#Interval = newInterval(negative, digits map (n * _))
+  final def *(n: Int): S#Interval = newNumber(negative, digits map (n * _))
 
   final def /(n: Int, length: Int = defaultLength): S#Interval =
     numberSystem.Interval.fromRational(toRational / n, math.max(this.length, length))
