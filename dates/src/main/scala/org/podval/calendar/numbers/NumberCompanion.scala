@@ -2,7 +2,7 @@ package org.podval.calendar.numbers
 
 import NumberSystem.RawNumber
 
-abstract class NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]]
+trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]]
   extends NumberSystemMember[S]
 {
   def newNumber(raw: RawNumber): N

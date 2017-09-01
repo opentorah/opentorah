@@ -25,7 +25,8 @@ trait AngleNumberSystem extends RangedHeadDigitNumberSystem[AngleNumberSystem] {
   protected final override def createPoint(raw: RawNumber): AnglePoint =
     new AnglePoint(raw) with AngleNumberSystemMember
 
-  final object AnglePoint extends PointCompanionBase[AngleNumberSystem] with AngleNumberSystemMember
+  final object AnglePoint extends PointCompanionBase[AngleNumberSystem]
+    with AngleNumberCompanion[AnglePoint] with AngleNumberSystemMember
 
   final override def headRange: Int = 360
 
