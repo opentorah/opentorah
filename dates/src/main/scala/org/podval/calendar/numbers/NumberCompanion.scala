@@ -1,6 +1,6 @@
 package org.podval.calendar.numbers
 
-import NumberSystem.RawNumber
+import NumberSystem.{RawNumber, signum}
 
 trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSystemMember[S] {
   def newNumber(raw: RawNumber): N
@@ -55,5 +55,44 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
             (acc :+ (digit, reminder), wholeAndFraction(mult(reminder, range)))
         }
     digits.map(_._1) :+ round(lastDigit, lastReminder)
+  }
+
+  protected final def normalize(raw: RawNumber): RawNumber = {
+    def step(elem: (Int, Int), acc: (Int, List[Int])) = {
+      val (digit, position) = elem
+      val (carry, result) = acc
+      val value: Int = digit + carry
+      val range: Int = numberSystem.range(position)
+      val (quotient: Int, reminder: Int) = (value / range, value % range)
+      val (carry_, digit_) =
+        if (value >= 0) (quotient, reminder)
+        else (quotient - 1, reminder + range)
+      (carry_, digit_ :: result)
+    }
+
+    def headStep(head: Int, headCarry: Int): (Boolean, Int) = {
+      val carriedHead: Int = numberSystem.correctHeadDigit(head + headCarry)
+      val carriedNegative: Boolean = carriedHead < 0
+      (carriedNegative, signum(carriedNegative) * carriedHead)
+    }
+
+    val (negative: Boolean, digits: List[Int]) = raw
+    val (headCarry: Int, newTail: List[Int]) = (digits.tail.zipWithIndex :\(0, List.empty[Int]))(step)
+    val (carriedNegative: Boolean, newHead: Int) = headStep(digits.head, headCarry)
+
+    val newNegative: Boolean = if (negative) !carriedNegative else carriedNegative
+    val newDigits = newHead :: newTail
+
+    // Ensure that digits are within appropriate ranges
+    newDigits.foreach(digit => require(digit >= 0, s"$digit must be non-negative"))
+    numberSystem.checkHeadDigit(newHead)
+    numberSystem.zipWithRanges(newTail).foreach
+    { case (digit, range) => require(digit < range, s"$digit must be less than $range") }
+
+    // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
+    val resultDigits = newDigits.head +: newDigits.tail.reverse.dropWhile(_ == 0).reverse
+    // Treat -0 as 0
+    val resultNegative = if ((newDigits.length == 1) && (newDigits.head == 0)) false else newNegative
+    (resultNegative, resultDigits)
   }
 }

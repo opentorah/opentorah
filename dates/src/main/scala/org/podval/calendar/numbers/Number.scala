@@ -5,6 +5,8 @@ import NumberSystem.RawNumber
 abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber)
   extends Ordered[N] with NumberSystemMember[S]
 { this: N =>
+  // TODO now that it is accessible, verify the input (NumberCompanion.normalize())?
+
   protected def newNumber(raw: RawNumber): N
 
   final def negative: Boolean = raw._1

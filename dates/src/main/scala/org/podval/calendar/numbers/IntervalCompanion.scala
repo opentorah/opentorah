@@ -4,5 +4,5 @@ import NumberSystem.RawNumber
 
 abstract class IntervalCompanion[S <: NumberSystem[S]] extends NumberCompanion[S, S#Interval] {
   final override def newNumber(raw: RawNumber): S#Interval =
-    numberSystem.createInterval(numberSystem.normalize(raw))
+    numberSystem.createInterval(normalize(raw))
 }
