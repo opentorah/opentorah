@@ -2,7 +2,7 @@ package org.podval.calendar.gregorian
 
 import org.podval.calendar.dates.{Calendar, CalendarMember}
 import org.podval.calendar.numbers.NumberSystem.RawNumber
-import org.podval.calendar.numbers.PointCompanionBase
+import org.podval.calendar.numbers.PointCompanion
 
 class Gregorian private() extends Calendar[Gregorian] {
 
@@ -44,7 +44,7 @@ class Gregorian private() extends Calendar[Gregorian] {
       final override def numberSystem: Gregorian = Gregorian.this
     }
 
-  final override object Moment extends PointCompanionBase[Gregorian] with GregorianCalendarMember {
+  final override object Moment extends PointCompanion[Gregorian] with GregorianCalendarMember {
     override def numberSystem: Gregorian = calendar // TODO unify as "family"?
   }
 }

@@ -1,7 +1,7 @@
 package org.podval.calendar.time
 
 import org.podval.calendar.numbers.NumberSystem.RawNumber
-import org.podval.calendar.numbers.{IntervalCompanionBase, NumberSystemMember, PointCompanionBase}
+import org.podval.calendar.numbers.{IntervalCompanion, NumberSystemMember, PointCompanion}
 
 // This exists so that TimeNumberSystem could be tested stand-alone.
 // TODO "lift" tests to Calendar and eliminate?
@@ -15,8 +15,8 @@ class SimpleTimeNumberSystem extends TimeNumberSystem[SimpleTimeNumberSystem] {
     new TimePointBase[SimpleTimeNumberSystem](raw) with SimpleTimeNumberSystemMember
   final override protected def createInterval(raw: RawNumber): TimeIntervalBase[SimpleTimeNumberSystem] =
     new TimeIntervalBase[SimpleTimeNumberSystem](raw) with SimpleTimeNumberSystemMember
-  final object Interval extends IntervalCompanionBase[SimpleTimeNumberSystem] with SimpleTimeNumberSystemMember
-  final object Point extends PointCompanionBase[SimpleTimeNumberSystem] with SimpleTimeNumberSystemMember
+  final object Interval extends IntervalCompanion[SimpleTimeNumberSystem] with SimpleTimeNumberSystemMember
+  final object Point extends PointCompanion[SimpleTimeNumberSystem] with SimpleTimeNumberSystemMember
 }
 
 

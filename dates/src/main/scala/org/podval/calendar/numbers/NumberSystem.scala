@@ -10,11 +10,15 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   protected def createPoint(raw: RawNumber): S#Point
 
+  val Point: PointCompanion[S]
+
   type Interval <: IntervalBase[S]
 
   final def newInterval(raw: RawNumber): S#Interval = createInterval(normalize(raw))
 
   protected def createInterval(raw: RawNumber): S#Interval
+
+  val Interval: IntervalCompanion[S]
 
   // TODO use it for all operations, including + and -, to guide which overflow digit to round.
   val defaultLength: Int
@@ -77,6 +81,8 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   final def zipWithRanges(tail: List[Int]): List[(Int, Int)] =
     tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
+
+  // TODO move into the "companion" objects...
 
   final def fromRational(value: BigRational, length: Int = defaultLength): RawNumber =
     (value < BigRational.zero, from[BigRational](

@@ -2,7 +2,7 @@ package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.{Calendar, CalendarMember}
 import org.podval.calendar.numbers.NumberSystem.RawNumber
-import org.podval.calendar.numbers.PointCompanionBase
+import org.podval.calendar.numbers.PointCompanion
 
 class Jewish private() extends Calendar[Jewish] {
 
@@ -44,7 +44,7 @@ class Jewish private() extends Calendar[Jewish] {
       final override def numberSystem:  Jewish = Jewish.this
     }
 
-  final override object Moment extends PointCompanionBase[Jewish] with JewishCalendarMember {
+  final override object Moment extends PointCompanion[Jewish] with JewishCalendarMember {
     override def numberSystem: Jewish = calendar // TODO unify as "family"?
   }
 }

@@ -2,6 +2,7 @@ package org.podval.calendar.time
 
 import org.scalatest.FlatSpec
 import org.podval.calendar.numbers.BigRational
+import SimpleTimeNumberSystem.{Interval, fromRational}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class TimeNumberSystemTest extends FlatSpec {
@@ -15,8 +16,6 @@ final class TimeNumberSystemTest extends FlatSpec {
   }
 
   "toRational()" should "be correct" in {
-    import SimpleTimeNumberSystem.Interval
-
     val days = Interval(false, 3)
     assertResult("3d")(days.toString)
     assertResult(BigRational(3, 1))(days.toRational)
@@ -35,15 +34,12 @@ final class TimeNumberSystemTest extends FlatSpec {
   }
 
   "fromRational()" should "be correct" in {
-    // TODO use Interval, not newInterval...
-    import SimpleTimeNumberSystem.{Interval, fromRational, newInterval}
-
     def test(value: Interval): Unit =
-      assertResult(value)(newInterval(fromRational(value.toRational)))
+      assertResult(value)(Interval(fromRational(value.toRational)))
 
-    test(newInterval(false, List(3)))
-    test(newInterval(false, List(3, 5)))
-    test(newInterval(false, List(3, 5, 4)))
-    test(newInterval(false, List(3, 5, 4, 1)))
+    test(Interval(false, 3))
+    test(Interval(false, 3, 5))
+    test(Interval(false, 3, 5, 4))
+    test(Interval(false, 3, 5, 4, 1))
   }
 }
