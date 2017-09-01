@@ -3,6 +3,7 @@ package org.podval.calendar.numbers
 import NumberSystem.{RawNumber, signum}
 
 trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSystemMember[S] {
+  // TODO unify with apply(raw)
   def newNumber(raw: RawNumber): N
 
   final def apply(raw: RawNumber): N = newNumber(raw)
