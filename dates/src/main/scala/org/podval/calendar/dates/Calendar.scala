@@ -43,7 +43,7 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   def createMoment(raw: RawNumber): C#Moment
 
-  protected final override def createPoint(raw: RawNumber): C#Point = createMoment(raw)
+  final override def createPoint(raw: RawNumber): C#Point = createMoment(raw)
 
   val Moment: PointCompanion[C]
 

@@ -6,19 +6,14 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   type Point <: PointBase[S]
 
-  // TODO move into companion objects
-  final def newPoint(raw: RawNumber): S#Point = createPoint(normalize(raw))
-
-  protected def createPoint(raw: RawNumber): S#Point
+  // TODO now that it is accessible, verify the input?
+  def createPoint(raw: RawNumber): S#Point
 
   val Point: PointCompanion[S]
 
   type Interval <: IntervalBase[S]
 
-  // TODO move into companion objects
-  final def newInterval(raw: RawNumber): S#Interval = createInterval(normalize(raw))
-
-  protected def createInterval(raw: RawNumber): S#Interval
+  def createInterval(raw: RawNumber): S#Interval
 
   val Interval: IntervalCompanion[S]
 
@@ -39,7 +34,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   def sign(position: Int): Option[String] = signPartial.lift(position)
 
   // TODO move into NumberCompanion
-  private final def normalize(raw: RawNumber): RawNumber = {
+  final def normalize(raw: RawNumber): RawNumber = {
     def step(elem: (Int, Int), acc: (Int, List[Int])) = {
       val (digit, position) = elem
       val (carry, result) = acc
