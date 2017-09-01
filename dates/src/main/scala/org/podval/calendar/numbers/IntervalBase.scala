@@ -7,9 +7,6 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
 { this: S#Interval =>
   protected final override def newNumber(raw: RawNumber): S#Interval =  newInterval(raw)
 
-  private[this] def fromRational(value: BigRational, length: Int): RawNumber =
-    numberSystem.fromRational(value, length)
-
   private[this] def defaultLength: Int = numberSystem.defaultLength
 
   final def +(that: S#Interval): S#Interval = newInterval(add(negate = false, that))
@@ -19,7 +16,7 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
   final def *(n: Int): S#Interval = newInterval(negative, digits map (n * _))
 
   final def /(n: Int, length: Int = defaultLength): S#Interval =
-    newInterval(fromRational(toRational / n, math.max(this.length, length)))
+    numberSystem.Interval.fromRational(toRational / n, math.max(this.length, length))
 
 //  final def %(n: Int, length: Int = defaultLength): S#Interval =
 //    this - ((this / (n, length)) * n)
@@ -29,7 +26,7 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
     //      .foldRight(newInterval(false, List(0))) { case ((digit: Int, range: Int), acc: S#Interval) =>
     //        (acc + this*digit)/ (range, length)
     //      }
-    newInterval(fromRational(this.toRational*that.toRational, length))
+    numberSystem.Interval.fromRational(this.toRational*that.toRational, length)
   }
 
   final def /(that: S#Interval): Int = {

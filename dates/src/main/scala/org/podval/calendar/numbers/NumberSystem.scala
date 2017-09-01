@@ -6,6 +6,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   type Point <: PointBase[S]
 
+  // TODO move into companion objects
   final def newPoint(raw: RawNumber): S#Point = createPoint(normalize(raw))
 
   protected def createPoint(raw: RawNumber): S#Point
@@ -14,6 +15,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   type Interval <: IntervalBase[S]
 
+  // TODO move into companion objects
   final def newInterval(raw: RawNumber): S#Interval = createInterval(normalize(raw))
 
   protected def createInterval(raw: RawNumber): S#Interval
@@ -36,6 +38,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   def sign(position: Int): Option[String] = signPartial.lift(position)
 
+  // TODO move into NumberCompanion
   private final def normalize(raw: RawNumber): RawNumber = {
     def step(elem: (Int, Int), acc: (Int, List[Int])) = {
       val (digit, position) = elem
@@ -81,53 +84,6 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   final def zipWithRanges(tail: List[Int]): List[(Int, Int)] =
     tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
-
-  // TODO move into the "companion" objects...
-
-  final def fromRational(value: BigRational, length: Int = defaultLength): RawNumber =
-    (value < BigRational.zero, from[BigRational](
-      value.abs,
-      length,
-      _.wholeAndFraction,
-      _ * _,
-      BigRational.round
-    ))
-
-  final def fromDouble(value: Double, length: Int = defaultLength): RawNumber = {
-    def wholeAndFraction(what: Double): (Int, Double) = {
-      val whole: Double = math.floor(what)
-      val fraction: Double = what - whole
-      (whole.toInt, fraction)
-    }
-
-    def round(whole: Int, fraction: Double): Int = whole + math.round(fraction).toInt
-
-    (value < 0.0d, from[Double](
-      math.abs(value),
-      length,
-      wholeAndFraction,
-      _ * _,
-      round
-    ))
-  }
-
-  // This is an instance of a specialized unfold with an initiatot, unfolder and terminator
-  // (but we don't have even a simple unfold in the standard library)
-  private[this] final def from[T](
-    value: T,
-    length: Int,
-    wholeAndFraction: T => (Int, T),
-    mult: (T, Int) => T,
-    round: (Int, T) => Int): List[Int] =
-  {
-    val (digits: List[(Int, T)], (lastDigit: Int, lastReminder: T))  =
-      (0 until length).toList.map(range)
-        .foldLeft((List.empty[(Int, T)], wholeAndFraction(value))) {
-          case ((acc, (digit: Int, reminder: T)), range: Int) =>
-            (acc :+ (digit, reminder), wholeAndFraction(mult(reminder, range)))
-        }
-    digits.map(_._1) :+ round(lastDigit, lastReminder)
-  }
 }
 
 
