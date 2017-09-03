@@ -1,6 +1,7 @@
 package org.podval.calendar.jewish
 
-import Jewish.{Year, TimeInterval}
+import Jewish.TimeInterval
+import org.podval.calendar.numbers.BigRational
 
 // TODO add Zodiac class (in astronomy)
 // TODO angular speed of the moon = 360 / (1/tropical month + 1/solar year) (in astronomy)
@@ -12,4 +13,10 @@ object Sun {
 
   // KH 10:1
   val yearOfRavAda: TimeInterval = Cycle.cycleLength / Cycle.yearsInCycle
+
+  val gregorianYear: TimeInterval = TimeInterval.fromRational(
+    BigRational(365) +
+    BigRational(1, 4) -
+    BigRational(1, 100) +
+    BigRational(1, 400))
 }

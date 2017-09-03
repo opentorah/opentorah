@@ -5,32 +5,32 @@ import org.podval.calendar.numbers.{NumberSystemMember, PointCompanion, RangedHe
 
 
 trait AngleNumberSystem extends RangedHeadDigitNumberSystem[AngleNumberSystem] {
-  final type Angle = AngleIntervalBase
-
-  final override type Interval = Angle
-
   trait AngleNumberSystemMember extends NumberSystemMember[AngleNumberSystem] {
     final override def numberSystem: AngleNumberSystem = AngleNumberSystem.this
   }
 
-  final override def createInterval(raw: RawNumber): Angle =
+  final override type Interval = AngleIntervalBase
+
+  final type Angle = Interval
+
+  final override def createInterval(raw: RawNumber): Interval =
     new Angle(raw) with AngleNumberSystemMember
 
-  final object Angle extends AngleCompanion with AngleNumberSystemMember
+  final override object Interval extends AngleCompanion with AngleNumberSystemMember
 
-  final override val Interval = Angle
+  final val Angle = Interval
 
-  final type AnglePoint = AnglePointBase
+  final override type Point = AnglePointBase
 
-  final override type Point = AnglePoint
+  final type AnglePoint = Point
 
-  final override def createPoint(raw: RawNumber): AnglePoint =
+  final override def createPoint(raw: RawNumber): Point =
     new AnglePoint(raw) with AngleNumberSystemMember
 
-  final object AnglePoint extends PointCompanion[AngleNumberSystem]
-    with AngleNumberCompanion[AnglePoint] with AngleNumberSystemMember
+  final override object Point extends PointCompanion[AngleNumberSystem]
+    with AngleNumberCompanion[Point] with AngleNumberSystemMember
 
-  final override val Point = AnglePoint
+  final val AnglePoint = Point
 
   final override def headRange: Int = 360
 

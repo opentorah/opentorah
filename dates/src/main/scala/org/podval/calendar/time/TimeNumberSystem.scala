@@ -24,6 +24,8 @@ trait TimeNumberSystem[S <: TimeNumberSystem[S]]
   }
 
   final override val defaultLength: Int = 3
+
+  val week: S#Interval = Interval().days(7)
 }
 
 

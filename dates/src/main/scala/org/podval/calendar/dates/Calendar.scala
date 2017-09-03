@@ -11,7 +11,7 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   type Year <: YearBase[C]
 
-  def createYear(number: Int): C#Year
+  def createYear(number: Int): Year
 
   type YearCharacter
 
@@ -21,7 +21,7 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   type MonthName
 
-  def createMonth(number: Int): C#Month
+  def createMonth(number: Int): Month
 
   type MonthNameAndLength = MonthNameAndLengthBase[C]
 
@@ -31,38 +31,32 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   type Day <: DayBase[C]
 
-  def createDay(number: Int): C#Day
+  def createDay(number: Int): Day
 
   type DayName
 
   val Day: DayCompanion[C]
 
-  type Moment <: MomentBase[C]
+  final type Moment = Point
 
-  final override type Point = Moment
+  override type Point <: MomentBase[C]
 
-  def createMoment(raw: RawNumber): C#Moment
-
-  final override def createPoint(raw: RawNumber): C#Point = createMoment(raw)
-
-  val Moment: PointCompanion[C]
-
-  final override val Point = Moment
+  final val Moment: PointCompanion[C] = Point
 
   final override type Interval = TimeIntervalBase[C]
 
   final type TimeInterval = Interval
 
-  final override def createInterval(raw: RawNumber): TimeInterval =
-    new TimeIntervalBase[C](raw) { this: C#TimeInterval =>
+  final override def createInterval(raw: RawNumber): Interval =
+    new TimeIntervalBase[C](raw) { this: Interval =>
       final override def numberSystem: C = Calendar.this
     }
 
-  final object TimeInterval extends IntervalCompanion[C] {
+  final override object Interval extends IntervalCompanion[C] {
     override def numberSystem: C = Calendar.this
   }
 
-  final override val Interval = TimeInterval
+  final val TimeInterval = Interval
 }
 
 

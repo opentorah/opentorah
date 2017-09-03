@@ -28,17 +28,16 @@ allprojects {
 def scalaVersion      = '2.12.3'
 def scalaVersionMajor = '2.12'
 
-// TODO default dependencies for all projects?
-
 ext.lib = [
   zinc      : 'com.typesafe.zinc:zinc:0.3.15',
   scala     : "org.scala-lang:scala-library:$scalaVersion",
   junit     : 'junit:junit:4.12',
-  scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.3"
+  scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.3",
+  scalaCheck: "org.scalacheck:scalacheck_${scalaVersionMajor}:1.13.4"
   // TODO add laws tests!!!
 ]
 
-// TODO add GIT link
+// TODO add GIT scm link
 def pomConfig = {
   description 'Jewish Calendar Dates.'
   licenses {
@@ -51,7 +50,7 @@ def pomConfig = {
   }
   organization {
     name 'Podval Group'
-    url 'http://www.podval.org'
+    url 'http://www.podval.org'  // http://www.jewish-calendar.org/
   }
   developers {
     developer {
@@ -76,7 +75,7 @@ project(':dates') {
   dependencies {
     zinc lib.zinc
     compile lib.scala
-    testImplementation lib.junit, lib.scalaTest
+    testImplementation lib.junit, lib.scalaTest, lib.scalaCheck
   }
 
   test {

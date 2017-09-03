@@ -37,19 +37,17 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override object Day extends JewishDayCompanion with JewishCalendarMember
 
-  final override type Moment = JewishMoment
+  final override type Point = JewishMoment
 
-  final override def createMoment(raw: RawNumber): Moment =
+  final override def createPoint(raw: RawNumber): Point =
     new JewishMoment(raw) with JewishCalendarMember {
       final override def numberSystem:  Jewish = Jewish.this
     }
 
-  final override object Moment extends PointCompanion[Jewish] with JewishCalendarMember {
+  final override object Point extends PointCompanion[Jewish] with JewishCalendarMember {
     override def numberSystem: Jewish = calendar // TODO unify as "family"?
   }
 }
 
 
-object Jewish extends Jewish {
-  val week: TimeInterval = Interval().days(7)
-}
+object Jewish extends Jewish

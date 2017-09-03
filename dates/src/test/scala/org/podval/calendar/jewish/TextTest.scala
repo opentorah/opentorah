@@ -2,8 +2,7 @@ package org.podval.calendar.jewish
 
 import org.scalatest.FlatSpec
 import org.podval.calendar.time.TimeNumberSystem.{hoursPerDay, hoursPerHalfDay, partsPerHour}
-import org.podval.calendar.dates.Calendar
-import Jewish.{Day, Moment, Month, Year, TimeInterval}
+import Jewish.{Day, Moment, Month, Year, TimeInterval, week}
 import Moon.meanLunarPeriod
 import Sun.{yearOfShmuel, yearOfRavAda}
 import JewishYearCompanion.{normalYear, leapYear}
@@ -13,8 +12,6 @@ import JewishYearCompanion.{normalYear, leapYear}
  */
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TextTest extends FlatSpec {
-  final val week: Jewish#TimeInterval = TimeInterval().days(Calendar.daysPerWeek)
-
   "time units" should "be as in KH 6:2" in {
     assertResult(  24)(hoursPerDay)
     assertResult(  12)(hoursPerHalfDay)

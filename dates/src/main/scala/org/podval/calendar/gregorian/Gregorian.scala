@@ -37,14 +37,14 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override object Day extends GregorianDayCompanion with GregorianCalendarMember
 
-  final override type Moment = GregorianMoment
+  final override type Point = GregorianMoment
 
-  final override def createMoment(raw: RawNumber): Moment =
+  final override def createPoint(raw: RawNumber): Point =
     new GregorianMoment(raw) with GregorianCalendarMember {
       final override def numberSystem: Gregorian = Gregorian.this
     }
 
-  final override object Moment extends PointCompanion[Gregorian] with GregorianCalendarMember {
+  final override object Point extends PointCompanion[Gregorian] with GregorianCalendarMember {
     override def numberSystem: Gregorian = calendar // TODO unify as "family"?
   }
 }

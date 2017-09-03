@@ -5,12 +5,12 @@
 
 I want to be able to do various things with the fixed Jewish calendar:
 
+* code Rambam's calculations (and verify Rambam's numerical examples)
 * convert dates from Jewish calendar to Gregorian and back
 * produce monthly calendars with both kinds of dates
 * list [dates of Birchas Hachamo](https://docs.google.com/document/d/1hpPZ0LYU3p8a-LJRXEqzXig-VQthkQ_MkaY79PMqr-Y/edit?hl=en_US)
-* calculate haftorah and tora reading schedule
 * calculate schedule of learning Rambam
-* calculate halachic times for a day (zmanim)
+* calculate haftorah and torah reading schedule
 * integrate with the Google Calendar
 * automate vestos calculations
 
@@ -22,13 +22,16 @@ formulas from it were not used directly.
 I want to do certain things with the astronomical calendar as described by Rambam
 in Chapters 11-19:
 
-* translate relevant chapters into English
-* verify Rambam's rounding decisions
+* code Rambam's calculations (and verify Rambam's numerical examples)
+* analyze correspondence with the fixed calendar
 * reconstruct models that Rambam uses, in contemporary (ancient Greek?) terminology and notation
 * describe the models with diagrams and formulae
-* verify the numbers given by Rambam against his models
+* reconstruct parameters of the models from the numbers given by Rambam 
+* verify Rambam's tables and rounding decisions his models
 * extract Rambam's criteria of visibility of the new moon
-* see how Rambam's calculations of the moon visibility correspond to the current models
+* see how Rambam's calculations of the moon visibility compare to the current models
+* translate relevant chapters into English
+* calculate halachic times for a day (zmanim)
 
 
 ##Early Jewish Years
