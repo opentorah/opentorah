@@ -1,19 +1,21 @@
 package org.podval.calendar.numbers
 
-import NumberSystem.RawNumber
-
-abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber)
+abstract class Number[S <: NumberSystem[S], N <: Number[S, N]]
+  (val negative: Boolean, val digits: Seq[Int])
   extends Ordered[N] with NumberSystemMember[S]
 { this: N =>
-  // TODO now that it is accessible, verify the input (NumberCompanion.normalize())?
+  require(digits.nonEmpty)
+  // Ensure that digits are within appropriate ranges
+  digits.foreach(digit => require(digit >= 0, s"$digit must be non-negative"))
+  numberSystem.checkHeadDigit(head)
+  numberSystem.zipWithRanges(tail).foreach
+    { case (digit, range) => require(digit < range, s"$digit must be less than $range") }
+  if (tail.isEmpty && (head == 0)) require(!negative)
+  if (tail.nonEmpty) require(tail.last != 0)
 
-  protected def newNumber(raw: RawNumber): N
-
-  final def negative: Boolean = raw._1
+  protected def newNumber(negative: Boolean, digits: Seq[Int]): N
 
   final def signum: Int = if ((length == 0) && (head == 0)) 0 else NumberSystem.signum(negative)
-
-  final def digits: Seq[Int] = raw._2
 
   final def head: Int = digits.head
 
@@ -28,7 +30,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber)
 
   final def unary_- : N = newNumber(!negative, digits)
 
-  protected final def add(negate: Boolean, that: Number[S, _]): RawNumber = {
+  protected final def add(negate: Boolean, that: Number[S, _]): (Boolean, Seq[Int]) = {
     val sameSign: Boolean = this.negative == that.negative
     val operationSelector: Boolean = if (negate) !sameSign else sameSign
     val operation: (Int, Int) => Int = if (operationSelector) _ + _ else _ - _

@@ -1,14 +1,16 @@
 package org.podval.calendar.numbers
 
-import NumberSystem.{RawNumber, signum}
+import NumberSystem.signum
 
 trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSystemMember[S] {
-  def apply(raw: RawNumber): N
-
-  final def apply(negative: Boolean, digits: Int*): N =
-    apply((negative, if (digits.nonEmpty) digits else Seq(0)))
+  def apply(negative: Boolean, digits: Int*): N
 
   final def apply(digits: Int*): N = apply(negative = false, digits: _*)
+
+  final def apply(raw: (Boolean, Seq[Int])): N = {
+    val (negative: Boolean, digits: Seq[Int]) = raw
+    apply(negative, digits: _*)
+  }
 
   final def fromRational(value: BigRational, length: Int = numberSystem.defaultLength): N =
     apply((value < BigRational.zero, from[BigRational](
@@ -55,7 +57,7 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
     digits.map(_._1) :+ round(lastDigit, lastReminder)
   }
 
-  protected final def normalize(raw: RawNumber): RawNumber = {
+  protected final def normalize(negative: Boolean, rawDigits: Seq[Int]): (Boolean, Seq[Int]) = {
     def step(elem: (Int, Int), acc: (Int, Seq[Int])) = {
       val (digit, position) = elem
       val (carry, result) = acc
@@ -74,23 +76,18 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
       (carriedNegative, signum(carriedNegative) * carriedHead)
     }
 
-    val (negative: Boolean, digits: Seq[Int]) = raw
+    val digits: Seq[Int] = if (rawDigits.nonEmpty) rawDigits else Seq(0)
+
     val (headCarry: Int, newTail: Seq[Int]) = (digits.tail.zipWithIndex :\(0, Seq.empty[Int]))(step)
     val (carriedNegative: Boolean, newHead: Int) = headStep(digits.head, headCarry)
 
-    val newNegative: Boolean = if (negative) !carriedNegative else carriedNegative
-    val newDigits = newHead +: newTail
-
-    // Ensure that digits are within appropriate ranges
-    newDigits.foreach(digit => require(digit >= 0, s"$digit must be non-negative"))
-    numberSystem.checkHeadDigit(newHead)
-    numberSystem.zipWithRanges(newTail).foreach
-    { case (digit, range) => require(digit < range, s"$digit must be less than $range") }
-
     // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
-    val resultDigits = newDigits.head +: newDigits.tail.reverse.dropWhile(_ == 0).reverse
-    // Treat -0 as 0
-    val resultNegative = if ((newDigits.length == 1) && (newDigits.head == 0)) false else newNegative
+    val resultDigits = newHead +: newTail.reverse.dropWhile(_ == 0).reverse
+
+    val resultNegative =
+      if (newTail.isEmpty && (newHead == 0)) false // Treat -0 as 0
+      else if (negative) !carriedNegative else carriedNegative
+
     (resultNegative, resultDigits)
   }
 }

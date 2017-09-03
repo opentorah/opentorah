@@ -3,7 +3,6 @@ package org.podval.calendar.dates
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.Jewish
 import org.podval.calendar.numbers.{IntervalCompanion, PointCompanion}
-import org.podval.calendar.numbers.NumberSystem.RawNumber
 import org.podval.calendar.time.TimeNumberSystem.hoursPerDay
 import org.podval.calendar.time.{TimeIntervalBase, TimeNumberSystem}
 
@@ -47,8 +46,8 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   final type TimeInterval = Interval
 
-  final override def createInterval(raw: RawNumber): Interval =
-    new TimeIntervalBase[C](raw) { this: Interval =>
+  final override def createInterval(negative: Boolean, digits: Seq[Int]): Interval =
+    new TimeIntervalBase[C](negative, digits) { this: Interval =>
       final override def numberSystem: C = Calendar.this
     }
 

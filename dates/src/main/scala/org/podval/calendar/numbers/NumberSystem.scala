@@ -1,18 +1,16 @@
 package org.podval.calendar.numbers
 
-import NumberSystem.RawNumber
-
 trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   type Point <: PointBase[S]
 
-  def createPoint(raw: RawNumber): Point
+  def createPoint(negative: Boolean, digits: Seq[Int]): Point
 
   val Point: PointCompanion[S]
 
   type Interval <: IntervalBase[S]
 
-  def createInterval(raw: RawNumber): Interval
+  def createInterval(negative: Boolean, digits: Seq[Int]): Interval
 
   val Interval: IntervalCompanion[S]
 
@@ -41,7 +39,5 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
 
 object NumberSystem {
-  type RawNumber = (Boolean, Seq[Int])
-
   final def signum(negative: Boolean): Int = if (negative) -1 else +1
 }

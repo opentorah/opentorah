@@ -1,11 +1,10 @@
 package org.podval.calendar.gregorian
 
-import org.podval.calendar.numbers.NumberSystem.RawNumber
 import org.podval.calendar.dates.MomentBase
 import Gregorian.Moment
 
-abstract class GregorianMoment(raw: RawNumber)
-  extends MomentBase[Gregorian](raw)
+abstract class GregorianMoment(negative: Boolean, digits: Seq[Int])
+  extends MomentBase[Gregorian](negative, digits)
 {
   final def morningHours(value: Int): Moment = firstHalfHours(value)
 
