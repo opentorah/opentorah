@@ -6,7 +6,7 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
   def apply(raw: RawNumber): N
 
   final def apply(negative: Boolean, digits: Int*): N =
-    apply((negative, (if (digits.nonEmpty) digits else Seq(0)).toList))
+    apply((negative, if (digits.nonEmpty) digits else Seq(0)))
 
   final def apply(digits: Int*): N = apply(negative = false, digits: _*)
 
@@ -44,11 +44,11 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
     length: Int,
     wholeAndFraction: T => (Int, T),
     mult: (T, Int) => T,
-    round: (Int, T) => Int): List[Int] =
+    round: (Int, T) => Int): Seq[Int] =
   {
-    val (digits: List[(Int, T)], (lastDigit: Int, lastReminder: T))  =
-      (0 until length).toList.map(numberSystem.range)
-        .foldLeft((List.empty[(Int, T)], wholeAndFraction(value))) {
+    val (digits: Seq[(Int, T)], (lastDigit: Int, lastReminder: T))  =
+      (0 until length).map(numberSystem.range)
+        .foldLeft((Seq.empty[(Int, T)], wholeAndFraction(value))) {
           case ((acc, (digit: Int, reminder: T)), range: Int) =>
             (acc :+ (digit, reminder), wholeAndFraction(mult(reminder, range)))
         }
@@ -56,7 +56,7 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
   }
 
   protected final def normalize(raw: RawNumber): RawNumber = {
-    def step(elem: (Int, Int), acc: (Int, List[Int])) = {
+    def step(elem: (Int, Int), acc: (Int, Seq[Int])) = {
       val (digit, position) = elem
       val (carry, result) = acc
       val value: Int = digit + carry
@@ -65,7 +65,7 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
       val (carry_, digit_) =
         if (value >= 0) (quotient, reminder)
         else (quotient - 1, reminder + range)
-      (carry_, digit_ :: result)
+      (carry_, digit_ +: result)
     }
 
     def headStep(head: Int, headCarry: Int): (Boolean, Int) = {
@@ -74,12 +74,12 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
       (carriedNegative, signum(carriedNegative) * carriedHead)
     }
 
-    val (negative: Boolean, digits: List[Int]) = raw
-    val (headCarry: Int, newTail: List[Int]) = (digits.tail.zipWithIndex :\(0, List.empty[Int]))(step)
+    val (negative: Boolean, digits: Seq[Int]) = raw
+    val (headCarry: Int, newTail: Seq[Int]) = (digits.tail.zipWithIndex :\(0, Seq.empty[Int]))(step)
     val (carriedNegative: Boolean, newHead: Int) = headStep(digits.head, headCarry)
 
     val newNegative: Boolean = if (negative) !carriedNegative else carriedNegative
-    val newDigits = newHead :: newTail
+    val newDigits = newHead +: newTail
 
     // Ensure that digits are within appropriate ranges
     newDigits.foreach(digit => require(digit >= 0, s"$digit must be non-negative"))

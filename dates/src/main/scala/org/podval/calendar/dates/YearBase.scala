@@ -54,6 +54,6 @@ abstract class YearBase[C <: Calendar[C]](number: Int)
     month(monthDescriptors.count(_.daysBefore < day))
   }
 
-  final def monthDescriptors: List[C#MonthDescriptor] =
+  final def monthDescriptors: Seq[C#MonthDescriptor] =
     calendar.Year.monthDescriptors(character)
 }

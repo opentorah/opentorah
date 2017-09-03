@@ -9,9 +9,9 @@ abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
     Seq(true, false)
 
   protected final override def monthNamesAndLengths(isLeap: YearCharacter):
-    List[MonthNameAndLength] =
+    Seq[MonthNameAndLength] =
   {
-    List(
+    Seq(
       createMonthNameAndLength(January  , 31),
       createMonthNameAndLength(February , if (isLeap) 29 else 28),
       createMonthNameAndLength(March    , 31),

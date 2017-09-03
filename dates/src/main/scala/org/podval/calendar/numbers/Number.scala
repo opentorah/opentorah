@@ -13,11 +13,11 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber)
 
   final def signum: Int = if ((length == 0) && (head == 0)) 0 else NumberSystem.signum(negative)
 
-  final def digits: List[Int] = raw._2
+  final def digits: Seq[Int] = raw._2
 
   final def head: Int = digits.head
 
-  final def tail: List[Int] = digits.tail
+  final def tail: Seq[Int] = digits.tail
 
   final def length: Int = tail.length
 
@@ -75,7 +75,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber)
     }._1
   }
 
-  private[this] def zip(that: Number[S, _]): List[(Int, Int)] =
+  private[this] def zip(that: Number[S, _]): Seq[(Int, Int)] =
     this.digits zipAll(that.digits, 0, 0)
 
   // TODO why can't I inline .tupled?
@@ -83,14 +83,14 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]](raw: RawNumber)
 
   // TODO: padding with 0 to a given length
   protected final def toSignedString: String = {
-    val digitsWithSigns: List[(Int, Option[String])] = tail.zipWithIndex.map {
+    val digitsWithSigns: Seq[(Int, Option[String])] = tail.zipWithIndex.map {
       case (digit, position) => (digit, numberSystem.sign(position))
     }
-    val tailResult: List[String] = if (digitsWithSigns.isEmpty) List.empty else
+    val tailResult: Seq[String] = if (digitsWithSigns.isEmpty) Seq.empty else
       digitsWithSigns.init.map { case (digit, sign) => digit + sign.getOrElse(",")} :+
         { val (digit, sign) = digitsWithSigns.last; digit + sign.getOrElse("") }
 
-    val result: List[String] = (head + numberSystem.headSign) +: tailResult
+    val result: Seq[String] = (head + numberSystem.headSign) +: tailResult
 
     (if (negative) "-" else "") + result.mkString
   }

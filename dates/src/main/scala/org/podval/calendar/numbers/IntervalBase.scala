@@ -23,7 +23,7 @@ abstract class IntervalBase[S <: NumberSystem[S]](raw: RawNumber)
 
   final def *[T <: NumberSystem[T]](that: T#Interval, length: Int = defaultLength): S#Interval = {
     //    ((that.head, 1) +: that.numberSystem.zipWithRanges(that.tail))
-    //      .foldRight(newInterval(false, List(0))) { case ((digit: Int, range: Int), acc: S#Interval) =>
+    //      .foldRight(newInterval(false, Seq(0))) { case ((digit: Int, range: Int), acc: S#Interval) =>
     //        (acc + this*digit)/ (range, length)
     //      }
     numberSystem.Interval.fromRational(this.toRational*that.toRational, length)

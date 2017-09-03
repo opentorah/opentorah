@@ -14,10 +14,10 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
 
   // KH 8:5-6
   protected final override def monthNamesAndLengths(character: YearCharacter):
-  List[MonthNameAndLength] =
+    Seq[MonthNameAndLength] =
   {
     character match { case (isLeap: Boolean, kind: Kind) =>
-      List(
+      Seq(
         createMonthNameAndLength(Tishrei   , 30),
         createMonthNameAndLength(Marheshvan, if (kind == Kind.Full) 30 else 29),
         createMonthNameAndLength(Kislev    , if (kind == Kind.Short) 29 else 30),
@@ -25,10 +25,10 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
         createMonthNameAndLength(Shvat     , 30)
       ) ++
         (if (!isLeap)
-          List(createMonthNameAndLength(Adar, 29))
+          Seq(createMonthNameAndLength(Adar, 29))
         else
-          List(createMonthNameAndLength(AdarI, 30), createMonthNameAndLength(AdarII, 29))) ++
-        List(
+          Seq(createMonthNameAndLength(AdarI, 30), createMonthNameAndLength(AdarII, 29))) ++
+        Seq(
           createMonthNameAndLength(Nisan , 30),
           createMonthNameAndLength(Iyar  , 29),
           createMonthNameAndLength(Sivan , 30),
