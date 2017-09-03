@@ -34,7 +34,6 @@ ext.lib = [
   junit     : 'junit:junit:4.12',
   scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.3",
   scalaCheck: "org.scalacheck:scalacheck_${scalaVersionMajor}:1.13.4"
-  // TODO add laws tests!!!
 ]
 
 // TODO add GIT scm link

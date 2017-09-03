@@ -40,11 +40,11 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override def createPoint(negative: Boolean, digits: Seq[Int]): Point =
     new GregorianMoment(negative, digits) with GregorianCalendarMember {
-      final override def numberSystem: Gregorian = Gregorian.this
+      final override def numberSystem: Gregorian = calendar
     }
 
   final override object Point extends PointCompanion[Gregorian] with GregorianCalendarMember {
-    override def numberSystem: Gregorian = calendar // TODO unify as "family"?
+    override def numberSystem: Gregorian = calendar
   }
 }
 

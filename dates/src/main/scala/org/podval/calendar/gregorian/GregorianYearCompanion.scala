@@ -41,7 +41,7 @@ abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
 
   private val daysInNonLeapYear: Int = 365
 
-  // TODO length of the year
+  // TODO calculate using length of the year
   final def firstDay(yearNumber: Int): Int =
     daysInNonLeapYear * (yearNumber - 1) + (yearNumber - 1)/4 - (yearNumber - 1)/100 +
       (yearNumber - 1)/400 + 1

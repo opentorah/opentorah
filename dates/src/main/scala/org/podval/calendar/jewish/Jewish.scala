@@ -40,11 +40,11 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override def createPoint(negative: Boolean, digits: Seq[Int]): Point =
     new JewishMoment(negative, digits) with JewishCalendarMember {
-      final override def numberSystem:  Jewish = Jewish.this
+      final override def numberSystem:  Jewish = calendar
     }
 
   final override object Point extends PointCompanion[Jewish] with JewishCalendarMember {
-    override def numberSystem: Jewish = calendar // TODO unify as "family"?
+    override def numberSystem: Jewish = calendar
   }
 }
 

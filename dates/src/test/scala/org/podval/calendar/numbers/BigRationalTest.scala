@@ -7,7 +7,7 @@ import BigRational.{zero, oneHalf, one}
 final class BigRationalTest extends FlatSpec {
   val minusThreeHalfs: BigRational = BigRational(-3, 2)
 
-  "BigRational.apply()" should "be correct" in {
+  "apply()" should "be correct" in {
     assertThrows[ArithmeticException](BigRational(1, 0))
     assertResult(-one)(BigRational(-1, 1))
     assertResult(-one)(BigRational(1, -1))
@@ -96,7 +96,7 @@ final class BigRationalTest extends FlatSpec {
     assertResult((0, zero))(zero.wholeAndFraction)
     assertResult((0, oneHalf))(oneHalf.wholeAndFraction)
 
-// TODO    assertResult((-1, -oneHalf))(minusThreeHalfs.wholeAndFraction)
+    assertResult((-1, -oneHalf))(minusThreeHalfs.wholeAndFraction)
   }
 
   "==()" should "be correct" in {

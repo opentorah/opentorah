@@ -1,7 +1,5 @@
 package org.podval.calendar.numbers
 
-
-// TODO Implement `Numeric`? Rename to `Rational`?
 /**
   * TODO
   * @param numerator
@@ -36,7 +34,6 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
 
   def /(that: Int): BigRational = this / BigRational(that)
 
-  // TODO take negativity into account
   def wholeAndFraction: (Int, BigRational) = {
     val whole: Int = (numerator / denominator).bigInteger.intValueExact
     val fraction: BigRational = BigRational(numerator - whole*denominator, denominator)
