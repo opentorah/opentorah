@@ -7,39 +7,66 @@ import SimpleTimeNumberSystem.Interval
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class TimeNumberSystemTest extends FlatSpec {
 
-  "ranges" should "be correct" in {
-    import SimpleTimeNumberSystem.range
-
-    assertResult(  24)(range(0))
-    assertResult(1080)(range(1))
-    assertResult(  76)(range(2))
-  }
-
   "toRational()" should "be correct" in {
-    val days = Interval(false, 3)
-    assertResult("3d")(days.toString)
-    assertResult(BigRational(3, 1))(days.toRational)
-
-    val hours = Interval(false, 3, 5)
-    assertResult("3d5h")(hours.toString)
-    assertResult(BigRational(3*24+5, 1*24))(hours.toRational)
-
-    val parts = Interval(false, 3, 5, 4)
-    assertResult("3d5h4p")(parts.toString)
-    assertResult(BigRational((3*24+5)*1080+4, 1*24*1080))(parts.toRational)
-
-    val moments = Interval(false, 3, 5, 4, 1)
-    assertResult("3d5h4p1m")(moments.toString)
-    assertResult(BigRational(((3*24+5)*1080+4)*76+1, 1*24*1080*76))(moments.toRational)
+    assertResult(BigRational(3, 1))(Interval(3).toRational)
+    assertResult(BigRational(-3, 1))(Interval(true, 3).toRational)
+    assertResult(BigRational(-3, 1))(Interval(-3).toRational)
+    assertResult(BigRational(3*24+5, 1*24))(Interval(3, 5).toRational)
+    assertResult(-BigRational(3*24+5, 1*24))(Interval(true, 3, 5).toRational)
+    assertResult(-BigRational(3*24+5, 1*24))(Interval(-3, 5).toRational)
+    assertResult(BigRational((3*24+5)*1080+4, 1*24*1080))(Interval(3, 5, 4).toRational)
+    assertResult(BigRational(((3*24+5)*1080+4)*76+1, 1*24*1080*76))(Interval(3, 5, 4, 1).toRational)
+    assertResult(-BigRational((3*24+5)*1080+4, 1*24*1080))(Interval(-3, 5, 4).toRational)
+    assertResult(BigRational(-((3*24+5)*1080+4), 1*24*1080))(Interval(-3, 5, 4).toRational)
+    assertResult(-BigRational((3*24+5)*1080+4, 1*24*1080))(Interval(true, 3, 5, 4).toRational)
   }
 
   "fromRational()" should "be correct" in {
     def test(value: Interval): Unit =
       assertResult(value)(Interval.fromRational(value.toRational))
 
-    test(Interval(false, 3))
-    test(Interval(false, 3, 5))
-    test(Interval(false, 3, 5, 4))
-    test(Interval(false, 3, 5, 4, 1))
+    test(Interval(3))
+    test(Interval(3, 5))
+    test(Interval(3, 5, 4))
+    test(Interval(true, 3, 5, 4))
+    test(Interval(-3, 5, 4))
+    test(Interval(3, 5, 4, 1))
+    test(Interval(true, 3, 5, 4, 1))
+    test(Interval(-3, 5, 4, 1))
+  }
+
+  "roundTo()" should "be correct" in {
+    assertResult(Interval(3))(Interval(3).roundTo(0))
+    assertResult(Interval(3))(Interval(3).roundTo(1))
+    assertResult(Interval(3))(Interval(3, 5).roundTo(0))
+    assertResult(Interval(3, 5))(Interval(3, 5).roundTo(1))
+    assertResult(Interval(3, 5))(Interval(3, 5).roundTo(2))
+    assertResult(Interval(3))(Interval(3, 5, 4).roundTo(0))
+    assertResult(Interval(3, 5))(Interval(3, 5, 4).roundTo(1))
+    assertResult(Interval(3, 5, 4))(Interval(3, 5, 4).roundTo(2))
+    assertResult(Interval(3, 5, 4))(Interval(3, 5, 4).roundTo(3))
+    assertResult(Interval(-3))(Interval(-3, 5, 4).roundTo(0))
+    assertResult(Interval(-3, 5))(Interval(-3, 5, 4).roundTo(1))
+    assertResult(Interval(-3, 5, 4))(Interval(-3, 5, 4).roundTo(2))
+    assertResult(Interval(-3, 5, 4))(Interval(-3, 5, 4).roundTo(3))
+    assertResult(Interval(3, 5, 4))(Interval(3, 5, 4, 1).roundTo(2))
+    assertResult(Interval(-3, 5, 4))(Interval(-3, 5, 4, 1).roundTo(2))
+    assertResult(Interval(-3, 5, 4))(Interval(-3, 5, 4, 37).roundTo(2))
+    assertResult(Interval(-3, 5, 5))(Interval(-3, 5, 4, 38).roundTo(2))
+    assertResult(Interval(-3, 5, 5))(Interval(-3, 5, 4, 39).roundTo(2))
+  }
+
+  "toString()" should "be correct" in {
+    assertResult("3d")(Interval(3).toString)
+    assertResult("3d5h")(Interval(3, 5).toString)
+    assertResult("3d5h0p")(Interval(3, 5).toString(2))
+    assertResult("3d5h0p0m")(Interval(3, 5).toString(3))
+    assertResult("3d5h0p0m0")(Interval(3, 5).toString(4))
+    assertResult("3d5h4p")(Interval(3, 5, 4).toString)
+    assertResult("-3d5h4p")(Interval(true, 3, 5, 4).toString)
+    assertResult("-3d5h4p")(Interval(-3, 5, 4).toString)
+    assertResult("3d5h4p1m")(Interval(3, 5, 4, 1).toString)
+    assertResult("-3d5h4p1m")(Interval(true, 3, 5, 4, 1).toString)
+    assertResult("-3d5h4p1m")(Interval(-3, 5, 4, 1).toString)
   }
 }

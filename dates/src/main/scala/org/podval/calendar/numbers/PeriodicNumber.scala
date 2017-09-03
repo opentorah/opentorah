@@ -7,10 +7,8 @@ trait PeriodicNumber[S <: PeriodicNumberSystem[S], N <: PeriodicNumber[S, N]]
 
   final def normal: N = digit(0, head % headRange)
 
-  // TODO does this work on a non-normalized number?
   final def canonical: N = if (!negative) this else this.complement
 
-  // TODO does this work on a non-normal number?
   final def symmetrical: N = if (head <= headRange/2) this else this.complement
 
   final def complement: N = newNumber(

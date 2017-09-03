@@ -1,6 +1,6 @@
 package org.podval.calendar.angle
 
-import org.podval.calendar.numbers.{NumberSystemMember, PointCompanion, PeriodicNumberSystem}
+import org.podval.calendar.numbers.{IntervalCompanion, NumberSystemMember, PeriodicNumberSystem, PointCompanion}
 
 
 trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
@@ -15,7 +15,8 @@ trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
   final override def createInterval(negative: Boolean, digits: Seq[Int]): Interval =
     new Angle(negative, digits) with AngleNumberSystemMember
 
-  final override object Interval extends AngleCompanion with AngleNumberSystemMember
+  final override object Interval extends IntervalCompanion[AngleNumberSystem]
+    with AngleNumberCompanion[Angle] with AngleNumberSystemMember
 
   final val Angle = Interval
 

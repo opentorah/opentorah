@@ -71,21 +71,17 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
     }
 
     val digits: Seq[Int] = if (rawDigits.nonEmpty) rawDigits else Seq(0)
-
     val (headCarry: Int, newTail: Seq[Int]) = (digits.tail.zipWithIndex :\(0, Seq.empty[Int]))(step)
-
-    val (carriedNegative: Boolean, newHead: Int) = {
-      val carriedHead: Int = digits.head + headCarry
-      val carriedNegative: Boolean = carriedHead < 0
-      (carriedNegative, signum(carriedNegative) * carriedHead)
-    }
+    val carriedHead: Int = digits.head + headCarry
+    val carriedNegative: Boolean = carriedHead < 0
+    val newHead: Int = signum(carriedNegative) * carriedHead
 
     // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
     val resultDigits = newHead +: newTail.reverse.dropWhile(_ == 0).reverse
 
+    // Treat -0 as 0
     val resultNegative =
-      if (newTail.isEmpty && (newHead == 0)) false // Treat -0 as 0
-      else if (negative) !carriedNegative else carriedNegative
+      if (newTail.isEmpty && (newHead == 0)) false else negative ^ carriedNegative
 
     (resultNegative, resultDigits)
   }

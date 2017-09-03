@@ -1,6 +1,7 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.Angle
+import org.podval.calendar.angle.AngleNumberSystem
+import AngleNumberSystem.Angle
 
 
 /*
@@ -36,7 +37,7 @@ trait DayData {
   final def reconstructed(days: Days): Angle =
     Angle.fromDegrees(reconstructed10(days), 6) // 6 60-digits
 
-  final def reconstructed10(days: Days): Double = Angle.exactify(rambamValue, days, value(days))
+  final def reconstructed10(days: Days): Double = exactify(rambamValue, days, value(days))
 
   final def recalculated(days: Days): Angle = exact*days
 
@@ -45,4 +46,9 @@ trait DayData {
   val almagestValue: Angle
 
   final def almagest(days: Days): Angle = almagestValue*days
+
+  final def exactify(approximate: Angle, days: Int, angle: Angle): Double = {
+    val fullRotations = math.floor(days*approximate.toDouble/AngleNumberSystem.headRange.toDouble).toInt
+    (AngleNumberSystem.headRange.toDouble*fullRotations + angle.toDegrees)/days
+  }
 }

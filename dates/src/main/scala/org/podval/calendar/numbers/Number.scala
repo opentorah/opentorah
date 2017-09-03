@@ -5,7 +5,6 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]]
   extends Ordered[N] with NumberSystemMember[S]
 { this: N =>
   require(digits.nonEmpty)
-  // Ensure that digits are within appropriate ranges
   digits.foreach(digit => require(digit >= 0, s"$digit must be non-negative"))
   zipWithRanges.foreach
     { case (digit, range) => require(digit < range, s"$digit must be less than $range") }
@@ -37,7 +36,6 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]]
     (negative, zip(that).map(operation.tupled))
   }
 
-  // TODO add rounding tests
   final def roundTo(length: Int): N = {
     require(length >= 0)
 
@@ -68,7 +66,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]]
     to[Double](forDigit, _ + _) * signum
   }
 
-  private[this] final def to[T](forDigit /* TODO rename digitTo */: (Int, BigInt) => T, plus: (T, T) => T): T = {
+  private[this] final def to[T](forDigit: (Int, BigInt) => T, plus: (T, T) => T): T = {
     val zeroDenominator: BigInt = BigInt(1)
     zipWithRanges.foldLeft((forDigit(head, zeroDenominator), zeroDenominator)) {
       case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>
@@ -83,24 +81,25 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]]
   private[this] def zip(that: Number[S, _]): Seq[(Int, Int)] =
     this.digits zipAll(that.digits, 0, 0)
 
-  // TODO why can't I inline .tupled?
-  private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = op.tupled
+  final def toString(length: Int): String = {
+    def digitToString(defaultSign: String)(pair: (Int, Option[String])): String = {
+      val (digit: Int, sign: Option[String]) = pair
+      digit + sign.getOrElse(defaultSign)
+    }
 
-  // TODO: padding with 0 to a given length
-  protected final def toSignedString: String = {
-    val digitsWithSigns: Seq[(Int, Option[String])] = tail.zipWithIndex.map {
+    val digitsWithSigns: Seq[(Int, Option[String])] = tail.padTo(length, 0).zipWithIndex.map {
       case (digit, position) => (digit, numberSystem.sign(position))
     }
-    val tailResult: Seq[String] = if (digitsWithSigns.isEmpty) Seq.empty else
-      digitsWithSigns.init.map { case (digit, sign) => digit + sign.getOrElse(",")} :+
-        { val (digit, sign) = digitsWithSigns.last; digit + sign.getOrElse("") }
+    val tailResult: Seq[String] =
+      if (tail.isEmpty) Seq.empty
+      else digitsWithSigns.init.map(digitToString(",")) :+ digitToString("")(digitsWithSigns.last)
 
     val result: Seq[String] = (head + numberSystem.headSign) +: tailResult
 
     (if (negative) "-" else "") + result.mkString
   }
 
-  override def toString: String = toSignedString
+  override def toString: String = toString(length)
 
   // This needs to be overridden for the RangedHeadDigitNumber, so it isn't final.
   override def hashCode: Int = digitsHashCode
@@ -113,6 +112,9 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]]
 
   final def compareDigits(that: N): Int =
     zip(that).map(lift(_ compare _)).find (_ != 0) getOrElse 0
+
+  // TODO why can't I inline .tupled?
+  private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = op.tupled
 
   final override def equals(other: Any): Boolean =
     // TODO deal with the "erasure" warning; compare numberSystem...

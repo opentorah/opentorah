@@ -1,8 +1,9 @@
 package org.podval.calendar.jewish
 
 import org.scalatest.FlatSpec
-import org.podval.calendar.time.TimeNumberSystem.{hoursPerDay, hoursPerHalfDay, partsPerHour}
-import Jewish.{Day, Moment, Month, Year, TimeInterval, week}
+import org.podval.calendar.time.TimeNumberSystem.{hoursPerDay, hoursPerHalfDay, partsPerHour,
+  momentsPerPart}
+import Jewish.{Day, Moment, Month, Year, TimeInterval, range, week}
 import Moon.meanLunarPeriod
 import Sun.{yearOfShmuel, yearOfRavAda}
 import JewishYearCompanion.{normalYear, leapYear}
@@ -14,8 +15,10 @@ import JewishYearCompanion.{normalYear, leapYear}
 class TextTest extends FlatSpec {
   "time units" should "be as in KH 6:2" in {
     assertResult(  24)(hoursPerDay)
+    assertResult(  24)(range(0))
     assertResult(  12)(hoursPerHalfDay)
     assertResult(1080)(partsPerHour)
+    assertResult(1080)(range(1))
     assertResult(0)(partsPerHour % 2)
     assertResult(0)(partsPerHour % 4)
     assertResult(0)(partsPerHour % 8)
@@ -23,6 +26,8 @@ class TextTest extends FlatSpec {
     assertResult(0)(partsPerHour % 6)
     assertResult(0)(partsPerHour % 9)
     assertResult(0)(partsPerHour % 10)
+    assertResult(76)(momentsPerPart)
+    assertResult(76)(range(2))
   }
 
   "mean lunar period" should "be as in KH 6:3" in {
