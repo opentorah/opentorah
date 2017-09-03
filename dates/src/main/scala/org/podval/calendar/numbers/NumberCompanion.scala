@@ -64,22 +64,21 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
       val value: Int = digit + carry
       val range: Int = numberSystem.range(position)
       val (quotient: Int, reminder: Int) = (value / range, value % range)
-      val (carry_, digit_) =
+      val (resultCarry, resultDigit) =
         if (value >= 0) (quotient, reminder)
         else (quotient - 1, reminder + range)
-      (carry_, digit_ +: result)
-    }
-
-    def headStep(head: Int, headCarry: Int): (Boolean, Int) = {
-      val carriedHead: Int = numberSystem.correctHeadDigit(head + headCarry)
-      val carriedNegative: Boolean = carriedHead < 0
-      (carriedNegative, signum(carriedNegative) * carriedHead)
+      (resultCarry, resultDigit +: result)
     }
 
     val digits: Seq[Int] = if (rawDigits.nonEmpty) rawDigits else Seq(0)
 
     val (headCarry: Int, newTail: Seq[Int]) = (digits.tail.zipWithIndex :\(0, Seq.empty[Int]))(step)
-    val (carriedNegative: Boolean, newHead: Int) = headStep(digits.head, headCarry)
+
+    val (carriedNegative: Boolean, newHead: Int) = {
+      val carriedHead: Int = digits.head + headCarry
+      val carriedNegative: Boolean = carriedHead < 0
+      (carriedNegative, signum(carriedNegative) * carriedHead)
+    }
 
     // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
     val resultDigits = newHead +: newTail.reverse.dropWhile(_ == 0).reverse

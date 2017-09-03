@@ -27,14 +27,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   val signPartial: PartialFunction[Int, String]
 
-  def sign(position: Int): Option[String] = signPartial.lift(position)
-
-  def checkHeadDigit(value: Int): Unit
-
-  def correctHeadDigit(value: Int): Int
-
-  final def zipWithRanges(tail: Seq[Int]): Seq[(Int, Int)] =
-    tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
+  final def sign(position: Int): Option[String] = signPartial.lift(position)
 }
 
 

@@ -1,7 +1,7 @@
 package org.podval.calendar.angle
 
-import org.podval.calendar.numbers.RangedHeadDigitPoint
+import org.podval.calendar.numbers.PeriodicPoint
 
 // TODO rename AnglePoint - when there is no AngleNumberSystem.AnglePoint
 abstract class AnglePointBase(negative: Boolean, digits: Seq[Int])
-  extends RangedHeadDigitPoint[AngleNumberSystem](negative, digits) with AngleNumber[AnglePointBase]
+  extends PeriodicPoint[AngleNumberSystem](negative, digits) with AngleNumber[AnglePointBase]

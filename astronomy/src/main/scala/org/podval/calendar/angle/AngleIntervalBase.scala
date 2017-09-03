@@ -1,7 +1,7 @@
 package org.podval.calendar.angle
 
-import org.podval.calendar.numbers.RangedHeadDigitInterval
+import org.podval.calendar.numbers.PeriodicInterval
 
 // TODO rename AngleInterval
 abstract class AngleIntervalBase(negative: Boolean, digits: Seq[Int])
-  extends RangedHeadDigitInterval[AngleNumberSystem](negative, digits) with AngleNumber[AngleIntervalBase]
+  extends PeriodicInterval[AngleNumberSystem](negative, digits) with AngleNumber[AngleIntervalBase]

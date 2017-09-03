@@ -7,8 +7,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]]
   require(digits.nonEmpty)
   // Ensure that digits are within appropriate ranges
   digits.foreach(digit => require(digit >= 0, s"$digit must be non-negative"))
-  numberSystem.checkHeadDigit(head)
-  numberSystem.zipWithRanges(tail).foreach
+  zipWithRanges.foreach
     { case (digit, range) => require(digit < range, s"$digit must be less than $range") }
   if (tail.isEmpty && (head == 0)) require(!negative)
   if (tail.nonEmpty) require(tail.last != 0)
@@ -26,7 +25,8 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]]
   final def digit(position: Int): Int = if (length >= position) digits(position) else 0
 
   final def digit(position: Int, value: Int): N =
-    newNumber(negative, digits.padTo(position + 1, 0).updated(position, value))
+    if (digit(position) == value) this
+    else newNumber(negative, digits.padTo(position + 1, 0).updated(position, value))
 
   final def unary_- : N = newNumber(!negative, digits)
 
@@ -70,12 +70,15 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]]
 
   private[this] final def to[T](forDigit /* TODO rename digitTo */: (Int, BigInt) => T, plus: (T, T) => T): T = {
     val zeroDenominator: BigInt = BigInt(1)
-    numberSystem.zipWithRanges(tail).foldLeft((forDigit(head, zeroDenominator), zeroDenominator)) {
+    zipWithRanges.foldLeft((forDigit(head, zeroDenominator), zeroDenominator)) {
       case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>
         val newDenominator: BigInt = denominator*range
         (plus(acc, forDigit(digit, newDenominator)), newDenominator)
     }._1
   }
+
+  protected final def zipWithRanges: Seq[(Int, Int)] =
+    tail.zipWithIndex.map { case (digit, position) => (digit, numberSystem.range(position)) }
 
   private[this] def zip(that: Number[S, _]): Seq[(Int, Int)] =
     this.digits zipAll(that.digits, 0, 0)

@@ -1,9 +1,9 @@
 package org.podval.calendar.angle
 
-import org.podval.calendar.numbers.{NumberSystemMember, PointCompanion, RangedHeadDigitNumberSystem}
+import org.podval.calendar.numbers.{NumberSystemMember, PointCompanion, PeriodicNumberSystem}
 
 
-trait AngleNumberSystem extends RangedHeadDigitNumberSystem[AngleNumberSystem] {
+trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
   trait AngleNumberSystemMember extends NumberSystemMember[AngleNumberSystem] {
     final override def numberSystem: AngleNumberSystem = AngleNumberSystem.this
   }

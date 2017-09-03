@@ -1,8 +1,8 @@
 package org.podval.calendar.astronomy.sun
 
 import org.scalatest.FlatSpec
+import org.podval.calendar.angle.AngleNumberSystem
 import org.podval.calendar.jewish.{Jewish, Sun}
-
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class LongitudeMeanTest extends FlatSpec {
@@ -11,7 +11,7 @@ class LongitudeMeanTest extends FlatSpec {
 
   it should "calculate to less than printed" in {
     LongitudeMean.keys.foreach{(days: Int) => assert((days == 1) ||
-      (LongitudeMean.calculated(days) < LongitudeMean.value(days)))}
+      (LongitudeMean.calculated(days).normal < LongitudeMean.value(days)))}
   }
 
   it should "be what Almagest rounds to" in {
@@ -20,7 +20,7 @@ class LongitudeMeanTest extends FlatSpec {
 
   it should "round from Almagest to less than printed" in {
     LongitudeMean.keys.foreach{(days: Int) => assert((days <= 10) ||
-      (LongitudeMean.almagest(days).roundToSeconds < LongitudeMean.value(days)))}
+      (LongitudeMean.almagest(days).roundToSeconds.normal < LongitudeMean.value(days)))}
   }
 
   it should "calculate for 29 days in two steps" in {
@@ -34,8 +34,7 @@ class LongitudeMeanTest extends FlatSpec {
 
   it should "make a full circle in a year" in {
     // TODO why isn't the NumberSystem type parameter inferred?
-    println(LongitudeMean.exact_ *[Jewish] Sun.yearOfRavAda)
-    // TODO why does this seem to be a *better* approximation?! Imprecise operations?
-    println(LongitudeMean.exact_ *[Jewish] Sun.yearOfShmuel)
+    assert(LongitudeMean.exact_ *[Jewish] Sun.yearOfRavAda > AngleNumberSystem.period)
+    assert(LongitudeMean.exact_ *[Jewish] Sun.yearOfShmuel > AngleNumberSystem.period)
   }
 }
