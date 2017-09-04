@@ -8,17 +8,14 @@ import SimpleTimeNumberSystem.Interval
 final class TimeNumberSystemTest extends FlatSpec {
 
   "toRational()" should "be correct" in {
-    assertResult(BigRational(3, 1))(Interval(3).toRational)
-    assertResult(BigRational(-3, 1))(Interval(true, 3).toRational)
     assertResult(BigRational(-3, 1))(Interval(-3).toRational)
+    assertResult(BigRational(3, 1))(Interval(3).toRational)
     assertResult(BigRational(3*24+5, 1*24))(Interval(3, 5).toRational)
-    assertResult(-BigRational(3*24+5, 1*24))(Interval(true, 3, 5).toRational)
     assertResult(-BigRational(3*24+5, 1*24))(Interval(-3, 5).toRational)
     assertResult(BigRational((3*24+5)*1080+4, 1*24*1080))(Interval(3, 5, 4).toRational)
     assertResult(BigRational(((3*24+5)*1080+4)*76+1, 1*24*1080*76))(Interval(3, 5, 4, 1).toRational)
     assertResult(-BigRational((3*24+5)*1080+4, 1*24*1080))(Interval(-3, 5, 4).toRational)
     assertResult(BigRational(-((3*24+5)*1080+4), 1*24*1080))(Interval(-3, 5, 4).toRational)
-    assertResult(-BigRational((3*24+5)*1080+4, 1*24*1080))(Interval(true, 3, 5, 4).toRational)
   }
 
   "fromRational()" should "be correct" in {
@@ -28,10 +25,8 @@ final class TimeNumberSystemTest extends FlatSpec {
     test(Interval(3))
     test(Interval(3, 5))
     test(Interval(3, 5, 4))
-    test(Interval(true, 3, 5, 4))
     test(Interval(-3, 5, 4))
     test(Interval(3, 5, 4, 1))
-    test(Interval(true, 3, 5, 4, 1))
     test(Interval(-3, 5, 4, 1))
   }
 
@@ -63,10 +58,8 @@ final class TimeNumberSystemTest extends FlatSpec {
     assertResult("3d5h0p0m")(Interval(3, 5).toString(3))
     assertResult("3d5h0p0m0")(Interval(3, 5).toString(4))
     assertResult("3d5h4p")(Interval(3, 5, 4).toString)
-    assertResult("-3d5h4p")(Interval(true, 3, 5, 4).toString)
     assertResult("-3d5h4p")(Interval(-3, 5, 4).toString)
     assertResult("3d5h4p1m")(Interval(3, 5, 4, 1).toString)
-    assertResult("-3d5h4p1m")(Interval(true, 3, 5, 4, 1).toString)
     assertResult("-3d5h4p1m")(Interval(-3, 5, 4, 1).toString)
   }
 }

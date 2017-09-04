@@ -5,15 +5,17 @@ trait PeriodicNumber[S <: PeriodicNumberSystem[S], N <: PeriodicNumber[S, N]]
 { this: N =>
   private[this] def headRange: Int = numberSystem.headRange
 
-  final def normal: N = digit(0, head % headRange)
+  final def normal: N = head(head % headRange) // TODO verify with negatives...
 
-  final def canonical: N = if (!negative) this else this.complement
+  final def canonical: N = complement(isNegative)
 
-  final def symmetrical: N = if (head <= headRange/2) this else this.complement
+  final def symmetrical: N = complement(absHead > headRange/2)
+
+  final def complement(condition: Boolean): N = if (!condition) this else this.complement
 
   final def complement: N = newNumber(
-    !negative,
-    (headRange - head) +: zipWithRanges.map { case (digit, range) => range - digit }
+    -signum*(headRange - absHead) +:
+      zipWithRanges.map { case (digit, range) => range - digit }
   )
 
   final override def compare(that: N): Int =

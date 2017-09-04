@@ -6,23 +6,23 @@ trait AngleNumber[N <: AngleNumber[N]] extends PeriodicNumber[AngleNumberSystem,
 { this: N =>
   def degrees: Int = head
 
-  def degrees(value: Int): N = digit(0, value)
+  def degrees(value: Int): N = head(value)
 
-  def minutes: Int = digit(1)
+  def minutes: Int = tail(0)
 
-  def minutes(value: Int): N = digit(1, value)
+  def minutes(value: Int): N = tail(0, value)
 
   def roundToMinutes: N = roundTo(1)
 
-  def seconds: Int = digit(2)
+  def seconds: Int = tail(1)
 
-  def seconds(value: Int): N = digit(2, value)
+  def seconds(value: Int): N = tail(1, value)
 
   def roundToSeconds: N = roundTo(2)
 
-  def thirds: Int  = digit(3)
+  def thirds: Int  = tail(2)
 
-  def thirds(value: Int): N = digit(3, value)
+  def thirds(value: Int): N = tail(2, value)
 
   def toRadians: Double = math.toRadians(toDegrees)
 

@@ -41,9 +41,9 @@ class AngleTest extends FlatSpec {
   }
 
   it should "compare correctly" in {
-    assertResult(Angle(negative = false, 0, 0, 0))(Angle(negative = true, 0))
+    assertResult(Angle(0, 0, 0))(Angle(-0))
     assertResult(Angle(15))(Angle(15))
-    assertResult(Angle(15))(Angle(negative = true, 345))
+    assertResult(Angle(15))(Angle(-345))
   }
 
   it should "observe periodic laws" in {

@@ -6,13 +6,13 @@ import org.podval.calendar.numbers.Number
 trait TimeNumber[S <: TimeNumberSystem[S], N <: TimeNumber[S, N]] extends Number[S, N] { this: N =>
   final def days: Int = head
 
-  final def days(value: Int): N = digit(0, value)
+  final def days(value: Int): N = head(value)
 
   final def day(number: Int): N = days(number-1)
 
-  final def hours: Int = digit(1)
+  final def hours: Int = tail(0)
 
-  final def hours(value: Int): N = digit(1, value)
+  final def hours(value: Int): N = tail(0, value)
 
   final def firstHalfHours(value: Int): N = {
     require(0 <= hours && hours < hoursPerHalfDay)
@@ -24,9 +24,9 @@ trait TimeNumber[S <: TimeNumberSystem[S], N <: TimeNumber[S, N]] extends Number
     hours(value + hoursPerHalfDay)
   }
 
-  final def parts: Int = digit(2)
+  final def parts: Int = tail(1)
 
-  final def parts(value: Int): N = digit(2, value)
+  final def parts(value: Int): N = tail(1, value)
 
   final def halfHour: N = parts(partsPerHalfHour)
 
@@ -38,7 +38,7 @@ trait TimeNumber[S <: TimeNumberSystem[S], N <: TimeNumber[S, N]] extends Number
 
   final def partsWithoutMinutes(value: Int): N = parts(minutes*partsPerMinute+value)
 
-  final def moments: Int = digit(3)
+  final def moments: Int = tail(2)
 
-  final def moments(value: Int): N = digit(3, value)
+  final def moments(value: Int): N = tail(2, value)
 }

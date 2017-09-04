@@ -46,8 +46,8 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   final type TimeInterval = Interval
 
-  final override def createInterval(negative: Boolean, digits: Seq[Int]): Interval =
-    new TimeIntervalBase[C](negative, digits) { this: Interval =>
+  final override def createInterval(digits: Seq[Int]): Interval =
+    new TimeIntervalBase[C](digits) { this: Interval =>
       final override def numberSystem: C = Calendar.this
     }
 

@@ -1,18 +1,20 @@
 package org.podval.calendar.numbers
 
-abstract class IntervalBase[S <: NumberSystem[S]](negative: Boolean, digits: Seq[Int])
-  extends Number[S, S#Interval](negative, digits)
+abstract class IntervalBase[S <: NumberSystem[S]](digits: Seq[Int])
+  extends Number[S, S#Interval](digits)
 { this: S#Interval =>
-  protected final override def newNumber(negative: Boolean, digits: Seq[Int]): S#Interval =
-    numberSystem.Interval((negative, digits))
+  protected final override def newNumber(digits: Seq[Int]): S#Interval =
+    numberSystem.Interval.fromDigits(digits)
 
   private[this] def defaultLength: Int = numberSystem.defaultLength
 
-  final def +(that: S#Interval): S#Interval = numberSystem.Interval(add(negate = false, that))
+  final def +(that: S#Interval): S#Interval =
+    numberSystem.Interval.fromDigits(add(negate = false, that))
 
-  final def -(that: S#Interval): S#Interval = numberSystem.Interval(add(negate = true, that))
+  final def -(that: S#Interval): S#Interval =
+    numberSystem.Interval.fromDigits(add(negate = true, that))
 
-  final def *(n: Int): S#Interval = newNumber(negative, digits map (n * _))
+  final def *(n: Int): S#Interval = newNumber(digits map (n * _))
 
   final def /(n: Int, length: Int = defaultLength): S#Interval =
     numberSystem.Interval.fromRational(toRational / n, math.max(this.length, length))

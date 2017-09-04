@@ -4,13 +4,13 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   type Point <: PointBase[S]
 
-  def createPoint(negative: Boolean, digits: Seq[Int]): Point
+  def createPoint(digits: Seq[Int]): Point
 
   val Point: PointCompanion[S]
 
   type Interval <: IntervalBase[S]
 
-  def createInterval(negative: Boolean, digits: Seq[Int]): Interval
+  def createInterval(digits: Seq[Int]): Interval
 
   val Interval: IntervalCompanion[S]
 
@@ -28,9 +28,4 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   val signPartial: PartialFunction[Int, String]
 
   final def sign(position: Int): Option[String] = signPartial.lift(position)
-}
-
-
-object NumberSystem {
-  final def signum(negative: Boolean): Int = if (negative) -1 else +1
 }

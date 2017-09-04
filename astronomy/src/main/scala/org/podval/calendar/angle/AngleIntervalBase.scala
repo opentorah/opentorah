@@ -4,5 +4,5 @@ import org.podval.calendar.numbers.PeriodicInterval
 
 // TODO eliminate
 // TODO rename AngleInterval
-abstract class AngleIntervalBase(negative: Boolean, digits: Seq[Int])
-  extends PeriodicInterval[AngleNumberSystem](negative, digits) with AngleNumber[AngleIntervalBase]
+abstract class AngleIntervalBase(digits: Seq[Int])
+  extends PeriodicInterval[AngleNumberSystem](digits) with AngleNumber[AngleIntervalBase]

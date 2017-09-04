@@ -12,8 +12,8 @@ trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
 
   final type Angle = Interval
 
-  final override def createInterval(negative: Boolean, digits: Seq[Int]): Interval =
-    new Angle(negative, digits) with AngleNumberSystemMember
+  final override def createInterval(digits: Seq[Int]): Interval =
+    new Angle(digits) with AngleNumberSystemMember
 
   final override object Interval extends IntervalCompanion[AngleNumberSystem]
     with AngleNumberCompanion[Angle] with AngleNumberSystemMember
@@ -24,8 +24,8 @@ trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
 
   final type AnglePoint = Point
 
-  final override def createPoint(negative: Boolean, digits: Seq[Int]): Point =
-    new AnglePoint(negative, digits) with AngleNumberSystemMember
+  final override def createPoint(digits: Seq[Int]): Point =
+    new AnglePoint(digits) with AngleNumberSystemMember
 
   final override object Point extends PointCompanion[AngleNumberSystem]
     with AngleNumberCompanion[Point] with AngleNumberSystemMember
