@@ -13,7 +13,7 @@ trait PeriodicNumber[S <: PeriodicNumberSystem[S], N <: PeriodicNumber[S, N]]
 
   final def complement(condition: Boolean): N = if (!condition) this else this.complement
 
-  final def complement: N = newNumber(
+  final def complement: N = fromDigits(
     -signum*(headRange - absHead) +:
       zipWithRanges.map { case (digit, range) => range - digit }
   )

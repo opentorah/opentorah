@@ -3,7 +3,7 @@ package org.podval.calendar.numbers
 abstract class PointBase[S <: NumberSystem[S]](digits: Seq[Int])
   extends Number[S, S#Point](digits)
 { this: S#Point =>
-  protected final override def newNumber(digits: Seq[Int]): S#Point =
+  protected final override def fromDigits(digits: Seq[Int]): S#Point =
     numberSystem.Point.fromDigits(digits)
 
   final def +(that: S#Interval): S#Point =

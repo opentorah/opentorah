@@ -68,6 +68,7 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
     }
 
     val digits: Seq[Int] = if (rawDigits.nonEmpty) rawDigits else Seq(0)
+
     val (headCarry: Int, newTail: Seq[Int]) = (digits.tail.zipWithIndex :\(0, Seq.empty[Int]))(step)
     val newHead: Int = digits.head + headCarry
 

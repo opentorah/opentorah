@@ -1,6 +1,6 @@
 package org.podval.calendar.numbers
 
-abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (val digits: Seq[Int])
+abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (digits: Seq[Int])
   extends Ordered[N] with NumberSystemMember[S]
 { this: N =>
   require(digits.nonEmpty)
@@ -10,15 +10,13 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (val digits: Seq[
   }
   if (tail_.nonEmpty) require(tail_.last != 0)
 
-  protected def newNumber(digits: Seq[Int]): N
+  protected def fromDigits(digits: Seq[Int]): N
 
   final def head: Int = digits.head
 
-  final def head(value: Int): N = if (head == value) this else newNumber(value +: tail_)
+  final def head(value: Int): N = if (head == value) this else fromDigits(value +: tail_)
 
   final def absHead: Int = math.abs(head)
-
-  final def absDigits: Seq[Int] = absHead +: tail_
 
   final def signum: Int = if (isZero) 0 else if (isNegative) -1 else +1
 
@@ -28,11 +26,11 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (val digits: Seq[
 
   final def isNegative: Boolean = head < 0
 
+  final def abs: N = head(absHead)
+
   final def unary_- : N = head(-head)
 
-  final def abs: N = if (isNegative) -this else this
-
-  private[this] final def tail_ : Seq[Int] = digits.tail
+  private final def tail_ : Seq[Int] = digits.tail
 
   final def length: Int = tail_.length
 
@@ -40,30 +38,27 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (val digits: Seq[
 
   final def tail(position: Int, value: Int): N =
     if (tail(position) == value) this
-    else newNumber(head +: tail_.padTo(position+1, 0).updated(position, value))
+    else fromDigits(head +: tail_.padTo(position+1, 0).updated(position, value))
 
   protected final def add(negate: Boolean, that: Number[S, _]): Seq[Int] = {
-    val sameSign: Boolean = this.isNegative == that.isNegative
-    val operationSelector: Boolean = if (negate) !sameSign else sameSign
-    val operation: (Int, Int) => Int = if (operationSelector) _ + _ else _ - _
-    val result: Seq[Int] = zip(that).map(operation.tupled)
+    val result: Seq[Int] = zipWith(that, if (negate ^ (this.signum == that.signum)) _ + _ else _ - _)
     if (!isNegative) result else -result.head +: result.tail
   }
 
   final def roundTo(length: Int): N = {
     require(length >= 0)
 
-    val (more_, toRound) = tail_ splitAt length
-    val tail = if (more_.isEmpty) more_ else {
+    val (toRetain, toRound) = tail_ splitAt length
+    val newTail = if (toRetain.isEmpty) toRetain else {
       val toRoundWithRange = toRound.zipWithIndex.map {
         case (digit, position) => (digit, numberSystem.range(length+position))
       }
       val carry =
         (toRoundWithRange :\ 0) { case ((x, range), c) => if (x + c >= range / 2) 1 else 0}
-      more_.init :+ (more_.last + carry)
+      toRetain.init :+ (toRetain.last + carry)
     }
 
-    newNumber(head +: tail)
+    fromDigits(head +: newTail)
   }
 
   final def toRational: BigRational = {
@@ -90,8 +85,8 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (val digits: Seq[
   protected final def zipWithRanges: Seq[(Int, Int)] =
     tail_.zipWithIndex.map { case (digit, position) => (digit, numberSystem.range(position)) }
 
-  private[this] def zip(that: Number[S, _]): Seq[(Int, Int)] =
-    this.absDigits zipAll(that.absDigits, 0, 0)
+  private[this] def zipWith(that: Number[S, _], operation: (Int, Int) => Int): Seq[Int] =
+    (this.absHead +: this.tail_).zipAll(that.absHead +: that.tail_, 0, 0).map(operation.tupled)
 
   final def toString(length: Int): String = {
     def digitToString(defaultSign: String)(pair: (Int, Option[String])): String = {
@@ -119,14 +114,9 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (val digits: Seq[
   final def digitsHashCode: Int = (73 /: digits)((v, x) => 41 * v + x)
 
   // This needs to be overridden for the PeriodicNumber, so it isn't final.
-  def compare(that: N): Int =
-    (if (this.isNegative != that.isNegative) 1 else compareDigits(that)) * signum
+  def compare(that: N): Int = (if (this.signum != that.signum) 1 else compareDigits(that)) * signum
 
-  final def compareDigits(that: N): Int =
-    zip(that).map(lift(_ compare _)).find (_ != 0) getOrElse 0
-
-  // TODO why can't I inline .tupled?
-  private[this] def lift[A, B, C](op: (A, B) => C): (((A, B)) => C) = op.tupled
+  final def compareDigits(that: N): Int = zipWith(that, _ compare _).find (_ != 0) getOrElse 0
 
   final override def equals(other: Any): Boolean =
     // TODO deal with the "erasure" warning; compare numberSystem...
