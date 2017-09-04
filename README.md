@@ -5,13 +5,12 @@
 
 I want to be able to do various things with the fixed Jewish calendar:
 
-* code Rambam's calculations (and verify Rambam's numerical examples)
-* convert dates from Jewish calendar to Gregorian and back
+-[x] code Rambam's calculations (and verify Rambam's numerical examples)
+-[x] convert dates from Jewish calendar to Gregorian and back
+-[x] list [dates of Birchas Hachamo](https://docs.google.com/document/d/1hpPZ0LYU3p8a-LJRXEqzXig-VQthkQ_MkaY79PMqr-Y/edit?hl=en_US)
 * produce monthly calendars with both kinds of dates
-* list [dates of Birchas Hachamo](https://docs.google.com/document/d/1hpPZ0LYU3p8a-LJRXEqzXig-VQthkQ_MkaY79PMqr-Y/edit?hl=en_US)
 * calculate schedule of learning Rambam
 * calculate haftorah and torah reading schedule
-* integrate with the Google Calendar
 * automate vestos calculations
 
 For my needs, the best source of information on the Jewish Calendar turned out
@@ -52,6 +51,8 @@ the Jewish calendar into [Joda Time](http://joda-time.sourceforge.net/) or
 the article [New Java Date and Time API](http://today.java.net/pub/a/today/2008/09/18/jsr-310-new-java-date-time-api.html) notwithstanding). 
 
 ##Google Calendar Integration
+
+It'd be nice to integrate with the Google Calendar.
 
 * [iCalendar](http://en.wikipedia.org/wiki/ICalendar)
 * [iCalendar RFC](http://tools.ietf.org/html/rfc2445)

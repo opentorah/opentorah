@@ -62,4 +62,21 @@ class AngleTest extends FlatSpec {
     assertResult(Angle(1))(Angle(721).symmetrical)
     assertResult(Angle(-1))(Angle(-721).symmetrical)
   }
+
+  // TODO move into TimeNumberSystemTest
+  it should "add and subtract correctly" in {
+    assertResult(Angle( 30))(Angle( 30) + Angle(  0))
+    assertResult(Angle( 30))(Angle(  0) + Angle( 30))
+    assertResult(Angle(-30))(Angle(-30) + Angle(  0))
+    assertResult(Angle(-30))(Angle(  0) + Angle(-30))
+    assertResult(Angle(  0))(Angle( 30) + Angle(-30))
+    assertResult(Angle(  0))(Angle(-30) + Angle( 30))
+
+    assertResult(Angle( 30))(Angle( 30) - Angle(  0))
+    assertResult(Angle(-30))(Angle(  0) - Angle( 30))
+    assertResult(Angle(-30))(Angle(-30) - Angle(  0))
+    assertResult(Angle( 30))(Angle(  0) - Angle(-30))
+    assertResult(Angle( 60))(Angle( 30) - Angle(-30))
+    assertResult(Angle(-60))(Angle(-30) - Angle( 30))
+  }
 }

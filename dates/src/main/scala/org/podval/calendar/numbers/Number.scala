@@ -41,8 +41,11 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (digits: Seq[Int]
     else fromDigits(head +: tail_.padTo(position+1, 0).updated(position, value))
 
   protected final def add(negate: Boolean, that: Number[S, _]): Seq[Int] = {
-    val result: Seq[Int] = zipWith(that, if (negate ^ (this.signum == that.signum)) _ + _ else _ - _)
-    if (!isNegative) result else -result.head +: result.tail
+    val invertOperation: Boolean =
+      negate ^ (!this.isZero && !that.isZero && (this.isNegative != that.isNegative))
+    val newSignum: Int = if (this.isZero) that.signum else this.signum
+    val result: Seq[Int] = zipWith(that, if (!invertOperation) _ + _ else _ - _)
+    newSignum*result.head +: result.tail
   }
 
   final def roundTo(length: Int): N = {
