@@ -37,7 +37,10 @@ class TextTest extends FlatSpec {
   }
 
   "angles" should "subtract as in KH 11:12" in {
-    // TODO test fails!!!
     assertResult(AnglePoint(259, 29, 50))((AnglePoint(100, 20, 30) - Angle(200, 50, 40)).normal.canonical)
   }
+
+
+  // TODO KH 11:16
+  // Night of Chamishi, 3rd of Nisan, year 4938 (7th year of the 260th 19-year cycle)
 }

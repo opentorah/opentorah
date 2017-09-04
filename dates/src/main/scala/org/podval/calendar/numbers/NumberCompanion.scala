@@ -73,6 +73,6 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
     val newHead: Int = digits.head + headCarry
 
     // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
-    newHead +: newTail.reverse.dropWhile(_ == 0).reverse
+    numberSystem.correctHeadDigit(newHead) +: newTail.reverse.dropWhile(_ == 0).reverse
   }
 }

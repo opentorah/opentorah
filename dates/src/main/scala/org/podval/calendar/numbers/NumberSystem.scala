@@ -16,6 +16,8 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   val defaultLength: Int
 
+  def correctHeadDigit(value: Int): Int = value
+
   /**
     *
     * @param position within the tail
