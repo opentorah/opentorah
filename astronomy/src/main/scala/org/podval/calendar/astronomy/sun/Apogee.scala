@@ -3,9 +3,7 @@ package org.podval.calendar.astronomy.sun
 import org.podval.calendar.angle.AngleNumberSystem.Angle
 import org.podval.calendar.astronomy.DayData
 
-
 object Apogee extends DayData {
-
   override val value: Map[Days, Angle] = Map(
     10    -> Angle(0,  0,  1, 30),
     100   -> Angle(0,  0, 15),

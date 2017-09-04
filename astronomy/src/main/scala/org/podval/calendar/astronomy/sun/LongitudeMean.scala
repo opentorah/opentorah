@@ -3,9 +3,7 @@ package org.podval.calendar.astronomy.sun
 import org.podval.calendar.angle.AngleNumberSystem.Angle
 import org.podval.calendar.astronomy.DayData
 
-
 object LongitudeMean extends DayData {
-
   override val value: Map[Days, Angle] = Map(
     1     -> Angle(  0, 59,  8),
     10    -> Angle(  9, 51, 23),
