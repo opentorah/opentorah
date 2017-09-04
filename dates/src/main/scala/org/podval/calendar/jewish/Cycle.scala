@@ -17,6 +17,9 @@ object Cycle {
 
   final def yearNumberInCycle(yearNumber: Int): Int = ((yearNumber - 1) % yearsInCycle) + 1
 
+  final def yearInCycle(yearCycle: Int, yearNumberInCycle: Int): Int =
+    yearsInCycle * (yearCycle-1) + yearNumberInCycle
+
   final def yearLengthInMonths(yearNumber: Int): Int = yearLengthInMonths(isLeapYear(yearNumber))
 
   final def yearLengthInMonths(isLeap: Boolean): Int = if (isLeap) 13 else 12

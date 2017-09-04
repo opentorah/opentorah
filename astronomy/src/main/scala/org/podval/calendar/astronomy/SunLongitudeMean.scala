@@ -1,9 +1,9 @@
-package org.podval.calendar.astronomy.sun
+package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.Angle
-import org.podval.calendar.astronomy.DayData
+import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
 
-object LongitudeMean extends DayData {
+object SunLongitudeMean extends DayData {
+  // KH 12:1
   override val value: Map[Days, Angle] = Map(
     1     -> Angle(  0, 59,  8),
     10    -> Angle(  9, 51, 23),
@@ -14,8 +14,14 @@ object LongitudeMean extends DayData {
     354   -> Angle(348, 55, 15)  // ??
   )
 
+  // Moznaim Rambam in English gives this value in KH 12:1 note 1 (without a reference) as the one
+  // Rambam uses in his calculations.
+  // TODO which of the year lengths does this correspond to?
+  val exact_ = Angle(0, 59, 8, 19, 48)
 
-  val exact_ = Angle(0, 59, 8, 19, 48)  // TODO why was it 49?
+  // KH 12:2
+  // (according to note 12 in Moznaim Rambam in English: at 6PM)
+  val atEpoch: AnglePoint = Zodiac.Aries.start + Angle(7, 3, 32)
 
   override val almagestValue = Angle(0, 59, 8, 17, 13, 12, 31)
 

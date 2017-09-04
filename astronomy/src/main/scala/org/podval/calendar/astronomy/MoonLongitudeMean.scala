@@ -1,9 +1,8 @@
-package org.podval.calendar.astronomy.moon
+package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem.Angle
-import org.podval.calendar.astronomy.DayData
 
-object LongitudeMean extends DayData {
+object MoonLongitudeMean extends DayData {
   override val value: Map[Days, Angle] = Map(
     1     -> Angle( 13, 10, 35),
     10    -> Angle(131, 45, 50),
@@ -13,6 +12,8 @@ object LongitudeMean extends DayData {
     29    -> Angle( 22,  6, 56),
     354   -> Angle(344, 26, 43)
   )
+
+  // TODO does this correspond to the lunar period?
 
   //    val exactInDegrees = 13.176397222222223
   val exact_ = Angle(13,10,35,1,48,1)

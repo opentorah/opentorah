@@ -4,6 +4,8 @@ import org.scalatest.FlatSpec
 import org.podval.calendar.angle.AngleNumberSystem
 import AngleNumberSystem.{Angle, AnglePoint, headRange, range}
 import Zodiac.{Constellation, constellations}
+import org.podval.calendar.jewish.{Cycle, Jewish}
+import Jewish.{Year, Month, Day}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TextTest extends FlatSpec {
@@ -40,7 +42,22 @@ class TextTest extends FlatSpec {
     assertResult(AnglePoint(259, 29, 50))((AnglePoint(100, 20, 30) - Angle(200, 50, 40)).normal.canonical)
   }
 
+  "example day" should "be as in KH 11:16" in {
+    assertResult(4938)(Cycle.yearInCycle(260, 17))
+    assertResult(260)(Cycle.yearCycle(4938))
+    assertResult(17)(Cycle.yearNumberInCycle(4938))
+    assertResult(Year(4938).month(Month.Name.Nisan).day(3))(Epoch.epoch)
+    assertResult(Day.Name.Chamishi)(Epoch.epoch.name)
+  }
 
-  // TODO KH 11:16
-  // Night of Chamishi, 3rd of Nisan, year 4938 (7th year of the 260th 19-year cycle)
+  "example Sun calculations" should "be as in KH 12:2" in {
+    val nextDay: Day = Year(4938).month(Month.Name.Tammuz).day(14)
+    assertResult(100)(nextDay.number - Epoch.epoch.number)
+    assertResult(Day.Name.Shabbos)(nextDay.name)
+    val nextLongitude: AnglePoint = SunLongitudeMean.atEpoch + SunLongitudeMean.value(100)
+    assertResult(AnglePoint(105, 37, 25))(nextLongitude)
+    val (constellation, angle) = Zodiac.fromAngle(nextLongitude)
+    assertResult(Zodiac.Cancer)(constellation)
+    assertResult(Angle(15, 37, 25))(angle)
+  }
 }

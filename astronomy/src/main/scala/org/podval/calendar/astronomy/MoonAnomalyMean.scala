@@ -1,9 +1,8 @@
-package org.podval.calendar.astronomy.moon
+package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem.Angle
-import org.podval.calendar.astronomy.DayData
 
-object AnomalyMean extends DayData {
+object MoonAnomalyMean extends DayData {
   override val value: Map[Days, Angle] = Map(
     1     -> Angle( 13,  3, 54),
     10    -> Angle(130, 39,  0),

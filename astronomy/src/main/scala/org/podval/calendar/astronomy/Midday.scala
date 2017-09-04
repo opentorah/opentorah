@@ -1,5 +1,4 @@
-package org.podval.calendar.astronomy.sun
-
+package org.podval.calendar.astronomy
 
 /**
  * Raw data for the hazot calculations is obtainable from the Naval Oceanography
@@ -13,6 +12,6 @@ package org.podval.calendar.astronomy.sun
  * 
  * @author dub
  */
-object Hazot {
+object Midday {
 
 }

@@ -1,11 +1,9 @@
-package org.podval.calendar.astronomy.moon
+package org.podval.calendar.astronomy
 
-import scala.collection.immutable.Map
 import org.podval.calendar.angle.AngleNumberSystem.{Angle, angleToRadians}
 import scala.math.{sin, cos, asin, sqrt, abs, pow, round}
 
-
-object AnomalyVisible {
+object MoonAnomalyVisible {
   /* Numbers as they are printed in Law 15:6 */
   val MISPRINTED: Map[Angle, Angle] = Map(
     Angle( 10) -> Angle(0, 50),

@@ -1,10 +1,8 @@
-package org.podval.calendar.astronomy.moon
+package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem.Angle
 
-
-object LongitudeCorrection {
-
+object MoonLongitudeCorrection {
   val VALUES: List[(String, Angle, Angle)] = List(
     ("middle of Taurus"        , Angle( 15), Angle(0)),
     ("beginning of Gemini"     , Angle( 30), Angle(0, 15)),

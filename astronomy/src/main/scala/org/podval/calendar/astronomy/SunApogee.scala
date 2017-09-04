@@ -1,9 +1,9 @@
-package org.podval.calendar.astronomy.sun
+package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.Angle
-import org.podval.calendar.astronomy.DayData
+import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
 
-object Apogee extends DayData {
+object SunApogee extends DayData {
+  // KH 12:2
   override val value: Map[Days, Angle] = Map(
     10    -> Angle(0,  0,  1, 30),
     100   -> Angle(0,  0, 15),
@@ -12,6 +12,9 @@ object Apogee extends DayData {
     29    -> Angle(0,  0,  4), // TODO: veod!
     354   -> Angle(0,  0, 53)
   )
+
+  // KH 12:2
+  val atEpoch: AnglePoint = Zodiac.Gemini.start + Angle(26, 45, 8)
 
   override val almagestValue = Angle(0) // TODO
 }
