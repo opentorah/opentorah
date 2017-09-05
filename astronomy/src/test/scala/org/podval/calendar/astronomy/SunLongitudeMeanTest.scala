@@ -1,7 +1,8 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem
-import org.podval.calendar.jewish.{Jewish, Sun}
+import org.podval.calendar.jewish
+import jewish.Jewish
 import org.scalatest.FlatSpec
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
@@ -34,7 +35,7 @@ class SunLongitudeMeanTest extends FlatSpec {
 
   it should "make a full circle in a year" in {
     // TODO why isn't the NumberSystem type parameter inferred?
-    assert(SunLongitudeMean.exact_ *[Jewish] Sun.yearOfRavAda > AngleNumberSystem.period)
-    assert(SunLongitudeMean.exact_ *[Jewish] Sun.yearOfShmuel > AngleNumberSystem.period)
+    assert(SunLongitudeMean.exact_ *[Jewish] jewish.Sun.yearOfRavAda > AngleNumberSystem.period)
+    assert(SunLongitudeMean.exact_ *[Jewish] jewish.Sun.yearOfShmuel > AngleNumberSystem.period)
   }
 }

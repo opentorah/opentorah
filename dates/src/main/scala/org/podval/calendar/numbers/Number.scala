@@ -48,20 +48,20 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (digits: Seq[Int]
     newSignum*result.head +: result.tail
   }
 
+  // TODO handle negativity
   final def roundTo(length: Int): N = {
     require(length >= 0)
 
     val (toRetain, toRound) = tail_ splitAt length
-    val newTail = if (toRetain.isEmpty) toRetain else {
-      val toRoundWithRange = toRound.zipWithIndex.map {
-        case (digit, position) => (digit, numberSystem.range(length+position))
-      }
-      val carry =
-        (toRoundWithRange :\ 0) { case ((x, range), c) => if (x + c >= range / 2) 1 else 0}
-      toRetain.init :+ (toRetain.last + carry)
+    val toRoundWithRange = toRound.zipWithIndex.map {
+      case (digit, position) => (digit, numberSystem.range(length+position))
     }
+    val carry = (toRoundWithRange :\ 0) { case ((x, range), c) => if (x + c >= range / 2) 1 else 0}
 
-    fromDigits(head +: newTail)
+    fromDigits(
+      if (toRetain.isEmpty) Seq(head + carry)
+      else  head +: toRetain.init :+ (toRetain.last + carry)
+    )
   }
 
   final def toRational: BigRational = {

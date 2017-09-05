@@ -13,8 +13,5 @@ object SunApogee extends DayData {
     354   -> Angle(0,  0, 53)
   )
 
-  // KH 12:2
-  val atEpoch: AnglePoint = Zodiac.Gemini.start + Angle(26, 45, 8)
-
   override val almagestValue = Angle(0) // TODO
 }

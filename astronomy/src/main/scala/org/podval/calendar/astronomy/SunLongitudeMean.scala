@@ -16,12 +16,8 @@ object SunLongitudeMean extends DayData {
 
   // Moznaim Rambam in English gives this value in KH 12:1 note 1 (without a reference) as the one
   // Rambam uses in his calculations.
-  // TODO which of the year lengths does this correspond to?
-  val exact_ = Angle(0, 59, 8, 19, 48)
-
-  // KH 12:2
-  // (according to note 12 in Moznaim Rambam in English: at 6PM)
-  val atEpoch: AnglePoint = Zodiac.Aries.start + Angle(7, 3, 32)
+  // TODO which of the year lengths does this correspond?
+  val exact_ : Angle = Angle(0, 59, 8, 19, 48)
 
   override val almagestValue = Angle(0, 59, 8, 17, 13, 12, 31)
 
