@@ -54,9 +54,10 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     zipWith(left, right, if (!negate) _ + _ else _ - _)
 
   // TODO handle negativity
-  final def roundTo(digits: Seq[Int], length: Int): Seq[Int] = {
+  final def roundTo(rawDigits: Seq[Int], length: Int): Seq[Int] = {
     require(length >= 0)
 
+    val digits: Seq[Int] = normal(rawDigits)
     val (toRetain, toRound) = digits.tail splitAt length
     val toRoundWithRange = toRound.zipWithIndex.map {
       case (digit, position) => (digit, range(length+position))

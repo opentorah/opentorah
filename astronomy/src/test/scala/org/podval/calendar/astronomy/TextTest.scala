@@ -25,7 +25,7 @@ class TextTest extends FlatSpec {
     assertResult(AnglePoint(0))(Zodiac.Aries.start)
     constellations.init.zip(constellations.tail).foreach {
       case (prev: Constellation, next: Constellation) =>
-        assertResult(prev.end)((prev.start + Angle(30)).normal)
+        assertResult(prev.end)(prev.start + Angle(30))
         assertResult(next.start)(prev.end)
     }
 
@@ -39,7 +39,7 @@ class TextTest extends FlatSpec {
   }
 
   "angles" should "subtract as in KH 11:12" in {
-    assertResult(AnglePoint(259, 29, 50))((AnglePoint(100, 20, 30) - Angle(200, 50, 40)).normal.canonical)
+    assertResult(AnglePoint(259, 29, 50))(AnglePoint(100, 20, 30) - Angle(200, 50, 40))
   }
 
   "epoch" should "be as in KH 11:16" in {
@@ -71,7 +71,7 @@ class TextTest extends FlatSpec {
     val course: Angle = nextLongitude - nextApogee
     assertResult(Angle(18, 52, 2))(course)
     assertResult(Angle(19))(course.roundTo(0))
-    assertResult(Angle(0, 38))(SunLongitudeCorrection.correction(course))
+    assertResult(Angle(0, -38))(SunLongitudeCorrection.correction(course))
     assertResult(AnglePoint(104, 59, 25))(Sun.longitudeTrue(nextDay))
   }
 }
