@@ -22,7 +22,7 @@ class TextTest extends FlatSpec {
 
   "zodiac" should "be as in KH 11:7-9" in {
     assertResult(12)(constellations.length)
-    assertResult(Angle(0))(Zodiac.Aries.start)
+    assertResult(AnglePoint(0))(Zodiac.Aries.start)
     constellations.init.zip(constellations.tail).foreach {
       case (prev: Constellation, next: Constellation) =>
         assertResult(prev.end)((prev.start + Angle(30)).normal)

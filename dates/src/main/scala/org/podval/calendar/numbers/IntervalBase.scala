@@ -3,8 +3,7 @@ package org.podval.calendar.numbers
 abstract class IntervalBase[S <: NumberSystem[S]](digits: Seq[Int])
   extends Number[S, S#Interval](digits)
 { this: S#Interval =>
-  protected final override def fromDigits(digits: Seq[Int]): S#Interval =
-    numberSystem.Interval.fromDigits(digits)
+  override def companion: NumberCompanion[S, S#Interval] = numberSystem.Interval
 
   private[this] def defaultLength: Int = numberSystem.defaultLength
 
@@ -42,4 +41,6 @@ abstract class IntervalBase[S <: NumberSystem[S]](digits: Seq[Int])
 //    val (whole: Int, fraction: BigRational) = (this.toRational / that.toRational).wholeAndFraction
 //    newInterval(fromRational(fraction, length))
   }
+
+  final override def toInterval: S#Interval = this
 }
