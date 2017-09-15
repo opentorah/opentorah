@@ -55,18 +55,11 @@ class AngleTest extends FlatSpec {
     assertResult(Angle(345))(Angle(-15).canonical)
     assertResult(Angle(1))(Angle(721).canonical)
     assertResult(Angle(359))(Angle(-721).canonical)
-  }
 
-  // TODO !!!
-  it should "observe periodic laws" ignore {
     assertResult(Angle(-15))(Angle(345).symmetrical)
     assertResult(Angle(-15))(Angle(-15).symmetrical)
     assertResult(Angle(1))(Angle(721).symmetrical)
     assertResult(Angle(-1))(Angle(-721).symmetrical)
-
-    assertResult(Angle(15))(Angle(345).complement)
-    assertResult(Angle(345))(Angle(-15).complement)
-    assertResult(Angle(-15))(Angle(705).complement)
   }
 
   it should "negate correctly" in {

@@ -5,7 +5,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
 { this: N =>
   val digits: Seq[Int] = if (rawDigits.nonEmpty) rawDigits else Seq(0)
 
-  def canonicalDigits: Seq[Int] = numberSystem.canonical(digits)
+  def normalDigits: Seq[Int] = numberSystem.normal(digits)
 
   def companion: NumberCompanion[S, N]
 
@@ -13,23 +13,23 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
 
   final def fromDigits(digits: Seq[Int]): N = companion.fromDigits(digits)
 
-  final def head: Int = canonicalDigits.head
+  final def head: Int = normalDigits.head
 
-  final def head(value: Int): N = fromDigits(canonicalDigits.updated(0, value))
+  final def head(value: Int): N = fromDigits(normalDigits.updated(0, value))
 
   final def tail(position: Int): Int = {
-    val digits: Seq[Int] = canonicalDigits
+    val digits: Seq[Int] = normalDigits
     if (digits.tail.length > position) digits(position+1) else 0
   }
 
   final def tail(position: Int, value: Int): N =
-    fromDigits(canonicalDigits.padTo(position+2, 0).updated(position+1, value))
+    fromDigits(normalDigits.padTo(position+2, 0).updated(position+1, value))
 
   final def length: Int = digits.tail.length
 
   final def normal: N = fromDigits(numberSystem.normal(digits))
 
-  final def canonical: N = fromDigits(canonicalDigits)
+  final def canonical: N = fromDigits(normalDigits)
 
   final def signum: Int = numberSystem.signum(digits)
 

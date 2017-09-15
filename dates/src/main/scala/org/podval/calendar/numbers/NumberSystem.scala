@@ -16,7 +16,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   val defaultLength: Int
 
-  def correctHeadDigit(value: Int): Int = value
+  def normalHead(value: Int): Int = value
 
   /**
     *
@@ -41,11 +41,10 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   private[this] def nonZeroDigit(digits: Seq[Int]): Option[Int] = normal(digits).find(_ != 0)
 
-  def canonical(digits: Seq[Int]): Seq[Int] = normal(digits)
-
   final def compare(left: Seq[Int], right: Seq[Int]): Int =
-    zipWith(canonical(left), canonical(right), _ compare _).find (_ != 0) getOrElse 0
+    zipWith(normal(left), normal(right), _ compare _).find (_ != 0) getOrElse 0
 
+  // TODO should probably pipe through normal().
   final def abs(digits: Seq[Int]): Seq[Int] = digits.map(math.abs)
 
   final def negate(digits: Seq[Int]): Seq[Int] = digits.map(-_)
@@ -158,7 +157,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     result.mkString
   }
 
-  final def hashCode(digits: Seq[Int]): Int = (73 /: canonical(digits))((v, x) => 41 * v + x)
+  final def hashCode(digits: Seq[Int]): Int = (73 /: normal(digits))((v, x) => 41 * v + x)
 
   final def normal(digits: Seq[Int]): Seq[Int] = {
     def step(elem: (Int, Int), acc: (Int, Seq[Int])) = {
@@ -177,7 +176,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     val newHead: Int = digits.head + headCarry
 
     // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
-    correctHeadDigit(newHead) +: newTail.reverse.dropWhile(_ == 0).reverse
+    normalHead(newHead) +: newTail.reverse.dropWhile(_ == 0).reverse
   }
 
   protected final def zipWith(left: Seq[Int], right: Seq[Int], operation: (Int, Int) => Int): Seq[Int] =

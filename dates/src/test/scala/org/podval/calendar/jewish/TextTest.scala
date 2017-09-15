@@ -52,18 +52,10 @@ class TextTest extends FlatSpec {
     assertResult(TimeInterval().days(5).hours(21).parts(589))(leapYear        % week)
   }
 
-  // TODO rewrite this to test what Rambam says separately from trying to
-  // figure out the year!
-  "molad Nisan example from KH 6:7" should "be correct" ignore {
-    // TODO Rambam doesn't give the year;
-    // the only year with molad Nisan on the time he gives is 5066,
-    // but day of the week is Rvii instead of Rishon :(
-    val year: Year = Year(5066)
-    val moladNisan: Moment = year.month(Month.Name.Nisan).newMoon
-    assertResult(TimeInterval().hours(17).parts(107))(moladNisan.time)
-//    assertResult(Day.Name.Rishon)(moladNisan.day.name)
-    val moladIyar: Moment = moladNisan.day.month.next.newMoon
-    assertResult(TimeInterval().hours( 5).parts(900))(moladIyar.time)
+  "molad Nisan example from KH 6:7" should "be correct" in {
+    // TODO Rambam doesn't give the year!
+    assertResult(TimeInterval().hours( 5).parts(900))(
+      (TimeInterval().hours(17).parts(107) + meanLunarPeriod).time)
   }
 
   "first two years' new moons" should "be as in KH 6:8" in {
