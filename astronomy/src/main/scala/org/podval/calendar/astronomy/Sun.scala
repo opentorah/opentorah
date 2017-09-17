@@ -27,4 +27,7 @@ object Sun {
     val correction = SunLongitudeCorrection.correction(longitude - apogee(day))
     longitude + correction
   }
+
+  // TODO in KH 13:11, calculation of true solstices/equinoxes is mentioned,
+  // but no algotithm is given.
 }

@@ -41,6 +41,16 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   private[this] def nonZeroDigit(digits: Seq[Int]): Option[Int] = normal(digits).find(_ != 0)
 
+  final def get(digits: Seq[Int], position: Int): Int = {
+    val normalDigits: Seq[Int] = normal(digits)
+    if (normalDigits.length > position) normalDigits(position) else 0
+  }
+
+  final def set(digits: Seq[Int], position: Int, value: Int): Seq[Int] = {
+    val normalDigits: Seq[Int] = normal(digits)
+    normalDigits.padTo(position+1, 0).updated(position, value)
+  }
+
   final def compare(left: Seq[Int], right: Seq[Int]): Int =
     zipWith(normal(left), normal(right), _ compare _).find (_ != 0) getOrElse 0
 
@@ -163,12 +173,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     def step(elem: (Int, Int), acc: (Int, Seq[Int])) = {
       val (digit, position) = elem
       val (carry, result) = acc
-      val value: Int = digit + carry
-      val digitRange: Int = range(position)
-      val (quotient: Int, reminder: Int) = (value / digitRange, value % digitRange)
-      val (resultCarry, resultDigit) =
-        if (reminder >= 0) (quotient, reminder)
-        else (quotient - 1, reminder + digitRange)
+      val (resultCarry, resultDigit) = normalDigit(digit + carry, range(position))
       (resultCarry, resultDigit +: result)
     }
 
@@ -177,6 +182,12 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
     // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
     normalHead(newHead) +: newTail.reverse.dropWhile(_ == 0).reverse
+  }
+
+  protected final def normalDigit(digit: Int, digitRange: Int): (Int, Int) = {
+    val (carry: Int, result: Int) = (digit / digitRange, digit % digitRange)
+    if (result >= 0) (carry, result)
+    else (carry - 1, result + digitRange)
   }
 
   protected final def zipWith(left: Seq[Int], right: Seq[Int], operation: (Int, Int) => Int): Seq[Int] =

@@ -5,31 +5,28 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
 { this: N =>
   val digits: Seq[Int] = if (rawDigits.nonEmpty) rawDigits else Seq(0)
 
-  def normalDigits: Seq[Int] = numberSystem.normal(digits)
-
   def companion: NumberCompanion[S, N]
 
   def toInterval: S#Interval
 
   final def fromDigits(digits: Seq[Int]): N = companion.fromDigits(digits)
 
-  final def head: Int = normalDigits.head
+  final def head: Int = numberSystem.get(digits, 0)
 
-  final def head(value: Int): N = fromDigits(normalDigits.updated(0, value))
+  final def head(value: Int): N = fromDigits(numberSystem.set(digits, 0, value))
 
-  final def tail(position: Int): Int = {
-    val digits: Seq[Int] = normalDigits
-    if (digits.tail.length > position) digits(position+1) else 0
-  }
+  final def tail(position: Int): Int = numberSystem.get(digits, position+1)
 
   final def tail(position: Int, value: Int): N =
-    fromDigits(normalDigits.padTo(position+2, 0).updated(position+1, value))
+    fromDigits(numberSystem.set(digits, position+1, value))
 
   final def length: Int = digits.tail.length
 
+  // TODO eliminate one of these?
+
   final def normal: N = fromDigits(numberSystem.normal(digits))
 
-  final def canonical: N = fromDigits(normalDigits)
+  final def canonical: N = fromDigits(numberSystem.normal(digits))
 
   final def signum: Int = numberSystem.signum(digits)
 

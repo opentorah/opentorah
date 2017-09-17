@@ -9,10 +9,7 @@ trait PeriodicNumberSystem[S <: PeriodicNumberSystem[S]] extends NumberSystem[S]
 
   require(headRange % 2 == 0)
 
-  final override def normalHead(value: Int): Int = {
-    val result = value % headRange
-    if (result >= 0) result else result+headRange
-  }
+  final override def normalHead(value: Int): Int = normalDigit(value, headRange)._2
 
   final def symmetrical(digits: Seq[Int]): Seq[Int] = {
     val result: Seq[Int] = normal(digits)
