@@ -16,8 +16,6 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   val defaultLength: Int
 
-  def normalHead(value: Int): Int = value
-
   /**
     *
     * @param position within the tail
@@ -52,29 +50,30 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   }
 
   final def compare(left: Seq[Int], right: Seq[Int]): Int =
-    zipWith(normal(left), normal(right), _ compare _).find (_ != 0) getOrElse 0
+    zipWith(canonical(left), canonical(right), _ compare _).find (_ != 0) getOrElse 0
 
   // TODO should probably pipe through normal().
   final def abs(digits: Seq[Int]): Seq[Int] = digits.map(math.abs)
 
   final def negate(digits: Seq[Int]): Seq[Int] = digits.map(-_)
 
-  final def add(negate: Boolean, left: Seq[Int], right: Seq[Int]): Seq[Int] =
-    zipWith(left, right, if (!negate) _ + _ else _ - _)
+  final def add(left: Seq[Int], right: Seq[Int]): Seq[Int] = zipWith(left, right, _ + _)
 
-  // TODO handle negativity
-  final def roundTo(rawDigits: Seq[Int], length: Int): Seq[Int] = {
+  final def subtract(left: Seq[Int], right: Seq[Int]): Seq[Int] = zipWith(left, right, _ - _)
+
+  // TODO test with negativity
+  final def roundTo(digits: Seq[Int], length: Int): Seq[Int] = {
     require(length >= 0)
 
-    val digits: Seq[Int] = normal(rawDigits)
-    val (toRetain, toRound) = digits.tail splitAt length
+    val normalDigits: Seq[Int] = normal(digits)
+    val (toRetain, toRound) = normalDigits.tail splitAt length
     val toRoundWithRange = toRound.zipWithIndex.map {
       case (digit, position) => (digit, range(length+position))
     }
     val carry = (toRoundWithRange :\ 0) { case ((x, range), c) => if (x + c >= range / 2) 1 else 0}
 
-    if (toRetain.isEmpty) Seq(digits.head + carry)
-    else digits.head +: toRetain.init :+ (toRetain.last + carry)
+    if (toRetain.isEmpty) Seq(normalDigits.head + carry)
+    else normalDigits.head +: toRetain.init :+ (toRetain.last + carry)
   }
 
   final def toRational(digits: Seq[Int]): BigRational = {
@@ -89,7 +88,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     to[Double](digits, forDigit, _ + _)
   }
 
-  final def to[T](digits: Seq[Int], forDigit: (Int, BigInt) => T, plus: (T, T) => T): T = {
+  private final def to[T](digits: Seq[Int], forDigit: (Int, BigInt) => T, plus: (T, T) => T): T = {
     val zeroDenominator: BigInt = BigInt(1)
     zipWithRanges(digits)
       .foldLeft[(T, BigInt)]((forDigit(digits.head, zeroDenominator), zeroDenominator)) {
@@ -130,7 +129,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   // This is an instance of a specialized unfold with an initiator, unfolder and terminator
   // (but we don't have even a simple unfold in the standard library)
-  final def from[T](
+  private final def from[T](
     signum: Int,
     value: T,
     length: Int,
@@ -152,47 +151,73 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   final def toString(digits: Seq[Int], length: Int): String = {
     def digitToString(defaultSign: String)(pair: (Int, Option[String])): String = {
       val (digit: Int, sign: Option[String]) = pair
-      digit + sign.getOrElse(defaultSign)
+      math.abs(digit) + sign.getOrElse(defaultSign)
     }
 
-    val digitsWithSigns: Seq[(Int, Option[String])] = digits.tail.padTo(length, 0).zipWithIndex.map {
-      case (digit, position) => (digit, sign(position))
-    }
+    val simpleDigits: Seq[Int] = simple(digits)
+    val digitsWithSigns: Seq[(Int, Option[String])] =
+      simpleDigits.tail.padTo(length, 0).zipWithIndex.map {
+        case (digit, position) => (digit, sign(position))
+      }
     val tailResult: Seq[String] =
       if (digitsWithSigns.isEmpty) Seq.empty
       else digitsWithSigns.init.map(digitToString(",")) :+ digitToString("")(digitsWithSigns.last)
 
-    val result: Seq[String] = (digits.head + headSign) +: tailResult
+    val result: Seq[String] = (math.abs(simpleDigits.head) + headSign) +: tailResult
 
-    result.mkString
+    (if (isNegative(simpleDigits)) "-" else "") + result.mkString
   }
 
-  final def hashCode(digits: Seq[Int]): Int = (73 /: normal(digits))((v, x) => 41 * v + x)
+  final def hashCode(digits: Seq[Int]): Int = (73 /: canonical(digits))((v, x) => 41 * v + x)
 
-  final def normal(digits: Seq[Int]): Seq[Int] = {
-    def step(elem: (Int, Int), acc: (Int, Seq[Int])) = {
-      val (digit, position) = elem
-      val (carry, result) = acc
-      val (resultCarry, resultDigit) = normalDigit(digit + carry, range(position))
-      (resultCarry, resultDigit +: result)
+  final def canonical(digits: Seq[Int]): Seq[Int] = {
+    val normalDigits: Seq[Int] = normal(digits)
+    val result: Seq[Int] = positive(normalDigits)
+    // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
+    result.head +: result.tail.reverse.dropWhile(_ == 0).reverse
+  }
+
+  final def simple(digits: Seq[Int]): Seq[Int] = {
+    val normalDigits: Seq[Int] = normal(digits)
+    if (isNegative(normalDigits)) negative(normalDigits) else positive(normalDigits)
+  }
+
+  final def normal(digits: Seq[Int]): Seq[Int] = transform(digits, normalDigit, normalHead)
+
+  protected final def normalDigit(digit: Int, digitRange: Int): (Int, Int) =
+    (digit / digitRange, digit % digitRange)
+
+  protected def normalHead(digit: Int): Int = digit
+
+  private final def positive(digits: Seq[Int]): Seq[Int] =
+    transform(digits, positiveDigit, positiveHead)
+
+  protected final def positiveDigit(digit: Int, digitRange: Int): (Int, Int) =
+    if (digit >= 0) (0, digit) else (-1, digit + digitRange)
+
+  protected def positiveHead(digit: Int): Int = digit
+
+  private final def negative(digits: Seq[Int]): Seq[Int] =
+    transform(digits, negativeDigit, negativeHead)
+
+  protected final def negativeDigit(digit: Int, digitRange: Int): (Int, Int) =
+    if (digit < 0) (0, digit) else (1, digit - digitRange)
+
+  protected def negativeHead(digit: Int): Int = digit
+
+  private final def transform(digits: Seq[Int], forDigit: (Int, Int) => (Int, Int), forHead: Int => Int): Seq[Int] = {
+    val (headCarry: Int, newTail: Seq[Int]) = (digits.tail.zipWithIndex :\(0, Seq.empty[Int])) {
+      case ((digit: Int, position: Int), (carry: Int, result: Seq[Int])) =>
+        val (resultCarry, resultDigit) = forDigit(digit + carry, range(position))
+        (resultCarry, resultDigit +: result)
     }
 
-    val (headCarry: Int, newTail: Seq[Int]) = (digits.tail.zipWithIndex :\(0, Seq.empty[Int]))(step)
-    val newHead: Int = digits.head + headCarry
-
-    // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
-    normalHead(newHead) +: newTail.reverse.dropWhile(_ == 0).reverse
+    forHead(digits.head + headCarry) +: newTail
   }
 
-  protected final def normalDigit(digit: Int, digitRange: Int): (Int, Int) = {
-    val (carry: Int, result: Int) = (digit / digitRange, digit % digitRange)
-    if (result >= 0) (carry, result)
-    else (carry - 1, result + digitRange)
-  }
-
-  protected final def zipWith(left: Seq[Int], right: Seq[Int], operation: (Int, Int) => Int): Seq[Int] =
+  private final def zipWith(left: Seq[Int], right: Seq[Int], operation: (Int, Int) => Int): Seq[Int] =
     left.zipAll(right, 0, 0).map(operation.tupled)
 
-  protected final def zipWithRanges(digits: Seq[Int]): Seq[(Int, Int)] =
+  private final def zipWithRanges(digits: Seq[Int]): Seq[(Int, Int)] =
     digits.tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
 }

@@ -22,11 +22,11 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
 
   final def length: Int = digits.tail.length
 
-  // TODO eliminate one of these?
+  final def canonical: N = fromDigits(numberSystem.canonical(digits))
+
+  final def simple: N = fromDigits(numberSystem.simple(digits))
 
   final def normal: N = fromDigits(numberSystem.normal(digits))
-
-  final def canonical: N = fromDigits(numberSystem.normal(digits))
 
   final def signum: Int = numberSystem.signum(digits)
 
@@ -39,9 +39,6 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
   final def abs: N = fromDigits(numberSystem.abs(digits))
 
   final def unary_- : N = fromDigits(numberSystem.negate(digits))
-
-  final def add(negate: Boolean, that: Number[S, _]): Seq[Int] =
-    numberSystem.add(negate, this.digits, that.digits)
 
   final def roundTo(length: Int): N = fromDigits(numberSystem.roundTo(digits, length))
 
@@ -58,8 +55,8 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
   final override def equals(other: Any): Boolean = {
     if (!other.isInstanceOf[Number[S, N]]) false else {
       val that: Number[S, N] = other.asInstanceOf[Number[S, N]]
-      if ((that.numberSystem != this.numberSystem) || (that.companion != this.companion)) false
-      else numberSystem.compare(this.digits, that.digits) == 0
+      (this.numberSystem == that.numberSystem) && (this.companion == that.companion) &&
+        (numberSystem.compare(this.digits, that.digits) == 0)
     }
   }
 

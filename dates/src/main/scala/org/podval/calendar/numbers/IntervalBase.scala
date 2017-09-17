@@ -8,10 +8,10 @@ abstract class IntervalBase[S <: NumberSystem[S]](digits: Seq[Int])
   private[this] def defaultLength: Int = numberSystem.defaultLength
 
   final def +(that: S#Interval): S#Interval =
-    numberSystem.Interval.fromDigits(add(negate = false, that))
+    numberSystem.Interval.fromDigits(numberSystem.add(this.digits, that.digits))
 
   final def -(that: S#Interval): S#Interval =
-    numberSystem.Interval.fromDigits(add(negate = true, that))
+    numberSystem.Interval.fromDigits(numberSystem.subtract(this.digits, that.digits))
 
   final def *(n: Int): S#Interval = fromDigits(digits map (n * _))
 

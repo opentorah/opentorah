@@ -12,7 +12,7 @@ object Zodiac {
     startDegrees   : Int
   ) {
     final def start: AnglePoint = AnglePoint(startDegrees)
-    final def end: AnglePoint = (start + Angle(30)).normal
+    final def end: AnglePoint = (start + Angle(30)).canonical
 
     final def contains(angle: AnglePoint): Boolean = (start <= angle) && (angle < end)
   }
@@ -35,7 +35,7 @@ object Zodiac {
     Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
 
   def fromAngle(rawAngle: AnglePoint): (Constellation, Angle) = {
-    val angle: AnglePoint = rawAngle.normal.canonical
+    val angle: AnglePoint = rawAngle.canonical
     val constellation: Constellation = constellations.find(_.contains(angle)).get
     (constellation, angle - constellation.start)
   }

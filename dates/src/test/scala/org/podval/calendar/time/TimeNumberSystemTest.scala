@@ -73,12 +73,12 @@ final class TimeNumberSystemTest extends FlatSpec {
   }
 
   "add()" should "be correct" in {
-    assertResult(Seq(0))(s.add(negate = false, Seq(0), Seq(0)))
-    assertResult(Seq(0))(s.add(negate = true, Seq(0), Seq(0)))
-    assertResult(Seq(0, 1))(s.add(negate = false, Seq(0, 1), Seq(0)))
-    assertResult(Seq(0, 1))(s.add(negate = true, Seq(0, 1), Seq(0)))
-    assertResult(Seq(0, 2))(s.add(negate = false, Seq(0, 1), Seq(0, 1)))
-    assertResult(Seq(0, 0))(s.add(negate = true, Seq(0, 1), Seq(0, 1)))
+    assertResult(Seq(0))(s.add(Seq(0), Seq(0)))
+    assertResult(Seq(0))(s.subtract(Seq(0), Seq(0)))
+    assertResult(Seq(0, 1))(s.add(Seq(0, 1), Seq(0)))
+    assertResult(Seq(0, 1))(s.subtract(Seq(0, 1), Seq(0)))
+    assertResult(Seq(0, 2))(s.add(Seq(0, 1), Seq(0, 1)))
+    assertResult(Seq(0, 0))(s.subtract(Seq(0, 1), Seq(0, 1)))
   }
 
   "normal()/canonical()" should "be correct" in {
@@ -151,9 +151,9 @@ final class TimeNumberSystemTest extends FlatSpec {
     assertResult("3d5h0p0m")(Interval(3, 5).toString(3))
     assertResult("3d5h0p0m0")(Interval(3, 5).toString(4))
     assertResult("3d5h4p")(Interval(3, 5, 4).toString)
-    assertResult("-3d5h4p")(Interval(-3, 5, 4).toString)
+    assertResult("-2d18h1076p")(Interval(-3, 5, 4).toString)
     assertResult("3d5h4p1m")(Interval(3, 5, 4, 1).toString)
-    assertResult("-3d5h4p1m")(Interval(-3, 5, 4, 1).toString)
-    assertResult("0d-5h-4p-1m")((-Interval(0, 5, 4, 1)).toString)
+    assertResult("-2d18h1075p75m")(Interval(-3, 5, 4, 1).toString)
+    assertResult("-0d5h4p1m")((-Interval(0, 5, 4, 1)).toString)
   }
 }
