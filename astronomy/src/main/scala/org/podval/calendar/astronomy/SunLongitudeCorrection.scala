@@ -4,8 +4,8 @@ import org.podval.calendar.angle.AngleNumberSystem.Angle
 
 // KH 13:4
 // TODO there are some diagrams in the Moznaim Rambam at this point.
-object SunLongitudeCorrection {
-  private final val values: Seq[(Angle, Angle)] = Seq(
+object SunLongitudeCorrection extends AngleCorrection {
+  final override val values: Map[Angle, Angle] = Map(
     Angle( 10) -> Angle(0, 20),
     Angle( 20) -> Angle(0, 40),
     Angle( 30) -> Angle(0, 58),
@@ -25,26 +25,4 @@ object SunLongitudeCorrection {
     Angle(170) -> Angle(0, 21),
     Angle(180) -> Angle(0,  0)
   )
-
-  // KH 13:7-8
-  final def value(course: Angle): Angle = {
-    require(Angle(0) < course && course < Angle(180))
-    val before = values.takeWhile(_._1 <= course).last
-    val after  = values.find(_._1 > course).get
-    require((after._1 - before._1) == Angle(10))
-    if (before._1 == course) before._2 else {
-      val more: Angle = ((after._2 - before._2) / 10)*(course - before._1)
-      before._2 + more
-    }
-  }
-
-  // KH 13:?
-  final def correction(rawCourse: Angle): Angle = {
-    val course: Angle = rawCourse.canonical.roundTo(0) // KH 13:9
-    // TODO make Angle(180) a constant on AngleNumberSystem
-    val x: Boolean = course < Angle(180)
-    if (course < Angle(180)) -value(course) else
-    if (course > Angle(180))  value(course - Angle(180)) else
-      Angle(0)
-  }
 }

@@ -9,11 +9,11 @@ class MoonAnomalyVisibleTest extends FlatSpec {
   behavior of "Anomaly"
 
   it should "be correctly misprinted :)" in {
-    test(MoonAnomalyVisible.MISPRINTED)
+    test(MoonAnomalyVisible.misprinted)
   }
 
   it should "be correct" in {
-    test(MoonAnomalyVisible.VALUES)
+    test(MoonAnomalyVisible.values)
   }
 
   private def test(table: Map[Angle, Angle]): Unit = {

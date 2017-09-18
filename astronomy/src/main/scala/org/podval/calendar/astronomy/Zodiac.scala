@@ -13,6 +13,7 @@ object Zodiac {
   ) {
     final def start: AnglePoint = AnglePoint(startDegrees)
     final def end: AnglePoint = (start + Angle(30)).canonical
+    final def middle: AnglePoint = (start + Angle(15)).canonical
 
     final def contains(angle: AnglePoint): Boolean = (start <= angle) && (angle < end)
   }
