@@ -1,7 +1,8 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.Angle
 import org.scalatest.FlatSpec
+import org.podval.calendar.angle.AngleNumberSystem.Angle
+import Angle2Angle.Table
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MoonAnomalyVisibleTest extends FlatSpec {
@@ -13,16 +14,16 @@ class MoonAnomalyVisibleTest extends FlatSpec {
   }
 
   it should "be correct" in {
-    test(MoonAnomalyVisible.values)
+    test(MoonAnomalyVisible.table)
   }
 
-  private def test(table: Map[Angle, Angle]): Unit = {
-    for ((maslul, mnas) <- table) {
+  private def test(table: Table): Unit = {
+    for (maslul <- Angle2Angle.keys) {
+      val mnas = MoonAnomalyVisible.fromTable(table)(maslul).abs
       val e: Double = MoonAnomalyVisible.efrommnasround(maslul, mnas)
       val mnasfrome = MoonAnomalyVisible.mnasfrome(maslul, e)
-      val mnas_ = mnasfrome.roundToMinutes
-
-      assert(mnas == mnas_)
+      val mnasRound = mnas.roundToMinutes
+      assertResult(mnas.roundToMinutes)(mnasfrome.roundToMinutes)
     }
   }
 }

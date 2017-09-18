@@ -201,7 +201,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     transform(digits, negativeDigit, negativeHead)
 
   protected final def negativeDigit(digit: Int, digitRange: Int): (Int, Int) =
-    if (digit < 0) (0, digit) else (1, digit - digitRange)
+    if (digit <= 0) (0, digit) else (1, digit - digitRange)
 
   protected def negativeHead(digit: Int): Int = digit
 

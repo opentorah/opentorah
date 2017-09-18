@@ -39,7 +39,7 @@ object Moon {
     val sunLongitudeMean: AnglePoint = Sun.longitudeMean(day)
     val meanAtTimeOfSighting: AnglePoint = longitudeMeanAtTimeOfSighting(day, sunLongitudeMean)
     val anomaly: AnglePoint = anomalyTrue(day, meanAtTimeOfSighting, sunLongitudeMean)
-    val anomalyVisible: Angle = MoonAnomalyVisible.correction(anomaly.toInterval)
+    val anomalyVisible: Angle = MoonAnomalyVisible.fromTable(anomaly.toInterval)
     meanAtTimeOfSighting + anomalyVisible
   }
 }

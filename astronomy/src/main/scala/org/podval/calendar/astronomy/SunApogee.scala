@@ -1,9 +1,9 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
-import DayData.Table
+import Days2Angle.Table
 
-object SunApogee extends DayData {
+object SunApogee extends Days2Angle {
   // KH 12:2
   final override val table = new Table {
     final override val one        : Angle = Angle.zero // Rambam doesn't give this value

@@ -50,6 +50,7 @@ class AngleTest extends FlatSpec {
     assertResult(Angle(-15))(Angle(-15).normal)
     assertResult(Angle(1))(Angle(721).normal)
     assertResult(Angle(-1))(Angle(-721).normal)
+    assertResult(-Angle(0, 50))(-Angle(360, 49, 59, 60).normal)
 
     assertResult(Angle(345))(Angle(345).canonical)
     assertResult(Angle(345))(Angle(-15).canonical)

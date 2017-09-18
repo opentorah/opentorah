@@ -1,9 +1,9 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem.Angle
-import DayData.Table
+import Days2Angle.Table
 
-object MoonAnomalyMean extends DayData {
+object MoonAnomalyMean extends Days2Angle {
   // TODO opposite direction!
 
   final override val table = new Table {

@@ -69,7 +69,7 @@ class TextTest extends FlatSpec {
     assertResult(Angle(18, 52, 2))(course)
 
     assertResult(Angle(19))(course.roundTo(0))
-    assertResult(Angle(0, -38))(SunLongitudeCorrection.correction(course))
+    assertResult(Angle(0, -38))(SunLongitudeCorrection.fromTable(course))
     assertResult(AnglePoint(104, 59, 25))(Sun.longitudeTrue(nextDay))
   }
 
@@ -99,7 +99,7 @@ class TextTest extends FlatSpec {
     // TODO printing error in standard editions: 180.
 //    assertResult(AnglePoint(108, 21))(moonAnomalyTrue) // TODO 108°22′
 
-    val anomalyVisible: Angle = MoonAnomalyVisible.correction(moonAnomalyTrue.toInterval)
+    val anomalyVisible: Angle = MoonAnomalyVisible.fromTable(moonAnomalyTrue.toInterval)
 //    assertResult(-Angle(5, 1))(anomalyVisible) // TODO -4°60′47″60‴
 
     val moonTrue = moonMeanAtTimeOfSighting + anomalyVisible

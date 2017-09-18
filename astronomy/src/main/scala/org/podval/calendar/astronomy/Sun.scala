@@ -24,7 +24,7 @@ object Sun {
   // KH 13:1-3,5-6 (maslul; mnas hamaslul)
   final def longitudeTrue(day: Day): AnglePoint = {
     val longitude = longitudeMean(day)
-    val correction = SunLongitudeCorrection.correction(longitude - apogee(day))
+    val correction = SunLongitudeCorrection.fromTable(longitude - apogee(day))
     longitude + correction
   }
 

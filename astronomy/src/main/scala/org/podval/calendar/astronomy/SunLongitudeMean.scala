@@ -1,9 +1,9 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
-import DayData.Table
+import Days2Angle.Table
 
-object SunLongitudeMean extends DayData {
+object SunLongitudeMean extends Days2Angle {
   // KH 12:1
   final override val table = new Table {
     final override val one        : Angle = Angle(  0, 59,  8)

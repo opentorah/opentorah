@@ -24,9 +24,9 @@ import AngleNumberSystem.Angle
  years) and the obliquity of the ecliptic (23° 35'), which was an elaboration of Hipparchus' work.
  */
 
-import DayData.{Days, Table}
+import Days2Angle.{Days, Table}
 
-trait DayData {
+trait Days2Angle {
 
   val table: Table
 
@@ -54,23 +54,7 @@ trait DayData {
 
   final def fromValue(days: Days): Angle = fromValue(rambamValue)(days)
 
-
-
-  final def exact: Angle = reconstructed(10000)
-
-  final def exact10: Double = reconstructed10(10000)
-
-  final def reconstructed(days: Days): Angle =
-    Angle.fromDegrees(reconstructed10(days), 6) // 6 60-digits
-
-  final def reconstructed10(days: Days): Double = exactify(table.one, days, fromTable(days))
-
-  final def recalculated(days: Days): Angle = exact*days
-
-  final def recalculated10(days: Days): Angle = Angle.fromDegrees(exact10*days, 6)
-
-  final def almagest(days: Days): Angle = almagestValue*days
-
+  // TODO rework to produce range for length
   final def exactify(approximate: Angle, days: Int, angle: Angle): Double = {
     val fullRotations = math.floor(days*approximate.toDouble/AngleNumberSystem.headRange.toDouble).toInt
     (AngleNumberSystem.headRange.toDouble*fullRotations + angle.toDegrees)/days
@@ -78,7 +62,7 @@ trait DayData {
 }
 
 
-object DayData {
+object Days2Angle {
   type Days = Int
 
   trait Table {
