@@ -57,7 +57,7 @@ class TextTest extends FlatSpec {
     assertResult(100)(nextDay.number - Epoch.epoch.number)
 
     val nextLongitude: AnglePoint = Sun.longitudeMean(nextDay)
-    assertResult(Sun.longitudeMeanAtEpoch + SunLongitudeMean.value(100))(nextLongitude)
+    assertResult(Sun.longitudeMeanAtEpoch + SunLongitudeMean.fromTable(100))(nextLongitude)
     assertResult(AnglePoint(105, 37, 25))(nextLongitude)
     val (constellation, angle) = Zodiac.fromAngle(nextLongitude)
     assertResult(Zodiac.Cancer)(constellation)
@@ -73,42 +73,41 @@ class TextTest extends FlatSpec {
     assertResult(AnglePoint(104, 59, 25))(Sun.longitudeTrue(nextDay))
   }
 
-  // TODO redo calculations so that they work from the tables.
   "true Moon calculations" should "be as in KH 15:8-9" ignore {
     // TODO why all these roundTo()s? I am overcalculating it :)  Where does Rambam says to ignore the rest?
     val nextDay: Day = Year(4938).month(Month.Name.Iyar).day(2)
 
     assertResult(Day.Name.Shishi)(nextDay.name)
     assertResult(29)(nextDay.number - Epoch.epoch.number)
-    val sunMean = Sun.longitudeMean(nextDay).roundTo(2)
-    // TODO calculate from the tables, not from the exact values!!!
-//    assertResult(AnglePoint(35, 38, 33))(sunMean) // TODO: 35°38′34″
+    val sunMean = Sun.longitudeMean(nextDay) //.roundToSeconds
+//    assertResult(AnglePoint(35, 38, 33))(sunMean) // TODO: 35°38′30″ (fromValue: 35°38′34″)
 
     val moonMeanAtTimeOfSighting = Moon.longitudeMeanAtTimeOfSighting(nextDay, sunMean).roundTo(2)
-    assertResult(AnglePoint(53, 36, 39))(moonMeanAtTimeOfSighting)
+//    assertResult(AnglePoint(53, 36, 39))(moonMeanAtTimeOfSighting) // TODO: 53°36′38″
 
-    val moonAnomalyMean = Moon.anomalyMean(nextDay).roundTo(2)
-    assertResult(AnglePoint(103, 21, 46))(moonAnomalyMean)
+    val moonAnomalyMean = Moon.anomalyMean(nextDay).roundToSeconds
+//    assertResult(AnglePoint(103, 21, 46))(moonAnomalyMean) // TODO 103°21′48″
 
     val elongation = moonMeanAtTimeOfSighting - sunMean
-//    assertResult(Angle(17, 58, 6))(elongation) // TODO 17°58′5″
+//    assertResult(Angle(17, 58, 6))(elongation) // TODO 17°58′8″ (fromValue 17°58′5″)
     val doubleElongation = elongation*2
-//    assertResult(Angle(35, 56, 12))(doubleElongation) // TODO 35°56′10″
+//    assertResult(Angle(35, 56, 12))(doubleElongation) // TODO 35°56′16″ (fromValue 35°56′10″)
     val correction = MoonLongitudeDoubleElongationCorrection.correction(doubleElongation)
     assertResult(Angle(5))(correction)
 
-    val moonAnomalyTrue = (moonAnomalyMean + correction).roundTo(1)
+    val moonAnomalyTrue = (moonAnomalyMean + correction).roundToMinutes
     // TODO printing error in standard editions: 180.
 //    assertResult(AnglePoint(108, 21))(moonAnomalyTrue) // TODO 108°22′
 
     val anomalyVisible: Angle = MoonAnomalyVisible.correction(moonAnomalyTrue.toInterval)
-    assertResult(-Angle(5, 1))(anomalyVisible)
+//    assertResult(-Angle(5, 1))(anomalyVisible) // TODO -4°60′47″60‴
 
     val moonTrue = moonMeanAtTimeOfSighting + anomalyVisible
     // TODO printing error in standard editions: 33.
-    assertResult(AnglePoint(48, 35, 39))(moonTrue)
+//    assertResult(AnglePoint(48, 35, 39))(moonTrue) // TODO 48°35′50″0‴
+//    assertResult(AnglePoint(48, 35, 39))(Moon.longitudeTrueAtTimeOfSighting(nextDay))
 
-    val (constellation, angle) = Zodiac.fromAngle(moonTrue.roundTo(1))
+    val (constellation, angle) = Zodiac.fromAngle(moonTrue.roundToMinutes)
     assertResult(Zodiac.Taurus)(constellation)
     assertResult(Angle(18, 36))(angle)
   }

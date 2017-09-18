@@ -23,17 +23,38 @@ import AngleNumberSystem.Angle
  He also recalculated the values for the precession of the equinoxes (54.5" per year, or 1° in 66
  years) and the obliquity of the ecliptic (23° 35'), which was an elaboration of Hipparchus' work.
  */
+
+import DayData.{Days, Table}
+
 trait DayData {
 
-  type Days = Int
+  val table: Table
 
-  val value: Map[Days, Angle]
+  final def fromTable(table: Table)(days: Int): Angle = {
+    val tenThousands: Int =  days          / 10000
+    val thousands   : Int = (days % 10000) /  1000
+    val hundreds    : Int = (days %  1000) /   100
+    val tens        : Int = (days %   100) /    10
+    val ones        : Int =  days %    10
 
-  final def keys: List[Days] = value.keys.toList.sorted
+    table.tenThousand*tenThousands +
+    table.thousand   *thousands +
+    table.hundred    *hundreds +
+    table.ten        *tens +
+    table.one        *ones
+  }
 
-  final def rambamValue = value(1)
+  final def fromTable(days: Int): Angle = fromTable(table)(days)
 
-  final def calculated(days: Days): Angle = rambamValue*days
+  val rambamValue: Angle
+
+  val almagestValue: Angle
+
+  final def fromValue(value: Angle)(days: Days): Angle = value*days
+
+  final def fromValue(days: Days): Angle = fromValue(rambamValue)(days)
+
+
 
   final def exact: Angle = reconstructed(10000)
 
@@ -42,13 +63,11 @@ trait DayData {
   final def reconstructed(days: Days): Angle =
     Angle.fromDegrees(reconstructed10(days), 6) // 6 60-digits
 
-  final def reconstructed10(days: Days): Double = exactify(rambamValue, days, value(days))
+  final def reconstructed10(days: Days): Double = exactify(table.one, days, fromTable(days))
 
   final def recalculated(days: Days): Angle = exact*days
 
   final def recalculated10(days: Days): Angle = Angle.fromDegrees(exact10*days, 6)
-
-  val almagestValue: Angle
 
   final def almagest(days: Days): Angle = almagestValue*days
 
@@ -56,4 +75,22 @@ trait DayData {
     val fullRotations = math.floor(days*approximate.toDouble/AngleNumberSystem.headRange.toDouble).toInt
     (AngleNumberSystem.headRange.toDouble*fullRotations + angle.toDegrees)/days
   }
+}
+
+
+object DayData {
+  type Days = Int
+
+  trait Table {
+    def one        : Angle //     1
+    def ten        : Angle //    10
+    def hundred    : Angle //   100
+    def thousand   : Angle //  1000
+    def tenThousand: Angle // 10000
+
+    def month      : Angle //    29
+    def year       : Angle //   354
+  }
+
+  final val keys: Seq[Days] = Seq(10, 100, 1000, 10000, 29, 254)
 }

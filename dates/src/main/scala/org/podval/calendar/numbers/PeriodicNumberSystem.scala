@@ -23,4 +23,6 @@ trait PeriodicNumberSystem[S <: PeriodicNumberSystem[S]] extends NumberSystem[S]
   }
 
   val period: S#Interval = Interval(headRange)
+
+  val halfPeriod: S#Interval = Interval(headRange/2)
 }

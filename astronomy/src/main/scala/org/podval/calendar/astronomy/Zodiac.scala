@@ -16,6 +16,11 @@ object Zodiac {
     final def middle: AnglePoint = (start + Angle(15)).canonical
 
     final def contains(angle: AnglePoint): Boolean = (start <= angle) && (angle < end)
+
+    final def at(angle: Angle): AnglePoint = {
+      require((angle.isPositive) && (angle < Angle(30)))
+      start + angle
+    }
   }
 
   case object Aries       extends Constellation("Aries"      , "Ram"        , "Tele"   ,   0)

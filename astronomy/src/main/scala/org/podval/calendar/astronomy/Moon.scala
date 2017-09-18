@@ -7,10 +7,10 @@ object Moon {
 
   // KH 14:4
   // (according to note 12 in Moznaim Rambam in English: at 6PM)
-  val longitudeMeanAtEpoch: AnglePoint = Zodiac.Taurus.start + Angle(1, 14, 43)
+  val longitudeMeanAtEpoch: AnglePoint = Zodiac.Taurus.at(Angle(1, 14, 43))
 
   final def longitudeMean(day: Day): AnglePoint =
-    longitudeMeanAtEpoch + MoonLongitudeMean.exact_ * (day.number-Epoch.epoch.number)
+    longitudeMeanAtEpoch + MoonLongitudeMean.fromTable(day.number-Epoch.epoch.number)
 
   final def longitudeMeanAtTimeOfSighting(day: Day): AnglePoint =
     longitudeMeanAtTimeOfSighting(day, Sun.longitudeMean(day))
@@ -23,7 +23,7 @@ object Moon {
 
   // KH 14:4
   final def anomalyMean(day: Day): AnglePoint =
-    anomalyAtEpoch + MoonAnomalyMean.exact_ * (day.number-Epoch.epoch.number)
+    anomalyAtEpoch + MoonAnomalyMean.fromTable(day.number-Epoch.epoch.number)
 
   // KH 15:1-3
   // TODO Moznaim Rambam, KH 15:1f2: double elongation = distance between moon's mean and apogee
