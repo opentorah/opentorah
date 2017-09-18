@@ -34,14 +34,18 @@ trait Days2Angle {
     val tenThousands: Int =  days          / 10000
     val thousands   : Int = (days % 10000) /  1000
     val hundreds    : Int = (days %  1000) /   100
+    val lessThanHundred: Int = days % 100
     val tens        : Int = (days %   100) /    10
     val ones        : Int =  days %    10
 
     table.tenThousand*tenThousands +
     table.thousand   *thousands +
-    table.hundred    *hundreds +
-    table.ten        *tens +
-    table.one        *ones
+    // TODO without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in
+    // KH 15:8-9 (see test).
+    table.hundred    *hundreds + (if (lessThanHundred == 29) table.month else {
+      table.ten * tens +
+      table.one * ones
+    })
   }
 
   final def fromTable(days: Int): Angle = fromTable(table)(days)
