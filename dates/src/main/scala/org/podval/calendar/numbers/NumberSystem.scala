@@ -62,42 +62,32 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   final def subtract(left: Seq[Int], right: Seq[Int]): Seq[Int] = zipWith(left, right, _ - _)
 
   // TODO test with negativity
-  // TODO generalize transform and use it here?
   final def roundTo(digits: Seq[Int], length: Int): Seq[Int] = {
     require(length >= 0)
 
-    def forDigit(digit: Int, range: Int): Int =
-      if (math.abs(digit) >= range / 2) math.signum(digit) else 0
+    def forDigit(digit: Int, position: Int, range: Int): (Int, Int) =
+      if (position < length) (0, digit)
+      else (if (math.abs(digit) >= range / 2) math.signum(digit) else 0, 0)
 
-    val normalDigits: Seq[Int] = normal(digits)
-
-    // TODO simplify: split the whole thing, noty just tail; rerieve range directly from index...
-    val (toRetain, toRound) = normalDigits.tail splitAt length
-    val toRoundWithRange = toRound.zipWithIndex.map {
-      case (digit, position) => (digit, range(length+position))
-    }
-    val carry = (toRoundWithRange :\ 0) { case ((x, range), c) => forDigit(x+c, range) }
-
-    if (toRetain.isEmpty) Seq(normalDigits.head + carry)
-    else normalDigits.head +: toRetain.init :+ (toRetain.last + carry)
+    transform(normal(digits), forDigit, (digit: Int) => digit)
   }
 
-  final def toRational(digits: Seq[Int]): BigRational = {
-    def forDigit(digit: Int, denominator: BigInt): BigRational =
-      BigRational(digit, denominator)
-    to[BigRational](digits, forDigit, _ + _)
-  }
+  final def toRational(digits: Seq[Int]): BigRational = to[BigRational](
+    digits,
+    (digit: Int, denominator: BigInt) => BigRational(digit, denominator),
+    _ + _
+  )
 
-  final def toDouble(digits: Seq[Int]): Double = {
-    def forDigit(digit: Int, denominator: BigInt): Double =
-      digit.toDouble/denominator.bigInteger.longValueExact()
-    to[Double](digits, forDigit, _ + _)
-  }
+  final def toDouble(digits: Seq[Int]): Double = to[Double](
+    digits,
+    (digit: Int, denominator: BigInt) => digit.toDouble/denominator.bigInteger.longValueExact(),
+    _ + _
+  )
 
   private final def to[T](digits: Seq[Int], forDigit: (Int, BigInt) => T, plus: (T, T) => T): T = {
     val zeroDenominator: BigInt = BigInt(1)
-    zipWithRanges(digits)
-      .foldLeft[(T, BigInt)]((forDigit(digits.head, zeroDenominator), zeroDenominator)) {
+    digits.tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
+    .foldLeft[(T, BigInt)]((forDigit(digits.head, zeroDenominator), zeroDenominator)) {
       case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>
         val newDenominator: BigInt = denominator*range
         (plus(acc, forDigit(digit, newDenominator)), newDenominator)
@@ -117,8 +107,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   final def fromDouble(value: Double, length: Int = defaultLength): Seq[Int] = {
     def wholeAndFraction(what: Double): (Int, Double) = {
       val whole: Double = math.floor(what)
-      val fraction: Double = what - whole
-      (whole.toInt, fraction)
+      (whole.toInt, what - whole)
     }
 
     def round(whole: Int, fraction: Double): Int = whole + math.round(fraction).toInt
@@ -190,7 +179,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   final def normal(digits: Seq[Int]): Seq[Int] = transform(digits, normalDigit, normalHead)
 
-  protected final def normalDigit(digit: Int, digitRange: Int): (Int, Int) =
+  protected final def normalDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
     (digit / digitRange, digit % digitRange)
 
   protected def normalHead(digit: Int): Int = digit
@@ -198,7 +187,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   private final def positive(digits: Seq[Int]): Seq[Int] =
     transform(digits, positiveDigit, positiveHead)
 
-  protected final def positiveDigit(digit: Int, digitRange: Int): (Int, Int) =
+  protected final def positiveDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
     if (digit >= 0) (0, digit) else (-1, digit + digitRange)
 
   protected def positiveHead(digit: Int): Int = digit
@@ -206,24 +195,29 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   private final def negative(digits: Seq[Int]): Seq[Int] =
     transform(digits, negativeDigit, negativeHead)
 
-  protected final def negativeDigit(digit: Int, digitRange: Int): (Int, Int) =
+  protected final def negativeDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
     if (digit <= 0) (0, digit) else (1, digit - digitRange)
 
   protected def negativeHead(digit: Int): Int = digit
 
-  private final def transform(digits: Seq[Int], forDigit: (Int, Int) => (Int, Int), forHead: Int => Int): Seq[Int] = {
+  private final def transform(
+    digits: Seq[Int],
+    forDigit: (Int, Int, Int) => (Int, Int),
+    forHead: Int => Int
+  ): Seq[Int] = {
     val (headCarry: Int, newTail: Seq[Int]) = (digits.tail.zipWithIndex :\(0, Seq.empty[Int])) {
       case ((digit: Int, position: Int), (carry: Int, result: Seq[Int])) =>
-        val (resultCarry, resultDigit) = forDigit(digit + carry, range(position))
+        val (resultCarry, resultDigit) = forDigit(digit + carry, position, range(position))
         (resultCarry, resultDigit +: result)
     }
 
     forHead(digits.head + headCarry) +: newTail
   }
 
-  private final def zipWith(left: Seq[Int], right: Seq[Int], operation: (Int, Int) => Int): Seq[Int] =
+  private final def zipWith(
+    left: Seq[Int],
+    right: Seq[Int],
+    operation: (Int, Int) => Int
+  ): Seq[Int] =
     left.zipAll(right, 0, 0).map(operation.tupled)
-
-  private final def zipWithRanges(digits: Seq[Int]): Seq[(Int, Int)] =
-    digits.tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
 }
