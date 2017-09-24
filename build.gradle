@@ -29,7 +29,9 @@ def scalaVersion      = '2.12.3'
 def scalaVersionMajor = '2.12'
 
 ext.lib = [
-  zinc      : 'com.typesafe.zinc:zinc:0.3.15',
+  zinc      :
+  'com.typesafe.zinc:zinc:0.3.15',
+//    'org.scala-sbt:zinc:1.0',
   scala     : "org.scala-lang:scala-library:$scalaVersion",
   junit     : 'junit:junit:4.12',
   scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.3",

@@ -8,6 +8,8 @@ trait AngleNumber[N <: AngleNumber[N]] extends PeriodicNumber[AngleNumberSystem,
 
   def degrees(value: Int): N = head(value)
 
+  def roundToDegrees: N = roundTo(0)
+
   def minutes: Int = tail(0)
 
   def minutes(value: Int): N = tail(0, value)

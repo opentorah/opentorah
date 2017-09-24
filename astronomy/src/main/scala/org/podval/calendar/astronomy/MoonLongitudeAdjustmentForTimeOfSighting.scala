@@ -6,7 +6,7 @@ import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
 object MoonLongitudeAdjustmentForTimeOfSighting {
   // TODO see notes in Moznaim Rambam
   // TODO sun longitude: mean or true?
-  final def adjustment(sun: AnglePoint): Angle = {
+  final def calculate(sun: AnglePoint): Angle = {
     def between(from: AnglePoint, to: AnglePoint): Boolean = (from <= sun) && (sun < to)
     if      (between(Zodiac.Pisces     .middle, Zodiac.Aries      .middle))  Angle(0)
     else if (between(Zodiac.Aries      .middle, Zodiac.Gemini     .start ))  Angle(0, 15)

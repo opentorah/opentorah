@@ -1,7 +1,7 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem
-import AngleNumberSystem.Angle
+import org.podval.calendar.angle.{AngleNumberSystem, AnglePointBase}
+import AngleNumberSystem.{Angle, AnglePoint}
 
 
 /*
@@ -30,33 +30,13 @@ trait Days2Angle {
 
   val table: Table
 
-  final def fromTable(table: Table)(days: Int): Angle = {
-    val tenThousands: Int =  days          / 10000
-    val thousands   : Int = (days % 10000) /  1000
-    val hundreds    : Int = (days %  1000) /   100
-    val lessThanHundred: Int = days % 100
-    val tens        : Int = (days %   100) /    10
-    val ones        : Int =  days %    10
-
-    table.tenThousand*tenThousands +
-    table.thousand   *thousands +
-    // TODO without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in
-    // KH 15:8-9 (see test).
-    table.hundred    *hundreds + (if (lessThanHundred == 29) table.month else {
-      table.ten * tens +
-      table.one * ones
-    })
-  }
-
-  final def fromTable(days: Int): Angle = fromTable(table)(days)
+  val atEpoch: AnglePoint
 
   val rambamValue: Angle
 
   val almagestValue: Angle
 
   final def fromValue(value: Angle)(days: Days): Angle = value*days
-
-  final def fromValue(days: Days): Angle = fromValue(rambamValue)(days)
 
   // TODO rework to produce range for length
   final def exactify(approximate: Angle, days: Int, angle: Angle): Double = {
@@ -78,6 +58,24 @@ object Days2Angle {
 
     def month      : Angle //    29
     def year       : Angle //   354
+
+    final def calculate(days: Int): Angle = {
+      val tenThousands: Int =  days          / 10000
+      val thousands   : Int = (days % 10000) /  1000
+      val hundreds    : Int = (days %  1000) /   100
+      val lessThanHundred: Int = days % 100
+      val tens        : Int = (days %   100) /    10
+      val ones        : Int =  days %    10
+
+      tenThousand*tenThousands +
+      thousand   *thousands +
+        // TODO without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in
+        // KH 15:8-9 (see test).
+      hundred    *hundreds + (if (lessThanHundred == 29) month else {
+        ten * tens +
+        one * ones
+      })
+    }
   }
 
   final val keys: Seq[Days] = Seq(10, 100, 1000, 10000, 29, 254)

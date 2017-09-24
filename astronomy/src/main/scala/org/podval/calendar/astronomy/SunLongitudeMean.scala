@@ -17,6 +17,9 @@ object SunLongitudeMean extends Days2Angle {
     final override val year       : Angle = Angle(348, 55, 15)  // TODO ??
   }
 
+  // KH 12:2
+  final override val atEpoch: AnglePoint = Zodiac.Aries.at(Angle(7, 3, 32))
+
   // Moznaim Rambam in English gives this value in KH 12:1 note 1 (without a reference) as the one
   // Rambam uses in his calculations.
   // TODO which of the year lengths does this correspond?

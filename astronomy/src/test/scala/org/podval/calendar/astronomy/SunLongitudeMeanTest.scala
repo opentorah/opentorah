@@ -23,7 +23,7 @@ class SunLongitudeMeanTest extends FlatSpec {
 
   it should "calculate correctly for the regular year" ignore {
     assertResult(SunLongitudeMean.table.year)(SunLongitudeMean.table.one*354)
-    assertResult(SunLongitudeMean.table.year)(SunLongitudeMean.fromTable(354))
+    assertResult(SunLongitudeMean.table.year)(SunLongitudeMean.table.calculate(354))
   }
 
   it should "make a full circle in a year" in {

@@ -19,7 +19,7 @@ class MoonAnomalyVisibleTest extends FlatSpec {
 
   private def test(table: Table): Unit = {
     for (maslul <- Angle2Angle.keys) {
-      val mnas = MoonAnomalyVisible.fromTable(table)(maslul).abs
+      val mnas = table.calculate(maslul).abs
       val e: Double = MoonAnomalyVisible.efrommnasround(maslul, mnas)
       val mnasfrome = MoonAnomalyVisible.mnasfrome(maslul, e)
       val mnasRound = mnas.roundToMinutes

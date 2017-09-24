@@ -62,15 +62,21 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   final def subtract(left: Seq[Int], right: Seq[Int]): Seq[Int] = zipWith(left, right, _ - _)
 
   // TODO test with negativity
+  // TODO generalize transform and use it here?
   final def roundTo(digits: Seq[Int], length: Int): Seq[Int] = {
     require(length >= 0)
 
+    def forDigit(digit: Int, range: Int): Int =
+      if (math.abs(digit) >= range / 2) math.signum(digit) else 0
+
     val normalDigits: Seq[Int] = normal(digits)
+
+    // TODO simplify: split the whole thing, noty just tail; rerieve range directly from index...
     val (toRetain, toRound) = normalDigits.tail splitAt length
     val toRoundWithRange = toRound.zipWithIndex.map {
       case (digit, position) => (digit, range(length+position))
     }
-    val carry = (toRoundWithRange :\ 0) { case ((x, range), c) => if (x + c >= range / 2) 1 else 0}
+    val carry = (toRoundWithRange :\ 0) { case ((x, range), c) => forDigit(x+c, range) }
 
     if (toRetain.isEmpty) Seq(normalDigits.head + carry)
     else normalDigits.head +: toRetain.init :+ (toRetain.last + carry)

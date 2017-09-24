@@ -16,6 +16,9 @@ object SunApogee extends Days2Angle {
     final override val year       : Angle = Angle(0,  0, 53)
   }
 
+  // KH 12:2
+  final override val atEpoch: AnglePoint = Zodiac.Gemini.at(Angle(26, 45, 8))
+
   final override val rambamValue = Angle(0) // TODO
 
   final override val almagestValue = Angle(0) // TODO

@@ -29,13 +29,8 @@ class TextTest extends FlatSpec {
         assertResult(next.start)(prev.end)
     }
 
-    val (constellation1: Zodiac.Constellation, angle1: Angle) = Zodiac.fromAngle(AnglePoint(70, 30, 40))
-    assertResult(Zodiac.Gemini)(constellation1)
-    assertResult(Angle(10, 30, 40))(angle1)
-
-    val (constellation2: Zodiac.Constellation, angle2: Angle) = Zodiac.fromAngle(AnglePoint(320))
-    assertResult(Zodiac.Aquarius)(constellation2)
-    assertResult(Angle(20))(angle2)
+    assertResult((Zodiac.Gemini, Angle(10, 30, 40)))(Zodiac.fromAngle(AnglePoint(70, 30, 40)))
+    assertResult((Zodiac.Aquarius, Angle(20)))(Zodiac.fromAngle(AnglePoint(320)))
   }
 
   "angles" should "subtract as in KH 11:12" in {
@@ -51,64 +46,62 @@ class TextTest extends FlatSpec {
   }
 
   "true Sun calculations" should "be as in KH 13:9-10" in {
-    val nextDay: Day = Year(4938).month(Month.Name.Tammuz).day(14)
-
-    assertResult(Day.Name.Shabbos)(nextDay.name)
-    assertResult(100)(nextDay.number - Epoch.epoch.number)
-
-    val nextLongitude: AnglePoint = Sun.longitudeMean(nextDay)
-    assertResult(Sun.longitudeMeanAtEpoch + SunLongitudeMean.fromTable(100))(nextLongitude)
-    assertResult(AnglePoint(105, 37, 25))(nextLongitude)
-    val (constellation, angle) = Zodiac.fromAngle(nextLongitude)
-    assertResult(Zodiac.Cancer)(constellation)
-    assertResult(Angle(15, 37, 25))(angle)
-
-    val nextApogee: AnglePoint = Sun.apogee(nextDay)
-    assertResult(AnglePoint(86, 45, 23))(nextApogee)
-    val course: Angle = nextLongitude - nextApogee
-    assertResult(Angle(18, 52, 2))(course)
-
-    assertResult(Angle(19))(course.roundTo(0))
-    assertResult(Angle(0, -38))(SunLongitudeCorrection.fromTable(course))
-    assertResult(AnglePoint(104, 59, 25))(Sun.longitudeTrue(nextDay))
+    val result = Calculator.TableCalculator.calculate(Year(4938).month(Month.Name.Tammuz).day(14))
+    assertResult(Day.Name.Shabbos)(result.day.name)
+    assertResult(100)(result.daysAfterEpoch)
+    assertResult(AnglePoint(105, 37, 25))(result.sunLongitudeMean)
+    assertResult((Zodiac.Cancer, Angle(15, 37, 25)))(Zodiac.fromAngle(result.sunLongitudeMean))
+    assertResult(AnglePoint(86, 45, 23))(result.sunApogee)
+    assertResult(Angle(18, 52, 2))(result.sunCourse)
+    assertResult(Angle(19))(result.sunCourse.roundToDegrees)
+    assertResult(-Angle(0, 38))(result.sunLongitudeCorrection)
+    assertResult(AnglePoint(104, 59, 25))(result.sunLongitudeTrue)
   }
 
   "true Moon calculations" should "be as in KH 15:8-9" in {
     // TODO why all these roundTo()s? I am overcalculating it :)  Where does Rambam says to ignore the rest?
-    val nextDay: Day = Year(4938).month(Month.Name.Iyar).day(2)
-
-    assertResult(Day.Name.Shishi)(nextDay.name)
-    assertResult(29)(nextDay.number - Epoch.epoch.number)
-    val sunMean = Sun.longitudeMean(nextDay) //.roundToSeconds
-    assertResult(AnglePoint(35, 38, 33))(sunMean)
-
-    val moonMeanAtTimeOfSighting = Moon.longitudeMeanAtTimeOfSighting(nextDay, sunMean).roundTo(2)
-    assertResult(AnglePoint(53, 36, 39))(moonMeanAtTimeOfSighting)
-
-    val moonAnomalyMean = Moon.anomalyMean(nextDay).roundToSeconds
-    assertResult(AnglePoint(103, 21, 46))(moonAnomalyMean)
-
-    val elongation = moonMeanAtTimeOfSighting - sunMean
-    assertResult(Angle(17, 58, 6))(elongation)
-    val doubleElongation = elongation*2
-    assertResult(Angle(35, 56, 12))(doubleElongation)
-    val correction = MoonLongitudeDoubleElongationCorrection.correction(doubleElongation)
-    assertResult(Angle(5))(correction)
-
-    val moonAnomalyTrue = (moonAnomalyMean + correction).roundToMinutes
+    val result = Calculator.TableCalculator.calculate(Year(4938).month(Month.Name.Iyar).day(2))
+    assertResult(Day.Name.Shishi)(result.day.name)
+    assertResult(29)(result.daysAfterEpoch)
+    assertResult(AnglePoint(35, 38, 33))(result.sunLongitudeMean)
+    assertResult(AnglePoint(53, 36, 39))(result.moonLongitudeMeanAtTimeOfSighting)
+    assertResult(AnglePoint(103, 21, 46))(result.moonAnomalyMean)
+    assertResult(Angle(17, 58, 6))(result.elongation)
+    assertResult(Angle(35, 56, 12))(result.doubleElongation)
+    assertResult(Angle(5))(result.moonLongitudeDoubleElongationCorrection)
     // TODO printing error in standard editions: 180.
-//    assertResult(AnglePoint(108, 21))(moonAnomalyTrue) // TODO 108°22′
-
-    val anomalyVisible: Angle = MoonAnomalyVisible.fromTable(moonAnomalyTrue.toInterval).roundToMinutes
-    assertResult(-Angle(5, 1))(anomalyVisible)
-
-    val moonTrue = moonMeanAtTimeOfSighting + anomalyVisible
+//    assertResult(AnglePoint(108, 21))(result.moonAnomalyTrue) // TODO 108°21′46
+    assertResult(-Angle(5, 1))(result.moonAnomalyVisible)
     // TODO printing error in standard editions: 33.
-    assertResult(AnglePoint(48, 35, 39))(moonTrue)
-    assertResult(AnglePoint(48, 35, 39))(Moon.longitudeTrueAtTimeOfSighting(nextDay))
+    assertResult(AnglePoint(48, 35, 39))(result.moonLongitudeTrue)
+    assertResult((Zodiac.Taurus, Angle(18, 36)))(Zodiac.fromAngle(result.moonLongitudeTrue.roundToMinutes))
+  }
 
-    val (constellation, angle) = Zodiac.fromAngle(moonTrue.roundToMinutes)
-    assertResult(Zodiac.Taurus)(constellation)
-    assertResult(Angle(18, 36))(angle)
+  "moon head calculations" should "be as in KH 16:4-5" in {
+    val result = Calculator.TableCalculator.calculate(Year(4938).month(Month.Name.Iyar).day(2))
+    assertResult(Day.Name.Shishi)(result.day.name)
+    assertResult(29)(result.daysAfterEpoch)
+    assertResult(AnglePoint(182, 29, 37))(result.moonHeadMeanReversed)
+    assertResult(AnglePoint(177, 30, 23))(result.moonHeadMean)
+    assertResult(Zodiac.Virgo.at(Angle(27, 30)))(result.moonHeadMean.roundToMinutes)
+  }
+
+  "interpolation of the lattitude" should "be as in KH 16:12" in {
+    assertResult(Angle(3, 59))(MoonLattitude.table.calculate(Angle(53)).abs) // TODO sign
+  }
+
+  "quadranting of the lattitude" should "be as in KH 16:16-18" in {
+    assertResult(Angle(2, 30))(MoonLattitude.table.calculate(Angle(150)).abs)
+    assertResult(Angle(1, 43))(MoonLattitude.table.calculate(Angle(200)).abs)
+    assertResult(Angle(4, 20))(MoonLattitude.table.calculate(Angle(300)).abs)
+  }
+
+  "moon lattitude calculations" should "be as in KH 16:19" in {
+    val result = Calculator.TableCalculator.calculate(Year(4938).month(Month.Name.Iyar).day(2))
+    assertResult(Day.Name.Shishi)(result.day.name)
+    assertResult((Zodiac.Taurus, Angle(18, 36)))(Zodiac.fromAngle(result.moonLongitudeTrue.roundToMinutes))
+    assertResult(Zodiac.Virgo.at(Angle(27, 30)))(result.moonHeadMean.roundToMinutes)
+    assertResult(Angle(231, 6))(result.moonLattitudeCourse)
+    assertResult(Angle(3, 53))(result.moonLattitude)
   }
 }

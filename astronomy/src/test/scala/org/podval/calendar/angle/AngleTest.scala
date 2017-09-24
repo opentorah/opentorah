@@ -37,6 +37,7 @@ class AngleTest extends FlatSpec {
   it should "round correctly" in {
     assertResult(Angle(104, 58, 50))(Angle(104, 58, 50, 16, 39, 59, 43).roundToSeconds)
     assertResult(Angle(0, 31))((Angle(0, 15, 15)*2).roundToMinutes)
+    assertResult(-Angle(182, 30))((-Angle(182, 29, 37)).roundToMinutes)
   }
 
   it should "compare correctly" in {

@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.Angle
+import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
 import Days2Angle.Table
 
 object MoonAnomalyMean extends Days2Angle {
@@ -18,6 +18,9 @@ object MoonAnomalyMean extends Days2Angle {
     // KH 14:4
     final override val year       : Angle = Angle(305,  0, 13)
   }
+
+  // KH 14:4
+  final override val atEpoch: AnglePoint = AnglePoint(84, 28, 42)
 
   final override val rambamValue: Angle = Angle(13, 3, 53, 55, 49)
 

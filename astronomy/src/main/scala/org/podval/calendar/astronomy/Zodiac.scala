@@ -5,7 +5,7 @@ import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
 object Zodiac {
 
   // KH 11:9
-  sealed class Constellation(
+  sealed abstract class Constellation(
     val nameLatin  : String,
     val nameEnglish: String,
     val nameHebrew : String,
@@ -18,7 +18,7 @@ object Zodiac {
     final def contains(angle: AnglePoint): Boolean = (start <= angle) && (angle < end)
 
     final def at(angle: Angle): AnglePoint = {
-      require((angle.isPositive) && (angle < Angle(30)))
+      require(angle.isPositive && (angle < Angle(30)))
       start + angle
     }
   }
@@ -42,7 +42,17 @@ object Zodiac {
 
   def fromAngle(rawAngle: AnglePoint): (Constellation, Angle) = {
     val angle: AnglePoint = rawAngle.canonical
-    val constellation: Constellation = constellations.find(_.contains(angle)).get
+    val constellation: Constellation = inConstellation(rawAngle)
     (constellation, angle - constellation.start)
+  }
+
+  def inConstellation(rawAngle: AnglePoint): Constellation = {
+    val angle: AnglePoint = rawAngle.canonical
+    constellations.find(_.contains(angle)).get
+  }
+
+  def in(rawAngle: AnglePoint, constellations: Set[Constellation]):Boolean = {
+    val angle: AnglePoint = rawAngle.canonical
+    constellations.exists(_.contains(angle))
   }
 }
