@@ -25,18 +25,10 @@ abstract class IntervalBase[S <: NumberSystem[S]](digits: Seq[Int])
   final def *(r: BigRational, length: Int): S#Interval =
     numberSystem.Interval.fromRational(this.toRational*r, length)
 
-  final def *[T <: NumberSystem[T]](that: T#Interval, length: Int = defaultLength): S#Interval = {
-    //    ((that.head, 1) +: that.numberSystem.zipWithRanges(that.tail))
-    //      .foldRight(newInterval(false, Seq(0))) { case ((digit: Int, range: Int), acc: S#Interval) =>
-    //        (acc + this*digit)/ (range, length)
-    //      }
+  final def *[T <: NumberSystem[T]](that: T#Interval, length: Int = defaultLength): S#Interval =
     numberSystem.Interval.fromRational(this.toRational*that.toRational, length)
-  }
 
-  final def /(that: S#Interval): Int = {
-    val (whole: Int, fraction: BigRational) = (this.toRational / that.toRational).wholeAndFraction
-    whole
-  }
+  final def /(that: S#Interval): Int = (this.toRational / that.toRational).wholeAndFraction._1
 
   final def %[T <: NumberSystem[T]](that: S#Interval, length: Int = defaultLength): S#Interval = {
     // TODO: law:

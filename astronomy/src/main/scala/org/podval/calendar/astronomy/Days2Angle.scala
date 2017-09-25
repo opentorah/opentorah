@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.{AngleNumberSystem, AnglePointBase}
+import org.podval.calendar.angle.AngleNumberSystem
 import AngleNumberSystem.{Angle, AnglePoint}
 
 

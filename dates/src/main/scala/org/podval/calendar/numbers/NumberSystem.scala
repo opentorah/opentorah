@@ -52,8 +52,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   final def compare(left: Seq[Int], right: Seq[Int]): Int =
     zipWith(canonical(left), canonical(right), _ compare _).find (_ != 0) getOrElse 0
 
-  // TODO should probably pipe through normal().
-  final def abs(digits: Seq[Int]): Seq[Int] = digits.map(math.abs)
+  final def abs(digits: Seq[Int]): Seq[Int] = simple(digits).map(math.abs)
 
   final def negate(digits: Seq[Int]): Seq[Int] = digits.map(-_)
 
@@ -61,7 +60,6 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   final def subtract(left: Seq[Int], right: Seq[Int]): Seq[Int] = zipWith(left, right, _ - _)
 
-  // TODO test with negativity
   final def roundTo(digits: Seq[Int], length: Int): Seq[Int] = {
     require(length >= 0)
 

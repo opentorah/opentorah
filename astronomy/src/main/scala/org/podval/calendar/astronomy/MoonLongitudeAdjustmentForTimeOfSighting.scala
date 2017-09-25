@@ -7,17 +7,18 @@ object MoonLongitudeAdjustmentForTimeOfSighting {
   // TODO see notes in Moznaim Rambam
   // TODO sun longitude: mean or true?
   final def calculate(sun: AnglePoint): Angle = {
-    def between(from: AnglePoint, to: AnglePoint): Boolean = (from <= sun) && (sun < to)
-    if      (between(Zodiac.Pisces     .middle, Zodiac.Aries      .middle))  Angle(0)
-    else if (between(Zodiac.Aries      .middle, Zodiac.Gemini     .start ))  Angle(0, 15)
+    import Zodiac._
+    def in(from: AnglePoint, to: AnglePoint): Boolean = (from <= sun) && (sun < to)
+    if (in(Pisces     .middle, Aries      .middle))  Angle(0)     else
+    if (in(Aries      .middle, Gemini     .start ))  Angle(0, 15) else
     // TODO 15 in most editions!
-    else if (between(Zodiac.Gemini     .start , Zodiac.Leo        .start ))  Angle(0, 30)
-    else if (between(Zodiac.Leo        .start , Zodiac.Virgo      .middle))  Angle(0, 15)
-    else if (between(Zodiac.Virgo      .middle, Zodiac.Libra      .middle))  Angle(0)
-    else if (between(Zodiac.Libra      .middle, Zodiac.Sagittarius.start )) -Angle(0, 15)
+    if (in(Gemini     .start , Leo        .start ))  Angle(0, 30) else
+    if (in(Leo        .start , Virgo      .middle))  Angle(0, 15) else
+    if (in(Virgo      .middle, Libra      .middle))  Angle(0)     else
+    if (in(Libra      .middle, Sagittarius.start )) -Angle(0, 15) else
     // TODO 15 in most editions!
-    else if (between(Zodiac.Sagittarius.start , Zodiac.Aquarius   .start )) -Angle(0, 30)
-    else if (between(Zodiac.Aquarius   .start , Zodiac.Pisces     .middle)) -Angle(0, 15)
-    else throw new IllegalArgumentException
+    if (in(Sagittarius.start , Aquarius   .start )) -Angle(0, 30) else
+    if (in(Aquarius   .start , Pisces     .middle)) -Angle(0, 15) else
+      throw new IllegalArgumentException
   }
 }

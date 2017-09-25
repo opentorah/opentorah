@@ -52,9 +52,6 @@ object ICalGenerator {
 
 
   def main(args: Array[String]) {
-    val x = Jewish /// TODO why do I need to do this?!
-    val y = Gregorian
-
     new ICalGenerator(new FileOutputStream("/tmp/jc.ics")).writeYear(2013)
   }
 }
