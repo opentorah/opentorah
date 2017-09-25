@@ -4,10 +4,19 @@ import org.podval.calendar.angle.AngleNumberSystem.{Angle, angleToRadians}
 import Angle2Angle.Table
 import scala.math.{abs, asin, cos, pow, round, sin, sqrt}
 
-// KH 15:6
 object MoonAnomalyVisible extends Angle2Angle {
   // As printed
   class Misprinted extends Table {
+    // KH 15:4, 15:7
+    override def calculate(moonAnomalyTrue: Angle): Angle = {
+      // TODO round for MoonAnomalyVisible too?
+      val angle: Angle = moonAnomalyTrue.canonical.roundToDegrees // KH 13:9
+      if (angle < Angle(180)) -interpolate(angle) else
+      if (angle > Angle(180))  interpolate(Angle(360) - angle) else
+        Angle(0)
+    }
+
+    // KH 15:6
     override val a10 : Angle = Angle(0, 50)
     override val a20 : Angle = Angle(1, 38)
     override val a30 : Angle = Angle(2, 24)

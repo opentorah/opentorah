@@ -2,7 +2,7 @@ package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
 
-object MoonLattitudeSightingAdjustment {
+object MoonLatitudeSightingAdjustment {
 
   // KH 17:8-9
   final def calculate(moonLongitudeTrue: AnglePoint): Angle = {

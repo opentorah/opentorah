@@ -3,10 +3,18 @@ package org.podval.calendar.astronomy
 import org.podval.calendar.angle.AngleNumberSystem.Angle
 import Angle2Angle.Table
 
-// KH 13:4
 // TODO there are some diagrams in the Moznaim Rambam at this point.
 object SunLongitudeCorrection extends Angle2Angle {
   final override val table: Table = new Table {
+    // KH 13:2-3
+    override def calculate(sunCourse: Angle): Angle = {
+      val angle: Angle = sunCourse.canonical.roundToDegrees // KH 13:9
+      if (angle < Angle(180)) -interpolate(angle) else
+      if (angle > Angle(180))  interpolate(Angle(360) - angle) else
+        Angle(0)
+    }
+
+    // KH 13:4
     override val a10 : Angle = Angle(0, 20)
     override val a20 : Angle = Angle(0, 40)
     override val a30 : Angle = Angle(0, 58)

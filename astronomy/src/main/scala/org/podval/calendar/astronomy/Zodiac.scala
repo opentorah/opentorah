@@ -18,7 +18,7 @@ object Zodiac {
     final def contains(angle: AnglePoint): Boolean = (start <= angle) && (angle < end)
 
     final def at(angle: Angle): AnglePoint = {
-      require(angle.isPositive && (angle < Angle(30)))
+      require(!angle.isNegative && (angle <= Angle(30)))
       start + angle
     }
   }

@@ -15,4 +15,5 @@ abstract class PointBase[S <: NumberSystem[S]](digits: Seq[Int])
     numberSystem.Interval.fromDigits(numberSystem.subtract(this.digits, that.digits))
 
   final override def toInterval: S#Interval = this - numberSystem.Point()
+  final override def toPoint   : S#Point    = this
 }

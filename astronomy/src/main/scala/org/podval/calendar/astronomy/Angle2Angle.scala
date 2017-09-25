@@ -10,6 +10,8 @@ abstract class Angle2Angle {
 
 object Angle2Angle {
   trait Table {
+    def calculate(moonAnomalyTrue: Angle): Angle
+
     def a0  : Angle = Angle.zero
     def a10 : Angle
     def a20 : Angle
@@ -56,16 +58,6 @@ object Angle2Angle {
       val reminder: Angle = angle.head(angle.head % 10)
       val more: Angle = (after-before)*(reminder/10)
       before + more
-    }
-
-    // KH 13:?; 15:4, 15:7
-    final def calculate(rawAngle: Angle): Angle = {
-      // TODO introduce roundToDegrees()
-      // TODO round for MoonAnomalyVisible too?
-      val angle: Angle = rawAngle.roundTo(0) // KH 13:9
-      if (angle < Angle(180)) -interpolate(angle) else
-      if (angle > Angle(180))  interpolate(angle - Angle(180)) else
-        Angle(0)
     }
   }
 

@@ -1,7 +1,8 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.jewish.Jewish.Day
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
+import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint, defaultLength}
+import org.podval.calendar.numbers.BigRational
 
 // TODO virtualize calls to roundTo()
 
@@ -36,10 +37,15 @@ trait Calculator {
 
   def moonHeadMeanCalculator: Int => Angle
 
-  def moonLattitudeCalculator: Angle => Angle
+  def moonLatitudeCalculator: Angle => Angle
 
   def moonLongitudeSightingAdjustmentCalculator: AnglePoint => Angle
-  def moonLattitudeSightingAdjustmentCalculator: AnglePoint => Angle
+
+  def moonLatitudeSightingAdjustmentCalculator: AnglePoint => Angle
+
+  def moonCircuitPortionCalculator: AnglePoint => BigRational
+
+  def moonLongitude3PortionCalculator: AnglePoint => BigRational
 
   final def calculate(day: Day): Calculator.Result = {
     val daysAfterEpoch: Int = day.number - epoch.number
@@ -88,7 +94,7 @@ trait Calculator {
     val moonAnomalyVisible: Angle =
       moonAnomalyVisibleCalculator(moonAnomalyTrue.toInterval).roundToMinutes
 
-    val moonLongitudeTrue = moonLongitudeMeanAtTimeOfSighting + moonAnomalyVisible
+    val moonLongitudeTrue: AnglePoint = moonLongitudeMeanAtTimeOfSighting + moonAnomalyVisible
 
     // KH 16:3
     val moonHeadMeanReversed: AnglePoint = moonHeadMeanAtEpoch + moonHeadMeanCalculator(daysAfterEpoch)
@@ -96,45 +102,73 @@ trait Calculator {
     val moonTailMean: AnglePoint = moonHeadMean + Angle(180)
 
     // KH 16:10
-    val moonLattitudeCourse: Angle = moonLongitudeTrue.roundToMinutes - moonHeadMean.roundToMinutes
-    val moonLattitude: Angle = moonLattitudeCalculator(moonLattitudeCourse)
-    val isMoonLattitudeNortherly: Boolean = moonLattitude.isNegative // TODO
+    val moonLatitudeCourse: Angle =
+      (moonLongitudeTrue.roundToMinutes - moonHeadMean.roundToMinutes).canonical
+    val isMoonLatitudeNortherly: Boolean = moonLatitudeCourse < Angle(180)
+    val moonLatitude: Angle = moonLatitudeCalculator(moonLatitudeCourse) // TODO AnglePoint
 
     // KH 17:1
-    val longitude1: Angle = moonLongitudeTrue - sunLongitudeTrue
+    val longitude1: Angle = moonLongitudeTrue - sunLongitudeTrue // TODO AnglePoint
     // KH 17:2
-    val lattitude1: Angle = moonLattitude
+    val latitude1: Angle = moonLatitude // TODO AnglePoint
 
     // KH 17:3-4
-    val result1: Option[Boolean] = {
-      import Zodiac._
-      if (in(moonLongitudeTrue, Set(Capricorn, Aquarius, Pisces, Aries, Taurus, Gemini))) {
+    val inNortherlyInclinedConstellations: Boolean = Zodiac.in(moonLongitudeTrue, Set(
+      Zodiac.Capricorn, Zodiac.Aquarius, Zodiac.Pisces, Zodiac.Aries, Zodiac.Taurus, Zodiac.Gemini
+    ))
+
+    val result1: Option[Boolean] =
+      if (inNortherlyInclinedConstellations) {
         if (longitude1 <= Angle(9)) Some(false)
         else if (longitude1 > Angle(15)) Some(true)
         else None
-      } else
-      if (in(moonLongitudeTrue, Set(Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius))) {
+      } else {
         if (longitude1 <= Angle(10)) Some(false)
         else if (longitude1 > Angle(24)) Some(true)
         else None
-      } else
-        throw new IllegalArgumentException
-    }
+      }
 
     // KH 17:5-6
     val longitudeSightingAdjustment: Angle =
       moonLongitudeSightingAdjustmentCalculator(moonLongitudeTrue)
-    val longitude2: Angle = longitude1 - longitudeSightingAdjustment
+    val longitude2: Angle = longitude1 - longitudeSightingAdjustment // TODO AnglePoint
 
     // KH 17:7-9
-    val lattitudeSightingAdjustment: Angle =
-      moonLattitudeSightingAdjustmentCalculator(moonLongitudeTrue)
-    val lattitude2: Angle =
-      if (isMoonLattitudeNortherly) lattitude1 - lattitudeSightingAdjustment
-      else lattitude1 + lattitudeSightingAdjustment
+    val latitudeSightingAdjustment: Angle =
+      moonLatitudeSightingAdjustmentCalculator(moonLongitudeTrue)
+    val latitude2: Angle =  // TODO AnglePoint
+      if (isMoonLatitudeNortherly) latitude1 - latitudeSightingAdjustment
+      else latitude1 + latitudeSightingAdjustment
 
-    val result: Boolean = result1.getOrElse {
-      false // TODO
+    // KH 17:10
+    val moonCircuitPortion: BigRational = moonCircuitPortionCalculator(moonLongitudeTrue)
+    val moonCircuit: Angle = latitude2*(moonCircuitPortion, defaultLength)
+
+    // KH 17:11
+    val longitude3: Angle = // TODO AnglePoint
+      if (
+        (isMoonLatitudeNortherly && inNortherlyInclinedConstellations) ||
+        (!isMoonLatitudeNortherly && !inNortherlyInclinedConstellations)
+      ) longitude2 - moonCircuit else longitude2 + moonCircuit
+
+    // KH 17:12
+    val moonLongitude3Portion: BigRational = moonLongitude3PortionCalculator(longitude3.toPoint)
+    val moonLongitude3Correction: Angle = longitude3*(moonLongitude3Portion, defaultLength)
+    val longitude4: Angle = longitude3 + moonLongitude3Correction // TODO AnglePoint
+
+    // KH 17:12
+    val geographicCorrection: Angle = latitude1*(BigRational(2, 3), defaultLength)
+    val arcOfSighting: Angle =
+      if (isMoonLatitudeNortherly) longitude4 + geographicCorrection
+      else longitude4 - geographicCorrection
+
+    val isMoonSightable: Boolean = result1.getOrElse {
+      // KH 17:15
+      if (arcOfSighting <= Angle(9)) false else
+      if (arcOfSighting > Angle(14)) true else {
+        // KH 17:16-21
+        true // TODO can't understand what Rambam is saying: "from 9 to 10 or more than 10"?!
+      }
     }
 
     Calculator.Result(
@@ -158,48 +192,30 @@ trait Calculator {
       moonHeadMeanReversed,
       moonHeadMean,
       moonTailMean,
-      moonLattitudeCourse,
-      moonLattitude,
+      moonLatitudeCourse,
+      moonLatitude,
+      isMoonLatitudeNortherly,
       longitude1,
-      lattitude1,
+      latitude1,
       longitudeSightingAdjustment,
-      lattitudeSightingAdjustment,
+      latitudeSightingAdjustment,
       longitude2,
-      lattitude2
+      latitude2,
+      moonCircuitPortion,
+      moonCircuit,
+      longitude3,
+      moonLongitude3Portion,
+      moonLongitude3Correction,
+      longitude4,
+      geographicCorrection,
+      arcOfSighting,
+      isMoonSightable
     )
   }
 }
 
 
 object Calculator {
-  object TableCalculator extends Calculator {
-    final override def epoch: Day = Epoch.epoch
-    final override def sunLongitudeMeanAtEpoch: AnglePoint = SunLongitudeMean.atEpoch
-    final override def sunLongitudeMeanCalculator: Int => Angle = SunLongitudeMean.table.calculate
-    final override def sunApogeeAtEpoch: AnglePoint = SunApogee.atEpoch
-    final override def sunApogeeCalculator: Int => Angle = SunApogee.table.calculate
-    final override def sunLongitudeCorrectionCalculator: Angle => Angle =
-      SunLongitudeCorrection.table.calculate
-    final override def moonLongitudeMeanAtEpoch: AnglePoint = MoonLongitudeMean.atEpoch
-    final override def moonLongitudeMeanCalculator: Int => Angle =
-      MoonLongitudeMean.table.calculate
-    final override def moonLongitudeAdjustmentForTimeOfSightingCalculator: AnglePoint => Angle =
-      MoonLongitudeAdjustmentForTimeOfSighting.calculate
-    final override def moonAnomalyMeanAtEpoch: AnglePoint = MoonAnomalyMean.atEpoch
-    final override def moonAnomalyMeanCalculator: Int => Angle = MoonAnomalyMean.table.calculate
-    final def moonLongitudeDoubleElongationCorrectionCalculator: Angle => Angle =
-      MoonLongitudeDoubleElongationCorrection.calculate
-    final override def moonAnomalyVisibleCalculator: Angle => Angle =
-      MoonAnomalyVisible.table.calculate
-    final override def moonHeadMeanAtEpoch: AnglePoint = MoonHeadMean.atEpoch
-    final override def moonHeadMeanCalculator: Int => Angle = MoonHeadMean.table.calculate
-    final override def moonLattitudeCalculator: Angle => Angle = MoonLattitude.table.calculate
-    final override def moonLongitudeSightingAdjustmentCalculator: AnglePoint => Angle =
-      MoonLongitudeSightingAdjustment.calculate
-    final override def moonLattitudeSightingAdjustmentCalculator: AnglePoint => Angle =
-      MoonLattitudeSightingAdjustment.calculate
-  }
-
   case class Result(
     day: Day,
     daysAfterEpoch: Int,
@@ -221,13 +237,55 @@ object Calculator {
     moonHeadMeanReversed: AnglePoint,
     moonHeadMean: AnglePoint,
     moonTailMean: AnglePoint,
-    moonLattitudeCourse: Angle,
-    moonLattitude: Angle,
+    moonLatitudeCourse: Angle,
+    moonLatitude: Angle,
+    isMoonLatitudeNortherly: Boolean,
     longitude1: Angle,
-    lattitude1: Angle,
+    latitude1: Angle,
     longitudeSightingAdjustment: Angle,
-    lattitudeSightingAdjustment: Angle,
+    latitudeSightingAdjustment: Angle,
     longitude2: Angle,
-    lattitude2: Angle
+    latitude2: Angle,
+    moonCircuitPortion: BigRational,
+    moonCircuit: Angle,
+    longitude3: Angle,
+    moonLongitude3Portion: BigRational,
+    moonLongitude3Correction: Angle,
+    longitude4: Angle,
+    geographicCorrection: Angle,
+    arcOfSighting: Angle,
+    isMoonSightable: Boolean
   )
+
+  object TableCalculator extends Calculator {
+    final override def epoch: Day = Epoch.epoch
+    final override def sunLongitudeMeanAtEpoch: AnglePoint = SunLongitudeMean.atEpoch
+    final override def sunLongitudeMeanCalculator: Int => Angle = SunLongitudeMean.table.calculate
+    final override def sunApogeeAtEpoch: AnglePoint = SunApogee.atEpoch
+    final override def sunApogeeCalculator: Int => Angle = SunApogee.table.calculate
+    final override def sunLongitudeCorrectionCalculator: Angle => Angle =
+      SunLongitudeCorrection.table.calculate
+    final override def moonLongitudeMeanAtEpoch: AnglePoint = MoonLongitudeMean.atEpoch
+    final override def moonLongitudeMeanCalculator: Int => Angle =
+      MoonLongitudeMean.table.calculate
+    final override def moonLongitudeAdjustmentForTimeOfSightingCalculator: AnglePoint => Angle =
+      MoonLongitudeAdjustmentForTimeOfSighting.calculate
+    final override def moonAnomalyMeanAtEpoch: AnglePoint = MoonAnomalyMean.atEpoch
+    final override def moonAnomalyMeanCalculator: Int => Angle = MoonAnomalyMean.table.calculate
+    final def moonLongitudeDoubleElongationCorrectionCalculator: Angle => Angle =
+      MoonLongitudeDoubleElongationCorrection.calculate
+    final override def moonAnomalyVisibleCalculator: Angle => Angle =
+      MoonAnomalyVisible.table.calculate
+    final override def moonHeadMeanAtEpoch: AnglePoint = MoonHeadMean.atEpoch
+    final override def moonHeadMeanCalculator: Int => Angle = MoonHeadMean.table.calculate
+    final override def moonLatitudeCalculator: Angle => Angle = MoonLatitude.table.calculate
+    final override def moonLongitudeSightingAdjustmentCalculator: AnglePoint => Angle =
+      MoonLongitudeSightingAdjustment.calculate
+    final override def moonLatitudeSightingAdjustmentCalculator: AnglePoint => Angle =
+      MoonLatitudeSightingAdjustment.calculate
+    final override def moonCircuitPortionCalculator: AnglePoint => BigRational =
+      MoonCircuitPortion.calculate
+    final override def moonLongitude3PortionCalculator: AnglePoint => BigRational =
+      MoonLongitude3Portion.calculate
+  }
 }

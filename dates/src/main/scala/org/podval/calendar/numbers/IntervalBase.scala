@@ -21,6 +21,10 @@ abstract class IntervalBase[S <: NumberSystem[S]](digits: Seq[Int])
 //  final def %(n: Int, length: Int = defaultLength): S#Interval =
 //    this - ((this / (n, length)) * n)
 
+  // TODO if length has a default (defaultLength), this method gets confused with the *(S#Interval)...
+  final def *(r: BigRational, length: Int): S#Interval =
+    numberSystem.Interval.fromRational(this.toRational*r, length)
+
   final def *[T <: NumberSystem[T]](that: T#Interval, length: Int = defaultLength): S#Interval = {
     //    ((that.head, 1) +: that.numberSystem.zipWithRanges(that.tail))
     //      .foldRight(newInterval(false, Seq(0))) { case ((digit: Int, range: Int), acc: S#Interval) =>
@@ -43,4 +47,5 @@ abstract class IntervalBase[S <: NumberSystem[S]](digits: Seq[Int])
   }
 
   final override def toInterval: S#Interval = this
+  final override def toPoint   : S#Point    = numberSystem.Point() + this
 }

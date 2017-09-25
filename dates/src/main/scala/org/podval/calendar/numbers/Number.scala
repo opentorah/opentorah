@@ -9,6 +9,8 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
 
   def toInterval: S#Interval
 
+  def toPoint: S#Point
+
   final def fromDigits(digits: Seq[Int]): N = companion.fromDigits(digits)
 
   final def head: Int = numberSystem.get(digits, 0)
