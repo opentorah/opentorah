@@ -147,8 +147,8 @@ class TextTest extends FlatSpec {
   }
 
   "year of RavAda" should "be as in KH 10:1-2" in {
-    assertResult(TimeInterval().days(365).hours(5).parts(997).moments(48))(yearOfRavAda)
-    assertResult(TimeInterval().days(10).hours(21).parts(121).moments(48))(yearOfRavAda - normalYear)
+    assertResult(TimeInterval().days(365).hours(5 ).parts(997).moments(48))(yearOfRavAda)
+    assertResult(TimeInterval().days( 10).hours(21).parts(121).moments(48))(yearOfRavAda - normalYear)
     assertResult(TimeInterval())(yearOfRavAda*Cycle.yearsInCycle - Cycle.cycleLength)
     // KH 10:2
     assertResult(TimeInterval().days(91).hours(7).parts(519).moments(31))(

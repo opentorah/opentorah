@@ -152,7 +152,7 @@ trait Calculator {
       ) longitude2 - moonCircuit else longitude2 + moonCircuit
 
     // KH 17:12
-    val moonLongitude3Portion: BigRational = moonLongitude3PortionCalculator(longitude3.toPoint)
+    val moonLongitude3Portion: BigRational = moonLongitude3PortionCalculator(moonLongitudeTrue/* TODO longitude3.toPoint?*/)
     val moonLongitude3Correction: Angle = longitude3*(moonLongitude3Portion, defaultLength)
     val longitude4: Angle = longitude3 + moonLongitude3Correction // TODO AnglePoint
 

@@ -132,25 +132,23 @@ class TextTest extends FlatSpec {
     assertResult(Angle(1, 1))(result.moonCircuit.roundToMinutes)
     // KH 17:14
     assertResult(Angle(11, 28))(result.longitude3.roundToMinutes)
-    // TODO "this longitude is in Taurus" - ?
-    // TODO Expected 1/5, but got 1/6
-    // assertResult(BigRational(1, 5))(result.moonLongitude3Portion)
-    // TODO Expected 2°18′, but got 1°54′36″30‴
-    // assertResult(Angle(2, 18))(result.moonLongitude3Correction)
-    // TODO Expected 13°46′, but got 13°22′15″30‴
+    // TODO "this longitude is in Taurus" - but longitude3 isn't, so I get 1/6 instead of 1/5...
+    // Am I supposed to look at moonTrueLongitude?!
+    assertResult(BigRational(1, 5))(result.moonLongitude3Portion)
+    assertResult(Angle(2, 18))(result.moonLongitude3Correction.roundToMinutes)
+    // TODO Expected 13°46′, but got 13°45′10″48‴
     // assertResult(Angle(13, 46))(result.longitude4)
-    assertResult(Angle(2, 35))(result.geographicCorrection.roundToMinutes)
-    // TODO Expected 11°11′, but got 10°46′55″30‴
+    // assertResult(Angle(2, 35))(result.geographicCorrection.roundToMinutes)
+    // TODO Expected 11°11′, but got 11°9′50″48‴
     // assertResult(Angle(11, 11))(result.arcOfSighting)
   }
 
   "isSightable calculations" should "be as in KH 17:22" in {
     val result = Calculator.TableCalculator.calculate(Year(4938).month(Month.Name.Iyar).day(2))
     assertResult(Day.Name.Shishi)(result.day.name)
-    // TODO Expected 11°11′, but got 10°28′15″30‴
+    // TODO Expected 11°11′, but got 11°9′50″48‴
     // assertResult(Angle(11, 11))(result.arcOfSighting)
-    // TODO Expected 11°27′, but got 11°10′54″0‴
-    // assertResult(Angle(11, 27))(result.longitude1)
+    assertResult(Angle(11, 27))(result.longitude1.roundToMinutes)
     assertResult(true)(result.isMoonSightable)
   }
 }
