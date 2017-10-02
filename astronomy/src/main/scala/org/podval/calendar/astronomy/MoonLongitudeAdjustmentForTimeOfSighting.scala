@@ -9,6 +9,7 @@ object MoonLongitudeAdjustmentForTimeOfSighting {
   final def calculate(sun: AnglePoint): Angle = {
     import Zodiac._
     def in(from: AnglePoint, to: AnglePoint): Boolean = (from <= sun) && (sun < to)
+
     if (in(Pisces     .middle, Aries      .middle))  Angle(0)     else
     if (in(Aries      .middle, Gemini     .start ))  Angle(0, 15) else
     // TODO 15 in most editions!

@@ -3,9 +3,9 @@ package org.podval.calendar.astronomy
 import org.podval.calendar.angle.AngleNumberSystem.AnglePoint
 import org.podval.calendar.numbers.BigRational
 
-// KH 17:12
 object MoonLongitude3Portion {
 
+  // KH 17:12
   final def calculate(moonLongitude3: AnglePoint): BigRational = {
     import Zodiac._
     def in(constellation1: Constellation, constellation2: Constellation): Boolean =

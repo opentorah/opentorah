@@ -59,10 +59,10 @@ class TextTest extends FlatSpec {
     assertResult(Day.Name.Shabbos)(result.day.name)
     assertResult(AnglePoint(105, 37, 25))(result.sunLongitudeMean)
     assertResult(AnglePoint(86, 45, 23))(result.sunApogee)
-    assertResult(Angle(18, 52, 2))(result.sunCourse)
-    assertResult(Angle(19))(result.sunCourseRounded)
+    assertResult(Angle(18, 52, 2))(result.sunCourseRaw)
+    assertResult(Angle(19))(result.sunCourse)
     assertResult(-Angle(0, 38))(result.sunLongitudeCorrection)
-    assertResult(AnglePoint(104, 59, 25))(result.sunLongitudeTrue)
+    assertResult(AnglePoint(104, 59, 25))(result.sunLongitudeTrueRaw)
   }
 
   "true Moon calculations" should "be as in KH 15:8-9" in {
@@ -76,13 +76,13 @@ class TextTest extends FlatSpec {
     assertResult(Angle(35, 56, 12))(result.doubleElongation)
     assertResult(Angle(5))(result.moonLongitudeDoubleElongationCorrection)
     // TODO printing error in standard editions: 180.
-    // assertResult(AnglePoint(108, 21))(result.moonAnomalyTrue) // TODO 108°21′46″
-    assertResult(AnglePoint(108))(result.moonAnomalyTrueRounded)
+    // assertResult(AnglePoint(108, 21))(result.moonAnomalyTrue) // TODO got 108°21′46″
+    assertResult(AnglePoint(108))(result.moonAnomalyTrue)
     // KH 15:9
     assertResult(-Angle(5, 1))(result.moonAnomalyVisible)
     // TODO printing error in standard editions: 33.
-    assertResult(AnglePoint(48, 35, 39))(result.moonLongitudeTrue)
-    assertResult((Zodiac.Taurus, Angle(18, 36)))(Zodiac.fromAngle(result.moonLongitudeTrueRounded))
+    assertResult(AnglePoint(48, 35, 39))(result.moonLongitudeTrueRaw)
+    assertResult((Zodiac.Taurus, Angle(18, 36)))(Zodiac.fromAngle(result.moonLongitudeTrue))
   }
 
   "moon head calculations" should "be as in KH 16:4-5" in {
@@ -91,8 +91,8 @@ class TextTest extends FlatSpec {
     assertResult(29)(result.daysAfterEpoch)
     // KH 16:5
     assertResult(AnglePoint(182, 29, 37))(result.moonHeadMeanReversed)
-    assertResult(AnglePoint(177, 30, 23))(result.moonHeadMean)
-    assertResult(Zodiac.Virgo.at(Angle(27, 30)))(result.moonHeadMeanRounded)
+    assertResult(AnglePoint(177, 30, 23))(result.moonHeadMeanRaw)
+    assertResult(Zodiac.Virgo.at(Angle(27, 30)))(result.moonHeadMean)
   }
 
   "interpolation of the lattitude" should "be as in KH 16:12" in {
@@ -108,17 +108,17 @@ class TextTest extends FlatSpec {
   "moon lattitude calculations" should "be as in KH 16:19" in {
     val result = Calculator.Text.calculate(Year(4938).month(Month.Name.Iyar).day(2))
     assertResult(Day.Name.Shishi)(result.day.name)
-    assertResult((Zodiac.Taurus, Angle(18, 36)))(Zodiac.fromAngle(result.moonLongitudeTrueRounded))
-    assertResult(Zodiac.Virgo.at(Angle(27, 30)))(result.moonHeadMeanRounded)
-    assertResult(Angle(231, 6))(result.moonLatitudeCourse)
+    assertResult((Zodiac.Taurus, Angle(18, 36)))(Zodiac.fromAngle(result.moonLongitudeTrue))
+    assertResult(Zodiac.Virgo.at(Angle(27, 30)))(result.moonHeadMean)
+    assertResult(Angle(231, 6))(result.moonLatitudeCourseRaw)
     assertResult(Angle(3, 53))(result.moonLatitude)
   }
 
   "arc of sighting calculations" should "be as in KH 17:13-14" in {
     val result = Calculator.Text.calculate(Year(4938).month(Month.Name.Iyar).day(2))
     assertResult(Day.Name.Shishi)(result.day.name)
-    assertResult(Zodiac.Taurus.at(Angle(7, 9)))(result.sunLongitudeTrueRounded)
-    assertResult(Zodiac.Taurus.at(Angle(18, 36)))(result.moonLongitudeTrueRounded)
+    assertResult(Zodiac.Taurus.at(Angle(7, 9)))(result.sunLongitudeTrue)
+    assertResult(Zodiac.Taurus.at(Angle(18, 36)))(result.moonLongitudeTrue)
     assertResult(Angle(3, 53))(result.moonLatitude)
     assertResult(result.moonLatitude)(result.latitude1)
     assertResult(false)(result.isMoonLatitudeNortherly)
