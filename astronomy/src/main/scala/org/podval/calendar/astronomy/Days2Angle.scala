@@ -30,8 +30,6 @@ trait Days2Angle {
 
   val table: Table
 
-  val atEpoch: AnglePoint
-
   val rambamValue: Angle
 
   val almagestValue: Angle

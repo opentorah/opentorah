@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
+import org.podval.calendar.angle.AngleNumberSystem.Angle
 import Days2Angle.Table
 
 object SunLongitudeMean extends Days2Angle {
@@ -16,9 +16,6 @@ object SunLongitudeMean extends Days2Angle {
     final override val month      : Angle = Angle( 28, 35,  1)
     final override val year       : Angle = Angle(348, 55, 15)  // TODO ??
   }
-
-  // KH 12:2
-  final override val atEpoch: AnglePoint = Zodiac.Aries.at(Angle(7, 3, 32))
 
   // Moznaim Rambam in English gives this value in KH 12:1 note 1 (without a reference) as the one
   // Rambam uses in his calculations.

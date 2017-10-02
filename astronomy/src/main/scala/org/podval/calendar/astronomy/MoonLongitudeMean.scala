@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
+import org.podval.calendar.angle.AngleNumberSystem.Angle
 import Days2Angle.Table
 
 object MoonLongitudeMean extends Days2Angle {
@@ -16,10 +16,6 @@ object MoonLongitudeMean extends Days2Angle {
     final override val month      : Angle = Angle( 22,  6, 56)
     final override val year       : Angle = Angle(344, 26, 43)
   }
-
-  // KH 14:4
-  final override val atEpoch: AnglePoint = Zodiac.Taurus.at(Angle(1, 14, 43))
-
 
   // TODO does this correspond to the lunar period?
 
