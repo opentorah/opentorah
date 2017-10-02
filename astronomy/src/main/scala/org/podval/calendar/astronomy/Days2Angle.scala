@@ -77,6 +77,4 @@ object Days2Angle {
       })
     }
   }
-
-  final val keys: Seq[Days] = Seq(10, 100, 1000, 10000, 29, 254)
 }

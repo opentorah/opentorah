@@ -32,6 +32,8 @@ object Angle2Angle {
     def a170: Angle
     def a180: Angle = Angle.zero
 
+    // TODO move interpolation out and implement quadrantification literally as in Rambam
+
     // KH 13:7-8, 15:7
     final def interpolate(angle: Angle): Angle = {
       val (before: Angle, after: Angle) =
@@ -60,6 +62,4 @@ object Angle2Angle {
       before + more
     }
   }
-
-  final val keys: Seq[Angle] = (0 to 18).map(_ * 10).map(Angle(_))
 }
