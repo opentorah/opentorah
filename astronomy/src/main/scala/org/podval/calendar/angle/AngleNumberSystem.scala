@@ -1,7 +1,7 @@
 package org.podval.calendar.angle
 
 import org.podval.calendar.numbers.{IntervalCompanion, NumberSystemMember, PointCompanion,
-  PeriodicNumberSystem, PeriodicPoint}
+  PeriodicNumberSystem}
 
 trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
   trait AngleNumberSystemMember extends NumberSystemMember[AngleNumberSystem] {

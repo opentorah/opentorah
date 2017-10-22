@@ -2,47 +2,50 @@ package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem.{Angle, angleToRadians}
 import Angle2Angle.Table
+
 import scala.math.{abs, asin, cos, pow, round, sin, sqrt}
 
 object MoonAnomalyVisible extends Angle2Angle {
   // As printed
   class Misprinted extends Table {
+    // KH 15:6
+    override val values: Map[Angle, Angle] = Map(
+      Angle(  0) -> Angle(0    ),
+      Angle( 10) -> Angle(0, 50),
+      Angle( 20) -> Angle(1, 38),
+      Angle( 30) -> Angle(2, 24),
+      Angle( 40) -> Angle(3,  6),
+      Angle( 50) -> Angle(3, 44),
+      Angle( 60) -> Angle(4, 16),
+      Angle( 70) -> Angle(4, 41),
+      Angle( 80) -> Angle(5,  0),
+      Angle( 90) -> Angle(5,  5),
+      Angle(100) -> Angle(5,  8),
+      Angle(110) -> Angle(4, 59),
+      Angle(120) -> Angle(4, 20),
+      Angle(130) -> Angle(4, 11),
+      Angle(140) -> Angle(3, 33),
+      Angle(150) -> Angle(3, 48),
+      Angle(160) -> Angle(1, 56),
+      Angle(170) -> Angle(1, 59),
+      Angle(180) -> Angle(0    )
+    )
+
     // KH 15:4, 15:7
     override def calculate(moonAnomalyTrue: Angle): Angle = {
-      // TODO round for MoonAnomalyVisible too?
-      val angle: Angle = moonAnomalyTrue.canonical.roundToDegrees // KH 13:9
-      if (angle < Angle(180)) -interpolate(angle) else
-      if (angle > Angle(180))  interpolate(Angle(360) - angle) else
-        Angle(0)
+      val angle: Angle = moonAnomalyTrue.canonical
+      if (angle <= Angle(180)) -interpolateNg(angle) else interpolateNg(Angle(360) - angle)
     }
-
-    // KH 15:6
-    override val a10 : Angle = Angle(0, 50)
-    override val a20 : Angle = Angle(1, 38)
-    override val a30 : Angle = Angle(2, 24)
-    override val a40 : Angle = Angle(3,  6)
-    override val a50 : Angle = Angle(3, 44)
-    override val a60 : Angle = Angle(4, 16)
-    override val a70 : Angle = Angle(4, 41)
-    override val a80 : Angle = Angle(5,  0)
-    override val a90 : Angle = Angle(5,  5)
-    override val a100: Angle = Angle(5,  8)
-    override val a110: Angle = Angle(4, 59)
-    override val a120: Angle = Angle(4, 20)
-    override val a130: Angle = Angle(4, 11)
-    override val a140: Angle = Angle(3, 33)
-    override val a150: Angle = Angle(3, 48)
-    override val a160: Angle = Angle(1, 56)
-    override val a170: Angle = Angle(1, 59)
   }
 
   final val misprinted: Table = new Misprinted
 
   // Misprints corrected.
   final override val table: Table = new Misprinted {
-    override val a120: Angle = Angle(4, 40)
-    override val a150: Angle = Angle(2, 48)
-    override val a170: Angle = Angle(0, 59)
+    override val values: Map[Angle, Angle] = misprinted.values
+      .updated(Angle(120), Angle(4, 40))
+      .updated(Angle(150), Angle(2, 48))
+      .updated(Angle(170), Angle(0, 59))
   }
 
   def mnasfrome(maslul: Angle, e: Double): Angle = {
