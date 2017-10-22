@@ -80,17 +80,6 @@ class Calculator(epoch: Epoch, calculators: Calculators, rounders: Rounders) {
       Zodiac.Capricorn, Zodiac.Aquarius, Zodiac.Pisces, Zodiac.Aries, Zodiac.Taurus, Zodiac.Gemini
     ))
 
-    val result1: Option[Boolean] =
-      if (inNortherlyInclinedConstellations) {
-        if (longitude1 <= Angle(9)) Some(false)
-        else if (longitude1 > Angle(15)) Some(true)
-        else None
-      } else {
-        if (longitude1 <= Angle(10)) Some(false)
-        else if (longitude1 > Angle(24)) Some(true)
-        else None
-      }
-
     // KH 17:5-6
     val longitudeSightingAdjustment: Angle =
       calculators.moonLongitudeSightingAdjustment(moonLongitudeTrue)
@@ -124,18 +113,18 @@ class Calculator(epoch: Epoch, calculators: Calculators, rounders: Rounders) {
     // KH 17:12
     val geographicCorrection: Angle =
       rounders.geographicCorrection(latitude1*(BigRational(2, 3), defaultLength))
-    val arcOfSighting: Angle =
-      rounders.arcOfSighting(if (isMoonLatitudeNortherly) longitude4 + geographicCorrection
+    val arcOfSighting: Angle = rounders.arcOfSighting(
+      if (isMoonLatitudeNortherly) longitude4 + geographicCorrection
       else longitude4 - geographicCorrection)
 
-    val isMoonSightable: Boolean = result1.getOrElse {
-      // KH 17:15
-      if (arcOfSighting <= Angle(9)) false else
-      if (arcOfSighting > Angle(14)) true else {
-        // KH 17:16-21
-        true // TODO can't understand what Rambam is saying: "from 9 to 10 or more than 10"?!
-      }
-    }
+    // KH 17:3-4,15-21
+    val isMoonSightable: Boolean =
+      MoonSightable.forLongitude1(longitude1, inNortherlyInclinedConstellations).orElse(
+      MoonSightable.forArcOfSighting(arcOfSighting)).getOrElse(
+      MoonSightable.forSightingLimits(arcOfSighting, longitude1)
+    )
+
+    // TODO crescent calculations: KH 18-19!
 
     Calculator.Result(
       day,
