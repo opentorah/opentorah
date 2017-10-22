@@ -1,6 +1,7 @@
 #sudo: false
+# TODO disable unneeded stuff like riak :)
 language: scala
-scala: 2.12.3
+scala: 2.12.4
 jdk: oraclejdk8
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
