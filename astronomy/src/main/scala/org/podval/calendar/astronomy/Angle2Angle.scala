@@ -7,10 +7,10 @@ abstract class Angle2Angle {
   val table: Table
 }
 
-
 object Angle2Angle {
   trait Table {
     def calculate(moonAnomalyTrue: Angle): Angle
+
 
     def a0  : Angle = Angle.zero
     def a10 : Angle
@@ -60,40 +60,16 @@ object Angle2Angle {
       before + more
 
       // TODO move interpolation out and implement quadrantification literally as in Rambam
-//      interpolate(Angle(  0),  a0, Angle( 10), a10)(angle).getOrElse(
-//      interpolate(Angle( 10), a10, Angle( 20), a20)(angle).getOrElse(
-//      interpolate(Angle( 20), a10, Angle( 30), a20)(angle).getOrElse(
-//      interpolate(Angle( 30), a10, Angle( 40), a20)(angle).getOrElse(
-//      interpolate(Angle( 40), a10, Angle( 50), a20)(angle).getOrElse(
-//      interpolate(Angle( 50), a10, Angle( 60), a20)(angle).getOrElse(
-//      interpolate(Angle( 60), a10, Angle( 70), a20)(angle).getOrElse(
-//      interpolate(Angle( 70), a10, Angle( 80), a20)(angle).getOrElse(
-//      interpolate(Angle( 80), a10, Angle( 90), a20)(angle).getOrElse(
-//      interpolate(Angle( 90), a10, Angle(100), a20)(angle).getOrElse(
-//      interpolate(Angle(100), a10, Angle(110), a20)(angle).getOrElse(
-//      interpolate(Angle(110), a10, Angle(120), a20)(angle).getOrElse(
-//      interpolate(Angle(120), a10, Angle(130), a20)(angle).getOrElse(
-//      interpolate(Angle(130), a10, Angle(140), a20)(angle).getOrElse(
-//      interpolate(Angle(140), a10, Angle(150), a20)(angle).getOrElse(
-//      interpolate(Angle(150), a10, Angle(160), a20)(angle).getOrElse(
-//      interpolate(Angle(160), a10, Angle(170), a20)(angle).getOrElse(
-//      interpolate(Angle(170), a10, Angle(180), a20)(angle).getOrElse(
-//        throw new IllegalArgumentException
-//      ))))))))))))))))))
     }
 
     final def interpolate(
       before: Angle,
       beforeValue: Angle,
       after: Angle,
-      afterValue: Angle)(value: Angle): Option[Angle] =
+      afterValue: Angle)(value: Angle): Angle =
     {
-      if ((value < before) || (after <= value)) None else {
-        // TODO generalize for after-before != 10!
-        val reminder: Angle = value.head(value.head % 10)
-        val more: Angle = (afterValue-beforeValue)*(reminder/10)
-        Some(beforeValue + more)
-      }
+      require((value < before) || (after <= value))
+      beforeValue + (afterValue-beforeValue)*((value - before)/(after-before))
     }
   }
 }

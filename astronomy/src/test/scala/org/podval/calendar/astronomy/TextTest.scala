@@ -66,7 +66,11 @@ class TextTest extends FlatSpec {
   }
 
   "true Moon calculations" should "be as in KH 15:8-9" in {
-    val result = Calculator.Text.calculate(Year(4938).month(Month.Name.Iyar).day(2))
+    val month: Month = Year(4938).month(Month.Name.Iyar)
+    val day: Day = month.day(2)
+    val newMoonDay: Day = month.newMoon.day
+    // TODO what is the day of sighting? Not the day of the new moon... assertResult(day)(newMoonDay)
+    val result = Calculator.Text.calculate(day)
     assertResult(Day.Name.Shishi)(result.day.name)
     assertResult(29)(result.daysAfterEpoch)
     assertResult(AnglePoint(35, 38, 33))(result.sunLongitudeMean)
