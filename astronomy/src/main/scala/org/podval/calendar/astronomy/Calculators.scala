@@ -57,5 +57,5 @@ object Calculators {
       MoonLongitude3Portion.calculate
   }
 
-  // TODO hather all misprints into object Misprints extends Calculators
+  // TODO gather all misprints into object Misprints extends Calculators
 }

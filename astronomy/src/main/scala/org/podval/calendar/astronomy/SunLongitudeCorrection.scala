@@ -1,13 +1,12 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem.Angle
-import Angle2Angle.Table
 
 // TODO there are some diagrams in the Moznaim Rambam at this point.
-object SunLongitudeCorrection extends Angle2Angle {
-  final override val table: Table = new Table {
+object SunLongitudeCorrection  {
+  final val table: InterpolatedTable = new InterpolatedTable {
     // KH 13:4
-    override val values: Map[Angle, Angle] = Map(
+    final override val values: Map[Angle, Angle] = Map(
       Angle(  0) -> Angle(0    ),
       Angle( 10) -> Angle(0, 20),
       Angle( 20) -> Angle(0, 40),
@@ -30,9 +29,9 @@ object SunLongitudeCorrection extends Angle2Angle {
     )
 
     // KH 13:2-3
-    override def calculate(sunCourse: Angle): Angle = {
+    final override def calculate(sunCourse: Angle): Angle = {
       val angle: Angle = sunCourse.canonical
-      if (angle <= Angle(180)) -interpolateNg(angle) else interpolateNg(Angle(360) - angle)
+      if (angle <= Angle(180)) -interpolate(angle) else interpolate(Angle(360) - angle)
     }
   }
 }

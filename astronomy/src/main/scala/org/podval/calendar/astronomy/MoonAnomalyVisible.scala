@@ -1,13 +1,12 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem.{Angle, angleToRadians}
-import Angle2Angle.Table
 
 import scala.math.{abs, asin, cos, pow, round, sin, sqrt}
 
-object MoonAnomalyVisible extends Angle2Angle {
+object MoonAnomalyVisible {
   // As printed
-  class Misprinted extends Table {
+  class Misprinted extends InterpolatedTable {
     // KH 15:6
     override val values: Map[Angle, Angle] = Map(
       Angle(  0) -> Angle(0    ),
@@ -32,16 +31,16 @@ object MoonAnomalyVisible extends Angle2Angle {
     )
 
     // KH 15:4, 15:7
-    override def calculate(moonAnomalyTrue: Angle): Angle = {
+    final override def calculate(moonAnomalyTrue: Angle): Angle = {
       val angle: Angle = moonAnomalyTrue.canonical
-      if (angle <= Angle(180)) -interpolateNg(angle) else interpolateNg(Angle(360) - angle)
+      if (angle <= Angle(180)) -interpolate(angle) else interpolate(Angle(360) - angle)
     }
   }
 
-  final val misprinted: Table = new Misprinted
+  final val misprinted: InterpolatedTable = new Misprinted
 
   // Misprints corrected.
-  final override val table: Table = new Misprinted {
+  final val table: InterpolatedTable = new Misprinted {
     override val values: Map[Angle, Angle] = misprinted.values
       .updated(Angle(120), Angle(4, 40))
       .updated(Angle(150), Angle(2, 48))
