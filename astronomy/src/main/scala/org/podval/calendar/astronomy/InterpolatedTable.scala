@@ -11,12 +11,16 @@ trait InterpolatedTable {
   final def interpolate(argument: Angle): Angle = {
     // TODO presort to avoid constant sorting...
     val (before: Angle, beforeValue: Angle) = values.filter(_._1 <= argument).toList.maxBy(_._1)
-    val (after : Angle, afterValue : Angle) = values.filter(_._1 >  argument).toList.minBy(_._1)
-    val change: Angle = afterValue - beforeValue
     val reminder: Angle = argument - before
-    val span: Angle = after - before
-    val portion: BigRational = reminder.toRational/span.toRational
-    val more = change*(portion, AngleNumberSystem.defaultLength)
+    val more = if (reminder.isZero) {
+      Angle.zero
+    } else {
+      val (after : Angle, afterValue : Angle) = values.filter(_._1 >  argument).toList.minBy(_._1)
+      val change: Angle = afterValue - beforeValue
+      val span: Angle = after - before
+      val portion: BigRational = reminder.toRational/span.toRational
+      change*(portion, AngleNumberSystem.defaultLength)
+    }
     val result = beforeValue + more
     result
   }
