@@ -1,3 +1,7 @@
+// If I annotate the test classes to use ScalaTest's JUnit runner, Idea doesn't give me an option
+// to run/debug individual test methods (in addition to this annotation noise);
+// if I use ScalaTest Gradle plugin, there is no way (currently) to get rid of the all
+// build-time test-related noise :(
 plugins {
   id "com.github.maiflai.scalatest" version "0.18" apply false
 }
@@ -39,7 +43,6 @@ ext.lib = [
   'com.typesafe.zinc:zinc:0.3.15',
 //    'org.scala-sbt:zinc:1.0',
   scala     : "org.scala-lang:scala-library:$scalaVersion",
-  junit     : 'junit:junit:4.12',
   scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.3",
   pegdown   : 'org.pegdown:pegdown:1.4.2', // for scalatest reports
   scalaCheck: "org.scalacheck:scalacheck_${scalaVersionMajor}:1.13.4"
@@ -84,7 +87,7 @@ project(':dates') {
   dependencies {
     zinc lib.zinc
     compile lib.scala
-    testImplementation lib.junit, lib.scalaTest, lib.scalaCheck
+    testImplementation lib.scalaTest, lib.scalaCheck
     testRuntime lib.pegdown
   }
 
@@ -115,7 +118,7 @@ project(':astronomy') {
   dependencies {
     zinc lib.zinc
     compile lib.scala, project(':dates')
-    testImplementation lib.junit, lib.scalaTest
+    testImplementation lib.scalaTest
     testRuntime lib.pegdown
   }
 
@@ -133,7 +136,7 @@ project(':generate') {
   dependencies {
     zinc lib.zinc
     compile lib.scala, project(':dates')
-    testImplementation lib.junit, lib.scalaTest
+    testImplementation lib.scalaTest
     testRuntime lib.pegdown
   }
 
