@@ -1,6 +1,9 @@
 plugins {
   id "com.github.maiflai.scalatest" version "0.18" apply false
 }
+
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 apply plugin: 'idea'
 
 idea {
@@ -85,13 +88,11 @@ project(':dates') {
     testRuntime lib.pegdown
   }
 
-  // TODO suppress logging of non-failing tests to standard output.
-//  test {
-//    testLogging {
-//      showStandardStreams = true
-//      quiet.events = ["failed", "skipped"]
-//    }
-//  }
+  test {
+    testLogging {
+      test.testLogging.events = [TestLogEvent.FAILED]
+    }
+  }
 
   install {
     repositories.mavenInstaller {
@@ -117,6 +118,12 @@ project(':astronomy') {
     testImplementation lib.junit, lib.scalaTest
     testRuntime lib.pegdown
   }
+
+  test {
+    testLogging {
+      test.testLogging.events = [TestLogEvent.FAILED]
+    }
+  }
 }
 
 project(':generate') {
@@ -128,5 +135,11 @@ project(':generate') {
     compile lib.scala, project(':dates')
     testImplementation lib.junit, lib.scalaTest
     testRuntime lib.pegdown
+  }
+
+  test {
+    testLogging {
+      test.testLogging.events = [TestLogEvent.FAILED]
+    }
   }
 }
