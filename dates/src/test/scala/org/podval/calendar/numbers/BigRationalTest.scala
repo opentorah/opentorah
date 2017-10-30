@@ -3,7 +3,6 @@ package org.podval.calendar.numbers
 import org.scalatest.FlatSpec
 import BigRational.{zero, oneHalf, one}
 
-@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class BigRationalTest extends FlatSpec {
   val minusThreeHalfs: BigRational = BigRational(-3, 2)
 

@@ -3,7 +3,6 @@ package org.podval.calendar.astronomy
 import org.scalatest.FlatSpec
 import org.podval.calendar.angle.AngleNumberSystem.Angle
 
-@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MoonAnomalyVisibleTest extends FlatSpec {
 
   behavior of "Anomaly"

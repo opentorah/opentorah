@@ -4,7 +4,6 @@ import org.scalatest.FlatSpec
 import Jewish.{Day, Month, MonthName, Year}
 import Month.Name._
 
-@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class DatesTest extends FlatSpec {
 
   "known dates" should "have correct day of the week" in {

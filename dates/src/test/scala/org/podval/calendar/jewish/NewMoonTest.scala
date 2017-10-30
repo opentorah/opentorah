@@ -7,7 +7,6 @@ import org.podval.calendar.gregorian.Gregorian.Month.Name._
 import Jewish.Day.Name._
 import Jewish.Month.Name._
 
-@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class NewMoonTest extends FlatSpec {
 
   "new moons from the printed tables" should "calculate correctly" in {

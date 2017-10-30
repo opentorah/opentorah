@@ -4,7 +4,6 @@ import org.scalatest.FlatSpec
 import org.podval.calendar.numbers.BigRational
 import SimpleTimeNumberSystem.{Interval, Point}
 
-@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class TimeNumberSystemTest extends FlatSpec {
 
   val s: SimpleTimeNumberSystem.type = SimpleTimeNumberSystem

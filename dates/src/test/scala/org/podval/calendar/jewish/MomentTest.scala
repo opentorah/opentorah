@@ -3,7 +3,6 @@ package org.podval.calendar.jewish
 import org.scalatest.FlatSpec
 import Jewish.TimeInterval
 
-@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class MomentTest extends FlatSpec {
 
   "Moment components" should "be correct" in {

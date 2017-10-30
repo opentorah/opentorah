@@ -11,7 +11,6 @@ import JewishYearCompanion.{normalYear, leapYear}
 /**
  * Tests based on the statements from the text itself.
  */
-@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TextTest extends FlatSpec {
   "time units" should "be as in KH 6:2" in {
     assertResult(  24)(hoursPerDay)

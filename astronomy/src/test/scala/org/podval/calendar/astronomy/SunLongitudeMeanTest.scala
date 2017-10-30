@@ -5,7 +5,6 @@ import org.podval.calendar.angle.AngleNumberSystem.{Angle, period}
 import org.podval.calendar.jewish
 import jewish.Jewish
 
-@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class SunLongitudeMeanTest extends FlatSpec {
 
   behavior of "Mean Sun Longitude"

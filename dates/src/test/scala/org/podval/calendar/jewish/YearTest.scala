@@ -2,7 +2,6 @@ package org.podval.calendar.jewish
 
 import org.scalatest.FlatSpec
 
-@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 final class YearTest extends FlatSpec {
 
   private val years = (1 to 6000) map (Jewish.Year(_))

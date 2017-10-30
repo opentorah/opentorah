@@ -8,7 +8,6 @@ import org.podval.calendar.jewish.{Cycle, Jewish}
 import Jewish.{Day, Month, Year}
 import org.podval.calendar.numbers.BigRational
 
-@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TextTest extends FlatSpec {
   "angle units" should "be as in KH 11:7" in {
     assertResult(360)(headRange)

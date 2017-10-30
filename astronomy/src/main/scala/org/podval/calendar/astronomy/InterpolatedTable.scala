@@ -12,9 +12,7 @@ trait InterpolatedTable {
     // TODO presort to avoid constant sorting...
     val (before: Angle, beforeValue: Angle) = values.filter(_._1 <= argument).toList.maxBy(_._1)
     val reminder: Angle = argument - before
-    val more = if (reminder.isZero) {
-      Angle.zero
-    } else {
+    val more = if (reminder.isZero) Angle.zero else {
       val (after : Angle, afterValue : Angle) = values.filter(_._1 >  argument).toList.minBy(_._1)
       val change: Angle = afterValue - beforeValue
       val span: Angle = after - before

@@ -4,7 +4,6 @@ import org.scalatest.FlatSpec
 
 import AngleNumberSystem.Angle
 
-@org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class AngleTest extends FlatSpec {
 
   behavior of "Angle"
