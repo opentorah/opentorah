@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.scalatest.FlatSpec
-import Jewish.{Day, Month, MonthName, Year}
+import Jewish.{Day, Month, Year}
 import Month.Name._
 
 final class DatesTest extends FlatSpec {
@@ -17,7 +17,7 @@ final class DatesTest extends FlatSpec {
     test(5769, Nisan  , 14)
   }
 
-  private def test(yearNumber: Int, monthName: MonthName, dayNumber: Int) {
+  private def test(yearNumber: Int, monthName: Month.Name, dayNumber: Int) {
     val year = Year(yearNumber)
     assertResult(yearNumber)(year.number)
 
