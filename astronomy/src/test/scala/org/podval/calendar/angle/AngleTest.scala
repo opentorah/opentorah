@@ -42,7 +42,7 @@ class AngleTest extends FlatSpec {
   it should "compare correctly" in {
     assertResult(Angle(0, 0, 0))(Angle(-0))
     assertResult(Angle(15))(Angle(15))
-    assertResult(Angle(15))(Angle(-345))
+    assertResult(Angle(15))(Angle(-345).canonical)
   }
 
   it should "normalize and canonicalize correctly" in {
@@ -82,5 +82,12 @@ class AngleTest extends FlatSpec {
     assertResult(Angle( 30))(Angle(  0) - Angle(-30))
     assertResult(Angle( 60))(Angle( 30) - Angle(-30))
     assertResult(Angle(-60))(Angle(-30) - Angle( 30))
+  }
+
+  "angles" should "multiply correctly" in {
+    assertResult(Angle(180))(Angle(90)*2)
+    assertResult(Angle(270))(Angle(90)*3)
+    assertResult(Angle(360))(Angle(90)*4)
+    assertResult(Angle(450))(Angle(90)*5)
   }
 }

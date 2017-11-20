@@ -50,7 +50,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   }
 
   final def compare(left: Seq[Int], right: Seq[Int]): Int =
-    zipWith(canonical(left), canonical(right), _ compare _).find (_ != 0) getOrElse 0
+    zipWith(simple(left), simple(right), _ compare _).find (_ != 0) getOrElse 0
 
   final def abs(digits: Seq[Int]): Seq[Int] = simple(digits).map(math.abs)
 

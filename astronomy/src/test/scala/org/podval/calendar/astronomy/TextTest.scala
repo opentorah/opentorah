@@ -34,7 +34,7 @@ class TextTest extends FlatSpec {
   }
 
   "angles" should "subtract as in KH 11:12" in {
-    assertResult(AnglePoint(259, 29, 50))(AnglePoint(100, 20, 30) - Angle(200, 50, 40))
+    assertResult(AnglePoint(259, 29, 50))((AnglePoint(100, 20, 30) - Angle(200, 50, 40)).canonical)
   }
 
   "epoch" should "be as in KH 11:16" in {
@@ -94,8 +94,8 @@ class TextTest extends FlatSpec {
     assertResult(29)(result.daysAfterEpoch)
     // KH 16:5
     assertResult(AnglePoint(182, 29, 37))(result.moonHeadMeanReversed)
-    assertResult(AnglePoint(177, 30, 23))(result.moonHeadMeanRaw)
-    assertResult(Zodiac.Virgo.at(Angle(27, 30)))(result.moonHeadMean)
+    assertResult(AnglePoint(177, 30, 23))(result.moonHeadMeanRaw.canonical)
+    assertResult(Zodiac.Virgo.at(Angle(27, 30)))(result.moonHeadMean.canonical)
   }
 
   "interpolation of the lattitude" should "be as in KH 16:12" in {
@@ -112,7 +112,7 @@ class TextTest extends FlatSpec {
     val result = Calculator.Text.calculate(Year(4938).month(Month.Name.Iyar).day(2))
     assertResult(Day.Name.Shishi)(result.day.name)
     assertResult(Zodiac.Taurus.at(Angle(18, 36)))(result.moonLongitudeTrue)
-    assertResult(Zodiac.Virgo .at(Angle(27, 30)))(result.moonHeadMean)
+    assertResult(Zodiac.Virgo .at(Angle(27, 30)))(result.moonHeadMean.canonical)
     assertResult(Angle(231, 6))(result.moonLatitudeCourseRaw)
     assertResult(Angle(3, 53))(result.moonLatitude)
   }
