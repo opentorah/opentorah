@@ -38,18 +38,29 @@ trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
 
   final override def headSign: String = "°"
 
+  import AngleNumberSystem.Position
+
   final override val signPartial: PartialFunction[Int, String] = {
-    case 0 => "′"
-    case 1 => "″"
-    case 2 => "‴"
+    case Position.MINUTES => "′"
+    case Position.SECONDS => "″"
+    case Position.THIRDS  => "‴"
   }
 
-  final override val defaultLength: Int = 3
+  final override val defaultLength: Int = Position.default
 }
 
 
 object AngleNumberSystem extends AngleNumberSystem {
   import scala.language.implicitConversions
+
+  // TODO use in roundTo()...
+  object Position {
+    final val MINUTES: Int = 0
+    final val SECONDS: Int = 1
+    final val THIRDS : Int = 2
+
+    final val default = 3
+  }
 
   implicit def angleToRadians(angle: Angle): Double = angle.toRadians
 }
