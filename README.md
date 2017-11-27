@@ -5,13 +5,13 @@
 
 I want to be able to do various things with the fixed Jewish calendar:
 
--[x] code Rambam's calculations (and verify Rambam's numerical examples)
--[x] convert dates from Jewish calendar to Gregorian and back
--[x] list [dates of Birchas Hachamo](https://docs.google.com/document/d/1hpPZ0LYU3p8a-LJRXEqzXig-VQthkQ_MkaY79PMqr-Y/edit?hl=en_US)
--[x] generate schedule of learning Rambam
--[ ] generate haftorah and torah reading schedule
--[ ] generate monthly calendars with both kinds of dates
--[ ] automate vestos calculations
+- [x] code Rambam's calculations (and verify Rambam's numerical examples)
+- [x] convert dates from Jewish calendar to Gregorian and back
+- [x] list [dates of Birchas Hachamo](https://docs.google.com/document/d/1hpPZ0LYU3p8a-LJRXEqzXig-VQthkQ_MkaY79PMqr-Y/edit?hl=en_US)
+- [x] generate schedule of learning Rambam
+- [ ] generate haftorah and torah reading schedule
+- [ ] generate monthly calendars with both kinds of dates
+- [ ] automate vestos calculations
 
 For my needs, the best source of information on the Jewish Calendar turned out
 to be Rambam, the Laws of the Sanctification of the Moon, Chapters 6-10.
@@ -21,17 +21,17 @@ formulas from it were not used directly.
 I want to do certain things with the astronomical calendar as described by Rambam
 in Chapters 11-19:
 
--[ ] code Rambam's calculations (and verify Rambam's numerical examples)
--[ ] reconstruct actual parameters from the numbers given by Rambam
--[ ] verify Rambam's tables and rounding decisions against his models
--[ ] analyze impact of various misprints on the sighting calculations 
--[ ] analyze correspondence with the fixed calendar
--[ ] reconstruct models that Rambam uses, in contemporary (ancient Greek?) terminology and notation
--[ ] describe the models with diagrams and formulae
--[ ] reconstruct parameters of the models from the numbers given by Rambam 
--[ ] see how Rambam's calculations of the moon visibility compare to the current models
--[ ] translate relevant chapters into English
--[ ] calculate halachic times (zmanim)
+- [ ] code Rambam's calculations (and verify Rambam's numerical examples)
+- [ ] reconstruct actual parameters from the numbers given by Rambam
+- [ ] verify Rambam's tables and rounding decisions against his models
+- [ ] analyze impact of various misprints on the sighting calculations 
+- [ ] analyze correspondence with the fixed calendar
+- [ ] reconstruct models that Rambam uses, in contemporary (ancient Greek?) terminology and notation
+- [ ] describe the models with diagrams and formulae
+- [ ] reconstruct parameters of the models from the numbers given by Rambam 
+- [ ] see how Rambam's calculations of the moon visibility compare to the current models
+- [ ] translate relevant chapters into English
+- [ ] calculate halachic times (zmanim)
 
 
 ## Early Jewish Years
