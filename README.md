@@ -1,7 +1,7 @@
-#Jewish Calendar
+# Jewish Calendar
 (Understanding the ignored for fun and schar.)
 
-##Goals
+## Goals
 
 I want to be able to do various things with the fixed Jewish calendar:
 
@@ -34,12 +34,12 @@ in Chapters 11-19:
 -[ ] calculate halachic times (zmanim)
 
 
-##Early Jewish Years
+## Early Jewish Years
 
 Jewish years before the adoption of the fixed calendar were structured by the Bes Din.
 I'd like to have an official record of what they were. Rabbi Hai Gaon? Seder Olam?
 
-##Zmanim
+## Zmanim
 
 There is an Android application; it references some kind of an "engine".
 Mushinsky knows something too.
@@ -50,14 +50,14 @@ There it is produced in accordance with the algorithm described in the Meese's b
 Another source of data is http://www.timeanddate.com/worldclock/sunrise.html.
 
 
-##Joda Time
+## Joda Time
 
 As a good open-source citizen I probably should integrate my implementation of
 the Jewish calendar into [Joda Time](http://joda-time.sourceforge.net/) or
 [JSR 130](http://jcp.org/en/jsr/detail?id=310) (although the latter is inactive,
 the article [New Java Date and Time API](http://today.java.net/pub/a/today/2008/09/18/jsr-310-new-java-date-time-api.html) notwithstanding). 
 
-##Google Calendar Integration
+## Google Calendar Integration
 
 It'd be nice to integrate with the Google Calendar.
 
