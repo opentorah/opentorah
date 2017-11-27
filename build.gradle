@@ -189,7 +189,7 @@ project(':astronomy') {
         pom.withXml {
           def root = asNode()
           root.appendNode('description', artifactInfo.description)
-          root.appendNode('name', artifactInfo.name)
+          root.appendNode('name'       , artifactInfo.name)
           root.children().last() + pomConfig
         }
       }
