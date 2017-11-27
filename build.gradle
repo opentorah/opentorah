@@ -112,7 +112,7 @@ def pomConfig = {
 
 def bintrayInfo = [
   user: 'dubinsky',
-  password: bintrayApiKey,
+  password: findProperty('bintrayApiKey'),
   repository: 'org.podval'
 ]
 
