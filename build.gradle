@@ -1,12 +1,60 @@
+// TODO
 // If I annotate the test classes to use ScalaTest's JUnit runner, Idea doesn't give me an option
 // to run/debug individual test methods (in addition to this annotation noise);
 // if I use ScalaTest Gradle plugin, there is no way (currently) to get rid of the all
 // build-time test-related noise :(
 plugins {
   id "com.github.maiflai.scalatest" version "0.18" apply false
+  id "com.jfrog.artifactory" version "4.5.4" apply false
+  id "com.jfrog.bintray" version "1.7.3" apply false
 }
 
-import org.gradle.api.tasks.testing.logging.TestLogEvent
+// TODO factor out commonality in publishing into defs.
+
+def scalaVersion      = '2.12.4'
+def scalaVersionMajor = '2.12'
+
+ext.lib = [
+  zinc      : 'com.typesafe.zinc:zinc:0.3.15',
+//  "org.scala-sbt:zinc_${scalaVersionMajor}:1.0.3"
+  scala     : "org.scala-lang:scala-library:$scalaVersion",
+  scalaCheck: "org.scalacheck:scalacheck_${scalaVersionMajor}:1.13.4",
+  scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.4",
+  pegdown   : 'org.pegdown:pegdown:1.4.2' // for scalatest reports
+]
+
+allprojects {
+  repositories {
+    jcenter()
+  }
+
+  group = 'org.podval.calendar'
+  version = '0.1.1'
+}
+
+subprojects {
+  apply plugin: 'scala'
+  apply plugin: 'com.github.maiflai.scalatest'
+  apply plugin: 'maven-publish'
+  apply plugin: 'com.jfrog.bintray'
+
+  dependencies {
+    zinc lib.zinc
+    compile lib.scala
+    testImplementation lib.scalaCheck, lib.scalaTest, lib.pegdown
+  }
+
+  test {
+    testLogging {
+      test.testLogging.events = [org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED]
+    }
+  }
+
+  task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+  }
+}
 
 apply plugin: 'idea'
 
@@ -24,35 +72,21 @@ idea {
   }
 }
 
-//jar.baseName = 'org.podval.calendar.dates'
+def gitHubRepository    = "jewish-calendar/calendar"
+def gitHubRepositoryUrl = "https://github.com/${gitHubRepository}"
 
-allprojects {
-  repositories {
-    jcenter()
-  }
-
-  group = 'org.podval.calendar'
-  version = '1.0-SNAPSHOT'
-}
-
-def scalaVersion      = '2.12.4'
-def scalaVersionMajor = '2.12'
-
-ext.lib = [
-  zinc      : 'com.typesafe.zinc:zinc:0.3.15',
-//  "org.scala-sbt:zinc_${scalaVersionMajor}:1.0.3"
-  scala     : "org.scala-lang:scala-library:$scalaVersion",
-  scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.4",
-  pegdown   : 'org.pegdown:pegdown:1.4.2', // for scalatest reports
-  scalaCheck: "org.scalacheck:scalacheck_${scalaVersionMajor}:1.13.4"
+def artifactUrls = [
+  siteUrl  : "${gitHubRepositoryUrl}",
+  issuesUrl: "${gitHubRepositoryUrl}/issues",
+  vcsUrl   : "${gitHubRepositoryUrl}.git"
 ]
 
-// TODO add GIT scm link
 def pomConfig = {
-  description 'Jewish Calendar Dates.'
+  url artifactUrls.siteUrl
+  scm { url artifactUrls.siteUrl }
   licenses {
     license {
-      name = 'The Apache Software License, Version 2.0'
+      name 'The Apache Software License, Version 2.0'
       url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
       distribution 'repo'
       comments 'A business-friendly OSS license'
@@ -60,88 +94,113 @@ def pomConfig = {
   }
   organization {
     name 'Podval Group'
-    url 'http://www.podval.org'  // http://www.jewish-calendar.org/
+    url 'http://www.podval.org'
   }
   developers {
     developer {
       id 'dub'
       name 'Leonid Dubinsky'
       email 'dub@podval.org'
-      url 'http:dub.podval.org'
+      url 'http://dub.podval.org'
       organization 'Podval Group'
       organizationUrl 'http://www.podval.org'
-      roles {
-        role 'developer'
-      }
+      roles { role 'developer' }
       timezone '-5'
     }
   }
 }
 
+def bintrayInfo = [
+  user: 'dubinsky',
+  password: bintrayApiKey,
+  repository: 'org.podval'
+]
+
+def bintrayConfig = {
+  user         = bintrayInfo.user
+  key          = bintrayInfo.password
+  publications = ['mavenPublication']
+  dryRun       = false
+  publish      = true
+  override     = false
+  pkg {
+    repo                   = bintrayInfo.repository
+    name                   = project.group
+    desc                   = 'Jewish Calendar'
+    websiteUrl             = artifactUrls.siteUrl
+    issueTrackerUrl        = artifactUrls.issuesUrl
+    vcsUrl                 = artifactUrls.vcsUrl
+    githubRepo             = gitHubRepository
+    licenses               = ['Apache-2.0']
+    labels                 = ['Scala', 'Calendar', 'Jewish']
+    publicDownloadNumbers  = true
+    githubReleaseNotesFile = 'README.md'
+    version { name         = project.version }
+  }
+}
+
 project(':dates') {
-  apply plugin: 'scala'
-  apply plugin: 'com.github.maiflai.scalatest'
-  apply plugin: 'maven'
+  def artifactInfo = [
+    id: 'org.podval.calendar.dates',
+    name: 'jewish-calendar-dates',
+    description: 'Jewish Calendar Dates.'
+  ]
 
-  dependencies {
-    zinc lib.zinc
-    compile lib.scala
-    testImplementation lib.scalaTest, lib.scalaCheck
-    testRuntime lib.pegdown
-  }
+  publishing {
+    publications {
+      mavenPublication(MavenPublication) {
+        artifactId artifactInfo.id
 
-  test {
-    testLogging {
-      test.testLogging.events = [TestLogEvent.FAILED]
+        from components.java
+        artifact sourceJar
+
+        pom.withXml {
+          def root = asNode()
+          root.appendNode('description', artifactInfo.description)
+          root.appendNode('name'       , artifactInfo.name       )
+          root.children().last() + pomConfig
+        }
+      }
     }
   }
 
-  install {
-    repositories.mavenInstaller {
-      pom.project pomConfig
-    }
-  }
-
-  uploadArchives {
-    repositories.mavenDeployer {
-//    repository(...)
-      pom.project pomConfig
-    }
-  }
+  bintray bintrayConfig
 }
 
 project(':astronomy') {
-  apply plugin: 'scala'
-  apply plugin: 'com.github.maiflai.scalatest'
-
   dependencies {
-    zinc lib.zinc
     compile lib.scala, project(':dates')
-    testImplementation lib.scalaTest
-    testRuntime lib.pegdown
   }
 
-  test {
-    testLogging {
-      test.testLogging.events = [TestLogEvent.FAILED]
+  def artifactInfo = [
+    id         : 'org.podval.calendar.astronomy',
+    name       : 'jewish-calendar-astronomy',
+    description: 'Jewish Calendar Astronomy.'
+  ]
+
+  publishing {
+    publications {
+      mavenPublication(MavenPublication) {
+        artifactId artifactInfo.id
+
+        from components.java
+        artifact sourceJar
+
+        pom.withXml {
+          def root = asNode()
+          root.appendNode('description', artifactInfo.description)
+          root.appendNode('name', artifactInfo.name)
+          root.children().last() + pomConfig
+        }
+      }
     }
   }
+
+  bintray bintrayConfig
 }
 
 project(':generate') {
-  apply plugin: 'scala'
-  apply plugin: 'com.github.maiflai.scalatest'
-
   dependencies {
-    zinc lib.zinc
-    compile lib.scala, project(':dates')
-    testImplementation lib.scalaTest
-    testRuntime lib.pegdown
-  }
-
-  test {
-    testLogging {
-      test.testLogging.events = [TestLogEvent.FAILED]
-    }
+    compile project(':dates')
   }
 }
