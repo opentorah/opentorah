@@ -78,7 +78,7 @@ class TextTest extends FlatSpec {
     assertResult(TimeInterval().hours(1).parts(485))(
       yearOfShmuel*Cycle.yearsInCycle - Cycle.cycleLength)
     // KH 9:2
-    assertResult(TimeInterval().days(91).hours(7).halfHour)(Seasons.Shmuel.seasonLength)
+    assertResult(TimeInterval().days(91).hours(7).halfHour)(SeasonsFixed.Shmuel.seasonLength)
   }
 
   "leap years" should "be as in KH 6:11" in {
@@ -113,32 +113,32 @@ class TextTest extends FlatSpec {
   }
 
   "first tkufas Nisan for Shmuel" should "as in KH 9:3-4" in {
-    assertResult(Year(1).month(Month.Name.Nisan).newMoon)(Seasons.firstMoladNisan)
+    assertResult(Year(1).month(Month.Name.Nisan).newMoon)(SeasonsFixed.firstMoladNisan)
     assertResult(TimeInterval().days(7).hours(9).parts(642))(
-      Seasons.firstMoladNisan - Seasons.Shmuel.firstTkufasNisan)
+      SeasonsFixed.firstMoladNisan - SeasonsFixed.Shmuel.firstTkufasNisan)
     // TODO more tests from 9:4
-    assertResult(Day.Name.Rvii)(Seasons.Shmuel.firstTkufasNisan.day.name)
+    assertResult(Day.Name.Rvii)(SeasonsFixed.Shmuel.firstTkufasNisan.day.name)
   }
 
   "tkufos of 4930" should "be as in KH 9:5-8" in {
     val year: Year = Year(4930)
-    val tkufasNisan = Seasons.Shmuel.tkufasNisan(year)
+    val tkufasNisan = SeasonsFixed.Shmuel.tkufasNisan(year)
     assertResult(Day.Name.Chamishi)(tkufasNisan.day.name)
     assertResult(TimeInterval().hours(6))(tkufasNisan.time)
 
-    val tkufasTammuz = Seasons.Shmuel.tkufasTammuz(year)
+    val tkufasTammuz = SeasonsFixed.Shmuel.tkufasTammuz(year)
     assertResult(Day.Name.Chamishi)(tkufasTammuz.day.name)
     assertResult(TimeInterval().hours(13).halfHour)(tkufasTammuz.time)
 
-    val tkufasTishrei = Seasons.Shmuel.tkufasTishrei(year)
+    val tkufasTishrei = SeasonsFixed.Shmuel.tkufasTishrei(year)
     assertResult(Day.Name.Chamishi)(tkufasTishrei.day.name)
     assertResult(TimeInterval().hours(21))(tkufasTishrei.time)
 
-    val tkufasTeves = Seasons.Shmuel.tkufasTeves(year)
+    val tkufasTeves = SeasonsFixed.Shmuel.tkufasTeves(year)
     assertResult(Day.Name.Shishi)(tkufasTeves.day.name)
     assertResult(TimeInterval().hours(4).halfHour)(tkufasTeves.time)
 
-    val nextTkufasNisan = Seasons.Shmuel.tkufasNisan(year+1)
+    val nextTkufasNisan = SeasonsFixed.Shmuel.tkufasNisan(year+1)
     assertResult(Day.Name.Shishi)(nextTkufasNisan.day.name)
     assertResult(TimeInterval().hours(12))(nextTkufasNisan.time)
 
@@ -151,14 +151,14 @@ class TextTest extends FlatSpec {
     assertResult(TimeInterval())(yearOfRavAda*Cycle.yearsInCycle - Cycle.cycleLength)
     // KH 10:2
     assertResult(TimeInterval().days(91).hours(7).parts(519).moments(31))(
-      Seasons.RavAda.seasonLength)
+      SeasonsFixed.RavAda.seasonLength)
   }
 
   "first tkufas Nisan for RavAda" should "as in KH 10:3-4" in {
     assertResult(TimeInterval().hours(9).parts(642))(
-      Seasons.firstMoladNisan - Seasons.RavAda.firstTkufasNisan)
+      SeasonsFixed.firstMoladNisan - SeasonsFixed.RavAda.firstTkufasNisan)
     // TODO more tests from 10:3-4
-    assertResult(Day.Name.Rvii)(Seasons.RavAda.firstTkufasNisan.day.name)
+    assertResult(Day.Name.Rvii)(SeasonsFixed.RavAda.firstTkufasNisan.day.name)
   }
 
   // TODO KH 10:7 check that real vernal equinox is approximately two days before the mean one

@@ -5,6 +5,7 @@ import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint, defaultLe
 import org.podval.calendar.numbers.BigRational
 
 class Calculator(epoch: Epoch, calculators: Calculators, rounders: Rounders) {
+
   def calculate(day: Day): Calculator.Result = {
     val daysAfterEpoch: Int = epoch.daysAfterEpoch(day)
 
@@ -173,6 +174,21 @@ class Calculator(epoch: Epoch, calculators: Calculators, rounders: Rounders) {
       arcOfSighting,
       isMoonSightable
     )
+  }
+
+  // TODO calculate for a moment, not just day.
+  def sunLongitudeTrue(day: Day): AnglePoint = {
+    val daysAfterEpoch: Int = epoch.daysAfterEpoch(day)
+
+    val sunLongitudeMean: AnglePoint =
+      epoch.sunLongitudeMean + calculators.sunLongitudeMean(daysAfterEpoch)
+
+    val sunApogee: AnglePoint = epoch.sunApogee + calculators.sunApogee(daysAfterEpoch)
+
+    // KH 13:1-3,5-6 (maslul; mnas hamaslul)
+    val sunCourse: Angle = rounders.sunCourse(sunLongitudeMean - sunApogee)
+    val sunLongitudeCorrection: Angle = calculators.sunLongitudeCorrection(sunCourse)
+    rounders.sunLongitudeTrue(sunLongitudeMean + sunLongitudeCorrection)
   }
 }
 

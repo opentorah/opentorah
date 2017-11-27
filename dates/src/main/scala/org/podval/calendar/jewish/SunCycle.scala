@@ -12,5 +12,5 @@ object SunCycle {
   // It never happens on Passover.
   // It happens more often than on the Passover Eve on 7 days.
   def birkasHachama(cycle: Int): Moment =
-    Seasons.Shmuel.firstTkufasNisan + yearOfShmuel * 28 * cycle + TimeInterval().hours(12)
+    SeasonsFixed.Shmuel.firstTkufasNisan + yearOfShmuel * 28 * cycle + TimeInterval().hours(12)
 }
