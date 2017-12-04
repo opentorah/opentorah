@@ -1,10 +1,22 @@
 package org.podval.calendar.numbers
 
 import org.scalatest.FlatSpec
-import BigRational.{zero, oneHalf, one}
+import org.scalatest.Matchers
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalacheck.{Arbitrary, Gen}
+import Arbitrary.arbitrary
 
-final class BigRationalTest extends FlatSpec {
+import BigRational.{one, oneHalf, zero}
+
+final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matchers {
   val minusThreeHalfs: BigRational = BigRational(-3, 2)
+
+  def rationals: Gen[BigRational] =
+    for {
+      // TODO figure out how to make BigInts and use Gen.nonEmptyListOf(Arbitrary.arbitrary[Int]).map()
+      numerator <- arbitrary[Int]
+      denominator <- arbitrary[Int] if denominator != 0
+    } yield BigRational(numerator, denominator)
 
   "apply()" should "be correct" in {
     assertThrows[ArithmeticException](BigRational(1, 0))
@@ -36,6 +48,14 @@ final class BigRationalTest extends FlatSpec {
     assertResult(BigRational(3, 2))(minusThreeHalfs.abs)
   }
 
+  "invert()" should "be correct" in {
+    assertThrows[ArithmeticException](zero.invert)
+    assertResult(one+one)(oneHalf.invert)
+    assertResult(BigRational(-2, 3))(minusThreeHalfs.invert)
+
+    forAll(rationals) { r => whenever (r.numerator != 0) { r.invert.invert should be (r) }}
+  }
+
   "+()" should "be correct" in {
     assertResult(zero)(zero+zero)
     assertResult(-one)(oneHalf+minusThreeHalfs)
@@ -44,12 +64,6 @@ final class BigRationalTest extends FlatSpec {
   "-()" should "be correct" in {
     assertResult(zero)(zero-zero)
     assertResult(one*2)(oneHalf-minusThreeHalfs)
-  }
-
-  "invert()" should "be correct" in {
-    assertThrows[ArithmeticException](zero.invert)
-    assertResult(one+one)(oneHalf.invert)
-    assertResult(BigRational(-2, 3))(minusThreeHalfs.invert)
   }
 
   "*(Int)" should "be correct" in {
@@ -90,7 +104,7 @@ final class BigRationalTest extends FlatSpec {
 
     val (partsO: Int, remainder: BigRational) = (remainderp*1080).wholeAndFraction
     assertResult(parts)(partsO)
-    assert(remainder == 0)
+    assert(remainder.numerator == 0)
 
     assertResult((0, zero))(zero.wholeAndFraction)
     assertResult((0, oneHalf))(oneHalf.wholeAndFraction)
@@ -100,8 +114,8 @@ final class BigRationalTest extends FlatSpec {
 
   "==()" should "be correct" in {
     assert(zero == zero)
-    assert(zero == 0)
-    assert(zero != 1)
+    assert(zero == BigRational(0))
+    assert(zero != BigRational(1))
   }
 
   "compare()" should "be correct" in {

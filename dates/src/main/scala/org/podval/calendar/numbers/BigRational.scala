@@ -49,10 +49,6 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
     case that: BigRational =>
       (this.numerator    == that.numerator) && (this.denominator  == that.denominator)
 
-    case that: Int => (denominator == 1) && (numerator == that)
-
-    case that: Long => (denominator == 1) && (numerator == that)
-
     case _ => false
   }
 
