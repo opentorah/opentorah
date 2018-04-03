@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.0/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.0/rng/docbook.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://www.oxygenxml.com/docbook/xml/5.0/rng/dbmathmlsvg.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Rambam on Calendar</title>
+  <section>
+    <title>Introduction</title>
+    <para>In the "Laws of Sanctification of the Moon", Rambam (TODO: where?) gives algorithmic description of two
+      calendars: fixed ("arithmetic") and observational ("astronomical"). Both calendars are described in the form ready
+      to be implemented, but the reasons for the calculation steps are not always given. Especially for the astronomical
+      calendar, the following questions arise: where do the numbers come from? What are the models - and the formulae
+      resulting from them - that reproduce the numbers? Sometimes Rambam describes the models, so only the formulae need
+      to be reconstructed; sometimes the models are not described, so both the models and the formulae need to be
+      reconstructed. </para>
+  </section>
+  <section>
+    <title>Goals</title>
+    <itemizedlist>
+      <listitem>
+        <para>Translate appropriate chapters of Rambam into English. The translation does not have to be literal;
+          literal translations are already available (<biblioref linkend="Yale"/>, <biblioref linkend="Touger"/>). The
+          goal of our translation is to make the text complete and accessible for collaboration by people not proficient
+          enough in Hebrew.</para>
+      </listitem>
+      <listitem>
+        <para>Reconstruct the models and formulae implied in the text.</para>
+      </listitem>
+      <listitem>
+        <para>Implement the algorithms.</para>
+      </listitem>
+      <listitem>
+        <para>Verify consistency of Rambam's numbers.</para>
+      </listitem>
+      <listitem>
+        <para>Compare Rambam's models with contemporary astronomical models.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+  <section>
+    <title>History</title>
+    <para>In 1984, The Rebbe instructed the Jews to learn Rambam every day. As a result, in 1991 I encountered calendar
+      chapters of Rambam, decided to reconstruct the models behind the calculations described in them, and discovered
+      mistakes in the text of one of the laws (15:6). The results were published in "Notices of Temimim and Anash", a
+      weekly of the central Lubavicher Yeshiva 770. Some of the readers were appalled that someone dares to correct the
+      text of Rambam! My point was that the text as published contains mistakes that need to be corrected. Indeed,
+      Frenkel edition [<biblioref linkend="Frenkel"/>], that was already published at the time, corrects all of the
+      mistakes I did. In fact, they were already corrected by Hazon Ish in his commentary on Rambam [<biblioref
+        linkend="HazonIsh"/>] - but I did not know it then.</para>
+    <para>In 2005, during a visit to Israel, I discussed the subject with Rabbi Michael Koretz.</para>
+    <para>In 2008 I acquired a pile of books on the subject and started looking into it; I also experimented with
+      various ways of publishing the work on the web.</para>
+    <para>In 2009 I coded some of the algorithms to look into the rumors the dates of Birkhat HaHamah that were
+      circulating then.</para>
+    <para>In 2011 I realized that the work needs to be published before it is finished - so that others could help
+      finish it ;)</para>
+  </section>
+  <section>
+    <title>Acknowledgements</title>
+    <para>I want to acknowledge people who contributed to the content of this work - and to the fact of its existence ;)
+      If your name should be on this list but isn't, please forgive me: the omission is not intentional. </para>
+    <para><personname><firstname>Mordechai</firstname><surname>Goldin</surname></personname> - for providing office
+      space and computer equipment when I, as a Yeshiva student, had neither;
+          <personname><firstname>Ilia</firstname><surname>Pomansky</surname></personname> - for encouraging this work at
+      the early stages, in 1991; my wife Nina - for listening to my wild ideas, for her patience, and for help with
+      math; my daughter Menucha Rochel - for assistance with the translation; Rabbi Michael Koretz - for interesting
+      descussions and help in obtaining texts on the subject; Dr. Michael Partensky - for encouragement and advise;
+      Peter Ofman - for asking questions that prodded me to revive this project in 2011, after years of hiatus; Aron
+      Matskin - for a discussion during his visit on Rosh Chodesh Mar Cheshvan 5772; Rabbi Chaim Prus - for causing me
+      to investigate which number does the year of Creation has - 0 or 1. </para>
+  </section>
+  <!-- TODO How to distinguish Rambam from me? Get rid of "discussion"! Maybe just give all translation up front? -->
+  <xi:include href="solar-theory.xml"/>
+  <xi:include href="lunar-theory.xml"/>
+  <glossary>
+    <glossentry xml:id="mla-term">
+      <glossterm>mean lunar anomaly (אמצע המסלול)</glossterm>
+      <acronym>mla</acronym>
+      <glossdef>
+        <para>Mean angular coordinate of the Moon on its epicicle.</para>
+      </glossdef>
+    </glossentry>
+  </glossary>
+  <bibliography>
+    <bibliodiv>
+      <title>Laws of Sanctification of the Moon by Rambam</title>
+      <biblioentry xml:id="Vilno" xreflabel="Vilno">
+        <author>
+          <personname>Rambam</personname>
+        </author>
+        <title>Mishne Torah</title>
+        <publisher>
+          <publishername>Widov and Brothers Romm</publishername>
+        </publisher>
+      </biblioentry>
+      <biblioentry xml:id="LaAm" xreflabel="Rambam LaAm">
+        <author>
+          <personname>Rambam</personname>
+        </author>
+        <title>Mishne Torah</title>
+        <edition>Rambam LaAm</edition>
+      </biblioentry>
+      <biblioentry xml:id="Eshkol" xreflabel="Eshkol">
+        <author>
+          <personname>Rambam</personname>
+        </author>
+        <title>Mishne Torah</title>
+        <publisher>
+          <publishername>Eshkol</publishername>
+        </publisher>
+        <pubdate>1987</pubdate>
+      </biblioentry>
+      <biblioentry xml:id="Kapach" xreflabel="Kapach">
+        <author>
+          <personname>Rambam</personname>
+        </author>
+        <title>Mishne Torah</title>
+        <editor>
+          <personname>
+            <honorific>Rabbi</honorific>
+            <surname>Kapach</surname>
+          </personname>
+        </editor>
+      </biblioentry>
+      <biblioentry xml:id="Frenkel" xreflabel="Frenkel">
+        <author>
+          <personname>Rambam</personname>
+        </author>
+        <title>Mishne Torah</title>
+        <editor>
+          <personname>
+            <honorific>Rabbi</honorific>
+            <surname>Frenkel</surname>
+          </personname>
+        </editor>
+      </biblioentry>
+      <biblioentry xml:id="Bluming" xreflabel="Bluming">
+        <author>
+          <personname>Rambam</personname>
+        </author>
+        <title>Mishne Torah</title>
+        <edition>Rambam HaAruch</edition>
+        <editor>
+          <personname>
+            <honorific>Rabbi</honorific>
+            <firstname>Y</firstname>
+            <surname>Bluming</surname>
+          </personname>
+        </editor>
+        <pubdate>2005</pubdate>
+      </biblioentry>
+      <biblioentry xml:id="Yale" xreflabel="Yale">
+        <author>
+          <personname>Rambam</personname>
+        </author>
+        <editor role="translator">
+          <personname><firstname>Solomon</firstname><surname>Gandz</surname></personname>
+        </editor>
+        <editor role="introduction">
+          <personname><firstname>Julian</firstname><surname>Obermann</surname></personname>
+        </editor>
+        <title>Mishne Torah</title>
+        <title>Code of Maimonides, Book 3, Treatise 8: Sanctification of the New Moon (Yale Judaica Series, Vol.
+          11)</title>
+        <publisher>
+          <publishername>Yale</publishername>
+        </publisher>
+        <pubdate>1967</pubdate>
+      </biblioentry>
+      <biblioentry xml:id="Touger" xreflabel="Touger">
+        <author>
+          <personname>Rambam</personname>
+        </author>
+        <title>Mishne Torah</title>
+        <editor>
+          <personname>
+            <honorific>Rabbi</honorific>
+            <surname>Touger</surname>
+          </personname>
+        </editor>
+      </biblioentry>
+      <biblioentry xml:id="HazonIsh">
+        <author>
+          <personname>Hazon Ish</personname>
+        </author>
+      </biblioentry>
+    </bibliodiv>
+    <bibliodiv>
+      <title>Jewish Writings on Calendar</title>
+      <biblioentry xml:id="Losh" xreflabel="Losh">
+        <title>Sefer HaTchunah LeMatchil</title>
+        <author>
+          <personname>
+            <firstname>Yosef Yitzchok</firstname>
+            <surname>Losh</surname>
+          </personname>
+        </author>
+        <pubdate>1988</pubdate>
+      </biblioentry>
+      <biblioentry xml:id="Keller" xreflabel="Keller">
+        <title>Tchunat HaShamaim</title>
+        <author>
+          <personname>
+            <firstname>Yosef Yitzchok</firstname>
+            <surname>Keller</surname>
+          </personname>
+        </author>
+        <pubdate>1988</pubdate>
+      </biblioentry>
+      <biblioentry xml:id="Glitzenshtein" xreflabel="Glitzenshtein">
+        <title>Kidush HaChodesh LeHaRambam</title>
+        <author>
+          <personname>
+            <firstname>Menachem Mendel</firstname>
+            <surname>Glitzenshtein</surname>
+          </personname>
+        </author>
+        <pubdate>1993</pubdate>
+      </biblioentry>
+      <biblioentry xml:id="Tzikuni" xreflabel="Tzikuni">
+        <title>הזון שמים (Hazon Shamaim)</title>
+        <author>
+          <personname>
+            <firstname>Eitan</firstname>
+            <surname>Tzikuni</surname>
+          </personname>
+        </author>
+        <pubdate>2001</pubdate>
+      </biblioentry>
+      <biblioentry>
+        <title>Hazon Ish and the sine tables</title>
+        <biblioid class="uri">http://www.biu.ac.il/JH/Parasha/pekudey/lev.html</biblioid>
+      </biblioentry>
+    </bibliodiv>
+    <bibliodiv>
+      <title>Greeks on Astronomy</title>
+      <biblioentry xml:id="Neugebauer" xreflabel="Neugebauer">
+        <title>The Exact Sciences in Antiquity</title>
+        <author>
+          <personname>
+            <firstname>Otto</firstname>
+            <surname>Neugebauer</surname>
+          </personname>
+        </author>
+        <edition>2nd</edition>
+        <publisher>
+          <publishername>Dover Publications</publishername>
+        </publisher>
+        <pubdate>1969</pubdate>
+        <biblioid class="uri">http://isbn.nu/0486223329</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <title>Astronomy and History Selected Essays</title>
+        <author>
+          <personname>
+            <firstname>Otto</firstname>
+            <surname>Neugebauer</surname>
+          </personname>
+        </author>
+        <publisher>
+          <publishername>Springer</publishername>
+        </publisher>
+        <pubdate>August 8, 1983</pubdate>
+        <biblioid class="uri">http://isbn.nu/0387908447</biblioid>
+      </biblioentry>
+      <biblioentry xml:id="Crowe" xreflabel="Crowe">
+        <title>Theories of the World from Antiquity to the Copernican Revolution</title>
+        <author>
+          <personname>
+            <firstname>Michael</firstname>
+            <othername>J.</othername>
+            <surname>Crowe</surname>
+          </personname>
+        </author>
+        <edition>2nd</edition>
+        <publisher>
+          <publishername>Dover Publications</publishername>
+        </publisher>
+        <pubdate>2001</pubdate>
+        <biblioid class="uri">http://isbn.nu/0486414442</biblioid>
+      </biblioentry>
+      <biblioentry xml:id="Evans" xreflabel="Evans">
+        <title>The History &amp; Practice of Ancient Astronomy</title>
+        <author>
+          <personname>
+            <firstname>James</firstname>
+            <surname>Evans</surname>
+          </personname>
+        </author>
+        <publisher>
+          <publishername>Oxford University Press</publishername>
+        </publisher>
+        <pubdate>1998</pubdate>
+        <biblioid class="uri">http://isbn.nu/0195095391</biblioid>
+      </biblioentry>
+      <biblioentry xml:id="Thurston" xreflabel="Thurston">
+        <title>Early Astronomy</title>
+        <author>
+          <personname>
+            <firstname>Hugh</firstname>
+            <surname>Thurston</surname>
+          </personname>
+        </author>
+        <publisher>
+          <publishername>Springer Verlag</publishername>
+        </publisher>
+        <pubdate>1996</pubdate>
+        <biblioid class="uri">http://isbn.nu/0387948228</biblioid>
+      </biblioentry>
+      <biblioentry xml:id="Almagest" xreflabel="Almagest">
+        <title>Ptolemy's Almagest</title>
+        <author role="translator">
+          <personname>
+            <firstname>G. J.</firstname>
+            <surname>Toomer</surname>
+          </personname>
+        </author>
+        <publisher>
+          <publishername>Princeton University Press</publishername>
+        </publisher>
+        <pubdate>1998</pubdate>
+        <biblioid class="uri">http://isbn.nu/0691002606</biblioid>
+      </biblioentry>
+      <biblioentry xml:id="Campanus" xreflabel="Campanus">
+        <title>Campanus of Novara &amp; Medieval Planetary Theory</title>
+        <authorgroup>
+          <author>
+            <personname>
+              <firstname>G. J.</firstname>
+              <surname>Toomer</surname>
+              <lineage>Jr</lineage>
+            </personname>
+          </author>
+          <author>
+            <personname>
+              <firstname>Francis</firstname>
+              <othername>S.</othername>
+              <surname>Benjamin</surname>
+            </personname>
+          </author>
+        </authorgroup>
+        <publisher>
+          <publishername>University of Wisconsin Press</publishername>
+        </publisher>
+        <pubdate>1972</pubdate>
+        <biblioid class="uri">http://isbn.nu/029905960X</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <title>Ancient Planetary Model Animations</title>
+        <biblioid class="uri">http://people.sc.fsu.edu/~dduke/models</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <title>A Modern Almagest: An updated version of Ptolemy's Almagest</title>
+        <biblioid class="uri">http://farside.ph.utexas.edu/Books/Syntaxis/Syntaxis.html</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <title>Summary of Ptolemaic Astronomy</title>
+        <biblioid class="uri"
+          >http://www.clas.ufl.edu/users/ufhatch/HIS-SCI-STUDY-GUIDE/0034_summaryPtolemiacAstron.html</biblioid>
+      </biblioentry>
+    </bibliodiv>
+    <bibliodiv>
+      <title>Contemporary Models</title>
+      <biblioentry xml:id="Meeus" xreflabel="Meeus">
+        <title>Astronomical Algorithms</title>
+        <author>
+          <personname>
+            <firstname>Jean</firstname>
+            <surname>Meeus</surname>
+          </personname>
+        </author>
+        <edition>2nd</edition>
+        <publisher>
+          <publishername>Willmann-Bell</publishername>
+        </publisher>
+        <pubdate>1998</pubdate>
+        <biblioid class="uri">http://isbn.nu/0943396611</biblioid>
+      </biblioentry>
+      <biblioentry xml:id="Montenbruck" xreflabel="Montenbruck">
+        <title>Astronomy on the Personal Computer</title>
+        <authorgroup>
+          <author>
+            <personname>
+              <firstname>Oliver</firstname>
+              <surname>Montenbruck</surname>
+            </personname>
+          </author>
+          <author>
+            <personname>
+              <firstname>Thomas</firstname>
+              <surname>Pfleger</surname>
+            </personname>
+          </author>
+        </authorgroup>
+        <edition>4th</edition>
+        <publisher>
+          <publishername>Springer Verlag</publishername>
+        </publisher>
+        <pubdate>2000</pubdate>
+        <biblioid class="uri">http://isbn.nu/3540672214</biblioid>
+      </biblioentry>
+      <biblioentry xml:id="Dershowitz" xreflabel="Dershowitz">
+        <title>Calendrical Calculations</title>
+        <authorgroup>
+          <author>
+            <personname>
+              <firstname>Nachum</firstname>
+              <surname>Dershowitz</surname>
+            </personname>
+          </author>
+          <author>
+            <personname>
+              <firstname>Edward</firstname>
+              <othername>M.</othername>
+              <surname>Reingold</surname>
+            </personname>
+          </author>
+        </authorgroup>
+        <edition>3rd</edition>
+        <publisher>
+          <publishername>Cambridge University Press</publishername>
+        </publisher>
+        <pubdate>2008</pubdate>
+        <biblioid class="uri">http://isbn.nu/0521702386</biblioid>
+      </biblioentry>
+      <biblioentry xml:id="Dermott" xreflabel="Dermott">
+        <title>Solar System Dynamics</title>
+        <authorgroup>
+          <author>
+            <personname>
+              <firstname>S.</firstname>
+              <othername>F.</othername>
+              <surname>Dermott</surname>
+            </personname>
+          </author>
+          <author>
+            <personname>
+              <firstname>Carl</firstname>
+              <othername>D.</othername>
+              <surname>Murray</surname>
+            </personname>
+          </author>
+        </authorgroup>
+        <publisher>
+          <publishername>Cambridge University Press</publishername>
+        </publisher>
+        <pubdate>2000</pubdate>
+        <biblioid class="uri">http://isbn.nu/0521575974</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <title>How to compute planetary positions</title>
+        <biblioid class="uri">http://stjarnhimlen.se/comp/ppcomp.html</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <title>Sky View</title>
+        <biblioid class="uri">http://www.sky-view.co.il/</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <title>Israeli New Moon Society</title>
+        <biblioid class="uri">https://sites.google.com/site/moonsoc/</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <title>EarthTools</title>
+        <biblioid class="uri">http://www.earthtools.org/webservices.htm#usage</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <title>NOAA Solar Calculator</title>
+        <biblioid class="uri">http://www.esrl.noaa.gov/gmd/grad/solcalc/</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <title>Naval Oceanography Portal</title>
+        <biblioid class="uri">http://aa.usno.navy.mil/data/index.php</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <title>Zmanim</title>
+        <biblioid class="uri">http://www.myzmanim.com/search.aspx</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <title>MikvahCalendar</title>
+        <biblioid class="uri">https://www.mikvahcalendar.com/</biblioid>
+      </biblioentry>
+    </bibliodiv>
+    <bibliodiv>
+      <title>On Jewish Calendar</title>
+      <biblioentry>
+        <title>Understanding the Jewish Calendar</title>
+        <author>
+          <personname>
+            <firstname>Nathan</firstname>
+            <surname>Bushwick</surname>
+          </personname>
+        </author>
+        <publisher>
+          <publishername>Moznaim</publishername>
+        </publisher>
+        <pubdate>February 1, 1989</pubdate>
+        <biblioid class="uri">http://isbn.nu/0940118173</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <title>The Hebrew Calendar</title>
+        <author>
+          <personname>
+            <honorific>Dr</honorific>
+            <firstname>Irv</firstname>
+            <surname>Bromberg</surname>
+          </personname>
+        </author>
+        <publisher>
+          <publishername>University of Toronto, Canada</publishername>
+        </publisher>
+        <biblioid class="uri">http://www.sym454.org/hebrew</biblioid>
+      </biblioentry>
+      <biblioentry xml:id="Feldman" xreflabel="Feldman">
+        <author>
+          <personname><firstname>W. M.</firstname><surname>Feldman</surname></personname>
+        </author>
+        <title>Rabbinical Mathematics and Astronomy</title>
+        <seriesvolnums>Judaic Studies Library; No. Shp4</seriesvolnums>
+        <publisher>
+          <publishername>Intellectbooks</publishername>
+        </publisher>
+        <pubdate>January 1, 1931</pubdate>
+        <edition>3</edition>
+        <biblioid class="uri">http://isbn.nu/0872030261</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <author>
+          <personname>Belenkiy</personname>
+        </author>
+        <biblioid class="uri">http://u.cs.biu.ac.il/~belenka/calendar.html</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <author>
+          <personname>Bromberg</personname>
+        </author>
+        <biblioid class="uri">http://individual.utoronto.ca/kalendis/</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <author>
+          <personname><firstname>Remy</firstname><surname>Landau</surname></personname>
+        </author>
+        <title>Hebrew Calendar Science and Myths</title>
+        <biblioid class="uri">http://hebrewcalendar.tripod.com/</biblioid>
+      </biblioentry>
+      <biblioentry>
+        <author>
+          <personname><firstname>Sacha</firstname><surname>Stern</surname></personname>
+        </author>
+        <title>Calendar and Community: A History of the Jewish Calendar, 2nd Century BCE to 10th Century CE</title>
+      </biblioentry>
+      <biblioentry>
+        <title> The Reality of Epicycles and Eccentrics Denied</title>
+        <biblioid class="uri">http://homepages.wmich.edu/~mcgrew/maimonides.htm</biblioid>
+      </biblioentry>
+    </bibliodiv>
+  </bibliography>
+</article>

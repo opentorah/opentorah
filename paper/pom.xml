@@ -1,0 +1,181 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.podval</groupId>
+        <artifactId>calendar</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>org.podval.calendar</groupId>
+    <artifactId>paper</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Rambam on Calendar Paper</name>
+
+    <properties>
+        <tables.directory>${project.build.directory}/tables</tables.directory>
+
+        <!-- Input directories -->
+        <xsl.directory>src/main/xsl</xsl.directory>
+        <css.directory>src/main/css</css.directory>
+        <images.directory>src/main/images</images.directory>
+
+        <!-- Output directories -->
+        <docbkx.output.directory>${project.build.directory}/docbkx</docbkx.output.directory>
+        <docbkx.pdf.output.directory>${docbkx.output.directory}/pdf</docbkx.pdf.output.directory>
+        <docbkx.html.output.directory>${docbkx.output.directory}/html</docbkx.html.output.directory>
+        <docbkx.epub.output.directory>${docbkx.output.directory}/epub/expanded</docbkx.epub.output.directory>
+
+        <!-- Fonts -->
+        <body.font.family>sans-serif</body.font.family>
+        <body.font.master>14</body.font.master>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.podval.calendar</groupId>
+            <artifactId>org.podval.calendar.astronomy</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.scala-lang.modules</groupId>
+            <artifactId>scala-xml_${scala.major.version}</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>org.podval.calendar.paper.Tables</mainClass>
+                    <arguments>
+                        <argument>${tables.directory}</argument>
+                    </arguments>
+                </configuration>            
+            </plugin>
+
+            <plugin>
+                <groupId>com.agilejava.docbkx</groupId>
+                <artifactId>docbkx-maven-plugin</artifactId>
+
+                <configuration>
+                    <sourceDirectory>src/main/docbook</sourceDirectory>
+                    <includes>calendar.xml</includes>
+
+                    <xincludeSupported>true</xincludeSupported>
+                    <generatedSourceDirectory>${tables.directory}</generatedSourceDirectory>
+
+                    <entities>
+                        <entity>
+                            <name>version</name>
+                            <value>${project.version}</value>
+                        </entity>
+
+                        <!-- I'd rather use an entity &tables-directory; in my DocBook, but how do I tell oXygen that it is "../../../target/tables" ?! -->
+                        <entity>
+                            <name>tables-directory</name>
+                            <value>${tables.directory}</value>
+                        </entity>
+                    </entities>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>pdf</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>generate-pdf</goal>
+                        </goals>
+                        <configuration>
+                            <targetDirectory>${docbkx.pdf.output.directory}</targetDirectory>
+                            <foCustomization>${xsl.directory}/pdf.xsl</foCustomization>
+
+                            <!-- Fonts -->
+                            <bodyFontFamily>${body.font.family}</bodyFontFamily>
+                            <bodyFontMaster>${body.font.master}</bodyFontMaster>
+
+                            <!-- Images -->
+                            <imgSrcPath>${basedir}/src/main/images/</imgSrcPath>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>html</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>generate-html</goal>
+                        </goals>
+                        <configuration>
+                            <targetDirectory>${docbkx.html.output.directory}</targetDirectory>
+                            <htmlCustomization>${xsl.directory}/html.xsl</htmlCustomization>
+
+                            <!-- CSS -->
+                            <htmlStylesheet>css/docbook.css</htmlStylesheet>
+
+                            <!-- Images -->
+                            <imgSrcPath>images/</imgSrcPath>
+
+                            <preProcess>
+                                <copy todir="${docbkx.html.output.directory}/css" filtering="true">
+                                    <fileset dir="${css.directory}"/>
+                                    <!-- Fonts (via filtering) -->
+                                    <filterset>
+                                        <filter token="body.font.family" value="${body.font.family}"/>
+                                    </filterset>
+                                </copy>
+                                <copy todir="${docbkx.html.output.directory}/images">
+                                    <fileset dir="${images.directory}"/>
+                                </copy>
+                            </preProcess>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>epub</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>generate-epub</goal>
+                        </goals>
+
+                        <configuration>
+                            <targetDirectory>${docbkx.epub.output.directory}</targetDirectory>
+                            <epubCustomization>${xsl.directory}/epub.xsl</epubCustomization>
+
+                            <!-- CSS -->
+                            <htmlStylesheet>css/docbook.css</htmlStylesheet>
+
+                            <!-- Images -->
+                            <imgSrcPath>images/</imgSrcPath>
+
+                            <preProcess>
+                                <copy todir="${docbkx.epub.output.directory}/css" filtering="true">
+                                    <fileset dir="${css.directory}"/>
+                                    <!-- Fonts (via filtering) -->
+                                    <filterset>
+                                        <filter token="body.font.family" value="${body.font.family}"/>
+                                    </filterset>
+                                </copy>
+                                <copy todir="${docbkx.epub.output.directory}/images">
+                                    <fileset dir="${images.directory}"/>
+                                </copy>
+                            </preProcess>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
