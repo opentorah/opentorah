@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="http://docbook.org/xml/5.0/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<?xml-model href="http://docbook.org/xml/5.0/rng/docbook.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://www.oxygenxml.com/docbook/xml/5.0/rng/dbmathmlsvg.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <title>Rambam on Calendar</title>
+  <info>
+    <title>Rambam on Calendar</title>
+    <author><personname>Leonid Dubinsky</personname></author>
+  </info>
   <section>
     <title>Introduction</title>
     <para>In the "Laws of Sanctification of the Moon", Rambam (TODO: where?) gives algorithmic description of two
@@ -70,6 +70,12 @@
       to investigate which number does the year of Creation has - 0 or 1. </para>
   </section>
   <!-- TODO How to distinguish Rambam from me? Get rid of "discussion"! Maybe just give all translation up front? -->
+  <section>
+    <title>Laws of the Sanctification of the Moon</title>
+    <para>There is one positive commandment: to calculate, to know, and to establish on which day each month of the
+      year begins. Explanation of this commandment is in these chapters.</para>
+    <xi:include href="chapter1.xml"/>
+  </section>
   <xi:include href="solar-theory.xml"/>
   <xi:include href="lunar-theory.xml"/>
   <glossary>

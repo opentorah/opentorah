@@ -5,7 +5,18 @@
     exclude-result-prefixes="xs"
     version="1.0">
 
-    <xsl:import href="urn:docbkx:stylesheet/chunk.xsl"/>
+    <xsl:import href="@docbook@/html/chunk.xsl"/>
 
     <xsl:import href="common-html.xsl"/>
+
+    <xsl:template name="user.head.content">
+        <script type="text/javascript">
+          window.MathJax = {
+            MathML: {
+              extensions: [ "content-mathml.js", "mml3.js" ]
+            }
+          };
+        </script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML"/>
+    </xsl:template>
 </xsl:stylesheet>

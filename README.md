@@ -67,3 +67,7 @@ It'd be nice to integrate with the Google Calendar.
 * [iCal4j](http://ical4j.sourceforge.net/introduction.html)
 * [Publish web content events in iCalendar format](http://www.google.com/support/calendar/bin/answer.py?hl=en&answer=48526)
 * [GData Java library](http://code.google.com/apis/gdata/client-java.html)
+
+## Publishing on the Web
+
+See <http://blog.dub.podval.org/2011/11/publishing-papers-on-web.html> about technical details of the publication.

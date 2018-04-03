@@ -9,7 +9,7 @@
     
     <xsl:import href="common.xsl"/>
 
-    <xsl:param name="chunked.ouutput">true</xsl:param>
+    <xsl:param name="chunked.output">true</xsl:param>
     <xsl:param name="chunker.output.encoding">UTF-8</xsl:param>
     
     <!-- Pretty-print the HTML -->
