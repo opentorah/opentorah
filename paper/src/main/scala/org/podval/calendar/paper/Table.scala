@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Podval Group.
+ * Copyright 2011-2018 Podval Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ final class Table[A](name: String, columns: Seq[Column[A]], rows: List[A]) {
     </informaltable>
 
 
-  def write(directory: File) {
+  def write(directory: File): Unit = {
     println("writing table " + name)
     writeHtml(open(directory, name, "html"))
     writeDocBook(open(directory, name, "xml"))
@@ -82,18 +82,18 @@ final class Table[A](name: String, columns: Seq[Column[A]], rows: List[A]) {
     new PrintStream(new FileOutputStream(new File(directory, name + "." + extension)))
 
 
-  private[this] def writeHtml(out: PrintStream) {
+  private[this] def writeHtml(out: PrintStream): Unit = {
     write(toHtml, out)
   }
 
 
-  private[this] def writeDocBook(out: PrintStream) {
+  private[this] def writeDocBook(out: PrintStream): Unit = {
     out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
     write(toDocBook, out)
   }
 
 
-  private[this] def write(xml: Elem, out: PrintStream) {
+  private[this] def write(xml: Elem, out: PrintStream): Unit = {
     val what = new PrettyPrinter(80, 2).format(toDocBook)
     out.print(what)
     out.println()

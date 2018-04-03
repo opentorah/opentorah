@@ -2,6 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <prerequisites>
+        <maven>3.1.0</maven>
+    </prerequisites>
+
     <parent>
         <groupId>org.podval</groupId>
         <artifactId>calendar</artifactId>
@@ -13,24 +17,30 @@
     <packaging>pom</packaging>
 
     <name>Rambam on Calendar Paper</name>
+    <url>http://www.jewish-calendar.org</url>
 
     <properties>
-        <tables.directory>${project.build.directory}/tables</tables.directory>
+        <tables.directory>${project.build.directory}/tables</tables.directory>   <!-- Generated content -->
 
         <!-- Input directories -->
-        <xsl.directory>src/main/xsl</xsl.directory>
-        <css.directory>src/main/css</css.directory>
-        <images.directory>src/main/images</images.directory>
+        <xsl.directory>src/main/xsl</xsl.directory>                              <!-- XSLT customization layer -->
+        <css.directory>src/main/css</css.directory>                              <!-- HTML stylesheets -->
+        <images.directory>src/main/images</images.directory>                     <!-- Static content -->
 
         <!-- Output directories -->
         <docbkx.output.directory>${project.build.directory}/docbkx</docbkx.output.directory>
         <docbkx.pdf.output.directory>${docbkx.output.directory}/pdf</docbkx.pdf.output.directory>
         <docbkx.html.output.directory>${docbkx.output.directory}/html</docbkx.html.output.directory>
-        <docbkx.epub.output.directory>${docbkx.output.directory}/epub/expanded</docbkx.epub.output.directory>
+        <!-- EPUB has two directories configured, since docbkx plugin puts expanded EPUB where it is told,
+             and resulting EPUB file into the parent of where it is told :) -->
+        <docbkx.epub.output.directory>${docbkx.output.directory}/epub</docbkx.epub.output.directory>
+        <docbkx.epub.expanded.output.directory>${docbkx.epub.output.directory}/expanded</docbkx.epub.expanded.output.directory>
 
         <!-- Fonts -->
-        <body.font.family>sans-serif</body.font.family>
+        <body.font.family>Noto Sans, Noto Sans Hebrew</body.font.family>
         <body.font.master>14</body.font.master>
+        <title.font.family>Noto Sans, Noto Sans Hebrew</title.font.family>
+        <!-- In addition, symbol.font.family can be configured with catch-all symbol fonts. -->
     </properties>
 
     <dependencies>
@@ -43,14 +53,20 @@
         <dependency>
             <groupId>org.scala-lang.modules</groupId>
             <artifactId>scala-xml_${scala.major.version}</artifactId>
+            <version>1.0.3</version>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <!-- Generated content that needs to be included in DocBook is produced by executing the generating code.
+                 This has to happen before docbkx plugin is executed, so this plugin configuration has to preceede that of docbkx -
+                 or it has to be bound to an earlier lifecycle phase. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
+                <version>1.3.2</version>
+
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -64,12 +80,47 @@
                     <arguments>
                         <argument>${tables.directory}</argument>
                     </arguments>
-                </configuration>            
+                </configuration>
             </plugin>
 
             <plugin>
                 <groupId>com.agilejava.docbkx</groupId>
                 <artifactId>docbkx-maven-plugin</artifactId>
+                <version>2.0.15</version>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sf.docbook</groupId>
+                        <artifactId>docbook-xml</artifactId>
+                        <version>5.0-all</version>
+                        <classifier>resources</classifier>
+                        <type>zip</type>
+                        <scope>runtime</scope>
+                    </dependency>
+
+                    <!-- By default, docbkx plugin brings in FOP 1.0, but I want 1.1
+                         since it is newer and because of the Hebrew support. -->
+                    <dependency>
+                        <groupId>org.apache.xmlgraphics</groupId>
+                        <artifactId>fop</artifactId>
+                        <version>1.1</version>
+                        <scope>runtime</scope>
+                    </dependency>
+
+                    <!-- FOP does not handle MathML; it needs jEuclid plugin -->
+                    <dependency>
+                        <groupId>net.sourceforge.jeuclid</groupId>
+                        <artifactId>jeuclid-core</artifactId>
+                        <version>3.1.9</version>
+                    </dependency>
+
+                    <!-- jeuclid-fop is not available in Maven central repository and must be made available locally -->
+                    <dependency>
+                        <groupId>net.sourceforge.jeuclid</groupId>
+                        <artifactId>jeuclid-fop</artifactId>
+                        <version>3.1.9</version>
+                    </dependency>
+                </dependencies>
 
                 <configuration>
                     <sourceDirectory>src/main/docbook</sourceDirectory>
@@ -92,6 +143,11 @@
                     </entities>
                 </configuration>
 
+                <!-- Some configuration that could be placed in the XSL files was placed in the POM:
+                     img.src.path: to be near the related - copying of the images
+                     font configuration: to centralize configuration and avoid duplication (filtering is used to patch font configuration into CSS files)
+                -->
+
                 <executions>
                     <execution>
                         <id>pdf</id>
@@ -99,6 +155,7 @@
                         <goals>
                             <goal>generate-pdf</goal>
                         </goals>
+
                         <configuration>
                             <targetDirectory>${docbkx.pdf.output.directory}</targetDirectory>
                             <foCustomization>${xsl.directory}/pdf.xsl</foCustomization>
@@ -106,9 +163,13 @@
                             <!-- Fonts -->
                             <bodyFontFamily>${body.font.family}</bodyFontFamily>
                             <bodyFontMaster>${body.font.master}</bodyFontMaster>
+                            <titleFontFamily>${title.font.family}</titleFontFamily>
 
                             <!-- Images -->
-                            <imgSrcPath>${basedir}/src/main/images/</imgSrcPath>
+                            <imgSrcPath>${images.directory}</imgSrcPath>
+
+                            <!-- FOP -->
+                            <externalFOPConfiguration>${basedir}/src/main/fop/fop.xconf</externalFOPConfiguration>
                         </configuration>
                     </execution>
 
@@ -118,6 +179,7 @@
                         <goals>
                             <goal>generate-html</goal>
                         </goals>
+
                         <configuration>
                             <targetDirectory>${docbkx.html.output.directory}</targetDirectory>
                             <htmlCustomization>${xsl.directory}/html.xsl</htmlCustomization>
@@ -134,6 +196,7 @@
                                     <!-- Fonts (via filtering) -->
                                     <filterset>
                                         <filter token="body.font.family" value="${body.font.family}"/>
+                                        <filter token="title.font.family" value="${title.font.family}"/>
                                     </filterset>
                                 </copy>
                                 <copy todir="${docbkx.html.output.directory}/images">
@@ -151,7 +214,7 @@
                         </goals>
 
                         <configuration>
-                            <targetDirectory>${docbkx.epub.output.directory}</targetDirectory>
+                            <targetDirectory>${docbkx.epub.expanded.output.directory}</targetDirectory>
                             <epubCustomization>${xsl.directory}/epub.xsl</epubCustomization>
 
                             <!-- CSS -->
@@ -161,18 +224,40 @@
                             <imgSrcPath>images/</imgSrcPath>
 
                             <preProcess>
-                                <copy todir="${docbkx.epub.output.directory}/css" filtering="true">
+                                <copy todir="${docbkx.epub.expanded.output.directory}/css" filtering="true">
                                     <fileset dir="${css.directory}"/>
                                     <!-- Fonts (via filtering) -->
                                     <filterset>
                                         <filter token="body.font.family" value="${body.font.family}"/>
+                                        <filter token="title.font.family" value="${title.font.family}"/>
                                     </filterset>
                                 </copy>
-                                <copy todir="${docbkx.epub.output.directory}/images">
+                                <copy todir="${docbkx.epub.expanded.output.directory}/images">
                                     <fileset dir="${images.directory}"/>
                                 </copy>
                             </preProcess>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Results are packaged using assembly plugin.
+                 This way there is no need to align the directories between the "paper" project that "web site" project:
+                 resulting artifact can be retrieved and unpacked using dependency plugin. -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

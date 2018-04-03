@@ -1,0 +1,52 @@
+def scalaVersion      = '2.12.4'
+def scalaVersionMajor = '2.12'
+
+apply from: 'docbook.gradle'
+
+repositories {
+  jcenter()
+  mavenLocal()
+}
+
+ext.lib = [
+  zinc     : 'com.typesafe.zinc:zinc:0.3.15',
+  scala    : "org.scala-lang:scala-library:$scalaVersion",
+  scalaXml : "org.scala-lang.modules:scala-xml_$scalaVersionMajor:1.1.0",
+  astronomy: 'org.podval.calendar:org.podval.calendar.astronomy:0.1.1'
+]
+
+group = 'org.podval.calendar'
+version = '0.1.1'
+
+apply plugin: 'scala'
+
+dependencies {
+  zinc lib.zinc
+  compile lib.scala, lib.scalaXml, lib.astronomy
+}
+
+def tablesDir = "${buildDir}/tables"
+
+task buildTables(type:JavaExec, dependsOn: [classes]) {
+  classpath = sourceSets.main.runtimeClasspath
+  main = "org.podval.calendar.paper.Tables"
+  args = [ "${tablesDir}" ]
+}
+
+task docbook(dependsOn: [buildTables, docbookHtml])
+
+apply plugin: 'idea'
+
+idea {
+  project {
+    jdkName = '1.8'
+    vcs = 'Git'
+  }
+
+  module {
+    excludeDirs += [
+      file('.idea'),
+      file('gradle')
+    ]
+  }
+}
