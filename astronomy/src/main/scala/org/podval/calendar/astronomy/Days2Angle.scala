@@ -24,26 +24,43 @@ import AngleNumberSystem.Angle
  years) and the obliquity of the ecliptic (23° 35'), which was an elaboration of Hipparchus' work.
  */
 
-import Days2Angle.{Days, Key}
+object Days2Angle {
+  type Days = Int
+
+  sealed abstract class Key(val number: Int)
+  object Key {
+    case object One         extends Key(    1)
+    case object Ten         extends Key(   10)
+    case object Hundred     extends Key(  100)
+    case object Thousand    extends Key( 1000)
+    case object TenThousand extends Key(10000)
+    case object Month       extends Key(   29)
+    case object Year        extends Key(  354)
+
+    val all: Seq[Key] = Seq(One, Ten, Hundred, Thousand, TenThousand, Month, Year)
+  }
+}
 
 trait Days2Angle {
-  def one        : Angle //     1
-  def ten        : Angle //    10
-  def hundred    : Angle //   100
-  def thousand   : Angle //  1000
-  def tenThousand: Angle // 10000
+  import Days2Angle.{Days, Key}
 
-  def month      : Angle //    29
-  def year       : Angle //   354
+  def one        : Angle
+  def ten        : Angle
+  def hundred    : Angle
+  def thousand   : Angle
+  def tenThousand: Angle
+
+  def month      : Angle
+  def year       : Angle
 
   final def value(key: Key): Angle = key match {
-    case Key.One => one
-    case Key.Ten => ten
-    case Key.Hundred => hundred
-    case Key.Thousand => thousand
+    case Key.One         => one
+    case Key.Ten         => ten
+    case Key.Hundred     => hundred
+    case Key.Thousand    => thousand
     case Key.TenThousand => tenThousand
-    case Key.Month => month
-    case Key.Year => year
+    case Key.Month       => month
+    case Key.Year        => year
   }
 
   final def calculated(key: Key): Angle = one*key.number
@@ -71,35 +88,14 @@ trait Days2Angle {
     val tens        : Int = (days %   100) /    10
     val ones        : Int =  days %    10
 
-    tenThousand*tenThousands + thousand   *thousands + hundred*hundreds +
-      // TODO without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in
-      // KH 15:8-9 (see test).
-      (if (lessThanHundred == 29) month else {
-      ten*tens + one*ones
-    })
+    tenThousand*tenThousands + thousand*thousands + hundred*hundreds +
+      // TODO without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in KH 15:8-9 (see test).
+      (if (lessThanHundred == 29) month else ten*tens + one*ones)
   }
 
   // TODO rework to produce range for length
   final def exactify(approximate: Angle, days: Int, angle: Angle): Double = {
     val fullRotations = math.floor(days*approximate.toDouble/AngleNumberSystem.headRange.toDouble).toInt
     (AngleNumberSystem.headRange.toDouble*fullRotations + angle.toDegrees)/days
-  }
-}
-
-
-object Days2Angle {
-  type Days = Int
-
-  sealed abstract class Key(val number: Int)
-  object Key {
-    case object One extends Key(1)
-    case object Ten extends Key(10)
-    case object Hundred extends Key(100)
-    case object Thousand extends Key(1000)
-    case object TenThousand extends Key(10000)
-    case object Month extends Key(29)
-    case object Year extends Key(354)
-
-    val all: Seq[Key] = Seq(One, Ten, Hundred, Thousand, TenThousand, Month, Year)
   }
 }
