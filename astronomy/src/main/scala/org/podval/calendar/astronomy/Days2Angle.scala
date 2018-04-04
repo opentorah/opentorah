@@ -1,7 +1,7 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem
-import AngleNumberSystem.{Angle, AnglePoint}
+import AngleNumberSystem.Angle
 
 
 /*
@@ -24,17 +24,60 @@ import AngleNumberSystem.{Angle, AnglePoint}
  years) and the obliquity of the ecliptic (23° 35'), which was an elaboration of Hipparchus' work.
  */
 
-import Days2Angle.{Days, Table}
+import Days2Angle.{Days, Key}
 
 trait Days2Angle {
+  def one        : Angle //     1
+  def ten        : Angle //    10
+  def hundred    : Angle //   100
+  def thousand   : Angle //  1000
+  def tenThousand: Angle // 10000
 
-  val table: Table
+  def month      : Angle //    29
+  def year       : Angle //   354
 
-  val rambamValue: Angle
+  final def value(key: Key): Angle = key match {
+    case Key.One => one
+    case Key.Ten => ten
+    case Key.Hundred => hundred
+    case Key.Thousand => thousand
+    case Key.TenThousand => tenThousand
+    case Key.Month => month
+    case Key.Year => year
+  }
+
+  final def calculated(key: Key): Angle = one*key.number
 
   val almagestValue: Angle
 
+  final def calculatedAlmagest(key: Key): Angle = rounder(key)(almagestValue*key.number)
+
+  val rambamValue: Angle
+
+  // TODO use in calculate(ed)?
   final def fromValue(value: Angle)(days: Days): Angle = value*days
+
+
+  def rounder(key: Key): Angle => Angle
+
+  // TODO see if variations in this algorithms are logical: e.g., for 600, add for 1000 and subtract 4*for 100?
+  // TODO see if the end result is stable when Rambam's "real" value is used with straight multiplication and rounding
+  //   (abstract away the calculation mechaninsm).
+  final def calculate(days: Int): Angle = {
+    val tenThousands: Int =  days          / 10000
+    val thousands   : Int = (days % 10000) /  1000
+    val hundreds    : Int = (days %  1000) /   100
+    val lessThanHundred: Int = days % 100
+    val tens        : Int = (days %   100) /    10
+    val ones        : Int =  days %    10
+
+    tenThousand*tenThousands + thousand   *thousands + hundred*hundreds +
+      // TODO without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in
+      // KH 15:8-9 (see test).
+      (if (lessThanHundred == 29) month else {
+      ten*tens + one*ones
+    })
+  }
 
   // TODO rework to produce range for length
   final def exactify(approximate: Angle, days: Int, angle: Angle): Double = {
@@ -47,32 +90,16 @@ trait Days2Angle {
 object Days2Angle {
   type Days = Int
 
-  trait Table {
-    def one        : Angle //     1
-    def ten        : Angle //    10
-    def hundred    : Angle //   100
-    def thousand   : Angle //  1000
-    def tenThousand: Angle // 10000
+  sealed abstract class Key(val number: Int)
+  object Key {
+    case object One extends Key(1)
+    case object Ten extends Key(10)
+    case object Hundred extends Key(100)
+    case object Thousand extends Key(1000)
+    case object TenThousand extends Key(10000)
+    case object Month extends Key(29)
+    case object Year extends Key(354)
 
-    def month      : Angle //    29
-    def year       : Angle //   354
-
-    final def calculate(days: Int): Angle = {
-      val tenThousands: Int =  days          / 10000
-      val thousands   : Int = (days % 10000) /  1000
-      val hundreds    : Int = (days %  1000) /   100
-      val lessThanHundred: Int = days % 100
-      val tens        : Int = (days %   100) /    10
-      val ones        : Int =  days %    10
-
-      tenThousand*tenThousands +
-      thousand   *thousands +
-        // TODO without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in
-        // KH 15:8-9 (see test).
-      hundred    *hundreds + (if (lessThanHundred == 29) month else {
-        ten * tens +
-        one * ones
-      })
-    }
+    val all: Seq[Key] = Seq(One, Ten, Hundred, Thousand, TenThousand, Month, Year)
   }
 }

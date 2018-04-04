@@ -36,17 +36,17 @@ trait Calculators {
 
 object Calculators {
   object Text extends Calculators {
-    final override def sunLongitudeMean: Int => Angle = SunLongitudeMean.table.calculate
-    final override def sunApogee: Int => Angle = SunApogee.table.calculate
+    final override def sunLongitudeMean: Int => Angle = SunLongitudeMean.calculate
+    final override def sunApogee: Int => Angle = SunApogee.calculate
     final override def sunLongitudeCorrection: Angle => Angle = SunLongitudeCorrection.table.calculate
-    final override def moonLongitudeMean: Int => Angle = MoonLongitudeMean.table.calculate
+    final override def moonLongitudeMean: Int => Angle = MoonLongitudeMean.calculate
     final override def moonLongitudeAdjustmentForTimeOfSighting: AnglePoint => Angle =
       MoonLongitudeAdjustmentForTimeOfSighting.calculate
-    final override def moonAnomalyMean: Int => Angle = MoonAnomalyMean.table.calculate
+    final override def moonAnomalyMean: Int => Angle = MoonAnomalyMean.calculate
     final override def moonLongitudeDoubleElongationCorrection: Angle => Angle =
       MoonLongitudeDoubleElongationCorrection.calculate
     final override def moonAnomalyVisible: Angle => Angle = MoonAnomalyVisible.table.calculate
-    final override def moonHeadMean: Int => Angle = MoonHeadMean.table.calculate
+    final override def moonHeadMean: Int => Angle = MoonHeadMean.calculate
     final override def moonLatitude: Angle => Angle = MoonLatitude.table.calculate
     final override def moonLongitudeSightingAdjustment: AnglePoint => Angle =
       MoonLongitudeSightingAdjustment.calculate

@@ -1,21 +1,20 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem.Angle
-import Days2Angle.Table
 
 object SunLongitudeMean extends Days2Angle {
   // KH 12:1
-  final override val table = new Table {
-    final override val one        : Angle = Angle(  0, 59,  8)
-    final override val ten        : Angle = Angle(  9, 51, 23)
-    final override val hundred    : Angle = Angle( 98, 33, 53)
-    final override val thousand   : Angle = Angle(265, 38, 50) // remainder
-    final override val tenThousand: Angle = Angle(136, 28, 20)
+  final override val one        : Angle = Angle(  0, 59,  8)
+  final override val ten        : Angle = Angle(  9, 51, 23)
+  final override val hundred    : Angle = Angle( 98, 33, 53)
+  final override val thousand   : Angle = Angle(265, 38, 50) // remainder
+  final override val tenThousand: Angle = Angle(136, 28, 20)
 
-    // TODO reconstructs if calculated as 3*v(10)-v(1); not if using the exact value :)
-    final override val month      : Angle = Angle( 28, 35,  1)
-    final override val year       : Angle = Angle(348, 55, 15)  // TODO ??
-  }
+  // TODO reconstructs if calculated as 3*v(10)-v(1); not if using the exact value :)
+  final override val month      : Angle = Angle( 28, 35,  1)
+  final override val year       : Angle = Angle(348, 55, 15)  // TODO ??
+
+  final override def rounder(key: Days2Angle.Key): Angle => Angle = _.roundToSeconds
 
   // Moznaim Rambam in English gives this value in KH 12:1 note 1 (without a reference) as the one
   // Rambam uses in his calculations.

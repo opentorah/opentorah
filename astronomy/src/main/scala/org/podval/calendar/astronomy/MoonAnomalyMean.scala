@@ -1,23 +1,22 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem.Angle
-import Days2Angle.Table
 
 object MoonAnomalyMean extends Days2Angle {
   // TODO opposite direction!
 
-  final override val table = new Table {
-    // KH 14:3
-    final override val one        : Angle = Angle( 13,  3, 54)
-    final override val ten        : Angle = Angle(130, 39,  0)
-    final override val hundred    : Angle = Angle(226, 29, 53)
-    final override val thousand   : Angle = Angle(104, 58, 50)
-    final override val tenThousand: Angle = Angle(329, 48, 20)
+  // KH 14:3
+  final override val one        : Angle = Angle( 13,  3, 54)
+  final override val ten        : Angle = Angle(130, 39,  0)
+  final override val hundred    : Angle = Angle(226, 29, 53)
+  final override val thousand   : Angle = Angle(104, 58, 50)
+  final override val tenThousand: Angle = Angle(329, 48, 20)
 
-    final override val month      : Angle = Angle( 18, 53,  4)
-    // KH 14:4
-    final override val year       : Angle = Angle(305,  0, 13)
-  }
+  final override val month      : Angle = Angle( 18, 53,  4)
+  // KH 14:4
+  final override val year       : Angle = Angle(305,  0, 13)
+
+  final override def rounder(key: Days2Angle.Key): Angle => Angle = _.roundToSeconds
 
   final override val rambamValue: Angle = Angle(13, 3, 53, 55, 49)
 

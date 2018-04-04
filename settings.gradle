@@ -1,3 +1,4 @@
 include ':dates'
 include ':astronomy'
 include ':generate'
+include ':paper'

@@ -26,6 +26,8 @@ trait AngleNumber[N <: AngleNumber[N]] extends PeriodicNumber[AngleNumberSystem,
 
   def thirds(value: Int): N = tail(2, value)
 
+  def roundToThirds: N = roundTo(3)
+
   def toRadians: Double = math.toRadians(toDegrees)
 
   def toDegrees: Double = toDouble

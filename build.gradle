@@ -11,13 +11,14 @@ plugins {
 
 // TODO factor out commonality in publishing into defs.
 
-def scalaVersion      = '2.12.4'
+def scalaVersion      = '2.12.5'
 def scalaVersionMajor = '2.12'
 
 ext.lib = [
   zinc      : 'com.typesafe.zinc:zinc:0.3.15',
 //  "org.scala-sbt:zinc_${scalaVersionMajor}:1.0.3"
   scala     : "org.scala-lang:scala-library:$scalaVersion",
+  scalaXml  : "org.scala-lang.modules:scala-xml_$scalaVersionMajor:1.1.0",
   scalaCheck: "org.scalacheck:scalacheck_${scalaVersionMajor}:1.13.4",
   scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.4",
   pegdown   : 'org.pegdown:pegdown:1.4.2' // for scalatest reports
@@ -26,6 +27,8 @@ ext.lib = [
 allprojects {
   repositories {
     jcenter()
+    mavenCentral()
+    mavenLocal()
   }
 
   group = 'org.podval.calendar'
@@ -34,7 +37,7 @@ allprojects {
 
 subprojects {
   apply plugin: 'scala'
-  apply plugin: 'com.github.maiflai.scalatest'
+// TODO  apply plugin: 'com.github.maiflai.scalatest'
   apply plugin: 'maven-publish'
   apply plugin: 'com.jfrog.bintray'
 
@@ -71,6 +74,7 @@ idea {
     ]
   }
 }
+
 
 def gitHubRepository    = "jewish-calendar/calendar"
 def gitHubRepositoryUrl = "https://github.com/${gitHubRepository}"
@@ -203,4 +207,22 @@ project(':generate') {
   dependencies {
     compile project(':dates')
   }
+}
+
+project(':paper') {
+  dependencies {
+    compile lib.scalaXml, project(':astronomy')
+  }
+
+  apply from: 'docbook.gradle'
+
+  def tablesDir = "${buildDir}/tables"
+
+  task buildTables(type:JavaExec, dependsOn: [classes]) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = "org.podval.calendar.paper.Tables"
+    args = [ "${tablesDir}" ]
+  }
+
+  task docbook(dependsOn: [buildTables, docbookHtml])
 }

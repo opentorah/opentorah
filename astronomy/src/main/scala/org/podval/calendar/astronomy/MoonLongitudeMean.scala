@@ -1,21 +1,20 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem.Angle
-import Days2Angle.Table
 
 object MoonLongitudeMean extends Days2Angle {
-  final override val table = new Table {
-    // KH 14:1
-    final override val one        : Angle = Angle( 13, 10, 35)
-    // KH 14:2
-    final override val ten        : Angle = Angle(131, 45, 50)
-    final override val hundred    : Angle = Angle(237, 38, 23)
-    final override val thousand   : Angle = Angle(216, 23, 50)
-    final override val tenThousand: Angle = Angle(  3, 58, 20)
+  // KH 14:1
+  final override val one        : Angle = Angle( 13, 10, 35)
+  // KH 14:2
+  final override val ten        : Angle = Angle(131, 45, 50)
+  final override val hundred    : Angle = Angle(237, 38, 23)
+  final override val thousand   : Angle = Angle(216, 23, 50)
+  final override val tenThousand: Angle = Angle(  3, 58, 20)
 
-    final override val month      : Angle = Angle( 22,  6, 56)
-    final override val year       : Angle = Angle(344, 26, 43)
-  }
+  final override val month      : Angle = Angle( 22,  6, 56)
+  final override val year       : Angle = Angle(344, 26, 43)
+
+  final override def rounder(key: Days2Angle.Key): Angle => Angle = _.roundToSeconds
 
   // TODO does this correspond to the lunar period?
 

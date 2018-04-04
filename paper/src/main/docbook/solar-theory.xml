@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:base="../../../target/tables/">
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:base="../tables/">
     <title>Solar Theory</title>
     
     <section>
@@ -13,7 +13,7 @@
             
             <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
             
-            <xi:include href="sml-original.xml"/>
+            <xi:include href="slm-original.xml"/>
             
             <para>
                 And in this way you can calculate it for any number of days and years that you want.
@@ -38,35 +38,43 @@
                     smaller than that of Rambam. The following table compares printed and calculated
                     values:</para>
 
-                <xi:include href="sml-calculated.xml"/>
+                <xi:include href="slm-calculated.xml"/>
 
                 <para> Although the value of the movement of the mean solar longitude in one day
                     given by <biblioref linkend="Almagest"/> III 1 (H209) (which, rounded to
                     seconds, becomes Rambam's value) is bigger, it is not big enough, and Rambam's
                     numbers (for more than 10 days) can not be explained by performing calculations
-                    with the long value from Almagest and then rounding the results. </para>
+                    with the long value from Almagest and then rounding the results to the precision
+                    of the Rambam's values. </para>
                 
-                <xi:include href="sml-almagest.xml"/>
+                <xi:include href="slm-almagest.xml"/>
 
                 <para>
                     From the printed values it is possible to reconstruct the value of the
                     movement in mean solar longitude in one day that Rambam used to calculate each of them:</para>
-                
-                <xi:include href="sml-reconstructed.xml"/>
+                <!-- TODO
+                <xi:include href="slm-reconstructed.xml"/>
+                -->
 
                 <para>
-                    <biblioref linkend="Tzikuni"/> (p. XXX) gives the algorithm of such reconstruction: add to the remainder as many times 360 as there were full rotations in given
-                    time period, and then divide. It also gives a value reconstructed from the printed values for 10,000, 1000 and 100 days: 59′8.33″, or 0.9856472 degrees, and the
-                    current "scientific" value of 0.9856473 degrees. It seems that origins of the Rambam's value were questioned by his commentators, including "Pirush". Value that
-                    can be derived from the tradition that 19 years = 6939 days 16 hours and 595 parts is 0.9856348. This algorithm can be modified to produce an interval of
-                    possible values, taking into account precision of the numbers.</para>
+                    <biblioref linkend="Tzikuni"/> (p. XXX) gives the algorithm of such reconstruction: add to the
+                    remainder as many times 360 as there were full rotations in given time period, and then divide.
+                    It also gives a value reconstructed from the printed values for 10,000, 1000 and 100 days: 59′8.33″,
+                    or 0.9856472 degrees, and the current "scientific" value of 0.9856473 degrees. It seems that origins
+                    of the Rambam's value were questioned by his commentators, including "Pirush". Value that can be
+                    derived from the tradition that 19 years = 6939 days 16 hours and 595 parts is 0.9856348. This
+                    algorithm can be modified to produce an interval of possible values, taking into account precision
+                    of the numbers.</para>
 
                 <para>
-                    Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
+                    Following table compares the printed values with calculations based on the most "precise"
+                    reconstructed value - that for 10000 days.
                 </para>
-                
-                <xi:include href="sml-recalculated.xml"/>
-                <xi:include href="sml-recalculated10.xml"/>
+
+                <!-- TODO the intervals
+                <xi:include href="slm-recalculated.xml"/>
+                <xi:include href="slm-recalculated10.xml"/>
+                -->
                 
                 <para> Values of the movement in one day apparently used by Rambam, if rounded to
                     the seconds, give the "official" Rambam's value. Values calculated from the
