@@ -15,14 +15,14 @@ class SunLongitudeMeanTest extends FlatSpec {
 
   it should "calculate for 29 days in two steps" in {
     // Rambam calculated value for 29 days as 3*10-1, not 2*10+9 :)
-    assertResult(SunLongitudeMean.table.month)(SunLongitudeMean.table.ten*3-SunLongitudeMean.table.one)
-    assertResult(Angle(28, 35, 1))(SunLongitudeMean.table.ten*3-SunLongitudeMean.table.one)
-    assertResult(Angle(28, 34, 58))(SunLongitudeMean.table.ten*2+SunLongitudeMean.table.one*9)
+    assertResult(SunLongitudeMean.month)(SunLongitudeMean.ten*3-SunLongitudeMean.one)
+    assertResult(Angle(28, 35, 1))(SunLongitudeMean.ten*3-SunLongitudeMean.one)
+    assertResult(Angle(28, 34, 58))(SunLongitudeMean.ten*2+SunLongitudeMean.one*9)
   }
 
   it should "calculate correctly for the regular year" ignore {
-    assertResult(SunLongitudeMean.table.year)(SunLongitudeMean.table.one*354)
-    assertResult(SunLongitudeMean.table.year)(SunLongitudeMean.table.calculate(354))
+    assertResult(SunLongitudeMean.year)(SunLongitudeMean.one*354)
+    assertResult(SunLongitudeMean.year)(SunLongitudeMean.calculate(354))
   }
 
   it should "make a full circle in a year" in {
