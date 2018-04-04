@@ -7,7 +7,7 @@ object MoonLatitudeSightingAdjustment {
   // KH 17:8-9
   final def calculate(moonLongitudeTrue: AnglePoint): Angle = {
     import Zodiac._
-    inConstellation(moonLongitudeTrue) match {
+    inZodiac(moonLongitudeTrue) match {
       case Aries       => Angle(0,  9)
       case Taurus      => Angle(0, 10)
       case Gemini      => Angle(0, 16)

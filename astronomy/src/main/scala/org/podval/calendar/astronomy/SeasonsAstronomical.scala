@@ -12,9 +12,8 @@ final class SeasonsAstronomical(calculator: Calculator) extends Seasons {
   def tkufasTishrei(year: Year): Moment = tkufa(Zodiac.Libra    )(year)
   def tkufasTeves  (year: Year): Moment = tkufa(Zodiac.Capricorn)(year)
 
-  private def tkufa(constellation: Zodiac.Constellation)(year: Year): Moment = {
-    def f(moment: Moment): AnglePoint =
-      (sunLongitudeTrue(moment) - constellation.start).toPoint.symmetrical
+  private def tkufa(zodiac: Zodiac)(year: Year): Moment = {
+    def f(moment: Moment): AnglePoint = (sunLongitudeTrue(moment) - zodiac.start).toPoint.symmetrical
     val left: Moment = year.month(Month.Name.Nisan).prev.firstDay.toMoment
     val right: Moment = year.month(Month.Name.Nisan).next.firstDay.toMoment
     val result: Moment = Math.findZero[Jewish, AngleNumberSystem](f, left, right, 0)

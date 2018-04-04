@@ -8,8 +8,8 @@ object MoonLongitude3Portion {
   // KH 17:12
   final def calculate(moonLongitude3: AnglePoint): BigRational = {
     import Zodiac._
-    def in(constellation1: Constellation, constellation2: Constellation): Boolean =
-      Zodiac.in(moonLongitude3, Set(constellation1, constellation2))
+    def in(zodiac1: Zodiac, zodiac2: Zodiac): Boolean =
+      Zodiac.in(moonLongitude3, Set(zodiac1, zodiac2))
 
     if (in(Pisces     , Aries ))  BigRational(1, 6) else
     if (in(Aquarius   , Taurus))  BigRational(1, 5) else

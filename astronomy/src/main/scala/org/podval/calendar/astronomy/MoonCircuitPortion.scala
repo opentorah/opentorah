@@ -9,12 +9,12 @@ object MoonCircuitPortion {
   final def calculate(moonLongitudeTrue: AnglePoint): BigRational = {
     import Zodiac._
     def in(
-      from1: Constellation,
+      from1: Zodiac,
       fromDegrees: Int,
-      to1: Constellation,
+      to1: Zodiac,
       toDegrees: Int,
-      from2: Constellation,
-      to2: Constellation
+      from2: Zodiac,
+      to2: Zodiac
     ): Boolean =
       ((from1.at(Angle(fromDegrees)) <= moonLongitudeTrue) &&
        (moonLongitudeTrue < to1.at(Angle(toDegrees)))) ||

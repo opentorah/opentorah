@@ -3,7 +3,6 @@ package org.podval.calendar.astronomy
 import org.scalatest.FlatSpec
 import org.podval.calendar.angle.AngleNumberSystem
 import AngleNumberSystem.{Angle, AnglePoint, headRange, range}
-import Zodiac.{Constellation, constellations}
 import org.podval.calendar.jewish.{Cycle, Jewish}
 import Jewish.{Day, Month, Year}
 import org.podval.calendar.numbers.BigRational
@@ -21,10 +20,10 @@ class TextTest extends FlatSpec {
   }
 
   "zodiac" should "be as in KH 11:7-9" in {
-    assertResult(12)(constellations.length)
+    assertResult(12)(Zodiac.all.length)
     assertResult(AnglePoint(0))(Zodiac.Aries.start)
-    constellations.init.zip(constellations.tail).foreach {
-      case (prev: Constellation, next: Constellation) =>
+    Zodiac.all.init.zip(Zodiac.all.tail).foreach {
+      case (prev: Zodiac, next: Zodiac) =>
         assertResult(prev.end)(prev.start + Angle(30))
         assertResult(next.start)(prev.end)
     }
