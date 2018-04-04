@@ -3,9 +3,6 @@ package org.podval.calendar.jewish
 import Jewish.{Day, Moment, TimeInterval}
 import Day.Name._
 
-// TODO KH 7:8 says that postponement of RoshHashonoh is done to align the calendar better with
-// the true molad; analyze the statistics of distances between mean *and* true molad and RoshHashono.
-// TODO are there meaningful names for the corrections?
 object NewYear {
 
   sealed class Delay(val days: Int)
@@ -30,7 +27,7 @@ object NewYear {
     else if (
       (newMoon.day.name == Sheni) &&
       (newMoon.time >= thirdCorrection) &&
-      // This is not defined for yer 0 - and doesn't apply :)
+      // This is not defined for year 0 - and doesn't apply :)
       Cycle.isLeapYear(yearNumber-1)) Third  /* KH 7:5 */
     else No
   }
@@ -47,7 +44,5 @@ object NewYear {
   final val secondCorrection: TimeInterval = TimeInterval().hours(9).parts(204)
 
   // KH 7:5
-  // TODO this can be calculated based on the maximum length of a year and
-  // the first correction; do it!
   final val thirdCorrection: TimeInterval  = TimeInterval().hours(15).parts(589)
 }

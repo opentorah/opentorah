@@ -54,8 +54,6 @@ final class Table[A](name: String, columns: Seq[Column[A]], rows: Seq[A]) {
     </html>
 
 
-  // TODO use more HTML-like tables
-  // TODO column width?
   private def toDocBook: Elem =
     <informaltable xmlns="http://docbook.org/ns/docbook" version="5.0" frame="all" xml:id={name}>
       <tgroup cols={columns.length.toString}>

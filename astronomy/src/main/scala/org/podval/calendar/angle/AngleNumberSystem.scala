@@ -53,7 +53,6 @@ trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
 object AngleNumberSystem extends AngleNumberSystem {
   import scala.language.implicitConversions
 
-  // TODO use in roundTo()...
   object Position {
     final val MINUTES: Int = 0
     final val SECONDS: Int = 1

@@ -1,9 +1,6 @@
 package org.podval.calendar.numbers
 
 object Math {
-
-  // TODO two separate lengths (precisions)?
-  // TODO unify precisions/lengths and digit positions.
   final def findZero[S <: NumberSystem[S], T <: NumberSystem[T]]
     (f: S#Point => T#Point, left: S#Point, right: S#Point, length: Int): S#Point =
   {

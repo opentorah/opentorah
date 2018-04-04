@@ -13,7 +13,6 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
 
   def rationals: Gen[BigRational] =
     for {
-      // TODO figure out how to make BigInts and use Gen.nonEmptyListOf(Arbitrary.arbitrary[Int]).map()
       numerator <- arbitrary[Int]
       denominator <- arbitrary[Int] if denominator != 0
     } yield BigRational(numerator, denominator)

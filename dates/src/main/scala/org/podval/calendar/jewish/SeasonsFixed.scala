@@ -36,9 +36,6 @@ object SeasonsFixed {
   object RavAda extends SeasonsFixed {
     final override def yearLength: TimeInterval = Sun.yearOfRavAda
 
-    // TODO Rav Ada's tkufos started a *week* later than Shmuel's!
-    // Isn't it readily observable?
-    // Analyze the difference in historic periods...
     // KH 10:3
     final override val firstTkufasNisanBeforeFirstMoladNisan: TimeInterval =
       TimeInterval().hours(9).parts(642)

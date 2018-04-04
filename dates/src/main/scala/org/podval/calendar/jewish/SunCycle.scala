@@ -3,7 +3,6 @@ package org.podval.calendar.jewish
 import Jewish.{Moment, TimeInterval}
 import Sun.yearOfShmuel
 
-// TODO Where and when was the Sun created? Does this jibe with Rambam's epoch?
 object SunCycle {
   // Since Birkas HaChama is said in the morning, we add 12 hours to the time of the equinox.
   // Sanctification of the Sun falls from Adar 10 to Nissan 26.

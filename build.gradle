@@ -1,15 +1,7 @@
-// TODO
-// If I annotate the test classes to use ScalaTest's JUnit runner, Idea doesn't give me an option
-// to run/debug individual test methods (in addition to this annotation noise);
-// if I use ScalaTest Gradle plugin, there is no way (currently) to get rid of the all
-// build-time test-related noise :(
 plugins {
-  id "com.github.maiflai.scalatest" version "0.18" apply false
   id "com.jfrog.artifactory" version "4.5.4" apply false
   id "com.jfrog.bintray" version "1.7.3" apply false
 }
-
-// TODO factor out commonality in publishing into defs.
 
 def scalaVersion      = '2.12.5'
 def scalaVersionMajor = '2.12'
@@ -37,7 +29,6 @@ allprojects {
 
 subprojects {
   apply plugin: 'scala'
-// TODO  apply plugin: 'com.github.maiflai.scalatest'
   apply plugin: 'maven-publish'
   apply plugin: 'com.jfrog.bintray'
 
@@ -224,5 +215,5 @@ project(':paper') {
     args = [ "${tablesDir}" ]
   }
 
-  task docbook(dependsOn: [buildTables, docbookHtml])
+  task docbook(dependsOn: [buildTables, docbookPdf /*, docbookHtml*/])
 }
