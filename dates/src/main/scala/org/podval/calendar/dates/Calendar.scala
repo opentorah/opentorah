@@ -63,7 +63,7 @@ object Calendar {
   final val daysPerWeek: Int = 7
 
   // It seems that first day of the first year was Sunday; molad - BaHaRad.
-  // Second year - friday; molad - 8 in the morning.
+  // Second year - Friday; molad - 8 in the morning.
   final val firstDayNumberInWeekJewish: Int = 1
 
   final val epoch: Int = 1373429
