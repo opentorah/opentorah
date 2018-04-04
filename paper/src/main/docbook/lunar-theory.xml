@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:base="../../../target/tables/">
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:base="../tables/">
     <title>Lunar Theory</title>
 
         <section>
@@ -31,7 +31,7 @@
 
                 <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
 
-                <xi:include href="mml-original.xml"/>
+                <xi:include href="mlm-original.xml"/>
 
                 <para>
                     And in this way you can calculate it for any number of days and years that you want.
@@ -49,7 +49,7 @@
                         the result is smaller than that of Rambam.
                         The following table compares printed and calculated values:</para>
 
-                    <xi:include href="mml-calculated.xml"/>
+                    <xi:include href="mlm-calculated.xml"/>
 
                     <para>
                         Moreover, the value of the movement of the mean lunar longitude in one day given by
@@ -62,14 +62,17 @@
                     <para>
                         From the printed values it is possible to reconstruct the value of the
                         movement in mean lunar longitude in one day that Rambam used to calculate each of them:</para>
-
-                    <xi:include href="mml-reconstructed.xml"/>
+                    <!-- TODO
+                    <xi:include href="mlm-reconstructed.xml"/>
+                    -->
 
                     <para>
                         Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
                     </para>
-                
-                    <xi:include href="mml-recalculated.xml"/>
+
+                    <!-- TODO
+                    <xi:include href="mlm-recalculated.xml"/>
+                    -->
 
                     <para>
                         Values of the movement in one day apparently used by Rambam, if rounded to the seconds, all give the "official" Rambam's value.
@@ -88,7 +91,7 @@
                     For longer periods, (remainder) of the movement in mean lunar anomaly is:
                 </para>
 
-                <xi:include href="mma-original.xml"/>
+                <xi:include href="mam-original.xml"/>
 
                 <section>
                     <title>Discussion</title>
@@ -104,7 +107,7 @@
                         The following table compares printed and calculated values:
                     </para>
                 
-                    <xi:include href="mma-calculated.xml"/>
+                    <xi:include href="mam-calculated.xml"/>
 
                     <para>
                         Although the value of the movement of the mean lunar anomaly in one day given by
@@ -118,21 +121,24 @@
                     <para>
                         From the printed values it is possible to reconstruct the value of the
                         movement in mean lunar anomaly in one day that Rambam used to calculate each of them:</para>
-                
-                    <xi:include href="mma-reconstructed.xml"/>
-                
+                    <!-- TODO
+                    <xi:include href="mam-reconstructed.xml"/>
+                    -->
+
                     <para>
                         Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
                     </para>
-                
-                    <xi:include href="mma-recalculated.xml"/>
+
+                    <!-- TODO
+                    <xi:include href="mam-recalculated.xml"/>
+                    -->
 
                     <para>
                         Values of the movement in one day apparently used by Rambam, if rounded to the seconds, all give the "official" Rambam's value.
                         Values calculated from the value reconstructed from the printed 10000 days movement, if rounded, produce the values Rambam published -
                         except for 354 days movement, which remains unexplained TODO!
                     </para>
-                
+
                     <para>
                         Here, everything is worse than in 14:2 TODO!!!
                     </para>
@@ -233,9 +239,9 @@
 
                 <para>
                     The value of mean [lunar longitude]
-                    after you add to it or subtract from it or leave it as 
+                    after you add to it or subtract from it or leave it as
                     it is - that is mean lunar longitude approximately a third of an hour after sunset on the
-                    date you are calculating it for. And this is what is called 
+                    date you are calculating it for. And this is what is called
                     <glossterm>mean lunar longitude at observation time</glossterm>.
                     <footnote><para>This is Law 6.</para></footnote>
                 </para>
@@ -327,7 +333,7 @@
                 <section>
                     <title>Discussion</title>
                     <para>
-                        Rambam does not describe the model behind this correction. 
+                        Rambam does not describe the model behind this correction.
                         Because the models Rambam did describe until now are the same
                         as Almagest's models
                         (including numerical parameters), and because this correction
@@ -364,7 +370,7 @@
                     mean lunar longitude the observation time. And if corrected lunar anomaly is
                     more than 180° but less than 360°, add visible anomaly of this corrected anomaly
                     to the mean lunar longitude the observation time. And mean lunar longitude after
-                    you add to it or subtract from it is the 
+                    you add to it or subtract from it is the
                     <glossterm>true lunar longitude at the observation time</glossterm>.
                     <footnote><para>This is Law 4.</para></footnote>
                 </para>
@@ -380,7 +386,9 @@
                     anomaly for a given value of the corrected anomaly?
                 </para>
 
+                <!-- TODO
                 <xi:include href="mva-original.xml"/>
+                -->
 
                 <section>
                     <title>Discussion</title>
@@ -433,8 +441,9 @@
                         value of e for them is way out of range it is in
                         for the rest of them.
                     </para>
-
+                    <!-- TODO
                     <xi:include href="mva-withe.xml"/>
+                    -->
                     
                     <para>
                         TODO Range of e - graph. Range of possible values for each based on the range of e.

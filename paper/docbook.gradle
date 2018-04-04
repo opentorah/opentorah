@@ -9,10 +9,18 @@ buildscript {
     }
     dependencies {
         // Saxon-HE had support for XSLT 1.0 up to v9.7, then dropped it, then - allegedly - reinstated it
-        // by popular demand in v9.8.0.7...
-        // When I use v9.8.0-10, I see a lot of
+        // by popular demand in v9.8.0.7. It doesn't seem fixed to me; when I use v9.8.0-10, I see a lot of
         //   "Static error... XPST0008: Variable... has not been declared (or its declaration is not in scope),
-        // but when I use v9.7.0-21 - I do not. Confusing...
+        // but when I use v9.7.0-21 - I do not.
+        //
+        // But it still doesn't work; I get (from DocBook XSLT):
+        //   Don't know how to chunk with Saxonica
+        //   Error at char 16 in xsl:value-of/@select on line 84 column 63 of chunker.xsl:
+        //   XTMM9000: Processing terminated by xsl:message at line 84 in chunker.xsl
+        // It seems that the extensions that DocBook XSLT stylesheets use to produce multiple output files are
+        // not supported even by Saxon-HE versions that supports XSLT 1.0.
+        //
+        // I'll need to dongrade to Saxon 6.5.5 :(
         classpath 'net.sf.saxon:Saxon-HE:9.7.0-21'
         classpath 'xerces:xercesImpl:2.11.0'
 
@@ -40,10 +48,6 @@ configurations {
 }
 
 dependencies {
-    repositories {
-        jcenter()
-        mavenCentral()
-    }
     // v1.79.2 has been released for a while, but doesn't seem to have made it into Mavrn repositories...
     docbookxslt 'net.sf.docbook:docbook-xsl:1.79.1:resources@zip'
 }
@@ -162,7 +166,8 @@ class Docbook extends DefaultTask {
         String rootFilename = outputFile.getName();
         rootFilename = rootFilename.substring(0, rootFilename.lastIndexOf('.'));
         transformer.setParameter("root.filename", rootFilename);
-        transformer.setParameter("base.dir", outputFile.getParent() + File.separator);
+//        transformer.setParameter("base.dir", outputFile.getParent() + File.separator);
+//        println("baseDir=" + outputFile.getParent())
         transformer.transform(new SAXSource(reader, inputSource), result);
     }
 }

@@ -25,11 +25,11 @@ final case class Column[A](heading: String, subheading: String, f: A => Any)
 
 final class Columns[A](suffix: String, columns: Column[A]*) {
 
-  def tabulate(name: String, rows: List[A]): Table[A] = new Table(name + "-" + suffix, columns, rows)
+  def tabulate(name: String, rows: Seq[A]): Table[A] = new Table(name + "-" + suffix, columns, rows)
 }
 
 
-final class Table[A](name: String, columns: Seq[Column[A]], rows: List[A]) {
+final class Table[A](name: String, columns: Seq[Column[A]], rows: Seq[A]) {
 
   private def toHtml: Elem =
     <html>
