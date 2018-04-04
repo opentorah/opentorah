@@ -3,7 +3,7 @@ package org.podval.calendar.jewish
 import org.scalatest.FlatSpec
 import org.podval.calendar.time.TimeNumberSystem.{hoursPerDay, hoursPerHalfDay, partsPerHour,
   momentsPerPart}
-import Jewish.{Day, Moment, Month, Year, TimeInterval, range, week}
+import Jewish.{Day, Month, Year, TimeInterval, range, week}
 import Moon.meanLunarPeriod
 import Sun.{yearOfShmuel, yearOfRavAda}
 import JewishYearCompanion.{normalYear, leapYear}
@@ -46,9 +46,9 @@ class TextTest extends FlatSpec {
   }
 
   "weekly reminders of month and year" should "be as in KH 6:5" in {
-    assertResult(TimeInterval().days(1).hours(12).parts(793))(meanLunarPeriod % week)
-    assertResult(TimeInterval().days(4).hours( 8).parts(876))(normalYear      % week)
-    assertResult(TimeInterval().days(5).hours(21).parts(589))(leapYear        % week)
+    assertResult(TimeInterval().days(1).hours(12).parts(793))(meanLunarPeriod remNumber week)
+    assertResult(TimeInterval().days(4).hours( 8).parts(876))(normalYear      remNumber week)
+    assertResult(TimeInterval().days(5).hours(21).parts(589))(leapYear        remNumber week)
   }
 
   "molad Nisan example from KH 6:7" should "be correct" in {
@@ -88,7 +88,7 @@ class TextTest extends FlatSpec {
   "cycle remainder" should "be as in KH 6:12" in {
     assertResult(TimeInterval().days(2).hours(16).parts(595))(
       (TimeInterval().days(4).hours( 8).parts(876)*12 +
-        TimeInterval().days(5).hours(21).parts(589)*7) % week
+       TimeInterval().days(5).hours(21).parts(589)* 7) remNumber week
     )
   }
 

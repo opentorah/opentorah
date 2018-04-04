@@ -1,7 +1,7 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.jewish.Jewish.Day
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint, defaultLength}
+import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
 import org.podval.calendar.numbers.BigRational
 
 class Calculator(epoch: Epoch, calculators: Calculators, rounders: Rounders) {
@@ -95,7 +95,7 @@ class Calculator(epoch: Epoch, calculators: Calculators, rounders: Rounders) {
 
     // KH 17:10
     val moonCircuitPortion: BigRational = calculators.moonCircuitPortion(moonLongitudeTrue)
-    val moonCircuit: Angle = rounders.moonCircuit(latitude2*(moonCircuitPortion, defaultLength))
+    val moonCircuit: Angle = rounders.moonCircuit(latitude2.multRational(moonCircuitPortion))
 
     // KH 17:11
     val longitude3: Angle = // TODO AnglePoint
@@ -108,12 +108,12 @@ class Calculator(epoch: Epoch, calculators: Calculators, rounders: Rounders) {
     val moonLongitude3Portion: BigRational =
       calculators.moonLongitude3Portion(moonLongitudeTrue) /* TODO longitude3.toPoint?*/
     val moonLongitude3Correction: Angle =
-      rounders.moonLongitude3Correction(longitude3*(moonLongitude3Portion, defaultLength))
+      rounders.moonLongitude3Correction(longitude3.multRational(moonLongitude3Portion))
     val longitude4: Angle = longitude3 + moonLongitude3Correction // TODO AnglePoint
 
     // KH 17:12
     val geographicCorrection: Angle =
-      rounders.geographicCorrection(latitude1*(BigRational(2, 3), defaultLength))
+      rounders.geographicCorrection(latitude1.multRational(BigRational(2, 3)))
     val arcOfSighting: Angle = rounders.arcOfSighting(
       if (isMoonLatitudeNortherly) longitude4 + geographicCorrection
       else longitude4 - geographicCorrection)

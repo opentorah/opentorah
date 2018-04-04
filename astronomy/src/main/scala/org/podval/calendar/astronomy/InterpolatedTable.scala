@@ -1,6 +1,5 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem
 import org.podval.calendar.angle.AngleNumberSystem.Angle
 import org.podval.calendar.numbers.BigRational
 
@@ -17,7 +16,7 @@ trait InterpolatedTable {
       val change: Angle = afterValue - beforeValue
       val span: Angle = after - before
       val portion: BigRational = reminder.toRational/span.toRational
-      change*(portion, AngleNumberSystem.defaultLength)
+      change.multRational(portion)
     }
     val result = beforeValue + more
     result
