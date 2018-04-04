@@ -5,7 +5,7 @@
     exclude-result-prefixes="xs"
     version="1.0">
 
-    <xsl:import href="@docbkx@/fo/..."/>
+    <xsl:import href="@docbook@/fo/docbook.xsl"/>
 
     <xsl:import href="common.xsl"/>
     

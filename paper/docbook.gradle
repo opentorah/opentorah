@@ -20,7 +20,7 @@ buildscript {
         // It seems that the extensions that DocBook XSLT stylesheets use to produce multiple output files are
         // not supported even by Saxon-HE versions that supports XSLT 1.0.
         //
-        // I'll need to dongrade to Saxon 6.5.5 :(
+        // I'll need to downgrade to Saxon 6.5.5 :(
         classpath 'net.sf.saxon:Saxon-HE:9.7.0-21'
         classpath 'xerces:xercesImpl:2.11.0'
 
@@ -35,7 +35,7 @@ buildscript {
         classpath 'org.apache.xmlgraphics:batik-svg-dom:1.9@jar'
         classpath 'org.apache.avalon.framework:avalon-framework-impl:4.3.1'
 
-        classpath 'net.sf.xslthl:xslthl:2.1.0'
+//        classpath 'net.sf.xslthl:xslthl:2.1.0'
 
         classpath('xml-apis:xml-apis:1.4.01') {
             force = true
@@ -53,7 +53,9 @@ dependencies {
 }
 
 import net.sf.saxon.TransformerFactoryImpl
-import org.apache.fop.apps.*
+import org.apache.fop.apps.Fop
+import org.apache.fop.apps.FopConfParser
+import org.apache.fop.apps.MimeConstants
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.apache.xerces.jaxp.SAXParserFactoryImpl
 import org.xml.sax.InputSource
@@ -181,15 +183,12 @@ class DocbookPdf extends DefaultTask {
 
     @TaskAction
     final void transform() {
-        FopFactory fopFactory = new FopConfParser(
-            new File(project.getProjectDir().getAbsolutePath() + '/src/main/fop/fop.xml'),
-            new File(project.getProjectDir().getAbsolutePath() + '/src').toURI()
-        ).getFopFactoryBuilder().build();
-
         OutputStream out = new BufferedOutputStream(new FileOutputStream(outputFile));
 
         try {
-            Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
+            Fop fop = new FopConfParser(
+                new File(project.getProjectDir().getAbsolutePath() + '/src/main/fop/fop.xconf')
+            ).getFopFactoryBuilder().build().newFop(MimeConstants.MIME_PDF, out);
 
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer transformer = factory.newTransformer();

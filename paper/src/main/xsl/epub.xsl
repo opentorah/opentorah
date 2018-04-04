@@ -5,7 +5,7 @@
     exclude-result-prefixes="xs"
     version="1.0">
 
-    <xsl:import href="@docbkx@/epub/..."/>
+    <xsl:import href="@docbook@/epub/docbook.xsl"/>
 
     <xsl:import href="common-html.xsl"/>
 </xsl:stylesheet>
