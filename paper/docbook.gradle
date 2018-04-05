@@ -33,21 +33,19 @@ buildscript {
         classpath 'xerces:xercesImpl:2.11.0'
 
         classpath 'org.apache.xmlgraphics:fop:2.2@jar'
-        classpath 'org.apache.xmlgraphics:xmlgraphics-commons:2.2'
-        classpath 'org.apache.xmlgraphics:batik-bridge:1.9@jar'
+//        classpath 'org.apache.xmlgraphics:xmlgraphics-commons:2.2'
+//        classpath 'org.apache.xmlgraphics:batik-bridge:1.9@jar'
 //        classpath 'org.apache.xmlgraphics:batik-css:1.8@jar'
 //        classpath 'org.apache.xmlgraphics:batik-dom:1.8'
         classpath 'org.apache.xmlgraphics:batik-transcoder:1.9' // exclude fop!
-        classpath 'org.apache.xmlgraphics:batik-gvt:1.9'
+//        classpath 'org.apache.xmlgraphics:batik-gvt:1.9'
 //        classpath 'org.apache.xmlgraphics:batik-svggen:1.8'
-        classpath 'org.apache.xmlgraphics:batik-svg-dom:1.9@jar'
+//        classpath 'org.apache.xmlgraphics:batik-svg-dom:1.9@jar'
         classpath 'org.apache.avalon.framework:avalon-framework-impl:4.3.1'
 
 //        classpath 'net.sf.xslthl:xslthl:2.1.0'
 
-        classpath('xml-apis:xml-apis:1.4.01') {
-            force = true
-        }
+//        classpath('xml-apis:xml-apis:1.4.01') { force = true }
     }
 }
 
@@ -56,7 +54,7 @@ configurations {
 }
 
 dependencies {
-    // v1.79.2 has been released for a while, but doesn't seem to have made it into Mavrn repositories...
+    // v1.79.2 has been out for a while, but doesn't seem to have made it into Mavrn repositories...
     docbookxslt 'net.sf.docbook:docbook-xsl:1.79.1:resources@zip'
 }
 
