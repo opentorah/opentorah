@@ -1,12 +1,11 @@
 package org.podval.calendar.jewish
 
 import org.scalatest.FlatSpec
-import org.podval.calendar.time.TimeNumberSystem.{hoursPerDay, hoursPerHalfDay, partsPerHour,
-  momentsPerPart}
+import org.podval.calendar.time.TimeNumberSystem.{hoursPerDay, hoursPerHalfDay, partsPerHour, momentsPerPart}
 import Jewish.{Day, Month, Year, TimeInterval, range, week}
+import JewishYearCompanion.{normalYear, leapYear}
 import Moon.meanLunarPeriod
 import Sun.{yearOfShmuel, yearOfRavAda}
-import JewishYearCompanion.{normalYear, leapYear}
 
 /**
  * Tests based on the statements from the text itself.
@@ -52,7 +51,6 @@ class TextTest extends FlatSpec {
   }
 
   "molad Nisan example from KH 6:7" should "be correct" in {
-    // TODO Rambam doesn't give the year!
     assertResult(TimeInterval().hours( 5).parts(900))(
       (TimeInterval().hours(17).parts(107) + meanLunarPeriod).time)
   }
@@ -92,16 +90,46 @@ class TextTest extends FlatSpec {
     )
   }
 
-  // TODO tests for KH 8:9
+  "kind of the year" should "be correct for years from KH 8:9" in {
+    var numberRegular: Int = 0
+    var numberFull: Int = 0
+    var numberShort: Int = 0
+    for (yearNumber <- 2 to 6000) {
+      val year: Year = Year(yearNumber)
+      if (!year.isLeap) {
+        val nextYearDay: Day.Name = year.next.firstDay.name
+        if (year.firstDay.name == Day.Name.Chamishi) {
+          if (nextYearDay == Day.Name.Sheni) {
+            numberRegular += 1
+            assertResult(Year.Kind.Regular)(year.kind)
+          }
+          if (nextYearDay == Day.Name.Shlishi) {
+            numberFull += 1
+            assertResult(Year.Kind.Full)(year.kind)
+          }
+        }
+        if (year.firstDay.name == Day.Name.Shabbos) {
+          if (nextYearDay == Day.Name.Shlishi) {
+            numberShort += 1
+            assertResult(Year.Kind.Short)(year.kind)
+          }
+        }
+      }
+    }
 
-  // KH 8:10
+    // Verify that we saw some years with properties from the text
+    assert(numberRegular > 0) // 1084 of them!
+    assert(numberFull    > 0) // 198 of them!
+    assert(numberShort   > 0) // 259 of them!
+  }
+
   "year kind laws" should "be as in KH 8:10" in {
     import Day.Name._
     for (yearNumber <- 1 to 6000) {
       val year = Year(yearNumber)
       val roshHashono = year.firstDay
       roshHashono.name match {
-        case Shlishi  => assertResult(Year.Kind.Regular)(year.kind)
+        case Shlishi  => assert(Year.Kind.Regular == year.kind)
         case Shabbos  => assert(Year.Kind.Regular != year.kind)
         case Sheni    => assert(Year.Kind.Regular != year.kind)
         case Chamishi =>
@@ -112,19 +140,23 @@ class TextTest extends FlatSpec {
     }
   }
 
-  "first tkufas Nisan for Shmuel" should "as in KH 9:3-4" in {
+  "first tkufas Nisan for Shmuel" should "be as in KH 9:3-4" in {
     assertResult(Year(1).month(Month.Name.Nisan).newMoon)(SeasonsFixed.firstMoladNisan)
     assertResult(TimeInterval().days(7).hours(9).parts(642))(
       SeasonsFixed.firstMoladNisan - SeasonsFixed.Shmuel.firstTkufasNisan)
-    // TODO more tests from 9:4
     assertResult(Day.Name.Rvii)(SeasonsFixed.Shmuel.firstTkufasNisan.day.name)
   }
 
-  "tkufos of 4930" should "be as in KH 9:5-8" in {
+  "tkufos of 4930" should "be as in KH 9:5-7" in {
     val year: Year = Year(4930)
+
+    assertResult(260)(year.cycle)
+    assertResult(9)(year.numberInCycle)
+
     val tkufasNisan = SeasonsFixed.Shmuel.tkufasNisan(year)
     assertResult(Day.Name.Chamishi)(tkufasNisan.day.name)
     assertResult(TimeInterval().hours(6))(tkufasNisan.time)
+    assertResult(year.month(Month.Name.Nisan).day(8))(tkufasNisan.day)
 
     val tkufasTammuz = SeasonsFixed.Shmuel.tkufasTammuz(year)
     assertResult(Day.Name.Chamishi)(tkufasTammuz.day.name)
@@ -141,8 +173,6 @@ class TextTest extends FlatSpec {
     val nextTkufasNisan = SeasonsFixed.Shmuel.tkufasNisan(year+1)
     assertResult(Day.Name.Shishi)(nextTkufasNisan.day.name)
     assertResult(TimeInterval().hours(12))(nextTkufasNisan.time)
-
-    // TODO more tests from KH 9:6-8
   }
 
   "year of RavAda" should "be as in KH 10:1-2" in {
@@ -154,12 +184,9 @@ class TextTest extends FlatSpec {
       SeasonsFixed.RavAda.seasonLength)
   }
 
-  "first tkufas Nisan for RavAda" should "as in KH 10:3-4" in {
+  "first tkufas Nisan for RavAda" should "as in KH 10:3" in {
     assertResult(TimeInterval().hours(9).parts(642))(
       SeasonsFixed.firstMoladNisan - SeasonsFixed.RavAda.firstTkufasNisan)
-    // TODO more tests from 10:3-4
     assertResult(Day.Name.Rvii)(SeasonsFixed.RavAda.firstTkufasNisan.day.name)
   }
-
-  // TODO KH 10:7 check that real vernal equinox is approximately two days before the mean one
 }

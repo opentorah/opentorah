@@ -16,16 +16,9 @@ abstract class JewishYear(number: Int) extends YearBase[Jewish](number) {
 
   final override def character: YearCharacter = (isLeap, kind)
 
-  // KH 8:7-8
-  final def kind: Year.Kind = {
-    val daysOverShort: Int = lengthInDays - (if (isLeap) 383 else 353)
+  final def kind: Year.Kind = Year.kind(isLeap, lengthInDays)
 
-    daysOverShort match {
-      case 0 => Year.Kind.Short
-      case 1 => Year.Kind.Regular
-      case 2 => Year.Kind.Full
-      case _ => throw new IllegalArgumentException(
-        "Impossible year length " + lengthInDays + " for " + this)
-    }
-  }
+  final def cycle: Int = Cycle.yearCycle(number)
+
+  final def numberInCycle: Int = Cycle.yearNumberInCycle(number)
 }

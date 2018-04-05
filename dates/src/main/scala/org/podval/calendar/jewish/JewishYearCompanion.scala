@@ -46,6 +46,19 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
   final override def firstMonth(yearNumber: Int): Int = Cycle.firstMonth(yearNumber)
 
   final override def lengthInMonths(yearNumber: Int): Int = Cycle.yearLengthInMonths(yearNumber)
+
+  // KH 8:7-8
+  final def kind(isLeap: Boolean, lengthInDays: Int): Kind = {
+    val daysOverShort: Int = lengthInDays - (if (isLeap) 383 else 353)
+
+    daysOverShort match {
+      case 0 => Kind.Short
+      case 1 => Kind.Regular
+      case 2 => Kind.Full
+      case _ => throw new IllegalArgumentException(
+        "Impossible year length " + lengthInDays + " for " + this)
+    }
+  }
 }
 
 

@@ -5,8 +5,7 @@ import Jewish.TimeInterval
 object Cycle {
   final val yearsInCycle: Int = 19
 
-  final val leapYears: Set[Int] =
-    Set(3, 6, 8, 11, 14, 17, 19)
+  final val leapYears: Set[Int] = Set(3, 6, 8, 11, 14, 17, 19)
 
   final val leapYearsInCycle: Int = leapYears.size
 
