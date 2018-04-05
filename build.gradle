@@ -215,5 +215,5 @@ project(':paper') {
     args = [ "${tablesDir}" ]
   }
 
-  task docbook(dependsOn: [buildTables, docbookPdf /*, docbookHtml*/])
+  task docbook(dependsOn: [buildTables, docbookPdf, docbookHtml])
 }
