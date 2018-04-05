@@ -1,3 +1,12 @@
+buildscript {
+  repositories {
+    // To function outside a composite, a plugin repository would be required.
+  }
+  dependencies {
+    classpath 'org.podval.docbook:gradle-plugin:+'
+  }
+}
+
 plugins {
   id "com.jfrog.artifactory" version "4.5.4" apply false
   id "com.jfrog.bintray" version "1.7.3" apply false
@@ -26,6 +35,8 @@ allprojects {
   group = 'org.podval.calendar'
   version = '0.1.1'
 }
+
+apply plugin: 'org.podval.docbook.gradle'
 
 subprojects {
   apply plugin: 'scala'
@@ -164,7 +175,7 @@ project(':dates') {
 
 project(':astronomy') {
   dependencies {
-    compile lib.scala, project(':dates')
+    compile project(':dates')
   }
 
   def artifactInfo = [
