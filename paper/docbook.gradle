@@ -1,68 +1,22 @@
-/*
- * Inspired by a Gist by Aristedes Maniatis
- * https://gist.github.com/ari/4156d967d54289f4abf6
- */
 buildscript {
     repositories {
         jcenter()
         mavenCentral()
     }
     dependencies {
-        // DocBook XSLT stylesheets are in XSLT 1.0; rewrite in XSLT 2.0 did not yet release anything.
-        //
-        // On http://saxon.sourceforge.net/, it says:
-        //    "even if your stylesheets only require XSLT 1.0, it is probably better to run them under Saxon 9.x"
-        //
-        // Saxon-HE had support for XSLT 1.0 up to v9.7, then dropped it, then - allegedly - reinstated it
-        // by popular demand in v9.8.0.7. It doesn't seem fixed to me; when I use v9.8.0-10, I see a lot of
-        //   "Static error... XPST0008: Variable... has not been declared (or its declaration is not in scope),
-        // but when I use v9.7.0-21 - I do not.
-        //
-        // But it still doesn't work; I get (from DocBook XSLT):
-        //   Don't know how to chunk with Saxonica
-        //   Error at char 16 in xsl:value-of/@select on line 84 column 63 of chunker.xsl:
-        //   XTMM9000: Processing terminated by xsl:message at line 84 in chunker.xsl
-        //
-        // It seems that the extensions that DocBook XSLT stylesheets used to produce multiple output files are
-        // not supported even by Saxon-HE versions that supports XSLT 1.0.
-        //
-        // I had to downgrade to a version of Saxon that is an XSLT 1.0 processor (with the needed extensions) :(
-        // That seems to be v6.5.5, but it is not available from Maven Central or JCenter, so I had to go with v6.5.3 :(
         classpath 'saxon:saxon:6.5.3'
-
         classpath 'xerces:xercesImpl:2.11.0'
-
-        classpath 'org.apache.xmlgraphics:fop:2.2@jar'
-//        classpath 'org.apache.xmlgraphics:xmlgraphics-commons:2.2'
-//        classpath 'org.apache.xmlgraphics:batik-bridge:1.9@jar'
-//        classpath 'org.apache.xmlgraphics:batik-css:1.8@jar'
-//        classpath 'org.apache.xmlgraphics:batik-dom:1.8'
+        classpath 'org.apache.xmlgraphics:fop:2.2@jar' // TODO drop jar and see if the dependencies are correct
         classpath 'org.apache.xmlgraphics:batik-transcoder:1.9' // exclude fop!
-//        classpath 'org.apache.xmlgraphics:batik-gvt:1.9'
-//        classpath 'org.apache.xmlgraphics:batik-svggen:1.8'
-//        classpath 'org.apache.xmlgraphics:batik-svg-dom:1.9@jar'
         classpath 'org.apache.avalon.framework:avalon-framework-impl:4.3.1'
-
 //        classpath 'net.sf.xslthl:xslthl:2.1.0'
-
-//        classpath('xml-apis:xml-apis:1.4.01') { force = true }
     }
-}
-
-configurations {
-    docbookxslt
-}
-
-dependencies {
-    // v1.79.2 has been out for a while, but doesn't seem to have made it into Mavrn repositories...
-    docbookxslt 'net.sf.docbook:docbook-xsl:1.79.1:resources@zip'
 }
 
 import com.icl.saxon.TransformerFactoryImpl
 import org.apache.fop.apps.Fop
 import org.apache.fop.apps.FopConfParser
 import org.apache.fop.apps.MimeConstants
-import org.apache.tools.ant.filters.ReplaceTokens
 import org.apache.xerces.jaxp.SAXParserFactoryImpl
 import org.xml.sax.InputSource
 import org.xml.sax.XMLReader
@@ -76,37 +30,16 @@ import javax.xml.transform.sax.SAXResult
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.stream.StreamSource
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 task buildScriptDependencies(type: DependencyReportTask) {
     configurations = project.buildscript.configurations
 }
 
-def docbookXsl = "${buildDir}/docbookXsl"
 def docbook    = "${buildDir}/docbook"
 def xsl        = "${buildDir}/xsl"
 def fo         = "${buildDir}/fo/index.fo"
 
-task explodeDocbookXsl {
-    copy { from zipTree(configurations.docbookxslt.singleFile) into "${docbookXsl}" }
-    copy { from "${docbookXsl}/docbook" into "${docbookXsl}" }
-}
-
-task copyXsl(type: Copy) { from "src/main/xsl" into "${xsl}"
-    filter(ReplaceTokens, tokens: [ docbook: "${docbookXsl}".toString() ])
-}
-
-task copyDocbook(type: Copy) { from "src/main/docbook" into "${docbook}"
-    filter(ReplaceTokens, tokens: [
-        version     : version,
-        date        : LocalDate.now().format(DateTimeFormatter.ofPattern("d MMM yyyy"))
-    ])
-}
-
-task prepareDocbook(dependsOn: [explodeDocbookXsl, copyXsl, copyDocbook])
-
-task docbookHtml(type: Docbook, dependsOn: [prepareDocbook]) {
+task docbookHtml(type: Docbook, dependsOn: [prepareDocBook]) {
     def html = "${buildDir}/html"
 
     description = 'DocBook -> chunked HTML'
@@ -121,7 +54,7 @@ task docbookHtml(type: Docbook, dependsOn: [prepareDocbook]) {
     }
 }
 
-task docbookPdfPrepare(type: Docbook, dependsOn: [prepareDocbook]) {
+task docbookPdfPrepare(type: Docbook, dependsOn: [prepareDocBook]) {
     description = 'DocBook -> FO'
     sourceDirectory = file("${docbook}")
     outputFile = file("${fo}")
