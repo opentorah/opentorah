@@ -3,7 +3,7 @@ buildscript {
     // To function outside a composite, a plugin repository would be required.
   }
   dependencies {
-    classpath 'org.podval.docbook:gradle-plugin:+'
+    classpath 'org.podval.docbook:gradle-docbook-plugin:+'
   }
 }
 
@@ -35,8 +35,6 @@ allprojects {
   group = 'org.podval.calendar'
   version = '0.1.1'
 }
-
-apply plugin: 'org.podval.docbook.gradle'
 
 subprojects {
   apply plugin: 'scala'
@@ -212,11 +210,24 @@ project(':generate') {
 }
 
 project(':paper') {
+  // TODO this should be taken care of by the plugin!
+  configurations {
+    docbookxslt
+  }
+
   dependencies {
+    // v1.79.2 has been out for a while, but doesn't seem to have made it into Mavrn repositories...
+    docbookxslt 'net.sf.docbook:docbook-xsl:1.79.1:resources@zip'
+
     compile lib.scalaXml, project(':astronomy')
   }
 
+  apply plugin: 'org.podval.docbook.gradle'
   apply from: 'docbook.gradle'
+
+  docbook {
+    inputFile = file("${projectDir}/src/main/docbook/index.xml")
+  }
 
   def tablesDir = "${buildDir}/tables"
 
