@@ -24,24 +24,15 @@ def scalaVersion      = '2.12.5'
 def scalaVersionMajor = '2.12'
 
 ext.lib = [
-  zinc           : 'com.typesafe.zinc:zinc:0.3.15',
-  scala          : "org.scala-lang:scala-library:$scalaVersion",
+  zinc      : 'com.typesafe.zinc:zinc:0.3.15',
+  scala     : "org.scala-lang:scala-library:$scalaVersion",
 
-  saxon          : 'saxon:saxon:6.5.3',
-  xerces         : 'xerces:xercesImpl:2.11.0',
+  saxon     : 'saxon:saxon:6.5.3',
+  xerces    : 'xerces:xercesImpl:2.11.0',
 
-  fop            : 'org.apache.xmlgraphics:fop:2.2',
-
-  // v1.79.2 has been out for a while, but doesn't seem to have made it into Mavrn repositories...
-  docbookxslt    : 'net.sf.docbook:docbook-xsl:1.79.1:resources@zip'
-
-//        xslthl: 'net.sf.xslthl:xslthl:2.1.0'
+  fop       : 'org.apache.xmlgraphics:fop:2.2',
 ]
 
-
-configurations {
-  docbookxslt
-}
 
 dependencies {
   zinc lib.zinc
@@ -71,8 +62,6 @@ dependencies {
   // That seems to be v6.5.5, but it is not available from Maven Central or JCenter, so I had to go with v6.5.3 :(
   compile lib.saxon, lib.fop
   runtime lib.xerces
-
-  docbookxslt lib.docbookxslt
 }
 
 
