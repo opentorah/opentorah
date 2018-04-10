@@ -1,14 +1,29 @@
 package org.podval.docbook.gradle
 
-import org.apache.fop.apps.{Fop, FopConfParser, FopFactory}
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 
 import javax.xml.transform.{Transformer, TransformerFactory}
 import javax.xml.transform.sax.SAXResult
 import javax.xml.transform.stream.StreamSource
+import org.apache.fop.apps.{Fop, FopConfParser, FopFactory}
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.{InputFile, OutputFile, TaskAction}
+
+class FopTask extends DefaultTask {
+  @InputFile
+  private var input: File = _
+  def setInput(value: File): Unit = input = value
+
+  @OutputFile
+  private var output: File = _
+  def setOutput(value: File): Unit = output = value
+
+  @TaskAction
+  def transform(): Unit = FopTask.transform(input, DocBookPlugin.fopConfiguration(getProject), output)
+}
 
 
-object Fop {
+object FopTask {
   def transform(input: File, configuration: File, output: File): Unit = {
     output.getParentFile.mkdirs
 

@@ -210,32 +210,27 @@ project(':generate') {
 }
 
 project(':paper') {
-  // TODO this should be taken care of by the plugin!
-  configurations {
-    docbookxslt
-  }
+  apply plugin: 'org.podval.docbook.gradle'
 
   dependencies {
-    // v1.79.2 has been out for a while, but doesn't seem to have made it into Mavrn repositories...
-    docbookxslt 'net.sf.docbook:docbook-xsl:1.79.1:resources@zip'
-
     compile lib.scalaXml, project(':astronomy')
   }
 
-  apply plugin: 'org.podval.docbook.gradle'
-  apply from: 'docbook.gradle'
-
   docbook {
-    inputFile = file("${projectDir}/src/main/docbook/index.xml")
+    inputFileName = "calendar"
   }
-
-  def tablesDir = "${buildDir}/tables"
 
   task buildTables(type:JavaExec, dependsOn: [classes]) {
     classpath = sourceSets.main.runtimeClasspath
     main = "org.podval.calendar.paper.Tables"
-    args = [ "${tablesDir}" ]
+    args = [ "${buildDir}/tables" ]
   }
 
-  task docbook(dependsOn: [buildTables, docbookPdf, docbookHtml])
+  prepareDocBookData.dependsOn.add(buildTables)
+
+  docBookHtml.doLast {
+    copy { from "src/main/images" into "${docBookHtml.outputDirectory}/images" }
+    copy { from "src/main/css"    into "${docBookHtml.outputDirectory}/css"    }
+    copy { from "src/main/js"     into "${docBookHtml.outputDirectory}/js"     }
+  }
 }
