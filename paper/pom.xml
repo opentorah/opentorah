@@ -60,7 +60,7 @@
     <build>
         <plugins>
             <!-- Generated content that needs to be included in DocBook is produced by executing the generating code.
-                 This has to happen before docbkx plugin is executed, so this plugin configuration has to preceede that of docbkx -
+                 This has to happen before docbkx plugin is executed, so this plugin configuration has to precede that of docbkx -
                  or it has to be bound to an earlier lifecycle phase. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
