@@ -1,7 +1,6 @@
 repositories {
   jcenter()
   mavenCentral()
-  mavenLocal()
 }
 
 apply plugin: 'java-gradle-plugin'
@@ -20,48 +19,16 @@ gradlePlugin {
 }
 
 
-def scalaVersion      = '2.12.5'
-def scalaVersionMajor = '2.12'
-
-ext.lib = [
-  zinc      : 'com.typesafe.zinc:zinc:0.3.15',
-  scala     : "org.scala-lang:scala-library:$scalaVersion",
-
-  saxon     : 'saxon:saxon:6.5.3',
-  xerces    : 'xerces:xercesImpl:2.11.0',
-
-  fop       : 'org.apache.xmlgraphics:fop:2.2',
-]
-
-
 dependencies {
-  zinc lib.zinc
-  compile lib.scala
+  zinc 'com.typesafe.zinc:zinc:0.3.15'
+  compile "org.scala-lang:scala-library:2.12.5"
 
   compile gradleApi()
 
-  // DocBook XSLT stylesheets are in XSLT 1.0; rewrite in XSLT 2.0 did not yet release anything.
-  //
-  // On http://saxon.sourceforge.net/, it says:
-  //    "even if your stylesheets only require XSLT 1.0, it is probably better to run them under Saxon 9.x"
-  //
-  // Saxon-HE had support for XSLT 1.0 up to v9.7, then dropped it, then - allegedly - reinstated it
-  // by popular demand in v9.8.0.7. It doesn't seem fixed to me; when I use v9.8.0-10, I see a lot of
-  //   "Static error... XPST0008: Variable... has not been declared (or its declaration is not in scope),
-  // but when I use v9.7.0-21 - I do not.
-  //
-  // But it still doesn't work; I get (from DocBook XSLT):
-  //   Don't know how to chunk with Saxonica
-  //   Error at char 16 in xsl:value-of/@select on line 84 column 63 of chunker.xsl:
-  //   XTMM9000: Processing terminated by xsl:message at line 84 in chunker.xsl
-  //
-  // It seems that the extensions that DocBook XSLT stylesheets used to produce multiple output files are
-  // not supported even by Saxon-HE versions that supports XSLT 1.0.
-  //
-  // I had to downgrade to a version of Saxon that is an XSLT 1.0 processor (with the needed extensions) :(
-  // That seems to be v6.5.5, but it is not available from Maven Central or JCenter, so I had to go with v6.5.3 :(
-  compile lib.saxon, lib.fop
-  runtime lib.xerces
+  compile 'saxon:saxon:6.5.3'
+  runtime 'xerces:xercesImpl:2.11.0'
+
+  compile 'org.apache.xmlgraphics:fop:2.2'
 }
 
 

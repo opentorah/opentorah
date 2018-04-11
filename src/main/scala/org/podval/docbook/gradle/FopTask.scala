@@ -1,34 +1,52 @@
 package org.podval.docbook.gradle
 
-import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
-
 import javax.xml.transform.{Transformer, TransformerFactory}
 import javax.xml.transform.sax.SAXResult
 import javax.xml.transform.stream.StreamSource
 import org.apache.fop.apps.{Fop, FopConfParser, FopFactory}
-import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.{InputFile, OutputFile, TaskAction}
+import org.gradle.api.provider.{Property, Provider}
+import org.gradle.api.{DefaultTask, Project}
+import org.gradle.api.tasks.{Input, InputFile, OutputDirectory, OutputFile, TaskAction}
+
+import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
+
+object FopTask {
+  def apply(
+    project: Project,
+    name: String,
+    description: String,
+    inputFile: Provider[File],
+    outputFileName: Property[String]
+  ): FopTask = project.getTasks.create("docBookPdf", classOf[FopTask], (task: FopTask) => {
+    task.setDescription(description)
+    task.inputFile.set(inputFile)
+    task.outputFileName.set(outputFileName)
+  })
+}
 
 class FopTask extends DefaultTask {
   @InputFile
-  private var input: File = _
-  def setInput(value: File): Unit = input = value
+  val inputFile: Property[File] = getProject.getObjects.property(classOf[File])
+
+  @OutputDirectory
+  val outputDirectory: File = DocBookPlugin.outputDirectory(getProject, "pdf")
+
+  @Input
+  val outputFileName: Property[String] = getProject.getObjects.property(classOf[String])
 
   @OutputFile
-  private var output: File = _
-  def setOutput(value: File): Unit = output = value
+  val outputFile: Provider[File] = outputFileName.map(DocBookPlugin.file(outputDirectory, _, "pdf"))
 
   @TaskAction
-  def transform(): Unit = FopTask.transform(input, DocBookPlugin.fopConfiguration(getProject), output)
-}
+  def fop(): Unit = {
+    val input: File = inputFile.get
+    val configurationFile: File = DocBookPlugin.fopConfiguration(getProject)
+    val output: File = outputFile.get
 
-
-object FopTask {
-  def transform(input: File, configuration: File, output: File): Unit = {
-    output.getParentFile.mkdirs
+    outputDirectory.mkdirs
 
     val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(output))
-    val fopFactory: FopFactory = new FopConfParser(configuration).getFopFactoryBuilder.build
+    val fopFactory: FopFactory = new FopConfParser(configurationFile).getFopFactoryBuilder.build
     val fop: Fop = fopFactory.newFop("application/pdf", outputStream)
 
     try {
