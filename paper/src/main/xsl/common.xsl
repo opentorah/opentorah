@@ -9,13 +9,11 @@
     <!-- This is needed for template-tweaking customizations, like removal of "Chapter" in chapter title. -->
     <xsl:param name="local.l10n.xml" select="document('')"/>
 
-
     <!-- Remove trailing period after honorific -->
     <xsl:param name="punct.honorific"/>
     
     <!-- Remove trailing period after run-in head (e.g., formal paragraph title) -->
     <xsl:param name="runinhead.default.title.end.punct"/>    
-
 
     <!-- Remove "Chapter" in chapter title -->
     <l:i18n xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0">

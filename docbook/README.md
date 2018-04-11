@@ -53,3 +53,6 @@ net.sourceforge.jeuclid:jeuclid-fop:3.1.9
  
 // TODO check that input and stylesheet files exist
 // TODO auto-remove ".xml" from the input file name?
+
+
+// TODO track down and suppress network IO!

@@ -5,7 +5,7 @@
     exclude-result-prefixes="xs"
     version="1.0">
 
-    <xsl:import href="@docbook@/html/chunk.xsl"/>
+    <xsl:import href="http://docbook.sourceforge.net/release/xsl-ns/current/html/chunk.xsl"/>
 
     <xsl:import href="common-html.xsl"/>
 
