@@ -3,12 +3,14 @@ package org.podval.docbook.gradle
 
 import java.io.File
 
-import org.apache.tools.ant.filters.ReplaceTokens
-import org.gradle.api.file.FileTree
+import javax.xml.transform.{Source, URIResolver}
+import javax.xml.transform.stream.StreamSource
+//import org.apache.tools.ant.filters.ReplaceTokens
+//import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.Copy
 import org.gradle.api.{DefaultTask, Plugin, Project}
 
-import scala.collection.JavaConverters._
+//import scala.collection.JavaConverters._
 
 final class DocBookPlugin extends Plugin[Project] {
   def apply(project: Project): Unit = {
@@ -25,44 +27,19 @@ final class DocBookPlugin extends Plugin[Project] {
 
     // TODO add highlighting using 'net.sf.xslthl:xslthl:2.1.0'
 
-    val explodeDocBookXslTask: Copy = copy(project,
-      name = "explodeDocBookXsl",
-      description = "Prepare DocBook XSLT stylesheets",
-      from = project.zipTree(docBookXslConfiguration.getSingleFile),
-      into = explodeDocBookXslInto(project)
-    )
-
-    val copyXslTask: Copy = copy(project,
-      name = "copyXsl",
-      description = "Prepare DocBook customization stylesheets",
-      from = project.fileTree(xslSrcDir(project)),
-      into = xslDir(project),
-      tokens = Map(
-        "docbook" -> docBookXsl(project).getAbsolutePath
-      )
-    )
-
-    val copyDocBookTask: Copy = copy(project,
-      name = "copyDocBook",
-      description = "Prepare DocBook sources",
-      from = project.fileTree(docBookSrcDir(project)),
-      into = docBookDir(project),
-      // TODO once programmatic entities definition *and* referencing DocBook XSL via catalog are in place,
-      // there shouldn't be any need to copy/filter DocBook sources!
-      tokens = Map(
-        "version" -> project.getVersion.toString
-      )
-    )
-
-    val prepareDocBookTask: DefaultTask = project.getTasks.create("prepareDocBook", classOf[DefaultTask])
-    prepareDocBookTask.setDescription("Prepare DocBook XSLT stylesheets, customizations and sources")
-    prepareDocBookTask.getDependsOn.add(explodeDocBookXslTask)
-    prepareDocBookTask.getDependsOn.add(copyDocBookTask)
-    prepareDocBookTask.getDependsOn.add(copyXslTask)
+    val prepareDocBookTask: Copy = project.getTasks.create("prepareDocBook", classOf[Copy], (copy: Copy) => {
+      copy.setDescription("Prepare DocBook XSLT stylesheets")
+      copy.from(project.zipTree(docBookXslConfiguration.getSingleFile))
+      copy.into(explodeDocBookXslInto(project))
+//      copy.filter(Map("tokens" -> tokens.asJava).asJava, classOf[ReplaceTokens])
+      ()
+    })
 
     val prepareDocBookDataTask: DefaultTask = project.getTasks.create("prepareDocBookData", classOf[DefaultTask])
     prepareDocBookDataTask.setDescription("Generate data for inclusion in DocBook; placeholder task: attach via doLast{}")
     prepareDocBookDataTask.getDependsOn.add(prepareDocBookTask)
+
+    val uriResolver = makeUriResolver(project)
 
     val docBookHtmlTask: SaxonTask = SaxonTask(project,
       name = "docBookHtml",
@@ -70,7 +47,8 @@ final class DocBookPlugin extends Plugin[Project] {
       inputFileName = extension.getInputFileName,
       stylesheetName = "html",
       outputFileNameOverride = Some("index"),
-      outputType = "html"
+      outputType = "html",
+      uriResolver = uriResolver
     )
     docBookHtmlTask.getDependsOn.add(prepareDocBookDataTask)
 
@@ -82,7 +60,8 @@ final class DocBookPlugin extends Plugin[Project] {
       description = "DocBook -> XSL-FO",
       inputFileName = extension.getInputFileName,
       stylesheetName = "pdf",
-      outputType = "fo"
+      outputType = "fo",
+      uriResolver = uriResolver
     )
     docBookFoTask.getDependsOn.add(prepareDocBookDataTask)
 
@@ -102,34 +81,13 @@ final class DocBookPlugin extends Plugin[Project] {
 }
 
 object DocBookPlugin {
-  def copy(
-    project: Project,
-    name: String,
-    description: String,
-    from: FileTree,
-    into: File,
-    tokens: Map[String, String] = Map.empty): Copy =
-  {
-    project.getTasks.create(name, classOf[Copy], (copy: Copy) => {
-      copy.setDescription(description)
-      copy.from(from)
-      copy.into(into)
-      copy.filter(Map("tokens" -> tokens.asJava).asJava, classOf[ReplaceTokens])
-      ()
-    })
-  }
-
   def explodeDocBookXslInto(project: Project): File = buildDirectory(project, "docBookXsl")
   def docBookXsl(project: Project): File = new File(explodeDocBookXslInto(project), "docbook")
 
-  private val xslDirName: String = "xsl"
-  def xslSrcDir(project: Project): File = projectDirectory(project, xslDirName)
-  def xslDir(project: Project): File = buildDirectory(project, xslDirName)
+  def xslDir(project: Project): File = projectDirectory(project, "xsl")
   def xslFile(project: Project, name: String): File = file(xslDir(project), name, "xsl")
 
-  private val docBookDirName: String = "docbook"
-  def docBookSrcDir(project: Project): File = projectDirectory(project, docBookDirName)
-  def docBookDir(project: Project): File = buildDirectory(project, docBookDirName)
+  def docBookDir(project: Project): File = projectDirectory(project, "docbook")
 
   def fopConfiguration(project: Project): File = projectDirectory(project, "fop/fop.xconf")
 
@@ -154,4 +112,14 @@ object DocBookPlugin {
   //          logging.captureStandardOutput(LogLevel.INFO)
   //        logging.captureStandardError(LogLevel.INFO)
   //      }
+
+  def makeUriResolver(project: Project): URIResolver = new URIResolver {
+    val docBookXslt: String = "http://docbook.sourceforge.net/release/xsl-ns/current/"
+    val docBookData: String = "http://podval.org/docbook/data/"
+    override def resolve(href: String, base: String): Source = {
+      if (href.startsWith(docBookXslt)) new StreamSource(new File(docBookXsl(project), href.drop(docBookXslt.length))) else
+        // TODO get data directory from the extension!
+      if (href.startsWith(docBookData)) new StreamSource(new File(buildDirectory(project, "tables"), href.drop(docBookData.length))) else null
+    }
+  }
 }

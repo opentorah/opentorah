@@ -2,7 +2,7 @@ package org.podval.docbook.gradle
 
 import com.icl.saxon.TransformerFactoryImpl
 import javax.xml.parsers.SAXParserFactory
-import javax.xml.transform.Transformer
+import javax.xml.transform.{Transformer, URIResolver}
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.{StreamResult, StreamSource}
 import org.apache.xerces.jaxp.SAXParserFactoryImpl
@@ -21,6 +21,7 @@ object SaxonTask {
     outputType: String,
     inputFileName: Provider[String],
     stylesheetName: String,
+    uriResolver: URIResolver,
     outputFileNameOverride: Option[String] = None
   ): SaxonTask = project.getTasks.create(name, classOf[SaxonTask], (task: SaxonTask) => {
     task.setDescription(description)
@@ -28,6 +29,7 @@ object SaxonTask {
     task.inputFileName.set(inputFileName)
     task.stylesheetName.set(stylesheetName)
     task.outputFileNameOverride.set(outputFileNameOverride)
+    task.uriResolver.set(uriResolver)
   })
 }
 
@@ -66,6 +68,9 @@ class SaxonTask extends DefaultTask {
   @OutputFile
   val outputFile: Provider[File] = outputFileName.map(DocBookPlugin.file(outputDirectory.get, _, outputType.get))
 
+  @Input
+  val uriResolver: Property[URIResolver] = getProject.getObjects.property(classOf[URIResolver])
+
   @TaskAction
   def saxon(): Unit = {
     val input: File = inputFile.get
@@ -77,14 +82,14 @@ class SaxonTask extends DefaultTask {
     val saxParserFactory: SAXParserFactory = new SAXParserFactoryImpl
     saxParserFactory.setXIncludeAware(true)
     val xmlReader: XMLReader = saxParserFactory.newSAXParser.getXMLReader
-    // TODO xmlReader.setEntityResolver()
+    // TODO apply a resolver that deals with references to data onto the xmlReader - but how?
 
     val stylesheetUrl: URL = stylesheet.toURI.toURL
     val transformer: Transformer = new TransformerFactoryImpl().newTransformer(
       new StreamSource(stylesheetUrl.openStream, stylesheetUrl.toExternalForm)
     )
 
-    // TODO transformer.setURIResolver()
+    transformer.setURIResolver(uriResolver.get)
 
     transformer.setParameter("root.filename", outputFileName.get)
     transformer.setParameter("base.dir", outputDirectory.get + File.separator)
