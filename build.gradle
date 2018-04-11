@@ -218,6 +218,11 @@ project(':paper') {
 
   docbook {
     inputFileName = "calendar"
+
+    // TODO define entities:
+    // version: project.version.toString
+    // tables-directory: ${buildDir}/tables
+    // date: LocalDate.now().format(DateTimeFormatter.ofPattern("d MMM yyyy"))
   }
 
   task buildTables(type:JavaExec, dependsOn: [classes]) {
@@ -229,8 +234,8 @@ project(':paper') {
   prepareDocBookData.dependsOn.add(buildTables)
 
   docBookHtml.doLast {
-    copy { from "src/main/images" into "${docBookHtml.outputDirectory}/images" }
-    copy { from "src/main/css"    into "${docBookHtml.outputDirectory}/css"    }
-    copy { from "src/main/js"     into "${docBookHtml.outputDirectory}/js"     }
+    def outputDirectory = file(docBookHtml.outputDirectory)
+    copy { from "src/main/images" into "$outputDirectory/images" }
+    copy { from "src/main/js"     into "$outputDirectory/js"     }
   }
 }
