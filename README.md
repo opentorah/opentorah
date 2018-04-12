@@ -67,3 +67,5 @@ Add SVG support
     // TODO fix FOP configuration to not get
     //   "font directory /home/dub/Projects/calendar/calendar/paper/src/main/fop/fop.xconf could not be found."
     // Also, strict?
+
+Changes in parameters do not trigger pdfFo?!
