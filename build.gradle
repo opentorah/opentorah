@@ -230,7 +230,7 @@ project(':paper') {
 //      "sans.font.family": "???",
 //      "monospace.font.family": "monospace",
 //      "symbol.font.family": "???" // TODO configure with catch-all symbol font(s)
-      "body.font.master": "14"
+      "body.font.master": "12"
 //      "footnote.font.size": "10"
     ]
 

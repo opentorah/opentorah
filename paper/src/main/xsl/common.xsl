@@ -10,7 +10,7 @@
     <xsl:param name="local.l10n.xml" select="document('')"/>
 
     <!-- Remove trailing period after honorific -->
-    <xsl:param name="punct.honorific"/>
+    <!-- <xsl:param name="punct.honorific"/> -->
     
     <!-- Remove trailing period after run-in head (e.g., formal paragraph title) -->
     <xsl:param name="runinhead.default.title.end.punct"/>    
