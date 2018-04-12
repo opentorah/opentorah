@@ -13,6 +13,8 @@ import org.xml.sax.{EntityResolver, InputSource, XMLReader}
 import java.io.{File, FileReader}
 import java.net.URL
 
+import scala.collection.JavaConverters._
+
 object SaxonTask {
   def apply(
     project: Project,
@@ -22,12 +24,14 @@ object SaxonTask {
     inputFileName: Provider[String],
     stylesheetName: String,
     dataDirectory: Property[File],
+    xslParameters: Property[java.util.Map[String, String]],
     outputFileNameOverride: Option[String] = None
   ): SaxonTask = project.getTasks.create(name, classOf[SaxonTask], (task: SaxonTask) => {
     task.setDescription(description)
     task.outputType.set(outputType)
     task.inputFileName.set(inputFileName)
     task.stylesheetName.set(stylesheetName)
+    task.xslParameters.set(xslParameters)
     task.dataDirectory.set(dataDirectory)
     task.outputFileNameOverride.set(outputFileNameOverride)
   })
@@ -51,6 +55,9 @@ class SaxonTask extends DefaultTask {
 
   @InputFile
   val stylesheetFile: Provider[File] = stylesheetName.map(DocBookPlugin.xslFile(getProject, _))
+
+  @Input
+  val xslParameters: Property[java.util.Map[String, String]] = getProject.getObjects.property(classOf[java.util.Map[String, String]])
 
   @InputFile
   val dataDirectory: Property[File] = getProject.getObjects.property(classOf[File])
@@ -91,9 +98,16 @@ class SaxonTask extends DefaultTask {
 
     transformer.setURIResolver(mkUriResolver(getProject))
 
-    // TODO take parameters and set them here - with defaults
-    transformer.setParameter("root.filename", outputFileName.get)
-    transformer.setParameter("base.dir", outputDirectory.get + File.separator)
+    val parameters: Map[String, String] = xslParameters.get.asScala.toMap
+
+    def setOptionalParameter(name: String, value: String): Unit =
+      if (!parameters.contains(name)) transformer.setParameter(name, value)
+
+    parameters.foreach { case (name: String, value: String) => transformer.setParameter(name, value) }
+
+    // For chunking:
+    setOptionalParameter("root.filename", outputFileName.get)
+    setOptionalParameter("base.dir", outputDirectory.get.toString)
 
     transformer.transform(
       new SAXSource(
@@ -106,7 +120,7 @@ class SaxonTask extends DefaultTask {
 
   // Resolves references to data in DocBook files
   def mkEntityResolver(project: Project, dataDirectory: File): EntityResolver = (publicId: String, systemId: String) => {
-    drop("http://podval.org/docbook/data/", systemId).map { path =>
+    drop(DocBookPlugin.docBookDataUrl, systemId).map { path =>
       val result = new InputSource(new FileReader(new File(dataDirectory, path)))
       result.setSystemId(systemId)
       result
@@ -115,7 +129,7 @@ class SaxonTask extends DefaultTask {
 
   // Resolves references to DocBook XSL in customization files
   def mkUriResolver(project: Project): URIResolver = (href: String, base: String) => {
-    drop("http://podval.org/docbook/data/", href).orElse(drop("http://docbook.sourceforge.net/release/xsl-ns/current/", href)
+    drop(DocBookPlugin.docBookXslUrl, href).orElse(drop(DocBookPlugin.docBookXslUrlOfficial, href)
     ).map(path => new StreamSource(new File(DocBookPlugin.docBookXsl(project), path))).orNull
   }
 

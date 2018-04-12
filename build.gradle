@@ -223,6 +223,17 @@ project(':paper') {
 
     dataDirectory = docBookData
 
+    xslParameters = [
+      "title.font.family": "Noto Sans, Noto Sans Hebrew",
+      "body.font.family": "Noto Sans, Noto Sans Hebrew",
+//      "dingbat.font.family": "???", // The font family for copyright, quotes, and other symbols
+//      "sans.font.family": "???",
+//      "monospace.font.family": "monospace",
+//      "symbol.font.family": "???" // TODO configure with catch-all symbol font(s)
+      "body.font.master": "14"
+//      "footnote.font.size": "10"
+    ]
+
     // TODO define entities:
     // version: project.version.toString
     // tables-directory: ${buildDir}/tables
