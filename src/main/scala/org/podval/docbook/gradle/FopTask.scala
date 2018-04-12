@@ -7,7 +7,6 @@ import org.apache.fop.apps.{Fop, FopConfParser, FopFactory}
 import org.gradle.api.provider.{Property, Provider}
 import org.gradle.api.{DefaultTask, Project}
 import org.gradle.api.tasks.{Input, InputFile, OutputDirectory, OutputFile, TaskAction}
-
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 
 object FopTask {
@@ -40,14 +39,14 @@ class FopTask extends DefaultTask {
   @TaskAction
   def fop(): Unit = {
     val input: File = inputFile.get
-
-    val configurationFile: File = DocBookPlugin.fopConfiguration(getProject)
-    // TODO The font directory /home/dub/Projects/calendar/calendar/paper/src/main/fop/fop.xconf could not be found.
     val output: File = outputFile.get
 
     outputDirectory.mkdirs
 
     val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(output))
+
+    val configurationFile: File = DocBookPlugin.fopConfiguration(getProject)
+
     val fopFactory: FopFactory = new FopConfParser(configurationFile).getFopFactoryBuilder.build
     val fop: Fop = fopFactory.newFop("application/pdf", outputStream)
 

@@ -13,4 +13,7 @@ class DocBookExtension(project: Project) {
   val dataDirectory: Property[File] = project.getObjects.property(classOf[File])
   def getDataDirectory: Property[File] = dataDirectory // for Gradle DSL
   dataDirectory.set(DocBookPlugin.buildDirectory(project, "data"))
+
+  val xslParameters: Property[java.util.Map[String, String]] = project.getObjects.property(classOf[java.util.Map[String, String]])
+  def getXslParameters: Property[java.util.Map[String, String]] = xslParameters
 }

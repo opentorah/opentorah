@@ -61,3 +61,9 @@ net.sourceforge.jeuclid:jeuclid-fop:3.1.9
 Add EPUB support
 
 Add SVG support
+
+
+
+    // TODO fix FOP configuration to not get
+    //   "font directory /home/dub/Projects/calendar/calendar/paper/src/main/fop/fop.xconf could not be found."
+    // Also, strict?

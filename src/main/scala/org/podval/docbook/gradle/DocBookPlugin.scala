@@ -42,6 +42,7 @@ final class DocBookPlugin extends Plugin[Project] {
       description = "DocBook -> HTML",
       inputFileName = extension.getInputFileName,
       stylesheetName = "html",
+      xslParameters = extension.xslParameters,
       dataDirectory = extension.getDataDirectory,
       outputFileNameOverride = Some("index"),
       outputType = "html"
@@ -56,6 +57,7 @@ final class DocBookPlugin extends Plugin[Project] {
       description = "DocBook -> XSL-FO",
       inputFileName = extension.getInputFileName,
       stylesheetName = "pdf",
+      xslParameters = extension.xslParameters,
       dataDirectory = extension.getDataDirectory,
       outputType = "fo"
     )
@@ -77,6 +79,10 @@ final class DocBookPlugin extends Plugin[Project] {
 }
 
 object DocBookPlugin {
+  val docBookDataUrl: String = "http://podval.org/docbook/data/"
+  val docBookXslUrl: String = "http://podval.org/docbook/xsl/"
+  val docBookXslUrlOfficial: String = "http://docbook.sourceforge.net/release/xsl-ns/current/"
+
   def explodeDocBookXslInto(project: Project): File = buildDirectory(project, "docBookXsl")
   def docBookXsl(project: Project): File = new File(explodeDocBookXslInto(project), "docbook")
 
