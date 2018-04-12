@@ -3,8 +3,6 @@ package org.podval.docbook.gradle
 
 import java.io.File
 
-import javax.xml.transform.{Source, URIResolver}
-import javax.xml.transform.stream.StreamSource
 //import org.apache.tools.ant.filters.ReplaceTokens
 //import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.Copy
@@ -39,16 +37,14 @@ final class DocBookPlugin extends Plugin[Project] {
     prepareDocBookDataTask.setDescription("Generate data for inclusion in DocBook; placeholder task: attach via doLast{}")
     prepareDocBookDataTask.getDependsOn.add(prepareDocBookTask)
 
-    val uriResolver = makeUriResolver(project)
-
     val docBookHtmlTask: SaxonTask = SaxonTask(project,
       name = "docBookHtml",
       description = "DocBook -> HTML",
       inputFileName = extension.getInputFileName,
       stylesheetName = "html",
+      dataDirectory = extension.getDataDirectory,
       outputFileNameOverride = Some("index"),
-      outputType = "html",
-      uriResolver = uriResolver
+      outputType = "html"
     )
     docBookHtmlTask.getDependsOn.add(prepareDocBookDataTask)
 
@@ -60,8 +56,8 @@ final class DocBookPlugin extends Plugin[Project] {
       description = "DocBook -> XSL-FO",
       inputFileName = extension.getInputFileName,
       stylesheetName = "pdf",
-      outputType = "fo",
-      uriResolver = uriResolver
+      dataDirectory = extension.getDataDirectory,
+      outputType = "fo"
     )
     docBookFoTask.getDependsOn.add(prepareDocBookDataTask)
 
@@ -112,14 +108,4 @@ object DocBookPlugin {
   //          logging.captureStandardOutput(LogLevel.INFO)
   //        logging.captureStandardError(LogLevel.INFO)
   //      }
-
-  def makeUriResolver(project: Project): URIResolver = new URIResolver {
-    val docBookXslt: String = "http://docbook.sourceforge.net/release/xsl-ns/current/"
-    val docBookData: String = "http://podval.org/docbook/data/"
-    override def resolve(href: String, base: String): Source = {
-      if (href.startsWith(docBookXslt)) new StreamSource(new File(docBookXsl(project), href.drop(docBookXslt.length))) else
-        // TODO get data directory from the extension!
-      if (href.startsWith(docBookData)) new StreamSource(new File(buildDirectory(project, "tables"), href.drop(docBookData.length))) else null
-    }
-  }
 }

@@ -216,8 +216,12 @@ project(':paper') {
     compile lib.scalaXml, project(':astronomy')
   }
 
+  def docBookData = file("${buildDir}/data")
+
   docbook {
     inputFileName = "calendar"
+
+    dataDirectory = docBookData
 
     // TODO define entities:
     // version: project.version.toString
@@ -228,9 +232,8 @@ project(':paper') {
   task buildTables(type:JavaExec, dependsOn: [classes]) {
     classpath = sourceSets.main.runtimeClasspath
     main = "org.podval.calendar.paper.Tables"
-    args = [ "${buildDir}/tables" ]
+    args = [ "$docBookData" ]
   }
-
   prepareDocBookData.dependsOn.add(buildTables)
 
   docBookHtml.doLast {

@@ -56,3 +56,8 @@ net.sourceforge.jeuclid:jeuclid-fop:3.1.9
 
 
 // TODO track down and suppress network IO!
+
+
+Add EPUB support
+
+Add SVG support

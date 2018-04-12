@@ -40,7 +40,9 @@ class FopTask extends DefaultTask {
   @TaskAction
   def fop(): Unit = {
     val input: File = inputFile.get
+
     val configurationFile: File = DocBookPlugin.fopConfiguration(getProject)
+    // TODO The font directory /home/dub/Projects/calendar/calendar/paper/src/main/fop/fop.xconf could not be found.
     val output: File = outputFile.get
 
     outputDirectory.mkdirs
