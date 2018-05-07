@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Leonid Dubinsky <dub@podval.org>.
+ * Copyright 2014-2018 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,56 +16,43 @@
 
 package org.podval.judaica.viewer
 
-import org.junit.Test
-import org.junit.Assert.{assertTrue, assertFalse, assertEquals}
+import org.scalatest.FlatSpec
 
+final class OrdererTest extends FlatSpec {
 
-final class OrdererTest {
-
-  @Test
-  def empty {
+  "Orderer" should "handle empty correctly" in {
     val arcs: Map[String, Seq[String]] = Map.empty
     val reachable = Orderer.close(arcs)
-    assertTrue(Orderer.inCycles(reachable).isEmpty)
+    assertResult(true)(Orderer.inCycles(reachable).isEmpty)
     val result = Orderer.order(reachable)
-    assertTrue(result.isEmpty)
+    assertResult(true)(result.isEmpty)
   }
 
-
-  @Test
-  def one {
+  it should "handle one correctly" in {
     val arcs: Map[String, Seq[String]] = Map("one" -> Seq.empty)
     val reachable = Orderer.close(arcs)
-    assertTrue(Orderer.inCycles(reachable).isEmpty)
-    assertEquals(Seq("one"), Orderer.order(reachable))
+    assertResult(true)(Orderer.inCycles(reachable).isEmpty)
+    assertResult(Seq("one"))(Orderer.order(reachable))
   }
 
-
-  @Test
-  def cycleOfOne {
+  it should "handle cycle of one correctly" in {
     val arcs: Map[String, Seq[String]] = Map("one" -> Seq("one"))
-    assertEquals(Set("one"), Orderer.inCycles(Orderer.close(arcs)))
+    assertResult(Set("one"))(Orderer.inCycles(Orderer.close(arcs)))
   }
 
-
-  @Test
-  def two {
+  it should "handle two correctly" in {
     val arcs: Map[String, Seq[String]] = Map("two" -> Seq("one"), "one" -> Seq.empty)
     val reachable = Orderer.close(arcs)
-    assertTrue(Orderer.inCycles(reachable).isEmpty)
-    assertEquals(Seq("one", "two"), Orderer.order(reachable))
+    assertResult(true)(Orderer.inCycles(reachable).isEmpty)
+    assertResult(Seq("one", "two"))(Orderer.order(reachable))
   }
 
-
-  @Test
-  def cycleOfTwo {
+  it should "handle cycle of two correctly" in {
     val arcs: Map[String, Seq[String]] = Map("two" -> Seq("one"), "one" -> Seq("two"))
-    assertEquals(Set("one", "two"), Orderer.inCycles(Orderer.close(arcs)))
+    assertResult(Set("one", "two"))(Orderer.inCycles(Orderer.close(arcs)))
   }
 
-
-  @Test
-  def chumash {
+  it should "handle Chumash correctly" in {
     val arcs: Map[String, Seq[String]] = Map(
       "work" -> Seq("book"),
       "book" -> Seq("chapter", "week"),
@@ -76,9 +63,9 @@ final class OrdererTest {
       "word" -> Seq.empty
     )
     val reachable = Orderer.close(arcs)
-    assertTrue(Orderer.inCycles(reachable).isEmpty)
+    assertResult(true)(Orderer.inCycles(reachable).isEmpty)
     val result = Orderer.order(reachable)
-    assertTrue(result.startsWith(Seq("word", "verse")))
-    assertTrue(result.endsWith(Seq("book", "work")))
+    assertResult(true)(result.startsWith(Seq("word", "verse")))
+    assertResult(true)(result.endsWith(Seq("book", "work")))
   }
 }

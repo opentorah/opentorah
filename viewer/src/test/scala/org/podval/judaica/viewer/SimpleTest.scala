@@ -16,104 +16,83 @@
 
 package org.podval.judaica.viewer
 
-import org.junit.Test
-import org.junit.Assert.{assertTrue, assertFalse, assertEquals}
-
+import org.scalatest.FlatSpec
 
 // TODO switch to ScalaTest!
-class SimpleTest {
+final class SimpleTest extends FlatSpec {
 
-  @Test
-  def findChumash = assertTrue(Works.workByName("Хумаш").isDefined)
+  "Works" should "find Хумаш" in {
+    assertResult(true)(Works.workByName("Хумаш").isDefined)
+  }
 
+  it should "find Tanach" in {
+    assertResult(true)(Works.workByName("Tanach").isDefined)
+  }
 
-  @Test
-  def findTanach = assertTrue(Works.workByName("Tanach").isDefined)
-
-
-  @Test
-  def bookSelector = {
+  it should "get correct book selectors" in {
     val bookOption = Works.getWorkByName("Tanach").selectorByName("book")
-    assertTrue(bookOption.isDefined)
+    assertResult(true)(bookOption.isDefined)
     val book = bookOption.get
-    assertEquals(Set("chapter", "week"), book.selectors.map(_.defaultName).toSet)
-    assertFalse(book.isNumbered)
+    assertResult(Set("chapter", "week"))(book.selectors.map(_.defaultName).toSet)
+    assertResult(true)(book.isNumbered)
   }
 
-
-  @Test
-  def chapterSelector = {
+  it should "get correct chapter selectors" in {
     val chapterOption = Works.getWorkByName("Tanach").selectorByName("book").get.selectorByName("chapter")
-    assertTrue(chapterOption.isDefined)
+    assertResult(true)(chapterOption.isDefined)
     val chapter = chapterOption.get
-    assertEquals(Set("verse"), chapter.selectors.map(_.defaultName).toSet)
-    assertTrue(chapter.isNumbered)
+    assertResult(Set("verse"))(chapter.selectors.map(_.defaultName).toSet)
+    assertResult(true)(chapter.isNumbered)
   }
 
+  it should "get correct default name" in {
+    assertResult("Tanach")(Works.getWorkByName("Хумаш").defaultName)
+  }
 
-  @Test
-  def defaultName = assertEquals("Tanach", Works.getWorkByName("Хумаш").defaultName)
+  it should "get correct directory" in {
+    assertResult("Tanach")(Works.getWorkByName("Хумаш").directory.getName)
+  }
 
+  it should "find Toronto edition" in {
+    assertResult(true)(Works.getWorkByName("Tanach").editionByName("Toronto").isDefined)
+  }
 
-  @Test
-  def directory = assertEquals("Tanach", Works.getWorkByName("Хумаш").directory.getName)
-
-
-  @Test
-  def findTorontoEdition = assertTrue(Works.getWorkByName("Tanach").editionByName("Toronto").isDefined)
-
-
-  @Test
-  def genesisWeekStructure {
+  it should "find Genesis weeks structure" in {
     Selection("Chumash").selectPath("book/Genesis/week").asDiv.selectDiv("Genesis")
   }
 
-
-//  @Test
-  def chumashFormats = {
+  it should "get Chumash formats" ignore {
     val formats: Seq[Seq[Selector]] = Works.getWorkByName("Хумаш").formats
     formats.map(_.map(_.defaultName).mkString("/")).foreach(println)
   }
 
-
-//  @Test
-  def genesisFormats = {
+  it should "get Genesis formats" in {
     val selection = Selection("Хумаш").selectPath("book/Genesis").asStructure
     val formats: Seq[Seq[Selector]] = selection.div.formats
     formats.map(_.map(_.defaultName).mkString("/")).foreach(println)
   }
 
-
-  @Test
-  def jerusalemEditionStorage = {
+  it should "get Jerusalem edition storage" in {
     val storage = Works.getWorkByName("Tanach").getEditionByName("Jerusalem").storage
-    assertTrue(storage.isDirectory)
-    assertEquals("book", storage.asDirectory.structure.selector.defaultName)
-    assertEquals(5, storage.asDirectory.storage.size)
+    assertResult(true)(storage.isDirectory)
+    assertResult("book")(storage.asDirectory.structure.selector.defaultName)
+    assertResult(5)(storage.asDirectory.storage.size)
   }
 
-
-  @Test
-  def ChumashContent {
-    val result = Selection("Tanach", "Jerusalem").content(None)
+  it should "get Chumash content" in {
+    Selection("Tanach", "Jerusalem").content(None)
   }
 
-
-  @Test
-  def GenesisContent {
-    val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis").asStructure.content(None)
+  it should "get Genesis content" in {
+    Selection("Tanach", "Jerusalem").selectPath("book/Genesis").asStructure.content(None)
   }
 
-
-  @Test
-  def Genesis1Content {
+  it should "get Genesis 1 content" in {
     val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis/chapter/1").asStructure.content(None)
     Xml.print(Content.toXmlNode(result), System.out)
   }
 
-
-  @Test
-  def Genesis1_1Content {
+  it should "get Genesis 1:1 content" in {
     val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis/chapter/1/verse/1").asStructure.content(None)
     Xml.print(Content.toXmlNode(result), System.out)
   }

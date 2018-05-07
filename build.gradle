@@ -9,8 +9,7 @@ ext.lib = [
   tagsoup   : 'org.ccil.cowan.tagsoup:tagsoup:+',
   scalaCheck: "org.scalacheck:scalacheck_${scalaVersionMajor}:1.13.4",
   scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.4",
-  pegdown   : 'org.pegdown:pegdown:1.4.2', // for scalatest reports,
-  junit     : 'org.junit:junit:+'
+  pegdown   : 'org.pegdown:pegdown:1.4.2' // for scalatest reports,
 ]
 
 allprojects {
@@ -30,7 +29,6 @@ subprojects {
   dependencies {
     zinc lib.zinc
     compile lib.scala
-    testCompile lib.junit
     testImplementation lib.scalaCheck, lib.scalaTest, lib.pegdown
   }
 
