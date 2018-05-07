@@ -1,0 +1,8 @@
+rootProject.name = 'judaica'
+
+include ':viewer'
+include ':importers'
+include ':paper'
+include ':webapp'
+
+//includeBuild 'docbook'

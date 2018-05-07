@@ -1,0 +1,82 @@
+def scalaVersion      = '2.12.5'
+def scalaVersionMajor = '2.12'
+
+ext.lib = [
+  zinc      : 'com.typesafe.zinc:zinc:0.3.15',
+//  "org.scala-sbt:zinc_${scalaVersionMajor}:1.0.3"
+  scala     : "org.scala-lang:scala-library:$scalaVersion",
+  scalaXml  : "org.scala-lang.modules:scala-xml_$scalaVersionMajor:1.1.0",
+  tagsoup   : 'org.ccil.cowan.tagsoup:tagsoup:+',
+  scalaCheck: "org.scalacheck:scalacheck_${scalaVersionMajor}:1.13.4",
+  scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.4",
+  pegdown   : 'org.pegdown:pegdown:1.4.2', // for scalatest reports,
+  junit     : 'org.junit:junit:+'
+]
+
+allprojects {
+  repositories {
+    jcenter()
+    mavenCentral()
+    mavenLocal()
+  }
+
+  group = 'org.podval.judaica'
+  version = '0.1.1'
+}
+
+subprojects {
+  apply plugin: 'scala'
+
+  dependencies {
+    zinc lib.zinc
+    compile lib.scala
+    testCompile lib.junit
+    testImplementation lib.scalaCheck, lib.scalaTest, lib.pegdown
+  }
+
+  test {
+    testLogging {
+      test.testLogging.events = [org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED]
+    }
+  }
+
+  task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+  }
+}
+
+apply plugin: 'idea'
+
+idea {
+  project {
+    jdkName = '1.8'
+    vcs = 'Git'
+  }
+
+  module {
+    excludeDirs += [
+      file('.idea'),
+      file('gradle')
+    ]
+  }
+}
+
+project(':viewer') {
+  dependencies {
+    compile lib.scalaXml
+  }
+}
+
+project(':importers') {
+  dependencies {
+    compile project(':viewer')
+    compile lib.tagsoup
+  }
+}
+
+project(':webapp') {
+}
+
+project(':paper') {
+}

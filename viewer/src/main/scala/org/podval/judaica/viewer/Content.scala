@@ -43,10 +43,10 @@ final case class SpanContent(sort: String, text: String) extends Content
 
 object Content {
 
-  def fromXmlSeq(xmls: Seq[Node]): Seq[Content] = xmls.map(fromXml).flatten
+  def fromXmlSeq(xmls: Seq[Node]): Seq[Content] = xmls.flatMap(fromXml)
 
 
-  def toXmlSeq(contents: Seq[Content]): Seq[Node] = contents.flatMap(toXml(_))
+  def toXmlSeq(contents: Seq[Content]): Seq[Node] = contents.flatMap(toXml)
 
 
   def fromXml(xml: Node): Option[Content] = xml match {
