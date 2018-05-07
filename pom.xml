@@ -2,18 +2,17 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>org.podval</groupId>
+    <artifactId>judaica</artifactId>
+    <name>Digital Judaica</name>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+
     <prerequisites>
         <maven>3.0.5</maven>
     </prerequisites>
 
-    <groupId>org.podval.judaica</groupId>
-    <artifactId>org.podval.judaica.viewer</artifactId>
-    <version>1.0-SNAPSHOT</version>
-
-    <name>Digital Judaica: Viewer</name>
-    <packaging>jar</packaging>
-
-    <url>http://www.digitaljudaica.org/</url>
+    <url>http://judaica.podval.org/</url>
 
     <licenses>
         <license>
@@ -44,79 +43,259 @@
         </developer>
     </developers>
 
+    <scm>
+        <url>https://github.com/dubinsky/podval-judaica</url>
+        <connection>scm:git:git@github.com:dubinsky/podval-judaica.git</connection>
+        <developerConnection>scm:git:git@github.com:dubinsky/podval-judaica.git</developerConnection>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/dubinsky/podval-judaica/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>hudson</system>
+        <url>http://judaica.podval.org/hudson/job/judaica/</url>
+    </ciManagement>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.version>2.11.5</scala.version>
-        <scala.major.version>2.11</scala.major.version>
+        <scala.version>2.10.3</scala.version>
+        <scala.major.version>2.10</scala.major.version>
+        <jersey.version>2.5</jersey.version>
     </properties>
  
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <version>3.1.5</version>
+                    <executions>
+                        <execution>
+                            <id>scala-compile-first</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>scala-test-compile</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <recompileMode>incremental</recompileMode>
+                        <useZincServer>true</useZincServer>
+                        <args>
+                            <arg>-unchecked</arg>
+                            <arg>-deprecation</arg>
+                            <!-- TODO
+                            Disabled because of
+                            https://issues.scala-lang.org/browse/SI-6123
+                            pending a fix in Scala 2.11
+                            <arg>-explaintypes</arg>
+                            -->
+                            <arg>-feature</arg>
+                        </args>
+                        <javacArgs>
+                            <javacArg>-Xlint:unchecked</javacArg>
+                            <javacArg>-Xlint:deprecation</javacArg>
+                        </javacArgs>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.0</version>
+                    <configuration>
+                        <source>1.6</source>
+                        <target>1.6</target>
+                        <compilerArguments>
+                            <Xlint:unchecked/>
+                            <Xlint:deprecation/>
+                        </compilerArguments>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.14.1</version>
+                </plugin>
+
+                <!-- docbkx-fop-support is no longer needed, since FOP does not require pre-generatuon of the font metrics files! -->
+                <plugin>
+                    <groupId>com.agilejava.docbkx</groupId>
+                    <artifactId>docbkx-maven-plugin</artifactId>
+                    <version>2.0.14</version>
+
+                    <dependencies>
+                        <dependency>
+                            <groupId>net.sf.docbook</groupId>
+                            <artifactId>docbook-xml</artifactId>
+                            <version>5.0-all</version>
+                            <classifier>resources</classifier>
+                            <type>zip</type>
+                            <scope>runtime</scope>
+                        </dependency>
+
+                        <!-- By default, docbkx plugin brings in FOP 1.0, but I want 1.1
+                             since it is newer and because of the Hebrew support. -->
+                        <dependency>
+                            <groupId>org.apache.xmlgraphics</groupId>
+                            <artifactId>fop</artifactId>
+                            <version>1.1</version>
+                            <scope>runtime</scope>
+                            <!-- FOP 1.1 POM asks for Avalon 4.2.0, which is not in the repositories (?).
+                                I excluded it and specified a dependency on the latest Avalon Framework below.
+                             -->
+                            <exclusions>
+                                <exclusion>
+                                    <groupId>org.apache.avalon.framework</groupId>
+                                    <artifactId>avalon-framework-api</artifactId>
+                                </exclusion>
+                                <exclusion>
+                                    <groupId>org.apache.avalon.framework</groupId>
+                                    <artifactId>avalon-framework-impl</artifactId>
+                                </exclusion>
+                            </exclusions>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.apache.avalon.framework</groupId>
+                            <artifactId>avalon-framework-api</artifactId>
+                            <version>4.3.1</version>
+                            <scope>runtime</scope>
+                        </dependency>
+
+                        <!-- FOP does not handle MathML; jEuclid is supposed to, but seems
+                        dead, jeuclid-fop is not available through Maven, and iy targets obsolete FOP 0.95 :(
+                        <dependency>
+                            <groupId>net.sourceforge.jeuclid</groupId>
+                            <artifactId>jeuclid-fop</artifactId>
+                            <version>3.1.9</version>
+                        </dependency>
+                        -->
+                    </dependencies>
+
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>generate-html</goal>
+                                <goal>generate-pdf</goal>
+                                <!-- <goal>generate-epub</goal>-->
+                            </goals>
+                            <phase>package</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.3</version>
+                    <configuration>
+                        <failOnMissingWebXml>false</failOnMissingWebXml>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>scala-compile-first</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>scala-test-compile</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <recompileMode>incremental</recompileMode>
-                    <useZincServer>true</useZincServer>
-                    <args>
-                        <arg>-unchecked</arg>
-                        <arg>-deprecation</arg>
-                        <arg>-explaintypes</arg>
-                        <arg>-feature</arg>
-                    </args>
-                    <javacArgs>
-                        <javacArg>-Xlint:unchecked</javacArg>
-                        <javacArg>-Xlint:deprecation</javacArg>
-                    </javacArgs>
-                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
-    
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+
+            <!-- ScalaTest -->
+            <dependency>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest_${scala.major.version}</artifactId>
+                <version>2.0</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.11</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish.jersey.containers</groupId>
+                <artifactId>jersey-container-servlet</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-server</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>            
+
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <scope>provided</scope>
+                <version>3.0</version>
+            </dependency>            
+
+            <dependency>
+                <groupId>org.ccil.cowan.tagsoup</groupId>
+                <artifactId>tagsoup</artifactId>
+                <version>1.2.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.scala-lang.modules</groupId>
-            <artifactId>scala-xml_${scala.major.version}</artifactId>
-            <version>1.0.3</version>
         </dependency>
 
         <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_${scala.major.version}</artifactId>
-            <version>2.2.1</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <modules>
+        <module>paper</module>
+        <module>common</module>
+        <module>importers</module>
+        <module>viewer</module>
+        <module>webapp</module>
+    </modules>
 </project>
- 
