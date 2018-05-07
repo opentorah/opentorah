@@ -21,7 +21,7 @@ import java.io.File
 
 object Works {
 
-  val directory = new File("/home/dub/Code/judaica/texts/")
+  val directory = new File("/home/dub/Projects/judaica/data/texts/")
 
 
   def works: Seq[Work] = works_.get

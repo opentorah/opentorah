@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011-2014 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2018 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.podval.judaica.viewer
 
 import org.scalatest.FlatSpec
 
-// TODO switch to ScalaTest!
 final class SimpleTest extends FlatSpec {
 
   "Works" should "find Хумаш" in {
@@ -34,7 +33,7 @@ final class SimpleTest extends FlatSpec {
     assertResult(true)(bookOption.isDefined)
     val book = bookOption.get
     assertResult(Set("chapter", "week"))(book.selectors.map(_.defaultName).toSet)
-    assertResult(true)(book.isNumbered)
+    assertResult(false)(book.isNumbered)
   }
 
   it should "get correct chapter selectors" in {
@@ -89,11 +88,11 @@ final class SimpleTest extends FlatSpec {
 
   it should "get Genesis 1 content" in {
     val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis/chapter/1").asStructure.content(None)
-    Xml.print(Content.toXmlNode(result), System.out)
+    //Xml.print(Content.toXmlNode(result), System.out)
   }
 
   it should "get Genesis 1:1 content" in {
     val result = Selection("Tanach", "Jerusalem").selectPath("book/Genesis/chapter/1/verse/1").asStructure.content(None)
-    Xml.print(Content.toXmlNode(result), System.out)
+    //Xml.print(Content.toXmlNode(result), System.out)
   }
 }
