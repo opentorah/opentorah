@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Leonid Dubinsky <dub@podval.org>.
+ * Copyright 2014-2018 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,21 +32,19 @@ object Orderer {
       close(Set.empty, arcs(root))
     }
 
-    roots.map(root => (root -> close(root))).toMap
+    roots.map(root => root -> close(root)).toMap
   }
 
 
-  def inCycles[K](reachable: Map[K, Set[K]]): Set[K] = {
-    def cycled: Map[K, Set[K]] = reachable.filter { case (k, c) => c.contains(k) }
-    cycled.map(_._1).toSet
-  }
+  def inCycles[K](reachable: Map[K, Set[K]]): Set[K] =
+    reachable.filter { case (k, c) => c.contains(k) }.keySet
 
 
   def order[K](reachable: Map[K, Set[K]]): Seq[K] = {
     def order(acc: Seq[K], left: Set[K]): Seq[K] = {
       if (left.isEmpty) acc else {
         val next = left.filter(reachable(_).subsetOf(acc.toSet))
-        require(!next.isEmpty)
+        require(next.nonEmpty)
         order(acc ++ next, left -- next)
       }
     }

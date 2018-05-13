@@ -1,4 +1,4 @@
-def scalaVersion      = '2.12.5'
+def scalaVersion      = '2.12.6'
 def scalaVersionMajor = '2.12'
 
 ext.lib = [
@@ -8,7 +8,7 @@ ext.lib = [
   scalaXml  : "org.scala-lang.modules:scala-xml_$scalaVersionMajor:1.1.0",
   tagsoup   : 'org.ccil.cowan.tagsoup:tagsoup:+',
   scalaCheck: "org.scalacheck:scalacheck_${scalaVersionMajor}:1.13.4",
-  scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.4",
+  scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.5",
   pegdown   : 'org.pegdown:pegdown:1.4.2' // for scalatest reports,
 ]
 

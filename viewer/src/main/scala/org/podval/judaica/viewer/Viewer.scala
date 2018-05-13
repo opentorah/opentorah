@@ -17,8 +17,6 @@
 
 package org.podval.judaica.viewer
 
-import scala.xml.{Node, Elem}
-
 /*
  * During Shavues 5771, I discussed the Chumash Taich interface with Zev.
  * He thinks that it is not important to present the text for Taich input in
