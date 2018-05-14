@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Leonid Dubinsky <dub@podval.org>.
+ * Copyright 2012-2018 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,23 +18,20 @@ package org.podval.judaica.viewer
 
 import java.io.File
 
+import org.podval.judaica.parsers.{DirectoryScanner, LazyLoad, WorkParser}
 
+
+// TODO move parsing into 'parsers'; make not global :)
 object Works {
-
   val directory = new File("/home/dub/Projects/judaica/data/texts/")
-
 
   def works: Seq[Work] = works_.get
 
-
   private[this] val works_ = LazyLoad(DirectoryScanner(directory, WorkParser.parseWork))
-
 
   def workByName(name: String): Option[Work] = Names.find(works, name)
 
-
   def getWorkByName(name: String): Work = Names.doFind(works, name, "work")
-
 
   def stylesheet: File = new File(directory, "stylesheet.css")
 }

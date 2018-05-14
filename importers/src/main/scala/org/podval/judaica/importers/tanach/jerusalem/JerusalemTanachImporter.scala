@@ -20,7 +20,7 @@ package org.podval.judaica.importers.tanach.jerusalem
 import org.podval.judaica.importers.tanach.TanachImporter
 
 import org.podval.judaica.viewer.{Content, SpanContent, AppContent, TextContent, DivContent, HebrewLanguage}
-import DivContent.prependAttribute
+import org.podval.judaica.parsers.DivContentParser.prependAttribute
 
 import scala.collection.mutable.ArrayBuffer
 import scala.xml.{MetaData, Node}

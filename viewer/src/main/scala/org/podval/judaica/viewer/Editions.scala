@@ -66,7 +66,7 @@ object Editions {
   def apply(work: Work, editionNames: String): Editions = {
     if (editionNames.contains('+')) {
       val names: Seq[String] = editionNames.split('+')
-      new LinearEditions(names.map(work.getEditionByName(_)))
+      new LinearEditions(names.map(work.getEditionByName))
 
     } else if (editionNames.contains('-')) {
       val diffs = editionNames.split("-")

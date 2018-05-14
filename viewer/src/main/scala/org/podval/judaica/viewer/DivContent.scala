@@ -16,31 +16,25 @@
 
 package org.podval.judaica.viewer
 
-import Xml.Ops
-import scala.xml.{Elem, Node, MetaData, UnprefixedAttribute, TopScope, Text}
+import scala.xml.MetaData
 import java.io.File
 
+import org.podval.judaica.parsers.{DivContentParser, XmlFile}
 
 trait DivContent extends Content {
-
   def prefix: Seq[Content]
-
 
   def sort: String
 
-
   def n: Option[String]
 
-
+  // TODO do NOT use Scala XML's Metadata here!
   def attributes: MetaData
-
 
   def head: Option[String]
 
-
   def children: Seq[Content]
 }
-
 
 
 final case class ParsedDivContent(
@@ -53,7 +47,6 @@ final case class ParsedDivContent(
 ) extends DivContent
 
 
-
 final case class BoundDivContent(
   div: Div,
   lang: Language,
@@ -63,78 +56,23 @@ final case class BoundDivContent(
 {
   override def sort: String = div.structure.defaultName
 
-
   override val n: Option[String] = Some(div.id)
-
 
   override val head: Option[String] = Some(div.name(lang))
 }
 
 
-
 object DivContent {
-
   def apply(sort: String, n: Option[String], attributes: MetaData, head: Option[String], children: Seq[Content]): DivContent =
     ParsedDivContent(Seq.empty, sort, n, attributes, head, children)
 
-
-
-  def replaceChildren(content: DivContent, children: Seq[Content]): DivContent =
+  private def replaceChildren(content: DivContent, children: Seq[Content]): DivContent =
     ParsedDivContent(content.prefix, content.sort, content.n, content.attributes, content.head, children)
 
-
-  def replacePrefix(content: DivContent, prefix: Seq[Content]): DivContent =
+  private def replacePrefix(content: DivContent, prefix: Seq[Content]): DivContent =
     ParsedDivContent(prefix, content.sort, content.n, content.attributes, content.head, content.children)
 
-
-  def fromXml(xml: Elem): DivContent = {
-    val sortOption = xml.attributeOption("type")
-    if (sortOption.isEmpty) throw new ViewerException(s"No type for a div")
-
-    val sort = sortOption.get
-    val n: Option[String] = xml.attributeOption("n")
-    val attributes = xml.attributes.filter(key => (key != "type") && (key != "n"))
-
-    val hasHead = !xml.child.isEmpty && xml.child.head.isInstanceOf[Elem] && xml.child.head.label == "head"
-
-    val head: Option[String] = if (!hasHead) None else Some(xml.child.head.text)
-
-    val children: Seq[Content] = Content.fromXmlSeq(if (!hasHead) xml.child else xml.child.tail)
-
-    DivContent(sort, n, attributes, head, children)
-  }
-
-
-  def toXml(div: DivContent): Seq[Node] = {
-    val prefixNodes = Content.toXmlSeq(div.prefix)
-
-    val headElemOption = div.head.map(head => <head>{head}</head>)
-
-    val childrenNodes = headElemOption.toSeq ++ Content.toXmlSeq(div.children)
-
-    prefixNodes :+
-      Elem(
-        null,
-        "div",
-        prependAttribute("type", div.sort, prependAttribute("n", div.n, div.attributes)),
-        TopScope,
-        true,
-        childrenNodes: _*)
-  }
-
-
-  def prependAttribute(name: String, value: String, attributes: MetaData): MetaData =
-    prependAttribute(name, Some(value), attributes)
-
-
-  def prependAttribute(name: String, value: Option[String], attributes: MetaData): MetaData =
-    value.fold(attributes)(v => new UnprefixedAttribute(name, Seq(Text(v)), attributes))
-
-
-  def prependAttribute(name: String, value: Boolean, attributes: MetaData): MetaData =
-    if (!value) attributes else new UnprefixedAttribute(name, Seq(Text("true")), attributes)
-
-  def select(file: File, path: Div.Path, format: Selector.Format): Content = select(fromXml(XmlFile.load(file)), path, format)
+  def select(file: File, path: Div.Path, format: Selector.Format): Content = select(DivContentParser.fromXml(XmlFile.load(file)), path, format)
 
   def select(content: DivContent, path: Div.Path, format: Selector.Format): Content =
     if (path.isEmpty) reformat(content, format) else {
@@ -147,7 +85,6 @@ object DivContent {
       replaceChildren(groupped, Seq(subSelect))
     }
 
-
   def bind(content: DivContent, parentDiv: Div, lang: Language): DivContent = {
     val selectorOption = parentDiv.selectorByName(content.sort)
     if (selectorOption.isEmpty) content else {
@@ -159,7 +96,6 @@ object DivContent {
       bindWithThis(content, divOption.get, lang)
     }
   }
-
 
   def bindWithThis(content: DivContent, div: Div, lang: Language): DivContent = {
     def bindSeq(contents: Seq[Content], parentDiv: Div): Seq[Content] = contents.map { c =>
@@ -175,16 +111,13 @@ object DivContent {
     )
   }
 
-
   def guessStructure(content: DivContent): String = {
     val nonEmptyDiv = content.children.find(c => c.isInstanceOf[DivContent] && c.asInstanceOf[DivContent].children.nonEmpty)
     if (nonEmptyDiv.isEmpty) throw new ViewerException(s"Can't guess structure")
     nonEmptyDiv.get.asInstanceOf[DivContent].sort
   }
 
-
   def group(content: DivContent, sort: String): DivContent = replaceChildren(content, group(content.children, sort))
-
 
   def group(children: Seq[Content], sort: String): Seq[Content] = if (children.isEmpty) Seq.empty else {
     val (prefix, rest) = children.span(c => !(c.isInstanceOf[DivContent] && (c.asInstanceOf[DivContent].sort == sort)))
@@ -198,13 +131,11 @@ object DivContent {
     }
   }
 
-
   def select(content: DivContent, div: Div): DivContent = {
     val result = content.children.find(c => c.isInstanceOf[DivContent] && (c.asInstanceOf[DivContent].n == Some(div.id)))
     if (result.isEmpty) throw new ViewerException(s"Child not found")
     result.get.asInstanceOf[DivContent]
   }
-
 
   def reformat(content: DivContent, format: Selector.Format): DivContent = content // TODO implement
 }

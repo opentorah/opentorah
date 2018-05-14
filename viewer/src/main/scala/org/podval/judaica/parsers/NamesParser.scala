@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.podval.judaica.parsers
 
-package org.podval.judaica.viewer
+import org.podval.judaica.viewer.{Exists, Name, Names}
 
-import java.io.File
+import scala.xml.Elem
+import Xml.Ops
 
+object NamesParser {
 
-object Exists {
-  def apply[T](value: Option[T], name: String, what: String): T = {
-    if (value.isEmpty) throw new NotFoundException(what, name)
-    value.get
-  }
+  private def name(xml: Elem) = new Name(
+    xml.getAttribute("name"),
+    xml.getAttribute("lang"),
+    xml.booleanAttribute("isTransliterated")
+  )
 
-  def apply[T](value: Seq[T], what: String): Seq[T] = {
-    if (value.isEmpty) throw new NotFoundException(what, "?")
-    value
-  }
+  //  def apply(name: String, xml: Elem, canBeEmpty: Boolean = false): Names = new Names(Some(name), xml, canBeEmpty)
 
-  def apply(file: File): File = {
-    if (!file.exists) throw new NotFoundException("file", file.getName)
-    file
+  def names(xml: Elem): Names = {
+    val names: Seq[Name] = Exists(xml.elemsFilter("name").map(name), "names")
+    new Names(names)
   }
 }

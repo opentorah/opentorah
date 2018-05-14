@@ -20,71 +20,41 @@ import java.io.File
 
 
 trait Work extends NamedDiv with DominantDiv {
-
-  final override val structure: NamedStructure = WorksStructure
-
+  final override val structure: NamedStructure = Work.Structure
 
   val directory: File
 
-
   override def names: Names
-
 
   override def selectors: Seq[Selector]
 
-
   override def structures: Map[Selector, NonRootStructure]
-
 
   def editions: Seq[Edition]
 
-
   final def editionByName(name: String): Option[Edition] = Names.find(editions, name)
-
 
   final def getEditionByName(name: String): Edition = Names.doFind(editions, name, "edition")
 
-
   final def stylesheet: File = new File(directory, "stylesheet.css")
-
 
   final override def toString: String = "Work (" + directory + ") " + names
 }
 
+object Work {
+  object Selector extends NamedSelector {
+    override val names: Names = new Names(Seq(new Name("work", "en", isTransliterated = false)))
+    override val isNameIncludedInHead: Boolean = false
+    override val headPrefix: Option[String] = None
+    override val headSuffix: Option[String] = None
+    override val selectors: Seq[Selector] = Seq.empty
+  }
 
-
-object WorkSelector extends NamedSelector {
-
-  override val names: Names = new Names(Seq(new Name("work", "en", isTransliterated = false)))
-
-
-  override val isNameIncludedInHead: Boolean = false
-
-
-  override val headPrefix: Option[String] = None
-
-
-  override val headSuffix: Option[String] = None
-
-
-  override val selectors: Seq[Selector] = Seq.empty
-}
-
-
-
-object WorksStructure extends NamedStructure {
-
-  override val selector: NamedSelector = WorkSelector
-
-
-  override def isRoot: Boolean = true
-
-
-  override def asNonRoot: NonRootStructure = throw new UnsupportedOperationException
-
-
-  override val divs: Seq[NamedDiv] = Seq.empty // Or maybe the work we are dealing with?
-
-
-  protected val lengthOption: Option[Int] = None
+  object Structure extends NamedStructure {
+    override val selector: NamedSelector = Work.Selector
+    override def isRoot: Boolean = true
+    override def asNonRoot: NonRootStructure = throw new UnsupportedOperationException
+    override val divs: Seq[NamedDiv] = Seq.empty // Or maybe the work we are dealing with?
+    protected val lengthOption: Option[Int] = None
+  }
 }

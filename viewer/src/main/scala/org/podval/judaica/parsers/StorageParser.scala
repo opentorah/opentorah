@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.podval.judaica.viewer
-
-import Xml.Ops
-
-import scala.xml.Elem
+package org.podval.judaica.parsers
 
 import java.io.File
+
+import org.podval.judaica.viewer.{DirectoryStorage, Div, Exists, FileStorage, NonRootStructure, Selector, Storage, ViewerException}
+
+import scala.xml.Elem
+import Xml.Ops
 
 
 object StorageParser {
@@ -31,9 +32,7 @@ object StorageParser {
     override val storage: Map[Div, Storage]) extends DirectoryStorage
 
 
-
   private final class ParsedFileStorage(override val file: File) extends FileStorage
-
 
 
   def parseDirectoryStorage(div: Div, xml0: Elem, directory: File): DirectoryStorage = {
@@ -48,7 +47,6 @@ object StorageParser {
       structure,
       storage)
   }
-
 
   private def forDiv(directory: File, div: Div): Storage = {
     val fileCandidate = new File(directory, div.id + ".xml")

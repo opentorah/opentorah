@@ -17,9 +17,10 @@
 
 package org.podval.judaica.importers
 
-import org.podval.judaica.viewer.{DivContent, Works, Edition, Content, Xml}
-
+import org.podval.judaica.viewer.{Content, DivContent, Edition, Works}
 import java.io.File
+
+import org.podval.judaica.parsers.{ContentParser, Xml}
 
 
 trait Importer {
@@ -31,7 +32,7 @@ trait Importer {
       val outputFile: File = new File(edition.directory, outputName + ".xml") //  .storage.storage(outputName).asFile.file
       val content: DivContent = parseBook(inputFile, outputName)
       val result: DivContent = processBook(content, edition, outputName)
-      Xml.print(Content.toXmlNode(result), outputFile)
+      Xml.print(ContentParser.toXmlNode(result), outputFile)
     }
   }
 

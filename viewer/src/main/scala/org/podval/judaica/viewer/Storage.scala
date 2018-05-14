@@ -1,5 +1,5 @@
 /*
- *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014-2018 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,24 +32,18 @@ sealed trait Storage {
 
 
 trait DirectoryStorage extends Storage {
-
   final override def isDirectory: Boolean = true
   final override def isFile: Boolean = false
   final override def asDirectory: DirectoryStorage = this
   final override def asFile: FileStorage = throw new ClassCastException
 
-
   val directory: File
-
 
   val structure: NonRootStructure
 
-
   val storage: Map[Div, Storage]
 
-
   final def storage(id: String): Storage = storage(structure.divById(id).get)
-
 
   final override def content(path: Div.Path, format: Selector.Format): DivContent = {
     val contents: Seq[Content] =
@@ -75,17 +69,13 @@ trait DirectoryStorage extends Storage {
 }
 
 
-
 trait FileStorage extends Storage {
-
   final override def isDirectory: Boolean = false
   final override def isFile: Boolean = true
   final override def asDirectory: DirectoryStorage = throw new ClassCastException
   final override def asFile: FileStorage = this
 
-
   val file: File
-
 
   final override def content(path: Div.Path, format: Selector.Format): Content = DivContent.select(file, path, format)
 }

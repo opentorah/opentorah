@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,29 @@
  * limitations under the License.
  */
 
-package org.podval.judaica.viewer
+package org.podval.judaica.parsers
 
-import java.io.File
+final class LazyLoad[T] private(gen: => T) {
+
+  // TODO switch to weak references, after all?
+  private[this] var cache = new java.lang.ref.SoftReference(null.asInstanceOf[T])
 
 
-object DirectoryScanner {
-
-  def apply[T](directory: File, f: (File, File) => T): Seq[T] = {
-    require(directory.isDirectory)
-
-    for {
-      subdirectory <- directory.listFiles.toSeq.filter(_.isDirectory)
-      file = new File(subdirectory, "index.xml")
-      if (file.exists)
-    } yield f(subdirectory, file)
+  def apply(): T = {
+    val value = cache.get
+    if (value != null) value else {
+      cache = new java.lang.ref.SoftReference(gen)
+      cache.get
+    }
   }
+
+
+  def get: T = apply()
+}
+
+
+
+object LazyLoad {
+
+  def apply[T](gen: => T) = new LazyLoad(gen)
 }

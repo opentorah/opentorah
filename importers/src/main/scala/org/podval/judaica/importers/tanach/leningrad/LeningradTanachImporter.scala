@@ -3,10 +3,11 @@ package org.podval.judaica.importers.tanach.leningrad
 import java.io.File
 
 import org.podval.judaica.importers.tanach.TanachImporter
-import org.podval.judaica.viewer.{DivContent, HebrewLanguage, SpanContent, TextContent, Xml, XmlFile}
-import Xml.Ops
+import org.podval.judaica.viewer.{DivContent, HebrewLanguage, SpanContent, TextContent}
+import org.podval.judaica.parsers.Xml.Ops
+import org.podval.judaica.parsers.{DivContentParser, XmlFile}
 
-import scala.xml.{Elem, MetaData, Node, Text}
+import scala.xml.{Elem, Node}
 
 final class LeningradTanachImporter extends TanachImporter {
 
@@ -58,9 +59,9 @@ final class LeningradTanachImporter extends TanachImporter {
     DivContent(
       sort = "word",
       n = None,
-      attributes = DivContent.prependAttribute("makaf", hasMaqaf, Node.NoAttributes),
+      attributes = DivContentParser.prependAttribute("makaf", hasMaqaf, Node.NoAttributes),
       head = None,
-      children = Seq(TextContent(text))
+      children = Seq(TextContent(result))
     )
   }
 }

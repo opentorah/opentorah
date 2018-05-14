@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011-2014 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2018 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,78 +16,38 @@
 
 package org.podval.judaica.viewer
 
-import Xml.Ops
-
-import scala.xml.Elem
-
-
 trait Named {
-
   def names: Names
-
 
   final def defaultName: String = names.default.name
 }
 
 
-
 final class Name(val name: String, val lang: String, val isTransliterated: Boolean) {
-
   override def toString: String =
     "Name: " + name + " (" + lang + (if (!isTransliterated) "" else ", " + isTransliterated) +  ")"
 }
 
 
-
-object Name {
-
-  def apply(xml: Elem) = new Name(
-    xml.getAttribute("name"),
-    xml.getAttribute("lang"),
-    xml.booleanAttribute("isTransliterated")
-  )
-}
-
-
-
 final class Names(val names: Seq[Name]) {
-
   def find(name: String): Option[Name] = find(names, name)
-
 
   private[this] def find(names: Seq[Name], name: String): Option[Name] = names.find(_.name == name)
 
-
   def has(name: String): Boolean = find(name).isDefined
-
 
   def byLang(lang: Language): Option[Name] = names.find(_.lang == lang.name)
 
-
-  def default: Name = names(0)
-
+  def default: Name = names.head
 
   def isEmpty: Boolean = names.isEmpty
-
 
   override def toString: String = "Names: " + names
 }
 
 
-
 object Names {
-
-//  def apply(name: String, xml: Elem, canBeEmpty: Boolean = false): Names = new Names(Some(name), xml, canBeEmpty)
-
-
-  def apply(xml: Elem): Names = {
-    val names: Seq[Name] = Exists(xml.elemsFilter("name").map(Name(_)), "names")
-    new Names(names)
-  }
-
-
   def find[T <: Named](nameds: Traversable[T], name: String): Option[T] = nameds.find(_.names.has(name))
-
 
   def doFind[T <: Named](nameds: Traversable[T], name: String, what: String): T = Exists(find(nameds, name), name, what)
 }

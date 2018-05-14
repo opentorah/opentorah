@@ -1,5 +1,5 @@
 /*
- *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014-2018 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.podval.judaica.viewer
+package org.podval.judaica.parsers
 
-import Xml.Ops
+import org.podval.judaica.viewer.{NamedSelector, Names, NumberedSelector, Parse, Selector}
 
 import scala.xml.Elem
+import Xml.Ops
 
 
 object SelectorParser {
@@ -31,7 +32,6 @@ object SelectorParser {
     final override val selectors: Seq[Selector]) extends Selector
 
 
-
   def parseSelectors(knownSelectors: Set[Selector], xml: Elem): Seq[Selector] = {
     def descendantsOfOne(result: Set[Selector], next: Selector): Set[Selector] = Selector.descendants(result, Set(next))
 
@@ -41,7 +41,7 @@ object SelectorParser {
 
   private def parseSelector(knownSelectors: Set[Selector], xml: Elem): Selector = {
     def newSelector: Selector = {
-      val names = Names(xml)
+      val names = NamesParser.names(xml)
       val isNameIncludedInHead = xml.booleanAttribute("isNameIncludedInHead")
       val headPrefix = xml.attributeOption("headPrefix")
       val headSuffix = xml.attributeOption("headSuffix")

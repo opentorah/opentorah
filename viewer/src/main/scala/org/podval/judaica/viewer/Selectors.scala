@@ -1,5 +1,5 @@
 /*
- *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014-2018 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,31 +21,22 @@ trait Selectors {
 
   import Selector.Format
 
-
   def selectors: Seq[Selector]
-
 
   final def selectorByName(name: String): Option[Selector] = Names.find(selectors, name)
 
-
   final def getSelectorByName(name: String): Selector = Names.doFind(selectors, name, "selector")
-
 
   final def dominantSelector: Selector = selectors.head
 
-
   final def isDominantSelector(selector: Selector): Boolean = selector == dominantSelector
 
-
   final def dominantFormat: Format = if (selectors.isEmpty) Nil else dominantSelector +: dominantSelector.dominantFormat
-
 
   final def formats: Seq[Format] =
     if (selectors.isEmpty) Seq(Nil) else selectors.flatMap(selector => selector.formats.map (selector +: _))
 
-
   final def parseFormat(formatOption: Option[String]): Format = formatOption.fold(dominantFormat)(parseFormat)
-
 
   final def parseFormat(format: String): Format =
     Parse.sequence[String, Selectors, Selector](_.getSelectorByName(_)) ((selectors, selector) => selector) (this, format.split("/"))

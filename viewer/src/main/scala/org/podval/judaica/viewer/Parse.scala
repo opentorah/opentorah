@@ -1,5 +1,5 @@
 /*
- *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014-2018 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.podval.judaica.viewer
 
 
 object Parse {
-
   def sequence[X, C, T](f : (C, X) => T)(n: (C, T) => C)(context: C, xs: Seq[X]): Seq[T] =
     xs.foldLeft((Seq.empty[T], context)) { case ((result, context), x) =>
         val one = f(context, x)

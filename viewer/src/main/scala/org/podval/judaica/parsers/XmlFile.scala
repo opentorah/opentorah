@@ -15,13 +15,13 @@
  * under the License.
  */
 
-package org.podval.judaica.viewer
+package org.podval.judaica.parsers
 
-import Xml.Ops
-import scala.xml.{Utility, XML, Elem}
-import scala.collection.mutable.WeakHashMap
 import java.io.File
 
+import scala.collection.mutable.WeakHashMap
+import scala.xml.{Elem, Utility, XML}
+import Xml.Ops
 
 object XmlFile {
 

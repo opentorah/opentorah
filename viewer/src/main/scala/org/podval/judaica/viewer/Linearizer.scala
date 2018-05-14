@@ -2,7 +2,7 @@ package org.podval.judaica.viewer
 
 import java.io.PrintWriter
 
-object Linerizer {
+object Linearizer {
 
   def main(args: Array[String]): Unit = {
     val out: PrintWriter = new PrintWriter("/tmp/linear.txt")

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014-2018 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.podval.judaica.viewer
 
 
 trait Selector extends Named with Selectors {
-
   /**
    * To include the name of the selector in the <head> element of the corresponding <div> or not?
    * For example, for chapters, the <head> contains "Chapter number", but for verses - just the number.
@@ -26,7 +25,6 @@ trait Selector extends Named with Selectors {
    * @return
    */
   def isNameIncludedInHead: Boolean
-
 
   /**
    * What goes before the name of the Div in the <head>.
@@ -37,21 +35,15 @@ trait Selector extends Named with Selectors {
   def headPrefix: Option[String]
   def headSuffix: Option[String]
 
-
   def isNumbered: Boolean
-
 
   final def isNamed: Boolean = !isNumbered
 
-
   def asNumbered: NumberedSelector
-
 
   def asNamed: NamedSelector
 
-
   final def isTerminal: Boolean = selectors.isEmpty
-
 
   final def name(lang: Language, divName: String): String = {
     val nameNameOption = if (isNameIncludedInHead) names.byLang(lang) else None
@@ -62,17 +54,12 @@ trait Selector extends Named with Selectors {
 }
 
 
-
 trait NumberedSelector extends Selector {
-
   final override def isNumbered: Boolean = true
-
 
   final override def asNumbered: NumberedSelector = this
 
-
   final override def asNamed: NamedSelector = throw new ClassCastException
-
 
   /**
    * Present the number as number - or as words?
@@ -82,23 +69,17 @@ trait NumberedSelector extends Selector {
    */
   def isSpelledOut: Boolean
 
-
   final def divName(lang: Language, div: NumberedDiv): String =
     name(lang, (if (isSpelledOut) lang.numberToSpelledOutString _ else lang.numberToString _)(div.number))
 }
 
 
-
 trait NamedSelector extends Selector {
-
   final override def isNumbered: Boolean = false
-
 
   final override def asNumbered: NumberedSelector = throw new ClassCastException
 
-
   final override def asNamed: NamedSelector = this
-
 
   final def divName(lang: Language, div: NamedDiv): String = {
     val nameOption = div.names.byLang(lang)
@@ -107,14 +88,10 @@ trait NamedSelector extends Selector {
 }
 
 
-
 object Selector {
-
   type Format = Seq[Selector]
 
-
   def descendants(next: Set[Selector]): Set[Selector] = descendants(Set.empty, next)
-
 
   def descendants(result: Set[Selector], next: Set[Selector]): Set[Selector] = {
     val add = next -- result

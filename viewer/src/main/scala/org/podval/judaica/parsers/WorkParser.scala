@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package org.podval.judaica.viewer
-
-import org.podval.judaica.viewer.ParseException.withMetadataFile
+package org.podval.judaica.parsers
 
 import java.io.File
+
+import ParseException.withMetadataFile
+import org.podval.judaica.viewer.{Edition, Exists, Names, NonRootStructure, Selection, Selector, Work}
 
 
 object WorkParser {
 
   private final class ParsedWork(override val directory: File, index: File) extends Work {
 
-    override val names: Names = withMetadataFile(index)(Names(_))
+    override val names: Names = withMetadataFile(index)(NamesParser.names)
 
 
     override def selectors: Seq[Selector] = selectors_.get

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014-2018 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package org.podval.judaica.viewer
-
-import Xml.Ops
-import ParseException.withMetadataFile
-
-import scala.xml.Elem
+package org.podval.judaica.parsers
 
 import java.io.File
 
+import ParseException.withMetadataFile
+import org.podval.judaica.viewer.{Div, NamedDiv, NamedSelector, NamedStructure, NonRootStructure, NumberedDiv,
+  NumberedSelector, NumberedStructure, Selector, Selectors, StructureSelection, ViewerException}
+
+import scala.xml.Elem
+import Xml.Ops
 
 object StructureParser {
 

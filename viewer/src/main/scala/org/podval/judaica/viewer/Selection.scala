@@ -1,5 +1,5 @@
 /*
- *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014-2018 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.podval.judaica.viewer
 
 
 abstract class Selection(val work: Work, val editions: Editions, val div: Div) {
-
   def isStructure: Boolean
   def isDiv: Boolean
   def asStructure: StructureSelection
@@ -31,15 +30,12 @@ abstract class Selection(val work: Work, val editions: Editions, val div: Div) {
 
   def selectDiv(div: Div): StructureSelection = new StructureSelection(work, editions, div)
 
-
   def selectPath(what: String): Selection = what.split("/").foldLeft(this)(_.select(_))
   def selectDominantPath(what: String): Selection = what.split("/").foldLeft(this)(_.selectDominant(_))
 }
 
 
-
 final class StructureSelection(work: Work, editions: Editions, div: Div) extends Selection(work, editions, div) {
-
   override def isStructure: Boolean = true
   override def isDiv: Boolean = false
   override def asStructure: StructureSelection = this
@@ -59,7 +55,6 @@ final class StructureSelection(work: Work, editions: Editions, div: Div) extends
     selectStructure(div.asDominant.dominantStructure)
   }
 
-
   def parseDominantPath(path: String): Div = {
     val target = selectDominantPath(path)
     if (!target.isStructure) throw new ViewerException(s"Path $path ended with a Div selection")
@@ -67,48 +62,35 @@ final class StructureSelection(work: Work, editions: Editions, div: Div) extends
     target.div
   }
 
-
   def content(formatOption: Option[String]): Content = content(div.parseFormat(formatOption))
-
 
   def content(format: Selector.Format): Content = editions.content(div, format)
 }
 
 
-
 final class DivSelection(work: Work, editions: Editions, div: Div, override val structure: Structure) extends Selection(work, editions, div) {
-
   override def isStructure: Boolean = false
   override def isDiv: Boolean = true
   override def asStructure: StructureSelection = throw new ClassCastException
   override def asDiv: DivSelection = this
 
-
   def divs: Seq[Div] = structure.divs
-
 
   override def select(name: String): StructureSelection = selectDiv(name)
   override def selectDominant(name: String): StructureSelection = selectDiv(name)
-
 
   def selectDiv(name: String): StructureSelection = selectDiv(Exists(structure.divById(name), name, "id"))
 }
 
 
-
 object Selection {
-
   def apply(workName: String): StructureSelection = apply(Works.getWorkByName(workName))
-
 
   def apply(work: Work): StructureSelection = apply(work, NoEditions)
 
-
   def apply(workName: String, editionNames: String): StructureSelection = apply(Works.getWorkByName(workName), editionNames)
 
-
   def apply(work: Work, editionNames: String): StructureSelection = apply(work, Editions(work, editionNames))
-
 
   def apply(work: Work, editions: Editions): StructureSelection = new StructureSelection(work, editions, work)
 }
