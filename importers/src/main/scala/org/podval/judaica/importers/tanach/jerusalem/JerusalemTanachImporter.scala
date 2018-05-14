@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2018 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,25 +32,16 @@ import java.io.File
 object JerusalemTanachImporter {
 
   def main(args: Array[String]) {
-    val importer = new JerusalemTanachImporter("/home/dub/Code/judaica/imports/Tanach/jerusalem")
-
-    importer.run
+    val importer = new JerusalemTanachImporter().importWork("/home/dub/Code/judaica/imports/Tanach/jerusalem")
   }
 
 
-  val SEFER = HebrewLanguage.SAMEH + HebrewLanguage.PEI + HebrewLanguage.RESH
+  val SEFER: String = HebrewLanguage.SAMEH + HebrewLanguage.PEI + HebrewLanguage.RESH
+  val PEREK: String = HebrewLanguage.PEI + HebrewLanguage.RESH + HebrewLanguage.QOF
+  val PEI3: String = HebrewLanguage.PEI + " " + HebrewLanguage.PEI + " " + HebrewLanguage.PEI
+  val SAMEH3: String = HebrewLanguage.SAMEH + " " + HebrewLanguage.SAMEH + " " + HebrewLanguage.SAMEH
 
-
-  val PEREK = HebrewLanguage.PEI + HebrewLanguage.RESH + HebrewLanguage.QOF
-
-
-  val PEI3 = HebrewLanguage.PEI + " " + HebrewLanguage.PEI + " " + HebrewLanguage.PEI
-
-
-  val SAMEH3 = HebrewLanguage.SAMEH + " " + HebrewLanguage.SAMEH + " " + HebrewLanguage.SAMEH
-
-
-  val HAZI =
+  val HAZI: String =
     HebrewLanguage.HET +
     HebrewLanguage.TSADI +
     HebrewLanguage.YOD +
@@ -69,18 +60,18 @@ object JerusalemTanachImporter {
     HebrewLanguage.MEM_SOFIT
 
 
-  val HAZAK = HebrewLanguage.HET + HebrewLanguage.ZAYIN + HebrewLanguage.QOF
+  val HAZAK: String = HebrewLanguage.HET + HebrewLanguage.ZAYIN + HebrewLanguage.QOF
 }
 
 
 
-final class JerusalemTanachImporter(inputDirectory: String)
-  extends TanachImporter(inputDirectory, "Tanach", "Jerusalem")
+final class JerusalemTanachImporter extends TanachImporter
 {
+  protected override def editionName: String = "Jerusalem"
+
   protected override def getInputExtension: String = "txt"
 
-
-  protected override def output2inputName: Map[String, String] = Map(
+  protected override def books: Map[String, String] = Map(
     "bereishis" -> "Genesis"/*,
     "shemos" -> "Exodus",
     "vayikro" -> "Leviticus",
@@ -88,31 +79,29 @@ final class JerusalemTanachImporter(inputDirectory: String)
     "devorim" -> "Deuteronomy"*/
   )
 
-
-  protected override def parseBook(inputFile: File, outputName: String): DivContent = {
+  protected override def parseBook(inputFile: File, bookName: String): DivContent = {
     def dropStuckChapter(what: Seq[String]) = if (isChapter(what.last)) what.dropRight(1) else what
     def isChapter(line: String): Boolean = line.startsWith(JerusalemTanachImporter.PEREK)
 
     val lines = Source.fromFile(inputFile, "UTF-16BE").getLines().map(_.trim)
     val bookNameFromFile = lines.next.trim  // has some crap at the end of the name
-    val bookName = outputName
 
     DivContent(
-      "book",
-      Some(bookName),
-      Node.NoAttributes,
-      None,
-      lines.filterNot(_.isEmpty).filterNot(isChapter).toSeq.zipWithIndex.map {
+      sort = "book",
+      n = Some(bookName),
+      attributes = Node.NoAttributes,
+      head = None,
+      children = lines.filterNot(_.isEmpty).filterNot(isChapter).toSeq.zipWithIndex.map {
         case (chapter, chapterNumberFrom0) =>
           val chapterNumber = chapterNumberFrom0 + 1
           DivContent(
-            "chapter",
-            Some(chapterNumber.toString),
-            Node.NoAttributes,
-            None,
-            dropStuckChapter(chapter.split(":").map(_.trim)).zipWithIndex.flatMap {
+            sort = "chapter",
+            n = Some(chapterNumber.toString),
+            attributes = Node.NoAttributes,
+            head = None,
+            children = dropStuckChapter(chapter.split(":").map(_.trim)).zipWithIndex.flatMap {
               case (verse, verseNumberFrom0) =>
-                parseVerse(verse, verseNumberFrom0+1)
+                parseVerse(verse, verseNumberFrom0 + 1)
             }
           )
       })
@@ -187,7 +176,7 @@ final class JerusalemTanachImporter(inputDirectory: String)
     val spaceIndex = line.indexOf(" ")
     val makafIndex = line.indexOf(HebrewLanguage.MAQAF)
 
-    def isFirst(one: Int, two: Int) = (one != -1) && ((two == -1) || (two > one))
+    def isFirst(one: Int, two: Int): Boolean = (one != -1) && ((two == -1) || (two > one))
     val isSpace = isFirst(spaceIndex, makafIndex)
     val isMakaf = isFirst(makafIndex, spaceIndex)
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2018 Leonid Dubinsky <dub@podval.org>.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,22 +17,14 @@
 
 package org.podval.judaica.importers.tanach.jerusalem
 
-
 final class Line(var line: String) {
+  def isEmpty: Boolean = line.isEmpty
 
-  def isEmpty = line.isEmpty
+  def size: Int = line.size
 
+  def indexOf(what: String): Int = line.indexOf(what)
 
-  def size = line.size
-
-
-  def indexOf(what: String) = line.indexOf(what)
-
-
-  def consumeToSpace(): String = {
-    consumeToIndex(line.indexOf(" "))
-  }
-
+  def consumeToSpace(): String = consumeToIndex(line.indexOf(" "))
 
   def consumeBracketed(): Option[String] = {
     if (line.startsWith("[")) {
@@ -45,7 +37,6 @@ final class Line(var line: String) {
     }
   }
 
-
   def consume(what: String): Boolean = {
     val result = line.startsWith(what)
     if (result) {
@@ -53,7 +44,6 @@ final class Line(var line: String) {
     }
     result
   }
-
 
   def consumeToIndex(index: Int): String = {
     val result = line.take(index)

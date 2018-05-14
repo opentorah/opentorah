@@ -1,5 +1,5 @@
 /*
- *  Copyright 2014 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2014-2018 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,8 @@ final case class ParsedDivContent(
 
 
 final case class BoundDivContent(
-  val div: Div,
-  val lang: Language,
+  div: Div,
+  lang: Language,
   override val prefix: Seq[Content],
   override val attributes: MetaData,
   override val children: Seq[Content]) extends DivContent
@@ -75,16 +75,16 @@ final case class BoundDivContent(
 object DivContent {
 
   def apply(sort: String, n: Option[String], attributes: MetaData, head: Option[String], children: Seq[Content]): DivContent =
-    new ParsedDivContent(Seq.empty, sort, n, attributes, head, children)
+    ParsedDivContent(Seq.empty, sort, n, attributes, head, children)
 
 
 
   def replaceChildren(content: DivContent, children: Seq[Content]): DivContent =
-    new ParsedDivContent(content.prefix, content.sort, content.n, content.attributes, content.head, children)
+    ParsedDivContent(content.prefix, content.sort, content.n, content.attributes, content.head, children)
 
 
   def replacePrefix(content: DivContent, prefix: Seq[Content]): DivContent =
-    new ParsedDivContent(prefix, content.sort, content.n, content.attributes, content.head, content.children)
+    ParsedDivContent(prefix, content.sort, content.n, content.attributes, content.head, content.children)
 
 
   def fromXml(xml: Elem): DivContent = {
@@ -134,9 +134,7 @@ object DivContent {
   def prependAttribute(name: String, value: Boolean, attributes: MetaData): MetaData =
     if (!value) attributes else new UnprefixedAttribute(name, Seq(Text("true")), attributes)
 
-
   def select(file: File, path: Div.Path, format: Selector.Format): Content = select(fromXml(XmlFile.load(file)), path, format)
-
 
   def select(content: DivContent, path: Div.Path, format: Selector.Format): Content =
     if (path.isEmpty) reformat(content, format) else {
@@ -156,7 +154,8 @@ object DivContent {
       val structure = parentDiv.getStructure(selectorOption.get)
       val divName = content.n.get
       val divOption = structure.divById(divName)
-      if (divOption.isEmpty) throw new ViewerException(s"No Div $divName in $structure")
+      if (divOption.isEmpty)
+        throw new ViewerException(s"No Div $divName in $structure")
       bindWithThis(content, divOption.get, lang)
     }
   }
@@ -167,7 +166,7 @@ object DivContent {
       if (c.isInstanceOf[DivContent]) bind(c.asInstanceOf[DivContent], parentDiv, lang) else c
     }
 
-    new BoundDivContent(
+    BoundDivContent(
       div,
       lang,
       bindSeq(content.prefix, div),
@@ -178,7 +177,7 @@ object DivContent {
 
 
   def guessStructure(content: DivContent): String = {
-    val nonEmptyDiv = content.children.find(c => c.isInstanceOf[DivContent] && !c.asInstanceOf[DivContent].children.isEmpty)
+    val nonEmptyDiv = content.children.find(c => c.isInstanceOf[DivContent] && c.asInstanceOf[DivContent].children.nonEmpty)
     if (nonEmptyDiv.isEmpty) throw new ViewerException(s"Can't guess structure")
     nonEmptyDiv.get.asInstanceOf[DivContent].sort
   }

@@ -49,7 +49,7 @@ object SelectorParser {
 
       if (xml.booleanAttribute("isNumbered")) {
         new ParsedSelector(names, isNameIncludedInHead, headPrefix, headSuffix, selectors) with NumberedSelector {
-          override val isSpelledOut = xml.booleanAttribute("isSpelledOut")
+          override val isSpelledOut: Boolean = xml.booleanAttribute("isSpelledOut")
         }
 
       } else

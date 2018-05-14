@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2018 Leonid Dubinsky <dub@podval.org>.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -25,37 +25,40 @@ import org.podval.judaica.viewer.{DivContent, Content, Edition}
 
 
 object ChabadImporter {
-
-    def main(args: Array[String]) {
-        val importer = new ChabadImporter("/home/dub/code/judaica/imports/Chabad/", null) // TODO
-
-        importer.importBook("Tanya/1/index", "Tanya/1");
-    }
+  def main(args: Array[String]): Unit = {
+    new ChabadImporter() {
+      override def workName = "Tanya"
+    }.importWork("/home/dub/code/judaica/imports/Chabad/") // TODO
+  }
 }
 
 
-class ChabadImporter(inputDirectory: String, workName: String) extends Importer(inputDirectory, workName, "Chabad") {
+abstract class ChabadImporter extends Importer {
+  protected final override def editionName: String = "Chabad"
 
-    def getInputExtension() : String = "htm"
+  protected final override def getInputExtension: String = "htm"
 
+  protected final override def books: Map[String, String] = Map(
+    "Tanya/1/index" -> "Tanya/1"
+  )
 
-    def parseBook(file: File, outputName: String): DivContent = {
-        val index = load(file)
+  def parseBook(file: File, outputName: String): DivContent = {
+    val index = load(file)
 
-        val directory = file.getParentFile
+    val directory = file.getParentFile
 
-       // TODO
-        null
-//        // TODO name
-//        <div type="book">{
-//            parseIndex(index).zipWithIndex.map {
-//                case (name, chapterNumberFrom0) =>
-//                    <div type="chapter" n={(chapterNumberFrom0+1).toString()}>{
-//                        parseChapter(new File(directory, name));
-//                    }</div>
-//            }
-//        }</div>
-    }
+    // TODO
+    null
+    //        // TODO name
+    //        <div type="book">{
+    //            parseIndex(index).zipWithIndex.map {
+    //                case (name, chapterNumberFrom0) =>
+    //                    <div type="chapter" n={(chapterNumberFrom0+1).toString()}>{
+    //                        parseChapter(new File(directory, name));
+    //                    }</div>
+    //            }
+    //        }</div>
+  }
 
 
 //    private def parseIndex(index: Node): Seq[String] =
@@ -104,7 +107,7 @@ class ChabadImporter(inputDirectory: String, workName: String) extends Importer(
 //    }
 
 
-    private def load(file: File): Node = Utility.trim(TagSoupXmlLoader.get().loadFile(file))
+  private def load(file: File): Node = Utility.trim(TagSoupXmlLoader.get().loadFile(file))
 
 
 //    private def getFileName(path: String): String = path.substring(path.lastIndexOf("/")+1)

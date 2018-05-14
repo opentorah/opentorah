@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2018 Leonid Dubinsky <dub@podval.org>.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,19 +18,11 @@
 package org.podval.judaica.importers
 package tanach
 
-import org.podval.judaica.viewer.{HebrewLanguage, DivContent, Content, Edition}
+import org.podval.judaica.viewer.{HebrewLanguage, DivContent, Edition}
 
 
-abstract class TanachImporter(inputDirectory: String, workName: String, editionName: String)
-  extends Importer(inputDirectory, workName, editionName)
-{
-  final def run {
-    output2inputName foreach { case (inputName, outputName) => importBook(inputName, outputName) }
-  }
-
-
-  protected def output2inputName: Map[String, String]
-
+trait TanachImporter extends Importer {
+  protected def workName: String = "Tanach"
 
   protected final override def processBook(content: DivContent, edition: Edition, outputName: String): DivContent = {
     val boundContent = DivContent.bind(content, edition.work, HebrewLanguage)

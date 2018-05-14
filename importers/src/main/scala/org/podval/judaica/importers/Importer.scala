@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011-2013 Leonid Dubinsky <dub@podval.org>.
+ *  Copyright 2011-2018 Leonid Dubinsky <dub@podval.org>.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -22,28 +22,28 @@ import org.podval.judaica.viewer.{DivContent, Works, Edition, Content, Xml}
 import java.io.File
 
 
-abstract class Importer(inputDirectoryPath: String, workName: String, editionName: String) {
-
-  private val inputDirectory = new File(inputDirectoryPath)
-
-
-  protected val edition: Edition = Works.getWorkByName(workName).getEditionByName(editionName)
-
-
-  final def importBook(inputName: String, outputName: String) {
-    val inFile = new File(inputDirectory, inputName + "." + getInputExtension)
-    val content = parseBook(inFile, outputName)
-    val result = processBook(content, edition, outputName)
-    val outputFile = edition.storage.storage(outputName).asFile.file
-    Xml.print(Content.toXmlNode(result), outputFile)
+trait Importer {
+  def importWork(inputDirectoryPath: String): Unit = {
+    val inputDirectory = new File(inputDirectoryPath)
+    val edition: Edition = Works.getWorkByName(workName).getEditionByName(editionName)
+    for ((inputName, outputName) <- books) {
+      val inputFile: File = new File(inputDirectory, inputName + "." + getInputExtension)
+      val outputFile: File = new File(edition.directory, outputName + ".xml") //  .storage.storage(outputName).asFile.file
+      val content: DivContent = parseBook(inputFile, outputName)
+      val result: DivContent = processBook(content, edition, outputName)
+      Xml.print(Content.toXmlNode(result), outputFile)
+    }
   }
 
+  protected def workName: String
+
+  protected def editionName: String
+
+  protected def books: Map[String, String]
 
   protected def getInputExtension: String
 
-
   protected def parseBook(file: File, outputName: String): DivContent
-
 
   protected def processBook(content: DivContent, edition: Edition, outputName: String): DivContent = content
 }
