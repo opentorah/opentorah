@@ -1,13 +1,14 @@
-/*
- * Inspired by a Gist by Aristedes Maniatis
- * https://gist.github.com/ari/4156d967d54289f4abf6
- */
+## Motivation
 
-## FOP version
+Inspired by the docbkx Maven plugin: http://docbkx-tools.sourceforge.net/docbkx-samples/manual.html
+Blog post.
+FOP version and lack of updates from docbkx.
+Inspired by a Gist by Aristedes Maniatis: https://gist.github.com/ari/4156d967d54289f4abf6
+The need for Gradle plugin (DRY).
 
 ## Saxon version
 
-DocBook XSLT stylesheets are in XSLT 1.0; rewrite in XSLT 2.0 did not yet release anything.
+DocBook XSLT stylesheets are in XSLT 1.0; rewrite in XSLT 2.0 did not yet release anything (link).
 
 On http://saxon.sourceforge.net/, it says:
    "even if your stylesheets only require XSLT 1.0, it is probably better to run them under Saxon 9.x"
@@ -33,39 +34,39 @@ But it still doesn't work; I get (from DocBook XSLT):
 
 v1.79.2 has been out for a while, but doesn't seem to have made it into Maven repositories, so I use v1.79.1
 
+Make version overridable in the project using this extension in docbook{ xslVersion = ...}
+and avoid "can't change after... resolved" - like 'zinc' for scala-plugin.
 
-// Task classes can not be 'final' - Gradle needs to create a proxy...
 
 ## JEuclid version
 
 FOP does not handle MathML; it needs jEuclid plugin
 net.sourceforge.jeuclid:jeuclid-core:3.1.9
-
-jeuclid-fop is not available in Maven central repository and must be made available locally
-net.sourceforge.jeuclid:jeuclid-fop:3.1.9
+net.sourceforge.jeuclid:jeuclid-fop:3.1.9  (both seem to be available from the Maven repositories!)
 
 
-## Zinc version
-'com.typesafe.zinc:zinc:0.3.15'
- // TODO - when will it work? "org.scala-sbt:zinc-core_${scalaVersionMajor}:1.1.5"
- 
- 
- 
-// TODO check that input and stylesheet files exist
-// TODO auto-remove ".xml" from the input file name?
+## TODO
+
+Suppress the logs from Saxon:
+     // suppress output from the XSLT transforms - unless running with '-d' or '-i'.
+     switch (project.gradle.startParameter.logLevel) {
+       case LogLevel.DEBUG:
+       case LogLevel.INFO:
+       break;
+       default:
+         logging.captureStandardOutput(LogLevel.INFO)
+       logging.captureStandardError(LogLevel.INFO)
+     }
 
 
-// TODO track down and suppress network IO!
+FOPp installation... did not recognize the jeuclid's jar-files (version 3.1.9) in /usr/share/fop (or some subfolder /lib).
+I was able to get it to work by modifying /usr/bin/fop which is actually just a shell script wrapper. The modified parts are as follows:
+...
+find_jars /usr/share/fop/fop-hyph.jar
+find_jars /usr/share/fop/jeuclid-core-3.1.9.jar
+find_jars /usr/share/fop/jeuclid-fop-3.1.9.jar
+find_jars fop
+...   
 
-
-Add EPUB support
-
-Add SVG support
-
-
-
-    // TODO fix FOP configuration to not get
-    //   "font directory /home/dub/Projects/calendar/calendar/paper/src/main/fop/fop.xconf could not be found."
-    // Also, strict?
-
-Changes in parameters do not trigger pdfFo?!
+Switch to Zinc v1 - when it actually works!
+  'com.typesafe.zinc:zinc:0.3.15' -> "org.scala-sbt:zinc-core_${scalaVersionMajor}:1.1.5"

@@ -120,6 +120,7 @@ class SaxonTask extends DefaultTask {
 
   // Resolves references to data in DocBook files
   def mkEntityResolver(project: Project, dataDirectory: File): EntityResolver = (publicId: String, systemId: String) => {
+    getLogger.error(s"================= publicId=$publicId; systemId=$systemId")
     drop(DocBookPlugin.docBookDataUrl, systemId).map { path =>
       val result = new InputSource(new FileReader(new File(dataDirectory, path)))
       result.setSystemId(systemId)
@@ -129,6 +130,7 @@ class SaxonTask extends DefaultTask {
 
   // Resolves references to DocBook XSL in customization files
   def mkUriResolver(project: Project): URIResolver = (href: String, base: String) => {
+    getLogger.error(s"================= href=$href; base=$base")
     drop(DocBookPlugin.docBookXslUrl, href).orElse(drop(DocBookPlugin.docBookXslUrlOfficial, href)
     ).map(path => new StreamSource(new File(DocBookPlugin.docBookXsl(project), path))).orNull
   }

@@ -29,6 +29,9 @@ dependencies {
   runtime 'xerces:xercesImpl:2.11.0'
 
   compile 'org.apache.xmlgraphics:fop:2.2'
+
+  compile 'net.sourceforge.jeuclid:jeuclid-fop:3.1.9'
+  runtime 'net.sourceforge.jeuclid:jeuclid-core:3.1.9'
 }
 
 
