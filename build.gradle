@@ -12,7 +12,7 @@ plugins {
   id "com.jfrog.bintray" version "1.7.3" apply false
 }
 
-def scalaVersion      = '2.12.5'
+def scalaVersion      = '2.12.6'
 def scalaVersionMajor = '2.12'
 
 ext.lib = [
@@ -85,6 +85,7 @@ def artifactUrls = [
   vcsUrl   : "${gitHubRepositoryUrl}.git"
 ]
 
+// TODO rework in Gradle DSL for 4.8.1+
 def pomConfig = {
   url artifactUrls.siteUrl
   scm { url artifactUrls.siteUrl }
@@ -240,7 +241,7 @@ project(':paper') {
     // date: LocalDate.now().format(DateTimeFormatter.ofPattern("d MMM yyyy"))
   }
 
-  task buildTables(type:JavaExec, dependsOn: [classes]) {
+  task buildTables(type: JavaExec, dependsOn: [classes]) {
     classpath = sourceSets.main.runtimeClasspath
     main = "org.podval.calendar.paper.Tables"
     args = [ "$docBookData" ]

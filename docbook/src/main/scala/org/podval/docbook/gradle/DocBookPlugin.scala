@@ -16,14 +16,9 @@ final class DocBookPlugin extends Plugin[Project] {
 
     val extension: DocBookExtension = project.getExtensions.create("docbook", classOf[DocBookExtension], project)
 
-    // TODO make version overridable in the project using this extension in docbook{ xslVersion = ...}
-    //   and avoid "can't change after... resolved" - like 'zinc' for scala-plugin.
-
     val docBookXslConfiguration = project.getConfigurations.create("docbookxsl").defaultDependencies(
       _.add(project.getDependencies.create("net.sf.docbook:docbook-xsl:1.79.1:resources@zip")) : Unit
     ).setVisible(false)
-
-    // TODO add highlighting using 'net.sf.xslthl:xslthl:2.1.0'
 
     val prepareDocBookTask: Copy = project.getTasks.create("prepareDocBook", classOf[Copy], (copy: Copy) => {
       copy.setDescription("Prepare DocBook XSLT stylesheets")
@@ -102,16 +97,4 @@ object DocBookPlugin {
   private def srcMain(project: Project): File = new File(project.getProjectDir, "src/main")
 
   def file(directory: File, name: String, extension: String): File = new File(directory, name + "." + extension)
-
-
-  // TODO log suppressor
-  //      // suppress output from the XSLT transforms - unless running with '-d' or '-i'.
-  //      switch (project.gradle.startParameter.logLevel) {
-  //        case LogLevel.DEBUG:
-  //        case LogLevel.INFO:
-  //        break;
-  //        default:
-  //          logging.captureStandardOutput(LogLevel.INFO)
-  //        logging.captureStandardError(LogLevel.INFO)
-  //      }
 }
