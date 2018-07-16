@@ -10,9 +10,10 @@ object Sun {
   // KH 10:1
   val yearOfRavAda: TimeInterval = Cycle.cycleLength / Cycle.yearsInCycle
 
-  val gregorianYear: TimeInterval = TimeInterval.fromRational(
-    BigRational(365) +
-    BigRational(1, 4) -
-    BigRational(1, 100) +
-    BigRational(1, 400))
+  // TODO move or remove
+//  val gregorianYear: TimeInterval = TimeInterval.fromRational(
+//    BigRational(365) +
+//    BigRational(1, 4) -
+//    BigRational(1, 100) +
+//    BigRational(1, 400))
 }

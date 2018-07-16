@@ -17,4 +17,5 @@ class SimpleTimeNumberSystem extends TimeNumberSystem[SimpleTimeNumberSystem] {
   final object Point extends PointCompanion[SimpleTimeNumberSystem] with SimpleTimeNumberSystemMember
 }
 
+
 object SimpleTimeNumberSystem extends SimpleTimeNumberSystem
