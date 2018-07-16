@@ -12,6 +12,8 @@ abstract class IntervalBase[S <: NumberSystem[S]](digits: Seq[Int])
 
   final def /(n: Int): S#Interval = /(n, defaultLength)
 
+  // TODO introduce implicit parameter of type Precision?
+
   final def /(n: Int, length: Int): S#Interval =
     numberSystem.Interval.fromRational(toRational / n, math.max(this.length, length))
 
@@ -20,13 +22,15 @@ abstract class IntervalBase[S <: NumberSystem[S]](digits: Seq[Int])
   final def %(n: Int, length: Int): S#Interval =
     this - ((this / (n, length)) * n)
 
-  final def /(that: S#Interval): Int =
+  final def /(that: S#Interval): Int = // TODO return BigRational instead?
     (this.toRational / that.toRational).wholeAndFraction._1
 
   final def *(that: BigRational): S#Interval = *(that, defaultLength)
 
   final def *(that: BigRational, length: Int): S#Interval =
     numberSystem.Interval.fromRational(this.toRational*that, length)
+
+  // TODO def %(BigRational)?
 
   final def *[T <: NumberSystem[T]](that: T#Interval): S#Interval = *(that, defaultLength)
 

@@ -25,16 +25,21 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
   def invert: BigRational = BigRational(denominator, numerator)
 
   def *(that: BigRational): BigRational = BigRational(
-    this.numerator*that.numerator,
-    this.denominator*that.denominator
+    numerator = this.numerator * that.numerator,
+    denominator = this.denominator * that.denominator
   )
-
-  def *(that: Int): BigRational = this * BigRational(that)
 
   def /(that: BigRational): BigRational = this * that.invert
 
+  // TODO def %(BigRational)?
+
+  def *(that: Int): BigRational = this * BigRational(that)
+
   def /(that: Int): BigRational = this / BigRational(that)
 
+  // TODO def %(Int)?
+
+  // TODO define whole() and fraction() instead/in addition?
   def wholeAndFraction: (Int, BigRational) = {
     val whole: Int = (numerator / denominator).bigInteger.intValueExact
     val fraction: BigRational = BigRational(numerator - whole*denominator, denominator)
@@ -48,6 +53,7 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
 
   override def equals(other: Any): Boolean = other match {
     case that: BigRational =>
+      // we rely on the representation being canonical
       (this.numerator == that.numerator) && (this.denominator == that.denominator)
 
     case _ => false
