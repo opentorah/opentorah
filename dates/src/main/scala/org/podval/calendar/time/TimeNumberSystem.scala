@@ -1,8 +1,8 @@
 package org.podval.calendar.time
 
-import org.podval.calendar.numbers.NumberSystem
+import org.podval.calendar.numbers.NonPeriodicNumberSystem
 
-trait TimeNumberSystem[S <: TimeNumberSystem[S]] extends NumberSystem[S] { this: S =>
+trait TimeNumberSystem[S <: TimeNumberSystem[S]] extends NonPeriodicNumberSystem[S] { this: S =>
   type Point <: TimePointBase[S]
 
   type Interval <: TimeIntervalBase[S]

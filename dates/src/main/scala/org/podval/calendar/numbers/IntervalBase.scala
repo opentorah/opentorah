@@ -4,13 +4,13 @@ abstract class IntervalBase[S <: NumberSystem[S]](digits: Seq[Int])
   extends Number[S, S#Interval](digits)
 { this: S#Interval =>
   final def +(that: S#Interval): S#Interval =
-    numberSystem.Interval.fromDigits(numberSystem.add(this.digits, that.digits))
+    numberSystem.Interval.fromDigits(numberSystem.add(this, that))
 
   final def -(that: S#Interval): S#Interval =
-    numberSystem.Interval.fromDigits(numberSystem.subtract(this.digits, that.digits))
+    numberSystem.Interval.fromDigits(numberSystem.subtract(this, that))
 
   final def *(n: Int): S#Interval =
-    fromDigits(digits map (n * _))
+    numberSystem.Interval.fromDigits(digits map (n * _))
 
   final def /(n: Int, length: Int = defaultLength): S#Interval =
     numberSystem.Interval.fromRational(toRational / n, math.max(this.length, length))

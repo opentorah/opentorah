@@ -6,13 +6,13 @@ abstract class PointBase[S <: NumberSystem[S]](digits: Seq[Int])
   override def companion: NumberCompanion[S, S#Point] = numberSystem.Point
 
   final def +(that: S#Interval): S#Point =
-    numberSystem.Point.fromDigits(numberSystem.add(this.digits, that.digits))
+    numberSystem.Point.fromDigits(numberSystem.add(this, that))
 
   final def -(that: S#Interval): S#Point =
-    numberSystem.Point.fromDigits(numberSystem.subtract(this.digits, that.digits))
+    numberSystem.Point.fromDigits(numberSystem.subtract(this, that))
 
   final def -(that: S#Point): S#Interval =
-    numberSystem.Interval.fromDigits(numberSystem.subtract(this.digits, that.digits))
+    numberSystem.Interval.fromDigits(numberSystem.subtract(this, that))
 
   final override def toInterval: S#Interval = this - numberSystem.Point()
   final override def toPoint   : S#Point    = this

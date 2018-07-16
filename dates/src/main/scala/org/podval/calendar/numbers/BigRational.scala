@@ -1,9 +1,10 @@
 package org.podval.calendar.numbers
 
 /**
-  * TODO
-  * @param numerator
-  * @param denominator
+  * Arbitrary precision Rational number.
+  *
+  * @param numerator  of the number (signed)
+  * @param denominator  of the number (unsigned)
   */
 final case class BigRational private(numerator: BigInt, denominator: BigInt)
   extends Comparable[BigRational] with Ordered[BigRational]
@@ -47,7 +48,7 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
 
   override def equals(other: Any): Boolean = other match {
     case that: BigRational =>
-      (this.numerator    == that.numerator) && (this.denominator  == that.denominator)
+      (this.numerator == that.numerator) && (this.denominator == that.denominator)
 
     case _ => false
   }

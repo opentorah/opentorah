@@ -29,55 +29,46 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   final def sign(position: Int): Option[String] = signPartial.lift(position)
 
-  final def signum(digits: Seq[Int]): Int = nonZeroDigit(digits).map(math.signum).getOrElse(0)
+  final def signum[N <: Number[S, N]](number: N): Int = nonZeroDigit(number.digits).map(math.signum).getOrElse(0)
 
-  final def isZero(digits: Seq[Int]): Boolean = nonZeroDigit(digits).isEmpty
+  final def isZero[N <: Number[S, N]](number: N): Boolean = nonZeroDigit(number.digits).isEmpty
 
-  final def isPositive(digits: Seq[Int]): Boolean = nonZeroDigit(digits).exists(_ > 0)
+  final def isPositive[N <: Number[S, N]](number: N): Boolean = nonZeroDigit(number.digits).exists(_ > 0)
 
+  final def isNegative[N <: Number[S, N]](number: N): Boolean = isNegative(number.digits)
   final def isNegative(digits: Seq[Int]): Boolean = nonZeroDigit(digits).exists(_ < 0)
 
   private[this] def nonZeroDigit(digits: Seq[Int]): Option[Int] = normal(digits).find(_ != 0)
 
-  final def get(digits: Seq[Int], position: Int): Int = {
-    val normalDigits: Seq[Int] = normal(digits)
-    if (normalDigits.length > position) normalDigits(position) else 0
-  }
-
-  final def set(digits: Seq[Int], position: Int, value: Int): Seq[Int] = {
-    val normalDigits: Seq[Int] = normal(digits)
-    normalDigits.padTo(position+1, 0).updated(position, value)
-  }
-
-  final def compare(left: Seq[Int], right: Seq[Int]): Int =
+  final def compare[N <: Number[S, N]](left: N, right: N): Int =
     zipWith(simple(left), simple(right), _ compare _).find (_ != 0) getOrElse 0
-
-  final def abs(digits: Seq[Int]): Seq[Int] = simple(digits).map(math.abs)
 
   final def negate(digits: Seq[Int]): Seq[Int] = digits.map(-_)
 
-  final def add(left: Seq[Int], right: Seq[Int]): Seq[Int] = zipWith(left, right, _ + _)
+  final def add[N1 <: Number[S, N1], N2 <: Number[S, N2]](left: N1, right: N2): Seq[Int] =
+    zipWith(left.digits, right.digits, _ + _)
 
-  final def subtract(left: Seq[Int], right: Seq[Int]): Seq[Int] = zipWith(left, right, _ - _)
+  final def subtract[N1 <: Number[S, N1], N2 <: Number[S, N2]](left: N1, right: N2): Seq[Int] =
+    zipWith(left.digits, right.digits, _ - _)
 
-  final def roundTo(digits: Seq[Int], length: Int): Seq[Int] = {
+  final def roundTo[N <: Number[S, N]](number: N, length: Int): Seq[Int] = {
     require(length >= 0)
 
     def forDigit(digit: Int, position: Int, range: Int): (Int, Int) =
       if (position < length) (0, digit)
       else (if (math.abs(digit) >= range / 2) math.signum(digit) else 0, 0)
 
-    transform(normal(digits), forDigit, (digit: Int) => digit)
+    transform(normal(number), forDigit, (digit: Int) => digit)
   }
 
-  final def toRational(digits: Seq[Int]): BigRational = to[BigRational](
-    digits,
+  final def toRational[N <: Number[S, N]](number: N): BigRational = to[BigRational](
+    number.digits,
     (digit: Int, denominator: BigInt) => BigRational(digit, denominator),
     _ + _
   )
 
-  final def toDouble(digits: Seq[Int]): Double = to[Double](
-    digits,
+  final def toDouble[N <: Number[S, N]](number: N): Double = to[Double](
+    number.digits,
     (digit: Int, denominator: BigInt) => digit.toDouble/denominator.bigInteger.longValueExact(),
     _ + _
   )
@@ -141,13 +132,13 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     if (signum != -1) result else negate(result)
   }
 
-  final def toString(digits: Seq[Int], length: Int): String = {
+  final def toString[N <: Number[S, N]](number: N, length: Int): String = {
     def digitToString(defaultSign: String)(pair: (Int, Option[String])): String = {
       val (digit: Int, sign: Option[String]) = pair
       math.abs(digit) + sign.getOrElse(defaultSign)
     }
 
-    val simpleDigits: Seq[Int] = simple(digits)
+    val simpleDigits: Seq[Int] = simple(number)
     val digitsWithSigns: Seq[(Int, Option[String])] =
       simpleDigits.tail.padTo(length, 0).zipWithIndex.map {
         case (digit, position) => (digit, sign(position))
@@ -161,26 +152,25 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     (if (isNegative(simpleDigits)) "-" else "") + result.mkString
   }
 
-  final def hashCode(digits: Seq[Int]): Int = (73 /: canonical(digits))((v, x) => 41 * v + x)
-
-  final def canonical(digits: Seq[Int]): Seq[Int] = {
-    val normalDigits: Seq[Int] = normal(digits)
+  final def canonical[N <: Number[S, N]](number: N): Seq[Int] = {
+    val normalDigits: Seq[Int] = normal(number)
     val result: Seq[Int] = positive(normalDigits)
     // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
     result.head +: result.tail.reverse.dropWhile(_ == 0).reverse
   }
 
-  final def simple(digits: Seq[Int]): Seq[Int] = {
-    val normalDigits: Seq[Int] = normal(digits)
+  final def simple[N <: Number[S, N]](number: N): Seq[Int] = {
+    val normalDigits: Seq[Int] = normal(number)
     if (isNegative(normalDigits)) negative(normalDigits) else positive(normalDigits)
   }
 
+  final def normal[N <: Number[S, N]](number: N): Seq[Int] = normal(number.digits)
   final def normal(digits: Seq[Int]): Seq[Int] = transform(digits, normalDigit, normalHead)
 
   protected final def normalDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
     (digit / digitRange, digit % digitRange)
 
-  protected def normalHead(digit: Int): Int = digit
+  protected def normalHead(value: Int): Int
 
   private final def positive(digits: Seq[Int]): Seq[Int] =
     transform(digits, positiveDigit, positiveHead)
@@ -188,7 +178,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   protected final def positiveDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
     if (digit >= 0) (0, digit) else (-1, digit + digitRange)
 
-  protected def positiveHead(digit: Int): Int = digit
+  protected def positiveHead(value: Int): Int
 
   private final def negative(digits: Seq[Int]): Seq[Int] =
     transform(digits, negativeDigit, negativeHead)
@@ -196,7 +186,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
   protected final def negativeDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
     if (digit <= 0) (0, digit) else (1, digit - digitRange)
 
-  protected def negativeHead(digit: Int): Int = digit
+  protected def negativeHead(value: Int): Int
 
   private final def transform(
     digits: Seq[Int],

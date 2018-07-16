@@ -15,8 +15,8 @@ trait PeriodicNumberSystem[S <: PeriodicNumberSystem[S]] extends NumberSystem[S]
 
   protected final override def negativeHead(value: Int): Int = negativeDigit(value, -1, headRange)._2
 
-  final def symmetrical(digits: Seq[Int]): Seq[Int] = {
-    val result: Seq[Int] = normal(digits)
+  final def symmetrical[N <: PeriodicNumber[S, N]](number: N): Seq[Int] = {
+    val result: Seq[Int] = normal(number)
     if (result.head <= headRange/2) result
     else (result.head - headRange) +: result.tail
   }

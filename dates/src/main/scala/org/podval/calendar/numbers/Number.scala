@@ -11,56 +11,65 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
 
   def toPoint: S#Point
 
-  final def fromDigits(digits: Seq[Int]): N = companion.fromDigits(digits)
+  protected final def fromDigits(digits: Seq[Int]): N = companion.fromDigits(digits)
 
-  final def head: Int = numberSystem.get(digits, 0)
+  final def head: Int = get(0)
 
-  final def head(value: Int): N = fromDigits(numberSystem.set(digits, 0, value))
+  final def head(value: Int): N = fromDigits(set(0, value))
 
-  final def tail(position: Int): Int = numberSystem.get(digits, position+1)
+  final def tail(position: Int): Int = get(position+1)
 
-  final def tail(position: Int, value: Int): N =
-    fromDigits(numberSystem.set(digits, position+1, value))
+  final def tail(position: Int, value: Int): N = fromDigits(set(position+1, value))
+
+  private final def get(position: Int): Int = {
+    val normalDigits: Seq[Int] = numberSystem.normal(this)
+    if (normalDigits.length > position) normalDigits(position) else 0
+  }
+
+  private final def set(position: Int, value: Int): Seq[Int] = {
+    val normalDigits: Seq[Int] = numberSystem.normal(this)
+    normalDigits.padTo(position+1, 0).updated(position, value)
+  }
 
   final def length: Int = digits.tail.length
 
-  final def canonical: N = fromDigits(numberSystem.canonical(digits))
+  final def canonical: N = fromDigits(numberSystem.canonical(this))
 
-  final def simple: N = fromDigits(numberSystem.simple(digits))
+  final def simple: N = fromDigits(numberSystem.simple(this))
 
-  final def normal: N = fromDigits(numberSystem.normal(digits))
+  final def normal: N = fromDigits(numberSystem.normal(this))
 
-  final def signum: Int = numberSystem.signum(digits)
+  final def signum: Int = numberSystem.signum(this)
 
-  final def isZero: Boolean = numberSystem.isZero(digits)
+  final def isZero: Boolean = numberSystem.isZero(this)
 
-  final def isPositive: Boolean = numberSystem.isPositive(digits)
+  final def isPositive: Boolean = numberSystem.isPositive(this)
 
-  final def isNegative: Boolean = numberSystem.isNegative(digits)
+  final def isNegative: Boolean = numberSystem.isNegative(this)
 
-  final def abs: N = fromDigits(numberSystem.abs(digits))
+  final def abs: N = fromDigits(numberSystem.simple(this).map(math.abs))
 
   final def unary_- : N = fromDigits(numberSystem.negate(digits))
 
-  final def roundTo(length: Int): N = fromDigits(numberSystem.roundTo(digits, length))
+  final def roundTo(length: Int): N = fromDigits(numberSystem.roundTo(this, length))
 
-  final def toRational: BigRational = numberSystem.toRational(digits)
+  final def toRational: BigRational = numberSystem.toRational(this)
 
-  final def toDouble: Double = numberSystem.toDouble(digits)
+  final def toDouble: Double = numberSystem.toDouble(this)
 
-  final def toString(length: Int): String = numberSystem.toString(digits, length)
+  final def toString(length: Int): String = numberSystem.toString(this, length)
 
   override def toString: String = toString(length)
 
-  final def compare(that: N): Int = numberSystem.compare(this.digits, that.digits)
+  final def compare(that: N): Int = numberSystem.compare(this, that)
 
   final override def equals(other: Any): Boolean = {
-    if (!other.isInstanceOf[Number[S, N]]) false else {
-      val that: Number[S, N] = other.asInstanceOf[Number[S, N]]
+    if (!other.isInstanceOf[N]) false else {
+      val that: N = other.asInstanceOf[N]
       (this.numberSystem == that.numberSystem) && (this.companion == that.companion) &&
-        (numberSystem.compare(this.digits, that.digits) == 0)
+        (this.compare(that) == 0)
     }
   }
 
-  final override def hashCode: Int = numberSystem.hashCode(digits)
+  final override def hashCode: Int =  (73 /: numberSystem.canonical(this))((v, x) => 41 * v + x)
 }

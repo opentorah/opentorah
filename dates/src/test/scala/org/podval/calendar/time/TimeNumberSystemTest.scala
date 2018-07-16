@@ -9,43 +9,41 @@ final class TimeNumberSystemTest extends FlatSpec {
   val s: SimpleTimeNumberSystem.type = SimpleTimeNumberSystem
 
   "isZero()/isPositive()/isNegative()/signum()/abs()/negate()" should "be correct" in {
-    assertResult(true)(s.isZero(Seq(0)))
     assertResult(true)(Interval(0).isZero)
-    assertResult(false)(s.isZero(Seq(1)))
     assertResult(false)(Interval(1).isZero)
-    assertResult(false)(s.isZero(Seq(-1)))
-    assertResult(false)(s.isZero(Seq(0, 1)))
-    assertResult(false)(s.isZero(Seq(0, -1)))
+    assertResult(false)(Interval(-1).isZero)
+    assertResult(false)(Interval(0, 1).isZero)
+    assertResult(false)(Interval(0, -1).isZero)
 
-    assertResult(false)(s.isPositive(Seq(0)))
-    assertResult(true)(s.isPositive(Seq(1)))
-    assertResult(false)(s.isPositive(Seq(-1)))
-    assertResult(true)(s.isPositive(Seq(0, 1)))
-    assertResult(false)(s.isPositive(Seq(0, -1)))
+    assertResult(false)(Interval(0).isPositive)
+    assertResult(true)(Interval(1).isPositive)
+    assertResult(false)(Interval(-1).isPositive)
+    assertResult(true)(Interval(0, 1).isPositive)
+    assertResult(false)(Interval(0, -1).isPositive)
 
-    assertResult(false)(s.isPositive(Seq(0)))
-    assertResult(true)(s.isPositive(Seq(1)))
-    assertResult(false)(s.isPositive(Seq(-1)))
-    assertResult(true)(s.isPositive(Seq(0, 1)))
-    assertResult(false)(s.isPositive(Seq(0, -1)))
+    assertResult(false)(Interval(0).isNegative)
+    assertResult(false)(Interval(1).isNegative)
+    assertResult(true)(Interval(-1).isNegative)
+    assertResult(false)(Interval(0, 1).isNegative)
+    assertResult(true)(Interval(0, -1).isNegative)
 
-    assertResult(0)(s.signum(Seq(0)))
-    assertResult(1)(s.signum(Seq(1)))
-    assertResult(-1)(s.signum(Seq(-1)))
-    assertResult(1)(s.signum(Seq(0, 1)))
-    assertResult(-1)(s.signum(Seq(0, -1)))
+    assertResult(0)(Point(0).signum)
+    assertResult(1)(Point(1).signum)
+    assertResult(-1)(Point(-1).signum)
+    assertResult(1)(Point(0, 1).signum)
+    assertResult(-1)(Point(0, -1).signum)
 
-    assertResult(Seq(0))(s.abs(Seq(0)))
-    assertResult(Seq(1))(s.abs(Seq(1)))
-    assertResult(Seq(1))(s.abs(Seq(-1)))
-    assertResult(Seq(0, 1))(s.abs(Seq(0, 1)))
-    assertResult(Seq(0, 1))(s.abs(Seq(0, -1)))
+    assertResult(Point(0))(Point(0).abs)
+    assertResult(Point(1))(Point(1).abs)
+    assertResult(Point(1))(Point(-1).abs)
+    assertResult(Point(0, 1))(Point(0, 1).abs)
+    assertResult(Point(0, 1))(Point(0, -1).abs)
 
-    assertResult(Seq(0))(s.negate(Seq(0)))
-    assertResult(Seq(-1))(s.negate(Seq(1)))
-    assertResult(Seq(1))(s.negate(Seq(-1)))
-    assertResult(Seq(0, -1))(s.negate(Seq(0, 1)))
-    assertResult(Seq(0, 1))(s.negate(Seq(0, -1)))
+    assertResult(Point(0))(-Point(0))
+    assertResult(Point(-1))(-Point(1))
+    assertResult(Point(1))(-Point(-1))
+    assertResult(Point(0, -1))(-Point(0, 1))
+    assertResult(Point(0, 1))(-Point(0, -1))
   }
 
   "head()/tail()/length()" should "be correct" in {
@@ -72,18 +70,19 @@ final class TimeNumberSystemTest extends FlatSpec {
   }
 
   "add()" should "be correct" in {
-    assertResult(Seq(0))(s.add(Seq(0), Seq(0)))
-    assertResult(Seq(0))(s.subtract(Seq(0), Seq(0)))
-    assertResult(Seq(0, 1))(s.add(Seq(0, 1), Seq(0)))
-    assertResult(Seq(0, 1))(s.subtract(Seq(0, 1), Seq(0)))
-    assertResult(Seq(0, 2))(s.add(Seq(0, 1), Seq(0, 1)))
-    assertResult(Seq(0, 0))(s.subtract(Seq(0, 1), Seq(0, 1)))
+    assertResult(Interval(0))(Interval(0) + Interval(0))
+    assertResult(Interval(0))(Interval(0) - Interval(0))
+    assertResult(Interval(0, 1))(Interval(0, 1) + Interval(0))
+    assertResult(Interval(0, 1))(Interval(0, 1) - Interval(0))
+    assertResult(Interval(0, 2))(Interval(0, 1) +  Interval(0, 1))
+    assertResult(Interval(0, 0))(Interval(0, 1) - Interval(0, 1))
   }
 
   "normal()/canonical()" should "be correct" in {
     val notNormal0: Seq[Int] = Seq(1816909, 751829, 49683240)
     val notNormal1: Seq[Int] = Seq(1816909, 751829+46003)
     val notNormal2: Seq[Int] = Seq(1816909+33243)
+    // TODO tests?
   }
 
   "expression" should "be correct" in {
@@ -91,6 +90,7 @@ final class TimeNumberSystemTest extends FlatSpec {
     val time = expression.time
     val result = Interval(0, 17, 107)
     val x = 0
+    // TODO tests?
   }
 
   "toRational()" should "be correct" in {
