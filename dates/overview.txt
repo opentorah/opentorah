@@ -1,5 +1,19 @@
+Table of contents of Rambam's Kiddush HaChodesh
+
+ 1:1-4 Definitions (year, full month...).
+ 1:5-8 The court procedure.
+ 2:4 The court procedure.
+
 4:2 Vernal equinox >= 16th of Nisan => leap year.
-5:2 Fixed Rosh Hodesh: sighting of the Moon can be +/- 1 day; +2 - extremely rare.
+
+5 Aritmetic calendar
+ 5:1-2 Introduction; discrepancy with observations: -1…+1 day (+1 - very rare).
+ 5:2 Fixed Rosh Hodesh: sighting of the Moon can be +/- 1 day; +2 - extremely rare.
+ 5:3 When started.
+ 5:4-12 Second day of festivals.
+ 5:13 Conclusion.
+
+
 6:1 "Molad" - approximate conjunction (Sun. Moon and Earth on the same line).
 6:2 day = 24 hours; 1 hour = 1080 parts.
 6:3 Lunar month (between conjunctions) = 29d12h793p.

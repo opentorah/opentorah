@@ -109,7 +109,7 @@ final class Calculation(
   lazy val longitude3: Angle = // TODO AnglePoint
     rounders.longitude3(if (
       (isMoonLatitudeNortherly && inNortherlyInclinedConstellations) ||
-        (!isMoonLatitudeNortherly && !inNortherlyInclinedConstellations)
+      (!isMoonLatitudeNortherly && !inNortherlyInclinedConstellations)
     ) longitude2 - moonCircuit else longitude2 + moonCircuit)
 
   // KH 17:12
@@ -129,10 +129,9 @@ final class Calculation(
 
   // KH 17:3-4,15-21
   lazy val isMoonSightable: Boolean =
-    MoonSightable.forLongitude1(longitude1, inNortherlyInclinedConstellations).orElse(
-      MoonSightable.forArcOfSighting(arcOfSighting)).getOrElse(
-      MoonSightable.forSightingLimits(arcOfSighting, longitude1)
-    )
+    MoonSightable.forLongitude1(longitude1, inNortherlyInclinedConstellations)
+      .orElse(MoonSightable.forArcOfSighting(arcOfSighting))
+      .getOrElse(MoonSightable.forSightingLimits(arcOfSighting, longitude1))
 
   // TODO crescent calculations: KH 18-19!
 }

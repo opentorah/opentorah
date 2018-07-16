@@ -8,6 +8,6 @@ object Moon {
   // KH 6:3
   final val meanLunarPeriod: TimeInterval = TimeInterval().days(29).hours(12).parts(793)
 
-  // Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2), BeHaRaD: (KH 6:8)
+  // KH 6:8 Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2), BeHaRaD:
   final val firstNewMoon: Moment = Moment().day(2).nightHours(5).parts(204)
 }

@@ -2,7 +2,7 @@ package org.podval.calendar.time
 
 import org.podval.calendar.numbers.{IntervalCompanion, NumberSystemMember, PointCompanion}
 
-// This exists so that TimeNumberSystem could be tested stand-alone.
+// For stand-alone testing of the TimeNumberSystem.
 class SimpleTimeNumberSystem extends TimeNumberSystem[SimpleTimeNumberSystem] {
   final override type Point = TimePointBase[SimpleTimeNumberSystem]
   final override type Interval = TimeIntervalBase[SimpleTimeNumberSystem]
@@ -16,6 +16,5 @@ class SimpleTimeNumberSystem extends TimeNumberSystem[SimpleTimeNumberSystem] {
   final object Interval extends IntervalCompanion[SimpleTimeNumberSystem] with SimpleTimeNumberSystemMember
   final object Point extends PointCompanion[SimpleTimeNumberSystem] with SimpleTimeNumberSystemMember
 }
-
 
 object SimpleTimeNumberSystem extends SimpleTimeNumberSystem

@@ -41,7 +41,7 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
     (whole, fraction)
   }
 
-  override def toString: String = numerator.toShort + "/" + denominator.toString
+  override def toString: String = numerator.toString + "/" + denominator.toString
 
   override def compare(that: BigRational): Int =
     (this.numerator*that.denominator).compareTo(that.numerator*this.denominator)
@@ -79,6 +79,12 @@ object BigRational {
   final def apply(numerator: Int): BigRational = apply(numerator, 1)
 
   final def apply(numerator: Long): BigRational = apply(numerator, 1)
+
+  final def apply(value: String): BigRational = {
+    val values = value.split('/')
+    if (values.length != 2) throw new ArithmeticException(s"Invalid BigRational: $value")
+    apply(BigInt(values(0).trim), BigInt(values(1).trim))
+  }
 
   /**
     * Accepts return of a call to wholeAndFraction().

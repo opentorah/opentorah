@@ -13,8 +13,8 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
 
   def rationals: Gen[BigRational] =
     for {
-      numerator <- arbitrary[Int]
-      denominator <- arbitrary[Int] if denominator != 0
+      numerator <- arbitrary[BigInt]
+      denominator <- arbitrary[BigInt] if denominator != 0
     } yield BigRational(numerator, denominator)
 
   "apply()" should "be correct" in {
@@ -29,10 +29,26 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     assertResult("-3/2")(minusThreeHalfs.toString)
   }
 
+  "apply(String)" should "be inverse of toString()" in {
+    forAll(rationals) { r => BigRational(r.toString) should be (r) }
+  }
+
   "signum()" should "be correct" in {
     assertResult(0)(zero.signum)
     assertResult(1)(oneHalf.signum)
     assertResult(-1)(minusThreeHalfs.signum)
+  }
+
+  "signum() and <" should "be consistent" in {
+    forAll(rationals) { r =>
+      if (r.signum == -1) r < zero should be (true)
+      if (r.signum ==  0) r == zero should be (true)
+      if (r.signum ==  1) r > zero should be (true)
+    }
+  }
+
+  "signum() and abs()" should "be consistent" in {
+    forAll(rationals) { r =>  r.abs should be (if (r.signum == -1) -r else r) }
   }
 
   "abs()" should "be correct" in {
@@ -55,7 +71,7 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     assertResult(BigRational(3, 2))(minusThreeHalfs.abs)
   }
 
-  "unary_-()" should "be idempotent" in {
+  "unary_-()" should "self-inverse" in {
     forAll(rationals) { r => -(-r) should be (r) }
   }
 
@@ -85,6 +101,10 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
   "+()" should "have 0 as unit" in {
     forAll(rationals) { r => r + zero should be (r) }
     forAll(rationals) { r => zero + r should be (r) }
+  }
+
+  "+() and >" should "be consistent" in {
+    forAll(rationals, rationals) { (l, r) => r < r + l should be (l.signum > 0) }
   }
 
   "-()" should "be correct" in {
