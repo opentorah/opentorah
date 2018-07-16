@@ -79,18 +79,9 @@ final class TimeNumberSystemTest extends FlatSpec {
   }
 
   "normal()/canonical()" should "be correct" in {
-    val notNormal0: Seq[Int] = Seq(1816909, 751829, 49683240)
-    val notNormal1: Seq[Int] = Seq(1816909, 751829+46003)
-    val notNormal2: Seq[Int] = Seq(1816909+33243)
-    // TODO tests?
-  }
-
-  "expression" should "be correct" in {
-    val expression = Point(2, 5, 204) + Interval(29, 12, 793)*62651
-    val time = expression.time
-    val result = Interval(0, 17, 107)
-    val x = 0
-    // TODO tests?
+    assertResult("1850152d")(Interval(1816909, 751829, 49683240).canonical.toString)
+    assertResult("1850152d")(Interval(1816909, 751829+46003).normal.canonical.toString)
+    assertResult("1850152d")(Interval(1816909+33243).normal.canonical.toString)
   }
 
   "toRational()" should "be correct" in {

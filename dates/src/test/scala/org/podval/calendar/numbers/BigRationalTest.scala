@@ -59,6 +59,10 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     forAll(rationals) { r => -(-r) should be (r) }
   }
 
+  "unary_-()" should "be inverse of +()" in {
+    forAll(rationals) { r => r + -r should be (zero) }
+  }
+
   "invert()" should "be correct" in {
     assertThrows[ArithmeticException](zero.invert)
     assertResult(one+one)(oneHalf.invert)
@@ -66,7 +70,7 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
   }
 
   "invert()" should "be idempotent" in {
-    forAll(rationals) { r => whenever (r.numerator != 0) { r.invert.invert should be (r) }}
+    forAll(rationals) { r => whenever (r.signum != 0) { r.invert.invert should be (r) }}
   }
 
   "+()" should "be correct" in {
@@ -89,6 +93,7 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
   }
 
   "-()" should "be inverse of +()" in {
+    forAll(rationals) { r => r - r should be (zero) }
     forAll(rationals, rationals) { (l, r) => l + r - r should be (l) }
   }
 
@@ -130,11 +135,12 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
   }
 
   "/(BigRationa)" should "be inverse of *(BigRational)" in {
-    forAll(rationals, rationals) { (l, r) => whenever (r.numerator != 0) { l * r / r should be (l) }}
+    forAll(rationals, rationals) { (l, r) => whenever (r.signum != 0) { l * r / r should be (l) }}
+// TODO  forAll(rationals, rationals) { (l, r) => whenever (r.signum != 0) { r / r should be (1) }}
   }
 
   "/(BigRational), inverse() and *(BigRationa)" should "be related correctly" in {
-    forAll(rationals, rationals) { (l, r) => whenever (r.numerator != 0) { l / r should be (l * r.invert) }}
+    forAll(rationals, rationals) { (l, r) => whenever (r.signum != 0) { l / r should be (l * r.invert) }}
   }
 
   "wholeAndFraction()" should "be correct" in {

@@ -16,7 +16,7 @@ trait InterpolatedTable {
       val change: Angle = afterValue - beforeValue
       val span: Angle = after - before
       val portion: BigRational = reminder.toRational/span.toRational
-      change.multRational(portion)
+      change * portion
     }
     val result = beforeValue + more
     result

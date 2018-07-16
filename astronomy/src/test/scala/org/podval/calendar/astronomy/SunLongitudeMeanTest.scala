@@ -24,7 +24,7 @@ class SunLongitudeMeanTest extends FlatSpec {
   }
 
   it should "make a full circle in a year" in {
-    assert(SunLongitudeMean.rambamValue.multNumber[jewish.Jewish](jewish.Sun.yearOfRavAda) > period)
-    assert(SunLongitudeMean.rambamValue.multNumber[jewish.Jewish](jewish.Sun.yearOfShmuel) > period)
+    assert(SunLongitudeMean.rambamValue.*[jewish.Jewish](jewish.Sun.yearOfRavAda) > period)
+    assert(SunLongitudeMean.rambamValue.*[jewish.Jewish](jewish.Sun.yearOfShmuel) > period)
   }
 }

@@ -20,5 +20,5 @@ final class SeasonsAstronomical(calculator: Calculator) extends Seasons {
     result
   }
 
-  private def sunLongitudeTrue(moment: Moment): AnglePoint = calculator.sunLongitudeTrue(moment.day)
+  private def sunLongitudeTrue(moment: Moment): AnglePoint = calculator.calculate(moment.day).sunLongitudeTrue
 }
