@@ -7,9 +7,36 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
 
   final def fromDigits(digits: Seq[Int]): N = apply(digits: _*)
 
-  final def fromRational(value: BigRational, length: Int = numberSystem.defaultLength): N =
-    fromDigits(numberSystem.fromRational(value, length))
+  final def fromRational(value: BigRational, length: Int = numberSystem.defaultLength): N = {
+    val digits: Seq[Int] = numberSystem.from[BigRational](
+      value.signum,
+      value.abs,
+      length,
+      _.wholeAndFraction,
+      _ * _,
+      BigRational.round
+    )
 
-  final def fromDouble(value: Double, length: Int = numberSystem.defaultLength): N =
-    fromDigits(numberSystem.fromDouble(value, length))
+    fromDigits(digits)
+  }
+
+  final def fromDouble(value: Double, length: Int = numberSystem.defaultLength): N = {
+    def wholeAndFraction(what: Double): (Int, Double) = {
+      val whole: Double = math.floor(what)
+      (whole.toInt, what - whole)
+    }
+
+    def round(whole: Int, fraction: Double): Int = whole + math.round(fraction).toInt
+
+    val digits = numberSystem.from[Double](
+      math.signum(value).toInt,
+      math.abs(value),
+      length,
+      wholeAndFraction,
+      _ * _,
+      round
+    )
+
+    fromDigits(digits)
+  }
 }

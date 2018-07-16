@@ -15,53 +15,84 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
 
   final def head: Int = get(0)
 
-  final def head(value: Int): N = fromDigits(set(0, value))
+  final def head(value: Int): N = set(0, value)
 
   final def tail(position: Int): Int = get(position+1)
 
-  final def tail(position: Int, value: Int): N = fromDigits(set(position+1, value))
+  final def tail(position: Int, value: Int): N = set(position+1, value)
 
   private final def get(position: Int): Int = {
-    val normalDigits: Seq[Int] = numberSystem.normal(this)
+    val normalDigits: Seq[Int] = normal.digits
     if (normalDigits.length > position) normalDigits(position) else 0
   }
 
-  private final def set(position: Int, value: Int): Seq[Int] = {
-    val normalDigits: Seq[Int] = numberSystem.normal(this)
-    normalDigits.padTo(position+1, 0).updated(position, value)
+  private final def set(position: Int, value: Int): N = {
+    val normalDigits: Seq[Int] = normal.digits
+    val newDigits: Seq[Int] = normalDigits.padTo(position+1, 0).updated(position, value)
+    fromDigits(newDigits)
   }
 
   final def length: Int = digits.tail.length
 
-  final def canonical: N = fromDigits(numberSystem.canonical(this))
+  final def canonical: N = {
+    val result: Seq[Int] = numberSystem.withSign(isPositive = true, digits = normal.digits)
+    // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
+    val canonicalDigits: Seq[Int] = result.head +: result.tail.reverse.dropWhile(_ == 0).reverse
+    fromDigits(canonicalDigits)
+  }
 
-  final def simple: N = fromDigits(numberSystem.simple(this))
+  final def simple: N = {
+    val thisNormal: N = this.normal
+    fromDigits(numberSystem.withSign(!thisNormal.isNegative, thisNormal.digits))
+  }
 
   final def normal: N = fromDigits(numberSystem.normal(this))
 
-  final def signum: Int = numberSystem.signum(this)
+  final def signum: Int = nonZeroDigit.map(math.signum).getOrElse(0)
 
-  final def isZero: Boolean = numberSystem.isZero(this)
+  final def isZero: Boolean = nonZeroDigit.isEmpty
 
-  final def isPositive: Boolean = numberSystem.isPositive(this)
+  final def isPositive: Boolean = nonZeroDigit.exists(_ > 0)
 
-  final def isNegative: Boolean = numberSystem.isNegative(this)
+  final def isNegative: Boolean = nonZeroDigit.exists(_ < 0)
 
-  final def abs: N = fromDigits(numberSystem.simple(this).map(math.abs))
+  private[this] def nonZeroDigit: Option[Int] = normal.digits.find(_ != 0)
 
-  final def unary_- : N = fromDigits(numberSystem.negate(digits))
+  final def abs: N = fromDigits(simple.digits.map(math.abs))
 
-  final def roundTo(length: Int): N = fromDigits(numberSystem.roundTo(this, length))
+  final def unary_- : N = fromDigits(digits.map(-_))
 
-  final def toRational: BigRational = numberSystem.toRational(this)
+  final def roundTo(length: Int): N = {
+    require(length >= 0)
 
-  final def toDouble: Double = numberSystem.toDouble(this)
+    def forDigit(digit: Int, position: Int, range: Int): (Int, Int) =
+      if (position < length) (0, digit)
+      else (if (math.abs(digit) >= range / 2) math.signum(digit) else 0, 0)
 
-  final def toString(length: Int): String = numberSystem.toString(this, length)
+    val roundedDigits: Seq[Int] = numberSystem.transform(normal.digits, forDigit, (digit: Int) => digit)
+
+    fromDigits(roundedDigits)
+  }
+
+  final def toRational: BigRational = numberSystem.to[BigRational](
+    digits,
+    (digit: Int, denominator: BigInt) => BigRational(digit, denominator),
+    _ + _
+  )
+
+  final def toDouble: Double = numberSystem.to[Double](
+    digits,
+    (digit: Int, denominator: BigInt) => digit.toDouble/denominator.bigInteger.longValueExact(),
+    _ + _
+  )
+
+  final def toString(length: Int): String = numberSystem.toString(this.simple, length)
 
   override def toString: String = toString(length)
 
-  final def compare(that: N): Int = numberSystem.compare(this, that)
+  final def compare(that: N): Int =
+    zipWith(this.simple.digits, that.simple.digits, _ compare _).find (_ != 0).getOrElse(0)
+
 
   final override def equals(other: Any): Boolean = {
     if (!other.isInstanceOf[N]) false else {
@@ -71,5 +102,16 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
     }
   }
 
-  final override def hashCode: Int =  (73 /: numberSystem.canonical(this))((v, x) => 41 * v + x)
+  final override def hashCode: Int =  (73 /: canonical.digits)((v, x) => 41 * v + x)
+
+  protected final def add[N1 <: Number[S, N1]](that: N1): Seq[Int] = zipWith(this.digits, that.digits, _ + _)
+
+  protected final def subtract[N1 <: Number[S, N1]](that: N1): Seq[Int] = zipWith(this.digits, that.digits, _ - _)
+
+  private final def zipWith(
+    left: Seq[Int],
+    right: Seq[Int],
+    operation: (Int, Int) => Int
+  ): Seq[Int] =
+    left.zipAll(right, 0, 0).map(operation.tupled)
 }
