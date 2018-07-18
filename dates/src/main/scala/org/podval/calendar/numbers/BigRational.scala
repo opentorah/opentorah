@@ -48,8 +48,6 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
 
   def round: Int = if (fraction.abs <= BigRational.oneHalf) whole else whole + fraction.signum
 
-  // TODO def %(BigRational) = fraction of the division; def %(Int)?
-
   override def toString: String = numerator + "/" + denominator
 
   override def compare(that: BigRational): Int = (this - that).signum

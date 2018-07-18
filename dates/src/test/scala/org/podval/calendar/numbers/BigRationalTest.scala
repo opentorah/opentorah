@@ -27,158 +27,154 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
   }
 
   "apply()" should "detect zero numerator" in {
-    BigRational(0, 7) should be(zero)
+    BigRational(0, 7) shouldBe zero
   }
 
   "apply()" should "handle sign correctly" in {
-    BigRational(-1, 1) should be (-one)
-    BigRational(1, -1) should be (-one)
-    BigRational(1, 1) should be (one)
+    BigRational(-1, 1) shouldBe -one
+    BigRational(1, -1) shouldBe -one
+    BigRational(1, 1) shouldBe one
   }
 
   "apply()" should "simplify via GCD correctly" in {
-    BigRational(-13, -26) should be (oneHalf)
-    BigRational(1, 1) should be (one)
+    BigRational(-13, -26) shouldBe oneHalf
+    BigRational(1, 1) shouldBe one
   }
 
   "toString()" should "be correct" in {
-    zero.toString should be ("0/1")
-    oneHalf.toString should be("1/2")
-    minusThreeHalfs.toString should be ("-3/2")
+    zero.toString shouldBe "0/1"
+    oneHalf.toString shouldBe "1/2"
+    minusThreeHalfs.toString shouldBe "-3/2"
   }
 
   "apply(String)" should "be inverse of toString()" in {
-    forAll(rational) { r => BigRational(r.toString) should be (r) }
+    forAll(rational) { r => BigRational(r.toString) shouldBe r }
   }
 
   "signum()" should "be correct" in {
-    zero.signum should be(0)
-    oneHalf.signum should be(1)
-    minusThreeHalfs.signum should be(-1)
+    zero.signum shouldBe 0
+    oneHalf.signum shouldBe 1
+    minusThreeHalfs.signum shouldBe -1
   }
 
   "signum() and <" should "be consistent" in {
     forAll(rational) { r =>
-      if (r.signum == -1) r < zero should be (true)
-      if (r.signum ==  0) r == zero should be (true)
-      if (r.signum ==  1) r > zero should be (true)
+      if (r.signum == -1) r < zero shouldBe true
+      if (r.signum ==  0) r == zero shouldBe true
+      if (r.signum ==  1) r > zero shouldBe true
     }
   }
 
-  "signum() and abs()" should "be consistent" in {
-    forAll(rational) { r =>  r.abs should be (if (r.signum == -1) -r else r) }
+  "abs()" should "be determined by signum()" in {
+    forAll(rational) { r => r.abs shouldBe (if (r.signum < 0) -r else r) }
   }
 
   "abs()" should "be correct" in {
-    zero.abs  should be(zero)
-    oneHalf.abs should be(oneHalf)
-    minusThreeHalfs.abs should be(-minusThreeHalfs)
+    zero.abs  shouldBe zero
+    oneHalf.abs shouldBe oneHalf
+    minusThreeHalfs.abs shouldBe -minusThreeHalfs
   }
 
   "abs()" should "be idempotent" in {
-    forAll(rational) { r => r.abs.abs should be (r.abs) }
-  }
-
-  "abs()" should "be determined by signum()" in {
-    forAll(rational) { r => if (r.signum < 0) r.abs should be (-r) else r.abs should be (r) }
+    forAll(rational) { r => r.abs.abs shouldBe r.abs }
   }
 
   "unary_-()" should "be correct" in {
-    -zero should be(zero)
-    -oneHalf should be(BigRational(-1, 2))
-    minusThreeHalfs.abs should be(BigRational(3, 2))
+    -zero shouldBe zero
+    -oneHalf shouldBe BigRational(-1, 2)
+    minusThreeHalfs.abs shouldBe BigRational(3, 2)
   }
 
   "unary_-()" should "be self-inverse" in {
-    forAll(rational) { r => -(-r) should be (r) }
+    forAll(rational) { r => -(-r) shouldBe r }
   }
 
   "unary_-()" should "be inverse of +()" in {
-    forAll(rational) { r => r + -r should be (zero) }
+    forAll(rational) { r => r + -r shouldBe zero }
   }
 
   "invert()" should "be correct" in {
     assertThrows[ArithmeticException](zero.invert)
-    oneHalf.invert should be (one+one)
-    minusThreeHalfs.invert should be (BigRational(-2, 3))
+    oneHalf.invert shouldBe one+one
+    minusThreeHalfs.invert shouldBe BigRational(-2, 3)
   }
 
   "invert()" should "be idempotent" in {
-    forAll(nonZeroRational) { r => r.invert.invert should be (r) }
+    forAll(nonZeroRational) { r => r.invert.invert shouldBe r }
   }
 
   "+()" should "be correct" in {
-    zero+zero should be (zero)
-    oneHalf + minusThreeHalfs should be (-one)
+    zero+zero shouldBe zero
+    oneHalf + minusThreeHalfs shouldBe -one
   }
 
   "+()" should "be commutative" in {
-    forAll(rational, rational) { (l, r) => l + r should be (r + l) }
+    forAll(rational, rational) { (l, r) => l + r shouldBe r + l }
   }
 
   "+()" should "have 0 as unit" in {
-    forAll(rational) { r => r + zero should be (r) }
-    forAll(rational) { r => zero + r should be (r) }
+    forAll(rational) { r => r + zero shouldBe r }
+    forAll(rational) { r => zero + r shouldBe r }
   }
 
   "+() and >" should "be consistent" in {
-    forAll(rational, rational) { (l, r) => r < r + l should be (l.signum > 0) }
+    forAll(rational, rational) { (l, r) => r < r + l shouldBe l.signum > 0 }
   }
 
   "-()" should "be correct" in {
-    zero-zero should be (zero)
-    oneHalf-minusThreeHalfs should be(one*2)
+    zero-zero shouldBe zero
+    oneHalf-minusThreeHalfs shouldBe one*2
   }
 
   "-()" should "be inverse of +()" in {
-    forAll(rational) { r => r - r should be (zero) }
-    forAll(rational, rational) { (l, r) => l + r - r should be (l) }
+    forAll(rational) { r => r - r shouldBe zero }
+    forAll(rational, rational) { (l, r) => l + r - r shouldBe l }
   }
 
   "-(), unary_-() and +()" should "be related correctly" in {
-    forAll(rational, rational) { (l, r) => l - r should be (l + (-r)) }
+    forAll(rational, rational) { (l, r) => l - r shouldBe l + (-r) }
   }
 
   "*(Int)" should "be correct" in {
-    zero*3 should be (zero)
-    oneHalf*(-2) should be (-one)
-    minusThreeHalfs*2 should be (zero-one-one-one)
+    zero*3 shouldBe zero
+    oneHalf*(-2) shouldBe -one
+    minusThreeHalfs*2 shouldBe zero-one-one-one
   }
 
   "*(BigRational)" should "be correct" in {
-    zero*zero should be (zero)
-    oneHalf*oneHalf should be (one/4)
-    minusThreeHalfs*oneHalf should be (BigRational(-3, 4))
+    zero*zero shouldBe zero
+    oneHalf*oneHalf shouldBe one/4
+    minusThreeHalfs*oneHalf shouldBe BigRational(-3, 4)
   }
 
   "*(BigRational)" should "be commutative" in {
-    forAll(rational, rational) { (l, r) => l * r should be (r * l) }
+    forAll(rational, rational) { (l, r) => l * r shouldBe r * l }
   }
 
   "*(BigRational)" should "have 1 as unit" in {
-    forAll(rational) { r => r * one should be (r) }
-    forAll(rational) { r => one * r should be (r) }
+    forAll(rational) { r => r * one shouldBe r }
+    forAll(rational) { r => one * r shouldBe r }
   }
 
   "/(Int)" should "be correct" in {
-    zero/3 should be (zero)
-    oneHalf/(-2) should be (BigRational(-1, 4))
-    minusThreeHalfs/2 should be (BigRational(-3, 4))
+    zero/3 shouldBe zero
+    oneHalf/(-2) shouldBe  BigRational(-1, 4)
+    minusThreeHalfs/2 shouldBe BigRational(-3, 4)
   }
 
   "/(BigRational)" should "be correct" in {
     assertThrows[ArithmeticException](zero/zero)
-    oneHalf/oneHalf should be (one)
-    minusThreeHalfs/oneHalf should be (-(one+one+one))
+    oneHalf/oneHalf shouldBe one
+    minusThreeHalfs/oneHalf shouldBe -(one+one+one)
   }
 
   "/(BigRational)" should "be inverse of *(BigRational)" in {
-    forAll(rational, nonZeroRational) { (l, r) => l * r / r should be (l) }
-    forAll(nonZeroRational) { r => r / r should be (one) }
+    forAll(rational, nonZeroRational) { (l, r) => l * r / r shouldBe l }
+    forAll(nonZeroRational) { r => r / r shouldBe one }
   }
 
   "/(BigRational), inverse() and *(BigRational)" should "be related correctly" in {
-    forAll(rational, nonZeroRational) { (l, r) => l / r should be (l * r.invert) }
+    forAll(rational, nonZeroRational) { (l, r) => l / r shouldBe l * r.invert }
   }
 
   "wholeAndFraction()" should "be correct" in {
@@ -189,25 +185,25 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
 
     val daysO: Int = time.whole
     val remainderhp: BigRational = time.fraction
-    daysO should be (days)
+    daysO shouldBe days
 
     val hoursO: Int = (remainderhp*24).whole
     val remainderp: BigRational = (remainderhp*24).fraction
-    hoursO should be (hours)
+    hoursO shouldBe hours
 
     val partsO: Int = (remainderp*1080).whole
     val remainder: BigRational = (remainderp*1080).fraction
-    partsO should be (parts)
-    remainder.numerator should be (0)
+    partsO shouldBe parts
+    remainder.numerator shouldBe 0
 
-    zero.whole should be (0)
-    zero.fraction should be (zero)
+    zero.whole shouldBe 0
+    zero.fraction shouldBe zero
 
-    oneHalf.whole should be (0)
-    oneHalf.fraction should be (oneHalf)
+    oneHalf.whole shouldBe 0
+    oneHalf.fraction shouldBe oneHalf
 
-    minusThreeHalfs.whole should be (-1)
-    minusThreeHalfs.fraction should be (-oneHalf)
+    minusThreeHalfs.whole shouldBe -1
+    minusThreeHalfs.fraction shouldBe -oneHalf
   }
 
   "==()" should "be correct" in {

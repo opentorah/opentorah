@@ -29,11 +29,14 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   val signPartial: PartialFunction[Int, String]
 
+  private val zeroDenominator: BigInt = BigInt(1)
+
+  // TODO move into companion object; pass ranges in
+
   // TODO comments
   final def to[T: Convertible](digits: Seq[Int]): T = {
     val ev: Convertible[T] = Convertible[T]
 
-    val zeroDenominator: BigInt = BigInt(1)
     digits.tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
     .foldLeft[(T, BigInt)]((ev.div(digits.head, zeroDenominator), zeroDenominator)) {
       case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>
