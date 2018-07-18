@@ -74,17 +74,9 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
     fromDigits(roundedDigits)
   }
 
-  final def toRational: BigRational = numberSystem.to[BigRational](
-    digits,
-    (digit: Int, denominator: BigInt) => BigRational(digit, denominator),
-    _ + _
-  )
-
-  final def toDouble: Double = numberSystem.to[Double](
-    digits,
-    (digit: Int, denominator: BigInt) => digit.toDouble/denominator.bigInteger.longValueExact(),
-    _ + _
-  )
+  final def to[T: Convertible] = numberSystem.to[T](digits)
+  final def toRational: BigRational = to[BigRational]
+  final def toDouble: Double = to[Double]
 
   final def toString(length: Int): String = numberSystem.toString(this.simple, length)
 

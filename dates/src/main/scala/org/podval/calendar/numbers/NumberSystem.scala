@@ -27,34 +27,37 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   val signPartial: PartialFunction[Int, String]
 
-  final def to[T](digits: Seq[Int], forDigit: (Int, BigInt) => T, plus: (T, T) => T): T = {
+  // TODO comments
+  final def to[T: Convertible](digits: Seq[Int]): T = {
+    val ev: Convertible[T] = implicitly[Convertible[T]]
+
     val zeroDenominator: BigInt = BigInt(1)
     digits.tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
-    .foldLeft[(T, BigInt)]((forDigit(digits.head, zeroDenominator), zeroDenominator)) {
+    .foldLeft[(T, BigInt)]((ev.forDigit(digits.head, zeroDenominator), zeroDenominator)) {
       case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>
         val newDenominator: BigInt = denominator*range
-        (plus(acc, forDigit(digit, newDenominator)), newDenominator)
+        (ev.plus(acc, ev.forDigit(digit, newDenominator)), newDenominator)
     }._1
   }
 
+  // TODO comments
   // This is an instance of a specialized unfold with an initiator, unfolder and terminator
   // (but we don't have even a simple unfold in the standard library)
-  final def from[T](
-    signum: Int,
-    value: T,
-    length: Int,
-    wholeAndFraction: T => (Int, T),
-    mult: (T, Int) => T,
-    round: (Int, T) => Int): Seq[Int] =
-  {
+  final def from[T : Convertible](raw: T, length: Int): Seq[Int] = {
+    val ev: Convertible[T] = implicitly[Convertible[T]]
+
+    val signum: Int = ev.signum(raw)
+    val value: T = ev.abs(raw)
+
     val (rawDigits: Seq[(Int, T)], (lastDigit: Int, lastReminder: T))  =
       (0 until length).map(range)
-        .foldLeft((Seq.empty[(Int, T)], wholeAndFraction(value))) {
+        .foldLeft((Seq.empty[(Int, T)], ev.wholeAndFraction(value))) {
           case ((acc, (digit: Int, reminder: T)), range: Int) =>
-            (acc :+ (digit, reminder), wholeAndFraction(mult(reminder, range)))
+            (acc :+ (digit, reminder), ev.wholeAndFraction(ev.mult(reminder, range)))
         }
+
     val digits: Seq[Int] = rawDigits.map(_._1)
-    val result: Seq[Int] = digits.head +: digits.tail :+ round(lastDigit, lastReminder)
+    val result: Seq[Int] = digits.head +: digits.tail :+ ev.round(lastDigit, lastReminder)
     if (signum != -1) result else result.map(-_)
   }
 
@@ -80,6 +83,7 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     (if (number.isNegative) "-" else "") + result.mkString
   }
 
+  // TODO normalize and chop off trailing zeroes when constructing
   final def normal[N <: Number[S, N]](number: N): Seq[Int] = transform(number.digits, normalDigit, normalHead)
 
   protected final def normalDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
