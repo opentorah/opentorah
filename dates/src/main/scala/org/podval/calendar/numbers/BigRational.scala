@@ -3,8 +3,15 @@ package org.podval.calendar.numbers
 /**
   * Arbitrary precision Rational number.
   *
+  * Numerator is a BigInteger; denominator is a non-zero BigInteger.
+  * If numerator is zero, resulting BigRational is zero (denominator is ignored).
+  *
+  * Representation is canonical:
+  * - sign of the BigRational is kept in the numerator; denominator is always positive;
+  * - numerator and denominator do not have common divisors.
+  *
   * @param numerator  of the number (signed)
-  * @param denominator  of the number (unsigned)
+  * @param denominator  of the number (positive)
   */
 final case class BigRational private(numerator: BigInt, denominator: BigInt)
   extends Comparable[BigRational] with Ordered[BigRational]
@@ -16,8 +23,8 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
   def unary_- : BigRational = BigRational(-numerator, denominator)
 
   def +(that: BigRational): BigRational = BigRational(
-    this.numerator*that.denominator+that.numerator*this.denominator,
-    this.denominator*that.denominator
+    this.numerator * that.denominator + that.numerator * this.denominator,
+    this.denominator * that.denominator
   )
 
   def -(that: BigRational): BigRational = this + -that
@@ -31,31 +38,24 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
 
   def /(that: BigRational): BigRational = this * that.invert
 
-  // TODO def %(BigRational)?
-
   def *(that: Int): BigRational = this * BigRational(that)
 
   def /(that: Int): BigRational = this / BigRational(that)
 
-  // TODO def %(Int)?
-
   // TODO define whole() and fraction() instead/in addition?
+  // TODO def %(BigRational) = fraction of the division
+  // TODO def %(Int)?
   def wholeAndFraction: (Int, BigRational) = {
     val whole: Int = (numerator / denominator).bigInteger.intValueExact
-    val fraction: BigRational = BigRational(numerator - whole*denominator, denominator)
-    (whole, fraction)
+    (whole, this - BigRational(whole))
   }
 
-  override def toString: String = numerator.toString + "/" + denominator.toString
+  override def toString: String = numerator + "/" + denominator
 
-  override def compare(that: BigRational): Int =
-    (this.numerator*that.denominator).compareTo(that.numerator*this.denominator)
+  override def compare(that: BigRational): Int = (this - that).signum
 
   override def equals(other: Any): Boolean = other match {
-    case that: BigRational =>
-      // we rely on the representation being canonical
-      (this.numerator == that.numerator) && (this.denominator == that.denominator)
-
+    case that: BigRational => compare(that) == 0
     case _ => false
   }
 
@@ -76,15 +76,13 @@ object BigRational {
     if (numerator == 0) zero else {
       val gcd: BigInt = numerator.gcd(denominator)
       new BigRational(
-        (numerator / gcd) * denominator.signum,
-        (denominator / gcd).abs
+        numerator = (numerator / gcd) * denominator.signum,
+        denominator = (denominator / gcd).abs
       )
     }
   }
 
   final def apply(numerator: Int): BigRational = apply(numerator, 1)
-
-  final def apply(numerator: Long): BigRational = apply(numerator, 1)
 
   final def apply(value: String): BigRational = {
     val values = value.split('/')

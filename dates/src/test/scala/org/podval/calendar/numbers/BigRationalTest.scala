@@ -11,36 +11,54 @@ import BigRational.{one, oneHalf, zero}
 final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matchers {
   val minusThreeHalfs: BigRational = BigRational(-3, 2)
 
-  def rationals: Gen[BigRational] =
-    for {
-      numerator <- arbitrary[BigInt]
-      denominator <- arbitrary[BigInt] if denominator != 0
-    } yield BigRational(numerator, denominator)
+  def rational: Gen[BigRational] = for {
+    numerator <- arbitrary[BigInt]
+    denominator <- arbitrary[BigInt] if denominator != 0
+  } yield BigRational(numerator, denominator)
 
-  "apply()" should "be correct" in {
+  def nonZeroRational: Gen[BigRational] = for {
+    numerator <- arbitrary[BigInt] if numerator != 0
+    denominator <- arbitrary[BigInt] if denominator != 0
+  } yield BigRational(numerator, denominator)
+
+  "apply()" should "detect zero denominator" in {
     assertThrows[ArithmeticException](BigRational(1, 0))
-    assertResult(-one)(BigRational(-1, 1))
-    assertResult(-one)(BigRational(1, -1))
+    assertThrows[ArithmeticException](BigRational(0, 0))
+  }
+
+  "apply()" should "detect zero numerator" in {
+    BigRational(0, 7) should be(zero)
+  }
+
+  "apply()" should "handle sign correctly" in {
+    BigRational(-1, 1) should be (-one)
+    BigRational(1, -1) should be (-one)
+    BigRational(1, 1) should be (one)
+  }
+
+  "apply()" should "simplify via GCD correctly" in {
+    BigRational(-13, -26) should be (oneHalf)
+    BigRational(1, 1) should be (one)
   }
 
   "toString()" should "be correct" in {
-    assertResult("0/1")(zero.toString)
-    assertResult("1/2")(oneHalf.toString)
-    assertResult("-3/2")(minusThreeHalfs.toString)
+    zero.toString should be ("0/1")
+    oneHalf.toString should be("1/2")
+    minusThreeHalfs.toString should be ("-3/2")
   }
 
   "apply(String)" should "be inverse of toString()" in {
-    forAll(rationals) { r => BigRational(r.toString) should be (r) }
+    forAll(rational) { r => BigRational(r.toString) should be (r) }
   }
 
   "signum()" should "be correct" in {
-    assertResult(0)(zero.signum)
-    assertResult(1)(oneHalf.signum)
-    assertResult(-1)(minusThreeHalfs.signum)
+    zero.signum should be(0)
+    oneHalf.signum should be(1)
+    minusThreeHalfs.signum should be(-1)
   }
 
   "signum() and <" should "be consistent" in {
-    forAll(rationals) { r =>
+    forAll(rational) { r =>
       if (r.signum == -1) r < zero should be (true)
       if (r.signum ==  0) r == zero should be (true)
       if (r.signum ==  1) r > zero should be (true)
@@ -48,119 +66,119 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
   }
 
   "signum() and abs()" should "be consistent" in {
-    forAll(rationals) { r =>  r.abs should be (if (r.signum == -1) -r else r) }
+    forAll(rational) { r =>  r.abs should be (if (r.signum == -1) -r else r) }
   }
 
   "abs()" should "be correct" in {
-    assertResult(zero)(zero.abs)
-    assertResult(oneHalf)(oneHalf.abs)
-    assertResult(-minusThreeHalfs)(minusThreeHalfs.abs)
+    zero.abs  should be(zero)
+    oneHalf.abs should be(oneHalf)
+    minusThreeHalfs.abs should be(-minusThreeHalfs)
   }
 
-  "abs()" should "be idepmotent" in {
-    forAll(rationals) { r => r.abs.abs should be (r.abs) }
+  "abs()" should "be idempotent" in {
+    forAll(rational) { r => r.abs.abs should be (r.abs) }
   }
 
   "abs()" should "be determined by signum()" in {
-    forAll(rationals) { r => if (r.signum < 0) r.abs should be (-r) else r.abs should be (r) }
+    forAll(rational) { r => if (r.signum < 0) r.abs should be (-r) else r.abs should be (r) }
   }
 
   "unary_-()" should "be correct" in {
-    assertResult(zero)(-zero)
-    assertResult(BigRational(-1, 2))(-oneHalf)
-    assertResult(BigRational(3, 2))(minusThreeHalfs.abs)
+    -zero should be(zero)
+    -oneHalf should be(BigRational(-1, 2))
+    minusThreeHalfs.abs should be(BigRational(3, 2))
   }
 
-  "unary_-()" should "self-inverse" in {
-    forAll(rationals) { r => -(-r) should be (r) }
+  "unary_-()" should "be self-inverse" in {
+    forAll(rational) { r => -(-r) should be (r) }
   }
 
   "unary_-()" should "be inverse of +()" in {
-    forAll(rationals) { r => r + -r should be (zero) }
+    forAll(rational) { r => r + -r should be (zero) }
   }
 
   "invert()" should "be correct" in {
     assertThrows[ArithmeticException](zero.invert)
-    assertResult(one+one)(oneHalf.invert)
-    assertResult(BigRational(-2, 3))(minusThreeHalfs.invert)
+    oneHalf.invert should be (one+one)
+    minusThreeHalfs.invert should be (BigRational(-2, 3))
   }
 
   "invert()" should "be idempotent" in {
-    forAll(rationals) { r => whenever (r.signum != 0) { r.invert.invert should be (r) }}
+    forAll(nonZeroRational) { r => r.invert.invert should be (r) }
   }
 
   "+()" should "be correct" in {
-    assertResult(zero)(zero+zero)
-    assertResult(-one)(oneHalf+minusThreeHalfs)
+    zero+zero should be (zero)
+    oneHalf + minusThreeHalfs should be (-one)
   }
 
   "+()" should "be commutative" in {
-    forAll(rationals, rationals) { (l, r) => l + r should be (r + l) }
+    forAll(rational, rational) { (l, r) => l + r should be (r + l) }
   }
 
   "+()" should "have 0 as unit" in {
-    forAll(rationals) { r => r + zero should be (r) }
-    forAll(rationals) { r => zero + r should be (r) }
+    forAll(rational) { r => r + zero should be (r) }
+    forAll(rational) { r => zero + r should be (r) }
   }
 
   "+() and >" should "be consistent" in {
-    forAll(rationals, rationals) { (l, r) => r < r + l should be (l.signum > 0) }
+    forAll(rational, rational) { (l, r) => r < r + l should be (l.signum > 0) }
   }
 
   "-()" should "be correct" in {
-    assertResult(zero)(zero-zero)
-    assertResult(one*2)(oneHalf-minusThreeHalfs)
+    zero-zero should be (zero)
+    oneHalf-minusThreeHalfs should be(one*2)
   }
 
   "-()" should "be inverse of +()" in {
-    forAll(rationals) { r => r - r should be (zero) }
-    forAll(rationals, rationals) { (l, r) => l + r - r should be (l) }
+    forAll(rational) { r => r - r should be (zero) }
+    forAll(rational, rational) { (l, r) => l + r - r should be (l) }
   }
 
   "-(), unary_-() and +()" should "be related correctly" in {
-    forAll(rationals, rationals) { (l, r) => l - r should be (l + (-r)) }
+    forAll(rational, rational) { (l, r) => l - r should be (l + (-r)) }
   }
 
   "*(Int)" should "be correct" in {
-    assertResult(zero)(zero*3)
-    assertResult(-one)(oneHalf*(-2))
-    assertResult(zero-one-one-one)(minusThreeHalfs*2)
+    zero*3 should be (zero)
+    oneHalf*(-2) should be (-one)
+    minusThreeHalfs*2 should be (zero-one-one-one)
   }
 
   "*(BigRational)" should "be correct" in {
-    assertResult(zero)(zero*zero)
-    assertResult(one/4)(oneHalf*oneHalf)
-    assertResult(BigRational(-3, 4))(minusThreeHalfs*oneHalf)
+    zero*zero should be (zero)
+    oneHalf*oneHalf should be (one/4)
+    minusThreeHalfs*oneHalf should be (BigRational(-3, 4))
   }
 
   "*(BigRational)" should "be commutative" in {
-    forAll(rationals, rationals) { (l, r) => l * r should be (r * l) }
+    forAll(rational, rational) { (l, r) => l * r should be (r * l) }
   }
 
   "*(BigRational)" should "have 1 as unit" in {
-    forAll(rationals) { r => r * one should be (r) }
-    forAll(rationals) { r => one * r should be (r) }
+    forAll(rational) { r => r * one should be (r) }
+    forAll(rational) { r => one * r should be (r) }
   }
 
   "/(Int)" should "be correct" in {
-    assertResult(zero)(zero/3)
-    assertResult(BigRational(-1, 4))(oneHalf/(-2))
-    assertResult(BigRational(-3, 4))(minusThreeHalfs/2)
+    zero/3 should be (zero)
+    oneHalf/(-2) should be (BigRational(-1, 4))
+    minusThreeHalfs/2 should be (BigRational(-3, 4))
   }
 
   "/(BigRational)" should "be correct" in {
     assertThrows[ArithmeticException](zero/zero)
-    assertResult(one)(oneHalf/oneHalf)
-    assertResult(-(one+one+one))(minusThreeHalfs/oneHalf)
+    oneHalf/oneHalf should be (one)
+    minusThreeHalfs/oneHalf should be (-(one+one+one))
   }
 
-  "/(BigRationa)" should "be inverse of *(BigRational)" in {
-    forAll(rationals, rationals) { (l, r) => whenever (r.signum != 0) { l * r / r should be (l) }}
-// TODO  forAll(rationals, rationals) { (l, r) => whenever (r.signum != 0) { r / r should be (1) }}
+  "/(BigRational)" should "be inverse of *(BigRational)" in {
+    forAll(rational, nonZeroRational) { (l, r) => l * r / r should be (l) }
+    forAll(nonZeroRational) { r => r / r should be (one) }
   }
 
-  "/(BigRational), inverse() and *(BigRationa)" should "be related correctly" in {
-    forAll(rationals, rationals) { (l, r) => whenever (r.signum != 0) { l / r should be (l * r.invert) }}
+  "/(BigRational), inverse() and *(BigRational)" should "be related correctly" in {
+    forAll(rational, nonZeroRational) { (l, r) => l / r should be (l * r.invert) }
   }
 
   "wholeAndFraction()" should "be correct" in {
@@ -170,19 +188,19 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     val time: BigRational = BigRational(((days*24)+hours)*1080+parts, 1*24*1080)
 
     val (daysO: Int, remainderhp: BigRational) = time.wholeAndFraction
-    assertResult(days)(daysO)
+    daysO should be (days)
 
     val (hoursO: Int, remainderp: BigRational) = (remainderhp*24).wholeAndFraction
-    assertResult(hours)(hours)
+    hoursO should be (hours)
 
     val (partsO: Int, remainder: BigRational) = (remainderp*1080).wholeAndFraction
-    assertResult(parts)(partsO)
-    assert(remainder.numerator == 0)
+    partsO should be (parts)
+    remainder.numerator should be (0)
 
-    assertResult((0, zero))(zero.wholeAndFraction)
-    assertResult((0, oneHalf))(oneHalf.wholeAndFraction)
+    zero.wholeAndFraction should be (0, zero)
+    oneHalf.wholeAndFraction should be (0, oneHalf)
 
-    assertResult((-1, -oneHalf))(minusThreeHalfs.wholeAndFraction)
+    minusThreeHalfs.wholeAndFraction should be (-1, -oneHalf)
   }
 
   "==()" should "be correct" in {

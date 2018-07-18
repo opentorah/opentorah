@@ -9,12 +9,12 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
 
   final def fromRational(value: BigRational, length: Int = numberSystem.defaultLength): N = {
     val digits: Seq[Int] = numberSystem.from[BigRational](
-      value.signum,
-      value.abs,
-      length,
-      _.wholeAndFraction,
-      _ * _,
-      BigRational.round
+      signum = value.signum,
+      value = value.abs,
+      length = length,
+      wholeAndFraction = _.wholeAndFraction,
+      mult = _ * _,
+      round = BigRational.round
     )
 
     fromDigits(digits)
@@ -29,12 +29,12 @@ trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSys
     def round(whole: Int, fraction: Double): Int = whole + math.round(fraction).toInt
 
     val digits = numberSystem.from[Double](
-      math.signum(value).toInt,
-      math.abs(value),
-      length,
-      wholeAndFraction,
-      _ * _,
-      round
+      signum = math.signum(value).toInt,
+      value = math.abs(value),
+      length = length,
+      wholeAndFraction = wholeAndFraction,
+      mult = _ * _,
+      round = round
     )
 
     fromDigits(digits)
