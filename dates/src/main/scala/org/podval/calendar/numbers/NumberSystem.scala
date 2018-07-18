@@ -1,5 +1,7 @@
 package org.podval.calendar.numbers
 
+import Convertible.ConvertibleOps
+
 trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   type Point <: PointBase[S]
@@ -29,36 +31,32 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   // TODO comments
   final def to[T: Convertible](digits: Seq[Int]): T = {
-    val ev: Convertible[T] = implicitly[Convertible[T]]
+    val ev: Convertible[T] = Convertible[T]
 
     val zeroDenominator: BigInt = BigInt(1)
     digits.tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
-    .foldLeft[(T, BigInt)]((ev.forDigit(digits.head, zeroDenominator), zeroDenominator)) {
+    .foldLeft[(T, BigInt)]((ev.div(digits.head, zeroDenominator), zeroDenominator)) {
       case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>
         val newDenominator: BigInt = denominator*range
-        (ev.plus(acc, ev.forDigit(digit, newDenominator)), newDenominator)
+        (acc + ev.div(digit, newDenominator), newDenominator)
     }._1
   }
 
   // TODO comments
   // This is an instance of a specialized unfold with an initiator, unfolder and terminator
   // (but we don't have even a simple unfold in the standard library)
-  final def from[T : Convertible](raw: T, length: Int): Seq[Int] = {
-    val ev: Convertible[T] = implicitly[Convertible[T]]
+  final def from[T : Convertible](value: T, length: Int): Seq[Int] = {
+    def wholeAndFraction(value: T): (Int, T) = (value.whole, value.fraction)
 
-    val signum: Int = ev.signum(raw)
-    val value: T = ev.abs(raw)
-
-    val (rawDigits: Seq[(Int, T)], (lastDigit: Int, lastReminder: T))  =
-      (0 until length).map(range)
-        .foldLeft((Seq.empty[(Int, T)], ev.wholeAndFraction(value))) {
-          case ((acc, (digit: Int, reminder: T)), range: Int) =>
-            (acc :+ (digit, reminder), ev.wholeAndFraction(ev.mult(reminder, range)))
-        }
+    val (rawDigits: Seq[(Int, T)], (lastDigit: Int, lastReminder: T))  = (0 until length).map(range)
+      .foldLeft((Seq.empty[(Int, T)], wholeAndFraction(value.abs))) {
+        case ((acc, (digit: Int, reminder: T)), range: Int) =>
+          (acc :+ (digit, reminder), wholeAndFraction(reminder * range))
+      }
 
     val digits: Seq[Int] = rawDigits.map(_._1)
-    val result: Seq[Int] = digits.head +: digits.tail :+ ev.round(lastDigit, lastReminder)
-    if (signum != -1) result else result.map(-_)
+    val result: Seq[Int] = digits :+ (lastDigit + lastReminder.round)
+    result.map(value.signum*_)
   }
 
   // TODO tests with negative digits - and for angles

@@ -187,20 +187,27 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     val parts: Int = 3
     val time: BigRational = BigRational(((days*24)+hours)*1080+parts, 1*24*1080)
 
-    val (daysO: Int, remainderhp: BigRational) = time.wholeAndFraction
+    val daysO: Int = time.whole
+    val remainderhp: BigRational = time.fraction
     daysO should be (days)
 
-    val (hoursO: Int, remainderp: BigRational) = (remainderhp*24).wholeAndFraction
+    val hoursO: Int = (remainderhp*24).whole
+    val remainderp: BigRational = (remainderhp*24).fraction
     hoursO should be (hours)
 
-    val (partsO: Int, remainder: BigRational) = (remainderp*1080).wholeAndFraction
+    val partsO: Int = (remainderp*1080).whole
+    val remainder: BigRational = (remainderp*1080).fraction
     partsO should be (parts)
     remainder.numerator should be (0)
 
-    zero.wholeAndFraction should be (0, zero)
-    oneHalf.wholeAndFraction should be (0, oneHalf)
+    zero.whole should be (0)
+    zero.fraction should be (zero)
 
-    minusThreeHalfs.wholeAndFraction should be (-1, -oneHalf)
+    oneHalf.whole should be (0)
+    oneHalf.fraction should be (oneHalf)
+
+    minusThreeHalfs.whole should be (-1)
+    minusThreeHalfs.fraction should be (-oneHalf)
   }
 
   "==()" should "be correct" in {

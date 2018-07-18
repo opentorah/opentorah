@@ -42,13 +42,13 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
 
   def /(that: Int): BigRational = this / BigRational(that)
 
-  // TODO define whole() and fraction() instead/in addition?
-  // TODO def %(BigRational) = fraction of the division
-  // TODO def %(Int)?
-  def wholeAndFraction: (Int, BigRational) = {
-    val whole: Int = (numerator / denominator).bigInteger.intValueExact
-    (whole, this - BigRational(whole))
-  }
+  def whole: Int = (numerator / denominator).bigInteger.intValueExact
+
+  def fraction: BigRational = this - BigRational(whole)
+
+  def round: Int = if (fraction.abs <= BigRational.oneHalf) whole else whole + fraction.signum
+
+  // TODO def %(BigRational) = fraction of the division; def %(Int)?
 
   override def toString: String = numerator + "/" + denominator
 
@@ -89,12 +89,4 @@ object BigRational {
     if (values.length != 2) throw new ArithmeticException(s"Invalid BigRational: $value")
     apply(BigInt(values(0).trim), BigInt(values(1).trim))
   }
-
-  /**
-    * Accepts return of a call to wholeAndFraction().
-    * @param whole
-    * @param fraction
-    * @return
-    */
-  def round(whole: Int, fraction: BigRational): Int = whole + (if (fraction >= oneHalf) 1 else 0)
 }

@@ -22,8 +22,8 @@ abstract class IntervalBase[S <: NumberSystem[S]](digits: Seq[Int])
   final def %(n: Int, length: Int): S#Interval =
     this - ((this / (n, length)) * n)
 
-  final def /(that: S#Interval): Int = // TODO return BigRational instead?
-    (this.toRational / that.toRational).wholeAndFraction._1
+  // TODO return BigRational instead?
+  final def /(that: S#Interval): Int = (this.toRational / that.toRational).whole
 
   final def *(that: BigRational): S#Interval = *(that, defaultLength)
 

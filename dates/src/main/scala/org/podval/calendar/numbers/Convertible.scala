@@ -10,23 +10,38 @@ trait Convertible[T] {
   def abs(value: T): T
   def plus(value: T, that: T): T
   def mult(value: T, n: Int): T
-  def forDigit(digit: Int, denominator: BigInt): T
-  // TODO simplify: define in the implicits; round the value itself; split wholeAndFraction...
-  def wholeAndFraction(value: T): (Int, T)
-  def round(whole: Int, fraction: T): Int
+  def whole(value: T): Int
+  def fraction(value: T): T
+  def round(value: T): Int
+
+  def div(digit: Int, denominator: BigInt): T
 }
 
 object Convertible {
-  // TODO add ConvertibleOps class - or not to bother?
+  // TODO turn ConvertibleOps into a value class - or not to bother?
+
+  def apply[T](implicit ev: Convertible[T]): Convertible[T] = ev
+
+  implicit class ConvertibleOps[T: Convertible](value: T) {
+    def signum: Int = Convertible[T].signum(value)
+    def abs: T = Convertible[T].abs(value)
+    def +(that: T): T = Convertible[T].plus(value, that)
+    def *(n: Int): T = Convertible[T].mult(value, n)
+    def whole: Int = Convertible[T].whole(value)
+    def fraction: T = Convertible[T].fraction(value)
+    def round: Int = Convertible[T].round(value)
+  }
 
   implicit val bigRationalConvertible: Convertible[BigRational] = new Convertible[BigRational] {
     override def signum(value: BigRational): Int = value.signum
     override def abs(value: BigRational): BigRational = value.abs
     override def plus(value: BigRational, that: BigRational): BigRational = value + that
     override def mult(value: BigRational, n: Int): BigRational = value * n
-    override def wholeAndFraction(value: BigRational): (Int, BigRational) = value.wholeAndFraction
-    override def round(whole: Int, fraction: BigRational): Int = BigRational.round(whole, fraction)
-    override def forDigit(digit: Int, denominator: BigInt): BigRational = BigRational(digit, denominator)
+    override def whole(value: BigRational): Int = value.whole
+    override def fraction(value: BigRational): BigRational = value.fraction
+    override def round(value: BigRational): Int = value.round
+
+    override def div(digit: Int, denominator: BigInt): BigRational = BigRational(digit, denominator)
   }
 
   implicit val doubleConvertible: Convertible[Double] = new Convertible[Double] {
@@ -34,11 +49,10 @@ object Convertible {
     override def abs(value: Double): Double = math.abs(value)
     override def plus(value: Double, that: Double): Double = value + that
     override def mult(value: Double, n: Int): Double = value * n
-    override def wholeAndFraction(value: Double): (Int, Double) = {
-      val whole: Double = math.floor(value)
-      (whole.toInt, value - whole)
-    }
-    override def round(whole: Int, fraction: Double): Int = whole + math.round(fraction).toInt
-    override def forDigit(digit: Int, denominator: BigInt): Double = digit.toDouble/denominator.bigInteger.longValueExact
+    override def whole(value: Double): Int = math.floor(value).toInt
+    override def fraction(value: Double): Double = value - whole(value)
+    override def round(value: Double): Int = math.round(value).toInt
+
+    override def div(digit: Int, denominator: BigInt): Double = digit.toDouble/denominator.bigInteger.longValueExact
   }
 }
