@@ -19,8 +19,6 @@ trait Convertible[T] {
 }
 
 object Convertible {
-  // TODO turn ConvertibleOps into a value class - or not to bother?
-
   def apply[T](implicit ev: Convertible[T]): Convertible[T] = ev
 
   implicit class ConvertibleOps[T: Convertible](value: T) {

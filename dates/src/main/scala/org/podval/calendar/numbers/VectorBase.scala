@@ -12,8 +12,6 @@ abstract class VectorBase[S <: NumberSystem[S]](digits: Seq[Int])
 
   final def /(n: Int): S#Vector = /(n, defaultLength)
 
-  // TODO introduce implicit parameter of type Precision?
-
   final def /(n: Int, length: Int): S#Vector =
     numberSystem.Vector.fromRational(toRational / n, math.max(this.length, length))
 
@@ -22,15 +20,12 @@ abstract class VectorBase[S <: NumberSystem[S]](digits: Seq[Int])
   final def %(n: Int, length: Int): S#Vector =
     this - ((this / (n, length)) * n)
 
-  // TODO return BigRational instead?
   final def /(that: S#Vector): Int = (this.toRational / that.toRational).whole
 
   final def *(that: BigRational): S#Vector = *(that, defaultLength)
 
   final def *(that: BigRational, length: Int): S#Vector =
     numberSystem.Vector.fromRational(this.toRational*that, length)
-
-  // TODO def %(BigRational)?
 
   final def *[T <: NumberSystem[T]](that: T#Vector): S#Vector = *(that, defaultLength)
 

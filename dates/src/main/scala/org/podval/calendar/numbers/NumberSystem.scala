@@ -45,7 +45,6 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   private def ranges(length: Int): Seq[Int] = (0 until length).map(range)
 
-  // TODO tests with negative digits - and for angles
   final def toString[N <: Number[S, N]](number: N, length: Int): String = {
     def signFor(position: Int): Option[String] = signPartial.lift(position)
 

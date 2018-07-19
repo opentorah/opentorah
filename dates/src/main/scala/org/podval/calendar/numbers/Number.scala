@@ -7,8 +7,6 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
 
   def companion: NumberCompanion[S, N]
 
-  // TODO remove in favor of explicit conversions?
-
   def toVector: S#Vector
 
   def toPoint: S#Point
@@ -86,12 +84,10 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
     zipWith(this.simple.digits, that.simple.digits, _ compare _).find (_ != 0).getOrElse(0)
 
 
-  final override def equals(other: Any): Boolean = {
-    if (!other.isInstanceOf[N]) false else {
-      val that: N = other.asInstanceOf[N]
-      (this.numberSystem == that.numberSystem) && (this.companion == that.companion) &&
-        (this.compare(that) == 0)
-    }
+  final override def equals(other: Any): Boolean = other match {
+    case that: N =>
+      (this.numberSystem == that.numberSystem) && (this.companion == that.companion) && (this.compare(that) == 0)
+    case _ => false
   }
 
   final override def hashCode: Int =  (73 /: canonical.digits)((v, x) => 41 * v + x)
