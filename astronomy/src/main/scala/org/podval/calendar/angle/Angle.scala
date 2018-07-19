@@ -2,7 +2,7 @@ package org.podval.calendar.angle
 
 import org.podval.calendar.numbers.PeriodicNumber
 
-trait AngleNumber[N <: AngleNumber[N]] extends PeriodicNumber[AngleNumberSystem, N]
+trait Angle[N <: Angle[N]] extends PeriodicNumber[AngleNumberSystem, N]
 { this: N =>
   def degrees: Int = head
 

@@ -17,7 +17,7 @@ trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
     new Rotation(digits) with AngleNumberSystemMember
 
   final override object Vector extends VectorCompanion[AngleNumberSystem]
-    with AngleNumberCompanion[Rotation] with AngleNumberSystemMember
+    with AngleCompanion[Rotation] with AngleNumberSystemMember
 
   final val Rotation = Vector
 
@@ -29,7 +29,7 @@ trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
     new Position(digits) with AngleNumberSystemMember
 
   final override object Point extends PointCompanion[AngleNumberSystem]
-    with AngleNumberCompanion[Point] with AngleNumberSystemMember
+    with AngleCompanion[Point] with AngleNumberSystemMember
 
   final val Position = Point
 
