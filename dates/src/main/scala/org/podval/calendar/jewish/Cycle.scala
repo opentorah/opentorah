@@ -1,6 +1,6 @@
 package org.podval.calendar.jewish
 
-import Jewish.TimeInterval
+import Jewish.TimeVector
 
 object Cycle {
   final val yearsInCycle: Int = 19
@@ -36,7 +36,7 @@ object Cycle {
   final def firstMonth(yearNumber: Int): Int =
     monthsInCycle*(yearCycle(yearNumber) - 1) + firstMonthInCycle(yearNumber)
 
-  final val cycleLength: TimeInterval = Moon.meanLunarPeriod * monthsInCycle
+  final val cycleLength: TimeVector = Moon.meanLunarPeriod * monthsInCycle
 
   final def numberInCycleOfMonth(monthNumber: Int): Int = ((monthNumber - 1) % monthsInCycle) + 1
 

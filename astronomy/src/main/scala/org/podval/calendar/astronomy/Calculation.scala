@@ -61,7 +61,7 @@ final class Calculation(
 
   // KH 15:4
   lazy val moonAnomalyVisible: Angle =
-    rounders.moonAnomalyVisible(calculators.moonAnomalyVisible(moonAnomalyTrue.toInterval))
+    rounders.moonAnomalyVisible(calculators.moonAnomalyVisible(moonAnomalyTrue.toVector))
 
   def moonLongitudeTrueRaw: AnglePoint = moonLongitudeMeanAtTimeOfSighting + moonAnomalyVisible
   lazy val moonLongitudeTrue: AnglePoint = rounders.moonLongitudeTrue(moonLongitudeTrueRaw)

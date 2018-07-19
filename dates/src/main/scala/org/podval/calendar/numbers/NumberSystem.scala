@@ -10,11 +10,11 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   val Point: PointCompanion[S]
 
-  type Interval <: IntervalBase[S]
+  type Vector <: VectorBase[S]
 
-  def createInterval(digits: Seq[Int]): Interval
+  def createVector(digits: Seq[Int]): Vector
 
-  val Interval: IntervalCompanion[S]
+  val Vector: VectorCompanion[S]
 
   val defaultLength: Int
 

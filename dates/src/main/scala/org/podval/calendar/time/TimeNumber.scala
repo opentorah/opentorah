@@ -10,7 +10,7 @@ trait TimeNumber[S <: TimeNumberSystem[S], N <: TimeNumber[S, N]] extends Number
 
   final def day(number: Int): N = days(number-1)
 
-  final def time: S#Interval = days(0).toInterval
+  final def time: S#Vector = days(0).toVector
 
   final def hours: Int = tail(0)
 

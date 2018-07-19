@@ -5,12 +5,12 @@ abstract class PointBase[S <: NumberSystem[S]](digits: Seq[Int])
 { this: S#Point =>
   override def companion: NumberCompanion[S, S#Point] = numberSystem.Point
 
-  final def +(that: S#Interval): S#Point = numberSystem.Point.fromDigits(add(that))
+  final def +(that: S#Vector): S#Point = numberSystem.Point.fromDigits(add(that))
 
-  final def -(that: S#Interval): S#Point = numberSystem.Point.fromDigits(subtract(that))
+  final def -(that: S#Vector): S#Point = numberSystem.Point.fromDigits(subtract(that))
 
-  final def -(that: S#Point): S#Interval = numberSystem.Interval.fromDigits(subtract(that))
+  final def -(that: S#Point): S#Vector = numberSystem.Vector.fromDigits(subtract(that))
 
-  final override def toInterval: S#Interval = this - numberSystem.Point()
-  final override def toPoint   : S#Point    = this
+  final override def toVector: S#Vector = this - numberSystem.Point()
+  final override def toPoint: S#Point = this
 }

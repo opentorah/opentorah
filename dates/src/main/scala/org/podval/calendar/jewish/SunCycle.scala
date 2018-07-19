@@ -1,6 +1,6 @@
 package org.podval.calendar.jewish
 
-import Jewish.{Moment, TimeInterval}
+import Jewish.{Moment, TimeVector}
 import Sun.yearOfShmuel
 
 object SunCycle {
@@ -11,5 +11,5 @@ object SunCycle {
   // It never happens on Passover.
   // It happens more often than on the Passover Eve on 7 days.
   def birkasHachama(cycle: Int): Moment =
-    SeasonsFixed.Shmuel.firstTkufasNisan + yearOfShmuel * 28 * cycle + TimeInterval().hours(12)
+    SeasonsFixed.Shmuel.firstTkufasNisan + yearOfShmuel * 28 * cycle + TimeVector().hours(12)
 }

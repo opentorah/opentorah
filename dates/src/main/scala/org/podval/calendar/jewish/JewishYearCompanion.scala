@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.YearCompanion
-import Jewish.{Month, MonthNameAndLength, TimeInterval, YearCharacter}
+import Jewish.{Month, MonthNameAndLength, TimeVector, YearCharacter}
 import Month.Name._
 
 abstract class JewishYearCompanion extends YearCompanion[Jewish] {
@@ -73,6 +73,6 @@ object JewishYearCompanion {
     val values: Seq[Kind] = Seq(Short, Regular, Full)
   }
 
-  final val normalYear: TimeInterval = Moon.meanLunarPeriod*Cycle.yearLengthInMonths(isLeap = false)
-  final val leapYear: TimeInterval = Moon.meanLunarPeriod*Cycle.yearLengthInMonths(isLeap = true)
+  final val normalYear: TimeVector = Moon.meanLunarPeriod*Cycle.yearLengthInMonths(isLeap = false)
+  final val leapYear: TimeVector = Moon.meanLunarPeriod*Cycle.yearLengthInMonths(isLeap = true)
 }

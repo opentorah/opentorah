@@ -1,6 +1,6 @@
 package org.podval.calendar.jewish
 
-import Jewish.{Day, Moment, TimeInterval}
+import Jewish.{Day, Moment, TimeVector}
 import Day.Name._
 
 object NewYear {
@@ -38,11 +38,11 @@ object NewYear {
   private val adu: Set[Day.Name] = Set(Rishon, Rvii, Shishi)
 
   // KH 7:1-2 (molad zoken)
-  final val firstCorrection: TimeInterval  = TimeInterval().hours(18)
+  final val firstCorrection: TimeVector  = TimeVector().hours(18)
 
   // KH 7:4
-  final val secondCorrection: TimeInterval = TimeInterval().hours(9).parts(204)
+  final val secondCorrection: TimeVector = TimeVector().hours(9).parts(204)
 
   // KH 7:5
-  final val thirdCorrection: TimeInterval  = TimeInterval().hours(15).parts(589)
+  final val thirdCorrection: TimeVector  = TimeVector().hours(15).parts(589)
 }

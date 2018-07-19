@@ -1,6 +1,6 @@
 package org.podval.calendar.jewish
 
-import Jewish.{Moment, TimeInterval, Month, Year}
+import Jewish.{Moment, TimeVector, Month, Year}
 
 abstract class SeasonsFixed  extends Seasons {
   final def tkufasNisan  (year: Year): Moment = tkufa(year, 0)
@@ -11,14 +11,14 @@ abstract class SeasonsFixed  extends Seasons {
   final def tkufa(year: Year, number: Int): Moment =
     firstTkufasNisan + seasonLength * ((year.number - 1)*4 + number)
 
-  def yearLength: TimeInterval
+  def yearLength: TimeVector
 
-  final def seasonLength: TimeInterval = yearLength / 4
+  final def seasonLength: TimeVector = yearLength / 4
 
   final def firstTkufasNisan: Moment =
     SeasonsFixed.firstMoladNisan - firstTkufasNisanBeforeFirstMoladNisan
 
-  val firstTkufasNisanBeforeFirstMoladNisan: TimeInterval
+  val firstTkufasNisanBeforeFirstMoladNisan: TimeVector
 }
 
 object SeasonsFixed {
@@ -26,18 +26,18 @@ object SeasonsFixed {
   val firstMoladNisan: Moment = Year(1).month(Month.Name.Nisan).newMoon
 
   object Shmuel extends SeasonsFixed {
-    final override def yearLength: TimeInterval = Sun.yearOfShmuel
+    final override def yearLength: TimeVector = Sun.yearOfShmuel
 
     // KH 9:3
-    final override val firstTkufasNisanBeforeFirstMoladNisan: TimeInterval =
-      TimeInterval().days(7).hours(9).parts(642)
+    final override val firstTkufasNisanBeforeFirstMoladNisan: TimeVector =
+      TimeVector().days(7).hours(9).parts(642)
   }
 
   object RavAda extends SeasonsFixed {
-    final override def yearLength: TimeInterval = Sun.yearOfRavAda
+    final override def yearLength: TimeVector = Sun.yearOfRavAda
 
     // KH 10:3
-    final override val firstTkufasNisanBeforeFirstMoladNisan: TimeInterval =
-      TimeInterval().hours(9).parts(642)
+    final override val firstTkufasNisanBeforeFirstMoladNisan: TimeVector =
+      TimeVector().hours(9).parts(642)
   }
 }

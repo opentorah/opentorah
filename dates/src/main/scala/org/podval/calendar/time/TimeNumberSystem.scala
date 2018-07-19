@@ -5,7 +5,7 @@ import org.podval.calendar.numbers.NonPeriodicNumberSystem
 trait TimeNumberSystem[S <: TimeNumberSystem[S]] extends NonPeriodicNumberSystem[S] { this: S =>
   type Point <: TimePointBase[S]
 
-  type Interval <: TimeIntervalBase[S]
+  type Vector <: TimeVectorBase[S]
 
   final override def range(position: Int): Int = position match {
     case 0 => TimeNumberSystem.hoursPerDay
@@ -23,7 +23,7 @@ trait TimeNumberSystem[S <: TimeNumberSystem[S]] extends NonPeriodicNumberSystem
 
   final override val defaultLength: Int = 3
 
-  val week: S#Interval = Interval().days(7)
+  val week: S#Vector = Vector().days(7)
 }
 
 

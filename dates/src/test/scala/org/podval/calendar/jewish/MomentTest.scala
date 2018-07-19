@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.scalatest.FlatSpec
-import Jewish.TimeInterval
+import Jewish.TimeVector
 
 final class MomentTest extends FlatSpec {
 
@@ -14,7 +14,7 @@ final class MomentTest extends FlatSpec {
   }
 
   private def test(days: Int, hours: Int, parts: Int) {
-    val moment = TimeInterval().days(days).hours(hours).parts(parts)
+    val moment = TimeVector().days(days).hours(hours).parts(parts)
 
     assertResult(days )(moment.days)
     assertResult(hours)(moment.hours)

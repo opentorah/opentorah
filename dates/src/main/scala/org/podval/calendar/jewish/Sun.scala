@@ -1,17 +1,17 @@
 package org.podval.calendar.jewish
 
-import Jewish.TimeInterval
+import Jewish.TimeVector
 import org.podval.calendar.numbers.BigRational
 
 object Sun {
   // KH 9:1
-  val yearOfShmuel: TimeInterval = TimeInterval().days(365).hours(6)
+  val yearOfShmuel: TimeVector = TimeVector().days(365).hours(6)
 
   // KH 10:1
-  val yearOfRavAda: TimeInterval = Cycle.cycleLength / Cycle.yearsInCycle
+  val yearOfRavAda: TimeVector = Cycle.cycleLength / Cycle.yearsInCycle
 
   // TODO move or remove
-//  val gregorianYear: TimeInterval = TimeInterval.fromRational(
+//  val gregorianYear: TimeVector = TimeVector.fromRational(
 //    BigRational(365) +
 //    BigRational(1, 4) -
 //    BigRational(1, 100) +

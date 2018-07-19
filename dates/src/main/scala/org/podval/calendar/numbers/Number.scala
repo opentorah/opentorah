@@ -7,7 +7,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
 
   def companion: NumberCompanion[S, N]
 
-  def toInterval: S#Interval
+  def toVector: S#Vector
 
   def toPoint: S#Point
 

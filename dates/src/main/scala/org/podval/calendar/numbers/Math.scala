@@ -18,7 +18,7 @@ object Math {
     println(s"$left $leftValue $leftSignum $right $rightValue $rightSignum $length")
     if (leftSignum == 0) left else if (rightSignum == 0) right else {
       require(leftSignum != rightSignum)
-      val halfDistance: S#Interval = (right - left) / (2, length+1)
+      val halfDistance: S#Vector = (right - left) / (2, length+1)
       if (halfDistance.roundTo(length).isZero) left else {
         val middle = left + halfDistance
         val middleValue: T#Point = f(middle)

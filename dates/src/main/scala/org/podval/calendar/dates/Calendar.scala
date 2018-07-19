@@ -2,9 +2,9 @@ package org.podval.calendar.dates
 
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.Jewish
-import org.podval.calendar.numbers.{IntervalCompanion, PointCompanion}
+import org.podval.calendar.numbers.{VectorCompanion, PointCompanion}
 import org.podval.calendar.time.TimeNumberSystem.hoursPerDay
-import org.podval.calendar.time.{TimeIntervalBase, TimeNumberSystem}
+import org.podval.calendar.time.{TimeVectorBase, TimeNumberSystem}
 
 trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
@@ -42,20 +42,20 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   final val Moment: PointCompanion[C] = Point
 
-  final override type Interval = TimeIntervalBase[C]
+  final override type Vector = TimeVectorBase[C]
 
-  final type TimeInterval = Interval
+  final type TimeVector = Vector
 
-  final override def createInterval(digits: Seq[Int]): Interval =
-    new TimeIntervalBase[C](digits) { this: Interval =>
+  final override def createVector(digits: Seq[Int]): Vector =
+    new TimeVectorBase[C](digits) { this: Vector =>
       final override def numberSystem: C = Calendar.this
     }
 
-  final override object Interval extends IntervalCompanion[C] {
+  final override object Vector extends VectorCompanion[C] {
     override def numberSystem: C = Calendar.this
   }
 
-  final val TimeInterval = Interval
+  final val TimeVector = Vector
 }
 
 

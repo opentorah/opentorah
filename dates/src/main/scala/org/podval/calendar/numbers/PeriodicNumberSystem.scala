@@ -3,7 +3,7 @@ package org.podval.calendar.numbers
 trait PeriodicNumberSystem[S <: PeriodicNumberSystem[S]] extends NumberSystem[S] { this: S =>
   type Point <: PeriodicPoint[S]
 
-  type Interval <: PeriodicInterval[S]
+  type Vector <: PeriodicVector[S]
 
   def headRange: Int
 
@@ -21,7 +21,7 @@ trait PeriodicNumberSystem[S <: PeriodicNumberSystem[S]] extends NumberSystem[S]
     else (result.head - headRange) +: result.tail
   }
 
-  val period: S#Interval = Interval(headRange)
+  val period: S#Vector = Vector(headRange)
 
-  val halfPeriod: S#Interval = Interval(headRange/2)
+  val halfPeriod: S#Vector = Vector(headRange/2)
 }
