@@ -29,39 +29,13 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   val signPartial: PartialFunction[Int, String]
 
-  private val zeroDenominator: BigInt = BigInt(1)
+  final def to[T: Convertible](digits: Seq[Int]): T = NumberSystem.to[T](digits, ranges(digits.tail.length))
 
-  // TODO move into companion object; pass ranges in
+  final def from[T : Convertible](value: T, length: Int): Seq[Int] = NumberSystem.from[T](value, ranges(length))
 
-  // TODO comments
-  final def to[T: Convertible](digits: Seq[Int]): T = {
-    val ev: Convertible[T] = Convertible[T]
+  private def ranges(length: Int): Seq[Int] = (0 until length).map(range)
 
-    digits.tail.zipWithIndex.map { case (digit, position) => (digit, range(position)) }
-    .foldLeft[(T, BigInt)]((ev.div(digits.head, zeroDenominator), zeroDenominator)) {
-      case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>
-        val newDenominator: BigInt = denominator*range
-        (acc + ev.div(digit, newDenominator), newDenominator)
-    }._1
-  }
-
-  // TODO comments
-  // This is an instance of a specialized unfold with an initiator, unfolder and terminator
-  // (but we don't have even a simple unfold in the standard library)
-  final def from[T : Convertible](value: T, length: Int): Seq[Int] = {
-    def wholeAndFraction(value: T): (Int, T) = (value.whole, value.fraction)
-
-    val (rawDigits: Seq[(Int, T)], (lastDigit: Int, lastReminder: T))  = (0 until length).map(range)
-      .foldLeft((Seq.empty[(Int, T)], wholeAndFraction(value.abs))) {
-        case ((acc, (digit: Int, reminder: T)), range: Int) =>
-          (acc :+ (digit, reminder), wholeAndFraction(reminder * range))
-      }
-
-    val digits: Seq[Int] = rawDigits.map(_._1)
-    val result: Seq[Int] = digits :+ (lastDigit + lastReminder.round)
-    result.map(value.signum*_)
-  }
-
+  // TODO move into companion object; pass signs in
   // TODO tests with negative digits - and for angles
   final def toString[N <: Number[S, N]](number: N, length: Int): String = {
     def signFor(position: Int): Option[String] = signPartial.lift(position)
@@ -119,5 +93,31 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     }
 
     forHead(digits.head + headCarry) +: newTail
+  }
+}
+
+object NumberSystem {
+  def to[T: Convertible](digits: Seq[Int], ranges: Seq[Int]): T = {
+    digits.zip(ranges :+ 0).foldLeft[(T, BigInt)]((Convertible[T].zero, BigInt(1))) {
+      case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>
+        (acc + Convertible[T].div(digit, denominator), denominator*range)
+    }._1
+  }
+
+  // TODO comments
+  // This is an instance of a specialized unfold with an initiator, unfolder and terminator
+  // (but we don't have even a simple unfold in the standard library)
+  final def from[T : Convertible](value: T, ranges: Seq[Int]): Seq[Int] = {
+    def wholeAndFraction(value: T): (Int, T) = (value.whole, value.fraction)
+
+    val (rawDigits: Seq[(Int, T)], (lastDigit: Int, lastReminder: T))  = ranges
+      .foldLeft((Seq.empty[(Int, T)], wholeAndFraction(value.abs))) {
+        case ((acc, (digit: Int, remainder: T)), range: Int) =>
+          (acc :+ (digit, remainder), wholeAndFraction(remainder * range))
+      }
+
+    val digits: Seq[Int] = rawDigits.map(_._1)
+    val result: Seq[Int] = digits :+ (lastDigit + lastReminder.round)
+    result.map(value.signum*_)
   }
 }

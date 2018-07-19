@@ -6,6 +6,7 @@ package org.podval.calendar.numbers
   * @tparam T  type of the number to convert to/from
   */
 trait Convertible[T] {
+  def zero: T
   def signum(value: T): Int
   def abs(value: T): T
   def plus(value: T, that: T): T
@@ -33,6 +34,7 @@ object Convertible {
   }
 
   implicit val bigRationalConvertible: Convertible[BigRational] = new Convertible[BigRational] {
+    override def zero: BigRational = BigRational.zero
     override def signum(value: BigRational): Int = value.signum
     override def abs(value: BigRational): BigRational = value.abs
     override def plus(value: BigRational, that: BigRational): BigRational = value + that
@@ -45,6 +47,7 @@ object Convertible {
   }
 
   implicit val doubleConvertible: Convertible[Double] = new Convertible[Double] {
+    override def zero: Double = 0
     override def signum(value: Double): Int = math.signum(value).toInt
     override def abs(value: Double): Double = math.abs(value)
     override def plus(value: Double, that: Double): Double = value + that
