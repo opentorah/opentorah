@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.Rotation
+import org.podval.calendar.angle.Angles.Rotation
 
 // TODO there are some diagrams in the Moznaim Rambam at this point.
 object SunLongitudeCorrection  {

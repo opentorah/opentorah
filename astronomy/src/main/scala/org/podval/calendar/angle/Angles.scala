@@ -3,10 +3,9 @@ package org.podval.calendar.angle
 import org.podval.calendar.numbers.{VectorCompanion, NumberSystemMember, PointCompanion,
   PeriodicNumberSystem}
 
-// TODO maybe move 'angle' package into 'dates' project after all, closer to the NumberSystem tests? It's small...
-trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
-  trait AngleNumberSystemMember extends NumberSystemMember[AngleNumberSystem] {
-    final override def numberSystem: AngleNumberSystem = AngleNumberSystem.this
+trait Angles extends PeriodicNumberSystem[Angles] {
+  trait AnglesMember extends NumberSystemMember[Angles] {
+    final override def numberSystem: Angles = Angles.this
   }
 
   final override type Vector = RotationBase
@@ -14,10 +13,10 @@ trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
   final type Rotation = Vector
 
   final override def createVector(digits: Seq[Int]): Vector =
-    new Rotation(digits) with AngleNumberSystemMember
+    new Rotation(digits) with AnglesMember
 
-  final override object Vector extends VectorCompanion[AngleNumberSystem]
-    with AngleCompanion[Rotation] with AngleNumberSystemMember
+  final override object Vector extends VectorCompanion[Angles]
+    with AngleCompanion[Rotation] with AnglesMember
 
   final val Rotation = Vector
 
@@ -26,10 +25,10 @@ trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
   final type Position = Point
 
   final override def createPoint(digits: Seq[Int]): Point =
-    new Position(digits) with AngleNumberSystemMember
+    new Position(digits) with AnglesMember
 
-  final override object Point extends PointCompanion[AngleNumberSystem]
-    with AngleCompanion[Point] with AngleNumberSystemMember
+  final override object Point extends PointCompanion[Angles]
+    with AngleCompanion[Point] with AnglesMember
 
   final val Position = Point
 
@@ -39,7 +38,7 @@ trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
 
   final override def headSign: String = "°"
 
-  import AngleNumberSystem.PositionIndex
+  import Angles.PositionIndex
 
   final override val signPartial: PartialFunction[Int, String] = {
     case PositionIndex.MINUTES => "′"
@@ -51,7 +50,7 @@ trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
 }
 
 
-object AngleNumberSystem extends AngleNumberSystem {
+object Angles extends Angles {
   import scala.language.implicitConversions
 
   // TODO use for rounding precision etc...

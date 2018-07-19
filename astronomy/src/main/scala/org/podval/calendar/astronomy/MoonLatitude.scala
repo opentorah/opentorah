@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.Rotation
+import org.podval.calendar.angle.Angles.Rotation
 
 object MoonLatitude {
   final val table: InterpolatedTable = new InterpolatedTable {

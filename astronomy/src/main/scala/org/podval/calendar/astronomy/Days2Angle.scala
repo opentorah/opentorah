@@ -1,7 +1,7 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem
-import AngleNumberSystem.Rotation
+import org.podval.calendar.angle.Angles
+import Angles.Rotation
 
 
 /*
@@ -95,7 +95,7 @@ trait Days2Angle {
 
   // TODO rework to produce range for length
   final def exactify(approximate: Rotation, days: Int, angle: Rotation): Double = {
-    val fullRotations = math.floor(days*approximate.toDouble/AngleNumberSystem.headRange.toDouble).toInt
-    (AngleNumberSystem.headRange.toDouble*fullRotations + angle.toDegrees)/days
+    val fullRotations = math.floor(days*approximate.toDouble/Angles.headRange.toDouble).toInt
+    (Angles.headRange.toDouble*fullRotations + angle.toDegrees)/days
   }
 }

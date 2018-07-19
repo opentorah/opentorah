@@ -1,9 +1,9 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem
+import org.podval.calendar.angle.Angles
 import org.podval.calendar.jewish.{Jewish, Seasons}
 import org.podval.calendar.jewish.Jewish.{Moment, Month, Year}
-import org.podval.calendar.angle.AngleNumberSystem.Position
+import org.podval.calendar.angle.Angles.Position
 import org.podval.calendar.numbers.Math
 
 final class SeasonsAstronomical(calculator: Calculator) extends Seasons {
@@ -16,7 +16,7 @@ final class SeasonsAstronomical(calculator: Calculator) extends Seasons {
     def f(moment: Moment): Position = (sunLongitudeTrue(moment) - zodiac.start).toPoint.symmetrical
     val left: Moment = year.month(Month.Name.Nisan).prev.firstDay.toMoment
     val right: Moment = year.month(Month.Name.Nisan).next.firstDay.toMoment
-    val result: Moment = Math.findZero[Jewish, AngleNumberSystem](f, left, right, 0)
+    val result: Moment = Math.findZero[Jewish, Angles](f, left, right, 0)
     result
   }
 

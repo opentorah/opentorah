@@ -1,7 +1,7 @@
 package org.podval.calendar.astronomy
 
 import org.scalatest.FlatSpec
-import org.podval.calendar.angle.AngleNumberSystem.{Rotation, period}
+import org.podval.calendar.angle.Angles.{Rotation, period}
 import org.podval.calendar.jewish
 
 class SunLongitudeMeanTest extends FlatSpec {

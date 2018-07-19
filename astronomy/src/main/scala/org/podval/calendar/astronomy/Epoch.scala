@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.{Rotation, Position}
+import org.podval.calendar.angle.Angles.{Rotation, Position}
 import org.podval.calendar.jewish.Jewish.{Day, Month, Year}
 
 trait Epoch {

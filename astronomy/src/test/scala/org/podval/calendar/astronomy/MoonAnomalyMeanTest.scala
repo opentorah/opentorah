@@ -1,7 +1,7 @@
 package org.podval.calendar.astronomy
 
 import org.scalatest.FlatSpec
-import org.podval.calendar.angle.AngleNumberSystem.Rotation
+import org.podval.calendar.angle.Angles.Rotation
 
 class MoonAnomalyMeanTest extends FlatSpec {
   behavior of "Mean Moon Anomaly"

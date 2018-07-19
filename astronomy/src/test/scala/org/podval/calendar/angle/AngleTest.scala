@@ -2,7 +2,7 @@ package org.podval.calendar.angle
 
 import org.scalatest.FlatSpec
 
-import AngleNumberSystem.Rotation
+import Angles.Rotation
 
 class AngleTest extends FlatSpec {
 

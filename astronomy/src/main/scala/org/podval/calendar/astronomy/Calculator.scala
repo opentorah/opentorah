@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem
+import org.podval.calendar.angle.Angles
 import org.podval.calendar.jewish.Jewish
 import Jewish.{Year, Day, Month, Moment}
 import org.podval.calendar.numbers.Math
@@ -13,12 +13,12 @@ class Calculator(val epoch: Epoch, val calculators: Calculators, val rounders: R
   )
 
   // TODO trying to figure out why Iyar 2 4938 is the day of sighting
-  def elongation(moment: Moment): AngleNumberSystem.Point = calculate(moment.day).elongation.toPoint.symmetrical
+  def elongation(moment: Moment): Angles.Point = calculate(moment.day).elongation.toPoint.symmetrical
 
   def dayOfSighting(month: Month): Day = {
     val from: Moment = (month.firstDay - 5).toMoment
     val to: Moment = (month.firstDay + 5).toMoment
-    val result = Math.findZero[Jewish, AngleNumberSystem](
+    val result = Math.findZero[Jewish, Angles](
       elongation,
       from,
       to,
