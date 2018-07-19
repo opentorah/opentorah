@@ -98,26 +98,17 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
 object NumberSystem {
   def to[T: Convertible](digits: Seq[Int], ranges: Seq[Int]): T = {
-    digits.zip(ranges :+ 0).foldLeft[(T, BigInt)]((Convertible[T].zero, BigInt(1))) {
+    digits.zip(ranges :+ 0).foldLeft((Convertible[T].zero, BigInt(1))) {
       case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>
         (acc + Convertible[T].div(digit, denominator), denominator*range)
     }._1
   }
 
-  // TODO comments
-  // This is an instance of a specialized unfold with an initiator, unfolder and terminator
-  // (but we don't have even a simple unfold in the standard library)
-  final def from[T : Convertible](value: T, ranges: Seq[Int]): Seq[Int] = {
-    def wholeAndFraction(value: T): (Int, T) = (value.whole, value.fraction)
+  def from[T : Convertible](value: T, ranges: Seq[Int]): Seq[Int] = {
+    val (digits: Seq[Int], lastValue: T) = ranges.foldLeft((Seq.empty[Int], value.abs)) {
+      case ((acc: Seq[Int], value: T), range: Int) => (acc :+ value.whole, value.fraction * range)
+    }
 
-    val (rawDigits: Seq[(Int, T)], (lastDigit: Int, lastReminder: T))  = ranges
-      .foldLeft((Seq.empty[(Int, T)], wholeAndFraction(value.abs))) {
-        case ((acc, (digit: Int, remainder: T)), range: Int) =>
-          (acc :+ (digit, remainder), wholeAndFraction(remainder * range))
-      }
-
-    val digits: Seq[Int] = rawDigits.map(_._1)
-    val result: Seq[Int] = digits :+ (lastDigit + lastReminder.round)
-    result.map(value.signum*_)
+    (digits :+ lastValue.round).map(value.signum*_)
   }
 }
