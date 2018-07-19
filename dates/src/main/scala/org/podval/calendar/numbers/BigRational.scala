@@ -18,6 +18,12 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
 {
   def signum: Int = numerator.signum
 
+  def isZero: Boolean = signum == 0
+
+  def isPositive: Boolean = signum > 0
+
+  def isNegative: Boolean = signum < 0
+
   def abs: BigRational = BigRational(numerator.abs, denominator)
 
   def unary_- : BigRational = BigRational(-numerator, denominator)

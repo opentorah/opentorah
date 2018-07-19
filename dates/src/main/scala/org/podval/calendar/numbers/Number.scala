@@ -48,15 +48,13 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
 
   final def normal: N = fromDigits(numberSystem.normal(this))
 
-  final def signum: Int = nonZeroDigit.map(math.signum).getOrElse(0)
+  final def signum: Int = normal.digits.find(_ != 0).map(math.signum).getOrElse(0)
 
-  final def isZero: Boolean = nonZeroDigit.isEmpty
+  final def isZero: Boolean = signum == 0
 
-  final def isPositive: Boolean = nonZeroDigit.exists(_ > 0)
+  final def isPositive: Boolean = signum > 0
 
-  final def isNegative: Boolean = nonZeroDigit.exists(_ < 0)
-
-  private[this] def nonZeroDigit: Option[Int] = normal.digits.find(_ != 0)
+  final def isNegative: Boolean = signum < 0
 
   final def abs: N = fromDigits(simple.digits.map(math.abs))
 
@@ -74,7 +72,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
     fromDigits(roundedDigits)
   }
 
-  final def to[T: Convertible] = numberSystem.to[T](digits)
+  final def to[T: Convertible]: T = numberSystem.to[T](digits)
   final def toRational: BigRational = to[BigRational]
   final def toDouble: Double = to[Double]
 
