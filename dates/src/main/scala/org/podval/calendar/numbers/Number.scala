@@ -1,5 +1,6 @@
 package org.podval.calendar.numbers
 
+// TODO split into NumberBase class and Number interface with self-type NumberBase - maybe tying the knot will be easier?
 abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[Int])
   extends Ordered[N] with NumberSystemMember[S]
 { this: N =>
@@ -7,8 +8,10 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
 
   def companion: NumberCompanion[S, N]
 
+  // TODO remove
   def toVector: S#Vector
 
+  // TODO remove
   def toPoint: S#Point
 
   protected final def fromDigits(digits: Seq[Int]): N = companion.fromDigits(digits)

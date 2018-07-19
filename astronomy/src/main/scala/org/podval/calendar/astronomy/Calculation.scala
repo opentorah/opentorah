@@ -60,6 +60,8 @@ final class Calculation(
   lazy val moonAnomalyTrue: Position = rounders.moonAnomalyTrue(moonAnomalyTrueRaw)
 
   // KH 15:4
+  // TODO moonAnomalyTrue should be a Rotation - or the calculator should take Position;
+  // figure it out and eliminate the use of toVector()
   lazy val moonAnomalyVisible: Rotation =
     rounders.moonAnomalyVisible(calculators.moonAnomalyVisible(moonAnomalyTrue.toVector))
 

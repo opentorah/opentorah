@@ -13,6 +13,7 @@ class Calculator(val epoch: Epoch, val calculators: Calculators, val rounders: R
   )
 
   // TODO trying to figure out why Iyar 2 4938 is the day of sighting
+  // TODO elongation should be a Rotation; eliminate the use of toPoint()
   def elongation(moment: Moment): Angles.Point = calculate(moment.day).elongation.toPoint.symmetrical
 
   def dayOfSighting(month: Month): Day = {
