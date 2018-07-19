@@ -10,34 +10,40 @@ import BigRational.{one, oneHalf, zero}
 final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matchers {
   val minusThreeHalfs: BigRational = BigRational(-3, 2)
 
+  def nonZeroInt: Gen[Int] = for {
+    result <- arbitrary[Int] if result != 0
+  } yield result
+
+  def bigInt: Gen[BigInt] = arbitrary[BigInt]
+
+  def nonZeroBigInt: Gen[BigInt] = for {
+    result <- arbitrary[BigInt] if result != 0
+  } yield result
+
   def rational: Gen[BigRational] = for {
-    numerator <- arbitrary[BigInt]
-    denominator <- arbitrary[BigInt] if denominator != 0
+    numerator <- bigInt
+    denominator <- nonZeroBigInt
   } yield BigRational(numerator, denominator)
 
   def nonZeroRational: Gen[BigRational] = for {
-    numerator <- arbitrary[BigInt] if numerator != 0
-    denominator <- arbitrary[BigInt] if denominator != 0
+    numerator <- nonZeroBigInt
+    denominator <- nonZeroBigInt
   } yield BigRational(numerator, denominator)
 
-  "apply()" should "detect zero denominator" in {
-    assertThrows[ArithmeticException](BigRational(1, 0))
-    assertThrows[ArithmeticException](BigRational(0, 0))
+  "apply()" should "not admit zero denominator" in {
+    forAll(bigInt) { n => assertThrows[ArithmeticException](BigRational(n, 0)) }
   }
 
   "apply()" should "detect zero numerator" in {
-    BigRational(0, 7) shouldBe zero
+    forAll(nonZeroBigInt) { n => BigRational(0, n) shouldBe zero }
   }
 
   "apply()" should "handle sign correctly" in {
-    BigRational(-1, 1) shouldBe -one
-    BigRational(1, -1) shouldBe -one
-    BigRational(1, 1) shouldBe one
+    forAll(bigInt, nonZeroBigInt) { (n, d) => BigRational(-n, -d) shouldBe BigRational(n, d) }
   }
 
   "apply()" should "simplify via GCD correctly" in {
-    BigRational(-13, -26) shouldBe oneHalf
-    BigRational(1, 1) shouldBe one
+    forAll(bigInt, nonZeroBigInt, nonZeroInt) { (n, d, c) => BigRational(n*c, d*c) shouldBe BigRational(n, d) }
   }
 
   "toString()" should "be correct" in {
@@ -48,6 +54,18 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
 
   "apply(String)" should "be inverse of toString()" in {
     forAll(rational) { r => BigRational(r.toString) shouldBe r }
+  }
+
+  "==()" should "be correct" in {
+    zero == zero shouldBe true
+    zero == BigRational(0) shouldBe true
+    zero == BigRational(1) shouldBe false
+  }
+
+  "compare()" should "be correct" in {
+    zero < oneHalf shouldBe true
+    oneHalf <= one shouldBe true
+    one > minusThreeHalfs shouldBe true
   }
 
   "signum()" should "be correct" in {
@@ -66,12 +84,6 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
 
   "abs()" should "be determined by signum()" in {
     forAll(rational) { r => r.abs shouldBe (if (r.signum < 0) -r else r) }
-  }
-
-  "abs()" should "be correct" in {
-    zero.abs  shouldBe zero
-    oneHalf.abs shouldBe oneHalf
-    minusThreeHalfs.abs shouldBe -minusThreeHalfs
   }
 
   "abs()" should "be idempotent" in {
@@ -98,7 +110,7 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     minusThreeHalfs.invert shouldBe BigRational(-2, 3)
   }
 
-  "invert()" should "be idempotent" in {
+  "invert()" should "be selv-inverse" in {
     forAll(nonZeroRational) { r => r.invert.invert shouldBe r }
   }
 
@@ -172,7 +184,7 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     forAll(nonZeroRational) { r => r / r shouldBe one }
   }
 
-  "/(BigRational), inverse() and *(BigRational)" should "be related correctly" in {
+  "/(BigRational), invert() and *(BigRational)" should "be consistent" in {
     forAll(rational, nonZeroRational) { (l, r) => l / r shouldBe l * r.invert }
   }
 
@@ -201,18 +213,6 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
 
     minusThreeHalfs.whole shouldBe -1
     minusThreeHalfs.fraction shouldBe -oneHalf
-  }
-
-  "==()" should "be correct" in {
-    assert(zero == zero)
-    assert(zero == BigRational(0))
-    assert(zero != BigRational(1))
-  }
-
-  "compare()" should "be correct" in {
-    assert(zero < oneHalf)
-    assert(oneHalf <= one)
-    assert(one > minusThreeHalfs)
   }
 
   "whole()+fraction()" should "be identity where defined" in {
