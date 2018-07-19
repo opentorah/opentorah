@@ -90,7 +90,7 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
     case _ => false
   }
 
-  final override def hashCode: Int =  (73 /: canonical.digits)((v, x) => 41 * v + x)
+  final override def hashCode: Int =  (73 /: canonical.digits)((v, x) => 41 * v + x) // TODO just canonical.digits.hashCode?
 
   protected final def add[N1 <: Number[S, N1]](that: N1): Seq[Int] = zipWith(this.digits, that.digits, _ + _)
 

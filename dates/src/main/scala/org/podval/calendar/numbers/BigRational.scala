@@ -55,23 +55,16 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
 
   def fraction: BigRational = this - BigRational(whole)
 
-  def round: Int = if (fraction.abs <= BigRational.oneHalf) whole else whole + fraction.signum
+  def round: Int = whole + (if (fraction.abs <= BigRational.oneHalf) 0 else fraction.signum)
 
   override def toString: String = numerator + "/" + denominator
 
   override def compare(that: BigRational): Int = (this - that).signum
-
-  override def equals(other: Any): Boolean = other match {
-    case that: BigRational => compare(that) == 0
-    case _ => false
-  }
-
-  override def hashCode: Int = 73*numerator.hashCode + 31*denominator.hashCode
 }
 
 
 object BigRational {
-  // This is instantiated directly to avoid cycle (and thus `null` value) during initialization.
+  // Used in apply(), so it is instantiated directly to avoid cycle (and thus `null` value) during initialization.
   val zero: BigRational = new BigRational(0, 1)
 
   val oneHalf: BigRational = BigRational(1, 2)

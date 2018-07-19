@@ -7,7 +7,7 @@ import SimpleTimeNumberSystem.{Point, Vector}
 
 final class SimpleTimeNumberSystemTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matchers {
 
-  "isZero()/isPositive()/isNegative()/signum()/abs()/negate()" should "be correct" in {
+  "isZero()/isPositive()/isNegative()/signum()/abs()/unary_-()" should "be correct" in {
     Vector(0).isZero shouldBe true
     Vector(1).isZero shouldBe false
     Vector(-1).isZero shouldBe false

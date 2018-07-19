@@ -3,6 +3,7 @@ package org.podval.calendar.angle
 import org.podval.calendar.numbers.{VectorCompanion, NumberSystemMember, PointCompanion,
   PeriodicNumberSystem}
 
+// TODO maybe move 'angle' package into 'dates' project after all, closer to the NumberSystem tests? It's small...
 trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
   trait AngleNumberSystemMember extends NumberSystemMember[AngleNumberSystem] {
     final override def numberSystem: AngleNumberSystem = AngleNumberSystem.this

@@ -176,23 +176,21 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     forAll(rational, nonZeroRational) { (l, r) => l / r shouldBe l * r.invert }
   }
 
-  "wholeAndFraction()" should "be correct" in {
+  "whole() and fraction()" should "be correct" in {
     val days: Int = 1
     val hours: Int = 2
     val parts: Int = 3
     val time: BigRational = BigRational(((days*24)+hours)*1080+parts, 1*24*1080)
 
-    val daysO: Int = time.whole
+    time.whole shouldBe days
+
     val remainderhp: BigRational = time.fraction
-    daysO shouldBe days
+    (remainderhp*24).whole shouldBe hours
 
-    val hoursO: Int = (remainderhp*24).whole
     val remainderp: BigRational = (remainderhp*24).fraction
-    hoursO shouldBe hours
+    (remainderp*1080).whole shouldBe parts
 
-    val partsO: Int = (remainderp*1080).whole
     val remainder: BigRational = (remainderp*1080).fraction
-    partsO shouldBe parts
     remainder.numerator shouldBe 0
 
     zero.whole shouldBe 0
@@ -215,5 +213,13 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     assert(zero < oneHalf)
     assert(oneHalf <= one)
     assert(one > minusThreeHalfs)
+  }
+
+  "whole()+fraction()" should "be identity where defined" in {
+    forAll(rational) { r =>
+      try {
+        BigRational(r.whole) + r.fraction shouldBe r
+      } catch { case e: ArithmeticException => /* whole() is too big */ }
+    }
   }
 }
