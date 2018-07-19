@@ -29,13 +29,22 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
 
   val signPartial: PartialFunction[Int, String]
 
-  final def to[T: Convertible](digits: Seq[Int]): T = NumberSystem.to[T](digits, ranges(digits.tail.length))
+  final def to[T: Convertible](digits: Seq[Int]): T =
+    digits.zip(ranges(digits.length-1) :+ 0).foldLeft((Convertible[T].zero, BigInt(1))) {
+      case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>
+        (acc + Convertible[T].div(digit, denominator), denominator*range)
+    }._1
 
-  final def from[T : Convertible](value: T, length: Int): Seq[Int] = NumberSystem.from[T](value, ranges(length))
+  final def from[T : Convertible](value: T, length: Int): Seq[Int] = {
+    val (digits: Seq[Int], lastValue: T) = ranges(length).foldLeft((Seq.empty[Int], value.abs)) {
+      case ((acc: Seq[Int], value: T), range: Int) => (acc :+ value.whole, value.fraction * range)
+    }
+
+    (digits :+ lastValue.round).map(value.signum*_)
+  }
 
   private def ranges(length: Int): Seq[Int] = (0 until length).map(range)
 
-  // TODO move into companion object; pass signs in
   // TODO tests with negative digits - and for angles
   final def toString[N <: Number[S, N]](number: N, length: Int): String = {
     def signFor(position: Int): Option[String] = signPartial.lift(position)
@@ -93,22 +102,5 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     }
 
     forHead(digits.head + headCarry) +: newTail
-  }
-}
-
-object NumberSystem {
-  def to[T: Convertible](digits: Seq[Int], ranges: Seq[Int]): T = {
-    digits.zip(ranges :+ 0).foldLeft((Convertible[T].zero, BigInt(1))) {
-      case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>
-        (acc + Convertible[T].div(digit, denominator), denominator*range)
-    }._1
-  }
-
-  def from[T : Convertible](value: T, ranges: Seq[Int]): Seq[Int] = {
-    val (digits: Seq[Int], lastValue: T) = ranges.foldLeft((Seq.empty[Int], value.abs)) {
-      case ((acc: Seq[Int], value: T), range: Int) => (acc :+ value.whole, value.fraction * range)
-    }
-
-    (digits :+ lastValue.round).map(value.signum*_)
   }
 }
