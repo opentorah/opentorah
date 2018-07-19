@@ -56,7 +56,7 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     forAll(rational) { r => BigRational(r.toString) shouldBe r }
   }
 
-  "==()" should "be correct" in {
+  "==" should "be correct" in {
     zero == zero shouldBe true
     zero == BigRational(0) shouldBe true
     zero == BigRational(1) shouldBe false
@@ -90,17 +90,17 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     forAll(rational) { r => r.abs.abs shouldBe r.abs }
   }
 
-  "unary_-()" should "be correct" in {
+  "unary -" should "be correct" in {
     -zero shouldBe zero
     -oneHalf shouldBe BigRational(-1, 2)
     minusThreeHalfs.abs shouldBe BigRational(3, 2)
   }
 
-  "unary_-()" should "be self-inverse" in {
+  "unary -" should "be self-inverse" in {
     forAll(rational) { r => -(-r) shouldBe r }
   }
 
-  "unary_-()" should "be inverse of +()" in {
+  "unary -" should "be inverse of +" in {
     forAll(rational) { r => r + -r shouldBe zero }
   }
 
@@ -114,81 +114,70 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     forAll(nonZeroRational) { r => r.invert.invert shouldBe r }
   }
 
-  "+()" should "be correct" in {
+  "+" should "be correct" in {
     zero+zero shouldBe zero
     oneHalf + minusThreeHalfs shouldBe -one
   }
 
-  "+()" should "be commutative" in {
+  "+" should "be commutative" in {
     forAll(rational, rational) { (l, r) => l + r shouldBe r + l }
   }
 
-  "+()" should "have 0 as unit" in {
+  "+" should "have 0 as unit" in {
     forAll(rational) { r => r + zero shouldBe r }
     forAll(rational) { r => zero + r shouldBe r }
   }
 
-  "+() and >" should "be consistent" in {
+  "+ and >" should "be consistent" in {
     forAll(rational, rational) { (l, r) => r < r + l shouldBe l.signum > 0 }
   }
 
-  "-()" should "be correct" in {
+  "-" should "be correct" in {
     zero-zero shouldBe zero
-    oneHalf-minusThreeHalfs shouldBe one*2
+    oneHalf-minusThreeHalfs shouldBe BigRational(2)
   }
 
-  "-()" should "be inverse of +()" in {
+  "-" should "be inverse of +" in {
     forAll(rational) { r => r - r shouldBe zero }
     forAll(rational, rational) { (l, r) => l + r - r shouldBe l }
   }
 
-  "-(), unary_-() and +()" should "be related correctly" in {
+  "-, unary - and +" should "be related correctly" in {
     forAll(rational, rational) { (l, r) => l - r shouldBe l + (-r) }
   }
 
-  "*(Int)" should "be correct" in {
-    zero*3 shouldBe zero
-    oneHalf*(-2) shouldBe -one
-    minusThreeHalfs*2 shouldBe zero-one-one-one
-  }
-
-  "*(BigRational)" should "be correct" in {
+  "*" should "be correct" in {
     zero*zero shouldBe zero
-    oneHalf*oneHalf shouldBe one/4
+    oneHalf*oneHalf shouldBe one/BigRational(4)
     minusThreeHalfs*oneHalf shouldBe BigRational(-3, 4)
   }
 
-  "*(BigRational)" should "be commutative" in {
+  "*" should "be commutative" in {
     forAll(rational, rational) { (l, r) => l * r shouldBe r * l }
   }
 
-  "*(BigRational)" should "have 1 as unit" in {
+  "*" should "have 1 as unit" in {
     forAll(rational) { r => r * one shouldBe r }
     forAll(rational) { r => one * r shouldBe r }
   }
 
-  "/(Int)" should "be correct" in {
-    zero/3 shouldBe zero
-    oneHalf/(-2) shouldBe  BigRational(-1, 4)
-    minusThreeHalfs/2 shouldBe BigRational(-3, 4)
-  }
-
-  "/(BigRational)" should "be correct" in {
+  "/" should "be correct" in {
     assertThrows[ArithmeticException](zero/zero)
     oneHalf/oneHalf shouldBe one
     minusThreeHalfs/oneHalf shouldBe -(one+one+one)
   }
 
-  "/(BigRational)" should "be inverse of *(BigRational)" in {
+  "/" should "be inverse of *" in {
     forAll(rational, nonZeroRational) { (l, r) => l * r / r shouldBe l }
     forAll(nonZeroRational) { r => r / r shouldBe one }
   }
 
-  "/(BigRational), invert() and *(BigRational)" should "be consistent" in {
+  "/, * and invert()" should "be consistent" in {
     forAll(rational, nonZeroRational) { (l, r) => l / r shouldBe l * r.invert }
   }
 
   "whole() and fraction()" should "be correct" in {
+    def mult(r: BigRational, n: Int): BigRational = r * BigRational(n)
     val days: Int = 1
     val hours: Int = 2
     val parts: Int = 3
@@ -197,12 +186,12 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     time.whole shouldBe days
 
     val remainderhp: BigRational = time.fraction
-    (remainderhp*24).whole shouldBe hours
+    mult(remainderhp, 24).whole shouldBe hours
 
-    val remainderp: BigRational = (remainderhp*24).fraction
-    (remainderp*1080).whole shouldBe parts
+    val remainderp: BigRational = mult(remainderhp, 24).fraction
+    mult(remainderp, 1080).whole shouldBe parts
 
-    val remainder: BigRational = (remainderp*1080).fraction
+    val remainder: BigRational = mult(remainderp, 1080).fraction
     remainder.numerator shouldBe 0
 
     zero.whole shouldBe 0
@@ -219,7 +208,7 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     forAll(rational) { r =>
       try {
         BigRational(r.whole) + r.fraction shouldBe r
-      } catch { case e: ArithmeticException => /* whole() is too big */ }
+      } catch { case _: ArithmeticException => /* whole() is too big */ }
     }
   }
 }

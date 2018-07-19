@@ -16,6 +16,7 @@ package org.podval.calendar.numbers
 final case class BigRational private(numerator: BigInt, denominator: BigInt)
   extends Comparable[BigRational] with Ordered[BigRational]
 {
+  // Representation invariants
   require(denominator > 0)
   require(numerator.gcd(denominator) == 1)
 
@@ -46,10 +47,6 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
   )
 
   def /(that: BigRational): BigRational = this * that.invert
-
-  def *(that: Int): BigRational = this * BigRational(that)
-
-  def /(that: Int): BigRational = this / BigRational(that)
 
   def whole: Int = (numerator / denominator).bigInteger.intValueExact
 

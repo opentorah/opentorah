@@ -36,7 +36,7 @@ object Convertible {
     override def signum(value: BigRational): Int = value.signum
     override def abs(value: BigRational): BigRational = value.abs
     override def plus(value: BigRational, that: BigRational): BigRational = value + that
-    override def mult(value: BigRational, n: Int): BigRational = value * n
+    override def mult(value: BigRational, n: Int): BigRational = value * BigRational(n)
     override def whole(value: BigRational): Int = value.whole
     override def fraction(value: BigRational): BigRational = value.fraction
     override def round(value: BigRational): Int = value.round

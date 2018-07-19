@@ -13,7 +13,7 @@ abstract class VectorBase[S <: NumberSystem[S]](digits: Seq[Int])
   final def /(n: Int): S#Vector = /(n, defaultLength)
 
   final def /(n: Int, length: Int): S#Vector =
-    numberSystem.Vector.fromRational(toRational / n, math.max(this.length, length))
+    numberSystem.Vector.fromRational(toRational / BigRational(n), math.max(this.length, length))
 
   final def %(n: Int): S#Vector = %(n, defaultLength)
 
