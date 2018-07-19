@@ -16,7 +16,7 @@
 
 package org.podval.calendar.paper
 
-import org.podval.calendar.angle.AngleNumberSystem.Angle
+import org.podval.calendar.angle.AngleNumberSystem.Rotation
 import org.podval.calendar.astronomy.{MoonAnomalyVisible}
 
 import scala.math.{sin, cos, tan, round}

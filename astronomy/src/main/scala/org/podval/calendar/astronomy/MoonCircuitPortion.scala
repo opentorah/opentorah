@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, Position}
+import org.podval.calendar.angle.AngleNumberSystem.{Rotation, Position}
 import org.podval.calendar.numbers.BigRational
 
 object MoonCircuitPortion {
@@ -16,10 +16,10 @@ object MoonCircuitPortion {
       from2: Zodiac,
       to2: Zodiac
     ): Boolean =
-      ((from1.at(Angle(fromDegrees)) <= moonLongitudeTrue) &&
-       (moonLongitudeTrue < to1.at(Angle(toDegrees)))) ||
-      ((from2.at(Angle(fromDegrees)) <= moonLongitudeTrue) &&
-       (moonLongitudeTrue < to2.at(Angle(toDegrees))))
+      ((from1.at(Rotation(fromDegrees)) <= moonLongitudeTrue) &&
+       (moonLongitudeTrue < to1.at(Rotation(toDegrees)))) ||
+      ((from2.at(Rotation(fromDegrees)) <= moonLongitudeTrue) &&
+       (moonLongitudeTrue < to2.at(Rotation(toDegrees))))
 
     if (in(Aries ,  0, Aries , 20, Libra      , Libra      )) BigRational(2,  5) else
     if (in(Aries , 20, Taurus, 10, Libra      , Scorpio    )) BigRational(1,  3) else

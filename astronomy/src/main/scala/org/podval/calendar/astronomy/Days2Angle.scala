@@ -1,7 +1,7 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angle.AngleNumberSystem
-import AngleNumberSystem.Angle
+import AngleNumberSystem.Rotation
 
 
 /*
@@ -44,16 +44,16 @@ object Days2Angle {
 trait Days2Angle {
   import Days2Angle.{Days, Key}
 
-  def one        : Angle
-  def ten        : Angle
-  def hundred    : Angle
-  def thousand   : Angle
-  def tenThousand: Angle
+  def one        : Rotation
+  def ten        : Rotation
+  def hundred    : Rotation
+  def thousand   : Rotation
+  def tenThousand: Rotation
 
-  def month      : Angle
-  def year       : Angle
+  def month      : Rotation
+  def year       : Rotation
 
-  final def value(key: Key): Angle = key match {
+  final def value(key: Key): Rotation = key match {
     case Key.One         => one
     case Key.Ten         => ten
     case Key.Hundred     => hundred
@@ -63,24 +63,24 @@ trait Days2Angle {
     case Key.Year        => year
   }
 
-  final def calculated(key: Key): Angle = one*key.number
+  final def calculated(key: Key): Rotation = one*key.number
 
-  val almagestValue: Angle
+  val almagestValue: Rotation
 
-  final def calculatedAlmagest(key: Key): Angle = rounder(key)(almagestValue*key.number)
+  final def calculatedAlmagest(key: Key): Rotation = rounder(key)(almagestValue*key.number)
 
-  val rambamValue: Angle
+  val rambamValue: Rotation
 
   // TODO use in calculate(ed)?
-  final def fromValue(value: Angle)(days: Days): Angle = value*days
+  final def fromValue(value: Rotation)(days: Days): Rotation = value*days
 
 
-  def rounder(key: Key): Angle => Angle
+  def rounder(key: Key): Rotation => Rotation
 
   // TODO see if variations in this algorithms are logical: e.g., for 600, add for 1000 and subtract 4*for 100?
   // TODO see if the end result is stable when Rambam's "real" value is used with straight multiplication and rounding
   //   (abstract away the calculation mechaninsm).
-  final def calculate(days: Int): Angle = {
+  final def calculate(days: Int): Rotation = {
     val tenThousands: Int =  days          / 10000
     val thousands   : Int = (days % 10000) /  1000
     val hundreds    : Int = (days %  1000) /   100
@@ -94,7 +94,7 @@ trait Days2Angle {
   }
 
   // TODO rework to produce range for length
-  final def exactify(approximate: Angle, days: Int, angle: Angle): Double = {
+  final def exactify(approximate: Rotation, days: Int, angle: Rotation): Double = {
     val fullRotations = math.floor(days*approximate.toDouble/AngleNumberSystem.headRange.toDouble).toInt
     (AngleNumberSystem.headRange.toDouble*fullRotations + angle.toDegrees)/days
   }

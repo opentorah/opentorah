@@ -9,18 +9,17 @@ trait AngleNumberSystem extends PeriodicNumberSystem[AngleNumberSystem] {
     final override def numberSystem: AngleNumberSystem = AngleNumberSystem.this
   }
 
-  final override type Vector = AngleVectorBase
+  final override type Vector = RotationBase
 
-  // TODO rename Movement? Rotation?
-  final type Angle = Vector
+  final type Rotation = Vector
 
   final override def createVector(digits: Seq[Int]): Vector =
-    new Angle(digits) with AngleNumberSystemMember
+    new Rotation(digits) with AngleNumberSystemMember
 
   final override object Vector extends VectorCompanion[AngleNumberSystem]
-    with AngleNumberCompanion[Angle] with AngleNumberSystemMember
+    with AngleNumberCompanion[Rotation] with AngleNumberSystemMember
 
-  final val Angle = Vector
+  final val Rotation = Vector
 
   final override type Point = PositionBase
 
@@ -64,5 +63,5 @@ object AngleNumberSystem extends AngleNumberSystem {
     final val default = 3
   }
 
-  implicit def angleToRadians(angle: Angle): Double = angle.toRadians
+  implicit def angleToRadians(angle: Rotation): Double = angle.toRadians
 }

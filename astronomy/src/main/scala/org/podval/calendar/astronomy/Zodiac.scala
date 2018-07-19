@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, Position}
+import org.podval.calendar.angle.AngleNumberSystem.{Rotation, Position}
 
 // KH 11:9
 sealed abstract class Zodiac(
@@ -10,13 +10,13 @@ sealed abstract class Zodiac(
   val startDegrees: Int)
 {
   final def start: Position = Position(startDegrees)
-  final def end: Position = (start + Angle(30)).canonical
-  final def middle: Position = (start + Angle(15)).canonical
+  final def end: Position = (start + Rotation(30)).canonical
+  final def middle: Position = (start + Rotation(15)).canonical
 
   final def contains(angle: Position): Boolean = (start <= angle) && (angle < end)
 
-  final def at(angle: Angle): Position = {
-    require(!angle.isNegative && (angle <= Angle(30)))
+  final def at(angle: Rotation): Position = {
+    require(!angle.isNegative && (angle <= Rotation(30)))
     start + angle
   }
 }
@@ -39,7 +39,7 @@ object Zodiac {
     Aries, Taurus, Gemini, Cancer, Leo, Virgo,
     Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
 
-  def fromAngle(rawAngle: Position): (Zodiac, Angle) = {
+  def fromAngle(rawAngle: Position): (Zodiac, Rotation) = {
     val angle: Position = rawAngle.canonical
     val zodiac: Zodiac = inZodiac(rawAngle)
     (zodiac, angle - zodiac.start)

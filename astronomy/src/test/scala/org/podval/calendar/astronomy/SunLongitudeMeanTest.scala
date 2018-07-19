@@ -1,7 +1,7 @@
 package org.podval.calendar.astronomy
 
 import org.scalatest.FlatSpec
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, period}
+import org.podval.calendar.angle.AngleNumberSystem.{Rotation, period}
 import org.podval.calendar.jewish
 
 class SunLongitudeMeanTest extends FlatSpec {
@@ -14,8 +14,8 @@ class SunLongitudeMeanTest extends FlatSpec {
 
   it should "calculate for 29 days in two steps" in {
     assertResult(SunLongitudeMean.month)(SunLongitudeMean.ten*3-SunLongitudeMean.one)
-    assertResult(Angle(28, 35, 1))(SunLongitudeMean.ten*3-SunLongitudeMean.one)
-    assertResult(Angle(28, 34, 58))(SunLongitudeMean.ten*2+SunLongitudeMean.one*9)
+    assertResult(Rotation(28, 35, 1))(SunLongitudeMean.ten*3-SunLongitudeMean.one)
+    assertResult(Rotation(28, 34, 58))(SunLongitudeMean.ten*2+SunLongitudeMean.one*9)
   }
 
   it should "calculate correctly for the regular year" ignore {

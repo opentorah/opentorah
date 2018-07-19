@@ -1,14 +1,14 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.Angle
+import org.podval.calendar.angle.AngleNumberSystem.Rotation
 
 object MoonLongitudeDoubleElongationCorrection {
   // KH 15:2-3
   // TODO Moznaim Rambam, KH 15:2f3: discrepancy in the limits
   // TODO encode the limits
-  def calculate(doubleElongation: Angle): Angle = {
+  def calculate(doubleElongation: Rotation): Rotation = {
     def between(from: Int, to: Int): Boolean =
-      (Angle(from) <= doubleElongation) && (doubleElongation < Angle(to + 1))
+      (Rotation(from) <= doubleElongation) && (doubleElongation < Rotation(to + 1))
 
     val result: Int =
       if (between( 0,  5)) 0 else
@@ -23,6 +23,6 @@ object MoonLongitudeDoubleElongationCorrection {
       if (between(60, 63)) 9 else
         0 // so that Calculator doesn't throw exceptions
 
-    Angle(result)
+    Rotation(result)
   }
 }

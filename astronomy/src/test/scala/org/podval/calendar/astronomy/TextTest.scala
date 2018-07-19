@@ -2,7 +2,7 @@ package org.podval.calendar.astronomy
 
 import org.scalatest.FlatSpec
 import org.podval.calendar.angle.AngleNumberSystem
-import AngleNumberSystem.{Angle, Position, headRange, range}
+import AngleNumberSystem.{Rotation, Position, headRange, range}
 import org.podval.calendar.jewish.{Cycle, Jewish}
 import Jewish.{Day, Month, Year}
 import org.podval.calendar.numbers.BigRational
@@ -24,16 +24,16 @@ class TextTest extends FlatSpec {
     assertResult(Position(0))(Zodiac.Aries.start)
     Zodiac.all.init.zip(Zodiac.all.tail).foreach {
       case (prev: Zodiac, next: Zodiac) =>
-        assertResult(prev.end)(prev.start + Angle(30))
+        assertResult(prev.end)(prev.start + Rotation(30))
         assertResult(next.start)(prev.end)
     }
 
-    assertResult(Zodiac.Gemini  .at(Angle(10, 30, 40)))(Position(70, 30, 40))
-    assertResult(Zodiac.Aquarius.at(Angle(20        )))(Position(320))
+    assertResult(Zodiac.Gemini  .at(Rotation(10, 30, 40)))(Position(70, 30, 40))
+    assertResult(Zodiac.Aquarius.at(Rotation(20        )))(Position(320))
   }
 
   "angles" should "subtract as in KH 11:12" in {
-    assertResult(Position(259, 29, 50))((Position(100, 20, 30) - Angle(200, 50, 40)).canonical)
+    assertResult(Position(259, 29, 50))((Position(100, 20, 30) - Rotation(200, 50, 40)).canonical)
   }
 
   "epoch" should "be as in KH 11:16" in {
@@ -49,7 +49,7 @@ class TextTest extends FlatSpec {
     assertResult(Day.Name.Shabbos)(result.day.name)
     assertResult(100)(result.daysAfterEpoch)
     assertResult(Position(105, 37, 25))(result.sunLongitudeMean)
-    assertResult(Zodiac.Cancer.at(Angle(15, 37, 25)))(result.sunLongitudeMean)
+    assertResult(Zodiac.Cancer.at(Rotation(15, 37, 25)))(result.sunLongitudeMean)
   }
 
   "true Sun calculations" should "be as in KH 13:9-10" in {
@@ -57,9 +57,9 @@ class TextTest extends FlatSpec {
     assertResult(Day.Name.Shabbos)(result.day.name)
     assertResult(Position(105, 37, 25))(result.sunLongitudeMean)
     assertResult(Position(86, 45, 23))(result.sunApogee)
-    assertResult(Angle(18, 52, 2))(result.sunCourseRaw)
-    assertResult(Angle(19))(result.sunCourse)
-    assertResult(-Angle(0, 38))(result.sunLongitudeCorrection)
+    assertResult(Rotation(18, 52, 2))(result.sunCourseRaw)
+    assertResult(Rotation(19))(result.sunCourse)
+    assertResult(-Rotation(0, 38))(result.sunLongitudeCorrection)
     assertResult(Position(104, 59, 25))(result.sunLongitudeTrueRaw)
   }
 
@@ -74,17 +74,17 @@ class TextTest extends FlatSpec {
     assertResult(Position(35, 38, 33))(result.sunLongitudeMean)
     assertResult(Position(53, 36, 39))(result.moonLongitudeMeanAtTimeOfSighting)
     assertResult(Position(103, 21, 46))(result.moonAnomalyMean)
-    assertResult(Angle(17, 58, 6))(result.elongation)
-    assertResult(Angle(35, 56, 12))(result.doubleElongation)
-    assertResult(Angle(5))(result.moonLongitudeDoubleElongationCorrection)
+    assertResult(Rotation(17, 58, 6))(result.elongation)
+    assertResult(Rotation(35, 56, 12))(result.doubleElongation)
+    assertResult(Rotation(5))(result.moonLongitudeDoubleElongationCorrection)
     // TODO printing error in standard editions: 180.
     // assertResult(Position(108, 21))(result.moonAnomalyTrue) // TODO got 108°21′46″
     assertResult(Position(108))(result.moonAnomalyTrue)
     // KH 15:9
-    assertResult(-Angle(5, 1))(result.moonAnomalyVisible)
+    assertResult(-Rotation(5, 1))(result.moonAnomalyVisible)
     // TODO printing error in standard editions: 33.
     assertResult(Position(48, 35, 39))(result.moonLongitudeTrueRaw)
-    assertResult(Zodiac.Taurus.at(Angle(18, 36)))(result.moonLongitudeTrue)
+    assertResult(Zodiac.Taurus.at(Rotation(18, 36)))(result.moonLongitudeTrue)
   }
 
   "moon head calculations" should "be as in KH 16:4-5" in {
@@ -94,59 +94,59 @@ class TextTest extends FlatSpec {
     // KH 16:5
     assertResult(Position(182, 29, 37))(result.moonHeadMeanReversed)
     assertResult(Position(177, 30, 23))(result.moonHeadMeanRaw.canonical)
-    assertResult(Zodiac.Virgo.at(Angle(27, 30)))(result.moonHeadMean.canonical)
+    assertResult(Zodiac.Virgo.at(Rotation(27, 30)))(result.moonHeadMean.canonical)
   }
 
   "interpolation of the lattitude" should "be as in KH 16:12" in {
-    assertResult(Angle(3, 59))(Calculators.Text.moonLatitude(Angle(53)))
+    assertResult(Rotation(3, 59))(Calculators.Text.moonLatitude(Rotation(53)))
   }
 
   "quadranting of the lattitude" should "be as in KH 16:16-18" in {
-    assertResult(Angle(2, 30))(Calculators.Text.moonLatitude(Angle(150)))
-    assertResult(Angle(1, 43))(Calculators.Text.moonLatitude(Angle(200)))
-    assertResult(Angle(4, 20))(Calculators.Text.moonLatitude(Angle(300)))
+    assertResult(Rotation(2, 30))(Calculators.Text.moonLatitude(Rotation(150)))
+    assertResult(Rotation(1, 43))(Calculators.Text.moonLatitude(Rotation(200)))
+    assertResult(Rotation(4, 20))(Calculators.Text.moonLatitude(Rotation(300)))
   }
 
   "moon lattitude calculations" should "be as in KH 16:19" in {
     val result = Calculator.Text.calculate(Year(4938).month(Month.Name.Iyar).day(2))
     assertResult(Day.Name.Shishi)(result.day.name)
-    assertResult(Zodiac.Taurus.at(Angle(18, 36)))(result.moonLongitudeTrue)
-    assertResult(Zodiac.Virgo .at(Angle(27, 30)))(result.moonHeadMean.canonical)
-    assertResult(Angle(231, 6))(result.moonLatitudeCourseRaw)
-    assertResult(Angle(3, 53))(result.moonLatitude)
+    assertResult(Zodiac.Taurus.at(Rotation(18, 36)))(result.moonLongitudeTrue)
+    assertResult(Zodiac.Virgo .at(Rotation(27, 30)))(result.moonHeadMean.canonical)
+    assertResult(Rotation(231, 6))(result.moonLatitudeCourseRaw)
+    assertResult(Rotation(3, 53))(result.moonLatitude)
   }
 
   "arc of sighting calculations" should "be as in KH 17:13-14" in {
     val result = Calculator.Text.calculate(Year(4938).month(Month.Name.Iyar).day(2))
     assertResult(Day.Name.Shishi)(result.day.name)
-    assertResult(Zodiac.Taurus.at(Angle(7, 9)))(result.sunLongitudeTrue)
-    assertResult(Zodiac.Taurus.at(Angle(18, 36)))(result.moonLongitudeTrue)
-    assertResult(Angle( 3, 53))(result.moonLatitude)
+    assertResult(Zodiac.Taurus.at(Rotation(7, 9)))(result.sunLongitudeTrue)
+    assertResult(Zodiac.Taurus.at(Rotation(18, 36)))(result.moonLongitudeTrue)
+    assertResult(Rotation( 3, 53))(result.moonLatitude)
     assertResult(result.moonLatitude)(result.latitude1)
     assertResult(false)(result.isMoonLatitudeNortherly)
-    assertResult(Angle(11, 27))(result.longitude1)
-    assertResult(Angle(1))(result.longitudeSightingAdjustment)
-    assertResult(Angle(10, 27))(result.longitude2)
-    assertResult(Angle( 0, 10))(result.latitudeSightingAdjustment)
-    assertResult(Angle( 4, 3))(result.latitude2)
+    assertResult(Rotation(11, 27))(result.longitude1)
+    assertResult(Rotation(1))(result.longitudeSightingAdjustment)
+    assertResult(Rotation(10, 27))(result.longitude2)
+    assertResult(Rotation( 0, 10))(result.latitudeSightingAdjustment)
+    assertResult(Rotation( 4, 3))(result.latitude2)
     assertResult(BigRational(1, 4))(result.moonCircuitPortion)
-    assertResult(Angle( 1, 1))(result.moonCircuit)
+    assertResult(Rotation( 1, 1))(result.moonCircuit)
     // KH 17:14
-    assertResult(Angle(11, 28))(result.longitude3)
+    assertResult(Rotation(11, 28))(result.longitude3)
     // TODO "this longitude is in Taurus" - but longitude3 isn't, so I get 1/6 instead of 1/5...
     // Am I supposed to look at moonTrueLongitude?!
     assertResult(BigRational(1, 5))(result.moonLongitude3Portion)
-    assertResult(Angle( 2, 18))(result.moonLongitude3Correction)
-    assertResult(Angle(13, 46))(result.longitude4)
-    assertResult(Angle( 2, 35))(result.geographicCorrection)
-    assertResult(Angle(11, 11))(result.arcOfSighting)
+    assertResult(Rotation( 2, 18))(result.moonLongitude3Correction)
+    assertResult(Rotation(13, 46))(result.longitude4)
+    assertResult(Rotation( 2, 35))(result.geographicCorrection)
+    assertResult(Rotation(11, 11))(result.arcOfSighting)
   }
 
   "isSightable calculations" should "be as in KH 17:22" in {
     val result = Calculator.Text.calculate(Year(4938).month(Month.Name.Iyar).day(2))
     assertResult(Day.Name.Shishi)(result.day.name)
-    assertResult(Angle(11, 11))(result.arcOfSighting)
-    assertResult(Angle(11, 27))(result.longitude1)
+    assertResult(Rotation(11, 11))(result.arcOfSighting)
+    assertResult(Rotation(11, 27))(result.longitude1)
     assertResult(true)(result.isMoonSightable)
   }
 }

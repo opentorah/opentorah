@@ -1,28 +1,28 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.Angle
+import org.podval.calendar.angle.AngleNumberSystem.Rotation
 
 object MoonLongitudeMean extends Days2Angle {
   // KH 14:1
-  final override val one        : Angle = Angle( 13, 10, 35)
+  final override val one        : Rotation = Rotation( 13, 10, 35)
   // KH 14:2
-  final override val ten        : Angle = Angle(131, 45, 50)
-  final override val hundred    : Angle = Angle(237, 38, 23)
-  final override val thousand   : Angle = Angle(216, 23, 50)
-  final override val tenThousand: Angle = Angle(  3, 58, 20)
+  final override val ten        : Rotation = Rotation(131, 45, 50)
+  final override val hundred    : Rotation = Rotation(237, 38, 23)
+  final override val thousand   : Rotation = Rotation(216, 23, 50)
+  final override val tenThousand: Rotation = Rotation(  3, 58, 20)
 
-  final override val month      : Angle = Angle( 22,  6, 56)
-  final override val year       : Angle = Angle(344, 26, 43)
+  final override val month      : Rotation = Rotation( 22,  6, 56)
+  final override val year       : Rotation = Rotation(344, 26, 43)
 
-  final override def rounder(key: Days2Angle.Key): Angle => Angle = _.roundToSeconds
+  final override def rounder(key: Days2Angle.Key): Rotation => Rotation = _.roundToSeconds
 
   // TODO does this correspond to the lunar period?
 
   //    val exactInDegrees = 13.176397222222223
-  final override val rambamValue = Angle(13, 10, 35, 1, 48, 1)
+  final override val rambamValue = Rotation(13, 10, 35, 1, 48, 1)
 
   // TODO Moznaim Rambam, KH 13:2f4: (13, 10, 35, 3) -
   // as explanation of the value for 100 days (3 extra seconds)
 
-  final override val almagestValue = Angle(13,10,34,58,33,30,30)
+  final override val almagestValue = Rotation(13,10,34,58,33,30,30)
 }
