@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.Angles.Position
+import org.podval.calendar.angles.Angles.Position
 import org.podval.calendar.numbers.BigRational
 
 object MoonLongitude3Portion {

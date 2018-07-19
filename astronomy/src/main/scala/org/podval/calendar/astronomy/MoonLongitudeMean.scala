@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.Angles.Rotation
+import org.podval.calendar.angles.Angles.Rotation
 
 object MoonLongitudeMean extends Days2Angle {
   // KH 14:1

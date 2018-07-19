@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.Angles
+import org.podval.calendar.angles.Angles
 import Angles.Rotation
 
 

@@ -1,7 +1,7 @@
 package org.podval.calendar.astronomy
 
 import org.scalatest.FlatSpec
-import org.podval.calendar.angle.Angles
+import org.podval.calendar.angles.Angles
 import Angles.{Rotation, Position, headRange, range}
 import org.podval.calendar.jewish.{Cycle, Jewish}
 import Jewish.{Day, Month, Year}

@@ -1,9 +1,9 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.Angles
+import org.podval.calendar.angles.Angles
 import org.podval.calendar.jewish.{Jewish, Seasons}
 import org.podval.calendar.jewish.Jewish.{Moment, Month, Year}
-import org.podval.calendar.angle.Angles.Position
+import org.podval.calendar.angles.Angles.Position
 import org.podval.calendar.numbers.Math
 
 final class SeasonsAstronomical(calculator: Calculator) extends Seasons {

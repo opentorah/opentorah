@@ -1,4 +1,4 @@
-package org.podval.calendar.angle
+package org.podval.calendar.angles
 
 import org.podval.calendar.numbers.PeriodicVector
 

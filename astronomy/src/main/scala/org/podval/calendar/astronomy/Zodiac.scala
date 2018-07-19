@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.Angles.{Rotation, Position}
+import org.podval.calendar.angles.Angles.{Rotation, Position}
 
 // KH 11:9
 sealed abstract class Zodiac(

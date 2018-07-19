@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.Angles
+import org.podval.calendar.angles.Angles
 import org.podval.calendar.jewish.Jewish
 import Jewish.{Year, Day, Month, Moment}
 import org.podval.calendar.numbers.Math
