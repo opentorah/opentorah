@@ -1,14 +1,14 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
+import org.podval.calendar.angle.AngleNumberSystem.{Angle, Position}
 
 // KH 14:5
 object MoonLongitudeAdjustmentForTimeOfSighting {
   // TODO see notes in Moznaim Rambam
   // TODO sun longitude: mean or true?
-  final def calculate(sun: AnglePoint): Angle = {
+  final def calculate(sun: Position): Angle = {
     import Zodiac._
-    def in(from: AnglePoint, to: AnglePoint): Boolean = (from <= sun) && (sun < to)
+    def in(from: Position, to: Position): Boolean = (from <= sun) && (sun < to)
 
     if (in(Pisces     .middle, Aries      .middle))  Angle(0)     else
     if (in(Aries      .middle, Gemini     .start ))  Angle(0, 15) else

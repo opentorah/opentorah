@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
+import org.podval.calendar.angle.AngleNumberSystem.{Angle, Position}
 import org.podval.calendar.numbers.BigRational
 
 trait Calculators {
@@ -12,7 +12,7 @@ trait Calculators {
 
   def moonLongitudeMean: Int => Angle
 
-  def moonLongitudeAdjustmentForTimeOfSighting: AnglePoint => Angle
+  def moonLongitudeAdjustmentForTimeOfSighting: Position => Angle
 
   def moonAnomalyMean: Int => Angle
 
@@ -24,13 +24,13 @@ trait Calculators {
 
   def moonLatitude: Angle => Angle
 
-  def moonLongitudeSightingAdjustment: AnglePoint => Angle
+  def moonLongitudeSightingAdjustment: Position => Angle
 
-  def moonLatitudeSightingAdjustment: AnglePoint => Angle
+  def moonLatitudeSightingAdjustment: Position => Angle
 
-  def moonCircuitPortion: AnglePoint => BigRational
+  def moonCircuitPortion: Position => BigRational
 
-  def moonLongitude3Portion: AnglePoint => BigRational
+  def moonLongitude3Portion: Position => BigRational
 }
 
 
@@ -40,7 +40,7 @@ object Calculators {
     final override def sunApogee: Int => Angle = SunApogee.calculate
     final override def sunLongitudeCorrection: Angle => Angle = SunLongitudeCorrection.table.calculate
     final override def moonLongitudeMean: Int => Angle = MoonLongitudeMean.calculate
-    final override def moonLongitudeAdjustmentForTimeOfSighting: AnglePoint => Angle =
+    final override def moonLongitudeAdjustmentForTimeOfSighting: Position => Angle =
       MoonLongitudeAdjustmentForTimeOfSighting.calculate
     final override def moonAnomalyMean: Int => Angle = MoonAnomalyMean.calculate
     final override def moonLongitudeDoubleElongationCorrection: Angle => Angle =
@@ -48,12 +48,12 @@ object Calculators {
     final override def moonAnomalyVisible: Angle => Angle = MoonAnomalyVisible.table.calculate
     final override def moonHeadMean: Int => Angle = MoonHeadMean.calculate
     final override def moonLatitude: Angle => Angle = MoonLatitude.table.calculate
-    final override def moonLongitudeSightingAdjustment: AnglePoint => Angle =
+    final override def moonLongitudeSightingAdjustment: Position => Angle =
       MoonLongitudeSightingAdjustment.calculate
-    final override def moonLatitudeSightingAdjustment: AnglePoint => Angle =
+    final override def moonLatitudeSightingAdjustment: Position => Angle =
       MoonLatitudeSightingAdjustment.calculate
-    final override def moonCircuitPortion: AnglePoint => BigRational = MoonCircuitPortion.calculate
-    final override def moonLongitude3Portion: AnglePoint => BigRational =
+    final override def moonCircuitPortion: Position => BigRational = MoonCircuitPortion.calculate
+    final override def moonLongitude3Portion: Position => BigRational =
       MoonLongitude3Portion.calculate
   }
 

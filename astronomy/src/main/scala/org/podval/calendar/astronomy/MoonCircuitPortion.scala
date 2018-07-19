@@ -1,12 +1,12 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
+import org.podval.calendar.angle.AngleNumberSystem.{Angle, Position}
 import org.podval.calendar.numbers.BigRational
 
 object MoonCircuitPortion {
 
   // KH 17:10
-  final def calculate(moonLongitudeTrue: AnglePoint): BigRational = {
+  final def calculate(moonLongitudeTrue: Position): BigRational = {
     import Zodiac._
     def in(
       from1: Zodiac,

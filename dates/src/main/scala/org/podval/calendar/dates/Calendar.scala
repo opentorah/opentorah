@@ -44,6 +44,7 @@ trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
 
   final override type Vector = TimeVectorBase[C]
 
+  // TODO rename TimeSpan?
   final type TimeVector = Vector
 
   final override def createVector(digits: Seq[Int]): Vector =

@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
+import org.podval.calendar.angle.AngleNumberSystem.{Angle, Position}
 import org.podval.calendar.jewish.Jewish.Day
 import org.podval.calendar.numbers.BigRational
 
@@ -17,35 +17,35 @@ final class Calculation(
   lazy val daysAfterEpoch: Int = epoch.daysAfterEpoch(day)
 
   // KH 12:2
-  lazy val sunLongitudeMean: AnglePoint =
+  lazy val sunLongitudeMean: Position =
     epoch.sunLongitudeMean + calculators.sunLongitudeMean(daysAfterEpoch)
 
   // KH 12:2
   // TODO Rambam says "the same way", but doesn't give value for 1 day...
-  lazy val sunApogee: AnglePoint = epoch.sunApogee + calculators.sunApogee(daysAfterEpoch)
+  lazy val sunApogee: Position = epoch.sunApogee + calculators.sunApogee(daysAfterEpoch)
 
   // KH 13:1-3,5-6 (maslul; mnas hamaslul)
   def sunCourseRaw: Angle = sunLongitudeMean - sunApogee
   lazy val sunCourse: Angle = rounders.sunCourse(sunCourseRaw)
   lazy val sunLongitudeCorrection: Angle = calculators.sunLongitudeCorrection(sunCourse)
-  def sunLongitudeTrueRaw: AnglePoint = sunLongitudeMean + sunLongitudeCorrection
+  def sunLongitudeTrueRaw: Position = sunLongitudeMean + sunLongitudeCorrection
   // TODO calculate for a moment, not just day.
-  lazy val sunLongitudeTrue: AnglePoint = rounders.sunLongitudeTrue(sunLongitudeTrueRaw)
+  lazy val sunLongitudeTrue: Position = rounders.sunLongitudeTrue(sunLongitudeTrueRaw)
 
   // TODO in KH 13:11, calculation of true solstices/equinoxes is mentioned,
   // but no algorithm is given.
 
-  lazy val moonLongitudeMean: AnglePoint =
+  lazy val moonLongitudeMean: Position =
     epoch.moonLongitudeMean + calculators.moonLongitudeMean(daysAfterEpoch)
 
   lazy val moonLongitudeAdjustmentForTimeOfSighting: Angle =
     calculators.moonLongitudeAdjustmentForTimeOfSighting(sunLongitudeMean)
 
-  lazy val moonLongitudeMeanAtTimeOfSighting: AnglePoint =
+  lazy val moonLongitudeMeanAtTimeOfSighting: Position =
     moonLongitudeMean + moonLongitudeAdjustmentForTimeOfSighting
 
   // KH 14:4
-  lazy val moonAnomalyMean: AnglePoint =
+  lazy val moonAnomalyMean: Position =
     epoch.moonAnomalyMean + calculators.moonAnomalyMean(daysAfterEpoch)
 
   // KH 15:1-3
@@ -56,33 +56,33 @@ final class Calculation(
   lazy val moonLongitudeDoubleElongationCorrection: Angle =
     calculators.moonLongitudeDoubleElongationCorrection(doubleElongation)
 
-  def moonAnomalyTrueRaw: AnglePoint = moonAnomalyMean + moonLongitudeDoubleElongationCorrection
-  lazy val moonAnomalyTrue: AnglePoint = rounders.moonAnomalyTrue(moonAnomalyTrueRaw)
+  def moonAnomalyTrueRaw: Position = moonAnomalyMean + moonLongitudeDoubleElongationCorrection
+  lazy val moonAnomalyTrue: Position = rounders.moonAnomalyTrue(moonAnomalyTrueRaw)
 
   // KH 15:4
   lazy val moonAnomalyVisible: Angle =
     rounders.moonAnomalyVisible(calculators.moonAnomalyVisible(moonAnomalyTrue.toVector))
 
-  def moonLongitudeTrueRaw: AnglePoint = moonLongitudeMeanAtTimeOfSighting + moonAnomalyVisible
-  lazy val moonLongitudeTrue: AnglePoint = rounders.moonLongitudeTrue(moonLongitudeTrueRaw)
+  def moonLongitudeTrueRaw: Position = moonLongitudeMeanAtTimeOfSighting + moonAnomalyVisible
+  lazy val moonLongitudeTrue: Position = rounders.moonLongitudeTrue(moonLongitudeTrueRaw)
 
   // KH 16:3
-  def moonHeadMeanReversed: AnglePoint = epoch.moonHeadMean + calculators.moonHeadMean(daysAfterEpoch)
-  def moonHeadMeanRaw: AnglePoint = -moonHeadMeanReversed
-  lazy val moonHeadMean: AnglePoint = rounders.moonHeadMean(moonHeadMeanRaw)
-  def moonTailMeanRaw: AnglePoint = moonHeadMeanRaw + Angle(180)
-  def moonTailMean: AnglePoint = moonHeadMean + Angle(180)
+  def moonHeadMeanReversed: Position = epoch.moonHeadMean + calculators.moonHeadMean(daysAfterEpoch)
+  def moonHeadMeanRaw: Position = -moonHeadMeanReversed
+  lazy val moonHeadMean: Position = rounders.moonHeadMean(moonHeadMeanRaw)
+  def moonTailMeanRaw: Position = moonHeadMeanRaw + Angle(180)
+  def moonTailMean: Position = moonHeadMean + Angle(180)
 
   // KH 16:10
   def moonLatitudeCourseRaw: Angle = (moonLongitudeTrue - moonHeadMean).canonical
   lazy val moonLatitudeCourse: Angle = rounders.moonLatitudeCourse(moonLatitudeCourseRaw)
   lazy val isMoonLatitudeNortherly: Boolean = moonLatitudeCourse < Angle(180)
-  lazy val moonLatitude: Angle = calculators.moonLatitude(moonLatitudeCourse) // TODO AnglePoint
+  lazy val moonLatitude: Angle = calculators.moonLatitude(moonLatitudeCourse) // TODO Position
 
   // KH 17:1
-  lazy val longitude1: Angle = rounders.longitude1(moonLongitudeTrue - sunLongitudeTrue) // TODO AnglePoint
+  lazy val longitude1: Angle = rounders.longitude1(moonLongitudeTrue - sunLongitudeTrue) // TODO Position
   // KH 17:2
-  lazy val latitude1: Angle = moonLatitude // TODO AnglePoint
+  lazy val latitude1: Angle = moonLatitude // TODO Position
 
   // KH 17:3-4
   lazy val inNortherlyInclinedConstellations: Boolean = Zodiac.in(moonLongitudeTrue, Set(
@@ -92,12 +92,12 @@ final class Calculation(
   // KH 17:5-6
   lazy val longitudeSightingAdjustment: Angle =
     calculators.moonLongitudeSightingAdjustment(moonLongitudeTrue)
-  lazy val longitude2: Angle = rounders.longitude2(longitude1 - longitudeSightingAdjustment) // TODO AnglePoint
+  lazy val longitude2: Angle = rounders.longitude2(longitude1 - longitudeSightingAdjustment) // TODO Position
 
   // KH 17:7-9
   lazy val latitudeSightingAdjustment: Angle =
     calculators.moonLatitudeSightingAdjustment(moonLongitudeTrue)
-  lazy val latitude2: Angle = // TODO AnglePoint
+  lazy val latitude2: Angle = // TODO Position
     if (isMoonLatitudeNortherly) latitude1 - latitudeSightingAdjustment
     else latitude1 + latitudeSightingAdjustment
 
@@ -106,7 +106,7 @@ final class Calculation(
   lazy val moonCircuit: Angle = rounders.moonCircuit(latitude2 * moonCircuitPortion)
 
   // KH 17:11
-  lazy val longitude3: Angle = // TODO AnglePoint
+  lazy val longitude3: Angle = // TODO Position
     rounders.longitude3(if (
       (isMoonLatitudeNortherly && inNortherlyInclinedConstellations) ||
       (!isMoonLatitudeNortherly && !inNortherlyInclinedConstellations)
@@ -118,7 +118,7 @@ final class Calculation(
   /* TODO longitude3.toPoint?*/
   lazy val moonLongitude3Correction: Angle =
     rounders.moonLongitude3Correction(longitude3 * moonLongitude3Portion)
-  lazy val longitude4: Angle = longitude3 + moonLongitude3Correction // TODO AnglePoint
+  lazy val longitude4: Angle = longitude3 + moonLongitude3Correction // TODO Position
 
   // KH 17:12
   lazy val geographicCorrection: Angle =

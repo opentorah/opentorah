@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
+import org.podval.calendar.angle.AngleNumberSystem.{Angle, Position}
 
 // KH 11:9
 sealed abstract class Zodiac(
@@ -9,13 +9,13 @@ sealed abstract class Zodiac(
   val nameHebrew  : String,
   val startDegrees: Int)
 {
-  final def start: AnglePoint = AnglePoint(startDegrees)
-  final def end: AnglePoint = (start + Angle(30)).canonical
-  final def middle: AnglePoint = (start + Angle(15)).canonical
+  final def start: Position = Position(startDegrees)
+  final def end: Position = (start + Angle(30)).canonical
+  final def middle: Position = (start + Angle(15)).canonical
 
-  final def contains(angle: AnglePoint): Boolean = (start <= angle) && (angle < end)
+  final def contains(angle: Position): Boolean = (start <= angle) && (angle < end)
 
-  final def at(angle: Angle): AnglePoint = {
+  final def at(angle: Angle): Position = {
     require(!angle.isNegative && (angle <= Angle(30)))
     start + angle
   }
@@ -39,19 +39,19 @@ object Zodiac {
     Aries, Taurus, Gemini, Cancer, Leo, Virgo,
     Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
 
-  def fromAngle(rawAngle: AnglePoint): (Zodiac, Angle) = {
-    val angle: AnglePoint = rawAngle.canonical
+  def fromAngle(rawAngle: Position): (Zodiac, Angle) = {
+    val angle: Position = rawAngle.canonical
     val zodiac: Zodiac = inZodiac(rawAngle)
     (zodiac, angle - zodiac.start)
   }
 
-  def inZodiac(rawAngle: AnglePoint): Zodiac = {
-    val angle: AnglePoint = rawAngle.canonical
+  def inZodiac(rawAngle: Position): Zodiac = {
+    val angle: Position = rawAngle.canonical
     all.find(_.contains(angle)).get
   }
 
-  def in(rawAngle: AnglePoint, zodiacs: Set[Zodiac]):Boolean = {
-    val angle: AnglePoint = rawAngle.canonical
+  def in(rawAngle: Position, zodiacs: Set[Zodiac]):Boolean = {
+    val angle: Position = rawAngle.canonical
     zodiacs.exists(_.contains(angle))
   }
 }

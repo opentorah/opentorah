@@ -1,11 +1,11 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
+import org.podval.calendar.angle.AngleNumberSystem.{Angle, Position}
 
 object MoonLatitudeSightingAdjustment {
 
   // KH 17:8-9
-  final def calculate(moonLongitudeTrue: AnglePoint): Angle = {
+  final def calculate(moonLongitudeTrue: Position): Angle = {
     import Zodiac._
     inZodiac(moonLongitudeTrue) match {
       case Aries       => Angle(0,  9)

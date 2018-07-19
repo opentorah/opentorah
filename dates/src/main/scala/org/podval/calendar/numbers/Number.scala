@@ -7,6 +7,8 @@ abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[I
 
   def companion: NumberCompanion[S, N]
 
+  // TODO remove in favor of explicit conversions?
+
   def toVector: S#Vector
 
   def toPoint: S#Point

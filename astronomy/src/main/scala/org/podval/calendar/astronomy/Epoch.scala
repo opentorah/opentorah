@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
+import org.podval.calendar.angle.AngleNumberSystem.{Angle, Position}
 import org.podval.calendar.jewish.Jewish.{Day, Month, Year}
 
 trait Epoch {
@@ -8,15 +8,15 @@ trait Epoch {
 
   final def daysAfterEpoch(day: Day): Int = day.number - this.day.number
 
-  def sunLongitudeMean: AnglePoint
+  def sunLongitudeMean: Position
 
-  def sunApogee: AnglePoint
+  def sunApogee: Position
 
-  def moonLongitudeMean: AnglePoint
+  def moonLongitudeMean: Position
 
-  def moonAnomalyMean: AnglePoint
+  def moonAnomalyMean: Position
 
-  def moonHeadMean: AnglePoint
+  def moonHeadMean: Position
 }
 
 
@@ -25,18 +25,18 @@ object Epoch {
     final override val day: Day = Year(4938).month(Month.Name.Nisan).day(3)
 
     // KH 12:2
-    final override def sunLongitudeMean: AnglePoint = Zodiac.Aries.at(Angle(7, 3, 32))
+    final override def sunLongitudeMean: Position = Zodiac.Aries.at(Angle(7, 3, 32))
 
     // KH 12:2
-    final override def sunApogee: AnglePoint = Zodiac.Gemini.at(Angle(26, 45, 8))
+    final override def sunApogee: Position = Zodiac.Gemini.at(Angle(26, 45, 8))
 
     // KH 14:4
-    final override def moonLongitudeMean: AnglePoint = Zodiac.Taurus.at(Angle(1, 14, 43))
+    final override def moonLongitudeMean: Position = Zodiac.Taurus.at(Angle(1, 14, 43))
 
     // KH 14:4
-    final override def moonAnomalyMean: AnglePoint = AnglePoint(84, 28, 42)
+    final override def moonAnomalyMean: Position = Position(84, 28, 42)
 
     // KH 14:4; f7
-    final override def moonHeadMean: AnglePoint = AnglePoint(180, 57, 28)
+    final override def moonHeadMean: Position = Position(180, 57, 28)
   }
 }

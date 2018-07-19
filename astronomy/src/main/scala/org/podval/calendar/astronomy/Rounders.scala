@@ -1,19 +1,19 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angle.AngleNumberSystem.{Angle, AnglePoint}
+import org.podval.calendar.angle.AngleNumberSystem.{Angle, Position}
 
 trait Rounders {
   def sunCourse: Angle => Angle
 
-  def sunLongitudeTrue: AnglePoint => AnglePoint
+  def sunLongitudeTrue: Position => Position
 
-  def moonAnomalyTrue: AnglePoint => AnglePoint
+  def moonAnomalyTrue: Position => Position
 
   def moonAnomalyVisible: Angle => Angle
 
-  def moonLongitudeTrue: AnglePoint => AnglePoint
+  def moonLongitudeTrue: Position => Position
 
-  def moonHeadMean: AnglePoint => AnglePoint
+  def moonHeadMean: Position => Position
 
   def moonLatitudeCourse: Angle => Angle
 
@@ -36,11 +36,11 @@ trait Rounders {
 object Rounders {
   object Text extends Rounders {
     final override def sunCourse: Angle => Angle = _.roundToDegrees // KH 13:9
-    final override def sunLongitudeTrue: AnglePoint => AnglePoint = _.roundToMinutes // KH 13:10
-    final override def moonAnomalyTrue: AnglePoint => AnglePoint = _.roundToDegrees // KH 15:8
-    final override def moonLongitudeTrue: AnglePoint => AnglePoint = _.roundToMinutes // KH 13:10
+    final override def sunLongitudeTrue: Position => Position = _.roundToMinutes // KH 13:10
+    final override def moonAnomalyTrue: Position => Position = _.roundToDegrees // KH 15:8
+    final override def moonLongitudeTrue: Position => Position = _.roundToMinutes // KH 13:10
     final override def moonAnomalyVisible: Angle => Angle = _.roundToMinutes // KH 13:10
-    final override def moonHeadMean: AnglePoint => AnglePoint = _.roundToMinutes // KH 13:10
+    final override def moonHeadMean: Position => Position = _.roundToMinutes // KH 13:10
     final override def moonLatitudeCourse: Angle => Angle = _.roundToDegrees // KH 16:19
     final override def longitude1: Angle => Angle = _.roundToMinutes // KH 13:10
     final override def longitude2: Angle => Angle =  _.roundToMinutes // KH 13:10
@@ -53,11 +53,11 @@ object Rounders {
 
   object Identity extends Rounders {
     final override def sunCourse: Angle => Angle = identity
-    final override def sunLongitudeTrue: AnglePoint => AnglePoint = identity
-    final override def moonAnomalyTrue: AnglePoint => AnglePoint = identity
-    final override def moonLongitudeTrue: AnglePoint => AnglePoint = identity
+    final override def sunLongitudeTrue: Position => Position = identity
+    final override def moonAnomalyTrue: Position => Position = identity
+    final override def moonLongitudeTrue: Position => Position = identity
     final override def moonAnomalyVisible: Angle => Angle = identity
-    final override def moonHeadMean: AnglePoint => AnglePoint = identity
+    final override def moonHeadMean: Position => Position = identity
     final override def moonLatitudeCourse: Angle => Angle = identity
     final override def longitude1: Angle => Angle = identity
     final override def longitude2: Angle => Angle =  identity
