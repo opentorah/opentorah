@@ -7,9 +7,9 @@ trait NumberCompanion[S <: Numbers[S], N <: Number[S, N]] extends NumbersMember[
 
   final def fromDigits(digits: Seq[Int]): N = apply(digits: _*)
 
-  final def from[T: Convertible](value: T, length: Int = numberSystem.defaultLength): N =
-    fromDigits(numberSystem.from[T](value, length))
+  final def from[T: Convertible](value: T, length: Int = numbers.defaultLength): N =
+    fromDigits(numbers.from[T](value, length))
 
-  final def fromRational(value: BigRational, length: Int = numberSystem.defaultLength): N = from[BigRational](value, length)
-  final def fromDouble(value: Double, length: Int = numberSystem.defaultLength): N = from[Double](value, length)
+  final def fromRational(value: BigRational, length: Int = numbers.defaultLength): N = from[BigRational](value, length)
+  final def fromDouble(value: Double, length: Int = numbers.defaultLength): N = from[Double](value, length)
 }

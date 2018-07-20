@@ -35,7 +35,7 @@ trait Number[S <: Numbers[S], N <: Number[S, N]]
   final def length: Int = digits.tail.length
 
   final def canonical: N = {
-    val result: Seq[Int] = numberSystem.withSign(isPositive = true, digits = normal.digits)
+    val result: Seq[Int] = numbers.withSign(isPositive = true, digits = normal.digits)
     // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
     val canonicalDigits: Seq[Int] = result.head +: result.tail.reverse.dropWhile(_ == 0).reverse
     fromDigits(canonicalDigits)
@@ -43,10 +43,10 @@ trait Number[S <: Numbers[S], N <: Number[S, N]]
 
   final def simple: N = {
     val thisNormal: N = this.normal
-    fromDigits(numberSystem.withSign(!thisNormal.isNegative, thisNormal.digits))
+    fromDigits(numbers.withSign(!thisNormal.isNegative, thisNormal.digits))
   }
 
-  final def normal: N = fromDigits(numberSystem.normal(this))
+  final def normal: N = fromDigits(numbers.normal(this))
 
   final def signum: Int = normal.digits.find(_ != 0).map(math.signum).getOrElse(0)
 
@@ -67,16 +67,16 @@ trait Number[S <: Numbers[S], N <: Number[S, N]]
       if (position < length) (0, digit)
       else (if (math.abs(digit) >= range / 2) math.signum(digit) else 0, 0)
 
-    val roundedDigits: Seq[Int] = numberSystem.transform(normal.digits, forDigit, (digit: Int) => digit)
+    val roundedDigits: Seq[Int] = numbers.transform(normal.digits, forDigit, (digit: Int) => digit)
 
     fromDigits(roundedDigits)
   }
 
-  final def to[T: Convertible]: T = numberSystem.to[T](digits)
+  final def to[T: Convertible]: T = numbers.to[T](digits)
   final def toRational: BigRational = to[BigRational]
   final def toDouble: Double = to[Double]
 
-  final def toString(length: Int): String = numberSystem.toString(this.simple, length)
+  final def toString(length: Int): String = numbers.toString(this.simple, length)
 
   override def toString: String = toString(length)
 
@@ -86,7 +86,7 @@ trait Number[S <: Numbers[S], N <: Number[S, N]]
 
   final override def equals(other: Any): Boolean = other match {
     case that: N =>
-      (this.numberSystem == that.numberSystem) && (this.companion == that.companion) && (this.compare(that) == 0)
+      (this.numbers == that.numbers) && (this.companion == that.companion) && (this.compare(that) == 0)
     case _ => false
   }
 

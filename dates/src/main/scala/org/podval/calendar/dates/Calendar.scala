@@ -48,11 +48,11 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   final override def createVector(digits: Seq[Int]): Vector =
     new Digits(digits) with TimeVectorBase[C] { this: Vector =>
-      final override def numberSystem: C = Calendar.this
+      final override def numbers: C = Calendar.this
     }
 
   final override object Vector extends VectorCompanion[C] {
-    override def numberSystem: C = Calendar.this
+    override def numbers: C = Calendar.this
   }
 
   final val TimeVector = Vector

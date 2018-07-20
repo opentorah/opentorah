@@ -5,7 +5,7 @@ import org.podval.calendar.numbers.{Digits, VectorCompanion, NumbersMember,
 
 trait Angles extends PeriodicNumbers[Angles] {
   trait AnglesMember extends NumbersMember[Angles] {
-    final override def numberSystem: Angles = Angles.this
+    final override def numbers: Angles = Angles.this
   }
 
   final override type Vector = RotationBase
