@@ -1,18 +1,19 @@
 package org.podval.calendar.angles
 
-import org.scalatest.FlatSpec
+import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 import Angles.Rotation
 
-class AngleTest extends FlatSpec {
+class AngleTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matchers {
 
   behavior of "Angle"
 
   it should "construct correctly" in {
-    def construction(degrees: Int, minutes: Int) {
+    def construction(degrees: Int, minutes: Int): Unit = {
       val angle = Rotation(degrees, minutes)
-      assertResult(degrees)(angle.degrees)
-      assertResult(minutes)(angle.minutes)
+      angle.degrees shouldBe degrees
+      angle.minutes shouldBe minutes
     }
 
     construction(  5, 34)
@@ -22,9 +23,9 @@ class AngleTest extends FlatSpec {
   }
 
   it should "convert correctly" in {
-    def conversion(degrees: Int, minutes: Int) {
+    def conversion(degrees: Int, minutes: Int): Unit = {
       val angle = Rotation(degrees, minutes)
-      assert(angle == Rotation.fromDegrees(angle.toDegrees, 2))
+      Rotation.fromDegrees(angle.toDegrees, 2) shouldBe angle
     }
 
     conversion(5, 34)
@@ -34,60 +35,60 @@ class AngleTest extends FlatSpec {
   }
 
   it should "round correctly" in {
-    assertResult(Rotation(104, 58, 50))(Rotation(104, 58, 50, 16, 39, 59, 43).roundToSeconds)
-    assertResult(Rotation(0, 31))((Rotation(0, 15, 15)*2).roundToMinutes)
-    assertResult(-Rotation(182, 30))((-Rotation(182, 29, 37)).roundToMinutes)
+    Rotation(104, 58, 50, 16, 39, 59, 43).roundToSeconds shouldBe Rotation(104, 58, 50)
+    (Rotation(0, 15, 15)*2).roundToMinutes shouldBe Rotation(0, 31)
+    (-Rotation(182, 29, 37)).roundToMinutes shouldBe -Rotation(182, 30)
   }
 
   it should "compare correctly" in {
-    assertResult(Rotation(0, 0, 0))(Rotation(-0))
-    assertResult(Rotation(15))(Rotation(15))
-    assertResult(Rotation(15))(Rotation(-345).canonical)
+    Rotation(0, 0, 0) == Rotation(-0) shouldBe true
+    Rotation(15) == Rotation(15) shouldBe true
+    Rotation(15) == Rotation(-345).canonical shouldBe true
   }
 
   it should "normalize and canonicalize correctly" in {
-    assertResult(Rotation(345))(Rotation(345).normal)
-    assertResult(Rotation(-15))(Rotation(-15).normal)
-    assertResult(Rotation(1))(Rotation(721).normal)
-    assertResult(Rotation(-1))(Rotation(-721).normal)
-    assertResult(-Rotation(0, 50))(-Rotation(360, 49, 59, 60).normal)
+    Rotation(345).normal shouldBe Rotation(345)
+    Rotation(-15).normal shouldBe Rotation(-15)
+    Rotation(721).normal shouldBe Rotation(1)
+    Rotation(-721).normal shouldBe Rotation(-1)
+    -Rotation(360, 49, 59, 60).normal shouldBe -Rotation(0, 50)
 
-    assertResult(Rotation(345))(Rotation(345).canonical)
-    assertResult(Rotation(345))(Rotation(-15).canonical)
-    assertResult(Rotation(1))(Rotation(721).canonical)
-    assertResult(Rotation(359))(Rotation(-721).canonical)
+    Rotation(345).canonical shouldBe Rotation(345)
+    Rotation(-15).canonical shouldBe Rotation(345)
+    Rotation(721).canonical shouldBe Rotation(1)
+    Rotation(-721).canonical shouldBe Rotation(359)
 
-    assertResult(Rotation(-15))(Rotation(345).symmetrical)
-    assertResult(Rotation(-15))(Rotation(-15).symmetrical)
-    assertResult(Rotation(1))(Rotation(721).symmetrical)
-    assertResult(Rotation(-1))(Rotation(-721).symmetrical)
+    Rotation(345).symmetrical shouldBe Rotation(-15)
+    Rotation(-15).symmetrical shouldBe Rotation(-15)
+    Rotation(721).symmetrical shouldBe Rotation(1)
+    Rotation(-721).symmetrical shouldBe Rotation(-1)
   }
 
   it should "negate correctly" in {
-    assertResult(Rotation(-3))(-Rotation(3))
-    assertResult(Rotation(0, -3))(-Rotation(0, 3))
+    -Rotation(3) shouldBe Rotation(-3)
+    -Rotation(0, 3) shouldBe Rotation(0, -3)
   }
 
   it should "add and subtract correctly" in {
-    assertResult(Rotation( 30))(Rotation( 30) + Rotation(  0))
-    assertResult(Rotation( 30))(Rotation(  0) + Rotation( 30))
-    assertResult(Rotation(-30))(Rotation(-30) + Rotation(  0))
-    assertResult(Rotation(-30))(Rotation(  0) + Rotation(-30))
-    assertResult(Rotation(  0))(Rotation( 30) + Rotation(-30))
-    assertResult(Rotation(  0))(Rotation(-30) + Rotation( 30))
+    Rotation( 30) + Rotation(  0) shouldBe Rotation( 30)
+    Rotation(  0) + Rotation( 30) shouldBe Rotation( 30)
+    Rotation(-30) + Rotation(  0) shouldBe Rotation(-30)
+    Rotation(  0) + Rotation(-30) shouldBe Rotation(-30)
+    Rotation( 30) + Rotation(-30) shouldBe Rotation(  0)
+    Rotation(-30) + Rotation( 30) shouldBe Rotation(  0)
 
-    assertResult(Rotation( 30))(Rotation( 30) - Rotation(  0))
-    assertResult(Rotation(-30))(Rotation(  0) - Rotation( 30))
-    assertResult(Rotation(-30))(Rotation(-30) - Rotation(  0))
-    assertResult(Rotation( 30))(Rotation(  0) - Rotation(-30))
-    assertResult(Rotation( 60))(Rotation( 30) - Rotation(-30))
-    assertResult(Rotation(-60))(Rotation(-30) - Rotation( 30))
+    Rotation( 30) - Rotation(  0) shouldBe Rotation( 30)
+    Rotation(  0) - Rotation( 30) shouldBe Rotation(-30)
+    Rotation(-30) - Rotation(  0) shouldBe Rotation(-30)
+    Rotation(  0) - Rotation(-30) shouldBe Rotation( 30)
+    Rotation( 30) - Rotation(-30) shouldBe Rotation( 60)
+    Rotation(-30) - Rotation( 30) shouldBe Rotation(-60)
   }
 
   "angles" should "multiply correctly" in {
-    assertResult(Rotation(180))(Rotation(90)*2)
-    assertResult(Rotation(270))(Rotation(90)*3)
-    assertResult(Rotation(360))(Rotation(90)*4)
-    assertResult(Rotation(450))(Rotation(90)*5)
+    Rotation(90)*2 shouldBe Rotation(180)
+    Rotation(90)*3 shouldBe Rotation(270)
+    Rotation(90)*4 shouldBe Rotation(360)
+    Rotation(90)*5 shouldBe Rotation(450)
   }
 }

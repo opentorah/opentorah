@@ -2,7 +2,7 @@ package org.podval.calendar.times
 
 import org.podval.calendar.numbers.{VectorCompanion, NumberSystemMember, PointCompanion}
 
-// For stand-alone testing of the TimeNumberSystem.
+// For stand-alone testing of the Times NumberSystem.
 class SimpleTimes extends Times[SimpleTimes] {
   final override type Point = TimePointBase[SimpleTimes]
   final override type Vector = TimeVectorBase[SimpleTimes]
