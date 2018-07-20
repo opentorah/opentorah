@@ -134,8 +134,12 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     forAll(rational, nonZeroRational) { (l, r) => l / r shouldBe l * r.invert }
   }
 
-  "fraction()" should "be idempotent" in {
-    forAll(rational) { r => r.fraction.fraction shouldBe r.fraction }
+  "fraction()" should "be idempotent where defined" in {
+    forAll(rational) { r =>
+    try {
+        r.fraction.fraction shouldBe r.fraction
+      } catch { case _: ArithmeticException => /* whole() is too big */ }
+    }
   }
 
   "whole()+fraction()" should "be identity where defined" in {
