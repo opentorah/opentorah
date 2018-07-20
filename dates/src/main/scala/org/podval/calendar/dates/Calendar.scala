@@ -3,10 +3,10 @@ package org.podval.calendar.dates
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.Jewish
 import org.podval.calendar.numbers.{VectorCompanion, PointCompanion}
-import org.podval.calendar.time.TimeNumberSystem.hoursPerDay
-import org.podval.calendar.time.{TimeVectorBase, TimeNumberSystem}
+import org.podval.calendar.times.Times.hoursPerDay
+import org.podval.calendar.times.{TimeVectorBase, Times}
 
-trait Calendar[C <: Calendar[C]] extends TimeNumberSystem[C] { this: C =>
+trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   type Year <: YearBase[C]
 

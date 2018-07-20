@@ -1,9 +1,9 @@
-package org.podval.calendar.time
+package org.podval.calendar.times
 
 import org.podval.calendar.numbers.Number
-import TimeNumberSystem.{hoursPerHalfDay, partsPerHalfHour, partsPerMinute}
+import Times.{hoursPerHalfDay, partsPerHalfHour, partsPerMinute}
 
-trait TimeNumber[S <: TimeNumberSystem[S], N <: TimeNumber[S, N]] extends Number[S, N] { this: N =>
+trait Time[S <: Times[S], N <: Time[S, N]] extends Number[S, N] { this: N =>
   final def days: Int = head
 
   final def days(value: Int): N = head(value)

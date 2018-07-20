@@ -1,16 +1,16 @@
-package org.podval.calendar.time
+package org.podval.calendar.times
 
 import org.podval.calendar.numbers.NonPeriodicNumberSystem
 
-trait TimeNumberSystem[S <: TimeNumberSystem[S]] extends NonPeriodicNumberSystem[S] { this: S =>
+trait Times[S <: Times[S]] extends NonPeriodicNumberSystem[S] { this: S =>
   type Point <: TimePointBase[S]
 
   type Vector <: TimeVectorBase[S]
 
   final override def range(position: Int): Int = position match {
-    case 0 => TimeNumberSystem.hoursPerDay
-    case 1 => TimeNumberSystem.partsPerHour
-    case 2 => TimeNumberSystem.momentsPerPart
+    case 0 => Times.hoursPerDay
+    case 1 => Times.partsPerHour
+    case 2 => Times.momentsPerPart
   }
 
   final override def headSign: String = "d"
@@ -27,7 +27,7 @@ trait TimeNumberSystem[S <: TimeNumberSystem[S]] extends NonPeriodicNumberSystem
 }
 
 
-object TimeNumberSystem {
+object Times {
   final val hoursPerDay = 24
   require(hoursPerDay % 2 == 0)
 

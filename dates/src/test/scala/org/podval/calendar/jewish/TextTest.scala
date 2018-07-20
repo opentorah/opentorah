@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.scalatest.FlatSpec
-import org.podval.calendar.time.TimeNumberSystem.{hoursPerDay, hoursPerHalfDay, partsPerHour, momentsPerPart}
+import org.podval.calendar.times.Times.{hoursPerDay, hoursPerHalfDay, partsPerHour, momentsPerPart}
 import Jewish.{Day, Month, Year, TimeVector, range, week}
 import JewishYearCompanion.{normalYear, leapYear}
 import Moon.meanLunarPeriod

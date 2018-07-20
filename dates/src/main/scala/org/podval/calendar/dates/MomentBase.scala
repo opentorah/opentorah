@@ -1,6 +1,6 @@
 package org.podval.calendar.dates
 
-import org.podval.calendar.time.TimePointBase
+import org.podval.calendar.times.TimePointBase
 
 abstract class MomentBase[C <: Calendar[C]](digits: Seq[Int])
   extends TimePointBase[C](digits) with CalendarMember[C]
