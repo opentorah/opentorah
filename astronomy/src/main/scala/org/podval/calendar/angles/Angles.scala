@@ -1,10 +1,10 @@
 package org.podval.calendar.angles
 
-import org.podval.calendar.numbers.{Digits, VectorCompanion, NumberSystemMember,
-  PointCompanion, PeriodicNumberSystem}
+import org.podval.calendar.numbers.{Digits, VectorCompanion, NumbersMember,
+  PointCompanion, PeriodicNumbers}
 
-trait Angles extends PeriodicNumberSystem[Angles] {
-  trait AnglesMember extends NumberSystemMember[Angles] {
+trait Angles extends PeriodicNumbers[Angles] {
+  trait AnglesMember extends NumbersMember[Angles] {
     final override def numberSystem: Angles = Angles.this
   }
 

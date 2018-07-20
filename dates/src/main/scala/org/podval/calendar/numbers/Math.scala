@@ -1,7 +1,7 @@
 package org.podval.calendar.numbers
 
 object Math {
-  final def findZero[S <: NumberSystem[S], T <: NumberSystem[T]]
+  final def findZero[S <: Numbers[S], T <: Numbers[T]]
     (f: S#Point => T#Point, left: S#Point, right: S#Point, length: Int): S#Point =
   {
     val leftValue : T#Point = f(left)
@@ -9,7 +9,7 @@ object Math {
     findZero(f, left, leftValue, leftValue.signum, right, rightValue, rightValue.signum, length)
   }
 
-  private final def findZero[S <: NumberSystem[S], T <: NumberSystem[T]](
+  private final def findZero[S <: Numbers[S], T <: Numbers[T]](
     f: S#Point => T#Point,
     left : S#Point, leftValue : T#Point, leftSignum : Int,
     right: S#Point, rightValue: T#Point, rightSignum: Int,

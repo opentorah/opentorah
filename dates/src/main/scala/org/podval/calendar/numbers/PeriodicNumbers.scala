@@ -1,6 +1,6 @@
 package org.podval.calendar.numbers
 
-trait PeriodicNumberSystem[S <: PeriodicNumberSystem[S]] extends NumberSystem[S] { this: S =>
+trait PeriodicNumbers[S <: PeriodicNumbers[S]] extends Numbers[S] { this: S =>
   type Point <: PeriodicPoint[S]
 
   type Vector <: PeriodicVector[S]

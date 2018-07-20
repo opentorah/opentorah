@@ -1,7 +1,7 @@
 package org.podval.calendar.numbers
 
-trait Number[S <: NumberSystem[S], N <: Number[S, N]]
-  extends Ordered[N] with NumberSystemMember[S]
+trait Number[S <: Numbers[S], N <: Number[S, N]]
+  extends Ordered[N] with NumbersMember[S]
 { this: N =>
   def digits: Seq[Int]
 

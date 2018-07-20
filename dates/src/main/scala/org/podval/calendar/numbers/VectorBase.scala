@@ -1,6 +1,6 @@
 package org.podval.calendar.numbers
 
-trait VectorBase[S <: NumberSystem[S]] extends Number[S, S#Vector]
+trait VectorBase[S <: Numbers[S]] extends Number[S, S#Vector]
 { this: S#Vector =>
   final def +(that: S#Vector): S#Vector = numberSystem.Vector.fromDigits(add(that))
 
@@ -26,12 +26,12 @@ trait VectorBase[S <: NumberSystem[S]] extends Number[S, S#Vector]
   final def *(that: BigRational, length: Int): S#Vector =
     numberSystem.Vector.fromRational(this.toRational*that, length)
 
-  final def *[T <: NumberSystem[T]](that: T#Vector): S#Vector = *(that, defaultLength)
+  final def *[T <: Numbers[T]](that: T#Vector): S#Vector = *(that, defaultLength)
 
-  final def *[T <: NumberSystem[T]](that: T#Vector, length: Int): S#Vector =
+  final def *[T <: Numbers[T]](that: T#Vector, length: Int): S#Vector =
     *(that.toRational, length)
 
-  final def %[T <: NumberSystem[T]](that: S#Vector, length: Int = defaultLength): S#Vector =
+  final def %[T <: Numbers[T]](that: S#Vector, length: Int = defaultLength): S#Vector =
     this - (that * (this / that))
 
   private[this] def defaultLength: Int = numberSystem.defaultLength

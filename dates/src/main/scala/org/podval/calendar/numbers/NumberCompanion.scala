@@ -1,6 +1,6 @@
 package org.podval.calendar.numbers
 
-trait NumberCompanion[S <: NumberSystem[S], N <: Number[S, N]] extends NumberSystemMember[S] {
+trait NumberCompanion[S <: Numbers[S], N <: Number[S, N]] extends NumbersMember[S] {
   val zero: N = apply(0)
 
   def apply(digits: Int*): N

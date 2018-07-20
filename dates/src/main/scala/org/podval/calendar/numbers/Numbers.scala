@@ -2,7 +2,7 @@ package org.podval.calendar.numbers
 
 import Convertible.ConvertibleOps
 
-trait NumberSystem[S <: NumberSystem[S]] { this: S =>
+trait Numbers[S <: Numbers[S]] { this: S =>
 
   type Point <: PointBase[S]
 
