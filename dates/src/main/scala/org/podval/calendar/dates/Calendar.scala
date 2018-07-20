@@ -2,7 +2,7 @@ package org.podval.calendar.dates
 
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.Jewish
-import org.podval.calendar.numbers.{VectorCompanion, PointCompanion}
+import org.podval.calendar.numbers.{Digits, PointCompanion, VectorCompanion}
 import org.podval.calendar.times.Times.hoursPerDay
 import org.podval.calendar.times.{TimeVectorBase, Times}
 
@@ -47,7 +47,7 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
   final type TimeVector = Vector
 
   final override def createVector(digits: Seq[Int]): Vector =
-    new TimeVectorBase[C](digits) { this: Vector =>
+    new Digits(digits) with TimeVectorBase[C] { this: Vector =>
       final override def numberSystem: C = Calendar.this
     }
 

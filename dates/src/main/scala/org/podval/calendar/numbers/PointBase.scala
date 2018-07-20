@@ -1,7 +1,6 @@
 package org.podval.calendar.numbers
 
-abstract class PointBase[S <: NumberSystem[S]](digits: Seq[Int])
-  extends Number[S, S#Point](digits)
+trait PointBase[S <: NumberSystem[S]] extends Number[S, S#Point]
 { this: S#Point =>
   override def companion: NumberCompanion[S, S#Point] = numberSystem.Point
 

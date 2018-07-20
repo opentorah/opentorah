@@ -1,7 +1,7 @@
 package org.podval.calendar.angles
 
-import org.podval.calendar.numbers.{VectorCompanion, NumberSystemMember, PointCompanion,
-  PeriodicNumberSystem}
+import org.podval.calendar.numbers.{Digits, VectorCompanion, NumberSystemMember,
+  PointCompanion, PeriodicNumberSystem}
 
 trait Angles extends PeriodicNumberSystem[Angles] {
   trait AnglesMember extends NumberSystemMember[Angles] {
@@ -13,7 +13,7 @@ trait Angles extends PeriodicNumberSystem[Angles] {
   final type Rotation = Vector
 
   final override def createVector(digits: Seq[Int]): Vector =
-    new Rotation(digits) with AnglesMember
+    new Digits(digits) with Rotation with AnglesMember
 
   final override object Vector extends VectorCompanion[Angles]
     with AngleCompanion[Rotation] with AnglesMember
@@ -25,7 +25,7 @@ trait Angles extends PeriodicNumberSystem[Angles] {
   final type Position = Point
 
   final override def createPoint(digits: Seq[Int]): Point =
-    new Position(digits) with AnglesMember
+    new Digits(digits) with Position with AnglesMember
 
   final override object Point extends PointCompanion[Angles]
     with AngleCompanion[Point] with AnglesMember

@@ -1,7 +1,7 @@
 package org.podval.calendar.gregorian
 
 import org.podval.calendar.dates.{Calendar, CalendarMember}
-import org.podval.calendar.numbers.PointCompanion
+import org.podval.calendar.numbers.{Digits, PointCompanion}
 
 class Gregorian private() extends Calendar[Gregorian] {
 
@@ -39,7 +39,7 @@ class Gregorian private() extends Calendar[Gregorian] {
   final override type Point = GregorianMoment
 
   final override def createPoint(digits: Seq[Int]): Point =
-    new GregorianMoment(digits) with GregorianCalendarMember {
+    new Digits(digits) with GregorianMoment with GregorianCalendarMember {
       final override def numberSystem: Gregorian = calendar
     }
 

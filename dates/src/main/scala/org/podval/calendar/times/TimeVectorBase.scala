@@ -2,8 +2,7 @@ package org.podval.calendar.times
 
 import org.podval.calendar.numbers.VectorBase
 
-abstract class TimeVectorBase[S <: Times[S]](digits: Seq[Int])
-  extends VectorBase[S](digits) with Time[S, S#Vector]
-{
-  this: S#Vector =>
+trait TimeVectorBase[S <: Times[S]]
+  extends VectorBase[S] with Time[S, S#Vector]
+{ this: S#Vector =>
 }

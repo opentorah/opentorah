@@ -1,9 +1,9 @@
 package org.podval.calendar.numbers
 
-abstract class Number[S <: NumberSystem[S], N <: Number[S, N]] (rawDigits: Seq[Int])
+trait Number[S <: NumberSystem[S], N <: Number[S, N]]
   extends Ordered[N] with NumberSystemMember[S]
 { this: N =>
-  val digits: Seq[Int] = if (rawDigits.nonEmpty) rawDigits else Seq(0)
+  def digits: Seq[Int]
 
   def companion: NumberCompanion[S, N]
 
