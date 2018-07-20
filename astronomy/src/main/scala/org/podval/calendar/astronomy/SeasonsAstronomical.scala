@@ -1,9 +1,8 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angles.Angles
+import org.podval.calendar.angles.Angles.{Position, Rotation}
 import org.podval.calendar.jewish.{Jewish, Seasons}
 import org.podval.calendar.jewish.Jewish.{Moment, Month, Year}
-import org.podval.calendar.angles.Angles.Position
 import org.podval.calendar.numbers.Math
 
 final class SeasonsAstronomical(calculator: Calculator) extends Seasons {
@@ -13,10 +12,11 @@ final class SeasonsAstronomical(calculator: Calculator) extends Seasons {
   def tkufasTeves  (year: Year): Moment = tkufa(Zodiac.Capricorn)(year)
 
   private def tkufa(zodiac: Zodiac)(year: Year): Moment = {
-    def f(moment: Moment): Position = (sunLongitudeTrue(moment) - zodiac.start).toPoint.symmetrical
+    def f(moment: Moment): Rotation = (sunLongitudeTrue(moment) - zodiac.start).symmetrical
+    // TODO should this always be Nisan?
     val left: Moment = year.month(Month.Name.Nisan).prev.firstDay.toMoment
     val right: Moment = year.month(Month.Name.Nisan).next.firstDay.toMoment
-    val result: Moment = Math.findZero[Jewish, Angles](f, left, right, 0)
+    val result: Moment = Math.findZero[Jewish, Rotation](f, left, right, 0)
     result
   }
 

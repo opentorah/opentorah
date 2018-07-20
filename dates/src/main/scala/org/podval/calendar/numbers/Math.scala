@@ -1,33 +1,33 @@
 package org.podval.calendar.numbers
 
 object Math {
-  final def findZero[S <: Numbers[S], T <: Numbers[T]]
-    (f: S#Point => T#Point, left: S#Point, right: S#Point, length: Int): S#Point =
-  {
-    val leftValue : T#Point = f(left)
-    val rightValue: T#Point = f (right)
-    findZero(f, left, leftValue, leftValue.signum, right, rightValue, rightValue.signum, length)
-  }
+  import Zeroable.ZeroableOps
 
-  private final def findZero[S <: Numbers[S], T <: Numbers[T]](
-    f: S#Point => T#Point,
-    left : S#Point, leftValue : T#Point, leftSignum : Int,
-    right: S#Point, rightValue: T#Point, rightSignum: Int,
+  final def findZero[S <: Numbers[S], V : Zeroable]
+    (f: S#Point => V, left: S#Point, right: S#Point, length: Int): S#Point =
+    findZero(f, left, f(left), right, f(right), length)
+
+  private final def findZero[S <: Numbers[S], V : Zeroable](
+    f: S#Point => V,
+    left : S#Point, leftValue : V,
+    right: S#Point, rightValue: V,
     length: Int
   ): S#Point = {
+    val leftSignum : Int = leftValue.signum
+    val rightSignum: Int = rightValue.signum
     println(s"$left $leftValue $leftSignum $right $rightValue $rightSignum $length")
     if (leftSignum == 0) left else if (rightSignum == 0) right else {
       require(leftSignum != rightSignum)
       val halfDistance: S#Vector = (right - left) / (2, length+1)
       if (halfDistance.roundTo(length).isZero) left else {
         val middle = left + halfDistance
-        val middleValue: T#Point = f(middle)
+        val middleValue: V = f(middle)
         val middleSignum: Int = middleValue.signum
         if (middleSignum == 0) middle else {
           if (middleSignum == leftSignum)
-            findZero(f, middle, middleValue, middleSignum, right, rightValue, rightSignum, length)
+            findZero(f, middle, middleValue, right, rightValue, length)
           else
-            findZero(f, left, leftValue, leftSignum, middle, middleValue, middleSignum, length)
+            findZero(f, left, leftValue, middle, middleValue, length)
         }
       }
     }
