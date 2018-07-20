@@ -74,6 +74,10 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     forAll(rational) { r => r.abs.abs shouldBe r.abs }
   }
 
+  "0" should "fixed point of unary -" in {
+    -zero shouldBe zero
+  }
+
   "unary -" should "be self-inverse" in {
     forAll(rational) { r => -(-r) shouldBe r }
   }
@@ -117,6 +121,10 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     forAll(rational) { r => one * r shouldBe r }
   }
 
+  "1" should "fixed point of invert()" in {
+    one.invert shouldBe one
+  }
+
   "/" should "be inverse of *" in {
     forAll(rational, nonZeroRational) { (l, r) => l * r / r shouldBe l }
     forAll(nonZeroRational) { r => r / r shouldBe one }
@@ -124,6 +132,10 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
 
   "/, * and invert()" should "be consistent" in {
     forAll(rational, nonZeroRational) { (l, r) => l / r shouldBe l * r.invert }
+  }
+
+  "fraction()" should "be idempotent" in {
+    forAll(rational) { r => r.fraction.fraction shouldBe r.fraction }
   }
 
   "whole()+fraction()" should "be identity where defined" in {
