@@ -13,7 +13,6 @@ final class SeasonsAstronomical(calculator: Calculator) extends Seasons {
   def tkufasTeves  (year: Year): Moment = tkufa(Zodiac.Capricorn)(year)
 
   private def tkufa(zodiac: Zodiac)(year: Year): Moment = {
-    // TODO eliminta the use of toPoint()
     def f(moment: Moment): Position = (sunLongitudeTrue(moment) - zodiac.start).toPoint.symmetrical
     val left: Moment = year.month(Month.Name.Nisan).prev.firstDay.toMoment
     val right: Moment = year.month(Month.Name.Nisan).next.firstDay.toMoment

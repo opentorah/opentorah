@@ -2,7 +2,6 @@ package org.podval.calendar.time
 
 import org.podval.calendar.numbers.NonPeriodicNumberSystem
 
-// TODO rename Times
 trait TimeNumberSystem[S <: TimeNumberSystem[S]] extends NonPeriodicNumberSystem[S] { this: S =>
   type Point <: TimePointBase[S]
 

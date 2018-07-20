@@ -66,7 +66,6 @@ trait NumberSystem[S <: NumberSystem[S]] { this: S =>
     (if (number.isNegative) "-" else "") + result.mkString
   }
 
-  // TODO normalize and chop off trailing zeroes when constructing
   final def normal[N <: Number[S, N]](number: N): Seq[Int] = transform(number.digits, normalDigit, normalHead)
 
   protected final def normalDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =

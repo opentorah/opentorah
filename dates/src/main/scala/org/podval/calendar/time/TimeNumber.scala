@@ -3,7 +3,6 @@ package org.podval.calendar.time
 import org.podval.calendar.numbers.Number
 import TimeNumberSystem.{hoursPerHalfDay, partsPerHalfHour, partsPerMinute}
 
-// TODO rename Time
 trait TimeNumber[S <: TimeNumberSystem[S], N <: TimeNumber[S, N]] extends Number[S, N] { this: N =>
   final def days: Int = head
 
@@ -11,7 +10,6 @@ trait TimeNumber[S <: TimeNumberSystem[S], N <: TimeNumber[S, N]] extends Number
 
   final def day(number: Int): N = days(number-1)
 
-  // TODO define this in Vector as returning Vector etc. and eliminate the use of toVector()
   final def time: S#Vector = days(0).toVector
 
   final def hours: Int = tail(0)
