@@ -10,7 +10,6 @@ object Sun {
   // KH 10:1
   val yearOfRavAda: TimeVector = Cycle.cycleLength / Cycle.yearsInCycle
 
-  // TODO move or remove
 //  val gregorianYear: TimeVector = TimeVector.fromRational(
 //    BigRational(365) +
 //    BigRational(1, 4) -

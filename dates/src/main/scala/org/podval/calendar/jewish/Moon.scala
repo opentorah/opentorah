@@ -3,7 +3,6 @@ package org.podval.calendar.jewish
 import org.podval.calendar.jewish.Jewish.{Moment, TimeVector}
 
 object Moon {
-  // TODO move; merge the rest with Sun into Epoch(s) (and base Seasons on it)
   final def newMoon(number: Int): Moment = firstNewMoon + meanLunarPeriod*(number-1)
 
   // KH 6:3
