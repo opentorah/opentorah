@@ -11,5 +11,4 @@ trait PointBase[S <: Numbers[S]] extends Number[S, S#Point]
   final def -(that: S#Point): S#Vector = numbers.Vector.fromDigits(subtract(that))
 
   final override def toVector: S#Vector = this - numbers.Point()
-  final override def toPoint: S#Point = this
 }

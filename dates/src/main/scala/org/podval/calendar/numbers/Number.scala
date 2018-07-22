@@ -9,8 +9,6 @@ trait Number[S <: Numbers[S], N <: Number[S, N]]
 
   def toVector: S#Vector
 
-  def toPoint: S#Point
-
   protected final def fromDigits(digits: Seq[Int]): N = companion.fromDigits(digits)
 
   final def head: Int = get(0)

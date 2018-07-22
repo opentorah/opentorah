@@ -38,5 +38,4 @@ trait VectorBase[S <: Numbers[S]] extends Number[S, S#Vector]
 
   final override def companion: NumberCompanion[S, S#Vector] = numbers.Vector
   final override def toVector: S#Vector = this
-  final override def toPoint: S#Point = numbers.Point() + this
 }
