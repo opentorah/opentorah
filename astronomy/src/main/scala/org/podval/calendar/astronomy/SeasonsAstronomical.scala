@@ -5,6 +5,7 @@ import org.podval.calendar.jewish.{Jewish, Seasons}
 import org.podval.calendar.jewish.Jewish.{Moment, Month, Year}
 import org.podval.calendar.numbers.Math
 
+// In KH 13:11, calculation of true solstices/equinoxes is mentioned, but no algorithm is given.
 final class SeasonsAstronomical(calculator: Calculator) extends Seasons {
   def tkufasNisan  (year: Year): Moment = tkufa(Zodiac.Aries    )(year)
   def tkufasTammuz (year: Year): Moment = tkufa(Zodiac.Cancer   )(year)
