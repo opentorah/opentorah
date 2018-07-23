@@ -78,14 +78,13 @@ trait Number[S <: Numbers[S], N <: Number[S, N]]
 
   override def toString: String = toString(length)
 
-  final def compare(that: N): Int =
+  final override def compare(that: N): Int =
     zipWith(this.simple.digits, that.simple.digits, _ compare _).find (_ != 0).getOrElse(0)
 
 
-  final override def equals(other: Any): Boolean = other match {
-    case that: N =>
-      (this.numbers == that.numbers) && (this.companion == that.companion) && (this.compare(that) == 0)
-    case _ => false
+  final override def equals(other: Any): Boolean = other.isInstanceOf[Number[_, _]] && {
+    val that: N = other.asInstanceOf[N]
+    (this.numbers == that.numbers) && (this.companion == that.companion) && (this.compare(that) == 0)
   }
 
   final override def hashCode: Int = canonical.digits.hashCode
