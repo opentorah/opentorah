@@ -31,13 +31,13 @@ trait Numbers[S <: Numbers[S]] { this: S =>
 
   final def to[T: Convertible](digits: Seq[Int]): T =
     digits.zip(ranges(digits.length-1) :+ 0).foldLeft((Convertible[T].zero, BigInt(1))) {
-      case ((acc: T, denominator: BigInt), (digit: Int, range: Int)) =>
+      case ((acc, denominator: BigInt), (digit: Int, range: Int)) =>
         (acc + Convertible[T].div(digit, denominator), denominator*range)
     }._1
 
   final def from[T : Convertible](value: T, length: Int): Seq[Int] = {
-    val (digits: Seq[Int], lastValue: T) = ranges(length).foldLeft((Seq.empty[Int], value.abs)) {
-      case ((acc: Seq[Int], value: T), range: Int) => (acc :+ value.whole, value.fraction * range)
+    val (digits: Seq[Int], lastValue) = ranges(length).foldLeft((Seq.empty[Int], value.abs)) {
+      case ((acc: Seq[Int], v), range: Int) => (acc :+ v.whole, v.fraction * range)
     }
 
     (digits :+ lastValue.round).map(value.signum*_)
