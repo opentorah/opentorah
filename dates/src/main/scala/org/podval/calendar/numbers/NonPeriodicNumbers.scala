@@ -1,13 +1,8 @@
 package org.podval.calendar.numbers
 
+// TODO introduce NonPeriodicPoint/Vector - or remove NonPeriodicNumbers...
 trait NonPeriodicNumbers[S <: NonPeriodicNumbers[S]] extends Numbers[S] { this: S =>
   type Point <: PointBase[S]
 
   type Vector <: VectorBase[S]
-
-  protected final override def normalHead(value: Int): Int = value
-
-  protected final override def positiveHead(value: Int): Int = value
-
-  protected final override def negativeHead(value: Int): Int = value
 }

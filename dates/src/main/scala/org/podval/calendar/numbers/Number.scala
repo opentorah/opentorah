@@ -33,7 +33,7 @@ trait Number[S <: Numbers[S], N <: Number[S, N]]
   final def length: Int = digits.tail.length
 
   final def canonical: N = {
-    val result: Seq[Int] = numbers.withSign(isPositive = true, digits = normal.digits)
+    val result: Seq[Int] = withSign(isPositive = true, digits = normal.digits)
     // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
     val canonicalDigits: Seq[Int] = result.head +: result.tail.reverse.dropWhile(_ == 0).reverse
     fromDigits(canonicalDigits)
@@ -41,10 +41,30 @@ trait Number[S <: Numbers[S], N <: Number[S, N]]
 
   final def simple: N = {
     val thisNormal: N = this.normal
-    fromDigits(numbers.withSign(!thisNormal.isNegative, thisNormal.digits))
+    fromDigits(withSign(!thisNormal.isNegative, thisNormal.digits))
   }
 
-  final def normal: N = fromDigits(numbers.normal(this))
+  private def withSign(isPositive: Boolean, digits: Seq[Int]): Seq[Int] = numbers.transform(digits,
+    if (isPositive) positiveDigit else negativeDigit,
+    if (isPositive) positiveHead else negativeHead
+  )
+
+  protected final def normalDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
+    (digit / digitRange, digit % digitRange)
+
+  protected def normalHead(value: Int): Int
+
+  protected final def positiveDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
+    if (digit >= 0) (0, digit) else (-1, digit + digitRange)
+
+  protected def positiveHead(value: Int): Int
+
+  protected final def negativeDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
+    if (digit <= 0) (0, digit) else (1, digit - digitRange)
+
+  protected def negativeHead(value: Int): Int
+
+  final def normal: N = fromDigits(numbers.transform(digits, normalDigit, normalHead))
 
   final def signum: Int = normal.digits.find(_ != 0).map(math.signum).getOrElse(0)
 

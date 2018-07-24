@@ -66,28 +66,6 @@ trait Numbers[S <: Numbers[S]] { this: S =>
     (if (number.isNegative) "-" else "") + result.mkString
   }
 
-  final def normal[N <: Number[S, N]](number: N): Seq[Int] = transform(number.digits, normalDigit, normalHead)
-
-  protected final def normalDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
-    (digit / digitRange, digit % digitRange)
-
-  protected def normalHead(value: Int): Int
-
-  def withSign(isPositive: Boolean, digits: Seq[Int]): Seq[Int] = transform(digits,
-    if (isPositive) positiveDigit else negativeDigit,
-    if (isPositive) positiveHead else negativeHead
-  )
-
-  protected final def positiveDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
-    if (digit >= 0) (0, digit) else (-1, digit + digitRange)
-
-  protected def positiveHead(value: Int): Int
-
-  protected final def negativeDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
-    if (digit <= 0) (0, digit) else (1, digit - digitRange)
-
-  protected def negativeHead(value: Int): Int
-
   final def transform(
     digits: Seq[Int],
     forDigit: (Int, Int, Int) => (Int, Int),
