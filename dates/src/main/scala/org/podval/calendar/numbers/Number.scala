@@ -44,6 +44,8 @@ trait Number[S <: Numbers[S], N <: Number[S, N]]
     fromDigits(withSign(!thisNormal.isNegative, thisNormal.digits))
   }
 
+  final def normal: N = fromDigits(numbers.transform(digits, normalDigit, normalHead))
+
   private def withSign(isPositive: Boolean, digits: Seq[Int]): Seq[Int] = numbers.transform(digits,
     if (isPositive) positiveDigit else negativeDigit,
     if (isPositive) positiveHead else negativeHead
@@ -63,8 +65,6 @@ trait Number[S <: Numbers[S], N <: Number[S, N]]
     if (digit <= 0) (0, digit) else (1, digit - digitRange)
 
   protected def negativeHead(value: Int): Int
-
-  final def normal: N = fromDigits(numbers.transform(digits, normalDigit, normalHead))
 
   final def signum: Int = normal.digits.find(_ != 0).map(math.signum).getOrElse(0)
 
