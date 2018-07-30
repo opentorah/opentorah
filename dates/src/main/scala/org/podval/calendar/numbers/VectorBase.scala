@@ -36,6 +36,5 @@ trait VectorBase[S <: Numbers[S]] extends Number[S, S#Vector]
 
   private[this] def defaultLength: Int = numbers.defaultLength
 
-  final override def companion: NumberCompanion[S, S#Vector] = numbers.Vector
   final override def toVector: S#Vector = this
 }

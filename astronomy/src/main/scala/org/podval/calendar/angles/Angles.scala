@@ -12,11 +12,11 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final type Rotation = Vector
 
-  final override def createVector(digits: Seq[Int]): Vector =
-    new Digits(digits) with Rotation with AnglesMember
-
-  final override object Vector extends VectorCompanion[Angles]
-    with AngleCompanion[Rotation] with AnglesMember
+  final override object Vector extends VectorCompanion[Angles] with AngleCompanion[Rotation] with AnglesMember {
+    override def apply(digits: Int*): Vector = new Digits(digits) with Rotation {
+      final override def companion: VectorCompanion[Angles] = Vector
+    }
+  }
 
   final val Rotation = Vector
 
@@ -24,11 +24,11 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final type Position = Point
 
-  final override def createPoint(digits: Seq[Int]): Point =
-    new Digits(digits) with Position with AnglesMember
-
-  final override object Point extends PointCompanion[Angles]
-    with AngleCompanion[Point] with AnglesMember
+  final override object Point extends PointCompanion[Angles] with AngleCompanion[Point] with AnglesMember {
+    override def apply(digits: Int*): Point = new Digits(digits) with Position {
+      final override def companion: PointCompanion[Angles] = Point
+    }
+  }
 
   final val Position = Point
 

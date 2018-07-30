@@ -6,13 +6,9 @@ trait Numbers[S <: Numbers[S]] { this: S =>
 
   type Point <: PointBase[S]
 
-  def createPoint(digits: Seq[Int]): Point
-
   val Point: PointCompanion[S]
 
   type Vector <: VectorBase[S]
-
-  def createVector(digits: Seq[Int]): Vector
 
   val Vector: VectorCompanion[S]
 

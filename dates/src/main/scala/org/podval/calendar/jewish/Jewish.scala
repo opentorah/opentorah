@@ -38,13 +38,11 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Point = JewishMoment
 
-  final override def createPoint(digits: Seq[Int]): Point =
-    new Digits(digits) with JewishMoment with JewishCalendarMember {
-      final override def numbers: Jewish = calendar
+  final override object Point extends PointCompanion[Jewish] {
+    override def numbers: Jewish = Jewish.this
+    override def apply(digits: Int*): Point = new Digits(digits) with JewishMoment {
+      final override def companion: PointCompanion[Jewish] = Point
     }
-
-  final override object Point extends PointCompanion[Jewish] with JewishCalendarMember {
-    override def numbers: Jewish = calendar
   }
 }
 
