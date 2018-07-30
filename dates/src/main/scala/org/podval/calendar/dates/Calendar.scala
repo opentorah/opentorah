@@ -10,8 +10,6 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   type Year <: YearBase[C]
 
-  def createYear(number: Int): Year
-
   type YearCharacter
 
   val Year: YearCompanion[C]
@@ -20,8 +18,6 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   type MonthName
 
-  def createMonth(number: Int): Month
-
   type MonthNameAndLength = MonthNameAndLengthBase[C]
 
   type MonthDescriptor = MonthDescriptorBase[C]
@@ -29,8 +25,6 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
   val Month: MonthCompanion[C]
 
   type Day <: DayBase[C]
-
-  def createDay(number: Int): Day
 
   type DayName
 

@@ -1,5 +1,7 @@
 package org.podval.calendar.dates
 
-trait CalendarMember[C <: Calendar[C]] {
-  def calendar: C
+import org.podval.calendar.numbers.NumbersMember
+
+trait CalendarMember[C <: Calendar[C]] extends NumbersMember[C] {
+  final def calendar: C = numbers
 }

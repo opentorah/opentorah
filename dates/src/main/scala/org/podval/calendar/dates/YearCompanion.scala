@@ -4,8 +4,7 @@ package org.podval.calendar.dates
   *
   */
 abstract class YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
-  final def apply(number: Int): C#Year =
-    calendar.createYear(number)
+  def apply(number: Int): C#Year
 
   final def apply(month: C#Month): C#Year =
     apply(calendar.Month.yearNumber(month.number))
