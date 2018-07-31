@@ -8,6 +8,10 @@ import org.podval.calendar.times.{TimeVectorBase, Times}
 
 trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
+  trait AbstractCalendarMember extends CalendarMember[C] {
+    final override def numbers: C = Calendar.this
+  }
+
   type Year <: YearBase[C]
 
   type YearCharacter
@@ -40,9 +44,8 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   final type TimeVector = Vector
 
-  final override object Vector extends VectorCompanion[C] {
-    override def numbers: C = Calendar.this
-    override def apply(digits: Int*): Vector = new Digits(digits) with TimeVectorBase[C] {
+  final override object Vector extends VectorCompanion[C] with AbstractCalendarMember  {
+    override def apply(digits: Int*): Vector = new Digits(digits) with TimeVectorBase[C] with AbstractCalendarMember {
       final override def companion: VectorCompanion[C] = Vector
     }
   }

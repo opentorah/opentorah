@@ -11,7 +11,7 @@ class SimpleTimes extends Times[SimpleTimes] {
   final override type Point = TimePointBase[SimpleTimes]
 
   final override object Point extends PointCompanion[SimpleTimes] with SimpleTimesMember {
-    override def apply(digits: Int*): Point = new Digits(digits) with TimePointBase[SimpleTimes] {
+    override def apply(digits: Int*): Point = new Digits(digits) with TimePointBase[SimpleTimes] with SimpleTimesMember {
       final override def companion: PointCompanion[SimpleTimes] = Point
     }
   }
@@ -19,11 +19,10 @@ class SimpleTimes extends Times[SimpleTimes] {
   final override type Vector = TimeVectorBase[SimpleTimes]
 
   final override object Vector extends VectorCompanion[SimpleTimes] with SimpleTimesMember {
-    override def apply(digits: Int*): Vector = new Digits(digits) with TimeVectorBase[SimpleTimes] {
+    override def apply(digits: Int*): Vector = new Digits(digits) with TimeVectorBase[SimpleTimes] with SimpleTimesMember {
       final override def companion: VectorCompanion[SimpleTimes] = Vector
     }
   }
 }
-
 
 object SimpleTimes extends SimpleTimes

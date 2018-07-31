@@ -1,11 +1,9 @@
 package org.podval.calendar.numbers
 
-trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] { this: N =>
+trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with NumbersMember[S] { this: N =>
   def digits: Seq[Int]
 
   def companion: NumberCompanion[S, N]
-
-  final def numbers: S = companion.numbers
 
   def toVector: S#Vector
 
