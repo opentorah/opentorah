@@ -1,8 +1,6 @@
 package org.podval.calendar.numbers
 
-trait PeriodicVectorCompanion[S <: PeriodicNumbers[S]] extends VectorCompanion[S]
-  // TODO #56: Vector shouldn't be periodic: ... with NonPeriodicNumberCompanion[S, S#Vector]
-{
+trait PeriodicVectorCompanion[S <: PeriodicNumbers[S]] extends VectorCompanion[S] {
   final override def normalHead(value: Int): Int = headDigit(normalDigit, value)
 
   protected final override def positiveHead(value: Int): Int = headDigit(positiveDigit, value)
