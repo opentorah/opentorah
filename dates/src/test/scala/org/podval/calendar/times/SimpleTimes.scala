@@ -1,6 +1,7 @@
 package org.podval.calendar.times
 
-import org.podval.calendar.numbers.{Digits, NumbersMember, PointCompanion, VectorCompanion}
+import org.podval.calendar.numbers.{Digits, NumbersMember, PointCompanion, VectorCompanion,
+  NonPeriodicPointCompanion, NonPeriodicVectorCompanion}
 
 // For stand-alone testing of Times.
 class SimpleTimes extends Times[SimpleTimes] {
@@ -10,7 +11,7 @@ class SimpleTimes extends Times[SimpleTimes] {
 
   final override type Point = TimePointBase[SimpleTimes]
 
-  final override object Point extends PointCompanion[SimpleTimes] with SimpleTimesMember {
+  final override object Point extends NonPeriodicPointCompanion[SimpleTimes] with SimpleTimesMember {
     override def apply(digits: Int*): Point = new Digits(digits) with TimePointBase[SimpleTimes] with SimpleTimesMember {
       final override def companion: PointCompanion[SimpleTimes] = Point
     }
@@ -18,7 +19,7 @@ class SimpleTimes extends Times[SimpleTimes] {
 
   final override type Vector = TimeVectorBase[SimpleTimes]
 
-  final override object Vector extends VectorCompanion[SimpleTimes] with SimpleTimesMember {
+  final override object Vector extends NonPeriodicVectorCompanion[SimpleTimes] with SimpleTimesMember {
     override def apply(digits: Int*): Vector = new Digits(digits) with TimeVectorBase[SimpleTimes] with SimpleTimesMember {
       final override def companion: VectorCompanion[SimpleTimes] = Vector
     }

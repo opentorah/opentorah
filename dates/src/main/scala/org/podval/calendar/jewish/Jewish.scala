@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.{Calendar, CalendarMember}
-import org.podval.calendar.numbers.{Digits, PointCompanion}
+import org.podval.calendar.numbers.{Digits, NonPeriodicPointCompanion, PointCompanion}
 
 class Jewish private() extends Calendar[Jewish] {
 
@@ -35,7 +35,7 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Point = JewishMoment
 
-  final override object Point extends PointCompanion[Jewish] with JewishCalendarMember {
+  final override object Point extends NonPeriodicPointCompanion[Jewish] with JewishCalendarMember {
     override def apply(digits: Int*): Point = new Digits(digits) with JewishMoment with JewishCalendarMember {
       final override def companion: PointCompanion[Jewish] = Point
     }
