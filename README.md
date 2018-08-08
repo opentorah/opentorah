@@ -22,13 +22,12 @@ I want to do certain things with the astronomical calendar as described by Ramba
 in Chapters 11-19:
 
 - [ ] code Rambam's calculations (and verify Rambam's numerical examples)
-- [ ] reconstruct actual parameters from the numbers given by Rambam
 - [ ] verify Rambam's tables and rounding decisions against his models
 - [ ] analyze impact of various misprints on the sighting calculations 
 - [ ] analyze correspondence with the fixed calendar
 - [ ] reconstruct models that Rambam uses, in contemporary (ancient Greek?) terminology and notation
 - [ ] describe the models with diagrams and formulae
-- [ ] reconstruct parameters of the models from the numbers given by Rambam 
+- [ ] reconstruct actual parameters of the models from the numbers given by Rambam 
 - [ ] see how Rambam's calculations of the moon visibility compare to the current models
 - [ ] translate relevant chapters into English
 - [ ] calculate halachic times (zmanim)
