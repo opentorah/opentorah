@@ -1,7 +1,7 @@
-package org.podval.calendar.generate
+package org.podval.calendar.generate.rambam
 
+import org.podval.calendar.generate.{Formatter, Schedule}
 import org.podval.calendar.jewish.Jewish.{Year, Month, Day}
-
 
 /**
  * Generate Rambam study schedule for Sefer HaMitzvos
