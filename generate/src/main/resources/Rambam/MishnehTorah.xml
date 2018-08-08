@@ -1,0 +1,36 @@
+<structure>
+    <part chapters="3">
+        <names>
+            <name lang="ru">Предисловие аффтора</name>
+            <name lang="en">Introduction by Rambam OBM</name>
+        </names>
+    </part>
+    <part chapters="3">
+        <names>
+            <name lang="ru">Список повелевающих заповедей</name>
+        </names>
+    </part>
+    <part chapters="3">
+        <names>
+            <name lang="ru">Список запрещающих заповедей</name>
+        </names>
+    </part>
+    <part chapters="3">
+        <names>
+            <name lang="ru">Оглавление</name>
+        </names>
+    </part>
+
+    <book n="1">
+        <names>
+            <name lang="ru">Книга Знания</name>
+        </names>
+        <part n="1" chapters="10">
+            <names>
+                <name lang="ru">Законы основ Торы</name>
+            </names>
+        </part>
+
+        <!-- И далее в том же духе -->
+    </book>
+</structure>
