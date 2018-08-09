@@ -1,15 +1,45 @@
 package org.podval.calendar.generate.chumash
 
-import Parsha.{AchareiMot, Metzora, Tzav, Nitzavim, Vayelech}
-import org.podval.calendar.jewish.Jewish.{Year, Month, Day}
+import org.podval.calendar.dates.Calendar
+import org.podval.calendar.jewish.Jewish.{Day, Month, Year}
+import org.podval.calendar.jewish.SpecialDay
+import Parsha._
 
-case class Readings(parsha: Parsha, secondParsha: Option[Parsha])
+case class Readings(parsha: Parsha, secondParsha: Option[Parsha] = None)
 
 /**
   * Determine weekly portion read on a given Shabbos.
   * Source of rules: Shulchan Aruch, Orach Chayim, Laws of New Month, Chapter 428.
   */
 object Readings {
+
+  val fromBereishitToKiTisa: Seq[Readings] = Seq(
+    Bereshit, Noach, LechLecha, Vayeira, ChayeiSarah, Toledot, Vayetze, Vayishlach, Vayeshev, Miketz, Vayigash, Vayechi,
+    Shemot, Vaeira, Bo, Beshalach, Yitro, Mishpatim, Terumah, Tetzaveh, KiTisa
+  ).map(Readings(_))
+
+  // Will this ever be in the standard library?
+  def unfold[A, B](start: A)(f: A => Option[(A, B)]): Stream[B] =
+    f(start).map { case (a, b) => b #:: unfold(a)(f) }.getOrElse(Stream.empty)
+
+  def allShabbotim(year: Year): Seq[Day] = unfold(year.firstDay.next(Day.Name.Shabbos)) { shabbos =>
+    val next = shabbos + Calendar.daysPerWeek
+    if (next.year != year) None else Some(next, shabbos)
+  }.toList
+
+  def daysWhenRegularParshaIsNotRead(year: Year, inHolyLand: Boolean): Seq[Day] = Seq(
+    SpecialDay.RoshHashanah,
+    SpecialDay.YomKippur,
+    SpecialDay.Sukkot,
+    SpecialDay.Pesach,
+    SpecialDay.Shavuot
+  ).flatMap(_.days(year, inHolyLand))
+
+  // TODO drop until Shabbos Breshit from which we start
+  def shabbotimWhenRegularParshaIsRead(year: Year, inHolyLand: Boolean): Seq[Day] = {
+    val exclude: Seq[Day] = daysWhenRegularParshaIsNotRead(year, inHolyLand)
+    allShabbotim(year).filterNot(exclude.contains)
+  }
 
   def forDay(day: Day): Readings = {
     val year = day.year
@@ -29,35 +59,35 @@ object Readings {
       val number: Int = numberOfShabbosAfterShabbos(shabbos, shabbosBereshit(year))
 
       if (combineVayakhelAndPekudei && (number == 22)) Readings(
-          parsha = Parsha.Vayakhel,
-          secondParsha = if (combineVayakhelAndPekudei) Some(Parsha.Pekudei) else None
+          parsha = Vayakhel,
+          secondParsha = if (combineVayakhelAndPekudei) Some(Pekudei) else None
       ) else {
         val parsha: Parsha = number match {
-          case  1 => Parsha.Bereshit
-          case  2 => Parsha.Noach
-          case  3 => Parsha.LechLecha
-          case  4 => Parsha.Vayeira
-          case  5 => Parsha.ChayeiSarah
-          case  6 => Parsha.Toledot
-          case  7 => Parsha.Vayetze
-          case  8 => Parsha.Vayishlach
-          case  9 => Parsha.Vayeshev
-          case 10 => Parsha.Miketz
-          case 11 => Parsha.Vayigash
-          case 12 => Parsha.Vayechi
-          case 13 => Parsha.Shemot
-          case 14 => Parsha.Vaeira
-          case 15 => Parsha.Bo
-          case 16 => Parsha.Beshalach
-          case 17 => Parsha.Yitro
-          case 18 => Parsha.Mishpatim
-          case 19 => Parsha.Terumah
-          case 20 => Parsha.Tetzaveh
-          case 21 => Parsha.KiTisa
-          case 22 => Parsha.Vayakhel
-          case 23 => Parsha.Pekudei
+          case  1 => Bereshit
+          case  2 => Noach
+          case  3 => LechLecha
+          case  4 => Vayeira
+          case  5 => ChayeiSarah
+          case  6 => Toledot
+          case  7 => Vayetze
+          case  8 => Vayishlach
+          case  9 => Vayeshev
+          case 10 => Miketz
+          case 11 => Vayigash
+          case 12 => Vayechi
+          case 13 => Shemot
+          case 14 => Vaeira
+          case 15 => Bo
+          case 16 => Beshalach
+          case 17 => Yitro
+          case 18 => Mishpatim
+          case 19 => Terumah
+          case 20 => Tetzaveh
+          case 21 => KiTisa
+          case 22 => Vayakhel
+          case 23 => Pekudei
         }
-        Readings(parsha = parsha, secondParsha = None)
+        Readings(parsha = parsha)
       }
     } else
 
@@ -72,15 +102,9 @@ object Readings {
 
   def shabbosBereshit(year: Year): Day = shabbosAfter(simchasTorah(year))
 
-  def passover(year: Year): Day = year.month(Month.Name.Nisan).day(15)
+  def shabbosBeforePassover(year: Year): Day = shabbosBefore(SpecialDay.Pesach.start(year))
 
-  def shavuot(year: Year): Day = year.month(Month.Name.Sivan).day(6)
-
-  def tishaBeAv(year: Year): Day = year.month(Month.Name.Av).day(9)
-
-  def shabbosBeforePassover(year: Year): Day = shabbosBefore(passover(year))
-
-  def shabbosBeforeShavuot(year: Year): Day = shabbosBefore(shavuot(year))
+  def shabbosBeforeShavuot(year: Year): Day = shabbosBefore(SpecialDay.Shavuot.start(year))
 
   def shabbosBefore(day: Day): Day = day.prev.prev(Day.Name.Shabbos)
 
@@ -117,8 +141,10 @@ object Readings {
 
   def main(args: Array[String]): Unit = {
     val year = Year(5778)
-    val beforePassover: Day = shabbosBeforePassover(year)
-    println(beforePassover)
-    println(forDay(beforePassover))
+    shabbotimWhenRegularParshaIsRead(year, false).foreach(println)
+
+//    val beforePassover: Day = shabbosBeforePassover(year)
+//    println(beforePassover)
+//    println(forDay(beforePassover))
   }
 }
