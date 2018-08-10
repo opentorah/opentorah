@@ -36,7 +36,7 @@ object SpecialDay {
   case object ShminiAtzeretAndSimchatTorahInHolyLand extends SpecialDayBase(Tishrei, 22)
 
   case object ShabbosBereshit extends SpecialDay {
-    override def apply(year: Year): Day = shabbosAfter(SimchatTorah(year))
+    override def apply(year: Year): Day = SimchatTorah(year).next(Day.Name.Shabbos)
   }
 
   case object Hanukkah extends SpecialDayBase(Kislev, 25)
@@ -78,11 +78,6 @@ object SpecialDay {
   case object FastOfTammuz extends  SpecialDayBase(Tammuz, 17)
 
   case object TishaBav extends SpecialDayBase(Av, 9)
-
-
-  def shabbosBefore(day: Day): Day = day.prev.prev(Day.Name.Shabbos)
-
-  def shabbosAfter(day: Day): Day = day.next.next(Day.Name.Shabbos)
 
 
   val festivals: Seq[SpecialDayBase] = Seq(
