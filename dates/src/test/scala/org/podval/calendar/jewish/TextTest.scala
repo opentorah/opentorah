@@ -1,6 +1,6 @@
 package org.podval.calendar.jewish
 
-import org.scalatest.FlatSpec
+import org.scalatest.{FlatSpec, Matchers}
 import org.podval.calendar.times.Times.{hoursPerDay, hoursPerHalfDay, partsPerHour, momentsPerPart}
 import Jewish.{Day, Month, Year, TimeVector, range, week}
 import JewishYearCompanion.{normalYear, leapYear}
@@ -10,26 +10,26 @@ import Sun.{yearOfShmuel, yearOfRavAda}
 /**
  * Tests based on the statements from the text itself.
  */
-class TextTest extends FlatSpec {
+class TextTest extends FlatSpec with Matchers {
   "time units" should "be as in KH 6:2" in {
-    assertResult(  24)(hoursPerDay)
-    assertResult(  24)(range(0))
-    assertResult(  12)(hoursPerHalfDay)
-    assertResult(1080)(partsPerHour)
-    assertResult(1080)(range(1))
-    assertResult(0)(partsPerHour % 2)
-    assertResult(0)(partsPerHour % 4)
-    assertResult(0)(partsPerHour % 8)
-    assertResult(0)(partsPerHour % 3)
-    assertResult(0)(partsPerHour % 6)
-    assertResult(0)(partsPerHour % 9)
-    assertResult(0)(partsPerHour % 10)
-    assertResult(76)(momentsPerPart)
-    assertResult(76)(range(2))
+    hoursPerDay shouldBe 24
+    range(0) shouldBe 24
+    hoursPerHalfDay shouldBe 12
+    partsPerHour shouldBe 1080
+    range(1) shouldBe 1080
+    partsPerHour % 2 shouldBe 0
+    partsPerHour % 4 shouldBe 0
+    partsPerHour % 8 shouldBe 0
+    partsPerHour % 3 shouldBe 0
+    partsPerHour % 6 shouldBe 0
+    partsPerHour % 9 shouldBe 0
+    partsPerHour % 10 shouldBe 0
+    momentsPerPart shouldBe 76
+    range(2) shouldBe 76
   }
 
   "mean lunar period" should "be as in KH 6:3" in {
-    assertResult(TimeVector().days(29).hours(12).parts(793))(meanLunarPeriod)
+    meanLunarPeriod shouldBe TimeVector().days(29).hours(12).parts(793)
   }
 
   "year lengths" should "be as in KH 6:4" in {
