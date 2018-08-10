@@ -4,7 +4,6 @@ import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.jewish.SpecialDay
 import Parsha._
-import Day.Name.Shabbos
 
 case class Readings(parsha: Parsha, secondParsha: Option[Parsha] = None)
 
@@ -18,32 +17,38 @@ case class Readings(parsha: Parsha, secondParsha: Option[Parsha] = None)
   */
 object Readings {
 
-  private def single(parshas: Parsha*): Seq[Readings] = parshas.map(Readings(_))
+  private abstract class Segment(val max: Int, combinable: Int) {
+    final def min: Int = max - combinable
+
+    final def isLengthAllowed(length: Int): Boolean = min <= length && length <= max
+
+    final def zip(weeks: Seq[Day]): Seq[(Day, Readings)] = {
+      val length = weeks.length
+
+      require(isLengthAllowed(length), s"length $length is not between $min and $max")
+
+      val readings = get(max - length)
+      require(readings.length == length)
+
+      weeks zip readings
+    }
+
+    protected def get(needToCombine: Int): Seq[Readings]
+
+    protected final def single(parshas: Parsha*): Seq[Readings] = parshas.map(Readings(_))
+  }
 
   def readings(year: Year, inHolyLand: Boolean): Seq[(Day, Readings)] = {
     val all = weeks(year, inHolyLand)
 
     //    Перед Шавуот читают Бемидбар
     //    Перед 9 ава или в сам 9 ава - Дварим
-    val shabbosBeforeShavuot = SpecialDay.Shavuot(year).prev.prev(Shabbos)
-    val (beforeBemidbar, bemidbarAndAfter) = all.partition(_ < shabbosBeforeShavuot)
-    val afterBemidbar = bemidbarAndAfter.tail
-    val shabbosBeforeOrOnTishaBeAv = SpecialDay.TishaBav(year).prev(Shabbos)
-    val (betweenBemidbarAndDevarim, devarimAndAfter) = afterBemidbar.partition(_ < shabbosBeforeOrOnTishaBeAv)
-    val afterDevarim = devarimAndAfter.tail
+    val shabbosBeforeShavuot = SpecialDay.Shavuot(year).prev.prev(Day.Name.Shabbos)
+    val shabbosBeforeOrOnTishaBeAv = SpecialDay.TishaBav(year).prev(Day.Name.Shabbos)
 
-    zip(beforeBemidbar, segmentBeforeBemidbar) ++
-    Seq(shabbosBeforeShavuot -> Readings(Bemidbar)) ++
-    zip(betweenBemidbarAndDevarim, segmentBetweenBemidbarAndDevarim) ++
-    Seq(shabbosBeforeOrOnTishaBeAv -> Readings(Devarim)) ++
-    zip(afterDevarim, segmentAfterDevarim)
-  }
-
-  private def zip(weeks: Seq[Day], segment: Int => Seq[Readings]): Seq[(Day, Readings)] = {
-    val length: Int = weeks.length
-    val readings: Seq[Readings] = segment(length)
-    require(readings.length == length)
-    weeks zip readings
+    beforeBemidbar.zip(all.takeWhile(_ < shabbosBeforeShavuot)) ++
+    fromBemidbarUntilDevarim.zip(all.dropWhile(_ < shabbosBeforeShavuot).takeWhile(_ < shabbosBeforeOrOnTishaBeAv)) ++
+    fromDevarim.zip(all.dropWhile(_ < shabbosBeforeOrOnTishaBeAv) )
   }
 
   /**
@@ -55,95 +60,63 @@ object Readings {
     * @return  Shabbos days when regular Parsha is read
     */
   def weeks(year: Year, inHolyLand: Boolean): Seq[Day] = {
-    val exclude: Seq[Day] = SpecialDay.festivals(inHolyLand).map(_(year))
+    // Since the cycle goes into next year, we need to exclude the festivals and
+    // intermediate days until next Simchat Torah.
+    val exclude: Seq[Day] =
+      SpecialDay.festivals(inHolyLand).map(_(year)) ++
+      SpecialDay.festivals(inHolyLand).map(_(year+1))
 
     // TODO unfold flavour [A, A]
-    unfold(SpecialDay.ShabbosBereshit(year)) { shabbos => Some(shabbos + Calendar.daysPerWeek, shabbos) }
+    val result = unfold(SpecialDay.ShabbosBereshit(year)) { shabbos => Some(shabbos + Calendar.daysPerWeek, shabbos) }
     .takeWhile(_ < SpecialDay.ShabbosBereshit(year+1))
     .filterNot(exclude.contains)
     .toList
+
+    result
   }
 
-  private def segmentBeforeBemidbar(length: Int): Seq[Readings] = {
-    // In this segment there are 33 portions and 4 combining pairs;
-    // it can deliver lengths from 29 to 33.
-    verifyLength(length, 29, 33)
+  private object beforeBemidbar extends Segment(33, 4) {
+    protected override def get(needToCombine: Int): Seq[Readings] = {
+      val (combinePekudei, combineBeforeBemidbar) =
+        if (needToCombine == 4) (true, 3)
+        else (false, needToCombine)
 
-    val needToCombine = 33-length
-    val (combinePekudei, combineBeforeBemidbar) =
-      if (needToCombine == 4) (true, 3)
-      else (false, needToCombine)
-
-    single(
-      Bereshit, Noach, LechLecha, Vayeira, ChayeiSarah, Toledot,
-      Vayetze, Vayishlach, Vayeshev, Miketz, Vayigash, Vayechi,
-      Shemot, Vaeira, Bo, Beshalach, Yitro, Mishpatim,
-      Terumah, Tetzaveh, KiTisa
-    ) ++
-    combineIf(combinePekudei, Vayakhel, Pekudei) ++
-    single(Vayikra, Tzav, Shemini) ++
-    combineIf(combineBeforeBemidbar >= 3, Tazria, Metzora) ++
-    combineIf(combineBeforeBemidbar >= 2, AchareiMot, Kedoshim) ++
-    single(Emor) ++
-    combineIf(combineBeforeBemidbar >= 1, Behar, Bechukotai)
+      single(
+        Bereshit, Noach, LechLecha, Vayeira, ChayeiSarah, Toledot,
+        Vayetze, Vayishlach, Vayeshev, Miketz, Vayigash, Vayechi,
+        Shemot, Vaeira, Bo, Beshalach, Yitro, Mishpatim,
+        Terumah, Tetzaveh, KiTisa
+      ) ++
+      combineIf(combinePekudei, Vayakhel, Pekudei) ++
+      single(Vayikra, Tzav, Shemini) ++
+      combineIf(combineBeforeBemidbar >= 3, Tazria, Metzora) ++
+      combineIf(combineBeforeBemidbar >= 2, AchareiMot, Kedoshim) ++
+      single(Emor) ++
+      combineIf(combineBeforeBemidbar >= 1, Behar, Bechukotai)
+    }
   }
 
-  private def segmentBetweenBemidbarAndDevarim(length: Int): Seq[Readings] = {
-    // In this segment there are 9 portions and 2 combining pairs;
-    // it can deliver lengths from 7 to 9.
-    verifyLength(length, 7, 9)
-
-    val combineBeforeDevarim = 9-length
-
-    single(Naso, Behaalotecha, Shlach, Korach) ++
-    combineIf(combineBeforeDevarim >= 2, Chukat, Balak) ++
-    single(Pinchas) ++
-    combineIf(combineBeforeDevarim >= 1, Matot, Masei)
+  private object fromBemidbarUntilDevarim extends Segment(10, 2) {
+    protected override def get(needToCombine: Int): Seq[Readings] = {
+      single(Bemidbar, Naso, Behaalotecha, Shlach, Korach) ++
+      combineIf(needToCombine >= 2, Chukat, Balak) ++
+      single(Pinchas) ++
+      combineIf(needToCombine >= 1, Matot, Masei)
+    }
   }
 
-  private def segmentAfterDevarim(length: Int): Seq[Readings] = {
-    // In this segment there are 10 portions and 1 combining pairs;
-    // it can deliver lengths from 9 to 10.
-    verifyLength(length, 9, 10)
-
-    val combineVayelech: Boolean = length < 10
-
-    single(Vaetchanan, Eikev, Reeh, Shoftim, KiTeitzei, KiTavo) ++
-    combineIf(combineVayelech, Nitzavim, Vayelech) ++
-    single(Haazinu, VZotHaBerachah)
-  }
-
-  private def verifyLength(length: Int, from: Int, to: Int): Unit = {
-    require(from <= length && length <= to, s"length $length is not between $from and $to")
+  private object fromDevarim extends Segment(10, 1) {
+    protected override def get(needToCombine: Int): Seq[Readings] = {
+      single(Devarim, Vaetchanan, Eikev, Reeh, Shoftim, KiTeitzei, KiTavo) ++
+      combineIf(needToCombine > 0, Nitzavim, Vayelech) ++
+      single(Haazinu)
+      // VZotHaBerachah is read on Simchat Torah, and thus is not included in the regular schedule
+    }
   }
 
   private def combineIf(condition: Boolean, parsha: Parsha, secondParsha: Parsha): Seq[Readings] =
     if (condition) Seq(Readings(parsha, Some(secondParsha)))
     else Seq(Readings(parsha), Readings(secondParsha))
-
-
-
-//  def beforePassover(year: Year): Parsha = if (!year.isLeap) Tzav else {
-//    val roshHaShonohOnChamishi: Boolean = SpecialDay.RoshHashanah(year).name == Day.Name.Chamishi
-//    val bothCheshvanAndKislevFullOrLacking = year.kind != Year.Kind.Regular
-//    if (roshHaShonohOnChamishi && bothCheshvanAndKislevFullOrLacking) AchareiMot else Metzora
-//  }
-
-//  def beforeRoshHaShonoh(year: Year): Readings = {
-//    val roshHaShonohDay: Day.Name = SpecialDay.RoshHashanah(year).name
-//    val roshHaShonohOnSheniOrShlishi: Boolean =
-//      (roshHaShonohDay == Day.Name.Sheni) || (roshHaShonohDay == Day.Name.Shlishi)
-//    Readings(
-//      parsha = Nitzavim,
-//      secondParsha = if (roshHaShonohOnSheniOrShlishi) None else Some(Vayelech)
-//    )
-//  }
-
-  def main(args: Array[String]): Unit = {
-    val year = Year(5778)
-//    weeks(year, inHolyLand = false).foreach(println)
-    readings(year, inHolyLand = false).foreach(println)
-  }
 
   // Will this *ever* be in the standard library?
   def unfold[A, B](start: A)(f: A => Option[(A, B)]): Stream[B] =
