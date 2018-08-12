@@ -36,7 +36,7 @@ object SpecialDay {
   case object ShminiAtzeretAndSimchatTorahInHolyLand extends SpecialDayBase(Tishrei, 22)
 
   case object ShabbosBereshit extends SpecialDay {
-    override def apply(year: Year): Day = SimchatTorah(year).next(Day.Name.Shabbos)
+    override def apply(year: Year): Day = shabbosAfter(SimchatTorah(year))
   }
 
   case object Hanukkah extends SpecialDayBase(Kislev, 25)
@@ -134,4 +134,8 @@ object SpecialDay {
   // TODO for generating Siddur, we need a list of days when Tachanun is not said;
   // also, when Av Harachamim is not said on Shabbos (by the way, when Tisha Bav is on Shabbos, it *is* said,
   // although we wouldn't have said Tachanun if it wasn't Shabbos...)
+
+  def shabbosAfter(day: Day): Day = day.next.next(Day.Name.Shabbos)
+
+  def shabbosBefore(day: Day): Day = day.prev.prev(Day.Name.Shabbos)
 }

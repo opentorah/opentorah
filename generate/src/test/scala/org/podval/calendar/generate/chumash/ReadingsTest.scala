@@ -21,42 +21,36 @@ class ReadingsTest extends FlatSpec with Matchers {
       val year = Year(number)
       println(year)
 
-      val readings = Readings.readings(year, inHolyLand = false)
-      val readingsInHolyLand = Readings.readings(year, inHolyLand = true)
-
-      verifyShabbosBeforePesach(year, readings)
-
-      // TODO in the Holy Land sometimes Vayikra is read on Shabbos before Pesach;
-      // either my algorithm is wrong - or Shulchan Oruch is only talking about Diaspora...
-      // verifyShabbosBeforePesach(year, readingsInHolyLand)
-
-      // verifyVayelech(year, readings)
+//      verify(year, inHolyLand = false)
+      verify(year, inHolyLand = true)
     }
   }
 
-  def verifyShabbosBeforePesach(year: Year, readings: Seq[(Day, Readings)]): Unit = {
-    val shabbosBeforePesach = SpecialDay.Pesach(year).prev.prev(Day.Name.Shabbos)
-    val readingsBeforePesach: Readings = findReadings(readings, shabbosBeforePesach)
+  def verify(year: Year, inHolyLand: Boolean): Unit = {
+    val readings: Seq[(Day, Readings)] = Readings.readings(year, inHolyLand)
+
+    def findReadings(day: Day): Readings = readings.find(_._1 == day).get._2
+    def isCombined(parsha: Parsha): Boolean = readings.exists(_._2.secondParsha.contains(parsha))
+
+    val readingsBeforePesach: Readings = findReadings(SpecialDay.shabbosBefore(SpecialDay.Pesach(year)))
     readingsBeforePesach.isCombined shouldBe false
-    val correctParsha: Parsha = if (!year.isLeap) Tzav else {
+    // TODO in the Holy Land sometimes Vayikra is read on Shabbos before Pesach;
+    // either my algorithm is wrong - or Shulchan Oruch is only talking about Diaspora...
+    readingsBeforePesach.parsha shouldBe (if (!year.isLeap) Tzav else {
       val roshHaShonohOnChamishi: Boolean = SpecialDay.RoshHashanah(year).name == Day.Name.Chamishi
       val bothCheshvanAndKislevFullOrLacking = year.kind != Year.Kind.Regular
       if (roshHaShonohOnChamishi && bothCheshvanAndKislevFullOrLacking) AchareiMot else Metzora
-    }
-    readingsBeforePesach.parsha shouldBe correctParsha
+    })
+
+    val readingsBeforeShavuot = findReadings(SpecialDay.shabbosBefore(SpecialDay.Shavuot(year)))
+    readingsBeforeShavuot.isCombined shouldBe false
+    val parshaBeforeShavuot = readingsBeforeShavuot.parsha
+    (parshaBeforeShavuot == Bemidbar || parshaBeforeShavuot == Naso) shouldBe true
+
+    findReadings(SpecialDay.shabbosAfter(SpecialDay.TishaBav(year))) shouldBe Readings(Vaetchanan)
+
+    findReadings(SpecialDay.shabbosBefore(SpecialDay.RoshHashanah(year+1))).parsha shouldBe Nitzavim
+    val roshHaShanahDay: Day.Name = SpecialDay.RoshHashanah(year+1).name
+    isCombined(Vayelech) shouldBe (roshHaShanahDay != Day.Name.Sheni) && (roshHaShanahDay != Day.Name.Shlishi)
   }
-
-  def verifyVayelech(year: Year, readings: Seq[(Day, Readings)]): Unit = {
-    val roshHaShonohDay: Day.Name = SpecialDay.RoshHashanah(year+1).name
-    val roshHaShonohOnSheniOrShlishi: Boolean =
-      (roshHaShonohDay == Day.Name.Sheni) || (roshHaShonohDay == Day.Name.Shlishi)
-
-    isCombined(readings, Vayelech) shouldBe roshHaShonohOnSheniOrShlishi
-  }
-
-  def findReadings(readings: Seq[(Day, Readings)], day: Day): Readings =
-    readings.find(_._1 == day).get._2
-
-  def isCombined(readings: Seq[(Day, Readings)], parsha: Parsha): Boolean =
-    readings.exists(_._2.secondParsha.contains(parsha))
 }

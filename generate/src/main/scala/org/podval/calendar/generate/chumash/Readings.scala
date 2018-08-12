@@ -13,9 +13,57 @@ case class Readings(parsha: Parsha, secondParsha: Option[Parsha] = None) {
   * Determine weekly portion read on a given Shabbos.
   * Source: Shulchan Aruch, Orach Chayim, Laws of New Month, Chapter 428.
   *
-  * verified: SimchasTorah doesn't fall on Shabbos, so Shabbos Breshit is the same here and there
+  * Based on limitations on the day of the week Hoshanah Rabbah can fall on (as given in 428:1),
+  * Simchat Torah can't fall on Shabbos, so definition of Shabbat Breshit as Shabbat after Simchat Torah
+  * is correct both for the Holy Land and the Diaspora.
   *
   */
+/*
+  Shulchan Aruch, Orach Chayim, Laws of New Month, 428:4.
+
+  We always read "Tzav at Aharon" before Pesach in a non-leap year and Metzorah in a leap year
+  except when Rosh Hashanah is on Thursday and
+  the year is lacking and leap (Ramo: or full and leap) [Magen Avraham: thus, any leap year]
+  when we read "Acharei Mot" before Pesach;
+
+  we always read "Bemidbar Sinai" before Shavuot;
+
+  Tisha Be Av is before (we read) Vaetchanan;
+
+  "Atem Nitzavim" (we read) before Rosh HaShanah;
+  because of this, when Rosh HaShanah is on Monday or Tuesday,
+  so that there are 2 Saturdays between Rosh HaShanah and Sukkot,
+  we have to separate Nitzavim and Vayelech and to read Vayelech between
+  Rosh HaShanah and Yom Kippur and Haazinu between Yom Kippur and Sukkot;
+  mnemonics: King [Magen Avraham: Rosh HaShanah, when we say "The King of Judgement"] on 2 or 3 - split Vayelech;
+  but when Rosh HaShanah is Thursday or Friday [when, according to 428:1, it can not be?],
+  there is only 1 Saturday between Rosh HaShanah and Sukkot,
+  and we read Haazinu on it,
+  then (we read) Vayelech together with Nitzavim before Rosh HaShanah.
+
+  Mnemonics:
+    for non-leap year: commanded [Magen Avraham: Tzav, "command"], then Pesach;
+    for leap year: segregated [Magen Avraham: Metzorah, segregation of a leper], then Pesach;
+
+    get counted [Magen Avraham: Bemidbar, census], then stop [Magen Avraham: Shavuot, "stopping"]
+
+    fast [Magen Avraham: 9th of Av], then pray [Magen Avraham: Vaetchanan]
+
+    stand up [Magen Avraham: Nitzavim, "standing"], then sound (the Shofar) [Magen Avraham: Rosh HaShanah]
+
+
+  NOTES:
+
+  Criterion for when Acharei Mot is read on a leap year on Saturday before Pesach (when Rosh Ha Shanah is on Thursday)
+  is given by the Mechaber as "the year is lacking"; Ramo adds "or full"; Magen Avraham says "any leap year" - which is
+  strange, since there are regular (not full nor lacking) leap years.
+
+  Once reading for Shabbat after Tisha Be Av is fixed to be Vaetchanan, reading for Shabbat before next Rosh Ha Shanah
+  is *guaranteed* to include Nitzavim (there is no adjustments that can be made anyway), so motivation the choice of
+  Nitzavim for this reading brought by the commentators seems somewhat post-hoc :)
+  Criteria for cobining Nitzavim and Vayelech are also satisfied automatically - with the caveat that one scenario when
+  they should be combined - Rosh Ha Shanah on Friday - is prohibited by 428:1.
+ */
 object Readings {
 
   def readings(year: Year, inHolyLand: Boolean): Seq[(Day, Readings)] = {
@@ -31,27 +79,27 @@ object Readings {
       .filterNot(festivals.contains)
       .toList
 
-    val shabbosBeforeShavuot = SpecialDay.Shavuot(year).prev.prev(Day.Name.Shabbos)
+    val shabbosBeforeShavuot = SpecialDay.shabbosBefore(SpecialDay.Shavuot(year))
     val weeksBeforeShavuot: Int = weeks.takeWhile(_ < shabbosBeforeShavuot).length
 
-    val shabbosBeforeOrOnTishaBeAv = SpecialDay.TishaBav(year).prev(Day.Name.Shabbos)
-    val weeksFromShavuotToTishaBeAv: Int = weeks.takeWhile(_ < shabbosBeforeOrOnTishaBeAv).length - weeksBeforeShavuot
+    val shabbosAfterTishaBeAv = SpecialDay.shabbosAfter(SpecialDay.TishaBav(year))
+    val weeksFromShavuotToAfterTishaBeAv: Int = weeks.takeWhile(_ < shabbosAfterTishaBeAv).length - weeksBeforeShavuot
 
-    val weeksAfterTishaBeAv: Int = weeks.length - weeksBeforeShavuot - weeksFromShavuotToTishaBeAv
+    val weeksFromVaetchanan: Int = weeks.length - weeksBeforeShavuot - weeksFromShavuotToAfterTishaBeAv
 
-    // Перед Шавуот читают Бемидбар, а если до Шавуота 34 недели - Насо TODO
-    // Перед 9 ава или в сам 9 ава - Дварим
     val combineBeforeBemidbarCandidate: Int = 33 - weeksBeforeShavuot
-    val combineBeforeDevarimCandidate: Int = 10 - weeksFromShavuotToTishaBeAv
+    val combineBeforeVaetchananCandidate: Int = 11 - weeksFromShavuotToAfterTishaBeAv
 
-    val (combineBeforeBemidbar: Int, combineBeforeDevarim: Int) =
-      if (combineBeforeBemidbarCandidate >= 0) (combineBeforeBemidbarCandidate, combineBeforeDevarimCandidate)
-      else (0, combineBeforeBemidbarCandidate + combineBeforeDevarimCandidate)
+    // When there are to many Saturdays before Shavuot to assign Bemidbar to the one immediately before Shavuot,
+    // Bemidbar is read one week before Shavuot:
+    val (combineBeforeBemidbar: Int, combineBeforeVaetchanan: Int) =
+      if (combineBeforeBemidbarCandidate >= 0) (combineBeforeBemidbarCandidate, combineBeforeVaetchananCandidate)
+      else (0, combineBeforeBemidbarCandidate + combineBeforeVaetchananCandidate)
     require(0 <= combineBeforeBemidbar && combineBeforeBemidbar <= 4)
-    require(0 <= combineBeforeDevarim && combineBeforeDevarim <= 2)
+    require(0 <= combineBeforeVaetchanan && combineBeforeVaetchanan <= 2)
 
-    val combineAfterDevarim: Int = 10 - weeksAfterTishaBeAv
-    require(0 <= combineAfterDevarim && combineAfterDevarim <= 1)
+    val combineFromVaetchanan: Int = 9 - weeksFromVaetchanan
+    require(0 <= combineFromVaetchanan && combineFromVaetchanan <= 1)
 
     // maximum: 33 portions; combine: 4
     val result = single(
@@ -66,14 +114,15 @@ object Readings {
     combineIf(combineBeforeBemidbar >= 2, AchareiMot, Kedoshim) ++
     single(Emor) ++
     combineIf(combineBeforeBemidbar >= 1, Behar, Bechukotai) ++
-    // maximum: 10 portions; combine: 2
+    // maximum: 11 portions; combine: 2
     single(Bemidbar, Naso, Behaalotecha, Shlach, Korach) ++
-    combineIf(combineBeforeDevarim >= 2, Chukat, Balak) ++
+    combineIf(combineBeforeVaetchanan >= 2, Chukat, Balak) ++
     single(Pinchas) ++
-    combineIf(combineBeforeDevarim >= 1, Matot, Masei) ++
-    // maximum: 10 portions; combine: 1
-    single(Devarim, Vaetchanan, Eikev, Reeh, Shoftim, KiTeitzei, KiTavo) ++
-    combineIf(combineAfterDevarim >= 1, Nitzavim, Vayelech) ++
+    combineIf(combineBeforeVaetchanan >= 1, Matot, Masei) ++
+    single(Devarim) ++
+    // maximum: 9 portions; combine: 1
+    single(Vaetchanan, Eikev, Reeh, Shoftim, KiTeitzei, KiTavo) ++
+    combineIf(combineFromVaetchanan >= 1, Nitzavim, Vayelech) ++
     single(Haazinu)
     // VZotHaBerachah is read on Simchat Torah, and thus is not included in the regular schedule
 
