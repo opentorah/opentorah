@@ -5,7 +5,9 @@ import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.jewish.SpecialDay
 import Parsha._
 
-case class Readings(parsha: Parsha, secondParsha: Option[Parsha] = None)
+case class Readings(parsha: Parsha, secondParsha: Option[Parsha] = None) {
+  def isCombined: Boolean = secondParsha.isDefined
+}
 
 /**
   * Determine weekly portion read on a given Shabbos.
@@ -13,112 +15,86 @@ case class Readings(parsha: Parsha, secondParsha: Option[Parsha] = None)
   *
   * verified: SimchasTorah doesn't fall on Shabbos, so Shabbos Breshit is the same here and there
   *
-  *
   */
 object Readings {
 
-  private abstract class Segment(val max: Int, combinable: Int) {
-    final def min: Int = max - combinable
-
-    final def isLengthAllowed(length: Int): Boolean = min <= length && length <= max
-
-    final def zip(weeks: Seq[Day]): Seq[(Day, Readings)] = {
-      val length = weeks.length
-
-      require(isLengthAllowed(length), s"length $length is not between $min and $max")
-
-      val readings = get(max - length)
-      require(readings.length == length)
-
-      weeks zip readings
-    }
-
-    protected def get(needToCombine: Int): Seq[Readings]
-
-    protected final def single(parshas: Parsha*): Seq[Readings] = parshas.map(Readings(_))
-  }
-
   def readings(year: Year, inHolyLand: Boolean): Seq[(Day, Readings)] = {
-    val all = weeks(year, inHolyLand)
-
-    //    Перед Шавуот читают Бемидбар
-    //    Перед 9 ава или в сам 9 ава - Дварим
-    val shabbosBeforeShavuot = SpecialDay.Shavuot(year).prev.prev(Day.Name.Shabbos)
-    val shabbosBeforeOrOnTishaBeAv = SpecialDay.TishaBav(year).prev(Day.Name.Shabbos)
-
-    beforeBemidbar.zip(all.takeWhile(_ < shabbosBeforeShavuot)) ++
-    fromBemidbarUntilDevarim.zip(all.dropWhile(_ < shabbosBeforeShavuot).takeWhile(_ < shabbosBeforeOrOnTishaBeAv)) ++
-    fromDevarim.zip(all.dropWhile(_ < shabbosBeforeOrOnTishaBeAv) )
-  }
-
-  /**
-    * All Shabbos days for the cycle of the Torah reading starting this year during
-    * which regular Parsha is read (i.e., excepting festivals and intermediate days).
-    *
-    * @param year  when the Torah reading cycle starts
-    * @param inHolyLand  or in Diaspora
-    * @return  Shabbos days when regular Parsha is read
-    */
-  def weeks(year: Year, inHolyLand: Boolean): Seq[Day] = {
-    // Since the cycle goes into next year, we need to exclude the festivals and
-    // intermediate days until next Simchat Torah.
-    val exclude: Seq[Day] =
+    // Reading cycle goes into the next year, so we need to exclude the festivals for both years.
+    val festivals: Seq[Day] =
       SpecialDay.festivals(inHolyLand).map(_(year)) ++
       SpecialDay.festivals(inHolyLand).map(_(year+1))
 
-    // TODO unfold flavour [A, A]
-    val result = unfold(SpecialDay.ShabbosBereshit(year)) { shabbos => Some(shabbos + Calendar.daysPerWeek, shabbos) }
-    .takeWhile(_ < SpecialDay.ShabbosBereshit(year+1))
-    .filterNot(exclude.contains)
-    .toList
+    // All Shabbos days that are not festivals from one Shabbos Bereshit until the next.
+    val weeks: Seq[Day] =
+      unfoldInfiniteSimple(SpecialDay.ShabbosBereshit(year))(_ + Calendar.daysPerWeek)
+      .takeWhile(_ < SpecialDay.ShabbosBereshit(year+1))
+      .filterNot(festivals.contains)
+      .toList
 
-    result
+    val shabbosBeforeShavuot = SpecialDay.Shavuot(year).prev.prev(Day.Name.Shabbos)
+    val weeksBeforeShavuot: Int = weeks.takeWhile(_ < shabbosBeforeShavuot).length
+
+    val shabbosBeforeOrOnTishaBeAv = SpecialDay.TishaBav(year).prev(Day.Name.Shabbos)
+    val weeksFromShavuotToTishaBeAv: Int = weeks.takeWhile(_ < shabbosBeforeOrOnTishaBeAv).length - weeksBeforeShavuot
+
+    val weeksAfterTishaBeAv: Int = weeks.length - weeksBeforeShavuot - weeksFromShavuotToTishaBeAv
+
+    // Перед Шавуот читают Бемидбар, а если до Шавуота 34 недели - Насо TODO
+    // Перед 9 ава или в сам 9 ава - Дварим
+    val combineBeforeBemidbarCandidate: Int = 33 - weeksBeforeShavuot
+    val combineBeforeDevarimCandidate: Int = 10 - weeksFromShavuotToTishaBeAv
+
+    val (combineBeforeBemidbar: Int, combineBeforeDevarim: Int) =
+      if (combineBeforeBemidbarCandidate >= 0) (combineBeforeBemidbarCandidate, combineBeforeDevarimCandidate)
+      else (0, combineBeforeBemidbarCandidate + combineBeforeDevarimCandidate)
+    require(0 <= combineBeforeBemidbar && combineBeforeBemidbar <= 4)
+    require(0 <= combineBeforeDevarim && combineBeforeDevarim <= 2)
+
+    val combineAfterDevarim: Int = 10 - weeksAfterTishaBeAv
+    require(0 <= combineAfterDevarim && combineAfterDevarim <= 1)
+
+    // maximum: 33 portions; combine: 4
+    val result = single(
+      Bereshit, Noach, LechLecha, Vayeira, ChayeiSarah, Toledot,
+      Vayetze, Vayishlach, Vayeshev, Miketz, Vayigash, Vayechi,
+      Shemot, Vaeira, Bo, Beshalach, Yitro, Mishpatim,
+      Terumah, Tetzaveh, KiTisa
+    ) ++
+    combineIf(combineBeforeBemidbar >= 4, Vayakhel, Pekudei) ++
+    single(Vayikra, Tzav, Shemini) ++
+    combineIf(combineBeforeBemidbar >= 3, Tazria, Metzora) ++
+    combineIf(combineBeforeBemidbar >= 2, AchareiMot, Kedoshim) ++
+    single(Emor) ++
+    combineIf(combineBeforeBemidbar >= 1, Behar, Bechukotai) ++
+    // maximum: 10 portions; combine: 2
+    single(Bemidbar, Naso, Behaalotecha, Shlach, Korach) ++
+    combineIf(combineBeforeDevarim >= 2, Chukat, Balak) ++
+    single(Pinchas) ++
+    combineIf(combineBeforeDevarim >= 1, Matot, Masei) ++
+    // maximum: 10 portions; combine: 1
+    single(Devarim, Vaetchanan, Eikev, Reeh, Shoftim, KiTeitzei, KiTavo) ++
+    combineIf(combineAfterDevarim >= 1, Nitzavim, Vayelech) ++
+    single(Haazinu)
+    // VZotHaBerachah is read on Simchat Torah, and thus is not included in the regular schedule
+
+    require(result.length == weeks.length)
+    weeks zip result
   }
 
-  private object beforeBemidbar extends Segment(33, 4) {
-    protected override def get(needToCombine: Int): Seq[Readings] = {
-      val (combinePekudei, combineBeforeBemidbar) =
-        if (needToCombine == 4) (true, 3)
-        else (false, needToCombine)
-
-      single(
-        Bereshit, Noach, LechLecha, Vayeira, ChayeiSarah, Toledot,
-        Vayetze, Vayishlach, Vayeshev, Miketz, Vayigash, Vayechi,
-        Shemot, Vaeira, Bo, Beshalach, Yitro, Mishpatim,
-        Terumah, Tetzaveh, KiTisa
-      ) ++
-      combineIf(combinePekudei, Vayakhel, Pekudei) ++
-      single(Vayikra, Tzav, Shemini) ++
-      combineIf(combineBeforeBemidbar >= 3, Tazria, Metzora) ++
-      combineIf(combineBeforeBemidbar >= 2, AchareiMot, Kedoshim) ++
-      single(Emor) ++
-      combineIf(combineBeforeBemidbar >= 1, Behar, Bechukotai)
-    }
-  }
-
-  private object fromBemidbarUntilDevarim extends Segment(10, 2) {
-    protected override def get(needToCombine: Int): Seq[Readings] = {
-      single(Bemidbar, Naso, Behaalotecha, Shlach, Korach) ++
-      combineIf(needToCombine >= 2, Chukat, Balak) ++
-      single(Pinchas) ++
-      combineIf(needToCombine >= 1, Matot, Masei)
-    }
-  }
-
-  private object fromDevarim extends Segment(10, 1) {
-    protected override def get(needToCombine: Int): Seq[Readings] = {
-      single(Devarim, Vaetchanan, Eikev, Reeh, Shoftim, KiTeitzei, KiTavo) ++
-      combineIf(needToCombine > 0, Nitzavim, Vayelech) ++
-      single(Haazinu)
-      // VZotHaBerachah is read on Simchat Torah, and thus is not included in the regular schedule
-    }
-  }
+  private def single(parshas: Parsha*): Seq[Readings] = parshas.map(Readings(_))
 
   private def combineIf(condition: Boolean, parsha: Parsha, secondParsha: Parsha): Seq[Readings] =
     if (condition) Seq(Readings(parsha, Some(secondParsha)))
     else Seq(Readings(parsha), Readings(secondParsha))
 
   // Will this *ever* be in the standard library?
+
   def unfold[A, B](start: A)(f: A => Option[(A, B)]): Stream[B] =
     f(start).map { case (a, b) => b #:: unfold(a)(f) }.getOrElse(Stream.empty)
+
+  def unfoldInfinite[A, B](start: A)(f: A => (A, B)): Stream[B] =
+    f(start) match { case (a, b) => b #:: unfoldInfinite(a)(f) }
+
+  def unfoldInfiniteSimple[A](start: A)(f: A => A): Stream[A] =
+    start #:: unfoldInfiniteSimple(f(start))(f)
 }

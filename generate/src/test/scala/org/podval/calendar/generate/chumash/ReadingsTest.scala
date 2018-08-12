@@ -2,7 +2,8 @@ package org.podval.calendar.generate.chumash
 
 import org.scalatest.{FlatSpec, Matchers}
 import org.podval.calendar.jewish.{Jewish, SpecialDay}
-import Jewish.Day
+import Jewish.{Day, Year}
+import Parsha._
 
 // TODO check that fixed parshios are read on the days they should
 // TODO check simanim from the Shulchan Oruch
@@ -16,39 +17,46 @@ class ReadingsTest extends FlatSpec with Matchers {
     // - on Shabbos before Shavuot read Bemidbar;
     // - on Shabbos before or on Tisha Be Av read Devarim;
     // - priorities of combining the portions.
-    //
-    // So seems combinig Nitzavim/Vayelech, which can make a nice, albeit redundant, test: TODO
-    //  def beforeRoshHaShonoh(year: Year): Readings = {
-    //    val roshHaShonohDay: Day.Name = SpecialDay.RoshHashanah(year).name
-    //    val roshHaShonohOnSheniOrShlishi: Boolean =
-    //      (roshHaShonohDay == Day.Name.Sheni) || (roshHaShonohDay == Day.Name.Shlishi)
-    //    Readings(
-    //      parsha = Nitzavim,
-    //      secondParsha = if (roshHaShonohOnSheniOrShlishi) None else Some(Vayelech)
-    //    )
-    //  }
-    //
-    // TODO
-    // But this thing about Pesach - is it an emergent phenomenon - or an additional pinning requirement?
-    //  def beforePassover(year: Year): Parsha = if (!year.isLeap) Tzav else {
-    //    val roshHaShonohOnChamishi: Boolean = SpecialDay.RoshHashanah(year).name == Day.Name.Chamishi
-    //    val bothCheshvanAndKislevFullOrLacking = year.kind != Year.Kind.Regular
-    //    if (roshHaShonohOnChamishi && bothCheshvanAndKislevFullOrLacking) AchareiMot else Metzora
-    //  }
-
-    def findReadings(readings: Seq[(Day, Readings)], day: Day): Readings = readings.find(_._1 == day).get._2
-
-    // TODO too many weeks after Devarim for year 1; 34 for year 3
-    (5775 to 5789) foreach { number =>
-      val year = Jewish.Year(number)
-      val shabbosBeforePesach = SpecialDay.Pesach(year).prev.prev(Day.Name.Shabbos)
+    (1 to 6000) foreach { number =>
+      val year = Year(number)
+      println(year)
 
       val readings = Readings.readings(year, inHolyLand = false)
-//      val readingsInHolyLand = Readings.readings(year, inHolyLand = true)
+      val readingsInHolyLand = Readings.readings(year, inHolyLand = true)
 
+      verifyShabbosBeforePesach(year, readings)
 
-      println(year + " " + findReadings(readings, shabbosBeforePesach))
-//      println(findReadings(readingsInHolyLand, shabbosBeforePesach))
+      // TODO in the Holy Land sometimes Vayikra is read on Shabbos before Pesach;
+      // either my algorithm is wrong - or Shulchan Oruch is only talking about Diaspora...
+      // verifyShabbosBeforePesach(year, readingsInHolyLand)
+
+      // verifyVayelech(year, readings)
     }
   }
+
+  def verifyShabbosBeforePesach(year: Year, readings: Seq[(Day, Readings)]): Unit = {
+    val shabbosBeforePesach = SpecialDay.Pesach(year).prev.prev(Day.Name.Shabbos)
+    val readingsBeforePesach: Readings = findReadings(readings, shabbosBeforePesach)
+    readingsBeforePesach.isCombined shouldBe false
+    val correctParsha: Parsha = if (!year.isLeap) Tzav else {
+      val roshHaShonohOnChamishi: Boolean = SpecialDay.RoshHashanah(year).name == Day.Name.Chamishi
+      val bothCheshvanAndKislevFullOrLacking = year.kind != Year.Kind.Regular
+      if (roshHaShonohOnChamishi && bothCheshvanAndKislevFullOrLacking) AchareiMot else Metzora
+    }
+    readingsBeforePesach.parsha shouldBe correctParsha
+  }
+
+  def verifyVayelech(year: Year, readings: Seq[(Day, Readings)]): Unit = {
+    val roshHaShonohDay: Day.Name = SpecialDay.RoshHashanah(year+1).name
+    val roshHaShonohOnSheniOrShlishi: Boolean =
+      (roshHaShonohDay == Day.Name.Sheni) || (roshHaShonohDay == Day.Name.Shlishi)
+
+    isCombined(readings, Vayelech) shouldBe roshHaShonohOnSheniOrShlishi
+  }
+
+  def findReadings(readings: Seq[(Day, Readings)], day: Day): Readings =
+    readings.find(_._1 == day).get._2
+
+  def isCombined(readings: Seq[(Day, Readings)], parsha: Parsha): Boolean =
+    readings.exists(_._2.secondParsha.contains(parsha))
 }
