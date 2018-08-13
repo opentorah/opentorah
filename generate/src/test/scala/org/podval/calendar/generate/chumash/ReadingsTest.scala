@@ -42,7 +42,4 @@ class ReadingsTest extends FlatSpec with Matchers {
     val roshHaShanahDay: Day.Name = SpecialDay.RoshHashanah(year+1).name
     isCombined(Vayelech) shouldBe (roshHaShanahDay != Day.Name.Sheni) && (roshHaShanahDay != Day.Name.Shlishi)
   }
-
-  // TODO https://www.shoresh.org.il/spages/articles/m/parashathibur.htm
-  // TODO check simanim from commentators on the Shulchan Aruch
 }

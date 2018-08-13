@@ -21,7 +21,6 @@ case class Readings(parsha: Parsha, secondParsha: Option[Parsha] = None) {
   */
 /*
   Shulchan Aruch, Orach Chayim, Laws of New Month, 428:4.
-  TODO Rambam
 
   We always read "Tzav at Aharon" before Pesach in a non-leap year and Metzorah in a leap year
   except when Rosh Hashanah is on Thursday and
@@ -66,16 +65,6 @@ case class Readings(parsha: Parsha, secondParsha: Option[Parsha] = None) {
     Tazria and Metzora cn be combined only if AchareiMot and Kedoshim are combined;
     AchareiMot and Kedoshim can be combined only if Behar and Bechukotai are combined;
     Chukat and Balak can be combined only if Matot and Masei are combined.
-
-  TODO
-  Baladi (Yemenite) custom: instead of Matot and Masai combine Chukat and Balak.
-  Daradaim (following Rabbi Saadia Gaon) instead of combining Mamtot and Masai, add to Korach Chukat to 20:21, and next
-  Shabbos read the rest of Chukkat and Balak,
-
-https://en.wikibooks.org/wiki/Mathematics_of_the_Jewish_Calendar/The_Annual_Cycle_of_Torah_Readings
-
-Пока делал красивый алгоритм нашел табличный метод:
-https://www.shoresh.org.il/spages/articles/m/parashathibur.htm
 
   Criterion for when Acharei Mot is read on a leap year on Saturday before Pesach (when Rosh Ha Shanah is on Thursday)
   is given by the Mechaber as "the year is lacking"; Ramo adds "or full"; Magen Avraham says "any leap year" - which is

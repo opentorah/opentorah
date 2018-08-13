@@ -7,7 +7,7 @@ import SpecialDay._
 
 class SpecialDayTest extends FlatSpec with Matchers {
 
-  // Shulchan Aruch, Orach Chaim, 428:1; Rambam TODO
+  // Shulchan Aruch, Orach Chaim, 428:1
   "Festivals" should "not fall on the proscribed days" in {
     (1 to 6000) foreach { number =>
       val year = Jewish.Year(number)
@@ -34,9 +34,6 @@ class SpecialDayTest extends FlatSpec with Matchers {
       // sameDay(Hanukkah, Shavuot)
     }
   }
-
-  // TODO Shulchan Aruch, Orach Chaim, 428:2; Rambam TODO
-  // TODO Shulchan Aruch, Orach Chaim, 428:3; Rambam TODO
 
   // TODO
 //  Знаки лет в распределении по простым и високосным.
