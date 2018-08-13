@@ -38,8 +38,7 @@ class SpecialDayTest extends FlatSpec with Matchers {
   // TODO Shulchan Aruch, Orach Chaim, 428:2; Rambam TODO
   // TODO Shulchan Aruch, Orach Chaim, 428:3; Rambam TODO
 
-
-
+  // TODO
 //  Знаки лет в распределении по простым и високосным.
 //  Первая буква - день недели Рош ашана.
 //  Вторая определяет длину мархешвана и кислева.
