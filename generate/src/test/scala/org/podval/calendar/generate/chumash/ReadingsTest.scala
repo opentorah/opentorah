@@ -47,3 +47,25 @@ class ReadingsTest extends FlatSpec with Matchers {
     isCombined(Vayelech) shouldBe (roshHaShanahDay != Day.Name.Sheni) && (roshHaShanahDay != Day.Name.Shlishi)
   }
 }
+
+
+// TODO how do I get at a test class from a dependency?
+//sealed trait Combination
+//case object Combined extends Combination
+//case object Separate extends Combination
+//case object CombinedInDiaspora extends Combination
+//
+//final case class ReadingStructure
+//(
+//  vp: Combination, // Vayakhel/Pekudei
+//  tm: Combination, // Tazria/Metzora
+//  ak: Combination, // Acharei/Kedoshim
+//  bb: Combination, // Behar/Bechukotai
+//  cb: Combination, // Chukat/Balak
+//  mm: Combination, // Matot/Masai
+//  nv: Combination  // Nitzavim/Vayelech
+//)
+//
+//object ReadingStructure {
+//  val structures: Map[YearType]
+//}

@@ -124,47 +124,7 @@ final class DatesTest extends FlatSpec with Matchers {
     }
   }
 
-  "Jewish Year" should "have correct character" in {
-    years foreach { year =>
-      val (isLeap, kind) = year.character
-      val yearType = (if (isLeap) YearType.leap else YearType.nonLeap).find { yearType =>
-        (yearType.roshHashanah == RoshHashanah(year).name) && (yearType.kind == kind)
-      }
-      Pesach(year).name shouldBe yearType.get.pesach
-    }
-  }
-}
-
-final case class YearType(roshHashanah: Day.Name, kind: Year.Kind, pesach: Day.Name)
-
-// This table of unknown origin was submitted by @michaelko58.
-// It lists all occurring year types:
-//   day of the week of Rosh Hashanah
-//   year kind (short, regular, full);
-//   day of the week of Pesach.
-object YearType {
-  val nonLeap: Seq[YearType] = Seq("בחג" ,"בשה" ,"גכה" ,"הכז" ,"השא" ,"זחא", "זשג").map(apply)
-  val leap: Seq[YearType] = Seq("בחה", "בשז", "גכז", "החא", "השג", "זחג", "זשה").map(apply)
-
-  def apply(value: String): YearType = {
-    require(value.length == 3)
-
-    def dayOfTheWeek(char: Char): Day.Name = char match {
-      case 'א' => Day.Name.Rishon
-      case 'ב' => Day.Name.Sheni
-      case 'ג' => Day.Name.Shlishi
-      case 'ה' => Day.Name.Chamishi
-      case 'ז' => Day.Name.Shabbos
-    }
-
-    new YearType(
-      roshHashanah = dayOfTheWeek(value.charAt(0)),
-      kind = value.charAt(1) match {
-        case 'ח' => Year.Kind.Short
-        case 'כ' => Year.Kind.Regular
-        case 'ש' => Year.Kind.Full
-      },
-      pesach = dayOfTheWeek(value.charAt(2))
-    )
+  "Jewish Year" should "have allowed type" in {
+    years foreach { year => Pesach(year).name shouldBe YearType.get(year).pesach }
   }
 }
