@@ -1,26 +1,26 @@
 package org.podval.calendar.astronomy
 
-import org.scalatest.FlatSpec
+import org.scalatest.{FlatSpec, Matchers}
 import org.podval.calendar.angles.Angles.{Rotation, period}
 import org.podval.calendar.jewish
 
-class SunLongitudeMeanTest extends FlatSpec {
+class SunLongitudeMeanTest extends FlatSpec with Matchers {
 
   behavior of "Mean Sun Longitude"
 
   it should "round to the same as Almagest" in {
-    assertResult(SunLongitudeMean.rambamValue.roundToSeconds)(SunLongitudeMean.almagestValue.roundToSeconds)
+    SunLongitudeMean.almagestValue.roundToSeconds shouldBe SunLongitudeMean.rambamValue.roundToSeconds
   }
 
   it should "calculate for 29 days in two steps" in {
-    assertResult(SunLongitudeMean.month)(SunLongitudeMean.ten*3-SunLongitudeMean.one)
-    assertResult(Rotation(28, 35, 1))(SunLongitudeMean.ten*3-SunLongitudeMean.one)
-    assertResult(Rotation(28, 34, 58))(SunLongitudeMean.ten*2+SunLongitudeMean.one*9)
+    (SunLongitudeMean.ten*3-SunLongitudeMean.one) shouldBe SunLongitudeMean.month
+    (SunLongitudeMean.ten*3-SunLongitudeMean.one) shouldBe Rotation(28, 35, 1)
+    (SunLongitudeMean.ten*2+SunLongitudeMean.one*9) shouldBe Rotation(28, 34, 58)
   }
 
   it should "calculate correctly for the regular year" ignore {
-    assertResult(SunLongitudeMean.year)(SunLongitudeMean.one*354)
-    assertResult(SunLongitudeMean.year)(SunLongitudeMean.calculate(354))
+    (SunLongitudeMean.one*354) shouldBe SunLongitudeMean.year
+    SunLongitudeMean.calculate(354) shouldBe SunLongitudeMean.year
   }
 
   it should "make a full circle in a year" in {

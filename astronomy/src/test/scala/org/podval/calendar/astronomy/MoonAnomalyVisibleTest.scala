@@ -1,9 +1,9 @@
 package org.podval.calendar.astronomy
 
-import org.scalatest.FlatSpec
+import org.scalatest.{FlatSpec, Matchers}
 import org.podval.calendar.angles.Angles.Rotation
 
-class MoonAnomalyVisibleTest extends FlatSpec {
+class MoonAnomalyVisibleTest extends FlatSpec with Matchers {
 
   behavior of "Anomaly"
 
@@ -21,7 +21,7 @@ class MoonAnomalyVisibleTest extends FlatSpec {
       val e: Double = MoonAnomalyVisible.efrommnasround(maslul, mnas)
       val mnasfrome = MoonAnomalyVisible.mnasfrome(maslul, e)
       val mnasRound = mnas.roundToMinutes
-      assertResult(mnas.roundToMinutes)(mnasfrome.roundToMinutes)
+      mnasfrome.roundToMinutes shouldBe mnas.roundToMinutes
     }
   }
 }
