@@ -31,9 +31,11 @@ abstract class DayBase[C <: Calendar[C]](number: Int)
 
   final def name: C#DayName = calendar.Day.names(numberInWeek - 1)
 
-  final def next(dayName: C#DayName): C#Day = if (this.name == dayName) this else this.next.next(dayName)
+  final def is(name: C#DayName): Boolean = this.name == name
 
-  final def prev(dayName: C#DayName): C#Day = if (this.name == dayName) this else this.prev.prev(dayName)
+  final def next(dayName: C#DayName): C#Day = if (is(dayName)) this else this.next.next(dayName)
+
+  final def prev(dayName: C#DayName): C#Day = if (is(dayName)) this else this.prev.prev(dayName)
 
   final def toMoment: C#Moment = calendar.Moment().days(number - 1)
 

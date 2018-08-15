@@ -62,8 +62,8 @@ object SpecialDay {
   case object FastOfEster extends SpecialDay {
     override def apply(year: Year): Day = {
       val result = Purim(year)-1
-      if (result.name == Day.Name.Shabbos) result-2 else
-      if (result.name == Day.Name.Shishi ) result-1 else
+      if (result.is(Day.Name.Shabbos)) result-2 else
+      if (result.is(Day.Name.Shishi )) result-1 else
         result
     }
   }
@@ -101,7 +101,7 @@ object SpecialDay {
   case object FastOfTammuz extends SpecialDay {
     override def apply(year: Year): Day = {
       val result = year.month(Tammuz).day(17)
-      if (result.name == Day.Name.Shabbos) result+1 else result
+      if (result.is(Day.Name.Shabbos)) result+1 else result
     }
   }
 
@@ -112,7 +112,7 @@ object SpecialDay {
   case object TishaBav extends SpecialDay {
     override def apply(year: Year): Day = {
       val result = year.month(Av).day(9)
-      if (result.name == Day.Name.Shabbos) result+1 else result
+      if (result.is(Day.Name.Shabbos)) result+1 else result
     }
   }
 

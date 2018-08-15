@@ -27,7 +27,7 @@ class ReadingsTest extends FlatSpec with Matchers {
     val readingsBeforePesach: Readings = findReadings(shabbosBefore(Pesach(year)))
     readingsBeforePesach.isCombined shouldBe false
     readingsBeforePesach.parsha shouldBe (if (!year.isLeap) Tzav else {
-      val roshHaShonohOnChamishi: Boolean = RoshHashanah(year).name == Day.Name.Chamishi
+      val roshHaShonohOnChamishi: Boolean = RoshHashanah(year).is(Day.Name.Chamishi)
       val bothCheshvanAndKislevFullOrLacking = year.kind != Year.Kind.Regular
       if (roshHaShonohOnChamishi && bothCheshvanAndKislevFullOrLacking) AchareiMot else Metzora
     })
