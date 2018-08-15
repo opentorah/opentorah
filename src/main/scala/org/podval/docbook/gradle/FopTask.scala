@@ -5,7 +5,7 @@ import javax.xml.transform.sax.SAXResult
 import javax.xml.transform.stream.StreamSource
 import org.apache.fop.apps.{Fop, FopConfParser, FopFactory}
 import org.gradle.api.provider.{Property, Provider}
-import org.gradle.api.{DefaultTask, Project}
+import org.gradle.api.{Action, DefaultTask, Project}
 import org.gradle.api.tasks.{Input, InputFile, OutputDirectory, OutputFile, TaskAction}
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 
@@ -16,11 +16,12 @@ object FopTask {
     description: String,
     inputFile: Provider[File],
     outputFileName: Property[String]
-  ): FopTask = project.getTasks.create("docBookPdf", classOf[FopTask], (task: FopTask) => {
-    task.setDescription(description)
-    task.inputFile.set(inputFile)
-    task.outputFileName.set(outputFileName)
-  })
+  ): FopTask = project.getTasks.create("docBookPdf", classOf[FopTask], new Action[FopTask] {
+    override def execute(task: FopTask): Unit = {
+      task.setDescription(description)
+      task.inputFile.set(inputFile)
+      task.outputFileName.set(outputFileName)
+    }})
 }
 
 class FopTask extends DefaultTask {
