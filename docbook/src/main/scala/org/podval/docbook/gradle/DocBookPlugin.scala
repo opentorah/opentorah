@@ -3,6 +3,8 @@ package org.podval.docbook.gradle
 
 import java.io.File
 
+import org.gradle.api.Action
+
 //import org.apache.tools.ant.filters.ReplaceTokens
 //import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.Copy
@@ -20,12 +22,14 @@ final class DocBookPlugin extends Plugin[Project] {
       _.add(project.getDependencies.create("net.sf.docbook:docbook-xsl:1.79.1:resources@zip")) : Unit
     ).setVisible(false)
 
-    val prepareDocBookTask: Copy = project.getTasks.create("prepareDocBook", classOf[Copy], (copy: Copy) => {
-      copy.setDescription("Prepare DocBook XSLT stylesheets")
-      copy.from(project.zipTree(docBookXslConfiguration.getSingleFile))
-      copy.into(explodeDocBookXslInto(project))
-//      copy.filter(Map("tokens" -> tokens.asJava).asJava, classOf[ReplaceTokens])
-      ()
+    val prepareDocBookTask: Copy = project.getTasks.create("prepareDocBook", classOf[Copy], new Action[Copy] {
+      override def execute(copy: Copy): Unit = {
+        copy.setDescription("Prepare DocBook XSLT stylesheets")
+        copy.from(project.zipTree(docBookXslConfiguration.getSingleFile))
+        copy.into(explodeDocBookXslInto(project))
+        //      copy.filter(Map("tokens" -> tokens.asJava).asJava, classOf[ReplaceTokens])
+        ()
+      }
     })
 
     val prepareDocBookDataTask: DefaultTask = project.getTasks.create("prepareDocBookData", classOf[DefaultTask])

@@ -8,7 +8,7 @@ buildscript {
 }
 
 plugins {
-  id "com.github.maiflai.scalatest" version "0.20"
+//  id "com.github.maiflai.scalatest" version "0.22"
   id "com.jfrog.artifactory" version "4.5.4" apply false
   id "com.jfrog.bintray" version "1.7.3" apply false
 }
@@ -48,11 +48,19 @@ subprojects {
     testImplementation lib.scalaCheck, lib.scalaTest, lib.pegdown
   }
 
-  test {
-    testLogging {
-      test.testLogging.events = [org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED]
-    }
-  }
+//  task scalaTest(dependsOn: ['testClasses'], type: JavaExec) {
+//    main = 'org.scalatest.tools.Runner'
+//    args = ['-R', 'build/classes/test', '-o']
+//    classpath = sourceSets.test.runtimeClasspath
+//  }
+//
+//  test.dependsOn scalaTest
+
+//  test {
+//    testLogging {
+//      test.testLogging.events = [org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED]
+//    }
+//  }
 
   task sourceJar(type: Jar) {
     from sourceSets.main.allSource

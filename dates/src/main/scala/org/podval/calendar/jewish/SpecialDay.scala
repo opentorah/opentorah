@@ -14,6 +14,9 @@ class SpecialDayBase(month: Month.Name, numberInMonth: Int) extends SpecialDay {
 object SpecialDay {
   case object RoshHashanah extends SpecialDayBase(Tishrei, 1)
   case object RoshHashanah2 extends SpecialDayBase(Tishrei, 2)
+
+  case object FastOfGedalia extends SpecialDayBase(Tishrei, 3)
+
   case object YomKippur extends SpecialDayBase(Tishrei, 10)
 
   case object Sukkot extends SpecialDayBase(Tishrei, 15)
@@ -39,10 +42,30 @@ object SpecialDay {
     override def apply(year: Year): Day = shabbosAfter(SimchatTorah(year))
   }
 
-  case object Hanukkah extends SpecialDayBase(Kislev, 25)
+  case object Hanukkah1 extends SpecialDayBase(Kislev, 25)
+  case object Hanukkah2 extends SpecialDayBase(Kislev, 26)
+  case object Hanukkah3 extends SpecialDayBase(Kislev, 27)
+  case object Hanukkah4 extends SpecialDayBase(Kislev, 28)
+  case object Hanukkah5 extends SpecialDayBase(Kislev, 29)
+  case object Hanukkah6 extends SpecialDay {
+    override def apply(year: Year): Day = Hanukkah5(year)+1
+  }
+  case object Hanukkah7 extends SpecialDay {
+    override def apply(year: Year): Day = Hanukkah5(year)+2
+  }
+  case object Hanukkah8 extends SpecialDay {
+    override def apply(year: Year): Day = Hanukkah5(year)+3
+  }
+
+  case object FastOfTevet extends SpecialDayBase(Teves, 10)
 
   case object FastOfEster extends SpecialDay {
-    override def apply(year: Year): Day = Purim(year).prev
+    override def apply(year: Year): Day = {
+      val result = Purim(year)-1
+      if (result.name == Day.Name.Shabbos) result-2 else
+      if (result.name == Day.Name.Shishi ) result-1 else
+        result
+    }
   }
 
   case object Purim extends SpecialDay {
@@ -50,7 +73,7 @@ object SpecialDay {
   }
 
   case object ShushanPurim extends SpecialDay {
-    override def apply(year: Year): Day = Purim(year).next
+    override def apply(year: Year): Day = Purim(year)+1
   }
 
   case object Pesach extends SpecialDayBase(Nisan, 15)
@@ -75,9 +98,23 @@ object SpecialDay {
   case object Shavuot extends SpecialDayBase(Sivan, 6)
   case object Shavuot2 extends SpecialDayBase(Sivan, 7)
 
-  case object FastOfTammuz extends  SpecialDayBase(Tammuz, 17)
+  case object FastOfTammuz extends SpecialDay {
+    override def apply(year: Year): Day = {
+      val result = year.month(Tammuz).day(17)
+      if (result.name == Day.Name.Shabbos) result+1 else result
+    }
+  }
 
-  case object TishaBav extends SpecialDayBase(Av, 9)
+  // TODO for generating Siddur, we need a list of days when Tachanun is not said;
+  // also, when Av Harachamim is not said on Shabbos (by the way, when Tisha Bav is on Shabbos, it *is* said,
+  // although we wouldn't have said Tachanun if it wasn't Shabbos...) - but shouldn't postponed fast
+  // (or advanced Purim) leave some trace?
+  case object TishaBav extends SpecialDay {
+    override def apply(year: Year): Day = {
+      val result = year.month(Av).day(9)
+      if (result.name == Day.Name.Shabbos) result+1 else result
+    }
+  }
 
 
   val festivals: Seq[SpecialDayBase] = Seq(
@@ -129,11 +166,6 @@ object SpecialDay {
   )
 
   def festivals(inHolyLand: Boolean): Seq[SpecialDayBase] = if (inHolyLand) festivalsInHolyLand else festivals
-
-
-  // TODO for generating Siddur, we need a list of days when Tachanun is not said;
-  // also, when Av Harachamim is not said on Shabbos (by the way, when Tisha Bav is on Shabbos, it *is* said,
-  // although we wouldn't have said Tachanun if it wasn't Shabbos...)
 
   def shabbosAfter(day: Day): Day = day.next.next(Day.Name.Shabbos)
 

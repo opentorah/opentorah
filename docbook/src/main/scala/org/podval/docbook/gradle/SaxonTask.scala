@@ -6,7 +6,7 @@ import javax.xml.transform.{Transformer, URIResolver}
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.{StreamResult, StreamSource}
 import org.apache.xerces.jaxp.SAXParserFactoryImpl
-import org.gradle.api.{DefaultTask, Project}
+import org.gradle.api.{Action, DefaultTask, Project}
 import org.gradle.api.provider.{Property, Provider}
 import org.gradle.api.tasks.{Input, InputDirectory, InputFile, OutputDirectory, OutputFile, TaskAction}
 import org.xml.sax.{EntityResolver, InputSource, XMLReader}
@@ -26,15 +26,16 @@ object SaxonTask {
     dataDirectory: Property[File],
     xslParameters: Property[java.util.Map[String, String]],
     outputFileNameOverride: Option[String] = None
-  ): SaxonTask = project.getTasks.create(name, classOf[SaxonTask], (task: SaxonTask) => {
-    task.setDescription(description)
-    task.outputType.set(outputType)
-    task.inputFileName.set(inputFileName)
-    task.stylesheetName.set(stylesheetName)
-    task.xslParameters.set(xslParameters)
-    task.dataDirectory.set(dataDirectory)
-    task.outputFileNameOverride.set(outputFileNameOverride)
-  })
+  ): SaxonTask = project.getTasks.create(name, classOf[SaxonTask], new Action[SaxonTask] {
+    override def execute(task: SaxonTask): Unit = {
+      task.setDescription(description)
+      task.outputType.set(outputType)
+      task.inputFileName.set(inputFileName)
+      task.stylesheetName.set(stylesheetName)
+      task.xslParameters.set(xslParameters)
+      task.dataDirectory.set(dataDirectory)
+      task.outputFileNameOverride.set(outputFileNameOverride)
+    }})
 }
 
 class SaxonTask extends DefaultTask {

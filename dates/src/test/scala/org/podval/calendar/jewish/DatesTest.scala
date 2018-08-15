@@ -110,7 +110,7 @@ final class DatesTest extends FlatSpec with Matchers {
       notOn(Pesach, Sheni, Rvii, Shishi)
       notOn(Shavuot, Shlishi, Chamishi, Shabbos)
       notOn(HoshanahRabbah, Shlishi, Chamishi, Shabbos)
-      notOn(Hanukkah, Shlishi)
+      notOn(Hanukkah1, Shlishi)
       notOn(FastOfEster, Rishon, Shlishi, Shishi)
       notOn(FastOfTammuz, Sheni, Rvii, Shishi)
       notOn(TishaBav, Sheni, Rvii, Shishi)
