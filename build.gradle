@@ -180,7 +180,7 @@ project(':dates') {
   bintray bintrayConfig
 }
 
-project(':generate') {
+project(':service') {
   dependencies {
     compile project(':dates')
   }
