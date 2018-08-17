@@ -74,7 +74,6 @@ object SpecialDay {
   case object SukkotIntermediate3InHolyLand extends SpecialDayBase(Tishrei, 18) with Intermediate
   case object SukkotIntermediate4InHolyLand extends SpecialDayBase(Tishrei, 19) with Intermediate
   case object SukkotIntermediate5InHolyLand extends SpecialDayBase(Tishrei, 20) with Intermediate
-  case object SukkotIntermediate6InHolyLand extends SpecialDayBase(Tishrei, 21) with Intermediate
   case object ShminiAtzeretAndSimchatTorahInHolyLand extends SpecialDayBase(Tishrei, 22) with Festival
 
   case object ShabbosBereshit extends SpecialDay {
@@ -183,7 +182,7 @@ object SpecialDay {
     YomKippur,
     Sukkot,
     SukkotIntermediate1InHolyLand, SukkotIntermediate2InHolyLand, SukkotIntermediate3InHolyLand,
-    SukkotIntermediate4InHolyLand, SukkotIntermediate5InHolyLand, SukkotIntermediate6InHolyLand,
+    SukkotIntermediate4InHolyLand, SukkotIntermediate5InHolyLand, HoshanahRabbah,
     ShminiAtzeretAndSimchatTorahInHolyLand,
     Pesach, Pesach2,
     PesachIntermediate1InHolyLand, PesachIntermediate2InHolyLand, PesachIntermediate3InHolyLand,

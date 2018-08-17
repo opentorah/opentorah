@@ -107,6 +107,7 @@ final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) {
 object WeeklyReading {
   private final val fromBereshitToBemidbar: Int = Parsha.distance(Bereshit, Bemidbar)
   private final val combinableFromBereshitToVayikra: Seq[Parsha] = Seq(Vayakhel)
+  private final val allowedBeforePesach: Set[Parsha] = Set[Parsha](Tzav, Metzora, AchareiMot)
   private final val combinableFromVayikraToBemidbar: Seq[Parsha] = Seq(Behar, AchareiMot, Tazria)
   private final val fromBemidbarToVaetchanan: Int = Parsha.distance(Bemidbar, Vaetchanan)
   private final val combinableFromBemidbarToVaetchanan: Seq[Parsha] = Seq(Matot, Chukat)
@@ -147,9 +148,9 @@ object WeeklyReading {
         // and maybe rename it to ...beforTzav or something?
         val doCombineVayakhelPekudei: Boolean =
           (combinefromBereshitToBemidbar == combinableFromBereshitToVayikra.length + combinableFromVayikraToBemidbar.length) || {
-            // This tweak is required only for the Holy Land - and never for AchareiMot?
+            // This tweak is required only for the Holy Land (and never for AchareiMot) for some reason?
             val parshahBeforePesach: Parsha = Parsha.forIndex(weeksTo(shabbosBefore(Pesach(year))))
-            !Set[Parsha](Tzav, Metzora).contains(parshahBeforePesach)
+            !allowedBeforePesach.contains(parshahBeforePesach)
           }
 
         val combineFromBereshitToVayikra: Int = if (doCombineVayakhelPekudei) 1 else 0

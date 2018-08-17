@@ -8,8 +8,8 @@ I want to be able to do various things with the fixed Jewish calendar:
 - [x] code Rambam's calculations (and verify Rambam's numerical examples)
 - [x] convert dates from Jewish calendar to Gregorian and back
 - [x] list [dates of Birchas Hachamo](https://docs.google.com/document/d/1hpPZ0LYU3p8a-LJRXEqzXig-VQthkQ_MkaY79PMqr-Y/edit?hl=en_US)
-- [x] generate schedule of learning Rambam
-- [ ] generate haftorah and torah reading schedule
+- [ ] generate Torah and Haftorah reading schedule
+- [ ] generate schedule of learning Rambam
 - [ ] generate monthly calendars with both kinds of dates
 - [ ] automate vestos calculations
 
@@ -32,6 +32,12 @@ in Chapters 11-19:
 - [ ] translate relevant chapters into English
 - [ ] calculate halachic times (zmanim)
 
+
+## Sources
+
+TODO Rambam corresponding to Shulchan Aruch Orach Chayim 428
+TODO https://he.wikipedia.org/wiki/הלוח_העברי
+TODO https://en.wikibooks.org/wiki/Mathematics_of_the_Jewish_Calendar/The_Annual_Cycle_of_Torah_Readings
 
 ## Early Jewish Years
 
