@@ -118,7 +118,7 @@ object WeeklyReading {
 
   def getCycle(year: Year, inHolyLand: Boolean): Seq[(Day, WeeklyReading)] = {
     // Reading cycle goes into the next year, so we need to exclude the festivals for both years.
-    val festivals: Seq[Day] =
+    val festivals: Set[Day] =
       SpecialDay.festivals(inHolyLand).map(_(year)) ++
       SpecialDay.festivals(inHolyLand).map(_(year+1))
 
