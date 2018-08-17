@@ -166,55 +166,43 @@ object SpecialDay {
   }
 
 
-  val festivals: Seq[SpecialDayBase] = Seq(
-    RoshHashanah,
-    RoshHashanah2,
+  val festivals: Set[SpecialDay] = Set(
+    RoshHashanah, RoshHashanah2,
     YomKippur,
-    Sukkot,
-    Sukkot2,
-    SukkotIntermediate1,
-    SukkotIntermediate2,
-    SukkotIntermediate3,
-    SukkotIntermediate4,
-    SukkotIntermediate5,
-    ShminiAtzeret,
-    SimchatTorah,
-    Pesach,
-    Pesach2,
-    PesachIntermediate1,
-    PesachIntermediate2,
-    PesachIntermediate3,
-    PesachIntermediate4,
-    ShviiShelPesach,
-    AcharonShelPesach,
-    Shavuot,
-    Shavuot2
+    Sukkot, Sukkot2,
+    SukkotIntermediate1, SukkotIntermediate2, SukkotIntermediate3, SukkotIntermediate4, SukkotIntermediate5,
+    ShminiAtzeret, SimchatTorah,
+    Pesach, Pesach2,
+    PesachIntermediate1, PesachIntermediate2, PesachIntermediate3, PesachIntermediate4,
+    ShviiShelPesach, AcharonShelPesach,
+    Shavuot, Shavuot2
   )
 
-  val festivalsInHolyLand: Seq[SpecialDayBase] = Seq(
-    RoshHashanah,
-    RoshHashanah2,
+  val festivalsInHolyLand: Set[SpecialDay] = Set(
+    RoshHashanah, RoshHashanah2,
     YomKippur,
     Sukkot,
-    SukkotIntermediate1InHolyLand,
-    SukkotIntermediate2InHolyLand,
-    SukkotIntermediate3InHolyLand,
-    SukkotIntermediate4InHolyLand,
-    SukkotIntermediate5InHolyLand,
-    SukkotIntermediate6InHolyLand,
+    SukkotIntermediate1InHolyLand, SukkotIntermediate2InHolyLand, SukkotIntermediate3InHolyLand,
+    SukkotIntermediate4InHolyLand, SukkotIntermediate5InHolyLand, SukkotIntermediate6InHolyLand,
     ShminiAtzeretAndSimchatTorahInHolyLand,
-    Pesach,
-    Pesach2,
-    PesachIntermediate1InHolyLand,
-    PesachIntermediate2InHolyLand,
-    PesachIntermediate3InHolyLand,
-    PesachIntermediate4InHolyLand,
-    PesachIntermediate5InHolyLand,
+    Pesach, Pesach2,
+    PesachIntermediate1InHolyLand, PesachIntermediate2InHolyLand, PesachIntermediate3InHolyLand,
+    PesachIntermediate4InHolyLand, PesachIntermediate5InHolyLand,
     ShviiAndAcharonShelPesachInHolyLand,
     Shavuot
   )
 
-  def festivals(inHolyLand: Boolean): Seq[SpecialDayBase] = if (inHolyLand) festivalsInHolyLand else festivals
+  def festivals(inHolyLand: Boolean): Set[SpecialDay] = if (inHolyLand) festivalsInHolyLand else festivals
+
+  val fasts: Set[SpecialDay] = Set(FastOfGedalia, FastOfTevet, FastOfEster, FastOfTammuz, TishaBav)
+
+  val rabbinicFestivals: Set[SpecialDay] = Set(
+    Hanukkah1, Hanukkah2, Hanukkah3, Hanukkah4, Hanukkah5, Hanukkah6, Hanukkah7, Hanukkah8,
+    Purim // ShushanPurim
+  )
+
+  def daysWithSpecialReadings(inHolyLand: Boolean): Set[SpecialDay] =
+    festivals(inHolyLand) ++ fasts ++ rabbinicFestivals
 
   def shabbosAfter(day: Day): Day = day.next.next(Day.Name.Shabbos)
 

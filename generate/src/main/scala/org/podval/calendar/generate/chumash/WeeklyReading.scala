@@ -6,10 +6,6 @@ import org.podval.calendar.jewish.SpecialDay
 import Parsha._
 import SpecialDay.{ShabbosBereshit, Pesach, Shavuot, TishaBav, shabbosAfter, shabbosBefore}
 
-case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha] = None) {
-  def isCombined: Boolean = secondParsha.isDefined
-}
-
 /**
   * Determine weekly portion read on a given Shabbos.
   *
@@ -104,6 +100,10 @@ case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha] = None) {
   assumptions of the algorithm itself hold is verified by the unit tests for the years 1-6000;
   I am too lazy to prove the theorems :)
  */
+final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) {
+  def isCombined: Boolean = secondParsha.isDefined
+}
+
 object WeeklyReading {
   private final val fromBereshitToBemidbar: Int = Parsha.distance(Bereshit, Bemidbar)
   private final val combinableFromBereshitToVayikra: Seq[Parsha] = Seq(Vayakhel)
@@ -173,7 +173,8 @@ object WeeklyReading {
     def process(toProcess: Seq[Parsha]): Seq[WeeklyReading] = toProcess match {
       case first :: second :: rest if combine.contains(first) =>
         WeeklyReading(first, Some(second)) +: process(rest)
-      case first :: rest => WeeklyReading(first) +: process(rest)
+      case first :: rest =>
+        WeeklyReading(first, None) +: process(rest)
       case Nil =>  Nil
     }
 
