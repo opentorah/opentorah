@@ -2,7 +2,7 @@ package org.podval.calendar.astronomy
 
 import org.scalatest.{FlatSpec, Matchers}
 import org.podval.calendar.angles.Angles
-import Angles.{Rotation, Position, headRange, range}
+import Angles.{Position, Rotation, headRange, range}
 import org.podval.calendar.jewish.{Cycle, Jewish}
 import Jewish.{Day, Month, Year}
 import org.podval.calendar.numbers.BigRational

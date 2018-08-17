@@ -2,7 +2,7 @@ package org.podval.calendar.astronomy
 
 import org.podval.calendar.angles.Angles.{Position, Rotation}
 import org.podval.calendar.jewish.{Jewish, Seasons}
-import org.podval.calendar.jewish.Jewish.{Moment, Month, Year}
+import Jewish.{Moment, Month, Year}
 import org.podval.calendar.numbers.Math
 
 // In KH 13:11, calculation of true solstices/equinoxes is mentioned, but no algorithm is given.

@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angles.Angles.{Rotation, angleToRadians}
+import org.podval.calendar.angles.Angles.Rotation
 
 import scala.math.{abs, asin, cos, pow, round, sin, sqrt}
 
