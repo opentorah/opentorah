@@ -1,7 +1,5 @@
 package org.podval.calendar.generate.chumash
 
-// TODO load the names in various languages from the XML file
-
 sealed trait Parsha
 
 object Parsha {
@@ -59,4 +57,21 @@ object Parsha {
   case object Vayelech extends Parsha
   case object Haazinu extends Parsha
   case object VZotHaBerachah extends Parsha
+
+  // TODO add half-parshiot for the Dardaki custom
+
+  final val all: Seq[Parsha] = Seq(
+    Bereshit, Noach, LechLecha, Vayeira, ChayeiSarah, Toledot,
+    Vayetze, Vayishlach, Vayeshev, Miketz, Vayigash, Vayechi,
+    Shemot, Vaeira, Bo, Beshalach, Yitro, Mishpatim, Terumah, Tetzaveh, KiTisa, Vayakhel, Pekudei,
+    Vayikra, Tzav, Shemini, Tazria, Metzora, AchareiMot, Kedoshim, Emor, Behar, Bechukotai,
+    Bemidbar, Naso, Behaalotecha, Shlach, Korach, Chukat, Balak, Pinchas, Matot, Masei,
+    Devarim, Vaetchanan, Eikev, Reeh, Shoftim, KiTeitzei, KiTavo, Nitzavim, Vayelech, Haazinu, VZotHaBerachah
+  )
+
+  def forIndex(index: Int): Parsha = all(index)
+
+  def indexOf(parsha: Parsha): Int = all.indexOf(parsha)
+
+  def distance(from: Parsha, to: Parsha): Int = indexOf(to) - indexOf(from)
 }

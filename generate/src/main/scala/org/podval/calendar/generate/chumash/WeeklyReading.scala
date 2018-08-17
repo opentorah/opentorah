@@ -6,7 +6,7 @@ import org.podval.calendar.jewish.SpecialDay
 import Parsha._
 import SpecialDay.{ShabbosBereshit, Pesach, Shavuot, TishaBav, shabbosAfter, shabbosBefore}
 
-case class Readings(parsha: Parsha, secondParsha: Option[Parsha] = None) {
+case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha] = None) {
   def isCombined: Boolean = secondParsha.isDefined
 }
 
@@ -104,25 +104,19 @@ case class Readings(parsha: Parsha, secondParsha: Option[Parsha] = None) {
   assumptions of the algorithm itself hold is verified by the unit tests for the years 1-6000;
   I am too lazy to prove the theorems :)
  */
-/*
-Дополнительные дни чтения Торы
+object WeeklyReading {
+  private final val fromBereshitToBemidbar: Int = Parsha.distance(Bereshit, Bemidbar)
+  private final val combinableFromBereshitToVayikra: Seq[Parsha] = Seq(Vayakhel)
+  private final val combinableFromVayikraToBemidbar: Seq[Parsha] = Seq(Behar, AchareiMot, Tazria)
+  private final val fromBemidbarToVaetchanan: Int = Parsha.distance(Bemidbar, Vaetchanan)
+  private final val combinableFromBemidbarToVaetchanan: Seq[Parsha] = Seq(Matot, Chukat)
+  private final val fromVaetchanan: Int = Parsha.distance(Vaetchanan, VZotHaBerachah)
+  private final val combinableFromVaetchanan: Seq[Parsha] = Seq(Nitzavim)
 
-1. Йом тов и холь а-моэд
-2. Рош ходеш - 1 и 30 день месяца
-3. Ханука - с 25 кислева 8 дней, то есть до 2 или 3 тевета в зависимости от года
-4. Пурим 14 адара ( или адара 2 в високосном году) во всем мире, 15 адара (адара 2) в Иерусалиме, сомнительные ( выяснить)
-5. Посты: 3 тишрей, 10 тевета, 13 адара (адара 2) - если выпадает на шабат или пятницу - в предыдущий четверг), 17 тамуза ( если шабат - 18), 9 ава ( если шабат - 10)
-6. Каждый понедельник и четверг
-7. Чтение Торы в минху: шабат, Йом кипур, дни постов.
-Законы совпадений:
-8. vi.  отодвигается при любом совпадении
-9. i. и 2) 3) 4) совпадающие с шабатом - дополнительный свиток Торы
-      3.2) и 3) дополнительный свиток , то есть если и 2. то три свитка Торы
-10. В 7) Йом кипур отодвигает шабат
- */
-object Readings {
+  def getYear(year: Year, inHolyLand: Boolean): Map[Day, WeeklyReading] =
+    (getCycle(year-1, inHolyLand) ++ getCycle(year, inHolyLand)).filter(_._1.year == year).toMap
 
-  def readings(year: Year, inHolyLand: Boolean): Seq[(Day, Readings)] = {
+  def getCycle(year: Year, inHolyLand: Boolean): Seq[(Day, WeeklyReading)] = {
     // Reading cycle goes into the next year, so we need to exclude the festivals for both years.
     val festivals: Seq[Day] =
       SpecialDay.festivals(inHolyLand).map(_(year)) ++
@@ -130,7 +124,7 @@ object Readings {
 
     // All Shabbos days that are not festivals from one Shabbos Bereshit until the next.
     val weeks: Seq[Day] =
-      unfoldInfiniteSimple(ShabbosBereshit(year))(_ + Calendar.daysPerWeek)
+      Util.unfoldInfiniteSimple(ShabbosBereshit(year))(_ + Calendar.daysPerWeek)
       .takeWhile(_ < ShabbosBereshit(year+1))
       .filterNot(festivals.contains)
       .toList
@@ -141,73 +135,57 @@ object Readings {
 
     val weeksFromShavuotToAfterTishaBeAv: Int = weeksTo(shabbosAfter(TishaBav(year))) - weeksToShavuot
 
-    val combineBeforeBemidbarCandidate: Int = 33 - weeksToShavuot
-    val combineBeforeVaetchananCandidate: Int = 11 - weeksFromShavuotToAfterTishaBeAv
-
     // When there are to many Saturdays before Shavuot to assign Bemidbar to the one immediately before Shavuot,
     // Bemidbar is read one week before Shavuot:
-    val (combineVayakhelPekudei: Int, combineBeforeBemidbar: Int, combineBeforeVaetchanan: Int) =
-      if (combineBeforeBemidbarCandidate < 0) (0, 0, combineBeforeBemidbarCandidate + combineBeforeVaetchananCandidate)
-      else {
-        val doCombineVayakhelPekudei: Boolean = (combineBeforeBemidbarCandidate == 4) || {
-          // This tweak is required only for the Holy Land - and never for AchareiMot.
-          val parshahBeforePesach: Int = weeksTo(shabbosBefore(Pesach(year))) + 1
-          (parshahBeforePesach != 25) && (parshahBeforePesach != 28) // Tzav; Metzora
-        }
+    val (combineFromBereshitToVayikra: Int, combineFromVayikraToBemidbar: Int, combineFromBemidbarToVaetchanan: Int) = {
+      val combinefromBereshitToBemidbar: Int = fromBereshitToBemidbar - weeksToShavuot
+      val combineFromBemidbarToVaetchananCandidate: Int = fromBemidbarToVaetchanan - weeksFromShavuotToAfterTishaBeAv
 
-        val combineVayakhelPekudei: Int = if (doCombineVayakhelPekudei) 1 else 0
-        (combineVayakhelPekudei, combineBeforeBemidbarCandidate-combineVayakhelPekudei, combineBeforeVaetchananCandidate)
+      if (combinefromBereshitToBemidbar < 0) (0, 0, combinefromBereshitToBemidbar + combineFromBemidbarToVaetchananCandidate)
+      else {
+        // TODO clean this up, so there is no hardcoded assumption about combinableFromBereshitToVayikra.length == 1
+        // and maybe rename it to ...beforTzav or something?
+        val doCombineVayakhelPekudei: Boolean =
+          (combinefromBereshitToBemidbar == combinableFromBereshitToVayikra.length + combinableFromVayikraToBemidbar.length) || {
+            // This tweak is required only for the Holy Land - and never for AchareiMot?
+            val parshahBeforePesach: Parsha = Parsha.forIndex(weeksTo(shabbosBefore(Pesach(year))))
+            !Set[Parsha](Tzav, Metzora).contains(parshahBeforePesach)
+          }
+
+        val combineFromBereshitToVayikra: Int = if (doCombineVayakhelPekudei) 1 else 0
+        (
+          combineFromBereshitToVayikra,
+          combinefromBereshitToBemidbar - combineFromBereshitToVayikra,
+          combineFromBemidbarToVaetchananCandidate
+        )
       }
-    require(0 <= combineVayakhelPekudei && combineVayakhelPekudei <= 1)
-    require(0 <= combineBeforeBemidbar && combineBeforeBemidbar <= 3)
-    require(0 <= combineBeforeVaetchanan && combineBeforeVaetchanan <= 2)
+    }
 
     val weeksFromVaetchanan: Int = weeks.length - weeksToShavuot - weeksFromShavuotToAfterTishaBeAv
-    val combineFromVaetchanan: Int = 9 - weeksFromVaetchanan
-    require(0 <= combineFromVaetchanan && combineFromVaetchanan <= 1)
+    val combineFromVaetchanan: Int = fromVaetchanan - weeksFromVaetchanan
 
-    // maximum: 33 portions; combine: 1+3
-    val result = single(
-      Bereshit, Noach, LechLecha, Vayeira, ChayeiSarah, Toledot,
-      Vayetze, Vayishlach, Vayeshev, Miketz, Vayigash, Vayechi,
-      Shemot, Vaeira, Bo, Beshalach, Yitro, Mishpatim,
-      Terumah, Tetzaveh, KiTisa
-    ) ++
-    combineIf(combineVayakhelPekudei >= 1, Vayakhel, Pekudei) ++
-    single(Vayikra, Tzav, Shemini) ++
-    combineIf(combineBeforeBemidbar >= 3, Tazria, Metzora) ++
-    combineIf(combineBeforeBemidbar >= 2, AchareiMot, Kedoshim) ++
-    single(Emor) ++
-    combineIf(combineBeforeBemidbar >= 1, Behar, Bechukotai) ++
-    // maximum: 11 portions; combine: 2
-    single(Bemidbar, Naso, Behaalotecha, Shlach, Korach) ++
-    combineIf(combineBeforeVaetchanan >= 2, Chukat, Balak) ++
-    single(Pinchas) ++
-    combineIf(combineBeforeVaetchanan >= 1, Matot, Masei) ++
-    single(Devarim) ++
-    // maximum: 9 portions; combine: 1
-    single(Vaetchanan, Eikev, Reeh, Shoftim, KiTeitzei, KiTavo) ++
-    combineIf(combineFromVaetchanan >= 1, Nitzavim, Vayelech) ++
-    single(Haazinu)
-    // VZotHaBerachah is read on Simchat Torah, and thus is not included in the regular schedule
+    val combine: Set[Parsha] =
+      take(combinableFromBereshitToVayikra, combineFromBereshitToVayikra) ++
+      take(combinableFromVayikraToBemidbar, combineFromVayikraToBemidbar) ++
+      take(combinableFromBemidbarToVaetchanan, combineFromBemidbarToVaetchanan) ++
+      take(combinableFromVaetchanan, combineFromVaetchanan)
+
+    def process(toProcess: Seq[Parsha]): Seq[WeeklyReading] = toProcess match {
+      case first :: second :: rest if combine.contains(first) =>
+        WeeklyReading(first, Some(second)) +: process(rest)
+      case first :: rest => WeeklyReading(first) +: process(rest)
+      case Nil =>  Nil
+    }
+
+    val result = process(Parsha.all.init)
 
     require(result.length == weeks.length)
+
     weeks zip result
   }
 
-  private def single(parshas: Parsha*): Seq[Readings] = parshas.map(Readings(_))
-
-  private def combineIf(condition: Boolean, parsha: Parsha, secondParsha: Parsha): Seq[Readings] =
-    if (condition) Seq(Readings(parsha, Some(secondParsha)))
-    else Seq(Readings(parsha), Readings(secondParsha))
-
-  // Will this *ever* be in the standard library?
-
-//  def unfold[A, B](start: A)(f: A => Option[(A, B)]): Stream[B] =
-//    f(start).map { case (a, b) => b #:: unfold(a)(f) }.getOrElse(Stream.empty)
-//
-//  def unfoldInfinite[A, B](start: A)(f: A => (A, B)): Stream[B] =
-//    f(start) match { case (a, b) => b #:: unfoldInfinite(a)(f) }
-
-  def unfoldInfiniteSimple[A](start: A)(f: A => A): Stream[A] = start #:: unfoldInfiniteSimple(f(start))(f)
+  private def take(what: Seq[Parsha], number: Int): Set[Parsha] = {
+    require(0 <= number && number <= what.length)
+    what.take(number).toSet
+  }
 }

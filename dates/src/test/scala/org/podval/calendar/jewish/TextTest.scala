@@ -96,19 +96,19 @@ class TextTest extends FlatSpec with Matchers {
     for (yearNumber <- 2 to 6000) {
       val year: Year = Year(yearNumber)
       if (!year.isLeap) {
-        val nextYearDay: Day.Name = year.next.firstDay.name
+        val nextYearFirstDay: Day = year.next.firstDay
         if (year.firstDay.is(Day.Name.Chamishi)) {
-          if (nextYearDay == Day.Name.Sheni) {
+          if (nextYearFirstDay.is(Day.Name.Sheni)) {
             numberRegular += 1
             year.kind shouldBe Year.Kind.Regular
           }
-          if (nextYearDay == Day.Name.Shlishi) {
+          if (nextYearFirstDay.is(Day.Name.Shlishi)) {
             numberFull += 1
             year.kind shouldBe Year.Kind.Full
           }
         }
         if (year.firstDay.is(Day.Name.Shabbos)) {
-          if (nextYearDay == Day.Name.Shlishi) {
+          if (nextYearFirstDay.is(Day.Name.Shlishi)) {
             numberShort += 1
             year.kind shouldBe Year.Kind.Short
           }
