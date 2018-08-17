@@ -1,7 +1,6 @@
 rootProject.name = 'calendar'
 
 include ':dates'
-include ':astronomy'
 include ':generate'
 include ':paper'
 

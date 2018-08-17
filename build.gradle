@@ -180,38 +180,6 @@ project(':dates') {
   bintray bintrayConfig
 }
 
-project(':astronomy') {
-  dependencies {
-    compile project(':dates')
-  }
-
-  def artifactInfo = [
-    id         : 'org.podval.calendar.astronomy',
-    name       : 'jewish-calendar-astronomy',
-    description: 'Jewish Calendar Astronomy.'
-  ]
-
-  publishing {
-    publications {
-      mavenPublication(MavenPublication) {
-        artifactId artifactInfo.id
-
-        from components.java
-        artifact sourceJar
-
-        pom.withXml {
-          def root = asNode()
-          root.appendNode('description', artifactInfo.description)
-          root.appendNode('name'       , artifactInfo.name)
-          root.children().last() + pomConfig
-        }
-      }
-    }
-  }
-
-  bintray bintrayConfig
-}
-
 project(':generate') {
   dependencies {
     compile project(':dates')
@@ -222,7 +190,7 @@ project(':paper') {
   apply plugin: 'org.podval.docbook.gradle'
 
   dependencies {
-    compile lib.scalaXml, project(':astronomy')
+    compile lib.scalaXml, project(':dates')
   }
 
   def docBookData = file("${buildDir}/data")
