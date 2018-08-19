@@ -10,7 +10,7 @@ import SpecialDay._
 class WeeklyReadingTest extends FlatSpec with Matchers {
 
   "Torah readings" should "be assigned correctly" in {
-    (5778 to 5778) foreach { number =>
+    (1 to 6000) foreach { number =>
       val year = Year(number)
 
       verify(year, inHolyLand = false)
@@ -28,9 +28,7 @@ class WeeklyReadingTest extends FlatSpec with Matchers {
     val readingsBeforePesach: WeeklyReading = findReadings(shabbosBefore(Pesach(year)))
     readingsBeforePesach.isCombined shouldBe false
     readingsBeforePesach.parsha shouldBe {
-      if (!year.isLeap) Tzav else
-      if (RoshHashanah(year).is(Day.Name.Chamishi) /* Magen Avraham: not needed && (year.kind != Year.Kind.Regular)*/)
-        AchareiMot else Metzora
+      if (!year.isLeap) Tzav else if (RoshHashanah(year).is(Day.Name.Chamishi)) AchareiMot else Metzora
     }
 
     // Shavuot
@@ -49,10 +47,7 @@ class WeeklyReadingTest extends FlatSpec with Matchers {
     val combined: Seq[Parsha] = readings.map(_._2).filter(_.isCombined).map(_.parsha)
     val yearType = YearType.get(year)
     val combinedFromStructure: Seq[Parsha] = ReadingStructure.all(yearType).combined(inHolyLand)
-//    if (yearType != YearType.N5R) {
-//      println(yearType)
-      combined.toSet shouldBe combinedFromStructure.toSet
-//    }
+    combined.toSet shouldBe combinedFromStructure.toSet
   }
 }
 

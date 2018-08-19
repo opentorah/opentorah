@@ -1,6 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.prop.TableDrivenPropertyChecks.{Table, forAll}
 import Jewish.{Day, Month, Year}
 import Jewish.TimeVector
 import Jewish.Day.Name._
@@ -17,85 +18,96 @@ final class DatesTest extends FlatSpec with Matchers {
     Day(5772, Marheshvan, 24).name shouldBe Day.Name.Sheni
   }
 
-  // TODO redo with data sources
   "Conversions from date to days and back" should "end where they started" in {
-    def test(yearNumber: Int, monthName: Month.Name, dayNumber: Int): Unit = {
-      val year = Year(yearNumber)
-      year.number shouldBe yearNumber
+    val data = Table(
+      ("yearNumber", "monthName", "dayNumber"),
+      (1   , Tishrei,  1),
+      (2   , Tishrei,  1),
+      (5768, AdarII , 28),
+      (5769, Nisan  , 14)
+    )
 
-      val month = year.month(monthName)
-      month.name shouldBe monthName
+    forAll(data) {
+      (
+        yearNumber: Int,
+        monthName: Month.Name,
+        dayNumber: Int
+      ) =>
+        val year = Year(yearNumber)
+        year.number shouldBe yearNumber
 
-      val day = month.day(dayNumber)
+        val month = year.month(monthName)
+        month.name shouldBe monthName
 
-      day.year shouldBe year
-      day.month shouldBe month
-      day.numberInMonth shouldBe dayNumber
+        val day = month.day(dayNumber)
+        day.year shouldBe year
+        day.month shouldBe month
+        day.numberInMonth shouldBe dayNumber
     }
-
-    test(1   , Tishrei,  1)
-    test(2   , Tishrei,  1)
-    test(5768, AdarII , 28)
-    test(5769, Nisan  , 14)
   }
 
-  // TODO redo with data sources
   "New moons from the printed tables" should "calculate correctly" in {
-    // year and month for the molad; jewish date; georgian date; georgian time
-    newMoon(5769, Tishrei   , Shlishi ,  5769, Tishrei,  1,  2008, September, 30,  1, 58, 13)
-    newMoon(5769, Marheshvan, Rvii    ,  5769, Tishrei, 30,  2008, October  , 29, 14, 42, 14)
-    newMoon(5769, Kislev    , Shishi  ,  5769, Kislev ,  1,  2008, November , 28,  3, 26, 15)
+    val data = Table(
+      // year and month for the molad; jewish date; georgian date; georgian time
+      ("moladYear", "moladMonth", "dayOfWeek", "year", "month", "day", "yearG", "monthG", "dayG", "hours", "minutes", "parts"),
 
-    newMoon(5771, Tishrei   , Chamishi,  5771, Tishrei,  1,  2010, September,  8, 19, 36,  1)
+      (5769, Tishrei   , Shlishi ,  5769, Tishrei,  1,  2008, September, 30,  1, 58, 13),
+      (5769, Marheshvan, Rvii    ,  5769, Tishrei, 30,  2008, October  , 29, 14, 42, 14),
+      (5769, Kislev    , Shishi  ,  5769, Kislev ,  1,  2008, November , 28,  3, 26, 15),
 
-    newMoon(5772, Tishrei   , Shlishi ,  5771, Elul   , 28,  2011, September, 27, 17,  8, 14)
-    newMoon(5772, Marheshvan, Chamishi,  5772, Tishrei, 29,  2011, October  , 27,  5, 52, 15)
+      (5771, Tishrei   , Chamishi,  5771, Tishrei,  1,  2010, September,  8, 19, 36,  1),
 
-    newMoon(5773, Tishrei   , Rishon  ,  5772, Elul   , 29,  2012, September, 16,  1, 57,  8)
-    newMoon(5773, Adar      , Rishon  ,  5773, Shvat  , 30,  2013, February , 10, 17, 37, 13)
-    newMoon(5773, Nisan     , Shlishi ,  5773, Nisan  ,  1,  2013, March    , 12,  6, 21, 14)
-  }
+      (5772, Tishrei   , Shlishi ,  5771, Elul   , 28,  2011, September, 27, 17,  8, 14),
+      (5772, Marheshvan, Chamishi,  5772, Tishrei, 29,  2011, October  , 27,  5, 52, 15),
 
-  private def newMoon(
-    moladYear: Int, moladMonth: Jewish.MonthName, dayOfWeek: Jewish.DayName,
-    year: Int, month: Jewish.MonthName, day: Int,
-    yearG: Int, monthG: Gregorian.MonthName, dayG: Int,
-    hours: Int, minutes: Int, parts: Int)
-  {
-    val dayJ = Jewish.Day(year, month, day)
-    val dateG = Gregorian.Day(yearG, monthG, dayG).toMoment.
-      hours(hours).minutes(minutes).partsWithoutMinutes(parts)
-    val molad = Jewish.Year(moladYear).month(moladMonth).newMoon
+      (5773, Tishrei   , Rishon  ,  5772, Elul   , 29,  2012, September, 16,  1, 57,  8),
+      (5773, Adar      , Rishon  ,  5773, Shvat  , 30,  2013, February , 10, 17, 37, 13),
+      (5773, Nisan     , Shlishi ,  5773, Nisan  ,  1,  2013, March    , 12,  6, 21, 14)
+    )
 
-    molad.day.name shouldBe dayOfWeek
-    molad.day shouldBe dayJ
+    forAll(data) {
+      (
+        moladYear: Int, moladMonth: Jewish.MonthName, dayOfWeek: Jewish.DayName,
+        year: Int, month: Jewish.MonthName, day: Int,
+        yearG: Int, monthG: Gregorian.MonthName, dayG: Int,
+        hours: Int, minutes: Int, parts: Int
+      ) =>
+        val dayJ = Jewish.Day(year, month, day)
+        val dateG = Gregorian.Day(yearG, monthG, dayG).toMoment.
+          hours(hours).minutes(minutes).partsWithoutMinutes(parts)
+        val molad = Jewish.Year(moladYear).month(moladMonth).newMoon
 
-    Calendar.toJewish(dateG).day shouldBe dayJ
-    Calendar.fromJewish(molad) shouldBe dateG
-  }
+        molad.day.name shouldBe dayOfWeek
+        molad.day shouldBe dayJ
 
-  // TODO redo with data sources
-  "Moment components" should "be correct" in {
-    def test(days: Int, hours: Int, parts: Int): Unit = {
-      val moment = TimeVector().days(days).hours(hours).parts(parts)
-
-      moment.days shouldBe days
-      moment.hours shouldBe hours
-      moment.parts shouldBe parts
+        Calendar.toJewish(dateG).day shouldBe dayJ
+        Calendar.fromJewish(molad) shouldBe dateG
     }
+  }
 
-    test( 0, 18,   0)
-    test( 0,  9, 204)
-    test( 0, 15, 589)
-    test(29, 12, 793)
-    test( 1,  5, 204)
+  "Moment components" should "be correct" in {
+    val data = Table(
+      ("days", "hours", "parts"),
+      ( 0,     18,      0),
+      ( 0,      9,    204),
+      ( 0,     15,    589),
+      (29,     12,    793),
+      ( 1,      5,    204)
+    )
+
+    forAll(data) {
+      (days: Int, hours: Int, parts: Int) =>
+        val moment = TimeVector().days(days).hours(hours).parts(parts)
+        moment.days shouldBe days
+        moment.hours shouldBe hours
+        moment.parts shouldBe parts
+    }
   }
 
   private val years = (1 to 6000) map (Year(_))
 
   "Jewish year" should "be the year of the month retrieved from it" in {
-    for (year <- years; month <- 1 to year.lengthInMonths)
-      year.month(month).year shouldBe year
+    for (year <- years; month <- year.months) month.year shouldBe year
   }
 
   // Shulchan Aruch, Orach Chaim, 428:1
@@ -124,7 +136,7 @@ final class DatesTest extends FlatSpec with Matchers {
     }
   }
 
-  "Jewish Year" should "have allowed type" in {
+  "Jewish Year" should "have allowed type with Pesach on correct day of the week" in {
     years foreach { year => Pesach(year).name shouldBe YearType.get(year).pesach }
   }
 }

@@ -80,9 +80,11 @@ import SpecialDay.{ShabbosBereshit, Pesach, Shavuot, TishaBav, shabbosAfter, sha
   Requirements of the Shulchan Aruch uniquely define the schedule only when priorities of combining
   combinable portions are specified, which Shulchan Aruch itself doesn't do. Customs vary
   (see Magen Avraham 6); currently, those priorities are codified as follows:
-    Tazria and Metzora cn be combined only if AchareiMot and Kedoshim are combined;
-    AchareiMot and Kedoshim can be combined only if Behar and Bechukotai are combined;
+    Behar and Bechukotai can be combined only if AchareiMot and Kedoshim are combined;
+    AchareiMot and Kedoshim can be combined only if Tazria and Metzora are combined;
     Chukat and Balak can be combined only if Matot and Masei are combined.
+  TODO?
+  Source: https://orot.ac.il/sites/default/files/morashtenu/16-3.pdf
 
   When Shulchan Oruch says that Bemidbar is read before Shavuot, it uses the same word "before"
   as when it says that Tisha Be Av is before the reading of Vaetchanan and in other places in
@@ -108,7 +110,7 @@ object WeeklyReading {
   private final val fromBereshitToBemidbar: Int = Parsha.distance(Bereshit, Bemidbar)
   private final val combinableFromBereshitToVayikra: Seq[Parsha] = Seq(Vayakhel)
   private final val allowedBeforePesach: Set[Parsha] = Set[Parsha](Tzav, Metzora, AchareiMot)
-  private final val combinableFromVayikraToBemidbar: Seq[Parsha] = Seq(Behar, AchareiMot, Tazria)
+  private final val combinableFromVayikraToBemidbar: Seq[Parsha] = Seq(Tazria, AchareiMot, Behar)
   private final val fromBemidbarToVaetchanan: Int = Parsha.distance(Bemidbar, Vaetchanan)
   private final val combinableFromBemidbarToVaetchanan: Seq[Parsha] = Seq(Matot, Chukat)
   private final val fromVaetchanan: Int = Parsha.distance(Vaetchanan, VZotHaBerachah)
@@ -142,7 +144,8 @@ object WeeklyReading {
       val combinefromBereshitToBemidbar: Int = fromBereshitToBemidbar - weeksToShavuot
       val combineFromBemidbarToVaetchananCandidate: Int = fromBemidbarToVaetchanan - weeksFromShavuotToAfterTishaBeAv
 
-      if (combinefromBereshitToBemidbar < 0) (0, 0, combinefromBereshitToBemidbar + combineFromBemidbarToVaetchananCandidate)
+      if (combinefromBereshitToBemidbar < 0)
+        (0, 0, combinefromBereshitToBemidbar + combineFromBemidbarToVaetchananCandidate)
       else {
         // TODO clean this up, so there is no hardcoded assumption about combinableFromBereshitToVayikra.length == 1
         // and maybe rename it to ...beforTzav or something?
@@ -154,6 +157,7 @@ object WeeklyReading {
           }
 
         val combineFromBereshitToVayikra: Int = if (doCombineVayakhelPekudei) 1 else 0
+
         (
           combineFromBereshitToVayikra,
           combinefromBereshitToBemidbar - combineFromBereshitToVayikra,
