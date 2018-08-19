@@ -15,7 +15,7 @@ import Gregorian.Month.Name._
 final class DatesTest extends FlatSpec with Matchers {
 
   "Known dates" should "have correct day of the week" in {
-    Day(5772, Marheshvan, 24).name shouldBe Day.Name.Sheni
+    Day(5772, Marheshvan, 24).name shouldBe Sheni
   }
 
   "Conversions from date to days and back" should "end where they started" in {
@@ -112,27 +112,67 @@ final class DatesTest extends FlatSpec with Matchers {
 
   // Shulchan Aruch, Orach Chaim, 428:1
   "Festivals" should "not fall on the proscribed days" in {
+    val data = Table(
+      ("specialDay", "notOn"),
+      (RoshHashanah, Seq(Rishon, Rvii, Shishi)),
+      (YomKippur, Seq(Shlishi, Rishon, Shishi)),
+      (Purim, Seq(Shabbos, Sheni, Rvii)),
+      (Pesach, Seq(Sheni, Rvii, Shishi)),
+      (Shavuot, Seq(Shlishi, Chamishi, Shabbos)),
+      (HoshanahRabbah, Seq(Shlishi, Chamishi, Shabbos)),
+      (Hanukkah1, Seq(Shlishi)),
+      (FastOfEster, Seq(Rishon, Shlishi, Shishi)),
+      (FastOfTammuz, Seq(Sheni, Rvii, Shishi)),
+      (TishaBav, Seq(Sheni, Rvii, Shishi))
+    )
     years foreach { year =>
-      def notOn(specialDay: SpecialDay, days: Day.Name*): Unit =
+      forAll(data) {
+        (specialDay: SpecialDay, days: Seq[Day.Name]) =>
         days contains specialDay(year).name shouldBe false
-
-      notOn(RoshHashanah, Rishon, Rvii, Shishi)
-      notOn(YomKippur, Shlishi, Rishon, Shishi)
-      notOn(Purim, Shabbos, Sheni, Rvii)
-      notOn(Pesach, Sheni, Rvii, Shishi)
-      notOn(Shavuot, Shlishi, Chamishi, Shabbos)
-      notOn(HoshanahRabbah, Shlishi, Chamishi, Shabbos)
-      notOn(Hanukkah1, Shlishi)
-      notOn(FastOfEster, Rishon, Shlishi, Shishi)
-      notOn(FastOfTammuz, Sheni, Rvii, Shishi)
-      notOn(TishaBav, Sheni, Rvii, Shishi)
+      }
 
       def sameDay(a: SpecialDay, b: SpecialDay): Unit =
         a(year).name shouldBe b(year).name
 
       sameDay(Purim, LagBaOmer)
-      // TODO This is wrong; see Taz
+      // misprint, see Taz 1, Magen Avraham 1
       // sameDay(Hanukkah, Shavuot)
+    }
+  }
+
+  // Shulchan Aruch, Orach Chaim, 428:2
+  "Roshei Chodoshim" should "fall on allowed days" in {
+    val data = Table(
+      ("month", "days"),
+      (Nisan, Seq(Rishon, Shlishi, Chamishi, Shabbos)),
+      (Iyar, Seq(Sheni, Shlishi, Chamishi, Shabbos)),
+      (Sivan, Seq(Rishon, Shlishi, Rvii, Shishi)),
+      (Tammuz, Seq(Rishon, Shlishi, Chamishi, Shishi)),
+      (Av, Seq(Sheni, Rvii, Shishi, Shabbos)),
+      (Elul, Seq(Rishon, Sheni, Rvii, Shishi)),
+      (Tishrei, Seq(Sheni, Shlishi, Chamishi, Shabbos)),
+      // see Taz 2, Magen Avraham 2:
+      (Marheshvan, Seq(Sheni, Rvii, Chamishi, Shabbos)),
+      (Kislev, Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi)),
+      (Teves, Seq(Rishon, Sheni, Shlishi, Rvii, Shishi)),
+      (Shvat, Seq(Sheni, Shlishi, Rvii, Chamishi, Shabbos)),
+      // see Ramo:
+      (Adar, Seq(Shabbos, Sheni, Rvii, Shishi)),
+      (AdarI, Seq(Sheni, Rvii, Chamishi, Shabbos)),
+      (AdarII, Seq(Sheni, Rvii, Shishi, Shabbos))
+    )
+    years foreach { year =>
+      forAll(data) {
+        (month: Month.Name, days: Seq[Day.Name]) =>
+          val monthExistsInYear: Boolean =
+            (month != Adar && month != AdarI && month != AdarII) ||
+            ((month == Adar) && !year.isLeap) ||
+            ((month == AdarI || month == AdarII) && year.isLeap)
+          if (monthExistsInYear) {
+            val roshChodesDay = year.month(month).firstDay
+            days contains roshChodesDay.name shouldBe true
+          }
+      }
     }
   }
 
