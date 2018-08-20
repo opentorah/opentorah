@@ -110,6 +110,9 @@ object WeeklyReading {
   private final val fromBereshitToBemidbar: Int = Parsha.distance(Bereshit, Bemidbar)
   private final val combinableFromBereshitToVayikra: Seq[Parsha] = Seq(Vayakhel)
   private final val allowedBeforePesach: Set[Parsha] = Set[Parsha](Tzav, Metzora, AchareiMot)
+  // TODO see #56; Magen Avraham 428:4 (6);
+  // Reversing the priorities here currently affects only non-leap regular years with Rosh
+  // Hashanah on Thursday (and Pesach on Shabbat).
   private final val combinableFromVayikraToBemidbar: Seq[Parsha] = Seq(Tazria, AchareiMot, Behar)
   private final val fromBemidbarToVaetchanan: Int = Parsha.distance(Bemidbar, Vaetchanan)
   private final val combinableFromBemidbarToVaetchanan: Seq[Parsha] = Seq(Matot, Chukat)

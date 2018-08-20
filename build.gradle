@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 buildscript {
   repositories {
     // To function outside a composite, a plugin repository would be required.
@@ -8,7 +10,7 @@ buildscript {
 }
 
 plugins {
-//  id "com.github.maiflai.scalatest" version "0.22"
+  id "com.github.maiflai.scalatest" version "0.22" apply false
   id "com.jfrog.artifactory" version "4.5.4" apply false
   id "com.jfrog.bintray" version "1.7.3" apply false
 }
@@ -21,8 +23,8 @@ ext.lib = [
 //  "org.scala-sbt:zinc_${scalaVersionMajor}:1.0.3"
   scala     : "org.scala-lang:scala-library:$scalaVersion",
   scalaXml  : "org.scala-lang.modules:scala-xml_$scalaVersionMajor:1.1.0",
-  scalaCheck: "org.scalacheck:scalacheck_${scalaVersionMajor}:1.13.4",
-  scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.4",
+  scalaCheck: "org.scalacheck:scalacheck_${scalaVersionMajor}:1.14.0",
+  scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.5",
   pegdown   : 'org.pegdown:pegdown:1.4.2' // for scalatest reports
 ]
 
@@ -39,6 +41,7 @@ allprojects {
 
 subprojects {
   apply plugin: 'scala'
+  apply plugin: 'com.github.maiflai.scalatest'
   apply plugin: 'maven-publish'
   apply plugin: 'com.jfrog.bintray'
 
@@ -48,19 +51,11 @@ subprojects {
     testImplementation lib.scalaCheck, lib.scalaTest, lib.pegdown
   }
 
-//  task scalaTest(dependsOn: ['testClasses'], type: JavaExec) {
-//    main = 'org.scalatest.tools.Runner'
-//    args = ['-R', 'build/classes/test', '-o']
-//    classpath = sourceSets.test.runtimeClasspath
-//  }
-//
-//  test.dependsOn scalaTest
-
-//  test {
-//    testLogging {
-//      test.testLogging.events = [org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED]
-//    }
-//  }
+  test {
+    testLogging {
+      events = [TestLogEvent.FAILED]
+    }
+  }
 
   task sourceJar(type: Jar) {
     from sourceSets.main.allSource

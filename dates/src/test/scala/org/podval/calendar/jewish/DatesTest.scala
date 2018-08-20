@@ -176,6 +176,20 @@ final class DatesTest extends FlatSpec with Matchers {
     }
   }
 
+  // Shulchan Aruch, Orach Chaim, 428:3
+  "Festivals" should "follow the rule" in {
+    years foreach { year =>
+      val pesach: Day = Pesach(year)
+      TishaBav(year).name shouldBe pesach.name
+      Shavuot(year).name shouldBe (pesach+1).name
+      RoshHashanah(year+1).name shouldBe (pesach+2).name
+      SimchatTorah(year+1).name shouldBe (pesach+3).name
+      YomKippur(year+1).name shouldBe (pesach+4).name
+      Purim(year).name shouldBe (pesach+5).name
+    }
+  }
+
+
   "Jewish Year" should "have allowed type with Pesach on correct day of the week" in {
     years foreach { year => Pesach(year).name shouldBe YearType.get(year).pesach }
   }
