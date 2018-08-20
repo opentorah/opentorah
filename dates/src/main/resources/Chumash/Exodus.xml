@@ -2,8 +2,11 @@
 <meta>
 
   <week chapter="1" verse="1">
-    <hebrewname>שמות</hebrewname>
-    <name>Shemos</name>
+    <names>
+      <name lang="he">שמות</name>
+      <name lang="en" transliteration="yes">Shemos</name>
+      <name lang="ru" transliteration="yes">Шмот</name>
+    </names>
   </week>
 
   <day number="1" chapter="1" verse="1"/>
@@ -17,8 +20,10 @@
 
 
   <week chapter="6" verse="2">
-    <hebrewname>וארא</hebrewname>
-    <name></name>
+    <names>
+      <name lang="he">וארא</name>
+      <name lang="ru" transliteration="yes">Ваэра</name>
+    </names>
   </week>
   
   <day number="1" chapter="6" verse="2"/>
@@ -32,8 +37,10 @@
 
   
   <week chapter="10" verse="1">
-    <hebrewname>בא</hebrewname>
-    <name></name>
+    <names>
+      <name lang="he">בא</name>
+      <name lang="ru" transliteration="yes">Бо</name>
+    </names>
   </week>
   
   <day number="1" chapter="10" verse="1"/>
@@ -47,8 +54,10 @@
   
   
   <week chapter="13" verse="17">
-    <hebrewname>בשלח</hebrewname>
-    <name></name>
+    <names>
+      <name lang="he">בשלח</name>
+      <name lang="ru" transliteration="yes">Бэшалах</name>
+    </names>
   </week>
   
   <day number="1" chapter="13" verse="17"/>
@@ -62,8 +71,10 @@
   
   
   <week chapter="18" verse="1">
-    <hebrewname>יתרו</hebrewname>
-    <name></name>
+    <names>
+      <name lang="he">יתרו</name>
+      <name lang="ru" transliteration="yes">Итро</name>
+    </names>
   </week>
 
   <day number="1" chapter="18" verse="1"/>
@@ -77,8 +88,10 @@
 
 
   <week chapter="21" verse="1">
-    <hebrewname>משפטימ</hebrewname>
-    <name></name>
+    <names>
+      <name lang="he">משפטימ</name>
+      <name lang="ru" transliteration="yes">Мишпатим</name>
+    </names>
   </week>
   
   <day number="1" chapter="21" verse="1"/>
@@ -92,8 +105,10 @@
 
 
   <week chapter="25" verse="1">
-    <hebrewname>תרומה</hebrewname>
-    <name></name>
+    <names>
+      <name lang="he">תרומה</name>
+      <name lang="ru" transliteration="yes">Трума</name>
+    </names>
   </week>
   
   <day number="1" chapter="25" verse="1"/>
@@ -107,8 +122,10 @@
 
 
   <week chapter="27" verse="20">
-    <hebrewname>תצוה</hebrewname>
-    <name></name>
+    <names>
+      <name lang="he">תצוה</name>
+      <name lang="ru" transliteration="yes">Тэцавэ</name>
+    </names>
   </week>
 
   <day number="1" chapter="27" verse="20"/>
@@ -122,8 +139,10 @@
 
 
   <week chapter="30" verse="22">
-    <hebrewname>כי תשא</hebrewname>
-    <name></name>
+    <names>
+      <name lang="he">כי תשא</name>
+      <name lang="ru" transliteration="yes">Ки-Тиса</name>
+    </names>
   </week>
 
   <day number="1" chapter="30" verse="11"/>
@@ -137,8 +156,10 @@
 
 
   <week chapter="35" verse="1">
-    <hebrewname>ויקהל</hebrewname>
-    <name></name>
+    <names>
+      <name lang="he">ויקהל</name>
+      <name lang="ru" transliteration="yes">Вайакѓэл</name>
+    </names>
   </week>
 
   <day number="1" chapter="35" verse="1"/>
@@ -152,8 +173,10 @@
 
 
   <week chapter="38" verse="21">
-    <hebrewname>פקודי</hebrewname>
-    <name></name>
+    <names>
+      <name lang="he">פקודי</name>
+      <name lang="ru" transliteration="yes">Пэкудэй</name>
+    </names>
   </week>
 
   <day number="1" chapter="38" verse="21"/>
@@ -164,6 +187,4 @@
   <day number="6" chapter="40" verse="17"/>
   <day number="7" chapter="40" verse="28"/>
   <maftir chapter="40" verse="34"/>
-
 </meta>
-
