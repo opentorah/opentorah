@@ -10,7 +10,7 @@ buildscript {
 }
 
 plugins {
-  id "com.github.maiflai.scalatest" version "0.22"
+  id "com.github.maiflai.scalatest" version "0.22" apply false
   id "com.jfrog.artifactory" version "4.5.4" apply false
   id "com.jfrog.bintray" version "1.7.3" apply false
 }
@@ -41,6 +41,7 @@ allprojects {
 
 subprojects {
   apply plugin: 'scala'
+  apply plugin: 'com.github.maiflai.scalatest'
   apply plugin: 'maven-publish'
   apply plugin: 'com.jfrog.bintray'
 
@@ -51,14 +52,8 @@ subprojects {
   }
 
   test {
-//    filter {
-//      includeTestsMatching 'org.podval.calendar.dates.*'
-//    }
-    beforeTest { descriptor ->
-      logger.lifecycle("Running test: ${descriptor}")
-    }
     testLogging {
-      events = [TestLogEvent.STANDARD_OUT, TestLogEvent.STANDARD_ERROR, TestLogEvent.STARTED]
+      events = [TestLogEvent.FAILED]
     }
   }
 
