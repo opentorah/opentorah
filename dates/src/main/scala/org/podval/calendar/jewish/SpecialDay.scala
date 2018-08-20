@@ -6,6 +6,8 @@ import Month.Name._
 sealed trait SpecialDay {
   def apply(year: Year): Day
 
+  def corrected(year: Year): Day = apply(year)
+
   // No more than one of the predicates is true
 
   def isFast: Boolean
@@ -54,7 +56,12 @@ object SpecialDay {
   case object RoshHashanah extends SpecialDayBase(Tishrei, 1) with Festival
   case object RoshHashanah2 extends SpecialDayBase(Tishrei, 2) with Festival
 
-  case object FastOfGedalia extends SpecialDayBase(Tishrei, 3) with Fast
+  case object FastOfGedalia extends SpecialDayBase(Tishrei, 3) with Fast {
+    override def corrected(year: Year): Day = {
+      val result = apply(year)
+      if (result.isShabbos) result+1 else result
+    }
+  }
 
   case object YomKippur extends SpecialDayBase(Tishrei, 10) with Festival
 
@@ -102,8 +109,10 @@ object SpecialDay {
   case object FastOfTevet extends SpecialDayBase(Teves, 10) with Fast
 
   case object FastOfEster extends SpecialDay with Fast {
-    override def apply(year: Year): Day = {
-      val result = Purim(year)-1
+    override def apply(year: Year): Day = Purim(year)-1
+
+    override def corrected(year: Year): Day = {
+      val result = apply(year)
       // If on Friday or Saturday - move to Thursday
       if (result.isShabbos) result-2 else
       if (result.next.isShabbos) result-1 else
@@ -146,9 +155,9 @@ object SpecialDay {
   case object Shavuot extends SpecialDayBase(Sivan, 6) with Festival
   case object Shavuot2 extends SpecialDayBase(Sivan, 7) with Festival
 
-  case object FastOfTammuz extends SpecialDay with Fast {
-    override def apply(year: Year): Day = {
-      val result = year.month(Tammuz).day(17)
+  case object FastOfTammuz extends SpecialDayBase(Tammuz, 17) with Fast {
+    override def corrected(year: Year): Day = {
+      val result = apply(year)
       if (result.isShabbos) result+1 else result
     }
   }
@@ -157,9 +166,9 @@ object SpecialDay {
   // also, when Av Harachamim is not said on Shabbos (by the way, when Tisha Bav is on Shabbos, it *is* said,
   // although we wouldn't have said Tachanun if it wasn't Shabbos...) - but shouldn't postponed fast
   // (or advanced Purim) leave some trace?
-  case object TishaBav extends SpecialDay with Fast {
-    override def apply(year: Year): Day = {
-      val result = year.month(Av).day(9)
+  case object TishaBav extends SpecialDayBase(Av, 9) with Fast {
+    override def corrected(year: Year): Day = {
+      val result = apply(year)
       if (result.isShabbos) result+1 else result
     }
   }
@@ -193,6 +202,7 @@ object SpecialDay {
 
   def festivals(inHolyLand: Boolean): Set[SpecialDay] = if (inHolyLand) festivalsInHolyLand else festivals
 
+  // TODO use corrected() istead of apply() for Torah readings; double-check Purim.
   val fasts: Set[SpecialDay] = Set(FastOfGedalia, FastOfTevet, FastOfEster, FastOfTammuz, TishaBav)
 
   val rabbinicFestivals: Set[SpecialDay] = Set(
