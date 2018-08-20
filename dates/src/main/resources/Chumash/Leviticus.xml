@@ -3,6 +3,7 @@
   <week chapter="1" verse="1">
     <names>
       <name lang="he">ויקרא</name>
+      <name lang="en" transliteration="yes">Vayikra</name>
       <name lang="ru" transliteration="yes">Вайикра</name>
     </names>
   </week>
@@ -19,6 +20,7 @@
   <week chapter="6" verse="1">
     <names>
       <name lang="he">צו</name>
+      <name lang="en" transliteration="yes">Tzav</name>
       <name lang="ru" transliteration="yes">Цав</name>
     </names>
   </week>
@@ -35,6 +37,7 @@
   <week chapter="9" verse="1">
     <names>
       <name lang="he">שמיני</name>
+      <name lang="en" transliteration="yes">Shemini</name>
       <name lang="ru" transliteration="yes">Шмини</name>
     </names>
   </week>
@@ -51,6 +54,7 @@
   <week chapter="12" verse="1">
     <names>
       <name lang="he">תזריע</name>
+      <name lang="en" transliteration="yes">Tazria</name>
       <name lang="ru" transliteration="yes">Тазриа</name>
     </names>
   </week>
@@ -67,6 +71,7 @@
   <week chapter="14" verse="1">
     <names>
       <name lang="he">מצורע</name>
+      <name lang="en" transliteration="yes">Metzora</name>
       <name lang="ru" transliteration="yes">Мецора</name>
     </names>
   </week>
@@ -83,6 +88,7 @@
   <week chapter="16" verse="1">
     <names>
       <name lang="he">אחרי מות</name>
+      <name lang="en" transliteration="yes">Acharei</name>
       <name lang="ru" transliteration="yes">Ахарэй</name>
     </names>
   </week>
@@ -99,6 +105,7 @@
   <week chapter="19" verse="1">
     <names>
       <name lang="he">קדושים</name>
+      <name lang="en" transliteration="yes">Kedoshim</name>
       <name lang="ru" transliteration="yes">Кдошим</name>
     </names>
   </week>
@@ -115,6 +122,7 @@
   <week chapter="21" verse="1">
     <names>
       <name lang="he">אמור</name>
+      <name lang="en" transliteration="yes">Emor</name>
       <name lang="ru" transliteration="yes">Эмор</name>
     </names>
   </week>
@@ -131,6 +139,7 @@
   <week chapter="25" verse="1">
     <names>
       <name lang="he">בהר</name>
+      <name lang="en" transliteration="yes">Behar</name>
       <name lang="ru" transliteration="yes">Бэѓар</name>
     </names>
   </week>
@@ -147,6 +156,7 @@
   <week chapter="26" verse="3">
     <names>
       <name lang="he">בחקותי</name>
+      <name lang="en" transliteration="yes">Bechukosai</name>
       <name lang="ru" transliteration="yes">Бэхукотай</name>
     </names>
   </week>

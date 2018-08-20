@@ -4,6 +4,7 @@
   <week chapter="1" verse="1">
     <names>
       <name lang="he">במדבר</name>
+      <name lang="en" transliteration="yes">Bemidbar</name>
       <name lang="ru" transliterated="true">Бэмидбар</name>
     </names>
   </week>
@@ -20,6 +21,7 @@
   <week chapter="4" verse="21">
     <names>
       <name lang="he">נשא</name>
+      <name lang="en" transliteration="yes">Nasso</name>
       <name lang="ru" transliterated="true">Насо</name>
     </names>
   </week>
@@ -36,6 +38,7 @@
   <week chapter="8" verse="1">
     <names>
       <name lang="he">בהעלותך</name>
+      <name lang="en" transliteration="yes">Beha'aloscha</name>
       <name lang="ru" transliterated="true">Бэѓаалотха</name>
     </names>
   </week>
@@ -52,6 +55,7 @@
   <week chapter="13" verse="1">
     <names>
       <name lang="he">שלח</name>
+      <name lang="en" transliteration="yes">Shelach</name>
       <name lang="ru" transliterated="true">Шлах</name>
     </names>
   </week>
@@ -68,6 +72,7 @@
   <week chapter="16" verse="1">
     <names>
       <name lang="he">קרח</name>
+      <name lang="en" transliteration="yes">Korach</name>
       <name lang="ru" transliterated="true">Корах</name>
     </names>
   </week>
@@ -84,6 +89,7 @@
   <week chapter="19" verse="1">
     <names>
       <name lang="he">חקת</name>
+      <name lang="en" transliteration="yes">Chukas</name>
       <name lang="ru" transliterated="true">Хукат</name>
     </names>
   </week>
@@ -100,6 +106,7 @@
   <week chapter="22" verse="2">
     <names>
       <name lang="he">בלק</name>
+      <name lang="en" transliteration="yes">Balak</name>
       <name lang="ru" transliterated="true">Балак</name>
     </names>
   </week>
@@ -116,6 +123,7 @@
   <week chapter="25" verse="10">
     <names>
       <name lang="he">פנחס</name>
+      <name lang="en" transliteration="yes">Pinchas</name>
       <name lang="ru" transliterated="true">Пинхас</name>
     </names>
   </week>
@@ -132,6 +140,7 @@
   <week chapter="30" verse="2">
     <names>
       <name lang="he">מטות</name>
+      <name lang="en" transliteration="yes">Mattos</name>
       <name lang="ru" transliterated="true">Матот</name>
     </names>
   </week>
@@ -148,6 +157,7 @@
   <week chapter="33" verse="1">
     <names>
       <name lang="he">מסעי</name>
+      <name lang="en" transliteration="yes">Masei</name>
       <name lang="ru" transliterated="true">Масъэй</name>
     </names>
   </week>

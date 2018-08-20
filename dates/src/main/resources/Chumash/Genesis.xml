@@ -5,8 +5,7 @@
     <names>
       <name lang="he">בראשית</name>
       <name n="Bereishis" lang="en" transliteration="yes"/>
-      <name n="Bereshis" lang="en" transliteration="yes"/>
-      <name n="Breshis" lang="en" transliteration="yes"/>
+      <name n="Bereshit" lang="en" transliteration="yes" flavour="sefarad"/>
       <name n="Genesis" lang="en"/>
       <name n="Берешит" lang="ru" transliteration="yes"/>
     </names>

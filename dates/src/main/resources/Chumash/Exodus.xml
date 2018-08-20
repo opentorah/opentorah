@@ -22,6 +22,7 @@
   <week chapter="6" verse="2">
     <names>
       <name lang="he">וארא</name>
+      <name lang="en" transliteration="yes">Va'eira</name>
       <name lang="ru" transliteration="yes">Ваэра</name>
     </names>
   </week>
@@ -39,6 +40,7 @@
   <week chapter="10" verse="1">
     <names>
       <name lang="he">בא</name>
+      <name lang="en" transliteration="yes">Bo</name>
       <name lang="ru" transliteration="yes">Бо</name>
     </names>
   </week>
@@ -56,6 +58,7 @@
   <week chapter="13" verse="17">
     <names>
       <name lang="he">בשלח</name>
+      <name lang="en" transliteration="yes">Beshalach</name>
       <name lang="ru" transliteration="yes">Бэшалах</name>
     </names>
   </week>
@@ -73,6 +76,7 @@
   <week chapter="18" verse="1">
     <names>
       <name lang="he">יתרו</name>
+      <name lang="en" transliteration="yes">Yisro</name>
       <name lang="ru" transliteration="yes">Итро</name>
     </names>
   </week>
@@ -90,6 +94,7 @@
   <week chapter="21" verse="1">
     <names>
       <name lang="he">משפטימ</name>
+      <name lang="en" transliteration="yes">Mishpatim</name>
       <name lang="ru" transliteration="yes">Мишпатим</name>
     </names>
   </week>
@@ -107,6 +112,7 @@
   <week chapter="25" verse="1">
     <names>
       <name lang="he">תרומה</name>
+      <name lang="en" transliteration="yes">Terumah</name>
       <name lang="ru" transliteration="yes">Трума</name>
     </names>
   </week>
@@ -124,6 +130,7 @@
   <week chapter="27" verse="20">
     <names>
       <name lang="he">תצוה</name>
+      <name lang="en" transliteration="yes">Tetzaveh</name>
       <name lang="ru" transliteration="yes">Тэцавэ</name>
     </names>
   </week>
@@ -141,6 +148,7 @@
   <week chapter="30" verse="22">
     <names>
       <name lang="he">כי תשא</name>
+      <name lang="en" transliteration="yes">Ki Sisa</name>
       <name lang="ru" transliteration="yes">Ки-Тиса</name>
     </names>
   </week>
@@ -158,6 +166,7 @@
   <week chapter="35" verse="1">
     <names>
       <name lang="he">ויקהל</name>
+      <name lang="en" transliteration="yes">Vayakhel</name>
       <name lang="ru" transliteration="yes">Вайакѓэл</name>
     </names>
   </week>
@@ -175,6 +184,7 @@
   <week chapter="38" verse="21">
     <names>
       <name lang="he">פקודי</name>
+      <name lang="en" transliteration="yes">Pekudei</name>
       <name lang="ru" transliteration="yes">Пэкудэй</name>
     </names>
   </week>
