@@ -28,21 +28,21 @@ class WeeklyReadingTest extends FlatSpec with Matchers {
     val readingsBeforePesach: WeeklyReading = findReadings(shabbosBefore(Pesach(year)))
     readingsBeforePesach.isCombined shouldBe false
     readingsBeforePesach.parsha shouldBe {
-      if (!year.isLeap) Tzav else if (RoshHashanah(year).is(Day.Name.Chamishi)) AchareiMot else Metzora
+      if (!year.isLeap) Tzav else if (RoshHashanah(year).is(Day.Name.Chamishi)) Acharei else Metzora
     }
 
     // Shavuot
     val readingsBeforeShavuot = findReadings(shabbosBefore(Shavuot(year)))
     readingsBeforeShavuot.isCombined shouldBe false
-    Set[Parsha](Bemidbar, Naso).contains(readingsBeforeShavuot.parsha) shouldBe true
+    Set[Parsha](Bemidbar, Nasso).contains(readingsBeforeShavuot.parsha) shouldBe true
 
     // Tisha Be Av
-    findReadings(shabbosAfter(TishaBav(year))) shouldBe WeeklyReading(Vaetchanan, None)
+    findReadings(shabbosAfter(TishaBav(year))) shouldBe WeeklyReading(Va_eschanan, None)
 
     // Rosh Ha Shanah
     findReadings(shabbosBefore(RoshHashanah(year+1))).parsha shouldBe Nitzavim
     val roshHaShanah: Day = RoshHashanah(year+1)
-    isCombined(Vayelech) shouldBe !roshHaShanah.is(Day.Name.Sheni) && !roshHaShanah.is(Day.Name.Shlishi)
+    isCombined(Vayeilech) shouldBe !roshHaShanah.is(Day.Name.Sheni) && !roshHaShanah.is(Day.Name.Shlishi)
 
     val combined: Seq[Parsha] = readings.map(_._2).filter(_.isCombined).map(_.parsha)
     val yearType = YearType.get(year)
@@ -80,18 +80,18 @@ object ReadingStructure {
     vp: Combine, // Vayakhel/Pekudei
     tm: Combine, // Tazria/Metzora
     ak: Combine, // Acharei/Kedoshim
-    bb: Combine, // Behar/Bechukotai
-    cb: Combine, // Chukat/Balak
-    mm: Combine, // Matot/Masai
-    nv: Combine  // Nitzavim/Vayelech
+    bb: Combine, // Behar/Bechukosai
+    cb: Combine, // Chukas/Balak
+    mm: Combine, // Mattos/Masai
+    nv: Combine  // Nitzavim/Vayeilech
   ) {
     def combined(inHolyLand: Boolean): Seq[Parsha] = Seq[(Combine, Parsha)](
       vp -> Vayakhel,
       tm -> Tazria,
-      ak -> AchareiMot,
+      ak -> Acharei,
       bb -> Behar,
-      cb -> Chukat,
-      mm -> Matot,
+      cb -> Chukas,
+      mm -> Mattos,
       nv -> Nitzavim
     ).flatMap { case (c, p) => c.combined(p, inHolyLand) }
   }

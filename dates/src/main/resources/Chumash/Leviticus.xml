@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<meta>
+<book>
   <week chapter="1" verse="1">
     <names>
       <name lang="he">ויקרא</name>
       <name lang="en" transliteration="yes">Vayikra</name>
       <name lang="ru" transliteration="yes">Вайикра</name>
     </names>
-  </week>
 
-  <day number="1" chapter="1" verse="1"/>
-  <day number="2" chapter="1" verse="14"/>
-  <day number="3" chapter="2" verse="7"/>
-  <day number="4" chapter="3" verse="1"/>
-  <day number="5" chapter="4" verse="1"/>
-  <day number="6" chapter="4" verse="27"/>
-  <day number="7" chapter="5" verse="11"/>
-  <maftir chapter="5" verse="24"/>
+    <day number="1" chapter="1" verse="1"/>
+    <day number="2" chapter="1" verse="14"/>
+    <day number="3" chapter="2" verse="7"/>
+    <day number="4" chapter="3" verse="1"/>
+    <day number="5" chapter="4" verse="1"/>
+    <day number="6" chapter="4" verse="27"/>
+    <day number="7" chapter="5" verse="11"/>
+    <maftir chapter="5" verse="24"/>
+  </week>
 
   <week chapter="6" verse="1">
     <names>
@@ -23,16 +23,16 @@
       <name lang="en" transliteration="yes">Tzav</name>
       <name lang="ru" transliteration="yes">Цав</name>
     </names>
-  </week>
 
-  <day number="1" chapter="6" verse="1"/>
-  <day number="2" chapter="6" verse="12"/>
-  <day number="3" chapter="7" verse="11"/>
-  <day number="4" chapter="8" verse="1"/>
-  <day number="5" chapter="8" verse="14"/>
-  <day number="6" chapter="8" verse="22"/>
-  <day number="7" chapter="8" verse="30"/>
-  <maftir chapter="8" verse="33"/>
+    <day number="1" chapter="6" verse="1"/>
+    <day number="2" chapter="6" verse="12"/>
+    <day number="3" chapter="7" verse="11"/>
+    <day number="4" chapter="8" verse="1"/>
+    <day number="5" chapter="8" verse="14"/>
+    <day number="6" chapter="8" verse="22"/>
+    <day number="7" chapter="8" verse="30"/>
+    <maftir chapter="8" verse="33"/>
+  </week>
 
   <week chapter="9" verse="1">
     <names>
@@ -40,16 +40,16 @@
       <name lang="en" transliteration="yes">Shemini</name>
       <name lang="ru" transliteration="yes">Шмини</name>
     </names>
-  </week>
 
-  <day number="1" chapter="9" verse="1"/>
-  <day number="2" chapter="9" verse="17"/>
-  <day number="3" chapter="9" verse="24"/>
-  <day number="4" chapter="10" verse="12"/>
-  <day number="5" chapter="10" verse="16"/>
-  <day number="6" chapter="11" verse="1"/>
-  <day number="7" chapter="11" verse="33"/>
-  <maftir chapter="11" verse="45"/>
+    <day number="1" chapter="9" verse="1"/>
+    <day number="2" chapter="9" verse="17"/>
+    <day number="3" chapter="9" verse="24"/>
+    <day number="4" chapter="10" verse="12"/>
+    <day number="5" chapter="10" verse="16"/>
+    <day number="6" chapter="11" verse="1"/>
+    <day number="7" chapter="11" verse="33"/>
+    <maftir chapter="11" verse="45"/>
+  </week>
 
   <week chapter="12" verse="1">
     <names>
@@ -57,16 +57,16 @@
       <name lang="en" transliteration="yes">Tazria</name>
       <name lang="ru" transliteration="yes">Тазриа</name>
     </names>
-  </week>
 
-  <day number="1" chapter="12" verse="1"/>
-  <day number="2" chapter="13" verse="6"/>
-  <day number="3" chapter="13" verse="18"/>
-  <day number="4" chapter="13" verse="24"/>
-  <day number="5" chapter="13" verse="29"/>
-  <day number="6" chapter="13" verse="40"/>
-  <day number="7" chapter="13" verse="55"/>
-  <maftir chapter="13" verse="57"/>
+    <day number="1" chapter="12" verse="1"/>
+    <day number="2" chapter="13" verse="6"/>
+    <day number="3" chapter="13" verse="18"/>
+    <day number="4" chapter="13" verse="24"/>
+    <day number="5" chapter="13" verse="29"/>
+    <day number="6" chapter="13" verse="40"/>
+    <day number="7" chapter="13" verse="55"/>
+    <maftir chapter="13" verse="57"/>
+  </week>
 
   <week chapter="14" verse="1">
     <names>
@@ -74,16 +74,16 @@
       <name lang="en" transliteration="yes">Metzora</name>
       <name lang="ru" transliteration="yes">Мецора</name>
     </names>
-  </week>
 
-  <day number="1" chapter="14" verse="1"/>
-  <day number="2" chapter="14" verse="13"/>
-  <day number="3" chapter="14" verse="21"/>
-  <day number="4" chapter="14" verse="33"/>
-  <day number="5" chapter="14" verse="54"/>
-  <day number="6" chapter="15" verse="16"/>
-  <day number="7" chapter="15" verse="29"/>
-  <maftir chapter="15" verse="31"/>
+    <day number="1" chapter="14" verse="1"/>
+    <day number="2" chapter="14" verse="13"/>
+    <day number="3" chapter="14" verse="21"/>
+    <day number="4" chapter="14" verse="33"/>
+    <day number="5" chapter="14" verse="54"/>
+    <day number="6" chapter="15" verse="16"/>
+    <day number="7" chapter="15" verse="29"/>
+    <maftir chapter="15" verse="31"/>
+  </week>
 
   <week chapter="16" verse="1">
     <names>
@@ -91,16 +91,16 @@
       <name lang="en" transliteration="yes">Acharei</name>
       <name lang="ru" transliteration="yes">Ахарэй</name>
     </names>
-  </week>
 
-  <day number="1" chapter="16" verse="1"/>
-  <day number="2" chapter="16" verse="18"/>
-  <day number="3" chapter="16" verse="25"/>
-  <day number="4" chapter="17" verse="1"/>
-  <day number="5" chapter="17" verse="8"/>
-  <day number="6" chapter="18" verse="6"/>
-  <day number="7" chapter="18" verse="22"/>
-  <maftir chapter="18" verse="28"/>
+    <day number="1" chapter="16" verse="1"/>
+    <day number="2" chapter="16" verse="18"/>
+    <day number="3" chapter="16" verse="25"/>
+    <day number="4" chapter="17" verse="1"/>
+    <day number="5" chapter="17" verse="8"/>
+    <day number="6" chapter="18" verse="6"/>
+    <day number="7" chapter="18" verse="22"/>
+    <maftir chapter="18" verse="28"/>
+  </week>
 
   <week chapter="19" verse="1">
     <names>
@@ -108,16 +108,16 @@
       <name lang="en" transliteration="yes">Kedoshim</name>
       <name lang="ru" transliteration="yes">Кдошим</name>
     </names>
-  </week>
 
-  <day number="1" chapter="19" verse="1"/>
-  <day number="2" chapter="19" verse="15"/>
-  <day number="3" chapter="19" verse="23"/>
-  <day number="4" chapter="19" verse="33"/>
-  <day number="5" chapter="20" verse="1"/>
-  <day number="6" chapter="20" verse="8"/>
-  <day number="7" chapter="20" verse="23"/>
-  <maftir chapter="20" verse="25"/>
+    <day number="1" chapter="19" verse="1"/>
+    <day number="2" chapter="19" verse="15"/>
+    <day number="3" chapter="19" verse="23"/>
+    <day number="4" chapter="19" verse="33"/>
+    <day number="5" chapter="20" verse="1"/>
+    <day number="6" chapter="20" verse="8"/>
+    <day number="7" chapter="20" verse="23"/>
+    <maftir chapter="20" verse="25"/>
+  </week>
 
   <week chapter="21" verse="1">
     <names>
@@ -125,16 +125,16 @@
       <name lang="en" transliteration="yes">Emor</name>
       <name lang="ru" transliteration="yes">Эмор</name>
     </names>
-  </week>
 
-  <day number="1" chapter="21" verse="1"/>
-  <day number="2" chapter="21" verse="16"/>
-  <day number="3" chapter="22" verse="17"/>
-  <day number="4" chapter="23" verse="1"/>
-  <day number="5" chapter="23" verse="23"/>
-  <day number="6" chapter="23" verse="33"/>
-  <day number="7" chapter="24" verse="1"/>
-  <maftir chapter="24" verse="21"/>
+    <day number="1" chapter="21" verse="1"/>
+    <day number="2" chapter="21" verse="16"/>
+    <day number="3" chapter="22" verse="17"/>
+    <day number="4" chapter="23" verse="1"/>
+    <day number="5" chapter="23" verse="23"/>
+    <day number="6" chapter="23" verse="33"/>
+    <day number="7" chapter="24" verse="1"/>
+    <maftir chapter="24" verse="21"/>
+  </week>
 
   <week chapter="25" verse="1">
     <names>
@@ -142,16 +142,16 @@
       <name lang="en" transliteration="yes">Behar</name>
       <name lang="ru" transliteration="yes">Бэѓар</name>
     </names>
-  </week>
 
-  <day number="1" chapter="25" verse="1"/>
-  <day number="2" chapter="25" verse="14"/>
-  <day number="3" chapter="25" verse="19"/>
-  <day number="4" chapter="25" verse="25"/>
-  <day number="5" chapter="25" verse="29"/>
-  <day number="6" chapter="25" verse="39"/>
-  <day number="7" chapter="25" verse="47"/>
-  <maftir chapter="25" verse="55"/>
+    <day number="1" chapter="25" verse="1"/>
+    <day number="2" chapter="25" verse="14"/>
+    <day number="3" chapter="25" verse="19"/>
+    <day number="4" chapter="25" verse="25"/>
+    <day number="5" chapter="25" verse="29"/>
+    <day number="6" chapter="25" verse="39"/>
+    <day number="7" chapter="25" verse="47"/>
+    <maftir chapter="25" verse="55"/>
+  </week>
 
   <week chapter="26" verse="3">
     <names>
@@ -159,14 +159,14 @@
       <name lang="en" transliteration="yes">Bechukosai</name>
       <name lang="ru" transliteration="yes">Бэхукотай</name>
     </names>
-  </week>
 
-  <day number="1" chapter="26" verse="3"/>
-  <day number="2" chapter="26" verse="6"/>
-  <day number="3" chapter="26" verse="10"/>
-  <day number="4" chapter="27" verse="1"/>
-  <day number="5" chapter="27" verse="16"/>
-  <day number="6" chapter="27" verse="22"/>
-  <day number="7" chapter="27" verse="29"/>
-  <maftir chapter="27" verse="32"/>
-</meta>
+    <day number="1" chapter="26" verse="3"/>
+    <day number="2" chapter="26" verse="6"/>
+    <day number="3" chapter="26" verse="10"/>
+    <day number="4" chapter="27" verse="1"/>
+    <day number="5" chapter="27" verse="16"/>
+    <day number="6" chapter="27" verse="22"/>
+    <day number="7" chapter="27" verse="29"/>
+    <maftir chapter="27" verse="32"/>
+  </week>
+</book>
