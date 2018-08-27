@@ -1,0 +1,92 @@
+<!--
+  TODO Create a file with the list of books of Tanakh and Change the names here to English.
+  TODO Split the intervals into chapterFrom vareseFrom ChapterTo verseTo.
+-->
+<haftarah>
+    <week n="Bereishis" book="ישעיהו" fromChapter="42" fromVerse="5">
+        <custom n="Ashkenaz" toChapter="43" toVerse="10"/>
+        <custom n="Sephard" toVerse="21"/>
+    </week>
+    <week n="Noach" book="ישעיהו" fromChapter="44" fromVerse="1">
+        <custom n="Ashkenaz" toChapter="43" toVerse="5"/>
+        <custom n="Sephard" toVerse="10"/>
+    </week>
+    <week n="Lech Lecha" book="ישעיהו" fromChapter="40" fromVerse="27" toChapter="41" toVerse="16"/>
+    <week n="Vayeira" book="מלכים ב" fromChapter="4" fromVerse="1">
+        <custom n="Ashkenaz" toVerse="37"/>
+        <custom n="Sephard" toVerse="23"/>
+    </week>
+    <week n="Chayei Sarah" book="מלכים א" fromChapter="1" fromVerse="1" toVerse="31"/>
+    <week n="Toldos" book="מלאכי" fromChapter="1" fromVerse="1" toChapter="2" toVerse="7"/>
+    <week n="Vayeitzei" book="הושע">
+        <custom n="Sephard" fromChapter="11" fromVerse="7" toChapter="12" toVerse="12"/>
+        <custom n="Sephard2" fromChapter="11" fromVerse="7" toChapter="13" toVerse="6"/>
+        <custom n="Ashkenaz" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
+    </week>
+    <!-- TODO ??? book="הושע" what="יא,ז-יב,יב" -->
+    <week n="Vayishlach" book="עובדיה" fromChapter="1" fromVerse="1" toVerse="21"/>
+    <week n="Vayeishev" book="עמוס" fromChapter="2" fromVerse="6" toChapter="3" toVerse="5"/>
+    <week n="Mikeitz" book="מלכים א" fromChapter="3" fromVerse="15" toChapter="4" toVerse="1"/>
+    <week n="Vayigash" book="יחזקאל" fromChapter="37" fromVerse="15" toVerse="28"/>
+    <week n="Vayechi" book="מלכים א" fromChapter="2" fromVerse="1" toVerse="12"/>
+
+    <week n="Shemos">
+        <custom n="Ashkenaz" book="ישעיהו">
+            <part n="1" fromChapter="27" fromVerse="6" toChapter="28" toVerse="13"/>
+            <part n="2" fromChapter="29" fromVerse="22" toVerse="23"/>
+        </custom>
+        <custom n="Sephard" book="ירמיהו" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/>
+    </week>
+    <week n="Va'eira" book="יחזקאל" fromChapter="28" fromVerse="25" toChapter="29" toVerse="21"/>
+    <week n="Bo" book="ירמיהו" fromChapter="46" fromVerse="13" toVerse="28"/>
+    <week n="Beshalach" book="שופטים">
+        <custom n="Ashkenaz" fromChapter="4" fromVerse="4" toChapter="5" toVerse="31"/>
+        <custom n="Sephard" fromChapter="5" fromVerse="1" toVerse="31"/>
+    </week>
+    <week n="Yisro" book="ישעיהו" what="ו,א-ז,ו; ט,ה-ו;  ו,א-יג"/>
+    <week n="Mishpatim" book="ירמיהו" what="לד,ח-כב; לג,כה-כו"/>
+    <week n="Terumah" book="מלכים א" fromChapter="5" fromVerse="26" toChapter="6" toVerse="13"/>
+    <week n="Tetzaveh" book="יחזקאל" fromChapter="43" fromVerse="10" toVerse="27"/>
+    <week n="Ki Sisa" book="מלכים א" what="יח,א-לט; א יח,כ-לט"/>
+    <week n="Vayakhel" book="מלכים א" what="ז,מ-נ; ז,יג-כו"/>
+    <week n="Pekudei" book="מלכים א" what="ז,נא-ח,כא; ז,מ-נ"/>
+
+    <week n="Vayikra" book="ישעיהו " fromChapter="43" fromVerse="21" toChapter="44" toVerse="23"/>
+    <week n="Tzav" book="ירמיהו " what="ז,כא-ח,ג; ט,כב-כג"/>
+    <week n="Shemini" book="שמואל ב" what="ו,א-ז,יז; ו,א-יט"/>
+    <week n="Tazria" book="מלכים ב" fromChapter="4" fromVerse="42" toChapter="5" toVerse="19"/>
+    <week n="Metzora" book="מלכים ב" fromChapter="7" fromVerse="3" toVerse="20"/>
+    <week n="Acharei" book="יחזקאל" fromChapter="23" fromVerse="1" toVerse="16"/>
+    <week n="Kedoshim" book="יחזקאל" what="כ,ב-כ">
+        <second book="עמוס" what="ט,ז-טו"/>
+    </week>
+    <week n="Emor" book="יחזקאל" fromChapter="44" fromVerse="15" toVerse="31"/>
+    <week n="Behar" book="ירמיהו" fromChapter="32" fromVerse="6" toVerse="27"/>
+    <week n="Bechukosai" book="ירמיהו" fromChapter="16" fromVerse="19" toChapter="17" toVerse="14"/>
+
+    <week n="Bemidbar" book="הושע" fromChapter="2" fromVerse="1" toVerse="22"/>
+    <week n="Nasso" book="שופטים" fromChapter="13" fromVerse="2" toVerse="25"/>
+    <week n="Beha'aloscha" book="זכריה" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>
+    <week n="Shelach" book="יהושוע" fromChapter="2" fromVerse="1" toVerse="24"/>
+    <week n="Korach" book="שמואל א" fromChapter="11" fromVerse="14" toChapter="12" toVerse="22"/>
+    <week n="Chukas" book="שופטים" fromChapter="11" fromVerse="1" toVerse="33"/>
+    <week n="Balak" book="מיכה" fromChapter="5" fromVerse="6" toChapter="6" toVerse="8"/>
+    <week n="Pinchas" book="מלכים א" fromChapter="18" fromVerse="46" toChapter="19" toVerse="21"/>
+    <week n="Mattos" book="ירמיהו" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/>
+    <week n="Masei" book="ירמיהו" what="ב,ד-כח; ג,ד; ב,ד-כח; ד,א-ב"/>
+
+    <week n="Devarim" book="ישעיהו" fromChapter="1" fromVerse="1" toVerse="27"/>
+    <week n="Va'eschanan" book="ישעיהו" fromChapter="40" fromVerse="1" toVerse="26"/>
+    <week n="Eikev" book="ישעיהו" fromChapter="49" fromVerse="14" toChapter="51" toVerse="3"/>
+    <week n="Re'eh" book="ישעיהו" fromChapter="54" fromVerse="11" toChapter="55" toVerse="5"/>
+    <week n="Shoftim" book="ישעיהו" fromChapter="51" fromVerse="12" toChapter="52" toVerse="12"/>
+    <week n="Ki Seitzei" book="ישעיהו" fromChapter="54" fromVerse="1" toVerse="10"/>
+    <week n="Ki Savo" book="ישעיהו" fromChapter="60" fromVerse="1" toVerse="22"/>
+    <week n="Nitzavim" book="ישעיהו" fromChapter="61" fromVerse="10" toChapter="63" toVerse="9"/>
+    <week n="Vayeilech" book="הושע" what="יד,ב-י">
+        <second book="יואל" what="ב,טו-כז"/>
+        <third book="מיכה" what="ז,יח-כ"/>
+    </week>
+    <week n="Haazinu" book="שמואל ב" fromChapter="22" fromVerse="1" toVerse="51"/>
+    <week n="Vezos Haberacha" book="יהושוע" what="א,א-יח; א,א-ט"/>
+</haftarah>

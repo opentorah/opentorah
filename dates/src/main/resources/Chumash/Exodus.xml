@@ -3,6 +3,7 @@
   <week chapter="1" verse="1">
     <names>
       <name lang="he">שמות</name>
+      <name lang="en">Exodus</name>
       <name lang="en" transliteration="yes">Shemos</name>
       <name lang="ru" transliteration="yes">Шмот</name>
     </names>
@@ -136,7 +137,7 @@
     <maftir chapter="30" verse="8"/>
   </week>
 
-  <week chapter="30" verse="22">
+  <week chapter="30" verse="11">
     <names>
       <name lang="he">כי תשא</name>
       <name lang="en" transliteration="yes">Ki Sisa</name>
