@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TODO all the other special days -->
+<!-- TODO aliyot -->
+<special-days>
+    <day>
+        <names>
+            <name n="Erev Rosh Chodesh" lang="en" transliteration="yes"/>
+        </names>
+        <haftarah book="Samuel I" fromChapter="20" fromVerse="18" toVerse="42"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Shabbos Rosh Chodesh" lang="en" transliteration="yes"/>
+        </names>
+        <haftarah book="Isaia" fromChapter="66">
+            <part n="1" fromVerse="1" toVerse="24"/>
+            <part n="1" fromVerse="23" toVerse="23"/>
+            <!--TODO if Sunday is also Rosh Chodesh, Chabad adds Samuеl I 20:18,42 -->
+        </haftarah>
+    </day>
+
+    <day>
+        <names>
+            <name n="Rosh Chodesh" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Numbers" fromChapter="28" fromVerse="1" toVerse="15">
+        </torah>
+        <!-- no maftir or haftarah -->
+    </day>
+
+    <day>
+        <names>
+            <name n="Rosh Hashanah 1" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Genesis" fromChapter="21">
+        </torah>
+        <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
+        <haftarah book="Samuel I" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
+    </day>
+</special-days>

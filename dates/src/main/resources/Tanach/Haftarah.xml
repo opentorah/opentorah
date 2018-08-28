@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Each Haftarah is described by the <haftarah> element,
   with attribute 'n' giving the name of the Parsha or a special day.
@@ -182,13 +183,4 @@
         <custom n="Ashkenaz Chabad" toVerse="18"/>
         <custom n="Sefard" toVerse="9"/>
     </haftarah>
-
-    <haftarah n="Erev Rosh Chodesh" book="Samuel I" fromChapter="20" fromVerse="18" toVerse="42"/>
-    <haftarah n="Shabbos Rosh Chodesh" book="Isaia" fromChapter="66">
-        <part n="1" fromVerse="1" toVerse="24"/>
-        <part n="1" fromVerse="23" toVerse="23"/>
-        <!--TODO if Sunday is also Rosh Chodesh, Chabad adds Samuеl I 20:18,42 -->
-    </haftarah>
-
-    <!-- TODO all the other special haftoros -->
 </haftaros>
