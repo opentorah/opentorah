@@ -26,7 +26,8 @@
     - <custom> element that doesn't declare the 'n' attribute describes a universal custom;
     - <custom> element that doesn't declare any attributes can be omitted.
 
-  Custom Chabad and Taiman is the same as Sefard unless specified.
+  Customs Chabad, Magreb and Teiman are the same as Sefard unless specified.
+  Custom Italki is the same as Ashkenaz unless specified.
 -->
 <haftaros>
     <haftarah n="Bereishis" book="Isaiah" fromChapter="42">
@@ -56,14 +57,14 @@
         <custom n="Ashkenaz Sefard" toChapter="2" toVerse="7"/>
         <custom n="Teiman" toChapter="3" toVerse="4"/>
     </haftarah>
-    <haftarah n="Vayeitzei" book="Hosea">
+    <haftarah n="Vayeitzei" >
         <custom n="Ashkenaz">
-          <part n="1" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
+          <part n="1" book="Hosea" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
           <part n="2" book="Yoel" fromChapter="2" fromVerse="26" toVerse="27"/>
         </custom>
-        <custom n="Sefard" fromChapter="11" fromVerse="7" toChapter="13" toVerse="5"/>
-        <custom n="Sefard1" fromChapter="11" fromVerse="7" toChapter="12" toVerse="12"/>
-        <custom n="Chabad Teiman Italki" fromChapter="11" fromVerse="7" toChapter="12" toVerse="14"/>
+        <custom n="Sefard" book="Hosea" fromChapter="11" fromVerse="7" toChapter="13" toVerse="5"/>
+        <custom n="Sefard1" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="12"/>
+        <custom n="Chabad Teiman Italki" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="14"/>
     </haftarah>
     <haftarah n="Vayishlach" book="Obadiah" fromChapter="1" fromVerse="1" toVerse="21"/>
     <haftarah n="Vayeishev" book="Amos" fromChapter="2" fromVerse="6" toChapter="3" toVerse="8"/> <!-- On Chanuka - Chanukah I -->
