@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<meta>
+    <book n="Genesis"/>
+    <book n="Exodus"/>
+    <book n="Leviticus"/>
+    <book n="Numbers"/>
+    <book n="Deuteronomy"/>
+
+    <book>
+        <names>
+            <name lang="en" n="Joshua"/>
+            <name lang="he" n="יהושע"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Judges"/>
+            <name lang="he" n="שופטים"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Samuel I"/>
+            <name lang="he" n="שמואל א"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Samuel II"/>
+            <name lang="he" n="שמואל ב"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Kings I"/>
+            <name lang="he" n="מלכים א"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Kings II"/>
+            <name lang="he" n="מלכים ב"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Isaiah"/>
+            <name lang="he" n="ישעיה"/>
+            <name lang="he" n="ישעיהו"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Jeremiah"/>
+            <name lang="he" n="ירמיה"/>
+            <name lang="he" n="ירמיהו"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Ezekiel"/>
+            <name lang="he" n="יחזקאל"/>
+        </names>
+    </book>
+
+    <!-- תרי עשר -->
+    <book>
+        <names>
+            <name lang="en" n="Hosea"/>
+            <name lang="he" n="הושע"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Joel"/>
+            <name lang="he" n="יואל"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Amos"/>
+            <name lang="he" n="עמוס"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Obadiah"/>
+            <name lang="he" n="עובדיה"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Jonah"/>
+            <name lang="he" n="יונה"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Micah"/>
+            <name lang="he" n="מיכה"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Nahum"/>
+            <name lang="he" n="נחום"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Habakkuk"/>
+            <name lang="he" n="חבקוק"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Zephaniah"/>
+            <name lang="he" n="צפניה"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Haggai"/>
+            <name lang="he" n="חגי"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Zechariah"/>
+            <name lang="he" n="זכריה"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Malachi"/>
+            <name lang="he" n="מלאכי"/>
+        </names>
+    </book>
+
+    <book>
+        <names>
+            <name lang="en" n="Psalms"/>
+            <name lang="he" n="תהלים"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Proverbs"/>
+            <name lang="he" n="משלי"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Job"/>
+            <name lang="he" n="איוב"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Song of Songs"/>
+            <name lang="he" n="שיר השירים"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Ruth"/>
+            <name lang="he" n="רות"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Lamentations"/>
+            <name lang="he" n="איכה"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Ecclesiastes"/>
+            <name lang="he" n="קהלת"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Esther"/>
+            <name lang="he" n="אסתר"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Daniel"/>
+            <name lang="he" n="דניאל"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Ezra"/>
+            <name lang="he" n="עזרא"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Nehemiah"/>
+            <name lang="he" n="נחמיה"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Chronicles I"/>
+            <name lang="he" n="דברי הימים א"/>
+        </names>
+    </book>
+    <book>
+        <names>
+            <name lang="en" n="Chronicles II"/>
+            <name lang="he" n="דברי הימים ב"/>
+        </names>
+    </book>
+</meta>

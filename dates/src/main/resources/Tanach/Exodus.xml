@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book>
+  <week chapter="1" verse="1">
+    <names>
+      <name lang="he">שמות</name>
+      <name lang="en">Exodus</name>
+      <name lang="en" transliteration="yes">Shemos</name>
+      <name lang="ru" transliteration="yes">Шмот</name>
+    </names>
+
+    <day n="1" chapter="1" verse="1"/>
+    <day n="2" chapter="1" verse="18"/>
+    <day n="3" chapter="2" verse="11"/>
+    <day n="4" chapter="3" verse="1"/>
+    <day n="5" chapter="3" verse="16"/>
+    <day n="6" chapter="4" verse="18"/>
+    <day n="7" chapter="5" verse="1"/>
+    <maftir chapter="5" verse="22"/>
+  </week>
+
+  <week chapter="6" verse="2">
+    <names>
+      <name lang="he">וארא</name>
+      <name lang="en" transliteration="yes">Va'eira</name>
+      <name lang="ru" transliteration="yes">Ваэра</name>
+    </names>
+
+    <day n="1" chapter="6" verse="2"/>
+    <day n="2" chapter="6" verse="14"/>
+    <day n="3" chapter="6" verse="29"/>
+    <day n="4" chapter="7" verse="8"/>
+    <day n="5" chapter="8" verse="7"/>
+    <day n="6" chapter="8" verse="19"/>
+    <day n="7" chapter="9" verse="17"/>
+    <maftir chapter="9" verse="33"/>
+  </week>
+
+  <week chapter="10" verse="1">
+    <names>
+      <name lang="he">בא</name>
+      <name lang="en" transliteration="yes">Bo</name>
+      <name lang="ru" transliteration="yes">Бо</name>
+    </names>
+
+    <day n="1" chapter="10" verse="1"/>
+    <day n="2" chapter="10" verse="12"/>
+    <day n="3" chapter="10" verse="24"/>
+    <day n="4" chapter="11" verse="4"/>
+    <day n="5" chapter="12" verse="21"/>
+    <day n="6" chapter="12" verse="29"/>
+    <day n="7" chapter="13" verse="1"/>
+    <maftir chapter="13" verse="14"/>
+  </week>
+
+  <week chapter="13" verse="17">
+    <names>
+      <name lang="he">בשלח</name>
+      <name lang="en" transliteration="yes">Beshalach</name>
+      <name lang="ru" transliteration="yes">Бэшалах</name>
+    </names>
+
+    <day n="1" chapter="13" verse="17"/>
+    <day n="2" chapter="14" verse="9"/>
+    <day n="3" chapter="14" verse="15"/>
+    <day n="4" chapter="14" verse="26"/>
+    <day n="5" chapter="15" verse="27"/>
+    <day n="6" chapter="16" verse="11"/>
+    <day n="7" chapter="17" verse="1"/>
+    <maftir chapter="17" verse="14"/>
+  </week>
+
+  <week chapter="18" verse="1">
+    <names>
+      <name lang="he">יתרו</name>
+      <name lang="en" transliteration="yes">Yisro</name>
+      <name lang="ru" transliteration="yes">Итро</name>
+    </names>
+
+    <day n="1" chapter="18" verse="1"/>
+    <day n="2" chapter="18" verse="13"/>
+    <day n="3" chapter="18" verse="24"/>
+    <day n="4" chapter="19" verse="1"/>
+    <day n="5" chapter="19" verse="7"/>
+    <day n="6" chapter="19" verse="20"/>
+    <day n="7" chapter="20" verse="15"/>
+    <maftir chapter="20" verse="19"/>
+  </week>
+
+  <week chapter="21" verse="1">
+    <names>
+      <name lang="he">משפטימ</name>
+      <name lang="en" transliteration="yes">Mishpatim</name>
+      <name lang="ru" transliteration="yes">Мишпатим</name>
+    </names>
+
+    <day n="1" chapter="21" verse="1"/>
+    <day n="2" chapter="21" verse="20"/>
+    <day n="3" chapter="22" verse="4"/>
+    <day n="4" chapter="22" verse="27"/>
+    <day n="5" chapter="23" verse="6"/>
+    <day n="6" chapter="23" verse="20"/>
+    <day n="7" chapter="23" verse="26"/>
+    <maftir chapter="24" verse="15"/>
+  </week>
+
+  <week chapter="25" verse="1">
+    <names>
+      <name lang="he">תרומה</name>
+      <name lang="en" transliteration="yes">Terumah</name>
+      <name lang="ru" transliteration="yes">Трума</name>
+    </names>
+
+    <day n="1" chapter="25" verse="1"/>
+    <day n="2" chapter="25" verse="17"/>
+    <day n="3" chapter="25" verse="31"/>
+    <day n="4" chapter="26" verse="15"/>
+    <day n="5" chapter="26" verse="31"/>
+    <day n="6" chapter="27" verse="1"/>
+    <day n="7" chapter="27" verse="9"/>
+    <maftir chapter="27" verse="17"/>
+  </week>
+
+  <week chapter="27" verse="20">
+    <names>
+      <name lang="he">תצוה</name>
+      <name lang="en" transliteration="yes">Tetzaveh</name>
+      <name lang="ru" transliteration="yes">Тэцавэ</name>
+    </names>
+
+    <day n="1" chapter="27" verse="20"/>
+    <day n="2" chapter="28" verse="13"/>
+    <day n="3" chapter="28" verse="31"/>
+    <day n="4" chapter="29" verse="1"/>
+    <day n="5" chapter="29" verse="19"/>
+    <day n="6" chapter="29" verse="38"/>
+    <day n="7" chapter="30" verse="1"/>
+    <maftir chapter="30" verse="8"/>
+  </week>
+
+  <week chapter="30" verse="11">
+    <names>
+      <name lang="he">כי תשא</name>
+      <name lang="en" transliteration="yes">Ki Sisa</name>
+      <name lang="ru" transliteration="yes">Ки-Тиса</name>
+    </names>
+
+    <day n="1" chapter="30" verse="11"/>
+    <day n="2" chapter="31" verse="18"/>
+    <day n="3" chapter="33" verse="12"/>
+    <day n="4" chapter="33" verse="17"/>
+    <day n="5" chapter="34" verse="1"/>
+    <day n="6" chapter="34" verse="10"/>
+    <day n="7" chapter="34" verse="27"/>
+    <maftir chapter="34" verse="33"/>
+  </week>
+
+  <week chapter="35" verse="1">
+    <names>
+      <name lang="he">ויקהל</name>
+      <name lang="en" transliteration="yes">Vayakhel</name>
+      <name lang="ru" transliteration="yes">Вайакѓэл</name>
+    </names>
+
+    <day n="1" chapter="35" verse="1"/>
+    <day n="2" chapter="35" verse="21"/>
+    <day n="3" chapter="35" verse="30" whentogether="2"/>
+    <day n="4" chapter="36" verse="8"/>
+    <day n="5" chapter="36" verse="20"/>
+    <day n="6" chapter="37" verse="17" whentogether="3"/>
+    <day n="7" chapter="38" verse="1" whentogether="4"/>
+    <maftir chapter="38" verse="18"/>
+  </week>
+
+  <week chapter="38" verse="21">
+    <names>
+      <name lang="he">פקודי</name>
+      <name lang="en" transliteration="yes">Pekudei</name>
+      <name lang="ru" transliteration="yes">Пэкудэй</name>
+    </names>
+
+    <day n="1" chapter="38" verse="21"/>
+    <day n="2" chapter="39" verse="2" whentogether="5"/>
+    <day n="3" chapter="39" verse="22" whentogether="6"/>
+    <day n="4" chapter="39" verse="33"/>
+    <day n="5" chapter="40" verse="1" whentogether="7"/>
+    <day n="6" chapter="40" verse="17"/>
+    <day n="7" chapter="40" verse="28"/>
+    <maftir chapter="40" verse="34"/>
+  </week>
+</book>
