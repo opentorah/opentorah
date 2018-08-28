@@ -32,6 +32,7 @@
     <haftarah n="Bereishis" book="Isaiah" fromChapter="42" fromVerse="5">
         <custom n="Ashkenaz" toChapter="43" toVerse="10"/>
         <custom n="Sefard" toChapter="42" toVerse="21"/>
+        <custom n="Taiman" fromVerse="1" toChapter="42" toVerse="16"/>
     </haftarah>
     <haftarah n="Noach" book="Isaiah" fromChapter="54" fromVerse="1">
         <custom n="Ashkenaz" toChapter="55" toVerse="5"/>
