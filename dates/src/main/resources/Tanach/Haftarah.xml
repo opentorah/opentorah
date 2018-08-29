@@ -29,6 +29,8 @@
   Customs Chabad, Magreb and Teiman are the same as Sefard unless specified.
   Custom Italki is the same as Ashkenaz unless specified.
   Custom Baladi is the same as Teiman unless specified.
+TODO --Обычаи ашкеназа Вайеце
+TODO --Обычаи ашкеназа Пекудей
 -->
 <haftaros>
     <haftarah n="Bereishis" book="Isaiah" fromChapter="42">
@@ -82,12 +84,12 @@
         <custom n="Italki" book="Jeremiah" fromChapter="1" fromVerse="1" toVerse="19"/>
         <custom n="Teiman" book="Ezekiel" fromChapter="16" fromVerse="1" toVerse="14"/>
     </haftarah>
-    <haftarah n="Va'eira" book="Ezekiel" toChapter="29" toVerse="21">
-        <custom n="Ashkenaz Sefard" fromChapter="28" fromVerse="25"/>
-        <custom n="Teiman" fromChapter="24" fromVerse="1"/>
+    <haftarah n="Va'eira" book="Ezekiel" fromChapter="28" toChapter="29" toVerse="21">
+        <custom n="Ashkenaz Sefard"  fromVerse="25"/>
+        <custom n="Teiman" fromVerse="24"/>
     </haftarah>
     <haftarah n="Bo">
-         <custom n="Ashkenaz Sefarad" book="Jeremiah" fromChapter="46" fromVerse="13" toVerse="28"/>
+        <custom n="Ashkenaz Sefarad" book="Jeremiah" fromChapter="46" fromVerse="13" toVerse="28"/>
         <custom n="Teiman" book="Isaiah" fromChapter="19" fromVerse="1" toVerse="25"/>
         <custom n="Italki" book="Isaiah" fromChapter="18" fromVerse="7" toChapter="19" toVerse="25"/>
     </haftarah>
@@ -102,9 +104,9 @@
             <part n="1" fromChapter="6" fromVerse="1" toChapter="7" toVerse="6"/>
             <part n="2" fromChapter="9" fromVerse="5" toVerse="6"/>
         </custom>
-        <custom n="Sefard" fromChapter="6" fromVerse="1" toChapter="7" toVerse="13"/>
+        <custom n="Sefard" fromChapter="6" fromVerse="1" toVerse="13"/>
         <custom n="Teiman">
-            <part n="1" fromChapter="6" fromVerse="1" toChapter="7" toVerse="13"/>
+            <part n="1" fromChapter="6" fromVerse="1" toVerse="13"/>
             <part n="2" fromChapter="9" fromVerse="5" toVerse="6"/>
         </custom>
     </haftarah>
