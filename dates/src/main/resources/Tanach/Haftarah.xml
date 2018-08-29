@@ -26,31 +26,56 @@
     - <custom> element that doesn't declare the 'n' attribute describes a universal custom;
     - <custom> element that doesn't declare any attributes can be omitted.
 
-  Custom Chabad and Taiman is the same as Sefard unless specified.
+  Customs Chabad, Magreb and Teiman are the same as Sefard unless specified.
+  Custom Italki is the same as Ashkenaz unless specified.
+  Custom Lita is the same as Ashkenaz unless specified.
+  Custom Baladi is the same as Teiman unless specified.
+TODO --Обычаи Вайеце
+TODO --Обычаи ашкеназа Ваишлах - Ошеа
+TODO --Обычаи ашкеназа Пекудей
 -->
 <haftaros>
-    <haftarah n="Bereishis" book="Isaiah" fromChapter="42" fromVerse="5">
-        <custom n="Ashkenaz" toChapter="43" toVerse="10"/>
-        <custom n="Sefard" toChapter="42" toVerse="21"/>
-        <custom n="Taiman" fromVerse="1" toChapter="42" toVerse="16"/>
+    <haftarah n="Bereishis" book="Isaiah" fromChapter="42">
+        <custom n="Ashkenaz" fromVerse="5" toChapter="43" toVerse="10"/>
+        <custom n="Sefard" fromVerse="5" toChapter="42" toVerse="21"/>
+        <custom n="Teiman" fromVerse="1" toChapter="42" toVerse="16"/>
+        <custom n="Italki" fromVerse="1" toChapter="42" toVerse="21"/>
     </haftarah>
     <haftarah n="Noach" book="Isaiah" fromChapter="54" fromVerse="1">
-        <custom n="Ashkenaz" toChapter="55" toVerse="5"/>
+        <custom n="Ashkenaz Magreb" toChapter="55" toVerse="5"/>
         <custom n="Sefard" toChapter="54" toVerse="10"/>
+        <custom n="Teiman" toChapter="55" toVerse="3"/>
     </haftarah>
-    <haftarah n="Lech Lecha" book="Isaiah" fromChapter="40" fromVerse="27" toChapter="41" toVerse="16"/>
+    <haftarah n="Lech Lecha" book="Isaiah" fromChapter="40"/>
+        <custom n="Ashkenaz Sefard" fromVerse="27" toChapter="41" toVerse="16"/> 
+        <custom n="Teiman Italki" fromVerse="25" toChapter="41" toVerse="17"/>
+    </haftarah>
     <haftarah n="Vayeira" book="Kings II" fromChapter="4" fromVerse="1">
         <custom n="Ashkenaz Chabad" toVerse="37"/>
         <custom n="Sefard" toVerse="23"/>
     </haftarah>
-    <haftarah n="Chayei Sarah" book="Kings I" fromChapter="1" fromVerse="1" toVerse="31"/>
-    <haftarah n="Toldos" book="Malachi" fromChapter="1" fromVerse="1" toChapter="2" toVerse="7"/>
-    <haftarah n="Vayeitzei" book="Hosea">
-        <custom n="Ashkenaz" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
-        <custom n="Sefard" fromChapter="11" fromVerse="7" toChapter="13" toVerse="5"/>
-        <custom n="Chabad" fromChapter="11" fromVerse="7" toChapter="12" toVerse="14"/>
+    <haftarah n="Chayei Sarah" book="Kings I" fromChapter="1" fromVerse="1"/>
+        <custom n="Ashkenaz Sefard" toVerse="31"/>
+        <custom n="Italki" toVerse="34"/>
     </haftarah>
-    <haftarah n="Vayishlach" book="Obadiah" fromChapter="1" fromVerse="1" toVerse="21"/>
+    <haftarah n="Toldos" book="Malachi" fromChapter="1" fromVerse="1" />
+        <custom n="Ashkenaz Sefard" toChapter="2" toVerse="7"/>
+        <custom n="Teiman" toChapter="3" toVerse="4"/>
+    </haftarah>
+    <haftarah n="Vayeitzei" >
+        <custom n="Ashkenaz" book="Hosea" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
+        <custom n="Lita">
+          <part n="1" book="Hosea" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
+          <part n="2" book="Yoel" fromChapter="2" fromVerse="26" toVerse="27"/>
+        </custom>
+        <custom n="Sefard_1" book="Hosea" fromChapter="11" fromVerse="7" toChapter="13" toVerse="5"/>
+        <custom n="Sefard" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="12"/>
+        <custom n="Chabad Teiman Italki" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="14"/>
+    </haftarah>
+    <haftarah n="Vayishlach">
+       <custom n="Sefard" book="Obadiah" fromChapter="1" fromVerse="1" toVerse="21"/>
+       <custom n="Ashkenaz" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="12"/>
+    </haftarah>
     <haftarah n="Vayeishev" book="Amos" fromChapter="2" fromVerse="6" toChapter="3" toVerse="8"/> <!-- On Chanuka - Chanukah I -->
     <haftarah n="Mikeitz" book="Kings I" fromChapter="3" fromVerse="15" toChapter="4" toVerse="1"/> <!-- On Chanuka - Chanukah I or II -->
     <haftarah n="Vayigash" book="Ezekiel" fromChapter="37" fromVerse="15" toVerse="28"/>
@@ -62,79 +87,113 @@
             <part n="2" fromChapter="29" fromVerse="22" toVerse="23"/>
         </custom>
         <custom n="Sefard" book="Jeremiah" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/> <!-- Matos -->
+        <custom n="Italki" book="Jeremiah" fromChapter="1" fromVerse="1" toVerse="19"/>
+        <custom n="Teiman" book="Ezekiel" fromChapter="16" fromVerse="1" toVerse="14"/>
     </haftarah>
-    <haftarah n="Va'eira" book="Ezekiel" fromChapter="28" fromVerse="25" toChapter="29" toVerse="21"/>
-    <haftarah n="Bo" book="Jeremiah" fromChapter="46" fromVerse="13" toVerse="28"/>
+    <haftarah n="Va'eira" book="Ezekiel" fromChapter="28" toChapter="29" toVerse="21">
+        <custom n="Ashkenaz Sefard"  fromVerse="25"/>
+        <custom n="Teiman" fromVerse="24"/>
+    </haftarah>
+    <haftarah n="Bo">
+        <custom n="Ashkenaz Sefarad" book="Jeremiah" fromChapter="46" fromVerse="13" toVerse="28"/>
+        <custom n="Teiman" book="Isaiah" fromChapter="19" fromVerse="1" toVerse="25"/>
+        <custom n="Italki" book="Isaiah" fromChapter="18" fromVerse="7" toChapter="19" toVerse="25"/>
+    </haftarah>
     <haftarah n="Beshalach" book="Judges">
         <custom n="Ashkenaz Chabad" fromChapter="4" fromVerse="4" toChapter="5" toVerse="31"/>
-        <custom n="Sefard" fromChapter="5" fromVerse="1" toChapter="5" toVerse="31"/>
+        <custom n="Ashkenaz1" fromChapter="4" fromVerse="4" toChapter="5" toVerse="3"/>
+        <custom n="Sefard" fromChapter="5" fromVerse="1" toVerse="31"/>
+        <custom n="Teiman" fromChapter="4" fromVerse="23" toChapter="5" toVerse="31"/>
     </haftarah>
     <haftarah n="Yisro" book="Isaiah">
-        <custom n="Ahkenaz">
-            <part n="1" fromChapter="6" fromVerse="1" toVerse="13"/>
-            <part n="2" fromChapter="9" fromVerse="5" toVerse="6"/>
-        </custom>
-        <custom n="Sefard">
+        <custom n="Ashkenaz Italki">
             <part n="1" fromChapter="6" fromVerse="1" toChapter="7" toVerse="6"/>
             <part n="2" fromChapter="9" fromVerse="5" toVerse="6"/>
         </custom>
+        <custom n="Sefard" fromChapter="6" fromVerse="1" toVerse="13"/>
+        <custom n="Teiman">
+            <part n="1" fromChapter="6" fromVerse="1" toVerse="13"/>
+            <part n="2" fromChapter="9" fromVerse="5" toVerse="6"/>
+        </custom>
     </haftarah>
-    <haftarah n="Mishpatim" book="Jeremiah">
-        <part n="1" fromChapter="34" fromVerse="8" toVerse="22"/>
-        <part n="2" fromChapter="33" fromVerse="25" toVerse="26"/>
+    <haftarah n="Mishpatim" book="Jeremiah" >
+        <custom n="Ashkenaz Sefard">
+          <part n="1" fromChapter="34" fromVerse="8" toVerse="22"/>
+          <part n="2" fromChapter="33" fromVerse="25" toVerse="26"/>
+        </custom> 
+        <custom n="Teiman" fromChapter="34" fromVerse="8" toChapter="35" toVerse="19"/>
+        <custom n="Italki" fromChapter="34" fromVerse="8" toChapter="35" toVerse="11"/>
     </haftarah>
     <haftarah n="Terumah" book="Kings I" fromChapter="5" fromVerse="26" toChapter="6" toVerse="13"/>
     <haftarah n="Tetzaveh" book="Ezekiel" fromChapter="43" fromVerse="10" toVerse="27"/>
     <haftarah n="Ki Sisa" book="Kings I" fromChapter="18">
         <custom n="Ashkenaz" fromVerse="1" toVerse="39"/>
-        <custom n="Sefard" fromVerse="20" toVerse="39"/>
+        <custom n="Sefard Italki" fromVerse="20" toVerse="39"/>
+        <custom n="Telman" fromVerse="1" toVerse="45"/>
     </haftarah>
     <haftarah n="Vayakhel" book="Kings I" fromChapter="7">
         <custom n="Ashkenaz" fromVerse="40" toVerse="50"/> <!-- Chanukkah II -->
-        <custom n="Sefard" fromVerse="13" toVerse="26"/>
+        <custom n="Sefard Italki" fromVerse="13" toVerse="26"/>
+        <custom n="Teiman" fromVerse="13" toVerse="22"/>
     </haftarah>
     <haftarah n="Pekudei" book="Kings I" fromChapter="7">
-        <custom n="Ashkenaz Chabad" fromVerse="51" toChapter="8" toVerse="21"/>
+        <custom n="Ashkenaz Chabad" fromVerse="40"  toVerse="51"/>
+       <custom n="Italki" fromVerse="13" toVerse="26"/>
         <custom n="Sefard" fromVerse="40" toVerse="50"/> <!-- Chanukkah II -->
     </haftarah>
 
-    <haftarah n="Vayikra" book="Isaiah " fromChapter="43" fromVerse="21" toChapter="44" toVerse="23"/>
+    <haftarah n="Vayikra" book="Isaiah " fromChapter="43"  />
+        <custom n="Ashkenaz Sefard" fromVerse="21" toChapter="44" toVerse="23"/>
+        <custom n="Italki Teiman" fromVerse="40" toVerse="50"/> <!-- Chanukkah II -->
+    </haftarah>
     <haftarah n="Tzav" book="Jeremiah ">
         <custom n="Ashkenaz Sefard">
             <part n="1" fromChapter="7" fromVerse="21" toChapter="8" toVerse="3"/>
             <part n="2" fromChapter="9" fromVerse="22" toVerse="23"/>
         </custom>
-        <custom n="Chabad">
-            <part n="1" fromChapter="7" fromVerse="21" toChapter="7" toVerse="28"/>
+        <custom n="Chabad Teiman">
+            <part n="1" fromChapter="7" fromVerse="21"  toVerse="28"/>
             <part n="2" fromChapter="9" fromVerse="22" toVerse="23"/>
+        </custom>
+        <custom n="Italki">
+            <part n="1" fromChapter="7" fromVerse="21"  toVerse="28"/>
+            <part n="2" fromChapter="10" fromVerse="6" toVerse="7"/>
         </custom>
     </haftarah>
     <haftarah n="Shemini" book="Samuel II" fromChapter="6" fromVerse="1">
         <custom n="Ashkenaz" toChapter="7" toVerse="17"/>
         <custom n="Sefard" toChapter="6" toVerse="19"/>
+        <custom n="Teiman Italki" toChapter="7" toVerse="3"/>
     </haftarah>
     <haftarah n="Tazria" book="Kings II" fromChapter="4" fromVerse="42" toChapter="5" toVerse="19"/>
-    <haftarah n="Metzora" book="Kings II" fromChapter="7" fromVerse="3" toVerse="20"/>
+    <haftarah n="Metzora" book="Kings II">
+        <custom n="Ashkenaz Sefard" fromChapter="7" fromVerse="3" toChapter="7" toVerse="20"  />
+        <custom n="Teiman Italki">
+            <part n="1" fromChapter="7" fromVerse="3" toChapter="7" toVerse="20"/>
+            <part n="2" fromChapter="13" fromVerse="23" />
+        </custom>
+    </haftarah>
     <haftarah n="Acharei">
         <custom n="Ashkenaz Chabad" book="Amos" fromChapter="9" fromVerse="7" toVerse="15"/>
         <custom n="Sefard" book="Ezekiel" fromChapter="22" fromVerse="1" toVerse="16"/> <!-- = Kedoshim:Ashkenaz -->
     </haftarah>
     <haftarah n="Kedoshim" book="Ezekiel">
-        <custom n="Ashkenaz">
-            <part n="1" fromChapter="22" fromVerse="1" toVerse="16"/>
-        </custom>
-        <custom n="Sefard"> <!-- this one when Acharei & Kedoshim combine -->
-            <part n="1" fromChapter="20" fromVerse="2" toVerse="20"/>
-            <part n="2" fromChapter="22" fromVerse="1" toVerse="16"/>
-        </custom>
+        <custom n="Ashkenaz" fromChapter="22" fromVerse="1" toVerse="16">
+        <custom n="Sefard" fromChapter="20" fromVerse="2" toVerse="20">                > <!-- this one when Acharei & Kedoshim combine -->
+        <custom n="Teiman" fromChapter="20" fromVerse="1" toVerse="20">   
+        <custom n="Baladi" fromChapter="20" fromVerse="1" toVerse="15"> 
     </haftarah>
     <haftarah n="Emor" book="Ezekiel" fromChapter="44" fromVerse="15" toVerse="31"/>
-    <haftarah n="Behar" book="Jeremiah" fromChapter="32" fromVerse="6">
-        <custom n="Ashkenaz Sefard" toVerse="27"/>
-        <custom n="Chabad" toVerse="22"/>
+    <haftarah n="Behar" book="Jeremiah" >
+        <custom n="Ashkenaz Sefard" fromChapter="32" fromVerse="6" toVerse="27"/>
+        <custom n="Chabad" fromChapter="32" fromVerse="6" toVerse="22"/>
+        <custom n="Italki" fromChapter="16" fromVerse="19" toChapter="17" toVerse="14"/>
     </haftarah>
-    <haftarah n="Bechukosai" book="Jeremiah" fromChapter="16" fromVerse="19" toChapter="17" toVerse="14"/>
-
+    <haftarah n="Bechukosai">
+        <custom n="Ashkenaz Sefard" book="Jeremiah" fromChapter="16" fromVerse="19" toChapter="17" toVerse="14"/>
+        <custom n="Teiman" book="Ezekiel" fromChapter="34" fromVerse="1" toVerse="27"/>
+        <custom n="Italki" book="Ezekiel" fromChapter="34" fromVerse="1" toVerse="15"/>  
+    </haftarah>
     <haftarah n="Bemidbar" book="Hosea" fromChapter="2" fromVerse="1" toVerse="22"/>
     <haftarah n="Nasso" book="Judges" fromChapter="13" fromVerse="2" toVerse="25"/>
     <haftarah n="Beha'aloscha" book="Zechariah" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>
@@ -149,7 +208,7 @@
             <part n="1" fromChapter="2" fromVerse="4" toVerse="28"/>
             <part n="2" fromChapter="3" fromVerse="4" toVerse="4"/>
         </custom>
-        <custom n="Defard">
+        <custom n="Sefard">
             <part n="1" fromChapter="2" fromVerse="4" toVerse="28"/>
             <part n="2" fromChapter="4" fromVerse="1" toVerse="2"/>
         </custom>
