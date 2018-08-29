@@ -118,9 +118,9 @@ final class DatesTest extends FlatSpec with Matchers {
       (YomKippur, Seq(Shlishi, Rishon, Shishi)),
       (Purim, Seq(Shabbos, Sheni, Rvii)),
       (Pesach, Seq(Sheni, Rvii, Shishi)),
-      (Shavuot, Seq(Shlishi, Chamishi, Shabbos)),
+      (Shavuos, Seq(Shlishi, Chamishi, Shabbos)),
       (HoshanahRabbah, Seq(Shlishi, Chamishi, Shabbos)),
-      (Hanukkah1, Seq(Shlishi)),
+      (Chanukah1, Seq(Shlishi)),
       (FastOfEster, Seq(Rishon, Shlishi, Shishi)),
       (FastOfTammuz, Seq(Sheni, Rvii, Shishi)),
       (TishaBav, Seq(Sheni, Rvii, Shishi))
@@ -181,7 +181,7 @@ final class DatesTest extends FlatSpec with Matchers {
     years foreach { year =>
       val pesach: Day = Pesach(year)
       TishaBav(year).name shouldBe pesach.name
-      Shavuot(year).name shouldBe (pesach+1).name
+      Shavuos(year).name shouldBe (pesach+1).name
       RoshHashanah(year+1).name shouldBe (pesach+2).name
       SimchatTorah(year+1).name shouldBe (pesach+3).name
       YomKippur(year+1).name shouldBe (pesach+4).name

@@ -65,25 +65,25 @@ object SpecialDay {
 
   case object YomKippur extends SpecialDayBase(Tishrei, 10) with Festival
 
-  case object Sukkot extends SpecialDayBase(Tishrei, 15) with Festival
-  case object Sukkot2 extends SpecialDayBase(Tishrei, 16) with Festival
-  case object SukkotIntermediate1 extends SpecialDayBase(Tishrei, 17) with Intermediate
-  case object SukkotIntermediate2 extends SpecialDayBase(Tishrei, 18) with Intermediate
-  case object SukkotIntermediate3 extends SpecialDayBase(Tishrei, 19) with Intermediate
-  case object SukkotIntermediate4 extends SpecialDayBase(Tishrei, 20) with Intermediate
-  case object SukkotIntermediate5 extends SpecialDayBase(Tishrei, 21) with Intermediate
+  case object Succos extends SpecialDayBase(Tishrei, 15) with Festival
+  case object Succos2 extends SpecialDayBase(Tishrei, 16) with Festival
+  case object SuccosIntermediate1 extends SpecialDayBase(Tishrei, 17) with Intermediate
+  case object SuccosIntermediate2 extends SpecialDayBase(Tishrei, 18) with Intermediate
+  case object SuccosIntermediate3 extends SpecialDayBase(Tishrei, 19) with Intermediate
+  case object SuccosIntermediate4 extends SpecialDayBase(Tishrei, 20) with Intermediate
+  case object SuccosIntermediate5 extends SpecialDayBase(Tishrei, 21) with Intermediate
   case object HoshanahRabbah extends SpecialDayBase(Tishrei, 21) with Intermediate
   case object ShminiAtzeret extends SpecialDayBase(Tishrei, 22) with Festival
   case object SimchatTorah extends SpecialDayBase(Tishrei, 23) with Festival
 
-  case object SukkotIntermediate1InHolyLand extends SpecialDayBase(Tishrei, 16) with Intermediate
-  case object SukkotIntermediate2InHolyLand extends SpecialDayBase(Tishrei, 17) with Intermediate
-  case object SukkotIntermediate3InHolyLand extends SpecialDayBase(Tishrei, 18) with Intermediate
-  case object SukkotIntermediate4InHolyLand extends SpecialDayBase(Tishrei, 19) with Intermediate
-  case object SukkotIntermediate5InHolyLand extends SpecialDayBase(Tishrei, 20) with Intermediate
+  case object SuccosIntermediate1InHolyLand extends SpecialDayBase(Tishrei, 16) with Intermediate
+  case object SuccosIntermediate2InHolyLand extends SpecialDayBase(Tishrei, 17) with Intermediate
+  case object SuccosIntermediate3InHolyLand extends SpecialDayBase(Tishrei, 18) with Intermediate
+  case object SuccosIntermediate4InHolyLand extends SpecialDayBase(Tishrei, 19) with Intermediate
+  case object SuccosIntermediate5InHolyLand extends SpecialDayBase(Tishrei, 20) with Intermediate
   case object ShminiAtzeretAndSimchatTorahInHolyLand extends SpecialDayBase(Tishrei, 22) with Festival
 
-  case object ShabbosBereshit extends SpecialDay {
+  case object ShabbosBereishis extends SpecialDay {
     override def apply(year: Year): Day = shabbosAfter(SimchatTorah(year))
     final override def isFast: Boolean = false
     final override def isFestival: Boolean = false
@@ -91,22 +91,22 @@ object SpecialDay {
     final override def isRabbinicFestival: Boolean = false
   }
 
-  case object Hanukkah1 extends SpecialDayBase(Kislev, 25) with RabbinicFestival
-  case object Hanukkah2 extends SpecialDayBase(Kislev, 26) with RabbinicFestival
-  case object Hanukkah3 extends SpecialDayBase(Kislev, 27) with RabbinicFestival
-  case object Hanukkah4 extends SpecialDayBase(Kislev, 28) with RabbinicFestival
-  case object Hanukkah5 extends SpecialDayBase(Kislev, 29) with RabbinicFestival
-  case object Hanukkah6 extends SpecialDay with RabbinicFestival {
-    override def apply(year: Year): Day = Hanukkah5(year)+1
+  case object Chanukah1 extends SpecialDayBase(Kislev, 25) with RabbinicFestival
+  case object Chanukah2 extends SpecialDayBase(Kislev, 26) with RabbinicFestival
+  case object Chanukah3 extends SpecialDayBase(Kislev, 27) with RabbinicFestival
+  case object Chanukah4 extends SpecialDayBase(Kislev, 28) with RabbinicFestival
+  case object Chanukah5 extends SpecialDayBase(Kislev, 29) with RabbinicFestival
+  case object Chanukah6 extends SpecialDay with RabbinicFestival {
+    override def apply(year: Year): Day = Chanukah5(year)+1
   }
-  case object Hanukkah7 extends SpecialDay with RabbinicFestival {
-    override def apply(year: Year): Day = Hanukkah5(year)+2
+  case object Chanukah7 extends SpecialDay with RabbinicFestival {
+    override def apply(year: Year): Day = Chanukah5(year)+2
   }
-  case object Hanukkah8 extends SpecialDay with RabbinicFestival {
-    override def apply(year: Year): Day = Hanukkah5(year)+3
+  case object Chanukah8 extends SpecialDay with RabbinicFestival {
+    override def apply(year: Year): Day = Chanukah5(year)+3
   }
 
-  case object FastOfTevet extends SpecialDayBase(Teves, 10) with Fast
+  case object FastOfTeves extends SpecialDayBase(Teves, 10) with Fast
 
   case object FastOfEster extends SpecialDay with Fast {
     override def apply(year: Year): Day = Purim(year)-1
@@ -152,8 +152,8 @@ object SpecialDay {
     final override def isRabbinicFestival: Boolean = false
   }
 
-  case object Shavuot extends SpecialDayBase(Sivan, 6) with Festival
-  case object Shavuot2 extends SpecialDayBase(Sivan, 7) with Festival
+  case object Shavuos extends SpecialDayBase(Sivan, 6) with Festival
+  case object Shavuos2 extends SpecialDayBase(Sivan, 7) with Festival
 
   case object FastOfTammuz extends SpecialDayBase(Tammuz, 17) with Fast {
     override def corrected(year: Year): Day = {
@@ -177,36 +177,36 @@ object SpecialDay {
   val festivals: Set[SpecialDay] = Set(
     RoshHashanah, RoshHashanah2,
     YomKippur,
-    Sukkot, Sukkot2,
-    SukkotIntermediate1, SukkotIntermediate2, SukkotIntermediate3, SukkotIntermediate4, SukkotIntermediate5,
+    Succos, Succos2,
+    SuccosIntermediate1, SuccosIntermediate2, SuccosIntermediate3, SuccosIntermediate4, SuccosIntermediate5,
     ShminiAtzeret, SimchatTorah,
     Pesach, Pesach2,
     PesachIntermediate1, PesachIntermediate2, PesachIntermediate3, PesachIntermediate4,
     ShviiShelPesach, AcharonShelPesach,
-    Shavuot, Shavuot2
+    Shavuos, Shavuos2
   )
 
   val festivalsInHolyLand: Set[SpecialDay] = Set(
     RoshHashanah, RoshHashanah2,
     YomKippur,
-    Sukkot,
-    SukkotIntermediate1InHolyLand, SukkotIntermediate2InHolyLand, SukkotIntermediate3InHolyLand,
-    SukkotIntermediate4InHolyLand, SukkotIntermediate5InHolyLand, HoshanahRabbah,
+    Succos,
+    SuccosIntermediate1InHolyLand, SuccosIntermediate2InHolyLand, SuccosIntermediate3InHolyLand,
+    SuccosIntermediate4InHolyLand, SuccosIntermediate5InHolyLand, HoshanahRabbah,
     ShminiAtzeretAndSimchatTorahInHolyLand,
     Pesach, Pesach2,
     PesachIntermediate1InHolyLand, PesachIntermediate2InHolyLand, PesachIntermediate3InHolyLand,
     PesachIntermediate4InHolyLand, PesachIntermediate5InHolyLand,
     ShviiAndAcharonShelPesachInHolyLand,
-    Shavuot
+    Shavuos
   )
 
   def festivals(inHolyLand: Boolean): Set[SpecialDay] = if (inHolyLand) festivalsInHolyLand else festivals
 
   // TODO use corrected() istead of apply() for Torah readings; double-check Purim.
-  val fasts: Set[SpecialDay] = Set(FastOfGedalia, FastOfTevet, FastOfEster, FastOfTammuz, TishaBav)
+  val fasts: Set[SpecialDay] = Set(FastOfGedalia, FastOfTeves, FastOfEster, FastOfTammuz, TishaBav)
 
   val rabbinicFestivals: Set[SpecialDay] = Set(
-    Hanukkah1, Hanukkah2, Hanukkah3, Hanukkah4, Hanukkah5, Hanukkah6, Hanukkah7, Hanukkah8,
+    Chanukah1, Chanukah2, Chanukah3, Chanukah4, Chanukah5, Chanukah6, Chanukah7, Chanukah8,
     Purim // ShushanPurim
   )
 
