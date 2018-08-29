@@ -30,7 +30,7 @@
   Customs Chabad, Magreb and Teiman are the same as Sefard unless specified.
   Custom Baladi and Shami are the same as Teiman unless specified.
 TODO -Обычаи Вайеце
-TODO -Обычаи ашкеназа Пекудей
+
 -->
 <haftaros>
     <haftarah n="Bereishis" book="Isaiah" fromChapter="42">
@@ -125,9 +125,9 @@ TODO -Обычаи ашкеназа Пекудей
     <haftarah n="Terumah" book="Kings I" fromChapter="5" fromVerse="26" toChapter="6" toVerse="13"/>
     <haftarah n="Tetzaveh" book="Ezekiel" fromChapter="43" fromVerse="10" toVerse="27"/>
     <haftarah n="Ki Sisa" book="Kings I" fromChapter="18">
-        <custom n="Ashkenaz" fromVerse="1" toVerse="39"/>
+        <custom n="Ashkenaz Chabad" fromVerse="1" toVerse="39"/>
         <custom n="Sefard Italki" fromVerse="20" toVerse="39"/>
-        <custom n="Telman" fromVerse="1" toVerse="45"/>
+        <custom n="Teiman" fromVerse="1" toVerse="45"/>
     </haftarah>
     <haftarah n="Vayakhel" book="Kings I" fromChapter="7">
         <custom n="Ashkenaz" fromVerse="40" toVerse="50"/> <!-- Chanukkah II -->
@@ -135,16 +135,16 @@ TODO -Обычаи ашкеназа Пекудей
         <custom n="Teiman" fromVerse="13" toVerse="22"/>
     </haftarah>
     <haftarah n="Pekudei" book="Kings I" fromChapter="7">
-        <custom n="Ashkenaz Chabad" fromVerse="40"  toVerse="51"/>
-       <custom n="Italki" fromVerse="13" toVerse="26"/>
+        <custom n="Ashkenaz Chabad" fromVerse="51" toChapter="8" toVerse="21"/>
+        <custom n="Italki" fromVerse="40" toVerse="51"/>
         <custom n="Sefard" fromVerse="40" toVerse="50"/> <!-- Chanukkah II -->
     </haftarah>
 
-    <haftarah n="Vayikra" book="Isaiah " fromChapter="43">
+    <haftarah n="Vayikra" book="Isaiah" fromChapter="43">
         <custom n="Ashkenaz Sefard" fromVerse="21" toChapter="44" toVerse="23"/>
         <custom n="Italki Teiman" fromVerse="40" toVerse="50"/> <!-- Chanukkah II -->
     </haftarah>
-    <haftarah n="Tzav" book="Jeremiah ">
+    <haftarah n="Tzav" book="Jeremiah">
         <custom n="Ashkenaz Sefard">
             <part n="1" fromChapter="7" fromVerse="21" toChapter="8" toVerse="3"/>
             <part n="2" fromChapter="9" fromVerse="22" toVerse="23"/>
