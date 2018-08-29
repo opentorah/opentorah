@@ -115,11 +115,11 @@
       <aliyah n="3" chapter="19" verse="10"/>
     </day>
     <day n="2" chapter="19" verse="18"/>
-    <day n="3" chapter="20" verse="7"/>
+    <day n="3" chapter="20" verse="7" whentogether="2"/>
     <day n="4" chapter="20" verse="14"/>
-    <day n="5" chapter="20" verse="22"/>
+    <day n="5" chapter="20" verse="22" whentogether="3"/>
     <day n="6" chapter="21" verse="10"/>
-    <day n="7" chapter="21" verse="21"/>
+    <day n="7" chapter="21" verse="21" whentogether="4"/>
     <maftir chapter="21" verse="34"/>
   </week>
 
@@ -134,11 +134,11 @@
       <aliyah n="2" chapter="22" verse="5"/>
       <aliyah n="3" chapter="22" verse="8"/>
     </day>
-    <day n="2" chapter="22" verse="13"/>
+    <day n="2" chapter="22" verse="13" whentogether="5"/>
     <day n="3" chapter="22" verse="21"/>
-    <day n="4" chapter="22" verse="39"/>
+    <day n="4" chapter="22" verse="39" whentogether="6"/>
     <day n="5" chapter="23" verse="13"/>
-    <day n="6" chapter="23" verse="27"/>
+    <day n="6" chapter="23" verse="27" whentogether="7"/>
     <day n="7" chapter="24" verse="14"/>
     <maftir chapter="25" verse="7"/>
   </week>
@@ -176,11 +176,11 @@
       <aliyah n="3" chapter="30" verse="14"/>
     </day>
     <day n="2" chapter="31" verse="1"/>
-    <day n="3" chapter="31" verse="13"/>
+    <day n="3" chapter="31" verse="13" whentogether="2"/>
     <day n="4" chapter="31" verse="25"/>
     <day n="5" chapter="31" verse="42"/>
-    <day n="6" chapter="32" verse="1"/>
-    <day n="7" chapter="32" verse="20"/>
+    <day n="6" chapter="32" verse="1" whentogether="3"/>
+    <day n="7" chapter="32" verse="20" whentogether="4"/>
     <maftir chapter="32" verse="39"/>
   </week>
 
@@ -194,14 +194,14 @@
     <day n="1" chapter="33" verse="1">
       <aliyah n="2" chapter="33" verse="4"/>      
     </day>
-    <day n="2" chapter="33" verse="11"/>
+    <day n="2" chapter="33" verse="11" whentogether="5"/>
     <day n="3" chapter="33" verse="50">
       <aliyah n="3" chapter="33" verse="50"/>
       <aliyah n="end" chapter="33" verse="53"/>
     </day>
-    <day n="4" chapter="34" verse="16"/>
+    <day n="4" chapter="34" verse="16" whentogether="6"/>
     <day n="5" chapter="35" verse="1"/>
-    <day n="6" chapter="35" verse="9"/>
+    <day n="6" chapter="35" verse="9" whentogether="7"/>
     <day n="7" chapter="36" verse="1"/>
     <maftir chapter="36" verse="11"/>
   </week>

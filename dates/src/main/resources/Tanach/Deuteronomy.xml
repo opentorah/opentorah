@@ -159,10 +159,10 @@
       <aliyah n="isroel" chapter="29" verse="15"/>
       <aliyah n="end" chapter="29" verse="28"/>
     </day>
-    <day n="4" chapter="30" verse="1"/>
-    <day n="5" chapter="30" verse="7"/>
+    <day n="4" chapter="30" verse="1"  whentogether="2"/>
+    <day n="5" chapter="30" verse="7" whentogether="3"/>
     <day n="6" chapter="30" verse="11"/>
-    <day n="7" chapter="30" verse="15"/>
+    <day n="7" chapter="30" verse="15" whentogether="4"/>
     <maftir chapter="30" verse="15"/>
   </week>
 
@@ -177,14 +177,14 @@
     <day n="2" chapter="31" verse="4">
       <aliyah n="levi" chapter="31" verse="4"/>
     </day>
-    <day n="3" chapter="31" verse="7">
+    <day n="3" chapter="31" verse="7" whentogether="5">
       <aliyah n="isroel" chapter="31" verse="7"/>
     </day>
     <day n="4" chapter="31" verse="10">
       <aliyah n="end" chapter="31" verse="13"/>
     </day>
-    <day n="5" chapter="31" verse="14"/>
-    <day n="6" chapter="31" verse="20"/>
+    <day n="5" chapter="31" verse="14" whentogether="6"/>
+    <day n="6" chapter="31" verse="20" whentogether="7"/>
     <day n="7" chapter="31" verse="25"/>
     <maftir chapter="31" verse="28"/>
   </week>
