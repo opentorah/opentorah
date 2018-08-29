@@ -10,8 +10,8 @@
     </names>
 
     <day n="1" chapter="1" verse="1">
-      <aliyah n="2" chapter="" verse=""/>
-      <aliyah n="3" chapter="" verse=""/>
+      <aliyah n="2" chapter="1" verse="5"/>
+      <aliyah n="3" chapter="1" verse="17"/>
     </day>
     <day n="2" chapter="1" verse="20"/>
     <day n="3" chapter="2" verse="1"/>
@@ -31,8 +31,8 @@
     </names>
 
     <day n="1" chapter="4" verse="21">
-      <aliyah n="2" chapter="" verse=""/>
-      <aliyah n="3" chapter="" verse=""/>
+      <aliyah n="2" chapter="4" verse="25"/>
+      <aliyah n="3" chapter="4" verse="29"/>
     </day>
     <day n="2" chapter="4" verse="38"/>
     <day n="3" chapter="5" verse="1"/>
@@ -51,8 +51,8 @@
     </names>
 
     <day n="1" chapter="8" verse="1">
-      <aliyah n="2" chapter="" verse=""/>
-      <aliyah n="3" chapter="" verse=""/>
+      <aliyah n="2" chapter="8" verse="5"/>
+      <aliyah n="3" chapter="8" verse="10"/>
     </day>
     <day n="2" chapter="8" verse="15"/>
     <day n="3" chapter="9" verse="1"/>
@@ -71,8 +71,8 @@
     </names>
 
     <day n="1" chapter="13" verse="1">
-      <aliyah n="2" chapter="" verse=""/>
-      <aliyah n="3" chapter="" verse=""/>
+      <aliyah n="2" chapter="13" verse="4"/>
+      <aliyah n="3" chapter="13" verse="17"/>
     </day>
     <day n="2" chapter="13" verse="21"/>
     <day n="3" chapter="14" verse="8"/>
@@ -91,8 +91,8 @@
     </names>
 
     <day n="1" chapter="16" verse="1">
-      <aliyah n="2" chapter="" verse=""/>
-      <aliyah n="3" chapter="" verse=""/>
+      <aliyah n="2" chapter="16" verse="4"/>
+      <aliyah n="3" chapter="16" verse="8"/>
     </day>
     <day n="2" chapter="16" verse="14"/>
     <day n="3" chapter="16" verse="20"/>
@@ -111,8 +111,8 @@
     </names>
 
     <day n="1" chapter="19" verse="1">
-      <aliyah n="2" chapter="" verse=""/>
-      <aliyah n="3" chapter="" verse=""/>
+      <aliyah n="2" chapter="19" verse="7"/>
+      <aliyah n="3" chapter="19" verse="10"/>
     </day>
     <day n="2" chapter="19" verse="18"/>
     <day n="3" chapter="20" verse="7"/>
@@ -131,8 +131,8 @@
     </names>
 
     <day n="1" chapter="22" verse="2">
-      <aliyah n="2" chapter="" verse=""/>
-      <aliyah n="3" chapter="" verse=""/>
+      <aliyah n="2" chapter="22" verse="5"/>
+      <aliyah n="3" chapter="22" verse="8"/>
     </day>
     <day n="2" chapter="22" verse="13"/>
     <day n="3" chapter="22" verse="21"/>
@@ -151,8 +151,8 @@
     </names>
 
     <day n="1" chapter="25" verse="10">
-      <aliyah n="2" chapter="" verse=""/>
-      <aliyah n="3" chapter="" verse=""/>
+      <aliyah n="2" chapter="25" verse="13"/>
+      <aliyah n="3" chapter="25" verse="16"/>
     </day>
     <day n="2" chapter="26" verse="5"/>
     <day n="3" chapter="26" verse="52"/>
@@ -172,8 +172,8 @@
     </names>
 
     <day n="1" chapter="30" verse="2">
-      <aliyah n="2" chapter="" verse=""/>
-      <aliyah n="3" chapter="" verse=""/>
+      <aliyah n="2" chapter="30" verse="10"/>
+      <aliyah n="3" chapter="30" verse="14"/>
     </day>
     <day n="2" chapter="31" verse="1"/>
     <day n="3" chapter="31" verse="13"/>
@@ -192,12 +192,13 @@
     </names>
 
     <day n="1" chapter="33" verse="1">
-      <aliyah n="2" chapter="" verse=""/>
-      <aliyah n="3" chapter="" verse=""/>
-      <aliyah n="end" chapter="33" verse="53"/>
+      <aliyah n="2" chapter="33" verse="4"/>      
     </day>
     <day n="2" chapter="33" verse="11"/>
-    <day n="3" chapter="33" verse="50"/>
+    <day n="3" chapter="33" verse="50">
+      <aliyah n="3" chapter="33" verse="50"/>
+      <aliyah n="end" chapter="33" verse="53"/>
+    </day>
     <day n="4" chapter="34" verse="16"/>
     <day n="5" chapter="35" verse="1"/>
     <day n="6" chapter="35" verse="9"/>
