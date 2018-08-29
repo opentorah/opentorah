@@ -32,7 +32,7 @@
 TODO -Обычаи Вайеце
 
 -->
-<haftaros>
+<meta type="Haftarah">
     <haftarah n="Bereishis" book="Isaiah" fromChapter="42">
         <custom n="Ashkenaz" fromVerse="5" toChapter="43" toVerse="10"/>
         <custom n="Sefard" fromVerse="5" toChapter="42" toVerse="21"/>
@@ -66,8 +66,8 @@ TODO -Обычаи Вайеце
           <part n="1" book="Hosea" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
           <part n="2" book="Yoel" fromChapter="2" fromVerse="26" toVerse="27"/>
         </custom>
-        <custom n="Sefard_1" book="Hosea" fromChapter="11" fromVerse="7" toChapter="13" toVerse="5"/>
         <custom n="Sefard" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="12"/>
+        <custom n="Sefard_1" book="Hosea" fromChapter="11" fromVerse="7" toChapter="13" toVerse="5"/> <!-- TODO(@michaelko58) 5 or 6? -->
         <custom n="Chabad Teiman Italki" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="14"/>
     </haftarah>
     <haftarah n="Vayishlach">
@@ -234,7 +234,7 @@ TODO -Обычаи Вайеце
     <haftarah n="Va'eschanan" book="Isaiah">
           <custom n="Sefard Ashkenaz" fromChapter="40" fromVerse="1" toVerse="26"/>
           <custom n="Italki" fromChapter="40" fromVerse="1"  toVerse="16"/>
-          <custom n="Teiman"/>
+          <custom n="Teiman">
               <part n="1" fromChapter="40" fromVerse="1" toVerse="27"/>
               <part n="2" fromChapter="41" fromVerse="17"/>
           </custom>
@@ -285,4 +285,4 @@ TODO -Обычаи Вайеце
             <part n="2" fromChapter="6" fromVerse="27"/>
         </custom>
     </haftarah>
-</haftaros>
+</meta>

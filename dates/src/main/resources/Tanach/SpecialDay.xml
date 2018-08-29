@@ -62,7 +62,7 @@
 
  -->
 <!-- TODO aliyot -->
-<special-days>
+<meta type="SpecialDay">
     <day>
         <names>
             <name n="Erev Rosh Chodesh" lang="en" transliteration="yes"/>
@@ -99,4 +99,4 @@
         <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
         <haftarah book="Samuel I" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
     </day>
-</special-days>
+</meta>
