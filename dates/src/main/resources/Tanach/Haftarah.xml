@@ -28,8 +28,9 @@
 
   Customs Chabad, Magreb and Teiman are the same as Sefard unless specified.
   Custom Italki is the same as Ashkenaz unless specified.
+  Custom Lita is the same as Ashkenaz unless specified.
   Custom Baladi is the same as Teiman unless specified.
-TODO --Обычаи ашкеназа Вайеце
+TODO --Обычаи Вайеце
 TODO --Обычаи ашкеназа Ваишлах - Ошеа
 TODO --Обычаи ашкеназа Пекудей
 -->
@@ -63,12 +64,12 @@ TODO --Обычаи ашкеназа Пекудей
     </haftarah>
     <haftarah n="Vayeitzei" >
         <custom n="Ashkenaz" book="Hosea" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
-        <custom n="Ashkenaz_1">
+        <custom n="Lita">
           <part n="1" book="Hosea" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
           <part n="2" book="Yoel" fromChapter="2" fromVerse="26" toVerse="27"/>
         </custom>
-        <custom n="Sefard" book="Hosea" fromChapter="11" fromVerse="7" toChapter="13" toVerse="5"/>
-        <custom n="Sefard_1" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="12"/>
+        <custom n="Sefard_1" book="Hosea" fromChapter="11" fromVerse="7" toChapter="13" toVerse="5"/>
+        <custom n="Sefard" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="12"/>
         <custom n="Chabad Teiman Italki" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="14"/>
     </haftarah>
     <haftarah n="Vayishlach" book="Obadiah" fromChapter="1" fromVerse="1" toVerse="21"/>
