@@ -30,7 +30,6 @@
   Customs Chabad, Magreb and Teiman are the same as Sefard unless specified.
   Custom Baladi is the same as Teiman unless specified.
 TODO -Обычаи Вайеце
-TODO -Обычаи ашкеназа Ваишлах - Ошеа
 TODO -Обычаи ашкеназа Пекудей
 -->
 <haftaros>
@@ -194,23 +193,37 @@ TODO -Обычаи ашкеназа Пекудей
         <custom n="Italki" book="Ezekiel" fromChapter="34" fromVerse="1" toVerse="15"/>  
     </haftarah>
     <haftarah n="Bemidbar" book="Hosea" fromChapter="2" fromVerse="1" toVerse="22"/>
-    <haftarah n="Nasso" book="Judges" fromChapter="13" fromVerse="2" toVerse="25"/>
-    <haftarah n="Beha'aloscha" book="Zechariah" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>
+    <haftarah n="Nasso" book="Judges" fromChapter="13" fromVerse="2" toVerse="25">
+        <custom n="Teiman" toVerse="24"/>
+        <custom n="Ashkenaz Sefard" toVerse="25"/> 
+    </haftarah>
+    <haftarah n="Beha'aloscha" book="Zechariah" fromChapter="2" fromVerse="14" toChapter="4">
+        <custom n="Teiman" toVerse="9"/>
+        <custom n="Ashkenaz Sefard" toVerse="7"/> 
+    </haftarah>
     <haftarah n="Shelach" book="Joshua" fromChapter="2" fromVerse="1" toVerse="24"/>
     <haftarah n="Korach" book="Samuel I" fromChapter="11" fromVerse="14" toChapter="12" toVerse="22"/>
-    <haftarah n="Chukas" book="Judges" fromChapter="11" fromVerse="1" toVerse="33"/>
+    <haftarah n="Chukas" book="Judges" fromChapter="11" fromVerse="1">
+        <custom n="Teiman" toVerse="40"/>
+        <custom n="Ashkenaz Sefard" toVerse="33"/> 
+    </haftarah>
     <haftarah n="Balak" book="Micah" fromChapter="5" fromVerse="6" toChapter="6" toVerse="8"/>
     <haftarah n="Pinchas" book="Kings I" fromChapter="18" fromVerse="46" toChapter="19" toVerse="21"/> <!-- In 3 weeks - Matos -->
-    <haftarah n="Mattos" book="Jeremiah" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/>
-    <haftarah n="Masei" book="Jeremiah">  <!-- even on Shabbos Rosh Chodesh -->
-        <custom n="Ahkenaz">
+    <haftarah n="Mattos">
+         <custom n="Italki" book="Jehoshua" fromChapter="13" fromVerse="15" toVerse="33"/>
+         <custom n="Ashkenaz Sefard" book="Jeremiah" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/> 
+    </haftarah>
+    <haftarah n="Masei" >  <!-- even on Shabbos Rosh Chodesh -->
+        <custom n="Ahkenaz" book="Jeremiah">
             <part n="1" fromChapter="2" fromVerse="4" toVerse="28"/>
             <part n="2" fromChapter="3" fromVerse="4" toVerse="4"/>
         </custom>
-        <custom n="Sefard">
+        <custom n="Sefard" book="Jeremiah">
             <part n="1" fromChapter="2" fromVerse="4" toVerse="28"/>
             <part n="2" fromChapter="4" fromVerse="1" toVerse="2"/>
         </custom>
+        <custom n="Italki" book="Jehoshua" fromChapter="19" fromVerse="21" toChapter="21" toVerse="3"/>
+        <custom n="Teiman" book="Isaiah" fromChapter="1" fromVerse="1" toChapter="1" toVerse="20"/>
         <!-- TODO on Rosh Chodesh Av: Isaia 66:1, 23-24, 23 -->
     </haftarah>
 
