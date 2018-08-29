@@ -32,7 +32,7 @@ class WeeklyReadingTest extends FlatSpec with Matchers {
     }
 
     // Shavuot
-    val readingsBeforeShavuot = findReadings(shabbosBefore(Shavuot(year)))
+    val readingsBeforeShavuot = findReadings(shabbosBefore(Shavuos(year)))
     readingsBeforeShavuot.isCombined shouldBe false
     Set[Parsha](Bemidbar, Nasso).contains(readingsBeforeShavuot.parsha) shouldBe true
 

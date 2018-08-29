@@ -17,14 +17,14 @@
   - 'toChapter' and 'toVerse' identify the ending point of the fragment.
   When 'toChapter' is absent, it is assumed to be the same as 'fromChapter'.
 
-  Attributes are inherited from the enclosing element, so:
-    - any of the 'book', 'fromChapter', 'fromVerse', 'toChapter', 'toVerse' attributes
-      declared on the <custom> element apply to all nested <part> elements;
-    - <part n="1"> element that doesn't declare anyt attributes can be omitted;
-    - any of the 'book', 'fromChapter', 'fromVerse', 'toChapter', 'toVerse' attributes
-      declared on the <haftarah> element apply to all nested <custom> elements;
-    - <custom> element that doesn't declare the 'n' attribute describes a universal custom;
-    - <custom> element that doesn't declare any attributes can be omitted.
+  Attributes are inherited from the enclosing element;
+  'book', 'fromChapter', 'fromVerse', 'toChapter', 'toVerse' attributes
+  declared on the <haftarah> element apply to all nested <custom> elements;
+  declared on the <custom> element apply to all nested <part> elements.
+
+  - <custom> element that doesn't declare the 'n' attribute describes a universal custom;
+  - <custom> element that doesn't declare any attributes can be omitted;
+  - <part n="1"> element that doesn't declare any attributes can be omitted.
 
   Custom Chabad and Taiman is the same as Sefard unless specified.
 -->

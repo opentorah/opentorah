@@ -4,7 +4,7 @@ import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.jewish.SpecialDay
 import Parsha._
-import SpecialDay.{ShabbosBereshit, Pesach, Shavuot, TishaBav, shabbosAfter, shabbosBefore}
+import SpecialDay.{ShabbosBereishis, Pesach, Shavuos, TishaBav, shabbosAfter, shabbosBefore}
 
 /**
   * Determine weekly portion read on a given Shabbos.
@@ -130,14 +130,14 @@ object WeeklyReading {
 
     // All Shabbos days that are not festivals from one Shabbos Bereshit until the next.
     val weeks: Seq[Day] =
-      Util.unfoldInfiniteSimple(ShabbosBereshit(year))(_ + Calendar.daysPerWeek)
-      .takeWhile(_ < ShabbosBereshit(year+1))
+      Util.unfoldInfiniteSimple(ShabbosBereishis(year))(_ + Calendar.daysPerWeek)
+      .takeWhile(_ < ShabbosBereishis(year+1))
       .filterNot(festivals.contains)
       .toList
 
     def weeksTo(day: Day): Int = weeks.takeWhile(_ < day).length
 
-    val weeksToShavuot: Int = weeksTo(shabbosBefore(Shavuot(year)))
+    val weeksToShavuot: Int = weeksTo(shabbosBefore(Shavuos(year)))
 
     val weeksFromShavuotToAfterTishaBeAv: Int = weeksTo(shabbosAfter(TishaBav(year))) - weeksToShavuot
 

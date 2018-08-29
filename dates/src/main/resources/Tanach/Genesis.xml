@@ -12,14 +12,12 @@
       <name n="Берешит" lang="ru" transliteration="yes"/>
     </names>
 
-    <!-- TODO This name for the Shabbos afternoon AND Monday and Thursday morning reading is really stupid;
-      we need a better one! -->
-    <afternoon n="1" chapter="1" verse="1"/>
-    <afternoon n="2" chapter="1" verse="6"/>
-    <afternoon n="3" chapter="1" verse="9"/>
-    <afternoon n="end" chapter="1" verse="13"/>
-
-    <day n="1" chapter="1" verse="1"/>
+    <day n="1" chapter="1" verse="1">
+      <aliyah n="1" chapter="1" verse="1"/>
+      <aliyah n="2" chapter="1" verse="6"/>
+      <aliyah n="3" chapter="1" verse="9"/>
+      <aliyah n="end" chapter="1" verse="13"/>
+    </day>
     <day n="2" chapter="2" verse="4"/>
     <day n="3" chapter="2" verse="20"/>
     <day n="4" chapter="3" verse="22"/>
@@ -36,7 +34,10 @@
       <name n="Ноах" lang="ru" transliteration="yes"/>
     </names>
 
-    <day n="1" chapter="6" verse="9"/>
+    <day n="1" chapter="6" verse="9">
+      <aliyah n="2" chapter="" verse=""/>
+      <aliyah n="3" chapter="" verse=""/>
+    </day>
     <day n="2" chapter="7" verse="1"/>
     <day n="3" chapter="7" verse="17"/>
     <day n="4" chapter="8" verse="15"/>
@@ -53,7 +54,10 @@
       <name n="Лех-Леха" lang="ru" transliteration="yes"/>
     </names>
 
-    <day n="1" chapter="12" verse="1"/>
+    <day n="1" chapter="12" verse="1">
+      <aliyah n="2" chapter="" verse=""/>
+      <aliyah n="3" chapter="" verse=""/>
+    </day>
     <day n="2" chapter="12" verse="14"/>
     <day n="3" chapter="13" verse="5"/>
     <day n="4" chapter="14" verse="1"/>
@@ -70,7 +74,10 @@
       <name n="Вайера" lang="ru" transliteration="yes"/>
     </names>
 
-    <day n="1" chapter="18" verse="1"/>
+    <day n="1" chapter="18" verse="1">
+      <aliyah n="2" chapter="" verse=""/>
+      <aliyah n="3" chapter="" verse=""/>
+    </day>
     <day n="2" chapter="18" verse="15"/>
     <day n="3" chapter="19" verse="1"/>
     <day n="4" chapter="19" verse="21"/>
@@ -87,7 +94,10 @@
       <name n="Хайей-Сара" lang="ru" transliteration="yes"/>
     </names>
 
-    <day n="1" chapter="23" verse="1"/>
+    <day n="1" chapter="23" verse="1">
+      <aliyah n="2" chapter="" verse=""/>
+      <aliyah n="3" chapter="" verse=""/>
+    </day>
     <day n="2" chapter="23" verse="17"/>
     <day n="3" chapter="24" verse="10"/>
     <day n="4" chapter="24" verse="27"/>
@@ -104,7 +114,10 @@
       <name n="Толдот" lang="ru" transliteration="yes"/>
     </names>
 
-    <day n="1" chapter="25" verse="19"/>
+    <day n="1" chapter="25" verse="19">
+      <aliyah n="2" chapter="" verse=""/>
+      <aliyah n="3" chapter="" verse=""/>
+    </day>
     <day n="2" chapter="26" verse="6"/>
     <day n="3" chapter="26" verse="13"/>
     <day n="4" chapter="26" verse="23"/>
@@ -121,7 +134,10 @@
       <name n="Вайеце" lang="ru" transliteration="yes"/>
     </names>
 
-    <day n="1" chapter="28" verse="10"/>
+    <day n="1" chapter="28" verse="10">
+      <aliyah n="2" chapter="" verse=""/>
+      <aliyah n="3" chapter="" verse=""/>
+    </day>
     <day n="2" chapter="29" verse="1"/>
     <day n="3" chapter="29" verse="18"/>
     <day n="4" chapter="30" verse="14"/>
@@ -138,7 +154,10 @@
       <name n="Вайишлах" lang="ru" transliteration="yes"/>
     </names>
 
-    <day n="1" chapter="32" verse="4"/>
+    <day n="1" chapter="32" verse="4">
+      <aliyah n="2" chapter="" verse=""/>
+      <aliyah n="3" chapter="" verse=""/>
+    </day>
     <day n="2" chapter="32" verse="14"/>
     <day n="3" chapter="32" verse="31"/>
     <day n="4" chapter="33" verse="6"/>
@@ -155,7 +174,10 @@
       <name n="Вайешев" lang="ru" transliteration="yes"/>
     </names>
 
-    <day n="1" chapter="37" verse="1"/>
+    <day n="1" chapter="37" verse="1">
+      <aliyah n="2" chapter="" verse=""/>
+      <aliyah n="3" chapter="" verse=""/>
+    </day>
     <day n="2" chapter="37" verse="12"/>
     <day n="3" chapter="37" verse="23"/>
     <day n="4" chapter="38" verse="1"/>
@@ -172,7 +194,10 @@
       <name n="Микец" lang="ru" transliteration="yes"/>
     </names>
 
-    <day n="1" chapter="41" verse="1"/>
+    <day n="1" chapter="41" verse="1">
+      <aliyah n="2" chapter="" verse=""/>
+      <aliyah n="3" chapter="" verse=""/>
+    </day>
     <day n="2" chapter="41" verse="15"/>
     <day n="3" chapter="41" verse="39"/>
     <day n="4" chapter="41" verse="53"/>
@@ -189,7 +214,10 @@
       <name n="Вайигаш" lang="ru" transliteration="yes"/>
     </names>
 
-    <day n="1" chapter="44" verse="18"/>
+    <day n="1" chapter="44" verse="18">
+      <aliyah n="2" chapter="" verse=""/>
+      <aliyah n="3" chapter="" verse=""/>
+    </day>
     <day n="2" chapter="44" verse="31"/>
     <day n="3" chapter="45" verse="8"/>
     <day n="4" chapter="45" verse="28"/>
@@ -206,7 +234,10 @@
       <name n="Вайехи" lang="ru" transliteration="yes"/>
     </names>
 
-    <day n="1" chapter="47" verse="28"/>
+    <day n="1" chapter="47" verse="28">
+      <aliyah n="2" chapter="" verse=""/>
+      <aliyah n="3" chapter="" verse=""/>
+    </day>
     <day n="2" chapter="48" verse="10"/>
     <day n="3" chapter="48" verse="17"/>
     <day n="4" chapter="49" verse="1"/>
