@@ -228,7 +228,7 @@ TODO -Обычаи Вайеце
     </haftarah>
 
     <haftarah n="Devarim" book="Isaiah" fromChapter="1">
-          <custom n="Sefard Ashkenaz" fromVerse="11" toVerse="27"/>
+          <custom n="Sefard Ashkenaz" fromVerse="1" toVerse="27"/>
           <custom n="Teiman" fromVerse="21" toVerse="31"/>
     </haftarah>
     <haftarah n="Va'eschanan" book="Isaiah">
