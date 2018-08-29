@@ -88,9 +88,9 @@ TODO -Обычаи Вайеце
         <custom n="Italki" book="Jeremiah" fromChapter="1" fromVerse="1" toVerse="19"/>
         <custom n="Teiman" book="Ezekiel" fromChapter="16" fromVerse="1" toVerse="14"/>
     </haftarah>
-    <haftarah n="Va'eira" book="Ezekiel" fromChapter="28" toChapter="29" toVerse="21">
-        <custom n="Ashkenaz Sefard"  fromVerse="25"/>
-        <custom n="Teiman" fromVerse="24"/>
+    <haftarah n="Va'eira" book="Ezekiel" fromChapter="28">
+        <custom n="Ashkenaz Sefard" fromVerse="25" toChapter="29" toVerse="21"/>
+        <custom n="Teiman" fromVerse="24" toChapter="29" toVerse="21"/>
     </haftarah>
     <haftarah n="Bo">
         <custom n="Ashkenaz Sefarad" book="Jeremiah" fromChapter="46" fromVerse="13" toVerse="28"/>
@@ -114,7 +114,7 @@ TODO -Обычаи Вайеце
             <part n="2" fromChapter="9" fromVerse="5" toVerse="6"/>
         </custom>
     </haftarah>
-    <haftarah n="Mishpatim" book="Jeremiah" >
+    <haftarah n="Mishpatim" book="Jeremiah">
         <custom n="Ashkenaz Sefard">
           <part n="1" fromChapter="34" fromVerse="8" toVerse="22"/>
           <part n="2" fromChapter="33" fromVerse="25" toVerse="26"/>
