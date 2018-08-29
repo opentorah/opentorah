@@ -30,6 +30,7 @@
   Custom Italki is the same as Ashkenaz unless specified.
   Custom Baladi is the same as Teiman unless specified.
 TODO --Обычаи ашкеназа Вайеце
+TODO --Обычаи ашкеназа Ваишлах - Ошеа
 TODO --Обычаи ашкеназа Пекудей
 -->
 <haftaros>
@@ -61,7 +62,8 @@ TODO --Обычаи ашкеназа Пекудей
         <custom n="Teiman" toChapter="3" toVerse="4"/>
     </haftarah>
     <haftarah n="Vayeitzei" >
-        <custom n="Ashkenaz">
+        <custom n="Ashkenaz" book="Hosea" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
+        <custom n="Ashkenaz_1">
           <part n="1" book="Hosea" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
           <part n="2" book="Yoel" fromChapter="2" fromVerse="26" toVerse="27"/>
         </custom>
