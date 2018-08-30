@@ -128,10 +128,10 @@
 
     <day>
         <names>
-            <name n="Shabbos Succos Intermediate" lang="en" transliteration="yes"/>
+            <name n="Shabbos Intermediate Succos" lang="en" transliteration="yes"/>
         </names>
         <torah book="Exodus" fromChapter="33" fromVerse="12" toChapter="34" toVerse="26"/>
-        <!-- TODO Numbers 29
+        <!-- TODO maftir: Numbers 29
           day 1: 17-22; day 3: 23-28; day: 26-31
          -->
         <haftarah book="Ezekiel" fromChapter="38" fromVerse="18" toChapter="39" toVerse="16"/>
@@ -167,68 +167,101 @@
         <haftarah book="Joshua" fromChapter="1" fromVerse="1" toVerse="18"/>
     </day>
 
-    <!-- TODO См. распределение по дням. -->
+    <!-- TODO
+    Детальное распределение текстов для чтения в Хануку
+    Первый день Хануки Бемидбар,7:1-17 (для сфарадим - до 7:23, см. далее).
+    Чтение следующий шести дней : по минагу ашкеназим (Рамо) и так в Хабаде -
+    первые двое читают текущий день (пополам), а третий  читает следующий день;
+    обычай сфарадим - третий возвращается и читает весь текущий день.
+    2. 18-23
+    3. 24-29
+    4. 30-35
+    5. 36-41
+    6. 42-47
+    7. 48-53
+    Зот Ханука - Бемидбар,7:54 - 89
+    -->
     <day>
         <names>
             <name n="Channukah 1" lang="en" transliteration="yes"/>
         </names>
-        <torah book="Bemidbar" fromChapter="7" fromVerse="1" toChapter="8" toVerse="4"/>
+        <torah book="Numbers" fromChapter="7" fromVerse="1" toVerse="17"/>
     </day>
 
     <day>
         <names>
             <name n="Channukah 2" lang="en" transliteration="yes"/>
         </names>
+        <torah book="Numbers" fromChapter="7" fromVerse="18" toVerse="29"/>
     </day>
 
     <day>
         <names>
             <name n="Channukah 3" lang="en" transliteration="yes"/>
         </names>
+        <torah book="Numbers" fromChapter="7" fromVerse="24" toVerse="35"/>
     </day>
 
     <day>
         <names>
             <name n="Channukah 4" lang="en" transliteration="yes"/>
         </names>
+        <torah book="Numbers" fromChapter="7" fromVerse="30" toVerse="41"/>
     </day>
 
     <day>
         <names>
             <name n="Channukah 5" lang="en" transliteration="yes"/>
         </names>
+        <torah book="Numbers" fromChapter="7" fromVerse="36" toVerse="47"/>
     </day>
 
     <day>
         <names>
             <name n="Channukah 6" lang="en" transliteration="yes"/>
         </names>
+        <torah book="Numbers" fromChapter="7" fromVerse="48" toVerse="59"/>
     </day>
 
     <day>
         <names>
             <name n="Channukah 7" lang="en" transliteration="yes"/>
         </names>
+        <torah book="Numbers" fromChapter="7" fromVerse="48" toVerse="59"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Channukah 7 Rosh Chodesh" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Numbers" fromChapter="7" fromVerse="42" toVerse="47"/>
     </day>
 
     <day>
         <names>
             <name n="Channukah 8" lang="en" transliteration="yes"/>
         </names>
+        <torah book="Numbers" fromChapter="7" fromVerse="54" toChapter="8" toVerse="4"/>
     </day>
 
-    <!-- TODO Рош ходеш в будни в Хануку 28:11-15. -->
+    <!-- TODO Рош ходеш в будни в Хануку 28:11-15 - what does this mean?! -->
 
     <day>
         <names>
             <name n="Shabbos Channukah 1" lang="en" transliteration="yes"/>
         </names>
+        <!-- TODO maftir: Numbers 7
+          day 1: 1-17; day 2: 18-23; 3: 24-29; 4: 30-35; 6: !!!; 7: 48-53
+         -->
+        <haftarah book="Zecharia" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>
     </day>
 
     <day>
         <names>
             <name n="Shabbos Channukah 2" lang="en" transliteration="yes"/>
         </names>
+        <maftir book="Numbers" fromChapter="7" fromVerse="54" toChapter="8" toVerse="4"/>
+        <haftarah book="Kings I" fromChapter="7" fromVerse="40" toVerse="50"/>
     </day>
 
     <day>
@@ -236,6 +269,7 @@
             <name n="Parshas Shekalim" lang="en" transliteration="yes"/>
         </names>
         <maftir book="Exodus" fromChapter="30" fromVerse="11" toVerse="16"/>
+        <haftarah book="Kings II" fromChapter="11" fromVerse="17" toChapter="11" toVerse="17"/>
     </day>
 
     <day>
@@ -243,6 +277,7 @@
             <name n="Parshas Zachor" lang="en" transliteration="yes"/>
         </names>
         <maftir book="Deuteronomy" fromChapter="25" fromVerse="17" toVerse="19"/>
+        <haftarah book="Samuel I" fromChapter="15" fromVerse="1" toVerse="34"/>
     </day>
 
     <day>
@@ -250,6 +285,7 @@
             <name n="Parshas Parah" lang="en" transliteration="yes"/>
         </names>
         <maftir book="Numbers" fromChapter="19" fromVerse="1" toVerse="22"/>
+        <haftarah book="Ezekiel" fromChapter="36" fromVerse="16" toVerse="38"/>
     </day>
 
     <day>
@@ -257,6 +293,7 @@
             <name n="Parshas Hachodesh" lang="en" transliteration="yes"/>
         </names>
         <maftir book="Exodus" fromChapter="12" fromVerse="1" toVerse="20"/>
+        <haftarah book="Ezekiel" fromChapter="45" fromVerse="16" toChapter="46" toVerse="18"/>
     </day>
 
     <day>
@@ -270,6 +307,7 @@
         <names>
             <name n="Shabbos Hagodol" lang="en" transliteration="yes"/>
         </names>
+        <haftarah book="Malachi" fromChapter="3" fromVerse="4" toVerse="24"/>
     </day>
 
     <day>
@@ -277,6 +315,12 @@
             <name n="Pesach 1" lang="en" transliteration="yes"/>
         </names>
         <torah book="Exodus" fromChapter="12" fromVerse="21" toVerse="51"/>
+        <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>
+        <haftarah book="Joshua">
+            <part n="1" fromChapter="3" fromVerse="5" toVerse="7"/>
+            <part n="2" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
+            <part n="3" fromChapter="6" fromVerse="27"/>
+        </haftarah>
     </day>
 
     <day>
@@ -284,12 +328,21 @@
             <name n="Pesach 2" lang="en" transliteration="yes"/>
         </names>
         <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44"/>
+        <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>
+        <haftarah book="Kings II" fromChapter="23">
+            <part n="1" fromVerse="1" toVerse="9"/>
+            <part n="2" fromVerse="21" toVerse="25"/>
+        </haftarah>
     </day>
 
     <day>
         <names>
             <name n="Pesach Intermediate 1" lang="en" transliteration="yes"/>
         </names>
+        <torah>
+            <part n="1" book="Exodus" fromChapter="13" fromVerse="1" toVerse="6"/>
+            <part n="2" book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
+        </torah>
     </day>
 
 
@@ -297,6 +350,10 @@
         <names>
             <name n="Pesach Intermediate 2" lang="en" transliteration="yes"/>
         </names>
+        <torah>
+            <part n="1" book="Exodus" fromChapter="22" fromVerse="24" toChapter="23" toVerse="19"/>
+            <part n="2" book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
+        </torah>
     </day>
 
 
@@ -304,6 +361,10 @@
         <names>
             <name n="Pesach Intermediate 3" lang="en" transliteration="yes"/>
         </names>
+        <torah>
+            <part n="1" book="Exodus" fromChapter="34" fromVerse="1" toVerse="26"/>
+            <part n="2" book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
+        </torah>
     </day>
 
 
@@ -311,12 +372,19 @@
         <names>
             <name n="Pesach Intermediate 4" lang="en" transliteration="yes"/>
         </names>
+        <torah>
+            <part n="1" book="Numbers" fromChapter="9" fromVerse="1" toVerse="14"/>
+            <part n="2" book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
+        </torah>
     </day>
 
     <day>
         <names>
             <name n="Shabbos Intermediate Pesach" lang="en" transliteration="yes"/>
         </names>
+        <torah book="Exodus" fromChapter="33" fromVerse="12" toChapter="34" toVerse="26"/>
+        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
+        <haftarah book="Ezekiel" fromChapter="37" fromVerse="1" toVerse="14"/>
     </day>
 
     <day>
@@ -324,6 +392,8 @@
             <name n="Pesach 7" lang="en" transliteration="yes"/>
         </names>
         <torah book="Exodus" fromChapter="13" fromVerse="17" toChapter="15" toVerse="26"/>
+        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
+        <haftarah book="Samuel II" fromChapter="22" fromVerse="1" toVerse="51"/>
     </day>
 
     <day>
@@ -331,6 +401,8 @@
             <name n="Pesach 8" lang="en" transliteration="yes"/>
         </names>
         <torah book="Deuteronomy" fromChapter="15" fromVerse="19" toChapter="16" toVerse="17"/>
+        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
+        <haftarah book="Isaia" fromChapter="10" fromVerse="32" toChapter="12" toVerse="6"/>
     </day>
 
     <day>
@@ -338,6 +410,8 @@
             <name n="Pesach 8 Shabbos" lang="en" transliteration="yes"/> <!-- => Devarim -->
         </names>
         <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17"/>
+        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
+        <haftarah book="Isaia" fromChapter="10" fromVerse="32" toChapter="12" toVerse="6"/>
     </day>
 
     <day>
@@ -345,19 +419,29 @@
             <name n="Shavuos 1" lang="en" transliteration="yes"/>
         </names>
         <torah book="Exodus" fromChapter="19" fromVerse="1" toChapter="20" toVerse="22"/>
+        <maftir book="Numbers" fromChapter="28" fromVerse="26" toVerse="31"/>
+        <haftarah book="Ezekiel">
+            <part n="1" fromChapter="1" fromVerse="1" toVerse="28"/>
+            <part n="2" fromChapter="3" fromVerse="12"/>
+        </haftarah>
     </day>
 
     <day>
         <names>
             <name n="Shavuos 2" lang="en" transliteration="yes"/>
         </names>
-        <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17"/>
+        <torah book="Deuteronomy" fromChapter="15" fromVerse="19" toChapter="16" toVerse="17"/>
+        <maftir book="Numbers" fromChapter="28" fromVerse="26" toVerse="31"/>
+        <haftarah book="Habkkuk" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
     </day>
 
     <day>
         <names>
             <name n="Shavuos 2 Shabbos" lang="en" transliteration="yes"/>
         </names>
+        <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17"/>
+        <maftir book="Numbers" fromChapter="28" fromVerse="26" toVerse="31"/>
+        <haftarah book="Habkkuk" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
     </day>
 
     <day>
@@ -365,5 +449,17 @@
             <name n="Tisha Bav" lang="en" transliteration="yes"/>
         </names>
         <torah book="Deuteronomy" fromChapter="4" fromVerse="25" toVerse="40"/>
+        <haftarah book="Jeremiah" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Tisha Bav Mincha" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Exodus">
+            <part n="1" fromChapter="32" fromVerse="11" toVerse="14"/>
+            <part n="2" fromChapter="34" fromVerse="1" toVerse="10"/>
+        </torah>
+        <haftarah book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56" toVerse="8"/>
     </day>
 </meta>
