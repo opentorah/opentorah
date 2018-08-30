@@ -1,86 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- TODO all the other special days
-Дополнительные дни чтения Торы
-
-1. Йом тов и холь а-моэд
-2. Рош ходеш - 1 и 30 день месяца
-3. Ханука - с 25 кислева 8 дней, то есть до 2 или 3 тевета в зависимости от года
-4. Пурим 14 адара ( или адара 2 в високосном году) во всем мире, 15 адара (адара 2) в Иерусалиме, сомнительные ( выяснить)
-5. Посты.
-6. Каждый понедельник и четверг
-7. Чтение Торы в минху: шабат, Йом кипур, дни постов.
-Законы совпадений:
-1. 6) отодвигается при любом сожертвоприношения
-2. 2) 3) 4) совпадающие с шабатом - дополнительный свиток Торы
-3. 2) и 3) дополнительный свиток , то есть если и 2. то три свитка Торы
-4. В 7) Йом кипур отодвигает шабат.
-Дополнительные чтения Торы - мафтир.
-1. Шабат Шкалим
-2. Шабат Захор
-3. Шабат Пара
-4. Шабат а-Ходеш
-5. Когда на шабат выпадает рош ходеш или холь амоед (см. 9) - мафтир жертвоприношения.
-6. В холь а-моед Песах - мафтир жертвоприношения.
-7. Йом тов, Рош а-шана, Йом кипур - мафтир жертвоприношения.
-
-
-Тексты для дополнительных чтений Торы
-
-Обязательные чтения в течении года
-Основное чтение в шахарит
-1. Рош ходеш
-а) Бемидбар, 28:1-15
-б) в Шабат 28:9-15
-в) в будни в Хануку 28:11-15
-2. Пост: Шмот 32:11-14, 34:1-10
-3. Рош ашана, первый день: Берешит, 21:1-34
-4. Рош ашана, второй день: Берешит, 22:1-24
-5. Йом кипур шахарит: Ваикра, 16:1-34
-6. Первый йом тов Суккот (в диаспоре и второй): Ваикра 22:26 - 23:44
-7. Шмини ацерет (диаспора): Дварим, 14:22 - 16:17
-8. Симхат Тора: Зот а-браха, Берешит, 1:1-2:3, жертвоприношения
-9. Ханука: Бемдбар, 7:1 -8:4 . См. распределение по дням
-10. Пурим: Шмот, 17:8-16
-11. Песах:Шмот,12:21-51
-12. Второй день Песаха       Ваикра, 22:26 - 23:44
-13.Седьмой день Песаха:  Шмот, 13:17 - 15:26
-14. Последний день Песаха (диаспора)
-  а) если совпал с шабатом Дварим, 14:22 - 16:17
-  б) если не совпал: Дварим, 15:19 - 16:17
-15. Шавуот: Шмот, 19:1 - 20:22
-16. Второй день Шавуот (в диаспоре) : Дварим, 14:22 - 16:17
-17. Тиша беав: Дварим, 4:25-40
-
-Мафтир
-1. Шкалим: Шмот, 30:11-16
-2. Захор: Дварим, 25:17-19
-3.Пара: Бемидбар, 19:1-22
-4. А-ходеш: Шмот, 12:1-20
-Основное чтение в минху
-1. Йом кипур : Ваикра, 18:1-30
-2.  Пост: Шмот, 32:11-14, 34:1-10
-
+<!--
  -->
-<!-- TODO aliyot -->
-<special-days>
-    <day>
-        <names>
-            <name n="Erev Rosh Chodesh" lang="en" transliteration="yes"/>
-        </names>
-        <haftarah book="Samuel I" fromChapter="20" fromVerse="18" toVerse="42"/>
-    </day>
-
-    <day>
-        <names>
-            <name n="Shabbos Rosh Chodesh" lang="en" transliteration="yes"/>
-        </names>
-        <haftarah book="Isaia" fromChapter="66">
-            <part n="1" fromVerse="1" toVerse="24"/>
-            <part n="1" fromVerse="23" toVerse="23"/>
-            <!--TODO if Sunday is also Rosh Chodesh, Chabad adds Samuеl I 20:18,42 -->
-        </haftarah>
-    </day>
-
+<meta type="SpecialDay">
     <day>
         <names>
             <name n="Rosh Chodesh" lang="en" transliteration="yes"/>
@@ -92,11 +13,357 @@
 
     <day>
         <names>
+            <name n="Shabbos Erev Rosh Chodesh" lang="en" transliteration="yes"/>
+        </names>
+        <haftarah book="Samuel I" fromChapter="20" fromVerse="18" toVerse="42"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Shabbos Rosh Chodesh" lang="en" transliteration="yes"/>
+        </names>
+        <maftir book="Numbers" fromChapter="28" fromVerse="9" toVerse="15"/>
+        <haftarah book="Isaia" fromChapter="66">
+            <part n="1" fromVerse="1" toVerse="24"/>
+            <part n="1" fromVerse="23" toVerse="23"/>
+            <!--TODO if Sunday is also Rosh Chodesh, Chabad adds Samuеl I 20:18,42 -->
+        </haftarah>
+    </day>
+
+    <day>
+        <names>
+            <name n="Public Fast" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Exodus">
+            <part n="1" fromChapter="32" fromVerse="11" toVerse="14"/>
+            <part n="2" fromChapter="34" fromVerse="1" toVerse="10"/>
+        </torah>
+        <haftarah book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56" toVerse="8"/>
+    </day>
+
+    <day>
+        <names>
             <name n="Rosh Hashanah 1" lang="en" transliteration="yes"/>
         </names>
-        <torah book="Genesis" fromChapter="21">
+        <torah book="Genesis" fromChapter="21" fromVerse="1" toVerse="34">
+            <aliyah n="2" verse=""/>
+            <aliyah n="3" verse=""/>
+            <aliyah n="4" verse=""/>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
         <haftarah book="Samuel I" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
     </day>
-</special-days>
+
+    <day>
+        <names>
+            <name n="Rosh Hashanah 2" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Genesis" fromChapter="22" fromVerse="1" toVerse="24"/>
+        <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
+        <haftarah book="Jeremiah" fromChapter="31" fromVerse="1" toVerse="19"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Yom Kippur Shacharis" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Leviticus" fromChapter="16" fromVerse="1" toVerse="34"/>
+        <maftir book="Numbers" fromChapter="29" fromVerse="7" toVerse="11"/>
+        <haftarah book="Isaiah" fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Yom Kippur Mincha" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Leviticus" fromChapter="18" fromVerse="1" toVerse="30"/>
+        <maftir book="Jonah"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Succos 1" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44"/>
+        <maftir book="Numbers" fromChapter="29" fromVerse="12" toVerse="16"/>
+        <haftarah book="Zechariah" fromChapter="14" fromVerse="1" toVerse="21"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Succos 2" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44"/>
+        <maftir book="Numbers" fromChapter="29" fromVerse="12" toVerse="16"/>
+        <haftarah book="Kings I" fromChapter="8" fromVerse="2" toVerse="21"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Succos Intermediate 1" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Numbers" fromChapter="29" fromVerse="17" toVerse="25"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Succos Intermediate 2" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Numbers" fromChapter="29" fromVerse="20" toVerse="28"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Succos Intermediate 3" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Numbers" fromChapter="29" fromVerse="23" toVerse="31"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Succos Intermediate 4" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Numbers" fromChapter="29" fromVerse="26" toVerse="34"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Shabbos Succos Intermediate" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Exodus" fromChapter="33" fromVerse="12" toChapter="34" toVerse="26"/>
+        <!-- TODO Numbers 29
+          day 1: 17-22; day 3: 23-28; day: 26-31
+         -->
+        <haftarah book="Ezekiel" fromChapter="38" fromVerse="18" toChapter="39" toVerse="16"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Hoshana Rabbah" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Numbers" fromChapter="29" fromVerse="26" toVerse="34"/>
+    </day>
+
+    <day>
+        <names> <!-- In Diaspora. -->
+            <name n="Shemini Atzeres" lang="en" transliteration="yes"/>
+            <name n="Шмини ацерет" lang="ru" transliteration="yes"/>
+        </names>
+        <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17"/>
+        <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
+        <haftarah book="Kings I" fromChapter="8" fromVerse="54" toChapter="9" toVerse="1"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Simchas Torah" lang="en" transliteration="yes"/>
+            <name n="Симхат Тора" lang="ru" transliteration="yes"/>
+        </names>
+        <torah>
+            <part n="1" book="Deuteronomy" fromChapter="33" fromVerse="1" toChapter="34" toVerse="12"/> <!-- Zos Haberacha -->
+            <part n="2" book="Genesis" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/>
+        </torah>
+        <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
+        <haftarah book="Joshua" fromChapter="1" fromVerse="1" toVerse="18"/>
+    </day>
+
+    <!-- TODO См. распределение по дням. -->
+    <day>
+        <names>
+            <name n="Channukah 1" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Bemidbar" fromChapter="7" fromVerse="1" toChapter="8" toVerse="4"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Channukah 2" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+    <day>
+        <names>
+            <name n="Channukah 3" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+    <day>
+        <names>
+            <name n="Channukah 4" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+    <day>
+        <names>
+            <name n="Channukah 5" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+    <day>
+        <names>
+            <name n="Channukah 6" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+    <day>
+        <names>
+            <name n="Channukah 7" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+    <day>
+        <names>
+            <name n="Channukah 8" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+    <!-- TODO Рош ходеш в будни в Хануку 28:11-15. -->
+
+    <day>
+        <names>
+            <name n="Shabbos Channukah 1" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+    <day>
+        <names>
+            <name n="Shabbos Channukah 2" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+    <day>
+        <names>
+            <name n="Parshas Shekalim" lang="en" transliteration="yes"/>
+        </names>
+        <maftir book="Exodus" fromChapter="30" fromVerse="11" toVerse="16"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Parshas Zachor" lang="en" transliteration="yes"/>
+        </names>
+        <maftir book="Deuteronomy" fromChapter="25" fromVerse="17" toVerse="19"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Parshas Parah" lang="en" transliteration="yes"/>
+        </names>
+        <maftir book="Numbers" fromChapter="19" fromVerse="1" toVerse="22"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Parshas Hachodesh" lang="en" transliteration="yes"/>
+        </names>
+        <maftir book="Exodus" fromChapter="12" fromVerse="1" toVerse="20"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Purim" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Exodus" fromChapter="17" fromVerse="8" toVerse="16"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Shabbos Hagodol" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+    <day>
+        <names>
+            <name n="Pesach 1" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Exodus" fromChapter="12" fromVerse="21" toVerse="51"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Pesach 2" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Pesach Intermediate 1" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+
+    <day>
+        <names>
+            <name n="Pesach Intermediate 2" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+
+    <day>
+        <names>
+            <name n="Pesach Intermediate 3" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+
+    <day>
+        <names>
+            <name n="Pesach Intermediate 4" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+    <day>
+        <names>
+            <name n="Shabbos Intermediate Pesach" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+    <day>
+        <names>
+            <name n="Pesach 7" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Exodus" fromChapter="13" fromVerse="17" toChapter="15" toVerse="26"/>
+    </day>
+
+    <day>
+        <names> <!-- In Diaspora  -->
+            <name n="Pesach 8" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Deuteronomy" fromChapter="15" fromVerse="19" toChapter="16" toVerse="17"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Pesach 8 Shabbos" lang="en" transliteration="yes"/> <!-- => Devarim -->
+        </names>
+        <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Shavuos 1" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Exodus" fromChapter="19" fromVerse="1" toChapter="20" toVerse="22"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Shavuos 2" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17"/>
+    </day>
+
+    <day>
+        <names>
+            <name n="Shavuos 2 Shabbos" lang="en" transliteration="yes"/>
+        </names>
+    </day>
+
+    <day>
+        <names>
+            <name n="Tisha Bav" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Deuteronomy" fromChapter="4" fromVerse="25" toVerse="40"/>
+    </day>
+</meta>

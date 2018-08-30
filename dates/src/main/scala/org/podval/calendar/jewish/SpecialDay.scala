@@ -67,6 +67,7 @@ object SpecialDay {
 
   case object Succos extends SpecialDayBase(Tishrei, 15) with Festival
   case object Succos2 extends SpecialDayBase(Tishrei, 16) with Festival
+  // TODO mapping to the readings skips Shabbos!
   case object SuccosIntermediate1 extends SpecialDayBase(Tishrei, 17) with Intermediate
   case object SuccosIntermediate2 extends SpecialDayBase(Tishrei, 18) with Intermediate
   case object SuccosIntermediate3 extends SpecialDayBase(Tishrei, 19) with Intermediate
@@ -131,6 +132,7 @@ object SpecialDay {
   case object Pesach extends SpecialDayBase(Nisan, 15) with Festival
   case object Pesach2 extends SpecialDayBase(Nisan, 16) with Festival
 
+  // TODO mapping to the readings skips Shabbos!
   case object PesachIntermediate1 extends SpecialDayBase(Nisan, 17) with Intermediate
   case object PesachIntermediate2 extends SpecialDayBase(Nisan, 18) with Intermediate
   case object PesachIntermediate3 extends SpecialDayBase(Nisan, 19) with Intermediate

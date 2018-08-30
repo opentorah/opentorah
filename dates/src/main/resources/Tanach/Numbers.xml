@@ -9,10 +9,10 @@
       <name lang="ru" transliterated="true">Бэмидбар</name>
     </names>
 
-    <day n="1" chapter="1" verse="1">
-      <aliyah n="2" chapter="1" verse="5"/>
-      <aliyah n="3" chapter="1" verse="17"/>
-    </day>
+    <aliyah n="2" chapter="1" verse="5"/>
+    <aliyah n="3" chapter="1" verse="17"/>
+
+    <day n="1" chapter="1" verse="1"/>
     <day n="2" chapter="1" verse="20"/>
     <day n="3" chapter="2" verse="1"/>
     <day n="4" chapter="3" verse="1"/>
@@ -30,10 +30,10 @@
       <name lang="ru" transliterated="true">Насо</name>
     </names>
 
-    <day n="1" chapter="4" verse="21">
-      <aliyah n="2" chapter="4" verse="25"/>
-      <aliyah n="3" chapter="4" verse="29"/>
-    </day>
+    <aliyah n="2" chapter="4" verse="25"/>
+    <aliyah n="3" chapter="4" verse="29"/>
+
+    <day n="1" chapter="4" verse="21"/>
     <day n="2" chapter="4" verse="38"/>
     <day n="3" chapter="5" verse="1"/>
     <day n="4" chapter="5" verse="11"/>
@@ -50,10 +50,10 @@
       <name lang="ru" transliterated="true">Бэѓаалотха</name>
     </names>
 
-    <day n="1" chapter="8" verse="1">
-      <aliyah n="2" chapter="8" verse="5"/>
-      <aliyah n="3" chapter="8" verse="10"/>
-    </day>
+    <aliyah n="2" chapter="8" verse="5"/>
+    <aliyah n="3" chapter="8" verse="10"/>
+
+    <day n="1" chapter="8" verse="1"/>
     <day n="2" chapter="8" verse="15"/>
     <day n="3" chapter="9" verse="1"/>
     <day n="4" chapter="9" verse="15"/>
@@ -70,10 +70,10 @@
       <name lang="ru" transliterated="true">Шлах</name>
     </names>
 
-    <day n="1" chapter="13" verse="1">
-      <aliyah n="2" chapter="13" verse="4"/>
-      <aliyah n="3" chapter="13" verse="17"/>
-    </day>
+    <aliyah n="2" chapter="13" verse="4"/>
+    <aliyah n="3" chapter="13" verse="17"/>
+
+    <day n="1" chapter="13" verse="1"/>
     <day n="2" chapter="13" verse="21"/>
     <day n="3" chapter="14" verse="8"/>
     <day n="4" chapter="14" verse="26"/>
@@ -90,10 +90,10 @@
       <name lang="ru" transliterated="true">Корах</name>
     </names>
 
-    <day n="1" chapter="16" verse="1">
-      <aliyah n="2" chapter="16" verse="4"/>
-      <aliyah n="3" chapter="16" verse="8"/>
-    </day>
+    <aliyah n="2" chapter="16" verse="4"/>
+    <aliyah n="3" chapter="16" verse="8"/>
+
+    <day n="1" chapter="16" verse="1"/>
     <day n="2" chapter="16" verse="14"/>
     <day n="3" chapter="16" verse="20"/>
     <day n="4" chapter="17" verse="9"/>
@@ -110,10 +110,10 @@
       <name lang="ru" transliterated="true">Хукат</name>
     </names>
 
-    <day n="1" chapter="19" verse="1">
-      <aliyah n="2" chapter="19" verse="7"/>
-      <aliyah n="3" chapter="19" verse="10"/>
-    </day>
+    <aliyah n="2" chapter="19" verse="7"/>
+    <aliyah n="3" chapter="19" verse="10"/>
+
+    <day n="1" chapter="19" verse="1"/>
     <day n="2" chapter="19" verse="18"/>
     <day n="3" chapter="20" verse="7" whentogether="2"/>
     <day n="4" chapter="20" verse="14"/>
@@ -130,10 +130,10 @@
       <name lang="ru" transliterated="true">Балак</name>
     </names>
 
-    <day n="1" chapter="22" verse="2">
-      <aliyah n="2" chapter="22" verse="5"/>
-      <aliyah n="3" chapter="22" verse="8"/>
-    </day>
+    <aliyah n="2" chapter="22" verse="5"/>
+    <aliyah n="3" chapter="22" verse="8"/>
+
+    <day n="1" chapter="22" verse="2"/>
     <day n="2" chapter="22" verse="13" whentogether="5"/>
     <day n="3" chapter="22" verse="21"/>
     <day n="4" chapter="22" verse="39" whentogether="6"/>
@@ -150,10 +150,10 @@
       <name lang="ru" transliterated="true">Пинхас</name>
     </names>
 
-    <day n="1" chapter="25" verse="10">
-      <aliyah n="2" chapter="25" verse="13"/>
-      <aliyah n="3" chapter="25" verse="16"/>
-    </day>
+    <aliyah n="2" chapter="25" verse="13"/>
+    <aliyah n="3" chapter="25" verse="16"/>
+
+    <day n="1" chapter="25" verse="10"/>
     <day n="2" chapter="26" verse="5"/>
     <day n="3" chapter="26" verse="52"/>
     <day n="4" chapter="27" verse="6"/>
@@ -171,10 +171,10 @@
       <name lang="ru" transliterated="true">Матот</name>
     </names>
 
-    <day n="1" chapter="30" verse="2">
-      <aliyah n="2" chapter="30" verse="10"/>
-      <aliyah n="3" chapter="30" verse="14"/>
-    </day>
+    <aliyah n="2" chapter="30" verse="10"/>
+    <aliyah n="3" chapter="30" verse="14"/>
+
+    <day n="1" chapter="30" verse="2"/>
     <day n="2" chapter="31" verse="1"/>
     <day n="3" chapter="31" verse="13" whentogether="2"/>
     <day n="4" chapter="31" verse="25"/>
@@ -191,14 +191,15 @@
       <name lang="ru" transliterated="true">Масъэй</name>
     </names>
 
-    <day n="1" chapter="33" verse="1">
-      <aliyah n="2" chapter="33" verse="4"/>      
-    </day>
-    <day n="2" chapter="33" verse="11" whentogether="5"/>
-    <day n="3" chapter="33" verse="50">
-      <aliyah n="3" chapter="33" verse="50"/>
-      <aliyah n="end" chapter="33" verse="53"/>
-    </day>
+    <aliyah n="2" chapter="33" verse="4"/>
+    <aliyah n="3" chapter="33" verse="50"/>
+    <aliyah n="end" chapter="33" verse="53"/>
+
+    <day n="1" chapter="33" verse="1"/>
+    <day n="2" chapter="33" verse="11" whentogether="5" custom="Ashkenaz"/>
+    <day n="2" chapter="33" verse="50" whentogether="5"/>
+    <day n="3" chapter="33" verse="54"/>
+    <day n="3" chapter="33" verse="50" custom="Ashkenaz"/>
     <day n="4" chapter="34" verse="16" whentogether="6"/>
     <day n="5" chapter="35" verse="1"/>
     <day n="6" chapter="35" verse="9" whentogether="7"/>
