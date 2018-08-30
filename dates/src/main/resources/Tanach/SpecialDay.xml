@@ -7,8 +7,10 @@
             <name n="Rosh Chodesh" lang="en" transliteration="yes"/>
         </names>
         <torah book="Numbers" fromChapter="28" fromVerse="1" toVerse="15">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
+            <aliyah n="1" chapter="28" verse="1" toverse="3"/>
+            <aliyah n="2" chapter="28" verse="2"/>
+            <aliyah n="3" chapter="28" verse="7"/>
+            <aliyah n="4" chapter="28" verse="11"/>
         </torah>
     </day>
 
@@ -26,7 +28,7 @@
         <maftir book="Numbers" fromChapter="28" fromVerse="9" toVerse="15"/>
         <haftarah book="Isaia" fromChapter="66">
             <part n="1" fromVerse="1" toVerse="24"/>
-            <part n="1" fromVerse="23" toVerse="23"/>
+            <part n="2" fromVerse="23" toVerse="23"/>
             <!--TODO if Sunday is also Rosh Chodesh, Chabad adds Samuеl I 20:18,42 -->
         </haftarah>
     </day>
@@ -36,12 +38,9 @@
             <name n="Public Fast" lang="en" transliteration="yes"/>
         </names>
         <torah book="Exodus">
-            <part n="1" fromChapter="32" fromVerse="11" toVerse="14">
-                <aliyah n="2" chapter="" verse=""/>
-            </part>
-            <part n="2" fromChapter="34" fromVerse="1" toVerse="10">
-                <aliyah n="3" chapter="" verse=""/>
-            </part>
+            <aliyah n="1" chapter="32" verse="11"  toVerse="14"/>
+            <aliyah n="2" chapter="34" verse="1"/>
+            <aliyah n="3" chapter="34" verse="4" toVerse="10"/> <--!mincha - maftir-->
         </torah>
         <haftarah book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56" toVerse="8"/>
     </day>
@@ -51,9 +50,12 @@
             <name n="Rosh Hashanah 1" lang="en" transliteration="yes"/>
         </names>
         <torah book="Genesis" fromChapter="21" fromVerse="1" toVerse="34">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
+            <aliyah n="2" chapter="21" verse="5" whenhol="2"/>
+            <aliyah n="3" chapter="21" verse="9"/>
+            <aliyah n="4" chapter="21" verse="13" whenhol="3"/>
+            <aliyah n="5" chapter="21" verse="18"/>
+            <aliyah n="6" chapter="21" verse="22" whenhol="4"/>
+            <aliyah n="7" chapter="21" verse="28" whenhol="5"/>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
         <haftarah book="Samuel I" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
@@ -64,10 +66,10 @@
             <name n="Rosh Hashanah 2" lang="en" transliteration="yes"/>
         </names>
         <torah book="Genesis" fromChapter="22" fromVerse="1" toVerse="24">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
-            <aliyah n="5" chapter="" verse=""/>
+            <aliyah n="2" chapter="" verse="4"/>
+            <aliyah n="3" chapter="" verse="9"/>
+            <aliyah n="4" chapter="" verse="15"/>
+            <aliyah n="5" chapter="" verse="20"/>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
         <haftarah book="Jeremiah" fromChapter="31" fromVerse="1" toVerse="19"/>
@@ -78,10 +80,12 @@
             <name n="Yom Kippur Shacharis" lang="en" transliteration="yes"/>
         </names>
         <torah book="Leviticus" fromChapter="16" fromVerse="1" toVerse="34">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
-            <aliyah n="5" chapter="" verse=""/>
+            <aliyah n="2" chapter="16" verse="4"/>
+            <aliyah n="3" chapter="16" verse="7" whenhol="2"/>
+            <aliyah n="4" chapter="16" verse="12" whenhol="3"/>
+            <aliyah n="5" chapter="" verse="18" whenhol="4"/>
+            <aliyah n="6" chapter="" verse="25" whenhol="5"/>
+            <aliyah n="7" chapter="" verse="31" whenhol="6"/>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="7" toVerse="11"/>
         <haftarah book="Isaiah" fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
@@ -92,12 +96,13 @@
             <name n="Yom Kippur Mincha" lang="en" transliteration="yes"/>
         </names>
         <torah book="Leviticus" fromChapter="18" fromVerse="1" toVerse="30">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
-            <aliyah n="5" chapter="" verse=""/>
+            <aliyah n="2" chapter="18" verse="6"/>
+            <aliyah n="3" chapter="18" verse="22"/> <--!mincha - maftir-->
         </torah>
-        <maftir book="Jonah"/>
+        <haftarah >
+           <part n="1" book="Jonah"/>
+           <part n="2"  book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
+        </haftarah> 
     </day>
 
     <day>
@@ -105,10 +110,12 @@
             <name n="Succos 1" lang="en" transliteration="yes"/>
         </names>
         <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
-            <aliyah n="5" chapter="" verse=""/>
+            <aliyah n="2" chapter="23" verse="1"/>
+            <aliyah n="3" chapter="23" verse="4"                                                                                                                                                              
+            <aliyah n="4" chapter="23" verse="9"/>
+            <aliyah n="5" chapter="23" verse="15" whenhol="3"/>
+            <aliyah n="6" chapter="23" verse="23" whenhol="4"/>
+            <aliyah n="7" chapter="23" verse="33" whenhol="5"/>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="12" toVerse="16"/>
         <haftarah book="Zechariah" fromChapter="14" fromVerse="1" toVerse="21"/>
