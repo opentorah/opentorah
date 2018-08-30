@@ -9,7 +9,7 @@
         <torah book="Numbers" fromChapter="28" fromVerse="1" toVerse="15">
             <aliyah n="1" chapter="28" verse="1" toverse="3"/>
             <aliyah n="2" chapter="28" verse="2"/>
-            <aliyah n="3" chapter="28" verse="7"/>
+            <aliyah n="3" chapter="28" verse="6"/>
             <aliyah n="4" chapter="28" verse="11"/>
         </torah>
     </day>
@@ -111,7 +111,7 @@
         </names>
         <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44">
             <aliyah n="2" chapter="23" verse="1"/>
-            <aliyah n="3" chapter="23" verse="4"                                                                                                                                                              
+            <aliyah n="3" chapter="23" verse="4" whenhol="2"/>                                                                                                                                                             
             <aliyah n="4" chapter="23" verse="9"/>
             <aliyah n="5" chapter="23" verse="15" whenhol="3"/>
             <aliyah n="6" chapter="23" verse="23" whenhol="4"/>
@@ -126,10 +126,10 @@
             <name n="Succos 2" lang="en" transliteration="yes"/>
         </names>
         <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
-            <aliyah n="5" chapter="" verse=""/>
+            <aliyah n="2" chapter="23" verse="4"/>
+            <aliyah n="3" chapter="23" verse="15"/>
+            <aliyah n="4" chapter="23" verse="23"/>
+            <aliyah n="5" chapter="23" verse="33"/>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="12" toVerse="16"/>
         <haftarah book="Kings I" fromChapter="8" fromVerse="2" toVerse="21"/>
@@ -137,11 +137,15 @@
 
     <day>
         <names>
-            <name n="Succos Intermediate 1" lang="en" transliteration="yes"/>
+            <name n="Succos Intermediate 1" lang="en" transliteration="yes"/> <--! בארץ ובח"ל זה יומים שונים -->
         </names>
         <torah book="Numbers" fromChapter="29" fromVerse="17" toVerse="25">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
+            <aliyah n="2" chapter="29" verse="20"/>
+            <aliyah n="3" chapter="29" verse="23" toVerse="25"/>
+            <aliyah n="4" chapter="29" verse="17" > 
+                 <option n="isroel" toVerse="19"/>
+                 <option n="diaspora" toVerse="22"/>
+            </aliyah> 
         </torah>
     </day>
 
@@ -150,8 +154,12 @@
             <name n="Succos Intermediate 2" lang="en" transliteration="yes"/>
         </names>
         <torah book="Numbers" fromChapter="29" fromVerse="20" toVerse="28">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
+            <aliyah n="2" chapter="29" verse="23"/>
+            <aliyah n="3" chapter="29" verse="26" toVerse="28"/>
+            <aliyah n="4" chapter="29" verse="20" > 
+                 <option n="isroel" toVerse="21"/>
+                 <option n="diaspora" toVerse="25"/>
+            </aliyah> 
         </torah>
     </day>
 
@@ -160,8 +168,12 @@
             <name n="Succos Intermediate 3" lang="en" transliteration="yes"/>
         </names>
         <torah book="Numbers" fromChapter="29" fromVerse="23" toVerse="31">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
+            <aliyah n="2" chapter="29" verse="26"/>
+            <aliyah n="3" chapter="29" verse="29" toVerse="31"/>
+            <aliyah n="4" chapter="29" verse="23" > 
+                 <option n="isroel" toVerse="25"/>
+                 <option n="diaspora" toVerse="28"/>
+            </aliyah> 
         </torah>
     </day>
 
@@ -170,8 +182,24 @@
             <name n="Succos Intermediate 4" lang="en" transliteration="yes"/>
         </names>
         <torah book="Numbers" fromChapter="29" fromVerse="26" toVerse="34">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
+            <aliyah n="2" chapter="29" verse="29"/>
+            <aliyah n="3" chapter="29" verse="32" toVerse="34"/>
+            <aliyah n="4" chapter="29" verse="26"> 
+                 <option n="isroel" toVerse="28"/>
+                 <option n="diaspora" toVerse="31"/>
+            </aliyah> 
+        </torah>
+    </day>
+    
+     <day>
+        <names>
+            <name n="Succos Intermediate 5" lang="en" transliteration="yes"/> <--!only Eretz Isroel  -->
+        </names>
+        <torah book="Numbers" fromChapter="29" fromVerse="26" toVerse="34">
+            <aliyah n="2" chapter="29" verse="29"/>
+            <aliyah n="3" chapter="29" verse="32" toVerse="34"/>
+            <aliyah n="4" chapter="26" verse="28" /> 
+                
         </torah>
     </day>
 
@@ -180,15 +208,15 @@
             <name n="Shabbos Intermediate Succos" lang="en" transliteration="yes"/>
         </names>
         <torah book="Exodus" fromChapter="33" fromVerse="12" toChapter="34" toVerse="26">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
-            <aliyah n="5" chapter="" verse=""/>
-            <aliyah n="6" chapter="" verse=""/>
-            <aliyah n="7" chapter="" verse=""/>
+            <aliyah n="2" chapter="33" verse="17"/>
+            <aliyah n="3" chapter="33" verse="20"/>
+            <aliyah n="4" chapter="34" verse="1"/>
+            <aliyah n="5" chapter="34" verse="4"/>
+            <aliyah n="6" chapter="34" verse="11"/>
+            <aliyah n="7" chapter="32" verse="18"/>
         </torah>
         <!-- TODO maftir: Numbers 29
-          day 1: 17-22; day 3: 23-28; day: 26-31
+          day 1: 17-22; day 3: 23-28; day: 26-31 - Diaspora
          -->
         <haftarah book="Ezekiel" fromChapter="38" fromVerse="18" toChapter="39" toVerse="16"/>
     </day>
@@ -198,10 +226,12 @@
             <name n="Hoshana Rabbah" lang="en" transliteration="yes"/>
         </names>
         <torah book="Numbers" fromChapter="29" fromVerse="26" toVerse="34">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
-            <aliyah n="5" chapter="" verse=""/>
+            <aliyah n="2" chapter="29" verse="29"/>
+            <aliyah n="3" chapter="29" verse="32" toVerse="34"/>
+            <aliyah n="4" chapter="29" toVerse="34> 
+                 <option n="isroel" verse="32"/>
+                 <option n="diaspora" verse="29"/>
+            </aliyah> 
         </torah>
     </day>
 
@@ -211,10 +241,12 @@
             <name n="Шмини ацерет" lang="ru" transliteration="yes"/>
         </names>
         <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
-            <aliyah n="5" chapter="" verse=""/>
+            <aliyah n="2" chapter="15" verse="1"/>
+            <aliyah n="3" chapter="15" verse="19"/>
+            <aliyah n="4" chapter="16" verse="1" whenhol="2"/> 
+            <aliyah n="5" chapter="16" verse="4" whenhol="3"/> 
+            <aliyah n="6" chapter="16" verse="9" whenhol="4"/> 
+            <aliyah n="7" chapter="16" verse="13" whenhol="5"/> 
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
         <haftarah book="Kings I" fromChapter="8" fromVerse="54" toChapter="9" toVerse="1"/>
@@ -227,14 +259,14 @@
         </names>
         <torah>
             <part n="1" book="Deuteronomy" fromChapter="33" fromVerse="1" toChapter="34" toVerse="12"> <!-- Zos Haberacha -->
-                <aliyah n="2" chapter="" verse=""/>
-                <aliyah n="3" chapter="" verse=""/>
-                <aliyah n="4" chapter="" verse=""/>
-                <aliyah n="5" chapter="" verse=""/>
-                <aliyah n="6" chapter="" verse=""/>
-            </part>
+                <aliyah n="2" chapter="33" verse="5"/>
+                <aliyah n="3" chapter="33" verse="13"/>
+                <aliyah n="4" chapter="33" verse="18"/>
+                <aliyah n="5" chapter="33" verse="22"/>
+                <aliyah n="6" chapter="33" verse="27"/> <--!hatan Tora -->
+             </part>
             <part n="2" book="Genesis" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3">
-                <aliyah n="7" chapter="" verse=""/>
+                <aliyah n="7" chapter="1" verse="1"/>  <--!hatan Bereshis -->
             </part>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
@@ -260,9 +292,8 @@
             <name n="Channukah 1" lang="en" transliteration="yes"/>
         </names>
         <torah book="Numbers" fromChapter="7" fromVerse="1" toVerse="17">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
+            <aliyah n="2" chapter="7" verse="12"/>
+            <aliyah n="3" chapter="7" verse="15"/>
         </torah>
     </day>
 
@@ -271,9 +302,8 @@
             <name n="Channukah 2" lang="en" transliteration="yes"/>
         </names>
         <torah book="Numbers" fromChapter="7" fromVerse="18" toVerse="29">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
+            <aliyah n="2" chapter="7" verse="21"/>
+            <aliyah n="3" chapter="7" verse="24"/>
         </torah>
     </day>
 
@@ -282,9 +312,8 @@
             <name n="Channukah 3" lang="en" transliteration="yes"/>
         </names>
         <torah book="Numbers" fromChapter="7" fromVerse="24" toVerse="35">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
+            <aliyah n="2" chapter="7" verse="27"/>
+            <aliyah n="3" chapter="7" verse="30"/>
         </torah>
     </day>
 
@@ -293,9 +322,8 @@
             <name n="Channukah 4" lang="en" transliteration="yes"/>
         </names>
         <torah book="Numbers" fromChapter="7" fromVerse="30" toVerse="41">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
+            <aliyah n="2" chapter="7" verse="33"/>
+            <aliyah n="3" chapter="7" verse="36"/>
         </torah>
     </day>
 
@@ -304,31 +332,29 @@
             <name n="Channukah 5" lang="en" transliteration="yes"/>
         </names>
         <torah book="Numbers" fromChapter="7" fromVerse="36" toVerse="47">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
+            <aliyah n="2" chapter="7" verse="39"/>
+            <aliyah n="3" chapter="7" verse="42"/>
         </torah>
     </day>
-
+  
     <day>
         <names>
-            <name n="Channukah 6" lang="en" transliteration="yes"/>
+            <name n="Channukah 6 Rosh Chodesh" lang="en" transliteration="yes"/>
         </names>
-        <torah book="Numbers" fromChapter="7" fromVerse="48" toVerse="59">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
+        <torah book="Numbers" >
+            <aliyah n="1" chapter="28" verse="1"/>
+            <aliyah n="2" chapter="28" verse="6"/>
+            <aliyah n="3" chapter="28" verse="11" toVerse="15"/>
+            <aliyah n="4" chapter="7" verse="42" toVerse="47"/>
         </torah>
     </day>
-
     <day>
         <names>
             <name n="Channukah 7" lang="en" transliteration="yes"/>
         </names>
         <torah book="Numbers" fromChapter="7" fromVerse="48" toVerse="59">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
+            <aliyah n="2" chapter="7" verse="51"/>
+            <aliyah n="3" chapter="7" verse="54"/>
         </torah>
     </day>
 
@@ -336,10 +362,11 @@
         <names>
             <name n="Channukah 7 Rosh Chodesh" lang="en" transliteration="yes"/>
         </names>
-        <torah book="Numbers" fromChapter="7" fromVerse="42" toVerse="47">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
+        <torah book="Numbers" >
+            <aliyah n="1" chapter="28" verse="1"/>
+            <aliyah n="2" chapter="28" verse="6"/>
+            <aliyah n="3" chapter="28" verse="11" toVerse="15"/>
+            <aliyah n="4" chapter="7" verse="42" toVerse="50"/>
         </torah>
     </day>
 
@@ -348,9 +375,8 @@
             <name n="Channukah 8" lang="en" transliteration="yes"/>
         </names>
         <torah book="Numbers" fromChapter="7" fromVerse="54" toChapter="8" toVerse="4">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
+            <aliyah n="2" chapter="7" verse="57"/>
+            <aliyah n="3" chapter="7" verse="60"/>
         </torah>
     </day>
 
@@ -411,10 +437,9 @@
             <name n="Purim" lang="en" transliteration="yes"/>
         </names>
         <torah book="Exodus" fromChapter="17" fromVerse="8" toVerse="16">
-            <aliyah n="2" chapter="" verse=""/>
-            <aliyah n="3" chapter="" verse=""/>
-            <aliyah n="4" chapter="" verse=""/>
-        </torah>
+            <aliyah n="2" chapter="17" verse="11"/>
+            <aliyah n="3" chapter="17" verse="14"/>
+       </torah>
     </day>
 
     <day>
