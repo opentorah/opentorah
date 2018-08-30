@@ -97,7 +97,7 @@
         </names>
         <torah book="Leviticus" fromChapter="18" fromVerse="1" toVerse="30">
             <aliyah n="2" chapter="18" verse="6"/>
-            <aliyah n="3" chapter="18" verse="22"/> <--!mincha - maftir-->
+            <aliyah n="3" chapter="18" verse="22"/> <!-- mincha - maftir-->
         </torah>
         <haftarah >
            <part n="1" book="Jonah"/>
@@ -228,10 +228,10 @@
         <torah book="Numbers" fromChapter="29" fromVerse="26" toVerse="34">
             <aliyah n="2" chapter="29" verse="29"/>
             <aliyah n="3" chapter="29" verse="32" toVerse="34"/>
-            <aliyah n="4" chapter="29" toVerse="34> 
+            <aliyah n="4" chapter="29" toVerse="34">
                  <option n="1" place="isroel" verse="32"/>
                  <option n="2" place="diaspora" verse="29"/>
-            </aliyah> 
+            </aliyah>
         </torah>
     </day>
 
@@ -263,10 +263,10 @@
                 <aliyah n="3" chapter="33" verse="13"/>
                 <aliyah n="4" chapter="33" verse="18"/>
                 <aliyah n="5" chapter="33" verse="22"/>
-                <aliyah n="6" chapter="33" verse="27"/> <--!hatan Tora -->
+                <aliyah n="6" chapter="33" verse="27"/> <!-- hatan Tora -->
              </part>
             <part n="2" book="Genesis" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3">
-                <aliyah n="7" chapter="1" verse="1"/>  <--!hatan Bereshis -->
+                <aliyah n="7" chapter="1" verse="1"/>  <!-- hatan Bereshis -->
             </part>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
@@ -496,7 +496,8 @@
         <torah>
             <part n="1" book="Exodus" fromChapter="13" fromVerse="1" toVerse="16">
                 <aliyah n="2" chapter="13" verse="5"/>
-                <aliyah n="3" chapter="13 verse="11"/>
+                <aliyah n="3" chapter="13" verse="11"/>
+            </part>
             <part n="2" book="Numbers" fromChapter="28" fromVerse="19" toVerse="25">
                 <aliyah n="4" chapter="28" verse="19"/>
             </part>
@@ -589,7 +590,7 @@
         </names>
         <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17">
             <aliyah n="2" chapter="15" verse="1"/>
-            <aliyah n="3" chapter="15" verse="19"whenhol="1"/>
+            <aliyah n="3" chapter="15" verse="19" whenhol="1"/>
             <aliyah n="4" chapter="16" verse="1" whenhol="2"/>
             <aliyah n="5" chapter="16" verse="4" whenhol="3"/>
             <aliyah n="6" chapter="16" verse="9" whenhol="4"/>
@@ -637,7 +638,7 @@
         </names>
        <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17">
             <aliyah n="2" chapter="15" verse="1"/>
-            <aliyah n="3" chapter="15" verse="19"whenhol="1"/>
+            <aliyah n="3" chapter="15" verse="19" whenhol="1"/>
             <aliyah n="4" chapter="16" verse="1" whenhol="2"/>
             <aliyah n="5" chapter="16" verse="4" whenhol="3"/>
             <aliyah n="6" chapter="16" verse="9" whenhol="4"/>
@@ -657,5 +658,4 @@
          </torah>
         <haftarah book="Jeremiah" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
     </day>
-     <!-- - minha tisha beav above taanit -->
 </meta>
