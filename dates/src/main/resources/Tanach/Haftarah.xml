@@ -30,7 +30,7 @@
   Customs Chabad, Magreb, Bavlim and Teiman are the same as Sefard unless specified.
   Customs Baladi and Shami are the same as Teiman unless specified.
   Custom Hayey_odom is the same as Lita unless specified.
-  Custom Algeria and Toshbim are the same as Magreb unless specified.
+  Customs Algeria and Toshbim are the same as Magreb unless specified.
 -->
 <meta type="Haftarah">
     <haftarah n="Bereishis" book="Isaiah" fromChapter="42">
@@ -259,7 +259,7 @@
     <haftarah n="Ki Seitzei">
           <custom n="Sefard Ashkenaz" book="Isaiah" fromChapter="54" fromVerse="1" toVerse="10"/>
           <custom n="Italki" book="Samuel I" fromChapter="8" fromVerse="1" toVerse="22"/>
-        <!-- = Noach; on 14th of Elul, Chabad: ...-->
+        <!-- = Noach; TODO on 14th of Elul, Chabad: ...-->
     </haftarah>
     <haftarah n="Ki Savo">
           <custom n="Sefard Ashkenaz" book="Isaiah" fromChapter="60" fromVerse="1" toVerse="22"/>
