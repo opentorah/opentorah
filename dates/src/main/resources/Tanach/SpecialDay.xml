@@ -19,6 +19,7 @@
         </torah>
     </day>
 
+    <!-- TODO Scope the whole thing into <shabbos> and stuff it into RoshChodesh? -->
     <day>
         <names>
             <name n="Shabbos Rosh Chodesh" lang="en" transliteration="yes"/>
@@ -54,13 +55,15 @@
             <aliyah n="4" fromVerse="22"/>
             <aliyah n="5" fromVerse="28" toVerse="34"/>
 
-            <aliyah n="1" fromVerse="1" shabbos="true"/>
-            <aliyah n="2" fromVerse="5" shabbos="true"/>
-            <aliyah n="3" fromVerse="9" shabbos="true"/>
-            <aliyah n="4" fromVerse="13" shabbos="true"/>
-            <aliyah n="5" fromVerse="18" shabbos="true"/>
-            <aliyah n="6" fromVerse="22" shabbos="true"/>
-            <aliyah n="7" fromVerse="28" toVerse="34" shabbos="true"/>
+            <shabbos>
+                <aliyah n="1" fromVerse="1"/>
+                <aliyah n="2" fromVerse="5"/>
+                <aliyah n="3" fromVerse="9"/>
+                <aliyah n="4" fromVerse="13"/>
+                <aliyah n="5" fromVerse="18"/>
+                <aliyah n="6" fromVerse="22"/>
+                <aliyah n="7" fromVerse="28" toVerse="34"/>
+            </shabbos>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
         <haftarah book="Samuel I" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
@@ -93,13 +96,15 @@
             <aliyah n="5" fromVerse="25"/>
             <aliyah n="6" fromVerse="31" toVerse="34"/>
 
-            <aliyah n="1" fromVerse="1" shabbos="true"/>
-            <aliyah n="2" fromVerse="4" shabbos="true"/>
-            <aliyah n="3" fromVerse="7" shabbos="true"/>
-            <aliyah n="4" fromVerse="12" shabbos="true"/>
-            <aliyah n="5" fromVerse="18" shabbos="true"/>
-            <aliyah n="6" fromVerse="25" shabbos="true"/>
-            <aliyah n="7" fromVerse="31" toVerse="34" shabbos="true"/>
+            <shabbos>
+                <aliyah n="1" fromVerse="1"/>
+                <aliyah n="2" fromVerse="4"/>
+                <aliyah n="3" fromVerse="7"/>
+                <aliyah n="4" fromVerse="12"/>
+                <aliyah n="5" fromVerse="18"/>
+                <aliyah n="6" fromVerse="25"/>
+                <aliyah n="7" fromVerse="31" toVerse="34"/>
+            </shabbos>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="7" toVerse="11"/>
         <haftarah book="Isaiah" fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
@@ -131,13 +136,15 @@
             <aliyah n="4" fromChapter="23" fromVerse="23"/>
             <aliyah n="5" fromChapter="23" fromVerse="33" toVerse="44"/>
 
-            <aliyah n="1" fromChapter="22" fromVerse="26" shabbos="true"/>
-            <aliyah n="2" fromChapter="23" fromVerse="1" shabbos="true"/>
-            <aliyah n="3" fromChapter="23" fromVerse="4" shabbos="true"/>
-            <aliyah n="4" fromChapter="23" fromVerse="9" shabbos="true"/>
-            <aliyah n="5" fromChapter="23" fromVerse="15" shabbos="true"/>
-            <aliyah n="6" fromChapter="23" fromVerse="23" shabbos="true"/>
-            <aliyah n="7" fromChapter="23" fromVerse="33" toVerse="44" shabbos="true"/>
+            <shabbos>
+                <aliyah n="1" fromChapter="22" fromVerse="26"/>
+                <aliyah n="2" fromChapter="23" fromVerse="1"/>
+                <aliyah n="3" fromChapter="23" fromVerse="4"/>
+                <aliyah n="4" fromChapter="23" fromVerse="9"/>
+                <aliyah n="5" fromChapter="23" fromVerse="15"/>
+                <aliyah n="6" fromChapter="23" fromVerse="23"/>
+                <aliyah n="7" fromChapter="23" fromVerse="33" toVerse="44"/>
+            </shabbos>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="12" toVerse="16"/>
         <haftarah book="Zechariah" fromChapter="14" fromVerse="1" toVerse="21"/>
@@ -275,13 +282,15 @@
             <aliyah n="4" fromChapter="16" fromVerse="9"/>
             <aliyah n="5" fromChapter="16" fromVerse="13" toVerse="17"/>
 
-            <aliyah n="1" fromChapter="14" fromVerse="22" shabbos="true"/>
-            <aliyah n="2" fromChapter="15" fromVerse="1" shabbos="true"/>
-            <aliyah n="3" fromChapter="15" fromVerse="19" shabbos="true"/>
-            <aliyah n="4" fromChapter="16" fromVerse="1" shabbos="true"/>
-            <aliyah n="5" fromChapter="16" fromVerse="4" shabbos="true"/>
-            <aliyah n="6" fromChapter="16" fromVerse="9" shabbos="true"/>
-            <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17" shabbos="true"/>
+            <shabbos>
+                <aliyah n="1" fromChapter="14" fromVerse="22"/>
+                <aliyah n="2" fromChapter="15" fromVerse="1"/>
+                <aliyah n="3" fromChapter="15" fromVerse="19"/>
+                <aliyah n="4" fromChapter="16" fromVerse="1"/>
+                <aliyah n="5" fromChapter="16" fromVerse="4"/>
+                <aliyah n="6" fromChapter="16" fromVerse="9"/>
+                <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17"/>
+            </shabbos>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
         <haftarah book="Kings I" fromChapter="8" fromVerse="54" toChapter="9" toVerse="1"/>
@@ -504,13 +513,15 @@
             <aliyah n="4" fromVerse="37"/>
             <aliyah n="5" fromVerse="43" toVerse="51"/>
 
-            <aliyah n="1" fromVerse="21" shabbos="true"/>
-            <aliyah n="2" fromVerse="25" shabbos="true"/>
-            <aliyah n="3" fromVerse="29" shabbos="true"/>
-            <aliyah n="4" fromVerse="33" shabbos="true"/>
-            <aliyah n="5" fromVerse="37" shabbos="true"/>
-            <aliyah n="6" fromVerse="43" shabbos="true"/>
-            <aliyah n="7" fromVerse="48" toVerse="51" shabbos="true"/>
+            <shabbos>
+                <aliyah n="1" fromVerse="21"/>
+                <aliyah n="2" fromVerse="25"/>
+                <aliyah n="3" fromVerse="29"/>
+                <aliyah n="4" fromVerse="33"/>
+                <aliyah n="5" fromVerse="37"/>
+                <aliyah n="6" fromVerse="43"/>
+                <aliyah n="7" fromVerse="48" toVerse="51"/>
+            </shabbos>
         </torah>
         <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>
         <haftarah book="Joshua">
@@ -527,11 +538,12 @@
         <torah book="Leviticus">
             <aliyah n="1" fromChapter="22" fromVerse="26"/>
             <aliyah n="2" fromChapter="23" fromVerse="4"/>
-            <aliyah n="3" fromChapter="23" fromVerse="15" toVerse="44"/> <!-- TODO what?! -->
+            <aliyah n="3" fromChapter="23" fromVerse="15" toVerse="44"/>
             <aliyah n="3" fromChapter="23" fromVerse="15" toVerse="22" diaspora="true"/>
             <aliyah n="4" fromChapter="23" fromVerse="23"/>
             <aliyah n="5" fromChapter="23" fromVerse="33" toVerse="44"/>
         </torah>
+        <!-- TODO aliyot a split differently in Diaspora; is there maftir/haftarah in the Holy Land?!-->
         <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>
         <haftarah book="Kings II" fromChapter="23">
             <part n="1" fromVerse="1" toVerse="9"/>
@@ -541,7 +553,7 @@
 
     <day>
         <names>
-            <name n="Pesach Intermediate 1" lang="en" transliteration="yes"/> <!-- TODO Intermediate 2 Eretz Isroel -->
+            <name n="Pesach Intermediate 1" lang="en" transliteration="yes"/>
         </names>
         <torah>
             <part n="1" book="Exodus" fromChapter="13">
@@ -554,7 +566,6 @@
             </part>
         </torah>
     </day>
-
 
     <day>
         <names>
@@ -572,7 +583,6 @@
         </torah>
     </day>
 
-
     <day>
         <names>
             <name n="Pesach Intermediate 3" lang="en" transliteration="yes"/>
@@ -588,7 +598,6 @@
             </part>
         </torah>
     </day>
-
 
     <day>
         <names>
@@ -628,26 +637,28 @@
             <name n="Pesach 7" lang="en" transliteration="yes"/>
         </names>
         <torah book="Exodus">
-            <aliyah n="1" fromChapter="13" fromVerse="17" toVerse=""/>
+            <aliyah n="1" fromChapter="13" fromVerse="17"/>
             <aliyah n="2" fromChapter="14" fromVerse="1"/>
             <aliyah n="3" fromChapter="14" fromVerse="9"/>
             <aliyah n="4" fromChapter="14" fromVerse="15"/>
             <aliyah n="5" fromChapter="14" fromVerse="26" toChapter="15" toVerse="26"/>
 
-            <aliyah n="1" fromChapter="13" fromVerse="17" shabbos="true"/>
-            <aliyah n="2" fromChapter="13" fromVerse="20" shabbos="true"/>
-            <aliyah n="3" fromChapter="14" fromVerse="1" shabbos="true"/>
-            <aliyah n="4" fromChapter="14" fromVerse="5" shabbos="true"/>
-            <aliyah n="5" fromChapter="14" fromVerse="9" shabbos="true"/>
-            <aliyah n="6" fromChapter="14" fromVerse="15" shabbos="true"/>
-            <aliyah n="7" fromChapter="14" fromVerse="26" toChapter="15" toVerse="26" shabbos="true"/>
+            <shabbos>
+                <aliyah n="1" fromChapter="13" fromVerse="17"/>
+                <aliyah n="2" fromChapter="13" fromVerse="20"/>
+                <aliyah n="3" fromChapter="14" fromVerse="1"/>
+                <aliyah n="4" fromChapter="14" fromVerse="5"/>
+                <aliyah n="5" fromChapter="14" fromVerse="9"/>
+                <aliyah n="6" fromChapter="14" fromVerse="15"/>
+                <aliyah n="7" fromChapter="14" fromVerse="26" toChapter="15" toVerse="26"/>
+            </shabbos>
         </torah>
         <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
         <haftarah book="Samuel II" fromChapter="22" fromVerse="1" toVerse="51"/>
     </day>
 
     <day>
-        <names> <!-- TODO In Diaspora  -->
+        <names>
             <name n="Pesach 8" lang="en" transliteration="yes"/>
         </names>
         <torah book="Deuteronomy">
@@ -657,13 +668,15 @@
             <aliyah n="4" fromChapter="16" fromVerse="9"/>
             <aliyah n="5" fromChapter="16" fromVerse="13" toVerse="17"/>
 
-            <aliyah n="1" fromChapter="14" fromVerse="22" shabbos="true"/>
-            <aliyah n="2" fromChapter="15" fromVerse="1" shabbos="true"/>
-            <aliyah n="3" fromChapter="15" fromVerse="19" shabbos="true"/>
-            <aliyah n="4" fromChapter="16" fromVerse="1" shabbos="true"/>
-            <aliyah n="5" fromChapter="16" fromVerse="4" shabbos="true"/>
-            <aliyah n="6" fromChapter="16" fromVerse="9" shabbos="true"/>
-            <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17" shabbos="true"/>
+            <shabbos>
+                <aliyah n="1" fromChapter="14" fromVerse="22"/>
+                <aliyah n="2" fromChapter="15" fromVerse="1"/>
+                <aliyah n="3" fromChapter="15" fromVerse="19"/>
+                <aliyah n="4" fromChapter="16" fromVerse="1"/>
+                <aliyah n="5" fromChapter="16" fromVerse="4"/>
+                <aliyah n="6" fromChapter="16" fromVerse="9"/>
+                <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17"/>
+            </shabbos>
         </torah>
         <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
         <haftarah book="Isaia" fromChapter="10" fromVerse="32" toChapter="12" toVerse="6"/>
@@ -691,22 +704,6 @@
         <names>
             <name n="Shavuos 2" lang="en" transliteration="yes"/>
         </names>
-        <torah book="Deuteronomy">
-            <aliyah n="1" fromChapter="15" fromVerse="19"/>
-            <aliyah n="2" fromChapter="" fromVerse=""/>
-            <aliyah n="3" fromChapter="" fromVerse=""/>
-            <aliyah n="4" fromChapter="" fromVerse=""/>
-            <aliyah n="5" fromChapter="" fromVerse=""/>
-            <aliyah n="6" fromChapter="" fromVerse="" toChapter="16" toVerse="17"/>
-        </torah>
-        <maftir book="Numbers" fromChapter="28" fromVerse="26" toVerse="31"/>
-        <haftarah book="Habkkuk" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
-    </day>
-
-    <day>
-        <names>
-            <name n="Shavuos 2 Shabbos" lang="en" transliteration="yes"/>
-        </names>
        <torah book="Deuteronomy">
            <aliyah n="1" fromChapter="15" fromVerse="19"/>
            <aliyah n="2" fromChapter="16" fromVerse="1"/>
@@ -714,16 +711,18 @@
            <aliyah n="4" fromChapter="16" fromVerse="9"/>
            <aliyah n="5" fromChapter="16" fromVerse="13" toVerse="17"/>
 
-           <aliyah n="1" fromChapter="14" fromVerse="22" shabbos="true"/>
-           <aliyah n="2" fromChapter="15" fromVerse="1" shabbos="true"/>
-           <aliyah n="3" fromChapter="15" fromVerse="19" shabbos="true"/>
-           <aliyah n="4" fromChapter="16" fromVerse="1" shabbos="true"/>
-           <aliyah n="5" fromChapter="16" fromVerse="4" shabbos="true"/>
-           <aliyah n="6" fromChapter="16" fromVerse="9" shabbos="true"/>
-           <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17" shabbos="true"/>
+           <shabbos>
+               <aliyah n="1" fromChapter="14" fromVerse="22"/>
+               <aliyah n="2" fromChapter="15" fromVerse="1"/>
+               <aliyah n="3" fromChapter="15" fromVerse="19"/>
+               <aliyah n="4" fromChapter="16" fromVerse="1"/>
+               <aliyah n="5" fromChapter="16" fromVerse="4"/>
+               <aliyah n="6" fromChapter="16" fromVerse="9"/>
+               <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17"/>
+           </shabbos>
         </torah>
         <maftir book="Numbers" fromChapter="28" fromVerse="26" toVerse="31"/>
-        <haftarah book="Habkkuk" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
+        <haftarah book="Habakkuk" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
     </day>
 
     <day>
