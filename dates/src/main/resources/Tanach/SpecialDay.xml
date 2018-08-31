@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta type="SpecialDay">
+    <!-- TODO 'day' is really a reading building block...  -->
     <day>
         <names>
             <name n="Shabbos Erev Rosh Chodesh" lang="en" transliteration="yes"/>
@@ -7,6 +8,10 @@
         <haftarah book="Samuel I" fromChapter="20" fromVerse="18" toVerse="42"/>
     </day>
 
+    <!-- RULE: on weekday: add Torah reading, no Maftir/Haftorah;
+               on Shabbos: usual Torah, add Maftir/Haftorah;
+               on Shabbos if Sunday is also Rosh Chodesh: add "Shabbos Rosh Chodesh Additional Haftorah".
+     -->
     <day>
         <names>
             <name n="Rosh Chodesh" lang="en" transliteration="yes"/>
@@ -17,13 +22,6 @@
             <aliyah n="3" fromVerse="6"/>
             <aliyah n="4" fromVerse="11" toVerse="15"/>
         </torah>
-    </day>
-
-    <!-- TODO Scope the whole thing into <shabbos> and stuff it into RoshChodesh? -->
-    <day>
-        <names>
-            <name n="Shabbos Rosh Chodesh" lang="en" transliteration="yes"/>
-        </names>
         <maftir book="Numbers" fromChapter="28" fromVerse="9" toVerse="15"/>
         <haftarah book="Isaia" fromChapter="66">
             <part n="1" fromVerse="1" toVerse="24"/>
@@ -32,6 +30,15 @@
         </haftarah>
     </day>
 
+    <day n="Shabbos Rosh Chodesh Additional Haftorah">
+        <haftarah book="Samuel I" fromChapter="20" custom="Chabad">
+            <part n="1" fromVerse="18" toVerse="18">
+            <part n="2" fromVerse="42" toVerse="42">
+        </haftarah>
+    </day>
+
+    <!-- RULE: in the morning: Torah reading only;
+               in the afternoon, 3rd aliyah is Maftir; read Haftarah. -->
     <day>
         <names>
             <name n="Public Fast" lang="en" transliteration="yes"/>
@@ -39,11 +46,12 @@
         <torah book="Exodus">
             <aliyah n="1" fromChapter="32" fromVerse="11"  toVerse="14"/>
             <aliyah n="2" fromChapter="34" fromVerse="1"/>
-            <aliyah n="3" fromChapter="34" fromVerse="4" toVerse="10"/> <!-- TODO mincha - maftir-->
+            <aliyah n="3" fromChapter="34" fromVerse="4" toVerse="10"/>
         </torah>
         <haftarah book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56" toVerse="8"/>
     </day>
 
+    <!-- RULE: on Bboth days of Rosh Hashanah, add Rosh Hashanah Maftir. -->
     <day>
         <names>
             <name n="Rosh Hashanah 1" lang="en" transliteration="yes"/>
@@ -65,7 +73,6 @@
                 <aliyah n="7" fromVerse="28" toVerse="34"/>
             </shabbos>
         </torah>
-        <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
         <haftarah book="Samuel I" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
     </day>
 
@@ -80,8 +87,11 @@
             <aliyah n="4" fromVerse="15"/>
             <aliyah n="5" fromVerse="20" toVerse="24"/>
         </torah>
-        <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
         <haftarah book="Jeremiah" fromChapter="31" fromVerse="1" toVerse="19"/>
+    </day>
+
+    <day n="Rosh Hashanah Maftir">
+        <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
     </day>
 
     <day>
@@ -125,6 +135,7 @@
         </haftarah> 
     </day>
 
+    <!-- RULE: on first festival days of Succos, add "Succos Maftir". -->
     <day>
         <names>
             <name n="Succos 1" lang="en" transliteration="yes"/>
@@ -146,7 +157,6 @@
                 <aliyah n="7" fromChapter="23" fromVerse="33" toVerse="44"/>
             </shabbos>
         </torah>
-        <maftir book="Numbers" fromChapter="29" fromVerse="12" toVerse="16"/>
         <haftarah book="Zechariah" fromChapter="14" fromVerse="1" toVerse="21"/>
     </day>
 
@@ -161,9 +171,14 @@
             <aliyah n="4" fromChapter="23" fromVerse="23"/>
             <aliyah n="5" fromChapter="23" fromVerse="33" toVerse="44"/>
         </torah>
-        <maftir book="Numbers" fromChapter="29" fromVerse="12" toVerse="16"/>
         <haftarah book="Kings I" fromChapter="8" fromVerse="2" toVerse="21"/>
     </day>
+
+    <day n="Succos Maftir">
+        <maftir book="Numbers" fromChapter="29" fromVerse="12" toVerse="16"/>
+    </day>
+
+    <!-- TODO dig into the Succos readings and how to express them the cleanest using rules. -->
 
     <day>
         <names>
@@ -270,6 +285,7 @@
         </torah>
     </day>
 
+    <!-- RULE: on Shemini Atzeres and Simchas Torah: add Shemini Atzeres Maftir.  -->
     <day>
         <names> <!-- TODO In Diaspora. -->
             <name n="Shemini Atzeres" lang="en" transliteration="yes"/>
@@ -292,7 +308,6 @@
                 <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17"/>
             </shabbos>
         </torah>
-        <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
         <haftarah book="Kings I" fromChapter="8" fromVerse="54" toChapter="9" toVerse="1"/>
     </day>
 
@@ -314,11 +329,14 @@
                 <aliyah n="7" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/>  <!-- TODO hatan Bereshis -->
             </part>
         </torah>
-        <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
         <haftarah book="Joshua" fromChapter="1" fromVerse="1" toVerse="18"/>
     </day>
 
-    <!-- TODO
+    <day n="Shemini Atzeres Maftir">
+        <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
+    </day>
+
+    <!-- TODO(dub) dig into the rules here (and collapse the names into the day element):
     Детальное распределение текстов для чтения в Хануку
     Первый день Хануки Бемидбар,7:1-17 (для сфарадим - до 7:23, см. далее).
     Чтение следующий шести дней : по минагу ашкеназим (Рамо) и так в Хабаде -
