@@ -19,6 +19,7 @@
         </torah>
     </day>
 
+    <!-- TODO Scope the whole thing into <shabbos> and stuff it into RoshChodesh? -->
     <day>
         <names>
             <name n="Shabbos Rosh Chodesh" lang="en" transliteration="yes"/>

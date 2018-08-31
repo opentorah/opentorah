@@ -8,8 +8,8 @@
       <name lang="ru" transliterated="true">Дварим</name>
     </names>
 
-    <aliyah n="levi" fromChapter="1" fromVerse="4"/>
-    <aliyah n="isroel" fromChapter="1" fromVerse="8"/>
+    <aliyah n="2" fromChapter="1" fromVerse="4"/>
+    <aliyah n="3" fromChapter="1" fromVerse="8"/>
 
     <day n="1" fromChapter="1" fromVerse="1"/>
     <day n="2" fromChapter="1" fromVerse="11"/>
@@ -29,8 +29,8 @@
       <name lang="ru" transliterated="true">Ваэтханан</name>
     </names>
 
-    <aliyah n="levi" fromChapter="3" fromVerse="26"/>
-    <aliyah n="isroel" fromChapter="4" fromVerse="5" toVerse="8"/>
+    <aliyah n="2" fromChapter="3" fromVerse="26"/>
+    <aliyah n="3" fromChapter="4" fromVerse="5" toVerse="8"/>
 
     <day n="1" fromChapter="3" fromVerse="23"/>
     <day n="2" fromChapter="4" fromVerse="5"/>
@@ -49,8 +49,8 @@
       <name lang="ru" transliterated="true">Эйкев</name>
     </names>
 
-    <aliyah n="levi" fromChapter="7" fromVerse="22"/>
-    <aliyah n="isroel" fromChapter="8" fromVerse="4"/>
+    <aliyah n="2" fromChapter="7" fromVerse="22"/>
+    <aliyah n="3" fromChapter="8" fromVerse="4"/>
 
     <day n="1" fromChapter="7" fromVerse="12"/>
     <day n="2" fromChapter="8" fromVerse="11"/>
@@ -69,7 +69,7 @@
     </names>
 
     <aliyah n="2" fromChapter="11" fromVerse="32"/>
-    <aliyah n="isroel" fromChapter="12" fromVerse="6"/>
+    <aliyah n="3" fromChapter="12" fromVerse="6"/>
 
     <day n="1" fromChapter="11" fromVerse="26"/>
     <day n="2" fromChapter="12" fromVerse="11"/>
@@ -88,8 +88,8 @@
       <name lang="ru" transliterated="true">Шофтим</name>
     </names>
 
-    <aliyah n="levi" fromChapter="16" fromVerse="21"/>
-    <aliyah n="isroel" fromChapter="17" fromVerse="11"/>
+    <aliyah n="2" fromChapter="16" fromVerse="21"/>
+    <aliyah n="3" fromChapter="17" fromVerse="11"/>
 
     <day n="1" fromChapter="16" fromVerse="18"/>
     <day n="2" fromChapter="17" fromVerse="14"/>
@@ -108,8 +108,8 @@
       <name lang="ru" transliterated="true">Ки-Теце</name>
     </names>
 
-    <aliyah n="levi" fromChapter="21" fromVerse="15"/>
-    <aliyah n="isroel" fromChapter="21" fromVerse="18"/>
+    <aliyah n="2" fromChapter="21" fromVerse="15"/>
+    <aliyah n="3" fromChapter="21" fromVerse="18"/>
 
     <day n="1" fromChapter="21" fromVerse="10"/>
     <day n="2" fromChapter="21" fromVerse="22"/>
@@ -128,8 +128,8 @@
       <name lang="ru" transliterated="true">Ки-Таво</name>
     </names>
 
-    <aliyah n="levi" fromChapter="26" fromVerse="4"/>
-    <aliyah n="isroel" fromChapter="26" fromVerse="12" toVerse="15"/>
+    <aliyah n="2" fromChapter="26" fromVerse="4"/>
+    <aliyah n="3" fromChapter="26" fromVerse="12" toVerse="15"/>
 
     <day n="1" fromChapter="26" fromVerse="1"/>
     <day n="2" fromChapter="26" fromVerse="12"/>
@@ -148,8 +148,8 @@
       <name lang="ru" transliterated="true">Ницавим</name>
     </names>
 
-    <aliyah n="levi" fromChapter="29" fromVerse="12"/>
-    <aliyah n="isroel" fromChapter="29" fromVerse="15" toverse="28"/>
+    <aliyah n="2" fromChapter="29" fromVerse="12"/>
+    <aliyah n="3" fromChapter="29" fromVerse="15" toverse="28"/>
 
     <day n="1" fromChapter="29" fromVerse="9"/>
     <day n="2" fromChapter="29" fromVerse="12"/>
@@ -171,8 +171,8 @@
       <name lang="ru" transliterated="true">Вайэлех</name>
     </names>
 
-    <aliyah n="levi" fromChapter="31" fromVerse="4"/>
-    <aliyah n="isroel" fromChapter="31" fromVerse="7" toVerse="13"/>
+    <aliyah n="2" fromChapter="31" fromVerse="4"/>
+    <aliyah n="3" fromChapter="31" fromVerse="7" toVerse="13"/>
 
     <day n="1" fromChapter="31" fromVerse="1"/>
     <day n="2" fromChapter="31" fromVerse="4"/>
@@ -196,8 +196,8 @@
       <name lang="ru" transliterated="true">Ѓаазину</name>
     </names>
 
-    <aliyah n="levi" fromChapter="32" fromVerse="4"/>
-    <aliyah n="isroel" fromChapter="32" fromVerse="7" toVerse="12"/>
+    <aliyah n="2" fromChapter="32" fromVerse="4"/>
+    <aliyah n="3" fromChapter="32" fromVerse="7" toVerse="12"/>
 
     <day n="1" fromChapter="32" fromVerse="1"/>
     <day n="2" fromChapter="32" fromVerse="7"/>
@@ -218,8 +218,8 @@
       <name lang="ru" transliterated="true">Вэзот ѓа-браха</name>
     </names>
 
-    <aliyah n="levi" fromChapter="33" fromVerse="8"/>
-    <aliyah n="isroel" fromChapter="33" fromVerse="13" toVerse="17"/>
+    <aliyah n="2" fromChapter="33" fromVerse="8"/>
+    <aliyah n="3" fromChapter="33" fromVerse="13" toVerse="17"/>
 
     <day n="1" fromChapter="33" fromVerse="1"/>
     <day n="2" fromChapter="33" fromVerse="8"/>
