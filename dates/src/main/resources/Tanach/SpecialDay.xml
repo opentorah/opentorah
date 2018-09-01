@@ -539,7 +539,11 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         </torah>
     </day>
 
-    <day n="Shabbos Chol Hamoed Pesach">
+    <day>
+        <names>
+            <name n="Shabbos Intermediate Pesach" lang="en" transliteration="yes"/>
+        </names>
+        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
         <haftarah book="Ezekiel" fromChapter="37" fromVerse="1" toVerse="14"/>
     </day>
 
