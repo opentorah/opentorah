@@ -34,10 +34,11 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
 
     <!-- RULE: on weekday: add Torah reading, part1, part2 no Maftir/Haftorah;
                on Chanukka: alia 4 - part2
-               on Shabbos: usual Torah, add Maftir/Haftorah;
-               on Shabbos Chamukka, Shkalim, Ha-hodesh, rosh hodesh Menachem Ov - 
+               on Shabbos: usual Torah, add Maftir/Haftorah; (include rosh chodesh elul) 
+               on Shabbos Chamukka, Shkalim, Ha-hodesh, 
+                       Alia 7: Rosh chodesh part 2
                     -  Shabbos  Rosh Chodesh Additional Haftorah
-                    if Sunday is also Rosh Chodesh: add "Shabbos Erev Rosh Chodesh Additional Haftora
+               on Shabos rosh hodesh Menachem Ov  - only maftir rosh chodesh 
                on Shabbos if Sunday is also Rosh Chodesh: add "Shabbos Erev Rosh Chodesh Additional Haftorah".
      -->
     <day n="Rosh Chodesh">
