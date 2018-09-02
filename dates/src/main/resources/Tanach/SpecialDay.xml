@@ -230,8 +230,8 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
              3         6
              4         in the Holy Land - 6; in Diaspora - 5 and 6
 
-           Maftir Shabbos Chol Hamoed Succos:
-             in the Holy Land - n+1, in Diaspora - n+1 and n+2 TODO(@michaelko58) or is it n, n and n+1???
+           Maftir Shabbos Chol Hamoed Succos n :
+             in the Holy Land - n, in Diaspora - n and n+1 
          TODO: Шмини ацерет ( и Симхат Тора) - 35-39 - WHAT(@michaelko58) DOES THIS MEAN?
      -->
     <day n="Korbanot Succos">
@@ -255,8 +255,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
     </day>
 
-    <day n="Shemini Atzeres"> <!-- TODO(@michaelko58) не понял, какая тут разница между голусом и Святой Землёй;
-      сделай, пожалуйста, правила - или отдельные таблицы.
+    <day n="Shemini Atzeres"> <!-- only in Diaspora. In Eretz Isroel - Simchas Tojro
       -->
         <torah book="Deuteronomy">
             <aliyah n="1" fromChapter="14" fromVerse="22" toChapter="15" toVerse="19"/>
