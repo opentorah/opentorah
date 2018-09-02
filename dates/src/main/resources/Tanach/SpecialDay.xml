@@ -40,29 +40,31 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         <torah book="Numbers" fromChapter="28">
             <aliyah n="1" fromVerse="1" toVerse="3"/>
             <aliyah n="2" fromVerse="2"/>
-            <aliyah n="3" fromVerse="6"/>
-            <aliyah n="4" fromVerse="11" toVerse="15"/>
-            <!-- TODO if Rosh Chodesh coincides with Channukah (or maybe anything else?),
-                   its reading is done in 3 aliyot:
-            <aliyah n="1" fromChapter="28" fromVerse="1"/>
-            <aliyah n="2" fromChapter="28" fromVerse="6"/>
-            <aliyah n="3" fromChapter="28" fromVerse="11" toVerse="15"/>
-            -->
+            <aliyah n="3" fromVerse="6" chanukka="2"/>
+            <aliyah n="4" fromVerse="11" toVerse="15" chanukka="3"/>           
         </torah>
-        <maftir book="Numbers" fromChapter="28" fromVerse="9" toVerse="15"/>
-        <haftarah book="Isaia" fromChapter="66">
+         <maftir book="Numbers" fromChapter="28" fromVerse="9" toVerse="15"/>
+            <haftarah book="Isaia" fromChapter="66">
             <part n="1" fromVerse="1" toVerse="24"/>
             <part n="2" fromVerse="23" toVerse="23"/>
-            <!--TODO if Sunday is also Rosh Chodesh, Chabad adds Samuеl I 20:18,42 -->
-        </haftarah>
+         </haftarah>
     </day>
 
-    <day n="Shabbos Rosh Chodesh Additional Haftorah">
+    <day n="Shabbos  Rosh Chodesh Additional Haftorah">
+        <haftarah book="Isaya" fromChapter="66" custom="Chabad">
+            <part n="1" fromVerse="1" toVerse="1">
+            <part n="2" fromVerse="23" toVerse="24">
+            <part n="3" fromVerse="23" toVerse="23">    
+        </haftarah>
+    </day>
+    <day n="Shabbos Erev Rosh Chodesh Additional Haftorah">
         <haftarah book="Samuel I" fromChapter="20" custom="Chabad">
             <part n="1" fromVerse="18" toVerse="18">
             <part n="2" fromVerse="42" toVerse="42">
         </haftarah>
-    </day>
+    </day>        
+            
+            
 
     <!-- RULE: in the morning: Torah reading only;
                in the afternoon, 3rd aliyah is Maftir; read Haftarah. -->
@@ -176,7 +178,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         <maftir book="Numbers" fromChapter="29" fromVerse="12" toVerse="16"/>
     </day>
 
-    <day n="Succos 1">
+    <day n="Succos 1-2">
         <torah book="Leviticus">
             <aliyah n="1" fromChapter="22" fromVerse="26"/>
             <aliyah n="2" fromChapter="23" fromVerse="4"/>
@@ -197,14 +199,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         <haftarah book="Zechariah" fromChapter="14" fromVerse="1" toVerse="21"/>
     </day>
 
-    <day n="Succos 2"> <!-- TODO In Diaspora -- שבת?\\\>
-        <torah book="Leviticus">
-            <aliyah n="1" fromChapter="22" fromVerse="26"/>
-            <aliyah n="2" fromChapter="23" fromVerse="4"/>
-            <aliyah n="3" fromChapter="23" fromVerse="15"/>
-            <aliyah n="4" fromChapter="23" fromVerse="23"/>
-            <aliyah n="5" fromChapter="23" fromVerse="33" toVerse="44"/>
-        </torah>
+    <day n="Succos 2">
         <haftarah book="Kings I" fromChapter="8" fromVerse="2" toVerse="21"/>
     </day>
 
@@ -494,7 +489,6 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
     </day>
 
     <day n="Shabbos Chol Hamoed Pesach">
-        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
         <haftarah book="Ezekiel" fromChapter="37" fromVerse="1" toVerse="14"/>
     </day>
 
@@ -527,7 +521,8 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <aliyah n="4" fromChapter="16" fromVerse="9"/>
             <aliyah n="5" fromChapter="16" fromVerse="13" toVerse="17"/>
 
-            <!-- TODO(@michaelko58) мне кажерся, что ты это хочешь грохнуть. Почему? -->
+            <!-- TODO(@michaelko58) мне кажерся, что ты это хочешь грохнуть. Почему?
+    Это чтение Шмини Ацерет -->
             <shabbos>
                 <aliyah n="1" fromChapter="14" fromVerse="22"/>
                 <aliyah n="2" fromChapter="15" fromVerse="1"/>
