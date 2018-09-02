@@ -148,6 +148,10 @@ def bintrayConfig = {
 }
 
 project(':dates') {
+  dependencies {
+    compile lib.scalaXml
+  }
+
   def artifactInfo = [
     id: 'org.podval.calendar.dates',
     name: 'jewish-calendar-dates',

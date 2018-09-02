@@ -1,29 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta type="SpecialDay">
-    <day>
-        <names>
-            <name n="Shabbos Erev Rosh Chodesh" lang="en" transliteration="yes"/>
-        </names>
+    <!-- TODO 'day' is really a reading building block; this is not "Special Day", this is "Special Reading"  -->
+    <!-- TODO проработаь записки сумасшедшего: это уже всё вставлено или надо ещё что-то делать?
+Законы совпадений:
+1. 6) отодвигается при любом сожертвоприношения
+2. 2) 3) 4) совпадающие с шабатом - дополнительный свиток Торы
+3. 2) и 3) дополнительный свиток , то есть если и 2. то три свитка Торы
+4. В 7) Йом кипур отодвигает шабат.
+Чтение в шени и хамиши отодвигаются любым обязательным чтением Торы, чтение в минху отодвигается в Йом кипур.
+
+Дополнительные чтения Торы - мафтир.
+5. Когда на шабат выпадает рош ходеш или холь амоед - мафтир жертвоприношения.
+6. В холь а-моед Песах - мафтир жертвоприношения.
+7. Йом тов, Рош а-шана, Йом кипур - мафтир жертвоприношения.
+
+Тексты жертвоприношений
+Все дни жертвоприношений в Храме (кроме шабата, не совпавшего с рош ходеш) мы читаем стихи жертвоприношений (Бемидбар, 28-29)
+Эти дни: рош ходеш, Рош ашана, Йом кипур, все праздничные у полупраздничные дни.
+В диаспоре обязательное чтение в холь-амоед - двух дней, сегодняшнего и завтрашнего
+Из них: в рош-ходеш и холь амоед Суккот жертвоприношения читают в основном чтении. При обязательное чтение должно быть завершением.
+В остальные дни  - мафтир.
+Рош ходеш - см. выше
+
+Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
+44 verse=18 7. Бемидбар, 28:9-15 Может ли быть другая глава?
+Аналогично - в шабат Шкалим и шабат а-Ходеш, выпавшие в рош ходеш:
+на 6 алию читают 6 и 7.
+7 алия - чтение см. выше
+     -->
+    <day n="Shabbos Erev Rosh Chodesh">
         <haftarah book="Samuel I" fromChapter="20" fromVerse="18" toVerse="42"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Rosh Chodesh" lang="en" transliteration="yes"/>
-        </names>
+    <!-- RULE: on weekday: add Torah reading, no Maftir/Haftorah;
+               on Shabbos: usual Torah, add Maftir/Haftorah;
+               on Shabbos if Sunday is also Rosh Chodesh: add "Shabbos Rosh Chodesh Additional Haftorah".
+     -->
+    <day n="Rosh Chodesh">
         <torah book="Numbers" fromChapter="28">
             <aliyah n="1" fromVerse="1" toVerse="3"/>
             <aliyah n="2" fromVerse="2"/>
             <aliyah n="3" fromVerse="6"/>
             <aliyah n="4" fromVerse="11" toVerse="15"/>
+            <!-- TODO if Rosh Chodesh coincides with Channukah (or maybe anything else?),
+                   its reading is done in 3 aliyot:
+            <aliyah n="1" fromChapter="28" fromVerse="1"/>
+            <aliyah n="2" fromChapter="28" fromVerse="6"/>
+            <aliyah n="3" fromChapter="28" fromVerse="11" toVerse="15"/>
+            -->
         </torah>
-    </day>
-
-    <!-- TODO Scope the whole thing into <shabbos> and stuff it into RoshChodesh? -->
-    <day>
-        <names>
-            <name n="Shabbos Rosh Chodesh" lang="en" transliteration="yes"/>
-        </names>
         <maftir book="Numbers" fromChapter="28" fromVerse="9" toVerse="15"/>
         <haftarah book="Isaia" fromChapter="66">
             <part n="1" fromVerse="1" toVerse="24"/>
@@ -32,22 +57,54 @@
         </haftarah>
     </day>
 
-    <day>
-        <names>
-            <name n="Public Fast" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Shabbos Rosh Chodesh Additional Haftorah">
+        <haftarah book="Samuel I" fromChapter="20" custom="Chabad">
+            <part n="1" fromVerse="18" toVerse="18">
+            <part n="2" fromVerse="42" toVerse="42">
+        </haftarah>
+    </day>
+
+    <!-- RULE: in the morning: Torah reading only;
+               in the afternoon, 3rd aliyah is Maftir; read Haftarah. -->
+    <day n="Public Fast">
         <torah book="Exodus">
             <aliyah n="1" fromChapter="32" fromVerse="11"  toVerse="14"/>
             <aliyah n="2" fromChapter="34" fromVerse="1"/>
-            <aliyah n="3" fromChapter="34" fromVerse="4" toVerse="10"/> <!-- TODO mincha - maftir-->
+            <aliyah n="3" fromChapter="34" fromVerse="4" toVerse="10"/>
         </torah>
         <haftarah book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56" toVerse="8"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Rosh Hashanah 1" lang="en" transliteration="yes"/>
-        </names>
+    <!-- RULE: in the morning, Torah reading only (?);
+               in the afternoon, 3rd aliyah is Maftir; read Haftarah. -->
+    <day n="Tisha Bav">
+        <torah book="Deuteronomy" fromChapter="4">
+            <aliyah n="1" fromVerse="25"/>
+            <aliyah n="2" fromVerse="30"/>
+            <aliyah n="3" fromVerse="36" toVerse="40"/>
+        </torah>
+        <haftarah book="Jeremiah" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
+    </day>
+
+    <!-- RULE: on Shabbos Chol Hamoed Succos and Pesach, add "Shabbos Chol Hamoed Torah". -->
+    <day n="Shabbos Chol Hamoed Torah">
+        <torah book="Exodus">
+            <aliyah n="1" fromChapter="33" fromVerse="12"/>
+            <aliyah n="2" fromChapter="33" fromVerse="17"/>
+            <aliyah n="3" fromChapter="33" fromVerse="20"/>
+            <aliyah n="4" fromChapter="34" fromVerse="1"/>
+            <aliyah n="5" fromChapter="34" fromVerse="4"/>
+            <aliyah n="6" fromChapter="34" fromVerse="11"/>
+            <aliyah n="7" fromChapter="34" fromVerse="18" toVerse="26"/>
+        </torah>
+    </day>
+
+    <!-- RULE: on Bboth days of Rosh Hashanah, add Rosh Hashanah Maftir. -->
+    <day n="Rosh Hashanah Maftir">
+        <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
+    </day>
+
+    <day n="Rosh Hashanah 1">
         <torah book="Genesis" fromChapter="21">
             <aliyah n="1" fromVerse="1"/>
             <aliyah n="2" fromVerse="5"/>
@@ -65,14 +122,10 @@
                 <aliyah n="7" fromVerse="28" toVerse="34"/>
             </shabbos>
         </torah>
-        <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
         <haftarah book="Samuel I" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Rosh Hashanah 2" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Rosh Hashanah 2">
         <torah book="Genesis" fromChapter="22">
             <aliyah n="1" fromVerse="1"/>
             <aliyah n="2" fromVerse="4"/>
@@ -80,14 +133,10 @@
             <aliyah n="4" fromVerse="15"/>
             <aliyah n="5" fromVerse="20" toVerse="24"/>
         </torah>
-        <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
         <haftarah book="Jeremiah" fromChapter="31" fromVerse="1" toVerse="19"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Yom Kippur Shacharis" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Yom Kippur Shacharis">
         <torah book="Leviticus" fromChapter="16">
             <aliyah n="1" fromVerse="1"/>
             <aliyah n="2" fromVerse="7"/>
@@ -110,10 +159,7 @@
         <haftarah book="Isaiah" fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Yom Kippur Mincha" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Yom Kippur Mincha">
         <torah book="Leviticus" fromChapter="18">
             <aliyah n="1" fromVerse="1"/>
             <aliyah n="2" fromVerse="6"/>
@@ -125,10 +171,12 @@
         </haftarah> 
     </day>
 
-    <day>
-        <names>
-            <name n="Succos 1" lang="en" transliteration="yes"/>
-        </names>
+    <!-- RULE: on first festival days of Succos, add "Succos Maftir". -->
+    <day n="Succos Maftir">
+        <maftir book="Numbers" fromChapter="29" fromVerse="12" toVerse="16"/>
+    </day>
+
+    <day n="Succos 1">
         <torah book="Leviticus">
             <aliyah n="1" fromChapter="22" fromVerse="26"/>
             <aliyah n="2" fromChapter="23" fromVerse="4"/>
@@ -146,14 +194,10 @@
                 <aliyah n="7" fromChapter="23" fromVerse="33" toVerse="44"/>
             </shabbos>
         </torah>
-        <maftir book="Numbers" fromChapter="29" fromVerse="12" toVerse="16"/>
         <haftarah book="Zechariah" fromChapter="14" fromVerse="1" toVerse="21"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Succos 2" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Succos 2">
         <torah book="Leviticus">
             <aliyah n="1" fromChapter="22" fromVerse="26"/>
             <aliyah n="2" fromChapter="23" fromVerse="4"/>
@@ -161,120 +205,46 @@
             <aliyah n="4" fromChapter="23" fromVerse="23"/>
             <aliyah n="5" fromChapter="23" fromVerse="33" toVerse="44"/>
         </torah>
-        <maftir book="Numbers" fromChapter="29" fromVerse="12" toVerse="16"/>
         <haftarah book="Kings I" fromChapter="8" fromVerse="2" toVerse="21"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Succos Intermediate 1" lang="en" transliteration="yes"/> <!-- TODO בארץ ובח"ל זה יומים שונים -->
-        </names>
-        <torah book="Numbers" fromChapter="29">
-            <aliyah n="1" fromVerse="17"/>
-            <aliyah n="2" fromVerse="20"/>
-            <aliyah n="3" fromVerse="23" toVerse="25"/>
-            <aliyah n="4" fromVerse="17" toVerse="19"/>
-            <aliyah n="4" fromVerse="17" toVerse="22" diaspora="true"/>
-            <aliyah n="5" fromVerse="20" toVerse="25"/>
-            <aliyah n="5" fromVerse="23" toVerse="25" diaspora="true"/>
-        </torah>
-    </day>
+    <!-- RULE: on Chol Hamoed, Torah reading is composed of "Succos Fragments" with numbers dependend
+               on the number ("n") of the day of Chol Hamoed:
+                 aliyah
+                 1         n
+                 2         n+1
+                 3         n+2
+                 4         n (in Diaspora, also n+1)
+         TODO: exception on the 6th day of Succos ("Hoshana Rabbah"):
+         Все читают первые три алийот как в диаспоре, но в четвертой - разница как описана выше.
 
-    <day>
-        <names>
-            <name n="Succos Intermediate 2" lang="en" transliteration="yes"/>
-        </names>
+         TODO: Шмини ацерет ( и Симхат Тора) - 35-39 - WHAT DOES THIS MEAN?
+     -->
+    <day n="Succos Fragments">
         <torah book="Numbers" fromChapter="29">
-            <aliyah n="1" fromVerse="20"/>
-            <aliyah n="2" fromVerse="23"/>
-            <aliyah n="3" fromVerse="26" toVerse="28"/>
-            <aliyah n="4" fromVerse="20" toVerse="21"/>
-            <aliyah n="4" fromVerse="20" toVerse="25" diaspora="true"/>
-            <aliyah n="5" fromVerse="22" toVerse="28"/>
-            <aliyah n="5" fromVerse="26" toVerse="28" diaspora="true"/>
-        </torah>
-    </day>
-
-    <day>
-        <names>
-            <name n="Succos Intermediate 3" lang="en" transliteration="yes"/>
-        </names>
-        <torah book="Numbers" fromChapter="29">
-            <aliyah n="1" fromVerse="23"/>
-            <aliyah n="2" fromVerse="26"/>
-            <aliyah n="3" fromVerse="29" toVerse="31"/>
+            <aliyah n="1" fromVerse="12" toVerse="16"/>
+            <aliyah n="2" fromVerse="17" toVerse="19"/>
+            <aliyah n="3" fromVerse="20" toVerse="22"/>
             <aliyah n="4" fromVerse="23" toVerse="25"/>
-            <aliyah n="4" fromVerse="23" toVerse="28" diaspora="true"/>
-            <aliyah n="5" fromVerse="26" toVerse="31"/>
-            <aliyah n="5" fromVerse="29" toVerse="31" diaspora="true"/>
+            <aliyah n="5" fromVerse="26" toVerse="28"/>
+            <aliyah n="6" fromVerse="29" toVerse="31"/>
+            <aliyah n="7" fromVerse="32" toVerse="34"/>
         </torah>
     </day>
 
-    <day>
-        <names>
-            <name n="Succos Intermediate 4" lang="en" transliteration="yes"/>
-        </names>
-        <torah book="Numbers" fromChapter="29">
-            <aliyah n="1" fromVerse="26"/>
-            <aliyah n="2" fromVerse="29"/>
-            <aliyah n="3" fromVerse="32" toVerse="34"/>
-            <aliyah n="4" fromVerse="26" toVerse="28"/>
-            <aliyah n="4" fromVerse="26" toVerse="31" diaspora="true"/>
-            <aliyah n="5" fromVerse="29" toVerse="34"/>
-            <aliyah n="5" fromVerse="32" toVerse="34" diaspora="true"/>
-        </torah>
-    </day>
-    
-     <day>
-        <names>
-            <name n="Succos Intermediate 5" lang="en" transliteration="yes"/> <!--TODO only Eretz Isroel  -->
-        </names>
-        <torah book="Numbers" fromChapter="29">
-            <aliyah n="1" fromVerse="26"/>
-            <aliyah n="2" fromVerse="29"/>
-            <aliyah n="3" fromVerse="32" toVerse="34"/>
-            <aliyah n="4" fromVerse="26" toVerse="28" />
-            <aliyah n="5" fromVerse="29" toVerse="34" />
-        </torah>
-    </day>
-
-    <day>
-        <names>
-            <name n="Shabbos Intermediate Succos" lang="en" transliteration="yes"/>
-        </names>
-        <torah book="Exodus">
-            <aliyah n="1" fromChapter="33" fromVerse="12"/>
-            <aliyah n="2" fromChapter="33" fromVerse="17"/>
-            <aliyah n="3" fromChapter="33" fromVerse="20"/>
-            <aliyah n="4" fromChapter="34" fromVerse="1"/>
-            <aliyah n="5" fromChapter="34" fromVerse="4"/>
-            <aliyah n="6" fromChapter="34" fromVerse="11"/>
-            <aliyah n="7" fromChapter="34" fromVerse="18" toVerse="26"/>
-        </torah>
+    <day n="Shabbos Chol Hamoed Succos">
         <!-- TODO maftir: Numbers 29
           day 1: 17-22; day 3: 23-28; day: 26-31 - Diaspora
          -->
         <haftarah book="Ezekiel" fromChapter="38" fromVerse="18" toChapter="39" toVerse="16"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Hoshana Rabbah" lang="en" transliteration="yes"/>
-        </names>
-        <torah book="Numbers" fromChapter="29">
-            <aliyah n="1" fromVerse="26"/>
-            <aliyah n="2" fromVerse="29"/>
-            <aliyah n="3" fromVerse="32" toVerse="34"/>
-            <aliyah n="4" fromVerse="32" toVerse="34"/>
-            <aliyah n="4" fromVerse="29" toVerse="34" diaspora="true"/>
-        </torah>
+    <!-- RULE: on Shemini Atzeres and Simchas Torah: add Shemini Atzeres Maftir.  -->
+    <day n="Shemini Atzeres Maftir">
+        <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
     </day>
 
-    <day>
-        <names> <!-- TODO In Diaspora. -->
-            <name n="Shemini Atzeres" lang="en" transliteration="yes"/>
-            <name n="Шмини ацерет" lang="ru" transliteration="yes"/>
-        </names>
+    <day n="Shemini Atzeres"> <!-- TODO Only in Diaspora -->
         <torah book="Deuteronomy">
             <aliyah n="1" fromChapter="14" fromVerse="22" toChapter="15" toVerse="19"/>
             <aliyah n="2" fromChapter="16" fromVerse="1"/>
@@ -292,15 +262,10 @@
                 <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17"/>
             </shabbos>
         </torah>
-        <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
         <haftarah book="Kings I" fromChapter="8" fromVerse="54" toChapter="9" toVerse="1"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Simchas Torah" lang="en" transliteration="yes"/>
-            <name n="Симхат Тора" lang="ru" transliteration="yes"/>
-        </names>
+    <day n="Simchas Torah">
         <torah>
             <part n="1" book="Deuteronomy"> <!-- Zos Haberacha -->
                 <aliyah n="1" fromChapter="33" fromVerse="1"/>
@@ -314,28 +279,40 @@
                 <aliyah n="7" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/>  <!-- TODO hatan Bereshis -->
             </part>
         </torah>
-        <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
         <haftarah book="Joshua" fromChapter="1" fromVerse="1" toVerse="18"/>
     </day>
 
-    <!-- TODO
-    Детальное распределение текстов для чтения в Хануку
+    <!-- TODO(@michaelko58) переработай, пожалуйста, в более чёткую форму:
+    - перечисли все фрагменты, о которых нужен знать алгоритм (без "пополам");
+    - сформулируй правило, приписывающее номера этих фрагментов алийёт, если день Хануки - n, а алия - k;
+    - сформулируй аналогичное правило для сфарадим.
+
+    Когда это будет сделано, я уберу занудное расписание "Channukah 1", "Channukah 2" и т.д. - после того как
+    проверю, что твои правила порождают это расписание.
+    Учти что в самом этом расписании есть, по-моему, ошибки!
+
     Первый день Хануки Бемидбар,7:1-17 (для сфарадим - до 7:23, см. далее).
     Чтение следующий шести дней : по минагу ашкеназим (Рамо) и так в Хабаде -
     первые двое читают текущий день (пополам), а третий  читает следующий день;
     обычай сфарадим - третий возвращается и читает весь текущий день.
-    2. 18-23
-    3. 24-29
-    4. 30-35
-    5. 36-41
-    6. 42-47
-    7. 48-53
-    Зот Ханука - Бемидбар,7:54 - 89
+
+    RULE: when a day of Channukah falls on Rosh Chodesh (6th - always; 7th - sometimes),
+            first 3 aliyot are from Rosh Chodesh (see above).
     -->
-    <day>
-        <names>
-            <name n="Channukah 1" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Channukah Fragments">
+        <torah book="Numbers" fromChapter="7">
+            <aliyah n="1" fromVerse= "1" toVerse="17"/>
+            <aliyah n="2" fromVerse="18" toVerse="23"/>
+            <aliyah n="3" fromVerse="24" toVerse="29"/>
+            <aliyah n="4" fromVerse="30" toVerse="35"/>
+            <aliyah n="5" fromVerse="36" toVerse="41"/>
+            <aliyah n="6" fromVerse="42" toVerse="47"/>
+            <aliyah n="7" fromVerse="48" toVerse="53"/>
+            <aliyah n="8" fromVerse="54" toVerse="89"/>
+        </torah>
+    </day>
+
+    <day n="Channukah 1">
         <torah book="Numbers" fromChapter="7">
             <aliyah n="1" fromVerse="1"/>
             <aliyah n="2" fromVerse="12"/>
@@ -343,10 +320,7 @@
         </torah>
     </day>
 
-    <day>
-        <names>
-            <name n="Channukah 2" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Channukah 2">
         <torah book="Numbers" fromChapter="7">
             <aliyah n="1" fromVerse="18"/>
             <aliyah n="2" fromVerse="21"/>
@@ -354,10 +328,7 @@
         </torah>
     </day>
 
-    <day>
-        <names>
-            <name n="Channukah 3" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Channukah 3">
         <torah book="Numbers" fromChapter="7">
             <aliyah n="1" fromVerse="24"/>
             <aliyah n="2" fromVerse="27"/>
@@ -365,10 +336,7 @@
         </torah>
     </day>
 
-    <day>
-        <names>
-            <name n="Channukah 4" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Channukah 4">
         <torah book="Numbers" fromChapter="7">
             <aliyah n="1" fromVerse="30"/>
             <aliyah n="2" fromVerse="33"/>
@@ -376,10 +344,7 @@
         </torah>
     </day>
 
-    <day>
-        <names>
-            <name n="Channukah 5" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Channukah 5">
         <torah book="Numbers" fromChapter="7">
             <aliyah n="1" fromVerse="36"/>
             <aliyah n="2" fromVerse="39"/>
@@ -387,21 +352,15 @@
         </torah>
     </day>
   
-    <day>
-        <names>
-            <name n="Channukah 6 Rosh Chodesh" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Channukah 6 Rosh Chodesh">
         <torah book="Numbers">
             <aliyah n="1" fromChapter="28" fromVerse="1"/>
             <aliyah n="2" fromChapter="28" fromVerse="6"/>
             <aliyah n="3" fromChapter="28" fromVerse="11" toVerse="15"/>
-            <aliyah n="4" fromChapter="7" fromVerse="42" toVerse="47"/>
+            <aliyah n="4" fromChapter="7" fromVerse="42" toVerse="47"/> <!-- 7:48-59? -->
         </torah>
     </day>
-    <day>
-        <names>
-            <name n="Channukah 7" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Channukah 7">
         <torah book="Numbers" fromChapter="7">
             <aliyah n="1" fromVerse="48"/>
             <aliyah n="2" fromVerse="51"/>
@@ -409,22 +368,16 @@
         </torah>
     </day>
 
-    <day>
-        <names>
-            <name n="Channukah 7 Rosh Chodesh" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Channukah 7 Rosh Chodesh">
         <torah book="Numbers" >
             <aliyah n="1" fromChapter="28" fromVerse="1"/>
             <aliyah n="2" fromChapter="28" fromVerse="6"/>
             <aliyah n="3" fromChapter="28" fromVerse="11" toVerse="15"/>
-            <aliyah n="4" fromChapter="7" fromVerse="42" toVerse="50"/>
+            <aliyah n="4" fromChapter="7" fromVerse="42" toVerse="50"/> <!-- TODO 42:47? -->
         </torah>
     </day>
 
-    <day>
-        <names>
-            <name n="Channukah 8" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Channukah 8"> <!-- TODO = Zos Channukah -->
         <torah book="Numbers" fromChapter="7">
             <aliyah n="1" fromChapter="7" fromVerse="54"/>
             <aliyah n="2" fromChapter="7" fromVerse="57"/>
@@ -432,62 +385,39 @@
         </torah>
     </day>
 
-    <!-- TODO Рош ходеш в будни в Хануку 28:11-15 - what does this mean?! -->
-
-    <day>
-        <names>
-            <name n="Shabbos Channukah 1" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Shabbos Channukah 1">
         <!-- TODO maftir: Numbers 7
           day 1: 1-17; day 2: 18-23; 3: 24-29; 4: 30-35; 6: !!!; 7: 48-53
          -->
         <haftarah book="Zecharia" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Shabbos Channukah 2" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Shabbos Channukah 2">
         <maftir book="Numbers" fromChapter="7" fromVerse="54" toChapter="8" toVerse="4"/>
         <haftarah book="Kings I" fromChapter="7" fromVerse="40" toVerse="50"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Parshas Shekalim" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Parshas Shekalim">
         <maftir book="Exodus" fromChapter="30" fromVerse="11" toVerse="16"/>
         <haftarah book="Kings II" fromChapter="11" fromVerse="17" toChapter="11" toVerse="17"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Parshas Zachor" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Parshas Zachor">
         <maftir book="Deuteronomy" fromChapter="25" fromVerse="17" toVerse="19"/>
         <haftarah book="Samuel I" fromChapter="15" fromVerse="1" toVerse="34"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Parshas Parah" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Parshas Parah">
         <maftir book="Numbers" fromChapter="19" fromVerse="1" toVerse="22"/>
         <haftarah book="Ezekiel" fromChapter="36" fromVerse="16" toVerse="38"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Parshas Hachodesh" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Parshas Hachodesh">
         <maftir book="Exodus" fromChapter="12" fromVerse="1" toVerse="20"/>
         <haftarah book="Ezekiel" fromChapter="45" fromVerse="16" toChapter="46" toVerse="18"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Purim" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Purim">
         <torah book="Exodus" fromChapter="17">
             <aliyah n="1" fromVerse="8"/>
             <aliyah n="2" fromVerse="11"/>
@@ -495,17 +425,34 @@
        </torah>
     </day>
 
-    <day>
-        <names>
-            <name n="Shabbos Hagodol" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Shabbos Hagodol">
         <haftarah book="Malachi" fromChapter="3" fromVerse="4" toVerse="24"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Pesach 1" lang="en" transliteration="yes"/>
-        </names>
+    <!-- RULE: on first festival days of Pesach, add "Pesach Maftir";
+               on other days of Pesach, add "Pesach Additional Torah Reading"
+                 as 4th aliyah on weekdays and as Maftir on Shabbos and last festival days.
+
+         TODO using the number of the day:
+2. Кадеш: Шмот, 13:1-16
+3. Кесеф: Шмот, 22:24 -23:19
+4. Псоль: Шмот, 34:1-26
+5. Бемидбар: Бемидбар, 9:1-14
+
+Когда первый день Песаха  в шабат, в первый или третий день недели: с 3 по 6 день Песаха
+читают: 2. 3. 4. 5.
+Когда первый день Песаха  в пятый день недели: с 3 по 6 день Песаха
+читают: 2. 3. 1. 5.
+    -->
+    <day n="Pesach Maftir">
+        <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>
+    </day>
+
+    <day n="Pesach Additional Torah Reading">
+        <torah book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
+    </day>
+
+    <day n="Pesach 1">
         <torah book="Exodus" fromChapter="12">
             <aliyah n="1" fromVerse="21"/>
             <aliyah n="2" fromVerse="25"/>
@@ -523,7 +470,6 @@
                 <aliyah n="7" fromVerse="48" toVerse="51"/>
             </shabbos>
         </torah>
-        <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>
         <haftarah book="Joshua">
             <part n="1" fromChapter="3" fromVerse="5" toVerse="7"/>
             <part n="2" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
@@ -531,10 +477,10 @@
         </haftarah>
     </day>
 
-    <day>
-        <names>
-            <name n="Pesach 2" lang="en" transliteration="yes"/>
-        </names>
+    <!-- TODO aliyot a split differently in Diaspora (and that is the only difference between the Holy Land and
+           Diaspora remaining in the data).
+         TODO is there maftir/haftarah in the Holy Land?! -->
+    <day n="Pesach 2">
         <torah book="Leviticus">
             <aliyah n="1" fromChapter="22" fromVerse="26"/>
             <aliyah n="2" fromChapter="23" fromVerse="4"/>
@@ -543,8 +489,6 @@
             <aliyah n="4" fromChapter="23" fromVerse="23"/>
             <aliyah n="5" fromChapter="23" fromVerse="33" toVerse="44"/>
         </torah>
-        <!-- TODO aliyot a split differently in Diaspora; is there maftir/haftarah in the Holy Land?!-->
-        <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>
         <haftarah book="Kings II" fromChapter="23">
             <part n="1" fromVerse="1" toVerse="9"/>
             <part n="2" fromVerse="21" toVerse="25"/>
@@ -555,15 +499,10 @@
         <names>
             <name n="Pesach Intermediate 1" lang="en" transliteration="yes"/>
         </names>
-        <torah>
-            <part n="1" book="Exodus" fromChapter="13">
-                <aliyah n="1" fromVerse="1"/>
-                <aliyah n="2" fromVerse="5"/>
-                <aliyah n="3" fromVerse="11" toVerse="16"/>
-            </part>
-            <part n="2" book="Numbers">
-                <aliyah n="4" fromChapter="28" fromVerse="19" toVerse="25"/>
-            </part>
+        <torah book="Exodus" fromChapter="13">
+            <aliyah n="1" fromVerse="1"/>
+            <aliyah n="2" fromVerse="5"/>
+            <aliyah n="3" fromVerse="11" toVerse="16"/>
         </torah>
     </day>
 
@@ -571,15 +510,10 @@
         <names>
             <name n="Pesach Intermediate 2" lang="en" transliteration="yes"/>
         </names>
-        <torah>
-            <part n="1" book="Exodus">
-                <aliyah n="1" fromChapter="22" fromVerse="24"/>
-                <aliyah n="2" fromChapter="22" fromVerse="27"/>
-                <aliyah n="3" fromChapter="23" fromVerse="6" toVerse="19"/>
-            </part>
-            <part n="2" book="Numbers">
-                <aliyah n="4" fromChapter="28" fromVerse="19" toVerse="25"/>
-            </part>
+        <torah book="Exodus">
+            <aliyah n="1" fromChapter="22" fromVerse="24"/>
+            <aliyah n="2" fromChapter="22" fromVerse="27"/>
+            <aliyah n="3" fromChapter="23" fromVerse="6" toVerse="19"/>
         </torah>
     </day>
 
@@ -587,15 +521,10 @@
         <names>
             <name n="Pesach Intermediate 3" lang="en" transliteration="yes"/>
         </names>
-        <torah>
-            <part n="1" book="Exodus">
-                <aliyah n="1" fromChapter="34" fromVerse="1"/>
-                <aliyah n="2" fromChapter="34" fromVerse="4"/>
-                <aliyah n="3" fromChapter="34" fromVerse="18" toVerse="26"/>
-            </part>
-            <part n="2" book="Numbers">
-                <aliyah n="4" fromChapter="28" fromVerse="19" toVerse="25"/>
-            </part>
+        <torah book="Exodus">
+            <aliyah n="1" fromChapter="34" fromVerse="1"/>
+            <aliyah n="2" fromChapter="34" fromVerse="4"/>
+            <aliyah n="3" fromChapter="34" fromVerse="18" toVerse="26"/>
         </torah>
     </day>
 
@@ -603,39 +532,18 @@
         <names>
             <name n="Pesach Intermediate 4" lang="en" transliteration="yes"/>
         </names>
-        <torah>
-            <part n="1" book="Numbers" fromChapter="9">
-                <aliyah n="1" fromVerse="1"/>
-                <aliyah n="2" fromVerse="7"/>
-                <aliyah n="3" fromVerse="9" toVerse="14"/>
-            </part>
-            <part n="2" book="Numbers">
-                <aliyah n="4" fromChapter="28" fromVerse="19" toVerse="25"/>
-            </part>
+        <torah book="Numbers" fromChapter="9">
+            <aliyah n="1" fromVerse="1"/>
+            <aliyah n="2" fromVerse="7"/>
+            <aliyah n="3" fromVerse="9" toVerse="14"/>
         </torah>
     </day>
 
-    <day>
-        <names>
-            <name n="Shabbos Intermediate Pesach" lang="en" transliteration="yes"/>
-        </names>
-        <torah book="Exodus">
-            <aliyah n="1" fromChapter="33" fromVerse="12"/>
-            <aliyah n="2" fromChapter="33" fromVerse="17"/>
-            <aliyah n="3" fromChapter="33" fromVerse="20"/>
-            <aliyah n="4" fromChapter="34" fromVerse="1"/>
-            <aliyah n="5" fromChapter="34" fromVerse="4"/>
-            <aliyah n="6" fromChapter="34" fromVerse="11"/>
-            <aliyah n="7" fromChapter="34" fromVerse="18" toVerse="26"/>
-        </torah>
-        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
+    <day n="Shabbos Chol Hamoed Pesach">
         <haftarah book="Ezekiel" fromChapter="37" fromVerse="1" toVerse="14"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Pesach 7" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Pesach 7">
         <torah book="Exodus">
             <aliyah n="1" fromChapter="13" fromVerse="17"/>
             <aliyah n="2" fromChapter="14" fromVerse="1"/>
@@ -653,14 +561,10 @@
                 <aliyah n="7" fromChapter="14" fromVerse="26" toChapter="15" toVerse="26"/>
             </shabbos>
         </torah>
-        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
         <haftarah book="Samuel II" fromChapter="22" fromVerse="1" toVerse="51"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Pesach 8" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Pesach 8">
         <torah book="Deuteronomy">
             <aliyah n="1" fromChapter="15" fromVerse="19"/>
             <aliyah n="2" fromChapter="16" fromVerse="1"/>
@@ -678,14 +582,15 @@
                 <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17"/>
             </shabbos>
         </torah>
-        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
         <haftarah book="Isaia" fromChapter="10" fromVerse="32" toChapter="12" toVerse="6"/>
     </day>
 
-    <day>
-        <names>
-            <name n="Shavuos 1" lang="en" transliteration="yes"/>
-        </names>
+    <!-- RULE: on all Shavuos days, add "Shavuos Maftir" -->
+    <day n="Shavuos Maftir">
+        <maftir book="Numbers" fromChapter="28" fromVerse="26" toVerse="31"/>
+    </day>
+
+    <day n="Shavuos 1">
         <torah book="Exodus">
             <aliyah n="1" fromChapter="19" fromVerse="1"/>
             <aliyah n="2" fromChapter="19" fromVerse="7"/>
@@ -693,17 +598,13 @@
             <aliyah n="4" fromChapter="19" fromVerse="20"/>
             <aliyah n="5" fromChapter="20" fromVerse="15" toVerse="22"/>
         </torah>
-        <maftir book="Numbers" fromChapter="28" fromVerse="26" toVerse="31"/>
         <haftarah book="Ezekiel">
             <part n="1" fromChapter="1" fromVerse="1" toVerse="28"/>
             <part n="2" fromChapter="3" fromVerse="12"/>
         </haftarah>
     </day>
 
-    <day>
-        <names>
-            <name n="Shavuos 2" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Shavuos 2">
        <torah book="Deuteronomy">
            <aliyah n="1" fromChapter="15" fromVerse="19"/>
            <aliyah n="2" fromChapter="16" fromVerse="1"/>
@@ -721,19 +622,6 @@
                <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17"/>
            </shabbos>
         </torah>
-        <maftir book="Numbers" fromChapter="28" fromVerse="26" toVerse="31"/>
         <haftarah book="Habakkuk" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
-    </day>
-
-    <day>
-        <names>
-            <name n="Tisha Bav" lang="en" transliteration="yes"/>
-        </names>
-        <torah book="Deuteronomy" fromChapter="4">
-            <aliyah n="1" fromVerse="25"/>
-            <aliyah n="2" fromVerse="30"/>
-            <aliyah n="3" fromVerse="36" toVerse="40"/> <!-- TODO mincha - maftir-->
-         </torah>
-        <haftarah book="Jeremiah" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
     </day>
 </meta>
