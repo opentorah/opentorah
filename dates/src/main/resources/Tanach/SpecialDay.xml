@@ -32,17 +32,25 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         <haftarah book="Samuel I" fromChapter="20" fromVerse="18" toVerse="42"/>
     </day>
 
-    <!-- RULE: on weekday: add Torah reading, no Maftir/Haftorah;
+    <!-- RULE: on weekday: add Torah reading, part1, part2 no Maftir/Haftorah;
+               on Chanukka: alia 4 - part2
                on Shabbos: usual Torah, add Maftir/Haftorah;
-               on Shabbos if Sunday is also Rosh Chodesh: add "Shabbos Rosh Chodesh Additional Haftorah".
+               on Shabbos Chamukka, Shkalim, Ha-hodesh, rosh hodesh Menachem Ov - 
+                    -  Shabbos  Rosh Chodesh Additional Haftorah
+                    if Sunday is also Rosh Chodesh: add "Shabbos Erev Rosh Chodesh Additional Haftora
+               on Shabbos if Sunday is also Rosh Chodesh: add "Shabbos Erev Rosh Chodesh Additional Haftorah".
      -->
     <day n="Rosh Chodesh">
         <torah book="Numbers" fromChapter="28">
+           <part n="1">
             <aliyah n="1" fromVerse="1" toVerse="3"/>
             <aliyah n="2" fromVerse="2"/>
             <aliyah n="3" fromVerse="6" chanukka="2"/>
-            <aliyah n="4" fromVerse="11" toVerse="15" chanukka="3"/>           
-        </torah>
+          </part>       
+          <part n=2>
+              <aliyah n="4" fromVerse="11" toVerse="15" chanukka="3"/>           
+        </part>
+       </torah>
          <maftir book="Numbers" fromChapter="28" fromVerse="9" toVerse="15"/>
             <haftarah book="Isaia" fromChapter="66">
             <part n="1" fromVerse="1" toVerse="24"/>
