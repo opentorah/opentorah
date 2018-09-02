@@ -197,7 +197,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         <haftarah book="Zechariah" fromChapter="14" fromVerse="1" toVerse="21"/>
     </day>
 
-    <day n="Succos 2">
+    <day n="Succos 2"> <!-- TODO In Diaspora -->
         <torah book="Leviticus">
             <aliyah n="1" fromChapter="22" fromVerse="26"/>
             <aliyah n="2" fromChapter="23" fromVerse="4"/>
@@ -208,19 +208,33 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         <haftarah book="Kings I" fromChapter="8" fromVerse="2" toVerse="21"/>
     </day>
 
-    <!-- RULE: on Chol Hamoed, Torah reading is composed of "Succos Fragments" with numbers dependend
-               on the number ("n") of the day of Chol Hamoed:
-                 aliyah
-                 1         n
-                 2         n+1
-                 3         n+2
-                 4         n (in Diaspora, also n+1)
-         TODO: exception on the 6th day of Succos ("Hoshana Rabbah"):
-         Все читают первые три алийот как в диаспоре, но в четвертой - разница как описана выше.
+    <!-- In the following, "n" is the number of the day starting from 1 for the first day of Chol Hamoed Succos.
+           for n<=4:
+             aliyah    Korbanot Succos
+             1         n
+             2         n+1
+             3         n+2
+             4         in the Holy Land - n; in Diaspora - n and n+1
 
-         TODO: Шмини ацерет ( и Симхат Тора) - 35-39 - WHAT DOES THIS MEAN?
+           for n==5 in the Holy Land:
+             aliyah    Korbanot Succos
+             1         4
+             2         5
+             3         6
+             4         5
+
+           Hoshana Rabbah (n==6 in the Holy Land, 5 in Diaspora):
+             aliyah    Korbanot Succos
+             1         4
+             2         5
+             3         6
+             4         in the Holy Land - 6; in Diaspora - 5 and 6
+
+           Maftir Shabbos Chol Hamoed Succos n :
+             in the Holy Land - n, in Diaspora - n and n+1 
+         TODO: Шмини ацерет ( и Симхат Тора) - 35-39 - WHAT(@michaelko58) DOES THIS MEAN?
      -->
-    <day n="Succos Fragments">
+    <day n="Korbanot Succos">
         <torah book="Numbers" fromChapter="29">
             <aliyah n="1" fromVerse="12" toVerse="16"/>
             <aliyah n="2" fromVerse="17" toVerse="19"/>
@@ -232,19 +246,17 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         </torah>
     </day>
 
-    <day n="Shabbos Chol Hamoed Succos">
-        <!-- TODO maftir: Numbers 29
-          day 1: 17-22; day 3: 23-28; day: 26-31 - Diaspora
-         -->
+    <day n="Haftarah Shabbos Chol Hamoed Succos">
         <haftarah book="Ezekiel" fromChapter="38" fromVerse="18" toChapter="39" toVerse="16"/>
     </day>
 
     <!-- RULE: on Shemini Atzeres and Simchas Torah: add Shemini Atzeres Maftir.  -->
-    <day n="Shemini Atzeres Maftir">
+    <day n="Maftir Shemini Atzeres">
         <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
     </day>
 
-    <day n="Shemini Atzeres"> <!-- TODO Only in Diaspora -->
+    <day n="Shemini Atzeres"> <!-- only in Diaspora. In Eretz Isroel - Simchas Tojro
+      -->
         <torah book="Deuteronomy">
             <aliyah n="1" fromChapter="14" fromVerse="22" toChapter="15" toVerse="19"/>
             <aliyah n="2" fromChapter="16" fromVerse="1"/>
@@ -282,113 +294,61 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         <haftarah book="Joshua" fromChapter="1" fromVerse="1" toVerse="18"/>
     </day>
 
-    <!-- TODO(@michaelko58) переработай, пожалуйста, в более чёткую форму:
-    - перечисли все фрагменты, о которых нужен знать алгоритм (без "пополам");
-    - сформулируй правило, приписывающее номера этих фрагментов алийёт, если день Хануки - n, а алия - k;
-    - сформулируй аналогичное правило для сфарадим.
-
-    Когда это будет сделано, я уберу занудное расписание "Channukah 1", "Channukah 2" и т.д. - после того как
-    проверю, что твои правила порождают это расписание.
-    Учти что в самом этом расписании есть, по-моему, ошибки!
-
-    Первый день Хануки Бемидбар,7:1-17 (для сфарадим - до 7:23, см. далее).
-    Чтение следующий шести дней : по минагу ашкеназим (Рамо) и так в Хабаде -
-    первые двое читают текущий день (пополам), а третий  читает следующий день;
-    обычай сфарадим - третий возвращается и читает весь текущий день.
-
+    <!--
     RULE: when a day of Channukah falls on Rosh Chodesh (6th - always; 7th - sometimes),
             first 3 aliyot are from Rosh Chodesh (see above).
     -->
-    <day n="Channukah Fragments">
-        <torah book="Numbers" fromChapter="7">
-            <aliyah n="1" fromVerse= "1" toVerse="17"/>
-            <aliyah n="2" fromVerse="18" toVerse="23"/>
-            <aliyah n="3" fromVerse="24" toVerse="29"/>
-            <aliyah n="4" fromVerse="30" toVerse="35"/>
-            <aliyah n="5" fromVerse="36" toVerse="41"/>
-            <aliyah n="6" fromVerse="42" toVerse="47"/>
-            <aliyah n="7" fromVerse="48" toVerse="53"/>
-            <aliyah n="8" fromVerse="54" toVerse="89"/>
-        </torah>
+     <!--
+     RULE for days that do not coincide with Shabbos or Rosh Chodesh:
+       Mingag Chabad (Ramo)
+       day 1
+         Aliyah
+         1      0, 1.1, 1.2
+         2      1.1
+         3      1.2  TODO(@michaelko58) а что делают сфарадим чтобы дочитать до 7:23?
+
+       day n, 1 < n < 8:
+         Aliyah
+         1      n.1
+         2      n.2
+         3      Ashkenaz/Chabad: (n+1).1 and (n+1).2
+                Sefard: n.1 and n.2
+
+       day 8 (Zot Chanukka):
+         Aliyah
+         1      8.1
+         2      8.2
+         3      "end"
+
+       Shabat Chanukka Maftir: n.1 and n.2  TODO(@michaelko58) в обе - или во 2ю всё же
+          <maftir book="Numbers" fromChapter="7" fromVerse="54" toChapter="8" toVerse="4"/>???
+
+       Chanukka Rosh Chodesh: Aliyah 4: n.1 and n.2
+       TODO(@michaelko58) перепроверь, пожалуйста: в разблюдовке на рош ходеш было и 42-47, и 48-59, и 42-50...
+    -->
+    <day n="Korbanot Channukah" book="Numbers" fromChapter="7">
+      <text n="0" fromVerse="1" toVerse="11"/>
+      <text n="1.1" fromVerse="12" toVerse="14"/>
+      <text n="1.2" fromVerse="15" toVerse="17"/>
+      <text n="2.1" fromVerse="18" toVerse="20"/>
+      <text n="2.2" fromVerse="21" toVerse="23"/>
+      <text n="3.1" fromVerse="24" toVerse="26"/>
+      <text n="3.2" fromVerse="27" toVerse="29"/>
+      <text n="4.1" fromVerse="30" toVerse="32"/>
+      <text n="4.2" fromVerse="33" toVerse="35"/>
+      <text n="5.1" fromVerse="36" toVerse="38"/>
+      <text n="5.2" fromVerse="39" toVerse="41"/>
+      <text n="6.1" fromVerse="42" toVerse="44"/>
+      <text n="6.2" fromVerse="45" toVerse="47"/>
+      <text n="7.1" fromVerse="48" toVerse="50"/>
+      <text n="7.2" fromVerse="51" toVerse="53"/>
+      <text n="8.1" fromVerse="12" toVerse="14"/>
+      <text n="8.2" fromVerse="15" toVerse="17"/>
+      <text n="end" fromChapter="7" fromVerse="18" toChapter="8" toVerse="4"/>
     </day>
 
-    <day n="Channukah 1">
-        <torah book="Numbers" fromChapter="7">
-            <aliyah n="1" fromVerse="1"/>
-            <aliyah n="2" fromVerse="12"/>
-            <aliyah n="3" fromVerse="15" toVerse="17"/>
-        </torah>
-    </day>
-
-    <day n="Channukah 2">
-        <torah book="Numbers" fromChapter="7">
-            <aliyah n="1" fromVerse="18"/>
-            <aliyah n="2" fromVerse="21"/>
-            <aliyah n="3" fromVerse="24" toVerse="29"/>
-        </torah>
-    </day>
-
-    <day n="Channukah 3">
-        <torah book="Numbers" fromChapter="7">
-            <aliyah n="1" fromVerse="24"/>
-            <aliyah n="2" fromVerse="27"/>
-            <aliyah n="3" fromVerse="30" toVerse="35"/>
-        </torah>
-    </day>
-
-    <day n="Channukah 4">
-        <torah book="Numbers" fromChapter="7">
-            <aliyah n="1" fromVerse="30"/>
-            <aliyah n="2" fromVerse="33"/>
-            <aliyah n="3" fromVerse="36" toVerse="41"/>
-        </torah>
-    </day>
-
-    <day n="Channukah 5">
-        <torah book="Numbers" fromChapter="7">
-            <aliyah n="1" fromVerse="36"/>
-            <aliyah n="2" fromVerse="39"/>
-            <aliyah n="3" fromVerse="42" toVerse="47"/>
-        </torah>
-    </day>
-  
-    <day n="Channukah 6 Rosh Chodesh">
-        <torah book="Numbers">
-            <aliyah n="1" fromChapter="28" fromVerse="1"/>
-            <aliyah n="2" fromChapter="28" fromVerse="6"/>
-            <aliyah n="3" fromChapter="28" fromVerse="11" toVerse="15"/>
-            <aliyah n="4" fromChapter="7" fromVerse="42" toVerse="47"/> <!-- 7:48-59? -->
-        </torah>
-    </day>
-    <day n="Channukah 7">
-        <torah book="Numbers" fromChapter="7">
-            <aliyah n="1" fromVerse="48"/>
-            <aliyah n="2" fromVerse="51"/>
-            <aliyah n="3" fromVerse="54" toVerse="59"/>
-        </torah>
-    </day>
-
-    <day n="Channukah 7 Rosh Chodesh">
-        <torah book="Numbers" >
-            <aliyah n="1" fromChapter="28" fromVerse="1"/>
-            <aliyah n="2" fromChapter="28" fromVerse="6"/>
-            <aliyah n="3" fromChapter="28" fromVerse="11" toVerse="15"/>
-            <aliyah n="4" fromChapter="7" fromVerse="42" toVerse="50"/> <!-- TODO 42:47? -->
-        </torah>
-    </day>
-
-    <day n="Channukah 8"> <!-- TODO = Zos Channukah -->
-        <torah book="Numbers" fromChapter="7">
-            <aliyah n="1" fromChapter="7" fromVerse="54"/>
-            <aliyah n="2" fromChapter="7" fromVerse="57"/>
-            <aliyah n="3" fromChapter="7" fromVerse="60" toChapter="8" toVerse="4"/>
-        </torah>
-    </day>
 
     <day n="Shabbos Channukah 1">
-        <!-- TODO maftir: Numbers 7
-          day 1: 1-17; day 2: 18-23; 3: 24-29; 4: 30-35; 6: !!!; 7: 48-53
-         -->
         <haftarah book="Zecharia" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>
     </day>
 
@@ -433,7 +393,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
                on other days of Pesach, add "Pesach Additional Torah Reading"
                  as 4th aliyah on weekdays and as Maftir on Shabbos and last festival days.
 
-         TODO using the number of the day:
+         TODO(@michaelko58) опиши правилами испольжуя день Пейсаха:
 2. Кадеш: Шмот, 13:1-16
 3. Кесеф: Шмот, 22:24 -23:19
 4. Псоль: Шмот, 34:1-26
@@ -495,10 +455,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         </haftarah>
     </day>
 
-    <day>
-        <names>
-            <name n="Pesach Intermediate 1" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Pesach 3">
         <torah book="Exodus" fromChapter="13">
             <aliyah n="1" fromVerse="1"/>
             <aliyah n="2" fromVerse="5"/>
@@ -506,10 +463,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         </torah>
     </day>
 
-    <day>
-        <names>
-            <name n="Pesach Intermediate 2" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Pesach 4">
         <torah book="Exodus">
             <aliyah n="1" fromChapter="22" fromVerse="24"/>
             <aliyah n="2" fromChapter="22" fromVerse="27"/>
@@ -517,10 +471,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         </torah>
     </day>
 
-    <day>
-        <names>
-            <name n="Pesach Intermediate 3" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Pesach 5">
         <torah book="Exodus">
             <aliyah n="1" fromChapter="34" fromVerse="1"/>
             <aliyah n="2" fromChapter="34" fromVerse="4"/>
@@ -528,10 +479,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         </torah>
     </day>
 
-    <day>
-        <names>
-            <name n="Pesach Intermediate 4" lang="en" transliteration="yes"/>
-        </names>
+    <day n="Pesach 6">
         <torah book="Numbers" fromChapter="9">
             <aliyah n="1" fromVerse="1"/>
             <aliyah n="2" fromVerse="7"/>
@@ -540,6 +488,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
     </day>
 
     <day n="Shabbos Chol Hamoed Pesach">
+        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
         <haftarah book="Ezekiel" fromChapter="37" fromVerse="1" toVerse="14"/>
     </day>
 
@@ -572,6 +521,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <aliyah n="4" fromChapter="16" fromVerse="9"/>
             <aliyah n="5" fromChapter="16" fromVerse="13" toVerse="17"/>
 
+            <!-- TODO(@michaelko58) мне кажерся, что ты это хочешь грохнуть. Почему? -->
             <shabbos>
                 <aliyah n="1" fromChapter="14" fromVerse="22"/>
                 <aliyah n="2" fromChapter="15" fromVerse="1"/>
