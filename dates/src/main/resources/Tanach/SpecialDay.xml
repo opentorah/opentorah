@@ -299,16 +299,139 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
     RULE: when a day of Channukah falls on Rosh Chodesh (6th - always; 7th - sometimes),
             first 3 aliyot are from Rosh Chodesh (see above).
     -->
-    <day n="Channukah Fragments">
-        <torah book="Numbers" fromChapter="7">
-            <aliyah n="1" fromVerse= "1" toVerse="17"/>
-            <aliyah n="2" fromVerse="18" toVerse="23"/>
-            <aliyah n="3" fromVerse="24" toVerse="29"/>
-            <aliyah n="4" fromVerse="30" toVerse="35"/>
-            <aliyah n="5" fromVerse="36" toVerse="41"/>
-            <aliyah n="6" fromVerse="42" toVerse="47"/>
-            <aliyah n="7" fromVerse="48" toVerse="53"/>
-            <aliyah n="8" fromVerse="54" toVerse="89"/>
+     <!--RULES
+       Mingag Chabad (Ramo)
+      Chanukka 1 day
+        Alia 1 BeginChanukka
+        Alia 2 Chanuka 1 part1
+        Alia 3 Chanuka 1 part2
+     Other days (not shabes and not rosh chodesh)
+         Chahnuka n day (n<8)
+          Alia 1 Chanuka n part 1
+          Alia 2 Chanuka n part 2
+          Alia 3 Chanuka n+1
+       Zot Chanukka
+          Alia 1 Chanuka 8 part 1
+          Aliq 2 Chanuka 8 part 2
+          Alia 3 Chanuka End
+       Shabat Chanukka n
+         Maftir Chanukka n part 1, Chanukka n part 2
+       Chanukka Rosh chodesh
+         Alia 4 Chanukka 6 (or Chanukka 7 part 1, Chanukka 7 part 2) -->
+
+
+     <text>
+       <names>
+            <name n="Korbanot Begin Chanuka " lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="1" toVerse="17" >
+        </names>
+    </text>
+
+     <text>
+       <names>
+            <name n="Korbanot Chanuka 1 part1" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="12" toVerse="14">
+        </names>
+    </text>
+    <text>
+       <names>
+            <name n="Korbanot Chanuka 1 part2" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="15" toVerse="17">
+        </names>
+    </text>
+    <text>
+       <names>
+            <name n="Korbanot Chanuka 2 part1" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="18" toVerse="20">
+        </names>
+    </text>
+    <text>
+       <names>
+            <name n="Korbanot Chanuka 2 part2" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="21" toVerse="23">
+        </names>
+    </text>
+    <text>
+       <names>
+            <name n="Korbanot Chanuka 3 part1" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="24" toVerse="26">
+        </names>
+    </text>
+    <text>
+       <names>
+            <name n="Korbanot Chanuka 3 part2" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="27" toVerse="29">
+        </names>
+    </text>
+    <text>
+       <names>
+            <name n="Korbanot Chanuka 4 part1" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="30" toVerse="32">
+        </names>
+    </text>
+    <text>
+       <names>
+            <name n="Korbanot Chanuka 4 part2" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="33" toVerse="35">
+        </names>
+    </text>
+    <text>
+       <names>
+            <name n="Korbanot Chanuka 5 part1" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="36" toVerse="38">
+        </names>
+    </text>
+    <text>
+       <names>
+            <name n="Korbanot Chanuka 5 part2" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="39" toVerse="41">
+        </names>
+    </text>
+    <text>
+       <names>
+            <name n="Korbanot Chanuka 6" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="42" toVerse="47">
+        </names>
+    </text>
+    <text>
+       <names>
+            <name n="Korbanot Chanuka 7 part1" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="48" toVerse="50">
+        </names>
+    </text>
+    <text>
+       <names>
+            <name n="Korbanot Chanuka 7 part2" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="51" toVerse="53">
+        </names>
+    </text>
+    <text>
+       <names>
+            <name n="Korbanot Chanuka 8 part1" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="12" toVerse="14">
+        </names>
+    </text>
+    <text>
+       <names>
+            <name n="Korbanot Chanuka 8 part2" lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="15" toVerse="17">
+        </names>
+    </text>
+   <text>
+       <names>
+            <name n="Korbanot End Chanuka " lang="en" transliteration="yes"/>
+            <torah book="Numbers" fromChapter="7" fromVerse="18" toChapter="8" toVerse="4">
+        </names>
+    </text>
+
+
+    <day>
+        <names>
+            <name n="Channukah 1" lang="en" transliteration="yes"/>
+        </names>
+        <torah book="Numbers" fromChapter="7" fromVerse="1" toVerse="17">
+            <aliyah n="2" chapter="7" verse="12"/>
+            <aliyah n="3" chapter="7" verse="15"/>
         </torah>
     </day>
 
@@ -351,7 +474,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <aliyah n="3" fromVerse="42" toVerse="47"/>
         </torah>
     </day>
-  
+
     <day n="Channukah 6 Rosh Chodesh">
         <torah book="Numbers">
             <aliyah n="1" fromChapter="28" fromVerse="1"/>
