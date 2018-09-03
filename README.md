@@ -11,7 +11,6 @@ I want to be able to do various things with the fixed Jewish calendar:
 - [ ] generate Torah and Haftorah reading schedule
 - [ ] generate schedule of learning Rambam
 - [ ] generate monthly calendars with both kinds of dates
-- [ ] automate vestos calculations
 
 For my needs, the best source of information on the Jewish Calendar turned out
 to be Rambam, the Laws of the Sanctification of the Moon, Chapters 6-10.
@@ -38,6 +37,28 @@ in Chapters 11-19:
 TODO Rambam corresponding to Shulchan Aruch Orach Chayim 428
 TODO https://he.wikipedia.org/wiki/הלוח_העברי
 TODO https://en.wikibooks.org/wiki/Mathematics_of_the_Jewish_Calendar/The_Annual_Cycle_of_Torah_Readings
+
+מקורות קריאת התורה למועדים
+פסח: ג. שו"ע סי' תפח סע' ג
+מוציאין שני ספרים וקורין בראשון חמשה גברי (<ג> ואם מוסיפין ביום טוב ע"ל ריש סימן רפ"ב)
+  בפרשת בא מן משכו עד מארץ מצרים על צבאותם,
+  (ט) ג ומפטיר קורא בשני בפרשת פנחס ובחודש הראשון ומפטיר ביהושע (י) בעת ההיא,
+סי' תצ סע' א, ה-ו ומשנה ברורה
+סי' תצד סע' א- ב ומשנה ברורה
+סי' תקנט סע' ד ומשנה ברורה
+סי' תקפד סע' ב ומשנה ברורה [בעיקר: סק"ח]
+סי' תרא סע' א ומשנה ברורה
+סי' תרכא סע' א ומשנה ברורה [בעיקר סק"ד]
+סי' תרכב סע' ב ומשנה ברורה
+סי' תרנט ומשנה ברורה [בעיקר: סק"ד]
+סי' תרסב סע' ג ומשנה ברורה [בעיקר: סק"ד]
+סי' תרסג סע' א, ג ומשנה ברורה [בעיקר: סק"ד]
+סי' תרסח סע' ב ומשנה ברורה
+סי' תרסט ומשנה ברורה
+סי' תרפד ומשנה ברורה [בעיקר: ס"ק ג, ח, יד, יז]
+סי' תרצג סע' ד ומשנה ברורה
+סי' תכה סע' א- ב ומשנה ברורה [בעיקר: ס"ק ד, ח, יב]
+סי' תכח סע' ד, ו, ח ומשנה ברורה
 
 ## Early Jewish Years
 

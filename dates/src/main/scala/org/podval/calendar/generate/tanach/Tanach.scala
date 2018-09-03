@@ -1,97 +1,147 @@
 package org.podval.calendar.generate.tanach
 
-// TODO introduce Tanach and bind from Parsha
-abstract class TanachBook(
-  names: Names,
-  chapters: Array[Int]
-)
+object Tanach {
+  abstract class BookStructure(
+    val names: Names,
+    val chapters: Array[Int]
+  )
 
-object TanachBook {
-  def checkChapters(chapters: Seq[ChapterParsed]): Array[Int] = {
-    if (chapters.map(_.n) != (1 to chapters.length)) throw new IllegalArgumentException("Wrong chapter numbers.")
-    chapters.map(_.length).toArray
+  final class ChumashBookStructure(
+    names: Names,
+    chapters: Array[Int],
+    val weeks: Seq[ParshaStructure]
+  ) extends BookStructure(names, chapters)
+
+  final class NachBookStructure(
+    names: Names,
+    chapters: Array[Int]
+  ) extends BookStructure(names, chapters)
+
+  final class ParshaStructure(
+    val names: Names,
+    val fromChapter: Int,
+    val fromVerse: Int,
+    val toChapter: Int,
+    val toVerse: Int,
+    val maftir: Maftir
+  ) {
+    require(fromChapter > 0)
+    require(fromVerse > 0)
   }
-}
 
-final case class ChumashBook private(
-  names: Names,
-  chapters: Array[Int],
-  weeks: Seq[Week]
-) extends TanachBook(names, chapters)
-
-final case class Week private(
-  names: Names,
-  fromChapter: Int,
-  fromVerse: Int,
-// TODO calculate
-//  toChapter: Int,
-//  toVerse: Int,
-  maftir: Week.Maftir
-) {
-  if (fromChapter <= 0) throw new IllegalArgumentException("Non-positive 'fromChapter'.")
-  if (fromVerse <= 0) throw new IllegalArgumentException("Non-positive 'fromVerse'.")
-}
-
-object Week {
-  final case class Aliyah(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
+  final class Aliyah(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
 
   // TODO add custom and combined
   // TODO check against Parsha what can be combined
-  final case class Day(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
+  final class Day(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
 
-  final case class Maftir(fromChapter: Int, fromVerse: Int)
-}
+  // TODO special Maftir has reference to the book; generalize?
+  final class Maftir(
+    val fromChapter: Int,
+    val fromVerse: Int,
+    val toChapter: Int,
+    val toVerse: Int
+  )
 
-object ChumashBook {
-  // TODO check that chapters are numbered correctly
-  // TODO validate week/aliyah/day/maftir against chapters!
-  def apply(
-    chaptersParsed: Seq[ChapterParsed],
-    weeksParsed: Seq[WeekParsed]
-  ): ChumashBook = {
-    val chapters = TanachBook.checkChapters(chaptersParsed)
-    val weeks: Seq[Week] = weeksParsed.map { week =>
-      Week(
-        week.names,
-        week.fromChapter,
-        week.fromVerse,
-        week.maftir
-      )
-    }
+  sealed trait Book {
+    def name: String = getClass.getSimpleName.replace("$", "")
 
-    new ChumashBook(
-      weeks.head.names,
-      chapters,
-      weeks
-    )
+    def structure: BookStructure
   }
-}
 
-final case class ChapterParsed(n: Int, length: Int)
+  trait ChumashBook extends Book {
+    final override lazy val structure: ChumashBookStructure =
+      bookStructureForName(name).asInstanceOf[ChumashBookStructure]
+  }
 
+  trait NachBook extends Book {
+    final override lazy val structure: NachBookStructure =
+      bookStructureForName(name).asInstanceOf[NachBookStructure]
+  }
 
-final case class WeekParsed(
-  names: Names,
-  fromChapter: Int,
-  fromVerse: Int,
-  days: Seq[WeekParsed.Day],
-  aliyot: Seq[WeekParsed.Aliyah],
-  maftir: Week.Maftir
-)
+  case object Genesis extends ChumashBook
+  case object Exodus extends ChumashBook
+  case object Leviticus extends ChumashBook
+  case object Numbers extends ChumashBook
+  case object Deuteronomy extends ChumashBook
 
-object WeekParsed {
-  final case class Aliyah(n: Int, fromChapter: Int, fromVerse: Int, toChapter: Option[Int], toVerse: Option[Int])
-  final case class Day(n: Int, fromChapter: Int, fromVerse: Int, toChapter: Option[Int], toVerse: Option[Int])
-}
+  case object Joshua extends NachBook
+  case object Judges extends NachBook
+  case object SamuelI extends NachBook { override def name: String = "Samuel I" }
+  case object SamuelII  extends NachBook { override def name: String = "Samuel II" }
+  case object KingsI extends NachBook { override def name: String = "Kings I" }
+  case object KingsII  extends NachBook { override def name: String = "Kings II" }
+  case object Isaiah extends NachBook
+  case object Jeremiah extends NachBook
+  case object Ezekiel extends NachBook
 
-final class NachBook private(
-  names: Names,
-  chapters: Array[Int]
-) extends TanachBook(names, chapters)
+  <!-- תרי עשר -->
+  case object Hosea extends NachBook
+  case object Joel extends NachBook
+  case object Amos extends NachBook
+  case object Obadiah extends NachBook
+  case object Jonah extends NachBook
+  case object Micah extends NachBook
+  case object Nahum extends NachBook
+  case object Habakkuk extends NachBook
+  case object Zephaniah extends NachBook
+  case object Haggai extends NachBook
+  case object Zechariah extends NachBook
+  case object Malachi extends NachBook
 
-object NachBook {
-  def apply(
-    names: Names,
-    chaptersParsed: Seq[ChapterParsed]
-  ): NachBook = new NachBook(names, TanachBook.checkChapters(chaptersParsed))
+  case object Psalms extends NachBook
+  case object Proverbs extends NachBook
+  case object Job extends NachBook
+  case object SongOfSongs extends NachBook { override def name: String = "Song of Songs" }
+  case object Ruth extends NachBook
+  case object Lamentations extends NachBook
+  case object Ecclesiastes extends NachBook
+  case object Esther extends NachBook
+  case object Daniel extends NachBook
+  case object Ezra extends NachBook
+  case object Nehemiah extends NachBook
+  case object ChroniclesI extends NachBook { override def name: String = "Chronicles I" }
+  case object ChroniclesII extends NachBook { override def name: String = "Chronicles II" }
+
+  val chumash: Seq[ChumashBook] = Seq(Genesis, Exodus, Leviticus, Numbers, Deuteronomy)
+
+  val nach: Seq[NachBook] = Seq(
+    Joshua, Judges, SamuelI, SamuelII, KingsI, KingsII, Isaiah, Jeremiah, Ezekiel,
+    Hosea, Joel, Amos, Obadiah, Jonah, Micah, Nahum, Habakkuk, Zephaniah, Haggai, Zechariah, Malachi,
+    Psalms, Proverbs, Job, SongOfSongs, Ruth, Lamentations, Ecclesiastes, Esther,
+    Daniel, Ezra, Nehemiah, ChroniclesI, ChroniclesII)
+
+  val all: Seq[Book] = chumash ++ nach
+
+  private val bookStructures: Seq[BookStructure] = TanachParser.parse
+  private val structure2book: Map[BookStructure, Book] =
+    all.map(book => book.structure -> book).toMap
+  require(bookStructures.toSet == structure2book.keySet)
+
+  private val parshaStructures: Seq[ParshaStructure] = chumash.flatMap(_.structure.weeks)
+  private val structure2parsha: Map[ParshaStructure, Parsha] =
+    Parsha.all.map(parsha => parsha.structure -> parsha).toMap
+  require(parshaStructures.toSet == structure2parsha.keySet)
+
+  def bookStructureForName(name: String): BookStructure = {
+    val result = bookStructures.filter(_.names.has(name))
+    require(result.nonEmpty, s"No structure for $name")
+    require(result.length == 1)
+    result.head
+  }
+
+  def parshaStructureForName(name: String): ParshaStructure = {
+    val result = parshaStructures.filter(_.names.has(name))
+    require(result.nonEmpty, s"No structure for $name")
+    require(result.length == 1)
+    result.head
+  }
+
+  def bookForName(name: String): Book = structure2book(bookStructureForName(name))
+
+  def main(args: Array[String]): Unit = {
+    val genesis = Genesis.structure
+    val deuteronomy = bookForName("Devarim")
+    val z = 0
+  }
 }

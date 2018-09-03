@@ -1,5 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <book>
+  <chapter n="1" length="17"/>
+  <chapter n="2" length="16"/>
+  <chapter n="3" length="17"/>
+  <chapter n="4" length="35"/>
+  <chapter n="5" length="26"/>
+  <chapter n="6" length="23"/>
+  <chapter n="7" length="38"/>
+  <chapter n="8" length="36"/>
+  <chapter n="9" length="24"/>
+  <chapter n="10" length="20"/>
+  <chapter n="11" length="47"/>
+  <chapter n="12" length="8"/>
+  <chapter n="13" length="59"/>
+  <chapter n="14" length="57"/>
+  <chapter n="15" length="33"/>
+  <chapter n="16" length="34"/>
+  <chapter n="17" length="16"/>
+  <chapter n="18" length="30"/>
+  <chapter n="19" length="37"/>
+  <chapter n="20" length="27"/>
+  <chapter n="21" length="24"/>
+  <chapter n="22" length="33"/>
+  <chapter n="23" length="44"/>
+  <chapter n="24" length="23"/>
+  <chapter n="25" length="55"/>
+  <chapter n="26" length="46"/>
+  <chapter n="27" length="34"/>
+
   <week fromChapter="1" fromVerse="1">
     <names>
       <name lang="he">ויקרא</name>
