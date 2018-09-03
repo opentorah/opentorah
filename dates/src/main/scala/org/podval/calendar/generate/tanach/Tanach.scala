@@ -11,6 +11,20 @@ object TanachBook {
     if (chapters.map(_.n) != (1 to chapters.length)) throw new IllegalArgumentException("Wrong chapter numbers.")
     chapters.map(_.length).toArray
   }
+
+  def validate(chapter: Int, verse: Int, chapters: Array[Int]): Unit = {
+    if (chapter <= 0) throw new IllegalArgumentException("Non-positive chapter.")
+    if (verse <= 0) throw new IllegalArgumentException("Non-positive verse.")
+    if (chapter > chapters.length) throw new IllegalArgumentException("Chapter out of range")
+    if (verse > chapters(chapter-1)) throw new IllegalArgumentException("Verse out of range")
+  }
+
+  def prev(chapter: Int, verse: Int, chapters: Array[Int]): (Int, Int) = {
+    validate(chapter, verse, chapters)
+    if (verse > 1) (chapter, verse-1)
+    else if (chapter > 1) (chapter-1, chapters(chapter-2))
+    else throw new IllegalArgumentException("No chapters before the first one.")
+  }
 }
 
 final case class ChumashBook private(
@@ -43,19 +57,33 @@ object Week {
 }
 
 object ChumashBook {
-  // TODO check that chapters are numbered correctly
   // TODO validate week/aliyah/day/maftir against chapters!
   def apply(
     chaptersParsed: Seq[ChapterParsed],
     weeksParsed: Seq[WeekParsed]
   ): ChumashBook = {
     val chapters = TanachBook.checkChapters(chaptersParsed)
-    val weeks: Seq[Week] = weeksParsed.map { week =>
+
+    // Validate 'from' for each week.
+    weeksParsed.foreach(week => TanachBook.validate(week.fromChapter, week.fromVerse, chapters))
+
+    // Set implied toChapter/toVerse on weeks.
+    val weeksWithTo =
+      weeksParsed.zip(weeksParsed.tail).map { case (week, nextWeek) =>
+        val (toChapterImplied, toVerseImplied) = TanachBook.prev(nextWeek.fromChapter, nextWeek.fromVerse, chapters)
+        setImpliedTo(week, toChapterImplied, toVerseImplied)
+      } :+ setImpliedTo(weeksParsed.last, chapters.length, chapters(chapters.length-1))
+
+    val weeks: Seq[Week] = weeksWithTo.map { week =>
+      val maftir = Week.Maftir(
+        fromChapter = week.maftir.fromChapter,
+        fromVerse = week.maftir.fromVerse
+      )
       Week(
         week.names,
         week.fromChapter,
         week.fromVerse,
-        week.maftir
+        maftir
       )
     }
 
@@ -64,6 +92,14 @@ object ChumashBook {
       chapters,
       weeks
     )
+  }
+
+  private def setImpliedTo(week: WeekParsed, toChapterImplied: Int, toVerseImplied: Int): WeekParsed = {
+    if (week.toChapter.nonEmpty && !week.toChapter.contains(toChapterImplied))
+      throw new IllegalArgumentException("Wrong explicit 'toChapter'")
+    if (week.toVerse.nonEmpty && !week.toVerse.contains(toVerseImplied))
+      throw new IllegalArgumentException("Wrong explicit 'toVerse'")
+    week.copy(toChapter = Some(toChapterImplied), toVerse = Some(toVerseImplied))
   }
 }
 
@@ -74,14 +110,38 @@ final case class WeekParsed(
   names: Names,
   fromChapter: Int,
   fromVerse: Int,
+  toChapter: Option[Int],
+  toVerse: Option[Int],
   days: Seq[WeekParsed.Day],
   aliyot: Seq[WeekParsed.Aliyah],
-  maftir: Week.Maftir
+  maftir: WeekParsed.Maftir
 )
 
 object WeekParsed {
-  final case class Aliyah(n: Int, fromChapter: Int, fromVerse: Int, toChapter: Option[Int], toVerse: Option[Int])
-  final case class Day(n: Int, fromChapter: Int, fromVerse: Int, toChapter: Option[Int], toVerse: Option[Int])
+  final case class Aliyah(
+    n: Int,
+    fromChapter: Int,
+    fromVerse: Int,
+    toChapter: Option[Int],
+    toVerse: Option[Int]
+  )
+
+  final case class Day(
+    n: Int,
+    fromChapter: Int,
+    fromVerse: Int,
+    toChapter: Option[Int],
+    toVerse: Option[Int],
+    custom: Option[String],
+    isCombined: Boolean
+  )
+
+  final case class Maftir(
+    fromChapter: Int,
+    fromVerse: Int,
+    toChapter: Option[Int],
+    toVerse: Option[Int]
+  )
 }
 
 final class NachBook private(
@@ -94,4 +154,11 @@ object NachBook {
     names: Names,
     chaptersParsed: Seq[ChapterParsed]
   ): NachBook = new NachBook(names, TanachBook.checkChapters(chaptersParsed))
+}
+
+object Main {
+  def main(args: Array[String]): Unit = {
+    val result = TanachParser.parse
+    val z = 0
+  }
 }

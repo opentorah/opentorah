@@ -24,17 +24,36 @@ object XML {
     }
   }
 
-  def checkElement(elem: Elem, name: String, allowedAttributes: Set[String]): Map[String, String] = {
-    if (elem.label != name) throw new IllegalArgumentException(s"Wrong element: ${elem.label} instead of $name")
-    val result = getAttributes(elem)
-    result.foreach { case (key, _) =>
+  def open(element: Elem, name: String, allowedAttributes: Set[String]): (Map[String, String], Seq[Elem]) = {
+    val attributes = check(element, name, allowedAttributes)
+
+    val (elements, nonElements) = element.child.partition(_.isInstanceOf[Elem])
+    if (nonElements.nonEmpty) throw new IllegalArgumentException("Non-element children present.")
+
+    (attributes, elements.map(_.asInstanceOf[Elem]))
+  }
+
+  // TODO make vararg for the allowedAttributes?
+  def openEmpty(element: Elem, name: String, allowedAttributes: Set[String]): Map[String, String] = {
+    val attributes = check(element, name, allowedAttributes)
+
+    val (elements, _) = element.child.partition(_.isInstanceOf[Elem])
+    if (elements.nonEmpty) throw new IllegalArgumentException("Nested elements present.")
+
+    attributes
+  }
+
+  private def check(element: Elem, name: String, allowedAttributes: Set[String]): Map[String, String] = {
+    if (element.label != name) throw new IllegalArgumentException(s"Wrong element: ${element.label} instead of $name")
+    val attributes = getAttributes(element)
+    attributes.foreach { case (key, _) =>
       if (!allowedAttributes.contains(key))
         throw new IllegalArgumentException(s"Attribute $key not allowed.")
     }
-    result
+    attributes
   }
 
-  def getAttributes(elem: Elem): Map[String, String] = elem.attributes.map { metadata =>
+  private def getAttributes(element: Elem): Map[String, String] = element.attributes.map { metadata =>
     val key = metadata.key
     val value = metadata.value.toString
     key -> value
@@ -48,6 +67,9 @@ object XML {
     }
   }
 
+  def doGetIntAttribute(attributes: Map[String, String], name: String): Int =
+    getIntAttribute(attributes, name).get
+
   def getBooleanAttribute(attributes: Map[String, String], name: String): Option[Boolean] =
     attributes.get(name).map { value =>
       if ((value == "true") || (value == "yes")) true
@@ -55,23 +77,39 @@ object XML {
       else throw new IllegalArgumentException("Bad boolean attribute value")
     }
 
-  def checkMeta(elem: Elem, what: String): Elem = {
-    checkElement(elem, "meta", Set("type"))
-    val typeOption = getAttributes(elem).get("type")
+  def doGetBooleanAttribute(attributes: Map[String, String], name: String): Boolean =
+    getBooleanAttribute(attributes, name).getOrElse(false)
+
+  def checkMeta(element: Elem, what: String): Seq[Elem] = {
+    val (attributes, elements) = open(element, "meta", Set("type"))
+    val typeOption = attributes.get("type")
     if (typeOption.isEmpty) throw new IllegalArgumentException("Attribute 'type' missing.")
     if (typeOption.get != what) throw new IllegalArgumentException("Wrong type.")
-    elem
+    elements
   }
 
-  def children(elem: Elem): Seq[Elem] = {
-    val (result, nonElements) = elem.child.partition(_.isInstanceOf[Elem])
-    if (nonElements.nonEmpty) throw new IllegalArgumentException("Non-element children present.")
-    result.map(_.asInstanceOf[Elem])
-  }
-
-  def text(elem: Elem): Option[String] = {
-    val result = elem.text
+  def text(element: Elem): Option[String] = {
+    val result = element.text
     if (result.isEmpty) None else Some(result)
+  }
+
+  def span(elements: Seq[Elem], name1: String): (Seq[Elem], Seq[Elem]) = {
+    elements.span(_.label == name1)
+  }
+
+  def span(elements: Seq[Elem], name1: String, name2: String): (Seq[Elem], Seq[Elem]) = {
+    val (elements1, tail1) = elements.span(_.label == name1)
+    val (elements2, tail2) = tail1.span(_.label == name2)
+    checkNoMoreElements(tail2)
+    (elements1, elements2)
+  }
+
+  def span(elements: Seq[Elem], name1: String, name2: String, name3: String): (Seq[Elem], Seq[Elem], Seq[Elem]) = {
+    val (elements1, tail1) = elements.span(_.label == name1)
+    val (elements2, tail2) = tail1.span(_.label == name2)
+    val (elements3, tail3) = tail2.span(_.label == name3)
+    checkNoMoreElements(tail3)
+    (elements1, elements2, elements3)
   }
 
   def checkNoMoreElements(elements: Seq[Elem]): Unit =
