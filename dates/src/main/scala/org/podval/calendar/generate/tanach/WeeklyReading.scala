@@ -116,7 +116,7 @@ object WeeklyReading {
   private final val combinableFromVayikraToBemidbar: Seq[Parsha] = Seq(Tazria, Acharei, Behar)
   private final val fromBemidbarToVa_eschanan: Int = Parsha.distance(Bemidbar, Va_eschanan)
   private final val combinableFromBemidbarToVa_eschanan: Seq[Parsha] = Seq(Mattos, Chukas)
-  private final val fromVa_eschanan: Int = Parsha.distance(Va_eschanan, VezosHaberacha)
+  private final val fromVa_eschanan: Int = Parsha.distance(Va_eschanan, VezosHaberachah)
   private final val combinableFromVa_eschanan: Seq[Parsha] = Seq(Nitzavim)
 
   def getYear(year: Year, inHolyLand: Boolean): Map[Day, WeeklyReading] =

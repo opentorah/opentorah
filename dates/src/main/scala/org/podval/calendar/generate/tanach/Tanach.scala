@@ -44,23 +44,19 @@ object Tanach {
   )
 
   sealed trait Book {
-    final def name: String = {
-      val result = getClass.getSimpleName.replace("$", "")
-      if (result.endsWith("II")) result.replace("II", " II") else
-      if (result.endsWith("I")) result.replace("I", " I") else
-      if (result == "SongOfSongs") "Song of Songs" else
-        result
-    }
+    def name: String = getClass.getSimpleName.replace("$", "")
 
     def structure: BookStructure
   }
 
   trait ChumashBook extends Book {
-    final override lazy val structure: ChumashBookStructure = structureForName(name).asInstanceOf[ChumashBookStructure]
+    final override lazy val structure: ChumashBookStructure =
+      bookStructureForName(name).asInstanceOf[ChumashBookStructure]
   }
 
   trait NachBook extends Book {
-    final override lazy val structure: NachBookStructure = structureForName(name).asInstanceOf[NachBookStructure]
+    final override lazy val structure: NachBookStructure =
+      bookStructureForName(name).asInstanceOf[NachBookStructure]
   }
 
   case object Genesis extends ChumashBook
@@ -71,10 +67,10 @@ object Tanach {
 
   case object Joshua extends NachBook
   case object Judges extends NachBook
-  case object SamuelI extends NachBook
-  case object SamuelII  extends NachBook
-  case object KingsI extends NachBook
-  case object KingsII  extends NachBook
+  case object SamuelI extends NachBook { override def name: String = "Samuel I" }
+  case object SamuelII  extends NachBook { override def name: String = "Samuel II" }
+  case object KingsI extends NachBook { override def name: String = "Kings I" }
+  case object KingsII  extends NachBook { override def name: String = "Kings II" }
   case object Isaiah extends NachBook
   case object Jeremiah extends NachBook
   case object Ezekiel extends NachBook
@@ -96,7 +92,7 @@ object Tanach {
   case object Psalms extends NachBook
   case object Proverbs extends NachBook
   case object Job extends NachBook
-  case object SongOfSongs extends NachBook
+  case object SongOfSongs extends NachBook { override def name: String = "Song of Songs" }
   case object Ruth extends NachBook
   case object Lamentations extends NachBook
   case object Ecclesiastes extends NachBook
@@ -104,8 +100,8 @@ object Tanach {
   case object Daniel extends NachBook
   case object Ezra extends NachBook
   case object Nehemiah extends NachBook
-  case object ChroniclesI extends NachBook
-  case object ChroniclesII extends NachBook
+  case object ChroniclesI extends NachBook { override def name: String = "Chronicles I" }
+  case object ChroniclesII extends NachBook { override def name: String = "Chronicles II" }
 
   val chumash: Seq[ChumashBook] = Seq(Genesis, Exodus, Leviticus, Numbers, Deuteronomy)
 
@@ -117,18 +113,31 @@ object Tanach {
 
   val all: Seq[Book] = chumash ++ nach
 
-  private val structures: Seq[BookStructure] = TanachParser.parse
-  private val structure2book: Map[BookStructure, Book] = all.map(book => book.structure -> book).toMap
-  require(structures.toSet == structure2book.keySet)
+  private val bookStructures: Seq[BookStructure] = TanachParser.parse
+  private val structure2book: Map[BookStructure, Book] =
+    all.map(book => book.structure -> book).toMap
+  require(bookStructures.toSet == structure2book.keySet)
 
-  def structureForName(name: String): BookStructure = {
-    val result = structures.filter(_.names.has(name))
+  private val parshaStructures: Seq[ParshaStructure] = chumash.flatMap(_.structure.weeks)
+  private val structure2parsha: Map[ParshaStructure, Parsha] =
+    Parsha.all.map(parsha => parsha.structure -> parsha).toMap
+  require(parshaStructures.toSet == structure2parsha.keySet)
+
+  def bookStructureForName(name: String): BookStructure = {
+    val result = bookStructures.filter(_.names.has(name))
     require(result.nonEmpty, s"No structure for $name")
     require(result.length == 1)
     result.head
   }
 
-  def bookForName(name: String): Book = structure2book(structureForName(name))
+  def parshaStructureForName(name: String): ParshaStructure = {
+    val result = parshaStructures.filter(_.names.has(name))
+    require(result.nonEmpty, s"No structure for $name")
+    require(result.length == 1)
+    result.head
+  }
+
+  def bookForName(name: String): Book = structure2book(bookStructureForName(name))
 
   def main(args: Array[String]): Unit = {
     val genesis = Genesis.structure
