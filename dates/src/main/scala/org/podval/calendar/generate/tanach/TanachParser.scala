@@ -76,10 +76,10 @@ object TanachParser {
     )
   }
 
-  private def parseAliyah(element: Elem): AliyahParsed = {
+  private def parseAliyah(element: Elem): WeekParsed.Aliyah = {
     val attributes = XML.checkElement(element, "aliyah",
       Set("n", "fromChapter", "fromVerse", "toChapter", "toVerse"))
-    AliyahParsed(
+    WeekParsed.Aliyah(
       n = getIntAttribute(attributes, "n").get,
       fromChapter = getIntAttribute(attributes, "fromChapter").get,
       fromVerse = getIntAttribute(attributes, "fromVerse").get,
@@ -88,10 +88,10 @@ object TanachParser {
     )
   }
 
-  private def parseDay(element: Elem): DayParsed = {
+  private def parseDay(element: Elem): WeekParsed.Day = {
     val attributes = XML.checkElement(element, "day",
       Set("n", "fromChapter", "fromVerse", "toChapter", "toVerse", "custom", "combined"))
-    DayParsed(
+    WeekParsed.Day(
       n = getIntAttribute(attributes, "n").get,
       fromChapter = getIntAttribute(attributes, "fromChapter").get,
       fromVerse = getIntAttribute(attributes, "fromVerse").get,
@@ -100,9 +100,9 @@ object TanachParser {
     )
   }
 
-  private def parseMaftir(element: Elem): Maftir = {
+  private def parseMaftir(element: Elem): Week.Maftir = {
     val attributes = XML.checkElement(element, "maftir", Set("fromChapter", "fromVerse"))
-    Maftir(
+    Week.Maftir(
       fromChapter = getIntAttribute(attributes, "fromChapter").get,
       fromVerse = getIntAttribute(attributes, "fromVerse").get
     )

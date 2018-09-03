@@ -26,10 +26,20 @@ final case class Week private(
 // TODO calculate
 //  toChapter: Int,
 //  toVerse: Int,
-  maftir: Maftir
+  maftir: Week.Maftir
 ) {
   if (fromChapter <= 0) throw new IllegalArgumentException("Non-positive 'fromChapter'.")
   if (fromVerse <= 0) throw new IllegalArgumentException("Non-positive 'fromVerse'.")
+}
+
+object Week {
+  final case class Aliyah(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
+
+  // TODO add custom and combined
+  // TODO check against Parsha what can be combined
+  final case class Day(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
+
+  final case class Maftir(fromChapter: Int, fromVerse: Int)
 }
 
 object ChumashBook {
@@ -59,24 +69,20 @@ object ChumashBook {
 
 final case class ChapterParsed(n: Int, length: Int)
 
-final case class AliyahParsed(n: Int, fromChapter: Int, fromVerse: Int, toChapter: Option[Int], toVerse: Option[Int])
-final case class Aliyah(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
-
-// TODO add custom and combined
-// TODO check against Parsha what can be combined
-final case class DayParsed(n: Int, fromChapter: Int, fromVerse: Int, toChapter: Option[Int], toVerse: Option[Int])
-final case class Day(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
-
-final case class Maftir(fromChapter: Int, fromVerse: Int)
 
 final case class WeekParsed(
   names: Names,
   fromChapter: Int,
   fromVerse: Int,
-  days: Seq[DayParsed],
-  aliyot: Seq[AliyahParsed],
-  maftir: Maftir
+  days: Seq[WeekParsed.Day],
+  aliyot: Seq[WeekParsed.Aliyah],
+  maftir: Week.Maftir
 )
+
+object WeekParsed {
+  final case class Aliyah(n: Int, fromChapter: Int, fromVerse: Int, toChapter: Option[Int], toVerse: Option[Int])
+  final case class Day(n: Int, fromChapter: Int, fromVerse: Int, toChapter: Option[Int], toVerse: Option[Int])
+}
 
 final class NachBook private(
   names: Names,
