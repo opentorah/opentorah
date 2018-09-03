@@ -34,7 +34,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
     </day>
 
     <!-- RULE: on weekday: add Torah reading, part1, part2 no Maftir/Haftorah;
-               on Chanukka: alia 4 - part2
+               on Chanukka: alia 1,2,3 - part1
                on Shabbos: usual Torah, add Maftir/Haftorah; (include rosh chodesh elul) 
                on Shabbos Chamukka, Shkalim, Ha-hodesh, 
                        Alia 7: Rosh chodesh part 2
@@ -307,10 +307,12 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
        Mingag Chabad (Ramo)
        day 1
          Aliyah
-         1      0, 1.1, 1.2
-         2      1.1
-         3      1.2  TODO(@michaelko58) а что делают сфарадим чтобы дочитать до 7:23?
-              не делят 2: 1.1 1.2 3. 2.1 2.2
+         1      0
+         2      1.1, 
+         2      1.2
+           Sefarad   1. 0
+                     2.  1.1 1.2 
+                     3. 2.1 2.2
 
        day n, 1 < n < 8:
          Aliyah
@@ -318,7 +320,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
          2      n.2  
          3      Ashkenaz/Chabad: (n+1).1 and (n+1).2
                 Sefard: n.1 and n.2
-
+        
        day 8 (Zot Chanukka):
          Aliyah
          1      8.1
@@ -328,7 +330,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
        Shabat Chanukka Maftir: n
 
        Chanukka Rosh Chodesh: Aliyah 4: n
-       TODO(@michaelko58) перепроверь, пожалуйста: в разблюдовке на рош ходеш было и 42-47, и 48-59, и 42-50...
+       
     -->
     <day n="Korbanot Channukah" book="Numbers" fromChapter="7">
       <text n="0" fromVerse="1" toVerse="11"/>
@@ -450,7 +452,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
     </day>
 
     <!-- TODO aliyot a split differently in Diaspora (and that is the only difference between the Holy Land and
-           Diaspora remaining in the data). אולי גם כאן נעשה שתי קריאות?
+           Diaspora remaining in the data).  @Dubinsky אולי גם כאן נעשה שתי קריאות?
          -->
     <day n="Pesach 2">
         <torah book="Leviticus">
@@ -533,7 +535,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <aliyah n="5" fromChapter="16" fromVerse="13" toVerse="17"/>
 
             <!-- TODO(@michaelko58) мне кажерся, что ты это хочешь грохнуть. Почему?
-    Это чтение Шмини Ацерет -->
+    Это чтение Шмини Ацерет, повтор-->
             <shabbos>
                 <aliyah n="1" fromChapter="14" fromVerse="22"/>
                 <aliyah n="2" fromChapter="15" fromVerse="1"/>
