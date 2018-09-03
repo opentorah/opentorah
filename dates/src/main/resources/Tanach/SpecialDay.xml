@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta type="SpecialDay">
-    <!-- TODO 'day' is really a reading building block; this is not "Special Day", this is "Special Reading"  -->
+    <!-- TODO 'day' is really a reading build
+ing block; this is not "Special Day", this is "Special Reading"  -->
     <!-- TODO проработаь записки сумасшедшего: это уже всё вставлено или надо ещё что-то делать?
 Законы совпадений:
 1. 6) отодвигается при любом сожертвоприношения
@@ -309,11 +310,12 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
          1      0, 1.1, 1.2
          2      1.1
          3      1.2  TODO(@michaelko58) а что делают сфарадим чтобы дочитать до 7:23?
+              не делят 2: 1.1 1.2 3. 2.1 2.2
 
        day n, 1 < n < 8:
          Aliyah
-         1      n.1
-         2      n.2
+         1      n.1  
+         2      n.2  
          3      Ashkenaz/Chabad: (n+1).1 and (n+1).2
                 Sefard: n.1 and n.2
 
@@ -321,7 +323,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
          Aliyah
          1      8.1
          2      8.2
-         3      "end"
+         3      "end" Sefard : 8 end
 
        Shabat Chanukka Maftir: n
 
