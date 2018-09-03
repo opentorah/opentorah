@@ -4,8 +4,8 @@
     <names>
       <name lang="he">במדבר</name>
       <name lang="en">Numbers</name>
-      <name lang="en" transliteration="yes">Bemidbar</name>
-      <name lang="en" transliteration="yes">Bamidbar</name>
+      <name lang="en" transliterated="yes">Bemidbar</name>
+      <name lang="en" transliterated="yes">Bamidbar</name>
       <name lang="ru" transliterated="true">Бэмидбар</name>
     </names>
 
@@ -25,8 +25,8 @@
   <week fromChapter="4" fromVerse="21">
     <names>
       <name lang="he">נשא</name>
-      <name lang="en" transliteration="yes">Nasso</name>
-      <name lang="en" transliteration="yes">Naso</name>
+      <name lang="en" transliterated="yes">Nasso</name>
+      <name lang="en" transliterated="yes">Naso</name>
       <name lang="ru" transliterated="true">Насо</name>
     </names>
 
@@ -46,7 +46,7 @@
   <week fromChapter="8" fromVerse="1">
     <names>
       <name lang="he">בהעלותך</name>
-      <name lang="en" transliteration="yes">Beha'aloscha</name>
+      <name lang="en" transliterated="yes">Beha'aloscha</name>
       <name lang="ru" transliterated="true">Бэѓаалотха</name>
     </names>
 
@@ -66,7 +66,7 @@
   <week fromChapter="13" fromVerse="1">
     <names>
       <name lang="he">שלח</name>
-      <name lang="en" transliteration="yes">Shelach</name>
+      <name lang="en" transliterated="yes">Shelach</name>
       <name lang="ru" transliterated="true">Шлах</name>
     </names>
 
@@ -86,7 +86,7 @@
   <week fromChapter="16" fromVerse="1">
     <names>
       <name lang="he">קרח</name>
-      <name lang="en" transliteration="yes">Korach</name>
+      <name lang="en" transliterated="yes">Korach</name>
       <name lang="ru" transliterated="true">Корах</name>
     </names>
 
@@ -106,7 +106,7 @@
   <week fromChapter="19" fromVerse="1">
     <names>
       <name lang="he">חקת</name>
-      <name lang="en" transliteration="yes">Chukas</name>
+      <name lang="en" transliterated="yes">Chukas</name>
       <name lang="ru" transliterated="true">Хукат</name>
     </names>
 
@@ -129,7 +129,7 @@
   <week fromChapter="22" fromVerse="2">
     <names>
       <name lang="he">בלק</name>
-      <name lang="en" transliteration="yes">Balak</name>
+      <name lang="en" transliterated="yes">Balak</name>
       <name lang="ru" transliterated="true">Балак</name>
     </names>
 
@@ -152,7 +152,7 @@
   <week fromChapter="25" fromVerse="10">
     <names>
       <name lang="he">פנחס</name>
-      <name lang="en" transliteration="yes">Pinchas</name>
+      <name lang="en" transliterated="yes">Pinchas</name>
       <name lang="ru" transliterated="true">Пинхас</name>
     </names>
 
@@ -172,8 +172,8 @@
   <week fromChapter="30" fromVerse="2">
     <names>
       <name lang="he">מטות</name>
-      <name lang="en" transliteration="yes">Mattos</name>
-      <name lang="en" transliteration="yes">Matos</name>
+      <name lang="en" transliterated="yes">Mattos</name>
+      <name lang="en" transliterated="yes">Matos</name>
       <name lang="ru" transliterated="true">Матот</name>
     </names>
 
@@ -196,7 +196,7 @@
   <week fromChapter="33" fromVerse="1">
     <names>
       <name lang="he">מסעי</name>
-      <name lang="en" transliteration="yes">Masei</name>
+      <name lang="en" transliterated="yes">Masei</name>
       <name lang="ru" transliterated="true">Масъэй</name>
     </names>
 

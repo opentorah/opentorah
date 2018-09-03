@@ -1,4 +1,4 @@
-package org.podval.calendar.generate.chumash
+package org.podval.calendar.generate.tanach
 
 import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Year}

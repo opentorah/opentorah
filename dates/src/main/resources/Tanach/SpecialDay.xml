@@ -35,11 +35,11 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
 
     <!-- RULE: on weekday: add Torah reading, part1, part2 no Maftir/Haftorah;
                on Chanukka: alia 1,2,3 - part1
-               on Shabbos: usual Torah, add Maftir/Haftorah; (include rosh chodesh elul) 
-               on Shabbos Chamukka, Shkalim, Ha-hodesh, 
+               on Shabbos: usual Torah, add Maftir/Haftorah; (include rosh chodesh elul)
+               on Shabbos Chamukka, Shkalim, Ha-hodesh,
                        Alia 7: Rosh chodesh part 2
                     -  Shabbos  Rosh Chodesh Additional Haftorah
-               on Shabos rosh hodesh Menachem Ov  - only maftir rosh chodesh 
+               on Shabos rosh hodesh Menachem Ov  - only maftir rosh chodesh
                on Shabbos if Sunday is also Rosh Chodesh: add "Shabbos Erev Rosh Chodesh Additional Haftorah".
      -->
     <day n="Rosh Chodesh">
@@ -48,9 +48,9 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <aliyah n="1" fromVerse="1" toVerse="3"/>
             <aliyah n="2" fromVerse="2"/>
             <aliyah n="3" fromVerse="6" chanukka="2"/>
-          </part>       
+          </part>
           <part n=2>
-              <aliyah n="4" fromVerse="11" toVerse="15" chanukka="3"/>           
+              <aliyah n="4" fromVerse="11" toVerse="15" chanukka="3"/>
         </part>
        </torah>
          <maftir book="Numbers" fromChapter="28" fromVerse="9" toVerse="15"/>
@@ -64,7 +64,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         <haftarah book="Isaya" fromChapter="66" custom="Chabad">
             <part n="1" fromVerse="1" toVerse="1">
             <part n="2" fromVerse="23" toVerse="24">
-            <part n="3" fromVerse="23" toVerse="23">    
+            <part n="3" fromVerse="23" toVerse="23">
         </haftarah>
     </day>
     <day n="Shabbos Erev Rosh Chodesh Additional Haftorah">
@@ -72,9 +72,9 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <part n="1" fromVerse="18" toVerse="18">
             <part n="2" fromVerse="42" toVerse="42">
         </haftarah>
-    </day>        
-            
-            
+    </day>
+
+
 
     <!-- RULE: in the morning: Torah reading only;
                in the afternoon, 3rd aliyah is Maftir; read Haftarah. -->
@@ -87,7 +87,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         <haftarah book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56" toVerse="8"/>
     </day>
 
-    <!-- RULE: 
+    <!-- RULE:
                in the morning and the afternoon, 3rd aliyah is Maftir; read Haftarah. -->
     <day n="Tisha Bav">
         <torah book="Deuteronomy" fromChapter="4">
@@ -236,7 +236,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
              4         in the Holy Land - 6; in Diaspora - 5 and 6
 
            Maftir Shabbos Chol Hamoed Succos n :
-             in the Holy Land - n, in Diaspora - n and n+1 
+             in the Holy Land - n, in Diaspora - n and n+1
              -->
     <day n="Korbanot Succos">
         <torah book="Numbers" fromChapter="29">
@@ -308,19 +308,19 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
        day 1
          Aliyah
          1      0
-         2      1.1, 
+         2      1.1,
          2      1.2
            Sefarad   1. 0
-                     2.  1.1 1.2 
+                     2.  1.1 1.2
                      3. 2.1 2.2
 
        day n, 1 < n < 8:
          Aliyah
-         1      n.1  
-         2      n.2  
+         1      n.1
+         2      n.2
          3      Ashkenaz/Chabad: (n+1).1 and (n+1).2
                 Sefard: n.1 and n.2
-        
+
        day 8 (Zot Chanukka):
          Aliyah
          1      8.1
@@ -330,7 +330,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
        Shabat Chanukka Maftir: n
 
        Chanukka Rosh Chodesh: Aliyah 4: n
-       
+
     -->
     <day n="Korbanot Channukah" book="Numbers" fromChapter="7">
       <text n="0" fromVerse="1" toVerse="11"/>
@@ -398,7 +398,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
                on other days of Pesach, add "Pesach Additional Torah Reading"
                  as 4th aliyah on weekdays and as Maftir on Shabbos and last festival days.
 
-       
+
 2. Кадеш: Шмот, 13:1-16
 3. Кесеф: Шмот, 22:24 -23:19
 4. Псоль: Шмот, 34:1-26
@@ -413,7 +413,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
 3 день - 2
 4 день - 3
 6 день - 5
-Когда первый день Песаха в пятый день недели: 
+Когда первый день Песаха в пятый день недели:
 4 день - 2
 5 день - 3
 6 день - 5

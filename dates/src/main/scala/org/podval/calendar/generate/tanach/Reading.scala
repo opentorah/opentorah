@@ -1,4 +1,4 @@
-package org.podval.calendar.generate.chumash
+package org.podval.calendar.generate.tanach
 
 /*
 Days without Tachanun
