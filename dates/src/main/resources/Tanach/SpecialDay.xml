@@ -433,8 +433,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <aliyah n="3" fromVerse="29"/>
             <aliyah n="4" fromVerse="37"/>
             <aliyah n="5" fromVerse="43" toVerse="51"/>
-
-            <shabbos>
+           <shabbos>
                 <aliyah n="1" fromVerse="21"/>
                 <aliyah n="2" fromVerse="25"/>
                 <aliyah n="3" fromVerse="29"/>
@@ -442,26 +441,25 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
                 <aliyah n="5" fromVerse="37"/>
                 <aliyah n="6" fromVerse="43"/>
                 <aliyah n="7" fromVerse="48" toVerse="51"/>
-            </shabbos>
+            </shabbos>  
         </torah>
         <haftarah book="Joshua">
             <part n="1" fromChapter="3" fromVerse="5" toVerse="7"/>
             <part n="2" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
             <part n="3" fromChapter="6" fromVerse="27"/>
         </haftarah>
-    </day>
-
-    <!-- TODO aliyot a split differently in Diaspora (and that is the only difference between the Holy Land and
-           Diaspora remaining in the data).  @Dubinsky אולי גם כאן נעשה שתי קריאות?
-         -->
+    </day>           
+            
+            
     <day n="Pesach 2">
         <torah book="Leviticus">
             <aliyah n="1" fromChapter="22" fromVerse="26"/>
             <aliyah n="2" fromChapter="23" fromVerse="4"/>
             <aliyah n="3" fromChapter="23" fromVerse="15" toVerse="44"/>
             <aliyah n="3" fromChapter="23" fromVerse="15" toVerse="22" diaspora="true"/>
-            <aliyah n="4" fromChapter="23" fromVerse="23"/>
-            <aliyah n="5" fromChapter="23" fromVerse="33" toVerse="44"/>
+            <aliyah n="4" fromChapter="23" fromVerse="23" diaspora="true"/>
+           <aliyah n="5" fromChapter="23" fromVerse="33" toVerse="44" diaspora="true"/>
+                  
         </torah>
         <haftarah book="Kings II" fromChapter="23"> <!-- Diaspora -->
             <part n="1" fromVerse="1" toVerse="9"/>
@@ -534,17 +532,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <aliyah n="4" fromChapter="16" fromVerse="9"/>
             <aliyah n="5" fromChapter="16" fromVerse="13" toVerse="17"/>
 
-            <!-- TODO(@michaelko58) мне кажерся, что ты это хочешь грохнуть. Почему?
-    Это чтение Шмини Ацерет, повтор-->
-            <shabbos>
-                <aliyah n="1" fromChapter="14" fromVerse="22"/>
-                <aliyah n="2" fromChapter="15" fromVerse="1"/>
-                <aliyah n="3" fromChapter="15" fromVerse="19"/>
-                <aliyah n="4" fromChapter="16" fromVerse="1"/>
-                <aliyah n="5" fromChapter="16" fromVerse="4"/>
-                <aliyah n="6" fromChapter="16" fromVerse="9"/>
-                <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17"/>
-            </shabbos>
+            <!--RULE - shabos - above Shmini atceres-->
         </torah>
         <haftarah book="Isaia" fromChapter="10" fromVerse="32" toChapter="12" toVerse="6"/>
     </day>
@@ -569,23 +557,8 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
     </day>
 
     <day n="Shavuos 2">
-       <torah book="Deuteronomy">
-           <aliyah n="1" fromChapter="15" fromVerse="19"/>
-           <aliyah n="2" fromChapter="16" fromVerse="1"/>
-           <aliyah n="3" fromChapter="16" fromVerse="4"/>
-           <aliyah n="4" fromChapter="16" fromVerse="9"/>
-           <aliyah n="5" fromChapter="16" fromVerse="13" toVerse="17"/>
-
-           <shabbos>
-               <aliyah n="1" fromChapter="14" fromVerse="22"/>
-               <aliyah n="2" fromChapter="15" fromVerse="1"/>
-               <aliyah n="3" fromChapter="15" fromVerse="19"/>
-               <aliyah n="4" fromChapter="16" fromVerse="1"/>
-               <aliyah n="5" fromChapter="16" fromVerse="4"/>
-               <aliyah n="6" fromChapter="16" fromVerse="9"/>
-               <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17"/>
-           </shabbos>
-        </torah>
+       <!--RULE -shabos - above Shmini atceres
+                   hol - above 8 shel Pesach                    -->
         <haftarah book="Habakkuk" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
     </day>
 </meta>
