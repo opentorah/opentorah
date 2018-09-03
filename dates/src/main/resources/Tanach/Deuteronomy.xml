@@ -59,6 +59,7 @@
     <day n="5" fromChapter="10" fromVerse="12"/>
     <day n="6" fromChapter="11" fromVerse="10"/>
     <day n="7" fromChapter="11" fromVerse="22"/>
+    <maftir fromChapter="11" fromVerse="22"/>
   </week>
 
   <week fromChapter="11" fromVerse="26">
@@ -149,18 +150,18 @@
     </names>
 
     <aliyah n="2" fromChapter="29" fromVerse="12"/>
-    <aliyah n="3" fromChapter="29" fromVerse="15" toverse="28"/>
+    <aliyah n="3" fromChapter="29" fromVerse="15" toVerse="28"/>
 
     <day n="1" fromChapter="29" fromVerse="9"/>
     <day n="2" fromChapter="29" fromVerse="12"/>
     <day n="3" fromChapter="29" fromVerse="15"/>
     <day n="4" fromChapter="30" fromVerse="1"/>
-    <day n="2" fromChapter="30" fromVerse="1"  whentogether="true"/>
+    <day n="2" fromChapter="30" fromVerse="1"  combined="true"/>
     <day n="5" fromChapter="30" fromVerse="7"/>
-    <day n="3" fromChapter="30" fromVerse="7" whentogether="true"/>
+    <day n="3" fromChapter="30" fromVerse="7" combined="true"/>
     <day n="6" fromChapter="30" fromVerse="11"/>
     <day n="7" fromChapter="30" fromVerse="15"/>
-    <day n="4" fromChapter="30" fromVerse="15" whentogether="true"/>
+    <day n="4" fromChapter="30" fromVerse="15" combined="true"/>
     <maftir fromChapter="30" fromVerse="15"/>
   </week>
 
@@ -177,12 +178,12 @@
     <day n="1" fromChapter="31" fromVerse="1"/>
     <day n="2" fromChapter="31" fromVerse="4"/>
     <day n="3" fromChapter="31" fromVerse="7"/>
-    <day n="5" fromChapter="31" fromVerse="7" whentogether="true"/>
+    <day n="5" fromChapter="31" fromVerse="7" combined="true"/>
     <day n="4" fromChapter="31" fromVerse="10"/>
     <day n="5" fromChapter="31" fromVerse="14"/>
-    <day n="6" fromChapter="31" fromVerse="14" whentogether="true"/>
+    <day n="6" fromChapter="31" fromVerse="14" combined="true"/>
     <day n="6" fromChapter="31" fromVerse="20"/>
-    <day n="7" fromChapter="31" fromVerse="20" whentogether="true"/>
+    <day n="7" fromChapter="31" fromVerse="20" combined="true"/>
     <day n="7" fromChapter="31" fromVerse="25"/>
     <maftir fromChapter="31" fromVerse="28"/>
   </week>
@@ -209,7 +210,7 @@
     <maftir fromChapter="32" fromVerse="48"/>
   </week>
 
-
+  <!-- Read on Simchas Torah; Maftir is NOT what it says here :) -->
   <week fromChapter="33" fromVerse="1">
     <names>
       <name lang="he">וזאת הברכה</name>
@@ -228,5 +229,6 @@
     <day n="5" fromChapter="33" fromVerse="22"/>
     <day n="6" fromChapter="33" fromVerse="27"/>
     <day n="7" fromChapter="34" fromVerse="1"/>
+    <maftir fromChapter="34" fromVerse="1"/>
   </week>
 </book>

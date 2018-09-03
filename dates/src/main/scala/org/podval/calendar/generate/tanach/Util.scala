@@ -1,4 +1,4 @@
-package org.podval.calendar.generate.chumash
+package org.podval.calendar.generate.tanach
 
 object Util {
   // Will this *ever* be in the standard library?

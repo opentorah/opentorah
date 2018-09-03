@@ -1,4 +1,4 @@
-package org.podval.calendar.generate.chumash
+package org.podval.calendar.generate.tanach
 
 import org.scalatest.{FlatSpec, Matchers}
 import org.podval.calendar.jewish.{Jewish, SpecialDay, YearType}
