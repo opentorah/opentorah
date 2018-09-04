@@ -11,4 +11,6 @@ object Util {
   //    f(start) match { case (a, b) => b #:: unfoldInfinite(a)(f) }
 
   def unfoldInfiniteSimple[A](start: A)(f: A => A): Stream[A] = start #:: unfoldInfiniteSimple(f(start))(f)
+
+  def className(what: AnyRef): String = what.getClass.getSimpleName.replace("$", "")
 }

@@ -49,9 +49,9 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <aliyah n="2" fromVerse="2"/>
             <aliyah n="3" fromVerse="6" chanukka="2"/>
           </part>
-          <part n=2>
+          <part n="2">
               <aliyah n="4" fromVerse="11" toVerse="15" chanukka="3"/>
-        </part>
+          </part>
        </torah>
          <maftir book="Numbers" fromChapter="28" fromVerse="9" toVerse="15"/>
             <haftarah book="Isaia" fromChapter="66">
@@ -62,15 +62,15 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
 
     <day n="Shabbos  Rosh Chodesh Additional Haftorah">
         <haftarah book="Isaya" fromChapter="66" custom="Chabad">
-            <part n="1" fromVerse="1" toVerse="1">
-            <part n="2" fromVerse="23" toVerse="24">
-            <part n="3" fromVerse="23" toVerse="23">
+            <part n="1" fromVerse="1" toVerse="1"/>
+            <part n="2" fromVerse="23" toVerse="24"/>
+            <part n="3" fromVerse="23" toVerse="23"/>
         </haftarah>
     </day>
     <day n="Shabbos Erev Rosh Chodesh Additional Haftorah">
         <haftarah book="Samuel I" fromChapter="20" custom="Chabad">
-            <part n="1" fromVerse="18" toVerse="18">
-            <part n="2" fromVerse="42" toVerse="42">
+            <part n="1" fromVerse="18" toVerse="18"/>
+            <part n="2" fromVerse="42" toVerse="42"/>
         </haftarah>
     </day>
 
