@@ -129,16 +129,28 @@ object TanachParser {
     )
   }
 
-  // TODO validate aliyah/day/maftir against chapters.
-  private def processWeek(week: WeekParsed, chapters: Array[Int]): Tanach.ParshaStructure = {
+  // TODO validate aliyah against chapters.
+  private def processWeek(week: WeekParsed, chapters: Array[Int]): Parsha.Structure = {
+    val fromChapter = week.fromChapter
+    val fromVerse = week.fromVerse
     val toChapter = week.toChapter.get
     val toVerse = week.toVerse.get
-    new Tanach.ParshaStructure(
+    // TODO and pack the results
+    val days: Array[Parsha.Day] = processDays(
+      week.days,
+      chapters,
+      fromChapter: Int,
+      fromVerse: Int,
+      toChapter,
+      toVerse
+    )
+    new Parsha.Structure(
       names = week.names,
-      fromChapter = week.fromChapter,
-      fromVerse = week.fromVerse,
+      fromChapter = fromChapter,
+      fromVerse = fromVerse,
       toChapter = toChapter,
       toVerse = toVerse,
+      days = days,
       maftir = processMaftir(week.maftir, chapters, toChapter, toVerse)
     )
   }
@@ -187,6 +199,94 @@ object TanachParser {
     )
   }
 
+  private def processDays(
+    days: Seq[DayParsed],
+    chapters: Array[Int],
+    fromChapter: Int,
+    fromVerse: Int,
+    toChapter: Int,
+    toVerse: Int
+  ): Array[Parsha.Day] = {
+    val (defaultDays, nonDefaultDays) = days.partition(day => !day.isCombined && day.custom.isEmpty)
+
+    val implied1: Seq[DayParsed] = if (defaultDays.head.n == 1) Seq.empty else Seq(DayParsed(
+      n = 1,
+      fromChapter = fromChapter,
+      fromVerse = fromVerse,
+      toChapter = None,
+      toVerse = None,
+      custom = None,
+      isCombined = false
+    ))
+
+    val last = defaultDays.last
+    val implied7 = if (last.n == 7) Seq.empty[DayParsed] else {
+      val (nextChapter, nextVerse) = next(last.toChapter.get, last.toVerse.get, chapters)
+      Seq(DayParsed(
+        n = 7,
+        fromChapter = fromChapter,
+        fromVerse = fromVerse,
+        toChapter = Some(toChapter),
+        toVerse = Some(toVerse),
+        custom = None,
+        isCombined = false
+      ))
+    }
+
+    processDaysSequence(
+      days = implied1 ++ defaultDays ++ implied7,
+      fromChapter,
+      fromVerse,
+      toChapter,
+      toVerse,
+      chapters
+    )
+
+    // TODO process add customs and combined
+    // TODO check against Parsha what can be combined
+  }
+
+  private def processDaysSequence(
+    days: Seq[DayParsed],
+    fromChapter: Int,
+    fromVerse: Int,
+    toChapter: Int,
+    toVerse: Int,
+    chapters: Array[Int]
+  ): Array[Parsha.Day] = {
+    if (days.map(_.n) != (1 to 7))
+      throw new IllegalArgumentException("Wrong day numbers.")
+
+    def setImpliedTo(day: DayParsed, toChapterImplied: Int, toVerseImplied: Int): DayParsed = {
+      validateImpliedTo(day, toChapterImplied, toVerseImplied)
+      day.copy(toChapter = Some(toChapterImplied), toVerse = Some(toVerseImplied))
+    }
+
+    // Set implied toChapter/toVerse on days.
+    val daysWithTo = days.zip(days.tail).map { case (day, nextDay) =>
+      val (toChapterImplied, toVerseImplied) = prev(nextDay.fromChapter, nextDay.fromVerse, chapters)
+      setImpliedTo(day, toChapterImplied, toVerseImplied)
+    } :+ {
+      setImpliedTo(days.last, toChapter, toVerse)
+    }
+
+    // First day has to start correctly
+    val first = daysWithTo.head
+    require((first.fromChapter == fromChapter) && (first.fromVerse == fromVerse))
+
+    daysWithTo.map { day =>
+      validate(day.fromChapter, day.fromVerse, chapters)
+      validate(day.toChapter.get, day.toVerse.get, chapters)
+
+      new Parsha.Day(
+        fromChapter = day.fromChapter,
+        fromVerse = day.fromVerse,
+        toChapter = day.toChapter.get,
+        toVerse = day.toVerse.get
+      )
+    }.toArray
+  }
+
   private final case class MaftirParsed(
     fromChapter: Int,
     fromVerse: Int,
@@ -205,10 +305,10 @@ object TanachParser {
     )
   }
 
-  private def processMaftir(maftir: MaftirParsed, chapters: Array[Int], toChapter: Int, toVerse: Int): Tanach.Maftir = {
+  private def processMaftir(maftir: MaftirParsed, chapters: Array[Int], toChapter: Int, toVerse: Int): Parsha.Maftir = {
     validate(maftir.fromChapter, maftir.fromVerse, chapters)
     validateImpliedTo(maftir, toChapter, toVerse)
-    new Tanach.Maftir(
+    new Parsha.Maftir(
       fromChapter = maftir.fromChapter,
       fromVerse = maftir.fromVerse,
       toChapter = toChapter,
@@ -220,7 +320,8 @@ object TanachParser {
     if (chapter <= 0) throw new IllegalArgumentException("Non-positive chapter.")
     if (verse <= 0) throw new IllegalArgumentException("Non-positive verse.")
     if (chapter > chapters.length) throw new IllegalArgumentException("Chapter out of range")
-    if (verse > chapters(chapter-1)) throw new IllegalArgumentException("Verse out of range")
+    if (verse > chapters(chapter-1))
+      throw new IllegalArgumentException(s"Verse $verse out of chapter #$chapter of length ${chapters(chapter-1)}")
   }
 
   def prev(chapter: Int, verse: Int, chapters: Array[Int]): (Int, Int) = {
@@ -228,6 +329,13 @@ object TanachParser {
     if (verse > 1) (chapter, verse-1)
     else if (chapter > 1) (chapter-1, chapters(chapter-2))
     else throw new IllegalArgumentException("No chapters before the first one.")
+  }
+
+  def next(chapter: Int, verse: Int, chapters: Array[Int]): (Int, Int) = {
+    validate(chapter, verse, chapters)
+    if (verse < chapters(chapter)) (chapter, verse+1)
+    else if (chapter < chapters.length) (chapter+1, 1)
+    else throw new IllegalArgumentException("No chapters after the last one.")
   }
 
   def last(chapters: Array[Int]): (Int, Int) = (chapters.length, chapters(chapters.length-1))

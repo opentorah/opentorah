@@ -9,39 +9,13 @@ object Tanach {
   final class ChumashBookStructure(
     names: Names,
     chapters: Array[Int],
-    val weeks: Seq[ParshaStructure]
+    val weeks: Seq[Parsha.Structure]
   ) extends BookStructure(names, chapters)
 
   final class NachBookStructure(
     names: Names,
     chapters: Array[Int]
   ) extends BookStructure(names, chapters)
-
-  final class ParshaStructure(
-    val names: Names,
-    val fromChapter: Int,
-    val fromVerse: Int,
-    val toChapter: Int,
-    val toVerse: Int,
-    val maftir: Maftir
-  ) {
-    require(fromChapter > 0)
-    require(fromVerse > 0)
-  }
-
-  final class Aliyah(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
-
-  // TODO add custom and combined
-  // TODO check against Parsha what can be combined
-  final class Day(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
-
-  // TODO special Maftir has reference to the book; generalize?
-  final class Maftir(
-    val fromChapter: Int,
-    val fromVerse: Int,
-    val toChapter: Int,
-    val toVerse: Int
-  )
 
   sealed trait Book {
     def name: String = getClass.getSimpleName.replace("$", "")
@@ -51,12 +25,12 @@ object Tanach {
 
   trait ChumashBook extends Book {
     final override lazy val structure: ChumashBookStructure =
-      bookStructureForName(name).asInstanceOf[ChumashBookStructure]
+      structureForName(name).asInstanceOf[ChumashBookStructure]
   }
 
   trait NachBook extends Book {
     final override lazy val structure: NachBookStructure =
-      bookStructureForName(name).asInstanceOf[NachBookStructure]
+      structureForName(name).asInstanceOf[NachBookStructure]
   }
 
   case object Genesis extends ChumashBook
@@ -113,35 +87,23 @@ object Tanach {
 
   val all: Seq[Book] = chumash ++ nach
 
-  private val bookStructures: Seq[BookStructure] = TanachParser.parse
-  private val structure2book: Map[BookStructure, Book] =
-    all.map(book => book.structure -> book).toMap
-  require(bookStructures.toSet == structure2book.keySet)
+  private val structures: Seq[BookStructure] = TanachParser.parse
+  private val structure2book: Map[BookStructure, Book] = all.map(book => book.structure -> book).toMap
+  require(structures.toSet == structure2book.keySet)
 
-  private val parshaStructures: Seq[ParshaStructure] = chumash.flatMap(_.structure.weeks)
-  private val structure2parsha: Map[ParshaStructure, Parsha] =
-    Parsha.all.map(parsha => parsha.structure -> parsha).toMap
-  require(parshaStructures.toSet == structure2parsha.keySet)
-
-  def bookStructureForName(name: String): BookStructure = {
-    val result = bookStructures.filter(_.names.has(name))
+  private def structureForName(name: String): BookStructure = {
+    val result = structures.filter(_.names.has(name))
     require(result.nonEmpty, s"No structure for $name")
     require(result.length == 1)
     result.head
   }
 
-  def parshaStructureForName(name: String): ParshaStructure = {
-    val result = parshaStructures.filter(_.names.has(name))
-    require(result.nonEmpty, s"No structure for $name")
-    require(result.length == 1)
-    result.head
-  }
-
-  def bookForName(name: String): Book = structure2book(bookStructureForName(name))
+  def forName(name: String): Book = structure2book(structureForName(name))
 
   def main(args: Array[String]): Unit = {
     val genesis = Genesis.structure
-    val deuteronomy = bookForName("Devarim")
+    val genesisWeek = Parsha.Bereishis.structure
+    val deuteronomy = forName("Devarim")
     val z = 0
   }
 }

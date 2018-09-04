@@ -1,13 +1,42 @@
 package org.podval.calendar.generate.tanach
 
-// TODO fold into Tanach?
 sealed trait Parsha {
   def name: String = getClass.getSimpleName.replace("$", "")
 
-  lazy val structure: Tanach.ParshaStructure = Tanach.parshaStructureForName(name)
+  lazy val structure: Parsha.Structure = Parsha.structureForName(name)
 }
 
 object Parsha {
+  final class Structure(
+    val names: Names,
+    val fromChapter: Int,
+    val fromVerse: Int,
+    val toChapter: Int,
+    val toVerse: Int,
+    val days: Array[Day], // length 7 :)
+    val maftir: Maftir
+  ) {
+    require(fromChapter > 0)
+    require(fromVerse > 0)
+  }
+
+  final class Aliyah(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
+
+  final class Day(
+    val fromChapter: Int,
+    val fromVerse: Int,
+    val toChapter: Int,
+    val toVerse: Int
+  )
+
+  // TODO special Maftir has reference to the book; generalize?
+  final class Maftir(
+    val fromChapter: Int,
+    val fromVerse: Int,
+    val toChapter: Int,
+    val toVerse: Int
+  )
+
   case object Bereishis extends Parsha
   case object Noach extends Parsha
   case object LechLecha extends Parsha { override def name: String = "Lech Lecha" }
@@ -79,4 +108,17 @@ object Parsha {
   def indexOf(parsha: Parsha): Int = all.indexOf(parsha)
 
   def distance(from: Parsha, to: Parsha): Int = indexOf(to) - indexOf(from)
+
+  def forName(name: String): Parsha = structure2parsha(structureForName(name))
+
+  private val structures: Seq[Parsha.Structure] = Tanach.chumash.flatMap(_.structure.weeks)
+  private val structure2parsha: Map[Parsha.Structure, Parsha] = all.map(parsha => parsha.structure -> parsha).toMap
+  require(structures.toSet == structure2parsha.keySet)
+
+  private def structureForName(name: String): Parsha.Structure = {
+    val result = structures.filter(_.names.has(name))
+    require(result.nonEmpty, s"No structure for $name")
+    require(result.length == 1)
+    result.head
+  }
 }
