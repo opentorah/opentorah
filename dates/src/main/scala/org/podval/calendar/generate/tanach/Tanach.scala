@@ -24,13 +24,11 @@ object Tanach {
   }
 
   trait ChumashBook extends Book {
-    final override lazy val structure: ChumashBookStructure =
-      structureForName(name).asInstanceOf[ChumashBookStructure]
+    final override def structure: ChumashBookStructure = TanachParser.forBook(this)
   }
 
   trait NachBook extends Book {
-    final override lazy val structure: NachBookStructure =
-      structureForName(name).asInstanceOf[NachBookStructure]
+    final override def structure: NachBookStructure = TanachParser.forBook(this)
   }
 
   case object Genesis extends ChumashBook
@@ -42,9 +40,9 @@ object Tanach {
   case object Joshua extends NachBook
   case object Judges extends NachBook
   case object SamuelI extends NachBook { override def name: String = "Samuel I" }
-  case object SamuelII  extends NachBook { override def name: String = "Samuel II" }
+  case object SamuelII extends NachBook { override def name: String = "Samuel II" }
   case object KingsI extends NachBook { override def name: String = "Kings I" }
-  case object KingsII  extends NachBook { override def name: String = "Kings II" }
+  case object KingsII extends NachBook { override def name: String = "Kings II" }
   case object Isaiah extends NachBook
   case object Jeremiah extends NachBook
   case object Ezekiel extends NachBook
@@ -79,31 +77,23 @@ object Tanach {
 
   val chumash: Seq[ChumashBook] = Seq(Genesis, Exodus, Leviticus, Numbers, Deuteronomy)
 
-  val nach: Seq[NachBook] = Seq(
+  val prophets: Seq[NachBook] = Seq(
     Joshua, Judges, SamuelI, SamuelII, KingsI, KingsII, Isaiah, Jeremiah, Ezekiel,
-    Hosea, Joel, Amos, Obadiah, Jonah, Micah, Nahum, Habakkuk, Zephaniah, Haggai, Zechariah, Malachi,
-    Psalms, Proverbs, Job, SongOfSongs, Ruth, Lamentations, Ecclesiastes, Esther,
-    Daniel, Ezra, Nehemiah, ChroniclesI, ChroniclesII)
+    Hosea, Joel, Amos, Obadiah, Jonah, Micah, Nahum, Habakkuk, Zephaniah, Haggai, Zechariah, Malachi)
+
+  val writings: Seq[NachBook] = Seq(Psalms, Proverbs, Job, SongOfSongs, Ruth, Lamentations, Ecclesiastes,
+    Esther, Daniel, Ezra, Nehemiah, ChroniclesI, ChroniclesII)
+
+  val nach: Seq[NachBook] = prophets ++ writings
 
   val all: Seq[Book] = chumash ++ nach
 
-  private val structures: Seq[BookStructure] = TanachParser.parse
-  private val structure2book: Map[BookStructure, Book] = all.map(book => book.structure -> book).toMap
-  require(structures.toSet == structure2book.keySet)
-
-  private def structureForName(name: String): BookStructure = {
-    val result = structures.filter(_.names.has(name))
-    require(result.nonEmpty, s"No structure for $name")
-    require(result.length == 1)
-    result.head
-  }
-
-  def forName(name: String): Book = structure2book(structureForName(name))
+  def forName(name: String): Option[Book] = TanachParser.forBookName(name)
 
   def main(args: Array[String]): Unit = {
     val genesis = Genesis.structure
     val genesisWeek = Parsha.Bereishis.structure
-    val deuteronomy = forName("Devarim")
+    val deuteronomy = forName("Devarim").get.structure
     val z = 0
   }
 }

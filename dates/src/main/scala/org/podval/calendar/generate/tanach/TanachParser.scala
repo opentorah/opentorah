@@ -1,41 +1,67 @@
 package org.podval.calendar.generate.tanach
 
 import scala.xml.Elem
-import XML.{getIntAttribute, doGetIntAttribute}
+import XML.{doGetIntAttribute, getIntAttribute}
 
 object TanachParser {
-  def parse: Seq[Tanach.BookStructure] = {
+  private val (
+    chumash: Map[Tanach.ChumashBook, Tanach.ChumashBookStructure],
+    nach: Map[Tanach.NachBook, Tanach.NachBookStructure]
+  ) = {
     val baseUrl = XML.baseUrl
-    val url = XML.childFileURL(baseUrl, "Tanach")
-    val children: Seq[Elem] = XML.checkMeta(XML.loadResource(url).get, "Tanach")
-    val books: Seq[(Map[String, String], Names, Seq[Elem])] = children.map(NamesParser.doParse(_, "book", Set("n")))
-    Names.checkDisjoint(books.map(_._2))
-    val books1 = books.map { case (_, names, elements) =>
-      if (elements.nonEmpty) (names, elements) else {
-        val subresources: Seq[Elem] = names.names.flatMap(name => XML.loadResource(XML.childFileURL(baseUrl, name.name)))
-        if (subresources.size > 1) throw new IllegalArgumentException("More than one subresource.")
-        if (subresources.isEmpty) (names, elements) else {
-          val (_, newNames, newElements) = NamesParser.parse(subresources.head, "book", Set("n"))
-          val mergedNames: Names = newNames.fold(names)(newNames => Names.merge(names, newNames))
-          (mergedNames, newElements)
-        }
+    val books: Seq[(Names, Seq[Elem])] =
+      XML.checkMeta(XML.loadResource(XML.childFileURL(baseUrl, "Tanach")).get, "Tanach").map { element =>
+        XML.loadSubresource(element, "book", baseUrl)
       }
+    Names.checkDisjoint(books.map(_._1))
+
+    val chumash = Tanach.chumash.zip(books.take(Tanach.chumash.length)).map {
+      case (book: Tanach.ChumashBook, (names: Names, elements: Seq[Elem])) =>
+        require(names.has(book.name))
+        book -> parseChumashBook(book, names, elements)
     }
-    books1.take(5).map { case (names, elements) => parseChumashBook(names, elements) } ++
-    books1.drop(5).map { case (names, elements) => parseNachhBook(names, elements) }
+
+    val nach = Tanach.nach.zip(books.drop(Tanach.chumash.length)).map {
+      case (book: Tanach.NachBook, (names: Names, elements: Seq[Elem])) =>
+        require(names.has(book.name))
+        book -> parseNachBook(book, names, elements)
+    }
+
+    (chumash.toMap, nach.toMap)
   }
 
-  private def parseChumashBook(names: Names, elements: Seq[Elem]): Tanach.ChumashBookStructure = {
+  def forBook(book: Tanach.ChumashBook): Tanach.ChumashBookStructure = chumash(book)
+
+  def forBook(book: Tanach.NachBook): Tanach.NachBookStructure = nach(book)
+
+  def forBookName(name: String): Option[Tanach.Book] =
+    chumash.find(_._2.names.has(name)).map(_._1).orElse(nach.find(_._2.names.has(name)).map(_._1))
+
+  private val parsha2structure: Map[Parsha, Parsha.Structure] = chumash.flatMap {
+    case (book: Tanach.ChumashBook, structure: Tanach.ChumashBookStructure) =>
+      Parsha.forBook(book).zip(structure.weeks)
+  }
+
+  def forParsha(parsha: Parsha): Parsha.Structure = parsha2structure(parsha)
+
+  def forParshaName(name: String): Option[Parsha] =
+    parsha2structure.find(_._2.names.has(name)).map(_._1)
+
+  private def parseChumashBook(
+    book: Tanach.ChumashBook,
+    names: Names,
+    elements: Seq[Elem]
+  ): Tanach.ChumashBookStructure = {
     val (chapterElements, weekElements) = XML.span(elements, "chapter", "week")
-    if (weekElements.isEmpty) throw new IllegalArgumentException("No weeks.")
+    require(weekElements.nonEmpty, "No weeks.")
     val chapters = parseChapters(chapterElements)
     val weeksParsed = weekElements.map(parseWeek)
 
     // Validate 'from' for each week.
     weeksParsed.foreach(week => validate(week.fromChapter, week.fromVerse, chapters))
     val firstWeek = weeksParsed.head
-    if ((firstWeek.fromChapter != 1) || (firstWeek.fromVerse != 1))
-      throw new IllegalArgumentException(s"First week doesn't start at 1:1: ${firstWeek.names}")
+    require((firstWeek.fromChapter == 1) && (firstWeek.fromVerse == 1),
+      s"First week doesn't start at 1:1: ${firstWeek.names}")
 
     def setImpliedTo(week: WeekParsed, toChapterImplied: Int, toVerseImplied: Int): WeekParsed = {
       validateImpliedTo(week, toChapterImplied, toVerseImplied)
@@ -59,7 +85,11 @@ object TanachParser {
     )
   }
 
-  private def parseNachhBook(names: Names, elements: Seq[Elem]): Tanach.NachBookStructure = {
+  private def parseNachBook(
+    book: Tanach.NachBook,
+    names: Names,
+    elements: Seq[Elem]
+  ): Tanach.NachBookStructure = {
     val (chapterElements, tail) = XML.span(elements, "chapter")
     XML.checkNoMoreElements(tail)
     new Tanach.NachBookStructure(
@@ -79,8 +109,7 @@ object TanachParser {
       )
     }
 
-    if (chapters.map(_.n) != (1 to chapters.length))
-      throw new IllegalArgumentException("Wrong chapter numbers.")
+    require(chapters.map(_.n) == (1 to chapters.length), "Wrong chapter numbers.")
 
     chapters.map(_.length).toArray
   }
@@ -93,10 +122,8 @@ object TanachParser {
   }
 
   private def validateImpliedTo(fragment: Fragment, toChapterImplied: Int, toVerseImplied: Int): Unit = {
-    if (fragment.toChapter.nonEmpty && !fragment.toChapter.contains(toChapterImplied))
-      throw new IllegalArgumentException("Wrong explicit 'toChapter'")
-    if (fragment.toVerse.nonEmpty && !fragment.toVerse.contains(toVerseImplied))
-      throw new IllegalArgumentException("Wrong explicit 'toVerse'")
+    require(fragment.toChapter.isEmpty || fragment.toChapter.contains(toChapterImplied), "Wrong explicit 'toChapter'")
+    require(fragment.toVerse.isEmpty || fragment.toVerse.contains(toVerseImplied), "Wrong explicit 'toVerse'")
   }
 
   private final case class WeekParsed(
@@ -111,11 +138,11 @@ object TanachParser {
   ) extends Fragment
 
   private def parseWeek(element: Elem): WeekParsed = {
-    val (attributes, names, elements) = NamesParser.doParse(element, "week", Set("n", "fromChapter", "fromVerse"))
+    val (attributes, names, elements) = XML.doParseNames(element, "week", Set("n", "fromChapter", "fromVerse"))
     val (aliyahElements, dayElements, maftirElements) = XML.span(elements, "aliyah", "day", "maftir")
     // TODO introduce convenience methods:
-    if (maftirElements.isEmpty) throw new IllegalArgumentException(s"No 'maftir' in $names.")
-    if (maftirElements.size > 1) throw new IllegalArgumentException("Spurious 'maftir'.")
+    require(maftirElements.nonEmpty, s"No 'maftir' in $names.")
+    require(maftirElements.size <= 1, "Spurious 'maftir'.")
 
     WeekParsed(
       names,
@@ -224,8 +251,8 @@ object TanachParser {
       val (nextChapter, nextVerse) = next(last.toChapter.get, last.toVerse.get, chapters)
       Seq(DayParsed(
         n = 7,
-        fromChapter = fromChapter,
-        fromVerse = fromVerse,
+        fromChapter = nextChapter,
+        fromVerse = nextVerse,
         toChapter = Some(toChapter),
         toVerse = Some(toVerse),
         custom = None,
@@ -254,8 +281,7 @@ object TanachParser {
     toVerse: Int,
     chapters: Array[Int]
   ): Array[Parsha.Day] = {
-    if (days.map(_.n) != (1 to 7))
-      throw new IllegalArgumentException("Wrong day numbers.")
+    require(days.map(_.n) == (1 to 7), "Wrong day numbers.")
 
     def setImpliedTo(day: DayParsed, toChapterImplied: Int, toVerseImplied: Int): DayParsed = {
       validateImpliedTo(day, toChapterImplied, toVerseImplied)
@@ -317,11 +343,10 @@ object TanachParser {
   }
 
   def validate(chapter: Int, verse: Int, chapters: Array[Int]): Unit = {
-    if (chapter <= 0) throw new IllegalArgumentException("Non-positive chapter.")
-    if (verse <= 0) throw new IllegalArgumentException("Non-positive verse.")
-    if (chapter > chapters.length) throw new IllegalArgumentException("Chapter out of range")
-    if (verse > chapters(chapter-1))
-      throw new IllegalArgumentException(s"Verse $verse out of chapter #$chapter of length ${chapters(chapter-1)}")
+    require(chapter > 0, "Non-positive chapter.")
+    require(verse > 0, "Non-positive verse.")
+    require(chapter <= chapters.length, "Chapter out of range")
+    require(verse <= chapters(chapter-1), s"Verse $verse out of chapter #$chapter of length ${chapters(chapter-1)}")
   }
 
   def prev(chapter: Int, verse: Int, chapters: Array[Int]): (Int, Int) = {

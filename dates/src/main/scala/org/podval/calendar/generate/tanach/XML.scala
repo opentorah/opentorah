@@ -10,7 +10,7 @@ object XML {
 
   def getURL(name: String): URL = getClass.getClassLoader.getResource(name)
 
-  def childURL(parent: URL, name: String): URL = new URL(
+  private def childURL(parent: URL, name: String): URL = new URL(
     parent.getProtocol, parent.getHost, parent.getPort, parent.getFile + "/" + name, null)
 
   def childFileURL(parent: URL, name: String): URL = childURL(parent, name + ".xml")
@@ -24,11 +24,67 @@ object XML {
     }
   }
 
-  def open(element: Elem, name: String, allowedAttributes: Set[String]): (Map[String, String], Seq[Elem]) = {
+  def loadSubresource(element: Elem, elementName: String, baseUrl: URL): (Names, Seq[Elem]) = {
+    val (attributes: Map[String, String], names: Names, elements: Seq[Elem]) = doParseNames(element, elementName, Set("n"))
+
+    if (elements.nonEmpty) (names, elements) else {
+      val subresources: Seq[Elem] = names.names.flatMap(name => loadResource(childFileURL(baseUrl, name.name)))
+      require(subresources.size <= 1, "More than one subresource.")
+      if (subresources.isEmpty) (names, elements) else {
+        val (_, newNames, newElements) = parseNames(subresources.head, elementName, Set("n"))
+        (
+          newNames.fold(names)(Names.merge(names, _)),
+          newElements
+        )
+      }
+    }
+  }
+
+  def doParseNames(element: Elem, name: String, allowedAttributes: Set[String]): (Map[String, String], Names, Seq[Elem]) = {
+    val (attributes, names, elements) = parseNames(element, name, allowedAttributes)
+    (attributes, names.get, elements)
+  }
+
+  private def parseNames(element: Elem, name: String, allowedAttributes: Set[String]): (Map[String, String], Option[Names], Seq[Elem]) = {
+    val (attributes, elements) = open(element, name, allowedAttributes)
+    val defaultName: Option[Name] = attributes.get("n").map {
+      defaultName => Name(defaultName, None, None, None)
+    }
+    val (namesElements, tail) = span(elements, "names")
+    // TODO make a convenience method?
+    require(namesElements.size <= 1, "Multiple 'names' elements.")
+    val namesElement: Option[Elem] = namesElements.headOption
+    val names: Seq[Name] = if (namesElement.isEmpty)
+      if (defaultName.isEmpty) Seq.empty else Seq(defaultName.get)
+    else {
+      val (_, nameElements) = open(namesElement.get, "names", Set.empty)
+      val nonDefaultNames: Seq[Name] = nameElements.map(parseName)
+      defaultName.fold(nonDefaultNames)(_ +: nonDefaultNames)
+    }
+
+    (attributes, if (names.isEmpty) None else Some(new Names(names)) , tail)
+  }
+
+  private def parseName(element: Elem): Name = {
+    val attributes = openEmpty(element, "name", Set("n", "lang", "transliterated", "flavour"))
+    val n: Option[String] = attributes.get("n")
+    val text: Option[String] = getText(element)
+    require(n.isEmpty || text.isEmpty, "Both 'n' attribute and text are present.")
+    val name: Option[String] = n.orElse(text)
+    require(name.nonEmpty, "Both 'n' attribute and text are absent.")
+    Name(
+      name.get,
+      lang = attributes.get("lang"),
+      isTransliterated = getBooleanAttribute(attributes, "transliterated"),
+      flavour = attributes.get("flavour")
+    )
+  }
+
+  private def open(element: Elem, name: String, allowedAttributes: Set[String]): (Map[String, String], Seq[Elem]) = {
     val attributes = check(element, name, allowedAttributes)
 
     val (elements, nonElements) = element.child.partition(_.isInstanceOf[Elem])
-    if (nonElements.nonEmpty) throw new IllegalArgumentException("Non-element children present.")
+    require(nonElements.isEmpty, "Non-element children present.")
 
     (attributes, elements.map(_.asInstanceOf[Elem]))
   }
@@ -38,18 +94,15 @@ object XML {
     val attributes = check(element, name, allowedAttributes)
 
     val (elements, _) = element.child.partition(_.isInstanceOf[Elem])
-    if (elements.nonEmpty) throw new IllegalArgumentException("Nested elements present.")
+    require(elements.isEmpty, "Nested elements present.")
 
     attributes
   }
 
   private def check(element: Elem, name: String, allowedAttributes: Set[String]): Map[String, String] = {
-    if (element.label != name) throw new IllegalArgumentException(s"Wrong element: ${element.label} instead of $name")
+    require(element.label == name, s"Wrong element: ${element.label} instead of $name")
     val attributes = getAttributes(element)
-    attributes.foreach { case (key, _) =>
-      if (!allowedAttributes.contains(key))
-        throw new IllegalArgumentException(s"Attribute $key not allowed.")
-    }
+    attributes.foreach { case (key, _) => require(allowedAttributes.contains(key), s"Attribute $key not allowed.") }
     attributes
   }
 
@@ -62,7 +115,7 @@ object XML {
   def getIntAttribute(attributes: Map[String, String], name: String): Option[Int] = {
     attributes.get(name).map { attribute =>
       val result = attribute.toInt
-      if (result <= 0) throw new IllegalArgumentException(s"Non-positive integer: $result")
+      require(result > 0, s"Non-positive integer: $result")
       result
     }
   }
@@ -83,12 +136,12 @@ object XML {
   def checkMeta(element: Elem, what: String): Seq[Elem] = {
     val (attributes, elements) = open(element, "meta", Set("type"))
     val typeOption = attributes.get("type")
-    if (typeOption.isEmpty) throw new IllegalArgumentException("Attribute 'type' missing.")
-    if (typeOption.get != what) throw new IllegalArgumentException("Wrong type.")
+    require(typeOption.nonEmpty, "Attribute 'type' missing.")
+    require(typeOption.get == what, "Wrong type.")
     elements
   }
 
-  def text(element: Elem): Option[String] = {
+  private def getText(element: Elem): Option[String] = {
     val result = element.text
     if (result.isEmpty) None else Some(result)
   }
@@ -113,7 +166,7 @@ object XML {
   }
 
   def checkNoMoreElements(elements: Seq[Elem]): Unit =
-    if (elements.nonEmpty) throw new IllegalArgumentException(s"Spurious elements: ${elements.head.label}")
+    require(elements.isEmpty, s"Spurious elements: ${elements.head.label}")
 
   def print(xml: Node, outStream: OutputStream): Unit = print(xml, new OutputStreamWriter(outStream))
   def print(xml: Node, outFile: File): Unit = print(xml, new FileWriter(outFile))
