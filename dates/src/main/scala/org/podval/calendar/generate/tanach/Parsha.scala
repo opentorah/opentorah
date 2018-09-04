@@ -5,9 +5,11 @@ import org.podval.calendar.generate.tanach.Tanach.ChumashBook
 sealed trait Parsha {
   def book: ChumashBook
 
-  def name: String = getClass.getSimpleName.replace("$", "")
+  def name: String = Util.className(this)
 
-  final def structure: Parsha.Structure = TanachParser.forParsha(this)
+  final def structure: Parsha.Structure = Parsha.parshaStructure(this)
+
+  final def names: Names = structure.names
 }
 
 object Parsha {
@@ -139,5 +141,12 @@ object Parsha {
 
   def distance(from: Parsha, to: Parsha): Int = indexOf(to) - indexOf(from)
 
-  def forName(name: String): Option[Parsha] = TanachParser.forParshaName(name)
+  private val parshaStructure: Map[Parsha, Structure] = Tanach.chumash.flatMap {
+    // TODO once the structures are bound tighter, not only the names will be checked,
+    // but this correspondence will be already calculated:
+    book => forBook(book).zip(book.structure.weeks)
+  }.toMap
+
+
+  def forName(name: String): Option[Parsha] = parshaStructure.find(_._2.names.has(name)).map(_._1)
 }

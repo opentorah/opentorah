@@ -4,9 +4,9 @@ import scala.xml.Elem
 import XML.{doGetIntAttribute, getIntAttribute}
 
 object TanachParser {
-  private val (
-    chumash: Map[Tanach.ChumashBook, Tanach.ChumashBookStructure],
-    nach: Map[Tanach.NachBook, Tanach.NachBookStructure]
+  def parse: (
+    Map[Tanach.ChumashBook, Tanach.ChumashBookStructure],
+    Map[Tanach.NachBook, Tanach.NachBookStructure]
   ) = {
     val baseUrl = XML.baseUrl
     val books: Seq[(Names, Seq[Elem])] =
@@ -29,23 +29,6 @@ object TanachParser {
 
     (chumash.toMap, nach.toMap)
   }
-
-  def forBook(book: Tanach.ChumashBook): Tanach.ChumashBookStructure = chumash(book)
-
-  def forBook(book: Tanach.NachBook): Tanach.NachBookStructure = nach(book)
-
-  def forBookName(name: String): Option[Tanach.Book] =
-    chumash.find(_._2.names.has(name)).map(_._1).orElse(nach.find(_._2.names.has(name)).map(_._1))
-
-  private val parsha2structure: Map[Parsha, Parsha.Structure] = chumash.flatMap {
-    case (book: Tanach.ChumashBook, structure: Tanach.ChumashBookStructure) =>
-      Parsha.forBook(book).zip(structure.weeks)
-  }
-
-  def forParsha(parsha: Parsha): Parsha.Structure = parsha2structure(parsha)
-
-  def forParshaName(name: String): Option[Parsha] =
-    parsha2structure.find(_._2.names.has(name)).map(_._1)
 
   private def parseChumashBook(
     book: Tanach.ChumashBook,
@@ -81,7 +64,7 @@ object TanachParser {
     new Tanach.ChumashBookStructure(
       firstWeek.names,
       chapters,
-      weeksWithTo.map(week => processWeek(week, chapters))
+      weeksWithTo.map(processWeek(_, chapters))
     )
   }
 
