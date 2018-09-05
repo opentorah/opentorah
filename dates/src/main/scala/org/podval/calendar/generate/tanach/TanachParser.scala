@@ -2,11 +2,12 @@ package org.podval.calendar.generate.tanach
 
 import scala.xml.Elem
 import XML.{doGetIntAttribute, getIntAttribute}
+import Tanach.{ChumashBook, ChumashBookStructure, NachBook, NachBookStructure}
 
 object TanachParser {
   def parse: (
-    Map[Tanach.ChumashBook, Tanach.ChumashBookStructure],
-    Map[Tanach.NachBook, Tanach.NachBookStructure]
+    Map[ChumashBook, ChumashBookStructure],
+    Map[NachBook, NachBookStructure]
   ) = {
     val baseUrl = XML.baseUrl
     val books: Seq[(Names, Seq[Elem])] =
@@ -16,13 +17,13 @@ object TanachParser {
     Names.checkDisjoint(books.map(_._1))
 
     val chumash = Tanach.chumash.zip(books.take(Tanach.chumash.length)).map {
-      case (book: Tanach.ChumashBook, (names: Names, elements: Seq[Elem])) =>
+      case (book: ChumashBook, (names: Names, elements: Seq[Elem])) =>
         require(names.has(book.name))
         book -> parseChumashBook(book, names, elements)
     }
 
     val nach = Tanach.nach.zip(books.drop(Tanach.chumash.length)).map {
-      case (book: Tanach.NachBook, (names: Names, elements: Seq[Elem])) =>
+      case (book: NachBook, (names: Names, elements: Seq[Elem])) =>
         require(names.has(book.name))
         book -> parseNachBook(book, names, elements)
     }
@@ -30,60 +31,49 @@ object TanachParser {
     (chumash.toMap, nach.toMap)
   }
 
-  private def parseChumashBook(
-    book: Tanach.ChumashBook,
+  private def parseNachBook(
+    book: NachBook,
     names: Names,
     elements: Seq[Elem]
-  ): Tanach.ChumashBookStructure = {
-    val (chapterElements, weekElements) = XML.span(elements, "chapter", "week")
-    require(weekElements.nonEmpty, "No weeks.")
-    val chapters = parseChapters(chapterElements)
-    val weeksParsed = weekElements.map(parseWeek)
-
-    // Validate 'from' for each week.
-    weeksParsed.foreach(week => validate(week.fromChapter, week.fromVerse, chapters))
-    val firstWeek = weeksParsed.head
-    require((firstWeek.fromChapter == 1) && (firstWeek.fromVerse == 1),
-      s"First week doesn't start at 1:1: ${firstWeek.names}")
-
-    def setImpliedTo(week: WeekParsed, toChapterImplied: Int, toVerseImplied: Int): WeekParsed = {
-      validateImpliedTo(week, toChapterImplied, toVerseImplied)
-      week.copy(toChapter = Some(toChapterImplied), toVerse = Some(toVerseImplied))
-    }
-
-    // Set implied toChapter/toVerse on weeks.
-    val weeksWithTo =
-      weeksParsed.zip(weeksParsed.tail).map { case (week, nextWeek) =>
-        val (toChapterImplied, toVerseImplied) = prev(nextWeek.fromChapter, nextWeek.fromVerse, chapters)
-        setImpliedTo(week, toChapterImplied, toVerseImplied)
-      } :+ {
-        val (lastToChapter, lastToVerse) = last(chapters)
-        setImpliedTo(weeksParsed.last, lastToChapter, lastToVerse)
-      }
-
-    new Tanach.ChumashBookStructure(
-      firstWeek.names,
-      chapters,
-      weeksWithTo.map(processWeek(_, chapters))
+  ): NachBookStructure = {
+    val (chapterElements, tail) = XML.span(elements, "chapter")
+    XML.checkNoMoreElements(tail)
+    new NachBookStructure(
+      book,
+      names,
+      chapters = parseChapters(book, chapterElements)
     )
   }
 
-  private def parseNachBook(
-    book: Tanach.NachBook,
+  private def parseChumashBook(
+    book: ChumashBook,
     names: Names,
     elements: Seq[Elem]
-  ): Tanach.NachBookStructure = {
-    val (chapterElements, tail) = XML.span(elements, "chapter")
-    XML.checkNoMoreElements(tail)
-    new Tanach.NachBookStructure(
-      names,
-      chapters = parseChapters(chapterElements)
+  ): ChumashBookStructure = {
+    val (chapterElements, weekElements) = XML.span(elements, "chapter", "week")
+    val chapters: Chapters = parseChapters(book, chapterElements)
+    val weeksParsed: Seq[WeekParsed] = weekElements.map(parseWeek)
+
+    val weekSpans: Seq[Span] = processSpanSequence(weeksParsed.map(_.span), chapters.full, chapters)
+    require(weekSpans.length == weeksParsed.length)
+
+    val weeks: Map[Parsha, Parsha.Structure] = Parsha.forBook(book).zip(weeksParsed).zip(weekSpans).map {
+      case ((parsha: Parsha, week: WeekParsed), span: Span) =>
+        require(week.names.has(parsha.name))
+        parsha -> processWeek(parsha, week, span, chapters)
+    }.toMap
+
+    new ChumashBookStructure(
+      book,
+      weeksParsed.head.names,
+      chapters,
+      weeks
     )
   }
 
   private final case class ChapterParsed(n: Int, length: Int)
 
-  private def parseChapters(elements: Seq[Elem]): Array[Int] = {
+  private def parseChapters(book: Tanach.Book, elements: Seq[Elem]): Chapters = {
     val chapters: Seq[ChapterParsed] = elements.map { element =>
       val attributes = XML.openEmpty(element, "chapter", Set("n", "length"))
       ChapterParsed(
@@ -94,257 +84,167 @@ object TanachParser {
 
     require(chapters.map(_.n) == (1 to chapters.length), "Wrong chapter numbers.")
 
-    chapters.map(_.length).toArray
-  }
-
-  private trait Fragment {
-    def fromChapter: Int
-    def fromVerse: Int
-    def toChapter: Option[Int]
-    def toVerse: Option[Int]
-  }
-
-  private def validateImpliedTo(fragment: Fragment, toChapterImplied: Int, toVerseImplied: Int): Unit = {
-    require(fragment.toChapter.isEmpty || fragment.toChapter.contains(toChapterImplied), "Wrong explicit 'toChapter'")
-    require(fragment.toVerse.isEmpty || fragment.toVerse.contains(toVerseImplied), "Wrong explicit 'toVerse'")
+    new Chapters(chapters.map(_.length).toArray)
   }
 
   private final case class WeekParsed(
     names: Names,
-    fromChapter: Int,
-    fromVerse: Int,
-    toChapter: Option[Int],
-    toVerse: Option[Int],
+    span: SpanParsed,
     days: Seq[DayParsed],
-    aliyot: Seq[AliyahParsed],
-    maftir: MaftirParsed
-  ) extends Fragment
+    aliyot: Seq[NumberedSpan],
+    maftir: SpanParsed
+  )
 
   private def parseWeek(element: Elem): WeekParsed = {
     val (attributes, names, elements) = XML.doParseNames(element, "week", Set("n", "fromChapter", "fromVerse"))
     val (aliyahElements, dayElements, maftirElements) = XML.span(elements, "aliyah", "day", "maftir")
-    // TODO introduce convenience methods:
-    require(maftirElements.nonEmpty, s"No 'maftir' in $names.")
-    require(maftirElements.size <= 1, "Spurious 'maftir'.")
+    require(maftirElements.length == 1)
 
     WeekParsed(
       names,
-      fromChapter = doGetIntAttribute(attributes, "fromChapter"),
-      fromVerse = doGetIntAttribute(attributes, "fromVerse"),
-      toChapter = None,
-      toVerse = None,
+      span = parseSpan(attributes),
       days = dayElements.map(parseDay),
       aliyot = aliyahElements.map(parseAliyah),
       maftir = parseMaftir(maftirElements.head)
     )
   }
 
-  // TODO validate aliyah against chapters.
-  private def processWeek(week: WeekParsed, chapters: Array[Int]): Parsha.Structure = {
-    val fromChapter = week.fromChapter
-    val fromVerse = week.fromVerse
-    val toChapter = week.toChapter.get
-    val toVerse = week.toVerse.get
-    // TODO and pack the results
-    val days: Array[Parsha.Day] = processDays(
-      week.days,
-      chapters,
-      fromChapter: Int,
-      fromVerse: Int,
-      toChapter,
-      toVerse
-    )
-    new Parsha.Structure(
-      names = week.names,
-      fromChapter = fromChapter,
-      fromVerse = fromVerse,
-      toChapter = toChapter,
-      toVerse = toVerse,
-      days = days,
-      maftir = processMaftir(week.maftir, chapters, toChapter, toVerse)
-    )
-  }
-
-  private final case class AliyahParsed(
-    n: Int,
-    fromChapter: Int,
-    fromVerse: Int,
-    toChapter: Option[Int],
-    toVerse: Option[Int]
-  ) extends Fragment
-
-  private def parseAliyah(element: Elem): AliyahParsed = {
-    val attributes = XML.openEmpty(element, "aliyah",
-      Set("n", "fromChapter", "fromVerse", "toChapter", "toVerse"))
-    AliyahParsed(
-      n = doGetIntAttribute(attributes, "n"),
-      fromChapter = doGetIntAttribute(attributes, "fromChapter"),
-      fromVerse = doGetIntAttribute(attributes, "fromVerse"),
-      toChapter = getIntAttribute(attributes, "toChapter"),
-      toVerse = getIntAttribute(attributes, "toVerse")
-    )
-  }
-
-  private final case class DayParsed(
-    n: Int,
-    fromChapter: Int,
-    fromVerse: Int,
-    toChapter: Option[Int],
-    toVerse: Option[Int],
-    custom: Option[String],
-    isCombined: Boolean
-  ) extends Fragment
+  private final class DayParsed(
+    val span: NumberedSpan,
+    val custom: Option[String],
+    val isCombined: Boolean
+  )
 
   private def parseDay(element: Elem): DayParsed = {
-    val attributes = XML.openEmpty(element, "day",
-      Set("n", "fromChapter", "fromVerse", "toChapter", "toVerse", "custom", "combined"))
-    DayParsed(
-      n = doGetIntAttribute(attributes, "n"),
-      fromChapter = doGetIntAttribute(attributes, "fromChapter"),
-      fromVerse = doGetIntAttribute(attributes, "fromVerse"),
-      toChapter = getIntAttribute(attributes, "toChapter"),
-      toVerse = getIntAttribute(attributes, "toVerse"),
+    val attributes = XML.openEmpty(element, "day", Set("n", "custom", "combined") ++ spanAttributes)
+    new DayParsed(
+      span = parseNumberedSpan(attributes),
       custom = attributes.get("custom"),
       isCombined = XML.doGetBooleanAttribute(attributes, "combined")
     )
   }
 
-  private def processDays(
-    days: Seq[DayParsed],
-    chapters: Array[Int],
-    fromChapter: Int,
-    fromVerse: Int,
-    toChapter: Int,
-    toVerse: Int
-  ): Array[Parsha.Day] = {
-    val (defaultDays, nonDefaultDays) = days.partition(day => !day.isCombined && day.custom.isEmpty)
+  private def parseAliyah(element: Elem): NumberedSpan = {
+    val attributes = XML.openEmpty(element, "aliyah", Set("n") ++ spanAttributes)
+    parseNumberedSpan(attributes)
+  }
 
-    val implied1: Seq[DayParsed] = if (defaultDays.head.n == 1) Seq.empty else Seq(DayParsed(
-      n = 1,
-      fromChapter = fromChapter,
-      fromVerse = fromVerse,
-      toChapter = None,
-      toVerse = None,
-      custom = None,
-      isCombined = false
-    ))
+  private def parseMaftir(element: Elem): SpanParsed = {
+    val attributes = XML.openEmpty(element, "maftir", spanAttributes)
+    parseSpan(attributes)
+  }
 
-    val last = defaultDays.last
-    val implied7 = if (last.n == 7) Seq.empty[DayParsed] else {
-      val (nextChapter, nextVerse) = next(last.toChapter.get, last.toVerse.get, chapters)
-      Seq(DayParsed(
-        n = 7,
-        fromChapter = nextChapter,
-        fromVerse = nextVerse,
-        toChapter = Some(toChapter),
-        toVerse = Some(toVerse),
-        custom = None,
-        isCombined = false
-      ))
+  private val spanAttributes = Set("fromChapter", "fromVerse", "toChapter", "toVerse")
+
+  private final class NumberedSpan(val n: Int, val span: SpanParsed)
+
+  private def parseNumberedSpan(attributes: Map[String, String]): NumberedSpan = new NumberedSpan(
+    n = doGetIntAttribute(attributes, "n"),
+    span = parseSpan(attributes)
+  )
+
+  private final class SpanParsed(val from: Verse, val to: Option[Verse]) {
+    def setTo(value: Verse): Span = {
+      require(to.isEmpty || to.contains(value), "Wrong explicit 'to'")
+      Span(from, value)
     }
+  }
 
-    processDaysSequence(
-      days = implied1 ++ defaultDays ++ implied7,
-      fromChapter,
-      fromVerse,
-      toChapter,
-      toVerse,
+  private def parseSpan(attributes: Map[String, String]): SpanParsed = {
+    val from = parseFrom(attributes)
+    val toChapter = getIntAttribute(attributes, "toChapter")
+    val toVerse = getIntAttribute(attributes, "toVerse")
+    val to = if (toVerse.isEmpty) {
+      require(toChapter.isEmpty)
+      None
+    } else {
+      Some(Verse(toChapter.getOrElse(from.chapter), toVerse.get))
+    }
+    new SpanParsed(from, to)
+  }
+
+  private def parseFrom(attributes: Map[String, String]): Verse = Verse(
+    doGetIntAttribute(attributes, "fromChapter"),
+    doGetIntAttribute(attributes, "fromVerse")
+  )
+
+  private def processWeek(parsha: Parsha, week: WeekParsed, span: Span, chapters: Chapters): Parsha.Structure = {
+    val days: Seq[Span] = processDays(week.days, span, chapters)
+
+    val aliyot: Seq[Span] = processSpanSequence(
+      week.aliyot,
+      3,
+      Span(span.from, week.aliyot.last.span.to.getOrElse(days.head.to)),
       chapters
     )
 
-    // TODO process add customs and combined
+    val maftir: Span = processSpanSequence(
+      Seq(week.maftir),
+      Span(week.maftir.from, week.maftir.to.getOrElse(span.to)),
+      chapters
+    ).head
+
+    new Parsha.Structure(
+      parsha = parsha,
+      names = week.names,
+      span = span,
+      days = days,
+      maftir = maftir,
+      aliyot = aliyot
+    )
+  }
+
+  private def processDays(days: Seq[DayParsed], span: Span, chapters: Chapters): Seq[Span] = {
+    // TODO process customs and combined
     // TODO check against Parsha what can be combined
-  }
+    // TODO and pack the results
+    val defaultDays = days.filter(day => !day.isCombined && day.custom.isEmpty)
+    val customDays: Map[String, Seq[NumberedSpan]] = days
+      .filter(day => !day.isCombined && day.custom.nonEmpty)
+      .groupBy(_.custom.get)
+      .mapValues(_.map(_.span))
 
-  private def processDaysSequence(
-    days: Seq[DayParsed],
-    fromChapter: Int,
-    fromVerse: Int,
-    toChapter: Int,
-    toVerse: Int,
-    chapters: Array[Int]
-  ): Array[Parsha.Day] = {
-    require(days.map(_.n) == (1 to 7), "Wrong day numbers.")
-
-    def setImpliedTo(day: DayParsed, toChapterImplied: Int, toVerseImplied: Int): DayParsed = {
-      validateImpliedTo(day, toChapterImplied, toVerseImplied)
-      day.copy(toChapter = Some(toChapterImplied), toVerse = Some(toVerseImplied))
-    }
-
-    // Set implied toChapter/toVerse on days.
-    val daysWithTo = days.zip(days.tail).map { case (day, nextDay) =>
-      val (toChapterImplied, toVerseImplied) = prev(nextDay.fromChapter, nextDay.fromVerse, chapters)
-      setImpliedTo(day, toChapterImplied, toVerseImplied)
-    } :+ {
-      setImpliedTo(days.last, toChapter, toVerse)
-    }
-
-    // First day has to start correctly
-    val first = daysWithTo.head
-    require((first.fromChapter == fromChapter) && (first.fromVerse == fromVerse))
-
-    daysWithTo.map { day =>
-      validate(day.fromChapter, day.fromVerse, chapters)
-      validate(day.toChapter.get, day.toVerse.get, chapters)
-
-      new Parsha.Day(
-        fromChapter = day.fromChapter,
-        fromVerse = day.fromVerse,
-        toChapter = day.toChapter.get,
-        toVerse = day.toVerse.get
-      )
-    }.toArray
-  }
-
-  private final case class MaftirParsed(
-    fromChapter: Int,
-    fromVerse: Int,
-    toChapter: Option[Int],
-    toVerse: Option[Int]
-  ) extends Fragment
-
-  private def parseMaftir(element: Elem): MaftirParsed = {
-    val attributes = XML.openEmpty(element, "maftir",
-      Set("fromChapter", "fromVerse"))
-    MaftirParsed(
-      fromChapter = doGetIntAttribute(attributes, "fromChapter"),
-      fromVerse = doGetIntAttribute(attributes, "fromVerse"),
-      toChapter = None,
-      toVerse = None
+    val result = processSpanSequence(
+      spans = defaultDays.map(_.span),
+      number = 7,
+      span,
+      chapters
     )
+
+    result
   }
 
-  private def processMaftir(maftir: MaftirParsed, chapters: Array[Int], toChapter: Int, toVerse: Int): Parsha.Maftir = {
-    validate(maftir.fromChapter, maftir.fromVerse, chapters)
-    validateImpliedTo(maftir, toChapter, toVerse)
-    new Parsha.Maftir(
-      fromChapter = maftir.fromChapter,
-      fromVerse = maftir.fromVerse,
-      toChapter = toChapter,
-      toVerse = toVerse
-    )
+  private def processSpanSequence(
+    spans: Seq[NumberedSpan],
+    number: Int,
+    span: Span,
+    chapters: Chapters
+  ): Seq[Span] = {
+    // Span #1 can be implied:
+    val first = spans.head
+    val implied: Seq[NumberedSpan] = if (first.n == 1) Seq.empty else Seq(new NumberedSpan(1, new SpanParsed(
+      span.from,
+      Some(chapters.prev(first.span.from).get)
+    )))
+
+    val result: Seq[NumberedSpan] = implied ++ spans
+    require(result.map(_.n) == (1 to number), "Wrong number of spans.")
+
+    processSpanSequence(result.map(_.span), span, chapters)
   }
 
-  def validate(chapter: Int, verse: Int, chapters: Array[Int]): Unit = {
-    require(chapter > 0, "Non-positive chapter.")
-    require(verse > 0, "Non-positive verse.")
-    require(chapter <= chapters.length, "Chapter out of range")
-    require(verse <= chapters(chapter-1), s"Verse $verse out of chapter #$chapter of length ${chapters(chapter-1)}")
-  }
+  private def processSpanSequence(
+    spans: Seq[SpanParsed],
+    span: Span,
+    chapters: Chapters
+  ): Seq[Span] = {
+    // Set implied 'to'
+    val result = spans.zip(spans.tail).map { case (day, nextDay) =>
+      day.setTo(chapters.prev(nextDay.from).get)
+    } :+ spans.last.setTo(span.to)
 
-  def prev(chapter: Int, verse: Int, chapters: Array[Int]): (Int, Int) = {
-    validate(chapter, verse, chapters)
-    if (verse > 1) (chapter, verse-1)
-    else if (chapter > 1) (chapter-1, chapters(chapter-2))
-    else throw new IllegalArgumentException("No chapters before the first one.")
-  }
+    require(chapters.cover(result, span))
 
-  def next(chapter: Int, verse: Int, chapters: Array[Int]): (Int, Int) = {
-    validate(chapter, verse, chapters)
-    if (verse < chapters(chapter)) (chapter, verse+1)
-    else if (chapter < chapters.length) (chapter+1, 1)
-    else throw new IllegalArgumentException("No chapters after the last one.")
+    result
   }
-
-  def last(chapters: Array[Int]): (Int, Int) = (chapters.length, chapters(chapters.length-1))
 }

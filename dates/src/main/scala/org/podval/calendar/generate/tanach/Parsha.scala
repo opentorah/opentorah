@@ -1,44 +1,25 @@
 package org.podval.calendar.generate.tanach
 
-import org.podval.calendar.generate.tanach.Tanach.ChumashBook
+import Tanach.ChumashBook
 
 sealed trait Parsha {
   def book: ChumashBook
 
   def name: String = Util.className(this)
 
-  final def structure: Parsha.Structure = Parsha.parshaStructure(this)
+  final def structure: Parsha.Structure = book.structure.weeks(this)
 
   final def names: Names = structure.names
 }
 
 object Parsha {
   final class Structure(
+    val parsha: Parsha,
     val names: Names,
-    val fromChapter: Int,
-    val fromVerse: Int,
-    val toChapter: Int,
-    val toVerse: Int,
-    val days: Array[Day], // length 7 :)
-    val maftir: Maftir
-  ) {
-    require(fromChapter > 0)
-    require(fromVerse > 0)
-  }
-
-  final class Day(
-    val fromChapter: Int,
-    val fromVerse: Int,
-    val toChapter: Int,
-    val toVerse: Int
-  )
-
-  // TODO special Maftir has reference to the book; generalize?
-  final class Maftir(
-    val fromChapter: Int,
-    val fromVerse: Int,
-    val toChapter: Int,
-    val toVerse: Int
+    val span: Span,
+    val days: Seq[Span], // length 7 :)
+    val maftir: Span,
+    val aliyot: Seq[Span] // length 3
   )
 
   final class Aliyah(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
@@ -141,12 +122,5 @@ object Parsha {
 
   def distance(from: Parsha, to: Parsha): Int = indexOf(to) - indexOf(from)
 
-  private val parshaStructure: Map[Parsha, Structure] = Tanach.chumash.flatMap {
-    // TODO once the structures are bound tighter, not only the names will be checked,
-    // but this correspondence will be already calculated:
-    book => forBook(book).zip(book.structure.weeks)
-  }.toMap
-
-
-  def forName(name: String): Option[Parsha] = parshaStructure.find(_._2.names.has(name)).map(_._1)
+  def forName(name: String): Option[Parsha] = all.find(_.names.has(name))
 }
