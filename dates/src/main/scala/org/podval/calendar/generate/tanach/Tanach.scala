@@ -120,9 +120,14 @@ object Tanach {
     val genesis = Genesis.structure
     val deuteronomy = forName("Devarim").get.structure
 
-    val week = Parsha.Vayigash.structure
-    printSpans(week.days)
+/////    printSpans(Parsha.Mattos.structure.days)
+//    printSpans(Parsha.Mattos.structure.daysCombined)
+    val x = Parsha.Mattos.structure
+    printSpans(Parsha.Mattos.structure.daysCombinedCustom("Ashkenaz"))
     println()
-    printSpans(week.customDays("Chabad"))
+//    printSpans(Parsha.Masei.structure.days)
+//    printSpans(Parsha.Masei.structure.daysCustom("Ashkenaz"))
+//    printSpans(Parsha.Masei.structure.daysCombined)
+    println()
   }
 }

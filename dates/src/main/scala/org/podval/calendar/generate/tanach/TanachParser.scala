@@ -46,35 +46,6 @@ object TanachParser {
     )
   }
 
-  private def parseChumashBook(
-    book: ChumashBook,
-    names: Names,
-    elements: Seq[Elem]
-  ): ChumashBookStructure = {
-    val (chapterElements, weekElements) = XML.span(elements, "chapter", "week")
-    val chapters: Chapters = parseChapters(book, chapterElements)
-    val weeksPreparsed: Seq[WeekPreparsed] = weekElements.map(preparseWeek)
-    val weekSpans: Seq[Span] = setImpliedTo(weeksPreparsed.map(_.span), chapters.full, chapters)
-    require(weekSpans.length == weeksPreparsed.length)
-
-    val weeksParsed: Seq[WeekParsed] = weeksPreparsed.zip(Parsha.forBook(book)).zip(weekSpans).map {
-      case ((week: WeekPreparsed, parsha: Parsha), span: Span) =>
-        require(week.names.has(parsha.name))
-        parseWeek(week, parsha, span)
-    }
-
-    val weeks: Map[Parsha, Parsha.Structure] = weeksParsed.map { week =>
-       week.parsha -> processWeek(week, chapters)
-    }.toMap
-
-    new ChumashBookStructure(
-      book,
-      weeksParsed.head.names,
-      chapters,
-      weeks
-    )
-  }
-
   private final case class ChapterParsed(n: Int, length: Int)
 
   private def parseChapters(book: Tanach.Book, elements: Seq[Elem]): Chapters = {
@@ -91,11 +62,54 @@ object TanachParser {
     new Chapters(chapters.map(_.length).toArray)
   }
 
-  private final class WeekPreparsed(
-    val span: SpanParsed,
-    val names: Names,
-    val elements: Seq[Elem]
-  )
+  private def parseChumashBook(
+    book: ChumashBook,
+    names: Names,
+    elements: Seq[Elem]
+  ): ChumashBookStructure = {
+    val (chapterElements, weekElements) = XML.span(elements, "chapter", "week")
+    val chapters: Chapters = parseChapters(book, chapterElements)
+
+    val weeksPreparsed: Seq[WeekPreparsed] = weekElements.map(preparseWeek)
+    val weekSpans: Seq[Span] = setImpliedTo(weeksPreparsed.map(_.span), chapters.full, chapters)
+    require(weekSpans.length == weeksPreparsed.length)
+
+    val weeksParsed: Seq[WeekParsed] = weeksPreparsed.zip(Parsha.forBook(book)).zip(weekSpans).map {
+      case ((week: WeekPreparsed, parsha: Parsha), span: Span) =>
+        require(week.names.has(parsha.name))
+        week.parse(parsha, span)
+    }
+
+    val weeksProcessed: Seq[WeekProcessed] = weeksParsed.map(_.process(chapters))
+    val weeks: Seq[Parsha.Structure] = processCombined(weeksProcessed, chapters)
+
+    new ChumashBookStructure(
+      book,
+      weeksParsed.head.names,
+      chapters,
+      weeks.map(week => week.parsha -> week).toMap
+    )
+  }
+
+  private def processCombined(weeks: Seq[WeekProcessed], chapters: Chapters): Seq[Parsha.Structure] = weeks match {
+    case week1 :: week2 :: tail =>
+      if (!week1.combines) {
+        require(week1.isDaysCombinedEmpty)
+        week1.postProcess() +: processCombined(week2 +: tail, chapters)
+      } else {
+        require(!week2.combines)
+        require(!week1.isDaysCombinedEmpty)
+        require(!week2.isDaysCombinedEmpty)
+        val (daysCombined, daysCombinedCustom) = processCombined(week1, week2, chapters)
+        week1.postProcess(daysCombined, daysCombinedCustom) +: week2.postProcess() +: processCombined(tail, chapters)
+      }
+
+    case week :: Nil =>
+      require(!week.combines)
+      Seq(week.postProcess())
+
+    case Nil => Nil
+  }
 
   private def preparseWeek(element: Elem): WeekPreparsed = {
     val (attributes, names, elements) = XML.doParseNames(element, "week", Set("n") ++ spanAttributes)
@@ -104,6 +118,41 @@ object TanachParser {
       names = names,
       elements = elements
     )
+  }
+
+  private final class WeekPreparsed(
+    val span: SpanParsed,
+    val names: Names,
+    val elements: Seq[Elem]
+  ) {
+    def parse(parsha: Parsha, span: Span): WeekParsed = {
+      val (aliyahElements, dayElements, maftirElements) = XML.span(elements,
+        "aliyah", "day", "maftir")
+      require(maftirElements.length == 1)
+
+      def split(days: Seq[DayParsed]): (Seq[NumberedSpan], Map[String, Seq[NumberedSpan]]) = {
+        def toNumberedSpan(days: Seq[DayParsed]): Seq[NumberedSpan] = days.map(_.span)
+        val (default, custom) = days.partition(_.custom.isEmpty)
+        (toNumberedSpan(default), custom.groupBy(_.custom.get).mapValues(toNumberedSpan))
+      }
+
+      val daysParsed = dayElements.map(parseDay)
+      val (normal: Seq[DayParsed], combined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
+      val (days, daysCustom) = split(normal)
+      val (daysCombined, daysCombinedCustom) = split(combined)
+
+      WeekParsed(
+        parsha = parsha,
+        names,
+        span = span,
+        days = days,
+        daysCustom = daysCustom,
+        daysCombined = daysCombined,
+        daysCombinedCustom = daysCombinedCustom,
+        aliyot = aliyahElements.map(parseAliyah),
+        maftir = parseMaftir(maftirElements.head)
+      )
+    }
   }
 
   private final case class WeekParsed(
@@ -116,35 +165,68 @@ object TanachParser {
     daysCombinedCustom: Map[String, Seq[NumberedSpan]],
     aliyot: Seq[NumberedSpan],
     maftir: SpanParsed
-  )
+  ) {
+    def process(chapters: Chapters): WeekProcessed = {
+      // TODO process combined; check against Parsha what can be combined (bring the combinations over from where they are)
+      val (daysProcessed: Seq[Span], daysCustomProcessed: Map[String, Seq[Span]]) =
+        processDays(days, daysCustom, span, chapters)
 
-  private def parseWeek(week: WeekPreparsed, parsha: Parsha, span: Span): WeekParsed = {
-    val (aliyahElements, dayElements, maftirElements) = XML.span(week.elements,
-      "aliyah", "day", "maftir")
-    require(maftirElements.length == 1)
+      // TODO if Cohen ends in a custom place, does it affect the end of the 3 aliyah on Mon/Thu?
+      // TODO if the parshiot combine, does it affect those small aliyot?
+      val aliyotSpan = Span(span.from, aliyot.last.span.to.getOrElse(daysProcessed.head.to))
+      val aliyotWithImplied1: Seq[NumberedSpan] = addImplied1(aliyot, aliyotSpan, chapters)
+      val aliyotProcessed: Seq[Span] = setImpliedTo(dropNumbers(checkNumber(aliyotWithImplied1, 3)), aliyotSpan, chapters)
 
-    def split(days: Seq[DayParsed]): (Seq[NumberedSpan], Map[String, Seq[NumberedSpan]]) = {
-      def toNumberedSpan(days: Seq[DayParsed]): Seq[NumberedSpan] = days.map(_.span)
-      val (default, custom) = days.partition(_.custom.isEmpty)
-      (toNumberedSpan(default), custom.groupBy(_.custom.get).mapValues(toNumberedSpan))
+      val maftirProcessed: Span = setImpliedTo(
+        Seq(maftir),
+        Span(maftir.from, maftir.to.getOrElse(span.to)),
+        chapters
+      ).head
+
+      new WeekProcessed(
+        parsha = parsha,
+        names = names,
+        span = span,
+        days = daysProcessed,
+        daysCustom = daysCustomProcessed,
+        daysCombined = daysCombined,
+        daysCombinedCustom = daysCombinedCustom,
+        maftir = maftirProcessed,
+        aliyot = aliyotProcessed
+      )
     }
+  }
 
-    val daysParsed = dayElements.map(parseDay)
-    val (normal: Seq[DayParsed], combined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
-    val (days, daysCustom) = split(normal)
-    val (daysCombined, daysCombinedCustom) = split(combined)
+  final class WeekProcessed(
+    val parsha: Parsha,
+    val names: Names,
+    val span: Span,
+    val days: Seq[Span], // length 7 :)
+    val daysCustom: Map[String, Seq[Span]],
+    val daysCombined: Seq[NumberedSpan],
+    val daysCombinedCustom: Map[String, Seq[NumberedSpan]],
+    val maftir: Span,
+    val aliyot: Seq[Span] // length 3
+  ) {
+    def combines: Boolean = parsha.combines
 
-    WeekParsed(
-      parsha = parsha,
-      week.names,
-      span = span,
-      days = days,
-      daysCustom = daysCustom,
-      daysCombined = daysCombined,
-      daysCombinedCustom = daysCombinedCustom,
-      aliyot = aliyahElements.map(parseAliyah),
-      maftir = parseMaftir(maftirElements.head)
-    )
+    def isDaysCombinedEmpty: Boolean = daysCombined.isEmpty && daysCombinedCustom.isEmpty
+
+    def postProcess(): Parsha.Structure = postProcess(Seq.empty, Map.empty)
+
+    def postProcess(daysCombined: Seq[Span], daysCombinedCustom: Map[String, Seq[Span]]): Parsha.Structure = {
+      new Parsha.Structure(
+        parsha = parsha,
+        names = names,
+        span = span,
+        days = days,
+        daysCustom = daysCustom,
+        daysCombined = daysCombined,
+        daysCombinedCustom = daysCombinedCustom,
+        maftir = maftir,
+        aliyot = aliyot
+      )
+    }
   }
 
   private final class DayParsed(
@@ -172,30 +254,17 @@ object TanachParser {
     parseSpan(attributes)
   }
 
-  private def processWeek(week: WeekParsed, chapters: Chapters): Parsha.Structure = {
-    // TODO process combined; check against Parsha what can be combined (bring the combinations over from where they are)
-    val (days: Seq[Span], customDays: Map[String, Seq[Span]]) = processDays(week.days, week.daysCustom, week.span, chapters)
-
-    // TODO if Cohen ends in a custom place, does it affect the end of the 3 aliyah on Mon/Thu?
-    val aliyotSpan = Span(week.span.from, week.aliyot.last.span.to.getOrElse(days.head.to))
-    val aliyotWithImplied1: Seq[NumberedSpan] = addImplied1(week.aliyot, aliyotSpan, chapters)
-    val aliyot: Seq[Span] = setImpliedTo(dropNumbers(checkNumber(aliyotWithImplied1, 3)), aliyotSpan, chapters)
-
-    val maftir: Span = setImpliedTo(
-      Seq(week.maftir),
-      Span(week.maftir.from, week.maftir.to.getOrElse(week.span.to)),
-      chapters
-    ).head
-
-    new Parsha.Structure(
-      parsha = week.parsha,
-      names = week.names,
-      span = week.span,
-      days = days,
-      customDays = customDays,
-      maftir = maftir,
-      aliyot = aliyot
-    )
+  private def processCombined(week1: WeekProcessed, week2: WeekProcessed, chapters: Chapters): (Seq[Span], Map[String, Seq[Span]]) = {
+    // TODO Use defaults from week1.days?
+    val daysCombined: Seq[NumberedSpan] = week1.daysCombined ++ week2.daysCombined
+    val daysCombinedCustom: Map[String, Seq[NumberedSpan]] = {
+      val result = week1.daysCombinedCustom.map { case (custom, days) =>
+        (custom, days ++ week2.daysCombinedCustom.getOrElse(custom, Seq.empty))
+      }
+      val more = week2.daysCombinedCustom.filterKeys(custom => !result.contains(custom))
+      result ++ more
+    }
+    processDays(daysCombined, daysCombinedCustom, chapters.merge(week1.span, week2.span), chapters)
   }
 
   private def processDays(
@@ -204,20 +273,20 @@ object TanachParser {
     span: Span,
     chapters: Chapters
   ): (Seq[Span], Map[String, Seq[Span]]) = {
-    val daysWithImplied1 = addImplied1(days, span, chapters)
-
-    def complete(different: Seq[NumberedSpan]): Seq[NumberedSpan] = {
-      val result: Array[NumberedSpan] = daysWithImplied1.toArray
-      different.foreach(span => result(span.n-1) = span)
-      result.toSeq
-    }
+    val withImplied1 = addImplied1(days, span, chapters)
 
     def process(spans: Seq[NumberedSpan]): Seq[Span] =
       setImpliedTo(dropNumbers(checkNumber(spans, 7)), span, chapters)
 
     (
-      process(daysWithImplied1),
-      daysCustom.mapValues { spans: Seq[NumberedSpan] => process(complete(spans)) }
+      process(withImplied1),
+      daysCustom.mapValues { spans: Seq[NumberedSpan] => process(overlaySpans(withImplied1, spans)) }
     )
+  }
+
+  private def overlaySpans(base: Seq[NumberedSpan], differences: Seq[NumberedSpan]): Seq[NumberedSpan] = {
+    val result: Array[NumberedSpan] = base.toArray
+    differences.foreach(span => result(span.n-1) = span)
+    result.toSeq
   }
 }

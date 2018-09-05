@@ -10,16 +10,19 @@ sealed trait Parsha {
   final def structure: Parsha.Structure = book.structure.weeks(this)
 
   final def names: Names = structure.names
+
+  final def combines: Boolean = Parsha.combinableAll.contains(this)
 }
 
 object Parsha {
   final class Structure(
-    // TODO remove
-    parsha: Parsha,
+    val parsha: Parsha,
     val names: Names,
     val span: Span,
     val days: Seq[Span], // length 7 :)
-    val customDays: Map[String, Seq[Span]],
+    val daysCustom: Map[String, Seq[Span]],
+    val daysCombined: Seq[Span],
+    val daysCombinedCustom: Map[String, Seq[Span]],
     val maftir: Span,
     val aliyot: Seq[Span] // length 3
   )
@@ -115,4 +118,17 @@ object Parsha {
   def distance(from: Parsha, to: Parsha): Int = indexOf(to) - indexOf(from)
 
   def forName(name: String): Option[Parsha] = all.find(_.names.has(name))
+
+  // Rules of combining; affect the WeeklyReading.
+  // TODO deal with alternative customs of what and in what sequence combines?
+  final val combinableFromBereishisToVayikra: Seq[Parsha] = Seq(Vayakhel)
+  // TODO see #56; Magen Avraham 428:4 (6);
+  // Reversing the priorities here currently affects only non-leap regular years with Rosh
+  // Hashanah on Thursday (and Pesach on Shabbat).
+  final val combinableFromVayikraToBemidbar: Seq[Parsha] = Seq(Tazria, Acharei, Behar)
+  final val combinableFromBemidbarToVa_eschanan: Seq[Parsha] = Seq(Mattos, Chukas)
+  final val combinableFromVa_eschanan: Seq[Parsha] = Seq(Nitzavim)
+
+  final val combinableAll: Set[Parsha] = (combinableFromBereishisToVayikra ++ combinableFromVayikraToBemidbar ++
+    combinableFromBemidbarToVa_eschanan ++ combinableFromVa_eschanan).toSet
 }
