@@ -113,12 +113,16 @@ object Tanach {
   def forName(name: String): Option[Book] = forChumashName(name).orElse(forNachName(name))
 
   def main(args: Array[String]): Unit = {
-    val genesis = Genesis.structure
-    val genesisWeek = Parsha.Bereishis.structure
-    val deuteronomy = forName("Devarim").get.structure
-    val days = genesisWeek.days
-    days.zipWithIndex.foreach { case (day, index) =>
-      println(s"${index+1}: $day")
+    def printSpans(spans: Seq[Span]): Unit = spans.zipWithIndex.foreach { case (span, index) =>
+      println(s"${index+1}: $span")
     }
+
+    val genesis = Genesis.structure
+    val deuteronomy = forName("Devarim").get.structure
+
+    val week = Parsha.Vayigash.structure
+    printSpans(week.days)
+    println()
+    printSpans(week.customDays("Chabad"))
   }
 }

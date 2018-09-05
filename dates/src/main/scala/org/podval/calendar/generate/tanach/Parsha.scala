@@ -14,10 +14,12 @@ sealed trait Parsha {
 
 object Parsha {
   final class Structure(
-    val parsha: Parsha,
+    // TODO remove
+    parsha: Parsha,
     val names: Names,
     val span: Span,
     val days: Seq[Span], // length 7 :)
+    val customDays: Map[String, Seq[Span]],
     val maftir: Span,
     val aliyot: Seq[Span] // length 3
   )

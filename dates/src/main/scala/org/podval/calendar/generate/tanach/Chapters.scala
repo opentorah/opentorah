@@ -44,6 +44,8 @@ final class Chapters(chapters: Seq[Int]) {
   def consecutive(spans: Seq[Span]): Boolean =
     spans.zip(spans.tail).forall { case (first, second) => consecutive(first, second) }
 
-  def cover(spans: Seq[Span], span: Span): Boolean =
+  def cover(spans: Seq[Span], span: Span): Boolean = {
+    require(contains(span))
     consecutive(spans) && (spans.head.from == span.from) && (spans.last.to == span.to)
+  }
 }
