@@ -24,25 +24,7 @@ object Parsha {
 
   final class Aliyah(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
 
-  trait GenesisParsha extends Parsha {
-    final override def book: ChumashBook = Tanach.Genesis
-  }
-
-  trait ExodusParsha extends Parsha {
-    final override def book: ChumashBook = Tanach.Exodus
-  }
-
-  trait LeviticusParsha extends Parsha {
-    final override def book: ChumashBook = Tanach.Leviticus
-  }
-
-  trait NumbersParsha extends Parsha {
-    final override def book: ChumashBook = Tanach.Numbers
-  }
-
-  trait DeutoronomyParsha extends Parsha {
-    final override def book: ChumashBook = Tanach.Deuteronomy
-  }
+  trait GenesisParsha extends Parsha { final override def book: ChumashBook = Tanach.Genesis }
 
   case object Bereishis extends GenesisParsha
   case object Noach extends GenesisParsha
@@ -57,6 +39,8 @@ object Parsha {
   case object Vayigash extends GenesisParsha
   case object Vayechi extends GenesisParsha
 
+  trait ExodusParsha extends Parsha { final override def book: ChumashBook = Tanach.Exodus }
+
   case object Shemos extends ExodusParsha
   case object Va_eira extends ExodusParsha { override def name: String = "Va'eira" }
   case object Bo extends ExodusParsha
@@ -69,6 +53,8 @@ object Parsha {
   case object Vayakhel extends ExodusParsha
   case object Pekudei extends ExodusParsha
 
+  trait LeviticusParsha extends Parsha { final override def book: ChumashBook = Tanach.Leviticus }
+
   case object Vayikra extends LeviticusParsha
   case object Tzav extends LeviticusParsha
   case object Shemini extends LeviticusParsha
@@ -80,6 +66,8 @@ object Parsha {
   case object Behar extends LeviticusParsha
   case object Bechukosai extends LeviticusParsha
 
+  trait NumbersParsha extends Parsha { final override def book: ChumashBook = Tanach.Numbers }
+
   case object Bemidbar extends NumbersParsha
   case object Nasso extends NumbersParsha
   case object Beha_aloscha extends NumbersParsha { override def name: String = "Beha'aloscha" }
@@ -90,6 +78,8 @@ object Parsha {
   case object Pinchas extends NumbersParsha
   case object Mattos extends NumbersParsha
   case object Masei extends NumbersParsha
+
+  trait DeutoronomyParsha extends Parsha { final override def book: ChumashBook = Tanach.Deuteronomy }
 
   case object Devarim extends DeutoronomyParsha
   case object Va_eschanan extends DeutoronomyParsha { override def name: String = "Va'eschanan" }

@@ -11,7 +11,8 @@ object Tanach {
   }
 
   abstract class BookStructure(
-    val book: Book,
+    // TODO remove?
+    book: Book,
     val names: Names,
     val chapters: Chapters
   )
@@ -115,6 +116,9 @@ object Tanach {
     val genesis = Genesis.structure
     val genesisWeek = Parsha.Bereishis.structure
     val deuteronomy = forName("Devarim").get.structure
-    val z = 0
+    val days = genesisWeek.days
+    days.zipWithIndex.foreach { case (day, index) =>
+      println(s"${index+1}: $day")
+    }
   }
 }

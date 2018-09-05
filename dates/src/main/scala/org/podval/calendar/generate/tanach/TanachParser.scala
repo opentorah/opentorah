@@ -54,7 +54,7 @@ object TanachParser {
     val chapters: Chapters = parseChapters(book, chapterElements)
     val weeksParsed: Seq[WeekParsed] = weekElements.map(parseWeek)
 
-    val weekSpans: Seq[Span] = processSpanSequence(weeksParsed.map(_.span), chapters.full, chapters)
+    val weekSpans: Seq[Span] = setImpliedTo(weeksParsed.map(_.span), chapters.full, chapters)
     require(weekSpans.length == weeksParsed.length)
 
     val weeks: Map[Parsha, Parsha.Structure] = Parsha.forBook(book).zip(weeksParsed).zip(weekSpans).map {
@@ -134,6 +134,8 @@ object TanachParser {
     parseSpan(attributes)
   }
 
+  // TODO reuse Span etc. in Haftorot parsing.
+
   private val spanAttributes = Set("fromChapter", "fromVerse", "toChapter", "toVerse")
 
   private final class NumberedSpan(val n: Int, val span: SpanParsed)
@@ -178,7 +180,7 @@ object TanachParser {
       chapters
     )
 
-    val maftir: Span = processSpanSequence(
+    val maftir: Span = setImpliedTo(
       Seq(week.maftir),
       Span(week.maftir.from, week.maftir.to.getOrElse(span.to)),
       chapters
@@ -195,32 +197,32 @@ object TanachParser {
   }
 
   private def processDays(days: Seq[DayParsed], span: Span, chapters: Chapters): Seq[Span] = {
+    def process(spans: Seq[NumberedSpan]): Seq[Span] = processSpanSequence(spans, number = 7, span, chapters)
+
     // TODO process customs and combined
-    // TODO check against Parsha what can be combined
-    // TODO and pack the results
-    val defaultDays = days.filter(day => !day.isCombined && day.custom.isEmpty)
+    // TODO check against Parsha what can be combined (bring the combinations over from where they are)
+    val defaultDays: Seq[NumberedSpan] = days
+      .filter(day => !day.isCombined && day.custom.isEmpty)
+      .map(_.span)
+
+    def complete(different: Seq[NumberedSpan]): Seq[NumberedSpan] = ???
+
     val customDays: Map[String, Seq[NumberedSpan]] = days
       .filter(day => !day.isCombined && day.custom.nonEmpty)
       .groupBy(_.custom.get)
-      .mapValues(_.map(_.span))
+      .mapValues { days => complete(days.map(_.span)) }
 
-    val result = processSpanSequence(
-      spans = defaultDays.map(_.span),
-      number = 7,
-      span,
-      chapters
-    )
+    val result = process(defaultDays)
 
     result
   }
 
-  private def processSpanSequence(
+  private def addImplied1(
     spans: Seq[NumberedSpan],
     number: Int,
     span: Span,
     chapters: Chapters
-  ): Seq[Span] = {
-    // Span #1 can be implied:
+  ): Seq[NumberedSpan] = {
     val first = spans.head
     val implied: Seq[NumberedSpan] = if (first.n == 1) Seq.empty else Seq(new NumberedSpan(1, new SpanParsed(
       span.from,
@@ -230,19 +232,37 @@ object TanachParser {
     val result: Seq[NumberedSpan] = implied ++ spans
     require(result.map(_.n) == (1 to number), "Wrong number of spans.")
 
-    processSpanSequence(result.map(_.span), span, chapters)
+    result
   }
 
   private def processSpanSequence(
+    spans: Seq[NumberedSpan],
+    number: Int,
+    span: Span,
+    chapters: Chapters
+  ): Seq[Span] = processNumberedSpanSequence(
+    addImplied1(spans, number, span, chapters),
+    span,
+    chapters
+  )
+
+  private def processNumberedSpanSequence(
+    spans: Seq[NumberedSpan],
+    span: Span,
+    chapters: Chapters
+  ): Seq[Span] = setImpliedTo(
+    spans.map(_.span),
+    span,
+    chapters
+  )
+
+  private def setImpliedTo(
     spans: Seq[SpanParsed],
     span: Span,
     chapters: Chapters
   ): Seq[Span] = {
-    // Set implied 'to'
-    val result = spans.zip(spans.tail).map { case (day, nextDay) =>
-      day.setTo(chapters.prev(nextDay.from).get)
-    } :+ spans.last.setTo(span.to)
-
+    val tos: Seq[Verse] = spans.tail.map(_.from).map(chapters.prev(_).get) :+ span.to
+    val result = spans.zip(tos).map { case (span, to) => span.setTo(to) }
     require(chapters.cover(result, span))
 
     result
