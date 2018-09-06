@@ -10,6 +10,8 @@ sealed trait Parsha {
   final def structure: Parsha.Structure = book.structure.weeks(this)
 
   final def names: Names = structure.names
+
+  final def combines: Boolean = Parsha.combinableAll.contains(this)
 }
 
 object Parsha {
@@ -18,31 +20,16 @@ object Parsha {
     val names: Names,
     val span: Span,
     val days: Seq[Span], // length 7 :)
+    val daysCustom: Map[String, Seq[Span]],
+    val daysCombined: Seq[Span],
+    val daysCombinedCustom: Map[String, Seq[Span]],
     val maftir: Span,
     val aliyot: Seq[Span] // length 3
   )
 
   final class Aliyah(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
 
-  trait GenesisParsha extends Parsha {
-    final override def book: ChumashBook = Tanach.Genesis
-  }
-
-  trait ExodusParsha extends Parsha {
-    final override def book: ChumashBook = Tanach.Exodus
-  }
-
-  trait LeviticusParsha extends Parsha {
-    final override def book: ChumashBook = Tanach.Leviticus
-  }
-
-  trait NumbersParsha extends Parsha {
-    final override def book: ChumashBook = Tanach.Numbers
-  }
-
-  trait DeutoronomyParsha extends Parsha {
-    final override def book: ChumashBook = Tanach.Deuteronomy
-  }
+  trait GenesisParsha extends Parsha { final override def book: ChumashBook = Tanach.Genesis }
 
   case object Bereishis extends GenesisParsha
   case object Noach extends GenesisParsha
@@ -57,6 +44,8 @@ object Parsha {
   case object Vayigash extends GenesisParsha
   case object Vayechi extends GenesisParsha
 
+  trait ExodusParsha extends Parsha { final override def book: ChumashBook = Tanach.Exodus }
+
   case object Shemos extends ExodusParsha
   case object Va_eira extends ExodusParsha { override def name: String = "Va'eira" }
   case object Bo extends ExodusParsha
@@ -69,6 +58,8 @@ object Parsha {
   case object Vayakhel extends ExodusParsha
   case object Pekudei extends ExodusParsha
 
+  trait LeviticusParsha extends Parsha { final override def book: ChumashBook = Tanach.Leviticus }
+
   case object Vayikra extends LeviticusParsha
   case object Tzav extends LeviticusParsha
   case object Shemini extends LeviticusParsha
@@ -80,6 +71,8 @@ object Parsha {
   case object Behar extends LeviticusParsha
   case object Bechukosai extends LeviticusParsha
 
+  trait NumbersParsha extends Parsha { final override def book: ChumashBook = Tanach.Numbers }
+
   case object Bemidbar extends NumbersParsha
   case object Nasso extends NumbersParsha
   case object Beha_aloscha extends NumbersParsha { override def name: String = "Beha'aloscha" }
@@ -90,6 +83,8 @@ object Parsha {
   case object Pinchas extends NumbersParsha
   case object Mattos extends NumbersParsha
   case object Masei extends NumbersParsha
+
+  trait DeutoronomyParsha extends Parsha { final override def book: ChumashBook = Tanach.Deuteronomy }
 
   case object Devarim extends DeutoronomyParsha
   case object Va_eschanan extends DeutoronomyParsha { override def name: String = "Va'eschanan" }
@@ -123,4 +118,17 @@ object Parsha {
   def distance(from: Parsha, to: Parsha): Int = indexOf(to) - indexOf(from)
 
   def forName(name: String): Option[Parsha] = all.find(_.names.has(name))
+
+  // Rules of combining; affect the WeeklyReading.
+  // TODO deal with alternative customs of what and in what sequence combines?
+  final val combinableFromBereishisToVayikra: Seq[Parsha] = Seq(Vayakhel)
+  // TODO see #56; Magen Avraham 428:4 (6);
+  // Reversing the priorities here currently affects only non-leap regular years with Rosh
+  // Hashanah on Thursday (and Pesach on Shabbat).
+  final val combinableFromVayikraToBemidbar: Seq[Parsha] = Seq(Tazria, Acharei, Behar)
+  final val combinableFromBemidbarToVa_eschanan: Seq[Parsha] = Seq(Mattos, Chukas)
+  final val combinableFromVa_eschanan: Seq[Parsha] = Seq(Nitzavim)
+
+  final val combinableAll: Set[Parsha] = (combinableFromBereishisToVayikra ++ combinableFromVayikraToBemidbar ++
+    combinableFromBemidbarToVa_eschanan ++ combinableFromVa_eschanan).toSet
 }

@@ -11,7 +11,8 @@ object Tanach {
   }
 
   abstract class BookStructure(
-    val book: Book,
+    // TODO remove?
+    book: Book,
     val names: Names,
     val chapters: Chapters
   )
@@ -112,9 +113,21 @@ object Tanach {
   def forName(name: String): Option[Book] = forChumashName(name).orElse(forNachName(name))
 
   def main(args: Array[String]): Unit = {
+    def printSpans(spans: Seq[Span]): Unit = spans.zipWithIndex.foreach { case (span, index) =>
+      println(s"${index+1}: $span")
+    }
+
     val genesis = Genesis.structure
-    val genesisWeek = Parsha.Bereishis.structure
     val deuteronomy = forName("Devarim").get.structure
-    val z = 0
+
+/////    printSpans(Parsha.Mattos.structure.days)
+//    printSpans(Parsha.Mattos.structure.daysCombined)
+    val x = Parsha.Mattos.structure
+    printSpans(Parsha.Mattos.structure.daysCombinedCustom("Ashkenaz"))
+    println()
+//    printSpans(Parsha.Masei.structure.days)
+//    printSpans(Parsha.Masei.structure.daysCustom("Ashkenaz"))
+//    printSpans(Parsha.Masei.structure.daysCombined)
+    println()
   }
 }

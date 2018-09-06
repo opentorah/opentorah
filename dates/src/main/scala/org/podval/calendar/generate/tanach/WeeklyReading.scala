@@ -108,16 +108,9 @@ final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) {
 
 object WeeklyReading {
   private final val fromBereishisToBemidbar: Int = Parsha.distance(Bereishis, Bemidbar)
-  private final val combinableFromBereishisToVayikra: Seq[Parsha] = Seq(Vayakhel)
   private final val allowedBeforePesach: Set[Parsha] = Set[Parsha](Tzav, Metzora, Acharei)
-  // TODO see #56; Magen Avraham 428:4 (6);
-  // Reversing the priorities here currently affects only non-leap regular years with Rosh
-  // Hashanah on Thursday (and Pesach on Shabbat).
-  private final val combinableFromVayikraToBemidbar: Seq[Parsha] = Seq(Tazria, Acharei, Behar)
   private final val fromBemidbarToVa_eschanan: Int = Parsha.distance(Bemidbar, Va_eschanan)
-  private final val combinableFromBemidbarToVa_eschanan: Seq[Parsha] = Seq(Mattos, Chukas)
   private final val fromVa_eschanan: Int = Parsha.distance(Va_eschanan, VezosHaberachah)
-  private final val combinableFromVa_eschanan: Seq[Parsha] = Seq(Nitzavim)
 
   def getYear(year: Year, inHolyLand: Boolean): Map[Day, WeeklyReading] =
     (getCycle(year-1, inHolyLand) ++ getCycle(year, inHolyLand)).filter(_._1.year == year).toMap
