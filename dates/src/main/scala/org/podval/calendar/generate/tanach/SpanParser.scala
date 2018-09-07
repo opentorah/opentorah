@@ -1,14 +1,12 @@
 package org.podval.calendar.generate.tanach
 
-import XML.{doGetIntAttribute, getIntAttribute}
+import org.podval.calendar.metadata.Attributes
 
 object SpanParser {
-  val spanAttributes = Set("fromChapter", "fromVerse", "toChapter", "toVerse")
-
   final class NumberedSpan(val n: Int, val span: SpanParsed)
 
-  def parseNumberedSpan(attributes: Map[String, String]): NumberedSpan = new NumberedSpan(
-    n = doGetIntAttribute(attributes, "n"),
+  def parseNumberedSpan(attributes: Attributes): NumberedSpan = new NumberedSpan(
+    n = attributes.doGetInt("n"),
     span = parseSpan(attributes)
   )
 
@@ -19,10 +17,10 @@ object SpanParser {
     }
   }
 
-  def parseSpan(attributes: Map[String, String]): SpanParsed = {
+  def parseSpan(attributes: Attributes): SpanParsed = {
     val from = parseFrom(attributes)
-    val toChapter = getIntAttribute(attributes, "toChapter")
-    val toVerse = getIntAttribute(attributes, "toVerse")
+    val toChapter = attributes.getInt("toChapter")
+    val toVerse = attributes.getInt("toVerse")
     val to = if (toVerse.isEmpty) {
       require(toChapter.isEmpty)
       None
@@ -32,9 +30,9 @@ object SpanParser {
     new SpanParsed(from, to)
   }
 
-  def parseFrom(attributes: Map[String, String]): Verse = Verse(
-    doGetIntAttribute(attributes, "fromChapter"),
-    doGetIntAttribute(attributes, "fromVerse")
+  def parseFrom(attributes: Attributes): Verse = Verse(
+    attributes.doGetInt("fromChapter"),
+    attributes.doGetInt("fromVerse")
   )
 
   def addImplied1(

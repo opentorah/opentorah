@@ -1,12 +1,4 @@
-package org.podval.calendar.generate.tanach
-
-// TODO merge with Nae used for Months etc.
-final case class Name(
-  name: String,
-  lang: Option[String],
-  isTransliterated: Option[Boolean],
-  flavour: Option[String]
-)
+package org.podval.calendar.metadata
 
 final class Names(val names: Seq[Name]) {
   // No duplicates
