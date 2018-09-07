@@ -1,24 +1,20 @@
 package org.podval.calendar.generate.tanach
 
+import org.podval.calendar.metadata.{Names, Metadata, WithMetadata}
+
 object Tanach {
 
-  sealed trait Book {
-    def name: String = Util.className(this)
-
-    def structure: BookStructure
-
-    final def names: Names = structure.names
-  }
+  sealed trait Book[M <: BookStructure] extends WithMetadata[M]
 
   abstract class BookStructure(
     // TODO remove?
-    book: Book,
+    book: Book[_],
     val names: Names,
     val chapters: Chapters
-  )
+  ) extends Metadata
 
-  trait ChumashBook extends Book {
-    final override def structure: ChumashBookStructure = chumashStructure(this)
+  trait ChumashBook extends Book[ChumashBookStructure] {
+    final override def metadata: ChumashBookStructure = chumashStructure(this)
   }
 
   final class ChumashBookStructure(
@@ -28,8 +24,8 @@ object Tanach {
     val weeks: Map[Parsha, Parsha.Structure]
   ) extends BookStructure(book, names, chapters)
 
-  trait NachBook extends Book {
-    final override def structure: NachBookStructure = nachStructure(this)
+  trait NachBook extends Book[NachBookStructure] {
+    final override def metadata: NachBookStructure = nachStructure(this)
   }
 
   final class NachBookStructure(
@@ -48,18 +44,25 @@ object Tanach {
 
   trait ProphetsBook extends NachBook
 
-  case object Joshua extends ProphetsBook
-  case object Judges extends ProphetsBook
-  case object SamuelI extends ProphetsBook { override def name: String = "Samuel I" }
-  case object SamuelII extends ProphetsBook { override def name: String = "Samuel II" }
-  case object KingsI extends ProphetsBook { override def name: String = "Kings I" }
-  case object KingsII extends ProphetsBook { override def name: String = "Kings II" }
-  case object Isaiah extends ProphetsBook
-  case object Jeremiah extends ProphetsBook
-  case object Ezekiel extends ProphetsBook
+  trait EarlyProphetsBook extends ProphetsBook
+
+  case object Joshua extends EarlyProphetsBook
+  case object Judges extends EarlyProphetsBook
+  case object SamuelI extends EarlyProphetsBook { override def name: String = "Samuel I" }
+  case object SamuelII extends EarlyProphetsBook { override def name: String = "Samuel II" }
+  case object KingsI extends EarlyProphetsBook { override def name: String = "Kings I" }
+  case object KingsII extends EarlyProphetsBook { override def name: String = "Kings II" }
+
+  val earlyProphets: Seq[ProphetsBook] = Seq(Joshua, Judges, SamuelI, SamuelII, KingsI, KingsII)
+
+  trait LateProphetsBook extends ProphetsBook
+
+  case object Isaiah extends LateProphetsBook
+  case object Jeremiah extends LateProphetsBook
+  case object Ezekiel extends LateProphetsBook
 
   <!-- תרי עשר -->
-  trait TreiAsarBook extends ProphetsBook
+  trait TreiAsarBook extends LateProphetsBook
 
   case object Hosea extends TreiAsarBook
   case object Joel extends TreiAsarBook
@@ -77,8 +80,9 @@ object Tanach {
   val treiAsar: Seq[TreiAsarBook] = Seq(Hosea, Joel, Amos, Obadiah, Jonah, Micah,
     Nahum, Habakkuk, Zephaniah, Haggai, Zechariah, Malachi)
 
-  val prophets: Seq[ProphetsBook] =
-    Seq(Joshua, Judges, SamuelI, SamuelII, KingsI, KingsII, Isaiah, Jeremiah, Ezekiel) ++ treiAsar
+  val lateProphets: Seq[ProphetsBook] = Seq(Isaiah, Jeremiah, Ezekiel) ++ treiAsar
+
+  val prophets: Seq[ProphetsBook] = earlyProphets ++ lateProphets
 
   trait WritingsBook extends NachBook
 
@@ -101,29 +105,26 @@ object Tanach {
 
   val nach: Seq[NachBook] = prophets ++ writings
 
-  val all: Seq[Book] = chumash ++ nach
+  val all: Seq[Book[_]] = chumash ++ nach
 
   private val (
     chumashStructure: Map[ChumashBook, ChumashBookStructure],
     nachStructure: Map[NachBook, NachBookStructure]
-  ) = TanachParser.parse
+  ) = TanachParser.parse(this)
 
   def forChumashName(name: String): Option[ChumashBook] = chumashStructure.find(_._2.names.has(name)).map(_._1)
   def forNachName(name: String): Option[NachBook] = nachStructure.find(_._2.names.has(name)).map(_._1)
-  def forName(name: String): Option[Book] = forChumashName(name).orElse(forNachName(name))
+  def forName(name: String): Option[Book[_]] = forChumashName(name).orElse(forNachName(name))
 
   def main(args: Array[String]): Unit = {
     def printSpans(spans: Seq[Span]): Unit = spans.zipWithIndex.foreach { case (span, index) =>
       println(s"${index+1}: $span")
     }
 
-    val genesis = Genesis.structure
-    val deuteronomy = forName("Devarim").get.structure
-
 /////    printSpans(Parsha.Mattos.structure.days)
 //    printSpans(Parsha.Mattos.structure.daysCombined)
-    val x = Parsha.Mattos.structure
-    printSpans(Parsha.Mattos.structure.daysCombinedCustom("Ashkenaz"))
+    val x = Parsha.Mattos.metadata
+    printSpans(Parsha.Mattos.metadata.daysCombinedCustom("Ashkenaz"))
     println()
 //    printSpans(Parsha.Masei.structure.days)
 //    printSpans(Parsha.Masei.structure.daysCustom("Ashkenaz"))
