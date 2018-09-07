@@ -1,6 +1,6 @@
 package org.podval.calendar.metadata
 
-import org.podval.calendar.metadata.XML.{open, openEmpty, span}
+import org.podval.calendar.metadata.XML.{open, span}
 
 import scala.xml.Elem
 

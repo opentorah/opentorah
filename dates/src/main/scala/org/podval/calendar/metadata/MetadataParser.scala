@@ -7,9 +7,8 @@ import org.podval.calendar.metadata.XML.open
 
 import scala.xml.{Elem, Utility}
 
-// TODO sibling subresource.
-// TODO pre-parse,  bind and load subresources in a general way; return Map[WithMetadata[M], M].
 object MetadataParser {
+
   final case class MetadataPreparsed(
     attributes: Attributes, // actual parser needs to call close()!
     names: Names,
@@ -63,8 +62,11 @@ object MetadataParser {
     loadMetadata(url, elements, name)
   }
 
-  def loadMetadata(url: URL, elements: Seq[Elem], name: String): Seq[MetadataPreparsed] =
-    elements.map(element => loadSubresource(parentUrl(url), element, name))
+  def loadMetadata(url: URL, elements: Seq[Elem], name: String): Seq[MetadataPreparsed] = {
+    val result = elements.map(element => loadSubresource(parentUrl(url), element, name))
+    Names.checkDisjoint(result.map(_.names))
+    result
+  }
 
   private def loadSubresource(url: URL, element: Elem, name: String ): MetadataPreparsed = {
     val (attributes: Attributes, namesOption: Option[Names], elements: Seq[Elem]) =
@@ -99,10 +101,7 @@ object MetadataParser {
   }
 
   def bind[K <: WithMetadata[_], M <: Metadata](keys: Seq[K], metadatas: Seq[M]): Seq[(K, M)] = {
-    Names.checkDisjoint(metadatas.map(_.names))
     require(keys.length == metadatas.length)
-    // TODO should we give more ordering flexibility - or continue to insist on position correspondence?
-    // Weeks parser expects the results in order...
     keys.zip(metadatas).map { case (key, metadata) =>
       require(metadata.names.has(key.name))
       key -> metadata
