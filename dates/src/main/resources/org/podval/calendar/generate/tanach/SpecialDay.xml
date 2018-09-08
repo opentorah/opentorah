@@ -444,10 +444,17 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             </shabbos>  
         </torah>
         <haftarah book="Joshua">
+            <custom n="Ashkenaz>
             <part n="1" fromChapter="3" fromVerse="5" toVerse="7"/>
             <part n="2" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
             <part n="3" fromChapter="6" fromVerse="27"/>
-        </haftarah>
+            </custom>
+            <custom n="Sefard">
+            <part n="1" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
+            <part n="2" fromChapter="6" fromVerse="27"/>
+            </custom>   
+             <custom n="Frankfurt Hagra" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
+          </haftarah>
     </day>           
             
             
