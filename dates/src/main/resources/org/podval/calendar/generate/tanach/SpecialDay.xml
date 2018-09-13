@@ -418,8 +418,12 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
 5 день - 3
 6 день - 5
     -->
-    <day n="Pesach Maftir">
+    <day n="Pesach 1 Maftir"> <!-- Diaspora 1 & 2   -->
         <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>
+    </day>
+    
+    <day n="Pesach Hol ha-Moed Maftir"> 
+        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
     </day>
 
     <day n="Pesach Additional Torah Reading">
@@ -453,7 +457,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <part n="1" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
             <part n="2" fromChapter="6" fromVerse="27"/>
             </custom>   
-             <custom n="Frankfurt Hagra" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
+             <custom n="Frankfurt Hagro" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
           </haftarah>
     </day>           
             
