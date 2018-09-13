@@ -28,6 +28,13 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
 Аналогично - в шабат Шкалим и шабат а-Ходеш, выпавшие в рош ходеш:
 на 6 алию читают 6 и 7.
 7 алия - чтение см. выше
+TODO: check minhogim shabas Hol amoed Pesax
+Minhagim haftara mincha taanis
+Kriat Tora minhagim hol amoed Sukkot & Chanuka
+Rosh chodesh elul shabat
+Mekorot
+
+
      -->
     <day n="Shabbos Erev Rosh Chodesh">
         <haftarah book="Samuel I" fromChapter="20" fromVerse="18" toVerse="42"/>
@@ -95,7 +102,13 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <aliyah n="2" fromVerse="30"/>
             <aliyah n="3" fromVerse="36" toVerse="40"/>
         </torah>
-        <haftarah book="Jeremiah" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
+        <haftarah book="Jeremiah" >
+          <custom n="Ashkenaz Sefarad"  fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
+          <custom n="Teiman">
+            <part n="1" fromChapter="6" fromVerse="15"  toVerse="16"/>
+            <part n="2" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/> 
+          </custom> 
+        </haftarah>    
     </day>
 
     <!-- RULE: on Shabbos Chol Hamoed Succos and Pesach, add "Shabbos Chol Hamoed Torah". -->
@@ -278,7 +291,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
           <custom "Italki Teimani" fromVerse="1" toChapter="38" toVerse="23"/>
         </haftarah>    
     </day>  
-    </day>
+    
 
     <!-- RULE: on Shemini Atzeres and Simchas Torah: add Shemini Atzeres Maftir.  -->
     <day n="Maftir Shemini Atzeres">
@@ -391,31 +404,52 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
 
 
     <day n="Shabbos Channukah 1">
-        <haftarah book="Zecharia" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>
+        <haftarah book="Zecharia" fromChapter="2" fromVerse="14" >
+          <custom n="Ahkenaz Sefarad" toChapter="4"  toVerse="7"/>
+          <custom n="Teiman" toChapter="4"  toVerse="7"/>
+        </hafara>        
     </day>
 
     <day n="Shabbos Channukah 2">
-        <haftarah book="Kings I" fromChapter="7" fromVerse="40" toVerse="50"/>
+        <haftarah book="Kings II" fromChapter="7" fromVerse="40" to Chapter="7"> 
+           <custom n="Ahkenaz Sefarad" toVerse="50"/>
+          <custom n="Italki" toVerse="51"/>
+        </hafara>     
     </day>
 
     <day n="Parshas Shekalim">
         <maftir book="Exodus" fromChapter="30" fromVerse="11" toVerse="16"/>
-        <haftarah book="Kings II" fromChapter="11" fromVerse="17" toChapter="11" toVerse="17"/>
+        <haftarah book="Kings II">
+          <custom n="Ashkenaz Italki Teiman Chabad" fromChapter="12" fromVerse="1" toVerse="17"/>
+          <custom n="Sefarad" fromChapter="11" fromVerse="17" to Chapter="12"  toVerse="17"/>
+        </hafara>     
     </day>
 
     <day n="Parshas Zachor">
         <maftir book="Deuteronomy" fromChapter="25" fromVerse="17" toVerse="19"/>
-        <haftarah book="Samuel I" fromChapter="15" fromVerse="1" toVerse="34"/>
+        <haftarah book="Samuel I">
+             <custom n="Ashkenaz Chabad" fromChapter="15" fromVerse="2" toVerse="34"/>
+             <custom n="Sefarad" fromChapter="15" fromVerse="1" toVerse="34"/>
+             <custom n="Teiman" fromChapter="14" fromVerse="52" toChapter="15" toVerse="33"/>
+        </haftara>  
     </day>
 
     <day n="Parshas Parah">
         <maftir book="Numbers" fromChapter="19" fromVerse="1" toVerse="22"/>
-        <haftarah book="Ezekiel" fromChapter="36" fromVerse="16" toVerse="38"/>
+        <haftarah book="Ezekiel" fromChapter="36" fromVerse="16" 
+            <custom n="Ashkenaz Italki" toVerse="38"/>
+            <custom n="Sefard" toVerse="36"/>
+        </haftara>
     </day>
 
     <day n="Parshas Hachodesh">
         <maftir book="Exodus" fromChapter="12" fromVerse="1" toVerse="20"/>
-        <haftarah book="Ezekiel" fromChapter="45" fromVerse="16" toChapter="46" toVerse="18"/>
+        <haftarah book="Ezekiel" fromChapter="45" toChapter="46">
+           <custom n="Ashkenaz" fromVerse="16"  toVerse="18"/>
+           <custom n="Italki"  fromVerse="18"  toVerse="11"/>
+           <custom n="Sefarad"  fromVerse="18"  toVerse="15"/>
+           <custom n="Teiman"  fromVerse="9"  toVerse="11"/>                                                                                              
+        </haftara>
     </day>
 
     <day n="Purim">
@@ -426,7 +460,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
        </torah>
     </day>
 
-    <day n="Shabbos Hagodol"> <!-- only erev Pesah -->
+    <day n="Shabbos Hagodol"> <!-- Chabad only erev Pesah -->
         <haftarah book="Malachi" fromChapter="3" fromVerse="4" toVerse="24"/>
     </day>
 
@@ -484,14 +518,14 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             </shabbos>  
         </torah>
         <haftarah book="Joshua">
-            <custom n="Ashkenaz>
-            <part n="1" fromChapter="3" fromVerse="5" toVerse="7"/>
-            <part n="2" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
-            <part n="3" fromChapter="6" fromVerse="27"/>
+            <custom n="Ashkenaz Chabad>
+                <part n="1" fromChapter="3" fromVerse="5" toVerse="7"/>
+                <part n="2" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
+                <part n="3" fromChapter="6" fromVerse="27"/>
             </custom>
             <custom n="Sefard">
-            <part n="1" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
-            <part n="2" fromChapter="6" fromVerse="27"/>
+                <part n="1" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
+                <part n="2" fromChapter="6" fromVerse="27"/>
             </custom>   
              <custom n="Frankfurt Hagro" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
           </haftarah>
@@ -508,9 +542,16 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
            <aliyah n="5" fromChapter="23" fromVerse="33" toVerse="44" diaspora="true"/>
                   
         </torah>
-        <haftarah book="Kings II" fromChapter="23"> <!-- Diaspora -->
-            <part n="1" fromVerse="1" toVerse="9"/>
-            <part n="2" fromVerse="21" toVerse="25"/>
+        <haftarah book="Kings II">  <!-- Diaspora -->
+            <custom n="Ashkenaz Sefarad>
+                <part n="1" fromChapter="23" fromVerse="1" toVerse="9"/>
+                <part n="2" fromChapter="23" fromVerse="21" toVerse="25"/>     
+            </custom>
+            <custom n="Italki" fromChapter="23" fromVerse="21" toVerse="30"/>
+            <custom n="Teiman" >
+                <part n="1" fromChapter="22" fromVerse="1" toVerse="7"/>
+                <part n="2" fromChapter="23" fromVerse="21" toVerse="25"/>
+            </custom>                                                                   
         </haftarah>
     </day>
 
@@ -545,11 +586,13 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <aliyah n="3" fromVerse="9" toVerse="14"/>
         </torah>
     </day>
-
-    <day n="Shabbos Chol Hamoed Pesach">
-        <haftarah book="Ezekiel" fromChapter="37" fromVerse="1" toVerse="14"/>
-    </day>
-
+    <day n="Haftarah Shabbos Chol Hamoed Pesach">
+        <haftarah book="Ezekiel" > 
+          <custom "Ashkenaz Sefarad" fromChapter="37" fromVerse="1" toVerse="14"/>
+          <custom "Teiman" fromChapter="36" fromVerse="37" toChapter="37" toVerse="17"/>
+        </haftarah>    
+    </day>  
+    
     <day n="Pesach 7">
         <torah book="Exodus">
             <aliyah n="1" fromChapter="13" fromVerse="17"/>
@@ -571,7 +614,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
         <haftarah book="Samuel II" fromChapter="22" fromVerse="1" toVerse="51"/>
     </day>
 
-    <day n="Pesach 8">
+    <day n="Pesach 8"> <!-- Diaspora -->
         <torah book="Deuteronomy">
             <aliyah n="1" fromChapter="15" fromVerse="19"/>
             <aliyah n="2" fromChapter="16" fromVerse="1"/>
@@ -598,14 +641,22 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <aliyah n="5" fromChapter="20" fromVerse="15" toVerse="22"/>
         </torah>
         <haftarah book="Ezekiel">
+          <custom n="Ashkenaz Sefarad">                      
             <part n="1" fromChapter="1" fromVerse="1" toVerse="28"/>
             <part n="2" fromChapter="3" fromVerse="12"/>
+          </custom>
+           <custom n="Teiman">                      
+            <part n="1" fromChapter="1" fromVerse="1" toChapter="2" toVerse="2"/>
+            <part n="2" fromChapter="3" fromVerse="12"/>
+          </custom>                                                         
         </haftarah>
     </day>
 
     <day n="Shavuos 2">
        <!--RULE -shabos - above Shmini atceres
                    hol - above 8 shel Pesach                    -->
-        <haftarah book="Habakkuk" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
+        <haftarah book="Habakkuk"> 
+       <custom n="Ashkenaz" fromChapter="3" fromVerse="1"  toVerse="19"/>
+       <custom n="Sefarad" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
     </day>
 </meta>
