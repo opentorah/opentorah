@@ -1,93 +1,28 @@
 package org.podval.calendar.generate.tanach
 
-import java.net.URL
+import org.podval.calendar.generate.tanach.SpanParser.{NumberedSpan, SpanParsed, parseSpan, parseNumberedSpan,
+  addImplied1, setImpliedTo, checkNumber, dropNumbers}
+import org.podval.calendar.metadata.MetadataParser.{MetadataPreparsed, bind}
+import org.podval.calendar.metadata.{HasNames, Names, XML}
 
 import scala.xml.Elem
-import Tanach.{ChumashBook, ChumashBookStructure, NachBook, NachBookStructure}
-import SpanParser.{NumberedSpan, SpanParsed, addImplied1, checkNumber, dropNumbers, parseNumberedSpan, parseSpan, setImpliedTo}
-import org.podval.calendar.metadata.MetadataParser.{MetadataPreparsed, bind}
-import org.podval.calendar.metadata.{Metadata, MetadataParser, Names, XML}
 
-object TanachParser {
-  def parse(obj: AnyRef): (
-    Map[ChumashBook, ChumashBookStructure],
-    Map[NachBook, NachBookStructure]
-  ) = {
-    val (className, url) = MetadataParser.getUrl(obj)
-    val books: Seq[MetadataPreparsed] = MetadataParser.loadMetadataResource(url, className, "book")
+object ParshaMetadataParser {
 
-    (
-      bind(Tanach.chumash, books.take(Tanach.chumash.length)).map(parseChumashBook(url, _)).toMap,
-      bind(Tanach.nach, books.drop(Tanach.chumash.length)).map(parseNachBook).toMap
-    )
-  }
-
-  private def parseNachBook(arg: (NachBook, MetadataPreparsed)): (NachBook, NachBookStructure) = {
-    val (book: NachBook, metadata: MetadataPreparsed) = arg
-    metadata.attributes.close()
-    val (chapterElements, tail) = XML.span(metadata.elements, "chapter")
-    XML.checkNoMoreElements(tail)
-    val result = new NachBookStructure(
-      book,
-      metadata.names,
-      chapters = parseChapters(book, chapterElements)
-    )
-    book -> result
-  }
-
-  private final case class ChapterParsed(n: Int, length: Int)
-
-  private def parseChapters(book: Tanach.Book[_], elements: Seq[Elem]): Chapters = {
-    val chapters: Seq[ChapterParsed] = elements.map { element =>
-      val attributes = XML.openEmpty(element, "chapter" )
-      val result = ChapterParsed(
-        n = attributes.doGetInt("n"),
-        length = attributes.doGetInt("length")
-      )
-      attributes.close()
-      result
-    }
-
-    require(chapters.map(_.n) == (1 to chapters.length), "Wrong chapter numbers.")
-
-    new Chapters(chapters.map(_.length).toArray)
-  }
-
-  private def parseChumashBook(
-    url: URL,
-    arg: (ChumashBook, MetadataPreparsed)
-  ): (ChumashBook,  ChumashBookStructure) = {
-    val (book: ChumashBook, metadata: MetadataPreparsed) = arg
-    metadata.attributes.close()
-    // TODO handle names from metadata
-    val (chapterElements, weekElements) = XML.span(metadata.elements, "chapter", "week")
-    val chapters: Chapters = parseChapters(book, chapterElements)
-
-    val weeksMetadata: Seq[MetadataPreparsed] = MetadataParser.loadMetadata(url, weekElements, "week")
-    val weeksPreparsed: Seq[WeekPreparsed] = weeksMetadata.map(preparseWeek)
+  def parse(metadata: Seq[MetadataPreparsed], parshiot: Seq[Parsha], chapters: Chapters): Seq[(Parsha, Parsha.Structure)] = {
+    val weeksPreparsed: Seq[Preparsed] = metadata.map(preparseWeek)
     val weekSpans: Seq[Span] = setImpliedTo(weeksPreparsed.map(_.span), chapters.full, chapters)
     require(weekSpans.length == weeksPreparsed.length)
-    val weeksParsed: Seq[WeekParsed] = weeksPreparsed.zip(weekSpans).map { case (week, span) =>
-      week.parse(span, chapters) }
-
-    val weeksCombined: Seq[WeekCombined] = combine(weeksParsed)
-    val weeksBound: Seq[(Parsha, WeekCombined)] = bind(Parsha.forBook(book), weeksCombined)
-    val weeks: Seq[(Parsha, Parsha.Structure)] = weeksBound.map { case (parsha: Parsha, week: WeekCombined) =>
-        parsha -> week.squash(parsha, chapters)
+    val weeksParsed: Seq[Parsed] = weeksPreparsed.zip(weekSpans).map { case (week, span) =>
+      week.parse(span, chapters)
     }
-
-    val result = new ChumashBookStructure(
-      book,
-      weeksParsed.head.names,
-      chapters,
-      weeks.toMap
-    )
-
-    book -> result
+    val weeksCombined: Seq[Combined] = combine(weeksParsed)
+    val weeksBound: Seq[(Parsha, Combined)] = bind(parshiot, weeksCombined)
+    weeksBound.map { case (parsha: Parsha, week: Combined) => parsha -> week.squash(parsha, chapters) }
   }
 
-  private def preparseWeek(metadata: MetadataPreparsed): WeekPreparsed = {
-    val result = new WeekPreparsed(
+  private def preparseWeek(metadata: MetadataPreparsed): Preparsed = {
+    val result = new Preparsed(
       span = parseSpan(metadata.attributes),
       names = metadata.names,
       elements = metadata.elements
@@ -96,12 +31,12 @@ object TanachParser {
     result
   }
 
-  private final class WeekPreparsed(
+  private final class Preparsed(
     val span: SpanParsed,
     val names: Names,
     val elements: Seq[Elem]
   ) {
-    def parse(span: Span, chapters: Chapters): WeekParsed = {
+    def parse(span: Span, chapters: Chapters): Parsed = {
       val (aliyahElements, dayElements, maftirElements) = XML.span(elements,
         "aliyah", "day", "maftir")
       require(maftirElements.length == 1)
@@ -125,7 +60,8 @@ object TanachParser {
       // TODO if the parshiot combine, does it affect those small aliyot?
       val aliyotSpan: Span = Span(span.from, aliyot.last.span.to.getOrElse(daysProcessed.head.to))
       val aliyotWithImplied1: Seq[NumberedSpan] = addImplied1(aliyot, aliyotSpan, chapters)
-      val aliyotResult: Seq[Span] = setImpliedTo(dropNumbers(checkNumber(aliyotWithImplied1, 3)), aliyotSpan, chapters)
+      val aliyotResult: Seq[Span] = setImpliedTo(dropNumbers(
+        checkNumber(aliyotWithImplied1, 3)), aliyotSpan, chapters)
 
       val maftir: SpanParsed = parseMaftir(maftirElements.head)
       val maftirResult: Span = setImpliedTo(
@@ -134,7 +70,7 @@ object TanachParser {
         chapters
       ).head
 
-      WeekParsed(
+      Parsed(
         names,
         span = span,
         days = daysProcessed,
@@ -147,16 +83,16 @@ object TanachParser {
     }
   }
 
-  private def combine(weeks: Seq[WeekParsed]): Seq[WeekCombined] = weeks match {
+  private def combine(weeks: Seq[Parsed]): Seq[Combined] = weeks match {
     case week1 :: week2 :: tail =>
       week1.combine(week2.daysCombined, week2.daysCombinedCustom, week2.span) +: combine(week2 +: tail)
     case week :: Nil =>
-      Seq(week.combine(Seq.empty, Map.empty, Span(Verse(1, 1), Verse(1, 1))))
+      Seq(week.combine(Seq.empty, Map.empty, Span(Verse(1, 1), Verse(1, 1)))) // The Span will never be used!
     case Nil =>
       Nil
   }
 
-  private final case class WeekParsed(
+  private final case class Parsed(
     names: Names,
     span: Span,
     days: Seq[Span],
@@ -170,7 +106,7 @@ object TanachParser {
       daysCombinedNext: Seq[NumberedSpan],
       daysCombinedCustomNext: Map[String, Seq[NumberedSpan]],
       spanNext: Span
-    ): WeekCombined = new WeekCombined(
+    ): Combined = new Combined(
       names = names,
       span = span,
       days = days,
@@ -185,7 +121,7 @@ object TanachParser {
     )
   }
 
-  final class WeekCombined(
+  final class Combined(
     val names: Names,
     val span: Span,
     val days: Seq[Span],
@@ -197,7 +133,7 @@ object TanachParser {
     val daysCombinedCustomNext: Map[String, Seq[NumberedSpan]],
     val maftir: Span,
     val aliyot: Seq[Span]
-  ) extends Metadata {
+  ) extends HasNames {
     def squash(parsha: Parsha, chapters: Chapters): Parsha.Structure = {
       val (daysCombinedResult: Seq[Span], daysCombinedCustomResult: Map[String, Seq[Span]]) =
         if (!parsha.combines) (Seq.empty, Map.empty) else {
@@ -224,7 +160,6 @@ object TanachParser {
       )
     }
   }
-
 
   private final class DayParsed(
     val span: NumberedSpan,

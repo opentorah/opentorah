@@ -1,5 +1,5 @@
 package org.podval.calendar.metadata
 
-trait Metadata {
+trait HasNames {
   def names: Names
 }

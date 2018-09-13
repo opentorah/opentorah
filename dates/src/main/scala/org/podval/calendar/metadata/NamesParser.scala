@@ -16,17 +16,20 @@ object NamesParser {
     // TODO make a convenience method?
     require(namesElements.size <= 1, "Multiple 'names' elements.")
     val namesElement: Option[Elem] = namesElements.headOption
-    val names: Seq[Name] = if (namesElement.isEmpty)
-      if (defaultName.isEmpty) Seq.empty else Seq(defaultName.get)
-    else {
-      val (attributes, nameElements) = open(namesElement.get, "names")
-      attributes.close()
+    val names: Option[Names] =
+      if (namesElement.isEmpty) if (defaultName.isEmpty) None else Some(new Names(Seq(defaultName.get)))
+      else Some(parseNamesElement(namesElement.get, defaultName))
 
-      val nonDefaultNames: Seq[Name] = nameElements.map(parseName)
-      defaultName.fold(nonDefaultNames)(_ +: nonDefaultNames)
-    }
+    (attributes, names, tail)
+  }
 
-    (attributes, if (names.isEmpty) None else Some(new Names(names)) , tail)
+  def parseNamesElement(element: Elem, defaultName: Option[Name]): Names = {
+    val (attributes, nameElements) = open(element, "names")
+    attributes.close()
+
+    val nonDefaultNames: Seq[Name] = nameElements.map(parseName)
+    val names = defaultName.fold(nonDefaultNames)(_ +: nonDefaultNames)
+    new Names(names)
   }
 
   private def parseName(element: Elem): Name = {

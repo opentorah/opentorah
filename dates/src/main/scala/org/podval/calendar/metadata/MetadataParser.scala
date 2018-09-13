@@ -13,15 +13,13 @@ object MetadataParser {
     attributes: Attributes, // actual parser needs to call close()!
     names: Names,
     elements: Seq[Elem]
-  ) extends Metadata
+  ) extends HasNames
 
-  final class NamesOnlyMetadata(val names: Names) extends Metadata
-
-  def getURL(name: String): URL = getClass.getClassLoader.getResource(name)
+  def getUrl(obj: AnyRef, name: String): URL = obj.getClass.getResource(name + ".xml")
 
   private def childUrl(parent: URL, name: String): URL = changePath(parent, parent.getFile + "/" + name)
 
-  def childFileUrl(parent: URL, name: String): URL = childUrl(parent, name + ".xml")
+  private def childFileUrl(parent: URL, name: String): URL = childUrl(parent, name + ".xml")
 
   private def parentUrl(url: URL): URL = {
     val path = url.getFile
@@ -34,31 +32,8 @@ object MetadataParser {
   private def changePath(url: URL, path: String): URL =
     new URL(url.getProtocol, url.getHost, url.getPort, path, null)
 
-  def loadResource(url: URL): Option[Elem] = {
-    try {
-      val result = xml.XML.load(url.openStream())
-      Some(Utility.trimProper(result).asInstanceOf[Elem])
-    } catch {
-      case _: FileNotFoundException => None
-    }
-  }
-
-  def loadNames[K <: WithMetadata[Metadata]](obj: AnyRef, keys: Seq[K], name: String): Map[K, Metadata] = {
-    val (className, url) = getUrl(obj)
-    bind(keys, loadMetadataResource(url, className, name)).toMap.mapValues { metadata =>
-      metadata.attributes.close()
-      new NamesOnlyMetadata(metadata.names)
-    }
-  }
-
-  def getUrl(obj: AnyRef): (String, URL) = {
-    val className: String = WithMetadata.className(obj)
-    val url = obj.getClass.getResource(className + ".xml")
-    (className, url)
-  }
-
   def loadMetadataResource(url: URL, what: String, name: String): Seq[MetadataPreparsed] = {
-    val elements: Seq[Elem] = loadMetadata(url, what)
+    val elements: Seq[Elem] = loadMetadataElements(url, "metadata", what)
     loadMetadata(url, elements, name)
   }
 
@@ -89,10 +64,10 @@ object MetadataParser {
     }
   }
 
-  private def loadMetadata(url: URL, what: String): Seq[Elem] = {
+  private def loadMetadataElements(url: URL, rootElementName: String, what: String): Seq[Elem] = {
     val element = loadResource(url)
     require(element.isDefined, s"No resource: $url")
-    val (attributes, elements) = open(element.get, "meta")
+    val (attributes, elements) = open(element.get, rootElementName)
     val typeOption = attributes.get("type")
     attributes.close()
     require(typeOption.nonEmpty, "Attribute 'type' is missing.")
@@ -100,11 +75,40 @@ object MetadataParser {
     elements
   }
 
-  def bind[K <: WithMetadata[_], M <: Metadata](keys: Seq[K], metadatas: Seq[M]): Seq[(K, M)] = {
+  private def loadResource(url: URL): Option[Elem] = {
+    try {
+      val result = xml.XML.load(url.openStream())
+      Some(Utility.trimProper(result).asInstanceOf[Elem])
+    } catch {
+      case _: FileNotFoundException => None
+    }
+  }
+
+  def bind[K <: Named, M <: HasNames](keys: Seq[K], metadatas: Seq[M]): Seq[(K, M)] = {
     require(keys.length == metadatas.length)
     keys.zip(metadatas).map { case (key, metadata) =>
       require(metadata.names.has(key.name))
       key -> metadata
     }
+  }
+
+  def loadNames[K <: WithNames[K]](obj: AnyRef, keys: Seq[K]): Map[K, Names] =
+    loadNames(obj, Named.className(obj), keys)
+
+  def loadNames[K <: WithNames[K]](obj: AnyRef, name: String, keys: Seq[K]): Map[K, Names] = {
+    val url = getUrl(obj, name)
+    val elements = loadMetadataElements(url, "names", name)
+    val metadatas: Seq[Names] = elements.map(element => NamesParser.parseNamesElement(element, None))
+    Names.checkDisjoint(metadatas)
+
+    // TODO relax the "same order" requirement.
+    // TODO merge into bind()?
+    require(keys.length == metadatas.length)
+    val result = keys.zip(metadatas).map { case (key, metadata) =>
+      require(metadata.has(key.name))
+      key -> metadata
+    }
+
+    result.toMap
   }
 }

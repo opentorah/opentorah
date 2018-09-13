@@ -1,6 +1,6 @@
 package org.podval.calendar.generate.tanach
 
-import org.podval.calendar.metadata.{Names, Metadata, WithMetadata}
+import org.podval.calendar.metadata.{HasNames, Names, WithMetadata}
 
 object Tanach {
 
@@ -9,9 +9,9 @@ object Tanach {
   abstract class BookStructure(
     // TODO remove?
     book: Book[_],
-    val names: Names,
+    override val names: Names,
     val chapters: Chapters
-  ) extends Metadata
+  ) extends HasNames
 
   trait ChumashBook extends Book[ChumashBookStructure] {
     final override def metadata: ChumashBookStructure = chumashStructure(this)
@@ -110,7 +110,7 @@ object Tanach {
   private val (
     chumashStructure: Map[ChumashBook, ChumashBookStructure],
     nachStructure: Map[NachBook, NachBookStructure]
-  ) = TanachParser.parse(this)
+  ) = TanachMetadataParser.parse(this)
 
   def forChumashName(name: String): Option[ChumashBook] = chumashStructure.find(_._2.names.has(name)).map(_._1)
   def forNachName(name: String): Option[NachBook] = nachStructure.find(_._2.names.has(name)).map(_._1)
@@ -130,5 +130,7 @@ object Tanach {
 //    printSpans(Parsha.Masei.structure.daysCustom("Ashkenaz"))
 //    printSpans(Parsha.Masei.structure.daysCombined)
     println()
+
+    println(Custom.Chabad.names)
   }
 }
