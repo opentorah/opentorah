@@ -135,7 +135,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             </shabbos>
         </torah>
         <haftarah book="Samuel I" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
-    </day>
+      </day>
 
     <day n="Rosh Hashanah 2">
         <torah book="Genesis" fromChapter="22">
@@ -168,7 +168,13 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             </shabbos>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="7" toVerse="11"/>
-        <haftarah book="Isaiah" fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
+        <haftarah book="Isaiah">
+          <custom "Ashkenaz Sefarad"   fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
+          <custom "Italki Teimani">
+               <part n="1"  fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
+               <part n="2"  fromChapter="59" fromVerse="20" toVerse="21"/>
+          </custom>    
+        </haftarah>     
     </day>
 
     <day n="Yom Kippur Mincha">
@@ -177,7 +183,7 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <aliyah n="2" fromVerse="6"/>
             <aliyah n="3" fromVerse="22" toVerse="30"/> <!-- TODO mincha - maftir-->
         </torah>
-        <haftarah >
+        <haftarah>
            <part n="1" book="Jonah"/>
            <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
         </haftarah> 
@@ -295,7 +301,13 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
                 <aliyah n="7" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/>  <!-- TODO hatan Bereshis -->
             </part>
         </torah>
-        <haftarah book="Joshua" fromChapter="1" fromVerse="1" toVerse="18"/>
+          <haftarah book="Joshua">
+            <custom n="Ahkenaz Sefarad" fromChapter="1" fromVerse="1" toVerse="18"/>
+            <custom n="Teiman>
+               <part n="1"  fromChapter="1" fromVerse="1" toVerse="18"/>
+               <part n="6"  fromChapter="27"/>                                                       
+            </custom>  
+        </haftara>           
     </day>
 
     <!--
