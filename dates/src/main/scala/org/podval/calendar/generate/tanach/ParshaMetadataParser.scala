@@ -41,7 +41,7 @@ object ParshaMetadataParser {
         "aliyah", "day", "maftir")
       require(maftirElements.length == 1)
 
-      def split(days: Seq[DayParsed]): (Seq[NumberedSpan], Map[String, Seq[NumberedSpan]]) = {
+      def split(days: Seq[DayParsed]): (Seq[NumberedSpan], Map[Custom, Seq[NumberedSpan]]) = {
         def toNumberedSpan(days: Seq[DayParsed]): Seq[NumberedSpan] = days.map(_.span)
         val (default, custom) = days.partition(_.custom.isEmpty)
         (toNumberedSpan(default), custom.groupBy(_.custom.get).mapValues(toNumberedSpan))
@@ -52,7 +52,7 @@ object ParshaMetadataParser {
       val (days, daysCustom) = split(normal)
       val (daysCombined, daysCombinedCustom) = split(combined)
 
-      val (daysProcessed: Seq[Span], daysCustomProcessed: Map[String, Seq[Span]]) =
+      val (daysProcessed: Seq[Span], daysCustomProcessed: Map[Custom, Seq[Span]]) =
         processDays(days, daysCustom, span, chapters)
 
       val aliyot: Seq[NumberedSpan] = aliyahElements.map(parseAliyah)
@@ -96,15 +96,15 @@ object ParshaMetadataParser {
     names: Names,
     span: Span,
     days: Seq[Span],
-    daysCustom: Map[String, Seq[Span]],
+    daysCustom: Map[Custom, Seq[Span]],
     daysCombined: Seq[NumberedSpan],
-    daysCombinedCustom: Map[String, Seq[NumberedSpan]],
+    daysCombinedCustom: Map[Custom, Seq[NumberedSpan]],
     aliyot: Seq[Span],
     maftir: Span
   ) {
     def combine(
       daysCombinedNext: Seq[NumberedSpan],
-      daysCombinedCustomNext: Map[String, Seq[NumberedSpan]],
+      daysCombinedCustomNext: Map[Custom, Seq[NumberedSpan]],
       spanNext: Span
     ): Combined = new Combined(
       names = names,
@@ -125,21 +125,21 @@ object ParshaMetadataParser {
     val names: Names,
     val span: Span,
     val days: Seq[Span],
-    val daysCustom: Map[String, Seq[Span]],
+    val daysCustom: Map[Custom, Seq[Span]],
     val daysCombined: Seq[NumberedSpan],
-    val daysCombinedCustom: Map[String, Seq[NumberedSpan]],
+    val daysCombinedCustom: Map[Custom, Seq[NumberedSpan]],
     val spanNext: Span,
     val daysCombinedNext: Seq[NumberedSpan],
-    val daysCombinedCustomNext: Map[String, Seq[NumberedSpan]],
+    val daysCombinedCustomNext: Map[Custom, Seq[NumberedSpan]],
     val maftir: Span,
     val aliyot: Seq[Span]
   ) extends HasNames {
     def squash(parsha: Parsha, chapters: Chapters): Parsha.Structure = {
-      val (daysCombinedResult: Seq[Span], daysCombinedCustomResult: Map[String, Seq[Span]]) =
+      val (daysCombinedResult: Seq[Span], daysCombinedCustomResult: Map[Custom, Seq[Span]]) =
         if (!parsha.combines) (Seq.empty, Map.empty) else {
           // TODO Use defaults from days?
           val daysCombinedResult: Seq[NumberedSpan] = daysCombined ++ daysCombinedNext
-          val daysCombinedCustomResult: Map[String, Seq[NumberedSpan]] = {
+          val daysCombinedCustomResult: Map[Custom, Seq[NumberedSpan]] = {
             val result = daysCombinedCustom.map { case (custom, days) =>
               (custom, days ++ daysCombinedCustomNext.getOrElse(custom, Seq.empty)) }
             daysCombinedCustomNext ++ result
@@ -163,15 +163,20 @@ object ParshaMetadataParser {
 
   private final class DayParsed(
     val span: NumberedSpan,
-    val custom: Option[String],
+    val custom: Option[Custom],
     val isCombined: Boolean
   )
 
   private def parseDay(element: Elem): DayParsed = {
     val attributes = XML.openEmpty(element, "day")
+    val custom: Option[Custom] = attributes.get("custom").map { name: String =>
+      val result = Custom.forName(name)
+      require(result.isDefined, s"Unknown Custom: $name")
+      result.get
+    }
     val result = new DayParsed(
       span = parseNumberedSpan(attributes),
-      custom = attributes.get("custom"),
+      custom = custom,
       isCombined = attributes.doGetBoolean("combined")
     )
     attributes.close()
@@ -194,10 +199,10 @@ object ParshaMetadataParser {
 
   private def processDays(
     days: Seq[NumberedSpan],
-    daysCustom: Map[String, Seq[NumberedSpan]],
+    daysCustom: Map[Custom, Seq[NumberedSpan]],
     span: Span,
     chapters: Chapters
-  ): (Seq[Span], Map[String, Seq[Span]]) = {
+  ): (Seq[Span], Map[Custom, Seq[Span]]) = {
     val withImplied1 = addImplied1(days, span, chapters)
 
     def process(spans: Seq[NumberedSpan]): Seq[Span] =

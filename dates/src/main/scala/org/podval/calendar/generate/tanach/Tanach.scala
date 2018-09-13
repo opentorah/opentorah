@@ -1,6 +1,6 @@
 package org.podval.calendar.generate.tanach
 
-import org.podval.calendar.metadata.{HasNames, Names, WithMetadata}
+import org.podval.calendar.metadata.{HasNames, Names, WithMetadata, LanguageSpec, Language}
 
 object Tanach {
 
@@ -112,8 +112,8 @@ object Tanach {
     nachStructure: Map[NachBook, NachBookStructure]
   ) = TanachMetadataParser.parse(this)
 
-  def forChumashName(name: String): Option[ChumashBook] = chumashStructure.find(_._2.names.has(name)).map(_._1)
-  def forNachName(name: String): Option[NachBook] = nachStructure.find(_._2.names.has(name)).map(_._1)
+  def forChumashName(name: String): Option[ChumashBook] = chumash.find(_.names.has(name))
+  def forNachName(name: String): Option[NachBook] = nach.find(_.names.has(name))
   def forName(name: String): Option[Book[_, _]] = forChumashName(name).orElse(forNachName(name))
 
   def main(args: Array[String]): Unit = {
@@ -121,21 +121,14 @@ object Tanach {
       println(s"${index+1}: $span")
     }
 
-/////    printSpans(Parsha.Mattos.structure.days)
-//    printSpans(Parsha.Mattos.structure.daysCombined)
-    val x = Parsha.Mattos.metadata
-    printSpans(Parsha.Mattos.metadata.daysCombinedCustom("Ashkenaz"))
-    println()
-//    printSpans(Parsha.Masei.structure.days)
-//    printSpans(Parsha.Masei.structure.daysCustom("Ashkenaz"))
-//    printSpans(Parsha.Masei.structure.daysCombined)
-    println()
-
+    printSpans(Parsha.Mattos.metadata.daysCombinedCustom(Custom.Ashkenaz))
+    println(org.podval.calendar.metadata.Language.Russian.names)
     println(Custom.Chabad.names)
-    println(org.podval.calendar.gregorian.GregorianDayCompanion.Sunday.name)
-    println(org.podval.calendar.gregorian.GregorianDayCompanion.Sunday.names)
-    println(org.podval.calendar.jewish.JewishDayCompanion.Rishon.names)
-    println(org.podval.calendar.gregorian.GregorianMonthCompanion.July.names)
-    println(org.podval.calendar.jewish.JewishMonthCompanion.Marheshvan.names)
+    println(org.podval.calendar.jewish.Jewish.Day.Name.Rishon.names)
+    println(org.podval.calendar.gregorian.Gregorian.Month.Name.July.names)
+    println(org.podval.calendar.jewish.Jewish.Month.Name.Marheshvan.names)
+    println(org.podval.calendar.jewish.Jewish.Day.Name.Sheni.toString(LanguageSpec(Language.English)))
+    println(org.podval.calendar.jewish.Jewish.Day.Name.Sheni.toString(LanguageSpec(Language.Russian)))
+    println(org.podval.calendar.jewish.Jewish.Month.Name.Marheshvan.toString(LanguageSpec(Language.Russian)))
   }
 }

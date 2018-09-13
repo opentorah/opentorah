@@ -96,9 +96,6 @@ object MetadataParser {
     }
   }
 
-  def loadNames[K <: WithNames[K]](obj: AnyRef, keys: Seq[K]): Map[K, Names] =
-    loadNames(obj, Named.className(obj), keys)
-
   def loadNames[K <: WithNames[K]](obj: AnyRef, name: String, keys: Seq[K]): Map[K, Names] = {
     val url = getUrl(obj, name)
     val elements = loadMetadataElements(url, "names", name)
@@ -107,7 +104,7 @@ object MetadataParser {
 
     // TODO relax the "same order" requirement.
     // TODO merge into bind()?
-    require(keys.length == metadatas.length)
+    require(keys.length == metadatas.length, s"Different lengths: $keys and $metadatas")
     val result = keys.zip(metadatas).map { case (key, metadata) =>
       require(metadata.has(key.name))
       key -> metadata

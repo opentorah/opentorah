@@ -9,9 +9,7 @@ object NamesParser {
   def parseNames(element: Elem, name: String): (Attributes, Option[Names], Seq[Elem]) = {
     val (attributes, elements) = open(element, name)
 
-    val defaultName: Option[Name] = attributes.get("n").map {
-      defaultName => Name(defaultName, None, None, None)
-    }
+    val defaultName: Option[Name] = attributes.get("n").map { defaultName => Name(defaultName, LanguageSpec.empty) }
     val (namesElements, tail) = span(elements, "names")
     // TODO make a convenience method?
     require(namesElements.size <= 1, "Multiple 'names' elements.")
@@ -34,17 +32,26 @@ object NamesParser {
 
   private def parseName(element: Elem): Name = {
     val (attributes, text: Option[String]) = XML.openText(element, "name")
+
     val n: Option[String] = attributes.get("n")
     require(n.isEmpty || text.isEmpty, "Both 'n' attribute and text are present.")
     val name: Option[String] = n.orElse(text)
     require(name.nonEmpty, "Both 'n' attribute and text are absent.")
-    val result = Name(
-      name.get,
-      lang = attributes.get("lang"),
+
+    val lang: Option[Language] = attributes.get("lang").map { code: String =>
+      val result = Language.forCode(code)
+      require(result.isDefined, s"Unknown language code: $code")
+      result.get
+    }
+
+    val result = Name(name.get, LanguageSpec(
+      lang,
       isTransliterated = attributes.getBoolean("transliterated"),
       flavour = attributes.get("flavour")
-    )
+    ))
+
     attributes.close()
+
     result
   }
 }

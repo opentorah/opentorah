@@ -17,9 +17,9 @@ object Parsha {
     override val names: Names,
     val span: Span,
     val days: Seq[Span], // length 7 :)
-    val daysCustom: Map[String, Seq[Span]],
+    val daysCustom: Map[Custom, Seq[Span]],
     val daysCombined: Seq[Span],
-    val daysCombinedCustom: Map[String, Seq[Span]],
+    val daysCombinedCustom: Map[Custom, Seq[Span]],
     val maftir: Span,
     val aliyot: Seq[Span] // length 3
   ) extends HasNames

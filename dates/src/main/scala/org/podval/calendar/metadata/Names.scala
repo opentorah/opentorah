@@ -11,15 +11,14 @@ final class Names(val names: Seq[Name]) {
 
   def has(name: String): Boolean = find(name).isDefined
 
-  def find(
-    lang: Option[String],
-    isTransliterated: Option[Boolean],
-    flavour: Option[String]
-  ): Option[Name] = names.find { name =>
-    (lang.isEmpty || (name.lang == lang)) &&
-    (isTransliterated.isEmpty || (name.isTransliterated == isTransliterated)) &&
-    (flavour.isEmpty || (name.flavour == flavour))
-  }
+  def find(spec: LanguageSpec): Option[Name] = names.find(_.satisfies(spec))
+
+  def doFind(spec: LanguageSpec): Name =
+    find(spec)
+      .orElse(find(spec.dropFlavour))
+      .orElse(find(spec.dropFlavour.dropIsTransliterated))
+      .orElse(find(spec.dropFlavour.dropIsTransliterated.dropLanguage))
+      .get
 
   override def toString: String = names.mkString("Names(", ", ", ")")
 
