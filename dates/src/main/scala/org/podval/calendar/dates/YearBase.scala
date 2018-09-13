@@ -1,6 +1,6 @@
 package org.podval.calendar.dates
 
-import org.podval.calendar.util.Numbered
+import org.podval.calendar.metadata.Numbered
 
 /**
   *

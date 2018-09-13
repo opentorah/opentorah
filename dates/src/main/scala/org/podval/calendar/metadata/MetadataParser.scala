@@ -15,7 +15,11 @@ object MetadataParser {
     elements: Seq[Elem]
   ) extends HasNames
 
-  def getUrl(obj: AnyRef, name: String): URL = obj.getClass.getResource(name + ".xml")
+  def getUrl(obj: AnyRef, name: String): URL =  {
+    val result = obj.getClass.getResource(name + ".xml")
+    require(result != null, s"No such resource: $obj:$name")
+    result
+  }
 
   private def childUrl(parent: URL, name: String): URL = changePath(parent, parent.getFile + "/" + name)
 

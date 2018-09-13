@@ -132,5 +132,10 @@ object Tanach {
     println()
 
     println(Custom.Chabad.names)
+    println(org.podval.calendar.gregorian.GregorianDayCompanion.Sunday.name)
+    println(org.podval.calendar.gregorian.GregorianDayCompanion.Sunday.names)
+    println(org.podval.calendar.jewish.JewishDayCompanion.Rishon.names)
+    println(org.podval.calendar.gregorian.GregorianMonthCompanion.July.names)
+    println(org.podval.calendar.jewish.JewishMonthCompanion.Marheshvan.names)
   }
 }

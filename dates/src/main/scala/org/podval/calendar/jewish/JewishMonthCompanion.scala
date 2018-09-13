@@ -1,12 +1,12 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.MonthCompanion
-import org.podval.calendar.util.Named
+import org.podval.calendar.metadata.{MetadataParser, Names, WithNames}
 
 abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
-  final type Name = JewishMonthCompanion.Name
+  final val Name: JewishMonthCompanion.type = JewishMonthCompanion
 
-  final val Name: JewishMonthCompanion.Name.type = JewishMonthCompanion.Name
+  final type Name = Name.Name
 
   final override def yearNumber(monthNumber: Int): Int = Cycle.monthYear(monthNumber)
 
@@ -15,22 +15,27 @@ abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
 
 
 object JewishMonthCompanion {
-  sealed class Name(val name: String) extends Named(name)
-
-  object Name {
-    case object Tishrei extends Name("Tishrei")
-    case object Marheshvan extends Name("Marcheshvan")
-    case object Kislev extends Name("Kislev")
-    case object Teves extends Name("Teves")
-    case object Shvat extends Name("Shevat")
-    case object Adar extends Name("Adar")
-    case object Nisan extends Name("Nissan")
-    case object Iyar extends Name("Iyar")
-    case object Sivan extends Name("Sivan")
-    case object Tammuz extends Name("Tammuz")
-    case object Av extends Name("Av")
-    case object Elul extends Name("Elul")
-    case object AdarI extends Name("Adar I")
-    case object AdarII extends Name("Adar II")
+  sealed trait Name extends WithNames[Name] {
+    def toNames: Map[Name, Names] = month2names
   }
+
+  case object Tishrei extends Name
+  case object Marheshvan extends Name
+  case object Kislev extends Name
+  case object Teves extends Name
+  case object Shvat extends Name
+  case object Adar extends Name
+  case object Nisan extends Name
+  case object Iyar extends Name
+  case object Sivan extends Name
+  case object Tammuz extends Name
+  case object Av extends Name
+  case object Elul extends Name
+  case object AdarI extends Name { override def name: String = "Adar I"}
+  case object AdarII extends Name { override def name: String = "Adar II"}
+
+  val values: Seq[Name] =
+    Seq(Tishrei, Marheshvan, Kislev, Teves, Shvat, Adar, Nisan, Iyar, Sivan, Tammuz, Av, Elul, AdarI, AdarII)
+
+  private val month2names: Map[Name, Names] = MetadataParser.loadNames(this, "JewishMonth", values)
 }

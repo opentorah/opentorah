@@ -7,5 +7,6 @@ trait Named extends HasNames {
 }
 
 object Named {
+  // TODO this breaks on inner classes; fixed in JDK 9...
   def className(obj: AnyRef): String = obj.getClass.getSimpleName.replace("$", "")
 }

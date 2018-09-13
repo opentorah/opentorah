@@ -1,4 +1,4 @@
-package org.podval.calendar.util
+package org.podval.calendar.metadata
 
 abstract class Numbered[T <: Numbered[T]](val number: Int) extends Ordered[T] {
 
