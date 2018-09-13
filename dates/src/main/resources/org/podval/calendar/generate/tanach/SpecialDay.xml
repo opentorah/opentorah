@@ -184,8 +184,15 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             <aliyah n="3" fromVerse="22" toVerse="30"/> <!-- TODO mincha - maftir-->
         </torah>
         <haftarah>
-           <part n="1" book="Jonah"/>
-           <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
+           <custom n="Ashkenaz Sefarad">
+               <part n="1" book="Jonah"/>
+               <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
+           </custom> 
+            <custom n="Italki" fromChapter="1" fromVerse="21"/>
+               <part n="1" book="Obadiah"/>
+               <part n="2" book="Jonah"/>
+               <part n="3" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
+           </custom>     
         </haftarah> 
     </day>
 
