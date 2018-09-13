@@ -4,6 +4,8 @@ trait Named extends HasNames {
   def name: String = Named.className(this)
 
   override def toString: String = name
+
+  final def toString(spec: LanguageSpec): String = names.doFind(spec).name
 }
 
 object Named {

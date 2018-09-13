@@ -1,0 +1,20 @@
+<names type="Language">
+    <names>
+        <name lang="en" n="English"/>
+        <name lang="en" n="en"/>
+        <name lang="ru" n="английский"/>
+        <!-- <name lang="he" n=""/> -->
+    </names>
+    <names>
+        <name lang="en" n="Hebrew"/>
+        <name lang="en" n="he"/>
+        <name lang="ru" n="иврит"/>
+        <!-- <name lang="he" n=""/> -->
+    </names>
+    <names>
+        <name lang="en" n="Russian"/>
+        <name lang="en" n="ru"/>
+        <name lang="ru" n="русский"/>
+        <!-- <name lang="he" n=""/> -->
+    </names>
+</names>

@@ -1,17 +1,31 @@
 package org.podval.calendar.generate.tanach
 
-import org.podval.calendar.metadata.{MetadataParser, Names, WithNames}
+import org.podval.calendar.metadata.{WithNames, WithNamesCompanion}
 
-sealed trait Custom extends WithNames[Custom] {
-  final override def toNames: Map[Custom, Names] = Custom.toNames
+// I don't think it worth it to move parent definitions into the XML file...
+sealed class Custom(parent: Option[Custom]) extends WithNames[Custom] {
+  final override def companion: WithNamesCompanion[Custom] = Custom
 }
 
-object Custom {
-  case object Chabad extends Custom
-  case object Ashkenaz extends Custom
-  case object Sefard extends Custom
+object Custom extends WithNamesCompanion[Custom] {
+  case object Ashkenaz extends Custom(None)
+  case object Italki extends Custom(Some(Ashkenaz))
+  case object Frankfurt extends Custom(Some(Ashkenaz))
+  case object Lita extends Custom(Some(Ashkenaz))
+  case object Hayey_odom extends Custom(Some(Lita))
+  case object Hagra extends Custom(Some(Ashkenaz))
 
-  val all: Seq[Custom] = Seq(Chabad, Ashkenaz, Sefard)
+  case object Sefard extends Custom(None)
+  case object Chabad extends Custom(Some(Sefard))
+  case object Magreb extends Custom(Some(Sefard))
+  case object Algeria extends Custom(Some(Magreb))
+  case object Toshbim extends Custom(Some(Magreb))
+  case object Bavlim extends Custom(Some(Sefard))
+  case object Teiman extends Custom(Some(Sefard))
+  case object Baladi extends Custom(Some(Teiman))
+  case object Shami extends Custom(Some(Teiman))
 
-  private val toNames: Map[Custom, Names] = MetadataParser.loadNames(this, all)
+  override val values: Seq[Custom] = Seq(
+    Ashkenaz, Italki, Frankfurt, Lita, Hayey_odom, Hagra,
+    Sefard, Chabad, Magreb, Algeria, Toshbim, Bavlim, Teiman, Baladi, Shami)
 }

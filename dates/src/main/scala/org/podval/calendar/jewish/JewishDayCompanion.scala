@@ -1,33 +1,32 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.{Calendar, DayCompanion}
-import org.podval.calendar.metadata.{MetadataParser, Names, WithNames}
+import org.podval.calendar.metadata.{WithNames, WithNamesCompanion}
 
 abstract class JewishDayCompanion extends DayCompanion[Jewish] {
   final val Name: JewishDayCompanion.type = JewishDayCompanion
 
-  final type Name = Name.Name // TODO push into DayCompanion
+  final type Name = JewishDayName // TODO push into DayCompanion
 
   final override def names: Seq[Name] = JewishDayCompanion.values
 
   final override val firstDayNumberInWeek: Int = Calendar.firstDayNumberInWeekJewish
 }
 
+sealed trait JewishDayName extends WithNames[JewishDayName] {
+  override def companion: WithNamesCompanion[JewishDayName] = JewishDayCompanion
+}
 
-object JewishDayCompanion {
-  sealed trait Name extends WithNames[Name] {
-    def toNames: Map[Name, Names] = day2names
-  }
+object JewishDayCompanion extends WithNamesCompanion[JewishDayName] {
+  case object Rishon extends JewishDayName
+  case object Sheni extends JewishDayName
+  case object Shlishi extends JewishDayName
+  case object Rvii extends JewishDayName
+  case object Chamishi extends JewishDayName
+  case object Shishi extends JewishDayName
+  case object Shabbos extends JewishDayName
 
-  case object Rishon extends Name
-  case object Sheni extends Name
-  case object Shlishi extends Name
-  case object Rvii extends Name
-  case object Chamishi extends Name
-  case object Shishi extends Name
-  case object Shabbos extends Name
+  override val values: Seq[JewishDayName] = Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi, Shabbos)
 
-  val values: Seq[Name] = Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi, Shabbos)
-
-  private val day2names: Map[Name, Names] = MetadataParser.loadNames(this, "JewishDay", values)
+  override def resourceName: String = "JewishDay"
 }
