@@ -4,17 +4,17 @@ import org.podval.calendar.metadata.{HasNames, Names, WithMetadata}
 
 object Tanach {
 
-  sealed trait Book[M <: BookStructure] extends WithMetadata[M]
+  sealed trait Book[K <: WithMetadata[K, M], M <: BookStructure] extends WithMetadata[K, M] { this: K => }
 
   abstract class BookStructure(
     // TODO remove?
-    book: Book[_],
+    book: Book[_, _],
     override val names: Names,
     val chapters: Chapters
   ) extends HasNames
 
-  trait ChumashBook extends Book[ChumashBookStructure] {
-    final override def metadata: ChumashBookStructure = chumashStructure(this)
+  trait ChumashBook extends Book[ChumashBook, ChumashBookStructure] {
+    final override def toMetadata: Map[ChumashBook, ChumashBookStructure] = chumashStructure
   }
 
   final class ChumashBookStructure(
@@ -24,8 +24,8 @@ object Tanach {
     val weeks: Map[Parsha, Parsha.Structure]
   ) extends BookStructure(book, names, chapters)
 
-  trait NachBook extends Book[NachBookStructure] {
-    final override def metadata: NachBookStructure = nachStructure(this)
+  trait NachBook extends Book[NachBook, NachBookStructure] {
+    final override def toMetadata: Map[NachBook, NachBookStructure] = nachStructure
   }
 
   final class NachBookStructure(
@@ -105,7 +105,7 @@ object Tanach {
 
   val nach: Seq[NachBook] = prophets ++ writings
 
-  val all: Seq[Book[_]] = chumash ++ nach
+  val all: Seq[Book[_, _]] = chumash ++ nach
 
   private val (
     chumashStructure: Map[ChumashBook, ChumashBookStructure],
@@ -114,7 +114,7 @@ object Tanach {
 
   def forChumashName(name: String): Option[ChumashBook] = chumashStructure.find(_._2.names.has(name)).map(_._1)
   def forNachName(name: String): Option[NachBook] = nachStructure.find(_._2.names.has(name)).map(_._1)
-  def forName(name: String): Option[Book[_]] = forChumashName(name).orElse(forNachName(name))
+  def forName(name: String): Option[Book[_, _]] = forChumashName(name).orElse(forNachName(name))
 
   def main(args: Array[String]): Unit = {
     def printSpans(spans: Seq[Span]): Unit = spans.zipWithIndex.foreach { case (span, index) =>

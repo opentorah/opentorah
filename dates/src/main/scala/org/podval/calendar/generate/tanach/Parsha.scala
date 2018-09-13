@@ -3,10 +3,10 @@ package org.podval.calendar.generate.tanach
 import Tanach.ChumashBook
 import org.podval.calendar.metadata.{HasNames, Names, WithMetadata}
 
-sealed trait Parsha extends WithMetadata[Parsha.Structure] {
+sealed trait Parsha extends WithMetadata[Parsha, Parsha.Structure] {
   def book: ChumashBook
 
-  final override def metadata: Parsha.Structure = book.metadata.weeks(this)
+  final override def toMetadata: Map[Parsha, Parsha.Structure] = book.metadata.weeks
 
   final def combines: Boolean = Parsha.combinableAll.contains(this)
 }

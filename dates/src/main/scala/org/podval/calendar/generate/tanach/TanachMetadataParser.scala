@@ -38,7 +38,7 @@ object TanachMetadataParser {
 
   private final case class ChapterParsed(n: Int, length: Int)
 
-  private def parseChapters(book: Tanach.Book[_], elements: Seq[Elem]): Chapters = {
+  private def parseChapters(book: Tanach.Book[_, _], elements: Seq[Elem]): Chapters = {
     val chapters: Seq[ChapterParsed] = elements.map { element =>
       val attributes = XML.openEmpty(element, "chapter" )
       val result = ChapterParsed(
