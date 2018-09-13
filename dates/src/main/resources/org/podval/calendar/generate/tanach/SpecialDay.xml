@@ -219,11 +219,20 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
                 <aliyah n="7" fromChapter="23" fromVerse="33" toVerse="44"/>
             </shabbos>
         </torah>
-        <haftarah book="Zechariah" fromChapter="14" fromVerse="1" toVerse="21"/>
-    </day>
+      </day> 
+      <day  n="Succos 1">
+        <haftarah book="Zechariah" toChapter="14" toVerse="21"> 
+           <custom "Ashkenaz Sefarad"  fromChapter="14" fromVerse="1" />
+          <custom "Teimani" fromChapter="13" fromVerse="9" />
+          </haftarah>    
+       </day>
 
-    <day n="Succos 2">
-        <haftarah book="Kings I" fromChapter="8" fromVerse="2" toVerse="21"/>
+    <day n="Succos 2"> <!-- Diaspora -->
+        <haftarah book="Kings I">
+           <custom "Ashkenaz Sefarad" fromChapter="8" fromVerse="2" toVerse="21"/>
+           <custom "Italki" fromChapter="7" fromVerse="51" toChapter="8" toVerse="15"/>
+           <custom "Teimani" fromChapter="7" fromVerse="51" toChapter="8" toVerse="21"/>
+          </haftarah>  
     </day>
 
     <!-- In the following, "n" is the number of the day starting from 1 for the first day of Chol Hamoed Succos.
@@ -264,7 +273,11 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
     </day>
 
     <day n="Haftarah Shabbos Chol Hamoed Succos">
-        <haftarah book="Ezekiel" fromChapter="38" fromVerse="18" toChapter="39" toVerse="16"/>
+        <haftarah book="Ezekiel" fromChapter="38"> 
+          <custom "Ashkenaz Sefarad" fromVerse="18" toChapter="39" toVerse="16"/>
+          <custom "Italki Teimani" fromVerse="1" toChapter="38" toVerse="23"/>
+        </haftarah>    
+    </day>  
     </day>
 
     <!-- RULE: on Shemini Atzeres and Simchas Torah: add Shemini Atzeres Maftir.  -->
@@ -291,7 +304,10 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
                 <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17"/>
             </shabbos>
         </torah>
-        <haftarah book="Kings I" fromChapter="8" fromVerse="54" toChapter="9" toVerse="1"/>
+        <haftarah book="Kings I" fromChapter="8" fromVerse="54" > 
+           <custom "Ashkenaz Sefarad"  toChapter="8" toVerse="18"/>
+           <custom "Italki"  toChapter="9" toVerse="1"/>
+        </haftarah>    
     </day>
 
     <day n="Simchas Torah">
@@ -309,9 +325,10 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
             </part>
         </torah>
           <haftarah book="Joshua">
-            <custom n="Ahkenaz Sefarad" fromChapter="1" fromVerse="1" toVerse="18"/>
+            <custom n="Ahkenaz Italki" fromChapter="1" fromVerse="1" toVerse="18"/>
+            <custom n="Sefarad  fromChapter="1" fromVerse="1" toVerse="18"/>
             <custom n="Teiman>
-               <part n="1"  fromChapter="1" fromVerse="1" toVerse="18"/>
+               <part n="1"  fromChapter="1" fromVerse="1" toVerse="9/>
                <part n="6"  fromChapter="27"/>                                                       
             </custom>  
         </haftara>           
