@@ -1,17 +1,11 @@
-<meta type="Custom">
-    <custom>
-        <names>
-            <name n="Chabad" lang="en" transliterated="true"/>
-        </names>
-    </custom>
-    <custom>
-        <names>
-            <name n="Ashkenaz" lang="en" transliterated="true"/>
-        </names>
-    </custom>
-    <custom>
-        <names>
-            <name n="Sefard" lang="en" transliterated="true"/>
-        </names>
-    </custom>
-</meta>
+<names type="Custom">
+    <names>
+        <name n="Chabad" lang="en" transliterated="true"/>
+    </names>
+    <names>
+        <name n="Ashkenaz" lang="en" transliterated="true"/>
+    </names>
+    <names>
+        <name n="Sefard" lang="en" transliterated="true"/>
+    </names>
+</names>

@@ -2,7 +2,7 @@ package org.podval.calendar.metadata
 
 final class Names(val names: Seq[Name]) {
   // No duplicates
-  require(names.size == names.map(_.name).toSet.size)
+  require(names.size == names.map(_.name).toSet.size, s"Different sizes: $names and ${names.map(_.name).toSet}")
   // TODO check that there are no duplicate combinations of parameters OTHER than name!
 
   def isEmpty: Boolean = names.isEmpty

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<meta type="SpecialDay">
+<metadata type="SpecialDay">
     <!-- TODO 'day' is really a reading build
 ing block; this is not "Special Day", this is "Special Reading"  -->
     <!-- TODO проработаь записки сумасшедшего: это уже всё вставлено или надо ещё что-то делать?
@@ -561,4 +561,4 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
                    hol - above 8 shel Pesach                    -->
         <haftarah book="Habakkuk" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
     </day>
-</meta>
+</metadata>

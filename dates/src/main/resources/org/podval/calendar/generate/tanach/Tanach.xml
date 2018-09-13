@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<meta type="Tanach">
+<metadata type="Tanach">
     <book n="Genesis"/>
     <book n="Exodus"/>
     <book n="Leviticus"/>
@@ -240,4 +240,4 @@
             <name lang="he" n="דברי הימים ב"/>
         </names>
     </book>
-</meta>
+</metadata>

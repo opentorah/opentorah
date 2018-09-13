@@ -1,32 +1,33 @@
 package org.podval.calendar.gregorian
 
 import org.podval.calendar.dates.{Calendar, DayCompanion}
-import org.podval.calendar.util.Named
+import org.podval.calendar.metadata.{MetadataParser, Names, WithNames}
 
 abstract class GregorianDayCompanion extends DayCompanion[Gregorian] {
-  final type Name = GregorianDayCompanion.Name
+  final val Name: GregorianDayCompanion.type = GregorianDayCompanion
 
-  final val Name: GregorianDayCompanion.Name.type = GregorianDayCompanion.Name
+  final type Name = Name.Name // TODO push into DayCompanion
 
-  final override def names: Seq[Name] = Name.values
+  final override def names: Seq[Name] = GregorianDayCompanion.values
 
   final override val firstDayNumberInWeek: Int = Calendar.firstDayNumberInWeekGregorian
 }
 
 
 object GregorianDayCompanion {
-  sealed class Name(name: String) extends Named(name)
-
-  object Name {
-    case object Sunday extends Name("Sunday")
-    case object Monday extends Name("Monday")
-    case object Tuesday extends Name("Tuesday")
-    case object Wednesday extends Name("Wednesday")
-    case object Thursday extends Name("Thursday")
-    case object Friday extends Name("Friday")
-    case object Saturday extends Name("Saturday")
-
-    val values: Seq[Name] =
-      Seq(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+  sealed trait Name extends WithNames[Name] {
+    def toNames: Map[Name, Names] = day2names
   }
+
+  case object Sunday extends Name
+  case object Monday extends Name
+  case object Tuesday extends Name
+  case object Wednesday extends Name
+  case object Thursday extends Name
+  case object Friday extends Name
+  case object Saturday extends Name
+
+  val values: Seq[Name] = Seq(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+
+  private val day2names: Map[Name, Names] = MetadataParser.loadNames(this, "GregorianDay", values)
 }

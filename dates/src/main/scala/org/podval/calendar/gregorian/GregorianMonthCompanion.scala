@@ -1,13 +1,13 @@
 package org.podval.calendar.gregorian
 
 import org.podval.calendar.dates.MonthCompanion
-import org.podval.calendar.util.Named
 import Gregorian.Year
+import org.podval.calendar.metadata.{MetadataParser, Names, WithNames}
 
 abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
-  final type Name = GregorianMonthCompanion.Name
+  final val Name: GregorianMonthCompanion.type = GregorianMonthCompanion
 
-  final val Name: GregorianMonthCompanion.Name.type = GregorianMonthCompanion.Name
+  final type Name = Name.Name
 
   final override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Year.monthsInYear + 1
 
@@ -17,20 +17,25 @@ abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
 
 
 object GregorianMonthCompanion {
-  sealed class Name(name: String) extends Named(name)
-
-  object Name {
-    case object January extends Name("January")
-    case object February extends Name("February")
-    case object March extends Name("March")
-    case object April extends Name("April")
-    case object May extends Name("May")
-    case object June extends Name("June")
-    case object July extends Name("July")
-    case object August extends Name("August")
-    case object September extends Name("September")
-    case object October extends Name("October")
-    case object November extends Name("November")
-    case object December extends Name("December")
+  sealed trait Name extends WithNames[Name] {
+    def toNames: Map[Name, Names] = month2names
   }
+
+  case object January extends Name
+  case object February extends Name
+  case object March extends Name
+  case object April extends Name
+  case object May extends Name
+  case object June extends Name
+  case object July extends Name
+  case object August extends Name
+  case object September extends Name
+  case object October extends Name
+  case object November extends Name
+  case object December extends Name
+
+  val values: Seq[Name] =
+    Seq(January, February, March, April, May, June, July, August, September, October, November, December)
+
+  private val month2names: Map[Name, Names] = MetadataParser.loadNames(this, "GregorianMonth", values)
 }
