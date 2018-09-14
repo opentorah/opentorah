@@ -1,7 +1,7 @@
 package org.podval.calendar.generate.tanach
 
 import Tanach.ChumashBook
-import org.podval.calendar.metadata.{HasNames, Names, WithMetadata}
+import org.podval.calendar.metadata.{HasNames, LanguageSpec, Names, WithMetadata}
 
 sealed trait Parsha extends WithMetadata[Parsha, Parsha.Structure] {
   def book: ChumashBook
@@ -9,6 +9,8 @@ sealed trait Parsha extends WithMetadata[Parsha, Parsha.Structure] {
   final override def toMetadata: Map[Parsha, Parsha.Structure] = book.metadata.weeks
 
   final def combines: Boolean = Parsha.combinableAll.contains(this)
+
+  final override def toString: String = toString(LanguageSpec.empty)
 }
 
 object Parsha {
@@ -16,10 +18,8 @@ object Parsha {
     val parsha: Parsha,
     override val names: Names,
     val span: Span,
-    val days: Seq[Span], // length 7 :)
-    val daysCustom: Map[Custom, Seq[Span]],
-    val daysCombined: Seq[Span],
-    val daysCombinedCustom: Map[Custom, Seq[Span]],
+    val days: Custom.Of[Seq[Span]],
+    val daysCombined: Custom.Of[Seq[Span]],
     val maftir: Span,
     val aliyot: Seq[Span] // length 3
   ) extends HasNames

@@ -15,16 +15,19 @@ object TanachMetadataParser {
     val className: String = Named.className(obj)
     val url = MetadataParser.getUrl(obj, className)
 
-    val books: Seq[MetadataPreparsed] = MetadataParser.loadMetadataResource(url, className, "book")
+    val books: Seq[MetadataPreparsed] = MetadataParser.loadMetadata(url, className, "book")
 
     (
-      bind(Tanach.chumash, books.take(Tanach.chumash.length)).map(parseChumashBook(url, _)).toMap,
-      bind(Tanach.nach, books.drop(Tanach.chumash.length)).map(parseNachBook).toMap
+      bind(Tanach.chumash, books.take(Tanach.chumash.length)).map { case (book, metadata) =>
+        parseChumashBook(url, book, metadata)
+      }.toMap,
+      bind(Tanach.nach, books.drop(Tanach.chumash.length)).map { case (book, metadata) =>
+        parseNachBook(book, metadata)
+      }.toMap
     )
   }
 
-  private def parseNachBook(arg: (NachBook, MetadataPreparsed)): (NachBook, NachBookStructure) = {
-    val (book: NachBook, metadata: MetadataPreparsed) = arg
+  private def parseNachBook(book: NachBook, metadata: MetadataPreparsed): (NachBook, NachBookStructure) = {
     metadata.attributes.close()
     val (chapterElements, tail) = XML.span(metadata.elements, "chapter")
     XML.checkNoMoreElements(tail)
@@ -49,23 +52,23 @@ object TanachMetadataParser {
       result
     }
 
-    require(chapters.map(_.n) == (1 to chapters.length), "Wrong chapter numbers.")
+    require(chapters.map(_.n) == (1 to chapters.length), s"Wrong chapter numbers: $chapters")
 
     new Chapters(chapters.map(_.length).toArray)
   }
 
   private def parseChumashBook(
     url: URL,
-    arg: (ChumashBook, MetadataPreparsed)
+    book: ChumashBook,
+    metadata: MetadataPreparsed
   ): (ChumashBook,  ChumashBookStructure) = {
-    val (book: ChumashBook, metadata: MetadataPreparsed) = arg
     metadata.attributes.close()
     // TODO handle names from metadata
     val (chapterElements, weekElements) = XML.span(metadata.elements, "chapter", "week")
     val chapters: Chapters = parseChapters(book, chapterElements)
 
     val weeks: Seq[(Parsha, Parsha.Structure)] = ParshaMetadataParser.parse(
-      metadata = MetadataParser.loadMetadata(url, weekElements, "week"),
+      metadata = MetadataParser.preparseMetadata(url, weekElements, "week"),
       parshiot = Parsha.forBook(book),
       chapters = chapters
     )

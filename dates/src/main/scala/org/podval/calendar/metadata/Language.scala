@@ -3,6 +3,10 @@ package org.podval.calendar.metadata
 sealed class Language(code: String) extends WithNames[Language] {
   final override def name: String = code
   final override def companion: WithNamesCompanion[Language] = Language
+
+  // TODO add toLanguageSpec()?
+
+  def toString(number: Int): String = number.toString
 }
 
 object Language extends WithNamesCompanion[Language] {
@@ -18,7 +22,7 @@ object Language extends WithNamesCompanion[Language] {
     private val decades: List[Char] = "יכלמנסעפצ".toList
     private val hundreds: List[Char] = "קרשת".toList
 
-    def numberToString(number: Int): String = {
+    override def toString(number: Int): String = {
       require (number > 0)
       require (number <= 500)
 
@@ -42,9 +46,6 @@ object Language extends WithNamesCompanion[Language] {
 
       result.toString
     }
-
-
-    private val spelledOuts: List[String] = List("ראשון", "שני", "שלישי", "רביעי", "חמישי", "ששי", "שביעי")
   }
 
   override val values: Seq[Language] = Seq(English, Hebrew, Russian)

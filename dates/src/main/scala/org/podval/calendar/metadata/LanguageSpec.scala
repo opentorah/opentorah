@@ -5,6 +5,8 @@ final case class LanguageSpec(
   isTransliterated: Option[Boolean],
   flavour: Option[String]
 ) {
+  def toString(number: Int): String = language.fold(number.toString)(_.toString(number))
+
   def dropFlavour: LanguageSpec = copy(flavour = None)
   def dropIsTransliterated: LanguageSpec = copy(isTransliterated = None)
   def dropLanguage: LanguageSpec = copy(language = None)

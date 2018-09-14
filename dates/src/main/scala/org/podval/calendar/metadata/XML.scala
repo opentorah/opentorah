@@ -1,6 +1,6 @@
 package org.podval.calendar.metadata
 
-import java.io.{Writer, File, FileWriter, OutputStream, OutputStreamWriter, PrintWriter}
+import java.io.{File, FileWriter, OutputStream, OutputStreamWriter, PrintWriter, Writer}
 
 import scala.xml.{Elem, Node, PrettyPrinter}
 
@@ -32,7 +32,7 @@ object XML {
     require(getElements(element).isEmpty, "Nested elements present.")
 
   private def checkNoNonElements(element: Elem): Unit =
-    require(getNonElements(element).isEmpty, "Non-element children present.")
+    require(getNonElements(element).isEmpty, s"Non-element children present on element $element: ${getNonElements(element)}")
 
   private def getElements(element: Elem): Seq[Elem] =
     element.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
@@ -40,6 +40,7 @@ object XML {
   private def getNonElements(element: Elem): Seq[Node] =
     element.child.filterNot(_.isInstanceOf[Elem])
 
+  // TODO make a convenience flavour that checks that the tail is empty
   def span(elements: Seq[Elem], name1: String): (Seq[Elem], Seq[Elem]) = {
     elements.span(_.label == name1)
   }

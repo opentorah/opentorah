@@ -1,5 +1,8 @@
 <names type="Custom">
     <names>
+        <name n="Common" lang="en"/>
+    </names>
+    <names>
         <name n="Ashkenaz" lang="en" transliterated="true"/>
     </names>
     <names>
@@ -31,6 +34,9 @@
     </names>
     <names>
         <name n="Toshbim" lang="en" transliterated="true"/>
+    </names>
+    <names>
+        <name n="Djerba" lang="en" transliterated="true"/>
     </names>
     <names>
         <name n="Bavlim" lang="en" transliterated="true"/>
