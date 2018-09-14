@@ -31,7 +31,7 @@ object Names {
       one <- nameses
       other <- nameses if !other.eq(one)
     } yield {
-      if (!one.isDisjoint(other)) throw new IllegalArgumentException("Names overlap.")
+      require(one.isDisjoint(other), s"Names overlap: $one and $other")
     }
   }
 

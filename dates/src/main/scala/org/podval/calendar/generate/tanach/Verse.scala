@@ -1,5 +1,7 @@
 package org.podval.calendar.generate.tanach
 
+import org.podval.calendar.metadata.LanguageSpec
+
 final case class Verse(chapter: Int, verse: Int) extends Ordered[Verse] {
   require(chapter > 0)
   require(verse > 0)
@@ -9,5 +11,7 @@ final case class Verse(chapter: Int, verse: Int) extends Ordered[Verse] {
     if (result != 0) result else this.verse - that.verse
   }
 
-  override def toString: String = s"$chapter:$verse"
+  override def toString: String = toString(LanguageSpec.empty)
+
+  def toString(spec: LanguageSpec): String = spec.toString(chapter) + ":" + spec.toString(verse)
 }

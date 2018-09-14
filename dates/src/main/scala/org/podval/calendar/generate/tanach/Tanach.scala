@@ -6,9 +6,11 @@ object Tanach {
 
   sealed trait Book[K <: WithMetadata[K, M], M <: BookStructure] extends WithMetadata[K, M] { this: K => }
 
+  type TanachBook = Book[_, _]
+
   abstract class BookStructure(
     // TODO remove?
-    book: Book[_, _],
+    book: TanachBook,
     override val names: Names,
     val chapters: Chapters
   ) extends HasNames
@@ -105,7 +107,7 @@ object Tanach {
 
   val nach: Seq[NachBook] = prophets ++ writings
 
-  val all: Seq[Book[_, _]] = chumash ++ nach
+  val all: Seq[TanachBook] = chumash ++ nach
 
   private val (
     chumashStructure: Map[ChumashBook, ChumashBookStructure],
@@ -114,21 +116,31 @@ object Tanach {
 
   def forChumashName(name: String): Option[ChumashBook] = chumash.find(_.names.has(name))
   def forNachName(name: String): Option[NachBook] = nach.find(_.names.has(name))
-  def forName(name: String): Option[Book[_, _]] = forChumashName(name).orElse(forNachName(name))
+  def forName(name: String): Option[TanachBook] = forChumashName(name).orElse(forNachName(name))
+
+  private def printHaftarahList(custom: Custom, spec: LanguageSpec): Unit = {
+    println(custom.toString(spec))
+    for (parsha <- Parsha.all) {
+      val haftarah: Haftarah = Haftarah.forParsha(parsha)
+      val customEffective: Custom = Custom.find(haftarah.customs, custom)
+      val customEffectiveString: String =
+        if (customEffective == custom) ""
+        else " [" + customEffective.toString(spec)  + "]"
+      val spans: Seq[NachSpan] = haftarah.customs(customEffective)
+      println(parsha.toString(spec) + customEffectiveString + ": " + NachSpan.toString(spans, spec))
+    }
+  }
 
   def main(args: Array[String]): Unit = {
     def printSpans(spans: Seq[Span]): Unit = spans.zipWithIndex.foreach { case (span, index) =>
       println(s"${index+1}: $span")
     }
 
-    printSpans(Parsha.Mattos.metadata.daysCombinedCustom(Custom.Ashkenaz))
-    println(org.podval.calendar.metadata.Language.Russian.names)
-    println(Custom.Chabad.names)
-    println(org.podval.calendar.jewish.Jewish.Day.Name.Rishon.names)
-    println(org.podval.calendar.gregorian.Gregorian.Month.Name.July.names)
-    println(org.podval.calendar.jewish.Jewish.Month.Name.Marheshvan.names)
-    println(org.podval.calendar.jewish.Jewish.Day.Name.Sheni.toString(LanguageSpec(Language.English)))
-    println(org.podval.calendar.jewish.Jewish.Day.Name.Sheni.toString(LanguageSpec(Language.Russian)))
-    println(org.podval.calendar.jewish.Jewish.Month.Name.Marheshvan.toString(LanguageSpec(Language.Russian)))
+//    printSpans(Parsha.Mattos.metadata.daysCombined(Custom.Ashkenaz))
+
+
+    printHaftarahList(Custom.Ashkenaz, LanguageSpec(Language.Hebrew))
+    println()
+    printHaftarahList(Custom.Djerba, LanguageSpec(Language.Russian))
   }
 }

@@ -10,6 +10,8 @@ final class Attributes private(attributes: Map[String, String]) {
     attributes.get(name)
   }
 
+  def doGet(name: String): String = get(name).get
+
   def close(): Unit = {
     val notAllowed: Set[String] = attributes.keySet -- used
     if (notAllowed.nonEmpty)

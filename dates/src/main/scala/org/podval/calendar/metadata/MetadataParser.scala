@@ -9,42 +9,38 @@ import scala.xml.{Elem, Utility}
 
 object MetadataParser {
 
-  final case class MetadataPreparsed(
-    attributes: Attributes, // actual parser needs to call close()!
-    names: Names,
-    elements: Seq[Elem]
-  ) extends HasNames
-
   def getUrl(obj: AnyRef, name: String): URL =  {
     val result = obj.getClass.getResource(name + ".xml")
     require(result != null, s"No such resource: $obj:$name")
     result
   }
 
-  private def childUrl(parent: URL, name: String): URL = changePath(parent, parent.getFile + "/" + name)
+  final case class MetadataPreparsed(
+    attributes: Attributes, // actual parser needs to call close()!
+    names: Names,
+    elements: Seq[Elem]
+  ) extends HasNames
 
-  private def childFileUrl(parent: URL, name: String): URL = childUrl(parent, name + ".xml")
+  def loadMetadata(obj: AnyRef, resourceName: String, name: String): Seq[MetadataPreparsed] =
+    loadMetadata(getUrl(obj, resourceName), resourceName, name)
 
-  private def parentUrl(url: URL): URL = {
-    val path = url.getFile
-    val indexOfLastSlash: Int = path.lastIndexOf('/')
-    require(indexOfLastSlash != -1)
-
-    changePath(url, path.substring(0, indexOfLastSlash))
+  def loadMetadata(url: URL, resourceName: String, name: String): Seq[MetadataPreparsed] = {
+    val elements: Seq[Elem] = loadMetadataElements(url, "metadata", resourceName)
+    preparseMetadata(url, elements, name)
   }
 
-  private def changePath(url: URL, path: String): URL =
-    new URL(url.getProtocol, url.getHost, url.getPort, path, null)
-
-  def loadMetadataResource(url: URL, what: String, name: String): Seq[MetadataPreparsed] = {
-    val elements: Seq[Elem] = loadMetadataElements(url, "metadata", what)
-    loadMetadata(url, elements, name)
-  }
-
-  def loadMetadata(url: URL, elements: Seq[Elem], name: String): Seq[MetadataPreparsed] = {
-    val result = elements.map(element => loadSubresource(parentUrl(url), element, name))
+  def preparseMetadata(url: URL, elements: Seq[Elem], name: String): Seq[MetadataPreparsed] = {
+    val result = elements.map(element => loadSubresource(url, element, name))
     Names.checkDisjoint(result.map(_.names))
     result
+  }
+
+  def bind[K <: Named, M <: HasNames](keys: Seq[K], metadatas: Seq[M]): Seq[(K, M)] = {
+    require(keys.length == metadatas.length)
+    keys.zip(metadatas).map { case (key, metadata) =>
+      require(metadata.names.has(key.name))
+      key -> metadata
+    }
   }
 
   private def loadSubresource(url: URL, element: Elem, name: String ): MetadataPreparsed = {
@@ -53,7 +49,7 @@ object MetadataParser {
     val names: Names = namesOption.get
 
     if (elements.nonEmpty) MetadataPreparsed(attributes, names, elements) else {
-      val subresources: Seq[Elem] = names.names.flatMap(name => loadResource(childFileUrl(url, name.name)))
+      val subresources: Seq[Elem] = names.names.flatMap(name => loadResource(siblingUrl(url, name.name)))
       require(subresources.size <= 1, "More than one subresource.")
       if (subresources.isEmpty) MetadataPreparsed(attributes, names, elements) else {
         attributes.close()
@@ -88,14 +84,6 @@ object MetadataParser {
     }
   }
 
-  def bind[K <: Named, M <: HasNames](keys: Seq[K], metadatas: Seq[M]): Seq[(K, M)] = {
-    require(keys.length == metadatas.length)
-    keys.zip(metadatas).map { case (key, metadata) =>
-      require(metadata.names.has(key.name))
-      key -> metadata
-    }
-  }
-
   def loadNames[K <: WithNames[K]](obj: AnyRef, name: String, keys: Seq[K]): Map[K, Names] = {
     val url = getUrl(obj, name)
     val elements = loadMetadataElements(url, "names", name)
@@ -111,5 +99,15 @@ object MetadataParser {
     }
 
     result.toMap
+  }
+
+  private def siblingUrl(url: URL, name: String): URL = {
+    val path = url.getFile
+    val indexOfLastSlash: Int = path.lastIndexOf('/')
+    require(indexOfLastSlash != -1)
+    val parentPath = path.substring(0, indexOfLastSlash)
+    val newPath = parentPath + "/" + name + ".xml"
+
+    new URL(url.getProtocol, url.getHost, url.getPort, newPath, null)
   }
 }
