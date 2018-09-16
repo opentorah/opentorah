@@ -2,7 +2,6 @@ package org.podval.calendar.generate.tanach
 
 import java.net.URL
 
-import scala.xml.Elem
 import Tanach.{ChumashBook, ChumashBookStructure, NachBook, NachBookStructure}
 import org.podval.calendar.metadata.MetadataParser.{MetadataPreparsed, bind}
 import org.podval.calendar.metadata.{MetadataParser, Named, XML}
@@ -19,65 +18,46 @@ object TanachMetadataParser {
 
     (
       bind(Tanach.chumash, books.take(Tanach.chumash.length)).map { case (book, metadata) =>
-        parseChumashBook(url, book, metadata)
+        book -> parseChumashBook(url, Parsha.forBook(book), metadata)
       }.toMap,
-      bind(Tanach.nach, books.drop(Tanach.chumash.length)).map { case (book, metadata) =>
-        parseNachBook(book, metadata)
+
+      bind(Tanach.nach, books.takeRight(Tanach.nach.length)).map { case (book, metadata) =>
+        book -> parseNachBook(metadata)
       }.toMap
     )
   }
 
-  private def parseNachBook(book: NachBook, metadata: MetadataPreparsed): (NachBook, NachBookStructure) = {
-    metadata.attributes.close()
-    val (chapterElements, tail) = XML.span(metadata.elements, "chapter")
-    XML.checkNoMoreElements(tail)
-    val result = new NachBookStructure(
-      metadata.names,
-      chapters = parseChapters(chapterElements)
-    )
-    book -> result
-  }
-
-  private final case class ChapterParsed(n: Int, length: Int)
-
-  private def parseChapters(elements: Seq[Elem]): Chapters = {
-    val chapters: Seq[ChapterParsed] = elements.map { element =>
-      val attributes = XML.openEmpty(element, "chapter" )
-      val result = ChapterParsed(
-        n = attributes.doGetInt("n"),
-        length = attributes.doGetInt("length")
-      )
-      attributes.close()
-      result
-    }
-
-    require(chapters.map(_.n) == (1 to chapters.length), s"Wrong chapter numbers: $chapters")
-
-    new Chapters(chapters.map(_.length).toArray)
-  }
-
   private def parseChumashBook(
     url: URL,
-    book: ChumashBook,
+    parshiot: Seq[Parsha],
     metadata: MetadataPreparsed
-  ): (ChumashBook,  ChumashBookStructure) = {
+  ): ChumashBookStructure = {
     metadata.attributes.close()
     // TODO handle names from metadata
     val (chapterElements, weekElements) = XML.span(metadata.elements, "chapter", "week")
-    val chapters: Chapters = parseChapters(chapterElements)
+    val chapters: Chapters = ChaptersParser.parse(chapterElements)
 
     val weeks: Seq[(Parsha, Parsha.Structure)] = ParshaMetadataParser.parse(
       metadata = MetadataParser.preparseMetadata(url, weekElements, "week"),
-      parshiot = Parsha.forBook(book),
+      parshiot = parshiot,
       chapters = chapters
     )
 
-    val result = new ChumashBookStructure(
+    new ChumashBookStructure(
       weeks.head._2.names,
       chapters,
       weeks.toMap
     )
+  }
 
-    book -> result
+  private def parseNachBook(metadata: MetadataPreparsed): NachBookStructure = {
+    metadata.attributes.close()
+    val (chapterElements, tail) = XML.span(metadata.elements, "chapter")
+    XML.checkNoMoreElements(tail)
+
+    new NachBookStructure(
+      metadata.names,
+      chapters = ChaptersParser.parse(chapterElements)
+    )
   }
 }
