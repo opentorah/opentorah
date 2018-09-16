@@ -4,37 +4,17 @@ import org.podval.calendar.metadata.{HasNames, Names, WithMetadata, LanguageSpec
 
 object Tanach {
 
-  sealed trait Book[K <: WithMetadata[K, M], M <: BookStructure] extends WithMetadata[K, M] { this: K => }
+  sealed trait Book
 
-  type TanachBook = Book[_, _]
-
-  abstract class BookStructure(
-    // TODO remove?
-    book: TanachBook,
-    override val names: Names,
-    val chapters: Chapters
-  ) extends HasNames
-
-  trait ChumashBook extends Book[ChumashBook, ChumashBookStructure] {
+  trait ChumashBook extends Book with WithMetadata[ChumashBook, ChumashBookStructure] {
     final override def toMetadata: Map[ChumashBook, ChumashBookStructure] = chumashStructure
   }
 
   final class ChumashBookStructure(
-    book: ChumashBook,
-    names: Names,
-    chapters: Chapters,
+    override val names: Names,
+    val chapters: Chapters,
     val weeks: Map[Parsha, Parsha.Structure]
-  ) extends BookStructure(book, names, chapters)
-
-  trait NachBook extends Book[NachBook, NachBookStructure] {
-    final override def toMetadata: Map[NachBook, NachBookStructure] = nachStructure
-  }
-
-  final class NachBookStructure(
-    book: NachBook,
-    names: Names,
-    chapters: Chapters
-  ) extends BookStructure(book, names, chapters)
+  ) extends HasNames
 
   case object Genesis extends ChumashBook
   case object Exodus extends ChumashBook
@@ -43,6 +23,15 @@ object Tanach {
   case object Deuteronomy extends ChumashBook
 
   val chumash: Seq[ChumashBook] = Seq(Genesis, Exodus, Leviticus, Numbers, Deuteronomy)
+
+  trait NachBook extends Book with WithMetadata[NachBook, NachBookStructure] {
+    final override def toMetadata: Map[NachBook, NachBookStructure] = nachStructure
+  }
+
+  final class NachBookStructure(
+    override val names: Names,
+    val chapters: Chapters
+  ) extends HasNames
 
   trait ProphetsBook extends NachBook
 
@@ -107,7 +96,7 @@ object Tanach {
 
   val nach: Seq[NachBook] = prophets ++ writings
 
-  val all: Seq[TanachBook] = chumash ++ nach
+  val all: Seq[Book] = chumash ++ nach
 
   private val (
     chumashStructure: Map[ChumashBook, ChumashBookStructure],
@@ -116,7 +105,7 @@ object Tanach {
 
   def forChumashName(name: String): Option[ChumashBook] = chumash.find(_.names.has(name))
   def forNachName(name: String): Option[NachBook] = nach.find(_.names.has(name))
-  def forName(name: String): Option[TanachBook] = forChumashName(name).orElse(forNachName(name))
+  def forName(name: String): Option[Book] = forChumashName(name).orElse(forNachName(name))
 
   private def printHaftarahList(custom: Custom, spec: LanguageSpec): Unit = {
     println(custom.toString(spec))

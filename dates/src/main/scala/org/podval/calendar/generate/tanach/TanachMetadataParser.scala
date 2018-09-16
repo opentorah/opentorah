@@ -32,16 +32,15 @@ object TanachMetadataParser {
     val (chapterElements, tail) = XML.span(metadata.elements, "chapter")
     XML.checkNoMoreElements(tail)
     val result = new NachBookStructure(
-      book,
       metadata.names,
-      chapters = parseChapters(book, chapterElements)
+      chapters = parseChapters(chapterElements)
     )
     book -> result
   }
 
   private final case class ChapterParsed(n: Int, length: Int)
 
-  private def parseChapters(book: Tanach.Book[_, _], elements: Seq[Elem]): Chapters = {
+  private def parseChapters(elements: Seq[Elem]): Chapters = {
     val chapters: Seq[ChapterParsed] = elements.map { element =>
       val attributes = XML.openEmpty(element, "chapter" )
       val result = ChapterParsed(
@@ -65,7 +64,7 @@ object TanachMetadataParser {
     metadata.attributes.close()
     // TODO handle names from metadata
     val (chapterElements, weekElements) = XML.span(metadata.elements, "chapter", "week")
-    val chapters: Chapters = parseChapters(book, chapterElements)
+    val chapters: Chapters = parseChapters(chapterElements)
 
     val weeks: Seq[(Parsha, Parsha.Structure)] = ParshaMetadataParser.parse(
       metadata = MetadataParser.preparseMetadata(url, weekElements, "week"),
@@ -74,7 +73,6 @@ object TanachMetadataParser {
     )
 
     val result = new ChumashBookStructure(
-      book,
       weeks.head._2.names,
       chapters,
       weeks.toMap
