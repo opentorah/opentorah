@@ -246,6 +246,7 @@
     </week>
     <week n="Eikev" book="Isaiah" fromChapter="49" fromVerse="14" toChapter="51" toVerse="3"/>
     <week n="Re'eh" book="Isaiah" fromChapter="54" fromVerse="11" toChapter="55" toVerse="5">
+      <!--RULE If rosh chodeh Chabad: afara rosh chodesh -->
         <!-- If Sunday is Rosh Chodesh, Chabad: Samuel I 20:18,42 -->
     </week>
     <week n="Shoftim">
@@ -256,6 +257,7 @@
           <custom n="Sefard Ashkenaz" book="Isaiah" fromChapter="54" fromVerse="1" toVerse="10"/>
           <custom n="Italki" book="Samuel I" fromChapter="8" fromVerse="1" toVerse="22"/>
         <!-- = Noach; TODO on 14th of Elul, Chabad: ...-->
+       <!--RULE If shabos Reeh rosh chodesh - Chabad - book="Isaiah" fromChapter="54" fromVerse="1" toChapter="55" toVerse="5" -->
     </week>
     <week n="Ki Savo">
           <custom n="Sefard Ashkenaz" book="Isaiah" fromChapter="60" fromVerse="1" toVerse="22"/>
