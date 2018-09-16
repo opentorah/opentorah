@@ -31,11 +31,8 @@ Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
 TODO: check minhogim shabas Hol amoed Pesax
 Minhagim haftara mincha taanis
 Kriat Tora minhagim hol amoed Sukkot & Chanuka
-Rosh chodesh elul shabat
 Mekorot
-
-
-     -->
+    -->
     <day n="Shabbos Erev Rosh Chodesh">
         <haftarah book="Samuel I" fromChapter="20" fromVerse="18" toVerse="42"/>
     </day>
