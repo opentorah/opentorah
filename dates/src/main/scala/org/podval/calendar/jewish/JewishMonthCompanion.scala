@@ -1,23 +1,23 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.MonthCompanion
-import org.podval.calendar.metadata.{WithNames, WithNamesCompanion}
+import org.podval.calendar.metadata.WithNames
 
 abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
   final val Name: JewishMonthCompanion.type = JewishMonthCompanion
 
-  final type Name = JewishMonthName
+  final type Name = JewishMonthCompanion.JewishMonthName // TODO push into MonthCompanion
 
   final override def yearNumber(monthNumber: Int): Int = Cycle.monthYear(monthNumber)
 
   final override def numberInYear(monthNumber: Int): Int = Cycle.monthNumberInYear(monthNumber)
 }
 
-sealed trait JewishMonthName extends WithNames[JewishMonthName] {
-  def companion: WithNamesCompanion[JewishMonthName] = JewishMonthCompanion
-}
+object JewishMonthCompanion extends WithNames {
+  sealed trait JewishMonthName extends KeyBase
 
-object JewishMonthCompanion extends WithNamesCompanion[JewishMonthName] {
+  override type Key = JewishMonthName
+
   case object Tishrei extends JewishMonthName
   case object Marheshvan extends JewishMonthName
   case object Kislev extends JewishMonthName

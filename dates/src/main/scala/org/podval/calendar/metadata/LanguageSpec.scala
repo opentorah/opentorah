@@ -1,5 +1,7 @@
 package org.podval.calendar.metadata
 
+import Language.Language
+
 final case class LanguageSpec(
   language: Option[Language],
   isTransliterated: Option[Boolean],

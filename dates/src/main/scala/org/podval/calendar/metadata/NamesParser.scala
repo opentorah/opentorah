@@ -1,6 +1,6 @@
 package org.podval.calendar.metadata
 
-import org.podval.calendar.metadata.XML.{open, span}
+import org.podval.calendar.metadata.XML.{open, take}
 
 import scala.xml.Elem
 
@@ -10,7 +10,7 @@ object NamesParser {
     val (attributes, elements) = open(element, name)
 
     val defaultName: Option[Name] = attributes.get("n").map { defaultName => Name(defaultName, LanguageSpec.empty) }
-    val (namesElements, tail) = span(elements, "names")
+    val (namesElements, tail) = take(elements, "names")
     // TODO make a convenience method?
     require(namesElements.size <= 1, "Multiple 'names' elements.")
     val namesElement: Option[Elem] = namesElements.headOption
@@ -38,14 +38,8 @@ object NamesParser {
     val name: Option[String] = n.orElse(text)
     require(name.nonEmpty, "Both 'n' attribute and text are absent.")
 
-    val lang: Option[Language] = attributes.get("lang").map { code: String =>
-      val result = Language.forCode(code)
-      require(result.isDefined, s"Unknown language code: $code")
-      result.get
-    }
-
     val result = Name(name.get, LanguageSpec(
-      lang,
+      language = attributes.get("lang").map(Language.getForDefaultName),
       isTransliterated = attributes.getBoolean("transliterated"),
       flavour = attributes.get("flavour")
     ))

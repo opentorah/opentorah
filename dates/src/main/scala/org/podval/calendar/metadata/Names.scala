@@ -26,6 +26,20 @@ final class Names(val names: Seq[Name]) {
 }
 
 object Names {
+  trait HasNames {
+    def names: Names
+
+    // TODO toString = names.doFind(LanguageSpec.empty).name
+  }
+
+  trait NamedBase extends HasNames {
+    def name: String = Named.className(this)
+
+    override def toString: String = name
+
+    final def toString(spec: LanguageSpec): String = names.doFind(spec).name
+  }
+
   def checkDisjoint(nameses: Seq[Names]): Unit = {
     for {
       one <- nameses
@@ -36,5 +50,5 @@ object Names {
   }
 
   def merge(one: Names, other: Names): Names =
-    if (other.isEmpty) one else throw new IllegalArgumentException("Merging Names not implemented.")
+    if (other.isEmpty) one else throw new IllegalArgumentException(s"Merging Names not implemented: $one with $other")
 }

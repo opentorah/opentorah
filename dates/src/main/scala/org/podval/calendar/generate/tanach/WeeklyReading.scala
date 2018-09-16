@@ -179,7 +179,7 @@ object WeeklyReading {
       case Nil =>  Nil
     }
 
-    val result = process(Parsha.all.init)
+    val result = process(Parsha.values.init)
 
     require(result.length == weeks.length)
 

@@ -9,7 +9,9 @@ import scala.xml.{Elem, Utility}
 
 object MetadataParser {
 
-  def getUrl(obj: AnyRef, name: String): URL =  {
+  def getUrl(obj: AnyRef): URL = getUrl(obj, Named.className(obj))
+
+  def getUrl(obj: AnyRef, name: String): URL = {
     val result = obj.getClass.getResource(name + ".xml")
     require(result != null, s"No such resource: $obj:$name")
     result
@@ -19,10 +21,7 @@ object MetadataParser {
     attributes: Attributes, // actual parser needs to call close()!
     names: Names,
     elements: Seq[Elem]
-  ) extends HasNames
-
-  def loadMetadata(obj: AnyRef, resourceName: String, name: String): Seq[MetadataPreparsed] =
-    loadMetadata(getUrl(obj, resourceName), resourceName, name)
+  ) extends Names.HasNames
 
   def loadMetadata(url: URL, resourceName: String, name: String): Seq[MetadataPreparsed] = {
     val elements: Seq[Elem] = loadMetadataElements(url, "metadata", resourceName)
@@ -33,14 +32,6 @@ object MetadataParser {
     val result = elements.map(element => loadSubresource(url, element, name))
     Names.checkDisjoint(result.map(_.names))
     result
-  }
-
-  def bind[K <: Named, M <: HasNames](keys: Seq[K], metadatas: Seq[M]): Seq[(K, M)] = {
-    require(keys.length == metadatas.length)
-    keys.zip(metadatas).map { case (key, metadata) =>
-      require(metadata.names.has(key.name))
-      key -> metadata
-    }
   }
 
   private def loadSubresource(url: URL, element: Elem, name: String ): MetadataPreparsed = {
@@ -64,7 +55,7 @@ object MetadataParser {
     }
   }
 
-  private def loadMetadataElements(url: URL, rootElementName: String, what: String): Seq[Elem] = {
+  def loadMetadataElements(url: URL, rootElementName: String, what: String): Seq[Elem] = {
     val element = loadResource(url)
     require(element.isDefined, s"No resource: $url")
     val (attributes, elements) = open(element.get, rootElementName)
@@ -82,23 +73,6 @@ object MetadataParser {
     } catch {
       case _: FileNotFoundException => None
     }
-  }
-
-  def loadNames[K <: WithNames[K]](obj: AnyRef, name: String, keys: Seq[K]): Map[K, Names] = {
-    val url = getUrl(obj, name)
-    val elements = loadMetadataElements(url, "names", name)
-    val metadatas: Seq[Names] = elements.map(element => NamesParser.parseNamesElement(element, None))
-    Names.checkDisjoint(metadatas)
-
-    // TODO relax the "same order" requirement.
-    // TODO merge into bind()?
-    require(keys.length == metadatas.length, s"Different lengths: $keys and $metadatas")
-    val result = keys.zip(metadatas).map { case (key, metadata) =>
-      require(metadata.has(key.name))
-      key -> metadata
-    }
-
-    result.toMap
   }
 
   private def siblingUrl(url: URL, name: String): URL = {

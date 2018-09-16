@@ -1,39 +1,23 @@
 package org.podval.calendar.generate.tanach
 
-import org.podval.calendar.metadata.{HasNames, Names, WithMetadata, LanguageSpec, Language}
+import java.net.URL
 
-object Tanach {
+import org.podval.calendar.metadata.MetadataParser.MetadataPreparsed
+import org.podval.calendar.metadata.{Names, WithKeyedMetadata, WithMetadataLoading, XML}
 
-  sealed trait Book
+object Nach extends WithKeyedMetadata with  WithMetadataLoading {
+  trait Book extends MetadataBase
 
-  trait ChumashBook extends Book with WithMetadata[ChumashBook, ChumashBookStructure] {
-    final override def toMetadata: Map[ChumashBook, ChumashBookStructure] = chumashStructure
-  }
+  override type Key = Book
 
-  final class ChumashBookStructure(
-    override val names: Names,
-    val chapters: Chapters,
-    val weeks: Map[Parsha, Parsha.Structure]
-  ) extends HasNames
-
-  case object Genesis extends ChumashBook
-  case object Exodus extends ChumashBook
-  case object Leviticus extends ChumashBook
-  case object Numbers extends ChumashBook
-  case object Deuteronomy extends ChumashBook
-
-  val chumash: Seq[ChumashBook] = Seq(Genesis, Exodus, Leviticus, Numbers, Deuteronomy)
-
-  trait NachBook extends Book with WithMetadata[NachBook, NachBookStructure] {
-    final override def toMetadata: Map[NachBook, NachBookStructure] = nachStructure
-  }
-
-  final class NachBookStructure(
+  final class BookStructure(
     override val names: Names,
     val chapters: Chapters
-  ) extends HasNames
+  ) extends Names.NamedBase
 
-  trait ProphetsBook extends NachBook
+  override type Metadata = BookStructure
+
+  trait ProphetsBook extends Book
 
   trait EarlyProphetsBook extends ProphetsBook
 
@@ -75,7 +59,9 @@ object Tanach {
 
   val prophets: Seq[ProphetsBook] = earlyProphets ++ lateProphets
 
-  trait WritingsBook extends NachBook
+  def getProhetForName(name: String): ProphetsBook = getForName(name).asInstanceOf[ProphetsBook]
+
+  trait WritingsBook extends Book
 
   case object Psalms extends WritingsBook
   case object Proverbs extends WritingsBook
@@ -94,42 +80,17 @@ object Tanach {
   val writings: Seq[WritingsBook] = Seq(Psalms, Proverbs, Job, SongOfSongs, Ruth, Lamentations, Ecclesiastes,
     Esther, Daniel, Ezra, Nehemiah, ChroniclesI, ChroniclesII)
 
-  val nach: Seq[NachBook] = prophets ++ writings
+  override val values: Seq[Book] = prophets ++ writings
 
-  val all: Seq[Book] = chumash ++ nach
+  protected override def elementName: String = "book"
 
-  private val (
-    chumashStructure: Map[ChumashBook, ChumashBookStructure],
-    nachStructure: Map[NachBook, NachBookStructure]
-  ) = TanachMetadataParser.parse(this)
+  protected override def parseMetadata(url: URL, book: Book, metadata: MetadataPreparsed): BookStructure = {
+    metadata.attributes.close()
+    val chapterElements = XML.span(metadata.elements, "chapter")
 
-  def forChumashName(name: String): Option[ChumashBook] = chumash.find(_.names.has(name))
-  def forNachName(name: String): Option[NachBook] = nach.find(_.names.has(name))
-  def forName(name: String): Option[Book] = forChumashName(name).orElse(forNachName(name))
-
-  private def printHaftarahList(custom: Custom, spec: LanguageSpec): Unit = {
-    println(custom.toString(spec))
-    for (parsha <- Parsha.all) {
-      val haftarah: Haftarah = Haftarah.forParsha(parsha)
-      val customEffective: Custom = Custom.find(haftarah.customs, custom)
-      val customEffectiveString: String =
-        if (customEffective == custom) ""
-        else " [" + customEffective.toString(spec)  + "]"
-      val spans: Seq[NachSpan] = haftarah.customs(customEffective)
-      println(parsha.toString(spec) + customEffectiveString + ": " + NachSpan.toString(spans, spec))
-    }
-  }
-
-  def main(args: Array[String]): Unit = {
-    def printSpans(spans: Seq[Span]): Unit = spans.zipWithIndex.foreach { case (span, index) =>
-      println(s"${index+1}: $span")
-    }
-
-//    printSpans(Parsha.Mattos.metadata.daysCombined(Custom.Ashkenaz))
-
-
-    printHaftarahList(Custom.Ashkenaz, LanguageSpec(Language.Hebrew))
-    println()
-    printHaftarahList(Custom.Djerba, LanguageSpec(Language.Russian))
+    new BookStructure(
+      metadata.names,
+      chapters = Chapters(chapterElements)
+    )
   }
 }

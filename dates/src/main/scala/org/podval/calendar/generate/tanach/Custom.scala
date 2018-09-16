@@ -1,13 +1,13 @@
 package org.podval.calendar.generate.tanach
 
-import org.podval.calendar.metadata.{WithNames, WithNamesCompanion}
+import org.podval.calendar.metadata.WithNames
 
-// I don't think it worth it to move parent definitions into the XML file...
-sealed class Custom(val parent: Option[Custom]) extends WithNames[Custom] {
-  final override def companion: WithNamesCompanion[Custom] = Custom
-}
+object Custom extends WithNames {
+  // I don't think it worth it to move parent definitions into the XML file...
+  sealed class Custom(val parent: Option[Custom]) extends KeyBase
 
-object Custom extends WithNamesCompanion[Custom] {
+  override type Key = Custom
+
   case object Common extends Custom(None)
     case object Ashkenaz extends Custom(Some(Common))
       case object Italki extends Custom(Some(Ashkenaz))
@@ -32,14 +32,27 @@ object Custom extends WithNamesCompanion[Custom] {
 
   type Of[T] = Map[Custom, T]
 
+  def find[T](customs: Of[T], custom: Custom): Custom = find(customs.keySet, custom)
 
-  def find[T](customs: Of[T], custom: Custom): Custom = {
-    val result: Option[T] = customs.get(custom)
-    if (result.isDefined) custom else {
+  def find(customs: Set[Custom], custom: Custom): Custom = {
+    if (customs.contains(custom)) custom else {
       require(custom.parent.isDefined)
       find(customs, custom.parent.get)
     }
   }
 
-  def get[T](customs: Of[T], custom: Custom): T = customs(find(customs, custom))
+  def parse(names: String): Set[Custom] = {
+    val customs: Seq[Custom] = names.split(' ').map(_.trim).map(getForName)
+    require(customs.length == customs.toSet.size, s"Duplicate customs: $customs")
+    val result = customs.toSet
+
+    // TODO add customs that have all children already in the set - recursively.
+
+    // Remove customs that have parents in the set.
+    result.filterNot(custom => custom.parent.isDefined && result.contains(custom.parent.get))
+  }
+
+  def checkDisjoint(sets: Set[Set[Custom]]): Unit = {
+    // TODO
+  }
 }

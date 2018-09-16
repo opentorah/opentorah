@@ -1,23 +1,23 @@
 package org.podval.calendar.gregorian
 
 import org.podval.calendar.dates.{Calendar, DayCompanion}
-import org.podval.calendar.metadata.{WithNames, WithNamesCompanion}
+import org.podval.calendar.metadata.WithNames
 
 abstract class GregorianDayCompanion extends DayCompanion[Gregorian] {
   final val Name: GregorianDayCompanion.type = GregorianDayCompanion
 
-  final type Name = GregorianDayName // TODO push into DayCompanion
+  final type Name = GregorianDayCompanion.GregorianDayName // TODO push into DayCompanion
 
   final override def names: Seq[Name] = GregorianDayCompanion.values
 
   final override val firstDayNumberInWeek: Int = Calendar.firstDayNumberInWeekGregorian
 }
 
-sealed trait GregorianDayName extends WithNames[GregorianDayName] {
-  def companion: WithNamesCompanion[GregorianDayName] = GregorianDayCompanion
-}
+object GregorianDayCompanion extends WithNames {
+  sealed trait GregorianDayName extends KeyBase
 
-object GregorianDayCompanion extends WithNamesCompanion[GregorianDayName] {
+  override type Key = GregorianDayName
+
   case object Sunday extends GregorianDayName
   case object Monday extends GregorianDayName
   case object Tuesday extends GregorianDayName
