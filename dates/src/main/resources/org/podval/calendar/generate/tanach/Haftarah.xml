@@ -246,7 +246,7 @@
     </week>
     <week n="Eikev" book="Isaiah" fromChapter="49" fromVerse="14" toChapter="51" toVerse="3"/>
     <week n="Re'eh" book="Isaiah" fromChapter="54" fromVerse="11" toChapter="55" toVerse="5">
-      <!--RULE If rosh chodeh Chabad: afara rosh chodesh -->
+      <!--RULE If rosh chodeh Chabad: aftara rosh chodesh -->
         <!-- If Sunday is Rosh Chodesh, Chabad: Samuel I 20:18,42 -->
     </week>
     <week n="Shoftim">
