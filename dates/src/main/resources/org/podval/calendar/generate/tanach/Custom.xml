@@ -2,77 +2,77 @@
     <names>
         <name n="Common" lang="en"/>
         <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name n="כללי" lang="he" n=""/> 
     </names>
     <names>
         <name n="Ashkenaz" lang="en" transliterated="true"/>
-        <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name n="Ашкеназский " lang="ru" />
+        <name n="אשכנז" lang="he" n=""/> 
     </names>
     <names>
         <name n="Italki" lang="en" transliterated="true"/>
-        <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name n="Итальянский" lang="ru" />
+        <name n="יטלקי" lang="he" n=""/> 
     </names>
     <names>
         <name n="Frankfurt" lang="en" transliterated="true"/>
-        <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name n=Фракуфртский" lang="ru" />
+        <name n="פרנקפורט" lang="he" n=""/> 
     </names>
     <names>
         <name n="Lita" lang="en" transliterated="true"/>
-        <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name n="Литовский" lang="ru" />
+        <name n="ליטה" lang="he" n=""/> 
     </names>
     <names>
         <name n="Hayey_odom" lang="en" transliterated="true"/>
-        <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name n="Хаей адам" lang="ru" />
+        <name n="חיי אדם" lang="he" n=""/> 
     </names>
     <names>
         <name n="Hagra" lang="en" transliterated="true"/>
-        <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name n="Агро" lang="ru" />
+        <name n="הגרא" lang="he" n=""/> 
     </names>
     <names>
         <name n="Sefard" lang="en" transliterated="true"/>
-        <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name n="Сефардский" lang="ru" />
+        <name n="ספרד" lang="he" n=""/> 
     </names>
     <names>
         <name n="Chabad" lang="en" transliterated="true"/>
-        <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name n="Хабад" lang="ru" />
+        <name n="חבד" lang="he" n=""/> 
     </names>
     <names>
         <name n="Magreb" lang="en" transliterated="true"/>
-        <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name n="Магреб" lang="ru" />
+        <name n="מגרב" lang="he" n=""/> 
     </names>
     <names>
         <name n="Algeria" lang="en" transliterated="true"/>
-        <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name n="Алжирский" lang="ru" />
+        <name n="אלגיר" lang="he" n=""/> 
     </names>
     <names>
         <name n="Toshbim" lang="en" transliterated="true"/>
-        <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name n="Тошбим" lang="ru" />
+        <name n="תושבים" lang="he" n=""/> 
     </names>
     <names>
         <name n="Djerba" lang="en" transliterated="true"/>
-        <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name n="Джебра" lang="ru" />
+        <name n="דגבה" lang="he" n=""/> 
     </names>
     <names>
         <name n="Bavlim" lang="en" transliterated="true"/>
-        <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name n="Вавилонский" lang="ru" />
+        <name n="בבלים" lang="he" n=""/> 
     </names>
     <names>
         <name n="Teiman" lang="en" transliterated="true"/>
-        <name n="Общий" lang="ru" />
-        <name n="" lang="he" n=""/> 
+        <name "Йеменский" lang="ru" />
+        <name n="תימן" lang="he" n=""/> 
     </names>
     <names>
         <name n="Baladi" lang="en" transliterated="true"/>
