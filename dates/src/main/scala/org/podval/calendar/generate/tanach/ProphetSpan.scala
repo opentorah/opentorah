@@ -9,8 +9,9 @@ final case class ProphetSpan(book: Nach.ProphetsBook, span: Span) {
 }
 
 object ProphetSpan {
-  def toString(spans: Seq[ProphetSpan], spec: LanguageSpec): String = {
-    // TODO skip repeated book name?
-    spans.map(_.toString(spec)).mkString("; ")
-  }
+  def toString(spans: Seq[ProphetSpan], spec: LanguageSpec): String =
+    Util.group(spans, (span: ProphetSpan) => span.book)
+      .map { bookSpans =>
+        bookSpans.head.book.toString(spec) + " " + bookSpans.map(_.span.toString(spec)).mkString(", ")
+      }.mkString("; ")
 }

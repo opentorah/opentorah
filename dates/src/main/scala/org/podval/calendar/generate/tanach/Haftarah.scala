@@ -87,7 +87,7 @@ object Haftarah extends MetadataLoader {
       val haftarah: Haftarah = Haftarah.forParsha(parsha)
       val customEffective: Custom = Custom.find(haftarah.customs, custom)
       val spans: Seq[ProphetSpan] = haftarah.customs(customEffective)
-      val result = ProphetSpan.toString(spans, spec)
+      val result: String = ProphetSpan.toString(spans, spec)
 
       if (customEffective == custom) {
         println(parsha.toString(spec) + ": " + result)
@@ -104,10 +104,12 @@ object Haftarah extends MetadataLoader {
 
     //    printSpans(Parsha.Mattos.metadata.daysCombined(Custom.Ashkenaz))
 
-    Custom.values.foreach { custom => if (custom != Custom.Common) {
-      printHaftarahList(custom, LanguageSpec(Language.Hebrew), full = false)
-      println()
-      println()
-    }}
+//    Custom.values.foreach { custom => if (custom != Custom.Common) {
+//      printHaftarahList(custom, LanguageSpec(Language.Hebrew), full = false)
+//      println()
+//      println()
+//    }}
+
+    printHaftarahList(Custom.Shami, LanguageSpec(Language.Hebrew), full = false)
   }
 }
