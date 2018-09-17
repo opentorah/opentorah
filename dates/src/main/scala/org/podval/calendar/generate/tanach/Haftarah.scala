@@ -2,7 +2,7 @@ package org.podval.calendar.generate.tanach
 
 import org.podval.calendar.generate.tanach.SpanParser.{NachSpanParsed, NumberedNachSpan, parseNachSpan, parseNumberedNachSpan}
 import org.podval.calendar.metadata.MetadataParser.MetadataPreparsed
-import org.podval.calendar.metadata.{Language, LanguageSpec, MetadataParser, XML}
+import org.podval.calendar.metadata.{Language, LanguageSpec, MetadataLoader, XML}
 import Custom.Custom
 import Parsha.Parsha
 
@@ -18,17 +18,20 @@ final class Haftarah(val customs: Custom.Of[Seq[ProphetSpan]]) {
   }
 }
 
-object Haftarah {
-  def forParsha(parsha: Parsha): Haftarah = toHaftarah(parsha)
+object Haftarah extends MetadataLoader {
+  override type Key = Parsha.Parsha
 
-  protected def resourceName: String = "Haftarah"
+  override val values: Seq[Parsha.Parsha] = Parsha.values
 
-  private val toHaftarah: Map[Parsha, Haftarah] = {
-    val url = MetadataParser.getUrl(this, resourceName)
-    MetadataParser.loadMetadata(url, resourceName, "week").map(parseWeek).toMap
-  }
+  override type Metadata = Haftarah
 
-  private def parseWeek(metadata: MetadataPreparsed): (Parsha, Haftarah) = {
+  def forParsha(parsha: Parsha): Haftarah = toMetadata(parsha)
+
+  override protected def resourceName: String = "Haftarah"
+
+  override protected def elementName: String = "week"
+
+  override protected def parseMetadata(parhsa: Parsha.Parsha,  metadata: MetadataPreparsed): Haftarah = {
     val n = metadata.attributes.doGet("n")
     val parsha = Parsha.forName(n)
     require(parsha.isDefined, s"Unknown Parsha: $n")
@@ -47,7 +50,7 @@ object Haftarah {
 
     // TODO check that customs are different.
 
-    parsha.get -> new Haftarah(
+    new Haftarah(
       customs = result.flatMap { case (customs, spans) => customs.map(custom => custom -> spans) }
     )
   }

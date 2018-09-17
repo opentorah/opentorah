@@ -1,13 +1,13 @@
 package org.podval.calendar.metadata
 
 trait WithKeyedMetadata extends WithMetadata {
-  trait MetadataBase extends Names.NamedBase { this: Key =>
+  trait KeyBase extends Named.NamedBase { this: Key =>
     final def metadata: Metadata = toMetadata(this)
 
     final override def names: Names = metadata.names
   }
 
-  override type Key <: MetadataBase
+  override type Key <: KeyBase
 
-  override type Metadata <: Names.NamedBase
+  override type Metadata <: Named.NamedBase
 }

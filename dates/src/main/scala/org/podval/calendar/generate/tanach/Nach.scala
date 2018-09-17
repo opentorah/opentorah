@@ -1,19 +1,17 @@
 package org.podval.calendar.generate.tanach
 
-import java.net.URL
-
 import org.podval.calendar.metadata.MetadataParser.MetadataPreparsed
-import org.podval.calendar.metadata.{Names, WithKeyedMetadata, WithMetadataLoading, XML}
+import org.podval.calendar.metadata.{Named, Names, WithKeyedMetadata, MetadataLoader, XML}
 
-object Nach extends WithKeyedMetadata with  WithMetadataLoading {
-  trait Book extends MetadataBase
+object Nach extends WithKeyedMetadata with MetadataLoader {
+  trait Book extends KeyBase
 
   override type Key = Book
 
   final class BookStructure(
     override val names: Names,
     val chapters: Chapters
-  ) extends Names.NamedBase
+  ) extends Named.NamedBase
 
   override type Metadata = BookStructure
 
@@ -84,7 +82,7 @@ object Nach extends WithKeyedMetadata with  WithMetadataLoading {
 
   protected override def elementName: String = "book"
 
-  protected override def parseMetadata(url: URL, book: Book, metadata: MetadataPreparsed): BookStructure = {
+  protected override def parseMetadata(book: Book, metadata: MetadataPreparsed): BookStructure = {
     metadata.attributes.close()
     val chapterElements = XML.span(metadata.elements, "chapter")
 

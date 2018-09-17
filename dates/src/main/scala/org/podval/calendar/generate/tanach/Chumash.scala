@@ -1,14 +1,12 @@
 package org.podval.calendar.generate.tanach
 
-import java.net.URL
-
 import org.podval.calendar.metadata.MetadataParser.MetadataPreparsed
-import org.podval.calendar.metadata.{MetadataParser, Names,WithKeyedMetadata,  WithMetadataLoading, XML}
+import org.podval.calendar.metadata.{MetadataParser, Named, Names, WithKeyedMetadata,  MetadataLoader, XML}
 import Parsha.Parsha
 
-object Chumash extends WithKeyedMetadata with WithMetadataLoading  {
+object Chumash extends WithKeyedMetadata with MetadataLoader  {
 
-  sealed trait Book extends MetadataBase {
+  sealed trait Book extends KeyBase {
     final def parshiot: Seq[Parsha] = Parsha.values.filter(_.book == this)
   }
 
@@ -18,7 +16,7 @@ object Chumash extends WithKeyedMetadata with WithMetadataLoading  {
     override val names: Names,
     val chapters: Chapters,
     val weeks: Map[Parsha, Parsha.Structure]
-  ) extends Names.NamedBase
+  ) extends Named.NamedBase
 
   override type Metadata = BookStructure
 
@@ -32,14 +30,14 @@ object Chumash extends WithKeyedMetadata with WithMetadataLoading  {
 
   protected override def elementName: String = "book"
 
-  protected override def parseMetadata(url: URL, book: Book, metadata: MetadataPreparsed): BookStructure = {
+  protected override def parseMetadata(book: Book, metadata: MetadataPreparsed): BookStructure = {
     metadata.attributes.close()
     val (chapterElements, weekElements) = XML.span(metadata.elements, "chapter", "week")
     val chapters: Chapters = Chapters(chapterElements)
 
     val weeks: Seq[(Parsha, Parsha.Structure)] = {
       val weeksCombined: Seq[ParshaMetadataParser.Combined] = ParshaMetadataParser.parse(
-        metadata = MetadataParser.preparseMetadata(url, weekElements, "week"),
+        metadata = weekElements.map(element => MetadataParser.loadSubresource(getUrl, element, "week")),
         chapters = chapters
       )
       val weeksBound: Seq[(Parsha, ParshaMetadataParser.Combined)] = Parsha.bind(book.parshiot, weeksCombined)

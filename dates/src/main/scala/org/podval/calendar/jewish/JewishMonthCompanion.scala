@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.MonthCompanion
-import org.podval.calendar.metadata.WithNames
+import org.podval.calendar.metadata.NamesLoader
 
 abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
   final val Name: JewishMonthCompanion.type = JewishMonthCompanion
@@ -13,7 +13,7 @@ abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
   final override def numberInYear(monthNumber: Int): Int = Cycle.monthNumberInYear(monthNumber)
 }
 
-object JewishMonthCompanion extends WithNames {
+object JewishMonthCompanion extends NamesLoader {
   sealed trait JewishMonthName extends KeyBase
 
   override type Key = JewishMonthName

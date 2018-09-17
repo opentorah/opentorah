@@ -1,15 +1,7 @@
 package org.podval.calendar.metadata
 
 trait Named {
-  type Key <: Names.NamedBase
-
-  def bind[M <: Names.HasNames](keys: Seq[Key], metadatas: Seq[M]): Seq[(Key, M)] = {
-    require(keys.length == metadatas.length)
-    keys.zip(metadatas).map { case (key, metadata) =>
-      require(metadata.names.has(key.name))
-      key -> metadata
-    }
-  }
+  type Key <: Named.NamedBase
 
   val values: Seq[Key]
 
@@ -21,7 +13,7 @@ trait Named {
     result.get
   }
 
-  final def forName(name: String): Option[Key] = values.find(_.names.has(name))
+  final def forName(name: String): Option[Key] = values.find(_.names.hasName(name))
 
   final def getForName(name: String): Key = {
     val result = forName(name)
@@ -39,6 +31,22 @@ trait Named {
 }
 
 object Named {
+  trait HasNames {
+    def names: Names
+
+    final def hasName(name: String): Boolean = names.hasName(name)
+
+    // TODO toString = names.doFind(LanguageSpec.empty).name
+  }
+
+  trait NamedBase extends HasNames {
+    def name: String = Named.className(this)
+
+    override def toString: String = name
+
+    final def toString(spec: LanguageSpec): String = names.doFind(spec).name
+  }
+
   // TODO this breaks on inner classes; fixed in JDK 9...
   def className(obj: AnyRef): String = obj.getClass.getSimpleName.replace("$", "")
 }

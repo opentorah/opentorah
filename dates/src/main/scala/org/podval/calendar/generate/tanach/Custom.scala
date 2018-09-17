@@ -1,8 +1,8 @@
 package org.podval.calendar.generate.tanach
 
-import org.podval.calendar.metadata.WithNames
+import org.podval.calendar.metadata.NamesLoader
 
-object Custom extends WithNames {
+object Custom extends NamesLoader {
   // I don't think it worth it to move parent definitions into the XML file...
   sealed class Custom(val parent: Option[Custom]) extends KeyBase
 

@@ -1,6 +1,6 @@
 package org.podval.calendar.metadata
 
-object Language extends WithNames {
+object Language extends NamesLoader {
   sealed class Language(code: String) extends KeyBase {
     final override def name: String = code
 

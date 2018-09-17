@@ -1,7 +1,7 @@
 package org.podval.calendar.gregorian
 
 import org.podval.calendar.dates.{Calendar, DayCompanion}
-import org.podval.calendar.metadata.WithNames
+import org.podval.calendar.metadata.NamesLoader
 
 abstract class GregorianDayCompanion extends DayCompanion[Gregorian] {
   final val Name: GregorianDayCompanion.type = GregorianDayCompanion
@@ -13,7 +13,7 @@ abstract class GregorianDayCompanion extends DayCompanion[Gregorian] {
   final override val firstDayNumberInWeek: Int = Calendar.firstDayNumberInWeekGregorian
 }
 
-object GregorianDayCompanion extends WithNames {
+object GregorianDayCompanion extends NamesLoader {
   sealed trait GregorianDayName extends KeyBase
 
   override type Key = GregorianDayName

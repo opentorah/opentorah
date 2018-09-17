@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.{Calendar, DayCompanion}
-import org.podval.calendar.metadata.WithNames
+import org.podval.calendar.metadata.NamesLoader
 
 abstract class JewishDayCompanion extends DayCompanion[Jewish] {
   final val Name: JewishDayCompanion.type = JewishDayCompanion
@@ -13,7 +13,7 @@ abstract class JewishDayCompanion extends DayCompanion[Jewish] {
   final override val firstDayNumberInWeek: Int = Calendar.firstDayNumberInWeekJewish
 }
 
-object JewishDayCompanion extends WithNames {
+object JewishDayCompanion extends NamesLoader {
   sealed trait JewishDayName extends KeyBase
 
   override type Key = JewishDayName

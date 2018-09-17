@@ -3,7 +3,7 @@ package org.podval.calendar.generate.tanach
 import org.podval.calendar.generate.tanach.SpanParser.{NumberedSpan, SpanParsed, parseSpan, parseNumberedSpan,
   addImplied1, setImpliedTo, checkNumber, dropNumbers}
 import org.podval.calendar.metadata.MetadataParser.MetadataPreparsed
-import org.podval.calendar.metadata.{Names, XML}
+import org.podval.calendar.metadata.{Named, Names, XML}
 import Parsha.Parsha
 
 import scala.xml.Elem
@@ -113,7 +113,7 @@ object ParshaMetadataParser {
     val daysCombinedNext: Custom.Of[Seq[NumberedSpan]],
     val maftir: Span,
     val aliyot: Seq[Span]
-  ) extends Names.HasNames {
+  ) extends Named.HasNames {
     def squash(parsha: Parsha, chapters: Chapters): Parsha.Structure = {
       def combine: Custom.Of[Seq[Span]] = {
         // TODO Use defaults from days?

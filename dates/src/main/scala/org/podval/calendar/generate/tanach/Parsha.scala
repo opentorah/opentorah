@@ -1,9 +1,9 @@
 package org.podval.calendar.generate.tanach
 
-import org.podval.calendar.metadata.{LanguageSpec, Names, WithKeyedMetadata}
+import org.podval.calendar.metadata.{LanguageSpec, Named, Names, WithKeyedMetadata}
 
 object Parsha extends WithKeyedMetadata {
-  sealed trait Parsha extends MetadataBase {
+  sealed trait Parsha extends KeyBase {
     def book: Chumash.Book
 
     final def combines: Boolean = Parsha.combinableAll.contains(this)
@@ -21,7 +21,7 @@ object Parsha extends WithKeyedMetadata {
     val daysCombined: Custom.Of[Seq[Span]],
     val maftir: Span,
     val aliyot: Seq[Span]
-  ) extends Names.NamedBase
+  ) extends Named.NamedBase
 
   override type Metadata = Structure
 
