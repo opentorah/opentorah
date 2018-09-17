@@ -10,17 +10,13 @@ trait NamesLoader extends ResourceLoader {
 
   override type Key <: KeyBase
 
+  final override type BindableMetadata = Names
+
   final override type Metadata = Names
 
   final override protected def rootElementName: String = "names"
 
-  final override protected def preparseMetadata(element: Elem): MetadataParser.MetadataPreparsed =
-    MetadataParser.MetadataPreparsed(
-      attributes = Attributes.empty,
-      names = Names.parse(element, None),
-      elements = Seq.empty
-    )
+  final override protected def preparseMetadata(element: Elem): Names = Names.parse(element, None)
 
-  final override protected def parseMetadata(key: Key, metadata: MetadataParser.MetadataPreparsed): Metadata =
-    metadata.names
+  final override protected def parseMetadata(key: Key, metadata: Names): Metadata = metadata
 }

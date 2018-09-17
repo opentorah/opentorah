@@ -35,19 +35,24 @@ object Chumash extends WithKeyedMetadata with MetadataLoader  {
     val (chapterElements, weekElements) = XML.span(metadata.elements, "chapter", "week")
     val chapters: Chapters = Chapters(chapterElements)
 
-    val weeks: Seq[(Parsha, Parsha.Structure)] = {
+    val weeks: Map[Parsha, Parsha.Structure] = {
       val weeksCombined: Seq[ParshaMetadataParser.Combined] = ParshaMetadataParser.parse(
         metadata = weekElements.map(element => MetadataParser.loadSubresource(getUrl, element, "week")),
         chapters = chapters
       )
-      val weeksBound: Seq[(Parsha, ParshaMetadataParser.Combined)] = Parsha.bind(book.parshiot, weeksCombined)
-      weeksBound.map { case (parsha: Parsha, week: ParshaMetadataParser.Combined) => parsha -> week.squash(parsha, chapters) }
+
+      Parsha.bind(
+        keys = book.parshiot,
+        metadatas = weeksCombined,
+        parse = (parsha: Parsha, week: ParshaMetadataParser.Combined) => week.squash(parsha, chapters)
+      )
     }
 
+    val names: Names = weeks(book.parshiot.head).names // TODO Names.merge(names, metadata.names)
     new BookStructure(
-      weeks.head._2.names, // TODO Names.merge(weeks.head._2.names, metadata.names)
+      names,
       chapters,
-      weeks.toMap
+      weeks
     )
   }
 }

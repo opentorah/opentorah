@@ -2,20 +2,13 @@ package org.podval.calendar.metadata
 
 import java.net.URL
 
-import org.podval.calendar.metadata.MetadataParser.MetadataPreparsed
-
 import scala.xml.Elem
 
 trait ResourceLoader extends WithMetadata {
   // This is lazy to allow correct initialization: the code uses values(),
   // Language metadata file references Language instances by name :)
-  final override protected lazy val toMetadata: Map[Key, Metadata] = {
-    val metadatas: Seq[MetadataPreparsed] = loadMetadataElements.map(preparseMetadata)
-
-    bind(values, metadatas).map { case (key, metadata) =>
-      key -> parseMetadata(key, metadata)
-    }.toMap
-  }
+  final override protected lazy val toMetadata: Map[Key, Metadata] =
+    bind(values, loadMetadataElements.map(preparseMetadata), parseMetadata)
 
   protected final def loadMetadataElements: Seq[Elem] = {
     val url = getUrl
@@ -39,9 +32,9 @@ trait ResourceLoader extends WithMetadata {
 
   protected def rootElementName: String
 
-  // TODO fold preparse/parse into the WithMetadata...
+  // TODO fold into the WithMetadata...
 
-  protected def preparseMetadata(element: Elem):MetadataPreparsed
+  protected def preparseMetadata(element: Elem): BindableMetadata
 
-  protected def parseMetadata(key: Key, metadata:MetadataPreparsed): Metadata
+  protected def parseMetadata(key: Key, metadata: BindableMetadata): Metadata
 }

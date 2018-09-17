@@ -23,6 +23,8 @@ object Parsha extends WithKeyedMetadata {
     val aliyot: Seq[Span]
   ) extends Named.NamedBase
 
+  override type BindableMetadata = ParshaMetadataParser.Combined
+
   override type Metadata = Structure
 
   final class Aliyah(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)

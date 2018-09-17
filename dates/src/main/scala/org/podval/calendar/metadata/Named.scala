@@ -31,10 +31,14 @@ trait Named {
 }
 
 object Named {
-  trait HasNames {
+  trait HasName {
+    def hasName(name: String): Boolean
+  }
+
+  trait HasNames extends HasName {
     def names: Names
 
-    final def hasName(name: String): Boolean = names.hasName(name)
+    final override def hasName(name: String): Boolean = names.hasName(name)
 
     // TODO toString = names.doFind(LanguageSpec.empty).name
   }

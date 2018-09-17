@@ -2,7 +2,7 @@ package org.podval.calendar.metadata
 
 import scala.xml.Elem
 
-final class Names(val names: Seq[Name]) {
+final class Names(val names: Seq[Name]) extends Named.HasName {
   // No duplicates
   require(names.size == names.map(_.name).toSet.size, s"Different sizes: $names and ${names.map(_.name).toSet}")
 
