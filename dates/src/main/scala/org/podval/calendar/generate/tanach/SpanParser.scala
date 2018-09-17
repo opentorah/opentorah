@@ -1,6 +1,8 @@
 package org.podval.calendar.generate.tanach
 
-import org.podval.calendar.metadata.Attributes
+import org.podval.calendar.metadata.{Attributes, XML}
+
+import scala.xml.Elem
 
 object SpanParser {
   final class NumberedSpan(val n: Int, val span: SpanParsed)
@@ -9,6 +11,13 @@ object SpanParser {
     val result: Array[NumberedSpan] = base.toArray
     differences.foreach(span => result(span.n-1) = span)
     result.toSeq
+  }
+
+  def parseNumberedSpan(element: Elem, name: String): NumberedSpan = {
+    val attributes = XML.openEmpty(element, name)
+    val result = parseNumberedSpan(attributes)
+    attributes.close()
+    result
   }
 
   def parseNumberedSpan(attributes: Attributes): NumberedSpan = new NumberedSpan(
@@ -21,6 +30,13 @@ object SpanParser {
       require(to.isEmpty || to.contains(value), "Wrong explicit 'to'")
       Span(from, value)
     }
+  }
+
+  def parseSpan(element: Elem, name: String): SpanParsed = {
+    val attributes = XML.openEmpty(element, name)
+    val result = parseSpan(attributes)
+    attributes.close()
+    result
   }
 
   def parseSpan(attributes: Attributes): SpanParsed = {
@@ -97,13 +113,13 @@ object SpanParser {
       )
     }
 
-    def resolve: NachSpan = {
+    def resolve: ProphetSpan = {
       require(book.isDefined)
       require(fromChapter.isDefined)
       require(fromVerse.isDefined)
 
-      val result = NachSpan(
-        book = Tanach.forNachName(book.get).get,
+      val result = ProphetSpan(
+        book = Nach.getProhetForName(book.get),
         span = Span(
           from = Verse(
             chapter = fromChapter.get,
@@ -121,9 +137,9 @@ object SpanParser {
       result
     }
 
-    private def verify(result: NachSpan): Unit = {
+    private def verify(result: ProphetSpan): Unit = {
       // TODO we need chapter structure for the Nach books used in Haftarahs to enable this:
-      //    require(result.book.metadata.chapters.contains(result.span), s"Book ${result.book} doesn't contain span ${result.span}")
+      require(result.book.metadata.chapters.contains(result.span), s"Book ${result.book} doesn't contain span ${result.span}")
     }
   }
 
@@ -137,7 +153,7 @@ object SpanParser {
 
   final class NumberedNachSpan(
     val n: Int,
-    val span: NachSpan
+    val span: ProphetSpan
   )
 
   def parseNumberedNachSpan(attributes: Attributes, contextSpan: NachSpanParsed): NumberedNachSpan = {

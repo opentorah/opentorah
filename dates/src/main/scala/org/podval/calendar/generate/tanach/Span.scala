@@ -14,5 +14,7 @@ final case class Span(from: Verse, to: Verse) {
 
   def toString(spec: LanguageSpec): String =
     if (from.chapter != to.chapter) from.toString(spec) + "-" + to.toString(spec)
-    else spec.toString(from.chapter) + ":" + spec.toString(from.verse) + "-" + spec.toString(to.verse)
+    else spec.toString(from.chapter) + ":" +
+      (if (from.verse == to.verse) spec.toString(from.verse)
+      else spec.toString(from.verse) + "-" + spec.toString(to.verse))
 }

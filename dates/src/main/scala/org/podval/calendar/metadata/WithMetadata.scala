@@ -1,9 +1,26 @@
 package org.podval.calendar.metadata
 
-trait WithMetadata[K <: WithMetadata[K, M], M <: HasNames] extends Named { this: K =>
-  final def metadata: M = toMetadata(this)
+trait WithMetadata extends Named {
 
-  final override def names: Names = metadata.names
+  type BindableMetadata <: Named.HasName
 
-  def toMetadata: Map[K, M]
+  type Metadata
+
+  protected def toMetadata: Key => Metadata
+
+  def bind(
+    keys: Seq[Key],
+    metadatas: Seq[BindableMetadata],
+    parse: (Key, BindableMetadata) => Metadata
+  ): Map[Key, Metadata] = {
+    require(keys.length == metadatas.length)
+
+    // TODO disjoint
+
+    // TODO relax the "same order" requirement.
+    keys.zip(metadatas).map { case (key, metadata) =>
+      require(metadata.hasName(key.name))
+      key -> parse(key, metadata)
+    }.toMap
+  }
 }

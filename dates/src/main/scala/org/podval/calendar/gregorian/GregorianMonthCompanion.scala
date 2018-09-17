@@ -2,12 +2,12 @@ package org.podval.calendar.gregorian
 
 import org.podval.calendar.dates.MonthCompanion
 import Gregorian.Year
-import org.podval.calendar.metadata.{WithNames, WithNamesCompanion}
+import org.podval.calendar.metadata.NamesLoader
 
 abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
   final val Name: GregorianMonthCompanion.type = GregorianMonthCompanion
 
-  final type Name = GregorianMonthName
+  final type Name = GregorianMonthCompanion.GregorianMonthName // TODO push into MonthCompanion
 
   final override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Year.monthsInYear + 1
 
@@ -15,11 +15,11 @@ abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
     monthNumber - Year.firstMonth(yearNumber(monthNumber)) + 1
 }
 
-sealed trait GregorianMonthName extends WithNames[GregorianMonthName] {
-  def companion: WithNamesCompanion[GregorianMonthName] = GregorianMonthCompanion
-}
+object GregorianMonthCompanion extends NamesLoader {
+  sealed trait GregorianMonthName extends KeyBase
 
-object GregorianMonthCompanion extends WithNamesCompanion[GregorianMonthName] {
+  override type Key = GregorianMonthName
+
   case object January extends GregorianMonthName
   case object February extends GregorianMonthName
   case object March extends GregorianMonthName

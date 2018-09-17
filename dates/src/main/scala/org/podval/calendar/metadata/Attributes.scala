@@ -36,6 +36,8 @@ final class Attributes private(attributes: Map[String, String]) {
 }
 
 object Attributes {
+  val empty: Attributes = new Attributes(Map.empty)
+
   def apply(element: Elem): Attributes = {
     val attributes = element.attributes.map { metadata =>
       val key = metadata.key

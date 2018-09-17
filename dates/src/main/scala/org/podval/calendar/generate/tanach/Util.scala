@@ -11,4 +11,10 @@ object Util {
   //    f(start) match { case (a, b) => b #:: unfoldInfinite(a)(f) }
 
   def unfoldInfiniteSimple[A](start: A)(f: A => A): Stream[A] = start #:: unfoldInfiniteSimple(f(start))(f)
+
+  def group[T, K](list: Seq[T], key: T => K): Seq[Seq[T]] = if (list.isEmpty) Nil else {
+    val k = key(list.head)
+    val (ks, notks) = list.span(key(_) == k)
+    Seq(ks) ++ group(notks, key)
+  }
 }

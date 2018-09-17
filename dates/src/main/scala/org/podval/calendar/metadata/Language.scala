@@ -1,15 +1,16 @@
 package org.podval.calendar.metadata
 
-sealed class Language(code: String) extends WithNames[Language] {
-  final override def name: String = code
-  final override def companion: WithNamesCompanion[Language] = Language
+object Language extends NamesLoader {
+  sealed class Language(code: String) extends KeyBase {
+    final override def name: String = code
 
-  // TODO add toLanguageSpec()?
+    // TODO add toLanguageSpec()?
 
-  def toString(number: Int): String = number.toString
-}
+    def toString(number: Int): String = number.toString
+  }
 
-object Language extends WithNamesCompanion[Language] {
+  override type Key = Language
+
   case object English extends Language("en")
   case object Russian extends Language("ru")
 

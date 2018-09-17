@@ -41,8 +41,14 @@ object XML {
     element.child.filterNot(_.isInstanceOf[Elem])
 
   // TODO make a convenience flavour that checks that the tail is empty
-  def span(elements: Seq[Elem], name1: String): (Seq[Elem], Seq[Elem]) = {
+  def take(elements: Seq[Elem], name1: String): (Seq[Elem], Seq[Elem]) = {
     elements.span(_.label == name1)
+  }
+
+  def span(elements: Seq[Elem], name1: String): Seq[Elem] = {
+    val (result, tail) = take(elements, name1)
+    checkNoMoreElements(tail)
+    result
   }
 
   def span(elements: Seq[Elem], name1: String, name2: String): (Seq[Elem], Seq[Elem]) = {
@@ -60,7 +66,7 @@ object XML {
     (elements1, elements2, elements3)
   }
 
-  def checkNoMoreElements(elements: Seq[Elem]): Unit =
+  private def checkNoMoreElements(elements: Seq[Elem]): Unit =
     require(elements.isEmpty, s"Spurious elements: ${elements.head.label}")
 
   def print(xml: Node, outStream: OutputStream): Unit = print(xml, new OutputStreamWriter(outStream))
