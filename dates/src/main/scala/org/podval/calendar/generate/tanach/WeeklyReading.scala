@@ -3,8 +3,9 @@ package org.podval.calendar.generate.tanach
 import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.jewish.SpecialDay
-import Parsha._
-import SpecialDay.{ShabbosBereishis, Pesach, Shavuos, TishaBav, shabbosAfter, shabbosBefore}
+import SpecialDay.{Pesach, ShabbosBereishis, Shavuos, TishaBav, shabbosAfter, shabbosBefore}
+import org.podval.judaica.metadata.tanach.{Parsha, Util}
+import org.podval.judaica.metadata.tanach.Parsha._
 
 /**
   * Determine weekly portion read on a given Shabbos.

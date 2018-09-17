@@ -1,12 +1,10 @@
 package org.podval.calendar.gregorian
 
 import org.podval.calendar.dates.{Calendar, DayCompanion}
-import org.podval.calendar.metadata.NamesLoader
+import org.podval.judaica.metadata.NamesLoader
 
 abstract class GregorianDayCompanion extends DayCompanion[Gregorian] {
-  final val Name: GregorianDayCompanion.type = GregorianDayCompanion
-
-  final type Name = GregorianDayCompanion.GregorianDayName // TODO push into DayCompanion
+  final override val Name: GregorianDayCompanion.type = GregorianDayCompanion
 
   final override def names: Seq[Name] = GregorianDayCompanion.values
 
@@ -14,19 +12,17 @@ abstract class GregorianDayCompanion extends DayCompanion[Gregorian] {
 }
 
 object GregorianDayCompanion extends NamesLoader {
-  sealed trait GregorianDayName extends KeyBase
+  sealed trait Key extends KeyBase
 
-  override type Key = GregorianDayName
+  case object Sunday extends Key
+  case object Monday extends Key
+  case object Tuesday extends Key
+  case object Wednesday extends Key
+  case object Thursday extends Key
+  case object Friday extends Key
+  case object Saturday extends Key
 
-  case object Sunday extends GregorianDayName
-  case object Monday extends GregorianDayName
-  case object Tuesday extends GregorianDayName
-  case object Wednesday extends GregorianDayName
-  case object Thursday extends GregorianDayName
-  case object Friday extends GregorianDayName
-  case object Saturday extends GregorianDayName
-
-  override val values: Seq[GregorianDayName] = Seq(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+  override val values: Seq[Key] = Seq(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
 
   override def resourceName: String = "GregorianDay"
 }

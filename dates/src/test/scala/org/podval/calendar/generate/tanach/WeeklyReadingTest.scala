@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import org.podval.calendar.jewish.{Jewish, SpecialDay, YearType}
 import YearType._
 import Jewish.{Day, Year}
-import Parsha._
+import org.podval.judaica.metadata.tanach.Parsha._
 import SpecialDay._
 
 class WeeklyReadingTest extends FlatSpec with Matchers {

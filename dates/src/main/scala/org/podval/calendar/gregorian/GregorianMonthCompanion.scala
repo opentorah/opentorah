@@ -2,12 +2,10 @@ package org.podval.calendar.gregorian
 
 import org.podval.calendar.dates.MonthCompanion
 import Gregorian.Year
-import org.podval.calendar.metadata.NamesLoader
+import org.podval.judaica.metadata.NamesLoader
 
 abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
-  final val Name: GregorianMonthCompanion.type = GregorianMonthCompanion
-
-  final type Name = GregorianMonthCompanion.GregorianMonthName // TODO push into MonthCompanion
+  final override val Name: GregorianMonthCompanion.type = GregorianMonthCompanion
 
   final override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Year.monthsInYear + 1
 
@@ -16,24 +14,22 @@ abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
 }
 
 object GregorianMonthCompanion extends NamesLoader {
-  sealed trait GregorianMonthName extends KeyBase
+  sealed trait Key extends KeyBase
 
-  override type Key = GregorianMonthName
+  case object January extends Key
+  case object February extends Key
+  case object March extends Key
+  case object April extends Key
+  case object May extends Key
+  case object June extends Key
+  case object July extends Key
+  case object August extends Key
+  case object September extends Key
+  case object October extends Key
+  case object November extends Key
+  case object December extends Key
 
-  case object January extends GregorianMonthName
-  case object February extends GregorianMonthName
-  case object March extends GregorianMonthName
-  case object April extends GregorianMonthName
-  case object May extends GregorianMonthName
-  case object June extends GregorianMonthName
-  case object July extends GregorianMonthName
-  case object August extends GregorianMonthName
-  case object September extends GregorianMonthName
-  case object October extends GregorianMonthName
-  case object November extends GregorianMonthName
-  case object December extends GregorianMonthName
-
-  override val values: Seq[GregorianMonthName] =
+  override val values: Seq[Key] =
     Seq(January, February, March, April, May, June, July, August, September, October, November, December)
 
   override def resourceName: String = "GregorianMonth"

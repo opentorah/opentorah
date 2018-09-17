@@ -1,9 +1,16 @@
 package org.podval.calendar.dates
 
+import org.podval.judaica.metadata.NamesLoader
+
 /**
   *
   */
 abstract class MonthCompanion[C <: Calendar[C]] extends CalendarMember[C] {
+  val Name: NamesLoader
+
+  // TODO push up into Calendar?
+  final type Name = Name.Key
+
   def apply(number: Int): C#Month
 
   final def apply(year: Int, monthInYear: Int): C#Month =
