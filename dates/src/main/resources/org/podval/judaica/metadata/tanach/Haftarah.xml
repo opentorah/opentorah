@@ -178,11 +178,10 @@
         <custom n="Sefard Italki" book="Ezekiel" fromChapter="22" fromVerse="1" toVerse="16"/> <!-- = Kedoshim:Ashkenaz -->
     </week>
     <week n="Kedoshim" book="Ezekiel">
-        <custom n="Ashkenaz" fromChapter="22" fromVerse="1" toVerse="16"/>
+        <custom n="Ashkenaz Lita" fromChapter="22" fromVerse="1" toVerse="16"/> <!-- Lita: Ahkenaz when Acharei - rosh hodesh Iyar -->
         <custom n="Sefard" fromChapter="20" fromVerse="2" toVerse="20"/>  <!-- this one when Acharei & Kedoshim combine -->
         <custom n="Italki Teiman" fromChapter="20" fromVerse="1" toVerse="20"/>
         <custom n="Baladi" fromChapter="20" fromVerse="1" toVerse="15"/>
-        <custom n="Lita" fromChapter="22" fromVerse="1" toVerse="16"/> <!--Ahkenaz when Acharei - rosh hodesh Iyar -->
     </week>
     <week n="Emor" book="Ezekiel" fromChapter="44" fromVerse="15" toVerse="31"/>
     <week n="Behar" book="Jeremiah" >

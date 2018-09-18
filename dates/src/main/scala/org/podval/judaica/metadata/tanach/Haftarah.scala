@@ -3,7 +3,7 @@ package org.podval.judaica.metadata.tanach
 import org.podval.judaica.metadata.{Language, LanguageSpec, MetadataLoader, PreparsedMetadata, XML}
 import org.podval.judaica.metadata.tanach.Custom.Custom
 import org.podval.judaica.metadata.tanach.Parsha.Parsha
-import org.podval.judaica.metadata.tanach.SpanParser.{NachSpanParsed, NumberedProphetSpan}
+import org.podval.judaica.metadata.tanach.SpanParser.{ProphetSpanParsed, NumberedProphetSpan}
 
 import scala.xml.Elem
 
@@ -31,7 +31,7 @@ object Haftarah extends MetadataLoader {
   override protected def elementName: String = "week"
 
   override protected def parseMetadata(parhsa: Parsha,  metadata: PreparsedMetadata): Haftarah = {
-    val weekSpan = SpanParser.parseNachSpan(metadata.attributes)
+    val weekSpan = SpanParser.parseProphetSpan(metadata.attributes)
     metadata.attributes.close()
 
     val customElements = XML.span(metadata.elements, "custom")
@@ -40,26 +40,18 @@ object Haftarah extends MetadataLoader {
       if (customElements.isEmpty) Map(Set[Custom](Custom.Common) -> Seq(weekSpan.resolve))
       else customElements.map(element => parseCustom(element, weekSpan)).toMap
 
-    // Check that custom sets do not overlap.
-    val customSets: Set[Set[Custom]] = result.keySet
-
-    // TODO check that customs are different.
-
-    new Haftarah(
-      customs = result.flatMap { case (customs, spans) => customs.map(custom => custom -> spans) }
-    )
+    new Haftarah(Custom.denormalize(result))
   }
 
-  private def parseCustom(element: Elem, weekSpan: NachSpanParsed): (Set[Custom], Seq[ProphetSpan]) = {
+  private def parseCustom(element: Elem, weekSpan: ProphetSpanParsed): (Set[Custom], Seq[ProphetSpan]) = {
     val (attributes, elements) = XML.open(element, "custom")
     val customs: Set[Custom] = Custom.parse(attributes.doGet("n"))
 
-    val customSpan = SpanParser.parseNachSpan(attributes)
+    val customSpan = SpanParser.parseProphetSpan(attributes)
     attributes.close()
+    val contextSpan = customSpan.inheritFrom(weekSpan)
 
     val partElements = XML.span(elements, "part")
-
-    val contextSpan = customSpan.inheritFrom(weekSpan)
 
     val result: Seq[ProphetSpan] =
       if (partElements.isEmpty) Seq(contextSpan.resolve)
@@ -68,9 +60,9 @@ object Haftarah extends MetadataLoader {
     customs -> result
   }
 
-  private def parseParts(elements: Seq[Elem], contextSpan: NachSpanParsed): Seq[ProphetSpan] = {
+  private def parseParts(elements: Seq[Elem], contextSpan: ProphetSpanParsed): Seq[ProphetSpan] = {
     val result: Seq[NumberedProphetSpan] = elements.map(element =>
-      SpanParser.parseNumberedNachSpan(XML.openEmpty(element, "part"), contextSpan))
+      SpanParser.parseNumberedProphetSpan(XML.openEmpty(element, "part"), contextSpan))
     WithNumber.checkConsecutive(result, "part")
     result.map(_.span)
   }

@@ -1,5 +1,6 @@
 package org.podval.judaica.metadata.tanach
 
+import org.podval.judaica.metadata.tanach.Chumash.Book
 import org.podval.judaica.metadata.tanach.SpanParser.{NumberedSpan, SpanParsed}
 import org.podval.judaica.metadata.{LanguageSpec, MainMetadata, Named, Names, PreparsedMetadata, SubresourceLoader, XML}
 
@@ -7,7 +8,7 @@ import scala.xml.Elem
 
 object Parsha extends MainMetadata with SubresourceLoader {
   sealed trait Parsha extends KeyBase {
-    def book: Chumash.Book
+    def book: Book
 
     final def combines: Boolean = Parsha.combinableAll.contains(this)
 
@@ -31,7 +32,7 @@ object Parsha extends MainMetadata with SubresourceLoader {
 
   final class Aliyah(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
 
-  trait GenesisParsha extends Parsha { final override def book: Chumash.Book = Chumash.Genesis }
+  trait GenesisParsha extends Parsha { final override def book: Book = Chumash.Genesis }
 
   case object Bereishis extends GenesisParsha
   case object Noach extends GenesisParsha
@@ -46,7 +47,7 @@ object Parsha extends MainMetadata with SubresourceLoader {
   case object Vayigash extends GenesisParsha
   case object Vayechi extends GenesisParsha
 
-  trait ExodusParsha extends Parsha { final override def book: Chumash.Book = Chumash.Exodus }
+  trait ExodusParsha extends Parsha { final override def book: Book = Chumash.Exodus }
 
   case object Shemos extends ExodusParsha
   case object Va_eira extends ExodusParsha { override def name: String = "Va'eira" }
@@ -60,7 +61,7 @@ object Parsha extends MainMetadata with SubresourceLoader {
   case object Vayakhel extends ExodusParsha
   case object Pekudei extends ExodusParsha
 
-  trait LeviticusParsha extends Parsha { final override def book: Chumash.Book = Chumash.Leviticus }
+  trait LeviticusParsha extends Parsha { final override def book: Book = Chumash.Leviticus }
 
   case object Vayikra extends LeviticusParsha
   case object Tzav extends LeviticusParsha
@@ -73,7 +74,7 @@ object Parsha extends MainMetadata with SubresourceLoader {
   case object Behar extends LeviticusParsha
   case object Bechukosai extends LeviticusParsha
 
-  trait NumbersParsha extends Parsha { final override def book: Chumash.Book = Chumash.Numbers }
+  trait NumbersParsha extends Parsha { final override def book: Book = Chumash.Numbers }
 
   case object Bemidbar extends NumbersParsha
   case object Nasso extends NumbersParsha
@@ -86,7 +87,7 @@ object Parsha extends MainMetadata with SubresourceLoader {
   case object Mattos extends NumbersParsha
   case object Masei extends NumbersParsha
 
-  trait DeutoronomyParsha extends Parsha { final override def book: Chumash.Book = Chumash.Deuteronomy }
+  trait DeutoronomyParsha extends Parsha { final override def book: Book = Chumash.Deuteronomy }
 
   case object Devarim extends DeutoronomyParsha
   case object Va_eschanan extends DeutoronomyParsha { override def name: String = "Va'eschanan" }
@@ -128,22 +129,20 @@ object Parsha extends MainMetadata with SubresourceLoader {
 
   override protected def elementName: String = "week"
 
-  def parse(elements: Seq[Elem], book: Chumash.Book, chapters: Chapters): Map[Parsha, Structure] = {
-    val metadata: Seq[PreparsedMetadata] = elements.map(element => loadSubresource(element))
-    val weeksPreparsed: Seq[Preparsed] = metadata.map(preparseWeek)
-    val weekSpans: Seq[Span] = SpanParser.setImpliedTo(weeksPreparsed.map(_.span), chapters.full, chapters)
-    require(weekSpans.length == weeksPreparsed.length)
-    val weeksParsed: Seq[Parsed] = weeksPreparsed.zip(weekSpans).map { case (week, span) => week.parse(span, chapters) }
-    val weeksCombined: Seq[Combined] = combine(weeksParsed)
+  def parse(elements: Seq[Elem], book: Book, chapters: Chapters): Map[Parsha, Structure] = {
+    val preparsed: Seq[Preparsed] = elements.map(element => loadSubresource(element)).map(preparse)
+    val spans: Seq[Span] = SpanParser.setImpliedTo(preparsed.map(_.span), chapters.full, chapters)
+    require(spans.length == preparsed.length)
+    val parsed: Seq[Parsed] = preparsed.zip(spans).map { case (week, span) => week.parse(span, chapters) }
 
     bind(
       keys = book.parshiot,
-      metadatas = weeksCombined,
+      metadatas = combine(parsed),
       parse = (parsha: Parsha, week: Combined) => week.squash(parsha, chapters)
     )
   }
 
-  private def preparseWeek(metadata: PreparsedMetadata): Preparsed = {
+  private def preparse(metadata: PreparsedMetadata): Preparsed = {
     val result = new Preparsed(
       span = SpanParser.parseSpan(metadata.attributes),
       names = metadata.names,
@@ -163,21 +162,16 @@ object Parsha extends MainMetadata with SubresourceLoader {
         "aliyah", "day", "maftir")
       require(maftirElements.length == 1)
 
-      def byCustom(days: Seq[DayParsed]): Custom.Of[Seq[NumberedSpan]] = {
-        def toNumberedSpan(days: Seq[DayParsed]): Seq[NumberedSpan] = days.map(_.span)
-        val (common, custom) = days.partition(_.custom.isEmpty)
-        val result: Custom.Of[Seq[DayParsed]] = custom.groupBy(_.custom.get)
-        require(!result.contains(Custom.Common))
-        (result + (Custom.Common -> common)).mapValues(toNumberedSpan)
-      }
+      def byCustom(days: Seq[DayParsed]): Custom.Sets[Seq[NumberedSpan]] =
+        days.groupBy(_.custom).mapValues(days => days.map(_.span))
 
       val (days: Seq[DayParsed], daysCombined: Seq[DayParsed]) = dayElements.map(parseDay).partition(!_.isCombined)
-      val daysResult: Custom.Of[Seq[Span]] = processDays(byCustom(days), span, chapters)
+      val daysResult: Custom.Sets[Seq[Span]] = processDays(byCustom(days), span, chapters)
 
       val aliyot: Seq[NumberedSpan] = aliyahElements.map(element => SpanParser.parseNumberedSpan(element, "aliyah"))
-      // TODO if Cohen ends in a custom place, does it affect the end of the 3 aliyah on Mon/Thu?
-      // TODO if the parshiot combine, does it affect those small aliyot?
-      val aliyotSpan: Span = Span(span.from, aliyot.last.span.to.getOrElse(daysResult(Custom.Common).head.to))
+      // TODO QUESTION if Cohen ends in a custom place, does it affect the end of the 3 aliyah on Mon/Thu?
+      // TODO QUESTION if the parshiot combine, does it affect those small aliyot?
+      val aliyotSpan: Span = Span(span.from, aliyot.last.span.to.getOrElse(Custom.common(daysResult).head.to))
       val aliyotWithImplied1: Seq[NumberedSpan] = SpanParser.addImplied1(aliyot, aliyotSpan, chapters)
       val aliyotResult: Seq[Span] =
         SpanParser.setImpliedToCheckAndDropNumbers(aliyotWithImplied1, 3, aliyotSpan, chapters)
@@ -209,13 +203,13 @@ object Parsha extends MainMetadata with SubresourceLoader {
   private final case class Parsed(
     names: Names,
     span: Span,
-    days: Custom.Of[Seq[Span]],
-    daysCombined: Custom.Of[Seq[NumberedSpan]],
+    days: Custom.Sets[Seq[Span]],
+    daysCombined: Custom.Sets[Seq[NumberedSpan]],
     aliyot: Seq[Span],
     maftir: Span
   ) {
     def combine(
-      daysCombinedNext: Custom.Of[Seq[NumberedSpan]],
+      daysCombinedNext: Custom.Sets[Seq[NumberedSpan]],
       spanNext: Span
     ): Combined = new Combined(
       names = names,
@@ -232,27 +226,27 @@ object Parsha extends MainMetadata with SubresourceLoader {
   final class Combined(
     val names: Names,
     val span: Span,
-    val days: Custom.Of[Seq[Span]],
-    val daysCombined: Custom.Of[Seq[NumberedSpan]],
+    val days: Custom.Sets[Seq[Span]],
+    val daysCombined: Custom.Sets[Seq[NumberedSpan]],
     val spanNext: Span,
-    val daysCombinedNext: Custom.Of[Seq[NumberedSpan]],
+    val daysCombinedNext: Custom.Sets[Seq[NumberedSpan]],
     val aliyot: Seq[Span],
     val maftir: Span
   ) extends Named.HasNames {
     def squash(parsha: Parsha, chapters: Chapters): Parsha.Structure = {
-      def combine: Custom.Of[Seq[Span]] = {
+      def combine: Custom.Sets[Seq[Span]] = {
         // TODO Use defaults from days?
-        val result = daysCombinedNext ++ daysCombined.map { case (custom, days) =>
-          (custom, days ++ daysCombinedNext.getOrElse(custom, Seq.empty))
+        val combinedFull = daysCombinedNext ++ daysCombined.map { case (customs, value) =>
+          (customs, value ++ daysCombinedNext.getOrElse(customs, Seq.empty))
         }
-        processDays(result, chapters.merge(span, spanNext), chapters)
+        processDays(combinedFull, chapters.merge(span, spanNext), chapters)
       }
 
       new Parsha.Structure(
         names = names,
         span = span,
-        days = days,
-        daysCombined = if (!parsha.combines) Map.empty else combine,
+        days = Custom.denormalize(days),
+        daysCombined = if (!parsha.combines) Map.empty else Custom.denormalize(combine),
         maftir = maftir,
         aliyot = aliyot
       )
@@ -261,7 +255,7 @@ object Parsha extends MainMetadata with SubresourceLoader {
 
   private final class DayParsed(
     val span: NumberedSpan,
-    val custom: Option[Custom.Custom],
+    val custom: Set[Custom.Custom],
     val isCombined: Boolean
   )
 
@@ -269,8 +263,7 @@ object Parsha extends MainMetadata with SubresourceLoader {
     val attributes = XML.openEmpty(element, "day")
     val result = new DayParsed(
       span = SpanParser.parseNumberedSpan(attributes),
-      // TODO allow *lists* of customs here as in Haftarah?
-      custom = attributes.get("custom").map(Custom.getForName),
+      custom = attributes.get("custom").fold[Set[Custom.Custom]](Set(Custom.Common))(Custom.parse),
       isCombined = attributes.doGetBoolean("combined")
     )
     attributes.close()
@@ -278,11 +271,11 @@ object Parsha extends MainMetadata with SubresourceLoader {
   }
 
   private def processDays(
-    days: Custom.Of[Seq[NumberedSpan]],
+    days: Custom.Sets[Seq[NumberedSpan]],
     span: Span,
     chapters: Chapters
-  ): Custom.Of[Seq[Span]] = {
-    val withImplied1 = SpanParser.addImplied1(days(Custom.Common), span, chapters)
+  ): Custom.Sets[Seq[Span]] = {
+    val withImplied1 = SpanParser.addImplied1(Custom.common(days), span, chapters)
 
     days.mapValues { spans: Seq[NumberedSpan] =>
       val overlayedSpans = SpanParser.overlaySpans(withImplied1, spans)

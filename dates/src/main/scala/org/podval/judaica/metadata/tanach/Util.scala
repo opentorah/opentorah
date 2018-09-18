@@ -12,9 +12,20 @@ object Util {
 
   def unfoldInfiniteSimple[A](start: A)(f: A => A): Stream[A] = start #:: unfoldInfiniteSimple(f(start))(f)
 
+  // Group consecutive elements with the same key - didn't find this in the standard library.
   def group[T, K](list: Seq[T], key: T => K): Seq[Seq[T]] = if (list.isEmpty) Nil else {
     val k = key(list.head)
     val (ks, notks) = list.span(key(_) == k)
     Seq(ks) ++ group(notks, key)
   }
+
+  def duplicates[T](seq: Seq[T]): Set[T] = seq.groupBy(t => t).filter { case (t, ts) => ts.length > 1 }.keySet
+
+  def checkNoDuplicates[T](seq: Seq[T], what: String): Unit = {
+    val result = duplicates(seq)
+    require(result.isEmpty, s"Duplicate $what: $result")
+  }
+
+  // b.intersect(a) == b?
+  def contains[T](a: Set[T], b: Set[T]): Boolean = b.forall(t => a.contains(t))
 }

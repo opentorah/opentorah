@@ -98,21 +98,21 @@ object SpanParser {
     result
   }
 
-  final class NachSpanParsed(
+  final class ProphetSpanParsed(
     val book: Option[String],
     val fromChapter: Option[Int],
     val fromVerse: Option[Int],
     val toChapter: Option[Int],
     val toVerse: Option[Int]
   ) {
-    def inheritFrom(span: NachSpanParsed): NachSpanParsed = {
+    def inheritFrom(span: ProphetSpanParsed): ProphetSpanParsed = {
       require(this.book.isEmpty || span.book.isEmpty)
       require(this.fromChapter.isEmpty || span.fromChapter.isEmpty)
       require(this.fromVerse.isEmpty || span.fromVerse.isEmpty)
       require(this.toChapter.isEmpty || span.toChapter.isEmpty)
       require(this.toVerse.isEmpty || span.toVerse.isEmpty)
 
-      new NachSpanParsed(
+      new ProphetSpanParsed(
         book = this.book.orElse(span.book),
         fromChapter = this.fromChapter.orElse(span.fromChapter),
         fromVerse = this.fromVerse.orElse(span.fromVerse),
@@ -150,7 +150,7 @@ object SpanParser {
     }
   }
 
-  def parseNachSpan(attributes: Attributes): NachSpanParsed = new NachSpanParsed(
+  def parseProphetSpan(attributes: Attributes): ProphetSpanParsed = new ProphetSpanParsed(
     book = attributes.get("book"),
     fromChapter = attributes.getInt("fromChapter"),
     fromVerse = attributes.getInt("fromVerse"),
@@ -163,9 +163,9 @@ object SpanParser {
     val span: ProphetSpan
   ) extends WithNumber
 
-  def parseNumberedNachSpan(attributes: Attributes, contextSpan: NachSpanParsed): NumberedProphetSpan = {
+  def parseNumberedProphetSpan(attributes: Attributes, contextSpan: ProphetSpanParsed): NumberedProphetSpan = {
     val n: Int = attributes.doGetInt("n")
-    val partSpan = parseNachSpan(attributes)
+    val partSpan = parseProphetSpan(attributes)
     attributes.close()
     val span = partSpan.inheritFrom(contextSpan)
     new NumberedProphetSpan(
