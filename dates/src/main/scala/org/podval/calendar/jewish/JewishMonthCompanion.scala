@@ -1,12 +1,10 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.MonthCompanion
-import org.podval.calendar.metadata.NamesLoader
+import org.podval.judaica.metadata.NamesLoader
 
 abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
-  final val Name: JewishMonthCompanion.type = JewishMonthCompanion
-
-  final type Name = JewishMonthCompanion.JewishMonthName // TODO push into MonthCompanion
+  final override val Name: JewishMonthCompanion.type = JewishMonthCompanion
 
   final override def yearNumber(monthNumber: Int): Int = Cycle.monthYear(monthNumber)
 
@@ -14,26 +12,24 @@ abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
 }
 
 object JewishMonthCompanion extends NamesLoader {
-  sealed trait JewishMonthName extends KeyBase
+  sealed trait Key extends KeyBase
 
-  override type Key = JewishMonthName
+  case object Tishrei extends Key
+  case object Marheshvan extends Key
+  case object Kislev extends Key
+  case object Teves extends Key
+  case object Shvat extends Key
+  case object Adar extends Key
+  case object Nisan extends Key
+  case object Iyar extends Key
+  case object Sivan extends Key
+  case object Tammuz extends Key
+  case object Av extends Key
+  case object Elul extends Key
+  case object AdarI extends Key { override def name: String = "Adar I"}
+  case object AdarII extends Key { override def name: String = "Adar II"}
 
-  case object Tishrei extends JewishMonthName
-  case object Marheshvan extends JewishMonthName
-  case object Kislev extends JewishMonthName
-  case object Teves extends JewishMonthName
-  case object Shvat extends JewishMonthName
-  case object Adar extends JewishMonthName
-  case object Nisan extends JewishMonthName
-  case object Iyar extends JewishMonthName
-  case object Sivan extends JewishMonthName
-  case object Tammuz extends JewishMonthName
-  case object Av extends JewishMonthName
-  case object Elul extends JewishMonthName
-  case object AdarI extends JewishMonthName { override def name: String = "Adar I"}
-  case object AdarII extends JewishMonthName { override def name: String = "Adar II"}
-
-  override val values: Seq[JewishMonthName] =
+  override val values: Seq[Key] =
     Seq(Tishrei, Marheshvan, Kislev, Teves, Shvat, Adar, Nisan, Iyar, Sivan, Tammuz, Av, Elul, AdarI, AdarII)
 
   override def resourceName: String = "JewishMonth"
