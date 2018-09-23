@@ -101,7 +101,7 @@ Mekorot
         <haftarah book="Jeremiah" >
           <custom n="Ashkenaz Sefarad"  fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
           <custom n="Teiman">
-            <part n="1" fromChapter="6" fromVerse="15"  toVerse="16"/>
+            <part n="1" fromChapter="6" fromVerse="16"  toVerse="17"/>
             <part n="2" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/> 
           </custom> 
         </haftarah>    
