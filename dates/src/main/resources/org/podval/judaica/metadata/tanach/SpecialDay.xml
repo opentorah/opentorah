@@ -585,7 +585,7 @@ Mekorot
     <day n="Haftarah Shabbos Chol Hamoed Pesach">
         <haftarah book="Ezekiel" > 
           <custom "Ashkenaz Sefarad" fromChapter="37" fromVerse="1" toVerse="14"/>
-          <custom "Teiman" fromChapter="36" fromVerse="37" toChapter="37" toVerse="17"/>
+          <custom "Teiman" fromChapter="36" fromVerse="37" toChapter="37" toVerse="14"/>
         </haftarah>    
     </day>  
     
