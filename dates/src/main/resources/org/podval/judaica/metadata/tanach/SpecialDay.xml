@@ -21,15 +21,14 @@ ing block; this is not "Special Day", this is "Special Reading"  -->
 В диаспоре обязательное чтение в холь-амоед - двух дней, сегодняшнего и завтрашнего
 Из них: в рош-ходеш и холь амоед Суккот жертвоприношения читают в основном чтении. При обязательное чтение должно быть завершением.
 В остальные дни  - мафтир.
-Рош ходеш - см. выше
+Рош ходеш - см. выше 
 
 Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
 44 verse=18 7. Бемидбар, 28:9-15 Может ли быть другая глава?
 Аналогично - в шабат Шкалим и шабат а-Ходеш, выпавшие в рош ходеш:
 на 6 алию читают 6 и 7.
 7 алия - чтение см. выше
-TODO: Minhagim haftara mincha taanis
-Kriat Tora minhagim hol amoed Sukkot & Chanuka
+TODO: Minhagim kria Chanuka
 Mekorot
     -->
     <day n="Shabbos Erev Rosh Chodesh">
@@ -268,6 +267,11 @@ fust haftara (exsept Zom Gedalia - Shuva Isroel
              2         5
              3         6
              4         in the Holy Land - 6; in Diaspora - 5 and 6
+
+  Custom rav Nae Eretz Isroel:
+n day of Sukkos
+ all alios (1 - 4) korbonos of. n day
+    
 
            Maftir Shabbos Chol Hamoed Succos n :
              in the Holy Land - n, in Diaspora - n and n+1
