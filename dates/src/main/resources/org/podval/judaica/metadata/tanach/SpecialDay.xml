@@ -91,7 +91,11 @@ Mekorot
     </day>
 
     <!-- RULE:
-               in the morning and the afternoon, 3rd aliyah is Maftir; read Haftarah. -->
+               in the morning and the afternoon, 3rd aliyah is Maftir; read Haftarah.
+ Rambam custom - haftara only shacharis
+Sfaradim Eretz Isroel
+fust haftara (exsept Zom Gedalia - Shuva Isroel
+-->
     <day n="Tisha Bav">
         <torah book="Deuteronomy" fromChapter="4">
             <aliyah n="1" fromVerse="25"/>
@@ -112,8 +116,7 @@ Mekorot
         <torah book="Exodus">
             <aliyah n="1" fromChapter="33" fromVerse="12"/>
             <aliyah n="2" fromChapter="33" fromVerse="17"/>
-            <aliyah n="3" fromChapter="33" fromVerse="20"/>
-            <aliyah n="4" fromChapter="34" fromVerse="1"/>
+3            <aliyah n="4" fromChapter="34" fromVerse="1"/>
             <aliyah n="5" fromChapter="34" fromVerse="4"/>
             <aliyah n="6" fromChapter="34" fromVerse="11"/>
             <aliyah n="7" fromChapter="34" fromVerse="18" toVerse="26"/>
