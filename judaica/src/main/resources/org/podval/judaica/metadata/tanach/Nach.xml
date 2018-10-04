@@ -56,7 +56,7 @@
         <chapter n="21" length="25"/>
     </book>
     <book>
-        <name lang="en" n="Samuel I"/>
+        <name lang="en" n="I Samuel"/>
         <name lang="he" n="שמואל א"/>
 
         <chapter n="1" length="28"/>
@@ -92,7 +92,7 @@
         <chapter n="31" length="13"/>
     </book>
     <book>
-        <name lang="en" n="Samuel II"/>
+        <name lang="en" n="II Samuel"/>
         <name lang="he" n="שמואל ב"/>
 
         <chapter n="1" length="27"/>
@@ -121,7 +121,7 @@
         <chapter n="24" length="25"/>
     </book>
     <book>
-        <name lang="en" n="Kings I"/>
+        <name lang="en" n="I Kings"/>
         <name lang="he" n="מלכים א"/>
 
         <chapter n="1" length="53"/>
@@ -148,7 +148,7 @@
         <chapter n="22" length="54"/>
     </book>
     <book>
-        <name lang="en" n="Kings II"/>
+        <name lang="en" n="II Kings"/>
         <name lang="he" n="מלכים ב"/>
 
         <chapter n="1" length="18"/>
@@ -515,11 +515,11 @@
         <name lang="he" n="נחמיה"/>
     </book>
     <book>
-        <name lang="en" n="Chronicles I"/>
+        <name lang="en" n="I Chronicles"/>
         <name lang="he" n="דברי הימים א"/>
     </book>
     <book>
-        <name lang="en" n="Chronicles II"/>
+        <name lang="en" n="II Chronicles"/>
         <name lang="he" n="דברי הימים ב"/>
     </book>
 </metadata>

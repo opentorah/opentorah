@@ -20,10 +20,10 @@ object Nach extends MainMetadata with MetadataLoader {
 
   case object Joshua extends EarlyProphetsBook
   case object Judges extends EarlyProphetsBook
-  case object SamuelI extends EarlyProphetsBook { override def name: String = "Samuel I" }
-  case object SamuelII extends EarlyProphetsBook { override def name: String = "Samuel II" }
-  case object KingsI extends EarlyProphetsBook { override def name: String = "Kings I" }
-  case object KingsII extends EarlyProphetsBook { override def name: String = "Kings II" }
+  case object SamuelI extends EarlyProphetsBook { override def name: String = "I Samuel" }
+  case object SamuelII extends EarlyProphetsBook { override def name: String = "II Samuel" }
+  case object KingsI extends EarlyProphetsBook { override def name: String = "I Kings" }
+  case object KingsII extends EarlyProphetsBook { override def name: String = "II Kings" }
 
   val earlyProphets: Seq[ProphetsBook] = Seq(Joshua, Judges, SamuelI, SamuelII, KingsI, KingsII)
 
@@ -71,8 +71,8 @@ object Nach extends MainMetadata with MetadataLoader {
   case object Daniel extends WritingsBook
   case object Ezra extends WritingsBook
   case object Nehemiah extends WritingsBook
-  case object ChroniclesI extends WritingsBook { override def name: String = "Chronicles I" }
-  case object ChroniclesII extends WritingsBook { override def name: String = "Chronicles II" }
+  case object ChroniclesI extends WritingsBook { override def name: String = "I Chronicles" }
+  case object ChroniclesII extends WritingsBook { override def name: String = "II Chronicles" }
 
   val writings: Seq[WritingsBook] = Seq(Psalms, Proverbs, Job, SongOfSongs, Ruth, Lamentations, Ecclesiastes,
     Esther, Daniel, Ezra, Nehemiah, ChroniclesI, ChroniclesII)
