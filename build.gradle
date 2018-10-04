@@ -147,9 +147,15 @@ def bintrayConfig = {
   }
 }
 
-project(':dates') {
+project(':judaica') {
   dependencies {
     compile lib.scalaXml
+  }
+}
+
+project(':dates') {
+  dependencies {
+    compile project(':judaica')
   }
 
   def artifactInfo = [
