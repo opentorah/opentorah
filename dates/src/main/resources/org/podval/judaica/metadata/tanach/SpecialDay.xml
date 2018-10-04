@@ -21,16 +21,14 @@ ing block; this is not "Special Day", this is "Special Reading"  -->
 В диаспоре обязательное чтение в холь-амоед - двух дней, сегодняшнего и завтрашнего
 Из них: в рош-ходеш и холь амоед Суккот жертвоприношения читают в основном чтении. При обязательное чтение должно быть завершением.
 В остальные дни  - мафтир.
-Рош ходеш - см. выше
+Рош ходеш - см. выше 
 
 Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
 44 verse=18 7. Бемидбар, 28:9-15 Может ли быть другая глава?
 Аналогично - в шабат Шкалим и шабат а-Ходеш, выпавшие в рош ходеш:
 на 6 алию читают 6 и 7.
 7 алия - чтение см. выше
-TODO: check minhogim shabas Hol amoed Pesax
-Minhagim haftara mincha taanis
-Kriat Tora minhagim hol amoed Sukkot & Chanuka
+TODO: Minhagim kria Chanuka
 Mekorot
     -->
     <day n="Shabbos Erev Rosh Chodesh">
@@ -92,7 +90,11 @@ Mekorot
     </day>
 
     <!-- RULE:
-               in the morning and the afternoon, 3rd aliyah is Maftir; read Haftarah. -->
+               in the morning and the afternoon, 3rd aliyah is Maftir; read Haftarah.
+ Rambam custom - haftara only shacharis
+Sfaradim Eretz Isroel
+fust haftara (exsept Zom Gedalia - Shuva Isroel
+-->
     <day n="Tisha Bav">
         <torah book="Deuteronomy" fromChapter="4">
             <aliyah n="1" fromVerse="25"/>
@@ -102,7 +104,7 @@ Mekorot
         <haftarah book="Jeremiah" >
           <custom n="Ashkenaz Sefarad"  fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
           <custom n="Teiman">
-            <part n="1" fromChapter="6" fromVerse="15"  toVerse="16"/>
+            <part n="1" fromChapter="6" fromVerse="16"  toVerse="17"/>
             <part n="2" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/> 
           </custom> 
         </haftarah>    
@@ -113,8 +115,7 @@ Mekorot
         <torah book="Exodus">
             <aliyah n="1" fromChapter="33" fromVerse="12"/>
             <aliyah n="2" fromChapter="33" fromVerse="17"/>
-            <aliyah n="3" fromChapter="33" fromVerse="20"/>
-            <aliyah n="4" fromChapter="34" fromVerse="1"/>
+3            <aliyah n="4" fromChapter="34" fromVerse="1"/>
             <aliyah n="5" fromChapter="34" fromVerse="4"/>
             <aliyah n="6" fromChapter="34" fromVerse="11"/>
             <aliyah n="7" fromChapter="34" fromVerse="18" toVerse="26"/>
@@ -266,6 +267,11 @@ Mekorot
              2         5
              3         6
              4         in the Holy Land - 6; in Diaspora - 5 and 6
+
+  Custom rav Nae Eretz Isroel:
+n day of Sukkos
+ all alios (1 - 4) korbonos of. n day
+    
 
            Maftir Shabbos Chol Hamoed Succos n :
              in the Holy Land - n, in Diaspora - n and n+1
@@ -586,7 +592,7 @@ Mekorot
     <day n="Haftarah Shabbos Chol Hamoed Pesach">
         <haftarah book="Ezekiel" > 
           <custom "Ashkenaz Sefarad" fromChapter="37" fromVerse="1" toVerse="14"/>
-          <custom "Teiman" fromChapter="36" fromVerse="37" toChapter="37" toVerse="17"/>
+          <custom "Teiman" fromChapter="36" fromVerse="37" toChapter="37" toVerse="14"/>
         </haftarah>    
     </day>  
     
