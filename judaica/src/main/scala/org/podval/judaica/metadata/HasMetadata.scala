@@ -12,9 +12,9 @@ trait HasMetadata extends Named {
 
   protected def toMetadata: Key => Metadata
 
-  protected final def loadResource(resourceName: String): Option[Elem] = {
+  protected final def loadResource(resourceName: String): Elem = {
     val url = Option(this.getClass.getResource(resourceName + ".xml"))
-    url.flatMap { url =>
+    val result = url.flatMap { url =>
       try {
         val result = xml.XML.load(url.openStream())
         Some(Utility.trimProper(result).asInstanceOf[Elem])
@@ -22,6 +22,9 @@ trait HasMetadata extends Named {
         case _: FileNotFoundException => None
       }
     }
+
+    require(result.isDefined, s"No resource: $resourceName")
+    result.get
   }
 
   protected final def bind(

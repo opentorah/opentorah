@@ -10,12 +10,10 @@ trait ResourceLoader extends HasMetadata {
 
   protected final def loadMetadataElements: Seq[Elem] = {
     val element = loadResource(resourceName)
-    require(element.isDefined, s"No resource: $resourceName")
-    val (attributes, elements) = XML.open(element.get, rootElementName)
-    val typeOption = attributes.get("type")
+    val (attributes, elements) = XML.open(element, rootElementName)
+    val type_ = attributes.doGet("type")
     attributes.close()
-    require(typeOption.nonEmpty, "Attribute 'type' is missing.")
-    require(typeOption.contains(resourceName), s"Wrong metadata type: ${typeOption.get} instead of $resourceName")
+    require(type_ == resourceName, s"Wrong metadata type: $type_ instead of $resourceName")
     elements
   }
 

@@ -4,6 +4,7 @@ import org.podval.judaica.metadata.NamesLoader
 
 object Custom extends NamesLoader {
   // I don't think it worth it to move parent definitions into the XML file...
+  // child < parent does not induce total order...
   sealed class Custom(val parent: Option[Custom]) extends KeyBase {
     lazy val children: Set[Custom] = values.filter(_.parent.contains(this)).toSet
   }

@@ -4,23 +4,18 @@ import scala.xml.Elem
 
 trait SubresourceLoader extends HasMetadata {
   protected final def loadSubresource(element: Elem): PreparsedMetadata = {
-    val (attributes: Attributes, namesOption: Option[Names], elements: Seq[Elem]) = Names.parse(element, elementName)
-    val names: Names = namesOption.get
-
-    if (elements.nonEmpty) PreparsedMetadata(attributes, names, elements) else {
-      val subresources: Seq[Elem] = names.names.flatMap { name => loadResource(name.name) }
-      require(subresources.size <= 1, s"More than one subresource: $subresources")
-      if (subresources.isEmpty) PreparsedMetadata(attributes, names, elements) else {
-        attributes.close()
-        val (newAttributes: Attributes, newNames: Option[Names], newElements: Seq[Elem]) =
-          Names.parse(subresources.head, elementName)
-        PreparsedMetadata(
-          newAttributes,
-          newNames.fold(names)(Names.merge(names, _)),
-          newElements
-        )
-      }
+    val (attributes, elements) = XML.open(element, elementName)
+    attributes.get("resource").fold(pack(attributes, elements)) { subresourceName: String =>
+      attributes.close()
+      val subresource: Elem = loadResource(subresourceName)
+      val (newAttributes, newElements) = XML.open(subresource, elementName)
+      pack(newAttributes, newElements)
     }
+  }
+
+  private def pack(attributes: Attributes, elements: Seq[Elem]): PreparsedMetadata = {
+    val (names: Names, tail: Seq[Elem]) = Names.parse(attributes, elements)
+    PreparsedMetadata(attributes, names, tail)
   }
 
   protected def elementName: String

@@ -39,20 +39,22 @@ object Names {
     }
   }
 
+  // TODO inline
   def merge(one: Names, other: Names): Names =
     if (other.isEmpty) one else throw new IllegalArgumentException(s"Merging Names not implemented: $one with $other")
 
-  def parse(element: Elem, elementName: String): (Attributes, Option[Names], Seq[Elem]) = {
-    val (attributes, elements) = XML.open(element, elementName)
-
-    val defaultName: Option[Name] = attributes.get("n").map { defaultName => Name(defaultName, LanguageSpec.empty) }
+  def parse(attributes: Attributes, elements: Seq[Elem]): (Names, Seq[Elem]) = {
+    val defaultName: Option[Name] = parseDefaultName(attributes)
     val (nameElements, tail) = XML.take(elements, "name")
-    val names: Option[Names] =
-      if (nameElements.isEmpty) if (defaultName.isEmpty) None else Some(new Names(Seq(defaultName.get)))
-      else Some(parse(nameElements, defaultName))
+    val names: Names =
+      if (nameElements.isEmpty) new Names(Seq(defaultName.get))
+      else Names.parse(nameElements, defaultName)
 
-    (attributes, names, tail)
+    (names, tail)
   }
+
+  private def parseDefaultName(attributes: Attributes): Option[Name] =
+    attributes.get("n").map { defaultName => Name(defaultName, LanguageSpec.empty) }
 
   def parse(element: Elem, defaultName: Option[Name]): Names = {
     val (attributes, nameElements) = XML.open(element, "names")

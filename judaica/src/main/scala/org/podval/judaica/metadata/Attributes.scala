@@ -10,7 +10,11 @@ final class Attributes private(attributes: Map[String, String]) {
     attributes.get(name)
   }
 
-  def doGet(name: String): String = get(name).get
+  def doGet(name: String): String =  {
+    val result = get(name)
+    require(result.isDefined, s"Attribute $name is missing")
+    result.get
+  }
 
   def close(): Unit = {
     val notAllowed: Set[String] = attributes.keySet -- used
