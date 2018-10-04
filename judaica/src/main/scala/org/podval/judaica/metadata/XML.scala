@@ -40,7 +40,6 @@ object XML {
   private def getNonElements(element: Elem): Seq[Node] =
     element.child.filterNot(_.isInstanceOf[Elem])
 
-  // TODO make a convenience flavour that checks that the tail is empty
   def take(elements: Seq[Elem], name1: String): (Seq[Elem], Seq[Elem]) = {
     elements.span(_.label == name1)
   }

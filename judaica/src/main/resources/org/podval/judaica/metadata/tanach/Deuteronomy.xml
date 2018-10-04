@@ -36,12 +36,10 @@
   <chapter n="34" length="12"/>
 
   <week fromChapter="1" fromVerse="1">
-    <names>
-      <name lang="he">דברים</name>
-      <name lang="en">Deuteronomy</name>
-      <name lang="en" transliterated="true">Devarim</name>
-      <name lang="ru" transliterated="true">Дварим</name>
-    </names>
+    <name lang="he">דברים</name>
+    <name lang="en">Deuteronomy</name>
+    <name lang="en" transliterated="true">Devarim</name>
+    <name lang="ru" transliterated="true">Дварим</name>
 
     <aliyah n="2" fromChapter="1" fromVerse="4"/>
     <aliyah n="3" fromChapter="1" fromVerse="8"/>
@@ -58,11 +56,9 @@
   </week>
 
   <week fromChapter="3" fromVerse="23">
-    <names>
-      <name lang="he">ואתחנן</name>
-      <name lang="en" transliterated="true">Va'eschanan</name>
-      <name lang="ru" transliterated="true">Ваэтханан</name>
-    </names>
+    <name lang="he">ואתחנן</name>
+    <name lang="en" transliterated="true">Va'eschanan</name>
+    <name lang="ru" transliterated="true">Ваэтханан</name>
 
     <aliyah n="2" fromChapter="3" fromVerse="26"/>
     <aliyah n="3" fromChapter="4" fromVerse="5" toVerse="8"/>
@@ -78,11 +74,9 @@
   </week>
 
   <week fromChapter="7" fromVerse="12">
-    <names>
-      <name lang="he">עקב</name>
-      <name lang="en" transliterated="true">Eikev</name>
-      <name lang="ru" transliterated="true">Эйкев</name>
-    </names>
+    <name lang="he">עקב</name>
+    <name lang="en" transliterated="true">Eikev</name>
+    <name lang="ru" transliterated="true">Эйкев</name>
 
     <aliyah n="2" fromChapter="7" fromVerse="22"/>
     <aliyah n="3" fromChapter="8" fromVerse="4"/>
@@ -98,11 +92,9 @@
   </week>
 
   <week fromChapter="11" fromVerse="26">
-    <names>
-      <name lang="he">ראה</name>
-      <name lang="en" transliterated="true">Re'eh</name>
-      <name lang="ru" transliterated="true">Рээ</name>
-    </names>
+    <name lang="he">ראה</name>
+    <name lang="en" transliterated="true">Re'eh</name>
+    <name lang="ru" transliterated="true">Рээ</name>
 
     <aliyah n="2" fromChapter="11" fromVerse="32"/>
     <aliyah n="3" fromChapter="12" fromVerse="6"/>
@@ -118,11 +110,9 @@
   </week>
 
   <week fromChapter="16" fromVerse="18">
-    <names>
-      <name lang="he">שופטים</name>
-      <name lang="en" transliterated="true">Shoftim</name>
-      <name lang="ru" transliterated="true">Шофтим</name>
-    </names>
+    <name lang="he">שופטים</name>
+    <name lang="en" transliterated="true">Shoftim</name>
+    <name lang="ru" transliterated="true">Шофтим</name>
 
     <aliyah n="2" fromChapter="16" fromVerse="21"/>
     <aliyah n="3" fromChapter="17" fromVerse="11"/>
@@ -138,11 +128,9 @@
   </week>
 
   <week fromChapter="21" fromVerse="10">
-    <names>
-      <name lang="he">כי תצא</name>
-      <name lang="en" transliterated="true">Ki Seitzei</name>
-      <name lang="ru" transliterated="true">Ки-Теце</name>
-    </names>
+    <name lang="he">כי תצא</name>
+    <name lang="en" transliterated="true">Ki Seitzei</name>
+    <name lang="ru" transliterated="true">Ки-Теце</name>
 
     <aliyah n="2" fromChapter="21" fromVerse="15"/>
     <aliyah n="3" fromChapter="21" fromVerse="18"/>
@@ -158,11 +146,9 @@
   </week>
 
   <week fromChapter="26" fromVerse="1">
-    <names>
-      <name lang="he">כי תבוא</name>
-      <name lang="en" transliterated="true">Ki Savo</name>
-      <name lang="ru" transliterated="true">Ки-Таво</name>
-    </names>
+    <name lang="he">כי תבוא</name>
+    <name lang="en" transliterated="true">Ki Savo</name>
+    <name lang="ru" transliterated="true">Ки-Таво</name>
 
     <aliyah n="2" fromChapter="26" fromVerse="4"/>
     <aliyah n="3" fromChapter="26" fromVerse="12" toVerse="15"/>
@@ -178,11 +164,9 @@
   </week>
 
   <week fromChapter="29" fromVerse="9">
-    <names>
-      <name lang="he">נצבים</name>
-      <name lang="en" transliterated="true">Nitzavim</name>
-      <name lang="ru" transliterated="true">Ницавим</name>
-    </names>
+    <name lang="he">נצבים</name>
+    <name lang="en" transliterated="true">Nitzavim</name>
+    <name lang="ru" transliterated="true">Ницавим</name>
 
     <aliyah n="2" fromChapter="29" fromVerse="12"/>
     <aliyah n="3" fromChapter="29" fromVerse="15" toVerse="28"/>
@@ -201,11 +185,9 @@
   </week>
 
   <week fromChapter="31" fromVerse="1">
-    <names>
-      <name lang="he">וילך</name>
-      <name lang="en" transliterated="true">Vayeilech</name>
-      <name lang="ru" transliterated="true">Вайэлех</name>
-    </names>
+    <name lang="he">וילך</name>
+    <name lang="en" transliterated="true">Vayeilech</name>
+    <name lang="ru" transliterated="true">Вайэлех</name>
 
     <aliyah n="2" fromChapter="31" fromVerse="4"/>
     <aliyah n="3" fromChapter="31" fromVerse="7" toVerse="13"/>
@@ -225,12 +207,10 @@
 
 
   <week fromChapter="32" fromVerse="1">
-    <names>
-      <name lang="he">האזינו</name>
-      <name lang="en" transliterated="true">Haazinu</name>
-      <name lang="en" transliterated="true">Ha'azinu</name>
-      <name lang="ru" transliterated="true">Ѓаазину</name>
-    </names>
+    <name lang="he">האזינו</name>
+    <name lang="en" transliterated="true">Haazinu</name>
+    <name lang="en" transliterated="true">Ha'azinu</name>
+    <name lang="ru" transliterated="true">Ѓаазину</name>
 
     <aliyah n="2" fromChapter="32" fromVerse="4"/>
     <aliyah n="3" fromChapter="32" fromVerse="7" toVerse="12"/>
@@ -247,12 +227,10 @@
 
   <!-- Read on Simchas Torah; Maftir is NOT what it says here :) -->
   <week fromChapter="33" fromVerse="1">
-    <names>
-      <name lang="he">וזאת הברכה</name>
-      <name lang="en" transliterated="true">Vezos Haberachah</name>
-      <name lang="en" transliterated="true">Vezos Habrachah</name>
-      <name lang="ru" transliterated="true">Вэзот ѓа-браха</name>
-    </names>
+    <name lang="he">וזאת הברכה</name>
+    <name lang="en" transliterated="true">Vezos Haberachah</name>
+    <name lang="en" transliterated="true">Vezos Habrachah</name>
+    <name lang="ru" transliterated="true">Вэзот ѓа-браха</name>
 
     <aliyah n="2" fromChapter="33" fromVerse="8"/>
     <aliyah n="3" fromChapter="33" fromVerse="13" toVerse="17"/>

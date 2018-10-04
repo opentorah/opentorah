@@ -46,13 +46,10 @@ object Names {
     val (attributes, elements) = XML.open(element, elementName)
 
     val defaultName: Option[Name] = attributes.get("n").map { defaultName => Name(defaultName, LanguageSpec.empty) }
-    val (namesElements, tail) = XML.take(elements, "names")
-    // TODO make a convenience method?
-    require(namesElements.size <= 1, "Multiple 'names' elements.")
-    val namesElement: Option[Elem] = namesElements.headOption
+    val (nameElements, tail) = XML.take(elements, "name")
     val names: Option[Names] =
-      if (namesElement.isEmpty) if (defaultName.isEmpty) None else Some(new Names(Seq(defaultName.get)))
-      else Some(parse(namesElement.get, defaultName))
+      if (nameElements.isEmpty) if (defaultName.isEmpty) None else Some(new Names(Seq(defaultName.get)))
+      else Some(parse(nameElements, defaultName))
 
     (attributes, names, tail)
   }
@@ -60,7 +57,10 @@ object Names {
   def parse(element: Elem, defaultName: Option[Name]): Names = {
     val (attributes, nameElements) = XML.open(element, "names")
     attributes.close()
+    parse(nameElements, defaultName)
+  }
 
+  private def parse(nameElements: Seq[Elem], defaultName: Option[Name]): Names = {
     val nonDefaultNames: Seq[Name] = nameElements.map(parseName)
     val names = defaultName.fold(nonDefaultNames)(_ +: nonDefaultNames)
     new Names(names)

@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata type="Nach">
     <book>
-        <names>
-            <name lang="en" n="Joshua"/>
-            <name lang="he" n="יהושע"/>
-        </names>
+        <name lang="en" n="Joshua"/>
+        <name lang="he" n="יהושע"/>
 
         <chapter n="1" length="18"/>
         <chapter n="2" length="24"/>
@@ -32,10 +30,8 @@
         <chapter n="24" length="33"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Judges"/>
-            <name lang="he" n="שופטים"/>
-        </names>
+        <name lang="en" n="Judges"/>
+        <name lang="he" n="שופטים"/>
 
         <chapter n="1" length="36"/>
         <chapter n="2" length="23"/>
@@ -60,10 +56,8 @@
         <chapter n="21" length="25"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Samuel I"/>
-            <name lang="he" n="שמואל א"/>
-        </names>
+        <name lang="en" n="Samuel I"/>
+        <name lang="he" n="שמואל א"/>
 
         <chapter n="1" length="28"/>
         <chapter n="2" length="36"/>
@@ -98,10 +92,8 @@
         <chapter n="31" length="13"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Samuel II"/>
-            <name lang="he" n="שמואל ב"/>
-        </names>
+        <name lang="en" n="Samuel II"/>
+        <name lang="he" n="שמואל ב"/>
 
         <chapter n="1" length="27"/>
         <chapter n="2" length="32"/>
@@ -129,10 +121,8 @@
         <chapter n="24" length="25"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Kings I"/>
-            <name lang="he" n="מלכים א"/>
-        </names>
+        <name lang="en" n="Kings I"/>
+        <name lang="he" n="מלכים א"/>
 
         <chapter n="1" length="53"/>
         <chapter n="2" length="46"/>
@@ -158,10 +148,8 @@
         <chapter n="22" length="54"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Kings II"/>
-            <name lang="he" n="מלכים ב"/>
-        </names>
+        <name lang="en" n="Kings II"/>
+        <name lang="he" n="מלכים ב"/>
 
         <chapter n="1" length="18"/>
         <chapter n="2" length="25"/>
@@ -190,11 +178,9 @@
         <chapter n="25" length="30"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Isaiah"/>
-            <name lang="he" n="ישעיה"/>
-            <name lang="he" n="ישעיהו"/>
-        </names>
+        <name lang="en" n="Isaiah"/>
+        <name lang="he" n="ישעיה"/>
+        <name lang="he" n="ישעיהו"/>
 
         <chapter n="1" length="31"/>
         <chapter n="2" length="22"/>
@@ -264,11 +250,9 @@
         <chapter n="66" length="24"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Jeremiah"/>
-            <name lang="he" n="ירמיה"/>
-            <name lang="he" n="ירמיהו"/>
-        </names>
+        <name lang="en" n="Jeremiah"/>
+        <name lang="he" n="ירמיה"/>
+        <name lang="he" n="ירמיהו"/>
 
         <chapter n="1" length="19"/>
         <chapter n="2" length="37"/>
@@ -324,10 +308,8 @@
         <chapter n="52" length="34"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Ezekiel"/>
-            <name lang="he" n="יחזקאל"/>
-        </names>
+        <name lang="en" n="Ezekiel"/>
+        <name lang="he" n="יחזקאל"/>
 
         <chapter n="1" length="28"/>
         <chapter n="2" length="10"/>
@@ -381,10 +363,8 @@
 
     <!-- תרי עשר -->
     <book>
-        <names>
-            <name lang="en" n="Hosea"/>
-            <name lang="he" n="הושע"/>
-        </names>
+        <name lang="en" n="Hosea"/>
+        <name lang="he" n="הושע"/>
 
         <chapter n="1" length="9"/>
         <chapter n="2" length="25"/>
@@ -402,10 +382,8 @@
         <chapter n="14" length="10"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Joel"/>
-            <name lang="he" n="יואל"/>
-        </names>
+        <name lang="en" n="Joel"/>
+        <name lang="he" n="יואל"/>
 
         <chapter n="1" length="20"/>
         <chapter n="2" length="27"/>
@@ -413,10 +391,8 @@
         <chapter n="4" length="21"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Amos"/>
-            <name lang="he" n="עמוס"/>
-        </names>
+        <name lang="en" n="Amos"/>
+        <name lang="he" n="עמוס"/>
 
         <chapter n="1" length="15"/>
         <chapter n="2" length="16"/>
@@ -429,24 +405,18 @@
         <chapter n="9" length="15"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Obadiah"/>
-            <name lang="he" n="עובדיה"/>
-        </names>
+        <name lang="en" n="Obadiah"/>
+        <name lang="he" n="עובדיה"/>
 
         <chapter n="1" length="21"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Jonah"/>
-            <name lang="he" n="יונה"/>
-        </names>
+        <name lang="en" n="Jonah"/>
+        <name lang="he" n="יונה"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Micah"/>
-            <name lang="he" n="מיכה"/>
-        </names>
+        <name lang="en" n="Micah"/>
+        <name lang="he" n="מיכה"/>
 
         <chapter n="1" length="16"/>
         <chapter n="2" length="13"/>
@@ -457,34 +427,24 @@
         <chapter n="7" length="20"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Nahum"/>
-            <name lang="he" n="נחום"/>
-        </names>
+        <name lang="en" n="Nahum"/>
+        <name lang="he" n="נחום"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Habakkuk"/>
-            <name lang="he" n="חבקוק"/>
-        </names>
+        <name lang="en" n="Habakkuk"/>
+        <name lang="he" n="חבקוק"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Zephaniah"/>
-            <name lang="he" n="צפניה"/>
-        </names>
+        <name lang="en" n="Zephaniah"/>
+        <name lang="he" n="צפניה"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Haggai"/>
-            <name lang="he" n="חגי"/>
-        </names>
+        <name lang="en" n="Haggai"/>
+        <name lang="he" n="חגי"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Zechariah"/>
-            <name lang="he" n="זכריה"/>
-        </names>
+        <name lang="en" n="Zechariah"/>
+        <name lang="he" n="זכריה"/>
 
         <chapter n="1" length="17"/>
         <chapter n="2" length="17"/>
@@ -502,10 +462,8 @@
         <chapter n="14" length="21"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Malachi"/>
-            <name lang="he" n="מלאכי"/>
-        </names>
+        <name lang="en" n="Malachi"/>
+        <name lang="he" n="מלאכי"/>
 
         <chapter n="1" length="14"/>
         <chapter n="2" length="17"/>
@@ -513,81 +471,55 @@
     </book>
 
     <book>
-        <names>
-            <name lang="en" n="Psalms"/>
-            <name lang="he" n="תהלים"/>
-        </names>
+        <name lang="en" n="Psalms"/>
+        <name lang="he" n="תהלים"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Proverbs"/>
-            <name lang="he" n="משלי"/>
-        </names>
+        <name lang="en" n="Proverbs"/>
+        <name lang="he" n="משלי"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Job"/>
-            <name lang="he" n="איוב"/>
-        </names>
+        <name lang="en" n="Job"/>
+        <name lang="he" n="איוב"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Song of Songs"/>
-            <name lang="he" n="שיר השירים"/>
-        </names>
+        <name lang="en" n="Song of Songs"/>
+        <name lang="he" n="שיר השירים"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Ruth"/>
-            <name lang="he" n="רות"/>
-        </names>
+        <name lang="en" n="Ruth"/>
+        <name lang="he" n="רות"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Lamentations"/>
-            <name lang="he" n="איכה"/>
-        </names>
+        <name lang="en" n="Lamentations"/>
+        <name lang="he" n="איכה"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Ecclesiastes"/>
-            <name lang="he" n="קהלת"/>
-        </names>
+        <name lang="en" n="Ecclesiastes"/>
+        <name lang="he" n="קהלת"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Esther"/>
-            <name lang="he" n="אסתר"/>
-        </names>
+        <name lang="en" n="Esther"/>
+        <name lang="he" n="אסתר"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Daniel"/>
-            <name lang="he" n="דניאל"/>
-        </names>
+        <name lang="en" n="Daniel"/>
+        <name lang="he" n="דניאל"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Ezra"/>
-            <name lang="he" n="עזרא"/>
-        </names>
+        <name lang="en" n="Ezra"/>
+        <name lang="he" n="עזרא"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Nehemiah"/>
-            <name lang="he" n="נחמיה"/>
-        </names>
+        <name lang="en" n="Nehemiah"/>
+        <name lang="he" n="נחמיה"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Chronicles I"/>
-            <name lang="he" n="דברי הימים א"/>
-        </names>
+        <name lang="en" n="Chronicles I"/>
+        <name lang="he" n="דברי הימים א"/>
     </book>
     <book>
-        <names>
-            <name lang="en" n="Chronicles II"/>
-            <name lang="he" n="דברי הימים ב"/>
-        </names>
+        <name lang="en" n="Chronicles II"/>
+        <name lang="he" n="דברי הימים ב"/>
     </book>
 </metadata>

@@ -42,12 +42,10 @@
   <chapter n="40" length="38"/>
 
   <week fromChapter="1" fromVerse="1">
-    <names>
-      <name lang="he">שמות</name>
-      <name lang="en">Exodus</name>
-      <name lang="en" transliterated="yes">Shemos</name>
-      <name lang="ru" transliterated="yes">Шмот</name>
-    </names>
+    <name lang="he">שמות</name>
+    <name lang="en">Exodus</name>
+    <name lang="en" transliterated="yes">Shemos</name>
+    <name lang="ru" transliterated="yes">Шмот</name>
 
     <aliyah n="2" fromChapter="1" fromVerse="8"/>
     <aliyah n="3" fromChapter="1" fromVerse="13"/>
@@ -63,11 +61,9 @@
   </week>
 
   <week fromChapter="6" fromVerse="2">
-    <names>
-      <name lang="he">וארא</name>
-      <name lang="en" transliterated="yes">Va'eira</name>
-      <name lang="ru" transliterated="yes">Ваэра</name>
-    </names>
+    <name lang="he">וארא</name>
+    <name lang="en" transliterated="yes">Va'eira</name>
+    <name lang="ru" transliterated="yes">Ваэра</name>
 
     <aliyah n="2" fromChapter="6" fromVerse="6"/>
     <aliyah n="3" fromChapter="6" fromVerse="10"/>
@@ -83,11 +79,9 @@
   </week>
 
   <week fromChapter="10" fromVerse="1">
-    <names>
-      <name lang="he">בא</name>
-      <name lang="en" transliterated="yes">Bo</name>
-      <name lang="ru" transliterated="yes">Бо</name>
-    </names>
+    <name lang="he">בא</name>
+    <name lang="en" transliterated="yes">Bo</name>
+    <name lang="ru" transliterated="yes">Бо</name>
 
     <aliyah n="2" fromChapter="10" fromVerse="4"/>
     <aliyah n="3" fromChapter="10" fromVerse="7"/>
@@ -103,11 +97,9 @@
   </week>
 
   <week fromChapter="13" fromVerse="17">
-    <names>
-      <name lang="he">בשלח</name>
-      <name lang="en" transliterated="yes">Beshalach</name>
-      <name lang="ru" transliterated="yes">Бэшалах</name>
-    </names>
+    <name lang="he">בשלח</name>
+    <name lang="en" transliterated="yes">Beshalach</name>
+    <name lang="ru" transliterated="yes">Бэшалах</name>
 
     <aliyah n="2" fromChapter="14" fromVerse="1"/>
     <aliyah n="3" fromChapter="14" fromVerse="5"/>
@@ -123,11 +115,9 @@
   </week>
 
   <week fromChapter="18" fromVerse="1">
-    <names>
-      <name lang="he">יתרו</name>
-      <name lang="en" transliterated="yes">Yisro</name>
-      <name lang="ru" transliterated="yes">Итро</name>
-    </names>
+    <name lang="he">יתרו</name>
+    <name lang="en" transliterated="yes">Yisro</name>
+    <name lang="ru" transliterated="yes">Итро</name>
 
     <aliyah n="2" fromChapter="18" fromVerse="5"/>
     <aliyah n="3" fromChapter="18" fromVerse="9"/>
@@ -143,11 +133,9 @@
   </week>
 
   <week fromChapter="21" fromVerse="1">
-    <names>
-      <name lang="he">משפטימ</name>
-      <name lang="en" transliterated="yes">Mishpatim</name>
-      <name lang="ru" transliterated="yes">Мишпатим</name>
-    </names>
+    <name lang="he">משפטימ</name>
+    <name lang="en" transliterated="yes">Mishpatim</name>
+    <name lang="ru" transliterated="yes">Мишпатим</name>
 
     <aliyah n="2" fromChapter="21" fromVerse="7"/>
     <aliyah n="3" fromChapter="21" fromVerse="12"/>
@@ -163,11 +151,9 @@
   </week>
 
   <week fromChapter="25" fromVerse="1">
-    <names>
-      <name lang="he">תרומה</name>
-      <name lang="en" transliterated="yes">Terumah</name>
-      <name lang="ru" transliterated="yes">Трума</name>
-    </names>
+    <name lang="he">תרומה</name>
+    <name lang="en" transliterated="yes">Terumah</name>
+    <name lang="ru" transliterated="yes">Трума</name>
 
     <aliyah n="2" fromChapter="25" fromVerse="6"/>
     <aliyah n="3" fromChapter="25" fromVerse="10"/>
@@ -183,11 +169,9 @@
   </week>
 
   <week fromChapter="27" fromVerse="20">
-    <names>
-      <name lang="he">תצוה</name>
-      <name lang="en" transliterated="yes">Tetzaveh</name>
-      <name lang="ru" transliterated="yes">Тэцавэ</name>
-    </names>
+    <name lang="he">תצוה</name>
+    <name lang="en" transliterated="yes">Tetzaveh</name>
+    <name lang="ru" transliterated="yes">Тэцавэ</name>
 
     <aliyah n="2" fromChapter="28" fromVerse="6"/>
     <aliyah n="3" fromChapter="28" fromVerse="10"/>
@@ -203,11 +187,9 @@
   </week>
 
   <week fromChapter="30" fromVerse="11">
-    <names>
-      <name lang="he">כי תשא</name>
-      <name lang="en" transliterated="yes">Ki Sisa</name>
-      <name lang="ru" transliterated="yes">Ки-Тиса</name>
-    </names>
+    <name lang="he">כי תשא</name>
+    <name lang="en" transliterated="yes">Ki Sisa</name>
+    <name lang="ru" transliterated="yes">Ки-Тиса</name>
 
     <aliyah n="2" fromChapter="30" fromVerse="14"/>
     <aliyah n="3" fromChapter="30" fromVerse="17" toVerse="21"/>
@@ -223,11 +205,9 @@
   </week>
 
   <week fromChapter="35" fromVerse="1">
-    <names>
-      <name lang="he">ויקהל</name>
-      <name lang="en" transliterated="yes">Vayakhel</name>
-      <name lang="ru" transliterated="yes">Вайакѓэл</name>
-    </names>
+    <name lang="he">ויקהל</name>
+    <name lang="en" transliterated="yes">Vayakhel</name>
+    <name lang="ru" transliterated="yes">Вайакѓэл</name>
 
     <aliyah n="2" fromChapter="35" fromVerse="4"/>
     <aliyah n="3" fromChapter="35" fromVerse="11"/>
@@ -246,11 +226,9 @@
   </week>
 
   <week fromChapter="38" fromVerse="21">
-    <names>
-      <name lang="he">פקודי</name>
-      <name lang="en" transliterated="yes">Pekudei</name>
-      <name lang="ru" transliterated="yes">Пэкудэй</name>
-    </names>
+    <name lang="he">פקודי</name>
+    <name lang="en" transliterated="yes">Pekudei</name>
+    <name lang="ru" transliterated="yes">Пэкудэй</name>
 
     <aliyah n="2" fromChapter="38" fromVerse="24"/>
     <aliyah n="3" fromChapter="38" fromVerse="28"/>
