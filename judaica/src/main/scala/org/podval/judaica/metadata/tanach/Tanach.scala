@@ -15,14 +15,19 @@ object Tanach extends Named {
     final def chapters: Chapters = toChapters(this)
   }
 
-  private lazy val toNames: Map[Book, Names] = getToMetadata.mapValues(_.names)
+  private lazy val toNames: Map[Book, Names] =
+    getToMetadata.mapValues(_.names)
 
-  private lazy val toChapters: Map[Book, Chapters] = getToMetadata.mapValues(metadata => Chapters(metadata.chapterElements))
+  private lazy val toChapters: Map[Book, Chapters] =
+    getToMetadata.mapValues(metadata => Chapters(metadata.chapterElements))
 
   sealed trait ChumashBook extends Book {
     final def parshiot: Seq[Parsha.Parsha] = Parsha.values.filter(_.book == this)
 
-    final override def names: Names = parshiot.head.names
+    private lazy val weeks: Map[Parsha.Parsha, Parsha.Structure] =
+      Parsha.parse(this, getToMetadata(this).weekElements)
+
+    final override def names: Names =  weeks(parshiot.head).names
   }
 
   case object Genesis extends ChumashBook
@@ -100,7 +105,7 @@ object Tanach extends Named {
 
   override val values: Seq[Book] = chumash ++ nach
 
-  private final case class TanachMetadata(names: Names, chapterElements: Seq[Elem], elements: Seq[Elem])
+  private final case class TanachMetadata(names: Names, chapterElements: Seq[Elem], weekElements: Seq[Elem])
 
   // We do not need preparsed metadata once it is parsed, so the reference is week:
   private var toMetadata: WeakReference[Map[Book, TanachMetadata]] = new WeakReference(loadMetadata)
@@ -119,20 +124,12 @@ object Tanach extends Named {
     resourceName = "Tanach",
     rootElementName = "metadata",
     elementName = "book"
-  ).mapValues { metadata =>
+  ).map { case (book, metadata) =>
     metadata.attributes.close()
-    val (chapterElements: Seq[Elem], tail: Seq[Elem]) = XML.take(metadata.elements, "chapter")
-    TanachMetadata(metadata.names, chapterElements, tail)
+    val (chapterElements: Seq[Elem], weekElements: Seq[Elem]) = XML.span(metadata.elements, "chapter", "week")
+    if (!book.isInstanceOf[ChumashBook]) XML.checkNoMoreElements(weekElements)
+    book -> TanachMetadata(metadata.names, chapterElements, weekElements)
   }
-
-//    val (chapterElements, weekElements) = XML.span(metadata.elements, "chapter", "week")
-//
-//    val weeks: Map[Parsha, Parsha.Structure] = Parsha.parse(
-//      elements = weekElements,
-//      book = book,
-//      chapters = chapters
-//    )
-
 
   def main(args: Array[String]): Unit = {
     println(Joshua.names)

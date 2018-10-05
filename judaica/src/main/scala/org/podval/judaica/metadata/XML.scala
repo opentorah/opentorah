@@ -65,7 +65,7 @@ object XML {
     (elements1, elements2, elements3)
   }
 
-  private def checkNoMoreElements(elements: Seq[Elem]): Unit =
+  def checkNoMoreElements(elements: Seq[Elem]): Unit =
     require(elements.isEmpty, s"Spurious elements: ${elements.head.label}")
 
   def print(xml: Node, outStream: OutputStream): Unit = print(xml, new OutputStreamWriter(outStream))

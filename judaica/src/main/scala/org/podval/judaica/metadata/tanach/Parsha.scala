@@ -142,6 +142,20 @@ object Parsha extends MainMetadata with SubresourceLoader {
     )
   }
 
+  def parse(book: Tanach.ChumashBook, elements: Seq[Elem]): Map[Parsha, Structure] = {
+    val chapters = book.chapters
+    val preparsed: Seq[Preparsed] = elements.map(element => loadSubresource(element)).map(preparse)
+    val spans: Seq[Span] = SpanParser.setImpliedTo(preparsed.map(_.span), chapters.full, chapters)
+    require(spans.length == preparsed.length)
+    val parsed: Seq[Parsed] = preparsed.zip(spans).map { case (week, span) => week.parse(span, chapters) }
+
+    bind(
+      keys = book.parshiot,
+      metadatas = combine(parsed),
+      parse = (parsha: Parsha, week: Combined) => week.squash(parsha, chapters)
+    )
+  }
+
   private def preparse(metadata: PreparsedMetadata): Preparsed = {
     val result = new Preparsed(
       span = SpanParser.parseSpan(metadata.attributes),

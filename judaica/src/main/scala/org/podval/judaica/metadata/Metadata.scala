@@ -11,11 +11,20 @@ object Metadata {
     resourceName: String,
     rootElementName: String,
     elementName: String
-  ): Map[K, PreparsedMetadata] = {
-    val metadataElements: Seq[Elem] = loadMetadataElements(obj, resourceName, rootElementName)
-    val metadatas: Seq[PreparsedMetadata] = metadataElements.map(loadSubresource(obj, _, elementName))
-    bind(values, metadatas)
-  }
+  ): Map[K, PreparsedMetadata] = load(
+    values,
+    obj,
+    metadataElements = loadMetadataElements(obj, resourceName, rootElementName),
+    elementName
+  )
+
+  final def load[K <: Named.NamedBase, M <: Named.HasName](
+    values: Seq[K],
+    obj: AnyRef,
+    metadataElements: Seq[Elem],
+    elementName: String
+  ): Map[K, PreparsedMetadata] =
+    bind(values, metadataElements.map(loadSubresource(obj, _, elementName)))
 
   final def loadMetadataElements(obj: AnyRef, resourceName: String, rootElementName: String): Seq[Elem] = {
     val element = loadResource(obj, resourceName)
