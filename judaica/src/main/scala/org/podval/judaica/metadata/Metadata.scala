@@ -65,10 +65,10 @@ object Metadata {
     PreparsedMetadata(attributes, names, tail)
   }
 
-  protected final def bind[K <: Named.NamedBase]( // TODO M is always PreparsedMetadata?
+  final def bind[K <: Named.NamedBase, M <: Named.HasName]( // TODO make M be always PreparsedMetadata?
     keys: Seq[K],
-    metadatas: Seq[PreparsedMetadata]
-  ): Map[K, PreparsedMetadata] = {
+    metadatas: Seq[M]
+  ): Map[K, M] = {
     require(keys.length == metadatas.length)
 
     // TODO disjoint

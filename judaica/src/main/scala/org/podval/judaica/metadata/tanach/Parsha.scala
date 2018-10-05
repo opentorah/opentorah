@@ -2,20 +2,22 @@ package org.podval.judaica.metadata.tanach
 
 import org.podval.judaica.metadata.tanach.Tanach.ChumashBook
 import org.podval.judaica.metadata.tanach.SpanParser.{NumberedSpan, SpanParsed}
-import org.podval.judaica.metadata.{Named, Names, MainMetadata, LanguageSpec, Metadata, PreparsedMetadata, XML}
+import org.podval.judaica.metadata.{Named, Names, LanguageSpec, Metadata, PreparsedMetadata, XML}
 
 import scala.xml.Elem
 
-object Parsha extends MainMetadata {
-  sealed trait Parsha extends KeyBase {
+object Parsha {
+  sealed trait Parsha extends Named.NamedBase {
     def book: ChumashBook
+
+    final def metadata: Structure = toMetadata(this)
+
+    final override def names: Names = metadata.names
 
     final def combines: Boolean = Parsha.combinableAll.contains(this)
 
     final override def toString: String = toString(LanguageSpec.empty)
   }
-
-  override type Key = Parsha
 
   final class Structure(
     override val names: Names,
@@ -25,10 +27,6 @@ object Parsha extends MainMetadata {
     val maftir: Span,
     val aliyot: Seq[Span]
   ) extends Named.NamedBase
-
-  override type BindableMetadata = Combined
-
-  override type Metadata = Structure
 
   final class Aliyah(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
 
@@ -116,7 +114,7 @@ object Parsha extends MainMetadata {
 
   // TODO add half-parshiot for the Dardaki custom
 
-  final override val values: Seq[Parsha] = genesis ++ exodus ++ leviticus ++ numbers ++ deuteronomy
+  final val values: Seq[Parsha] = genesis ++ exodus ++ leviticus ++ numbers ++ deuteronomy
 
   // Rules of combining; affect the WeeklyReading.
   // TODO deal with alternative customs of what and in what sequence combines?
@@ -131,7 +129,7 @@ object Parsha extends MainMetadata {
   final val combinableAll: Set[Parsha] = (combinableFromBereishisToVayikra ++ combinableFromVayikraToBemidbar ++
     combinableFromBemidbarToVa_eschanan ++ combinableFromVa_eschanan).toSet
 
-  override def toMetadata: Parsha => Structure = parsha => parsha.book.weeks(parsha)
+  private def toMetadata: Parsha => Structure = parsha => parsha.book.weeks(parsha)
 
   def parse(book: Tanach.ChumashBook, elements: Seq[Elem]): Map[Parsha, Structure] = {
     val chapters = book.chapters
@@ -140,11 +138,10 @@ object Parsha extends MainMetadata {
     require(spans.length == preparsed.length)
     val parsed: Seq[Parsed] = preparsed.zip(spans).map { case (week, span) => week.parse(span, chapters) }
 
-    bind(
+    Metadata.bind(
       keys = book.parshiot,
-      metadatas = combine(parsed),
-      parse = (parsha: Parsha, week: Combined) => week.squash(parsha, chapters)
-    )
+      metadatas = combine(parsed)
+    ).map { case (parsha: Parsha, week: Combined) => parsha -> week.squash(parsha, chapters) }
   }
 
   private def preparse(metadata: PreparsedMetadata): Preparsed = {

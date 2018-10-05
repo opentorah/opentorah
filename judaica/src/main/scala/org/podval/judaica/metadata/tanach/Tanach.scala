@@ -130,8 +130,4 @@ object Tanach extends Named {
     if (!book.isInstanceOf[ChumashBook]) XML.checkNoMoreElements(weekElements)
     book -> TanachMetadata(metadata.names, chapterElements, weekElements)
   }
-
-  def main(args: Array[String]): Unit = {
-    println(Joshua.names)
-  }
 }
