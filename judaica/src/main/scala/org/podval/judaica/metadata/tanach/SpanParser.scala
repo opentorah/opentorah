@@ -127,7 +127,7 @@ object SpanParser {
       require(fromVerse.isDefined)
 
       val result = ProphetSpan(
-        book = Nach.getProhetForName(book.get),
+        book = Tanach.getProhetForName(book.get),
         span = Span(
           from = Verse(
             chapter = fromChapter.get,
@@ -146,7 +146,7 @@ object SpanParser {
     }
 
     private def verify(result: ProphetSpan): Unit = {
-      require(result.book.metadata.chapters.contains(result.span), s"Book ${result.book} doesn't contain span ${result.span}")
+      require(result.book.chapters.contains(result.span), s"Book ${result.book} doesn't contain span ${result.span}")
     }
   }
 

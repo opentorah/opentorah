@@ -32,7 +32,7 @@ trait HasMetadata extends Named {
     metadatas: Seq[BindableMetadata],
     parse: (Key, BindableMetadata) => Metadata
   ): Map[Key, Metadata] = {
-    require(keys.length == metadatas.length)
+    require(keys.length == metadatas.length, s"lengths are different: ${keys.length} != ${metadatas.length}; keys: $keys")
 
     // TODO disjoint
 

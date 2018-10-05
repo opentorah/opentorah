@@ -10,8 +10,6 @@ object Tanach extends Named {
   override type Key = TanachBook
 
   sealed trait TanachBook extends Named.NamedBase {
-    override def names: Names = toNames(this)
-
     final def chapters: Chapters = toChapters(this)
   }
 
@@ -21,24 +19,24 @@ object Tanach extends Named {
   private lazy val toChapters: Map[TanachBook, Chapters] =
     getToMetadata.mapValues(metadata => Chapters(metadata.chapterElements))
 
-  sealed trait ChumashBook extends TanachBook {
-    final def parshiot: Seq[Parsha.Parsha] = Parsha.values.filter(_.book == this)
-
-    private lazy val weeks: Map[Parsha.Parsha, Parsha.Structure] =
+  sealed abstract class ChumashBook(val parshiot: Seq[Parsha.Parsha]) extends TanachBook {
+    lazy val weeks: Map[Parsha.Parsha, Parsha.Structure] =
       Parsha.parse(this, getToMetadata(this).weekElements)
 
     final override def names: Names =  weeks(parshiot.head).names
   }
 
-  case object Genesis extends ChumashBook
-  case object Exodus extends ChumashBook
-  case object Leviticus extends ChumashBook
-  case object Numbers extends ChumashBook
-  case object Deuteronomy extends ChumashBook
+  case object Genesis extends ChumashBook(Parsha.genesis)
+  case object Exodus extends ChumashBook(Parsha.exodus)
+  case object Leviticus extends ChumashBook(Parsha.leviticus)
+  case object Numbers extends ChumashBook(Parsha.numbers)
+  case object Deuteronomy extends ChumashBook(Parsha.deuteronomy)
 
   val chumash: Seq[ChumashBook] = Seq(Genesis, Exodus, Leviticus, Numbers, Deuteronomy)
 
-  sealed trait NachBook extends TanachBook
+  sealed trait NachBook extends TanachBook {
+    final override def names: Names = toNames(this)
+  }
 
   sealed trait ProphetsBook extends NachBook
 

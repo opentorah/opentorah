@@ -1,6 +1,6 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.tanach.Chumash.Book
+import org.podval.judaica.metadata.tanach.Tanach.ChumashBook
 import org.podval.judaica.metadata.tanach.SpanParser.{NumberedSpan, SpanParsed}
 import org.podval.judaica.metadata.{LanguageSpec, MainMetadata, Named, Names, PreparsedMetadata, SubresourceLoader, XML}
 
@@ -8,7 +8,7 @@ import scala.xml.Elem
 
 object Parsha extends MainMetadata with SubresourceLoader {
   sealed trait Parsha extends KeyBase {
-    def book: Book
+    def book: ChumashBook
 
     final def combines: Boolean = Parsha.combinableAll.contains(this)
 
@@ -32,7 +32,7 @@ object Parsha extends MainMetadata with SubresourceLoader {
 
   final class Aliyah(fromChapter: Int, fromVerse: Int, toChapter: Int, toVerse: Int)
 
-  trait GenesisParsha extends Parsha { final override def book: Book = Chumash.Genesis }
+  trait GenesisParsha extends Parsha { final override def book: ChumashBook = Tanach.Genesis }
 
   case object Bereishis extends GenesisParsha
   case object Noach extends GenesisParsha
@@ -47,7 +47,10 @@ object Parsha extends MainMetadata with SubresourceLoader {
   case object Vayigash extends GenesisParsha
   case object Vayechi extends GenesisParsha
 
-  trait ExodusParsha extends Parsha { final override def book: Book = Chumash.Exodus }
+  val genesis: Seq[Parsha] = Seq(Bereishis, Noach, LechLecha, Vayeira, ChayeiSarah, Toldos,
+    Vayeitzei, Vayishlach, Vayeishev, Mikeitz, Vayigash, Vayechi)
+
+  trait ExodusParsha extends Parsha { final override def book: ChumashBook = Tanach.Exodus }
 
   case object Shemos extends ExodusParsha
   case object Va_eira extends ExodusParsha { override def name: String = "Va'eira" }
@@ -61,7 +64,10 @@ object Parsha extends MainMetadata with SubresourceLoader {
   case object Vayakhel extends ExodusParsha
   case object Pekudei extends ExodusParsha
 
-  trait LeviticusParsha extends Parsha { final override def book: Book = Chumash.Leviticus }
+  val exodus: Seq[Parsha] = Seq(Shemos, Va_eira, Bo, Beshalach, Yisro, Mishpatim, Terumah,
+    Tetzaveh, KiSisa, Vayakhel, Pekudei)
+
+  trait LeviticusParsha extends Parsha { final override def book: ChumashBook = Tanach.Leviticus }
 
   case object Vayikra extends LeviticusParsha
   case object Tzav extends LeviticusParsha
@@ -74,7 +80,9 @@ object Parsha extends MainMetadata with SubresourceLoader {
   case object Behar extends LeviticusParsha
   case object Bechukosai extends LeviticusParsha
 
-  trait NumbersParsha extends Parsha { final override def book: Book = Chumash.Numbers }
+  val leviticus: Seq[Parsha] = Seq(Vayikra, Tzav, Shemini, Tazria, Metzora, Acharei, Kedoshim, Emor, Behar, Bechukosai)
+
+  trait NumbersParsha extends Parsha { final override def book: ChumashBook = Tanach.Numbers }
 
   case object Bemidbar extends NumbersParsha
   case object Nasso extends NumbersParsha
@@ -87,7 +95,9 @@ object Parsha extends MainMetadata with SubresourceLoader {
   case object Mattos extends NumbersParsha
   case object Masei extends NumbersParsha
 
-  trait DeutoronomyParsha extends Parsha { final override def book: Book = Chumash.Deuteronomy }
+  val numbers: Seq[Parsha] = Seq(Bemidbar, Nasso, Beha_aloscha, Shelach, Korach, Chukas, Balak, Pinchas, Mattos, Masei)
+
+  trait DeutoronomyParsha extends Parsha { final override def book: ChumashBook = Tanach.Deuteronomy }
 
   case object Devarim extends DeutoronomyParsha
   case object Va_eschanan extends DeutoronomyParsha { override def name: String = "Va'eschanan" }
@@ -101,16 +111,12 @@ object Parsha extends MainMetadata with SubresourceLoader {
   case object Haazinu extends DeutoronomyParsha
   case object VezosHaberachah extends DeutoronomyParsha { override def name: String = "Vezos Haberachah" }
 
+  val deuteronomy: Seq[Parsha] = Seq(Devarim, Va_eschanan, Eikev, Re_eh, Shoftim, KiSeitzei, KiSavo,
+    Nitzavim, Vayeilech, Haazinu, VezosHaberachah)
+
   // TODO add half-parshiot for the Dardaki custom
 
-  final override val values: Seq[Parsha] = Seq(
-    Bereishis, Noach, LechLecha, Vayeira, ChayeiSarah, Toldos,
-    Vayeitzei, Vayishlach, Vayeishev, Mikeitz, Vayigash, Vayechi,
-    Shemos, Va_eira, Bo, Beshalach, Yisro, Mishpatim, Terumah, Tetzaveh, KiSisa, Vayakhel, Pekudei,
-    Vayikra, Tzav, Shemini, Tazria, Metzora, Acharei, Kedoshim, Emor, Behar, Bechukosai,
-    Bemidbar, Nasso, Beha_aloscha, Shelach, Korach, Chukas, Balak, Pinchas, Mattos, Masei,
-    Devarim, Va_eschanan, Eikev, Re_eh, Shoftim, KiSeitzei, KiSavo, Nitzavim, Vayeilech, Haazinu, VezosHaberachah
-  )
+  final override val values: Seq[Parsha] = genesis ++ exodus ++ leviticus ++ numbers ++ deuteronomy
 
   // Rules of combining; affect the WeeklyReading.
   // TODO deal with alternative customs of what and in what sequence combines?
@@ -125,22 +131,9 @@ object Parsha extends MainMetadata with SubresourceLoader {
   final val combinableAll: Set[Parsha] = (combinableFromBereishisToVayikra ++ combinableFromVayikraToBemidbar ++
     combinableFromBemidbarToVa_eschanan ++ combinableFromVa_eschanan).toSet
 
-  override def toMetadata: Parsha => Structure = parsha => parsha.book.metadata.weeks(parsha)
+  override def toMetadata: Parsha => Structure = parsha => parsha.book.weeks(parsha)
 
   override protected def elementName: String = "week"
-
-  def parse(elements: Seq[Elem], book: Book, chapters: Chapters): Map[Parsha, Structure] = {
-    val preparsed: Seq[Preparsed] = elements.map(element => loadSubresource(element)).map(preparse)
-    val spans: Seq[Span] = SpanParser.setImpliedTo(preparsed.map(_.span), chapters.full, chapters)
-    require(spans.length == preparsed.length)
-    val parsed: Seq[Parsed] = preparsed.zip(spans).map { case (week, span) => week.parse(span, chapters) }
-
-    bind(
-      keys = book.parshiot,
-      metadatas = combine(parsed),
-      parse = (parsha: Parsha, week: Combined) => week.squash(parsha, chapters)
-    )
-  }
 
   def parse(book: Tanach.ChumashBook, elements: Seq[Elem]): Map[Parsha, Structure] = {
     val chapters = book.chapters
