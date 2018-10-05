@@ -27,7 +27,7 @@ trait Named {
 
   final def distance(from: Key, to: Key): Int = indexOf(to) - indexOf(from)
 
-  def what: String = Named.className(this)
+  final def what: String = Named.className(this)
 }
 
 object Named {
