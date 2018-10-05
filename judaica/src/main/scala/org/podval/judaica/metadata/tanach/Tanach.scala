@@ -7,21 +7,21 @@ import scala.xml.Elem
 
 object Tanach extends Named {
 
-  override type Key = Book
+  override type Key = TanachBook
 
-  sealed trait Book extends Named.NamedBase {
+  sealed trait TanachBook extends Named.NamedBase {
     override def names: Names = toNames(this)
 
     final def chapters: Chapters = toChapters(this)
   }
 
-  private lazy val toNames: Map[Book, Names] =
+  private lazy val toNames: Map[TanachBook, Names] =
     getToMetadata.mapValues(_.names)
 
-  private lazy val toChapters: Map[Book, Chapters] =
+  private lazy val toChapters: Map[TanachBook, Chapters] =
     getToMetadata.mapValues(metadata => Chapters(metadata.chapterElements))
 
-  sealed trait ChumashBook extends Book {
+  sealed trait ChumashBook extends TanachBook {
     final def parshiot: Seq[Parsha.Parsha] = Parsha.values.filter(_.book == this)
 
     private lazy val weeks: Map[Parsha.Parsha, Parsha.Structure] =
@@ -38,9 +38,11 @@ object Tanach extends Named {
 
   val chumash: Seq[ChumashBook] = Seq(Genesis, Exodus, Leviticus, Numbers, Deuteronomy)
 
-  trait ProphetsBook extends Book
+  sealed trait NachBook extends TanachBook
 
-  trait EarlyProphetsBook extends ProphetsBook
+  sealed trait ProphetsBook extends NachBook
+
+  sealed trait EarlyProphetsBook extends ProphetsBook
 
   case object Joshua extends EarlyProphetsBook
   case object Judges extends EarlyProphetsBook
@@ -51,14 +53,14 @@ object Tanach extends Named {
 
   val earlyProphets: Seq[ProphetsBook] = Seq(Joshua, Judges, SamuelI, SamuelII, KingsI, KingsII)
 
-  trait LateProphetsBook extends ProphetsBook
+  sealed trait LateProphetsBook extends ProphetsBook
 
   case object Isaiah extends LateProphetsBook
   case object Jeremiah extends LateProphetsBook
   case object Ezekiel extends LateProphetsBook
 
   <!-- תרי עשר -->
-  trait TreiAsarBook extends LateProphetsBook
+  sealed trait TreiAsarBook extends LateProphetsBook
 
   case object Hosea extends TreiAsarBook
   case object Joel extends TreiAsarBook
@@ -82,7 +84,7 @@ object Tanach extends Named {
 
   def getProhetForName(name: String): ProphetsBook = getForName(name).asInstanceOf[ProphetsBook]
 
-  trait WritingsBook extends Book
+  sealed trait WritingsBook extends NachBook
 
   case object Psalms extends WritingsBook
   case object Proverbs extends WritingsBook
@@ -101,16 +103,16 @@ object Tanach extends Named {
   val writings: Seq[WritingsBook] = Seq(Psalms, Proverbs, Job, SongOfSongs, Ruth, Lamentations, Ecclesiastes,
     Esther, Daniel, Ezra, Nehemiah, ChroniclesI, ChroniclesII)
 
-  val nach: Seq[Book] = prophets ++ writings
+  val nach: Seq[TanachBook] = prophets ++ writings
 
-  override val values: Seq[Book] = chumash ++ nach
+  override val values: Seq[TanachBook] = chumash ++ nach
 
   private final case class TanachMetadata(names: Names, chapterElements: Seq[Elem], weekElements: Seq[Elem])
 
   // We do not need preparsed metadata once it is parsed, so the reference is week:
-  private var toMetadata: WeakReference[Map[Book, TanachMetadata]] = new WeakReference(loadMetadata)
+  private var toMetadata: WeakReference[Map[TanachBook, TanachMetadata]] = new WeakReference(loadMetadata)
 
-  private def getToMetadata: Map[Book, TanachMetadata] = {
+  private def getToMetadata: Map[TanachBook, TanachMetadata] = {
     toMetadata.get.fold {
       val result = loadMetadata
       toMetadata = new WeakReference(result)
@@ -118,7 +120,7 @@ object Tanach extends Named {
     } { result => result }
   }
 
-  private def loadMetadata: Map[Book, TanachMetadata] = Metadata.load(
+  private def loadMetadata: Map[TanachBook, TanachMetadata] = Metadata.load(
     values = values,
     obj = this,
     resourceName = "Tanach",
