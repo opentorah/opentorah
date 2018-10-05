@@ -2,11 +2,11 @@ package org.podval.judaica.metadata.tanach
 
 import org.podval.judaica.metadata.tanach.Tanach.ChumashBook
 import org.podval.judaica.metadata.tanach.SpanParser.{NumberedSpan, SpanParsed}
-import org.podval.judaica.metadata.{LanguageSpec, MainMetadata, Named, Names, PreparsedMetadata, SubresourceLoader, XML}
+import org.podval.judaica.metadata.{Named, Names, MainMetadata, LanguageSpec, Metadata, PreparsedMetadata, XML}
 
 import scala.xml.Elem
 
-object Parsha extends MainMetadata with SubresourceLoader {
+object Parsha extends MainMetadata {
   sealed trait Parsha extends KeyBase {
     def book: ChumashBook
 
@@ -133,11 +133,9 @@ object Parsha extends MainMetadata with SubresourceLoader {
 
   override def toMetadata: Parsha => Structure = parsha => parsha.book.weeks(parsha)
 
-  override protected def elementName: String = "week"
-
   def parse(book: Tanach.ChumashBook, elements: Seq[Elem]): Map[Parsha, Structure] = {
     val chapters = book.chapters
-    val preparsed: Seq[Preparsed] = elements.map(element => loadSubresource(element)).map(preparse)
+    val preparsed: Seq[Preparsed] = elements.map(element => Metadata.loadSubresource(this, element, "week")).map(preparse)
     val spans: Seq[Span] = SpanParser.setImpliedTo(preparsed.map(_.span), chapters.full, chapters)
     require(spans.length == preparsed.length)
     val parsed: Seq[Parsed] = preparsed.zip(spans).map { case (week, span) => week.parse(span, chapters) }

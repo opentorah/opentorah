@@ -1,9 +1,9 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.{Language, LanguageSpec, MetadataLoader, PreparsedMetadata, XML}
+import org.podval.judaica.metadata.{LanguageSpec, Language, Metadata, XML}
 import org.podval.judaica.metadata.tanach.Custom.Custom
 import org.podval.judaica.metadata.tanach.Parsha.Parsha
-import org.podval.judaica.metadata.tanach.SpanParser.{ProphetSpanParsed, NumberedProphetSpan}
+import org.podval.judaica.metadata.tanach.SpanParser.{NumberedProphetSpan, ProphetSpanParsed}
 
 import scala.xml.Elem
 
@@ -17,20 +17,16 @@ final class Haftarah(val customs: Custom.Of[Seq[ProphetSpan]]) {
   }
 }
 
-object Haftarah extends MetadataLoader {
-  override type Key = Parsha
-
-  override val values: Seq[Parsha] = Parsha.values
-
-  override type Metadata = Haftarah
-
+object Haftarah {
   def forParsha(parsha: Parsha): Haftarah = toMetadata(parsha)
 
-  override protected def resourceName: String = "Haftarah"
-
-  override protected def elementName: String = "week"
-
-  override protected def parseMetadata(parhsa: Parsha,  metadata: PreparsedMetadata): Haftarah = {
+  private lazy val toMetadata: Map[Parsha, Haftarah] = Metadata.load(
+    values = Parsha.values,
+    obj = this,
+    resourceName = "Haftarah",
+    rootElementName = "metadata",
+    elementName = "week"
+  ).mapValues { metadata =>
     val weekSpan = SpanParser.parseProphetSpan(metadata.attributes)
     metadata.attributes.close()
 
