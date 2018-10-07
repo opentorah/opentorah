@@ -6,18 +6,20 @@ import org.podval.judaica.metadata.{Named, Names, LanguageSpec, Metadata, Prepar
 
 import scala.xml.Elem
 
-object Parsha {
-  sealed trait Parsha extends Named.NamedBase {
-    def book: ChumashBook
+sealed trait Parsha extends Named.NamedBase {
+  def book: ChumashBook
 
-    final def metadata: Structure = toMetadata(this)
+  final def metadata: Parsha.Structure = Parsha.toMetadata(this)
 
-    final override def names: Names = metadata.names
+  final override def names: Names = metadata.names
 
-    final def combines: Boolean = Parsha.combinableAll.contains(this)
+  final def combines: Boolean = Parsha.combinableAll.contains(this)
 
-    final override def toString: String = toString(LanguageSpec.empty)
-  }
+  final override def toString: String = toString(LanguageSpec.empty)
+}
+
+object Parsha extends Named {
+  override type Key = Parsha
 
   final class Structure(
     override val names: Names,
@@ -114,7 +116,7 @@ object Parsha {
 
   // TODO add half-parshiot for the Dardaki custom
 
-  final val values: Seq[Parsha] = genesis ++ exodus ++ leviticus ++ numbers ++ deuteronomy
+  final override val values: Seq[Parsha] = genesis ++ exodus ++ leviticus ++ numbers ++ deuteronomy
 
   // Rules of combining; affect the WeeklyReading.
   // TODO deal with alternative customs of what and in what sequence combines?
@@ -257,7 +259,7 @@ object Parsha {
 
   private final class DayParsed(
     val span: NumberedSpan,
-    val custom: Set[Custom.Custom],
+    val custom: Set[Custom],
     val isCombined: Boolean
   )
 
@@ -265,7 +267,7 @@ object Parsha {
     val attributes = XML.openEmpty(element, "day")
     val result = new DayParsed(
       span = SpanParser.parseNumberedSpan(attributes),
-      custom = attributes.get("custom").fold[Set[Custom.Custom]](Set(Custom.Common))(Custom.parse),
+      custom = attributes.get("custom").fold[Set[Custom]](Set(Custom.Common))(Custom.parse),
       isCombined = attributes.doGetBoolean("combined")
     )
     attributes.close()

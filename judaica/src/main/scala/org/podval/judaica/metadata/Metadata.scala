@@ -5,6 +5,22 @@ import java.io.FileNotFoundException
 import scala.xml.{Elem, Utility}
 
 object Metadata {
+
+  // This is lazy to allow correct initialization: the code uses values(),
+  // Language metadata file references Language instances by name :)
+  def loadNames[K <: Named.NamedBase](
+    values: Seq[K],
+    obj: AnyRef,
+    resourceName: String
+  ): Map[K, Names] = {
+    val metadataElements: Seq[Elem] = loadMetadataElements(
+      obj = obj,
+      resourceName = resourceName,
+      rootElementName = "names"
+    )
+    bind(values, metadataElements.map(element => Names.parse(element, None)))
+  }
+
   final def load[K <: Named.NamedBase, M <: Named.HasName](
     values: Seq[K],
     obj: AnyRef,
@@ -14,7 +30,11 @@ object Metadata {
   ): Map[K, PreparsedMetadata] = load(
     values,
     obj,
-    metadataElements = loadMetadataElements(obj, resourceName, rootElementName),
+    metadataElements = loadMetadataElements(
+      obj,
+      resourceName,
+      rootElementName
+    ),
     elementName
   )
 

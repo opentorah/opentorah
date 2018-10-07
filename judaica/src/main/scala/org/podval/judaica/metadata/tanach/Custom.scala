@@ -1,13 +1,16 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.NamesLoader
+import org.podval.judaica.metadata.{Named, Names}
 
-object Custom extends NamesLoader {
+sealed class Custom(val parent: Option[Custom]) extends Named.NamedBase {
+  final override def names: Names = Custom.toNames(this)
+
+  lazy val children: Set[Custom] = Custom.values.filter(_.parent.contains(this)).toSet
+}
+
+object Custom extends Named {
   // I don't think it worth it to move parent definitions into the XML file...
   // child < parent does not induce total order...
-  sealed class Custom(val parent: Option[Custom]) extends KeyBase {
-    lazy val children: Set[Custom] = values.filter(_.parent.contains(this)).toSet
-  }
 
   override type Key = Custom
 

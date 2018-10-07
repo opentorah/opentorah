@@ -1,7 +1,5 @@
 package org.podval.judaica.metadata
 
-import org.podval.judaica.metadata.Language.Language
-
 final case class LanguageSpec(
   language: Option[Language],
   isTransliterated: Option[Boolean],

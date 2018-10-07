@@ -1,8 +1,6 @@
 package org.podval.judaica.metadata.tanach
 
 import org.podval.judaica.metadata.{LanguageSpec, Language, Metadata, XML}
-import org.podval.judaica.metadata.tanach.Custom.Custom
-import org.podval.judaica.metadata.tanach.Parsha.Parsha
 import org.podval.judaica.metadata.tanach.SpanParser.{NumberedProphetSpan, ProphetSpanParsed}
 
 import scala.xml.Elem

@@ -13,14 +13,14 @@ object Tanach extends Named {
     final def chapters: Chapters = toChapters(this)
   }
 
-  private lazy val toNames: Map[TanachBook, Names] =
+  override lazy val toNames: Map[TanachBook, Names] =
     getToMetadata.mapValues(_.names)
 
   private lazy val toChapters: Map[TanachBook, Chapters] =
     getToMetadata.mapValues(metadata => Chapters(metadata.chapterElements))
 
-  sealed abstract class ChumashBook(val parshiot: Seq[Parsha.Parsha]) extends TanachBook {
-    lazy val weeks: Map[Parsha.Parsha, Parsha.Structure] =
+  sealed abstract class ChumashBook(val parshiot: Seq[Parsha]) extends TanachBook {
+    lazy val weeks: Map[Parsha, Parsha.Structure] =
       Parsha.parse(this, getToMetadata(this).weekElements)
 
     final override def names: Names =  weeks(parshiot.head).names

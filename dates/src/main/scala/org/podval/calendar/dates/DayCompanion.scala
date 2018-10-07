@@ -1,13 +1,13 @@
 package org.podval.calendar.dates
 
 import Calendar.daysPerWeek
-import org.podval.judaica.metadata.NamesLoader
+import org.podval.judaica.metadata.Named
 
 /**
   *
   */
 abstract class DayCompanion[C <: Calendar[C]] extends CalendarMember[C] {
-  val Name: NamesLoader
+  val Name: Named
 
   // TODO push up into Calendar?
   final type Name = Name.Key

@@ -1,15 +1,19 @@
 package org.podval.judaica.metadata
 
-object Language extends NamesLoader {
-  sealed class Language(code: String) extends KeyBase {
-    final override def name: String = code
+sealed class Language(code: String) extends Named.NamedBase {
+  final override def names: Names = Language.toNames(this)
 
-    // TODO add toLanguageSpec()?
+  final override def name: String = code
 
-    def toString(number: Int): String = number.toString
-  }
+  // TODO add toLanguageSpec()?
 
+  def toString(number: Int): String = number.toString
+}
+
+object Language extends Named {
   override type Key = Language
+
+  override val values: Seq[Language] = Seq(English, Hebrew, Russian)
 
   case object English extends Language("en")
   case object Russian extends Language("ru")
@@ -48,6 +52,4 @@ object Language extends NamesLoader {
       result.toString
     }
   }
-
-  override val values: Seq[Language] = Seq(English, Hebrew, Russian)
 }
