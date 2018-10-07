@@ -124,7 +124,7 @@ object Tanach extends NamedCompanion {
 
   private val metadatas = new Holder[Map[TanachBook, TanachMetadata]] {
     protected override def load: Map[TanachBook, TanachMetadata] = Metadata.loadMetadata(
-      values = values,
+      keys = values,
       obj = this,
       resourceName = "Tanach",
       rootElementName = "metadata",
@@ -150,9 +150,10 @@ object Tanach extends NamedCompanion {
   private final class ChumashBookMetadataHolder(book: ChumashBook) extends Holder[Map[Parsha, ParshaMetadata]] {
     protected override def load: Map[Parsha, ParshaMetadata] =
       Metadata.bind(
-        book.parshiot,
-        Tanach.metadatas.get(book).weekElements
-          .map(element => Metadata.loadSubresource(this, element, "week"))
+        keys = book.parshiot,
+        elements = Tanach.metadatas.get(book).weekElements,
+        obj = this,
+        elementName = "week"
       ).mapValues { metadata =>
 
         def byCustom(days: Seq[Tanach.DayParsed]): Custom.Sets[Seq[NumberedSpan]] =

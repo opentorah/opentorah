@@ -14,26 +14,46 @@ object Metadata {
   // This is lazy to allow correct initialization: the code uses values(),
   // Language metadata file references Language instances by name :)
   def loadNames[K <: Named](
-    values: Seq[K],
+    keys: Seq[K],
     obj: AnyRef,
     resourceName: String
   ): Map[K, Names] = bind(
-    values,
+    keys,
     loadMetadataElements(obj, resourceName, rootElementName = "names")
       .map(element => Names.parse(element, None))
   )
 
   def loadMetadata[K <: Named, M <: HasName](
-    values: Seq[K],
+    keys: Seq[K],
     obj: AnyRef,
     resourceName: String,
     rootElementName: String,
     elementName: String
   ): Map[K, Metadata] = bind(
-    values,
-    loadMetadataElements(obj, resourceName, rootElementName = "metadata")
-      .map(element => loadSubresource(obj, element, elementName))
+    keys = keys,
+    elements = loadMetadataElements(obj, resourceName, rootElementName = "metadata"),
+    obj = obj,
+    elementName = elementName
   )
+
+  final def bind[K <: Named](
+    keys: Seq[K],
+    elements: Seq[Elem],
+    obj: AnyRef,
+    elementName: String
+  ): Map[K, Metadata] = {
+    def loadSubresource(element: Elem): Metadata = {
+      val (attributes, elements) = XML.open(element, elementName)
+      attributes.get("resource").fold(Metadata(attributes, elements)) { subresourceName: String =>
+        attributes.close()
+        val subresource: Elem = loadResource(obj, subresourceName)
+        val (newAttributes, newElements) = XML.open(subresource, elementName)
+        Metadata(newAttributes, newElements)
+      }
+    }
+
+    bind(keys, elements.map(loadSubresource))
+  }
 
   private def apply(attributes: Attributes, elements: Seq[Elem]): Metadata = {
     val (names: Names, tail: Seq[Elem]) = Names.parse(attributes, elements)
@@ -64,20 +84,8 @@ object Metadata {
     result.get
   }
 
-  // TODO make private?
-  final def loadSubresource(obj: AnyRef, element: Elem, elementName: String): Metadata = {
-    val (attributes, elements) = XML.open(element, elementName)
-    attributes.get("resource").fold(Metadata(attributes, elements)) { subresourceName: String =>
-      attributes.close()
-      val subresource: Elem = loadResource(obj, subresourceName)
-      val (newAttributes, newElements) = XML.open(subresource, elementName)
-      Metadata(newAttributes, newElements)
-    }
-  }
-
-  // TODO make private?
   // This is used to bind both Metadata and names, so - HasName...
-  final def bind[K <: Named, M <: HasName](
+  private def bind[K <: Named, M <: HasName](
     keys: Seq[K],
     metadatas: Seq[M]
   ): Map[K, M] = {
