@@ -2,7 +2,7 @@ package org.podval.judaica.metadata.tanach
 
 import org.podval.judaica.metadata.tanach.Tanach.ChumashBook
 import org.podval.judaica.metadata.tanach.SpanParser.{NumberedSpan, SpanParsed}
-import org.podval.judaica.metadata.{Named, Names, LanguageSpec, Metadata, PreparsedMetadata, XML}
+import org.podval.judaica.metadata.{Named, Names, LanguageSpec, Metadata, XML}
 
 import scala.xml.Elem
 
@@ -133,9 +133,9 @@ object Parsha extends Named {
 
   private def toMetadata: Parsha => Structure = parsha => parsha.book.weeks(parsha)
 
-  def parse(book: Tanach.ChumashBook, elements: Seq[Elem]): Map[Parsha, Structure] = {
+  def parse(book: Tanach.ChumashBook, metadatas: Seq[Metadata]): Map[Parsha, Structure] = {
     val chapters = book.chapters
-    val preparsed: Seq[Preparsed] = elements.map(element => Metadata.loadSubresource(this, element, "week")).map(preparse)
+    val preparsed: Seq[Preparsed] = metadatas.map(preparse)
     val spans: Seq[Span] = SpanParser.setImpliedTo(preparsed.map(_.span), chapters.full, chapters)
     require(spans.length == preparsed.length)
     val parsed: Seq[Parsed] = preparsed.zip(spans).map { case (week, span) => week.parse(span, chapters) }
@@ -146,7 +146,7 @@ object Parsha extends Named {
     ).map { case (parsha: Parsha, week: Combined) => parsha -> week.squash(parsha, chapters) }
   }
 
-  private def preparse(metadata: PreparsedMetadata): Preparsed = {
+  private def preparse(metadata: Metadata): Preparsed = {
     val result = new Preparsed(
       span = SpanParser.parseSpan(metadata.attributes),
       names = metadata.names,

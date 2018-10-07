@@ -476,10 +476,8 @@
         <chapter n="3" length="24"/>
     </book>
 
-    <book>
-        <name lang="en" n="Psalms"/>
-        <name lang="he" n="תהלים"/>
-    </book>
+    <book resource="Psalms"/>
+
     <book>
         <name lang="en" n="Proverbs"/>
         <name lang="he" n="משלי"/>

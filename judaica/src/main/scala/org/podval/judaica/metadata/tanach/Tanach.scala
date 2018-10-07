@@ -1,8 +1,7 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.{Named, Names, Metadata, XML}
+import org.podval.judaica.metadata.{Named, Names, Metadata, XML, Holder}
 
-import scala.ref.WeakReference
 import scala.xml.Elem
 
 object Tanach extends Named {
@@ -14,14 +13,18 @@ object Tanach extends Named {
   }
 
   override lazy val toNames: Map[TanachBook, Names] =
-    getToMetadata.mapValues(_.names)
+    metadata.get.mapValues(_.names)
 
   private lazy val toChapters: Map[TanachBook, Chapters] =
-    getToMetadata.mapValues(metadata => Chapters(metadata.chapterElements))
+    metadata.get.mapValues(metadata => Chapters(metadata.chapterElements))
 
   sealed abstract class ChumashBook(val parshiot: Seq[Parsha]) extends TanachBook {
-    lazy val weeks: Map[Parsha, Parsha.Structure] =
-      Parsha.parse(this, getToMetadata(this).weekElements)
+    private val metadata = new Holder[Seq[Metadata]] {
+      protected override def load: Seq[Metadata] = Tanach.metadata.get(ChumashBook.this).weekElements
+        .map(element => Metadata.loadSubresource(this, element, "week"))
+    }
+
+    lazy val weeks: Map[Parsha, Parsha.Structure] = Parsha.parse(this, metadata.get)
 
     final override def names: Names =  weeks(parshiot.head).names
   }
@@ -107,27 +110,19 @@ object Tanach extends Named {
 
   private final case class TanachMetadata(names: Names, chapterElements: Seq[Elem], weekElements: Seq[Elem])
 
-  // We do not need preparsed metadata once it is parsed, so the reference is week:
-  private var toMetadata: WeakReference[Map[TanachBook, TanachMetadata]] = new WeakReference(loadMetadata)
-
-  private def getToMetadata: Map[TanachBook, TanachMetadata] = {
-    toMetadata.get.fold {
-      val result = loadMetadata
-      toMetadata = new WeakReference(result)
-      result
-    } { result => result }
-  }
-
-  private def loadMetadata: Map[TanachBook, TanachMetadata] = Metadata.load(
-    values = values,
-    obj = this,
-    resourceName = "Tanach",
-    rootElementName = "metadata",
-    elementName = "book"
-  ).map { case (book, metadata) =>
-    metadata.attributes.close()
-    val (chapterElements: Seq[Elem], weekElements: Seq[Elem]) = XML.span(metadata.elements, "chapter", "week")
-    if (!book.isInstanceOf[ChumashBook]) XML.checkNoMoreElements(weekElements)
-    book -> TanachMetadata(metadata.names, chapterElements, weekElements)
+  private val metadata = new Holder[Map[TanachBook, TanachMetadata]] {
+    protected override def load: Map[TanachBook, TanachMetadata] = Metadata.loadMetadata(
+      values = values,
+      obj = this,
+      resourceName = "Tanach",
+      rootElementName = "metadata",
+      elementName = "book"
+    ).map { case (book, bookMetadata) =>
+      bookMetadata.attributes.close()
+      val (chapterElements: Seq[Elem], weekElements: Seq[Elem]) =
+        XML.span(bookMetadata.elements, "chapter", "week")
+      if (!book.isInstanceOf[ChumashBook]) XML.checkNoMoreElements(weekElements)
+      book -> TanachMetadata(bookMetadata.names, chapterElements, weekElements)
+    }
   }
 }

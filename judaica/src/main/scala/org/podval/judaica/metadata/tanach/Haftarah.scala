@@ -18,7 +18,7 @@ final class Haftarah(val customs: Custom.Of[Seq[ProphetSpan]]) {
 object Haftarah {
   def forParsha(parsha: Parsha): Haftarah = toMetadata(parsha)
 
-  private lazy val toMetadata: Map[Parsha, Haftarah] = Metadata.load(
+  private lazy val toMetadata: Map[Parsha, Haftarah] = Metadata.loadMetadata(
     values = Parsha.values,
     obj = this,
     resourceName = "Haftarah",
