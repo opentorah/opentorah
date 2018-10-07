@@ -16,9 +16,7 @@ final class Haftarah(val customs: Custom.Of[Seq[ProphetSpan]]) {
 }
 
 object Haftarah {
-  def forParsha(parsha: Parsha): Haftarah = toMetadata(parsha)
-
-  private lazy val toMetadata: Map[Parsha, Haftarah] = Metadata.loadMetadata(
+  lazy val haftarah: Map[Parsha, Haftarah] = Metadata.loadMetadata(
     values = Parsha.values,
     obj = this,
     resourceName = "Haftarah",
@@ -64,7 +62,7 @@ object Haftarah {
   private def printHaftarahList(custom: Custom, spec: LanguageSpec, full: Boolean): Unit = {
     println(custom.toString(spec))
     for (parsha <- Parsha.values) {
-      val haftarah: Haftarah = Haftarah.forParsha(parsha)
+      val haftarah: Haftarah = Haftarah.haftarah(parsha)
       val customEffective: Custom = Custom.find(haftarah.customs, custom)
       val spans: Seq[ProphetSpan] = haftarah.customs(customEffective)
       val result: String = ProphetSpan.toString(spans, spec)
@@ -82,7 +80,7 @@ object Haftarah {
       println(s"${index+1}: $span")
     }
 
-    printSpans(Parsha.Mattos.metadata.daysCombined(Custom.Ashkenaz))
+    printSpans(Parsha.Mattos.daysCombined(Custom.Ashkenaz))
 
     printHaftarahList(Custom.Shami, LanguageSpec(Language.Hebrew), full = false)
   }

@@ -28,4 +28,8 @@ object Util {
 
   // b.intersect(a) == b?
   def contains[T](a: Set[T], b: Set[T]): Boolean = b.forall(t => a.contains(t))
+
+
+  def inSequence[K, V, R](keys: Seq[K], map: Map[K, V], f: Seq[(K, V)] => Seq[R]): Map[K, R] =
+    keys.zip(f(keys.map { key => key -> map(key) })).toMap
 }

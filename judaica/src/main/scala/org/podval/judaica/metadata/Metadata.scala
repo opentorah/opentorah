@@ -76,7 +76,8 @@ object Metadata {
   }
 
   // TODO make private?
-  final def bind[K <: Named.NamedBase, M <: Named.HasName]( // TODO make M be always PreparsedMetadata?
+  // This is used to bind both Metadata and names, so - HasName...
+  final def bind[K <: Named.NamedBase, M <: Named.HasName](
     keys: Seq[K],
     metadatas: Seq[M]
   ): Map[K, M] = {
