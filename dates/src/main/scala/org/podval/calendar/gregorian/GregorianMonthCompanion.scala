@@ -2,7 +2,7 @@ package org.podval.calendar.gregorian
 
 import org.podval.calendar.dates.MonthCompanion
 import Gregorian.Year
-import org.podval.judaica.metadata.{Named, Names}
+import org.podval.judaica.metadata.{NamedCompanion, Named, Names}
 
 abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
   final override val Name: GregorianMonthCompanion.type = GregorianMonthCompanion
@@ -13,8 +13,8 @@ abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
     monthNumber - Year.firstMonth(yearNumber(monthNumber)) + 1
 }
 
-object GregorianMonthCompanion extends Named {
-  sealed trait Key extends Named.NamedBase {
+object GregorianMonthCompanion extends NamedCompanion {
+  sealed trait Key extends Named {
     final override def names: Names = toNames(this)
   }
 

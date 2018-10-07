@@ -1,10 +1,8 @@
 package org.podval.judaica.metadata
 
-import org.podval.judaica.metadata.tanach.Util
-
 import scala.xml.Elem
 
-final class Names(val names: Seq[Name]) extends Named.HasName {
+final class Names(val names: Seq[Name]) extends HasName {
   Util.checkNoDuplicates(names.map(_.name), "names")
 
   // TODO check that there are no duplicate combinations of parameters OTHER than name!

@@ -1,4 +1,4 @@
-package org.podval.judaica.metadata.tanach
+package org.podval.judaica.metadata
 
 object Util {
   // Will this *ever* be in the standard library?
@@ -32,4 +32,7 @@ object Util {
 
   def inSequence[K, V, R](keys: Seq[K], map: Map[K, V], f: Seq[(K, V)] => Seq[R]): Map[K, R] =
     keys.zip(f(keys.map { key => key -> map(key) })).toMap
+
+  // TODO this breaks on inner classes; fixed in JDK 9...
+  def className(obj: AnyRef): String = obj.getClass.getSimpleName.replace("$", "")
 }

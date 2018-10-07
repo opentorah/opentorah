@@ -1,6 +1,6 @@
 package org.podval.judaica.metadata
 
-sealed class Language(code: String) extends Named.NamedBase {
+sealed class Language(code: String) extends Named {
   final override def names: Names = Language.toNames(this)
 
   final override def name: String = code
@@ -10,7 +10,7 @@ sealed class Language(code: String) extends Named.NamedBase {
   def toString(number: Int): String = number.toString
 }
 
-object Language extends Named {
+object Language extends NamedCompanion {
   override type Key = Language
 
   override val values: Seq[Language] = Seq(English, Hebrew, Russian)

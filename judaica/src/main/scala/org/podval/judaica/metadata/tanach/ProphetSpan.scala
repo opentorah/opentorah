@@ -1,6 +1,6 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.LanguageSpec
+import org.podval.judaica.metadata.{LanguageSpec, Util}
 
 final case class ProphetSpan(book: Tanach.ProphetsBook, span: Span) {
   override def toString: String = toString(LanguageSpec.empty)

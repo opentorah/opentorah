@@ -1,9 +1,9 @@
 package org.podval.judaica.metadata.tanach
 
 import org.podval.judaica.metadata.tanach.Tanach.ChumashBook
-import org.podval.judaica.metadata.{Named, Names, LanguageSpec}
+import org.podval.judaica.metadata.{LanguageSpec, NamedCompanion, Named, Names}
 
-sealed trait Parsha extends Named.NamedBase {
+sealed trait Parsha extends Named {
   def book: ChumashBook
 
   final override def names: Names = book.toNames(this)
@@ -25,7 +25,7 @@ sealed trait Parsha extends Named.NamedBase {
   final override def toString: String = toString(LanguageSpec.empty)
 }
 
-object Parsha extends Named {
+object Parsha extends NamedCompanion {
   override type Key = Parsha
 
   trait GenesisParsha extends Parsha { final override def book: ChumashBook = Tanach.Genesis }

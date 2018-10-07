@@ -4,7 +4,8 @@ import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.jewish.SpecialDay
 import SpecialDay.{Pesach, ShabbosBereishis, Shavuos, TishaBav, shabbosAfter, shabbosBefore}
-import org.podval.judaica.metadata.tanach.{Parsha, Util}
+import org.podval.judaica.metadata.Util
+import org.podval.judaica.metadata.tanach.Parsha
 import org.podval.judaica.metadata.tanach.Parsha._
 
 /**

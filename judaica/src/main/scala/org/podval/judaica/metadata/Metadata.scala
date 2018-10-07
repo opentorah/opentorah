@@ -8,12 +8,12 @@ final case class Metadata(
   attributes: Attributes, // actual parser needs to call close()!
   names: Names,
   elements: Seq[Elem]
-) extends Named.HasNames
+) extends HasNames
 
 object Metadata {
   // This is lazy to allow correct initialization: the code uses values(),
   // Language metadata file references Language instances by name :)
-  def loadNames[K <: Named.NamedBase](
+  def loadNames[K <: Named](
     values: Seq[K],
     obj: AnyRef,
     resourceName: String
@@ -23,7 +23,7 @@ object Metadata {
       .map(element => Names.parse(element, None))
   )
 
-  def loadMetadata[K <: Named.NamedBase, M <: Named.HasName](
+  def loadMetadata[K <: Named, M <: HasName](
     values: Seq[K],
     obj: AnyRef,
     resourceName: String,
@@ -77,7 +77,7 @@ object Metadata {
 
   // TODO make private?
   // This is used to bind both Metadata and names, so - HasName...
-  final def bind[K <: Named.NamedBase, M <: Named.HasName](
+  final def bind[K <: Named, M <: HasName](
     keys: Seq[K],
     metadatas: Seq[M]
   ): Map[K, M] = {
