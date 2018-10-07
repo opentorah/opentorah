@@ -1,4 +1,4 @@
-package org.podval.calendar.generate
+package org.podval.calendar.schedule
 
 import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Month, Year}

@@ -1,6 +1,6 @@
 package org.podval.judaica.metadata
 
-trait HasNames extends HasName {
+trait WithNames extends HasName {
   def names: Names
 
   final override def hasName(name: String): Boolean = names.hasName(name)

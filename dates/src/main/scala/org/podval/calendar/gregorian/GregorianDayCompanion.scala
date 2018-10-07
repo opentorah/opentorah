@@ -6,7 +6,6 @@ import org.podval.judaica.metadata.{NamedCompanion, Named, Names}
 abstract class GregorianDayCompanion extends DayCompanion[Gregorian] {
   final override val Name: GregorianDayCompanion.type = GregorianDayCompanion
 
-  // TODO push into DayCompanion?
   final override def names: Seq[Name] = GregorianDayCompanion.values
 
   final override val firstDayNumberInWeek: Int = Calendar.firstDayNumberInWeekGregorian

@@ -1,4 +1,4 @@
-package org.podval.calendar.generate
+package org.podval.calendar.schedule
 
 trait Formatter {
   def formatLesson(

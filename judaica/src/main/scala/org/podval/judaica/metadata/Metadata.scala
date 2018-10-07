@@ -8,7 +8,7 @@ final case class Metadata(
   attributes: Attributes, // actual parser needs to call close()!
   names: Names,
   elements: Seq[Elem]
-) extends HasNames
+) extends WithNames
 
 object Metadata {
   // This is lazy to allow correct initialization: the code uses values(),
@@ -19,7 +19,7 @@ object Metadata {
     resourceName: String
   ): Map[K, Names] = bind(
     keys,
-    loadMetadataElements(obj, resourceName, rootElementName = "names")
+    loadMetadataElements(obj, resourceName, rootElementName = "names", elementName = "names")
       .map(element => Names.parse(element, None))
   )
 
@@ -31,18 +31,17 @@ object Metadata {
     elementName: String
   ): Map[K, Metadata] = bind(
     keys = keys,
-    elements = loadMetadataElements(obj, resourceName, rootElementName = "metadata"),
-    obj = obj,
-    elementName = elementName
+    elements = loadMetadataElements(obj, resourceName, rootElementName = "metadata", elementName = elementName),
+    obj = obj
   )
 
   final def bind[K <: Named](
     keys: Seq[K],
     elements: Seq[Elem],
-    obj: AnyRef,
-    elementName: String
+    obj: AnyRef
   ): Map[K, Metadata] = {
     def loadSubresource(element: Elem): Metadata = {
+      val elementName: String = element.label
       val (attributes, elements) = XML.open(element, elementName)
       attributes.get("resource").fold(Metadata(attributes, elements)) { subresourceName: String =>
         attributes.close()
@@ -60,13 +59,18 @@ object Metadata {
     Metadata(attributes, names, tail)
   }
 
-  private def loadMetadataElements(obj: AnyRef, resourceName: String, rootElementName: String): Seq[Elem] = {
+  private def loadMetadataElements(
+    obj: AnyRef,
+    resourceName: String,
+    rootElementName: String,
+    elementName: String
+  ): Seq[Elem] = {
     val element = loadResource(obj, resourceName)
     val (attributes, elements) = XML.open(element, rootElementName)
     val type_ = attributes.doGet("type")
     attributes.close()
     require(type_ == resourceName, s"Wrong metadata type: $type_ instead of $resourceName")
-    elements
+    XML.span(elements, elementName)
   }
 
   private def loadResource(obj: AnyRef, resourceName: String): Elem = {
@@ -84,19 +88,24 @@ object Metadata {
     result.get
   }
 
-  // This is used to bind both Metadata and names, so - HasName...
-  private def bind[K <: Named, M <: HasName](
-    keys: Seq[K],
-    metadatas: Seq[M]
-  ): Map[K, M] = {
+  // This is used to bind both Metadata and Names, so - HasName.
+  private def bind[K <: Named, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Map[K, M] = {
     require(keys.length == metadatas.length)
 
-    // TODO disjoint
+    // TODO check that the names are disjoint
 
-    // TODO relax the "same order" requirement.
-    keys.zip(metadatas).map { case (key, metadata) =>
-      require(metadata.hasName(key.name), s"Metadata entry $metadata doesn't have the name ${key.name}")
-      key -> metadata
-    }.toMap
+    findAndBind(keys, metadatas).toMap
+  }
+
+
+  private def findAndBind[K <: Named, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Seq[(K, M)] = {
+    require(keys.isEmpty == metadatas.isEmpty)
+    if (keys.isEmpty) Nil else {
+      val key: K = keys.head
+      val (withName: Seq[M], withoutName: Seq[M]) = metadatas.partition(_.hasName(key.name))
+      require(withName.nonEmpty)
+      require(withName.length == 1)
+      (key, withName.head) +: findAndBind(keys.tail, withoutName)
+    }
   }
 }

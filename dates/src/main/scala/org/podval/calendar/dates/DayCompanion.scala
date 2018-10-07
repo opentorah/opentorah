@@ -12,7 +12,6 @@ abstract class DayCompanion[C <: Calendar[C]] extends CalendarMember[C] {
   // TODO push up into Calendar?
   final type Name = Name.Key
 
-  // TODO pull in from the subclasses
   def names: Seq[C#DayName]
 
   def apply(number: Int): C#Day

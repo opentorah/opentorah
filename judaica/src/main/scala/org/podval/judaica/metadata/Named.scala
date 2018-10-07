@@ -1,6 +1,6 @@
 package org.podval.judaica.metadata
 
-trait Named extends HasNames {
+trait Named extends WithNames {
   def name: String = Util.className(this)
 
   override def toString: String = name

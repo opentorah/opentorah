@@ -20,7 +20,7 @@ sealed trait Parsha extends Named {
 
   final def haftarah: Haftarah = Haftarah.haftarah(this)
 
-  final def combines: Boolean = Parsha.combinableAll.contains(this)
+  final def combines: Boolean = Parsha.combinable.contains(this)
 
   final override def toString: String = toString(LanguageSpec.empty)
 }
@@ -124,6 +124,6 @@ object Parsha extends NamedCompanion {
   final val combinableFromBemidbarToVa_eschanan: Seq[Parsha] = Seq(Mattos, Chukas)
   final val combinableFromVa_eschanan: Seq[Parsha] = Seq(Nitzavim)
 
-  final val combinableAll: Set[Parsha] = (combinableFromBereishisToVayikra ++ combinableFromVayikraToBemidbar ++
+  final val combinable: Set[Parsha] = (combinableFromBereishisToVayikra ++ combinableFromVayikraToBemidbar ++
     combinableFromBemidbarToVa_eschanan ++ combinableFromVa_eschanan).toSet
 }

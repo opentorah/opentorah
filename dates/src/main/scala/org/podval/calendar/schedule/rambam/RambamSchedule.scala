@@ -1,6 +1,6 @@
-package org.podval.calendar.generate.rambam
+package org.podval.calendar.schedule.rambam
 
-import org.podval.calendar.generate.{Formatter, Schedule}
+import org.podval.calendar.schedule.{Formatter, Schedule}
 import org.podval.calendar.jewish.Jewish.{Year, Month, Day}
 
 /**

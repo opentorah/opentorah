@@ -13,11 +13,9 @@ object Tanach extends NamedCompanion {
     final def chapters: Chapters = toChapters(this)
   }
 
-  override lazy val toNames: Map[TanachBook, Names] =
-    metadatas.get.mapValues(_.names)
+  override lazy val toNames: Map[TanachBook, Names] = metadatas.names
 
-  private lazy val toChapters: Map[TanachBook, Chapters] =
-    metadatas.get.mapValues(metadata => Chapters(metadata.chapterElements))
+  private lazy val toChapters: Map[TanachBook, Chapters] = metadatas.chapters
 
   sealed abstract class ChumashBook(val parshiot: Seq[Parsha]) extends TanachBook with NamedCompanion {
     final override type Key = Parsha
@@ -120,9 +118,9 @@ object Tanach extends NamedCompanion {
 
   override val values: Seq[TanachBook] = chumash ++ nach
 
-  private final case class TanachMetadata(names: Names, chapterElements: Seq[Elem], weekElements: Seq[Elem])
+  private final case class TanachMetadata(names: Names, chapters: Chapters, weekElements: Seq[Elem])
 
-  private val metadatas = new Holder[Map[TanachBook, TanachMetadata]] {
+  private object metadatas extends Holder[TanachBook, TanachMetadata] {
     protected override def load: Map[TanachBook, TanachMetadata] = Metadata.loadMetadata(
       keys = values,
       obj = this,
@@ -134,8 +132,12 @@ object Tanach extends NamedCompanion {
       val (chapterElements: Seq[Elem], weekElements: Seq[Elem]) =
         XML.span(metadata.elements, "chapter", "week")
       if (!book.isInstanceOf[ChumashBook]) XML.checkNoMoreElements(weekElements)
-      book -> TanachMetadata(metadata.names, chapterElements, weekElements)
+      book -> TanachMetadata(metadata.names, Chapters(chapterElements), weekElements)
     }
+
+    override def names: Map[TanachBook, Names] = get.mapValues(_.names)
+
+    def chapters: Map[TanachBook, Chapters] = get.mapValues(_.chapters)
   }
 
   private final case class ParshaMetadata(
@@ -143,17 +145,16 @@ object Tanach extends NamedCompanion {
     span: SpanParsed,
     days: Custom.Sets[Seq[NumberedSpan]],
     daysCombined: Custom.Sets[Seq[NumberedSpan]],
-    aliyahElements: Seq[Elem],
-    maftirElements: Seq[Elem]
+    aliyot: Seq[NumberedSpan],
+    maftir: SpanParsed
   )
 
-  private final class ChumashBookMetadataHolder(book: ChumashBook) extends Holder[Map[Parsha, ParshaMetadata]] {
+  private final class ChumashBookMetadataHolder(book: ChumashBook) extends Holder[Parsha, ParshaMetadata] {
     protected override def load: Map[Parsha, ParshaMetadata] =
       Metadata.bind(
         keys = book.parshiot,
         elements = Tanach.metadatas.get(book).weekElements,
-        obj = this,
-        elementName = "week"
+        obj = this
       ).mapValues { metadata =>
 
         def byCustom(days: Seq[Tanach.DayParsed]): Custom.Sets[Seq[NumberedSpan]] =
@@ -173,12 +174,12 @@ object Tanach extends NamedCompanion {
           span = span,
           days = byCustom(days),
           daysCombined = byCustom(daysCombined),
-          aliyahElements = aliyahElements,
-          maftirElements = maftirElements
+          aliyot = aliyahElements.map(element => SpanParser.parseNumberedSpan(element, "aliyah")),
+          maftir = SpanParser.parseSpan(maftirElements.head, "maftir")
         )
       }
 
-    def names: Map[Parsha, Names] = get.mapValues(_.names)
+    override def names: Map[Parsha, Names] = get.mapValues(_.names)
 
     def span: Map[Parsha, Span] = Util.inSequence(
       keys = book.parshiot,
@@ -197,17 +198,16 @@ object Tanach extends NamedCompanion {
     )
 
     def aliyot: Map[Parsha, Seq[Span]] = get.map { case (parsha, metadata) =>
-      val aliyot: Seq[NumberedSpan] = metadata.aliyahElements.map(element => SpanParser.parseNumberedSpan(element, "aliyah"))
       // TODO QUESTION if Cohen ends in a custom place, does it affect the end of the 3 aliyah on Mon/Thu?
       // TODO QUESTION if the parshiot combine, does it affect those small aliyot?
-      val aliyotSpan: Span = Span(parsha.span.from, aliyot.last.span.to.getOrElse(parsha.days(Custom.Common).head.to))
-      val aliyotWithImplied1: Seq[NumberedSpan] = SpanParser.addImplied1(aliyot, aliyotSpan, book.chapters)
+      val aliyotSpan: Span = Span(parsha.span.from, metadata.aliyot.last.span.to.getOrElse(parsha.days(Custom.Common).head.to))
+      val aliyotWithImplied1: Seq[NumberedSpan] = SpanParser.addImplied1(metadata.aliyot, aliyotSpan, book.chapters)
       val result: Seq[Span] = SpanParser.setImpliedToCheckAndDropNumbers(aliyotWithImplied1, 3, aliyotSpan, book.chapters)
       parsha -> result
     }
 
     def maftir: Map[Parsha, Span] = get.map { case (parsha, metadata) =>
-      val maftir: SpanParsed = SpanParser.parseSpan(metadata.maftirElements.head, "maftir")
+      val maftir = metadata.maftir
       val result: Span = SpanParser.setImpliedTo(
         Seq(maftir),
         Span(maftir.from, maftir.to.getOrElse(parsha.span.to)),
@@ -217,15 +217,15 @@ object Tanach extends NamedCompanion {
     }
   }
 
-  private final class DayParsed(
-    val span: NumberedSpan,
-    val custom: Set[Custom],
-    val isCombined: Boolean
+  private final case class DayParsed(
+    span: NumberedSpan,
+    custom: Set[Custom],
+    isCombined: Boolean
   )
 
   private def parseDay(element: Elem): DayParsed = {
     val attributes = XML.openEmpty(element, "day")
-    val result = new DayParsed(
+    val result = DayParsed(
       span = SpanParser.parseNumberedSpan(attributes),
       custom = attributes.get("custom").fold[Set[Custom]](Set(Custom.Common))(Custom.parse),
       isCombined = attributes.doGetBoolean("combined")
