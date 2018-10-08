@@ -90,3 +90,17 @@ trait BookSpan {
     new Numbered(n, span = span.inheritFrom(contextSpan).resolve)
   }
 }
+
+object BookSpan {
+  object ChumashSpan extends BookSpan {
+    override type Book = Tanach.ChumashBook
+
+    override protected def getBook(name: String): Tanach.ChumashBook = Tanach.getChumashForName(name)
+  }
+
+  object ProphetSpan extends BookSpan {
+    override type Book = Tanach.ProphetsBook
+
+    override protected def getBook(name: String): Tanach.ProphetsBook = Tanach.getProhetForName(name)
+  }
+}

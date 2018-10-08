@@ -1,5 +1,6 @@
 package org.podval.judaica.metadata.tanach
 
+import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
 import org.podval.judaica.metadata.{Attributes, LanguageSpec, Metadata, XML}
 
 import scala.xml.Elem

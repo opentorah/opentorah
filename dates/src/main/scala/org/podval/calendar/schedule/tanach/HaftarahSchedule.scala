@@ -1,7 +1,8 @@
 package org.podval.calendar.schedule.tanach
 
+import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
 import org.podval.judaica.metadata.{Language, LanguageSpec}
-import org.podval.judaica.metadata.tanach.{Custom, Haftarah, Parsha, ProphetSpan, Span}
+import org.podval.judaica.metadata.tanach.{Custom, Haftarah, Parsha, Span}
 
 object HaftarahSchedule {
   private def printHaftarahList(custom: Custom, spec: LanguageSpec, full: Boolean): Unit = {
