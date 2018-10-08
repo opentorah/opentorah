@@ -235,30 +235,24 @@ object Tanach extends NamedCompanion {
   }
 
   private def combineDays(weeks: Seq[(Parsha, Custom.Sets[Seq[NumberedSpan]])]): Seq[Custom.Of[Seq[Span]]] = weeks match {
-    case (parsha1, days1) :: (parsha2, days2) :: tail =>
-      combineDays(parsha1, days1, days2, parsha2.span) +: combineDays((parsha2, days2) +: tail)
-    case (parsha, days) :: Nil =>
-      Seq(combineDays(parsha, days, Map.empty, Span(Verse(1, 1), Verse(1, 1)))) // The Span will never be used!
-    case Nil => Nil
-  }
+    case (parsha, days) :: (parshaNext, daysNext) :: tail =>
+      val result: Custom.Of[Seq[Span]] = if (!parsha.combines) Map.empty else  {
+        // TODO Use defaults from days?
+        val combined: Custom.Sets[Seq[NumberedSpan]] = daysNext ++ days.map { case (customs, value) =>
+          (customs, value ++ daysNext.getOrElse(customs, Seq.empty))
+        }
 
-  private def combineDays(
-    parsha: Parsha,
-    daysCombined: Custom.Sets[Seq[NumberedSpan]],
-    daysCombinedNext: Custom.Sets[Seq[NumberedSpan]],
-    spanNext: Span
-  ): Custom.Of[Seq[Span]] = {
-    val chapters: Chapters = parsha.book.chapters
-
-    def combine: Custom.Sets[Seq[Span]] = {
-      // TODO Use defaults from days?
-      val combinedFull = daysCombinedNext ++ daysCombined.map { case (customs, value) =>
-        (customs, value ++ daysCombinedNext.getOrElse(customs, Seq.empty))
+        val chapters: Chapters = parsha.book.chapters
+        Custom.denormalize(processDays(combined, chapters.merge(parsha.span, parshaNext.span), chapters))
       }
-      processDays(combinedFull, chapters.merge(parsha.span, spanNext), chapters)
-    }
 
-    if (!parsha.combines) Map.empty else Custom.denormalize(combine)
+      result +: combineDays((parshaNext, daysNext) +: tail)
+
+    case (parsha, days) :: Nil =>
+      require(!parsha.combines)
+      Seq(Map.empty)
+
+    case Nil => Nil
   }
 
   private def processDays(
