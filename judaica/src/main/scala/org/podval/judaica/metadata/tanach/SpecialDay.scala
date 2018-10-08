@@ -1,11 +1,16 @@
 package org.podval.judaica.metadata.tanach
 
+import org.podval.judaica.metadata.tanach.BookSpan.{ChumashSpan, ProphetSpan}
 import org.podval.judaica.metadata.{Holder, Metadata, Named, NamedCompanion, Names, XML}
 
 import scala.xml.Elem
 
 sealed class SpecialDay(override val name: String) extends Named {
   final override def names: Names = SpecialDay.toNames(this)
+
+  final def maftir: Option[ChumashSpan.BookSpan] = SpecialDay.toMaftir(this)
+
+  final def haftarah: Option[Custom.Of[Seq[ProphetSpan.BookSpan]]] = SpecialDay.toHaftarah(this)
 }
 
 object SpecialDay extends NamedCompanion {
@@ -75,10 +80,14 @@ object SpecialDay extends NamedCompanion {
 
   override lazy val toNames: Map[SpecialDay, Names] = metadatas.names
 
+  lazy val toMaftir: Map[SpecialDay, Option[ChumashSpan.BookSpan]] = metadatas.maftir
+
+  lazy val toHaftarah: Map[SpecialDay, Option[Custom.Of[Seq[ProphetSpan.BookSpan]]]] = metadatas.haftarah
+
   private final case class SpecialDayMetadata(
     names: Names,
     torah: Option[Elem],
-    maftir: Option[Elem],
+    maftir: Option[ChumashSpan.BookSpan],
     haftarah: Option[Custom.Of[Seq[ProphetSpan.BookSpan]]]
   )
 
@@ -103,10 +112,13 @@ object SpecialDay extends NamedCompanion {
       day -> SpecialDayMetadata(
         metadata.names,
         torah = noMoreThanOne(torahElements),
-        maftir = noMoreThanOne(maftriElements),
+        maftir = noMoreThanOne(maftriElements).map(parsemaftir),
         haftarah = noMoreThanOne(haftarahElements).map(parseHaftarah)
       )
     }
+
+    private def parsemaftir(element: Elem): ChumashSpan.BookSpan =
+      BookSpan.ChumashSpan.parse(element, "maftir").resolve
 
     private def parseHaftarah(element: Elem): Custom.Of[Seq[ProphetSpan.BookSpan]] = {
       val (attributes, elements) = XML.open(element, "haftarah")
@@ -114,9 +126,13 @@ object SpecialDay extends NamedCompanion {
     }
 
     override def names: Map[SpecialDay, Names] = get.mapValues(_.names)
+
+    def maftir: Map[SpecialDay, Option[ChumashSpan.BookSpan]] = get.mapValues(_.maftir)
+
+    def haftarah: Map[SpecialDay, Option[Custom.Of[Seq[ProphetSpan.BookSpan]]]] = get.mapValues(_.haftarah)
   }
 
   def main(args: Array[String]): Unit = {
-    print(SpecialDay.toNames)
+    print(SpecialDay.SheminiAtzeresMaftir.maftir)
   }
 }

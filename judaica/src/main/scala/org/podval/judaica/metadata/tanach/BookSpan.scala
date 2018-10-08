@@ -1,6 +1,8 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.{Attributes, LanguageSpec, Util}
+import org.podval.judaica.metadata.{Attributes, LanguageSpec, Util, XML}
+
+import scala.xml.Elem
 
 trait BookSpan {
   type Book <: Tanach.TanachBook
@@ -66,6 +68,13 @@ trait BookSpan {
 
     private def verify(result: BookSpan): Unit =
       require(result.book.chapters.contains(result.span), s"Book ${result.book} doesn't contain span ${result.span}")
+  }
+
+  final def parse(element: Elem, name: String): Parsed = {
+    val attributes = XML.openEmpty(element, name)
+    val result = parse(attributes)
+    attributes.close()
+    result
   }
 
   final def parse(attributes: Attributes): Parsed = new Parsed(
