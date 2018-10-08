@@ -8,6 +8,7 @@ sealed class Custom(val parent: Option[Custom]) extends Named {
   lazy val children: Set[Custom] = Custom.values.filter(_.parent.contains(this)).toSet
 }
 
+// TODO we need some consistency in the naming of customs: if Bavlim, then maybe Sefaradim?
 object Custom extends NamedCompanion {
   // I don't think it worth it to move parent definitions into the XML file...
   // child < parent does not induce total order...

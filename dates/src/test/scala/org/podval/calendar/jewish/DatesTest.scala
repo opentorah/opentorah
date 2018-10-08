@@ -123,7 +123,7 @@ final class DatesTest extends FlatSpec with Matchers {
       (Chanukah1, Seq(Shlishi)),
       (FastOfEster, Seq(Rishon, Shlishi, Shishi)),
       (FastOfTammuz, Seq(Sheni, Rvii, Shishi)),
-      (TishaBav, Seq(Sheni, Rvii, Shishi))
+      (TishaBeAv, Seq(Sheni, Rvii, Shishi))
     )
     years foreach { year =>
       forAll(data) {
@@ -180,7 +180,7 @@ final class DatesTest extends FlatSpec with Matchers {
   "Festivals" should "follow the rule" in {
     years foreach { year =>
       val pesach: Day = Pesach(year)
-      TishaBav(year).name shouldBe pesach.name
+      TishaBeAv(year).name shouldBe pesach.name
       Shavuos(year).name shouldBe (pesach+1).name
       RoshHashanah(year+1).name shouldBe (pesach+2).name
       SimchatTorah(year+1).name shouldBe (pesach+3).name

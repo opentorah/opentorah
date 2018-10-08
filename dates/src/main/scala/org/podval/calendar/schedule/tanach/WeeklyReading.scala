@@ -3,7 +3,7 @@ package org.podval.calendar.schedule.tanach
 import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.jewish.SpecialDay
-import SpecialDay.{Pesach, ShabbosBereishis, Shavuos, TishaBav, shabbosAfter, shabbosBefore}
+import SpecialDay.{Pesach, ShabbosBereishis, Shavuos, TishaBeAv, shabbosAfter, shabbosBefore}
 import org.podval.judaica.metadata.Util
 import org.podval.judaica.metadata.tanach.Parsha
 import org.podval.judaica.metadata.tanach.Parsha._
@@ -134,7 +134,7 @@ object WeeklyReading {
 
     val weeksToShavuot: Int = weeksTo(shabbosBefore(Shavuos(year)))
 
-    val weeksFromShavuotToAfterTishaBeAv: Int = weeksTo(shabbosAfter(TishaBav(year))) - weeksToShavuot
+    val weeksFromShavuotToAfterTishaBeAv: Int = weeksTo(shabbosAfter(TishaBeAv(year))) - weeksToShavuot
 
     // When there are to many Saturdays before Shavuot to assign Bemidbar to the one immediately before Shavuot,
     // Bemidbar is read one week before Shavuot:

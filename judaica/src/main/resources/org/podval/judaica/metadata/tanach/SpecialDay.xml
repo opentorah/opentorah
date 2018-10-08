@@ -31,7 +31,7 @@ TODO: Minhagim kria Chanuka
 Mekorot
     -->
     <day n="Shabbos Erev Rosh Chodesh">
-        <haftarah book="Samuel I" fromChapter="20" fromVerse="18" toVerse="42"/>
+        <haftarah book="I Samuel" fromChapter="20" fromVerse="18" toVerse="42"/>
     </day>
 
     <!-- RULE: on weekday: add Torah reading, part1, part2 no Maftir/Haftorah;
@@ -55,23 +55,32 @@ Mekorot
             </part>
         </torah>
         <maftir book="Numbers" fromChapter="28" fromVerse="9" toVerse="15"/>
-        <haftarah book="Isaia" fromChapter="66">
-            <part n="1" fromVerse="1" toVerse="24"/>
-            <part n="2" fromVerse="23" toVerse="23"/>
+        <haftarah book="Isaiah" fromChapter="66">
+            <custom n="Common">
+                <part n="1" fromVerse="1" toVerse="24"/>
+                <part n="2" fromVerse="23" toVerse="23"/>
+            </custom>
         </haftarah>
     </day>
 
-    <day n="Shabbos  Rosh Chodesh Additional Haftorah">
-        <haftarah book="Isaya" fromChapter="66" custom="Chabad">
-            <part n="1" fromVerse="1" toVerse="1"/>
-            <part n="2" fromVerse="23" toVerse="24"/>
-            <part n="3" fromVerse="23" toVerse="23"/>
+    <!-- TODO Added by Chabad and Fes (Marocco); @michaelko58 needs to add the rules :) -->
+    <day n="Shabbos Rosh Chodesh Additional Haftorah">
+        <haftarah book="Isaiah" fromChapter="66">
+            <custom n="Common">
+                <part n="1" fromVerse="1" toVerse="1"/>
+                <part n="2" fromVerse="23" toVerse="24"/>
+                <part n="3" fromVerse="23" toVerse="23"/>
+            </custom>
         </haftarah>
     </day>
+
+    <!-- TODO Added by Chabad and Fes (Marocco); @michaelko58 needs to add the rules :) -->
     <day n="Shabbos Erev Rosh Chodesh Additional Haftorah">
-        <haftarah book="Samuel I" fromChapter="20" custom="Chabad">
-            <part n="1" fromVerse="18" toVerse="18"/>
-            <part n="2" fromVerse="42" toVerse="42"/>
+        <haftarah book="I Samuel" fromChapter="20">
+            <custom n="Common">
+                <part n="1" fromVerse="18" toVerse="18"/>
+                <part n="2" fromVerse="42" toVerse="42"/>
+            </custom>
         </haftarah>
     </day>
 
@@ -100,7 +109,7 @@ fust haftara (exsept Zom Gedalia - Shuva Isroel
             <aliyah n="3" fromVerse="36" toVerse="40"/>
         </torah>
         <haftarah book="Jeremiah">
-            <custom n="Ashkenaz Sefarad" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
+            <custom n="Ashkenaz Sefard" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
             <custom n="Teiman">
                 <part n="1" fromChapter="6" fromVerse="16" toVerse="17"/>
                 <part n="2" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
@@ -144,7 +153,7 @@ fust haftara (exsept Zom Gedalia - Shuva Isroel
                 <aliyah n="7" fromVerse="28" toVerse="34"/>
             </shabbos>
         </torah>
-        <haftarah book="Samuel I" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
+        <haftarah book="I Samuel" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
     </day>
 
     <day n="Rosh Hashanah 2">
@@ -179,8 +188,8 @@ fust haftara (exsept Zom Gedalia - Shuva Isroel
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="7" toVerse="11"/>
         <haftarah book="Isaiah">
-            <custom n="Ashkenaz Sefarad" fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
-            <custom n="Italki Teimani">
+            <custom n="Ashkenaz Sefard" fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
+            <custom n="Italki Teiman">
                 <part n="1" fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
                 <part n="2" fromChapter="59" fromVerse="20" toVerse="21"/>
             </custom>
@@ -194,13 +203,13 @@ fust haftara (exsept Zom Gedalia - Shuva Isroel
             <aliyah n="3" fromVerse="22" toVerse="30"/> <!-- TODO mincha - maftir-->
         </torah>
         <haftarah>
-            <custom n="Ashkenaz Sefarad">
-                <part n="1" book="Jonah"/>
+            <custom n="Ashkenaz Sefard">
+                <part n="1" book="Jonah" fromChapter="1" fromVerse="1" toChapter="4" toVerse="11"/>
                 <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
             </custom>
-            <custom n="Italki" fromChapter="1" fromVerse="21">
-                <part n="1" book="Obadiah"/>
-                <part n="2" book="Jonah"/>
+            <custom n="Italki">
+                <part n="1" book="Obadiah" fromChapter="1" fromVerse="21"/>
+                <part n="2" book="Jonah" fromChapter="1" fromVerse="1" toChapter="4" toVerse="11"/>
                 <part n="3" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
             </custom>
         </haftarah>
@@ -232,16 +241,16 @@ fust haftara (exsept Zom Gedalia - Shuva Isroel
     </day>
     <day n="Succos 1">
         <haftarah book="Zechariah" toChapter="14" toVerse="21">
-            <custom n="Ashkenaz Sefarad" fromChapter="14" fromVerse="1"/>
-            <custom n="Teimani" fromChapter="13" fromVerse="9"/>
+            <custom n="Ashkenaz Sefard" fromChapter="14" fromVerse="1"/>
+            <custom n="Teiman" fromChapter="13" fromVerse="9"/>
         </haftarah>
     </day>
 
     <day n="Succos 2"> <!-- Diaspora -->
-        <haftarah book="Kings I">
-            <custom n="Ashkenaz Sefarad" fromChapter="8" fromVerse="2" toVerse="21"/>
+        <haftarah book="I Kings">
+            <custom n="Ashkenaz Sefard" fromChapter="8" fromVerse="2" toVerse="21"/>
             <custom n="Italki" fromChapter="7" fromVerse="51" toChapter="8" toVerse="15"/>
-            <custom n="Teimani" fromChapter="7" fromVerse="51" toChapter="8" toVerse="21"/>
+            <custom n="Teiman" fromChapter="7" fromVerse="51" toChapter="8" toVerse="21"/>
         </haftarah>
     </day>
 
@@ -275,7 +284,7 @@ n day of Sukkos
            Maftir Shabbos Chol Hamoed Succos n :
              in the Holy Land - n, in Diaspora - n and n+1
              -->
-    <day n="Korbanot Succos">
+    <day n="Succos Korbanot">
         <torah book="Numbers" fromChapter="29">
             <aliyah n="1" fromVerse="12" toVerse="16"/>
             <aliyah n="2" fromVerse="17" toVerse="19"/>
@@ -287,21 +296,20 @@ n day of Sukkos
         </torah>
     </day>
 
-    <day n="Haftarah Shabbos Chol Hamoed Succos">
+    <day n="Succos Shabbos Chol Hamoed Haftarah">
         <haftarah book="Ezekiel" fromChapter="38">
-            <custom n="Ashkenaz Sefarad" fromVerse="18" toChapter="39" toVerse="16"/>
-            <custom n="Italki Teimani" fromVerse="1" toChapter="38" toVerse="23"/>
+            <custom n="Ashkenaz Sefard" fromVerse="18" toChapter="39" toVerse="16"/>
+            <custom n="Italki Teiman" fromVerse="1" toChapter="38" toVerse="23"/>
         </haftarah>
     </day>
 
 
     <!-- RULE: on Shemini Atzeres and Simchas Torah: add Shemini Atzeres Maftir.  -->
-    <day n="Maftir Shemini Atzeres">
+    <day n="Shemini Atzeres Maftir">
         <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
     </day>
 
-    <day n="Shemini Atzeres"> <!-- only in Diaspora. In Eretz Isroel - Simchas Tojro
-      -->
+    <day n="Shemini Atzeres"> <!-- only in Diaspora. In Eretz Isroel - Simchas Torah -->
         <torah book="Deuteronomy">
             <aliyah n="1" fromChapter="14" fromVerse="22" toChapter="15" toVerse="19"/>
             <aliyah n="2" fromChapter="16" fromVerse="1"/>
@@ -319,9 +327,11 @@ n day of Sukkos
                 <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17"/>
             </shabbos>
         </torah>
-        <haftarah book="Kings I" fromChapter="8" fromVerse="54">
-            <custom n="Ashkenaz Sefarad" toChapter="8" toVerse="18"/>
-            <custom n="Italki" toChapter="9" toVerse="1"/>
+        <haftarah book="I Kings" fromChapter="8" fromVerse="54">
+            <!-- TODO Artscroll lists Ashkenaz custom ending at 9:1,
+             but @michaelko58 insists that Ashkenaz custom is the same as Sefard - to end at 8:66... -->
+            <custom n="Sefard Ashkenaz" toChapter="8" toVerse="66"/>
+            <custom n="Italki Chabad" toChapter="9" toVerse="1"/>
         </haftarah>
     </day>
 
@@ -340,11 +350,10 @@ n day of Sukkos
             </part>
         </torah>
         <haftarah book="Joshua">
-            <custom n="Ahkenaz Italki" fromChapter="1" fromVerse="1" toVerse="18"/>
-            <custom n="Sefarad" fromChapter="1" fromVerse="1" toVerse="18"/>
+            <custom n="Ashkenaz Sefard Italki" fromChapter="1" fromVerse="1" toVerse="18"/>
             <custom n="Teiman">
                 <part n="1" fromChapter="1" fromVerse="1" toVerse="9"/>
-                <part n="6" fromChapter="27"/>
+                <part n="2" fromChapter="6" fromVerse="27"/>
             </custom>
         </haftarah>
     </day>
@@ -361,7 +370,7 @@ n day of Sukkos
         1      0
         2      1.1,
         2      1.2
-          Sefarad   1. 0
+          Sefard   1. 0
                     2.  1.1 1.2
                     3. 2.1 2.2
 
@@ -383,55 +392,55 @@ n day of Sukkos
       Chanukka Rosh Chodesh: Aliyah 4: n
 
    -->
-    <day n="Korbanot Channukah" book="Numbers" fromChapter="7">
-        <text n="0" fromVerse="1" toVerse="11"/>
-        <text n="1.1" fromVerse="12" toVerse="14"/>
-        <text n="1.2" fromVerse="15" toVerse="17"/>
-        <text n="2.1" fromVerse="18" toVerse="20"/>
-        <text n="2.2" fromVerse="21" toVerse="23"/>
-        <text n="3.1" fromVerse="24" toVerse="26"/>
-        <text n="3.2" fromVerse="27" toVerse="29"/>
-        <text n="4.1" fromVerse="30" toVerse="32"/>
-        <text n="4.2" fromVerse="33" toVerse="35"/>
-        <text n="5.1" fromVerse="36" toVerse="38"/>
-        <text n="5.2" fromVerse="39" toVerse="41"/>
-        <text n="6.1" fromVerse="42" toVerse="44"/>
-        <text n="6.2" fromVerse="45" toVerse="47"/>
-        <text n="7.1" fromVerse="48" toVerse="50"/>
-        <text n="7.2" fromVerse="51" toVerse="53"/>
-        <text n="8.1" fromVerse="12" toVerse="14"/>
-        <text n="8.2" fromVerse="15" toVerse="17"/>
-        <text n="end" fromChapter="7" fromVerse="18" toChapter="8" toVerse="4"/>
+    <day n="Channukah Korbanot">
+        <torah book="Numbers" fromChapter="7">
+            <!-- TODO I changed 'text' to 'aliyah' to start parsing, but tjose aren't aliyot but fragments... -->
+            <aliyah n="0" fromVerse="1" toVerse="11"/>
+            <aliyah n="1.1" fromVerse="12" toVerse="14"/>
+            <aliyah n="1.2" fromVerse="15" toVerse="17"/>
+            <aliyah n="2.1" fromVerse="18" toVerse="20"/>
+            <aliyah n="2.2" fromVerse="21" toVerse="23"/>
+            <aliyah n="3.1" fromVerse="24" toVerse="26"/>
+            <aliyah n="3.2" fromVerse="27" toVerse="29"/>
+            <aliyah n="4.1" fromVerse="30" toVerse="32"/>
+            <aliyah n="4.2" fromVerse="33" toVerse="35"/>
+            <aliyah n="5.1" fromVerse="36" toVerse="38"/>
+            <aliyah n="5.2" fromVerse="39" toVerse="41"/>
+            <aliyah n="6.1" fromVerse="42" toVerse="44"/>
+            <aliyah n="6.2" fromVerse="45" toVerse="47"/>
+            <aliyah n="7.1" fromVerse="48" toVerse="50"/>
+            <aliyah n="7.2" fromVerse="51" toVerse="53"/>
+            <aliyah n="8.1" fromVerse="12" toVerse="14"/>
+            <aliyah n="8.2" fromVerse="15" toVerse="17"/>
+            <aliyah n="end" fromChapter="7" fromVerse="18" toChapter="8" toVerse="4"/>
+        </torah>
     </day>
 
 
-    <day n="Shabbos Channukah 1">
-        <haftarah book="Zecharia" fromChapter="2" fromVerse="14">
-            <custom n="Ahkenaz Sefarad" toChapter="4" toVerse="7"/>
-            <custom n="Teiman" toChapter="4" toVerse="7"/>
-        </haftarah>
+    <day n="Channukah Shabbos 1">
+        <haftarah book="Zechariah" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>
     </day>
 
-    <day n="Shabbos Channukah 2">
-        <haftarah book="Kings II" fromChapter="7" fromVerse="40" toChapter="7">
-            <custom n="Ahkenaz Sefarad" toVerse="50"/>
+    <day n="Channukah Shabbos 2">
+        <haftarah book="I Kings" fromChapter="7" fromVerse="40" toChapter="7">
+            <custom n="Ashkenaz Sefard" toVerse="50"/>
             <custom n="Italki" toVerse="51"/>
         </haftarah>
     </day>
 
     <day n="Parshas Shekalim">
         <maftir book="Exodus" fromChapter="30" fromVerse="11" toVerse="16"/>
-        <haftarah book="Kings II">
+        <haftarah book="II Kings">
             <custom n="Ashkenaz Italki Teiman Chabad" fromChapter="12" fromVerse="1" toVerse="17"/>
-            <custom n="Sefarad" fromChapter="11" fromVerse="17" toChapter="12" toVerse="17"/>
+            <custom n="Sefard" fromChapter="11" fromVerse="17" toChapter="12" toVerse="17"/>
         </haftarah>
     </day>
 
     <day n="Parshas Zachor">
         <maftir book="Deuteronomy" fromChapter="25" fromVerse="17" toVerse="19"/>
-        <haftarah book="Samuel I">
+        <haftarah book="I Samuel">
             <custom n="Ashkenaz Chabad" fromChapter="15" fromVerse="2" toVerse="34"/>
-            <custom n="Sefarad" fromChapter="15" fromVerse="1" toVerse="34"/>
+            <custom n="Sefard" fromChapter="15" fromVerse="1" toVerse="34"/>
             <custom n="Teiman" fromChapter="14" fromVerse="52" toChapter="15" toVerse="33"/>
         </haftarah>
     </day>
@@ -449,7 +458,7 @@ n day of Sukkos
         <haftarah book="Ezekiel" fromChapter="45" toChapter="46">
             <custom n="Ashkenaz" fromVerse="16" toVerse="18"/>
             <custom n="Italki" fromVerse="18" toVerse="11"/>
-            <custom n="Sefarad" fromVerse="18" toVerse="15"/>
+            <custom n="Sefard" fromVerse="18" toVerse="15"/>
             <custom n="Teiman" fromVerse="9" toVerse="11"/>
         </haftarah>
     </day>
@@ -494,7 +503,7 @@ n day of Sukkos
         <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>
     </day>
 
-    <day n="Pesach Hol ha-Moed Maftir">
+    <day n="Pesach Chol Hamoed Maftir">
         <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
     </day>
 
@@ -529,7 +538,7 @@ n day of Sukkos
                 <part n="1" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
                 <part n="2" fromChapter="6" fromVerse="27"/>
             </custom>
-            <custom n="Frankfurt Hagro" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
+            <custom n="Frankfurt Hagra" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
         </haftarah>
     </day>
 
@@ -543,8 +552,8 @@ n day of Sukkos
             <aliyah n="4" fromChapter="23" fromVerse="23" diaspora="true"/>
             <aliyah n="5" fromChapter="23" fromVerse="33" toVerse="44" diaspora="true"/>
         </torah>
-        <haftarah book="Kings II">  <!-- Diaspora -->
-            <custom n="Ashkenaz Sefarad">
+        <haftarah book="II Kings">  <!-- Diaspora -->
+            <custom n="Ashkenaz Sefard">
                 <part n="1" fromChapter="23" fromVerse="1" toVerse="9"/>
                 <part n="2" fromChapter="23" fromVerse="21" toVerse="25"/>
             </custom>
@@ -587,9 +596,9 @@ n day of Sukkos
             <aliyah n="3" fromVerse="9" toVerse="14"/>
         </torah>
     </day>
-    <day n="Haftarah Shabbos Chol Hamoed Pesach">
+    <day n="Pesach Shabbos Chol Hamoed Haftarah">
         <haftarah book="Ezekiel">
-            <custom n="Ashkenaz Sefarad" fromChapter="37" fromVerse="1" toVerse="14"/>
+            <custom n="Ashkenaz Sefard" fromChapter="37" fromVerse="1" toVerse="14"/>
             <custom n="Teiman" fromChapter="36" fromVerse="37" toChapter="37" toVerse="14"/>
         </haftarah>
     </day>
@@ -612,7 +621,7 @@ n day of Sukkos
                 <aliyah n="7" fromChapter="14" fromVerse="26" toChapter="15" toVerse="26"/>
             </shabbos>
         </torah>
-        <haftarah book="Samuel II" fromChapter="22" fromVerse="1" toVerse="51"/>
+        <haftarah book="II Samuel" fromChapter="22" fromVerse="1" toVerse="51"/>
     </day>
 
     <day n="Pesach 8"> <!-- Diaspora -->
@@ -625,7 +634,7 @@ n day of Sukkos
 
             <!--RULE - shabos - above Shmini atceres-->
         </torah>
-        <haftarah book="Isaia" fromChapter="10" fromVerse="32" toChapter="12" toVerse="6"/>
+        <haftarah book="Isaiah" fromChapter="10" fromVerse="32" toChapter="12" toVerse="6"/>
     </day>
 
     <!-- RULE: on all Shavuos days, add "Shavuos Maftir" -->
@@ -642,7 +651,7 @@ n day of Sukkos
             <aliyah n="5" fromChapter="20" fromVerse="15" toVerse="22"/>
         </torah>
         <haftarah book="Ezekiel">
-            <custom n="Ashkenaz Sefarad">
+            <custom n="Ashkenaz Sefard">
                 <part n="1" fromChapter="1" fromVerse="1" toVerse="28"/>
                 <part n="2" fromChapter="3" fromVerse="12"/>
             </custom>
@@ -658,7 +667,7 @@ n day of Sukkos
                     hol - above 8 shel Pesach                    -->
         <haftarah book="Habakkuk">
             <custom n="Ashkenaz" fromChapter="3" fromVerse="1" toVerse="19"/>
-            <custom n="Sefarad" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
+            <custom n="Sefard" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
         </haftarah>
     </day>
 </metadata>

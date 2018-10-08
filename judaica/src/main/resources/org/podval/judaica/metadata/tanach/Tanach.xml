@@ -419,6 +419,11 @@
     <book>
         <name lang="en" n="Jonah"/>
         <name lang="he" n="יונה"/>
+
+        <chapter n="1" length="16"/>
+        <chapter n="2" length="11"/>
+        <chapter n="3" length="10"/>
+        <chapter n="4" length="11"/>
     </book>
     <book>
         <name lang="en" n="Micah"/>
@@ -435,14 +440,26 @@
     <book>
         <name lang="en" n="Nahum"/>
         <name lang="he" n="נחום"/>
+
+        <chapter n="1" length="14"/>
+        <chapter n="2" length="14"/>
+        <chapter n="3" length="19"/>
     </book>
     <book>
         <name lang="en" n="Habakkuk"/>
         <name lang="he" n="חבקוק"/>
+
+        <chapter n="1" length="17"/>
+        <chapter n="2" length="20"/>
+        <chapter n="3" length="19"/>
     </book>
     <book>
         <name lang="en" n="Zephaniah"/>
         <name lang="he" n="צפניה"/>
+
+        <chapter n="1" length="18"/>
+        <chapter n="2" length="15"/>
+        <chapter n="3" length="20"/>
     </book>
     <book>
         <name lang="en" n="Haggai"/>
