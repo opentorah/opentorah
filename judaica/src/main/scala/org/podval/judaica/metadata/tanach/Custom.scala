@@ -22,7 +22,7 @@ object Custom extends NamedCompanion {
       case object Lita extends Custom(Some(Ashkenaz))
         case object Hayey_odom extends Custom(Some(Lita))
       case object Hagra extends Custom(Some(Ashkenaz))
-    case object Sefard extends Custom(Some(Common)) // TODO SefarAd?
+    case object Sefard extends Custom(Some(Common)) // TODO SefarAd? or Sefaradim?
       case object Chabad extends Custom(Some(Sefard))
       case object Magreb extends Custom(Some(Sefard))
         case object Algeria extends Custom(Some(Magreb))
