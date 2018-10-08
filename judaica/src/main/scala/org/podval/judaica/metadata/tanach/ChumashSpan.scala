@@ -1,6 +1,7 @@
 package org.podval.judaica.metadata.tanach
 
-final case class ChumashSpan(
-  override val book: Tanach.ChumashBook,
-  override val span: Span
-) extends BookSpan[Tanach.ChumashBook](book, span)
+object ChumashSpan extends BookSpan {
+  override type Book = Tanach.ChumashBook
+
+  override protected def getBook(name: String): Tanach.ChumashBook = Tanach.getChumashForName(name)
+}

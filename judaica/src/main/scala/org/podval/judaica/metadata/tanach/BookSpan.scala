@@ -2,19 +2,17 @@ package org.podval.judaica.metadata.tanach
 
 import org.podval.judaica.metadata.{Attributes, LanguageSpec, Util}
 
-class BookSpan[B <: Tanach.TanachBook](val book: B, val span: Span) {
-  override def toString: String = toString(LanguageSpec.empty)
+trait BookSpan {
+  type Book <: Tanach.TanachBook
 
-  def toString(spec: LanguageSpec): String = book.toString(spec) + " " + span.toString(spec)
-}
+  final class BookSpan(val book: Book, val span: Span) {
+    override def toString: String = toString(LanguageSpec.empty)
 
-trait BookSpanCompanion {
-  type BookType <: Tanach.TanachBook
+    def toString(spec: LanguageSpec): String = book.toString(spec) + " " + span.toString(spec)
+  }
 
-  type SpanType <: BookSpan[BookType]
-
-  final def toString(spans: Seq[SpanType], spec: LanguageSpec): String =
-    Util.group(spans, (span: SpanType) => span.book)
+  final def toString(spans: Seq[BookSpan], spec: LanguageSpec): String =
+    Util.group(spans, (span: BookSpan) => span.book)
       .map { bookSpans =>
         bookSpans.head.book.toString(spec) + " " + bookSpans.map(_.span.toString(spec)).mkString(", ")
       }.mkString("; ")
@@ -42,12 +40,12 @@ trait BookSpanCompanion {
       )
     }
 
-    def resolve: SpanType = {
+    def resolve: BookSpan = {
       require(book.isDefined)
       require(fromChapter.isDefined)
       require(fromVerse.isDefined)
 
-      val result = create(
+      val result = new BookSpan(
         book = getBook(book.get),
         span = Span(
           from = Verse(
@@ -66,7 +64,7 @@ trait BookSpanCompanion {
       result
     }
 
-    private def verify(result: SpanType): Unit =
+    private def verify(result: BookSpan): Unit =
       require(result.book.chapters.contains(result.span), s"Book ${result.book} doesn't contain span ${result.span}")
   }
 
@@ -78,22 +76,17 @@ trait BookSpanCompanion {
     toVerse = attributes.getInt("toVerse")
   )
 
-  protected def getBook(name: String): BookType
-
-  protected def create(book: BookType, span: Span): SpanType
+  protected def getBook(name: String): Book
 
   final class Numbered(
     override val n: Int,
-    val span: SpanType
+    val span: BookSpan
   ) extends WithNumber
 
   final def parseNumbered(attributes: Attributes, contextSpan: Parsed): Numbered = {
     val n: Int = attributes.doGetInt("n")
     val span: Parsed = parse(attributes)
     attributes.close()
-    new Numbered(
-      n = n,
-      span = span.inheritFrom(contextSpan).resolve
-    )
+    new Numbered(n, span = span.inheritFrom(contextSpan).resolve)
   }
 }

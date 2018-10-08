@@ -46,6 +46,8 @@ object Tanach extends NamedCompanion {
 
   val chumash: Seq[ChumashBook] = Seq(Genesis, Exodus, Leviticus, Numbers, Deuteronomy)
 
+  def getChumashForName(name: String): ChumashBook = getForName(name).asInstanceOf[ChumashBook]
+
   sealed trait NachBook extends TanachBook {
     final override def names: Names = toNames(this)
   }

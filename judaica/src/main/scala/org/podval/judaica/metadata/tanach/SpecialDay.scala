@@ -79,7 +79,7 @@ object SpecialDay extends NamedCompanion {
     names: Names,
     torah: Option[Elem],
     maftir: Option[Elem],
-    haftarah: Option[Custom.Of[Seq[ProphetSpan]]]
+    haftarah: Option[Custom.Of[Seq[ProphetSpan.BookSpan]]]
   )
 
   private object metadatas extends Holder[SpecialDay, SpecialDayMetadata] {
@@ -108,7 +108,7 @@ object SpecialDay extends NamedCompanion {
       )
     }
 
-    private def parseHaftarah(element: Elem): Custom.Of[Seq[ProphetSpan]] = {
+    private def parseHaftarah(element: Elem): Custom.Of[Seq[ProphetSpan.BookSpan]] = {
       val (attributes, elements) = XML.open(element, "haftarah")
       Haftarah.parse(attributes, elements)
     }
