@@ -1,17 +1,16 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.{LanguageSpec, Util}
+final case class ProphetSpan(
+  override val book: Tanach.ProphetsBook,
+  override val span: Span
+) extends BookSpan[Tanach.ProphetsBook](book, span)
 
-final case class ProphetSpan(book: Tanach.ProphetsBook, span: Span) {
-  override def toString: String = toString(LanguageSpec.empty)
+object ProphetSpan extends BookSpanCompanion {
+  override type BookType = Tanach.ProphetsBook
 
-  def toString(spec: LanguageSpec): String = book.toString(spec) + " " + span.toString(spec)
-}
+  override type SpanType = ProphetSpan
 
-object ProphetSpan {
-  def toString(spans: Seq[ProphetSpan], spec: LanguageSpec): String =
-    Util.group(spans, (span: ProphetSpan) => span.book)
-      .map { bookSpans =>
-        bookSpans.head.book.toString(spec) + " " + bookSpans.map(_.span.toString(spec)).mkString(", ")
-      }.mkString("; ")
+  override protected def getBook(name: String): Tanach.ProphetsBook = Tanach.getProhetForName(name)
+
+  override protected def create(book: Tanach.ProphetsBook, span: Span): ProphetSpan = ProphetSpan(book, span)
 }

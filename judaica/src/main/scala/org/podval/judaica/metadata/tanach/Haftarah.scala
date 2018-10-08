@@ -1,7 +1,6 @@
 package org.podval.judaica.metadata.tanach
 
 import org.podval.judaica.metadata.{Attributes, LanguageSpec, Metadata, XML}
-import org.podval.judaica.metadata.tanach.SpanParser.{NumberedProphetSpan, ProphetSpanParsed}
 
 import scala.xml.Elem
 
@@ -23,7 +22,7 @@ object Haftarah {
   ).mapValues { metadata => new Haftarah(parse(metadata.attributes, metadata.elements)) }
 
   def parse(attributes: Attributes, elements: Seq[Elem]): Custom.Of[Seq[ProphetSpan]] = {
-    val globalSpan = SpanParser.parseProphetSpan(attributes)
+    val globalSpan = ProphetSpan.parse(attributes)
     attributes.close()
 
     // TODO allow 'part' elements before 'custom' elements; treat them as 'Common'; clean up SpecialDay.xml.
@@ -36,11 +35,11 @@ object Haftarah {
     Custom.denormalize(result)
   }
 
-  private def parseCustom(element: Elem, weekSpan: ProphetSpanParsed): (Set[Custom], Seq[ProphetSpan]) = {
+  private def parseCustom(element: Elem, weekSpan: ProphetSpan.Parsed): (Set[Custom], Seq[ProphetSpan]) = {
     val (attributes, elements) = XML.open(element, "custom")
     val customs: Set[Custom] = Custom.parse(attributes.doGet("n"))
 
-    val customSpan = SpanParser.parseProphetSpan(attributes)
+    val customSpan = ProphetSpan.parse(attributes)
     attributes.close()
     val contextSpan = customSpan.inheritFrom(weekSpan)
 
@@ -53,9 +52,9 @@ object Haftarah {
     customs -> result
   }
 
-  private def parseParts(elements: Seq[Elem], contextSpan: ProphetSpanParsed): Seq[ProphetSpan] = {
-    val result: Seq[NumberedProphetSpan] = elements.map(element =>
-      SpanParser.parseNumberedProphetSpan(XML.openEmpty(element, "part"), contextSpan))
+  private def parseParts(elements: Seq[Elem], contextSpan: ProphetSpan.Parsed): Seq[ProphetSpan] = {
+    val result: Seq[ProphetSpan.Numbered] = elements.map(element =>
+      ProphetSpan.parseNumbered(XML.openEmpty(element, "part"), contextSpan))
     WithNumber.checkConsecutive(result, "part")
     result.map(_.span)
   }
