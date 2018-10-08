@@ -63,7 +63,7 @@ Mekorot
         </haftarah>
     </day>
 
-    <!-- TODO What are the rules for this? Only in Chabad? -->
+    <!-- TODO Added by Chabad and Fes (Marocco); @michaelko58 needs to add the rules :) -->
     <day n="Shabbos Rosh Chodesh Additional Haftorah">
         <haftarah book="Isaiah" fromChapter="66">
             <custom n="Common">
@@ -74,7 +74,7 @@ Mekorot
         </haftarah>
     </day>
 
-    <!-- TODO What are the rules for this? Only in Chabad? -->
+    <!-- TODO Added by Chabad and Fes (Marocco); @michaelko58 needs to add the rules :) -->
     <day n="Shabbos Erev Rosh Chodesh Additional Haftorah">
         <haftarah book="I Samuel" fromChapter="20">
             <custom n="Common">
@@ -328,8 +328,10 @@ n day of Sukkos
             </shabbos>
         </torah>
         <haftarah book="I Kings" fromChapter="8" fromVerse="54">
-            <custom n="Sefard" toChapter="8" toVerse="66"/>
-            <custom n="Ashkenaz Italki" toChapter="9" toVerse="1"/>
+            <!-- TODO Artscroll lists Ashkenaz custom ending at 9:1,
+             but @michaelko58 insists that Ashkenaz custom is the same as Sefard - to end at 8:66... -->
+            <custom n="Sefard Ashkenaz" toChapter="8" toVerse="66"/>
+            <custom n="Italki Chabad" toChapter="9" toVerse="1"/>
         </haftarah>
     </day>
 
@@ -351,9 +353,7 @@ n day of Sukkos
             <custom n="Ashkenaz Sefard Italki" fromChapter="1" fromVerse="1" toVerse="18"/>
             <custom n="Teiman">
                 <part n="1" fromChapter="1" fromVerse="1" toVerse="9"/>
-                <!-- TODO HWT IS THIS?! part 6, no from/to verse?
-                <part n="6" fromChapter="27"/>
-                -->
+                <part n="2" fromChapter="6" fromVerse="27"/>
             </custom>
         </haftarah>
     </day>

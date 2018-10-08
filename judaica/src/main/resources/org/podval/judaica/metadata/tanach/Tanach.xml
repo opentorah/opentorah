@@ -440,6 +440,10 @@
     <book>
         <name lang="en" n="Nahum"/>
         <name lang="he" n="נחום"/>
+
+        <chapter n="1" length="14"/>
+        <chapter n="2" length="14"/>
+        <chapter n="3" length="19"/>
     </book>
     <book>
         <name lang="en" n="Habakkuk"/>
@@ -452,6 +456,10 @@
     <book>
         <name lang="en" n="Zephaniah"/>
         <name lang="he" n="צפניה"/>
+
+        <chapter n="1" length="18"/>
+        <chapter n="2" length="15"/>
+        <chapter n="3" length="20"/>
     </book>
     <book>
         <name lang="en" n="Haggai"/>

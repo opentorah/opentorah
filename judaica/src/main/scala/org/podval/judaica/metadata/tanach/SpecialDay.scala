@@ -17,7 +17,7 @@ object SpecialDay extends NamedCompanion {
   case object ShabbosRoshChodeshAdditionalHaftorah extends SpecialDay("Shabbos Rosh Chodesh Additional Haftorah")
   case object ShabbosErevRoshChodeshAdditionalHaftorah extends SpecialDay("Shabbos Erev Rosh Chodesh Additional Haftorah")
   case object PublicFast extends SpecialDay("Public Fast")
-  case object TishaBav extends SpecialDay("Tisha Bav")
+  case object TishaBeAv extends SpecialDay("Tisha Bav")
   case object ShabbosCholHamoedTorah extends SpecialDay("Shabbos Chol Hamoed Torah")
   case object RoshHashanahMaftir extends SpecialDay("Rosh Hashanah Maftir")
   case object RoshHashanah1 extends SpecialDay("Rosh Hashanah 1")
@@ -61,7 +61,7 @@ object SpecialDay extends NamedCompanion {
   override val values: Seq[SpecialDay] = Seq(
     ShabbosErevRoshChodesh, ShabbosErevRoshChodeshAdditionalHaftorah,
     RoshChodesh, ShabbosRoshChodeshAdditionalHaftorah,
-    PublicFast, TishaBav, ShabbosCholHamoedTorah,
+    PublicFast, TishaBeAv, ShabbosCholHamoedTorah,
     RoshHashanahMaftir, RoshHashanah1, RoshHashanah2, YomKippurShacharis, YomKippurMincha,
     SuccosMaftir, Succos1_2, Succos1, Succos2, SuccosKorbanot, SuccosShabbosCholHamoedHaftarah,
     SheminiAtzeresMaftir, SheminiAtzeres, SimchasTorah,

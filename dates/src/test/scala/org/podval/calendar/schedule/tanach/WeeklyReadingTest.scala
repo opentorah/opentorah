@@ -38,7 +38,7 @@ class WeeklyReadingTest extends FlatSpec with Matchers {
     Set[Parsha](Bemidbar, Nasso).contains(readingsBeforeShavuot.parsha) shouldBe true
 
     // Tisha Be Av
-    findReadings(shabbosAfter(TishaBav(year))) shouldBe WeeklyReading(Va_eschanan, None)
+    findReadings(shabbosAfter(TishaBeAv(year))) shouldBe WeeklyReading(Va_eschanan, None)
 
     // Rosh Ha Shanah
     findReadings(shabbosBefore(RoshHashanah(year+1))).parsha shouldBe Nitzavim

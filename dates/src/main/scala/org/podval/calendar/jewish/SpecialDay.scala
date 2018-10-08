@@ -167,7 +167,7 @@ object SpecialDay {
   // also, when Av Harachamim is not said on Shabbos (by the way, when Tisha Bav is on Shabbos, it *is* said,
   // although we wouldn't have said Tachanun if it wasn't Shabbos...) - but shouldn't postponed fast
   // (or advanced Purim) leave some trace?
-  case object TishaBav extends SpecialDayBase(Av, 9) with Fast {
+  case object TishaBeAv extends SpecialDayBase(Av, 9) with Fast {
     override def corrected(year: Year): Day = {
       val result = apply(year)
       if (result.isShabbos) result+1 else result
@@ -204,7 +204,7 @@ object SpecialDay {
   def festivals(inHolyLand: Boolean): Set[SpecialDay] = if (inHolyLand) festivalsInHolyLand else festivals
 
   // TODO use corrected() istead of apply() for Torah readings; double-check Purim.
-  val fasts: Set[SpecialDay] = Set(FastOfGedalia, FastOfTeves, FastOfEster, FastOfTammuz, TishaBav)
+  val fasts: Set[SpecialDay] = Set(FastOfGedalia, FastOfTeves, FastOfEster, FastOfTammuz, TishaBeAv)
 
   val rabbinicFestivals: Set[SpecialDay] = Set(
     Chanukah1, Chanukah2, Chanukah3, Chanukah4, Chanukah5, Chanukah6, Chanukah7, Chanukah8,
