@@ -5,7 +5,7 @@ import org.podval.judaica.metadata.{Attributes, LanguageSpec, Metadata, XML}
 
 import scala.xml.Elem
 
-final class Haftarah(val customs: Custom.Of[Seq[ProphetSpan.BookSpan]]) {
+final case class Haftarah(customs: Custom.Of[Seq[ProphetSpan.BookSpan]]) {
   override def toString: String = toString(LanguageSpec.empty)
 
   def toString(spec: LanguageSpec): String = {
@@ -20,9 +20,9 @@ object Haftarah {
     keys = Parsha.values,
     obj = Haftarah.this,
     elementName = "week"
-  ).mapValues { metadata => new Haftarah(parse(metadata.attributes, metadata.elements)) }
+  ).mapValues { metadata => parse(metadata.attributes, metadata.elements) }
 
-  def parse(attributes: Attributes, elements: Seq[Elem]): Custom.Of[Seq[ProphetSpan.BookSpan]] = {
+  def parse(attributes: Attributes, elements: Seq[Elem]): Haftarah = {
     val globalSpan = ProphetSpan.parse(attributes)
     attributes.close()
 
@@ -33,7 +33,7 @@ object Haftarah {
       if (customElements.isEmpty) Map(Set[Custom](Custom.Common) -> Seq(globalSpan.resolve))
       else customElements.map(element => parseCustom(element, globalSpan)).toMap
 
-    Custom.denormalize(result)
+    new Haftarah(Custom.denormalize(result))
   }
 
   private def parseCustom(element: Elem, weekSpan: ProphetSpan.Parsed): (Set[Custom], Seq[ProphetSpan.BookSpan]) = {

@@ -1,19 +1,10 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.{Attributes, XML}
+import org.podval.judaica.metadata.Attributes
 
-import scala.xml.Elem
-
-final class NumberedSpan(override val n: Int, val span: Span.Parsed) extends WithNumber
+final case class NumberedSpan(override val n: Int, span: Span.Parsed) extends WithNumber
 
 object NumberedSpan {
-  def parse(element: Elem, name: String): NumberedSpan = {
-    val attributes = XML.openEmpty(element, name)
-    val result = parse(attributes)
-    attributes.close()
-    result
-  }
-
   def parse(attributes: Attributes): NumberedSpan = new NumberedSpan(
     n = attributes.doGetInt("n"),
     span = Span.parse(attributes)
@@ -50,7 +41,7 @@ object NumberedSpan {
 
   def overlaySpans(base: Seq[NumberedSpan], differences: Seq[NumberedSpan]): Seq[NumberedSpan] = {
     val result: Array[NumberedSpan] = base.toArray
-    differences.foreach(span => result(span.n-1) = span)
+    differences.foreach(span => result(span.n - 1) = span)
     result.toSeq
   }
 }

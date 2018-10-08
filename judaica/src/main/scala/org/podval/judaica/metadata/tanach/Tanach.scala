@@ -173,8 +173,8 @@ object Tanach extends NamedCompanion {
           span = span,
           days = byCustom(days),
           daysCombined = byCustom(daysCombined),
-          aliyot = aliyahElements.map(element => NumberedSpan.parse(element, "aliyah")),
-          maftir = Span.parse(maftirElements.head, "maftir")
+          aliyot = aliyahElements.map(element => XML.parseEmpty(element, "aliyah", NumberedSpan.parse)),
+          maftir = XML.parseEmpty(maftirElements.head, "maftir", Span.parse)
         )
       }
 
@@ -249,6 +249,7 @@ object Tanach extends NamedCompanion {
 
     case (parsha, days) :: Nil =>
       require(!parsha.combines)
+      // TODO require(days.isEmpty, s"Not empty: $days")
       Seq(Map.empty)
 
     case Nil => Nil

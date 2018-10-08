@@ -22,6 +22,69 @@ final case class Span(from: Verse, to: Verse) {
 }
 
 object Span {
+
+  final case class Raw(
+    fromChapter: Option[Int],
+    fromVerse: Option[Int],
+    toChapter: Option[Int],
+    toVerse: Option[Int]
+  ) {
+    def inheritFrom(ancestor: Raw): Raw = {
+      require(this.fromChapter.isEmpty || ancestor.fromChapter.isEmpty)
+      require(this.fromVerse.isEmpty || ancestor.fromVerse.isEmpty)
+      require(this.toChapter.isEmpty || ancestor.toChapter.isEmpty)
+      require(this.toVerse.isEmpty || ancestor.toVerse.isEmpty)
+
+      Raw(
+        fromChapter = this.fromChapter.orElse(ancestor.fromChapter),
+        fromVerse = this.fromVerse.orElse(ancestor.fromVerse),
+        toChapter = this.toChapter.orElse(ancestor.toChapter),
+        toVerse = this.toVerse.orElse(ancestor.toVerse)
+      )
+    }
+
+    def parse: Parsed = {
+      val from = resolveFrom
+
+      require(toVerse.nonEmpty || toChapter.isEmpty)
+
+      val to = if (toVerse.isEmpty) None else Some(Verse(
+        chapter = toChapter.getOrElse(from.chapter),
+        verse = toVerse.get
+      ))
+
+      new Parsed(from, to)
+    }
+
+    def resolve: Span = {
+      val from = resolveFrom
+
+      val to = Verse(
+        chapter = toChapter.getOrElse(fromChapter.get),
+        verse = toVerse.getOrElse(fromVerse.get)
+      )
+
+      Span(from, to)
+    }
+
+    private def resolveFrom: Verse = {
+      require(fromChapter.isDefined)
+      require(fromVerse.isDefined)
+
+      Verse(
+        fromChapter.get,
+        fromVerse.get
+      )
+    }
+  }
+
+  final def parseRaw(attributes: Attributes): Raw = Raw(
+    fromChapter = attributes.getInt("fromChapter"),
+    fromVerse = attributes.getInt("fromVerse"),
+    toChapter = attributes.getInt("toChapter"),
+    toVerse = attributes.getInt("toVerse")
+  )
+
   final class Parsed(val from: Verse, val to: Option[Verse]) {
     def setTo(value: Verse): Span = {
       require(to.isEmpty || to.contains(value), "Wrong explicit 'to'")
@@ -29,30 +92,7 @@ object Span {
     }
   }
 
-  def parse(element: Elem, name: String): Parsed = {
-    val attributes = XML.openEmpty(element, name)
-    val result = parse(attributes)
-    attributes.close()
-    result
-  }
-
-  def parse(attributes: Attributes): Parsed = {
-    val from = parseFrom(attributes)
-    val toChapter = attributes.getInt("toChapter")
-    val toVerse = attributes.getInt("toVerse")
-    val to = if (toVerse.isEmpty) {
-      require(toChapter.isEmpty)
-      None
-    } else {
-      Some(Verse(toChapter.getOrElse(from.chapter), toVerse.get))
-    }
-    new Parsed(from, to)
-  }
-
-  private def parseFrom(attributes: Attributes): Verse = Verse(
-    attributes.doGetInt("fromChapter"),
-    attributes.doGetInt("fromVerse")
-  )
+  def parse(attributes: Attributes): Parsed = parseRaw(attributes).parse
 
   def setImpliedTo(
     spans: Seq[Parsed],
@@ -60,7 +100,7 @@ object Span {
     chapters: Chapters
   ): Seq[Span] = {
     val tos: Seq[Verse] = spans.tail.map(_.from).map(chapters.prev(_).get) :+ span.to
-    val result = spans.zip(tos).map { case (span, to) => span.setTo(to) }
+    val result = spans.zip(tos).map { case (s, to) => s.setTo(to) }
     require(chapters.cover(result, span))
 
     result
