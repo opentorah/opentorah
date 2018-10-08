@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.{Calendar, DayCompanion}
-import org.podval.judaica.metadata.NamesLoader
+import org.podval.judaica.metadata.{NamedCompanion, Named, Names}
 
 abstract class JewishDayCompanion extends DayCompanion[Jewish] {
   final override val Name: JewishDayCompanion.type = JewishDayCompanion
@@ -11,8 +11,10 @@ abstract class JewishDayCompanion extends DayCompanion[Jewish] {
   final override val firstDayNumberInWeek: Int = Calendar.firstDayNumberInWeekJewish
 }
 
-object JewishDayCompanion extends NamesLoader {
-  sealed trait Key extends KeyBase
+object JewishDayCompanion extends NamedCompanion {
+  sealed trait Key extends Named {
+    final override def names: Names = toNames(this)
+  }
 
   case object Rishon extends Key
   case object Sheni extends Key
@@ -24,5 +26,5 @@ object JewishDayCompanion extends NamesLoader {
 
   override val values: Seq[Key] = Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi, Shabbos)
 
-  override def resourceName: String = "JewishDay"
+  protected override def resourceName: String = "JewishDay"
 }

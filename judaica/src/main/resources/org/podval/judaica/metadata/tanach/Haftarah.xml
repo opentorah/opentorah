@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Each Haftarah is described by the <week> element,
+  with attribute 'n' giving the name of the Parsha.
+
+  Within the <week> element are nested one or more <custom> elements,
+  with attribute 'n' giving the name of the custom ("Ashkenaz")
+  or a space-separated list of such names ("Sefard Chabad").
+  A custom can only be listed once.
+
+  Within the <custom> element are nested one or more <part> elements,
+  with attribute 'n' is a sequence number, starting from 1.
+
+  Following attributes of the <part> element describe the text fragment:
+  - 'book' is the name of the book of Nach;
+  - 'fromChapter' and 'fromVerse' identify the starting point of the fragment;
+  - 'toChapter' and 'toVerse' identify the ending point of the fragment.
+  When 'toChapter' is absent, it is assumed to be the same as 'fromChapter'.
+
+  Attributes are inherited from the enclosing element;
+  'book', 'fromChapter', 'fromVerse', 'toChapter', 'toVerse' attributes
+  declared on the <week> element apply to all nested <custom> elements;
+  declared on the <custom> element apply to all nested <part> elements.
+
+  - <custom> element that doesn't declare the 'n' attribute describes a universal custom;
+  - <custom> element that doesn't declare any attributes can be omitted;
+  - <part n="1"> element that doesn't declare any attributes can be omitted.
+
+  When not specified explicitly, custom follows its parent custom as described in Custom.scala.
+-->
+<metadata type="Haftarah">
+    <week n="Bereishis" book="Isaiah" fromChapter="42">
+        <custom n="Ashkenaz" fromVerse="5" toChapter="43" toVerse="10"/>
+        <custom n="Sefard Frankfurt" fromVerse="5" toChapter="42" toVerse="21"/>
+        <custom n="Teiman" fromVerse="1" toChapter="42" toVerse="16"/>
+        <custom n="Italki" fromVerse="1" toChapter="42" toVerse="21"/>
+    </week>
+    <week n="Noach" book="Isaiah" fromChapter="54" fromVerse="1">
+        <custom n="Ashkenaz Magreb Shami" toChapter="55" toVerse="5"/>
+        <custom n="Sefard Frankfurt" toChapter="54" toVerse="10"/>
+        <custom n="Teiman" toChapter="55" toVerse="3"/>
+    </week>
+    <week n="Lech Lecha" book="Isaiah" fromChapter="40">
+        <custom n="Ashkenaz Sefard" fromVerse="27" toChapter="41" toVerse="16"/> 
+        <custom n="Teiman Italki" fromVerse="25" toChapter="41" toVerse="17"/>
+    </week>
+    <week n="Vayeira" book="II Kings" fromChapter="4" fromVerse="1">
+        <custom n="Ashkenaz Chabad Algeria" toVerse="37"/>
+        <custom n="Sefard" toVerse="23"/>
+    </week>
+    <week n="Chayei Sarah" book="I Kings" fromChapter="1" fromVerse="1">
+        <custom n="Ashkenaz Sefard" toVerse="31"/>
+        <custom n="Italki" toVerse="34"/>
+    </week>
+    <week n="Toldos" book="Malachi" fromChapter="1" fromVerse="1">
+        <custom n="Ashkenaz Sefard" toChapter="2" toVerse="7"/>
+        <custom n="Teiman" toChapter="3" toVerse="4"/>
+    </week>
+    <week n="Vayeitzei" >
+        <custom n="Ashkenaz" book="Hosea" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
+        <custom n="Lita">
+          <part n="1" book="Hosea" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
+          <part n="2" book="Joel" fromChapter="2" fromVerse="26" toVerse="27"/>
+        </custom>
+        <custom n="Sefard" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="12"/>
+        <custom n="Magreb" book="Hosea" fromChapter="11" fromVerse="7" toChapter="13" toVerse="5"/> 
+        <custom n="Chabad Teiman Italki Djerba" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="14"/>
+    </week>
+    <week n="Vayishlach">
+       <custom n="Ashkenaz Sefard" book="Obadiah" fromChapter="1" fromVerse="1" toVerse="21"/>
+       <custom n="Lita" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="12"/>
+       <custom n="Hayey_odom" book="Hosea" fromChapter="11" fromVerse="7" toChapter="13" toVerse="4"/>
+    </week>
+    <week n="Vayeishev" book="Amos" fromChapter="2" fromVerse="6" toChapter="3" toVerse="8"/> <!-- On Chanuka - Chanukah I -->
+    <week n="Mikeitz" book="I Kings" fromChapter="3" fromVerse="15" toChapter="4" toVerse="1"/> <!-- On Chanuka - Chanukah I or II -->
+    <week n="Vayigash" book="Ezekiel" fromChapter="37" fromVerse="15" toVerse="28"/>
+    <week n="Vayechi" book="I Kings" fromChapter="2" fromVerse="1" toVerse="12"/>
+
+    <week n="Shemos">
+        <custom n="Ashkenaz Chabad" book="Isaiah">
+            <part n="1" fromChapter="27" fromVerse="6" toChapter="28" toVerse="13"/>
+            <part n="2" fromChapter="29" fromVerse="22" toVerse="23"/>
+        </custom>
+        <custom n="Sefard" book="Jeremiah" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/> <!-- Matos -->
+        <custom n="Italki" book="Jeremiah" fromChapter="1" fromVerse="1" toVerse="19"/>
+        <custom n="Teiman Bavlim Magreb" book="Ezekiel" fromChapter="16" fromVerse="1" toVerse="14"/>
+    </week>
+    <week n="Va'eira" book="Ezekiel" fromChapter="28">
+        <custom n="Ashkenaz Sefard" fromVerse="25" toChapter="29" toVerse="21"/>
+        <custom n="Teiman" fromVerse="24" toChapter="29" toVerse="21"/>
+    </week>
+    <week n="Bo">
+        <custom n="Ashkenaz Sefard" book="Jeremiah" fromChapter="46" fromVerse="13" toVerse="28"/>
+        <custom n="Teiman Magreb" book="Isaiah" fromChapter="19" fromVerse="1" toVerse="25"/>
+        <custom n="Italki Bavlim" book="Isaiah" fromChapter="18" fromVerse="7" toChapter="19" toVerse="25"/>
+    </week>
+    <week n="Beshalach" book="Judges">
+        <custom n="Ashkenaz Chabad" fromChapter="4" fromVerse="4" toChapter="5" toVerse="31"/>
+        <custom n="Italki" fromChapter="4" fromVerse="4" toChapter="5" toVerse="3"/>
+        <custom n="Sefard" fromChapter="5" fromVerse="1" toVerse="31"/>
+        <custom n="Teiman" fromChapter="4" fromVerse="23" toChapter="5" toVerse="31"/>
+    </week>
+    <week n="Yisro" book="Isaiah">
+        <custom n="Ashkenaz Italki">
+            <part n="1" fromChapter="6" fromVerse="1" toChapter="7" toVerse="6"/>
+            <part n="2" fromChapter="9" fromVerse="5" toVerse="6"/>
+        </custom>
+        <custom n="Algeria" fromChapter="6" fromVerse="1" toChapter="7" toVerse="6"/>
+        <custom n="Sefard" fromChapter="6" fromVerse="1" toVerse="13"/>
+        <custom n="Teiman">
+            <part n="1" fromChapter="6" fromVerse="1" toVerse="13"/>
+            <part n="2" fromChapter="9" fromVerse="5" toVerse="6"/>
+        </custom>
+    </week>
+    <week n="Mishpatim" book="Jeremiah">
+        <custom n="Ashkenaz Sefard">
+          <part n="1" fromChapter="34" fromVerse="8" toVerse="22"/>
+          <part n="2" fromChapter="33" fromVerse="25" toVerse="26"/>
+        </custom> 
+        <custom n="Teiman" fromChapter="34" fromVerse="8" toChapter="35" toVerse="19"/>
+        <custom n="Italki" fromChapter="34" fromVerse="8" toChapter="35" toVerse="11"/>
+    </week>
+    <week n="Terumah" book="I Kings" fromChapter="5" fromVerse="26" toChapter="6" toVerse="13"/>
+    <week n="Tetzaveh" book="Ezekiel" fromChapter="43" fromVerse="10" toVerse="27"/>
+    <week n="Ki Sisa" book="I Kings" fromChapter="18">
+        <custom n="Ashkenaz Chabad" fromVerse="1" toVerse="39"/>
+        <custom n="Sefard Italki" fromVerse="20" toVerse="39"/>
+        <custom n="Teiman" fromVerse="1" toVerse="45"/>
+    </week>
+    <week n="Vayakhel" book="I Kings" fromChapter="7">
+        <custom n="Ashkenaz" fromVerse="40" toVerse="50"/> <!-- Chanukkah II -->
+        <custom n="Sefard Italki" fromVerse="13" toVerse="26"/>
+        <custom n="Teiman" fromVerse="13" toVerse="22"/>
+    </week>
+    <week n="Pekudei" book="I Kings" fromChapter="7">
+        <custom n="Ashkenaz Chabad" fromVerse="51" toChapter="8" toVerse="21"/>
+        <custom n="Italki" fromVerse="40" toVerse="51"/>
+        <custom n="Sefard" fromVerse="40" toVerse="50"/> <!-- Chanukkah II -->
+    </week>
+
+    <week n="Vayikra" book="Isaiah" >
+        <custom n="Ashkenaz Sefard"  fromChapter="43" fromVerse="21" toChapter="44"  toVerse="23"/>
+        <custom n="Italki Teiman Magreb" fromChapter="43" fromVerse="21" toChapter="44" toVerse="6"/> 
+        <custom n="Toshbim">
+            <part n="1" fromChapter="43" fromVerse="21"  toChapter="44" toVerse="6"/>
+            <part n="2" fromChapter="44" fromVerse="21" toVerse="23"/>
+        </custom> 
+    </week>
+    <week n="Tzav" book="Jeremiah">
+        <custom n="Ashkenaz Sefard">
+            <part n="1" fromChapter="7" fromVerse="21" toChapter="8" toVerse="3"/>
+            <part n="2" fromChapter="9" fromVerse="22" toVerse="23"/>
+        </custom>
+        <custom n="Chabad Teiman Toshbim">
+            <part n="1" fromChapter="7" fromVerse="21"  toVerse="28"/>
+            <part n="2" fromChapter="9" fromVerse="22" toVerse="23"/>
+        </custom>
+        <custom n="Italki">
+            <part n="1" fromChapter="7" fromVerse="21"  toVerse="28"/>
+            <part n="2" fromChapter="10" fromVerse="6" toVerse="7"/>
+        </custom>
+    </week>
+    <week n="Shemini" book="II Samuel" fromChapter="6" fromVerse="1">
+        <custom n="Ashkenaz" toChapter="7" toVerse="17"/>
+        <custom n="Sefard" toChapter="6" toVerse="19"/>
+        <custom n="Teiman Italki" toChapter="7" toVerse="3"/>
+    </week>
+    <week n="Tazria" book="II Kings" fromChapter="4" fromVerse="42" toChapter="5" toVerse="19"/>
+    <week n="Metzora" book="II Kings">
+        <custom n="Ashkenaz Sefard" fromChapter="7" fromVerse="3" toVerse="20"  />
+        <custom n="Teiman Italki">
+            <part n="1" fromChapter="7" fromVerse="1" toVerse="20"/>
+            <part n="2" fromChapter="13" fromVerse="23"/>
+        </custom>
+    </week>
+    <week n="Acharei">
+        <custom n="Ashkenaz Chabad" book="Amos" fromChapter="9" fromVerse="7" toVerse="15"/>
+        <custom n="Sefard Italki" book="Ezekiel" fromChapter="22" fromVerse="1" toVerse="16"/> <!-- = Kedoshim:Ashkenaz -->
+    </week>
+    <week n="Kedoshim" book="Ezekiel">
+        <custom n="Ashkenaz Lita" fromChapter="22" fromVerse="1" toVerse="16"/> <!-- Lita: Ahkenaz when Acharei - rosh hodesh Iyar -->
+        <custom n="Sefard" fromChapter="20" fromVerse="2" toVerse="20"/>  <!-- this one when Acharei & Kedoshim combine -->
+        <custom n="Italki Teiman" fromChapter="20" fromVerse="1" toVerse="20"/>
+        <custom n="Baladi" fromChapter="20" fromVerse="1" toVerse="15"/>
+    </week>
+    <week n="Emor" book="Ezekiel" fromChapter="44" fromVerse="15" toVerse="31"/>
+    <week n="Behar" book="Jeremiah" >
+        <custom n="Ashkenaz Sefard" fromChapter="32" fromVerse="6" toVerse="27"/>
+        <custom n="Chabad" fromChapter="32" fromVerse="6" toVerse="22"/>
+        <custom n="Italki Teiman" fromChapter="16" fromVerse="19" toChapter="17" toVerse="14"/>
+    </week>
+    <week n="Bechukosai">
+        <custom n="Ashkenaz Sefard" book="Jeremiah" fromChapter="16" fromVerse="19" toChapter="17" toVerse="14"/>
+        <custom n="Teiman" book="Ezekiel" fromChapter="34" fromVerse="1" toVerse="27"/>
+        <custom n="Italki" book="Ezekiel" fromChapter="34" fromVerse="1" toVerse="15"/>  
+    </week>
+    <week n="Bemidbar" book="Hosea" fromChapter="2" fromVerse="1" toVerse="22"/>
+    <week n="Nasso" book="Judges" fromChapter="13" fromVerse="2">
+        <custom n="Teiman" toVerse="24"/>
+        <custom n="Ashkenaz Sefard" toVerse="25"/> 
+    </week>
+    <week n="Beha'aloscha" book="Zechariah" fromChapter="2" fromVerse="14" toChapter="4">
+        <custom n="Teiman" toVerse="9"/>
+        <custom n="Toshbim" toVerse="10"/>
+        <custom n="Ashkenaz Sefard" toVerse="7"/>  <!-- On Chanuka - Chanukah I -->
+    </week>
+    <week n="Shelach" book="Joshua" fromChapter="2" fromVerse="1" toVerse="24"/>
+    <week n="Korach" book="I Samuel" fromChapter="11" fromVerse="14" toChapter="12" toVerse="22"/>
+    <week n="Chukas" book="Judges" fromChapter="11" fromVerse="1">
+        <custom n="Teiman" toVerse="40"/>
+        <custom n="Ashkenaz Sefard" toVerse="33"/> 
+    </week>
+    <week n="Balak" book="Micah" fromChapter="5" fromVerse="6" toChapter="6" toVerse="8"/>
+    <week n="Pinchas" book="I Kings" fromChapter="18" fromVerse="46" toChapter="19" toVerse="21"/> <!-- In 3 weeks - Matos -->
+    <week n="Mattos">
+         <custom n="Italki" book="Joshua" fromChapter="13" fromVerse="15" toVerse="33"/>
+         <custom n="Ashkenaz Sefard" book="Jeremiah" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/> 
+         <custom n="Teiman" book="Jeremiah" fromChapter="1" fromVerse="1" toChapter="1" toVerse="19"/>
+    </week>
+    <week n="Masei" >  <!-- even on Shabbos Rosh Chodesh -->
+        <custom n="Ashkenaz" book="Jeremiah">
+            <part n="1" fromChapter="2" fromVerse="4" toVerse="28"/>
+            <part n="2" fromChapter="3" fromVerse="4" toVerse="4"/>
+        </custom>
+        <custom n="Sefard Shami" book="Jeremiah">
+            <part n="1" fromChapter="2" fromVerse="4" toVerse="28"/>
+            <part n="2" fromChapter="4" fromVerse="1" toVerse="2"/>
+        </custom>
+        <custom n="Italki" book="Joshua" fromChapter="19" fromVerse="21" toChapter="21" toVerse="3"/>
+        <custom n="Teiman" book="Isaiah" fromChapter="1" fromVerse="1" toChapter="1" toVerse="20"/>
+        <!-- TODO on Rosh Chodesh Av: Isaia 66:1, 23-24, 23 -->
+    </week>
+
+    <week n="Devarim" book="Isaiah" fromChapter="1">
+          <custom n="Sefard Ashkenaz Shami" fromVerse="1" toVerse="27"/>
+          <custom n="Teiman" fromVerse="21" toVerse="31"/>
+    </week>
+    <week n="Va'eschanan" book="Isaiah">
+          <custom n="Sefard Ashkenaz" fromChapter="40" fromVerse="1" toVerse="26"/>
+          <custom n="Italki" fromChapter="40" fromVerse="1" toVerse="16"/>
+          <custom n="Teiman">
+              <part n="1" fromChapter="40" fromVerse="1" toVerse="27"/>
+              <part n="2" fromChapter="41" fromVerse="17"/>
+          </custom>
+    </week>
+    <week n="Eikev" book="Isaiah" fromChapter="49" fromVerse="14" toChapter="51" toVerse="3"/>
+    <week n="Re'eh" book="Isaiah" fromChapter="54" fromVerse="11" toChapter="55" toVerse="5">
+      <!--RULE If rosh chodeh Chabad: aftara rosh chodesh -->
+        <!-- If Sunday is Rosh Chodesh, Chabad: Samuel I 20:18,42 -->
+    </week>
+    <week n="Shoftim">
+          <custom n="Sefard Ashkenaz" book="Isaiah" fromChapter="51" fromVerse="12" toChapter="52" toVerse="12"/>
+          <custom n="Italki" book="I Samuel" fromChapter="17" fromVerse="1" toVerse="37"/>
+    </week>
+    <week n="Ki Seitzei">
+          <custom n="Sefard Ashkenaz" book="Isaiah" fromChapter="54" fromVerse="1" toVerse="10"/>
+          <custom n="Italki" book="I Samuel" fromChapter="8" fromVerse="1" toVerse="22"/>
+        <!-- = Noach; TODO on 14th of Elul, Chabad: ...-->
+       <!--RULE If shabos Reeh rosh chodesh - Chabad - book="Isaiah" fromChapter="54" fromVerse="1" toChapter="55" toVerse="5" -->
+    </week>
+    <week n="Ki Savo">
+          <custom n="Sefard Ashkenaz" book="Isaiah" fromChapter="60" fromVerse="1" toVerse="22"/>
+          <custom n="Italki" book="Joshua" fromChapter="8" fromVerse="30" toChapter="9" toVerse="27"/>
+    </week>
+    <week n="Nitzavim">
+          <custom n="Sefard Ashkenaz" book="Isaiah" fromChapter="61" fromVerse="10" toChapter="63" toVerse="9"/>
+          <custom n="Italki" book="Joshua" fromChapter="24" fromVerse="1"  toVerse="18"/>
+          <custom n="Teiman" book="Isaiah" fromChapter="61" fromVerse="9" toChapter="63" toVerse="9"/>
+    </week>
+    <week n="Vayeilech"> <!-- = Shabbos Shuvah -->
+        <custom n="Ashkenaz">
+          <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
+          <part n="2" book="Joel" fromChapter="2" fromVerse="11" toVerse="27"/>
+        </custom>
+        <custom n="Sefard">
+            <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
+            <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
+        </custom>
+        <custom n="Italki" book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56" toVerse="8"/>
+        <custom n="Teiman" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
+    </week>
+    <week n="Haazinu">
+          <custom n="Sefard Ashkenaz" book="II Samuel" fromChapter="22" fromVerse="1" toVerse="51"/> 
+          <custom n="Italki Teiman" book="Ezekiel" fromChapter="17" fromVerse="22" toChapter="18" toVerse="32"/>         
+    </week>
+    <week n="Vezos Haberachah" book="Joshua" > <!-- = Simchas Torah -->
+        <custom n="Ashkenaz Chabad Italki" fromChapter="1" fromVerse="1" toVerse="18"/>
+        <custom n="Sefard" fromChapter="1" fromVerse="1" toVerse="9"/>
+        <custom n="Teiman">
+            <part n="1" fromChapter="1" fromVerse="1" toVerse="9"/>
+            <part n="2" fromChapter="6" fromVerse="27"/>
+        </custom>
+    </week>
+</metadata>
