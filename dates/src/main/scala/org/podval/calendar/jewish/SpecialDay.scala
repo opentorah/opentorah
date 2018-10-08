@@ -52,7 +52,6 @@ object SpecialDay {
     final override def isRabbinicFestival: Boolean = true
   }
 
-
   case object RoshHashanah extends SpecialDayBase(Tishrei, 1) with Festival
   case object RoshHashanah2 extends SpecialDayBase(Tishrei, 2) with Festival
 

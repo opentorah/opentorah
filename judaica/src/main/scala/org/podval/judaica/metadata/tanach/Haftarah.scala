@@ -1,6 +1,6 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.{LanguageSpec, Metadata, XML}
+import org.podval.judaica.metadata.{Attributes, LanguageSpec, Metadata, XML}
 import org.podval.judaica.metadata.tanach.SpanParser.{NumberedProphetSpan, ProphetSpanParsed}
 
 import scala.xml.Elem
@@ -18,21 +18,22 @@ final class Haftarah(val customs: Custom.Of[Seq[ProphetSpan]]) {
 object Haftarah {
   lazy val haftarah: Map[Parsha, Haftarah] = Metadata.loadMetadata(
     keys = Parsha.values,
-    obj = this,
-    resourceName = "Haftarah",
-    rootElementName = "metadata",
+    obj = Haftarah.this,
     elementName = "week"
-  ).mapValues { metadata =>
-    val weekSpan = SpanParser.parseProphetSpan(metadata.attributes)
-    metadata.attributes.close()
+  ).mapValues { metadata => new Haftarah(parse(metadata.attributes, metadata.elements)) }
 
-    val customElements = XML.span(metadata.elements, "custom")
+  def parse(attributes: Attributes, elements: Seq[Elem]): Custom.Of[Seq[ProphetSpan]] = {
+    val globalSpan = SpanParser.parseProphetSpan(attributes)
+    attributes.close()
+
+    // TODO allow 'part' elements before 'custom' elements; treat them as 'Common'; clean up SpecialDay.xml.
+    val customElements = XML.span(elements, "custom")
 
     val result: Map[Set[Custom], Seq[ProphetSpan]] =
-      if (customElements.isEmpty) Map(Set[Custom](Custom.Common) -> Seq(weekSpan.resolve))
-      else customElements.map(element => parseCustom(element, weekSpan)).toMap
+      if (customElements.isEmpty) Map(Set[Custom](Custom.Common) -> Seq(globalSpan.resolve))
+      else customElements.map(element => parseCustom(element, globalSpan)).toMap
 
-    new Haftarah(Custom.denormalize(result))
+    Custom.denormalize(result)
   }
 
   private def parseCustom(element: Elem, weekSpan: ProphetSpanParsed): (Set[Custom], Seq[ProphetSpan]) = {

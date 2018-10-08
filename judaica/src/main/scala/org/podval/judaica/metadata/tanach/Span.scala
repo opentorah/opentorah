@@ -3,7 +3,7 @@ package org.podval.judaica.metadata.tanach
 import org.podval.judaica.metadata.LanguageSpec
 
 final case class Span(from: Verse, to: Verse) {
-  require(from <= to)
+  require(from <= to, s"Empty span: $from..$to")
 
   def contains(verse: Verse): Boolean = (from <= verse) && (verse <= to)
 

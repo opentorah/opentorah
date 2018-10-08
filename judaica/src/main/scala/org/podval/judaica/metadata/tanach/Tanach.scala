@@ -123,9 +123,7 @@ object Tanach extends NamedCompanion {
   private object metadatas extends Holder[TanachBook, TanachMetadata] {
     protected override def load: Map[TanachBook, TanachMetadata] = Metadata.loadMetadata(
       keys = values,
-      obj = this,
-      resourceName = "Tanach",
-      rootElementName = "metadata",
+      obj = Tanach.this,
       elementName = "book"
     ).map { case (book, metadata) =>
       metadata.attributes.close()
