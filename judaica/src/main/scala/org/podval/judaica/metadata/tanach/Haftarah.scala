@@ -26,23 +26,30 @@ object Haftarah {
     val globalSpan = ProphetSpan.parse(attributes)
     attributes.close()
 
-    // TODO allow 'part' elements before 'custom' elements; treat them as 'Common'; clean up SpecialDay.xml.
-    val customElements = XML.span(elements, "custom")
+    val (partElements, customElements) = XML.span(elements, "part", "custom")
 
-    val result: Map[Set[Custom], Seq[ProphetSpan.BookSpan]] =
-      if (customElements.isEmpty) Map(Set[Custom](Custom.Common) -> Seq(globalSpan.resolve))
-      else customElements.map(element => parseCustom(element, globalSpan)).toMap
+    val common: Option[Seq[ProphetSpan.BookSpan]] =
+      if (partElements.isEmpty && customElements.isEmpty) Some(Seq(globalSpan.resolve)) else
+      if (partElements.isEmpty) None else Some(parseParts(partElements, globalSpan))
+
+    // TODO toMap() will silently ignore duplicates...
+    val customs: Custom.Sets[Seq[ProphetSpan.BookSpan]] = customElements.map(parseCustom(globalSpan)).toMap
+
+    val result: Custom.Sets[Seq[ProphetSpan.BookSpan]] = common.fold(customs) { common =>
+      // TODO updated() will silently ignore duplicates...
+      customs.updated(Set[Custom](Custom.Common), common)
+    }
 
     new Haftarah(Custom.denormalize(result))
   }
 
-  private def parseCustom(element: Elem, weekSpan: ProphetSpan.Parsed): (Set[Custom], Seq[ProphetSpan.BookSpan]) = {
+  private def parseCustom(globalSpan: ProphetSpan.Parsed)(element: Elem): (Set[Custom], Seq[ProphetSpan.BookSpan]) = {
     val (attributes, elements) = XML.open(element, "custom")
     val customs: Set[Custom] = Custom.parse(attributes.doGet("n"))
 
     val customSpan = ProphetSpan.parse(attributes)
     attributes.close()
-    val contextSpan = customSpan.inheritFrom(weekSpan)
+    val contextSpan = customSpan.inheritFrom(globalSpan)
 
     val partElements = XML.span(elements, "part")
 
@@ -57,6 +64,7 @@ object Haftarah {
     val result: Seq[ProphetSpan.Numbered] = elements.map(element =>
       ProphetSpan.parseNumbered(XML.openEmpty(element, "part"), contextSpan))
     WithNumber.checkConsecutive(result, "part")
+    require(result.length > 1)
     ProphetSpan.dropNumbers(result)
   }
 }
