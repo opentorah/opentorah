@@ -54,6 +54,8 @@ trait BookSpan[Book <: Tanach.TanachBook] {
     attributes.close()
     new Numbered(n, span = span.inheritFrom(contextSpan).resolve)
   }
+
+  def dropNumbers(spans: Seq[Numbered]): Seq[BookSpan] = spans.map(_.span)
 }
 
 object BookSpan {

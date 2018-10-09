@@ -111,13 +111,13 @@ object SpecialDay extends NamedCompanion {
       day -> SpecialDayMetadata(
         metadata.names,
         torah = noMoreThanOne(torahElements),
-        maftir = noMoreThanOne(maftriElements).map(parsemaftir),
+        maftir = noMoreThanOne(maftriElements).map(parseMaftir),
         haftarah = noMoreThanOne(haftarahElements).map(parseHaftarah)
       )
     }
 
-    private def parsemaftir(element: Elem): ChumashSpan.BookSpan =
-      XML.parseEmpty(element, "maftir", BookSpan.ChumashSpan.parse).resolve
+    private def parseMaftir(element: Elem): ChumashSpan.BookSpan =
+      XML.parseEmpty(element, "maftir", ChumashSpan.parse).resolve
 
     private def parseHaftarah(element: Elem): Haftarah = {
       val (attributes, elements) = XML.open(element, "haftarah")

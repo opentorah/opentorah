@@ -1,8 +1,6 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.{Attributes, LanguageSpec, XML}
-
-import scala.xml.Elem
+import org.podval.judaica.metadata.{Attributes, LanguageSpec}
 
 final case class Span(from: Verse, to: Verse) {
   require(from <= to, s"Empty span: $from..$to")

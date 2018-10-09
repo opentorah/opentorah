@@ -263,7 +263,7 @@ object Tanach extends NamedCompanion {
     val withImplied1 = NumberedSpan.addImplied1(Custom.common(days), span, chapters)
 
     days.mapValues { spans: Seq[NumberedSpan] =>
-      val overlayedSpans = NumberedSpan.overlaySpans(withImplied1, spans)
+      val overlayedSpans = WithNumber.overlay(withImplied1, spans)
       NumberedSpan.setImpliedToCheckAndDropNumbers(overlayedSpans, 7, span, chapters)
     }
   }

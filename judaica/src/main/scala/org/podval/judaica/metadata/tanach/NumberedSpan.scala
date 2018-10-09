@@ -29,19 +29,7 @@ object NumberedSpan {
     number: Int,
     span: Span,
     chapters: Chapters
-  ): Seq[Span] = Span.setImpliedTo(dropNumbers(checkNumber(spans, number)), span, chapters)
-
-  private def checkNumber(spans: Seq[NumberedSpan], number: Int): Seq[NumberedSpan] = {
-    WithNumber.checkConsecutive(spans, "span")
-    require(spans.length == number, "Wrong number of spans.")
-    spans
-  }
+  ): Seq[Span] = Span.setImpliedTo(dropNumbers(WithNumber.checkNumber(spans, number, "span")), span, chapters)
 
   private def dropNumbers(spans: Seq[NumberedSpan]): Seq[Span.Parsed] = spans.map(_.span)
-
-  def overlaySpans(base: Seq[NumberedSpan], differences: Seq[NumberedSpan]): Seq[NumberedSpan] = {
-    val result: Array[NumberedSpan] = base.toArray
-    differences.foreach(span => result(span.n - 1) = span)
-    result.toSeq
-  }
 }

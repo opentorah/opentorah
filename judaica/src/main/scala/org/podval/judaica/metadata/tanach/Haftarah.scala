@@ -57,6 +57,6 @@ object Haftarah {
     val result: Seq[ProphetSpan.Numbered] = elements.map(element =>
       ProphetSpan.parseNumbered(XML.openEmpty(element, "part"), contextSpan))
     WithNumber.checkConsecutive(result, "part")
-    result.map(_.span)
+    ProphetSpan.dropNumbers(result)
   }
 }
