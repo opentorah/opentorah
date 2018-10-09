@@ -41,18 +41,16 @@ trait BookSpan[Book <: Tanach.TanachBook] {
 
   protected def getBook(name: String): Book
 
-  // TODO merge into NumberedSpan
-
   final class Numbered(
     override val n: Int,
     val span: BookSpan
   ) extends WithNumber
 
-  final def parseNumbered(attributes: Attributes, contextSpan: Parsed): Numbered = {
+  final def parseNumbered(attributes: Attributes, ancestorSpan: Parsed): Numbered = {
     val n: Int = attributes.doGetInt("n")
     val span: Parsed = parse(attributes)
     attributes.close()
-    new Numbered(n, span = span.inheritFrom(contextSpan).resolve)
+    new Numbered(n, span = span.inheritFrom(ancestorSpan).resolve)
   }
 
   def dropNumbers(spans: Seq[Numbered]): Seq[BookSpan] = spans.map(_.span)

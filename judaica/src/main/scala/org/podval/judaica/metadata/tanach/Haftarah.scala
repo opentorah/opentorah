@@ -23,17 +23,17 @@ object Haftarah {
   ).mapValues { metadata => parse(metadata.attributes, metadata.elements) }
 
   def parse(attributes: Attributes, elements: Seq[Elem]): Haftarah = {
-    val globalSpan = ProphetSpan.parse(attributes)
+    val span = ProphetSpan.parse(attributes)
     attributes.close()
 
     val (partElements, customElements) = XML.span(elements, "part", "custom")
 
     val common: Option[Seq[ProphetSpan.BookSpan]] =
-      if (partElements.isEmpty && customElements.isEmpty) Some(Seq(globalSpan.resolve)) else
-      if (partElements.isEmpty) None else Some(parseParts(partElements, globalSpan))
+      if (partElements.isEmpty && customElements.isEmpty) Some(Seq(span.resolve)) else
+      if (partElements.isEmpty) None else Some(parseParts(partElements, span))
 
     // TODO toMap() will silently ignore duplicates...
-    val customs: Custom.Sets[Seq[ProphetSpan.BookSpan]] = customElements.map(parseCustom(globalSpan)).toMap
+    val customs: Custom.Sets[Seq[ProphetSpan.BookSpan]] = customElements.map(parseCustom(span)).toMap
 
     val result: Custom.Sets[Seq[ProphetSpan.BookSpan]] = common.fold(customs) { common =>
       // TODO updated() will silently ignore duplicates...
@@ -43,26 +43,25 @@ object Haftarah {
     new Haftarah(Custom.denormalize(result))
   }
 
-  private def parseCustom(globalSpan: ProphetSpan.Parsed)(element: Elem): (Set[Custom], Seq[ProphetSpan.BookSpan]) = {
+  private def parseCustom(ancestorSpan: ProphetSpan.Parsed)(element: Elem): (Set[Custom], Seq[ProphetSpan.BookSpan]) = {
     val (attributes, elements) = XML.open(element, "custom")
     val customs: Set[Custom] = Custom.parse(attributes.doGet("n"))
 
-    val customSpan = ProphetSpan.parse(attributes)
+    val span = ProphetSpan.parse(attributes).inheritFrom(ancestorSpan)
     attributes.close()
-    val contextSpan = customSpan.inheritFrom(globalSpan)
 
     val partElements = XML.span(elements, "part")
 
     val result: Seq[ProphetSpan.BookSpan] =
-      if (partElements.isEmpty) Seq(contextSpan.resolve)
-      else parseParts(partElements, contextSpan)
+      if (partElements.isEmpty) Seq(span.resolve)
+      else parseParts(partElements, span)
 
     customs -> result
   }
 
-  private def parseParts(elements: Seq[Elem], contextSpan: ProphetSpan.Parsed): Seq[ProphetSpan.BookSpan] = {
+  private def parseParts(elements: Seq[Elem], ancestorSpan: ProphetSpan.Parsed): Seq[ProphetSpan.BookSpan] = {
     val result: Seq[ProphetSpan.Numbered] = elements.map(element =>
-      ProphetSpan.parseNumbered(XML.openEmpty(element, "part"), contextSpan))
+      ProphetSpan.parseNumbered(XML.openEmpty(element, "part"), ancestorSpan))
     WithNumber.checkConsecutive(result, "part")
     require(result.length > 1)
     ProphetSpan.dropNumbers(result)
