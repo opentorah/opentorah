@@ -1,11 +1,17 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.{Holder, Metadata, Named, NamedCompanion, Names, XML}
+import org.podval.judaica.metadata.{Holder, Named, NamedCompanion, Names, Metadata, XML, Language, LanguageSpec}
+import org.podval.judaica.metadata.tanach.BookSpan.ChumashSpan
 
 import scala.xml.Elem
 
 sealed class SpecialDay(override val name: String) extends Named {
+  // TODO we do not need Named or names() here!
   final override def names: Names = SpecialDay.toNames(this)
+
+  final def maftir: Option[ChumashSpan.BookSpan] = SpecialDay.toMaftir(this)
+
+  final def haftarah: Option[Haftarah] = SpecialDay.toHaftarah(this)
 }
 
 object SpecialDay extends NamedCompanion {
@@ -75,11 +81,15 @@ object SpecialDay extends NamedCompanion {
 
   override lazy val toNames: Map[SpecialDay, Names] = metadatas.names
 
+  lazy val toMaftir: Map[SpecialDay, Option[ChumashSpan.BookSpan]] = metadatas.maftir
+
+  lazy val toHaftarah: Map[SpecialDay, Option[Haftarah]] = metadatas.haftarah
+
   private final case class SpecialDayMetadata(
     names: Names,
     torah: Option[Elem],
-    maftir: Option[Elem],
-    haftarah: Option[Custom.Of[Seq[ProphetSpan]]]
+    maftir: Option[ChumashSpan.BookSpan],
+    haftarah: Option[Haftarah]
   )
 
   private object metadatas extends Holder[SpecialDay, SpecialDayMetadata] {
@@ -89,8 +99,6 @@ object SpecialDay extends NamedCompanion {
       elementName = "day"
     ).map { case (day, metadata) =>
       metadata.attributes.close()
-
-      println(metadata.names)
 
       val (torahElements, maftriElements, haftarahElements) = XML.span(metadata.elements,
         "torah", "maftir", "haftarah")
@@ -103,20 +111,27 @@ object SpecialDay extends NamedCompanion {
       day -> SpecialDayMetadata(
         metadata.names,
         torah = noMoreThanOne(torahElements),
-        maftir = noMoreThanOne(maftriElements),
+        maftir = noMoreThanOne(maftriElements).map(parseMaftir),
         haftarah = noMoreThanOne(haftarahElements).map(parseHaftarah)
       )
     }
 
-    private def parseHaftarah(element: Elem): Custom.Of[Seq[ProphetSpan]] = {
+    private def parseMaftir(element: Elem): ChumashSpan.BookSpan =
+      XML.parseEmpty(element, "maftir", ChumashSpan.parse).resolve
+
+    private def parseHaftarah(element: Elem): Haftarah = {
       val (attributes, elements) = XML.open(element, "haftarah")
       Haftarah.parse(attributes, elements)
     }
 
     override def names: Map[SpecialDay, Names] = get.mapValues(_.names)
+
+    def maftir: Map[SpecialDay, Option[ChumashSpan.BookSpan]] = get.mapValues(_.maftir)
+
+    def haftarah: Map[SpecialDay, Option[Haftarah]] = get.mapValues(_.haftarah)
   }
 
   def main(args: Array[String]): Unit = {
-    print(SpecialDay.toNames)
+    print(SpecialDay.SheminiAtzeresMaftir.maftir.get.toString(LanguageSpec(Language.English)))
   }
 }

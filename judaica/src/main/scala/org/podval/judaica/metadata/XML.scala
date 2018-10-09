@@ -11,6 +11,7 @@ object XML {
     (Attributes(element), getElements(element))
   }
 
+  // TODO make private and use only via parseEmpty
   def openEmpty(element: Elem, name: String): Attributes = {
     checkName(element, name)
     checkNoElements(element)
@@ -42,6 +43,13 @@ object XML {
 
   def take(elements: Seq[Elem], name1: String): (Seq[Elem], Seq[Elem]) = {
     elements.span(_.label == name1)
+  }
+
+  def parseEmpty[T](element: Elem, name: String, parser: Attributes => T): T = {
+    val attributes = XML.openEmpty(element, name)
+    val result = parser(attributes)
+    attributes.close()
+    result
   }
 
   def span(elements: Seq[Elem], name1: String): Seq[Elem] = {

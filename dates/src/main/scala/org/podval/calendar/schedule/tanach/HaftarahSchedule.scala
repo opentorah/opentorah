@@ -1,7 +1,8 @@
 package org.podval.calendar.schedule.tanach
 
+import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
 import org.podval.judaica.metadata.{Language, LanguageSpec}
-import org.podval.judaica.metadata.tanach.{Custom, Haftarah, Parsha, ProphetSpan, Span}
+import org.podval.judaica.metadata.tanach.{Custom, Haftarah, Parsha, Span}
 
 object HaftarahSchedule {
   private def printHaftarahList(custom: Custom, spec: LanguageSpec, full: Boolean): Unit = {
@@ -9,7 +10,7 @@ object HaftarahSchedule {
     for (parsha <- Parsha.values) {
       val haftarah: Haftarah = Haftarah.haftarah(parsha)
       val customEffective: Custom = Custom.find(haftarah.customs, custom)
-      val spans: Seq[ProphetSpan] = haftarah.customs(customEffective)
+      val spans: Seq[ProphetSpan.BookSpan] = haftarah.customs(customEffective)
       val result: String = ProphetSpan.toString(spans, spec)
 
       if (customEffective == custom) {

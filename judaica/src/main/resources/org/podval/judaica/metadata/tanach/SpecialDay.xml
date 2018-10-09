@@ -56,31 +56,25 @@ Mekorot
         </torah>
         <maftir book="Numbers" fromChapter="28" fromVerse="9" toVerse="15"/>
         <haftarah book="Isaiah" fromChapter="66">
-            <custom n="Common">
-                <part n="1" fromVerse="1" toVerse="24"/>
-                <part n="2" fromVerse="23" toVerse="23"/>
-            </custom>
+            <part n="1" fromVerse="1" toVerse="24"/>
+            <part n="2" fromVerse="23" toVerse="23"/>
         </haftarah>
     </day>
 
     <!-- TODO Added by Chabad and Fes (Marocco); @michaelko58 needs to add the rules :) -->
     <day n="Shabbos Rosh Chodesh Additional Haftorah">
         <haftarah book="Isaiah" fromChapter="66">
-            <custom n="Common">
-                <part n="1" fromVerse="1" toVerse="1"/>
-                <part n="2" fromVerse="23" toVerse="24"/>
-                <part n="3" fromVerse="23" toVerse="23"/>
-            </custom>
+            <part n="1" fromVerse="1" toVerse="1"/>
+            <part n="2" fromVerse="23" toVerse="24"/>
+            <part n="3" fromVerse="23" toVerse="23"/>
         </haftarah>
     </day>
 
     <!-- TODO Added by Chabad and Fes (Marocco); @michaelko58 needs to add the rules :) -->
     <day n="Shabbos Erev Rosh Chodesh Additional Haftorah">
         <haftarah book="I Samuel" fromChapter="20">
-            <custom n="Common">
-                <part n="1" fromVerse="18" toVerse="18"/>
-                <part n="2" fromVerse="42" toVerse="42"/>
-            </custom>
+            <part n="1" fromVerse="18" toVerse="18"/>
+            <part n="2" fromVerse="42" toVerse="42"/>
         </haftarah>
     </day>
 
