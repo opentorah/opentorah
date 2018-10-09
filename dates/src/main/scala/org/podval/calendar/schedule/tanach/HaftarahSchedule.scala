@@ -8,7 +8,7 @@ object HaftarahSchedule {
   private def printHaftarahList(custom: Custom, spec: LanguageSpec, full: Boolean): Unit = {
     println(custom.toString(spec))
     for (parsha <- Parsha.values) {
-      val haftarah: Haftarah = Haftarah.haftarah(parsha)
+      val haftarah: Haftarah = parsha.haftarah
       val customEffective: Custom = Custom.find(haftarah.customs, custom)
       val spans: Seq[ProphetSpan.BookSpan] = haftarah.customs(customEffective)
       val result: String = ProphetSpan.toString(spans, spec)

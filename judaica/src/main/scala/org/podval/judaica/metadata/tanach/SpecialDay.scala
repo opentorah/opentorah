@@ -1,6 +1,6 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.{Holder, Named, NamedCompanion, Names, Metadata, XML, Language, LanguageSpec}
+import org.podval.judaica.metadata.{Holder, Named, Names, Metadata, XML, Language, LanguageSpec}
 import org.podval.judaica.metadata.tanach.BookSpan.ChumashSpan
 
 import scala.xml.Elem
@@ -14,9 +14,7 @@ sealed class SpecialDay(override val name: String) extends Named {
   final def haftarah: Option[Haftarah] = SpecialDay.toHaftarah(this)
 }
 
-object SpecialDay extends NamedCompanion {
-
-  override type Key = SpecialDay
+object SpecialDay {
 
   case object ShabbosErevRoshChodesh extends SpecialDay("Shabbos Erev Rosh Chodesh")
   case object RoshChodesh extends SpecialDay("Rosh Chodesh")
@@ -64,7 +62,7 @@ object SpecialDay extends NamedCompanion {
   case object Shavuos1 extends SpecialDay("Shavuos 1")
   case object Shavuos2 extends SpecialDay("Shavuos 2")
 
-  override val values: Seq[SpecialDay] = Seq(
+  val values: Seq[SpecialDay] = Seq(
     ShabbosErevRoshChodesh, ShabbosErevRoshChodeshAdditionalHaftorah,
     RoshChodesh, ShabbosRoshChodeshAdditionalHaftorah,
     PublicFast, TishaBeAv, ShabbosCholHamoedTorah,
@@ -79,11 +77,11 @@ object SpecialDay extends NamedCompanion {
     ShavuosMaftir, Shavuos1, Shavuos2
   )
 
-  override lazy val toNames: Map[SpecialDay, Names] = metadatas.names
+  private lazy val toNames: Map[SpecialDay, Names] = metadatas.names
 
-  lazy val toMaftir: Map[SpecialDay, Option[ChumashSpan.BookSpan]] = metadatas.maftir
+  private lazy val toMaftir: Map[SpecialDay, Option[ChumashSpan.BookSpan]] = metadatas.maftir
 
-  lazy val toHaftarah: Map[SpecialDay, Option[Haftarah]] = metadatas.haftarah
+  private lazy val toHaftarah: Map[SpecialDay, Option[Haftarah]] = metadatas.haftarah
 
   private final case class SpecialDayMetadata(
     names: Names,
@@ -121,7 +119,7 @@ object SpecialDay extends NamedCompanion {
 
     private def parseHaftarah(element: Elem): Haftarah = {
       val (attributes, elements) = XML.open(element, "haftarah")
-      Haftarah.parse(attributes, elements)
+      Haftarah(attributes, elements)
     }
 
     override def names: Map[SpecialDay, Names] = get.mapValues(_.names)
