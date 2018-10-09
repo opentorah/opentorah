@@ -590,6 +590,7 @@ n day of Sukkos
             <aliyah n="3" fromVerse="9" toVerse="14"/>
         </torah>
     </day>
+
     <day n="Pesach Shabbos Chol Hamoed Haftarah">
         <haftarah book="Ezekiel">
             <custom n="Ashkenaz Sefard" fromChapter="37" fromVerse="1" toVerse="14"/>
