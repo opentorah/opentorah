@@ -142,9 +142,9 @@ object Tanach extends NamedCompanion {
   private final case class ParshaMetadata(
     names: Names,
     span: Span.Parsed,
-    days: Custom.Sets[Seq[NumberedSpan]],
-    daysCombined: Custom.Sets[Seq[NumberedSpan]],
-    aliyot: Seq[NumberedSpan],
+    days: Custom.Sets[Seq[Span.Numbered]],
+    daysCombined: Custom.Sets[Seq[Span.Numbered]],
+    aliyot: Seq[Span.Numbered],
     maftir: Span.Parsed
   )
 
@@ -156,7 +156,7 @@ object Tanach extends NamedCompanion {
         obj = this
       ).mapValues { metadata =>
 
-        def byCustom(days: Seq[Tanach.DayParsed]): Custom.Sets[Seq[NumberedSpan]] =
+        def byCustom(days: Seq[Tanach.DayParsed]): Custom.Sets[Seq[Span.Numbered]] =
           days.groupBy(_.custom).mapValues(days => days.map(_.span))
 
         val span = Span.parse(metadata.attributes)
@@ -173,7 +173,7 @@ object Tanach extends NamedCompanion {
           span = span,
           days = byCustom(days),
           daysCombined = byCustom(daysCombined),
-          aliyot = aliyahElements.map(element => XML.parseEmpty(element, "aliyah", NumberedSpan.parse)),
+          aliyot = aliyahElements.map(element => XML.parseEmpty(element, "aliyah", Span.parseNumbered)),
           maftir = XML.parseEmpty(maftirElements.head, "maftir", Span.parse)
         )
       }
@@ -200,8 +200,8 @@ object Tanach extends NamedCompanion {
       // TODO QUESTION if Cohen ends in a custom place, does it affect the end of the 3 aliyah on Mon/Thu?
       // TODO QUESTION if the parshiot combine, does it affect those small aliyot?
       val aliyotSpan: Span = Span(parsha.span.from, metadata.aliyot.last.span.to.getOrElse(parsha.days(Custom.Common).head.to))
-      val aliyotWithImplied1: Seq[NumberedSpan] = NumberedSpan.addImplied1(metadata.aliyot, aliyotSpan, book.chapters)
-      val result: Seq[Span] = NumberedSpan.setImpliedToCheckAndDropNumbers(aliyotWithImplied1, 3, aliyotSpan, book.chapters)
+      val aliyotWithImplied1: Seq[Span.Numbered] = Span.addImplied1(metadata.aliyot, aliyotSpan, book.chapters)
+      val result: Seq[Span] = Span.setImpliedToCheckAndDropNumbers(aliyotWithImplied1, 3, aliyotSpan, book.chapters)
       parsha -> result
     }
 
@@ -217,7 +217,7 @@ object Tanach extends NamedCompanion {
   }
 
   private final case class DayParsed(
-    span: NumberedSpan,
+    span: Span.Numbered,
     custom: Set[Custom],
     isCombined: Boolean
   )
@@ -225,7 +225,7 @@ object Tanach extends NamedCompanion {
   private def parseDay(element: Elem): DayParsed = {
     val attributes = XML.openEmpty(element, "day")
     val result = DayParsed(
-      span = NumberedSpan.parse(attributes),
+      span = Span.parseNumbered(attributes),
       custom = attributes.get("custom").fold[Set[Custom]](Set(Custom.Common))(Custom.parse),
       isCombined = attributes.doGetBoolean("combined")
     )
@@ -233,11 +233,11 @@ object Tanach extends NamedCompanion {
     result
   }
 
-  private def combineDays(weeks: Seq[(Parsha, Custom.Sets[Seq[NumberedSpan]])]): Seq[Custom.Of[Seq[Span]]] = weeks match {
+  private def combineDays(weeks: Seq[(Parsha, Custom.Sets[Seq[Span.Numbered]])]): Seq[Custom.Of[Seq[Span]]] = weeks match {
     case (parsha, days) :: (parshaNext, daysNext) :: tail =>
       val result: Custom.Of[Seq[Span]] = if (!parsha.combines) Map.empty else  {
         // TODO Use defaults from days?
-        val combined: Custom.Sets[Seq[NumberedSpan]] = daysNext ++ days.map { case (customs, value) =>
+        val combined: Custom.Sets[Seq[Span.Numbered]] = daysNext ++ days.map { case (customs, value) =>
           (customs, value ++ daysNext.getOrElse(customs, Seq.empty))
         }
 
@@ -256,15 +256,15 @@ object Tanach extends NamedCompanion {
   }
 
   private def processDays(
-    days: Custom.Sets[Seq[NumberedSpan]],
+    days: Custom.Sets[Seq[Span.Numbered]],
     span: Span,
     chapters: Chapters
   ): Custom.Sets[Seq[Span]] = {
-    val withImplied1 = NumberedSpan.addImplied1(Custom.common(days), span, chapters)
+    val withImplied1 = Span.addImplied1(Custom.common(days), span, chapters)
 
-    days.mapValues { spans: Seq[NumberedSpan] =>
+    days.mapValues { spans: Seq[Span.Numbered] =>
       val overlayedSpans = WithNumber.overlay(withImplied1, spans)
-      NumberedSpan.setImpliedToCheckAndDropNumbers(overlayedSpans, 7, span, chapters)
+      Span.setImpliedToCheckAndDropNumbers(overlayedSpans, 7, span, chapters)
     }
   }
 }

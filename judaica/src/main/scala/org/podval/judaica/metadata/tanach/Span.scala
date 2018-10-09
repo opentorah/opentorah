@@ -103,4 +103,34 @@ object Span {
 
     result
   }
+
+  final case class Numbered(override val n: Int, span: Parsed) extends WithNumber
+
+  def parseNumbered(attributes: Attributes): Numbered = Numbered(
+    n = attributes.doGetInt("n"),
+    span = parse(attributes)
+  )
+
+  def setImpliedToCheckAndDropNumbers(
+    spans: Seq[Numbered],
+    number: Int,
+    span: Span,
+    chapters: Chapters
+  ): Seq[Span] = setImpliedTo(dropNumbers(WithNumber.checkNumber(spans, number, "span")), span, chapters)
+
+  private def dropNumbers(spans: Seq[Numbered]): Seq[Parsed] = spans.map(_.span)
+
+  def addImplied1(
+    spans: Seq[Numbered],
+    span: Span,
+    chapters: Chapters
+  ): Seq[Numbered] = {
+    val first = spans.head
+    val implied: Seq[Numbered] = if (first.n == 1) Seq.empty else Seq(Numbered(1, new Parsed(
+      span.from,
+      Some(chapters.prev(first.span.from).get)
+    )))
+
+    implied ++ spans
+  }
 }
