@@ -17,6 +17,10 @@ final case class Span(from: Verse, to: Verse) {
     else spec.toString(from.chapter) + ":" +
       (if (from.verse == to.verse) spec.toString(from.verse)
       else spec.toString(from.verse) + "-" + spec.toString(to.verse))
+
+  def inBook(book: Tanach.ChumashBook): BookSpan.ChumashSpan.BookSpan = BookSpan.ChumashSpan.BookSpan(book, this)
+
+  def inBook(book: Tanach.ProphetsBook): BookSpan.ProphetSpan.BookSpan = BookSpan.ProphetSpan.BookSpan(book, this)
 }
 
 object Span {

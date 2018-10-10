@@ -1,8 +1,9 @@
 package org.podval.calendar.schedule.tanach
 
+import org.podval.judaica.metadata.Language.Hebrew
 import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
-import org.podval.judaica.metadata.{Language, LanguageSpec}
-import org.podval.judaica.metadata.tanach.{Custom, Haftarah, Parsha, Span}
+import org.podval.judaica.metadata.LanguageSpec
+import org.podval.judaica.metadata.tanach.{Custom, Haftarah, Parsha}
 
 object HaftarahSchedule {
   private def printHaftarahList(custom: Custom, spec: LanguageSpec, full: Boolean): Unit = {
@@ -22,12 +23,8 @@ object HaftarahSchedule {
   }
 
   def main(args: Array[String]): Unit = {
-    def printSpans(spans: Seq[Span]): Unit = spans.zipWithIndex.foreach { case (span, index) =>
-      println(s"${index+1}: $span")
-    }
+    println(Parsha.Mattos.getDaysCombined(Custom.Ashkenaz).toString(Hebrew.toSpec))
 
-    printSpans(Parsha.Mattos.daysCombined(Custom.Ashkenaz))
-
-    printHaftarahList(Custom.Shami, LanguageSpec(Language.Hebrew), full = false)
+    printHaftarahList(Custom.Shami, Hebrew.toSpec, full = false)
   }
 }

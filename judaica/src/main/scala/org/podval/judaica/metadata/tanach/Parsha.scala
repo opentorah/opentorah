@@ -10,13 +10,18 @@ sealed trait Parsha extends Named {
 
   final def span: Span = book.span(this)
 
-  final def days: Custom.Of[Seq[Span]] = book.days(this)
+  final def days: Custom.Of[Aliyot] = book.days(this)
 
-  final def daysCombined: Custom.Of[Seq[Span]] = book.daysCombined(this)
+  final def daysCombined: Option[Custom.Of[Aliyot]] = book.daysCombined(this)
+
+  final def getDaysCombined: Custom.Of[Aliyot] = {
+    require(this.combines)
+    daysCombined.get
+  }
 
   final def aliyot: Aliyot = book.aliyot(this)
 
-  final def maftir: Span = book.maftir(this)
+  final def maftir: BookSpan.ChumashSpan.BookSpan = book.maftir(this)
 
   final def haftarah: Haftarah = Parsha.haftarah(this)
 

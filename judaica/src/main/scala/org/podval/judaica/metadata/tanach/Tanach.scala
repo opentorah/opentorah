@@ -29,13 +29,13 @@ object Tanach extends NamedCompanion {
 
     lazy val span: Map[Parsha, Span] = metadatas.span
 
-    lazy val days: Map[Parsha, Custom.Of[Seq[Span]]] = metadatas.days
+    lazy val days: Map[Parsha, Custom.Of[Aliyot]] = metadatas.days
 
-    lazy val daysCombined: Map[Parsha, Custom.Of[Seq[Span]]] = metadatas.daysCombined
+    lazy val daysCombined: Map[Parsha, Option[Custom.Of[Aliyot]]] = metadatas.daysCombined
 
     lazy val aliyot: Map[Parsha, Aliyot] = metadatas.aliyot
 
-    lazy val maftir: Map[Parsha, Span] = metadatas.maftir
+    lazy val maftir: Map[Parsha, BookSpan.ChumashSpan.BookSpan] = metadatas.maftir
   }
 
   case object Genesis extends ChumashBook(Parsha.genesis)
@@ -186,11 +186,11 @@ object Tanach extends NamedCompanion {
       f = (pairs: Seq[(Parsha, Span.SemiResolved)]) => Span.setImpliedTo(pairs.map(_._2), book.chapters.full, book.chapters)
     )
 
-    def days: Map[Parsha, Custom.Of[Seq[Span]]] = get.map { case (parsha, metadata) =>
+    def days: Map[Parsha, Custom.Of[Aliyot]] = get.map { case (parsha, metadata) =>
       parsha -> Aliyot.processDays(book, metadata.days, parsha.span)
     }
 
-    def daysCombined: Map[Parsha, Custom.Of[Seq[Span]]] = Util.inSequence(
+    def daysCombined: Map[Parsha, Option[Custom.Of[Aliyot]]] = Util.inSequence(
       keys = book.parshiot,
       map = get.map { case (parsha: Parsha, metadata: ParshaMetadata) => parsha -> metadata.daysCombined },
       f = combineDays
@@ -202,7 +202,7 @@ object Tanach extends NamedCompanion {
       parsha -> Aliyot.parseAliyot(parsha, metadata.aliyot)
     }
 
-    def maftir: Map[Parsha, Span] = get.map { case (parsha, metadata) =>
+    def maftir: Map[Parsha, BookSpan.ChumashSpan.BookSpan] = get.map { case (parsha, metadata) =>
       parsha -> Aliyot.parseMaftir(parsha, metadata.maftir)
     }
   }
@@ -224,24 +224,24 @@ object Tanach extends NamedCompanion {
     result
   }
 
-  private def combineDays(weeks: Seq[(Parsha, Custom.Sets[Seq[Span.Numbered]])]): Seq[Custom.Of[Seq[Span]]] = weeks match {
+  private def combineDays(weeks: Seq[(Parsha, Custom.Sets[Seq[Span.Numbered]])]): Seq[Option[Custom.Of[Aliyot]]] = weeks match {
     case (parsha, days) :: (parshaNext, daysNext) :: tail =>
-      val result: Custom.Of[Seq[Span]] = if (!parsha.combines) Map.empty else  {
+      val result: Option[Custom.Of[Aliyot]] = if (!parsha.combines) None else  {
         // TODO Use defaults from days?
         val combined: Custom.Sets[Seq[Span.Numbered]] = daysNext ++ days.map { case (customs, value) =>
           (customs, value ++ daysNext.getOrElse(customs, Seq.empty))
         }
 
         val book = parsha.book
-        Aliyot.processDays(book, combined, book.chapters.merge(parsha.span, parshaNext.span))
+        Some(Aliyot.processDays(book, combined, book.chapters.merge(parsha.span, parshaNext.span)))
       }
 
       result +: combineDays((parshaNext, daysNext) +: tail)
 
-    case (parsha, days) :: Nil =>
+    case (parsha, _ /*days*/) :: Nil =>
       require(!parsha.combines)
       // TODO require(days.isEmpty, s"Not empty: $days")
-      Seq(Map.empty)
+      Seq(None)
 
     case Nil => Nil
   }
