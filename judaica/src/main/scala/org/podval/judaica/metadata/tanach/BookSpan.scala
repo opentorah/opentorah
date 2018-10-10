@@ -36,7 +36,7 @@ trait BookSpan[Book <: Tanach.TanachBook] {
 
   final def parse(attributes: Attributes): Parsed = Parsed(
     book = attributes.get("book"),
-    Span.parseRaw(attributes)
+    Span.parse(attributes)
   )
 
   protected def getBook(name: String): Book

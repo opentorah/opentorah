@@ -55,7 +55,7 @@ object Span {
     }
   }
 
-  final def parseRaw(attributes: Attributes): Parsed = Parsed(
+  final def parse(attributes: Attributes): Parsed = Parsed(
     from = Verse.parseFrom(attributes),
     to = Verse.parseTo(attributes)
   )
@@ -67,7 +67,7 @@ object Span {
     }
   }
 
-  def parse(attributes: Attributes): SemiResolved = parseRaw(attributes).semiResolve
+  def parseSemiResolved(attributes: Attributes): SemiResolved = parse(attributes).semiResolve
 
   def setImpliedTo(
     spans: Seq[SemiResolved],
@@ -85,29 +85,6 @@ object Span {
 
   def parseNumbered(attributes: Attributes): Numbered = Numbered(
     n = attributes.doGetInt("n"),
-    span = parse(attributes)
+    span = parseSemiResolved(attributes)
   )
-
-  def setImpliedToCheckAndDropNumbers(
-    spans: Seq[Numbered],
-    number: Int,
-    span: Span,
-    chapters: Chapters
-  ): Seq[Span] = setImpliedTo(dropNumbers(WithNumber.checkNumber(spans, number, "span")), span, chapters)
-
-  private def dropNumbers(spans: Seq[Numbered]): Seq[SemiResolved] = spans.map(_.span)
-
-  def addImplied1(
-    spans: Seq[Numbered],
-    span: Span,
-    chapters: Chapters
-  ): Seq[Numbered] = {
-    val first = spans.head
-    val implied: Seq[Numbered] = if (first.n == 1) Seq.empty else Seq(Numbered(1, SemiResolved(
-      span.from,
-      Some(chapters.prev(first.span.from).get)
-    )))
-
-    implied ++ spans
-  }
 }

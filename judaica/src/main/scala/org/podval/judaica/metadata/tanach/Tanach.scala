@@ -33,7 +33,7 @@ object Tanach extends NamedCompanion {
 
     lazy val daysCombined: Map[Parsha, Custom.Of[Seq[Span]]] = metadatas.daysCombined
 
-    lazy val aliyot: Map[Parsha, Seq[Span]] = metadatas.aliyot
+    lazy val aliyot: Map[Parsha, Aliyot] = metadatas.aliyot
 
     lazy val maftir: Map[Parsha, Span] = metadatas.maftir
   }
@@ -159,7 +159,7 @@ object Tanach extends NamedCompanion {
         def byCustom(days: Seq[Tanach.DayParsed]): Custom.Sets[Seq[Span.Numbered]] =
           days.groupBy(_.custom).mapValues(days => days.map(_.span))
 
-        val span = Span.parse(metadata.attributes)
+        val span = Span.parseSemiResolved(metadata.attributes)
         metadata.attributes.close()
 
         val (aliyahElements, dayElements, maftirElements) = XML.span(metadata.elements,
@@ -174,7 +174,7 @@ object Tanach extends NamedCompanion {
           days = byCustom(days),
           daysCombined = byCustom(daysCombined),
           aliyot = aliyahElements.map(element => XML.parseEmpty(element, "aliyah", Span.parseNumbered)),
-          maftir = XML.parseEmpty(maftirElements.head, "maftir", Span.parse)
+          maftir = XML.parseEmpty(maftirElements.head, "maftir", Span.parseSemiResolved)
         )
       }
 
@@ -187,7 +187,7 @@ object Tanach extends NamedCompanion {
     )
 
     def days: Map[Parsha, Custom.Of[Seq[Span]]] = get.map { case (parsha, metadata) =>
-      parsha -> Custom.denormalize(processDays(metadata.days, parsha.span, book.chapters))
+      parsha -> Aliyot.processDays(book, metadata.days, parsha.span)
     }
 
     def daysCombined: Map[Parsha, Custom.Of[Seq[Span]]] = Util.inSequence(
@@ -196,23 +196,14 @@ object Tanach extends NamedCompanion {
       f = combineDays
     )
 
-    def aliyot: Map[Parsha, Seq[Span]] = get.map { case (parsha, metadata) =>
-      // TODO QUESTION if Cohen ends in a custom place, does it affect the end of the 3 aliyah on Mon/Thu?
-      // TODO QUESTION if the parshiot combine, does it affect those small aliyot?
-      val aliyotSpan: Span = Span(parsha.span.from, metadata.aliyot.last.span.to.getOrElse(parsha.days(Custom.Common).head.to))
-      val aliyotWithImplied1: Seq[Span.Numbered] = Span.addImplied1(metadata.aliyot, aliyotSpan, book.chapters)
-      val result: Seq[Span] = Span.setImpliedToCheckAndDropNumbers(aliyotWithImplied1, 3, aliyotSpan, book.chapters)
-      parsha -> result
+    // TODO QUESTION if Cohen ends in a custom place, does it affect the end of the 3 aliyah on Mon/Thu?
+    // TODO QUESTION if the parshiot combine, does it affect those small aliyot?
+    def aliyot: Map[Parsha, Aliyot] = get.map { case (parsha, metadata) =>
+      parsha -> Aliyot.parseAliyot(parsha, metadata.aliyot)
     }
 
     def maftir: Map[Parsha, Span] = get.map { case (parsha, metadata) =>
-      val maftir = metadata.maftir
-      val result: Span = Span.setImpliedTo(
-        Seq(maftir),
-        Span(maftir.from, maftir.to.getOrElse(parsha.span.to)),
-        book.chapters
-      ).head
-      parsha -> result
+      parsha -> Aliyot.parseMaftir(parsha, metadata.maftir)
     }
   }
 
@@ -241,8 +232,8 @@ object Tanach extends NamedCompanion {
           (customs, value ++ daysNext.getOrElse(customs, Seq.empty))
         }
 
-        val chapters: Chapters = parsha.book.chapters
-        Custom.denormalize(processDays(combined, chapters.merge(parsha.span, parshaNext.span), chapters))
+        val book = parsha.book
+        Aliyot.processDays(book, combined, book.chapters.merge(parsha.span, parshaNext.span))
       }
 
       result +: combineDays((parshaNext, daysNext) +: tail)
@@ -253,18 +244,5 @@ object Tanach extends NamedCompanion {
       Seq(Map.empty)
 
     case Nil => Nil
-  }
-
-  private def processDays(
-    days: Custom.Sets[Seq[Span.Numbered]],
-    span: Span,
-    chapters: Chapters
-  ): Custom.Sets[Seq[Span]] = {
-    val withImplied1 = Span.addImplied1(Custom.common(days), span, chapters)
-
-    days.mapValues { spans: Seq[Span.Numbered] =>
-      val overlayedSpans = WithNumber.overlay(withImplied1, spans)
-      Span.setImpliedToCheckAndDropNumbers(overlayedSpans, 7, span, chapters)
-    }
   }
 }
