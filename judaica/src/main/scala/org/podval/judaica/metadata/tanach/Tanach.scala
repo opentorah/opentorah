@@ -141,11 +141,11 @@ object Tanach extends NamedCompanion {
 
   private final case class ParshaMetadata(
     names: Names,
-    span: Span.Parsed,
+    span: Span.SemiResolved,
     days: Custom.Sets[Seq[Span.Numbered]],
     daysCombined: Custom.Sets[Seq[Span.Numbered]],
     aliyot: Seq[Span.Numbered],
-    maftir: Span.Parsed
+    maftir: Span.SemiResolved
   )
 
   private final class ChumashBookMetadataHolder(book: ChumashBook) extends Holder[Parsha, ParshaMetadata] {
@@ -183,7 +183,7 @@ object Tanach extends NamedCompanion {
     def span: Map[Parsha, Span] = Util.inSequence(
       keys = book.parshiot,
       map = get.mapValues(_.span),
-      f = (pairs: Seq[(Parsha, Span.Parsed)]) => Span.setImpliedTo(pairs.map(_._2), book.chapters.full, book.chapters)
+      f = (pairs: Seq[(Parsha, Span.SemiResolved)]) => Span.setImpliedTo(pairs.map(_._2), book.chapters.full, book.chapters)
     )
 
     def days: Map[Parsha, Custom.Of[Seq[Span]]] = get.map { case (parsha, metadata) =>

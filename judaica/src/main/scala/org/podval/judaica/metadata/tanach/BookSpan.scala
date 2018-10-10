@@ -18,7 +18,7 @@ trait BookSpan[Book <: Tanach.TanachBook] {
       }.mkString("; ")
   }
 
-  final case class Parsed(book: Option[String], span: Span.Raw) {
+  final case class Parsed(book: Option[String], span: Span.Parsed) {
     def inheritFrom(ancestor: Parsed): Parsed = {
       require(this.book.isEmpty || ancestor.book.isEmpty)
 

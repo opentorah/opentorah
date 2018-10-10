@@ -21,79 +21,56 @@ final case class Span(from: Verse, to: Verse) {
 
 object Span {
 
-  final case class Raw(
-    fromChapter: Option[Int],
-    fromVerse: Option[Int],
-    toChapter: Option[Int],
-    toVerse: Option[Int]
+  final case class Parsed(
+    from: Verse.Parsed,
+    to: Verse.Parsed
   ) {
-    def inheritFrom(ancestor: Raw): Raw = {
-      require(this.fromChapter.isEmpty || ancestor.fromChapter.isEmpty)
-      require(this.fromVerse.isEmpty || ancestor.fromVerse.isEmpty)
-      require(this.toChapter.isEmpty || ancestor.toChapter.isEmpty)
-      require(this.toVerse.isEmpty || ancestor.toVerse.isEmpty)
+    def inheritFrom(ancestor: Parsed): Parsed = Parsed(
+      from = this.from.inheritFrom(ancestor.from),
+      to = this.to.inheritFrom(ancestor.to)
+    )
 
-      Raw(
-        fromChapter = this.fromChapter.orElse(ancestor.fromChapter),
-        fromVerse = this.fromVerse.orElse(ancestor.fromVerse),
-        toChapter = this.toChapter.orElse(ancestor.toChapter),
-        toVerse = this.toVerse.orElse(ancestor.toVerse)
-      )
-    }
+    def semiResolve: SemiResolved = {
+      val fromResult = from.resolve
 
-    def parse: Parsed = {
-      val from = resolveFrom
+      require(to.verse.nonEmpty || to.chapter.isEmpty)
 
-      require(toVerse.nonEmpty || toChapter.isEmpty)
-
-      val to = if (toVerse.isEmpty) None else Some(Verse(
-        chapter = toChapter.getOrElse(from.chapter),
-        verse = toVerse.get
+      val toResult = if (to.verse.isEmpty) None else Some(Verse(
+        chapter = to.chapter.getOrElse(fromResult.chapter),
+        verse = to.verse.get
       ))
 
-      new Parsed(from, to)
+      SemiResolved(fromResult, toResult)
     }
 
     def resolve: Span = {
-      val from = resolveFrom
+      val fromResult = from.resolve
 
-      val to = Verse(
-        chapter = toChapter.getOrElse(fromChapter.get),
-        verse = toVerse.getOrElse(fromVerse.get)
+      val toResult = Verse(
+        chapter = to.chapter.getOrElse(fromResult.chapter),
+        verse = to.verse.getOrElse(fromResult.verse)
       )
 
-      Span(from, to)
-    }
-
-    private def resolveFrom: Verse = {
-      require(fromChapter.isDefined)
-      require(fromVerse.isDefined)
-
-      Verse(
-        fromChapter.get,
-        fromVerse.get
-      )
+      Span(fromResult, toResult)
     }
   }
 
-  final def parseRaw(attributes: Attributes): Raw = Raw(
-    fromChapter = attributes.getInt("fromChapter"),
-    fromVerse = attributes.getInt("fromVerse"),
-    toChapter = attributes.getInt("toChapter"),
-    toVerse = attributes.getInt("toVerse")
+  final def parseRaw(attributes: Attributes): Parsed = Parsed(
+    from = Verse.parseFrom(attributes),
+    to = Verse.parseTo(attributes)
   )
 
-  final class Parsed(val from: Verse, val to: Option[Verse]) {
+  final case class SemiResolved(from: Verse, to: Option[Verse]) {
     def setTo(value: Verse): Span = {
       require(to.isEmpty || to.contains(value), "Wrong explicit 'to'")
       Span(from, value)
     }
   }
 
-  def parse(attributes: Attributes): Parsed = parseRaw(attributes).parse
+  def parse(attributes: Attributes): SemiResolved = parseRaw(attributes).semiResolve
 
   def setImpliedTo(
-    spans: Seq[Parsed],
+    spans: Seq[SemiResolved],
     span: Span,
     chapters: Chapters
   ): Seq[Span] = {
@@ -104,7 +81,7 @@ object Span {
     result
   }
 
-  final case class Numbered(override val n: Int, span: Parsed) extends WithNumber
+  final case class Numbered(override val n: Int, span: SemiResolved) extends WithNumber
 
   def parseNumbered(attributes: Attributes): Numbered = Numbered(
     n = attributes.doGetInt("n"),
@@ -118,7 +95,7 @@ object Span {
     chapters: Chapters
   ): Seq[Span] = setImpliedTo(dropNumbers(WithNumber.checkNumber(spans, number, "span")), span, chapters)
 
-  private def dropNumbers(spans: Seq[Numbered]): Seq[Parsed] = spans.map(_.span)
+  private def dropNumbers(spans: Seq[Numbered]): Seq[SemiResolved] = spans.map(_.span)
 
   def addImplied1(
     spans: Seq[Numbered],
@@ -126,7 +103,7 @@ object Span {
     chapters: Chapters
   ): Seq[Numbered] = {
     val first = spans.head
-    val implied: Seq[Numbered] = if (first.n == 1) Seq.empty else Seq(Numbered(1, new Parsed(
+    val implied: Seq[Numbered] = if (first.n == 1) Seq.empty else Seq(Numbered(1, SemiResolved(
       span.from,
       Some(chapters.prev(first.span.from).get)
     )))
