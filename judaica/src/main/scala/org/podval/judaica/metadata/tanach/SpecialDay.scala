@@ -6,15 +6,15 @@ import org.podval.judaica.metadata.tanach.BookSpan.ChumashSpan
 import scala.xml.Elem
 
 sealed class SpecialDay(override val name: String) extends Named {
-  final override def names: Names = SpecialDay.toNames(this)
+  final override def names: Names = SpecialDay.names(this)
 
-  final def weekdayAliyot: Option[Aliyot] = SpecialDay.toWeekdayAliyot(this)
+  final def weekdayAliyot: Option[Aliyot] = SpecialDay.weekdayAliyot(this)
 
-  final def shabbosAliyot: Option[Aliyot] = SpecialDay.toShabbosAliyot(this)
+  final def shabbosAliyot: Option[Aliyot] = SpecialDay.shabbosAliyot(this)
 
-  final def maftir: Option[ChumashSpan.BookSpan] = SpecialDay.toMaftir(this)
+  final def maftir: Option[ChumashSpan.BookSpan] = SpecialDay.maftir(this)
 
-  final def haftarah: Option[Haftarah] = SpecialDay.toHaftarah(this)
+  final def haftarah: Option[Haftarah] = SpecialDay.haftarah(this)
 
   // TODO verify: aliyot present when they should etc...
 }
@@ -87,15 +87,15 @@ object SpecialDay {
     ShavuosMaftir, Shavuos1, Shavuos2
   )
 
-  private lazy val toNames: Map[SpecialDay, Names] = metadatas.names
+  private lazy val names: Map[SpecialDay, Names] = metadatas.names
 
-  private lazy val toWeekdayAliyot: Map[SpecialDay, Option[Aliyot]] = metadatas.weekdayAliyot
+  private lazy val weekdayAliyot: Map[SpecialDay, Option[Aliyot]] = metadatas.get.mapValues(_.weekdayAliyot)
 
-  private lazy val toShabbosAliyot: Map[SpecialDay, Option[Aliyot]] = metadatas.shabbosAliyot
+  private lazy val shabbosAliyot: Map[SpecialDay, Option[Aliyot]] = metadatas.get.mapValues(_.shabbosAliyot)
 
-  private lazy val toMaftir: Map[SpecialDay, Option[ChumashSpan.BookSpan]] = metadatas.maftir
+  private lazy val maftir: Map[SpecialDay, Option[ChumashSpan.BookSpan]] = metadatas.get.mapValues(_.maftir)
 
-  private lazy val toHaftarah: Map[SpecialDay, Option[Haftarah]] = metadatas.haftarah
+  private lazy val haftarah: Map[SpecialDay, Option[Haftarah]] = metadatas.get.mapValues(_.haftarah)
 
   private final case class SpecialDayMetadata(
     names: Names,
@@ -172,14 +172,6 @@ object SpecialDay {
     }
 
     override def names: Map[SpecialDay, Names] = get.mapValues(_.names)
-
-    def weekdayAliyot: Map[SpecialDay, Option[Aliyot]] = get.mapValues(_.weekdayAliyot)
-
-    def shabbosAliyot: Map[SpecialDay, Option[Aliyot]] = get.mapValues(_.shabbosAliyot)
-
-    def maftir: Map[SpecialDay, Option[ChumashSpan.BookSpan]] = get.mapValues(_.maftir)
-
-    def haftarah: Map[SpecialDay, Option[Haftarah]] = get.mapValues(_.haftarah)
   }
 
   def main(args: Array[String]): Unit = {
