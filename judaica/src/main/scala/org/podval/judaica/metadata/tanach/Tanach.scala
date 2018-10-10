@@ -1,6 +1,6 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.{Holder, Metadata, Named, NamedCompanion, Names, Util, XML}
+import org.podval.judaica.metadata.{Attributes, Holder, Metadata, Named, NamedCompanion, Names, Util, XML}
 
 import scala.xml.Elem
 
@@ -159,7 +159,7 @@ object Tanach extends NamedCompanion {
         def byCustom(days: Seq[Tanach.DayParsed]): Custom.Sets[Seq[Span.Numbered]] =
           days.groupBy(_.custom).mapValues(days => days.map(_.span))
 
-        val span = Span.parseSemiResolved(metadata.attributes)
+        val span = parseSemiResolved(metadata.attributes)
         metadata.attributes.close()
 
         val (aliyahElements, dayElements, maftirElements) = XML.span(metadata.elements,
@@ -173,8 +173,8 @@ object Tanach extends NamedCompanion {
           span = span,
           days = byCustom(days),
           daysCombined = byCustom(daysCombined),
-          aliyot = aliyahElements.map(element => XML.parseEmpty(element, "aliyah", Span.parseNumbered)),
-          maftir = XML.parseEmpty(maftirElements.head, "maftir", Span.parseSemiResolved)
+          aliyot = aliyahElements.map(element => XML.parseEmpty(element, "aliyah", parseNumbered)),
+          maftir = XML.parseEmpty(maftirElements.head, "maftir", parseSemiResolved)
         )
       }
 
@@ -216,13 +216,20 @@ object Tanach extends NamedCompanion {
   private def parseDay(element: Elem): DayParsed = {
     val attributes = XML.openEmpty(element, "day")
     val result = DayParsed(
-      span = Span.parseNumbered(attributes),
+      span = parseNumbered(attributes),
       custom = attributes.get("custom").fold[Set[Custom]](Set(Custom.Common))(Custom.parse),
       isCombined = attributes.doGetBoolean("combined")
     )
     attributes.close()
     result
   }
+
+  private def parseNumbered(attributes: Attributes): Span.Numbered = Span.Numbered(
+    n = attributes.doGetInt("n"),
+    span = parseSemiResolved(attributes)
+  )
+
+  private def parseSemiResolved(attributes: Attributes): Span.SemiResolved = Span.parse(attributes).semiResolve
 
   private def combineDays(weeks: Seq[(Parsha, Custom.Sets[Seq[Span.Numbered]])]): Seq[Option[Custom.Of[Aliyot]]] = weeks match {
     case (parsha, days) :: (parshaNext, daysNext) :: tail =>

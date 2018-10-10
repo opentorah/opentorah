@@ -134,9 +134,9 @@ object SpecialDay {
       attributes.close()
 
       def parseAliyot(elements: Seq[Elem]): Aliyot = {
-        val aliyot = elements.map(element => XML.parseEmpty(element, "aliyah",
-          Span.parseNumberedFrom(bookSpan.span.from.chapter)))
-        Aliyot.parseAliyot(bookSpan, aliyot)
+        val fromChapter: Int = bookSpan.span.from.chapter
+        val result = elements.map(element => XML.parseEmpty(element, "aliyah", parseNumbered(fromChapter)))
+        Aliyot.parseAliyot(bookSpan, result)
       }
 
       val (weekdayElements, shabbos) = XML.span(elements, "aliyah", "shabbos")
@@ -152,6 +152,15 @@ object SpecialDay {
       shabbosAliyot.foreach(aliyot => require(aliyot.aliyot.length == 7))
 
       (weekdayAliyot, shabbosAliyot)
+    }
+
+    private def parseNumbered(fromChapter: Int)(attributes: Attributes): Span.Numbered = {
+      val span: Span.SemiResolved = Span.parse(attributes).defaultFromChapter(fromChapter).semiResolve
+      require(span.to.isEmpty)
+      Span.Numbered(
+        n = attributes.doGetInt("n"),
+        span = span
+      )
     }
 
     private def parseMaftir(element: Elem): ChumashSpan.BookSpan =
