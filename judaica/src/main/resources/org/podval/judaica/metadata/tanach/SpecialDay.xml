@@ -44,6 +44,7 @@ Mekorot
                on Shabbos if Sunday is also Rosh Chodesh: add "Shabbos Erev Rosh Chodesh Additional Haftorah".
      -->
     <day n="Rosh Chodesh">
+        <!-- TODO I do not understand what is going on here; re-express using consecutive aliyot and rules
         <torah book="Numbers" fromChapter="28">
             <part n="1">
                 <aliyah n="1" fromVerse="1" toVerse="3"/>
@@ -54,6 +55,7 @@ Mekorot
                 <aliyah n="4" fromVerse="11" toVerse="15" chanukka="3"/>
             </part>
         </torah>
+        -->
         <maftir book="Numbers" fromChapter="28" fromVerse="9" toVerse="15"/>
         <haftarah book="Isaiah" fromChapter="66">
             <part n="1" fromVerse="1" toVerse="24"/>
@@ -80,13 +82,16 @@ Mekorot
 
 
     <!-- RULE: in the morning: Torah reading only;
-               in the afternoon, 3rd aliyah is Maftir; read Haftarah. -->
-    <day n="Public Fast">
-        <torah book="Exodus">
-            <aliyah n="1" fromChapter="32" fromVerse="11" toVerse="14"/>
-            <aliyah n="2" fromChapter="34" fromVerse="1"/>
-            <aliyah n="3" fromChapter="34" fromVerse="4" toVerse="10"/>
+               in the afternoon, 3rd aliyah (part 2 aliyah 2) is Maftir; read Haftarah. -->
+    <day n="Public Fast Torah Part 1">
+        <torah book="Exodus" fromChapter="32" fromVerse="11" toVerse="14"/>
+    </day>
+    <day n="Public Fast Torah Part 2">
+        <torah book="Exodus" fromChapter="34" fromVerse="1" toVerse="10">
+            <aliyah n="2" fromVerse="4"/>
         </torah>
+    </day>
+    <day n="Public Fast Haftarah">
         <haftarah book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56" toVerse="8"/>
     </day>
 
@@ -97,10 +102,9 @@ Sfaradim Eretz Isroel
 fust haftara (exsept Zom Gedalia - Shuva Isroel
 -->
     <day n="Tisha Bav">
-        <torah book="Deuteronomy" fromChapter="4">
-            <aliyah n="1" fromVerse="25"/>
+        <torah book="Deuteronomy" fromChapter="4" fromVerse="25" toVerse="40">
             <aliyah n="2" fromVerse="30"/>
-            <aliyah n="3" fromVerse="36" toVerse="40"/>
+            <aliyah n="3" fromVerse="36"/>
         </torah>
         <haftarah book="Jeremiah">
             <custom n="Ashkenaz Sefard" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
@@ -113,14 +117,15 @@ fust haftara (exsept Zom Gedalia - Shuva Isroel
 
     <!-- RULE: on Shabbos Chol Hamoed Succos and Pesach, add "Shabbos Chol Hamoed Torah". -->
     <day n="Shabbos Chol Hamoed Torah">
-        <torah book="Exodus">
-            <aliyah n="1" fromChapter="33" fromVerse="12"/>
-            <aliyah n="2" fromChapter="33" fromVerse="17"/>
-            <aliyah n="3" fromChapter="33" fromVerse="20"/>
-            <aliyah n="4" fromChapter="34" fromVerse="1"/>
-            <aliyah n="5" fromChapter="34" fromVerse="4"/>
-            <aliyah n="6" fromChapter="34" fromVerse="11"/>
-            <aliyah n="7" fromChapter="34" fromVerse="18" toVerse="26"/>
+        <torah book="Exodus" fromChapter="33" fromVerse="12" toChapter="34" toVerse="26">
+            <shabbos>
+                <aliyah n="2" fromChapter="33" fromVerse="17"/>
+                <aliyah n="3" fromChapter="33" fromVerse="20"/>
+                <aliyah n="4" fromChapter="34" fromVerse="1"/>
+                <aliyah n="5" fromChapter="34" fromVerse="4"/>
+                <aliyah n="6" fromChapter="34" fromVerse="11"/>
+                <aliyah n="7" fromChapter="34" fromVerse="18"/>
+            </shabbos>
         </torah>
     </day>
 
@@ -130,54 +135,49 @@ fust haftara (exsept Zom Gedalia - Shuva Isroel
     </day>
 
     <day n="Rosh Hashanah 1">
-        <torah book="Genesis" fromChapter="21">
-            <aliyah n="1" fromVerse="1"/>
+        <torah book="Genesis" fromChapter="21" fromVerse="1" toVerse="34">
             <aliyah n="2" fromVerse="5"/>
             <aliyah n="3" fromVerse="13"/>
             <aliyah n="4" fromVerse="22"/>
-            <aliyah n="5" fromVerse="28" toVerse="34"/>
+            <aliyah n="5" fromVerse="28"/>
 
             <shabbos>
-                <aliyah n="1" fromVerse="1"/>
                 <aliyah n="2" fromVerse="5"/>
                 <aliyah n="3" fromVerse="9"/>
                 <aliyah n="4" fromVerse="13"/>
                 <aliyah n="5" fromVerse="18"/>
                 <aliyah n="6" fromVerse="22"/>
-                <aliyah n="7" fromVerse="28" toVerse="34"/>
+                <aliyah n="7" fromVerse="28"/>
             </shabbos>
         </torah>
         <haftarah book="I Samuel" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
     </day>
 
     <day n="Rosh Hashanah 2">
-        <torah book="Genesis" fromChapter="22">
-            <aliyah n="1" fromVerse="1"/>
+        <torah book="Genesis" fromChapter="22" fromVerse="1" toVerse="24">
             <aliyah n="2" fromVerse="4"/>
             <aliyah n="3" fromVerse="9"/>
             <aliyah n="4" fromVerse="15"/>
-            <aliyah n="5" fromVerse="20" toVerse="24"/>
+            <aliyah n="5" fromVerse="20"/>
         </torah>
         <haftarah book="Jeremiah" fromChapter="31" fromVerse="1" toVerse="19"/>
     </day>
 
     <day n="Yom Kippur Shacharis">
-        <torah book="Leviticus" fromChapter="16">
-            <aliyah n="1" fromVerse="1"/>
+        <torah book="Leviticus" fromChapter="16" fromVerse="1" toVerse="34">
             <aliyah n="2" fromVerse="7"/>
             <aliyah n="3" fromVerse="12"/>
             <aliyah n="4" fromVerse="18"/>
             <aliyah n="5" fromVerse="25"/>
-            <aliyah n="6" fromVerse="31" toVerse="34"/>
+            <aliyah n="6" fromVerse="31"/>
 
             <shabbos>
-                <aliyah n="1" fromVerse="1"/>
                 <aliyah n="2" fromVerse="4"/>
                 <aliyah n="3" fromVerse="7"/>
                 <aliyah n="4" fromVerse="12"/>
                 <aliyah n="5" fromVerse="18"/>
                 <aliyah n="6" fromVerse="25"/>
-                <aliyah n="7" fromVerse="31" toVerse="34"/>
+                <aliyah n="7" fromVerse="31"/>
             </shabbos>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="7" toVerse="11"/>
@@ -191,10 +191,9 @@ fust haftara (exsept Zom Gedalia - Shuva Isroel
     </day>
 
     <day n="Yom Kippur Mincha">
-        <torah book="Leviticus" fromChapter="18">
-            <aliyah n="1" fromVerse="1"/>
+        <torah book="Leviticus" fromChapter="18" fromVerse="1" toVerse="30">
             <aliyah n="2" fromVerse="6"/>
-            <aliyah n="3" fromVerse="22" toVerse="30"/> <!-- TODO mincha - maftir-->
+            <aliyah n="3" fromVerse="22"/> <!-- TODO mincha - maftir-->
         </torah>
         <haftarah>
             <custom n="Ashkenaz Sefard">
@@ -215,21 +214,19 @@ fust haftara (exsept Zom Gedalia - Shuva Isroel
     </day>
 
     <day n="Succos 1-2">
-        <torah book="Leviticus">
-            <aliyah n="1" fromChapter="22" fromVerse="26"/>
+        <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44">
             <aliyah n="2" fromChapter="23" fromVerse="4"/>
             <aliyah n="3" fromChapter="23" fromVerse="15"/>
             <aliyah n="4" fromChapter="23" fromVerse="23"/>
-            <aliyah n="5" fromChapter="23" fromVerse="33" toVerse="44"/>
+            <aliyah n="5" fromChapter="23" fromVerse="33"/>
 
             <shabbos>
-                <aliyah n="1" fromChapter="22" fromVerse="26"/>
                 <aliyah n="2" fromChapter="23" fromVerse="1"/>
                 <aliyah n="3" fromChapter="23" fromVerse="4"/>
                 <aliyah n="4" fromChapter="23" fromVerse="9"/>
                 <aliyah n="5" fromChapter="23" fromVerse="15"/>
                 <aliyah n="6" fromChapter="23" fromVerse="23"/>
-                <aliyah n="7" fromChapter="23" fromVerse="33" toVerse="44"/>
+                <aliyah n="7" fromChapter="23" fromVerse="33"/>
             </shabbos>
         </torah>
     </day>
@@ -279,14 +276,13 @@ n day of Sukkos
              in the Holy Land - n, in Diaspora - n and n+1
              -->
     <day n="Succos Korbanot">
-        <torah book="Numbers" fromChapter="29">
-            <aliyah n="1" fromVerse="12" toVerse="16"/>
-            <aliyah n="2" fromVerse="17" toVerse="19"/>
-            <aliyah n="3" fromVerse="20" toVerse="22"/>
-            <aliyah n="4" fromVerse="23" toVerse="25"/>
-            <aliyah n="5" fromVerse="26" toVerse="28"/>
-            <aliyah n="6" fromVerse="29" toVerse="31"/>
-            <aliyah n="7" fromVerse="32" toVerse="34"/>
+        <torah book="Numbers" fromChapter="29" fromVerse="12" toVerse="34">
+            <aliyah n="2" fromVerse="17"/>
+            <aliyah n="3" fromVerse="20"/>
+            <aliyah n="4" fromVerse="23"/>
+            <aliyah n="5" fromVerse="26"/>
+            <aliyah n="6" fromVerse="29"/>
+            <aliyah n="7" fromVerse="32"/>
         </torah>
     </day>
 
@@ -304,21 +300,19 @@ n day of Sukkos
     </day>
 
     <day n="Shemini Atzeres"> <!-- only in Diaspora. In Eretz Isroel - Simchas Torah -->
-        <torah book="Deuteronomy">
-            <aliyah n="1" fromChapter="14" fromVerse="22" toChapter="15" toVerse="19"/>
+        <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17">
             <aliyah n="2" fromChapter="16" fromVerse="1"/>
             <aliyah n="3" fromChapter="16" fromVerse="4"/>
             <aliyah n="4" fromChapter="16" fromVerse="9"/>
-            <aliyah n="5" fromChapter="16" fromVerse="13" toVerse="17"/>
+            <aliyah n="5" fromChapter="16" fromVerse="13"/>
 
             <shabbos>
-                <aliyah n="1" fromChapter="14" fromVerse="22"/>
                 <aliyah n="2" fromChapter="15" fromVerse="1"/>
                 <aliyah n="3" fromChapter="15" fromVerse="19"/>
                 <aliyah n="4" fromChapter="16" fromVerse="1"/>
                 <aliyah n="5" fromChapter="16" fromVerse="4"/>
                 <aliyah n="6" fromChapter="16" fromVerse="9"/>
-                <aliyah n="7" fromChapter="16" fromVerse="13" toVerse="17"/>
+                <aliyah n="7" fromChapter="16" fromVerse="13"/>
             </shabbos>
         </torah>
         <haftarah book="I Kings" fromChapter="8" fromVerse="54">
@@ -329,19 +323,14 @@ n day of Sukkos
         </haftarah>
     </day>
 
+    <!-- RULE: add Simchas Torah Chassan Bereishis as the 7th aliyah -->
     <day n="Simchas Torah">
-        <torah>
-            <part n="1" book="Deuteronomy"> <!-- Zos Haberacha -->
-                <aliyah n="1" fromChapter="33" fromVerse="1"/>
-                <aliyah n="2" fromChapter="33" fromVerse="5"/>
-                <aliyah n="3" fromChapter="33" fromVerse="13"/>
-                <aliyah n="4" fromChapter="33" fromVerse="18"/>
-                <aliyah n="5" fromChapter="33" fromVerse="22"/>
-                <aliyah n="6" fromChapter="33" fromVerse="27" toChapter="34" toVerse="12"/> <!-- TODO hatan Tora -->
-            </part>
-            <part n="2" book="Genesis">
-                <aliyah n="7" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/>  <!-- TODO hatan Bereshis -->
-            </part>
+        <torah book="Deuteronomy" fromChapter="33" fromVerse="1" toChapter="34" toVerse="12"> <!-- Zos Haberacha -->
+          <aliyah n="2" fromChapter="33" fromVerse="5"/>
+          <aliyah n="3" fromChapter="33" fromVerse="13"/>
+          <aliyah n="4" fromChapter="33" fromVerse="18"/>
+          <aliyah n="5" fromChapter="33" fromVerse="22"/>
+          <aliyah n="6" fromChapter="33" fromVerse="27"/>
         </torah>
         <haftarah book="Joshua">
             <custom n="Ashkenaz Sefard Italki" fromChapter="1" fromVerse="1" toVerse="18"/>
@@ -352,11 +341,15 @@ n day of Sukkos
         </haftarah>
     </day>
 
+    <day n="Simchas Torah Chassan Bereishis">
+        <torah book="Genesis" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/>
+    </day>
+
     <!--
     RULE: when a day of Channukah falls on Rosh Chodesh (6th - always; 7th - sometimes),
             first 3 aliyot are from Rosh Chodesh (see above).
-    -->
-    <!--
+
+    TODO renumber aliyot in the rules.
     RULE for days that do not coincide with Shabbos or Rosh Chodesh:
       Mingag Chabad (Ramo)
       day 1
@@ -387,27 +380,26 @@ n day of Sukkos
 
    -->
     <day n="Channukah Korbanot">
-        <torah book="Numbers" fromChapter="7">
-            <!-- TODO I changed 'text' to 'aliyah' to start parsing, but tjose aren't aliyot but fragments... -->
-            <aliyah n="0" fromVerse="1" toVerse="11"/>
-            <aliyah n="1.1" fromVerse="12" toVerse="14"/>
-            <aliyah n="1.2" fromVerse="15" toVerse="17"/>
-            <aliyah n="2.1" fromVerse="18" toVerse="20"/>
-            <aliyah n="2.2" fromVerse="21" toVerse="23"/>
-            <aliyah n="3.1" fromVerse="24" toVerse="26"/>
-            <aliyah n="3.2" fromVerse="27" toVerse="29"/>
-            <aliyah n="4.1" fromVerse="30" toVerse="32"/>
-            <aliyah n="4.2" fromVerse="33" toVerse="35"/>
-            <aliyah n="5.1" fromVerse="36" toVerse="38"/>
-            <aliyah n="5.2" fromVerse="39" toVerse="41"/>
-            <aliyah n="6.1" fromVerse="42" toVerse="44"/>
-            <aliyah n="6.2" fromVerse="45" toVerse="47"/>
-            <aliyah n="7.1" fromVerse="48" toVerse="50"/>
-            <aliyah n="7.2" fromVerse="51" toVerse="53"/>
-            <aliyah n="8.1" fromVerse="12" toVerse="14"/>
-            <aliyah n="8.2" fromVerse="15" toVerse="17"/>
-            <aliyah n="end" fromChapter="7" fromVerse="18" toChapter="8" toVerse="4"/>
+        <torah book="Numbers" fromChapter="7" fromVerse="1" toVerse="53">
+            <aliyah n="1"  fromVerse="1" />   <!-- 0 -->
+            <aliyah n="2"  fromVerse="12"/>   <!-- 1.1 = 8.1 -->
+            <aliyah n="3"  fromVerse="15"/>   <!-- 1.1 = 8.2 -->
+            <aliyah n="4"  fromVerse="18"/>   <!-- 2.1 -->
+            <aliyah n="5"  fromVerse="21"/>   <!-- 2.2 -->
+            <aliyah n="6"  fromVerse="24"/>   <!-- 3.1 -->
+            <aliyah n="7"  fromVerse="27"/>   <!-- 3.2 -->
+            <aliyah n="8"  fromVerse="30"/>   <!-- 4.1 -->
+            <aliyah n="9"  fromVerse="33"/>   <!-- 4.2 -->
+            <aliyah n="10" fromVerse="36"/>   <!-- 5.1 -->
+            <aliyah n="11" fromVerse="39"/>   <!-- 5.2 -->
+            <aliyah n="12" fromVerse="42"/>   <!-- 6.1 -->
+            <aliyah n="13" fromVerse="45"/>   <!-- 6.2 -->
+            <aliyah n="14" fromVerse="48"/>   <!-- 7.1 -->
+            <aliyah n="15" fromVerse="51"/>   <!-- 7.2 -->
         </torah>
+    </day>
+    <day n="Channukah Korbanot End">
+      <torah book="Numbers" fromChapter="7" fromVerse="18" toChapter="8" toVerse="4"/>
     </day>
 
 
@@ -458,10 +450,9 @@ n day of Sukkos
     </day>
 
     <day n="Purim">
-        <torah book="Exodus" fromChapter="17">
-            <aliyah n="1" fromVerse="8"/>
+        <torah book="Exodus" fromChapter="17" fromVerse="8" toVerse="16">
             <aliyah n="2" fromVerse="11"/>
-            <aliyah n="3" fromVerse="14" toVerse="16"/>
+            <aliyah n="3" fromVerse="14"/>
         </torah>
     </day>
 
@@ -506,20 +497,19 @@ n day of Sukkos
     </day>
 
     <day n="Pesach 1">
-        <torah book="Exodus" fromChapter="12">
-            <aliyah n="1" fromVerse="21"/>
+        <torah book="Exodus" fromChapter="12" fromVerse="21" toVerse="51">
             <aliyah n="2" fromVerse="25"/>
             <aliyah n="3" fromVerse="29"/>
             <aliyah n="4" fromVerse="37"/>
-            <aliyah n="5" fromVerse="43" toVerse="51"/>
+            <aliyah n="5" fromVerse="43"/>
+
             <shabbos>
-                <aliyah n="1" fromVerse="21"/>
                 <aliyah n="2" fromVerse="25"/>
                 <aliyah n="3" fromVerse="29"/>
                 <aliyah n="4" fromVerse="33"/>
                 <aliyah n="5" fromVerse="37"/>
                 <aliyah n="6" fromVerse="43"/>
-                <aliyah n="7" fromVerse="48" toVerse="51"/>
+                <aliyah n="7" fromVerse="48"/>
             </shabbos>
         </torah>
         <haftarah book="Joshua">
@@ -538,13 +528,19 @@ n day of Sukkos
 
 
     <day n="Pesach 2">
-        <torah book="Leviticus">
+        <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44">
             <aliyah n="1" fromChapter="22" fromVerse="26"/>
             <aliyah n="2" fromChapter="23" fromVerse="4"/>
-            <aliyah n="3" fromChapter="23" fromVerse="15" toVerse="44"/>
-            <aliyah n="3" fromChapter="23" fromVerse="15" toVerse="22" diaspora="true"/>
-            <aliyah n="4" fromChapter="23" fromVerse="23" diaspora="true"/>
-            <aliyah n="5" fromChapter="23" fromVerse="33" toVerse="44" diaspora="true"/>
+            <aliyah n="3" fromChapter="23" fromVerse="15"/>
+        </torah>
+    </day>
+    <day n="Pesach 2 Diaspora">
+        <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44">
+            <aliyah n="1" fromChapter="22" fromVerse="26"/>
+            <aliyah n="2" fromChapter="23" fromVerse="4"/>
+            <aliyah n="3" fromChapter="23" fromVerse="15"/>
+            <aliyah n="4" fromChapter="23" fromVerse="23"/>
+            <aliyah n="5" fromChapter="23" fromVerse="33"/>
         </torah>
         <haftarah book="II Kings">  <!-- Diaspora -->
             <custom n="Ashkenaz Sefard">
@@ -560,34 +556,30 @@ n day of Sukkos
     </day>
 
     <day n="Pesach 3">
-        <torah book="Exodus" fromChapter="13">
-            <aliyah n="1" fromVerse="1"/>
+        <torah book="Exodus" fromChapter="13" fromVerse="1" toVerse="16">
             <aliyah n="2" fromVerse="5"/>
-            <aliyah n="3" fromVerse="11" toVerse="16"/>
+            <aliyah n="3" fromVerse="11"/>
         </torah>
     </day>
 
     <day n="Pesach 4">
-        <torah book="Exodus">
-            <aliyah n="1" fromChapter="22" fromVerse="24"/>
+        <torah book="Exodus" fromChapter="22" fromVerse="24" toChapter="23" toVerse="19">
             <aliyah n="2" fromChapter="22" fromVerse="27"/>
-            <aliyah n="3" fromChapter="23" fromVerse="6" toVerse="19"/>
+            <aliyah n="3" fromChapter="23" fromVerse="6"/>
         </torah>
     </day>
 
     <day n="Pesach 5">
-        <torah book="Exodus">
-            <aliyah n="1" fromChapter="34" fromVerse="1"/>
+        <torah book="Exodus" fromChapter="34" fromVerse="1" toVerse="26">
             <aliyah n="2" fromChapter="34" fromVerse="4"/>
-            <aliyah n="3" fromChapter="34" fromVerse="18" toVerse="26"/>
+            <aliyah n="3" fromChapter="34" fromVerse="18"/>
         </torah>
     </day>
 
     <day n="Pesach 6">
-        <torah book="Numbers" fromChapter="9">
-            <aliyah n="1" fromVerse="1"/>
+        <torah book="Numbers" fromChapter="9" fromVerse="1" toVerse="14">
             <aliyah n="2" fromVerse="7"/>
-            <aliyah n="3" fromVerse="9" toVerse="14"/>
+            <aliyah n="3" fromVerse="9"/>
         </torah>
     </day>
 
@@ -599,33 +591,30 @@ n day of Sukkos
     </day>
 
     <day n="Pesach 7">
-        <torah book="Exodus">
-            <aliyah n="1" fromChapter="13" fromVerse="17"/>
+        <torah book="Exodus" fromChapter="13" fromVerse="17" toChapter="15" toVerse="26">
             <aliyah n="2" fromChapter="14" fromVerse="1"/>
             <aliyah n="3" fromChapter="14" fromVerse="9"/>
             <aliyah n="4" fromChapter="14" fromVerse="15"/>
-            <aliyah n="5" fromChapter="14" fromVerse="26" toChapter="15" toVerse="26"/>
+            <aliyah n="5" fromChapter="14" fromVerse="26"/>
 
             <shabbos>
-                <aliyah n="1" fromChapter="13" fromVerse="17"/>
                 <aliyah n="2" fromChapter="13" fromVerse="20"/>
                 <aliyah n="3" fromChapter="14" fromVerse="1"/>
                 <aliyah n="4" fromChapter="14" fromVerse="5"/>
                 <aliyah n="5" fromChapter="14" fromVerse="9"/>
                 <aliyah n="6" fromChapter="14" fromVerse="15"/>
-                <aliyah n="7" fromChapter="14" fromVerse="26" toChapter="15" toVerse="26"/>
+                <aliyah n="7" fromChapter="14" fromVerse="26"/>
             </shabbos>
         </torah>
         <haftarah book="II Samuel" fromChapter="22" fromVerse="1" toVerse="51"/>
     </day>
 
     <day n="Pesach 8"> <!-- Diaspora -->
-        <torah book="Deuteronomy">
-            <aliyah n="1" fromChapter="15" fromVerse="19"/>
+        <torah book="Deuteronomy" fromChapter="15" fromVerse="19" toChapter="16" toVerse="17">
             <aliyah n="2" fromChapter="16" fromVerse="1"/>
             <aliyah n="3" fromChapter="16" fromVerse="4"/>
             <aliyah n="4" fromChapter="16" fromVerse="9"/>
-            <aliyah n="5" fromChapter="16" fromVerse="13" toVerse="17"/>
+            <aliyah n="5" fromChapter="16" fromVerse="13"/>
 
             <!--RULE - shabos - above Shmini atceres-->
         </torah>
@@ -638,12 +627,11 @@ n day of Sukkos
     </day>
 
     <day n="Shavuos 1">
-        <torah book="Exodus">
-            <aliyah n="1" fromChapter="19" fromVerse="1"/>
+        <torah book="Exodus" fromChapter="19" fromVerse="1" toChapter="20" toVerse="22">
             <aliyah n="2" fromChapter="19" fromVerse="7"/>
             <aliyah n="3" fromChapter="19" fromVerse="14"/>
             <aliyah n="4" fromChapter="19" fromVerse="20"/>
-            <aliyah n="5" fromChapter="20" fromVerse="15" toVerse="22"/>
+            <aliyah n="5" fromChapter="20" fromVerse="15"/>
         </torah>
         <haftarah book="Ezekiel">
             <custom n="Ashkenaz Sefard">

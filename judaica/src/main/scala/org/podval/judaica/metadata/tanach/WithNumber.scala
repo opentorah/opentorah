@@ -14,7 +14,7 @@ object WithNumber {
 
   def checkNumber[T <: WithNumber](result: Seq[T], number: Int, what: String): Seq[T] = {
     checkConsecutive(result, what)
-    require(result.length == number, s"Wrong number of ${what}s")
+    require(result.length == number, s"Wrong number of ${what}s: ${result.length} != $number")
     result
   }
 

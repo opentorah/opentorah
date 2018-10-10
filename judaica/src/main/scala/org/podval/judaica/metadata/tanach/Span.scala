@@ -73,6 +73,16 @@ object Span {
 
   def parseSemiResolved(attributes: Attributes): SemiResolved = parse(attributes).semiResolve
 
+  def parseSemiResolvedFrom(fromChapter: Int, attributes: Attributes): SemiResolved = {
+    val span: Parsed = parse(attributes)
+    val withInheritance: Parsed = if (span.from.chapter.isDefined) span else {
+      Parsed(from = Verse.Parsed(chapter = Some(fromChapter), verse = span.from.verse), to = span.to)
+    }
+    val result = withInheritance.semiResolve
+    require(result.to.isEmpty)
+    result
+  }
+
   def setImpliedTo(
     spans: Seq[SemiResolved],
     span: Span,
@@ -90,5 +100,10 @@ object Span {
   def parseNumbered(attributes: Attributes): Numbered = Numbered(
     n = attributes.doGetInt("n"),
     span = parseSemiResolved(attributes)
+  )
+
+  def parseNumberedFrom(fromChapter: Int)(attributes: Attributes): Numbered = Numbered(
+    n = attributes.doGetInt("n"),
+    span = parseSemiResolvedFrom(fromChapter, attributes)
   )
 }

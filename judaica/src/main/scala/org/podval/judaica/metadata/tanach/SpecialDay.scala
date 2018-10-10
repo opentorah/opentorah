@@ -1,17 +1,22 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.{Holder, Named, Names, Metadata, XML, Language, LanguageSpec}
+import org.podval.judaica.metadata.{Attributes, Holder, Named, Names, Metadata, XML, Language, LanguageSpec}
 import org.podval.judaica.metadata.tanach.BookSpan.ChumashSpan
 
 import scala.xml.Elem
 
 sealed class SpecialDay(override val name: String) extends Named {
-  // TODO we do not need Named or names() here!
   final override def names: Names = SpecialDay.toNames(this)
+
+  final def weekdayAliyot: Option[Aliyot] = SpecialDay.toWeekdayAliyot(this)
+
+  final def shabbosAliyot: Option[Aliyot] = SpecialDay.toShabbosAliyot(this)
 
   final def maftir: Option[ChumashSpan.BookSpan] = SpecialDay.toMaftir(this)
 
   final def haftarah: Option[Haftarah] = SpecialDay.toHaftarah(this)
+
+  // TODO verify: aliyot present when they should etc...
 }
 
 object SpecialDay {
@@ -20,7 +25,9 @@ object SpecialDay {
   case object RoshChodesh extends SpecialDay("Rosh Chodesh")
   case object ShabbosRoshChodeshAdditionalHaftorah extends SpecialDay("Shabbos Rosh Chodesh Additional Haftorah")
   case object ShabbosErevRoshChodeshAdditionalHaftorah extends SpecialDay("Shabbos Erev Rosh Chodesh Additional Haftorah")
-  case object PublicFast extends SpecialDay("Public Fast")
+  case object PublicFastTorahPart1 extends SpecialDay("Public Fast Torah Part 1")
+  case object PublicFastTorahPart2 extends SpecialDay("Public Fast Torah Part 2")
+  case object PublicFastHaftarah extends SpecialDay("Public Fast Haftarah")
   case object TishaBeAv extends SpecialDay("Tisha Bav")
   case object ShabbosCholHamoedTorah extends SpecialDay("Shabbos Chol Hamoed Torah")
   case object RoshHashanahMaftir extends SpecialDay("Rosh Hashanah Maftir")
@@ -37,7 +44,9 @@ object SpecialDay {
   case object SheminiAtzeresMaftir extends SpecialDay("Shemini Atzeres Maftir")
   case object SheminiAtzeres extends SpecialDay("Shemini Atzeres")
   case object SimchasTorah extends SpecialDay("Simchas Torah")
+  case object SimchasTorahChassanBereishis extends SpecialDay("Simchas Torah Chassan Bereishis")
   case object ChannukahKorbanot extends SpecialDay("Channukah Korbanot")
+  case object ChannukahKorbanotEnd extends SpecialDay("Channukah Korbanot End")
   case object ChannukahShabbos1 extends SpecialDay("Channukah Shabbos 1")
   case object ChannukahShabbos2 extends SpecialDay("Channukah Shabbos 2")
   case object ParshasShekalim extends SpecialDay("Parshas Shekalim")
@@ -51,6 +60,7 @@ object SpecialDay {
   case object PesachAdditionalTorahReading extends SpecialDay("Pesach Additional Torah Reading")
   case object Pesach1 extends SpecialDay("Pesach 1")
   case object Pesach2 extends SpecialDay("Pesach 2")
+  case object Pesach2Diaspora extends SpecialDay("Pesach 2 Diaspora")
   case object Pesach3 extends SpecialDay("Pesach 3")
   case object Pesach4 extends SpecialDay("Pesach 4")
   case object Pesach5 extends SpecialDay("Pesach 5")
@@ -65,19 +75,23 @@ object SpecialDay {
   val values: Seq[SpecialDay] = Seq(
     ShabbosErevRoshChodesh, ShabbosErevRoshChodeshAdditionalHaftorah,
     RoshChodesh, ShabbosRoshChodeshAdditionalHaftorah,
-    PublicFast, TishaBeAv, ShabbosCholHamoedTorah,
+    PublicFastTorahPart1, PublicFastTorahPart2, PublicFastHaftarah, TishaBeAv, ShabbosCholHamoedTorah,
     RoshHashanahMaftir, RoshHashanah1, RoshHashanah2, YomKippurShacharis, YomKippurMincha,
     SuccosMaftir, Succos1_2, Succos1, Succos2, SuccosKorbanot, SuccosShabbosCholHamoedHaftarah,
-    SheminiAtzeresMaftir, SheminiAtzeres, SimchasTorah,
-    ChannukahKorbanot, ChannukahShabbos1, ChannukahShabbos2,
+    SheminiAtzeresMaftir, SheminiAtzeres, SimchasTorah, SimchasTorahChassanBereishis,
+    ChannukahKorbanot, ChannukahKorbanotEnd, ChannukahShabbos1, ChannukahShabbos2,
     ParshasShekalim, ParshasZachor, ParshasParah, ParshasHachodesh,
     Purim, ShabbosHagodol,
     Pesach1Maftir, PesachCholHamoedMaftir, PesachAdditionalTorahReading, PesachShabbosCholHamoedHaftarah,
-    Pesach1, Pesach2, Pesach3, Pesach4, Pesach5, Pesach6, Pesach7, Pesach8,
+    Pesach1, Pesach2, Pesach2Diaspora, Pesach3, Pesach4, Pesach5, Pesach6, Pesach7, Pesach8,
     ShavuosMaftir, Shavuos1, Shavuos2
   )
 
   private lazy val toNames: Map[SpecialDay, Names] = metadatas.names
+
+  private lazy val toWeekdayAliyot: Map[SpecialDay, Option[Aliyot]] = metadatas.weekdayAliyot
+
+  private lazy val toShabbosAliyot: Map[SpecialDay, Option[Aliyot]] = metadatas.shabbosAliyot
 
   private lazy val toMaftir: Map[SpecialDay, Option[ChumashSpan.BookSpan]] = metadatas.maftir
 
@@ -85,7 +99,8 @@ object SpecialDay {
 
   private final case class SpecialDayMetadata(
     names: Names,
-    torah: Option[Elem],
+    weekdayAliyot: Option[Aliyot],
+    shabbosAliyot: Option[Aliyot],
     maftir: Option[ChumashSpan.BookSpan],
     haftarah: Option[Haftarah]
   )
@@ -101,17 +116,42 @@ object SpecialDay {
       val (torahElements, maftriElements, haftarahElements) = XML.span(metadata.elements,
         "torah", "maftir", "haftarah")
 
-      def noMoreThanOne(elements: Seq[Elem]): Option[Elem] = {
-        require(elements.length <= 1)
-        elements.headOption
-      }
+      val (weekdayAliyot: Option[Aliyot], shabbosAliyot: Option[Aliyot]) =
+        XML.noMoreThanOne(torahElements).fold[(Option[Aliyot], Option[Aliyot])]((None, None))(parseTorah)
 
       day -> SpecialDayMetadata(
         metadata.names,
-        torah = noMoreThanOne(torahElements),
-        maftir = noMoreThanOne(maftriElements).map(parseMaftir),
-        haftarah = noMoreThanOne(haftarahElements).map(parseHaftarah)
+        weekdayAliyot = weekdayAliyot,
+        shabbosAliyot = shabbosAliyot,
+        maftir = XML.noMoreThanOne(maftriElements).map(parseMaftir),
+        haftarah = XML.noMoreThanOne(haftarahElements).map(parseHaftarah)
       )
+    }
+
+    private def parseTorah(element: Elem): (Option[Aliyot], Option[Aliyot]) = {
+      val (attributes: Attributes, elements: Seq[Elem]) = XML.open(element, "torah")
+      val bookSpan: BookSpan.ChumashSpan.BookSpan = BookSpan.ChumashSpan.parse(attributes).resolve
+      attributes.close()
+
+      def parseAliyot(elements: Seq[Elem]): Aliyot = {
+        val aliyot = elements.map(element => XML.parseEmpty(element, "aliyah",
+          Span.parseNumberedFrom(bookSpan.span.from.chapter)))
+        Aliyot.parseAliyot(bookSpan, aliyot)
+      }
+
+      val (weekdayElements, shabbos) = XML.span(elements, "aliyah", "shabbos")
+      val shabbosElements: Option[Seq[Elem]] = XML.noMoreThanOne(shabbos).map { shabbos =>
+        val (shabbosAttributes, shabbosElements) = XML.open(shabbos, "shabbos")
+        shabbosAttributes.close()
+        XML.span(shabbosElements, "aliyah")
+      }
+
+      val weekdayAliyot = if (weekdayElements.isEmpty) None else Some(parseAliyot(weekdayElements))
+      val shabbosAliyot = shabbosElements.map(elements => parseAliyot(elements))
+
+      shabbosAliyot.foreach(aliyot => require(aliyot.aliyot.length == 7))
+
+      (weekdayAliyot, shabbosAliyot)
     }
 
     private def parseMaftir(element: Elem): ChumashSpan.BookSpan =
@@ -124,12 +164,17 @@ object SpecialDay {
 
     override def names: Map[SpecialDay, Names] = get.mapValues(_.names)
 
+    def weekdayAliyot: Map[SpecialDay, Option[Aliyot]] = get.mapValues(_.weekdayAliyot)
+
+    def shabbosAliyot: Map[SpecialDay, Option[Aliyot]] = get.mapValues(_.shabbosAliyot)
+
     def maftir: Map[SpecialDay, Option[ChumashSpan.BookSpan]] = get.mapValues(_.maftir)
 
     def haftarah: Map[SpecialDay, Option[Haftarah]] = get.mapValues(_.haftarah)
   }
 
   def main(args: Array[String]): Unit = {
-    print(SpecialDay.SheminiAtzeresMaftir.maftir.get.toString(LanguageSpec(Language.English)))
+    println(SpecialDay.SheminiAtzeres.shabbosAliyot.get.toString(LanguageSpec(Language.English)))
+    println(SpecialDay.SheminiAtzeresMaftir.maftir.get.toString(LanguageSpec(Language.English)))
   }
 }

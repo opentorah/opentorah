@@ -3,7 +3,7 @@ package org.podval.judaica.metadata.tanach
 import org.podval.judaica.metadata.LanguageSpec
 
 final case class Aliyot(span: BookSpan.ChumashSpan.BookSpan, aliyot: Seq[Span]) {
-  // TODO require()
+  // TODO verify that spans are consecutive and cover the book span
 
   override def toString: String = toString(LanguageSpec.empty)
 
@@ -14,7 +14,6 @@ final case class Aliyot(span: BookSpan.ChumashSpan.BookSpan, aliyot: Seq[Span]) 
 
 object Aliyot {
 
-  // TODO need AliyotCustom.empty() in Tanach.combineDays() - or make daysCombined optional!
   def processDays(
     book: Tanach.ChumashBook,
     days: Custom.Sets[Seq[Span.Numbered]],
@@ -51,6 +50,21 @@ object Aliyot {
     )
   }
 
+  def parseAliyot(
+    bookSpan: BookSpan.ChumashSpan.BookSpan,
+    aliyot: Seq[Span.Numbered]
+  ): Aliyot = {
+    val span = bookSpan.span
+    val chapters = bookSpan.book.chapters
+    val withImplied1: Seq[Span.Numbered] = addImplied1(aliyot, span, chapters)
+    val result: Seq[Span] = setImpliedToCheckAndDropNumbers(withImplied1, withImplied1.length, span, chapters)
+
+    Aliyot(
+      span = bookSpan,
+      aliyot = result
+    )
+  }
+
   def parseMaftir(
     parsha: Parsha,
     maftir: Span.SemiResolved
@@ -72,12 +86,12 @@ object Aliyot {
     chapters: Chapters
   ): Seq[Span.Numbered] = {
     val first = spans.head
-    val implied: Seq[Span.Numbered] = if (first.n == 1) Seq.empty else Seq(Span.Numbered(1, Span.SemiResolved(
+    val implied1: Seq[Span.Numbered] = if (first.n == 1) Seq.empty else Seq(Span.Numbered(1, Span.SemiResolved(
       span.from,
       Some(chapters.prev(first.span.from).get)
     )))
 
-    implied ++ spans
+    implied1 ++ spans
   }
 
   private def setImpliedToCheckAndDropNumbers(
