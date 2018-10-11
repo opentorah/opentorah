@@ -28,11 +28,15 @@ object Metadata {
   def loadMetadata[K <: Named, M <: HasName](
     keys: Seq[K],
     obj: AnyRef,
-    elementName: String
+    elementName: String,
+    resourceName: Option[String] = None
   ): Map[K, Metadata] = bind(
     keys = keys,
-    elements = loadMetadataElements(obj, Util.className(obj), rootElementName = "metadata", elementName = elementName),
-    obj = obj
+    obj = obj,
+    elements = loadMetadataElements(obj,
+      resourceName.getOrElse(Util.className(obj)),
+      rootElementName = "metadata",
+      elementName = elementName)
   )
 
   def bind[K <: Named](
@@ -94,7 +98,6 @@ object Metadata {
 
     findAndBind(keys, metadatas).toMap
   }
-
 
   private def findAndBind[K <: Named, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Seq[(K, M)] = {
     if (keys.isEmpty) require(metadatas.isEmpty, s"Unmatched metadatas: ${metadatas.mkString("\n")}")

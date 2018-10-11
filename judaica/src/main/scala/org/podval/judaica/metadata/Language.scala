@@ -5,7 +5,7 @@ sealed class Language(code: String) extends Named {
 
   final override def name: String = code
 
-  // TODO add toLanguageSpec()?
+  final def toSpec: LanguageSpec = LanguageSpec(this)
 
   def toString(number: Int): String = number.toString
 }

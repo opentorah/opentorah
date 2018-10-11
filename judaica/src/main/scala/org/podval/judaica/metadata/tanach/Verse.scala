@@ -1,6 +1,6 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.LanguageSpec
+import org.podval.judaica.metadata.{Attributes, LanguageSpec}
 
 final case class Verse(chapter: Int, verse: Int) extends Ordered[Verse] {
   require(chapter > 0)
@@ -14,4 +14,36 @@ final case class Verse(chapter: Int, verse: Int) extends Ordered[Verse] {
   override def toString: String = toString(LanguageSpec.empty)
 
   def toString(spec: LanguageSpec): String = spec.toString(chapter) + ":" + spec.toString(verse)
+}
+
+object Verse {
+
+  final case class Parsed(chapter: Option[Int], verse: Option[Int]) {
+
+    def inheritFrom(ancestor: Parsed): Parsed = {
+      require(this.chapter.isEmpty || ancestor.chapter.isEmpty)
+      require(this.verse.isEmpty || ancestor.verse.isEmpty)
+
+      Parsed(
+        chapter = this.chapter.orElse(ancestor.chapter),
+        verse = this.verse.orElse(ancestor.verse),
+      )
+    }
+
+    def defaultChapter(defaultChapter: Int): Parsed =
+      if (chapter.isDefined) this
+      else Parsed(chapter = Some(defaultChapter), verse = verse)
+
+    def resolve: Verse = Verse(chapter.get, verse.get)
+  }
+
+  final def parseFrom(attributes: Attributes): Parsed = Parsed(
+    chapter = attributes.getInt("fromChapter"),
+    verse = attributes.getInt("fromVerse")
+  )
+
+  final def parseTo(attributes: Attributes): Parsed = Parsed(
+    chapter = attributes.getInt("toChapter"),
+    verse = attributes.getInt("toVerse")
+  )
 }

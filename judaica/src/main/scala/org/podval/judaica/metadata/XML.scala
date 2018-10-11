@@ -52,6 +52,11 @@ object XML {
     result
   }
 
+  def noMoreThanOne(elements: Seq[Elem]): Option[Elem] = {
+    require(elements.length <= 1)
+    elements.headOption
+  }
+
   def span(elements: Seq[Elem], name1: String): Seq[Elem] = {
     val (result, tail) = take(elements, name1)
     checkNoMoreElements(tail)

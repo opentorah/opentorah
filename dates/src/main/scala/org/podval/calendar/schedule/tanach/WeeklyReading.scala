@@ -4,8 +4,8 @@ import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.jewish.SpecialDay
 import SpecialDay.{Pesach, ShabbosBereishis, Shavuos, TishaBeAv, shabbosAfter, shabbosBefore}
-import org.podval.judaica.metadata.Util
-import org.podval.judaica.metadata.tanach.Parsha
+import org.podval.judaica.metadata.{Language, LanguageSpec, Util}
+import org.podval.judaica.metadata.tanach.{Parsha, SpecialReading}
 import org.podval.judaica.metadata.tanach.Parsha._
 
 /**
@@ -191,5 +191,10 @@ object WeeklyReading {
   private def take(what: Seq[Parsha], number: Int): Set[Parsha] = {
     require(0 <= number && number <= what.length)
     what.take(number).toSet
+  }
+
+  def main(args: Array[String]): Unit = {
+    println(SpecialReading.SheminiAtzeres.shabbosAliyot.get.toString(LanguageSpec(Language.English)))
+    println(SpecialReading.SheminiAtzeresMaftir.maftir.get.toString(LanguageSpec(Language.English)))
   }
 }

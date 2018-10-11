@@ -1,7 +1,7 @@
 package org.podval.judaica.metadata.tanach
 
 import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
-import org.podval.judaica.metadata.{Attributes, LanguageSpec, Metadata, XML}
+import org.podval.judaica.metadata.{Attributes, LanguageSpec, XML}
 
 import scala.xml.Elem
 
@@ -16,13 +16,7 @@ final case class Haftarah(customs: Custom.Of[Seq[ProphetSpan.BookSpan]]) {
 }
 
 object Haftarah {
-  lazy val haftarah: Map[Parsha, Haftarah] = Metadata.loadMetadata(
-    keys = Parsha.values,
-    obj = Haftarah.this,
-    elementName = "week"
-  ).mapValues { metadata => parse(metadata.attributes, metadata.elements) }
-
-  def parse(attributes: Attributes, elements: Seq[Elem]): Haftarah = {
+  def apply(attributes: Attributes, elements: Seq[Elem]): Haftarah = {
     val span = ProphetSpan.parse(attributes)
     attributes.close()
 
