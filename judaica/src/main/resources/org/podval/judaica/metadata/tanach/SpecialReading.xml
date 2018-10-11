@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metadata type="SpecialDay">
-    <!-- TODO 'day' is really a reading building block; this is not "Special Day", this is "Special Reading"  -->
+<metadata type="SpecialReading">
     <!-- TODO проработаь записки сумасшедшего: это уже всё вставлено или надо ещё что-то делать?
 Законы совпадений:
 1. 6) отодвигается при любом сожертвоприношения
@@ -37,7 +36,7 @@ Mekorot
     <!-- RULE: on weekday: add Torah reading, part1, part2 no Maftir/Haftorah;
                on Chanukka: alia 1,2,3 - part1
                on Shabbos: usual Torah, add Maftir/Haftorah; (include rosh chodesh elul)
-               on Shabbos Chamukka, Shkalim, Ha-hodesh,
+               on Shabbos Chanukka, Shkalim, Ha-hodesh,
                        Alia 7: Rosh chodesh part 2
                     -  Shabbos  Rosh Chodesh Additional Haftorah
                on Shabos rosh hodesh Menachem Ov  - only maftir rosh chodesh

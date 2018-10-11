@@ -29,16 +29,13 @@ object Span {
     from: Verse.Parsed,
     to: Verse.Parsed
   ) {
-    // TODO generalize or inline :)
-
     def inheritFrom(ancestor: Parsed): Parsed = Parsed(
       from = this.from.inheritFrom(ancestor.from),
       to = this.to.inheritFrom(ancestor.to)
     )
 
     def defaultFromChapter(fromChapter: Int): Parsed =
-      if (from.chapter.isDefined) this
-      else Parsed(from = Verse.Parsed(chapter = Some(fromChapter), verse = from.verse), to = to)
+      Parsed(from = from.defaultChapter(fromChapter), to = to)
 
     def semiResolve: SemiResolved = {
       val fromResult = from.resolve
@@ -90,4 +87,18 @@ object Span {
   }
 
   final case class Numbered(override val n: Int, span: SemiResolved) extends WithNumber
+
+  def addImplied1(
+    spans: Seq[Numbered],
+    span: Span,
+    chapters: Chapters
+  ): Seq[Numbered] = {
+    val first = spans.head
+    val implied1: Seq[Numbered] = if (first.n == 1) Seq.empty else Seq(Numbered(1, SemiResolved(
+      span.from,
+      Some(chapters.prev(first.span.from).get)
+    )))
+
+    implied1 ++ spans
+  }
 }

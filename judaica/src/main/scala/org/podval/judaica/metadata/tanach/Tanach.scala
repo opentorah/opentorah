@@ -187,7 +187,7 @@ object Tanach extends NamedCompanion {
     )
 
     def days: Map[Parsha, Custom.Of[Aliyot]] = get.map { case (parsha, metadata) =>
-      parsha -> Aliyot.processDays(book, metadata.days, parsha.span)
+      parsha -> processDays(book, metadata.days, parsha.span)
     }
 
     def daysCombined: Map[Parsha, Option[Custom.Of[Aliyot]]] = Util.inSequence(
@@ -199,11 +199,26 @@ object Tanach extends NamedCompanion {
     // TODO QUESTION if Cohen ends in a custom place, does it affect the end of the 3 aliyah on Mon/Thu?
     // TODO QUESTION if the parshiot combine, does it affect those small aliyot?
     def aliyot: Map[Parsha, Aliyot] = get.map { case (parsha, metadata) =>
-      parsha -> Aliyot.parseAliyot(parsha, metadata.aliyot)
+      val aliyot = metadata.aliyot
+      val bookSpan = Span(
+        parsha.span.from,
+        aliyot.last.span.to.getOrElse(parsha.days(Custom.Common).aliyot.head.to)
+      ).inBook(parsha.book)
+      parsha -> Aliyot(bookSpan, aliyot, number = Some(3))
     }
 
     def maftir: Map[Parsha, BookSpan.ChumashSpan.BookSpan] = get.map { case (parsha, metadata) =>
-      parsha -> Aliyot.parseMaftir(parsha, metadata.maftir)
+      val maftir = metadata.maftir
+      val book = parsha.book
+      val span = Span(maftir.from, maftir.to.getOrElse(parsha.span.to))
+
+      val result = Span.setImpliedTo(
+        Seq(maftir),
+        span,
+        book.chapters
+      ).head.inBook(parsha.book)
+
+      parsha -> result
     }
   }
 
@@ -240,7 +255,7 @@ object Tanach extends NamedCompanion {
         }
 
         val book = parsha.book
-        Some(Aliyot.processDays(book, combined, book.chapters.merge(parsha.span, parshaNext.span)))
+        Some(processDays(book, combined, book.chapters.merge(parsha.span, parshaNext.span)))
       }
 
       result +: combineDays((parshaNext, daysNext) +: tail)
@@ -251,5 +266,20 @@ object Tanach extends NamedCompanion {
       Seq(None)
 
     case Nil => Nil
+  }
+
+  private def processDays(
+    book: Tanach.ChumashBook,
+    days: Custom.Sets[Seq[Span.Numbered]],
+    span: Span
+  ): Custom.Of[Aliyot] = {
+    val bookSpan = span.inBook(book)
+    val with1 = Span.addImplied1(Custom.common(days), span, book.chapters)
+
+    val result: Custom.Sets[Aliyot] = days.mapValues { spans: Seq[Span.Numbered] =>
+      Aliyot(bookSpan, WithNumber.overlay(with1, spans), Some(7))
+    }
+
+    Custom.denormalize(result)
   }
 }

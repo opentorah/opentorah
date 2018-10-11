@@ -30,6 +30,10 @@ object Verse {
       )
     }
 
+    def defaultChapter(defaultChapter: Int): Parsed =
+      if (chapter.isDefined) this
+      else Parsed(chapter = Some(defaultChapter), verse = verse)
+
     def resolve: Verse = Verse(chapter.get, verse.get)
   }
 
