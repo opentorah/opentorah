@@ -1,6 +1,6 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.{Attributes, Named, Names, Metadata, XML, Language, LanguageSpec}
+import org.podval.judaica.metadata.{Attributes, Named, Names, Metadata, XML}
 import org.podval.judaica.metadata.tanach.BookSpan.ChumashSpan
 
 import scala.xml.Elem
@@ -158,10 +158,5 @@ object SpecialReading {
   private def parseHaftarah(element: Elem): Haftarah = {
     val (attributes, elements) = XML.open(element, "haftarah")
     Haftarah(attributes, elements)
-  }
-
-  def main(args: Array[String]): Unit = {
-    println(SpecialReading.SheminiAtzeres.shabbosAliyot.get.toString(LanguageSpec(Language.English)))
-    println(SpecialReading.SheminiAtzeresMaftir.maftir.get.toString(LanguageSpec(Language.English)))
   }
 }
