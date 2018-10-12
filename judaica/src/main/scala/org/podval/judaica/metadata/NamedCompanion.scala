@@ -32,6 +32,8 @@ trait NamedCompanion {
 
   final def indexOf(key: Key): Int = values.indexOf(key)
 
+  final def next(key: Key): Key = forIndex(indexOf(key) + 1)
+
   final def distance(from: Key, to: Key): Int = indexOf(to) - indexOf(from)
 
   final val ordering: Ordering[Key] = new Ordering[Key] {

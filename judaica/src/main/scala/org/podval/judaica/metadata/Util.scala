@@ -10,7 +10,11 @@ object Util {
   //  def unfoldInfinite[A, B](start: A)(f: A => (A, B)): Stream[B] =
   //    f(start) match { case (a, b) => b #:: unfoldInfinite(a)(f) }
 
-  def unfoldInfiniteSimple[A](start: A)(f: A => A): Stream[A] = start #:: unfoldInfiniteSimple(f(start))(f)
+  def unfoldInfiniteSimple[A](start: A, next: A => A): Stream[A] =
+    start #:: unfoldInfiniteSimple(next(start), next)
+
+  def unfoldSimple[A](start: A, next: A => A, take: A => Boolean): Seq[A] =
+    unfoldInfiniteSimple(start, next).takeWhile(take).toList
 
   // Group consecutive elements with the same key - didn't find this in the standard library.
   def group[T, K](list: Seq[T], key: T => K): Seq[Seq[T]] = if (list.isEmpty) Nil else {

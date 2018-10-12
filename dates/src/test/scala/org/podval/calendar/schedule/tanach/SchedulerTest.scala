@@ -8,10 +8,10 @@ import org.podval.judaica.metadata.tanach.Parsha
 import org.podval.judaica.metadata.tanach.Parsha._
 import SpecialDay._
 
-class WeeklyReadingTest extends FlatSpec with Matchers {
+final class SchedulerTest extends FlatSpec with Matchers {
 
   "Torah readings" should "be assigned correctly" in {
-    (1 to 6000) foreach { number =>
+    (2 to 6000) foreach { number =>
       val year = Year(number)
 
       verify(year, inHolyLand = false)
@@ -20,9 +20,9 @@ class WeeklyReadingTest extends FlatSpec with Matchers {
   }
 
   def verify(year: Year, inHolyLand: Boolean): Unit = {
-    val readings: Seq[(Day, WeeklyReading)] = WeeklyReading.getCycle(year, inHolyLand)
+    val readings: Map[Day, WeeklyReading] = Scheduler.forYear(year, inHolyLand).weeklyReadings
 
-    def findReadings(day: Day): WeeklyReading = readings.find(_._1 == day).get._2
+    def findReadings(day: Day): WeeklyReading = readings(day)
     def isCombined(parsha: Parsha): Boolean = readings.exists(_._2.secondParsha.contains(parsha))
 
     // Pesach
@@ -45,15 +45,14 @@ class WeeklyReadingTest extends FlatSpec with Matchers {
     val roshHaShanah: Day = RoshHashanah(year+1)
     isCombined(Vayeilech) shouldBe !roshHaShanah.is(Day.Name.Sheni) && !roshHaShanah.is(Day.Name.Shlishi)
 
-    val combined: Seq[Parsha] = readings.map(_._2).filter(_.isCombined).map(_.parsha)
+    val combined: Set[Parsha] = readings.values.toSet.filter(_.isCombined).map(_.parsha)
     val yearType = YearType.get(year)
     val combinedFromStructure: Seq[Parsha] = ReadingStructure.all(yearType).combined(inHolyLand)
-    combined.toSet shouldBe combinedFromStructure.toSet
+    combined shouldBe combinedFromStructure.toSet
   }
 }
 
 object ReadingStructure {
-  //
   // This table gives parsha combinations for all occurring year types.
   // Submitted by @michaelko58; sourced from  https://www.shoresh.org.il/spages/articles/parashathibur.htm
   // Primary/classical source needs to be determined.
@@ -64,15 +63,15 @@ object ReadingStructure {
     def combine(inHolyLand: Boolean): Boolean
   }
 
-  case object M extends Combine { // mehubarim
+  case object M extends Combine { // Mehubarim: combined
     def combine(inHolyLand: Boolean): Boolean = true
   }
 
-  case object N extends Combine { // nifradim
+  case object N extends Combine { // Nifradim: separate
     def combine(inHolyLand: Boolean): Boolean = false
   }
 
-  case object C extends Combine { // mehubarim chutz looretz
+  case object C extends Combine { // mehubarim Chutz lo'oretz: combined in diaspora
     def combine(inHolyLand: Boolean): Boolean = !inHolyLand
   }
 
