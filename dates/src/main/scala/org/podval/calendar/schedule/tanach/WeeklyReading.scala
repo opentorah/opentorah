@@ -108,7 +108,7 @@ import org.podval.judaica.metadata.tanach.Parsha._
 final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) {
   def isCombined: Boolean = secondParsha.isDefined
 
-  def getReading: Schedule.Reading = Schedule.Reading(
+  def getReading: DaySchedule.Reading = DaySchedule.Reading(
     aliyot = (if (isCombined) parsha.daysCombined.get else parsha.days).mapValues(_.getAliyot),
     maftir = Some((if (isCombined) secondParsha.get else parsha).maftir),
     haftarah = Some((if (isCombined) secondParsha.get else parsha).haftarah)

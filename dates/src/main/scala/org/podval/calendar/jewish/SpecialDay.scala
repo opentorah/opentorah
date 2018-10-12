@@ -24,32 +24,34 @@ abstract class SpecialDayBase(month: Month.Name, numberInMonth: Int) extends Spe
 }
 
 object SpecialDay {
-  trait Fast { this: SpecialDay =>
-    final override def isFast: Boolean = true
-    final override def isFestival: Boolean = false
-    final override def isIntermediate: Boolean = false
-    final override def isRabbinicFestival: Boolean = false
-  }
+  trait FestivalOrIntermediate extends SpecialDay
 
-  trait Festival { this: SpecialDay =>
+  trait Festival extends FestivalOrIntermediate {
     final override def isFast: Boolean = false
     final override def isFestival: Boolean = true
     final override def isIntermediate: Boolean = false
     final override def isRabbinicFestival: Boolean = false
   }
 
-  trait Intermediate { this: SpecialDay =>
+  trait Intermediate extends FestivalOrIntermediate {
     final override def isFast: Boolean = false
     final override def isFestival: Boolean = false
     final override def isIntermediate: Boolean = true
     final override def isRabbinicFestival: Boolean = false
   }
 
-  trait RabbinicFestival { this: SpecialDay =>
+  trait RabbinicFestival extends SpecialDay {
     final override def isFast: Boolean = false
     final override def isFestival: Boolean = true
     final override def isIntermediate: Boolean = false
     final override def isRabbinicFestival: Boolean = true
+  }
+
+  trait Fast extends SpecialDay {
+    final override def isFast: Boolean = true
+    final override def isFestival: Boolean = false
+    final override def isIntermediate: Boolean = false
+    final override def isRabbinicFestival: Boolean = false
   }
 
   case object RoshHashanah extends SpecialDayBase(Tishrei, 1) with Festival
@@ -82,14 +84,6 @@ object SpecialDay {
   case object SuccosIntermediate4InHolyLand extends SpecialDayBase(Tishrei, 19) with Intermediate
   case object SuccosIntermediate5InHolyLand extends SpecialDayBase(Tishrei, 20) with Intermediate
   case object ShminiAtzeretAndSimchatTorahInHolyLand extends SpecialDayBase(Tishrei, 22) with Festival
-
-  case object ShabbosBereishis extends SpecialDay {
-    override def apply(year: Year): Day = shabbosAfter(SimchatTorah(year))
-    final override def isFast: Boolean = false
-    final override def isFestival: Boolean = false
-    final override def isIntermediate: Boolean = false
-    final override def isRabbinicFestival: Boolean = false
-  }
 
   case object Chanukah1 extends SpecialDayBase(Kislev, 25) with RabbinicFestival
   case object Chanukah2 extends SpecialDayBase(Kislev, 26) with RabbinicFestival
@@ -163,10 +157,6 @@ object SpecialDay {
     }
   }
 
-  // TODO for generating Siddur, we need a list of days when Tachanun is not said;
-  // also, when Av Harachamim is not said on Shabbos (by the way, when Tisha Bav is on Shabbos, it *is* said,
-  // although we wouldn't have said Tachanun if it wasn't Shabbos...) - but shouldn't postponed fast
-  // (or advanced Purim) leave some trace?
   case object TishaBeAv extends SpecialDayBase(Av, 9) with Fast {
     override def corrected(year: Year): Day = {
       val result = apply(year)
@@ -175,7 +165,7 @@ object SpecialDay {
   }
 
 
-  val festivals: Set[SpecialDay] = Set(
+  val festivals: Set[FestivalOrIntermediate] = Set(
     RoshHashanah, RoshHashanah2,
     YomKippur,
     Succos, Succos2,
@@ -187,7 +177,7 @@ object SpecialDay {
     Shavuos, Shavuos2
   )
 
-  val festivalsInHolyLand: Set[SpecialDay] = Set(
+  val festivalsInHolyLand: Set[FestivalOrIntermediate] = Set(
     RoshHashanah, RoshHashanah2,
     YomKippur,
     Succos,
@@ -201,12 +191,12 @@ object SpecialDay {
     Shavuos
   )
 
-  def festivals(inHolyLand: Boolean): Set[SpecialDay] = if (inHolyLand) festivalsInHolyLand else festivals
+  def festivals(inHolyLand: Boolean): Set[FestivalOrIntermediate] = if (inHolyLand) festivalsInHolyLand else festivals
 
   // TODO use corrected() istead of apply() for Torah readings; double-check Purim.
-  val fasts: Set[SpecialDay] = Set(FastOfGedalia, FastOfTeves, FastOfEster, FastOfTammuz, TishaBeAv)
+  val fasts: Set[Fast] = Set(FastOfGedalia, FastOfTeves, FastOfEster, FastOfTammuz, TishaBeAv)
 
-  val rabbinicFestivals: Set[SpecialDay] = Set(
+  val rabbinicFestivals: Set[RabbinicFestival] = Set(
     Chanukah1, Chanukah2, Chanukah3, Chanukah4, Chanukah5, Chanukah6, Chanukah7, Chanukah8,
     Purim // ShushanPurim
   )
@@ -217,4 +207,6 @@ object SpecialDay {
   def shabbosAfter(day: Day): Day = day.next.next(Day.Name.Shabbos)
 
   def shabbosBefore(day: Day): Day = day.prev.prev(Day.Name.Shabbos)
+
+  def shabbosBereishis(year: Year): Day = shabbosAfter(SimchatTorah(year))
 }

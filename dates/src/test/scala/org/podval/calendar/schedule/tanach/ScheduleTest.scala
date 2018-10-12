@@ -8,19 +8,20 @@ import org.podval.judaica.metadata.tanach.Parsha
 import org.podval.judaica.metadata.tanach.Parsha._
 import SpecialDay._
 
-final class SchedulerTest extends FlatSpec with Matchers {
+final class ScheduleTest extends FlatSpec with Matchers {
 
   "Torah readings" should "be assigned correctly" in {
     (2 to 6000) foreach { number =>
       val year = Year(number)
 
+      println(year)
       verify(year, inHolyLand = false)
       verify(year, inHolyLand = true)
     }
   }
 
   def verify(year: Year, inHolyLand: Boolean): Unit = {
-    val readings: Map[Day, WeeklyReading] = Scheduler.forYear(year, inHolyLand).weeklyReadings
+    val readings: Map[Day, WeeklyReading] = Schedule.forYear(year, inHolyLand).weeklyReadings
 
     def findReadings(day: Day): WeeklyReading = readings(day)
     def isCombined(parsha: Parsha): Boolean = readings.exists(_._2.secondParsha.contains(parsha))
