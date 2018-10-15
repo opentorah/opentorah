@@ -14,14 +14,13 @@ final class ScheduleTest extends FlatSpec with Matchers {
     (2 to 6000) foreach { number =>
       val year = Year(number)
 
-      println(year)
       verify(year, inHolyLand = false)
       verify(year, inHolyLand = true)
     }
   }
 
   def verify(year: Year, inHolyLand: Boolean): Unit = {
-    val readings: Map[Day, WeeklyReading] = Schedule.forYear(year, inHolyLand).weeklyReadings
+    val readings: Map[Day, WeeklyReading] = Schedule.weeklyReadingsForYear(year, inHolyLand)
 
     def findReadings(day: Day): WeeklyReading = readings(day)
     def isCombined(parsha: Parsha): Boolean = readings.exists(_._2.secondParsha.contains(parsha))

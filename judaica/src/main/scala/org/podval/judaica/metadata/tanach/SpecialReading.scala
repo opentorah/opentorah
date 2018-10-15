@@ -12,11 +12,11 @@ sealed class SpecialReading(override val name: String) extends Named {
 
   final def shabbosAliyot: Option[Aliyot] = SpecialReading.metadatas(this).shabbosAliyot
 
+  final def getAliyot(isShabbos: Boolean): Option[Aliyot] = if (isShabbos) shabbosAliyot else weekdayAliyot
+
   final def maftir: Option[ChumashSpan.BookSpan] = SpecialReading.metadatas(this).maftir
 
   final def haftarah: Option[Haftarah] = SpecialReading.metadatas(this).haftarah
-
-  // TODO verify: aliyot present when they should etc...
 }
 
 object SpecialReading {
@@ -27,64 +27,58 @@ object SpecialReading {
   case object ShabbosErevRoshChodeshAdditionalHaftorah extends SpecialReading("Shabbos Erev Rosh Chodesh Additional Haftorah")
   case object PublicFastTorahPart1 extends SpecialReading("Public Fast Torah Part 1")
   case object PublicFastTorahPart2 extends SpecialReading("Public Fast Torah Part 2")
-  case object PublicFastHaftarah extends SpecialReading("Public Fast Haftarah")
-  case object TishaBeAv extends SpecialReading("Tisha Bav")
+  case object TishaBeAvReading extends SpecialReading("Tisha Bav")
   case object ShabbosCholHamoedTorah extends SpecialReading("Shabbos Chol Hamoed Torah")
-  case object RoshHashanahMaftir extends SpecialReading("Rosh Hashanah Maftir")
-  case object RoshHashanah1 extends SpecialReading("Rosh Hashanah 1")
-  case object RoshHashanah2 extends SpecialReading("Rosh Hashanah 2")
+  case object RoshHashanah1Reading extends SpecialReading("Rosh Hashanah 1")
+  case object RoshHashanah2Reading extends SpecialReading("Rosh Hashanah 2")
   case object YomKippurShacharis extends SpecialReading("Yom Kippur Shacharis")
   case object YomKippurMincha extends SpecialReading("Yom Kippur Mincha")
-  case object SuccosMaftir extends SpecialReading("Succos Maftir")
   case object Succos1_2 extends SpecialReading("Succos 1-2")
-  case object Succos1 extends SpecialReading("Succos 1")
-  case object Succos2 extends SpecialReading("Succos 2")
+  case object Succos2Haftarah extends SpecialReading("Succos 2 Haftarah")
   case object SuccosKorbanot extends SpecialReading("Succos Korbanot")
   case object SuccosShabbosCholHamoedHaftarah extends SpecialReading("Succos Shabbos Chol Hamoed Haftarah")
-  case object SheminiAtzeresMaftir extends SpecialReading("Shemini Atzeres Maftir")
-  case object SheminiAtzeres extends SpecialReading("Shemini Atzeres")
-  case object SimchasTorah extends SpecialReading("Simchas Torah")
+  case object ShminiAtzeresReading extends SpecialReading("Shemini Atzeres")
+  case object SimchasTorahReading extends SpecialReading("Simchas Torah")
   case object SimchasTorahChassanBereishis extends SpecialReading("Simchas Torah Chassan Bereishis")
   case object ChannukahKorbanot extends SpecialReading("Channukah Korbanot")
   case object ChannukahKorbanotEnd extends SpecialReading("Channukah Korbanot End")
   case object ChannukahShabbos1 extends SpecialReading("Channukah Shabbos 1")
   case object ChannukahShabbos2 extends SpecialReading("Channukah Shabbos 2")
-  case object ParshasShekalim extends SpecialReading("Parshas Shekalim")
-  case object ParshasZachor extends SpecialReading("Parshas Zachor")
-  case object ParshasParah extends SpecialReading("Parshas Parah")
-  case object ParshasHachodesh extends SpecialReading("Parshas Hachodesh")
-  case object Purim extends SpecialReading("Purim")
-  case object ShabbosHagodol extends SpecialReading("Shabbos Hagodol")
-  case object Pesach1Maftir extends SpecialReading("Pesach 1 Maftir")
+  case object ParshasShekalim extends SpecialReading("Parshas Shekalim") // TODO in Schedule
+  case object ParshasZachor extends SpecialReading("Parshas Zachor") // TODO in Schedule
+  case object ParshasParah extends SpecialReading("Parshas Parah") // TODO in Schedule
+  case object ParshasHachodesh extends SpecialReading("Parshas Hachodesh") // TODO in Schedule
+  case object PurimReading extends SpecialReading("Purim")
+  case object ShabbosHagodol extends SpecialReading("Shabbos Hagodol") // TODO in Schedule
   case object PesachCholHamoedMaftir extends SpecialReading("Pesach Chol Hamoed Maftir")
   case object PesachAdditionalTorahReading extends SpecialReading("Pesach Additional Torah Reading")
-  case object Pesach1 extends SpecialReading("Pesach 1")
-  case object Pesach2 extends SpecialReading("Pesach 2")
-  case object Pesach2Diaspora extends SpecialReading("Pesach 2 Diaspora")
-  case object Pesach3 extends SpecialReading("Pesach 3")
-  case object Pesach4 extends SpecialReading("Pesach 4")
-  case object Pesach5 extends SpecialReading("Pesach 5")
-  case object Pesach6 extends SpecialReading("Pesach 6")
+  case object Pesach1Reading extends SpecialReading("Pesach 1")
+  case object Pesach2Reading extends SpecialReading("Pesach 2") // TODO rename "InHolyLand"
+  case object Pesach2DiasporaReading extends SpecialReading("Pesach 2 Diaspora") // TODO rename Pesach 2
+  case object Pesach3Reading extends SpecialReading("Pesach 3")
+  case object Pesach4Reading extends SpecialReading("Pesach 4")
+  case object Pesach5Reading extends SpecialReading("Pesach 5")
+  case object Pesach6Reading extends SpecialReading("Pesach 6")
   case object PesachShabbosCholHamoedHaftarah extends SpecialReading("Pesach Shabbos Chol Hamoed Haftarah")
-  case object Pesach7 extends SpecialReading("Pesach 7")
-  case object Pesach8 extends SpecialReading("Pesach 8")
-  case object ShavuosMaftir extends SpecialReading("Shavuos Maftir")
-  case object Shavuos1 extends SpecialReading("Shavuos 1")
-  case object Shavuos2 extends SpecialReading("Shavuos 2")
+  case object Pesach7Reading extends SpecialReading("Pesach 7")
+  case object Pesach8Reading extends SpecialReading("Pesach 8")
+  case object Shavuos1Reading extends SpecialReading("Shavuos 1")
+  case object Shavuos2Haftarah extends SpecialReading("Shavuos 2 Haftarah")
 
   val values: Seq[SpecialReading] = Seq(
     ShabbosErevRoshChodesh, ShabbosErevRoshChodeshAdditionalHaftorah,
     RoshChodesh, ShabbosRoshChodeshAdditionalHaftorah,
-    PublicFastTorahPart1, PublicFastTorahPart2, PublicFastHaftarah, TishaBeAv, ShabbosCholHamoedTorah,
-    RoshHashanahMaftir, RoshHashanah1, RoshHashanah2, YomKippurShacharis, YomKippurMincha,
-    SuccosMaftir, Succos1_2, Succos1, Succos2, SuccosKorbanot, SuccosShabbosCholHamoedHaftarah,
-    SheminiAtzeresMaftir, SheminiAtzeres, SimchasTorah, SimchasTorahChassanBereishis,
+    PublicFastTorahPart1, PublicFastTorahPart2, TishaBeAvReading, ShabbosCholHamoedTorah,
+    RoshHashanah1Reading, RoshHashanah2Reading, YomKippurShacharis, YomKippurMincha,
+    Succos1_2, Succos2Haftarah, SuccosKorbanot, SuccosShabbosCholHamoedHaftarah,
+    ShminiAtzeresReading, SimchasTorahReading, SimchasTorahChassanBereishis,
     ChannukahKorbanot, ChannukahKorbanotEnd, ChannukahShabbos1, ChannukahShabbos2,
     ParshasShekalim, ParshasZachor, ParshasParah, ParshasHachodesh,
-    Purim, ShabbosHagodol,
-    Pesach1Maftir, PesachCholHamoedMaftir, PesachAdditionalTorahReading, PesachShabbosCholHamoedHaftarah,
-    Pesach1, Pesach2, Pesach2Diaspora, Pesach3, Pesach4, Pesach5, Pesach6, Pesach7, Pesach8,
-    ShavuosMaftir, Shavuos1, Shavuos2
+    PurimReading, ShabbosHagodol,
+    PesachCholHamoedMaftir, PesachAdditionalTorahReading, PesachShabbosCholHamoedHaftarah,
+    Pesach1Reading, Pesach2Reading, Pesach2DiasporaReading, Pesach3Reading,
+    Pesach4Reading, Pesach5Reading, Pesach6Reading, Pesach7Reading, Pesach8Reading,
+    Shavuos1Reading, Shavuos2Haftarah
   )
 
   private final case class SpecialReadingMetadata(
@@ -125,7 +119,7 @@ object SpecialReading {
     def parseAliyot(elements: Seq[Elem]): Aliyot = {
       val fromChapter: Int = bookSpan.span.from.chapter
       val result = elements.map(element => XML.parseEmpty(element, "aliyah", parseNumbered(fromChapter)))
-      Aliyot(bookSpan, result, None)
+      Aliyot(bookSpan, result, number = None)
     }
 
     val (weekdayElements, shabbos) = XML.span(elements, "aliyah", "shabbos")
@@ -135,7 +129,11 @@ object SpecialReading {
       XML.span(shabbosElements, "aliyah")
     }
 
-    val weekdayAliyot = if (weekdayElements.isEmpty) None else Some(parseAliyot(weekdayElements))
+    val weekdayAliyot =
+      if (weekdayElements.nonEmpty) Some(parseAliyot(weekdayElements))
+      else if (shabbosElements.isEmpty) Some(Aliyot(bookSpan, Seq(bookSpan.span)))
+      else None
+
     val shabbosAliyot = shabbosElements.map(elements => parseAliyot(elements))
 
     shabbosAliyot.foreach(aliyot => require(aliyot.aliyot.length == 7))

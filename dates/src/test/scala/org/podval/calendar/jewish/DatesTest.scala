@@ -131,12 +131,9 @@ final class DatesTest extends FlatSpec with Matchers {
         days contains specialDay(year).name shouldBe false
       }
 
-      def sameDay(a: SpecialDay, b: SpecialDay): Unit =
-        a(year).name shouldBe b(year).name
-
-      sameDay(Purim, LagBaOmer)
+      Purim(year).name shouldBe SpecialDay.lagBaOmer(year).name
       // misprint, see Taz 1, Magen Avraham 1
-      // sameDay(Hanukkah, Shavuot)
+      // Hanukkah(year).name shouldBe Shavuot(year.name)
     }
   }
 
