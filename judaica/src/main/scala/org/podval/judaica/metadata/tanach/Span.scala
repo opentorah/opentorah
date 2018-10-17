@@ -7,9 +7,6 @@ final case class Span(from: Verse, to: Verse) {
 
   def contains(verse: Verse): Boolean = (from <= verse) && (verse <= to)
 
-  // Assuming that Chapters.consecutive(this, that) returned 'true'.
-  // def merge(that: Span): Span = Span(this.from, that.to)
-
   override def toString: String = toString(LanguageSpec.empty)
 
   def toString(spec: LanguageSpec): String =

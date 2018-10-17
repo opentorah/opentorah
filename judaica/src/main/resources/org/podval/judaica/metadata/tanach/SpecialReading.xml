@@ -8,26 +8,14 @@
 4. В 7) Йом кипур отодвигает шабат.
 Чтение в шени и хамиши отодвигаются любым обязательным чтением Торы, чтение в минху отодвигается в Йом кипур.
 
-Дополнительные чтения Торы - мафтир.
-5. Когда на шабат выпадает рош ходеш или холь амоед - мафтир жертвоприношения.
-6. В холь а-моед Песах - мафтир жертвоприношения.
-7. Йом тов, Рош а-шана, Йом кипур - мафтир жертвоприношения.
-
-Тексты жертвоприношений
-Все дни жертвоприношений в Храме (кроме шабата, не совпавшего с рош ходеш) мы читаем стихи жертвоприношений (Бемидбар, 28-29)
-Эти дни: рош ходеш, Рош ашана, Йом кипур, все праздничные у полупраздничные дни.
-В диаспоре обязательное чтение в холь-амоед - двух дней, сегодняшнего и завтрашнего
-Из них: в рош-ходеш и холь амоед Суккот жертвоприношения читают в основном чтении. При обязательное чтение должно быть завершением.
-В остальные дни  - мафтир.
-Рош ходеш - см. выше
 
 Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
 44 verse=18 7. Бемидбар, 28:9-15 Может ли быть другая глава?
 Аналогично - в шабат Шкалим и шабат а-Ходеш, выпавшие в рош ходеш:
 на 6 алию читают 6 и 7.
 7 алия - чтение см. выше
-TODO: Minhagim kria Chanuka
-Mekorot
+
+TODO Mekorot
     -->
     <day n="Shabbos Erev Rosh Chodesh">
         <haftarah book="I Samuel" fromChapter="20" fromVerse="18" toVerse="42"/>
@@ -80,26 +68,17 @@ Mekorot
     </day>
 
 
-    <!-- RULE: in the morning: Torah reading only;
-               in the afternoon, 3rd aliyah (part 2 aliyah 2) is Maftir; read Haftarah. -->
-    <day n="Public Fast Torah Part 1">
+    <day n="Fast">
         <torah book="Exodus" fromChapter="32" fromVerse="11" toVerse="14"/>
     </day>
-    <day n="Public Fast Torah Part 2">
+    <day n="Fast Part 2">
         <torah book="Exodus" fromChapter="34" fromVerse="1" toVerse="10">
             <aliyah n="2" fromVerse="4"/>
         </torah>
         <haftarah book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56" toVerse="8"/>
     </day>
 
-    <!-- RULE:
-               in the morning and the afternoon, 3rd aliyah is Maftir; read Haftarah.
-TODO:
- Rambam custom - haftara only shacharis
-Sfaradim Eretz Isroel
-fast haftara (exsept Zom Gedalia - Shuva Isroel
--->
-    <day n="Tisha Bav">
+    <day n="Tisha BeAv">
         <torah book="Deuteronomy" fromChapter="4" fromVerse="25" toVerse="40">
             <aliyah n="2" fromVerse="30"/>
             <aliyah n="3" fromVerse="36"/>
@@ -113,8 +92,7 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
         </haftarah>
     </day>
 
-    <!-- RULE: on Shabbos Chol Hamoed Succos and Pesach, add "Shabbos Chol Hamoed Torah". -->
-    <day n="Shabbos Chol Hamoed Torah">
+    <day n="Shabbos Chol Hamoed">
         <torah book="Exodus" fromChapter="33" fromVerse="12" toChapter="34" toVerse="26">
             <shabbos>
                 <aliyah n="2" fromChapter="33" fromVerse="17"/>
@@ -154,11 +132,10 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
             <aliyah n="4" fromVerse="15"/>
             <aliyah n="5" fromVerse="20"/>
         </torah>
-        <!-- RULE: same maftir as on the first day of Rosh Hashanah. -->
         <haftarah book="Jeremiah" fromChapter="31" fromVerse="1" toVerse="19"/>
     </day>
 
-    <day n="Yom Kippur Shacharis">
+    <day n="Yom Kippur">
         <torah book="Leviticus" fromChapter="16" fromVerse="1" toVerse="34">
             <aliyah n="2" fromVerse="7"/>
             <aliyah n="3" fromVerse="12"/>
@@ -185,7 +162,7 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
         </haftarah>
     </day>
 
-    <day n="Yom Kippur Mincha">
+    <day n="Yom Kippur Afternoon">
         <torah book="Leviticus" fromChapter="18" fromVerse="1" toVerse="30">
             <aliyah n="2" fromVerse="6"/>
             <aliyah n="3" fromVerse="22"/> <!-- TODO mincha - maftir - but this is only read in mincha?! -->
@@ -203,7 +180,7 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
         </haftarah>
     </day>
 
-    <day n="Succos 1-2">
+    <day n="Succos">
         <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44">
             <aliyah n="2" fromChapter="23" fromVerse="4"/>
             <aliyah n="3" fromChapter="23" fromVerse="15"/>
@@ -226,7 +203,7 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
         </haftarah>
     </day>
 
-    <day n="Succos 2 Haftarah">
+    <day n="Succos 2">
         <haftarah book="I Kings">
             <custom n="Ashkenaz Sefard" fromChapter="8" fromVerse="2" toVerse="21"/>
             <custom n="Italki" fromChapter="7" fromVerse="51" toChapter="8" toVerse="15"/>
@@ -234,44 +211,15 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
         </haftarah>
     </day>
 
-    <!-- In the following, "n" is the number of the day starting from 1 for the first day of Chol Hamoed Succos.
-           for n<=4:
-             aliyah    Korbanot Succos
-             1         n
-             2         n+1
-             3         n+2
-             4         in the Holy Land - n; in Diaspora - n and n+1
-
-           for n==5 in the Holy Land:
-             aliyah    Korbanot Succos
-             1         4
-             2         5
-             3         6
-             4         5
-
-           Hoshana Rabbah (n==6 in the Holy Land, 5 in Diaspora):
-             aliyah    Korbanot Succos
-             1         4
-             2         5
-             3         6
-             4         in the Holy Land - 6; in Diaspora - 5 and 6
-
-    TODO Custom rav Nae Eretz Isroel: n day of Sukkos all alios (1 - 4) korbonos of n day
-
-    Maftir Shabbos Chol Hamoed Succos n: in the Holy Land - n, in Diaspora - n and n+1
-    -->
-    <day n="Succos Korbanot">
+    <day n="Succos Intermediate">
         <torah book="Numbers" fromChapter="29" fromVerse="12" toVerse="34">
             <aliyah n="2" fromVerse="17"/>
             <aliyah n="3" fromVerse="20"/>
             <aliyah n="4" fromVerse="23"/>
             <aliyah n="5" fromVerse="26"/>
             <aliyah n="6" fromVerse="29"/>
-            <aliyah n="7" fromVerse="32"/> <!-- TODO aliya 7 doesn't seem to be used at all? -->
+            <aliyah n="7" fromVerse="32"/>
         </torah>
-    </day>
-
-    <day n="Succos Shabbos Chol Hamoed Haftarah">
         <haftarah book="Ezekiel" fromChapter="38">
             <custom n="Ashkenaz Sefard" fromVerse="18" toChapter="39" toVerse="16"/>
             <custom n="Italki Teiman" fromVerse="1" toChapter="38" toVerse="23"/>
@@ -279,7 +227,7 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
     </day>
 
 
-    <day n="Shemini Atzeres"> <!-- only in Diaspora. In Eretz Isroel - Simchas Torah -->
+    <day n="Shemini Atzeres">
         <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17">
             <aliyah n="2" fromChapter="16" fromVerse="1"/>
             <aliyah n="3" fromChapter="16" fromVerse="4"/>
@@ -304,7 +252,6 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
         </haftarah>
     </day>
 
-    <!-- RULE: add Simchas Torah Chassan Bereishis as the 7th aliyah. -->
     <day n="Simchas Torah">
         <torah book="Deuteronomy" fromChapter="33" fromVerse="1" toChapter="34" toVerse="12"> <!-- Zos Haberacha -->
           <aliyah n="2" fromChapter="33" fromVerse="5"/>
@@ -313,7 +260,6 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
           <aliyah n="5" fromChapter="33" fromVerse="22"/>
           <aliyah n="6" fromChapter="33" fromVerse="27"/>
         </torah>
-        <!-- RULE: same maftir as on Shmini Atzeres.  -->
         <haftarah book="Joshua">
             <custom n="Ashkenaz Sefard Italki" fromChapter="1" fromVerse="1" toVerse="18"/>
             <custom n="Teiman">
@@ -326,63 +272,28 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
         <torah book="Genesis" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/>
     </day>
 
-    <!--
-    RULE: when a day of Channukah falls on Rosh Chodesh (6th - always; 7th - sometimes),
-            first 3 aliyot are from Rosh Chodesh (see above).
-
-    TODO renumber aliyot in the rules.
-    RULE for days that do not coincide with Shabbos or Rosh Chodesh:
-      Mingag Chabad (Ramo)
-      day 1
-        Aliyah
-        1      0
-        2      1.1,
-        2      1.2
-          Sefard   1. 0
-                    2.  1.1 1.2
-                    3. 2.1 2.2
-
-      day n, 1 < n < 8:
-        Aliyah
-        1      n.1
-        2      n.2
-        3      Ashkenaz/Chabad: (n+1).1 and (n+1).2
-               Sefard: n.1 and n.2
-
-      day 8 (Zot Chanukka):
-        Aliyah
-        1      8.1
-        2      8.2
-        3      "end" Sefard : 8 end
-
-      Shabat Chanukka Maftir: n
-
-      Chanukka Rosh Chodesh: Aliyah 4: n
-
-   -->
-    <day n="Channukah Korbanot">
+    <day n="Channukah">
         <torah book="Numbers" fromChapter="7" fromVerse="1" toVerse="53">
-            <aliyah n="1"  fromVerse="1" />   <!-- 0 -->
-            <aliyah n="2"  fromVerse="12"/>   <!-- 1.1 = 8.1 -->
-            <aliyah n="3"  fromVerse="15"/>   <!-- 1.1 = 8.2 -->
-            <aliyah n="4"  fromVerse="18"/>   <!-- 2.1 -->
-            <aliyah n="5"  fromVerse="21"/>   <!-- 2.2 -->
-            <aliyah n="6"  fromVerse="24"/>   <!-- 3.1 -->
-            <aliyah n="7"  fromVerse="27"/>   <!-- 3.2 -->
-            <aliyah n="8"  fromVerse="30"/>   <!-- 4.1 -->
-            <aliyah n="9"  fromVerse="33"/>   <!-- 4.2 -->
-            <aliyah n="10" fromVerse="36"/>   <!-- 5.1 -->
-            <aliyah n="11" fromVerse="39"/>   <!-- 5.2 -->
-            <aliyah n="12" fromVerse="42"/>   <!-- 6.1 -->
-            <aliyah n="13" fromVerse="45"/>   <!-- 6.2 -->
-            <aliyah n="14" fromVerse="48"/>   <!-- 7.1 -->
-            <aliyah n="15" fromVerse="51"/>   <!-- 7.2 -->
+            <aliyah n="1"  fromVerse="1" />
+            <aliyah n="2"  fromVerse="12"/>
+            <aliyah n="3"  fromVerse="15"/>
+            <aliyah n="4"  fromVerse="18"/>
+            <aliyah n="5"  fromVerse="21"/>
+            <aliyah n="6"  fromVerse="24"/>
+            <aliyah n="7"  fromVerse="27"/>
+            <aliyah n="8"  fromVerse="30"/>
+            <aliyah n="9"  fromVerse="33"/>
+            <aliyah n="10" fromVerse="36"/>
+            <aliyah n="11" fromVerse="39"/>
+            <aliyah n="12" fromVerse="42"/>
+            <aliyah n="13" fromVerse="45"/>
+            <aliyah n="14" fromVerse="48"/>
+            <aliyah n="15" fromVerse="51"/>
         </torah>
     </day>
-    <day n="Channukah Korbanot End">
+    <day n="Channukah End">
       <torah book="Numbers" fromChapter="7" fromVerse="18" toChapter="8" toVerse="4"/>
     </day>
-
 
     <day n="Channukah Shabbos 1">
         <haftarah book="Zechariah" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>
@@ -437,37 +348,11 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
         </torah>
     </day>
 
-    <day n="Shabbos Hagodol"> <!-- Chabad only erev Pesah -->
+    <day n="Shabbos Hagodol"> <!-- TODO Chabad only erev Pesah -->
         <haftarah book="Malachi" fromChapter="3" fromVerse="4" toVerse="24"/>
     </day>
 
-    <!-- RULE: starting with first intermediate day of Pesach, "Pesach Additional Torah Reading"
-               as 4th aliyah on weekdays and as Maftir on Shabbos and last festival days.
-
-2. Кадеш: Шмот, 13:1-16
-3. Кесеф: Шмот, 22:24 -23:19
-4. Псоль: Шмот, 34:1-26
-5. Бемидбар: Бемидбар, 9:1-14
-
-Когда первый день Песаха  в шабат, в первый день недели:
-3 день - 2
-4 день - 3
-5 день - 4
-6 день - 5
-Когда первый день Песаха в третий день недели:
-3 день - 2
-4 день - 3
-6 день - 5
-Когда первый день Песаха в пятый день недели:
-4 день - 2
-5 день - 3
-6 день - 5
-    -->
-    <day n="Pesach Additional Torah Reading">
-        <torah book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
-    </day>
-
-    <day n="Pesach 1">
+    <day n="Pesach">
         <torah book="Exodus" fromChapter="12" fromVerse="21" toVerse="51">
             <aliyah n="2" fromVerse="25"/>
             <aliyah n="3" fromVerse="29"/>
@@ -498,7 +383,7 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
         </haftarah>
     </day>
 
-    <day n="Pesach 2 Diaspora">
+    <day n="Pesach 2">
         <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44">
             <aliyah n="1" fromChapter="22" fromVerse="26"/>
             <aliyah n="2" fromChapter="23" fromVerse="4"/>
@@ -506,8 +391,7 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
             <aliyah n="4" fromChapter="23" fromVerse="23"/>
             <aliyah n="5" fromChapter="23" fromVerse="33"/>
         </torah>
-        <!-- RULE: Same maftir as on Pesach 1. -->
-        <haftarah book="II Kings">  <!-- Diaspora -->
+        <haftarah book="II Kings">
             <custom n="Ashkenaz Sefard">
                 <part n="1" fromChapter="23" fromVerse="1" toVerse="9"/>
                 <part n="2" fromChapter="23" fromVerse="21" toVerse="25"/>
@@ -520,11 +404,7 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
         </haftarah>
     </day>
 
-    <day n="Pesach Chol Hamoed Maftir">
-        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
-    </day>
-
-    <day n="Pesach 2">
+    <day n="Pesach 2 in Holy Land">
         <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44">
             <aliyah n="1" fromChapter="22" fromVerse="26"/>
             <aliyah n="2" fromChapter="23" fromVerse="4"/>
@@ -560,7 +440,7 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
         </torah>
     </day>
 
-    <day n="Pesach Shabbos Chol Hamoed Haftarah">
+    <day n="Pesach Shabbos Chol Hamoed">
         <haftarah book="Ezekiel">
             <custom n="Ashkenaz Sefard" fromChapter="37" fromVerse="1" toVerse="14"/>
             <custom n="Teiman" fromChapter="36" fromVerse="37" toChapter="37" toVerse="14"/>
@@ -583,22 +463,21 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
                 <aliyah n="7" fromChapter="14" fromVerse="26"/>
             </shabbos>
         </torah>
+        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
         <haftarah book="II Samuel" fromChapter="22" fromVerse="1" toVerse="51"/>
     </day>
 
-    <day n="Pesach 8"> <!-- Diaspora -->
+    <day n="Pesach 8">
         <torah book="Deuteronomy" fromChapter="15" fromVerse="19" toChapter="16" toVerse="17">
             <aliyah n="2" fromChapter="16" fromVerse="1"/>
             <aliyah n="3" fromChapter="16" fromVerse="4"/>
             <aliyah n="4" fromChapter="16" fromVerse="9"/>
             <aliyah n="5" fromChapter="16" fromVerse="13"/>
-
-            <!-- RULE: Shabbos: same as on Shabbos Shmini Atzeres. -->
         </torah>
         <haftarah book="Isaiah" fromChapter="10" fromVerse="32" toChapter="12" toVerse="6"/>
     </day>
 
-    <day n="Shavuos 1">
+    <day n="Shavuos">
         <torah book="Exodus" fromChapter="19" fromVerse="1" toChapter="20" toVerse="22">
             <aliyah n="2" fromChapter="19" fromVerse="7"/>
             <aliyah n="3" fromChapter="19" fromVerse="14"/>
@@ -618,9 +497,7 @@ fast haftara (exsept Zom Gedalia - Shuva Isroel
         </haftarah>
     </day>
 
-    <day n="Shavuos 2 Haftarah">
-        <!-- RULE: Torah reading: if Shabbos - Shabbos Shmini Atzeres; weekday - Pesach 8 -->
-        <!-- RULE: same maftir as on Shavuos 1 -->
+    <day n="Shavuos 2">
         <haftarah book="Habakkuk">
             <custom n="Ashkenaz" fromChapter="3" fromVerse="1" toVerse="19"/>
             <custom n="Sefard" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>

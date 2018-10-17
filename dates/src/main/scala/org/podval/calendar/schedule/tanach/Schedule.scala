@@ -4,7 +4,7 @@ import org.podval.calendar.jewish.Jewish.{Day, Month, Year}
 import org.podval.calendar.jewish.SpecialDay
 import org.podval.calendar.jewish.SpecialDay.{FestivalOrIntermediate, shabbosBereishis}
 import org.podval.judaica.metadata.{Language, LanguageSpec}
-import org.podval.judaica.metadata.tanach.{Custom, Haftarah, Parsha, Reading, SpecialReading}
+import org.podval.judaica.metadata.tanach.{Custom, Haftarah, Parsha, Reading, SpecialReading, WeeklyReading}
 import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
 import org.podval.judaica.metadata.Util
 
@@ -44,10 +44,14 @@ object Schedule {
     val daysWithSpecialReadingsNotFestivals: Map[Day, SpecialDay] = filter(from, to, data.years.map(year =>
       SpecialDay.daysWithSpecialReadingsNotFestivals.map(day => day.corrected(year) -> day).toMap))
 
+    val pesachOnChamishi: Set[Year] = data.years.flatMap { year =>
+      if (SpecialDay.Pesach(year).is(Day.Name.Chamishi)) Some(year) else None }.toSet
+
     def forDay(day: Day): DaySchedule = getReading(
       day = day,
       weeklyReading = data.weeklyReadings.get(day),
-      specialDay = data.festivals.get(day).orElse(daysWithSpecialReadingsNotFestivals.get(day))
+      specialDay = data.festivals.get(day).orElse(daysWithSpecialReadingsNotFestivals.get(day)),
+      isPesachOnChamishi = pesachOnChamishi.contains(day.year)
     )
 
     val days: Seq[Day] = Util.unfoldSimple[Day](from, _ + 1, _ <= to)
@@ -63,9 +67,11 @@ object Schedule {
   private final def getReading(
     day: Day,
     weeklyReading: Option[WeeklyReading],
-    specialDay: Option[SpecialDay]
+    specialDay: Option[SpecialDay],
+    isPesachOnChamishi: Boolean
   ): DaySchedule = {
     val isShabbos: Boolean = day.isShabbos
+    val isRoshChodesh: Boolean = day.isRoshChodesh
 
     // TODO we need the next weekly reading to determine the sheni/chamishi one
     val afternoonSpecial: Option[Reading] = specialDay flatMap { specialDay => specialDay.getAfternoonReading }
@@ -73,7 +79,7 @@ object Schedule {
     DaySchedule(
       day,
       morning =
-        specialDay.map(_.getReading(isShabbos)) // TODO pass weeklyReading for intermediate and Chanukkah
+        specialDay.map(_.getReading(isShabbos, isRoshChodesh, weeklyReading, isPesachOnChamishi))
           .orElse(weeklyReading.map(_.getReading)),
       afternoon = afternoonSpecial
     )
@@ -93,7 +99,7 @@ object Schedule {
     }
 
     val weeklyReadings: Seq[Map[Day, WeeklyReading]] = (yearsData zip yearsData.tail).map { case (current, next) =>
-      WeeklyReading.getCycle(
+      WeeklyReadingSchedule.getCycle(
         year = current.year,
         fromShabbosBereishis = current.shabbosBereishis,
         toShabbosBereishis = next.shabbosBereishis,
@@ -138,8 +144,8 @@ object Schedule {
   def main(args: Array[String]): Unit = {
     println(Parsha.Mattos.getDaysCombined(Custom.Ashkenaz).toString(Language.Hebrew.toSpec))
     printHaftarahList(Custom.Shami, Language.Hebrew.toSpec, full = false)
-    println(SpecialReading.ShminiAtzeresReading.shabbosAliyot.get.toString(Language.English.toSpec))
-    println(SpecialReading.ShminiAtzeresReading.maftir.get.toString(Language.English.toSpec))
+    println(SpecialReading.SheminiAtzeres.shabbosAliyot.get.toString(Language.English.toSpec))
+    println(SpecialReading.SheminiAtzeres.maftir.get.toString(Language.English.toSpec))
 
     val year = Year(5779)
     val day = year.month(Month.Name.Marheshvan).day(25)

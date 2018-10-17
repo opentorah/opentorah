@@ -5,7 +5,7 @@ import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.jewish.SpecialDay
 import SpecialDay.{Pesach, Shavuos, TishaBeAv, shabbosAfter, shabbosBefore}
 import org.podval.judaica.metadata.Util
-import org.podval.judaica.metadata.tanach.{Parsha, Reading}
+import org.podval.judaica.metadata.tanach.{Parsha, WeeklyReading}
 import org.podval.judaica.metadata.tanach.Parsha._
 
 /**
@@ -104,18 +104,7 @@ import org.podval.judaica.metadata.tanach.Parsha._
   assumptions of the algorithm itself hold is verified by the unit tests for the years 1-6000;
   I am too lazy to prove the theorems :)
  */
-// TODO there is no need to keep secondParsha around, it can be calculated if isCombined is true...
-final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) {
-  def isCombined: Boolean = secondParsha.isDefined
-
-  def getReading: Reading = Reading(
-    aliyot = (if (isCombined) parsha.daysCombined.get else parsha.days).mapValues(_.getAliyot),
-    maftir = Some((if (isCombined) secondParsha.get else parsha).maftir),
-    haftarah = Some((if (isCombined) secondParsha.get else parsha).haftarah)
-  )
-}
-
-object WeeklyReading {
+object WeeklyReadingSchedule {
   private final val fromBereishisToBemidbar: Int = Parsha.distance(Bereishis, Bemidbar)
   private final val allowedBeforePesach: Set[Parsha] = Set[Parsha](Tzav, Metzora, Acharei)
   private final val fromBemidbarToVa_eschanan: Int = Parsha.distance(Bemidbar, Va_eschanan)
@@ -150,8 +139,10 @@ object WeeklyReading {
 
     def process(toProcess: Seq[Parsha]): Seq[WeeklyReading] = toProcess match {
       case first :: second :: rest if combine.contains(first) =>
+        require(!combine.contains(second))
         WeeklyReading(first, Some(second)) +: process(rest)
       case first :: rest =>
+        require(!combine.contains(first))
         WeeklyReading(first, None) +: process(rest)
       case Nil =>  Nil
     }
@@ -167,8 +158,8 @@ object WeeklyReading {
   private def combined(year: Year, weeks: Seq[Day]): Set[Parsha] = {
     def weeksTo(day: Day): Int = weeks.takeWhile(_ < day).length
 
+    val weeksBeforePesach: Int = weeksTo(shabbosBefore(Pesach(year)))
     val weeksToShavuot: Int = weeksTo(shabbosBefore(Shavuos(year)))
-
     val weeksFromShavuotToAfterTishaBeAv: Int = weeksTo(shabbosAfter(TishaBeAv(year))) - weeksToShavuot
 
     // When there are to many Saturdays before Shavuot to assign Bemidbar to the one immediately before Shavuot,
@@ -186,7 +177,7 @@ object WeeklyReading {
         val doCombineVayakhelPekudei: Boolean =
         (combinefromBereishisToBemidbar == combinableFromBereishisToVayikra.length + combinableFromVayikraToBemidbar.length) || {
           // This tweak is required only for the Holy Land (and never for AchareiMot) for some reason?
-          val parshahBeforePesach: Parsha = Parsha.forIndex(weeksTo(shabbosBefore(Pesach(year))))
+          val parshahBeforePesach: Parsha = Parsha.forIndex(weeksBeforePesach)
           !allowedBeforePesach.contains(parshahBeforePesach)
         }
 

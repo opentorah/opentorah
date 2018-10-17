@@ -29,7 +29,7 @@ final class ScheduleTest extends FlatSpec with Matchers {
     val readingsBeforePesach: WeeklyReading = findReadings(shabbosBefore(Pesach(year)))
     readingsBeforePesach.isCombined shouldBe false
     readingsBeforePesach.parsha shouldBe {
-      if (!year.isLeap) Tzav else if (RoshHashanah(year).is(Day.Name.Chamishi)) Acharei else Metzora
+      if (!year.isLeap) Tzav else if (RoshHashanah1(year).is(Day.Name.Chamishi)) Acharei else Metzora
     }
 
     // Shavuot
@@ -38,11 +38,11 @@ final class ScheduleTest extends FlatSpec with Matchers {
     Set[Parsha](Bemidbar, Nasso).contains(readingsBeforeShavuot.parsha) shouldBe true
 
     // Tisha Be Av
-    findReadings(shabbosAfter(TishaBeAv(year))) shouldBe WeeklyReading(Va_eschanan, None)
+    findReadings(shabbosAfter(TishaBeAv(year))) shouldBe WeeklyReadingSchedule(Va_eschanan, None)
 
     // Rosh Ha Shanah
-    findReadings(shabbosBefore(RoshHashanah(year+1))).parsha shouldBe Nitzavim
-    val roshHaShanah: Day = RoshHashanah(year+1)
+    findReadings(shabbosBefore(RoshHashanah1(year+1))).parsha shouldBe Nitzavim
+    val roshHaShanah: Day = RoshHashanah1(year+1)
     isCombined(Vayeilech) shouldBe !roshHaShanah.is(Day.Name.Sheni) && !roshHaShanah.is(Day.Name.Shlishi)
 
     val combined: Set[Parsha] = readings.values.toSet.filter(_.isCombined).map(_.parsha)

@@ -11,22 +11,13 @@ final case class Reading(
 object Reading {
   def apply(
     aliyot: SpecialReading,
+    isShabbos: Boolean,
     maftir: SpecialReading,
     haftarah: SpecialReading
   ): Reading = Reading(
-    aliyot = Custom.ofCommon(aliyot.weekdayAliyot.get.getAliyot),
-    maftir = Some(maftir.maftir.get),
-    haftarah = Some(haftarah.haftarah.get)
-  )
-
-  def apply(
-    aliyot: Aliyot,
-    maftir: SpecialReading,
-    haftarah: SpecialReading
-  ): Reading = Reading(
-    aliyot = Custom.ofCommon(aliyot.getAliyot),
-    maftir = Some(maftir.maftir.get),
-    haftarah = Some(haftarah.haftarah.get)
+    aliyot = aliyot.getAliyot(isShabbos).get.getAliyot,
+    maftir = maftir,
+    haftarah = haftarah
   )
 
   def apply(
@@ -34,8 +25,24 @@ object Reading {
     maftir: SpecialReading,
     haftarah: SpecialReading
   ): Reading = Reading(
+    aliyot = aliyot,
+    maftir = maftir.maftir.get,
+    haftarah = haftarah
+  )
+
+  def apply(
+    aliyot: Seq[ChumashSpan.BookSpan],
+    maftir: ChumashSpan.BookSpan,
+    haftarah: SpecialReading
+  ): Reading = Reading(
     aliyot = Custom.ofCommon(aliyot),
-    maftir = Some(maftir.maftir.get),
+    maftir = Some(maftir),
     haftarah = Some(haftarah.haftarah.get)
+  )
+
+  def apply(aliyot: Seq[ChumashSpan.BookSpan]): Reading = Reading(
+    aliyot = Custom.ofCommon(aliyot),
+    maftir = None,
+    haftarah = None
   )
 }
