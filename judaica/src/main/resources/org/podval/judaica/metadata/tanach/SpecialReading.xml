@@ -92,7 +92,7 @@ TODO Mekorot
         </haftarah>
     </day>
 
-    <day n="Shabbos Chol Hamoed">
+    <day n="Intermediate Shabbos">
         <torah book="Exodus" fromChapter="33" fromVerse="12" toChapter="34" toVerse="26">
             <shabbos>
                 <aliyah n="2" fromChapter="33" fromVerse="17"/>
@@ -440,7 +440,7 @@ TODO Mekorot
         </torah>
     </day>
 
-    <day n="Pesach Shabbos Chol Hamoed">
+    <day n="Pesach Intermediate Shabbos">
         <haftarah book="Ezekiel">
             <custom n="Ashkenaz Sefard" fromChapter="37" fromVerse="1" toVerse="14"/>
             <custom n="Teiman" fromChapter="36" fromVerse="37" toChapter="37" toVerse="14"/>

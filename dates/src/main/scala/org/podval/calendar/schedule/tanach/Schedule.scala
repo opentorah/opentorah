@@ -143,15 +143,18 @@ object Schedule {
 
   def main(args: Array[String]): Unit = {
     println(Parsha.Mattos.getDaysCombined(Custom.Ashkenaz).toString(Language.Hebrew.toSpec))
+    println()
     printHaftarahList(Custom.Shami, Language.Hebrew.toSpec, full = false)
+    println()
     println(SpecialReading.SheminiAtzeres.shabbosAliyot.get.toString(Language.English.toSpec))
+    println()
     println(SpecialReading.SheminiAtzeres.maftir.get.toString(Language.English.toSpec))
+    println()
 
     val year = Year(5779)
     val day = year.month(Month.Name.Marheshvan).day(25)
     val schedule: Schedule = forYear(year, inHolyLand = false)
     val daySchedule = schedule.days(day)
-    println()
     println(daySchedule)
   }
 }

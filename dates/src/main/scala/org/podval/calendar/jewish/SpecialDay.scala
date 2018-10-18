@@ -51,7 +51,7 @@ object SpecialDay {
     protected def getReading(isShabbos: Boolean): Reading
   }
 
-  abstract class SimpleSpecialDay(month: Month.Name, numberInMonth: Int, reading: SpecialReading.Simple)
+  abstract class SimpleSpecialDay(month: Month.Name, numberInMonth: Int, reading: SpecialReading)
     extends SpecialDayBase(month, numberInMonth) with SimpleGetReading
   {
     protected final override def getReading(isShabbos: Boolean): Reading = reading.getReading(isShabbos)
@@ -103,12 +103,9 @@ object SpecialDay {
     }
   }
 
-  case object YomKippur extends SpecialDayBase(Tishrei, 10) with Festival {
-    protected override def getReading(isShabbos: Boolean): Reading =
-      SpecialReading.YomKippur.getReading(isShabbos)
-
+  case object YomKippur extends SimpleSpecialDay(Tishrei, 10, SpecialReading.YomKippur) with Festival {
     override def getAfternoonReading: Option[Reading] =
-      Some(SpecialReading.YomKippurAfternoon.getReading)
+      Some(SpecialReading.YomKippurAfternoon.getReading(false))
   }
 
   case object Succos extends SimpleSpecialDay(Tishrei, 15, SpecialReading.Succos) with Festival
@@ -136,7 +133,6 @@ object SpecialDay {
   case object HoshanahRabbahInHolyLand extends SuccosIntermediate(Tishrei, 21, 6, true)
 
   case object SheminiAtzeret extends SimpleSpecialDay(Tishrei, 22, SpecialReading.SheminiAtzeres) with Festival
-
   case object SimchasTorah extends SimpleSpecialDay(Tishrei, 23, SpecialReading.SimchasTorah) with Festival
 
   case object ShminiAtzeretAndSimchatTorahInHolyLand extends
@@ -190,19 +186,9 @@ object SpecialDay {
       SpecialReading.Purim.getReading(isShabbos)
   }
 
-  // TODO if there is no reading of the Torah - remove.
-  case object ShushanPurim extends SpecialDay with RabbinicFestival with SimpleGetReading {
-    override def apply(year: Year): Day = Purim(year)+1
-
-    protected override def getReading(isShabbos: Boolean): Reading = ???
-  }
-
   case object Pesach extends SimpleSpecialDay(Nisan, 15, SpecialReading.Pesach) with Festival
   case object Pesach2 extends SimpleSpecialDay(Nisan, 16, SpecialReading.Pesach2) with Festival
-
-  case object Pesach2InHolyLand extends
-    SimpleSpecialDay(Nisan, 16, SpecialReading.Pesach2InHolyLand) with Intermediate
-
+  case object Pesach2InHolyLand extends SimpleSpecialDay(Nisan, 16, SpecialReading.Pesach2InHolyLand) with Intermediate
   case object Pesach3 extends SimpleSpecialDay(Nisan, 17, SpecialReading.Pesach3) with Intermediate
 
   case object Pesach4 extends SpecialDayBase(Nisan, 18) with Intermediate {
@@ -228,7 +214,6 @@ object SpecialDay {
   case object Pesach8 extends SimpleSpecialDay(Nisan, 22, SpecialReading.Pesach8) with Festival
 
   case object Shavuos extends SimpleSpecialDay(Sivan, 6, SpecialReading.Shavuos) with Festival
-
   case object Shavuos2 extends SimpleSpecialDay(Sivan, 7, SpecialReading.Shavuos2) with Festival
 
   case object FastOfTammuz extends SpecialDayBase(Tammuz, 17) with Fast {
@@ -292,6 +277,8 @@ object SpecialDay {
   def shabbosBefore(day: Day): Day = day.prev.prev(Day.Name.Shabbos)
 
   def shabbosBereishis(year: Year): Day = shabbosAfter(SimchasTorah(year))
+
+  def shushanPurim(year: Year): Day = Purim(year)+1
 
   def lagBaOmer(year: Year): Day = year.month(Iyar).day(18)
 }
