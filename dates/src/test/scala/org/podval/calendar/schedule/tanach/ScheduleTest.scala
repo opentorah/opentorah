@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import org.podval.calendar.jewish.{Jewish, SpecialDay, YearType}
 import YearType._
 import Jewish.{Day, Year}
-import org.podval.judaica.metadata.tanach.Parsha
+import org.podval.judaica.metadata.tanach.{Parsha, WeeklyReading}
 import org.podval.judaica.metadata.tanach.Parsha._
 import SpecialDay._
 
@@ -38,7 +38,7 @@ final class ScheduleTest extends FlatSpec with Matchers {
     Set[Parsha](Bemidbar, Nasso).contains(readingsBeforeShavuot.parsha) shouldBe true
 
     // Tisha Be Av
-    findReadings(shabbosAfter(TishaBeAv(year))) shouldBe WeeklyReadingSchedule(Va_eschanan, None)
+    findReadings(shabbosAfter(TishaBeAv(year))) shouldBe WeeklyReading(Va_eschanan, None)
 
     // Rosh Ha Shanah
     findReadings(shabbosBefore(RoshHashanah1(year+1))).parsha shouldBe Nitzavim

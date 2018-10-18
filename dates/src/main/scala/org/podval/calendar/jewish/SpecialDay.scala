@@ -233,7 +233,7 @@ object SpecialDay {
       SpecialReading.TishaBeAv.getReading(isShabbos)
 
     override def getAfternoonReading: Option[Reading] =
-      Some(getReading(isShabbos = false))
+      Some(SpecialReading.TishaBeAv.getAfternoonReading)
   }
 
 

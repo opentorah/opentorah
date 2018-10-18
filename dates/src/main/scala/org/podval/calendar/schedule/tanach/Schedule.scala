@@ -146,9 +146,9 @@ object Schedule {
     println()
     printHaftarahList(Custom.Shami, Language.Hebrew.toSpec, full = false)
     println()
-    println(SpecialReading.SheminiAtzeres.shabbosAliyot.get.toString(Language.English.toSpec))
+//    println(SpecialReading.SheminiAtzeres.shabbosAliyot.get.toString(Language.English.toSpec))
     println()
-    println(SpecialReading.SheminiAtzeres.maftir.get.toString(Language.English.toSpec))
+    println(SpecialReading.SheminiAtzeres.getReading(false).maftir.get.toString(Language.English.toSpec))
     println()
 
     val year = Year(5779)

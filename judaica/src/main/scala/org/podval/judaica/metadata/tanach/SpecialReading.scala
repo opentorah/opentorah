@@ -12,50 +12,40 @@ sealed class SpecialReading(override val name: String, isShabbosAllowed: Boolean
     checkIsShabbosAllowed(isShabbos)
 
     Reading(
-      getAliyotSeq(isShabbos),
-      getMaftirOpt,
-      getHaftarahOpt
+      aliyot(isShabbos),
+      maftir,
+      haftarah
     )
   }
 
   protected final def checkIsShabbosAllowed(isShabbos: Boolean): Unit =
     if (isShabbos) require(isShabbosAllowed)
 
-  protected def getAliyotSeq(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] =
+  protected def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] =
     aliyotSameAs(isShabbos).getAliyot(isShabbos)
 
   protected def aliyotSameAs(isShabbos: Boolean): SpecialReading = this
 
-  private final def weekdayAliyot: Option[Aliyot] = SpecialReading.metadatas(this).weekdayAliyot
+  final def getAliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] = {
+    val result = SpecialReading.metadatas(this)
+    (if (isShabbos) result.shabbosAliyot else result.weekdayAliyot).get.getAliyot
+  }
 
-  final def getWeekdayAliyot: Seq[ChumashSpan.BookSpan] = weekdayAliyot.get.getAliyot
+  final def getWeekdayAliyot: Seq[ChumashSpan.BookSpan] = getAliyot(isShabbos = false)
 
-  final def shabbosAliyot: Option[Aliyot] = SpecialReading.metadatas(this).shabbosAliyot
+  protected def maftir: Option[ChumashSpan.BookSpan] = Some(getMaftir)
 
-  final def getShabbosAliyot: Seq[ChumashSpan.BookSpan] = shabbosAliyot.get.getAliyot
-
-  final def getAliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] =
-    if (isShabbos) getShabbosAliyot else getWeekdayAliyot
-
-  protected def getMaftirOpt: Option[ChumashSpan.BookSpan] = Some(getMaftir)
-
-  protected def getMaftir: ChumashSpan.BookSpan = maftirSameAs.maftir.get
+  protected def getMaftir: ChumashSpan.BookSpan = SpecialReading.metadatas(maftirSameAs).maftir.get
 
   protected def maftirSameAs: SpecialReading = this
 
-  final def maftir: Option[ChumashSpan.BookSpan] = SpecialReading.metadatas(this).maftir
-
-  protected def getHaftarahOpt: Option[Haftarah] = Some(haftarahSameAs.haftarah.get)
-
-  protected def haftarahSameAs: SpecialReading = this
-
-  final def haftarah: Option[Haftarah] = SpecialReading.metadatas(this).haftarah
+  protected def haftarah: Option[Haftarah] = Some(SpecialReading.metadatas(this).haftarah.get)
 }
 
 object SpecialReading {
   trait NoHaftarah { self: SpecialReading =>
-    protected final override def getMaftirOpt: Option[BookSpan.ChumashSpan.BookSpan] = None
-    protected final override def getHaftarahOpt: Option[Haftarah] = None
+    protected final override def maftir: Option[ChumashSpan.BookSpan] = None
+    protected final override def haftarah: Option[Haftarah] = None
   }
 
   case object ShabbosErevRoshChodesh extends SpecialReading("Shabbos Erev Rosh Chodesh")
@@ -64,7 +54,7 @@ object SpecialReading {
   case object ShabbosErevRoshChodeshAdditionalHaftorah extends SpecialReading("Shabbos Erev Rosh Chodesh Additional Haftorah")
 
   case object Fast extends SpecialReading("Fast", isShabbosAllowed = false) with NoHaftarah {
-    protected override def getAliyotSeq(isShabbos: Boolean): Seq[BookSpan.ChumashSpan.BookSpan] =
+    protected override def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] =
       Fast.getAliyot(isShabbos) ++ FastPart2.getAliyot(isShabbos)
 
     def getAfternoonReading: Reading = {
@@ -73,21 +63,19 @@ object SpecialReading {
       Reading(
         aliyot = aliyot1 ++ aliyot2.init,
         maftir = Some(aliyot2.last),
-        haftarah = FastPart2.getHaftarahOpt
+        haftarah = FastPart2.haftarah
       )
     }
   }
 
-  case object FastPart2 extends SpecialReading("Fast Part 2")
+  private case object FastPart2 extends SpecialReading("Fast Part 2")
 
-  // TODO: Rambam custom - haftara only shacharis;
-  //       Sfaradim Eretz Isroel fast haftara (except Zom Gedalia - Shuva Isroel
+  // TODO Rambam custom: haftara only shacharis.
+  // TODO Sfaradim Eretz Isroel: fast haftara (except Zom Gedalia - Shuva Isroel
   case object TishaBeAv extends SpecialReading("Tisha BeAv", isShabbosAllowed = false) {
-    protected override def getAliyotSeq(isShabbos: Boolean): Seq[BookSpan.ChumashSpan.BookSpan] =
-      getAliyot(false).init
-
-    protected override def getMaftir: BookSpan.ChumashSpan.BookSpan =
-      getAliyot(false).last
+    protected override def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] = getAliyot(false).init
+    protected override def getMaftir: ChumashSpan.BookSpan = getAliyot(false).last
+    def getAfternoonReading: Reading = getReading(false)
   }
 
   case object IntermediateShabbos extends SpecialReading("Intermediate Shabbos")
@@ -101,11 +89,8 @@ object SpecialReading {
   case object YomKippur extends SpecialReading("Yom Kippur")
 
   case object YomKippurAfternoon extends SpecialReading("Yom Kippur Afternoon") {
-    protected override def getAliyotSeq(isShabbos: Boolean): Seq[BookSpan.ChumashSpan.BookSpan] =
-      getWeekdayAliyot.init
-
-    protected override def getMaftir: BookSpan.ChumashSpan.BookSpan =
-      getWeekdayAliyot.last
+    protected override def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] = getWeekdayAliyot.init
+    protected override def getMaftir: ChumashSpan.BookSpan = getWeekdayAliyot.last
   }
 
   case object Succos extends SpecialReading("Succos")
@@ -118,8 +103,8 @@ object SpecialReading {
   // TODO Custom rav Nae Eretz Isroel: n day of Sukkos all alios (1 - 4) korbonos of n day.
   case object SuccosIntermediate extends SpecialReading("Succos Intermediate") {
     def getReading(isShabbos: Boolean, number: Int, inHolyLand: Boolean): Reading = {
-      val aliyot: Seq[ChumashSpan.BookSpan] = getWeekdayAliyot
-      def korbanot(n: Int): ChumashSpan.BookSpan = aliyot(n-1)
+      val all: Seq[ChumashSpan.BookSpan] = getWeekdayAliyot
+      def korbanot(n: Int): ChumashSpan.BookSpan = all(n-1)
 
       if (number == 6) require(inHolyLand)
       val last: ChumashSpan.BookSpan =
@@ -128,9 +113,9 @@ object SpecialReading {
 
       if (isShabbos) Reading(
         // TODO RULE: on Succos Intermediate Shabbos, add aliyot "Intermediate Shabbos".
-        aliyot = aliyot,
+        aliyot = all,
         maftir = Some(last),
-        haftarah = getHaftarahOpt // TODO ?
+        haftarah = haftarah // TODO ?
       ) else {
         val n: Int = if (number <= 4) number else 4
         val first3: Seq[ChumashSpan.BookSpan] = Seq(korbanot(n), korbanot(n+1), korbanot(n+2))
@@ -142,7 +127,7 @@ object SpecialReading {
   case object SheminiAtzeres extends SpecialReading("Shemini Atzeres")
 
   case object SimchasTorah extends SpecialReading("Simchas Torah", isShabbosAllowed = false) {
-    protected override def getAliyotSeq(isShabbos: Boolean): Seq[BookSpan.ChumashSpan.BookSpan] =
+    protected override def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] =
       getAliyot(isShabbos) ++ SimchasTorahChassanBereishis.getAliyot(isShabbos)
 
     protected override def maftirSameAs: SpecialReading = SheminiAtzeres
@@ -159,9 +144,9 @@ object SpecialReading {
       isRoshChodesh: Boolean,
       weeklyReading: Option[WeeklyReading]): Reading =
     {
-      val aliyot: Seq[ChumashSpan.BookSpan] = getWeekdayAliyot
-      def first(n: Int): ChumashSpan.BookSpan = aliyot(2*n-1)
-      def second(n: Int): ChumashSpan.BookSpan = aliyot(2*n  )
+      val all: Seq[ChumashSpan.BookSpan] = getWeekdayAliyot
+      def first(n: Int): ChumashSpan.BookSpan = all(2*n-1)
+      def second(n: Int): ChumashSpan.BookSpan = all(2*n  )
       def split(n: Int): Seq[ChumashSpan.BookSpan] = Seq(first(n), second(n))
       def full(n: Int): ChumashSpan.BookSpan = ChumashSpan.merge(split(n))
 
@@ -171,7 +156,7 @@ object SpecialReading {
       if (isShabbos) Reading(
         aliyot = weeklyReading.get.getReading.aliyot,
         maftir = Some(full(number)),
-        haftarah = Some((if (number < 8) ChannukahShabbos1 else ChannukahShabbos2).haftarah.get)
+        haftarah = (if (number < 8) ChannukahShabbos1 else ChannukahShabbos2).haftarah
       )
 //      else  if (isRoshChodesh) {
 //      RULE: when a day of Channukah falls on Rosh Chodesh (6th - always; 7th - sometimes),
@@ -181,8 +166,8 @@ object SpecialReading {
       else {
         val result: Custom.Of[Seq[ChumashSpan.BookSpan]] =
           if (number == 1) Map(
-              Custom.Ashkenaz -> (aliyot.head +: split(1)),
-              Custom.Sefard -> Seq(aliyot.head, full(1), full(2))
+              Custom.Ashkenaz -> (all.head +: split(1)),
+              Custom.Sefard -> Seq(all.head, full(1), full(2))
           ) else if (number < 8) {
             val common = split(number)
             val ashkenazAndChabad = common :+ full(if (number < 7) number+1 else 1)
@@ -239,8 +224,8 @@ object SpecialReading {
       if (isShabbos) PesachIntermediateShabbos.getReading(isShabbos) else super.getReading(isShabbos)
     }
 
-    protected override def getAliyotSeq(isShabbos: Boolean): Seq[BookSpan.ChumashSpan.BookSpan] =
-      super.getAliyotSeq(isShabbos) :+ Pesach7.getMaftir
+    protected override def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] =
+      super.aliyot(isShabbos) :+ Pesach7.getMaftir
   }
 
   case object Pesach2InHolyLand extends PesachIntermediate("Pesach 2 in Holy Land", isShabbosAllowed = false)
@@ -335,7 +320,7 @@ object SpecialReading {
 
   private def parseTorah(element: Elem): (Option[Aliyot], Option[Aliyot]) = {
     val (attributes: Attributes, elements: Seq[Elem]) = XML.open(element, "torah")
-    val bookSpan: BookSpan.ChumashSpan.BookSpan = BookSpan.ChumashSpan.parse(attributes).resolve
+    val bookSpan: ChumashSpan.BookSpan = ChumashSpan.parse(attributes).resolve
     attributes.close()
 
     def parseAliyot(elements: Seq[Elem]): Aliyot = {
