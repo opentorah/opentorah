@@ -28,6 +28,7 @@ object Custom extends NamedCompanion {
         case object Algeria extends Custom(Some(Magreb))
         case object Toshbim extends Custom(Some(Magreb))
         case object Djerba extends Custom(Some(Magreb))
+        case object Fes extends Custom(Some(Magreb))
       case object Bavlim extends Custom(Some(Sefard))
       case object Teiman extends Custom(Some(Sefard))
         case object Baladi extends Custom(Some(Teiman))
@@ -35,7 +36,7 @@ object Custom extends NamedCompanion {
 
   override val values: Seq[Custom] = Seq(
     Common, Ashkenaz, Italki, Frankfurt, Lita, Hayey_odom, Hagra,
-    Sefard, Chabad, Magreb, Algeria, Toshbim, Djerba, Bavlim, Teiman, Baladi, Shami)
+    Sefard, Chabad, Magreb, Algeria, Toshbim, Djerba, Fes, Bavlim, Teiman, Baladi, Shami)
 
   type Of[T] = Map[Custom, T]
 

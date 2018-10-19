@@ -59,7 +59,7 @@ object SpecialDay {
 
   trait FestivalOrIntermediate extends SpecialDay
 
-  trait Festival extends FestivalOrIntermediate  with SimpleGetReading {
+  trait Festival extends FestivalOrIntermediate with SimpleGetReading {
     final override def isFast: Boolean = false
     final override def isFestival: Boolean = true
     final override def isIntermediate: Boolean = false
@@ -105,7 +105,7 @@ object SpecialDay {
 
   case object YomKippur extends SimpleSpecialDay(Tishrei, 10, SpecialReading.YomKippur) with Festival {
     override def getAfternoonReading: Option[Reading] =
-      Some(SpecialReading.YomKippurAfternoon.getReading(false))
+      Some(SpecialReading.YomKippur.getAfternoonReading)
   }
 
   case object Succos extends SimpleSpecialDay(Tishrei, 15, SpecialReading.Succos) with Festival

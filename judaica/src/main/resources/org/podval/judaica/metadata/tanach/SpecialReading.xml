@@ -7,35 +7,6 @@
          на 6 алию читают 6 и 7.
          7 алия - чтение см. выше
 
-         Question: "Tisha BeAv Rambam custom: haftara only shacharis" - do I need to do this now or
-           this is like Yemenites' reading of thre parshiot in two weeks?
-
-         Question: Tisha BeAv "Sfaradim Eretz Isroel: fast haftara (except Zom Gedalia - Shuva Isroel" -
-           is this about Tisha Beav or all fasts?
-           Is "Sfaradim Eretz Isroel" a custom that needs to be added to the list?
-
-         Question: What does it mean that "Shabbos [Erev] Rosh Chodesh Additional Haftorah" are added
-         by Chabad and Fes (Marocco)?
-         Where and when exactly are they added?
-         Is "Fes" a Custom that needs to be added to the list?
-
-         Question: Yom Kippur Mincha: 3rd aliya is marked "mincha - maftir" - but this is only read in mincha?!
-
-         Question: Succos Chol Hamoed: "Custom rav Nae Eretz Isroel: n day of Sukkos all alios (1 - 4) korbonos of n day".
-           What does this mean exactly? Is "rav Nae Eretz Isroel" a custom that needs to be added to the list?
-
-         Question: Succos Shabbos Chol Hamoed has its own Torah reading; what do we do with the Shabbos Chol Hamoed aliyos?
-
-         Question: Haftarah Shemini Atzeres: Artscroll lists Ashkenaz custom ending at 9:1,
-         but @michaelko58 insists that Ashkenaz custom is the same as Sefard - to end at 8:66...
-
-         Question: Channukah: are "Minhagim kria Chanuka" done?
-
-         Question: Channukah: "Mingag Chabad (Ramo)" - what is minhag Chabad?
-          Same as Ashkenaz on the 1st day? Is "Ramo" a custom that needs to be added to the list?
-
-         Question: when are Shekalim Zachor, Parah and Hachodesh read?
-
          TODO Sources
     -->
     <day n="Shabbos Erev Rosh Chodesh">
@@ -71,6 +42,10 @@
         </haftarah>
     </day>
 
+    <!-- RULE: When another haftarah (e.g., Shekalim) takes over, add "Shabbos [Erev] Rosh Chodesh Additional Haftorah"
+               Chabad: always
+               Fes: only EREV rosh chodesh
+    -->
     <day n="Shabbos Rosh Chodesh Additional Haftorah">
         <haftarah book="Isaiah" fromChapter="66">
             <part n="1" fromVerse="1" toVerse="1"/>
@@ -263,6 +238,12 @@
             </shabbos>
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
+        <!--
+        Artscroll gives custom Ashkenaz ending at 9:1,
+        but @michaelko58 insists that it is the same as Sefard and ends at 8:66.
+        His explanation: "there are some ashkenazic communities that follow custom Italki.
+        It is possible that this is a difference between chassidim and litaim."
+        -->
         <haftarah book="I Kings" fromChapter="8" fromVerse="54">
             <custom n="Sefard Ashkenaz" toChapter="8" toVerse="66"/>
             <custom n="Italki Chabad" toChapter="9" toVerse="1"/>
