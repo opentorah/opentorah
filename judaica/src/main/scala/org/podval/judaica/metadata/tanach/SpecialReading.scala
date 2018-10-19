@@ -70,8 +70,6 @@ object SpecialReading {
 
   private case object FastPart2 extends SpecialReading("Fast Part 2")
 
-  // TODO Rambam custom: haftara only shacharis.
-  // TODO Sfaradim Eretz Isroel: fast haftara (except Zom Gedalia - Shuva Isroel
   case object TishaBeAv extends SpecialReading("Tisha BeAv", isShabbosAllowed = false) {
     protected override def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] = getAliyot(false).init
     protected override def getMaftir: ChumashSpan.BookSpan = getAliyot(false).last
@@ -100,7 +98,6 @@ object SpecialReading {
     protected override def maftirSameAs: SpecialReading = Succos
   }
 
-  // TODO Custom rav Nae Eretz Isroel: n day of Sukkos all alios (1 - 4) korbonos of n day.
   case object SuccosIntermediate extends SpecialReading("Succos Intermediate") {
     def getReading(isShabbos: Boolean, number: Int, inHolyLand: Boolean): Reading = {
       val all: Seq[ChumashSpan.BookSpan] = getWeekdayAliyot
@@ -136,8 +133,6 @@ object SpecialReading {
   case object SimchasTorahChassanBereishis extends SpecialReading("Simchas Torah Chassan Bereishis")
 
   case object Channukah extends SpecialReading("Channukah") {
-    // TODO: Minhagim kria Chanuka
-    // TODO Mingag Chabad (Ramo) - what is minhag Chabad? Same as Ashkenaz on the 1st day? What Ramo?!
     def getReading(
       isShabbos: Boolean,
       number: Int,

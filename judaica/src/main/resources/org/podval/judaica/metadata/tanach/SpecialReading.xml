@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata type="SpecialReading">
     <!-- TODO what is all this about?
-
          Exception - kriat Tora shabat rosh chodesh tevet, shkalim,a-hodesh #98
          44 verse=18 7. Бемидбар, 28:9-15 Может ли быть другая глава?
          Аналогично - в шабат Шкалим и шабат а-Ходеш, выпавшие в рош ходеш:
          на 6 алию читают 6 и 7.
          7 алия - чтение см. выше
+
+         Question: "Tisha BeAv Rambam custom: haftara only shacharis" - do I need to do this now or
+           this is like Yemenites' reading of thre parshiot in two weeks?
+
+         Question: Tisha BeAv "Sfaradim Eretz Isroel: fast haftara (except Zom Gedalia - Shuva Isroel" -
+           is this about Tisha Beav or all fasts?
+           Is "Sfaradim Eretz Isroel" a custom that needs to be added to the list?
+
+         Question: What does it mean that "Shabbos [Erev] Rosh Chodesh Additional Haftorah" are added
+         by Chabad and Fes (Marocco)?
+         Where and when exactly are they added?
+         Is "Fes" a Custom that needs to be added to the list?
+
+         Question: Yom Kippur Mincha: 3rd aliya is marked "mincha - maftir" - but this is only read in mincha?!
+
+         Question: Succos Chol Hamoed: "Custom rav Nae Eretz Isroel: n day of Sukkos all alios (1 - 4) korbonos of n day".
+           What does this mean exactly? Is "rav Nae Eretz Isroel" a custom that needs to be added to the list?
+
+         Question: Succos Shabbos Chol Hamoed has its own Torah reading; what do we do with the Shabbos Chol Hamoed aliyos?
+
+         Question: Haftarah Shemini Atzeres: Artscroll lists Ashkenaz custom ending at 9:1,
+         but @michaelko58 insists that Ashkenaz custom is the same as Sefard - to end at 8:66...
+
+         Question: Channukah: are "Minhagim kria Chanuka" done?
+
+         Question: Channukah: "Mingag Chabad (Ramo)" - what is minhag Chabad?
+          Same as Ashkenaz on the 1st day? Is "Ramo" a custom that needs to be added to the list?
+
+         Question: when are Shekalim Zachor, Parah and Hachodesh read?
 
          TODO Sources
     -->
@@ -43,7 +71,6 @@
         </haftarah>
     </day>
 
-    <!-- TODO Added by Chabad and Fes (Marocco); @michaelko58 needs to add the rules :) -->
     <day n="Shabbos Rosh Chodesh Additional Haftorah">
         <haftarah book="Isaiah" fromChapter="66">
             <part n="1" fromVerse="1" toVerse="1"/>
@@ -52,7 +79,6 @@
         </haftarah>
     </day>
 
-    <!-- TODO Added by Chabad and Fes (Marocco); @michaelko58 needs to add the rules :) -->
     <day n="Shabbos Erev Rosh Chodesh Additional Haftorah">
         <haftarah book="I Samuel" fromChapter="20">
             <part n="1" fromVerse="18" toVerse="18"/>
@@ -158,7 +184,7 @@
     <day n="Yom Kippur Afternoon">
         <torah book="Leviticus" fromChapter="18" fromVerse="1" toVerse="30">
             <aliyah n="2" fromVerse="6"/>
-            <aliyah n="3" fromVerse="22"/> <!-- TODO mincha - maftir - but this is only read in mincha?! -->
+            <aliyah n="3" fromVerse="22"/>
         </torah>
         <haftarah>
             <custom n="Ashkenaz Sefard">
@@ -238,8 +264,6 @@
         </torah>
         <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
         <haftarah book="I Kings" fromChapter="8" fromVerse="54">
-            <!-- TODO Artscroll lists Ashkenaz custom ending at 9:1,
-             but @michaelko58 insists that Ashkenaz custom is the same as Sefard - to end at 8:66... -->
             <custom n="Sefard Ashkenaz" toChapter="8" toVerse="66"/>
             <custom n="Italki Chabad" toChapter="9" toVerse="1"/>
         </haftarah>
@@ -341,7 +365,7 @@
         </torah>
     </day>
 
-    <day n="Shabbos Hagodol"> <!-- TODO Chabad only erev Pesah -->
+    <day n="Shabbos Hagodol"> <!-- Rule: Chabad only erev Pesah -->
         <haftarah book="Malachi" fromChapter="3" fromVerse="4" toVerse="24"/>
     </day>
 
