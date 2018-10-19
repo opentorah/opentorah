@@ -114,7 +114,7 @@ final class DatesTest extends FlatSpec with Matchers {
   "Festivals" should "not fall on the proscribed days" in {
     val data = Table(
       ("specialDay", "notOn"),
-      (RoshHashanah, Seq(Rishon, Rvii, Shishi)),
+      (RoshHashanah1, Seq(Rishon, Rvii, Shishi)),
       (YomKippur, Seq(Shlishi, Rishon, Shishi)),
       (Purim, Seq(Shabbos, Sheni, Rvii)),
       (Pesach, Seq(Sheni, Rvii, Shishi)),
@@ -131,12 +131,9 @@ final class DatesTest extends FlatSpec with Matchers {
         days contains specialDay(year).name shouldBe false
       }
 
-      def sameDay(a: SpecialDay, b: SpecialDay): Unit =
-        a(year).name shouldBe b(year).name
-
-      sameDay(Purim, LagBaOmer)
+      Purim(year).name shouldBe SpecialDay.lagBaOmer(year).name
       // misprint, see Taz 1, Magen Avraham 1
-      // sameDay(Hanukkah, Shavuot)
+      // Hanukkah(year).name shouldBe Shavuot(year.name)
     }
   }
 
@@ -182,8 +179,8 @@ final class DatesTest extends FlatSpec with Matchers {
       val pesach: Day = Pesach(year)
       TishaBeAv(year).name shouldBe pesach.name
       Shavuos(year).name shouldBe (pesach+1).name
-      RoshHashanah(year+1).name shouldBe (pesach+2).name
-      SimchatTorah(year+1).name shouldBe (pesach+3).name
+      RoshHashanah1(year+1).name shouldBe (pesach+2).name
+      SimchasTorah(year+1).name shouldBe (pesach+3).name
       YomKippur(year+1).name shouldBe (pesach+4).name
       Purim(year).name shouldBe (pesach+5).name
     }

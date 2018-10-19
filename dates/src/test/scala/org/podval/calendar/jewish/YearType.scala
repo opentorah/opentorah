@@ -35,7 +35,7 @@ object YearType {
     val (isLeap, kind) = year.character
     types.find { yearType =>
       (yearType.isLeap == isLeap) &&
-      (yearType.roshHashanah == SpecialDay.RoshHashanah(year).name) &&
+      (yearType.roshHashanah == SpecialDay.RoshHashanah1(year).name) &&
       (yearType.kind == kind)
     }.get
   }

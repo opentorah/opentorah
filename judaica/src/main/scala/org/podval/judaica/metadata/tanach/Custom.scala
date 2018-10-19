@@ -39,6 +39,8 @@ object Custom extends NamedCompanion {
 
   type Of[T] = Map[Custom, T]
 
+  def ofCommon[T](value: T): Custom.Of[T] = Map(Common -> value)
+
   def find[T](customs: Of[T], custom: Custom): Custom = find(customs.keySet, custom)
 
   def find(customs: Set[Custom], custom: Custom): Custom = {

@@ -54,6 +54,13 @@ trait BookSpan[Book <: Tanach.TanachBook] {
   }
 
   def dropNumbers(spans: Seq[Numbered]): Seq[BookSpan] = spans.map(_.span)
+
+  def merge(spans: Seq[BookSpan]): BookSpan = {
+    val book = spans.head.book
+    require(spans.forall(_.book == book))
+    require(book.chapters.consecutive(spans.map(_.span)))
+    BookSpan(book = book, Span(spans.head.span.from, spans.last.span.to))
+  }
 }
 
 object BookSpan {

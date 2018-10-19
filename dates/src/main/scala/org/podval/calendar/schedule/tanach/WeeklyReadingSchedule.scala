@@ -3,9 +3,9 @@ package org.podval.calendar.schedule.tanach
 import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.jewish.SpecialDay
-import SpecialDay.{Pesach, ShabbosBereishis, Shavuos, TishaBeAv, shabbosAfter, shabbosBefore}
-import org.podval.judaica.metadata.{Language, LanguageSpec, Util}
-import org.podval.judaica.metadata.tanach.{Parsha, SpecialReading}
+import SpecialDay.{Pesach, Shavuos, TishaBeAv, shabbosAfter, shabbosBefore}
+import org.podval.judaica.metadata.Util
+import org.podval.judaica.metadata.tanach.{Parsha, WeeklyReading}
 import org.podval.judaica.metadata.tanach.Parsha._
 
 /**
@@ -20,7 +20,7 @@ import org.podval.judaica.metadata.tanach.Parsha._
   the year is lacking and leap (Ramo: or full and leap) (Magen Avraham: thus, any leap year) [note 1]
   when we read "Acharei Mos" before Pesach;
 
-  we always read "Bemidbar Sinai" before Shavuot;
+  We always read "Bemidbar Sinai" before Shavuot;
 
   Tisha Be Av is before (we read) Va'eschanan;
 
@@ -104,55 +104,82 @@ import org.podval.judaica.metadata.tanach.Parsha._
   assumptions of the algorithm itself hold is verified by the unit tests for the years 1-6000;
   I am too lazy to prove the theorems :)
  */
-final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) {
-  def isCombined: Boolean = secondParsha.isDefined
-}
-
-object WeeklyReading {
+object WeeklyReadingSchedule {
   private final val fromBereishisToBemidbar: Int = Parsha.distance(Bereishis, Bemidbar)
   private final val allowedBeforePesach: Set[Parsha] = Set[Parsha](Tzav, Metzora, Acharei)
   private final val fromBemidbarToVa_eschanan: Int = Parsha.distance(Bemidbar, Va_eschanan)
   private final val fromVa_eschanan: Int = Parsha.distance(Va_eschanan, VezosHaberachah)
 
-  def getYear(year: Year, inHolyLand: Boolean): Map[Day, WeeklyReading] =
-    (getCycle(year-1, inHolyLand) ++ getCycle(year, inHolyLand)).filter(_._1.year == year).toMap
-
-  def getCycle(year: Year, inHolyLand: Boolean): Seq[(Day, WeeklyReading)] = {
-    // Reading cycle goes into the next year, so we need to exclude the festivals for both years.
-    val festivals: Set[Day] =
-      SpecialDay.festivals(inHolyLand).map(_(year)) ++
-      SpecialDay.festivals(inHolyLand).map(_(year+1))
+  /**
+    * Yearly cycle of the reading of the Torah:
+    * Shabbos days with normal (non-special) Torah readings paired with their readings.
+    *
+    * @param year in which the cycle starts
+    * @param fromShabbosBereishis start of the cycle
+    * @param toShabbosBereishis end of the cycle
+    * @param festivals for this year and the next: since the cycle goes into the next year,
+    *                  we need to exclude the festivals for both
+    * @return
+    */
+  def getCycle(
+    year: Year,
+    fromShabbosBereishis: Day,
+    toShabbosBereishis: Day,
+    festivals: Set[Day]): Seq[(Day, WeeklyReading)] =
+  {
+    require(fromShabbosBereishis.year == year)
+    require(toShabbosBereishis.year == year+1)
 
     // All Shabbos days that are not festivals from one Shabbos Bereshit until the next.
     val weeks: Seq[Day] =
-      Util.unfoldInfiniteSimple(ShabbosBereishis(year))(_ + Calendar.daysPerWeek)
-      .takeWhile(_ < ShabbosBereishis(year+1))
+      Util.unfoldSimple[Day](fromShabbosBereishis, _ + Calendar.daysPerWeek, _ < toShabbosBereishis)
       .filterNot(festivals.contains)
-      .toList
 
+    val combine: Set[Parsha] = combined(year, weeks)
+
+    def process(toProcess: Seq[Parsha]): Seq[WeeklyReading] = toProcess match {
+      case first :: second :: rest if combine.contains(first) =>
+        require(!combine.contains(second))
+        WeeklyReading(first, Some(second)) +: process(rest)
+      case first :: rest =>
+        require(!combine.contains(first))
+        WeeklyReading(first, None) +: process(rest)
+      case Nil =>  Nil
+    }
+
+    val result = process(Parsha.values.init)
+
+    require(result.length == weeks.length)
+
+    weeks zip result
+  }
+
+  // What weekly portions combine in this cycle.
+  private def combined(year: Year, weeks: Seq[Day]): Set[Parsha] = {
     def weeksTo(day: Day): Int = weeks.takeWhile(_ < day).length
 
+    val weeksBeforePesach: Int = weeksTo(shabbosBefore(Pesach(year)))
     val weeksToShavuot: Int = weeksTo(shabbosBefore(Shavuos(year)))
-
     val weeksFromShavuotToAfterTishaBeAv: Int = weeksTo(shabbosAfter(TishaBeAv(year))) - weeksToShavuot
 
     // When there are to many Saturdays before Shavuot to assign Bemidbar to the one immediately before Shavuot,
     // Bemidbar is read one week before Shavuot:
-    val (combineFromBereishisToVayikra: Int, combineFromVayikraToBemidbar: Int, combineFromBemidbarToVa_eschanan: Int) = {
-      val combinefromBereishisToBemidbar: Int = fromBereishisToBemidbar - weeksToShavuot
-      val combineFromBemidbarToVa_eschananCandidate: Int = fromBemidbarToVa_eschanan - weeksFromShavuotToAfterTishaBeAv
 
+    val combinefromBereishisToBemidbar: Int = fromBereishisToBemidbar - weeksToShavuot
+    val combineFromBemidbarToVa_eschananCandidate: Int = fromBemidbarToVa_eschanan - weeksFromShavuotToAfterTishaBeAv
+
+    val (combineFromBereishisToVayikra: Int, combineFromVayikraToBemidbar: Int, combineFromBemidbarToVa_eschanan: Int) = {
       if (combinefromBereishisToBemidbar < 0)
         (0, 0, combinefromBereishisToBemidbar + combineFromBemidbarToVa_eschananCandidate)
       else {
         // TODO clean this up, so there is no hardcoded assumption about combinableFromBereshitToVayikra.length == 1
         // and maybe rename it to ...beforTzav or something?
         val doCombineVayakhelPekudei: Boolean =
-          (combinefromBereishisToBemidbar == combinableFromBereishisToVayikra.length + combinableFromVayikraToBemidbar.length) || {
-            // This tweak is required only for the Holy Land (and never for AchareiMot) for some reason?
-            val parshahBeforePesach: Parsha = Parsha.forIndex(weeksTo(shabbosBefore(Pesach(year))))
-            !allowedBeforePesach.contains(parshahBeforePesach)
-          }
+        (combinefromBereishisToBemidbar == combinableFromBereishisToVayikra.length + combinableFromVayikraToBemidbar.length) || {
+          // This tweak is required only for the Holy Land (and never for AchareiMot) for some reason?
+          val parshahBeforePesach: Parsha = Parsha.forIndex(weeksBeforePesach)
+          !allowedBeforePesach.contains(parshahBeforePesach)
+        }
 
         val combineFromBereishisToVayikra: Int = if (doCombineVayakhelPekudei) 1 else 0
 
@@ -167,34 +194,14 @@ object WeeklyReading {
     val weeksFromVa_eschanan: Int = weeks.length - weeksToShavuot - weeksFromShavuotToAfterTishaBeAv
     val combineFromVa_eschanan: Int = fromVa_eschanan - weeksFromVa_eschanan
 
-    val combine: Set[Parsha] =
-      take(combinableFromBereishisToVayikra, combineFromBereishisToVayikra) ++
-      take(combinableFromVayikraToBemidbar, combineFromVayikraToBemidbar) ++
-      take(combinableFromBemidbarToVa_eschanan, combineFromBemidbarToVa_eschanan) ++
-      take(combinableFromVa_eschanan, combineFromVa_eschanan)
-
-    def process(toProcess: Seq[Parsha]): Seq[WeeklyReading] = toProcess match {
-      case first :: second :: rest if combine.contains(first) =>
-        WeeklyReading(first, Some(second)) +: process(rest)
-      case first :: rest =>
-        WeeklyReading(first, None) +: process(rest)
-      case Nil =>  Nil
-    }
-
-    val result = process(Parsha.values.init)
-
-    require(result.length == weeks.length)
-
-    weeks zip result
+    take(combinableFromBereishisToVayikra, combineFromBereishisToVayikra) ++
+    take(combinableFromVayikraToBemidbar, combineFromVayikraToBemidbar) ++
+    take(combinableFromBemidbarToVa_eschanan, combineFromBemidbarToVa_eschanan) ++
+    take(combinableFromVa_eschanan, combineFromVa_eschanan)
   }
 
   private def take(what: Seq[Parsha], number: Int): Set[Parsha] = {
     require(0 <= number && number <= what.length)
     what.take(number).toSet
-  }
-
-  def main(args: Array[String]): Unit = {
-    println(SpecialReading.SheminiAtzeres.shabbosAliyot.get.toString(LanguageSpec(Language.English)))
-    println(SpecialReading.SheminiAtzeresMaftir.maftir.get.toString(LanguageSpec(Language.English)))
   }
 }

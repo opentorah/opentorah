@@ -33,10 +33,14 @@ Days without Tachanun
 18 элула - не все
 Минха в канун этих дней
 
+Note: when Av Harachamim is not said on Shabbos (by the way, when Tisha Bav is on Shabbos, it *is* said,
+although we wouldn't have said Tachanun if it wasn't Shabbos...) - but shouldn't postponed fast
+(or advanced Purim) leave some trace?
+
 Добавить Пурим мешулаш:
 Шушан Пурим, выпадающий на шабат, празднуется три дня. В пятницу читают мегилу, в шабат Тору, а в йом ришон - сеуда и остальные заповеди.
 
 */
-object Reading {
+object Tachanun {
 
 }

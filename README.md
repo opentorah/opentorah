@@ -3,7 +3,8 @@
 
 ## Goals
 
-I want to be able to do various things with the fixed Jewish calendar:
+I want to be able to do various things with the fixed Jewish calendar
+as described by Rambam in the Laws of the Sanctification of the Moon, Chapters 6-10:
 
 - [x] code Rambam's calculations (and verify Rambam's numerical examples)
 - [x] convert dates from Jewish calendar to Gregorian and back
@@ -12,13 +13,8 @@ I want to be able to do various things with the fixed Jewish calendar:
 - [ ] generate schedule of learning Rambam
 - [ ] generate monthly calendars with both kinds of dates
 
-For my needs, the best source of information on the Jewish Calendar turned out
-to be Rambam, the Laws of the Sanctification of the Moon, Chapters 6-10.
-The book "Calendrical Calculations" was also interesting, but algorithms and
-formulas from it were not used directly.
-
-I want to do certain things with the astronomical calendar as described by Rambam
-in Chapters 11-19:
+I want to do certain things with the astronomical Jewsih calendar
+as described by Rambam in the Laws of the Sanctification of the Moon, in Chapters 11-19:
 
 - [ ] code Rambam's calculations (and verify Rambam's numerical examples)
 - [ ] verify Rambam's tables and rounding decisions against his models
@@ -59,6 +55,9 @@ TODO https://en.wikibooks.org/wiki/Mathematics_of_the_Jewish_Calendar/The_Annual
 סי' תרצג סע' ד ומשנה ברורה
 סי' תכה סע' א- ב ומשנה ברורה [בעיקר: ס"ק ד, ח, יב]
 סי' תכח סע' ד, ו, ח ומשנה ברורה
+
+Book "Calendrical Calculations" was also interesting, but algorithms and
+formulas from it were not used directly.
 
 ## Early Jewish Years
 
