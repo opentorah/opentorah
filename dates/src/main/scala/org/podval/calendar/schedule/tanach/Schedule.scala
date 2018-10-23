@@ -2,7 +2,7 @@ package org.podval.calendar.schedule.tanach
 
 import org.podval.calendar.jewish.Jewish.{Day, Month, Year}
 import org.podval.calendar.jewish.SpecialDay
-import org.podval.calendar.jewish.SpecialDay.{FestivalOrIntermediate, shabbosBereishis}
+import org.podval.calendar.jewish.SpecialDay.{FestivalOrIntermediate, ShabbosBereishis}
 import org.podval.judaica.metadata.{Language, LanguageSpec}
 import org.podval.judaica.metadata.tanach.{Custom, Haftarah, Parsha, Reading, SpecialReading, WeeklyReading}
 import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
@@ -41,7 +41,7 @@ object Schedule {
   def apply(from: Day, to: Day, inHolyLand: Boolean): Schedule = {
     val data: ScheduleData = scheduleData(from, to, inHolyLand)
 
-    val daysWithSpecialReadingsNotFestivals: Map[Day, SpecialDay] = filter(from, to, data.years.map(year =>
+    val daysWithSpecialReadingsNotFestivals: Map[Day, SpecialDay.WithReading] = filter(from, to, data.years.map(year =>
       SpecialDay.daysWithSpecialReadingsNotFestivals.map(day => day.corrected(year) -> day).toMap))
 
     val pesachOnChamishi: Set[Year] = data.years.flatMap { year =>
@@ -67,7 +67,7 @@ object Schedule {
   private final def getReading(
     day: Day,
     weeklyReading: Option[WeeklyReading],
-    specialDay: Option[SpecialDay],
+    specialDay: Option[SpecialDay.WithReading],
     isPesachOnChamishi: Boolean
   ): DaySchedule = {
     val isShabbos: Boolean = day.isShabbos
@@ -86,14 +86,14 @@ object Schedule {
   }
 
   private def scheduleData(from: Day, to: Day, inHolyLand: Boolean): ScheduleData = {
-    val fromYear: Year = if (shabbosBereishis(from.year) <= from) from.year else from.year-1
-    val toYear: Year = if (to < shabbosBereishis(to.year)) to.year else to.year+1
+    val fromYear: Year = if (ShabbosBereishis(from.year) <= from) from.year else from.year-1
+    val toYear: Year = if (to < ShabbosBereishis(to.year)) to.year else to.year+1
     val years: Seq[Year] = Util.unfoldSimple[Year](fromYear, _ + 1, _ <= toYear)
 
     val yearsData: Seq[YearData] = years.map { year =>
       YearData(
         year = year,
-        shabbosBereishis = shabbosBereishis(year),
+        shabbosBereishis = ShabbosBereishis(year),
         festivals = SpecialDay.festivals(inHolyLand).map { specialDay =>  specialDay(year) -> specialDay }.toMap
       )
     }

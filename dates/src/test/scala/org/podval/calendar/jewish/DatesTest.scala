@@ -131,7 +131,7 @@ final class DatesTest extends FlatSpec with Matchers {
         days contains specialDay(year).name shouldBe false
       }
 
-      Purim(year).name shouldBe SpecialDay.lagBaOmer(year).name
+      Purim(year).name shouldBe SpecialDay.LagBaOmer(year).name
       // misprint, see Taz 1, Magen Avraham 1
       // Hanukkah(year).name shouldBe Shavuot(year.name)
     }

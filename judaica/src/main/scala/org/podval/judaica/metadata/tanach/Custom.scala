@@ -20,23 +20,27 @@ object Custom extends NamedCompanion {
       case object Italki extends Custom(Some(Ashkenaz))
       case object Frankfurt extends Custom(Some(Ashkenaz))
       case object Lita extends Custom(Some(Ashkenaz))
-        case object Hayey_odom extends Custom(Some(Lita))
+        case object ChayeyOdom extends Custom(Some(Lita)) { override def name: String = "Chayey Odom" }
       case object Hagra extends Custom(Some(Ashkenaz))
     case object Sefard extends Custom(Some(Common))
+      // According to some, this is prevaling Chabad custom:
+      case object RavNaeHolyLand extends Custom(Some(Chabad)) { override def name: String = "Rav Nae Holy Land" }
       case object Chabad extends Custom(Some(Sefard))
       case object Magreb extends Custom(Some(Sefard))
         case object Algeria extends Custom(Some(Magreb))
         case object Toshbim extends Custom(Some(Magreb))
         case object Djerba extends Custom(Some(Magreb))
-        case object Fes extends Custom(Some(Magreb))
+        case object Morocco extends Custom(Some(Magreb))
+          case object Fes extends Custom(Some(Morocco))
       case object Bavlim extends Custom(Some(Sefard))
       case object Teiman extends Custom(Some(Sefard))
         case object Baladi extends Custom(Some(Teiman))
         case object Shami extends Custom(Some(Teiman))
 
   override val values: Seq[Custom] = Seq(
-    Common, Ashkenaz, Italki, Frankfurt, Lita, Hayey_odom, Hagra,
-    Sefard, Chabad, Magreb, Algeria, Toshbim, Djerba, Fes, Bavlim, Teiman, Baladi, Shami)
+    Common, Ashkenaz, Italki, Frankfurt, Lita, ChayeyOdom, Hagra,
+    Sefard, RavNaeHolyLand, Chabad,
+    Magreb, Algeria, Toshbim, Djerba, Morocco, Fes, Bavlim, Teiman, Baladi, Shami)
 
   type Of[T] = Map[Custom, T]
 
@@ -55,7 +59,7 @@ object Custom extends NamedCompanion {
   // - add customs that have all children already in the set (recursively);
   // - remove customs that have parents in the set.
   def parse(names: String): Set[Custom] = {
-    val customs: Seq[Custom] = names.split(' ').map(_.trim).map(getForName)
+    val customs: Seq[Custom] = names.split(',').map(_.trim).map(getForName)
     Util.checkNoDuplicates(customs, "customs")
 
     val result = addParents(customs.toSet)
@@ -83,7 +87,7 @@ object Custom extends NamedCompanion {
   }
 
   // Check that the sets do not overlap - and cover all customs.
-  def check[T](map: Sets[T]): Unit = {
+  private def check[T](map: Sets[T]): Unit = {
     val sets: Set[Set[Custom]] = map.keySet
     sets.foreach(a => sets.foreach(b => if (b != a) {
       require(b.intersect(a).isEmpty, s"Overlaping sets of customs: $a and $b")
