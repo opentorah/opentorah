@@ -1,7 +1,7 @@
 package org.podval.judaica.metadata.tanach
 
 import org.podval.judaica.metadata.tanach.Tanach.ChumashBook
-import org.podval.judaica.metadata.{LanguageSpec, Metadata, NamedCompanion, Named, Names}
+import org.podval.judaica.metadata.{LanguageSpec, NamedCompanion, Named, Names}
 
 sealed trait Parsha extends Named {
   def book: ChumashBook
@@ -22,8 +22,6 @@ sealed trait Parsha extends Named {
   final def aliyot: Aliyot = book.aliyot(this)
 
   final def maftir: BookSpan.ChumashSpan.BookSpan = book.maftir(this)
-
-  final def haftarah: Haftarah = Parsha.haftarah(this)
 
   final def combines: Boolean = Parsha.combinable.contains(this)
 
@@ -131,11 +129,4 @@ object Parsha extends NamedCompanion {
 
   final val combinable: Set[Parsha] = (combinableFromBereishisToVayikra ++ combinableFromVayikraToBemidbar ++
     combinableFromBemidbarToVa_eschanan ++ combinableFromVa_eschanan).toSet
-
-  private lazy val haftarah: Map[Parsha, Haftarah] = Metadata.loadMetadata(
-    keys = values,
-    obj = this,
-    elementName = "week",
-    resourceName = Some("Haftarah")
-  ).mapValues { metadata => Haftarah(metadata.attributes, metadata.elements) }
 }

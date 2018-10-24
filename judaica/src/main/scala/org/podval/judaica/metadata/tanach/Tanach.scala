@@ -4,6 +4,7 @@ import org.podval.judaica.metadata.{Attributes, Holder, Metadata, Named, NamedCo
 
 import scala.xml.Elem
 
+// TODO Aliyot and Custom are entangled with Tanach and thus can't be moved into "schedule". Disentangle?
 object Tanach extends NamedCompanion {
 
   override type Key = TanachBook

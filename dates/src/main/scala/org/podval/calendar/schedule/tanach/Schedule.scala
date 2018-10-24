@@ -1,10 +1,9 @@
 package org.podval.calendar.schedule.tanach
 
 import org.podval.calendar.jewish.Jewish.{Day, Month, Year}
-import org.podval.calendar.jewish.SpecialDay
-import org.podval.calendar.jewish.SpecialDay.{FestivalOrIntermediate, ShabbosBereishis}
+import org.podval.calendar.schedule.tanach.SpecialDay.{FestivalOrIntermediate, ShabbosBereishis}
 import org.podval.judaica.metadata.{Language, LanguageSpec}
-import org.podval.judaica.metadata.tanach.{Custom, Haftarah, Parsha, Reading, SpecialReading, WeeklyReading}
+import org.podval.judaica.metadata.tanach.{Custom, Parsha}
 import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
 import org.podval.judaica.metadata.Util
 
@@ -99,7 +98,7 @@ object Schedule {
     }
 
     val weeklyReadings: Seq[Map[Day, WeeklyReading]] = (yearsData zip yearsData.tail).map { case (current, next) =>
-      WeeklyReadingSchedule.getCycle(
+      WeeklyReading.getCycle(
         year = current.year,
         fromShabbosBereishis = current.shabbosBereishis,
         toShabbosBereishis = next.shabbosBereishis,
@@ -128,7 +127,7 @@ object Schedule {
   def printHaftarahList(custom: Custom, spec: LanguageSpec, full: Boolean): Unit = {
     println(custom.toString(spec))
     for (parsha <- Parsha.values) {
-      val haftarah: Haftarah = parsha.haftarah
+      val haftarah: Haftarah = Haftarah.forParsha(parsha)
       val customEffective: Custom = Custom.find(haftarah.customs, custom)
       val spans: Seq[ProphetSpan.BookSpan] = haftarah.customs(customEffective)
       val result: String = ProphetSpan.toString(spans, spec)

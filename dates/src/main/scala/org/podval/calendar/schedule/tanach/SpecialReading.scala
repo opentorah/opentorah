@@ -1,7 +1,8 @@
-package org.podval.judaica.metadata.tanach
+package org.podval.calendar.schedule.tanach
 
 import org.podval.judaica.metadata.{Attributes, Metadata, Named, Names, XML}
 import org.podval.judaica.metadata.tanach.BookSpan.ChumashSpan
+import org.podval.judaica.metadata.tanach.{Aliyot, Custom, Span}
 
 import scala.xml.Elem
 

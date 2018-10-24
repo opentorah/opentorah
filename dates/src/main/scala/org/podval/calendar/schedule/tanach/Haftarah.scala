@@ -1,7 +1,8 @@
-package org.podval.judaica.metadata.tanach
+package org.podval.calendar.schedule.tanach
 
 import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
-import org.podval.judaica.metadata.{Attributes, LanguageSpec, XML}
+import org.podval.judaica.metadata.tanach.{Custom, Parsha, WithNumber}
+import org.podval.judaica.metadata.{Attributes, LanguageSpec, Metadata, XML}
 
 import scala.xml.Elem
 
@@ -16,6 +17,15 @@ final case class Haftarah(customs: Custom.Of[Seq[ProphetSpan.BookSpan]]) {
 }
 
 object Haftarah {
+  final def forParsha(parsha: Parsha): Haftarah = haftarah(parsha)
+
+  private lazy val haftarah: Map[Parsha, Haftarah] = Metadata.loadMetadata(
+    keys = Parsha.values,
+    obj = this,
+    elementName = "week",
+    resourceName = Some("Haftarah")
+  ).mapValues { metadata => Haftarah(metadata.attributes, metadata.elements) }
+
   def apply(attributes: Attributes, elements: Seq[Elem]): Haftarah = {
     val span = ProphetSpan.parse(attributes)
     attributes.close()

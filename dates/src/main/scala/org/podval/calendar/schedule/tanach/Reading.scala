@@ -1,6 +1,7 @@
-package org.podval.judaica.metadata.tanach
+package org.podval.calendar.schedule.tanach
 
 import org.podval.judaica.metadata.tanach.BookSpan.ChumashSpan
+import org.podval.judaica.metadata.tanach.Custom
 
 final case class Reading(
   aliyot: Custom.Of[Seq[ChumashSpan.BookSpan]],

@@ -1,10 +1,10 @@
 package org.podval.calendar.schedule.tanach
 
 import org.scalatest.{FlatSpec, Matchers}
-import org.podval.calendar.jewish.{Jewish, SpecialDay, YearType}
+import org.podval.calendar.jewish.{Jewish, YearType}
 import YearType._
 import Jewish.{Day, Year}
-import org.podval.judaica.metadata.tanach.{Parsha, WeeklyReading}
+import org.podval.judaica.metadata.tanach.Parsha
 import org.podval.judaica.metadata.tanach.Parsha._
 import SpecialDay._
 

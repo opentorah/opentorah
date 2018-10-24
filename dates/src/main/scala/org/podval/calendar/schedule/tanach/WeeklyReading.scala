@@ -2,10 +2,9 @@ package org.podval.calendar.schedule.tanach
 
 import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Year}
-import org.podval.calendar.jewish.SpecialDay
 import SpecialDay.{Pesach, Shavuos, TishaBeAv, shabbosAfter, shabbosBefore}
 import org.podval.judaica.metadata.Util
-import org.podval.judaica.metadata.tanach.{Parsha, WeeklyReading}
+import org.podval.judaica.metadata.tanach.Parsha
 import org.podval.judaica.metadata.tanach.Parsha._
 
 /**
@@ -104,7 +103,18 @@ import org.podval.judaica.metadata.tanach.Parsha._
   assumptions of the algorithm itself hold is verified by the unit tests for the years 1-6000;
   I am too lazy to prove the theorems :)
  */
-object WeeklyReadingSchedule {
+final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) {
+  def isCombined: Boolean = secondParsha.isDefined
+
+  def getReading: Reading = Reading(
+    aliyot = (if (isCombined) parsha.daysCombined.get else parsha.days).mapValues(_.getAliyot),
+    maftir = Some((if (isCombined) secondParsha.get else parsha).maftir),
+    // TODO when is it the first haftarah and when is it the second one?
+    haftarah = Some(Haftarah.forParsha(if (isCombined) secondParsha.get else parsha))
+  )
+}
+
+object WeeklyReading {
   private final val fromBereishisToBemidbar: Int = Parsha.distance(Bereishis, Bemidbar)
   private final val allowedBeforePesach: Set[Parsha] = Set[Parsha](Tzav, Metzora, Acharei)
   private final val fromBemidbarToVa_eschanan: Int = Parsha.distance(Bemidbar, Va_eschanan)

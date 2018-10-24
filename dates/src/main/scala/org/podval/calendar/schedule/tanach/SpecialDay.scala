@@ -1,9 +1,7 @@
-package org.podval.calendar.jewish
+package org.podval.calendar.schedule.tanach
 
-import Jewish.{Day, Month, Year}
-import Month.Name._
-import org.podval.judaica.metadata.tanach.{Reading, WeeklyReading}
-import org.podval.judaica.metadata.tanach.SpecialReading
+import org.podval.calendar.jewish.Jewish.{Day, Month, Year}
+import org.podval.calendar.jewish.Jewish.Month.Name._
 
 sealed trait SpecialDay {
   def apply(year: Year): Day
