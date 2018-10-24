@@ -183,7 +183,7 @@ object SpecialDay {
   }
 
   case object Purim extends SpecialDay with RabbinicFestival with WithSimpleReading {
-    override def apply(year: Year): Day = year.month(if (year.isLeap) AdarII else Adar).day(14)
+    override def apply(year: Year): Day = year.latestAdar.day(14)
 
     protected override def getReading(isShabbos: Boolean): Reading =
       SpecialReading.Purim.getReading(isShabbos)

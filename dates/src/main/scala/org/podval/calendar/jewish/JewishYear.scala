@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.YearBase
-import Jewish.{Year, Moment, YearCharacter}
+import Jewish.{Year, Moment, Month, YearCharacter}
 
 abstract class JewishYear(number: Int) extends YearBase[Jewish](number) {
   require(0 < number)
@@ -21,4 +21,6 @@ abstract class JewishYear(number: Int) extends YearBase[Jewish](number) {
   final def cycle: Int = Cycle.yearCycle(number)
 
   final def numberInCycle: Int = Cycle.yearNumberInCycle(number)
+
+  final def latestAdar: Month = month(if (isLeap) Month.Name.AdarII else Month.Name.Adar)
 }
