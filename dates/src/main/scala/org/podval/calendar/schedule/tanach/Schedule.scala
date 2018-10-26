@@ -40,7 +40,7 @@ object Schedule {
   def apply(from: Day, to: Day, inHolyLand: Boolean): Schedule = {
     val data: ScheduleData = scheduleData(from, to, inHolyLand)
 
-    val daysWithSpecialReadingsNotFestivals: Map[Day, SpecialDay.WithReading] = filter(from, to, data.years.map(year =>
+    val daysWithSpecialReadingsNotFestivals: Map[Day, SpecialDay.WithDate with SpecialDay.WithReading] = filter(from, to, data.years.map(year =>
       SpecialDay.daysWithSpecialReadingsNotFestivals.map(day => day.corrected(year) -> day).toMap))
 
     val pesachOnChamishi: Set[Year] = data.years.flatMap { year =>
@@ -147,7 +147,7 @@ object Schedule {
     println()
 //    println(SpecialReading.SheminiAtzeres.shabbosAliyot.get.toString(Language.English.toSpec))
     println()
-    println(SpecialReading.SheminiAtzeres.getReading(false).maftir.get.toString(Language.English.toSpec))
+    println(SpecialDay.SheminiAtzeres.getReading(false).maftir.get.toString(Language.English.toSpec))
     println()
 
     val year = Year(5779)

@@ -109,18 +109,18 @@ final class DatesTest extends FlatSpec with Matchers {
     for (year <- years; month <- year.months) month.year shouldBe year
   }
 
-  private def RoshHashanah(year: Year): Day = specialDay(year, Tishrei, 1)
-  private def YomKippur(year: Year): Day = specialDay(year, Tishrei, 10)
-  private def HoshanahRabbah(year: Year): Day = specialDay(year, Tishrei, 21)
-  private def SimchasTorah(year: Year): Day = specialDay(year, Tishrei, 23)
-  private def Chanukah(year: Year): Day = specialDay(year, Kislev, 25)
-  private def FastOfEster(year: Year): Day = Purim(year)-1
-  private def Purim(year: Year): Day = year.latestAdar.day(14)
-  private def Pesach(year: Year): Day = specialDay(year, Nisan, 15)
-  private def LagBaOmer(year: Year): Day = specialDay(year, Iyar, 18)
-  private def Shavuos(year: Year): Day = specialDay(year, Sivan, 6)
-  private def FastOfTammuz(year: Year): Day = specialDay(year, Tammuz, 17)
-  private def TishaBeAv(year: Year): Day = specialDay(year, Av, 9)
+  private def RoshHashanah: Year => Day = year => specialDay(year, Tishrei, 1)
+  private def YomKippur: Year => Day = year => specialDay(year, Tishrei, 10)
+  private def HoshanahRabbah: Year => Day = year => specialDay(year, Tishrei, 21)
+  private def SimchasTorah: Year => Day = year => specialDay(year, Tishrei, 23)
+  private def Chanukah: Year => Day = year => specialDay(year, Kislev, 25)
+  private def FastOfEster: Year => Day = year => Purim(year)-1
+  private def Purim: Year => Day = _.latestAdar.day(14)
+  private def Pesach: Year => Day = year => specialDay(year, Nisan, 15)
+  private def LagBaOmer: Year => Day = year => specialDay(year, Iyar, 18)
+  private def Shavuos: Year => Day = year => specialDay(year, Sivan, 6)
+  private def FastOfTammuz: Year => Day = year => specialDay(year, Tammuz, 17)
+  private def TishaBeAv: Year => Day = year => specialDay(year, Av, 9)
 
   private def specialDay(year: Year, month: Month.Name, day: Int): Day =
     year.month(month).day(day)
@@ -129,16 +129,16 @@ final class DatesTest extends FlatSpec with Matchers {
   "Festivals" should "not fall on the proscribed days" in {
     val data = Table(
       ("specialDay", "notOn"),
-      (RoshHashanah _, Seq(Rishon, Rvii, Shishi)),
-      (YomKippur _, Seq(Shlishi, Rishon, Shishi)),
-      (Purim _, Seq(Shabbos, Sheni, Rvii)),
-      (Pesach _, Seq(Sheni, Rvii, Shishi)),
-      (Shavuos _, Seq(Shlishi, Chamishi, Shabbos)),
-      (HoshanahRabbah _, Seq(Shlishi, Chamishi, Shabbos)),
-      (Chanukah _, Seq(Shlishi)),
-      (FastOfEster _, Seq(Rishon, Shlishi, Shishi)),
-      (FastOfTammuz _, Seq(Sheni, Rvii, Shishi)),
-      (TishaBeAv _, Seq(Sheni, Rvii, Shishi))
+      (RoshHashanah, Seq(Rishon, Rvii, Shishi)),
+      (YomKippur, Seq(Shlishi, Rishon, Shishi)),
+      (Purim, Seq(Shabbos, Sheni, Rvii)),
+      (Pesach, Seq(Sheni, Rvii, Shishi)),
+      (Shavuos, Seq(Shlishi, Chamishi, Shabbos)),
+      (HoshanahRabbah, Seq(Shlishi, Chamishi, Shabbos)),
+      (Chanukah, Seq(Shlishi)),
+      (FastOfEster, Seq(Rishon, Shlishi, Shishi)),
+      (FastOfTammuz, Seq(Sheni, Rvii, Shishi)),
+      (TishaBeAv, Seq(Sheni, Rvii, Shishi))
     )
     years foreach { year =>
       forAll(data) {
