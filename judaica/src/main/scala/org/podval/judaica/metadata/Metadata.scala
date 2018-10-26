@@ -15,7 +15,7 @@ final case class Metadata(
 object Metadata {
   // This is lazy to allow correct initialization: the code uses values(),
   // Language metadata file references Language instances by name :)
-  def loadNames[K <: Named](
+  def loadNames[K <: WithName](
     keys: Seq[K],
     obj: AnyRef,
     resourceName: String
@@ -39,7 +39,7 @@ object Metadata {
       elementName = elementName)
   )
 
-  def bind[K <: Named](
+  def bind[K <: WithName](
     keys: Seq[K],
     elements: Seq[Elem],
     obj: AnyRef
@@ -93,13 +93,13 @@ object Metadata {
   }
 
   // This is used to bind both Metadata and Names, so - HasName.
-  private def bind[K <: Named, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Map[K, M] = {
+  private def bind[K <: WithName, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Map[K, M] = {
     // TODO check that the names are disjoint
 
     findAndBind(keys, metadatas).toMap
   }
 
-  private def findAndBind[K <: Named, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Seq[(K, M)] = {
+  private def findAndBind[K <: WithName, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Seq[(K, M)] = {
     if (keys.isEmpty) require(metadatas.isEmpty, s"Unmatched metadatas: ${metadatas.mkString("\n")}")
     if (metadatas.isEmpty) require(keys.isEmpty, s"Unmatched keys: $keys")
 

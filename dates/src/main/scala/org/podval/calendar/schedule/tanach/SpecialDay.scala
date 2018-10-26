@@ -9,8 +9,9 @@ import org.podval.calendar.jewish.{JewishDay, JewishYear}
 
 import scala.xml.Elem
 
+// TODO Private should extend WithName, and only non-synthesized WithReading ones - named!
+// WithMetadata; WithReading doesn't imply Loaded...
 // TODO synthesize names in known languages
-// TODO do not require Private to extends Named
 sealed abstract class SpecialDay(override val name: String) extends Named {
   final override def names: Names = metadata.names
 
