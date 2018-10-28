@@ -25,7 +25,7 @@ object Metadata {
       .map(element => Names.parse(element, None))
   )
 
-  def loadMetadata[K <: Named, M <: HasName](
+  def loadMetadata[K <: WithName, M <: HasName](
     keys: Seq[K],
     obj: AnyRef,
     elementName: String,

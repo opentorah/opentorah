@@ -40,11 +40,11 @@ object Schedule {
   def apply(from: Day, to: Day, inHolyLand: Boolean): Schedule = {
     val data: ScheduleData = scheduleData(from, to, inHolyLand)
 
-    val daysWithSpecialReadingsNotFestivals: Map[Day, SpecialDay.WithDate with SpecialDay.WithReading] = filter(from, to, data.years.map(year =>
-      SpecialDay.daysWithSpecialReadingsNotFestivals.map(day => day.corrected(year) -> day).toMap))
+    val daysWithSpecialReadingsNotFestivals: Map[Day, SpecialDay.Date with SpecialDay.WithReading] = filter(from, to, data.years.map(year =>
+      SpecialDay.daysWithSpecialReadingsNotFestivals.map(day => day.correctedDate(year) -> day).toMap))
 
     val pesachOnChamishi: Set[Year] = data.years.flatMap { year =>
-      if (SpecialDay.Pesach(year).is(Day.Name.Chamishi)) Some(year) else None }.toSet
+      if (SpecialDay.Pesach.date(year).is(Day.Name.Chamishi)) Some(year) else None }.toSet
 
     def forDay(day: Day): DaySchedule = getReading(
       day = day,
@@ -85,15 +85,15 @@ object Schedule {
   }
 
   private def scheduleData(from: Day, to: Day, inHolyLand: Boolean): ScheduleData = {
-    val fromYear: Year = if (ShabbosBereishis(from.year) <= from) from.year else from.year-1
-    val toYear: Year = if (to < ShabbosBereishis(to.year)) to.year else to.year+1
+    val fromYear: Year = if (ShabbosBereishis.date(from.year) <= from) from.year else from.year-1
+    val toYear: Year = if (to < ShabbosBereishis.date(to.year)) to.year else to.year+1
     val years: Seq[Year] = Util.unfoldSimple[Year](fromYear, _ + 1, _ <= toYear)
 
     val yearsData: Seq[YearData] = years.map { year =>
       YearData(
         year = year,
-        shabbosBereishis = ShabbosBereishis(year),
-        festivals = SpecialDay.festivals(inHolyLand).map { specialDay =>  specialDay(year) -> specialDay }.toMap
+        shabbosBereishis = ShabbosBereishis.date(year),
+        festivals = SpecialDay.festivals(inHolyLand).map { specialDay =>  specialDay.date(year) -> specialDay }.toMap
       )
     }
 

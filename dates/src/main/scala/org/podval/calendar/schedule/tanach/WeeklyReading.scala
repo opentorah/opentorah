@@ -168,9 +168,9 @@ object WeeklyReading {
   private def combined(year: Year, weeks: Seq[Day]): Set[Parsha] = {
     def weeksTo(day: Day): Int = weeks.takeWhile(_ < day).length
 
-    val weeksBeforePesach: Int = weeksTo(shabbosBefore(Pesach(year)))
-    val weeksToShavuot: Int = weeksTo(shabbosBefore(Shavuos(year)))
-    val weeksFromShavuotToAfterTishaBeAv: Int = weeksTo(shabbosAfter(TishaBeAv(year))) - weeksToShavuot
+    val weeksBeforePesach: Int = weeksTo(shabbosBefore(Pesach.date(year)))
+    val weeksToShavuot: Int = weeksTo(shabbosBefore(Shavuos.date(year)))
+    val weeksFromShavuotToAfterTishaBeAv: Int = weeksTo(shabbosAfter(TishaBeAv.date(year))) - weeksToShavuot
 
     // When there are to many Saturdays before Shavuot to assign Bemidbar to the one immediately before Shavuot,
     // Bemidbar is read one week before Shavuot:
