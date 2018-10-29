@@ -7,7 +7,7 @@ import scala.ref.WeakReference
 // To have more flexibility in the order of parsing, and to make possible to use parts that
 // are already parsed when parsing the other parts, we hold loaded metadata;
 // since we do not need to hold it once the prasing is done, the reference is week.
-abstract class Holder[K <: Named, M] {
+abstract class Holder[K, M] {
   final type T = Map[K, M]
 
   private var value: Option[WeakReference[T]] = None
