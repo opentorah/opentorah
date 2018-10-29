@@ -1,16 +1,14 @@
 package org.podval.calendar.schedule.tanach
 
-import org.podval.judaica.metadata.{Attributes, Metadata, Named, Names, WithName, XML}
+import org.podval.judaica.metadata.{Attributes, Metadata, Names, WithName, WithNames, XML}
 import org.podval.judaica.metadata.tanach.BookSpan.ChumashSpan
-import org.podval.judaica.metadata.tanach.{Aliyot, Custom, Span}
+import org.podval.judaica.metadata.tanach.{Aliyot, BookSpan, Custom, Span}
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.jewish.Jewish.Month.Name._
 import org.podval.calendar.jewish.{JewishDay, JewishYear}
 
 import scala.xml.Elem
 
-// TODO only non-synthesized WithReading ones - named!
-// WithMetadata; WithReading doesn't imply Loaded...
 // TODO synthesize names in known languages
 
 object SpecialDay {
@@ -19,7 +17,7 @@ object SpecialDay {
     protected def metadata: SpecialDayMetadata = metadatas(this)
   }
 
-  sealed trait LoadedNames extends Named with WithMetadata {
+  sealed trait LoadNames extends WithNames with WithMetadata {
     final override def names: Names = metadata.names
   }
 
@@ -29,17 +27,6 @@ object SpecialDay {
     final def correctedDate(year: Year): Day = correctDate(date(year))
 
     protected def correctDate(date: Day): Day = date
-  }
-
-  sealed trait WithReading {
-    def getReading(
-      isShabbos: Boolean,
-      isRoshChodesh: Boolean,
-      weeklyReading: Option[WeeklyReading],
-      isPesachOnChamishi: Boolean
-    ): Reading
-
-    def getAfternoonReading: Option[Reading] = None
   }
 
   sealed trait DayOf extends Date {
@@ -58,20 +45,18 @@ object SpecialDay {
     final override def date(year: Year): Day = firstDay.date(year) + (dayNumber-1)
   }
 
-  sealed trait Loaded extends WithMetadata {
-    final def getAliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] = {
-      val result = metadata
-      (if (isShabbos) result.shabbosAliyot else result.weekdayAliyot).get.getAliyot
-    }
+  sealed trait WithReading {
+    def getReading(
+      isShabbos: Boolean,
+      isRoshChodesh: Boolean,
+      weeklyReading: Option[WeeklyReading],
+      isPesachOnChamishi: Boolean
+    ): Reading
 
-    final def weekdayAliyot: Seq[ChumashSpan.BookSpan] = getAliyot(isShabbos = false)
-
-    def maftir: Option[ChumashSpan.BookSpan] = Some(metadata.maftir.get)
-
-    def haftarah: Option[Haftarah] = Some(metadata.haftarah.get)
+    def getAfternoonReading: Option[Reading] = None
   }
 
-  sealed trait WithSimpleReading extends WithReading with Loaded {
+  sealed trait SimpleReading extends WithReading {
     final override def getReading(
       isShabbos: Boolean,
       isRoshChodesh: Boolean,
@@ -85,73 +70,96 @@ object SpecialDay {
 
     protected def isShabbosAllowed: Boolean = true
 
-    def getReading(isShabbos: Boolean): Reading = Reading(
+    def getReading(isShabbos: Boolean): Reading
+  }
+
+  sealed trait NoShabbosAllowed extends SimpleReading {
+    protected final override def isShabbosAllowed: Boolean = false
+  }
+
+  sealed trait WithAliyot {
+    def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan]
+  }
+
+  sealed trait AliyotSameAs extends VerySimpleReading {
+    final override def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] =
+      aliyotSameAs(isShabbos).aliyot(isShabbos)
+
+    protected def aliyotSameAs(isShabbos: Boolean): VerySimpleReading
+  }
+
+  sealed trait LoadAliyot extends WithAliyot with WithMetadata {
+    final override def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] = {
+      val result = metadata
+      (if (isShabbos) result.shabbosAliyot else result.weekdayAliyot).get.getAliyot
+    }
+  }
+
+  sealed trait WithMaftir {
+    def maftir: Option[ChumashSpan.BookSpan] = None
+  }
+
+  sealed trait LoadMaftir extends WithMaftir with WithMetadata {
+    final override def maftir: Option[ChumashSpan.BookSpan] = Some(metadata.maftir.get)
+  }
+
+  sealed trait WithHaftarah {
+    def haftarah: Option[Haftarah] = None
+  }
+
+  sealed trait LoadHaftarah extends WithHaftarah with WithMetadata {
+    final override def haftarah: Option[Haftarah] = Some(metadata.haftarah.get)
+  }
+
+  sealed trait VerySimpleReading extends SimpleReading with WithAliyot with WithMaftir with WithHaftarah {
+    final override def getReading(isShabbos: Boolean): Reading = Reading(
       aliyot = aliyot(isShabbos),
       maftir = maftir,
       haftarah = haftarah
     )
-
-    def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] =
-      aliyotSameAs(isShabbos).getAliyot(isShabbos)
-
-    protected def aliyotSameAs(isShabbos: Boolean): WithSimpleReading = this
   }
 
-  sealed trait NoShabbosAllowed { this: WithSimpleReading =>
-    protected final override def isShabbosAllowed: Boolean = false
-  }
+  sealed class Private(override val name: String) extends WithName
 
-  sealed class Private(override val name: String) extends WithName with Loaded
+  sealed trait FestivalOrIntermediate extends WithNames with Date with WithReading
 
-  sealed trait FestivalOrIntermediate extends LoadedNames with Date with WithReading
+  sealed trait Festival extends FestivalOrIntermediate with SimpleReading
 
-  sealed trait Festival extends FestivalOrIntermediate with WithSimpleReading
+  sealed trait FestivalFirstDay extends Festival with VerySimpleReading with LoadNames with LoadAliyot with LoadMaftir with LoadHaftarah
 
-  sealed trait SecondDay extends Festival with NonFirstDayOf {
-    def secondDayOf: Festival
+  sealed trait FestivalSecondDay extends Festival with VerySimpleReading with NonFirstDayOf with LoadHaftarah {
+    def secondDayOf: FestivalFirstDay
 
     override def maftir: Option[ChumashSpan.BookSpan] = secondDayOf.maftir
   }
 
-  sealed abstract class Intermediate(override val name: String, intermediateDayNumber: Int, inHolyLand: Boolean)
-    extends LoadedNames with FestivalOrIntermediate with NonFirstDayOf
+  sealed abstract class Intermediate(name: String, intermediateDayNumber: Int, inHolyLand: Boolean)
+    extends FestivalOrIntermediate with NonFirstDayOf
   {
     override def dayNumber: Int = intermediateDayNumber + (if (inHolyLand) 1 else 2)
   }
 
-  sealed trait RabbinicFestival extends WithReading with Date
+  sealed trait RabbinicFestival extends WithNames with WithReading with Date
 
-  sealed trait Fast extends WithSimpleReading with Date with NoShabbosAllowed { this: LoadedNames => }
+  sealed trait Fast extends LoadNames with VerySimpleReading with Date with NoShabbosAllowed
 
-  case object ShabbosErevRoshChodesh extends LoadedNames {
-    override def name: String = "Shabbos Erev Rosh Chodesh"
-  }
+  private case object ShabbosErevRoshChodesh extends Private("Shabbos Erev Rosh Chodesh")
 
-  case object RoshChodesh extends LoadedNames {
+  case object RoshChodesh extends LoadNames {
     override def name: String = "Rosh Chodesh"
   }
 
-  private case object RoshChodeshPart2 extends LoadedNames {
-    override def name: String = "Rosh Chodesh Part 2"
-  }
+  private case object RoshChodeshPart2 extends Private("Rosh Chodesh Part 2")
+  private case object ShabbosRoshChodeshAdditionalHaftorah extends Private("Shabbos Rosh Chodesh Additional Haftorah")
+  private case object ShabbosErevRoshChodeshAdditionalHaftorah extends Private("Shabbos Erev Rosh Chodesh Additional Haftorah")
 
-  case object ShabbosRoshChodeshAdditionalHaftorah extends LoadedNames {
-    override def name: String =  "Shabbos Rosh Chodesh Additional Haftorah"
-  }
+  sealed abstract class FastLike(override val name: String) extends Fast {
+    override def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] =
+      FastReading.aliyot(isShabbos) ++ FastPart2.aliyot(isShabbos)
 
-  case object ShabbosErevRoshChodeshAdditionalHaftorah extends LoadedNames {
-    override def name: String =  "Shabbos Erev Rosh Chodesh Additional Haftorah"
-  }
+    override def maftir: Option[BookSpan.ChumashSpan.BookSpan] = None
 
-  sealed abstract class FastLike(override val name: String) extends LoadedNames with Fast with NoShabbosAllowed {
-    final override def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] =
-      FastReading.getAliyot(isShabbos) ++ FastPart2.getAliyot(isShabbos)
-
-    final override def getReading(isShabbos: Boolean): Reading = Reading(
-      aliyot = aliyot(isShabbos),
-      maftir = None,
-      haftarah = None
-    )
+    override def haftarah: Option[Haftarah] = None
 
     final override def getAfternoonReading: Option[Reading] = {
       val all = aliyot(false)
@@ -165,79 +173,83 @@ object SpecialDay {
     protected def afternoonHaftarah: Option[Haftarah] = FastPart2.haftarah
   }
 
-  private case object FastReading extends Private("Fast")
+  private case object FastReading extends Private("Fast") with LoadAliyot
 
-  private case object FastPart2 extends Private("Fast Part 2")
+  private case object FastPart2 extends Private("Fast Part 2") with LoadAliyot with LoadHaftarah
 
-  private case object IntermediateShabbos extends Private("Intermediate Shabbos")
+  private case object IntermediateShabbos extends Private("Intermediate Shabbos") with LoadAliyot
 
-  case object RoshHashanah1 extends LoadedNames with Festival with FirstDayOf {
+  case object RoshHashanah1 extends FestivalFirstDay with FirstDayOf {
     override def name: String = "Rosh Hashanah 1"
     override def date(year: JewishYear): JewishDay = year.month(Tishrei).day(1)
   }
 
-  case object RoshHashanah2 extends LoadedNames
-    with SecondDay with NonFirstDayOf with NoShabbosAllowed
-  {
+  case object RoshHashanah2 extends FestivalSecondDay with NoShabbosAllowed with LoadAliyot {
     override def name: String = "Rosh Hashanah 2"
 
-    override def secondDayOf: Festival = RoshHashanah1
+    override def names: Names = ???
+
+    override def secondDayOf: FestivalFirstDay = RoshHashanah1
 
     override def firstDay: Date = RoshHashanah1
 
     override def dayNumber: Int = 2
   }
 
-  case object FastOfGedalia extends FastLike("Fast of Gedalia") {
+  case object FastOfGedalia extends FastLike("Fast of Gedalia") with LoadHaftarah {
     final override def date(year: Year): Day = year.month(Tishrei).day(3)
 
     final override protected def correctDate(result: Day): Day =
       if (result.isShabbos) result+1 else result
 
-    protected override def afternoonHaftarah: Option[Haftarah] = FastOfGedalia.haftarah
+    protected override def afternoonHaftarah: Option[Haftarah] = haftarah
   }
 
-  case object YomKippur extends LoadedNames with Festival {
+  case object YomKippur extends FestivalFirstDay {
     override def name: String = "Yom Kippur"
 
     override def date(year: JewishYear): JewishDay = year.month(Tishrei).day(10)
 
     override def getAfternoonReading: Option[Reading] = Some(Reading(
-      aliyot = YomKippurAfternoon.getAliyot(false).init,
-      maftir = Some(YomKippurAfternoon.getAliyot(false).last),
+      aliyot = YomKippurAfternoon.aliyot(false).init,
+      maftir = Some(YomKippurAfternoon.aliyot(false).last),
       haftarah = Some(YomKippurAfternoon.haftarah.get)
     ))
   }
 
-  private case object YomKippurAfternoon extends Private("Yom Kippur Afternoon")
+  private case object YomKippurAfternoon extends Private("Yom Kippur Afternoon") with LoadAliyot with LoadHaftarah
 
-  case object Succos extends LoadedNames with Festival with FirstDayOf {
+  case object Succos extends FestivalFirstDay with FirstDayOf {
     override def name: String = "Succos"
 
     override def date(year: JewishYear): JewishDay = year.month(Tishrei).day(15)
   }
 
-  case object Succos2 extends LoadedNames with SecondDay {
+  case object Succos2 extends FestivalSecondDay with AliyotSameAs {
     override def name: String = "Succos 2"
+
+    override def names: Names = ???
 
     override def firstDay: Date = Succos
 
     override def dayNumber: Int = 2
 
-    override def secondDayOf: Festival = Succos
+    override def secondDayOf: FestivalFirstDay = Succos
 
-    protected override def aliyotSameAs(isShabbos: Boolean): WithSimpleReading = Succos
+    protected override def aliyotSameAs(isShabbos: Boolean): VerySimpleReading = Succos
   }
 
   // TODO mapping to the readings skips Shabbos - whatever that means... Or was it meant for Pesach only?
   sealed class SuccosIntermediate(intermediateDayNumber: Int, inHolyLand: Boolean)
     extends Intermediate("Succos Intermediate " + intermediateDayNumber, intermediateDayNumber, inHolyLand)
-      with WithSimpleReading
+      with SimpleReading
   {
+    override def names: Names = ???
+
     override def firstDay: Date = Succos
 
-    override def getReading(isShabbos: Boolean): Reading ={
-      val all: Seq[ChumashSpan.BookSpan] = SuccosIntermediateReading.weekdayAliyot
+    override def getReading(isShabbos: Boolean): Reading = {
+      val all: Seq[ChumashSpan.BookSpan] = SuccosIntermediateReading.aliyot(false)
       def korbanot(n: Int): ChumashSpan.BookSpan = all(n-1)
 
       if (intermediateDayNumber == 6) require(inHolyLand)
@@ -246,7 +258,7 @@ object SpecialDay {
         else korbanot(intermediateDayNumber) + korbanot(intermediateDayNumber+1)
 
       if (isShabbos) Reading(
-        aliyot = IntermediateShabbos.getAliyot(isShabbos),
+        aliyot = IntermediateShabbos.aliyot(isShabbos),
         maftir = Some(last),
         haftarah = SuccosIntermediateReading.haftarah // TODO ?
       ) else {
@@ -258,7 +270,7 @@ object SpecialDay {
     }
   }
 
-  private case object SuccosIntermediateReading extends Private("Succos Intermediate")
+  private case object SuccosIntermediateReading extends Private("Succos Intermediate") with LoadAliyot with LoadHaftarah
 
   case object SuccosIntermediate1 extends SuccosIntermediate(1, false)
   case object SuccosIntermediate2 extends SuccosIntermediate(2, false)
@@ -273,30 +285,29 @@ object SpecialDay {
   case object SuccosIntermediate5InHolyLand extends SuccosIntermediate(5, true)
   case object HoshanahRabbahInHolyLand      extends SuccosIntermediate(6, true)
 
-  case object SheminiAtzeres extends LoadedNames with Festival with NonFirstDayOf {
+  case object SheminiAtzeres extends FestivalFirstDay with NonFirstDayOf {
     override def name: String = "Shemini Atzeres"
     override def firstDay: Date = Succos
     override def dayNumber: Int = 8
   }
 
-  case object SimchasTorah extends LoadedNames with SecondDay with NoShabbosAllowed {
+  case object SimchasTorah extends Festival with NonFirstDayOf with NoShabbosAllowed with LoadNames with LoadAliyot with LoadHaftarah {
     override def name: String = "Simchas Torah"
 
     override def firstDay: Date = Succos
 
     override def dayNumber: Int = 9
 
-    override def secondDayOf: Festival = SheminiAtzeres
-
-    override def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] =
-      getAliyot(isShabbos) ++ SimchasTorahChassanBereishis.getAliyot(isShabbos)
+    override def getReading(isShabbos: Boolean): Reading = Reading(
+      aliyot = aliyot(isShabbos) ++ SimchasTorahChassanBereishis.aliyot(isShabbos),
+      maftir = SheminiAtzeres.maftir,
+      haftarah = haftarah
+    )
   }
 
-  private case object SimchasTorahChassanBereishis extends Private("Simchas Torah Chassan Bereishis")
+  private case object SimchasTorahChassanBereishis extends Private("Simchas Torah Chassan Bereishis") with LoadAliyot
 
-  case object SheminiAtzeresAndSimchasTorahInHolyLand extends LoadedNames
-    with Festival with NonFirstDayOf
-  {
+  case object SheminiAtzeresAndSimchasTorahInHolyLand extends Festival with NonFirstDayOf with LoadNames {
     override def name: String = "Shemini Atzeres and Simchas Torah"
 
     override def firstDay: Date = Succos
@@ -308,15 +319,14 @@ object SpecialDay {
     override def getAfternoonReading: Option[Reading] = SimchasTorah.getAfternoonReading
   }
 
-  case object ShabbosBereishis extends LoadedNames with Date {
+  case object ShabbosBereishis extends LoadNames with Date {
     override def name: String = "Shabbos Bereishis"
     override def date(year: Year): Day = shabbosAfter(SimchasTorah.date(year))
   }
 
-  sealed class Chanukah(override val dayNumber: Int) extends LoadedNames
-    with DayOf with RabbinicFestival
-  {
-    final override def name: String = "Chanukah " + dayNumber
+  sealed class Chanukah(override val dayNumber: Int) extends WithNames with DayOf with RabbinicFestival {
+    override def names: Names = ???
+//    final override def name: String = "Chanukah " + dayNumber
     final override def firstDay: Date = Chanukah1
 
     override def date(year: Year): Day = Chanukah1.date(year)+(dayNumber-1)
@@ -327,7 +337,7 @@ object SpecialDay {
       weeklyReading: Option[WeeklyReading],
       isPesachOnChamishi: Boolean
     ): Reading = {
-      val all: Seq[ChumashSpan.BookSpan] = ChannukahReading.weekdayAliyot
+      val all: Seq[ChumashSpan.BookSpan] = ChannukahReading.aliyot(false)
       def first(n: Int): ChumashSpan.BookSpan = all(2*n-1)
       def second(n: Int): ChumashSpan.BookSpan = all(2*n  )
       def split(n: Int): Seq[ChumashSpan.BookSpan] = Seq(first(n), second(n))
@@ -360,7 +370,7 @@ object SpecialDay {
               Custom.Sefard -> (common :+ full(dayNumber))
             )
           } else {
-            val endAliyot = ChannukahEnd.weekdayAliyot
+            val endAliyot = ChannukahEnd.aliyot(false)
             require(endAliyot.length == 1)
             val end = endAliyot.head
             val common = split(1)
@@ -378,10 +388,10 @@ object SpecialDay {
       }
     }
   }
-  private case object ChannukahReading extends Private("Channukah")
-  private case object ChannukahEnd extends Private("Channukah End")
-  private case object ChannukahShabbos1 extends Private("Channukah Shabbos 1")
-  private case object ChannukahShabbos2 extends Private("Channukah Shabbos 2")
+  private case object ChannukahReading extends Private("Channukah") with LoadAliyot
+  private case object ChannukahEnd extends Private("Channukah End") with LoadAliyot
+  private case object ChannukahShabbos1 extends Private("Channukah Shabbos 1") with LoadHaftarah
+  private case object ChannukahShabbos2 extends Private("Channukah Shabbos 2") with LoadHaftarah
 
   case object Chanukah1 extends Chanukah(1) {
     override def date(year: Year): Day = year.month(Kislev).day(25)
@@ -398,10 +408,7 @@ object SpecialDay {
     final def date(year: Year): Day = year.month(Teves).day(10)
   }
 
-  // TODO FastLike
-  case object FastOfEster extends LoadedNames with Fast {
-    override def name: String = "fast of Ester"
-
+  case object FastOfEster extends FastLike("Fast of Ester") {
     override def date(year: Year): Day = Purim.date(year)-1
 
     final override protected def correctDate(result: Day): Day =
@@ -411,76 +418,70 @@ object SpecialDay {
         result
   }
 
+
+  sealed abstract class SpecialParsha(override val name: String) extends Date with LoadNames with LoadMaftir with LoadHaftarah
+
   // TODO add in Schedule:
 
-  case object ParshasShekalim extends LoadedNames with Date {
-    override def name: String = "Parshas Shekalim"
+  case object ParshasShekalim extends SpecialParsha("Parshas Shekalim") {
     override def date(year: Year): Day = {
       val result = Purim.date(year).month.firstDay
       if (result.isShabbos) result else shabbosBefore(result)
     }
   }
 
-  case object ParshasZachor extends LoadedNames with Date {
-    override def name: String = "Parshas Zachor"
+  case object ParshasZachor extends SpecialParsha("Parshas Zachor") {
     override def date(year: Year): Day = shabbosBefore(Purim.date(year))
   }
 
-  case object ParshasParah extends LoadedNames with Date {
-    override def name: String = "Parshas Parah"
+  case object ParshasParah extends SpecialParsha("Parshas Parah") {
     override def date(year: Year): Day = shabbosBefore(ParshasHachodesh.date(year))
   }
 
-  case object ParshasHachodesh extends LoadedNames with Date {
-    override def name: String = "Parshas Hachodesh"
-
+  case object ParshasHachodesh extends SpecialParsha("Parshas Hachodesh") {
     override def date(year: Year): Day = {
       val result = year.month(Nisan).firstDay
       if (result.isShabbos) result else shabbosBefore(result)
     }
   }
 
-  // TODO in Schedule
-  case object ShabbosHagodol extends LoadedNames with Date {
+  case object ShabbosHagodol extends LoadNames with Date {
     override def name: String = "Shabbos Hagodol"
     override def date(year: Year): Day = shabbosBefore(Pesach.date(year))
   }
 
-  case object Purim extends LoadedNames with RabbinicFestival with WithSimpleReading with NoShabbosAllowed {
+  case object Purim extends LoadNames with RabbinicFestival with VerySimpleReading with NoShabbosAllowed with LoadAliyot {
     override def name: String = "Purim"
-
     override def date(year: Year): Day = year.latestAdar.day(14)
-
-    override def getReading(isShabbos: Boolean): Reading = Reading(
-      aliyot = aliyot(isShabbos),
-      maftir = None,
-      haftarah = None
-    )
   }
-  case object ShushanPurim extends LoadedNames with Date {
+  case object ShushanPurim extends LoadNames with Date {
     override def name: String = "Shushan Purim"
     override def date(year: Year): Day = Purim.date(year) + 1
   }
 
-  case object Pesach extends LoadedNames with FirstDayOf with WithSimpleReading with Festival {
+  case object Pesach extends FestivalFirstDay with FirstDayOf with LoadNames {
     override def name: String = "Pesach"
     final def date(year: Year): Day = year.month(Nisan).day(15)
   }
 
-  case object Pesach2 extends LoadedNames with NonFirstDayOf with SecondDay with WithSimpleReading with NoShabbosAllowed {
+  case object Pesach2 extends FestivalSecondDay with NonFirstDayOf with NoShabbosAllowed with LoadAliyot {
     override def name: String = "Pesach 2"
+
+    override def names: Names = ???
 
     override def firstDay: Date = Pesach
 
     override def dayNumber: Int = 2
 
-    override def secondDayOf: Festival = Pesach
+    override def secondDayOf: FestivalFirstDay = Pesach
   }
 
   sealed class PesachIntermediate(
     intermediateDayNumber: Int,
     inHolyLand: Boolean
   ) extends Intermediate("Pesach Intermediate " + intermediateDayNumber, intermediateDayNumber, inHolyLand) {
+    override def names: Names = ???
+
     override def firstDay: Date = Pesach
 
     final override def getReading(
@@ -492,12 +493,12 @@ object SpecialDay {
       if (isShabbos) {
         require((dayNumber != 2) && (dayNumber != 6))
         Reading(
-          aliyot = IntermediateShabbos.getAliyot(isShabbos),
+          aliyot = IntermediateShabbos.aliyot(isShabbos),
           maftir = Pesach7.maftir,
           haftarah = PesachIntermediateShabbos.haftarah
         )
       } else {
-        val reading: Loaded = dayNumber match {
+        val reading: LoadAliyot = dayNumber match {
           case 2 => Pesach2InHolyLand
           case 3 => Pesach3
           case 4 => if (!isPesachOnChamishi) Pesach4 else Pesach3
@@ -505,9 +506,9 @@ object SpecialDay {
           case 6 => Pesach6
         }
         Reading(
-          aliyot = reading.getAliyot(isShabbos),
-          maftir = reading.maftir,
-          haftarah = reading.haftarah
+          aliyot = reading.aliyot(isShabbos),
+          maftir = None,
+          haftarah = None
         )
       }
     }
@@ -529,15 +530,14 @@ object SpecialDay {
   case object PesachIntermediate5InHolyLand extends PesachIntermediate(5, true)
 
 
-  private case object PesachIntermediateShabbos extends Private("Pesach Intermediate Shabbos")
-  private case object Pesach2InHolyLand extends Private("Pesach 2 in Holy Land")
-  private case object Pesach3 extends Private("Pesach 3")
-  private case object Pesach4 extends Private("Pesach 4")
-  private case object Pesach5 extends Private("Pesach 5")
-  private case object Pesach6 extends Private("Pesach 6")
+  private case object PesachIntermediateShabbos extends Private("Pesach Intermediate Shabbos") with LoadHaftarah
+  private case object Pesach2InHolyLand extends Private("Pesach 2 in Holy Land") with LoadAliyot
+  private case object Pesach3 extends Private("Pesach 3") with LoadAliyot
+  private case object Pesach4 extends Private("Pesach 4") with LoadAliyot
+  private case object Pesach5 extends Private("Pesach 5") with LoadAliyot
+  private case object Pesach6 extends Private("Pesach 6") with LoadAliyot
 
-
-  case object Pesach7 extends LoadedNames with Festival with NonFirstDayOf with WithSimpleReading {
+  case object Pesach7 extends FestivalFirstDay with NonFirstDayOf with LoadNames {
     override def name: String = "Pesach 7"
 
     override def firstDay: Date = Pesach
@@ -545,39 +545,41 @@ object SpecialDay {
     override def dayNumber: Int = 7
   }
 
-  case object Pesach8 extends LoadedNames with NonFirstDayOf with SecondDay {
+  case object Pesach8 extends FestivalSecondDay with NonFirstDayOf with LoadNames with AliyotSameAs {
     override def name: String = "Pesach 8"
 
     override def firstDay: Date = Pesach
 
     override def dayNumber: Int = 8
 
-    override def secondDayOf: Festival = Pesach7
+    override def secondDayOf: FestivalFirstDay = Pesach7
 
-    override def aliyotSameAs(isShabbos: Boolean): WithSimpleReading =
+    protected override def aliyotSameAs(isShabbos: Boolean): VerySimpleReading =
       if (!isShabbos) this else SheminiAtzeres
   }
 
-  case object LagBaOmer extends LoadedNames with Date {
+  case object LagBaOmer extends LoadNames with Date {
     override def name: String = "Lag Ba Omer"
     override def date(year: Year): Day = year.month(Iyar).day(18)
   }
 
-  case object Shavuos extends LoadedNames with FirstDayOf with Festival with NoShabbosAllowed {
+  case object Shavuos extends FestivalFirstDay with FirstDayOf with NoShabbosAllowed with LoadNames {
     override def name: String = "Shavuos"
     override def date(year: Year): Day = year.month(Sivan).day(6)
   }
 
-  case object Shavuos2 extends LoadedNames with NonFirstDayOf with SecondDay {
+  case object Shavuos2 extends FestivalSecondDay with NonFirstDayOf with AliyotSameAs {
     override def name: String = "Shavuos 2"
+
+    override def names: Names = ???
 
     override def firstDay: Date = Shavuos
 
     override def dayNumber: Int = 2
 
-    override def secondDayOf: Festival = Shavuos
+    override def secondDayOf: FestivalFirstDay = Shavuos
 
-    override def aliyotSameAs(isShabbos: Boolean): WithSimpleReading =
+    protected override def aliyotSameAs(isShabbos: Boolean): VerySimpleReading =
       if (!isShabbos) Pesach8 else SheminiAtzeres
   }
 
@@ -588,7 +590,7 @@ object SpecialDay {
       if (result.isShabbos) result+1 else result
   }
 
-  case object TishaBeAv extends LoadedNames with Fast with NoShabbosAllowed {
+  case object TishaBeAv extends Fast with NoShabbosAllowed {
     override def name: String = "Tisha BeAv"
 
     override def date(year: Year): Day = year.month(Av).day(9)
@@ -596,8 +598,8 @@ object SpecialDay {
     final override protected def correctDate(result: Day): Day =
       if (result.isShabbos) result+1 else result
 
-    override def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] = getAliyot(false).init
-    override def maftir: Option[ChumashSpan.BookSpan] = Some(getAliyot(false).last)
+    override def aliyot(isShabbos: Boolean): Seq[ChumashSpan.BookSpan] = aliyot(false).init
+    override def maftir: Option[ChumashSpan.BookSpan] = Some(aliyot(false).last)
 
     override def getAfternoonReading: Option[Reading] = Some(Reading(
       aliyot = aliyot(false),
@@ -606,7 +608,7 @@ object SpecialDay {
     ))
   }
 
-  private case object TishaBeAvAfternoon extends Private("Tisha BeAv Afternoon")
+  private case object TishaBeAvAfternoon extends Private("Tisha BeAv Afternoon") with LoadHaftarah
 
   val festivals: Set[FestivalOrIntermediate] = Set(
     RoshHashanah1, RoshHashanah2,

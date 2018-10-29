@@ -46,7 +46,7 @@ object Names {
     val (nameElements, tail) = XML.take(elements, "name")
     val names: Names =
       if (nameElements.isEmpty) new Names(Seq(defaultName.get))
-      else Names.parse(nameElements, defaultName)
+      else parse(nameElements, defaultName)
 
     (names, tail)
   }
@@ -62,7 +62,10 @@ object Names {
 
   private def parse(nameElements: Seq[Elem], defaultName: Option[Name]): Names = {
     val nonDefaultNames: Seq[Name] = nameElements.map(parseName)
-    val names = defaultName.fold(nonDefaultNames)(_ +: nonDefaultNames)
+    val names = defaultName.fold(nonDefaultNames){ defaultName =>
+      // TODO drop default name if it is contained in the non-default ones
+      defaultName +: nonDefaultNames
+    }
     new Names(names)
   }
 
