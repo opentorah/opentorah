@@ -57,6 +57,8 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
   override def toString: String = numerator + "/" + denominator
 
   override def compare(that: BigRational): Int = (this - that).signum
+
+  def toDouble: Double = numerator.toDouble / denominator.toDouble
 }
 
 

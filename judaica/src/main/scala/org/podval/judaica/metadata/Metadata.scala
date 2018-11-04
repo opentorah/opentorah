@@ -43,19 +43,17 @@ object Metadata {
     keys: Seq[K],
     elements: Seq[Elem],
     obj: AnyRef
-  ): Map[K, Metadata] = {
-    def loadSubresource(element: Elem): Metadata = {
-      val elementName: String = element.label
-      val (attributes, elements) = XML.open(element, elementName)
-      attributes.get("resource").fold(Metadata(attributes, elements)) { subresourceName: String =>
-        attributes.close()
-        val subresource: Elem = loadResource(obj, subresourceName)
-        val (newAttributes, newElements) = XML.open(subresource, elementName)
-        Metadata(newAttributes, newElements)
-      }
-    }
+  ): Map[K, Metadata] = bind(keys, elements.map(loadSubresource(_, obj)))
 
-    bind(keys, elements.map(loadSubresource))
+  private def loadSubresource(element: Elem, obj: AnyRef): Metadata = {
+    val elementName: String = element.label
+    val (attributes, elements) = XML.open(element, elementName)
+    attributes.get("resource").fold(Metadata(attributes, elements)) { subresourceName: String =>
+      attributes.close()
+      val subresource: Elem = loadResource(obj, subresourceName)
+      val (newAttributes, newElements) = XML.open(subresource, elementName)
+      Metadata(newAttributes, newElements)
+    }
   }
 
   private def apply(attributes: Attributes, elements: Seq[Elem]): Metadata = {

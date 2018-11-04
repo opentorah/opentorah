@@ -129,8 +129,8 @@ object Schedule {
     for (parsha <- Parsha.values) {
       val haftarah: Haftarah = Haftarah.forParsha(parsha)
       val customEffective: Custom = Custom.find(haftarah.customs, custom)
-      val spans: Seq[ProphetSpan.BookSpan] = haftarah.customs(customEffective)
-      val result: String = ProphetSpan.toString(spans, spec)
+      val spansOpt: Option[Seq[ProphetSpan.BookSpan]] = haftarah.customs(customEffective)
+      val result: String = spansOpt.fold("")(spans => ProphetSpan.toString(spans, spec))
 
       if (customEffective == custom) {
         println(parsha.toString(spec) + ": " + result)
@@ -149,6 +149,8 @@ object Schedule {
     println()
     println(SpecialDay.SheminiAtzeres.getReading(false).maftir.get.toString(Language.English.toSpec))
     println()
+
+    val x = SpecialDay.RoshHashanah1.aliyot(true)
 
     val year = Year(5779)
     val day = year.month(Month.Name.Marheshvan).day(25)

@@ -1,6 +1,8 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angles.Angles.Rotation
+import org.podval.calendar.jewish.{Jewish, Sun}
+import org.podval.calendar.numbers.BigRational
 
 object SunLongitudeMean extends Days2Angle {
   // KH 12:1
@@ -16,12 +18,15 @@ object SunLongitudeMean extends Days2Angle {
 
   final override def rounder(key: Days2Angle.Key): Rotation => Rotation = _.roundToSeconds
 
+  // Ibn Habib on Pirush gives Albatani value as:
+  final val albataniValue: Rotation = Rotation(0, 59, 8, 20, 35)
+
   // Moznaim Rambam in English gives this value in KH 12:1 note 1 (without a reference) as the one
   // Rambam uses in his calculations.
   // TODO which of the year lengths does this correspond?
   final override val rambamValue: Rotation = Rotation(0, 59, 8, 19, 48)
 
-  final override val almagestValue = Rotation(0, 59, 8, 17, 13, 12, 31)
+  final override val almagestValue: Rotation = Rotation(0, 59, 8, 17, 13, 12, 31)
 
 
   // TODO move into tests
@@ -35,5 +40,20 @@ object SunLongitudeMean extends Days2Angle {
 
     val v354 = Rotation(98, 33, 53)*3 + Rotation(9, 51, 23)*5 + Rotation(0, 59, 8)*4
     println(v354)
+
+    def rat(rot: Rotation): BigRational = Rotation(360).toRational/rot.toRational
+    def len(x: BigRational): Jewish.TimeVector = Jewish.TimeVector.fromRational(x, 3)
+
+    val albatani = rat(albataniValue)
+    val moznaim  = rat(rambamValue)
+    val almagest = rat(almagestValue)
+
+    println("Albatani: " + albatani.toDouble + " " + len(albatani))
+    println("Moznaim : " + moznaim.toDouble + " " + len(moznaim))
+    println("Almagest: " + almagest.toDouble + " " + len(almagest))
+    println("Rav Ada : " + Sun.yearOfRavAda.toRational.toDouble + " " + Sun.yearOfRavAda)
+    println("Shmuel  : " + Sun.yearOfShmuel.toRational.toDouble + " " + Sun.yearOfShmuel)
+
+    println((almagestValue*1000).roundToMinutes)
   }
 }

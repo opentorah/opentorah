@@ -6,12 +6,14 @@ import org.podval.judaica.metadata.{Attributes, LanguageSpec, Metadata, XML}
 
 import scala.xml.Elem
 
-final case class Haftarah(customs: Custom.Of[Seq[ProphetSpan.BookSpan]]) {
+// TODO split the check for full coverage.
+// TODO modify Reading to apply to a single custom; eliminate Option[] from here.
+final case class Haftarah(customs: Custom.Of[Option[Seq[ProphetSpan.BookSpan]]]) {
   override def toString: String = toString(LanguageSpec.empty)
 
   def toString(spec: LanguageSpec): String = {
-    customs.toSeq.map { case (custom, spans) =>
-      custom.toString(spec) + ": " + ProphetSpan.toString(spans, spec)
+    customs.toSeq.map { case (custom, spansOpt) =>
+      custom.toString(spec) + ": " + spansOpt.fold("")(spans => ProphetSpan.toString(spans, spec))
     }.mkString("\n")
   }
 }
@@ -44,7 +46,8 @@ object Haftarah {
       customs.updated(Set[Custom](Custom.Common), common)
     }
 
-    new Haftarah(Custom.denormalize(result))
+    // TODO push up into parsing; express emptiness of a Cusom in the XML file
+    new Haftarah(Custom.denormalize(result).mapValues(Some(_)))
   }
 
   private def parseCustom(ancestorSpan: ProphetSpan.Parsed)(element: Elem): (Set[Custom], Seq[ProphetSpan.BookSpan]) = {
