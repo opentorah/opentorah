@@ -7,6 +7,8 @@ import org.podval.judaica.metadata.tanach.{Custom, Parsha}
 import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
 import org.podval.judaica.metadata.Util
 
+// TODO add special parshiot, Shabbos hagodol...
+
 final case class Schedule(
   from: Day,
   to: Day,
