@@ -65,6 +65,31 @@ object Schedule {
     )
   }
 
+  /*
+    // TODO add special parshios, Shabbos Hagodol, erev rosh chodesh...
+     Shabbos  Rosh Chodesh Additional Haftorah
+
+     on Shabos rosh hodesh Menachem Ov  - only maftir rosh chodesh, haftarah - current and the added piece;
+     on Shabbos if Sunday is also Rosh Chodesh: add "Shabbos Erev Rosh Chodesh Additional Haftorah".
+
+     If Rosh Chodesh Elul is Shabbos, on 14th something merges...
+
+   TODO RULE: When another haftarah (e.g., Shekalim) takes over, add "Shabbos [Erev] Rosh Chodesh Additional Haftorah"
+             Chabad: always
+             Fes: only EREV rosh chodesh
+             остальные не добавляют
+
+Какой-то шабат выпал на канун рош-ходеша.
+Широкий обычай - читают афтару кануна рош ходеша.
+Обычай Феса - читают афтару недельной главы и добавляют эту добавку - первый и последний стих из афтары кануна рош-ходеша.
+Для широкого обычая есть ситуации, когда афтара недельной главы отодвигаются по другой причине.
+Это не только канун рош ходеша, но и рош ходеш или суббота перед рош ходеш адар (Шкалим) или суббота перед рош-ходеш нисан (Аходеш).
+В этом случае  в Хабаде читают афтару этого более сильного случая (рош ходеша, Шкалим или Аходеш) и добавляют эту добавку.
+Особый случай рош ходеш менахем ав или его канун и канун рош ходеш элул.
+В этом случае читают афтару недельной главы (которая на самом деле из трех увещеваний или семи утешений),
+а в конце добавляют эти два стиха из афтары кануна рош ходеша.
+
+  */
   private final def getReading(
     day: Day,
     weeklyReading: Option[WeeklyReading],
@@ -81,8 +106,10 @@ object Schedule {
     val specialReading: Option[Reading] = specialDay.map { specialDay =>
       val result = specialDay.getReading(isShabbos, weeklyReading, isPesachOnChamishi)
       val normalAliyot = result.aliyot
+
+
       val aliyot = if (isRoshChodesh) {
-        // Applies only to Channukah:
+        // Applies only to Channukah - or the same happems on Shekalim. Hachodesh?
         if (!isShabbos) RoshChodesh.in3aliyot :+ normalAliyot.last else {
           // TODO for all customs:
           //   normalAliyot.take(5) :+ (normalAliyot(5)+normalAliyot(6))

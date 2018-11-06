@@ -12,9 +12,7 @@ import scala.xml.Elem
 // TODO synthesize names in known languages
 // TODO number of aliyot: Shabbos and Simchas Torah - 7; Yom Kippur - 6; Yom Tov - 5; Intermediate and Rosh Chodesh - 4;
 //  Chanukkah, Purim, Fast, Sheni/Chamishi and Shabbos afternoon - 3 (add to WithAliyot).
-// TODO replace Custom "Ashkenaz, Sefard" with "Common"
 // TODO list all days with haftarah.
-
 
 object SpecialDay {
 
@@ -173,30 +171,6 @@ object SpecialDay {
     protected def afternoonHaftarah: Option[Haftarah]
   }
 
-  /* TODO: move code from Shabbos Chanukah here, since the same approach (7 aliyot in 6) applies to Shkalim, and Ha-hodesh.
-
-     Shabbos  Rosh Chodesh Additional Haftorah
-
-     on Shabos rosh hodesh Menachem Ov  - only maftir rosh chodesh, haftarah - current and the added piece;
-     on Shabbos if Sunday is also Rosh Chodesh: add "Shabbos Erev Rosh Chodesh Additional Haftorah".
-
-     If Rosh Chodesh Elul is Shabbos, on 14th something merges...
-
-   TODO RULE: When another haftarah (e.g., Shekalim) takes over, add "Shabbos [Erev] Rosh Chodesh Additional Haftorah"
-             Chabad: always
-             Fes: only EREV rosh chodesh
-             остальные не добавляют
-
-Какой-то шабат выпал на канун рош-ходеша.
-Широкий обычай - читают афтару кануна рош ходеша.
-Обычай Феса - читают афтару недельной главы и добавляют эту добавку - первый и последний стих из афтары кануна рош-ходеша.
-Для широкого обычая есть ситуации, когда афтара недельной главы отодвигаются по другой причине.
-Это не только канун рош ходеша, но и рош ходеш или суббота перед рош ходеш адар (Шкалим) или суббота перед рош-ходеш нисан (Аходеш).
-В этом случае  в Хабаде читают афтару этого более сильного случая (рош ходеша, Шкалим или Аходеш) и добавляют эту добавку.
-Особый случай рош ходеш менахем ав или его канун и канун рош ходеш элул.
-В этом случае читают афтару недельной главы (которая на самом деле из трех увещеваний или семи утешений),
-а в конце добавляют эти два стиха из афтары кануна рош ходеша.
-  */
   case object RoshChodesh extends LoadNames {
     protected override val namesXml: Elem =
       <names>
@@ -218,7 +192,6 @@ object SpecialDay {
       haftarah = None
     )
 
-    // TODO add special parshios, Shabbos Hagodol, erev rosh chodesh...
     def shabbos(weeklyReading: Option[WeeklyReading]): Reading = Reading(
       aliyot = Seq(), //TODO: aliyot from the weekly reading
       maftir = Some(shabbosMaftir),
@@ -374,7 +347,7 @@ object SpecialDay {
 
     protected override val haftarahXml: Elem =
       <haftarah book="Isaiah">
-        <custom n="Ashkenaz, Sefard" fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
+        <custom n="Common" fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
         <custom n="Italki, Teiman">
           <part n="1" fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
           <part n="2" fromChapter="59" fromVerse="20" toVerse="21"/>
@@ -390,7 +363,7 @@ object SpecialDay {
 
     override protected val afternoonHaftarah: Option[Haftarah] = Some(parseHaftarah(
       <haftarah>
-        <custom n="Ashkenaz, Sefard">
+        <custom n="Common">
           <part n="1" book="Jonah" fromChapter="1" fromVerse="1" toChapter="4" toVerse="11"/>
           <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
         </custom>
@@ -427,7 +400,7 @@ object SpecialDay {
 
     protected override val haftarahXml: Elem =
       <haftarah book="Zechariah" toChapter="14" toVerse="21">
-        <custom n="Ashkenaz, Sefard" fromChapter="14" fromVerse="1"/>
+        <custom n="Common" fromChapter="14" fromVerse="1"/>
         <custom n="Teiman" fromChapter="13" fromVerse="9"/>
       </haftarah>
 
@@ -452,7 +425,7 @@ object SpecialDay {
 
     protected override val haftarahXml: Elem =
       <haftarah book="I Kings">
-        <custom n="Ashkenaz, Sefard" fromChapter="8" fromVerse="2" toVerse="21"/>
+        <custom n="Common" fromChapter="8" fromVerse="2" toVerse="21"/>
         <custom n="Italki" fromChapter="7" fromVerse="51" toChapter="8" toVerse="15"/>
         <custom n="Teiman" fromChapter="7" fromVerse="51" toChapter="8" toVerse="21"/>
       </haftarah>
@@ -490,7 +463,7 @@ object SpecialDay {
 
     protected override val haftarahXml: Elem =
       <haftarah book="Ezekiel" fromChapter="38">
-        <custom n="Ashkenaz, Sefard" fromVerse="18" toChapter="39" toVerse="16"/>
+        <custom n="Common" fromVerse="18" toChapter="39" toVerse="16"/>
         <custom n="Italki, Teiman" fromVerse="1" toChapter="38" toVerse="23"/>
       </haftarah>
   }
@@ -540,7 +513,7 @@ object SpecialDay {
   It is possible that this is a difference between chassidim and litaim."
   */
       <haftarah book="I Kings" fromChapter="8" fromVerse="54">
-        <custom n="Sefard, Ashkenaz" toChapter="8" toVerse="66"/>
+        <custom n="Common" toChapter="8" toVerse="66"/>
         <custom n="Italki, Chabad" toChapter="9" toVerse="1"/>
       </haftarah>
   }
@@ -555,7 +528,6 @@ object SpecialDay {
     // Although Simchas Torah doesn't fall on Shabbos, its aliyot are reused by SheminiAtzeresAndSimchasTorahInHolyLand,
     // which does; so, isShabbos has to explicitly be set to false:
     override def getReading(isShabbos: Boolean): Reading = {
-      // TODO require 7 aliyot:
       Reading(
         aliyot = torah,
         maftir = SheminiAtzeres.maftir,
@@ -582,7 +554,7 @@ object SpecialDay {
 
     protected override val haftarahXml: Elem =
       <haftarah book="Joshua">
-        <custom n="Ashkenaz, Sefard, Italki" fromChapter="1" fromVerse="1" toVerse="18"/>
+        <custom n="Common, Italki" fromChapter="1" fromVerse="1" toVerse="18"/>
         <custom n="Teiman">
           <part n="1" fromChapter="1" fromVerse="1" toVerse="9"/>
           <part n="2" fromChapter="6" fromVerse="27"/>
@@ -692,7 +664,7 @@ object SpecialDay {
 
     private val haftarahShabbos2: Haftarah = parseHaftarah(
       <haftarah book="I Kings" fromChapter="7" fromVerse="40" toChapter="7">
-        <custom n="Ashkenaz, Sefard" toVerse="50"/>
+        <custom n="Common" toVerse="50"/>
         <custom n="Italki" toVerse="51"/>
       </haftarah>)
   }
@@ -906,7 +878,7 @@ object SpecialDay {
 
     protected override val haftarahXml: Elem =
       <haftarah book="II Kings">
-        <custom n="Ashkenaz, Sefard">
+        <custom n="Common">
           <part n="1" fromChapter="23" fromVerse="1" toVerse="9"/>
           <part n="2" fromChapter="23" fromVerse="21" toVerse="25"/>
         </custom>
@@ -982,7 +954,7 @@ object SpecialDay {
 
     private val shabbosHaftarah: Haftarah = parseHaftarah(
       <haftarah book="Ezekiel">
-        <custom n="Ashkenaz, Sefard" fromChapter="37" fromVerse="1" toVerse="14"/>
+        <custom n="Common" fromChapter="37" fromVerse="1" toVerse="14"/>
         <custom n="Teiman" fromChapter="36" fromVerse="37" toChapter="37" toVerse="14"/>
       </haftarah>)
   }
@@ -1071,7 +1043,7 @@ object SpecialDay {
 
     protected override val haftarahXml: Elem =
       <haftarah book="Ezekiel">
-        <custom n="Ashkenaz, Sefard">
+        <custom n="Common">
           <part n="1" fromChapter="1" fromVerse="1" toVerse="28"/>
           <part n="2" fromChapter="3" fromVerse="12"/>
         </custom>
@@ -1124,7 +1096,7 @@ object SpecialDay {
 
     protected override val haftarahXml: Elem =
       <haftarah book="Jeremiah">
-        <custom n="Ashkenaz, Sefard" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
+        <custom n="Common" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
         <custom n="Teiman">
           <part n="1" fromChapter="6" fromVerse="16" toVerse="17"/>
           <part n="2" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
