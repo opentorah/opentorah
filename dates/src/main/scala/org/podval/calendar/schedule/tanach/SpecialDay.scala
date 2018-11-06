@@ -102,14 +102,14 @@ object SpecialDay {
   }
 
   sealed trait WithMaftir {
-    def maftir: Option[ChumashSpan.BookSpan] = None
+    def maftir: ChumashSpan.BookSpan
   }
 
   sealed trait VerySimpleReading extends SimpleReading with WithAliyot with WithMaftir {
     final override def getReading(isShabbos: Boolean): Reading = Reading(
       torah = aliyot(isShabbos),
       maftir = maftir,
-      haftarah = Some(haftarah)
+      haftarah = haftarah
     )
 
     def haftarah: Haftarah.Customs
@@ -119,16 +119,12 @@ object SpecialDay {
 
   sealed trait Festival extends FestivalOrIntermediate with SimpleReading with WithMaftir
 
-  sealed trait FestivalFirstDay extends Festival with VerySimpleReading with LoadNames {
-    protected val maftirXml: Elem
-
-    final override lazy val maftir: Option[ChumashSpan.BookSpan] = Some(parseMaftir(maftirXml))
-  }
+  sealed trait FestivalFirstDay extends Festival with VerySimpleReading with LoadNames
 
   sealed trait FestivalSecondDay extends Festival with VerySimpleReading with NonFirstDayOf {
     def secondDayOf: Festival
 
-    final override def maftir: Option[ChumashSpan.BookSpan] = secondDayOf.maftir
+    final override def maftir: ChumashSpan.BookSpan = secondDayOf.maftir
   }
 
   sealed abstract class Intermediate(intermediateDayNumber: Int, inHolyLand: Boolean)
@@ -206,7 +202,7 @@ object SpecialDay {
   sealed trait Fast extends SimpleReading with Date with NoShabbosAllowed with LoadNames {
     final override def getAfternoonReading: Option[Reading] = {
       val afternoonHaftarah = haftarahExceptions.fold(defaultHaftarah)(haftarahExceptions => defaultHaftarah ++ haftarahExceptions)
-      Some(readingWithLastAliyaAsMaftir(afternoonTorah, ??? /* TODO afternoonHaftarah*/))
+      Some(Reading.mkOptional(afternoonTorah, afternoonHaftarah))
     }
 
     protected final val afternoonTorah: Torah = parseTorah(
@@ -250,8 +246,8 @@ object SpecialDay {
         <aliyah n="7" fromVerse="28"/>
       </torah>
 
-    protected override val maftirXml: Elem =
-        <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
+    override val maftir: ChumashSpan.BookSpan = parseMaftir(
+        <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>)
 
     override val haftarah: Haftarah.Customs = parseHaftarah(
         <haftarah book="I Samuel" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>)
@@ -310,8 +306,8 @@ object SpecialDay {
         <aliyah n="7" fromVerse="31"/>
       </torah>
 
-    protected override val maftirXml: Elem =
-        <maftir book="Numbers" fromChapter="29" fromVerse="7" toVerse="11"/>
+    override val maftir: ChumashSpan.BookSpan = parseMaftir(
+        <maftir book="Numbers" fromChapter="29" fromVerse="7" toVerse="11"/>)
 
     override val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Isaiah">
@@ -323,8 +319,7 @@ object SpecialDay {
       </haftarah>)
 
 
-    override def getAfternoonReading: Option[Reading] =
-      Some(readingWithLastAliyaAsMaftir(afternoonAliyot, afternoonHaftarah))
+    override def getAfternoonReading: Option[Reading] = Some(Reading(afternoonAliyot, afternoonHaftarah))
 
     private val afternoonAliyot: Torah = parseTorah(
       <torah book="Leviticus" fromChapter="18" fromVerse="1" toVerse="30">
@@ -366,7 +361,7 @@ object SpecialDay {
         <aliyah n="7" fromChapter="23" fromVerse="33"/>
       </torah>
 
-    override def maftir: Option[BookSpan.ChumashSpan.BookSpan] = Some(korbanot.head)
+    override def maftir: BookSpan.ChumashSpan.BookSpan = korbanot.head
 
     override val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Zechariah" toChapter="14" toVerse="21">
@@ -416,7 +411,7 @@ object SpecialDay {
         if (inHolyLand) korbanot(dayNumber) else korbanot(dayNumber-1) + korbanot(dayNumber)
 
       if (isShabbos) Reading(
-        torah = Custom.ofCommon(shabbosTorah),
+        torah = shabbosTorah,
         maftir = last,
         haftarah = haftarah
       ) else {
@@ -472,8 +467,8 @@ object SpecialDay {
 
     def shortAliyot: Torah = aliyot(isShabbos = true).drop(2)
 
-    override protected val maftirXml: Elem =
-        <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>
+    override val maftir: ChumashSpan.BookSpan = parseMaftir(
+        <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>)
 
     /*
   Artscroll gives custom Ashkenaz ending at 9:1,
@@ -488,25 +483,18 @@ object SpecialDay {
       </haftarah>)
   }
 
-  case object SimchasTorah extends Festival with NonFirstDayOf with NoShabbosAllowed with LoadNames {
-    override def firstDay: Date = Succos
-
-    override def dayNumber: Int = 9
+  sealed trait SimchasTorahCommon extends Festival with NonFirstDayOf with LoadNames {
+    final override def firstDay: Date = Succos
 
     // Although Simchas Torah doesn't fall on Shabbos, its aliyot are reused by SheminiAtzeresAndSimchasTorahInHolyLand,
     // which does; so, isShabbos has to explicitly be set to false:
-    override def getReading(isShabbos: Boolean): Reading = {
+    final override def getReading(isShabbos: Boolean): Reading = {
       Reading(
-        torah = Custom.ofCommon(torah),
-        maftir = SheminiAtzeres.maftir.get,
+        torah = torah,
+        maftir = SheminiAtzeres.maftir,
         haftarah = haftarah
       )
     }
-
-    protected override val namesXml: Elem =
-      <names>
-        <name lang="en" transliterated="yes">Simchas Torah</name>
-      </names>
 
     // Zos Haberacha
     private val torah: Torah = parseTorah(
@@ -519,6 +507,8 @@ object SpecialDay {
       </torah>) ++ parseTorah(
         <torah book="Genesis" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/>)
 
+    override def maftir: ChumashSpan.BookSpan = ??? // TODO what is it?!
+
     private val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Joshua">
         <custom n="Common, Italki" fromChapter="1" fromVerse="1" toVerse="18"/>
@@ -529,11 +519,17 @@ object SpecialDay {
       </haftarah>)
   }
 
-  case object SheminiAtzeresAndSimchasTorahInHolyLand extends Festival with NonFirstDayOf with LoadNames {
-    override def firstDay: Date = Succos
+  case object SimchasTorah extends SimchasTorahCommon with NoShabbosAllowed {
+    override def dayNumber: Int = 9
+
+    protected override val namesXml: Elem =
+      <names>
+        <name lang="en" transliterated="yes">Simchas Torah</name>
+      </names>
+  }
+
+  case object SheminiAtzeresAndSimchasTorahInHolyLand extends SimchasTorahCommon {
     override def dayNumber: Int = 8
-    override def getReading(isShabbos: Boolean): Reading = SimchasTorah.getReading(isShabbos)
-    override def getAfternoonReading: Option[Reading] = SimchasTorah.getAfternoonReading
 
     protected override val namesXml: Elem =
       <names>
@@ -807,8 +803,8 @@ object SpecialDay {
         <aliyah n="7" fromVerse="48" shabbos="true"/>
       </torah>
 
-    protected override val maftirXml: Elem =
-        <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>
+    override val maftir: ChumashSpan.BookSpan = parseMaftir(
+        <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>)
 
     override val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Joshua">
@@ -869,8 +865,8 @@ object SpecialDay {
       if (isShabbos) {
         require((dayNumber != 2) && (dayNumber != 6))
         Reading(
-          torah = Custom.ofCommon(shabbosTorah),
-          maftir = Pesach7.maftir.get,
+          torah = shabbosTorah,
+          maftir = Pesach7.maftir,
           haftarah = shabbosHaftarah
         )
       } else {
@@ -885,7 +881,7 @@ object SpecialDay {
             case 6 => day6
           }
 
-          torah :+ Pesach7.maftir.get
+          torah :+ Pesach7.maftir
         }
 
         Reading(torah)
@@ -953,8 +949,8 @@ object SpecialDay {
         <aliyah n="7" fromChapter="14" fromVerse="26"/>
       </torah>
 
-    protected override val maftirXml: Elem =
-        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
+    override val maftir: ChumashSpan.BookSpan = parseMaftir(
+        <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>)
 
     override val haftarah: Haftarah.Customs = parseHaftarah(
         <haftarah book="II Samuel" fromChapter="22" fromVerse="1" toVerse="51"/>)
@@ -1002,8 +998,8 @@ object SpecialDay {
         <aliyah n="5" fromChapter="20" fromVerse="15"/>
       </torah>
 
-    protected override val maftirXml: Elem =
-        <maftir book="Numbers" fromChapter="28" fromVerse="26" toVerse="31"/>
+    override val maftir: ChumashSpan.BookSpan = parseMaftir(
+        <maftir book="Numbers" fromChapter="28" fromVerse="26" toVerse="31"/>)
 
     override val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Ezekiel">
@@ -1045,7 +1041,7 @@ object SpecialDay {
 
   case object TishaBeAv extends Fast with PostponeOnShabbos with LoadAliyot {
     override def date(year: Year): Day = year.month(Av).day(9)
-    override def getReading(isShabbos: Boolean): Reading = readingWithLastAliyaAsMaftir(aliyot(isShabbos), haftarah)
+    override def getReading(isShabbos: Boolean): Reading = Reading(aliyot(isShabbos), haftarah)
 
     protected override val namesXml: Elem =
       <names>
@@ -1067,12 +1063,6 @@ object SpecialDay {
         </custom>
       </haftarah>)
   }
-
-  private def readingWithLastAliyaAsMaftir(aliyot: Torah, haftarah: Haftarah.Customs): Reading = Reading(
-    torah = Custom.ofCommon(aliyot.init),
-    maftir = aliyot.last,
-    haftarah = haftarah
-  )
 
   val festivals: Set[FestivalOrIntermediate] = Set(
     RoshHashanah1, RoshHashanah2,

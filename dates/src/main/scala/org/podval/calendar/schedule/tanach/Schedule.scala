@@ -201,7 +201,7 @@ object Schedule {
     val year = Year(5779)
     val day = year.month(Month.Name.Marheshvan).day(25)
     val schedule: Schedule = forYear(year, inHolyLand = false)
-    val daySchedule = schedule.days(day)
+    val daySchedule: DaySchedule = schedule.days(day)
     println(daySchedule)
   }
 }

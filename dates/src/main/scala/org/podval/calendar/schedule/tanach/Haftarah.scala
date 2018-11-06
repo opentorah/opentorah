@@ -2,7 +2,7 @@ package org.podval.calendar.schedule.tanach
 
 import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
 import org.podval.judaica.metadata.tanach.{Custom, Parsha, WithNumber}
-import org.podval.judaica.metadata.{Attributes, LanguageSpec, Metadata, XML}
+import org.podval.judaica.metadata.{Attributes, Metadata, XML}
 
 import scala.xml.Elem
 
@@ -10,14 +10,6 @@ object Haftarah {
   type Customs = Custom.Of[Seq[ProphetSpan.BookSpan]]
 
   type OptionalCustoms = Custom.Of[Option[Seq[ProphetSpan.BookSpan]]]
-
-  def toString(customs: OptionalCustoms): String = toString(customs, LanguageSpec.empty)
-
-  def toString(customs: OptionalCustoms, spec: LanguageSpec): String = {
-    customs.toSeq.map { case (custom, spansOpt) =>
-      custom.toString(spec) + ": " + spansOpt.fold("")(spans => ProphetSpan.toString(spans, spec))
-    }.mkString("\n")
-  }
 
   final def forParsha(parsha: Parsha): Customs = haftarah(parsha)
 
