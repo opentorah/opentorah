@@ -105,18 +105,18 @@ object Schedule {
 
     val specialReading: Option[Reading] = specialDay.map { specialDay =>
       val result = specialDay.getReading(isShabbos, weeklyReading, isPesachOnChamishi)
-      val normalAliyot = result.aliyot
-
-
-      val aliyot = if (isRoshChodesh) {
-        // Applies only to Channukah - or the same happems on Shekalim. Hachodesh?
-        if (!isShabbos) RoshChodesh.in3aliyot :+ normalAliyot.last else {
-          // TODO for all customs:
-          //   normalAliyot.take(5) :+ (normalAliyot(5)+normalAliyot(6))
-          //   maftir = Some(RoshChodesh.shabbosMaftir),
-          //   add Shabbos Rosh Chodesh Haftara to the one there already
-        }
-      } else normalAliyot
+//      val normalAliyot = result.aliyot
+//
+//
+//      val aliyot = if (isRoshChodesh) {
+//        // Applies only to Channukah - or the same happems on Shekalim. Hachodesh?
+//        if (!isShabbos) RoshChodesh.in3aliyot :+ normalAliyot.last else {
+//          // TODO for all customs:
+//          //   normalAliyot.take(5) :+ (normalAliyot(5)+normalAliyot(6))
+//          //   maftir = Some(RoshChodesh.shabbosMaftir),
+//          //   add Shabbos Rosh Chodesh Haftara to the one there already
+//        }
+//      } else normalAliyot
 
       result// TODO.copy(aliyot = aliyot)
     }
@@ -193,7 +193,7 @@ object Schedule {
     println()
 //    println(SpecialReading.SheminiAtzeres.shabbosAliyot.get.toString(Language.English.toSpec))
     println()
-    println(SpecialDay.SheminiAtzeres.getReading(false).maftir.get.toString(Language.English.toSpec))
+//    println(SpecialDay.SheminiAtzeres.getReading(false).maftir.get.toString(Language.English.toSpec))
     println()
 
     val x = SpecialDay.RoshHashanah1.aliyot(true)
