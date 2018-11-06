@@ -204,7 +204,7 @@ object Tanach extends NamedCompanion {
         parsha.span.from,
         aliyot.last.span.to.getOrElse(parsha.days(Custom.Common).head.span.to)
       ).inBook(parsha.book)
-      parsha -> Aliyot(bookSpan, aliyot, number = Some(3))
+      parsha -> Aliyot.parse(bookSpan, aliyot, number = Some(3))
     }
 
     def maftir: Map[Parsha, BookSpan.ChumashSpan.BookSpan] = get.map { case (parsha, metadata) =>
@@ -277,7 +277,7 @@ object Tanach extends NamedCompanion {
     val with1 = Span.addImplied1(Custom.common(days), span, book.chapters)
 
     val result: Custom.Sets[Aliyot.Torah] = days.mapValues { spans: Seq[Span.Numbered] =>
-      Aliyot(bookSpan, WithNumber.overlay(with1, spans), Some(7))
+      Aliyot.parse(bookSpan, WithNumber.overlay(with1, spans), Some(7))
     }
 
     Custom.denormalize(result, full = true)

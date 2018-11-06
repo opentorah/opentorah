@@ -1153,7 +1153,7 @@ object SpecialDay {
 
     val result: Seq[(Span.Numbered, Boolean)] =
       elements.map(element => XML.parseEmpty(element, "aliyah", parseNumberedWithShabbos))
-    val shabbosAliyot: Torah = Aliyot(bookSpan, result.map(_._1), number = Some(7))
+    val shabbosAliyot: Torah = Aliyot.parse(bookSpan, result.map(_._1), number = Some(7))
     val toDrop: Set[Int] = result.filter(_._2).map(_._1.n).toSet
     require(!toDrop.contains(1))
     val weekdayAliyot =
@@ -1171,7 +1171,7 @@ object SpecialDay {
   private def parseAliyot(bookSpan: ChumashSpan.BookSpan, elements: Seq[Elem]): Aliyot.Torah = {
     val fromChapter: Int = bookSpan.span.from.chapter
     val result = elements.map(element => XML.parseEmpty(element, "aliyah", parseNumbered(fromChapter)))
-    Aliyot(bookSpan, result, number = None)
+    Aliyot.parse(bookSpan, result, number = None)
   }
 
   private def parseNumbered(fromChapter: Int)(attributes: Attributes): Span.Numbered = {

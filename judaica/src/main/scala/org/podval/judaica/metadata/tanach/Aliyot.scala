@@ -15,7 +15,7 @@ object Aliyot {
     s"${index+1}: $s"
   }.mkString("\n")
 
-  def apply(
+  def parse(
     bookSpan: ChumashSpan.BookSpan,
     aliyotRaw: Seq[Span.Numbered],
     number: Option[Int]
