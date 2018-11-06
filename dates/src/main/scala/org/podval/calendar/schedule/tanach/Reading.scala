@@ -7,14 +7,14 @@ import org.podval.judaica.metadata.tanach.Custom
 final case class Reading(
   aliyot: Custom.Of[Seq[ChumashSpan.BookSpan]],
   maftir: Option[ChumashSpan.BookSpan],
-  haftarah: Option[Haftarah.OptionalCustoms]
+  haftarah: Option[Haftarah.Customs]
 )
 
 object Reading {
   def apply(
     aliyot: Seq[ChumashSpan.BookSpan],
     maftir: Option[ChumashSpan.BookSpan],
-    haftarah: Option[Haftarah.OptionalCustoms]
+    haftarah: Option[Haftarah.Customs]
   ): Reading = Reading(
     aliyot = Custom.ofCommon(aliyot),
     maftir = maftir,

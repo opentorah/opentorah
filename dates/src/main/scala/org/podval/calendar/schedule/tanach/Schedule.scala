@@ -173,10 +173,10 @@ object Schedule {
   def printHaftarahList(custom: Custom, spec: LanguageSpec, full: Boolean): Unit = {
     println(custom.toString(spec))
     for (parsha <- Parsha.values) {
-      val haftarah: Haftarah.OptionalCustoms = Haftarah.forParsha(parsha)
+      val haftarah: Haftarah.Customs = Haftarah.forParsha(parsha)
       val customEffective: Custom = Custom.find(haftarah, custom)
-      val spansOpt: Option[Seq[ProphetSpan.BookSpan]] = haftarah(customEffective)
-      val result: String = spansOpt.fold("")(spans => ProphetSpan.toString(spans, spec))
+      val spansOpt: Seq[ProphetSpan.BookSpan] = haftarah(customEffective)
+      val result: String = ProphetSpan.toString(spansOpt, spec)
 
       if (customEffective == custom) {
         println(parsha.toString(spec) + ": " + result)

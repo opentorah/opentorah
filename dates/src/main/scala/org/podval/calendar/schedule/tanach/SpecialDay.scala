@@ -112,13 +112,13 @@ object SpecialDay {
   }
 
   sealed trait WithHaftarah {
-    def haftarah: Option[Haftarah.OptionalCustoms] = None
+    def haftarah: Option[Haftarah.Customs] = None
   }
 
   sealed trait LoadHaftarah extends WithHaftarah {
     protected val haftarahXml: Elem
 
-    final override lazy val haftarah: Option[Haftarah.OptionalCustoms] = Some(parseHaftarah(haftarahXml))
+    final override lazy val haftarah: Option[Haftarah.Customs] = Some(parseHaftarah(haftarahXml))
   }
 
   sealed trait VerySimpleReading extends SimpleReading with WithAliyot with WithMaftir with WithHaftarah {
@@ -160,15 +160,6 @@ object SpecialDay {
 
   sealed trait RabbinicFestival extends WithNames with WithReading with Date
 
-  sealed trait AfternoonReading extends WithReading {
-    final override def getAfternoonReading: Option[Reading] =
-      Some(readingWithLastAliyaAsMaftir(afternoonAliyot, afternoonHaftarah.get))
-
-    protected def afternoonAliyot: Torah
-
-    protected def afternoonHaftarah: Option[Haftarah.OptionalCustoms]
-  }
-
   case object RoshChodesh extends LoadNames {
     protected override val namesXml: Elem =
       <names>
@@ -200,33 +191,36 @@ object SpecialDay {
 
     def shabbosMaftir: ChumashSpan.BookSpan = torah(4)+torah(5)
 
-    private val shabbosHaftarah: Haftarah.OptionalCustoms = parseHaftarah(
+    private val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Isaiah" fromChapter="66">
         <part n="1" fromVerse="1" toVerse="24"/>
         <part n="2" fromVerse="23" toVerse="23"/>
       </haftarah>)
 
     // TODO added by Chabad only
-    private val shabbosAdditionalHaftarah: Haftarah.OptionalCustoms = parseHaftarah(
+    private val shabbosAdditionalHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Isaiah" fromChapter="66">
         <part n="1" fromVerse="1" toVerse="1"/>
         <part n="2" fromVerse="23" toVerse="24"/>
         <part n="3" fromVerse="23" toVerse="23"/>
       </haftarah>)
 
-    private val shabbosErevRoshChodeshHaftarah: Haftarah.OptionalCustoms = parseHaftarah(
+    private val shabbosErevRoshChodeshHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="I Samuel" fromChapter="20" fromVerse="18" toVerse="42"/>)
 
     // TODO added by Chabad and Fes only; after haftarah if it wasn't pushed off by the haftarah Shabbos erev Rosh Chodesh.
-    private val shabbosErevRoshChodeshAdditionalHaftorah: Haftarah.OptionalCustoms = parseHaftarah(
+    private val shabbosErevRoshChodeshAdditionalHaftorah: Haftarah.Customs = parseHaftarah(
       <haftarah book="I Samuel" fromChapter="20">
         <part n="1" fromVerse="18" toVerse="18"/>
         <part n="2" fromVerse="42" toVerse="42"/>
       </haftarah>)
   }
 
-  sealed trait Fast extends SimpleReading with Date with NoShabbosAllowed with AfternoonReading with LoadNames {
-    final override protected def afternoonAliyot: Torah = afternoonTorah
+  sealed trait Fast extends SimpleReading with Date with NoShabbosAllowed with LoadNames {
+    final override def getAfternoonReading: Option[Reading] = {
+      val afternoonHaftarah = haftarahExceptions.fold(defaultHaftarah)(haftarahExceptions => defaultHaftarah ++ haftarahExceptions)
+      Some(readingWithLastAliyaAsMaftir(afternoonTorah, ??? /* TODO afternoonHaftarah*/))
+    }
 
     protected final val afternoonTorah: Torah = parseTorah(
         <torah book="Exodus" fromChapter="32" fromVerse="11" toVerse="14"/>) ++ parseTorah(
@@ -234,9 +228,7 @@ object SpecialDay {
         <aliyah n="2" fromVerse="4"/>
       </torah>)
 
-    final override protected def afternoonHaftarah: Option[Haftarah.OptionalCustoms] = Some(defaultHaftarah) // TODO apply haftarahExceptions
-
-    private val defaultHaftarah: Haftarah.OptionalCustoms = parseHaftarah(
+    private val defaultHaftarah: Haftarah.OptionalCustoms = parseHaftarahOptional(
       <haftarah>
         <custom n="Common" empty="true"/>
         <custom n="Ashkenaz, Chabad, Morocco" book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56" toVerse="8"/>
@@ -300,7 +292,7 @@ object SpecialDay {
       <haftarah book="Jeremiah" fromChapter="31" fromVerse="1" toVerse="19"/>
   }
 
-  case object FastOfGedalia extends NonTishaBeAvFast with PostponeOnShabbos with AfternoonReading {
+  case object FastOfGedalia extends NonTishaBeAvFast with PostponeOnShabbos {
     final override def date(year: Year): Day = year.month(Tishrei).day(3)
 
     protected override val namesXml: Elem =
@@ -317,7 +309,7 @@ object SpecialDay {
       </haftarah>))
   }
 
-  case object YomKippur extends FestivalFirstDay with AfternoonReading with LoadAliyotForShabbosAndWeekday {
+  case object YomKippur extends FestivalFirstDay with LoadAliyotForShabbosAndWeekday {
     override def date(year: JewishYear): JewishDay = year.month(Tishrei).day(10)
 
     protected override val namesXml: Elem =
@@ -347,13 +339,17 @@ object SpecialDay {
         </custom>
       </haftarah>
 
-    override protected val afternoonAliyot: Torah = parseTorah(
+
+    override def getAfternoonReading: Option[Reading] =
+      Some(readingWithLastAliyaAsMaftir(afternoonAliyot, afternoonHaftarah))
+
+    private val afternoonAliyot: Torah = parseTorah(
       <torah book="Leviticus" fromChapter="18" fromVerse="1" toVerse="30">
         <aliyah n="2" fromVerse="6"/>
         <aliyah n="3" fromVerse="22"/>
       </torah>)
 
-    override protected val afternoonHaftarah: Option[Haftarah.OptionalCustoms] = Some(parseHaftarah(
+    private val afternoonHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah>
         <custom n="Common">
           <part n="1" book="Jonah" fromChapter="1" fromVerse="1" toChapter="4" toVerse="11"/>
@@ -364,7 +360,7 @@ object SpecialDay {
           <part n="2" book="Jonah" fromChapter="1" fromVerse="1" toChapter="4" toVerse="11"/>
           <part n="3" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
         </custom>
-      </haftarah>))
+      </haftarah>)
   }
 
   case object Succos extends Festival with FirstDayOf with VerySimpleReading
@@ -649,10 +645,10 @@ object SpecialDay {
         <aliyah n="18" fromVerse="60"/>
       </torah>)
 
-    private val haftarahShabbos1: Haftarah.OptionalCustoms = parseHaftarah(
+    private val haftarahShabbos1: Haftarah.Customs = parseHaftarah(
         <haftarah book="Zechariah" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>)
 
-    private val haftarahShabbos2: Haftarah.OptionalCustoms = parseHaftarah(
+    private val haftarahShabbos2: Haftarah.Customs = parseHaftarah(
       <haftarah book="I Kings" fromChapter="7" fromVerse="40" toChapter="7">
         <custom n="Common" toVerse="50"/>
         <custom n="Italki" toVerse="51"/>
@@ -942,7 +938,7 @@ object SpecialDay {
         <aliyah n="3" fromVerse="9"/>
       </torah>)
 
-    private val shabbosHaftarah: Haftarah.OptionalCustoms = parseHaftarah(
+    private val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Ezekiel">
         <custom n="Common" fromChapter="37" fromVerse="1" toVerse="14"/>
         <custom n="Teiman" fromChapter="36" fromVerse="37" toChapter="37" toVerse="14"/>
@@ -1094,7 +1090,7 @@ object SpecialDay {
       </haftarah>
   }
 
-  private def readingWithLastAliyaAsMaftir(aliyot: Torah, haftarah: Haftarah.OptionalCustoms): Reading = Reading(
+  private def readingWithLastAliyaAsMaftir(aliyot: Torah, haftarah: Haftarah.Customs): Reading = Reading(
     aliyot = aliyot.init,
     maftir = Some(aliyot.last),
     haftarah = Some(haftarah)
@@ -1186,7 +1182,9 @@ object SpecialDay {
   private def parseMaftir(element: Elem): ChumashSpan.BookSpan =
     XML.parseEmpty(element, "maftir", ChumashSpan.parse).resolve
 
-  private def parseHaftarah(element: Elem): Haftarah.OptionalCustoms = Haftarah.parse(element, full= true)
+  private def parseHaftarahOptional(element: Elem): Haftarah.OptionalCustoms = Haftarah.parseOptional(element, full= true)
 
-  private def parseHaftarahNotFull(element: Elem): Haftarah.OptionalCustoms = Haftarah.parse(element, full= false)
+  private def parseHaftarah(element: Elem): Haftarah.Customs = Haftarah.parse(element, full= true)
+
+  private def parseHaftarahNotFull(element: Elem): Haftarah.OptionalCustoms = Haftarah.parseOptional(element, full= false)
 }
