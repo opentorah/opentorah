@@ -2,7 +2,7 @@ package org.podval.judaica.metadata
 
 import java.io._
 
-import scala.xml.{Elem, Node, PrettyPrinter}
+import scala.xml.{Elem, Node, PrettyPrinter, Text}
 
 object XML {
   def open(element: Elem, name: String): (Attributes, Seq[Elem]) = {
@@ -32,14 +32,20 @@ object XML {
   private def checkNoElements(element: Elem): Unit =
     require(getElements(element).isEmpty, "Nested elements present.")
 
-  private def checkNoNonElements(element: Elem): Unit =
-    require(getNonElements(element).isEmpty, s"Non-element children present on element $element: ${getNonElements(element)}")
+  private def checkNoNonElements(element: Elem): Unit = {
+    val nonElements = getNonElements(element)
+    require(nonElements.isEmpty, s"Non-element children present on element $element: $nonElements")
+  }
 
   private def getElements(element: Elem): Seq[Elem] =
     element.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
-  private def getNonElements(element: Elem): Seq[Node] =
-    element.child.filterNot(_.isInstanceOf[Elem])
+  private def getNonElements(element: Elem): Seq[Node] = {
+    element.child.filterNot(_.isInstanceOf[Elem]).filter { node =>
+      !node.isInstanceOf[Text] ||
+      node.asInstanceOf[Text].text.replace('\n', ' ').trim.nonEmpty
+    }
+  }
 
   def take(elements: Seq[Elem], name1: String): (Seq[Elem], Seq[Elem]) = {
     elements.span(_.label == name1)

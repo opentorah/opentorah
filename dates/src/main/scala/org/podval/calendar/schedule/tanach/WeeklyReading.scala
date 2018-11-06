@@ -2,10 +2,9 @@ package org.podval.calendar.schedule.tanach
 
 import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Year}
-import org.podval.calendar.jewish.SpecialDay
 import SpecialDay.{Pesach, Shavuos, TishaBeAv, shabbosAfter, shabbosBefore}
 import org.podval.judaica.metadata.Util
-import org.podval.judaica.metadata.tanach.{Parsha, WeeklyReading}
+import org.podval.judaica.metadata.tanach.Parsha
 import org.podval.judaica.metadata.tanach.Parsha._
 
 /**
@@ -104,7 +103,18 @@ import org.podval.judaica.metadata.tanach.Parsha._
   assumptions of the algorithm itself hold is verified by the unit tests for the years 1-6000;
   I am too lazy to prove the theorems :)
  */
-object WeeklyReadingSchedule {
+final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) {
+  def isCombined: Boolean = secondParsha.isDefined
+
+  def getReading: Reading = Reading(
+    torah = if (isCombined) parsha.daysCombined.get else parsha.days,
+    maftir = (if (isCombined) secondParsha.get else parsha).maftir,
+    // TODO what is the exception when the haftarah is the second one?
+    haftarah = Haftarah.forParsha(if (isCombined) secondParsha.get else parsha)
+  )
+}
+
+object WeeklyReading {
   private final val fromBereishisToBemidbar: Int = Parsha.distance(Bereishis, Bemidbar)
   private final val allowedBeforePesach: Set[Parsha] = Set[Parsha](Tzav, Metzora, Acharei)
   private final val fromBemidbarToVa_eschanan: Int = Parsha.distance(Bemidbar, Va_eschanan)
@@ -158,9 +168,9 @@ object WeeklyReadingSchedule {
   private def combined(year: Year, weeks: Seq[Day]): Set[Parsha] = {
     def weeksTo(day: Day): Int = weeks.takeWhile(_ < day).length
 
-    val weeksBeforePesach: Int = weeksTo(shabbosBefore(Pesach(year)))
-    val weeksToShavuot: Int = weeksTo(shabbosBefore(Shavuos(year)))
-    val weeksFromShavuotToAfterTishaBeAv: Int = weeksTo(shabbosAfter(TishaBeAv(year))) - weeksToShavuot
+    val weeksBeforePesach: Int = weeksTo(shabbosBefore(Pesach.date(year)))
+    val weeksToShavuot: Int = weeksTo(shabbosBefore(Shavuos.date(year)))
+    val weeksFromShavuotToAfterTishaBeAv: Int = weeksTo(shabbosAfter(TishaBeAv.date(year))) - weeksToShavuot
 
     // When there are to many Saturdays before Shavuot to assign Bemidbar to the one immediately before Shavuot,
     // Bemidbar is read one week before Shavuot:

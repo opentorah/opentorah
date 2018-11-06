@@ -15,7 +15,7 @@ plugins {
   id "com.jfrog.bintray" version "1.7.3" apply false
 }
 
-def scalaVersion      = '2.12.6'
+def scalaVersion      = '2.12.7'
 def scalaVersionMajor = '2.12'
 
 ext.lib = [

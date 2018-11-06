@@ -9,6 +9,8 @@ trait BookSpan[Book <: Tanach.TanachBook] {
     override def toString: String = toString(LanguageSpec.empty)
 
     def toString(spec: LanguageSpec): String = book.toString(spec) + " " + span.toString(spec)
+
+    def +(next: BookSpan): BookSpan = merge(Seq(this, next))
   }
 
   final def toString(spans: Seq[BookSpan], spec: LanguageSpec): String = {

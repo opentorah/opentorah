@@ -46,6 +46,9 @@ abstract class YearBase[C <: Calendar[C]](number: Int)
     calendar.Month(firstMonthNumber + numberInYear - 1)
   }
 
+  final def containsMonth(name: C#MonthName): Boolean =
+    monthDescriptors.exists(_.name == name)
+
   final def month(name: C#MonthName): C#Month =
     month(monthDescriptors.indexWhere(_.name == name) + 1)
 

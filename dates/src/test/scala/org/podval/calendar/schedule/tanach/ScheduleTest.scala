@@ -1,10 +1,10 @@
 package org.podval.calendar.schedule.tanach
 
 import org.scalatest.{FlatSpec, Matchers}
-import org.podval.calendar.jewish.{Jewish, SpecialDay, YearType}
+import org.podval.calendar.jewish.{Jewish, YearType}
 import YearType._
 import Jewish.{Day, Year}
-import org.podval.judaica.metadata.tanach.{Parsha, WeeklyReading}
+import org.podval.judaica.metadata.tanach.Parsha
 import org.podval.judaica.metadata.tanach.Parsha._
 import SpecialDay._
 
@@ -26,23 +26,23 @@ final class ScheduleTest extends FlatSpec with Matchers {
     def isCombined(parsha: Parsha): Boolean = readings.exists(_._2.secondParsha.contains(parsha))
 
     // Pesach
-    val readingsBeforePesach: WeeklyReading = findReadings(shabbosBefore(Pesach(year)))
+    val readingsBeforePesach: WeeklyReading = findReadings(shabbosBefore(Pesach.date(year)))
     readingsBeforePesach.isCombined shouldBe false
     readingsBeforePesach.parsha shouldBe {
-      if (!year.isLeap) Tzav else if (RoshHashanah1(year).is(Day.Name.Chamishi)) Acharei else Metzora
+      if (!year.isLeap) Tzav else if (RoshHashanah1.date(year).is(Day.Name.Chamishi)) Acharei else Metzora
     }
 
     // Shavuot
-    val readingsBeforeShavuot = findReadings(shabbosBefore(Shavuos(year)))
+    val readingsBeforeShavuot = findReadings(shabbosBefore(Shavuos.date(year)))
     readingsBeforeShavuot.isCombined shouldBe false
     Set[Parsha](Bemidbar, Nasso).contains(readingsBeforeShavuot.parsha) shouldBe true
 
     // Tisha Be Av
-    findReadings(shabbosAfter(TishaBeAv(year))) shouldBe WeeklyReading(Va_eschanan, None)
+    findReadings(shabbosAfter(TishaBeAv.date(year))) shouldBe WeeklyReading(Va_eschanan, None)
 
     // Rosh Ha Shanah
-    findReadings(shabbosBefore(RoshHashanah1(year+1))).parsha shouldBe Nitzavim
-    val roshHaShanah: Day = RoshHashanah1(year+1)
+    val roshHaShanah: Day = RoshHashanah1.date(year+1)
+    findReadings(shabbosBefore(roshHaShanah)).parsha shouldBe Nitzavim
     isCombined(Vayeilech) shouldBe !roshHaShanah.is(Day.Name.Sheni) && !roshHaShanah.is(Day.Name.Shlishi)
 
     val combined: Set[Parsha] = readings.values.toSet.filter(_.isCombined).map(_.parsha)
