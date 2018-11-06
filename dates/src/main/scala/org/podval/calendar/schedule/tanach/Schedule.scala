@@ -3,7 +3,7 @@ package org.podval.calendar.schedule.tanach
 import org.podval.calendar.jewish.Jewish.{Day, Month, Year}
 import org.podval.calendar.schedule.tanach.SpecialDay.{FestivalOrIntermediate, RoshChodesh, ShabbosBereishis}
 import org.podval.judaica.metadata.{Language, LanguageSpec}
-import org.podval.judaica.metadata.tanach.{Custom, Parsha}
+import org.podval.judaica.metadata.tanach.{Aliyot, Custom, Parsha}
 import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
 import org.podval.judaica.metadata.Util
 
@@ -173,9 +173,9 @@ object Schedule {
   def printHaftarahList(custom: Custom, spec: LanguageSpec, full: Boolean): Unit = {
     println(custom.toString(spec))
     for (parsha <- Parsha.values) {
-      val haftarah: Haftarah = Haftarah.forParsha(parsha)
-      val customEffective: Custom = Custom.find(haftarah.customs, custom)
-      val spansOpt: Option[Seq[ProphetSpan.BookSpan]] = haftarah.customs(customEffective)
+      val haftarah: Haftarah.OptionalCustoms = Haftarah.forParsha(parsha)
+      val customEffective: Custom = Custom.find(haftarah, custom)
+      val spansOpt: Option[Seq[ProphetSpan.BookSpan]] = haftarah(customEffective)
       val result: String = spansOpt.fold("")(spans => ProphetSpan.toString(spans, spec))
 
       if (customEffective == custom) {
@@ -187,7 +187,7 @@ object Schedule {
   }
 
   def main(args: Array[String]): Unit = {
-    println(Parsha.Mattos.getDaysCombined(Custom.Ashkenaz).toString(Language.Hebrew.toSpec))
+    println(Aliyot.toString(Parsha.Mattos.getDaysCombined(Custom.Ashkenaz), Language.Hebrew.toSpec))
     println()
     printHaftarahList(Custom.Shami, Language.Hebrew.toSpec, full = false)
     println()

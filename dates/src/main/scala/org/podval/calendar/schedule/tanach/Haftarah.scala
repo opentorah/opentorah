@@ -6,29 +6,34 @@ import org.podval.judaica.metadata.{Attributes, LanguageSpec, Metadata, XML}
 
 import scala.xml.Elem
 
-// TODO split the check for full coverage.
-// TODO modify Reading to apply to a single custom; eliminate Option[] from here.
-final case class Haftarah(customs: Custom.Of[Option[Seq[ProphetSpan.BookSpan]]]) {
-  override def toString: String = toString(LanguageSpec.empty)
+object Haftarah {
+  type Customs = Custom.Of[Seq[ProphetSpan.BookSpan]]
 
-  def toString(spec: LanguageSpec): String = {
+  type OptionalCustoms = Custom.Of[Option[Seq[ProphetSpan.BookSpan]]]
+
+  def toString(customs: OptionalCustoms): String = toString(customs, LanguageSpec.empty)
+
+  def toString(customs: OptionalCustoms, spec: LanguageSpec): String = {
     customs.toSeq.map { case (custom, spansOpt) =>
       custom.toString(spec) + ": " + spansOpt.fold("")(spans => ProphetSpan.toString(spans, spec))
     }.mkString("\n")
   }
-}
 
-object Haftarah {
-  final def forParsha(parsha: Parsha): Haftarah = haftarah(parsha)
+  final def forParsha(parsha: Parsha): OptionalCustoms = haftarah(parsha)
 
-  private lazy val haftarah: Map[Parsha, Haftarah] = Metadata.loadMetadata(
+  private lazy val haftarah: Map[Parsha, OptionalCustoms] = Metadata.loadMetadata(
     keys = Parsha.values,
     obj = this,
     elementName = "week",
     resourceName = Some("Haftarah")
-  ).mapValues { metadata => Haftarah(metadata.attributes, metadata.elements, full = true) }
+  ).mapValues { metadata => parse(metadata.attributes, metadata.elements, full = true) }
 
-  def apply(attributes: Attributes, elements: Seq[Elem], full: Boolean): Haftarah = {
+  def parse(element: Elem, full: Boolean): Haftarah.OptionalCustoms = {
+    val (attributes, elements) = XML.open(element, "haftarah")
+    Haftarah.parse(attributes, elements, full = full)
+  }
+
+  def parse(attributes: Attributes, elements: Seq[Elem], full: Boolean): OptionalCustoms = {
     val span = ProphetSpan.parse(attributes)
     attributes.close()
 
@@ -46,7 +51,7 @@ object Haftarah {
       customs.updated(Set[Custom](Custom.Common), Some(common))
     }
 
-    new Haftarah(Custom.denormalize(result, full))
+    Custom.denormalize(result, full)
   }
 
   private def parseCustom(ancestorSpan: ProphetSpan.Parsed)(element: Elem): (Set[Custom], Option[Seq[ProphetSpan.BookSpan]]) = {
