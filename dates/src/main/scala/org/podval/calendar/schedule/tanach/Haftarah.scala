@@ -26,9 +26,9 @@ object Haftarah {
     obj = this,
     elementName = "week",
     resourceName = Some("Haftarah")
-  ).mapValues { metadata => Haftarah(metadata.attributes, metadata.elements) }
+  ).mapValues { metadata => Haftarah(metadata.attributes, metadata.elements, full = true) }
 
-  def apply(attributes: Attributes, elements: Seq[Elem]): Haftarah = {
+  def apply(attributes: Attributes, elements: Seq[Elem], full: Boolean): Haftarah = {
     val span = ProphetSpan.parse(attributes)
     attributes.close()
 
@@ -39,29 +39,31 @@ object Haftarah {
       if (partElements.isEmpty) None else Some(parseParts(partElements, span))
 
     // TODO toMap() will silently ignore duplicates...
-    val customs: Custom.Sets[Seq[ProphetSpan.BookSpan]] = customElements.map(parseCustom(span)).toMap
+    val customs: Custom.Sets[Option[Seq[ProphetSpan.BookSpan]]] = customElements.map(parseCustom(span)).toMap
 
-    val result: Custom.Sets[Seq[ProphetSpan.BookSpan]] = common.fold(customs) { common =>
+    val result: Custom.Sets[Option[Seq[ProphetSpan.BookSpan]]] = common.fold(customs) { common =>
       // TODO updated() will silently ignore duplicates...
-      customs.updated(Set[Custom](Custom.Common), common)
+      customs.updated(Set[Custom](Custom.Common), Some(common))
     }
 
-    // TODO push up into parsing; express emptiness of a Cusom in the XML file
-    new Haftarah(Custom.denormalize(result).mapValues(Some(_)))
+    new Haftarah(Custom.denormalize(result, full))
   }
 
-  private def parseCustom(ancestorSpan: ProphetSpan.Parsed)(element: Elem): (Set[Custom], Seq[ProphetSpan.BookSpan]) = {
+  private def parseCustom(ancestorSpan: ProphetSpan.Parsed)(element: Elem): (Set[Custom], Option[Seq[ProphetSpan.BookSpan]]) = {
     val (attributes, elements) = XML.open(element, "custom")
     val customs: Set[Custom] = Custom.parse(attributes.doGet("n"))
 
-    val span = ProphetSpan.parse(attributes).inheritFrom(ancestorSpan)
-    attributes.close()
+    val result: Option[Seq[ProphetSpan.BookSpan]] =
+      if (attributes.getBoolean("empty").contains(true)) None else Some {
 
-    val partElements = XML.span(elements, "part")
+        val span = ProphetSpan.parse(attributes).inheritFrom(ancestorSpan)
+        attributes.close()
 
-    val result: Seq[ProphetSpan.BookSpan] =
-      if (partElements.isEmpty) Seq(span.resolve)
-      else parseParts(partElements, span)
+        val partElements = XML.span(elements, "part")
+
+        if (partElements.isEmpty) Seq(span.resolve)
+        else parseParts(partElements, span)
+      }
 
     customs -> result
   }

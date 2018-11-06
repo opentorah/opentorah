@@ -1,7 +1,7 @@
 package org.podval.calendar.schedule.tanach
 
 import org.podval.calendar.jewish.Jewish.{Day, Month, Year}
-import org.podval.calendar.schedule.tanach.SpecialDay.{FestivalOrIntermediate, ShabbosBereishis}
+import org.podval.calendar.schedule.tanach.SpecialDay.{FestivalOrIntermediate, RoshChodesh, ShabbosBereishis}
 import org.podval.judaica.metadata.{Language, LanguageSpec}
 import org.podval.judaica.metadata.tanach.{Custom, Parsha}
 import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
@@ -75,13 +75,30 @@ object Schedule {
     val isRoshChodesh: Boolean = day.isRoshChodesh
 
     // TODO we need the next weekly reading to determine the sheni/chamishi one
+    // TODO On Festival that falls on Shabbos, afternoon reading is that of the Shabbos - except on Yom Kippur.
     val afternoonSpecial: Option[Reading] = specialDay flatMap { specialDay => specialDay.getAfternoonReading }
+
+    val specialReading: Option[Reading] = specialDay.map { specialDay =>
+      val result = specialDay.getReading(isShabbos, weeklyReading, isPesachOnChamishi)
+      val normalAliyot = result.aliyot
+      val aliyot = if (isRoshChodesh) {
+        // Applies only to Channukah:
+        if (!isShabbos) RoshChodesh.in3aliyot :+ normalAliyot.last else {
+          // TODO for all customs:
+          //   normalAliyot.take(5) :+ (normalAliyot(5)+normalAliyot(6))
+          //   maftir = Some(RoshChodesh.shabbosMaftir),
+          //   add Shabbos Rosh Chodesh Haftara to the one there already
+        }
+      } else normalAliyot
+
+      result// TODO.copy(aliyot = aliyot)
+    }
+
+    val morningReading: Option[Reading] = specialReading.orElse(weeklyReading.map(_.getReading))
 
     DaySchedule(
       day,
-      morning =
-        specialDay.map(_.getReading(isShabbos, isRoshChodesh, weeklyReading, isPesachOnChamishi))
-          .orElse(weeklyReading.map(_.getReading)),
+      morning = morningReading,
       afternoon = afternoonSpecial
     )
   }

@@ -280,6 +280,6 @@ object Tanach extends NamedCompanion {
       Aliyot(bookSpan, WithNumber.overlay(with1, spans), Some(7))
     }
 
-    Custom.denormalize(result)
+    Custom.denormalize(result, full = true)
   }
 }

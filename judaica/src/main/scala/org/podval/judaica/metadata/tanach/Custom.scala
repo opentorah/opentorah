@@ -80,20 +80,20 @@ object Custom extends NamedCompanion {
 
   type Sets[T] = Map[Set[Custom], T]
 
-  def denormalize[T](map: Sets[T]): Of[T] = {
-    check(map)
+  def denormalize[T](map: Sets[T], full: Boolean): Of[T] = {
+    check(map, full)
     Util.checkNoDuplicates(map.values.toSeq, "customs")
     map.flatMap { case (customs, value) => customs.map(custom => custom -> value) }
   }
 
   // Check that the sets do not overlap - and cover all customs.
-  private def check[T](map: Sets[T]): Unit = {
+  private def check[T](map: Sets[T], full: Boolean): Unit = {
     val sets: Set[Set[Custom]] = map.keySet
     sets.foreach(a => sets.foreach(b => if (b != a) {
       require(b.intersect(a).isEmpty, s"Overlaping sets of customs: $a and $b")
     }))
     val all: Set[Custom] = addParents(sets.flatten)
-    values.foreach(custom => find(all, custom))
+    if (full) values.foreach(custom => find(all, custom))
   }
 
   def common[T](map: Sets[T]): T = map(map.keySet.find(_.contains(Custom.Common)).get)
