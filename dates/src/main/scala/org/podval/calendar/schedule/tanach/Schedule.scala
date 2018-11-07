@@ -1,7 +1,7 @@
 package org.podval.calendar.schedule.tanach
 
 import org.podval.calendar.jewish.Jewish.{Day, Month, Year}
-import org.podval.calendar.schedule.tanach.SpecialDay.{FestivalOrIntermediate, RoshChodesh, ShabbosBereishis}
+import org.podval.calendar.schedule.tanach.SpecialDay.{FestivalOrIntermediate, RoshChodesh, ShabbosBereishis, WeekdayReading}
 import org.podval.judaica.metadata.{Language, LanguageSpec}
 import org.podval.judaica.metadata.tanach.{Aliyot, Custom, Parsha}
 import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
@@ -42,7 +42,7 @@ object Schedule {
   def apply(from: Day, to: Day, inHolyLand: Boolean): Schedule = {
     val data: ScheduleData = scheduleData(from, to, inHolyLand)
 
-    val daysWithSpecialReadingsNotFestivals: Map[Day, SpecialDay.Date with SpecialDay.WithReading] = filter(from, to, data.years.map(year =>
+    val daysWithSpecialReadingsNotFestivals: Map[Day, SpecialDay.Date] = filter(from, to, data.years.map(year =>
       SpecialDay.daysWithSpecialReadingsNotFestivals.map(day => day.correctedDate(year) -> day).toMap))
 
     val pesachOnChamishi: Set[Year] = data.years.flatMap { year =>
@@ -65,63 +65,52 @@ object Schedule {
     )
   }
 
-  /*
-    // TODO add special parshios, Shabbos Hagodol, erev rosh chodesh...
-     Shabbos  Rosh Chodesh Additional Haftorah
-
-     on Shabos rosh hodesh Menachem Ov  - only maftir rosh chodesh, haftarah - current and the added piece;
-     on Shabbos if Sunday is also Rosh Chodesh: add "Shabbos Erev Rosh Chodesh Additional Haftorah".
-
-     If Rosh Chodesh Elul is Shabbos, on 14th something merges...
-
-   TODO RULE: When another haftarah (e.g., Shekalim) takes over, add "Shabbos [Erev] Rosh Chodesh Additional Haftorah"
-             Chabad: always
-             Fes: only EREV rosh chodesh
-             остальные не добавляют
-
-Какой-то шабат выпал на канун рош-ходеша.
-Широкий обычай - читают афтару кануна рош ходеша.
-Обычай Феса - читают афтару недельной главы и добавляют эту добавку - первый и последний стих из афтары кануна рош-ходеша.
-Для широкого обычая есть ситуации, когда афтара недельной главы отодвигаются по другой причине.
-Это не только канун рош ходеша, но и рош ходеш или суббота перед рош ходеш адар (Шкалим) или суббота перед рош-ходеш нисан (Аходеш).
-В этом случае  в Хабаде читают афтару этого более сильного случая (рош ходеша, Шкалим или Аходеш) и добавляют эту добавку.
-Особый случай рош ходеш менахем ав или его канун и канун рош ходеш элул.
-В этом случае читают афтару недельной главы (которая на самом деле из трех увещеваний или семи утешений),
-а в конце добавляют эти два стиха из афтары кануна рош ходеша.
-
-  */
   private final def getReading(
     day: Day,
     weeklyReading: Option[WeeklyReading],
-    specialDay: Option[SpecialDay.WithReading],
+    specialDay: Option[SpecialDay.Date],
     isPesachOnChamishi: Boolean
   ): DaySchedule = {
     val isShabbos: Boolean = day.isShabbos
     val isRoshChodesh: Boolean = day.isRoshChodesh
 
-    // TODO we need the next weekly reading to determine the sheni/chamishi one
-    // TODO On Festival that falls on Shabbos, afternoon reading is that of the Shabbos - except on Yom Kippur.
-    val afternoonSpecial: Option[Reading] = specialDay flatMap { specialDay => specialDay.getAfternoonReading }
+    val specialReading: Option[Reading] = specialDay.flatMap { specialDay =>
+      if (isShabbos) {
+        specialDay match {
+          case specialDay: SpecialDay.ShabbosReading =>
+            Some(specialDay.getShabbosReading)
 
-    val specialReading: Option[Reading] = specialDay.map { specialDay =>
-      val result = specialDay.getReading(isShabbos, weeklyReading, isPesachOnChamishi)
-//      val normalAliyot = result.aliyot
-//
-//
-//      val aliyot = if (isRoshChodesh) {
-//        // Applies only to Channukah - or the same happems on Shekalim. Hachodesh?
-//        if (!isShabbos) RoshChodesh.in3aliyot :+ normalAliyot.last else {
-//          // TODO for all customs:
-//          //   normalAliyot.take(5) :+ (normalAliyot(5)+normalAliyot(6))
-//          //   maftir = Some(RoshChodesh.shabbosMaftir),
-//          //   add Shabbos Rosh Chodesh Haftara to the one there already
-//        }
-//      } else normalAliyot
+          case specialDay: SpecialDay.Chanukah =>
+            require(weeklyReading.isDefined)
+            Some(specialDay.getShabbosReading(weeklyReading.get, isRoshChodesh))
 
-      result// TODO.copy(aliyot = aliyot)
+          case _ => None
+        }
+      } else {
+        specialDay match {
+          case specialDay: WeekdayReading =>
+            Some(specialDay.getWeekdayReading)
+
+          case specialDay: SpecialDay.Chanukah =>
+            Some(specialDay.getWeekdayReading(isRoshChodesh))
+
+          case specialDay: SpecialDay.PesachIntermediate =>
+            Some(specialDay.getWeekdayReading(isPesachOnChamishi))
+          case _ => None
+        }
+      }
     }
 
     val morningReading: Option[Reading] = specialReading.orElse(weeklyReading.map(_.getReading))
+    // TODO special parshiot and Shabbos Hagodol
+
+    val afternoonSpecial: Option[Reading] = specialDay flatMap { specialDay => specialDay match {
+      case specialDay: SpecialDay.AfternoonReading => Some(specialDay.getAfternoonReading)
+      case _ => None
+    }}
+
+    // TODO On Festival that falls on Shabbos, afternoon reading is that of the Shabbos - except on Yom Kippur.
+    // TODO afternoon reading o fthe next weekly portion (which needs to be present in the data)
 
     DaySchedule(
       day,
@@ -129,6 +118,12 @@ object Schedule {
       afternoon = afternoonSpecial
     )
   }
+
+  def shabbosRoshChodesh(weeklyReading: Option[WeeklyReading]): Reading = Reading(
+    torah = Custom.ofCommon(Seq()), //TODO: aliyot from the weekly reading
+    maftir = RoshChodesh.shabbosMaftir,
+    haftarah = RoshChodesh.shabbosHaftarah
+  )
 
   private def scheduleData(from: Day, to: Day, inHolyLand: Boolean): ScheduleData = {
     val fromYear: Year = if (ShabbosBereishis.date(from.year) <= from) from.year else from.year-1
@@ -195,8 +190,6 @@ object Schedule {
     println()
 //    println(SpecialDay.SheminiAtzeres.getReading(false).maftir.get.toString(Language.English.toSpec))
     println()
-
-    val x = SpecialDay.RoshHashanah1.aliyot(true)
 
     val year = Year(5779)
     val day = year.month(Month.Name.Marheshvan).day(25)

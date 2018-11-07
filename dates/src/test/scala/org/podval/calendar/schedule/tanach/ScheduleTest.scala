@@ -11,12 +11,14 @@ import SpecialDay._
 final class ScheduleTest extends FlatSpec with Matchers {
 
   "Torah readings" should "be assigned correctly" in {
+    val start = System.currentTimeMillis()
     (2 to 6000) foreach { number =>
       val year = Year(number)
 
       verify(year, inHolyLand = false)
       verify(year, inHolyLand = true)
     }
+    println("Time in ms: " + (System.currentTimeMillis()-start))
   }
 
   def verify(year: Year, inHolyLand: Boolean): Unit = {

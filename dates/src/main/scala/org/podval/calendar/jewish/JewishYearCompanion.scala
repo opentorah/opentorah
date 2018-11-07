@@ -13,7 +13,17 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
     for (isLeap <- Seq(true, false); kind <- Kind.values) yield (isLeap, kind)
 
   // KH 8:5-6
-  protected final override def monthNamesAndLengths(character: YearCharacter):
+  protected final override def monthNamesAndLengths(character: YearCharacter): Seq[MonthNameAndLength] =
+    // year structures are memoized instead of being calculated each time; no change in performance...
+    character2monthNamesAndLengths(character)
+
+  private val character2monthNamesAndLengths: Map[YearCharacter, Seq[MonthNameAndLength]] =
+    (for (isLeap <- Set(true, false); kind <- Kind.values) yield {
+      val character = (isLeap, kind)
+      character -> calculateMonthNamesAndLengths(character)
+    }).toMap
+
+  private def calculateMonthNamesAndLengths(character: YearCharacter):
     Seq[MonthNameAndLength] =
   {
     character match { case (isLeap: Boolean, kind: Kind) =>
