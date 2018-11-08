@@ -10,6 +10,7 @@ sealed class Custom(val parent: Option[Custom]) extends Named {
 
 // TODO we need some consistency in the naming of customs: if Bavlim, then maybe Sefaradim?
 object Custom extends NamedCompanion {
+
   // I don't think it worth it to move parent definitions into the XML file...
   // child < parent does not induce total order...
 
@@ -44,14 +45,16 @@ object Custom extends NamedCompanion {
 
   type Of[T] = Map[Custom, T]
 
-  def ofCommon[T](value: T): Custom.Of[T] = Map(Common -> value)
+  def common[T](value: T): Custom.Of[T] = Map(Common -> value)
 
-  def find[T](customs: Of[T], custom: Custom): Custom = find(customs.keySet, custom)
+  def find[T](customs: Of[T], custom: Custom): Custom = doFind(customs.keySet, custom)
 
-  def find(customs: Set[Custom], custom: Custom): Custom = {
+  def lift[A, B, C](a: Of[A], b: Of[B], f: (A, B) => C): Of[C] = ???
+
+  private def doFind(customs: Set[Custom], custom: Custom): Custom = {
     if (customs.contains(custom)) custom else {
       require(custom.parent.isDefined, s"Custom $custom is missing from $customs")
-      find(customs, custom.parent.get)
+      doFind(customs, custom.parent.get)
     }
   }
 
@@ -93,7 +96,7 @@ object Custom extends NamedCompanion {
       require(b.intersect(a).isEmpty, s"Overlaping sets of customs: $a and $b")
     }))
     val all: Set[Custom] = addParents(sets.flatten)
-    if (full) values.foreach(custom => find(all, custom))
+    if (full) values.foreach(custom => doFind(all, custom))
   }
 
   def common[T](map: Sets[T]): T = map(map.keySet.find(_.contains(Custom.Common)).get)

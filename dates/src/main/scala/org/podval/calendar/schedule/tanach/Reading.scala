@@ -34,7 +34,7 @@ object Reading {
   }
 
   def apply(torah: Torah, maftir: ChumashSpan.BookSpan, haftarah: Haftarah.Customs): Reading =
-    apply(Custom.ofCommon(torah), maftir, haftarah)
+    apply(Custom.common(torah), maftir, haftarah)
 
   def apply(torah: Custom.Of[Torah], maftir: ChumashSpan.BookSpan, haftarah: Haftarah.Customs): Reading = {
     // TODO handle the case when there are Torah customs not represented in Haftarah
@@ -67,7 +67,7 @@ object Reading {
     haftarah = haftarah
   )
 
-  def apply(torah: Torah): Reading = Reading(Custom.ofCommon(torah))
+  def apply(torah: Torah): Reading = Reading(Custom.common(torah))
 
   def apply(torah: Custom.Of[Torah]): Reading = {
     val customs = torah.mapValues(torah => ReadingCustom(torah, maftirAndHaftarah = None))

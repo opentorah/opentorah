@@ -78,7 +78,7 @@ object Schedule {
       if (isShabbos) {
         specialDay match {
           case specialDay: SpecialDay.ShabbosReading =>
-            Some(specialDay.getShabbosReading)
+            Some(specialDay.shabbos)
 
           case specialDay: SpecialDay.Chanukah =>
             require(weeklyReading.isDefined)
@@ -89,7 +89,7 @@ object Schedule {
       } else {
         specialDay match {
           case specialDay: WeekdayReading =>
-            Some(specialDay.getWeekdayReading)
+            Some(specialDay.weekday)
 
           case specialDay: SpecialDay.Chanukah =>
             Some(specialDay.getWeekdayReading(isRoshChodesh))
@@ -120,7 +120,7 @@ object Schedule {
   }
 
   def shabbosRoshChodesh(weeklyReading: Option[WeeklyReading]): Reading = Reading(
-    torah = Custom.ofCommon(Seq()), //TODO: aliyot from the weekly reading
+    torah = Custom.common(Seq()), //TODO: aliyot from the weekly reading
     maftir = RoshChodesh.shabbosMaftir,
     haftarah = RoshChodesh.shabbosHaftarah
   )
