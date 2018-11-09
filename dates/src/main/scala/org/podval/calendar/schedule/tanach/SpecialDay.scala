@@ -10,8 +10,9 @@ import org.podval.calendar.jewish.{JewishDay, JewishYear}
 import scala.xml.Elem
 
 // TODO корректору:
-// 1) verify Torah for Shemini Atzeres, Pesach8 and Shavuos 2!
-// 2) TODO verify Chanukah: it seems that for 1 < dayNumber < 8, there is no difference between the customs?!
+// 1) verify Torah for Shemini Atzeres, Pesach8 and Shavuos 2.
+// 2) verify Torah for Chanukah, 1 < dayNumber < 8: it seems that there is no difference between the customs?!
+// 3) verify Chanukah in all details: Shabbos, Rosh Chodesh, Shabbos Rosh Codesh, Shabbos Erev Rosh Chodesh...
 
 // TODO number of aliyot: Shabbos and Simchas Torah - 7; Yom Kippur - 6 (even on Shabbos); Yom Tov - 5;
 // Intermediate and Rosh Chodesh - 4; Chanukkah, Purim, Fast, Sheni/Chamishi and Shabbos afternoon - 3.
@@ -164,15 +165,17 @@ object SpecialDay {
 
     def in3aliyot: Torah = Seq(torah(0)+torah(1)+torah(2), torah(3)+torah(4), torah(5))
 
+    def shabbosChanukahTorah: ChumashSpan.BookSpan = torah(4)+torah(5)
+
     def shabbosRoshChodesh(weeklyReading: Option[WeeklyReading]): Reading = Reading(
       torah = Custom.common(Seq()), //TODO: aliyot from the weekly reading
       maftir = RoshChodesh.shabbosMaftir,
       haftarah = RoshChodesh.shabbosHaftarah
     )
 
-    private val shabbosMaftir: ChumashSpan.BookSpan = torah(4)+torah(5)
+    val shabbosMaftir: ChumashSpan.BookSpan = torah(4)+torah(5)
 
-    private val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
+    val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Isaiah" fromChapter="66">
         <part n="1" fromVerse="1" toVerse="24"/>
         <part n="2" fromVerse="23" toVerse="23"/>
@@ -560,25 +563,17 @@ object SpecialDay {
     override def date(year: Year): Day = Chanukah1.date(year)+(dayNumber-1)
 
     final def shabbos(weeklyReading: WeeklyReading, isRoshChodesh: Boolean): Reading = {
-      if (!isRoshChodesh) {
-        // Replace maftir and haftarah
-        val shabbosMaftir: ChumashSpan.BookSpan = full(dayNumber)
-        val shabbosHaftarah: Haftarah.Customs =
-          if (dayNumber < 8) Chanukah.haftarahShabbos1 else Chanukah.haftarahShabbos2
+      val reading = weeklyReading.getReading
 
-        Reading(
-          torah = weeklyReading.getReading.customs.mapValues(_.torah),
-          maftir = shabbosMaftir,
-          haftarah = shabbosHaftarah
+      val result =
+        if (!isRoshChodesh) reading
+        else reading.transformTorah(torah =>
+          torah.take(5) :+ (torah(5)+torah(6)) :+ RoshChodesh.shabbosChanukahTorah
         )
-      } else {
-        // TODO for all customs:
-        //  val torah = weeklyReading...
-        //  torah = torah.take(5) :+ (torah(5)+torah(6))
-        //  maftir = Some(RoshChodesh.shabbosMaftir),
-        //  add Shabbos Rosh Chodesh Haftara to the one there already
-        ???
-      }
+
+      result
+        .replaceMaftir(full(dayNumber))
+        .replaceHaftarah(if (dayNumber < 8) Chanukah.haftarahShabbos1 else Chanukah.haftarahShabbos2)
     }
 
     final def weekday(isRoshChodesh: Boolean): Reading = {

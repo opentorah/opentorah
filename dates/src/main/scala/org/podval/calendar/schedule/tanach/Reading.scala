@@ -11,6 +11,29 @@ final class Reading private(val customs: Custom.Of[Reading.ReadingCustom]) {
     customs.toSeq.map { case (custom, readingCustom) =>
       custom.toString(spec) + ": " + readingCustom.toString(spec)
     }.mkString("\n")
+
+  def transformTorah(transformer: Reading.Torah => Reading.Torah): Reading = new Reading(customs.mapValues { reading =>
+    reading.copy(torah = transformer(reading.torah))
+  })
+
+  def replaceMaftir(maftir: ChumashSpan.BookSpan): Reading = new Reading(customs.mapValues { reading =>
+    reading.copy(maftirAndHaftarah = Some(reading.maftirAndHaftarah.get.copy(maftir = maftir)))
+  })
+
+  def replaceHaftarah(haftarah: Haftarah.Customs): Reading = transform(haftarah, { case (reading, newHaftarah) =>
+    reading.copy(maftirAndHaftarah = Some(reading.maftirAndHaftarah.get.copy(haftarah = newHaftarah)))
+  })
+
+  def transform(
+    haftarah: Haftarah.Customs,
+    transformer: (Reading.ReadingCustom, Reading.Haftarah) => Reading.ReadingCustom
+  ): Reading = new Reading(
+    Custom.lift[Reading.ReadingCustom, Reading.Haftarah, Reading.ReadingCustom](
+      customs,
+      haftarah,
+      transformer
+    )
+  )
 }
 
 object Reading {

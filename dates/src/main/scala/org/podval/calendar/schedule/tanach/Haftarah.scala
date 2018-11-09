@@ -7,9 +7,15 @@ import org.podval.judaica.metadata.{Attributes, Metadata, XML}
 import scala.xml.Elem
 
 object Haftarah {
-  type Customs = Custom.Of[Seq[ProphetSpan.BookSpan]]
+  type Haftarah = Seq[ProphetSpan.BookSpan]
 
-  type OptionalCustoms = Custom.Of[Option[Seq[ProphetSpan.BookSpan]]]
+  type Customs = Custom.Of[Haftarah]
+
+  type OptionalCustoms = Custom.Of[Option[Haftarah]]
+
+  def add(first: Customs, second: Customs): Customs = Custom.lift[Haftarah, Haftarah, Haftarah](first, second,
+    { case (first: Haftarah, second: Haftarah) => first ++ second }
+  )
 
   final def forParsha(parsha: Parsha): Customs = haftarah(parsha)
 
