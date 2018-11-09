@@ -7,6 +7,7 @@ final case class Aliyot(bookSpan: ChumashSpan.BookSpan, aliyot: Seq[Span])
 
 object Aliyot {
 
+  // TODO unify with Torah from other places
   type Torah = Seq[ChumashSpan.BookSpan]
 
   def toString(torah: Torah): String = toString(torah, LanguageSpec.empty)
