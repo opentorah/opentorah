@@ -225,7 +225,9 @@
     <maftir fromChapter="32" fromVerse="48"/>
   </week>
 
-  <!-- Read on Simchas Torah; Maftir is NOT what it says here :) -->
+  <!-- TODO fold into SpecialDay SimchasTorah
+       Maftir is NOT what it says here :)
+  -->
   <week fromChapter="33" fromVerse="1">
     <name lang="he">וזאת הברכה</name>
     <name lang="en" transliterated="true">Vezos Haberachah</name>
