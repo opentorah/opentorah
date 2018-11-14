@@ -19,6 +19,7 @@ object Schedule {
     day: Day,
     morning: Option[Reading],
     afternoon: Option[Reading]
+    // TODO add Chitas!
   )
 
   def apply(from: Day, to: Day, inHolyLand: Boolean): Schedule = createBuilder(from, to, inHolyLand).build
@@ -57,32 +58,28 @@ object Schedule {
       val isShabbos: Boolean = day.isShabbos
       if (!isShabbos) require(weeklyReading.isEmpty && specialShabbos.isEmpty)
 
-      val isRoshChodesh: Boolean = day.isRoshChodesh
-      val isSheniOrChamishi: Boolean = Set[Day.Name](Day.Name.Sheni, Day.Name.Chamishi).contains(day.name)
-
       DaySchedule(
         day,
         morning = SpecialDay.getMorningReading(
+          day = day,
           specialDay = specialDay,
           specialShabbos = specialShabbos,
           weeklyReading = weeklyReading,
           nextWeeklyReading = nextWeeklyReading,
-          isShabbos = isShabbos,
-          isRoshChodesh = isRoshChodesh,
-          isPesachOnChamishi = isPesachOnChamishi,
-          isSheniOrChamishi = isSheniOrChamishi
+          isPesachOnChamishi = isPesachOnChamishi
         ),
         afternoon = SpecialDay.getAfternoonReading(
+          day = day,
           specialDay = specialDay,
-          nextWeeklyReading = nextWeeklyReading,
-          isShabbos = isShabbos
+          nextWeeklyReading = nextWeeklyReading
         )
       )
     }
 
     private def nextWeeklyReadingFor(day: Day): WeeklyReading = {
       val nextShabbos = day.shabbosAfter
-      weeklyReadings.getOrElse(nextShabbos, nextWeeklyReadingFor(nextShabbos))
+      val result = weeklyReadings.get(nextShabbos)
+      if (result.isDefined) result.get else nextWeeklyReadingFor(nextShabbos)
     }
   }
 
@@ -92,9 +89,6 @@ object Schedule {
     festivals: Map[Day, FestivalOrIntermediate]
   )
 
-  // TODO we need to keep some days after 'to':
-  // - next Shabbos with weekly reading for the sheni/chamishi;
-  // - festival etc. for tachanun...
   private def createBuilder(from: Day, to: Day, inHolyLand: Boolean): Builder = {
     val fromYear: Year = if (ShabbosBereishis.date(from.year) <= from) from.year else from.year - 1
     val toYear: Year = if (to < ShabbosBereishis.date(to.year)) to.year else to.year + 1
@@ -118,7 +112,10 @@ object Schedule {
     }
 
     def filter[T](from: Day, to: Day, data: Seq[Map[Day, T]]): Map[Day, T] = {
-      val result = data.head.filterKeys(from <= _) +: data.tail.init :+ data.last.filterKeys(_ <= to)
+      // TODO we need to keep some days after 'to':
+      // - next Shabbos with weekly reading for the sheni/chamishi;
+      // - festival etc. for tachanun...
+      val result = data // TODO .head.filterKeys(from <= _) +: data.tail.init :+ data.last.filterKeys(_ <= to)
       result.flatten.toMap
     }
 
@@ -140,8 +137,12 @@ object Schedule {
   }
 
   // Used by tests only
-  def weeklyReadingsForYear(year: Year, inHolyLand: Boolean): Map[Day, WeeklyReading] =
-    createBuilder(year.firstDay, year.lastDay, inHolyLand).weeklyReadings
+  def weeklyReadingsForYear(year: Year, inHolyLand: Boolean): Map[Day, WeeklyReading] = {
+    val from = year.firstDay
+    val to = year.lastDay
+    val result = createBuilder(from, to, inHolyLand).weeklyReadings
+    result.filterKeys(from <= _).filterKeys(_ <= to)
+  }
 
 
 
@@ -149,7 +150,7 @@ object Schedule {
     println(custom.toString(spec))
     for (parsha <- Parsha.values) {
       val haftarah: Haftarah.Customs = Haftarah.forParsha(parsha)
-      val customEffective: Custom = Custom.find(haftarah, custom)
+      val customEffective: Custom = Custom.effective(haftarah, custom)
       val spansOpt: Seq[ProphetSpan.BookSpan] = haftarah(customEffective)
       val result: String = ProphetSpan.toString(spansOpt, spec)
 

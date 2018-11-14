@@ -185,7 +185,7 @@ final class DatesTest extends FlatSpec with Matchers {
   }
 
   // Shulchan Aruch, Orach Chaim, 428:3
-  "Festivals" should "follow the rule" in {
+  "Festivals" should "satisfy the rules" in {
     years foreach { year =>
       val pesach: Day = Pesach(year)
       TishaBeAv(year).name shouldBe pesach.name

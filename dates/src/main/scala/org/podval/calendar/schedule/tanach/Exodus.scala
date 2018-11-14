@@ -6,14 +6,14 @@ object Exodus extends TorahReadings {
   val parshasHachodeshMaftir: ChumashSpan.BookSpan = parseMaftir(
       <maftir book="Exodus" fromChapter="12" fromVerse="1" toVerse="20"/>)
 
-  val pesach1torah: (Torah, Torah) = parseTorahForShabbosAndWeekday(
+  val pesach1torah: (Torah, Torah) = parseTorahForShabbosAndWeekday(4, 7,
     <torah book="Exodus" fromChapter="12" fromVerse="21" toVerse="51">
       <aliyah n="2" fromVerse="25"/>
       <aliyah n="3" fromVerse="29"/>
-      <aliyah n="4" fromVerse="33" shabbos="true"/>
+      <aliyah n="4" fromVerse="33"/>
       <aliyah n="5" fromVerse="37"/>
       <aliyah n="6" fromVerse="43"/>
-      <aliyah n="7" fromVerse="48" shabbos="true"/>
+      <aliyah n="7" fromVerse="48"/>
     </torah>)
 
   val pesach3torah: Torah = parseTorah(
@@ -22,11 +22,11 @@ object Exodus extends TorahReadings {
       <aliyah n="3" fromVerse="11"/>
     </torah>)
 
-  val pesach7torah: (Torah, Torah) = parseTorahForShabbosAndWeekday(
+  val pesach7torah: (Torah, Torah) = parseTorahForShabbosAndWeekday(2, 4,
     <torah book="Exodus" fromChapter="13" fromVerse="17" toChapter="15" toVerse="26">
-      <aliyah n="2" fromChapter="13" fromVerse="20" shabbos="true"/>
+      <aliyah n="2" fromChapter="13" fromVerse="20"/>
       <aliyah n="3" fromChapter="14" fromVerse="1"/>
-      <aliyah n="4" fromChapter="14" fromVerse="5" shabbos="true"/>
+      <aliyah n="4" fromChapter="14" fromVerse="5"/>
       <aliyah n="5" fromChapter="14" fromVerse="9"/>
       <aliyah n="6" fromChapter="14" fromVerse="15"/>
       <aliyah n="7" fromChapter="14" fromVerse="26"/>

@@ -9,23 +9,27 @@ object Deuteronomy extends TorahReadings {
       <aliyah n="3" fromVerse="36"/>
     </torah>)
 
-  val sheminiAtzeresTorah: (Torah, Torah) = parseTorahForShabbosAndWeekday(
+  private val festivalEndShabbosTorahTorah: Torah = parseTorah(
     <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17">
-      <aliyah n="2" fromChapter="15" fromVerse="1" shabbos="true"/>
-      <aliyah n="3" fromChapter="15" fromVerse="19" shabbos="true"/>
+      <aliyah n="2" fromChapter="15" fromVerse="1"/>
+      <aliyah n="3" fromChapter="15" fromVerse="19"/>
       <aliyah n="4" fromChapter="16" fromVerse="1"/>
       <aliyah n="5" fromChapter="16" fromVerse="4"/>
       <aliyah n="6" fromChapter="16" fromVerse="9"/>
       <aliyah n="7" fromChapter="16" fromVerse="13"/>
     </torah>)
 
+  val sheminiAtzeresTorah: (Torah, Torah) = (festivalEndShabbosTorahTorah, drop(festivalEndShabbosTorahTorah, Set(2, 3)))
+
+  val festivalEndTorah: (Torah, Torah) = (festivalEndShabbosTorahTorah, festivalEndShabbosTorahTorah.drop(2))
+
   val parshasZachorMaftir: ChumashSpan.BookSpan = parseMaftir(
       <maftir book="Deuteronomy" fromChapter="25" fromVerse="17" toVerse="19"/>)
 
-  // TODO 7th aliyah is swallowed by the 6th, BUT ALSO 2nd one starts at posuk 5 instead of 8?!
+  // TODO squash 6th and 7th together, like elsewhere!
   val zosHaberachaIn6: Torah = parseTorah(
     <torah book="Deuteronomy" fromChapter="33" fromVerse="1" toChapter="34" toVerse="12">
-      <aliyah n="2" fromChapter="33" fromVerse="5"/>
+      <aliyah n="2" fromChapter="33" fromVerse="8"/>
       <aliyah n="3" fromChapter="33" fromVerse="13"/>
       <aliyah n="4" fromChapter="33" fromVerse="18"/>
       <aliyah n="5" fromChapter="33" fromVerse="22"/>

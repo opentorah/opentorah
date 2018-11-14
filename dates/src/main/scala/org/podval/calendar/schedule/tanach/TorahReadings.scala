@@ -9,21 +9,8 @@ import scala.xml.Elem
 trait TorahReadings {
   type Torah = Seq[ChumashSpan.BookSpan]
 
-  protected final def parseTorahForShabbosAndWeekday(element: Elem): (Torah, Torah) = {
-    val (attributes: Attributes, elements: Seq[Elem]) = XML.open(element, "torah")
-    val bookSpan: ChumashSpan.BookSpan = ChumashSpan.parse(attributes).resolve
-    attributes.close()
-
-    val fromChapter: Int = bookSpan.span.from.chapter
-    def parseNumberedWithShabbos(attributes: Attributes): (Span.Numbered, Boolean) =
-      (parseNumbered(fromChapter)(attributes), attributes.doGetBoolean("shabbos"))
-
-    val result: Seq[(Span.Numbered, Boolean)] =
-      elements.map(element => XML.parseEmpty(element, "aliyah", parseNumberedWithShabbos))
-    val shabbosAliyot: Torah = Aliyot.parse(bookSpan, result.map(_._1), number = Some(7))
-    val toDrop: Set[Int] = result.filter(_._2).map(_._1.n).toSet
-    (shabbosAliyot, drop(shabbosAliyot, toDrop))
-  }
+  protected final def parseTorahForShabbosAndWeekday(drop1: Int, drop2: Int, element: Elem): (Torah, Torah) =
+    parseTorahForShabbosAndWeekday(Set(drop1, drop2), element)
 
   protected final def parseTorahForShabbosAndWeekday(toDrop: Set[Int], element: Elem): (Torah, Torah) = {
     val shabbosAliyot: Torah = parseTorah(element)
@@ -35,7 +22,8 @@ trait TorahReadings {
     val bookSpan: ChumashSpan.BookSpan = ChumashSpan.parse(attributes).resolve
     attributes.close()
     val fromChapter: Int = bookSpan.span.from.chapter
-    val result = elements.map(element => XML.parseEmpty(element, "aliyah", parseNumbered(fromChapter)))
+    val result: Seq[Span.Numbered] =
+      elements.map(element => XML.parseEmpty(element, "aliyah", parseNumbered(fromChapter)))
     Aliyot.parse(bookSpan, result, number = None)
   }
 
@@ -48,10 +36,17 @@ trait TorahReadings {
     )
   }
 
-  private def drop(torah: Torah, toDrop: Set[Int]): Torah = {
-    require(!toDrop.contains(1))
-    // TODO incorrect!!!
-    torah.zipWithIndex.filterNot { case (_, index: Int) => toDrop.contains(index + 1) }.map(_._1)
+  protected final def drop(torah: Torah, toDrop: Set[Int]): Torah = {
+    def drop(what: Seq[(ChumashSpan.BookSpan, Boolean)]): Seq[ChumashSpan.BookSpan] = what match {
+      case (a1, d1) :: (a2, d2) :: tail =>
+        if (d2) drop((a1+a2, d1) +: tail)
+        else a1 +: drop((a2, d2) +: tail)
+      case (a1, d1) :: Nil =>
+        Seq(a1)
+    }
+    val withDrop = torah.zipWithIndex.map { case (a, i) => (a, toDrop.contains(i+1)) }
+    require(!withDrop.head._2)
+    drop(withDrop)
   }
 
   protected final def parseMaftir(element: Elem): ChumashSpan.BookSpan =

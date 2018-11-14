@@ -2,19 +2,23 @@ package org.podval.judaica.metadata.tanach
 
 import org.podval.judaica.metadata.{NamedCompanion, Named, Names, Util}
 
+// Assumptions: no cycles; only Common doesn't have parent.
 sealed class Custom(val parent: Option[Custom]) extends Named {
   final override def names: Names = Custom.toNames(this)
 
-  lazy val children: Set[Custom] = Custom.values.filter(_.parent.contains(this)).toSet
+  final lazy val children: Set[Custom] = Custom.values.filter(_.parent.contains(this)).toSet
+
+  final def isLeafe: Boolean = children.isEmpty
 }
 
 // TODO we need some consistency in the naming of customs: if Bavlim, then maybe Sefaradim?
 object Custom extends NamedCompanion {
 
-  // I don't think it worth it to move parent definitions into the XML file...
-  // child < parent does not induce total order...
-
   override type Key = Custom
+
+  type Of[T] = Map[Custom, T]
+
+  type Sets[T] = Map[Set[Custom], T]
 
   case object Common extends Custom(None)
     case object Ashkenaz extends Custom(Some(Common))
@@ -43,13 +47,17 @@ object Custom extends NamedCompanion {
     Sefard, RavNaeHolyLand, Chabad,
     Magreb, Algeria, Toshbim, Djerba, Morocco, Fes, Bavlim, Teiman, Baladi, Shami)
 
-  type Of[T] = Map[Custom, T]
+  val leaves: Set[Custom] = values.toSet.filter(_.isLeafe)
 
   def common[T](value: T): Custom.Of[T] = Map(Common -> value)
 
-  def find[T](customs: Of[T], custom: Custom): Custom = doFind(customs.keySet, custom)
+  def find[T](customs: Of[T], custom: Custom): T = customs(effective(customs, custom))
 
-  def lift[A, B, C](a: Of[A], b: Of[B], f: (A, B) => C): Of[C] = ???
+  def effective[T](customs: Of[T], custom: Custom): Custom = doFind(customs.keySet, custom)
+
+  def lift[A, B, C](a: Of[A], b: Of[B], f: (Custom, A, B) => C): Of[C] = leaves.map { custom =>
+    custom -> f(custom, find(a, custom), find(b, custom))
+  }.toMap // TODO minimize?
 
   private def doFind(customs: Set[Custom], custom: Custom): Custom = {
     if (customs.contains(custom)) custom else {
@@ -70,18 +78,16 @@ object Custom extends NamedCompanion {
   }
 
   private def addParents(customs: Set[Custom]): Set[Custom] = {
+    def addOneParent(customs: Set[Custom]): (Set[Custom], Boolean) = values
+      .find { custom =>
+        !customs.contains(custom) && !custom.isLeafe && Util.contains(customs, custom.children)
+      }
+      .fold((customs, false))(missing => (customs + missing, true))
+
     val (result, added) = addOneParent(customs)
     if (!added) result else addParents(result)
   }
 
-  private def addOneParent(customs: Set[Custom]): (Set[Custom], Boolean) = values
-    .find { custom =>
-      val children = custom.children
-      !customs.contains(custom) && children.nonEmpty && Util.contains(customs, children)
-    }
-    .fold((customs, false))(missing => (customs + missing, true))
-
-  type Sets[T] = Map[Set[Custom], T]
 
   def denormalize[T](map: Sets[T], full: Boolean): Of[T] = {
     check(map, full)

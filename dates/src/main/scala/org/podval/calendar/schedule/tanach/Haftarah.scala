@@ -13,10 +13,6 @@ object Haftarah {
 
   type OptionalCustoms = Custom.Of[Option[Haftarah]]
 
-  def add(first: Customs, second: Customs): Customs = Custom.lift[Haftarah, Haftarah, Haftarah](first, second,
-    { case (first: Haftarah, second: Haftarah) => first ++ second }
-  )
-
   final def forParsha(parsha: Parsha): Customs = haftarah(parsha)
 
   private lazy val haftarah: Map[Parsha, Customs] = Metadata.loadMetadata(
@@ -36,7 +32,7 @@ object Haftarah {
     parse(attributes, elements, full = full)
   }
 
-  // TODO clean up code duplication
+  // TODO clean up code duplication - better, remove parsing of "empty", and assume None for Common if not specified explicitly!
 
   def parseOptional(attributes: Attributes, elements: Seq[Elem], full: Boolean): OptionalCustoms = {
     val span = ProphetSpan.parse(attributes)
@@ -59,7 +55,7 @@ object Haftarah {
     Custom.denormalize(result, full)
   }
 
-  def parse(attributes: Attributes, elements: Seq[Elem], full: Boolean): Customs = {
+  private def parse(attributes: Attributes, elements: Seq[Elem], full: Boolean): Customs = {
     val span = ProphetSpan.parse(attributes)
     attributes.close()
 

@@ -16,19 +16,11 @@ final class Reading private(val customs: Custom.Of[Reading.ReadingCustom]) {
     reading.copy(torah = transformer(reading.torah))
   })
 
-  def replaceMaftir(maftir: ChumashSpan.BookSpan): Reading = new Reading(customs.mapValues { reading =>
-    reading.copy(maftirAndHaftarah = Some(reading.maftirAndHaftarah.get.copy(maftir = maftir)))
-  })
-
-  def replaceHaftarah(haftarah: Haftarah.Customs): Reading = transform(haftarah, { case (reading, newHaftarah) =>
-    reading.copy(maftirAndHaftarah = Some(reading.maftirAndHaftarah.get.copy(haftarah = newHaftarah)))
-  })
-
-  def transform(
-    haftarah: Haftarah.Customs,
-    transformer: (Reading.ReadingCustom, Reading.Haftarah) => Reading.ReadingCustom
+  def transform[T](
+    haftarah: Custom.Of[T],
+    transformer: (Custom, Reading.ReadingCustom, T) => Reading.ReadingCustom
   ): Reading = new Reading(
-    Custom.lift[Reading.ReadingCustom, Reading.Haftarah, Reading.ReadingCustom](
+    Custom.lift[Reading.ReadingCustom, T, Reading.ReadingCustom](
       customs,
       haftarah,
       transformer
@@ -46,6 +38,15 @@ object Reading {
   ) {
     def toString(spec: LanguageSpec): String =
       "torah: " + ChumashSpan.toString(torah, spec) + maftirAndHaftarah.fold("")(it => " " + it.toString(spec))
+
+    def addHaftarah(haftaraAddition: Haftarah.Haftarah): ReadingCustom =
+      copy(maftirAndHaftarah = Some(maftirAndHaftarah.get.addHaftarah(haftaraAddition)))
+
+    def replaceMaftirAndHaftarah(maftir: ChumashSpan.BookSpan, haftarah: Haftarah.Haftarah): ReadingCustom =
+      copy(maftirAndHaftarah = Some(MaftirAndHaftarah(maftir, haftarah)))
+
+    def replaceHaftarah(haftarah: Haftarah.Haftarah): ReadingCustom =
+      copy(maftirAndHaftarah = Some(maftirAndHaftarah.get.replaceHaftarah(haftarah)))
   }
 
   final case class MaftirAndHaftarah(
@@ -54,6 +55,12 @@ object Reading {
   ) {
     def toString(spec: LanguageSpec): String =
       "maftir: " + maftir.toString(spec) + " haftarah: " + ProphetSpan.toString(haftarah, spec)
+
+    def addHaftarah(haftaraAddition: Haftarah.Haftarah): MaftirAndHaftarah =
+      copy(haftarah = haftarah ++ haftaraAddition)
+
+    def replaceHaftarah(haftarah: Haftarah.Haftarah): MaftirAndHaftarah =
+      copy(haftarah = haftarah)
   }
 
   def apply(torah: Torah, maftir: ChumashSpan.BookSpan, haftarah: Haftarah.Customs): Reading =
@@ -63,8 +70,8 @@ object Reading {
     // TODO handle the case when there are Torah customs not represented in Haftarah
     val keys: Set[Custom] = haftarah.keySet
     val customs = keys.map { custom =>
-      val torahCustom = torah(Custom.find(torah, custom))
-      val haftarahCustom = haftarah(Custom.find(haftarah, custom))
+      val torahCustom = Custom.find(torah, custom)
+      val haftarahCustom = Custom.find(haftarah, custom)
       custom -> ReadingCustom(
         torah = torahCustom,
         maftirAndHaftarah = Some(MaftirAndHaftarah(maftir = maftir, haftarah = haftarahCustom))
