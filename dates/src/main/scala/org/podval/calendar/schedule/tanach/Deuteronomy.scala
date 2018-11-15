@@ -1,6 +1,7 @@
 package org.podval.calendar.schedule.tanach
 
 import org.podval.judaica.metadata.tanach.BookSpan.ChumashSpan
+import org.podval.judaica.metadata.tanach.{Custom, Parsha}
 
 object Deuteronomy extends TorahReadings {
   val tishaBeAvTorah: Torah = parseTorah(
@@ -26,13 +27,6 @@ object Deuteronomy extends TorahReadings {
   val parshasZachorMaftir: ChumashSpan.BookSpan = parseMaftir(
       <maftir book="Deuteronomy" fromChapter="25" fromVerse="17" toVerse="19"/>)
 
-  // TODO squash 6th and 7th together, like elsewhere!
-  val zosHaberachaIn6: Torah = parseTorah(
-    <torah book="Deuteronomy" fromChapter="33" fromVerse="1" toChapter="34" toVerse="12">
-      <aliyah n="2" fromChapter="33" fromVerse="8"/>
-      <aliyah n="3" fromChapter="33" fromVerse="13"/>
-      <aliyah n="4" fromChapter="33" fromVerse="18"/>
-      <aliyah n="5" fromChapter="33" fromVerse="22"/>
-      <aliyah n="6" fromChapter="33" fromVerse="27"/>
-    </torah>)
+  // TODO check that there isn't anything other than Common:
+  val zosHaberachaIn6: Torah = TorahReadings.torah7to6(Parsha.VezosHaberachah.days(Custom.Common))
 }

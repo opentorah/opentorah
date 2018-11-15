@@ -7,7 +7,7 @@ import org.podval.judaica.metadata.tanach.{Aliyot, Span}
 import scala.xml.Elem
 
 trait TorahReadings {
-  type Torah = Seq[ChumashSpan.BookSpan]
+  type Torah = TorahReadings.Torah
 
   protected final def parseTorahForShabbosAndWeekday(drop1: Int, drop2: Int, element: Elem): (Torah, Torah) =
     parseTorahForShabbosAndWeekday(Set(drop1, drop2), element)
@@ -51,4 +51,10 @@ trait TorahReadings {
 
   protected final def parseMaftir(element: Elem): ChumashSpan.BookSpan =
     XML.parseEmpty(element, "maftir", ChumashSpan.parse).resolve
+}
+
+object TorahReadings {
+  type Torah = Seq[ChumashSpan.BookSpan]
+
+  def torah7to6(torah: Torah): Torah = torah.take(5) :+ (torah(5)+torah(6))
 }

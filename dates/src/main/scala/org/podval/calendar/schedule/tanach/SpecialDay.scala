@@ -502,7 +502,7 @@ object SpecialDay {
         haftarah = if (dayNumber < 8) Chanukah.haftarahShabbos1 else Chanukah.haftarahShabbos2)
 
       if (!isRoshChodesh) result
-      else result.transformTorah(torah => torah.take(5) :+ (torah(5)+torah(6)) :+ RoshChodesh.shabbosChanukahTorah)
+      else result.transformTorah(torah => TorahReadings.torah7to6(torah) :+ RoshChodesh.shabbosChanukahTorah)
     }
 
     final def weekday(isRoshChodesh: Boolean): Reading = {
@@ -903,6 +903,56 @@ object SpecialDay {
     else getWeekdayMorningReading(day, specialDay, nextWeeklyReading, isPesachOnChamishi)
   }
 
+  private final def getShabbosMorningReading(
+    day: Day,
+    specialDay: Option[Date],
+    weeklyReading: Option[WeeklyReading],
+    specialShabbos: Option[SpecialShabbos],
+  ): Reading = {
+    require(day.isShabbos)
+
+    val normal: Reading = specialDay.map {
+      case specialDay: ShabbosReading =>
+        require(weeklyReading.isEmpty)
+        specialDay.shabbos
+
+      case specialDay: Chanukah =>
+        require(weeklyReading.isDefined)
+        specialDay.shabbos(weeklyReading.get, day.isRoshChodesh)
+
+      case _ =>
+        throw new IllegalArgumentException("Must have Shabbos reading!")
+    }
+      .getOrElse {
+        require(weeklyReading.isDefined)
+        val result = weeklyReading.get.getReading
+        // TODO Chabad: on Shabbos Ki Teize (14th of Ellul) adds haftarah Reeh after the regular one.
+        result
+      }
+
+    val result = specialShabbos.fold(normal) {
+      case s: SpecialParsha => s.transform(normal)
+      case ShabbosHagodol =>
+        ShabbosHagodol.transform(isErevPesach = day.next == Pesach.date(day.year), normal)
+    }
+
+    val roshChodeshOf: Option[Month.Name] = {
+      val result = day.roshChodeshOf
+      // We do not mention Rosh Chodesh on Rosh Hashanah
+      if (result.contains(Tishrei)) None else result
+    }
+
+    val isSpecialShabbos: Boolean = specialShabbos.isDefined
+
+    val correctedForRoshChodesh = roshChodeshOf
+      .fold(result)(month =>
+        RoshChodesh.correct(month, isSpecialShabbos, result))
+
+    day.next.roshChodeshOf
+      .fold(correctedForRoshChodesh)(month =>
+        ErevRoshChodesh.correct(month, roshChodeshOf.isDefined, isSpecialShabbos, correctedForRoshChodesh))
+  }
+
   private final def getWeekdayMorningReading(
     day: Day,
     specialDay: Option[Date],
@@ -933,52 +983,6 @@ object SpecialDay {
         if (!isRoshChodesh) None else Some(RoshChodesh.weekday)
       }
   }
-
-  private final def getShabbosMorningReading(
-    day: Day,
-    specialDay: Option[Date],
-    weeklyReading: Option[WeeklyReading],
-    specialShabbos: Option[SpecialShabbos],
-  ): Reading = {
-    require(day.isShabbos)
-
-    val normal: Reading = specialDay.map {
-      case specialDay: ShabbosReading =>
-        require(weeklyReading.isEmpty)
-        specialDay.shabbos
-
-      case specialDay: Chanukah =>
-        require(weeklyReading.isDefined)
-        specialDay.shabbos(weeklyReading.get, day.isRoshChodesh)
-
-      case _ =>
-        throw new IllegalArgumentException("Must have Shabbos reading!")
-    }
-      .getOrElse(weeklyReading.get.getReading)
-
-    val result = specialShabbos.fold(normal) {
-      case s: SpecialParsha => s.transform(normal)
-      case ShabbosHagodol =>
-        ShabbosHagodol.transform(isErevPesach = day.next == Pesach.date(day.year), normal)
-    }
-
-    val roshChodeshOf: Option[Month.Name] = {
-      val result = day.roshChodeshOf
-      // We do not mention Rosh Chodesh on Rosh Hashanah
-      if (result.contains(Tishrei)) None else result
-    }
-
-    val isSpecialShabbos: Boolean = specialShabbos.isDefined
-
-    val correctedForRoshChodesh = roshChodeshOf
-      .fold(result)(month => RoshChodesh.correct(month, isSpecialShabbos, result))
-
-    day.next.roshChodeshOf
-      .fold(correctedForRoshChodesh)(month =>
-        ErevRoshChodesh.correct(month, roshChodeshOf.isDefined, isSpecialShabbos, correctedForRoshChodesh))
-  }
-
-  // TODO Chabad: on Shabbos Ki Teize (14th of Ellul) adds haftarah Reeh after the regular one.
 
   // On Festival that falls on Shabbos, afternoon reading is that of the Shabbos - except on Yom Kippur.
   def getAfternoonReading(

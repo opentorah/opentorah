@@ -17,6 +17,7 @@ object Schedule {
 
   final case class DaySchedule private(
     day: Day,
+    // TODO add day names!
     morning: Option[Reading],
     afternoon: Option[Reading]
     // TODO add Chitas!
