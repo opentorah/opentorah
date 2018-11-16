@@ -11,12 +11,14 @@ import SpecialDay._
 final class ScheduleTest extends FlatSpec with Matchers {
 
   "Torah readings" should "be assigned correctly" in {
+    val start = System.currentTimeMillis()
     (2 to 6000) foreach { number =>
       val year = Year(number)
 
       verify(year, inHolyLand = false)
       verify(year, inHolyLand = true)
     }
+    println("Time in ms: " + (System.currentTimeMillis()-start))
   }
 
   def verify(year: Year, inHolyLand: Boolean): Unit = {
@@ -26,23 +28,23 @@ final class ScheduleTest extends FlatSpec with Matchers {
     def isCombined(parsha: Parsha): Boolean = readings.exists(_._2.secondParsha.contains(parsha))
 
     // Pesach
-    val readingsBeforePesach: WeeklyReading = findReadings(shabbosBefore(Pesach.date(year)))
+    val readingsBeforePesach: WeeklyReading = findReadings(Pesach.date(year).shabbosBefore)
     readingsBeforePesach.isCombined shouldBe false
     readingsBeforePesach.parsha shouldBe {
       if (!year.isLeap) Tzav else if (RoshHashanah1.date(year).is(Day.Name.Chamishi)) Acharei else Metzora
     }
 
     // Shavuot
-    val readingsBeforeShavuot = findReadings(shabbosBefore(Shavuos.date(year)))
+    val readingsBeforeShavuot = findReadings(Shavuos.date(year).shabbosBefore)
     readingsBeforeShavuot.isCombined shouldBe false
     Set[Parsha](Bemidbar, Nasso).contains(readingsBeforeShavuot.parsha) shouldBe true
 
     // Tisha Be Av
-    findReadings(shabbosAfter(TishaBeAv.date(year))) shouldBe WeeklyReading(Va_eschanan, None)
+    findReadings(TishaBeAv.date(year).shabbosAfter) shouldBe WeeklyReading(Va_eschanan, None)
 
     // Rosh Ha Shanah
     val roshHaShanah: Day = RoshHashanah1.date(year+1)
-    findReadings(shabbosBefore(roshHaShanah)).parsha shouldBe Nitzavim
+    findReadings(roshHaShanah.shabbosBefore).parsha shouldBe Nitzavim
     isCombined(Vayeilech) shouldBe !roshHaShanah.is(Day.Name.Sheni) && !roshHaShanah.is(Day.Name.Shlishi)
 
     val combined: Set[Parsha] = readings.values.toSet.filter(_.isCombined).map(_.parsha)

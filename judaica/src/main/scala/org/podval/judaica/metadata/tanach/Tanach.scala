@@ -202,7 +202,7 @@ object Tanach extends NamedCompanion {
       val aliyot = metadata.aliyot
       val bookSpan = Span(
         parsha.span.from,
-        aliyot.last.span.to.getOrElse(parsha.days(Custom.Common).head.span.to)
+        aliyot.last.span.to.getOrElse(parsha.days.common.head.span.to)
       ).inBook(parsha.book)
       parsha -> Aliyot.parse(bookSpan, aliyot, number = Some(3))
     }
@@ -249,6 +249,7 @@ object Tanach extends NamedCompanion {
   private def combineDays(weeks: Seq[(Parsha, Custom.Sets[Seq[Span.Numbered]])]): Seq[Option[Custom.Of[Aliyot.Torah]]] = weeks match {
     case (parsha, days) :: (parshaNext, daysNext) :: tail =>
       val result: Option[Custom.Of[Aliyot.Torah]] = if (!parsha.combines) None else  {
+        // TODO express via lift() etc.
         // TODO Use defaults from days?
         val combined: Custom.Sets[Seq[Span.Numbered]] = daysNext ++ days.map { case (customs, value) =>
           (customs, value ++ daysNext.getOrElse(customs, Seq.empty))
@@ -280,6 +281,6 @@ object Tanach extends NamedCompanion {
       Aliyot.parse(bookSpan, WithNumber.overlay(with1, spans), Some(7))
     }
 
-    Custom.denormalize(result, full = true)
+    Custom.Of(result)
   }
 }

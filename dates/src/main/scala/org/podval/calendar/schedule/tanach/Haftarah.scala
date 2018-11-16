@@ -7,9 +7,9 @@ import org.podval.judaica.metadata.{Attributes, Metadata, XML}
 import scala.xml.Elem
 
 object Haftarah {
-  type Customs = Custom.Of[Seq[ProphetSpan.BookSpan]]
+  type Haftarah = Seq[ProphetSpan.BookSpan]
 
-  type OptionalCustoms = Custom.Of[Option[Seq[ProphetSpan.BookSpan]]]
+  type Customs = Custom.Of[Haftarah]
 
   final def forParsha(parsha: Parsha): Customs = haftarah(parsha)
 
@@ -20,40 +20,12 @@ object Haftarah {
     resourceName = Some("Haftarah")
   ).mapValues { metadata => parse(metadata.attributes, metadata.elements, full = true) }
 
-  def parseOptional(element: Elem, full: Boolean): Haftarah.OptionalCustoms = {
-    val (attributes, elements) = XML.open(element, "haftarah")
-    parseOptional(attributes, elements, full = full)
-  }
-
   def parse(element: Elem, full: Boolean): Haftarah.Customs = {
     val (attributes, elements) = XML.open(element, "haftarah")
     parse(attributes, elements, full = full)
   }
 
-  // TODO clean up code duplication
-
-  def parseOptional(attributes: Attributes, elements: Seq[Elem], full: Boolean): OptionalCustoms = {
-    val span = ProphetSpan.parse(attributes)
-    attributes.close()
-
-    val (partElements, customElements) = XML.span(elements, "part", "custom")
-
-    val common: Option[Seq[ProphetSpan.BookSpan]] =
-      if (partElements.isEmpty && customElements.isEmpty) Some(Seq(span.resolve)) else
-      if (partElements.isEmpty) None else Some(parseParts(partElements, span))
-
-    // TODO toMap() will silently ignore duplicates...
-    val customs: Custom.Sets[Option[Seq[ProphetSpan.BookSpan]]] = customElements.map(parseOptionalCustom(span)).toMap
-
-    val result: Custom.Sets[Option[Seq[ProphetSpan.BookSpan]]] = common.fold(customs) { common =>
-      // TODO updated() will silently ignore duplicates...
-      customs.updated(Set[Custom](Custom.Common), Some(common))
-    }
-
-    Custom.denormalize(result, full)
-  }
-
-  def parse(attributes: Attributes, elements: Seq[Elem], full: Boolean): Customs = {
+  private def parse(attributes: Attributes, elements: Seq[Elem], full: Boolean): Customs = {
     val span = ProphetSpan.parse(attributes)
     attributes.close()
 
@@ -71,30 +43,16 @@ object Haftarah {
       customs.updated(Set[Custom](Custom.Common), common)
     }
 
-    Custom.denormalize(result, full)
-  }
-
-  private def parseOptionalCustom(ancestorSpan: ProphetSpan.Parsed)(element: Elem): (Set[Custom], Option[Seq[ProphetSpan.BookSpan]]) = {
-    val (customs, attributes, elements) = open(element)
-
-    val result: Option[Seq[ProphetSpan.BookSpan]] =
-      if (attributes.getBoolean("empty").contains(true)) {
-        attributes.close()
-        None
-      } else Some(parseCustom(ancestorSpan, attributes, elements))
-
-    customs -> result
+    Custom.Of(result, full)
   }
 
   private def parseCustom(ancestorSpan: ProphetSpan.Parsed)(element: Elem): (Set[Custom], Seq[ProphetSpan.BookSpan]) = {
-    val (customs, attributes, elements) = open(element)
+    val (customs, attributes, elements) =  {
+      val (attributes, elements) = XML.open(element, "custom")
+      val customs: Set[Custom] = Custom.parse(attributes.doGet("n"))
+      (customs, attributes, elements)
+    }
     customs -> parseCustom(ancestorSpan, attributes, elements)
-  }
-
-  private def open(element: Elem): (Set[Custom], Attributes, Seq[Elem]) = {
-    val (attributes, elements) = XML.open(element, "custom")
-    val customs: Set[Custom] = Custom.parse(attributes.doGet("n"))
-    (customs, attributes, elements)
   }
 
   private def parseCustom(
