@@ -51,20 +51,38 @@ object Custom extends NamedCompanion {
       this
     }
 
-    final def minimize: Of[T] = {
-      this // TODO
-    }
+    final def minimize: Map[Custom, T] = {
+      def one(result: Map[Custom, T], custom: Custom, value: T): Map[Custom, T] =
+        result -- custom.children ++ Map(custom -> value)
 
-//    private def addParents: Of[T] = {
-//      def addOneParent: (Of[T], Boolean) = values
-//        .find { custom =>
-//          !customs.contains(custom) && !custom.isLeaf && Util.contains(customs.keySet, custom.children)
-//        }
-//        .fold((customs, false))(missing => (customs + missing, true))
-//
-//      val (result, added) = addOneParent
-//      if (!added) result else result.addParents
-//    }
+      def step(result: Map[Custom, T]): (Map[Custom, T], Boolean) = {
+        val toAdd: Set[(Custom, T)] = values.toSet.flatMap { custom: Custom =>
+          if (custom.isLeaf /*|| result.contains(custom)*/) None else {
+            val ts: Seq[Option[T]] = custom.children.toSeq.map(child => result.get(child))
+            if (!ts.forall(_.isDefined)) None else {
+              val tset: Set[T] = ts.map(_.get).toSet
+              if (tset.size != 1) None else Some((custom, tset.head))
+            }
+          }
+        }
+
+        if (toAdd.isEmpty) (result, false) else {
+          val out: Map[Custom, T] = toAdd.foldRight(result) { case ((custom, value), acc) =>
+            acc -- custom.children ++ Map(custom -> value)
+          }
+          (out, true)
+        }
+      }
+
+      def addParents(result: Map[Custom, T]): Map[Custom, T] = {
+        val (out: Map[Custom, T], more: Boolean) = step(result)
+        if (!more) out else addParents(out)
+      }
+
+      // TODO remove unaccessible ancestors
+
+      addParents(customs)
+    }
 
     final def lift[Q, R](b: Of[Q], f: (Custom, Option[T], Option[Q]) => R): Map[Custom, R] =
       lift[Q, Option[T], Option[Q], R](b, f, _.find(_), _.find(_))
@@ -120,9 +138,9 @@ object Custom extends NamedCompanion {
         case object ChayeyOdom extends Custom(Some(Lita)) { override def name: String = "Chayey Odom" }
       case object Hagra extends Custom(Some(Ashkenaz))
     case object Sefard extends Custom(Some(Common))
-      // According to some, this is prevaling Chabad custom:
-      case object RavNaeHolyLand extends Custom(Some(Chabad)) { override def name: String = "Rav Nae Holy Land" }
       case object Chabad extends Custom(Some(Sefard))
+        // According to some, this is prevaling Chabad custom:
+        case object RavNaeHolyLand extends Custom(Some(Chabad)) { override def name: String = "Rav Nae Holy Land" }
       case object Magreb extends Custom(Some(Sefard))
         case object Algeria extends Custom(Some(Magreb))
         case object Toshbim extends Custom(Some(Magreb))

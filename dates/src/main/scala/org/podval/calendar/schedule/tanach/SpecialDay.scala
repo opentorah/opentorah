@@ -899,8 +899,11 @@ object SpecialDay {
     nextWeeklyReading: WeeklyReading,
     isPesachOnChamishi: Boolean
   ): Option[Reading] = {
-    if (day.isShabbos) Some(getShabbosMorningReading(day, specialDay, weeklyReading, specialShabbos))
-    else getWeekdayMorningReading(day, specialDay, nextWeeklyReading, isPesachOnChamishi)
+    val result =
+      if (day.isShabbos) Some(getShabbosMorningReading(day, specialDay, weeklyReading, specialShabbos))
+      else getWeekdayMorningReading(day, specialDay, nextWeeklyReading, isPesachOnChamishi)
+
+    result.map(result => new Reading(result.minimize))
   }
 
   private final def getShabbosMorningReading(
@@ -997,7 +1000,9 @@ object SpecialDay {
       case _ => None
     }
 
-    specialReading.orElse { if (!day.isShabbos) None else Some(nextWeeklyReading.aliyot) }
+    val result = specialReading.orElse { if (!day.isShabbos) None else Some(nextWeeklyReading.aliyot) }
+
+    result.map(result => new Reading(result.minimize))
   }
 
   private val loadNames: Seq[LoadNames] = Seq(RoshChodesh, ErevRoshChodesh,

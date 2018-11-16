@@ -176,6 +176,6 @@ object Schedule {
     val day = year.month(Month.Name.Marheshvan).day(25)
     val schedule: Schedule = apply(year, inHolyLand = false)
     val daySchedule: DaySchedule = schedule.days(day)
-    println(daySchedule)
+    println(new Reading(daySchedule.morning.get.minimize))
   }
 }
