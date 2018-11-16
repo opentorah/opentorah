@@ -146,13 +146,12 @@ object Schedule {
   }
 
 
-
   def printHaftarahList(custom: Custom, spec: LanguageSpec, full: Boolean): Unit = {
     println(custom.toString(spec))
     for (parsha <- Parsha.values) {
       val haftarah: Haftarah.Customs = Haftarah.forParsha(parsha)
-      val customEffective: Custom = Custom.effective(haftarah, custom)
-      val spansOpt: Seq[ProphetSpan.BookSpan] = haftarah(customEffective)
+      val customEffective: Custom = haftarah.doFindKey(custom)
+      val spansOpt: Seq[ProphetSpan.BookSpan] = haftarah.doFind(customEffective)
       val result: String = ProphetSpan.toString(spansOpt, spec)
 
       if (customEffective == custom) {
@@ -164,7 +163,7 @@ object Schedule {
   }
 
   def main(args: Array[String]): Unit = {
-    println(Aliyot.toString(Parsha.Mattos.getDaysCombined(Custom.Ashkenaz), Language.Hebrew.toSpec))
+    println(Aliyot.toString(Parsha.Mattos.getDaysCombined.doFind(Custom.Ashkenaz), Language.Hebrew.toSpec))
     println()
     printHaftarahList(Custom.Shami, Language.Hebrew.toSpec, full = false)
     println()

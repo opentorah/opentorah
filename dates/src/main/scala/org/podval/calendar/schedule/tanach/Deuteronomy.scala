@@ -27,6 +27,5 @@ object Deuteronomy extends TorahReadings {
   val parshasZachorMaftir: ChumashSpan.BookSpan = parseMaftir(
       <maftir book="Deuteronomy" fromChapter="25" fromVerse="17" toVerse="19"/>)
 
-  // TODO check that there isn't anything other than Common:
-  val zosHaberachaIn6: Torah = TorahReadings.torah7to6(Parsha.VezosHaberachah.days(Custom.Common))
+  val zosHaberachaIn6: Torah = TorahReadings.torah7to6(Parsha.VezosHaberachah.days.common)
 }

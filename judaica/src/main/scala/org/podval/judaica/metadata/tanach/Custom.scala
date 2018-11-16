@@ -8,7 +8,7 @@ sealed class Custom(val parent: Option[Custom]) extends Named {
 
   final lazy val children: Set[Custom] = Custom.values.filter(_.parent.contains(this)).toSet
 
-  final def isLeafe: Boolean = children.isEmpty
+  final def isLeaf: Boolean = children.isEmpty
 }
 
 // TODO we need some consistency in the naming of customs: if Bavlim, then maybe Sefaradim?
@@ -16,7 +16,88 @@ object Custom extends NamedCompanion {
 
   override type Key = Custom
 
-  type Of[T] = Map[Custom, T]
+  class Of[T](val customs: Map[Custom, T]) {
+    final def find(custom: Custom): Option[T] =
+      customs.get(custom).orElse(custom.parent.flatMap(find))
+
+    final def doFind(custom: Custom): T = {
+      val result = find(custom)
+      require(result.nonEmpty, s"Missing custom: $custom")
+      result.get
+    }
+
+    final def common: T = doFind(Common)
+
+    final def findKey(custom: Custom): Option[Custom] =
+      if (customs.contains(custom)) Some(custom) else custom.parent.flatMap(findKey)
+
+    final def doFindKey(custom: Custom): Custom = {
+      val result = findKey(custom)
+      require(result.nonEmpty, s"Missing custom: $custom")
+      result.get
+    }
+
+    final def toLeaves: Of[T] =
+      new Of(leaves.flatMap(custom => find(custom).map(custom -> _)).toMap)
+
+    final def contains(custom: Custom): Boolean = find(custom).isDefined
+
+    final def keySet: Set[Custom] = leaves.filter(contains)
+
+    final def notCovered: Set[Custom] = leaves -- keySet
+
+    final def verifyFull: Of[T] = {
+      leaves.foreach(doFind)
+      this
+    }
+
+    final def minimize: Of[T] = ??? // add parents; remove unaccessible parents
+//    private def addParents(customs: Set[Custom]): Set[Custom] = {
+//      def addOneParent(customs: Set[Custom]): (Set[Custom], Boolean) = values
+//        .find { custom =>
+//          !customs.contains(custom) && !custom.isLeaf && Util.contains(customs, custom.children)
+//        }
+//        .fold((customs, false))(missing => (customs + missing, true))
+//
+//      val (result, added) = addOneParent(customs)
+//      if (!added) result else addParents(result)
+//    }
+
+    final def lift[Q, R](b: Of[Q], f: (Custom, Option[T], Option[Q]) => R): Of[R] =
+      new Of[R](leaves.map { custom => custom -> f(custom, find(custom), b.find(custom)) }.toMap)
+
+    final def liftL[Q, R](b: Of[Q], f: (Custom, T, Option[Q]) => R): Of[R] =
+      new Of[R](leaves.map { custom => custom -> f(custom, doFind(custom), b.find(custom)) }.toMap)
+
+    final def liftLR[Q, R](b: Of[Q], f: (Custom, T, Q) => R): Of[R] =
+      new Of[R](leaves.map { custom => custom -> f(custom, doFind(custom), b.doFind(custom)) }.toMap)
+
+    final def lift[R](f: (Custom, Option[T]) => R): Of[R] =
+      new Of[R](leaves.map { custom => custom -> f(custom, find(custom)) }.toMap )
+
+    final def ++(other: Of[T]): Of[T] = new Of[T](customs ++ other.customs)
+
+    final def *(other: Of[T]): Of[(T, Option[T])] =
+      liftL[T, (T, Option[T])](other, { case (custom: Custom, a: T, b: Option[T]) => (a, b) })
+  }
+
+  object Of {
+    def apply[T](value: T): Custom.Of[T] = new Of[T](Map(Common -> value))
+
+    def apply[T](map: Sets[T], full: Boolean = true): Of[T] = {
+      // Check that the sets do not overlap.
+      val sets: Set[Set[Custom]] = map.keySet
+      sets.foreach(a => sets.foreach(b => if (b != a) {
+        require(b.intersect(a).isEmpty, s"Overlaping sets of customs: $a and $b")
+      }))
+
+      // TODO -?
+      Util.checkNoDuplicates(map.values.toSeq, "customs")
+
+      val result = new Of[T](map.flatMap { case (customs, value) => customs.map(custom => custom -> value) })
+      if (full) result.verifyFull else result
+    }
+  }
 
   type Sets[T] = Map[Set[Custom], T]
 
@@ -47,62 +128,12 @@ object Custom extends NamedCompanion {
     Sefard, RavNaeHolyLand, Chabad,
     Magreb, Algeria, Toshbim, Djerba, Morocco, Fes, Bavlim, Teiman, Baladi, Shami)
 
-  val leaves: Set[Custom] = values.toSet.filter(_.isLeafe)
+  val leaves: Set[Custom] = values.toSet.filter(_.isLeaf)
 
-  def common[T](value: T): Custom.Of[T] = Map(Common -> value)
-
-  def find[T](customs: Of[T], custom: Custom): T = customs(effective(customs, custom))
-
-  def effective[T](customs: Of[T], custom: Custom): Custom = doFind(customs.keySet, custom)
-
-  def lift[A, B, C](a: Of[A], b: Of[B], f: (Custom, A, B) => C): Of[C] = leaves.map { custom =>
-    custom -> f(custom, find(a, custom), find(b, custom))
-  }.toMap // TODO minimize?
-
-  private def doFind(customs: Set[Custom], custom: Custom): Custom = {
-    if (customs.contains(custom)) custom else {
-      require(custom.parent.isDefined, s"Custom $custom is missing from $customs")
-      doFind(customs, custom.parent.get)
-    }
-  }
-
-  // Parse and normalize a set of customs:
-  // - add customs that have all children already in the set (recursively);
-  // - remove customs that have parents in the set.
   def parse(names: String): Set[Custom] = {
-    val customs: Seq[Custom] = names.split(',').map(_.trim).map(getForName)
-    Util.checkNoDuplicates(customs, "customs")
-
-    val result = addParents(customs.toSet)
-    result.filterNot(custom => custom.parent.isDefined && result.contains(custom.parent.get))
-  }
-
-  private def addParents(customs: Set[Custom]): Set[Custom] = {
-    def addOneParent(customs: Set[Custom]): (Set[Custom], Boolean) = values
-      .find { custom =>
-        !customs.contains(custom) && !custom.isLeafe && Util.contains(customs, custom.children)
-      }
-      .fold((customs, false))(missing => (customs + missing, true))
-
-    val (result, added) = addOneParent(customs)
-    if (!added) result else addParents(result)
-  }
-
-
-  def denormalize[T](map: Sets[T], full: Boolean): Of[T] = {
-    check(map, full)
-    Util.checkNoDuplicates(map.values.toSeq, "customs")
-    map.flatMap { case (customs, value) => customs.map(custom => custom -> value) }
-  }
-
-  // Check that the sets do not overlap - and cover all customs.
-  private def check[T](map: Sets[T], full: Boolean): Unit = {
-    val sets: Set[Set[Custom]] = map.keySet
-    sets.foreach(a => sets.foreach(b => if (b != a) {
-      require(b.intersect(a).isEmpty, s"Overlaping sets of customs: $a and $b")
-    }))
-    val all: Set[Custom] = addParents(sets.flatten)
-    if (full) values.foreach(custom => doFind(all, custom))
+    val result: Seq[Custom] = names.split(',').map(_.trim).map(getForName)
+    Util.checkNoDuplicates(result, "customs")
+    result.toSet
   }
 
   def common[T](map: Sets[T]): T = map(map.keySet.find(_.contains(Custom.Common)).get)

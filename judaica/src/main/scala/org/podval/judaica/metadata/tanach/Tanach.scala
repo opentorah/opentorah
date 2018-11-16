@@ -202,7 +202,7 @@ object Tanach extends NamedCompanion {
       val aliyot = metadata.aliyot
       val bookSpan = Span(
         parsha.span.from,
-        aliyot.last.span.to.getOrElse(parsha.days(Custom.Common).head.span.to)
+        aliyot.last.span.to.getOrElse(parsha.days.common.head.span.to)
       ).inBook(parsha.book)
       parsha -> Aliyot.parse(bookSpan, aliyot, number = Some(3))
     }
@@ -280,6 +280,6 @@ object Tanach extends NamedCompanion {
       Aliyot.parse(bookSpan, WithNumber.overlay(with1, spans), Some(7))
     }
 
-    Custom.denormalize(result, full = true)
+    Custom.Of(result)
   }
 }
