@@ -67,13 +67,21 @@ object Custom extends NamedCompanion {
 //    }
 
     final def lift[Q, R](b: Of[Q], f: (Custom, Option[T], Option[Q]) => R): Map[Custom, R] =
-      leaves.map { custom => custom -> f(custom, find(custom), b.find(custom)) }.toMap
+      lift[Q, Option[T], Option[Q], R](b, f, _.find(_), _.find(_))
 
     final def liftL[Q, R](b: Of[Q], f: (Custom, T, Option[Q]) => R): Map[Custom, R] =
-      leaves.map { custom => custom -> f(custom, doFind(custom), b.find(custom)) }.toMap
+      lift[Q, T, Option[Q], R](b, f, _.doFind(_), _.find(_))
 
     final def liftLR[Q, R](b: Of[Q], f: (Custom, T, Q) => R): Map[Custom, R] =
-      leaves.map { custom => custom -> f(custom, doFind(custom), b.doFind(custom)) }.toMap
+      lift[Q, T, Q, R](b, f, _.doFind(_), _.doFind(_))
+
+    private def lift[Q, TA, QA, R](
+      b: Of[Q],
+      f: (Custom, TA, QA) => R,
+      tf: (Of[T], Custom) => TA,
+      qf: (Of[Q], Custom) => QA
+    ): Map[Custom, R] =
+      leaves.map { custom => custom -> f(custom, tf(this, custom), qf(b, custom)) }.toMap
 
     final def lift[R](f: (Custom, Option[T]) => R): Map[Custom, R] =
       leaves.map { custom => custom -> f(custom, find(custom)) }.toMap

@@ -19,11 +19,6 @@ final class Reading(map: Map[Custom, Reading.ReadingCustom]) extends Custom.Of[R
 
   def transform[Q](
     haftarah: Custom.Of[Q],
-    transformer: (Custom, Reading.ReadingCustom, Option[Q]) => Reading.ReadingCustom
-  ): Reading = new Reading(liftL[Q, Reading.ReadingCustom](haftarah, transformer))
-
-  def transformR[Q](
-    haftarah: Custom.Of[Q],
     transformer: (Custom, Reading.ReadingCustom, Q) => Reading.ReadingCustom
   ): Reading = new Reading(liftLR[Q, Reading.ReadingCustom](haftarah, transformer))
 }
@@ -68,11 +63,8 @@ object Reading {
   def apply(torah: Custom.Of[Torah]): Reading =
     new Reading(torah.customs.mapValues(torah => ReadingCustom(torah, maftirAndHaftarah = None)))
 
-  def apply(torah: Torah, haftarah: Haftarah.Customs): Reading = apply(
-    torah = torah.init,
-    maftir = torah.last,
-    haftarah = haftarah
-  )
+  def apply(torah: Torah, haftarah: Haftarah.Customs): Reading =
+    apply(torah = torah.init, maftir = torah.last, haftarah = haftarah)
 
   def apply(torah: Torah, maftir: ChumashSpan.BookSpan, haftarah: Haftarah.Customs): Reading =
     apply(Custom.Of(torah), maftir, haftarah)

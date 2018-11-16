@@ -107,7 +107,7 @@ object SpecialDay {
     reading: Reading,
     maftir: ChumashSpan.BookSpan,
     haftarah: Haftarah.Customs
-  ): Reading = reading.transformR[Haftarah.Haftarah](haftarah, transformer = {
+  ): Reading = reading.transform[Haftarah.Haftarah](haftarah, transformer = {
     case (custom: Custom, readingCustom: Reading.ReadingCustom, haftarah: Haftarah.Haftarah) =>
       readingCustom.replaceMaftirAndHaftarah(maftir, haftarah)
   })
@@ -121,7 +121,7 @@ object SpecialDay {
         Option[Haftarah.Haftarah]
       ) => Reading.ReadingCustom,
       reading: Reading
-    ): Reading = reading.transformR[(Haftarah.Haftarah, Option[Haftarah.Haftarah])](haftarahs, { case (
+    ): Reading = reading.transform[(Haftarah.Haftarah, Option[Haftarah.Haftarah])](haftarahs, { case (
         custom: Custom,
         reading: Reading.ReadingCustom,
         haftarahs: (Haftarah.Haftarah, Option[Haftarah.Haftarah])
@@ -633,7 +633,7 @@ object SpecialDay {
     override def date(year: Year): Day = Pesach.date(year).shabbosBefore
 
     def transform(isErevPesach: Boolean, reading: Reading): Reading =
-      reading.transformR[Haftarah.Haftarah](haftarah, {
+      reading.transform[Haftarah.Haftarah](haftarah, {
         case (custom: Custom, readingCustom: Reading.ReadingCustom, haftarah: Haftarah.Haftarah) =>
           if ((custom == Custom.Chabad) && !isErevPesach) readingCustom
           else readingCustom.replaceHaftarah(haftarah)
