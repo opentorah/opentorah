@@ -66,22 +66,22 @@ object Custom extends NamedCompanion {
 //      if (!added) result else result.addParents
 //    }
 
-    final def lift[Q, R](b: Of[Q], f: (Custom, Option[T], Option[Q]) => R): Of[R] =
-      new Of[R](leaves.map { custom => custom -> f(custom, find(custom), b.find(custom)) }.toMap)
+    final def lift[Q, R](b: Of[Q], f: (Custom, Option[T], Option[Q]) => R): Map[Custom, R] =
+      leaves.map { custom => custom -> f(custom, find(custom), b.find(custom)) }.toMap
 
-    final def liftL[Q, R](b: Of[Q], f: (Custom, T, Option[Q]) => R): Of[R] =
-      new Of[R](leaves.map { custom => custom -> f(custom, doFind(custom), b.find(custom)) }.toMap)
+    final def liftL[Q, R](b: Of[Q], f: (Custom, T, Option[Q]) => R): Map[Custom, R] =
+      leaves.map { custom => custom -> f(custom, doFind(custom), b.find(custom)) }.toMap
 
-    final def liftLR[Q, R](b: Of[Q], f: (Custom, T, Q) => R): Of[R] =
-      new Of[R](leaves.map { custom => custom -> f(custom, doFind(custom), b.doFind(custom)) }.toMap)
+    final def liftLR[Q, R](b: Of[Q], f: (Custom, T, Q) => R): Map[Custom, R] =
+      leaves.map { custom => custom -> f(custom, doFind(custom), b.doFind(custom)) }.toMap
 
-    final def lift[R](f: (Custom, Option[T]) => R): Of[R] =
-      new Of[R](leaves.map { custom => custom -> f(custom, find(custom)) }.toMap )
+    final def lift[R](f: (Custom, Option[T]) => R): Map[Custom, R] =
+      leaves.map { custom => custom -> f(custom, find(custom)) }.toMap
 
     final def ++(other: Of[T]): Of[T] = new Of[T](customs ++ other.customs)
 
     final def *(other: Of[T]): Of[(T, Option[T])] =
-      liftL[T, (T, Option[T])](other, { case (custom: Custom, a: T, b: Option[T]) => (a, b) })
+      new Of[(T, Option[T])](liftL[T, (T, Option[T])](other, { case (_: Custom, a: T, b: Option[T]) => (a, b) }))
   }
 
   object Of {

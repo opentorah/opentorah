@@ -47,14 +47,12 @@ object Haftarah {
   }
 
   private def parseCustom(ancestorSpan: ProphetSpan.Parsed)(element: Elem): (Set[Custom], Seq[ProphetSpan.BookSpan]) = {
-    val (customs, attributes, elements) = open(element)
+    val (customs, attributes, elements) =  {
+      val (attributes, elements) = XML.open(element, "custom")
+      val customs: Set[Custom] = Custom.parse(attributes.doGet("n"))
+      (customs, attributes, elements)
+    }
     customs -> parseCustom(ancestorSpan, attributes, elements)
-  }
-
-  private def open(element: Elem): (Set[Custom], Attributes, Seq[Elem]) = {
-    val (attributes, elements) = XML.open(element, "custom")
-    val customs: Set[Custom] = Custom.parse(attributes.doGet("n"))
-    (customs, attributes, elements)
   }
 
   private def parseCustom(
