@@ -51,16 +51,19 @@ object Custom extends NamedCompanion {
       this
     }
 
-    final def minimize: Of[T] = ??? // add parents; remove unaccessible parents
-//    private def addParents(customs: Set[Custom]): Set[Custom] = {
-//      def addOneParent(customs: Set[Custom]): (Set[Custom], Boolean) = values
+    final def minimize: Of[T] = {
+      this // TODO
+    }
+
+//    private def addParents: Of[T] = {
+//      def addOneParent: (Of[T], Boolean) = values
 //        .find { custom =>
-//          !customs.contains(custom) && !custom.isLeaf && Util.contains(customs, custom.children)
+//          !customs.contains(custom) && !custom.isLeaf && Util.contains(customs.keySet, custom.children)
 //        }
 //        .fold((customs, false))(missing => (customs + missing, true))
 //
-//      val (result, added) = addOneParent(customs)
-//      if (!added) result else addParents(result)
+//      val (result, added) = addOneParent
+//      if (!added) result else result.addParents
 //    }
 
     final def lift[Q, R](b: Of[Q], f: (Custom, Option[T], Option[Q]) => R): Of[R] =

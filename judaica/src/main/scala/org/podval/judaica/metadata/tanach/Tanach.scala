@@ -249,6 +249,7 @@ object Tanach extends NamedCompanion {
   private def combineDays(weeks: Seq[(Parsha, Custom.Sets[Seq[Span.Numbered]])]): Seq[Option[Custom.Of[Aliyot.Torah]]] = weeks match {
     case (parsha, days) :: (parshaNext, daysNext) :: tail =>
       val result: Option[Custom.Of[Aliyot.Torah]] = if (!parsha.combines) None else  {
+        // TODO express via lift() etc.
         // TODO Use defaults from days?
         val combined: Custom.Sets[Seq[Span.Numbered]] = daysNext ++ days.map { case (customs, value) =>
           (customs, value ++ daysNext.getOrElse(customs, Seq.empty))
