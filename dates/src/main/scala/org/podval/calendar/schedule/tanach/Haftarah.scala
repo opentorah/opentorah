@@ -1,15 +1,25 @@
 package org.podval.calendar.schedule.tanach
 
-import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
-import org.podval.judaica.metadata.tanach.{Custom, Parsha, WithNumber}
-import org.podval.judaica.metadata.{Attributes, Metadata, XML}
+import org.podval.judaica.metadata.tanach.{WithBookSpans, Tanach, Custom, Parsha, WithNumber}
+import org.podval.judaica.metadata.{Attributes, LanguageSpec, LanguageString, Metadata, Util, XML}
 
 import scala.xml.Elem
 
-object Haftarah {
-  type Haftarah = Seq[ProphetSpan.BookSpan]
+final class Haftarah private(spans: Seq[Haftarah.BookSpan]) extends Haftarah.Spans(spans) with LanguageString {
+  override def toLanguageString(implicit spec: LanguageSpec): String = {
+    Util.group(spans, (span: Haftarah.BookSpan) => span.book)
+      .map { bookSpans =>
+        bookSpans.head.book.toLanguageString + " " + bookSpans.map(_.span.toLanguageString).mkString(", ")
+      }.mkString("; ")
+  }
+}
 
-  type Customs = Custom.Of[Haftarah]
+object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
+  override type Many = Haftarah
+
+  override def apply(spans: Seq[BookSpan]): Haftarah = new Haftarah(spans)
+
+  override protected def getBook(name: String): Tanach.ProphetsBook = Tanach.getProhetForName(name)
 
   final def forParsha(parsha: Parsha): Customs = haftarah(parsha)
 
@@ -20,25 +30,23 @@ object Haftarah {
     resourceName = Some("Haftarah")
   ).mapValues { metadata => parse(metadata.attributes, metadata.elements, full = true) }
 
-  def parse(element: Elem, full: Boolean): Haftarah.Customs = {
+  def parse(element: Elem, full: Boolean): Customs = {
     val (attributes, elements) = XML.open(element, "haftarah")
     parse(attributes, elements, full = full)
   }
 
   private def parse(attributes: Attributes, elements: Seq[Elem], full: Boolean): Customs = {
-    val span = ProphetSpan.parse(attributes)
-    attributes.close()
-
+    val span: BookSpanParsed = parseSpan(attributes)
     val (partElements, customElements) = XML.span(elements, "part", "custom")
 
-    val common: Option[Seq[ProphetSpan.BookSpan]] =
-      if (partElements.isEmpty && customElements.isEmpty) Some(Seq(span.resolve)) else
+    val common: Option[Haftarah] =
+      if (partElements.isEmpty && customElements.isEmpty) Some(oneSpan(span)) else
       if (partElements.isEmpty) None else Some(parseParts(partElements, span))
 
     // TODO toMap() will silently ignore duplicates...
-    val customs: Custom.Sets[Seq[ProphetSpan.BookSpan]] = customElements.map(parseCustom(span)).toMap
+    val customs: Custom.Sets[Haftarah] = customElements.map(parseCustom(span)).toMap
 
-    val result: Custom.Sets[Seq[ProphetSpan.BookSpan]] = common.fold(customs) { common =>
+    val result: Custom.Sets[Haftarah] = common.fold(customs) { common =>
       // TODO updated() will silently ignore duplicates...
       customs.updated(Set[Custom](Custom.Common), common)
     }
@@ -46,7 +54,7 @@ object Haftarah {
     Custom.Of(result, full)
   }
 
-  private def parseCustom(ancestorSpan: ProphetSpan.Parsed)(element: Elem): (Set[Custom], Seq[ProphetSpan.BookSpan]) = {
+  private def parseCustom(ancestorSpan: BookSpanParsed)(element: Elem): (Set[Custom], Haftarah) = {
     val (customs, attributes, elements) =  {
       val (attributes, elements) = XML.open(element, "custom")
       val customs: Set[Custom] = Custom.parse(attributes.doGet("n"))
@@ -56,24 +64,28 @@ object Haftarah {
   }
 
   private def parseCustom(
-    ancestorSpan: ProphetSpan.Parsed,
+    ancestorSpan: BookSpanParsed,
     attributes: Attributes,
     elements: Seq[Elem]
-  ): Seq[ProphetSpan.BookSpan] = {
-    val span = ProphetSpan.parse(attributes).inheritFrom(ancestorSpan)
-    attributes.close()
-
+  ): Haftarah = {
+    val span = parseSpan(attributes).inheritFrom(ancestorSpan)
     val partElements = XML.span(elements, "part")
 
-    if (partElements.isEmpty) Seq(span.resolve)
-    else parseParts(partElements, span)
+    if (partElements.isEmpty) oneSpan(span) else parseParts(partElements, span)
   }
 
-  private def parseParts(elements: Seq[Elem], ancestorSpan: ProphetSpan.Parsed): Seq[ProphetSpan.BookSpan] = {
-    val result: Seq[ProphetSpan.Numbered] = elements.map(element =>
-      ProphetSpan.parseNumbered(XML.openEmpty(element, "part"), ancestorSpan))
+  private def oneSpan(span: BookSpanParsed): Haftarah = Haftarah(Seq(span.resolve))
+
+  private def parseParts(elements: Seq[Elem], ancestorSpan: BookSpanParsed): Haftarah = {
+    val result: Seq[WithNumber[BookSpan]] = elements.map { element =>
+      WithNumber.parse(
+        attributes = XML.openEmpty(element, "part"),
+        attributes => parseSpan(attributes).inheritFrom(ancestorSpan).resolve
+      )
+    }
+
     WithNumber.checkConsecutive(result, "part")
     require(result.length > 1)
-    ProphetSpan.dropNumbers(result)
+    Haftarah(WithNumber.dropNumbers(result))
   }
 }

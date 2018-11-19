@@ -60,21 +60,16 @@ final class Chapters(chapters: Seq[Int]) {
 }
 
 object Chapters {
-  private final case class ChapterParsed(n: Int, length: Int) extends WithNumber
-
   def apply(elements: Seq[Elem]): Chapters = {
-    val chapters: Seq[ChapterParsed] = elements.map { element =>
+    val chapters: Seq[WithNumber[Int]] = elements.map { element =>
       val attributes = XML.openEmpty(element, "chapter" )
-      val result = ChapterParsed(
-        n = attributes.doGetInt("n"),
-        length = attributes.doGetInt("length")
-      )
+      val result = WithNumber.parse(attributes, attributes => attributes.doGetInt("length"))
       attributes.close()
       result
     }
 
     WithNumber.checkConsecutive(chapters, "chapter")
 
-    new Chapters(chapters.map(_.length).toArray)
+    new Chapters(WithNumber.dropNumbers(chapters).toArray)
   }
 }

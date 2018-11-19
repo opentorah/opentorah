@@ -1,7 +1,8 @@
 package org.podval.judaica.metadata.tanach
 
 import org.podval.judaica.metadata.tanach.Tanach.ChumashBook
-import org.podval.judaica.metadata.{LanguageSpec, NamedCompanion, Named, Names}
+import org.podval.judaica.metadata.{NamedCompanion, Named, Names}
+import org.podval.judaica.metadata.tanach.Torah.Maftir
 
 sealed trait Parsha extends Named {
   def book: ChumashBook
@@ -10,22 +11,20 @@ sealed trait Parsha extends Named {
 
   final def span: Span = book.span(this)
 
-  final def days: Custom.Of[Aliyot.Torah] = book.days(this)
+  final def days: Torah.Customs = book.days(this)
 
-  final def daysCombined: Option[Custom.Of[Aliyot.Torah]] = book.daysCombined(this)
+  final def daysCombined: Option[Torah.Customs] = book.daysCombined(this)
 
-  final def getDaysCombined: Custom.Of[Aliyot.Torah] = {
+  final def getDaysCombined: Torah.Customs = {
     require(this.combines)
     daysCombined.get
   }
 
-  final def aliyot: Aliyot.Torah = book.aliyot(this)
+  final def aliyot: Torah = book.aliyot(this)
 
-  final def maftir: BookSpan.ChumashSpan.BookSpan = book.maftir(this)
+  final def maftir: Maftir = book.maftir(this)
 
   final def combines: Boolean = Parsha.combinable.contains(this)
-
-  final override def toString: String = toString(LanguageSpec.empty)
 }
 
 object Parsha extends NamedCompanion {

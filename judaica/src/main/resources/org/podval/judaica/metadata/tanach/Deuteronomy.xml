@@ -241,7 +241,7 @@
     <day n="5" fromChapter="33" fromVerse="22"/>
     <day n="6" fromChapter="33" fromVerse="27"/>
     <day n="7" fromChapter="34" fromVerse="1"/>
-    <!-- TODO Maftir SimchasTorah is NOT what it says here :) -->
+    <!-- Maftir SimchasTorah is NOT what it says here :) -->
     <maftir fromChapter="34" fromVerse="1"/>
   </week>
 </book>

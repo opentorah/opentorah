@@ -1,5 +1,7 @@
 package org.podval.calendar.schedule.tanach
 
+import org.podval.judaica.metadata.tanach.Torah
+
 object Genesis extends TorahReadings {
   val chassanBereishis: Torah = parseTorah(
     <torah book="Genesis" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3">

@@ -1,10 +1,8 @@
 package org.podval.calendar.schedule.tanach
 
-import org.podval.calendar.jewish.Jewish.{Day, Month, Year}
+import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.schedule.tanach.SpecialDay.{FestivalOrIntermediate, ShabbosBereishis}
-import org.podval.judaica.metadata.{Language, LanguageSpec, Util}
-import org.podval.judaica.metadata.tanach.{Aliyot, Custom, Parsha}
-import org.podval.judaica.metadata.tanach.BookSpan.ProphetSpan
+import org.podval.judaica.metadata.Util
 
 final case class Schedule private(
   from: Day,
@@ -77,6 +75,7 @@ object Schedule {
       )
     }
 
+    // TODO keep it current in a var? Have a list?
     private def nextWeeklyReadingFor(day: Day): WeeklyReading = {
       val nextShabbos = day.shabbosAfter
       val result = weeklyReadings.get(nextShabbos)
@@ -143,39 +142,5 @@ object Schedule {
     val to = year.lastDay
     val result = createBuilder(from, to, inHolyLand).weeklyReadings
     result.filterKeys(from <= _).filterKeys(_ <= to)
-  }
-
-
-  def printHaftarahList(custom: Custom, spec: LanguageSpec, full: Boolean): Unit = {
-    println(custom.toString(spec))
-    for (parsha <- Parsha.values) {
-      val haftarah: Haftarah.Customs = Haftarah.forParsha(parsha)
-      val customEffective: Custom = haftarah.doFindKey(custom)
-      val spansOpt: Seq[ProphetSpan.BookSpan] = haftarah.doFind(customEffective)
-      val result: String = ProphetSpan.toString(spansOpt, spec)
-
-      if (customEffective == custom) {
-        println(parsha.toString(spec) + ": " + result)
-      } else if (full) {
-        println(parsha.toString(spec) + " [" + customEffective.toString(spec)  + "]" + ": " + result)
-      }
-    }
-  }
-
-  def main(args: Array[String]): Unit = {
-    println(Aliyot.toString(Parsha.Mattos.getDaysCombined.doFind(Custom.Ashkenaz), Language.Hebrew.toSpec))
-    println()
-    printHaftarahList(Custom.Shami, Language.Hebrew.toSpec, full = false)
-    println()
-    //    println(SpecialReading.SheminiAtzeres.shabbosAliyot.get.toString(Language.English.toSpec))
-    println()
-    //    println(SpecialDay.SheminiAtzeres.getReading(false).maftir.get.toString(Language.English.toSpec))
-    println()
-
-    val year = Year(5779)
-    val day = year.month(Month.Name.Marheshvan).day(25)
-    val schedule: Schedule = apply(year, inHolyLand = false)
-    val daySchedule: DaySchedule = schedule.days(day)
-    println(new Reading(daySchedule.morning.get.minimize))
   }
 }

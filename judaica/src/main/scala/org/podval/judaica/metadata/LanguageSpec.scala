@@ -7,6 +7,8 @@ final case class LanguageSpec(
 ) {
   def toString(number: Int): String = language.fold(number.toString)(_.toString(number))
 
+  def languageName: String = language.get.toLanguageString(this)
+
   def dropFlavour: LanguageSpec = copy(flavour = None)
   def dropIsTransliterated: LanguageSpec = copy(isTransliterated = None)
   def dropLanguage: LanguageSpec = copy(language = None)
