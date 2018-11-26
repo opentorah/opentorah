@@ -6,5 +6,5 @@ trait Named extends WithName with WithNames {
 
   override def toString: String = name
 
-  final def toString(spec: LanguageSpec): String = names.doFind(spec).name
+  final def toLanguageString(implicit spec: LanguageSpec): String = names.doFind(spec).name
 }

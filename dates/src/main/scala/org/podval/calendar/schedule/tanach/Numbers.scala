@@ -1,6 +1,7 @@
 package org.podval.calendar.schedule.tanach
 
-import org.podval.judaica.metadata.tanach.BookSpan.ChumashSpan
+import org.podval.judaica.metadata.tanach.Torah
+import org.podval.judaica.metadata.tanach.Torah.Maftir
 
 object Numbers extends TorahReadings  {
   // last aliyah is for Zos Channukah
@@ -32,7 +33,7 @@ object Numbers extends TorahReadings  {
       <aliyah n="3" fromVerse="9"/>
     </torah>)
 
-  val parshasParahMaftir: ChumashSpan.BookSpan = parseMaftir(
+  val parshasParahMaftir: Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="19" fromVerse="1" toVerse="22"/>)
 
   val roshChodesh: Torah = parseTorah(
@@ -44,23 +45,23 @@ object Numbers extends TorahReadings  {
       <aliyah n="6" fromVerse="11"/>
     </torah>)
 
-  val pesachMaftir: ChumashSpan.BookSpan = parseMaftir(
+  val pesachMaftir: Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>)
 
-  // TODO 4th aliyah Chol Hamoed, maftir Shabbos Chol Hamoed and last two days
-  val pesachEndMaftir: ChumashSpan.BookSpan = parseMaftir(
+  // Maftir Pesach Intermediate Shabbos and last two days of Pesach
+  // TODO is this supposed to be also the 4th aliyah on intermediate days?
+  val pesachEndMaftir: Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>)
 
-  val shavuosMaftir: ChumashSpan.BookSpan = parseMaftir(
+  val shavuosMaftir: Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="28" fromVerse="26" toVerse="31"/>)
 
-  val roshHashanahMaftir: ChumashSpan.BookSpan = parseMaftir(
+  val roshHashanahMaftir: Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>)
 
-  val yomKippurMaftir: ChumashSpan.BookSpan = parseMaftir(
+  val yomKippurMaftir: Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="29" fromVerse="7" toVerse="11"/>)
 
-  // TODO maftir for Shabbos: 1st day 17-22; 3rd 23-28; 4th 26-38
   val succosKorbanot: Torah = parseTorah(
     <torah book="Numbers" fromChapter="29" fromVerse="12" toVerse="34">
       <aliyah n="2" fromVerse="17"/>
@@ -71,6 +72,6 @@ object Numbers extends TorahReadings  {
       <aliyah n="7" fromVerse="32"/>
     </torah>)
 
-  val sheminiAtzeresMaftir: ChumashSpan.BookSpan = parseMaftir(
+  val sheminiAtzeresMaftir: Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>)
 }

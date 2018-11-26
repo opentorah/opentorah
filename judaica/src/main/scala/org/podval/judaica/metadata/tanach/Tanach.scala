@@ -1,6 +1,7 @@
 package org.podval.judaica.metadata.tanach
 
 import org.podval.judaica.metadata.{Attributes, Holder, Metadata, Named, NamedCompanion, Names, Util, XML}
+import org.podval.judaica.metadata.tanach.Torah.Maftir
 
 import scala.xml.Elem
 
@@ -29,13 +30,13 @@ object Tanach extends NamedCompanion {
 
     lazy val span: Map[Parsha, Span] = metadatas.span
 
-    lazy val days: Map[Parsha, Custom.Of[Aliyot.Torah]] = metadatas.days
+    lazy val days: Map[Parsha, Torah.Customs] = metadatas.days
 
-    lazy val daysCombined: Map[Parsha, Option[Custom.Of[Aliyot.Torah]]] = metadatas.daysCombined
+    lazy val daysCombined: Map[Parsha, Option[Torah.Customs]] = metadatas.daysCombined
 
-    lazy val aliyot: Map[Parsha, Aliyot.Torah] = metadatas.aliyot
+    lazy val aliyot: Map[Parsha, Torah] = metadatas.aliyot
 
-    lazy val maftir: Map[Parsha, BookSpan.ChumashSpan.BookSpan] = metadatas.maftir
+    lazy val maftir: Map[Parsha, Maftir] = metadatas.maftir
   }
 
   case object Genesis extends ChumashBook(Parsha.genesis)
@@ -141,11 +142,11 @@ object Tanach extends NamedCompanion {
 
   private final case class ParshaMetadata(
     names: Names,
-    span: Span.SemiResolved,
-    days: Custom.Sets[Seq[Span.Numbered]],
-    daysCombined: Custom.Sets[Seq[Span.Numbered]],
-    aliyot: Seq[Span.Numbered],
-    maftir: Span.SemiResolved
+    span: SpanSemiResolved,
+    days: Custom.Sets[Seq[Torah.Numbered]],
+    daysCombined: Custom.Sets[Seq[Torah.Numbered]],
+    aliyot: Seq[Torah.Numbered],
+    maftir: SpanSemiResolved
   )
 
   private final class ChumashBookMetadataHolder(book: ChumashBook) extends Holder[Parsha, ParshaMetadata] {
@@ -156,7 +157,7 @@ object Tanach extends NamedCompanion {
         obj = this
       ).mapValues { metadata =>
 
-        def byCustom(days: Seq[Tanach.DayParsed]): Custom.Sets[Seq[Span.Numbered]] =
+        def byCustom(days: Seq[Tanach.DayParsed]): Custom.Sets[Seq[Torah.Numbered]] =
           days.groupBy(_.custom).mapValues(days => days.map(_.span))
 
         val span = parseSemiResolved(metadata.attributes)
@@ -183,14 +184,14 @@ object Tanach extends NamedCompanion {
     def span: Map[Parsha, Span] = Util.inSequence(
       keys = book.parshiot,
       map = get.mapValues(_.span),
-      f = (pairs: Seq[(Parsha, Span.SemiResolved)]) => Span.setImpliedTo(pairs.map(_._2), book.chapters.full, book.chapters)
+      f = (pairs: Seq[(Parsha, SpanSemiResolved)]) => Torah.setImpliedTo(pairs.map(_._2), book.chapters.full, book.chapters)
     )
 
-    def days: Map[Parsha, Custom.Of[Aliyot.Torah]] = get.map { case (parsha, metadata) =>
-      parsha -> processDays(book, metadata.days, parsha.span)
+    def days: Map[Parsha, Torah.Customs] = get.map { case (parsha, metadata) =>
+      parsha -> Torah.processDays(book, metadata.days, parsha.span)
     }
 
-    def daysCombined: Map[Parsha, Option[Custom.Of[Aliyot.Torah]]] = Util.inSequence(
+    def daysCombined: Map[Parsha, Option[Torah.Customs]] = Util.inSequence(
       keys = book.parshiot,
       map = get.map { case (parsha: Parsha, metadata: ParshaMetadata) => parsha -> metadata.daysCombined },
       f = combineDays
@@ -198,32 +199,36 @@ object Tanach extends NamedCompanion {
 
     // TODO QUESTION if Cohen ends in a custom place, does it affect the end of the 3 aliyah on Mon/Thu?
     // TODO QUESTION if the parshiot combine, does it affect those small aliyot?
-    def aliyot: Map[Parsha, Aliyot.Torah] = get.map { case (parsha, metadata) =>
+    def aliyot: Map[Parsha, Torah] = get.map { case (parsha, metadata) =>
       val aliyot = metadata.aliyot
-      val bookSpan = Span(
-        parsha.span.from,
-        aliyot.last.span.to.getOrElse(parsha.days.common.head.span.to)
-      ).inBook(parsha.book)
-      parsha -> Aliyot.parse(bookSpan, aliyot, number = Some(3))
+      val bookSpan = Torah.inBook(parsha.book,
+        Span(
+          parsha.span.from,
+          aliyot.last.what.to.getOrElse(parsha.days.common.spans.head.span.to)
+        )
+      )
+      parsha -> Torah.parseAliyot(bookSpan, aliyot, number = Some(3))
     }
 
-    def maftir: Map[Parsha, BookSpan.ChumashSpan.BookSpan] = get.map { case (parsha, metadata) =>
+    def maftir: Map[Parsha, Maftir] = get.map { case (parsha, metadata) =>
       val maftir = metadata.maftir
       val book = parsha.book
       val span = Span(maftir.from, maftir.to.getOrElse(parsha.span.to))
 
-      val result = Span.setImpliedTo(
-        Seq(maftir),
-        span,
-        book.chapters
-      ).head.inBook(parsha.book)
+      val result = Torah.inBook(parsha.book,
+        Torah.setImpliedTo(
+          Seq(maftir),
+          span,
+          book.chapters
+        ).head
+      )
 
       parsha -> result
     }
   }
 
   private final case class DayParsed(
-    span: Span.Numbered,
+    span: Torah.Numbered,
     custom: Set[Custom],
     isCombined: Boolean
   )
@@ -239,24 +244,22 @@ object Tanach extends NamedCompanion {
     result
   }
 
-  private def parseNumbered(attributes: Attributes): Span.Numbered = Span.Numbered(
-    n = attributes.doGetInt("n"),
-    span = parseSemiResolved(attributes)
-  )
+  private def parseNumbered(attributes: Attributes): Torah.Numbered =
+    WithNumber.parse(attributes, parseSemiResolved)
 
-  private def parseSemiResolved(attributes: Attributes): Span.SemiResolved = Span.parse(attributes).semiResolve
+  private def parseSemiResolved(attributes: Attributes): SpanSemiResolved = SpanParsed.parse(attributes).semiResolve
 
-  private def combineDays(weeks: Seq[(Parsha, Custom.Sets[Seq[Span.Numbered]])]): Seq[Option[Custom.Of[Aliyot.Torah]]] = weeks match {
+  private def combineDays(weeks: Seq[(Parsha, Custom.Sets[Seq[Torah.Numbered]])]): Seq[Option[Torah.Customs]] = weeks match {
     case (parsha, days) :: (parshaNext, daysNext) :: tail =>
-      val result: Option[Custom.Of[Aliyot.Torah]] = if (!parsha.combines) None else  {
+      val result: Option[Torah.Customs] = if (!parsha.combines) None else  {
         // TODO express via lift() etc.
         // TODO Use defaults from days?
-        val combined: Custom.Sets[Seq[Span.Numbered]] = daysNext ++ days.map { case (customs, value) =>
+        val combined: Custom.Sets[Seq[Torah.Numbered]] = daysNext ++ days.map { case (customs, value) =>
           (customs, value ++ daysNext.getOrElse(customs, Seq.empty))
         }
 
         val book = parsha.book
-        Some(processDays(book, combined, book.chapters.merge(parsha.span, parshaNext.span)))
+        Some(Torah.processDays(book, combined, book.chapters.merge(parsha.span, parshaNext.span)))
       }
 
       result +: combineDays((parshaNext, daysNext) +: tail)
@@ -267,20 +270,5 @@ object Tanach extends NamedCompanion {
       Seq(None)
 
     case Nil => Nil
-  }
-
-  private def processDays(
-    book: Tanach.ChumashBook,
-    days: Custom.Sets[Seq[Span.Numbered]],
-    span: Span
-  ): Custom.Of[Aliyot.Torah] = {
-    val bookSpan = span.inBook(book)
-    val with1 = Span.addImplied1(Custom.common(days), span, book.chapters)
-
-    val result: Custom.Sets[Aliyot.Torah] = days.mapValues { spans: Seq[Span.Numbered] =>
-      Aliyot.parse(bookSpan, WithNumber.overlay(with1, spans), Some(7))
-    }
-
-    Custom.Of(result)
   }
 }

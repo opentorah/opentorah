@@ -28,11 +28,27 @@ object Language extends NamedCompanion {
     private val hundreds: List[Char] = "קרשת".toList
 
     override def toString(number: Int): String = {
-      require (number > 0)
-      require (number <= 500)
+      require(number > 0)
+      require(number <= 10000)
 
       val result = new StringBuilder
       var remainder = number
+
+      if (remainder >= 1000) {
+        result.append(units((remainder / 1000) - 1))
+        result.append("'") // TODO correct apostrophe!
+        remainder = remainder % 1000
+      }
+
+      if (remainder >= 900) {
+        result.append("תת")
+        remainder = remainder - 800
+      }
+
+      if (remainder >= 500) {
+        result.append("ת")
+        remainder = remainder - 400
+      }
 
       if (remainder >= 100) {
         result.append(hundreds((remainder / 100) - 1))
@@ -51,5 +67,7 @@ object Language extends NamedCompanion {
 
       result.toString
     }
+
+    // TODO number parser
   }
 }

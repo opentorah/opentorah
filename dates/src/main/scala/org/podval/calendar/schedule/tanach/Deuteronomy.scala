@@ -1,7 +1,8 @@
 package org.podval.calendar.schedule.tanach
 
-import org.podval.judaica.metadata.tanach.BookSpan.ChumashSpan
-import org.podval.judaica.metadata.tanach.{Custom, Parsha}
+import org.podval.judaica.metadata.tanach.Torah
+import org.podval.judaica.metadata.tanach.Torah.Maftir
+import org.podval.judaica.metadata.tanach.Parsha
 
 object Deuteronomy extends TorahReadings {
   val tishaBeAvTorah: Torah = parseTorah(
@@ -10,22 +11,23 @@ object Deuteronomy extends TorahReadings {
       <aliyah n="3" fromVerse="36"/>
     </torah>)
 
-  private val festivalEndShabbosTorahTorah: Torah = parseTorah(
-    <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17">
-      <aliyah n="2" fromChapter="15" fromVerse="1"/>
-      <aliyah n="3" fromChapter="15" fromVerse="19"/>
-      <aliyah n="4" fromChapter="16" fromVerse="1"/>
-      <aliyah n="5" fromChapter="16" fromVerse="4"/>
-      <aliyah n="6" fromChapter="16" fromVerse="9"/>
-      <aliyah n="7" fromChapter="16" fromVerse="13"/>
-    </torah>)
+  private val (festivalEndShabbosTorah: Torah, sheminiAtzeresTorahWeekdayTorah: Torah) =
+    parseTorahForShabbosAndWeekday(2, 3,
+      <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17">
+        <aliyah n="2" fromChapter="15" fromVerse="1"/>
+        <aliyah n="3" fromChapter="15" fromVerse="19"/>
+        <aliyah n="4" fromChapter="16" fromVerse="1"/>
+        <aliyah n="5" fromChapter="16" fromVerse="4"/>
+        <aliyah n="6" fromChapter="16" fromVerse="9"/>
+        <aliyah n="7" fromChapter="16" fromVerse="13"/>
+      </torah>)
 
-  val sheminiAtzeresTorah: (Torah, Torah) = (festivalEndShabbosTorahTorah, drop(festivalEndShabbosTorahTorah, Set(2, 3)))
+  val sheminiAtzeresTorah: (Torah, Torah) = (festivalEndShabbosTorah, sheminiAtzeresTorahWeekdayTorah)
 
-  val festivalEndTorah: (Torah, Torah) = (festivalEndShabbosTorahTorah, festivalEndShabbosTorahTorah.drop(2))
+  val festivalEndTorah: (Torah, Torah) = (festivalEndShabbosTorah, Torah(festivalEndShabbosTorah.spans.drop(2)))
 
-  val parshasZachorMaftir: ChumashSpan.BookSpan = parseMaftir(
+  val parshasZachorMaftir: Maftir = parseMaftir(
       <maftir book="Deuteronomy" fromChapter="25" fromVerse="17" toVerse="19"/>)
 
-  val zosHaberachaIn6: Torah = TorahReadings.torah7to6(Parsha.VezosHaberachah.days.common)
+  val zosHaberacha: Torah = Parsha.VezosHaberachah.days.common
 }

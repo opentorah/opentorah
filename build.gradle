@@ -1,8 +1,13 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
+// TODO  scalacOptions ++= Seq("-Ypartial-unification") - for http4s
+
 buildscript {
   repositories {
     // To function outside a composite, a plugin repository would be required.
+
+// Only necessary for SNAPSHOT releases (e.g., of http4s)
+//  resolvers += Resolver.sonatypeRepo("snapshots")
   }
   dependencies {
     classpath 'org.podval.docbook:gradle-docbook-plugin:+'
@@ -17,15 +22,26 @@ plugins {
 
 def scalaVersion      = '2.12.7'
 def scalaVersionMajor = '2.12'
+def http4sVersion     = '0.18.21' // '0.20.0-SNAPSHOT'
 
 ext.lib = [
   zinc      : 'com.typesafe.zinc:zinc:0.3.15',
 //  "org.scala-sbt:zinc_${scalaVersionMajor}:1.0.3"
-  scala     : "org.scala-lang:scala-library:$scalaVersion",
-  scalaXml  : "org.scala-lang.modules:scala-xml_$scalaVersionMajor:1.1.0",
-  scalaCheck: "org.scalacheck:scalacheck_${scalaVersionMajor}:1.14.0",
-  scalaTest : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.5",
-  pegdown   : 'org.pegdown:pegdown:1.4.2' // for scalatest reports
+  scala          : "org.scala-lang:scala-library:$scalaVersion",
+  scalaXml       : "org.scala-lang.modules:scala-xml_$scalaVersionMajor:1.1.0",
+
+  slf4jJdk       : "org.slf4j:slf4j-jdk14:1.7.25",
+
+  http4sDsl      : "org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion",
+  http4sScalatags: "org.http4s:http4s-scalatags_$scalaVersionMajor:$http4sVersion",
+  http4sServer   : "org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion",
+  http4sClient   : "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion",
+
+  scalatags      : "com.lihaoyi:scalatags_$scalaVersionMajor:0.6.7",
+
+  scalaCheck     : "org.scalacheck:scalacheck_${scalaVersionMajor}:1.14.0",
+  scalaTest      : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.5",
+  pegdown        : 'org.pegdown:pegdown:1.4.2' // for scalatest reports
 ]
 
 allprojects {
@@ -187,7 +203,12 @@ project(':dates') {
 
 project(':service') {
   dependencies {
-    compile project(':dates')
+    compile project(':dates'), lib.http4sDsl, lib.http4sServer, lib.http4sClient
+    compile lib.scalatags
+// http4s -> Scalatags bridge, when included as a dependency, confuses the imports;
+// doing explicit conversions for now :)    
+//    compile lib.http4sScalatags
+    compile lib.slf4jJdk // TODO into implementation
   }
 }
 

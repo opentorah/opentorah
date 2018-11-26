@@ -1,5 +1,7 @@
 package org.podval.calendar.schedule.tanach
 
+import org.podval.judaica.metadata.tanach.Torah
+
 object Leviticus extends TorahReadings {
   val yomKippurTorah: (Torah, Torah) = parseTorahForShabbosAndWeekday(Set(2),
     <torah book="Leviticus" fromChapter="16" fromVerse="1" toVerse="34">

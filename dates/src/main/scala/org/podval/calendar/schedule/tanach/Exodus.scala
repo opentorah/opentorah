@@ -1,9 +1,10 @@
 package org.podval.calendar.schedule.tanach
 
-import org.podval.judaica.metadata.tanach.BookSpan.ChumashSpan
+import org.podval.judaica.metadata.tanach.Torah
+import org.podval.judaica.metadata.tanach.Torah.Maftir
 
 object Exodus extends TorahReadings {
-  val parshasHachodeshMaftir: ChumashSpan.BookSpan = parseMaftir(
+  val parshasHachodeshMaftir: Maftir = parseMaftir(
       <maftir book="Exodus" fromChapter="12" fromVerse="1" toVerse="20"/>)
 
   val pesach1torah: (Torah, Torah) = parseTorahForShabbosAndWeekday(4, 7,
@@ -52,7 +53,7 @@ object Exodus extends TorahReadings {
       <aliyah n="3" fromChapter="23" fromVerse="6"/>
     </torah>)
 
-  val parshasShekalimMaftir: ChumashSpan.BookSpan = parseMaftir(
+  val parshasShekalimMaftir: Maftir = parseMaftir(
       <maftir book="Exodus" fromChapter="30" fromVerse="11" toVerse="16"/>)
 
   private final val fastAfternoonTorahPart1: Torah = parseTorah(
@@ -70,18 +71,22 @@ object Exodus extends TorahReadings {
       <aliyah n="7" fromChapter="34" fromVerse="18"/>
     </torah>)
 
-  // TODO subsume into intermediateShabbosTorah?
-  private val fastAfternoonTorahPart2: Torah = parseTorah(
-    <torah book="Exodus" fromChapter="34" fromVerse="1" toVerse="10">
-      <aliyah n="2" fromVerse="4"/>
-    </torah>)
+  private val fastAfternoonTorahPart2: Torah = {
+    val all = intermediateShabbosTorah.spans
+    Torah.aliyot(
+      all(3), // 34:1-3
+      all(4)  // 34:4-10
+    )
+  }
 
-  // TODO subsume into intermediateShabbosTorah?
-  val pesach5torah: Torah = parseTorah(
-    <torah book="Exodus" fromChapter="34" fromVerse="1" toVerse="26">
-      <aliyah n="2" fromChapter="34" fromVerse="4"/>
-      <aliyah n="3" fromChapter="34" fromVerse="18"/>
-    </torah>)
+  val pesach5torah: Torah = {
+    val all = intermediateShabbosTorah.spans
+    Torah.aliyot(
+      all(3),         // 34:1-3
+      all(4)+all(5),  // 34:4-17
+      all(6)          // 34:18-26
+    )
+  }
 
   val fastTorah: Torah = fastAfternoonTorahPart1 ++ fastAfternoonTorahPart2
 }

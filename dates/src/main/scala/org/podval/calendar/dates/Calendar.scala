@@ -5,6 +5,7 @@ import org.podval.calendar.jewish.Jewish
 import org.podval.calendar.numbers.{Digits, NonPeriodicVectorCompanion, PointCompanion, VectorCompanion}
 import org.podval.calendar.times.Times.hoursPerDay
 import org.podval.calendar.times.{TimeVectorBase, Times}
+import org.podval.judaica.metadata.Named
 
 trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
@@ -20,7 +21,7 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   type Month <: MonthBase[C]
 
-  type MonthName
+  type MonthName <: Named
 
   type MonthNameAndLength = MonthNameAndLengthBase[C]
 
@@ -30,7 +31,7 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   type Day <: DayBase[C]
 
-  type DayName
+  type DayName <: Named
 
   val Day: DayCompanion[C]
 
@@ -97,4 +98,11 @@ object Calendar {
   final def fromJewish(day: Jewish   .Day): Gregorian.Day = Gregorian.Day(day.number - epoch)
 
   final def toJewish  (day: Gregorian.Day): Jewish   .Day = Jewish   .Day(day.number + epoch)
+
+  final def nowGregorian: Gregorian.Day = {
+    val result = new java.util.Date()
+    Gregorian.Year(result.getYear+1900).month(result.getMonth+1).day(result.getDate)
+  }
+
+  final def nowJewish: Jewish.Day = toJewish(nowGregorian)
 }

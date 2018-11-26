@@ -11,7 +11,6 @@ object XML {
     (Attributes(element), getElements(element))
   }
 
-  // TODO make private and use only via parseEmpty
   def openEmpty(element: Elem, name: String): Attributes = {
     checkName(element, name)
     checkNoElements(element)
