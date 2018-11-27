@@ -5,7 +5,9 @@ import org.podval.judaica.metadata.{Attributes, LanguageSpec, LanguageString, Me
 
 import scala.xml.Elem
 
-final class Haftarah private(spans: Seq[Haftarah.BookSpan]) extends Haftarah.Spans(spans) with LanguageString {
+final case class Haftarah private(override val spans: Seq[Haftarah.BookSpan])
+  extends Haftarah.Spans(spans) with LanguageString
+{
   override def toLanguageString(implicit spec: LanguageSpec): String = {
     Util.group(spans, (span: Haftarah.BookSpan) => span.book)
       .map { bookSpans =>

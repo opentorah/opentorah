@@ -25,6 +25,8 @@ final class Names(val names: Seq[Name]) extends HasName {
   override def toString: String = names.mkString("Names(", ", ", ")")
 
   def isDisjoint(other: Names): Boolean = names.forall(name => !other.hasName(name.name))
+
+  def transform(transformer: Name => Name): Names = new Names(names.map(transformer))
 }
 
 object Names {
@@ -40,6 +42,14 @@ object Names {
   // TODO inline
   def merge(one: Names, other: Names): Names =
     if (other.isEmpty) one else throw new IllegalArgumentException(s"Merging Names not implemented: $one with $other")
+
+
+  // TODO there is a lot of similarities with Custom...
+  def combine(one: Names, other: Names, combiner: (LanguageSpec, String, String) => String): Names = {
+    val specs: Set[LanguageSpec] = one.names.map(_.languageSpec).toSet ++ other.names.map(_.languageSpec)
+    val result: Set[Name] = specs.map { spec => Name(combiner(spec, one.doFind(spec).name, other.doFind(spec).name), spec) }
+    new Names(result.toSeq)
+  }
 
   def parse(attributes: Attributes, elements: Seq[Elem]): (Names, Seq[Elem]) = {
     val defaultName: Option[Name] = parseDefaultName(attributes)
