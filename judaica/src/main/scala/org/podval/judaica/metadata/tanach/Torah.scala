@@ -1,7 +1,9 @@
 package org.podval.judaica.metadata.tanach
 
 // Other than on Simchas Torah, aliyot are from the same book.
-final class Torah private(spans: Seq[Torah.BookSpan]) extends Torah.Spans(spans) {
+final case class Torah private(override val spans: Seq[Torah.BookSpan])
+  extends Torah.Spans(spans)
+{
   def to6withLast(last: Torah.Aliyah): Torah =
     Torah(spans.take(5) :+ (spans(5)+spans(6)) :+ last)
 }

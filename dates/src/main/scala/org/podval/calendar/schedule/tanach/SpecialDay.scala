@@ -850,10 +850,7 @@ object SpecialDay {
   }
 
   private def namesWithNumber(withNames: WithNames, number: Int): Names =
-    new Names(withNames.names.names.map { name =>
-      val numberStr = name.languageSpec.language.fold(number.toString)(_.toString(number))
-      name.copy(name.name + " " + numberStr)
-    })
+    withNames.names.transform(name => name.copy(name.name + " " + name.languageSpec.toString(number)))
 
   val festivals: Set[FestivalOrIntermediate] = Set(
     RoshHashanah1, RoshHashanah2,

@@ -9,6 +9,8 @@ sealed class Custom(val parent: Option[Custom]) extends Named {
   final lazy val children: Set[Custom] = Custom.values.filter(_.parent.contains(this)).toSet
 
   final def isLeaf: Boolean = children.isEmpty
+
+  final def level: Int = parent.fold(0)(parent => parent.level+1)
 }
 
 // TODO we need some consistency in the naming of customs: if Bavlim, then maybe Sefaradim?
@@ -55,37 +57,46 @@ object Custom extends NamedCompanion {
     }
 
     final def minimize: Of[T] = {
-      def one(result: Map[Custom, T], custom: Custom, value: T): Map[Custom, T] =
-        result -- custom.children ++ Map(custom -> value)
-
-      // TODO do 1 at each step, and minimize the number of Customs present.
-      def step(result: Map[Custom, T]): (Map[Custom, T], Boolean) = {
-        val toAdd: Set[(Custom, T)] = values.toSet.flatMap { custom: Custom =>
-          if (custom.isLeaf /*|| result.contains(custom)*/) None else {
-            val ts: Seq[Option[T]] = custom.children.toSeq.map(child => result.get(child))
-            if (!ts.forall(_.isDefined)) None else {
-              val tset: Set[T] = ts.map(_.get).toSet
-              if (tset.size != 1) None else Some((custom, tset.head))
-            }
-          }
-        }
-
-        if (toAdd.isEmpty) (result, false) else {
-          val out: Map[Custom, T] = toAdd.foldRight(result) { case ((custom, value), acc) =>
-            acc -- custom.children ++ Map(custom -> value)
-          }
-          (out, true)
+      // go through levels of Customs in descending order;
+      // each group only affects the next one, not the preceding ones
+      byLevelDescending.foldLeft(this) { case (groupResult: Of[T], group: Seq[Custom]) =>
+        // Customs on the same level do not affect one another
+        group.foldRight(groupResult) { case (custom: Custom, result: Of[T]) =>
+          result.minimize(custom)
         }
       }
+    }
 
-      def addParents(result: Map[Custom, T]): Map[Custom, T] = {
-        val (out: Map[Custom, T], more: Boolean) = step(result)
-        if (!more) out else addParents(out)
+    private final def minimize(custom: Custom): Of[T] = {
+      val children: Set[Custom] = custom.children
+      if (children.isEmpty) this else {
+        val optionalValue: Option[T] = find(custom)
+        val childrenOptionalValues: Map[Option[T], Set[Custom]] = children.groupBy(customs.get)
+        val missingChildren: Set[Custom] = childrenOptionalValues.getOrElse(None, Set.empty)
+        val childrenValues: Map[T, Set[Custom]] = {
+          if (missingChildren.isEmpty) childrenOptionalValues else {
+            // Missing children rely on their ancestors to provide their value.
+            // There is another transformation that could be used here:
+            // value for a Custom is not relevant when values for all its children are present;
+            // we'll have to encode such irrelevant values differently from the missing ones
+            // if we were to employ that transformation...
+            require(optionalValue.isDefined)
+            val valueToSet: Option[T] = Some(optionalValue.get)
+            val currentSet: Set[Custom] = childrenOptionalValues.getOrElse(valueToSet, Set.empty)
+            (childrenOptionalValues - None).updated(valueToSet, currentSet ++ missingChildren)
+          }
+        }.map { case (key, value) => key.get -> value }
+
+        val childrenValuePopularities: Map[T, Int] = childrenValues.mapValues(_.size)
+        val maxChildrenValuePopularity: Int = childrenValuePopularities.values.max
+        val mostPopularValues: Set[T] =
+          childrenValuePopularities.filter { case (_, popularity) => popularity == maxChildrenValuePopularity }.keySet
+        val newValue: T = mostPopularValues.head
+        val childrenToRemove: Set[Custom] = childrenValues(newValue)
+
+        val result: Map[Custom, T] = (customs -- childrenToRemove).updated(custom, newValue)
+        new Of(result)
       }
-
-      // TODO remove unaccessible ancestors
-
-      new Of[T](addParents(customs))
     }
 
     final def lift[Q, R](b: Of[Q], f: (Custom, Option[T], Option[Q]) => R): Of[R] =
@@ -162,6 +173,11 @@ object Custom extends NamedCompanion {
     Magreb, Algeria, Toshbim, Djerba, Morocco, Fes, Bavlim, Teiman, Baladi, Shami)
 
   val leaves: Set[Custom] = values.toSet.filter(_.isLeaf)
+
+  val byLevelDescending: Seq[Seq[Custom]] = {
+    val byLevel: Map[Int, Seq[Custom]] = values.groupBy(_.level)
+    (0 to byLevel.keySet.max).reverse.flatMap(level => byLevel.get(level))
+  }
 
   def parse(names: String): Set[Custom] = {
     val result: Seq[Custom] = names.split(',').map(_.trim).map(getForName)

@@ -12,57 +12,21 @@ import org.http4s.server.middleware.AutoSlash
 import org.podval.calendar.dates.{Calendar, DayBase, MonthBase, YearBase}
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.Jewish
-import org.podval.calendar.schedule.tanach.{Haftarah, Reading, Schedule}
-import org.podval.judaica.metadata.tanach.Torah
-import org.podval.judaica.metadata.tanach.Custom
-import org.podval.judaica.metadata.{Language, LanguageSpec}
+import org.podval.calendar.schedule.tanach.{Reading, Schedule}
+import org.podval.judaica.metadata.{Language, LanguageSpec, WithNames}
+import org.podval.judaica.metadata.tanach.{Custom, Torah}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 import scalatags.Text.TypedTag
 import scalatags.Text.all._
 
+// TODO around Jewish year 3761, Gregorian day numbers become negative...
 // TODO add borders to tables
 object CalendarService extends StreamApp[IO] {
 
   private val calendarService: HttpService[IO] = HttpService[IO] {
-    case GET -> Root => renderHtml(home)
-
-    case GET -> Root / IntVar(yearNumber)
-      :? OptionalLanguageQueryParamMatcher(maybeLanguage)
-      :? OptionalInHolyLandQueryParamMatcher(maybeLocation)
-    =>
-      val spec: LanguageSpec = toSpec(maybeLanguage)
-      val location: Location = toLocation(maybeLocation)
-      renderHtml(
-        if (isJewish(yearNumber)) renderYear(Jewish.Year(yearNumber))(JewishK, location, spec)
-        else renderYear(Gregorian.Year(yearNumber))(GregorianK, location, spec)
-      )
-
-    case GET -> Root / IntVar(yearNumber) / monthStr
-      :? OptionalLanguageQueryParamMatcher(maybeLanguage)
-      :? OptionalInHolyLandQueryParamMatcher(maybeLocation)
-    =>
-      val spec: LanguageSpec = toSpec(maybeLanguage)
-      val location: Location = toLocation(maybeLocation)
-      renderHtml(
-        if (isJewish(yearNumber)) renderMonth(getJewishMonth(Jewish.Year(yearNumber), monthStr))(JewishK, location, spec)
-        else renderMonth(getGregorianMonth(Gregorian.Year(yearNumber), monthStr))(GregorianK, location, spec)
-      )
-
-    case GET -> Root / IntVar(yearNumber) / monthStr / IntVar(dayNumber)
-      :? OptionalLanguageQueryParamMatcher(maybeLanguage)
-      :? OptionalInHolyLandQueryParamMatcher(maybeLocation)
-    =>
-      val spec: LanguageSpec = toSpec(maybeLanguage)
-      val location: Location = toLocation(maybeLocation)
-      renderHtml(if (isJewish(yearNumber)) {
-        val day = getJewishMonth(Jewish.Year(yearNumber), monthStr).day(dayNumber)
-        renderDay(day, Calendar.fromJewish(day))(JewishK, location, spec)
-      } else {
-        val day = getGregorianMonth(Gregorian.Year(yearNumber), monthStr).day(dayNumber)
-        renderDay(Calendar.toJewish(day), day)(GregorianK, location, spec)
-      })
+    case GET -> Root => renderHtml(renderRoot)
 
     case GET -> Root / "jewish"
       :? OptionalLanguageQueryParamMatcher(maybeLanguage)
@@ -129,8 +93,6 @@ object CalendarService extends StreamApp[IO] {
     override def theOther: Kind = JewishK
   }
 
-  private def isJewish(yearNumber: Int): Boolean = yearNumber > 2240
-
   private implicit val languageQueryParamDecoder: QueryParamDecoder[Language] =
     QueryParamDecoder[String].map(Language.getForName)
 
@@ -144,12 +106,6 @@ object CalendarService extends StreamApp[IO] {
     QueryParamDecoder[Boolean].map(if (_) HolyLand else Diaspora)
 
   private object OptionalInHolyLandQueryParamMatcher extends OptionalQueryParamDecoderMatcher[Location]("inHolyLand")
-
-  private def home: TypedTag[String] = html(
-    body(
-      h1("title")
-    )
-  )
 
   private object JewishYearVar {
     def unapply(str: String): Option[Jewish.Year] =
@@ -176,12 +132,6 @@ object CalendarService extends StreamApp[IO] {
   private def toSpec(language: Option[Language]): LanguageSpec = language.getOrElse(Language.English).toSpec
 
   private def toLocation(location: Option[Location]): Location = location.getOrElse(Diaspora)
-
-  private def renderLanding(day: DayBase[_])(implicit
-    kind: Kind,
-    location: Location,
-    spec: LanguageSpec
-  ): TypedTag[String] = addPickers(s"/$kind", dayLinks(day))
 
   private def dayLinks(day: DayBase[_])(implicit
     kind: Kind,
@@ -245,6 +195,17 @@ object CalendarService extends StreamApp[IO] {
     spec: LanguageSpec
   ): TypedTag[String] = a(href := s"$url$suffix")(spacing, text)
 
+  private def renderRoot: TypedTag[String] = div(
+    div(a(href := "/jewish")("jewish")),
+    div(a(href := "/gregorian")("gregorian"))
+  )
+
+  private def renderLanding(day: DayBase[_])(implicit
+    kind: Kind,
+    location: Location,
+    spec: LanguageSpec
+  ): TypedTag[String] = addPickers(s"/$kind", dayLinks(day))
+
   private def renderYear(year: YearBase[_])(implicit
     kind: Kind,
     location: Location,
@@ -297,7 +258,12 @@ object CalendarService extends StreamApp[IO] {
     addPickers(dayUrl(day), div(
       div(dayLinks(first)(kind, location, spec), " ", first.name.toLanguageString),
       div(dayLinks(second)(kind.theOther, location, spec), " ", second.name.toLanguageString),
+      div(daySchedule.dayNames.map { withNames: WithNames => span(spacing, withNames.names.doFind(spec).name) }),
       renderOptionalReading("Morning", daySchedule.morning),
+      div(
+        h5("Chitas"),
+        daySchedule.chitas.map(fragment => span(spacing, fragment.toLanguageString))
+      ),
       renderOptionalReading("Afternoon", daySchedule.afternoon)
     ))
   }
@@ -308,34 +274,27 @@ object CalendarService extends StreamApp[IO] {
   )(implicit
     location: Location,
     spec: LanguageSpec
-  ): TypedTag[String] = div(
-    h4(name),
-    reading.fold(p("None")) { reading => div(
-      h5("Torah"),
-      div(reading.torah.customs.toSeq.map { case (custom: Custom, torah: Torah) => renderTorah(custom, torah) }),
-      h5("Maftir"),
-      renderByCustom(reading.maftir)(maftir => span(maftir.fold("None")(_.toLanguageString))),
-      h5("Haftarah"),
-      renderByCustom(reading.haftarah)(haftarah => span(haftarah.fold("None")(_.toLanguageString)))
-    )}
-  )
-
-  private def renderByCustom[T](customs: Custom.Of[T])(renderer: T => TypedTag[String]
-  )(
-    implicit spec: LanguageSpec
-  ): TypedTag[String] = table(
-    tbody(
-      customs.customs.toSeq.map { case (custom: Custom, value: T) =>
-        tr(td(custom.toLanguageString), td(renderer(value)))
-      }
+  ): TypedTag[String] = {
+    def renderByCustom[T](customs: Custom.Of[T])(renderer: T => TypedTag[String]): TypedTag[String] = table(
+      tbody(
+        customs.customs.toSeq.map { case (custom: Custom, value: T) =>
+          tr(td(custom.toLanguageString), td(renderer(value)))
+        }
+      )
     )
-  )
 
-  private def renderTorahByCustom(customs: Custom.Of[Torah])(
-    implicit spec: LanguageSpec
-  ): TypedTag[String] = div(
-    customs.customs.toSeq.map { case (custom: Custom, torah: Torah) => renderTorah(custom, torah) }
-  )
+    div(
+      h4(name),
+      reading.fold(p("None")) { reading => div(
+        h5("Torah"),
+        div(reading.torah.customs.toSeq.map { case (custom: Custom, torah: Torah) => renderTorah(custom, torah) }),
+        h5("Maftir"),
+        renderByCustom(reading.maftir)(maftir => span(maftir.fold("None")(_.toLanguageString))),
+        h5("Haftarah"),
+        renderByCustom(reading.haftarah)(haftarah => span(haftarah.fold("None")(_.toLanguageString)))
+      )}
+    )
+  }
 
   private def renderTorah(custom: Custom, torah: Torah)(implicit spec: LanguageSpec): TypedTag[String] = table(
     caption(custom.toLanguageString),
@@ -384,8 +343,9 @@ object CalendarService extends StreamApp[IO] {
     paddingRight := 10
   )
 
-  private val builder: BlazeBuilder[IO] = BlazeBuilder[IO].bindHttp(8080, "localhost")
-    .mountService(AutoSlash(calendarService), "/")
+  // To be accessible when running in a docker container the server must bind to all IPs, not just 127.0.0.1:
+  private val builder: BlazeBuilder[IO] = BlazeBuilder[IO].bindHttp(host = "0.0.0.0", port = 8090)
+    .mountService(AutoSlash(calendarService), prefix = "/")
 
   override def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, ExitCode] =
     builder.serve

@@ -23,4 +23,6 @@ abstract class JewishYear(number: Int) extends YearBase[Jewish](number) {
   final def numberInCycle: Int = Cycle.yearNumberInCycle(number)
 
   final def latestAdar: Month = month(if (isLeap) Month.Name.AdarII else Month.Name.Adar)
+
+  final def isShemittah: Boolean = (number % 7) == 0
 }

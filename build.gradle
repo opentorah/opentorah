@@ -18,6 +18,8 @@ plugins {
   id "com.github.maiflai.scalatest" version "0.22" apply false
   id "com.jfrog.artifactory" version "4.5.4" apply false
   id "com.jfrog.bintray" version "1.7.3" apply false
+//  id 'com.bmuschko.docker-remote-api' version '4.0.5' apply false
+  id 'com.bmuschko.docker-java-application' version '4.0.5'
 }
 
 def scalaVersion      = '2.12.7'
@@ -202,13 +204,26 @@ project(':dates') {
 }
 
 project(':service') {
+  apply plugin: 'application'
+  apply plugin: 'com.bmuschko.docker-java-application'
+
   dependencies {
-    compile project(':dates'), lib.http4sDsl, lib.http4sServer, lib.http4sClient
+    compile project(':dates')
+    compile lib.http4sDsl, lib.http4sServer, lib.http4sClient
     compile lib.scalatags
 // http4s -> Scalatags bridge, when included as a dependency, confuses the imports;
 // doing explicit conversions for now :)    
 //    compile lib.http4sScalatags
-    compile lib.slf4jJdk // TODO into implementation
+    implementation lib.slf4jJdk
+  }
+
+  mainClassName = 'org.podval.calendar.service.CalendarService'
+
+  docker {
+    javaApplication {
+      maintainer = 'Leonid Dubinsky dub@podval.org'
+      ports = [8090]
+    }
   }
 }
 

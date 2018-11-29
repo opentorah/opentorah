@@ -51,7 +51,7 @@ trait WithBookSpans[Book <: Tanach.TanachBook] {
 
   protected def getBook(name: String): Book
 
-  private def merge(spans: Seq[BookSpan]): BookSpan = {
+  def merge(spans: Seq[BookSpan]): BookSpan = {
     val book = spans.head.book
     require(spans.forall(_.book == book))
     require(book.chapters.consecutive(spans.map(_.span)))
