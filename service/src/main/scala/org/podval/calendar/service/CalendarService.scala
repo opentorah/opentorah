@@ -21,11 +21,16 @@ import scalatags.Text.TypedTag
 import scalatags.Text.all._
 
 // TODO around Jewish year 3761, Gregorian day numbers become negative...
-// TODO add borders to tables
 object CalendarService extends StreamApp[IO] {
 
+  private val staticResourceExtensions: Seq[String] = Seq(".ico", ".css", ".js")
+  private def isStaticResource(path: String): Boolean = staticResourceExtensions.exists(path.endsWith)
+  private def serveStaticResource(path: String, request: Request[IO]): IO[Response[IO]] =
+    StaticFile.fromResource("/" + path, Some(request)).getOrElseF(NotFound())
+
+
   private val calendarService: HttpService[IO] = HttpService[IO] {
-    case GET -> Root / "favicon.ico" => NotFound("No favicon.ico")
+    case request @ GET -> Root / path if isStaticResource(path) => serveStaticResource(path, request)
 
     case GET -> Root
       :? OptionalLanguageQueryParamMatcher(maybeLanguage)
@@ -77,6 +82,12 @@ object CalendarService extends StreamApp[IO] {
     def second(day: DayBase[_]): Gregorian.Day
 
     def theOther: Kind
+
+    def yearNumberToString(number: Int)(implicit spec: LanguageSpec): String
+
+    def monthNumberToString(number: Int)(implicit spec: LanguageSpec): String
+
+    def dayNumberToString(number: Int)(implicit spec: LanguageSpec): String
   }
 
   private final case object JewishK extends Kind("jewish") {
@@ -93,6 +104,15 @@ object CalendarService extends StreamApp[IO] {
     override def second(day: DayBase[_]): Gregorian.Day = Calendar.fromJewish(first(day))
 
     override def theOther: Kind = GregorianK
+
+    override def yearNumberToString(number: Int)(implicit spec: LanguageSpec): String =
+      spec.toString(number)
+
+    override def monthNumberToString(number: Int)(implicit spec: LanguageSpec): String =
+      spec.toString(number)
+
+    override def dayNumberToString(number: Int)(implicit spec: LanguageSpec): String =
+      spec.toString(number)
   }
 
   private final case object GregorianK extends Kind("gregorian") {
@@ -108,6 +128,15 @@ object CalendarService extends StreamApp[IO] {
     override def first(day: DayBase[_]): Jewish.Day = Calendar.toJewish(second(day))
     override def second(day: DayBase[_]): Gregorian.Day = day.asInstanceOf[Gregorian.Day]
     override def theOther: Kind = JewishK
+
+    override def yearNumberToString(number: Int)(implicit spec: LanguageSpec): String =
+      number.toString
+
+    override def monthNumberToString(number: Int)(implicit spec: LanguageSpec): String =
+      number.toString
+
+    override def dayNumberToString(number: Int)(implicit spec: LanguageSpec): String =
+      number.toString
   }
 
   private def getKind(kindStr: String): Kind =
@@ -148,32 +177,32 @@ object CalendarService extends StreamApp[IO] {
     kind: Kind,
     location: Location,
     spec: LanguageSpec
-  ): TypedTag[String] = link(
-    url = yearUrl(year),
-    text = text.getOrElse(spec.toString(year.number))
-  )
+  ): TypedTag[String] = {
+    val label: String = text.getOrElse(kind.yearNumberToString(year.number))
+    a(cls := "nav", href := s"${yearUrl(year)}$suffix")(label)
+  }
 
   private def yearUrl(year: YearBase[_])(implicit kind: Kind): String =
     s"/$kind/${year.number}"
 
+  // TODO monthUrl
   private def monthLink(month: MonthBase[_])(implicit
     kind: Kind,
     location: Location,
     spec: LanguageSpec
-  ): TypedTag[String] = link(
-    // TODO monthUrl
-    url = s"/$kind/${month.year.number}/${month.numberInYear}",
-    text = spec.toString(month.numberInYear)
-  )
+  ): TypedTag[String] = {
+    val label: String = kind.monthNumberToString(month.numberInYear)
+    a(cls := "nav", href := s"/$kind/${month.year.number}/${month.numberInYear}/$suffix")(label)
+  }
 
   private def monthNameLink(month: MonthBase[_], text: Option[String] = None)(implicit
     kind: Kind,
     location: Location,
     spec: LanguageSpec
-  ): TypedTag[String] = link(
-    url = monthNameUrl(month),
-    text = text.getOrElse(month.name.toLanguageString)
-  )
+  ): TypedTag[String] = {
+    val label: String = text.getOrElse(month.name.toLanguageString)
+    a(cls := "nav", href := s"${monthNameUrl(month)}$suffix")(label)
+  }
 
   private def monthNameUrl(month: MonthBase[_])(implicit kind: Kind, spec: LanguageSpec): String =
     s"/$kind/${month.year.number}/${month.name.toLanguageString}"
@@ -182,10 +211,10 @@ object CalendarService extends StreamApp[IO] {
     kind: Kind,
     location: Location,
     spec: LanguageSpec
-  ): TypedTag[String] = link(
-    url = dayUrl(day),
-    text = text.getOrElse(spec.toString(day.numberInMonth))
-  )
+  ): TypedTag[String] = {
+    val label: String = text.getOrElse(kind.dayNumberToString(day.numberInMonth))
+    a(cls := "nav", href := s"${dayUrl(day)}$suffix")(label)
+  }
 
   private def dayUrl(day: DayBase[_])(implicit kind: Kind, spec: LanguageSpec): String =
     s"/$kind/${day.year.number}/${day.month.numberInYear}/${day.numberInMonth}"
@@ -218,6 +247,9 @@ object CalendarService extends StreamApp[IO] {
     }))
   ))
 
+  private def direction(implicit spec: LanguageSpec): String =
+    if (spec.language.contains(Language.Hebrew)) "rtl" else "ltr"
+
   private def renderMonth(month: MonthBase[_])(implicit
     kind: Kind,
     location: Location,
@@ -241,7 +273,7 @@ object CalendarService extends StreamApp[IO] {
     val first: DayBase[_] = if (kind == JewishK) day else gregorianDay
     val second: DayBase[_] = if (kind == JewishK) gregorianDay else day
 
-    renderHtml(dayUrl(day), div(
+    renderHtml(dayUrl(first), div(
       div(dayLinks(first)(kind, location, spec), " ", first.name.toLanguageString),
       div(dayLinks(second)(kind.theOther, location, spec), " ", second.name.toLanguageString),
       div(daySchedule.dayNames.map { withNames: WithNames => renderNames(withNames.names) }),
@@ -253,17 +285,17 @@ object CalendarService extends StreamApp[IO] {
 
   private def renderChitas(chitas: Chitas)(implicit spec: LanguageSpec): TypedTag[String] = {
     def renderFragment(fragment: Chitas.Fragment): TypedTag[String] =
-      span(spacing, renderNames(fragment.names), fragment.torah.toLanguageString)
+      span(renderNames(fragment.names), fragment.torah.toLanguageString)
 
     div(
-      h4("Chitas"),
+      span(cls := "heading")("Chitas"),
       renderFragment(chitas.first),
       chitas.second.fold(Seq.empty[TypedTag[String]])(fragment => Seq(renderFragment(fragment)))
     )
   }
 
   private def renderNames(names: Names)(implicit spec: LanguageSpec): TypedTag[String] =
-    span(spacing, names.doFind(spec).name)
+    span(cls := "name", names.doFind(spec).name)
 
   private def renderOptionalReading(
     name: String,
@@ -271,9 +303,9 @@ object CalendarService extends StreamApp[IO] {
   )(implicit
     location: Location,
     spec: LanguageSpec
-  ): TypedTag[String] = {
+  ): Seq[TypedTag[String]] = {
     def renderByCustom[T <: LanguageString](title: String, customs: Custom.Of[Option[T]]): Seq[TypedTag[String]] = Seq(
-      h5(title),
+      span(cls := "subheading")(title),
       table(tbody(
         customs.customs.toSeq.map { case (custom: Custom, value: Option[T]) =>
           tr(td(custom.toLanguageString), td(span(value.fold("None")(_.toLanguageString))))
@@ -281,17 +313,19 @@ object CalendarService extends StreamApp[IO] {
       ))
     )
 
-    div(
-      h4(name),
-      reading.fold(p("None")) { reading =>
-        val torah: Seq[TypedTag[String]] = reading.torah.customs.toSeq.map { case (custom: Custom, torah: Torah) => table(
-          caption(custom.toLanguageString),
-          tbody(
-            torah.spans.zipWithIndex map { case (fragment, index) =>
-              tr(td(index+1), td(fragment.toLanguageString))
-            }
-          )
-        )}
+    reading.fold(Seq.empty[TypedTag[String]]) { reading => Seq(div(
+      span(cls := "heading")(name),
+      {
+        val torah: Seq[TypedTag[String]] = reading.torah.customs.toSeq.map { case (custom: Custom, torah: Torah) =>
+          div(cls := "custom")(table(
+            caption(custom.toLanguageString),
+            tbody(
+              torah.spans.zipWithIndex map { case (fragment, index) =>
+                tr(td(spec.toString(index+1)), td(fragment.toLanguageString))
+              }
+            )
+          ))
+        }
 
         val maftir = reading.maftir
         val haftarah = reading.haftarah
@@ -299,15 +333,16 @@ object CalendarService extends StreamApp[IO] {
           maftir.commonOnly.fold(false)(_.isEmpty) && haftarah.commonOnly.fold(false)(_.isEmpty)
 
         div(
-          h5(Seq[TypedTag[String]](span(spacing, "Torah")) ++ reading.names.map(renderNames).toSeq),
+          span(cls := "subheading")("Torah"),
+          reading.names.map(renderNames).toSeq,
           torah,
-          if (noMaftirHaftarah) h5("No maftir/haftarah") else Seq(
+          if (noMaftirHaftarah) Seq.empty[TypedTag[String]] else Seq(
             renderByCustom("Maftir", maftir),
             renderByCustom("Haftarah", haftarah)
           )
         )
       }
-    )
+    ))}
   }
 
   private def renderHtml(
@@ -319,19 +354,27 @@ object CalendarService extends StreamApp[IO] {
   ): IO[Response[IO]] = {
     val languages = Language.values.map(_.toSpec) map { spec1 =>
       val languageName = spec1.languageName
-      if (spec1.language == spec.language) span(spacing, languageName)
-      else a(href := s"$url${suffix(location, spec1)}")(spacing, languageName)
+      if (spec1.language == spec.language) span(cls := "picker", languageName)
+      else a(cls := "picker", href := s"$url${suffix(location, spec1)}")(languageName)
     }
 
     val locations = Seq(HolyLand, Diaspora).map { location1 =>
-      if (location1 == location) span(spacing, location1.name)
-      else a(href := s"$url${suffix(location1, spec)}")(spacing, location1.name)
+      if (location1 == location) span(cls := "picker", location1.name)
+      else a(cls := "picker", href := s"$url${suffix(location1, spec)}")(location1.name)
     }
 
-    val result = div(
-      div(languages),
-      div(locations),
-      content
+    val result = html(dir := direction)(
+      head(
+//        title("Reading Schedule"),
+        link(rel := "stylesheet", `type` := "text/css", href := "/style.css")
+      ),
+      body(
+        div(
+          div(languages),
+          div(locations),
+          content
+        )
+      )
     )
 
     Ok(result.render).map(
@@ -339,20 +382,17 @@ object CalendarService extends StreamApp[IO] {
     )
   }
 
-  private val spacing: Modifier = modifier(
-    paddingRight := 10
-  )
-
-  private def link(url: String, text: String)(implicit location: Location, spec: LanguageSpec): TypedTag[String] =
-    a(href := s"$url$suffix")(spacing, text)
-
   private def suffix(implicit location: Location, spec: LanguageSpec): String =
     s"?inHolyLand=${location.inHolyLand}&lang=${spec.languageName}"
 
   // To be accessible when running in a docker container the server must bind to all IPs, not just 127.0.0.1:
-  private val builder: BlazeBuilder[IO] = BlazeBuilder[IO].bindHttp(host = "0.0.0.0", port = 8090)
+  private val builder: BlazeBuilder[IO] = BlazeBuilder[IO]
+    .bindHttp(host = "0.0.0.0", port = getServicePort)
     .mountService(AutoSlash(calendarService), prefix = "/")
 
   override def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, ExitCode] =
     builder.serve
+
+  private def getServicePort: Int =
+    scala.util.Properties.envOrNone("SERVICE_PORT").map(_.toInt).getOrElse(8090)
 }

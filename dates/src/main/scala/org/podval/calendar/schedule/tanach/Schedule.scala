@@ -1,7 +1,7 @@
 package org.podval.calendar.schedule.tanach
 
 import org.podval.calendar.jewish.Jewish.{Day, Year}
-import org.podval.calendar.schedule.tanach.SpecialDay.{FestivalOrIntermediate, ShabbosBereishis}
+import org.podval.calendar.schedule.tanach.SpecialDay.{FestivalOrIntermediate, ShabbosBereishis, Omer}
 import org.podval.judaica.metadata.{Util, WithNames}
 
 final case class Schedule private(
@@ -35,7 +35,7 @@ object Schedule {
     years: Seq[Year],
     daysWithSpecialReadingsNotFestivals: Map[Day, SpecialDay.Date],
     specialShabboses: Map[Day, SpecialDay.SpecialShabbos],
-    pesachOnChamishi: Set[Year]
+    pesachOnChamishi: Set[Year] // TODO calculate on the spot via a advancing memoized holder :)
   ) {
     def build: Schedule = {
       currentWeeklyReadings = weeklyReadingsList
@@ -70,7 +70,8 @@ object Schedule {
           specialDay.toSeq ++
           specialShabbos.toSeq ++
           (if (day.next.isRoshChodesh) Seq(SpecialDay.ErevRoshChodesh) else Seq.empty) ++
-          (if (day.isRoshChodesh) Seq(SpecialDay.RoshChodesh) else Seq.empty),
+          (if (day.isRoshChodesh) Seq(SpecialDay.RoshChodesh) else Seq.empty) ++
+          Omer.dayOf(day).toSeq,
         morning = SpecialDay.getMorningReading(
           day = day,
           specialDay = specialDay,

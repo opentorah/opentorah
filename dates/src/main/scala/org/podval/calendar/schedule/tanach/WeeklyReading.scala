@@ -3,7 +3,7 @@ package org.podval.calendar.schedule.tanach
 import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import SpecialDay.{Pesach, Shavuos, TishaBeAv}
-import org.podval.judaica.metadata.{Names, Util}
+import org.podval.judaica.metadata.{Names, Util, WithNames}
 import org.podval.judaica.metadata.tanach.Parsha
 import org.podval.judaica.metadata.tanach.Parsha._
 
@@ -103,10 +103,10 @@ import org.podval.judaica.metadata.tanach.Parsha._
   assumptions of the algorithm itself hold is verified by the unit tests for the years 1-6000;
   I am too lazy to prove the theorems :)
  */
-final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) {
+final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) extends WithNames {
   def isCombined: Boolean = secondParsha.isDefined
 
-  private def names: Names = if (!isCombined) parsha.names else
+  override def names: Names = if (!isCombined) parsha.names else
     Names.combine(parsha.names, secondParsha.get.names, { case (_, one, other) =>
         one + "-" + other
     })

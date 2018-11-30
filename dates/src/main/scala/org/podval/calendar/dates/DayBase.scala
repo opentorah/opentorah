@@ -15,9 +15,11 @@ abstract class DayBase[C <: Calendar[C]](number: Int)
 
   final def prev: C#Day = this - 1
 
-  final def +(change: Int) = calendar.Day(number + change)
+  final def +(change: Int): C#Day = calendar.Day(number + change)
 
-  final def -(change: Int) = calendar.Day(number - change)
+  final def -(change: Int): C#Day = calendar.Day(number - change)
+
+  final def -(that: C#Day): Int = this.number - that.number
 
   final def year: C#Year = calendar.Year(this)
 

@@ -496,7 +496,7 @@ object SpecialDay {
   }
 
   sealed class Chanukah(override val dayNumber: Int) extends WithNames with DayOf with RabbinicFestival {
-    private def korbanot: Torah = Numbers.channukahKorbanot
+    private def korbanot: Torah = Numbers.chanukahKorbanot
 
     final override lazy val names: Names = namesWithNumber(Chanukah, dayNumber)
 
@@ -516,7 +516,7 @@ object SpecialDay {
     final def weekday(isRoshChodesh: Boolean): Reading = {
       val (common: Torah, ashkenazAndChabadTail: Torah, sefardTail: Torah) =
         if (dayNumber == 1) (
-          Torah.aliyot(korbanot.spans.head),
+          Torah.aliyot(Numbers.chanukahFirst.spans.head), //(korbanot.spans.head),
           Torah.aliyot(first(dayNumber), second(dayNumber)),
           Torah.aliyot(full(dayNumber), full(dayNumber + 1))
         ) else {
@@ -787,12 +787,25 @@ object SpecialDay {
         <haftarah book="Isaiah" fromChapter="10" fromVerse="32" toChapter="12" toVerse="6"/>)
   }
 
+  case class Omer(number: Int) extends WithNames {
+    override def names: Names = namesWithNumber(Omer, number)
+  }
+
+  object Omer extends LoadNames("Omer") {
+    def dayOf(day: Day): Option[Omer] = {
+      val year = day.year
+      val pesach = Pesach.date(year)
+      val shavous = Shavuos.date(year)
+      if ((day <= pesach) || (day >= shavous)) None else Some(Omer(day - pesach))
+    }
+  }
+
   case object LagBaOmer extends LoadNames("Lag Ba Omer") with Date {
-    override def date(year: Year): Day = Pesach.date(year) + 33 // year.month(Iyar).day(18)
+    override def date(year: Year): Day = Pesach.date(year) + 33
   }
 
   case object Shavuos extends LoadNames("Shavuos") with Festival with FirstDayOf with WeekdayReadingSimple {
-    override def date(year: Year): Day = Pesach.date(year) + 50 // year.month(Sivan).day(6)
+    override def date(year: Year): Day = Pesach.date(year) + 50
 
     protected override def torah: Torah = Exodus.shavuosTorah
 
@@ -1014,7 +1027,7 @@ object SpecialDay {
     ShabbosBereishis, Chanukah, FastOfTeves,
     ParshasShekalim, ParshasZachor, ParshasParah, ParshasHachodesh, ShabbosHagodol,
     FastOfEster, Purim, ShushanPurim, Pesach, PesachIntermediate, Pesach7, Pesach8,
-    LagBaOmer, Shavuos, FastOfTammuz, TishaBeAv
+    Omer, LagBaOmer, Shavuos, FastOfTammuz, TishaBeAv
   )
 
   private val toNames: Map[WithName, Names] = Metadata.loadNames(loadNames, this, "SpecialDay")
