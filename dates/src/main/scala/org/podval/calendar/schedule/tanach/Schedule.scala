@@ -2,7 +2,6 @@ package org.podval.calendar.schedule.tanach
 
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.schedule.tanach.SpecialDay.{FestivalOrIntermediate, ShabbosBereishis}
-import org.podval.judaica.metadata.tanach.{Custom, Parsha, Torah}
 import org.podval.judaica.metadata.{Util, WithNames}
 
 final case class Schedule private(
@@ -19,7 +18,7 @@ object Schedule {
     dayNames: Seq[WithNames],
     morning: Option[Reading],
     afternoon: Option[Reading],
-    chitas: Seq[Torah.Fragment] // only on SimchasTorah are there more  than one fragment
+    chitas: Chitas
   )
 
   def apply(from: Day, to: Day, inHolyLand: Boolean): Schedule = createBuilder(from, to, inHolyLand).build
@@ -55,64 +54,39 @@ object Schedule {
     }
 
     private def nextWeeklyReadings(day: Day): WeeklyReading = {
-      currentWeeklyReadings = nextWeeklyReadings.dropWhile(_._1 <= day)
-      currentWeeklyReadings.head._2
+      nextWeeklyReadings = nextWeeklyReadings.dropWhile(_._1 <= day)
+      nextWeeklyReadings.head._2
     }
 
     private def forDay(day: Day): DaySchedule = {
       val weeklyReading: Option[WeeklyReading] = weeklyReadings.get(day)
       val specialDay: Option[SpecialDay.Date] = festivals.get(day).orElse(daysWithSpecialReadingsNotFestivals.get(day))
       val specialShabbos: Option[SpecialDay.SpecialShabbos] = specialShabboses.get(day)
-      val isPesachOnChamishi: Boolean = pesachOnChamishi.contains(day.year)
       val nextWeeklyReading: WeeklyReading = nextWeeklyReadings(day)
-
-      val isShabbos: Boolean = day.isShabbos
-      if (!isShabbos) require(weeklyReading.isEmpty && specialShabbos.isEmpty)
-
-      val dayNames: Seq[WithNames] =
-        weeklyReading.toSeq ++
-        specialDay.toSeq ++
-        specialShabbos.toSeq ++
-        (if (day.next.isRoshChodesh) Seq(SpecialDay.ErevRoshChodesh) else Seq.empty) ++
-        (if (day.isRoshChodesh) Seq(SpecialDay.RoshChodesh) else Seq.empty)
-
-      // TODO pre-calculate?
-      val simchasTorah: Day = SpecialDay.SimchasTorah.date(day.year)
-      val isSimchasTorahThisWeek: Boolean = simchasTorah.shabbosAfter == day.shabbosAfter
-      val chitas: Seq[Torah.Fragment] = {
-        if (!isSimchasTorahThisWeek) chabadDay(currentWeeklyReadings(day).getReading.torah, day) else {
-          if (day < simchasTorah) chabadDay(Parsha.VezosHaberachah.days, day) else
-          if (day > simchasTorah) chabadDay(Parsha.Bereishis.days, day) else Seq(
-            Torah.merge(chabadTorah(Parsha.VezosHaberachah.days).drop(day.numberInWeek-1)),
-            Torah.merge(chabadTorah(Parsha.Bereishis.days).take(day.numberInWeek))
-          )
-        }
-      }
 
       DaySchedule(
         day,
-        dayNames = dayNames,
+        dayNames =
+          specialDay.toSeq ++
+          specialShabbos.toSeq ++
+          (if (day.next.isRoshChodesh) Seq(SpecialDay.ErevRoshChodesh) else Seq.empty) ++
+          (if (day.isRoshChodesh) Seq(SpecialDay.RoshChodesh) else Seq.empty),
         morning = SpecialDay.getMorningReading(
           day = day,
           specialDay = specialDay,
           specialShabbos = specialShabbos,
           weeklyReading = weeklyReading,
           nextWeeklyReading = nextWeeklyReading,
-          isPesachOnChamishi = isPesachOnChamishi
+          isPesachOnChamishi = pesachOnChamishi.contains(day.year)
         ),
         afternoon = SpecialDay.getAfternoonReading(
           day = day,
           specialDay = specialDay,
           nextWeeklyReading = nextWeeklyReading
         ),
-        chitas = chitas
+        chitas = Chitas(day, currentWeeklyReadings(day))
       )
     }
-
-    private def chabadDay(customs: Torah.Customs, day: Day): Seq[Torah.Fragment] =
-      Seq(chabadTorah(customs)(day.numberInWeek-1))
-
-    private def chabadTorah(customs: Torah.Customs): Seq[Torah.BookSpan] = customs.doFind(Custom.Chabad).spans
   }
 
   private final case class YearData(

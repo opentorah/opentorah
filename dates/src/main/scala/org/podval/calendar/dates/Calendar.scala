@@ -52,6 +52,8 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
   }
 
   final val TimeVector = Vector
+
+  def now: Day
 }
 
 
@@ -98,11 +100,4 @@ object Calendar {
   final def fromJewish(day: Jewish   .Day): Gregorian.Day = Gregorian.Day(day.number - epoch)
 
   final def toJewish  (day: Gregorian.Day): Jewish   .Day = Jewish   .Day(day.number + epoch)
-
-  final def nowGregorian: Gregorian.Day = {
-    val result = new java.util.Date()
-    Gregorian.Year(result.getYear+1900).month(result.getMonth+1).day(result.getDate)
-  }
-
-  final def nowJewish: Jewish.Day = toJewish(nowGregorian)
 }

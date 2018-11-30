@@ -1,10 +1,12 @@
 package org.podval.calendar.schedule.tanach
 
-import org.podval.judaica.metadata.tanach.Torah
+import org.podval.judaica.metadata.Names
+import org.podval.judaica.metadata.tanach.{Custom, Torah}
 import org.podval.judaica.metadata.tanach.Torah.Maftir
-import org.podval.judaica.metadata.tanach.Custom
 
-final class Reading(map: Map[Custom, Reading.ReadingCustom]) extends Custom.Of[Reading.ReadingCustom](map) {
+final class Reading(customs: Map[Custom, Reading.ReadingCustom], val names: Option[Names] = None)
+  extends Custom.Of[Reading.ReadingCustom](customs)
+{
   def torah: Torah.Customs =
     new Custom.Of(customs.mapValues(_.torah)).minimize
 
@@ -54,20 +56,27 @@ object Reading {
       copy(haftarah = haftarah)
   }
 
-  def apply(torah: Torah): Reading = apply(Custom.Of(torah))
+  def apply(torah: Torah, names: Option[Names] = None): Reading =
+    apply(Custom.Of(torah), names = names)
 
-  def apply(torah: Torah.Customs): Reading =
-    new Reading(torah.customs.mapValues(torah => ReadingCustom(torah, maftirAndHaftarah = None)))
+  def apply(torah: Torah.Customs, names: Option[Names]): Reading = {
+    val result: Map[Custom, ReadingCustom] =
+      torah.customs.mapValues(torah => ReadingCustom(torah, maftirAndHaftarah = None))
+    new Reading(result, names)
+  }
 
   def apply(torah: Torah, haftarah: Haftarah.Customs): Reading =
     apply(torah = Torah(torah.spans.init), maftir = torah.spans.last, haftarah = haftarah)
 
   def apply(torah: Torah, maftir: Maftir, haftarah: Haftarah.Customs): Reading =
-    apply(Custom.Of(torah), maftir, haftarah)
+    apply(Custom.Of(torah), maftir, haftarah, names = None)
 
-  def apply(torah: Torah.Customs, maftir: Maftir, haftarah: Haftarah.Customs): Reading = new Reading(
-    torah.liftLR[Haftarah, ReadingCustom](haftarah, { case (_: Custom, torah: Torah, haftarah: Haftarah) =>
-      ReadingCustom(torah, maftirAndHaftarah = Some(MaftirAndHaftarah(maftir, haftarah)))
-    }).customs
-  )
+  def apply(torah: Torah.Customs, maftir: Maftir, haftarah: Haftarah.Customs, names: Option[Names]): Reading = {
+    val result: Map[Custom, ReadingCustom] =
+      torah.liftLR[Haftarah, ReadingCustom](haftarah, { case (_: Custom, torah: Torah, haftarah: Haftarah) =>
+        ReadingCustom(torah, maftirAndHaftarah = Some(MaftirAndHaftarah(maftir, haftarah)))
+      }).customs
+
+    new Reading(result, names)
+  }
 }

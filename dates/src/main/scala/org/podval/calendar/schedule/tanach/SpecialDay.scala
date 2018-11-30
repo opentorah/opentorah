@@ -10,6 +10,7 @@ import org.podval.calendar.jewish.{JewishDay, JewishYear}
 
 import scala.xml.Elem
 
+// TODO fully annotate Torah/Haftarah with Names ("Rosh Chodesh" etc...)
 object SpecialDay {
 
   sealed class LoadNames(override val name: String) extends WithName with WithNames {
@@ -403,7 +404,7 @@ object SpecialDay {
         Custom.RavNaeHolyLand -> Torah.aliyot(korbanot(n), korbanot(n), korbanot(n), korbanot(n))
       ))
 
-      Reading(torah)
+      Reading(torah, names = None)
     }
 
     private def korbanot(n: Int): Aliyah = Numbers.succosKorbanot.spans(n-1)
@@ -504,7 +505,7 @@ object SpecialDay {
     final override def date(year: Year): Day = year.month(Kislev).day(25)+(dayNumber-1)
 
     final def shabbos(weeklyReading: WeeklyReading, isRoshChodesh: Boolean): Reading = {
-      val result = replaceMaftirAndHaftarah(weeklyReading.getReading,
+      val result = replaceMaftirAndHaftarah(weeklyReading.getMorningReading,
         maftir = full(dayNumber),
         haftarah = if (dayNumber < 8) Chanukah.haftarahShabbos1 else Chanukah.haftarahShabbos2)
 
@@ -542,7 +543,7 @@ object SpecialDay {
         if (!isRoshChodesh) torah
         else Custom.Of(RoshChodesh.in3aliyot :+ full(dayNumber))
 
-      Reading(torahResult)
+      Reading(torahResult, names = None)
     }
 
     private def first(n: Int): Aliyah = korbanot.spans(2*n-1)
@@ -902,9 +903,13 @@ object SpecialDay {
     weeklyReading: Option[WeeklyReading],
     nextWeeklyReading: WeeklyReading,
     isPesachOnChamishi: Boolean
-  ): Option[Reading] =
-    if (day.isShabbos) Some(getShabbosMorningReading(day, specialDay, weeklyReading, specialShabbos))
+  ): Option[Reading] = {
+    val isShabbos: Boolean = day.isShabbos
+    if (!isShabbos) require(weeklyReading.isEmpty && specialShabbos.isEmpty)
+
+    if (isShabbos) Some(getShabbosMorningReading(day, specialDay, weeklyReading, specialShabbos))
     else getWeekdayMorningReading(day, specialDay, nextWeeklyReading, isPesachOnChamishi)
+  }
 
   private final def getShabbosMorningReading(
     day: Day,
@@ -928,7 +933,7 @@ object SpecialDay {
     }
       .getOrElse {
         require(weeklyReading.isDefined)
-        val result = weeklyReading.get.getReading
+        val result = weeklyReading.get.getMorningReading
         // TODO Chabad: on Shabbos Ki Teize (14th of Ellul) adds haftarah Reeh after the regular one.
         result
       }
@@ -980,7 +985,7 @@ object SpecialDay {
     specialReading
       .orElse {
         val isSheniOrChamishi: Boolean = Set[Day.Name](Day.Name.Sheni, Day.Name.Chamishi).contains(day.name)
-        if (!isSheniOrChamishi) None else Some(nextWeeklyReading.aliyot)
+        if (!isSheniOrChamishi) None else Some(nextWeeklyReading.getAfternoonReading)
       }
       .orElse {
         if (!isRoshChodesh) None else Some(RoshChodesh.weekday)
@@ -1000,7 +1005,7 @@ object SpecialDay {
       case _ => None
     }
 
-    specialReading.orElse { if (!day.isShabbos) None else Some(nextWeeklyReading.aliyot) }
+    specialReading.orElse { if (!day.isShabbos) None else Some(nextWeeklyReading.getAfternoonReading) }
   }
 
   private val loadNames: Seq[LoadNames] = Seq(RoshChodesh, ErevRoshChodesh,

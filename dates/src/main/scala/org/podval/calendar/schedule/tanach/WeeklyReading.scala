@@ -3,7 +3,7 @@ package org.podval.calendar.schedule.tanach
 import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import SpecialDay.{Pesach, Shavuos, TishaBeAv}
-import org.podval.judaica.metadata.{Names, Util, WithNames}
+import org.podval.judaica.metadata.{Names, Util}
 import org.podval.judaica.metadata.tanach.Parsha
 import org.podval.judaica.metadata.tanach.Parsha._
 
@@ -103,23 +103,24 @@ import org.podval.judaica.metadata.tanach.Parsha._
   assumptions of the algorithm itself hold is verified by the unit tests for the years 1-6000;
   I am too lazy to prove the theorems :)
  */
-final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) extends WithNames {
+final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) {
   def isCombined: Boolean = secondParsha.isDefined
 
-  def names: Names = if (!isCombined) parsha.names else
-    Names.combine(parsha.names, secondParsha.get.names, { case (spec, one, other) =>
+  private def names: Names = if (!isCombined) parsha.names else
+    Names.combine(parsha.names, secondParsha.get.names, { case (_, one, other) =>
         one + "-" + other
     })
 
-  def getReading: Reading = Reading(
+  def getMorningReading: Reading = Reading(
     torah = if (isCombined) parsha.daysCombined.get else parsha.days,
     maftir = (if (isCombined) secondParsha.get else parsha).maftir,
     // TODO what is the exception when the haftarah is NOT the second one?
-    haftarah = Haftarah.forParsha(if (isCombined) secondParsha.get else parsha)
+    haftarah = Haftarah.forParsha(if (isCombined) secondParsha.get else parsha),
+    names = Some(names)
   )
 
-  // TODO are 3 short aliyot always from the first parsha when to of them combine?
-  def aliyot: Reading = Reading(parsha.aliyot)
+  // TODO are 3 short aliyot always from the first parsha when two of them combine?
+  def getAfternoonReading: Reading = Reading(torah = parsha.aliyot, names = Some(names))
 }
 
 object WeeklyReading {

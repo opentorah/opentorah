@@ -40,6 +40,8 @@ class Jewish private() extends Calendar[Jewish] {
       final override def companion: PointCompanion[Jewish] = Point
     }
   }
+
+  final override def now: Day = Calendar.toJewish(org.podval.calendar.gregorian.Gregorian.now)
 }
 
 
