@@ -5,10 +5,8 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 buildscript {
   repositories {
     // To function outside a composite, a plugin repository would be required.
-
-// Only necessary for SNAPSHOT releases (e.g., of http4s)
-//  resolvers += Resolver.sonatypeRepo("snapshots")
   }
+
   dependencies {
     classpath 'org.podval.docbook:gradle-docbook-plugin:+'
   }
@@ -18,8 +16,8 @@ plugins {
   id "com.github.maiflai.scalatest" version "0.22" apply false
   id "com.jfrog.artifactory" version "4.5.4" apply false
   id "com.jfrog.bintray" version "1.7.3" apply false
-//  id 'com.bmuschko.docker-remote-api' version '4.0.5' apply false
-  id 'com.bmuschko.docker-java-application' version '4.0.5'
+  id 'com.bmuschko.docker-remote-api' version '4.0.5' apply false
+  id 'com.bmuschko.docker-java-application' version '4.0.5' apply false
 }
 
 def scalaVersion      = '2.12.7'
@@ -62,6 +60,8 @@ subprojects {
   apply plugin: 'com.github.maiflai.scalatest'
   apply plugin: 'maven-publish'
   apply plugin: 'com.jfrog.bintray'
+
+  jar.baseName = "$project.group-$project.name"
 
   dependencies {
     zinc lib.zinc
@@ -205,7 +205,10 @@ project(':dates') {
 
 project(':service') {
   apply plugin: 'application'
-  apply plugin: 'com.bmuschko.docker-java-application'
+  apply plugin: 'com.bmuschko.docker-remote-api'
+  // TODO Instead of using  'com.bmuschko.docker-java-application', I am building the image manually,
+  // so that third-party dependencies are in a different layer from the org.podval ones.
+  // Push is *still* bigger than what I want: there is some multy-megabyte top layer...
 
   dependencies {
     compile project(':dates')
@@ -219,11 +222,24 @@ project(':service') {
 
   mainClassName = 'org.podval.calendar.service.CalendarService'
 
-  docker {
-    javaApplication {
-      maintainer = 'Leonid Dubinsky dub@podval.org'
-      ports = [8090]
+  def dockerDir = file("$buildDir/docker/")
+
+  task copyDockerResources {
+    group = "docker"
+    dependsOn installDist
+
+    doLast {
+      copy { from "$installDist.destinationDir/lib" into "$dockerDir/project-libs" include "**/org.podval.*" }
+      copy { from "$installDist.destinationDir/lib" into "$dockerDir/dependencies" exclude "**/org.podval.*" }
+      copy { from "$installDist.destinationDir/bin" into "$dockerDir/bin" }
+      copy { from "$projectDir/Dockerfile" into dockerDir }
     }
+  }
+
+  task buildDockerImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage, dependsOn: copyDockerResources) {
+    group = "docker"
+    inputDir = dockerDir
+    tag = "gcr.io/calendar-service-1/service:$version".toString()
   }
 }
 

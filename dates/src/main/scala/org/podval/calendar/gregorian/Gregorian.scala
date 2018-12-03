@@ -40,6 +40,11 @@ class Gregorian private() extends Calendar[Gregorian] {
       final override def companion: PointCompanion[Gregorian] = Point
     }
   }
+
+  final override def now: Day = {
+    val result = new java.util.Date()
+    Gregorian.Year(result.getYear+1900).month(result.getMonth+1).day(result.getDate)
+  }
 }
 
 
