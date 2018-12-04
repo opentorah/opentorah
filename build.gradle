@@ -208,7 +208,6 @@ project(':service') {
   apply plugin: 'com.bmuschko.docker-remote-api'
   // TODO Instead of using  'com.bmuschko.docker-java-application', I am building the image manually,
   // so that third-party dependencies are in a different layer from the org.podval ones.
-  // Push is *still* bigger than what I want: there is some multy-megabyte top layer...
 
   dependencies {
     compile project(':dates')

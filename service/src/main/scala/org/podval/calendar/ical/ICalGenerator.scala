@@ -48,7 +48,7 @@ final class ICalGenerator private(os: OutputStream) {
 object ICalGenerator {
   val baseUrl: String = "http://calendar.podval.org/"
   val daysUrl: String = baseUrl + "day/"
-  val iconUrl: String = baseUrl + "icon.gif"
+  val iconUrl: String = baseUrl + "favicon.ico"
 
 
   def main(args: Array[String]) {

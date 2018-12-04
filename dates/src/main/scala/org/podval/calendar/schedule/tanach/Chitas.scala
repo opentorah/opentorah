@@ -25,6 +25,7 @@ object Chitas {
       Fragment(parsha.names, Torah.merge(selector(chabadTorah(parsha.days))))
 
     // TODO pre-calculate and pass in?
+    // TODO calculate on the spot via a advancing memoized holder :)
     val simchasTorah: Day = SpecialDay.SimchasTorah.date(day.year)
     val isSimchasTorahThisWeek: Boolean = simchasTorah.shabbosAfter == day.shabbosAfter
     if (!isSimchasTorahThisWeek) {

@@ -4,4 +4,5 @@ ADD dependencies /service/lib
 ADD bin /service/bin
 ADD project-libs /service/lib
 ENTRYPOINT ["/service/bin/service"]
-EXPOSE 8090
+ENV SERVICE_PORT 80
+EXPOSE 80
