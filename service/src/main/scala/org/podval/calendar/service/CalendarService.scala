@@ -65,7 +65,7 @@ object CalendarService extends StreamApp[IO] {
       val kind = getKind(kindStr)
       val day: DayBase[_] = kind.getMonth(yearStr, monthStr).day(dayStr.toInt)
       // TODO make renderDay order-independent in its explicit parameters
-      renderDay(kind.first(day), kind.second(day))(kind, toLocation(maybeLocation), toSpec(maybeLanguage))
+      renderDay(kind.jewish(day), kind.gregorian(day))(kind, toLocation(maybeLocation), toSpec(maybeLanguage))
   }
 
   private abstract class Kind(val name: String) {
@@ -77,9 +77,9 @@ object CalendarService extends StreamApp[IO] {
 
     def getMonth(yearStr: String, monthStr: String): MonthBase[_]
 
-    def first(day: DayBase[_]): Jewish.Day
+    def jewish(day: DayBase[_]): Jewish.Day
 
-    def second(day: DayBase[_]): Gregorian.Day
+    def gregorian(day: DayBase[_]): Gregorian.Day
 
     def theOther: Kind
 
@@ -100,8 +100,8 @@ object CalendarService extends StreamApp[IO] {
       if (monthName.isDefined) year.month(monthName.get)
       else year.month(monthStr.toInt)
     }
-    override def first(day: DayBase[_]): Jewish.Day = day.asInstanceOf[Jewish.Day]
-    override def second(day: DayBase[_]): Gregorian.Day = Calendar.fromJewish(first(day))
+    override def jewish(day: DayBase[_]): Jewish.Day = day.asInstanceOf[Jewish.Day]
+    override def gregorian(day: DayBase[_]): Gregorian.Day = Calendar.fromJewish(jewish(day))
 
     override def theOther: Kind = GregorianK
 
@@ -125,8 +125,8 @@ object CalendarService extends StreamApp[IO] {
       if (monthName.isDefined) year.month(monthName.get)
       else year.month(monthStr.toInt)
     }
-    override def first(day: DayBase[_]): Jewish.Day = Calendar.toJewish(second(day))
-    override def second(day: DayBase[_]): Gregorian.Day = day.asInstanceOf[Gregorian.Day]
+    override def jewish(day: DayBase[_]): Jewish.Day = Calendar.toJewish(gregorian(day))
+    override def gregorian(day: DayBase[_]): Gregorian.Day = day.asInstanceOf[Gregorian.Day]
     override def theOther: Kind = JewishK
 
     override def yearNumberToString(number: Int)(implicit spec: LanguageSpec): String =

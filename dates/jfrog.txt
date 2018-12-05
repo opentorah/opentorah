@@ -1,0 +1,21 @@
+11/26/2017 issues with JFrog
+
+jcenter.bintray.com/org/podval/calendar
+
+
+look for some well-known package with artifact id containing dots:
+how do they deploy snapshots to JCenter?
+
+In the lib-release and lib-snapshot repositories:
+
+org
+  podval
+    calendar
+      dates
+        -- nothing!
+      org.podval.calendar.dates
+        maven-metadata
+        0.1.0
+        0.1.1
+          org.podval.calendar.dates-0.1.1.jar
+          org.podval.calendar.dates-0.1.1.pom
