@@ -44,6 +44,7 @@ FOP does not handle MathML; it needs jEuclid plugin
 net.sourceforge.jeuclid:jeuclid-core:3.1.9
 net.sourceforge.jeuclid:jeuclid-fop:3.1.9  (both seem to be available from the Maven repositories!)
 
+NO LONGOR SUPPORTED; DOESN"T WORK WITH Java 9
 
 ## TODO
 
@@ -59,7 +60,7 @@ Suppress the logs from Saxon:
      }
 
 
-FOPp installation... did not recognize the jeuclid's jar-files (version 3.1.9) in /usr/share/fop (or some subfolder /lib).
+FOP installation... did not recognize the jeuclid's jar-files (version 3.1.9) in /usr/share/fop (or some subfolder /lib).
 I was able to get it to work by modifying /usr/bin/fop which is actually just a shell script wrapper. The modified parts are as follows:
 ...
 find_jars /usr/share/fop/fop-hyph.jar
@@ -70,3 +71,15 @@ find_jars fop
 
 Switch to Zinc v1 - when it actually works!
   'com.typesafe.zinc:zinc:0.3.15' -> "org.scala-sbt:zinc-core_${scalaVersionMajor}:1.1.5"
+
+## NEW TODO
+
+images directory: for HTML - copy; for PDF - ???
+
+HTML stylesheet - parameter? see in the online version...
+
+fonts in CSS: any standard?
+
+output-type-specific parameters
+
+entities (for version/revision/date) - entity resolver?
