@@ -16,10 +16,22 @@ plugins {
   id "com.github.maiflai.scalatest" version "0.22" apply false
   id "com.jfrog.artifactory" version "4.5.4" apply false
   id "com.jfrog.bintray" version "1.7.3" apply false
-  // Incompatible with Google Cloud Build, which uses Gradle v4.6 - here v4.8 minimum is needed.
-  // Commented out Docker plugins.
-//  id 'com.bmuschko.docker-remote-api' version '4.0.5' apply false
-//  id 'com.bmuschko.docker-java-application' version '4.0.5' apply false
+
+  // I do not use 'com.bmuschko.docker-java-application' because I want to separate third-party dependencies in a
+  // different layer from the org.podval ones.
+  //
+  // I do not use 'com.bmuschko.docker-remote-api' because I don't need to: Google Cloud Build step takes care
+  // of Docker image creation and push; also, Google Cloud Build provides Gradle v4.6, and the plugin requires v4.8.
+  //
+  // If I didn't use Cloud Build, this is how I'd do it:
+  //  task buildDockerImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage, dependsOn: prepareDockerContext) {
+  //    group = "docker"
+  //    inputDir = dockerDir
+  //    tag = "gcr.io/calendar-service-1/service".toString()
+  //  }
+  //
+  //  id 'com.bmuschko.docker-remote-api' version '4.0.5' apply false
+  //  id 'com.bmuschko.docker-java-application' version '4.0.5' apply false
 }
 
 def scalaVersion      = '2.12.7'
@@ -207,17 +219,14 @@ project(':dates') {
 
 project(':service') {
   apply plugin: 'application'
-//  apply plugin: 'com.bmuschko.docker-remote-api'
-  // TODO Instead of using  'com.bmuschko.docker-java-application', I am building the image manually,
-  // so that third-party dependencies are in a different layer from the org.podval ones.
 
   dependencies {
     compile project(':dates')
     compile lib.http4sDsl, lib.http4sServer, lib.http4sClient
     compile lib.scalatags
-// http4s -> Scalatags bridge, when included as a dependency, confuses the imports;
-// doing explicit conversions for now :)    
-//    compile lib.http4sScalatags
+    // http4s -> Scalatags bridge, when included as a dependency, confuses the imports;
+    // doing explicit conversions for now :)    
+    //    compile lib.http4sScalatags
     implementation lib.slf4jJdk
   }
 
@@ -225,7 +234,7 @@ project(':service') {
 
   def dockerDir = file("$buildDir/docker/")
 
-  task copyDockerResources {
+  task prepareDockerContext {
     group = "docker"
     dependsOn installDist
 
@@ -236,12 +245,6 @@ project(':service') {
       copy { from "$projectDir/Dockerfile" into dockerDir }
     }
   }
-
-//  task buildDockerImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage, dependsOn: copyDockerResources) {
-//    group = "docker"
-//    inputDir = dockerDir
-//    tag = "gcr.io/calendar-service-1/service:$version".toString()
-//  }
 }
 
 project(':paper') {

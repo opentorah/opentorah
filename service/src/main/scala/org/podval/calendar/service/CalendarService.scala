@@ -267,8 +267,7 @@ object CalendarService extends StreamApp[IO] {
     location: Location,
     spec: LanguageSpec
   ): IO[Response[IO]] = {
-    val schedule = Schedule(from = day, to = day, inHolyLand = location.inHolyLand)
-    val daySchedule = schedule.days(day)
+    val daySchedule = Schedule.get(day, inHolyLand = location.inHolyLand)
 
     val first: DayBase[_] = if (kind == JewishK) day else gregorianDay
     val second: DayBase[_] = if (kind == JewishK) gregorianDay else day

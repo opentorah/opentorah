@@ -514,11 +514,13 @@ object SpecialDay {
     }
 
     final def weekday(isRoshChodesh: Boolean): Reading = {
+      // TODO inline and see if it becomes cleaner:
+
       val (common: Torah, ashkenazAndChabadTail: Torah, sefardTail: Torah) =
         if (dayNumber == 1) (
-          Torah.aliyot(Numbers.chanukahFirst.spans.head), //(korbanot.spans.head),
-          Torah.aliyot(first(dayNumber), second(dayNumber)),
-          Torah.aliyot(full(dayNumber), full(dayNumber + 1))
+          Torah.aliyot(),
+          Torah.aliyot(Numbers.chanukahFirstAshkenazAndChabad, first(dayNumber), second(dayNumber)),
+          Torah.aliyot(Numbers.chanukahFirstSefard, full(dayNumber), full(dayNumber + 1))
         ) else {
           val ashkenazAndChabadTail: Aliyah = if (dayNumber == 8) korbanot.spans.last else full(dayNumber+1)
           (

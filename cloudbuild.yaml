@@ -1,23 +1,15 @@
 steps:
+# gradle: prepare docker context
   - name: 'gcr.io/cloud-builders/gradle'
-    args: [':service:copyDockerResources']
-
-# TODO: Cloud Build fails; looks like their Gradle builder is at Gradle v4.6, but Docker plugin requires at least 4.8;
-#       I am going to comment out Docker plugin...
-# ...
-#  :gradle-docbook-plugin:jar
-#  Step #0:
-#  Step #0: FAILURE: Build failed with an exception.
-#  Step #0:
-#  Step #0: * Where:
-#  Step #0: Build file '/workspace/build.gradle' line: 208
-#  Step #0:
-#  Step #0: * What went wrong:
-#  Step #0: A problem occurred evaluating root project 'calendar'.
-#  Step #0: > Failed to apply plugin [id 'com.bmuschko.docker-remote-api']
-#  Step #0: > Could not create an instance of type com.bmuschko.gradle.docker.DockerExtension_Decorated.
-#  Step #0: > org.gradle.api.file.ProjectLayout.configurableFiles([Ljava/lang/Object;)Lorg/gradle/api/file/ConfigurableFileCollection;
-
+    args: [':service:prepareDockerContext']
+# docker: build docker image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '--tag=gcr.io/$PROJECT_ID/service', './service/build/docker']
+# docker: push the image (as part of the build)
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/service']
+# gcloud: update VM instance's image
+  - name: gcr.io/cloud-builders/gcloud
+    args: ['compute', 'instances', 'update-container', 'instance-1', '--container-image=gcr.io/$PROJECT_ID/service']
+# also display the image in the build results
 images: ['gcr.io/$PROJECT_ID/service']
