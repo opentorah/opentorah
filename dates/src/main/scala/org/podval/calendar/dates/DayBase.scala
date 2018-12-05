@@ -21,8 +21,10 @@ abstract class DayBase[C <: Calendar[C]](number: Int)
 
   final def -(that: C#Day): Int = this.number - that.number
 
+  // TODO memoize in a lazy var
   final def year: C#Year = calendar.Year(this)
 
+  // TODO memoize in a lazy var
   final def month: C#Month = year.monthForDay(numberInYear)
 
   final def numberInYear: Int = number - year.firstDayNumber + 1

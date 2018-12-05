@@ -4,14 +4,17 @@ import org.podval.judaica.metadata.tanach.Torah
 import org.podval.judaica.metadata.tanach.Torah.Maftir
 
 object Numbers extends TorahReadings  {
-  // last aliyah is for Zos Channukah
-  val chanukahFirst: Torah = parseTorah(
+  private val chanukahFirst: Torah = parseTorah(
     <torah book="Numbers" fromChapter="6" fromVerse="22" toChapter="7" toVerse="11">
-      <aliyah n="1" fromVerse="22"/>
+      <aliyah n="2" fromChapter="7" fromVerse="1"/>
     </torah>
   )
 
+  val chanukahFirstAshkenazAndChabad: Torah.Fragment = chanukahFirst.spans(1)
+  val chanukahFirstSefard: Torah.Fragment = chanukahFirst.spans.head + chanukahFirstAshkenazAndChabad
+
   // TODO once Koritz approves, remove head of the following and adjust indices on first() and second():
+  // last aliyah is for Zos Channukah
   val chanukahKorbanot: Torah = parseTorah(
     <torah book="Numbers" fromChapter="7" fromVerse="1" toChapter="8" toVerse="4">
       <aliyah n="1"  fromVerse="1" />

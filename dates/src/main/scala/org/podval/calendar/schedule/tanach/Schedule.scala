@@ -21,6 +21,12 @@ object Schedule {
     chitas: Chitas
   )
 
+  def get(day: Day, inHolyLand: Boolean): DaySchedule = {
+    // TODO memoize and re-use year schedule to trade memory for performance
+    val schedule = Schedule(from = day, to = day, inHolyLand)
+    schedule.days(day)
+  }
+
   def apply(from: Day, to: Day, inHolyLand: Boolean): Schedule = createBuilder(from, to, inHolyLand).build
 
   def apply(year: Year, inHolyLand: Boolean): Schedule = Schedule(year.firstDay, year.lastDay, inHolyLand)
