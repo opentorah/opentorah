@@ -10,32 +10,33 @@ object Numbers extends TorahReadings  {
     </torah>
   )
 
-  val chanukahFirstAshkenazAndChabad: Torah.Fragment = chanukahFirst.spans(1)
-  val chanukahFirstSefard: Torah.Fragment = chanukahFirst.spans.head + chanukahFirstAshkenazAndChabad
+  val chanukahDay1CohenAshkenazAndChabad: Torah.Fragment = chanukahFirst.spans(1)
+  val chanukahDay1CohenSefard: Torah.Fragment = chanukahFirst.spans.head + chanukahDay1CohenAshkenazAndChabad
 
-  // TODO once Koritz approves, remove head of the following and adjust indices on first() and second():
-  // last aliyah is for Zos Channukah
-  val chanukahKorbanot: Torah = parseTorah(
-    <torah book="Numbers" fromChapter="7" fromVerse="1" toChapter="8" toVerse="4">
-      <aliyah n="1"  fromVerse="1" />
-      <aliyah n="2"  fromVerse="12"/>
-      <aliyah n="3"  fromVerse="15"/>
-      <aliyah n="4"  fromVerse="18"/>
-      <aliyah n="5"  fromVerse="21"/>
-      <aliyah n="6"  fromVerse="24"/>
-      <aliyah n="7"  fromVerse="27"/>
-      <aliyah n="8"  fromVerse="30"/>
-      <aliyah n="9"  fromVerse="33"/>
-      <aliyah n="10" fromVerse="36"/>
-      <aliyah n="11" fromVerse="39"/>
-      <aliyah n="12" fromVerse="42"/>
-      <aliyah n="13" fromVerse="45"/>
-      <aliyah n="14" fromVerse="48"/>
-      <aliyah n="15" fromVerse="51"/>
-      <aliyah n="16" fromVerse="54"/>
-      <aliyah n="17" fromVerse="57"/>
-      <aliyah n="18" fromVerse="60"/>
-    </torah>)
+  private val chanukahKorbanot: Seq[Torah.Fragment] = parseTorah(
+    <torah book="Numbers" fromChapter="7" fromVerse="12" toChapter="8" toVerse="4">
+      <aliyah n="1"  fromVerse="12"/>
+      <aliyah n="2"  fromVerse="15"/>
+      <aliyah n="3"  fromVerse="18"/>
+      <aliyah n="4"  fromVerse="21"/>
+      <aliyah n="5"  fromVerse="24"/>
+      <aliyah n="6"  fromVerse="27"/>
+      <aliyah n="7"  fromVerse="30"/>
+      <aliyah n="8"  fromVerse="33"/>
+      <aliyah n="9"  fromVerse="36"/>
+      <aliyah n="10" fromVerse="39"/>
+      <aliyah n="11" fromVerse="42"/>
+      <aliyah n="12" fromVerse="45"/>
+      <aliyah n="13" fromVerse="48"/>
+      <aliyah n="14" fromVerse="51"/>
+      <aliyah n="15" fromVerse="54"/>
+      <aliyah n="16" fromVerse="57"/>
+      <aliyah n="17" fromVerse="60"/>
+    </torah>).spans
+
+  def chanukahDayFirst(n: Int): Torah.Fragment = chanukahKorbanot(2*(n-1))
+  def chanukahDaySecond(n: Int): Torah.Fragment = chanukahKorbanot(2*(n-1)+1)
+  val zosChanukah: Torah.Fragment = chanukahKorbanot.last
 
   val pesach6torah: Torah = parseTorah(
     <torah book="Numbers" fromChapter="9" fromVerse="1" toVerse="14">

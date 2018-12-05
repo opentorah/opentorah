@@ -496,7 +496,9 @@ object SpecialDay {
   }
 
   sealed class Chanukah(override val dayNumber: Int) extends WithNames with DayOf with RabbinicFestival {
-    private def korbanot: Torah = Numbers.chanukahKorbanot
+    private def first(n: Int): Aliyah = Numbers.chanukahDayFirst(n)
+    private def second(n: Int): Aliyah = Numbers.chanukahDaySecond(n)
+    private def full(n: Int): Aliyah = first(n)+second(n)
 
     final override lazy val names: Names = namesWithNumber(Chanukah, dayNumber)
 
@@ -514,31 +516,24 @@ object SpecialDay {
     }
 
     final def weekday(isRoshChodesh: Boolean): Reading = {
-      // TODO inline and see if it becomes cleaner:
+      val (ashkenazAndChabad: Seq[Aliyah], sefard: Seq[Aliyah]) = if (dayNumber == 1) {
+        val ashkenazAndChabad = Seq(Numbers.chanukahDay1CohenAshkenazAndChabad, first(dayNumber), second(dayNumber))
+        val sefard = Seq(Numbers.chanukahDay1CohenSefard, full(dayNumber), full(dayNumber + 1))
+        (ashkenazAndChabad, sefard)
+      } else {
+        val common: Seq[Aliyah] = Seq(first(dayNumber), second(dayNumber))
+        val ashkenazAndChabadLast: Aliyah = if (dayNumber == 8) Numbers.zosChanukah else full(dayNumber+1)
+        val sefardLast: Aliyah = full(dayNumber) + ashkenazAndChabadLast
+        (common :+ ashkenazAndChabadLast, common :+ sefardLast)
+      }
 
-      val (common: Torah, ashkenazAndChabadTail: Torah, sefardTail: Torah) =
-        if (dayNumber == 1) (
-          Torah.aliyot(),
-          Torah.aliyot(Numbers.chanukahFirstAshkenazAndChabad, first(dayNumber), second(dayNumber)),
-          Torah.aliyot(Numbers.chanukahFirstSefard, full(dayNumber), full(dayNumber + 1))
-        ) else {
-          val ashkenazAndChabadTail: Aliyah = if (dayNumber == 8) korbanot.spans.last else full(dayNumber+1)
-          (
-            Torah.aliyot(first(dayNumber), second(dayNumber)),
-            Torah.aliyot(ashkenazAndChabadTail),
-            Torah.aliyot(full(dayNumber)+ashkenazAndChabadTail)
-          )
-        }
-
-      val ashkenazAndChabad: Torah = common ++ ashkenazAndChabadTail
-      val sefard: Torah = common ++ sefardTail
       require(ashkenazAndChabad.length == 3)
       require(sefard.length == 3)
 
-      val torah: Torah.Customs = new Torah.Customs(Map(
-        Custom.Ashkenaz -> ashkenazAndChabad,
-        Custom.Chabad -> ashkenazAndChabad,
-        Custom.Sefard -> sefard
+      var torah: Torah.Customs = new Torah.Customs(Map[Custom, Torah](
+        Custom.Ashkenaz -> Torah(ashkenazAndChabad),
+        Custom.Chabad -> Torah(ashkenazAndChabad),
+        Custom.Sefard -> Torah(sefard)
       ))
 
       val torahResult: Torah.Customs =
@@ -547,10 +542,6 @@ object SpecialDay {
 
       Reading(torahResult, names = None)
     }
-
-    private def first(n: Int): Aliyah = korbanot.spans(2*n-1)
-    private def second(n: Int): Aliyah = korbanot.spans(2*n)
-    private def full(n: Int): Aliyah = first(n)+second(n)
   }
 
   case object Chanukah1 extends Chanukah(1)

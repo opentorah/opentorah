@@ -10,6 +10,6 @@ steps:
     args: ['push', 'gcr.io/$PROJECT_ID/service']
 # gcloud: update VM instance's image
   - name: gcr.io/cloud-builders/gcloud
-    args: ['compute', 'instances', 'update-container', 'instance-1', '--container-image=gcr.io/$PROJECT_ID/service']
+    args: ['compute', 'instances', 'update-container', '--zone', 'us-east1-b', 'instance-1', '--container-image=gcr.io/$PROJECT_ID/service']
 # also display the image in the build results
 images: ['gcr.io/$PROJECT_ID/service']
