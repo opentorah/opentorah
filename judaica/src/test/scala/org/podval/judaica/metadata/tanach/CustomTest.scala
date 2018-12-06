@@ -16,13 +16,6 @@ final class CustomTest extends FlatSpec with Matchers {
     )
   }
 
-  "minimize()" should "not remove non-redundant children" in {
-    check(
-      Map(Ashkenaz -> "A", Sefard -> "S", Fes -> "F", Morocco -> "M"),
-      Map(Ashkenaz -> "A", Sefard -> "S", Fes -> "F", Morocco -> "M")
-    )
-  }
-
   private def check[T](sourceMap: Map[Custom, T], expectedMap: Map[Custom, T]): Unit = {
     val source: Of[T] = new Of(sourceMap)
     val expected: Of[T] = new Of(expectedMap)
