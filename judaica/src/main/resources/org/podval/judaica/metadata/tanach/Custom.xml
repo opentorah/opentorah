@@ -41,10 +41,6 @@
     <name n="ספרד" lang="he"/>
   </names>
   <names>
-    <name n="Rav Nae Holy Land" lang="en" transliterated="true"/>
-    <!-- TODO names in other languages -->
-  </names>
-  <names>
     <name n="Chabad" lang="en" transliterated="true"/>
     <name n="Хабад" lang="ru"/>
     <name n="חבד" lang="he"/>

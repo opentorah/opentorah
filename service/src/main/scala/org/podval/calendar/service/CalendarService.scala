@@ -161,6 +161,25 @@ object CalendarService extends StreamApp[IO] {
 
   private def toLocation(location: Option[Location]): Location = location.getOrElse(Diaspora)
 
+  private def yearUrl(year: YearBase[_])(implicit kind: Kind): String =
+    s"/$kind/${year.number}"
+
+  private def monthUrl(month: MonthBase[_])(implicit kind: Kind, spec: LanguageSpec): String =
+    s"/$kind/${month.year.number}/${month.numberInYear}"
+
+  private def monthNameUrl(month: MonthBase[_])(implicit kind: Kind, spec: LanguageSpec): String =
+    s"/$kind/${month.year.number}/${month.name.toLanguageString}"
+
+  private def dayUrl(day: DayBase[_])(implicit kind: Kind, spec: LanguageSpec): String =
+    s"/$kind/${day.year.number}/${day.month.numberInYear}/${day.numberInMonth}"
+
+  private def navLink(url: String, text: String)(implicit
+    kind: Kind,
+    location: Location,
+    spec: LanguageSpec
+  ): TypedTag[String] = a(cls := "nav", href := s"$url$suffix")(text)
+
+
   private def dayLinks(day: DayBase[_])(implicit
     kind: Kind,
     location: Location,
@@ -177,47 +196,25 @@ object CalendarService extends StreamApp[IO] {
     kind: Kind,
     location: Location,
     spec: LanguageSpec
-  ): TypedTag[String] = {
-    val label: String = text.getOrElse(kind.yearNumberToString(year.number))
-    a(cls := "nav", href := s"${yearUrl(year)}$suffix")(label)
-  }
+  ): TypedTag[String] = navLink(yearUrl(year), text.getOrElse(kind.yearNumberToString(year.number)))
 
-  private def yearUrl(year: YearBase[_])(implicit kind: Kind): String =
-    s"/$kind/${year.number}"
-
-  // TODO monthUrl
   private def monthLink(month: MonthBase[_])(implicit
     kind: Kind,
     location: Location,
     spec: LanguageSpec
-  ): TypedTag[String] = {
-    val label: String = kind.monthNumberToString(month.numberInYear)
-    a(cls := "nav", href := s"/$kind/${month.year.number}/${month.numberInYear}/$suffix")(label)
-  }
+  ): TypedTag[String] = navLink(monthUrl(month), kind.monthNumberToString(month.numberInYear))
 
   private def monthNameLink(month: MonthBase[_], text: Option[String] = None)(implicit
     kind: Kind,
     location: Location,
     spec: LanguageSpec
-  ): TypedTag[String] = {
-    val label: String = text.getOrElse(month.name.toLanguageString)
-    a(cls := "nav", href := s"${monthNameUrl(month)}$suffix")(label)
-  }
-
-  private def monthNameUrl(month: MonthBase[_])(implicit kind: Kind, spec: LanguageSpec): String =
-    s"/$kind/${month.year.number}/${month.name.toLanguageString}"
+  ): TypedTag[String] = navLink(monthNameUrl(month), text.getOrElse(month.name.toLanguageString))
 
   private def dayLink(day: DayBase[_], text: Option[String] = None)(implicit
     kind: Kind,
     location: Location,
     spec: LanguageSpec
-  ): TypedTag[String] = {
-    val label: String = text.getOrElse(kind.dayNumberToString(day.numberInMonth))
-    a(cls := "nav", href := s"${dayUrl(day)}$suffix")(label)
-  }
-
-  private def dayUrl(day: DayBase[_])(implicit kind: Kind, spec: LanguageSpec): String =
-    s"/$kind/${day.year.number}/${day.month.numberInYear}/${day.numberInMonth}"
+  ): TypedTag[String] = navLink(dayUrl(day), text.getOrElse(kind.dayNumberToString(day.numberInMonth)))
 
   private def renderRoot(implicit location: Location, spec: LanguageSpec): IO[Response[IO]] =
     renderHtml("/", div(
