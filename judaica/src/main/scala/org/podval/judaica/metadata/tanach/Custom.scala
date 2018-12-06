@@ -35,29 +35,31 @@ object Custom extends NamedCompanion {
 
     final def maximize: Of[T] = new Of(all.map(custom => custom -> doFind(custom)).toMap)
 
+    // TODO do minimization unboxedly
+
     final def minimize: Of[T] = {
       // start with maximized representation: all Customs other than Common present;
       // go through levels of Customs in descending order;
-      // each group only affects the next one, not the preceding ones
-      byLevelDescending.foldLeft(this.maximize) { case (groupResult: Of[T], group: Seq[Custom]) =>
-        // Customs on the same level do not affect one another
-        group.foldRight(groupResult) { case (custom: Custom, result: Of[T]) =>
+      // each group only affects the next one, not the preceding ones;
+      // customs on the same level do not affect one another.
+      // TODO do not do 0th level: Common is handled separately
+      val result = byLevelDescending.foldLeft(this.maximize) { case (groupResult: Of[T], group: Seq[Custom]) =>
+        group.foldLeft(groupResult) { case (result: Of[T], custom: Custom) =>
           result.minimize(custom)
         }
       }
+
+      val commonValue: Option[T] = if (result.customs.keySet != Common.children) None else {
+        val values: Set[T] = result.customs.values.toSet
+        if (values.size != 1) None else Some(values.head)
+      }
+
+      commonValue.fold(result)(commonValue => new Of(Map(Common -> commonValue)))
     }
 
-    private final def minimize(custom: Custom): Of[T] = {
-      val customValue: Option[T] = find(custom)
-      val childrenValues: Set[T] = custom.children.map(customs)
-      if (childrenValues.size != 1) this else {
-        // custom has children and values for all of them are the same
-        val childrenValue: T = childrenValues.head
-        if (customValue.isDefined && !customValue.contains(childrenValue)) this else {
-          // parent custom has the same value as all children - or no value (can only be Common)
-          val result: Map[Custom, T] = (customs -- custom.children).updated(custom, childrenValue)
-          new Of(result)
-        }
+    private final def minimize(custom: Custom): Of[T] = if (custom.children.isEmpty) this else {
+      customs.get(custom).fold(this) { value =>
+        new Of(customs -- custom.children.filter(customs(_) == value))
       }
     }
 
