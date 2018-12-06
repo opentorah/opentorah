@@ -270,6 +270,7 @@ object CalendarService extends StreamApp[IO] {
     val second: DayBase[_] = if (kind == JewishK) gregorianDay else day
 
     renderHtml(dayUrl(first), div(
+      // TODO put dayLinks into a table with no border and fixed column size
       div(dayLinks(first)(kind, location, spec), " ", first.name.toLanguageString),
       div(dayLinks(second)(kind.theOther, location, spec), " ", second.name.toLanguageString),
       div(daySchedule.dayNames.map { withNames: WithNames => renderNames(withNames.names) }),
@@ -300,38 +301,19 @@ object CalendarService extends StreamApp[IO] {
     location: Location,
     spec: LanguageSpec
   ): Seq[TypedTag[String]] = {
-    def renderByCustom[T <: LanguageString](title: String, customs: Custom.Of[Option[T]]): Seq[TypedTag[String]] = Seq(
-      span(cls := "subheading")(title),
-      table(tbody(
-        customs.customs.toSeq.map { case (custom: Custom, value: Option[T]) =>
-          tr(td(custom.toLanguageString), td(span(value.fold("None")(_.toLanguageString))))
-        }
-      ))
-    )
-
     reading.fold(Seq.empty[TypedTag[String]]) { reading => Seq(div(
       span(cls := "heading")(name),
       {
-        val torah: Seq[TypedTag[String]] = reading.torah.customs.toSeq.map { case (custom: Custom, torah: Torah) =>
-          div(cls := "custom")(table(
-            caption(custom.toLanguageString),
-            tbody(
-              torah.spans.zipWithIndex map { case (fragment, index) =>
-                tr(td(spec.toString(index+1)), td(fragment.toLanguageString))
-              }
-            )
-          ))
-        }
-
         val maftir = reading.maftir
         val haftarah = reading.haftarah
         val noMaftirHaftarah: Boolean =
           maftir.commonOnly.fold(false)(_.isEmpty) && haftarah.commonOnly.fold(false)(_.isEmpty)
+        // TODO render maftir and haftarah together when both vary
 
         div(
           span(cls := "subheading")("Torah"),
           reading.names.map(renderNames).toSeq,
-          torah,
+          renderTorah(reading.torah),
           if (noMaftirHaftarah) Seq.empty[TypedTag[String]] else Seq(
             renderByCustom("Maftir", maftir),
             renderByCustom("Haftarah", haftarah)
@@ -340,6 +322,31 @@ object CalendarService extends StreamApp[IO] {
       }
     ))}
   }
+
+  private def renderTorah(customs: Torah.Customs)(implicit spec: LanguageSpec): Seq[TypedTag[String]] = {
+    customs.customs.toSeq.map { case (custom: Custom, torah: Torah) =>
+      div(cls := "custom")(table(
+        caption(custom.toLanguageString),
+        tbody(
+          torah.spans.zipWithIndex map { case (fragment, index) =>
+            tr(td(spec.toString(index + 1)), td(fragment.toLanguageString))
+          }
+        )
+      ))
+    }
+  }
+
+  private def renderByCustom[T <: LanguageString](
+    title: String,
+    customs: Custom.Of[Option[T]]
+  )(implicit spec: LanguageSpec): Seq[TypedTag[String]] = Seq(
+    span(cls := "subheading")(title),
+    table(tbody(
+      customs.customs.toSeq.map { case (custom: Custom, value: Option[T]) =>
+        tr(td(custom.toLanguageString), td(span(value.fold("None")(_.toLanguageString))))
+      }
+    ))
+  )
 
   private def renderHtml(
     url: String,
@@ -365,11 +372,9 @@ object CalendarService extends StreamApp[IO] {
         link(rel := "stylesheet", `type` := "text/css", href := "/style.css")
       ),
       body(
-        div(
-          div(languages),
-          div(locations),
-          content
-        )
+        languages,
+        locations,
+        content
       )
     )
 

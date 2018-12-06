@@ -395,14 +395,13 @@ object SpecialDay {
     override def firstDay: Date = Succos1
 
     override def weekday: Reading = {
-      if (intermediateDayNumber == 6) require(inHolyLand)
-
-      val n: Int = Math.min(dayNumber, 5)
-
+      val n: Int = correctedIntermediateDayNumber
+      val ashkenazAndChabad: Torah = Torah.aliyot(korbanot(n), korbanot(n+1), korbanot(n+2), shabbosMaftir)
+      val sefard: Aliyah = shabbosMaftir
       val torah: Torah.Customs = new Torah.Customs(Map(
-        Custom.Ashkenaz -> Torah.aliyot(korbanot(n), korbanot(n+1), korbanot(n+2), shabbosMaftir),
-        Custom.Chabad -> Torah.aliyot(korbanot(n), korbanot(n+1), korbanot(n+2), shabbosMaftir),
-        Custom.Sefard -> Torah.aliyot(korbanot(n), korbanot(n), korbanot(n), korbanot(n))
+        Custom.Ashkenaz -> ashkenazAndChabad,
+        Custom.Chabad -> ashkenazAndChabad,
+        Custom.Sefard -> Torah.aliyot(sefard, sefard, sefard, sefard)
       ))
 
       Reading(torah, names = None)
@@ -410,10 +409,17 @@ object SpecialDay {
 
     private def korbanot(n: Int): Aliyah = Numbers.succosKorbanot(n)
 
-    protected override def shabbosMaftir: Maftir =
-      if (inHolyLand) korbanot(dayNumber) else korbanot(dayNumber-1) + korbanot(dayNumber)
+    protected override def shabbosMaftir: Maftir = {
+      val n: Int = correctedIntermediateDayNumber
+      if (inHolyLand) korbanot(n) else korbanot(n) + korbanot(n+1)
+    }
 
     protected override def shabbosHaftarah: Haftarah.Customs = SuccosIntermediate.shabbosHaftarah
+
+    private def correctedIntermediateDayNumber: Int = {
+      if (intermediateDayNumber == 6) require(inHolyLand)
+      Math.min(intermediateDayNumber, 5)
+    }
   }
 
   case object SuccosIntermediate1 extends SuccosIntermediate(1, false)
@@ -972,6 +978,8 @@ object SpecialDay {
         ErevRoshChodesh.correct(month, roshChodeshOf.isDefined, isSpecialShabbos, correctedForRoshChodesh))
   }
 
+  private final val sheniAndChamishi: Set[Day.Name] = Set(Day.Name.Sheni, Day.Name.Chamishi)
+
   private final def getWeekdayMorningReading(
     day: Day,
     specialDay: Option[Date],
@@ -994,13 +1002,8 @@ object SpecialDay {
     }
 
     specialReading
-      .orElse {
-        val isSheniOrChamishi: Boolean = Set[Day.Name](Day.Name.Sheni, Day.Name.Chamishi).contains(day.name)
-        if (!isSheniOrChamishi) None else Some(nextWeeklyReading.getAfternoonReading)
-      }
-      .orElse {
-        if (!isRoshChodesh) None else Some(RoshChodesh.weekday)
-      }
+      .orElse { if (!isRoshChodesh) None else Some(RoshChodesh.weekday) }
+      .orElse { if (!sheniAndChamishi.contains(day.name)) None else Some(nextWeeklyReading.getAfternoonReading) }
   }
 
   // On Festival that falls on Shabbos, afternoon reading is that of the Shabbos - except on Yom Kippur.

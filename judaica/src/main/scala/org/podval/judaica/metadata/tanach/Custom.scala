@@ -8,8 +8,6 @@ sealed class Custom(val parent: Option[Custom]) extends Named {
 
   final lazy val children: Set[Custom] = Custom.values.filter(_.parent.contains(this)).toSet
 
-  final def isLeaf: Boolean = children.isEmpty
-
   final def level: Int = parent.fold(0)(parent => parent.level+1)
 }
 
@@ -33,33 +31,15 @@ object Custom extends NamedCompanion {
     final def commonOnly: Option[T] =
       find(Common).flatMap(common => if (customs.size == 1) Some(common) else None)
 
-    final def findKey(custom: Custom): Option[Custom] =
-      if (customs.contains(custom)) Some(custom) else custom.parent.flatMap(findKey)
+    final def isFull: Boolean = all.forall(custom => find(custom).isDefined)
 
-    final def doFindKey(custom: Custom): Custom = {
-      val result = findKey(custom)
-      require(result.nonEmpty, s"Missing custom: $custom")
-      result.get
-    }
-
-    final def toLeaves: Of[T] =
-      new Of(leaves.flatMap(custom => find(custom).map(custom -> _)).toMap)
-
-    final def contains(custom: Custom): Boolean = find(custom).isDefined
-
-    final def keySet: Set[Custom] = leaves.filter(contains)
-
-    final def notCovered: Set[Custom] = leaves -- keySet
-
-    final def verifyFull: Of[T] = {
-      leaves.foreach(doFind)
-      this
-    }
+    final def maximize: Of[T] = new Of(all.map(custom => custom -> doFind(custom)).toMap)
 
     final def minimize: Of[T] = {
+      // start with maximized representation: all Customs other than Common present;
       // go through levels of Customs in descending order;
       // each group only affects the next one, not the preceding ones
-      byLevelDescending.foldLeft(this) { case (groupResult: Of[T], group: Seq[Custom]) =>
+      byLevelDescending.foldLeft(this.maximize) { case (groupResult: Of[T], group: Seq[Custom]) =>
         // Customs on the same level do not affect one another
         group.foldRight(groupResult) { case (custom: Custom, result: Of[T]) =>
           result.minimize(custom)
@@ -68,34 +48,16 @@ object Custom extends NamedCompanion {
     }
 
     private final def minimize(custom: Custom): Of[T] = {
-      val children: Set[Custom] = custom.children
-      if (children.isEmpty) this else {
-        val optionalValue: Option[T] = find(custom)
-        val childrenOptionalValues: Map[Option[T], Set[Custom]] = children.groupBy(customs.get)
-        val missingChildren: Set[Custom] = childrenOptionalValues.getOrElse(None, Set.empty)
-        val childrenValues: Map[T, Set[Custom]] = {
-          if (missingChildren.isEmpty) childrenOptionalValues else {
-            // Missing children rely on their ancestors to provide their value.
-            // There is another transformation that could be used here:
-            // value for a Custom is not relevant when values for all its children are present;
-            // we'll have to encode such irrelevant values differently from the missing ones
-            // if we were to employ that transformation...
-            require(optionalValue.isDefined)
-            val valueToSet: Option[T] = Some(optionalValue.get)
-            val currentSet: Set[Custom] = childrenOptionalValues.getOrElse(valueToSet, Set.empty)
-            (childrenOptionalValues - None).updated(valueToSet, currentSet ++ missingChildren)
-          }
-        }.map { case (key, value) => key.get -> value }
-
-        val childrenValuePopularities: Map[T, Int] = childrenValues.mapValues(_.size)
-        val maxChildrenValuePopularity: Int = childrenValuePopularities.values.max
-        val mostPopularValues: Set[T] =
-          childrenValuePopularities.filter { case (_, popularity) => popularity == maxChildrenValuePopularity }.keySet
-        val newValue: T = mostPopularValues.head
-        val childrenToRemove: Set[Custom] = childrenValues(newValue)
-
-        val result: Map[Custom, T] = (customs -- childrenToRemove).updated(custom, newValue)
-        new Of(result)
+      val customValue: Option[T] = find(custom)
+      val childrenValues: Set[T] = custom.children.map(customs)
+      if (childrenValues.size != 1) this else {
+        // custom has children and values for all of them are the same
+        val childrenValue: T = childrenValues.head
+        if (customValue.isDefined && !customValue.contains(childrenValue)) this else {
+          // parent custom has the same value as all children - or no value (can only be Common)
+          val result: Map[Custom, T] = (customs -- custom.children).updated(custom, childrenValue)
+          new Of(result)
+        }
       }
     }
 
@@ -114,10 +76,10 @@ object Custom extends NamedCompanion {
       tf: (Of[T], Custom) => TA,
       qf: (Of[Q], Custom) => QA
     ): Of[R] =
-      new Of[R](leaves.map { custom => custom -> f(custom, tf(this, custom), qf(b, custom)) }.toMap)
+      new Of[R](all.map { custom => custom -> f(custom, tf(this, custom), qf(b, custom)) }.toMap)
 
     final def lift[R](f: (Custom, Option[T]) => R): Of[R] =
-      new Of[R](leaves.map { custom => custom -> f(custom, find(custom)) }.toMap)
+      new Of[R](all.map { custom => custom -> f(custom, find(custom)) }.toMap)
 
     final def ++(other: Of[T]): Of[T] = new Of[T](customs ++ other.customs)
 
@@ -139,7 +101,8 @@ object Custom extends NamedCompanion {
       Util.checkNoDuplicates(map.values.toSeq, "customs")
 
       val result = new Of[T](map.flatMap { case (customs, value) => customs.map(custom => custom -> value) })
-      if (full) result.verifyFull else result
+      if (full) require(result.isFull)
+      result
     }
   }
 
@@ -166,11 +129,12 @@ object Custom extends NamedCompanion {
         case object Shami extends Custom(Some(Teiman))
 
   override val values: Seq[Custom] = Seq(
-    Common, Ashkenaz, Italki, Frankfurt, Lita, ChayeyOdom, Hagra,
+    Common,
+    Ashkenaz, Italki, Frankfurt, Lita, ChayeyOdom, Hagra,
     Sefard, Chabad,
     Magreb, Algeria, Toshbim, Djerba, Morocco, Fes, Bavlim, Teiman, Baladi, Shami)
 
-  val leaves: Set[Custom] = values.toSet.filter(_.isLeaf)
+  val all: Set[Custom] = values.toSet.filter(_.parent.isDefined)
 
   val byLevelDescending: Seq[Seq[Custom]] = {
     val byLevel: Map[Int, Seq[Custom]] = values.groupBy(_.level)
