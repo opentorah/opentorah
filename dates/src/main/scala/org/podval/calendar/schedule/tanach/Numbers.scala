@@ -73,16 +73,19 @@ object Numbers extends TorahReadings  {
   val yomKippurMaftir: Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="29" fromVerse="7" toVerse="11"/>)
 
-  val succosKorbanot: Torah = parseTorah(
-    <torah book="Numbers" fromChapter="29" fromVerse="12" toVerse="34">
+  private val succosKorbanotSpans: Seq[Torah.Aliyah] = parseTorah(
+    <torah book="Numbers" fromChapter="29" fromVerse="12" toChapter="30" toVerse="1">
       <aliyah n="2" fromVerse="17"/>
       <aliyah n="3" fromVerse="20"/>
       <aliyah n="4" fromVerse="23"/>
       <aliyah n="5" fromVerse="26"/>
       <aliyah n="6" fromVerse="29"/>
       <aliyah n="7" fromVerse="32"/>
-    </torah>)
+      <aliyah n="8" fromVerse="35"/>
+    </torah>).spans
 
-  val sheminiAtzeresMaftir: Maftir = parseMaftir(
-      <maftir book="Numbers" fromChapter="29" fromVerse="35" toChapter="30" toVerse="1"/>)
+  def succosKorbanot(n: Int): Torah.Aliyah = succosKorbanotSpans(n-1)
+
+  val succosMaftir: Maftir = succosKorbanotSpans.head
+  val sheminiAtzeresMaftir: Maftir = succosKorbanotSpans.last
 }

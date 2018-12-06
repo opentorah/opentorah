@@ -154,8 +154,6 @@ object Custom extends NamedCompanion {
       case object Hagra extends Custom(Some(Ashkenaz))
     case object Sefard extends Custom(Some(Common))
       case object Chabad extends Custom(Some(Sefard))
-        // According to some, this is prevaling Chabad custom:
-        case object RavNaeHolyLand extends Custom(Some(Chabad)) { override def name: String = "Rav Nae Holy Land" }
       case object Magreb extends Custom(Some(Sefard))
         case object Algeria extends Custom(Some(Magreb))
         case object Toshbim extends Custom(Some(Magreb))
@@ -169,7 +167,7 @@ object Custom extends NamedCompanion {
 
   override val values: Seq[Custom] = Seq(
     Common, Ashkenaz, Italki, Frankfurt, Lita, ChayeyOdom, Hagra,
-    Sefard, RavNaeHolyLand, Chabad,
+    Sefard, Chabad,
     Magreb, Algeria, Toshbim, Djerba, Morocco, Fes, Bavlim, Teiman, Baladi, Shami)
 
   val leaves: Set[Custom] = values.toSet.filter(_.isLeaf)
