@@ -35,33 +35,8 @@ object Custom extends NamedCompanion {
 
     final def maximize: Of[T] = new Of(all.map(custom => custom -> doFind(custom)).toMap)
 
-    // TODO do minimization unboxedly
 
-    final def minimize: Of[T] = {
-      // start with maximized representation: all Customs other than Common present;
-      // go through levels of Customs in descending order;
-      // each group only affects the next one, not the preceding ones;
-      // customs on the same level do not affect one another.
-      // TODO do not do 0th level: Common is handled separately
-      val result = byLevelDescending.foldLeft(this.maximize) { case (groupResult: Of[T], group: Seq[Custom]) =>
-        group.foldLeft(groupResult) { case (result: Of[T], custom: Custom) =>
-          result.minimize(custom)
-        }
-      }
-
-      val commonValue: Option[T] = if (result.customs.keySet != Common.children) None else {
-        val values: Set[T] = result.customs.values.toSet
-        if (values.size != 1) None else Some(values.head)
-      }
-
-      commonValue.fold(result)(commonValue => new Of(Map(Common -> commonValue)))
-    }
-
-    private final def minimize(custom: Custom): Of[T] = if (custom.children.isEmpty) this else {
-      customs.get(custom).fold(this) { value =>
-        new Of(customs -- custom.children.filter(customs(_) == value))
-      }
-    }
+    final def minimize: Of[T] = new Of(Of.minimize(this.maximize.customs))
 
     final def lift[Q, R](b: Of[Q], f: (Custom, Option[T], Option[Q]) => R): Of[R] =
       lift[Q, Option[T], Option[Q], R](b, f, _.find(_), _.find(_))
@@ -106,6 +81,33 @@ object Custom extends NamedCompanion {
       if (full) require(result.isFull)
       result
     }
+
+    def minimize[T](customs: Map[Custom, T]): Map[Custom, T] = {
+      // start with maximized representation: all Customs other than Common present;
+      // go through levels of Customs in descending order;
+      // each group only affects the next one, not the preceding ones;
+      // customs on the same level do not affect one another.
+      val result: Map[Custom, T] =
+        byLevelDescending.foldLeft(customs) { case (groupResult: Map[Custom, T], group: Seq[Custom]) =>
+          group.foldLeft(groupResult) { case (result: Map[Custom, T], custom: Custom) =>
+            minimize(result, custom)
+          }
+        }
+
+      val commonValue: Option[T] = if (result.keySet != Common.children) None else {
+        val values: Set[T] = result.values.toSet
+        if (values.size != 1) None else Some(values.head)
+      }
+
+      commonValue.fold(result)(commonValue => Map(Common -> commonValue))
+    }
+
+    private final def minimize[T](customs: Map[Custom, T], custom: Custom): Map[Custom, T] =
+      if (custom.children.isEmpty) customs else {
+        customs.get(custom).fold(customs) { value =>
+          customs -- custom.children.filter(customs(_) == value)
+        }
+      }
   }
 
   type Sets[T] = Map[Set[Custom], T]
@@ -140,7 +142,7 @@ object Custom extends NamedCompanion {
 
   val byLevelDescending: Seq[Seq[Custom]] = {
     val byLevel: Map[Int, Seq[Custom]] = values.groupBy(_.level)
-    (0 to byLevel.keySet.max).reverse.flatMap(level => byLevel.get(level))
+    (1 to byLevel.keySet.max).reverse.flatMap(level => byLevel.get(level))
   }
 
   def parse(names: String): Set[Custom] = {
