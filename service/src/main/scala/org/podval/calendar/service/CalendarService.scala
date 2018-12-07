@@ -304,19 +304,25 @@ object CalendarService extends StreamApp[IO] {
     reading.fold(Seq.empty[TypedTag[String]]) { reading => Seq(div(
       span(cls := "heading")(name),
       {
-        val maftir = reading.maftir
-        val haftarah = reading.haftarah
+        val maftirCommonOnly = reading.maftir.commonOnly
+        val haftarahCommonOnly = reading.haftarah.commonOnly
         val noMaftirHaftarah: Boolean =
-          maftir.commonOnly.fold(false)(_.isEmpty) && haftarah.commonOnly.fold(false)(_.isEmpty)
-        // TODO render maftir and haftarah together when both vary
+          maftirCommonOnly.fold(false)(_.isEmpty) && haftarahCommonOnly.fold(false)(_.isEmpty)
+        val varyingMaftirAndHaftarah: Boolean = maftirCommonOnly.isEmpty && haftarahCommonOnly.isEmpty
 
         div(
           span(cls := "subheading")("Torah"),
           reading.names.map(renderNames).toSeq,
           renderTorah(reading.torah),
-          if (noMaftirHaftarah) Seq.empty[TypedTag[String]] else Seq(
-            renderByCustom("Maftir", maftir),
-            renderByCustom("Haftarah", haftarah)
+          if (noMaftirHaftarah) Seq.empty[TypedTag[String]] else
+          if (varyingMaftirAndHaftarah) Seq(
+            span(cls := "subheading")("Maftir and Haftarah"),
+            renderMaftirAndHaftarah(reading.maftirAndHaftarah)
+          ) else Seq(
+            span(cls := "subheading")("Maftir"),
+            renderByCustom(reading.maftir),
+            span(cls := "subheading")("Haftarah"),
+            renderByCustom(reading.haftarah)
           )
         )
       }
@@ -336,17 +342,25 @@ object CalendarService extends StreamApp[IO] {
     }
   }
 
-  private def renderByCustom[T <: LanguageString](
-    title: String,
-    customs: Custom.Of[Option[T]]
-  )(implicit spec: LanguageSpec): Seq[TypedTag[String]] = Seq(
-    span(cls := "subheading")(title),
-    table(tbody(
-      customs.customs.toSeq.map { case (custom: Custom, value: Option[T]) =>
-        tr(td(custom.toLanguageString), td(span(value.fold("None")(_.toLanguageString))))
+  private def renderByCustom[T <: LanguageString](customs: Custom.Of[Option[T]])
+    (implicit spec: LanguageSpec): TypedTag[String] = table(tbody(
+    customs.customs.toSeq.map { case (custom: Custom, value: Option[T]) =>
+      tr(td(custom.toLanguageString), td(span(value.fold("None")(_.toLanguageString))))
+    }
+  ))
+
+  private def renderMaftirAndHaftarah(customs: Custom.Of[Option[Reading.MaftirAndHaftarah]])
+    (implicit spec: LanguageSpec): TypedTag[String] = table(tbody(
+      customs.customs.toSeq.map { case (custom: Custom, value: Option[Reading.MaftirAndHaftarah]) =>
+        val maftir = value.map(_.maftir)
+        val haftarah = value.map(_.haftarah)
+        tr(
+          td(custom.toLanguageString),
+          td(span(maftir.fold("None")(_.toLanguageString))),
+          td(span(haftarah.fold("None")(_.toLanguageString)))
+        )
       }
     ))
-  )
 
   private def renderHtml(
     url: String,
