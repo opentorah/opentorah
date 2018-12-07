@@ -3,7 +3,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Rosh Chodesh"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="ראש חודש"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -11,7 +11,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Erev Rosh Chodesh"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="ערב ראש חודש"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -19,7 +19,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Rosh Hashanah"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="ראש השנה"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -27,7 +27,7 @@
   <names>
     <name lang="en" n="Fast of Gedalia"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="צום גדליה"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -35,7 +35,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Yom Kippur"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="יום כיפור"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -43,7 +43,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Succos"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="סוכות"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -51,7 +51,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Succos Intermediate"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="חול המועד סוכות"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -59,7 +59,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Shemini Atzeres"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="שמימי עצרת"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -67,7 +67,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Simchas Torah"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="שימחת תורה"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -75,7 +75,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Shemini Atzeres and Simchas Torah"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="שמיני עמרת ושימחת תורה"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -83,7 +83,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Shabbos Bereishis"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="שבת בראשית"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -91,7 +91,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Chanukah"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="חנוכה"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -99,7 +99,7 @@
   <names>
     <name lang="en" n="Fast of 10th of Teves"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="צום עשרה בטבת"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -107,7 +107,7 @@
   <names>
     <name lang="en" n="Fast of Ester"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="תענית אסתר"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -123,7 +123,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Parshas Zachor"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="שבת זכור"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -139,7 +139,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Parshas Hachodesh"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="שבת פרה"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -147,7 +147,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Shabbos Hagodol"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="שבת הגדול"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -155,7 +155,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Purim"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="פורים"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -163,7 +163,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Shushan Purim"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="שושן פורים"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -171,7 +171,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Pesach"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="פסח"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -179,7 +179,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Pesach Intermediate"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="חןל המועד פסח"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -187,7 +187,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Pesach 7"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="שביעי של פסח"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -195,7 +195,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Pesach 8"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="אחרון של פסח"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -203,7 +203,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Omer"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="עומר"/>
      <name lang="ru" n=""/>
      -->
   </names>
@@ -211,7 +211,7 @@
   <names>
     <name lang="en" transliterated="yes" n="Lag Ba Omer"/>
     <!--
-     <name lang="he" n=""/>
+     <name lang="he" n="ל"ג בעומר"/>
      <name lang="ru" n=""/>
      -->
   </names>
