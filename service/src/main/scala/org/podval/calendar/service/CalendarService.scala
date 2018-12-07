@@ -21,6 +21,14 @@ import scalatags.Text.TypedTag
 import scalatags.Text.all._
 
 // TODO around Jewish year 3761, Gregorian day numbers become negative...
+/*
+  This UI was done just for testing the underlying calculations, not for public consumption.
+  That is why it is not dynamic, CSS styling sucks, internationalization is incomplete etc.
+  There is currently no need for the polished user-facing UI.
+  I am also not doing an API service right now: there are no consumers for it in development,
+  but it is possible at this point (12/2018) that one will appear soon, and then the API will
+  be designed to accommodate the needs of the real consumer.
+ */
 object CalendarService extends StreamApp[IO] {
 
   private val staticResourceExtensions: Seq[String] = Seq(".ico", ".css", ".js")

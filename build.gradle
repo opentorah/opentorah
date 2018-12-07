@@ -1,5 +1,3 @@
-import org.gradle.api.tasks.testing.logging.TestLogEvent
-
 // TODO  scalacOptions ++= Seq("-Ypartial-unification") - for http4s
 
 buildscript {
@@ -16,24 +14,29 @@ plugins {
   id "com.github.maiflai.scalatest" version "0.22" apply false
   id "com.jfrog.bintray" version "1.8.4" apply false
 
-  // I do not use 'com.bmuschko.docker-java-application' because I want to separate third-party dependencies in a
-  // different layer from the org.podval ones.
-  //
-  // I do not use 'com.bmuschko.docker-remote-api' because I don't need to: Google Cloud Build step takes care
-  // of Docker image creation and push; also, Google Cloud Build provides Gradle v4.6, and the plugin requires v4.8.
-  //
-  // If I didn't use Cloud Build, this is how I'd do it:
-  //  task buildDockerImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage, dependsOn: prepareDockerContext) {
-  //    group = "docker"
-  //    inputDir = dockerDir
-  //    tag = "gcr.io/calendar-service-1/service".toString()
-  //  }
-  //
-  //  id 'com.bmuschko.docker-remote-api' version '4.0.5' apply false
-  //  id 'com.bmuschko.docker-java-application' version '4.0.5' apply false
+  // Scala.js support:   Scala.js/Gradle: https://github.com/gtache/scalajs-gradle ?
+
+  /*
+  I do not use 'com.bmuschko.docker-java-application' because I want to separate third-party dependencies in a
+  different layer from the org.podval ones to speed up pushes.
+  
+  I do not use 'com.bmuschko.docker-remote-api' because I don't need to: Google Cloud Build step takes care
+  of Docker image creation and push; also, Google Cloud Build provides Gradle v4.6, and the plugin requires v4.8,
+  so it won't work on Cloud Build anyway :)
+  
+  If I didn't use Cloud Build, this is how I'd do it:
+    task buildDockerImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage, dependsOn: prepareDockerContext) {
+      group = "docker"
+      inputDir = dockerDir
+      tag = "gcr.io/calendar-service-1/service".toString()
+    }
+  
+    id 'com.bmuschko.docker-remote-api' version '4.0.5' apply false
+    id 'com.bmuschko.docker-java-application' version '4.0.5' apply false
+  */
 }
 
-def scalaVersion      = '2.12.7'
+def scalaVersion      = '2.12.8'
 def scalaVersionMajor = '2.12'
 def http4sVersion     = '0.18.21' // '0.20.0-SNAPSHOT'
 
@@ -51,6 +54,8 @@ ext.lib = [
   http4sClient   : "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion",
 
   scalatags      : "com.lihaoyi:scalatags_$scalaVersionMajor:0.6.7",
+
+  // add Circe when we need JSON: https://circe.github.io/circe/
 
   scalaCheck     : "org.scalacheck:scalacheck_${scalaVersionMajor}:1.14.0",
   scalaTest      : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.5",
@@ -84,7 +89,7 @@ subprojects {
 
   test {
     testLogging {
-      events = [TestLogEvent.FAILED]
+      events = [org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED]
     }
   }
 
@@ -212,8 +217,6 @@ project(':judaica') {
 }
 
 project(':dates') {
-  apply plugin: 'com.jfrog.bintray'
-
   dependencies {
     compile project(':judaica')
   }
