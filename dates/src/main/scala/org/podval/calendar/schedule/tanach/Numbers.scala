@@ -84,7 +84,7 @@ object Numbers extends TorahReadings  {
       <aliyah n="8" fromVerse="35"/>
     </torah>).spans
 
-  def succosKorbanot(n: Int): Torah.Aliyah = succosKorbanotSpans(n-1)
+  def succosKorbanot(n: Int): Torah.Aliyah = succosKorbanotSpans(n)
 
   val succosMaftir: Maftir = succosKorbanotSpans.head
   val sheminiAtzeresMaftir: Maftir = succosKorbanotSpans.last

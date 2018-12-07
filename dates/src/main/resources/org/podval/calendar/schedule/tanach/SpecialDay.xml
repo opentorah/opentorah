@@ -1,122 +1,242 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <names type="SpecialDay">
   <names>
-    <name lang="en" transliterated="yes">Rosh Chodesh</name>
+    <name lang="en" transliterated="yes" n="Rosh Chodesh"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Erev Rosh Chodesh</name>
+    <name lang="en" transliterated="yes" n="Erev Rosh Chodesh"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Rosh Hashanah</name>
+    <name lang="en" transliterated="yes" n="Rosh Hashanah"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en">Fast of Gedalia</name>
+    <name lang="en" n="Fast of Gedalia"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Yom Kippur</name>
+    <name lang="en" transliterated="yes" n="Yom Kippur"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Succos</name>
+    <name lang="en" transliterated="yes" n="Succos"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Succos Intermediate</name>
+    <name lang="en" transliterated="yes" n="Succos Intermediate"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Shemini Atzeres</name>
+    <name lang="en" transliterated="yes" n="Shemini Atzeres"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Simchas Torah</name>
+    <name lang="en" transliterated="yes" n="Simchas Torah"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Shemini Atzeres and Simchas Torah</name>
+    <name lang="en" transliterated="yes" n="Shemini Atzeres and Simchas Torah"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Shabbos Bereishis</name>
+    <name lang="en" transliterated="yes" n="Shabbos Bereishis"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Chanukah</name>
+    <name lang="en" transliterated="yes" n="Chanukah"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en">Fast of 10th of Teves</name>
+    <name lang="en" n="Fast of 10th of Teves"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en">Fast of Ester</name>
+    <name lang="en" n="Fast of Ester"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Parshas Shekalim</name>
+    <name lang="en" transliterated="yes" n="Parshas Shekalim"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Parshas Zachor</name>
+    <name lang="en" transliterated="yes" n="Parshas Zachor"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Parshas Parah</name>
+    <name lang="en" transliterated="yes" n="Parshas Parah"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Parshas Hachodesh</name>
+    <name lang="en" transliterated="yes" n="Parshas Hachodesh"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Shabbos Hagodol</name>
+    <name lang="en" transliterated="yes" n="Shabbos Hagodol"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Purim</name>
+    <name lang="en" transliterated="yes" n="Purim"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Shushan Purim</name>
+    <name lang="en" transliterated="yes" n="Shushan Purim"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Pesach</name>
+    <name lang="en" transliterated="yes" n="Pesach"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Pesach Intermediate</name>
+    <name lang="en" transliterated="yes" n="Pesach Intermediate"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Pesach 7</name>
+    <name lang="en" transliterated="yes" n="Pesach 7"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Pesach 8</name>
+    <name lang="en" transliterated="yes" n="Pesach 8"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Omer</name>
+    <name lang="en" transliterated="yes" n="Omer"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Lag Ba Omer</name>
+    <name lang="en" transliterated="yes" n="Lag Ba Omer"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Shavuos</name>
+    <name lang="en" transliterated="yes" n="Shavuos"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en">Fast of Tammuz</name>
+    <name lang="en" n="Fast of Tammuz"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 
   <names>
-    <name lang="en" transliterated="yes">Tisha BeAv</name>
+    <name lang="en" transliterated="yes" n="Tisha BeAv"/>
+    <!--
+     <name lang="he" n=""/>
+     <name lang="ru" n=""/>
+     -->
   </names>
 </names>
