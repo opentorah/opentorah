@@ -1,5 +1,3 @@
-import org.gradle.api.tasks.testing.logging.TestLogEvent
-
 // TODO  scalacOptions ++= Seq("-Ypartial-unification") - for http4s
 
 buildscript {
@@ -14,27 +12,31 @@ buildscript {
 
 plugins {
   id "com.github.maiflai.scalatest" version "0.22" apply false
-  id "com.jfrog.artifactory" version "4.5.4" apply false
-  id "com.jfrog.bintray" version "1.7.3" apply false
+  id "com.jfrog.bintray" version "1.8.4" apply false
 
-  // I do not use 'com.bmuschko.docker-java-application' because I want to separate third-party dependencies in a
-  // different layer from the org.podval ones.
-  //
-  // I do not use 'com.bmuschko.docker-remote-api' because I don't need to: Google Cloud Build step takes care
-  // of Docker image creation and push; also, Google Cloud Build provides Gradle v4.6, and the plugin requires v4.8.
-  //
-  // If I didn't use Cloud Build, this is how I'd do it:
-  //  task buildDockerImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage, dependsOn: prepareDockerContext) {
-  //    group = "docker"
-  //    inputDir = dockerDir
-  //    tag = "gcr.io/calendar-service-1/service".toString()
-  //  }
-  //
-  //  id 'com.bmuschko.docker-remote-api' version '4.0.5' apply false
-  //  id 'com.bmuschko.docker-java-application' version '4.0.5' apply false
+  // Scala.js support:   Scala.js/Gradle: https://github.com/gtache/scalajs-gradle ?
+
+  /*
+  I do not use 'com.bmuschko.docker-java-application' because I want to separate third-party dependencies in a
+  different layer from the org.podval ones to speed up pushes.
+  
+  I do not use 'com.bmuschko.docker-remote-api' because I don't need to: Google Cloud Build step takes care
+  of Docker image creation and push; also, Google Cloud Build provides Gradle v4.6, and the plugin requires v4.8,
+  so it won't work on Cloud Build anyway :)
+  
+  If I didn't use Cloud Build, this is how I'd do it:
+    task buildDockerImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage, dependsOn: prepareDockerContext) {
+      group = "docker"
+      inputDir = dockerDir
+      tag = "gcr.io/calendar-service-1/service".toString()
+    }
+  
+    id 'com.bmuschko.docker-remote-api' version '4.0.5' apply false
+    id 'com.bmuschko.docker-java-application' version '4.0.5' apply false
+  */
 }
 
-def scalaVersion      = '2.12.7'
+def scalaVersion      = '2.12.8'
 def scalaVersionMajor = '2.12'
 def http4sVersion     = '0.18.21' // '0.20.0-SNAPSHOT'
 
@@ -52,6 +54,8 @@ ext.lib = [
   http4sClient   : "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion",
 
   scalatags      : "com.lihaoyi:scalatags_$scalaVersionMajor:0.6.7",
+
+  // add Circe when we need JSON: https://circe.github.io/circe/
 
   scalaCheck     : "org.scalacheck:scalacheck_${scalaVersionMajor}:1.14.0",
   scalaTest      : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.5",
@@ -85,7 +89,7 @@ subprojects {
 
   test {
     testLogging {
-      events = [TestLogEvent.FAILED]
+      events = [org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED]
     }
   }
 
@@ -133,8 +137,8 @@ def pomConfig = {
     }
   }
   organization {
-    name 'Podval Group'
-    url 'http://www.podval.org'
+    name 'Jewish Calendar'
+    url 'http://www.jewish-calendar.org'
   }
   developers {
     developer {
@@ -152,20 +156,20 @@ def pomConfig = {
 
 def bintrayInfo = [
   user: 'dubinsky',
-  password: findProperty('bintrayApiKey'),
-  repository: 'org.podval'
+  key: findProperty('bintrayApiKey'),
+  repository: 'org.podval.calendar'
 ]
 
 def bintrayConfig = {
   user         = bintrayInfo.user
-  key          = bintrayInfo.password
+  key          = bintrayInfo.key
   publications = ['mavenPublication']
   dryRun       = false
   publish      = true
-  override     = false
+  override     = true
   pkg {
     repo                   = bintrayInfo.repository
-    name                   = project.group
+    name                   = project.jar.baseName
     desc                   = 'Jewish Calendar'
     websiteUrl             = artifactUrls.siteUrl
     issueTrackerUrl        = artifactUrls.issuesUrl
@@ -174,7 +178,7 @@ def bintrayConfig = {
     licenses               = ['Apache-2.0']
     labels                 = ['Scala', 'Calendar', 'Jewish']
     publicDownloadNumbers  = true
-    githubReleaseNotesFile = 'README.md'
+//    githubReleaseNotesFile = 'README.md'
     version { name         = project.version }
   }
 }
@@ -183,6 +187,33 @@ project(':judaica') {
   dependencies {
     compile lib.scalaXml
   }
+
+  def artifactInfo = [
+    artifactId: jar.baseName,
+    name: 'judaica-metadata',
+    description: 'Digital Judaica metadata.'
+  ]
+
+  publishing {
+    publications {
+      mavenPublication(MavenPublication) {
+        groupId project.group
+        artifactId artifactInfo.artifactId
+
+        from components.java
+        artifact sourceJar
+
+        pom.withXml {
+          def root = asNode()
+          root.appendNode('description', artifactInfo.description)
+          root.appendNode('name'       , artifactInfo.name       )
+          root.children().last() + pomConfig
+        }
+      }
+    }
+  }
+
+  bintray bintrayConfig
 }
 
 project(':dates') {
@@ -191,7 +222,7 @@ project(':dates') {
   }
 
   def artifactInfo = [
-    id: 'org.podval.calendar.dates',
+    artifactId: jar.baseName,
     name: 'jewish-calendar-dates',
     description: 'Jewish Calendar Dates.'
   ]
@@ -199,7 +230,8 @@ project(':dates') {
   publishing {
     publications {
       mavenPublication(MavenPublication) {
-        artifactId artifactInfo.id
+        groupId project.group
+        artifactId artifactInfo.artifactId
 
         from components.java
         artifact sourceJar
@@ -245,6 +277,33 @@ project(':service') {
       copy { from "$projectDir/Dockerfile" into dockerDir }
     }
   }
+
+  def artifactInfo = [
+    artifactId: jar.baseName,
+    name: 'jewish-calendar-service',
+    description: 'Jewish Calendar Service.'
+  ]
+
+  publishing {
+    publications {
+      mavenPublication(MavenPublication) {
+        groupId project.group
+        artifactId artifactInfo.artifactId
+
+        from components.java
+        artifact sourceJar
+
+        pom.withXml {
+          def root = asNode()
+          root.appendNode('description', artifactInfo.description)
+          root.appendNode('name'       , artifactInfo.name       )
+          root.children().last() + pomConfig
+        }
+      }
+    }
+  }
+
+  bintray bintrayConfig
 }
 
 project(':paper') {
