@@ -1,5 +1,5 @@
 language: scala
-scala: 2.12.4
+scala: 2.12.7
 jdk: oraclejdk8
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock

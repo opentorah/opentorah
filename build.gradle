@@ -14,8 +14,7 @@ buildscript {
 
 plugins {
   id "com.github.maiflai.scalatest" version "0.22" apply false
-  id "com.jfrog.artifactory" version "4.5.4" apply false
-  id "com.jfrog.bintray" version "1.7.3" apply false
+  id "com.jfrog.bintray" version "1.8.4" apply false
 
   // I do not use 'com.bmuschko.docker-java-application' because I want to separate third-party dependencies in a
   // different layer from the org.podval ones.
@@ -133,8 +132,8 @@ def pomConfig = {
     }
   }
   organization {
-    name 'Podval Group'
-    url 'http://www.podval.org'
+    name 'Jewish Calendar'
+    url 'http://www.jewish-calendar.org'
   }
   developers {
     developer {
@@ -152,20 +151,20 @@ def pomConfig = {
 
 def bintrayInfo = [
   user: 'dubinsky',
-  password: findProperty('bintrayApiKey'),
-  repository: 'org.podval'
+  key: findProperty('bintrayApiKey'),
+  repository: 'org.podval.calendar'
 ]
 
 def bintrayConfig = {
   user         = bintrayInfo.user
-  key          = bintrayInfo.password
+  key          = bintrayInfo.key
   publications = ['mavenPublication']
   dryRun       = false
   publish      = true
-  override     = false
+  override     = true
   pkg {
     repo                   = bintrayInfo.repository
-    name                   = project.group
+    name                   = project.jar.baseName
     desc                   = 'Jewish Calendar'
     websiteUrl             = artifactUrls.siteUrl
     issueTrackerUrl        = artifactUrls.issuesUrl
@@ -174,7 +173,7 @@ def bintrayConfig = {
     licenses               = ['Apache-2.0']
     labels                 = ['Scala', 'Calendar', 'Jewish']
     publicDownloadNumbers  = true
-    githubReleaseNotesFile = 'README.md'
+//    githubReleaseNotesFile = 'README.md'
     version { name         = project.version }
   }
 }
@@ -183,15 +182,44 @@ project(':judaica') {
   dependencies {
     compile lib.scalaXml
   }
+
+  def artifactInfo = [
+    artifactId: jar.baseName,
+    name: 'judaica-metadata',
+    description: 'Digital Judaica metadata.'
+  ]
+
+  publishing {
+    publications {
+      mavenPublication(MavenPublication) {
+        groupId project.group
+        artifactId artifactInfo.artifactId
+
+        from components.java
+        artifact sourceJar
+
+        pom.withXml {
+          def root = asNode()
+          root.appendNode('description', artifactInfo.description)
+          root.appendNode('name'       , artifactInfo.name       )
+          root.children().last() + pomConfig
+        }
+      }
+    }
+  }
+
+  bintray bintrayConfig
 }
 
 project(':dates') {
+  apply plugin: 'com.jfrog.bintray'
+
   dependencies {
     compile project(':judaica')
   }
 
   def artifactInfo = [
-    id: 'org.podval.calendar.dates',
+    artifactId: jar.baseName,
     name: 'jewish-calendar-dates',
     description: 'Jewish Calendar Dates.'
   ]
@@ -199,7 +227,8 @@ project(':dates') {
   publishing {
     publications {
       mavenPublication(MavenPublication) {
-        artifactId artifactInfo.id
+        groupId project.group
+        artifactId artifactInfo.artifactId
 
         from components.java
         artifact sourceJar
@@ -245,6 +274,33 @@ project(':service') {
       copy { from "$projectDir/Dockerfile" into dockerDir }
     }
   }
+
+  def artifactInfo = [
+    artifactId: jar.baseName,
+    name: 'jewish-calendar-service',
+    description: 'Jewish Calendar Service.'
+  ]
+
+  publishing {
+    publications {
+      mavenPublication(MavenPublication) {
+        groupId project.group
+        artifactId artifactInfo.artifactId
+
+        from components.java
+        artifact sourceJar
+
+        pom.withXml {
+          def root = asNode()
+          root.appendNode('description', artifactInfo.description)
+          root.appendNode('name'       , artifactInfo.name       )
+          root.children().last() + pomConfig
+        }
+      }
+    }
+  }
+
+  bintray bintrayConfig
 }
 
 project(':paper') {
