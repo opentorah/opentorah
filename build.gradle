@@ -4,14 +4,10 @@ buildscript {
   repositories {
     // To function outside a composite, a plugin repository would be required.
   }
-
-  dependencies {
-    classpath 'org.podval.docbook:gradle-docbook-plugin:+'
-  }
 }
 
 plugins {
-  id "com.github.maiflai.scalatest" version "0.22" apply false
+  id "com.github.maiflai.scalatest" version "0.23" apply false
   id "com.jfrog.bintray" version "1.8.4" apply false
 
   // Scala.js support:   Scala.js/Gradle: https://github.com/gtache/scalajs-gradle ?
@@ -59,7 +55,7 @@ ext.lib = [
 
   scalaCheck     : "org.scalacheck:scalacheck_${scalaVersionMajor}:1.14.0",
   scalaTest      : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.5",
-  pegdown        : 'org.pegdown:pegdown:1.4.2' // for scalatest reports
+  pegdown        : 'org.pegdown:pegdown:1.6.0' // for scalatest reports
 ]
 
 allprojects {
@@ -71,6 +67,32 @@ allprojects {
 
   group = 'org.podval.calendar'
   version = '0.1.1'
+}
+
+def gitHubRepository    = "jewish-calendar/calendar"
+def gitHubRepositoryUrl = "https://github.com/${gitHubRepository}"
+
+def bintrayConfig = {
+  user         = 'dubinsky'
+  key          = findProperty('bintrayApiKey')
+  publications = ['mavenPublication']
+  dryRun       = false
+  publish      = true
+  override     = true
+  pkg {
+    repo                   = 'org.podval.calendar'
+    name                   = project.jar.baseName
+    desc                   = project.description
+    websiteUrl             = "${gitHubRepositoryUrl}"
+    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
+    vcsUrl                 = "${gitHubRepositoryUrl}.git"
+    githubRepo             = gitHubRepository
+    licenses               = ['Apache-2.0']
+    labels                 = ['Scala', 'Calendar', 'Jewish']
+    publicDownloadNumbers  = true
+//    githubReleaseNotesFile = 'README.md'
+    version { name         = project.version }
+  }
 }
 
 subprojects {
@@ -97,6 +119,52 @@ subprojects {
     from sourceSets.main.allSource
     classifier = 'sources'
   }
+
+  publishing {
+    publications {
+      mavenPublication(MavenPublication) {
+        groupId project.group
+        artifactId jar.baseName
+
+        from components.java
+        artifact sourceJar
+
+        pom {
+          name = project.name
+          description = project.description
+          url = "${gitHubRepositoryUrl}"
+          scm {
+            url = "${gitHubRepositoryUrl}"
+            connection = "scm:git:git://github.com/${gitHubRepository}.git"
+            developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
+          }
+          licenses {
+            license {
+              name = 'The Apache Software License, Version 2.0'
+              url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+              distribution = 'repo'
+              comments = 'A business-friendly OSS license'
+            }
+          }
+          organization {
+            name = 'Jewish Calendar'
+            url = 'http://www.jewish-calendar.org'
+          }
+          developers {
+            developer {
+              id = 'dub'
+              name = 'Leonid Dubinsky'
+              email = 'dub@podval.org'
+              url = 'http://dub.podval.org'
+              organization = 'Podval Group'
+              organizationUrl = 'http://www.podval.org'
+              timezone = '-5'
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 apply plugin: 'idea'
@@ -115,141 +183,29 @@ idea {
   }
 }
 
-
-def gitHubRepository    = "jewish-calendar/calendar"
-def gitHubRepositoryUrl = "https://github.com/${gitHubRepository}"
-
-def artifactUrls = [
-  siteUrl  : "${gitHubRepositoryUrl}",
-  issuesUrl: "${gitHubRepositoryUrl}/issues",
-  vcsUrl   : "${gitHubRepositoryUrl}.git"
-]
-
-def pomConfig = {
-  url artifactUrls.siteUrl
-  scm { url artifactUrls.siteUrl }
-  licenses {
-    license {
-      name 'The Apache Software License, Version 2.0'
-      url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-      distribution 'repo'
-      comments 'A business-friendly OSS license'
-    }
-  }
-  organization {
-    name 'Jewish Calendar'
-    url 'http://www.jewish-calendar.org'
-  }
-  developers {
-    developer {
-      id 'dub'
-      name 'Leonid Dubinsky'
-      email 'dub@podval.org'
-      url 'http://dub.podval.org'
-      organization 'Podval Group'
-      organizationUrl 'http://www.podval.org'
-      roles { role 'developer' }
-      timezone '-5'
-    }
-  }
-}
-
-def bintrayInfo = [
-  user: 'dubinsky',
-  key: findProperty('bintrayApiKey'),
-  repository: 'org.podval.calendar'
-]
-
-def bintrayConfig = {
-  user         = bintrayInfo.user
-  key          = bintrayInfo.key
-  publications = ['mavenPublication']
-  dryRun       = false
-  publish      = true
-  override     = true
-  pkg {
-    repo                   = bintrayInfo.repository
-    name                   = project.jar.baseName
-    desc                   = 'Jewish Calendar'
-    websiteUrl             = artifactUrls.siteUrl
-    issueTrackerUrl        = artifactUrls.issuesUrl
-    vcsUrl                 = artifactUrls.vcsUrl
-    githubRepo             = gitHubRepository
-    licenses               = ['Apache-2.0']
-    labels                 = ['Scala', 'Calendar', 'Jewish']
-    publicDownloadNumbers  = true
-//    githubReleaseNotesFile = 'README.md'
-    version { name         = project.version }
-  }
-}
-
 project(':judaica') {
+  description = 'Digital Judaica metadata.'
+
   dependencies {
     compile lib.scalaXml
-  }
-
-  def artifactInfo = [
-    artifactId: jar.baseName,
-    name: 'judaica-metadata',
-    description: 'Digital Judaica metadata.'
-  ]
-
-  publishing {
-    publications {
-      mavenPublication(MavenPublication) {
-        groupId project.group
-        artifactId artifactInfo.artifactId
-
-        from components.java
-        artifact sourceJar
-
-        pom.withXml {
-          def root = asNode()
-          root.appendNode('description', artifactInfo.description)
-          root.appendNode('name'       , artifactInfo.name       )
-          root.children().last() + pomConfig
-        }
-      }
-    }
   }
 
   bintray bintrayConfig
 }
 
 project(':dates') {
+  description = 'Jewish Calendar Dates.' 
+
   dependencies {
     compile project(':judaica')
-  }
-
-  def artifactInfo = [
-    artifactId: jar.baseName,
-    name: 'jewish-calendar-dates',
-    description: 'Jewish Calendar Dates.'
-  ]
-
-  publishing {
-    publications {
-      mavenPublication(MavenPublication) {
-        groupId project.group
-        artifactId artifactInfo.artifactId
-
-        from components.java
-        artifact sourceJar
-
-        pom.withXml {
-          def root = asNode()
-          root.appendNode('description', artifactInfo.description)
-          root.appendNode('name'       , artifactInfo.name       )
-          root.children().last() + pomConfig
-        }
-      }
-    }
   }
 
   bintray bintrayConfig
 }
 
 project(':service') {
+  description = 'Jewish Calendar Service.'
+
   apply plugin: 'application'
 
   dependencies {
@@ -261,6 +217,8 @@ project(':service') {
     //    compile lib.http4sScalatags
     implementation lib.slf4jJdk
   }
+
+  bintray bintrayConfig
 
   mainClassName = 'org.podval.calendar.service.CalendarService'
 
@@ -276,77 +234,5 @@ project(':service') {
       copy { from "$installDist.destinationDir/bin" into "$dockerDir/bin" }
       copy { from "$projectDir/Dockerfile" into dockerDir }
     }
-  }
-
-  def artifactInfo = [
-    artifactId: jar.baseName,
-    name: 'jewish-calendar-service',
-    description: 'Jewish Calendar Service.'
-  ]
-
-  publishing {
-    publications {
-      mavenPublication(MavenPublication) {
-        groupId project.group
-        artifactId artifactInfo.artifactId
-
-        from components.java
-        artifact sourceJar
-
-        pom.withXml {
-          def root = asNode()
-          root.appendNode('description', artifactInfo.description)
-          root.appendNode('name'       , artifactInfo.name       )
-          root.children().last() + pomConfig
-        }
-      }
-    }
-  }
-
-  bintray bintrayConfig
-}
-
-project(':paper') {
-  apply plugin: 'org.podval.docbook.gradle'
-
-  dependencies {
-    compile lib.scalaXml, project(':dates')
-  }
-
-  def docBookData = file("${buildDir}/data")
-
-  docbook {
-    inputFileName = "calendar"
-
-    dataDirectory = docBookData
-
-    xslParameters = [
-      "title.font.family": "Noto Sans, Noto Sans Hebrew",
-      "body.font.family": "Noto Sans, Noto Sans Hebrew",
-//      "dingbat.font.family": "???", // The font family for copyright, quotes, and other symbols
-//      "sans.font.family": "???",
-//      "monospace.font.family": "monospace",
-//      "symbol.font.family": "???" // TODO configure with catch-all symbol font(s)
-      "body.font.master": "12"
-//      "footnote.font.size": "10"
-    ]
-
-    // TODO define entities:
-    // version: project.version.toString
-    // tables-directory: ${buildDir}/tables
-    // date: LocalDate.now().format(DateTimeFormatter.ofPattern("d MMM yyyy"))
-  }
-
-  task buildTables(type: JavaExec, dependsOn: [classes]) {
-    classpath = sourceSets.main.runtimeClasspath
-    main = "org.podval.calendar.paper.Tables"
-    args = [ "$docBookData" ]
-  }
-  prepareDocBookData.dependsOn.add(buildTables)
-
-  docBookHtml.doLast {
-    def outputDirectory = file(docBookHtml.outputDirectory)
-    copy { from "src/main/images" into "$outputDirectory/images" }
-    copy { from "src/main/js"     into "$outputDirectory/js"     }
   }
 }

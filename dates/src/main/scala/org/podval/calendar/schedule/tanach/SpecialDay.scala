@@ -396,8 +396,15 @@ object SpecialDay {
 
     override def weekday: Reading = {
       val n: Int = correctedIntermediateDayNumber
-      val ashkenazAndChabad: Torah = Torah.aliyot(korbanot(n), korbanot(n+1), korbanot(n+2), shabbosMaftir)
-      val sefard: Aliyah = shabbosMaftir
+      // Do not go beyond 6th fragment of korbanot.
+      // TODO when are the other fragments used?
+      val ashkenazAndChabad: Torah = Torah.aliyot(
+        korbanot(n),
+        korbanot(Math.min(6, n+1)),
+        korbanot(Math.min(6, n+2)),
+        today
+      )
+      val sefard: Aliyah = today
       val torah: Torah.Customs = new Torah.Customs(Map(
         Custom.Ashkenaz -> ashkenazAndChabad,
         Custom.Chabad -> ashkenazAndChabad,
@@ -409,10 +416,12 @@ object SpecialDay {
 
     private def korbanot(n: Int): Aliyah = Numbers.succosKorbanot(n)
 
-    protected override def shabbosMaftir: Maftir = {
+    private def today: Maftir = {
       val n: Int = correctedIntermediateDayNumber
       if (inHolyLand) korbanot(n) else korbanot(n) + korbanot(n+1)
     }
+
+    protected override def shabbosMaftir: Maftir = today
 
     protected override def shabbosHaftarah: Haftarah.Customs = SuccosIntermediate.shabbosHaftarah
 
@@ -717,7 +726,7 @@ object SpecialDay {
   private object PesachIntermediate extends LoadNames("Pesach Intermediate") {
     def torah(dayNumber: Int, isPesachOnChamishi: Boolean): Torah = {
       val realDayNumber: Int =
-        if (isPesachOnChamishi && ((dayNumber == 4) || (dayNumber ==5))) dayNumber-1 else dayNumber
+        if (isPesachOnChamishi && ((dayNumber == 4) || (dayNumber == 5))) dayNumber-1 else dayNumber
       realDayNumber match {
         case 3 => Exodus.pesach3torah
         case 4 => Exodus.pesach4torah
@@ -745,9 +754,9 @@ object SpecialDay {
     protected final override def shabbosHaftarah: Haftarah.Customs = PesachIntermediate.shabbosHaftarah
 
     final def weekday(isPesachOnChamishi: Boolean): Reading = {
+      // TODO override in PesachIntermediate1InHolyLand
       val torah: Torah = if (dayNumber == 2) {
-        val all = Pesach2.torah.spans
-        Torah.aliyot(all(1), all(2), all(3) + all(4) + all(5))
+        Pesach2.torah.drop(Set(4, 5))
       } else {
         PesachIntermediate.torah(dayNumber, isPesachOnChamishi) :+ shabbosMaftir
       }
