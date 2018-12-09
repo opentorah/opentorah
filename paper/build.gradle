@@ -1,0 +1,48 @@
+buildscript {
+  dependencies {
+    classpath 'org.podval.docbook:gradle-docbook-plugin:+'
+  }
+}
+
+apply plugin: 'org.podval.docbook.gradle'
+
+dependencies {
+  compile lib.scalaXml, project(':dates')
+}
+
+def docBookData = file("${buildDir}/data")
+
+docbook {
+  inputFileName = "calendar"
+
+  dataDirectory = docBookData
+
+  xslParameters = [
+    "title.font.family": "Noto Sans, Noto Sans Hebrew",
+    "body.font.family": "Noto Sans, Noto Sans Hebrew",
+//    "dingbat.font.family": "???", // The font family for copyright, quotes, and other symbols
+//    "sans.font.family": "???",
+//    "monospace.font.family": "monospace",
+//    "symbol.font.family": "???" // TODO configure with catch-all symbol font(s)
+    "body.font.master": "12"
+//    "footnote.font.size": "10"
+  ]
+
+  // TODO define entities:
+  // version: project.version.toString
+  // tables-directory: ${buildDir}/tables
+  // date: LocalDate.now().format(DateTimeFormatter.ofPattern("d MMM yyyy"))
+}
+
+task buildTables(type: JavaExec, dependsOn: [classes]) {
+  classpath = sourceSets.main.runtimeClasspath
+  main = "org.podval.calendar.paper.Tables"
+  args = [ "$docBookData" ]
+}
+prepareDocBookData.dependsOn.add(buildTables)
+
+docBookHtml.doLast {
+  def outputDirectory = file(docBookHtml.outputDirectory)
+  copy { from "src/main/images" into "$outputDirectory/images" }
+  copy { from "src/main/js"     into "$outputDirectory/js"     }
+}

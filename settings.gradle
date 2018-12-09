@@ -3,8 +3,8 @@ rootProject.name = 'calendar'
 include ':judaica'
 include ':dates'
 include ':service'
-include ':paper'
 
-includeBuild 'docbook'
+//include ':paper'
+//includeBuild 'docbook'
 
 // enableFeaturePreview('STABLE_PUBLISHING')

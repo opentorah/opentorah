@@ -4,14 +4,10 @@ buildscript {
   repositories {
     // To function outside a composite, a plugin repository would be required.
   }
-
-  dependencies {
-    classpath 'org.podval.docbook:gradle-docbook-plugin:+'
-  }
 }
 
 plugins {
-  id "com.github.maiflai.scalatest" version "0.22" apply false
+  id "com.github.maiflai.scalatest" version "0.23" apply false
   id "com.jfrog.bintray" version "1.8.4" apply false
 
   // Scala.js support:   Scala.js/Gradle: https://github.com/gtache/scalajs-gradle ?
@@ -59,7 +55,7 @@ ext.lib = [
 
   scalaCheck     : "org.scalacheck:scalacheck_${scalaVersionMajor}:1.14.0",
   scalaTest      : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.5",
-  pegdown        : 'org.pegdown:pegdown:1.4.2' // for scalatest reports
+  pegdown        : 'org.pegdown:pegdown:1.6.0' // for scalatest reports
 ]
 
 allprojects {
@@ -127,7 +123,11 @@ def artifactUrls = [
 
 def pomConfig = {
   url artifactUrls.siteUrl
-  scm { url artifactUrls.siteUrl }
+  scm {
+    url artifactUrls.siteUrl
+    connection = 'scm:git:git://github.com/jewish-calendar/calendar.git'
+    developerConnection = 'scm:git:ssh://github.com/jewish-calendar/calendar.git'
+  }
   licenses {
     license {
       name 'The Apache Software License, Version 2.0'
@@ -304,49 +304,4 @@ project(':service') {
   }
 
   bintray bintrayConfig
-}
-
-project(':paper') {
-  apply plugin: 'org.podval.docbook.gradle'
-
-  dependencies {
-    compile lib.scalaXml, project(':dates')
-  }
-
-  def docBookData = file("${buildDir}/data")
-
-  docbook {
-    inputFileName = "calendar"
-
-    dataDirectory = docBookData
-
-    xslParameters = [
-      "title.font.family": "Noto Sans, Noto Sans Hebrew",
-      "body.font.family": "Noto Sans, Noto Sans Hebrew",
-//      "dingbat.font.family": "???", // The font family for copyright, quotes, and other symbols
-//      "sans.font.family": "???",
-//      "monospace.font.family": "monospace",
-//      "symbol.font.family": "???" // TODO configure with catch-all symbol font(s)
-      "body.font.master": "12"
-//      "footnote.font.size": "10"
-    ]
-
-    // TODO define entities:
-    // version: project.version.toString
-    // tables-directory: ${buildDir}/tables
-    // date: LocalDate.now().format(DateTimeFormatter.ofPattern("d MMM yyyy"))
-  }
-
-  task buildTables(type: JavaExec, dependsOn: [classes]) {
-    classpath = sourceSets.main.runtimeClasspath
-    main = "org.podval.calendar.paper.Tables"
-    args = [ "$docBookData" ]
-  }
-  prepareDocBookData.dependsOn.add(buildTables)
-
-  docBookHtml.doLast {
-    def outputDirectory = file(docBookHtml.outputDirectory)
-    copy { from "src/main/images" into "$outputDirectory/images" }
-    copy { from "src/main/js"     into "$outputDirectory/js"     }
-  }
 }
