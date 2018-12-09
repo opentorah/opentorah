@@ -141,22 +141,21 @@ object SpecialDay {
   case object RoshChodesh extends LoadNames("Rosh Chodesh") with WeekdayReading with MaftirAndHaftarahTransform {
     private val torah: Torah = Numbers.roshChodesh
 
-    <torah book="Numbers" fromChapter="28" fromVerse="1" toVerse="15">
-      <aliyah n="2" fromVerse="3"/>
-      <aliyah n="3" fromVerse="4"/>
-      <aliyah n="4" fromVerse="6"/>
-      <aliyah n="5" fromVerse="9"/>
-      <aliyah n="6" fromVerse="11"/>
-    </torah>
-
     override def weekday: Reading = {
       val all = torah.spans
-      Reading(Torah.aliyot(
-        all.head+all(1), // 1-3
-        all(1)+all(2),   // 3-5
-        all(3)+all(4),   // 6-10
-        all(5)           // 11-15
+      val aliya1 = all.head+all(1)             // 1-3
+      val aliya2AshkenazSefard = all(1)+all(2) // 3-5
+      val aliya2Hagra = all(2)+all(3)          // 4-8
+      val aliya3 = all(3)+all(4)               // 6-10
+      val aliya4 = all(5)                      // 11-15
+      val ashkenazSefard = Torah.aliyot(aliya1, aliya2AshkenazSefard, aliya3, aliya4)
+      val hagra = Torah.aliyot(aliya1, aliya2Hagra, aliya3, aliya4)
+      val torahCustoms: Torah.Customs = new Torah.Customs(Map(
+        Custom.Ashkenaz -> ashkenazSefard,
+        Custom.Sefard -> ashkenazSefard,
+        Custom.Hagra -> hagra
       ))
+      Reading(torahCustoms, names = Some(names))
     }
 
     def in3aliyot: Torah = {

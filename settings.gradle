@@ -6,5 +6,3 @@ include ':service'
 
 //include ':paper'
 //includeBuild 'docbook'
-
-// enableFeaturePreview('STABLE_PUBLISHING')
