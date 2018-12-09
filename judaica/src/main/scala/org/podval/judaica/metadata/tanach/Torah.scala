@@ -4,8 +4,21 @@ package org.podval.judaica.metadata.tanach
 final case class Torah private(override val spans: Seq[Torah.BookSpan])
   extends Torah.Spans(spans)
 {
-  def to6withLast(last: Torah.Aliyah): Torah =
-    Torah(spans.take(5) :+ (spans(5)+spans(6)) :+ last)
+  def drop(toDrop: Set[Int]): Torah = {
+    def drop(what: Seq[(Torah.Aliyah, Boolean)]): Seq[Torah.Aliyah] = what match {
+      case (a1, d1) :: (a2, d2) :: tail =>
+        if (d2) drop((a1+a2, d1) +: tail)
+        else a1 +: drop((a2, d2) +: tail)
+      case (a1, d1) :: Nil =>
+        Seq(a1)
+    }
+
+    val withDrop = spans.zipWithIndex.map { case (a, i) => (a, toDrop.contains(i+1)) }
+    require(!withDrop.head._2)
+    Torah(drop(withDrop))
+  }
+
+  def to6withLast(last: Torah.Aliyah): Torah = drop(Set(7)) :+ last
 }
 
 object Torah extends WithBookSpans[Tanach.ChumashBook] {

@@ -201,6 +201,7 @@ final class DatesTest extends FlatSpec with Matchers {
     years foreach { year => Pesach(year).name shouldBe YearType.get(year).pesach }
   }
 
+  // TODO when is Parshas Hachodesh on Rosh Chodesh? Parshas Shekalim?
 //  "table of Shabbos Rosh CHodesh and Erev Rosh Chodesh Teves" should "be generatable" in {
 //    for (year <- years) {
 //      val kislev = year.month(Kislev)
