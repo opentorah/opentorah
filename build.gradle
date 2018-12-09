@@ -69,6 +69,32 @@ allprojects {
   version = '0.1.1'
 }
 
+def gitHubRepository    = "jewish-calendar/calendar"
+def gitHubRepositoryUrl = "https://github.com/${gitHubRepository}"
+
+def bintrayConfig = {
+  user         = 'dubinsky'
+  key          = findProperty('bintrayApiKey')
+  publications = ['mavenPublication']
+  dryRun       = false
+  publish      = true
+  override     = true
+  pkg {
+    repo                   = 'org.podval.calendar'
+    name                   = project.jar.baseName
+    desc                   = project.description
+    websiteUrl             = "${gitHubRepositoryUrl}"
+    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
+    vcsUrl                 = "${gitHubRepositoryUrl}.git"
+    githubRepo             = gitHubRepository
+    licenses               = ['Apache-2.0']
+    labels                 = ['Scala', 'Calendar', 'Jewish']
+    publicDownloadNumbers  = true
+//    githubReleaseNotesFile = 'README.md'
+    version { name         = project.version }
+  }
+}
+
 subprojects {
   apply plugin: 'scala'
   apply plugin: 'com.github.maiflai.scalatest'
@@ -93,6 +119,52 @@ subprojects {
     from sourceSets.main.allSource
     classifier = 'sources'
   }
+
+  publishing {
+    publications {
+      mavenPublication(MavenPublication) {
+        groupId project.group
+        artifactId jar.baseName
+
+        from components.java
+        artifact sourceJar
+
+        pom {
+          name = project.name
+          description = project.description
+          url = "${gitHubRepositoryUrl}"
+          scm {
+            url = "${gitHubRepositoryUrl}"
+            connection = "scm:git:git://github.com/${gitHubRepository}.git"
+            developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
+          }
+          licenses {
+            license {
+              name = 'The Apache Software License, Version 2.0'
+              url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+              distribution = 'repo'
+              comments = 'A business-friendly OSS license'
+            }
+          }
+          organization {
+            name = 'Jewish Calendar'
+            url = 'http://www.jewish-calendar.org'
+          }
+          developers {
+            developer {
+              id = 'dub'
+              name = 'Leonid Dubinsky'
+              email = 'dub@podval.org'
+              url = 'http://dub.podval.org'
+              organization = 'Podval Group'
+              organizationUrl = 'http://www.podval.org'
+              timezone = '-5'
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 apply plugin: 'idea'
@@ -111,145 +183,29 @@ idea {
   }
 }
 
-
-def gitHubRepository    = "jewish-calendar/calendar"
-def gitHubRepositoryUrl = "https://github.com/${gitHubRepository}"
-
-def artifactUrls = [
-  siteUrl  : "${gitHubRepositoryUrl}",
-  issuesUrl: "${gitHubRepositoryUrl}/issues",
-  vcsUrl   : "${gitHubRepositoryUrl}.git"
-]
-
-def pomConfig = {
-  url artifactUrls.siteUrl
-  scm {
-    url artifactUrls.siteUrl
-    connection = 'scm:git:git://github.com/jewish-calendar/calendar.git'
-    developerConnection = 'scm:git:ssh://github.com/jewish-calendar/calendar.git'
-  }
-  licenses {
-    license {
-      name 'The Apache Software License, Version 2.0'
-      url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-      distribution 'repo'
-      comments 'A business-friendly OSS license'
-    }
-  }
-  organization {
-    name 'Jewish Calendar'
-    url 'http://www.jewish-calendar.org'
-  }
-  developers {
-    developer {
-      id 'dub'
-      name 'Leonid Dubinsky'
-      email 'dub@podval.org'
-      url 'http://dub.podval.org'
-      organization 'Podval Group'
-      organizationUrl 'http://www.podval.org'
-      roles { role 'developer' }
-      timezone '-5'
-    }
-  }
-}
-
-def bintrayInfo = [
-  user: 'dubinsky',
-  key: findProperty('bintrayApiKey'),
-  repository: 'org.podval.calendar'
-]
-
-def bintrayConfig = {
-  user         = bintrayInfo.user
-  key          = bintrayInfo.key
-  publications = ['mavenPublication']
-  dryRun       = false
-  publish      = true
-  override     = true
-  pkg {
-    repo                   = bintrayInfo.repository
-    name                   = project.jar.baseName
-    desc                   = 'Jewish Calendar'
-    websiteUrl             = artifactUrls.siteUrl
-    issueTrackerUrl        = artifactUrls.issuesUrl
-    vcsUrl                 = artifactUrls.vcsUrl
-    githubRepo             = gitHubRepository
-    licenses               = ['Apache-2.0']
-    labels                 = ['Scala', 'Calendar', 'Jewish']
-    publicDownloadNumbers  = true
-//    githubReleaseNotesFile = 'README.md'
-    version { name         = project.version }
-  }
-}
-
 project(':judaica') {
+  description = 'Digital Judaica metadata.'
+
   dependencies {
     compile lib.scalaXml
-  }
-
-  def artifactInfo = [
-    artifactId: jar.baseName,
-    name: 'judaica-metadata',
-    description: 'Digital Judaica metadata.'
-  ]
-
-  publishing {
-    publications {
-      mavenPublication(MavenPublication) {
-        groupId project.group
-        artifactId artifactInfo.artifactId
-
-        from components.java
-        artifact sourceJar
-
-        pom.withXml {
-          def root = asNode()
-          root.appendNode('description', artifactInfo.description)
-          root.appendNode('name'       , artifactInfo.name       )
-          root.children().last() + pomConfig
-        }
-      }
-    }
   }
 
   bintray bintrayConfig
 }
 
 project(':dates') {
+  description = 'Jewish Calendar Dates.' 
+
   dependencies {
     compile project(':judaica')
-  }
-
-  def artifactInfo = [
-    artifactId: jar.baseName,
-    name: 'jewish-calendar-dates',
-    description: 'Jewish Calendar Dates.'
-  ]
-
-  publishing {
-    publications {
-      mavenPublication(MavenPublication) {
-        groupId project.group
-        artifactId artifactInfo.artifactId
-
-        from components.java
-        artifact sourceJar
-
-        pom.withXml {
-          def root = asNode()
-          root.appendNode('description', artifactInfo.description)
-          root.appendNode('name'       , artifactInfo.name       )
-          root.children().last() + pomConfig
-        }
-      }
-    }
   }
 
   bintray bintrayConfig
 }
 
 project(':service') {
+  description = 'Jewish Calendar Service.'
+
   apply plugin: 'application'
 
   dependencies {
@@ -261,6 +217,8 @@ project(':service') {
     //    compile lib.http4sScalatags
     implementation lib.slf4jJdk
   }
+
+  bintray bintrayConfig
 
   mainClassName = 'org.podval.calendar.service.CalendarService'
 
@@ -277,31 +235,4 @@ project(':service') {
       copy { from "$projectDir/Dockerfile" into dockerDir }
     }
   }
-
-  def artifactInfo = [
-    artifactId: jar.baseName,
-    name: 'jewish-calendar-service',
-    description: 'Jewish Calendar Service.'
-  ]
-
-  publishing {
-    publications {
-      mavenPublication(MavenPublication) {
-        groupId project.group
-        artifactId artifactInfo.artifactId
-
-        from components.java
-        artifact sourceJar
-
-        pom.withXml {
-          def root = asNode()
-          root.appendNode('description', artifactInfo.description)
-          root.appendNode('name'       , artifactInfo.name       )
-          root.children().last() + pomConfig
-        }
-      }
-    }
-  }
-
-  bintray bintrayConfig
 }
