@@ -5,6 +5,8 @@ import org.podval.calendar.schedule.tanach.SpecialDay.{FestivalOrIntermediate, S
 import org.podval.judaica.metadata.{Util, WithNames}
 
 // TODO add Nassi
+// TODO add Molad
+// TODO add Tehillim
 
 final case class Schedule private(
   from: Day,

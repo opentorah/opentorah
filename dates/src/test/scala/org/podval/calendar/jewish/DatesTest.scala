@@ -200,4 +200,12 @@ final class DatesTest extends FlatSpec with Matchers {
   "Jewish Year" should "have allowed type with Pesach on correct day of the week" in {
     years foreach { year => Pesach(year).name shouldBe YearType.get(year).pesach }
   }
+
+//  "table of Shabbos Rosh CHodesh and Erev Rosh Chodesh Teves" should "be generatable" in {
+//    for (year <- years) {
+//      val kislev = year.month(Kislev)
+//      val kislev23 = kislev.day(23)
+//      if ((kislev.length == 30) && kislev23.is(Shabbos)) println(year)
+//    }
+//  }
 }

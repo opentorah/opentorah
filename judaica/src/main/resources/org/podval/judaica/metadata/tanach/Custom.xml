@@ -58,12 +58,12 @@
   <names>
     <name n="Morocco" lang="en" transliterated="true"/>
     <name n="Марокко" lang="ru"/>
-    <!-- TODO name in he -->
+    <name n="מרוקו" lang="he"/>
   </names>
   <names>
     <name n="Fes" lang="en" transliterated="true"/>
     <name n="Фес" lang="ru"/>
-    <!-- TODO name in he -->
+    <name n="פאס‎" lang="he"/>
   </names>
   <names>
     <name n="Toshbim" lang="en" transliterated="true"/>
