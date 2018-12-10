@@ -1,7 +1,7 @@
 package org.podval.judaica.metadata.tanach
 
-import org.scalatest.{FlatSpec, Matchers}
 import org.podval.judaica.metadata.tanach.Custom._
+import org.scalatest.{FlatSpec, Matchers}
 
 final class CustomTest extends FlatSpec with Matchers {
 

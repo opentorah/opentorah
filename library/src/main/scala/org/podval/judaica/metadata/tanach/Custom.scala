@@ -1,6 +1,6 @@
 package org.podval.judaica.metadata.tanach
 
-import org.podval.judaica.metadata.{NamedCompanion, Named, Names, Util}
+import org.podval.judaica.metadata.{Named, NamedCompanion, Names, Util}
 
 // Assumptions: no cycles; only Common doesn't have parent.
 sealed class Custom(val parent: Option[Custom]) extends Named {

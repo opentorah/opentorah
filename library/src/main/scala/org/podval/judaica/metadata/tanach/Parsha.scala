@@ -1,8 +1,8 @@
 package org.podval.judaica.metadata.tanach
 
 import org.podval.judaica.metadata.tanach.Tanach.ChumashBook
-import org.podval.judaica.metadata.{NamedCompanion, Named, Names}
 import org.podval.judaica.metadata.tanach.Torah.Maftir
+import org.podval.judaica.metadata.{Named, NamedCompanion, Names}
 
 sealed trait Parsha extends Named {
   def book: ChumashBook
