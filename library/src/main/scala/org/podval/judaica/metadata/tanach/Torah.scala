@@ -36,8 +36,6 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
 
   def aliyot(spans: BookSpan*): Torah = Torah(spans)
 
-  // TODO def toStringWithNumbers()
-
   type Numbered = WithNumber[SpanSemiResolved]
 
   def parseAliyot(
@@ -49,7 +47,6 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
     val chapters: Chapters = bookSpan.book.chapters
     val with1: Seq[Numbered] = addImplied1(aliyotRaw, span, chapters)
     val spans: Seq[Numbered] = WithNumber.checkNumber(with1, number.getOrElse(with1.length), "span")
-    // TODO verify that spans are consecutive and cover the book span - only when parsing!
     val result: Seq[Span] = setImpliedTo(WithNumber.dropNumbers(spans), span, chapters)
     Torah(result.map(inBook(bookSpan.book, _)))
   }

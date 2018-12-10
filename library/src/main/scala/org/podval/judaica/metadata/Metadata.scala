@@ -15,7 +15,6 @@ final case class Metadata(
 object Metadata {
   // This is lazy to allow correct initialization: the code uses values(),
   // Language metadata file references Language instances by name :)
-  // TODO check that there are no duplicate keys!
   def loadNames[K <: WithName](
     keys: Seq[K],
     obj: AnyRef,
@@ -93,8 +92,6 @@ object Metadata {
 
   // This is used to bind both Metadata and Names, so - HasName.
   private def bind[K <: WithName, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Map[K, M] = {
-    // TODO check that the names are disjoint
-
     findAndBind(keys, metadatas).toMap
   }
 

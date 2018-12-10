@@ -56,7 +56,6 @@ object Reading {
       copy(haftarah = haftarah)
   }
 
-  // TODO change to WithNames
   def apply(torah: Torah, names: Option[Names] = None): Reading =
     apply(Custom.Of(torah), names = names)
 
@@ -72,7 +71,6 @@ object Reading {
   def apply(torah: Torah, maftir: Maftir, haftarah: Haftarah.Customs): Reading =
     apply(Custom.Of(torah), maftir, haftarah, names = None)
 
-  // TODO change to WithNames
   def apply(torah: Torah.Customs, maftir: Maftir, haftarah: Haftarah.Customs, names: Option[Names]): Reading = {
     val result: Map[Custom, ReadingCustom] =
       torah.liftLR[Haftarah, ReadingCustom](haftarah, { case (_: Custom, torah: Torah, haftarah: Haftarah) =>

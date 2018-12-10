@@ -92,7 +92,6 @@ object XML {
   def print(xml: Node, writer: Writer) {
     val out = new PrintWriter(writer)
     val pretty = prettyPrinter.format(xml)
-    // TODO when outputting XML, include <xml> header?
     out.println(pretty)
     out.close()
   }

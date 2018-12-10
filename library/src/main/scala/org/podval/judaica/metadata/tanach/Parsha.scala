@@ -112,14 +112,10 @@ object Parsha extends NamedCompanion {
   val deuteronomy: Seq[Parsha] = Seq(Devarim, Va_eschanan, Eikev, Re_eh, Shoftim, KiSeitzei, KiSavo,
     Nitzavim, Vayeilech, Haazinu, VezosHaberachah)
 
-  // TODO add half-parshiot for the Dardaki custom
-
   final override val values: Seq[Parsha] = genesis ++ exodus ++ leviticus ++ numbers ++ deuteronomy
 
   // Rules of combining; affect the WeeklyReading.
-  // TODO deal with alternative customs of what and in what sequence combines?
   final val combinableFromBereishisToVayikra: Seq[Parsha] = Seq(Vayakhel)
-  // TODO see #56; Magen Avraham 428:4 (6);
   // Reversing the priorities here currently affects only non-leap regular years with Rosh
   // Hashanah on Thursday (and Pesach on Shabbat).
   final val combinableFromVayikraToBemidbar: Seq[Parsha] = Seq(Tazria, Acharei, Behar)

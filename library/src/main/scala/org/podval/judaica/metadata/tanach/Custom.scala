@@ -11,7 +11,6 @@ sealed class Custom(val parent: Option[Custom]) extends Named {
   final def level: Int = parent.fold(0)(parent => parent.level+1)
 }
 
-// TODO we need some consistency in the naming of customs: if Bavlim, then maybe Sefaradim?
 object Custom extends NamedCompanion {
 
   override type Key = Custom
@@ -32,8 +31,6 @@ object Custom extends NamedCompanion {
       find(Common).flatMap(common => if (customs.size == 1) Some(common) else None)
 
     final def isFull: Boolean = all.forall(custom => find(custom).isDefined)
-
-    // TODO factor out maximize() on Maps and express lift through it
 
     final def maximize: Of[T] = new Of(all.map(custom => custom -> doFind(custom)).toMap)
 
@@ -75,7 +72,6 @@ object Custom extends NamedCompanion {
         require(b.intersect(a).isEmpty, s"Overlaping sets of customs: $a and $b")
       }))
 
-      // TODO -?
       Util.checkNoDuplicates(map.values.toSeq, "customs")
 
       val result = new Of[T](map.flatMap { case (customs, value) => customs.map(custom => custom -> value) })

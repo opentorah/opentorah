@@ -99,9 +99,8 @@ object CalendarService extends StreamApp[IO] {
   }
 
   private final case object JewishK extends Kind("jewish") {
-    override def now: Jewish.Day = Jewish.now
+    override def now: Jewish.Day = Jewish.nowDay
     override def getYear(yearStr: String): Jewish.Year = Jewish.Year(yearStr.toInt)
-    // TODO factor out commonality:
     override def getMonth(yearStr: String, monthStr: String): Jewish.Month = {
       val year = getYear(yearStr)
       val monthName: Option[Jewish.Month.Name] = Jewish.Month.Name.forName(monthStr)
@@ -124,9 +123,8 @@ object CalendarService extends StreamApp[IO] {
   }
 
   private final case object GregorianK extends Kind("gregorian") {
-    override def now: Gregorian.Day = Gregorian.now
+    override def now: Gregorian.Day = Gregorian.nowDay
     override def getYear(yearStr: String): Gregorian.Year = Gregorian.Year(yearStr.toInt)
-    // TODO factor out commonality:
     override def getMonth(yearStr: String, monthStr: String): Gregorian.Month = {
       val year = getYear(yearStr)
       val monthName: Option[Gregorian.Month.Name] = Gregorian.Month.Name.forName(monthStr)

@@ -36,7 +36,7 @@ object Language extends NamedCompanion {
 
       if (remainder >= 1000) {
         result.append(units((remainder / 1000) - 1))
-        result.append("'") // TODO correct apostrophe!
+        result.append("'")
         remainder = remainder % 1000
       }
 
@@ -67,7 +67,5 @@ object Language extends NamedCompanion {
 
       result.toString
     }
-
-    // TODO number parser
   }
 }

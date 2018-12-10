@@ -27,8 +27,6 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type Day = GregorianDay
 
-  final override type DayName = Day.Name
-
   final override object Day extends GregorianDayCompanion with GregorianCalendarMember {
     override def apply(number: Int): Day = new GregorianDay(number) with GregorianCalendarMember
   }
@@ -41,7 +39,7 @@ class Gregorian private() extends Calendar[Gregorian] {
     }
   }
 
-  final override def now: Day = {
+  final override def nowDay: Day = {
     val result = new java.util.Date()
     Gregorian.Year(result.getYear+1900).month(result.getMonth+1).day(result.getDate)
   }

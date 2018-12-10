@@ -4,10 +4,6 @@ import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.schedule.tanach.SpecialDay.{FestivalOrIntermediate, ShabbosBereishis, Omer}
 import org.podval.judaica.metadata.{Util, WithNames}
 
-// TODO add Nassi
-// TODO add Molad
-// TODO add Tehillim
-
 final case class Schedule private(
   from: Day,
   to: Day,
@@ -26,7 +22,6 @@ object Schedule {
   )
 
   def get(day: Day, inHolyLand: Boolean): DaySchedule = {
-    // TODO memoize and re-use year schedule to trade memory for performance
     val schedule = Schedule(from = day, to = day, inHolyLand)
     schedule.days(day)
   }
@@ -45,7 +40,7 @@ object Schedule {
     years: Seq[Year],
     daysWithSpecialReadingsNotFestivals: Map[Day, SpecialDay.Date],
     specialShabboses: Map[Day, SpecialDay.SpecialShabbos],
-    pesachOnChamishi: Set[Year] // TODO calculate on the spot via a advancing memoized holder :)
+    pesachOnChamishi: Set[Year]
   ) {
     def build: Schedule = {
       currentWeeklyReadings = weeklyReadingsList
@@ -143,8 +138,6 @@ object Schedule {
         (init ++ last, extra)
       }
     }
-
-    // TODO we also need festivals after 'to' for tachanun, maariv motzoei Shabbos...
 
     def filter[T](data: Seq[Set[(Day, T)]]): Map[Day, T] = {
       val result = data.head.filter(from <= _._1) +: data.tail.init :+ data.last.filter(_._1 <= to)

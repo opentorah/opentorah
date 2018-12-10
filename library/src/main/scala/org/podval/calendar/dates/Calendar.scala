@@ -31,7 +31,7 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   type Day <: DayBase[C]
 
-  type DayName <: Named
+  final type DayName = Day.Name
 
   val Day: DayCompanion[C]
 
@@ -53,7 +53,7 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   final val TimeVector = Vector
 
-  def now: Day
+  def nowDay: Day
 }
 
 
