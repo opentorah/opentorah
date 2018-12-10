@@ -66,6 +66,12 @@ allprojects {
 
   group = 'org.podval.calendar'
   version = '0.1.1'
+
+  // TODO doesn't work
+  tasks.withType(ScalaCompile) {
+    scalaCompileOptions.deprecation = true
+    scalaCompileOptions.unchecked = true
+  }
 }
 
 def gitHubRepository    = "jewish-calendar/calendar"

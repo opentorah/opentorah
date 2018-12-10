@@ -12,9 +12,9 @@ import org.http4s.server.middleware.AutoSlash
 import org.podval.calendar.dates.{Calendar, DayBase, MonthBase, YearBase}
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.Jewish
-import org.podval.calendar.schedule.tanach.{Chitas, Reading, Schedule}
+import org.podval.calendar.tanach.{Chitas, Reading, Schedule}
 import org.podval.judaica.metadata.{Language, LanguageSpec, LanguageString, Names, WithNames}
-import org.podval.judaica.metadata.tanach.{Custom, Torah}
+import org.podval.judaica.tanach.{Custom, Torah}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scalatags.Text.TypedTag

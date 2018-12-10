@@ -1,5 +1,7 @@
 package org.podval.judaica.metadata
 
+import org.podval.judaica.util.Util
+
 trait NamedCompanion {
   type Key <: Named
 

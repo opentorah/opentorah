@@ -1,5 +1,7 @@
 package org.podval.judaica.metadata
 
+import org.podval.judaica.util.Util
+
 import scala.xml.Elem
 
 final class Names(val names: Seq[Name]) extends HasName {
