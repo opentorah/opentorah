@@ -84,7 +84,6 @@ import org.podval.judaica.metadata.tanach.Parsha._
     Behar and Bechukosai can be combined only if Acharei and Kedoshim are combined;
     Acharei and Kedoshim can be combined only if Tazria and Metzora are combined;
     Chukas and Balak can be combined only if Mattos and Masei are combined.
-  TODO?
   Source: https://orot.ac.il/sites/default/files/morashtenu/16-3.pdf
 
   When Shulchan Oruch says that Bemidbar is read before Shavuot, it uses the same word "before"
@@ -190,7 +189,6 @@ object WeeklyReading {
       if (combinefromBereishisToBemidbar < 0)
         (0, 0, combinefromBereishisToBemidbar + combineFromBemidbarToVa_eschananCandidate)
       else {
-        // TODO clean this up, so there is no hardcoded assumption about combinableFromBereshitToVayikra.length == 1
         // and maybe rename it to ...beforTzav or something?
         val doCombineVayakhelPekudei: Boolean =
         (combinefromBereishisToBemidbar == combinableFromBereishisToVayikra.length + combinableFromVayikraToBemidbar.length) || {

@@ -91,9 +91,8 @@ object Metadata {
   }
 
   // This is used to bind both Metadata and Names, so - HasName.
-  private def bind[K <: WithName, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Map[K, M] = {
+  private def bind[K <: WithName, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Map[K, M] =
     findAndBind(keys, metadatas).toMap
-  }
 
   private def findAndBind[K <: WithName, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Seq[(K, M)] = {
     if (keys.isEmpty) require(metadatas.isEmpty, s"Unmatched metadatas: ${metadatas.mkString("\n")}")
