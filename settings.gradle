@@ -1,7 +1,6 @@
 rootProject.name = 'calendar'
 
-include ':judaica'
-include ':dates'
+include ':library'
 include ':service'
 
 //include ':paper'
