@@ -114,12 +114,10 @@ final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) ext
   def getMorningReading: Reading = Reading(
     torah = if (isCombined) parsha.daysCombined.get else parsha.days,
     maftir = (if (isCombined) secondParsha.get else parsha).maftir,
-    // TODO what is the exception when the haftarah is NOT the second one?
     haftarah = Haftarah.forParsha(if (isCombined) secondParsha.get else parsha),
     names = Some(names)
   )
 
-  // TODO are 3 short aliyot always from the first parsha when two of them combine?
   def getAfternoonReading: Reading = Reading(torah = parsha.aliyot, names = Some(names))
 }
 

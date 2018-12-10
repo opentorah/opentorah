@@ -27,8 +27,6 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Day = JewishDay
 
-  final override type DayName = Day.Name
-
   final override object Day extends JewishDayCompanion with JewishCalendarMember {
     override def apply(number: Int): Day = new JewishDay(number) with JewishCalendarMember
   }
@@ -41,7 +39,7 @@ class Jewish private() extends Calendar[Jewish] {
     }
   }
 
-  final override def now: Day = Calendar.toJewish(org.podval.calendar.gregorian.Gregorian.now)
+  final override def nowDay: Day = Calendar.toJewish(org.podval.calendar.gregorian.Gregorian.nowDay)
 }
 
 

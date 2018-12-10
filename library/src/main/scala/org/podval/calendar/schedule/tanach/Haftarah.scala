@@ -45,11 +45,9 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
       if (partElements.isEmpty && customElements.isEmpty) Some(oneSpan(span)) else
       if (partElements.isEmpty) None else Some(parseParts(partElements, span))
 
-    // TODO toMap() will silently ignore duplicates...
     val customs: Custom.Sets[Haftarah] = customElements.map(parseCustom(span)).toMap
 
     val result: Custom.Sets[Haftarah] = common.fold(customs) { common =>
-      // TODO updated() will silently ignore duplicates...
       customs.updated(Set[Custom](Custom.Common), common)
     }
 

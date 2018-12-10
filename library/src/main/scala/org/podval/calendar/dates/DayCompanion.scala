@@ -9,7 +9,6 @@ import org.podval.judaica.metadata.NamedCompanion
 abstract class DayCompanion[C <: Calendar[C]] extends CalendarMember[C] {
   val Name: NamedCompanion
 
-  // TODO push up into Calendar?
   final type Name = Name.Key
 
   def names: Seq[C#DayName]

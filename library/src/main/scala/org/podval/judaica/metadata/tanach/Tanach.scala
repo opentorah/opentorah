@@ -197,8 +197,6 @@ object Tanach extends NamedCompanion {
       f = combineDays
     )
 
-    // TODO QUESTION if Cohen ends in a custom place, does it affect the end of the 3 aliyah on Mon/Thu?
-    // TODO QUESTION if the parshiot combine, does it affect those small aliyot?
     def aliyot: Map[Parsha, Torah] = get.map { case (parsha, metadata) =>
       val aliyot = metadata.aliyot
       val bookSpan = Torah.inBook(parsha.book,
@@ -252,8 +250,6 @@ object Tanach extends NamedCompanion {
   private def combineDays(weeks: Seq[(Parsha, Custom.Sets[Seq[Torah.Numbered]])]): Seq[Option[Torah.Customs]] = weeks match {
     case (parsha, days) :: (parshaNext, daysNext) :: tail =>
       val result: Option[Torah.Customs] = if (!parsha.combines) None else  {
-        // TODO express via lift() etc.
-        // TODO Use defaults from days?
         val combined: Custom.Sets[Seq[Torah.Numbered]] = daysNext ++ days.map { case (customs, value) =>
           (customs, value ++ daysNext.getOrElse(customs, Seq.empty))
         }
@@ -266,7 +262,6 @@ object Tanach extends NamedCompanion {
 
     case (parsha, _ /*days*/) :: Nil =>
       require(!parsha.combines)
-      // TODO require(days.isEmpty, s"Not empty: $days")
       Seq(None)
 
     case Nil => Nil

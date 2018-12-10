@@ -10,7 +10,6 @@ import org.podval.calendar.jewish.{JewishDay, JewishYear}
 
 import scala.xml.Elem
 
-// TODO fully annotate Torah/Haftarah with Names ("Rosh Chodesh" etc...)
 object SpecialDay {
 
   sealed class LoadNames(override val name: String) extends WithName with WithNames {
@@ -167,8 +166,6 @@ object SpecialDay {
       )
     }
 
-    def shabbosChanukahTorah: Aliyah = shabbosMaftir // 9-15
-
     def correct(month: Month.Name, isSpecialShabbos: Boolean, reading: Reading): Reading = {
       val allowReplace: Boolean = !isSpecialShabbos && (month != Teves) && (month != Av)
       def transformer(
@@ -185,6 +182,9 @@ object SpecialDay {
 
       transform(transformer, reading)
     }
+
+    def addShabbosMaftirAs7thAliyah(reading: Reading): Reading =
+      reading.transformTorah(_.to6withLast(shabbosMaftir))
 
     private val shabbosMaftir: Maftir = torah.spans(4)+torah.spans(5)  // 9-15
 
@@ -394,9 +394,10 @@ object SpecialDay {
     override def firstDay: Date = Succos1
 
     override def weekday: Reading = {
-      val n: Int = correctedIntermediateDayNumber
+      if (intermediateDayNumber == 6) require(inHolyLand)
+      val n: Int = Math.min(intermediateDayNumber, 5)
+
       // Do not go beyond 6th fragment of korbanot.
-      // TODO when are the other fragments used?
       val ashkenazAndChabad: Torah = Torah.aliyot(
         korbanot(n),
         korbanot(Math.min(6, n+1)),
@@ -416,18 +417,13 @@ object SpecialDay {
     private def korbanot(n: Int): Aliyah = Numbers.succosKorbanot(n)
 
     private def today: Maftir = {
-      val n: Int = correctedIntermediateDayNumber
+      val n: Int = intermediateDayNumber
       if (inHolyLand) korbanot(n) else korbanot(n) + korbanot(n+1)
     }
 
     protected override def shabbosMaftir: Maftir = today
 
     protected override def shabbosHaftarah: Haftarah.Customs = SuccosIntermediate.shabbosHaftarah
-
-    private def correctedIntermediateDayNumber: Int = {
-      if (intermediateDayNumber == 6) require(inHolyLand)
-      Math.min(intermediateDayNumber, 5)
-    }
   }
 
   case object SuccosIntermediate1 extends SuccosIntermediate(1, false)
@@ -469,7 +465,7 @@ object SpecialDay {
   sealed trait SimchasTorahCommon extends Festival with NonFirstDayOf with WeekdayReadingSimple {
     final override def firstDay: Date = Succos1
 
-    protected override val torah: Torah = Deuteronomy.zosHaberacha.to6withLast(Genesis.chassanBereishis.spans.head)
+    protected override val torah: Torah = Deuteronomy.zosHaberacha.to6withLast(Genesis.chassanBereishis)
 
     protected override val maftir: Maftir = Numbers.sheminiAtzeresMaftir
 
@@ -527,8 +523,7 @@ object SpecialDay {
         maftir = full(dayNumber),
         haftarah = if (dayNumber < 8) Chanukah.haftarahShabbos1 else Chanukah.haftarahShabbos2)
 
-      if (!isRoshChodesh) result
-      else result.transformTorah(torah => torah.to6withLast(RoshChodesh.shabbosChanukahTorah))
+      if (!isRoshChodesh) result else RoshChodesh.addShabbosMaftirAs7thAliyah(result)
     }
 
     final def weekday(isRoshChodesh: Boolean): Reading = {
@@ -589,7 +584,10 @@ object SpecialDay {
   sealed trait SpecialShabbos extends Date
 
   sealed trait SpecialParsha extends SpecialShabbos with MaftrirAndHaftarah {
-    final def transform(reading: Reading): Reading = replaceMaftirAndHaftarah(reading, maftir, haftarah)
+    final def transform(reading: Reading, isRoshChodesh: Boolean): Reading = {
+      val result = replaceMaftirAndHaftarah(reading, maftir, haftarah)
+      if (!isRoshChodesh) result else RoshChodesh.addShabbosMaftirAs7thAliyah(result)
+    }
   }
 
   case object ParshasShekalim extends LoadNames("Parshas Shekalim") with SpecialParsha {
@@ -753,7 +751,6 @@ object SpecialDay {
     protected final override def shabbosHaftarah: Haftarah.Customs = PesachIntermediate.shabbosHaftarah
 
     final def weekday(isPesachOnChamishi: Boolean): Reading = {
-      // TODO override in PesachIntermediate1InHolyLand
       val torah: Torah = if (dayNumber == 2) {
         Pesach2.torah.drop(Set(4, 5))
       } else {
@@ -916,11 +913,6 @@ object SpecialDay {
   val specialShabbos: Set[SpecialShabbos] =
     Set(ParshasShekalim, ParshasZachor, ParshasParah, ParshasHachodesh, ShabbosHagodol)
 
-  // TODO list all days with haftarah - but why?
-
-  // TODO number of aliyot: Shabbos and Simchas Torah - 7; Yom Kippur - 6 (even on Shabbos); Yom Tov - 5;
-  // Intermediate and Rosh Chodesh - 4; Chanukkah, Purim, Fast, Sheni/Chamishi and Shabbos afternoon - 3.
-
   final def getMorningReading(
     day: Day,
     specialDay: Option[Date],
@@ -944,6 +936,8 @@ object SpecialDay {
   ): Reading = {
     require(day.isShabbos)
 
+    val isRoshChodesh: Boolean = day.isRoshChodesh
+
     val normal: Reading = specialDay.map {
       case specialDay: ShabbosReading =>
         require(weeklyReading.isEmpty)
@@ -951,7 +945,7 @@ object SpecialDay {
 
       case specialDay: Chanukah =>
         require(weeklyReading.isDefined)
-        specialDay.shabbos(weeklyReading.get, day.isRoshChodesh)
+        specialDay.shabbos(weeklyReading.get, isRoshChodesh)
 
       case _ =>
         throw new IllegalArgumentException("Must have Shabbos reading!")
@@ -959,12 +953,11 @@ object SpecialDay {
       .getOrElse {
         require(weeklyReading.isDefined)
         val result = weeklyReading.get.getMorningReading
-        // TODO Chabad: on Shabbos Ki Teize (14th of Ellul) adds haftarah Reeh after the regular one.
         result
       }
 
     val result = specialShabbos.fold(normal) {
-      case s: SpecialParsha => s.transform(normal)
+      case s: SpecialParsha => s.transform(normal, isRoshChodesh)
       case ShabbosHagodol =>
         ShabbosHagodol.transform(isErevPesach = day.next == Pesach.date(day.year), normal)
     }

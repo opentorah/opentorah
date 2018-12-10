@@ -3,10 +3,10 @@ package org.podval.calendar.schedule.tanach
 import org.podval.judaica.metadata.tanach.Torah
 
 object Genesis extends TorahReadings {
-  val chassanBereishis: Torah = parseTorah(
+  val chassanBereishis: Torah.Aliyah = parseTorah(
     <torah book="Genesis" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3">
       <aliyah n="1" fromVerse="1"/>
-    </torah>)
+    </torah>).spans.head
 
   val roshHashana1torah: (Torah, Torah) = parseTorahForShabbosAndWeekday(3, 5,
     <torah book="Genesis" fromChapter="21" fromVerse="1" toVerse="34">

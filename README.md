@@ -9,7 +9,7 @@ as described by Rambam in the Laws of the Sanctification of the Moon, Chapters 6
 - [x] code Rambam's calculations (and verify Rambam's numerical examples)
 - [x] convert dates from Jewish calendar to Gregorian and back
 - [x] list [dates of Birchas Hachamo](https://docs.google.com/document/d/1hpPZ0LYU3p8a-LJRXEqzXig-VQthkQ_MkaY79PMqr-Y/edit?hl=en_US)
-- [ ] generate Torah and Haftorah reading schedule
+- [x] generate Torah and Haftorah reading schedule
 - [ ] generate schedule of learning Rambam
 - [ ] generate monthly calendars with both kinds of dates
 
@@ -27,34 +27,34 @@ as described by Rambam in the Laws of the Sanctification of the Moon, in Chapter
 - [ ] translate relevant chapters into English
 - [ ] calculate halachic times (zmanim)
 
+## Credits
+
+I want to acknowledge people who contributed to the content of this work - and to the fact of its existence ;)
+If your name should be on this list but isn't, please forgive me: the omission is not intentional.
+
+- Mordechai Goldin - for providing office space and computer equipment when I, as a Yeshiva student, had neither;
+- Ilia Pomansky - for encouraging this work at the early stages (in 1991);
+- my wife Nina - for listening to my wild ideas, for her patience, and for help with math;
+- my daughter Menucha Rochel - for assistance with the translation;
+- Rabbi Michael Koretz - for stimulating discussions, encouragement, and extensive research
+into customs of Torah/Haftarah reading;
+- Dr. Michael Partensky - for encouragement and advise;
+- Dr. Peter Ofman - for asking questions that prodded me to revive this project in 2011, after years of hiatus;
+- Aron Matskin - for a discussion during his visit on Rosh Chodesh Mar Cheshvan 5772;
+- Rabbi Chaim Prus - for causing me to investigate which number does the year of Creation has - 0 or 1.
+
 
 ## Sources
+
+_Torah reading_: Shulchan Aruch Orach Chaim (and Mishna Brura):
+425:1-2 (4, 8, 12), 428:4,6,8, 488:3; 490:1, 494:1-2; 559:4,
+584:2 (8), 601:1, 621:1 (4), 622:2, 659 (4), 662:3 (4),
+663:1,3 (4), 668:2, 669, 684 (3, 8, 14, 17), 693:4,          
 
 TODO Rambam corresponding to Shulchan Aruch Orach Chayim 428
 TODO https://he.wikipedia.org/wiki/הלוח_העברי
 TODO https://en.wikibooks.org/wiki/Mathematics_of_the_Jewish_Calendar/The_Annual_Cycle_of_Torah_Readings
 
-מקורות קריאת התורה למועדים
-פסח: ג. שו"ע סי' תפח סע' ג
-מוציאין שני ספרים וקורין בראשון חמשה גברי (<ג> ואם מוסיפין ביום טוב ע"ל ריש סימן רפ"ב)
-  בפרשת בא מן משכו עד מארץ מצרים על צבאותם,
-  (ט) ג ומפטיר קורא בשני בפרשת פנחס ובחודש הראשון ומפטיר ביהושע (י) בעת ההיא,
-סי' תצ סע' א, ה-ו ומשנה ברורה
-סי' תצד סע' א- ב ומשנה ברורה
-סי' תקנט סע' ד ומשנה ברורה
-סי' תקפד סע' ב ומשנה ברורה [בעיקר: סק"ח]
-סי' תרא סע' א ומשנה ברורה
-סי' תרכא סע' א ומשנה ברורה [בעיקר סק"ד]
-סי' תרכב סע' ב ומשנה ברורה
-סי' תרנט ומשנה ברורה [בעיקר: סק"ד]
-סי' תרסב סע' ג ומשנה ברורה [בעיקר: סק"ד]
-סי' תרסג סע' א, ג ומשנה ברורה [בעיקר: סק"ד]
-סי' תרסח סע' ב ומשנה ברורה
-סי' תרסט ומשנה ברורה
-סי' תרפד ומשנה ברורה [בעיקר: ס"ק ג, ח, יד, יז]
-סי' תרצג סע' ד ומשנה ברורה
-סי' תכה סע' א- ב ומשנה ברורה [בעיקר: ס"ק ד, ח, יב]
-סי' תכח סע' ד, ו, ח ומשנה ברורה
 
 Book "Calendrical Calculations" was also interesting, but algorithms and
 formulas from it were not used directly.

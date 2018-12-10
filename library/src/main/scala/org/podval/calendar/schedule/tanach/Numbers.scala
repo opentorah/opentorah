@@ -60,7 +60,6 @@ object Numbers extends TorahReadings  {
       <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>)
 
   // Maftir Pesach Intermediate Shabbos and last two days of Pesach
-  // TODO is this supposed to be also the 4th aliyah on intermediate days?
   val pesachEndMaftir: Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>)
 

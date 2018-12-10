@@ -5,8 +5,6 @@ import scala.xml.Elem
 final class Names(val names: Seq[Name]) extends HasName {
   Util.checkNoDuplicates(names.map(_.name), "names")
 
-  // TODO check that there are no duplicate combinations of parameters OTHER than name!
-
   def isEmpty: Boolean = names.isEmpty
 
   def find(name: String): Option[Name] = names.find(_.name == name)
@@ -39,12 +37,10 @@ object Names {
     }
   }
 
-  // TODO inline
   def merge(one: Names, other: Names): Names =
     if (other.isEmpty) one else throw new IllegalArgumentException(s"Merging Names not implemented: $one with $other")
 
 
-  // TODO there is a lot of similarities with Custom...
   def combine(one: Names, other: Names, combiner: (LanguageSpec, String, String) => String): Names = {
     val specs: Set[LanguageSpec] = one.names.map(_.languageSpec).toSet ++ other.names.map(_.languageSpec)
     val result: Set[Name] = specs.map { spec => Name(combiner(spec, one.doFind(spec).name, other.doFind(spec).name), spec) }
@@ -73,7 +69,6 @@ object Names {
   private def parse(nameElements: Seq[Elem], defaultName: Option[Name]): Names = {
     val nonDefaultNames: Seq[Name] = nameElements.map(parseName)
     val names = defaultName.fold(nonDefaultNames){ defaultName =>
-      // TODO drop default name if it is contained in the non-default ones
       defaultName +: nonDefaultNames
     }
     new Names(names)

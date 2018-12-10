@@ -9,7 +9,6 @@ trait NamedCompanion {
   // This isn't final so that it can be overriden in Tanach, for instance.
   lazy val toNames: Map[Key, Names] = Metadata.loadNames(values, this, resourceName)
 
-  // TODO maybe create loadNames() that takes this as a parameter and make toNames an abstract val?
   protected def resourceName: String = Util.className(this)
 
   final def forDefaultName(name: String): Option[Key] = values.find(_.name == name)

@@ -4,6 +4,4 @@ trait WithNames extends HasName {
   def names: Names
 
   final override def hasName(name: String): Boolean = names.hasName(name)
-
-  // TODO toString = names.doFind(LanguageSpec.empty).name
 }
