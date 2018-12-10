@@ -395,13 +395,14 @@ object SpecialDay {
 
     override def weekday: Reading = {
       if (intermediateDayNumber == 6) require(inHolyLand)
-      val n: Int = Math.min(intermediateDayNumber, 5)
 
       // Do not go beyond 6th fragment of korbanot.
+      val n: Int = Math.min(intermediateDayNumber, 4)
+
       val ashkenazAndChabad: Torah = Torah.aliyot(
         korbanot(n),
-        korbanot(Math.min(6, n+1)),
-        korbanot(Math.min(6, n+2)),
+        korbanot(n+1),
+        korbanot(n+2),
         today
       )
       val sefard: Aliyah = today
