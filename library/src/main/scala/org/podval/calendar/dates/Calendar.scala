@@ -21,7 +21,7 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   type Month <: MonthBase[C]
 
-  type MonthName <: Named
+  final type MonthName = Month.Name
 
   type MonthNameAndLength = MonthNameAndLengthBase[C]
 
