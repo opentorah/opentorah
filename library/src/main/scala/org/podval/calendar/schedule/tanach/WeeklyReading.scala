@@ -114,7 +114,8 @@ final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) ext
   def getMorningReading: Reading = Reading(
     torah = if (isCombined) parsha.daysCombined.get else parsha.days,
     maftir = (if (isCombined) secondParsha.get else parsha).maftir,
-    haftarah = Haftarah.forParsha(if (isCombined) secondParsha.get else parsha),
+    haftarah = Haftarah.forParsha(
+      if (isCombined && (parsha != Mattos) && (parsha != Nitzavim)) secondParsha.get else parsha),
     names = Some(names)
   )
 

@@ -77,13 +77,22 @@ object CalendarService extends StreamApp[IO] {
   }
 
   private abstract class Kind(val name: String) {
+    protected type C <: Calendar[C]
+
+    protected val calendar: C
+
     final override def toString: String = name
 
-    def now: DayBase[_]
+    final def now: C#Day = calendar.nowDay
 
-    def getYear(yearStr: String): YearBase[_]
+    final def getYear(yearStr: String): C#Year = calendar.Year(yearStr.toInt)
 
-    def getMonth(yearStr: String, monthStr: String): MonthBase[_]
+    final def getMonth(yearStr: String, monthStr: String): C#Month = {
+      val year = getYear(yearStr)
+      val monthName: Option[C#MonthName] = calendar.Month.Name.forName(monthStr)
+      if (monthName.isDefined) year.month(monthName.get)
+      else year.month(monthStr.toInt)
+    }
 
     def jewish(day: DayBase[_]): Jewish.Day
 
@@ -98,16 +107,14 @@ object CalendarService extends StreamApp[IO] {
     def dayNumberToString(number: Int)(implicit spec: LanguageSpec): String
   }
 
+
   private final case object JewishK extends Kind("jewish") {
-    override def now: Jewish.Day = Jewish.nowDay
-    override def getYear(yearStr: String): Jewish.Year = Jewish.Year(yearStr.toInt)
-    override def getMonth(yearStr: String, monthStr: String): Jewish.Month = {
-      val year = getYear(yearStr)
-      val monthName: Option[Jewish.Month.Name] = Jewish.Month.Name.forName(monthStr)
-      if (monthName.isDefined) year.month(monthName.get)
-      else year.month(monthStr.toInt)
-    }
+    override protected type C = Jewish
+
+    override protected val calendar: C = Jewish
+
     override def jewish(day: DayBase[_]): Jewish.Day = day.asInstanceOf[Jewish.Day]
+
     override def gregorian(day: DayBase[_]): Gregorian.Day = Calendar.fromJewish(jewish(day))
 
     override def theOther: Kind = GregorianK
@@ -123,16 +130,14 @@ object CalendarService extends StreamApp[IO] {
   }
 
   private final case object GregorianK extends Kind("gregorian") {
-    override def now: Gregorian.Day = Gregorian.nowDay
-    override def getYear(yearStr: String): Gregorian.Year = Gregorian.Year(yearStr.toInt)
-    override def getMonth(yearStr: String, monthStr: String): Gregorian.Month = {
-      val year = getYear(yearStr)
-      val monthName: Option[Gregorian.Month.Name] = Gregorian.Month.Name.forName(monthStr)
-      if (monthName.isDefined) year.month(monthName.get)
-      else year.month(monthStr.toInt)
-    }
+    override protected type C = Gregorian
+
+    override protected val calendar: C = Gregorian
+
     override def jewish(day: DayBase[_]): Jewish.Day = Calendar.toJewish(gregorian(day))
+
     override def gregorian(day: DayBase[_]): Gregorian.Day = day.asInstanceOf[Gregorian.Day]
+
     override def theOther: Kind = JewishK
 
     override def yearNumberToString(number: Int)(implicit spec: LanguageSpec): String =
