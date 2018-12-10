@@ -20,7 +20,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scalatags.Text.TypedTag
 import scalatags.Text.all._
 
-// TODO around Jewish year 3761, Gregorian day numbers become negative...
 /*
   This UI was done just for testing the underlying calculations, not for public consumption.
   That is why it is not dynamic, CSS styling sucks, internationalization is incomplete etc.
@@ -72,7 +71,6 @@ object CalendarService extends StreamApp[IO] {
     =>
       val kind = getKind(kindStr)
       val day: DayBase[_] = kind.getMonth(yearStr, monthStr).day(dayStr.toInt)
-      // TODO make renderDay order-independent in its explicit parameters
       renderDay(kind.jewish(day), kind.gregorian(day))(kind, toLocation(maybeLocation), toSpec(maybeLanguage))
   }
 
@@ -281,7 +279,6 @@ object CalendarService extends StreamApp[IO] {
     val second: DayBase[_] = if (kind == JewishK) gregorianDay else day
 
     renderHtml(dayUrl(first), div(
-      // TODO put dayLinks into a table with no border and fixed column size
       div(dayLinks(first)(kind, location, spec), " ", first.name.toLanguageString),
       div(dayLinks(second)(kind.theOther, location, spec), " ", second.name.toLanguageString),
       div(daySchedule.dayNames.map { withNames: WithNames => renderNames(withNames.names) }),

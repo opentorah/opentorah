@@ -211,7 +211,7 @@
         <custom n="Common" toVerse="33"/>
     </week>
     <week n="Balak" book="Micah" fromChapter="5" fromVerse="6" toChapter="6" toVerse="8"/>
-    <week n="Pinchas" book="I Kings" fromChapter="18" fromVerse="46" toChapter="19" toVerse="21"/> <!-- In 3 weeks - Matos -->
+    <week n="Pinchas" book="I Kings" fromChapter="18" fromVerse="46" toChapter="19" toVerse="21"/> <!-- In 3 weeks - Mattos -->
     <week n="Mattos">
          <custom n="Italki" book="Joshua" fromChapter="13" fromVerse="15" toVerse="33"/>
          <custom n="Common" book="Jeremiah" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3"/>
