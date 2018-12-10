@@ -1,7 +1,7 @@
 package org.podval.calendar.tanach
 
 import org.podval.judaica.metadata.{Metadata, Names, WithName, WithNames}
-import org.podval.judaica.tanach.Torah
+import org.podval.judaica.tanach.{Parsha, Torah}
 import org.podval.judaica.tanach.Torah.{Aliyah, Maftir}
 import org.podval.judaica.tanach.Custom
 import org.podval.calendar.jewish.Jewish.{Day, Month, Year}
@@ -168,17 +168,17 @@ object SpecialDay {
 
     def correct(month: Month.Name, isSpecialShabbos: Boolean, reading: Reading): Reading = {
       val allowReplace: Boolean = !isSpecialShabbos && (month != Teves) && (month != Av)
+
       def transformer(
         custom: Custom,
         reading: Reading.ReadingCustom,
         haftarah: Haftarah,
         addition: Option[Haftarah]
-      ): Reading.ReadingCustom = {
+      ): Reading.ReadingCustom =
         if (allowReplace && ((month != Elul) || (custom == Custom.Chabad)))
           reading.replaceMaftirAndHaftarah(shabbosMaftir, haftarah)
         else
-          addition.fold(reading)(addition => reading.addHaftarah(addition))
-      }
+          reading.addHaftarah(addition)
 
       transform(transformer, reading)
     }
@@ -214,12 +214,11 @@ object SpecialDay {
         reading: Reading.ReadingCustom,
         haftarah: Haftarah,
         addition: Option[Haftarah]
-      ): Reading.ReadingCustom = {
+      ): Reading.ReadingCustom =
         if (allowReplace && (custom != Custom.Fes))
           reading.replaceHaftarah(haftarah)
         else
-          addition.fold(reading)(addition => reading.addHaftarah(addition))
-      }
+          reading.addHaftarah(addition)
 
       transform(transformer, reading)
     }
@@ -925,8 +924,30 @@ object SpecialDay {
     val isShabbos: Boolean = day.isShabbos
     if (!isShabbos) require(weeklyReading.isEmpty && specialShabbos.isEmpty)
 
-    if (isShabbos) Some(getShabbosMorningReading(day, specialDay, weeklyReading, specialShabbos))
-    else getWeekdayMorningReading(day, specialDay, nextWeeklyReading, isPesachOnChamishi)
+    val result =
+      if (isShabbos) Some(getShabbosMorningReading(day, specialDay, weeklyReading, specialShabbos))
+      else getWeekdayMorningReading(day, specialDay, nextWeeklyReading, isPesachOnChamishi)
+
+    val numAliyot: Int =
+      if (specialDay.contains(SimchasTorah)) 7 else
+      if (specialDay.contains(SheminiAtzeresAndSimchasTorahInHolyLand)) 7 else
+      if (specialDay.contains(YomKippur)) 6 else
+      if (isShabbos) 7 else
+      if (specialDay.exists(_.isInstanceOf[Festival])) 5 else
+      if (specialDay.exists(_.isInstanceOf[Intermediate])) 4 else
+      if (day.isRoshChodesh) 4 else
+      if (specialDay.exists(_.isInstanceOf[RabbinicFestival])) 3 else
+      if (specialDay.exists(_.isInstanceOf[Fast])) 3 else
+      if (day.is(Day.Name.Sheni) || day.is(Day.Name.Chamishi)) 3 else
+        0
+
+    result.fold(require(numAliyot == 0)) { result =>
+      result.torah.customs.values.foreach { torah =>
+        require(torah.length == numAliyot)
+      }
+    }
+
+    result
   }
 
   private final def getShabbosMorningReading(
@@ -954,7 +975,15 @@ object SpecialDay {
       .getOrElse {
         require(weeklyReading.isDefined)
         val result = weeklyReading.get.getMorningReading
-        result
+        val isKiSeitzei: Boolean = (day.month.name == Elul) && (day.numberInMonth == 14)
+        if (!isKiSeitzei) result else {
+          val customs: Custom.Of[Reading.ReadingCustom] = result.liftR {
+            case (custom: Custom, readingCustom: Reading.ReadingCustom) =>
+              if (custom != Custom.Chabad) readingCustom
+              else readingCustom.addHaftarah(Haftarah.forParsha(Parsha.Re_eh).doFind(Custom.Chabad))
+          }
+          new Reading(customs.customs)
+        }
       }
 
     val result = specialShabbos.fold(normal) {
@@ -1021,7 +1050,15 @@ object SpecialDay {
       case _ => None
     }
 
-    specialReading.orElse { if (!day.isShabbos) None else Some(nextWeeklyReading.getAfternoonReading) }
+    val result = specialReading.orElse { if (!day.isShabbos) None else Some(nextWeeklyReading.getAfternoonReading) }
+
+    result.foreach { result =>
+      result.torah.customs.values.foreach { torah =>
+        require(torah.length == 3)
+      }
+    }
+
+    result
   }
 
   private val loadNames: Seq[LoadNames] = Seq(RoshChodesh, ErevRoshChodesh,

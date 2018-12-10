@@ -35,6 +35,9 @@ object Reading {
     torah: Torah,
     maftirAndHaftarah: Option[MaftirAndHaftarah]
   ) {
+    def addHaftarah(haftaraAddition: Option[Haftarah]): ReadingCustom =
+      haftaraAddition.fold(this)(haftaraAddition => this.addHaftarah(haftaraAddition))
+
     def addHaftarah(haftaraAddition: Haftarah): ReadingCustom =
       copy(maftirAndHaftarah = Some(maftirAndHaftarah.get.addHaftarah(haftaraAddition)))
 

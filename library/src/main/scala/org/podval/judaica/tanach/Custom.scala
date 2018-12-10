@@ -33,9 +33,9 @@ object Custom extends NamedCompanion {
 
     final def isFull: Boolean = all.forall(custom => find(custom).isDefined)
 
-    final def maximize: Of[T] = new Of(all.map(custom => custom -> doFind(custom)).toMap)
+    final def maximize: Map[Custom, T] = all.map(custom => custom -> doFind(custom)).toMap
 
-    final def minimize: Of[T] = Of.minimize(this.maximize.customs)
+    final def minimize: Of[T] = new Of[T](Of.minimize(maximize))
 
     final def lift[Q, R](b: Of[Q], f: (Custom, Option[T], Option[Q]) => R): Of[R] =
       lift[Q, Option[T], Option[Q], R](b, f, _.find(_), _.find(_))
@@ -56,6 +56,9 @@ object Custom extends NamedCompanion {
 
     final def lift[R](f: (Custom, Option[T]) => R): Of[R] =
       new Of[R](all.map { custom => custom -> f(custom, find(custom)) }.toMap)
+
+    final def liftR[R](f: (Custom, T) => R): Of[R] =
+      new Of[R](all.map { custom => custom -> f(custom, doFind(custom)) }.toMap)
 
     final def ++(other: Of[T]): Of[T] = new Of[T](customs ++ other.customs)
 
@@ -85,7 +88,7 @@ object Custom extends NamedCompanion {
     // customs on the same level do not affect one another.
     private val byLevelDescending: Seq[Custom] = all.toSeq.sortBy(_.level).reverse
 
-    private def minimize[T](customs: Map[Custom, T]): Of[T] = {
+    private def minimize[T](customs: Map[Custom, T]): Map[Custom, T] = {
       // start with maximized representation: all Customs other than Common present;
       val result: Map[Custom, T] =
         byLevelDescending.foldLeft(customs) { case (customs: Map[Custom, T], custom: Custom) =>
@@ -101,15 +104,8 @@ object Custom extends NamedCompanion {
         if (values.size != 1) None else Some(values.head)
       }
 
-      commonValue.fold[Of[T]](new Of(result))(commonValue => Of(commonValue))
+      commonValue.fold[Map[Custom, T]](result)(commonValue => Map(Common -> commonValue))
     }
-
-    private final def minimize[T](customs: Map[Custom, T], custom: Custom): Map[Custom, T] =
-      if (custom.children.isEmpty) customs else {
-        customs.get(custom).fold(customs) { value =>
-          customs -- custom.children.filter(customs(_) == value)
-        }
-      }
   }
 
   type Sets[T] = Map[Set[Custom], T]

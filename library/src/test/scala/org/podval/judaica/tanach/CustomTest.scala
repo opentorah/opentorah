@@ -18,8 +18,11 @@ final class CustomTest extends FlatSpec with Matchers {
 
   private def check[T](sourceMap: Map[Custom, T], expectedMap: Map[Custom, T]): Unit = {
     val source: Of[T] = new Of(sourceMap)
-    val expected: Of[T] = new Of(expectedMap)
-    source.minimize.customs shouldBe expectedMap
-    source.maximize.customs shouldBe expected.maximize.customs
+    val expectedMaximized: Map[Custom, T] = new Of(expectedMap).maximize
+
+    val minimized = source.minimize
+    val maximized = source.maximize
+    minimized.customs shouldBe expectedMap
+    maximized shouldBe expectedMaximized
   }
 }
