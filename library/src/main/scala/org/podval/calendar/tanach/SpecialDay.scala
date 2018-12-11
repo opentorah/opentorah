@@ -949,6 +949,18 @@ object SpecialDay {
     result
   }
 
+  final def getPurimAlternativeMorningReading(
+    day: Day,
+    specialDay: Option[Date],
+    specialShabbos: Option[SpecialShabbos],
+    weeklyReading: Option[WeeklyReading],
+    nextWeeklyReading: WeeklyReading,
+    isPesachOnChamishi: Boolean
+  ): Option[Reading] = {
+    val isAlternative = specialDay.contains(Purim) || specialDay.contains(ShushanPurim)
+    if (!isAlternative) None else getMorningReading(day, None, specialShabbos, weeklyReading, nextWeeklyReading, isPesachOnChamishi)
+  }
+
   private final def getShabbosMorningReading(
     day: Day,
     specialDay: Option[Date],
@@ -1053,7 +1065,7 @@ object SpecialDay {
 
     result.foreach { result =>
       result.torah.customs.values.foreach { torah =>
-        require(torah.length == 3)
+        require((torah.length == 3) || (torah.length == 2)) // 3rd aliyah is also maftir...
       }
     }
 

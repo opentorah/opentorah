@@ -18,6 +18,7 @@ object Schedule {
     day: Day,
     dayNames: Seq[WithNames],
     morning: Option[Reading],
+    purimAlternativeMorning: Option[Reading],
     afternoon: Option[Reading],
     chitas: Chitas
   )
@@ -72,6 +73,14 @@ object Schedule {
           (if (day.isRoshChodesh) Seq(SpecialDay.RoshChodesh) else Seq.empty) ++
           Omer.dayOf(day).toSeq,
         morning = SpecialDay.getMorningReading(
+          day = day,
+          specialDay = specialDay,
+          specialShabbos = specialShabbos,
+          weeklyReading = weeklyReading,
+          nextWeeklyReading = nextWeeklyReading,
+          isPesachOnChamishi = pesachOnChamishi.get(day.year)
+        ),
+        purimAlternativeMorning = SpecialDay.getPurimAlternativeMorningReading(
           day = day,
           specialDay = specialDay,
           specialShabbos = specialShabbos,
