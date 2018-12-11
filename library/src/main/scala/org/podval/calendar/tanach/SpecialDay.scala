@@ -613,7 +613,7 @@ object SpecialDay {
 
     protected override val maftir: Maftir = Deuteronomy.parshasZachorMaftir
 
-    protected override val haftarah: Haftarah.Customs = parseHaftarah(
+    override val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="I Samuel">
         <custom n="Ashkenaz, Chabad" fromChapter="15" fromVerse="2" toVerse="34"/>
         <custom n="Sefard" fromChapter="15" fromVerse="1" toVerse="34"/>
@@ -674,6 +674,12 @@ object SpecialDay {
 
   case object ShushanPurim extends LoadNames("Shushan Purim") with PurimCommon {
     override def date(year: Year): Day = Purim.date(year) + 1
+
+    final def shabbos(weeklyReading: WeeklyReading): Reading = {
+      replaceMaftirAndHaftarah(weeklyReading.getMorningReading,
+        maftir = Exodus.shushanPurimShabbosMaftir,
+        haftarah = ParshasZachor.haftarah)
+    }
   }
 
   case object Pesach extends LoadNames("Pesach") with Festival with FirstDayOf with ShabbosAndWeekdayReading {
@@ -982,6 +988,10 @@ object SpecialDay {
       case specialDay: Chanukah =>
         require(weeklyReading.isDefined)
         specialDay.shabbos(weeklyReading.get, isRoshChodesh)
+
+      case ShushanPurim =>
+        require(weeklyReading.isDefined)
+        ShushanPurim.shabbos(weeklyReading.get)
 
       case _ =>
         throw new IllegalArgumentException("Must have Shabbos reading!")
