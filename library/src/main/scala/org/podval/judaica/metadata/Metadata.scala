@@ -2,6 +2,8 @@ package org.podval.judaica.metadata
 
 import java.io.FileNotFoundException
 
+import org.podval.judaica.util.Util
+
 import scala.xml.{Elem, Utility}
 
 final case class Metadata(

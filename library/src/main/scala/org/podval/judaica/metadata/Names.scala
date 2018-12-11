@@ -1,5 +1,7 @@
 package org.podval.judaica.metadata
 
+import org.podval.judaica.util.Util
+
 import scala.xml.Elem
 
 final class Names(val names: Seq[Name]) extends HasName {
@@ -36,10 +38,6 @@ object Names {
       require(one.isDisjoint(other), s"Names overlap: $one and $other")
     }
   }
-
-  def merge(one: Names, other: Names): Names =
-    if (other.isEmpty) one else throw new IllegalArgumentException(s"Merging Names not implemented: $one with $other")
-
 
   def combine(one: Names, other: Names, combiner: (LanguageSpec, String, String) => String): Names = {
     val specs: Set[LanguageSpec] = one.names.map(_.languageSpec).toSet ++ other.names.map(_.languageSpec)
