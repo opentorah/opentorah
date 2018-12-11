@@ -21,12 +21,21 @@ import scalatags.Text.TypedTag
 import scalatags.Text.all._
 
 /*
+  There is currently no need for the polished, public UI.
   This UI was done just for testing the underlying calculations, not for public consumption.
-  That is why it is not dynamic, CSS styling sucks, internationalization is incomplete etc.
-  There is currently no need for the polished user-facing UI.
+  That is why the following isn't being done:
+  - put dayLinks into a table with no border and fixed column size;
+  - deal with spacing and ltr/rtl;
+  - clean up CSS styling;
+  - complete internationalization;
+  - make UI dynamic;
+
   I am also not doing an API service right now: there are no consumers for it in development,
   but it is possible at this point (12/2018) that one will appear soon, and then the API will
   be designed to accommodate the needs of the real consumer.
+  Then, we'll:
+  - communicate selective applicability of Purim/Shushan Purim readings;
+  - add Nassi, Molad, Tehillim, Tachanun, Maariv after Shabbos...
  */
 object CalendarService extends StreamApp[IO] {
 
@@ -283,6 +292,7 @@ object CalendarService extends StreamApp[IO] {
       div(dayLinks(second)(kind.theOther, location, spec), " ", second.name.toLanguageString),
       div(daySchedule.dayNames.map { withNames: WithNames => renderNames(withNames.names) }),
       renderOptionalReading("Morning", daySchedule.morning),
+      renderOptionalReading("Purim morning alternative", daySchedule.purimAlternativeMorning),
       renderChitas(daySchedule.chitas),
       renderOptionalReading("Afternoon", daySchedule.afternoon)
     ))
