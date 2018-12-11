@@ -751,13 +751,12 @@ object SpecialDay {
     protected final override def shabbosHaftarah: Haftarah.Customs = PesachIntermediate.shabbosHaftarah
 
     final def weekday(isPesachOnChamishi: Boolean): Reading = {
-      val torah: Torah = if (dayNumber == 2) {
+      val torah: Torah = if (dayNumber == 2)
         Pesach2.torah.drop(Set(4, 5))
-      } else {
-        PesachIntermediate.torah(dayNumber, isPesachOnChamishi) :+ shabbosMaftir
-      }
+      else
+        PesachIntermediate.torah(dayNumber, isPesachOnChamishi)
 
-      Reading(torah)
+      Reading(torah :+ shabbosMaftir)
     }
   }
 

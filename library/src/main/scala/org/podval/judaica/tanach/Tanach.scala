@@ -124,7 +124,7 @@ object Tanach extends NamedCompanion {
   private final case class TanachMetadata(names: Names, chapters: Chapters, weekElements: Seq[Elem])
 
   private object metadatas extends Holder[TanachBook, TanachMetadata] {
-    protected override def load: Map[TanachBook, TanachMetadata] = Metadata.loadMetadata(
+    protected override def calculate: Map[TanachBook, TanachMetadata] = Metadata.loadMetadata(
       keys = values,
       obj = Tanach.this,
       elementName = "book"
@@ -151,7 +151,7 @@ object Tanach extends NamedCompanion {
   )
 
   private final class ChumashBookMetadataHolder(book: ChumashBook) extends Holder[Parsha, ParshaMetadata] {
-    protected override def load: Map[Parsha, ParshaMetadata] =
+    protected override def calculate: Map[Parsha, ParshaMetadata] =
       Metadata.bind(
         keys = book.parshiot,
         elements = Tanach.metadatas.get(book).weekElements,

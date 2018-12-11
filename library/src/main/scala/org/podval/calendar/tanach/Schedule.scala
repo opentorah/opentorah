@@ -3,7 +3,7 @@ package org.podval.calendar.tanach
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.tanach.SpecialDay.{FestivalOrIntermediate, Omer, ShabbosBereishis}
 import org.podval.judaica.metadata.WithNames
-import org.podval.judaica.util.Util
+import org.podval.judaica.util.{Cache, PairSlider, Util}
 
 final case class Schedule private(
   from: Day,
@@ -38,37 +38,30 @@ object Schedule {
     weeklyReadings: Map[Day, WeeklyReading],
     weeklyReadingsList: Seq[(Day, WeeklyReading)],
     festivals: Map[Day, FestivalOrIntermediate],
-    years: Seq[Year],
     daysWithSpecialReadingsNotFestivals: Map[Day, SpecialDay.Date],
-    specialShabboses: Map[Day, SpecialDay.SpecialShabbos],
-    pesachOnChamishi: Set[Year]
+    specialShabboses: Map[Day, SpecialDay.SpecialShabbos]
   ) {
     def build: Schedule = {
-      currentWeeklyReadings = weeklyReadingsList
-      nextWeeklyReadings = weeklyReadingsList
+      currentWeeklyReadings.reset()
+      nextWeeklyReadings.reset()
 
       val days: Seq[Day] = Util.unfoldSimple[Day](from, _ + 1, _ <= to)
       new Schedule(from, to, inHolyLand, days = days.map(day => day -> forDay(day)).toMap)
     }
 
-    private var currentWeeklyReadings: Seq[(Day, WeeklyReading)] = weeklyReadingsList
-    private var nextWeeklyReadings: Seq[(Day, WeeklyReading)] = weeklyReadingsList
+    private val currentWeeklyReadings = new PairSlider[Day, WeeklyReading](weeklyReadingsList, _ >= _)
 
-    private def currentWeeklyReadings(day: Day): WeeklyReading = {
-      currentWeeklyReadings = currentWeeklyReadings.dropWhile(_._1 < day)
-      currentWeeklyReadings.head._2
-    }
+    private val nextWeeklyReadings = new PairSlider[Day, WeeklyReading](weeklyReadingsList, _ > _)
 
-    private def nextWeeklyReadings(day: Day): WeeklyReading = {
-      nextWeeklyReadings = nextWeeklyReadings.dropWhile(_._1 <= day)
-      nextWeeklyReadings.head._2
+    private val pesachOnChamishi = new Cache[Year, Boolean] {
+      override protected def calculate(year: Year): Boolean = SpecialDay.Pesach.date(year).is(Day.Name.Chamishi)
     }
 
     private def forDay(day: Day): DaySchedule = {
       val weeklyReading: Option[WeeklyReading] = weeklyReadings.get(day)
       val specialDay: Option[SpecialDay.Date] = festivals.get(day).orElse(daysWithSpecialReadingsNotFestivals.get(day))
       val specialShabbos: Option[SpecialDay.SpecialShabbos] = specialShabboses.get(day)
-      val nextWeeklyReading: WeeklyReading = nextWeeklyReadings(day)
+      val nextWeeklyReading: WeeklyReading = nextWeeklyReadings.get(day)
 
       DaySchedule(
         day,
@@ -84,14 +77,14 @@ object Schedule {
           specialShabbos = specialShabbos,
           weeklyReading = weeklyReading,
           nextWeeklyReading = nextWeeklyReading,
-          isPesachOnChamishi = pesachOnChamishi.contains(day.year)
+          isPesachOnChamishi = pesachOnChamishi.get(day.year)
         ),
         afternoon = SpecialDay.getAfternoonReading(
           day = day,
           specialDay = specialDay,
           nextWeeklyReading = nextWeeklyReading
         ),
-        chitas = Chitas(day, currentWeeklyReadings(day))
+        chitas = Chitas(day, currentWeeklyReadings.get(day))
       )
     }
   }
@@ -152,14 +145,10 @@ object Schedule {
       weeklyReadings = weeklyReadings.toMap,
       weeklyReadingsList = weeklyReadings :+ extraWeeklyReading,
       festivals = filter(yearsData.map(_.festivals)),
-      years = years,
       daysWithSpecialReadingsNotFestivals = filter(years.map(year =>
         SpecialDay.daysWithSpecialReadingsNotFestivals.map(day => day.correctedDate(year) -> day))),
       specialShabboses = filter(years.map(year =>
-        SpecialDay.specialShabbos.map(day => day.correctedDate(year) -> day))),
-      pesachOnChamishi = years.flatMap { year =>
-        if (SpecialDay.Pesach.date(year).is(Day.Name.Chamishi)) Some(year) else None
-      }.toSet
+        SpecialDay.specialShabbos.map(day => day.correctedDate(year) -> day)))
     )
   }
 
