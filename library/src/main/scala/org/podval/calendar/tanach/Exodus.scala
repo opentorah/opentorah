@@ -39,6 +39,11 @@ object Exodus extends TorahReadings {
       <aliyah n="3" fromVerse="14"/>
     </torah>)
 
+  val shushanPurimShabbosMaftir: Torah.Aliyah = {
+    val spans = purimTorah.spans
+    spans(0)+spans(1)+spans(2)
+  }
+
   val shavuosTorah: Torah = parseTorah(
     <torah book="Exodus" fromChapter="19" fromVerse="1" toChapter="20" toVerse="22">
       <aliyah n="2" fromChapter="19" fromVerse="7"/>
