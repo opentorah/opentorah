@@ -59,19 +59,18 @@ object Reading {
       copy(haftarah = haftarah)
   }
 
-  def apply(torah: Torah, names: Option[Names] = None): Reading =
-    apply(Custom.Of(torah), names = names)
+  def apply(torah: Torah, names: Names): Reading = apply(Custom.Of(torah), names)
 
-  def apply(torah: Torah.Customs, names: Option[Names]): Reading = {
+  def apply(torah: Torah.Customs, names: Names): Reading = {
     val result: Map[Custom, ReadingCustom] =
       torah.customs.mapValues(torah => ReadingCustom(torah, maftirAndHaftarah = None))
-    new Reading(result, names)
+    new Reading(result, Some(names))
   }
 
-  def apply(torah: Torah, haftarah: Haftarah.Customs): Reading =
-    apply(torah = Torah(torah.spans.init), maftir = torah.spans.last, haftarah = haftarah)
+  def apply(torah: Torah, haftarah: Haftarah.Customs, names: Names): Reading =
+    apply(torah = Torah(torah.spans.init), maftir = torah.spans.last, haftarah = haftarah, names = Some(names))
 
-  def apply(torah: Torah, maftir: Maftir, haftarah: Haftarah.Customs): Reading =
+  def apply(torah: Torah, maftir: Maftir, haftarah: Haftarah.Customs, names: Option[Names] = None): Reading =
     apply(Custom.Of(torah), maftir, haftarah, names = None)
 
   def apply(torah: Torah.Customs, maftir: Maftir, haftarah: Haftarah.Customs, names: Option[Names]): Reading = {

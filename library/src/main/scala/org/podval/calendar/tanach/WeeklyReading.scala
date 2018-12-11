@@ -121,7 +121,7 @@ final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) ext
     )
   }
 
-  def getAfternoonReading: Reading = Reading(torah = parsha.aliyot, names = Some(names))
+  def getAfternoonReading: Reading = Reading(torah = parsha.aliyot, names)
 }
 
 object WeeklyReading {
