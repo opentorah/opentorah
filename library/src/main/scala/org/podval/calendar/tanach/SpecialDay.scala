@@ -730,17 +730,6 @@ object SpecialDay {
   }
 
   private object PesachIntermediate extends LoadNames("Pesach Intermediate") {
-    def torah(dayNumber: Int, isPesachOnChamishi: Boolean): Torah = {
-      val realDayNumber: Int =
-        if (isPesachOnChamishi && ((dayNumber == 4) || (dayNumber == 5))) dayNumber-1 else dayNumber
-      realDayNumber match {
-        case 3 => Exodus.pesach3torah
-        case 4 => Exodus.pesach4torah
-        case 5 => Exodus.pesach5torah
-        case 6 => Numbers.pesach6torah
-      }
-    }
-
     val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Ezekiel">
         <custom n="Common" fromChapter="37" fromVerse="1" toVerse="14"/>
@@ -759,13 +748,18 @@ object SpecialDay {
 
     protected final override def shabbosHaftarah: Haftarah.Customs = PesachIntermediate.shabbosHaftarah
 
-    final def weekday(isPesachOnChamishi: Boolean): Reading = {
-      val torah: Torah = if (dayNumber == 2)
-        Pesach2.torah.drop(Set(4, 5))
-      else
-        PesachIntermediate.torah(dayNumber, isPesachOnChamishi)
+    final def weekday(isPesachOnChamishi: Boolean): Reading =
+      Reading(first5(isPesachOnChamishi) :+ shabbosMaftir, names)
 
-      Reading(torah :+ shabbosMaftir, names)
+    protected def first5(isPesachOnChamishi: Boolean): Torah = {
+      val realDayNumber: Int =
+        if (isPesachOnChamishi && ((dayNumber == 4) || (dayNumber == 5))) dayNumber-1 else dayNumber
+      realDayNumber match {
+        case 3 => Exodus.pesach3torah
+        case 4 => Exodus.pesach4torah
+        case 5 => Exodus.pesach5torah
+        case 6 => Numbers.pesach6torah
+      }
     }
   }
 
@@ -774,7 +768,9 @@ object SpecialDay {
   case object PesachIntermediate3 extends PesachIntermediate(3, false)
   case object PesachIntermediate4 extends PesachIntermediate(4, false)
 
-  case object PesachIntermediate1InHolyLand extends PesachIntermediate(1, true)
+  case object PesachIntermediate1InHolyLand extends PesachIntermediate(1, true) {
+    override protected def first5(isPesachOnChamishi: Boolean): Torah = Pesach2.torah.drop(Set(4, 5))
+  }
   case object PesachIntermediate2InHolyLand extends PesachIntermediate(2, true)
   case object PesachIntermediate3InHolyLand extends PesachIntermediate(3, true)
   case object PesachIntermediate4InHolyLand extends PesachIntermediate(4, true)
@@ -951,7 +947,7 @@ object SpecialDay {
 
     result.fold(require(numAliyot == 0)) { result =>
       result.torah.customs.values.foreach { torah =>
-        require(torah.length == numAliyot)
+        require((torah.length == numAliyot) || ((numAliyot == 3) && (torah.length == 2))) // because maftir!
       }
     }
 

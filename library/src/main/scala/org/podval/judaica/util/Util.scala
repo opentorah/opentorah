@@ -23,7 +23,7 @@ object Util {
     Seq(ks) ++ group(notks, key)
   }
 
-  def duplicates[T](seq: Seq[T]): Set[T] = seq.groupBy(t => t).filter { case (t, ts) => ts.length > 1 }.keySet
+  def duplicates[T](seq: Seq[T]): Set[T] = seq.groupBy(t => t).filter { case (_, ts) => ts.length > 1 }.keySet
 
   def checkNoDuplicates[T](seq: Seq[T], what: String): Unit = {
     val result = duplicates(seq)
