@@ -37,5 +37,7 @@ object Util {
   def inSequence[K, V, R](keys: Seq[K], map: Map[K, V], f: Seq[(K, V)] => Seq[R]): Map[K, R] =
     keys.zip(f(keys.map { key => key -> map(key) })).toMap
 
+  // Maybe in JDK 9 and later I won't need to deal with '$'?
+  // see https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8057919
   def className(obj: AnyRef): String = obj.getClass.getSimpleName.replace("$", "")
 }

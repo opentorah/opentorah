@@ -748,18 +748,19 @@ object SpecialDay {
 
     protected final override def shabbosHaftarah: Haftarah.Customs = PesachIntermediate.shabbosHaftarah
 
-    final def weekday(isPesachOnChamishi: Boolean): Reading =
-      Reading(first5(isPesachOnChamishi) :+ shabbosMaftir, names)
-
-    protected def first5(isPesachOnChamishi: Boolean): Torah = {
+    final def weekday(isPesachOnChamishi: Boolean): Reading = {
       val realDayNumber: Int =
         if (isPesachOnChamishi && ((dayNumber == 4) || (dayNumber == 5))) dayNumber-1 else dayNumber
-      realDayNumber match {
+
+      val first5 = realDayNumber match {
+        case 2 => Pesach2.torah.drop(Set(4, 5))
         case 3 => Exodus.pesach3torah
         case 4 => Exodus.pesach4torah
         case 5 => Exodus.pesach5torah
         case 6 => Numbers.pesach6torah
       }
+
+      Reading(first5 :+ shabbosMaftir, names)
     }
   }
 
@@ -768,9 +769,7 @@ object SpecialDay {
   case object PesachIntermediate3 extends PesachIntermediate(3, false)
   case object PesachIntermediate4 extends PesachIntermediate(4, false)
 
-  case object PesachIntermediate1InHolyLand extends PesachIntermediate(1, true) {
-    override protected def first5(isPesachOnChamishi: Boolean): Torah = Pesach2.torah.drop(Set(4, 5))
-  }
+  case object PesachIntermediate1InHolyLand extends PesachIntermediate(1, true)
   case object PesachIntermediate2InHolyLand extends PesachIntermediate(2, true)
   case object PesachIntermediate3InHolyLand extends PesachIntermediate(3, true)
   case object PesachIntermediate4InHolyLand extends PesachIntermediate(4, true)

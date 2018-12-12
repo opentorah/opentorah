@@ -24,7 +24,7 @@ object Metadata {
   ): Map[K, Names] = bind(
     keys,
     loadMetadataElements(obj, resourceName, rootElementName = "names", elementName = "names")
-      .map(element => Names.parse(element, None))
+      .map(element => Names.parse(element))
   )
 
   def loadMetadata[K <: WithName, M <: HasName](
