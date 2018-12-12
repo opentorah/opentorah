@@ -6,6 +6,9 @@ import scala.xml.Elem
 
 final class Names(val names: Seq[Name]) extends HasName {
   Util.checkNoDuplicates(names.map(_.name), "names")
+  // There may be multiple names for the same language (for an example, see Language),
+  // so this check is disabled:
+  // Util.checkNoDuplicates(names.map(_.copy(name = "")), "name parameters")
 
   def isEmpty: Boolean = names.isEmpty
 
@@ -41,7 +44,8 @@ object Names {
 
   def combine(one: Names, other: Names, combiner: (LanguageSpec, String, String) => String): Names = {
     val specs: Set[LanguageSpec] = one.names.map(_.languageSpec).toSet ++ other.names.map(_.languageSpec)
-    val result: Set[Name] = specs.map { spec => Name(combiner(spec, one.doFind(spec).name, other.doFind(spec).name), spec) }
+    val result: Set[Name] = specs.map { spec =>
+      Name(combiner(spec, one.doFind(spec).name, other.doFind(spec).name), spec) }
     new Names(result.toSeq)
   }
 
