@@ -16,7 +16,9 @@ object Custom extends NamedCompanion {
 
   override type Key = Custom
 
-  class Of[T](val customs: Map[Custom, T]) {
+  class Of[T](val customs: Map[Custom, T], full: Boolean = true) {
+    if (full) require(isFull)
+
     final def find(custom: Custom): Option[T] =
       customs.get(custom).orElse(custom.parent.flatMap(find))
 
@@ -69,6 +71,11 @@ object Custom extends NamedCompanion {
   object Of {
     def apply[T](value: T): Custom.Of[T] = new Of[T](Map(Common -> value))
 
+    def apply[T](pairs: Seq[(Set[Custom], T)], full: Boolean): Of[T] = {
+      Util.checkNoDuplicates(pairs.map(_._1), "pre-map Sets[T]")
+      apply(pairs.toMap, full)
+    }
+
     def apply[T](map: Sets[T], full: Boolean = true): Of[T] = {
       // Check that the sets do not overlap.
       val sets: Set[Set[Custom]] = map.keySet
@@ -78,9 +85,7 @@ object Custom extends NamedCompanion {
 
       Util.checkNoDuplicates(map.values.toSeq, "customs")
 
-      val result = new Of[T](map.flatMap { case (customs, value) => customs.map(custom => custom -> value) })
-      if (full) require(result.isFull)
-      result
+      new Of[T](map.flatMap { case (customs, value) => customs.map(custom => custom -> value) }, full = full)
     }
 
     // go through levels of Customs (real) in descending order;

@@ -47,7 +47,7 @@ object Schedule {
       nextWeeklyReadings.reset()
 
       val days: Seq[Day] = Util.unfoldSimple[Day](from, _ + 1, _ <= to)
-      new Schedule(from, to, inHolyLand, days = days.map(day => day -> forDay(day)).toMap)
+      new Schedule(from, to, inHolyLand, days = days.map(day => day -> forDay(day, inHolyLand)).toMap)
     }
 
     private val currentWeeklyReadings = new PairSlider[Day, WeeklyReading](weeklyReadingsList, _ >= _)
@@ -58,7 +58,7 @@ object Schedule {
       override protected def calculate(year: Year): Boolean = SpecialDay.Pesach.date(year).is(Day.Name.Chamishi)
     }
 
-    private def forDay(day: Day): DaySchedule = {
+    private def forDay(day: Day, inHolyLand: Boolean): DaySchedule = {
       val weeklyReading: Option[WeeklyReading] = weeklyReadings.get(day)
       val specialDay: Option[SpecialDay.Date] = festivals.get(day).orElse(daysWithSpecialReadingsNotFestivals.get(day))
       val specialShabbos: Option[SpecialDay.SpecialShabbos] = specialShabboses.get(day)
@@ -93,7 +93,7 @@ object Schedule {
           specialDay = specialDay,
           nextWeeklyReading = nextWeeklyReading
         ),
-        chitas = Chitas(day, currentWeeklyReadings.get(day))
+        chitas = Chitas(day, currentWeeklyReadings.get(day), inHolyLand)
       )
     }
   }

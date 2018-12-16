@@ -12,10 +12,8 @@ final case class Chitas private(first: Chitas.Fragment, second: Option[Chitas.Fr
 object Chitas {
   final case class Fragment(names: Names, torah: Torah.Fragment)
 
-  def apply(day: Day, currentWeeklyReading: WeeklyReading): Chitas = {
+  def apply(day: Day, currentWeeklyReading: WeeklyReading, inHolyLand: Boolean): Chitas = {
     val numberInWeek: Int = day.numberInWeek
-
-    def forParsha(parsha: Parsha): Chitas = forCustoms(parsha.names, parsha.days)
 
     def forCustoms(names: Names, customs: Torah.Customs): Chitas = Chitas(
       first = Fragment(names, chabadTorah(customs)(numberInWeek-1)),
@@ -32,20 +30,25 @@ object Chitas {
 
     val isBereishis = currentWeeklyReading.parsha == Bereishis
     if (!isBereishis) forReading else {
-      val simchasTorah = simchasTorahs.get(day.year)
+      val simchasTorah = simchasTorahs.get((day.year, inHolyLand))
       if (day > simchasTorah) forReading else
       if (day == simchasTorah) Chitas(
         first = forFragments(VezosHaberachah, _.drop(numberInWeek - 1)),
         second = Some(forFragments(Bereishis, _.take(numberInWeek)))
       ) else
-        forParsha(VezosHaberachah)
+        forCustoms(VezosHaberachah.names, VezosHaberachah.days)
     }
   }
 
   private def chabadTorah(customs: Torah.Customs): Seq[Torah.BookSpan] =
     customs.doFind(Custom.Chabad).spans
 
-  private val simchasTorahs = new Cache[Year, Day] {
-    override protected def calculate(year: Year): Day = SpecialDay.SimchasTorah.date(year)
+  private val simchasTorahs = new Cache[(Year, Boolean), Day] {
+    override protected def calculate(args: (Year, Boolean)): Day = args match {
+      case (year: Year, inHolyLand: Boolean) =>
+        val specialDay: SpecialDay.Date =
+          if (inHolyLand) SpecialDay.SheminiAtzeresAndSimchasTorahInHolyLand else SpecialDay.SimchasTorah
+        specialDay.date(year)
+    }
   }
 }
