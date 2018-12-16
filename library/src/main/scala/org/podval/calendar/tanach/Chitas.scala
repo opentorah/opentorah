@@ -25,18 +25,20 @@ object Chitas {
     def forFragments(parsha: Parsha, selector: Seq[Torah.Fragment] => Seq[Torah.BookSpan]): Fragment =
       Fragment(parsha.names, Torah.merge(selector(chabadTorah(parsha.days))))
 
-    val simchasTorah = simchasTorahs.get(day.year)
-    val isSimchasTorahThisWeek: Boolean = simchasTorah.shabbosAfter == day.shabbosAfter
-
-    if (!isSimchasTorahThisWeek) {
+    def forReading: Chitas = {
       val reading = currentWeeklyReading.getMorningReading
       forCustoms(reading.names.get, reading.torah)
-    } else {
-      if (day < simchasTorah) forParsha(VezosHaberachah) else
-      if (day > simchasTorah) forParsha(Bereishis) else Chitas(
+    }
+
+    val isBereishis = currentWeeklyReading.parsha == Bereishis
+    if (!isBereishis) forReading else {
+      val simchasTorah = simchasTorahs.get(day.year)
+      if (day > simchasTorah) forReading else
+      if (day == simchasTorah) Chitas(
         first = forFragments(VezosHaberachah, _.drop(numberInWeek - 1)),
         second = Some(forFragments(Bereishis, _.take(numberInWeek)))
-      )
+      ) else
+        forParsha(VezosHaberachah)
     }
   }
 

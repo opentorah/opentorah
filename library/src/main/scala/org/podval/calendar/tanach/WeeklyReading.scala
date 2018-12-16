@@ -85,7 +85,6 @@ import org.podval.judaica.util.Util
     Behar and Bechukosai can be combined only if Acharei and Kedoshim are combined;
     Acharei and Kedoshim can be combined only if Tazria and Metzora are combined;
     Chukas and Balak can be combined only if Mattos and Masei are combined.
-  Source: https://orot.ac.il/sites/default/files/morashtenu/16-3.pdf
 
   When Shulchan Oruch says that Bemidbar is read before Shavuot, it uses the same word "before"
   as when it says that Tisha Be Av is before the reading of Va'eschanan and in other places in

@@ -56,6 +56,7 @@ Chanukah: 684 (3, 8, 14, 17),
 TODO Rambam corresponding to Shulchan Aruch Orach Chayim 428
 TODO https://he.wikipedia.org/wiki/הלוח_העברי
 TODO https://en.wikibooks.org/wiki/Mathematics_of_the_Jewish_Calendar/The_Annual_Cycle_of_Torah_Readings
+TODO https://orot.ac.il/sites/default/files/morashtenu/16-3.pdf
 
 Book "Calendrical Calculations" was also interesting, but algorithms and
 formulas from it were not used directly.
