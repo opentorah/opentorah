@@ -8,7 +8,7 @@ trait NamedCompanion {
   def values: Seq[Key]
 
   // This is public so that it can be accessed from the Key type if it isn't defined within the object derived from Named.
-  // This isn't final so that it can be overriden in Tanach, for instance.
+  // This isn't final so that it can be overridden in Tanach, for instance.
   lazy val toNames: Map[Key, Names] = Metadata.loadNames(values, this, resourceName)
 
   protected def resourceName: String = Util.className(this)

@@ -42,6 +42,8 @@ object Names {
     }
   }
 
+  // If I ever figure out how work with Custom using Cats typeclasses, something similar
+  // should work here too :)
   def combine(one: Names, other: Names, combiner: (LanguageSpec, String, String) => String): Names = {
     val specs: Set[LanguageSpec] = one.names.map(_.languageSpec).toSet ++ other.names.map(_.languageSpec)
     val result: Set[Name] = specs.map { spec =>
@@ -50,7 +52,8 @@ object Names {
   }
 
   def parse(attributes: Attributes, elements: Seq[Elem]): (Names, Seq[Elem]) = {
-    val defaultName: Option[Name] = parseDefaultName(attributes)
+    val defaultName: Option[Name] =
+      attributes.get("n").map { defaultName => Name(defaultName, LanguageSpec.empty) }
     val (nameElements, tail) = XML.take(elements, "name")
     val names: Names =
       if (nameElements.isEmpty) new Names(Seq(defaultName.get))
@@ -59,19 +62,17 @@ object Names {
     (names, tail)
   }
 
-  private def parseDefaultName(attributes: Attributes): Option[Name] =
-    attributes.get("n").map { defaultName => Name(defaultName, LanguageSpec.empty) }
-
-  def parse(element: Elem, defaultName: Option[Name]): Names = {
+  def parse(element: Elem): Names = {
     val (attributes, nameElements) = XML.open(element, "names")
     attributes.close()
-    parse(nameElements, defaultName)
+    parse(nameElements, None)
   }
 
   private def parse(nameElements: Seq[Elem], defaultName: Option[Name]): Names = {
     val nonDefaultNames: Seq[Name] = nameElements.map(parseName)
     val names = defaultName.fold(nonDefaultNames){ defaultName =>
-      defaultName +: nonDefaultNames
+      if (nonDefaultNames.exists(_.name == defaultName.name)) nonDefaultNames
+      else nonDefaultNames :+ defaultName
     }
     new Names(names)
   }

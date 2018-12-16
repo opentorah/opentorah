@@ -86,10 +86,11 @@ object XML {
   def checkNoMoreElements(elements: Seq[Elem]): Unit =
     require(elements.isEmpty, s"Spurious elements: ${elements.head.label}")
 
-  def print(xml: Node, outStream: OutputStream): Unit = print(xml, new OutputStreamWriter(outStream))
-  def print(xml: Node, outFile: File): Unit = print(xml, new FileWriter(outFile))
+  private def print(xml: Node, outStream: OutputStream): Unit = print(xml, new OutputStreamWriter(outStream))
+  private def print(xml: Node, outFile: File): Unit = print(xml, new FileWriter(outFile))
 
-  def print(xml: Node, writer: Writer) {
+  private def print(xml: Node, writer: Writer) {
+    // Mayve add <xml> header?
     val out = new PrintWriter(writer)
     val pretty = prettyPrinter.format(xml)
     out.println(pretty)
