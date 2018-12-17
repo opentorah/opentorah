@@ -11,7 +11,6 @@ as described by Rambam in the Laws of the Sanctification of the Moon, Chapters 6
 - [x] list [dates of Birchas Hachamo](https://docs.google.com/document/d/1hpPZ0LYU3p8a-LJRXEqzXig-VQthkQ_MkaY79PMqr-Y/edit?hl=en_US)
 - [x] generate Torah and Haftorah reading schedule
 - [ ] generate schedule of learning Rambam
-- [ ] generate monthly calendars with both kinds of dates
 
 I want to do certain things with the astronomical Jewsih calendar
 as described by Rambam in the Laws of the Sanctification of the Moon, in Chapters 11-19:
@@ -42,11 +41,17 @@ into customs of Torah/Haftarah reading;
 - Dr. Peter Ofman - for asking questions that prodded me to revive this project in 2011, after years of hiatus;
 - Aron Matskin - for a discussion during his visit on Rosh Chodesh Mar Cheshvan 5772;
 - Rabbi Chaim Prus - for causing me to investigate which number does the year of Creation has - 0 or 1.
-
+- stackoverflow user [ayvango](https://stackoverflow.com/users/837133/ayvango) - for a
+ [post](https://stackoverflow.com/questions/1154571/scala-abstract-types-vs-generics/10891994#10891994) that
+ taught me how to encode family polymorphism in Scala with family members in separate files.
 
 ## Sources
 
-_Torah reading_: Shulchan Aruch Orach Chaim (and Mishna Brura):
+### Calendar
+Rambam, Laws of the Sanctification of the Moon, Chapters 6-10
+
+### Torah readings
+Shulchan Aruch Orach Chaim (and Mishna Brura):
 425:1-2 (4, 8, 12), 428:4,6,8, 488:3; 490:1, 494:1-2; 559:4,
 584:2 (8), 601:1, 621:1 (4), 622:2, 659 (4), 662:3 (4),
 663:1,3 (4), 668:2, 669
@@ -54,12 +59,13 @@ Chanukah: 684 (3, 8, 14, 17),
 693:4          
 
 TODO Rambam corresponding to Shulchan Aruch Orach Chayim 428
-TODO https://he.wikipedia.org/wiki/הלוח_העברי
-TODO https://en.wikibooks.org/wiki/Mathematics_of_the_Jewish_Calendar/The_Annual_Cycle_of_Torah_Readings
-TODO https://orot.ac.il/sites/default/files/morashtenu/16-3.pdf
 
-Book "Calendrical Calculations" was also interesting, but algorithms and
-formulas from it were not used directly.
+### Interesting sources that were not used 
+https://en.wikipedia.org/wiki/Hebrew_calendar
+https://en.wikibooks.org/wiki/Mathematics_of_the_Jewish_Calendar
+https://orot.ac.il/sites/default/files/morashtenu/16-3.pdf
+["Calendrical Calculations"](https://www.amazon.com/Calendrical-Calculations-Ultimate-Edward-Reingold/dp/1107683165)
+by Edward M. Reingold and Nachum Dershowitz
 
 ## Early Jewish Years
 
@@ -75,7 +81,6 @@ Raw data for the hazot calculations is obtainable from the Naval Oceanography Po
  http://www.usno.navy.mil/USNO/astronomical-applications/data-services/rs-one-year-us
 There it is produced in accordance with the algorithm described in the Meese's book, I think...
 Another source of data is http://www.timeanddate.com/worldclock/sunrise.html.
-
 
 ## Joda Time
 

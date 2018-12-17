@@ -48,6 +48,7 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
     val with1: Seq[Numbered] = addImplied1(aliyotRaw, span, chapters)
     val spans: Seq[Numbered] = WithNumber.checkNumber(with1, number.getOrElse(with1.length), "span")
     val result: Seq[Span] = setImpliedTo(WithNumber.dropNumbers(spans), span, chapters)
+    require(bookSpan.book.chapters.consecutive(result))
     Torah(result.map(inBook(bookSpan.book, _)))
   }
 
