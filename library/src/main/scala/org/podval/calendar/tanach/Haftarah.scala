@@ -46,13 +46,14 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
       if (partElements.isEmpty && customElements.isEmpty) Some(oneSpan(span)) else
       if (partElements.isEmpty) None else Some(parseParts(partElements, span))
 
-    val customs: Custom.Sets[Haftarah] = customElements.map(parseCustom(span)).toMap
+    val customs: Custom.Of[Haftarah] = Custom.Of(customElements.map(parseCustom(span)), full = false)
 
-    val result: Custom.Sets[Haftarah] = common.fold(customs) { common =>
-      customs.updated(Set[Custom](Custom.Common), common)
+    val result = common.fold(customs.customs) { common =>
+      require(customs.find(Custom.Common).isEmpty)
+      customs.customs.updated(Custom.Common, common)
     }
 
-    Custom.Of(result, full)
+    new Custom.Of(result, full = full)
   }
 
   private def parseCustom(ancestorSpan: BookSpanParsed)(element: Elem): (Set[Custom], Haftarah) = {
