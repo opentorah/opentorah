@@ -4,7 +4,7 @@ import org.podval.judaica.util.Util
 
 import scala.xml.Elem
 
-final class Names(val names: Seq[Name]) extends HasName {
+final class Names(val names: Seq[Name]) extends HasName with LanguageString {
   Util.checkNoDuplicates(names.map(_.name), "names")
   // There may be multiple names for the same language (for an example, see Language),
   // so this check is disabled:
@@ -25,7 +25,7 @@ final class Names(val names: Seq[Name]) extends HasName {
       .orElse(find(spec.dropFlavour.dropIsTransliterated.dropLanguage))
       .get
 
-  override def toString: String = names.mkString("Names(", ", ", ")")
+  def toLanguageString(implicit spec: LanguageSpec): String = doFind(spec).name.toString
 
   def isDisjoint(other: Names): Boolean = names.forall(name => !other.hasName(name.name))
 

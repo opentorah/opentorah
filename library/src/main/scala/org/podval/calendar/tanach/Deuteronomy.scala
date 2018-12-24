@@ -2,7 +2,6 @@ package org.podval.calendar.tanach
 
 import org.podval.judaica.tanach.Torah
 import org.podval.judaica.tanach.Torah.Maftir
-import org.podval.judaica.tanach.Parsha
 
 object Deuteronomy extends TorahReadings {
   val tishaBeAvTorah: Torah = parseTorah(
@@ -28,6 +27,4 @@ object Deuteronomy extends TorahReadings {
 
   val parshasZachorMaftir: Maftir = parseMaftir(
       <maftir book="Deuteronomy" fromChapter="25" fromVerse="17" toVerse="19"/>)
-
-  val zosHaberacha: Torah = Parsha.VezosHaberachah.days.common
 }

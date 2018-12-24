@@ -108,8 +108,7 @@ object Schedule {
 
   private def createBuilder(from: Day, to: Day, inHolyLand: Boolean): Builder = {
     val fromYear: Year = if (ShabbosBereishis.date(from.year) <= from) from.year else from.year - 1
-    val toYear: Year = /* we need WeeklyReading after 'to' if (to < ShabbosBereishis.date(to.year)) to.year else */
-      to.year + 1
+    val toYear: Year = to.year + 1
     val years: Seq[Year] = Util.unfoldSimple[Year](fromYear, _ + 1, _ <= toYear)
 
     val yearsData: Seq[YearData] = years.map { year => YearData(
@@ -142,10 +141,12 @@ object Schedule {
       }
     }
 
-    def filter[T](data: Seq[Set[(Day, T)]]): Map[Day, T] = {
-      val result = data.head.filter(from <= _._1) +: data.tail.init :+ data.last.filter(_._1 <= to)
-      result.flatten.toMap
-    }
+    def filterFirst[T](data: Set[(Day, T)]): Set[(Day, T)] = data.filter(from <= _._1)
+    def filterLast[T](data: Set[(Day, T)], to: Day): Set[(Day, T)] = data.filter(_._1 <= to)
+    def filter[T](data: Seq[Set[(Day, T)]], to: Day): Map[Day, T] =
+      (filterFirst(data.head) +: data.tail.init :+ filterLast(data.last, to)).flatten.toMap
+    def filterDates[T <: SpecialDay.Date](dates: Set[T]): Map[Day, T] =
+      filter(years.map(year => dates.map(day => day.correctedDate(year) -> day)), to)
 
     Builder(
       from = from,
@@ -153,11 +154,9 @@ object Schedule {
       inHolyLand = inHolyLand,
       weeklyReadings = weeklyReadings.toMap,
       weeklyReadingsList = weeklyReadings :+ extraWeeklyReading,
-      festivals = filter(yearsData.map(_.festivals)),
-      daysWithSpecialReadingsNotFestivals = filter(years.map(year =>
-        SpecialDay.daysWithSpecialReadingsNotFestivals.map(day => day.correctedDate(year) -> day))),
-      specialShabboses = filter(years.map(year =>
-        SpecialDay.specialShabbos.map(day => day.correctedDate(year) -> day)))
+      festivals = filter(yearsData.map(_.festivals), to+7), // to get festivals for Tachanun and Motzoei Shabbos
+      daysWithSpecialReadingsNotFestivals = filterDates(SpecialDay.daysWithSpecialReadingsNotFestivals),
+      specialShabboses = filterDates(SpecialDay.specialShabbos)
     )
   }
 

@@ -1,5 +1,7 @@
 package org.podval.judaica.tanach
 
+import org.podval.judaica.metadata.WithNames
+
 // Other than on Simchas Torah, aliyot are from the same book.
 final case class Torah private(override val spans: Seq[Torah.BookSpan])
   extends Torah.Spans(spans)
@@ -16,6 +18,13 @@ final case class Torah private(override val spans: Seq[Torah.BookSpan])
     val withDrop = spans.zipWithIndex.map { case (a, i) => (a, toDrop.contains(i+1)) }
     require(!withDrop.head._2)
     Torah(drop(withDrop))
+  }
+
+  def fromWithNumbers(source: WithNames): Torah = {
+    val newSpans = spans.zipWithIndex.map { case (aliyah, index) =>
+      aliyah.from(new WithNames.AndNumber(withNames = source, number = index+1))
+    }
+    Torah(newSpans)
   }
 
   def to6withLast(last: Torah.Aliyah): Torah = drop(Set(7)) :+ last
@@ -48,6 +57,7 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
     val with1: Seq[Numbered] = addImplied1(aliyotRaw, span, chapters)
     val spans: Seq[Numbered] = WithNumber.checkNumber(with1, number.getOrElse(with1.length), "span")
     val result: Seq[Span] = setImpliedTo(WithNumber.dropNumbers(spans), span, chapters)
+    require(bookSpan.book.chapters.consecutive(result))
     Torah(result.map(inBook(bookSpan.book, _)))
   }
 

@@ -9,6 +9,7 @@ import scala.xml.Elem
 final case class Haftarah private(override val spans: Seq[Haftarah.BookSpan])
   extends Haftarah.Spans(spans) with LanguageString
 {
+  // This ignores the sources that may be present on the spans
   override def toLanguageString(implicit spec: LanguageSpec): String = {
     Util.group(spans, (span: Haftarah.BookSpan) => span.book)
       .map { bookSpans =>

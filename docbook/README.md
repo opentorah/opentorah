@@ -44,7 +44,14 @@ FOP does not handle MathML; it needs jEuclid plugin
 net.sourceforge.jeuclid:jeuclid-core:3.1.9
 net.sourceforge.jeuclid:jeuclid-fop:3.1.9  (both seem to be available from the Maven repositories!)
 
-NO LONGOR SUPPORTED; DOESN"T WORK WITH Java 9
+NO LONGOR SUPPORTED; DOESN"T WORK WITH Java 9 (Link to the note from the author!)
+
+https://print-css.rocks/blog/2016-10-06/integrating-mathjax.html
+
+Look into:
+https://github.com/vivliostyle/vivliostyle.js
+https://sourceforge.net/projects/dblatex/
+
 
 ## TODO
 
