@@ -62,6 +62,9 @@ object Custom extends NamedCompanion {
     final def liftR[R](f: (Custom, T) => R): Of[R] =
       new Of[R](all.map { custom => custom -> f(custom, doFind(custom)) }.toMap)
 
+    final def map[R](f: T => R): Of[R] =
+      new Of[R](customs.mapValues(f))
+
     final def ++(other: Of[T]): Of[T] = new Of[T](customs ++ other.customs)
 
     final def *(other: Of[T]): Of[(T, Option[T])] =

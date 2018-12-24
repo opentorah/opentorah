@@ -113,14 +113,14 @@ final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) ext
   def getMorningReading: Reading = {
     val haftarahParsha = if (isCombined && (parsha != Mattos) && (parsha != Nitzavim)) secondParsha.get else parsha
     Reading(
-      torah = if (isCombined) parsha.daysCombined.get else parsha.days,
+      torah = (if (isCombined) parsha.daysCombined.get else parsha.days).map(_.fromWithNumbers(this)),
       maftir = (if (isCombined) secondParsha.get else parsha).maftir,
-      haftarah = Haftarah.forParsha(haftarahParsha),
-      names = Some(names)
+      haftarah = Haftarah.forParsha(haftarahParsha)
     )
   }
 
-  def getAfternoonReading: Reading = Reading(torah = parsha.aliyot, names)
+  def getAfternoonReading: Reading =
+    Reading(torah = parsha.aliyot.from(this))
 }
 
 object WeeklyReading {
