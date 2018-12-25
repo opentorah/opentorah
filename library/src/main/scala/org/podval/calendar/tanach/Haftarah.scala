@@ -23,7 +23,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
 
   override protected def getBook(name: String): Tanach.ProphetsBook = Tanach.getProhetForName(name)
 
-  final def forParsha(parsha: Parsha): Customs = haftarah(parsha)
+  final def forParsha(parsha: Parsha): Customs = haftarah(parsha).map(_.from(parsha))
 
   private lazy val haftarah: Map[Parsha, Customs] = Metadata.loadMetadata(
     keys = Parsha.values,

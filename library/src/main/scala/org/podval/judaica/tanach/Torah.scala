@@ -20,7 +20,13 @@ final case class Torah private(override val spans: Seq[Torah.BookSpan])
     Torah(drop(withDrop))
   }
 
-  def fromWithNumbers(source: WithNames): Torah = Torah(Torah.fromWithNumbers(spans, source))
+  def fromWithNumbers(source: WithNames): Torah =  {
+    val result = spans.zipWithIndex.map { case (aliyah, index) =>
+      aliyah.from(new Source.AndNumber(withNames = source, number = index + 1))
+    }
+
+    Torah(result)
+  }
 
   def to6withLast(last: Torah.Aliyah): Torah = drop(Set(7)) :+ last
 }
@@ -98,9 +104,4 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
 
     implied1 ++ spans
   }
-
-  private def fromWithNumbers(spans: Seq[Aliyah], source: WithNames): Seq[Aliyah] =
-    spans.zipWithIndex.map { case (aliyah, index) =>
-      aliyah.from(new Source.AndNumber(withNames = source, number = index+1))
-    }
 }

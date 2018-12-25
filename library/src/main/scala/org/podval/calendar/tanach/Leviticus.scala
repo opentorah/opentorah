@@ -1,10 +1,9 @@
 package org.podval.calendar.tanach
 
-import org.podval.judaica.metadata.WithNames
-import org.podval.judaica.tanach.Torah
+import scala.xml.Elem
 
-object Leviticus extends TorahReadings {
-  def yomKippurTorah(source: WithNames): (Torah, Torah) = parseTorahForShabbosAndWeekday(source, Set(2),
+object Leviticus {
+  val yomKippurTorah: Elem =
     <torah book="Leviticus" fromChapter="16" fromVerse="1" toVerse="34">
       <aliyah n="2" fromVerse="4"/>
       <aliyah n="3" fromVerse="7"/>
@@ -12,15 +11,15 @@ object Leviticus extends TorahReadings {
       <aliyah n="5" fromVerse="18"/>
       <aliyah n="6" fromVerse="25"/>
       <aliyah n="7" fromVerse="31"/>
-    </torah>)
+    </torah>
 
-  def yomKippurAfternoonTorah(source: WithNames): Torah = parseTorah(source,
+  val yomKippurAfternoonTorah: Elem =
     <torah book="Leviticus" fromChapter="18" fromVerse="1" toVerse="30">
       <aliyah n="2" fromVerse="6"/>
       <aliyah n="3" fromVerse="22"/>
-    </torah>)
+    </torah>
 
-  def succos1and2torah(source: WithNames): (Torah, Torah) = parseTorahForShabbosAndWeekday(source, 2, 4,
+  val succos1and2torah: Elem =
     <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44">
       <aliyah n="2" fromChapter="23" fromVerse="1"/>
       <aliyah n="3" fromChapter="23" fromVerse="4"/>
@@ -28,5 +27,5 @@ object Leviticus extends TorahReadings {
       <aliyah n="5" fromChapter="23" fromVerse="15"/>
       <aliyah n="6" fromChapter="23" fromVerse="23"/>
       <aliyah n="7" fromChapter="23" fromVerse="33"/>
-    </torah>)
+    </torah>
 }

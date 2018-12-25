@@ -5,34 +5,15 @@ import org.podval.judaica.tanach.{SpanParsed, Torah, WithNumber}
 
 import scala.xml.Elem
 
-trait TorahReadings {
-  protected final def parseTorahForShabbosAndWeekday(
-    source: WithNames,
-    drop1: Int,
-    drop2: Int,
-    element: Elem
-  ): (Torah, Torah) =
-    parseTorahForShabbosAndWeekday(source, Set(drop1, drop2), element)
-
-  protected final def parseTorahForShabbosAndWeekday(
-    source: WithNames,
-    toDrop: Set[Int],
-    element: Elem
-  ): (Torah, Torah) = {
-    val shabbosAliyot: Torah = parseTorah(source, element)
-    (shabbosAliyot, shabbosAliyot.drop(toDrop))
-  }
-
-  protected final def parseTorah(
-    source: WithNames,
-    element: Elem
-  ): Torah = {
+trait Parse { self: WithNames =>
+  final def parseTorah(element: Elem): Torah = {
     val (attributes: Attributes, elements: Seq[Elem]) = XML.open(element, "torah")
     val bookSpan: Torah.Fragment = Torah.parseSpan(attributes).resolve
     val fromChapter: Int = bookSpan.span.from.chapter
-    val result: Seq[Torah.Numbered] =
+    val spans: Seq[Torah.Numbered] =
       elements.map(element => XML.parseEmpty(element, "aliyah", parseNumbered(fromChapter)))
-    Torah.parseAliyot(bookSpan, result, number = None).fromWithNumbers(source)
+    val result: Torah = Torah.parseAliyot(bookSpan, spans, number = None)
+    result.fromWithNumbers(this)
   }
 
   private def parseNumbered(fromChapter: Int)(attributes: Attributes): Torah.Numbered = {
@@ -42,8 +23,14 @@ trait TorahReadings {
     result
   }
 
-  protected final def parseMaftir(element: Elem): Torah.Maftir = {
+  def parseMaftir(element: Elem): Torah.Maftir = {
     val attributes = XML.openEmpty(element, "maftir")
-    Torah.parseSpan(attributes).resolve
+    val result = Torah.parseSpan(attributes).resolve
+    result.from(this)
+  }
+
+  def parseHaftarah(element: Elem, full: Boolean = true): Haftarah.Customs = {
+    val result: Haftarah.Customs = Haftarah.parse(element, full = full)
+    result.map(_.from(this), full = full)
   }
 }
