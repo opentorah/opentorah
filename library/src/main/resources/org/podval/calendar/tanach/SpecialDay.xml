@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <names type="SpecialDay">
   <names>
+    <name lang="en" transliterated="yes" n="Festival End"/>
+    <name lang="he" n="--- TODO ---"/>
+    <name lang="ru" transliterated="yes" n="Конец праздника"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Intermediate Shabbos"/>
+    <name lang="he" n="שבת חול המועד"/>
+    <name lang="ru" transliterated="yes" n="Шабос Холь а-моэд"/>
+  </names>
+
+  <names>
     <name lang="en" transliterated="yes" n="Rosh Chodesh"/>
      <name lang="he" n="ראש חודש"/>
      <name lang="ru" n="Новомесячье"/>
@@ -10,6 +22,12 @@
     <name lang="en" transliterated="yes" n="Erev Rosh Chodesh"/>
      <name lang="he" n="ערב ראש חודש"/>
      <name lang="ru" n="Канун новомесячья"/>
+  </names>
+
+  <names>
+    <name lang="en" n="Public Fast"/>
+    <name lang="he" n="תענית"/>
+    <name lang="ru" n="Пост"/>
   </names>
 
   <names>

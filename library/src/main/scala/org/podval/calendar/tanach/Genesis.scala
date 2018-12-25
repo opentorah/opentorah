@@ -1,14 +1,15 @@
 package org.podval.calendar.tanach
 
+import org.podval.judaica.metadata.WithNames
 import org.podval.judaica.tanach.Torah
 
 object Genesis extends TorahReadings {
-  val chassanBereishis: Torah.Aliyah = parseTorah(
+  def chassanBereishis(source: WithNames): Torah.Aliyah = parseTorah(source,
     <torah book="Genesis" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3">
       <aliyah n="1" fromVerse="1"/>
     </torah>).spans.head
 
-  val roshHashana1torah: (Torah, Torah) = parseTorahForShabbosAndWeekday(3, 5,
+  def roshHashana1torah(source: WithNames): (Torah, Torah) = parseTorahForShabbosAndWeekday(source, 3, 5,
     <torah book="Genesis" fromChapter="21" fromVerse="1" toVerse="34">
       <aliyah n="2" fromVerse="5"/>
       <aliyah n="3" fromVerse="9"/>
@@ -18,7 +19,7 @@ object Genesis extends TorahReadings {
       <aliyah n="7" fromVerse="28"/>
     </torah>)
 
-  val roshHashanah2torah: Torah = parseTorah(
+  def roshHashanah2torah(source: WithNames): Torah = parseTorah(source,
     <torah book="Genesis" fromChapter="22" fromVerse="1" toVerse="24">
       <aliyah n="2" fromVerse="4"/>
       <aliyah n="3" fromVerse="9"/>

@@ -1,19 +1,17 @@
 package org.podval.calendar.tanach
 
+import org.podval.judaica.metadata.WithNames
 import org.podval.judaica.tanach.Torah
 import org.podval.judaica.tanach.Torah.Maftir
 
 object Numbers extends TorahReadings  {
-  private val chanukahFirst: Torah = parseTorah(
+  def chanukahFirst(source: WithNames): Torah = parseTorah(source,
     <torah book="Numbers" fromChapter="6" fromVerse="22" toChapter="7" toVerse="11">
       <aliyah n="2" fromChapter="7" fromVerse="1"/>
     </torah>
   )
 
-  val chanukahDay1CohenAshkenazAndChabad: Torah.Fragment = chanukahFirst.spans(1)
-  val chanukahDay1CohenSefard: Torah.Fragment = chanukahFirst.spans.head + chanukahDay1CohenAshkenazAndChabad
-
-  private val chanukahKorbanot: Seq[Torah.Fragment] = parseTorah(
+  def chanukahKorbanotSpans(source: WithNames): Seq[Torah.Fragment] = parseTorah(source,
     <torah book="Numbers" fromChapter="7" fromVerse="12" toChapter="8" toVerse="4">
       <aliyah n="1"  fromVerse="12"/>
       <aliyah n="2"  fromVerse="15"/>
@@ -34,11 +32,7 @@ object Numbers extends TorahReadings  {
       <aliyah n="17" fromVerse="60"/>
     </torah>).spans
 
-  def chanukahDayFirst(n: Int): Torah.Fragment = chanukahKorbanot(2*(n-1))
-  def chanukahDaySecond(n: Int): Torah.Fragment = chanukahKorbanot(2*(n-1)+1)
-  val zosChanukah: Torah.Fragment = chanukahKorbanot.last
-
-  val pesach6torah: Torah = parseTorah(
+  def pesach6torah(source: WithNames): Torah = parseTorah(source,
     <torah book="Numbers" fromChapter="9" fromVerse="1" toVerse="14">
       <aliyah n="2" fromVerse="7"/>
       <aliyah n="3" fromVerse="9"/>
@@ -47,7 +41,7 @@ object Numbers extends TorahReadings  {
   val parshasParahMaftir: Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="19" fromVerse="1" toVerse="22"/>)
 
-  val roshChodesh: Torah = parseTorah(
+  def roshChodesh(source: WithNames): Torah = parseTorah(source,
     <torah book="Numbers" fromChapter="28" fromVerse="1" toVerse="15">
       <aliyah n="2" fromVerse="3"/>
       <aliyah n="3" fromVerse="4"/>
@@ -72,7 +66,7 @@ object Numbers extends TorahReadings  {
   val yomKippurMaftir: Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="29" fromVerse="7" toVerse="11"/>)
 
-  private val succosKorbanotSpans: Seq[Torah.Aliyah] = parseTorah(
+  def succosKorbanotSpans(source: WithNames): Seq[Torah.Aliyah] = parseTorah(source,
     <torah book="Numbers" fromChapter="29" fromVerse="12" toChapter="30" toVerse="1">
       <aliyah n="2" fromVerse="17"/>
       <aliyah n="3" fromVerse="20"/>
@@ -82,9 +76,4 @@ object Numbers extends TorahReadings  {
       <aliyah n="7" fromVerse="32"/>
       <aliyah n="8" fromVerse="35"/>
     </torah>).spans
-
-  def succosKorbanot(n: Int): Torah.Aliyah = succosKorbanotSpans(n)
-
-  val succosMaftir: Maftir = succosKorbanotSpans.head
-  val sheminiAtzeresMaftir: Maftir = succosKorbanotSpans.last
 }
