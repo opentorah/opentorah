@@ -5,7 +5,7 @@ import org.podval.judaica.tanach.{SpanParsed, Torah, WithNumber}
 
 import scala.xml.Elem
 
-trait Parse { self: WithNames =>
+trait ParseTorahRaw { self: WithNames =>
   final def parseTorah(element: Elem): Torah = {
     val (attributes: Attributes, elements: Seq[Elem]) = XML.open(element, "torah")
     val bookSpan: Torah.Fragment = Torah.parseSpan(attributes).resolve
@@ -21,16 +21,5 @@ trait Parse { self: WithNames =>
       attributes => SpanParsed.parse(attributes).defaultFromChapter(fromChapter).semiResolve)
     require(result.what.to.isEmpty, s"Non-empty to: ${result.what}")
     result
-  }
-
-  def parseMaftir(element: Elem): Torah.Maftir = {
-    val attributes = XML.openEmpty(element, "maftir")
-    val result = Torah.parseSpan(attributes).resolve
-    result.from(this)
-  }
-
-  def parseHaftarah(element: Elem, full: Boolean = true): Haftarah.Customs = {
-    val result: Haftarah.Customs = Haftarah.parse(element, full = full)
-    result.map(_.from(this), full = full)
   }
 }

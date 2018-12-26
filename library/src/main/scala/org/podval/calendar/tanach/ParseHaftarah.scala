@@ -1,0 +1,11 @@
+package org.podval.calendar.tanach
+
+import org.podval.judaica.metadata.WithNames
+
+import scala.xml.Elem
+
+trait ParseHaftarah extends ParseHaftarahRaw { self: WithNames =>
+  final lazy val haftarah: Haftarah.Customs = parseHaftarah(haftarahElement)
+
+  protected def haftarahElement: Elem
+}

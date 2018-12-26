@@ -1,4 +1,4 @@
-package org.podval.calendar.tanach
+package org.podval.calendar.tanach.books
 
 import scala.xml.Elem
 
