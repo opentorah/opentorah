@@ -32,12 +32,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
     resourceName = Some("Haftarah")
   ).mapValues { metadata => parse(metadata.attributes, metadata.elements, full = true) }
 
-  def parse(element: Elem, full: Boolean): Customs = {
-    val (attributes, elements) = XML.open(element, "haftarah")
-    parse(attributes, elements, full = full)
-  }
-
-  private def parse(attributes: Attributes, elements: Seq[Elem], full: Boolean): Customs = {
+  def parse(attributes: Attributes, elements: Seq[Elem], full: Boolean): Customs = {
     val span: BookSpanParsed = parseSpan(attributes)
     val (partElements, customElements) = XML.span(elements, "part", "custom")
 

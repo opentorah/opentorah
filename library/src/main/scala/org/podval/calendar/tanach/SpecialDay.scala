@@ -276,8 +276,10 @@ object SpecialDay {
 
   sealed trait Fast extends Date with WeekdayReading with AfternoonReading {
     final override def afternoon: Reading = {
-      val torah = Fast.torah.fromWithNumbers(this)
-      val haftarah = afternoonHaftarah
+      val torah: Torah = Fast.torah.fromWithNumbers(this)
+      val haftarah: Haftarah.Customs =
+        afternoonHaftarahExceptions.fold(Fast.defaultAfternoonHaftarah) { afternoonHaftarahExceptions =>
+          Fast.defaultAfternoonHaftarah ++ afternoonHaftarahExceptions }
 
       new Reading(
         customs = haftarah.lift { case (_: Custom, haftarah: Option[Haftarah]) =>
@@ -290,10 +292,6 @@ object SpecialDay {
         }.customs
       )
     }
-
-    private def afternoonHaftarah: Haftarah.Customs =
-      afternoonHaftarahExceptions.fold(Fast.defaultAfternoonHaftarah) { afternoonHaftarahExceptions =>
-        Fast.defaultAfternoonHaftarah ++ afternoonHaftarahExceptions }
 
     protected val afternoonHaftarahExceptions: Option[Haftarah.Customs] = None
   }
