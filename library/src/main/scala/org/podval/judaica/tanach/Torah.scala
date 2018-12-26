@@ -20,11 +20,12 @@ final case class Torah private(override val spans: Seq[Torah.BookSpan])
     Torah(drop(withDrop))
   }
 
-  def fromWithNumbers(source: WithNames): Torah = {
-    val newSpans = spans.zipWithIndex.map { case (aliyah, index) =>
-      aliyah.from(new WithNames.AndNumber(withNames = source, number = index+1))
+  def fromWithNumbers(source: WithNames): Torah =  {
+    val result = spans.zipWithIndex.map { case (aliyah, index) =>
+      aliyah.from(new Source.AndNumber(withNames = source, number = index + 1))
     }
-    Torah(newSpans)
+
+    Torah(result)
   }
 
   def to6withLast(last: Torah.Aliyah): Torah = drop(Set(7)) :+ last
@@ -55,10 +56,11 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
     val span: Span = bookSpan.span
     val chapters: Chapters = bookSpan.book.chapters
     val with1: Seq[Numbered] = addImplied1(aliyotRaw, span, chapters)
-    val spans: Seq[Numbered] = WithNumber.checkNumber(with1, number.getOrElse(with1.length), "span")
-    val result: Seq[Span] = setImpliedTo(WithNumber.dropNumbers(spans), span, chapters)
-    require(bookSpan.book.chapters.consecutive(result))
-    Torah(result.map(inBook(bookSpan.book, _)))
+    val numberedSpans: Seq[Numbered] = WithNumber.checkNumber(with1, number.getOrElse(with1.length), "span")
+    val spans: Seq[Span] = setImpliedTo(WithNumber.dropNumbers(numberedSpans), span, chapters)
+    require(bookSpan.book.chapters.consecutive(spans))
+    val bookSpans: Seq[Aliyah] = spans.map(inBook(bookSpan.book, _))
+    Torah(bookSpans)
   }
 
   def inBook(book: Tanach.ChumashBook, span: Span): BookSpan = BookSpan(book, span)

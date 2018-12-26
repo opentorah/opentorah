@@ -1,31 +1,29 @@
 package org.podval.calendar.tanach
 
 import org.podval.judaica.tanach.{Custom, Parsha, Tanach, WithBookSpans, WithNumber}
-import org.podval.judaica.metadata.{Attributes, LanguageSpec, LanguageString, Metadata, XML}
+import org.podval.judaica.metadata.{Attributes, LanguageSpec, Metadata, XML}
 import org.podval.judaica.util.Util
 
 import scala.xml.Elem
 
 final case class Haftarah private(override val spans: Seq[Haftarah.BookSpan])
-  extends Haftarah.Spans(spans) with LanguageString
-{
-  // This ignores the sources that may be present on the spans
-  override def toLanguageString(implicit spec: LanguageSpec): String = {
-    Util.group(spans, (span: Haftarah.BookSpan) => span.book)
-      .map { bookSpans =>
-        bookSpans.head.book.toLanguageString + " " + bookSpans.map(_.span.toLanguageString).mkString(", ")
-      }.mkString("; ")
-  }
-}
+  extends Haftarah.Spans(spans)
 
 object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
   override type Many = Haftarah
 
   override def apply(spans: Seq[BookSpan]): Haftarah = new Haftarah(spans)
 
+  def toLanguageString(spans: Seq[BookSpan])(implicit spec: LanguageSpec): String = {
+    Util.group(spans, (span: BookSpan) => span.book)
+      .map { bookSpans =>
+        bookSpans.head.book.toLanguageString + " " + bookSpans.map(_.span.toLanguageString).mkString(", ")
+      }.mkString("; ")
+  }
+
   override protected def getBook(name: String): Tanach.ProphetsBook = Tanach.getProhetForName(name)
 
-  final def forParsha(parsha: Parsha): Customs = haftarah(parsha)
+  final def forParsha(parsha: Parsha): Customs = haftarah(parsha).map(_.from(parsha))
 
   private lazy val haftarah: Map[Parsha, Customs] = Metadata.loadMetadata(
     keys = Parsha.values,

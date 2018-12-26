@@ -28,10 +28,7 @@ trait WithBookSpans[Book <: Tanach.TanachBook] {
 
     def +(next: BookSpan): BookSpan = merge(Seq(this, next))
 
-    def from(source: WithNames): BookSpan = {
-      require(this.source.isEmpty)
-      new BookSpan(book, span, Some(source))
-    }
+    def from(source: WithNames): BookSpan = new BookSpan(book, span, Some(source))
 
     override def hashCode(): Int = book.hashCode()*37 + span.hashCode() + 73
 

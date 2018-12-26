@@ -12,9 +12,10 @@ import org.http4s.server.middleware.AutoSlash
 import org.podval.calendar.dates.{Calendar, DayBase, MonthBase, YearBase}
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.Jewish
-import org.podval.calendar.tanach.{Chitas, Reading, Schedule, Haftarah}
+import org.podval.calendar.tanach.{Chitas, Haftarah, Reading, Schedule}
 import org.podval.judaica.metadata.{Language, LanguageSpec, WithNames}
 import org.podval.judaica.tanach.{Custom, Torah}
+import org.podval.judaica.util.Util
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scalatags.Text.TypedTag
@@ -303,10 +304,10 @@ object CalendarService extends StreamApp[IO] {
     def renderFragment(fragment: Torah.Fragment) =
       Seq(td(span(fragment.toLanguageString)), td(renderSource(fragment.source)))
 
-    table(
+    table(tbody(
       tr(renderFragment(chitas.first)) +:
       chitas.second.fold(Seq.empty[TypedTag[String]])(fragment => Seq(tr(renderFragment(fragment))))
-    )
+    ))
   }
 
   private def renderOptionalReading(
@@ -354,10 +355,14 @@ object CalendarService extends StreamApp[IO] {
 
   private def renderHaftarah(haftarah: Option[Haftarah])
     (implicit spec: LanguageSpec): Seq[TypedTag[String]] =
-    haftarah.fold(Seq(tr(td("None")))) { _.spans map { fragment => tr(
-      td(fragment.toLanguageString),
-      td(renderSource(fragment.source))
-    )}}
+    haftarah.fold(Seq(tr(td("None")))){ haftarah =>
+      val spans = haftarah.spans
+      val parts: Seq[Seq[Haftarah.BookSpan]] =
+        Util.group[Haftarah.BookSpan, Option[WithNames]](spans, span => span.source)
+      parts map { part: Seq[Haftarah.BookSpan] => tr(
+        td(Haftarah.toLanguageString(part)),
+        td(renderSource(part.head.source))
+      )}}
 
   private def renderMaftirAndHaftarah(maftirAndHaftarah: Option[Reading.MaftirAndHaftarah])
     (implicit spec: LanguageSpec): Seq[TypedTag[String]] =
@@ -376,9 +381,7 @@ object CalendarService extends StreamApp[IO] {
     customs.customs.toSeq.map { case (custom: Custom, value: T) =>
       table(cls := "custom")(
         caption(custom.toLanguageString),
-        tbody(
-          renderer(value)
-        )
+        tbody(renderer(value))
       )
     }
 
