@@ -366,7 +366,7 @@ object CalendarService extends StreamApp[IO] {
 
   private def renderMaftirAndHaftarah(maftirAndHaftarah: Option[Reading.MaftirAndHaftarah])
     (implicit spec: LanguageSpec): Seq[TypedTag[String]] =
-    renderMaftir(maftirAndHaftarah.map(_.maftir)) ++
+    renderMaftir(maftirAndHaftarah.flatMap(_.maftir)) ++
     renderHaftarah(maftirAndHaftarah.map(_.haftarah))
 
   private def renderSource(source: Option[WithNames])(implicit spec: LanguageSpec): String =
