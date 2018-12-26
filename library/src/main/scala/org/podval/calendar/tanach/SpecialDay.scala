@@ -450,6 +450,7 @@ object SpecialDay {
         today
       )
       val sefard: Aliyah = today
+
       Reading(
         Custom.Ashkenaz -> ashkenazAndChabad,
         Custom.Chabad -> ashkenazAndChabad,
@@ -738,11 +739,8 @@ object SpecialDay {
         haftarah = ParshasZachor.haftarah)
     }
 
-    private val shushanPurimShabbosMaftir: Torah.Aliyah = {
-      // TODO use merge instead:
-      val spans = Purim.torah.spans
-      spans.head+spans(1)+spans(2)
-    }
+    private val shushanPurimShabbosMaftir: Torah.Aliyah =
+      Torah.merge(Purim.torah.spans.take(3)).from(this)
   }
 
   case object Pesach extends LoadNames("Pesach") with Festival with FirstDayOf
@@ -806,7 +804,6 @@ object SpecialDay {
       case 6 => day6
     }
 
-    // TODO add numbers to names (AndNumber)?
     private val day2: Torah = Pesach2.torah.drop(Set(4, 5))
     private val day3: Torah = parseTorah(Exodus.pesach3torah)
     private val day4: Torah = parseTorah(Exodus.pesach4torah)
