@@ -26,6 +26,12 @@ as described by Rambam in the Laws of the Sanctification of the Moon, in Chapter
 - [ ] translate relevant chapters into English
 - [ ] calculate halachic times (zmanim)
 
+## Availability
+
+https://github.com/jewish-calendar/calendar/commits/master
+
+https://jcenter.bintray.com/org/podval/calendar/org.podval.calendar-library/
+
 ## Credits
 
 I want to acknowledge people who contributed to the content of this work - and to the fact of its existence ;)
