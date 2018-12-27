@@ -2,31 +2,41 @@
 <structure>
   <part chapters="3">
     <names>
+      <name lang="he" n="הקדמת הרמב״ם ז״ל"/>
       <name lang="ru">Предисловие автора</name>
       <name lang="en">Introduction by Rambam OBM</name>
     </names>
+    <!-- TODO "named" chapters -->
   </part>
   <part chapters="3">
     <names>
+      <name lang="he" n="מצות עשה"/>
+      <name lang="en">List of positive commandments</name>
       <name lang="ru">Список повелевающих заповедей</name>
     </names>
+    <!-- TODO "named" chapters -->
   </part>
   <part chapters="3">
     <names>
+      <name lang="he" n="מצות לא תעשה"/>
+      <name lang="en">List of negative commandments</name>
       <name lang="ru">Список запрещающих заповедей</name>
     </names>
+    <!-- TODO "named" chapters -->
   </part>
   <part chapters="3">
     <names>
+      <name lang="he" n="כותרות"/>
+      <name lang="en">Contents</name>
       <name lang="ru">Оглавление</name>
     </names>
+    <!-- TODO "named" chapters -->
   </part>
 
   <book n="1">
     <names>
       <name lang="he" n="ספר המדע"/>
       <name lang="ru" n="Знания"/>
-      <name lang="ru" n="Мада" transliterated="yes"/>
       <name lang="en" n="The Book of Knowledge"/>
       <name lang="en" n="Sefer Madda" transliterated="yes"/>
     </names>
@@ -34,8 +44,7 @@
       <names>
         <name lang="he" n="הלכות יסודי התורה"/>
         <name lang="ru" n="Законы основ Торы"/>
-        <name lang="ru" n="" transliterated="yes"/>
-        <name lang="en" n="belief in G-d and other principles of faith"/>
+        <name lang="en" n="foundations of Torah"/>
         <name lang="en" n="Yesodei haTorah" transliterated="yes"/>
       </names>
     </part>
@@ -43,7 +52,6 @@
       <names>
         <name lang="he" n="הלכות דעות"/>
         <name lang="ru" n="Законы об образе жизни"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="general proper behavior"/>
         <name lang="en" n="De'ot" transliterated="yes"/>
       </names>
@@ -52,7 +60,6 @@
       <names>
         <name lang="he" n="הלכות תלמוד תורה"/>
         <name lang="ru" n="Законы изучения Торы"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="Torah study"/>
         <name lang="en" n="Talmud Torah" transliterated="yes"/>
       </names>
@@ -61,7 +68,6 @@
       <names>
         <name lang="he" n="הלכות עבודה זרה וחוקות הגויים"/>
         <name lang="ru" n="Законы об идолопоклонстве и нееврейских обычаях"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="idolatry and foreign worship"/>
         <name lang="en" n="Avodah Zarah" transliterated="yes"/>
       </names>
@@ -70,7 +76,6 @@
       <names>
         <name lang="he" n="הלכות תשובה"/>
         <name lang="ru" n="Законы о раскаянии"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="repentance"/>
         <name lang="en" n="Teshuvah" transliterated="yes"/>
       </names>
@@ -81,7 +86,6 @@
     <names>
       <name lang="he" n="ספר אהבה"/>
       <name lang="ru" n="Любовь"/>
-      <name lang="ru" n="" transliterated="yes"/>
       <name lang="en" n="The Book of the Love of G-d"/>
       <name lang="en" n="Sefer Ahavah" transliterated="yes"/>
     </names>
@@ -89,7 +93,6 @@
       <names>
         <name lang="he" n="הלכות קריאת שמע"/>
         <name lang="ru" n="Законы чтения «Шма, Исраэль...»"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="recitation of the Shema"/>
         <name lang="en" n="Kri'at Shema" transliterated="yes"/>
       </names>
@@ -98,7 +101,6 @@
       <names>
         <name lang="he" n="הלכות תפילה וברכת כהנים"/>
         <name lang="ru" n="Законы молитвы и благословения коэнов"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="prayer and the priestly blessing"/>
         <name lang="en" n="Tefilah and Birkat Kohanim" transliterated="yes"/>
       </names>
@@ -107,7 +109,6 @@
       <names>
         <name lang="he" n="הלכות תפילין מזוזה וספר תורה"/>
         <name lang="ru" n="Законы о тфиллин, мезузе и свитке Торы"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="Tefillin, Mezuzah, and Sefer Torah"/>
         <name lang="en" n="" transliterated="yes"/>
       </names>
@@ -116,7 +117,6 @@
       <names>
         <name lang="he" n="הלכות ציצית"/>
         <name lang="ru" n="Законы о цицит"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="fringes"/>
         <name lang="en" n="Tzitzit" transliterated="yes"/>
       </names>
@@ -125,7 +125,6 @@
       <names>
         <name lang="he" n="הלכות ברכות"/>
         <name lang="ru" n="Законы о благословениях"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="blessings"/>
         <name lang="en" n="Berachot" transliterated="yes"/>
       </names>
@@ -134,26 +133,26 @@
       <names>
         <name lang="he" n="הלכות מילה"/>
         <name lang="ru" n="Законы обрезания"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="circumcision"/>
         <name lang="en" n="Milah" transliterated="yes"/>
       </names>
     </part>
-    <part n="7" chapters="4">
+    <part n="7" chapters="5">
       <!--
          Order of Prayer for the Entire Year
-         Text of the Blessings of Shemoneh Esreh
-         Text of all the Intermediate Blessings
-         Text of the Confession
-         Text of the Grace After Meals
+           Unnamed
+           Blessings of Shemoneh Esreh; Kaddish
+           Intermediate Blessings
+           Confession
+           Grace After Meals
        -->
       <names>
-        <name lang="he" n="סדר התפילה"/>
+        <name lang="he" n="סדר תפילות כל השנה"/>
         <name lang="ru" n="Порядок молитвы"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="Order of Prayers"/>
         <name lang="en" n="Seder Tefilot" transliterated="yes"/>
       </names>
+      <!-- TODO "named" chapters -->
     </part>
   </book>
 
@@ -161,7 +160,6 @@
     <names>
       <name lang="he" n="ספר זמנים"/>
       <name lang="ru" n="Времена"/>
-      <name lang="ru" n="" transliterated="yes"/>
       <name lang="en" n="The Book of Times"/>
       <name lang="en" n="Zemanim" transliterated="yes"/>
     </names>
@@ -169,7 +167,6 @@
       <names>
         <name lang="he" n="הלכות שבת"/>
         <name lang="ru" n="Законы субботы"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="Sabbath"/>
         <name lang="en" n="Shabbat" transliterated="yes"/>
       </names>
@@ -178,7 +175,6 @@
       <names>
         <name lang="he" n="הלכות ערובין"/>
         <name lang="ru" n="Законы эрува"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n=""/>
         <name lang="en" n="Eruvin" transliterated="yes"/>
       </names>
@@ -187,7 +183,6 @@
       <names>
         <name lang="he" n="הלכות שביתת עשור"/>
         <name lang="ru" n="Законы Дня Искупления"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="Yom Kippur"/>
         <name lang="en" n="Shevitat Asor" transliterated="yes"/>
       </names>
@@ -196,7 +191,6 @@
       <names>
         <name lang="he" n="הלכות שביתת יום טוב"/>
         <name lang="ru" n="Законы праздников"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="festivals"/>
         <name lang="en" n="Shevitat Yom Tov" transliterated="yes"/>
       </names>
@@ -205,7 +199,6 @@
       <names>
         <name lang="he" n="הלכות חמץ ומצה"/>
         <name lang="ru" n="Законы квасного и мацы"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="Passover"/>
         <name lang="en" n="Chametz u'Matza" transliterated="yes"/>
       </names>
@@ -214,7 +207,6 @@
       <names>
         <name lang="he" n="הלכות שופר סוכה ולולב"/>
         <name lang="ru" n="Законы шофара, сукки и лулава"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="Rosh Hashanah and Sukkot"/>
         <name lang="en" n="Shofar, Sukkah v'Lulav" transliterated="yes"/>
       </names>
@@ -223,7 +215,6 @@
       <names>
         <name lang="he" n="הלכות שקלים"/>
         <name lang="ru" n="Законы полушекеля"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="money collected for the Temple in Jerusalem"/>
         <name lang="en" n="Shekalim" transliterated="yes"/>
       </names>
@@ -232,7 +223,6 @@
       <names>
         <name lang="he" n="הלכות קידוש החודש"/>
         <name lang="ru" n="Законы освящения нового месяца"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="sanctification of the month"/>
         <name lang="en" n="Kiddush haChodesh" transliterated="yes"/>
       </names>
@@ -241,7 +231,6 @@
       <names>
         <name lang="he" n="הלכות תעניות"/>
         <name lang="ru" n="Законы постов"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="fasts"/>
         <name lang="en" n="Ta'aniyot" transliterated="yes"/>
       </names>
@@ -250,7 +239,6 @@
       <names>
         <name lang="he" n="הלכות מגילה וחנוכה"/>
         <name lang="ru" n="Законы о Свитке Эстер и Хануке"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="Purim and Chanukah"/>
         <name lang="en" n="Megillah vChanukah" transliterated="yes"/>
       </names>
@@ -261,7 +249,6 @@
     <names>
       <name lang="he" n="ספר נשים"/>
       <name lang="ru" n="Женщины"/>
-      <name lang="ru" n="" transliterated="yes"/>
       <name lang="en" n="The Book of Women"/>
       <name lang="en" n="Nashim" transliterated="yes"/>
     </names>
@@ -269,7 +256,6 @@
       <names>
         <name lang="he" n="הלכות אישות"/>
         <name lang="ru" n="Законы брака"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="marriage"/>
         <name lang="en" n="Ishut" transliterated="yes"/>
       </names>
@@ -278,7 +264,6 @@
       <names>
         <name lang="he" n="הלכות גירושין"/>
         <name lang="ru" n="Законы развода"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="divorce"/>
         <name lang="en" n="Gerushin" transliterated="yes"/>
       </names>
@@ -287,7 +272,6 @@
       <names>
         <name lang="he" n="הלכות ייבום וחליצה"/>
         <name lang="ru" n="Законы левиратных брака и развода"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="levirate marriage"/>
         <name lang="en" n="Yibbum vChalitzah" transliterated="yes"/>
       </names>
@@ -296,7 +280,6 @@
       <names>
         <name lang="he" n="הלכות נערה בתולה"/>
         <name lang="ru" n="Законы об обрученной девственнице"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="unmarried woman"/>
         <name lang="en" n="Na'arah Betulah" transliterated="yes"/>
       </names>
@@ -305,7 +288,6 @@
       <names>
         <name lang="he" n="הלכות שׂוטה"/>
         <name lang="ru" n="Законы о подозреваемой в неверности"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="woman suspected of infidelity"/>
         <name lang="en" n="Sotah" transliterated="yes"/>
       </names>
@@ -316,7 +298,6 @@
     <names>
       <name lang="he" n="ספר קדושה"/>
       <name lang="ru" n="Святость"/>
-      <name lang="ru" n="" transliterated="yes"/>
       <name lang="en" n="The Book of Holiness"/>
       <name lang="en" n="Kedushah" transliterated="yes"/>
     </names>
@@ -324,7 +305,6 @@
       <names>
         <name lang="he" n="הלכות איסורי ביאה"/>
         <name lang="ru" n="Законы запрещенных половых связей"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="forbidden sexual relations"/>
         <name lang="en" n="Issurei Biah" transliterated="yes"/>
       </names>
@@ -333,7 +313,6 @@
       <names>
         <name lang="he" n="הלכות מאכלות אסורות"/>
         <name lang="ru" n="Законы запрещенной пищи"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="forbidden foods"/>
         <name lang="en" n="Ma'achalot Assurot" transliterated="yes"/>
       </names>
@@ -342,7 +321,6 @@
       <names>
         <name lang="he" n="הלכות שחיטה"/>
         <name lang="ru" n="Законы ритуального убоя скота и птицы"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="slaughter"/>
         <name lang="en" n="Shechitah" transliterated="yes"/>
       </names>
@@ -353,7 +331,6 @@
     <names>
       <name lang="he" n="ספר הפלאה"/>
       <name lang="ru" n="Обязательства"/>
-      <name lang="ru" n="" transliterated="yes"/>
       <name lang="en" n="The Book of Promises"/>
       <name lang="en" n="Hafla'ah" transliterated="yes"/>
     </names>
@@ -361,7 +338,6 @@
       <names>
         <name lang="he" n="הלכות שבועות"/>
         <name lang="ru" n="Законы клятв"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="oaths"/>
         <name lang="en" n="Shvuot" transliterated="yes"/>
       </names>
@@ -370,7 +346,6 @@
       <names>
         <name lang="he" n="הלכות נדרים"/>
         <name lang="ru" n="Законы обетов"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="vows"/>
         <name lang="en" n="Nedarim" transliterated="yes"/>
       </names>
@@ -379,7 +354,6 @@
       <names>
         <name lang="he" n="הלכות נזירות"/>
         <name lang="ru" n="Законы назореев"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="Nazirites"/>
         <name lang="en" n="Nezirut" transliterated="yes"/>
       </names>
@@ -388,7 +362,6 @@
       <names>
         <name lang="he" n="הלכות ערכים וחרמים"/>
         <name lang="ru" n="Законы об оценивании и отрешенном имуществе"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="donations to the temple"/>
         <name lang="en" n="Arachim vaCharamim" transliterated="yes"/>
       </names>
@@ -399,7 +372,6 @@
     <names>
       <name lang="he" n="ספר זרעים"/>
       <name lang="ru" n="Семена"/>
-      <name lang="ru" n="" transliterated="yes"/>
       <name lang="en" n="The Book of Seeds"/>
       <name lang="en" n="Zeraim" transliterated="yes"/>
     </names>
@@ -407,7 +379,6 @@
       <names>
         <name lang="he" n="הלכות כלאיים"/>
         <name lang="ru" n="Законы о запрете смешанния видов"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="forbidden mixtures"/>
         <name lang="en" n="Kilayim" transliterated="yes"/>
       </names>
@@ -416,7 +387,6 @@
       <names>
         <name lang="he" n="הלכות מתנות עניים"/>
         <name lang="ru" n="Законы пожертвований бедным"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="obligatory gifts to the poor"/>
         <name lang="en" n="Matnot Aniyim" transliterated="yes"/>
       </names>
@@ -425,7 +395,6 @@
       <names>
         <name lang="he" n="15"/>
         <name lang="ru" n="Законы возношения"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="obligatory gifts to the priests"/>
         <name lang="en" n="Terumot" transliterated="yes"/>
       </names>
@@ -434,7 +403,6 @@
       <names>
         <name lang="he" n="הלכות מעשרות"/>
         <name lang="ru" n="Законы десятины"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="tithes"/>
         <name lang="en" n="Maasrot" transliterated="yes"/>
       </names>
@@ -443,7 +411,6 @@
       <names>
         <name lang="he" n="הלכות מעשר שני ונטע רבעי"/>
         <name lang="ru" n="Законы второй десятины и плодов четвертого года"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="secondary tithes"/>
         <name lang="en" n="Maaser Sheini" transliterated="yes"/>
       </names>
@@ -452,7 +419,6 @@
       <names>
         <name lang="he" n="הלכות ביכורים ושאר מתנות כהונה שבגבולין"/>
         <name lang="ru" n="Законы приношения первых плодов урожая"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="first fruit offerings"/>
         <name lang="en" n="Bikkurim" transliterated="yes"/>
       </names>
@@ -461,7 +427,6 @@
       <names>
         <name lang="he" n="הלכות שמיטה ויובל"/>
         <name lang="ru" n="Законы субботнего и юбилейного годов"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="sabbatical year"/>
         <name lang="en" n="Shemitah" transliterated="yes"/>
       </names>
@@ -472,7 +437,6 @@
     <names>
       <name lang="he" n="ספר עבודה"/>
       <name lang="ru" n="Служение"/>
-      <name lang="ru" n="" transliterated="yes"/>
       <name lang="en" n="The Book of Service"/>
       <name lang="en" n="Avodah" transliterated="yes"/>
     </names>
@@ -480,7 +444,6 @@
       <names>
         <name lang="he" n="הלכות בית הבחירה"/>
         <name lang="ru" n="Законы о Храме"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="G-d's chosen house"/>
         <name lang="en" n="Beit HaBechirah" transliterated="yes"/>
       </names>
@@ -489,7 +452,6 @@
       <names>
         <name lang="he" n="הלכות כלי המקדש והעובדים בו"/>
         <name lang="ru" n="Законы храмовой утвари и служения в Храме"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="temple utensils and those who serve within"/>
         <name lang="en" n="Klei HaMikdash" transliterated="yes"/>
       </names>
@@ -498,7 +460,6 @@
       <names>
         <name lang="he" n="הלכות ביאת המקדש"/>
         <name lang="ru" n="Законы о приходе в Храм"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="entry to the sanctuary"/>
         <name lang="en" n="Biat HaMikdash" transliterated="yes"/>
       </names>
@@ -507,7 +468,6 @@
       <names>
         <name lang="he" n="הלכות איסורי מזבח"/>
         <name lang="ru" n="Законы о животных, запрещенных для жертвоприношений"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="entities prohibited to be offered on the altar"/>
         <name lang="en" n="Issurei Mizbeiach" transliterated="yes"/>
       </names>
@@ -516,7 +476,6 @@
       <names>
         <name lang="he" n="הלכות מעשה הקרבנות"/>
         <name lang="ru" n="Законы принесения жертвоприношений"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="sacrificial procedures"/>
         <name lang="en" n="Maaseh HaKorbanot" transliterated="yes"/>
       </names>
@@ -525,7 +484,6 @@
       <names>
         <name lang="he" n="הלכות תמידין ומוספין"/>
         <name lang="ru" n="Законы ежедневных и дополнительных жертвоприношений"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="continual and additional offerings"/>
         <name lang="en" n="Temidim uMusafim" transliterated="yes"/>
       </names>
@@ -534,7 +492,6 @@
       <names>
         <name lang="he" n="הלכות פסולי המוקדשין"/>
         <name lang="ru" n="Законы о жертвоприношениях, непригодных для еды"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="consecrated entities that have been disqualified"/>
         <name lang="en" n="Pesulei HaMukdashim" transliterated="yes"/>
       </names>
@@ -543,7 +500,6 @@
       <names>
         <name lang="he" n="הלכות עבודת יום הכיפורים"/>
         <name lang="ru" n="Законы храмовой службы в День Искупления"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="Yom Kippur service"/>
         <name lang="en" n="Avodat Yom HaKippurim" transliterated="yes"/>
       </names>
@@ -552,7 +508,6 @@
       <names>
         <name lang="he" n="הלכות מעילה"/>
         <name lang="ru" n="Законы использования имущества, посвященного Храму"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="misappropriation of consecrated property"/>
         <name lang="en" n="Me'ilah" transliterated="yes"/>
       </names>
@@ -563,7 +518,6 @@
     <names>
       <name lang="he" n="ספר קרבנות"/>
       <name lang="ru" n="Жертвоприношения"/>
-      <name lang="ru" n="" transliterated="yes"/>
       <name lang="en" n="The Book of Sacrifices"/>
       <name lang="en" n="Korbanot" transliterated="yes"/>
     </names>
@@ -571,7 +525,6 @@
       <names>
         <name lang="he" n="הלכות קרבן פסח"/>
         <name lang="ru" n="Законы пасхальной жертвы"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="Passover offering"/>
         <name lang="en" n="Korban Pesach" transliterated="yes"/>
       </names>
@@ -580,7 +533,6 @@
       <names>
         <name lang="he" n="הלכות חגיגה"/>
         <name lang="ru" n="Законы праздничной жертвы"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="festival offering"/>
         <name lang="en" n="Chagigah" transliterated="yes"/>
       </names>
@@ -589,7 +541,6 @@
       <names>
         <name lang="he" n="הלכות בכורות"/>
         <name lang="ru" n="Законы о первенцах животных"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="first-born children"/>
         <name lang="en" n="Bechorot" transliterated="yes"/>
       </names>
@@ -598,7 +549,6 @@
       <names>
         <name lang="he" n="הלכות שגגות"/>
         <name lang="ru" n="Законы о жертве за непреднамеренный грех"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="offerings for unintentional transgressions"/>
         <name lang="en" n="Shegagot" transliterated="yes"/>
       </names>
@@ -607,7 +557,6 @@
       <names>
         <name lang="he" n="הלכות מחוסרי כפרה"/>
         <name lang="ru" n="Законы о человеке, который не получил искупления"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="offerings for those with incomplete atonement"/>
         <name lang="en" n="Mechussarey Kapparah" transliterated="yes"/>
       </names>
@@ -616,7 +565,6 @@
       <names>
         <name lang="he" n="הלכות תמורה"/>
         <name lang="ru" n="Законы о замене животного, приносимого в жертву"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="substitution"/>
         <name lang="en" n="Temurah" transliterated="yes"/>
       </names>
@@ -627,7 +575,6 @@
     <names>
       <name lang="he" n="ספר טהרה"/>
       <name lang="ru" n="Чистота"/>
-      <name lang="ru" n="" transliterated="yes"/>
       <name lang="en" n="The Book of Ritual Purity"/>
       <name lang="en" n="Taharah" transliterated="yes"/>
     </names>
@@ -635,7 +582,6 @@
       <names>
         <name lang="he" n="הלכות טומאת מת"/>
         <name lang="ru" n="Законы ритуальной нечистоты, порождаемой мертвым"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="defilement by coming into contact with the dead"/>
         <name lang="en" n="Tum'at Met" transliterated="yes"/>
       </names>
@@ -644,7 +590,6 @@
       <names>
         <name lang="he" n="הלכות פרה אדומה"/>
         <name lang="ru" n="Законы красной коровы"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="red heifer"/>
         <name lang="en" n="Parah Adumah" transliterated="yes"/>
       </names>
@@ -653,7 +598,6 @@
       <names>
         <name lang="he" n="הלכות טומאת צרעת"/>
         <name lang="ru" n="Законы ритуальной нечистоты, порождаемой болезнью «проказа»"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="defilement by tzara'at"/>
         <name lang="en" n="Tum'at Tsara’at" transliterated="yes"/>
       </names>
@@ -662,7 +606,6 @@
       <names>
         <name lang="he" n="הלכות מטמאי משכב ומושב"/>
         <name lang="ru" n="Законы ритуальной нечистоты, передающейся предмету, на котором сидят или лежат"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n=""/>
         <name lang="en" n="Metamei Mishkav uMoshav" transliterated="yes"/>
       </names>
@@ -671,7 +614,6 @@
       <names>
         <name lang="he" n="הלכות שאר אבות הטומאות"/>
         <name lang="ru" n="Законы других источников ритуальной нечистоты"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n=""/>
         <name lang="en" n="She'ar Avot haTumot" transliterated="yes"/>
       </names>
@@ -680,7 +622,6 @@
       <names>
         <name lang="he" n="הלכות טומאת אוכלין"/>
         <name lang="ru" n="Законы о ритуальной нечистоте пищи"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="defilement of foods"/>
         <name lang="en" n="Tum'at Ochalin" transliterated="yes"/>
       </names>
@@ -689,7 +630,6 @@
       <names>
         <name lang="he" n="הלכות כלים"/>
         <name lang="ru" n="Законы сосудов"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="vessels"/>
         <name lang="en" n="Kelim" transliterated="yes"/>
       </names>
@@ -698,7 +638,6 @@
       <names>
         <name lang="he" n="הלכות מקוואות"/>
         <name lang="ru" n="Законы миквы"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="mikvah"/>
         <name lang="en" n="Mikvaot" transliterated="yes"/>
       </names>
@@ -709,7 +648,6 @@
     <names>
       <name lang="he" n="ספר נזיקין"/>
       <name lang="ru" n="Ущербы"/>
-      <name lang="ru" n="" transliterated="yes"/>
       <name lang="en" n="The Book of Injuries"/>
       <name lang="en" n="Nezikin" transliterated="yes"/>
     </names>
@@ -717,7 +655,6 @@
       <names>
         <name lang="he" n="הלכות נזקי ממון"/>
         <name lang="ru" n="Законы об ущербах, причиненных имуществом"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="property damage"/>
         <name lang="en" n="Nizkei Mamon" transliterated="yes"/>
       </names>
@@ -726,7 +663,6 @@
       <names>
         <name lang="he" n="הלכות גניבה"/>
         <name lang="ru" n="Законы о воровстве"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="theft"/>
         <name lang="en" n="Genevah" transliterated="yes"/>
       </names>
@@ -735,7 +671,6 @@
       <names>
         <name lang="he" n="הלכות גזילה ואבידה"/>
         <name lang="ru" n="Законы о грабеже и возвращении потери"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="robbery and lost property"/>
         <name lang="en" n="Gezelah vaAvidah" transliterated="yes"/>
       </names>
@@ -744,7 +679,6 @@
       <names>
         <name lang="he" n="הלכות חובל ומזיק"/>
         <name lang="ru" n="Законы о телесных повреждениях"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="one who injures another"/>
         <name lang="en" n="Chovel uMazik" transliterated="yes"/>
       </names>
@@ -753,7 +687,6 @@
       <names>
         <name lang="he" n="הלכות רוצח ושמירת נפש"/>
         <name lang="ru" n="Законы об убийстве и защите жизни"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="murderers and life preservation"/>
         <name lang="en" n="Rotzeah uShmirat Nefesh" transliterated="yes"/>
       </names>
@@ -764,7 +697,6 @@
     <names>
       <name lang="he" n="ספר קניין"/>
       <name lang="ru" n="Имущество"/>
-      <name lang="ru" n="" transliterated="yes"/>
       <name lang="en" n="The Book of Acquisition"/>
       <name lang="en" n="Kinyan" transliterated="yes"/>
     </names>
@@ -772,7 +704,6 @@
       <names>
         <name lang="he" n="הלכות מכירה"/>
         <name lang="ru" n="Законы продажи"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n=""/>
         <name lang="en" n="Mechirah" transliterated="yes"/>
       </names>
@@ -781,7 +712,6 @@
       <names>
         <name lang="he" n="הלכות זכייה ומתנה"/>
         <name lang="ru" n="Законы приобретения во владение и дарения"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="ownerless property and gifts"/>
         <name lang="en" n="Zechiyah uMatanah" transliterated="yes"/>
       </names>
@@ -790,7 +720,6 @@
       <names>
         <name lang="he" n="הלכות שכנים"/>
         <name lang="ru" n="Законы о соседях"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="neighbors"/>
         <name lang="en" n="Shechenim" transliterated="yes"/>
       </names>
@@ -799,7 +728,6 @@
       <names>
         <name lang="he" n="הלכות שלוחין ושותפין"/>
         <name lang="ru" n="Законы о посланцах и компаньонах"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="agents and partners"/>
         <name lang="en" n="Shluchin veShutafin" transliterated="yes"/>
       </names>
@@ -808,7 +736,6 @@
       <names>
         <name lang="he" n="הלכות עבדים"/>
         <name lang="ru" n="Законы о рабах"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="slaves"/>
         <name lang="en" n="Avadim" transliterated="yes"/>
       </names>
@@ -819,7 +746,6 @@
     <names>
       <name lang="he" n="ספר משפטים"/>
       <name lang="ru" n="Законы"/>
-      <name lang="ru" n="" transliterated="yes"/>
       <name lang="en" n="The Book of Judgements"/>
       <name lang="en" n="Mishpatim" transliterated="yes"/>
     </names>
@@ -827,7 +753,6 @@
       <names>
         <name lang="he" n="הלכות שכירות"/>
         <name lang="ru" n="Законы наемных работников"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n=""/>
         <name lang="en" n="Sechirut" transliterated="yes"/>
       </names>
@@ -836,7 +761,6 @@
       <names>
         <name lang="he" n="הלכות שאלה ופיקדון"/>
         <name lang="ru" n="Законы займа и хранения имущества"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n=""/>
         <name lang="en" n="She'elah uPikadon" transliterated="yes"/>
       </names>
@@ -845,7 +769,6 @@
       <names>
         <name lang="he" n="הלכות מלווה ולווה"/>
         <name lang="ru" n="Законы денежных ссуд"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n=""/>
         <name lang="en" n="Malveh veLoveh" transliterated="yes"/>
       </names>
@@ -854,7 +777,6 @@
       <names>
         <name lang="he" n="הלכות טוען ונטען"/>
         <name lang="ru" n="Законы исков (об истце и ответчике)"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n=""/>
         <name lang="en" n="To'en veNit'an" transliterated="yes"/>
       </names>
@@ -863,7 +785,6 @@
       <names>
         <name lang="he" n="הלכות נחלות"/>
         <name lang="ru" n="Законы наследования"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n=""/>
         <name lang="en" n="Nachalot" transliterated="yes"/>
       </names>
@@ -874,7 +795,6 @@
     <names>
       <name lang="he" n="ספר שופטים"/>
       <name lang="ru" n="Судьи"/>
-      <name lang="ru" n="" transliterated="yes"/>
       <name lang="en" n="The Book of Judges"/>
       <name lang="en" n="Shoftim" transliterated="yes"/>
     </names>
@@ -882,7 +802,6 @@
       <names>
         <name lang="he" n="הלכות סנהדרין והעונשין המסורין להם"/>
         <name lang="ru" n="Законы о Санедрине"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="court"/>
         <name lang="en" n="Sanhedrin vehaOnashin haMesurin lahem" transliterated="yes"/>
       </names>
@@ -891,7 +810,6 @@
       <names>
         <name lang="he" n="הלכות עדות"/>
         <name lang="ru" n="Законы о свидетелях"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="testimony"/>
         <name lang="en" n="Edut" transliterated="yes"/>
       </names>
@@ -900,7 +818,6 @@
       <names>
         <name lang="he" n="הלכות ממרים"/>
         <name lang="ru" n="Законы об ослушниках"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n=""/>
         <name lang="en" n="Mamrim" transliterated="yes"/>
       </names>
@@ -909,7 +826,6 @@
       <names>
         <name lang="he" n="הלכות אבל"/>
         <name lang="ru" n="Законы траура"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="mourning"/>
         <name lang="en" n="Avel" transliterated="yes"/>
       </names>
@@ -918,7 +834,6 @@
       <names>
         <name lang="he" n="הלכות מלכים ומלחמות"/>
         <name lang="ru" n="Законы о королях, их войнах и Короле Мошиахе"/>
-        <name lang="ru" n="" transliterated="yes"/>
         <name lang="en" n="kings and wars"/>
         <name lang="en" n="Melachim uMilchamoteyhem" transliterated="yes"/>
       </names>
