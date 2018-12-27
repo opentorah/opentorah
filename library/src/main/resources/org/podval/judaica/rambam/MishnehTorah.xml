@@ -2,7 +2,7 @@
 <structure>
   <part chapters="3">
     <names>
-      <name lang="ru">Предисловие аффтора</name>
+      <name lang="ru">Предисловие автора</name>
       <name lang="en">Introduction by Rambam OBM</name>
     </names>
   </part>
@@ -139,7 +139,7 @@
         <name lang="en" n="Milah" transliterated="yes"/>
       </names>
     </part>
-    <part n="7" chapters="">
+    <part n="7" chapters="4">
       <!--
          Order of Prayer for the Entire Year
          Text of the Blessings of Shemoneh Esreh
