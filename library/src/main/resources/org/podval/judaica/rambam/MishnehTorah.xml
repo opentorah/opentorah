@@ -9,25 +9,95 @@
       <name lang="he" n="הקדמת הרמב״ם ז״ל"/>
       <name lang="ru">Предисловие автора</name>
       <name lang="en">Introduction by Rambam OBM</name>
-      <!-- TODO "named" chapters -->
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
     </part>
     <part n="2" chapters="3">
       <name lang="he" n="מצות עשה"/>
       <name lang="en">List of positive commandments</name>
       <name lang="ru">Список повелевающих заповедей</name>
-      <!-- TODO "named" chapters -->
+
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
     </part>
     <part n="3" chapters="3">
       <name lang="he" n="מצות לא תעשה"/>
       <name lang="en">List of negative commandments</name>
       <name lang="ru">Список запрещающих заповедей</name>
-      <!-- TODO "named" chapters -->
+
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
     </part>
     <part n="4" chapters="3">
       <name lang="he" n="כותרות"/>
       <name lang="en">Contents</name>
       <name lang="ru">Оглавление</name>
-      <!-- TODO "named" chapters -->
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
     </part>
   </book>
 
@@ -124,7 +194,37 @@
       <name lang="ru" n="Порядок молитвы"/>
       <name lang="en" n="Order of Prayers"/>
       <name lang="en" n="Seder Tefilot" transliterated="yes"/>
-      <!-- TODO "named" chapters -->
+
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
+
+      <chapter>
+        <name lang="he" n="бла"/>
+        <name lang="ru" n="блааа"/>
+        <name lang="en" n="blah"/>
+      </chapter>
     </part>
   </book>
 

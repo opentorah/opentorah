@@ -29,6 +29,9 @@ final class Names(val names: Seq[Name]) extends HasName with LanguageString {
 
   def isDisjoint(other: Names): Boolean = names.forall(name => !other.hasName(name.name))
 
+  def withNumber(number: Int): Names =
+    transform(name => name.copy(name.name + " " + name.languageSpec.toString(number)))
+
   def transform(transformer: Name => Name): Names = new Names(names.map(transformer))
 }
 

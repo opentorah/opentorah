@@ -26,8 +26,9 @@ object RambamSchedule {
   final def chapterNumber1chapter(day: Day): Int = (day - epoch) % numberOfChapters + 1
 
   def main(args: Array[String]): Unit = {
-    println(lessonNumber(org.podval.calendar.jewish.Jewish.nowDay))
-    //    printSchedule(Formatter.narrow)(5777)
+    println(chapters(1).names.doFind(org.podval.judaica.metadata.Language.Russian.toSpec).name)
+    // println(lessonNumber(org.podval.calendar.jewish.Jewish.nowDay))
+    // printSchedule(Formatter.narrow)(5777)
   }
 
   def printSchedule(formatter: Formatter)(numYear: Int): Unit =

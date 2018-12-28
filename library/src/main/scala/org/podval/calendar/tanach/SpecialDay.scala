@@ -964,8 +964,7 @@ object SpecialDay {
       </haftarah>
   }
 
-  private def namesWithNumber(withNames: WithNames, number: Int): Names =
-    withNames.names.transform(name => name.copy(name.name + " " + name.languageSpec.toString(number)))
+  private def namesWithNumber(withNames: WithNames, number: Int): Names = withNames.names.withNumber(number)
 
   val festivals: Set[FestivalOrIntermediate] = Set(
     RoshHashanah1, RoshHashanah2,
