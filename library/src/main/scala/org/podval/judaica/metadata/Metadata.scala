@@ -23,7 +23,7 @@ object Metadata {
     resourceName: String
   ): Map[K, Names] = bind(
     keys,
-    loadMetadataElements(obj, resourceName, rootElementName = "names", elementName = "names")
+    loadMetadataElements(obj, Some(resourceName), rootElementName = "names", elementName = "names")
       .map(element => Names.parse(element))
   )
 
@@ -36,7 +36,7 @@ object Metadata {
     keys = keys,
     obj = obj,
     elements = loadMetadataElements(obj,
-      resourceName.getOrElse(Util.className(obj)),
+      resourceName,
       rootElementName = "metadata",
       elementName = elementName)
   )
@@ -63,17 +63,18 @@ object Metadata {
     Metadata(attributes, names, tail)
   }
 
-  private def loadMetadataElements(
+  def loadMetadataElements(
     obj: AnyRef,
-    resourceName: String,
+    resourceName: Option[String],
     rootElementName: String,
     elementName: String
   ): Seq[Elem] = {
-    val element = loadResource(obj, resourceName)
+    val resourceNameEffective = resourceName.getOrElse(Util.className(obj))
+    val element = loadResource(obj, resourceNameEffective)
     val (attributes, elements) = XML.open(element, rootElementName)
     val type_ = attributes.doGet("type")
     attributes.close()
-    require(type_ == resourceName, s"Wrong metadata type: $type_ instead of $resourceName")
+    require(type_ == resourceNameEffective, s"Wrong metadata type: $type_ instead of $resourceName")
     XML.span(elements, elementName)
   }
 

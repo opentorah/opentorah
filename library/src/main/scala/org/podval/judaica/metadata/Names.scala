@@ -62,6 +62,11 @@ object Names {
     (names, tail)
   }
 
+  def parse(elements: Seq[Elem]): (Names, Seq[Elem]) = {
+    val (nameElements, tail) = XML.take(elements, "name")
+    (parse(nameElements, None), tail)
+  }
+
   def parse(element: Elem): Names = {
     val (attributes, nameElements) = XML.open(element, "names")
     attributes.close()
