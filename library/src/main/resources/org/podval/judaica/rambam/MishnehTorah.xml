@@ -6,24 +6,24 @@
     <name lang="en">Introduction by Rambam OBM</name>
 
     <part n="1" chapters="3">
-      <name lang="he" n="    <name lang="he" n=" .. הקדמת הרמב״ם אז לא אבוש וגו׳. כל המצות ... ימי שנת החמה"/>"/>
+      <name lang="he">הקדמת הרמב״ם</name>
       <name lang="ru">Предисловие автора ... </name>
       <name lang="en">Introduction by Rambam OBM</name>
 
       <chapter>
-        <name lang="he" n=" מצוות עשה:א. מצוה ראשונה ... ובן אין לו"/>
+        <name lang="he" n="הקדמה לרמב״ם כל המצוות-אלוהי ישראל"/>
         <name lang="ru" n="блааа"/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="бла"/>
+        <name lang="he" n="כל אלו החכמים-בין ראשון בין אחרון"/>
         <name lang="ru" n="блааа"/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n=" מצוות לא תעשה:א. מצוה ... אלו הם... בין עשה ובין לא תעשה."/>
+        <name lang="he" n="ודברים הללו-שנת החמה"/>
         <name lang="ru" n="блааа"/>
         <name lang="en" n="blah"/>
       </chapter>
@@ -35,19 +35,19 @@
 
 
       <chapter>
-        <name lang="he" n="бла"/>
+        <name lang="he" n="מצוות עשה א-פג"/>
         <name lang="ru" n="блааа"/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="бла"/>
+        <name lang="he" n="פד-קסו"/>
         <name lang="ru" n="блааа"/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="бла"/>
+        <name lang="he" n="קסז-רמח"/>
         <name lang="ru" n="блааа"/>
         <name lang="en" n="blah"/>
       </chapter>
@@ -59,19 +59,19 @@
 
 
       <chapter>
-        <name lang="he" n="бла"/>
+        <name lang="he" n="מצוות לא תעשה א-קכב"/>
         <name lang="ru" n="блааа"/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="бла"/>
+        <name lang="he" n="קכג-רמד"/>
         <name lang="ru" n="блааа"/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="бла"/>
+        <name lang="he" n="רמה-שסה"/>
         <name lang="ru" n="блааа"/>
         <name lang="en" n="blah"/>
       </chapter>
@@ -82,19 +82,19 @@
       <name lang="ru">Оглавление</name>
 
       <chapter>
-        <name lang="he" n="бла"/>
+        <name lang="he" n="וראיתי לחלק ספר המדע כו-ספר קדושה"/>
         <name lang="ru" n="блааа"/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="бла"/>
+        <name lang="he" n="ספר קדושה-ספר טהרה "/>
         <name lang="ru" n="блааа"/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="бла"/>
+        <name lang="he" n="ספר טהרה-ספר המדע"/>
         <name lang="ru" n="блааа"/>
         <name lang="en" n="blah"/>
       </chapter>
@@ -203,25 +203,25 @@
       </chapter>
 
       <chapter>
-        <name lang="he" n="бла"/>
+        <name lang="he" n="נוסח ברכות-וזהו נוסח כל הברכות"/>
         <name lang="ru" n="Текст благословений молитвы Шмоне эсре... три первых, три последних и одно среднее."/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="бла"/>
+        <name lang="he" n="נוסח ברכות-וזהו נוסח כל הברכות"/>
         <name lang="ru" n="Текст каждого из средних благословений...зачитывать их не обязан."/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="עושה שלום וכו׳"/>
+        <name lang="he" n="וזהו נוסח כל הברכות-נוסח הוידוי"/>
         <name lang="ru" n="Порядок молитв всего года...Да будут угодны Тебе слова уст... и т.д."/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="נוסח ברכת המזון ברוך אתה.. אשיש בה'. נחלתי עדותיך."/>
+        <name lang="he" n="נוסח הוידוי-אשיש בה׳"/>
         <name lang="ru" n="ТЕКСТ БЛАГОСЛОВЕНИЯ ПОСЛЕ ТРАПЕЗЫ ...Благословен дающий силы усталым"/>
         <name lang="en" n="blah"/>
       </chapter>
