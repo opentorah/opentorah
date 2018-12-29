@@ -1,17 +1,17 @@
 <!-- Structure of Yad HaChazoko -->
 <metadata type="MishnehTorah">
   <book n="0">
-    <name lang="he" n="הקדמת הרמב״ם ז״ל"/>
+    <name lang="he" n=".. הקדמת הרמב״ם"/>
     <name lang="ru">Предисловие автора</name>
     <name lang="en">Introduction by Rambam OBM</name>
 
     <part n="1" chapters="3">
-      <name lang="he" n="הקדמת הרמב״ם ז״ל"/>
-      <name lang="ru">Предисловие автора</name>
+      <name lang="he" n="    <name lang="he" n=" .. הקדמת הרמב״ם אז לא אבוש וגו׳. כל המצות ... ימי שנת החמה"/>"/>
+      <name lang="ru">Предисловие автора ... </name>
       <name lang="en">Introduction by Rambam OBM</name>
 
       <chapter>
-        <name lang="he" n="бла"/>
+        <name lang="he" n=" מצוות עשה:א. מצוה ראשונה ... ובן אין לו"/>
         <name lang="ru" n="блааа"/>
         <name lang="en" n="blah"/>
       </chapter>
@@ -23,7 +23,7 @@
       </chapter>
 
       <chapter>
-        <name lang="he" n="бла"/>
+        <name lang="he" n=" מצוות לא תעשה:א. מצוה ... אלו הם... בין עשה ובין לא תעשה."/>
         <name lang="ru" n="блааа"/>
         <name lang="en" n="blah"/>
       </chapter>
@@ -197,32 +197,32 @@
 
 
       <chapter>
-        <name lang="he" n="бла"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="he" n=" סדר תפלות כל השנה. נהגו העם ... ימלוך עלינו וכו׳"/>
+        <name lang="ru" n="Порядок молитв всего года...Который будет править во веки веков."/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
         <name lang="he" n="бла"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="ru" n="Текст благословений молитвы Шмоне эсре... три первых, три последних и одно среднее."/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
         <name lang="he" n="бла"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="ru" n="Текст каждого из средних благословений...зачитывать их не обязан."/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="бла"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="he" n="עושה שלום וכו׳"/>
+        <name lang="ru" n="Порядок молитв всего года...Да будут угодны Тебе слова уст... и т.д."/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="бла"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="he" n="נוסח ברכת המזון ברוך אתה.. אשיש בה'. נחלתי עדותיך."/>
+        <name lang="ru" n="ТЕКСТ БЛАГОСЛОВЕНИЯ ПОСЛЕ ТРАПЕЗЫ ...Благословен дающий силы усталым"/>
         <name lang="en" n="blah"/>
       </chapter>
     </part>
