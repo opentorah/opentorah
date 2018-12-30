@@ -3,28 +3,28 @@
   <book n="0">
     <name lang="he" n=".. הקדמת הרמב״ם"/>
     <name lang="ru">Предисловие автора</name>
-    <name lang="en">Introduction by Rambam OBM</name>
+    <name lang="en">Introduction by Rambam</name>
 
     <part n="1" chapters="3">
       <name lang="he">הקדמת הרמב״ם</name>
-      <name lang="ru">Предисловие автора ... </name>
-      <name lang="en">Introduction by Rambam OBM</name>
+      <name lang="ru">Предисловие автора</name>
+      <name lang="en">Introduction by Rambam</name>
 
       <chapter>
         <name lang="he" n="הקדמה לרמב״ם כל המצוות-אלוהי ישראל"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="ru" n="Предисловие к «Мишне Тора»" Все заповеди... все приняли от Г-спода, Б-га Израиля./>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
         <name lang="he" n="כל אלו החכמים-בין ראשון בין אחרון"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="ru" n="Все эти упомянутые мудрецы...которое кажется более соответствующим истине, раннее оно или позднее."/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
         <name lang="he" n="ודברים הללו-שנת החמה"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="ru" n="Так ведут себя в законах...число дней солнечного года."/>
         <name lang="en" n="blah"/>
       </chapter>
     </part>
@@ -36,19 +36,19 @@
 
       <chapter>
         <name lang="he" n="מצוות עשה א-פג"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="ru" n="Повелевающие заповеди: 1-83"/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
         <name lang="he" n="פד-קסו"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="ru" n="Повелевающие заповеди: 84-166"/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
         <name lang="he" n="קסז-רמח"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="ru" n="Повелевающие заповеди: 167-248"/>
         <name lang="en" n="blah"/>
       </chapter>
     </part>
@@ -60,19 +60,19 @@
 
       <chapter>
         <name lang="he" n="מצוות לא תעשה א-קכב"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="ru" n="Запрещающие заповеди: 1-122"/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
         <name lang="he" n="קכג-רמד"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="ru" n="Запрещающие заповеди: 123-244"/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="רמה-שסה"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="he" n="..רמה-שסה"/>
+        <name lang="ru" n="Запрещающие заповеди: 244-365 ... как повелевающей, так и запрещающей."/>
         <name lang="en" n="blah"/>
       </chapter>
     </part>
@@ -83,19 +83,19 @@
 
       <chapter>
         <name lang="he" n="וראיתי לחלק ספר המדע כו-ספר קדושה"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="ru" n="Я счел целесообразным разделить этот труд...восемь запрещающих заповедей"/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
         <name lang="he" n="ספר קדושה-ספר טהרה "/>
-        <name lang="ru" n="блааа"/>
+        <name lang="ru" n="Книга пятая, или Книга Святость...девятнадцать запрещающих заповедей. "/>
         <name lang="en" n="blah"/>
       </chapter>
 
       <chapter>
         <name lang="he" n="ספר טהרה-ספר המדע"/>
-        <name lang="ru" n="блааа"/>
+        <name lang="ru" n="Книга десятая, или Книга об Очищениях...сорок семь запрещающих."/>
         <name lang="en" n="blah"/>
       </chapter>
     </part>
