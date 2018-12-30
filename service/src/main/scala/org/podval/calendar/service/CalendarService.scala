@@ -12,8 +12,10 @@ import org.http4s.server.middleware.AutoSlash
 import org.podval.calendar.dates.{Calendar, DayBase, MonthBase, YearBase}
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.Jewish
+import org.podval.calendar.rambam.RambamSchedule
 import org.podval.calendar.tanach.{Chitas, Haftarah, Reading, Schedule}
 import org.podval.judaica.metadata.{Language, LanguageSpec, WithNames}
+import org.podval.judaica.rambam.MishnehTorah
 import org.podval.judaica.tanach.{Custom, Torah}
 import org.podval.judaica.util.Util
 
@@ -296,6 +298,8 @@ object CalendarService extends StreamApp[IO] {
       renderOptionalReading("Purim morning alternative", daySchedule.purimAlternativeMorning),
       span(cls := "heading")("Chitas"),
       renderChitas(daySchedule.chitas),
+      div(cls := "heading")("Rambam"),
+      renderRambam(RambamSchedule.forDay(day)),
       renderOptionalReading("Afternoon", daySchedule.afternoon)
     ))
   }
@@ -309,6 +313,44 @@ object CalendarService extends StreamApp[IO] {
       chitas.second.fold(Seq.empty[TypedTag[String]])(fragment => Seq(tr(renderFragment(fragment))))
     ))
   }
+
+  private def renderRambam(schedule: RambamSchedule)(implicit spec: LanguageSpec): Seq[TypedTag[String]] = Seq(
+    span(cls := "subheading")("3 chapters"),
+    table(
+      tr(td("Cycle"), td("Lesson")),
+      tr(
+        td(spec.toString(schedule.threeChapters.cycle)),
+        td(spec.toString(schedule.threeChapters.lesson))
+      )
+    ),
+    span(cls := "subheading")("chapters"),
+    table(
+      tr(td(), td("Book"), td("Part"), td("Chapter")),
+      tr(td(spec.toString(1)), renderRambamChapter(schedule.threeChapters.chapter1)),
+      tr(td(spec.toString(2)), renderRambamChapter(schedule.threeChapters.chapter2)),
+      tr(td(spec.toString(3)), renderRambamChapter(schedule.threeChapters.chapter3))
+    ),
+    span(cls := "subheading")("1 chapter"),
+    table(
+      tr(td("Cycle"), td("Year"), td("Chapter number")),
+      tr(
+        td(spec.toString(schedule.oneChapter.cycle)),
+        td(spec.toString(schedule.oneChapter.year)),
+        td(spec.toString(schedule.oneChapter.chapterNumber))
+      )
+    ),
+    span(cls := "subheading")("chapter"),
+    table(
+      tr(td("Book"), td("Part"), td("Chapter")),
+      tr(renderRambamChapter(schedule.oneChapter.chapter))
+    )
+  )
+
+  private def renderRambamChapter(chapter: MishnehTorah.Chapter)(implicit spec: LanguageSpec): Seq[TypedTag[String]] = Seq(
+    td(chapter.part.book.names.toLanguageString),
+    td(chapter.part.names.toLanguageString),
+    td(chapter.names.toLanguageString),
+  )
 
   private def renderOptionalReading(
     name: String,

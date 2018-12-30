@@ -12,91 +12,89 @@
 
       <chapter>
         <name lang="he" n="הקדמה לרמב״ם כל המצוות-אלוהי ישראל"/>
-        <name lang="ru" n="Предисловие к «Мишне Тора»" Все заповеди... все приняли от Г-спода, Б-га Израиля./>
-        <name lang="en" n="blah"/>
+        <name lang="ru" n="Предисловие к «Мишне Тора» Все заповеди... все приняли от Г-спода, Б-га Израиля."/>
+        <name lang="en" n="Introduction: Then etc. All the mitzvos... from Hashem the G-d of Israel"/>
       </chapter>
 
       <chapter>
         <name lang="he" n="כל אלו החכמים-בין ראשון בין אחרון"/>
-        <name lang="ru" n="Все эти упомянутые мудрецы...которое кажется более соответствующим истине, раннее оно или позднее."/>
-        <name lang="en" n="blah"/>
+        <name lang="ru" n="Все эти упомянутые мудрецы... которое кажется более соответствующим истине, раннее оно или позднее."/>
+        <name lang="en" n="Introduction: All these sages... whether first or whether last"/>
       </chapter>
 
       <chapter>
         <name lang="he" n="ודברים הללו-שנת החמה"/>
-        <name lang="ru" n="Так ведут себя в законах...число дней солнечного года."/>
-        <name lang="en" n="blah"/>
+        <name lang="ru" n="Так ведут себя в законах... число дней солнечного года."/>
+        <name lang="en" n="Introduction: And these things... the Year of the sun"/>
       </chapter>
     </part>
     <part n="2" chapters="3">
       <name lang="he" n="מצות עשה"/>
-      <name lang="en">List of positive commandments</name>
-      <name lang="ru">Список повелевающих заповедей</name>
-
+      <name lang="en">Positive commandments</name>
+      <name lang="ru">Повелевающие заповеди</name>
 
       <chapter>
-        <name lang="he" n="מצוות עשה א-פג"/>
-        <name lang="ru" n="Повелевающие заповеди: 1-83"/>
-        <name lang="en" n="blah"/>
+        <name lang="he" n="מצוות א-פג"/>
+        <name lang="ru" n="заповеди 1-83"/>
+        <name lang="en" n="commandments 1-83"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="פד-קסו"/>
-        <name lang="ru" n="Повелевающие заповеди: 84-166"/>
-        <name lang="en" n="blah"/>
+        <name lang="he" n="מצוות פד-קסו"/>
+        <name lang="ru" n="заповеди 84-166"/>
+        <name lang="en" n="commandments 84-166"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="קסז-רמח"/>
-        <name lang="ru" n="Повелевающие заповеди: 167-248"/>
-        <name lang="en" n="blah"/>
+        <name lang="he" n="מצוות קסז-רמח"/>
+        <name lang="ru" n="заповеди 167-248"/>
+        <name lang="en" n="commandments 167-248"/>
       </chapter>
     </part>
     <part n="3" chapters="3">
       <name lang="he" n="מצות לא תעשה"/>
-      <name lang="en">List of negative commandments</name>
-      <name lang="ru">Список запрещающих заповедей</name>
-
+      <name lang="en">Negative commandments</name>
+      <name lang="ru">Запрещающие заповеди</name>
 
       <chapter>
-        <name lang="he" n="מצוות לא תעשה א-קכב"/>
-        <name lang="ru" n="Запрещающие заповеди: 1-122"/>
-        <name lang="en" n="blah"/>
+        <name lang="he" n="מצוות א-קכב"/>
+        <name lang="ru" n="заповеди 1-122"/>
+        <name lang="en" n="commandments 1-122"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="קכג-רמד"/>
-        <name lang="ru" n="Запрещающие заповеди: 123-244"/>
-        <name lang="en" n="blah"/>
+        <name lang="he" n="מצוות קכג-רמד"/>
+        <name lang="ru" n="заповеди 123-244"/>
+        <name lang="en" n="commandments 123-244"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="..רמה-שסה"/>
-        <name lang="ru" n="Запрещающие заповеди: 244-365 ... как повелевающей, так и запрещающей."/>
-        <name lang="en" n="blah"/>
+        <name lang="he" n="מצוות רמה-שסה"/>
+        <name lang="ru" n="заповеди 245-365... как повелевающей, так и запрещающей."/>
+        <name lang="en" n="commandments 245-365"/>
       </chapter>
     </part>
     <part n="4" chapters="3">
       <name lang="he" n="כותרות"/>
-      <name lang="en">Contents</name>
+      <name lang="en">Index</name>
       <name lang="ru">Оглавление</name>
 
       <chapter>
         <name lang="he" n="וראיתי לחלק ספר המדע כו-ספר קדושה"/>
-        <name lang="ru" n="Я счел целесообразным разделить этот труд...восемь запрещающих заповедей"/>
-        <name lang="en" n="blah"/>
+        <name lang="ru" n="Я счел целесообразным разделить этот труд... восемь запрещающих заповедей"/>
+        <name lang="en" n="I have seen fit to divide... The book of Women"/>
       </chapter>
 
       <chapter>
-        <name lang="he" n="ספר קדושה-ספר טהרה "/>
-        <name lang="ru" n="Книга пятая, или Книга Святость...девятнадцать запрещающих заповедей. "/>
-        <name lang="en" n="blah"/>
+        <name lang="he" n="ספר קדושה-ספר טהרה"/>
+        <name lang="ru" n="Книга пятая, или Книга Святость... девятнадцать запрещающих заповедей. "/>
+        <name lang="en" n="The book of Holiness... The book of Sacrifices"/>
       </chapter>
 
       <chapter>
         <name lang="he" n="ספר טהרה-ספר המדע"/>
-        <name lang="ru" n="Книга десятая, или Книга об Очищениях...сорок семь запрещающих."/>
-        <name lang="en" n="blah"/>
+        <name lang="ru" n="Книга десятая, или Книга об Очищениях... сорок семь запрещающих."/>
+        <name lang="en" n="The book of Purity... with the help of G-d"/>
       </chapter>
     </part>
   </book>
@@ -182,48 +180,43 @@
       <name lang="en" n="Milah" transliterated="yes"/>
     </part>
     <part n="7" chapters="5">
-      <!--
-         Order of Prayer for the Entire Year
-           Unnamed
-           Blessings of Shemoneh Esreh; Kaddish
-           Intermediate Blessings
-           Confession
-           Grace After Meals
-       -->
       <name lang="he" n="סדר תפילות כל השנה"/>
-      <name lang="ru" n="Порядок молитвы"/>
-      <name lang="en" n="Order of Prayers"/>
+      <name lang="ru" n="Порядок молитв всего года"/>
+      <name lang="en" n="Order of Prayers for the Entire Year"/>
       <name lang="en" n="Seder Tefilot" transliterated="yes"/>
-
 
       <chapter>
         <name lang="he" n=" סדר תפלות כל השנה. נהגו העם ... ימלוך עלינו וכו׳"/>
-        <name lang="ru" n="Порядок молитв всего года...Который будет править во веки веков."/>
-        <name lang="en" n="blah"/>
+        <name lang="ru" n="Порядок молитв всего года... Который будет править во веки веков."/>
+        <name lang="en" n="Order of prayers for the whole year... He shall reign over us, etc."/>
       </chapter>
 
+      <!-- Blessings of Shemoneh Esreh; Kaddish -->
       <chapter>
         <name lang="he" n="נוסח ברכות-וזהו נוסח כל הברכות"/>
         <name lang="ru" n="Текст благословений молитвы Шмоне эсре... три первых, три последних и одно среднее."/>
-        <name lang="en" n="blah"/>
+        <name lang="en" n="Text of Blessings of the Amidah... Text of the Kaddish... one in the middle"/>
       </chapter>
 
+      <!-- Intermediate Blessings -->
       <chapter>
         <name lang="he" n="נוסח ברכות-וזהו נוסח כל הברכות"/>
-        <name lang="ru" n="Текст каждого из средних благословений...зачитывать их не обязан."/>
-        <name lang="en" n="blah"/>
+        <name lang="ru" n="Текст каждого из средних благословений... зачитывать их не обязан."/>
+        <name lang="en" n="And this is the text of all the middle blessings... The middle blessing... nothing more is required."/>
       </chapter>
 
+      <!-- Confession -->
       <chapter>
         <name lang="he" n="וזהו נוסח כל הברכות-נוסח הוידוי"/>
-        <name lang="ru" n="Порядок молитв всего года...Да будут угодны Тебе слова уст... и т.д."/>
-        <name lang="en" n="blah"/>
+        <name lang="ru" n="Порядок молитв всего года... Да будут угодны Тебе слова уст... и т.д."/>
+        <name lang="en" n="The text of viddui..."/>
       </chapter>
 
+      <!-- Grace After Meals -->
       <chapter>
         <name lang="he" n="נוסח הוידוי-אשיש בה׳"/>
-        <name lang="ru" n="ТЕКСТ БЛАГОСЛОВЕНИЯ ПОСЛЕ ТРАПЕЗЫ ...Благословен дающий силы усталым"/>
-        <name lang="en" n="blah"/>
+        <name lang="ru" n="ТЕКСТ БЛАГОСЛОВЕНИЯ ПОСЛЕ ТРАПЕЗЫ... Благословен дающий силы усталым"/>
+        <name lang="en" n="Text of blessing after a Meal... I will greatly rejoice in the L-rd"/>
       </chapter>
     </part>
   </book>
