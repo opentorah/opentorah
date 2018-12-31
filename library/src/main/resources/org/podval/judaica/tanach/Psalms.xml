@@ -154,7 +154,7 @@
   <chapter n="148" length="14"/>
   <chapter n="149" length="9"/>
   <chapter n="150" length="6"/>
-<!--
+
   <day n="1" fromChapter="1"/>
   <day n="2" fromChapter="10"/>
   <day n="3" fromChapter="18"/>
@@ -199,5 +199,4 @@
   <book n="3" fromChapter="73"/>
   <book n="4" fromChapter="90"/>
   <book n="5" fromChapter="107"/>
--->
 </book>

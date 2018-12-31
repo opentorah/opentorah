@@ -18,7 +18,7 @@ final case class VerseParsed(chapter: Option[Int], verse: Option[Int]) {
     if (chapter.isDefined) this
     else VerseParsed(chapter = Some(defaultChapter), verse = verse)
 
-  def resolve: Verse = Verse(chapter.get, verse.get)
+  def resolve: Verse = Verse(chapter.get, verse.getOrElse(1))
 }
 
 object VerseParsed {
