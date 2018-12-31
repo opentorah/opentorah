@@ -8,7 +8,8 @@ import org.podval.judaica.rambam.MishnehTorah
  */
 final class RambamSchedule(
   val threeChapters: RambamSchedule.ThreeChapters,
-  val oneChapter: RambamSchedule.OneChapter
+  val oneChapter: RambamSchedule.OneChapter,
+  val seferHamitzvos: SeferHamitzvosLessons.Lesson
 )
 
 object RambamSchedule {
@@ -52,7 +53,8 @@ object RambamSchedule {
         year = (distance % numberOfChapters) / numberOfLessons + 1,
         chapterNumber = distance % numberOfChapters + 1,
         chapter = chapters(distance % numberOfChapters)
-      )
+      ),
+      seferHamitzvos = SeferHamitzvosLessons.lessons(distance % numberOfLessons)
     )
   }
 

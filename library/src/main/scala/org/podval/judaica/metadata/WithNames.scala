@@ -9,4 +9,6 @@ trait WithNames extends HasName {
     require(this == that)
     this
   }
+
+  final def toLanguageString(implicit spec: LanguageSpec): String = names.toLanguageString
 }
