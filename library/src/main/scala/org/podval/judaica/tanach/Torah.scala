@@ -57,24 +57,13 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
     val chapters: Chapters = bookSpan.book.chapters
     val with1: Seq[Numbered] = addImplied1(aliyotRaw, span, chapters)
     val numberedSpans: Seq[Numbered] = WithNumber.checkNumber(with1, number.getOrElse(with1.length), "span")
-    val spans: Seq[Span] = setImpliedTo(WithNumber.dropNumbers(numberedSpans), span, chapters)
+    val spans: Seq[Span] = SpanSemiResolved.setImpliedTo(WithNumber.dropNumbers(numberedSpans), span, chapters)
     require(bookSpan.book.chapters.consecutive(spans))
     val bookSpans: Seq[Aliyah] = spans.map(inBook(bookSpan.book, _))
     Torah(bookSpans)
   }
 
   def inBook(book: Tanach.ChumashBook, span: Span): BookSpan = BookSpan(book, span)
-
-  def setImpliedTo(
-    spans: Seq[SpanSemiResolved],
-    span: Span,
-    chapters: Chapters
-  ): Seq[Span] = {
-    val tos: Seq[Verse] = spans.tail.map(_.from).map(chapters.prev(_).get) :+ span.to
-    val result = spans.zip(tos).map { case (s, to) => s.setTo(to) }
-    require(chapters.cover(result, span))
-    result
-  }
 
   def processDays(
     book: Tanach.ChumashBook,

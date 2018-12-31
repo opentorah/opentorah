@@ -23,7 +23,7 @@ object Tanach extends NamedCompanion {
 
     final override def values: Seq[Parsha] = parshiot
 
-    private val metadatas = new ChumashBookMetadataHolder(this)
+    private val metadatas: ChumashBookMetadataHolder = new ChumashBookMetadataHolder(this)
 
     final override def names: Names = toNames(parshiot.head)
 
@@ -100,7 +100,30 @@ object Tanach extends NamedCompanion {
 
   sealed trait WritingsBook extends NachBook
 
-  case object Psalms extends WritingsBook
+  case object Psalms extends WritingsBook {
+    private def parseNumbered(element: Elem, name: String): WithNumber[SpanParsed] = {
+      val attributes: Attributes = XML.openEmpty(element, name)
+      val result: WithNumber[SpanParsed] = WithNumber.parse(attributes, SpanParsed.parse)
+      attributes.close()
+      result
+    }
+
+    private def parseSpans(elements: Seq[Elem], name: String, number: Int): Seq[Span] = {
+      val spans: Seq[SpanParsed] = WithNumber.dropNumbers(WithNumber.checkNumber(
+        elements.map(element => parseNumbered(element, name)), number, name))
+      SpanSemiResolved.setImpliedTo(spans.map(_.semiResolve), chapters.full, chapters)
+    }
+
+    private def allElements: (Seq[Elem], Seq[Elem], Seq[Elem]) =
+      XML.span(metadatas.psalmsElements, "day", "weekDay", "book")
+
+    lazy val days: Seq[Span] = parseSpans(allElements._1, "day", 30)
+
+    lazy val weekDays: Seq[Span] = parseSpans(allElements._2, "weekDay", 7)
+
+    lazy val books: Seq[Span] = parseSpans(allElements._3, "book", 5)
+  }
+
   case object Proverbs extends WritingsBook
   case object Job extends WritingsBook
   case object SongOfSongs extends WritingsBook { override def name: String = "Song of Songs" }
@@ -121,7 +144,7 @@ object Tanach extends NamedCompanion {
 
   override val values: Seq[TanachBook] = chumash ++ nach
 
-  private final case class TanachMetadata(names: Names, chapters: Chapters, weekElements: Seq[Elem])
+  private final case class TanachMetadata(names: Names, chapters: Chapters, elements: Seq[Elem])
 
   private object metadatas extends Holder[TanachBook, TanachMetadata] {
     protected override def calculate: Map[TanachBook, TanachMetadata] = Metadata.loadMetadata(
@@ -130,15 +153,16 @@ object Tanach extends NamedCompanion {
       elementName = "book"
     ).map { case (book, metadata) =>
       metadata.attributes.close()
-      val (chapterElements: Seq[Elem], weekElements: Seq[Elem]) =
-        XML.span(metadata.elements, "chapter", "week")
-      if (!book.isInstanceOf[ChumashBook]) XML.checkNoMoreElements(weekElements)
-      book -> TanachMetadata(metadata.names, Chapters(chapterElements), weekElements)
+      val (chapterElements: Seq[Elem], elements: Seq[Elem]) = XML.take(metadata.elements, "chapter")
+      if (!book.isInstanceOf[ChumashBook] && (book != Psalms)) XML.checkNoMoreElements(elements)
+      book -> TanachMetadata(metadata.names, Chapters(chapterElements), elements)
     }
 
     override def names: Map[TanachBook, Names] = get.mapValues(_.names)
 
     def chapters: Map[TanachBook, Chapters] = get.mapValues(_.chapters)
+
+    def psalmsElements: Seq[Elem] = get(Psalms).elements
   }
 
   private final case class ParshaMetadata(
@@ -154,7 +178,7 @@ object Tanach extends NamedCompanion {
     protected override def calculate: Map[Parsha, ParshaMetadata] =
       Metadata.bind(
         keys = book.parshiot,
-        elements = Tanach.metadatas.get(book).weekElements,
+        elements = XML.span(Tanach.metadatas.get(book).elements, "week"),
         obj = this
       ).mapValues { metadata =>
 
@@ -185,7 +209,8 @@ object Tanach extends NamedCompanion {
     def span: Map[Parsha, Span] = Util.inSequence(
       keys = book.parshiot,
       map = get.mapValues(_.span),
-      f = (pairs: Seq[(Parsha, SpanSemiResolved)]) => Torah.setImpliedTo(pairs.map(_._2), book.chapters.full, book.chapters)
+      f = (pairs: Seq[(Parsha, SpanSemiResolved)]) =>
+        SpanSemiResolved.setImpliedTo(pairs.map(_._2), book.chapters.full, book.chapters)
     )
 
     def days: Map[Parsha, Torah.Customs] = get.map { case (parsha, metadata) =>
@@ -215,7 +240,7 @@ object Tanach extends NamedCompanion {
       val span = Span(maftir.from, maftir.to.getOrElse(parsha.span.to))
 
       val result = Torah.inBook(parsha.book,
-        Torah.setImpliedTo(
+        SpanSemiResolved.setImpliedTo(
           Seq(maftir),
           span,
           book.chapters

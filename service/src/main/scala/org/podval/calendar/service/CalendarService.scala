@@ -16,7 +16,8 @@ import org.podval.calendar.rambam.{RambamSchedule, SeferHamitzvosLessons}
 import org.podval.calendar.tanach.{Chitas, Haftarah, Reading, Schedule}
 import org.podval.judaica.metadata.{Language, LanguageSpec, WithNames}
 import org.podval.judaica.rambam.MishnehTorah
-import org.podval.judaica.tanach.{Custom, Torah}
+import org.podval.judaica.tanach.{Custom, Span, Torah}
+import org.podval.judaica.tanach.Tanach.Psalms
 import org.podval.judaica.util.Util
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -298,6 +299,11 @@ object CalendarService extends StreamApp[IO] {
       renderOptionalReading("Purim morning alternative", daySchedule.purimAlternativeMorning),
       span(cls := "heading")("Chitas"),
       renderChitas(daySchedule.chitas),
+      span(cls := "heading")("Tehillim"),
+      renderTehillim(
+        if ((day.numberInMonth == 29) && day.month.length == 29) Span(Psalms.days(29-1).from, Psalms.days(30-1).to)
+        else Psalms.days(day.numberInMonth)
+      ),
       div(cls := "heading")("Rambam"),
       renderRambam(RambamSchedule.forDay(day)),
       renderOptionalReading("Afternoon", daySchedule.afternoon)
@@ -312,6 +318,10 @@ object CalendarService extends StreamApp[IO] {
       tr(renderFragment(chitas.first)) +:
       chitas.second.fold(Seq.empty[TypedTag[String]])(fragment => Seq(tr(renderFragment(fragment))))
     ))
+  }
+
+  private def renderTehillim(what: Span)(implicit spec: LanguageSpec): TypedTag[String] = {
+    span(what.toLanguageString)
   }
 
   private def renderRambam(schedule: RambamSchedule)(implicit spec: LanguageSpec): Seq[TypedTag[String]] = Seq(
