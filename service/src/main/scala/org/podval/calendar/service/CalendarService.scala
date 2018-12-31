@@ -12,7 +12,7 @@ import org.http4s.server.middleware.AutoSlash
 import org.podval.calendar.dates.{Calendar, DayBase, MonthBase, YearBase}
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.Jewish
-import org.podval.calendar.rambam.RambamSchedule
+import org.podval.calendar.rambam.{RambamSchedule, SeferHamitzvosLessons}
 import org.podval.calendar.tanach.{Chitas, Haftarah, Reading, Schedule}
 import org.podval.judaica.metadata.{Language, LanguageSpec, WithNames}
 import org.podval.judaica.rambam.MishnehTorah
@@ -330,6 +330,10 @@ object CalendarService extends StreamApp[IO] {
       tr(td(spec.toString(2)), renderRambamChapter(schedule.threeChapters.chapter2)),
       tr(td(spec.toString(3)), renderRambamChapter(schedule.threeChapters.chapter3))
     ),
+    span(cls := "subheading")("Sefer Hamitzvos"),
+    table(schedule.seferHamitzvos.parts.map { part: SeferHamitzvosLessons.Part =>
+      tr(td(part.toLanguageString))
+    }),
     span(cls := "subheading")("1 chapter"),
     table(
       tr(td("Cycle"), td("Year"), td("Chapter number")),
@@ -347,9 +351,9 @@ object CalendarService extends StreamApp[IO] {
   )
 
   private def renderRambamChapter(chapter: MishnehTorah.Chapter)(implicit spec: LanguageSpec): Seq[TypedTag[String]] = Seq(
-    td(chapter.part.book.names.toLanguageString),
-    td(chapter.part.names.toLanguageString),
-    td(chapter.names.toLanguageString),
+    td(chapter.part.book.toLanguageString),
+    td(chapter.part.toLanguageString),
+    td(chapter.toLanguageString),
   )
 
   private def renderOptionalReading(
@@ -412,7 +416,7 @@ object CalendarService extends StreamApp[IO] {
     renderHaftarah(maftirAndHaftarah.map(_.haftarah))
 
   private def renderSource(source: Option[WithNames])(implicit spec: LanguageSpec): String =
-    source.fold[String]("")(_.names.toLanguageString)
+    source.fold[String]("")(_.toLanguageString)
 
   private def renderCustoms[T](
     what: String,

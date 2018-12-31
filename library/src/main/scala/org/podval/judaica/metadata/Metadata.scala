@@ -74,7 +74,7 @@ object Metadata {
     val (attributes, elements) = XML.open(element, rootElementName)
     val type_ = attributes.doGet("type")
     attributes.close()
-    require(type_ == resourceNameEffective, s"Wrong metadata type: $type_ instead of $resourceName")
+    require(type_ == resourceNameEffective, s"Wrong metadata type: $type_ instead of $resourceNameEffective")
     XML.span(elements, elementName)
   }
 
