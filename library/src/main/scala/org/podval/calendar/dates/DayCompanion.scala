@@ -1,6 +1,5 @@
 package org.podval.calendar.dates
 
-import Calendar.daysPerWeek
 import org.podval.judaica.metadata.NamedCompanion
 
 /**
@@ -22,7 +21,9 @@ abstract class DayCompanion[C <: Calendar[C]] extends CalendarMember[C] {
     calendar.Year(year).month(month).day(day)
 
   final def numberInWeek(dayNumber: Int): Int =
-    ((dayNumber + firstDayNumberInWeek - 1 - 1) % daysPerWeek) + 1
+    ((dayNumber + firstDayNumberInWeek - 1 - 1) % Calendar.daysPerWeek) + 1
 
   val firstDayNumberInWeek: Int
+
+  final def now: C#Day = calendar.Moment.now.day
 }

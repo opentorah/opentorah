@@ -94,7 +94,7 @@ object CalendarService extends StreamApp[IO] {
 
     final override def toString: String = name
 
-    final def now: C#Day = calendar.nowDay
+    final def now: C#Day = calendar.Day.now
 
     final def getYear(yearStr: String): C#Year = calendar.Year(yearStr.toInt)
 
@@ -110,12 +110,6 @@ object CalendarService extends StreamApp[IO] {
     def gregorian(day: DayBase[_]): Gregorian.Day
 
     def theOther: Kind
-
-    def yearNumberToString(number: Int)(implicit spec: LanguageSpec): String
-
-    def monthNumberToString(number: Int)(implicit spec: LanguageSpec): String
-
-    def dayNumberToString(number: Int)(implicit spec: LanguageSpec): String
   }
 
 
@@ -129,15 +123,6 @@ object CalendarService extends StreamApp[IO] {
     override def gregorian(day: DayBase[_]): Gregorian.Day = Calendar.fromJewish(jewish(day))
 
     override def theOther: Kind = GregorianK
-
-    override def yearNumberToString(number: Int)(implicit spec: LanguageSpec): String =
-      spec.toString(number)
-
-    override def monthNumberToString(number: Int)(implicit spec: LanguageSpec): String =
-      spec.toString(number)
-
-    override def dayNumberToString(number: Int)(implicit spec: LanguageSpec): String =
-      spec.toString(number)
   }
 
   private final case object GregorianK extends Kind("gregorian") {
@@ -150,15 +135,6 @@ object CalendarService extends StreamApp[IO] {
     override def gregorian(day: DayBase[_]): Gregorian.Day = day.asInstanceOf[Gregorian.Day]
 
     override def theOther: Kind = JewishK
-
-    override def yearNumberToString(number: Int)(implicit spec: LanguageSpec): String =
-      number.toString
-
-    override def monthNumberToString(number: Int)(implicit spec: LanguageSpec): String =
-      number.toString
-
-    override def dayNumberToString(number: Int)(implicit spec: LanguageSpec): String =
-      number.toString
   }
 
   private def getKind(kindStr: String): Kind =
@@ -218,13 +194,13 @@ object CalendarService extends StreamApp[IO] {
     kind: Kind,
     location: Location,
     spec: LanguageSpec
-  ): TypedTag[String] = navLink(yearUrl(year), text.getOrElse(kind.yearNumberToString(year.number)))
+  ): TypedTag[String] = navLink(yearUrl(year), text.getOrElse(year.toLanguageString))
 
   private def monthLink(month: MonthBase[_])(implicit
     kind: Kind,
     location: Location,
     spec: LanguageSpec
-  ): TypedTag[String] = navLink(monthUrl(month), kind.monthNumberToString(month.numberInYear))
+  ): TypedTag[String] = navLink(monthUrl(month), month.numberInYearToLanguageString)
 
   private def monthNameLink(month: MonthBase[_], text: Option[String] = None)(implicit
     kind: Kind,
@@ -236,7 +212,7 @@ object CalendarService extends StreamApp[IO] {
     kind: Kind,
     location: Location,
     spec: LanguageSpec
-  ): TypedTag[String] = navLink(dayUrl(day), text.getOrElse(kind.dayNumberToString(day.numberInMonth)))
+  ): TypedTag[String] = navLink(dayUrl(day), text.getOrElse(day.numberInMonthToLanguageString))
 
   private def renderRoot(implicit location: Location, spec: LanguageSpec): IO[Response[IO]] =
     renderHtml("/", div(

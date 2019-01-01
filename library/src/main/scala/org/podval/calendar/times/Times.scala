@@ -28,19 +28,27 @@ trait Times[S <: Times[S]] extends NonPeriodicNumbers[S] { this: S =>
 
 
 object Times {
-  final val hoursPerDay = 24
+  final val hoursPerDay: Int = 24
   require(hoursPerDay % 2 == 0)
 
   final val hoursPerHalfDay: Int = hoursPerDay / 2
 
-  final val partsPerHour = 1080
+  final val partsPerHour: Int = 1080
 
   final val partsPerHalfHour: Int = partsPerHour / 2
 
-  final val momentsPerPart = 76
-
-  final val minutesPerHour = 60 // KH 10:1
+  final val minutesPerHour: Int = 60 // KH 10:1
   require(partsPerHour % minutesPerHour == 0)
 
   final val partsPerMinute: Int = partsPerHour / minutesPerHour
+
+  final val momentsPerPart: Int = 76
+
+  final val momentsPerMinute: Int = partsPerMinute*momentsPerPart
+
+  final val secondsPerMinute: Int = 60
+
+  final val millisecondsPerSecond: Int = 1000
+
+  final val millisecondsPerMinute: Int = secondsPerMinute*millisecondsPerSecond
 }

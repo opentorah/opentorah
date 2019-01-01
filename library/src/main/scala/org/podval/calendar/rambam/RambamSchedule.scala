@@ -59,7 +59,7 @@ object RambamSchedule {
   }
 
   def main(args: Array[String]): Unit = {
-    println(chapters(1).names.doFind(org.podval.judaica.metadata.Language.Russian.toSpec).name)
+    // println(chapters(1).names.doFind(org.podval.judaica.metadata.Language.Russian.toSpec).name)
     // println(lessonNumber(org.podval.calendar.jewish.Jewish.nowDay))
     // printSchedule(Formatter.narrow)(5777)
   }

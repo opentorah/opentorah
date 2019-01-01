@@ -1,13 +1,13 @@
 package org.podval.calendar.dates
 
-import org.podval.judaica.metadata.Numbered
+import org.podval.judaica.metadata.{LanguageSpec, LanguageString, Numbered}
 
 /**
   *
   * @param number  of the Day
   */
 abstract class DayBase[C <: Calendar[C]](number: Int)
-  extends Numbered[C#Day](number) with CalendarMember[C]
+  extends Numbered[C#Day](number) with CalendarMember[C] with LanguageString
 { this: C#Day =>
   require(0 < number)
 
@@ -41,5 +41,8 @@ abstract class DayBase[C <: Calendar[C]](number: Int)
 
   final def toMoment: C#Moment = calendar.Moment().days(number - 1)
 
-  final override def toString: String = year + " " + month.name + " " + numberInMonth
+  final override def toLanguageString(implicit spec: LanguageSpec): String =
+    year.toLanguageString + " " + month.name.toLanguageString + " " + numberInMonthToLanguageString
+
+  final def numberInMonthToLanguageString(implicit spec: LanguageSpec): String = calendar.toString(numberInMonth)
 }

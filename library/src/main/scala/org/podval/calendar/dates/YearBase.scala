@@ -1,13 +1,13 @@
 package org.podval.calendar.dates
 
-import org.podval.judaica.metadata.Numbered
+import org.podval.judaica.metadata.{LanguageSpec, LanguageString, Numbered}
 
 /**
   *
   * @param number  of the Year
   */
 abstract class YearBase[C <: Calendar[C]](number: Int)
-  extends Numbered[C#Year](number) with CalendarMember[C]
+  extends Numbered[C#Year](number) with CalendarMember[C] with LanguageString
 { this: C#Year =>
   def character: C#YearCharacter
 
@@ -59,4 +59,6 @@ abstract class YearBase[C <: Calendar[C]](number: Int)
 
   final def monthDescriptors: Seq[C#MonthDescriptor] =
     calendar.Year.monthDescriptors(character)
+
+  final override def toLanguageString(implicit spec: LanguageSpec): String = calendar.toString(number)
 }
