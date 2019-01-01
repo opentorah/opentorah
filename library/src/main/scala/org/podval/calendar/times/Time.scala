@@ -34,11 +34,24 @@ trait Time[S <: Times[S], N <: Time[S, N]] extends NonPeriodicNumber[S, N] { thi
 
   final def minutes: Int = parts / partsPerMinute
 
-  final def minutes(value: Int): N = parts(value*partsPerMinute+partsWithoutMinutes)
+  final def minutes(value: Int): N = parts(value*partsPerMinute + partsWithoutMinutes)
 
   final def partsWithoutMinutes: Int = parts % partsPerMinute
 
-  final def partsWithoutMinutes(value: Int): N = parts(minutes*partsPerMinute+value)
+  final def partsWithoutMinutes(value: Int): N = parts(minutes*partsPerMinute + value)
+
+  final def seconds: Int = (partsWithoutMinutes*Times.momentsPerPart + moments) * Times.secondsPerMinute /
+    Times.momentsPerMinute
+
+  final def milliseconds: Int = ((partsWithoutMinutes*Times.momentsPerPart + moments) * Times.secondsPerMinute %
+    Times.momentsPerMinute) * Times.millisecondsPerSecond / Times.momentsPerMinute
+
+  final def secondsAndMilliseconds(seconds: Int, milliseconds: Int): N = {
+    val units: Int = (seconds*Times.millisecondsPerSecond + milliseconds)*Times.partsPerMinute
+    val newParts: Int = units / Times.millisecondsPerMinute
+    val newMoments: Int = (units % Times.millisecondsPerMinute)*Times.momentsPerPart / Times.millisecondsPerMinute
+    partsWithoutMinutes(newParts).moments(newMoments)
+  }
 
   final def moments: Int = tail(2)
 

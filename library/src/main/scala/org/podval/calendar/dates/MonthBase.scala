@@ -1,6 +1,6 @@
 package org.podval.calendar.dates
 
-import org.podval.judaica.metadata.Numbered
+import org.podval.judaica.metadata.{LanguageSpec, Numbered}
 
 /**
   *
@@ -40,5 +40,7 @@ abstract class MonthBase[C <: Calendar[C]](number: Int)
 
   final def length: Int = descriptor.length
 
-  private[this] def descriptor = year.monthDescriptors(numberInYear - 1)
+  private[this] def descriptor: C#MonthDescriptor = year.monthDescriptors(numberInYear - 1)
+
+  final def numberInYearToLanguageString(implicit spec: LanguageSpec): String = calendar.toString(numberInYear)
 }

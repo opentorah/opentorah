@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.YearBase
-import Jewish.{Year, Moment, Month, YearCharacter}
+import Jewish.{Moment, Month, Year, YearCharacter}
 
 abstract class JewishYear(number: Int) extends YearBase[Jewish](number) {
   require(0 < number)

@@ -1,5 +1,3 @@
-// TODO  scalacOptions ++= Seq("-Ypartial-unification") - for http4s
-
 buildscript {
   repositories {
     // To function outside a composite, a plugin repository would be required.
@@ -31,32 +29,6 @@ plugins {
   */
 }
 
-def scalaVersion      = '2.12.8'
-def scalaVersionMajor = '2.12'
-def http4sVersion     = '0.18.21' // '0.20.0-SNAPSHOT'
-
-ext.lib = [
-  zinc      : 'com.typesafe.zinc:zinc:0.3.15',
-//  "org.scala-sbt:zinc_${scalaVersionMajor}:1.0.3"
-  scala          : "org.scala-lang:scala-library:$scalaVersion",
-  scalaXml       : "org.scala-lang.modules:scala-xml_$scalaVersionMajor:1.1.0",
-
-  slf4jJdk       : "org.slf4j:slf4j-jdk14:1.7.25",
-
-  http4sDsl      : "org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion",
-  http4sScalatags: "org.http4s:http4s-scalatags_$scalaVersionMajor:$http4sVersion",
-  http4sServer   : "org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion",
-  http4sClient   : "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion",
-
-  scalatags      : "com.lihaoyi:scalatags_$scalaVersionMajor:0.6.7",
-
-  // add Circe when we need JSON: https://circe.github.io/circe/
-
-  scalaCheck     : "org.scalacheck:scalacheck_${scalaVersionMajor}:1.14.0",
-  scalaTest      : "org.scalatest:scalatest_${scalaVersionMajor}:3.0.5",
-  pegdown        : 'org.pegdown:pegdown:1.6.0' // for scalatest reports
-]
-
 allprojects {
   repositories {
     jcenter()
@@ -67,15 +39,55 @@ allprojects {
   group = 'org.podval.calendar'
   version = '0.2.5'
 
-  // TODO doesn't work
-  tasks.withType(ScalaCompile) {
-    scalaCompileOptions.deprecation = true
-    scalaCompileOptions.unchecked = true
-  }
+// for cats: scalacOptions += "-Ypartial-unification"
+//  tasks.withType(ScalaCompile) {
+//    scalaCompileOptions.deprecation = true
+//    scalaCompileOptions.unchecked = true
+//  }
 }
 
+def scalaVersion      = '2.12.8'
+def scalaVersionMajor = '2.12'
+def http4sVersion     = '0.18.21' // '0.20.0-SNAPSHOT'
+def circeVersion      = '0.10.0'
+def catsVersion       = '1.5.0'
+
+ext.lib = [
+  zinc           : 'com.typesafe.zinc:zinc:0.3.15',
+// zinc v1.0 still doesn't work "org.scala-sbt:zinc_${scalaVersionMajor}:1.0.3"
+  scala          : "org.scala-lang:scala-library:$scalaVersion",
+  scalaXml       : "org.scala-lang.modules:scala-xml_$scalaVersionMajor:1.1.0",
+
+  catsCore       : "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion",
+  catsLaws       : "org.typelevel:cats-laws_$scalaVersionMajor:$catsVersion",
+  catsTestkit    : "org.typelevel:cats-testkit_$scalaVersionMajor:$catsVersion",
+
+  // incompatible with 0.10.1 that http4s uses!
+  catsEffect     : "org.typelevel:cats-effect_$scalaVersionMajor:1,1,0",
+
+  algebra        : "org.typelevel:algebra_$scalaVersionMajor:1.0.0",
+  algebraLaws    : "org.typelevel:algebra-laws_$scalaVersionMajor:1.0.0",
+
+  slf4jJdk       : "org.slf4j:slf4j-jdk14:1.7.25",
+
+  http4sDsl      : "org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion",
+  http4sScalatags: "org.http4s:http4s-scalatags_$scalaVersionMajor:$http4sVersion",
+  http4sServer   : "org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion",
+  http4sClient   : "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion",
+
+  scalatags      : "com.lihaoyi:scalatags_$scalaVersionMajor:0.6.7",
+
+  circeCore      : "io.circe:circe-core:$circeVersion",
+  circeGeneric   : "io.circe:circe-generic:$circeVersion",
+  circeParser    : "io.circe:circe-parser:$circeVersion",
+
+  scalaCheck     : "org.scalacheck:scalacheck_$scalaVersionMajor:1.14.0",
+  scalaTest      : "org.scalatest:scalatest_$scalaVersionMajor:3.0.5",
+  pegdown        : 'org.pegdown:pegdown:1.6.0' // for scalatest reports
+]
+
 def gitHubRepository    = "jewish-calendar/calendar"
-def gitHubRepositoryUrl = "https://github.com/${gitHubRepository}"
+def gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
 
 def bintrayConfig = {
   user         = 'dubinsky'
@@ -95,7 +107,7 @@ def bintrayConfig = {
     licenses               = ['Apache-2.0']
     labels                 = ['Scala', 'Calendar', 'Jewish']
     publicDownloadNumbers  = true
-//    githubReleaseNotesFile = 'README.md'
+    githubReleaseNotesFile = 'CHANGELOG.md'
     version { name         = project.version }
   }
 }
@@ -111,13 +123,8 @@ subprojects {
   dependencies {
     zinc lib.zinc
     compile lib.scala
-    testImplementation lib.scalaCheck, lib.scalaTest, lib.pegdown
-  }
-
-  test {
-    testLogging {
-      events = [org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED]
-    }
+    testCompile lib.scalaCheck, lib.scalaTest
+    testRuntime lib.pegdown
   }
 
   task sourceJar(type: Jar) {
@@ -137,9 +144,9 @@ subprojects {
         pom {
           name = project.name
           description = project.description
-          url = "${gitHubRepositoryUrl}"
+          url = "$gitHubRepositoryUrl"
           scm {
-            url = "${gitHubRepositoryUrl}"
+            url = "$gitHubRepositoryUrl"
             connection = "scm:git:git://github.com/${gitHubRepository}.git"
             developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
           }
@@ -191,6 +198,8 @@ idea {
 project(':library') {
   dependencies {
     compile lib.scalaXml
+    testCompile lib.catsCore
+    testCompile lib.algebraLaws
   }
 
   description = 'Jewish Calendar Dates.' 
@@ -210,7 +219,9 @@ project(':service') {
     // http4s -> Scalatags bridge, when included as a dependency, confuses the imports;
     // doing explicit conversions for now :)    
     //    compile lib.http4sScalatags
-    implementation lib.slf4jJdk
+    //
+    // Add Circe dependencies when we need JSON.
+    runtime lib.slf4jJdk
   }
 
   bintray bintrayConfig

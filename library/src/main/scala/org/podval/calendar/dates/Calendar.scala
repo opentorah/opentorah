@@ -2,10 +2,9 @@ package org.podval.calendar.dates
 
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.Jewish
-import org.podval.calendar.numbers.{Digits, NonPeriodicVectorCompanion, PointCompanion, VectorCompanion}
-import org.podval.calendar.times.Times.hoursPerDay
+import org.podval.calendar.numbers.{Digits, NonPeriodicVectorCompanion, VectorCompanion}
 import org.podval.calendar.times.{TimeVectorBase, Times}
-import org.podval.judaica.metadata.Named
+import org.podval.judaica.metadata.LanguageSpec
 
 trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
@@ -39,7 +38,9 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   override type Point <: MomentBase[C]
 
-  final val Moment: PointCompanion[C] = Point
+  override val Point: MomentCompanion[C]
+
+  final val Moment: MomentCompanion[C] = Point
 
   final override type Vector = TimeVectorBase[C]
 
@@ -53,7 +54,7 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   final val TimeVector = Vector
 
-  def nowDay: Day
+  def toString(number: Int)(implicit spec: LanguageSpec): String
 }
 
 
@@ -73,7 +74,7 @@ object Calendar {
   //  Georgian:  |0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0
   private final val dayStartHoursJewish = 18
 
-  private final val dayStartHoursGregorian: Int = hoursPerDay - dayStartHoursJewish
+  private final val dayStartHoursGregorian: Int = Times.hoursPerDay - dayStartHoursJewish
 
   final def toJewish(moment: Gregorian.Moment): Jewish.Moment = {
     val hours = moment.hours
