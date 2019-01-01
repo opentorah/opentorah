@@ -52,6 +52,9 @@ abstract class YearBase[C <: Calendar[C]](number: Int)
   final def month(name: C#MonthName): C#Month =
     month(monthDescriptors.indexWhere(_.name == name) + 1)
 
+  final def monthAndDay(when: MonthAndDay[C]): C#Day =
+    month(when.monthName).day(when.numberInMonth)
+
   final def monthForDay(day: Int): C#Month = {
     require(0 < day && day <= lengthInDays)
     month(monthDescriptors.count(_.daysBefore < day))
