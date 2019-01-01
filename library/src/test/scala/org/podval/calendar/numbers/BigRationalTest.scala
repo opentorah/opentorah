@@ -8,27 +8,9 @@ import Arbitrary.arbitrary
 import BigRational.{one, oneHalf, zero}
 
 final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matchers {
+  import BigRationalTest._
+
   val minusThreeHalfs: BigRational = BigRational(-3, 2)
-
-  def nonZeroInt: Gen[Int] = for {
-    result <- arbitrary[Int] if result != 0
-  } yield result
-
-  def bigInt: Gen[BigInt] = arbitrary[BigInt]
-
-  def nonZeroBigInt: Gen[BigInt] = for {
-    result <- arbitrary[BigInt] if result != 0
-  } yield result
-
-  def rational: Gen[BigRational] = for {
-    numerator <- bigInt
-    denominator <- nonZeroBigInt
-  } yield BigRational(numerator, denominator)
-
-  def nonZeroRational: Gen[BigRational] = for {
-    numerator <- nonZeroBigInt
-    denominator <- nonZeroBigInt
-  } yield BigRational(numerator, denominator)
 
   "apply()" should "not allow zero denominator" in {
     forAll(bigInt) { n => assertThrows[ArithmeticException](BigRational(n, 0)) }
@@ -90,15 +72,6 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     forAll(nonZeroRational) { r => r.invert.invert shouldBe r }
   }
 
-  "+" should "be commutative" in {
-    forAll(rational, rational) { (l, r) => l + r shouldBe r + l }
-  }
-
-  "+" should "have 0 as unit" in {
-    forAll(rational) { r => r + zero shouldBe r }
-    forAll(rational) { r => zero + r shouldBe r }
-  }
-
   "+ and >" should "be consistent" in {
     forAll(rational, rational) { (l, r) => (r < r + l) shouldBe l.signum > 0 }
   }
@@ -110,15 +83,6 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
 
   "-, unary - and +" should "be related correctly" in {
     forAll(rational, rational) { (l, r) => l - r shouldBe l + (-r) }
-  }
-
-  "*" should "be commutative" in {
-    forAll(rational, rational) { (l, r) => l * r shouldBe r * l }
-  }
-
-  "*" should "have 1 as unit" in {
-    forAll(rational) { r => r * one shouldBe r }
-    forAll(rational) { r => one * r shouldBe r }
   }
 
   "1" should "fixed point of invert()" in {
@@ -235,4 +199,26 @@ final class BigRationalTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     minusThreeHalfs.whole shouldBe -1
     minusThreeHalfs.fraction shouldBe -oneHalf
   }
+}
+
+object BigRationalTest {
+  def nonZeroInt: Gen[Int] = for {
+    result <- arbitrary[Int] if result != 0
+  } yield result
+
+  def bigInt: Gen[BigInt] = arbitrary[BigInt]
+
+  def nonZeroBigInt: Gen[BigInt] = for {
+    result <- arbitrary[BigInt] if result != 0
+  } yield result
+
+  def rational: Gen[BigRational] = for {
+    numerator <- bigInt
+    denominator <- nonZeroBigInt
+  } yield BigRational(numerator, denominator)
+
+  def nonZeroRational: Gen[BigRational] = for {
+    numerator <- nonZeroBigInt
+    denominator <- nonZeroBigInt
+  } yield BigRational(numerator, denominator)
 }
