@@ -39,7 +39,7 @@ trait Numbers[S <: Numbers[S]] { this: S =>
     (digits :+ lastValue.round).map(value.signum*_)
   }
 
-  private def ranges(length: Int): Seq[Int] = (0 until length).map(range)
+  def ranges(length: Int): Seq[Int] = (0 until length).map(range)
 
   final def toString[N <: Number[S, N]](number: N, length: Int): String = {
     def signFor(position: Int): Option[String] = signPartial.lift(position)
