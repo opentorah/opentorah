@@ -273,6 +273,7 @@ object CalendarService extends StreamApp[IO] {
       div(daySchedule.dayNames.map { withNames: WithNames => span(cls := "name", withNames.names.doFind(spec).name) }),
       renderOptionalReading("Morning", daySchedule.morning),
       renderOptionalReading("Purim morning alternative", daySchedule.purimAlternativeMorning),
+      if (!day.isShabbosMevarchim) Seq.empty[TypedTag[String]] else renderShabbosMevarchim(day.month.next),
       span(cls := "heading")("Chitas"),
       renderChitas(daySchedule.chitas),
       span(cls := "heading")("Tehillim"),
@@ -285,6 +286,16 @@ object CalendarService extends StreamApp[IO] {
       renderOptionalReading("Afternoon", daySchedule.afternoon)
     ))
   }
+
+  private def renderShabbosMevarchim(month: Jewish.Month)(implicit spec: LanguageSpec): Seq[TypedTag[String]] = Seq(
+    span(cls := "subheading")("Shabbos Mevarchim"),
+    table(tr(
+      td(month.name.toLanguageString),
+      if (month.prev.length == 30) td(month.prev.lastDay.name.toLanguageString) else td(),
+      td(month.firstDay.name.toLanguageString),
+      td(month.newMoon.toLanguageString)
+    ))
+  )
 
   private def renderChitas(chitas: Chitas)(implicit spec: LanguageSpec): TypedTag[String] = {
     def renderFragment(fragment: Torah.Fragment) =

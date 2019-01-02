@@ -12,6 +12,8 @@ abstract class JewishDay(number: Int) extends DayBase[Jewish](number) {
 
   final def isRoshChodesh: Boolean = roshChodeshOf.isDefined
 
+  final def isShabbosMevarchim: Boolean = isShabbos && (shabbosAfter.month != this.month)
+
   final def shabbosAfter: Jewish.Day = next.next(Jewish.Day.Name.Shabbos)
 
   final def shabbosBefore: Jewish.Day = prev.prev(Jewish.Day.Name.Shabbos)
