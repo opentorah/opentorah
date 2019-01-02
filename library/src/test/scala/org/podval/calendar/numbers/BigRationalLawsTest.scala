@@ -13,7 +13,7 @@ class BigRationalLawsTest extends FunSuite with Discipline {
 
   // we discard zero denominators, so we need a higher maxDiscardedFactor than the default 5.0:
   implicit override val generatorDrivenConfig: PropertyCheckConfiguration =
-    PropertyCheckConfiguration(maxDiscardedFactor = PosZDouble(50.0))
+    PropertyCheckConfiguration(maxDiscardedFactor = PosZDouble(70.0))
 
   implicit def isArbitrary: Arbitrary[BigRational] = Arbitrary(rational)
 
