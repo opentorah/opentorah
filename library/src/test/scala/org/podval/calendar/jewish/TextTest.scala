@@ -89,6 +89,11 @@ class TextTest extends FlatSpec with Matchers {
      TimeVector().days(2).hours(16).parts(595)
   }
 
+  "year length for short years" should "be as in KH 8:7-8" in {
+    Jewish.Year.shortNonLeapYearLength shouldBe 353
+    Jewish.Year.shortLeapYearLength shouldBe 383
+  }
+
   "kind of the year" should "be correct for years from KH 8:9" in {
     var numberRegular: Int = 0
     var numberFull: Int = 0

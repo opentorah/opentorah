@@ -13,19 +13,7 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
     for (isLeap <- Seq(true, false); kind <- Kind.values) yield (isLeap, kind)
 
   // KH 8:5-6
-  protected final override def monthNamesAndLengths(character: YearCharacter): Seq[MonthNameAndLength] =
-    // year structures are memoized instead of being calculated each time; no change in performance...
-    character2monthNamesAndLengths(character)
-
-  private val character2monthNamesAndLengths: Map[YearCharacter, Seq[MonthNameAndLength]] =
-    (for (isLeap <- Set(true, false); kind <- Kind.values) yield {
-      val character = (isLeap, kind)
-      character -> calculateMonthNamesAndLengths(character)
-    }).toMap
-
-  private def calculateMonthNamesAndLengths(character: YearCharacter):
-    Seq[MonthNameAndLength] =
-  {
+  protected final override def monthNamesAndLengths(character: YearCharacter): Seq[MonthNameAndLength] = {
     character match { case (isLeap: Boolean, kind: Kind) =>
       Seq(
         createMonthNameAndLength(Tishrei   , 30),
@@ -58,8 +46,11 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
   final override def lengthInMonths(yearNumber: Int): Int = Cycle.yearLengthInMonths(yearNumber)
 
   // KH 8:7-8
+  val shortNonLeapYearLength: Int = yearLength((false, Kind.Short)) //353
+  val shortLeapYearLength: Int = yearLength((true, Kind.Short)) // 383
+
   final def kind(isLeap: Boolean, lengthInDays: Int): Kind = {
-    val daysOverShort: Int = lengthInDays - (if (isLeap) 383 else 353)
+    val daysOverShort: Int = lengthInDays - (if (isLeap) shortLeapYearLength else shortNonLeapYearLength)
 
     daysOverShort match {
       case 0 => Kind.Short
