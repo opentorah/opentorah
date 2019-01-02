@@ -85,7 +85,7 @@ class RotationTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matc
     Rotation(-30) - Rotation( 30) shouldBe Rotation(-60)
   }
 
-  "angles" should "multiply correctly" in {
+  it should "multiply by number correctly" in {
     Rotation(90)*2 shouldBe Rotation(180)
     Rotation(90)*3 shouldBe Rotation(270)
     Rotation(90)*4 shouldBe Rotation(360)

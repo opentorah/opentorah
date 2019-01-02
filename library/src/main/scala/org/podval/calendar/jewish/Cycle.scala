@@ -19,26 +19,26 @@ object Cycle {
   final def yearInCycle(yearCycle: Int, yearNumberInCycle: Int): Int =
     yearsInCycle * (yearCycle-1) + yearNumberInCycle
 
-  final def firstYearInCycle(cycleNumber: Int): Int = yearInCycle(cycleNumber, 0)
+  private final def firstYearInCycle(cycleNumber: Int): Int = yearInCycle(cycleNumber, 0)
 
   final def yearLengthInMonths(yearNumber: Int): Int = yearLengthInMonths(isLeapYear(yearNumber))
 
   final def yearLengthInMonths(isLeap: Boolean): Int = if (isLeap) 13 else 12
 
-  final val monthsBeforeYearInCycle: Seq[Int] =
+  private final val monthsBeforeYearInCycle: Seq[Int] =
     ((1 to yearsInCycle) map yearLengthInMonths).scanLeft(0)(_ + _)
 
-  final def firstMonthInCycle(yearNumber: Int): Int =
+  private final def firstMonthInCycle(yearNumber: Int): Int =
     monthsBeforeYearInCycle(yearNumberInCycle(yearNumber) - 1) + 1
 
-  final val monthsInCycle: Int = monthsBeforeYearInCycle.last
+  private final val monthsInCycle: Int = monthsBeforeYearInCycle.last
 
   final def firstMonth(yearNumber: Int): Int =
     monthsInCycle*(yearCycle(yearNumber) - 1) + firstMonthInCycle(yearNumber)
 
   final val cycleLength: TimeVector = Moon.meanLunarPeriod * monthsInCycle
 
-  final def numberInCycleOfMonth(monthNumber: Int): Int = ((monthNumber - 1) % monthsInCycle) + 1
+  private final def numberInCycleOfMonth(monthNumber: Int): Int = ((monthNumber - 1) % monthsInCycle) + 1
 
   final def monthYear(monthNumber: Int): Int = {
     val cycleOfMonth = ((monthNumber - 1) / monthsInCycle) + 1
