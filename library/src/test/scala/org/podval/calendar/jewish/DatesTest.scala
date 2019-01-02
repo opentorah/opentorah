@@ -200,4 +200,14 @@ final class DatesTest extends FlatSpec with Matchers {
   "Jewish Year" should "have allowed type with Pesach on correct day of the week" in {
     years foreach { year => Pesach(year).name shouldBe YearType.get(year).pesach }
   }
+
+  "Giving of the Torah" should "be off by the fixed calendar :)" in {
+    // Revelation took place in year 2448, on Shabbos, Sivan 6th (or 7th according to Rabbi Jose).
+    // Jews came to Mount Sinai on new moon, which was on Monday (or Sunday).
+    // Fixed calendar gives the new moon of the month on Wednesday and the 6th on the following Wednesday,
+    // proving that the fixed calendar was not in use then ;)
+    val day = Year(2448).month(Sivan).day(6)
+    day.name shouldBe Rvii
+    day.month.newMoon.day.name shouldBe Rvii
+  }
 }
