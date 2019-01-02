@@ -16,7 +16,7 @@ class TextTest extends FlatSpec with Matchers {
     range(3) shouldBe 60
     range(4) shouldBe 60
     range(5) shouldBe 60
-    range(6)
+    range(6) shouldBe 60
   }
 
   "zodiac" should "be as in KH 11:7-9" in {
