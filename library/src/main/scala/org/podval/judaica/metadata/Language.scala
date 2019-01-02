@@ -28,7 +28,7 @@ object Language extends NamedCompanion {
     private val hundreds: List[Char] = "קרשת".toList
 
     override def toString(number: Int): String = {
-      require(number > 0)
+// to display 0 as empty string :)      require(number > 0)
       require(number <= 10000)
 
       val result = new StringBuilder
