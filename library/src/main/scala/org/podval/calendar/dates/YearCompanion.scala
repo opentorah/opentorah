@@ -35,6 +35,11 @@ abstract class YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
   protected final def createMonthNameAndLength(name: C#MonthName, length: Int):
     C#MonthNameAndLength = new MonthNameAndLengthBase[C](name, length)
 
+  protected final def yearLength(character: C#YearCharacter): Int = {
+    val lastMonth: C#MonthDescriptor = monthDescriptors(character).last
+    lastMonth.daysBefore + lastMonth.length
+  }
+
   protected def areYearsPositive: Boolean
 
   private[this] final def yearsForSureBefore(dayNumber: Int): Int =  {

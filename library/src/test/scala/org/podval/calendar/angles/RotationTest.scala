@@ -5,9 +5,9 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 import Angles.Rotation
 
-class AngleTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matchers {
+class RotationTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matchers {
 
-  behavior of "Angle"
+  behavior of "Rotation"
 
   it should "construct correctly" in {
     def construction(degrees: Int, minutes: Int): Unit = {
