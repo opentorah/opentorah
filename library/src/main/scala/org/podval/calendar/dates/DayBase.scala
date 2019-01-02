@@ -35,6 +35,8 @@ abstract class DayBase[C <: Calendar[C]](number: Int)
 
   final def is(name: C#DayName): Boolean = this.name == name
 
+  final def monthAndDay: MonthAndDay[C] = new MonthAndDay[C](month.name, numberInMonth)
+
   final def next(dayName: C#DayName): C#Day = if (is(dayName)) this else this.next.next(dayName)
 
   final def prev(dayName: C#DayName): C#Day = if (is(dayName)) this else this.prev.prev(dayName)

@@ -9,12 +9,13 @@ import org.scalactic.anyvals.PosZDouble
 import org.typelevel.discipline.scalatest.Discipline
 
 class BigRationalLawsTest extends FunSuite with Discipline {
+  import BigRationalTest._
 
-  // we discard zero denominators, so we need a higher maxiscardedFactor than the default 5.0:
+  // we discard zero denominators, so we need a higher maxDiscardedFactor than the default 5.0:
   implicit override val generatorDrivenConfig: PropertyCheckConfiguration =
     PropertyCheckConfiguration(maxDiscardedFactor = PosZDouble(50.0))
 
-  implicit def isArbitrary: Arbitrary[BigRational] = Arbitrary(BigRationalTest.rational)
+  implicit def isArbitrary: Arbitrary[BigRational] = Arbitrary(rational)
 
   implicit val isAdditiveMonoid: AdditiveMonoid[BigRational] = new AdditiveMonoid[BigRational] {
     override def zero: BigRational = BigRational.zero
@@ -32,5 +33,5 @@ class BigRationalLawsTest extends FunSuite with Discipline {
 
   implicit def isEq: Eq[BigRational] = Eq.fromUniversalEquals
 
-  checkAll("BigRational.CommutativeRingLaws", RingLaws[BigRational].field)
+  checkAll("BigRational.FieldLaws", RingLaws[BigRational].field)
 }
