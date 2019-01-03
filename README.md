@@ -88,13 +88,14 @@ Raw data for the hazot calculations is obtainable from the Naval Oceanography Po
 There it is produced in accordance with the algorithm described in the Meese's book, I think...
 Another source of data is http://www.timeanddate.com/worldclock/sunrise.html.
 
-## Integratio
-## Joda Time
+## Integrations
+
+### Joda Time
 
 As a good open-source citizen I probably should integrate my implementation of the Jewish calendar into [Joda Time](http://joda-time.sourceforge.net/) or [JSR 130](http://jcp.org/en/jsr/detail?id=310) (although the latter is inactive,
 the article [New Java Date and Time API](http://today.java.net/pub/a/today/2008/09/18/jsr-310-new-java-date-time-api.html) notwithstanding). 
 
-## Google Calendar Integration
+### Google Calendar Integration
 
 It'd be nice to integrate with the Google Calendar.
 
@@ -109,5 +110,5 @@ It'd be nice to integrate with the Google Calendar.
 
 See <http://blog.dub.podval.org/2011/11/publishing-papers-on-web.html> about technical details of the publication.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE0NDg4OTg3MzZdfQ==
+eyJoaXN0b3J5IjpbODMyODMyOTQ1XX0=
 -->
