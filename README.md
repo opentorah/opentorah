@@ -10,7 +10,7 @@ as described by Rambam in the Laws of the Sanctification of the Moon, Chapters 6
 - [x] convert dates from Jewish calendar to Gregorian and back
 - [x] list [dates of Birchas Hachamo](https://docs.google.com/document/d/1hpPZ0LYU3p8a-LJRXEqzXig-VQthkQ_MkaY79PMqr-Y/edit?hl=en_US)
 - [x] generate Torah and Haftorah reading schedule
-- [ x] generate schedule of learning Rambam
+- [x] generate schedule of learning Rambam
 
 I want to do certain things with the astronomical Jewsih calendar
 as described by Rambam in the Laws of the Sanctification of the Moon, in Chapters 11-19:
@@ -109,6 +109,3 @@ It'd be nice to integrate with the Google Calendar.
 ## Publishing on the Web
 
 See <http://blog.dub.podval.org/2011/11/publishing-papers-on-web.html> about technical details of the publication.
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbODMyODMyOTQ1XX0=
--->
