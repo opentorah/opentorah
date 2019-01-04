@@ -6,21 +6,34 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
+
+# TODO add MathJax!
+
 title: Rambam on Jewish Calendar
+author: "Leonid Dubinsky"
 email: dub@podval.org
+
 description: >- # this means to ignore newlines until "baseurl:"
   Code for working with Jewish calendar, both arithmetic and astronomical.
   Some remarks.
+
+url: "http://www.jewish-calendar.org"
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: leoniddubinsky
+
 github_username:  dubinsky
+# twitter_username: leoniddubinsky
+
+# If you want to link only specific pages in your header, uncomment
+# this and add the path to the pages in order as they should show up
+header_pages:
+  - README.md
 
 # Build settings
 markdown: kramdown
 theme: minima
-#plugins:
-#  - jekyll-feed
+
+include:
+  - README.md
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
@@ -33,3 +46,11 @@ theme: minima
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+defaults:
+  -
+    scope:
+      path: ""
+    values:
+      layout: "default"
+      math: false
