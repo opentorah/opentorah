@@ -17,13 +17,12 @@ title: Table of Contents
 
 [CHANGELOG](/CHANGELOG.md)
 
-[CODEOWNERS](/CODEOWNERS)
-
 [JCenter](https://jcenter.bintray.com/org/podval/calendar/org.podval.calendar-library/)
-
 
 ### Writings ###
 
 [Paper](/paper/)
 
 [Remarks](/remarks/) 
+
+[Publishing](/Publishing.md)
