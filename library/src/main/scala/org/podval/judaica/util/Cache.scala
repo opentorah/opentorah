@@ -1,9 +1,13 @@
 package org.podval.judaica.util
 
-abstract class Cache[S, T] {
+abstract class Cache[S, T] extends Function[S, T] {
   private val values = new collection.mutable.WeakHashMap[S, T]
 
   final def get(s: S): T = values.getOrElseUpdate(s, calculate(s))
 
-  protected def calculate(s: S): T
+  final override def apply(s: S): T = get(s)
+
+  final def get(s: S, useCache: Boolean): T = if (useCache) get(s) else calculate(s)
+
+  def calculate(s: S): T
 }
