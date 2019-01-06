@@ -43,7 +43,7 @@ abstract class YearBase[C <: Calendar[C]](number: Int)
 
   final def month(numberInYear: Int): C#Month = {
     require(0 < numberInYear && numberInYear <= lengthInMonths)
-    calendar.Month(firstMonthNumber + numberInYear - 1)
+    calendar.Month(this, numberInYear)
   }
 
   final def containsMonth(name: C#MonthName): Boolean =

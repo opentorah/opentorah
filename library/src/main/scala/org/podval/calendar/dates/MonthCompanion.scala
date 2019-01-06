@@ -10,10 +10,10 @@ abstract class MonthCompanion[C <: Calendar[C]] extends CalendarMember[C] {
 
   final type Name = Name.Key
 
-  def apply(number: Int): C#Month
+  final def apply(year: C#Year, numberInYear: Int): C#Month =
+    apply(year.firstMonthNumber + numberInYear - 1)
 
-  final def apply(year: Int, monthInYear: Int): C#Month =
-    calendar.Year(year).month(monthInYear)
+  def apply(number: Int): C#Month
 
   def yearNumber(monthNumber: Int): Int
 
