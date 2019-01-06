@@ -48,7 +48,7 @@ final class ScheduleTest extends FlatSpec with Matchers {
     isCombined(Vayeilech) shouldBe !roshHaShanah.is(Day.Name.Sheni) && !roshHaShanah.is(Day.Name.Shlishi)
 
     val combined: Set[Parsha] = readings.values.toSet.filter(_.isCombined).map(_.parsha)
-    val yearType = YearType.get(year)
+    val yearType = YearType.forYear(year)
     val combinedFromStructure: Seq[Parsha] = ReadingStructure.all(yearType).combined(inHolyLand)
     combined shouldBe combinedFromStructure.toSet
   }

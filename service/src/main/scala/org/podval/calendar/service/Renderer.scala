@@ -2,9 +2,9 @@ package org.podval.calendar.service
 
 import org.podval.calendar.dates.{Calendar, DayBase, MonthBase, YearBase}
 import org.podval.calendar.gregorian.Gregorian
-import org.podval.calendar.jewish.Jewish
+import org.podval.calendar.jewish.{Cycle, Jewish, SeasonsFixed, Shemittah, SunCycle, YearType}
 import org.podval.calendar.rambam.{RambamSchedule, SeferHamitzvosLessons}
-import org.podval.calendar.tanach.{Chitas, Haftarah, Reading, Schedule}
+import org.podval.calendar.tanach.{Chitas, Haftarah, Reading, Schedule, SpecialDay}
 import org.podval.judaica.metadata.{Language, LanguageSpec, WithNames}
 import org.podval.judaica.rambam.MishnehTorah
 import org.podval.judaica.tanach.{Custom, Span, Torah}
@@ -90,18 +90,24 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
 
   def renderYear(yearStr: String): String = {
     val year: YearBase[_] = getYear(yearStr)
-    renderHtml(yearUrl(year), div(
-      yearLink(year-1, text = Some("<")),
-      yearLink(year),
-      yearLink(year+1, text = Some(">")),
-      table(tbody(year.months.map { month: MonthBase[_] =>
-        tr(
-          td(monthLink(month)),
-          td(monthNameLink(month))
-        )
-      }))
-    ))
+    renderHtml(
+      yearUrl(year),
+      div(
+        yearLink(year-1, text = Some("<")),
+        yearLink(year),
+        yearLink(year+1, text = Some(">")),
+        table(tbody(year.months.map { month: MonthBase[_] =>
+          tr(
+            td(monthLink(month)),
+            td(monthNameLink(month))
+          )
+        })),
+        renderYearInformation(year)
+      )
+    )
   }
+
+  protected def renderYearInformation(year: YearBase[_]): Seq[TypedTag[String]] = Seq.empty
 
   def renderMonth(yearStr: String, monthStr: String): String = {
     val month: MonthBase[_] = getMonth(yearStr, monthStr)
@@ -299,6 +305,57 @@ object Renderer {
     override protected def first(day: DayBase[_]): DayBase[_] = jewish(day)
 
     override protected def second(day: DayBase[_]): DayBase[_] = gregorian(day)
+
+    override protected def renderYearInformation(yearRaw: YearBase[_]): Seq[TypedTag[String]] = {
+      val year: Jewish.Year = yearRaw.asInstanceOf[Jewish.Year]
+
+      val numbers: TypedTag[String] = table(
+        tr(td("from creation"), td(year.toLanguageString(spec))),
+        tr(td("is leap"), td(year.isLeap.toString())),
+        tr(td("months"), td(spec.toString(year.lengthInMonths))),
+        tr(td("days"), td(spec.toString(year.lengthInDays))),
+        tr(td("type"), td(YearType.forYear(year).toString)),
+        tr(td("in Calendar cycle"), td(spec.toString(Cycle.yearNumberInCycle(year.number)))),
+        tr(td("in Shemittah cycle"), td(spec.toString(Shemittah.yearNumberInCycle(year)))),
+        tr(td("in Birkchas Hachamo cycle"), td(spec.toString(SunCycle.yearNumberInCycle(year)))),
+      )
+
+      def tkufa(name: String, number: Int, year: Jewish.Year): TypedTag[String] = tr(
+        td(name),
+        td(SeasonsFixed.Shmuel.tkufa(year, number).toGregorianLanguageString(spec)),
+        td(SeasonsFixed.RavAda.tkufa(year, number).toGregorianLanguageString(spec))
+      )
+
+      val tkufot: TypedTag[String] = table(
+        tr(td("Tkufa"), td("Shmuel"), td("Rav Ada")),
+        tkufa("Tishrei", 2, year-1),
+        tkufa("Teves", 3, year-1),
+        tkufa("Nisan", 0, year),
+        tkufa("Tammuz", 1, year)
+      )
+
+      val festivalDays: Seq[(SpecialDay.Date, Jewish.Day)] =
+        SpecialDay.daysWithSpecialReadings(location == Location.HolyLand)
+          .map(specialDay => specialDay -> specialDay.correctedDate(year))
+          .toSeq.sortBy(_._2)
+
+      val festivals: TypedTag[String] = table(
+        festivalDays.map { case (specialDay, day) => tr(
+          td(specialDay.toLanguageString(spec)),
+          td(day.toLanguageString(spec)),
+          td(day.name.toLanguageString(spec))
+        )}
+      )
+
+      Seq(
+        span(cls := "heading")("Year"),
+        numbers,
+        span(cls := "heading")("Tkufot"),
+        tkufot,
+        span(cls := "heading")("Special Days"),
+        festivals
+      )
+    }
   }
 
   private final class GregorianRenderer(location: Location, spec: LanguageSpec) extends Renderer(location, spec) {
