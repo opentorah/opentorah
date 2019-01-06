@@ -1,6 +1,6 @@
 package org.podval.calendar.jewish
 
-import Jewish.{Year, Day}
+import org.podval.calendar.jewish.Jewish.{Day, Year}
 
 final case class YearType
 (
@@ -9,7 +9,9 @@ final case class YearType
   roshHashanah: Day.Name,
   kind: Year.Kind,
   pesach: Day.Name
-)
+) {
+  override def toString: String = name
+}
 
 // This table of unknown origin was submitted by @michaelko58; it gives all occurring year types.
 object YearType {
@@ -30,15 +32,6 @@ object YearType {
   val L7F: YearType = YearType(isLeap = true, "זשה")
 
   private val types: Seq[YearType] = Seq(N2S, N2F, N3R, N5R, N5F, N7S, N7F, L2S, L2F, L3R, L4S, L5F, L7S, L7F)
-
-  def get(year: Year): YearType = {
-    val (isLeap, kind) = year.character
-    types.find { yearType =>
-      (yearType.isLeap == isLeap) &&
-      (yearType.roshHashanah == year.firstDay.name) &&
-      (yearType.kind == kind)
-    }.get
-  }
 
   def apply(isLeap: Boolean, name: String): YearType = {
     require(name.length == 3)
@@ -62,5 +55,14 @@ object YearType {
       },
       pesach = dayOfTheWeek(name.charAt(2))
     )
+  }
+
+  def forYear(year: Year): YearType = {
+    val (isLeap, kind) = year.character
+    types.find { yearType =>
+      (yearType.isLeap == isLeap) &&
+        (yearType.roshHashanah == year.firstDay.name) &&
+        (yearType.kind == kind)
+    }.get
   }
 }

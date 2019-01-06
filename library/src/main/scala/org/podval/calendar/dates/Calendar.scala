@@ -16,6 +16,8 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   type YearCharacter
 
+  final val cacheYears: Boolean = false
+
   val Year: YearCompanion[C]
 
   type Month <: MonthBase[C]

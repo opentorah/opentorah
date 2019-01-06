@@ -15,7 +15,7 @@ class Gregorian private() extends Calendar[Gregorian] {
   final override type YearCharacter = Boolean
 
   final override object Year extends GregorianYearCompanion with GregorianCalendarMember {
-    override def apply(number: Int): Year = new GregorianYear(number) with GregorianCalendarMember
+    protected override def newYear(number: Int): Year = new GregorianYear(number) with GregorianCalendarMember
   }
 
   final override type Month = GregorianMonth

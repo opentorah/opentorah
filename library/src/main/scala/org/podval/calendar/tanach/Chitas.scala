@@ -34,7 +34,7 @@ object Chitas {
     parsha.days.doFind(Custom.Chabad).fromWithNumbers(parsha).spans
 
   private val simchasTorahs = new Cache[(Year, Boolean), Day] {
-    override protected def calculate(args: (Year, Boolean)): Day = args match {
+    override def calculate(args: (Year, Boolean)): Day = args match {
       case (year: Year, inHolyLand: Boolean) =>
         val specialDay: SpecialDay.Date =
           if (inHolyLand) SpecialDay.SheminiAtzeresAndSimchasTorahInHolyLand else SpecialDay.SimchasTorah

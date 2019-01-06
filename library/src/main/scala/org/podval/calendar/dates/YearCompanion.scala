@@ -1,10 +1,17 @@
 package org.podval.calendar.dates
 
+import org.podval.judaica.util.Cache
+
 /**
   *
   */
 abstract class YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
-  def apply(number: Int): C#Year
+  private final val yearsCache: Cache[Int, C#Year] = new Cache[Int, C#Year] {
+    override def calculate(number: Int): C#Year = newYear(number)
+  }
+
+  final def apply(number: Int): C#Year =
+    yearsCache.get(number, calendar.cacheYears)
 
   final def apply(month: C#Month): C#Year =
     apply(calendar.Month.yearNumber(month.number))
@@ -15,6 +22,8 @@ abstract class YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
     while (result.next.firstDayNumber <= day.number) result = result.next
     result
   }
+
+  protected def newYear(number: Int): C#Year
 
   // lazy to make initialization work
   lazy val monthDescriptors: Map[C#YearCharacter, Seq[C#MonthDescriptor]] =

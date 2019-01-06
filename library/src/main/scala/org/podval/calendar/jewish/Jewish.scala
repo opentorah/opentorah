@@ -15,7 +15,7 @@ class Jewish private() extends Calendar[Jewish] {
   final override type YearCharacter = (Boolean, Year.Kind)
 
   final override object Year extends JewishYearCompanion with JewishCalendarMember {
-    override def apply(number: Int): Year = new JewishYear(number) with JewishCalendarMember
+    protected override def newYear(number: Int): Year = new JewishYear(number) with JewishCalendarMember
   }
 
   final override type Month = JewishMonth

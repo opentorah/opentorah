@@ -198,7 +198,7 @@ final class DatesTest extends FlatSpec with Matchers {
   }
 
   "Jewish Year" should "have allowed type with Pesach on correct day of the week" in {
-    years foreach { year => Pesach(year).name shouldBe YearType.get(year).pesach }
+    years foreach { year => Pesach(year).name shouldBe YearType.forYear(year).pesach }
   }
 
   "Giving of the Torah" should "be off by the fixed calendar :)" in {
