@@ -10,7 +10,7 @@ abstract class JewishYear(number: Int) extends YearBase[Jewish](number) {
 
   final def newYearDelay: NewYear.Delay = NewYear.delay(number, newMoon)
 
-  final override def firstDayNumber: Int = newMoon.day.number + newYearDelay.days
+  final override def firstDayNumber: Int = newMoon.dayNumber + newYearDelay.days
 
   final override def lengthInDays: Int = next.firstDayNumber - this.firstDayNumber
 
