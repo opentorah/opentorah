@@ -1,6 +1,6 @@
 package org.podval.calendar.jewish
 
-import org.podval.calendar.jewish.Jewish.{Moment, TimeVector}
+import org.podval.calendar.jewish.Jewish.{Moment, Month, TimeVector, Year}
 
 object Moon {
   final def newMoon(number: Int): Moment = firstNewMoon + meanLunarPeriod*(number-1)
@@ -10,4 +10,7 @@ object Moon {
 
   // KH 6:8 Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2), BeHaRaD:
   final val firstNewMoon: Moment = Moment().day(2).nightHours(5).parts(204)
+
+  // KH 6:8
+  final lazy val firstMoladNisan: Moment = Year(1).month(Month.Name.Nisan).newMoon
 }

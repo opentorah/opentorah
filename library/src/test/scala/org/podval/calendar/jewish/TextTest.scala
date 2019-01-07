@@ -5,7 +5,7 @@ import org.podval.calendar.times.Times.{hoursPerDay, hoursPerHalfDay, momentsPer
 import Jewish.{Day, Month, TimeVector, Year, range, week}
 import LeapYearsCycle.{leapYear, normalYear}
 import Moon.meanLunarPeriod
-import Sun.{yearOfRavAda, yearOfShmuel}
+import Sun.{RavAda, Shmuel}
 import org.podval.calendar.dates.YearsCycle
 
 /**
@@ -41,8 +41,8 @@ class TextTest extends FlatSpec with Matchers {
     leapYear shouldBe TimeVector().days(383).hours(21).parts(589)
 
     // (see also KH 9:1, 10:6)
-    yearOfShmuel shouldBe TimeVector().days(365).hours(6)
-    (yearOfShmuel - normalYear) shouldBe TimeVector().days(10).hours(21).parts(204)
+    Shmuel.yearLength shouldBe TimeVector().days(365).hours(6)
+    (Shmuel.yearLength - normalYear) shouldBe TimeVector().days(10).hours(21).parts(204)
   }
 
   "weekly reminders of month and year" should "be as in KH 6:5" in {
@@ -72,12 +72,12 @@ class TextTest extends FlatSpec with Matchers {
   "year of Shmuel" should "be as in KH 6:10; 9:1-2" in {
     LeapYearsCycle.yearsInCycle shouldBe 19
     LeapYearsCycle.leapYearsInCycle shouldBe 7
-    yearOfShmuel shouldBe TimeVector().days(365).hours(6)
+    Shmuel.yearLength shouldBe TimeVector().days(365).hours(6)
     LeapYearsCycle.cycleLength shouldBe (normalYear*12 + leapYear*7)
-    (yearOfShmuel*LeapYearsCycle.yearsInCycle - LeapYearsCycle.cycleLength) shouldBe
+    (Shmuel.yearLength*LeapYearsCycle.yearsInCycle - LeapYearsCycle.cycleLength) shouldBe
       TimeVector().hours(1).parts(485)
     // KH 9:2
-    SeasonsFixed.Shmuel.seasonLength shouldBe TimeVector().days(91).hours(7).halfHour
+    Shmuel.seasonLength shouldBe TimeVector().days(91).hours(7).halfHour
   }
 
   "leap years" should "be as in KH 6:11" in {
@@ -146,10 +146,10 @@ class TextTest extends FlatSpec with Matchers {
   }
 
   "first tkufas Nisan for Shmuel" should "be as in KH 9:3-4" in {
-    SeasonsFixed.firstMoladNisan shouldBe Year(1).month(Month.Name.Nisan).newMoon
-    (SeasonsFixed.firstMoladNisan - SeasonsFixed.Shmuel.firstTkufasNisan) shouldBe
+    Moon.firstMoladNisan shouldBe Year(1).month(Month.Name.Nisan).newMoon
+    (Moon.firstMoladNisan - Shmuel.firstTkufasNisan) shouldBe
       TimeVector().days(7).hours(9).parts(642)
-    SeasonsFixed.Shmuel.firstTkufasNisan.day.name shouldBe Day.Name.Rvii
+    Shmuel.firstTkufasNisan.day.name shouldBe Day.Name.Rvii
   }
 
   "tkufos of 4930" should "be as in KH 9:5-7" in {
@@ -157,41 +157,41 @@ class TextTest extends FlatSpec with Matchers {
 
     LeapYearsCycle.forYear(year) shouldBe YearsCycle.In(260, 9)
 
-    val tkufasNisan = SeasonsFixed.Shmuel.tkufasNisan(year)
+    val tkufasNisan = Shmuel.tkufasNisan(year)
     tkufasNisan.day.name shouldBe Day.Name.Chamishi
     tkufasNisan.time shouldBe TimeVector().hours(6)
     tkufasNisan.day shouldBe year.month(Month.Name.Nisan).day(8)
 
-    val tkufasTammuz = SeasonsFixed.Shmuel.tkufasTammuz(year)
+    val tkufasTammuz = Shmuel.tkufasTammuz(year)
     tkufasTammuz.day.name shouldBe Day.Name.Chamishi
     tkufasTammuz.time shouldBe TimeVector().hours(13).halfHour
 
-    val tkufasTishrei = SeasonsFixed.Shmuel.tkufasTishrei(year)
+    val tkufasTishrei = Shmuel.tkufasTishrei(year)
     tkufasTishrei.day.name shouldBe Day.Name.Chamishi
     tkufasTishrei.time shouldBe TimeVector().hours(21)
 
-    val tkufasTeves = SeasonsFixed.Shmuel.tkufasTeves(year)
+    val tkufasTeves = Shmuel.tkufasTeves(year)
     tkufasTeves.day.name shouldBe Day.Name.Shishi
     tkufasTeves.time shouldBe TimeVector().hours(4).halfHour
 
-    val nextTkufasNisan = SeasonsFixed.Shmuel.tkufasNisan(year+1)
+    val nextTkufasNisan = Shmuel.tkufasNisan(year+1)
     nextTkufasNisan.day.name shouldBe Day.Name.Shishi
     nextTkufasNisan.time shouldBe TimeVector().hours(12)
   }
 
   "year of RavAda" should "be as in KH 10:1-2" in {
-    yearOfRavAda shouldBe TimeVector().days(365).hours(5 ).parts(997).moments(48)
-    (yearOfRavAda - normalYear) shouldBe
+    RavAda.yearLength shouldBe TimeVector().days(365).hours(5 ).parts(997).moments(48)
+    (RavAda.yearLength - normalYear) shouldBe
       TimeVector().days( 10).hours(21).parts(121).moments(48)
-    (yearOfRavAda*LeapYearsCycle.yearsInCycle - LeapYearsCycle.cycleLength) shouldBe TimeVector.zero
+    (RavAda.yearLength*LeapYearsCycle.yearsInCycle - LeapYearsCycle.cycleLength) shouldBe TimeVector.zero
     // KH 10:2
-    SeasonsFixed.RavAda.seasonLength shouldBe
+    RavAda.seasonLength shouldBe
       TimeVector().days(91).hours(7).parts(519).moments(31)
   }
 
   "first tkufas Nisan for RavAda" should "as in KH 10:3" in {
-    (SeasonsFixed.firstMoladNisan - SeasonsFixed.RavAda.firstTkufasNisan) shouldBe
+    (Moon.firstMoladNisan - RavAda.firstTkufasNisan) shouldBe
       TimeVector().hours(9).parts(642)
-    SeasonsFixed.RavAda.firstTkufasNisan.day.name shouldBe Day.Name.Rvii
+    RavAda.firstTkufasNisan.day.name shouldBe Day.Name.Rvii
   }
 }
