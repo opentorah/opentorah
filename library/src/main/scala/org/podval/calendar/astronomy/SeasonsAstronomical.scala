@@ -1,18 +1,20 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angles.Angles.{Position, Rotation}
-import org.podval.calendar.jewish.{Jewish, Seasons}
+import org.podval.calendar.jewish.{Jewish, Season}
 import Jewish.{Moment, Month, Year}
 import org.podval.calendar.numbers.Math
 
 // In KH 13:11, calculation of true solstices/equinoxes is mentioned, but no algorithm is given.
-final class SeasonsAstronomical(calculator: Calculator) extends Seasons {
-  def tkufasNisan  (year: Year): Moment = tkufa(Zodiac.Aries    )(year)
-  def tkufasTammuz (year: Year): Moment = tkufa(Zodiac.Cancer   )(year)
-  def tkufasTishrei(year: Year): Moment = tkufa(Zodiac.Libra    )(year)
-  def tkufasTeves  (year: Year): Moment = tkufa(Zodiac.Capricorn)(year)
+final class SeasonsAstronomical(calculator: Calculator) extends Season.ForYear {
+  override def seasonForYear(season: Season, year: Year): Moment = {
+    val zodiac: Zodiac = season match {
+      case Season.TkufasNisan   => Zodiac.Aries
+      case Season.TkufasTammuz  => Zodiac.Cancer
+      case Season.TkufasTishrei => Zodiac.Libra
+      case Season.TkufasTeves   => Zodiac.Capricorn
+    }
 
-  private def tkufa(zodiac: Zodiac)(year: Year): Moment = {
     def f(moment: Moment): Rotation = (sunLongitudeTrue(moment) - zodiac.start).symmetrical
     // TODO should this always be Nisan?
     val left: Moment = year.month(Month.Name.Nisan).prev.firstDay.toMoment

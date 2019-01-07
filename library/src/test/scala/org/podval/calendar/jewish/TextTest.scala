@@ -157,24 +157,27 @@ class TextTest extends FlatSpec with Matchers {
 
     LeapYearsCycle.forYear(year) shouldBe YearsCycle.In(260, 9)
 
-    val tkufasNisan = Shmuel.tkufasNisan(year)
+    val tkufasNisan = Shmuel.seasonForYear(Season.TkufasNisan, year)
     tkufasNisan.day.name shouldBe Day.Name.Chamishi
     tkufasNisan.time shouldBe TimeVector().hours(6)
     tkufasNisan.day shouldBe year.month(Month.Name.Nisan).day(8)
 
-    val tkufasTammuz = Shmuel.tkufasTammuz(year)
+    val tkufasTammuz = Shmuel.seasonForYear(Season.TkufasTammuz, year)
     tkufasTammuz.day.name shouldBe Day.Name.Chamishi
     tkufasTammuz.time shouldBe TimeVector().hours(13).halfHour
 
-    val tkufasTishrei = Shmuel.tkufasTishrei(year)
+    // The code puts tkufas Tishrei and Teves of year n are in year n (before tkufas Nisan), not year n+1,
+    // hence year+1 for the tkufasTishrei and tkufasTeves tests:
+
+    val tkufasTishrei = Shmuel.seasonForYear(Season.TkufasTishrei, year+1)
     tkufasTishrei.day.name shouldBe Day.Name.Chamishi
     tkufasTishrei.time shouldBe TimeVector().hours(21)
 
-    val tkufasTeves = Shmuel.tkufasTeves(year)
+    val tkufasTeves = Shmuel.seasonForYear(Season.TkufasTeves, year+1)
     tkufasTeves.day.name shouldBe Day.Name.Shishi
     tkufasTeves.time shouldBe TimeVector().hours(4).halfHour
 
-    val nextTkufasNisan = Shmuel.tkufasNisan(year+1)
+    val nextTkufasNisan = Shmuel.seasonForYear(Season.TkufasNisan, year+1)
     nextTkufasNisan.day.name shouldBe Day.Name.Shishi
     nextTkufasNisan.time shouldBe TimeVector().hours(12)
   }
