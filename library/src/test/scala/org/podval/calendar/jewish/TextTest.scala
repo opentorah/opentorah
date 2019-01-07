@@ -157,24 +157,24 @@ class TextTest extends FlatSpec with Matchers {
 
     LeapYearsCycle.forYear(year) shouldBe YearsCycle.In(260, 9)
 
-    val tkufasNisan = Shmuel.tkufasNisan(year)
+    val tkufasNisan = Shmuel.seasonForYear(Season.TkufasNisan, year)
     tkufasNisan.day.name shouldBe Day.Name.Chamishi
     tkufasNisan.time shouldBe TimeVector().hours(6)
     tkufasNisan.day shouldBe year.month(Month.Name.Nisan).day(8)
 
-    val tkufasTammuz = Shmuel.tkufasTammuz(year)
+    val tkufasTammuz = Shmuel.seasonForYear(Season.TkufasTammuz, year)
     tkufasTammuz.day.name shouldBe Day.Name.Chamishi
     tkufasTammuz.time shouldBe TimeVector().hours(13).halfHour
 
-    val tkufasTishrei = Shmuel.tkufasTishrei(year)
+    val tkufasTishrei = Shmuel.seasonForYear(Season.TkufasTishrei, year)
     tkufasTishrei.day.name shouldBe Day.Name.Chamishi
     tkufasTishrei.time shouldBe TimeVector().hours(21)
 
-    val tkufasTeves = Shmuel.tkufasTeves(year)
+    val tkufasTeves = Shmuel.seasonForYear(Season.TkufasTeves, year)
     tkufasTeves.day.name shouldBe Day.Name.Shishi
     tkufasTeves.time shouldBe TimeVector().hours(4).halfHour
 
-    val nextTkufasNisan = Shmuel.tkufasNisan(year+1)
+    val nextTkufasNisan = Shmuel.seasonForYear(Season.TkufasNisan, year+1)
     nextTkufasNisan.day.name shouldBe Day.Name.Shishi
     nextTkufasNisan.time shouldBe TimeVector().hours(12)
   }

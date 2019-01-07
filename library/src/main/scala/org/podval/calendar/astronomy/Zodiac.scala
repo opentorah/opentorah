@@ -1,14 +1,14 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angles.Angles.{Position, Rotation}
+import org.podval.judaica.metadata.{Named, NamedCompanion, Names}
 
 // KH 11:9
-sealed abstract class Zodiac(
-  val nameLatin   : String,
-  val nameEnglish : String,
-  val nameHebrew  : String,
-  val startDegrees: Int)
-{
+sealed abstract class Zodiac extends Named {
+  final override def names: Names = Zodiac.toNames(this)
+
+  final lazy val startDegrees: Int = 30*Zodiac.indexOf(this)
+
   final def start: Position = Position(startDegrees)
   final def end: Position = (start + Rotation(30)).canonical
   final def middle: Position = (start + Rotation(15)).canonical
@@ -21,21 +21,23 @@ sealed abstract class Zodiac(
   }
 }
 
-object Zodiac {
-  case object Aries       extends Zodiac("Aries"      , "Ram"        , "Tele"   ,   0)
-  case object Taurus      extends Zodiac("Taurus"     , "Bull"       , "Shor"   ,  30)
-  case object Gemini      extends Zodiac("Gemini"     , "Twins"      , "Toamim" ,  60)
-  case object Cancer      extends Zodiac("Cancer"     , "Crab"       , "Sartan" ,  90)
-  case object Leo         extends Zodiac("Leo"        , "Lion"       , "Aryeh"  , 120)
-  case object Virgo       extends Zodiac("Virgo"      , "Virgin"     , "Btulah" , 150)
-  case object Libra       extends Zodiac("Libra"      , "Balance"    , "Moznaim", 180)
-  case object Scorpio     extends Zodiac("Scorpio"    , "Scorpion"   , "Akrav"  , 210)
-  case object Sagittarius extends Zodiac("Sagittarius", "Archer"     , "Kashat" , 240)
-  case object Capricorn   extends Zodiac("Capricorn"  , "Goat"       , "Gdi"    , 270)
-  case object Aquarius    extends Zodiac("Aquarius"   , "Waterbearer", "Dli"    , 300)
-  case object Pisces      extends Zodiac("Pisces"     , "Fishes"     , "Dagim"  , 330)
+object Zodiac extends NamedCompanion {
+  override type Key = Zodiac
 
-  final val all: Seq[Zodiac] = Seq(
+  case object Aries       extends Zodiac
+  case object Taurus      extends Zodiac
+  case object Gemini      extends Zodiac
+  case object Cancer      extends Zodiac
+  case object Leo         extends Zodiac
+  case object Virgo       extends Zodiac
+  case object Libra       extends Zodiac
+  case object Scorpio     extends Zodiac
+  case object Sagittarius extends Zodiac
+  case object Capricorn   extends Zodiac
+  case object Aquarius    extends Zodiac
+  case object Pisces      extends Zodiac
+
+  final override val values: Seq[Zodiac] = Seq(
     Aries, Taurus, Gemini, Cancer, Leo, Virgo,
     Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
 
@@ -47,7 +49,7 @@ object Zodiac {
 
   def inZodiac(rawAngle: Position): Zodiac = {
     val angle: Position = rawAngle.canonical
-    all.find(_.contains(angle)).get
+    values.find(_.contains(angle)).get
   }
 
   def in(rawAngle: Position, zodiacs: Set[Zodiac]):Boolean = {

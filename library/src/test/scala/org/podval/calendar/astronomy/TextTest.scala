@@ -21,9 +21,9 @@ class TextTest extends FlatSpec with Matchers {
   }
 
   "zodiac" should "be as in KH 11:7-9" in {
-    Zodiac.all.length shouldBe 12
+    Zodiac.values.length shouldBe 12
     Zodiac.Aries.start shouldBe Position(0)
-    Zodiac.all.init.zip(Zodiac.all.tail).foreach {
+    Zodiac.values.init.zip(Zodiac.values.tail).foreach {
       case (prev: Zodiac, next: Zodiac) =>
         (prev.start + Rotation(30)) shouldBe prev.end
         next.start shouldBe prev.end

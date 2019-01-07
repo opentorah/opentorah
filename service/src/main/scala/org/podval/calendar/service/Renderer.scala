@@ -2,7 +2,7 @@ package org.podval.calendar.service
 
 import org.podval.calendar.dates.{Calendar, DayBase, MonthBase, YearBase, YearsCycle}
 import org.podval.calendar.gregorian.Gregorian
-import org.podval.calendar.jewish.{LeapYearsCycle, Jewish, Sun, Shemittah, YearType}
+import org.podval.calendar.jewish.{LeapYearsCycle, Jewish, Season, Sun, Shemittah, YearType}
 import org.podval.calendar.rambam.{RambamSchedule, SeferHamitzvosLessons}
 import org.podval.calendar.tanach.{Chitas, Haftarah, Reading, Schedule, SpecialDay}
 import org.podval.judaica.metadata.{Language, LanguageSpec, WithNames}
@@ -333,18 +333,13 @@ object Renderer {
         cycle("Birchas Hachamo", Sun.Shmuel)
       )
 
-      def tkufa(name: String, number: Int, year: Jewish.Year): TypedTag[String] = tr(
-        td(name),
-        td(Sun.Shmuel.tkufa(year, number).toGregorianLanguageString(spec)),
-        td(Sun.RavAda.tkufa(year, number).toGregorianLanguageString(spec))
-      )
-
       val tkufot: TypedTag[String] = table(
         tr(td("Tkufa"), td("Shmuel"), td("Rav Ada")),
-        tkufa("Tishrei", 2, year-1),
-        tkufa("Teves", 3, year-1),
-        tkufa("Nisan", 0, year),
-        tkufa("Tammuz", 1, year)
+        Season.values.map { season => tr(
+          td(season.toLanguageString(spec)),
+          td(Sun.Shmuel.seasonForYearFromTishrei(season, year).toGregorianLanguageString(spec)),
+          td(Sun.RavAda.seasonForYearFromTishrei(season, year).toGregorianLanguageString(spec))
+        )}
       )
 
       val festivalDays: Seq[(SpecialDay.Date, Jewish.Day)] =
