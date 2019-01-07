@@ -2,7 +2,7 @@ package org.podval.calendar.service
 
 import org.podval.calendar.dates.{Calendar, DayBase, MonthBase, YearBase, YearsCycle}
 import org.podval.calendar.gregorian.Gregorian
-import org.podval.calendar.jewish.{LeapYearsCycle, Jewish, SeasonsFixed, Shemittah, SunCycle, YearType}
+import org.podval.calendar.jewish.{LeapYearsCycle, Jewish, Sun, Shemittah, YearType}
 import org.podval.calendar.rambam.{RambamSchedule, SeferHamitzvosLessons}
 import org.podval.calendar.tanach.{Chitas, Haftarah, Reading, Schedule, SpecialDay}
 import org.podval.judaica.metadata.{Language, LanguageSpec, WithNames}
@@ -330,13 +330,13 @@ object Renderer {
         tr(td("Cycle"), td("Number"), td("In Cycle")),
         cycle("Leap Years", LeapYearsCycle),
         cycle("Shemittah", Shemittah),
-        cycle("Birchas Hachamo", SunCycle)
+        cycle("Birchas Hachamo", Sun.Shmuel)
       )
 
       def tkufa(name: String, number: Int, year: Jewish.Year): TypedTag[String] = tr(
         td(name),
-        td(SeasonsFixed.Shmuel.tkufa(year, number).toGregorianLanguageString(spec)),
-        td(SeasonsFixed.RavAda.tkufa(year, number).toGregorianLanguageString(spec))
+        td(Sun.Shmuel.tkufa(year, number).toGregorianLanguageString(spec)),
+        td(Sun.RavAda.tkufa(year, number).toGregorianLanguageString(spec))
       )
 
       val tkufot: TypedTag[String] = table(

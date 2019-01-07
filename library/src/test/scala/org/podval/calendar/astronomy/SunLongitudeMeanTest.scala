@@ -24,7 +24,7 @@ class SunLongitudeMeanTest extends FlatSpec with Matchers {
   }
 
   it should "make a full circle in a year" in {
-    assert(SunLongitudeMean.rambamValue.*[jewish.Jewish](jewish.Sun.yearOfRavAda) > period)
-    assert(SunLongitudeMean.rambamValue.*[jewish.Jewish](jewish.Sun.yearOfShmuel) > period)
+    assert(SunLongitudeMean.rambamValue.*[jewish.Jewish](jewish.Sun.RavAda.yearLength) > period)
+    assert(SunLongitudeMean.rambamValue.*[jewish.Jewish](jewish.Sun.Shmuel.yearLength) > period)
   }
 }

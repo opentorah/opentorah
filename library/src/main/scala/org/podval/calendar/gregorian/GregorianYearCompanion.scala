@@ -1,8 +1,9 @@
 package org.podval.calendar.gregorian
 
 import org.podval.calendar.dates.YearCompanion
-import Gregorian.{MonthNameAndLength, Year, YearCharacter}
+import Gregorian.{MonthNameAndLength, TimeVector, Year, YearCharacter}
 import Gregorian.Month.Name._
+import org.podval.calendar.numbers.BigRational
 
 abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
   protected final override def characters: Seq[YearCharacter] =
@@ -47,4 +48,11 @@ abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
 
   final def lengthInDays(yearNumber: Int): Int =
     if (Year.isLeap(yearNumber)) daysInNonLeapYear + 1 else daysInNonLeapYear
+
+  final val yearLength: TimeVector = TimeVector.fromRational(
+    BigRational(365) +
+    BigRational(1, 4) -
+    BigRational(1, 100) +
+    BigRational(1, 400)
+  )
 }

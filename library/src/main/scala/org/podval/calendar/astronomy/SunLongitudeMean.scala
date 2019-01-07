@@ -51,8 +51,8 @@ object SunLongitudeMean extends Days2Angle {
     println("Albatani: " + albatani.toDouble + " " + len(albatani))
     println("Moznaim : " + moznaim.toDouble + " " + len(moznaim))
     println("Almagest: " + almagest.toDouble + " " + len(almagest))
-    println("Rav Ada : " + Sun.yearOfRavAda.toRational.toDouble + " " + Sun.yearOfRavAda)
-    println("Shmuel  : " + Sun.yearOfShmuel.toRational.toDouble + " " + Sun.yearOfShmuel)
+    println("Rav Ada : " + Sun.RavAda.yearLength.toRational.toDouble + " " + Sun.RavAda.yearLength)
+    println("Shmuel  : " + Sun.Shmuel.yearLength.toRational.toDouble + " " + Sun.Shmuel.yearLength)
 
     println((almagestValue*1000).roundToMinutes)
   }
