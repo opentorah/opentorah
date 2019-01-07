@@ -29,10 +29,7 @@ abstract class MonthBase[C <: Calendar[C]](final val year: C#Year, number: Int)
 
   final def days: Seq[C#Day] = (1 to length).map(day)
 
-  final def day(numberInMonth: Int): C#Day = {
-    require (0 < numberInMonth && numberInMonth <= length)
-    calendar.Day(firstDayNumber + numberInMonth - 1)
-  }
+  final def day(numberInMonth: Int): C#Day = calendar.Day.witNumberInMonth(this, numberInMonth)
 
   final def name: C#MonthName = descriptor.name
 
