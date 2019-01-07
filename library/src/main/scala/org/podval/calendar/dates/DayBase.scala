@@ -21,7 +21,12 @@ abstract class DayBase[C <: Calendar[C]](number: Int)
 
   final def -(that: C#Day): Int = this.number - that.number
 
-  final def year: C#Year = calendar.Year(this)
+  final def year: C#Year =  {
+    var result: C#Year = calendar.Year(calendar.Year.yearsForSureBefore(number))
+    require(result.firstDayNumber <= number)
+    while (result.next.firstDayNumber <= number) result = result.next
+    result
+  }
 
   final def month: C#Month = year.monthForDay(numberInYear)
 

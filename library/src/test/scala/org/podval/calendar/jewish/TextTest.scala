@@ -6,7 +6,7 @@ import Jewish.{Day, Month, TimeVector, Year, range, week}
 import LeapYearsCycle.{leapYear, normalYear}
 import Moon.meanLunarPeriod
 import Sun.{yearOfRavAda, yearOfShmuel}
-import org.podval.calendar.dates.Cycle
+import org.podval.calendar.dates.YearsCycle
 
 /**
  * Tests based on the statements from the text itself.
@@ -155,7 +155,7 @@ class TextTest extends FlatSpec with Matchers {
   "tkufos of 4930" should "be as in KH 9:5-7" in {
     val year: Year = Year(4930)
 
-    LeapYearsCycle.forYear(year) shouldBe Cycle.In(260, 9)
+    LeapYearsCycle.forYear(year) shouldBe YearsCycle.In(260, 9)
 
     val tkufasNisan = SeasonsFixed.Shmuel.tkufasNisan(year)
     tkufasNisan.day.name shouldBe Day.Name.Chamishi

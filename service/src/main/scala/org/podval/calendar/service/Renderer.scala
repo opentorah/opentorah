@@ -140,7 +140,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
       span(cls := "heading")("Tehillim"),
       renderTehillim(
         if ((jewishDay.numberInMonth == 29) && jewishDay.month.length == 29) Span(Psalms.days(29-1).from, Psalms.days(30-1).to)
-        else Psalms.days(jewishDay.numberInMonth)
+        else Psalms.days(jewishDay.numberInMonth-1)
       ),
       div(cls := "heading")("Rambam"),
       renderRambam(RambamSchedule.forDay(jewishDay)),
