@@ -41,10 +41,7 @@ abstract class YearBase[C <: Calendar[C]](number: Int)
 
   final def months: Seq[C#Month] = (1 to lengthInMonths).map(month)
 
-  final def month(numberInYear: Int): C#Month = {
-    require(0 < numberInYear && numberInYear <= lengthInMonths)
-    calendar.Month(firstMonthNumber + numberInYear - 1)
-  }
+  final def month(numberInYear: Int): C#Month = calendar.Month.withNumberInYear(this, numberInYear)
 
   final def containsMonth(name: C#MonthName): Boolean =
     monthDescriptors.exists(_.name == name)

@@ -14,7 +14,7 @@ import Gregorian.Month.Name._
 final class DatesTest extends FlatSpec with Matchers {
 
   "Known dates" should "have correct day of the week" in {
-    Day(5772, Marheshvan, 24).name shouldBe Sheni
+    Year(5772).month(Marheshvan).day(24).name shouldBe Sheni
   }
 
   "Conversions from date to days and back" should "end where they started" in {
@@ -71,8 +71,8 @@ final class DatesTest extends FlatSpec with Matchers {
         yearG: Int, monthG: Gregorian.MonthName, dayG: Int,
         hours: Int, minutes: Int, parts: Int
       ) =>
-        val dayJ = Jewish.Day(year, month, day)
-        val dateG = Gregorian.Day(yearG, monthG, dayG).toMoment.
+        val dayJ = Year(year).month(month).day(day)
+        val dateG = Gregorian.Year(yearG).month(monthG).day(dayG).toMoment.
           hours(hours).minutes(minutes).partsWithoutMinutes(parts)
         val molad = Jewish.Year(moladYear).month(moladMonth).newMoon
 

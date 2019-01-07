@@ -23,12 +23,12 @@ object NewYear {
     else if (
       newMoon.day.is(Shlishi) &&
       (newMoon.time >= secondCorrection) &&
-      !Cycle.isLeapYear(yearNumber)) Second  /* KH 7:4 */
+      !LeapYearsCycle.isLeapYear(yearNumber)) Second  /* KH 7:4 */
     else if (
       newMoon.day.is(Sheni) &&
       (newMoon.time >= thirdCorrection) &&
       // This is not defined for year 0 - and doesn't apply :)
-      Cycle.isLeapYear(yearNumber-1)) Third  /* KH 7:5 */
+      LeapYearsCycle.isLeapYear(yearNumber-1)) Third  /* KH 7:5 */
     else No
   }
 

@@ -68,7 +68,7 @@ object Custom extends NamedCompanion {
     final def ++(other: Of[T]): Of[T] = new Of[T](customs ++ other.customs, full = false)
 
     final def *(other: Of[T]): Of[(T, Option[T])] =
-      liftL[T, (T, Option[T])](other, { case (_: Custom, a: T, b: Option[T]) => (a, b) })
+      liftL[T, (T, Option[T])](other, { case (_: Custom, a /*: T*/, b: Option[T]) => (a, b) })
   }
 
   object Of {

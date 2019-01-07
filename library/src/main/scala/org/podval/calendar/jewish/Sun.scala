@@ -8,7 +8,7 @@ object Sun {
   val yearOfShmuel: TimeVector = TimeVector().days(365).hours(6)
 
   // KH 10:1
-  val yearOfRavAda: TimeVector = Cycle.cycleLength / Cycle.yearsInCycle
+  val yearOfRavAda: TimeVector = LeapYearsCycle.cycleLength / LeapYearsCycle.yearsInCycle
 
 //  val gregorianYear: TimeVector = TimeVector.fromRational(
 //    BigRational(365) +

@@ -7,7 +7,7 @@ import org.podval.judaica.metadata.{NamedCompanion, Named, Names}
 abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
   final override val Name: GregorianMonthCompanion.type = GregorianMonthCompanion
 
-  final override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Year.monthsInYear + 1
+  protected final override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Year.monthsInYear + 1
 
   final override def numberInYear(monthNumber: Int): Int =
     monthNumber - Year.firstMonth(yearNumber(monthNumber)) + 1

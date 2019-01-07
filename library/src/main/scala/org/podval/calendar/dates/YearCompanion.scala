@@ -13,9 +13,6 @@ abstract class YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
   final def apply(number: Int): C#Year =
     yearsCache.get(number, calendar.cacheYears)
 
-  final def apply(month: C#Month): C#Year =
-    apply(calendar.Month.yearNumber(month.number))
-
   final def apply(day: C#Day): C#Year = {
     var result = apply(yearsForSureBefore(day.number))
     require(result.firstDayNumber <= day.number)

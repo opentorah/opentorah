@@ -1,8 +1,8 @@
 package org.podval.calendar.service
 
-import org.podval.calendar.dates.{Calendar, DayBase, MonthBase, YearBase}
+import org.podval.calendar.dates.{Calendar, DayBase, MonthBase, YearBase, YearsCycle}
 import org.podval.calendar.gregorian.Gregorian
-import org.podval.calendar.jewish.{Cycle, Jewish, SeasonsFixed, Shemittah, SunCycle, YearType}
+import org.podval.calendar.jewish.{LeapYearsCycle, Jewish, SeasonsFixed, Shemittah, SunCycle, YearType}
 import org.podval.calendar.rambam.{RambamSchedule, SeferHamitzvosLessons}
 import org.podval.calendar.tanach.{Chitas, Haftarah, Reading, Schedule, SpecialDay}
 import org.podval.judaica.metadata.{Language, LanguageSpec, WithNames}
@@ -273,7 +273,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
     renderer: T => Seq[TypedTag[String]]
   ): Seq[TypedTag[String]] =
     span(cls := "subheading")(what) +:
-      customs.customs.toSeq.map { case (custom: Custom, value: T) =>
+      customs.customs.toSeq.map { case (custom: Custom, value /*: T*/) =>
         table(cls := "custom")(
           caption(custom.toLanguageString(spec)),
           tbody(renderer(value))
@@ -314,10 +314,23 @@ object Renderer {
         tr(td("is leap"), td(year.isLeap.toString())),
         tr(td("months"), td(spec.toString(year.lengthInMonths))),
         tr(td("days"), td(spec.toString(year.lengthInDays))),
-        tr(td("type"), td(YearType.forYear(year).toString)),
-        tr(td("in Calendar cycle"), td(spec.toString(Cycle.yearNumberInCycle(year.number)))),
-        tr(td("in Shemittah cycle"), td(spec.toString(Shemittah.yearNumberInCycle(year)))),
-        tr(td("in Birkchas Hachamo cycle"), td(spec.toString(SunCycle.yearNumberInCycle(year)))),
+        tr(td("type"), td(YearType.forYear(year).toString))
+      )
+
+      def cycle(name: String, yearsCycle: YearsCycle): TypedTag[String] = {
+        val in = yearsCycle.forYear(year)
+        tr(
+          td(name),
+          td(spec.toString(in.cycleNumber)),
+          td(spec.toString(in.numberInCycle))
+        )
+      }
+
+      val cycles: TypedTag[String] = table(
+        tr(td("Cycle"), td("Number"), td("In Cycle")),
+        cycle("Leap Years", LeapYearsCycle),
+        cycle("Shemittah", Shemittah),
+        cycle("Birchas Hachamo", SunCycle)
       )
 
       def tkufa(name: String, number: Int, year: Jewish.Year): TypedTag[String] = tr(
@@ -350,6 +363,8 @@ object Renderer {
       Seq(
         span(cls := "heading")("Year"),
         numbers,
+        span(cls := "heading")("Cycles"),
+        cycles,
         span(cls := "heading")("Tkufot"),
         tkufot,
         span(cls := "heading")("Special Days"),

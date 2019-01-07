@@ -1,11 +1,12 @@
 package org.podval.calendar.jewish
 
 import org.scalatest.{FlatSpec, Matchers}
-import org.podval.calendar.times.Times.{hoursPerDay, hoursPerHalfDay, partsPerHour, momentsPerPart}
-import Jewish.{Day, Month, Year, TimeVector, range, week}
-import JewishYearCompanion.{normalYear, leapYear}
+import org.podval.calendar.times.Times.{hoursPerDay, hoursPerHalfDay, momentsPerPart, partsPerHour}
+import Jewish.{Day, Month, TimeVector, Year, range, week}
+import LeapYearsCycle.{leapYear, normalYear}
 import Moon.meanLunarPeriod
-import Sun.{yearOfShmuel, yearOfRavAda}
+import Sun.{yearOfRavAda, yearOfShmuel}
+import org.podval.calendar.dates.Cycle
 
 /**
  * Tests based on the statements from the text itself.
@@ -69,18 +70,18 @@ class TextTest extends FlatSpec with Matchers {
   }
 
   "year of Shmuel" should "be as in KH 6:10; 9:1-2" in {
-    Cycle.yearsInCycle shouldBe 19
-    Cycle.leapYearsInCycle shouldBe 7
+    LeapYearsCycle.yearsInCycle shouldBe 19
+    LeapYearsCycle.leapYearsInCycle shouldBe 7
     yearOfShmuel shouldBe TimeVector().days(365).hours(6)
-    Cycle.cycleLength shouldBe (normalYear*12 + leapYear*7)
-    (yearOfShmuel*Cycle.yearsInCycle - Cycle.cycleLength) shouldBe
+    LeapYearsCycle.cycleLength shouldBe (normalYear*12 + leapYear*7)
+    (yearOfShmuel*LeapYearsCycle.yearsInCycle - LeapYearsCycle.cycleLength) shouldBe
       TimeVector().hours(1).parts(485)
     // KH 9:2
     SeasonsFixed.Shmuel.seasonLength shouldBe TimeVector().days(91).hours(7).halfHour
   }
 
   "leap years" should "be as in KH 6:11" in {
-    Cycle.leapYears shouldBe Set(3, 6, 8, 11, 14, 17, 19)
+    LeapYearsCycle.leapYears shouldBe Set(3, 6, 8, 11, 14, 17, 19)
   }
 
   "cycle remainder" should "be as in KH 6:12" in {
@@ -154,8 +155,7 @@ class TextTest extends FlatSpec with Matchers {
   "tkufos of 4930" should "be as in KH 9:5-7" in {
     val year: Year = Year(4930)
 
-    year.cycle shouldBe 260
-    year.numberInCycle shouldBe 9
+    LeapYearsCycle.forYear(year) shouldBe Cycle.In(260, 9)
 
     val tkufasNisan = SeasonsFixed.Shmuel.tkufasNisan(year)
     tkufasNisan.day.name shouldBe Day.Name.Chamishi
@@ -183,7 +183,7 @@ class TextTest extends FlatSpec with Matchers {
     yearOfRavAda shouldBe TimeVector().days(365).hours(5 ).parts(997).moments(48)
     (yearOfRavAda - normalYear) shouldBe
       TimeVector().days( 10).hours(21).parts(121).moments(48)
-    (yearOfRavAda*Cycle.yearsInCycle - Cycle.cycleLength) shouldBe TimeVector.zero
+    (yearOfRavAda*LeapYearsCycle.yearsInCycle - LeapYearsCycle.cycleLength) shouldBe TimeVector.zero
     // KH 10:2
     SeasonsFixed.RavAda.seasonLength shouldBe
       TimeVector().days(91).hours(7).parts(519).moments(31)

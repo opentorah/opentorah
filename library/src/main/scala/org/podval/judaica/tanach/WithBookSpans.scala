@@ -42,11 +42,11 @@ trait WithBookSpans[Book <: Tanach.TanachBook] {
     def apply(book: Book, span: Span, source: Option[WithNames] = None): BookSpan = new BookSpan(book, span, source)
   }
 
-  final case class BookSpanParsed(book: Option[String], span: SpanParsed) {
+  final class BookSpanParsed(val book: Option[String], val span: SpanParsed) {
     def inheritFrom(ancestor: BookSpanParsed): BookSpanParsed = {
       require(this.book.isEmpty || ancestor.book.isEmpty)
 
-      BookSpanParsed(
+      new BookSpanParsed(
         book = this.book.orElse(ancestor.book),
         span = this.span.inheritFrom(ancestor.span)
       )
@@ -56,7 +56,7 @@ trait WithBookSpans[Book <: Tanach.TanachBook] {
   }
 
   final def parseSpan(attributes: Attributes): BookSpanParsed = {
-    val result = BookSpanParsed(
+    val result = new BookSpanParsed(
       book = attributes.get("book"),
       SpanParsed.parse(attributes)
     )
