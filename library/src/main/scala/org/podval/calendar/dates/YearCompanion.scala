@@ -13,13 +13,6 @@ abstract class YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
   final def apply(number: Int): C#Year =
     yearsCache.get(number, calendar.cacheYears)
 
-  final def apply(day: C#Day): C#Year = {
-    var result = apply(yearsForSureBefore(day.number))
-    require(result.firstDayNumber <= day.number)
-    while (result.next.firstDayNumber <= day.number) result = result.next
-    result
-  }
-
   protected def newYear(number: Int): C#Year
 
   // lazy to make initialization work
@@ -48,8 +41,8 @@ abstract class YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
 
   protected def areYearsPositive: Boolean
 
-  private[this] final def yearsForSureBefore(dayNumber: Int): Int =  {
-    val result = (4 * dayNumber / (4 * 365 + 1)) - 1
+  final def yearsForSureBefore(dayNumber: Int): Int =  {
+    val result: Int = (4 * dayNumber / (4 * 365 + 1)) - 1
     if (areYearsPositive) scala.math.max(1, result) else result
   }
 
