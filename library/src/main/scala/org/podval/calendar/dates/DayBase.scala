@@ -6,10 +6,22 @@ import org.podval.judaica.metadata.{LanguageSpec, LanguageString, Numbered}
   *
   * @param number  of the Day
   */
-abstract class DayBase[C <: Calendar[C]](number: Int)
+abstract class DayBase[C <: Calendar[C]] private[calendar](private var monthOpt: Option[C#Month], number: Int)
   extends Numbered[C#Day](number) with CalendarMember[C] with LanguageString
 { this: C#Day =>
   require(0 < number)
+
+  final def month: C#Month = {
+    if (monthOpt.isEmpty) {
+      var year: C#Year = calendar.Year(calendar.Year.yearsForSureBefore(number))
+      require(year.firstDayNumber <= number)
+      while (year.next.firstDayNumber <= number) year = year.next
+
+      monthOpt = Some(year.monthForDay(number - year.firstDayNumber + 1))
+    }
+
+    monthOpt.get
+  }
 
   final def next: C#Day = this + 1
 
@@ -21,14 +33,7 @@ abstract class DayBase[C <: Calendar[C]](number: Int)
 
   final def -(that: C#Day): Int = this.number - that.number
 
-  final def year: C#Year =  {
-    var result: C#Year = calendar.Year(calendar.Year.yearsForSureBefore(number))
-    require(result.firstDayNumber <= number)
-    while (result.next.firstDayNumber <= number) result = result.next
-    result
-  }
-
-  final def month: C#Month = year.monthForDay(numberInYear)
+  final def year: C#Year = month.year
 
   final def numberInYear: Int = number - year.firstDayNumber + 1
 

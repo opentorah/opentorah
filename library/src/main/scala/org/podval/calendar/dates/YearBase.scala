@@ -41,7 +41,8 @@ abstract class YearBase[C <: Calendar[C]](number: Int)
 
   final def months: Seq[C#Month] = (1 to lengthInMonths).map(month)
 
-  final def month(numberInYear: Int): C#Month = calendar.Month.withNumberInYear(this, numberInYear)
+  final def month(numberInYear: Int): C#Month =
+    calendar.Month.withNumberInYear(this, numberInYear)
 
   final def containsMonth(name: C#MonthName): Boolean =
     monthDescriptors.exists(_.name == name)
@@ -52,12 +53,12 @@ abstract class YearBase[C <: Calendar[C]](number: Int)
   final def monthAndDay(when: MonthAndDay[C]): C#Day =
     month(when.monthName).day(when.numberInMonth)
 
-  final def monthForDay(day: Int): C#Month = {
+  private[dates] final def monthForDay(day: Int): C#Month = {
     require(0 < day && day <= lengthInDays)
     month(monthDescriptors.count(_.daysBefore < day))
   }
 
-  final def monthDescriptors: Seq[C#MonthDescriptor] =
+  private[dates] final def monthDescriptors: Seq[C#MonthDescriptor] =
     calendar.Year.monthDescriptors(character)
 
   final override def toLanguageString(implicit spec: LanguageSpec): String = calendar.toString(number)

@@ -22,15 +22,15 @@ class Gregorian private() extends Calendar[Gregorian] {
   final override type Month = GregorianMonth
 
   final override object Month extends GregorianMonthCompanion with GregorianCalendarMember {
-    protected override def apply(year: Year, number: Int): Month =
-      new GregorianMonth(year, number) with GregorianCalendarMember
+    private[calendar] override def apply(yearOpt: Option[Year], number: Int): Month =
+      new GregorianMonth(yearOpt, number) with GregorianCalendarMember
   }
 
   final override type Day = GregorianDay
 
   final override object Day extends GregorianDayCompanion with GregorianCalendarMember {
-    override def apply(number: Int): Day =
-      new GregorianDay(number) with GregorianCalendarMember
+    private[calendar] override def apply(monthOpt: Option[Month], number: Int): Day =
+      new GregorianDay(monthOpt, number) with GregorianCalendarMember
   }
 
   final override type Point = GregorianMoment

@@ -6,7 +6,9 @@ import org.podval.judaica.metadata.{LanguageSpec, LanguageString}
 trait MomentBase[C <: Calendar[C]] extends TimePointBase[C] with CalendarMember[C] with LanguageString
 { this: C#Moment =>
 
-  final def day: C#Day = calendar.Day(days + 1)
+  final def day: C#Day = calendar.Day(dayNumber)
+
+  final def dayNumber: Int = days + 1
 
   final override def toLanguageString(implicit spec: LanguageSpec): String =
     day.toLanguageString +
