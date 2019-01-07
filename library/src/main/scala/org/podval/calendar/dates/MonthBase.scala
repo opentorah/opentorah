@@ -19,7 +19,7 @@ abstract class MonthBase[C <: Calendar[C]](number: Int)
 
   final def -(change: Int): C#Month = calendar.Month(number - change)
 
-  final def year: C#Year = calendar.Year(this)
+  final def year: C#Year = calendar.Year(calendar.Month.yearNumber(number))
 
   final def numberInYear: Int = calendar.Month.numberInYear(number)
 
