@@ -3,8 +3,9 @@ package org.podval.calendar.astronomy
 import org.scalatest.{FlatSpec, Matchers}
 import org.podval.calendar.angles.Angles
 import Angles.{Position, Rotation, headRange, range}
-import org.podval.calendar.jewish.{Cycle, Jewish}
+import org.podval.calendar.jewish.{Jewish, LeapYearsCycle}
 import Jewish.{Day, Month, Year}
+import org.podval.calendar.dates.Cycle
 import org.podval.calendar.numbers.BigRational
 
 class TextTest extends FlatSpec with Matchers {
@@ -37,9 +38,8 @@ class TextTest extends FlatSpec with Matchers {
   }
 
   "epoch" should "be as in KH 11:16" in {
-    Cycle.yearInCycle(260, 17) shouldBe 4938
-    Cycle.yearCycle(4938) shouldBe 260
-    Cycle.yearNumberInCycle(4938) shouldBe 17
+    LeapYearsCycle.inCycle(260, 17) shouldBe 4938
+    LeapYearsCycle.forNumber(4938) shouldBe Cycle.In(260, 17)
     Epoch.Text.day shouldBe Year(4938).month(Month.Name.Nisan).day(3)
     Epoch.Text.day.name shouldBe Day.Name.Chamishi
   }

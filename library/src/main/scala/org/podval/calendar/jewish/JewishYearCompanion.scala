@@ -39,11 +39,11 @@ abstract class JewishYearCompanion extends YearCompanion[Jewish] {
 
   protected final override def areYearsPositive: Boolean = true
 
-  final override def isLeap(yearNumber: Int): Boolean = Cycle.isLeapYear(yearNumber)
+  final override def isLeap(yearNumber: Int): Boolean = LeapYearsCycle.isLeapYear(yearNumber)
 
-  final override def firstMonth(yearNumber: Int): Int = Cycle.firstMonth(yearNumber)
+  final override def firstMonth(yearNumber: Int): Int = LeapYearsCycle.firstMonth(yearNumber)
 
-  final override def lengthInMonths(yearNumber: Int): Int = Cycle.yearLengthInMonths(yearNumber)
+  final override def lengthInMonths(yearNumber: Int): Int = LeapYearsCycle.yearLengthInMonths(yearNumber)
 
   // KH 8:7-8
   val shortNonLeapYearLength: Int = yearLength((false, Kind.Short)) //353
@@ -73,7 +73,4 @@ object JewishYearCompanion {
 
     val values: Seq[Kind] = Seq(Short, Regular, Full)
   }
-
-  final val normalYear: TimeVector = Moon.meanLunarPeriod*Cycle.yearLengthInMonths(isLeap = false)
-  final val leapYear: TimeVector = Moon.meanLunarPeriod*Cycle.yearLengthInMonths(isLeap = true)
 }
