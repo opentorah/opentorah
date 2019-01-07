@@ -6,7 +6,7 @@ import org.podval.judaica.metadata.{LanguageSpec, Numbered}
   *
   * @param number  of the Month
   */
-abstract class MonthBase[C <: Calendar[C]](number: Int)
+abstract class MonthBase[C <: Calendar[C]](final val year: C#Year, number: Int)
   extends Numbered[C#Month](number) with CalendarMember[C]
 { this: C#Month =>
   require(0 < number)
@@ -18,8 +18,6 @@ abstract class MonthBase[C <: Calendar[C]](number: Int)
   final def +(change: Int): C#Month = calendar.Month(number + change)
 
   final def -(change: Int): C#Month = calendar.Month(number - change)
-
-  final def year: C#Year = calendar.Year(calendar.Month.yearNumber(number))
 
   final def numberInYear: Int = calendar.Month.numberInYear(number)
 

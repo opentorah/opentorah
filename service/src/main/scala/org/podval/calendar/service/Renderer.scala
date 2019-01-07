@@ -273,7 +273,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
     renderer: T => Seq[TypedTag[String]]
   ): Seq[TypedTag[String]] =
     span(cls := "subheading")(what) +:
-      customs.customs.toSeq.map { case (custom: Custom, value: T) =>
+      customs.customs.toSeq.map { case (custom: Custom, value /*: T*/) =>
         table(cls := "custom")(
           caption(custom.toLanguageString(spec)),
           tbody(renderer(value))
