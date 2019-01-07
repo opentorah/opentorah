@@ -166,14 +166,11 @@ class TextTest extends FlatSpec with Matchers {
     tkufasTammuz.day.name shouldBe Day.Name.Chamishi
     tkufasTammuz.time shouldBe TimeVector().hours(13).halfHour
 
-    // The code puts tkufas Tishrei and Teves of year n are in year n (before tkufas Nisan), not year n+1,
-    // hence year+1 for the tkufasTishrei and tkufasTeves tests:
-
-    val tkufasTishrei = Shmuel.seasonForYear(Season.TkufasTishrei, year+1)
+    val tkufasTishrei = Shmuel.seasonForYear(Season.TkufasTishrei, year)
     tkufasTishrei.day.name shouldBe Day.Name.Chamishi
     tkufasTishrei.time shouldBe TimeVector().hours(21)
 
-    val tkufasTeves = Shmuel.seasonForYear(Season.TkufasTeves, year+1)
+    val tkufasTeves = Shmuel.seasonForYear(Season.TkufasTeves, year)
     tkufasTeves.day.name shouldBe Day.Name.Shishi
     tkufasTeves.time shouldBe TimeVector().hours(4).halfHour
 

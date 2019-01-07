@@ -13,8 +13,18 @@ abstract class Sun extends Season.ForYear {
 
   def firstTkufasNisanBeforeFirstMoladNisan: TimeVector
 
-  final override def seasonForYear(season: Season, year: Year): Moment = firstTkufasNisan +
-    seasonLength * ((year.number - 1) * Season.numberOf + (season.numberInYear - Season.TkufasNisan.numberInYear))
+  final override def seasonForYear(season: Season, year: Year): Moment = {
+    val numberInYear: Int = season.numberInYear - Season.TkufasNisan.numberInYear
+    seasonForYear(if (numberInYear >= 0) numberInYear else numberInYear + 4, year)
+  }
+
+  // This method calculates tkufas Tishrei and Teves of year n in year n, before tkufas Nisan,
+  // not year n+1 like in the Rambam's text.
+  final def seasonForYearFromTishrei(season: Season, year: Year): Moment =
+    seasonForYear(season.numberInYear - Season.TkufasNisan.numberInYear, year)
+
+  private def seasonForYear(number: Int, year: Year): Moment = firstTkufasNisan +
+    seasonLength * ((year.number - 1) * Season.numberOf + number)
 }
 
 object Sun {

@@ -336,9 +336,9 @@ object Renderer {
       val tkufot: TypedTag[String] = table(
         tr(td("Tkufa"), td("Shmuel"), td("Rav Ada")),
         Season.values.map { season => tr(
-          td(season.name),
-          td(Sun.Shmuel.seasonForYear(season, year).toGregorianLanguageString(spec)),
-          td(Sun.RavAda.seasonForYear(season, year).toGregorianLanguageString(spec))
+          td(season.toLanguageString(spec)),
+          td(Sun.Shmuel.seasonForYearFromTishrei(season, year).toGregorianLanguageString(spec)),
+          td(Sun.RavAda.seasonForYearFromTishrei(season, year).toGregorianLanguageString(spec))
         )}
       )
 
