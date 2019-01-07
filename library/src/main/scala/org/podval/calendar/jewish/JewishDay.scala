@@ -2,7 +2,9 @@ package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.DayBase
 
-abstract class JewishDay(number: Int) extends DayBase[Jewish](number) {
+abstract class JewishDay private[jewish](monthOpt: Option[Jewish.Month], number: Int)
+  extends DayBase[Jewish](monthOpt, number)
+{
   final def isShabbos: Boolean = is(Jewish.Day.Name.Shabbos)
 
   final def roshChodeshOf: Option[Jewish.Month.Name] =

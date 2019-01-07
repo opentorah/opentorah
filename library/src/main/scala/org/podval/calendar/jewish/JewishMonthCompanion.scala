@@ -6,9 +6,9 @@ import org.podval.judaica.metadata.{NamedCompanion, Named, Names}
 abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
   final override val Name: JewishMonthCompanion.type = JewishMonthCompanion
 
-  protected final override def yearNumber(monthNumber: Int): Int = LeapYearsCycle.monthYear(monthNumber)
+  private[calendar] final override def yearNumber(monthNumber: Int): Int = LeapYearsCycle.monthYear(monthNumber)
 
-  final override def numberInYear(monthNumber: Int): Int = LeapYearsCycle.monthNumberInYear(monthNumber)
+  private[calendar] final override def numberInYear(monthNumber: Int): Int = LeapYearsCycle.monthNumberInYear(monthNumber)
 }
 
 object JewishMonthCompanion extends NamedCompanion {

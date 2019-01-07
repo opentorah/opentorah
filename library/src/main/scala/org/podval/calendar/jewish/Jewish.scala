@@ -22,14 +22,15 @@ class Jewish private() extends Calendar[Jewish] {
   final override type Month = JewishMonth
 
   final override object Month extends JewishMonthCompanion with JewishCalendarMember {
-    protected override def apply(year: Year, number: Int): Month =
-      new JewishMonth(year, number) with JewishCalendarMember
+    private[calendar] override def apply(yearOpt: Option[Year], number: Int): Month =
+      new JewishMonth(yearOpt, number) with JewishCalendarMember
   }
 
   final override type Day = JewishDay
 
   final override object Day extends JewishDayCompanion with JewishCalendarMember {
-    override def apply(number: Int): Day = new JewishDay(number) with JewishCalendarMember
+    private[calendar] override def apply(monthOpt: Option[Month], number: Int): Day =
+      new JewishDay(monthOpt, number) with JewishCalendarMember
   }
 
   final override type Point = JewishMoment

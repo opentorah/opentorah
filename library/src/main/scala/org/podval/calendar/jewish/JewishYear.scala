@@ -8,9 +8,14 @@ abstract class JewishYear(number: Int) extends YearBase[Jewish](number) {
 
   final def newMoon: Moment = month(1).newMoon
 
-  final def newYearDelay: NewYear.Delay = NewYear.delay(number, newMoon)
+  final def newYearDelay: NewYear.Delay = newYearDelay(newMoon)
 
-  final override def firstDayNumber: Int = newMoon.dayNumber + newYearDelay.days
+  private def newYearDelay(newMoon: Moment): NewYear.Delay = NewYear.delay(number, newMoon)
+
+  final override def firstDayNumber: Int = {
+    val nm = newMoon
+    nm.dayNumber + newYearDelay(nm).days
+  }
 
   final override def lengthInDays: Int = next.firstDayNumber - this.firstDayNumber
 
