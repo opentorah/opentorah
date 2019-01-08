@@ -24,7 +24,7 @@ abstract class Sun extends Season.ForYear {
     seasonForYear(season.numberInYear - Season.TkufasNisan.numberInYear, year)
 
   private def seasonForYear(number: Int, year: Year): Moment = firstTkufasNisan +
-    seasonLength * ((year.number - 1) * Season.numberOf + number)
+    seasonLength * ((year.number - 1) * Season.numberOfValues + number)
 }
 
 object Sun {

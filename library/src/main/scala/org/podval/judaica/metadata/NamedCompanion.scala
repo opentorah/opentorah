@@ -29,6 +29,8 @@ trait NamedCompanion {
     result.get
   }
 
+  final def numberOfValues: Int = values.length
+
   final def forIndex(index: Int): Key = values(index)
 
   final def indexOf(key: Key): Int = values.indexOf(key)

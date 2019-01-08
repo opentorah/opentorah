@@ -35,8 +35,6 @@ object Season extends NamedCompanion {
 
   final override val values: Seq[Season] = Seq(TkufasTishrei, TkufasTeves, TkufasNisan, TkufasTammuz)
 
-  final val numberOf: Int = values.length
-
   trait ForYear {
     def seasonForYear(season: Season, year: Jewish.Year): Jewish.Moment
   }
