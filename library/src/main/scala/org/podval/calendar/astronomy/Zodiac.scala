@@ -1,5 +1,6 @@
 package org.podval.calendar.astronomy
 
+import org.podval.calendar.angles.Angles
 import org.podval.calendar.angles.Angles.{Position, Rotation}
 import org.podval.judaica.metadata.{Named, NamedCompanion, Names}
 
@@ -7,16 +8,14 @@ import org.podval.judaica.metadata.{Named, NamedCompanion, Names}
 sealed abstract class Zodiac extends Named {
   final override def names: Names = Zodiac.toNames(this)
 
-  final lazy val startDegrees: Int = 30*Zodiac.indexOf(this)
-
-  final def start: Position = Position(startDegrees)
-  final def end: Position = (start + Rotation(30)).canonical
-  final def middle: Position = (start + Rotation(15)).canonical
+  final lazy val start: Position = Position(0) + Zodiac.size*Zodiac.indexOf(this)
+  final lazy val end: Position = (start + Zodiac.size).canonical
+  final lazy val middle: Position = (start + Zodiac.halfSize).canonical
 
   final def contains(angle: Position): Boolean = (start <= angle) && (angle < end)
 
   final def at(angle: Rotation): Position = {
-    require(!angle.isNegative && (angle <= Rotation(30)))
+    require(!angle.isNegative && (angle <= Zodiac.size))
     start + angle
   }
 }
@@ -40,6 +39,13 @@ object Zodiac extends NamedCompanion {
   final override val values: Seq[Zodiac] = Seq(
     Aries, Taurus, Gemini, Cancer, Leo, Virgo,
     Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
+
+  private val (size: Rotation, halfSize: Rotation) = {
+    require(Angles.headRange % numberOfValues == 0)
+    val sizeInDegrees: Int = Angles.headRange / numberOfValues
+    require(sizeInDegrees % 2 == 0)
+    (Rotation(sizeInDegrees), Rotation(sizeInDegrees / 2))
+  }
 
   def fromAngle(rawAngle: Position): (Zodiac, Rotation) = {
     val angle: Position = rawAngle.canonical

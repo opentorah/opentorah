@@ -10,7 +10,7 @@ trait Time[S <: Times[S], N <: Time[S, N]] extends NonPeriodicNumber[S, N] { thi
 
   final def day(number: Int): N = days(number-1)
 
-  final def time: S#Vector = days(0).toVector
+  final def time: S#Vector = this - companion(days)
 
   final def hours: Int = tail(0)
 

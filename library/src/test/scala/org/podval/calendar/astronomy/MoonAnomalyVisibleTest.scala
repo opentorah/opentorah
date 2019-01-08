@@ -1,7 +1,7 @@
 package org.podval.calendar.astronomy
 
 import org.scalatest.{FlatSpec, Matchers}
-import org.podval.calendar.angles.Angles.Rotation
+import org.podval.calendar.angles.Angles.Position
 
 class MoonAnomalyVisibleTest extends FlatSpec with Matchers {
 
@@ -15,8 +15,8 @@ class MoonAnomalyVisibleTest extends FlatSpec with Matchers {
     test(MoonAnomalyVisible.table)
   }
 
-  private def test(table: InterpolatedTable): Unit = {
-    for (maslul <- (0 to 18).map(_ * 10).map(Rotation(_))) {
+  private def test(table: InterpolatedTable[Position]): Unit = {
+    for (maslul <- (0 to 18).map(_ * 10).map(Position(_))) {
       val mnas = table.calculate(maslul).abs
       val e: Double = MoonAnomalyVisible.efrommnasround(maslul, mnas)
       val mnasfrome = MoonAnomalyVisible.mnasfrome(maslul, e)

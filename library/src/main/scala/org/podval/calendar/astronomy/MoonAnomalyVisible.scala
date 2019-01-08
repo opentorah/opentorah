@@ -1,63 +1,72 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angles.Angles.Rotation
+import org.podval.calendar.angles.Angles.{Position, Rotation}
 
 import scala.math.{abs, asin, cos, pow, round, sin, sqrt}
 
 object MoonAnomalyVisible {
   // As printed
-  class Misprinted extends InterpolatedTable {
+  class Misprinted extends InterpolatedTable[Position] {
     // KH 15:6
-    override val values: Map[Rotation, Rotation] = Map(
-      Rotation(  0) -> Rotation(0    ),
-      Rotation( 10) -> Rotation(0, 50),
-      Rotation( 20) -> Rotation(1, 38),
-      Rotation( 30) -> Rotation(2, 24),
-      Rotation( 40) -> Rotation(3,  6),
-      Rotation( 50) -> Rotation(3, 44),
-      Rotation( 60) -> Rotation(4, 16),
-      Rotation( 70) -> Rotation(4, 41),
-      Rotation( 80) -> Rotation(5,  0),
-      Rotation( 90) -> Rotation(5,  5),
-      Rotation(100) -> Rotation(5,  8),
-      Rotation(110) -> Rotation(4, 59),
-      Rotation(120) -> Rotation(4, 20),
-      Rotation(130) -> Rotation(4, 11),
-      Rotation(140) -> Rotation(3, 33),
-      Rotation(150) -> Rotation(3, 48),
-      Rotation(160) -> Rotation(1, 56),
-      Rotation(170) -> Rotation(1, 59),
-      Rotation(180) -> Rotation(0    )
+    override val values: Map[Position, Rotation] = Map(
+      row(  0, 0,  0),
+      row( 10, 0, 50),
+      row( 20, 1, 38),
+      row( 30, 2, 24),
+      row( 40, 3,  6),
+      row( 50, 3, 44),
+      row( 60, 4, 16),
+      row( 70, 4, 41),
+      row( 80, 5,  0),
+      row( 90, 5,  5),
+      row(100, 5,  8),
+      row(110, 4, 59),
+      row(120, 4, 20),
+      row(130, 4, 11),
+      row(140, 3, 33),
+      row(150, 3, 48),
+      row(160, 1, 56),
+      row(170, 1, 59),
+      row(180, 0,  0)
     )
 
     // KH 15:4, 15:7
-    final override def calculate(moonAnomalyTrue: Rotation): Rotation = {
-      val angle: Rotation = moonAnomalyTrue.canonical
-      if (angle <= Rotation(180)) -interpolate(angle) else interpolate(Rotation(360) - angle)
+    final override def calculate(moonAnomalyTrue: Position): Rotation = {
+      val angle: Position = moonAnomalyTrue.canonical
+      if (angle <= Position(180)) -interpolate(angle) else interpolate(angle.reflect)
     }
   }
 
-  final val misprinted: InterpolatedTable = new Misprinted
+  final val misprinted: InterpolatedTable[Position] = new Misprinted
 
   // Misprints corrected.
-  final val table: InterpolatedTable = new Misprinted {
-    override val values: Map[Rotation, Rotation] = misprinted.values
-      .updated(Rotation(120), Rotation(4, 40))
-      .updated(Rotation(150), Rotation(2, 48))
-      .updated(Rotation(170), Rotation(0, 59))
+  final val table: InterpolatedTable[Position] = new Misprinted {
+    override val values: Map[Position, Rotation] = misprinted.values ++ Map(
+      row(120, 4, 40),
+      row(150, 2, 48),
+      row(170, 0, 59)
+    )
   }
 
-  def mnasfrome(maslul: Rotation, e: Double): Rotation = {
-    val inRadians = asin(sin(maslul)/sqrt(e*e + 2*e*cos(maslul) + 1))
+  def mnasfrome(maslul: Position, e: Double): Rotation = {
+    val maslulRadians = maslul.toRadians
+    val inRadians = asin(sin(maslulRadians)/sqrt(e*e + 2*e*cos(maslulRadians) + 1))
     Rotation.fromRadians(inRadians, 1)
   }
 
-  def efrommnas(maslul: Rotation, mnas: Rotation): Double = sin(maslul)/sin(mnas)*abs(cos(mnas))-cos(maslul)
+  def efrommnas(maslul: Position, mnas: Rotation): Double = {
+    val maslulRadians = maslul.toRadians
+    val mnasRadians = mnas.toRadians
+    sin(maslulRadians)/sin(mnasRadians)*abs(cos(mnasRadians))-cos(maslulRadians)
+  }
 
-  def efrommnasround(maslul: Rotation, mnas: Rotation): Double = roundTo(efrommnas(maslul, mnas), 2)
+  def efrommnasround(maslul: Position, mnas: Rotation): Double = roundTo(efrommnas(maslul, mnas), 2)
 
   private def roundTo(value: Double, digits: Int): Double = {
     val quotient = pow(10, digits)
     round(value*quotient)/quotient
   }
+
+  private def row(argumentDegrees: Int, valueDegrees: Int, valueMinutes: Int): (Position, Rotation) =
+    Position(argumentDegrees) -> Rotation(valueDegrees, valueMinutes)
 }

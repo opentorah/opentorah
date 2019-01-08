@@ -51,8 +51,6 @@ trait Angles extends PeriodicNumbers[Angles] {
 
 
 object Angles extends Angles {
-  import scala.language.implicitConversions
-
   object PositionIndex {
     final val MINUTES: Int = 0
     final val SECONDS: Int = 1
@@ -60,6 +58,4 @@ object Angles extends Angles {
 
     final val default = 3
   }
-
-  implicit def angleToRadians(angle: Rotation): Double = angle.toRadians
 }

@@ -18,7 +18,7 @@ trait Calculators {
 
   def moonLongitudeDoubleElongationCorrection: Rotation => Rotation
 
-  def moonAnomalyVisible: Rotation => Rotation
+  def moonAnomalyVisible: Position => Rotation
 
   def moonHeadMean: Int => Rotation
 
@@ -45,7 +45,7 @@ object Calculators {
     final override def moonAnomalyMean: Int => Rotation = MoonAnomalyMean.calculate
     final override def moonLongitudeDoubleElongationCorrection: Rotation => Rotation =
       MoonLongitudeDoubleElongationCorrection.calculate
-    final override def moonAnomalyVisible: Rotation => Rotation = MoonAnomalyVisible.table.calculate
+    final override def moonAnomalyVisible: Position => Rotation = MoonAnomalyVisible.table.calculate
     final override def moonHeadMean: Int => Rotation = MoonHeadMean.calculate
     final override def moonLatitude: Rotation => Rotation = MoonLatitude.table.calculate
     final override def moonLongitudeSightingAdjustment: Position => Rotation =

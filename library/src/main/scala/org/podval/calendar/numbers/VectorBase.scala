@@ -4,8 +4,6 @@ trait VectorBase[S <: Numbers[S]] extends Number[S, S#Vector]
 { this: S#Vector =>
   final def +(that: S#Vector): S#Vector = companion.fromDigits(add(that))
 
-  final def -(that: S#Vector): S#Vector = companion.fromDigits(subtract(that))
-
   final def *(n: Int): S#Vector = companion.fromDigits(digits map (n * _))
 
   final def /(n: Int): S#Vector = /(n, defaultLength)
@@ -34,6 +32,4 @@ trait VectorBase[S <: Numbers[S]] extends Number[S, S#Vector]
     this - (that * (this / that))
 
   private[this] def defaultLength: Int = numbers.defaultLength
-
-  final override def toVector: S#Vector = this
 }

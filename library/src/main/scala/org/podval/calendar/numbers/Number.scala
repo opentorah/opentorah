@@ -5,8 +5,6 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
 
   def companion: NumberCompanion[S, N]
 
-  def toVector: S#Vector
-
   protected final def fromDigits(digits: Seq[Int]): N = companion.fromDigits(digits)
 
   final def head: Int = get(0)
@@ -55,6 +53,8 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
   final def abs: N = fromDigits(simple.digits.map(math.abs))
 
   final def unary_- : N = fromDigits(digits.map(-_))
+
+  final def -(that: N): S#Vector = numbers.Vector.fromDigits(subtract(that))
 
   final def roundTo(length: Int): N = {
     require(length >= 0)
