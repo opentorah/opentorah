@@ -3,84 +3,84 @@
     <name lang="en" n="Aries"/>
     <!--<name lang="en" n="Ram"/>-->
     <name lang="en" transliterated="yes" n="Tele"/>
-    <name lang="he" n="blah"/>
+    <name lang="he" n="טלה"/>
     <name lang="ru" n="Овен"/>
   </names>
   <names>
     <name lang="en" n="Taurus"/>
     <!--<name lang="en" n="Bull"/>-->
     <name lang="en" transliterated="yes" n="Shor"/>
-    <name lang="he" n="blah"/>
+    <name lang="he" n="שור"/>
     <name lang="ru" n="Телец"/>
   </names>
   <names>
     <name lang="en" n="Gemini"/>
     <!--<name lang="en" n="Twins"/>-->
     <name lang="en" transliterated="yes" n="Toamim"/>
-    <name lang="he" n="blah"/>
+    <name lang="he" n="תאומים"/>
     <name lang="ru" n="Близнецы"/>
   </names>
   <names>
     <name lang="en" n="Cancer"/>
     <!--<name lang="en" n="Crab"/>-->
     <name lang="en" transliterated="yes" n="Sartan"/>
-    <name lang="he" n="blah"/>
+    <name lang="he" n="סרטן"/>
     <name lang="ru" n="Рак"/>
   </names>
   <names>
     <name lang="en" n="Leo"/>
     <!--<name lang="en" n="Lion"/>-->
     <name lang="en" transliterated="yes" n="Aryeh"/>
-    <name lang="he" n="blah"/>
+    <name lang="he" n="אריה
     <name lang="ru" n="Лев"/>
   </names>
   <names>
     <name lang="en" n="Virgo"/>
     <!--<name lang="en" n="Virgin"/>-->
     <name lang="en" transliterated="yes" n="Btulah"/>
-    <name lang="he" n="blah"/>
+    <name lang="he" n="בתולה"/>
     <name lang="ru" n="Дева"/>
   </names>
   <names>
     <name lang="en" n="Libra"/>
     <!--<name lang="en" n="Balance"/>-->
     <name lang="en" transliterated="yes" n="Moznaim"/>
-    <name lang="he" n="blah"/>
+    <name lang="he" n="מאזניים"/>
     <name lang="ru" n="Весы"/>
   </names>
   <names>
     <name lang="en" n="Scorpio"/>
     <!--<name lang="en" n="Scorpion"/>-->
     <name lang="en" transliterated="yes" n="Akrav"/>
-    <name lang="he" n="blah"/>
+    <name lang="he" n="עקרב"/>
     <name lang="ru" n="Скорпион"/>
   </names>
   <names>
     <name lang="en" n="Sagittarius"/>
     <!--<name lang="en" n="Archer"/>-->
     <name lang="en" transliterated="yes" n="Kashat"/>
-    <name lang="he" n="blah"/>
+    <name lang="he" n="קשת"/>
     <name lang="ru" n="Стрелец"/>
   </names>
   <names>
     <name lang="en" n="Capricorn"/>
     <!--<name lang="en" n="Goat"/>-->
     <name lang="en" transliterated="yes" n="Gdi"/>
-    <name lang="he" n="blah"/>
+    <name lang="he" n="גדי"/>
     <name lang="ru" n="Козерог"/>
   </names>
   <names>
     <name lang="en" n="Aquarius"/>
     <!--<name lang="en" n="Waterbearer"/>-->
     <name lang="en" transliterated="yes" n="Dli"/>
-    <name lang="he" n="blah"/>
+    <name lang="he" n="דלי"/>
     <name lang="ru" n="Водолей"/>
   </names>
   <names>
     <name lang="en" n="Pisces"/>
     <!--<name lang="en" n="Fishes"/>-->
     <name lang="en" transliterated="yes" n="Dagim"/>
-    <name lang="he" n="blah"/>
+    <name lang="he" n="דגים"/>
     <name lang="ru" n="Рыбы"/>
   </names>
 </names>
