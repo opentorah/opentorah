@@ -5,4 +5,6 @@ trait PeriodicNumber[S <: PeriodicNumbers[S], N <: PeriodicNumber[S, N]]
 { this: N =>
 
   final def symmetrical: N = fromDigits(numbers.symmetrical(this))
+
+  final def reflect: N = fromDigits(numbers.period.subtract(this))
 }

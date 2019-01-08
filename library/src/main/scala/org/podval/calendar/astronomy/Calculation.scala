@@ -57,7 +57,7 @@ final class Calculation(
 
   // KH 15:4
   lazy val moonAnomalyVisible: Rotation =
-    rounders.moonAnomalyVisible(calculators.moonAnomalyVisible(moonAnomalyTrue.toVector))
+    rounders.moonAnomalyVisible(calculators.moonAnomalyVisible(moonAnomalyTrue))
 
   def moonLongitudeTrueRaw: Position = moonLongitudeMeanAtTimeOfSighting + moonAnomalyVisible
   lazy val moonLongitudeTrue: Position = rounders.moonLongitudeTrue(moonLongitudeTrueRaw)
@@ -73,6 +73,7 @@ final class Calculation(
   def moonLatitudeCourseRaw: Rotation = (moonLongitudeTrue - moonHeadMean).canonical
   lazy val moonLatitudeCourse: Rotation = rounders.moonLatitudeCourse(moonLatitudeCourseRaw)
   lazy val isMoonLatitudeNortherly: Boolean = moonLatitudeCourse < Rotation(180)
+
   lazy val moonLatitude: Rotation = calculators.moonLatitude(moonLatitudeCourse)
 
   // KH 17:1
