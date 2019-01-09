@@ -24,5 +24,3 @@ title: Table of Contents
 [Paper](/paper/)
 
 [Remarks](/remarks/) 
-
-[Publishing](/Publishing.md)
