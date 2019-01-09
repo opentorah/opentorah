@@ -4,6 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.podval.calendar.numbers.BigRational
 import SimpleTimes.{Point, Vector}
+import SimpleTimes.Digit
 
 final class SimpleTimesTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matchers {
 
@@ -46,26 +47,26 @@ final class SimpleTimesTest extends FlatSpec with GeneratorDrivenPropertyChecks 
   }
 
   "head()/tail()/length()" should "be correct" in {
-    Vector(0).head shouldBe 0
-    Vector(0).tail(0) shouldBe 0
-    Vector(0).tail(1) shouldBe 0
-    Vector(0, 2).head shouldBe 0
-    Vector(0, 2).tail(0) shouldBe 2
-    Vector(0, 2).tail(1) shouldBe 0
+    Vector(0).get(Digit.DAYS) shouldBe 0
+    Vector(0).get(Digit.HOURS) shouldBe 0
+    Vector(0).get(Digit.PARTS) shouldBe 0
+    Vector(0, 2).get(Digit.DAYS) shouldBe 0
+    Vector(0, 2).get(Digit.HOURS) shouldBe 2
+    Vector(0, 2).get(Digit.PARTS) shouldBe 0
 
-    Vector(0).head(3).digits shouldBe Seq(3)
-    Vector(0).tail(0, 2).digits shouldBe Seq(0, 2)
-    Vector(0).tail(1, 3).digits shouldBe Seq(0, 0, 3)
-    Vector(0, 2).head(4).digits shouldBe Seq(4, 2)
-    Vector(0, 2).tail(0, 3).digits shouldBe Seq(0, 3)
-    Vector(0, 2).tail(1, 3).digits shouldBe Seq(0, 2, 3)
+    Vector(0).set(Digit.DAYS, 3).digits shouldBe Seq(3)
+    Vector(0).set(Digit.HOURS, 2).digits shouldBe Seq(0, 2)
+    Vector(0).set(Digit.PARTS, 3).digits shouldBe Seq(0, 0, 3)
+    Vector(0, 2).set(Digit.DAYS, 4).digits shouldBe Seq(4, 2)
+    Vector(0, 2).set(Digit.HOURS, 3).digits shouldBe Seq(0, 3)
+    Vector(0, 2).set(Digit.PARTS, 3).digits shouldBe Seq(0, 2, 3)
 
-    Vector(0).head(3).length shouldBe 0
-    Vector(0).tail(0, 2).length shouldBe 1
-    Vector(0).tail(1, 3).length shouldBe 2
-    Vector(0, 2).head(4).length shouldBe 1
-    Vector(0, 2).tail(0, 3).length shouldBe 1
-    Vector(0, 2).tail(1, 3).length shouldBe 2
+    Vector(0).set(Digit.DAYS, 3).length shouldBe 0
+    Vector(0).set(Digit.HOURS, 2).length shouldBe 1
+    Vector(0).set(Digit.PARTS, 3).length shouldBe 2
+    Vector(0, 2).set(Digit.DAYS, 4).length shouldBe 1
+    Vector(0, 2).set(Digit.HOURS, 3).length shouldBe 1
+    Vector(0, 2).set(Digit.PARTS, 3).length shouldBe 2
   }
 
   "+()" should "be correct" in {
@@ -98,7 +99,7 @@ final class SimpleTimesTest extends FlatSpec with GeneratorDrivenPropertyChecks 
   "fromRational()" should "be correct" in {
     def test(value: Vector): Unit = {
       val rational = value.toRational
-      val number = Vector.fromRational(rational, Times.defaultLength)
+      val number = Vector.fromRational(rational, SimpleTimes.defaultLength)
       number shouldBe value
     }
 
@@ -114,27 +115,27 @@ final class SimpleTimesTest extends FlatSpec with GeneratorDrivenPropertyChecks 
 
   "roundTo()" should "be correct" in {
     Vector(3).roundTo(0) shouldBe Vector(3)
-    Vector(3).roundTo(1) shouldBe Vector(3)
+    Vector(3).roundTo(Digit.HOURS) shouldBe Vector(3)
     Vector(3, 5).roundTo(0) shouldBe Vector(3)
-    Vector(3, 5).roundTo(1) shouldBe Vector(3, 5)
-    Vector(3, 5).roundTo(2) shouldBe Vector(3, 5)
+    Vector(3, 5).roundTo(Digit.HOURS) shouldBe Vector(3, 5)
+    Vector(3, 5).roundTo(Digit.PARTS) shouldBe Vector(3, 5)
     -Vector(3, 5).roundTo(0) shouldBe -Vector(3)
     -Vector(3, 12).roundTo(0) shouldBe -Vector(4)
-    -Vector(3, 5).roundTo(1) shouldBe -Vector(3, 5)
-    -Vector(3, 5).roundTo(2) shouldBe -Vector(3, 5)
+    -Vector(3, 5).roundTo(Digit.HOURS) shouldBe -Vector(3, 5)
+    -Vector(3, 5).roundTo(Digit.PARTS) shouldBe -Vector(3, 5)
     Vector(3, 5, 4).roundTo(0) shouldBe Vector(3)
-    Vector(3, 5, 4).roundTo(1) shouldBe Vector(3, 5)
-    Vector(3, 5, 4).roundTo(2) shouldBe Vector(3, 5, 4)
-    Vector(3, 5, 4).roundTo(3) shouldBe Vector(3, 5, 4)
+    Vector(3, 5, 4).roundTo(Digit.HOURS) shouldBe Vector(3, 5)
+    Vector(3, 5, 4).roundTo(Digit.PARTS) shouldBe Vector(3, 5, 4)
+    Vector(3, 5, 4).roundTo(Digit.MOMENTS) shouldBe Vector(3, 5, 4)
     Vector(-3, 5, 4).roundTo(0) shouldBe Vector(-3)
-    Vector(-3, 5, 4).roundTo(1) shouldBe Vector(-3, 5)
-    Vector(-3, 5, 4).roundTo(2) shouldBe Vector(-3, 5, 4)
-    Vector(-3, 5, 4).roundTo(3) shouldBe Vector(-3, 5, 4)
-    Vector(3, 5, 4, 1).roundTo(2) shouldBe Vector(3, 5, 4)
-    Vector(-3, 5, 4, 1).roundTo(2) shouldBe Vector(-3, 5, 4)
-    Vector(-3, 5, 4, 37).roundTo(2) shouldBe Vector(-3, 5, 4)
-    Vector(-3, 5, 4, 38).roundTo(2) shouldBe Vector(-3, 5, 5)
-    Vector(-3, 5, 4, 39).roundTo(2) shouldBe Vector(-3, 5, 5)
+    Vector(-3, 5, 4).roundTo(Digit.HOURS) shouldBe Vector(-3, 5)
+    Vector(-3, 5, 4).roundTo(Digit.PARTS) shouldBe Vector(-3, 5, 4)
+    Vector(-3, 5, 4).roundTo(Digit.MOMENTS) shouldBe Vector(-3, 5, 4)
+    Vector(3, 5, 4, 1).roundTo(Digit.PARTS) shouldBe Vector(3, 5, 4)
+    Vector(-3, 5, 4, 1).roundTo(Digit.PARTS) shouldBe Vector(-3, 5, 4)
+    Vector(-3, 5, 4, 37).roundTo(Digit.PARTS) shouldBe Vector(-3, 5, 4)
+    Vector(-3, 5, 4, 38).roundTo(Digit.PARTS) shouldBe Vector(-3, 5, 5)
+    Vector(-3, 5, 4, 39).roundTo(Digit.PARTS) shouldBe Vector(-3, 5, 5)
   }
 
   "toString()" should "be correct" in {

@@ -4,17 +4,19 @@ import org.podval.calendar.numbers.NonPeriodicNumber
 import Times.{hoursPerHalfDay, partsPerHalfHour, partsPerMinute}
 
 trait Time[S <: Times[S], N <: Time[S, N]] extends NonPeriodicNumber[S, N] { this: N =>
-  final def days: Int = head
+  private def Digit = numbers.Digit
 
-  final def days(value: Int): N = head(value)
+  final def days: Int = get(Digit.DAYS)
+
+  final def days(value: Int): N = set(Digit.DAYS, value)
 
   final def day(number: Int): N = days(number-1)
 
   final def time: S#Vector = this - companion(days)
 
-  final def hours: Int = tail(0)
+  final def hours: Int = get(Digit.HOURS)
 
-  final def hours(value: Int): N = tail(0, value)
+  final def hours(value: Int): N = set(Digit.HOURS, value)
 
   final def firstHalfHours(value: Int): N = {
     require(0 <= hours && hours < hoursPerHalfDay)
@@ -26,9 +28,9 @@ trait Time[S <: Times[S], N <: Time[S, N]] extends NonPeriodicNumber[S, N] { thi
     hours(value + hoursPerHalfDay)
   }
 
-  final def parts: Int = tail(1)
+  final def parts: Int = get(Digit.PARTS)
 
-  final def parts(value: Int): N = tail(1, value)
+  final def parts(value: Int): N = set(Digit.PARTS, value)
 
   final def halfHour: N = parts(partsPerHalfHour)
 
@@ -53,7 +55,7 @@ trait Time[S <: Times[S], N <: Time[S, N]] extends NonPeriodicNumber[S, N] { thi
     partsWithoutMinutes(newParts).moments(newMoments)
   }
 
-  final def moments: Int = tail(2)
+  final def moments: Int = get(Digit.MOMENTS)
 
-  final def moments(value: Int): N = tail(2, value)
+  final def moments(value: Int): N = set(Digit.MOMENTS, value)
 }

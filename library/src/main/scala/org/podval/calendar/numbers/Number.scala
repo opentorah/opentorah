@@ -1,5 +1,7 @@
 package org.podval.calendar.numbers
 
+import DigitsDescriptor.Digit
+
 trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with NumbersMember[S] { this: N =>
   def digits: Seq[Int]
 
@@ -7,20 +9,16 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
 
   protected final def fromDigits(digits: Seq[Int]): N = companion.fromDigits(digits)
 
-  final def head: Int = get(0)
+  final def get(digit: Digit): Int = get(digit.position)
 
-  final def head(value: Int): N = set(0, value)
-
-  final def tail(position: Int): Int = get(position+1)
-
-  final def tail(position: Int, value: Int): N = set(position+1, value)
-
-  private final def get(position: Int): Int = {
+  final def get(position: Int): Int = {
     val normalDigits: Seq[Int] = normal.digits
     if (normalDigits.length > position) normalDigits(position) else 0
   }
 
-  private final def set(position: Int, value: Int): N = {
+  final def set(digit: Digit, value: Int): N = set(digit.position, value)
+
+  final def set(position: Int, value: Int): N = {
     val normalDigits: Seq[Int] = normal.digits
     val newDigits: Seq[Int] = normalDigits.padTo(position+1, 0).updated(position, value)
     fromDigits(newDigits)
@@ -55,6 +53,8 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
   final def unary_- : N = fromDigits(digits.map(-_))
 
   final def -(that: N): S#Vector = numbers.Vector.fromDigits(subtract(that))
+
+  final def roundTo(digit: Digit): N = roundTo(digit.position)
 
   final def roundTo(length: Int): N = {
     require(length >= 0)

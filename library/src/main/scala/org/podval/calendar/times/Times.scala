@@ -1,11 +1,20 @@
 package org.podval.calendar.times
 
-import org.podval.calendar.numbers.NonPeriodicNumbers
+import org.podval.calendar.numbers.{DigitsDescriptor, NonPeriodicNumbers}
 
 trait Times[S <: Times[S]] extends NonPeriodicNumbers[S] { this: S =>
-  type Point <: TimePointBase[S]
+  override type Point <: TimePointBase[S]
 
-  type Vector <: TimeVectorBase[S]
+  override type Vector <: TimeVectorBase[S]
+
+  final object Digit extends DigitsDescriptor {
+    object DAYS extends DigitBase("d")
+    object HOURS extends DigitBase("h")
+    object PARTS extends DigitBase("p")
+    object MOMENTS extends DigitBase("m")
+
+    override val values: Seq[DigitsDescriptor.Digit] = Seq(DAYS, HOURS, PARTS, MOMENTS)
+  }
 
   final override def range(position: Int): Int = position match {
     case 0 => Times.hoursPerDay
@@ -13,19 +22,10 @@ trait Times[S <: Times[S]] extends NonPeriodicNumbers[S] { this: S =>
     case 2 => Times.momentsPerPart
   }
 
-  final override def headSign: String = "d"
-
-  final override val signPartial: PartialFunction[Int, String] = {
-    case 0 => "h"
-    case 1 => "p"
-    case 2 => "m"
-  }
-
-  final override val defaultLength: Int = Times.defaultLength
+  final override val defaultLength: Int = 3
 
   val week: S#Vector = Vector().days(7)
 }
-
 
 object Times {
   final val hoursPerDay: Int = 24
@@ -51,6 +51,4 @@ object Times {
   final val millisecondsPerSecond: Int = 1000
 
   final val millisecondsPerMinute: Int = secondsPerMinute*millisecondsPerSecond
-
-  val defaultLength: Int = 3
 }

@@ -1,6 +1,6 @@
 package org.podval.calendar.angles
 
-import org.podval.calendar.numbers.{Digits, PeriodicVectorCompanion, NumbersMember,
+import org.podval.calendar.numbers.{Digits, DigitsDescriptor, PeriodicVectorCompanion, NumbersMember,
   PeriodicPointCompanion, PeriodicNumbers, PointCompanion, VectorCompanion}
 
 trait Angles extends PeriodicNumbers[Angles] {
@@ -32,30 +32,20 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final val Position = Point
 
+  object Digit extends DigitsDescriptor {
+    object DEGREES extends DigitBase("°")
+    object MINUTES extends DigitBase("′")
+    object SECONDS extends DigitBase("″")
+    object THIRDS  extends DigitBase("‴")
+
+    override val values: Seq[DigitsDescriptor.Digit] = Seq(DEGREES, MINUTES, SECONDS, THIRDS)
+  }
+
   final override def headRange: Int = 360
 
   final override def range(position: Int): Int = 60
 
-  final override def headSign: String = "°"
-
-  import Angles.PositionIndex
-
-  final override val signPartial: PartialFunction[Int, String] = {
-    case PositionIndex.MINUTES => "′"
-    case PositionIndex.SECONDS => "″"
-    case PositionIndex.THIRDS  => "‴"
-  }
-
-  final override val defaultLength: Int = PositionIndex.default
+  final override val defaultLength: Int = 3
 }
 
-
-object Angles extends Angles {
-  object PositionIndex {
-    final val MINUTES: Int = 0
-    final val SECONDS: Int = 1
-    final val THIRDS : Int = 2
-
-    final val default = 3
-  }
-}
+object Angles extends Angles

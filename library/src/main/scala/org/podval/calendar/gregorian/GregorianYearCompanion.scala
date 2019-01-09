@@ -55,6 +55,6 @@ abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
     BigRational(1, 4) -
     BigRational(1, 100) +
     BigRational(1, 400),
-    length = Times.defaultLength
+    length = numbers.defaultLength
   )
 }
