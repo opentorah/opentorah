@@ -2,7 +2,8 @@ package org.podval.calendar.jewish
 
 import org.podval.judaica.metadata.{Named, NamedCompanion, Names}
 
-sealed class Season(override val name: String) extends Named {
+// "abstract" is here to help with the exhaustiveness check.
+sealed abstract class Season(override val name: String) extends Named {
   final lazy val numberInYear: Int = Season.indexOf(this) + 1
 
   final override def names: Names = Season.toNames(this)
