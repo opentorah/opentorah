@@ -335,7 +335,7 @@ object Renderer {
 
       val tkufot: TypedTag[String] = {
         def tkufa(flavor: Season.ForYear, season: Season): String =
-          Calendar.fromJewish(flavor.seasonForYear(season, year)).toLanguageString(spec)
+          flavor.seasonForYear(season, year).toLanguageString(spec)
 
         table(
           tr(td("Tkufa"), td("Shmuel"), td("Rav Ada")),
