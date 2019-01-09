@@ -333,14 +333,19 @@ object Renderer {
         cycle("Birchas Hachamo", Sun.Shmuel)
       )
 
-      val tkufot: TypedTag[String] = table(
-        tr(td("Tkufa"), td("Shmuel"), td("Rav Ada")),
-        Season.values.map { season => tr(
-          td(season.toLanguageString(spec)),
-          td(Sun.Shmuel.seasonForYearFromTishrei(season, year).toGregorianLanguageString(spec)),
-          td(Sun.RavAda.seasonForYearFromTishrei(season, year).toGregorianLanguageString(spec))
-        )}
-      )
+      val tkufot: TypedTag[String] = {
+        def tkufa(flavor: Season.ForYear, season: Season): String =
+          Calendar.fromJewish(flavor.seasonForYear(season, year)).toLanguageString(spec)
+
+        table(
+          tr(td("Tkufa"), td("Shmuel"), td("Rav Ada")),
+          Season.values.map { season => tr(
+            td(season.toLanguageString(spec)),
+            td(tkufa(Sun.Shmuel, season)),
+            td(tkufa(Sun.RavAda, season))
+          )}
+        )
+      }
 
       val festivalDays: Seq[(SpecialDay.Date, Jewish.Day)] =
         SpecialDay.daysWithSpecialReadings(location == Location.HolyLand)

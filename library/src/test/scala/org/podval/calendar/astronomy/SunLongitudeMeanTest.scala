@@ -1,8 +1,8 @@
 package org.podval.calendar.astronomy
 
+import org.podval.calendar.angles.Angles
 import org.scalatest.{FlatSpec, Matchers}
-import org.podval.calendar.angles.Angles.{Rotation, period}
-import org.podval.calendar.jewish
+import org.podval.calendar.jewish.Sun
 
 class SunLongitudeMeanTest extends FlatSpec with Matchers {
 
@@ -14,8 +14,8 @@ class SunLongitudeMeanTest extends FlatSpec with Matchers {
 
   it should "calculate for 29 days in two steps" in {
     (SunLongitudeMean.ten*3-SunLongitudeMean.one) shouldBe SunLongitudeMean.month
-    (SunLongitudeMean.ten*3-SunLongitudeMean.one) shouldBe Rotation(28, 35, 1)
-    (SunLongitudeMean.ten*2+SunLongitudeMean.one*9) shouldBe Rotation(28, 34, 58)
+    (SunLongitudeMean.ten*3-SunLongitudeMean.one) shouldBe Angles.Rotation(28, 35, 1)
+    (SunLongitudeMean.ten*2+SunLongitudeMean.one*9) shouldBe Angles.Rotation(28, 34, 58)
   }
 
   it should "calculate correctly for the regular year" ignore {
@@ -24,7 +24,7 @@ class SunLongitudeMeanTest extends FlatSpec with Matchers {
   }
 
   it should "make a full circle in a year" in {
-    assert(SunLongitudeMean.rambamValue.*[jewish.Jewish](jewish.Sun.RavAda.yearLength) > period)
-    assert(SunLongitudeMean.rambamValue.*[jewish.Jewish](jewish.Sun.Shmuel.yearLength) > period)
+    assert(SunLongitudeMean.rambamValue *(Sun.RavAda.yearLength.toRational, Angles.defaultLength) > Angles.period)
+    assert(SunLongitudeMean.rambamValue *(Sun.Shmuel.yearLength.toRational, Angles.defaultLength) > Angles.period)
   }
 }

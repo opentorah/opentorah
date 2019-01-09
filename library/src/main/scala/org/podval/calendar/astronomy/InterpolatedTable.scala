@@ -17,7 +17,7 @@ trait InterpolatedTable[N <: Number[Angles, N]] {
       val change: Rotation = afterValue - beforeValue
       val span: Rotation = after - before
       val portion: BigRational = reminder.toRational/span.toRational
-      change * portion
+      change *(portion, Angles.defaultLength)
     }
     val result = beforeValue + more
     result
