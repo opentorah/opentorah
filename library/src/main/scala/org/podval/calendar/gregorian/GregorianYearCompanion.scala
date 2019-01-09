@@ -4,6 +4,7 @@ import org.podval.calendar.dates.YearCompanion
 import Gregorian.{MonthNameAndLength, TimeVector, Year, YearCharacter}
 import Gregorian.Month.Name._
 import org.podval.calendar.numbers.BigRational
+import org.podval.calendar.times.Times
 
 abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
   protected final override def characters: Seq[YearCharacter] =
@@ -53,6 +54,7 @@ abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
     BigRational(365) +
     BigRational(1, 4) -
     BigRational(1, 100) +
-    BigRational(1, 400)
+    BigRational(1, 400),
+    length = Times.defaultLength
   )
 }

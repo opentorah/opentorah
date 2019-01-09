@@ -21,7 +21,7 @@ trait Times[S <: Times[S]] extends NonPeriodicNumbers[S] { this: S =>
     case 2 => "m"
   }
 
-  final override val defaultLength: Int = 3
+  final override val defaultLength: Int = Times.defaultLength
 
   val week: S#Vector = Vector().days(7)
 }
@@ -51,4 +51,6 @@ object Times {
   final val millisecondsPerSecond: Int = 1000
 
   final val millisecondsPerMinute: Int = secondsPerMinute*millisecondsPerSecond
+
+  val defaultLength: Int = 3
 }
