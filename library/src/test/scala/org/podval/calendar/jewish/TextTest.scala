@@ -46,9 +46,9 @@ class TextTest extends FlatSpec with Matchers {
   }
 
   "weekly reminders of month and year" should "be as in KH 6:5" in {
-    (meanLunarPeriod % week) shouldBe TimeVector().days(1).hours(12).parts(793)
-    (normalYear      % week) shouldBe TimeVector().days(4).hours( 8).parts(876)
-    (leapYear        % week) shouldBe TimeVector().days(5).hours(21).parts(589)
+    reminderForWeek(meanLunarPeriod) shouldBe TimeVector().days(1).hours(12).parts(793)
+    reminderForWeek(normalYear     ) shouldBe TimeVector().days(4).hours( 8).parts(876)
+    reminderForWeek(leapYear       ) shouldBe TimeVector().days(5).hours(21).parts(589)
   }
 
   "molad Nisan example from KH 6:7" should "be correct" in {
@@ -85,10 +85,13 @@ class TextTest extends FlatSpec with Matchers {
   }
 
   "cycle remainder" should "be as in KH 6:12" in {
-    (TimeVector().days(4).hours( 8).parts(876)*12 +
-     TimeVector().days(5).hours(21).parts(589)* 7) % week shouldBe
+    reminderForWeek(TimeVector().days(4).hours( 8).parts(876)*12 +
+     TimeVector().days(5).hours(21).parts(589)* 7) shouldBe
      TimeVector().days(2).hours(16).parts(595)
   }
+
+  private def reminderForWeek(ofWhat: TimeVector): TimeVector =
+    ofWhat - (week * (ofWhat.toRational / week.toRational).whole)
 
   "year length for short years" should "be as in KH 8:7-8" in {
     Jewish.Year.shortNonLeapYearLength shouldBe 353
