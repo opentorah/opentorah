@@ -45,7 +45,7 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final override def range(position: Int): Int = 60
 
-  final override val defaultLength: Int = 3
+  final override val maxLength: Int = 10
 }
 
 object Angles extends Angles

@@ -63,22 +63,20 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
       if (position < length) (0, digit)
       else (if (math.abs(digit) >= range / 2) math.signum(digit) else 0, 0)
 
-    val roundedDigits: Seq[Int] = numbers.transform(normal.digits, forDigit, (digit: Int) => digit)
-
-    fromDigits(roundedDigits)
+    val result: Seq[Int] = numbers.transform(normal.digits, forDigit, (digit: Int) => digit)
+    fromDigits(result)
   }
 
   final def to[T: Convertible]: T = numbers.to[T](digits)
   final def toRational: BigRational = to[BigRational]
   final def toDouble: Double = to[Double]
 
-  final def toString(length: Int): String = numbers.toString(this.simple, length)
+  final def toString(length: Int): String = numbers.toString(this, length)
 
   override def toString: String = toString(length)
 
   final override def compare(that: N): Int =
     zipWith(this.simple.digits, that.simple.digits, _ compare _).find (_ != 0).getOrElse(0)
-
 
   final override def equals(other: Any): Boolean = other.isInstanceOf[Number[_, _]] && {
     val that: N = other.asInstanceOf[N]

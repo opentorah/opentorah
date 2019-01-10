@@ -99,7 +99,7 @@ final class SimpleTimesTest extends FlatSpec with GeneratorDrivenPropertyChecks 
   "fromRational()" should "be correct" in {
     def test(value: Vector): Unit = {
       val rational = value.toRational
-      val number = Vector.fromRational(rational, SimpleTimes.defaultLength)
+      val number = Vector.fromRational(rational, SimpleTimes.maxLength)
       number shouldBe value
     }
 

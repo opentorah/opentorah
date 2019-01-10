@@ -22,7 +22,7 @@ trait Times[S <: Times[S]] extends NonPeriodicNumbers[S] { this: S =>
     case 2 => Times.momentsPerPart
   }
 
-  final override val defaultLength: Int = 3
+  final override val maxLength: Int = 3
 
   val week: S#Vector = Vector().days(7)
 }

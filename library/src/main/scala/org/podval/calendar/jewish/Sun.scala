@@ -6,7 +6,7 @@ import Jewish.{Moment, TimeVector, Year}
 abstract class Sun extends Season.ForYear {
   def yearLength: TimeVector
 
-  final def seasonLength: TimeVector = yearLength /(4, Jewish.defaultLength)
+  final def seasonLength: TimeVector = yearLength /(4, Jewish.maxLength)
 
   final def firstTkufasNisan: Moment =
     Moon.firstMoladNisan - firstTkufasNisanBeforeFirstMoladNisan
@@ -55,7 +55,7 @@ object Sun {
   object RavAda extends Sun {
     // KH 10:1
     final override val yearLength: TimeVector =
-      LeapYearsCycle.cycleLength /(LeapYearsCycle.yearsInCycle, Jewish.defaultLength)
+      LeapYearsCycle.cycleLength /(LeapYearsCycle.yearsInCycle, Jewish.maxLength)
 
     // KH 10:3
     final override val firstTkufasNisanBeforeFirstMoladNisan: TimeVector =
