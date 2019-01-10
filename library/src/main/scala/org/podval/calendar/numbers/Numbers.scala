@@ -21,9 +21,7 @@ trait Numbers[S <: Numbers[S]] { this: S =>
     */
   def range(position: Int): Int
 
-  def headSign: String
-
-  val signPartial: PartialFunction[Int, String]
+  val Digit: DigitsDescriptor
 
   final def to[T: Convertible](digits: Seq[Int]): T =
     digits.zip(ranges(digits.length-1) :+ 0).foldLeft((Convertible[T].zero, BigInt(1))) {
@@ -42,7 +40,8 @@ trait Numbers[S <: Numbers[S]] { this: S =>
   def ranges(length: Int): Seq[Int] = (0 until length).map(range)
 
   final def toString[N <: Number[S, N]](number: N, length: Int): String = {
-    def signFor(position: Int): Option[String] = signPartial.lift(position)
+    def signFor(position: Int): Option[String] =
+      if (position < Digit.length) Some(Digit.forPosition(position).sign) else None
 
     def digitToString(defaultSign: String)(pair: (Int, Option[String])): String = {
       val (digit: Int, sign: Option[String]) = pair
@@ -50,14 +49,13 @@ trait Numbers[S <: Numbers[S]] { this: S =>
     }
 
     val digits: Seq[Int] = number.digits
-    val digitsWithSigns: Seq[(Int, Option[String])] = digits.tail.padTo(length, 0).zipWithIndex.map {
+    val digitsEffective: Seq[Int] = math.abs(digits.head) +: digits.tail.padTo(length, 0)
+    val digitsWithSigns: Seq[(Int, Option[String])] = digitsEffective.zipWithIndex.map {
       case (digit, position) => (digit, signFor(position))
     }
-    val tailResult: Seq[String] =
+    val result: Seq[String] =
       if (digitsWithSigns.isEmpty) Seq.empty
       else digitsWithSigns.init.map(digitToString(",")) :+ digitToString("")(digitsWithSigns.last)
-
-    val result: Seq[String] = (math.abs(digits.head) + headSign) +: tailResult
 
     (if (number.isNegative) "-" else "") + result.mkString
   }

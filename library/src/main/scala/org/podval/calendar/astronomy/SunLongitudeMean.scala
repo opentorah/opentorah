@@ -1,5 +1,6 @@
 package org.podval.calendar.astronomy
 
+import org.podval.calendar.angles.Angles
 import org.podval.calendar.angles.Angles.Rotation
 import org.podval.calendar.jewish.{Jewish, Sun}
 import org.podval.calendar.numbers.BigRational
@@ -31,7 +32,7 @@ object SunLongitudeMean extends Days2Angle {
 
   // TODO move into tests
   def main(args: Array[String]) {
-    def m(n: Int) = (rambamValue * n).roundTo(2)
+    def m(n: Int) = (rambamValue * n).roundTo(Angles.Digit.SECONDS)
     for (n <- List(1, 10, 100, 1000, 10000, 354))
       println(n + " " + m(n))
 

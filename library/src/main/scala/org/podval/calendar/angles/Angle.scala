@@ -1,31 +1,32 @@
 package org.podval.calendar.angles
 
 import org.podval.calendar.numbers.PeriodicNumber
+import Angles.Digit
 
 trait Angle[N <: Angle[N]] extends PeriodicNumber[Angles, N] { this: N =>
-  def degrees: Int = head
+  def degrees: Int = get(Digit.DEGREES)
 
-  def degrees(value: Int): N = head(value)
+  def degrees(value: Int): N = set(Digit.DEGREES, value)
 
-  def roundToDegrees: N = roundTo(0)
+  def roundToDegrees: N = roundTo(Digit.DEGREES)
 
-  def minutes: Int = tail(0)
+  def minutes: Int = get(Digit.MINUTES)
 
-  def minutes(value: Int): N = tail(0, value)
+  def minutes(value: Int): N = set(Digit.MINUTES, value)
 
-  def roundToMinutes: N = roundTo(1)
+  def roundToMinutes: N = roundTo(Digit.MINUTES)
 
-  def seconds: Int = tail(1)
+  def seconds: Int = get(Digit.SECONDS)
 
-  def seconds(value: Int): N = tail(1, value)
+  def seconds(value: Int): N = set(Digit.SECONDS, value)
 
-  def roundToSeconds: N = roundTo(2)
+  def roundToSeconds: N = roundTo(Digit.SECONDS)
 
-  def thirds: Int  = tail(2)
+  def thirds: Int  = get(Digit.THIRDS)
 
-  def thirds(value: Int): N = tail(2, value)
+  def thirds(value: Int): N = set(Digit.THIRDS, value)
 
-  def roundToThirds: N = roundTo(3)
+  def roundToThirds: N = roundTo(Digit.THIRDS)
 
   def toRadians: Double = math.toRadians(toDegrees)
 

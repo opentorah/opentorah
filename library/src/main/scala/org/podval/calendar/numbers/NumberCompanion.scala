@@ -29,10 +29,10 @@ trait NumberCompanion[S <: Numbers[S], N <: Number[S, N]] extends NumbersMember[
 
   protected def negativeHead(value: Int): Int
 
-  final def from[T: Convertible](value: T, length: Int = numbers.defaultLength): N =
+  final def from[T: Convertible](value: T, length: Int): N =
     fromDigits(numbers.from[T](value, length))
 
-  final def fromRational(value: BigRational, length: Int = numbers.defaultLength): N = from[BigRational](value, length)
+  final def fromRational(value: BigRational, length: Int): N = from[BigRational](value, length)
 
-  final def fromDouble(value: Double, length: Int = numbers.defaultLength): N = from[Double](value, length)
+  final def fromDouble(value: Double, length: Int): N = from[Double](value, length)
 }
