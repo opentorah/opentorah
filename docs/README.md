@@ -68,8 +68,9 @@ and [Oxygen](https://www.oxygenxml.com/).
 
 It is possible to add MathJax header incantations to the pages that have formulas.
 
-I still didn't figure out if it is possible to include generated tables in the published HTML.
-(When I do, I should publish this note as an update to my original blog post :))
+I still didn't figure out if it is possible to include generated tables in the published HTML:
+{\% include-relative xxx.md \%} probably doesn't work on GitHub pages.
+Cross-linking (<a name="anchor"></a> ... [](#anchor) probably does though.
 
 The road from Mardown to PDF is not easy, even if I write all the formulas in LaTeX.
 For instance, conversion of a recent book published as a series of
@@ -82,9 +83,19 @@ to the author of the elaborate machinery that generates the book's website:
 "This should be possible, and I have created similar setups in the past... but we're not currently
 working on this."
 
-So, current decision (beginning of 2019) is: give up on the PDF for now, give up on the
-rich semantic markup of DocBook, write and publish in MarkDown (at least it's not LaTeX!),
-and hope that by the time I am "done", automated PDF conversion will become available :)
+Also, with Markdown I lose:
+- structuring text into chapters and including them
+- table of contents
+- index
+- footnotes
+and all the advantages of semantic markup.
+
+
+So, current decision (beginning of 2019) is:
+1. continue with DocBook plugin (now in a separate repository),
+with the goal of supporting multi-format generation with diagrams, fonts, program-generated tables etc.,
+but with formulas as images.
+2. Use GitHub pages' Markdown for short preliminary pieces.
 
 
 # Gradle DocBook Plugin #
