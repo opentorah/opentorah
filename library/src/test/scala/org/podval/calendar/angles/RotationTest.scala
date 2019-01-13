@@ -3,7 +3,7 @@ package org.podval.calendar.angles
 import org.scalatest.{FlatSpec, Matchers}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
-import Angles.Rotation
+import Angles.{Position, Rotation}
 
 class RotationTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matchers {
 
@@ -41,27 +41,33 @@ class RotationTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matc
   }
 
   it should "compare correctly" in {
-    Rotation(0, 0, 0) == Rotation(-0) shouldBe true
-    Rotation(15) == Rotation(15) shouldBe true
-    Rotation(15) == Rotation(-345).canonical shouldBe true
+    Rotation(0, 0, 0) shouldBe Rotation(-0)
+    Rotation(15) shouldBe Rotation(15)
+    Rotation(-345).canonical shouldBe Rotation(15)
+    Rotation(345) shouldBe Rotation(345)
+    Rotation(-15) shouldBe Rotation(-15)
+
+    Position(721) shouldBe Position(1)
+    Rotation(721) == Rotation(1) shouldBe false
+    Rotation(721).canonical shouldBe Rotation(1)
+    Rotation(-721).canonical shouldBe Rotation(-1).canonical
+    -Rotation(360, 49, 59, 60).canonical shouldBe -Rotation(0, 50)
   }
 
-  it should "normalize and canonicalize correctly" in {
-    Rotation(345).normal shouldBe Rotation(345)
-    Rotation(-15).normal shouldBe Rotation(-15)
-    Rotation(721).normal shouldBe Rotation(1)
-    Rotation(-721).normal shouldBe Rotation(-1)
-    -Rotation(360, 49, 59, 60).normal shouldBe -Rotation(0, 50)
+  it should "canonicalize correctly" in {
+    Rotation(51).digits shouldBe List(51)
+    Rotation(51).canonical.digits shouldBe List(51)
+
+    Rotation(-51).digits shouldBe List(-51)
+    Rotation(-51).canonical.digits shouldBe List(309)
+
+    (Rotation(360) - Rotation(-51)).digits shouldBe List(411)
+    (Rotation(360) - Rotation(-51).canonical).digits shouldBe List(51)
 
     Rotation(345).canonical shouldBe Rotation(345)
     Rotation(-15).canonical shouldBe Rotation(345)
     Rotation(721).canonical shouldBe Rotation(1)
     Rotation(-721).canonical shouldBe Rotation(359)
-
-    Rotation(345).symmetrical shouldBe Rotation(-15)
-    Rotation(-15).symmetrical shouldBe Rotation(-15)
-    Rotation(721).symmetrical shouldBe Rotation(1)
-    Rotation(-721).symmetrical shouldBe Rotation(-1)
   }
 
   it should "negate correctly" in {

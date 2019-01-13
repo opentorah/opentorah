@@ -32,7 +32,7 @@ object MoonAnomalyVisible {
 
     // KH 15:4, 15:7
     final override def calculate(moonAnomalyTrue: Position): Rotation = {
-      val angle: Position = moonAnomalyTrue.canonical
+      val angle: Position = moonAnomalyTrue
       if (angle <= Position(180)) -interpolate(angle) else interpolate(angle.reflect)
     }
   }

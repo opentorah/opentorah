@@ -7,6 +7,14 @@ trait Times[S <: Times[S]] extends NonPeriodicNumbers[S] { this: S =>
 
   override type Vector <: TimeVectorBase[S]
 
+  final override val maxLength: Int = 3
+
+  final override def range(position: Int): Int = position match {
+    case 0 => Times.hoursPerDay
+    case 1 => Times.partsPerHour
+    case 2 => Times.momentsPerPart
+  }
+
   final object Digit extends DigitsDescriptor {
     object DAYS extends DigitBase("d")
     object HOURS extends DigitBase("h")
@@ -15,14 +23,6 @@ trait Times[S <: Times[S]] extends NonPeriodicNumbers[S] { this: S =>
 
     override val values: Seq[DigitsDescriptor.Digit] = Seq(DAYS, HOURS, PARTS, MOMENTS)
   }
-
-  final override def range(position: Int): Int = position match {
-    case 0 => Times.hoursPerDay
-    case 1 => Times.partsPerHour
-    case 2 => Times.momentsPerPart
-  }
-
-  final override val maxLength: Int = 3
 
   val week: S#Vector = Vector().days(7)
 }

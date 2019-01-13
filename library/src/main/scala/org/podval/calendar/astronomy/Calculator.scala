@@ -13,7 +13,7 @@ class Calculator(val epoch: Epoch, val calculators: Calculators, val rounders: R
   )
 
   // TODO trying to figure out why Iyar 2 4938 is the day of sighting
-  def elongation(moment: Moment): Rotation = calculate(moment.day).elongation.symmetrical
+  def elongation(moment: Moment): Rotation = calculate(moment.day).elongation
 
   def dayOfSighting(month: Month): Day = {
     val from: Moment = (month.firstDay - 5).toMoment

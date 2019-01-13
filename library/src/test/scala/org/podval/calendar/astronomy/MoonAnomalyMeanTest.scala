@@ -9,7 +9,7 @@ class MoonAnomalyMeanTest extends FlatSpec with Matchers {
   it should "calculate for 29 days in two steps" in {
     // TODO How did Rambam calculate value for 29 days?
 //    MoonAnomalyMean.table.month shouldBe Rotation(18, 53, 4)
-    MoonAnomalyMean.ten*3-MoonAnomalyMean.one shouldBe Rotation(18, 53, 6)
-    MoonAnomalyMean.ten*2+MoonAnomalyMean.one*9 shouldBe Rotation(18, 53, 6)
+    (MoonAnomalyMean.ten*3-MoonAnomalyMean.one).canonical shouldBe Rotation(18, 53, 6)
+    (MoonAnomalyMean.ten*2+MoonAnomalyMean.one*9).canonical shouldBe Rotation(18, 53, 6)
   }
 }

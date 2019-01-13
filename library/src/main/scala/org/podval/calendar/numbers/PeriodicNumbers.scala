@@ -5,15 +5,13 @@ trait PeriodicNumbers[S <: PeriodicNumbers[S]] extends Numbers[S] { this: S =>
 
   type Vector <: PeriodicVector[S]
 
+  override type VectorCompanionType <: PeriodicVectorCompanion[S]
+
   def headRange: Int
 
   require(headRange % 2 == 0)
 
-  final def symmetrical[N <: PeriodicNumber[S, N]](number: N): Seq[Int] = {
-    val result: Seq[Int] = number.normal.digits
-    if (result.head <= headRange/2) result
-    else (result.head - headRange) +: result.tail
-  }
+  protected final override def headDigit(f: (Int, Int, Int) => (Int, Int), value: Int): Int = f(value, -1, headRange)._2
 
   val period: S#Vector = Vector(headRange)
 

@@ -31,7 +31,7 @@ object SunLongitudeCorrection  {
     // KH 13:2-3
     final override def calculate(sunCourse: Rotation): Rotation = {
       val angle: Rotation = sunCourse.canonical
-      if (angle <= Rotation(180)) -interpolate(angle) else interpolate(Rotation(360) - angle)
+      if (angle <= Rotation(180)) -interpolate(angle) else interpolate((Rotation(360) - angle).canonical)
     }
   }
 

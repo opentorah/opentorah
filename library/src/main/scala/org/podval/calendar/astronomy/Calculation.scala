@@ -74,9 +74,9 @@ final class Calculation(
   def moonTailMean: Position = moonHeadMean + Rotation(180)
 
   // KH 16:10
-  def moonLatitudeCourseRaw: Rotation = (moonLongitudeTrue - moonHeadMean).canonical
+  def moonLatitudeCourseRaw: Rotation = moonLongitudeTrue - moonHeadMean
   lazy val moonLatitudeCourse: Rotation = rounders.moonLatitudeCourse(moonLatitudeCourseRaw)
-  lazy val isMoonLatitudeNortherly: Boolean = moonLatitudeCourse < Rotation(180)
+  lazy val isMoonLatitudeNortherly: Boolean = moonLatitudeCourse.canonical < Rotation(180)
 
   lazy val moonLatitude: Rotation = calculators.moonLatitude(moonLatitudeCourse)
 

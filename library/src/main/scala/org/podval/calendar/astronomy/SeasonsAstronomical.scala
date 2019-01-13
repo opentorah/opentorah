@@ -15,7 +15,7 @@ final class SeasonsAstronomical(calculator: Calculator) extends Season.ForYear {
       case Season.TkufasTeves   => Zodiac.Capricorn
     }
 
-    def f(moment: Moment): Rotation = (sunLongitudeTrue(moment) - zodiac.start).symmetrical
+    def f(moment: Moment): Rotation = sunLongitudeTrue(moment) - zodiac.start
     // TODO should this always be Nisan?
     val left: Moment = year.month(Month.Name.Nisan).prev.firstDay.toMoment
     val right: Moment = year.month(Month.Name.Nisan).next.firstDay.toMoment

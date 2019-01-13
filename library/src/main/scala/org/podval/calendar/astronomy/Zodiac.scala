@@ -9,8 +9,8 @@ sealed abstract class Zodiac extends Named {
   final override def names: Names = Zodiac.toNames(this)
 
   final lazy val start: Position = Position(0) + Zodiac.size*Zodiac.indexOf(this)
-  final lazy val end: Position = (start + Zodiac.size).canonical
-  final lazy val middle: Position = (start + Zodiac.halfSize).canonical
+  final lazy val end: Position = start + Zodiac.size
+  final lazy val middle: Position = start + Zodiac.halfSize
 
   final def contains(angle: Position): Boolean = (start <= angle) && (angle < end)
 
@@ -47,19 +47,14 @@ object Zodiac extends NamedCompanion {
     (Rotation(sizeInDegrees), Rotation(sizeInDegrees / 2))
   }
 
-  def fromAngle(rawAngle: Position): (Zodiac, Rotation) = {
-    val angle: Position = rawAngle.canonical
-    val zodiac: Zodiac = inZodiac(rawAngle)
+  def fromAngle(angle: Position): (Zodiac, Rotation) = {
+    val zodiac: Zodiac = inZodiac(angle)
     (zodiac, angle - zodiac.start)
   }
 
-  def inZodiac(rawAngle: Position): Zodiac = {
-    val angle: Position = rawAngle.canonical
+  def inZodiac(angle: Position): Zodiac =
     values.find(_.contains(angle)).get
-  }
 
-  def in(rawAngle: Position, zodiacs: Set[Zodiac]):Boolean = {
-    val angle: Position = rawAngle.canonical
+  def in(angle: Position, zodiacs: Set[Zodiac]):Boolean =
     zodiacs.exists(_.contains(angle))
-  }
 }

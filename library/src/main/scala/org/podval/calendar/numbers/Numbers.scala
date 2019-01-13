@@ -2,13 +2,19 @@ package org.podval.calendar.numbers
 
 trait Numbers[S <: Numbers[S]] { this: S =>
 
+  type NumbersMemberType <: NumbersMember[S]
+
   type Point <: PointBase[S]
 
-  val Point: PointCompanion[S]
+  type PointCompanionType <: NumberCompanion[S, S#Point]
+
+  val Point: PointCompanionType
 
   type Vector <: VectorBase[S]
 
-  val Vector: VectorCompanion[S]
+  type VectorCompanionType <: NumberCompanion[S, S#Vector]
+
+  val Vector: VectorCompanionType
 
   /**
     * Maximum number of digits after the dot.
@@ -24,9 +30,9 @@ trait Numbers[S <: Numbers[S]] { this: S =>
     */
   def range(position: Int): Int
 
-  final lazy val ranges: Seq[Int] = (0 until maxLength).map(range)
+  private[numbers] final lazy val ranges: Seq[Int] = (0 until maxLength).map(range)
 
-  final lazy val denominators: Seq[BigInt] = {
+  private final lazy val denominators: Seq[BigInt] = {
     def mult(acc: BigInt, tail: Seq[Int]): Seq[BigInt] = tail.toList match {
       case Nil => Seq.empty
       case r :: rs => acc +: mult(acc * r, rs)
@@ -37,10 +43,11 @@ trait Numbers[S <: Numbers[S]] { this: S =>
 
   val Digit: DigitsDescriptor
 
-  final def to[T: Convertible](digits: Seq[Int]): T =
+  private[numbers] final def to[T: Convertible](digits: Seq[Int]): T =
     digits zip denominators.take(digits.length) map (Convertible[T].div _).tupled reduce Convertible[T].plus
 
-  final def from[T : Convertible](value: T, length: Int): Seq[Int] = {
+  // this can probably be done with digit(i) = value*denominators(i).whole%denominator(i) - but will it be less precise?
+  private[numbers] final def from[T : Convertible](value: T, length: Int): Seq[Int] = {
     val (digits: Seq[Int], lastReminder /*: T*/) =
       ranges.take(length).foldLeft((Seq.empty[Int], Convertible[T].abs(value))) {
         case ((acc: Seq[Int], reminder /*: T*/), range: Int) =>
@@ -65,8 +72,8 @@ trait Numbers[S <: Numbers[S]] { this: S =>
     * @tparam N      flavor of the number
     * @return        String representation of the number
     */
-  final def toString[N <: Number[S, N]](number: N, length: Int): String = {
-    val digits: Seq[Int] = number.simple.digits.padTo(length+1, 0)
+  private[numbers] final def toString[N <: Number[S, N]](number: N, length: Int): String = {
+    val digits: Seq[Int] = normalize(number.digits, isCanonical = false).padTo(length+1, 0)
     val signs: Seq[String] = Digit.signs.take(length+1).padTo(length, ",").padTo(length+1, "")
 
     // ignore the signums of digits: all digits have the same signum, which we reflect in the overall result
@@ -74,7 +81,44 @@ trait Numbers[S <: Numbers[S]] { this: S =>
     (if (number.isNegative) "-" else "") + result.mkString
   }
 
-  final def transform(
+  private[numbers] final def normalize(digits: Seq[Int], isCanonical: Boolean): Seq[Int] =  {
+    val normalDigits: Seq[Int] = transform(
+      digits = if (digits.isEmpty) Seq(0) else digits,
+      forDigit = normalDigit,
+      forHead = (value: Int) => if (isCanonical) headDigit(normalDigit, value) else value
+    )
+    val isPositive: Boolean = isCanonical || (signum(normalDigits) >= 0)
+    val forDigit: (Int, Int, Int) => (Int, Int) = signedDigit(if (isPositive) 1 else -1)
+    val result: Seq[Int] = transform(
+      digits = normalDigits,
+      forDigit = forDigit,
+      forHead = (value: Int) => headDigit(forDigit, value)
+    )
+    // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
+    result.head +: result.tail.reverse.dropWhile(_ == 0).reverse
+  }
+
+  private[numbers] final def signum(digits: Seq[Int]): Int = digits.find(_ != 0).map(math.signum).getOrElse(0)
+
+  private def normalDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
+    (digit / digitRange, digit % digitRange)
+
+  private def signedDigit(sign: Int)(digit: Int, position: Int, digitRange: Int): (Int, Int) =
+    if ((digit == 0) || (math.signum(digit) == sign)) (0, digit) else (-sign, digit + sign*digitRange)
+
+  protected def headDigit(f: (Int, Int, Int) => (Int, Int), value: Int): Int
+
+  private[numbers] final def roundTo(digits: Seq[Int], length: Int): Seq[Int] = {
+    require(length >= 0)
+
+    def forDigit(digit: Int, position: Int, range: Int): (Int, Int) =
+      if (position < length) (0, digit)
+      else (if (math.abs(digit) >= range / 2) math.signum(digit) else 0, 0)
+
+    transform(normalize(digits, isCanonical = false), forDigit, (digit: Int) => digit)
+  }
+
+  private final def transform(
     digits: Seq[Int],
     forDigit: (Int, Int, Int) => (Int, Int),
     forHead: Int => Int

@@ -2,7 +2,7 @@ package org.podval.calendar.dates
 
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.Jewish
-import org.podval.calendar.numbers.{Digits, NonPeriodicVectorCompanion, VectorCompanion}
+import org.podval.calendar.numbers.{Digits, NumberCompanion}
 import org.podval.calendar.times.{TimeVectorBase, Times}
 import org.podval.judaica.metadata.LanguageSpec
 
@@ -40,7 +40,7 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   override type Point <: MomentBase[C]
 
-  override val Point: MomentCompanion[C]
+  override type PointCompanionType <: MomentCompanion[C]
 
   final val Moment: MomentCompanion[C] = Point
 
@@ -48,10 +48,13 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   final type TimeVector = Vector
 
-  final override object Vector extends NonPeriodicVectorCompanion[C] with AbstractCalendarMember  {
-    override def apply(digits: Int*): Vector = new Digits(digits) with TimeVectorBase[C] with AbstractCalendarMember {
-      final override def companion: VectorCompanion[C] = Vector
-    }
+  final override type VectorCompanionType = NumberCompanion[C, Vector]
+
+  final override object Vector extends VectorCompanionType with AbstractCalendarMember  {
+    protected override def newNumber(digits: Seq[Int]): Vector =
+      new Digits(digits) with Vector with AbstractCalendarMember {
+        final override def companion: VectorCompanionType = Vector
+      }
   }
 
   final val TimeVector = Vector
