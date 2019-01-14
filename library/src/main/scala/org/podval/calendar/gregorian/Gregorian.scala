@@ -1,7 +1,7 @@
 package org.podval.calendar.gregorian
 
 import org.podval.calendar.dates.{Calendar, CalendarMember}
-import org.podval.calendar.numbers.{Digits, PointCompanion}
+import org.podval.calendar.numbers.Digits
 import org.podval.judaica.metadata.LanguageSpec
 
 class Gregorian private() extends Calendar[Gregorian] {
@@ -9,6 +9,8 @@ class Gregorian private() extends Calendar[Gregorian] {
   trait GregorianCalendarMember extends CalendarMember[Gregorian] {
     final override def numbers: Gregorian = Gregorian.this
   }
+
+  final override type NumbersMemberType = GregorianCalendarMember
 
   final override type Year = GregorianYear
 
@@ -35,10 +37,13 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type Point = GregorianMoment
 
-  final override object Point extends GregorianMomentCompanion with GregorianCalendarMember {
-    override def apply(digits: Int*): Point = new Digits(digits) with GregorianMoment with GregorianCalendarMember {
-      final override def companion: PointCompanion[Gregorian] = Point
-    }
+  final override type PointCompanionType = GregorianMomentCompanion
+
+  final override object Point extends GregorianMomentCompanion with NumbersMemberType {
+    protected override def newNumber(digits: Seq[Int]): Point =
+      new Digits(digits) with GregorianMoment with NumbersMemberType {
+        final override def companion: PointCompanionType = Point
+      }
   }
 
   final override def toString(number: Int)(implicit spec: LanguageSpec): String = number.toString

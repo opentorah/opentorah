@@ -9,7 +9,7 @@ trait DigitsDescriptor {
 
   val values: Seq[Digit]
 
-  def position(digit: Digit): Int = values.indexOf(digit)
+  lazy val signs: Seq[String] = values.map(_.sign)
 
   def forPosition(index: Int): Digit = values(index)
 

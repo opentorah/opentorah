@@ -11,7 +11,7 @@ class NumbersLawsTest[N <: Numbers[N]](numberSystem: N) extends FunSuite with Di
   val headRange: Int = if (!numberSystem.isInstanceOf[PeriodicNumbers[_]]) Int.MaxValue else {
     numberSystem.asInstanceOf[PeriodicNumbers[_]].headRange
   }
-  val ranges: Seq[Int] = headRange +: numberSystem.ranges(numberSystem.defaultLength)
+  val ranges: Seq[Int] = headRange +: numberSystem.ranges
 
   def digits: Gen[Seq[Int]] = Gen.sequence[Seq[Int], Int](
     ranges.map { range: Int => Gen.choose[Int](0, range-1) }

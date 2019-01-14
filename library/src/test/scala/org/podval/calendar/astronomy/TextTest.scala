@@ -40,7 +40,7 @@ class TextTest extends FunSpec with Matchers {
 
     describe("Law 12") {
       it("angles subtraction") {
-        (Position(100, 20, 30) - Rotation(200, 50, 40)).canonical shouldBe Position(259, 29, 50)
+        (Position(100, 20, 30) - Rotation(200, 50, 40)) shouldBe Position(259, 29, 50)
       }
     }
 
@@ -117,8 +117,8 @@ class TextTest extends FunSpec with Matchers {
         result.daysAfterEpoch shouldBe 29
         // KH 16:5
         result.moonHeadMeanReversed shouldBe Position(182, 29, 37)
-        result.moonHeadMeanRaw.canonical shouldBe Position(177, 30, 23)
-        result.moonHeadMean.canonical shouldBe Zodiac.Virgo.at(Rotation(27, 30))
+        result.moonHeadMeanRaw shouldBe Position(177, 30, 23)
+        result.moonHeadMean shouldBe Zodiac.Virgo.at(Rotation(27, 30))
       }
     }
 
@@ -141,8 +141,8 @@ class TextTest extends FunSpec with Matchers {
         val result = Calculator.Text.calculate(Year(4938).month(Month.Name.Iyar).day(2))
         result.day.name shouldBe Day.Name.Shishi
         result.moonLongitudeTrue shouldBe Zodiac.Taurus.at(Rotation(18, 36))
-        result.moonHeadMean.canonical shouldBe Zodiac.Virgo.at(Rotation(27, 30))
-        result.moonLatitudeCourseRaw shouldBe Rotation(231, 6)
+        result.moonHeadMean shouldBe Zodiac.Virgo.at(Rotation(27, 30))
+        result.moonLatitudeCourseRaw.canonical shouldBe Rotation(231, 6)
         result.moonLatitude shouldBe Rotation(3, 53)
       }
     }

@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
 import org.podval.calendar.dates.{Calendar, CalendarMember}
-import org.podval.calendar.numbers.{Digits, PointCompanion}
+import org.podval.calendar.numbers.Digits
 import org.podval.judaica.metadata.LanguageSpec
 
 class Jewish private() extends Calendar[Jewish] {
@@ -9,6 +9,8 @@ class Jewish private() extends Calendar[Jewish] {
   trait JewishCalendarMember extends CalendarMember[Jewish] {
     final override def numbers: Jewish = Jewish.this
   }
+
+  final override type NumbersMemberType = JewishCalendarMember
 
   final override type Year = JewishYear
 
@@ -35,10 +37,13 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Point = JewishMoment
 
-  final override object Point extends JewishMomentCompanion with JewishCalendarMember {
-    override def apply(digits: Int*): Point = new Digits(digits) with JewishMoment with JewishCalendarMember {
-      final override def companion: PointCompanion[Jewish] = Point
-    }
+  final override type PointCompanionType = JewishMomentCompanion
+
+  final override object Point extends JewishMomentCompanion with NumbersMemberType {
+    protected override def newNumber(digits: Seq[Int]): Point =
+      new Digits(digits) with JewishMoment with NumbersMemberType {
+        final override def companion: PointCompanionType = Point
+      }
   }
 
   final override def toString(number: Int)(implicit spec: LanguageSpec): String = spec.toString(number)

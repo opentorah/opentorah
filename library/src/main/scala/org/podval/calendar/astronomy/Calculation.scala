@@ -9,6 +9,9 @@ final class Calculation(
   val calculator: Calculator,
   val day: Day
 ) {
+  // Precision of calculations
+  val length: Int = Angles.maxLength
+
   private def epoch: Epoch = calculator.epoch
 
   private def calculators: Calculators = calculator.calculators
@@ -71,9 +74,9 @@ final class Calculation(
   def moonTailMean: Position = moonHeadMean + Rotation(180)
 
   // KH 16:10
-  def moonLatitudeCourseRaw: Rotation = (moonLongitudeTrue - moonHeadMean).canonical
+  def moonLatitudeCourseRaw: Rotation = moonLongitudeTrue - moonHeadMean
   lazy val moonLatitudeCourse: Rotation = rounders.moonLatitudeCourse(moonLatitudeCourseRaw)
-  lazy val isMoonLatitudeNortherly: Boolean = moonLatitudeCourse < Rotation(180)
+  lazy val isMoonLatitudeNortherly: Boolean = moonLatitudeCourse.canonical < Rotation(180)
 
   lazy val moonLatitude: Rotation = calculators.moonLatitude(moonLatitudeCourse)
 
@@ -101,7 +104,7 @@ final class Calculation(
 
   // KH 17:10
   lazy val moonCircuitPortion: BigRational = calculators.moonCircuitPortion(moonLongitudeTrue)
-  lazy val moonCircuit: Rotation = rounders.moonCircuit(latitude2 *(moonCircuitPortion, Angles.defaultLength))
+  lazy val moonCircuit: Rotation = rounders.moonCircuit(latitude2 *(moonCircuitPortion, length))
 
   // KH 17:11
   lazy val longitude3: Rotation =
@@ -115,12 +118,12 @@ final class Calculation(
     calculators.moonLongitude3Portion(moonLongitudeTrue)
   /* TODO longitude3.toPoint?*/
   lazy val moonLongitude3Correction: Rotation =
-    rounders.moonLongitude3Correction(longitude3 *(moonLongitude3Portion, Angles.defaultLength))
+    rounders.moonLongitude3Correction(longitude3 *(moonLongitude3Portion, length))
   lazy val longitude4: Rotation = longitude3 + moonLongitude3Correction
 
   // KH 17:12
   lazy val geographicCorrection: Rotation =
-    rounders.geographicCorrection(latitude1 *(BigRational(2, 3), Angles.defaultLength))
+    rounders.geographicCorrection(latitude1 *(BigRational(2, 3), length))
   lazy val arcOfSighting: Rotation = rounders.arcOfSighting(
     if (isMoonLatitudeNortherly) longitude4 + geographicCorrection
     else longitude4 - geographicCorrection)

@@ -78,10 +78,10 @@ final class SimpleTimesTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     Vector(0, 1) - Vector(0, 1) shouldBe Vector(0, 0)
   }
 
-  "normal()/canonical()" should "be correct" in {
-    Vector(1816909, 751829, 49683240).canonical.toString shouldBe "1850152d"
-    Vector(1816909, 751829+46003).normal.canonical.toString shouldBe "1850152d"
-    Vector(1816909+33243).normal.canonical.toString shouldBe "1850152d"
+  "simple()/canonical()" should "be correct" in {
+    Vector(1816909, 751829, 49683240).toString shouldBe "1850152d"
+    Vector(1816909, 751829+46003).toString shouldBe "1850152d"
+    Vector(1816909+33243).toString shouldBe "1850152d"
   }
 
   "toRational()" should "be correct" in {
@@ -99,7 +99,7 @@ final class SimpleTimesTest extends FlatSpec with GeneratorDrivenPropertyChecks 
   "fromRational()" should "be correct" in {
     def test(value: Vector): Unit = {
       val rational = value.toRational
-      val number = Vector.fromRational(rational, SimpleTimes.defaultLength)
+      val number = Vector.fromRational(rational, SimpleTimes.maxLength)
       number shouldBe value
     }
 
@@ -119,6 +119,8 @@ final class SimpleTimesTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     Vector(3, 5).roundTo(0) shouldBe Vector(3)
     Vector(3, 5).roundTo(Digit.HOURS) shouldBe Vector(3, 5)
     Vector(3, 5).roundTo(Digit.PARTS) shouldBe Vector(3, 5)
+    Vector(-3, 12).roundTo(Digit.DAYS) shouldBe Vector(-3)
+    Vector(-2, -12).roundTo(Digit.DAYS) shouldBe Vector(-3)
     -Vector(3, 5).roundTo(0) shouldBe -Vector(3)
     -Vector(3, 12).roundTo(0) shouldBe -Vector(4)
     -Vector(3, 5).roundTo(Digit.HOURS) shouldBe -Vector(3, 5)
@@ -131,10 +133,11 @@ final class SimpleTimesTest extends FlatSpec with GeneratorDrivenPropertyChecks 
     Vector(-3, 5, 4).roundTo(Digit.HOURS) shouldBe Vector(-3, 5)
     Vector(-3, 5, 4).roundTo(Digit.PARTS) shouldBe Vector(-3, 5, 4)
     Vector(-3, 5, 4).roundTo(Digit.MOMENTS) shouldBe Vector(-3, 5, 4)
+    Vector(-3, 5, 540).roundTo(Digit.HOURS) shouldBe Vector(-2, -19)
     Vector(3, 5, 4, 1).roundTo(Digit.PARTS) shouldBe Vector(3, 5, 4)
     Vector(-3, 5, 4, 1).roundTo(Digit.PARTS) shouldBe Vector(-3, 5, 4)
     Vector(-3, 5, 4, 37).roundTo(Digit.PARTS) shouldBe Vector(-3, 5, 4)
-    Vector(-3, 5, 4, 38).roundTo(Digit.PARTS) shouldBe Vector(-3, 5, 5)
+    Vector(-3, 5, 4, 38).roundTo(Digit.PARTS) shouldBe Vector(-2, -18, -1076)
     Vector(-3, 5, 4, 39).roundTo(Digit.PARTS) shouldBe Vector(-3, 5, 5)
   }
 

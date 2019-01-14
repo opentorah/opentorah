@@ -20,12 +20,13 @@ object MoonLatitude {
 
     // KH 16:13-15
     final override def calculate(moonLatitudeCourse: Rotation): Rotation = {
+      def forCanonical(argument: Rotation): Rotation = interpolate(argument.canonical)
       val angle: Rotation = moonLatitudeCourse.canonical
       // canonical angle is always >= Rotation(0)
-      if (angle <= Rotation( 90)) interpolate(angle                ) else // KH 16:11
-      if (angle <= Rotation(180)) interpolate(Rotation(180) - angle) else // KH 16:13
-      if (angle <= Rotation(270)) interpolate(angle - Rotation(180)) else // KH 16:14
-                                  interpolate(Rotation(360) - angle)      // KH 16:15
+      if (angle <= Rotation( 90)) forCanonical(angle                ) else // KH 16:11
+      if (angle <= Rotation(180)) forCanonical(Rotation(180) - angle) else // KH 16:13
+      if (angle <= Rotation(270)) forCanonical(angle - Rotation(180)) else // KH 16:14
+        forCanonical(Rotation(360) - angle)      // KH 16:15
     }
   }
 

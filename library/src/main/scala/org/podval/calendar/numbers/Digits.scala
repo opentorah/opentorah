@@ -1,5 +1,8 @@
 package org.podval.calendar.numbers
 
-abstract class Digits(rawDigits: Seq[Int]) {
-  def digits: Seq[Int] = if (rawDigits.nonEmpty) rawDigits else Seq(0)
+abstract class Digits(val digits: Seq[Int]) {
+  // at leastthe head digit is present
+  require(digits.nonEmpty)
+  // no trailing 0s
+  require(!digits.tail.lastOption.contains(0))
 }
