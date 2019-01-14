@@ -207,6 +207,31 @@ project(':library') {
   bintray bintrayConfig
 }
 
+project(':docs') {
+  repositories {
+    maven {
+      url 'https://dl.bintray.com/tpolecat/maven/'
+    }
+  }
+
+  configurations.all {
+    resolutionStrategy {
+      force 'org.scala-lang:scala-library:2.12.7'
+    }
+  }
+
+  dependencies {
+    runtime project(':library')
+    runtime "org.tpolecat:tut-core_$scalaVersionMajor:0.6.10"
+  }
+
+  task tut(type: JavaExec) {
+    main = 'tut.TutMain'
+    args = ["$projectDir/tut", "$projectDir/examples", ".*\\.(md|markdown|txt|htm|html)"]
+    classpath = sourceSets.main.runtimeClasspath
+  }
+}
+
 project(':service') {
   description = 'Jewish Calendar Service.'
 
