@@ -17,8 +17,8 @@ description: >- # this means to ignore newlines until "baseurl:"
   Code for working with Jewish calendar, both arithmetic and astronomical.
   Some remarks.
 
-url: "http://www.jewish-calendar.org"
 baseurl: "" # the subpath of your site, e.g. /blog
+url: "http://www.jewish-calendar.org"
 
 github_username:  dubinsky
 # twitter_username: leoniddubinsky
@@ -35,17 +35,10 @@ theme: minima
 include:
   - README.md
 
-# Exclude from processing.
-# The following items will not be processed, by default. Create a custom list
-# to override the default setting.
-# exclude:
-#   - Gemfile
-#   - Gemfile.lock
-#   - node_modules
-#   - vendor/bundle/
-#   - vendor/cache/
-#   - vendor/gems/
-#   - vendor/ruby/
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - tut
 
 defaults:
   -
