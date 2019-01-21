@@ -1,8 +1,8 @@
 package org.podval.calendar.times
 
-import org.podval.calendar.numbers.NonPeriodicPoint
+import org.podval.calendar.numbers.PointBase
 
 trait TimePointBase[S <: Times[S]]
-  extends NonPeriodicPoint[S] with Time[S, S#Point]
+  extends PointBase[S] with Time[S, S#Point]
 { this: S#Point =>
 }

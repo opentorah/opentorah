@@ -75,12 +75,24 @@ trait Numbers[S <: Numbers[S]] { this: S =>
     * @return        String representation of the number
     */
   private[numbers] final def toString[N <: Number[S, N]](number: N, length: Int): String = {
-    val digits: Seq[Int] = normalize(number.digits, isCanonical = false).padTo(length+1, 0)
+    val digits: Seq[Int] = number.digits.padTo(length+1, 0)
     val signs: Seq[String] = Digit.signs.take(length+1).padTo(length, ",").padTo(length+1, "")
 
     // ignore the signums of digits: all digits have the same signum, which we reflect in the overall result
     val result: Seq[String] = (digits zip signs) map { case (digit: Int, sign: String) => math.abs(digit) + sign }
     (if (number.isNegative) "-" else "") + result.mkString
+  }
+
+  private[numbers] final def roundTo(digits: Seq[Int], length: Int): Seq[Int] = {
+    require(length >= 0)
+
+    transform(
+      digits = digits,
+      forDigit = (digit: Int, position: Int, range: Int) =>
+        if (position < length) (0, digit)
+        else (if (math.abs(digit) >= range / 2) math.signum(digit) else 0, 0),
+      forHead = (digit: Int) => digit
+    )
   }
 
   private[numbers] final def normalize(digits: Seq[Int], isCanonical: Boolean): Seq[Int] =  {
@@ -89,7 +101,7 @@ trait Numbers[S <: Numbers[S]] { this: S =>
       forDigit = normalDigit,
       forHead = (value: Int) => if (isCanonical) headDigit(normalDigit, value) else value
     )
-    val isPositive: Boolean = isCanonical || (signum(normalDigits) >= 0)
+    val isPositive: Boolean = (signum(normalDigits) >= 0) || (isCanonical && headRangeOpt.isDefined)
     val forDigit: (Int, Int, Int) => (Int, Int) = signedDigit(if (isPositive) 1 else -1)
     val result: Seq[Int] = transform(
       digits = normalDigits,
@@ -110,16 +122,6 @@ trait Numbers[S <: Numbers[S]] { this: S =>
 
   private def headDigit(f: (Int, Int, Int) => (Int, Int), value: Int): Int =
     headRangeOpt.fold(value){ headRange: Int => f(value, -1, headRange)._2 }
-
-  private[numbers] final def roundTo(digits: Seq[Int], length: Int): Seq[Int] = {
-    require(length >= 0)
-
-    def forDigit(digit: Int, position: Int, range: Int): (Int, Int) =
-      if (position < length) (0, digit)
-      else (if (math.abs(digit) >= range / 2) math.signum(digit) else 0, 0)
-
-    transform(normalize(digits, isCanonical = false), forDigit, (digit: Int) => digit)
-  }
 
   private final def transform(
     digits: Seq[Int],
