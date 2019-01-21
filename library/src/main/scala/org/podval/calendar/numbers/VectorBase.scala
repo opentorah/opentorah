@@ -12,4 +12,6 @@ trait VectorBase[S <: Numbers[S]] extends Number[S, S#Vector]
 
   final def *(that: BigRational, length: Int): S#Vector =
     companion.fromRational(this.toRational*that, math.max(this.length, length))
+
+  final def canonical: S#Vector = numbers.Vector.canonical(digits)
 }

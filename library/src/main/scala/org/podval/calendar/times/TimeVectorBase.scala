@@ -1,8 +1,8 @@
 package org.podval.calendar.times
 
-import org.podval.calendar.numbers.NonPeriodicVector
+import org.podval.calendar.numbers.VectorBase
 
 trait TimeVectorBase[S <: Times[S]]
-  extends NonPeriodicVector[S] with Time[S, S#Vector]
+  extends VectorBase[S] with Time[S, S#Vector]
 { this: S#Vector =>
 }

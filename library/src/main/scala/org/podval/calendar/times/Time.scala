@@ -1,9 +1,9 @@
 package org.podval.calendar.times
 
-import org.podval.calendar.numbers.NonPeriodicNumber
+import org.podval.calendar.numbers.Number
 import Times.{hoursPerHalfDay, partsPerHalfHour, partsPerMinute}
 
-trait Time[S <: Times[S], N <: Time[S, N]] extends NonPeriodicNumber[S, N] { this: N =>
+trait Time[S <: Times[S], N <: Time[S, N]] extends Number[S, N] { this: N =>
   private def Digit = numbers.Digit
 
   final def days: Int = get(Digit.DAYS)

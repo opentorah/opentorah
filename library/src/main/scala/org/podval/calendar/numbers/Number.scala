@@ -15,10 +15,8 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
 
   final def set(digit: Digit, value: Int): N = set(digit.position, value)
 
-  final def set(position: Int, value: Int): N = {
-    val newDigits: Seq[Int] = digits.padTo(position+1, 0).updated(position, value)
-    fromDigits(newDigits)
-  }
+  final def set(position: Int, value: Int): N =
+    fromDigits(digits.padTo(position+1, 0).updated(position, value))
 
   final def length: Int = digits.tail.length
 
@@ -30,7 +28,7 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
 
   final def isNegative: Boolean = signum < 0
 
-  final def abs: N = fromDigits(numbers.normalize(digits, isCanonical = false).map(math.abs))
+  final def abs: N = fromDigits(digits.map(math.abs))
 
   final def unary_- : N = fromDigits(digits.map(-_))
 
@@ -58,9 +56,9 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
 
   final override def hashCode: Int = digits.hashCode
 
-  protected final def add[N1 <: Number[S, N1]](that: N1): Seq[Int] = zipWith(this.digits, that.digits, _ + _)
+  private[numbers] final def add[N1 <: Number[S, N1]](that: N1): Seq[Int] = zipWith(this.digits, that.digits, _ + _)
 
-  protected final def subtract[N1 <: Number[S, N1]](that: N1): Seq[Int] = zipWith(this.digits, that.digits, _ - _)
+  private[numbers] final def subtract[N1 <: Number[S, N1]](that: N1): Seq[Int] = zipWith(this.digits, that.digits, _ - _)
 
   private final def zipWith(
     left: Seq[Int],

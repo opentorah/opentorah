@@ -25,7 +25,7 @@ package org.podval.calendar
   *
   * To avoid using the subversive isomorphism described above in the code using the `Numbers`,
   * certain operations have to be defined as fundamental, e.g.,
-  * [[org.podval.calendar.numbers.PeriodicNumber.reflect]].
+  * [[org.podval.calendar.numbers.PeriodicPoint.reflect]].
   *
   */
 package object numbers {

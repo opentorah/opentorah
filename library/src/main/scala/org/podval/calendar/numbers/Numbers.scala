@@ -6,15 +6,17 @@ trait Numbers[S <: Numbers[S]] { this: S =>
 
   type Point <: PointBase[S]
 
-  type PointCompanionType <: NumberCompanion[S, S#Point]
+  type PointCompanionType <: PointCompanion[S]
 
   val Point: PointCompanionType
 
   type Vector <: VectorBase[S]
 
-  type VectorCompanionType <: NumberCompanion[S, S#Vector]
+  type VectorCompanionType <: VectorCompanion[S]
 
   val Vector: VectorCompanionType
+
+  def headRangeOpt: Option[Int]
 
   /**
     * Maximum number of digits after the dot.
@@ -73,7 +75,7 @@ trait Numbers[S <: Numbers[S]] { this: S =>
     * @return        String representation of the number
     */
   private[numbers] final def toString[N <: Number[S, N]](number: N, length: Int): String = {
-    val digits: Seq[Int] = normalize(number.digits, isCanonical = false).padTo(length+1, 0)
+    val digits: Seq[Int] = number.digits.padTo(length+1, 0)
     val signs: Seq[String] = Digit.signs.take(length+1).padTo(length, ",").padTo(length+1, "")
 
     // ignore the signums of digits: all digits have the same signum, which we reflect in the overall result
@@ -81,42 +83,52 @@ trait Numbers[S <: Numbers[S]] { this: S =>
     (if (number.isNegative) "-" else "") + result.mkString
   }
 
+  private[numbers] final def roundTo(digits: Seq[Int], length: Int): Seq[Int] = {
+    require(length >= 0)
+
+    transform(
+      digits = digits,
+      forDigit = (digit: Int, position: Int, range: Int) =>
+        if (position < length) (0, digit)
+        else (if (math.abs(digit) >= range / 2) math.signum(digit) else 0, 0),
+      forHead = (digit: Int) => digit
+    )
+  }
+
   private[numbers] final def normalize(digits: Seq[Int], isCanonical: Boolean): Seq[Int] =  {
-    val normalDigits: Seq[Int] = transform(
+    def t(
+      digits: Seq[Int],
+      forDigit: (/* digit: */ Int, /* digitRange: */ Int) => (Int, Int)
+    ): Seq[Int] = transform(
+      digits,
+      (digit: Int, position: Int, digitRange: Int) => forDigit(digit, digitRange),
+      (headDigit: Int) =>
+        if (!isCanonical) headDigit
+        else headRangeOpt.fold(headDigit){ headRange: Int => forDigit(headDigit,headRange)._2 }
+    )
+
+    // fit all digits within their ranges
+    val normalDigits: Seq[Int] = t(
       digits = if (digits.isEmpty) Seq(0) else digits,
-      forDigit = normalDigit,
-      forHead = (value: Int) => if (isCanonical) headDigit(normalDigit, value) else value
+      forDigit = (digit: Int, digitRange: Int) => (digit / digitRange, digit % digitRange)
     )
-    val isPositive: Boolean = isCanonical || (signum(normalDigits) >= 0)
-    val forDigit: (Int, Int, Int) => (Int, Int) = signedDigit(if (isPositive) 1 else -1)
-    val result: Seq[Int] = transform(
+
+    // determine the sign of the result
+    val willBePositive: Boolean = (signum(normalDigits) >= 0) || (isCanonical && headRangeOpt.isDefined)
+    val sign: Int = if (willBePositive) 1 else -1
+
+    // make all digits of the same sign
+    val result: Seq[Int] = t(
       digits = normalDigits,
-      forDigit = forDigit,
-      forHead = (value: Int) => headDigit(forDigit, value)
+      forDigit = (digit: Int, digitRange: Int) =>
+        if ((digit == 0) || (math.signum(digit) == sign)) (0, digit) else (-sign, digit + sign * digitRange)
     )
-    // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
+
+    // drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
     result.head +: result.tail.reverse.dropWhile(_ == 0).reverse
   }
 
   private[numbers] final def signum(digits: Seq[Int]): Int = digits.find(_ != 0).map(math.signum).getOrElse(0)
-
-  private def normalDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
-    (digit / digitRange, digit % digitRange)
-
-  private def signedDigit(sign: Int)(digit: Int, position: Int, digitRange: Int): (Int, Int) =
-    if ((digit == 0) || (math.signum(digit) == sign)) (0, digit) else (-sign, digit + sign*digitRange)
-
-  protected def headDigit(f: (Int, Int, Int) => (Int, Int), value: Int): Int
-
-  private[numbers] final def roundTo(digits: Seq[Int], length: Int): Seq[Int] = {
-    require(length >= 0)
-
-    def forDigit(digit: Int, position: Int, range: Int): (Int, Int) =
-      if (position < length) (0, digit)
-      else (if (math.abs(digit) >= range / 2) math.signum(digit) else 0, 0)
-
-    transform(normalize(digits, isCanonical = false), forDigit, (digit: Int) => digit)
-  }
 
   private final def transform(
     digits: Seq[Int],
