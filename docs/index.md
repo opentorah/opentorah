@@ -7,7 +7,7 @@ title: Table of Contents
 
 [Overview](/rambam/overview.md)
 
-### Sources ###
+### Other Sources ###
 
 [Sources](/sources/)
 
@@ -16,6 +16,8 @@ title: Table of Contents
 [GitHub](https://github.com/jewish-calendar/) 
 
 [CHANGELOG](/CHANGELOG.md)
+
+[Travis](https://travis-ci.com/jewish-calendar/calendar)
 
 [JCenter](https://jcenter.bintray.com/org/podval/calendar/org.podval.calendar-library/)
 
