@@ -5,5 +5,5 @@ trait NonPeriodicNumbers[S <: NonPeriodicNumbers[S]] extends Numbers[S] { this: 
 
   type Vector <: NonPeriodicVector[S]
 
-  protected final override def headDigit(f: (Int, Int, Int) => (Int, Int), value: Int): Int = value
+  final override def headRangeOpt: Option[Int] = None
 }

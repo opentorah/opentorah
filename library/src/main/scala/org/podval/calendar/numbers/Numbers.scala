@@ -16,6 +16,8 @@ trait Numbers[S <: Numbers[S]] { this: S =>
 
   val Vector: VectorCompanionType
 
+  def headRangeOpt: Option[Int]
+
   /**
     * Maximum number of digits after the dot.
     *
@@ -106,7 +108,8 @@ trait Numbers[S <: Numbers[S]] { this: S =>
   private def signedDigit(sign: Int)(digit: Int, position: Int, digitRange: Int): (Int, Int) =
     if ((digit == 0) || (math.signum(digit) == sign)) (0, digit) else (-sign, digit + sign*digitRange)
 
-  protected def headDigit(f: (Int, Int, Int) => (Int, Int), value: Int): Int
+  private def headDigit(f: (Int, Int, Int) => (Int, Int), value: Int): Int =
+    headRangeOpt.fold(value){ headRange: Int => f(value, -1, headRange)._2 }
 
   private[numbers] final def roundTo(digits: Seq[Int], length: Int): Seq[Int] = {
     require(length >= 0)

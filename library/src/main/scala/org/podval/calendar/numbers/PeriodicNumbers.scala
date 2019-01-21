@@ -7,11 +7,11 @@ trait PeriodicNumbers[S <: PeriodicNumbers[S]] extends Numbers[S] { this: S =>
 
   override type VectorCompanionType <: PeriodicVectorCompanion[S]
 
+  final override def headRangeOpt: Option[Int] = Some(headRange)
+
   def headRange: Int
 
   require(headRange % 2 == 0)
-
-  protected final override def headDigit(f: (Int, Int, Int) => (Int, Int), value: Int): Int = f(value, -1, headRange)._2
 
   val period: S#Vector = Vector(headRange)
 
