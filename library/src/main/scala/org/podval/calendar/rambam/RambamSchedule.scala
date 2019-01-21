@@ -40,27 +40,27 @@ object RambamSchedule {
 
   def forDay(day: Day): RambamSchedule = {
     val distance: Int = day - epoch
+    val lesson: Int = Math.floorMod(distance, numberOfLessons)
+    val chapter: Int = Math.floorMod(distance, numberOfChapters)
     new RambamSchedule(
       threeChapters = new ThreeChapters(
         cycle = distance / numberOfLessons + 1,
-        lesson = distance % numberOfLessons + 1,
-        chapter1 = chapters((distance % numberOfLessons)*3+0),
-        chapter2 = chapters((distance % numberOfLessons)*3+1),
-        chapter3 = chapters((distance % numberOfLessons)*3+2)
+        lesson = lesson + 1,
+        chapter1 = chapters(lesson*3+0),
+        chapter2 = chapters(lesson*3+1),
+        chapter3 = chapters(lesson*3+2)
       ),
       oneChapter = new OneChapter(
         cycle = distance / numberOfChapters + 1,
-        year = (distance % numberOfChapters) / numberOfLessons + 1,
-        chapterNumber = distance % numberOfChapters + 1,
-        chapter = chapters(distance % numberOfChapters)
+        year = chapter / numberOfLessons + 1,
+        chapterNumber = chapter + 1,
+        chapter = chapters(chapter)
       ),
-      seferHamitzvos = SeferHamitzvosLessons.lessons(distance % numberOfLessons)
+      seferHamitzvos = SeferHamitzvosLessons.lessons(lesson)
     )
   }
 
   def main(args: Array[String]): Unit = {
-    // println(chapters(1).names.doFind(org.podval.judaica.metadata.Language.Russian.toSpec).name)
-    // println(lessonNumber(org.podval.calendar.jewish.Jewish.nowDay))
     // printSchedule(Formatter.narrow)(5777)
   }
 
