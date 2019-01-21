@@ -1,6 +1,7 @@
 package org.podval.calendar.angles
 
-import org.podval.calendar.numbers.{Digits, DigitsDescriptor, NumbersMember, PeriodicNumbers, PeriodicVectorCompanion}
+import org.podval.calendar.numbers.{Digits, DigitsDescriptor, NumbersMember, PeriodicNumbers,
+  PointCompanion, VectorCompanion}
 
 trait Angles extends PeriodicNumbers[Angles] {
   trait AnglesMember extends NumbersMember[Angles] {
@@ -13,9 +14,9 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final type Rotation = Vector
 
-  final override type VectorCompanionType = PeriodicVectorCompanion[Angles] with AngleCompanion[Rotation]
+  final override type VectorCompanionType = VectorCompanion[Angles] with AngleCompanion[Rotation]
 
-  final override object Vector extends PeriodicVectorCompanion[Angles] with AngleCompanion[Rotation] with NumbersMemberType {
+  final override object Vector extends VectorCompanion[Angles] with AngleCompanion[Rotation] with NumbersMemberType {
     protected override def newNumber(digits: Seq[Int]): Vector =
       new Digits(digits) with Rotation with NumbersMemberType {
         final override def companion: VectorCompanionType = Vector
@@ -28,9 +29,9 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final type Position = Point
 
-  final override type PointCompanionType = AngleCompanion[Position]
+  final override type PointCompanionType = PointCompanion[Angles] with AngleCompanion[Position]
 
-  final override object Point extends PointCompanionType with NumbersMemberType {
+  final override object Point extends PointCompanion[Angles] with AngleCompanion[Position] with NumbersMemberType {
     protected override def newNumber(digits: Seq[Int]): Point =
       new Digits(digits) with Position with NumbersMemberType {
         final override def companion: PointCompanionType = Point

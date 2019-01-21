@@ -6,13 +6,13 @@ trait Numbers[S <: Numbers[S]] { this: S =>
 
   type Point <: PointBase[S]
 
-  type PointCompanionType <: NumberCompanion[S, S#Point]
+  type PointCompanionType <: PointCompanion[S]
 
   val Point: PointCompanionType
 
   type Vector <: VectorBase[S]
 
-  type VectorCompanionType <: NumberCompanion[S, S#Vector]
+  type VectorCompanionType <: VectorCompanion[S]
 
   val Vector: VectorCompanionType
 
@@ -96,32 +96,39 @@ trait Numbers[S <: Numbers[S]] { this: S =>
   }
 
   private[numbers] final def normalize(digits: Seq[Int], isCanonical: Boolean): Seq[Int] =  {
-    val normalDigits: Seq[Int] = transform(
+    def t(
+      digits: Seq[Int],
+      forDigit: (/* digit: */ Int, /* digitRange: */ Int) => (Int, Int)
+    ): Seq[Int] = transform(
+      digits,
+      (digit: Int, position: Int, digitRange: Int) => forDigit(digit, digitRange),
+      (headDigit: Int) =>
+        if (!isCanonical) headDigit
+        else headRangeOpt.fold(headDigit){ headRange: Int => forDigit(headDigit,headRange)._2 }
+    )
+
+    // fit all digits within their ranges
+    val normalDigits: Seq[Int] = t(
       digits = if (digits.isEmpty) Seq(0) else digits,
-      forDigit = normalDigit,
-      forHead = (value: Int) => if (isCanonical) headDigit(normalDigit, value) else value
+      forDigit = (digit: Int, digitRange: Int) => (digit / digitRange, digit % digitRange)
     )
-    val isPositive: Boolean = (signum(normalDigits) >= 0) || (isCanonical && headRangeOpt.isDefined)
-    val forDigit: (Int, Int, Int) => (Int, Int) = signedDigit(if (isPositive) 1 else -1)
-    val result: Seq[Int] = transform(
+
+    // determine the sign of the result
+    val willBePositive: Boolean = (signum(normalDigits) >= 0) || (isCanonical && headRangeOpt.isDefined)
+    val sign: Int = if (willBePositive) 1 else -1
+
+    // make all digits of the same sign
+    val result: Seq[Int] = t(
       digits = normalDigits,
-      forDigit = forDigit,
-      forHead = (value: Int) => headDigit(forDigit, value)
+      forDigit = (digit: Int, digitRange: Int) =>
+        if ((digit == 0) || (math.signum(digit) == sign)) (0, digit) else (-sign, digit + sign * digitRange)
     )
-    // Drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
+
+    // drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
     result.head +: result.tail.reverse.dropWhile(_ == 0).reverse
   }
 
   private[numbers] final def signum(digits: Seq[Int]): Int = digits.find(_ != 0).map(math.signum).getOrElse(0)
-
-  private def normalDigit(digit: Int, position: Int, digitRange: Int): (Int, Int) =
-    (digit / digitRange, digit % digitRange)
-
-  private def signedDigit(sign: Int)(digit: Int, position: Int, digitRange: Int): (Int, Int) =
-    if ((digit == 0) || (math.signum(digit) == sign)) (0, digit) else (-sign, digit + sign*digitRange)
-
-  private def headDigit(f: (Int, Int, Int) => (Int, Int), value: Int): Int =
-    headRangeOpt.fold(value){ headRange: Int => f(value, -1, headRange)._2 }
 
   private final def transform(
     digits: Seq[Int],

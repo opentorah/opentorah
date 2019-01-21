@@ -11,9 +11,9 @@ trait NumberCompanion[S <: Numbers[S], N <: Number[S, N]] extends NumbersMember[
 
   private final def from[T: Convertible](value: T, length: Int): N = fromDigits(numbers.from[T](value, length))
 
-  final def fromDigits(digits: Seq[Int]): N = newNumber(numbers.normalize(digits, isCanonical = autoCanonicalize))
+  final def fromDigits(digits: Seq[Int]): N = newNumber(numbers.normalize(digits, isCanonical = isCanonical))
 
   protected def newNumber(digits: Seq[Int]): N
 
-  protected def autoCanonicalize: Boolean = true
+  protected def isCanonical: Boolean
 }

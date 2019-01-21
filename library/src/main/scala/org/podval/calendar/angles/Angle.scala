@@ -1,9 +1,9 @@
 package org.podval.calendar.angles
 
-import org.podval.calendar.numbers.PeriodicNumber
+import org.podval.calendar.numbers.Number
 import Angles.Digit
 
-trait Angle[N <: Angle[N]] extends PeriodicNumber[Angles, N] { this: N =>
+trait Angle[N <: Angle[N]] extends Number[Angles, N] { this: N =>
   def degrees: Int = get(Digit.DEGREES)
 
   def degrees(value: Int): N = set(Digit.DEGREES, value)
