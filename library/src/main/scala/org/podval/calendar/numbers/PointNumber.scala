@@ -1,6 +1,6 @@
 package org.podval.calendar.numbers
 
-trait PointBase[S <: Numbers[S]] extends Number[S, S#Point]
+trait PointNumber[S <: Numbers[S]] extends Number[S, S#Point]
 { this: S#Point =>
   final def +(that: S#Vector): S#Point = fromDigits(add(that))
 

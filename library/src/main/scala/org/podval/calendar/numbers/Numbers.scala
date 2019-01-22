@@ -4,13 +4,13 @@ trait Numbers[S <: Numbers[S]] { this: S =>
 
   type NumbersMemberType <: NumbersMember[S]
 
-  type Point <: PointBase[S]
+  type Point <: PointNumber[S]
 
   type PointCompanionType <: PointCompanion[S]
 
   val Point: PointCompanionType
 
-  type Vector <: VectorBase[S]
+  type Vector <: VectorNumber[S]
 
   type VectorCompanionType <: VectorCompanion[S]
 

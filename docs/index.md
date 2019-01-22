@@ -11,6 +11,12 @@ title: Table of Contents
 
 [Sources](/sources/)
 
+### Library ###
+
+[ScalaDoc](/scaladoc/)
+
+[Examples](/examples/)
+
 ### Development ###
 
 [GitHub](https://github.com/jewish-calendar/) 

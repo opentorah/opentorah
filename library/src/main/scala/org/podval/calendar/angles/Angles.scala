@@ -1,6 +1,6 @@
 package org.podval.calendar.angles
 
-import org.podval.calendar.numbers.{Digits, DigitsDescriptor, NumbersMember, PeriodicNumbers,
+import org.podval.calendar.numbers.{Digit, Digits, DigitsDescriptor, NumbersMember, PeriodicNumbers,
   PointCompanion, VectorCompanion}
 
 trait Angles extends PeriodicNumbers[Angles] {
@@ -52,7 +52,7 @@ trait Angles extends PeriodicNumbers[Angles] {
     object SECONDS extends DigitBase("″")
     object THIRDS  extends DigitBase("‴")
 
-    override val values: Seq[DigitsDescriptor.Digit] = Seq(DEGREES, MINUTES, SECONDS, THIRDS)
+    override val values: Seq[Digit] = Seq(DEGREES, MINUTES, SECONDS, THIRDS)
   }
 }
 

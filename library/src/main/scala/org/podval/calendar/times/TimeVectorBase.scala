@@ -1,8 +1,8 @@
 package org.podval.calendar.times
 
-import org.podval.calendar.numbers.VectorBase
+import org.podval.calendar.numbers.VectorNumber
 
 trait TimeVectorBase[S <: Times[S]]
-  extends VectorBase[S] with Time[S, S#Vector]
+  extends VectorNumber[S] with Time[S, S#Vector]
 { this: S#Vector =>
 }
