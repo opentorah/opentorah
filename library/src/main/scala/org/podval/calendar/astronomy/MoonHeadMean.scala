@@ -15,8 +15,6 @@ object MoonHeadMean extends Days2Angle {
   final override val month      : Rotation = Rotation(  1, 32,  9)
   final override val year       : Rotation = Rotation( 18, 44, 42)
 
-  final override def rounder(key: Days2Angle.Key): Rotation => Rotation = _.roundToSeconds
-
   final override val rambamValue = Rotation(0) // TODO
 
   final override val almagestValue = Rotation(0) // TODO

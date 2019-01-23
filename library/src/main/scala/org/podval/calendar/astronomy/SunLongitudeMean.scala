@@ -17,8 +17,6 @@ object SunLongitudeMean extends Days2Angle {
   final override val month      : Rotation = Rotation( 28, 35,  1)
   final override val year       : Rotation = Rotation(348, 55, 15)  // TODO ??
 
-  final override def rounder(key: Days2Angle.Key): Rotation => Rotation = _.roundToSeconds
-
   // Ibn Habib on Pirush gives Albatani value as:
   final val albataniValue: Rotation = Rotation(0, 59, 8, 20, 35)
 

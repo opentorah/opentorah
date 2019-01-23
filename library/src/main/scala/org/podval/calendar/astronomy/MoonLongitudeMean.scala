@@ -14,11 +14,8 @@ object MoonLongitudeMean extends Days2Angle {
   final override val month      : Rotation = Rotation( 22,  6, 56)
   final override val year       : Rotation = Rotation(344, 26, 43)
 
-  final override def rounder(key: Days2Angle.Key): Rotation => Rotation = _.roundToSeconds
-
   // TODO does this correspond to the lunar period?
 
-  //    val exactInDegrees = 13.176397222222223
   final override val rambamValue = Rotation(13, 10, 35, 1, 48, 1)
 
   // TODO Moznaim Rambam, KH 13:2f4: (13, 10, 35, 3) -

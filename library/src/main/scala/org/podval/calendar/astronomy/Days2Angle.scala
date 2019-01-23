@@ -2,7 +2,7 @@ package org.podval.calendar.astronomy
 
 import org.podval.calendar.angles.Angles
 import Angles.Rotation
-
+import org.podval.calendar.jewish.Jewish
 
 /*
  TODO
@@ -24,25 +24,8 @@ import Angles.Rotation
  years) and the obliquity of the ecliptic (23° 35'), which was an elaboration of Hipparchus' work.
  */
 
-object Days2Angle {
-  type Days = Int
-
-  sealed abstract class Key(val number: Int)
-  object Key {
-    case object One         extends Key(    1)
-    case object Ten         extends Key(   10)
-    case object Hundred     extends Key(  100)
-    case object Thousand    extends Key( 1000)
-    case object TenThousand extends Key(10000)
-    case object Month       extends Key(   29)
-    case object Year        extends Key(  354)
-
-    val all: Seq[Key] = Seq(One, Ten, Hundred, Thousand, TenThousand, Month, Year)
-  }
-}
-
 trait Days2Angle {
-  import Days2Angle.{Days, Key}
+  import Days2Angle.Key
 
   def one        : Rotation
   def ten        : Rotation
@@ -63,19 +46,9 @@ trait Days2Angle {
     case Key.Year        => year
   }
 
-  final def calculated(key: Key): Rotation = one*key.number
-
   val almagestValue: Rotation
 
-  final def calculatedAlmagest(key: Key): Rotation = rounder(key)(almagestValue*key.number)
-
   val rambamValue: Rotation
-
-  // TODO use in calculate(ed)?
-  final def fromValue(value: Rotation)(days: Days): Rotation = value*days
-
-
-  def rounder(key: Key): Rotation => Rotation
 
   // TODO see if variations in this algorithms are logical: e.g., for 600, add for 1000 and subtract 4*for 100?
   // TODO see if the end result is stable when Rambam's "real" value is used with straight multiplication and rounding
@@ -88,14 +61,64 @@ trait Days2Angle {
     val tens        : Int = (days %   100) /    10
     val ones        : Int =  days %    10
 
-    tenThousand*tenThousands + thousand*thousands + hundred*hundreds +
+    tenThousand*tenThousands +
+      thousand*thousands +
+      hundred*hundreds +
       // TODO without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in KH 15:8-9 (see test).
       (if (lessThanHundred == 29) month else ten*tens + one*ones)
   }
 
-  // TODO rework to produce range for length
-  final def exactify(approximate: Rotation, days: Int, angle: Rotation): Double = {
-    val fullRotations = math.floor(days*approximate.toDouble/Angles.headRange.toDouble).toInt
-    (Angles.headRange.toDouble*fullRotations + angle.toDegrees)/days
+  final def calculate(vector: Jewish#Vector): Rotation = {
+    val rational = vector.toRational
+    calculate(rational.whole) + Rotation.fromRational(rational.fraction*one.toRational, 6)
+  }
+
+  final def calculateExact(days: Int): Rotation = rambamValue*days
+
+  final def calculateExact(vector: Jewish#Vector): Rotation =
+    Rotation.fromRational(vector.toRational*one.toRational, 6)
+
+  final def exactify: Interval = {
+    val exact = Seq(Key.Ten, Key.Hundred, Key.Thousand, Key.TenThousand) // Key.all
+      .map(exactify).reduce(_ intersect _)
+    println(s"exact: $exact")
+    exact
+  }
+
+  final def exactify(key: Key): Interval = {
+    val small = one
+    val big = value(key)
+    val mult = key.number
+    val exactificator = new Exactify(small, mult, Angles.Digit.SECONDS.position, big)
+    val (fit, fitLength) = exactificator.findFit
+    val expanded = exactificator.expand(fit, fitLength, 6)
+    println(s"$expanded (6)    $small * $mult -> $big: $fit ($fitLength)")
+    expanded
+  }
+}
+
+object Days2Angle {
+  type Days = Int
+
+  sealed abstract class Key(val number: Int)
+
+  object Key {
+    case object One         extends Key(    1)
+    case object Ten         extends Key(   10)
+    case object Hundred     extends Key(  100)
+    case object Thousand    extends Key( 1000)
+    case object TenThousand extends Key(10000)
+    case object Month       extends Key(   29)
+    case object Year        extends Key(  354)
+
+    val values: Seq[Key] = Seq(One, Ten, Hundred, Thousand, TenThousand, Month, Year)
+  }
+
+  def main(args: Array[String]): Unit = {
+    MoonAnomalyMean.exactify
+    //    MoonLongitudeMean.exactify
+    //    MoonHeadMean.exactify
+    //    SunLongitudeMean.exactify
+    //    SunApogee.exactify // TODO doesn't work!
   }
 }

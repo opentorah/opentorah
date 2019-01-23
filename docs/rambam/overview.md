@@ -1,19 +1,27 @@
 # Table of contents of Rambam's Kiddush HaChodesh #
 
 1
-- 1:1-4 Definitions (year, full month...).
-- 1:5-8 The court procedure.
+- 1:1 Month is lunar; year is solar.
+- 1:2 Solar year is ~11 day longer than the lunar;
+      when discrepancy accumulates to ~30 days, year is made leap.
+- 1:3 Moon is not seen for ~1 day before and ~1 day after the conjunction;
+      first night when the Moon is sighted - Rosh Chodesh; then,
+      if it is sighted on the night of the 30th day - it is; if not - the 31st.      
+- 1:4 Short/full month.
+- 1:5-8 Court calculates in a manner _resembling_ the calculations of the astronomers.
+        Pesach must be in the spring.
 
-2:4 The court procedure.
+2-4 The court procedure.
 
+4:1 Vernal equinox must be in Nisan.
 4:2 Vernal equinox >= 16th of Nisan => leap year.
 
-5 Aritmetic calendar
- - 5:1-2 Introduction; discrepancy with observations: -1…+1 day (+1 - very rare).
- - 5:2 Fixed Rosh Hodesh: sighting of the Moon can be +/- 1 day; +2 - extremely rare.
- - 5:3 When started.
- - 5:4-12 Second day of festivals.
- - 5:13 Conclusion.
+5 Arithmetic calendar
+- 5:1-2 Introduction; discrepancy with observations: -1…+1 day (+1 - very rare).
+- 5:2 Fixed Rosh Hodesh: sighting of the Moon can be +/- 1 day; +2 - extremely rare.
+- 5:3 When started.
+- 5:4-12 Second day of festivals.
+- 5:13 Conclusion.
 
 6
 - 6:1 "Molad" - approximate conjunction (Sun. Moon and Earth on the same line).

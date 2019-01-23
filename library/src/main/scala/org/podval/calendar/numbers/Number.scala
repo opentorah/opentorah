@@ -50,7 +50,7 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
   /** Returns this number with the sign inverted. */
   final def unary_- : N = fromDigits(digits.map(-_))
 
-  /** Returns difference between `this` and `that` numbers (which must be of the same flavour). */
+  /** Returns Vector representing difference between `this` and `that` numbers (which must be both Points or both Vectors). */
   final def -(that: N): S#Vector = {
     require(isComparable(that))
     numbers.Vector.fromDigits(subtract(that))
@@ -92,8 +92,9 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
 
   protected final def fromDigits(digits: Seq[Int]): N = companion.fromDigits(digits)
 
-  private[numbers] final def add[N1 <: Number[S, N1]](that: N1): Seq[Int] = zipWith(that, _ + _)
+  protected final def add[N1 <: Number[S, N1]](that: N1): Seq[Int] = zipWith(that, _ + _)
 
+  // used in PeriodicPoint, so neds to be less than 'protected'
   private[numbers] final def subtract[N1 <: Number[S, N1]](that: N1): Seq[Int] = zipWith(that, _ - _)
 
   private final def isComparable(that: N): Boolean =

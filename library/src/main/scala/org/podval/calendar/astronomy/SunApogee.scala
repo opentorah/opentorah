@@ -13,9 +13,8 @@ object SunApogee extends Days2Angle {
   final override val month      : Rotation = Rotation(0,  0,  4) // TODO: veod!
   final override val year       : Rotation = Rotation(0,  0, 53)
 
-  final override def rounder(key: Days2Angle.Key): Rotation => Rotation =
-    if (key == Days2Angle.Key.One) _.roundToThirds else _.roundToSeconds
-
+//  final override def rounder(key: Days2Angle.Key): Rotation => Rotation =
+//    if (key == Days2Angle.Key.One) _.roundToThirds else _.roundToSeconds
 
   final override val rambamValue = Rotation(0) // TODO
 
