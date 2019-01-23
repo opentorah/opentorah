@@ -1,6 +1,6 @@
-package org.podval.calendar.astronomy
+package org.podval.calendar.angles
 
-import org.podval.calendar.angles.Angles.{Digit, Rotation}
+import org.podval.calendar.angles.Angles.Rotation
 
 final class Exactify(small: Rotation, mult: Int, round: Int, big: Rotation) {
 

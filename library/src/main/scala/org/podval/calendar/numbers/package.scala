@@ -22,11 +22,6 @@ package org.podval.calendar
   * Indeed, there is not much difference between the two when we are talking about angles.
   * However, for dates (`Point`s) it makes sense to ask what year/month the date is in -
   * but not for time intervals (`Vector`s)!
-  *
-  * To avoid using the subversive isomorphism described above in the code using the `Numbers`,
-  * certain operations have to be defined as fundamental, e.g.,
-  * [[org.podval.calendar.numbers.PeriodicPoint.reflect]].
-  *
   */
 package object numbers {
 }

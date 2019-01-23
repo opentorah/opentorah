@@ -91,7 +91,7 @@ trait Numbers[S <: Numbers[S]] { this: S =>
       forDigit = (digit: Int, position: Int, range: Int) =>
         if (position < length) (0, digit)
         else (if (math.abs(digit) >= range / 2) math.signum(digit) else 0, 0),
-      forHead = (digit: Int) => digit
+      forHead = identity
     )
   }
 

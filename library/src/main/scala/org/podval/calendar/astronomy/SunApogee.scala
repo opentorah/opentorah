@@ -2,7 +2,7 @@ package org.podval.calendar.astronomy
 
 import org.podval.calendar.angles.Angles.Rotation
 
-object SunApogee extends Days2Angle {
+object SunApogee extends Time2Rotation {
   // KH 12:2
   final override val one        : Rotation = Rotation.zero // Rambam doesn't give this value
   final override val ten        : Rotation = Rotation(0,  0,  1, 30)

@@ -2,7 +2,7 @@ package org.podval.calendar.astronomy
 
 import org.podval.calendar.angles.Angles.Rotation
 
-object MoonAnomalyMean extends Days2Angle {
+object MoonAnomalyMean extends Time2Rotation {
   // TODO opposite direction!
 
   // KH 14:3

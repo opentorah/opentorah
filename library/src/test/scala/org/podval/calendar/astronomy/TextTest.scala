@@ -86,8 +86,6 @@ class TextTest extends FunSpec with Matchers {
       it("true Moon") {
         val month: Month = Year(4938).month(Month.Name.Iyar)
         val day: Day = month.day(2)
-        val newMoonDay: Day = month.newMoon.day
-        // TODO what is the day of sighting? Not the day of the new moon... assertResult(day)(newMoonDay)
         val result = Calculator.Text.calculate(day)
         result.day.name shouldBe Day.Name.Shishi
         result.daysAfterEpoch shouldBe 29

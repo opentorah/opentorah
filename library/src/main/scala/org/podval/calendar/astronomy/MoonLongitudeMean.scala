@@ -2,7 +2,7 @@ package org.podval.calendar.astronomy
 
 import org.podval.calendar.angles.Angles.Rotation
 
-object MoonLongitudeMean extends Days2Angle {
+object MoonLongitudeMean extends Time2Rotation {
   // KH 14:1
   final override val one        : Rotation = Rotation( 13, 10, 35)
   // KH 14:2

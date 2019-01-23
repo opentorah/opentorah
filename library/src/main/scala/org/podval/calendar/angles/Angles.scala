@@ -10,7 +10,7 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final override type NumbersMemberType = AnglesMember
 
-  final override type Vector = RotationBase
+  final override type Vector = RotationAngle
 
   final type Rotation = Vector
 
@@ -25,7 +25,7 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final val Rotation = Vector
 
-  final override type Point = PositionBase
+  final override type Point = PositionAngle
 
   final type Position = Point
 

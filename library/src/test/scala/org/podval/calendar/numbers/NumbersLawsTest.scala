@@ -8,9 +8,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.typelevel.discipline.scalatest.Discipline
 
 class NumbersLawsTest[N <: Numbers[N]](numberSystem: N) extends FunSuite with Discipline {
-  val headRange: Int = if (!numberSystem.isInstanceOf[PeriodicNumbers[_]]) Int.MaxValue else {
-    numberSystem.asInstanceOf[PeriodicNumbers[_]].headRange
-  }
+  val headRange: Int = numberSystem.headRangeOpt.getOrElse(Int.MaxValue)
   val ranges: Seq[Int] = headRange +: numberSystem.ranges
 
   def digits: Gen[Seq[Int]] = Gen.sequence[Seq[Int], Int](

@@ -1,4 +1,4 @@
-package org.podval.calendar.astronomy
+package org.podval.calendar.angles
 
 import org.podval.calendar.angles.Angles.Rotation
 
