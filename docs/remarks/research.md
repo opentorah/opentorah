@@ -31,17 +31,17 @@ https://he.wikipedia.org/wiki/%D7%9E%D7%97%D7%9C%D7%95%D7%A7%D7%AA_%D7%A8%D7%91_
 
 make possible calculating the calendar according to the other opinion and compare the results.
 
-### Seasons ###
-
-Rav Ada's tkufos started a week later than Shmuel's! Isn't it readily observable?
-Analyze the difference in historic periods...
-
 ### Sun Cycle ###
 
 Where and when was the Sun created?
 Compare with Rambam's epoch from the astronomical calendar.
 Where and how is date of birchat hachamo defined?
 How would it look according to the other opinion? 
+
+### Seasons ###
+
+Rav Ada's tkufos started a week later than Shmuel's! Isn't it readily observable?
+Analyze the difference in historic periods...
 
 
 ## Astronomical Calendar ##
