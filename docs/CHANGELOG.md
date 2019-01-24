@@ -5,12 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.2.9] - 2019-01-23
 - using Cats and Algebra for testing the laws
 - optimization: Years are cached; Month/Day get their Year/Month at construction if it is known
 - moved jewish-calendar.org into the docs directory in *this* repository
 - configuring Jekyll (and MathJax) for the project's site
+- more documentation 
 - moved docbook plugin into a separate repository
-- added to schedule: Sefer Hamitzvos, Molad, Shabbos Mevarchim, seasons, year type and cycles 
+- added to schedule: Sefer Hamitzvos, Molad, Shabbos Mevarchim, seasons, year type and cycles
+- normal forms of numbers simplified and normalization centralized
+- exactification
 - cleanup
 
 ## [0.2.5] - 2018-12-31

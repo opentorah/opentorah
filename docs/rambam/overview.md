@@ -1,21 +1,50 @@
 # Table of contents of Rambam's Kiddush HaChodesh #
 
-1
-- 1:1-4 Definitions (year, full month...).
-- 1:5-8 The court procedure.
 
-2:4 The court procedure.
+## General ##
 
-4:2 Vernal equinox >= 16th of Nisan => leap year.
+### Chapter 1 ###
 
-5 Aritmetic calendar
- - 5:1-2 Introduction; discrepancy with observations: -1…+1 day (+1 - very rare).
- - 5:2 Fixed Rosh Hodesh: sighting of the Moon can be +/- 1 day; +2 - extremely rare.
- - 5:3 When started.
- - 5:4-12 Second day of festivals.
- - 5:13 Conclusion.
+- 1:1 Month is lunar; year is solar.
+- 1:2 Solar year is ~11 days longer than the lunar;
+      when discrepancy accumulates to ~30 days, year is made leap.
+- 1:3 Moon is not seen for ~1 day before and after the conjunction;
+      first night when the Moon is sighted - Rosh Chodesh; next Rosh Chodesh:
+      if it is sighted on the night of the 30th day - 30th; if not - 31st.      
+- 1:4 Short/full month.
+- 1:5-8 Court calculates in a manner _resembling_ the calculations of the astronomers.
 
-6
+### Chapter 2 ###
+
+- 1-10 Court procedure.
+
+### Chapter 3 ###
+
+- 1-19 Court procedure; messengers.
+
+### Chapter 4 ###
+
+- 4:1-2 Leap year - additional Adar;
+      Pesach (15th of Nisan) must be not before the vernal equinox (Sun enters Aries, see 9:3)
+      and the next summer solstice
+      (Raavad, Ramoh and others disagree with the sufficiency of this criterion).
+- 4:3-8 Other reasons for leaping the year;
+      (Succos after the autumnal equinox - not mentioned in Rambam)
+- 4:9-17 Court procedure.       
+
+
+## Arithmetic calendar ##
+
+### Chapter 5 ###
+
+- 5:1-2 Introduction; discrepancy with observations: -1…+1 day (+1 - very rare).
+- 5:2 Fixed Rosh Hodesh: sighting of the Moon can be +/- 1 day; +2 - extremely rare.
+- 5:3 When started.
+- 5:4-12 Second day of festivals.
+- 5:13 Conclusion.
+
+### Chapter 6 ###
+
 - 6:1 "Molad" - approximate conjunction (Sun. Moon and Earth on the same line).
 - 6:2 day = 24 hours; 1 hour = 1080 parts.
 - 6:3 Lunar month (between conjunctions) = 29d12h793p.
@@ -29,7 +58,8 @@
 - 6:11 Leap years: 3,6,8,11,14,17,19.
 - 6:12 cycle % 7 = 2d16h595p.
 
-7
+### Chapter 7 ###
+
 - 7:1 Rosh Hashono gets pushed off from Sunday, Wednesday, Friday.
 - 7:2 Gets pushed off if molad is after noon (Molad Zoken).
 - 7:3 ADU applies after noon push-off also.
@@ -37,12 +67,14 @@
 - 7:5 Year after leap one, Monday, after 5h589p: push to Tuesday.
 - 7:7 ADU - why?
 
-8
+### Chapter 8 ###
+
 - 8:1 -> 6.3
 - 8.2 Month - 29 or 30 days.
 - 8.5-8.6 Same?
 
-9
+### Chapter 9 ###
+
 - 9.2 1/4 of the year between seasons (91d 7.5h).
 - 9.3 Nisan (Spring) - Aries; Tammuz - Cancer; Tishrei - Libra; Teves - Cap.?
     Vernal equinox of year #1 = 7d9h642p before conjunction of Nisan. Notes 5,7 in Moznaim edition.
@@ -52,3 +84,20 @@
 - 9.7 Real seasons - 2 days before average ones.
     Note 5: 1st hour of the 4th day of creation; 1st vernal equinox.
     Autumnal: Wednesday, 3 hours after daybreak, 1d23h before conjunction of Tishrei.
+
+### Chapter 10 ###
+- ...
+
+
+## Atronomical Calculations ##
+
+### Chapter 10 ###
+### Chapter 11 ###
+### Chapter 12 ###
+### Chapter 13 ###
+### Chapter 14 ###
+### Chapter 15 ###
+### Chapter 16 ###
+### Chapter 17 ###
+### Chapter 18 ###
+### Chapter 19 ###

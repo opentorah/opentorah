@@ -12,7 +12,7 @@ val fullCircle = Rotation(360)
 // fullCircle: org.podval.calendar.angles.Angles#Vector = 360°
 
 val zero = Position(360)
-// zero: org.podval.calendar.angles.Angles.Position = 0°
+// zero: org.podval.calendar.angles.Angles#Point = 0°
 ```
 
 Look at them - inside and out:

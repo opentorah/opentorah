@@ -43,6 +43,51 @@ Compare with Rambam's epoch from the astronomical calendar.
 Where and how is date of birchat hachamo defined?
 How would it look according to the other opinion? 
 
+
+## Astronomical Calendar ##
+
+### Epoch ###
+- when was the Sun created?
+- introduce "creation" epoch.
+- compare calculations based on it and on the Rambam's epoch.
+- make possible calculations for a Moment, not just a Day (at least for the sun);
+
+### Math.findZero() ###
+- finish and test the code
+- use two separate lengths (precisions)?
+
+### Seasons ###
+- calculate true seasons in SeasonsAstronomical
+- KH 10:7 says that real vernal equinox is approximately two days before the mean one; add a test.
+
+### Exactification ###
+- Tzikuni gives the algorithm of such reconstruction:
+ add to the remainder as many times 360 as there were full rotations in given time period,
+ and then divide... find the page for exact reference;
+- use it to calculate intervals for Rambam's values of the angular velocities  
+  
+### Angular movement for 29 days ###
+
+Are Rambam's values reconstructible if value for 29 days is calculated as 3*10-1, not 2*10+9?
+For any tables other than SunLongitudeMean?
+
+### Angular speeds from periods ###
+
+Convert each year length mentioned in the fixed calendar to angular speed.
+Angular speed of the moon = 360 / (1/tropical month + 1/solar year).
+Moon.meanLunarPeriod - what is it called? Tropical?
+
+### Distance between the mean and true new moons ###
+
+KH 5:1-2 says that the distance is no more than a day.
+Calculate this difference for all months;
+Rambam's epoch - two days after molad?! (Petya Ofman).
+
+### Day of sighting ###
+
+How to find the day of sighting given a month?
+
+
 ## Schedule ##
 
 ### Shulchan Aruch ###
@@ -65,45 +110,3 @@ for 2/5/Shabbos day: look into and implement differences in customs
 Is anybody orthodox completing Torah cycle in three years?
 If yes, maybe we should generate that schedule too.
 Here is the list of Haftarot: https://www.google.com/url?q=https://faculty.biu.ac.il/~ofery/papers/haftarot3.pdf&sa=D&source=hangouts&ust=1535496504151000&usg=AFQjCNEMKEf2NJqydV6avPacDQhGBEqLDQ
-
-
-## Astronomical Calendar ##
-
-### Exactification ###
-- Tzikuni gives the algorithm of such reconstruction:
- add to the remainder as many times 360 as there were full rotations in given time period,
- and then divide
-- find the page for exact reference;
-- modify this algorithm to produce an interval of possible values,
-  taking into account precision of the numbers;
-- use it to calculate intervals for Rambam's values of the angular velocities  
-  
-### Angular movement for 29 days ###
-
-Are Rambam's values reconstructible if value for 29 days is calculated as 3*10-1, not 2*10+9?
-For any tables other than SunLongitudeMean?
-
-### Angular speeds from periods ###
-
-Cnvert each year length mentioned in the fixed calendar to angular speed.
-Angular speed of the moon = 360 / (1/tropical month + 1/solar year).
-Moon.meanLunarPeriod - what is it called? Tropical?
-
-### Distance between the mean and true new moons ###
-
-KH 5:1-2 says that the distance is no more than a day.
-Calculate this difference for all months;
-Rambam's epoch - two days after molad?! (Petya Ofman).
-
-### Math.findZero() ###
-- finish and test the code
-- use two separate lengths (precisions)?
-
-### Day of sighting ###
-
-How to find the day of sighting given a month?
-
-### Seasons ###
-- make possible calculations for a Moment, not just a Day (at least for the sun);
-- calculate true seasons in SeasonsAstronomical
-- KH 10:7 says that real vernal equinox is approximately two days before the mean one; add a test.
