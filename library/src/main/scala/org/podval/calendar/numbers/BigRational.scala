@@ -89,4 +89,12 @@ object BigRational {
     if (values.length != 2) throw new ArithmeticException(s"Invalid BigRational: $value")
     apply(BigInt(values(0).trim), BigInt(values(1).trim))
   }
+
+  final def continuedFraction(value: BigRational, length: Int): Seq[Int] = {
+    require(length >= 1)
+    val whole: Int = value.whole
+    val fraction: BigRational = value.fraction
+    if (fraction.isZero || (length == 1)) Seq(whole)
+    else whole +: continuedFraction(fraction.invert, length-1)
+  }
 }
