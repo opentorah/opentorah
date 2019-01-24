@@ -37,7 +37,7 @@ allprojects {
   }
 
   group = 'org.podval.calendar'
-  version = '0.2.5'
+  version = '0.2.9'
 
 // for cats: scalacOptions += "-Ypartial-unification"
 //  tasks.withType(ScalaCompile) {
@@ -226,10 +226,22 @@ project(':docs') {
   }
 
   task tut(type: JavaExec) {
+    group = 'documentation'
     main = 'tut.TutMain'
     args = ["$projectDir/tut", "$projectDir/examples", ".*\\.(md|markdown|txt|htm|html)"]
     classpath = sourceSets.main.runtimeClasspath
   }
+
+  task copyScaladoc(type: Copy) {
+    group = 'documentation'
+
+    dependsOn ':library:scaladoc'
+    from project(':library').tasks.named('scaladoc').get().destinationDir
+    into 'scaladoc'
+  }
+
+  build.dependsOn tut
+  build.dependsOn copyScaladoc
 }
 
 project(':service') {

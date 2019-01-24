@@ -4,8 +4,8 @@ package org.podval.calendar
   *
   * Each number system `S` (derived from [[org.podval.calendar.numbers.Number]])
   * supports two flavors of [[org.podval.calendar.numbers.Number]]:
-  * `S#Point` (derived from [[org.podval.calendar.numbers.PointBase]] and
-  * `S#Vector` (derived from [[org.podval.calendar.numbers.VectorBase]].
+  * `S#Point` (derived from [[org.podval.calendar.numbers.PointNumber]] and
+  * `S#Vector` (derived from [[org.podval.calendar.numbers.VectorNumber]].
   *
   * This distinction allows definitions of operations to be constrained to the types where
   * a give operation makes sense:
@@ -22,11 +22,6 @@ package org.podval.calendar
   * Indeed, there is not much difference between the two when we are talking about angles.
   * However, for dates (`Point`s) it makes sense to ask what year/month the date is in -
   * but not for time intervals (`Vector`s)!
-  *
-  * To avoid using the subversive isomorphism described above in the code using the `Numbers`,
-  * certain operations have to be defined as fundamental, e.g.,
-  * [[org.podval.calendar.numbers.PeriodicPoint.reflect]].
-  *
   */
 package object numbers {
 }

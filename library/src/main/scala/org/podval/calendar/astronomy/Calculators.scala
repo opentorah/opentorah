@@ -35,27 +35,26 @@ trait Calculators {
 
 
 object Calculators {
-  object Text extends Calculators {
-    final override def sunLongitudeMean: Int => Rotation = SunLongitudeMean.calculate
-    final override def sunApogee: Int => Rotation = SunApogee.calculate
-    final override def sunLongitudeCorrection: Rotation => Rotation = SunLongitudeCorrection.table.calculate
-    final override def moonLongitudeMean: Int => Rotation = MoonLongitudeMean.calculate
-    final override def moonLongitudeAdjustmentForTimeOfSighting: Position => Rotation =
-      MoonLongitudeAdjustmentForTimeOfSighting.calculate
-    final override def moonAnomalyMean: Int => Rotation = MoonAnomalyMean.calculate
-    final override def moonLongitudeDoubleElongationCorrection: Rotation => Rotation =
-      MoonLongitudeDoubleElongationCorrection.calculate
-    final override def moonAnomalyVisible: Position => Rotation = MoonAnomalyVisible.table.calculate
-    final override def moonHeadMean: Int => Rotation = MoonHeadMean.calculate
-    final override def moonLatitude: Rotation => Rotation = MoonLatitude.table.calculate
-    final override def moonLongitudeSightingAdjustment: Position => Rotation =
-      MoonLongitudeSightingAdjustment.calculate
-    final override def moonLatitudeSightingAdjustment: Position => Rotation =
-      MoonLatitudeSightingAdjustment.calculate
-    final override def moonCircuitPortion: Position => BigRational = MoonCircuitPortion.calculate
-    final override def moonLongitude3Portion: Position => BigRational =
-      MoonLongitude3Portion.calculate
+  class TextLike extends Calculators {
+    override def sunLongitudeMean: Int => Rotation = SunLongitudeMean.calculate
+    override def sunApogee: Int => Rotation = SunApogee.calculate
+    override def sunLongitudeCorrection: Rotation => Rotation = SunLongitudeCorrection.table.calculate
+    override def moonLongitudeMean: Int => Rotation = MoonLongitudeMean.calculate
+    override def moonLongitudeAdjustmentForTimeOfSighting: Position => Rotation = MoonLongitudeAdjustmentForTimeOfSighting.calculate
+    override def moonAnomalyMean: Int => Rotation = MoonAnomalyMean.calculate
+    override def moonLongitudeDoubleElongationCorrection: Rotation => Rotation = MoonLongitudeDoubleElongationCorrection.calculate
+    override def moonAnomalyVisible: Position => Rotation = MoonAnomalyVisible.table.calculate
+    override def moonHeadMean: Int => Rotation = MoonHeadMean.calculate
+    override def moonLatitude: Rotation => Rotation = MoonLatitude.table.calculate
+    override def moonLongitudeSightingAdjustment: Position => Rotation = MoonLongitudeSightingAdjustment.calculate
+    override def moonLatitudeSightingAdjustment: Position => Rotation = MoonLatitudeSightingAdjustment.calculate
+    override def moonCircuitPortion: Position => BigRational = MoonCircuitPortion.calculate
+    override def moonLongitude3Portion: Position => BigRational = MoonLongitude3Portion.calculate
   }
 
-  // TODO gather all misprints into object Misprints extends Calculators
+  object Text extends TextLike
+
+  object Misprints extends TextLike {
+    override def moonAnomalyVisible: Position => Rotation = MoonAnomalyVisible.misprinted.calculate
+  }
 }

@@ -26,7 +26,7 @@ object MoonLatitude {
       if (angle <= Rotation( 90)) forCanonical(angle                ) else // KH 16:11
       if (angle <= Rotation(180)) forCanonical(Rotation(180) - angle) else // KH 16:13
       if (angle <= Rotation(270)) forCanonical(angle - Rotation(180)) else // KH 16:14
-        forCanonical(Rotation(360) - angle)      // KH 16:15
+                                  forCanonical(Rotation(360) - angle)      // KH 16:15
     }
   }
 

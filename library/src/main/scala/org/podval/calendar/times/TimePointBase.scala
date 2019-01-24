@@ -1,8 +1,8 @@
 package org.podval.calendar.times
 
-import org.podval.calendar.numbers.PointBase
+import org.podval.calendar.numbers.PointNumber
 
 trait TimePointBase[S <: Times[S]]
-  extends PointBase[S] with Time[S, S#Point]
+  extends PointNumber[S] with Time[S, S#Point]
 { this: S#Point =>
 }

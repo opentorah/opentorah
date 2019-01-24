@@ -7,7 +7,8 @@ package org.podval.calendar.numbers
   * If numerator is zero, resulting BigRational is zero (denominator is ignored).
   *
   * Representation is canonical:
-  * - sign of the BigRational is kept in the numerator; denominator is always positive;
+  * - sign of the BigRational is kept in the numerator;
+  * - denominator is always positive;
   * - numerator and denominator do not have common divisors.
   *
   * @param numerator  of the number (signed)

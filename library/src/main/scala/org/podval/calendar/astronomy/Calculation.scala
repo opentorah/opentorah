@@ -116,7 +116,6 @@ final class Calculation(
   // KH 17:12
   lazy val moonLongitude3Portion: BigRational =
     calculators.moonLongitude3Portion(moonLongitudeTrue)
-  /* TODO longitude3.toPoint?*/
   lazy val moonLongitude3Correction: Rotation =
     rounders.moonLongitude3Correction(longitude3 *(moonLongitude3Portion, length))
   lazy val longitude4: Rotation = longitude3 + moonLongitude3Correction

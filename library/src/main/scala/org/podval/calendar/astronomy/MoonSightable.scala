@@ -24,7 +24,6 @@ object MoonSightable {
   }
 
   // KH 17:16-21
-  // TODO add a calculator method for this!
   def forSightingLimits(arcOfSighting: Rotation, longitude1: Rotation): Boolean = {
     // TODO is that what Rambam is saying?
     ((arcOfSighting > Rotation( 9)) && (longitude1 >= Rotation(13))) || // KH 17:17

@@ -1,6 +1,6 @@
 package org.podval.calendar.times
 
-import org.podval.calendar.numbers.{DigitsDescriptor, NonPeriodicNumbers}
+import org.podval.calendar.numbers.{Digit, DigitsDescriptor, NonPeriodicNumbers}
 
 trait Times[S <: Times[S]] extends NonPeriodicNumbers[S] { this: S =>
   override type Point <: TimePointBase[S]
@@ -21,7 +21,7 @@ trait Times[S <: Times[S]] extends NonPeriodicNumbers[S] { this: S =>
     object PARTS extends DigitBase("p")
     object MOMENTS extends DigitBase("m")
 
-    override val values: Seq[DigitsDescriptor.Digit] = Seq(DAYS, HOURS, PARTS, MOMENTS)
+    override val values: Seq[Digit] = Seq(DAYS, HOURS, PARTS, MOMENTS)
   }
 
   val week: S#Vector = Vector().days(7)

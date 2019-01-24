@@ -1,5 +1,6 @@
 package org.podval.calendar.astronomy
 
+import org.podval.calendar.angles.Angles
 import org.podval.calendar.angles.Angles.{Position, Rotation}
 
 import scala.math.{abs, asin, cos, pow, round, sin, sqrt}
@@ -33,7 +34,11 @@ object MoonAnomalyVisible {
     // KH 15:4, 15:7
     final override def calculate(moonAnomalyTrue: Position): Rotation = {
       val angle: Position = moonAnomalyTrue
-      if (angle <= Position(180)) -interpolate(angle) else interpolate(angle.reflect)
+      if (angle <= Position(180)) -interpolate(angle) else interpolate(reflect(angle))
+    }
+
+    private final def reflect(position: Position): Position = {
+      Position.zero + (Angles.period - (position - Position.zero))
     }
   }
 

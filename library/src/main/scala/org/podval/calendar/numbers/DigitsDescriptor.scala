@@ -1,7 +1,5 @@
 package org.podval.calendar.numbers
 
-import DigitsDescriptor.Digit
-
 trait DigitsDescriptor {
   class DigitBase(override val sign: String) extends Digit {
     final override def position: Int = values.indexOf(this)
@@ -14,14 +12,4 @@ trait DigitsDescriptor {
   def forPosition(index: Int): Digit = values(index)
 
   final def length: Int = values.length
-}
-
-
-object DigitsDescriptor {
-
-  trait Digit {
-    def sign: String
-
-    def position: Int
-  }
 }

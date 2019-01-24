@@ -7,8 +7,6 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-# TODO add MathJax!
-
 title: Rambam on Jewish Calendar
 author: "Leonid Dubinsky"
 email: dub@podval.org
