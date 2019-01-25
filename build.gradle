@@ -190,69 +190,23 @@ idea {
 }
 
 project(':library') {
+  description = 'Jewish Calendar Dates.'
+
   dependencies {
     compile lib.scalaXml
     testCompile lib.catsCore
     testCompile lib.algebraLaws
   }
 
-  description = 'Jewish Calendar Dates.' 
-
   bintray bintrayConfig
-}
-
-project(':docs') {
-  repositories {
-    maven {
-      url 'https://dl.bintray.com/tpolecat/maven/'
-    }
-  }
-
-  configurations.all {
-    resolutionStrategy {
-      force 'org.scala-lang:scala-library:2.12.7'
-    }
-  }
-
-  dependencies {
-    runtime project(':library')
-    runtime "org.tpolecat:tut-core_$scalaVersionMajor:0.6.10"
-  }
-
-  task tut(type: JavaExec) {
-    group = 'documentation'
-    main = 'tut.TutMain'
-    args = ["$projectDir/tut", "$projectDir/examples", ".*\\.(md|markdown|txt|htm|html)"]
-    classpath = sourceSets.main.runtimeClasspath
-  }
-
-  task copyScaladoc(type: Copy) {
-    group = 'documentation'
-
-    dependsOn ':library:scaladoc'
-    from project(':library').tasks.named('scaladoc').get().destinationDir
-    into 'scaladoc'
-  }
-
-  task copyPaper(type: Copy) {
-    group = 'documentation'
-
-    dependsOn ':paper:processDocBook'
-    from project(':paper').buildDir
-    into 'paper'
-    include 'html/**'
-    include 'pdf/**'
-  }
-
-  build.dependsOn tut
-//  build.dependsOn copyScaladoc
-  build.dependsOn copyPaper
 }
 
 project(':service') {
   description = 'Jewish Calendar Service.'
 
   apply plugin: 'application'
+
+  mainClassName = 'org.podval.calendar.service.CalendarService'
 
   dependencies {
     compile project(':library')
@@ -267,8 +221,6 @@ project(':service') {
   }
 
   bintray bintrayConfig
-
-  mainClassName = 'org.podval.calendar.service.CalendarService'
 
   def dockerDir = file("$buildDir/docker/")
 

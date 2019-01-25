@@ -3,10 +3,6 @@ buildscript {
     jcenter()
     mavenCentral()
     mavenLocal()
-    // TODO remove once personal Bintray repository gets linked into JCenter
-    maven {
-      url 'https://dl.bintray.com/dubinsky/org.podval.docbook'
-    }
   }
 
   dependencies {
