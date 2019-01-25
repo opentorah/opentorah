@@ -1,20 +1,14 @@
-
 package org.podval.docbook.gradle
 
-import java.io.File
-
-import org.gradle.api.Action
-
+import org.gradle.api.{Action, DefaultTask, Plugin, Project}
+import org.gradle.api.tasks.Copy
 //import org.apache.tools.ant.filters.ReplaceTokens
 //import org.gradle.api.file.FileTree
-import org.gradle.api.tasks.Copy
-import org.gradle.api.{DefaultTask, Plugin, Project}
-
 //import scala.collection.JavaConverters._
+import java.io.File
 
 final class DocBookPlugin extends Plugin[Project] {
   def apply(project: Project): Unit = {
-    import DocBookPlugin._
 
     val extension: DocBookExtension = project.getExtensions.create("docbook", classOf[DocBookExtension], project)
 
@@ -23,10 +17,10 @@ final class DocBookPlugin extends Plugin[Project] {
     ).setVisible(false)
 
     val prepareDocBookTask: Copy = project.getTasks.create("prepareDocBook", classOf[Copy], new Action[Copy] {
-      override def execute(copy: Copy): Unit = {
-        copy.setDescription("Prepare DocBook XSLT stylesheets")
-        copy.from(project.zipTree(docBookXslConfiguration.getSingleFile))
-        copy.into(explodeDocBookXslInto(project))
+      override def execute(task: Copy): Unit = {
+        task.setDescription("Prepare DocBook XSLT stylesheets")
+        task.from(project.zipTree(docBookXslConfiguration.getSingleFile))
+        task.into(Locations.explodeDocBookXslInto(project))
         //      copy.filter(Map("tokens" -> tokens.asJava).asJava, classOf[ReplaceTokens])
         ()
       }
@@ -43,10 +37,20 @@ final class DocBookPlugin extends Plugin[Project] {
       stylesheetName = "html",
       xslParameters = extension.xslParameters,
       dataDirectory = extension.getDataDirectory,
+      imagesDirectory = extension.imagesDirectory,
       outputFileNameOverride = Some("index"),
       outputType = "html"
     )
+    val copyImagesTask: Copy = project.getTasks.create("copyImages", classOf[Copy], new Action[Copy] {
+      override def execute(task: Copy): Unit = {
+        task.setDescription("Copy images into the HTML generated from DocBook")
+        task.from(Locations.imagesDirectory(project))
+        task.into(new File(Locations.outputDirectory(project, "html"), "images"))
+        ()
+      }
+    })
     docBookHtmlTask.getDependsOn.add(prepareDocBookDataTask)
+    docBookHtmlTask.getDependsOn.add(copyImagesTask)
 
     // TODO copy the CSS - with filtering.
     // copy { from "src/main/css"    into "$outputDirectory/css"    }
@@ -58,6 +62,7 @@ final class DocBookPlugin extends Plugin[Project] {
       stylesheetName = "pdf",
       xslParameters = extension.xslParameters,
       dataDirectory = extension.getDataDirectory,
+      imagesDirectory = extension.imagesDirectory,
       outputType = "fo"
     )
     docBookFoTask.getDependsOn.add(prepareDocBookDataTask)
@@ -72,33 +77,8 @@ final class DocBookPlugin extends Plugin[Project] {
 
     val processDocBookTask: DefaultTask = project.getTasks.create("processDocBook", classOf[DefaultTask])
     processDocBookTask.setDescription("Process DocBook into HTML and PDF")
+    processDocBookTask.setGroup("publishing")
     processDocBookTask.getDependsOn.add(docBookPdfTask)
     processDocBookTask.getDependsOn.add(docBookHtmlTask)
   }
-}
-
-object DocBookPlugin {
-  val docBookDataUrl: String = "http://podval.org/docbook/data/"
-  val docBookXslUrl: String = "http://podval.org/docbook/xsl/"
-  val docBookXslUrlOfficial: String = "http://docbook.sourceforge.net/release/xsl-ns/current/"
-
-  def explodeDocBookXslInto(project: Project): File = buildDirectory(project, "docBookXsl")
-  def docBookXsl(project: Project): File = new File(explodeDocBookXslInto(project), "docbook")
-
-  def xslDir(project: Project): File = projectDirectory(project, "xsl")
-  def xslFile(project: Project, name: String): File = file(xslDir(project), name, "xsl")
-
-  def docBookDir(project: Project): File = projectDirectory(project, "docbook")
-
-  def fopConfiguration(project: Project): File = projectDirectory(project, "fop/fop.xconf")
-
-  def outputDirectory(project: Project, name: String): File = buildDirectory(project, name)
-
-  def projectDirectory(project: Project, name: String): File = new File(srcMain(project), name)
-  def buildDirectory(project: Project, name: String): File = new File(project.getBuildDir, name)
-
-  // Should get the main sourceSet, but this is only available via JavaConventions...
-  private def srcMain(project: Project): File = new File(project.getProjectDir, "src/main")
-
-  def file(directory: File, name: String, extension: String): File = new File(directory, name + "." + extension)
 }

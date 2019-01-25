@@ -1,39 +1,128 @@
+plugins {
+  id "com.jfrog.bintray" version "1.8.4" apply false
+}
+
 repositories {
   jcenter()
   mavenCentral()
+  mavenLocal()
 }
-
-apply plugin: 'java-gradle-plugin'
-apply plugin: 'scala'
 
 group = 'org.podval.docbook'
 version = '0.1.0'
 
+description = 'Gradle DocBook plugin.'
+
+def gitHubRepository    = "dubinsky/podval-docbook-gradle"
+def gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
+
+def bintrayConfig = {
+  user         = 'dubinsky'
+  key          = findProperty('bintrayApiKey')
+  publications = ['mavenPublication']
+  dryRun       = false
+  publish      = true
+  override     = true
+  pkg {
+    repo                   = 'org.podval.docbook'
+    name                   = project.jar.baseName
+    desc                   = project.description
+    websiteUrl             = "${gitHubRepositoryUrl}"
+    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
+    vcsUrl                 = "${gitHubRepositoryUrl}.git"
+    githubRepo             = gitHubRepository
+    licenses               = ['Apache-2.0']
+    labels                 = ['Scala', 'Gradle', 'DocBook']
+    publicDownloadNumbers  = true
+    githubReleaseNotesFile = 'CHANGELOG.md'
+    version { name         = project.version }
+  }
+}
+
+apply plugin: 'scala'
+
+jar.baseName = "org.podval.docbook-gradle-plugin"
+
+def scalaVersion = '2.12.8'
+
+dependencies {
+  zinc 'com.typesafe.zinc:zinc:0.3.15'
+  compile "org.scala-lang:scala-library:$scalaVersion"
+
+//  compile gradleApi()
+
+  compile 'saxon:saxon:6.5.3'
+  runtime 'xerces:xercesImpl:2.11.0'
+
+  compile 'org.apache.xmlgraphics:fop:2.3'
+
+//  compile 'net.sourceforge.jeuclid:jeuclid-fop:3.1.9'
+//  runtime 'net.sourceforge.jeuclid:jeuclid-core:3.1.9'
+}
+
+task sourceJar(type: Jar) {
+  from sourceSets.main.allSource
+  classifier = 'sources'
+}
+
+apply plugin: 'java-gradle-plugin'
+
 gradlePlugin {
   plugins {
     customPlugin {
-      id = 'org.podval.docbook.gradle'
+      id = 'org.podval.docbook-gradle-plugin'
       implementationClass = 'org.podval.docbook.gradle.DocBookPlugin'
     }
   }
 }
 
+apply plugin: 'maven-publish'
 
-dependencies {
-  zinc 'com.typesafe.zinc:zinc:0.3.15'
-  compile "org.scala-lang:scala-library:2.12.5"
+publishing {
+  publications {
+    mavenPublication(MavenPublication) {
+      groupId project.group
+      artifactId jar.baseName
 
-  compile gradleApi()
+      from components.java
+      artifact sourceJar
 
-  compile 'saxon:saxon:6.5.3'
-  runtime 'xerces:xercesImpl:2.11.0'
-
-  compile 'org.apache.xmlgraphics:fop:2.2'
-
-  compile 'net.sourceforge.jeuclid:jeuclid-fop:3.1.9'
-  runtime 'net.sourceforge.jeuclid:jeuclid-core:3.1.9'
+      pom {
+        name = project.name
+        description = project.description
+        url = "$gitHubRepositoryUrl"
+        scm {
+          url = "$gitHubRepositoryUrl"
+          connection = "scm:git:git://github.com/${gitHubRepository}.git"
+          developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
+        }
+        licenses {
+          license {
+            name = 'The Apache Software License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution = 'repo'
+            comments = 'A business-friendly OSS license'
+          }
+        }
+        developers {
+          developer {
+            id = 'dub'
+            name = 'Leonid Dubinsky'
+            email = 'dub@podval.org'
+            url = 'http://dub.podval.org'
+            organization = 'Podval Group'
+            organizationUrl = 'http://www.podval.org'
+            timezone = '-5'
+          }
+        }
+      }
+    }
+  }
 }
 
+apply plugin: 'com.jfrog.bintray'
+
+bintray bintrayConfig
 
 apply plugin: 'idea'
 
