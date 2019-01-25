@@ -1,0 +1,43 @@
+repositories {
+  maven {
+    url 'https://dl.bintray.com/tpolecat/maven/'
+  }
+}
+
+configurations.all {
+  resolutionStrategy {
+    force 'org.scala-lang:scala-library:2.12.7'
+  }
+}
+
+dependencies {
+  runtime project(':library')
+  runtime "org.tpolecat:tut-core_2.12:0.6.10"
+}
+
+task tut(type: JavaExec) {
+  group = 'documentation'
+  main = 'tut.TutMain'
+  args = ["$projectDir/tut", "$projectDir/examples", ".*\\.(md|markdown|txt|htm|html)"]
+  classpath = sourceSets.main.runtimeClasspath
+}
+
+task copyScaladoc(type: Copy) {
+  group = 'documentation'
+  dependsOn ':library:scaladoc'
+  from project(':library').tasks.named('scaladoc').get().destinationDir
+  into 'scaladoc'
+}
+
+task copyPaper(type: Copy) {
+  group = 'documentation'
+  dependsOn ':paper:processDocBook'
+  from project(':paper').buildDir
+  into 'paper'
+  include 'html/**'
+  include 'pdf/**'
+}
+
+build.dependsOn tut
+//  build.dependsOn copyScaladoc
+build.dependsOn copyPaper
