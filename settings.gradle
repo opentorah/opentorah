@@ -4,5 +4,6 @@ include ':library'
 include ':docs'
 include ':service'
 
-//include ':paper'
-//includeBuild 'docbook'
+//includeBuild '../../docbook.gradle'
+
+include ':paper'

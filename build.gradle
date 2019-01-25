@@ -1,9 +1,3 @@
-buildscript {
-  repositories {
-    // To function outside a composite, a plugin repository would be required.
-  }
-}
-
 plugins {
   id "com.github.maiflai.scalatest" version "0.23" apply false
   id "com.jfrog.bintray" version "1.8.4" apply false
@@ -107,7 +101,7 @@ def bintrayConfig = {
     licenses               = ['Apache-2.0']
     labels                 = ['Scala', 'Calendar', 'Jewish']
     publicDownloadNumbers  = true
-    githubReleaseNotesFile = 'CHANGELOG.md'
+    githubReleaseNotesFile = "${rootProject.projectDir}/docs/CHANGELOG.md"
     version { name         = project.version }
   }
 }
@@ -240,8 +234,19 @@ project(':docs') {
     into 'scaladoc'
   }
 
+  task copyPaper(type: Copy) {
+    group = 'documentation'
+
+    dependsOn ':paper:processDocBook'
+    from project(':paper').buildDir
+    into 'paper'
+    include 'html/**'
+    include 'pdf/**'
+  }
+
   build.dependsOn tut
-  build.dependsOn copyScaladoc
+//  build.dependsOn copyScaladoc
+  build.dependsOn copyPaper
 }
 
 project(':service') {

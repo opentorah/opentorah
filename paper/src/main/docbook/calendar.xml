@@ -70,12 +70,14 @@
       to investigate which number does the year of Creation has - 0 or 1. </para>
   </section>
   <!-- TODO How to distinguish Rambam from me? Get rid of "discussion"! Maybe just give all translation up front? -->
+  <!--
   <section>
     <title>Laws of the Sanctification of the Moon</title>
     <para>There is one positive commandment: to calculate, to know, and to establish on which day each month of the
       year begins. Explanation of this commandment is in these chapters.</para>
     <xi:include href="chapter1.xml"/>
   </section>
+  -->
   <xi:include href="solar-theory.xml"/>
   <xi:include href="lunar-theory.xml"/>
   <glossary>
@@ -96,7 +98,7 @@
         </author>
         <title>Mishne Torah</title>
         <publisher>
-          <publishername>Widov and Brothers Romm</publishername>
+          <publishername>Widow and Brothers Romm</publishername>
         </publisher>
       </biblioentry>
       <biblioentry xml:id="LaAm" xreflabel="Rambam LaAm">

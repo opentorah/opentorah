@@ -1,8 +1,9 @@
 package org.podval.calendar.astronomy
 
 import org.podval.calendar.angles.{Angles, Exactify, Interval}
-import Angles.Rotation
+import Angles.{Digit, Rotation}
 import org.podval.calendar.jewish.Jewish
+import org.podval.calendar.numbers.Digit
 
 trait Time2Rotation {
   import Time2Rotation.Key
@@ -52,6 +53,10 @@ trait Time2Rotation {
     val rational = vector.toRational
     calculate(rational.whole) + Rotation.fromRational(rational.fraction*one.toRational, 6)
   }
+
+  final def calculated(key: Key): Rotation = one*key.number
+  final def calculatedAlmagest(key: Key): Rotation = (almagestValue*key.number).roundTo(precision(key))
+  protected def precision(key: Key): Digit = Digit.SECONDS
 
   final def calculateExact(days: Int): Rotation = rambamValue*days
 

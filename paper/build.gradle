@@ -1,13 +1,23 @@
 buildscript {
+  repositories {
+    jcenter()
+    mavenCentral()
+    mavenLocal()
+    // TODO remove once personal Bintray repository gets linked into JCenter
+    maven {
+      url 'https://dl.bintray.com/dubinsky/org.podval.docbook'
+    }
+  }
+
   dependencies {
-    classpath 'org.podval.docbook:gradle-docbook-plugin:+'
+    classpath 'org.podval.docbook:org.podval.docbook-gradle-plugin:+'
   }
 }
 
-apply plugin: 'org.podval.docbook.gradle'
+apply plugin: 'org.podval.docbook-gradle-plugin'
 
 dependencies {
-  compile lib.scalaXml, project(':dates')
+  compile lib.scalaXml, project(':library')
 }
 
 def docBookData = file("${buildDir}/data")
@@ -24,8 +34,9 @@ docbook {
 //    "sans.font.family": "???",
 //    "monospace.font.family": "monospace",
 //    "symbol.font.family": "???" // TODO configure with catch-all symbol font(s)
-    "body.font.master": "12"
-//    "footnote.font.size": "10"
+    "body.font.master": "12",
+//    "footnote.font.size": "10",
+    "html.stylesheet": "css/docbook.css"
   ]
 
   // TODO define entities:
@@ -34,15 +45,10 @@ docbook {
   // date: LocalDate.now().format(DateTimeFormatter.ofPattern("d MMM yyyy"))
 }
 
+// Generated content that needs to be included in DocBook is produced by executing the generating code.
 task buildTables(type: JavaExec, dependsOn: [classes]) {
   classpath = sourceSets.main.runtimeClasspath
   main = "org.podval.calendar.paper.Tables"
   args = [ "$docBookData" ]
 }
 prepareDocBookData.dependsOn.add(buildTables)
-
-docBookHtml.doLast {
-  def outputDirectory = file(docBookHtml.outputDirectory)
-  copy { from "src/main/images" into "$outputDirectory/images" }
-  copy { from "src/main/js"     into "$outputDirectory/js"     }
-}
