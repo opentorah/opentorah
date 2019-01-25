@@ -240,27 +240,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Results are packaged using assembly plugin.
-                 This way there is no need to align the directories between the "paper" project that "web site" project:
-                 resulting artifact can be retrieved and unpacked using dependency plugin. -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5.3</version>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/main/assembly/assembly.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 </project>
