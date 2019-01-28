@@ -16,16 +16,14 @@ dependencies {
   compile lib.scalaXml, project(':library')
 }
 
-def docBookData = file("${buildDir}/data")
-
 docbook {
   inputFileName = "calendar"
 
-  dataDirectory = docBookData
+  dataGeneratorClass = "org.podval.calendar.paper.Tables"
 
   xslParameters = [
-    "title.font.family": "Noto Sans, Noto Sans Hebrew",
-    "body.font.family": "Noto Sans, Noto Sans Hebrew",
+    "title.font.family": "Noto Sans",
+    "body.font.family": "Noto Sans",
 //    "dingbat.font.family": "???", // The font family for copyright, quotes, and other symbols
 //    "sans.font.family": "???",
 //    "monospace.font.family": "monospace",
@@ -40,11 +38,3 @@ docbook {
   // tables-directory: ${buildDir}/tables
   // date: LocalDate.now().format(DateTimeFormatter.ofPattern("d MMM yyyy"))
 }
-
-// Generated content that needs to be included in DocBook is produced by executing the generating code.
-task buildTables(type: JavaExec, dependsOn: [classes]) {
-  classpath = sourceSets.main.runtimeClasspath
-  main = "org.podval.calendar.paper.Tables"
-  args = [ "$docBookData" ]
-}
-prepareDocBookData.dependsOn.add(buildTables)
