@@ -12,6 +12,6 @@ class DocBookExtension(project: Project) {
   @BeanProperty val dataGeneratorClass: Property[String] =
     project.getObjects.property(classOf[String])
 
-  @BeanProperty val xslParameters: MapProperty[String, String] =
+  @BeanProperty val parameters: MapProperty[String, String] =
     project.getObjects.mapProperty(classOf[String], classOf[String])
 }

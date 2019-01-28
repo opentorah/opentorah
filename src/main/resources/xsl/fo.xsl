@@ -9,7 +9,6 @@
 
     <xsl:import href="common.xsl"/>
     
-
     <!-- Paper size; double-sidedness; not a draft -->
     <xsl:param name="paper.type">USletter</xsl:param>
     <xsl:param name="double.sided">1</xsl:param>

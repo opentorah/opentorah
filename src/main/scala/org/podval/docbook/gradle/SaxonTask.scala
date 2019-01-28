@@ -86,9 +86,11 @@ class SaxonTask extends DefaultTask {
 
     parameters.foreach { case (name: String, value: String) => setParameter(name, value) }
 
-    setOptionalParameter("img.src.path", imagesDirectory.get.toString)
+    // Relevant only for HTML and EPUB:
+    setOptionalParameter("img.src.path", imagesDirectory.get.getName + "/")
+    setOptionalParameter("html.stylesheet", "css/docbook.css")
 
-    // Relevant only for HTML chunking:
+    // Relevant only for chunked HTML:
     val outputFileName: String = {
       val result: String = outputFile.get.getName
       val lastDot: Int = result.lastIndexOf(".")

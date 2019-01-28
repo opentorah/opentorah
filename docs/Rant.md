@@ -43,6 +43,7 @@ It became harder to find a free version of Saxon.
 JEuclid is no longer maintained, doesn't integrate with current FOP,
 and doesn't work on Java 9 [at all](https://github.com/danfickle/openhtmltopdf/issues/161).
 So, there isn't non-commercial way from DocbBook with MathML to PDF at this point :(
+UNLESS there is some XSLT solution which I can then add to the DocBook pipeline?
 
 I followed the flow from Maven to [Gradle](https://gradle.org/); there is no Gradle DocBook plugin,
 although there are some scripts floating around. Since these scripts are not as full-featured as
@@ -177,35 +178,3 @@ Suppress the logs from Saxon...
          logging.captureStandardOutput(LogLevel.INFO)
        logging.captureStandardError(LogLevel.INFO)
      }
-
-
-## Plugin TODO ##
-
-- [ ] add real README: usage, directory layout...
-- [ ] add CHANGELOG.md
-- [ ] add README.md to Bintray upload
-- [ ] why aren't tags etc. uploaded to Bintray?
-- [ ] make images directory NOT configurable
-- [ ] set Saxon and Fop tasks in the plugin itself instead of the constructors
-- [ ] track down and suppress network IO (pre-load net.sf.docbook:docbook-xml:5.0-all?)
-- [ ] remove from XSL files' headers: xmlns:xs="http://www.w3.org/2001/XMLSchema"  exclude-result-prefixes="xs"
-- [ ] make sure that changes in parameters do trigger pdfFo!
-- [ ] check that input and stylesheet files exist?
-- [ ] write default configuration files into the project from resources included in the plugin;
-- [ ] figure out how to define XML entities or processing instructions like <?eval ${project.version}?> programmatically for things like version;
-- [ ] auto-remove ".xml" from the input file name?
-- [ ] do font settings via token substitution in CSS;
-- [ ] are there any standards for fonts in CSS?
-- [ ] fix FOP configuration to not get "font directory .../src/main/fop/fop.xconf could not be found."
-- [ ] make FOP configuration "strict"?
-- [ ] add EPUB support;
-- [ ] make output formats selectable;
-- [ ] make DocBook XSLT version configurable via docbook { xslVersion = ... }
-     and avoid "can't change after... resolved" - like 'zinc' for scala-plugin;
-- [ ] add support for multiple named documents;
-- [ ] support SVG in DocBook (test one formula);
-- [ ] add highlighting using 'net.sf.xslthl:xslthl:2.1.0';
-- [ ] what is missing for feature-parity with docbkx?
-- [ ] verify that Oxygen can be configured to resolve DocBook XSL and data URLs;
-- [ ] see if IntelliJ Idea *and* Oxygen can handle substitution tokens;
-- [ ] turn README into an updated version of the "Publishing on the Web" blog post;

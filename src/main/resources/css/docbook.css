@@ -1,0 +1,5 @@
+@namespace xml "http://www.w3.org/XML/1998/namespace";
+
+body {
+  font-family: @body.font.family@;
+}
