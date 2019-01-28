@@ -1,6 +1,8 @@
 package org.podval.calendar.astronomy
 
-import org.podval.calendar.angles.Angles.Rotation
+import org.podval.calendar.angles.Angles.{Digit, Rotation}
+import Time2Rotation.Key
+import org.podval.calendar.numbers.Digit
 
 object SunApogee extends Time2Rotation {
   // KH 12:2
@@ -13,8 +15,8 @@ object SunApogee extends Time2Rotation {
   final override val month      : Rotation = Rotation(0,  0,  4) // TODO: veod!
   final override val year       : Rotation = Rotation(0,  0, 53)
 
-//  final override def rounder(key: Days2Angle.Key): Rotation => Rotation =
-//    if (key == Days2Angle.Key.One) _.roundToThirds else _.roundToSeconds
+  protected override def precision(key: Key): Digit =
+    if (key == Key.One) Digit.THIRDS else Digit.SECONDS
 
   final override val rambamValue = Rotation(0) // TODO
 
