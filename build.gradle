@@ -13,35 +13,7 @@ version = '0.1.0'
 
 description = 'Gradle DocBook plugin.'
 
-def gitHubRepository    = "dubinsky/podval-docbook-gradle"
-def gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
-
-def bintrayConfig = {
-  user         = 'dubinsky'
-  key          = findProperty('bintrayApiKey')
-  publications = ['mavenPublication']
-  dryRun       = false
-  publish      = true
-  override     = true
-  pkg {
-    repo                   = 'org.podval.docbook'
-    name                   = project.jar.baseName
-    desc                   = project.description
-    websiteUrl             = "${gitHubRepositoryUrl}"
-    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
-    vcsUrl                 = "${gitHubRepositoryUrl}.git"
-    githubRepo             = gitHubRepository
-    licenses               = ['Apache-2.0']
-    labels                 = ['Scala', 'Gradle', 'DocBook']
-    publicDownloadNumbers  = true
-    githubReleaseNotesFile = 'CHANGELOG.md'
-    version { name         = project.version }
-  }
-}
-
 apply plugin: 'scala'
-
-jar.baseName = "org.podval.docbook-gradle-plugin"
 
 def scalaVersion = '2.12.8'
 
@@ -49,15 +21,10 @@ dependencies {
   zinc 'com.typesafe.zinc:zinc:0.3.15'
   compile "org.scala-lang:scala-library:$scalaVersion"
 
-//  compile gradleApi()
-
   compile 'saxon:saxon:6.5.3'
   runtime 'xerces:xercesImpl:2.11.0'
 
   compile 'org.apache.xmlgraphics:fop:2.3'
-
-//  compile 'net.sourceforge.jeuclid:jeuclid-fop:3.1.9'
-//  runtime 'net.sourceforge.jeuclid:jeuclid-core:3.1.9'
 }
 
 task sourceJar(type: Jar) {
@@ -77,6 +44,9 @@ gradlePlugin {
 }
 
 apply plugin: 'maven-publish'
+
+def gitHubRepository    = "dubinsky/podval-docbook-gradle"
+def gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
 
 publishing {
   publications {
@@ -122,7 +92,29 @@ publishing {
 
 apply plugin: 'com.jfrog.bintray'
 
-bintray bintrayConfig
+bintray {
+  user         = 'dubinsky'
+  key          = findProperty('bintrayApiKey')
+  publications = ['mavenPublication']
+  dryRun       = false
+  publish      = true
+  override     = true
+  pkg {
+    repo                   = 'org.podval.docbook'
+    name                   = project.jar.baseName
+    desc                   = project.description
+    websiteUrl             = "${gitHubRepositoryUrl}"
+    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
+    vcsUrl                 = "${gitHubRepositoryUrl}.git"
+    githubRepo             = gitHubRepository
+    licenses               = ['Apache-2.0']
+    labels                 = ['Scala', 'Gradle', 'DocBook']
+    publicDownloadNumbers  = true
+    githubReleaseNotesFile = 'CHANGELOG.md'
+    version { name         = project.version }
+  }
+}
+
 
 apply plugin: 'idea'
 

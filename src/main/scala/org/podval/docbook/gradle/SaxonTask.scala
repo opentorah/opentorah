@@ -1,11 +1,11 @@
 package org.podval.docbook.gradle
 
-import org.gradle.api.{Action, DefaultTask, Project}
-import org.gradle.api.provider.{Property, Provider, MapProperty}
-import org.gradle.api.tasks.{Input, InputDirectory, InputFile, OutputDirectory, OutputFile, TaskAction}
-
+import org.gradle.api.{DefaultTask, Project}
+import org.gradle.api.provider.{MapProperty, Property}
+import org.gradle.api.tasks.{Input, InputDirectory, InputFile, OutputFile, TaskAction}
 import java.io.{File, FileReader}
 import java.net.URL
+
 import javax.xml.parsers.SAXParserFactory
 import javax.xml.transform.{Source, Transformer, URIResolver}
 import javax.xml.transform.sax.SAXSource
@@ -14,86 +14,58 @@ import com.icl.saxon.TransformerFactoryImpl
 import org.apache.xerces.jaxp.SAXParserFactoryImpl
 import org.xml.sax.{EntityResolver, InputSource, XMLReader}
 
+import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 
 object SaxonTask {
-  def apply(
-    project: Project,
-    name: String,
-    description: String,
-    outputType: String,
-    inputFileName: Provider[String],
-    stylesheetName: String,
-    dataDirectory: Property[File],
-    imagesDirectory: Property[File],
-    xslParameters: MapProperty[String, String],
-    outputFileNameOverride: Option[String] = None
-  ): SaxonTask = project.getTasks.create(name, classOf[SaxonTask], new Action[SaxonTask] {
-    override def execute(task: SaxonTask): Unit = {
-      task.setDescription(description)
-      task.setGroup("publishing")
-      task.outputType.set(outputType)
-      task.inputFileName.set(inputFileName)
-      task.stylesheetName.set(stylesheetName)
-      task.xslParameters.set(xslParameters)
-      task.dataDirectory.set(dataDirectory)
-      task.imagesDirectory.set(imagesDirectory)
-      task.outputFileNameOverride.set(outputFileNameOverride)
-    }})
+  // If used in DocBook files, this prefix points to the data directory
+  val docBookDataUrl: String = "http://podval.org/docbook/data/"
+
+  def dataSystemId(systemId: String): Option[String] = drop(docBookDataUrl, systemId)
+
+  // If used in DocBook files, those point to the DocBook XSL files.
+  val docBookXslUrl: String = "http://podval.org/docbook/xsl/"
+  val docBookXslUrlOfficial: String = "http://docbook.sourceforge.net/release/xsl-ns/current/"
+
+  def docBookXslUrl(url: String): Option[String] = drop(docBookXslUrl, url)
+    .orElse(drop(SaxonTask.docBookXslUrlOfficial, url))
+
+  private def drop(what: String, from: String): Option[String] =
+    if (from.startsWith(what)) Some(from.drop(what.length)) else None
+
+  def apply(project: Project, name: String): SaxonTask = project.getTasks.create(name, classOf[SaxonTask])
 }
 
 class SaxonTask extends DefaultTask {
-  @InputDirectory
-  val inputDirectory: File = Locations.docBookDir(getProject)
+  @InputFile @BeanProperty val inputFile: Property[File] =
+    getProject.getObjects.property(classOf[File])
 
-  @Input
-  val inputFileName: Property[String] = getProject.getObjects.property(classOf[String])
+  @InputFile @BeanProperty val stylesheetFile: Property[File] =
+    getProject.getObjects.property(classOf[File])
 
-  @InputFile
-  val inputFile: Provider[File] = inputFileName.map(Locations.file(inputDirectory, _, "xml"))
+  @Input @BeanProperty val xslParameters: MapProperty[String, String] =
+    getProject.getObjects.mapProperty(classOf[String], classOf[String])
 
-  @InputDirectory
-  val xslDir: File = Locations.xslDir(getProject)
+  @InputDirectory @BeanProperty val xslDirectory: Property[File] =
+    getProject.getObjects.property(classOf[File])
 
-  @Input
-  val stylesheetName: Property[String] = getProject.getObjects.property(classOf[String])
+  @InputDirectory @BeanProperty val dataDirectory: Property[File] =
+    getProject.getObjects.property(classOf[File])
 
-  @InputFile
-  val stylesheetFile: Provider[File] = stylesheetName.map(Locations.xslFile(getProject, _))
+  @InputDirectory @BeanProperty val imagesDirectory: Property[File] =
+    getProject.getObjects.property(classOf[File])
 
-  @Input
-  val xslParameters: MapProperty[String, String] = getProject.getObjects.mapProperty(classOf[String], classOf[String])
-
-  @InputFile
-  val dataDirectory: Property[File] = getProject.getObjects.property(classOf[File])
-
-  @InputFile
-  val imagesDirectory: Property[File] = getProject.getObjects.property(classOf[File])
-
-  @Input
-  val outputType: Property[String] = getProject.getObjects.property(classOf[String])
-
-  @OutputDirectory
-  val outputDirectory: Provider[File] = outputType.map(Locations.outputDirectory(getProject, _))
-  def getOutputDirectory: Provider[File] = outputDirectory
-
-  @Input
-  val outputFileNameOverride: Property[Option[String]] = getProject.getObjects.property(classOf[Option[String]])
-
-  @Input
-  val outputFileName: Provider[String] = outputFileNameOverride.map(_.getOrElse(inputFileName.get))
-
-  @OutputFile
-  val outputFile: Provider[File] = outputFileName.map(Locations.file(outputDirectory.get, _, outputType.get))
+  @OutputFile @BeanProperty val outputFile: Property[File] =
+    getProject.getObjects.property(classOf[File])
 
   @TaskAction
   def saxon(): Unit = {
-    outputDirectory.get.mkdirs
+    outputFile.get.getParentFile.mkdirs
 
     val saxParserFactory: SAXParserFactory = new SAXParserFactoryImpl
     saxParserFactory.setXIncludeAware(true)
     val xmlReader: XMLReader = saxParserFactory.newSAXParser.getXMLReader
-    xmlReader.setEntityResolver(mkEntityResolver(getProject, dataDirectory.get))
+    xmlReader.setEntityResolver(mkEntityResolver(getProject))
 
     val stylesheetUrl: URL = stylesheetFile.get.toURI.toURL
     val transformer: Transformer = new TransformerFactoryImpl().newTransformer(
@@ -105,7 +77,7 @@ class SaxonTask extends DefaultTask {
     val parameters: Map[String, String] = xslParameters.get.asScala.toMap
 
     def setParameter(name: String, value: String): Unit = {
-      log(s"Transformer parameter $name=$value")
+      info(s"Transformer parameter $name=$value")
       transformer.setParameter(name, value)
     }
 
@@ -116,9 +88,14 @@ class SaxonTask extends DefaultTask {
 
     setOptionalParameter("img.src.path", imagesDirectory.get.toString)
 
-    // For chunking:
-    setOptionalParameter("root.filename", outputFileName.get)
-    setOptionalParameter("base.dir", outputDirectory.get.toString)
+    // Relevant only for HTML chunking:
+    val outputFileName: String = {
+      val result: String = outputFile.get.getName
+      val lastDot: Int = result.lastIndexOf(".")
+      result.substring(0, lastDot)
+    }
+    setOptionalParameter("root.filename", outputFileName)
+    setOptionalParameter("base.dir", outputFile.get.getParent)
 
     transformer.transform(
       new SAXSource(
@@ -130,13 +107,13 @@ class SaxonTask extends DefaultTask {
   }
 
   // Resolves references to data in DocBook files
-  private def mkEntityResolver(project: Project, dataDirectory: File): EntityResolver = new EntityResolver {
+  private def mkEntityResolver(project: Project): EntityResolver = new EntityResolver {
     override def resolveEntity(publicId: String, systemId: String): InputSource = {
-      val result: Option[File] = drop(Locations.docBookDataUrl, systemId).map { path =>
-        new File(dataDirectory, path)
+      val result: Option[File] = SaxonTask.dataSystemId(systemId).map { path =>
+        new File(dataDirectory.get, path)
       }
 
-      log(s"publicId=$publicId; systemId=$systemId -> $result")
+      info(s"publicId=$publicId; systemId=$systemId -> $result")
 
       result.map { file: File =>
         val source = new InputSource(new FileReader(file))
@@ -148,16 +125,13 @@ class SaxonTask extends DefaultTask {
 
   // Resolves references to DocBook XSL in customization files
   private def mkUriResolver(project: Project): URIResolver = new URIResolver {
-    private val xslDirectory: File = Locations.docBookXsl(project)
-
     override def resolve(href: String, base: String): Source = {
       val url: String = new URL(new URL(base), href).toString
-      val result: Option[File] = drop(Locations.docBookXslUrl, url)
-        .orElse(drop(Locations.docBookXslUrlOfficial, url)).map { path =>
-        new File(xslDirectory, path)
+      val result: Option[File] = SaxonTask.docBookXslUrl(url).map { path =>
+        new File(xslDirectory.get, path)
       }
 
-      log(s"href=$href; base=$base -> $result")
+      info(s"href=$href; base=$base -> $result")
 
       result.map { file: File =>
         new StreamSource(file)
@@ -165,8 +139,5 @@ class SaxonTask extends DefaultTask {
     }
   }
 
-  private def drop(what: String, from: String): Option[String] =
-    if (from.startsWith(what)) Some(from.drop(what.length)) else None
-
-  private def log(message: String): Unit = getLogger.info(message, null, null)
+  private def info(message: String): Unit = getLogger.info(message, null, null)
 }
