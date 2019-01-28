@@ -1,27 +1,8 @@
-/*
- * Copyright 2011-2018 Podval Group.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.podval.calendar.paper
 
-import org.podval.calendar.astronomy.{Days2Angle, SunLongitudeMean, SunApogee, MoonAnomalyMean, MoonHeadMean,
+import org.podval.calendar.astronomy.{Time2Rotation, SunLongitudeMean, SunApogee, MoonAnomalyMean, MoonHeadMean,
   MoonLongitudeMean}
-import Days2Angle.Key
-
-import java.io.File
-
+import Time2Rotation.Key
 
 object Days2AngleTables {
 
@@ -31,11 +12,11 @@ object Days2AngleTables {
     "mlm" -> MoonLongitudeMean,
     "mam" -> MoonAnomalyMean,
     "mhm" -> MoonHeadMean
-  ).flatMap { case (name: String, data: Days2Angle) =>
-    dayTables(name, data).map(_.tabulate(name, Key.all))
+  ).flatMap { case (name: String, data: Time2Rotation) =>
+    dayTables(name, data).map(_.tabulate(name, Key.values))
   }
 
-  private def dayTables(name: String, data: Days2Angle): List[Columns[Key]] = {
+  private def dayTables(name: String, data: Time2Rotation): List[Columns[Key]] = {
     val days = Column[Key]("days", "n", _.number)
     val value = Column[Key]("value", "v(n)", data.value)
     val calculated = Column[Key]("calculated", "v(1)*n", data.calculated)
