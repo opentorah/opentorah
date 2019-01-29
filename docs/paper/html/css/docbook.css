@@ -1,12 +1,8 @@
 @namespace xml "http://www.w3.org/XML/1998/namespace";
 
-
-
 body {
-    font-family: Noto Sans, Noto Sans Hebrew;
+    font-family: DejaVu Sans;
 }
-
-
 
 div.dedication {
     display:block;
@@ -17,8 +13,6 @@ div.dedication {
     border: 1px solid #FFAAAA;
 }
 
-
-
 div.colophon {
     display:block;
     background-color: #EFEFEF;
@@ -27,14 +21,10 @@ div.colophon {
     border: 1px solid #DDDDDD;    
 }
 
-
-    
 em.glossterm {
     display:inline;
     font-style:italic;
 }
-
-
 
 span.italic {
     text-decoration:inherit;

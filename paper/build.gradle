@@ -21,17 +21,36 @@ docbook {
 
   dataGeneratorClass = "org.podval.calendar.paper.Tables"
 
-  xslParameters = [
-    "title.font.family": "Noto Sans",
-    "body.font.family": "Noto Sans",
-//    "dingbat.font.family": "???", // The font family for copyright, quotes, and other symbols
-//    "sans.font.family": "???",
-//    "monospace.font.family": "monospace",
+  parameters = [
+    "title.font.family"    : "DejaVu Sans",
+    "body.font.family"     : "DejaVu Sans",
+    "sans.font.family"     : "DejaVu Sans",
+    "monospace.font.family": "DejaVu Sans Mono",
+    "dingbat.font.family"  : "ZapfDingbats", // The font family for copyright, quotes, and other symbols
 //    "symbol.font.family": "???" // TODO configure with catch-all symbol font(s)
+
     "body.font.master": "12",
-//    "footnote.font.size": "10",
-    "html.stylesheet": "css/docbook.css"
+//    "footnote.font.size": "10"
   ]
+
+/*
+
+Works:
+  DejaVu Sans, DejaVu Sans Mono, DejaVu Serif
+  Liberation Mono, Liberation Sans, Liberation Serif
+
+Doesn't work (at least, without setting the sans.font.family)
+  Monserratt, Nimbus Sans, PT Sans, Caladea - no Hebrew.
+  Droid Sans, Droid Sans Hebrew, Droid Sans Mono - missing symbols; Hebrew - in superscript position.
+
+Carlito
+Comfortaa
+FreeMono  FreeSans  FreeSerif
+Times, Times Roman
+URW Bookman
+URW Gothic
+ */
+
 
   // TODO define entities:
   // version: project.version.toString
