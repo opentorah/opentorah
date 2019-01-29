@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:base="http://podval.org/docbook/data/">
+<section
+  xmlns="http://docbook.org/ns/docbook" version="5.0"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  xml:base="http://podval.org/docbook/data/"
+>
     <title>Lunar Theory</title>
 
         <section>
@@ -31,7 +35,7 @@
 
                 <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
 
-                <xi:include href="mlm-original.xml"/>
+                <xi:include href="data:mlm-original.xml"/>
 
                 <para>
                     And in this way you can calculate it for any number of days and years that you want.

@@ -1,7 +1,8 @@
-# README
-## Understanding the ignored for fun and schar
+# README #
 
-## Goals
+## Understanding the ignored for fun and schar ##
+
+## Goals ##
 
 I want to be able to do various things with the fixed Jewish calendar
 as described by Rambam in the Laws of the Sanctification of the Moon, Chapters 6-10:
@@ -26,7 +27,9 @@ as described by Rambam in the Laws of the Sanctification of the Moon, in Chapter
 - [ ] translate relevant chapters into English
 - [ ] calculate halachic times (zmanim)
 
-## Credits
+More documentation and remarks are at http://www.jewish-calendar.org/
+
+## Credits ##
 
 I want to acknowledge people who contributed to the content of this work - and to the fact of its existence ;)
 If your name should be on this list but isn't, please forgive me: the omission is not intentional.
@@ -45,29 +48,23 @@ into customs of Torah/Haftarah reading;
  [post](https://stackoverflow.com/questions/1154571/scala-abstract-types-vs-generics/10891994#10891994) that
  taught me how to encode family polymorphism in Scala with family members in separate files.
 
-## Early Jewish Years
-
-Jewish years before the adoption of the fixed calendar were structured by the Bes Din.
-I'd like to have an official record of what they were. Rabbi Hai Gaon? Seder Olam?
-
-## Zmanim
+## Zmanim ##
 
 There is an Android application; it references some kind of an "engine".
-Mushinsky knows something too.
 
 Raw data for the hazot calculations is obtainable from the Naval Oceanography Portal at
  http://www.usno.navy.mil/USNO/astronomical-applications/data-services/rs-one-year-us
 There it is produced in accordance with the algorithm described in the Meese's book, I think...
 Another source of data is http://www.timeanddate.com/worldclock/sunrise.html.
 
-## Integrations
+## Integrations ##
 
-### Joda Time
+### Joda Time ###
 
 As a good open-source citizen I probably should integrate my implementation of the Jewish calendar into [Joda Time](http://joda-time.sourceforge.net/) or [JSR 130](http://jcp.org/en/jsr/detail?id=310) (although the latter is inactive,
 the article [New Java Date and Time API](http://today.java.net/pub/a/today/2008/09/18/jsr-310-new-java-date-time-api.html) notwithstanding). 
 
-### Google Calendar Integration
+### Google Calendar Integration ###
 
 It'd be nice to integrate with the Google Calendar.
 
