@@ -31,11 +31,9 @@ task copyScaladoc(type: Copy) {
 
 task copyPaper(type: Copy) {
   group = 'documentation'
-  dependsOn ':paper:processDocBook'
-  from project(':paper').buildDir
+  dependsOn ':paper:docBookProcess'
+  from "${project(':paper').buildDir}/docBook/"
   into 'paper'
-  include 'html/**'
-  include 'pdf/**'
 }
 
 build.dependsOn tut
