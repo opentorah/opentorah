@@ -1,6 +1,6 @@
 package org.podval.docbook.gradle
 
-import org.gradle.api.{DefaultTask, Project}
+import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.{InputFile, OutputFile, TaskAction}
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
@@ -10,13 +10,6 @@ import javax.xml.transform.stream.StreamSource
 import org.apache.fop.apps.{Fop, FopConfParser, FopFactory}
 
 import scala.beans.BeanProperty
-
-object FopTask {
-  def apply(
-    project: Project,
-    name: String
-  ): FopTask = project.getTasks.create("docBookPdf", classOf[FopTask])
-}
 
 class FopTask extends DefaultTask {
   @InputFile @BeanProperty val inputFile: Property[File] =

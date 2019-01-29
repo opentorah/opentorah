@@ -32,8 +32,6 @@ object SaxonTask {
 
   private def drop(what: String, from: String): Option[String] =
     if (from.startsWith(what)) Some(from.drop(what.length)) else None
-
-  def apply(project: Project, name: String): SaxonTask = project.getTasks.create(name, classOf[SaxonTask])
 }
 
 class SaxonTask extends DefaultTask {

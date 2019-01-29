@@ -21,6 +21,7 @@ final class DocBookPlugin extends Plugin[Project] {
     def sourceDirectory(name: String): File = new File(sourceRootDirectory, name)
     def sourceFile(directory: String, name: String, extension: String): File =
       file(sourceDirectory(directory), name, extension)
+    val fopConfigurationFile: File = sourceFile("fop", "fop", "xconf")
 
     val buildRootDirectory: File = project.getBuildDir
     def buildDirectory(name: String): File = new File(buildRootDirectory, name)
@@ -51,6 +52,11 @@ final class DocBookPlugin extends Plugin[Project] {
     prepareTask.from(project.zipTree(docBookXslConfiguration.getSingleFile))
     prepareTask.into(explodeDocBookXslInto)
 
+    // List fonts known to FOP.
+    val listFontsTask: ListFontsTask = project.getTasks.create("listFonts", classOf[ListFontsTask])
+    listFontsTask.setDescription("List fonts known to FOP")
+    listFontsTask.configurationFile.set(fopConfigurationFile)
+
     // Generate content that needs to be included in DocBook by executing the generating code.
     val dataTask: PrepareDocBookDataTask = project.getTasks.create("docBookData", classOf[PrepareDocBookDataTask])
     dataTask.setDescription("Generate data for inclusion in DocBook")
@@ -78,7 +84,7 @@ final class DocBookPlugin extends Plugin[Project] {
     }
 
     // Transform DocBook into HTML.
-    val htmlXsltTask: SaxonTask = SaxonTask(project, "docBookHtmlXslt")
+    val htmlXsltTask: SaxonTask = project.getTasks.create("docBookHtmlXslt", classOf[SaxonTask])
     setUpSaxonTask(htmlXsltTask, "html")
     htmlXsltTask.setDescription("DocBook -> HTML")
     htmlXsltTask.outputFile.set(file(outputDirectory("html"), "index", "html"))
@@ -94,22 +100,22 @@ final class DocBookPlugin extends Plugin[Project] {
     htmlTask.getDependsOn.add(htmlXsltTask)
 
     // Transform DocBook into XML-FO (temporary result).
-    val foTask: SaxonTask = SaxonTask(project, "docBookFoXslt")
+    val foTask: SaxonTask = project.getTasks.create("docBookFoXslt", classOf[SaxonTask])
     setUpSaxonTask(foTask, "fo")
     foTask.setDescription("DocBook -> XSL-FO")
     foTask.outputFile.set(extension.inputFileName.map[File](file(buildDirectory("fo"), _, "fo")))
 
     // Process XSL-FO into PDF.
-    val pdfTask: FopTask = FopTask(project, name = "docBookPdf")
+    val pdfTask: FopTask = project.getTasks.create("docBookPdf", classOf[FopTask])
     pdfTask.setDescription("Process DocBook into PDF")
     pdfTask.setGroup("publishing")
     pdfTask.inputFile.set(foTask.outputFile)
-    pdfTask.configurationFile.set(sourceFile("fop", "fop", "xconf"))
+    pdfTask.configurationFile.set(fopConfigurationFile)
     pdfTask.outputFile.set(extension.inputFileName.map[File](file(outputDirectory("pdf"), _, "pdf")))
     pdfTask.getDependsOn.add(foTask)
 
     // Transform DocBook into (expanded) EPUB (temporary result).
-    val epubXsltTask: SaxonTask = SaxonTask(project, "docBookEpubXslt")
+    val epubXsltTask: SaxonTask = project.getTasks.create("docBookEpubXslt", classOf[SaxonTask])
     setUpSaxonTask(epubXsltTask, "epub")
     epubXsltTask.setDescription("DocBook -> EPUB")
     epubXsltTask.outputFile.set(extension.inputFileName.map[File](file(expandedEpubDirectory, _, "epub")))

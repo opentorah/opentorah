@@ -58,12 +58,13 @@ Those parameters are set by the plugin only if they are not set in the DocBook e
 
 ## Plugin TODO ##
 
+- [ ] Roboto and NotoSans fonts do not work with FOP: https://issues.apache.org/jira/browse/FOP-2704
+      ("coverage set class table not yet supported"); what fonts CAN I use?
 - [ ] track down and suppress network IO (pre-load net.sf.docbook:docbook-xml:5.0-all?)
 - [ ] remove from XSL files' headers: xmlns:xs="http://www.w3.org/2001/XMLSchema"  exclude-result-prefixes="xs"
 - [ ] figure out how to define XML entities or processing instructions like <?eval ${project.version}?> programmatically for things like version;
-- [ ] fix FOP configuration to not get "font directory .../src/main/fop/fop.xconf could not be found."
-- [ ] make FOP configuration "strict"?
 - [ ] what is missing for feature-parity with docbkx?
+
 - [ ] verify that Oxygen can be configured to resolve DocBook XSL and data URLs;
 - [ ] see if IntelliJ Idea *and* Oxygen can handle substitution tokens;
 
