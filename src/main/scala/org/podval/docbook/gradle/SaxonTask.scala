@@ -1,11 +1,10 @@
 package org.podval.docbook.gradle
 
-import org.gradle.api.{DefaultTask, Project}
+import org.gradle.api.DefaultTask
 import org.gradle.api.provider.{MapProperty, Property}
 import org.gradle.api.tasks.{Input, InputDirectory, InputFile, OutputFile, TaskAction}
 import java.io.{File, FileReader}
 import java.net.URL
-
 import javax.xml.parsers.SAXParserFactory
 import javax.xml.transform.{Source, Transformer, URIResolver}
 import javax.xml.transform.sax.SAXSource
@@ -13,15 +12,16 @@ import javax.xml.transform.stream.{StreamResult, StreamSource}
 import com.icl.saxon.TransformerFactoryImpl
 import org.apache.xerces.jaxp.SAXParserFactoryImpl
 import org.xml.sax.{EntityResolver, InputSource, XMLReader}
-
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 
 object SaxonTask {
   // If used in DocBook files, this prefix points to the data directory
   val docBookDataUrl: String = "http://podval.org/docbook/data/"
+  val docBookDataUri: String = "data:"
 
   def dataSystemId(systemId: String): Option[String] = drop(docBookDataUrl, systemId)
+    .orElse(drop(docBookDataUri, systemId))
 
   // If used in DocBook files, those point to the DocBook XSL files.
   val docBookXslUrl: String = "http://podval.org/docbook/xsl/"
@@ -63,14 +63,14 @@ class SaxonTask extends DefaultTask {
     val saxParserFactory: SAXParserFactory = new SAXParserFactoryImpl
     saxParserFactory.setXIncludeAware(true)
     val xmlReader: XMLReader = saxParserFactory.newSAXParser.getXMLReader
-    xmlReader.setEntityResolver(mkEntityResolver(getProject))
+    xmlReader.setEntityResolver(mkEntityResolver)
 
     val stylesheetUrl: URL = stylesheetFile.get.toURI.toURL
     val transformer: Transformer = new TransformerFactoryImpl().newTransformer(
       new StreamSource(stylesheetUrl.openStream, stylesheetUrl.toExternalForm)
     )
 
-    transformer.setURIResolver(mkUriResolver(getProject))
+    transformer.setURIResolver(mkUriResolver)
 
     val parameters: Map[String, String] = xslParameters.get.asScala.toMap
 
@@ -86,7 +86,7 @@ class SaxonTask extends DefaultTask {
 
     // Relevant only for HTML and EPUB:
     setOptionalParameter("img.src.path", imagesDirectory.get.getName + "/")
-    setOptionalParameter("html.stylesheet", "css/docbook.css")
+    setOptionalParameter("html.stylesheet", "css/docBook.css")
 
     // Relevant only for chunked HTML:
     val outputFileName: String = {
@@ -107,7 +107,7 @@ class SaxonTask extends DefaultTask {
   }
 
   // Resolves references to data in DocBook files
-  private def mkEntityResolver(project: Project): EntityResolver = new EntityResolver {
+  private def mkEntityResolver: EntityResolver = new EntityResolver {
     override def resolveEntity(publicId: String, systemId: String): InputSource = {
       val result: Option[File] = SaxonTask.dataSystemId(systemId).map { path =>
         new File(dataDirectory.get, path)
@@ -124,7 +124,7 @@ class SaxonTask extends DefaultTask {
   }
 
   // Resolves references to DocBook XSL in customization files
-  private def mkUriResolver(project: Project): URIResolver = new URIResolver {
+  private def mkUriResolver: URIResolver = new URIResolver {
     override def resolve(href: String, base: String): Source = {
       val url: String = new URL(new URL(base), href).toString
       val result: Option[File] = SaxonTask.docBookXslUrl(url).map { path =>

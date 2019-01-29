@@ -1,49 +1,128 @@
-# Using the Plugin #
+# DocBook plugin for Gradle #
+
+## Motivation ##
+
+There is an excellent [DocBook](http://www.docbook.org/) plugin
+for [Maven](https://maven.apache.org/index.html):
+[docbkx-tools](https://code.google.com/p/docbkx-tools/).
+For [Gradle](https://gradle.org/), I found some Groovy scripts floating around,
+but no general-purpose plugins.
+This is my attempt at one :)
+
+## Theory of Operation ##
+
+The plugin uses Saxon with DocBook XSLT stylesheets to transform DocBook documents into
+HTML, EPUB and XSL-FO, and Apache FOP to transform XSL-FO into PDF.
+
+Plugin sets `img.src.path` XSLT parameter, so images should be referenced in the DocBook
+files *without* the `images/` prefix!
+
+
+## Adding to Gradle project ##
+
+To add the plugin to your Gradle project:
+
+```groovy
+
+buildscript {
+  repositories {
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'org.podval.docbook:org.podval.docbook-gradle-plugin:+'
+  }
+}
+
+apply plugin: 'org.podval.docbook-gradle-plugin'
+```
 
 ## Directory Layout ##
 
-    // Directory layout:
-    // Sources:
-    //   src/main/
-    //     css/
-    //     docBook/
-    //     fop/fop.xconf
-    //     images/
-    //     xsl/
-    //       epub.xsl
-    //       fo.xsl
-    //       html.xsl
-    //
-    // Build:
-    //   build/
-    //     data/
-    //     docBookXsl/docbook/
-    //     epub-expanded/
-    //
-    // Output:
-    //   build/docBook/
-    //     epub/<inputFileName>.epub
-    //     html/
-    //       css/
-    //       images/
-    //       index.html
-    //     pdf/<inputFileName>.pdf
+Overview of the directory layout used by the plugin:
 
+```
+   src/main/
+     css/docBook.css
+     docBook/<documentName>.xml
+     fop/fop.xconf
+     images/
+     xsl/
+       epub.xsl
+       fo.xsl
+       html.xsl
 
-Docbook sources and assets are under `src/main`: 
-  docbook/
-  images/
-images should be referenced by name, without the `images/` prefix;  
-  css/
+   build/
+     css/
+     data/
+     docBookXsl/docbook/
+     epub/
+     fo/
 
-When configuring "html.stylesheet" XSLT parameter, use the `css/` prefix: e.g., `css/docbook.css`  
+   build/docBook/
+     epub/<documentName>.epub
+     html/
+       css/
+       images/
+       index.html
+     pdf/<documentName>.pdf
+```
+
+### Sources ###
+
+Sources (under `src/main`) contain:
+- DocBook source of the document to be processed - `docBook/<documentName>.xml`;
+- additional DocBook sources included by the main document - in `docBook/`;
+- images used in the DocBook files - in `images/`;
+- CSS stylesheet that is used for HTML and EPUB - in `css/docBook.css`;
+- additional CSS files imported by the main one - in `css/`  
+- DocBook XSLT customizations (specific to the output format) - in `xsl/html.xsl` and the like;
+- FOP configuration - in /fop/fop.xconf.
+
+Plugin will create CSS stylesheet, XSL customizations and FOP configuration files if
+they are not present.  
+
+### Build ###
+
+Plugin 
+
+### Output ###
+
+Final output of the plugin is deposited under `build/docBook`,
+in a separate directory for each output format:
+- chunked HTML - in `epub/html`
+- PDF - in `pdf/<documentName>.pdf`;
+- EPUB file - in `epub/<documentName>.epub`.
+
+For HTML and EPUB, CSS stylesheets and images are included in the output.
 
 ## Customizations ##
 
   fop/
   xsl/  
 
+Some configuration that could be placed in the XSL files was placed in the POM:
+img.src.path: to be near the related - copying of the images
+font configuration: to centralize configuration and avoid duplication (filtering is used to patch font configuration into CSS files)
+
+
 ## Extension ##
+
+Plugin adds to the project an extension that can be configured using `docBook` closure: 
+
+```groovy
+docBook {
+  documentName = "calendar"
+
+  dataGeneratorClass = "org.podval.calendar.paper.Tables"
+
+  parameters = [
+    "title.font.family"    : "DejaVu Sans",
+    "body.font.family"     : "DejaVu Sans",
+    ...
+  ]
+}
+```
 
 ## Parameters ##
 
@@ -52,25 +131,23 @@ Plugin's Saxon tasks set some parameters in accordance with the expected directo
 Those parameters are set by the plugin only if they are not set in the DocBook extension's
 "parameters" setting, and it's best to leave them alone :)  
 
+## Fonts ##
 
+Default FOP configuration created by the plugin causes FOP to auto-detect available fonts,
+which are then cached by FOP to save time. After installing new fonts, FOP's font cache file
+needs to be removed for them to be detected.
+
+FOP can't use some popular fonts like Roboto and NotoSans, and logs an error
+"coverage set class table not yet supported" during fonts auto-detection;
+see https://issues.apache.org/jira/browse/FOP-2704 for more details.
+
+Plugin adds a Gradle task that can be used to list all the fonts that *are* available to FOP:
+```
+./gradlew listFonts
+```
+
+Some of the fonts that work well enough and support Latin, Russian and Hebrew scripts
+are DejaVu and Liberation.
 
 ## Tasks ##
 
-## Plugin TODO ##
-
-- [ ] Roboto and NotoSans fonts do not work with FOP: https://issues.apache.org/jira/browse/FOP-2704
-      ("coverage set class table not yet supported"); what fonts CAN I use?
-- [ ] track down and suppress network IO (pre-load net.sf.docbook:docbook-xml:5.0-all?)
-- [ ] remove from XSL files' headers: xmlns:xs="http://www.w3.org/2001/XMLSchema"  exclude-result-prefixes="xs"
-- [ ] figure out how to define XML entities or processing instructions like <?eval ${project.version}?> programmatically for things like version;
-- [ ] what is missing for feature-parity with docbkx?
-
-- [ ] verify that Oxygen can be configured to resolve DocBook XSL and data URLs;
-- [ ] see if IntelliJ Idea *and* Oxygen can handle substitution tokens;
-
-- [ ] turn Rant.md into an updated version of the "Publishing on the Web" blog post;
-- [ ] add README.md to Bintray upload
-- [ ] why aren't tags etc. uploaded to Bintray?
-- [ ] expose on Gradle plugin portal
-- [ ] use DirectoryProperty/FileProperty
-- [ ] add docBookProcess.outputDirectory property and use it in publishing

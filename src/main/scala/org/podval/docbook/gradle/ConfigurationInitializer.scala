@@ -5,7 +5,7 @@ import java.io.{File, InputStream}
 
 object ConfigurationInitializer {
   private val configurationResources: Seq[String] = Seq(
-    "css/docbook.css",
+    "css/docBook.css",
     "fop/fop.xconf",
     "xsl/common.xsl",
     "xsl/common-html.xsl",

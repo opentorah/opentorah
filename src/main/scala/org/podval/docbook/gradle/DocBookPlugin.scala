@@ -34,13 +34,14 @@ final class DocBookPlugin extends Plugin[Project] {
 
     val outputRootDirectory: File = buildDirectory("docBook")
     def outputDirectory(outputType: String): File = new File(outputRootDirectory, outputType)
+    def outputFile(outputType: String)(name: String): File =
+      file(outputDirectory(outputType), name, outputType)
 
     ConfigurationInitializer.doIt(sourceRootDirectory, project.getLogger)
 
-    val extension: DocBookExtension = project.getExtensions.create("docbook", classOf[DocBookExtension], project)
-    extension.inputFileName.set("index")
+    val extension: DocBookExtension = project.getExtensions.create("docBook", classOf[DocBookExtension], project)
+    extension.documentName.set("index")
     extension.dataGeneratorClass.set("")
-    val inputFile: Provider[File] = extension.inputFileName.map(sourceFile("docBook", _, "xml"))
 
     // Download and unpack DocBook XSLT stylesheets
     val docBookXslConfiguration = project.getConfigurations.create("docbookxsl").defaultDependencies(
@@ -73,7 +74,7 @@ final class DocBookPlugin extends Plugin[Project] {
 
     // Commonality between all SaxonTask instances.
     def setUpSaxonTask(task: SaxonTask, outputType: String): Unit = {
-      task.inputFile.set(inputFile)
+      task.inputFile.set(extension.documentName.map[File](sourceFile("docBook", _, "xml")))
       task.dataDirectory.set(dataDirectory)
       task.imagesDirectory.set(sourceDirectory("images"))
       task.xslParameters.set(extension.parameters)
@@ -87,7 +88,7 @@ final class DocBookPlugin extends Plugin[Project] {
     val htmlXsltTask: SaxonTask = project.getTasks.create("docBookHtmlXslt", classOf[SaxonTask])
     setUpSaxonTask(htmlXsltTask, "html")
     htmlXsltTask.setDescription("DocBook -> HTML")
-    htmlXsltTask.outputFile.set(file(outputDirectory("html"), "index", "html"))
+    htmlXsltTask.outputFile.set(outputFile("html")("index"))
 
     // Add CSS and images to the HTML output.
     val htmlTask: Copy = project.getTasks.create("docBookHtml", classOf[Copy])
@@ -103,7 +104,7 @@ final class DocBookPlugin extends Plugin[Project] {
     val foTask: SaxonTask = project.getTasks.create("docBookFoXslt", classOf[SaxonTask])
     setUpSaxonTask(foTask, "fo")
     foTask.setDescription("DocBook -> XSL-FO")
-    foTask.outputFile.set(extension.inputFileName.map[File](file(buildDirectory("fo"), _, "fo")))
+    foTask.outputFile.set(extension.documentName.map[File](file(buildDirectory("fo"), _, "fo")))
 
     // Process XSL-FO into PDF.
     val pdfTask: FopTask = project.getTasks.create("docBookPdf", classOf[FopTask])
@@ -111,14 +112,14 @@ final class DocBookPlugin extends Plugin[Project] {
     pdfTask.setGroup("publishing")
     pdfTask.inputFile.set(foTask.outputFile)
     pdfTask.configurationFile.set(fopConfigurationFile)
-    pdfTask.outputFile.set(extension.inputFileName.map[File](file(outputDirectory("pdf"), _, "pdf")))
+    pdfTask.outputFile.set(extension.documentName.map[File](outputFile("pdf")))
     pdfTask.getDependsOn.add(foTask)
 
     // Transform DocBook into (expanded) EPUB (temporary result).
     val epubXsltTask: SaxonTask = project.getTasks.create("docBookEpubXslt", classOf[SaxonTask])
     setUpSaxonTask(epubXsltTask, "epub")
     epubXsltTask.setDescription("DocBook -> EPUB")
-    epubXsltTask.outputFile.set(extension.inputFileName.map[File](file(expandedEpubDirectory, _, "epub")))
+    epubXsltTask.outputFile.set(extension.documentName.map[File](file(expandedEpubDirectory, _, "epub")))
 
     // Add CSS and images and package the EPUB.
     val epubTask: Zip = project.getTasks.create("docBookEpub", classOf[Zip])
@@ -126,7 +127,7 @@ final class DocBookPlugin extends Plugin[Project] {
     epubTask.setGroup("publishing")
     epubTask.setPreserveFileTimestamps(true)
     epubTask.setEntryCompression(ZipEntryCompression.STORED)
-    epubTask.getArchiveFileName.set(extension.inputFileName.map[String](_ + ".epub"))
+    epubTask.getArchiveFileName.set(extension.documentName.map[String](_ + ".epub"))
     epubTask.getDestinationDirectory.set(outputDirectory("epub"))
     epubTask.from(new File(expandedEpubDirectory, "OEBPS/"))
     includeFiles(epubTask, expandedEpubDirectory, "META-INF/**")

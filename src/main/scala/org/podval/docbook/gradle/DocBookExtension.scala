@@ -6,7 +6,7 @@ import org.gradle.api.provider.{MapProperty, Property}
 import scala.beans.BeanProperty
 
 class DocBookExtension(project: Project) {
-  @BeanProperty val inputFileName: Property[String] =
+  @BeanProperty val documentName: Property[String] =
     project.getObjects.property(classOf[String])
 
   @BeanProperty val dataGeneratorClass: Property[String] =
