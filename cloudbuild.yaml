@@ -1,9 +1,9 @@
 steps:
 # gradle: prepare docker context
-# Latest Gradle builder on Google Cloud Build is v4.6; I need v5.0,
+# Latest Gradle builder on Google Cloud Build is v4.6; I need v5.1.1.0,
 # so I am using a custom builder I had to build myself:
 #  - name: 'gcr.io/cloud-builders/gradle'
-  - name: 'gcr.io/calendar-service-1/gradle:5.0-jdk-8'
+  - name: 'gcr.io/calendar-service-1/gradle:5.1.1-jdk-8'
     args: [':service:prepareDockerContext']
 
 # docker: build docker image
