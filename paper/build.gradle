@@ -16,8 +16,8 @@ dependencies {
   compile lib.scalaXml, project(':library')
 }
 
-docbook {
-  inputFileName = "calendar"
+docBook {
+  documentName = "calendar"
 
   dataGeneratorClass = "org.podval.calendar.paper.Tables"
 
@@ -32,34 +32,6 @@ docbook {
     "body.font.master": "12",
 //    "footnote.font.size": "10"
   ]
-
-/*
-
-Roboto and NotoSans fonts (except for Mono) do not work with FOP;
-  see https://issues.apache.org/jira/browse/FOP-2704 ("coverage set class table not yet supported")
-
-./gradlew :paper:listFonts   lists fonts available to FOP
-
-Work:
-  DejaVu Sans, DejaVu Sans Mono, DejaVu Serif
-  Liberation Mono, Liberation Sans, Liberation Serif
-
-Don't work (at least, without setting the sans.font.family)
-  Monserratt, Nimbus Sans, PT Sans, Caladea - no Hebrew.
-  Droid Sans, Droid Sans Hebrew, Droid Sans Mono - missing symbols; Hebrew - in superscript position.
-
-Didn't try:
-  Carlito
-  Comfortaa
-  FreeMono  FreeSans  FreeSerif
-  Times, Times Roman
-  URW Bookman
-  URW Gothic
-*/
-
-
-  // TODO define entities:
-  // version: project.version.toString
-  // tables-directory: ${buildDir}/tables
-  // date: LocalDate.now().format(DateTimeFormatter.ofPattern("d MMM yyyy"))
 }
+
+build.dependsOn docBookProcess
