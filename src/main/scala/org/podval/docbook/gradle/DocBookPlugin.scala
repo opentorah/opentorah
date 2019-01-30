@@ -1,7 +1,6 @@
 package org.podval.docbook.gradle
 
 import org.gradle.api.{Action, DefaultTask, Plugin, Project}
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.{Zip, ZipEntryCompression}
 import java.io.File
