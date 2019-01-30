@@ -29,7 +29,7 @@ docBook {
     "dingbat.font.family"  : "ZapfDingbats", // The font family for copyright, quotes, and other symbols
 //    "symbol.font.family": "???" // TODO configure with catch-all symbol font(s)
 
-    "body.font.master": "12",
+    "body.font.master": "12"
 //    "footnote.font.size": "10"
   ]
 }
