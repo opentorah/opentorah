@@ -23,8 +23,8 @@ files *without* the `images/` prefix!
 To add the plugin to your Gradle project:
 
 ```groovy
-
 buildscript {
+  // for the plugin
   repositories {
     jcenter()
   }
@@ -32,6 +32,11 @@ buildscript {
   dependencies {
     classpath 'org.podval.docbook:org.podval.docbook-gradle-plugin:+'
   }
+}
+
+// for DocBook XSLT
+repositories {
+  jcenter()
 }
 
 apply plugin: 'org.podval.docbook-gradle-plugin'

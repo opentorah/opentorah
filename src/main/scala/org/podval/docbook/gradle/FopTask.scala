@@ -2,7 +2,7 @@ package org.podval.docbook.gradle
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.{InputFile, OutputFile, TaskAction}
+import org.gradle.api.tasks.{InputDirectory, InputFile, OutputFile, TaskAction}
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import javax.xml.transform.{Transformer, TransformerFactory}
 import javax.xml.transform.sax.SAXResult
@@ -12,22 +12,30 @@ import org.apache.fop.apps.{Fop, FopConfParser, FopFactory}
 import scala.beans.BeanProperty
 
 class FopTask extends DefaultTask {
+  @InputFile @BeanProperty val configurationFile: Property[File] =
+    getProject.getObjects.property(classOf[File])
+
   @InputFile @BeanProperty val inputFile: Property[File] =
     getProject.getObjects.property(classOf[File])
 
-  @InputFile @BeanProperty val configurationFile: Property[File] =
+  @InputDirectory @BeanProperty val imagesDirectory: Property[File] =
     getProject.getObjects.property(classOf[File])
 
   @OutputFile @BeanProperty val outputFile: Property[File] =
     getProject.getObjects.property(classOf[File])
 
+
   @TaskAction
   def fop(): Unit = {
     outputFile.get.getParentFile.mkdirs
-
     val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(outputFile.get))
 
-    val fopFactory: FopFactory = new FopConfParser(configurationFile.get).getFopFactoryBuilder.build
+    val fopConfParser: FopConfParser = new FopConfParser(
+      configurationFile.get,
+      imagesDirectory.get.getParentFile.toURI
+    )
+
+    val fopFactory: FopFactory = fopConfParser.getFopFactoryBuilder.build
     val fop: Fop = fopFactory.newFop("application/pdf", outputStream)
 
     try {

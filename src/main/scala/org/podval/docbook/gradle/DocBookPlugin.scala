@@ -21,6 +21,7 @@ final class DocBookPlugin extends Plugin[Project] {
     def sourceDirectory(name: String): File = new File(sourceRootDirectory, name)
     def sourceFile(directory: String, name: String, extension: String): File =
       file(sourceDirectory(directory), name, extension)
+    val imagesDirectory: File = sourceDirectory("images")
     val fopConfigurationFile: File = sourceFile("fop", "fop", "xconf")
 
     val buildRootDirectory: File = project.getBuildDir
@@ -76,7 +77,7 @@ final class DocBookPlugin extends Plugin[Project] {
     def setUpSaxonTask(task: SaxonTask, outputType: String): Unit = {
       task.inputFile.set(extension.documentName.map[File](sourceFile("docBook", _, "xml")))
       task.dataDirectory.set(dataDirectory)
-      task.imagesDirectory.set(sourceDirectory("images"))
+      task.imagesDirectory.set(imagesDirectory)
       task.xslParameters.set(extension.parameters)
       task.xslDirectory.set(docBookXslDirectory)
       task.stylesheetFile.set(sourceFile("xsl", outputType, "xsl"))
@@ -110,8 +111,9 @@ final class DocBookPlugin extends Plugin[Project] {
     val pdfTask: FopTask = project.getTasks.create("docBookPdf", classOf[FopTask])
     pdfTask.setDescription("Process DocBook into PDF")
     pdfTask.setGroup("publishing")
-    pdfTask.inputFile.set(foTask.outputFile)
     pdfTask.configurationFile.set(fopConfigurationFile)
+    pdfTask.inputFile.set(foTask.outputFile)
+    pdfTask.imagesDirectory.set(imagesDirectory)
     pdfTask.outputFile.set(extension.documentName.map[File](outputFile("pdf")))
     pdfTask.getDependsOn.add(foTask)
 

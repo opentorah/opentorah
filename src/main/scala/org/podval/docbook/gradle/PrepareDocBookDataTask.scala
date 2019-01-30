@@ -16,7 +16,7 @@ class PrepareDocBookDataTask extends JavaExec {
     getProject.getObjects.property(classOf[File])
 
   override def exec(): Unit = {
-    val javaPlugin: JavaPluginConvention = getProject.getConvention.getPlugin(classOf[JavaPluginConvention])
+    val javaPlugin: JavaPluginConvention = getProject.getConvention.findPlugin(classOf[JavaPluginConvention])
     if (javaPlugin == null) {
       info("Skipping DocBook data generation: no Java plugin in the project")
     } else {
