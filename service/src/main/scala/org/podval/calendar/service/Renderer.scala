@@ -57,7 +57,6 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
   private def dayUrl(day: DayBase[_], other: Boolean = false): String =
     s"/${getName(other)}/${day.year.number}/${day.month.numberInYear}/${day.numberInMonth}"
 
-
   private def yearLink(year: YearBase[_], other: Boolean = false, text: Option[String] = None): TypedTag[String] =
     navLink(yearUrl(year, other = other), text.getOrElse(year.toLanguageString(spec)))
 
@@ -78,7 +77,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
   private def dayLinks(day: DayBase[_], other: Boolean): TypedTag[String] = span(
     yearLink(day.year, other = other),
     monthNameLink(day.month, other = other),
-    dayLink(day-1, other = other, text = Some("<")),
+    if (day.number > 1) dayLink(day-1, other = other, text = Some("<")) else span(Renderer.earlyGregorianMessage, " "),
     dayLink(day, other = other),
     dayLink(day+1, other = other, text = Some(">"))
   )
@@ -138,10 +137,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
       span(cls := "heading")("Chitas"),
       renderChitas(daySchedule.chitas),
       span(cls := "heading")("Tehillim"),
-      renderTehillim(
-        if ((jewishDay.numberInMonth == 29) && jewishDay.month.length == 29) Span(Psalms.days(29-1).from, Psalms.days(30-1).to)
-        else Psalms.days(jewishDay.numberInMonth-1)
-      ),
+      renderTehillim(jewishDay),
       div(cls := "heading")("Rambam"),
       renderRambam(RambamSchedule.forDay(jewishDay)),
       renderOptionalReading("Afternoon", daySchedule.afternoon)
@@ -168,8 +164,18 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
     ))
   }
 
-  private def renderTehillim(what: Span): TypedTag[String] = {
-    span(what.toLanguageString(spec))
+  private def renderTehillim(day: Jewish.Day): TypedTag[String] = {
+    val forDayOfMonth: Span =
+      if ((day.numberInMonth == 29) && day.month.length == 29) Span(Psalms.days(29-1).from, Psalms.days(30-1).to)
+      else Psalms.days(day.numberInMonth-1)
+
+    val forDayOfWeek: Span =
+      Psalms.weekDays(day.numberInWeek-1)
+
+    table(
+      tr(td("for day of month"), td(span(forDayOfMonth.toLanguageString(spec)))),
+      tr(td("for day of week"), td(span(forDayOfWeek.toLanguageString(spec))))
+    )
   }
 
   private def renderRambam(schedule: RambamSchedule): Seq[TypedTag[String]] = Seq(
@@ -273,10 +279,10 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
     renderer: T => Seq[TypedTag[String]]
   ): Seq[TypedTag[String]] =
     span(cls := "subheading")(what) +:
-      customs.customs.toSeq.map { case (custom: Custom, value /*: T*/) =>
+      customs.customs.toSeq.map { case (custom: Custom, valueForCustom /*: T*/) =>
         table(cls := "custom")(
           caption(custom.toLanguageString(spec)),
-          tbody(renderer(value))
+          tbody(renderer(valueForCustom))
         )
       }
 
@@ -289,6 +295,8 @@ object Renderer {
 
   private val gregorianRenderername: String = "gregorian"
 
+  private val earlyGregorianMessage: String = "Gregorian dates before year 1 are not supported!"
+
   private final class JewishRenderer(location: Location, spec: LanguageSpec) extends Renderer(location, spec) {
     override protected type C = Jewish
 
@@ -300,7 +308,13 @@ object Renderer {
 
     override protected def jewish(day: DayBase[_]): Jewish.Day = day.asInstanceOf[Jewish.Day]
 
-    override protected def gregorian(day: DayBase[_]): Gregorian.Day = Calendar.fromJewish(jewish(day))
+    override protected def gregorian(day: DayBase[_]): Gregorian.Day = {
+      try {
+        Calendar.fromJewish(jewish(day))
+      } catch {
+        case e: IllegalArgumentException => Gregorian.Year(1).month(1).day(1)
+      }
+    }
 
     override protected def first(day: DayBase[_]): DayBase[_] = jewish(day)
 
