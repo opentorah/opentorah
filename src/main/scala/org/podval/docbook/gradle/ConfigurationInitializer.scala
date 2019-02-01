@@ -1,6 +1,5 @@
 package org.podval.docbook.gradle
 
-import org.gradle.api.logging.Logger
 import java.io.{File, InputStream}
 
 object ConfigurationInitializer {
@@ -22,9 +21,9 @@ object ConfigurationInitializer {
       } else {
         val file = new File(directory, name)
         if (file.exists()) {
-          logger.info(s"Skipping configuration resource $name: file $file already exists", null, null)
+          logger.info(s"Skipping configuration resource $name: file $file already exists")
         } else {
-          logger.info(s"Copying configuration resource $name to $file", null, null)
+          logger.info(s"Copying configuration resource $name to $file")
           file.getParentFile.mkdirs
           java.nio.file.Files.copy(is, file.toPath)
         }

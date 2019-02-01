@@ -16,6 +16,11 @@ description = 'Gradle DocBook plugin.'
 apply plugin: 'scala'
 
 def scalaVersion = '2.12.8'
+def scalaVersionMajor = '2.12'
+
+configurations {
+  docBookXslConfiguration
+}
 
 dependencies {
   zinc 'com.typesafe.zinc:zinc:0.3.15'
@@ -25,7 +30,18 @@ dependencies {
   runtime 'xerces:xercesImpl:2.11.0'
 
   compile 'org.apache.xmlgraphics:fop:2.3'
+
+  testCompile "org.scalatest:scalatest_$scalaVersionMajor:3.0.5"
+
+  docBookXslConfiguration "net.sf.docbook:docbook-xsl:1.79.1:resources@zip"
 }
+
+task ('prepareDocBookXsl', type: Copy) {
+  from(project.zipTree(configurations.getByName('docBookXslConfiguration').singleFile))
+  into("$buildDir/docBookXsl")
+}
+
+processTestResources.dependsOn(prepareDocBookXsl)
 
 task sourceJar(type: Jar) {
   from sourceSets.main.allSource

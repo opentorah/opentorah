@@ -4,18 +4,19 @@
 
 There is an excellent [DocBook](http://www.docbook.org/) plugin
 for [Maven](https://maven.apache.org/index.html):
-[docbkx-tools](https://code.google.com/p/docbkx-tools/).
+[docbkx-tools](https://github.com/mimil/docbkx-tools).
 For [Gradle](https://gradle.org/), I found some Groovy scripts floating around,
 but no general-purpose plugins.
-This is my attempt at one :)
+
+This is my attempt at one, inspired by the ideas pioneered by the Maven plugin.
+Thank you, [@mimil](https://github.com/mimil)!
+
+
 
 ## Theory of Operation ##
 
 The plugin uses Saxon with DocBook XSLT stylesheets to transform DocBook documents into
 HTML, EPUB and XSL-FO, and Apache FOP to transform XSL-FO into PDF.
-
-Plugin sets `img.src.path` XSLT parameter, so images should be referenced in the DocBook
-files *without* the `images/` prefix!
 
 
 ## Adding to Gradle project ##
@@ -41,6 +42,13 @@ repositories {
 
 apply plugin: 'org.podval.docbook-gradle-plugin'
 ```
+
+If a project doesn't contain any code, and doesn't apply any core Gradle plugins,
+to get basic tasks like "clean" and "build":
+
+```groovy
+apply plugin: 'base'
+``` 
 
 ## Directory Layout ##
 
@@ -89,7 +97,7 @@ they are not present.
 
 ### Build ###
 
-Plugin 
+Plugin ....
 
 ### Output ###
 
@@ -122,9 +130,8 @@ docBook {
   dataGeneratorClass = "org.podval.calendar.paper.Tables"
 
   parameters = [
-    "title.font.family"    : "DejaVu Sans",
-    "body.font.family"     : "DejaVu Sans",
-    ...
+    "body.font.family": "DejaVu Sans",
+    "body.font.master": "12"
   ]
 }
 ```
@@ -135,6 +142,11 @@ Plugin's Saxon tasks set some parameters in accordance with the expected directo
 "img.src.path" is set to "images/" and "html.stylesheet" is set to "css/docbook.xsl".
 Those parameters are set by the plugin only if they are not set in the DocBook extension's
 "parameters" setting, and it's best to leave them alone :)  
+
+## Images ##
+
+Plugin sets `img.src.path` XSLT parameter, so images should be referenced in the DocBook
+files *without* the `images/` prefix!
 
 ## Fonts ##
 
@@ -153,6 +165,20 @@ Plugin adds a Gradle task that can be used to list all the fonts that *are* avai
 
 Some of the fonts that work well enough and support Latin, Russian and Hebrew scripts
 are DejaVu and Liberation.
+
+Parameters set in XSLT customizations can be used to set fonts for the PDF output.
+Parameters set in the `docBook` closure of the `Gradle` build file can be used to set fonts both for the PDF output
+and for CSS, since they are substituted in the CSS files: 
+```css
+@font-face {
+  font-family: "@body.font.family@";
+  src: url("@body.font.family.url@");
+}
+
+body {
+  font-family: "@body-font-family@", sans-serif;
+}
+```
 
 ## Tasks ##
 

@@ -14,4 +14,7 @@ class DocBookExtension(project: Project) {
 
   @BeanProperty val parameters: MapProperty[String, String] =
     project.getObjects.mapProperty(classOf[String], classOf[String])
+
+  @BeanProperty val entities: MapProperty[String, String] =
+    project.getObjects.mapProperty(classOf[String], classOf[String])
 }

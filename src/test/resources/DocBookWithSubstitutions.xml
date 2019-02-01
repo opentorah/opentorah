@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd">
+<article xmlns="http://docbook.org/ns/docbook" version="5.0"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+    <info>
+        <title>Example Document</title>
+        <releaseinfo>Version <?eval version ?></releaseinfo>
+    </info>
+
+    <section>
+        <title>Using processing instructions</title>
+        <para>
+            Processing instructions of the form &lt;?eval EXPRESSION?&gt; used
+            in the DocBook documents are replaced with the result of evaluation
+            of the EXPRESSION. Right now, EXPRESSION can be either a property of
+            the Gradle project, or "date" (<?eval date ?>).
+            for example: Version <?eval version ?>.</para>
+        <para>
+            Processing instructions can only be used inside XML elements, not in
+            attributes.</para>
+    </section>
+
+    <section>
+        <title>Using entity substitutions</title>
+
+        <para>
+            This sample shows the use of entity substitution defined in your
+            pom.xml configuration: &amp;version; = &version;. The entity substitution is
+            also working within xml attributes as you can see in the following link:
+            <link xlink:href="http://&version;">this is a link</link>.
+        </para>
+        <para>To enable this functionality, you need to add a Docbook DOCTYPE
+            declaration to you top-level DocBook file, even though DocBook 5.x doesn't really have a DTD :).
+            Between the XML declaration and the root element, add the following:
+            &lt;!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd"&gt;
+            If using root element other than "article", adjust DOCTYPE declaration accordingly.
+        </para>
+    </section>
+</article>

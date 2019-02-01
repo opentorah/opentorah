@@ -5,6 +5,7 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.{Zip, ZipEntryCompression}
 import java.io.File
 
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.CopySpec
 
 // Properties are annotated with @BeanProperty to make them visible to Gradle.
@@ -37,14 +38,14 @@ final class DocBookPlugin extends Plugin[Project] {
     def outputFile(outputType: String)(name: String): File =
       file(outputDirectory(outputType), name, outputType)
 
-    ConfigurationInitializer.doIt(sourceRootDirectory, project.getLogger)
+    ConfigurationInitializer.doIt(sourceRootDirectory, new Logger.PluginLogger(project.getLogger))
 
     val extension: DocBookExtension = project.getExtensions.create("docBook", classOf[DocBookExtension], project)
     extension.documentName.set("index")
     extension.dataGeneratorClass.set("")
 
     // Download and unpack DocBook XSLT stylesheets
-    val docBookXslConfiguration = project.getConfigurations.create("docbookxsl").defaultDependencies(
+    val docBookXslConfiguration: Configuration = project.getConfigurations.create("docBookXsl").defaultDependencies(
       _.add(project.getDependencies.create("net.sf.docbook:docbook-xsl:1.79.1:resources@zip")) : Unit
     ).setVisible(false)
 
@@ -78,6 +79,7 @@ final class DocBookPlugin extends Plugin[Project] {
       task.dataDirectory.set(dataDirectory)
       task.imagesDirectory.set(imagesDirectory)
       task.xslParameters.set(extension.parameters)
+      task.entities.set(extension.entities)
       task.xslDirectory.set(docBookXslDirectory)
       task.stylesheetFile.set(sourceFile("xsl", outputType, "xsl"))
       task.getDependsOn.add(prepareTask)

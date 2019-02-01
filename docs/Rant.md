@@ -164,17 +164,3 @@ https://print-css.rocks/blog/2016-10-06/integrating-mathjax.html
 Look into:
 https://github.com/vivliostyle/vivliostyle.js
 https://sourceforge.net/projects/dblatex/
-
-
-## Logging ##
-
-Suppress the logs from Saxon...
-     // suppress output from the XSLT transforms - unless running with '-d' or '-i'.
-     switch (project.gradle.startParameter.logLevel) {
-       case LogLevel.DEBUG:
-       case LogLevel.INFO:
-       break;
-       default:
-         logging.captureStandardOutput(LogLevel.INFO)
-       logging.captureStandardError(LogLevel.INFO)
-     }
