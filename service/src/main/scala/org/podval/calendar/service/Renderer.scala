@@ -322,13 +322,16 @@ object Renderer {
 
     override protected def renderYearInformation(yearRaw: YearBase[_]): Seq[TypedTag[String]] = {
       val year: Jewish.Year = yearRaw.asInstanceOf[Jewish.Year]
+      val delay = year.newYearDelay
 
       val numbers: TypedTag[String] = table(
         tr(td("from creation"), td(year.toLanguageString(spec))),
         tr(td("is leap"), td(year.isLeap.toString())),
         tr(td("months"), td(spec.toString(year.lengthInMonths))),
         tr(td("days"), td(spec.toString(year.lengthInDays))),
-        tr(td("type"), td(YearType.forYear(year).toString))
+        tr(td("type"), td(YearType.forYear(year).toString)),
+        tr(td("Molad"), td(year.newMoon.toLanguageString(spec))),
+        tr(td("New Year Delay"), td(s"$delay (${delay.days})"))
       )
 
       def cycle(name: String, yearsCycle: YearsCycle): TypedTag[String] = {
