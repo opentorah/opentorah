@@ -6,6 +6,7 @@ import Day.Name._
 object NewYear {
 
   sealed class Delay(val days: Int)
+
   object Delay {
     case object No extends Delay(0)
     case object Adu extends Delay(1)
