@@ -4,7 +4,7 @@ import org.podval.calendar.dates.YearBase
 import Jewish.{Moment, Month, Year, YearCharacter}
 
 abstract class JewishYear(number: Int) extends YearBase[Jewish](number) {
-  require(0 < number)
+  require(0 <= number)
 
   final def newMoon: Moment = month(1).newMoon
 
