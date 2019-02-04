@@ -104,7 +104,15 @@ instead of Matot and Masai combine Chukat and Balak
 add to Korach Chukat to 20:21, and next Shabbos read the rest of Chukkat and Balak
 
 ### 3 small aliyot ###
-for 2/5/Shabbos day: look into and implement differences in customs  
+for 2/5/Shabbos day: look into and implement differences in customs 
+
+### Проблемы календаря, который устанавливался по свидетельствам наблюдения новой луны. ###
+Отличается от расчитанного:
+   1) основан не на среднем движении солнца и луны, поэтому к молад надо делать поправку, но не путем отодвигания Рош а-шана, а методами последних глав Кидуш а-ходеш
+   2) другой порядок високосных и простых лет
+   3) другой порядок полных и неполных месяцев
+   4) возможно ли рассчитать по Рамбаму, начало месяцев по этим принципам и сравнуть с завиксированныму в традиции датами и днями недели?
+   5) Пример: выход из Египта - 15 день от освящения месяца, четверг
 
 ### 3-year cycle ###
 Is anybody orthodox completing Torah cycle in three years?
