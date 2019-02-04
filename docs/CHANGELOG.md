@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-01/25/2019-01/27/2019 Integration with Gradle Task Input/Output
-01/09/2019 Moved it into a separate repository
-04/05/2018-04/12/2018 Started working on DocBook Gradle Plugin
+## [] - 01/25/2019-01/31/2019
+- integration with Gradle Task Input/Output
+- substitution of entities
+- evaluation of processing instructions
+
+## [] - 01/09/2019
+- moved it into a separate repository
+
+## [] - 04/05/2018-04/12/2018
+- started working on DocBook Gradle Plugin

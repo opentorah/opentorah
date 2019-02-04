@@ -14,9 +14,7 @@
         <para>
             Processing instructions of the form &lt;?eval EXPRESSION?&gt; used
             in the DocBook documents are replaced with the result of evaluation
-            of the EXPRESSION. Right now, EXPRESSION can be either a property of
-            the Gradle project, or "date" (<?eval date ?>).
-            for example: Version <?eval version ?>.</para>
+            of the EXPRESSION, for example: Version <?eval version ?>.</para>
         <para>
             Processing instructions can only be used inside XML elements, not in
             attributes.</para>

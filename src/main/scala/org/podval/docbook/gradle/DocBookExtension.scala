@@ -1,7 +1,7 @@
 package org.podval.docbook.gradle
 
 import org.gradle.api.Project
-import org.gradle.api.provider.{MapProperty, Property}
+import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 
 import scala.beans.BeanProperty
 
@@ -12,9 +12,15 @@ class DocBookExtension(project: Project) {
   @BeanProperty val dataGeneratorClass: Property[String] =
     project.getObjects.property(classOf[String])
 
-  @BeanProperty val parameters: MapProperty[String, String] =
+  @BeanProperty val xslParameters: MapProperty[String, String] =
     project.getObjects.mapProperty(classOf[String], classOf[String])
 
   @BeanProperty val entities: MapProperty[String, String] =
     project.getObjects.mapProperty(classOf[String], classOf[String])
+
+  @BeanProperty val substitutions: MapProperty[String, String] =
+    project.getObjects.mapProperty(classOf[String], classOf[String])
+
+  @BeanProperty val outputFormats: ListProperty[String] =
+    project.getObjects.listProperty(classOf[String])
 }
