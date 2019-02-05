@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - better substitutions
 - cleanup
 - README.md
+- publishing to plugin.gradle.org
 
 ## [] - 01/25/2019-01/31/2019
 - integration with Gradle Task Input/Output

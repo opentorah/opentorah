@@ -1,4 +1,5 @@
 plugins {
+  id "com.gradle.plugin-publish" version "0.10.1" apply false
   id "com.jfrog.bintray" version "1.8.4" apply false
 }
 
@@ -58,7 +59,7 @@ apply plugin: 'java-gradle-plugin'
 
 gradlePlugin {
   plugins {
-    customPlugin {
+    docBookPlugin {
       id = 'org.podval.docbook-gradle-plugin'
       implementationClass = 'org.podval.docbook.gradle.DocBookPlugin'
     }
@@ -134,6 +135,44 @@ bintray {
     publicDownloadNumbers  = true
     githubReleaseNotesFile = 'CHANGELOG.md'
     version { name         = project.version }
+  }
+}
+
+apply plugin: 'com.gradle.plugin-publish'
+
+pluginBundle {
+  website = "${gitHubRepositoryUrl}"
+  vcsUrl = "${gitHubRepositoryUrl}.git"
+
+  description = project.description
+
+  plugins {
+    docBookPlugin {
+      // id and displayName are mandatory.
+      // id is captured from java-gradle-plugin configuration.
+      displayName = 'Gradle Greeting plugin'
+      tags = ['Scala', 'DocBook', 'Gradle', 'Plugin']
+      // if no version is set, the project version will be used.
+      version = project.version
+    }
+  }
+
+  // Optional overrides for Maven coordinates.
+  // If you have an existing plugin deployed to Bintray and would like to keep
+  // your existing group ID and artifact ID for continuity, you can specify
+  // them here.
+  //
+  // As publishing to a custom group requires manual approval by the Gradle
+  // team for security reasons, we recommend not overriding the group ID unless
+  // you have an existing group ID that you wish to keep. If not overridden,
+  // plugins will be published automatically without a manual approval process.
+  //
+  // You can also override the version of the deployed artifact here, though it
+  // defaults to the project version, which would normally be sufficient.
+  mavenCoordinates {
+    groupId = project.group
+    artifactId = jar.baseName
+    version = project.version
   }
 }
 
