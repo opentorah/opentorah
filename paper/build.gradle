@@ -21,7 +21,7 @@ docBook {
 
   dataGeneratorClass = "org.podval.calendar.paper.Tables"
 
-  parameters = [
+  xslParameters = [
     "title.font.family"    : "DejaVu Sans",
     "body.font.family"     : "DejaVu Sans",
     "sans.font.family"     : "DejaVu Sans",
@@ -34,4 +34,4 @@ docBook {
   ]
 }
 
-build.dependsOn docBookProcess
+build.dependsOn processDocBook
