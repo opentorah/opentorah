@@ -1,12 +1,12 @@
 package org.podval.docbook.gradle
 
-import java.io.File
-
-import javax.inject.Inject
-import org.gradle.api.DefaultTask
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.{Action, DefaultTask}
+import org.gradle.api.file.CopySpec
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, InputDirectory, OutputDirectory, TaskAction}
-
+import java.io.File
+import javax.inject.Inject
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 
@@ -37,14 +37,45 @@ class DocBookTask extends DefaultTask {
 
   @TaskAction
   def docBook(): Unit = {
-    DocBook2.process(
-      outputFormats = outputFormats.get.asScala.toList,
-      layout = layout,
-      inputFileName = inputFileName.get,
-      xslParameters = xslParameters.get.asScala.toMap,
-      substitutions = substitutions.get.asScala.toMap,
-      project = getProject,
-      logger = new Logger.PluginLogger(getLogger)
+    val logger: Logger = new Logger.PluginLogger(getLogger)
+
+    val docBookXslConfiguration: Configuration =
+      getProject.getConfigurations.findByName(layout.docBookXslConfigurationName)
+
+    // Unpack DocBook XSLT stylesheets
+    if (!layout.docBookXslDirectory.exists) {
+      logger.info(s"Preparing DocBook XSLT stylesheets")
+      getProject.copy(new Action[CopySpec] {
+        override def execute(copySpec: CopySpec): Unit = {
+          copySpec
+            .into(layout.explodeDocBookXslInto)
+            .from(getProject.zipTree(docBookXslConfiguration.getSingleFile))
+        }
+      })
+    }
+
+    val substitutions: Map[String, String] = this.substitutions.get.asScala.toMap
+    val xslParameters: Map[String, String] = this.xslParameters.get.asScala.toMap
+
+    val saxon: Saxon = new Saxon(
+      substitutions = substitutions,
+      xslDirectory = layout.docBookXslDirectory,
+      dataDirectory = layout.dataDirectory,
+      logger: Logger
     )
+
+    val processorsToRun: List[DocBook2] = outputFormats.get.asScala.toList.map(DocBook2.forName)
+    val processorNames: String = processorsToRun.map(_.name).mkString(", ")
+    logger.info(s"Output formats selected: $processorNames")
+
+    processorsToRun.foreach(_.run(
+      layout = layout,
+      saxon = saxon,
+      inputFileName = inputFileName.get,
+      xslParameters = xslParameters,
+      substitutions = substitutions,
+      project = getProject,
+      logger = logger
+    ))
   }
 }

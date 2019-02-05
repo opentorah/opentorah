@@ -6,6 +6,8 @@ import org.gradle.api.tasks.SourceSet
 import java.io.File
 
 final class Layout(project: Project) {
+  val docBookXslConfigurationName: String = "docBookXsl"
+
   val mainSourceSet: Option[SourceSet] =
     Option(project.getConvention.findPlugin(classOf[JavaPluginConvention]))
       .map(_.getSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME))

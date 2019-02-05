@@ -9,6 +9,7 @@ final class DocBookPlugin extends Plugin[Project] {
 
   def apply(project: Project): Unit = {
     val layout: Layout = new Layout(project)
+
     val docBookXslVersion: String = "1.79.1"
 
     // Write default XSLT customizations, CSS stylesheet and FOP configuration.
@@ -18,10 +19,10 @@ final class DocBookPlugin extends Plugin[Project] {
     val extension: DocBookExtension = project.getExtensions.create("docBook", classOf[DocBookExtension], project)
     extension.documentName.set("index")
     extension.dataGeneratorClass.set("")
-    extension.outputFormats.set(DocBook2.processors.map(_.finalOutputFormat).asJava)
+    extension.outputFormats.set(DocBook2.availableFormats.asJava)
 
     // Configuration that resolves DocBook XSL stylesheets.
-    project.getConfigurations.create("docBookXsl").defaultDependencies(
+    project.getConfigurations.create(layout.docBookXslConfigurationName).defaultDependencies(
       _.add(project.getDependencies.create(s"net.sf.docbook:docbook-xsl:$docBookXslVersion:resources@zip")) : Unit
     ).setVisible(false)
 
@@ -33,7 +34,7 @@ final class DocBookPlugin extends Plugin[Project] {
 
     // Process DocBook.
     val docBookTask: DocBookTask = project.getTasks.create("processDocBook", classOf[DocBookTask])
-    docBookTask.setDescription("Process DocBook into HTML, PDF and EPUB")
+    docBookTask.setDescription(s"Process DocBook into ${DocBook2.availableFormatNames}")
     docBookTask.setGroup("publishing")
     docBookTask.inputFileName.set(extension.documentName)
     docBookTask.xslParameters.set(extension.xslParameters)
