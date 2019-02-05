@@ -2,7 +2,6 @@
 <section
   xmlns="http://docbook.org/ns/docbook" version="5.0"
   xmlns:xi="http://www.w3.org/2001/XInclude"
-  xml:base="http://podval.org/docbook/data/"
 >
     <title>Lunar Theory</title>
 
@@ -35,7 +34,7 @@
 
                 <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
 
-                <xi:include href="data:mlm-original.xml"/>
+                <xi:include href="urn:docbook:data:/mlm-original.xml"/>
 
                 <para>
                     And in this way you can calculate it for any number of days and years that you want.
@@ -53,7 +52,7 @@
                         the result is smaller than that of Rambam.
                         The following table compares printed and calculated values:</para>
 
-                    <xi:include href="mlm-calculated.xml"/>
+                    <xi:include href="urn:docbook:data:/mlm-calculated.xml"/>
 
                     <para>
                         Moreover, the value of the movement of the mean lunar longitude in one day given by
@@ -95,7 +94,7 @@
                     For longer periods, (remainder) of the movement in mean lunar anomaly is:
                 </para>
 
-                <xi:include href="mam-original.xml"/>
+                <xi:include href="urn:docbook:data:/mam-original.xml"/>
 
                 <section>
                     <title>Discussion</title>
@@ -111,7 +110,7 @@
                         The following table compares printed and calculated values:
                     </para>
                 
-                    <xi:include href="mam-calculated.xml"/>
+                    <xi:include href="urn:docbook:data:/mam-calculated.xml"/>
 
                     <para>
                         Although the value of the movement of the mean lunar anomaly in one day given by
