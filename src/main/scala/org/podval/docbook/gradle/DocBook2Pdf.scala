@@ -18,14 +18,18 @@ object DocBook2Pdf extends DocBook2 {
     layout: Layout,
     inputFileName: String,
     substitutions: Map[String, String],
-    project: Project
+    project: Project,
+    logger: Logger
   ): Unit = {
+    val inputFile: File = intermediateOutputFile(layout, inputFileName)
     val outputFile: File = finalOutputFile(layout, inputFileName)
+
+    logger.info(s"Transforming $inputFile to $outputFile")
     val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(outputFile))
 
     val fopConfParser: FopConfParser = new FopConfParser(
       layout.fopConfigurationFile,
-      layout.imagesDirectory.getParentFile.toURI
+      intermediateOutputDirectory(layout).toURI
     )
 
     val fopFactory: FopFactory = fopConfParser.getFopFactoryBuilder.build
@@ -35,7 +39,7 @@ object DocBook2Pdf extends DocBook2 {
       val transformer: Transformer = TransformerFactory.newInstance().newTransformer()
 
       transformer.transform(
-        new StreamSource(intermediateOutputFile(layout, inputFileName)),
+        new StreamSource(inputFile),
         new SAXResult(fop.getDefaultHandler)
       )
     } finally {

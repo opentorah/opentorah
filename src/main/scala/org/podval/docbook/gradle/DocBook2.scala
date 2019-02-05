@@ -5,6 +5,7 @@ import org.gradle.api.file.CopySpec
 import java.io.File
 import javax.xml.transform.stream.{StreamResult, StreamSource}
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.gradle.api.artifacts.Configuration
 import org.xml.sax.InputSource
 import scala.collection.JavaConverters._
 
@@ -16,8 +17,10 @@ abstract class DocBook2 {
     saxon: Saxon,
     xslParameters: Map[String, String],
     substitutions: Map[String, String],
-    project: Project
+    project: Project,
+    logger: Logger
   ): Unit = {
+    logger.info(s"\nProcessing DocBook to $finalOutputFormat")
     val saxonOutputDirectory: File = intermediateOutputDirectory(layout)
     saxonOutputDirectory.mkdirs
 
@@ -34,14 +37,25 @@ abstract class DocBook2 {
       xslParameters = xslParameters ++ (allAdditionalParameters -- xslParameters.keySet)
     )
 
+    logger.info(s"Copying images")
+    project.copy(new Action[CopySpec] {
+      override def execute(copySpec: CopySpec): Unit = {
+        copySpec
+          .into(saxonOutputDirectory)
+          .from(layout.imagesDirectory.getParentFile)
+          .include(layout.imagesDirectoryName + "/**")
+      }
+    })
+
     val outputDirectory: File = finalOutputDirectory(layout)
     outputDirectory.mkdirs
 
     postProcess(
-      layout,
-      inputFileName,
-      substitutions,
-      project
+      layout = layout,
+      inputFileName = inputFileName,
+      substitutions = substitutions ++ xslParameters,
+      project = project,
+      logger = logger
     )
   }
 
@@ -77,34 +91,33 @@ abstract class DocBook2 {
   protected final def additionalParametersHtml(layout: Layout, inputFileName: String): Map[String, String] = Map(
     "base.dir" -> intermediateOutputDirectory(layout).getAbsolutePath,
     "root.filename" -> Util.fileNameWithoutExtension(intermediateOutputFile(layout, inputFileName)),
-    "html.stylesheet" -> (layout.cssDirectoryName + "/docBook.css")
+    "html.stylesheet" -> (layout.cssDirectoryName + "/" + layout.cssFileName)
   )
 
   protected def postProcess(
     layout: Layout,
     inputFileName: String,
     substitutions: Map[String, String],
-    project: Project
+    project: Project,
+    logger: Logger
   ): Unit = {
   }
 
-  protected final def copyImagesAndCss(
+  protected final def copyCss(
     layout: Layout,
     directory: File,
     substitutions: Map[String, String],
-    project: Project
+    project: Project,
+    logger: Logger
   ): Unit = {
+    logger.info(s"Copying CSS")
     project.copy(new Action[CopySpec] {
       override def execute(copySpec: CopySpec): Unit = {
         copySpec
           .into(directory)
-          .`with`(project.copySpec
-            .from(layout.sourceRootDirectory)
-            .include(layout.imagesDirectoryName + "/**"))
-          .`with`(project.copySpec
-            .from(layout.sourceRootDirectory)
-            .include(layout.cssDirectoryName + "/**")
-            .filter(Map("tokens" -> substitutions.asJava).asJava, classOf[ReplaceTokens]))
+          .from(layout.cssDirectory.getParentFile)
+          .include(layout.cssDirectoryName + "/**")
+          .filter(Map("tokens" -> substitutions.asJava).asJava, classOf[ReplaceTokens])
       }
     })
   }
@@ -114,14 +127,11 @@ object DocBook2 {
 
   val processors: List[DocBook2] = List(DocBook2Html, DocBook2Epub, DocBook2Pdf)
 
-  val outputFormats: List[String] = processors.map(_.finalOutputFormat)
-
   def process(
     outputFormats: List[String],
     layout: Layout,
     inputFileName: String,
     xslParameters: Map[String, String],
-    entities: Map[String, String],
     substitutions: Map[String, String],
     project: Project,
     logger: Logger
@@ -129,7 +139,9 @@ object DocBook2 {
     val processorsToRun: List[DocBook2] = outputFormats.map { outputFormat =>
       val processor: Option[DocBook2] = processors.find(_.finalOutputFormat == outputFormat)
       if (processor.isEmpty) {
-        val message: String = s"Unsupported oitput format $outputFormat; supported formats are: ${processors.map(_.finalOutputFormat)}"
+        val message: String =
+          s"""Unsupported output format $outputFormat;
+             |  supported formats are: ${processors.map(_.finalOutputFormat)}""".stripMargin
         logger.error(message)
         throw new IllegalArgumentException(message)
       } else {
@@ -137,8 +149,23 @@ object DocBook2 {
       }
     }
 
+    logger.info(s"Output formats selected: ${processorsToRun.map(_.finalOutputFormat)}")
+
+    val docBookXslConfiguration: Configuration = project.getConfigurations.findByName("docBookXsl")
+
+    // Unpack DocBook XSLT stylesheets
+    if (!layout.docBookXslDirectory.exists) {
+      logger.info(s"Preparing DocBook XSLT stylesheets")
+      project.copy(new Action[CopySpec] {
+        override def execute(copySpec: CopySpec): Unit = {
+          copySpec
+            .into(layout.explodeDocBookXslInto)
+            .from(project.zipTree(docBookXslConfiguration.getSingleFile))
+        }
+      })
+    }
+
     val saxon: Saxon = new Saxon(
-      entities = entities,
       substitutions = substitutions,
       xslDirectory = layout.docBookXslDirectory,
       dataDirectory = layout.dataDirectory,
@@ -150,8 +177,9 @@ object DocBook2 {
       inputFileName = inputFileName,
       saxon = saxon,
       xslParameters = xslParameters,
-      substitutions = entities ++ substitutions,
-      project = project
+      substitutions = substitutions,
+      project = project,
+      logger = logger
     ))
   }
 }

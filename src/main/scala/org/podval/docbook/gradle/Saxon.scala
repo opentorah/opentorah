@@ -12,7 +12,6 @@ import org.apache.xerces.jaxp.SAXParserFactoryImpl
 import org.xml.sax.{InputSource, XMLReader}
 
 class Saxon(
-  entities: Map[String, String],
   substitutions: Map[String, String],
   xslDirectory: File,
   dataDirectory: File,
@@ -20,37 +19,32 @@ class Saxon(
 ) {
   logger.info(
     s"""Created new Saxon(
-       |  entities = $entities,
        |  substitutions = $substitutions,
        |  xslDirectory = "$xslDirectory",
        |  dataDirectory = "$dataDirectory"
        |)""".stripMargin
   )
 
-  logger.info("Configuring DocBookEntityResolver")
   val entityResolver: DocBookEntityResolver = new DocBookEntityResolver(
-    entities = entities,
+    entities = substitutions,
     dataDirectory = dataDirectory,
     logger = logger
   )
 
-  logger.info("Configuring XMLReader")
   val saxParserFactory: SAXParserFactory = new SAXParserFactoryImpl
   saxParserFactory.setXIncludeAware(true)
 
   val xmlReader: XMLReader = new ProcessingInstructionsFilter(
     parent = saxParserFactory.newSAXParser.getXMLReader,
-    substitutions = entities ++ substitutions,
+    substitutions = substitutions,
     logger = logger
   )
   xmlReader.setEntityResolver(entityResolver)
 
-  logger.info("Configuring DocBookUriResolver")
   val uriResolver: DocBookUriResolver = new DocBookUriResolver(xslDirectory, logger)
 
   def resolve(uri: String): Source = uriResolver.resolve(new URI(uri))
 
-  logger.info("Configuring TransformerFactory")
   val transformerFactory: TransformerFactory = new TransformerFactoryImpl
   // To intercept all network requests, URIResolver has to be set on the transformerFactory,
   // not the transformer itself: I guess some sub-transformers get created internally ;)

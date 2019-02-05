@@ -15,9 +15,6 @@ class DocBookExtension(project: Project) {
   @BeanProperty val xslParameters: MapProperty[String, String] =
     project.getObjects.mapProperty(classOf[String], classOf[String])
 
-  @BeanProperty val entities: MapProperty[String, String] =
-    project.getObjects.mapProperty(classOf[String], classOf[String])
-
   @BeanProperty val substitutions: MapProperty[String, String] =
     project.getObjects.mapProperty(classOf[String], classOf[String])
 

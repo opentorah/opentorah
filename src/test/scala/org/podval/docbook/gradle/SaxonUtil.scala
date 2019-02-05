@@ -9,7 +9,6 @@ object SaxonUtil {
   def toHtml(resourceName: String, substitutions: Map[String, String]): String = {
     val saxon: Saxon = new Saxon(
       xslDirectory = new File("build/docBookXsl/docbook").getAbsoluteFile,
-      entities = Map.empty,
       substitutions = substitutions,
       dataDirectory = new File("/tmp/data"),
       logger = new Logger.TestLogger

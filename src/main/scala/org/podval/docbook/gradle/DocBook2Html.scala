@@ -16,13 +16,15 @@ object DocBook2Html extends DocBook2 {
     layout: Layout,
     inputFileName: String,
     substitutions: Map[String, String],
-    project: Project
+    project: Project,
+    logger: Logger
   ): Unit = {
-    copyImagesAndCss(
+    copyCss(
       layout,
       finalOutputDirectory(layout),
       substitutions,
-      project
+      project,
+      logger
     )
   }
 }

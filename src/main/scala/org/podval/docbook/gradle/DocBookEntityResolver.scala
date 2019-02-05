@@ -58,9 +58,9 @@ final class DocBookEntityResolver(
 object DocBookEntityResolver {
   val docBookPublicId: String = "-//OASIS//DTD DocBook XML V5.0//EN"
 
-  // If used in DocBook files, this prefix points to the data directory.
+  // If used in DocBook files, those point to the data directory.
   val data: Seq[String] = Seq(
     "http://podval.org/docbook/data/",
-    "data:"
+    "urn:docbook:data:/"
   )
 }

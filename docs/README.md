@@ -12,7 +12,6 @@ This is my attempt at one, inspired by the ideas pioneered by the Maven plugin.
 Thank you, [@mimil](https://github.com/mimil)!
 
 
-
 ## Theory of Operation ##
 
 The plugin uses Saxon with DocBook XSLT stylesheets to transform DocBook documents into
@@ -43,7 +42,10 @@ repositories {
 apply plugin: 'org.podval.docbook-gradle-plugin'
 ```
 
-If a project doesn't contain any code, and doesn't apply any core Gradle plugins,
+For projects with code that is used to generate data for inclusion in the DocBook files,
+DocBook plugin needs to be applied *after* the Java plugin.
+
+If project does not contain any code nor applies any core Gradle plugins,
 to get basic tasks like "clean" and "build":
 
 ```groovy
@@ -65,13 +67,6 @@ Overview of the directory layout used by the plugin:
        fo.xsl
        html.xsl
 
-   build/
-     css/
-     data/
-     docBookXsl/docbook/
-     epub/
-     fo/
-
    build/docBook/
      epub/<documentName>.epub
      html/
@@ -79,6 +74,13 @@ Overview of the directory layout used by the plugin:
        images/
        index.html
      pdf/<documentName>.pdf
+
+   build/docBookXsl/docbook/
+
+   build/docBookTmp/
+     data/
+     epub/
+     fo/
 ```
 
 ### Sources ###

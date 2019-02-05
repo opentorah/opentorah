@@ -17,18 +17,19 @@ object DocBook2Epub extends DocBook2 {
     layout: Layout,
     inputFileName: String,
     substitutions: Map[String, String],
-    project: Project
+    project: Project,
+    logger: Logger
   ): Unit = {
     val expandedEpubDirectory: File = intermediateOutputDirectory(layout)
 
-    copyImagesAndCss(
+    copyCss(
       layout,
       expandedEpubDirectory,
       substitutions,
-      project
+      project,
+      logger
     )
 
-    // TODO do not include empty .epub in the result!
     val zip = new Zip
     zip.setProject(new org.apache.tools.ant.Project)
     zip.setPreserve0Permissions(true)

@@ -29,9 +29,6 @@ class DocBookTask extends DefaultTask {
   @Input @BeanProperty val xslParameters: MapProperty[String, String] =
     getProject.getObjects.mapProperty(classOf[String], classOf[String])
 
-  @Input @BeanProperty val entities: MapProperty[String, String] =
-    getProject.getObjects.mapProperty(classOf[String], classOf[String])
-
   @Input @BeanProperty val substitutions: MapProperty[String, String] =
     getProject.getObjects.mapProperty(classOf[String], classOf[String])
 
@@ -45,7 +42,6 @@ class DocBookTask extends DefaultTask {
       layout = layout,
       inputFileName = inputFileName.get,
       xslParameters = xslParameters.get.asScala.toMap,
-      entities = entities.get.asScala.toMap,
       substitutions = substitutions.get.asScala.toMap,
       project = getProject,
       logger = new Logger.PluginLogger(getLogger)
