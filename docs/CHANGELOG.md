@@ -6,10 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [] - 02/05/2019
+## [0.2.0] - 02/05/2019
 - configurable output formats
 - better substitutions
 - cleanup
+- README.md
 
 ## [] - 01/25/2019-01/31/2019
 - integration with Gradle Task Input/Output

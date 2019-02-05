@@ -9,18 +9,19 @@ object SaxonUtil {
   def toHtml(resourceName: String, substitutions: Map[String, String]): String = {
     val saxon: Saxon = new Saxon(
       xslDirectory = new File("build/docBookXsl/docbook").getAbsoluteFile,
-      substitutions = substitutions,
       dataDirectory = new File("/tmp/data"),
       logger = new Logger.TestLogger
     )
 
-    val output = new ByteArrayOutputStream
+    val output: ByteArrayOutputStream = new ByteArrayOutputStream
 
     saxon.run(
       inputSource = getResourceAsInputSource(resourceName),
       stylesheetSource = saxon.resolve("http://docbook.sourceforge.net/release/xsl-ns/current/html/docbook.xsl"),
       outputTarget = new StreamResult(output),
-      xslParameters = Map()
+      xslParameters = Map(),
+      entitySubstitutions = substitutions,
+      processingInstructionsSubstitutions = substitutions
     )
 
     output.toString

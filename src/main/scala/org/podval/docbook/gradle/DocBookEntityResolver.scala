@@ -61,6 +61,7 @@ object DocBookEntityResolver {
   // If used in DocBook files, those point to the data directory.
   val data: Seq[String] = Seq(
     "http://podval.org/docbook/data/",
-    "urn:docbook:data:/"
+    "urn:docbook:data:/",
+    "data:"
   )
 }

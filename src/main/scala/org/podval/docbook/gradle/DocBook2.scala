@@ -23,6 +23,7 @@ abstract class DocBook2 {
   ): Unit = {
     logger.info(s"\nProcessing DocBook to $name")
 
+    // Saxon output directory and file.
     val saxonOutputDirectory: File = new File(
       if (saxon2intermediate) layout.intermediateOutputDirectoryRoot else layout.finalOutputDirectoryRoot,
       saxonOutputFormat
@@ -31,6 +32,7 @@ abstract class DocBook2 {
 
     val saxonOutputFile: File = outputFileFor(saxonOutputDirectory, saxonOutputFormat, inputFileName)
 
+    // Image and HTML-related XSL parameters.
     val additionalParameters: Map[String, String] =
       Map("img.src.path" -> (layout.imagesDirectoryName + "/")) ++
         (if (!usesHtml) Map.empty else Map(
@@ -42,13 +44,20 @@ abstract class DocBook2 {
     val xslParametersEffective: Map[String, String] =
       xslParameters ++ (additionalParameters -- xslParameters.keySet)
 
+    // In processing instructions and CSS, substitute xslParameters also - because why not?
+    val allSubstitutions: Map[String, String] = substitutions ++ xslParametersEffective
+
+    // Saxon
     saxon.run(
       inputSource = new InputSource(layout.inputFile(inputFileName).toURI.toASCIIString),
       stylesheetSource = new StreamSource(layout.stylesheetFile(saxonOutputFormat)),
       outputTarget = new StreamResult(saxonOutputFile),
-      xslParameters = xslParametersEffective
+      xslParameters = xslParametersEffective,
+      entitySubstitutions = substitutions,
+      processingInstructionsSubstitutions = allSubstitutions
     )
 
+    // Images.
     logger.info(s"Copying images")
     project.copy(new Action[CopySpec] {
       override def execute(copySpec: CopySpec): Unit = {
@@ -59,8 +68,8 @@ abstract class DocBook2 {
       }
     })
 
+    // CSS.
     if (usesHtml) {
-      val substitutionsEffective: Map[String, String] = substitutions ++ xslParametersEffective
       logger.info(s"Copying CSS")
       project.copy(new Action[CopySpec] {
         override def execute(copySpec: CopySpec): Unit = {
@@ -68,11 +77,12 @@ abstract class DocBook2 {
             .into(saxonOutputDirectory)
             .from(layout.cssDirectory.getParentFile)
             .include(layout.cssDirectoryName + "/**")
-            .filter(Map("tokens" -> substitutionsEffective.asJava).asJava, classOf[ReplaceTokens])
+            .filter(Map("tokens" -> allSubstitutions.asJava).asJava, classOf[ReplaceTokens])
         }
       })
     }
 
+    // Post-processing.
     if (saxon2intermediate) {
       logger.info(s"Post-processing $name")
       val outputDirectory: File = new File(layout.finalOutputDirectoryRoot, finalOutputFormat)

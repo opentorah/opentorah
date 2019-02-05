@@ -54,11 +54,7 @@ class DocBookTask extends DefaultTask {
       })
     }
 
-    val substitutions: Map[String, String] = this.substitutions.get.asScala.toMap
-    val xslParameters: Map[String, String] = this.xslParameters.get.asScala.toMap
-
     val saxon: Saxon = new Saxon(
-      substitutions = substitutions,
       xslDirectory = layout.docBookXslDirectory,
       dataDirectory = layout.dataDirectory,
       logger: Logger
@@ -72,8 +68,8 @@ class DocBookTask extends DefaultTask {
       layout = layout,
       saxon = saxon,
       inputFileName = inputFileName.get,
-      xslParameters = xslParameters,
-      substitutions = substitutions,
+      xslParameters = xslParameters.get.asScala.toMap,
+      substitutions = substitutions.get.asScala.toMap,
       project = getProject,
       logger = logger
     ))

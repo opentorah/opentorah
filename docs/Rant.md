@@ -8,7 +8,7 @@ One way to do that is to write in [DocBook](https://docbook.org/)
 and use DocBook XSLT [stylesheets](https://github.com/docbook/xslt10-stylesheets)
 executed by [Saxon](http://www.saxonica.com/products/products.xml) to process DocBook
 into HTML, XSL-FO and EPUB, and [FOP](https://xmlgraphics.apache.org/fop/) to
-futher process XSL-FO to PDF.
+further process XSL-FO to PDF.
 
 I'd like to be able to insert a formula into the remarks now and then.
 

@@ -9,7 +9,7 @@ repositories {
 }
 
 group = 'org.podval.docbook'
-version = '0.1.0'
+version = '0.2.0'
 
 description = 'Gradle DocBook plugin.'
 
@@ -23,16 +23,22 @@ configurations {
 }
 
 dependencies {
+  // Scala
   zinc 'com.typesafe.zinc:zinc:0.3.15'
   compile "org.scala-lang:scala-library:$scalaVersion"
+  testCompile "org.scalatest:scalatest_$scalaVersionMajor:3.0.5"
 
+  // Saxon
   compile 'saxon:saxon:6.5.3'
   runtime 'xerces:xercesImpl:2.11.0'
 
+  // FOP
   compile 'org.apache.xmlgraphics:fop:2.3'
 
-  testCompile "org.scalatest:scalatest_$scalaVersionMajor:3.0.5"
+  // JEuclid?
+  // compile 'net.sourceforge.jeuclid:jeuclid-fop:3.1.9'
 
+  // DocBook XSL for tests
   docBookXslConfiguration "net.sf.docbook:docbook-xsl:1.79.1:resources@zip"
 }
 
