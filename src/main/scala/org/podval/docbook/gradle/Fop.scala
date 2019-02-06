@@ -1,7 +1,7 @@
 package org.podval.docbook.gradle
 
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
-import javax.xml.transform.{Transformer, TransformerFactory}
+import javax.xml.transform.Transformer
 import javax.xml.transform.sax.SAXResult
 import javax.xml.transform.stream.StreamSource
 import org.apache.fop.apps.{FopConfParser, FopFactory}
@@ -35,7 +35,7 @@ object Fop {
     val fop: org.apache.fop.apps.Fop = fopFactory.newFop("application/pdf", outputStream)
 
     try {
-      val transformer: Transformer = TransformerFactory.newInstance().newTransformer()
+      val transformer: Transformer = Saxon.getTransformerFactory.newTransformer
 
       transformer.transform(
         new StreamSource(inputFile),

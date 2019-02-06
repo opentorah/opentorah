@@ -9,7 +9,6 @@ object SaxonUtil {
   def toHtml(resourceName: String, substitutions: Map[String, String]): String = {
     val saxon: Saxon = new Saxon(
       xslDirectory = new File("build/docBookXsl/docbook").getAbsoluteFile,
-      dataDirectory = new File("/tmp/data"),
       logger = new Logger.TestLogger
     )
 
@@ -21,7 +20,8 @@ object SaxonUtil {
       outputTarget = new StreamResult(output),
       xslParameters = Map(),
       entitySubstitutions = substitutions,
-      processingInstructionsSubstitutions = substitutions
+      processingInstructionsSubstitutions = substitutions,
+      dataDirectory = new File("/tmp/data"),
     )
 
     output.toString

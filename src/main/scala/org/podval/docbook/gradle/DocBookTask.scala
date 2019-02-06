@@ -56,7 +56,6 @@ class DocBookTask extends DefaultTask {
 
     val saxon: Saxon = new Saxon(
       xslDirectory = layout.docBookXslDirectory,
-      dataDirectory = layout.dataDirectory,
       logger: Logger
     )
 

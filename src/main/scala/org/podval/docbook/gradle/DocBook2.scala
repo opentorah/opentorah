@@ -25,12 +25,18 @@ abstract class DocBook2 {
 
     // Saxon output directory and file.
     val saxonOutputDirectory: File = new File(
-      if (saxon2intermediate) layout.intermediateOutputDirectoryRoot else layout.finalOutputDirectoryRoot,
-      saxonOutputFormat
+      if (usesIntermediate) layout.intermediateOutputDirectoryRoot else layout.finalOutputDirectoryRoot,
+      if (usesIntermediate) intermediateDirectoryName else outputDirectoryName
     )
-    saxonOutputDirectory.mkdirs
 
-    val saxonOutputFile: File = outputFileFor(saxonOutputDirectory, saxonOutputFormat, inputFileName)
+    val outputFileName: String = outputFileNameOverride.getOrElse(inputFileName)
+    def outputFile(directory: File, extension: String): File = new File(directory, outputFileName + "." + extension)
+
+    val saxonOutputFile: File = outputFile(saxonOutputDirectory,
+      if (usesIntermediate) intermediateFileExtension else outputFileExtension
+    )
+
+    saxonOutputDirectory.mkdirs
 
     // Image and HTML-related XSL parameters.
     val additionalParameters: Map[String, String] =
@@ -50,19 +56,23 @@ abstract class DocBook2 {
     // Saxon
     saxon.run(
       inputSource = new InputSource(layout.inputFile(inputFileName).toURI.toASCIIString),
-      stylesheetSource = new StreamSource(layout.stylesheetFile(saxonOutputFormat)),
+      stylesheetSource = new StreamSource(layout.stylesheetFile(stylesheetName)),
       outputTarget = new StreamResult(saxonOutputFile),
       xslParameters = xslParametersEffective,
       entitySubstitutions = substitutions,
-      processingInstructionsSubstitutions = allSubstitutions
+      processingInstructionsSubstitutions = allSubstitutions,
+      dataDirectory = layout.dataDirectory,
     )
+
+    val copyDestinationDirectory: File =
+      copyDestinationDirectoryName.fold(saxonOutputDirectory)(new File(saxonOutputDirectory, _))
 
     // Images.
     logger.info(s"Copying images")
     project.copy(new Action[CopySpec] {
       override def execute(copySpec: CopySpec): Unit = {
         copySpec
-          .into(saxonOutputDirectory)
+          .into(copyDestinationDirectory)
           .from(layout.imagesDirectory.getParentFile)
           .include(layout.imagesDirectoryName + "/**")
       }
@@ -74,7 +84,7 @@ abstract class DocBook2 {
       project.copy(new Action[CopySpec] {
         override def execute(copySpec: CopySpec): Unit = {
           copySpec
-            .into(saxonOutputDirectory)
+            .into(copyDestinationDirectory)
             .from(layout.cssDirectory.getParentFile)
             .include(layout.cssDirectoryName + "/**")
             .filter(Map("tokens" -> allSubstitutions.asJava).asJava, classOf[ReplaceTokens])
@@ -83,40 +93,41 @@ abstract class DocBook2 {
     }
 
     // Post-processing.
-    if (saxon2intermediate) {
+    if (usesIntermediate) {
       logger.info(s"Post-processing $name")
-      val outputDirectory: File = new File(layout.finalOutputDirectoryRoot, finalOutputFormat)
+      val outputDirectory: File = new File(layout.finalOutputDirectoryRoot, outputDirectoryName)
       outputDirectory.mkdirs
 
       postProcess(
         layout = layout,
-        saxonOutputDirectory = saxonOutputDirectory,
-        saxonOutputFile = saxonOutputFile,
-        outputFile = outputFileFor(outputDirectory, finalOutputFormat, inputFileName),
+        inputDirectory = saxonOutputDirectory,
+        inputFile = saxonOutputFile,
+        outputFile = outputFile(outputDirectory, outputFileExtension),
         logger = logger
       )
     }
   }
 
-  private def outputFileFor(outputDirectory: File, outputFormat: String, inputFileName: String): File = {
-    val outputFileName: String = outputFileNameOverride.getOrElse(inputFileName)
-    new File(outputDirectory, outputFileName + "." + outputFormat)
-  }
-
   def usesHtml: Boolean
 
-  def saxon2intermediate: Boolean
+  def usesIntermediate: Boolean
 
-  def finalOutputFormat: String
+  def stylesheetName: String
 
-  def saxonOutputFormat: String = finalOutputFormat
+  def outputDirectoryName: String
+  def outputFileExtension: String
 
-  protected def outputFileNameOverride: Option[String] = None
+  def intermediateDirectoryName: String = outputDirectoryName
+  def intermediateFileExtension: String = outputFileExtension
+
+  def outputFileNameOverride: Option[String] = None
+
+  def copyDestinationDirectoryName: Option[String] = None
 
   protected def postProcess(
     layout: Layout,
-    saxonOutputDirectory: File,
-    saxonOutputFile: File,
+    inputDirectory: File,
+    inputFile: File,
     outputFile: File,
     logger: Logger
   ): Unit = {
@@ -127,50 +138,75 @@ object DocBook2 {
 
   object Html extends DocBook2 {
     override def usesHtml: Boolean = true
-    override def saxon2intermediate: Boolean = false
-    override def finalOutputFormat: String = "html"
-    override protected def outputFileNameOverride: Option[String] = Some("index")
+    override def usesIntermediate: Boolean = false
+    override def stylesheetName: String = "html"
+    override def outputDirectoryName: String = "html"
+    override def outputFileExtension: String = "html"
+    override def outputFileNameOverride: Option[String] = Some("index")
   }
 
   object Pdf extends DocBook2 {
     override def usesHtml: Boolean = false
-    override def saxon2intermediate: Boolean = true
-    override def saxonOutputFormat: String = "fo"
-    override def finalOutputFormat: String = "pdf"
+    override def usesIntermediate: Boolean = true
+
+    override def stylesheetName: String = "fo"
+    override def intermediateDirectoryName: String = "fo"
+    override def intermediateFileExtension: String = "fo"
+    override def outputDirectoryName: String = "pdf"
+    override def outputFileExtension: String = "pdf"
 
     override protected def postProcess(
       layout: Layout,
-      saxonOutputDirectory: File,
-      saxonOutputFile: File,
+      inputDirectory: File,
+      inputFile: File,
       outputFile: File,
       logger: Logger
     ): Unit = Fop.run(
       configurationFile = layout.fopConfigurationFile,
-      inputFile = saxonOutputFile,
-      baseDirectory = saxonOutputDirectory,
+      inputFile = inputFile,
+      baseDirectory = inputDirectory,
       outputFile = outputFile,
       logger = logger
     )
   }
 
-  object Epub2 extends DocBook2 {
-    override def usesHtml: Boolean = true
-    override def saxon2intermediate: Boolean = true
-    override def finalOutputFormat: String = "epub"
+  trait Epub extends DocBook2 {
+    final override def usesHtml: Boolean = true
+    final override def usesIntermediate: Boolean = true
+    final override def outputFileExtension: String = "epub"
+    final override def copyDestinationDirectoryName: Option[String] = Some("OEBPS")
 
-    override protected def postProcess(
+    final override protected def postProcess(
       layout: Layout,
-      saxonOutputDirectory: File,
-      saxonOutputFile: File,
+      inputDirectory: File,
+      inputFile: File,
       outputFile: File,
       logger: Logger
-    ): Unit = Epub.pack(
-      inputDirectory = saxonOutputDirectory,
-      outputFile = outputFile
-    )
+    ): Unit = {
+      val zip = new org.apache.tools.ant.taskdefs.Zip
+      zip.setProject(new org.apache.tools.ant.Project)
+      zip.setPreserve0Permissions(true)
+      zip.setCompress(false)
+      zip.setDestFile(outputFile)
+      val fileSet = new org.apache.tools.ant.types.FileSet()
+      fileSet.setDir(inputDirectory)
+      fileSet.appendIncludes(Array("mimetype", "META-INF/**", "OEBPS/**"))
+      zip.addFileset(fileSet)
+      zip.execute()
+    }
   }
 
-  private val all: List[DocBook2] = List(Html, Epub2, Pdf)
+  object Epub2 extends Epub {
+    override def outputDirectoryName: String = "epub"
+    override def stylesheetName: String = "epub"
+  }
+
+  object Epub3 extends Epub {
+    override def outputDirectoryName: String = "epub3"
+    override def stylesheetName: String = "epub3"
+  }
+
+  private val all: List[DocBook2] = List(Html, Epub2, Epub3, Pdf)
 
   def forName(name: String): DocBook2 = all.find(_.name.toUpperCase == name.toUpperCase).getOrElse {
     throw new IllegalArgumentException(
