@@ -151,6 +151,7 @@ pluginBundle {
       // id and displayName are mandatory.
       // id is captured from java-gradle-plugin configuration.
       displayName = project.description
+      description = project.description
       tags        = pluginTags
       // if no version is set, the project version will be used.
       version     = project.version

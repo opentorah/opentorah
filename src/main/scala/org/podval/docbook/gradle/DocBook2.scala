@@ -84,7 +84,7 @@ abstract class DocBook2 {
     })
 
     // CSS.
-    if (usesHtml) {
+    if (usesCss) {
       logger.info(s"Copying CSS")
       project.copy(new Action[CopySpec] {
         override def execute(copySpec: CopySpec): Unit = {

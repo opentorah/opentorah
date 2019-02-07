@@ -43,6 +43,14 @@ to files in that directory.
 To apply the plugin to a Gradle project:
 
 ```groovy
+plugins {
+  id "org.podval.docbook-gradle-plugin" version "0.2.1"
+}
+```
+
+Or:
+
+```groovy
 buildscript {
   // for the plugin
   repositories {
