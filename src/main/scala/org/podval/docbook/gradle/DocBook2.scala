@@ -25,7 +25,7 @@ abstract class DocBook2 {
 
     // Saxon output directory and file.
     val saxonOutputDirectory: File = new File(
-      if (usesIntermediate) layout.intermediateOutputDirectoryRoot else layout.finalOutputDirectoryRoot,
+      if (usesIntermediate) layout.saxonOutputDirectoryRoot else layout.outputDirectoryRoot,
       if (usesIntermediate) intermediateDirectoryName else outputDirectoryName
     )
 
@@ -100,7 +100,7 @@ abstract class DocBook2 {
     // Post-processing.
     if (usesIntermediate) {
       logger.info(s"Post-processing $name")
-      val outputDirectory: File = new File(layout.finalOutputDirectoryRoot, outputDirectoryName)
+      val outputDirectory: File = new File(layout.outputDirectoryRoot, outputDirectoryName)
       outputDirectory.mkdirs
 
       postProcess(

@@ -2,7 +2,7 @@ package org.podval.docbook.gradle
 
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.{Action, DefaultTask}
-import org.gradle.api.file.CopySpec
+import org.gradle.api.file.{CopySpec, FileCopyDetails, RelativePath}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, InputDirectory, OutputDirectory, TaskAction}
 import java.io.File
@@ -20,8 +20,8 @@ class DocBookTask extends DefaultTask {
   @InputDirectory @BeanProperty val imagesDirectory: File = layout.imagesDirectory
   @InputDirectory @BeanProperty val cssDirectory: File = layout.cssDirectory
   @InputDirectory @BeanProperty val fopConfigurationDirectory: File = layout.fopConfigurationDirectory
-  @OutputDirectory @BeanProperty val finalOutputDirectoryRoot: File = layout.finalOutputDirectoryRoot
-  @OutputDirectory @BeanProperty val intermediateOutputDirectoryRoot: File = layout.intermediateOutputDirectoryRoot
+  @OutputDirectory @BeanProperty val outputDirectoryRoot: File = layout.outputDirectoryRoot
+  @OutputDirectory @BeanProperty val saxonOutputDirectoryRoot: File = layout.saxonOutputDirectoryRoot
 
   @Input @BeanProperty val inputFileName: Property[String] =
     getProject.getObjects.property(classOf[String])
@@ -51,20 +51,31 @@ class DocBookTask extends DefaultTask {
       getProject.copy(new Action[CopySpec] {
         override def execute(copySpec: CopySpec): Unit = {
           copySpec
-            .into(layout.explodeDocBookXslInto)
+            .into(layout.docBookXslDirectory)
             .from(getProject.zipTree(docBookXslConfiguration.getSingleFile))
+            // following 7 lines of code deal with extracting just the "docbook" directory;
+            // this should become easier in Gradle 5.3, see:
+            // https://github.com/gradle/gradle/issues/1108
+            // https://github.com/gradle/gradle/pull/5405
+            .include("docbook/**")
+            .eachFile(new Action[FileCopyDetails] {
+              override def execute(file: FileCopyDetails): Unit = {
+                file.setRelativePath(new RelativePath(true, file.getRelativePath.getSegments.drop(1): _*))
+              }
+            })
+            .setIncludeEmptyDirs(false)
         }
       })
     }
 
     val processorsToRun: List[DocBook2] =
       Option(getProject.findProperty("docBook.outputFormats"))
-        .map(_.toString.split(",").map(_.trim).toList)
+        .map(_.toString.split(",").map(_.trim).toList.filter(_.nonEmpty))
         .getOrElse(outputFormats.get.asScala.toList)
         .map(DocBook2.forName)
 
-    val processorNames: String = processorsToRun.map(_.name).mkString(", ")
-    logger.info(s"Output formats selected: $processorNames")
+    val processorNames: String = processorsToRun.map(processor => "\"" + processor.name +"\"").mkString(", ")
+    logger.info(s"Output formats selected: [$processorNames]")
 
     processorsToRun.foreach(_.run(
       layout = layout,
