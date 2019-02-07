@@ -8,6 +8,6 @@ class ListFopFontsTask extends DefaultTask {
   @TaskAction
   def list(): Unit = {
     val configurationFile: File = new Layout(getProject).fopConfigurationFile
-    org.apache.fop.tools.fontlist.FontListMain.main(Array("-c", configurationFile.getAbsolutePath))
+    Fop.listFonts(configurationFile)
   }
 }

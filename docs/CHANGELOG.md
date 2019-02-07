@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 02.06.2019
+- EPUB3
+- EPUB font embedding
+
 ## [0.2.0] - 02/05/2019
 - configurable output formats
 - better substitutions

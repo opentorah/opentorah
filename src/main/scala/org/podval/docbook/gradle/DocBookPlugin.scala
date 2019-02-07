@@ -40,6 +40,7 @@ final class DocBookPlugin extends Plugin[Project] {
     docBookTask.xslParameters.set(extension.xslParameters)
     docBookTask.substitutions.set(extension.substitutions)
     docBookTask.outputFormats.set(extension.outputFormats)
+    docBookTask.epubEmbeddedFonts.set(extension.epubEmbeddedFonts)
     docBookTask.getDependsOn.add(dataTask)
 
     // List fonts known to FOP.

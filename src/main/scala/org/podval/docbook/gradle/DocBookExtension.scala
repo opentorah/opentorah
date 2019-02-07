@@ -20,4 +20,7 @@ class DocBookExtension(project: Project) {
 
   @BeanProperty val outputFormats: ListProperty[String] =
     project.getObjects.listProperty(classOf[String])
+
+  @BeanProperty val epubEmbeddedFonts: ListProperty[String] =
+    project.getObjects.listProperty(classOf[String])
 }

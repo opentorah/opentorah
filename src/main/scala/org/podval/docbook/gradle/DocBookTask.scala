@@ -35,6 +35,9 @@ class DocBookTask extends DefaultTask {
   @Input @BeanProperty val outputFormats: ListProperty[String] =
     getProject.getObjects.listProperty(classOf[String])
 
+  @BeanProperty val epubEmbeddedFonts: ListProperty[String] =
+    getProject.getObjects.listProperty(classOf[String])
+
   @TaskAction
   def docBook(): Unit = {
     val logger: Logger = new Logger.PluginLogger(getLogger)
@@ -54,21 +57,21 @@ class DocBookTask extends DefaultTask {
       })
     }
 
-    val saxon: Saxon = new Saxon(
-      xslDirectory = layout.docBookXslDirectory,
-      logger: Logger
-    )
+    val processorsToRun: List[DocBook2] =
+      Option(getProject.findProperty("docBook.outputFormats"))
+        .map(_.toString.split(",").map(_.trim).toList)
+        .getOrElse(outputFormats.get.asScala.toList)
+        .map(DocBook2.forName)
 
-    val processorsToRun: List[DocBook2] = outputFormats.get.asScala.toList.map(DocBook2.forName)
     val processorNames: String = processorsToRun.map(_.name).mkString(", ")
     logger.info(s"Output formats selected: $processorNames")
 
     processorsToRun.foreach(_.run(
       layout = layout,
-      saxon = saxon,
       inputFileName = inputFileName.get,
       xslParameters = xslParameters.get.asScala.toMap,
       substitutions = substitutions.get.asScala.toMap,
+      epubEmbeddedFonts = epubEmbeddedFonts.get.asScala.toList,
       project = getProject,
       logger = logger
     ))

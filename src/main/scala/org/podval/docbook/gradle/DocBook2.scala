@@ -15,9 +15,9 @@ abstract class DocBook2 {
   final def run(
     layout: Layout,
     inputFileName: String,
-    saxon: Saxon,
     xslParameters: Map[String, String],
     substitutions: Map[String, String],
+    epubEmbeddedFonts: List[String],
     project: Project,
     logger: Logger
   ): Unit = {
@@ -40,7 +40,10 @@ abstract class DocBook2 {
 
     // Image and HTML-related XSL parameters.
     val additionalParameters: Map[String, String] =
-      Map("img.src.path" -> (layout.imagesDirectoryName + "/")) ++
+      Map(
+        "img.src.path" -> (layout.imagesDirectoryName + "/"),
+        "epub.embedded.fonts" -> Fop.getFontFiles(layout.fopConfigurationFile, epubEmbeddedFonts, logger)
+      ) ++
         (if (!usesHtml) Map.empty else Map(
           "base.dir" -> saxonOutputDirectory.getAbsolutePath,
           "root.filename" -> Util.fileNameWithoutExtension(saxonOutputFile),
@@ -54,14 +57,16 @@ abstract class DocBook2 {
     val allSubstitutions: Map[String, String] = substitutions ++ xslParametersEffective
 
     // Saxon
-    saxon.run(
+    Saxon.run(
       inputSource = new InputSource(layout.inputFile(inputFileName).toURI.toASCIIString),
       stylesheetSource = new StreamSource(layout.stylesheetFile(stylesheetName)),
       outputTarget = new StreamResult(saxonOutputFile),
       xslParameters = xslParametersEffective,
       entitySubstitutions = substitutions,
       processingInstructionsSubstitutions = allSubstitutions,
+      xslDirectory = layout.docBookXslDirectory,
       dataDirectory = layout.dataDirectory,
+      logger = logger
     )
 
     val copyDestinationDirectory: File =
@@ -110,6 +115,8 @@ abstract class DocBook2 {
 
   def usesHtml: Boolean
 
+  def usesCss: Boolean
+
   def usesIntermediate: Boolean
 
   def stylesheetName: String
@@ -138,6 +145,7 @@ object DocBook2 {
 
   object Html extends DocBook2 {
     override def usesHtml: Boolean = true
+    override def usesCss: Boolean = true
     override def usesIntermediate: Boolean = false
     override def stylesheetName: String = "html"
     override def outputDirectoryName: String = "html"
@@ -147,6 +155,7 @@ object DocBook2 {
 
   object Pdf extends DocBook2 {
     override def usesHtml: Boolean = false
+    override def usesCss: Boolean = false
     override def usesIntermediate: Boolean = true
 
     override def stylesheetName: String = "fo"
@@ -172,6 +181,7 @@ object DocBook2 {
 
   trait Epub extends DocBook2 {
     final override def usesHtml: Boolean = true
+    final override def usesCss: Boolean = false
     final override def usesIntermediate: Boolean = true
     final override def outputFileExtension: String = "epub"
     final override def copyDestinationDirectoryName: Option[String] = Some("OEBPS")
