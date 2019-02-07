@@ -38,34 +38,30 @@ class DocBookTask extends DefaultTask {
   @BeanProperty val epubEmbeddedFonts: ListProperty[String] =
     getProject.getObjects.listProperty(classOf[String])
 
+  // TODO this has to come from the extension
+  val useDocBookXslt20: Boolean = false
+
   @TaskAction
   def docBook(): Unit = {
     val logger: Logger = new Logger.PluginLogger(getLogger)
 
-    val docBookXslConfiguration: Configuration =
-      getProject.getConfigurations.findByName(layout.docBookXslConfigurationName)
-
     // Unpack DocBook XSLT stylesheets
-    if (!layout.docBookXslDirectory.exists) {
-      logger.info(s"Preparing DocBook XSLT stylesheets")
-      getProject.copy(new Action[CopySpec] {
-        override def execute(copySpec: CopySpec): Unit = {
-          copySpec
-            .into(layout.docBookXslDirectory)
-            .from(getProject.zipTree(docBookXslConfiguration.getSingleFile))
-            // following 7 lines of code deal with extracting just the "docbook" directory;
-            // this should become easier in Gradle 5.3, see:
-            // https://github.com/gradle/gradle/issues/1108
-            // https://github.com/gradle/gradle/pull/5405
-            .include("docbook/**")
-            .eachFile(new Action[FileCopyDetails] {
-              override def execute(file: FileCopyDetails): Unit = {
-                file.setRelativePath(new RelativePath(true, file.getRelativePath.getSegments.drop(1): _*))
-              }
-            })
-            .setIncludeEmptyDirs(false)
-        }
-      })
+    unpackDocBookXsl(
+      name = "XSLT",
+      configurationName = layout.docBookXslConfigurationName,
+      directory = layout.docBookXslDirectory(false),
+      archiveSubdirectoryName = "docbook",
+      logger = logger
+    )
+
+    if (useDocBookXslt20) {
+      unpackDocBookXsl(
+        name = "XSLT 2.0",
+        configurationName = layout.docBookXsl2ConfigurationName,
+        directory = layout.docBookXslDirectory(true),
+        archiveSubdirectoryName = "xslt",
+        logger = logger
+      )
     }
 
     val processorsToRun: List[DocBook2] =
@@ -83,8 +79,43 @@ class DocBookTask extends DefaultTask {
       xslParameters = xslParameters.get.asScala.toMap,
       substitutions = substitutions.get.asScala.toMap,
       epubEmbeddedFonts = epubEmbeddedFonts.get.asScala.toList,
+      useDocBookXslt20 = useDocBookXslt20,
       project = getProject,
       logger = logger
     ))
+  }
+
+
+  private def unpackDocBookXsl(
+    name: String,
+    configurationName: String,
+    directory: File,
+    archiveSubdirectoryName: String,
+    logger: Logger
+  ): Unit = {
+    if (!directory.exists) {
+      logger.info(s"Preparing DocBook $name stylesheets")
+
+      val configuration: Configuration = getProject.getConfigurations.findByName(configurationName)
+
+      getProject.copy(new Action[CopySpec] {
+        override def execute(copySpec: CopySpec): Unit = {
+          copySpec
+            .into(directory)
+            .from(getProject.zipTree(configuration.getSingleFile))
+            // following 7 lines of code deal with extracting just the "docbook" directory;
+            // this should become easier in Gradle 5.3, see:
+            // https://github.com/gradle/gradle/issues/1108
+            // https://github.com/gradle/gradle/pull/5405
+            .include(archiveSubdirectoryName +  "/**")
+            .eachFile(new Action[FileCopyDetails] {
+              override def execute(file: FileCopyDetails): Unit = {
+                file.setRelativePath(new RelativePath(true, file.getRelativePath.getSegments.drop(1): _*))
+              }
+            })
+            .setIncludeEmptyDirs(false)
+        }
+      })
+    }
   }
 }

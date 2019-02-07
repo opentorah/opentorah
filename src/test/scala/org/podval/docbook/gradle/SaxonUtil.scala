@@ -8,6 +8,7 @@ import org.xml.sax.InputSource
 
 object SaxonUtil {
   def toHtml(resourceName: String, substitutions: Map[String, String]): String = {
+    val useDocBookXslt20: Boolean = false // TODO
     val xslDirectory = new File("build/docBookXsl/docbook").getAbsoluteFile
     val logger = new Logger.TestLogger
     val uriResolver = Saxon.getUriResolver(xslDirectory, logger)
@@ -23,6 +24,7 @@ object SaxonUtil {
       processingInstructionsSubstitutions = substitutions,
       xslDirectory = xslDirectory,
       dataDirectory = new File("/tmp/data"),
+      useDocBookXslt20 = useDocBookXslt20,
       logger = logger
     )
 

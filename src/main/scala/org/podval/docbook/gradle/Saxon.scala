@@ -17,6 +17,7 @@ object Saxon {
     xslDirectory: File,
     dataDirectory: File,
     outputTarget: Result,
+    useDocBookXslt20: Boolean,
     logger: Logger
 ): Unit = {
     logger.info(
@@ -28,13 +29,14 @@ object Saxon {
        |  processingInstructionsSubstitutions = $processingInstructionsSubstitutions,
        |  xslDirectory = "$xslDirectory",
        |  dataDirectory = "$dataDirectory",
-       |  outputTarget = ${outputTarget.getSystemId}
+       |  outputTarget = ${outputTarget.getSystemId},
+       |  useDocBookXslt20 = $useDocBookXslt20
        |)""".stripMargin
     )
 
     // To intercept all network requests, URIResolver has to be set on the transformerFactory,
     // not the transformer itself: I guess some sub-transformers get created internally ;)
-    val transformerFactory: TransformerFactory = getTransformerFactory
+    val transformerFactory: TransformerFactory = getTransformerFactory(useDocBookXslt20)
     transformerFactory.setURIResolver(getUriResolver(
       xslDirectory = xslDirectory,
       logger = logger
@@ -59,6 +61,10 @@ object Saxon {
     val xmlSource: SAXSource = new SAXSource(xmlReader, inputSource)
     transformer.transform(xmlSource, outputTarget)
   }
+
+  def getTransformerFactory(useDocBookXslt20: Boolean): TransformerFactory =
+    if (!useDocBookXslt20) new com.icl.saxon.TransformerFactoryImpl
+    else new com.icl.saxon.TransformerFactoryImpl // TODO add Saxon 9 dependency and instantiate what needs to be :)
 
   def getTransformerFactory: TransformerFactory =
     new com.icl.saxon.TransformerFactoryImpl

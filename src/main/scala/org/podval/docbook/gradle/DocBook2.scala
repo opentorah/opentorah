@@ -18,6 +18,7 @@ abstract class DocBook2 {
     xslParameters: Map[String, String],
     substitutions: Map[String, String],
     epubEmbeddedFonts: List[String],
+    useDocBookXslt20: Boolean,
     project: Project,
     logger: Logger
   ): Unit = {
@@ -59,13 +60,14 @@ abstract class DocBook2 {
     // Saxon
     Saxon.run(
       inputSource = new InputSource(layout.inputFile(inputFileName).toURI.toASCIIString),
-      stylesheetSource = new StreamSource(layout.stylesheetFile(stylesheetName)),
+      stylesheetSource = new StreamSource(layout.stylesheetFile(stylesheetName, useDocBookXslt20)),
       outputTarget = new StreamResult(saxonOutputFile),
       xslParameters = xslParametersEffective,
       entitySubstitutions = substitutions,
       processingInstructionsSubstitutions = allSubstitutions,
-      xslDirectory = layout.docBookXslDirectory,
+      xslDirectory = layout.docBookXslDirectory(useDocBookXslt20),
       dataDirectory = layout.dataDirectory,
+      useDocBookXslt20 = useDocBookXslt20,
       logger = logger
     )
 

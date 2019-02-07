@@ -10,7 +10,16 @@ final class DocBookPlugin extends Plugin[Project] {
   def apply(project: Project): Unit = {
     val layout: Layout = new Layout(project)
 
+    // Configurations that resolves DocBook XSL stylesheets.
     val docBookXslVersion: String = "1.79.1"
+    project.getConfigurations.create(layout.docBookXslConfigurationName).defaultDependencies(
+      _.add(project.getDependencies.create(s"net.sf.docbook:docbook-xsl:$docBookXslVersion:resources@zip")) : Unit
+    ).setVisible(false)
+
+    val docBookXsl2Version: String = "2.3.10"
+    project.getConfigurations.create(layout.docBookXsl2ConfigurationName).defaultDependencies(
+      _.add(project.getDependencies.create(s"org.docbook:docbook-xslt2:$docBookXsl2Version@jar")) : Unit
+    ).setVisible(false)
 
     // Write default XSLT customizations, CSS stylesheet and FOP configuration.
     initializeProject(layout, new Logger.PluginLogger(project.getLogger))
@@ -20,11 +29,6 @@ final class DocBookPlugin extends Plugin[Project] {
     extension.documentName.set("index")
     extension.dataGeneratorClass.set("")
     extension.outputFormats.set(DocBook2.availableFormats.asJava)
-
-    // Configuration that resolves DocBook XSL stylesheets.
-    project.getConfigurations.create(layout.docBookXslConfigurationName).defaultDependencies(
-      _.add(project.getDependencies.create(s"net.sf.docbook:docbook-xsl:$docBookXslVersion:resources@zip")) : Unit
-    ).setVisible(false)
 
     // Generate content that needs to be included in DocBook by executing the generating code.
     val dataTask: PrepareDocBookDataTask = project.getTasks.create("docBookData", classOf[PrepareDocBookDataTask])
@@ -53,7 +57,7 @@ final class DocBookPlugin extends Plugin[Project] {
     copyResource("fop", "fop.xconf", layout.fopConfigurationFile, logger)
 
     Seq("common", "common-html", "epub", "fo", "html").foreach { name: String =>
-      copyResource("xsl", name + ".xsl", layout.stylesheetFile(name), logger)
+      copyResource("xsl", name + ".xsl", layout.stylesheetFile(name, false), logger)
     }
   }
 

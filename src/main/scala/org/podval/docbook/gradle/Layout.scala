@@ -5,6 +5,7 @@ import java.io.File
 
 final class Layout(project: Project) {
   val docBookXslConfigurationName: String = "docBookXsl"
+  val docBookXsl2ConfigurationName: String = "docBookXsl2"
 
   private val sourceRootDirectory: File = new File(project.getProjectDir, "src/main")
   private def sourceDirectory(name: String): File = new File(sourceRootDirectory, name)
@@ -13,7 +14,9 @@ final class Layout(project: Project) {
   def inputFile(inputFileName: String) = new File(inputDirectory, inputFileName + ".xml")
 
   val stylesheetDirectory: File = sourceDirectory("xsl")
-  def stylesheetFile(name: String) = new File(stylesheetDirectory, name + ".xsl")
+  val stylesheet2Directory: File = sourceDirectory("xsl2")
+  def stylesheetFile(name: String, useDocBookXslt20: Boolean) =
+    new File(if (!useDocBookXslt20) stylesheetDirectory else stylesheet2Directory, name + ".xsl")
 
   val imagesDirectoryName: String = "images"
   val imagesDirectory: File = sourceDirectory(imagesDirectoryName)
@@ -29,7 +32,9 @@ final class Layout(project: Project) {
   private val buildRootDirectory: File = project.getBuildDir
   private def buildDirectory(name: String): File = new File(buildRootDirectory, name)
 
-  val docBookXslDirectory: File = buildDirectory("docBookXsl")
+  def docBookXslDirectory(useDocBookXslt20: Boolean): File =
+    buildDirectory(if (!useDocBookXslt20) "docBookXsl" else "docBookXsl2")
+
   val dataDirectory: File = buildDirectory("data")
   val outputDirectoryRoot: File = buildDirectory("docBook")
   val saxonOutputDirectoryRoot: File = buildDirectory("docBookTmp")
