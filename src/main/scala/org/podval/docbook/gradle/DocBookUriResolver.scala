@@ -55,6 +55,7 @@ object DocBookUriResolver {
   // If used in DocBook files, those point to the DocBook XSL files.
   val docBookXsl: Seq[String] = Seq(
     "http://docbook.sourceforge.net/release/xsl-ns/current/",
+    "https://cdn.docbook.org/release/latest/xslt/base/",
     "urn:docbook:xsl/"
   )
 }

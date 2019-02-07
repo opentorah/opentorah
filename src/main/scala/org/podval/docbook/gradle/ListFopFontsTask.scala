@@ -7,7 +7,8 @@ import java.io.File
 class ListFopFontsTask extends DefaultTask {
   @TaskAction
   def list(): Unit = {
-    val configurationFile: File = new Layout(getProject).fopConfigurationFile
+    // FOP configuration file is the same for XSLT 1.0 and 2.0
+    val configurationFile: File = Layouts.forProject(getProject).forXslt1.fopConfigurationFile
     Fop.listFonts(configurationFile)
   }
 }

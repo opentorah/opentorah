@@ -2,18 +2,21 @@ package org.podval.docbook.gradle
 
 import org.gradle.api.provider.Property
 import org.gradle.api.plugins.JavaPluginConvention
-import org.gradle.api.tasks.{Input, JavaExec, OutputDirectory, SourceSet}
+import org.gradle.api.tasks.{Input, JavaExec, SourceSet}
 import java.io.File
 import scala.beans.BeanProperty
 
 class PrepareDocBookDataTask extends JavaExec {
-  val layout: Layout = new Layout(getProject)
-  val logger: Logger = new Logger.PluginLogger(getProject.getLogger)
-
   @Input @BeanProperty val dataGeneratorClass: Property[String] =
     getProject.getObjects.property(classOf[String])
 
-  @OutputDirectory val dataDirectory: File = layout.dataDirectory
+  private val layouts: Layouts = Layouts.forProject(getProject)
+
+  // Data directory is the same for XSLT 1.0 and 2.0
+  private val dataDirectory: File = layouts.forXslt1.dataDirectory
+  getOutputs.dir(dataDirectory)
+
+  private val logger: Logger = new Logger.PluginLogger(getProject.getLogger)
 
   override def exec(): Unit = {
     val mainClass: String = dataGeneratorClass.get
@@ -27,11 +30,10 @@ class PrepareDocBookDataTask extends JavaExec {
       if (mainSourceSet.isEmpty) {
         logger.info("Skipping DocBook data generation: no Java plugin in the project")
       } else {
-        val outputDirectory = dataDirectory
-        logger.info(s"Running DocBook data generator $mainClass into $outputDirectory")
+        logger.info(s"Running DocBook data generator $mainClass into $dataDirectory")
         setClasspath(mainSourceSet.get.getRuntimeClasspath)
         setMain(mainClass)
-        setArgsString(outputDirectory.toString)
+        setArgsString(dataDirectory.toString)
         super.exec()
       }
     }

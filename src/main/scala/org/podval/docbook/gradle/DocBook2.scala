@@ -18,7 +18,6 @@ abstract class DocBook2 {
     xslParameters: Map[String, String],
     substitutions: Map[String, String],
     epubEmbeddedFonts: List[String],
-    useDocBookXslt20: Boolean,
     project: Project,
     logger: Logger
   ): Unit = {
@@ -60,19 +59,18 @@ abstract class DocBook2 {
     // Saxon
     Saxon.run(
       inputSource = new InputSource(layout.inputFile(inputFileName).toURI.toASCIIString),
-      stylesheetSource = new StreamSource(layout.stylesheetFile(stylesheetName, useDocBookXslt20)),
+      stylesheetSource = new StreamSource(layout.stylesheetFile(stylesheetName)),
       outputTarget = new StreamResult(saxonOutputFile),
       xslParameters = xslParametersEffective,
       entitySubstitutions = substitutions,
       processingInstructionsSubstitutions = allSubstitutions,
-      xslDirectory = layout.docBookXslDirectory(useDocBookXslt20),
+      xslDirectory = layout.docBookXslDirectory,
       dataDirectory = layout.dataDirectory,
-      useDocBookXslt20 = useDocBookXslt20,
+      useXslt2 = layout.useDocBookXslt2,
       logger = logger
     )
 
-    val copyDestinationDirectory: File =
-      copyDestinationDirectoryName.fold(saxonOutputDirectory)(new File(saxonOutputDirectory, _))
+    val copyDestinationDirectory: File = Util.subdirectory(saxonOutputDirectory, copyDestinationDirectoryName)
 
     // Images.
     logger.info(s"Copying images")
@@ -218,16 +216,7 @@ object DocBook2 {
     override def stylesheetName: String = "epub3"
   }
 
-  private val all: List[DocBook2] = List(Html, Epub2, Epub3, Pdf)
+  val forXslt1: List[DocBook2] = List(Html, Epub2, Epub3, Pdf)
 
-  def forName(name: String): DocBook2 = all.find(_.name.toUpperCase == name.toUpperCase).getOrElse {
-    throw new IllegalArgumentException(
-      s"""Unsupported output format $name;
-         |  supported formats are: $availableFormatNames""".stripMargin
-    )
-  }
-
-  val availableFormats: Seq[String] = all.map(_.name)
-
-  val availableFormatNames: String = availableFormats.mkString(", ")
+  val forXslt2: List[DocBook2] = List(Html)
 }
