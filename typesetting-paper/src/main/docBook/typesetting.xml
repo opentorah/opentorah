@@ -7,7 +7,8 @@
         <author><personname>Leonid Dubinsky</personname></author>
         <date>Date: 9-10 Kislev 5768</date>
     </info>
-    <section>
+
+    <section xml:id="todo">
         <title>TODO</title>
         <itemizedlist>
             <listitem>
@@ -28,7 +29,7 @@
         </itemizedlist>
     </section>
 
-    <section>
+    <section xml:id="font-formats">
         <title>Font Formats</title>
         <para>The problem: <link xlink:href="http://www.tanach.us/Tanach.xml#Intallation"
                 >http://www.tanach.us/Tanach.xml#Installation</link>.</para>
@@ -55,7 +56,7 @@
             can not use it.</para>
     </section>
 
-    <section>
+    <section xml:id="open-type">
         <title>TrueType, Type1 and history of OpenType</title>
         <para>Microsoft and Apple developed OpenType format <biblioref linkend="OpenType"/>. This
             format has various tables and is more expressive than Type1 and TrueType <biblioref
@@ -71,7 +72,7 @@
             MacOS.</para>
     </section>
 
-    <section>
+    <section xml:id="font-rendering">
         <title>Font Rendering</title>
         <para>Firefox: Pango everywhere?</para>
         <para><link xlink:href="http://www.freedesktop.org/">FreeDesktop</link> <link
@@ -89,7 +90,7 @@
                 Library Wiki</link></para>
     </section>
 
-    <section>
+    <section xml:id="fonts">
         <title>Fonts</title>
         <itemizedlist>
             <listitem>
@@ -104,7 +105,7 @@
         </itemizedlist>
     </section>
 
-    <section>
+    <section xml:id="vowels-and-cantillation">
         <title>Glyph Layout with Vowels and Cantillation</title>
         <para>TODO XXX's algorithm.</para>
         <para>Gorkin's algorithm.</para>
@@ -132,22 +133,22 @@
         <para>Does kerning work through vowels?</para>
     </section>
 
-    <section>
+    <section xml:id="people">
         <title>People</title>
         <para/>
     </section>
 
-    <section>
+    <section xml:id="intermediate-format">
         <title>Intermediate Format</title>
         <para>Repeatability and hand-finishing: contradictory requirements?</para>
     </section>
 
-    <section>
+    <section xml:id="pdf-generation">
         <title>PDF generation</title>
         <para/>
     </section>
 
-    <section>
+    <section xml:id="xsl-fo-engines">
         <title>XSL-FO engines</title>
         <para>For real typesetting of a tree of texts we'll need to generate our own PDF anyway. For
             typesetting papers and other project documentation, almost anything will work.</para>
@@ -186,7 +187,7 @@
         </section>
     </section>
 
-    <section>
+    <section xml:id="notes">
         <title>Notes</title>
         <para> There are rumors that Pango processes cantillation correctly - possibly, with good
             fonts? We need to accertain - with Behdad? - that we do not need special support from
@@ -197,7 +198,7 @@
         <para>"Typesetting Hebrew Cantillation".</para>
     </section>
 
-    <bibliography>
+    <bibliography xml:id="bibliography">
         <biblioentry xml:id="AAT">
             <title>Apple Advanced Typography (AAT)</title>
             <author>

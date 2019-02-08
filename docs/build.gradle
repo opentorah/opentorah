@@ -1,0 +1,12 @@
+build.dependsOn ':judaica-paper:processDocBook'
+build.dependsOn ':typesetting-paper:processDocBook'
+build.doLast {
+  project.sync {
+    from "${project(':judaica-paper').buildDir}/docBook/"
+    into 'judaica'
+  }
+  project.sync {
+    from "${project(':typesetting-paper').buildDir}/docBook/"
+    into 'typesetting'
+  }
+}
