@@ -1,0 +1,43 @@
+@namespace xml "http://www.w3.org/XML/1998/namespace";
+
+
+
+body {
+    font-family: sans-serif;
+}
+
+
+
+div.dedication {
+    display:block;
+    background-color: #FFEEEE;
+    color:inherit;
+    margin:1em 1em;
+    padding:0.2em;
+    border: 1px solid #FFAAAA;
+}
+
+
+
+div.colophon {
+    display:block;
+    background-color: #EFEFEF;
+    color:inherit;
+    margin:1em 1em;
+    border: 1px solid #DDDDDD;    
+}
+
+
+    
+em.glossterm {
+    display:inline;
+    font-style:italic;
+}
+
+
+
+span.italic {
+    text-decoration:inherit;
+    font-style:italic;
+    font-weight:inherit;
+}
