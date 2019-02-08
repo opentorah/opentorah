@@ -57,7 +57,7 @@ class DocBookTask extends DefaultTask {
       copyResource("fop", "fop.xconf", layouts.forXslt1.fopConfigurationFile, logger)
     }
 
-    run(processors2, layouts.forXslt2, logger, Set("html"))
+    run(processors2, layouts.forXslt2, logger, Set("html", "fo"))
 
     run(processors, layouts.forXslt1, logger, Set("common", "common-html", "epub", "fo", "html"))
   }
@@ -68,7 +68,7 @@ class DocBookTask extends DefaultTask {
     supported: List[DocBook2]
   ): List[DocBook2] = {
     def forName(name: String): DocBook2 = {
-      supported.find(_.name.toUpperCase == name.toUpperCase).getOrElse {
+      supported.find(processor => processor.name.equalsIgnoreCase(name)).getOrElse {
         throw new IllegalArgumentException(
           s"""Unsupported output format $name;
              |  supported formats are: ${getNames(supported)}""".stripMargin

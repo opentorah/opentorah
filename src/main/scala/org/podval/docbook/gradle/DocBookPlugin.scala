@@ -54,6 +54,6 @@ final class DocBookPlugin extends Plugin[Project] {
     version: String,
     what: String
   ): Unit = project.getConfigurations.create(name).defaultDependencies(
-    _.add(project.getDependencies.create(s"$groupId:$artifactId:$version:$what")) : Unit
+    _.add(project.getDependencies.create(s"$groupId:$artifactId:$version$what")) : Unit
   ).setVisible(false)
 }

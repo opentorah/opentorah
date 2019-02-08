@@ -10,7 +10,7 @@ import scala.collection.JavaConverters._
 
 abstract class DocBook2 {
 
-  final def name: String = Util.className(this).toUpperCase
+  def name: String
 
   final def run(
     layout: Layout,
@@ -45,7 +45,7 @@ abstract class DocBook2 {
         "epub.embedded.fonts" -> Fop.getFontFiles(layout.fopConfigurationFile, epubEmbeddedFonts, logger)
       ) ++
         (if (!usesHtml) Map.empty else Map(
-          "base.dir" -> saxonOutputDirectory.getAbsolutePath,
+          "base.dir" -> (saxonOutputDirectory.getAbsolutePath + "/"),
           "root.filename" -> Util.fileNameWithoutExtension(saxonOutputFile),
           "html.stylesheet" -> (layout.cssDirectoryName + "/" + layout.cssFileName)
         ))
@@ -147,6 +147,8 @@ object DocBook2 {
     override def usesHtml: Boolean = true
     override def usesCss: Boolean = true
     override def usesIntermediate: Boolean = false
+
+    override def name: String = "html"
     override def stylesheetName: String = "html"
     override def outputDirectoryName: String = "html"
     override def outputFileExtension: String = "html"
@@ -158,6 +160,7 @@ object DocBook2 {
     override def usesCss: Boolean = false
     override def usesIntermediate: Boolean = true
 
+    override def name: String = "pdf"
     override def stylesheetName: String = "fo"
     override def intermediateDirectoryName: String = "fo"
     override def intermediateFileExtension: String = "fo"
@@ -207,16 +210,18 @@ object DocBook2 {
   }
 
   object Epub2 extends Epub {
+    override def name: String = "epub2"
     override def outputDirectoryName: String = "epub"
     override def stylesheetName: String = "epub"
   }
 
   object Epub3 extends Epub {
+    override def name: String = "epub3"
     override def outputDirectoryName: String = "epub3"
     override def stylesheetName: String = "epub3"
   }
 
   val forXslt1: List[DocBook2] = List(Html, Epub2, Epub3, Pdf)
 
-  val forXslt2: List[DocBook2] = List(Html)
+  val forXslt2: List[DocBook2] = List(Html, Pdf)
 }

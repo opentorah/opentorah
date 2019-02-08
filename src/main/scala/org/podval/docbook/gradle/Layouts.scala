@@ -80,7 +80,7 @@ class Layouts(projectDir: File, buildDir: File) {
     protected override def docBookXslDirectoryName: String = "docBookXsl2"
     override def docBookXslArchiveSubdirectoryName: String = "xslt/base"
     protected override def outputDirectoryName: String = "docBook2"
-    protected override def saxonOutputDirectoryName: String = "docBook2Tmp"
+    protected override def saxonOutputDirectoryName: String = "docBookTmp2"
   }
 
   def inputDirectories: Set[File] =
