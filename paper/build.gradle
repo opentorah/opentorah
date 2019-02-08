@@ -1,16 +1,6 @@
-buildscript {
-  repositories {
-    jcenter()
-    mavenCentral()
-    mavenLocal()
-  }
-
-  dependencies {
-    classpath 'org.podval.docbook:org.podval.docbook-gradle-plugin:+'
-  }
+plugins {
+  id "org.podval.docbook-gradle-plugin" version "0.2.1"
 }
-
-apply plugin: 'org.podval.docbook-gradle-plugin'
 
 dependencies {
   compile lib.scalaXml, project(':library')
@@ -29,9 +19,15 @@ docBook {
     "dingbat.font.family"  : "ZapfDingbats", // The font family for copyright, quotes, and other symbols
 //    "symbol.font.family": "???" // TODO configure with catch-all symbol font(s)
 
-    "body.font.master": "12"
 //    "footnote.font.size": "10"
+    "body.font.master": "12"
   ]
+
+  substitutions = [
+    "version": project.version
+  ]
+
+//  epubEmbeddedFonts = [ "DejaVu Sans" ]
 }
 
 build.dependsOn processDocBook
