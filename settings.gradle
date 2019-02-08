@@ -2,7 +2,8 @@ rootProject.name = 'judaica'
 
 include ':viewer'
 include ':importers'
-include ':paper'
-include ':webapp'
+include ':judaica-paper'
+include ':typesetting-paper'
+//include ':webapp'
 
-//includeBuild 'docbook'
+includeBuild '../../docbook.gradle'

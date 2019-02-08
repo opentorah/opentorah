@@ -1,0 +1,23 @@
+plugins {
+  id "org.podval.docbook-gradle-plugin" version "0.2.1"
+}
+
+docBook {
+  documentName = "judaica"
+
+  xslParameters = [
+    "title.font.family"    : "DejaVu Sans",
+    "body.font.family"     : "DejaVu Sans",
+    "sans.font.family"     : "DejaVu Sans",
+    "monospace.font.family": "DejaVu Sans Mono",
+    "dingbat.font.family"  : "ZapfDingbats",
+    "body.font.master"     : "12",
+    "footnote.font.size"   : "10"
+  ]
+
+  substitutions = [
+    "version": project.version
+  ]
+}
+
+build.dependsOn processDocBook
