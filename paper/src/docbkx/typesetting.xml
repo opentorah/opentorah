@@ -5,10 +5,11 @@
 <article xmlns="http://docbook.org/ns/docbook" version="5.0"
     xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude">
 
-    <title>Typesetting classic Jewish texts</title>
-    <epigraph>
-        <para>Leonid Dubinsky. Date: 9-10 Kislev 5768</para>
-    </epigraph>
+    <info>
+      <title>Typesetting classic Jewish texts</title>
+        <author><personname>Leonid Dubinsky</personname></author>
+        <date>Date: 9-10 Kislev 5768</date>
+    </info>
     <section>
         <title>TODO</title>
         <itemizedlist>

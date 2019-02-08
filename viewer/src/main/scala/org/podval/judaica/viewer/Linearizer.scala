@@ -45,6 +45,7 @@ object Linearizer {
     val words = verse.children.filter(_.isInstanceOf[DivContent]).map(_.asInstanceOf[DivContent])
     words.init.foreach(word => printWord(word, sofPasuk = false, out))
     printWord(words.last, sofPasuk = true, out)
+    out.print('\f')
 //    Xml.print(Content.toXmlNode(verse), System.out)
   }
 
