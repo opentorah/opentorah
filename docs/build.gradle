@@ -35,6 +35,7 @@ task copyPaper(type: Copy) {
   group = 'documentation'
   dependsOn ':paper:processDocBook'
   from "${project(':paper').buildDir}/docBook/"
+//  from project(':paper:').tasks.getByPath('processDocBook').finalOutputDirectoryRoot
   into 'paper'
 }
 

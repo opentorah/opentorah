@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- This needs to be imported into the customization *after* the customizable is! -->
-<xsl:stylesheet
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    exclude-result-prefixes="xs"
-    version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
     <!-- This is needed for template-tweaking customizations, like removal of "Chapter" in chapter title. -->
     <xsl:param name="local.l10n.xml" select="document('')"/>
@@ -24,6 +20,7 @@
         </l:l10n>
     </l:i18n>
 
+    <!-- Table of contents -->
     <xsl:param name="toc.section.depth">4</xsl:param>
 
     <!-- Number everything arabically -->
