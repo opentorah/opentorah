@@ -35,7 +35,7 @@ final class DocBookUriResolver(docBookXslDirectory: File, logger: Logger) extend
       }
 
     file.fold[Source] {
-      logger.error(s"  unresolved")
+      logger.error(s"  unresolved: $uri")
       null
     }{ file =>
       if (!file.exists()) {

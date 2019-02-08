@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - XSLT 2.0 DocBook stylesheets with Saxon 9 HE
+- do not fail when images or data directories are missing
 
 ## [0.2.1] - 02.06.2019
 - EPUB3

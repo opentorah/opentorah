@@ -59,7 +59,7 @@ class DocBookTask extends DefaultTask {
 
     run(processors2, layouts.forXslt2, logger, Set("html", "fo"))
 
-    run(processors, layouts.forXslt1, logger, Set("common", "common-html", "epub", "fo", "html"))
+    run(processors, layouts.forXslt1, logger, Set("common", "common-html", "epub",  "epub3", "fo", "html"))
   }
 
   private def getProcessors(

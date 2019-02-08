@@ -21,7 +21,7 @@ final class DocBookEntityResolver(
     logger.info(s"EntityResolver.resolveEntity(publicId=$publicId, systemId=$systemId)")
 
     resolvePublicId(publicId).orElse(resolveSystemId(systemId)).getOrElse {
-      logger.error(s"  unresolved")
+      logger.error(s"  unresolved: (publicId=$publicId, systemId=$systemId)")
       null
     }
   }

@@ -265,6 +265,29 @@ Following features of the Maven Gradle plugin are not supported:
 
 Following enhancements are being considered:
 - support setting per-format parameters in the Gradle build file
-- support reuse of XSL customizations, images and CSS  
-- integrate with Apache resolver and Linux XML catalog
+- support reuse of XSL customizations, parameters, images and CSS  
 - make XSL stylesheet version configurable
+- integrate with Apache resolver and Linux XML catalog - or at least load the character entities:
+  (publicId=-//W3C//DTD MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/mathml2.dtd)
+  (publicId=-//W3C//ENTITIES MathML 2.0 Qualified Names 1.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/mathml2-qname-1.mod)
+  (publicId=-//W3C//ENTITIES Added Math Symbols: Arrow Relations for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isoamsa.ent)
+  (publicId=-//W3C//ENTITIES Added Math Symbols: Binary Operators for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isoamsb.ent)
+  (publicId=-//W3C//ENTITIES Added Math Symbols: Delimiters for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isoamsc.ent)
+  (publicId=-//W3C//ENTITIES Added Math Symbols: Negated Relations for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isoamsn.ent)
+  (publicId=-//W3C//ENTITIES Added Math Symbols: Ordinary for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isoamso.ent)
+  (publicId=-//W3C//ENTITIES Added Math Symbols: Relations for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isoamsr.ent)
+  (publicId=-//W3C//ENTITIES Greek Symbols for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isogrk3.ent)
+  (publicId=-//W3C//ENTITIES Math Alphabets: Fraktur for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isomfrk.ent)
+  (publicId=-//W3C//ENTITIES Math Alphabets: Open Face for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isomopf.ent)
+  (publicId=-//W3C//ENTITIES Math Alphabets: Script for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isomscr.ent)
+  (publicId=-//W3C//ENTITIES General Technical for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isotech.ent)
+  (publicId=-//W3C//ENTITIES Box and Line Drawing for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isobox.ent)
+  (publicId=-//W3C//ENTITIES Russian Cyrillic for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isocyr1.ent)
+  (publicId=-//W3C//ENTITIES Non-Russian Cyrillic for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isocyr2.ent)
+  (publicId=-//W3C//ENTITIES Diacritical Marks for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isodia.ent)
+  (publicId=-//W3C//ENTITIES Added Latin 1 for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isolat1.ent)
+  (publicId=-//W3C//ENTITIES Added Latin 2 for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isolat2.ent)
+  (publicId=-//W3C//ENTITIES Numeric and Special Graphic for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isonum.ent)
+  (publicId=-//W3C//ENTITIES Publishing for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isopub.ent)
+  (publicId=-//W3C//ENTITIES Extra for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/mathml/mmlextra.ent)
+  (publicId=-//W3C//ENTITIES Aliases for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/mathml/mmlalias.ent)
