@@ -7,7 +7,7 @@
         <author><personname>Leonid Dubinsky</personname></author>
     </info>
 
-    <section>
+    <section xml:id="introduction">
         <title>Introduction</title>
 
         <section>
@@ -70,7 +70,7 @@
         </section>
     </section>
 
-    <section>
+    <section xml:id="dream">
         <title>What do we want? (The Dream)</title>
         <section>
             <title>Аннотация</title>
@@ -679,7 +679,7 @@
         </bibliography>
     </section>
 
-    <section>
+    <section xml:id="implementation">
         <title>Implementation</title>
         <section>
             <title>Approach</title>
@@ -1363,7 +1363,7 @@
 
     </section>
 
-    <section>
+    <section xml:id="laying-out">
         <title>Laying out classic Jewish texts</title>
         <para>It is natural for a user, after researching with our system, to desire to print
             selected texts and fragments for personal - or group - study away from a computer. Such
@@ -1415,7 +1415,7 @@
                 Requirements</link></para>
     </section>
 
-    <section>
+    <section xml:id="texts">
         <title>Sources of Free Texts</title>
         <section>
             <title>Jumping points</title>
