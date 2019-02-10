@@ -24,21 +24,17 @@ task tut(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
 }
 
-task copyScaladoc(type: Copy) {
-  group = 'documentation'
-  dependsOn ':library:scaladoc'
-  from project(':library').tasks.named('scaladoc').get().destinationDir
-  into 'scaladoc'
-}
-
-task copyPaper(type: Copy) {
-  group = 'documentation'
-  dependsOn ':paper:processDocBook'
-  from "${project(':paper').buildDir}/docBook/"
-//  from project(':paper:').tasks.getByPath('processDocBook').finalOutputDirectoryRoot
-  into 'paper'
-}
-
 build.dependsOn tut
-//  build.dependsOn copyScaladoc
-build.dependsOn copyPaper
+//  build.dependsOn ':library:scaladoc'
+build.dependsOn ':paper:processDocBook'
+build.doLast {
+  project.sync {
+    from "${project(':paper').buildDir}/docBook/"
+//  from project(':paper:').tasks.getByPath('processDocBook').finalOutputDirectoryRoot
+    into 'paper'
+  }  
+//  sync {
+//    from project(':library').tasks.named('scaladoc').get().destinationDir
+//    into 'scaladoc'
+//  }
+}
