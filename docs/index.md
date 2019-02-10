@@ -1,4 +1,7 @@
-# Digital Judaica Done Right #
+---
+layout: home
+title: Digital Judaica Done Right
+---
 
 ## Code ##
 
