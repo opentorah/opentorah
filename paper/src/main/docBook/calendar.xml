@@ -4,7 +4,7 @@
     <title>Rambam on Calendar</title>
     <author><personname>Leonid Dubinsky</personname></author>
   </info>
-  <section>
+  <section xml:id="introduction">
     <title>Introduction</title>
     <para>In the "Laws of Sanctification of the Moon", Rambam (TODO: where?) gives algorithmic description of two
       calendars: fixed ("arithmetic") and observational ("astronomical"). Both calendars are described in the form ready
@@ -14,7 +14,7 @@
       to be reconstructed; sometimes the models are not described, so both the models and the formulae need to be
       reconstructed. </para>
   </section>
-  <section>
+  <section xml:id="goals">
     <title>Goals</title>
     <itemizedlist>
       <listitem>
@@ -37,7 +37,7 @@
       </listitem>
     </itemizedlist>
   </section>
-  <section>
+  <section xml:id="history">
     <title>History</title>
     <para>In 1984, The Rebbe instructed the Jews to learn Rambam every day. As a result, in 1991 I encountered calendar
       chapters of Rambam, decided to reconstruct the models behind the calculations described in them, and discovered
@@ -55,7 +55,7 @@
     <para>In 2011 I realized that the work needs to be published before it is finished - so that others could help
       finish it ;)</para>
   </section>
-  <section>
+  <section xml:id="acknowledgements">
     <title>Acknowledgements</title>
     <para>I want to acknowledge people who contributed to the content of this work - and to the fact of its existence ;)
       If your name should be on this list but isn't, please forgive me: the omission is not intentional. </para>
@@ -80,7 +80,7 @@
   -->
   <xi:include href="solar-theory.xml"/>
   <xi:include href="lunar-theory.xml"/>
-  <glossary>
+  <glossary xml:id="glossary">
     <glossentry xml:id="mla-term">
       <glossterm>mean lunar anomaly (אמצע המסלול)</glossterm>
       <acronym>mla</acronym>
@@ -89,7 +89,7 @@
       </glossdef>
     </glossentry>
   </glossary>
-  <bibliography>
+  <bibliography xml:id="bibliography">
     <bibliodiv>
       <title>Laws of Sanctification of the Moon by Rambam</title>
       <biblioentry xml:id="Vilno" xreflabel="Vilno">

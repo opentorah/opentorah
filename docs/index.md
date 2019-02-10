@@ -1,23 +1,21 @@
 ---
 layout: home
-title: Table of Contents
+title: Rambam on Jewish Calendar
 ---
 
-### Rambam ###
+## Sources ##
 
-[Overview](/rambam/overview.md)
+Overview of [Rambam](/rambam/overview.md).
 
-### Other Sources ###
+Other [sources](/sources/)
 
-[Sources](/sources/)
+## Code ##
 
-### Library ###
+Library for working with Jewish calendar, both arithmetic and astronomical.
 
 [ScalaDoc](/scaladoc/)
 
 [Examples](/examples/)
-
-### Development ###
 
 [GitHub](https://github.com/jewish-calendar/) 
 
@@ -27,8 +25,18 @@ title: Table of Contents
 
 [JCenter](https://jcenter.bintray.com/org/podval/calendar/org.podval.calendar-library/)
 
-### Writings ###
+## Writings ##
 
-[Paper](/paper/)
+Paper on the subject.
 
-[Remarks](/remarks/) 
+Available in various formats:
+- [HTML](/paper/html/)
+- [PDF](/paper/pdf/calendar.pdf)
+- [EPUB](/paper/epub/calendar.epub)
+
+Assorted [remarks](/remarks/) 
+
+
+This project is maintained by [Leonid Dubinsky](https://github.com/dubinsky).
+
+Website is hosted on GitHub Pages.
