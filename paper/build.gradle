@@ -1,5 +1,5 @@
 plugins {
-  id "org.podval.docbook-gradle-plugin" version "0.2.1"
+  id "org.podval.docbook-gradle-plugin" version "0.2.2"
 }
 
 dependencies {
@@ -10,6 +10,8 @@ docBook {
   documentName = "calendar"
 
   dataGeneratorClass = "org.podval.calendar.paper.Tables"
+
+  outputFormats = ["html", "pdf", "epub2"]
 
   xslParameters = [
     "title.font.family"    : "DejaVu Sans",
@@ -24,10 +26,8 @@ docBook {
   ]
 
   substitutions = [
-    "version": project.version
+    "project.version": project.version
   ]
-
-//  epubEmbeddedFonts = [ "DejaVu Sans" ]
 }
 
 build.dependsOn processDocBook
