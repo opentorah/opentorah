@@ -16,7 +16,10 @@ class DocBookTask extends DefaultTask {
 
   // Register inputs and outputs
   layouts.inputDirectories.foreach(getInputs.dir)
-  layouts.outputDirectories.foreach(getOutputs.dir)
+  layouts.outputDirectories.foreach { directory: File =>
+    Util.deleteRecursively(directory)
+    getOutputs.dir(directory)
+  }
 
   @Input @BeanProperty val inputFileName: Property[String] =
     getProject.getObjects.property(classOf[String])
