@@ -15,7 +15,7 @@ abstract class DocBook2 {
   final def run(
     layout: Layout,
     inputFileName: String,
-    xslParameters: Map[String, String],
+    xslParameters: Map[String, Object],
     substitutions: Map[String, String],
     epubEmbeddedFonts: List[String],
     project: Project,
@@ -39,7 +39,7 @@ abstract class DocBook2 {
     saxonOutputDirectory.mkdirs
 
     // Image and HTML-related XSL parameters.
-    val additionalParameters: Map[String, String] =
+    val additionalParameters: Map[String, Object] =
       Map(
         "img.src.path" -> (layout.imagesDirectoryName + "/"),
         "epub.embedded.fonts" -> Fop.getFontFiles(layout.fopConfigurationFile, epubEmbeddedFonts, logger)
@@ -50,11 +50,19 @@ abstract class DocBook2 {
           "html.stylesheet" -> (layout.cssDirectoryName + "/" + layout.cssFileName)
         ))
 
-    val xslParametersEffective: Map[String, String] =
+    val xslParametersEffective: Map[String, Object] =
       xslParameters ++ (additionalParameters -- xslParameters.keySet)
 
     // In processing instructions and CSS, substitute xslParameters also - because why not?
-    val allSubstitutions: Map[String, String] = substitutions ++ xslParametersEffective
+    val allSubstitutions: Map[String, String] = substitutions ++ xslParametersEffective.mapValues(_.toString)
+
+    // Resolver
+    val resolver: Resolver = new Resolver(
+      docBookXslDirectory = layout.docBookXslDirectory,
+      entities = substitutions,
+      dataDirectory = layout.dataDirectory,
+      logger: Logger
+    )
 
     // Saxon
     Saxon.run(
@@ -62,10 +70,8 @@ abstract class DocBook2 {
       stylesheetSource = new StreamSource(layout.stylesheetFile(stylesheetName)),
       outputTarget = new StreamResult(saxonOutputFile),
       xslParameters = xslParametersEffective,
-      entitySubstitutions = substitutions,
+      resolver = resolver,
       processingInstructionsSubstitutions = allSubstitutions,
-      xslDirectory = layout.docBookXslDirectory,
-      dataDirectory = layout.dataDirectory,
       useXslt2 = layout.useDocBookXslt2,
       logger = logger
     )
@@ -223,5 +229,5 @@ object DocBook2 {
 
   val forXslt1: List[DocBook2] = List(Html, Epub2, Epub3, Pdf)
 
-  val forXslt2: List[DocBook2] = List(Html, Pdf)
+  val forXslt2: List[DocBook2] = List(Html)
 }

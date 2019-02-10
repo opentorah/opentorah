@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 02.11.2019
+- using caching resolver from org.xmlresolver
+
 ## [0.2.2] - 02.10.2019
 - XSLT 2.0 DocBook stylesheets with Saxon 9 HE
 

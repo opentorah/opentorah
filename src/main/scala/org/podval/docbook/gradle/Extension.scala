@@ -5,15 +5,15 @@ import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 
 import scala.beans.BeanProperty
 
-class DocBookExtension(project: Project) {
+class Extension(project: Project) {
   @BeanProperty val documentName: Property[String] =
     project.getObjects.property(classOf[String])
 
   @BeanProperty val dataGeneratorClass: Property[String] =
     project.getObjects.property(classOf[String])
 
-  @BeanProperty val xslParameters: MapProperty[String, String] =
-    project.getObjects.mapProperty(classOf[String], classOf[String])
+  @BeanProperty val xslParameters: MapProperty[String, Object] =
+    project.getObjects.mapProperty(classOf[String], classOf[Object])
 
   @BeanProperty val substitutions: MapProperty[String, String] =
     project.getObjects.mapProperty(classOf[String], classOf[String])

@@ -6,7 +6,7 @@ import org.gradle.api.tasks.{Input, JavaExec, SourceSet}
 import java.io.File
 import scala.beans.BeanProperty
 
-class PrepareDocBookDataTask extends JavaExec {
+class DocBookDataTask extends JavaExec {
   @Input @BeanProperty val dataGeneratorClass: Property[String] =
     getProject.getObjects.property(classOf[String])
 

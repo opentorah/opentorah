@@ -17,14 +17,14 @@ final class DocBookPlugin extends Plugin[Project] {
       "org.docbook", "docbook-xslt2", "2.3.10", "@jar")
 
     // Extension for configuring the plugin.
-    val extension: DocBookExtension = project.getExtensions.create("docBook", classOf[DocBookExtension], project)
+    val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)
     extension.documentName.set("index")
     extension.dataGeneratorClass.set("")
     extension.outputFormats.set(DocBook2.forXslt1.map(_.name).asJava)
     extension.outputFormats2.set(List.empty[String].asJava)
 
     // Generate content that needs to be included in DocBook by executing the generating code.
-    val dataTask: PrepareDocBookDataTask = project.getTasks.create("docBookData", classOf[PrepareDocBookDataTask])
+    val dataTask: DocBookDataTask = project.getTasks.create("docBookData", classOf[DocBookDataTask])
     dataTask.setDescription("Generate data for inclusion in DocBook")
     dataTask.dataGeneratorClass.set(extension.dataGeneratorClass)
     Option(project.getTasks.findByName("classes")).foreach(dataTask.getDependsOn.add)

@@ -42,7 +42,7 @@ object Fop {
     val fop: org.apache.fop.apps.Fop = fopFactory.newFop("application/pdf", outputStream)
 
     try {
-      val transformer: Transformer = Saxon.getTransformerFactory.newTransformer
+      val transformer: Transformer = Saxon.getXslt1TransformerFactory.newTransformer
 
       transformer.transform(
         new StreamSource(inputFile),

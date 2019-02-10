@@ -106,7 +106,7 @@ docBook {
     "version": project.version       
   ]
 
-  epubEmbeddedFonts = [ "Liberation Sans" ]
+  epubEmbeddedFonts = [ "Liberation Sans" ]                 // embedded fonts should be OpenType or WOFF!
 }
 ```
 
@@ -114,7 +114,7 @@ docBook {
 
 Plugin itself sets certain XSL parameters:
 - `"img.src.path"` is set to `"images/"`;
-- `"html.stylesheet"` is set to "css/docBook.xsl";
+- `"html.stylesheet"` is set to "css/docBook.xsl" (it's unclear if this makes sense for EPUB);
 - `"base.dir"` is set to the output directory of the XSLT transform;
 - `"root.filename"` is set to the output file.
 
@@ -242,13 +242,29 @@ encountered in the DocBook documents are resolved to files in that directory.
 
 ## XSLT 2.0 ##
 
+XSLT 1.0 DocBook stylesheets rely on some multi-output extension of Saxon for chunking HTML.
+This extension is not supported in Saxon after version 6.5.3 (new Saxon).
+Switching to XSLT 2.0 stylesheets (https://github.com/docbook/xslt20-stylesheets)
+will allow me to use modern versions of Saxon
+(and eliminate namespace-cutting messages from the XSLT 1.0 stylesheets).
+
 Plugin has rudimentary support for the new XSLT 2.0 DocBook stylesheets.
 Property that configures output formats to produce is `outputFormats2`
 (overridable with -PdocBook.outputFormats2); by default, none are.
-Only HTML is "supported" at this point.
-
 Stylesheets are unpacked under `xsl2/` output generated under `build/docBook2`;
 intermediate results - under `build/docBookTmp2`.
+There is no support for EPUB in the new stylesheets.
+
+Issues with this integration:
+- main HTML chunk is not `index.html`;
+- HTML chunking is not deep enough;
+- HTML/CSS integration doesn't work;
+- FO/PDF pipeline doesn't work;
+- did not try CSS/PDF pipeline.
+
+I am not planning to pursue this - unless thete is a stylesheet that transforms MathML or LaTeX
+into SVG, and it requires XSLT 2.0 :)
+
 
 ## Past ##
 
@@ -267,27 +283,6 @@ Following enhancements are being considered:
 - support setting per-format parameters in the Gradle build file
 - support reuse of XSL customizations, parameters, images and CSS  
 - make XSL stylesheet version configurable
-- integrate with Apache resolver and Linux XML catalog - or at least load the character entities:
-  (publicId=-//W3C//DTD MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/mathml2.dtd)
-  (publicId=-//W3C//ENTITIES MathML 2.0 Qualified Names 1.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/mathml2-qname-1.mod)
-  (publicId=-//W3C//ENTITIES Added Math Symbols: Arrow Relations for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isoamsa.ent)
-  (publicId=-//W3C//ENTITIES Added Math Symbols: Binary Operators for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isoamsb.ent)
-  (publicId=-//W3C//ENTITIES Added Math Symbols: Delimiters for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isoamsc.ent)
-  (publicId=-//W3C//ENTITIES Added Math Symbols: Negated Relations for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isoamsn.ent)
-  (publicId=-//W3C//ENTITIES Added Math Symbols: Ordinary for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isoamso.ent)
-  (publicId=-//W3C//ENTITIES Added Math Symbols: Relations for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isoamsr.ent)
-  (publicId=-//W3C//ENTITIES Greek Symbols for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isogrk3.ent)
-  (publicId=-//W3C//ENTITIES Math Alphabets: Fraktur for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isomfrk.ent)
-  (publicId=-//W3C//ENTITIES Math Alphabets: Open Face for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isomopf.ent)
-  (publicId=-//W3C//ENTITIES Math Alphabets: Script for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isomscr.ent)
-  (publicId=-//W3C//ENTITIES General Technical for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso9573-13/isotech.ent)
-  (publicId=-//W3C//ENTITIES Box and Line Drawing for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isobox.ent)
-  (publicId=-//W3C//ENTITIES Russian Cyrillic for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isocyr1.ent)
-  (publicId=-//W3C//ENTITIES Non-Russian Cyrillic for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isocyr2.ent)
-  (publicId=-//W3C//ENTITIES Diacritical Marks for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isodia.ent)
-  (publicId=-//W3C//ENTITIES Added Latin 1 for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isolat1.ent)
-  (publicId=-//W3C//ENTITIES Added Latin 2 for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isolat2.ent)
-  (publicId=-//W3C//ENTITIES Numeric and Special Graphic for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isonum.ent)
-  (publicId=-//W3C//ENTITIES Publishing for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/iso8879/isopub.ent)
-  (publicId=-//W3C//ENTITIES Extra for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/mathml/mmlextra.ent)
-  (publicId=-//W3C//ENTITIES Aliases for MathML 2.0//EN, systemId=http://www.w3.org/Math/DTD/mathml2/mathml/mmlalias.ent)
+- make sure EPUB2 output contains `mimetype` file
+- codify EPUB customization along the lines of [ChunkingCustomization](http://www.sagehill.net/docbookxsl/ChunkingCustomization.html) 
+and epub3/README from the XSLT stlesheets distribution
