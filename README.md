@@ -71,7 +71,11 @@ apply plugin: 'org.podval.docbook-gradle-plugin'
 ```
 
 For projects with code that is used to generate data for inclusion in the DocBook files,
-DocBook plugin needs to be applied *after* the Java plugin.
+DocBook plugin needs to be applied *after* the Scala/Java plugin -or explicit dependency needs
+to be added by hand:
+```groovy
+processDocBook.dependsOn classes
+```
 
 If project does not contain any code nor applies any core Gradle plugins,
 to get basic tasks like "clean" and "build":
