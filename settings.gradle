@@ -3,7 +3,6 @@ rootProject.name = 'calendar'
 include ':library'
 include ':docs'
 include ':service'
-
-// includeBuild '../../docbook.gradle'
-
 include ':paper'
+
+// includeBuild '../../docbook-gradle'

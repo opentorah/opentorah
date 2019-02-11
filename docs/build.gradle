@@ -5,6 +5,8 @@ repositories {
   }
 }
 
+apply plugin: 'scala'
+
 // for Tut
 configurations.all {
   resolutionStrategy {
@@ -13,6 +15,9 @@ configurations.all {
 }
 
 dependencies {
+  zinc    "com.typesafe.zinc:zinc:$zincVersion"
+  compile "org.scala-lang:scala-library:2.12.7"
+
   runtime project(':library')
   runtime "org.tpolecat:tut-core_2.12:0.6.10"
 }
