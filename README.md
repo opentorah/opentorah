@@ -37,6 +37,8 @@ a directory path as a parameter. References in DocBook documents that are prefix
 with `data:`, `urn:docbook:data:/` or `http://podval.org/docbook/data/` are resolved
 to files in that directory.  
 
+Plugin uses JEuclid FOP plugin to process MathML when generating PDF.
+
 
 ## Applying to a Gradle project ##
 
@@ -111,6 +113,8 @@ docBook {
   ]
 
   epubEmbeddedFonts = [ "Liberation Sans" ]                 // embedded fonts should be OpenType or WOFF!
+
+  isJEuclidEnabled = true                                   // MathML processing for PDF is disabled by default 
 }
 ```
 
@@ -290,3 +294,8 @@ Following enhancements are being considered:
 - make sure EPUB2 output contains `mimetype` file
 - codify EPUB customization along the lines of [ChunkingCustomization](http://www.sagehill.net/docbookxsl/ChunkingCustomization.html) 
 and epub3/README from the XSLT stlesheets distribution
+- look into running MatJax stylesheets in the plugin ()without the browser to
+  convert MathML for PDF (that way, LaTeX will also be supported);
+- look into XSLT solutions for MatML/LaTeX -> SVG conversion
+  ([pmml2svg](http://pmml2svg.sourceforge.net/doc/user-xhtml-svg/index.xhtml)
+   doesn't seem to be maintained).

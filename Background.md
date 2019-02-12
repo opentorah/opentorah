@@ -98,6 +98,59 @@ with the goal of supporting multi-format generation with diagrams, fonts, progra
 but with formulas as images.
 2. Use GitHub pages' Markdown for short preliminary pieces.
 
+# JEuclid FOP Plugin #
+
+[Apache FOP](https://xmlgraphics.apache.org/fop/) can be extended to handle
+specialized markup by using plugins.
+
+One such plugin - JEuclid FOP - handles MathML in the XSL-FO files, which is what is needed
+to use MathML in DocBook: XSLT stylesheets that generate XSL-FO from DocBook pass MathML through
+untouched. That plugin uses [JEuclid](http://jeuclid.sourceforge.net/) for the actual rendering.
+Bot were written by [Max Berger](https://github.com/maxberger).
+
+Latest version of JEuclid and the FOP plugin - 3.1.9 - was released on 2010-02-12 and
+targets FOP 0.95. It is available in Maven repositories (`net.sourceforge.jeuclid:jeuclid-fop:3.1.9`),
+but attempts at using it in the DocBook plugin produce an exception:
+
+```
+java.lang.NoClassDefFoundError: Could not initialize class net.sourceforge.jeuclid.elements.JEuclidElementFactory
+  at net.sourceforge.jeuclid.elements.generic.DocumentElement.createElement(DocumentElement.java:152)
+  at com.icl.saxon.output.DOMEmitter.startElement(DOMEmitter.java:53)
+```
+
+I am not sure what is the exact cause of that: I am doing something wrong, JEuclid's and Gradle's
+ideas about classpaths differ, some reflection is in play...
+
+Fortunately, there exists a [fork](https://github.com/rototor/jeuclid) of JEuclid
+by [Emmeran Seehuber](https://github.com/rototor) that brings the codebase up-to-date in some
+respects: it now builds on JDK 9 and uses more current versions of some dependencies
+(for example, Batik).
+
+Unfortunately, that fork removed the FOP extension, since it wasn't useful for the project
+(details are in the [discussion](https://github.com/danfickle/openhtmltopdf/issues/161) that
+led to the fork).  
+
+Fortunately, using unchanged original Java sources of the JEuclid plugin with the
+forked JEuclid works! I guess FOP, which is currently at version 2.3,
+still supports the original extension mechanism :)
+
+Although FOP JEuclid plugin code works as is, I mage one change: I use explicit programmatic
+configuration instead of leaving classpath provider-configuration crumbs for the the ServerLoader
+(see JEuclidFopFactoryConfigurator class).
+
+I should probably submit a pull request to restore FOP plugin in the forked JEuclid,
+but I am getting compile errors in ConverterRegistry (talk about ServiceLoader!):
+```java
+  final Iterator<ConverterDetector> it = Service.providers(ConverterDetector.class);
+```
+```
+  incompatible types:
+   java.util.Iterator<java.lang.Object> cannot be converted to
+   java.util.Iterator<net.sourceforge.jeuclid.converter.ConverterDetector>
+```
+Besides, maybe I am the last developer even trying to use JEuclid for FOP?
+(How do all the XML editors - and they all ship it - make it work?)
+
 
 # Gradle DocBook Plugin #
 

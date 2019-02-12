@@ -2,14 +2,16 @@ package org.podval.docbook.gradle
 
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import java.net.URI
+
 import javax.xml.transform.Transformer
 import javax.xml.transform.sax.SAXResult
 import javax.xml.transform.stream.StreamSource
-import org.apache.fop.apps.{FopConfParser, FopFactory}
+import net.sourceforge.jeuclid.JEuclidFopFactoryConfigurator
+import org.apache.fop.apps.{FopConfParser, FopFactory, FopFactoryBuilder}
 import org.apache.xmlgraphics.util.MimeConstants
 import org.apache.fop.fonts.{FontEventListener, FontTriplet}
 import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
-import org.podval.docbook.gradle
+
 import scala.collection.JavaConverters._
 import scala.collection.immutable.SortedMap
 
@@ -17,6 +19,7 @@ object Fop {
 
   def run(
     configurationFile: File,
+    isJEuclidEnabled: Boolean,
     inputFile: File,
     baseDirectory: File,
     outputFile: File,
@@ -31,12 +34,11 @@ object Fop {
          |)""".stripMargin
     )
 
-    val fopConfParser: FopConfParser = new FopConfParser(
-      configurationFile,
-      baseDirectory.toURI
-    )
+    val fopFactory: FopFactory = getFopFactoryBuilder(configurationFile)
+      .setBaseURI(baseDirectory.toURI)
+      .build
 
-    val fopFactory: FopFactory = fopConfParser.getFopFactoryBuilder.build
+    if (isJEuclidEnabled) JEuclidFopFactoryConfigurator.configure(fopFactory)
 
     val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(outputFile))
     val fop: org.apache.fop.apps.Fop = fopFactory.newFop("application/pdf", outputStream)
@@ -103,7 +105,7 @@ object Fop {
   }
 
   def getFontFamilies(configurationFile: File): SortedMap[String, List[FontSpec]] = {
-    val fopFactory: FopFactory = new FopConfParser(configurationFile).getFopFactoryBuilder.build
+    val fopFactory: FopFactory = getFopFactoryBuilder(configurationFile).build
 
     val fontEventListener: FontEventListener  = new FontEventListener {
       override def fontLoadingErrorAtAutoDetection(source: AnyRef, fontURL: String, e: Exception): Unit =
@@ -121,9 +123,6 @@ object Fop {
       .mapValues(_.asScala.toList)
   }
 
-  def main(args: Array[String]): Unit = {
-    val configurationFile: File = new File("./src/main/resources/fop/fop.xconf")
-//    listFonts(configurationFile)
-    println("[" + getFontFiles(configurationFile, List("DejaVu Sans"), new gradle.Logger.TestLogger) + "]")
-  }
+  private def getFopFactoryBuilder(configurationFile: File): FopFactoryBuilder =
+    new FopConfParser(configurationFile).getFopFactoryBuilder
 }

@@ -14,6 +14,7 @@ abstract class DocBook2 {
 
   final def run(
     layout: Layout,
+    isJEuclidEnabled: Boolean,
     inputFileName: String,
     xslParameters: Map[String, Object],
     substitutions: Map[String, String],
@@ -111,6 +112,7 @@ abstract class DocBook2 {
 
       postProcess(
         layout = layout,
+        isJEuclidEnabled = isJEuclidEnabled,
         inputDirectory = saxonOutputDirectory,
         inputFile = saxonOutputFile,
         outputFile = outputFile(outputDirectory, outputFileExtension),
@@ -139,6 +141,7 @@ abstract class DocBook2 {
 
   protected def postProcess(
     layout: Layout,
+    isJEuclidEnabled: Boolean,
     inputDirectory: File,
     inputFile: File,
     outputFile: File,
@@ -175,12 +178,14 @@ object DocBook2 {
 
     override protected def postProcess(
       layout: Layout,
+      isJEuclidEnabled: Boolean,
       inputDirectory: File,
       inputFile: File,
       outputFile: File,
       logger: Logger
     ): Unit = Fop.run(
       configurationFile = layout.fopConfigurationFile,
+      isJEuclidEnabled = isJEuclidEnabled,
       inputFile = inputFile,
       baseDirectory = inputDirectory,
       outputFile = outputFile,
@@ -197,6 +202,7 @@ object DocBook2 {
 
     final override protected def postProcess(
       layout: Layout,
+      isJEuclidEnabled: Boolean,
       inputDirectory: File,
       inputFile: File,
       outputFile: File,

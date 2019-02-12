@@ -22,6 +22,9 @@ class DocBookTask extends DefaultTask {
     getOutputs.dir(directory)
   }
 
+  @Input @BeanProperty val isJEuclidEnabled: Property[Boolean] =
+    getProject.getObjects.property(classOf[Boolean])
+
   @Input @BeanProperty val inputFileName: Property[String] =
     getProject.getObjects.property(classOf[String])
 
@@ -84,6 +87,7 @@ class DocBookTask extends DefaultTask {
 
   private def run(processor: DocBook2, layout: Layout, logger: Logger): Unit = processor.run(
     layout = layout,
+    isJEuclidEnabled = isJEuclidEnabled.get,
     inputFileName = inputFileName.get,
     xslParameters = xslParameters.get.asScala.toMap,
     substitutions = substitutions.get.asScala.toMap,

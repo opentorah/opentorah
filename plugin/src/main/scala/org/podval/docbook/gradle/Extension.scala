@@ -6,6 +6,9 @@ import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import scala.beans.BeanProperty
 
 class Extension(project: Project) {
+  @BeanProperty val isJEuclidEnabled: Property[Boolean] =
+    project.getObjects.property(classOf[Boolean])
+
   @BeanProperty val documentName: Property[String] =
     project.getObjects.property(classOf[String])
 

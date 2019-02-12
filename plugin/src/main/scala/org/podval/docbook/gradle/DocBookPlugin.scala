@@ -18,6 +18,7 @@ final class DocBookPlugin extends Plugin[Project] {
 
     // Extension for configuring the plugin.
     val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)
+    extension.isJEuclidEnabled.set(false)
     extension.documentName.set("index")
     extension.dataGeneratorClass.set("")
     extension.outputFormats.set(DocBook2.forXslt1.map(_.name).asJava)
@@ -33,6 +34,7 @@ final class DocBookPlugin extends Plugin[Project] {
     val docBookTask: DocBookTask = project.getTasks.create("processDocBook", classOf[DocBookTask])
     docBookTask.setDescription(s"Process DocBook")
     docBookTask.setGroup("publishing")
+    docBookTask.isJEuclidEnabled.set(extension.isJEuclidEnabled)
     docBookTask.inputFileName.set(extension.documentName)
     docBookTask.xslParameters.set(extension.xslParameters)
     docBookTask.substitutions.set(extension.substitutions)

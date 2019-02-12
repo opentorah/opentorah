@@ -1,0 +1,13 @@
+apply plugin: 'scala'
+
+dependencies {
+  // Scala
+  zinc 'com.typesafe.zinc:zinc:0.3.15'
+  compile "org.scala-lang:scala-library:$scalaVersion"
+
+  testCompile "org.scalatest:scalatest_$scalaVersionMajor:3.0.5"
+
+  compile project(':org.podval.docbook-gradle-plugin')
+}
+
+// TODO add a task that runs before tests - and makes a direct call to unpack XSLT stylesheets :)

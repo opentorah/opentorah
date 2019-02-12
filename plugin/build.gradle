@@ -1,0 +1,158 @@
+plugins {
+  id "com.gradle.plugin-publish" version "0.10.1" apply false
+  id "com.jfrog.bintray" version "1.8.4" apply false
+}
+
+description = 'Gradle DocBook plugin.'
+
+apply plugin: 'scala'
+
+// v1.3.04 doesn't have org.w3c.dom.ElementTraversal that Xerces uses:
+configurations.all {
+  resolutionStrategy {
+    force "xml-apis:xml-apis:1.4.01"
+  }
+}
+
+dependencies {
+  // Scala
+  zinc 'com.typesafe.zinc:zinc:0.3.15'
+  compile "org.scala-lang:scala-library:$scalaVersion"
+  testCompile "org.scalatest:scalatest_$scalaVersionMajor:3.0.5"
+
+  // XMLResolver
+  compile 'org.xmlresolver:xmlresolver:0.14.0'
+
+  // Saxon
+  compile 'saxon:saxon:6.5.3'
+
+  // Saxon 9
+  compile 'net.sf.saxon:Saxon-HE:9.8.0-14'
+
+  // Xerces
+  runtime 'xerces:xercesImpl:2.11.0' // TODO 2.12.0?
+
+  // FOP
+  compile "org.apache.xmlgraphics:fop:$fopVersion"
+
+  // JEuclid-FOP
+  compile project(':jeuclid-fop')
+}
+
+task sourceJar(type: Jar) {
+  from sourceSets.main.allSource
+  classifier = 'sources'
+}
+
+apply plugin: 'java-gradle-plugin'
+
+gradlePlugin {
+  plugins {
+    docBookPlugin {
+      id = 'org.podval.docbook-gradle-plugin'
+      implementationClass = 'org.podval.docbook.gradle.DocBookPlugin'
+    }
+  }
+}
+
+apply plugin: 'maven-publish'
+
+def gitHubRepository    = "dubinsky/podval-docbook-gradle"
+def gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
+
+publishing {
+  publications {
+    mavenPublication(MavenPublication) {
+      groupId project.group
+      artifactId jar.baseName
+
+      from components.java
+      artifact sourceJar
+
+      pom {
+        name = project.name
+        description = project.description
+        url = "$gitHubRepositoryUrl"
+        scm {
+          url = "$gitHubRepositoryUrl"
+          connection = "scm:git:git://github.com/${gitHubRepository}.git"
+          developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
+        }
+        licenses {
+          license {
+            name = 'The Apache Software License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution = 'repo'
+            comments = 'A business-friendly OSS license'
+          }
+        }
+        developers {
+          developer {
+            id = 'dub'
+            name = 'Leonid Dubinsky'
+            email = 'dub@podval.org'
+            url = 'http://dub.podval.org'
+            organization = 'Podval Group'
+            organizationUrl = 'http://www.podval.org'
+            timezone = '-5'
+          }
+        }
+      }
+    }
+  }
+}
+
+apply plugin: 'com.jfrog.bintray'
+
+def pluginTags = ['Scala', 'DocBook', 'Gradle', 'Plugin']
+
+bintray {
+  user         = 'dubinsky'
+  key          = findProperty('bintrayApiKey')
+  publications = ['mavenPublication']
+  dryRun       = false
+  publish      = true
+  override     = true
+  pkg {
+    repo                   = 'org.podval.docbook'
+    name                   = project.jar.baseName
+    desc                   = project.description
+    websiteUrl             = "${gitHubRepositoryUrl}"
+    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
+    vcsUrl                 = "${gitHubRepositoryUrl}.git"
+    githubRepo             = gitHubRepository
+    licenses               = ['Apache-2.0']
+    labels                 = pluginTags
+    publicDownloadNumbers  = true
+    githubReleaseNotesFile = 'CHANGELOG.md'
+    version { name         = project.version }
+  }
+}
+
+apply plugin: 'com.gradle.plugin-publish'
+
+pluginBundle {
+  website = "${gitHubRepositoryUrl}"
+  vcsUrl = "${gitHubRepositoryUrl}.git"
+
+  plugins {
+    docBookPlugin {
+      // id and displayName are mandatory.
+      // id is captured from java-gradle-plugin configuration.
+      displayName = project.description
+      description = project.description
+      tags        = pluginTags
+      // if no version is set, the project version will be used.
+      version     = project.version
+    }
+  }
+
+  // If you have an existing plugin deployed to Bintray and would like to keep
+  // your existing group ID and artifact ID for continuity, you can specify
+  // them here (needs manual approval on first publication).
+  mavenCoordinates {
+    groupId    = project.group
+    artifactId = jar.baseName
+    version    = project.version // defaults to the project version
+  }
+}
