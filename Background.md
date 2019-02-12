@@ -136,7 +136,17 @@ still supports the original extension mechanism :)
 
 Although FOP JEuclid plugin code works as is, I mage one change: I use explicit programmatic
 configuration instead of leaving classpath provider-configuration crumbs for the the ServerLoader
-(see JEuclidFopFactoryConfigurator class).
+(see JEuclidFopFactoryConfigurator class). Here are the names and contents of the provider-configuration
+files for informational purposes:
+
+| Name                                                        | Contents                                                     |
+|-------------------------------------------------------------|--------------------------------------------------------------|
+| org.papache.fop.fo.ElementMapping                           | net.sourceforge.jeuclid.fop.JEuclidElementMapping            |
+| org.apache.fop.render.XMLHandler                            | net.sourceforge.jeuclid.fop.JEuclidXMLHandler                |
+|  org.apache.xmlgraphics.image.loader.spi.ImageConverter     | net.sourceforge.jeuclid.xmlgraphics.ImageConverterMathML2G2D |
+|  org.apache.xmlgraphics.image.loader.spi.ImageLoaderFactory | net.sourceforge.jeuclid.xmlgraphics.ImageLoaderFactoryMathML |
+|  org.apache.xmlgraphics.image.loader.spi.ImagePreloader     | net.sourceforge.jeuclid.xmlgraphics.PreloaderMathML          |
+
 
 I should probably submit a pull request to restore FOP plugin in the forked JEuclid,
 but I am getting compile errors in ConverterRegistry (talk about ServiceLoader!):

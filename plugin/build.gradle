@@ -35,8 +35,9 @@ dependencies {
   // FOP
   compile "org.apache.xmlgraphics:fop:$fopVersion"
 
-  // JEuclid-FOP
-  compile project(':jeuclid-fop')
+  // JEuclid
+  compile 'de.rototor.jeuclid:jeuclid-core:3.1.13'
+  // old:  compile 'net.sourceforge.jeuclid:jeuclid-fop:3.1.9'
 }
 
 task sourceJar(type: Jar) {
