@@ -1,3 +1,1 @@
-include ':plugin'
-project(':plugin').name = 'org.podval.docbook-gradle-plugin'
-include ':tests'
+rootProject.name = 'org.podval.docbook-gradle-plugin'

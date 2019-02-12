@@ -135,22 +135,22 @@ object Resolver {
     result
   }
 
-  def resourceInputSource(name: String): InputSource = {
-    val result = new InputSource(getClass.getResourceAsStream(name))
-    result.setSystemId(name)
-    result.setPublicId(null)
-    result
-  }
+//  def resourceInputSource(name: String): InputSource = {
+//    val result = new InputSource(getClass.getResourceAsStream(name))
+//    result.setSystemId(name)
+//    result.setPublicId(null)
+//    result
+//  }
 
   def fileSource(file: File): Source =
     new StreamSource(file)
 
-  def stringSource(input: String, publicId: Option[String], systemId: Option[String]): Source = {
-    val result = new StreamSource(new StringReader(input))
-    result.setPublicId(publicId.orNull)
-    result.setSystemId(systemId.orNull)
-    result
-  }
+//  def stringSource(input: String, publicId: Option[String], systemId: Option[String]): Source = {
+//    val result = new StreamSource(new StringReader(input))
+//    result.setPublicId(publicId.orNull)
+//    result.setSystemId(systemId.orNull)
+//    result
+//  }
 
   def createParentResolver: org.xmlresolver.Resolver = {
     val properties = new java.util.Properties

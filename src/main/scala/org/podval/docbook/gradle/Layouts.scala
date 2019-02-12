@@ -11,11 +11,11 @@ class Layouts(projectDir: File, buildDir: File) {
     private def sourceDirectory(name: String): File = new File(sourceDir, name)
 
     private def inputDirectoryName: String = "docBook"
-    private def inputDirectory: File = sourceDirectory(inputDirectoryName)
+    final override def inputDirectory: File = sourceDirectory(inputDirectoryName)
 
     final override def inputFile(inputFileName: String): File = new File(inputDirectory, inputFileName + ".xml")
 
-    private def stylesheetDirectory: File = sourceDirectory(stylesheetDirectoryName)
+    final override def stylesheetDirectory: File = sourceDirectory(stylesheetDirectoryName)
     final override def stylesheetFile(name: String) = new File(stylesheetDirectory, name + ".xsl")
 
     final override def imagesDirectoryName: String = "images"
@@ -27,7 +27,7 @@ class Layouts(projectDir: File, buildDir: File) {
     final override def cssFile: File = new File(cssDirectory, cssFileName)
 
     private def fopConfigurationDirectoryName: String = "fop"
-    private def fopConfigurationDirectory: File = sourceDirectory(fopConfigurationDirectoryName)
+    final override def fopConfigurationDirectory: File = sourceDirectory(fopConfigurationDirectoryName)
     private def fopConfigurationFileName: String = "fop.xconf"
     final override def fopConfigurationFile: File = new File(fopConfigurationDirectory, fopConfigurationFileName)
 
@@ -47,15 +47,6 @@ class Layouts(projectDir: File, buildDir: File) {
     protected def saxonOutputDirectoryName: String
 
     final override def saxonOutputDirectoryRoot: File = buildDirectory(saxonOutputDirectoryName)
-
-    def inputDirectories: Set[File] = Set(
-      inputDirectory,
-      stylesheetDirectory,
-      dataDirectory,
-      imagesDirectory,
-      cssDirectory,
-      fopConfigurationDirectory
-    )
   }
 
   val forXslt1: LayoutBase = new LayoutBase {

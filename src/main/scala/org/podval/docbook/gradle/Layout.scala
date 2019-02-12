@@ -7,9 +7,13 @@ trait Layout {
 
   def docBookXslConfigurationName: String
 
+  def inputDirectory: File
+
   def inputFile(inputFileName: String): File
 
   def stylesheetDirectoryName: String
+
+  def stylesheetDirectory: File
 
   def stylesheetFile(name: String): File
 
@@ -24,6 +28,8 @@ trait Layout {
   def cssFileName: String
 
   def cssFile: File
+
+  def fopConfigurationDirectory: File
 
   def fopConfigurationFile: File
 

@@ -4,7 +4,7 @@ import org.gradle.api.{Action, DefaultTask, Project}
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.{CopySpec, FileCopyDetails, RelativePath}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
-import org.gradle.api.tasks.{Input, TaskAction}
+import org.gradle.api.tasks.{Input, Internal, TaskAction}
 import java.io.{File, InputStream}
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
@@ -13,14 +13,31 @@ class DocBookTask extends DefaultTask {
 
   private val layouts: Layouts = Layouts.forProject(getProject)
 
+  private val logger: Logger = new Logger.PluginLogger(getLogger)
+
   // To let projects that use the plugin to not make assumptions about directory names
-  def getOutputDirectory: File = layouts.forXslt1.outputDirectoryRoot
+  @Internal def getOutputDirectory: File = layouts.forXslt1.outputDirectoryRoot
 
-  // Register inputs and outputs
-  (layouts.forXslt1.inputDirectories ++ layouts.forXslt2.inputDirectories)
-    .filter(_.exists)
-    .foreach(getInputs.dir)
+  // Register inputs
+  val inputDirectories: Set[File] = Set(
+    layouts.forXslt1.inputDirectory,
+    layouts.forXslt1.cssDirectory,
+    layouts.forXslt1.fopConfigurationDirectory,
+    layouts.forXslt1.dataDirectory,
+    layouts.forXslt1.stylesheetDirectory
+  ) ++ Set(
+    layouts.forXslt1.imagesDirectory,
+    // Only stylesheetDirectory can be different for XSLT 1.0 and 2.0
+    layouts.forXslt2.stylesheetDirectory
+  ).filter(_.exists)
 
+  inputDirectories.foreach { directory: File =>
+    logger.info(s"Registering input directory $directory")
+    directory.mkdirs()
+    getOutputs.dir(directory)
+  }
+
+  // Register outputs
   Set(
     layouts.forXslt1.saxonOutputDirectoryRoot,
     layouts.forXslt1.outputDirectoryRoot,
@@ -28,6 +45,7 @@ class DocBookTask extends DefaultTask {
     layouts.forXslt2.outputDirectoryRoot
   ).foreach { directory: File =>
     Util.deleteRecursively(directory)
+    logger.info(s"Registering output directory $directory")
     getOutputs.dir(directory)
   }
 
@@ -54,8 +72,6 @@ class DocBookTask extends DefaultTask {
 
   @TaskAction
   def docBook(): Unit = {
-    val logger: Logger = new Logger.PluginLogger(getLogger)
-
     val processors: List[DocBook2] =
       DocBookTask.getProcessors("docBook.outputFormats", outputFormats, DocBook2.forXslt1, getProject)
 

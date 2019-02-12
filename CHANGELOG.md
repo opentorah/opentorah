@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 02.13.2019
+- cleanup and tests  
+
 ## [0.4.1] - 02.11.2019
 - using caching resolver from org.xmlresolver
 - MathML in PDF via JEuclid FOP plugin
