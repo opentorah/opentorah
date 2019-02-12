@@ -88,6 +88,13 @@ apply plugin: 'base'
 
 Plugin adds to the project Gradle task `processDocBook` that processes DocBook :)
 
+To make use of the DocBook processing in a directory-name-independent way:
+```groovy
+  project.sync {
+    from project.tasks.getByPath(':<subproject with DocBook sources>:processDocBook').outputDirectory
+    into '<published directory>'
+  }  
+```
 
 ## Configuration ##
 

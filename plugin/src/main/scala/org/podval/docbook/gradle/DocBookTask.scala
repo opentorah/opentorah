@@ -6,18 +6,27 @@ import org.gradle.api.file.{CopySpec, FileCopyDetails, RelativePath}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, TaskAction}
 import java.io.{File, InputStream}
-import javax.inject.Inject
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 
-@Inject
 class DocBookTask extends DefaultTask {
 
-  val layouts: Layouts = Layouts.forProject(getProject)
+  private val layouts: Layouts = Layouts.forProject(getProject)
+
+  // To let projects that use the plugin to not make assumptions about directory names
+  def getOutputDirectory: File = layouts.forXslt1.outputDirectoryRoot
 
   // Register inputs and outputs
-  layouts.inputDirectories.foreach(getInputs.dir)
-  layouts.outputDirectories.foreach { directory: File =>
+  (layouts.forXslt1.inputDirectories ++ layouts.forXslt2.inputDirectories)
+    .filter(_.exists)
+    .foreach(getInputs.dir)
+
+  Set(
+    layouts.forXslt1.saxonOutputDirectoryRoot,
+    layouts.forXslt1.outputDirectoryRoot,
+    layouts.forXslt2.saxonOutputDirectoryRoot,
+    layouts.forXslt2.outputDirectoryRoot
+  ).foreach { directory: File =>
     Util.deleteRecursively(directory)
     getOutputs.dir(directory)
   }

@@ -56,11 +56,6 @@ class Layouts(projectDir: File, buildDir: File) {
       cssDirectory,
       fopConfigurationDirectory
     )
-
-    def outputDirectories: Set[File] = Set(
-      saxonOutputDirectoryRoot,
-      outputDirectoryRoot
-    )
   }
 
   val forXslt1: LayoutBase = new LayoutBase {
@@ -82,12 +77,6 @@ class Layouts(projectDir: File, buildDir: File) {
     protected override def outputDirectoryName: String = "docBook2"
     protected override def saxonOutputDirectoryName: String = "docBookTmp2"
   }
-
-  def inputDirectories: Set[File] =
-    (forXslt1.inputDirectories ++ forXslt2.inputDirectories).filter(_.exists)
-
-  def outputDirectories: Set[File] =
-    forXslt1.outputDirectories ++ forXslt2.outputDirectories
 }
 
 object Layouts {

@@ -1,3 +1,7 @@
+plugins {
+  id "org.podval.docbook-gradle-plugin" version "0.4.1" apply false
+}
+
 apply plugin: 'scala'
 
 dependencies {
@@ -10,4 +14,10 @@ dependencies {
   compile project(':org.podval.docbook-gradle-plugin')
 }
 
-// TODO add a task that runs before tests - and makes a direct call to unpack XSLT stylesheets :)
+apply plugin: 'org.podval.docbook-gradle-plugin'
+
+docBook {
+  outputFormats = []
+}
+
+test.dependsOn processDocBook

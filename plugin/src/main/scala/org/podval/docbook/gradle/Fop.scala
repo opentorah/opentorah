@@ -83,7 +83,7 @@ object Fop {
   }
 
   def getFontFiles(configurationFile: File, fontFamilyNames: List[String], logger: Logger): String = {
-    logger.info(s"Fop.getFontFiles($fontFamilyNames)")
+    val fontFamilyNamesStr: String = fontFamilyNames.mkString(", ")
     val fontFamilies: Map[String, List[FontSpec]] = getFontFamilies(configurationFile)
     val uris: List[URI] = fontFamilyNames.flatMap { fontFamilyName: String =>
       fontFamilies.get(fontFamilyName).fold[List[URI]] {
@@ -100,7 +100,7 @@ object Fop {
     if (nonFiles.nonEmpty) logger.error(s"Non-file URIs: $nonFiles")
 
     val result: String = files.map(uri => new File(uri.getPath).getAbsolutePath).mkString(", ")
-    logger.info(s"Fop.getFontFiles: [$result]")
+    logger.info(s"Fop.getFontFiles($fontFamilyNamesStr) = $result.")
     result
   }
 
