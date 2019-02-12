@@ -105,7 +105,7 @@ publishing {
 
 apply plugin: 'com.jfrog.bintray'
 
-def pluginTags = ['Scala', 'DocBook', 'Gradle', 'Plugin']
+def pluginTags = ['Scala', 'DocBook', 'Gradle', 'Plugin', "Html", "Pdf", "Epub", "MathML", "JEuclid"]
 
 bintray {
   user         = 'dubinsky'
@@ -138,13 +138,12 @@ pluginBundle {
 
   plugins {
     docBookPlugin {
-      // id and displayName are mandatory.
+      // id and displayName are mandatory;
       // id is captured from java-gradle-plugin configuration.
       displayName = project.description
       description = project.description
       tags        = pluginTags
-      // if no version is set, the project version will be used.
-      version     = project.version
+      version     = project.version  // defaults to the project version
     }
   }
 

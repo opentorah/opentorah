@@ -136,8 +136,12 @@ still supports the original extension mechanism :)
 
 Although FOP JEuclid plugin code works as is, I mage one change: I use explicit programmatic
 configuration instead of leaving classpath provider-configuration crumbs for the the ServerLoader
-(see JEuclidFopFactoryConfigurator class). Here are the names and contents of the provider-configuration
-files for informational purposes:
+(see JEuclidFopFactoryConfigurator class). The reason I did this (besides my general dislike
+for magic) is: I need to be able to disable JEuclid based on the configuration of my plugin in
+the Gradle build file, which isn't possible if it self-enables just by being on the classpath. 
+
+Here are the names and contents of the provider-configuration files that JEuclid FOP plugin
+had under `META-INF/services` (for informational purposes):
 
 | Name                                                        | Contents                                                     |
 |-------------------------------------------------------------|--------------------------------------------------------------|

@@ -3,4 +3,18 @@
     <xsl:import href="http://docbook.sourceforge.net/release/xsl-ns/current/html/chunk.xsl"/>
 
     <xsl:import href="common-html.xsl"/>
+
+    <!-- Add MathJax support -->
+    <!--
+    <xsl:template name="user.head.content">
+        <script type="text/javascript">
+          window.MathJax = {
+            MathML: {
+            extensions: [ "content-mathml.js", "mml3.js" ]
+            }
+          };
+        </script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML"/>
+    </xsl:template>
+    -->
 </xsl:stylesheet>

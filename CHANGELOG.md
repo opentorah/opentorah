@@ -7,16 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [0.4.1] - 02.11.2019
-- moved JEuclid FOP plugin classes into the plugin
-
-## [0.4.0] - 02.11.2019
-- MathML in PDF via JEuclid FOP plugin
-
-## [0.3.1] - 02.11.2019
-- fixed xml-apis version
-
-## [0.3.0] - 02.11.2019
 - using caching resolver from org.xmlresolver
+- MathML in PDF via JEuclid FOP plugin
 
 ## [0.2.2] - 02.10.2019
 - XSLT 2.0 DocBook stylesheets with Saxon 9 HE
