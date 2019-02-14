@@ -76,17 +76,25 @@ object Resolver {
   // If used in DocBook files, those point to the DocBook XSL files.
   val docBookXslUris: Seq[String] = Seq(
     "http://docbook.sourceforge.net/release/xsl-ns/current/",
-    "https://cdn.docbook.org/release/latest/xslt/base/",
-    "urn:docbook:xsl/"
+    // not needed: customization files with such references are auto-generated,
+    // so official references will serve:
+    // "urn:docbook:xsl/",
+    "https://cdn.docbook.org/release/latest/xslt/base/"        // XSLT 2.0
   )
 
   val docBookPublicId: String = "-//OASIS//DTD DocBook XML V5.0//EN"
 
   // If used in DocBook files, those point to the data directory.
   val dataUris: Seq[String] = Seq(
-    "http://podval.org/docbook/data/",
-    "urn:docbook:data:/",
+    "data/:",
     "data:"
+    // unnecessarily long:
+    //   "http://podval.org/docbook/data/",
+    // unnecessarily long:
+    //   "urn:docbook:data:/"
+    //   although XInclude says the "href" attribute is "any URI",
+    //   Oxygen insists on it being a URL:
+    //     SAXException - javax.xml.transform.TransformerException: Malformed URL urn:docbook:data:/...
   )
 
   def dtd(entities: Map[String, String]): String = entities.toSeq.map {

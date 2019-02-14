@@ -6,7 +6,7 @@ import java.net.URI
 import javax.xml.transform.Transformer
 import javax.xml.transform.sax.SAXResult
 import javax.xml.transform.stream.StreamSource
-import net.sourceforge.jeuclid.JEuclidFopFactoryConfigurator
+import net.sourceforge.jeuclid.fop.plugin.JEuclidFopFactoryConfigurator
 import org.apache.fop.apps.{FopConfParser, FopFactory, FopFactoryBuilder}
 import org.apache.xmlgraphics.util.MimeConstants
 import org.apache.fop.fonts.{FontEventListener, FontTriplet}

@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'org.podval.docbook'
-version = '0.5.0'
+version = '0.5.1'
 description = 'Gradle DocBook plugin.'
 
 repositories {
@@ -18,6 +18,7 @@ def scalaVersion = '2.12.8'
 def scalaVersionMajor = '2.12'
 def fopVersion = '2.3'
 
+def xercesVersion = '2.11.0' // TODO 2.12.0?
 // v1.3.04 doesn't have org.w3c.dom.ElementTraversal that Xerces uses:
 configurations.all {
   resolutionStrategy {
@@ -42,7 +43,7 @@ dependencies {
   compile 'net.sf.saxon:Saxon-HE:9.8.0-14'
 
   // Xerces
-  runtime 'xerces:xercesImpl:2.11.0' // TODO 2.12.0?
+  runtime "xerces:xercesImpl:$xercesVersion"
 
   // FOP
   compile "org.apache.xmlgraphics:fop:$fopVersion"
@@ -55,22 +56,26 @@ dependencies {
 // added by the 'java-gradle-plugin': testImplementation gradleTestKit()
 }
 
-// TODO do I even need this - or does 'java-gradle-plugin' take care of it?
-// TODO do I need to add ScalaDoc jar (JavaDoc one is built by the publishPluginJavaDocsJar task)?
+// Gradle plugin [publishing?] plugin adds tasks publishPluginJar and
+// publishPluginJavaDocsJar that create sources and javadoc archives;
+// attempts to use them as artifacts in the Maven publication failed,
+// so I make my own, replacing javadoc with scaladoc :)
 task sourceJar(type: Jar) {
   from sourceSets.main.allSource
-  // TODO what non-deprecated way is there?
-  classifier = 'sources'
+  archiveClassifier.set('sources')
 }
+
+task scaladocJar(type: Jar) {
+  from scaladoc.destinationDir
+  archiveClassifier.set('scaladoc')
+}
+scaladocJar.dependsOn scaladoc
 
 apply plugin: 'com.github.maiflai.scalatest'
 
 apply plugin: 'java-gradle-plugin'
 
-// TODO what non-deprecated way is there?
-// TODO is there a way to affect pluginArtifactId used by publishPlugin[JavaDocs]Jar tasks
-//  if it is *not* the project name?
-def pluginArtifactId = jar.baseName
+def pluginArtifactId = project.name // jar.baseName
 
 gradlePlugin {
   plugins {
@@ -85,7 +90,7 @@ apply plugin: 'com.gradle.plugin-publish'
 
 def gitHubRepository    = "dubinsky/podval-docbook-gradle"
 def gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
-def pluginTags = ['Scala', 'DocBook', 'Gradle', 'Plugin', "Html", "Pdf", "Epub", "MathML", "JEuclid"]
+def pluginTags = ['Scala', 'DocBook', 'Gradle', 'Plugin', 'Html', 'Pdf', 'Epub', 'MathML', 'JEuclid']
 
 pluginBundle {
   website = "${gitHubRepositoryUrl}"
@@ -93,13 +98,9 @@ pluginBundle {
 
   plugins {
     docBookPlugin {
-      // id and displayName are mandatory;
-      // id is captured from java-gradle-plugin configuration.
-      // TODO displayName and description can be set in the gradlePlugin closure!
       displayName = project.description
       description = project.description
       tags        = pluginTags
-      version     = project.version  // defaults to the project version
     }
   }
 
@@ -109,7 +110,6 @@ pluginBundle {
   mavenCoordinates {
     groupId    = project.group
     artifactId = pluginArtifactId
-    version    = project.version // defaults to the project version
   }
 }
 
@@ -122,7 +122,9 @@ publishing {
       artifactId pluginArtifactId
 
       from components.java
+
       artifact sourceJar
+      artifact scaladocJar
 
       pom {
         name = project.name
@@ -162,12 +164,18 @@ apply plugin: 'com.jfrog.bintray'
 bintray {
   user         = 'dubinsky'
   key          = findProperty('bintrayApiKey')
-  publications = ['mavenPublication']
+  publications = [
+    'mavenPublication',                        // Main: pom, jar, sources, etc.
+    // Gradle plugin [publishing?] plugin adds another publication 'pluginMaven'
+    // that produces the same Jar as the main one - and a POM that has only dependencies.
+    // I do not think I need to publish that :)          
+    'docBookPluginPluginMarkerMaven'           // plugin marker: TODO either link it to JCenter or stop publishing it to Bintray!
+  ]
   dryRun       = false
   publish      = true
   override     = true
   pkg {
-    repo                   = 'org.podval.docbook'
+    repo                   = project.group
     name                   = pluginArtifactId
     desc                   = project.description
     websiteUrl             = "${gitHubRepositoryUrl}"

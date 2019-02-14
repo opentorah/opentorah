@@ -34,8 +34,7 @@ version of the document into the output.
 
 If a data generator class is configured, it's `main()` method will be executed with
 a directory path as a parameter. References in DocBook documents that are prefixed
-with `data:`, `urn:docbook:data:/` or `http://podval.org/docbook/data/` are resolved
-to files in that directory.  
+with `data:/` or `data:` are resolved to files in that directory.  
 
 Plugin uses JEuclid FOP plugin to process MathML when generating PDF.
 
@@ -171,6 +170,9 @@ body {
 }
 ```
 
+Undefined entities break the transformation, while undefined processing instructions are ignored.
+This makes the processing instructions approach more suitable for use with XML editors like Oxygen.
+
 ## Fonts ##
 
 Default FOP configuration created by the plugin causes FOP to auto-detect available fonts,
@@ -247,7 +249,11 @@ For HTML and EPUB, CSS stylesheets and images are included in the output.
 
 Plugin unpacks official DocBook XSLT stylesheets under `build/docBookXsl/docbook/`. References
 in the customization XSL files that are prefixed with `http://docbook.sourceforge.net/release/xsl-ns/current/`
-or `urn:docbook:xsl/` are resolved to the local copies.
+are resolved to the local copies, suppressing retrieval of the stylesheets for each build.
+Gradle will retrieve them once when resolving dependency added by the plugin - and cache the JAR;
+unpacking after each `clean` is cheap. In fact, since plugin integrates with a caching XML resolver,
+this mechanism isn't really necessary, but it is already there :)
+ 
 
 For output formats that require post-processing or packing, intermediate results are deposited
 under `build/docBookTmp`.
@@ -280,6 +286,36 @@ Issues with this integration:
 I am not planning to pursue this - unless thete is a stylesheet that transforms MathML or LaTeX
 into SVG, and it requires XSLT 2.0 :)
 
+## Oxygen ##
+
+### XSLT Stylesheets ###
+
+Oxygen XML Editor makes its own copy of the DocBook XSLT stylesheets available for configuring
+transformation scenarios (as a part of its DocBook framework).
+
+### Generated Data ###
+To make references to the generated data files resolve in Oxygen, add a project-specific XML catalog in
+Options | Preferences | XML | XML Catalog (check `Project Options`, not `Global Options`).
+Since it is possible to use relative URIs in XML Catalogs, contents of such `docbook-data-catalog.xml` file,
+if it is placed in the root directory of a DocBook project (which contains `src/main/docBook/` directory),
+doesn't depend on the project. Here it is:
+
+```xml
+<?xml version="1.0"?>
+<!DOCTYPE catalog PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN"
+  "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+  <rewriteSystem systemIdStartString="data:/" rewritePrefix="build/data/"/>
+  <rewriteSystem systemIdStartString="data:" rewritePrefix="build/data/"/>
+</catalog>
+```
+
+### Images ###
+
+For transformation scenarios, define `img.src.path` parameter as `../images`.
+
+TODO Is teher a way to make images available to Oxygen during editing? 
+  
 
 ## Past ##
 

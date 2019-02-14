@@ -25,6 +25,8 @@ class PluginTest extends FlatSpec with Matchers {
         |<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd">
         |<article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink">
         |  <para>Processing instruction: <?eval version ?>.</para>
+        |  <para>Processing instruction with unknown substitution: <?eval version1 ?>.</para>
+        |  <para>Unknown processing instruction:<?eval1 XXX ?>.</para>
         |  <para>Entity: &version;.</para>
         |  <para>Entity in an attribute:<link xlink:href="http://&version;">link!</link>.</para>
         |</article>
@@ -34,6 +36,8 @@ class PluginTest extends FlatSpec with Matchers {
 
     val indexHtml: String = project.getIndexHtml
     indexHtml.contains("Processing instruction: v1.0.0.") shouldBe true
+    indexHtml.contains("Processing instruction with unknown substitution: Evaluation failed for [version1].") shouldBe true
+    indexHtml.contains("Unknown processing instruction:.") shouldBe true
     indexHtml.contains("Entity: v1.0.0.") shouldBe true
     indexHtml.contains("""Entity in an attribute:<a class="ulink" href="http://v1.0.0" target="_top">link!</a>.""") shouldBe true
   }
@@ -43,6 +47,8 @@ class PluginTest extends FlatSpec with Matchers {
       """
         |<article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink">
         |  <para>Processing instruction: <?eval version ?>.</para>
+        |  <para>Processing instruction with unknown substitution: <?eval version1 ?>.</para>
+        |  <para>Unknown processing instruction:<?eval1 XXX ?>.</para>
         |</article>
       """,
       substitutions = Map[String, String]("version" -> "\"v1.0.0\"")
@@ -50,6 +56,8 @@ class PluginTest extends FlatSpec with Matchers {
 
     val indexHtml: String = project.getIndexHtml
     indexHtml.contains("Processing instruction: v1.0.0.") shouldBe true
+    indexHtml.contains("Processing instruction with unknown substitution: Evaluation failed for [version1].") shouldBe true
+    indexHtml.contains("Unknown processing instruction:.") shouldBe true
   }
 
   "Plugin" should "fail resolving entity substitutions without DTD enabled" in {

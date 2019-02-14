@@ -1,4 +1,4 @@
-package net.sourceforge.jeuclid;
+package net.sourceforge.jeuclid.fop.plugin;
 
 import org.apache.fop.apps.FopFactory;
 
