@@ -1,5 +1,5 @@
 plugins {
-  id "org.podval.docbook-gradle-plugin" version "0.3.1" apply false
+  id "org.podval.docbook-gradle-plugin" version "0.5.0" apply false
 }
 
 apply plugin: 'scala'
@@ -33,6 +33,8 @@ docBook {
   substitutions = [
     "project.version": project.version
   ]
+
+  isJEuclidEnabled = true
 }
 
 build.dependsOn processDocBook
