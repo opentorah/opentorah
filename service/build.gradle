@@ -1,0 +1,67 @@
+/*
+I do not use 'com.bmuschko.docker-java-application' because I want to separate third-party dependencies in a
+different layer from the org.podval ones to speed up pushes.
+
+I do not use 'com.bmuschko.docker-remote-api' because I don't need to: Google Cloud Build step takes care
+of Docker image creation and push.
+
+If I did, this is how I'd do it:
+  task buildDockerImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage, dependsOn: prepareDockerContext) {
+    group = "docker"
+    inputDir = dockerDir
+    tag = "gcr.io/calendar-service-1/service".toString()
+  }
+
+  id 'com.bmuschko.docker-remote-api' version '4.0.5' apply false
+  id 'com.bmuschko.docker-java-application' version '4.0.5' apply false
+*/
+
+description = 'Jewish Calendar Service.'
+
+apply plugin: 'scala'
+
+def http4sVersion = '0.18.21' // '0.20.0-SNAPSHOT'
+def circeVersion  = '0.10.0'
+
+dependencies {
+  zinc    "com.typesafe.zinc:zinc:$zincVersion"
+
+//    compile "org.scala-lang:scala-library:$scalaVersion"
+
+  compile project(':library')
+
+  compile "org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion"
+  compile "org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion"
+  compile "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion"
+  // http4s -> Scalatags bridge, when included as a dependency, confuses the imports;
+  // doing explicit conversions for now :)    
+//  compile "org.http4s:http4s-scalatags_$scalaVersionMajor:$http4sVersion"
+
+  compile "com.lihaoyi:scalatags_$scalaVersionMajor:0.6.7"
+
+  // Add Circe dependencies when we need JSON.
+//  compile "io.circe:circe-core:$circeVersion"
+//  compile "io.circe:circe-generic:$circeVersion"
+//  compile "io.circe:circe-parser:$circeVersion"
+
+
+  runtime "org.slf4j:slf4j-jdk14:1.7.25"
+}
+
+apply plugin: 'application'
+
+mainClassName = 'org.podval.calendar.service.CalendarService'
+
+def dockerDir = file("$buildDir/docker/")
+
+task prepareDockerContext {
+  group = "docker"
+  dependsOn installDist
+
+  doLast {
+    copy { from "$installDist.destinationDir/lib" into "$dockerDir/project-libs" include "**/org.podval.*" }
+    copy { from "$installDist.destinationDir/lib" into "$dockerDir/dependencies" exclude "**/org.podval.*" }
+    copy { from "$installDist.destinationDir/bin" into "$dockerDir/bin" }
+    copy { from "$projectDir/Dockerfile" into dockerDir }
+  }
+}

@@ -5,6 +5,8 @@ repositories {
   }
 }
 
+apply plugin: 'scala'
+
 // for Tut
 configurations.all {
   resolutionStrategy {
@@ -13,14 +15,19 @@ configurations.all {
 }
 
 dependencies {
+  zinc    "com.typesafe.zinc:zinc:$zincVersion"
+  compile "org.scala-lang:scala-library:2.12.7"
+
   runtime project(':library')
   runtime "org.tpolecat:tut-core_2.12:0.6.10"
 }
 
+// Tut
+def tutOutput = "$buildDir/tut"
 task tut(type: JavaExec) {
   group = 'documentation'
   main = 'tut.TutMain'
-  args = ["$projectDir/tut", "$projectDir/examples", ".*\\.(md|markdown|txt|htm|html)"]
+  args = ["$projectDir/tut", tutOutput, ".*\\.(md|markdown|txt|htm|html)"]
   classpath = sourceSets.main.runtimeClasspath
 }
 
@@ -29,12 +36,15 @@ build.dependsOn tut
 build.dependsOn ':paper:processDocBook'
 build.doLast {
   project.sync {
-    from "${project(':paper').buildDir}/docBook/"
-//  from project(':paper:').tasks.getByPath('processDocBook').finalOutputDirectoryRoot
+    from project.tasks.getByPath(':paper:processDocBook').outputDirectory
     into 'paper'
-  }  
+  }
+  project.sync {
+    from tutOutput
+    into 'examples'
+  }
 //  sync {
-//    from project(':library').tasks.named('scaladoc').get().destinationDir
+//    from project.tasks.getByPath(':library:scaladoc').destinationDir
 //    into 'scaladoc'
 //  }
 }

@@ -1,0 +1,116 @@
+plugins {
+  id "com.github.maiflai.scalatest" version "0.23" apply false
+  id "com.jfrog.bintray" version "1.8.4" apply false
+}
+
+description = 'Jewish Calendar Dates.'
+
+apply plugin: 'scala'
+
+def catsVersion = '1.5.0'
+
+dependencies {
+  zinc    "com.typesafe.zinc:zinc:$zincVersion"
+  compile "org.scala-lang:scala-library:$scalaVersion"
+  compile "org.scala-lang.modules:scala-xml_$scalaVersionMajor:1.1.0"
+
+// for cats: scalacOptions += "-Ypartial-unification"
+
+  testCompile "org.scalacheck:scalacheck_$scalaVersionMajor:1.14.0"
+  testCompile "org.scalatest:scalatest_$scalaVersionMajor:3.0.5"
+  testRuntime "org.pegdown:pegdown:1.6.0" // for scalatest reports
+
+  testCompile "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
+  testCompile "org.typelevel:algebra-laws_$scalaVersionMajor:1.0.0"
+
+  //testCompile "org.typelevel:cats-laws_$scalaVersionMajor:$catsVersion"
+  //testCompile "org.typelevel:cats-testkit_$scalaVersionMajor:$catsVersion"
+  // incompatible with 0.10.1 that http4s uses!
+  //testCompile "org.typelevel:cats-effect_$scalaVersionMajor:1.1.0"
+  //testCompile "org.typelevel:algebra_$scalaVersionMajor:1.0.0"
+}
+
+task sourceJar(type: Jar) {
+  from sourceSets.main.allSource
+  classifier = 'sources'
+}
+
+apply plugin: 'com.github.maiflai.scalatest'
+
+jar.baseName = "$project.group-$project.name"
+
+def gitHubRepository    = "jewish-calendar/calendar"
+def gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
+
+def bintrayConfig = {
+  user         = 'dubinsky'
+  key          = findProperty('bintrayApiKey')
+  publications = ['mavenPublication']
+  dryRun       = false
+  publish      = true
+  override     = true
+  pkg {
+    repo                   = 'org.podval.calendar'
+    name                   = project.jar.baseName
+    desc                   = project.description
+    websiteUrl             = "${gitHubRepositoryUrl}"
+    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
+    vcsUrl                 = "${gitHubRepositoryUrl}.git"
+    githubRepo             = gitHubRepository
+    licenses               = ['Apache-2.0']
+    labels                 = ['Scala', 'Calendar', 'Jewish']
+    publicDownloadNumbers  = true
+    githubReleaseNotesFile = "${rootProject.projectDir}/docs/CHANGELOG.md"
+    version { name         = project.version }
+  }
+}
+
+apply plugin: 'maven-publish'
+publishing {
+  publications {
+    mavenPublication(MavenPublication) {
+      groupId project.group
+      artifactId jar.baseName
+
+      from components.java
+      artifact sourceJar
+
+      pom {
+        name = project.name
+        description = project.description
+        url = "$gitHubRepositoryUrl"
+        scm {
+          url = "$gitHubRepositoryUrl"
+          connection = "scm:git:git://github.com/${gitHubRepository}.git"
+          developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
+        }
+        licenses {
+          license {
+            name = 'The Apache Software License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution = 'repo'
+            comments = 'A business-friendly OSS license'
+          }
+        }
+        organization {
+          name = 'Jewish Calendar'
+          url = 'http://www.jewish-calendar.org'
+        }
+        developers {
+          developer {
+            id = 'dub'
+            name = 'Leonid Dubinsky'
+            email = 'dub@podval.org'
+            url = 'http://dub.podval.org'
+            organization = 'Podval Group'
+            organizationUrl = 'http://www.podval.org'
+            timezone = '-5'
+          }
+        }
+      }
+    }
+  }
+}
+
+apply plugin: 'com.jfrog.bintray'
+bintray bintrayConfig
