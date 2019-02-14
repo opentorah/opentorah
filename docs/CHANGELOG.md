@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2019-02-13
+- Psalms for the day of the week, year's molad and delay
+- website index.html consolidation
+- use sync for publishing the paper into docs
+- using DocBook Plugin!
+- using JEuclid: MathML in PDF!
+- font that has all required scripts
+- split build.gradle (and removed POM)
+
 ## [0.2.9] - 2019-01-23
 - using Cats and Algebra for testing the laws
 - optimization: Years are cached; Month/Day get their Year/Month at construction if it is known
