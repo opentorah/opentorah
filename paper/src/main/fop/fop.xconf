@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fop version="1.0">
-  <strict-configuration>true</strict-configuration>
-  <strict-validation>true</strict-validation>
-
-  <!-- Source resolution in dpi (dots/pixels per inch) for determining the size of pixels in SVG and bitmap images, default: 72dpi -->
-  <source-resolution>72</source-resolution>
-  <!-- Target resolution in dpi (dots/pixels per inch) for specifying the target resolution for generated bitmaps, default: 72dpi -->
-  <target-resolution>72</target-resolution>
-
   <renderers>
     <renderer mime="application/pdf">
       <fonts>
-        <!-- FOP will look for other fonts in the fonts installed in the operating system. -->
+        <!-- FOP will detect fonts available in the operating system. -->
         <auto-detect/>
       </fonts>
     </renderer>

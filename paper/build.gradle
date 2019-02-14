@@ -1,10 +1,17 @@
 plugins {
-  id "org.podval.docbook-gradle-plugin" version "0.2.2"
+  id "org.podval.docbook-gradle-plugin" version "0.5.0" apply false
 }
 
+apply plugin: 'scala'
+
 dependencies {
-  compile lib.scalaXml, project(':library')
+  zinc    "com.typesafe.zinc:zinc:$zincVersion"
+  compile "org.scala-lang:scala-library:$scalaVersion"
+
+  compile project(':library')
 }
+
+apply plugin: 'org.podval.docbook-gradle-plugin'
 
 docBook {
   documentName = "calendar"
@@ -18,9 +25,7 @@ docBook {
     "body.font.family"     : "DejaVu Sans",
     "sans.font.family"     : "DejaVu Sans",
     "monospace.font.family": "DejaVu Sans Mono",
-    "dingbat.font.family"  : "ZapfDingbats", // The font family for copyright, quotes, and other symbols
-//    "symbol.font.family": "???" // TODO configure with catch-all symbol font(s)
-
+    "dingbat.font.family"  : "ZapfDingbats",
 //    "footnote.font.size": "10"
     "body.font.master": "12"
   ]
@@ -28,6 +33,8 @@ docBook {
   substitutions = [
     "project.version": project.version
   ]
+
+  isJEuclidEnabled = true
 }
 
 build.dependsOn processDocBook
