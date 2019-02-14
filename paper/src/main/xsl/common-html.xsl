@@ -19,5 +19,6 @@
     <!-- "role" attribute on "para" will become "class" in HTML -->
     <xsl:param name="para.propagates.style">yes</xsl:param>
 
+    <!-- Include page number in cross-references -->
     <xsl:param name="insert.xref.page.number">yes</xsl:param>
 </xsl:stylesheet>
