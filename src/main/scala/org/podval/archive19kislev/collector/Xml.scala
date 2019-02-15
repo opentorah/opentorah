@@ -1,8 +1,8 @@
-package org.podval.archive19kislev
+package org.podval.archive19kislev.collector
 
-import scala.xml.{XML, Node, Elem, PrettyPrinter, Utility}
-import java.io.{File, OutputStream, Writer, FileWriter, OutputStreamWriter, PrintWriter}
+import java.io.{File, FileWriter, OutputStream, OutputStreamWriter, PrintWriter, Writer}
 
+import scala.xml.{Elem, Node, PrettyPrinter, Utility, XML}
 
 object Xml {
 
@@ -48,8 +48,8 @@ object Xml {
     }
 
 
-    def oneChild(name: String): Elem = oneOptionalChild(name, true).get
-    def optionalChild(name: String): Option[Elem] = oneOptionalChild(name, false)
+    def oneChild(name: String): Elem = oneOptionalChild(name, required = true).get
+    def optionalChild(name: String): Option[Elem] = oneOptionalChild(name, required = false)
 
 
     private[this] def oneOptionalChild(name: String, required: Boolean = true): Option[Elem] = {
@@ -58,7 +58,7 @@ object Xml {
       if (children.size > 1) throw new NoSuchElementException(s"To many children with name $name")
       if (required && children.isEmpty) throw new NoSuchElementException(s"No child with name $name")
 
-      if (children.isEmpty) None else Some(children(0).asInstanceOf[Elem])
+      if (children.isEmpty) None else Some(children.head.asInstanceOf[Elem])
     }
 
 

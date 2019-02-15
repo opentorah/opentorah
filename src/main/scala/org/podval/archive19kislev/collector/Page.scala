@@ -1,4 +1,4 @@
-package org.podval.archive19kislev
+package org.podval.archive19kislev.collector
 
 import scala.xml.Elem
 

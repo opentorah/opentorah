@@ -1,13 +1,15 @@
-package org.podval.archive19kislev
+package org.podval.archive19kislev.collector
 
 import java.io.File
 
 import scala.xml.Elem
 
 
-final class Collection(val directoryName: String, val title: String) {
-
-  val collectionDirectory = new File(Layout.site, directoryName)
+final class Collection(
+  val directoryName: String,
+  val title: String
+) {
+  val collectionDirectory = new File(Collection.docsDirectory, directoryName)
   val teiDirectory = new File(collectionDirectory, "documents")
   val facsimilesDirectory = new File(collectionDirectory, "facsimiles")
 
@@ -51,7 +53,7 @@ final class Collection(val directoryName: String, val title: String) {
 
     // Check that all the images are accounted for
     val orphanImages: Seq[String] = (imageNames.toSet -- pages.map(_.name).toSet).toSeq.sorted
-    if (!orphanImages.isEmpty) throw new IllegalArgumentException(s"Orphan images: $orphanImages")
+    if (orphanImages.nonEmpty) throw new IllegalArgumentException(s"Orphan images: $orphanImages")
   }
 
 
@@ -73,7 +75,7 @@ final class Collection(val directoryName: String, val title: String) {
   }
 
 
-  final def toHtml: Elem = {
+  def toHtml: Elem = {
     <html>
       <head>
         <link rel="stylesheet" href={"../css/index.css"} type="text/css"/>
@@ -91,9 +93,16 @@ final class Collection(val directoryName: String, val title: String) {
             </tbody>
           </table>
 
-          {if (!missingPages.isEmpty) <p>Отсутствуют фотографии страниц: {missingPages.mkString(" ")}</p>}
+          {if (missingPages.nonEmpty) <p>Отсутствуют фотографии страниц: {missingPages.mkString(" ")}</p>}
         </div>
       </body>
     </html>
   }
+}
+
+object Collection {
+  val docsDirectory: File = new File("docs").getAbsoluteFile
+
+  def writeIndex(directoryName: String, title: String): Unit =
+    new Collection(directoryName, title).writeIndex()
 }

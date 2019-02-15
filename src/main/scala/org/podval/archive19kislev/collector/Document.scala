@@ -1,7 +1,8 @@
-package org.podval.archive19kislev
+package org.podval.archive19kislev.collector
+
+import org.podval.archive19kislev.collector.Xml.Ops
 
 import scala.xml.Elem
-import Xml.Ops
 
 
 final class Document(xml: Elem, val name: String) {
@@ -20,7 +21,7 @@ final class Document(xml: Elem, val name: String) {
   val publicationDate: Option[String] = optionize(fileDesc.oneChild("publicationStmt").oneChild("date").text)
 
   val langUsage: Elem = teiHeader.oneChild("profileDesc").oneChild("langUsage")
-  val languages = extractLanguages(langUsage)
+  val languages: Seq[String] = extractLanguages(langUsage)
   val language: Option[String] = languages.headOption
 
   val content: Seq[Elem] = tei.oneChild("text").oneChild("body").elems
@@ -30,9 +31,9 @@ final class Document(xml: Elem, val name: String) {
     def text(e: Elem): String =   (e.child map (_.text)).mkString(" ")
 
     val titles = titleStmt.elemsFilter("title")
-    val partTitle = titles.find(_.getAttribute("type") == "part").map(text(_))
-    val mainTitle = titles.find(_.getAttribute("type") == "main").map(text(_)).flatMap(optionize)
-    val subTitle = titles.find(_.getAttribute("type") == "sub").map(text(_))
+    val partTitle = titles.find(_.getAttribute("type") == "part").map(text)
+    val mainTitle = titles.find(_.getAttribute("type") == "main").map(text).flatMap(optionize)
+    val subTitle = titles.find(_.getAttribute("type") == "sub").map(text)
     (partTitle, mainTitle, subTitle)
   }
 

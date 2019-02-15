@@ -1,5 +1,4 @@
-package org.podval.archive19kislev
-
+package org.podval.archive19kislev.collector
 
 object Name {
 
