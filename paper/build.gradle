@@ -1,5 +1,5 @@
 plugins {
-  id "org.podval.docbook-gradle-plugin" version "0.6.0" apply false
+  id "org.podval.docbook-gradle-plugin" version "0.6.8" apply false
 }
 
 apply plugin: 'scala'
@@ -14,21 +14,11 @@ dependencies {
 apply plugin: 'org.podval.docbook-gradle-plugin'
 
 docBook {
-  documentName = "calendar"
+  document = "calendar"
 
   dataGeneratorClass = "org.podval.calendar.paper.Tables"
 
   outputFormats = ["html", "pdf", "epub2"]
-
-  xslParameters = [
-    "title.font.family"    : "DejaVu Sans",
-    "body.font.family"     : "DejaVu Sans",
-    "sans.font.family"     : "DejaVu Sans",
-    "monospace.font.family": "DejaVu Sans Mono",
-    "dingbat.font.family"  : "ZapfDingbats",
-//    "footnote.font.size": "10"
-    "body.font.master": "12"
-  ]
 
   substitutions = [
     "project.version": project.version
@@ -36,5 +26,48 @@ docBook {
 
   isJEuclidEnabled = true
 }
+
+docBook.parameters.common = [
+  // "punct.honorific": "",    // Remove trailing period after honorific
+  "toc.section.depth": "4", // Table of contents
+  "section.autolabel": "0"  // Do not label the sections
+]
+
+docBook.parameters.htmlCommon = [
+  "chunk.quietly": "1",
+  "chunker.output.encoding": "UTF-8",
+  "chunker.output.indent": "yes", // Pretty-print the HTML
+  "use.id.as.filename": "yes",    // Use ids as names
+  "chunk.first.sections": "1"     // Chunk first section separately from the start of the chapter
+]
+
+docBook.parameters.html2 = [
+  "toc.section.depth": "4",   // Table of contents
+  "use.id.as.filename": "yes" // Use ids as names
+]
+
+docBook.parameters.pdf = [
+  "title.font.family"    : "DejaVu Sans",
+  "body.font.family"     : "DejaVu Sans",
+  "sans.font.family"     : "DejaVu Sans",
+  "monospace.font.family": "DejaVu Sans Mono",
+  "symbol.font.family"   : "DejaVu Sans",
+  // "footnote.font.size": "10"
+  "body.font.master": "12",
+
+  // Paper size; double-sidedness; not a draft
+  "paper.type": "USletter",
+  "double.sided": "1",
+  "draft.mode": "no",
+
+  // FOP extensions
+  "fop.extensions": "0",
+  "fop1.extensions": "1",
+
+  "body.start.indent": "0pt", // Suppress content indent
+  "orderedlist.label.width": "2em", // Some space for the list labels
+  "keep.relative.image.uris": "1" // XInclude shouldn't affect image URIs
+]
+
 
 build.dependsOn processDocBook
