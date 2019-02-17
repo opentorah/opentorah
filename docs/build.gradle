@@ -31,9 +31,9 @@ task tut(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
 }
 
+build.dependsOn ':paper:processDocBook'
 build.dependsOn tut
 build.dependsOn ':library:scaladoc'
-build.dependsOn ':paper:processDocBook'
 build.doLast {
   project.sync {
     from project.tasks.getByPath(':paper:processDocBook').outputDirectory

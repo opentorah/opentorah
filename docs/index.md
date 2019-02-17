@@ -39,6 +39,6 @@ Other [sources](/sources/)
 Paper on the subject; available in various formats:
 - [HTML](/paper/html/)
 - [PDF](/paper/pdf/calendar.pdf)
-- [EPUB](/paper/epub/calendar.epub)
+- [EPUB2](/paper/epub2/calendar.epub)
 
 Assorted [remarks](/remarks/) 
