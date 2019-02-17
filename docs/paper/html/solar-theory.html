@@ -9,12 +9,8 @@
       <link rel="up" href="index.html" title="Rambam on Calendar">
       <link rel="prev" href="acknowledgements.html" title="Acknowledgements">
       <link rel="next" href="lunar-theory.html" title="Lunar Theory"><script type="text/javascript">
-          window.MathJax = {
-            MathML: {
-              extensions: [ "content-mathml.js", "mml3.js" ]
-            }
-          };
-        </script><script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML"></script></head>
+      window.MathJax = { MathML: { extensions: [ "content-mathml.js", "mml3.js" ] } };
+    </script><script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML"></script></head>
    <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
       <div class="navheader">
          <table width="100%" summary="Navigation header">
@@ -43,404 +39,165 @@
             <div class="titlepage">
                <div>
                   <div>
-                     <h3 class="title"><a name="d0e76"></a>Chapter 12
+                     <h3 class="title"><a name="d0e76"></a>Discussion: Chapter 12, Law 1
                      </h3>
                   </div>
                </div>
             </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h4 class="title"><a name="d0e79"></a>Law 1
-                        </h4>
-                     </div>
-                  </div>
-               </div>
-               <p>The mean rate of movement of the sun in one day - that is, twenty four hours - is 59&#8242;8&#8243;.</p>
-               <p>For longer periods, (remainder) of the movement in mean lunar longitude is:</p>
-               <div class="informaltable"><a name="slm-original"></a><table class="informaltable" border="1">
-                     <colgroup>
-                        <col>
-                        <col>
-                     </colgroup>
-                     <thead>
-                        <tr>
-                           <th>days</th>
-                           <th>value</th>
-                        </tr>
-                        <tr>
-                           <th>n</th>
-                           <th>v(n)</th>
-                        </tr>
-                     </thead>
-                     <tbody>
-                        <tr>
-                           <td>1</td>
-                           <td>0&deg;59&#8242;8&#8243;</td>
-                        </tr>
-                        <tr>
-                           <td>10</td>
-                           <td>9&deg;51&#8242;23&#8243;</td>
-                        </tr>
-                        <tr>
-                           <td>100</td>
-                           <td>98&deg;33&#8242;53&#8243;</td>
-                        </tr>
-                        <tr>
-                           <td>1000</td>
-                           <td>265&deg;38&#8242;50&#8243;</td>
-                        </tr>
-                        <tr>
-                           <td>10000</td>
-                           <td>136&deg;28&#8242;20&#8243;</td>
-                        </tr>
-                        <tr>
-                           <td>29</td>
-                           <td>28&deg;35&#8242;1&#8243;</td>
-                        </tr>
-                        <tr>
-                           <td>354</td>
-                           <td>348&deg;55&#8242;15&#8243;</td>
-                        </tr>
-                     </tbody>
-                  </table>
-               </div>
-               <p>
-                                  And in this way you can calculate it for any number of days and years that you want.
-                                  And so if you want to calculate movement in 2, 3, 4 - up to 10 days - you can do it.
-                                  And so if you want to calculate movement in 20, 30, 40 - up to 100 days - you can do it.
-                                  And it is obvious that once you know the movement in one day.
-                                  Regular lunar year is 354 days.
-                              
-               </p>
-               <p>
-                                  Between two consecutive nights of observation there is 29 full days.
-                                  Between night of observation of a given month and the night of observation of the same month next year
-                                  is in a regular year - or one day more.
-                                  Our goal in all these calculations is solely to determine visibility of the moon.
-                              
-               </p>
-               <div class="section">
-                  <div class="titlepage">
-                     <div>
-                        <div>
-                           <h5 class="title"><a name="d0e140"></a>Discussion
-                           </h5>
-                        </div>
-                     </div>
-                  </div>
-                  <p> It is not clear how Rambam arrived at the values he gives. When value of the
-                                         movement in one day given by Rambam is multiplied by 29, 100 etc., the result is
-                                         smaller than that of Rambam. The following table compares printed and calculated
-                                         values:
-                  </p>
-                  <div class="informaltable"><a name="slm-calculated"></a><table class="informaltable" border="1">
-                        <colgroup>
-                           <col>
-                           <col>
-                           <col>
-                        </colgroup>
-                        <thead>
-                           <tr>
-                              <th>days</th>
-                              <th>value</th>
-                              <th>calculated</th>
-                           </tr>
-                           <tr>
-                              <th>n</th>
-                              <th>v(n)</th>
-                              <th>v(1)*n</th>
-                           </tr>
-                        </thead>
-                        <tbody>
-                           <tr>
-                              <td>1</td>
-                              <td>0&deg;59&#8242;8&#8243;</td>
-                              <td>0&deg;59&#8242;8&#8243;</td>
-                           </tr>
-                           <tr>
-                              <td>10</td>
-                              <td>9&deg;51&#8242;23&#8243;</td>
-                              <td>9&deg;51&#8242;20&#8243;</td>
-                           </tr>
-                           <tr>
-                              <td>100</td>
-                              <td>98&deg;33&#8242;53&#8243;</td>
-                              <td>98&deg;33&#8242;20&#8243;</td>
-                           </tr>
-                           <tr>
-                              <td>1000</td>
-                              <td>265&deg;38&#8242;50&#8243;</td>
-                              <td>985&deg;33&#8242;20&#8243;</td>
-                           </tr>
-                           <tr>
-                              <td>10000</td>
-                              <td>136&deg;28&#8242;20&#8243;</td>
-                              <td>9855&deg;33&#8242;20&#8243;</td>
-                           </tr>
-                           <tr>
-                              <td>29</td>
-                              <td>28&deg;35&#8242;1&#8243;</td>
-                              <td>28&deg;34&#8242;52&#8243;</td>
-                           </tr>
-                           <tr>
-                              <td>354</td>
-                              <td>348&deg;55&#8242;15&#8243;</td>
-                              <td>348&deg;53&#8242;12&#8243;</td>
-                           </tr>
-                        </tbody>
-                     </table>
-                  </div>
-                  <p> Although the value of the movement of the mean solar longitude in one day
-                                         given by <a class="biblioref" href="bibliography.html#Almagest">Almagest</a> III 1 (H209) (which, rounded to
-                                         seconds, becomes Rambam's value) is bigger, it is not big enough, and Rambam's
-                                         numbers (for more than 10 days) can not be explained by performing calculations
-                                         with the long value from Almagest and then rounding the results to the precision
-                                         of the Rambam's values. 
-                  </p>
-                  <div class="informaltable"><a name="slm-almagest"></a><table class="informaltable" border="1">
-                        <colgroup>
-                           <col>
-                           <col>
-                           <col>
-                        </colgroup>
-                        <thead>
-                           <tr>
-                              <th>days</th>
-                              <th>value</th>
-                              <th>Alamgest</th>
-                           </tr>
-                           <tr>
-                              <th>n</th>
-                              <th>v(n)</th>
-                              <th>*n</th>
-                           </tr>
-                        </thead>
-                        <tbody>
-                           <tr>
-                              <td>1</td>
-                              <td>0&deg;59&#8242;8&#8243;</td>
-                              <td>0&deg;59&#8242;8&#8243;</td>
-                           </tr>
-                           <tr>
-                              <td>10</td>
-                              <td>9&deg;51&#8242;23&#8243;</td>
-                              <td>9&deg;51&#8242;23&#8243;</td>
-                           </tr>
-                           <tr>
-                              <td>100</td>
-                              <td>98&deg;33&#8242;53&#8243;</td>
-                              <td>98&deg;33&#8242;49&#8243;</td>
-                           </tr>
-                           <tr>
-                              <td>1000</td>
-                              <td>265&deg;38&#8242;50&#8243;</td>
-                              <td>985&deg;38&#8242;7&#8243;</td>
-                           </tr>
-                           <tr>
-                              <td>10000</td>
-                              <td>136&deg;28&#8242;20&#8243;</td>
-                              <td>9856&deg;21&#8242;10&#8243;</td>
-                           </tr>
-                           <tr>
-                              <td>29</td>
-                              <td>28&deg;35&#8242;1&#8243;</td>
-                              <td>28&deg;35&#8242;</td>
-                           </tr>
-                           <tr>
-                              <td>354</td>
-                              <td>348&deg;55&#8242;15&#8243;</td>
-                              <td>348&deg;54&#8242;54&#8243;</td>
-                           </tr>
-                        </tbody>
-                     </table>
-                  </div>
-                  <p>
-                                         From the printed values it is possible to reconstruct the value of the
-                                         movement in mean solar longitude in one day that Rambam used to calculate each of them:
-                  </p>
-                  <p>
-                                         <a class="biblioref" href="bibliography.html#Tzikuni">Tzikuni</a> (p. XXX) gives the algorithm of such reconstruction: add to the
-                                         remainder as many times 360 as there were full rotations in given time period, and then divide.
-                                         It also gives a value reconstructed from the printed values for 10,000, 1000 and 100 days: 59&#8242;8.33&#8243;,
-                                         or 0.9856472 degrees, and the current "scientific" value of 0.9856473 degrees. It seems that origins
-                                         of the Rambam's value were questioned by his commentators, including "Pirush". Value that can be
-                                         derived from the tradition that 19 years = 6939 days 16 hours and 595 parts is 0.9856348. This
-                                         algorithm can be modified to produce an interval of possible values, taking into account precision
-                                         of the numbers.
-                  </p>
-                  <p>
-                                         Following table compares the printed values with calculations based on the most "precise"
-                                         reconstructed value - that for 10000 days.
-                                     
-                  </p>
-                  <p> Values of the movement in one day apparently used by Rambam, if rounded to
-                                         the seconds, give the "official" Rambam's value. Values calculated from the
-                                         value reconstructed from the printed 10000 days movement, if rounded, produce
-                                         the values Rambam published - except for 29 days, 354 days, and 10000 days which
-                                         we use to calculate the exact value that Rambam used! TODO! 
-                  </p>
-                  <p><a class="biblioref" href="bibliography.html#Tzikuni">Tzikuni</a> quotes Rambam's value for 354 days as 348&deg;55&#8242;15&#8243;, but calculated value
-                                         as 348&deg;55&#8242;9&#8243;, and notes that this "requires a little thought".
-                  </p>
-               </div>
+            <p> It is not clear how Rambam arrived at the values he gives. When value of the
+               movement in one day given by Rambam is multiplied by 29, 100 etc., the result is
+                     smaller than that of Rambam. The following table compares printed and calculated
+                     values:
+            </p>
+            <div class="informaltable"><a name="slm-calculated"></a><table class="informaltable" border="1">
+                  <colgroup>
+                     <col>
+                     <col>
+                     <col>
+                  </colgroup>
+                  <thead>
+                     <tr>
+                        <th>days</th>
+                        <th>value</th>
+                        <th>calculated</th>
+                     </tr>
+                     <tr>
+                        <th>n</th>
+                        <th>v(n)</th>
+                        <th>v(1)*n</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr>
+                        <td>1</td>
+                        <td>0&deg;59&#8242;8&#8243;</td>
+                        <td>0&deg;59&#8242;8&#8243;</td>
+                     </tr>
+                     <tr>
+                        <td>10</td>
+                        <td>9&deg;51&#8242;23&#8243;</td>
+                        <td>9&deg;51&#8242;20&#8243;</td>
+                     </tr>
+                     <tr>
+                        <td>100</td>
+                        <td>98&deg;33&#8242;53&#8243;</td>
+                        <td>98&deg;33&#8242;20&#8243;</td>
+                     </tr>
+                     <tr>
+                        <td>1000</td>
+                        <td>265&deg;38&#8242;50&#8243;</td>
+                        <td>985&deg;33&#8242;20&#8243;</td>
+                     </tr>
+                     <tr>
+                        <td>10000</td>
+                        <td>136&deg;28&#8242;20&#8243;</td>
+                        <td>9855&deg;33&#8242;20&#8243;</td>
+                     </tr>
+                     <tr>
+                        <td>29</td>
+                        <td>28&deg;35&#8242;1&#8243;</td>
+                        <td>28&deg;34&#8242;52&#8243;</td>
+                     </tr>
+                     <tr>
+                        <td>354</td>
+                        <td>348&deg;55&#8242;15&#8243;</td>
+                        <td>348&deg;53&#8242;12&#8243;</td>
+                     </tr>
+                  </tbody>
+               </table>
             </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h4 class="title"><a name="d0e298"></a>Law 2
-                        </h4>
-                     </div>
-                  </div>
-               </div>
-               <p>
-                                  There is a point on the Sun's orbit (and on orbits of the other 7 planets)
-                                  where Sun is the highest above Earth. This point of the Sun's orbit (and so for other planets,
-                                  except for the moon) rotates with constant speed. Movement of this point is approximately
-                                  1&deg; every 70 years. This point is called Sun's apogee (gva hashemesh).
-                              
-               </p>
-               <p>
-                                  We already said that the epoch that our calculations are based on is beginning of the
-                                  night of the fifth day that is 3rd of Nisan of the year 4938 from the Creation.
-                                  And mean longitude of the Sun was at the epoch 7&deg;3&#8242;32&#8243; in the zodiac of Ram (tele).
-                                  And apogee of the Sun was 26&deg;45&#8242;8&#8243; in the zodiac of Twins.
-                              
-               </p>
+            <p> Although the value of the movement of the mean solar longitude in one day
+                     given by <a class="biblioref" href="bibliography.html#Almagest">Almagest</a> III 1 (H209) (which, rounded to
+                     seconds, becomes Rambam's value) is bigger, it is not big enough, and Rambam's
+                     numbers (for more than 10 days) can not be explained by performing calculations
+                     with the long value from Almagest and then rounding the results to the precision
+                     of the Rambam's values. 
+            </p>
+            <div class="informaltable"><a name="slm-almagest"></a><table class="informaltable" border="1">
+                  <colgroup>
+                     <col>
+                     <col>
+                     <col>
+                  </colgroup>
+                  <thead>
+                     <tr>
+                        <th>days</th>
+                        <th>value</th>
+                        <th>Alamgest</th>
+                     </tr>
+                     <tr>
+                        <th>n</th>
+                        <th>v(n)</th>
+                        <th>*n</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr>
+                        <td>1</td>
+                        <td>0&deg;59&#8242;8&#8243;</td>
+                        <td>0&deg;59&#8242;8&#8243;</td>
+                     </tr>
+                     <tr>
+                        <td>10</td>
+                        <td>9&deg;51&#8242;23&#8243;</td>
+                        <td>9&deg;51&#8242;23&#8243;</td>
+                     </tr>
+                     <tr>
+                        <td>100</td>
+                        <td>98&deg;33&#8242;53&#8243;</td>
+                        <td>98&deg;33&#8242;49&#8243;</td>
+                     </tr>
+                     <tr>
+                        <td>1000</td>
+                        <td>265&deg;38&#8242;50&#8243;</td>
+                        <td>985&deg;38&#8242;7&#8243;</td>
+                     </tr>
+                     <tr>
+                        <td>10000</td>
+                        <td>136&deg;28&#8242;20&#8243;</td>
+                        <td>9856&deg;21&#8242;10&#8243;</td>
+                     </tr>
+                     <tr>
+                        <td>29</td>
+                        <td>28&deg;35&#8242;1&#8243;</td>
+                        <td>28&deg;35&#8242;</td>
+                     </tr>
+                     <tr>
+                        <td>354</td>
+                        <td>348&deg;55&#8242;15&#8243;</td>
+                        <td>348&deg;54&#8242;54&#8243;</td>
+                     </tr>
+                  </tbody>
+               </table>
             </div>
-         </div>
-         <div class="section">
-            <div class="titlepage">
-               <div>
-                  <div>
-                     <h3 class="title"><a name="d0e305"></a>Chapter 13
-                     </h3>
-                  </div>
-               </div>
-            </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h4 class="title"><a name="d0e308"></a>Law 1
-                        </h4>
-                     </div>
-                  </div>
-               </div>
-               <p></p>
-            </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h4 class="title"><a name="d0e312"></a>Law 2
-                        </h4>
-                     </div>
-                  </div>
-               </div>
-               <p></p>
-            </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h4 class="title"><a name="d0e316"></a>Law 3
-                        </h4>
-                     </div>
-                  </div>
-               </div>
-               <p></p>
-            </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h4 class="title"><a name="d0e320"></a>Law 4
-                        </h4>
-                     </div>
-                  </div>
-               </div>
-               <p></p>
-            </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h4 class="title"><a name="d0e324"></a>Law 5
-                        </h4>
-                     </div>
-                  </div>
-               </div>
-               <p></p>
-            </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h4 class="title"><a name="d0e328"></a>Law 6
-                        </h4>
-                     </div>
-                  </div>
-               </div>
-               <p></p>
-            </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h4 class="title"><a name="d0e332"></a>Law 7
-                        </h4>
-                     </div>
-                  </div>
-               </div>
-               <p></p>
-            </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h4 class="title"><a name="d0e336"></a>Law 8
-                        </h4>
-                     </div>
-                  </div>
-               </div>
-               <p></p>
-            </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h4 class="title"><a name="d0e340"></a>Law 9
-                        </h4>
-                     </div>
-                  </div>
-               </div>
-               <p></p>
-            </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h4 class="title"><a name="d0e344"></a>Law 10
-                        </h4>
-                     </div>
-                  </div>
-               </div>
-               <p></p>
-            </div>
-            <div class="section">
-               <div class="titlepage">
-                  <div>
-                     <div>
-                        <h4 class="title"><a name="d0e348"></a>Law 11
-                        </h4>
-                     </div>
-                  </div>
-               </div>
-               <p></p>
-            </div>
+            <p>
+                     From the printed values it is possible to reconstruct the value of the
+                     movement in mean solar longitude in one day that Rambam used to calculate each of them:
+            </p>
+            <p>
+                     <a class="biblioref" href="bibliography.html#Tzikuni">Tzikuni</a> (p. XXX) gives the algorithm of such reconstruction: add to the
+                     remainder as many times 360 as there were full rotations in given time period, and then divide.
+                     It also gives a value reconstructed from the printed values for 10,000, 1000 and 100 days: 59&#8242;8.33&#8243;,
+                     or 0.9856472 degrees, and the current "scientific" value of 0.9856473 degrees. It seems that origins
+                     of the Rambam's value were questioned by his commentators, including "Pirush". Value that can be
+                     derived from the tradition that 19 years = 6939 days 16 hours and 595 parts is 0.9856348. This
+                     algorithm can be modified to produce an interval of possible values, taking into account precision
+                     of the numbers.
+            </p>
+            <p>
+                     Following table compares the printed values with calculations based on the most "precise"
+                     reconstructed value - that for 10000 days.
+                   
+            </p>
+            <p> Values of the movement in one day apparently used by Rambam, if rounded to
+                     the seconds, give the "official" Rambam's value. Values calculated from the
+                     value reconstructed from the printed 10000 days movement, if rounded, produce
+                     the values Rambam published - except for 29 days, 354 days, and 10000 days which
+                     we use to calculate the exact value that Rambam used! TODO! 
+            </p>
+            <p><a class="biblioref" href="bibliography.html#Tzikuni">Tzikuni</a> quotes Rambam's value for 354 days as 348&deg;55&#8242;15&#8243;, but calculated value
+                     as 348&deg;55&#8242;9&#8243;, and notes that this "requires a little thought".
+            </p>
          </div>
       </div>
       <div class="navfooter">
