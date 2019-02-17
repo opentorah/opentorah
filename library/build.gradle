@@ -1,18 +1,19 @@
 plugins {
   id "com.github.maiflai.scalatest" version "0.23" apply false
   id "com.jfrog.bintray" version "1.8.4" apply false
+  id "com.github.ben-manes.versions" version "0.20.0"
 }
 
 description = 'Jewish Calendar Dates.'
 
 apply plugin: 'scala'
 
-def catsVersion = '1.5.0'
+def catsVersion = '1.6.0'
 
 dependencies {
   zinc    "com.typesafe.zinc:zinc:$zincVersion"
   compile "org.scala-lang:scala-library:$scalaVersion"
-  compile "org.scala-lang.modules:scala-xml_$scalaVersionMajor:1.1.0"
+  compile "org.scala-lang.modules:scala-xml_$scalaVersionMajor:1.1.1"
 
 // for cats: scalacOptions += "-Ypartial-unification"
 
@@ -21,7 +22,7 @@ dependencies {
   testRuntime "org.pegdown:pegdown:1.6.0" // for scalatest reports
 
   testCompile "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
-  testCompile "org.typelevel:algebra-laws_$scalaVersionMajor:1.0.0"
+  testCompile "org.typelevel:algebra-laws_$scalaVersionMajor:1.0.1"
 
   //testCompile "org.typelevel:cats-laws_$scalaVersionMajor:$catsVersion"
   //testCompile "org.typelevel:cats-testkit_$scalaVersionMajor:$catsVersion"
