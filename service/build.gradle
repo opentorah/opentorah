@@ -16,16 +16,15 @@ If I did, this is how I'd do it:
   id 'com.bmuschko.docker-java-application' version '4.0.5' apply false
 */
 
+plugins {
+  id 'scala'
+  id 'application'
+}
+
 description = 'Jewish Calendar Service.'
 
-apply plugin: 'scala'
-
-def http4sVersion = '0.18.21' // '0.20.0-SNAPSHOT'
-def circeVersion  = '0.10.0'
 
 dependencies {
-  zinc    "com.typesafe.zinc:zinc:$zincVersion"
-
 //    compile "org.scala-lang:scala-library:$scalaVersion"
 
   compile project(':library')
@@ -37,7 +36,7 @@ dependencies {
   // doing explicit conversions for now :)    
 //  compile "org.http4s:http4s-scalatags_$scalaVersionMajor:$http4sVersion"
 
-  compile "com.lihaoyi:scalatags_$scalaVersionMajor:0.6.7"
+  compile "com.lihaoyi:scalatags_$scalaVersionMajor:$scalatagsVersion"
 
   // Add Circe dependencies when we need JSON.
 //  compile "io.circe:circe-core:$circeVersion"
@@ -45,10 +44,8 @@ dependencies {
 //  compile "io.circe:circe-parser:$circeVersion"
 
 
-  runtime "org.slf4j:slf4j-jdk14:1.7.25"
+  runtime "org.slf4j:slf4j-jdk14:$slf4jVersion"
 }
-
-apply plugin: 'application'
 
 mainClassName = 'org.podval.calendar.service.CalendarService'
 
