@@ -15,7 +15,7 @@
             
             <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
             
-            <xi:include href="urn:docbook:data:/slm-original.xml"/>
+            <xi:include href="data:slm-original.xml"/>
             
             <para>
                 And in this way you can calculate it for any number of days and years that you want.
@@ -40,7 +40,7 @@
                     smaller than that of Rambam. The following table compares printed and calculated
                     values:</para>
 
-                <xi:include href="urn:docbook:data:/slm-calculated.xml"/>
+                <xi:include href="data:slm-calculated.xml"/>
 
                 <para> Although the value of the movement of the mean solar longitude in one day
                     given by <biblioref linkend="Almagest"/> III 1 (H209) (which, rounded to
@@ -49,7 +49,7 @@
                     with the long value from Almagest and then rounding the results to the precision
                     of the Rambam's values. </para>
                 
-                <xi:include href="urn:docbook:data:/slm-almagest.xml"/>
+                <xi:include href="data:/slm-almagest.xml"/>
 
                 <para>
                     From the printed values it is possible to reconstruct the value of the
