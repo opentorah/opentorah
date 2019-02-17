@@ -1,9 +1,7 @@
 package org.podval.docbook.gradle
 
 import org.gradle.testkit.runner.{BuildResult, GradleRunner}
-import java.io.{BufferedWriter, File, FileWriter}
-
-import scala.io.Source
+import java.io.File
 
 class PluginTestProject(
   val name: String,
@@ -59,13 +57,8 @@ class PluginTestProject(
     writeInto(s"src/main/docBook/$documentName.xml",
       """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" + document)
 
-    def writeInto(fileName: String, what: String): Unit = {
-      val file = new File(projectDir, fileName)
-      file.getParentFile.mkdirs()
-      val writer: BufferedWriter = new BufferedWriter(new FileWriter(file))
-      try { writer.write(what.stripMargin) }
-      finally { writer.close() }
-    }
+    def writeInto(fileName: String, what: String): Unit =
+      Util.writeInto(new File(projectDir, fileName), what)
   }
 
   def getIndexHtml: String = {
@@ -92,5 +85,5 @@ class PluginTestProject(
       .withArguments("-i", "clean", "processDocBook")
   }
 
-  private def indexHtml: String = Source.fromFile(indexHtmlFile).getLines.mkString("\n")
+  private def indexHtml: String = Util.readFrom(indexHtmlFile)
 }

@@ -14,19 +14,23 @@ abstract class DocBook2 {
 
   final def run(
     layout: Layout,
+    useDocBookXslt2: Boolean,
     isJEuclidEnabled: Boolean,
     inputFileName: String,
     xslParameters: Map[String, Object],
     substitutions: Map[String, String],
     epubEmbeddedFonts: List[String],
+    resolver: Resolver,
     project: Project,
     logger: Logger
   ): Unit = {
     logger.info(s"\nProcessing DocBook to $name")
 
+    val forXslt: ForXslt = layout.forXslt(useDocBookXslt2)
+
     // Saxon output directory and file.
     val saxonOutputDirectory: File = new File(
-      if (usesIntermediate) layout.saxonOutputDirectoryRoot else layout.outputDirectoryRoot,
+      if (usesIntermediate) forXslt.saxonOutputDirectoryRoot else forXslt.outputDirectoryRoot,
       if (usesIntermediate) intermediateDirectoryName else outputDirectoryName
     )
 
@@ -57,23 +61,15 @@ abstract class DocBook2 {
     // In processing instructions and CSS, substitute xslParameters also - because why not?
     val allSubstitutions: Map[String, String] = substitutions ++ xslParametersEffective.mapValues(_.toString)
 
-    // Resolver
-    val resolver: Resolver = new Resolver(
-      docBookXslDirectory = layout.docBookXslDirectory,
-      entities = substitutions,
-      dataDirectory = layout.dataDirectory,
-      logger: Logger
-    )
-
     // Saxon
     Saxon.run(
       inputSource = new InputSource(layout.inputFile(inputFileName).toURI.toASCIIString),
-      stylesheetSource = new StreamSource(layout.stylesheetFile(stylesheetName)),
+      stylesheetSource = new StreamSource(forXslt.stylesheetFile(stylesheetName)),
       outputTarget = new StreamResult(saxonOutputFile),
       xslParameters = xslParametersEffective,
       resolver = resolver,
       processingInstructionsSubstitutions = allSubstitutions,
-      useXslt2 = layout.useDocBookXslt2,
+      useXslt2 = useDocBookXslt2,
       logger = logger
     )
 
@@ -107,11 +103,12 @@ abstract class DocBook2 {
     // Post-processing.
     if (usesIntermediate) {
       logger.info(s"Post-processing $name")
-      val outputDirectory: File = new File(layout.outputDirectoryRoot, outputDirectoryName)
+      val outputDirectory: File = new File(forXslt.outputDirectoryRoot, outputDirectoryName)
       outputDirectory.mkdirs
 
       postProcess(
         layout = layout,
+        useDocBookXslt2 = useDocBookXslt2,
         isJEuclidEnabled = isJEuclidEnabled,
         inputDirectory = saxonOutputDirectory,
         inputFile = saxonOutputFile,
@@ -141,6 +138,7 @@ abstract class DocBook2 {
 
   protected def postProcess(
     layout: Layout,
+    useDocBookXslt2: Boolean,
     isJEuclidEnabled: Boolean,
     inputDirectory: File,
     inputFile: File,
@@ -178,6 +176,7 @@ object DocBook2 {
 
     override protected def postProcess(
       layout: Layout,
+      useDocBookXslt2: Boolean,
       isJEuclidEnabled: Boolean,
       inputDirectory: File,
       inputFile: File,
@@ -202,6 +201,7 @@ object DocBook2 {
 
     final override protected def postProcess(
       layout: Layout,
+      useDocBookXslt2: Boolean,
       isJEuclidEnabled: Boolean,
       inputDirectory: File,
       inputFile: File,
@@ -235,5 +235,7 @@ object DocBook2 {
 
   val forXslt1: List[DocBook2] = List(Html, Epub2, Epub3, Pdf)
 
-  val forXslt2: List[DocBook2] = List(Html)
+  val forXslt2: List[DocBook2] = List(
+//    Html
+  )
 }

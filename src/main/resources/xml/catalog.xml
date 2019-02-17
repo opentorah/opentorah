@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE catalog
+        PUBLIC "-//OASIS//DTD XML Catalogs V1.1//EN"
+        "http://www.oasis-open.org/committees/entity/release/1.1/catalog.dtd">
+
+<!-- TODO use Layout to generate this (data, docBookXsl[2], entity-substitutions)! -->
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="public">
+    <group xml:base="../../..">
+        <!--
+          There seems to be some confusion with the rewriteURI form:
+          Catalog DTD requires 'uriIdStartString' attribute (and that is what IntelliJ wants),
+          but XMLResolver looks for the 'uriStartString' attribute (and this seems to work in Oxygen).
+        -->
+        <!-- DocBook XSLT 1.0 stylesheets  -->
+        <rewriteURI rewritePrefix="@docBookXsl@" uriStartString="http://docbook.sourceforge.net/release/xsl-ns/current/"/>
+
+        <!-- DocBook XSLT 2.0 stylesheets  -->
+        <rewriteURI rewritePrefix="@docBookXsl2@" uriStartString="https://cdn.docbook.org/release/latest/xslt/base/"/>
+
+        <!-- generated data -->
+        <rewriteSystem rewritePrefix="@data@" systemIdStartString="data:/"/>
+        <rewriteSystem rewritePrefix="@data@" systemIdStartString="data:"/>
+        <rewriteSystem rewritePrefix="@data@" systemIdStartString="urn:docbook:data/"/>
+        <rewriteSystem rewritePrefix="@data@" systemIdStartString="http://podval.org/docbook/data/"/>
+
+        <!-- substitutions DTD -->
+        <public publicId="-//OASIS//DTD DocBook XML V5.0//EN" uri="@substitutions-dtd@"/>
+    </group>
+
+    <nextCatalog catalog="/etc/xml/catalog"/>
+</catalog>

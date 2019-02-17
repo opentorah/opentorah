@@ -218,3 +218,8 @@ https://print-css.rocks/blog/2016-10-06/integrating-mathjax.html
 Look into:
 https://github.com/vivliostyle/vivliostyle.js
 https://sourceforge.net/projects/dblatex/
+
+
+          There seems to be some confusion with the rewriteURI form:
+          Catalog DTD requires 'uriIdStartString' attribute (and that is what IntelliJ wants),
+          but XMLResolver looks for the 'uriStartString' attribute (and this seems to work in Oxygen).

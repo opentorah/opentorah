@@ -10,10 +10,7 @@ class DocBookDataTask extends JavaExec {
   @Input @BeanProperty val dataGeneratorClass: Property[String] =
     getProject.getObjects.property(classOf[String])
 
-  private val layouts: Layouts = Layouts.forProject(getProject)
-
-  // Data directory is the same for XSLT 1.0 and 2.0
-  private val dataDirectory: File = layouts.forXslt1.dataDirectory
+  private val dataDirectory: File = Layout.forProject(getProject).dataDirectory
   getOutputs.dir(dataDirectory)
 
   private val logger: Logger = new Logger.PluginLogger(getProject.getLogger)
