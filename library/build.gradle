@@ -32,48 +32,35 @@ dependencies {
 
 task sourceJar(type: Jar) {
   from sourceSets.main.allSource
-  classifier = 'sources'
+  archiveClassifier.set('sources')
 }
+
+task scaladocJar(type: Jar) {
+  from scaladoc.destinationDir
+  archiveClassifier.set('scaladoc')
+}
+scaladocJar.dependsOn scaladoc
 
 apply plugin: 'com.github.maiflai.scalatest'
 
-jar.baseName = "$project.group-$project.name"
+apply plugin: 'maven-publish'
 
 def gitHubRepository    = "jewish-calendar/calendar"
 def gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
 
-def bintrayConfig = {
-  user         = 'dubinsky'
-  key          = findProperty('bintrayApiKey')
-  publications = ['mavenPublication']
-  dryRun       = false
-  publish      = true
-  override     = true
-  pkg {
-    repo                   = 'org.podval.calendar'
-    name                   = project.jar.baseName
-    desc                   = project.description
-    websiteUrl             = "${gitHubRepositoryUrl}"
-    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
-    vcsUrl                 = "${gitHubRepositoryUrl}.git"
-    githubRepo             = gitHubRepository
-    licenses               = ['Apache-2.0']
-    labels                 = ['Scala', 'Calendar', 'Jewish']
-    publicDownloadNumbers  = true
-    githubReleaseNotesFile = "${rootProject.projectDir}/docs/CHANGELOG.md"
-    version { name         = project.version }
-  }
-}
+def libraryArtifactId = "$project.group-$project.name"
+jar.archiveBaseName.set(libraryArtifactId)
 
-apply plugin: 'maven-publish'
 publishing {
   publications {
     mavenPublication(MavenPublication) {
       groupId project.group
-      artifactId jar.baseName
-
+      artifactId libraryArtifactId
+      
       from components.java
+
       artifact sourceJar
+      artifact scaladocJar
 
       pom {
         name = project.name
@@ -113,4 +100,26 @@ publishing {
 }
 
 apply plugin: 'com.jfrog.bintray'
-bintray bintrayConfig
+
+bintray {
+  user         = 'dubinsky'
+  key          = findProperty('bintrayApiKey')
+  publications = ['mavenPublication']
+  dryRun       = false
+  publish      = true
+  override     = true
+  pkg {
+    repo                   = project.group
+    name                   = libraryArtifactId
+    desc                   = project.description
+    websiteUrl             = "${gitHubRepositoryUrl}"
+    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
+    vcsUrl                 = "${gitHubRepositoryUrl}.git"
+    githubRepo             = gitHubRepository
+    licenses               = ['Apache-2.0']
+    labels                 = ['Scala', 'Calendar', 'Jewish']
+    publicDownloadNumbers  = true
+    githubReleaseNotesFile = "${rootProject.projectDir}/docs/CHANGELOG.md"
+    version { name         = project.version }
+  }
+}

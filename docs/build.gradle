@@ -32,7 +32,7 @@ task tut(type: JavaExec) {
 }
 
 build.dependsOn tut
-//  build.dependsOn ':library:scaladoc'
+build.dependsOn ':library:scaladoc'
 build.dependsOn ':paper:processDocBook'
 build.doLast {
   project.sync {
@@ -43,8 +43,8 @@ build.doLast {
     from tutOutput
     into 'examples'
   }
-//  sync {
-//    from project.tasks.getByPath(':library:scaladoc').destinationDir
-//    into 'scaladoc'
-//  }
+  project.sync {
+    from project.tasks.getByPath(':library:scaladoc').destinationDir
+    into 'scaladoc'
+  }
 }

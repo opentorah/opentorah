@@ -3,6 +3,9 @@ steps:
 # Latest Gradle builder on Google Cloud Build is v4.6; I need v5.1.1.0,
 # so I am using a custom builder I had to build myself:
 #  - name: 'gcr.io/cloud-builders/gradle'
+#
+# TODO eventually, https://github.com/GoogleCloudPlatform/cloud-builders/pull/452
+# will make official Gradle images available on GCB. Use them when that happens :)
   - name: 'gcr.io/calendar-service-1/gradle:5.1.1-jdk-8'
     args: [':service:prepareDockerContext']
 
