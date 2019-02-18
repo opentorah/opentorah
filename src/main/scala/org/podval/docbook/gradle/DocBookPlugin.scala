@@ -18,11 +18,13 @@ final class DocBookPlugin extends Plugin[Project] {
 
     // Extension for configuring the plugin.
     val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)
-    extension.isJEuclidEnabled.set(false)
     extension.documentName.set("index")
     extension.dataGeneratorClass.set("")
     extension.outputFormats.set(DocBook2.forXslt1.map(_.name).asJava)
     extension.outputFormats2.set(List.empty[String].asJava)
+    extension.cssFileName.set("docBook")
+    extension.isJEuclidEnabled.set(false)
+    extension.epubEmbeddedFonts.set(List.empty[String].asJava)
 
     // Generate content that needs to be included in DocBook by executing the generating code.
     val docBookDataTask: DocBookDataTask = project.getTasks.create("docBookData", classOf[DocBookDataTask])
@@ -33,20 +35,23 @@ final class DocBookPlugin extends Plugin[Project] {
     // Prepare DocBook.
     val prepareDocBookTask: PrepareDocBookTask = project.getTasks.create("prepareDocBook", classOf[PrepareDocBookTask])
     prepareDocBookTask.setDescription(s"Prepare DocBook")
+    prepareDocBookTask.inputFileName.set(extension.documentName)
+    prepareDocBookTask.parameters.set(extension.parameters)
     prepareDocBookTask.substitutions.set(extension.substitutions)
+    prepareDocBookTask.cssFileName.set(extension.cssFileName)
+    prepareDocBookTask.epubEmbeddedFonts.set(extension.epubEmbeddedFonts)
     prepareDocBookTask.getDependsOn.add(docBookDataTask)
 
     // Process DocBook.
     val processDocBookTask: ProcessDocBookTask = project.getTasks.create("processDocBook", classOf[ProcessDocBookTask])
     processDocBookTask.setDescription(s"Process DocBook")
     processDocBookTask.setGroup("publishing")
-    processDocBookTask.isJEuclidEnabled.set(extension.isJEuclidEnabled)
     processDocBookTask.inputFileName.set(extension.documentName)
-    processDocBookTask.xslParameters.set(extension.xslParameters)
+    processDocBookTask.parameters.set(extension.parameters)
     processDocBookTask.substitutions.set(extension.substitutions)
     processDocBookTask.outputFormats.set(extension.outputFormats)
     processDocBookTask.outputFormats2.set(extension.outputFormats2)
-    processDocBookTask.epubEmbeddedFonts.set(extension.epubEmbeddedFonts)
+    processDocBookTask.isJEuclidEnabled.set(extension.isJEuclidEnabled)
     processDocBookTask.getDependsOn.add(docBookDataTask)
     processDocBookTask.getDependsOn.add(prepareDocBookTask)
 

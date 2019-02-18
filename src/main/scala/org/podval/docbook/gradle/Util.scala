@@ -37,11 +37,20 @@ object Util {
   def readFrom(file: File): String =
     scala.io.Source.fromFile(file).getLines.mkString("\n")
 
-  def writeInto(file: File, what: String): Unit = {
-    file.getParentFile.mkdirs()
-    val writer: BufferedWriter = new BufferedWriter(new FileWriter(file))
-    try { writer.write(what.stripMargin) }
-    finally { writer.close() }
+  def writeInto(file: File, logger: Logger, replace: Boolean)(content: => String): Unit = {
+    if (!replace && file.exists) {
+      logger.info(s"Already exists: $file")
+    } else {
+      logger.info(s"Writing $file")
+      file.getParentFile.mkdirs()
+      val writer: BufferedWriter = new BufferedWriter(new FileWriter(file))
+
+      try {
+        writer.write(content.stripMargin)
+      } finally {
+        writer.close()
+      }
+    }
   }
 
   //  def fileInputSource(file: File): InputSource =

@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.5]
+- XSLT files and XML catalog customizable and available to Oxygen
+- per-format parameters
+- HTML with XSLT 2.0 stylesheets
+
 ## [0.6.0] - 2019-02-17
 - resolving is delegated via generated XML catalog (and substitutions DTD) that can be used in Oxygen
 

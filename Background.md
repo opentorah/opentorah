@@ -223,3 +223,9 @@ https://sourceforge.net/projects/dblatex/
           There seems to be some confusion with the rewriteURI form:
           Catalog DTD requires 'uriIdStartString' attribute (and that is what IntelliJ wants),
           but XMLResolver looks for the 'uriStartString' attribute (and this seems to work in Oxygen).
+
+Norman Walsh seems to think that the future is CSS styling to PDF, but with no free CSS rendering engines available,
+that'd make my builds non-repeatable even if I could afford a commercial one.
+
+Markdown has its uses for presentation-only quickies like websites (GitHub pages).
+Fashionable AsciiDoc (?) publishing systems lose what is important to me: semantic markup; they are purely presentation-oriented.

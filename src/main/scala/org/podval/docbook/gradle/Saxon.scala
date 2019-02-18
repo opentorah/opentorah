@@ -10,7 +10,6 @@ object Saxon {
   def run(
     inputSource: InputSource,
     stylesheetSource: Source,
-    xslParameters: Map[String, Object],
     resolver: Resolver,
     processingInstructionsSubstitutions: Map[String, String],
     outputTarget: Result,
@@ -21,7 +20,6 @@ object Saxon {
       s"""Saxon.run(
        |  inputSource = ${inputSource.getSystemId},
        |  stylesheetSource = ${stylesheetSource.getSystemId},
-       |  xslParameters = $xslParameters,
        |  processingInstructionsSubstitutions = $processingInstructionsSubstitutions,
        |  outputTarget = ${outputTarget.getSystemId},
        |  useXslt2 = $useXslt2
@@ -36,8 +34,6 @@ object Saxon {
     transformerFactory.setURIResolver(resolver)
 
     val transformer: Transformer = transformerFactory.newTransformer(stylesheetSource)
-
-    xslParameters.foreach { case (name: String, value: Object) => transformer.setParameter(name, value) }
 
     val saxParserFactory: SAXParserFactory = Saxon.getSaxParserFactory
 

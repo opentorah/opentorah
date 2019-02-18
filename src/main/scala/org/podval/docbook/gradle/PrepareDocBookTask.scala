@@ -1,13 +1,14 @@
 package org.podval.docbook.gradle
 
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.{Action, DefaultTask}
+import org.gradle.api.DefaultTask
 import org.gradle.api.file.{CopySpec, FileCopyDetails, RelativePath}
-import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, TaskAction}
 import java.io.File
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
+import Util.writeInto
 
 class PrepareDocBookTask extends DefaultTask  {
 
@@ -15,56 +16,154 @@ class PrepareDocBookTask extends DefaultTask  {
 
   private val logger: Logger = new Logger.PluginLogger(getLogger)
 
+  @Input @BeanProperty val inputFileName: Property[String] =
+    getProject.getObjects.property(classOf[String])
+
+  @BeanProperty val parameters: MapProperty[String, java.util.Map[String, String]] =
+    getProject.getObjects.mapProperty(classOf[String], classOf[java.util.Map[String, String]])
+
   @Input @BeanProperty val substitutions: MapProperty[String, String] =
     getProject.getObjects.mapProperty(classOf[String], classOf[String])
 
+  @Input @BeanProperty val cssFileName: Property[String] =
+    getProject.getObjects.property(classOf[String])
+
+  @Input @BeanProperty val epubEmbeddedFonts: ListProperty[String] =
+    getProject.getObjects.listProperty(classOf[String])
+
   @TaskAction
   def prepareDocBook(): Unit = {
-    // Common configuration files
-    copyResource("css", "docBook.css", layout.cssFile)
-    copyResource("fop", "fop.xconf", layout.fopConfigurationFile)
-
-    // Customizations
-    copyCustomizations(layout.forXslt1, Set("common", "common-html", "epub",  "epub3", "fo", "html"))
-    copyCustomizations(layout.forXslt2, Set("html"))
+    // Input file
+    writeInto(layout.inputFile(inputFileName.get), logger, replace = false) {
+      """|<?xml version="1.0" encoding="UTF-8"?>
+         |<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd">
+         |<article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+         |</article>
+         |"""
+    }
 
     // XSLT stylesheets
     unpackDocBookXsl(layout.forXslt1, "XSLT")
     unpackDocBookXsl(layout.forXslt2, "XSLT 2.0")
 
+    writeInto(layout.cssFile(cssFileName.get), logger, replace = false) {
+      """@namespace xml "http://www.w3.org/XML/1998/namespace";"""
+    }
+
+    // FOP configuration
+    writeInto(layout.fopConfigurationFile, logger, replace = false) {
+      s"""<?xml version="1.0" encoding="UTF-8"?>
+         |<fop version="1.0">
+         |  <renderers>
+         |    <renderer mime="application/pdf">
+         |      <fonts>
+         |        <!-- FOP will detect fonts available in the operating system. -->
+         |        <auto-detect/>
+         |      </fonts>
+         |    </renderer>
+         |  </renderers>
+         |</fop>
+         |"""
+    }
+
+    // Stylesheet files and customizations
+
+    val allParameters: Map[String, Map[String, String]] =
+      parameters.get.asScala.toMap.mapValues(_.asScala.toMap)
+
+    val epubEmbeddedFontsStr: String =
+      Fop.getFontFiles(layout.fopConfigurationFile, epubEmbeddedFonts.get.asScala.toList, logger)
+
+    (DocBook2.forXslt1 ++ DocBook2.forXslt2).foreach { processor: DocBook2 =>
+      // Parameters for this processor
+      val parameters: Map[String, String] = List(
+        allParameters.get("common"),
+        if (!processor.usesHtml) None else allParameters.get("common-html"),
+        allParameters.get(processor.name),
+        allParameters.get(processor.stylesheetName)
+      ).flatten.flatten.toMap
+
+      processor.writeStylesheetFiles(
+      layout = layout,
+      inputFileName = inputFileName.get,
+      parameters = parameters,
+      cssFileName = cssFileName.get,
+      epubEmbeddedFonts = epubEmbeddedFontsStr,
+      logger = logger
+    )}
+
     // substitutions DTD
-    Util.writeInto(layout.substitutionsDtdFile, substitutions.get.asScala.toSeq.map {
-      case (name: String, value: String) => s"""<!ENTITY $name "$value">"""
-    }.mkString("", "\n", "\n"))
-
-    writeCatalog(layout.catalogFile)
-  }
-
-  private def copyCustomizations(forXslt: ForXslt, customizations: Set[String]): Unit =
-    customizations.foreach { name: String =>
-      copyResource(forXslt.stylesheetDirectoryName, name + ".xsl", forXslt.stylesheetFile(name))
+    writeInto(layout.xmlFile(layout.substitutionsDtdFileName), logger, replace = true) {
+      substitutions.get.asScala.toSeq.map {
+        case (name: String, value: String) => s"""<!ENTITY $name "$value">\n"""
+      }.mkString
     }
 
-  private def writeCatalog(file: File): Unit = writeFile(file){
-    Util.readFrom(getClass,  "/xml/catalog.xml")
-      .replace("@docBookXsl@", layout.forXslt1.docBookXslDirectoryRelative)
-      .replace("@docBookXsl2@", layout.forXslt2.docBookXslDirectoryRelative)
-      .replace("@data@", layout.dataDirectoryRelative)
-      .replace("@substitutions-dtd@", layout.substitutionsDtdRelative)
+    // XML catalog
+    writeInto(layout.catalogFile, logger, replace = true) {
+      val data: String = layout.dataDirectoryRelative
+
+      s"""<?xml version="1.0" encoding="UTF-8"?>
+         |<!DOCTYPE catalog
+         |  PUBLIC "-//OASIS//DTD XML Catalogs V1.1//EN"
+         |  "http://www.oasis-open.org/committees/entity/release/1.1/catalog.dtd">
+         |
+         |<!-- DO NOT EDIT! Generated by the DocBook plugin.
+         |     Customizations go into ${layout.catalogCustomFileName}. -->
+         |<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="public">
+         |  <group xml:base="${layout.catalogGroupBase}">
+         |    <!--
+         |      There seems to be some confusion with the rewriteURI form:
+         |      Catalog DTD requires 'uriIdStartString' attribute (and that is what IntelliJ wants),
+         |      but XMLResolver looks for the 'uriStartString' attribute (and this seems to work in Oxygen).
+         |    -->
+         |
+         |    <!-- DocBook XSLT 1.0 stylesheets  -->
+         |    <rewriteURI uriStartString="http://docbook.sourceforge.net/release/xsl-ns/current/"
+         |                rewritePrefix="${layout.forXslt1.docBookXslDirectoryRelative}"/>
+         |
+         |    <!-- DocBook XSLT 2.0 stylesheets  -->
+         |    <rewriteURI uriStartString="https://cdn.docbook.org/release/latest/xslt/"
+         |                rewritePrefix="${layout.forXslt2.docBookXslDirectoryRelative}"/>
+         |
+         |    <!-- generated data -->
+         |    <rewriteSystem rewritePrefix="$data" systemIdStartString="data:/"/>
+         |    <rewriteSystem rewritePrefix="$data" systemIdStartString="data:"/>
+         |    <rewriteSystem rewritePrefix="$data" systemIdStartString="urn:docbook:data:/"/>
+         |    <rewriteSystem rewritePrefix="$data" systemIdStartString="urn:docbook:data:"/>
+         |    <rewriteSystem rewritePrefix="$data" systemIdStartString="urn:docbook:data/"/>
+         |    <rewriteSystem rewritePrefix="$data" systemIdStartString="http://podval.org/docbook/data/"/>
+         |  </group>
+         |
+         |  <!-- substitutions DTD -->
+         |  <public publicId="-//OASIS//DTD DocBook XML V5.0//EN" uri="${layout.substitutionsDtdFileName}"/>
+         |
+         |  <nextCatalog catalog="${layout.catalogCustomFileName}"/>
+         |</catalog>
+         |"""
+    }
+
+    // XML catalog customization
+    writeInto(layout.xmlFile(layout.catalogCustomFileName), logger, replace = false) {
+      s"""<?xml version="1.0" encoding="UTF-8"?>
+         |<!DOCTYPE catalog
+         |  PUBLIC "-//OASIS//DTD XML Catalogs V1.1//EN"
+         |  "http://www.oasis-open.org/committees/entity/release/1.1/catalog.dtd">
+         |
+         |<!-- Customizations go here. -->
+         |<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="public">
+         |  <nextCatalog catalog="/etc/xml/catalog"/>
+         |</catalog>
+         |"""
+    }
   }
 
-  private def copyResource(directory: String, name: String, file: File): Unit =
-    writeFile(file)(Util.readFrom(getClass, s"/$directory/$name"))
-
-  private def writeFile(toFile: File)(content: => String): Unit = {
-    if (toFile.exists()) {
-      logger.info(s"Skipping: file $toFile already exists")
-    } else {
-      logger.info(s"Writing $toFile")
-      toFile.getParentFile.mkdirs
-
-      Util.writeInto(toFile, content)
-    }
+  private def copyResourceInto(
+    directory: String,
+    name: String,
+    file: File
+  ): Unit = writeInto(file, logger, replace = false) {
+    Util.readFrom(getClass, s"/$directory/$name")
   }
 
   private def unpackDocBookXsl(layout: ForXslt, name: String): Unit = {
@@ -75,22 +174,18 @@ class PrepareDocBookTask extends DefaultTask  {
       val configuration: Configuration = getProject.getConfigurations.findByName(layout.docBookXslConfigurationName)
       val zip: File = configuration.getSingleFile
       val toDrop: Int = layout.docBookXslArchiveSubdirectoryName.count(_ == '/') + 1
-      getProject.copy(new Action[CopySpec] {
-        override def execute(copySpec: CopySpec): Unit = copySpec
-          .into(directory)
-          .from(getProject.zipTree(zip))
-          // following 7 lines of code deal with extracting just the "docbook" directory;
-          // this should become easier in Gradle 5.3, see:
-          // https://github.com/gradle/gradle/issues/1108
-          // https://github.com/gradle/gradle/pull/5405
-          .include(layout.docBookXslArchiveSubdirectoryName +  "/**")
-          .eachFile(new Action[FileCopyDetails] {
-            override def execute(file: FileCopyDetails): Unit = {
-              file.setRelativePath(new RelativePath(true, file.getRelativePath.getSegments.drop(toDrop): _*))
-            }
-          })
-          .setIncludeEmptyDirs(false)
-      })
+      getProject.copy((copySpec: CopySpec) => copySpec
+        .into(directory)
+        .from(getProject.zipTree(zip))
+        // following 7 lines of code deal with extracting just the "docbook" directory;
+        // this should become easier in Gradle 5.3, see:
+        // https://github.com/gradle/gradle/issues/1108
+        // https://github.com/gradle/gradle/pull/5405
+        .include(layout.docBookXslArchiveSubdirectoryName + "/**")
+        .eachFile((file: FileCopyDetails) =>
+          file.setRelativePath(new RelativePath(true, file.getRelativePath.getSegments.drop(toDrop): _*))
+        )
+        .setIncludeEmptyDirs(false))
     }
   }
 }

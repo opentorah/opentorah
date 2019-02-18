@@ -19,8 +19,8 @@ class Layout(projectDir: File, buildDir: File) {
 
   final def cssDirectoryName: String = "css"
   final def cssDirectory: File = sourceDirectory(cssDirectoryName)
-  final def cssFileName: String = "docBook.css"
-  final def cssFile: File = new File(cssDirectory, cssFileName)
+  final def cssFile(name: String): File = new File(cssDirectory, name + ".css")
+  final def cssFileRelative(name: String): String = cssDirectoryName + "/" + name + ".css"
 
   final def imagesDirectoryName: String = "images"
   final def imagesDirectory: File = sourceDirectory(imagesDirectoryName)
@@ -31,6 +31,10 @@ class Layout(projectDir: File, buildDir: File) {
   private def fopConfigurationFileName: String = "fop.xconf"
   final def fopConfigurationFile: File = new File(fopConfigurationDirectory, fopConfigurationFileName)
 
+  final def mainStylesheet(name: String): String = name + ".xsl"
+  final def customStylesheet(name: String): String = name + "-custom.xsl"
+  final def paramsStylesheet(name: String): String = name + "-params.xsl"
+
   private def buildDirectory(name: String): File = new File(buildDir, name)
   private def buildDirectoryRelative(name: String): String = s"$buildDirRelative/$name/"
 
@@ -38,18 +42,19 @@ class Layout(projectDir: File, buildDir: File) {
   final def dataDirectory: File = buildDirectory(dataDirectoryName)
   final def dataDirectoryRelative: String = buildDirectoryRelative(dataDirectoryName)
 
-  private def substitutionsDtdFileName: String = "substitutions.dtd"
-  final def substitutionsDtdFile: File = new File(buildDir, substitutionsDtdFileName)
-  final def substitutionsDtdRelative: String = s"$buildDirRelative/$substitutionsDtdFileName"
+  final def catalogGroupBase: String = "../../.."
+  private def xmlDirectory: File = sourceDirectory("xml")
+  final def xmlFile(name: String): File = new File(xmlDirectory, name)
+  def substitutionsDtdFileName: String = "substitutions.dtd"
 
-  private def catalogFileName: String = "catalog.xml"
-  final def catalogFile: File = new File(sourceDirectory("xml"), catalogFileName)
-
+  private final def catalogFileName: String = "catalog.xml"
+  final def catalogFile: File = xmlFile(catalogFileName)
+  final def catalogCustomFileName: String = "catalog-custom.xml"
 
   trait ForXsltBase extends ForXslt {
 
     final override def stylesheetDirectory: File = sourceDirectory(stylesheetDirectoryName)
-    final override def stylesheetFile(name: String) = new File(stylesheetDirectory, name + ".xsl")
+    final override def stylesheetFile(name: String) = new File(stylesheetDirectory, name)
 
     protected def docBookXslDirectoryName: String
     final override def docBookXslDirectory: File = buildDirectory(docBookXslDirectoryName)
@@ -66,6 +71,7 @@ class Layout(projectDir: File, buildDir: File) {
 
   val forXslt1: ForXsltBase = new ForXsltBase {
     override def docBookXslConfigurationName: String = "docBookXsl"
+    override def stylesheetUri: String = "http://docbook.sourceforge.net/release/xsl-ns/current"
     override def stylesheetDirectoryName: String = "xsl"
     protected override def docBookXslDirectoryName: String = "docBookXsl"
     override def docBookXslArchiveSubdirectoryName: String = "docbook"
@@ -75,6 +81,7 @@ class Layout(projectDir: File, buildDir: File) {
 
   val forXslt2: ForXsltBase = new ForXsltBase {
     override def docBookXslConfigurationName: String = "docBookXsl2"
+    override def stylesheetUri: String = "https://cdn.docbook.org/release/latest/xslt"
     override def stylesheetDirectoryName: String = "xsl2"
     protected override def docBookXslDirectoryName: String = "docBookXsl2"
     override def docBookXslArchiveSubdirectoryName: String = "xslt/base"

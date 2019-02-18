@@ -14,8 +14,7 @@ class PluginTestProject(
   val indexHtmlFile: File = new File(projectDir, "build/docBook/html/index.html").getAbsoluteFile
 
   val buildGradle: String =
-    s"""
-       |plugins {
+    s"""plugins {
        |  id "org.podval.docbook-gradle-plugin" version "1.0.0"
        |}
        |
@@ -28,9 +27,9 @@ class PluginTestProject(
        |docBook {
        |  documentName = "$documentName"
        |  outputFormats = ["html"]
-       |  $substitutionsFormatted
+       |$substitutionsFormatted
        |}
-    """
+       |"""
 
   private def substitutionsFormatted: String = if (substitutions.isEmpty) "" else {
     val contents: String = substitutions.map { case (name: String, value: String) =>
@@ -40,7 +39,7 @@ class PluginTestProject(
       |  substitutions = [
       |    $contents
       |  ]
-    """
+      |"""
   }
 
   def destroy(): Unit = Util.deleteRecursively(projectDir)
@@ -56,10 +55,12 @@ class PluginTestProject(
 
     writeInto(s"src/main/docBook/$documentName.xml",
       """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" + document)
-
-    def writeInto(fileName: String, what: String): Unit =
-      Util.writeInto(new File(projectDir, fileName), what)
   }
+
+  private val logger: Logger = new Logger.TestLogger
+
+  private def writeInto(fileName: String, what: String): Unit =
+    Util.writeInto(new File(projectDir, fileName), logger, replace = true)(what)
 
   def getIndexHtml: String = {
     val result: BuildResult = run

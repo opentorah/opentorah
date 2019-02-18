@@ -6,17 +6,14 @@ import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import scala.beans.BeanProperty
 
 class Extension(project: Project) {
-  @BeanProperty val isJEuclidEnabled: Property[Boolean] =
-    project.getObjects.property(classOf[Boolean])
-
   @BeanProperty val documentName: Property[String] =
     project.getObjects.property(classOf[String])
 
   @BeanProperty val dataGeneratorClass: Property[String] =
     project.getObjects.property(classOf[String])
 
-  @BeanProperty val xslParameters: MapProperty[String, Object] =
-    project.getObjects.mapProperty(classOf[String], classOf[Object])
+  @BeanProperty val parameters: MapProperty[String, java.util.Map[String, String]] =
+    project.getObjects.mapProperty(classOf[String], classOf[java.util.Map[String, String]])
 
   @BeanProperty val substitutions: MapProperty[String, String] =
     project.getObjects.mapProperty(classOf[String], classOf[String])
@@ -26,6 +23,12 @@ class Extension(project: Project) {
 
   @BeanProperty val outputFormats2: ListProperty[String] =
     project.getObjects.listProperty(classOf[String])
+
+  @BeanProperty val cssFileName: Property[String] =
+    project.getObjects.property(classOf[String])
+
+  @BeanProperty val isJEuclidEnabled: Property[Boolean] =
+    project.getObjects.property(classOf[Boolean])
 
   @BeanProperty val epubEmbeddedFonts: ListProperty[String] =
     project.getObjects.listProperty(classOf[String])

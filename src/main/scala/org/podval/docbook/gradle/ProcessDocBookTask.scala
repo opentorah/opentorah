@@ -47,14 +47,11 @@ class ProcessDocBookTask extends DefaultTask {
     getOutputs.dir(directory)
   }
 
-  @Input @BeanProperty val isJEuclidEnabled: Property[Boolean] =
-    getProject.getObjects.property(classOf[Boolean])
-
   @Input @BeanProperty val inputFileName: Property[String] =
     getProject.getObjects.property(classOf[String])
 
-  @Input @BeanProperty val xslParameters: MapProperty[String, Object] =
-    getProject.getObjects.mapProperty(classOf[String], classOf[Object])
+  @BeanProperty val parameters: MapProperty[String, java.util.Map[String, String]] =
+    getProject.getObjects.mapProperty(classOf[String], classOf[java.util.Map[String, String]])
 
   @Input @BeanProperty val substitutions: MapProperty[String, String] =
     getProject.getObjects.mapProperty(classOf[String], classOf[String])
@@ -65,8 +62,8 @@ class ProcessDocBookTask extends DefaultTask {
   @Input @BeanProperty val outputFormats2: ListProperty[String] =
     getProject.getObjects.listProperty(classOf[String])
 
-  @Input @BeanProperty val epubEmbeddedFonts: ListProperty[String] =
-    getProject.getObjects.listProperty(classOf[String])
+  @Input @BeanProperty val isJEuclidEnabled: Property[Boolean] =
+    getProject.getObjects.property(classOf[Boolean])
 
   @TaskAction
   def processDocBook(): Unit = {
@@ -81,10 +78,22 @@ class ProcessDocBookTask extends DefaultTask {
     if (processors2.nonEmpty)
       logger.info(s"Output formats using XSLT 2.0: ${getNames(processors2)}")
 
+    // In processing instructions and CSS, substitute xslParameters also - because why not?
+    val allSubstitutions: Map[String, String] =
+      parameters.get.asScala.toMap.mapValues(_.asScala.toMap).values.toList.flatten.toMap ++
+      substitutions.get.asScala.toMap
+
     val resolver: Resolver = new Resolver(layout.catalogFile,  logger)
 
-    run(processors, false, resolver)
-    run(processors2, true, resolver)
+    (processors ++ processors2).foreach { _.run(
+      layout = layout,
+      isJEuclidEnabled = isJEuclidEnabled.get,
+      inputFileName = inputFileName.get,
+      substitutions = allSubstitutions,
+      project = getProject,
+      resolver = resolver,
+      logger = logger
+    )}
   }
 
   private def getProcessors(
@@ -107,23 +116,6 @@ class ProcessDocBookTask extends DefaultTask {
       .getOrElse(property.get.asScala.toList)
       .map(forName)
   }
-
-  private def run(
-    processors: List[DocBook2],
-    useDocBookXslt2: Boolean,
-    resolver: Resolver
-  ): Unit = processors.foreach { _.run(
-    layout = layout,
-    useDocBookXslt2 = useDocBookXslt2,
-    isJEuclidEnabled = isJEuclidEnabled.get,
-    inputFileName = inputFileName.get,
-    xslParameters = xslParameters.get.asScala.toMap,
-    substitutions = substitutions.get.asScala.toMap,
-    epubEmbeddedFonts = epubEmbeddedFonts.get.asScala.toList,
-    project = getProject,
-    resolver = resolver,
-    logger = logger
-  )}
 
   private def getNames(processors: List[DocBook2]): String =
     "[" + processors.map(processor => "\"" + processor.name +"\"").mkString(", ") + "]"

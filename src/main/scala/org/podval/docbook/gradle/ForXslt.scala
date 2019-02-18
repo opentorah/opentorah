@@ -5,6 +5,8 @@ import java.io.File
 trait ForXslt {
   def docBookXslConfigurationName: String
 
+  def stylesheetUri: String
+
   def stylesheetDirectoryName: String
 
   def stylesheetDirectory: File
