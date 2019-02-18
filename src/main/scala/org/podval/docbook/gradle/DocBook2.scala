@@ -52,7 +52,8 @@ abstract class DocBook2 {
         (if (!usesHtml) Map.empty else Map(
           "base.dir" -> (saxonOutputDirectory.getAbsolutePath + "/"),
           "root.filename" -> Util.fileNameWithoutExtension(saxonOutputFile),
-          "html.stylesheet" -> (layout.cssDirectoryName + "/" + layout.cssFileName)
+          "html.stylesheet" -> (layout.cssDirectoryName + "/" + layout.cssFileName),
+          "html.stylesheets" -> (layout.cssDirectoryName + "/" + layout.cssFileName) // TODO for XSLT 2.0
         ))
 
     val xslParametersEffective: Map[String, Object] =
@@ -235,7 +236,5 @@ object DocBook2 {
 
   val forXslt1: List[DocBook2] = List(Html, Epub2, Epub3, Pdf)
 
-  val forXslt2: List[DocBook2] = List(
-//    Html
-  )
+  val forXslt2: List[DocBook2] = List(Html)
 }

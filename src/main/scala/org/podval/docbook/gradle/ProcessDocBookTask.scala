@@ -13,8 +13,9 @@ class ProcessDocBookTask extends DefaultTask {
 
   private val logger: Logger = new Logger.PluginLogger(getLogger)
 
-  // To let projects that use the plugin to not make assumptions about directory names
+  // To let projects that use the plugin to not make assumptions about directory names:
   @Internal def getOutputDirectory: File = layout.forXslt1.outputDirectoryRoot
+  @Internal def getOutputDirectory2: File = layout.forXslt2.outputDirectoryRoot
 
   // Register inputs
   val inputDirectories: Set[File] = Set(

@@ -15,11 +15,13 @@
         <rewriteURI rewritePrefix="@docBookXsl@" uriStartString="http://docbook.sourceforge.net/release/xsl-ns/current/"/>
 
         <!-- DocBook XSLT 2.0 stylesheets  -->
-        <rewriteURI rewritePrefix="@docBookXsl2@" uriStartString="https://cdn.docbook.org/release/latest/xslt/base/"/>
+        <rewriteURI rewritePrefix="@docBookXsl2@" uriStartString="https://cdn.docbook.org/release/latest/xslt/"/>
 
         <!-- generated data -->
         <rewriteSystem rewritePrefix="@data@" systemIdStartString="data:/"/>
         <rewriteSystem rewritePrefix="@data@" systemIdStartString="data:"/>
+        <rewriteSystem rewritePrefix="@data@" systemIdStartString="urn:docbook:data:/"/>
+        <rewriteSystem rewritePrefix="@data@" systemIdStartString="urn:docbook:data:"/>
         <rewriteSystem rewritePrefix="@data@" systemIdStartString="urn:docbook:data/"/>
         <rewriteSystem rewritePrefix="@data@" systemIdStartString="http://podval.org/docbook/data/"/>
 

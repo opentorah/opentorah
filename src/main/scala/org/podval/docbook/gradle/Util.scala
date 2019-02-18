@@ -25,11 +25,17 @@ object Util {
       throw new Exception(s"Unable to delete ${file.getAbsolutePath}")
   }
 
+  def readFrom(clazz: Class[_], name: String): String = {
+    val is: InputStream = clazz.getResourceAsStream(name)
+    if (is == null) {
+      val message: String = s"Resource not found:  ${clazz.getCanonicalName}:$name"
+      throw new IllegalArgumentException(message)
+    }
+    scala.io.Source.fromInputStream(is).getLines.mkString("\n")
+  }
+
   def readFrom(file: File): String =
     scala.io.Source.fromFile(file).getLines.mkString("\n")
-
-  def readFrom(is: InputStream): String =
-    scala.io.Source.fromInputStream(is).getLines.mkString("\n")
 
   def writeInto(file: File, what: String): Unit = {
     file.getParentFile.mkdirs()

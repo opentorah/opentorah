@@ -5,7 +5,7 @@ import org.gradle.api.{Action, DefaultTask}
 import org.gradle.api.file.{CopySpec, FileCopyDetails, RelativePath}
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.tasks.{Input, TaskAction}
-import java.io.{File, InputStream}
+import java.io.File
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 
@@ -26,18 +26,18 @@ class PrepareDocBookTask extends DefaultTask  {
 
     // Customizations
     copyCustomizations(layout.forXslt1, Set("common", "common-html", "epub",  "epub3", "fo", "html"))
-    //    copyCustomizations(layout.forXslt2, Set("html", "fo"))
+    copyCustomizations(layout.forXslt2, Set("html"))
 
     // XSLT stylesheets
     unpackDocBookXsl(layout.forXslt1, "XSLT")
-    //    unpackDocBookXsl(layout.forXslt2, "XSLT 2.0")
+    unpackDocBookXsl(layout.forXslt2, "XSLT 2.0")
 
     // substitutions DTD
     Util.writeInto(layout.substitutionsDtdFile, substitutions.get.asScala.toSeq.map {
       case (name: String, value: String) => s"""<!ENTITY $name "$value">"""
     }.mkString("", "\n", "\n"))
 
-    writeCatalog("xml", "catalog.xml", layout.catalogFile)
+    writeCatalog(layout.catalogFile)
   }
 
   private def copyCustomizations(forXslt: ForXslt, customizations: Set[String]): Unit =
@@ -45,43 +45,25 @@ class PrepareDocBookTask extends DefaultTask  {
       copyResource(forXslt.stylesheetDirectoryName, name + ".xsl", forXslt.stylesheetFile(name))
     }
 
-  private def writeCatalog(directory: String, name: String, file: File): Unit = {
-    if (file.exists()) {
-      logger.info(s"Skipping catalog: file $file already exists")
-    } else {
-      logger.info(s"Writing catalog to $file")
-      file.getParentFile.mkdirs
-
-      val is: InputStream = getClass.getResourceAsStream(s"/$directory/$name")
-      if (is == null) {
-        val message: String = s"Catalog not found"
-        logger.error(message)
-        throw new IllegalArgumentException(message)
-      }
-      val template: String = Util.readFrom(is)
-      val catalog: String = template
-        .replace("@docBookXsl@", layout.forXslt1.docBookXslDirectoryRelative)
-        .replace("@docBookXsl2@", layout.forXslt2.docBookXslDirectoryRelative)
-        .replace("@data@", layout.dataDirectoryRelative)
-        .replace("@substitutions-dtd@", layout.substitutionsDtdRelative)
-      Util.writeInto(file, catalog)
-    }
+  private def writeCatalog(file: File): Unit = writeFile(file){
+    Util.readFrom(getClass,  "/xml/catalog.xml")
+      .replace("@docBookXsl@", layout.forXslt1.docBookXslDirectoryRelative)
+      .replace("@docBookXsl2@", layout.forXslt2.docBookXslDirectoryRelative)
+      .replace("@data@", layout.dataDirectoryRelative)
+      .replace("@substitutions-dtd@", layout.substitutionsDtdRelative)
   }
 
-  private def copyResource(directory: String, name: String, file: File): Unit = {
-    if (file.exists()) {
-      logger.info(s"Skipping configuration resource $name: file $file already exists")
-    } else {
-      logger.info(s"Writing $file")
-      file.getParentFile.mkdirs
+  private def copyResource(directory: String, name: String, file: File): Unit =
+    writeFile(file)(Util.readFrom(getClass, s"/$directory/$name"))
 
-      val is: InputStream = getClass.getResourceAsStream(s"/$directory/$name")
-      if (is == null) {
-        val message: String = s"Configuration resource not found: $name"
-        logger.error(message)
-        throw new IllegalArgumentException(message)
-      }
-      java.nio.file.Files.copy(is, file.toPath)
+  private def writeFile(toFile: File)(content: => String): Unit = {
+    if (toFile.exists()) {
+      logger.info(s"Skipping: file $toFile already exists")
+    } else {
+      logger.info(s"Writing $toFile")
+      toFile.getParentFile.mkdirs
+
+      Util.writeInto(toFile, content)
     }
   }
 
