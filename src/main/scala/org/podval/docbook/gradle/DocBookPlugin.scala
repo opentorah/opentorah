@@ -9,19 +9,13 @@ final class DocBookPlugin extends Plugin[Project] {
   def apply(project: Project): Unit = {
     val layout: Layout = Layout.forProject(project)
 
-    // Configurations that resolves DocBook XSL stylesheets.
-    createConfiguration(project, layout.forXslt1.docBookXslConfigurationName,
-      "net.sf.docbook", "docbook-xsl", "1.79.1", ":resources@zip")
-
-    createConfiguration(project, layout.forXslt2.docBookXslConfigurationName,
-      "org.docbook", "docbook-xslt2", "2.3.10", "@jar")
-
     // Extension for configuring the plugin.
     val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)
+    extension.xslt1version.set("+")
+    extension.xslt2version.set("+")
     extension.documentName.set("index")
     extension.dataGeneratorClass.set("")
-    extension.outputFormats.set(DocBook2.forXslt1.map(_.name).asJava)
-    extension.outputFormats2.set(List.empty[String].asJava)
+    extension.outputFormats.set(DocBook2.processors.filterNot(_.usesDocBookXslt2) .map(_.name).asJava)
     extension.cssFileName.set("docBook")
     extension.isJEuclidEnabled.set(false)
     extension.epubEmbeddedFonts.set(List.empty[String].asJava)
@@ -35,6 +29,8 @@ final class DocBookPlugin extends Plugin[Project] {
     // Prepare DocBook.
     val prepareDocBookTask: PrepareDocBookTask = project.getTasks.create("prepareDocBook", classOf[PrepareDocBookTask])
     prepareDocBookTask.setDescription(s"Prepare DocBook")
+    prepareDocBookTask.xslt1version.set(extension.xslt1version)
+    prepareDocBookTask.xslt2version.set(extension.xslt2version)
     prepareDocBookTask.inputFileName.set(extension.documentName)
     prepareDocBookTask.parameters.set(extension.parameters)
     prepareDocBookTask.substitutions.set(extension.substitutions)
@@ -50,7 +46,6 @@ final class DocBookPlugin extends Plugin[Project] {
     processDocBookTask.parameters.set(extension.parameters)
     processDocBookTask.substitutions.set(extension.substitutions)
     processDocBookTask.outputFormats.set(extension.outputFormats)
-    processDocBookTask.outputFormats2.set(extension.outputFormats2)
     processDocBookTask.isJEuclidEnabled.set(extension.isJEuclidEnabled)
     processDocBookTask.getDependsOn.add(docBookDataTask)
     processDocBookTask.getDependsOn.add(prepareDocBookTask)
@@ -59,15 +54,4 @@ final class DocBookPlugin extends Plugin[Project] {
     val listFontsTask: ListFopFontsTask = project.getTasks.create("listFopFonts", classOf[ListFopFontsTask])
     listFontsTask.setDescription("List FOP fonts")
   }
-
-  private def createConfiguration(
-    project: Project,
-    name: String,
-    groupId: String,
-    artifactId: String,
-    version: String,
-    what: String
-  ): Unit = project.getConfigurations.create(name).defaultDependencies(
-    _.add(project.getDependencies.create(s"$groupId:$artifactId:$version$what")) : Unit
-  ).setVisible(false)
 }

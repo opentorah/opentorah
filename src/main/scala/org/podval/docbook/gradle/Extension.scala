@@ -6,6 +6,12 @@ import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import scala.beans.BeanProperty
 
 class Extension(project: Project) {
+  @BeanProperty val xslt1version: Property[String] =
+    project.getObjects.property(classOf[String])
+
+  @BeanProperty val xslt2version: Property[String] =
+    project.getObjects.property(classOf[String])
+
   @BeanProperty val documentName: Property[String] =
     project.getObjects.property(classOf[String])
 
@@ -19,9 +25,6 @@ class Extension(project: Project) {
     project.getObjects.mapProperty(classOf[String], classOf[String])
 
   @BeanProperty val outputFormats: ListProperty[String] =
-    project.getObjects.listProperty(classOf[String])
-
-  @BeanProperty val outputFormats2: ListProperty[String] =
     project.getObjects.listProperty(classOf[String])
 
   @BeanProperty val cssFileName: Property[String] =

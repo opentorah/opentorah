@@ -229,3 +229,16 @@ that'd make my builds non-repeatable even if I could afford a commercial one.
 
 Markdown has its uses for presentation-only quickies like websites (GitHub pages).
 Fashionable AsciiDoc (?) publishing systems lose what is important to me: semantic markup; they are purely presentation-oriented.
+
+## XSLT 2.0 ##
+
+XSLT 1.0 DocBook stylesheets rely on multi-output extension of Saxon for chunking HTML.
+This extension is not supported in Saxon after version 6.5.3 (new Saxon).
+Switching to [XSLT 2.0 stylesheets](https://github.com/docbook/xslt20-stylesheets)
+will allow the use modern versions of Saxon 
+(and eliminate namespace-cutting messages from the XSLT 1.0 stylesheets).
+
+XSLT 2.0 stylesheets do not support EPUB;
+according to https://so.nwalsh.com/2019/01/10/printingDocBook, they do not support PDF either;
+the only supported output format is (X)HTML. Some of the parameters that affect the processing are
+different from - and not documented as well as - the ones in the XSLT 1.0 stylesheets.  

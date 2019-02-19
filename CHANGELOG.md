@@ -6,7 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6.5]
+## [0.6.6] - 2019-02-20
+- merged XSL customizations, temporary directory, output directory and
+  output formats configuration for XSLT 1.0 and 2.0 stylesheets
+- versions of the XSLT stylesheets are now configurable
+
+## [0.6.5] - 2019-02-19
 - XSLT files and XML catalog customizable and available to Oxygen
 - per-format parameters
 - HTML with XSLT 2.0 stylesheets
