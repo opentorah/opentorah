@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.7] -
+- Layout/DocBook2 cleanup
+- namespace-aware DocBook XSLT 1.0 stylesheets
+
 ## [0.6.6] - 2019-02-20
 - merged XSL customizations, temporary directory, output directory and
   output formats configuration for XSLT 1.0 and 2.0 stylesheets

@@ -1,7 +1,5 @@
 package org.podval.docbook.gradle
 
-import java.io.File
-
 trait Stylesheets {
   def name: String
 
@@ -27,7 +25,12 @@ object Stylesheets {
     override def name: String = "XSLT"
     override def groupId: String = "net.sf.docbook"
     override def artifactId: String = "docbook-xsl"
-    override def classifier: Option[String] = Some("resources")
+    // classifier for the non-NS-aware stylesheets is "resources";
+    // they  strip namespaces from DocBook V5.0 and produce a warning
+    //   "namesp. cut : stripped namespace before processing";
+    // during namespace stripping, the base URI of the document is lost;
+    // see details in https://docbook.org/docs/howto/howto.html
+    override def classifier: Option[String] = Some("ns-resources")
     override def extension: String = "zip"
 
     override def uri: String = "http://docbook.sourceforge.net/release/xsl-ns/current"

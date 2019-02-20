@@ -13,43 +13,31 @@ abstract class DocBook2 {
 
   def name: String
 
+  def stylesheetName: String = name
+
+  def usesIntermediate: Boolean
+
+  def outputDirectoryName: String = name
+
+  def intermediateDirectoryName: String = outputDirectoryName
+
+  def outputFileExtension: String
+
+  def intermediateFileExtension: String = outputFileExtension
+
+  def parameterSections: Set[String] =
+    Set(name, stylesheetName) ++
+      (if (usesDocBookXslt2) Set.empty else  Set("common") ++ (if (!usesHtml) Set.empty else Set("htmlCommon")))
+
   def usesDocBookXslt2: Boolean
+
+  def stylesheetUriName: String
 
   def usesHtml: Boolean
 
   def usesCss: Boolean
 
-  def embedsFonts: Boolean
-
-  def usesIntermediate: Boolean
-
-  def stylesheetName: String
-
-  def stylesheetUriName: String
-
-  def outputDirectoryName: String
-  def outputFileExtension: String
-
-  def intermediateDirectoryName: String = outputDirectoryName
-  def intermediateFileExtension: String = outputFileExtension
-
-  def parameterSections: Set[String] =
-    Set(name, stylesheetName) ++
-      (if (usesDocBookXslt2) Set.empty else  Set("common") ++ (if (!usesHtml) Set.empty else Set("common-html")))
-
-  protected final def getSaxonOutputDirectory(layout: Layout): File = new File(
-    if (usesIntermediate) layout.saxonOutputDirectoryRoot else layout.outputDirectoryRoot,
-    if (usesIntermediate) intermediateDirectoryName else outputDirectoryName
-  )
-
-  protected final def getSaxonOutputFile(layout: Layout, inputFileName: String): File = getOutputFile(
-    getSaxonOutputDirectory(layout),
-    inputFileName,
-    if (usesIntermediate) intermediateFileExtension else outputFileExtension
-  )
-
-  private def getOutputFile(directory: File, inputFileName: String, extension: String): File =
-    new File(directory, outputFileNameOverride.getOrElse(inputFileName) + "." + extension)
+  def isEpub: Boolean = false
 
   final def writeStylesheetFiles(
     layout: Layout,
@@ -79,19 +67,17 @@ abstract class DocBook2 {
          |"""
     }
 
-    val allParameters: Map[String, String] =
-      Map("img.src.path" -> (layout.imagesDirectoryName + "/")) ++
-      (if (!usesHtml) Map.empty else Map(
-        "base.dir" -> (getSaxonOutputDirectory(layout).getAbsolutePath + "/"),
-        "root.filename" -> Util.fileNameWithoutExtension(getSaxonOutputFile(layout, inputFileName))
-      )) ++
-      (if (!embedsFonts) Map.empty else Map(
-        "epub.embedded.fonts" -> epubEmbeddedFonts
-      )) ++
-      (if (!usesCss) Map.empty else Map(
-        (if (usesDocBookXslt2) "html.stylesheets" else "html.stylesheet") -> layout.cssFileRelative(cssFileName)
-      )) ++
-      parameters
+    def ifParameter(condition: Boolean, name: String, value: String): Option[(String, String)] =
+      if (!condition) None else Some(name -> value)
+
+    val allParameters: Map[String, String] = Seq[Option[(String, String)]](
+      ifParameter(condition = true, "img.src.path", layout.imagesDirectoryName + "/"),
+      ifParameter(usesHtml, "base.dir", layout.baseDir(this)),
+      ifParameter(usesHtml, "root.filename", layout.rootFilename(this, inputFileName)),
+      ifParameter(isEpub, "epub.embedded.fonts", epubEmbeddedFonts),
+      ifParameter(usesCss, if (usesDocBookXslt2) "html.stylesheets" else "html.stylesheet",
+        layout.cssFileRelativeToOutputDirectory(cssFileName))
+    ).flatten.toMap ++ parameters
 
     writeInto(layout.stylesheetFile(paramsStylesheetName), logger, replace = true) {
       val parametersStr: String = allParameters.map { case (name: String, value: String) =>
@@ -128,8 +114,8 @@ abstract class DocBook2 {
     logger.info(s"\nProcessing DocBook to $name")
 
     // Saxon output directory and file.
-    val saxonOutputDirectory: File = getSaxonOutputDirectory(layout)
-    val saxonOutputFile: File = getSaxonOutputFile(layout, inputFileName)
+    val saxonOutputDirectory: File = layout.saxonOutputDirectory(this)
+    val saxonOutputFile: File = layout.saxonOutputFile(this, inputFileName)
     saxonOutputDirectory.mkdirs
 
     // Saxon
@@ -167,7 +153,7 @@ abstract class DocBook2 {
     // Post-processing.
     if (usesIntermediate) {
       logger.info(s"Post-processing $name")
-      val outputDirectory: File = new File(layout.outputDirectoryRoot, outputDirectoryName)
+      val outputDirectory: File = layout.outputDirectory(this)
       outputDirectory.mkdirs
 
       postProcess(
@@ -176,7 +162,7 @@ abstract class DocBook2 {
         isJEuclidEnabled = isJEuclidEnabled,
         inputDirectory = saxonOutputDirectory,
         inputFile = saxonOutputFile,
-        outputFile = getOutputFile(outputDirectory, inputFileName, outputFileExtension),
+        outputFile = layout.outputFile(this, inputFileName),
         logger = logger
       )
     }
@@ -200,36 +186,39 @@ abstract class DocBook2 {
 
 object DocBook2 {
 
-  object Html extends DocBook2 {
+  trait HtmlLike extends DocBook2 {
+    final override def usesHtml: Boolean = true
+    final override def usesCss: Boolean = true
+    final override def usesIntermediate: Boolean = false
+    final override def outputFileExtension: String = "html"
+    final override def outputFileNameOverride: Option[String] = Some("index")
+  }
+
+  object Html extends DocBook2 with HtmlLike {
     override def usesDocBookXslt2: Boolean = false
-    override def usesHtml: Boolean = true
-    override def usesCss: Boolean = true
-    override def embedsFonts: Boolean = false
-    override def usesIntermediate: Boolean = false
-
     override def name: String = "html"
-    override def stylesheetName: String = "html"
     override def stylesheetUriName: String = "html/chunk"
+  }
 
-    override def outputDirectoryName: String = "html"
-    override def outputFileExtension: String = "html"
-    override def outputFileNameOverride: Option[String] = Some("index")
+  object Html2 extends DocBook2 with HtmlLike {
+    override def usesDocBookXslt2: Boolean = true
+    override def name: String = "html2"
+    override def stylesheetUriName: String = "html/chunk"
   }
 
   object Pdf extends DocBook2 {
     override def usesDocBookXslt2: Boolean = false
     override def usesHtml: Boolean = false
     override def usesCss: Boolean = false
-    override def embedsFonts: Boolean = false
-    override def usesIntermediate: Boolean = true
 
-    override def name: String = "pdf"
-    override def stylesheetName: String = "fo"
-    override def stylesheetUriName: String = "fo/docbook"
+    override def usesIntermediate: Boolean = true
     override def intermediateDirectoryName: String = "fo"
     override def intermediateFileExtension: String = "fo"
-    override def outputDirectoryName: String = "pdf"
+
+    override def name: String = "pdf"
     override def outputFileExtension: String = "pdf"
+
+    override def stylesheetUriName: String = "fo/docbook"
 
     override protected def postProcess(
       layout: Layout,
@@ -243,16 +232,17 @@ object DocBook2 {
       configurationFile = layout.fopConfigurationFile,
       isJEuclidEnabled = isJEuclidEnabled,
       inputFile = inputFile,
-      baseDirectory = inputDirectory,
+      inputDirectory = inputDirectory,
       outputFile = outputFile,
       logger = logger
     )
   }
 
   trait Epub extends DocBook2 {
+    final override def usesDocBookXslt2: Boolean = false
     final override def usesHtml: Boolean = true
     final override def usesCss: Boolean = false
-    final override def embedsFonts: Boolean = true
+    final override def isEpub: Boolean = true
     final override def usesIntermediate: Boolean = true
     final override def outputFileExtension: String = "epub"
     final override def copyDestinationDirectoryName: Option[String] = Some("OEBPS")
@@ -281,34 +271,12 @@ object DocBook2 {
 
   object Epub2 extends Epub {
     override def name: String = "epub2"
-    override def usesDocBookXslt2: Boolean = false
-    override def outputDirectoryName: String = "epub"
-    override def stylesheetName: String = "epub"
     override def stylesheetUriName: String = "epub/docbook"
   }
 
   object Epub3 extends Epub {
     override def name: String = "epub3"
-    override def usesDocBookXslt2: Boolean = false
-    override def outputDirectoryName: String = "epub3"
-    override def stylesheetName: String = "epub3"
     override def stylesheetUriName: String = "epub3/chunk"
-  }
-
-  object Html2 extends DocBook2 {
-    override def usesDocBookXslt2: Boolean = true
-    override def usesHtml: Boolean = true
-    override def usesCss: Boolean = true
-    override def embedsFonts: Boolean = false
-    override def usesIntermediate: Boolean = false
-
-    override def name: String = "html2"
-    override def stylesheetName: String = "html2"
-    override def stylesheetUriName: String = "html/chunk" // TODO "html/html"?
-
-    override def outputDirectoryName: String = "html2"
-    override def outputFileExtension: String = "html"
-    override def outputFileNameOverride: Option[String] = Some("index")
   }
 
   val processors: List[DocBook2] = List(Html, Epub2, Epub3, Pdf, Html2)

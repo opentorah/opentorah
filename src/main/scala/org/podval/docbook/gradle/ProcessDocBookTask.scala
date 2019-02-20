@@ -14,7 +14,7 @@ class ProcessDocBookTask extends DefaultTask {
   private val logger: Logger = new Logger.PluginLogger(getLogger)
 
   // To let projects that use the plugin to not make assumptions about directory names:
-  @Internal def getOutputDirectory: File = layout.outputDirectoryRoot
+  @Internal def getOutputDirectory: File = layout.outputRoot
 
   // Register inputs
   val inputDirectories: Set[File] = Set(
@@ -35,8 +35,8 @@ class ProcessDocBookTask extends DefaultTask {
 
   // Register outputs
   Set(
-    layout.saxonOutputDirectoryRoot,
-    layout.outputDirectoryRoot
+    layout.intermediateRoot,
+    layout.outputRoot
   ).foreach { directory: File =>
     Util.deleteRecursively(directory)
     logger.info(s"Registering output directory $directory")
@@ -68,10 +68,16 @@ class ProcessDocBookTask extends DefaultTask {
 
     logger.info(s"Output formats: ${getNames(processors)}")
 
+    val allParameters: Map[String, Map[String, String]] =
+      parameters.get.asScala.toMap.mapValues(_.asScala.toMap)
+
+    val unclaimedParameterSections: Set[String] = Util.unclaimedParameterSections(allParameters, processors.toSet)
+    if (unclaimedParameterSections.nonEmpty)
+      logger.info(s"Unclaimed parameter sections: ${unclaimedParameterSections.mkString(", ")}")
+
     // In processing instructions and CSS, substitute xslParameters also - because why not?
     val allSubstitutions: Map[String, String] =
-      parameters.get.asScala.toMap.mapValues(_.asScala.toMap).values.toList.flatten.toMap ++
-      substitutions.get.asScala.toMap
+      allParameters.values.toList.flatten.toMap ++ substitutions.get.asScala.toMap
 
     val resolver: Resolver = new Resolver(layout.catalogFile,  logger)
 

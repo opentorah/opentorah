@@ -21,7 +21,7 @@ of the output formats are configurable.
 
 XSL parameters can be configured in the `Gradle` build file usin `parameters` map,
 which can have sections applicable to a specific format (`html`), all HTML-like
-formats (`common-html`), and for all formats except `html2` (`common`).
+formats (`htmlCommon`), and for all formats except `html2` (`common`).
 
 Values configured as `substitutions` are available within the DocBook documents by
 their names. This mechanism can be used to insert things like processing date or the
@@ -83,6 +83,14 @@ plugins {
 }
 ```
 
+Plugin needs to be able to resolve DocBook XSLT stylesheets artifacts, so:
+
+```groovy
+repositories {
+  jcenter()
+}
+```
+
 For projects with code that is used to generate data for inclusion in the DocBook files,
 DocBook plugin needs to be applied *after* the Scala/Java plugin - or explicit dependency needs
 to be added by hand:
@@ -137,7 +145,7 @@ docBook {
     "common": [
       "toc.section.depth": "4"            
     ],
-    "html-common": [
+    "htmlCommon": [
       "use.id.as.filename": "yes"
     ],
     "pdf" : [

@@ -21,7 +21,7 @@ object Fop {
     configurationFile: File,
     isJEuclidEnabled: Boolean,
     inputFile: File,
-    baseDirectory: File,
+    inputDirectory: File,
     outputFile: File,
     logger: Logger
   ): Unit = {
@@ -29,13 +29,13 @@ object Fop {
       s"""Fop.run(
          |  configurationFile = $configurationFile,
          |  inputFile = $inputFile,
-         |  baseDirectory = "$baseDirectory",
+         |  inputDirectory = "$inputDirectory",
          |  outputFile = $outputFile,
          |)""".stripMargin
     )
 
     val fopFactory: FopFactory = getFopFactoryBuilder(configurationFile)
-      .setBaseURI(baseDirectory.toURI)
+      .setBaseURI(inputDirectory.toURI)
       .build
 
     if (isJEuclidEnabled) JEuclidFopFactoryConfigurator.configure(fopFactory)

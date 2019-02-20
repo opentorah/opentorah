@@ -43,16 +43,14 @@ class PrepareDocBookTask extends DefaultTask  {
     val allParameters: Map[String, Map[String, String]] =
       parameters.get.asScala.toMap.mapValues(_.asScala.toMap)
 
-    val sectionsPresent: Set[String] = allParameters.keySet
-    val sectionsClaimed: Set[String] = DocBook2.processors.toSet[DocBook2].flatMap(_.parameterSections)
-    val sectionsUnclaimed: Set[String] = sectionsPresent -- sectionsClaimed
-    if (sectionsUnclaimed.nonEmpty) {
+    val unclaimedParameterSections: Set[String] = Util.unclaimedParameterSections(allParameters, DocBook2.processors.toSet)
+    if (unclaimedParameterSections.nonEmpty) {
       val sections: String = DocBook2.processors.map { processor =>
         "  " + processor.name + ": " + processor.parameterSections.mkString(", ")
       }.mkString("\n")
 
       throw new IllegalArgumentException(
-        s"""Unsupported parameter sections: ${sectionsUnclaimed.mkString(", ")}.
+        s"""Unsupported parameter sections: ${unclaimedParameterSections.mkString(", ")}.
            |Supported sections are:
            |$sections
            |""".stripMargin

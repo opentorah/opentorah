@@ -3,7 +3,6 @@ package org.podval.docbook.gradle
 import org.gradle.api.{Plugin, Project}
 import scala.collection.JavaConverters._
 
-// Properties are annotated with @BeanProperty to make them visible to Gradle.
 final class DocBookPlugin extends Plugin[Project] {
 
   def apply(project: Project): Unit = {
@@ -20,7 +19,7 @@ final class DocBookPlugin extends Plugin[Project] {
     extension.isJEuclidEnabled.set(false)
     extension.epubEmbeddedFonts.set(List.empty[String].asJava)
 
-    // Generate content that needs to be included in DocBook by executing the generating code.
+    // Generate data for inclusion in DocBook by executing the generating code.
     val docBookDataTask: DocBookDataTask = project.getTasks.create("docBookData", classOf[DocBookDataTask])
     docBookDataTask.setDescription("Generate data for inclusion in DocBook")
     docBookDataTask.dataGeneratorClass.set(extension.dataGeneratorClass)

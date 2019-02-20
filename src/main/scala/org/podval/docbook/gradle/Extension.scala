@@ -5,6 +5,7 @@ import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 
 import scala.beans.BeanProperty
 
+// Properties are annotated with @BeanProperty to make them visible to Gradle.
 class Extension(project: Project) {
   @BeanProperty val xslt1version: Property[String] =
     project.getObjects.property(classOf[String])

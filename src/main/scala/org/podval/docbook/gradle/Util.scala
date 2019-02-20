@@ -53,6 +53,12 @@ object Util {
     }
   }
 
+  def unclaimedParameterSections(parameters: Map[String, Map[String, String]], processors: Set[DocBook2]): Set[String] = {
+    val present: Set[String] = parameters.keySet
+    val claimed: Set[String] = processors.flatMap(_.parameterSections)
+    present -- claimed
+  }
+
   //  def fileInputSource(file: File): InputSource =
   //    new InputSource(file.toURI.toASCIIString)
 
