@@ -13,7 +13,7 @@ class Extension(project: Project) {
   @BeanProperty val xslt2version: Property[String] =
     project.getObjects.property(classOf[String])
 
-  @BeanProperty val documentName: Property[String] =
+  @BeanProperty val document: Property[String] =
     project.getObjects.property(classOf[String])
 
   @BeanProperty val dataGeneratorClass: Property[String] =
@@ -28,7 +28,7 @@ class Extension(project: Project) {
   @BeanProperty val outputFormats: ListProperty[String] =
     project.getObjects.listProperty(classOf[String])
 
-  @BeanProperty val cssFileName: Property[String] =
+  @BeanProperty val cssFile: Property[String] =
     project.getObjects.property(classOf[String])
 
   @BeanProperty val isJEuclidEnabled: Property[Boolean] =

@@ -7,7 +7,7 @@ import javax.xml.transform.Transformer
 import javax.xml.transform.sax.SAXResult
 import javax.xml.transform.stream.StreamSource
 import net.sourceforge.jeuclid.fop.plugin.JEuclidFopFactoryConfigurator
-import org.apache.fop.apps.{FopConfParser, FopFactory, FopFactoryBuilder}
+import org.apache.fop.apps.{FOUserAgent, FopConfParser, FopFactory}
 import org.apache.xmlgraphics.util.MimeConstants
 import org.apache.fop.fonts.{FontEventListener, FontTriplet}
 import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
@@ -29,19 +29,30 @@ object Fop {
       s"""Fop.run(
          |  configurationFile = $configurationFile,
          |  inputFile = $inputFile,
-         |  inputDirectory = "$inputDirectory",
+         |  inputDirectory = $inputDirectory,
          |  outputFile = $outputFile,
          |)""".stripMargin
     )
 
-    val fopFactory: FopFactory = getFopFactoryBuilder(configurationFile)
-      .setBaseURI(inputDirectory.toURI)
-      .build
+    val fopFactory: FopFactory = getFopFactory(configurationFile)
+      // TODO do I need to set baseURI on the factory builder if I set default base URI in getFopFactoryBuilder()?
+      // .setBaseURI(inputDirectory.toURI).build
 
     if (isJEuclidEnabled) JEuclidFopFactoryConfigurator.configure(fopFactory)
 
+    val foUserAgent: FOUserAgent = fopFactory.newFOUserAgent
+    // metadata can be set on foUserAgent:
+      // FOP's PDFFactory set the current date, so resulting PDF files are different even if the contents are the same :(
+//      foUserAgent.setCreationDate()
+//    info.setCreator(userAgent.getCreator());
+//    info.setAuthor(userAgent.getAuthor());
+//    info.setTitle(userAgent.getTitle());
+//    info.setSubject(userAgent.getSubject());
+//    info.setKeywords(userAgent.getKeywords());
+
+
     val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(outputFile))
-    val fop: org.apache.fop.apps.Fop = fopFactory.newFop("application/pdf", outputStream)
+    val fop: org.apache.fop.apps.Fop = fopFactory.newFop("application/pdf", foUserAgent, outputStream)
 
     try {
       val transformer: Transformer = Saxon.getXslt1TransformerFactory.newTransformer
@@ -105,7 +116,7 @@ object Fop {
   }
 
   def getFontFamilies(configurationFile: File): SortedMap[String, List[FontSpec]] = {
-    val fopFactory: FopFactory = getFopFactoryBuilder(configurationFile).build
+    val fopFactory: FopFactory = getFopFactory(configurationFile)
 
     val fontEventListener: FontEventListener  = new FontEventListener {
       override def fontLoadingErrorAtAutoDetection(source: AnyRef, fontURL: String, e: Exception): Unit =
@@ -123,6 +134,8 @@ object Fop {
       .mapValues(_.asScala.toList)
   }
 
-  private def getFopFactoryBuilder(configurationFile: File): FopFactoryBuilder =
-    new FopConfParser(configurationFile).getFopFactoryBuilder
+  private def getFopFactory(configurationFile: File): FopFactory =
+    new FopConfParser(configurationFile, configurationFile.getParentFile.toURI)
+      .getFopFactoryBuilder
+      .build
 }

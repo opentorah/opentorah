@@ -58,7 +58,7 @@ more suitable than a code editor or an IDE for authoring DocBook.
 ## Credits ##
 
 I want to thank:
-- [@mimil](https://github.com/mimil) for the [Maven DocBook plugin](https://github.com/mimil/docbkx-tools);
+- [Cedric Pronzato](https://github.com/mimil) for the [Maven DocBook plugin](https://github.com/mimil/docbkx-tools);
 - [Norman Walsh](https://nwalsh.com/) for his work on [DocBook](http://www.docbook.org/),
 [XML Catalogs](http://xmlcatalogs.org/) and [XML Resolver](https://xmlresolver.org/);
 - [Bob Stayton](http://www.sagehill.net/bobsbio.html) for
@@ -131,8 +131,8 @@ docBook {
   // by default, latest versions of the DocBook XSLT stylesheets are used ("+");
   // above properties can be used to set a specific version 
 
-  documentName = "paper"
-  // defaults to "index" (.xml is assumed)
+  document = "paper"
+  // defaults to "index"; .xml is assumed
 
   dataGeneratorClass = "org.sample.stuff.paper.Tables"
   // by default, no data is generated 
@@ -141,15 +141,18 @@ docBook {
   // by default, all supported formats except html2 are generated;
   // this property can be overridden on the command line using `-PdocBook.outputFormats="epub3, html"`
 
+
+  // there is a parameter section for each format, for HTML-using ones, and for all
   parameters = [
     "common": [
-      "toc.section.depth": "4"            
+      "toc.section.depth" : "4"            
     ],
     "htmlCommon": [
       "use.id.as.filename": "yes"
     ],
     "pdf" : [
-      "body.font.master": "12"
+      "symbol.font.family": "DejaVu Sans",
+      "body.font.master"  : "12"
     ]
   ]
 
@@ -159,7 +162,7 @@ docBook {
   // names get replaced with configured values in DocBook documents
 
   cssFileName = "main"
-  // defaults to "docBook" (.css is assumed) 
+  // defaults to "docBook"; .css is assumed 
 
   epubEmbeddedFonts = [ "Liberation Sans" ]
   // embedded fonts should be OpenType or WOFF!

@@ -1,18 +1,21 @@
 plugins {
-  id "com.github.maiflai.scalatest" version "0.23" apply false
-  id "com.gradle.plugin-publish" version "0.10.1" apply false
-  id "com.jfrog.bintray" version "1.8.4" apply false
+  id 'com.github.ben-manes.versions' version "0.20.0"
+  id 'scala'
+  id 'com.github.maiflai.scalatest' version "0.23"
+  id 'java-gradle-plugin'
+  id 'maven-publish'
+  id 'com.gradle.plugin-publish' version "0.10.1"
+  id 'com.jfrog.bintray' version "1.8.4"
+  id 'idea'
 }
 
 group = 'org.podval.docbook'
 version = '0.6.7'
-description = 'Gradle DocBook plugin.'
+description = 'Gradle DocBook plugin'
 
 repositories {
   jcenter()
 }
-
-apply plugin: 'scala'
 
 def scalaVersion = '2.12.8'
 def scalaVersionMajor = '2.12'
@@ -36,11 +39,11 @@ dependencies {
   // XMLResolver
   compile 'org.xmlresolver:xmlresolver:0.14.0'
 
-  // Saxon
+  // Saxon 6 (XSLT 1.0)
   compile 'saxon:saxon:6.5.3'
 
-  // Saxon 9
-  compile 'net.sf.saxon:Saxon-HE:9.8.0-14'
+  // Saxon 9 (XSLT 2.0)
+  compile 'net.sf.saxon:Saxon-HE:9.9.1-1'
 
   // Xerces
   runtime "xerces:xercesImpl:$xercesVersion"
@@ -48,12 +51,25 @@ dependencies {
   // FOP
   compile "org.apache.xmlgraphics:fop:$fopVersion"
 
+  // Hyphenation patterns
+  compile 'net.sf.offo:fop-hyph:2.0'
+
   // JEuclid
   compile 'de.rototor.jeuclid:jeuclid-core:3.1.13'
-  // old:  compile 'net.sourceforge.jeuclid:jeuclid-fop:3.1.9'
+  // obsolete:  'net.sourceforge.jeuclid:jeuclid-fop:3.1.9'
 
   testImplementation "org.scalatest:scalatest_$scalaVersionMajor:3.0.5"
+  testImplementation "org.pegdown:pegdown:1.6.0" // for scalatest reports
 // added by the 'java-gradle-plugin': testImplementation gradleTestKit()
+}
+
+jar {
+  manifest {
+    attributes(
+      'Implementation-Title'  : project.description,
+      'Implementation-Version': project.version
+    )
+  }
 }
 
 // Gradle plugin [publishing?] plugin adds tasks publishPluginJar and
@@ -71,10 +87,6 @@ task scaladocJar(type: Jar) {
 }
 scaladocJar.dependsOn scaladoc
 
-apply plugin: 'com.github.maiflai.scalatest'
-
-apply plugin: 'java-gradle-plugin'
-
 def pluginArtifactId = project.name // jar.baseName
 
 gradlePlugin {
@@ -85,8 +97,6 @@ gradlePlugin {
     }
   }
 }
-
-apply plugin: 'com.gradle.plugin-publish'
 
 def gitHubRepository    = "dubinsky/podval-docbook-gradle"
 def gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
@@ -112,8 +122,6 @@ pluginBundle {
     artifactId = pluginArtifactId
   }
 }
-
-apply plugin: 'maven-publish'
 
 publishing {
   publications {
@@ -159,8 +167,6 @@ publishing {
   }
 }
 
-apply plugin: 'com.jfrog.bintray'
-
 bintray {
   user         = 'dubinsky'
   key          = findProperty('bintrayApiKey')
@@ -189,8 +195,6 @@ bintray {
     version { name         = project.version }
   }
 }
-
-apply plugin: 'idea'
 
 idea {
   project {

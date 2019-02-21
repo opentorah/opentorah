@@ -76,7 +76,7 @@ final class Layout(projectDir: File, buildDir: File) {
   private def saxonOutputDirectoryName(docBook2: DocBook2): String =
     if (docBook2.usesIntermediate) docBook2.intermediateDirectoryName else docBook2.outputDirectoryName
 
-  private val useRelativeBaseDir: Boolean = true
+  private val useRelativeBaseDir: Boolean = false // TODO must be absolute for tests!
   def baseDir(docBook2: DocBook2): String =
     if (!useRelativeBaseDir) saxonOutputDirectory(docBook2).getAbsolutePath + "/" else {
       val directoryName: String = if (docBook2.usesIntermediate) intermediateRootName else outputRootName

@@ -6,7 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6.7] -
+## [0.6.8] - 2019-02-
+- added hyphenation rules dependency;
+- suppressed "font directory" warning (set baseUri);
+- figured out how to set FOP metadata.
+
+## [0.6.7] - 2019-02-20
 - Layout/DocBook2 cleanup
 - namespace-aware DocBook XSLT 1.0 stylesheets
 

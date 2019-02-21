@@ -41,10 +41,7 @@ abstract class DocBook2 {
 
   final def writeStylesheetFiles(
     layout: Layout,
-    inputFileName: String,
     parameters: Map[String, String],
-    cssFileName: String,
-    epubEmbeddedFonts: String,
     logger: Logger
   ): Unit = {
     val customStylesheetName: String = layout.customStylesheet(stylesheetName)
@@ -67,20 +64,8 @@ abstract class DocBook2 {
          |"""
     }
 
-    def ifParameter(condition: Boolean, name: String, value: String): Option[(String, String)] =
-      if (!condition) None else Some(name -> value)
-
-    val allParameters: Map[String, String] = Seq[Option[(String, String)]](
-      ifParameter(condition = true, "img.src.path", layout.imagesDirectoryName + "/"),
-      ifParameter(usesHtml, "base.dir", layout.baseDir(this)),
-      ifParameter(usesHtml, "root.filename", layout.rootFilename(this, inputFileName)),
-      ifParameter(isEpub, "epub.embedded.fonts", epubEmbeddedFonts),
-      ifParameter(usesCss, if (usesDocBookXslt2) "html.stylesheets" else "html.stylesheet",
-        layout.cssFileRelativeToOutputDirectory(cssFileName))
-    ).flatten.toMap ++ parameters
-
     writeInto(layout.stylesheetFile(paramsStylesheetName), logger, replace = true) {
-      val parametersStr: String = allParameters.map { case (name: String, value: String) =>
+      val parametersStr: String = parameters.map { case (name: String, value: String) =>
         s"""  <xsl:param name="$name">$value</xsl:param>"""
       }.mkString("\n")
 
@@ -197,7 +182,7 @@ object DocBook2 {
   object Html extends DocBook2 with HtmlLike {
     override def usesDocBookXslt2: Boolean = false
     override def name: String = "html"
-    override def stylesheetUriName: String = "html/chunk"
+    override def stylesheetUriName: String = "html/chunkfast"
   }
 
   object Html2 extends DocBook2 with HtmlLike {

@@ -25,7 +25,7 @@ class PluginTestProject(
        |apply plugin: 'base'
        |
        |docBook {
-       |  documentName = "$documentName"
+       |  document = "$documentName"
        |  outputFormats = ["html"]
        |$substitutionsFormatted
        |}
@@ -57,7 +57,7 @@ class PluginTestProject(
       """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" + document)
   }
 
-  private val logger: Logger = new Logger.TestLogger
+  private val logger: Logger = new TestLogger
 
   private def writeInto(fileName: String, what: String): Unit =
     Util.writeInto(new File(projectDir, fileName), logger, replace = true)(what)

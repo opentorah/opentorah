@@ -3,11 +3,24 @@ package org.podval.docbook.gradle
 import java.io.{BufferedWriter, File, FileWriter, InputStream}
 
 object Util {
-  def fileNameWithoutExtension(file: File): String = {
-    val result: String = file.getName
-    val lastDot: Int = result.lastIndexOf(".")
-    result.substring(0, lastDot)
+  def fileNameAndExtension(nameWithExtension: String): (String, Option[String]) = {
+    val lastDot: Int = nameWithExtension.lastIndexOf(".")
+    if (lastDot == -1) (nameWithExtension, None)
+    else (
+      nameWithExtension.substring(0, lastDot),
+      Some(nameWithExtension.substring(lastDot+1))
+    )
   }
+
+  def dropAllowedExtension(nameWihtExtension: String, allowedExtension: String): String = {
+    val (name: String, extension: Option[String]) = fileNameAndExtension(nameWihtExtension)
+    if (extension.nonEmpty && !extension.contains("xml"))
+      throw new IllegalArgumentException(s"Extension must be '$allowedExtension' if present: $nameWihtExtension")
+    name
+  }
+
+  def fileNameWithoutExtension(file: File): String =
+    fileNameAndExtension(file.getName)._1
 
   def drop(what: Seq[String], from: String): Option[String] =
     what.flatMap(drop(_, from)).headOption

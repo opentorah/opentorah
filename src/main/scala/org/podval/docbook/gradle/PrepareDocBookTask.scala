@@ -22,7 +22,7 @@ class PrepareDocBookTask extends DefaultTask  {
   @BeanProperty val xslt2version: Property[String] =
     getProject.getObjects.property(classOf[String])
 
-  @Input @BeanProperty val inputFileName: Property[String] =
+  @Input @BeanProperty val document: Property[String] =
     getProject.getObjects.property(classOf[String])
 
   @BeanProperty val parameters: MapProperty[String, java.util.Map[String, String]] =
@@ -31,7 +31,7 @@ class PrepareDocBookTask extends DefaultTask  {
   @Input @BeanProperty val substitutions: MapProperty[String, String] =
     getProject.getObjects.mapProperty(classOf[String], classOf[String])
 
-  @Input @BeanProperty val cssFileName: Property[String] =
+  @Input @BeanProperty val cssFile: Property[String] =
     getProject.getObjects.property(classOf[String])
 
   @Input @BeanProperty val epubEmbeddedFonts: ListProperty[String] =
@@ -39,6 +39,9 @@ class PrepareDocBookTask extends DefaultTask  {
 
   @TaskAction
   def prepareDocBook(): Unit = {
+    val documentName: String = Util.dropAllowedExtension(document.get, "xml")
+    val cssFileName: String = Util.dropAllowedExtension(cssFile.get, "css")
+
     // Verify parameter sections
     val allParameters: Map[String, Map[String, String]] =
       parameters.get.asScala.toMap.mapValues(_.asScala.toMap)
@@ -58,23 +61,23 @@ class PrepareDocBookTask extends DefaultTask  {
     }
 
     // Input file
-    writeInto(layout.inputFile(inputFileName.get), logger, replace = false) {
-      """|<?xml version="1.0" encoding="UTF-8"?>
-         |<!DOCTYPE article
-         |  PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN"
-         |  "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd">
-         |
-         |<article xmlns="http://docbook.org/ns/docbook" version="5.0"
-         |         xmlns:xi="http://www.w3.org/2001/XInclude">
-         |</article>
-         |"""
+    writeInto(layout.inputFile(documentName), logger, replace = false) {
+      """<?xml version="1.0" encoding="UTF-8"?>
+        |<!DOCTYPE article
+        |  PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN"
+        |  "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd">
+        |
+        |<article xmlns="http://docbook.org/ns/docbook" version="5.0"
+        |         xmlns:xi="http://www.w3.org/2001/XInclude">
+        |</article>
+        |"""
     }
 
     // XSLT stylesheets
     unpackDocBookXsl(Stylesheets.xslt1, xslt1version.get)
     unpackDocBookXsl(Stylesheets.xslt2, xslt2version.get)
 
-    writeInto(layout.cssFile(cssFileName.get), logger, replace = false) {
+    writeInto(layout.cssFile(cssFileName), logger, replace = false) {
       """@namespace xml "http://www.w3.org/XML/1998/namespace";
         |"""
     }
@@ -93,22 +96,6 @@ class PrepareDocBookTask extends DefaultTask  {
          |  </renderers>
          |</fop>
          |"""
-    }
-
-    // Stylesheet files and customizations
-
-    val epubEmbeddedFontsStr: String =
-      Fop.getFontFiles(layout.fopConfigurationFile, epubEmbeddedFonts.get.asScala.toList, logger)
-
-    DocBook2.processors.foreach { processor: DocBook2 =>
-      processor.writeStylesheetFiles(
-        layout = layout,
-        inputFileName = inputFileName.get,
-        parameters = processor.parameterSections.flatMap(allParameters.get).flatten.toMap,
-        cssFileName = cssFileName.get,
-        epubEmbeddedFonts = epubEmbeddedFontsStr,
-        logger = logger
-      )
     }
 
     // substitutions DTD
@@ -146,16 +133,23 @@ class PrepareDocBookTask extends DefaultTask  {
          |                rewritePrefix="${layout.docBookXslDirectoryRelative(Stylesheets.xslt2.directoryName)}"/>
          |
          |    <!-- generated data -->
-         |    <rewriteSystem rewritePrefix="$data" systemIdStartString="data:/"/>
-         |    <rewriteSystem rewritePrefix="$data" systemIdStartString="data:"/>
-         |    <rewriteSystem rewritePrefix="$data" systemIdStartString="urn:docbook:data:/"/>
-         |    <rewriteSystem rewritePrefix="$data" systemIdStartString="urn:docbook:data:"/>
-         |    <rewriteSystem rewritePrefix="$data" systemIdStartString="urn:docbook:data/"/>
-         |    <rewriteSystem rewritePrefix="$data" systemIdStartString="http://podval.org/docbook/data/"/>
+         |    <rewriteSystem systemIdStartString="data:/"
+         |                   rewritePrefix="$data"/>
+         |    <rewriteSystem systemIdStartString="data:"
+         |                   rewritePrefix="$data"/>
+         |    <rewriteSystem systemIdStartString="urn:docbook:data:/"
+         |                   rewritePrefix="$data"/>
+         |    <rewriteSystem systemIdStartString="urn:docbook:data:"
+         |                   rewritePrefix="$data"/>
+         |    <rewriteSystem systemIdStartString="urn:docbook:data/"
+         |                   rewritePrefix="$data"/>
+         |    <rewriteSystem systemIdStartString="http://podval.org/docbook/data/"
+         |                   rewritePrefix="$data"/>
          |  </group>
          |
          |  <!-- substitutions DTD -->
-         |  <public publicId="-//OASIS//DTD DocBook XML V5.0//EN" uri="${layout.substitutionsDtdFileName}"/>
+         |  <public publicId="-//OASIS//DTD DocBook XML V5.0//EN"
+         |          uri="${layout.substitutionsDtdFileName}"/>
          |
          |  <nextCatalog catalog="${layout.catalogCustomFileName}"/>
          |</catalog>
@@ -174,6 +168,44 @@ class PrepareDocBookTask extends DefaultTask  {
          |  <nextCatalog catalog="/etc/xml/catalog"/>
          |</catalog>
          |"""
+    }
+
+    // Stylesheet files and customizations
+
+    lazy val epubEmbeddedFontsStr: String = {
+      val names: List[String] = epubEmbeddedFonts.get.asScala.toList
+      if (names.isEmpty) "" else Fop.getFontFiles(layout.fopConfigurationFile, names, logger)
+    }
+
+    DocBook2.processors.foreach { processor: DocBook2 =>
+      val processorParameters: Map[String, String] =
+        processor.parameterSections.flatMap(allParameters.get).flatten.toMap
+
+      def parameterIf(condition: Boolean, name: String, value: String): Option[(String, String)] =
+        if (!condition) None else Some(name -> value)
+
+      // base.dir and root.filename that are written into XSL files depend on the document name,
+      // making support for multiple documents challenging; good that it isn't really needed :)
+      val defaultParameters: Map[String, String] = Seq[Option[(String, String)]](
+        Some("img.src.path", layout.imagesDirectoryName + "/"),
+        parameterIf(processor.usesHtml && !processor.usesDocBookXslt2 && !logger.isInfoEnabled,
+          "chunk.quietly", "1"),
+        parameterIf(processor.usesHtml,
+          "base.dir", layout.baseDir(processor)),
+        parameterIf(processor.usesHtml,
+          "root.filename", layout.rootFilename(processor, documentName)),
+        parameterIf(processor.isEpub,
+          "epub.embedded.fonts", epubEmbeddedFontsStr),
+        parameterIf(processor.usesCss,
+          if (processor.usesDocBookXslt2) "html.stylesheets" else "html.stylesheet",
+          layout.cssFileRelativeToOutputDirectory(cssFileName))
+      ).flatten.toMap
+
+      processor.writeStylesheetFiles(
+        layout = layout,
+        parameters = defaultParameters ++ processorParameters,
+        logger = logger
+      )
     }
   }
 

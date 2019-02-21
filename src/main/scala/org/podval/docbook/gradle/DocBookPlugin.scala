@@ -6,16 +6,18 @@ import scala.collection.JavaConverters._
 final class DocBookPlugin extends Plugin[Project] {
 
   def apply(project: Project): Unit = {
-    val layout: Layout = Layout.forProject(project)
+    val logger: Logger = new Logger.PluginLogger(project.getLogger)
+    val info = getClass.getPackage
+    logger.info(info.getImplementationTitle + " v" + info.getImplementationVersion)
 
     // Extension for configuring the plugin.
     val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)
     extension.xslt1version.set("+")
     extension.xslt2version.set("+")
-    extension.documentName.set("index")
+    extension.document.set("index")
     extension.dataGeneratorClass.set("")
     extension.outputFormats.set(DocBook2.processors.filterNot(_.usesDocBookXslt2) .map(_.name).asJava)
-    extension.cssFileName.set("docBook")
+    extension.cssFile.set("docBook")
     extension.isJEuclidEnabled.set(false)
     extension.epubEmbeddedFonts.set(List.empty[String].asJava)
 
@@ -30,10 +32,10 @@ final class DocBookPlugin extends Plugin[Project] {
     prepareDocBookTask.setDescription(s"Prepare DocBook")
     prepareDocBookTask.xslt1version.set(extension.xslt1version)
     prepareDocBookTask.xslt2version.set(extension.xslt2version)
-    prepareDocBookTask.inputFileName.set(extension.documentName)
+    prepareDocBookTask.document.set(extension.document)
     prepareDocBookTask.parameters.set(extension.parameters)
     prepareDocBookTask.substitutions.set(extension.substitutions)
-    prepareDocBookTask.cssFileName.set(extension.cssFileName)
+    prepareDocBookTask.cssFile.set(extension.cssFile)
     prepareDocBookTask.epubEmbeddedFonts.set(extension.epubEmbeddedFonts)
     prepareDocBookTask.getDependsOn.add(docBookDataTask)
 
@@ -41,7 +43,7 @@ final class DocBookPlugin extends Plugin[Project] {
     val processDocBookTask: ProcessDocBookTask = project.getTasks.create("processDocBook", classOf[ProcessDocBookTask])
     processDocBookTask.setDescription(s"Process DocBook")
     processDocBookTask.setGroup("publishing")
-    processDocBookTask.inputFileName.set(extension.documentName)
+    processDocBookTask.document.set(extension.document)
     processDocBookTask.parameters.set(extension.parameters)
     processDocBookTask.substitutions.set(extension.substitutions)
     processDocBookTask.outputFormats.set(extension.outputFormats)

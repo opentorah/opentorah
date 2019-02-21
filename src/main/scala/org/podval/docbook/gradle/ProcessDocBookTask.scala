@@ -43,7 +43,7 @@ class ProcessDocBookTask extends DefaultTask {
     getOutputs.dir(directory)
   }
 
-  @Input @BeanProperty val inputFileName: Property[String] =
+  @Input @BeanProperty val document: Property[String] =
     getProject.getObjects.property(classOf[String])
 
   @BeanProperty val parameters: MapProperty[String, java.util.Map[String, String]] =
@@ -60,6 +60,8 @@ class ProcessDocBookTask extends DefaultTask {
 
   @TaskAction
   def processDocBook(): Unit = {
+    val documentName: String = Util.dropAllowedExtension(document.get, "xml")
+
     val processors: List[DocBook2] =
       Option(getProject.findProperty("docBook.outputFormats"))
         .map(_.toString.split(",").map(_.trim).toList.filter(_.nonEmpty))
@@ -84,7 +86,7 @@ class ProcessDocBookTask extends DefaultTask {
     processors.foreach { _.run(
       layout = layout,
       isJEuclidEnabled = isJEuclidEnabled.get,
-      inputFileName = inputFileName.get,
+      inputFileName = documentName,
       substitutions = allSubstitutions,
       project = getProject,
       resolver = resolver,
