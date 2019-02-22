@@ -24,3 +24,9 @@ _Tables_
 - days column needs to be aligned right
 - set column width?
 - use more HTML-like tables?
+
+_HTML with XSLT 2.0 stylesheets_
+- how to remove "Chapter"?
+- how to control numbering with `db` in `autolabel.elements`?
+- how to get navigational links?
+- how to chunk glossary and bibliography?
