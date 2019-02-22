@@ -6,10 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6.8] - 2019-02-
+## [0.6.8] - 2019-02-21
+- renamed `documentName` to `document`, `cssFileName` to `cssFile`;
+- `use.id.as.filename` by default;
 - added hyphenation rules dependency;
 - suppressed "font directory" warning (set baseUri);
-- figured out how to set FOP metadata.
+- chunk quietly and fast;
+- lifecycle and warning logging with logging ErrorListener;
+- skip "main" output file when chunking in XSLT 1.0 - and supply a writer in XSLT 2.0;
+- cleanup.
 
 ## [0.6.7] - 2019-02-20
 - Layout/DocBook2 cleanup
