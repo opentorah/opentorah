@@ -60,6 +60,10 @@ class PrepareDocBookTask extends DefaultTask  {
       )
     }
 
+    // XSLT stylesheets
+    unpackDocBookXsl(Stylesheets.xslt1, xslt1version.get)
+    unpackDocBookXsl(Stylesheets.xslt2, xslt2version.get)
+
     // Input file
     writeInto(layout.inputFile(documentName), logger, replace = false) {
       """<?xml version="1.0" encoding="UTF-8"?>
@@ -73,10 +77,7 @@ class PrepareDocBookTask extends DefaultTask  {
         |"""
     }
 
-    // XSLT stylesheets
-    unpackDocBookXsl(Stylesheets.xslt1, xslt1version.get)
-    unpackDocBookXsl(Stylesheets.xslt2, xslt2version.get)
-
+    // CSS
     writeInto(layout.cssFile(cssFileName), logger, replace = false) {
       """@namespace xml "http://www.w3.org/XML/1998/namespace";
         |"""
@@ -172,39 +173,19 @@ class PrepareDocBookTask extends DefaultTask  {
 
     // Stylesheet files and customizations
 
-    lazy val epubEmbeddedFontsStr: String = {
+    val epubEmbeddedFontsStr: String = {
       val names: List[String] = epubEmbeddedFonts.get.asScala.toList
       if (names.isEmpty) "" else Fop.getFontFiles(layout.fopConfigurationFile, names, logger)
     }
 
-    DocBook2.processors.foreach { processor: DocBook2 =>
-      val processorParameters: Map[String, String] =
-        processor.parameterSections.flatMap(allParameters.get).flatten.toMap
-
-      def parameterIf(condition: Boolean, name: String, value: String): Option[(String, String)] =
-        if (!condition) None else Some(name -> value)
-
-      // base.dir and root.filename that are written into XSL files depend on the document name,
-      // making support for multiple documents challenging; good that it isn't really needed :)
-      val defaultParameters: Map[String, String] = Seq[Option[(String, String)]](
-        Some("img.src.path", layout.imagesDirectoryName + "/"),
-        parameterIf(processor.usesHtml && !processor.usesDocBookXslt2 && !logger.isInfoEnabled,
-          "chunk.quietly", "1"),
-        parameterIf(processor.usesHtml,
-          "base.dir", layout.baseDir(processor)),
-        parameterIf(processor.usesHtml,
-          "root.filename", layout.rootFilename(processor, documentName)),
-        parameterIf(processor.isEpub,
-          "epub.embedded.fonts", epubEmbeddedFontsStr),
-        parameterIf(processor.usesCss,
-          if (processor.usesDocBookXslt2) "html.stylesheets" else "html.stylesheet",
-          layout.cssFileRelativeToOutputDirectory(cssFileName))
-      ).flatten.toMap
-
-      processor.writeStylesheetFiles(
+    DocBook2.processors.foreach { docBook2: DocBook2 =>
+      writeStylesheetFiles(
+        docBook2 = docBook2,
         layout = layout,
-        parameters = defaultParameters ++ processorParameters,
-        logger = logger
+        documentName = documentName,
+        cssFileName = cssFileName,
+        epubEmbeddedFonts = epubEmbeddedFontsStr,
+        parameters = docBook2.parameterSections.flatMap(allParameters.get).flatten.toMap
       )
     }
   }
@@ -245,5 +226,75 @@ class PrepareDocBookTask extends DefaultTask  {
         file.setRelativePath(new RelativePath(true, file.getRelativePath.getSegments.drop(toDrop): _*))
       )
       .setIncludeEmptyDirs(false))
+  }
+
+  private def writeStylesheetFiles(
+    docBook2: DocBook2,
+    layout: Layout,
+    documentName: String,
+    cssFileName: String,
+    epubEmbeddedFonts: String,
+    parameters: Map[String, String]
+  ): Unit = {
+    def parameterIf(condition: Boolean, name: String, value: String): Option[(String, String)] =
+      if (!condition) None else Some(name -> value)
+
+    val defaultParameters: Map[String, String] = Seq[Option[(String, String)]](
+      Some("img.src.path", layout.imagesDirectoryName + "/"),
+      parameterIf(docBook2.usesHtml && !docBook2.usesDocBookXslt2 && !logger.isInfoEnabled,
+        "chunk.quietly", "1"),
+      parameterIf(docBook2.usesHtml,
+        "base.dir", layout.baseDir(docBook2)),
+      parameterIf(docBook2.usesHtml,
+        "root.filename", layout.rootFilename(docBook2, documentName)),
+      parameterIf(docBook2.isEpub,
+        "epub.embedded.fonts", epubEmbeddedFonts),
+      parameterIf(docBook2.usesCss,
+        if (docBook2.usesDocBookXslt2) "html.stylesheets" else "html.stylesheet",
+        layout.cssFileRelativeToOutputDirectory(cssFileName))
+    ).flatten.toMap
+
+    val stylesheetName: String = docBook2.stylesheetName
+    val customStylesheetName: String = layout.customStylesheet(stylesheetName)
+    val paramsStylesheetName: String = layout.paramsStylesheet(stylesheetName)
+    val stylesheetUri: String = s"${Stylesheets(docBook2.usesDocBookXslt2).uri}/${docBook2.stylesheetUriName}.xsl"
+
+    // xsl:param has the last value assigned to it, so customization must come last;
+    // since it is imported (so as not to be overwritten), and import elements must come first,
+    // a separate "-param" file is written with the "default" values for the parameters :)
+
+    writeInto(layout.stylesheetFile(layout.mainStylesheet(stylesheetName)), logger, replace = true) {
+      s"""<?xml version="1.0" encoding="UTF-8"?>
+         |<!-- DO NOT EDIT! Generated by the DocBook plugin.
+         |     Customizations go into $customStylesheetName. -->
+         |<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+         |  <xsl:import href="$stylesheetUri"/>
+         |  <xsl:import href="$paramsStylesheetName"/>
+         |  <xsl:import href="$customStylesheetName"/>
+         |</xsl:stylesheet>
+         |"""
+    }
+
+    writeInto(layout.stylesheetFile(paramsStylesheetName), logger, replace = true) {
+      val parametersStr: String = (defaultParameters ++ parameters).map { case (name: String, value: String) =>
+        s"""  <xsl:param name="$name">$value</xsl:param>"""
+      }.mkString("\n")
+
+      s"""<?xml version="1.0" encoding="UTF-8"?>
+         |<!-- DO NOT EDIT! Generated by the DocBook plugin.
+         |     Customizations go into $customStylesheetName. -->
+         |<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+         |$parametersStr
+         |</xsl:stylesheet>
+         |"""
+    }
+
+    writeInto(layout.stylesheetFile(customStylesheetName), logger, replace = false) {
+      s"""<?xml version="1.0" encoding="UTF-8"?>
+         |<!-- Customizations go here. -->
+         |<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+         |</xsl:stylesheet>
+         |"""
+    }
   }
 }

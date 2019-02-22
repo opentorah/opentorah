@@ -56,6 +56,7 @@ object Fop {
 
     try {
       val transformer: Transformer = Saxon.getXslt1TransformerFactory.newTransformer
+      transformer.setErrorListener(logger.errorListener)
 
       transformer.transform(
         new StreamSource(inputFile),

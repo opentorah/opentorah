@@ -79,7 +79,7 @@ on the Gradle Plugin Portal. To apply it to a Gradle project:
 
 ```groovy
 plugins {
-  id "org.podval.docbook-gradle-plugin" version "0.6.6"
+  id "org.podval.docbook-gradle-plugin" version "0.6.7"
 }
 ```
 
@@ -142,7 +142,8 @@ docBook {
   // this property can be overridden on the command line using `-PdocBook.outputFormats="epub3, html"`
 
 
-  // there is a parameter section for each format, for HTML-using ones, and for all
+  // there is a parameter section for each format,
+  // for HTML-using ones (`htmlCommon`), and for all formats (`common`):
   parameters = [
     "common": [
       "toc.section.depth" : "4"            
@@ -161,7 +162,7 @@ docBook {
   ]
   // names get replaced with configured values in DocBook documents
 
-  cssFileName = "main"
+  cssFile = "main"
   // defaults to "docBook"; .css is assumed 
 
   epubEmbeddedFonts = [ "Liberation Sans" ]

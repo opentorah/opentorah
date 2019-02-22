@@ -8,7 +8,7 @@ final class DocBookPlugin extends Plugin[Project] {
   def apply(project: Project): Unit = {
     val logger: Logger = new Logger.PluginLogger(project.getLogger)
     val info = getClass.getPackage
-    logger.info(info.getImplementationTitle + " v" + info.getImplementationVersion)
+    logger.lifecycle(info.getImplementationTitle + " v" + info.getImplementationVersion + ".")
 
     // Extension for configuring the plugin.
     val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)

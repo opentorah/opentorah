@@ -34,6 +34,7 @@ object Saxon {
     transformerFactory.setURIResolver(resolver)
 
     val transformer: Transformer = transformerFactory.newTransformer(stylesheetSource)
+    transformer.setErrorListener(logger.errorListener)
 
     val saxParserFactory: SAXParserFactory = Saxon.getSaxParserFactory
 

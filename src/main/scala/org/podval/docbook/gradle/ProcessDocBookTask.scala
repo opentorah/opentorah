@@ -1,9 +1,14 @@
 package org.podval.docbook.gradle
 
-import org.gradle.api.DefaultTask
+import org.gradle.api.{DefaultTask, Project}
+import org.gradle.api.file.CopySpec
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, TaskAction}
 import java.io.File
+import javax.xml.transform.stream.{StreamResult, StreamSource}
+import org.apache.tools.ant.filters.ReplaceTokens
+import org.xml.sax.InputSource
+
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 
@@ -83,14 +88,11 @@ class ProcessDocBookTask extends DefaultTask {
 
     val resolver: Resolver = new Resolver(layout.catalogFile,  logger)
 
-    processors.foreach { _.run(
-      layout = layout,
-      isJEuclidEnabled = isJEuclidEnabled.get,
-      inputFileName = documentName,
+    processors.foreach { docBook2: DocBook2 => run(
+      docBook2 = docBook2,
+      documentName = documentName,
       substitutions = allSubstitutions,
-      project = getProject,
-      resolver = resolver,
-      logger = logger
+      resolver = resolver
     )}
   }
 
@@ -106,4 +108,71 @@ class ProcessDocBookTask extends DefaultTask {
 
   private def getNames(processors: List[DocBook2]): String =
     "[" + processors.map(processor => "\"" + processor.name +"\"").mkString(", ") + "]"
+
+  final def run(
+    docBook2: DocBook2,
+    documentName: String,
+    substitutions: Map[String, String],
+    resolver: Resolver
+  ): Unit = {
+    logger.lifecycle(s"DocBook: processing '$documentName' to ${docBook2.name}.")
+
+    // Saxon output directory and file.
+    val saxonOutputDirectory: File = layout.saxonOutputDirectory(docBook2)
+    saxonOutputDirectory.mkdirs
+
+    val saxonOutputFile: File = layout.saxonOutputFile(docBook2, documentName)
+    val outputTarget = new StreamResult
+    if (!docBook2.usesHtml) // skip outputTarget when chunking
+      outputTarget.setSystemId(saxonOutputFile)
+
+    // Saxon
+    Saxon.run(
+      inputSource = new InputSource(layout.inputFile(documentName).toURI.toASCIIString),
+      stylesheetSource = new StreamSource(layout.stylesheetFile(layout.mainStylesheet(docBook2.stylesheetName))),
+      outputTarget = outputTarget,
+      resolver = resolver,
+      processingInstructionsSubstitutions = substitutions,
+      useXslt2 = docBook2.usesDocBookXslt2,
+      logger = logger
+    )
+
+    val copyDestinationDirectory: File =
+      Util.subdirectory(saxonOutputDirectory, docBook2.copyDestinationDirectoryName)
+
+    // Images.
+    logger.info(s"Copying images")
+    getProject.copy((copySpec: CopySpec) => copySpec
+      .into(copyDestinationDirectory)
+      .from(layout.imagesDirectory.getParentFile)
+      .include(layout.imagesDirectoryName + "/**")
+    )
+
+    // CSS.
+    if (docBook2.usesCss) {
+      logger.info(s"Copying CSS")
+      getProject.copy((copySpec: CopySpec) => copySpec
+        .into(copyDestinationDirectory)
+        .from(layout.cssDirectory.getParentFile)
+        .include(layout.cssDirectoryName + "/**")
+        .filter(Map("tokens" -> substitutions.asJava).asJava, classOf[ReplaceTokens])
+      )
+    }
+
+    // Post-processing.
+    if (docBook2.usesIntermediate) {
+      logger.info(s"Post-processing ${docBook2.name}")
+      val outputDirectory: File = layout.outputDirectory(docBook2)
+      outputDirectory.mkdirs
+
+      docBook2.postProcess(
+        layout = layout,
+        isJEuclidEnabled = isJEuclidEnabled.get,
+        inputDirectory = saxonOutputDirectory,
+        inputFile = saxonOutputFile,
+        outputFile = layout.outputFile(docBook2, documentName),
+        logger = logger
+      )
+    }
+  }
 }
