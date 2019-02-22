@@ -247,6 +247,8 @@ class PrepareDocBookTask extends DefaultTask  {
         "base.dir", layout.baseDir(docBook2)),
       parameterIf(docBook2.usesHtml,
         "root.filename", layout.rootFilename(docBook2, documentName)),
+      parameterIf(docBook2.usesHtml,
+        "use.id.as.filename", "yes"),
       parameterIf(docBook2.isEpub,
         "epub.embedded.fonts", epubEmbeddedFonts),
       parameterIf(docBook2.usesCss,

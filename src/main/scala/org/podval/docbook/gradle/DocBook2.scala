@@ -20,7 +20,7 @@ abstract class DocBook2 {
 
   def parameterSections: Set[String] =
     Set(name, stylesheetName) ++
-      (if (usesDocBookXslt2) Set.empty else  Set("common") ++ (if (!usesHtml) Set.empty else Set("htmlCommon")))
+      (if (usesDocBookXslt2) Set.empty else Set("common") ++ (if (!usesHtml) Set.empty else Set("htmlCommon")))
 
   def usesDocBookXslt2: Boolean
 

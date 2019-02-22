@@ -4,7 +4,8 @@ import org.gradle.api.{DefaultTask, Project}
 import org.gradle.api.file.CopySpec
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, TaskAction}
-import java.io.File
+import java.io.{File, FileWriter}
+
 import javax.xml.transform.stream.{StreamResult, StreamSource}
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.xml.sax.InputSource
@@ -123,8 +124,13 @@ class ProcessDocBookTask extends DefaultTask {
 
     val saxonOutputFile: File = layout.saxonOutputFile(docBook2, documentName)
     val outputTarget = new StreamResult
-    if (!docBook2.usesHtml) // skip outputTarget when chunking
+    if (!docBook2.usesDocBookXslt2) {
+      if (!docBook2.usesHtml) // skip outputTarget when chunking in XSLT 1.0
+        outputTarget.setSystemId(saxonOutputFile)
+    } else {
       outputTarget.setSystemId(saxonOutputFile)
+      outputTarget.setWriter(new FileWriter(saxonOutputFile))
+    }
 
     // Saxon
     Saxon.run(
