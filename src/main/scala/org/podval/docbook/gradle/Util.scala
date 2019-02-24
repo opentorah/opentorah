@@ -1,8 +1,35 @@
 package org.podval.docbook.gradle
 
+import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import java.io.{BufferedWriter, File, FileWriter, InputStream}
+import section.Section
+
+import scala.collection.JavaConverters._
 
 object Util {
+  def documentNames(
+    document: Property[String],
+    documents: ListProperty[String]
+  ): (Option[String], List[String]) = {
+    def ifNotEmpty(string: String): Option[String] =
+      if (string.isEmpty) None else Some(string)
+
+    val documentName: Option[String] = ifNotEmpty(document.get).map(name =>
+      dropAllowedExtension(name, "xml"))
+    val documentNames: List[String] = documents.get.asScala.toList.flatMap(ifNotEmpty).map(name =>
+      dropAllowedExtension(name, "xml"))
+
+    if (documentName.isEmpty && documentNames.isEmpty)
+      throw new IllegalArgumentException(
+        """At least one document name must be specified using
+          |  document = "<document name>"
+          |or
+          |  documents = ["<document name>"]
+          |""".stripMargin)
+
+    (documentName, documentNames)
+  }
+
   def fileNameAndExtension(nameWithExtension: String): (String, Option[String]) = {
     val lastDot: Int = nameWithExtension.lastIndexOf(".")
     if (lastDot == -1) (nameWithExtension, None)
@@ -19,17 +46,17 @@ object Util {
     name
   }
 
-  def fileNameWithoutExtension(file: File): String =
-    fileNameAndExtension(file.getName)._1
+  def getSections(property: MapProperty[String, java.util.Map[String, String]]): Map[Section, Map[String, String]] = {
+    val result: Map[String, Map[String, String]] = property.get.asScala.toMap.mapValues(_.asScala.toMap)
+    result.map { case (sectionName, parameters) =>
+        Section.forName(sectionName) -> parameters
+    }
+  }
 
-  def drop(what: Seq[String], from: String): Option[String] =
-    what.flatMap(drop(_, from)).headOption
-
-  def drop(what: String, from: String): Option[String] =
-    if (from.startsWith(what)) Some(from.drop(what.length)) else None
-
-  def subdirectory(directory: File, subdirectoryName: Option[String]): File =
-    subdirectoryName.fold(directory)(new File(directory, _))
+  def applicationString: String = {
+    val info = getClass.getPackage
+    info.getImplementationTitle + " version " + info.getImplementationVersion
+  }
 
   def deleteRecursively(file: File): Unit = {
     if (file.isDirectory)
@@ -64,12 +91,6 @@ object Util {
         writer.close()
       }
     }
-  }
-
-  def unclaimedParameterSections(parameters: Map[String, Map[String, String]], processors: Set[DocBook2]): Set[String] = {
-    val present: Set[String] = parameters.keySet
-    val claimed: Set[String] = processors.flatMap(_.parameterSections)
-    present -- claimed
   }
 
   //  def fileInputSource(file: File): InputSource =

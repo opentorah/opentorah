@@ -9,6 +9,7 @@ import java.io.File
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 import Util.writeInto
+import section.{DocBook2, Section}
 
 class PrepareDocBookTask extends DefaultTask  {
 
@@ -25,6 +26,9 @@ class PrepareDocBookTask extends DefaultTask  {
   @Input @BeanProperty val document: Property[String] =
     getProject.getObjects.property(classOf[String])
 
+  @BeanProperty val documents: ListProperty[String] =
+    getProject.getObjects.listProperty(classOf[String])
+
   @BeanProperty val parameters: MapProperty[String, java.util.Map[String, String]] =
     getProject.getObjects.mapProperty(classOf[String], classOf[java.util.Map[String, String]])
 
@@ -39,42 +43,30 @@ class PrepareDocBookTask extends DefaultTask  {
 
   @TaskAction
   def prepareDocBook(): Unit = {
-    val documentName: String = Util.dropAllowedExtension(document.get, "xml")
+    val (documentName: Option[String], documentNames: List[String]) =
+      Util.documentNames(document, documents)
+
     val cssFileName: String = Util.dropAllowedExtension(cssFile.get, "css")
 
-    // Verify parameter sections
-    val allParameters: Map[String, Map[String, String]] =
-      parameters.get.asScala.toMap.mapValues(_.asScala.toMap)
-
-    val unclaimedParameterSections: Set[String] = Util.unclaimedParameterSections(allParameters, DocBook2.processors.toSet)
-    if (unclaimedParameterSections.nonEmpty) {
-      val sections: String = DocBook2.processors.map { processor =>
-        "  " + processor.name + ": " + processor.parameterSections.mkString(", ")
-      }.mkString("\n")
-
-      throw new IllegalArgumentException(
-        s"""Unsupported parameter sections: ${unclaimedParameterSections.mkString(", ")}.
-           |Supported sections are:
-           |$sections
-           |""".stripMargin
-      )
-    }
+    val sections: Map[Section, Map[String, String]] = Util.getSections(parameters)
 
     // XSLT stylesheets
     unpackDocBookXsl(Stylesheets.xslt1, xslt1version.get)
     unpackDocBookXsl(Stylesheets.xslt2, xslt2version.get)
 
-    // Input file
-    writeInto(layout.inputFile(documentName), logger, replace = false) {
-      """<?xml version="1.0" encoding="UTF-8"?>
-        |<!DOCTYPE article
-        |  PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN"
-        |  "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd">
-        |
-        |<article xmlns="http://docbook.org/ns/docbook" version="5.0"
-        |         xmlns:xi="http://www.w3.org/2001/XInclude">
-        |</article>
-        |"""
+    // Input files
+    (documentName.toList ++ documentNames).foreach { documentName =>
+      writeInto(layout.inputFile(documentName), logger, replace = false) {
+        """<?xml version="1.0" encoding="UTF-8"?>
+          |<!DOCTYPE article
+          |  PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN"
+          |  "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd">
+          |
+          |<article xmlns="http://docbook.org/ns/docbook" version="5.0"
+          |         xmlns:xi="http://www.w3.org/2001/XInclude">
+          |</article>
+          |"""
+      }
     }
 
     // CSS
@@ -178,14 +170,36 @@ class PrepareDocBookTask extends DefaultTask  {
       if (names.isEmpty) "" else Fop.getFontFiles(layout.fopConfigurationFile, names, logger)
     }
 
-    DocBook2.processors.foreach { docBook2: DocBook2 =>
-      writeStylesheetFiles(
+    for (docBook2: DocBook2 <- DocBook2.all) {
+      documentName.foreach { documentName: String =>
+        writeMainStylesheet(
+          docBook2 = docBook2,
+          prefixed = false,
+          documentName = documentName,
+          cssFileName = cssFileName,
+          epubEmbeddedFonts = epubEmbeddedFontsStr
+        )
+      }
+
+      documentNames.foreach { documentName: String =>
+        writeMainStylesheet(
+          docBook2 = docBook2,
+          prefixed = true,
+          documentName = documentName,
+          cssFileName = cssFileName,
+          epubEmbeddedFonts = epubEmbeddedFontsStr
+        )
+      }
+
+      writeParamsStylesheet(
         docBook2 = docBook2,
-        layout = layout,
-        documentName = documentName,
-        cssFileName = cssFileName,
-        epubEmbeddedFonts = epubEmbeddedFontsStr,
-        parameters = docBook2.parameterSections.flatMap(allParameters.get).flatten.toMap
+        sections = sections
+      )
+    }
+
+    for (section: Section <- Section.all) {
+      writeCustomStylesheet(
+        section
       )
     }
   }
@@ -228,73 +242,93 @@ class PrepareDocBookTask extends DefaultTask  {
       .setIncludeEmptyDirs(false))
   }
 
-  private def writeStylesheetFiles(
+  private def writeMainStylesheet(
     docBook2: DocBook2,
-    layout: Layout,
+    prefixed: Boolean,
     documentName: String,
     cssFileName: String,
-    epubEmbeddedFonts: String,
-    parameters: Map[String, String]
+    epubEmbeddedFonts: String
   ): Unit = {
-    def parameterIf(condition: Boolean, name: String, value: String): Option[(String, String)] =
-      if (!condition) None else Some(name -> value)
-
-    val defaultParameters: Map[String, String] = Seq[Option[(String, String)]](
-      Some("img.src.path", layout.imagesDirectoryName + "/"),
-      parameterIf(docBook2.usesHtml && !docBook2.usesDocBookXslt2 && !logger.isInfoEnabled,
-        "chunk.quietly", "1"),
-      parameterIf(docBook2.usesHtml,
-        "base.dir", layout.baseDir(docBook2)),
-      parameterIf(docBook2.usesHtml,
-        "root.filename", layout.rootFilename(docBook2, documentName)),
-      parameterIf(docBook2.usesHtml,
-        "use.id.as.filename", "yes"),
-      parameterIf(docBook2.isEpub,
-        "epub.embedded.fonts", epubEmbeddedFonts),
-      parameterIf(docBook2.usesCss,
-        if (docBook2.usesDocBookXslt2) "html.stylesheets" else "html.stylesheet",
-        layout.cssFileRelativeToOutputDirectory(cssFileName))
-    ).flatten.toMap
-
-    val stylesheetName: String = docBook2.stylesheetName
-    val customStylesheetName: String = layout.customStylesheet(stylesheetName)
-    val paramsStylesheetName: String = layout.paramsStylesheet(stylesheetName)
+    val mainStylesheetName: String = layout.mainStylesheet(docBook2, prefixed, documentName)
+    val paramsStylesheetName: String = layout.paramsStylesheet(docBook2)
     val stylesheetUri: String = s"${Stylesheets(docBook2.usesDocBookXslt2).uri}/${docBook2.stylesheetUriName}.xsl"
+
+    val nonOverridableParameters: Map[String, String] = Seq[Option[(String, String)]](
+      Some("img.src.path", layout.imagesDirectoryName + "/"),
+      docBook2.parameter(_.baseDirParameter, layout.baseDir(docBook2, prefixed, documentName)),
+      docBook2.parameter(_.rootFilenameParameter, docBook2.rootFilename(documentName)),
+      docBook2.parameter(_.epubEmbeddedFontsParameter, epubEmbeddedFonts),
+      docBook2.parameter(_.htmlStylesheetsParameter, layout.cssFileRelativeToOutputDirectory(cssFileName))
+    ).flatten.toMap
 
     // xsl:param has the last value assigned to it, so customization must come last;
     // since it is imported (so as not to be overwritten), and import elements must come first,
     // a separate "-param" file is written with the "default" values for the parameters :)
 
-    writeInto(layout.stylesheetFile(layout.mainStylesheet(stylesheetName)), logger, replace = true) {
+    val imports: String = docBook2.parameterSections.map(section =>
+      s"""  <xsl:import href="${layout.customStylesheet(section)}"/>"""
+    ).mkString("\n")
+
+    writeInto(layout.stylesheetFile(mainStylesheetName), logger, replace = true) {
       s"""<?xml version="1.0" encoding="UTF-8"?>
-         |<!-- DO NOT EDIT! Generated by the DocBook plugin.
-         |     Customizations go into $customStylesheetName. -->
-         |<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+         |<!-- DO NOT EDIT! Generated by the DocBook plugin. -->
+         |<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="${docBook2.xsltVersion}">
          |  <xsl:import href="$stylesheetUri"/>
          |  <xsl:import href="$paramsStylesheetName"/>
-         |  <xsl:import href="$customStylesheetName"/>
+         |$imports
+         |
+         |${toString(nonOverridableParameters)}
          |</xsl:stylesheet>
          |"""
     }
+  }
+
+  private def writeParamsStylesheet(
+    docBook2: DocBook2,
+    sections: Map[Section, Map[String, String]]
+  ): Unit = {
+    val paramsStylesheetName: String = layout.paramsStylesheet(docBook2)
+
+    val dynamicParameters: Map[String, String] = Seq[Option[(String, String)]](
+      if (logger.isInfoEnabled) None else
+        docBook2.parameter(_.chunkQuietlyParameter, "1")
+    ).flatten.toMap
+
+    val parameters: Map[String, String] = (
+      docBook2.parameterSections.map(_.defaultParameters) ++
+        List(dynamicParameters) ++
+        docBook2.parameterSections.flatMap(sections.get)
+      ).reduceLeft[Map[String, String]] { case (result, current) => result ++ current }
 
     writeInto(layout.stylesheetFile(paramsStylesheetName), logger, replace = true) {
-      val parametersStr: String = (defaultParameters ++ parameters).map { case (name: String, value: String) =>
-        s"""  <xsl:param name="$name">$value</xsl:param>"""
-      }.mkString("\n")
-
       s"""<?xml version="1.0" encoding="UTF-8"?>
-         |<!-- DO NOT EDIT! Generated by the DocBook plugin.
-         |     Customizations go into $customStylesheetName. -->
-         |<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-         |$parametersStr
+         |<!-- DO NOT EDIT! Generated by the DocBook plugin. -->
+         |<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="${docBook2.xsltVersion}">
+         |${toString(parameters)}
          |</xsl:stylesheet>
          |"""
     }
+  }
+
+  private def toString(parameters: Map[String, String]): String = parameters.map { case (name: String, value: String) =>
+    if (value.nonEmpty) s"""  <xsl:param name="$name">$value</xsl:param>"""
+    else s"""  <xsl:param name="$name"/>"""
+  }.mkString("\n")
+
+  private def writeCustomStylesheet(
+    section: Section
+  ): Unit = {
+    val customStylesheetName: String = layout.customStylesheet(section)
 
     writeInto(layout.stylesheetFile(customStylesheetName), logger, replace = false) {
       s"""<?xml version="1.0" encoding="UTF-8"?>
          |<!-- Customizations go here. -->
-         |<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+         |<xsl:stylesheet
+         |  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="${section.xsltVersion}"
+         |  xmlns:db="http://docbook.org/ns/docbook"
+         |  exclude-result-prefixes="db">
+         |
+         |${section.customStylesheet}
          |</xsl:stylesheet>
          |"""
     }

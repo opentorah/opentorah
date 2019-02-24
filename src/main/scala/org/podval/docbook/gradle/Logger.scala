@@ -11,7 +11,7 @@ trait Logger {
 
   def errorListener: ErrorListener = new ErrorListener {
     override def warning(exception: TransformerException): Unit =
-      Logger.this.warn(exception.getMessageAndLocation)
+      Logger.this.info(exception.getMessageAndLocation)
     override def error(exception: TransformerException): Unit =
       Logger.this.error(exception.getMessageAndLocation)
     override def fatalError(exception: TransformerException): Unit =

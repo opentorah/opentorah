@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.9] - 2019-02-2
+- multiple documents support
+
 ## [0.6.8] - 2019-02-21
 - renamed `documentName` to `document`, `cssFileName` to `cssFile`;
 - `use.id.as.filename` by default;

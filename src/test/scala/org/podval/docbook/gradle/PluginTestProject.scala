@@ -27,6 +27,7 @@ class PluginTestProject(
        |docBook {
        |  document = "$documentName"
        |  outputFormats = ["html"]
+       |  useRelativeBaseDir = true
        |$substitutionsFormatted
        |}
        |"""

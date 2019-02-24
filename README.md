@@ -14,14 +14,14 @@ pioneered by the Maven plugin.
 
 Plugin uses Saxon with DocBook XSLT stylesheets to process a DocBook document
 (and its includes) into HTML, EPUB, EPUB3 and PDF. Processing using XSLT 2.0
-DocBook stylesheets is supported for HTML only ("html2"). For PDF, DocBook is
+DocBook stylesheets is supported for HTML only ("HTML2"). For PDF, DocBook is
 first processed into XSL-FO, which is post-processed by Apache FOP. For PDF,
-JEuclid FOP plugin can be enabled to process MathML. Document name and the list
-of the output formats are configurable.
+JEuclid FOP plugin can be enabled to process MathML. Document name(s) and the
+list of the output formats are configurable.
 
-XSL parameters can be configured in the `Gradle` build file usin `parameters` map,
-which can have sections applicable to a specific format (`html`), all HTML-like
-formats (`htmlCommon`), and for all formats except `html2` (`common`).
+XSL parameters can be configured in the `Gradle` build file using `parameters` map.
+There are sections (and customization files) for each output format, all HTML-like formats
+(`htmlCommon`), and for all formats (`common`) (only `html2` applies to `html2`).
 
 Values configured as `substitutions` are available within the DocBook documents by
 their names. This mechanism can be used to insert things like processing date or the
@@ -32,12 +32,19 @@ a directory path as a parameter. References in DocBook documents that are prefix
 with `data:` are resolved to files in that directory.
 
 For each output format, plugin uses three XSL files: main, `-custom` and `-params`.
-Main and `-params` files are overwritten by the plugin at each run; `-custom` is
-where customizations go. Main file imports appropriate official DocBook XSLT stylesheet -
-and the other two files. (Since XSL parameters have the value assigned to them last, `-custom`
+Main and `-params` files are overwritten by the plugin at each run; `-custom` stylesheet
+can be used to override templates that need customization, define attribute sets (and to
+set parameters, although it seems cleaner to set them in the `Gradle` build file).
+Main file imports appropriate official DocBook XSLT stylesheet,
+`-param` file and customization files for all applicable sections (from general to specific).
+(Since XSL parameters have the value assigned to them last, `-custom`
 needs to be imported after plugin sets the values of the parameters; since import
 elements must come before all others, plugin sets the parameters in a separate `-param`
-XSL file that is imported before `-custom`.)
+XSL file that is imported before `-custom`.) 
+
+Plugin sets some parameters in the `-param` stylesheet based on the logging level at the time
+`prepare DocBook` task is executed; for example, `chunk.quietly` is set to `yes` unless
+logging at `info` level is enabled.
 
 Plugin generates an XML catalog `catalog.xml` and a DTD with all the configured substitutions,
 both of which are overwritten at each run; main catalog chains into `catalog-custom.xml`,
@@ -53,6 +60,21 @@ If they do not exist, plugin generates the following files:
 For DocBook processing, plugin uses the main XSL file for a format and `catalog.xml`, which can
 also be configured in an XML editor to replicate the setup that plugin uses in an environment
 more suitable than a code editor or an IDE for authoring DocBook.      
+
+Plugin assumes that images referenced in the DocBook files are in the `images` directory, and sets the 
+`img.src.path` XSL parameter accordingly. Images should be referenced *without* the `images/` prefix!
+
+Plugin sets some XSL parameters to reasonable default values, which can be seen in the `-param` XSL files
+and overridden in the `-custom` ones. Parameters that plugin sets in the main XSL file (base.dir, img.src.path)
+can not be overridden. Plugin also adds some reasonable customizations to the `-custom` XSL files when
+generating them. They can be tweaked/disabled as desired.
+
+To prevent generated XSL files (other than the `-custom`) from being checked in, a `.gitignore`
+file can be added to the `src/main/xsl` and/or `src/main/xml` directory:
+```git
+*
+!*-custom.*
+```
 
 
 ## Credits ##
@@ -132,7 +154,12 @@ docBook {
   // above properties can be used to set a specific version 
 
   document = "paper"
-  // defaults to "index"; .xml is assumed
+  documents = [ "paper", "paper2" ]
+  // .xml is assumed
+  // for `documents`, final (and intermediate, if any) output is placed under a subdirectory
+  // with the same name as the document;
+  // if both `document` and `documents` are configured, and one of the `documents` is named
+  // the same as one of the configured output formats, effect is undefined :)
 
   dataGeneratorClass = "org.sample.stuff.paper.Tables"
   // by default, no data is generated 
@@ -178,7 +205,6 @@ docBook.parameters.html2 = [
 
 ```
 
-
 ### substitutions ###
 
 Values configured via `substitutions` can be accessed in the DocBook files as XML entities with
@@ -203,6 +229,11 @@ transformation, while undefined processing instructions are ignored. Processing 
 is internal to the plugin, while entities resolution is externalized using generated substitutions DTD
 and XML catalog, making it possible to reproduce entities substitution in an XML editor. 
 
+Special substitutions -  `author`, `title`, `subject`, `keywords`, `creationDate` - are set as the PDF
+document's metadata properties (if they are configured); `creationDate` is expected to be formatted as
+`(new java.util.Date()).toString()` is.
+
+
 Both substitutions and parameters are also accessible in the CSS files, for instance:  
 ```css
 @font-face {
@@ -214,11 +245,6 @@ body {
   font-family: "@body-font-family@", sans-serif;
 }
 ```
-
-## Images ##
-
-Plugin uses images from the `images` directory, and sets the `img.src.path` XSL parameter accordingly.
-Images should be referenced in the DocBook files *without* the `images/` prefix!
 
 
 ## Fonts ##
@@ -269,21 +295,33 @@ Overview of the directory layout used by the plugin:
        catalog-custom.xml
        substitutions.dtd  
 
+   build/docBookXsl/
+   build/docBookXsl2/
+
    build/docBook/
-     epub/<documentName>.epub
+     epub2/<documentName>.epub
+     epub3/<documentName>.epub
      html/
        css/
        images/
        index.html
      pdf/<documentName>.pdf
-
-   build/docBookXsl/
-   build/docBookXsl2/
+     <documents 1>/
+       epub2/<documents 1>.epub
+       epub3/<documents 1>.epub
+       html/...
+       pdf/<documents 1>.pdf
+     ...  
 
    build/docBookTmp/
      data/
      epub/
      fo/
+     <documents 1>/
+       data/
+       epub/
+       fo/
+     ...  
 ```
 
 
@@ -311,7 +349,12 @@ in a separate directory for each output format:
 - PDF - in `pdf/<documentName>.pdf`;
 - EPUB file - in `epub/<documentName>.epub`.
 
+For documents listed in the `documents` property, final output is placed under a subdirectory
+with the same name as the document.
+
 For HTML and EPUB, CSS stylesheets and images are included in the output.
+For `html2`, main output file will be called `index.html` *only* if main input file has `xml:id="index"` on the root
+element *and* `use.id.as.filename` parameter is set (plugin sets it by default).
 
 
 ### Build ###
@@ -324,8 +367,9 @@ unpacking after each `clean` is cheap.
 Data generated by the data generator resides under `duild/data`. References to the generated data
 encountered in the DocBook documents are resolved to files in that directory. 
 
-For output formats that require post-processing or packing, intermediate results are deposited
-under `build/docBookTmp`.
+For output formats that require post-processing or packing, intermediate output is under `build/docBookTmp`.
+For documents listed in the `documents` property, intermediate output is placed under a subdirectory with
+the same name as the document.
 
 
 ## Past ##
@@ -335,7 +379,7 @@ Following features of the Maven Gradle plugin are not supported:
 - resolve XSL files based on the type of processing 
 - expressions in <?eval?>
 - access to the project and its properties in <?eval?>
-- multiple executions with different documents and parameters
+- multiple documents with different parameters
 
 
 ## Future ##

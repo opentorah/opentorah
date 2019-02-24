@@ -32,9 +32,9 @@ object Saxon {
     // To intercept all network requests, URIResolver has to be set on the transformerFactory,
     // not the transformer itself: I guess some sub-transformers get created internally ;)
     transformerFactory.setURIResolver(resolver)
+    transformerFactory.setErrorListener(logger.errorListener)
 
     val transformer: Transformer = transformerFactory.newTransformer(stylesheetSource)
-    transformer.setErrorListener(logger.errorListener)
 
     val saxParserFactory: SAXParserFactory = Saxon.getSaxParserFactory
 

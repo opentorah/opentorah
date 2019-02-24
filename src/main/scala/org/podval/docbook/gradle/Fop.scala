@@ -19,6 +19,7 @@ object Fop {
 
   def run(
     configurationFile: File,
+    substitutions: Map[String, String],
     isJEuclidEnabled: Boolean,
     inputFile: File,
     inputDirectory: File,
@@ -35,21 +36,25 @@ object Fop {
     )
 
     val fopFactory: FopFactory = getFopFactory(configurationFile)
-      // TODO do I need to set baseURI on the factory builder if I set default base URI in getFopFactoryBuilder()?
-      // .setBaseURI(inputDirectory.toURI).build
 
     if (isJEuclidEnabled) JEuclidFopFactoryConfigurator.configure(fopFactory)
 
     val foUserAgent: FOUserAgent = fopFactory.newFOUserAgent
-    // metadata can be set on foUserAgent:
-      // FOP's PDFFactory set the current date, so resulting PDF files are different even if the contents are the same :(
-//      foUserAgent.setCreationDate()
-//    info.setCreator(userAgent.getCreator());
-//    info.setAuthor(userAgent.getAuthor());
-//    info.setTitle(userAgent.getTitle());
-//    info.setSubject(userAgent.getSubject());
-//    info.setKeywords(userAgent.getKeywords());
 
+    // PDF metadata:
+    foUserAgent.setCreator(Util.applicationString)
+    substitutions.get("creationDate").foreach { creationDate =>
+      val format: java.text.DateFormat = new java.text.SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy")
+      val value: java.util.Date = format.parse(creationDate)
+      foUserAgent.setCreationDate(value)
+    }
+
+    def set(name: String, setter: FOUserAgent => String => Unit): Unit =
+      setter(foUserAgent)(substitutions.get(name).orNull)
+    set("author", _.setAuthor)
+    set("title", _.setTitle)
+    set("subject", _.setSubject)
+    set("keywords", _.setKeywords)
 
     val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(outputFile))
     val fop: org.apache.fop.apps.Fop = fopFactory.newFop("application/pdf", foUserAgent, outputStream)

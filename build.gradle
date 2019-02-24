@@ -10,7 +10,7 @@ plugins {
 }
 
 group = 'org.podval.docbook'
-version = '0.6.8'
+version = '0.6.9'
 description = 'Gradle DocBook plugin'
 
 repositories {
@@ -21,7 +21,7 @@ def scalaVersion = '2.12.8'
 def scalaVersionMajor = '2.12'
 def fopVersion = '2.3'
 
-def xercesVersion = '2.11.0' // TODO 2.12.0?
+def xercesVersion = '2.11.0'
 // v1.3.04 doesn't have org.w3c.dom.ElementTraversal that Xerces uses:
 configurations.all {
   resolutionStrategy {
@@ -55,7 +55,8 @@ dependencies {
   compile 'net.sf.offo:fop-hyph:2.0'
 
   // JEuclid
-  compile 'de.rototor.jeuclid:jeuclid-core:3.1.13'
+  compile 'de.rototor.jeuclid:jeuclid-fop:3.1.14'
+  // without FOP plugin: compile 'de.rototor.jeuclid:jeuclid-core:3.1.13'
   // obsolete:  'net.sourceforge.jeuclid:jeuclid-fop:3.1.9'
 
   testImplementation "org.scalatest:scalatest_$scalaVersionMajor:3.0.5"
@@ -175,7 +176,7 @@ bintray {
     // Gradle plugin [publishing?] plugin adds another publication 'pluginMaven'
     // that produces the same Jar as the main one - and a POM that has only dependencies.
     // I do not think I need to publish that :)          
-    'docBookPluginPluginMarkerMaven'           // plugin marker: TODO either link it to JCenter or stop publishing it to Bintray!
+    'docBookPluginPluginMarkerMaven'
   ]
   dryRun       = false
   publish      = true

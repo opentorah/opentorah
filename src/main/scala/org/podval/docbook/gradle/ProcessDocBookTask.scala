@@ -1,17 +1,16 @@
 package org.podval.docbook.gradle
 
-import org.gradle.api.{DefaultTask, Project}
+import org.gradle.api.DefaultTask
 import org.gradle.api.file.CopySpec
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, TaskAction}
 import java.io.{File, FileWriter}
-
 import javax.xml.transform.stream.{StreamResult, StreamSource}
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.xml.sax.InputSource
-
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
+import org.podval.docbook.gradle.section.{DocBook2, Section}
 
 class ProcessDocBookTask extends DefaultTask {
 
@@ -52,6 +51,9 @@ class ProcessDocBookTask extends DefaultTask {
   @Input @BeanProperty val document: Property[String] =
     getProject.getObjects.property(classOf[String])
 
+  @BeanProperty val documents: ListProperty[String] =
+    getProject.getObjects.listProperty(classOf[String])
+
   @BeanProperty val parameters: MapProperty[String, java.util.Map[String, String]] =
     getProject.getObjects.mapProperty(classOf[String], classOf[java.util.Map[String, String]])
 
@@ -66,76 +68,83 @@ class ProcessDocBookTask extends DefaultTask {
 
   @TaskAction
   def processDocBook(): Unit = {
-    val documentName: String = Util.dropAllowedExtension(document.get, "xml")
+    val (documentName: Option[String], documentNames: List[String]) =
+      Util.documentNames(document, documents)
 
     val processors: List[DocBook2] =
       Option(getProject.findProperty("docBook.outputFormats"))
         .map(_.toString.split(",").map(_.trim).toList.filter(_.nonEmpty))
         .getOrElse(outputFormats.get.asScala.toList)
-        .map(forName)
+        .map(DocBook2.forName)
 
-    logger.info(s"Output formats: ${getNames(processors)}")
+    logger.info(s"Output formats: ${DocBook2.getNames(processors)}")
 
-    val allParameters: Map[String, Map[String, String]] =
-      parameters.get.asScala.toMap.mapValues(_.asScala.toMap)
+    val sections: Map[Section, Map[String, String]] = Util.getSections(parameters)
 
-    val unclaimedParameterSections: Set[String] = Util.unclaimedParameterSections(allParameters, processors.toSet)
-    if (unclaimedParameterSections.nonEmpty)
-      logger.info(s"Unclaimed parameter sections: ${unclaimedParameterSections.mkString(", ")}")
+    val unusedSections: Set[Section] =
+      sections.keySet -- processors.flatMap(_.parameterSections).toSet
+    if (unusedSections.nonEmpty)
+      logger.info(s"Unused parameter sections: ${unusedSections.map(_.name).mkString(", ")}")
 
     // In processing instructions and CSS, substitute xslParameters also - because why not?
     val allSubstitutions: Map[String, String] =
-      allParameters.values.toList.flatten.toMap ++ substitutions.get.asScala.toMap
+      sections.values.toList.flatten.toMap ++ substitutions.get.asScala.toMap
 
     val resolver: Resolver = new Resolver(layout.catalogFile,  logger)
 
-    processors.foreach { docBook2: DocBook2 => run(
-      docBook2 = docBook2,
-      documentName = documentName,
-      substitutions = allSubstitutions,
-      resolver = resolver
-    )}
-  }
+    for (docBook2: DocBook2 <- processors) {
+      documentName.foreach { documentName: String =>
+        run(
+          docBook2 = docBook2,
+          prefixed = false,
+          documentName = documentName,
+          substitutions = allSubstitutions,
+          resolver = resolver
+        )
+      }
 
-  private def forName(name: String): DocBook2 = {
-    val supported: List[DocBook2] = DocBook2.processors
-    supported.find(processor => processor.name.equalsIgnoreCase(name)).getOrElse {
-      throw new IllegalArgumentException(
-        s"""Unsupported output format $name;
-           |  supported formats are: ${getNames(supported)}""".stripMargin
-      )
+      documentNames.foreach { documentName: String =>
+        run(
+          docBook2 = docBook2,
+          prefixed = true,
+          documentName = documentName,
+          substitutions = allSubstitutions,
+          resolver = resolver
+        )
+      }
     }
   }
 
-  private def getNames(processors: List[DocBook2]): String =
-    "[" + processors.map(processor => "\"" + processor.name +"\"").mkString(", ") + "]"
-
   final def run(
     docBook2: DocBook2,
+    prefixed: Boolean,
     documentName: String,
     substitutions: Map[String, String],
     resolver: Resolver
   ): Unit = {
     logger.lifecycle(s"DocBook: processing '$documentName' to ${docBook2.name}.")
 
-    // Saxon output directory and file.
-    val saxonOutputDirectory: File = layout.saxonOutputDirectory(docBook2)
+    // Saxon output directory.
+    val saxonOutputDirectory: File = layout.saxonOutputDirectory(docBook2, prefixed, documentName)
     saxonOutputDirectory.mkdirs
 
-    val saxonOutputFile: File = layout.saxonOutputFile(docBook2, documentName)
+    // Saxon output file and target.
+    val saxonOutputFile: File = layout.saxonOutputFile(docBook2, prefixed, documentName)
     val outputTarget = new StreamResult
-    if (!docBook2.usesDocBookXslt2) {
-      if (!docBook2.usesHtml) // skip outputTarget when chunking in XSLT 1.0
-        outputTarget.setSystemId(saxonOutputFile)
-    } else {
+    // null outputTarget when chunking in XSLT 1.0
+    if (docBook2.usesRootFile) {
       outputTarget.setSystemId(saxonOutputFile)
       outputTarget.setWriter(new FileWriter(saxonOutputFile))
+    } else {
+      outputTarget.setSystemId("dev-null")
+      outputTarget.setOutputStream((_: Int) => {})
     }
 
-    // Saxon
+    // Run Saxon.
+    val mainStylesheetName: String = layout.mainStylesheet(docBook2, prefixed, documentName)
     Saxon.run(
       inputSource = new InputSource(layout.inputFile(documentName).toURI.toASCIIString),
-      stylesheetSource = new StreamSource(layout.stylesheetFile(layout.mainStylesheet(docBook2.stylesheetName))),
+      stylesheetSource = new StreamSource(layout.stylesheetFile(mainStylesheetName)),
       outputTarget = outputTarget,
       resolver = resolver,
       processingInstructionsSubstitutions = substitutions,
@@ -144,9 +153,9 @@ class ProcessDocBookTask extends DefaultTask {
     )
 
     val copyDestinationDirectory: File =
-      Util.subdirectory(saxonOutputDirectory, docBook2.copyDestinationDirectoryName)
+      docBook2.copyDestinationDirectoryName.fold(saxonOutputDirectory)(new File(saxonOutputDirectory, _))
 
-    // Images.
+    // Copy images.
     logger.info(s"Copying images")
     getProject.copy((copySpec: CopySpec) => copySpec
       .into(copyDestinationDirectory)
@@ -154,7 +163,7 @@ class ProcessDocBookTask extends DefaultTask {
       .include(layout.imagesDirectoryName + "/**")
     )
 
-    // CSS.
+    // Copy CSS.
     if (docBook2.usesCss) {
       logger.info(s"Copying CSS")
       getProject.copy((copySpec: CopySpec) => copySpec
@@ -173,6 +182,7 @@ class ProcessDocBookTask extends DefaultTask {
 
       docBook2.postProcess(
         layout = layout,
+        substitutions = substitutions,
         isJEuclidEnabled = isJEuclidEnabled.get,
         inputDirectory = saxonOutputDirectory,
         inputFile = saxonOutputFile,

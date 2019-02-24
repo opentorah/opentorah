@@ -1,22 +1,23 @@
 package org.podval.docbook.gradle
 
 import org.gradle.api.{Plugin, Project}
+import org.podval.docbook.gradle.section.DocBook2
+
 import scala.collection.JavaConverters._
 
 final class DocBookPlugin extends Plugin[Project] {
 
   def apply(project: Project): Unit = {
-    val logger: Logger = new Logger.PluginLogger(project.getLogger)
-    val info = getClass.getPackage
-    logger.lifecycle(info.getImplementationTitle + " v" + info.getImplementationVersion + ".")
+    new Logger.PluginLogger(project.getLogger).lifecycle(Util.applicationString)
 
     // Extension for configuring the plugin.
     val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)
     extension.xslt1version.set("+")
     extension.xslt2version.set("+")
-    extension.document.set("index")
+    extension.document.set("")
+    extension.documents.set(List.empty.asJava)
     extension.dataGeneratorClass.set("")
-    extension.outputFormats.set(DocBook2.processors.filterNot(_.usesDocBookXslt2) .map(_.name).asJava)
+    extension.outputFormats.set(DocBook2.all.filterNot(_.usesDocBookXslt2) .map(_.name).asJava)
     extension.cssFile.set("docBook")
     extension.isJEuclidEnabled.set(false)
     extension.epubEmbeddedFonts.set(List.empty[String].asJava)
@@ -33,6 +34,7 @@ final class DocBookPlugin extends Plugin[Project] {
     prepareDocBookTask.xslt1version.set(extension.xslt1version)
     prepareDocBookTask.xslt2version.set(extension.xslt2version)
     prepareDocBookTask.document.set(extension.document)
+    prepareDocBookTask.documents.set(extension.documents)
     prepareDocBookTask.parameters.set(extension.parameters)
     prepareDocBookTask.substitutions.set(extension.substitutions)
     prepareDocBookTask.cssFile.set(extension.cssFile)
@@ -44,6 +46,7 @@ final class DocBookPlugin extends Plugin[Project] {
     processDocBookTask.setDescription(s"Process DocBook")
     processDocBookTask.setGroup("publishing")
     processDocBookTask.document.set(extension.document)
+    processDocBookTask.documents.set(extension.documents)
     processDocBookTask.parameters.set(extension.parameters)
     processDocBookTask.substitutions.set(extension.substitutions)
     processDocBookTask.outputFormats.set(extension.outputFormats)

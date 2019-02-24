@@ -16,6 +16,9 @@ class Extension(project: Project) {
   @BeanProperty val document: Property[String] =
     project.getObjects.property(classOf[String])
 
+  @BeanProperty val documents: ListProperty[String] =
+    project.getObjects.listProperty(classOf[String])
+
   @BeanProperty val dataGeneratorClass: Property[String] =
     project.getObjects.property(classOf[String])
 
