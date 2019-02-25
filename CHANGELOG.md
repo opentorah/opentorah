@@ -6,8 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6.9] - 2019-02-2
-- multiple documents support
+## [0.6.9] - 2019-02-24
+- multiple documents support;
+- per-section defaults and default customization files;
+- intercept Saxon warnings and log them as info;
+- removed local copy of the JEuclid FOP plugin;
+- substitutions for PDF metadata.
 
 ## [0.6.8] - 2019-02-21
 - renamed `documentName` to `document`, `cssFileName` to `cssFile`;
