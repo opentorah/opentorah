@@ -21,7 +21,7 @@ object Section {
   def forName(name: String): Section = {
     all.find(_.name.equalsIgnoreCase(name)).getOrElse {
       val sections: String = DocBook2.all.map { docBook2 =>
-        "  " + docBook2.name + ": " + docBook2.parameterSections.mkString(", ")
+        "  " + docBook2.name + ": " + docBook2.parameterSections.map(_.name).mkString(", ")
       }.mkString("\n")
 
       throw new IllegalArgumentException(

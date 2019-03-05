@@ -32,8 +32,6 @@ final class Layout(projectDir: File, buildDir: File) {
   def fopConfigurationFile: File = new File(fopConfigurationDirectory, fopConfigurationFileName)
 
   // src/main/xsl/
-  def mainStylesheet(section: Section, prefixed: Boolean, documentName: String): String =
-    section.name + (if (!prefixed) "" else "-" + documentName) + ".xsl"
   def customStylesheet(section: Section): String = section.name + "-custom.xsl"
   def paramsStylesheet(section: Section): String = section.name + "-params.xsl"
   private def stylesheetDirectoryName: String = "xsl"
@@ -80,59 +78,73 @@ final class Layout(projectDir: File, buildDir: File) {
 
   // Relative base.dir doesn't work for html2 (is it even needed?) and in test projects
   private val useRelativeBaseDir: Boolean = false
-  def baseDir(
-    docBook2: DocBook2,
-    prefixed: Boolean,
-    documentName: String
-  ): String =
-    if (!useRelativeBaseDir) saxonOutputDirectory(docBook2, prefixed, documentName).getAbsolutePath + "/" else {
-      val directoryName: String = if (docBook2.usesIntermediate) intermediateRootName else outputRootName
-      val directoryNameEffective: String = if (!prefixed) directoryName else s"$directoryName/$documentName"
-      buildDirectoryRelative(s"$directoryNameEffective/${saxonOutputDirectoryName(docBook2)}")
-    }
 
-  def saxonOutputDirectory(
-    docBook2: DocBook2,
-    prefixed: Boolean,
-    documentName: String
-  ): File = {
-    val saxonRoot: File = if (docBook2.usesIntermediate) intermediateRoot else outputRoot
-    val saxonRootEffective: File = if (!prefixed) saxonRoot else new File(saxonRoot, documentName)
-    new File(
-      saxonRootEffective,
-      saxonOutputDirectoryName(docBook2)
+  def forDocument(prefixed: Boolean, documentName: String): Layout.ForDocument = new Layout.ForDocument {
+
+    override def mainStylesheet(section: Section): String =
+      section.name + (if (!prefixed) "" else "-" + documentName) + ".xsl"
+
+    override def baseDir(docBook2: DocBook2): String =
+      if (!useRelativeBaseDir) saxonOutputDirectory(docBook2).getAbsolutePath + "/" else {
+        val directoryName: String = if (docBook2.usesIntermediate) intermediateRootName else outputRootName
+        val directoryNameEffective: String = if (!prefixed) directoryName else s"$directoryName/$documentName"
+        buildDirectoryRelative(s"$directoryNameEffective/${saxonOutputDirectoryName(docBook2)}")
+      }
+
+    override def saxonOutputDirectory(docBook2: DocBook2): File = outputDirectory(
+      root = if (docBook2.usesIntermediate) intermediateRoot else outputRoot,
+      subdirectoryName = saxonOutputDirectoryName(docBook2)
     )
+
+    override def saxonOutputFile(docBook2: DocBook2): File = outputFile(
+      docBook2,
+      saxonOutputDirectory(docBook2),
+      if (docBook2.usesIntermediate) docBook2.intermediateFileExtension else docBook2.outputFileExtension
+    )
+
+    override def outputDirectory(docBook2: DocBook2): File = outputDirectory(
+      root = outputRoot,
+      subdirectoryName = docBook2.name
+    )
+
+    override def outputFile(docBook2: DocBook2): File = outputFile(
+      docBook2,
+      outputDirectory(docBook2),
+      docBook2.outputFileExtension
+    )
+
+    private def outputDirectory(
+      root: File,
+      subdirectoryName: String
+    ): File = new File(
+      if (!prefixed) root else new File(root, documentName),
+      subdirectoryName
+    )
+
+    private def outputFile(
+      docBook2: DocBook2,
+      directory: File,
+      extension: String
+    ): File =
+      new File(directory, docBook2.rootFilename(documentName) + "." + extension)
   }
-
-  def outputDirectory(docBook2: DocBook2): File = new File(outputRoot, docBook2.name)
-
-  def saxonOutputFile(
-    docBook2: DocBook2,
-    prefixed: Boolean,
-    inputFileName: String
-  ): File = outputFile(
-    docBook2,
-    saxonOutputDirectory(docBook2, prefixed, inputFileName),
-    inputFileName,
-    if (docBook2.usesIntermediate) docBook2.intermediateFileExtension else docBook2.outputFileExtension
-  )
-
-  def outputFile(
-    docBook2: DocBook2,
-    inputFileName: String
-  ): File =
-    outputFile(docBook2, outputDirectory(docBook2), inputFileName, docBook2.outputFileExtension)
-
-  private def outputFile(
-    docBook2: DocBook2,
-    directory: File,
-    inputFileName: String,
-    extension: String
-  ): File =
-    new File(directory, docBook2.rootFilename(inputFileName) + "." + extension)
 }
 
 object Layout {
+  trait ForDocument {
+    def mainStylesheet(section: Section): String
+
+    def baseDir(docBook2: DocBook2): String
+
+    def saxonOutputDirectory(docBook2: DocBook2): File
+
+    def saxonOutputFile(docBook2: DocBook2): File
+
+    def outputDirectory(docBook2: DocBook2): File
+
+    def outputFile(docBook2: DocBook2): File
+  }
+
   def forProject(project: Project): Layout =
     new Layout(project.getProjectDir, project.getBuildDir)
 

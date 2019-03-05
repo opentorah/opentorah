@@ -249,13 +249,15 @@ class PrepareDocBookTask extends DefaultTask  {
     cssFileName: String,
     epubEmbeddedFonts: String
   ): Unit = {
-    val mainStylesheetName: String = layout.mainStylesheet(docBook2, prefixed, documentName)
+    val forDocument = layout.forDocument(prefixed, documentName)
+
+    val mainStylesheetName: String = forDocument.mainStylesheet(docBook2)
     val paramsStylesheetName: String = layout.paramsStylesheet(docBook2)
     val stylesheetUri: String = s"${Stylesheets(docBook2.usesDocBookXslt2).uri}/${docBook2.stylesheetUriName}.xsl"
 
     val nonOverridableParameters: Map[String, String] = Seq[Option[(String, String)]](
       Some("img.src.path", layout.imagesDirectoryName + "/"),
-      docBook2.parameter(_.baseDirParameter, layout.baseDir(docBook2, prefixed, documentName)),
+      docBook2.parameter(_.baseDirParameter, forDocument.baseDir(docBook2)),
       docBook2.parameter(_.rootFilenameParameter, docBook2.rootFilename(documentName)),
       docBook2.parameter(_.epubEmbeddedFontsParameter, epubEmbeddedFonts),
       docBook2.parameter(_.htmlStylesheetsParameter, layout.cssFileRelativeToOutputDirectory(cssFileName))

@@ -124,14 +124,16 @@ class ProcessDocBookTask extends DefaultTask {
   ): Unit = {
     logger.lifecycle(s"DocBook: processing '$documentName' to ${docBook2.name}.")
 
+    val forDocument = layout.forDocument(prefixed, documentName)
+
     // Saxon output directory.
-    val saxonOutputDirectory: File = layout.saxonOutputDirectory(docBook2, prefixed, documentName)
+    val saxonOutputDirectory: File = forDocument.saxonOutputDirectory(docBook2)
     saxonOutputDirectory.mkdirs
 
     // Saxon output file and target.
-    val saxonOutputFile: File = layout.saxonOutputFile(docBook2, prefixed, documentName)
+    val saxonOutputFile: File = forDocument.saxonOutputFile(docBook2)
     val outputTarget = new StreamResult
-    // null outputTarget when chunking in XSLT 1.0
+    // null the outputTarget when chunking in XSLT 1.0
     if (docBook2.usesRootFile) {
       outputTarget.setSystemId(saxonOutputFile)
       outputTarget.setWriter(new FileWriter(saxonOutputFile))
@@ -141,7 +143,7 @@ class ProcessDocBookTask extends DefaultTask {
     }
 
     // Run Saxon.
-    val mainStylesheetName: String = layout.mainStylesheet(docBook2, prefixed, documentName)
+    val mainStylesheetName: String = forDocument.mainStylesheet(docBook2)
     Saxon.run(
       inputSource = new InputSource(layout.inputFile(documentName).toURI.toASCIIString),
       stylesheetSource = new StreamSource(layout.stylesheetFile(mainStylesheetName)),
@@ -177,7 +179,7 @@ class ProcessDocBookTask extends DefaultTask {
     // Post-processing.
     if (docBook2.usesIntermediate) {
       logger.info(s"Post-processing ${docBook2.name}")
-      val outputDirectory: File = layout.outputDirectory(docBook2)
+      val outputDirectory: File = forDocument.outputDirectory(docBook2)
       outputDirectory.mkdirs
 
       docBook2.postProcess(
@@ -186,7 +188,7 @@ class ProcessDocBookTask extends DefaultTask {
         isJEuclidEnabled = isJEuclidEnabled.get,
         inputDirectory = saxonOutputDirectory,
         inputFile = saxonOutputFile,
-        outputFile = layout.outputFile(docBook2, documentName),
+        outputFile = forDocument.outputFile(docBook2),
         logger = logger
       )
     }
