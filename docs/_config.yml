@@ -1,1 +1,34 @@
+title: "Digital Judaica Done Right"
+author: "Leonid Dubinsky"
+email: dub@podval.org
+
+description: >- # this means to ignore newlines until "baseurl:"
+  Digital Judaica Done Right :)
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "http://www.digitaljudaica.org" # the base hostname & protocol for your site, e.g. http://example.com
+
+twitter_username: leoniddubinsky
+github_username:  dubinsky
+
+
+# Build settings
+markdown: kramdown
 theme: minima
+
+# Exclude from processing.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - .idea/
+  - CNAME
+
+timezone: America/New_York
+
+header_pages:
+  - index.md
+  - blog.md
