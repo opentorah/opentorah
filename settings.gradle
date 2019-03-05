@@ -5,8 +5,7 @@ include ':importers'
 
 //include ':webapp'
 
-include ':judaica-paper'
-include ':typesetting-paper'
+include ':papers'
 include ':docs'
 
-// includeBuild '../../docbook.gradle'
+//includeBuild '../../docbook-gradle'

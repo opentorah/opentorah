@@ -1,12 +1,12 @@
-build.dependsOn ':judaica-paper:processDocBook'
-build.dependsOn ':typesetting-paper:processDocBook'
+build.dependsOn ':papers:processDocBook'
 build.doLast {
+  def result = project.tasks.getByPath(':papers:processDocBook').outputDirectory
   project.sync {
-    from "${project(':judaica-paper').buildDir}/docBook/"
+    from "$result/judaica"
     into 'judaica'
   }
   project.sync {
-    from "${project(':typesetting-paper').buildDir}/docBook/"
+    from "$result/typesetting"
     into 'typesetting'
   }
 }
