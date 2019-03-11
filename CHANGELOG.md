@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2019-03-10
+- cleanup
+
 ## [0.6.9] - 2019-02-24
 - multiple documents support;
 - per-section defaults and default customization files;
