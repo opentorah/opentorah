@@ -16,30 +16,24 @@ docBook {
   ]
 
   parameters.htmlCommon = [
-         // "role" attribute on "para" will become "class" in HTML
-         "para.propagates.style": "yes",
-
          // Include page number in cross-references
          "insert.xref.page.number": "yes"
   ]
 
   parameters.pdf = [
-          "title.font.family"    : "DejaVu Sans",
-          "body.font.family"     : "DejaVu Sans",
-          "sans.font.family"     : "DejaVu Sans",
-          "monospace.font.family": "DejaVu Sans Mono",
-          "symbol.font.family"   : "DejaVu Sans",
-          "body.font.master"     : "12",
-          "footnote.font.size"   : "10",
+    "title.font.family"    : "DejaVu Sans",
+    "body.font.family"     : "DejaVu Sans",
+    "sans.font.family"     : "DejaVu Sans",
+    "monospace.font.family": "DejaVu Sans Mono",
+    "symbol.font.family"   : "DejaVu Sans",
+    "body.font.master"     : "12",
+    "footnote.font.size"   : "10",
 
-          // Suppress content indent
-          "body.start.indent"    : "0pt",
+    // Suppress content indent
+    "body.start.indent"    : "0pt",
 
-          // Some space for the list labels
-          "orderedlist.label.width": "2em",
-
-          // XInclude shouldn't affect image URIs
-          "keep.relative.image.uris": "1"
+    // Some space for the list labels
+    "orderedlist.label.width": "2em"
   ]
 }
 
