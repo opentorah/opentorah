@@ -1,9 +1,7 @@
 package org.podval.archive19kislev.collector
 
 import java.io.File
-
 import scala.xml.Elem
-
 
 final class Collection(
   val directoryName: String,
@@ -13,32 +11,27 @@ final class Collection(
   val teiDirectory = new File(collectionDirectory, "documents")
   val facsimilesDirectory = new File(collectionDirectory, "facsimiles")
 
-
   // Read
 
-  val imageNames: Seq[String] = listNames(facsimilesDirectory, ".jpg", Name.check)
-
+  val imageNames: Seq[String] = listNames(facsimilesDirectory, ".jpg", Page.check)
 
   val documents: Seq[Document] = {
-    val names = listNames(teiDirectory, ".xml", Name.checkBase)
+    val names = listNames(teiDirectory, ".xml", Page.checkBase)
     for (name <- names) yield {
       val file = new File(teiDirectory, name + ".xml")
       new Document(Xml.load(file), name)
     }
   }
 
-
   val pages: Seq[Page] = documents.flatMap(_.pages)
 
   val missingPages: Seq[String] = pages.filterNot(_.isPresent).map(_.displayName)
-
 
   private def listNames(directory: File, extension: String, check: String => Unit): Seq[String] = {
     val result = directory.listFiles.toSeq.map(_.getName).filter(_.endsWith(extension)).map(_.dropRight(extension.length))
 //    result.foreach(check)
     result.sorted
   }
-
 
   /// Check consistency
 
@@ -56,7 +49,6 @@ final class Collection(
     if (orphanImages.nonEmpty) throw new IllegalArgumentException(s"Orphan images: $orphanImages")
   }
 
-
   val documentsWithSiblings: Seq[(Document, (Option[Document], Option[Document]))] = {
     val documentOptions: Seq[Option[Document]] = documents.map(Some(_))
     val prev = None +: documentOptions.init
@@ -66,14 +58,12 @@ final class Collection(
 
   // TODO check order
 
-
   /// Generate HTML
 
   def writeIndex(): Unit = {
     val file = new File(collectionDirectory, "index.html")
     Xml.print(toHtml, file)
   }
-
 
   def toHtml: Elem = {
     <html>
@@ -101,7 +91,7 @@ final class Collection(
 }
 
 object Collection {
-  val docsDirectory: File = new File("docs").getAbsoluteFile
+  private val docsDirectory: File = new File("docs").getAbsoluteFile
 
   def writeIndex(directoryName: String, title: String): Unit =
     new Collection(directoryName, title).writeIndex()
