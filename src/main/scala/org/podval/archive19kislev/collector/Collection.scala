@@ -64,7 +64,7 @@ final class Collection(
   def writeIndex(): Unit = {
 //    val html = new File(collectionDirectory, "index.html")
 //    Xml.print(toHtml, html)
-    val md = new File(collectionDirectory, "list.md")
+    val md = new File(collectionDirectory, "index.md")
     val writer: BufferedWriter = new BufferedWriter(new FileWriter(md))
     try {
       writer.write(toMarkdown)
