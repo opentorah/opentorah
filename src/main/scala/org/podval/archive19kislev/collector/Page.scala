@@ -1,24 +1,14 @@
 package org.podval.archive19kislev.collector
 
-import scala.xml.Elem
-
-final class Page(val name: String, val isPresent: Boolean, val document: Document) {
-
+final case class Page(name: String, isPresent: Boolean, document: Document) {
   def displayName: String = Page.displayName(name)
-
-  def pageReference: Elem = {
-    val refClass = if (isPresent) "page" else "missing-page"
-    <a class={refClass} href={s"documents/${document.name}.xml#${toXmlId(name)}"}>{displayName}</a>
-  }
-
-  private def toXmlId(name: String): String = "p" + name
 }
 
 object Page {
   private val numberOfDigitsInName = 3
 
-  val frontSuffix = "-1"
-  val backSuffix = "-2"
+  private val frontSuffix = "-1"
+  private val backSuffix = "-2"
   require(frontSuffix.length == backSuffix.length)
 
   def check(name: String): Unit = {
