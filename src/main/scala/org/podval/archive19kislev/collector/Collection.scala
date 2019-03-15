@@ -62,8 +62,8 @@ final class Collection(
   /// Generate HTML
 
   def writeIndex(): Unit = {
-    val html = new File(collectionDirectory, "index.html")
-    Xml.print(toHtml, html)
+//    val html = new File(collectionDirectory, "index.html")
+//    Xml.print(toHtml, html)
     val md = new File(collectionDirectory, "list.md")
     val writer: BufferedWriter = new BufferedWriter(new FileWriter(md))
     try {
@@ -76,7 +76,7 @@ final class Collection(
   def toHtml: Elem = {
     <html>
       <head>
-        <link rel="stylesheet" href={"../css/index.css"} type="text/css"/>
+        <link rel="stylesheet" href={"../assets/list.css"} type="text/css"/>
         <title>{title}</title>
       </head>
       <body>
@@ -113,11 +113,15 @@ final class Collection(
       "---",
       s"title: $title",
       "layout: page",
+      "list: true",
       "---",
       toString(for (column <- Collection.columns) yield column.heading),
       toString(for (_      <- Collection.columns) yield "---")
     ) ++ documents.flatMap { document =>
-      document.partTitle.toSeq.map { partTitle => toString(Seq(partTitle)) } ++ Seq[String](
+      document.partTitle.toSeq.map { partTitle =>
+        val result = s"""<span class="part-title">$partTitle</span>"""
+        toString(Seq(result))
+      } ++ Seq[String](
         toString(for (column <- Collection.columns) yield Collection.toMarkdown(column.value(document)))
       )} ++ (if (missingPages.isEmpty) Seq.empty else Seq(
       "",
@@ -155,7 +159,9 @@ object Collection {
       if (cssClass.isEmpty) <a href={url}>{text}</a>
       else <a class={cssClass.get} href={url}>{text}</a>
 
-    def toMarkdown: String = s"[$text]($url)"
+    def toMarkdown: String =
+      if (cssClass.isEmpty) s"[$text]($url)"
+      else s"""<a class="${cssClass.get}" href="$url">$text</a>"""
   }
 
   private val columns = Seq(
@@ -174,7 +180,7 @@ object Collection {
         url = s"documents/${page.document.name}.xml#p${page.name}",
         cssClass = Some(if (page.isPresent) "page" else "missing-page")
       )),
-    Column[String]("Расшифрован", "isTranscribed",
+    Column[String]("Текст", "isTranscribed",
       document => if (document.isTranscribed) "да" else "нет")
   )
 
