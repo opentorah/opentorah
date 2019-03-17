@@ -45,8 +45,8 @@ object Xml {
     private[this] def oneOptionalChild(name: String, required: Boolean = true): Option[Elem] = {
       val children = elem \ name
 
-      if (children.size > 1) throw new NoSuchElementException(s"To many children with name $name")
-      if (required && children.isEmpty) throw new NoSuchElementException(s"No child with name $name")
+      if (children.size > 1) throw new NoSuchElementException(s"To many children with name '$name'")
+      if (required && children.isEmpty) throw new NoSuchElementException(s"No child with name '$name'")
 
       if (children.isEmpty) None else Some(children.head.asInstanceOf[Elem])
     }

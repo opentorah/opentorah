@@ -118,6 +118,7 @@ final class Collection(
       toString(for (column <- Collection.columns) yield column.heading),
       toString(for (_      <- Collection.columns) yield "---")
     ) ++ documents.flatMap { document =>
+      println(s"$title:${document.name}")
       document.partTitle.toSeq.map { partTitle =>
         val result = s"""<span class="part-title">$partTitle</span>"""
         toString(Seq(result))
@@ -165,7 +166,7 @@ object Collection {
   }
 
   private val columns = Seq(
-    Column[String]("Описание", "description", _.title.getOrElse("?")),
+    Column[String]("Описание", "description", _.description.getOrElse("?")),
     Column[String]("Дата", "date", _.date.getOrElse("")),
     Column[String]("Автор", "author", _.author.getOrElse("")),
     Column[String]("Язык", "language", _.language.getOrElse("")),
