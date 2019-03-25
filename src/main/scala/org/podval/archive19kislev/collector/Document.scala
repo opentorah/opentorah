@@ -23,7 +23,8 @@ final class Document(xml: Elem, val name: String) {
   private def text(e: Elem): String = (e.child map (_.text)).mkString(" ")
 
   def author: Option[String] = optionize(titleStmt.oneChild("author").text)
-  def isTranscribed: Boolean = titleStmt.elemsFilter("editor").nonEmpty
+  def transcriber: Option[String] = titleStmt.elemsFilter("editor")
+    .find(_.attributeOption("role").contains("transcriber")).map(_.text)
 
   def publicationDate: Option[String] = optionize(fileDesc.oneChild("publicationStmt").oneChild("date").text)
 
