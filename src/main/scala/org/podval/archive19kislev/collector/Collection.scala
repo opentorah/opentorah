@@ -9,7 +9,7 @@ final class Collection(
   private val collectionDirectory = new File(Collection.docsDirectory, directoryName)
   private val teiDirectory = new File(collectionDirectory, "documents")
   private val facsimilesDirectory = new File(collectionDirectory, "facsimiles")
-  private val ceteiDirectory = new File(collectionDirectory, Collection.documentsDirectoryName)
+  private val documentsDirectory = new File(collectionDirectory, Collection.documentsDirectoryName)
 
   // Read
 
@@ -72,13 +72,13 @@ final class Collection(
     )
 
     for ((document, (prev, next)) <- documentsWithSiblings) {
-      Collection.writeTo(ceteiDirectory, s"${document.name}.html",
+      Collection.writeTo(documentsDirectory, s"${document.name}.html",
         Seq("layout" -> "document") ++ documentName("self", document) ++
           prev.fold(Seq.empty[(String, String)])(prev => documentName("prev", prev)) ++
           next.fold(Seq.empty[(String, String)])(next => documentName("next", next))
       )(Seq.empty)
 
-      Collection.writeTo(ceteiDirectory, s"${document.name}-facs.html",
+      Collection.writeTo(documentsDirectory, s"${document.name}-facs.html",
         Seq("layout" -> "facsimile")
       )(
         for (page <- document.pages) yield {
@@ -129,13 +129,16 @@ object Collection {
     ("Дата", _.date.getOrElse("")),
     ("Автор", _.author.getOrElse("")),
     ("Язык", _.language.getOrElse("")),
-    ("Документ", document => { val name = document.name; Link(name, s"$documentsDirectoryName/$name.html") }),
+    ("Документ", document => Link(document.name, documentPath(document))),
     ("Страницы", document =>
       for (page <- document.pages) yield Link(
         text = page.displayName,
-        url = s"documents/${page.document.name}.xml#p${page.name}",
+        url = documentPath(document) + s"#p${page.name}",
         cssClass = Some(if (page.isPresent) "page" else "missing-page")
       )),
     ("Расшифровка", _.transcriber.getOrElse(""))
   )
+
+  private def documentPath(document: Document): String =
+    s"$documentsDirectoryName/${document.name}.html"
 }
