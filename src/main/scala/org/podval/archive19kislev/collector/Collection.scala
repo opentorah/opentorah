@@ -7,7 +7,7 @@ final class Collection(
   title: String
 ) {
   private val collectionDirectory = new File(Collection.docsDirectory, directoryName)
-  private val teiDirectory = new File(collectionDirectory, "documents")
+  private val teiDirectory = new File(collectionDirectory, "tei")
   private val facsimilesDirectory = new File(collectionDirectory, "facsimiles")
   private val documentsDirectory = new File(collectionDirectory, Collection.documentsDirectoryName)
 
@@ -96,7 +96,7 @@ final class Collection(
 object Collection {
   private val docsDirectory: File = new File("docs").getAbsoluteFile
 
-  private val documentsDirectoryName: String = "cetei"
+  private val documentsDirectoryName: String = "documents"
 
   def main(args: Array[String]): Unit = {
     new Collection("dubnov", "Дубнов").writeIndex()
