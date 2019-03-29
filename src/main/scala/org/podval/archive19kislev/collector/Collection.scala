@@ -72,16 +72,18 @@ final class Collection(
     )
 
     for ((document, (prev, next)) <- documentsWithSiblings) {
+      val navigation: Seq[(String, String)] = documentName("self", document) ++
+        prev.map(prev => documentName("prev", prev)).getOrElse(Seq.empty) ++
+        next.map(next => documentName("next", next)).getOrElse(Seq.empty)
+
       Collection.writeTo(documentsDirectory, s"${document.name}.html",
-        Seq("layout" -> "document") ++ documentName("self", document) ++
-          prev.fold(Seq.empty[(String, String)])(prev => documentName("prev", prev)) ++
-          next.fold(Seq.empty[(String, String)])(next => documentName("next", next))
+        Seq("layout" -> "document") ++ navigation
       )(Seq.empty)
 
       Collection.writeTo(documentsDirectory, s"${document.name}-facs.html",
-        Seq("layout" -> "facsimile")
+        Seq("layout" -> "facsimile") ++ navigation
       )(
-        for (page <- document.pages) yield {
+        for (page <- document.pages.filter(_.isPresent)) yield {
           val name: String = page.name
           s"""<img id="p$name" src="../facsimiles/$name.jpg" alt="facsimile for page $name">"""
         }
