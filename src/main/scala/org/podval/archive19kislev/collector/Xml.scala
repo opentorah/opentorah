@@ -19,6 +19,8 @@ object Xml {
 
     def elemsFilter(name: String): Seq[Elem] = elem.elems.filter(_.label == name)
 
+    def descendants(name: String): Seq[Elem] = elem.flatMap(_ \\ name).filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
+
     def elems: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
     def getAttribute(name: String): String = attributeOption(name).getOrElse(throw new NoSuchElementException(s"No attribute $name"))
