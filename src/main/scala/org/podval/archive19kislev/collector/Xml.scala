@@ -26,8 +26,7 @@ object Xml {
     def getAttribute(name: String): String = attributeOption(name).getOrElse(throw new NoSuchElementException(s"No attribute $name"))
 
     def attributeOption(name: String): Option[String] = {
-      val result: Seq[Node] = elem \ ("@" + name)
-      if (result.isEmpty) None else Some(result.text)
+      elem.attributes.asAttrMap.get(name)
     }
 
     def intAttributeOption(name: String): Option[Int] = attributeOption(name).map { value =>
@@ -64,9 +63,10 @@ object Xml {
   def loadResource(clazz: Class[_], name: String, tag: String): Elem =
     open(XML.load(clazz.getResourceAsStream(name + ".xml")), tag)
 
-  def load(file: File, tag: String): Elem = open(load(file), tag)
-
-  def load(file: File): Elem = Utility.trimProper(XML.loadFile(file)).asInstanceOf[Elem]
+  def load(directory: File, fileName: String): Elem = {
+    val file: File = new File(directory, fileName + ".xml")
+    Utility.trimProper(XML.loadFile(file)).asInstanceOf[Elem]
+  }
 
   def open(what: Elem, tag: String): Elem = what/*(0).asInstanceOf[Elem]*/.check(tag)
 

@@ -6,12 +6,6 @@ import scala.xml.Elem
 final class Document(xml: Elem, val name: String, val prev: Option[String], val next: Option[String]) {
   override def toString: String = name
 
-  val navigation: Seq[(String, String)] = documentName("self", name) ++
-    prev.map(prev => documentName("prev", prev)).getOrElse(Seq.empty) ++
-    next.map(next => documentName("next", next)).getOrElse(Seq.empty)
-
-  private def documentName(what: String, name: String): Seq[(String, String)] = Seq(what -> s"'$name'")
-
   private[this] val tei: Elem = Xml.open(xml, "TEI")
   private[this] val teiHeader: Elem = tei.oneChild("teiHeader")
   private[this] val fileDesc: Elem = teiHeader.oneChild("fileDesc")
@@ -54,9 +48,10 @@ final class Document(xml: Elem, val name: String, val prev: Option[String], val 
   def people: Seq[Name] = names("persName").filter(_.name != "?")
   def places: Seq[Name] = names("placeName")
   def organizations: Seq[Name] = names("orgName")
+  def references: Seq[Name] = people ++ places ++ organizations
 
   def addressee: Option[String] = people.find(_.role.contains("addressee")).map(_.name)
 
   private def text(e: Elem): String = (e.child map (_.text)).mkString(" ")
-  private def names(what: String): Seq[Name] = tei.descendants(what).map(Name(_, this))
+  private def names(what: String): Seq[Name] = tei.descendants(what).map(Name.apply)
 }
