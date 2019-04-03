@@ -1,11 +1,10 @@
 package org.podval.archive19kislev.collector
 
-import java.io.File
+import java.io.{BufferedWriter, File, FileWriter}
 
-final class Collection(
-  val directoryName: String,
-  val title: String
-) {
+import scala.xml.{Node, Text}
+
+final class Collection(val directoryName: String) {
   private val collectionDirectory = new File(Main.docsDirectory, directoryName)
   private val teiDirectory = new File(collectionDirectory, Main.teiDirectoryName)
   private val facsimilesDirectory = new File(collectionDirectory, Main.facsimilesDirectoryName)
@@ -14,7 +13,7 @@ final class Collection(
   // Read
 
   val documents: Seq[Document] = {
-    val names: Seq[String] = Files.listNames(teiDirectory, ".xml", Page.checkBase)
+    val names: Seq[String] = Collection.listNames(teiDirectory, ".xml", Page.checkBase)
 
     val namesWithSiblings: Seq[(String, (Option[String], Option[String]))] = {
       val documentOptions: Seq[Option[String]] = names.map(Some(_))
@@ -32,6 +31,7 @@ final class Collection(
   val missingPages: Seq[String] = pages.filterNot(_.isPresent).map(_.displayName)
 
   /// Check consistency
+  check()
 
   private def check(): Unit = {
     // Check for duplicates
@@ -43,7 +43,7 @@ final class Collection(
     }
 
     // Check that all the images are accounted for
-    val imageNames: Seq[String] = Files.listNames(facsimilesDirectory, ".jpg", Page.check)
+    val imageNames: Seq[String] = Collection.listNames(facsimilesDirectory, ".jpg", Page.check)
     val orphanImages: Seq[String] = (imageNames.toSet -- pages.map(_.name).toSet).toSeq.sorted
     if (orphanImages.nonEmpty) throw new IllegalArgumentException(s"Orphan images: $orphanImages")
   }
@@ -51,17 +51,44 @@ final class Collection(
   // TODO check order
 
   def writeIndex(): Unit = {
-    check()
-
-    val missing =
+    // TODO !!!
+    val missing: Seq[Node] =
       if (missingPages.isEmpty) Seq.empty
-      else Seq("", s"Отсутствуют фотографии страниц: ${missingPages.mkString(" ")}")
+      else <p>Отсутствуют фотографии страниц: {missingPages.mkString(" ")}</p>
 
-    Files.write(collectionDirectory, "index.md", Seq(
-      "title" -> title,
-      "layout" -> "collection"
-    ))(Collection.table.toMarkdown(documents) ++ missing)
+    val content =
+      <TEI xmlns="http://www.tei-c.org/ns/1.0">
+        <teiHeader>
+          <fileDesc>
+            <publicationStmt>
+              <publisher><ptr target="www.alter-rebbe.org"/></publisher>
+              <availability status="free">
+                <licence><ab><ref n="license" target="http://creativecommons.org/licenses/by/4.0/">Creative Commons
+                    Attribution 4.0 International License </ref></ab>
+                </licence>
+              </availability>
+            </publicationStmt>
+            <sourceDesc><p>Facsimile</p></sourceDesc>
+          </fileDesc>
+          <profileDesc><calendarDesc><calendar xml:id="julian"><p>Julian calendar</p></calendar></calendarDesc></profileDesc>
+        </teiHeader>
+        <text>
+          <body>
+            {Collection.table.toTei(documents)}
+            {missing}
+          </body>
+        </text>
+      </TEI>
 
+
+    Collection.write(collectionDirectory, "index.xml", content =
+      """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
+      """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
+      Xml.prettyPrinter.format(content)
+    )
+  }
+
+  def writeWrappers(): Unit = {
     for (document <- documents) {
       def documentName(what: String, name: String): Seq[(String, String)] = Seq(what -> s"'$name'")
 
@@ -69,17 +96,19 @@ final class Collection(
         document.prev.map(prev => documentName("prev", prev)).getOrElse(Seq.empty) ++
         document.next.map(next => documentName("next", next)).getOrElse(Seq.empty)
 
-      Files.write(documentsDirectory, s"${document.name}.html", Seq(
+      // TEI wrapper
+      Collection.write(documentsDirectory, s"${document.name}.html", Seq(
         "layout" -> "document",
         "tei" -> s"'../${Main.teiDirectoryName}/${document.name}.xml'"
       ) ++ navigation
-      )(Seq.empty)
+      )
 
-      Files.write(documentsDirectory, s"${document.name}-facs.html", Seq(
+      // Facsimile viewer
+      Collection.write(documentsDirectory, s"${document.name}-facs.html", Seq(
         "layout" -> "facsimile",
         "images" -> document.pages.filter(_.isPresent).map(_.name).mkString("[", ", ", "]")
       ) ++ navigation
-      )(Seq.empty)
+      )
     }
   }
 }
@@ -87,22 +116,60 @@ final class Collection(
 object Collection {
 
   private val table: Table[Document] = new Table[Document](
-    _.partTitle.toSeq.map(partTitle =>  s"""<span class="part-title">$partTitle</span>"""),
-    ("Описание", _.description.getOrElse("?")),
-    ("Дата", _.date.getOrElse("")),
-    ("Кто", _.author.getOrElse("")),
-    ("Кому", _.addressee.getOrElse("")),
-    ("Язык", _.language.getOrElse("")),
-    ("Документ", document => Link(document.name, documentPath(document))),
+    _.partTitle.toSeq.map(partTitle =>  <span rendition="part-title">{partTitle.child}</span>),
+    ("Описание", _.description.fold[Seq[Node]](Text(""))(_.child)),
+    ("Дата", _.date.fold[Seq[Node]](Text(""))(value => Text(value))),
+    ("Кто", _.author.fold[Seq[Node]](Text(""))(_.child)),
+    ("Кому", _.addressee.fold[Seq[Node]](Text(""))(addressee =>
+      <persName ref={addressee.ref.map("#" + _).orNull}>{addressee.name}</persName>)),
+    ("Язык", _.language.fold[Seq[Node]](Text(""))(value => Text(value))),
+    ("Документ", document => <ref target={documentPath(document)}>{document.name}</ref>),
     ("Страницы", document =>
-      for (page <- document.pages) yield Link(
-        text = page.displayName,
-        url = documentPath(document) + s"#p${page.name}",
-        cssClass = Some(if (page.isPresent) "page" else "missing-page")
-      )),
-    ("Расшифровка", _.transcriber.getOrElse(""))
+      for (page <- document.pages)
+        yield <ref rendition={if (page.isPresent) "page" else "missing-page"}
+                   target={documentPath(document) + s"#p${page.name}"}>{page.displayName}</ref>),
+    ("Расшифровка", _.transcriber.fold[Seq[Node]](Text(""))(_.child))
   )
 
   private def documentPath(document: Document): String =
     s"${Main.documentsDirectoryName}/${document.name}.html"
+
+  private def listNames(directory: File, extension: String, check: String => Unit): Seq[String] = {
+    val result = directory.listFiles.toSeq.map(_.getName).filter(_.endsWith(extension)).map(_.dropRight(extension.length))
+    //    result.foreach(check)
+    result.sorted
+  }
+
+  private def write(
+    directory: File,
+    fileName: String,
+    yaml: Seq[(String, String)]
+  ): Unit = {
+    val result: Seq[String] =
+      Seq("---") ++
+        (for ((name, value) <- yaml) yield name + ": " + value) ++
+        Seq("---") ++
+        Seq("")
+
+    Collection.write(
+      directory,
+      fileName,
+      result.mkString("\n")
+    )
+  }
+
+  private def write(
+    directory: File,
+    fileName: String,
+    content: String
+  ): Unit = {
+    directory.mkdirs()
+    val file = new File(directory, fileName)
+    val writer: BufferedWriter = new BufferedWriter(new FileWriter(file))
+    try {
+      writer.write(content)
+    } finally {
+      writer.close()
+    }
+  }
 }

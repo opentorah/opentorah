@@ -83,5 +83,5 @@ object Xml {
     out.close()
   }
 
-  private val prettyPrinter = new PrettyPrinter(120, 2)
+  val prettyPrinter: PrettyPrinter = new PrettyPrinter(120, 2)
 }

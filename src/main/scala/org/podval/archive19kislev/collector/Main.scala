@@ -12,8 +12,8 @@ object Main {
   val namesFileName: String = "names"
 
   val collections: Seq[Collection] = Seq(
-    new Collection("dubnov", "Дубнов"),
-    new Collection("archive", "Архив")
+    new Collection("dubnov"),
+    new Collection("archive")
   )
 
   val names: Names = new Names(docsDirectory, namesFileName)
@@ -42,7 +42,10 @@ object Main {
   }
 
   def main(args: Array[String]): Unit = {
-    collections.foreach(_.writeIndex())
+    collections.foreach { collection =>
+      collection.writeIndex()
+//      collection.writeWrappers()
+    }
     collections.foreach(checkNames)
   }
 }
