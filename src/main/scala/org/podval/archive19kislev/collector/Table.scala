@@ -1,11 +1,8 @@
 package org.podval.archive19kislev.collector
 
-import scala.xml.{Elem, Node}
+import scala.xml.{Elem, Node, Text, TopScope}
 
-final class Table[D](preRow: D => Seq[Node], columnsRaw: (String, D => Seq[Node])*) {
-  private val columns: Seq[Table.Column[D]] =
-    for ((heading, value) <- columnsRaw) yield new Table.Column[D](heading, value)
-
+final class Table[D](preRow: D => Seq[Node], columns: Column[D]*) {
   def toTei(data: Seq[D]): Elem =
     <table rendition="collection-index">
       <row>{ for (column <- columns) yield <cell>{column.heading}</cell> }</row>
@@ -14,11 +11,4 @@ final class Table[D](preRow: D => Seq[Node], columnsRaw: (String, D => Seq[Node]
       <row>{for (column <- columns) yield <cell>{column.value(rowData)}</cell>}</row>
       }}
     </table>
-}
-
-object Table {
-  final class Column[D](
-    val heading: String,
-    val value: D => Seq[Node]
-  )
 }

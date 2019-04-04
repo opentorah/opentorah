@@ -2,13 +2,15 @@ package org.podval.archive19kislev.collector
 
 import java.io.{BufferedWriter, File, FileWriter}
 
-import scala.xml.{Node, Text}
+import scala.xml.{Elem, Node, Text, TopScope}
+import Xml.Ops
 
-final class Collection(val directoryName: String) {
+final class Collection(val directoryName: String, val title: String) {
   private val collectionDirectory = new File(Main.docsDirectory, directoryName)
-  private val teiDirectory = new File(collectionDirectory, Main.teiDirectoryName)
-  private val facsimilesDirectory = new File(collectionDirectory, Main.facsimilesDirectoryName)
-  private val documentsDirectory = new File(collectionDirectory, Main.documentsDirectoryName)
+  private val teiDirectory = new File(collectionDirectory, Collection.teiDirectoryName)
+  private val facsimilesDirectory = new File(collectionDirectory, Collection.facsimilesDirectoryName)
+  private val documentsDirectory = new File(collectionDirectory, Collection.documentsDirectoryName)
+  private val viewersDirectory = new File(collectionDirectory, Collection.viewersDirectoryName)
 
   // Read
 
@@ -51,11 +53,6 @@ final class Collection(val directoryName: String) {
   // TODO check order
 
   def writeIndex(): Unit = {
-    // TODO !!!
-    val missing: Seq[Node] =
-      if (missingPages.isEmpty) Seq.empty
-      else <p>Отсутствуют фотографии страниц: {missingPages.mkString(" ")}</p>
-
     val content =
       <TEI xmlns="http://www.tei-c.org/ns/1.0">
         <teiHeader>
@@ -63,9 +60,8 @@ final class Collection(val directoryName: String) {
             <publicationStmt>
               <publisher><ptr target="www.alter-rebbe.org"/></publisher>
               <availability status="free">
-                <licence><ab><ref n="license" target="http://creativecommons.org/licenses/by/4.0/">Creative Commons
-                    Attribution 4.0 International License </ref></ab>
-                </licence>
+                <licence><ab><ref n="license" target="http://creativecommons.org/licenses/by/4.0/">
+                  Creative Commons Attribution 4.0 International License </ref></ab></licence>
               </availability>
             </publicationStmt>
             <sourceDesc><p>Facsimile</p></sourceDesc>
@@ -75,17 +71,27 @@ final class Collection(val directoryName: String) {
         <text>
           <body>
             {Collection.table.toTei(documents)}
-            {missing}
+            {if (missingPages.isEmpty) Seq.empty
+             else <p>Отсутствуют фотографии страниц: {missingPages.mkString(" ")}</p>}
           </body>
         </text>
       </TEI>
 
 
+    // Index
     Collection.write(collectionDirectory, "index.xml", content =
       """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
       """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
       Xml.prettyPrinter.format(content)
     )
+
+    // Index wrapper
+    Collection.write(collectionDirectory, "index.html", Seq(
+      "title" -> title,
+      "layout" -> "tei",
+      "tei" -> "index.xml",
+      "wide" -> "true"
+    ))
   }
 
   def writeWrappers(): Unit = {
@@ -98,13 +104,13 @@ final class Collection(val directoryName: String) {
 
       // TEI wrapper
       Collection.write(documentsDirectory, s"${document.name}.html", Seq(
-        "layout" -> "document",
-        "tei" -> s"'../${Main.teiDirectoryName}/${document.name}.xml'"
+        "layout" -> "tei",
+        "tei" -> s"'../${Collection.teiDirectoryName}/${document.name}.xml'"
       ) ++ navigation
       )
 
       // Facsimile viewer
-      Collection.write(documentsDirectory, s"${document.name}-facs.html", Seq(
+      Collection.write(viewersDirectory, s"${document.name}.html", Seq(
         "layout" -> "facsimile",
         "images" -> document.pages.filter(_.isPresent).map(_.name).mkString("[", ", ", "]")
       ) ++ navigation
@@ -114,25 +120,35 @@ final class Collection(val directoryName: String) {
 }
 
 object Collection {
+  val teiDirectoryName: String = "tei"
+  val facsimilesDirectoryName: String = "facsimiles"
+  val documentsDirectoryName: String = "documents" // wrappers for TEI XML
+  val viewersDirectoryName: String = "facs" // facsimile viewers
 
   private val table: Table[Document] = new Table[Document](
     _.partTitle.toSeq.map(partTitle =>  <span rendition="part-title">{partTitle.child}</span>),
-    ("Описание", _.description.fold[Seq[Node]](Text(""))(_.child)),
-    ("Дата", _.date.fold[Seq[Node]](Text(""))(value => Text(value))),
-    ("Кто", _.author.fold[Seq[Node]](Text(""))(_.child)),
-    ("Кому", _.addressee.fold[Seq[Node]](Text(""))(addressee =>
+    Column.elem("Описание", "description", _.description),
+    Column.string("Дата", "date", _.date),
+    Column.elem("Кто", "author", _.author),
+    new Column("Кому", "addressee",  _.addressee.fold[Seq[Node]](Text(""))(addressee =>
       <persName ref={addressee.ref.map("#" + _).orNull}>{addressee.name}</persName>)),
-    ("Язык", _.language.fold[Seq[Node]](Text(""))(value => Text(value))),
-    ("Документ", document => <ref target={documentPath(document)}>{document.name}</ref>),
-    ("Страницы", document =>
-      for (page <- document.pages)
-        yield <ref rendition={if (page.isPresent) "page" else "missing-page"}
-                   target={documentPath(document) + s"#p${page.name}"}>{page.displayName}</ref>),
-    ("Расшифровка", _.transcriber.fold[Seq[Node]](Text(""))(_.child))
+    Column.string("Язык", "language", _.language),
+    new Column("Документ", "document", document =>
+      <ref target={documentPath(document)} role="documentViewer">{document.name}</ref>),
+    new Column("Страницы", "pages", document => for (page <- document.pages) yield
+      <ref target={documentPath(document) + s"#p${page.name}"} role="documentViewer"
+           rendition={if (page.isPresent) "page" else "missing-page"}>{page.displayName}</ref>),
+    Column.elem("Расшифровка", "transcriber", _.transcriber)
   )
 
+  private def transplant(f: Document => Option[Elem]): Document => Seq[Node] = (document: Document) =>
+    f(document).fold[Seq[Node]](Text("")) { _.child.map {
+      case e: Elem => e.copy(scope = TopScope)
+      case n => n
+    }}
+
   private def documentPath(document: Document): String =
-    s"${Main.documentsDirectoryName}/${document.name}.html"
+    s"${Collection.documentsDirectoryName}/${document.name}.html"
 
   private def listNames(directory: File, extension: String, check: String => Unit): Seq[String] = {
     val result = directory.listFiles.toSeq.map(_.getName).filter(_.endsWith(extension)).map(_.dropRight(extension.length))

@@ -5,15 +5,11 @@ import java.io.File
 object Main {
   val docsDirectory: File = new File("docs").getAbsoluteFile
 
-  val documentsDirectoryName: String = "documents"
-  val teiDirectoryName: String = "tei"
-  val facsimilesDirectoryName: String = "facsimiles"
-
   val namesFileName: String = "names"
 
   val collections: Seq[Collection] = Seq(
-    new Collection("dubnov"),
-    new Collection("archive")
+    new Collection("dubnov", "Дубнов"),
+    new Collection("archive", "Архив")
   )
 
   val names: Names = new Names(docsDirectory, namesFileName)
@@ -44,7 +40,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     collections.foreach { collection =>
       collection.writeIndex()
-//      collection.writeWrappers()
+      collection.writeWrappers()
     }
     collections.foreach(checkNames)
   }
