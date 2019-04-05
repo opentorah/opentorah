@@ -19,11 +19,6 @@ final class Report(
 object Report {
   val NONE: Seq[String] = Seq("None")
 
-  def apply(collections: Seq[Collection], names: Names): Report = new Report(
-    collections = collections.map(CollectionReport(_, names)),
-    names = NamesReport(names)
-  )
-
   def filterUndefined(references: Set[Name]): Set[String] =
     references.filter(_.ref.isEmpty).map(_.name)
 
@@ -38,4 +33,9 @@ object Report {
       (if (references.isEmpty) NONE else {
         for (reference <- references.toSeq) yield s"- $reference"
       })
+
+  def apply(collections: Seq[Collection], names: Names): Report = new Report(
+    collections = collections.map(CollectionReport(_, names)),
+    names = NamesReport(names)
+  )
 }

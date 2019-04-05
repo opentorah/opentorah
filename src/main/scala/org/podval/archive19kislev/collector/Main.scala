@@ -15,10 +15,13 @@ object Main {
   val names: Names = new Names(docsDirectory, namesFileName)
 
   def main(args: Array[String]): Unit = {
+    println("Writing collection index files.")
     collections.foreach(_.write())
-    statusReport(Report(collections, names))
-  }
 
-  private def statusReport(report: Report): Unit =
-    Util.write(docsDirectory, "status.md", report.toStrings)
+    println("Validating TEI files.")
+    val report: Report = Report(collections, names)
+    Util.write(Main.docsDirectory, "status.md", report.toStrings)
+    if (report.failed)
+      throw new IllegalArgumentException("\nTEI valisation failed!\n" + report.toStrings.mkString("\n"))
+  }
 }
