@@ -2,21 +2,21 @@ package org.podval.archive19kislev.collector
 
 final class NamesReport(
   val undefinedReferences: Set[String],
-  val unresolvedReferences: Set[String]
+  val malformedReferences: Set[String]
 ) {
-  def failed: Boolean = undefinedReferences.nonEmpty || unresolvedReferences.nonEmpty
+  def failed: Boolean = undefinedReferences.nonEmpty || malformedReferences.nonEmpty
 
-  def toStrings: Seq[String] = Seq(
-    "## Names List ##",
-    "### Undefined references ###"
-  ) ++
+  def toStrings: Seq[String] =
+    Seq("## Names List ##") ++
+    Report.UNDEFINED ++
     (if (undefinedReferences.isEmpty) Report.NONE else Report.forUndefined(undefinedReferences)) ++
-    Report.forUnresolved(unresolvedReferences)
+    Report.MALFORMED ++
+    (if (malformedReferences.isEmpty) Report.NONE else Report.forMalformed(malformedReferences))
 }
 
 object NamesReport {
   def apply(names: Names): NamesReport = new NamesReport(
     undefinedReferences = Report.filterUndefined(names.references),
-    unresolvedReferences = Report.filterUnresolved(names.references, names)
+    malformedReferences = Report.filterMalformed(names.references)
   )
 }

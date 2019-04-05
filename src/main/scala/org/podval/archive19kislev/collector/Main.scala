@@ -20,8 +20,16 @@ object Main {
 
     println("Validating TEI files.")
     val report: Report = Report(collections, names)
-    Util.write(Main.docsDirectory, "status.md", report.toStrings)
+    Util.write(Main.docsDirectory, "status.md",
+      Seq(
+        "---",
+        "title: Status report",
+        "layout: page",
+        "---"
+      ) ++
+      report.toStrings
+    )
     if (report.failed)
-      throw new IllegalArgumentException("\nTEI valisation failed!\n" + report.toStrings.mkString("\n"))
+      throw new IllegalArgumentException("\nTEI validation failed!\n" + report.toStrings.mkString("\n"))
   }
 }
