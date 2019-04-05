@@ -1,11 +1,12 @@
 package org.podval.archive19kislev.collector
 
-import java.io.{BufferedWriter, File, FileWriter}
+import java.io.File
 
-import scala.xml.{Elem, Node, Text, TopScope}
-import Xml.Ops
+import scala.xml.{Node, Text}
 
 final class Collection(val directoryName: String, val title: String) {
+  override def toString: String = directoryName
+
   private val collectionDirectory = new File(Main.docsDirectory, directoryName)
   private val teiDirectory = new File(collectionDirectory, Collection.teiDirectoryName)
   private val facsimilesDirectory = new File(collectionDirectory, Collection.facsimilesDirectoryName)
@@ -52,7 +53,12 @@ final class Collection(val directoryName: String, val title: String) {
 
   // TODO check order
 
-  def writeIndex(): Unit = {
+  def write(): Unit = {
+    writeIndex()
+    writeWrappers()
+  }
+
+  private def writeIndex(): Unit = {
     val content =
       <TEI xmlns="http://www.tei-c.org/ns/1.0">
         <teiHeader>
@@ -79,7 +85,7 @@ final class Collection(val directoryName: String, val title: String) {
 
 
     // Index
-    Collection.write(collectionDirectory, "index.xml", content =
+    Util.write(collectionDirectory, "index.xml", content =
       """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
       """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
       Xml.prettyPrinter.format(content)
@@ -94,7 +100,7 @@ final class Collection(val directoryName: String, val title: String) {
     ))
   }
 
-  def writeWrappers(): Unit = {
+  private def writeWrappers(): Unit = {
     for (document <- documents) {
       def documentName(what: String, name: String): Seq[(String, String)] = Seq(what -> s"'$name'")
 
@@ -141,12 +147,6 @@ object Collection {
     Column.elem("Расшифровка", "transcriber", _.transcriber)
   )
 
-  private def transplant(f: Document => Option[Elem]): Document => Seq[Node] = (document: Document) =>
-    f(document).fold[Seq[Node]](Text("")) { _.child.map {
-      case e: Elem => e.copy(scope = TopScope)
-      case n => n
-    }}
-
   private def documentPath(document: Document): String =
     s"${Collection.documentsDirectoryName}/${document.name}.html"
 
@@ -167,25 +167,10 @@ object Collection {
         Seq("---") ++
         Seq("")
 
-    Collection.write(
+    Util.write(
       directory,
       fileName,
-      result.mkString("\n")
+      result
     )
-  }
-
-  private def write(
-    directory: File,
-    fileName: String,
-    content: String
-  ): Unit = {
-    directory.mkdirs()
-    val file = new File(directory, fileName)
-    val writer: BufferedWriter = new BufferedWriter(new FileWriter(file))
-    try {
-      writer.write(content)
-    } finally {
-      writer.close()
-    }
   }
 }

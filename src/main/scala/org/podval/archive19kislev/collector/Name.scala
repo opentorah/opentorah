@@ -3,11 +3,11 @@ package org.podval.archive19kislev.collector
 import scala.xml.Elem
 import Xml.Ops
 
-final class Name(
-  val name: String,
-  val id: Option[String],
-  val ref: Option[String],
-  val role: Option[String]
+final case class Name(
+  name: String,
+  id: Option[String],
+  ref: Option[String],
+  role: Option[String]
 )
 
 object Name {
@@ -16,8 +16,8 @@ object Name {
   def apply(elem: Elem): Name = {
     val ref: Option[String] = elem.attributeOption("ref")
     ref.foreach { ref =>
-      if (!ref.startsWith(refPrefix)) println(s"!!! Malformed ref: $ref")
-//      if (ref.contains(" ")) println(s"!!_ Malformed ref in ${document.name}: $ref")
+      if (!ref.startsWith(refPrefix)) println(s"""!!! Malformed 'ref="$ref"'""")
+      if (ref.contains(" ")) println(s"""!!_ Malformed 'ref="$ref"'""" )
     }
 
     new Name(
