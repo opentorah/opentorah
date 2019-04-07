@@ -70,18 +70,15 @@ object Xml {
 
   def open(what: Elem, tag: String): Elem = what/*(0).asInstanceOf[Elem]*/.check(tag)
 
-  def print(xml: Node, outFile: File, prefix: Seq[String] = Seq.empty): Unit = print(xml, new FileWriter(outFile), prefix)
+  def write(
+    directory: File,
+    fileName: String,
+    xml: Elem
+  ): Unit = Util.write(directory, fileName + ".xml", content =
+    """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
+      """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
+      Xml.prettyPrinter.format(xml)
+  )
 
-  private def print(xml: Node, writer: Writer, prefix: Seq[String]) {
-    val out = new PrintWriter(writer)
-
-    prefix.foreach(out.println)
-
-    val pretty = prettyPrinter.format(xml)
-    // TODO when outputting XML, include <xml> header?
-    out.println(pretty)
-    out.close()
-  }
-
-  val prettyPrinter: PrettyPrinter = new PrettyPrinter(120, 2)
+  private val prettyPrinter: PrettyPrinter = new PrettyPrinter(120, 2)
 }

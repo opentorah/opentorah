@@ -3,15 +3,16 @@ package org.podval.archive19kislev.collector
 import Xml.Ops
 import scala.xml.Elem
 
-final class Document(xml: Elem, val name: String, val prev: Option[String], val next: Option[String]) {
-  override def toString: String = name
+final class Document(
+  val collection: Collection,
+  val name: String,
+  val prev: Option[String],
+  val next: Option[String]
+) extends DocumentLike(collection.teiDirectory, name) {
 
-  private[this] val tei: Elem = Xml.open(xml, "TEI")
-  private[this] val teiHeader: Elem = tei.oneChild("teiHeader")
-  private[this] val fileDesc: Elem = teiHeader.oneChild("fileDesc")
+  override def url: String = collection.documentUrl(name)
+
   private[this] val titleStmt: Elem = fileDesc.oneChild("titleStmt")
-  private[this] val profileDesc: Elem = teiHeader.oneChild("profileDesc")
-  private[this] val body: Elem = tei.oneChild("text").oneChild("body")
 
   val (partTitle: Option[Elem], title: Option[Elem], subTitle: Option[Elem]) = {
     val titles: Seq[Elem] = titleStmt.elemsFilter("title")
@@ -21,7 +22,8 @@ final class Document(xml: Elem, val name: String, val prev: Option[String], val 
     (getTitle("part"), getTitle("main"), getTitle("sub"))
   }
 
-  def author: Option[Elem] = titleStmt.optionalChild("author")
+  def author: Option[Elem] =
+    titleStmt.optionalChild("author")
 
   def transcriber: Option[Elem] =
     titleStmt.elemsFilter("editor").find(_.attributeOption("role").contains("transcriber"))
@@ -44,13 +46,10 @@ final class Document(xml: Elem, val name: String, val prev: Option[String], val 
     isPresent = pb.attributeOption("facs").isDefined
   } yield Page(name, isPresent, this)
 
-  def people: Seq[Name] = names("persName").filter(_.name != "?")
-  def places: Seq[Name] = names("placeName")
-  def organizations: Seq[Name] = names("orgName")
-  def references: Seq[Name] = people ++ places ++ organizations
+  override def persNames: Seq[Name] = names(teiDescendants("persName"))
+  override def placeNames: Seq[Name] = names(teiDescendants("placeName"))
+  override def orgNames: Seq[Name] = names(teiDescendants("orgName"))
 
   def addressee: Option[Name] =
-    people.find(_.role.contains("addressee"))
-
-  private def names(what: String): Seq[Name] = tei.descendants(what).map(Name.apply)
+    persNames.find(_.role.contains("addressee"))
 }

@@ -1,6 +1,6 @@
 package org.podval.archive19kislev.collector
 
-import scala.xml.{Elem, Node, Text, TopScope}
+import scala.xml.{Elem, Node}
 
 final class Table[D](preRow: D => Seq[Node], columns: Column[D]*) {
   def toTei(data: Seq[D]): Elem =

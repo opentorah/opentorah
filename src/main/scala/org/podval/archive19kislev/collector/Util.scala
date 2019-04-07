@@ -23,4 +23,10 @@ object Util {
       writer.close()
     }
   }
+
+  def removeConsecutiveDuplicates[T](seq: Seq[T]): Seq[T] = seq match {
+    case Nil => Nil
+    case x :: y :: xs if x == y => removeConsecutiveDuplicates(y :: xs)
+    case x :: xs => x +: removeConsecutiveDuplicates(xs)
+  }
 }

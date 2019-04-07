@@ -4,16 +4,17 @@ import java.io.File
 
 import scala.xml.{Node, Text}
 
-final class Collection(val directoryName: String, val title: String) {
+final class Collection(docsDirectory: File, val directoryName: String, val title: String) {
   override def toString: String = directoryName
 
-  private val collectionDirectory = new File(Main.docsDirectory, directoryName)
-  private val teiDirectory = new File(collectionDirectory, Collection.teiDirectoryName)
+  private val collectionDirectory = new File(docsDirectory, directoryName)
+  val teiDirectory = new File(collectionDirectory, Collection.teiDirectoryName)
   private val facsimilesDirectory = new File(collectionDirectory, Collection.facsimilesDirectoryName)
   private val documentsDirectory = new File(collectionDirectory, Collection.documentsDirectoryName)
   private val viewersDirectory = new File(collectionDirectory, Collection.viewersDirectoryName)
 
-  // Read
+  def documentUrl(name: String): String =
+    "/" + directoryName + "/" + Collection.documentsDirectoryName + "/" + name + ".html"
 
   val documents: Seq[Document] = {
     val names: Seq[String] = Collection.listNames(teiDirectory, ".xml", Page.checkBase)
@@ -26,12 +27,12 @@ final class Collection(val directoryName: String, val title: String) {
     }
 
     for ((name, (prev, next)) <- namesWithSiblings)
-    yield new Document(Xml.load(teiDirectory, name), name, prev, next)
+    yield new Document(this, name, prev, next)
   }
 
-  val pages: Seq[Page] = documents.flatMap(_.pages)
+  private val pages: Seq[Page] = documents.flatMap(_.pages)
 
-  val missingPages: Seq[String] = pages.filterNot(_.isPresent).map(_.displayName)
+  private val missingPages: Seq[String] = pages.filterNot(_.isPresent).map(_.displayName)
 
   /// Check consistency
   check()
@@ -53,12 +54,7 @@ final class Collection(val directoryName: String, val title: String) {
 
   // TODO check order
 
-  def write(): Unit = {
-    writeIndex()
-    writeWrappers()
-  }
-
-  private def writeIndex(): Unit = {
+  def writeIndex(): Unit = {
     val content =
       <TEI xmlns="http://www.tei-c.org/ns/1.0">
         <teiHeader>
@@ -85,11 +81,7 @@ final class Collection(val directoryName: String, val title: String) {
 
 
     // Index
-    Util.write(collectionDirectory, "index.xml", content =
-      """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
-      """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
-      Xml.prettyPrinter.format(content)
-    )
+    Xml.write(collectionDirectory, "index", content)
 
     // Index wrapper
     Collection.write(collectionDirectory, "index.html", Seq(
@@ -100,7 +92,7 @@ final class Collection(val directoryName: String, val title: String) {
     ))
   }
 
-  private def writeWrappers(): Unit = {
+  def writeWrappers(): Unit = {
     for (document <- documents) {
       def documentName(what: String, name: String): Seq[(String, String)] = Seq(what -> s"'$name'")
 
