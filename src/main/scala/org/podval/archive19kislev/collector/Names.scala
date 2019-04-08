@@ -46,12 +46,12 @@ final class Names(directory: File, fileName: String) extends DocumentLike(direct
       override def transform(node: Node): Seq[Node] = node match {
         case namedElem: Elem if named2name.keySet.contains(namedElem.label) =>
           val id: Option[String] = namedElem.attributeOption("xml:id")
-          val mentionsElem: Elem = <p rendering="mentions">
+          val mentionsElem: Elem = <p rendition="mentions">
             {for (ref <- Util.removeConsecutiveDuplicates(resolvable.filter(_.ref == id).map(_.document)))
               yield <ref target={ref.url}>{ref.fileName}</ref>}</p>
 
           val (nonMentions, tail) = namedElem.child.span( _ match {
-              case elem: Elem if elem.label == "p" && (elem \ "@rendering").text == "mentions" => false
+              case elem: Elem if elem.label == "p" && (elem \ "@rendition").text == "mentions" => false
               case _ => true
             }
           )
