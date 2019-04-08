@@ -37,6 +37,7 @@ final class Names(directory: File, fileName: String) extends DocumentLike(direct
 
   val nameds: Seq[Named] = (persons ++ places ++ orgs).filter(_.id.isDefined)
 
+  def isUnresolved(name: Name): Boolean = find(name.ref.get).isEmpty
   def find(id: String): Option[Named] = nameds.find(_.id.contains(id))
 
   def addReferenced(references: Seq[Name]): Unit = {
@@ -48,7 +49,7 @@ final class Names(directory: File, fileName: String) extends DocumentLike(direct
           val id: Option[String] = namedElem.attributeOption("xml:id")
           val mentionsElem: Elem = <p rendition="mentions">
             {for (ref <- Util.removeConsecutiveDuplicates(resolvable.filter(_.ref == id).map(_.document)))
-              yield <ref target={ref.url}>{ref.fileName}</ref>}</p>
+              yield <ref target={ref.url} role="documentViewer">{ref.fileName}</ref>}</p>
 
           val (nonMentions, tail) = namedElem.child.span( _ match {
               case elem: Elem if elem.label == "p" && (elem \ "@rendition").text == "mentions" => false

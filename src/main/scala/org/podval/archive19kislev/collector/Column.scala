@@ -16,7 +16,7 @@ object Column {
     (data: D) => value(data).fold[Seq[Node]](Text(""))(_.child.map(removeNamespace))
   )
 
-  def removeNamespace(node: Node): Node = node match {
+  private def removeNamespace(node: Node): Node = node match {
     case e: Elem => e.copy(scope = TopScope, child = e.child.map(removeNamespace))
     case n => n
   }

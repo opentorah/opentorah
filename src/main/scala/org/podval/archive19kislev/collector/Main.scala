@@ -15,7 +15,7 @@ object Main {
   private val names: Names = new Names(docsDirectory, namesFileName)
 
   private val references: Seq[Name] =
-    names.names.toSeq ++
+    names.names ++
     (for { collection <- collections; document <- collection.documents } yield document.names).flatten
 
   private def report(): Unit = {
@@ -25,8 +25,7 @@ object Main {
 
     val missing: Seq[Name] = references.filter(_.isMissing).filterNot(_.name == "?")
     val malformed: Seq[Name] = references.filter(_.isMalformed)
-    val unresolved: Seq[Name] = references.filter(_.isResolvable)
-      .filter(reference => names.find(reference.ref.get).isEmpty)
+    val unresolved: Seq[Name] = references.filter(_.isResolvable).filter(names.isUnresolved)
 
     val failed: Boolean = missing.nonEmpty || malformed.nonEmpty || unresolved.nonEmpty
 
