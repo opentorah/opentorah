@@ -51,8 +51,8 @@ object Main {
     println("Writing collection index files.")
     collections.foreach(_.writeIndex())
 
-//    println("Writing wrappers.")
-//    collections.foreach(_.writeWrappers())
+    println("Writing wrappers.")
+    collections.foreach(_.writeWrappers())
 
     println("Adding back references.")
     names.addReferenced(references)

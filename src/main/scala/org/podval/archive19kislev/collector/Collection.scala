@@ -88,17 +88,19 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
       "title" -> title,
       "layout" -> "tei",
       "tei" -> "index.xml",
-      "wide" -> "true"
+      "wide" -> "true",
+      "target" -> "collectionViewer"
     ))
   }
 
   def writeWrappers(): Unit = {
     for (document <- documents) {
-      def documentName(what: String, name: String): Seq[(String, String)] = Seq(what -> s"'$name'")
+      def quote(what: String): String = s"'$what'"
 
-      val navigation: Seq[(String, String)] = documentName("self", document.name) ++
-        document.prev.map(prev => documentName("prev", prev)).getOrElse(Seq.empty) ++
-        document.next.map(next => documentName("next", next)).getOrElse(Seq.empty)
+      val navigation: Seq[(String, String)] =
+        document.prev.map(prev => Seq("prev" -> quote(prev))).getOrElse(Seq.empty) ++
+        Seq("self" -> quote(document.name)) ++
+        document.next.map(next => Seq("next" -> quote(next))).getOrElse(Seq.empty)
 
       // TEI wrapper
       Collection.write(documentsDirectory, s"${document.name}.html", Seq(
