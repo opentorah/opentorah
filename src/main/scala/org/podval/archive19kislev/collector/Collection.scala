@@ -84,7 +84,7 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
           <body>
             {Collection.table.toTei(documents)}
             {if (missingPages.isEmpty) Seq.empty
-             else <p>Отсутствуют фотографии страниц: {missingPages.mkString(" ")}</p>}
+             else <p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>}
           </body>
         </text>
       </TEI>
