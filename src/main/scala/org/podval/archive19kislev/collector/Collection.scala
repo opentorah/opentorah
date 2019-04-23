@@ -105,7 +105,8 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
       // TEI wrapper
       Collection.write(documentsDirectory, s"${document.name}.html", Seq(
         "layout" -> "tei",
-        "tei" -> s"'../${Collection.teiDirectoryName}/${document.name}.xml'"
+        "tei" -> s"'../${Collection.teiDirectoryName}/${document.name}.xml'",
+        "facs" -> s"'../${Collection.viewersDirectoryName}/${document.name}.html'"
       ) ++ navigation
       )
 
