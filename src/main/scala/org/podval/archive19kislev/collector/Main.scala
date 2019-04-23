@@ -36,12 +36,10 @@ object Main {
 
     Util.write(Main.docsDirectory, "status.md",
       Seq(
-        "---",
-        "title: Status report",
-        "layout: page",
-        "---"
-      ) ++
-        toStrings
+        "title" ->"Status report",
+        "layout" -> "page"
+      ),
+      toStrings
     )
     if (failed)
       throw new IllegalArgumentException("\nTEI validation failed!\n" + toStrings.mkString("\n"))

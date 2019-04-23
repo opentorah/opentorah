@@ -6,8 +6,21 @@ object Util {
   def write(
     directory: File,
     fileName: String,
-    content: Seq[String]
-  ): Unit = write(directory, fileName, content.mkString("\n"))
+    yaml: Seq[(String, String)],
+    content: Seq[String] = Seq.empty
+  ): Unit = {
+    val result: Seq[String] =
+      Seq("---") ++
+      (for ((name, value) <- yaml) yield name + ": " + value) ++
+      Seq("---") ++
+      Seq("")
+
+    write(
+      directory,
+      fileName,
+      (result ++ content).mkString("\n")
+    )
+  }
 
   def write(
     directory: File,

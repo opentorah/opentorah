@@ -7,7 +7,8 @@ final class Document(
   val collection: Collection,
   val name: String,
   val prev: Option[String],
-  val next: Option[String]
+  val next: Option[String],
+  val translations: Seq[String]
 ) extends DocumentLike(collection.teiDirectory, name) {
 
   override def url: String = collection.documentUrl(name)
@@ -52,4 +53,36 @@ final class Document(
 
   def addressee: Option[Name] =
     persNames.find(_.role.contains("addressee"))
+
+  def writeWrappers(): Unit = {
+    def quote(what: String): String = s"'$what'"
+
+    val navigation: Seq[(String, String)] =
+      prev.map(prev => Seq("prev" -> quote(prev))).getOrElse(Seq.empty) ++
+      Seq("self" -> quote(name)) ++
+      next.map(next => Seq("next" -> quote(next))).getOrElse(Seq.empty)
+
+    def writeTeiWrapper(name: String, lang: Option[String]): Unit = {
+      val nameWithLang: String = lang.fold(name)(lang => name + "-" + lang)
+
+      Util.write(collection.documentsDirectory, s"$nameWithLang.html", Seq(
+        "layout" -> "tei",
+        "tei" -> s"'../${Collection.teiDirectoryName}/$nameWithLang.xml'",
+        "facs" -> s"'../${Collection.viewersDirectoryName}/$name.html'"
+      ) ++ (if (lang.isDefined || translations.isEmpty) Seq.empty else Seq("translations" -> translations.mkString("[", ", ", "]")))
+        ++ navigation
+      )
+    }
+
+    // TEI wrapper(s)
+    writeTeiWrapper(name, None)
+    for (lang <- translations) writeTeiWrapper(name, Some(lang))
+
+    // Facsimile viewer
+    Util.write(collection.viewersDirectory, s"$name.html", Seq(
+      "layout" -> "facsimile",
+      "images" -> pages.filter(_.isPresent).map(_.name).mkString("[", ", ", "]")
+    ) ++ navigation
+    )
+  }
 }

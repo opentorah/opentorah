@@ -10,14 +10,24 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
   private val collectionDirectory = new File(docsDirectory, directoryName)
   val teiDirectory = new File(collectionDirectory, Collection.teiDirectoryName)
   private val facsimilesDirectory = new File(collectionDirectory, Collection.facsimilesDirectoryName)
-  private val documentsDirectory = new File(collectionDirectory, Collection.documentsDirectoryName)
-  private val viewersDirectory = new File(collectionDirectory, Collection.viewersDirectoryName)
+  val documentsDirectory = new File(collectionDirectory, Collection.documentsDirectoryName)
+  val viewersDirectory = new File(collectionDirectory, Collection.viewersDirectoryName)
 
   def documentUrl(name: String): String =
     "/" + directoryName + "/" + Collection.documentsDirectoryName + "/" + name + ".html"
 
   val documents: Seq[Document] = {
-    val names: Seq[String] = Collection.listNames(teiDirectory, ".xml", Page.checkBase)
+    def splitLang(name: String): (String, Option[String]) = {
+      val dash: Int = name.lastIndexOf('-')
+      if (dash != name.length-3) (name, None) else (name.substring(0, dash), Some(name.substring(dash+1)))
+    }
+    val namesWithLang: Seq[(String, Option[String])] =
+      Collection.listNames(teiDirectory, ".xml", Page.checkBase).map(splitLang)
+
+    val translations: Map[String, Seq[String]] =
+      namesWithLang.filter(_._2.isDefined).map(e => (e._1, e._2.get)).groupBy(_._1).mapValues(_.map(_._2))
+
+    val names: Seq[String] = namesWithLang.filter(_._2.isEmpty).map(_._1)
 
     val namesWithSiblings: Seq[(String, (Option[String], Option[String]))] = {
       val documentOptions: Seq[Option[String]] = names.map(Some(_))
@@ -27,7 +37,7 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
     }
 
     for ((name, (prev, next)) <- namesWithSiblings)
-    yield new Document(this, name, prev, next)
+    yield new Document(this, name, prev, next, translations.getOrElse(name, Seq.empty))
   }
 
   private val pages: Seq[Page] = documents.flatMap(_.pages)
@@ -84,7 +94,7 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
     Xml.write(collectionDirectory, "index", content)
 
     // Index wrapper
-    Collection.write(collectionDirectory, "index.html", Seq(
+    Util.write(collectionDirectory, "index.html", Seq(
       "title" -> title,
       "layout" -> "tei",
       "tei" -> "index.xml",
@@ -93,31 +103,7 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
     ))
   }
 
-  def writeWrappers(): Unit = {
-    for (document <- documents) {
-      def quote(what: String): String = s"'$what'"
-
-      val navigation: Seq[(String, String)] =
-        document.prev.map(prev => Seq("prev" -> quote(prev))).getOrElse(Seq.empty) ++
-        Seq("self" -> quote(document.name)) ++
-        document.next.map(next => Seq("next" -> quote(next))).getOrElse(Seq.empty)
-
-      // TEI wrapper
-      Collection.write(documentsDirectory, s"${document.name}.html", Seq(
-        "layout" -> "tei",
-        "tei" -> s"'../${Collection.teiDirectoryName}/${document.name}.xml'",
-        "facs" -> s"'../${Collection.viewersDirectoryName}/${document.name}.html'"
-      ) ++ navigation
-      )
-
-      // Facsimile viewer
-      Collection.write(viewersDirectory, s"${document.name}.html", Seq(
-        "layout" -> "facsimile",
-        "images" -> document.pages.filter(_.isPresent).map(_.name).mkString("[", ", ", "]")
-      ) ++ navigation
-      )
-    }
-  }
+  def writeWrappers(): Unit = for (document <- documents) document.writeWrappers()
 }
 
 object Collection {
@@ -149,23 +135,5 @@ object Collection {
     val result = directory.listFiles.toSeq.map(_.getName).filter(_.endsWith(extension)).map(_.dropRight(extension.length))
     //    result.foreach(check)
     result.sorted
-  }
-
-  private def write(
-    directory: File,
-    fileName: String,
-    yaml: Seq[(String, String)]
-  ): Unit = {
-    val result: Seq[String] =
-      Seq("---") ++
-        (for ((name, value) <- yaml) yield name + ": " + value) ++
-        Seq("---") ++
-        Seq("")
-
-    Util.write(
-      directory,
-      fileName,
-      result
-    )
   }
 }
