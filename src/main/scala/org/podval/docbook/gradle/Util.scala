@@ -74,8 +74,12 @@ object Util {
     scala.io.Source.fromInputStream(is).getLines.mkString("\n")
   }
 
-  def readFrom(file: File): String =
-    scala.io.Source.fromFile(file).getLines.mkString("\n")
+  def readFrom(file: File): String = {
+    val source = scala.io.Source.fromFile(file)
+    val result = source.getLines.mkString("\n")
+    source.close()
+    result
+  }
 
   def writeInto(file: File, logger: Logger, replace: Boolean)(content: => String): Unit = {
     if (!replace && file.exists) {

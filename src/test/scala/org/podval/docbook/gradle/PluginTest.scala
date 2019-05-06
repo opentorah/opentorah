@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class PluginTest extends FlatSpec with Matchers {
 
-  "result" should "contain the title" in {
+  "Plugin" should "preserve the title" in {
     val project: PluginTestProject = new PluginTestProject(name="title", document =
       """<article xmlns="http://docbook.org/ns/docbook" version="5.0">
         |  <info>
@@ -57,7 +57,7 @@ class PluginTest extends FlatSpec with Matchers {
     indexHtml.contains("Unknown processing instruction:.") shouldBe true
   }
 
-  "Plugin" should "fail resolving entity substitutions without DTD enabled" in {
+  it should "fail resolving entity substitutions without DTD enabled" in {
     val project: PluginTestProject = new PluginTestProject(name="substitutions-without-DTD", document =
       """<article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink">
         |  <para>Processing instruction: <?eval version ?>.</para>

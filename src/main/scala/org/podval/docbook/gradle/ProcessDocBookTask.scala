@@ -63,6 +63,9 @@ class ProcessDocBookTask extends DefaultTask {
   @Input @BeanProperty val outputFormats: ListProperty[String] =
     getProject.getObjects.listProperty(classOf[String])
 
+  @Input @BeanProperty val isMathJaxEnabled: Property[Boolean] =
+    getProject.getObjects.property(classOf[Boolean])
+
   @Input @BeanProperty val isJEuclidEnabled: Property[Boolean] =
     getProject.getObjects.property(classOf[Boolean])
 
@@ -185,6 +188,7 @@ class ProcessDocBookTask extends DefaultTask {
       docBook2.postProcess(
         layout = layout,
         substitutions = substitutions,
+        isMathJaxEnabled = isMathJaxEnabled.get,
         isJEuclidEnabled = isJEuclidEnabled.get,
         inputDirectory = saxonOutputDirectory,
         inputFile = saxonOutputFile,

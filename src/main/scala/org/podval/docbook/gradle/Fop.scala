@@ -11,6 +11,7 @@ import org.apache.fop.apps.{FOUserAgent, FopConfParser, FopFactory}
 import org.apache.xmlgraphics.util.MimeConstants
 import org.apache.fop.fonts.{FontEventListener, FontTriplet}
 import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
+import org.podval.docbook.gradle.mathjax.FopPlugin
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.SortedMap
@@ -19,7 +20,9 @@ object Fop {
 
   def run(
     configurationFile: File,
+    nodeModulesRoot: File,
     substitutions: Map[String, String],
+    isMathJaxEnabled: Boolean,
     isJEuclidEnabled: Boolean,
     inputFile: File,
     inputDirectory: File,
@@ -29,19 +32,25 @@ object Fop {
     logger.info(
       s"""Fop.run(
          |  configurationFile = $configurationFile,
+         |  nodeModulesRoot = $nodeModulesRoot,
          |  inputFile = $inputFile,
          |  inputDirectory = $inputDirectory,
          |  outputFile = $outputFile,
+         |  isMathJaxEnabled = $isMathJaxEnabled,
+         |  isJEuclidEnabled = $isJEuclidEnabled
          |)""".stripMargin
     )
 
-    val fopFactory: FopFactory = getFopFactory(configurationFile)
+    val fopFactory: FopFactory = getFopFactory(inputFile)
 
-    if (isJEuclidEnabled) JEuclidFopFactoryConfigurator.configure(fopFactory)
-
-    val foUserAgent: FOUserAgent = fopFactory.newFOUserAgent
+    require(!isMathJaxEnabled || !isJEuclidEnabled)
+    if (isMathJaxEnabled) FopPlugin.configure(fopFactory, nodeModulesRoot)
+    else if (isJEuclidEnabled) JEuclidFopFactoryConfigurator.configure(fopFactory)
 
     // PDF metadata:
+    val foUserAgent: FOUserAgent = fopFactory.newFOUserAgent
+    // TODO resolution?
+
     foUserAgent.setCreator(Util.applicationString)
     substitutions.get("creationDate").foreach { creationDate =>
       val format: java.text.DateFormat = new java.text.SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy")

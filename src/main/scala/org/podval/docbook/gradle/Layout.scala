@@ -55,6 +55,9 @@ final class Layout(projectDir: File, buildDir: File) {
   def buildDirectory(name: String): File = new File(buildDir, name)
   def buildDirectoryRelative(name: String): String = s"$buildDirRelative/$name/"
 
+  // node modules
+  def nodeModulesRoot: File = buildDir
+
   // build/docBookXslt[2]
   def docBookXslDirectory(docBookXslDirectoryName: String): File = buildDirectory(docBookXslDirectoryName)
   def docBookXslDirectoryRelative(docBookXslDirectoryName: String): String = buildDirectoryRelative(docBookXslDirectoryName)

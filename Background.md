@@ -230,6 +230,39 @@ that'd make my builds non-repeatable even if I could afford a commercial one.
 Markdown has its uses for presentation-only quickies like websites (GitHub pages).
 Fashionable AsciiDoc (?) publishing systems lose what is important to me: semantic markup; they are purely presentation-oriented.
 
+## MathJax FOP plugin ##
+
+MathJax for Node.js:
+  https://docs.mathjax.org/en/latest/advanced/mathjax-node.html
+  https://github.com/mathjax/MathJax-node
+
+NPM Plugin:
+ com.moowork.gradle:gradle-node-plugin
+ https://github.com/srs/gradle-node-plugin
+
+Java-to-Node.js binding:
+  https://github.com/eclipsesource/J2V8
+  com.eclipsesource.j2v8:j2v8;
+  does not ship for anything other than Android for years;
+  old version of Node.js (7.4.0; current is 12.0.0);
+  package is platform-specific; 
+  the only other alternative is https://github.com/graalvm/graaljs?
+
+if svg element has attribute xmlns="http://www.w3.org/2000/svg", bot not version="1.1":
+java.lang.ClassCastException:
+org.apache.batik.dom.GenericElement cannot be cast to
+org.apache.batik.anim.dom.SVGOMElement
+at org.apache.fop.fo.extensions.svg.SVGElement.getDimension(SVGElement.java:134)
+
+On previous attempts to handle in-line math:
+http://ricardo.ecn.wfu.edu/~cottrell/dbtexmath/about.pdf
+This should be done with an XML filter installed before DocBook for PDF processing only...
+
+When I swap MathML for SVG right in the Preloader, quality sucks.
+Do I need to supply loader and converter - or can I affect the quality of the SVG?
+Or can I tweak PDFImageHandlerSVG somehow?
+Or maybe I'll get lucky and this will turn out to be just a font configuration issue?
+
 ## XSLT 2.0 ##
 
 XSLT 1.0 DocBook stylesheets rely on multi-output extension of Saxon for chunking HTML.

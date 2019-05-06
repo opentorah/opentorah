@@ -7,7 +7,8 @@ class PluginTestProject(
   val name: String,
   val document: String,
   val documentName: String = "test",
-  val substitutions: Map[String, String] = Map.empty
+  val substitutions: Map[String, String] = Map.empty,
+  val taskName: String = "processDocBook"
 ) {
   val pluginDir: File = new File("build").getAbsoluteFile.getParentFile
   val projectDir: File = new File(s"build/pluginTestProject/$name").getAbsoluteFile
@@ -16,13 +17,12 @@ class PluginTestProject(
   val buildGradle: String =
     s"""plugins {
        |  id "org.podval.docbook-gradle-plugin" version "1.0.0"
+       |  id 'base'
        |}
        |
        |repositories {
        |  jcenter()
        |}
-       |
-       |apply plugin: 'base'
        |
        |docBook {
        |  document = "$documentName"
@@ -83,7 +83,7 @@ class PluginTestProject(
 
     GradleRunner.create
       .withProjectDir(projectDir)
-      .withArguments("-i", "clean", "processDocBook")
+      .withArguments("-i", "clean", taskName)
   }
 
   private def indexHtml: String = Util.readFrom(indexHtmlFile)

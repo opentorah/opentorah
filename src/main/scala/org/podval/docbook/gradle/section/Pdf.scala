@@ -36,6 +36,7 @@ object Pdf extends DocBook2 {
   override def postProcess(
     layout: Layout,
     substitutions: Map[String, String],
+    isMathJaxEnabled: Boolean,
     isJEuclidEnabled: Boolean,
     inputDirectory: File,
     inputFile: File,
@@ -43,7 +44,9 @@ object Pdf extends DocBook2 {
     logger: Logger
   ): Unit = Fop.run(
     configurationFile = layout.fopConfigurationFile,
+    nodeModulesRoot = layout.nodeModulesRoot,
     substitutions: Map[String, String],
+    isMathJaxEnabled = isMathJaxEnabled,
     isJEuclidEnabled = isJEuclidEnabled,
     inputFile = inputFile,
     inputDirectory = inputDirectory,

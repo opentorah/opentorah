@@ -23,6 +23,7 @@ trait Epub extends DocBook2 {
   final override def postProcess(
     layout: Layout,
     substitutions: Map[String, String],
+    isMathJaxEnabled: Boolean,
     isJEuclidEnabled: Boolean,
     inputDirectory: File,
     inputFile: File,

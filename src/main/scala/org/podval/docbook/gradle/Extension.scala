@@ -34,6 +34,9 @@ class Extension(project: Project) {
   @BeanProperty val cssFile: Property[String] =
     project.getObjects.property(classOf[String])
 
+  @BeanProperty val isMathJaxEnabled: Property[Boolean] =
+    project.getObjects.property(classOf[Boolean])
+
   @BeanProperty val isJEuclidEnabled: Property[Boolean] =
     project.getObjects.property(classOf[Boolean])
 
