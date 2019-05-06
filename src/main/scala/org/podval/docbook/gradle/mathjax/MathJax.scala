@@ -6,8 +6,6 @@ import com.eclipsesource.v8.{NodeJS, V8, V8Array, V8Function, V8Object}
 
 final class MathJax(nodeModulesRoot: File) {
 
-  MathJax.loadV8()
-
   private val nodeJS: NodeJS = NodeJS.createNodeJS()
   private val v8: V8 = nodeJS.getRuntime
   private val mathJaxNode: V8Object = nodeJS.require(new File(nodeModulesRoot, "node_modules/mathjax-node"))
@@ -100,15 +98,12 @@ final class MathJax(nodeModulesRoot: File) {
 }
 
 object MathJax {
-  private def libraryExtractDirectory: File = new File("/tmp/j2v8/")
-  private var loadedV8: Boolean = false
-  def loadV8(): Unit = {
-    if (!loadedV8) {
-      loadedV8 = true
-      val tmpDirectory: File = libraryExtractDirectory
-      tmpDirectory.mkdirs()
-      V8.createV8Runtime("dummy", tmpDirectory.getAbsolutePath).release()
-    }
+  // TODO arrange things so that this is called and there are no extracted libraries in the home directory -
+  //  and use official tmp directory!
+  {
+    val libraryExtractDirectory: File = new File("/tmp/j2v8/")
+    libraryExtractDirectory.mkdirs()
+    V8.createV8Runtime("dummy", libraryExtractDirectory.getAbsolutePath).release()
   }
 
   sealed trait Input {

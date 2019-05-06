@@ -6,5 +6,5 @@ class MathJaxObj(parent: FONode) extends XMLObj(parent) {
 
   override def getNamespaceURI: String = FopPlugin.MathMLNameSpace
 
-  override def getNormalNamespacePrefix: String = "mathml"
+  override def getNormalNamespacePrefix: String = FopPlugin.MathMLNameSpacePrefix
 }

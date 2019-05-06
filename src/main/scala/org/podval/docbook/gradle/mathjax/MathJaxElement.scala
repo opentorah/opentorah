@@ -4,34 +4,28 @@ import java.awt.geom.Point2D
 
 import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.{FOEventHandler, FONode, PropertyList}
-import org.apache.fop.fo.properties.FixedLength
 import org.xml.sax.{Attributes, Locator}
 
 class MathJaxElement(parent: FONode, mathJax: MathJax) extends MathJaxObj(parent) {
 
   private var parameters: Option[Parameters] = None
 
-  private def setParameter[T](parameter: Parameters.Parameter[T], value: T): Unit = {
-    if (parameters.isEmpty) parameters = Some(new Parameters)
-    parameters.get.setParameter(parameter, value)
+  override protected def createPropertyList(
+    pList: PropertyList,
+    foEventHandler: FOEventHandler
+  ): PropertyList = {
+    parameters = Some(new Parameters)
+
+    val commonFont = pList.getFontProps
+
+    parameters.get.setParameter(Parameters.FontSize,
+      (commonFont.fontSize.getNumericValue / Sizes.Points2Millipoints).toFloat)
+
+    parameters.get.setParameter(Parameters.Fonts,
+      commonFont.getFontState(getFOEventHandler.getFontInfo).toList.map(_.getName))
+
+    super.createPropertyList(pList, foEventHandler)
   }
-
-  private var sizes: Option[MathJaxElement.Sizes] = None
-
-  private def getSizes: MathJaxElement.Sizes = sizes.getOrElse {
-    val svgDocument = FopPlugin.mathML2SVG(doc, mathJax)
-    val viewSizes = FopPlugin.getSizes(svgDocument)
-    val result = new MathJaxElement.Sizes(
-      size = new Point2D.Float(viewSizes.width, viewSizes.height),
-      baseline = FixedLength.getInstance(-viewSizes.descent, "pt")
-    )
-    sizes = Some(result)
-    result
-  }
-
-  override def getDimension(view: Point2D): Point2D = getSizes.size
-
-  override def getIntrinsicAlignmentAdjust: Length = getSizes.baseline
 
   override def processNode(
     elementName: String,
@@ -40,39 +34,31 @@ class MathJaxElement(parent: FONode, mathJax: MathJax) extends MathJaxObj(parent
     propertyList: PropertyList
   ): Unit = {
     super.processNode(elementName, locator, attlist, propertyList)
-
-    createBasicDocument()
-
-    parameters.foreach(_.serializeInto(getDOMDocument.getDocumentElement))
+    parameters.foreach(_.serializeInto(createBasicDocument().getDocumentElement))
   }
 
-  override protected def createPropertyList(
-    pList: PropertyList,
-    foEventHandler: FOEventHandler
-  ): PropertyList = {
-    val commonFont = pList.getFontProps
+  // NOTE: It is tempting to typeset MathML to SVG right here to avoid duplicate conversions
+  // - one here in getSizes() and another one in PreloaderMathML -
+  // but resulting SVG is then preloaded by FOP itself (our preloader doesn't get called),
+  // and since there is no CSSEngine, there is no font size, which crashes in sizes calculations.
+  //
+  // Namespace of the document element is not modifiable, so I can't just re-label SVG as MathJax
+  // to force FOP to call our preloader. I guess the only way is to wrap resulting SVG in a document
+  // in the MathJax namespace...
+  //
+  //   override def finalizeNode(): Unit = {
+  //     doc = FopPlugin.mathML2SVG(doc, mathJax)
+  //   }
 
-    setParameter(Parameters.MathSize,
-      (commonFont.fontSize.getNumericValue / FopPlugin.Points2Millipoints).toFloat)
+  private var sizes: Option[Sizes] = None
 
-    setParameter(Parameters.FontsSerif,
-      commonFont.getFontState(getFOEventHandler.getFontInfo).toList.map(_.getName))
-
-    //    final Property colorProp = pList.get(org.apache.fop.fo.Constants.PR_COLOR)
-//    if (colorProp != null) {
-//      final Color color = colorProp.getColor(getUserAgent())
-//      layoutContext.setParameter(Parameter.MATHCOLOR, color)
-//    }
-//    final Property bcolorProp = pList.get(org.apache.fop.fo.Constants.PR_BACKGROUND_COLOR)
-//    if (bcolorProp != null) {
-//      final Color bcolor = bcolorProp.getColor(getUserAgent())
-//      layoutContext.setParameter(Parameter.MATHBACKGROUND, bcolor)
-//    }
-
-    super.createPropertyList(pList, foEventHandler)
+  private def getSizes: Sizes = sizes.getOrElse {
+    val result = Sizes(FopPlugin.mathML2SVG(doc, mathJax))
+    sizes = Some(result)
+    result
   }
-}
 
-object MathJaxElement {
-  private final class Sizes(val size: Point2D, val baseline: Length)
+  override def getDimension(view: Point2D): Point2D = getSizes.getPoint
+
+  override def getIntrinsicAlignmentAdjust: Length = getSizes.getIntrinsicAlignmentAdjust
 }

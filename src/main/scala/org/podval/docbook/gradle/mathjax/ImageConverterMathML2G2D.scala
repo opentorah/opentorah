@@ -16,17 +16,14 @@ final class ImageConverterMathML2G2D(mathJax: MathJax) extends AbstractImageConv
   override def convert(src: Image, hints: java.util.Map[_, _]): Image = {
     val mathmlDocument: Document = src.asInstanceOf[ImageXMLDOM].getDocument
     val svgDocument: SVGDocument = FopPlugin.mathML2SVG(mathmlDocument, mathJax)
-    val sizes: FopPlugin.Sizes = FopPlugin.getSizes(svgDocument)
+    val sizes: Sizes = Sizes(svgDocument)
 
     new ImageGraphics2D(src.getInfo, new Graphics2DImagePainter {
-      override def getImageSize: Dimension = new Dimension(
-        FopPlugin.toMilliPoints(sizes.width),
-        FopPlugin.toMilliPoints(sizes.height)
-      )
+      override def getImageSize: Dimension = sizes.getDimension
 
       override def paint(graphics2d: Graphics2D, rectangle2d: Rectangle2D): Unit = {
-        val x: Float = 0
-        val y: Float = sizes.ascent
+        //val x: Float = 0
+        //val y: Float = sizes.ascent
         val  hints: RenderingHints = graphics2d.getRenderingHints
         hints.add(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON))
         hints.add(new RenderingHints(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE))

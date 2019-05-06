@@ -18,41 +18,7 @@ import org.apache.xmlgraphics.image.loader.spi.{ImageImplRegistry, ImageLoader, 
 import org.w3c.dom.{DOMImplementation, Document, Element}
 import org.w3c.dom.svg.SVGDocument
 
-/*
-  Inspired by the JEuclid FOP plugin.
-
-  TODO PreloaderMathML typesets MathML to SVG and hands it over to FOP for rendering;
-
-  - it should be possible to typeset right in the MathJaxElement.processNode() to
-  avoid duplicate conversions;
-
-  - get clarity on the scaling factor that PreloaderMathML does have access to,
-  but MathJaxElement doesn't;
-
-  - find a way to configure SVG rendering with hints and such
-  (see ImageLoader, ImageConverterMathML2G2D);
-
-  - the same is true for SVG rendering in xmlHandler - if I need that at all?
-
-  - JEuclid's MathML preloader also parses MathML from a stream. Do I need this?
-
-  - parameters not relevant to MathJax should be removed, and the ones relevant - set properly :)
-
-  - use Scala's Serializable for Parameters - and set  'private static final long serialVersionUID = 1L'
-
-  - deal with nullable Parameters;
-
-  - add MathJax configuration (fonts, extensions etc.);
-
-  - handle re-configuration of MathJax for fonts used in FO;
-
-
-  If we need to make the pipeline longer:
-  - in PreloaderMathML, set imageInfo.mimeType to FopPlugin.MathMLMimeType;
-  - in PreloaderMathMl, set image.rootNameSpace to FopPlugin.MathMLNameSpace;
-  - complete ImageConverterMathML2G2D;
-  - configure imageLoaderFactory and imageConverter
- */
+//  Inspired by the JEuclid FOP plugin.
 final class FopPlugin(nodeModulesRoot: File) {
 
   private def configure(fopFactory: FopFactory): Unit = {
@@ -142,26 +108,35 @@ final class FopPlugin(nodeModulesRoot: File) {
 object FopPlugin {
   val MathMLNameSpace: String = "http://www.w3.org/1998/Math/MathML"
 
+  val MathMLNameSpacePrefix: String = "mathml"
+
   val MathMLElementName: String = "math"
 
   val MathMLMimeType: String = "application/mathml+xml"
 
-  val Points2Millipoints: Float = 1000.0f
+  val MathJaxNameSpace = "http://podval.org/mathjax/ns/ext"
+
+  val MathJaxAttributePrefix: String = "mathjax:"
 
   def configure(fopFactory: FopFactory, nodeModulesRoot: File): Unit =
     new FopPlugin(nodeModulesRoot).configure(fopFactory)
 
-  def isMathML(document: Document): Boolean = {
-    val rootNode: Element = document.getDocumentElement
-    (rootNode.getNamespaceURI == FopPlugin.MathMLNameSpace) &&
-      (rootNode.getNodeName == FopPlugin.MathMLElementName)
-  }
-
   def mathML2SVG(mathMLDocument: Document, mathJax: MathJax): SVGDocument = {
     val parameters: Parameters = Parameters(mathMLDocument.getDocumentElement)
 
-    val mathml: String = toString(mathMLDocument)
-    val svg: String = mathJax.typeset2String(mathml, MathJax.MathML, MathJax.Svg)
+    val svg: String = {
+      // TODO inline or display: look at the attribute(s) of the foreign object element...
+      val mode = mathMLDocument.getDocumentElement.getAttribute("mode")
+      if (mode == "tex") {
+        val mrow = mathMLDocument.getDocumentElement.getElementsByTagName("mrow").item(0).asInstanceOf[Element]
+        val mi = mrow.getElementsByTagName("mi").item(0).asInstanceOf[Element]
+        val tex = mi.getTextContent
+        mathJax.typeset2String(tex, MathJax.Tex, MathJax.Svg)
+      } else {
+        val mathml: String = toString(mathMLDocument)
+        mathJax.typeset2String(mathml, MathJax.MathML, MathJax.Svg)
+      }
+    }
 
     val in = new UnclosableInputStream(new StringBufferInputStream(svg))
     val length: Int = in.available()
@@ -171,10 +146,19 @@ object FopPlugin {
     // transplant the parameters
     parameters.serializeInto(svgDocument.getRootElement)
 
+    toSVG(svgDocument)
+  }
+
+  def toSVG(document: Document): SVGDocument = {
+    val result = document.asInstanceOf[SVGDocument]
+
+    val parameters: Parameters = Parameters(result.getDocumentElement)
+
     // supply (just) the font size for the sizes calculations
-    val mathSize: Float = parameters.getParameter(Parameters.MathSize)
-    svgDocument.getRootElement.asInstanceOf[SVGOMElement].setSVGContext(new SVGContext {
-      override def getFontSize: Float = mathSize
+    val fontSize: Float = parameters.getParameter(Parameters.FontSize)
+
+    result.getDocumentElement.asInstanceOf[SVGOMElement].setSVGContext(new SVGContext {
+      override def getFontSize: Float = fontSize
 
       override def getPixelUnitToMillimeter: Float = ???
       override def getPixelToMM: Float = ???
@@ -187,7 +171,7 @@ object FopPlugin {
       override def getViewportHeight: Float = ???
     })
 
-    svgDocument
+    result
   }
 
   def toString(document: Document): String = xmlSerializer.writeToString(document)
@@ -195,31 +179,4 @@ object FopPlugin {
   private val xmlSerializer: LSSerializerImpl = new org.apache.xml.serializer.dom3.LSSerializerImpl
 
   private val svgFactory: SAXSVGDocumentFactory = new SAXSVGDocumentFactory(PreloaderSVG.getParserName)
-
-  final class Sizes(val width: Float, val ascent: Float, val descent: Float) {
-    def height: Float = ascent + descent
-  }
-
-  def getSizes(svgDocument: SVGDocument): Sizes = {
-    val descent: Float = getDescent(svgDocument)
-    val width = svgDocument.getRootElement.getWidth.getBaseVal.getValue
-    val height = svgDocument.getRootElement.getHeight.getBaseVal.getValue
-    new Sizes(
-      width = width,
-      ascent = height - descent,
-      descent = descent
-    )
-  }
-
-  private val verticalAlignCss: String = "vertical-align:"
-  private val verticalAlignUnits: String = "ex" // TODO can it be in other units and require proper parsing?
-  private def getDescent(svgDocument: SVGDocument): Float =
-    svgDocument.getRootElement.getAttribute("style")
-      .split(";").map(_.trim).filterNot(_.isEmpty)
-      .find(a => a.startsWith(verticalAlignCss) && a.endsWith("ex"))
-      .map(_.drop(verticalAlignCss.length).dropRight(verticalAlignUnits.length).trim)
-      .map(a => -a.toFloat)
-      .getOrElse(0.0f)
-
-  def toMilliPoints(value: Float): Int = Math.round(value * FopPlugin.Points2Millipoints) // TODO .ceil?
 }
