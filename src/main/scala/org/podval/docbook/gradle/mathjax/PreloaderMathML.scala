@@ -20,7 +20,9 @@ final class PreloaderMathML(mathJax: MathJax) extends AbstractImagePreloader {
     val document: Document = src.asInstanceOf[DOMSource].getNode.asInstanceOf[Document]
 
     if (!isMathML(document)) null else  {
-      val svgDocument: SVGDocument = FopPlugin.mathML2SVG(document, mathJax)
+      val parameters: Parameters = Parameters(document.getDocumentElement)
+      val ex: Int = parameters.getParameter(Parameters.FontSize).toInt
+      val svgDocument: SVGDocument = FopPlugin.mathML2SVG(document, mathJax, ex)
       val sizes: Sizes = Sizes(svgDocument)
 
       val result: ImageInfo = new ImageInfo(uri, MimeConstants.MIME_SVG)

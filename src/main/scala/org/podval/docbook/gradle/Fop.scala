@@ -41,7 +41,11 @@ object Fop {
          |)""".stripMargin
     )
 
-    val fopFactory: FopFactory = getFopFactory(inputFile)
+    // TODO when I gave inputFile as a configuration file to FOP by mistake,
+    // it started complaining about mixed content in FO around equations
+    // (although the only thing in the real configuration file is the font auto-detection);
+    // when I fixed it, MathJax font size became TOO BIg - and spaces between 'sin' and 'a' disappeared - just like for JEuclid?!
+    val fopFactory: FopFactory = getFopFactory(configurationFile, inputFile)
 
     require(!isMathJaxEnabled || !isJEuclidEnabled)
     if (isMathJaxEnabled) FopPlugin.configure(fopFactory, nodeModulesRoot)
@@ -131,7 +135,7 @@ object Fop {
   }
 
   def getFontFamilies(configurationFile: File): SortedMap[String, List[FontSpec]] = {
-    val fopFactory: FopFactory = getFopFactory(configurationFile)
+    val fopFactory: FopFactory = getFopFactory(configurationFile, configurationFile)
 
     val fontEventListener: FontEventListener  = new FontEventListener {
       override def fontLoadingErrorAtAutoDetection(source: AnyRef, fontURL: String, e: Exception): Unit =
@@ -149,8 +153,8 @@ object Fop {
       .mapValues(_.asScala.toList)
   }
 
-  private def getFopFactory(configurationFile: File): FopFactory =
-    new FopConfParser(configurationFile, configurationFile.getParentFile.toURI)
+  private def getFopFactory(configurationFile: File, inputFile: File): FopFactory =
+    new FopConfParser(configurationFile, inputFile.getParentFile.toURI)
       .getFopFactoryBuilder
       .build
 }

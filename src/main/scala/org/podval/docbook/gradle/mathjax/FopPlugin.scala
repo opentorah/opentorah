@@ -98,8 +98,7 @@ final class FopPlugin(nodeModulesRoot: File) {
   private var mathJax: Option[MathJax] = None
 
   private def getMathJax: MathJax = mathJax.getOrElse {
-    val result = new MathJax(nodeModulesRoot)
-    result.open()
+    val result = new MathJax(nodeModulesRoot, MathJax.Config())
     mathJax = Some(result)
     result
   }
@@ -114,27 +113,24 @@ object FopPlugin {
 
   val MathMLMimeType: String = "application/mathml+xml"
 
-  val MathJaxNameSpace = "http://podval.org/mathjax/ns/ext"
-
-  val MathJaxAttributePrefix: String = "mathjax:"
-
   def configure(fopFactory: FopFactory, nodeModulesRoot: File): Unit =
     new FopPlugin(nodeModulesRoot).configure(fopFactory)
 
-  def mathML2SVG(mathMLDocument: Document, mathJax: MathJax): SVGDocument = {
+  def mathML2SVG(mathMLDocument: Document, mathJax: MathJax, ex: Int = 6): SVGDocument = { // TODO drop the default for 'ex'
     val parameters: Parameters = Parameters(mathMLDocument.getDocumentElement)
 
     val svg: String = {
       // TODO inline or display: look at the attribute(s) of the foreign object element...
-      val mode = mathMLDocument.getDocumentElement.getAttribute("mode")
-      if (mode == "tex") {
-        val mrow = mathMLDocument.getDocumentElement.getElementsByTagName("mrow").item(0).asInstanceOf[Element]
-        val mi = mrow.getElementsByTagName("mi").item(0).asInstanceOf[Element]
-        val tex = mi.getTextContent
-        mathJax.typeset2String(tex, MathJax.Tex, MathJax.Svg)
-      } else {
-        val mathml: String = toString(mathMLDocument)
-        mathJax.typeset2String(mathml, MathJax.MathML, MathJax.Svg)
+      parameters.getParameter(Parameters.Mode) match {
+        case Parameters.Mode.tex =>
+          val mrow = mathMLDocument.getDocumentElement.getElementsByTagName ("mrow").item (0).asInstanceOf[Element]
+          val mi = mrow.getElementsByTagName ("mi").item (0).asInstanceOf[Element]
+          val tex = mi.getTextContent
+          mathJax.typeset2String(tex, MathJax.Tex, ex = ex)
+
+        case _ =>
+          val mathml: String = toString (mathMLDocument)
+          mathJax.typeset2String(mathml, MathJax.MathML, ex = ex)
       }
     }
 

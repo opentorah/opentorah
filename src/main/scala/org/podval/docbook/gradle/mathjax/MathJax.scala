@@ -1,92 +1,151 @@
 package org.podval.docbook.gradle.mathjax
 
 import java.io.File
+import java.nio.file.Files
 
 import com.eclipsesource.v8.{NodeJS, V8, V8Array, V8Function, V8Object}
+import com.eclipsesource.v8.utils.V8ObjectUtils
+import scala.collection.JavaConverters._
 
-final class MathJax(nodeModulesRoot: File) {
+final class MathJax(nodeModulesRoot: File, configuration: MathJax.Config) {
 
-  private val nodeJS: NodeJS = NodeJS.createNodeJS()
-  private val v8: V8 = nodeJS.getRuntime
+  private val nodeJS: NodeJS = {
+    MathJax.loadV8()
+    NodeJS.createNodeJS()
+  }
+
+  private def v8: V8 = nodeJS.getRuntime
   private val mathJaxNode: V8Object = nodeJS.require(new File(nodeModulesRoot, "node_modules/mathjax-node"))
 
-  def open(): Unit = {
-    config()
-    start()
+  private var configured: Boolean = false
+
+  private def configure(): Unit = {
+    val args: V8Array = V8ObjectUtils.toV8Array(v8, List(Map(
+      "displayMessages"     -> configuration.displayMessages,
+      "displayErrors"       -> configuration.displayErrors,
+      "undefinedCharError"  -> configuration.undefinedCharError,
+      "extensions"          -> configuration.extensions,
+      "fontURL"             -> configuration.fontURL,
+      // standard MathJax configuration options; see https://docs.mathjax.org for more detail
+      "MathJax" -> Map(
+        "jax" -> List("input/TeX", "input/MathML", "input/AsciiMath", "output/SVG").asJava,
+        "SVG" -> Map("font" -> configuration.font).asJava
+      ).asJava
+    ).asJava).asJava)
+
+    mathJaxNode.executeVoidFunction("config", args)
+
+    args.release()
+
+    // TODO I have absolutely no idea why, but unless I typeset what I am typesetting here first,
+    // before typesetting simpler TeX, typesetting the TeX with backslashes later fails!!!
+    // Re-configuring and forcibly re-starting MathJax before each typeset call breaks the tests even more!
+
+    configured = true
+
+    typeset2String("\\sqrt{1^2}", MathJax.Tex)
   }
 
-  def config(): Unit = {
-    val config: V8Object = new V8Object(v8)
-    val mathJax: V8Object = new V8Object(v8)
-    val svgConfig: V8Object = new V8Object(v8)
-    svgConfig.add("font", "STIX-Web")
-//    mathJax.add("SVG", svgConfig)
-    config.add("MathJax", mathJax)
-
-//    Example:
-//    {
-//      MathJax: {SVG: {font: "STIX-Web"}},
-//      displayErrors: false,
-//      extensions: 'Safe,TeX/noUndefined'
-//    }
-
-    val configArgs = new V8Array(v8)
-    configArgs.push(config)
-    mathJaxNode.executeVoidFunction("config", configArgs)
-    svgConfig.release()
-    mathJax.release()
-    config.release()
-    configArgs.release()
+  // This is done automatically when typeset is first called.
+  private def start(): Unit = {
+    val args = new V8Array(v8)
+    mathJaxNode.executeVoidFunction("start", args)
+    args.release()
   }
 
-  def start(): Unit = {
-    val startArgs = new V8Array(v8)
-    mathJaxNode.executeVoidFunction("start", startArgs)
-    startArgs.release()
-  }
-
-  def typeset2String(math: String, input: MathJax.Input, output: MathJax.Output): String = {
-    val data: V8Object = typeset(math, input.input, output.output, output.css)
+  def typeset2String(math: String, input: MathJax.Input, output: MathJax.Output = MathJax.Svg, ex: Int = 6): String = {
+    val data: V8Object = typeset(math, input, output, isNode = false, ex)
     val result: String = data.getString(output.output)
     data.release()
     result
   }
 
-  def typeset2Dom(math: String, input: MathJax.Input, output: MathJax.Output): V8Object = {
-    val nodeOutput: String = output.output + "Node"
-    val data: V8Object = typeset(math, input.input, nodeOutput, output.css)
-    val result: V8Object = data.getObject(nodeOutput)
+  def typeset2Dom(math: String, input: MathJax.Input, output: MathJax.Output, ex: Int): V8Object = {
+    val data: V8Object = typeset(math, input, output, isNode = true, ex)
+    val result: V8Object = data.getObject(output.nodeOutput)
     data.release()
     result
   }
 
-  private def typeset(math: String, input: String, output: String, css: Boolean): V8Object = {
+  private def typeset(math: String, input: MathJax.Input, output: MathJax.Output, isNode: Boolean, ex: Int): V8Object = {
+    // TODO re-configuration on each call doesn't help the tests to work; re-start breaks them more...
+    if (!configured) configure()
+
     var result: V8Object = null
 
-    val typesetCallback: V8Function = new V8Function(v8, (_: V8Object, parameters: V8Array) => {
+    val options: V8Object = V8ObjectUtils.toV8Object(v8, Map(
+      "useFontCache"        -> true,         // use <defs> and <use> in svg output ('true' by default)?
+      "useGlobalCache"      -> false,        // use common <defs> for all equations?
+      "linebreaks"          -> false,        // automatic linebreaking
+      "speakText"           -> false,        // add textual alternative (for TeX/asciimath the input string, for MathML a dummy string)?
+      "xmlns"               -> "mml",        // the namespace to use for MathML
+      "timeout"             -> 10 * 1000,    // 10 second timeout before restarting MathJax
+      "width"               -> 100,          // width of container (in ex) for linebreaking and tags
+      "cjkCharWidth"        -> 13,           // width of CJK character
+      "equationNumbers"     -> "none",       // automatic equation numbering ("none", "AMS" or "all")
+      "ex"                  -> ex,           // ex-size in pixels
+      "format"              -> input.input,  // the input format (TeX, inline-TeX, AsciiMath, or MathML)
+      "math"                -> math,         // the math string to typeset
+      output.output(isNode) -> true,
+      "css"                 -> output.css    // generate CSS for HTML output?
+      //    state: {},                       // an object to store information from multiple calls (e.g.,
+                                             // <defs> if useGlobalCache, counter for equation numbering if equationNumbers ar )
+    ).asJava)
+
+    //  The typeset method expects a configuration object options and optionally a callback.
+    //  If no callback is passed, it will return a Promise.
+    //
+    //  Once called, typeset can be called repeatedly and will optionally store information across calls (see state below).
+    //
+    //  Promise.resolve(result,options) / Promise.reject(errors) / callback(result, options)
+    //  mathjax-node returns two objects to Promise.resolve or callback: a result object and the original input options.
+    //
+    //  The result object will contain (at most) the following structure:
+    //    errors:                     // an array of MathJax error messages if any errors occurred
+    //    (mml|html|svg)[Node]:       // a string or jsdom of the markup requested
+    //    css:                        // a string of CSS if HTML was requested
+    //    style:                      // a string of CSS inline style if SVG requested
+    //    height:                     // a string containing the height of the SVG output if SVG was requested
+    //    width:                      // a string containing the width of the SVG output if SVG was requested
+    //    speakText:                  // a string of speech text if requested
+    //
+    //    state: {                    // the state object (if useGlobalCache or equationNumbers is set)
+    //      glyphs:            // a collection of glyph data
+    //      defs :             // a string containing SVG def elements
+    //      AMS: {
+    //        startNumber:  // the current starting equation number
+    //        labels:       // the set of labels
+    //        IDs:          // IDs used in previous equations
+    //      }
+    //  }
+
+    //  If the errors array is non-empty, the Promise will reject, and be passed the errors array.
+    //  The options contains the configuration object passed to typeset; this can be useful for passing other data along or
+    //  for identifying which typeset() call is associated with this (callback) call (in case you use the same callback
+    //  function for more than one typeset()).
+    val callback: V8Function = new V8Function(v8, (receiver: V8Object, parameters: V8Array) => {
       result = parameters.getObject(0)
+      val errors: V8Array = result.getArray("errors")
+      if (!errors.isUndefined)
+        throw new IllegalArgumentException(V8ObjectUtils.toList(errors).asScala.map(_.asInstanceOf[String]).mkString("\n"))
+      errors.release()
       null
     })
 
-    val typeset: V8Object = new V8Object(v8)
-    typeset.add("format", input)
-    typeset.add(output, true)
-    typeset.add("css", css)
-    typeset.add("speakText", false)
+    val args: V8Array = V8ObjectUtils.toV8Array(v8, List(options, callback).asJava)
+    val callResult: V8Object = mathJaxNode.executeObjectFunction("typeset", args)
 
-    typeset.add("math", math)
-    val typesetArgs = new V8Array(v8)
-    typesetArgs.push(typeset)
-    typesetArgs.push(typesetCallback)
-    mathJaxNode.executeObjectFunction("typeset", typesetArgs)
-
-    typeset.release()
-    typesetCallback.release()
-    typesetArgs.release()
-
-    while (nodeJS.isRunning) {
-      nodeJS.handleMessage()
+    var done: Boolean = false
+    while (!done) {
+      if (nodeJS.isRunning) nodeJS.handleMessage()
+//      else if (result == null) Thread.sleep(10)
+      else done = true
     }
+
+    options.release()
+    callback.release()
+    args.release()
+    callResult.release()
 
     result
   }
@@ -98,12 +157,12 @@ final class MathJax(nodeModulesRoot: File) {
 }
 
 object MathJax {
-  // TODO arrange things so that this is called and there are no extracted libraries in the home directory -
-  //  and use official tmp directory!
-  {
-    val libraryExtractDirectory: File = new File("/tmp/j2v8/")
-    libraryExtractDirectory.mkdirs()
-    V8.createV8Runtime("dummy", libraryExtractDirectory.getAbsolutePath).release()
+
+  def loadV8(): Unit = {
+    if (!V8.isLoaded) V8.createV8Runtime(
+      "dummy",
+      Files.createTempDirectory("j2v8").toAbsolutePath.toString
+    ).release()
   }
 
   sealed trait Input {
@@ -112,6 +171,8 @@ object MathJax {
 
   sealed trait Output {
     def output: String
+    final def nodeOutput: String = output + "Node"
+    final def output(isNode: Boolean): String = if (isNode) nodeOutput else output
     def css: Boolean = false
   }
 
@@ -146,6 +207,20 @@ object MathJax {
     override def output: String = "html"
     override def css: Boolean = true
   }
+
+  final case class Config(
+    displayMessages: Boolean = false,        // determines whether Message.Set() calls are logged
+    displayErrors: Boolean = true,           // determines whether error messages are shown on the console
+    undefinedCharError: Boolean = false,     // determines whether "unknown characters" (i.e., no glyph in the configured fonts) are saved in the error array
+    extensions: String = "",                 // a convenience option to add MathJax extensions; example: 'Safe,TeX/noUndefined'
+    fontURL: String = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/fonts/HTML-CSS", // for webfont urls in the CSS for HTML output
+    font: String = "TeX"                     // possible values are TeX, STIX-Web, Asana-Math, Neo-Euler, Gyre-Pagella,
+                                             // Gyre-Termes and Latin-Modern. Note that not all mathematical characters
+                                             // are available in all fonts (e.g., Neo-Euler does not include italic
+                                             // characters), so some mathematics may work better in some fonts than in
+                                             // others. The STIX-Web font is the most complete.
+    // paths: Map[String, String] = Map.empty,  // configures custom path variables (e.g., for third party extensions, cf. test/config-third-party-extensions.js)
+  )
 
   def j2v8Version: String = "4.8.0"
 

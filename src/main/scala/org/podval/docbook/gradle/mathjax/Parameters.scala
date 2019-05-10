@@ -25,10 +25,14 @@ final class Parameters extends Serializable {
 
 object Parameters {
 
+  val MathJaxNameSpace = "http://podval.org/mathjax/ns/ext"
+
+  val MathJaxAttributePrefix: String = "mathjax:"
+
   sealed trait Parameter[T] {
     def name: String
 
-    final def prefixedName: String = FopPlugin.MathJaxAttributePrefix + name
+    final def prefixedName: String = MathJaxAttributePrefix + name
 
     def description: String
 
@@ -41,12 +45,20 @@ object Parameters {
     final def valueToString(value: Any): String = toString(value.asInstanceOf[T])
 
     def get(element: Element): Option[String] = {
-      val result: String = element.getAttributeNS(FopPlugin.MathMLNameSpace, prefixedName)
-      Some(result).filter(value => (value != null) && (value.length != 0))
+      def empty(value: String): Boolean = (value == null) || value.isEmpty
+
+      // TODO XMLObj.setAttributes() puts an attribute of the parsed MathML 'math' element
+      // into a namespace only if the corresponding 'xmlns' attribute precedes it,
+      // which for some reason it does not, regardless of how I order the attributes in the
+      // TeX wrapper (bug in Xerces? me not understanding what is going on?);
+      // so I have to look the 'mode' attribute up both with and *without* the namespace
+      // (and thus - the prefix) ...
+      Some(element.getAttributeNS(MathJaxNameSpace, prefixedName)).filterNot(empty)
+        .orElse(Some(element.getAttribute(name)).filterNot(empty))
     }
 
     def set(value: Any, element: Element): Unit =
-      element.setAttributeNS(FopPlugin.MathMLNameSpace, prefixedName, valueToString(value))
+      element.setAttributeNS(MathJaxNameSpace, prefixedName, valueToString(value))
   }
 
   def apply(element: Element): Parameters = {
@@ -87,7 +99,10 @@ object Parameters {
   case object Mode extends StringParameter {
     override def name: String = "mode"
     override def description: String = "Typesetting mode: tex, ..."
-    override def default: String = "mathml"
+    override def default: String = mathml
+
+    val mathml: String = "mathml"
+    val tex: String = "tex"
   }
 
   @SerialVersionUID(1L)
@@ -112,5 +127,5 @@ object Parameters {
       "DejaVu Serif", "DejaVuSerif", "Bitstream Vera Serif", "Luxi Serif", "FreeSerif", "serif")
   }
 
-  private val values: List[Parameter[_]] = List(Mode, FontSize, AntiAlias, Fonts)
+  private val values: List[Parameter[_]] = List(Mode, FontSize, AntiAlias, Fonts, Mode)
 }
