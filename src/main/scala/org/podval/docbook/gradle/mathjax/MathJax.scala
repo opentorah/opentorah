@@ -7,7 +7,7 @@ import com.eclipsesource.v8.{NodeJS, V8, V8Array, V8Function, V8Object}
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import scala.collection.JavaConverters._
 
-final class MathJax(nodeModulesRoot: File, configuration: MathJax.Config) {
+final class MathJax(nodeModulesRoot: File) {
 
   private val nodeJS: NodeJS = {
     MathJax.loadV8()
@@ -17,9 +17,7 @@ final class MathJax(nodeModulesRoot: File, configuration: MathJax.Config) {
   private def v8: V8 = nodeJS.getRuntime
   private val mathJaxNode: V8Object = nodeJS.require(new File(nodeModulesRoot, "node_modules/mathjax-node"))
 
-  private var configured: Boolean = false
-
-  private def configure(): Unit = {
+  def configure(configuration: MathJax.Config): Unit = {
     val args: V8Array = V8ObjectUtils.toV8Array(v8, List(Map(
       "displayMessages"     -> configuration.displayMessages,
       "displayErrors"       -> configuration.displayErrors,
@@ -36,22 +34,14 @@ final class MathJax(nodeModulesRoot: File, configuration: MathJax.Config) {
     mathJaxNode.executeVoidFunction("config", args)
 
     args.release()
-
-    // TODO I have absolutely no idea why, but unless I typeset what I am typesetting here first,
-    // before typesetting simpler TeX, typesetting the TeX with backslashes later fails!!!
-    // Re-configuring and forcibly re-starting MathJax before each typeset call breaks the tests even more!
-
-    configured = true
-
-    typeset2String("\\sqrt{1^2}", MathJax.Tex)
   }
 
   // This is done automatically when typeset is first called.
-  private def start(): Unit = {
-    val args = new V8Array(v8)
-    mathJaxNode.executeVoidFunction("start", args)
-    args.release()
-  }
+//  private def start(): Unit = {
+//    val args = new V8Array(v8)
+//    mathJaxNode.executeVoidFunction("start", args)
+//    args.release()
+//  }
 
   def typeset2String(math: String, input: MathJax.Input, output: MathJax.Output = MathJax.Svg, ex: Int = 6): String = {
     val data: V8Object = typeset(math, input, output, isNode = false, ex)
@@ -68,9 +58,6 @@ final class MathJax(nodeModulesRoot: File, configuration: MathJax.Config) {
   }
 
   private def typeset(math: String, input: MathJax.Input, output: MathJax.Output, isNode: Boolean, ex: Int): V8Object = {
-    // TODO re-configuration on each call doesn't help the tests to work; re-start breaks them more...
-    if (!configured) configure()
-
     var result: V8Object = null
 
     val options: V8Object = V8ObjectUtils.toV8Object(v8, Map(
@@ -177,35 +164,34 @@ object MathJax {
   }
 
   case object Tex extends Input {
-    override def input: String = "TeX"
+    override val input: String = "TeX"
   }
 
   case object TexInline extends Input {
-    override def input: String = "inline-TeX"
+    override val input: String = "inline-TeX"
   }
 
   case object AsciiMath extends Input {
-    override def input: String = "AsciiMath"
+    override val input: String = "AsciiMath"
   }
 
   case object MathML extends Input with Output {
-    override def input: String = "MathML"
-    override def output: String = "mml"
+    override val input: String = "MathML"
+    override val output: String = "mml"
   }
 
   // For SVG, width, height and style attributes are repeated in separate keys of the returned data.
   case object Svg extends Output {
-    override def output: String = "svg"
+    override val output: String = "svg"
   }
 
   case object Html extends Output {
-    override def output: String = "html"
+    override val output: String = "html"
   }
 
-  // TODO output is the same as for Html?
   case object HtmlWithCss extends Output {
-    override def output: String = "html"
-    override def css: Boolean = true
+    override val output: String = "html"
+    override val css: Boolean = true
   }
 
   final case class Config(

@@ -2,7 +2,9 @@ package org.podval.docbook.gradle.section
 
 import java.io.File
 
+import org.podval.docbook.gradle.mathjax.MathReader
 import org.podval.docbook.gradle.{Fop, Layout, Logger}
+import org.xml.sax.XMLFilter
 
 object Pdf extends DocBook2 {
   override def name: String = "pdf"
@@ -32,6 +34,8 @@ object Pdf extends DocBook2 {
        |    <xsl:attribute name="break-before">page</xsl:attribute>
        |  </xsl:attribute-set>
        |"""
+
+  override def xmlFilter: Option[XMLFilter] = Some(new MathReader)
 
   override def postProcess(
     layout: Layout,

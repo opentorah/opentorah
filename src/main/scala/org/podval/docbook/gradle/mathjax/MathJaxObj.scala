@@ -4,7 +4,7 @@ import org.apache.fop.fo.{FONode, XMLObj}
 
 class MathJaxObj(parent: FONode) extends XMLObj(parent) {
 
-  override def getNamespaceURI: String = FopPlugin.MathMLNameSpace
+  override def getNamespaceURI: String = MathJaxFopPlugin.MathMLNameSpace
 
-  override def getNormalNamespacePrefix: String = FopPlugin.MathMLNameSpacePrefix
+  override def getNormalNamespacePrefix: String = MathJaxFopPlugin.MathMLNameSpacePrefix
 }

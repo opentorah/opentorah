@@ -1,12 +1,13 @@
 package org.podval.docbook.gradle
 
 import org.scalatest.{FlatSpec, Matchers}
+import DocBookPlugin.DocBookNamespace
 
 class PluginTest extends FlatSpec with Matchers {
 
   "Plugin" should "preserve the title" in {
     val project: PluginTestProject = new PluginTestProject(name="title", document =
-      """<article xmlns="http://docbook.org/ns/docbook" version="5.0">
+     s"""<article xmlns="$DocBookNamespace" version="5.0">
         |  <info>
         |    <title>Test DocBook File</title>
         |  </info>
@@ -20,8 +21,8 @@ class PluginTest extends FlatSpec with Matchers {
 
   it should "resolve processing instructions and entity substitutions with DTD enabled" in {
     val project: PluginTestProject = new PluginTestProject(name="substitutions-with-DTD", document =
-      """<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd">
-        |<article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+     s"""<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd">
+        |<article xmlns="$DocBookNamespace" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink">
         |  <para>Processing instruction: <?eval version ?>.</para>
         |  <para>Processing instruction with unknown substitution: <?eval version1 ?>.</para>
         |  <para>Unknown processing instruction:<?eval1 XXX ?>.</para>
@@ -42,7 +43,7 @@ class PluginTest extends FlatSpec with Matchers {
 
   it should "resolve processing instructions substitutions without DTD enabled" in {
     val project: PluginTestProject = new PluginTestProject(name="substitutions-without-DTD", document =
-      """<article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+     s"""<article xmlns="$DocBookNamespace" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink">
         |  <para>Processing instruction: <?eval version ?>.</para>
         |  <para>Processing instruction with unknown substitution: <?eval version1 ?>.</para>
         |  <para>Unknown processing instruction:<?eval1 XXX ?>.</para>
@@ -59,7 +60,7 @@ class PluginTest extends FlatSpec with Matchers {
 
   it should "fail resolving entity substitutions without DTD enabled" in {
     val project: PluginTestProject = new PluginTestProject(name="substitutions-without-DTD", document =
-      """<article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+     s"""<article xmlns="$DocBookNamespace" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink">
         |  <para>Processing instruction: <?eval version ?>.</para>
         |  <para>Entity: &version;.</para>
         |  <para>Entity in an attribute:<link xlink:href="http://&version;">link!</link>.</para>

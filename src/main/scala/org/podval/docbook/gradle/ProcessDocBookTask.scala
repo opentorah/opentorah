@@ -4,13 +4,12 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.CopySpec
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, TaskAction}
-import java.io.{File, FileWriter}
-import javax.xml.transform.stream.{StreamResult, StreamSource}
+import java.io.File
+
 import org.apache.tools.ant.filters.ReplaceTokens
-import org.xml.sax.InputSource
+import org.podval.docbook.gradle.section.{DocBook2, Section}
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
-import org.podval.docbook.gradle.section.{DocBook2, Section}
 
 class ProcessDocBookTask extends DefaultTask {
 
@@ -135,25 +134,19 @@ class ProcessDocBookTask extends DefaultTask {
 
     // Saxon output file and target.
     val saxonOutputFile: File = forDocument.saxonOutputFile(docBook2)
-    val outputTarget = new StreamResult
-    // null the outputTarget when chunking in XSLT 1.0
-    if (docBook2.usesRootFile) {
-      outputTarget.setSystemId(saxonOutputFile)
-      outputTarget.setWriter(new FileWriter(saxonOutputFile))
-    } else {
-      outputTarget.setSystemId("dev-null")
-      outputTarget.setOutputStream((_: Int) => {})
-    }
 
     // Run Saxon.
-    val mainStylesheetName: String = forDocument.mainStylesheet(docBook2)
-    Saxon.run(
-      inputSource = new InputSource(layout.inputFile(documentName).toURI.toASCIIString),
-      stylesheetSource = new StreamSource(layout.stylesheetFile(mainStylesheetName)),
-      outputTarget = outputTarget,
+    Xml.transform(
+      useSaxon9 = docBook2.usesDocBookXslt2,
       resolver = resolver,
-      processingInstructionsSubstitutions = substitutions,
-      useXslt2 = docBook2.usesDocBookXslt2,
+      inputFile = layout.inputFile(documentName),
+      stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(docBook2)),
+      // do not output the 'main' file when chunking in XSLT 1.0
+      outputFile = if (docBook2.usesRootFile) Some(saxonOutputFile) else None,
+      xmlReader = Xml.getFilteredXMLReader(
+        Seq(new ProcessingInstructionsFilter(substitutions, resolver, logger)) ++
+          docBook2.xmlFilter.toSeq // ++ Seq(new TracingFilter)
+      ),
       logger = logger
     )
 

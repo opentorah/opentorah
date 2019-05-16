@@ -96,31 +96,4 @@ object Util {
       }
     }
   }
-
-  //  def fileInputSource(file: File): InputSource =
-  //    new InputSource(file.toURI.toASCIIString)
-
-  //  def stringInputSource(input: String, publicId: Option[String], systemId: Option[String]): InputSource = {
-  //    val result = new InputSource(new StringReader(input))
-  //    result.setPublicId(publicId.orNull)
-  //    result.setSystemId(systemId.orNull)
-  //    result
-  //  }
-
-  //  def resourceInputSource(name: String): InputSource = {
-  //    val result = new InputSource(getClass.getResourceAsStream(name))
-  //    result.setSystemId(name)
-  //    result.setPublicId(null)
-  //    result
-  //  }
-
-  //  def fileSource(file: File): Source =
-  //    new StreamSource(file)
-
-  //  def stringSource(input: String, publicId: Option[String], systemId: Option[String]): Source = {
-  //    val result = new StreamSource(new StringReader(input))
-  //    result.setPublicId(publicId.orNull)
-  //    result.setSystemId(systemId.orNull)
-  //    result
-  //  }
 }

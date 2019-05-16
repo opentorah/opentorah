@@ -1,11 +1,1 @@
-// TODO is there a way to affect pluginArtifactId as seen by publishPlugin[JavaDocs]Jar
-// tasks if it is *not* the project name?
-//
-// Of course, if there is, I'll need to declare the substitution when including this build,
-// since the nam of the published artifact will be different from the project name:
-//   {
-//     dependencySubstitution {
-//       substitute module('org.podval.docbook:org.podval.docbook-gradle-plugin') with project(':plugin')
-//     }
-//   }
 rootProject.name = 'org.podval.docbook-gradle-plugin'

@@ -1,13 +1,15 @@
 package org.podval.docbook.gradle
 
-import org.xml.sax.XMLReader
+import org.xml.sax.EntityResolver
 import org.xml.sax.helpers.XMLFilterImpl
 
-class ProcessingInstructionsFilter(
-  parent: XMLReader,
+final class ProcessingInstructionsFilter(
   substitutions: Map[String, String],
-  logger: Logger) extends XMLFilterImpl(parent)
+  entityResolver: EntityResolver,
+  logger: Logger) extends XMLFilterImpl
 {
+  setEntityResolver(entityResolver)
+
   override def processingInstruction(target: String, data: String): Unit = {
     logger.info(s"ProcessingInstructionsFilter.processingInstruction(target = $target, data = [$data])")
     if (target == "eval") {

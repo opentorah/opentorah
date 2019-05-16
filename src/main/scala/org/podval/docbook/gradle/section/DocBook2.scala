@@ -3,6 +3,7 @@ package org.podval.docbook.gradle.section
 import java.io.File
 
 import org.podval.docbook.gradle.{Layout, Logger}
+import org.xml.sax.XMLFilter
 
 trait DocBook2 extends Section {
 
@@ -58,6 +59,8 @@ trait DocBook2 extends Section {
   def outputFileNameOverride: Option[String] = None
 
   def copyDestinationDirectoryName: Option[String] = None
+
+  def xmlFilter: Option[XMLFilter] = None
 
   def postProcess(
     layout: Layout,

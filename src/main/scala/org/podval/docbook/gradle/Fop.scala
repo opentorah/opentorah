@@ -3,15 +3,12 @@ package org.podval.docbook.gradle
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import java.net.URI
 
-import javax.xml.transform.Transformer
-import javax.xml.transform.sax.SAXResult
-import javax.xml.transform.stream.StreamSource
 import net.sourceforge.jeuclid.fop.plugin.JEuclidFopFactoryConfigurator
 import org.apache.fop.apps.{FOUserAgent, FopConfParser, FopFactory}
 import org.apache.xmlgraphics.util.MimeConstants
 import org.apache.fop.fonts.{FontEventListener, FontTriplet}
 import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
-import org.podval.docbook.gradle.mathjax.FopPlugin
+import org.podval.docbook.gradle.mathjax.{MathJaxFopPlugin, MathJax}
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.SortedMap
@@ -41,19 +38,14 @@ object Fop {
          |)""".stripMargin
     )
 
-    // TODO when I gave inputFile as a configuration file to FOP by mistake,
-    // it started complaining about mixed content in FO around equations
-    // (although the only thing in the real configuration file is the font auto-detection);
-    // when I fixed it, MathJax font size became TOO BIg - and spaces between 'sin' and 'a' disappeared - just like for JEuclid?!
     val fopFactory: FopFactory = getFopFactory(configurationFile, inputFile)
 
     require(!isMathJaxEnabled || !isJEuclidEnabled)
-    if (isMathJaxEnabled) FopPlugin.configure(fopFactory, nodeModulesRoot)
+    if (isMathJaxEnabled) MathJaxFopPlugin.configure(fopFactory, nodeModulesRoot, MathJax.Config())
     else if (isJEuclidEnabled) JEuclidFopFactoryConfigurator.configure(fopFactory)
 
     // PDF metadata:
     val foUserAgent: FOUserAgent = fopFactory.newFOUserAgent
-    // TODO resolution?
 
     foUserAgent.setCreator(Util.applicationString)
     substitutions.get("creationDate").foreach { creationDate =>
@@ -73,12 +65,10 @@ object Fop {
     val fop: org.apache.fop.apps.Fop = fopFactory.newFop("application/pdf", foUserAgent, outputStream)
 
     try {
-      val transformer: Transformer = Saxon.getXslt1TransformerFactory.newTransformer
-      transformer.setErrorListener(logger.errorListener)
-
-      transformer.transform(
-        new StreamSource(inputFile),
-        new SAXResult(fop.getDefaultHandler)
+      Xml.transform(
+        inputFile = inputFile,
+        defaultHandler = fop.getDefaultHandler,
+        logger = logger
       )
     } finally {
       outputStream.close()

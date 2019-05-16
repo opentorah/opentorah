@@ -10,6 +10,8 @@ import org.apache.xmlgraphics.util.UnitConv
 import org.w3c.dom.svg.SVGDocument
 
 final class Sizes(width: Float, ascent: Float, descent: Float) {
+  override def toString: String = s"Sizes(width=${width}pt, ascent=${ascent}pt, descent=${descent}pt; height=${height}pt)"
+
   import Sizes.toMilliPoints
 
   private def height: Float = ascent + descent
@@ -18,8 +20,6 @@ final class Sizes(width: Float, ascent: Float, descent: Float) {
 
   def getIntrinsicAlignmentAdjust: Length = FixedLength.getInstance(-descent, "pt")
 
-  // NOTE: this is the only method that scales the values;
-  // other callers do not have access to sourceResolution.
   def getImageSize(sourceResolution: Float): ImageSize = {
     val scale: Float = UnitConv.IN2PT / sourceResolution
 
@@ -36,7 +36,10 @@ final class Sizes(width: Float, ascent: Float, descent: Float) {
 
 object Sizes {
   def apply(svgDocument: SVGDocument): Sizes = {
-    val descent: Float = getDescent(svgDocument)
+    val descentEx: Float = getDescent(svgDocument) // TODO with this, baseline seems to be correct: - 0.25f
+    val parameters: Parameters = Parameters(svgDocument)
+    val fontSize: Float = parameters.getFontSize
+    val descent: Float = descentEx * fontSize
     new Sizes(
       width = svgDocument.getRootElement.getWidth.getBaseVal.getValue,
       ascent = svgDocument.getRootElement.getHeight.getBaseVal.getValue - descent,
@@ -45,7 +48,7 @@ object Sizes {
   }
 
   private val verticalAlignCss: String = "vertical-align:"
-  private val verticalAlignUnits: String = "ex" // TODO can it be in other units and require proper parsing?
+  private val verticalAlignUnits: String = "ex"
   private def getDescent(svgDocument: SVGDocument): Float =
     svgDocument.getRootElement.getAttribute("style")
       .split(";").map(_.trim).filterNot(_.isEmpty)
@@ -54,7 +57,7 @@ object Sizes {
       .map(a => -a.toFloat)
       .getOrElse(0.0f)
 
-  private def toMilliPoints(value: Float): Int = Math.round(value * Points2Millipoints) // TODO .ceil?
+  private def toMilliPoints(value: Float): Int = Math.round(value * Points2Millipoints)
 
   val Points2Millipoints: Float = 1000.0f
 }

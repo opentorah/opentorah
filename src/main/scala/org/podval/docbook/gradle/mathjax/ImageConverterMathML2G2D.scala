@@ -9,13 +9,13 @@ import org.apache.xmlgraphics.java2d.Graphics2DImagePainter
 import org.w3c.dom.Document
 import org.w3c.dom.svg.SVGDocument
 
-final class ImageConverterMathML2G2D(mathJax: MathJax) extends AbstractImageConverter {
+final class ImageConverterMathML2G2D(fopPlugin: MathJaxFopPlugin) extends AbstractImageConverter {
   override def getSourceFlavor: ImageFlavor = ImageFlavor.XML_DOM
   override def getTargetFlavor: ImageFlavor = ImageFlavor.GRAPHICS2D
 
   override def convert(src: Image, hints: java.util.Map[_, _]): Image = {
     val mathmlDocument: Document = src.asInstanceOf[ImageXMLDOM].getDocument
-    val svgDocument: SVGDocument = FopPlugin.mathML2SVG(mathmlDocument, mathJax)
+    val svgDocument: SVGDocument = fopPlugin.mathML2SVG(mathmlDocument)
     val sizes: Sizes = Sizes(svgDocument)
 
     new ImageGraphics2D(src.getInfo, new Graphics2DImagePainter {
@@ -30,7 +30,7 @@ final class ImageConverterMathML2G2D(mathJax: MathJax) extends AbstractImageConv
         hints.add(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY))
         graphics2d.setRenderingHints(hints)
 
-        // TODO see org.apache.fop.image.loader.batik.ImageConverterSVG2G2D for conversion code - but:
+        // see org.apache.fop.image.loader.batik.ImageConverterSVG2G2D for conversion code - but:
         // "Specialized renderers may want to provide specialized adapters to profit
         // from target-format features (for example with PDF or PS)."
       }

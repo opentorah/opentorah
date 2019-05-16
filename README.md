@@ -16,8 +16,8 @@ Plugin uses Saxon with DocBook XSLT stylesheets to process a DocBook document
 (and its includes) into HTML, EPUB, EPUB3 and PDF. Processing using XSLT 2.0
 DocBook stylesheets is supported for HTML only ("HTML2"). For PDF, DocBook is
 first processed into XSL-FO, which is post-processed by Apache FOP. For PDF,
-JEuclid FOP plugin can be enabled to process MathML. Document name(s) and the
-list of the output formats are configurable.
+JEuclid or MathJax FOP plugin can be enabled to process MathML. Document
+name(s) and the list of the output formats are configurable.
 
 XSL parameters can be configured in the `Gradle` build file using `parameters` map.
 There are sections (and customization files) for each output format, all HTML-like formats
@@ -91,7 +91,11 @@ and [Saxon 9](https://www.saxonica.com/documentation/documentation.xml);
 - [Apache FOP team](https://xmlgraphics.apache.org/fop/) for Apache FOP;
 - [Max Berger](https://github.com/maxberger) for the original work on JEuclid and
 its [FOP plugin](http://jeuclid.sourceforge.net/jeuclid-fop/);
-- [Emmeran Seehuber](https://github.com/rototor) for [updating JEuclid](https://github.com/rototor/jeuclid).
+- [Emmeran Seehuber](https://github.com/rototor) for [updating JEuclid](https://github.com/rototor/jeuclid);
+- [MathJax team](https://www.mathjax.org/#about) for [MathJax](https://www.mathjax.org/) and
+[MathJax-node](https://github.com/mathjax/MathJax-node);
+- [Ian Bull](https://github.com/irbull) for [J2V8](https://github.com/eclipsesource/J2V8);
+- [Sten Roger Sandvik](https://github.com/srs) for [Gradle Node plugin](https://github.com/srs/gradle-node-plugin).   
 
 
 ## Applying to a Gradle project ##
@@ -195,8 +199,10 @@ docBook {
   epubEmbeddedFonts = [ "Liberation Sans" ]
   // embedded fonts should be OpenType or WOFF!
 
-  isJEuclidEnabled = true
-  // MathML processing for PDF is disabled by default 
+  isJEuclidEnabled = false
+  isMathJaxEnabled = true
+  // MathML processing for PDF is disabled by default;
+  // no more than one of `JEuclid` and `MathJax` can be enabled 
 }
 
 docBook.parameters.html2 = [
@@ -380,13 +386,3 @@ Following features of the Maven Gradle plugin are not supported:
 - expressions in <?eval?>
 - access to the project and its properties in <?eval?>
 - multiple documents with different parameters
-
-
-## Future ##
-
-Following enhancements are being considered:
-- look into running MatJax stylesheets in the plugin (without the browser) to
-  convert MathML for PDF (that way, LaTeX will also be supported);
-- look into XSLT solutions for MatML/LaTeX -> SVG conversion
-  ([pmml2svg](http://pmml2svg.sourceforge.net/doc/user-xhtml-svg/index.xhtml)
-   doesn't seem to be maintained).

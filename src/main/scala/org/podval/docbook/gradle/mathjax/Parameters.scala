@@ -1,7 +1,7 @@
 package org.podval.docbook.gradle.mathjax
 
 import Parameters.Parameter
-import org.w3c.dom.Element
+import org.w3c.dom.{Document, Element}
 
 // Inspired by net.sourceforge.jeuclid.context.Parameter and friends
 
@@ -13,11 +13,17 @@ final class Parameters extends Serializable {
   def setParameter[T](parameter: Parameter[T], value: T): Unit =
     parameters.put(parameter, value)
 
-  def setParameterFromString[T](parameter: Parameter[T], value: String): Unit =
+  private def setParameterFromString[T](parameter: Parameter[T], value: String): Unit =
     setParameter(parameter, parameter.fromString(value))
 
   def getParameter[T](parameter: Parameter[T]): T =
     parameters.getOrElse(parameter, parameter.default).asInstanceOf[T]
+
+  def getFontSize: Float = getParameter(Parameters.FontSize)
+
+  def getFontExSize: Int = getFontSize.toInt
+
+  def getMode: String = getParameter(Parameters.Mode)
 
   def serializeInto(element: Element): Unit =
     for { (parameter, value) <- parameters; if parameter.get(element).isEmpty } parameter.set(value, element)
@@ -27,12 +33,12 @@ object Parameters {
 
   val MathJaxNameSpace = "http://podval.org/mathjax/ns/ext"
 
-  val MathJaxAttributePrefix: String = "mathjax:"
+  val MathJaxAttributePrefix: String = "mathjax"
 
   sealed trait Parameter[T] {
     def name: String
 
-    final def prefixedName: String = MathJaxAttributePrefix + name
+    final def prefixedName: String = MathJaxAttributePrefix + ":" + name
 
     def description: String
 
@@ -47,7 +53,7 @@ object Parameters {
     def get(element: Element): Option[String] = {
       def empty(value: String): Boolean = (value == null) || value.isEmpty
 
-      // TODO XMLObj.setAttributes() puts an attribute of the parsed MathML 'math' element
+      // Note: XMLObj.setAttributes() puts an attribute of the parsed MathML 'math' element
       // into a namespace only if the corresponding 'xmlns' attribute precedes it,
       // which for some reason it does not, regardless of how I order the attributes in the
       // TeX wrapper (bug in Xerces? me not understanding what is going on?);
@@ -61,8 +67,9 @@ object Parameters {
       element.setAttributeNS(MathJaxNameSpace, prefixedName, valueToString(value))
   }
 
-  def apply(element: Element): Parameters = {
-    val result = new Parameters
+  def apply(document: Document): Parameters = {
+    val result: Parameters = new Parameters
+    val element: Element = document.getDocumentElement
     for (parameter <- values)
       parameter.get(element).foreach(value => result.setParameterFromString(parameter, value))
     result
@@ -93,16 +100,11 @@ object Parameters {
     override def toString(value: List[String]): String = value.mkString(",")
   }
 
-  // TODO  case object Display(EnumTypeWrapper.getInstance(Display.class), false, "display", "display style", Display.BLOCK)
-
   @SerialVersionUID(1L)
   case object Mode extends StringParameter {
     override def name: String = "mode"
-    override def description: String = "Typesetting mode: tex, ..."
-    override def default: String = mathml
-
-    val mathml: String = "mathml"
-    val tex: String = "tex"
+    override def description: String = "Typesetting mode: TeX, AsciiMath, MathML"
+    override def default: String = MathJax.MathML.input
   }
 
   @SerialVersionUID(1L)
@@ -127,5 +129,5 @@ object Parameters {
       "DejaVu Serif", "DejaVuSerif", "Bitstream Vera Serif", "Luxi Serif", "FreeSerif", "serif")
   }
 
-  private val values: List[Parameter[_]] = List(Mode, FontSize, AntiAlias, Fonts, Mode)
+  private val values: List[Parameter[_]] = List(Mode, FontSize, AntiAlias, Fonts)
 }

@@ -9,7 +9,7 @@ import org.apache.xmlgraphics.util.MimeConstants
 import org.w3c.dom.svg.SVGDocument
 import org.w3c.dom.Document
 
-final class PreloaderMathML(mathJax: MathJax) extends AbstractImagePreloader {
+final class PreloaderMathML(fopPlugin: MathJaxFopPlugin) extends AbstractImagePreloader {
 
   // NOTE: JEuclid's MathML preloader also parses MathML from a stream; do I need this?
   override def preloadImage(
@@ -20,14 +20,13 @@ final class PreloaderMathML(mathJax: MathJax) extends AbstractImagePreloader {
     val document: Document = src.asInstanceOf[DOMSource].getNode.asInstanceOf[Document]
 
     if (!isMathML(document)) null else  {
-      val parameters: Parameters = Parameters(document.getDocumentElement)
-      val ex: Int = parameters.getParameter(Parameters.FontSize).toInt
-      val svgDocument: SVGDocument = FopPlugin.mathML2SVG(document, mathJax, ex)
+      val svgDocument: SVGDocument = fopPlugin.mathML2SVG(document)
       val sizes: Sizes = Sizes(svgDocument)
+      val sourceResolution: Float = context.getSourceResolution
 
       val result: ImageInfo = new ImageInfo(uri, MimeConstants.MIME_SVG)
 
-      result.setSize(sizes.getImageSize(context.getSourceResolution))
+      result.setSize(sizes.getImageSize(sourceResolution))
 
       // The whole image had to be loaded for this, so keep it
       result.getCustomObjects.asInstanceOf[java.util.Map[AnyRef, AnyRef]].put(ImageInfo.ORIGINAL_IMAGE,
@@ -38,5 +37,5 @@ final class PreloaderMathML(mathJax: MathJax) extends AbstractImagePreloader {
   }
 
   private def isMathML(document: Document): Boolean =
-    document.getDocumentElement.getNamespaceURI == FopPlugin.MathMLNameSpace
+    document.getDocumentElement.getNamespaceURI == MathJaxFopPlugin.MathMLNameSpace
 }

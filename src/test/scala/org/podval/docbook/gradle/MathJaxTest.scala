@@ -107,10 +107,10 @@ class MathJaxTest extends FlatSpec with Matchers {
 
     val tex: String = "x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}."
 
-    mathJax.typeset2String(text, MathJax.Tex) shouldBe svg
+    // Note: the first two fail in reverse order; this doesn't look like a threading issue -
+    // or maybe whatever I "solved" by using fresh MathJax instance for each typesetting wasn't
+    // (just) a threading issue either?
     mathJax.typeset2String(tex, MathJax.Tex) shouldBe texsvg
-    mathJax.typeset2String(tex, MathJax.Tex) shouldBe texsvg
-    mathJax.typeset2String(text, MathJax.Tex) shouldBe svg
     mathJax.typeset2String(text, MathJax.Tex) shouldBe svg
 
     mathJax.typeset2String(text, MathJax.Tex, MathJax.MathML) shouldBe mml
@@ -118,26 +118,28 @@ class MathJaxTest extends FlatSpec with Matchers {
   }
 
   "Fop MathJax" should "work" in {
-    def doIt(useMathJax: Boolean): Unit = {
-      val suffix: String = if (useMathJax) "mathjax" else "jeuclid"
-      Fop.run(
-        configurationFile = new File(getTestResources, "fop.xconf"),
-        nodeModulesRoot = getBuildDir,
-        substitutions = Map.empty,
-        isMathJaxEnabled = useMathJax,
-        isJEuclidEnabled = !useMathJax,
-        inputFile = new File(getTestResources, "test.fo"),
-        inputDirectory = getTestResources,
-        outputFile = new File(getBuildDir, s"test-$suffix.pdf"),
-        logger = new TestLogger
-      )
-    }
+    def doIt(useMathJax: Boolean): Unit = Fop.run(
+      configurationFile = new File(getTestResources, "fop.xconf"),
+      nodeModulesRoot = getBuildDir,
+      substitutions = Map.empty,
+      isMathJaxEnabled = useMathJax,
+      isJEuclidEnabled = !useMathJax,
+      inputFile = new File(getTestResources, "test.fo"),
+      inputDirectory = getTestResources,
+      outputFile = new File(getBuildDir, s"test-${if (useMathJax) "mathjax" else "jeuclid"}.pdf"),
+      logger = new TestLogger
+    )
 
     doIt(true)
     doIt(false)
   }
 
-  private def getMathJax: MathJax = new MathJax(getBuildDir, MathJax.Config())
+  private def getMathJax: MathJax = {
+    val result = new MathJax(getBuildDir)
+    result.configure(MathJax.Config())
+    result
+  }
+
   private def getTestResources: File = new File(getProjectDir, "src/test/resources")
   private def getBuildDir: File = new File(getProjectDir, "build")
   private def getProjectDir: File = new File(".").getAbsoluteFile

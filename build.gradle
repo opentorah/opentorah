@@ -83,7 +83,6 @@ dependencies {
   // This is a plugin that is applied to the project that uses DocBook plugin :)
   compile "com.moowork.gradle:gradle-node-plugin:1.3.1"
 
-  // TODO Can't change buildscript dependencies from the plugin - but need to add this dependency when plugin is applied, not built!
   compile "com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0"
 
   testImplementation "org.scalatest:scalatest_$scalaVersionMajor:3.0.5"

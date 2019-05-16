@@ -306,7 +306,6 @@
             </rdf:RDF>
         </x:xmpmeta>
     </fo:declarations>
-    <fox:destination xmlns:fox="http://xmlgraphics.apache.org/fop/extensions" internal-destination="index"/>
     <fo:page-sequence xmlns:axf="http://www.antennahouse.com/names/XSL/Extensions" hyphenate="true"
                       master-reference="body" language="en" format="1" initial-page-number="1"
                       force-page-count="end-on-even" hyphenation-character="-" hyphenation-push-character-count="2"
@@ -581,23 +580,39 @@
             </fo:block>
         </fo:static-content>
         <fo:flow flow-name="xsl-region-body" start-indent="4pc" end-indent="0pt">
-            <fo:block id="index">
+            <fo:block id="d0e1">
                 <fo:block font-family="sans-serif,DejaVu Sans"/>
             </fo:block>
             <fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
-                <fo:block color="red">&lt;span&gt;Inline:&lt;/span&gt;</fo:block>
+                Some inline MathML:
                 <fo:instream-foreign-object>
-                    <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
-                        <mi>E</mi>
-                        <mo>=</mo>
-                        <mi>m</mi>
-                        <msup>
-                            <mi>c</mi>
-                            <mn>2</mn>
-                        </msup>
+                    <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline">
+                        <mrow>
+                            <msup>
+                                <mi>tan</mi>
+                                <mrow>
+                                    <mo>-</mo>
+                                    <mn>1</mn>
+                                </mrow>
+                            </msup>
+                            <mo>(</mo>
+                            <mfrac>
+                                <mrow>
+                                    <mi>sin</mi>
+                                    <mi>α</mi>
+                                </mrow>
+                                <mrow>
+                                    <mi>cos</mi>
+                                    <mi>α</mi>
+                                    <mo>+</mo>
+                                    <mi>ε</mi>
+                                </mrow>
+                            </mfrac>
+                            <mo>)</mo>
+                        </mrow>
                     </math>
                 </fo:instream-foreign-object>
-                <fo:block color="red">&lt;span&gt;Display:&lt;/span&gt;</fo:block>
+                - aftermath!
             </fo:block>
         </fo:flow>
     </fo:page-sequence>

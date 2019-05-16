@@ -6,7 +6,7 @@ import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.{FOEventHandler, FONode, PropertyList}
 import org.xml.sax.{Attributes, Locator}
 
-class MathJaxElement(parent: FONode, mathJax: MathJax) extends MathJaxObj(parent) {
+class MathJaxElement(parent: FONode, fopPlugin: MathJaxFopPlugin) extends MathJaxObj(parent) {
 
   private var parameters: Option[Parameters] = None
 
@@ -47,13 +47,13 @@ class MathJaxElement(parent: FONode, mathJax: MathJax) extends MathJaxObj(parent
   // in the MathJax namespace...
   //
   //   override def finalizeNode(): Unit = {
-  //     doc = FopPlugin.mathML2SVG(doc, mathJax)
+  //     doc = MathJaxFopPlugin.mathML2SVG(doc, mathJax)
   //   }
 
   private var sizes: Option[Sizes] = None
 
   private def getSizes: Sizes = sizes.getOrElse {
-    val result = Sizes(FopPlugin.mathML2SVG(doc, mathJax))
+    val result = Sizes(fopPlugin.mathML2SVG(doc))
     sizes = Some(result)
     result
   }
