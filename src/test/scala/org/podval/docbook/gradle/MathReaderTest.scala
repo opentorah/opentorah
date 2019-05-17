@@ -9,24 +9,24 @@ class MathReaderTest extends FlatSpec with Matchers {
     // Serializer outputs UTF-16; xml namespace is made explicit; order of attributes and spacing are different -
     // but other than that, the document is the same.
     parse(
-      """|<?xml version="1.0" encoding="UTF-16"?>
-         |<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="test-id"
-         |         xmlns:xi="http://www.w3.org/2001/XInclude">
+     s"""|<?xml version="1.0" encoding="UTF-16"?>
+         |<article ${Namespace.DocBook} version="5.0" xml:id="test-id"
+         |         ${Namespace.XInclude}>
          |  <para>
          |    Wrapped display TeX:<informalequation>
-         |    <math xmlns="http://www.w3.org/1998/Math/MathML"
-         |          xmlns:mathjax="http://podval.org/mathjax/ns/ext" mathjax:mode="TeX">
-         |      <mrow><mi>x = {-b \pm \sqrt{b^2-4ac} \over 2a}.</mi></mrow>
+         |    <math ${Namespace.MathML.default}
+         |          ${Namespace.MathJax} mathjax:mode="TeX">
+         |      <mrow><mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi></mrow>
          |    </math></informalequation>
          |  </para>
          |</article>""".stripMargin
     ) shouldBe
-      """|<?xml version="1.0" encoding="UTF-16"?><article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:id="test-id" xmlns:xi="http://www.w3.org/2001/XInclude">
+     s"""|<?xml version="1.0" encoding="UTF-16"?><article ${Namespace.DocBook} version="5.0" ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>
          |    Wrapped display TeX:<informalequation>
-         |    <math xmlns="http://www.w3.org/1998/Math/MathML" mathjax:mode="TeX" xmlns:mathjax="http://podval.org/mathjax/ns/ext">
+         |    <math ${Namespace.MathML.default} display="block" mathjax:mode="TeX" ${Namespace.MathJax}>
          |      <mrow>
-         |               <mi>x = {-b \pm \sqrt{b^2-4ac} \over 2a}.</mi>
+         |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
          |    </math>
          |      </informalequation>
@@ -37,18 +37,18 @@ class MathReaderTest extends FlatSpec with Matchers {
 
   it should "work for display TeX" in {
     parse(
-      """|<?xml version="1.0" encoding="UTF-8"?>
+     s"""|<?xml version="1.0" encoding="UTF-8"?>
          |<article xml:id="test-id"
-         |         xmlns="http://docbook.org/ns/docbook" version="5.0"
-         |         xmlns:xi="http://www.w3.org/2001/XInclude">
-         |  <para>Display TeX:$$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$</para>
+         |         ${Namespace.DocBook} version="5.0"
+         |         ${Namespace.XInclude}>
+         |  <para>Display TeX:$$$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$$$</para>
          |</article>""".stripMargin
     ) shouldBe
-      """|<?xml version="1.0" encoding="UTF-16"?><article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:id="test-id" xmlns:xi="http://www.w3.org/2001/XInclude">
+     s"""|<?xml version="1.0" encoding="UTF-16"?><article ${Namespace.DocBook} version="5.0" ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>Display TeX:<informalequation>
-         |         <math xmlns="http://www.w3.org/1998/Math/MathML" mathjax:mode="TeX" xmlns:mathjax="http://podval.org/mathjax/ns/ext">
+         |         <math ${Namespace.MathML.default} display="block" mathjax:mode="TeX" ${Namespace.MathJax}>
          |            <mrow>
-         |               <mi>x = {-b \pm \sqrt{b^2-4ac} \over 2a}.</mi>
+         |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
          |         </math>
          |      </informalequation>
@@ -59,19 +59,19 @@ class MathReaderTest extends FlatSpec with Matchers {
 
   it should "work for inline TeX" in {
     parse(
-      """|<?xml version="1.0" encoding="UTF-8"?>
+     s"""|<?xml version="1.0" encoding="UTF-8"?>
          |<article xml:id="test-id"
-         |         xmlns="http://docbook.org/ns/docbook" version="5.0"
-         |         xmlns:xi="http://www.w3.org/2001/XInclude">
-         |  <para>Inline TeX:$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$</para>
+         |         ${Namespace.DocBook} version="5.0"
+         |         ${Namespace.XInclude}>
+         |  <para>Inline TeX:$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$</para>
          |</article>
          |""".stripMargin
     ) shouldBe
-      """|<?xml version="1.0" encoding="UTF-16"?><article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:id="test-id" xmlns:xi="http://www.w3.org/2001/XInclude">
+     s"""|<?xml version="1.0" encoding="UTF-16"?><article ${Namespace.DocBook} version="5.0" ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>Inline TeX:<inlineequation>
-         |         <math xmlns="http://www.w3.org/1998/Math/MathML" mathjax:mode="TeX" xmlns:mathjax="http://podval.org/mathjax/ns/ext">
+         |         <math ${Namespace.MathML.default} display="inline" mathjax:mode="TeX" ${Namespace.MathJax}>
          |            <mrow>
-         |               <mi>x = {-b \pm \sqrt{b^2-4ac} \over 2a}.</mi>
+         |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
          |         </math>
          |      </inlineequation>
@@ -82,15 +82,15 @@ class MathReaderTest extends FlatSpec with Matchers {
 
   it should "work for equation display TeX" in {
     parse(
-      """|<?xml version="1.0" encoding="UTF-16"?>
-         |<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="test-id"
-         |         xmlns:xi="http://www.w3.org/2001/XInclude">
-         |  <para>Explicit display TeX:<equation>$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$</equation></para>
+     s"""|<?xml version="1.0" encoding="UTF-16"?>
+         |<article ${Namespace.DocBook} version="5.0" xml:id="test-id"
+         |         ${Namespace.XInclude}>
+         |  <para>Explicit display TeX:<equation>$$$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$$$</equation></para>
          |</article>""".stripMargin
     ) shouldBe
-      """|<?xml version="1.0" encoding="UTF-16"?><article xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:id="test-id" xmlns:xi="http://www.w3.org/2001/XInclude">
+     s"""|<?xml version="1.0" encoding="UTF-16"?><article ${Namespace.DocBook} version="5.0" ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>Explicit display TeX:<equation>
-         |         <math xmlns="http://www.w3.org/1998/Math/MathML" mathjax:mode="TeX" xmlns:mathjax="http://podval.org/mathjax/ns/ext">
+         |         <math ${Namespace.MathML.default} display="block" mathjax:mode="TeX" ${Namespace.MathJax}>
          |            <mrow>
          |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
@@ -102,23 +102,27 @@ class MathReaderTest extends FlatSpec with Matchers {
   }
 
 //  val wrappedInlineTex: String =
-//    """|<?xml version="1.0" encoding="UTF-8"?>
+//   s"""|<?xml version="1.0" encoding="UTF-8"?>
 //       |<article xml:id="test-id"
-//       |         xmlns="http://docbook.org/ns/docbook" version="5.0"
-//       |         xmlns:xi="http://www.w3.org/2001/XInclude">
+//       |         ${Namespace.DocBook} version="5.0"
+//       |         ${Namespace.XInclude}>
 //       |  <para>
 //       |    Wrapped display TeX:<inlineequation>
-//       |    <math xmlns="http://www.w3.org/1998/Math/MathML"
-//       |          xmlns:mathjax="http://podval.org/mathjax/ns/ext" mathjax:mode="TeX">
+//       |    <math ${Namespace.MathML.default}
+//       |          ${Namespace.MathJax} mathjax:mode="TeX">
 //       |      <mrow><mi>x = {-b \pm \sqrt{b^2-4ac} \over 2a}.</mi></mrow>
 //       |    </math></inlineequation>
 //       |  </para>
 //       |</article>""".stripMargin
 
+  // TODO a few more tests for the display mode functionality?
+
   private def parse(string: String): String = {
-    val mathReader = new MathReader
-    mathReader.setParent(Xml.getFilteredXMLReader(filters = Seq.empty))
-    val result = Xml.parse(string, mathReader, new TestLogger)
+    val result = Xml.parse(
+      input = string,
+      xmlReader = Xml.getFilteredXMLReader(filters = Seq(new MathReader /* , new TracingFilter */)),
+      logger = new TestLogger
+    )
     Xml.toString(result)
   }
 }

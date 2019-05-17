@@ -1,11 +1,8 @@
 package org.podval.docbook.gradle.mathjax
 
-import java.awt.geom.{AffineTransform, Rectangle2D}
-import java.io.StringBufferInputStream
-import java.io.File
+import java.io.{File, InputStream, StringBufferInputStream}
 
-import org.apache.batik.anim.dom.{SAXSVGDocumentFactory, SVGOMElement}
-import org.apache.batik.dom.svg.SVGContext
+import org.apache.batik.anim.dom.SAXSVGDocumentFactory
 import org.apache.fop.apps.FopFactory
 import org.apache.fop.fo.{ElementMapping, FONode}
 import org.apache.fop.image.loader.batik.PreloaderSVG
@@ -15,13 +12,45 @@ import org.apache.xmlgraphics.image.loader.{Image, ImageFlavor, ImageInfo, Image
 import org.apache.xmlgraphics.image.loader.impl.{AbstractImageLoader, AbstractImageLoaderFactory, ImageXMLDOM}
 import org.apache.xmlgraphics.image.loader.spi.{ImageImplRegistry, ImageLoader, ImageLoaderFactory}
 import org.podval.docbook.gradle.Xml
-import org.w3c.dom.{DOMImplementation, Document, Element}
+import org.podval.docbook.gradle.Namespace.MathML
+import org.w3c.dom.{DOMImplementation, Document}
 import org.w3c.dom.svg.SVGDocument
 
 //  Inspired by the JEuclid FOP plugin.
-final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJax.Config) {
+final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJax.Config = MathJax.Config()) {
 
-  def mathML2SVG(mathMLDocument: Document): SVGDocument = {
+  def typeset(mathMLDocument: Document): SVGDocument = {
+    val mode: String = Parameter.Mode.get(mathMLDocument).getOrElse(MathJax.MathML.input)
+    val isInline: Boolean = Parameter.Display.get(mathMLDocument).getOrElse(false)
+
+    val input: MathJax.Input = mode match {
+      case MathJax.Tex.input => if (isInline) MathJax.TexInline else MathJax.Tex
+      case MathJax.AsciiMath.input => MathJax.AsciiMath
+      case _ => MathJax.MathML
+    }
+
+    typeset(
+      what = if (input == MathJax.MathML) Xml.toString(mathMLDocument) else MathReader.unwrap(mathMLDocument),
+      input = input,
+      fontSize = Parameter.FontSize.get(mathMLDocument).get
+    )
+  }
+
+  def typeset(what: String, input: MathJax.Input, fontSize: Float): SVGDocument = {
+    val svg: String = typeset(what, input, fontSize.toInt, MathJax.Svg)
+
+    val in: InputStream = new UnclosableInputStream(new StringBufferInputStream(svg))
+    val length: Int = in.available()
+    in.mark(length + 1)
+    val result: SVGDocument = MathJaxFopPlugin.svgFactory.createSVGDocument(null, in)
+
+    // set font size on the resulting SVG - it is needed for the sizes calculations:
+    Parameter.FontSize.set(fontSize, result)
+
+    result
+  }
+
+  def typeset(what: String, input: MathJax.Input, fontSize: Float, output: MathJax.Output): String = {
     // NOTE: some tests failed unless I typeset specific TeX math first; some - even then;
     // re-configuring and forcibly re-starting MathJax before each typeset call breaks the tests even more;
     // sometimes, stopping Gradle daemon helped; once, JVM crashed; once, I got:
@@ -30,16 +59,24 @@ final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJa
     // Conclusion: MathJax has to be created, used and disposed by the same thread - duh!
     // For now, I just create, use and dispose a fresh MathJax instance for every typesetting -
     // but should probably do the worker thing mentioned in the J2V8 documentation.
+    //
+    // Some tests fail if their order is reversed when mathJax instance is re-used;
+    // this doesn't look like a threading issue - or maybe whatever I "solved" by using fresh MathJax instance
+    // for each typesetting wasn't (just) a threading issue either?
+
     val mathJax: MathJax = new MathJax(nodeModulesRoot)
     mathJax.configure(mathJaxConfiguration)
-    val result: SVGDocument = MathJaxFopPlugin.mathML2SVG(mathMLDocument, mathJax)
+
+    val result: String = mathJax.typeset2String(what, input, output, fontSize.toInt)
+
     mathJax.close()
+
     result
   }
 
   private def configure(fopFactory: FopFactory): Unit = {
     fopFactory.getElementMappingRegistry.addElementMapping(elementMapping)
-    fopFactory.getXMLHandlerRegistry.addXMLHandler(xmlHandler)
+    fopFactory.getXMLHandlerRegistry.addXMLHandler(xmlHandler(this))
 
     val images: ImageImplRegistry = fopFactory.getImageManager.getRegistry
 
@@ -50,7 +87,7 @@ final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJa
   }
 
   private def elementMapping: ElementMapping = new ElementMapping {
-    namespaceURI = MathJaxFopPlugin.MathMLNameSpace
+    namespaceURI = MathML.uri
 
     override def getDOMImplementation: DOMImplementation = ElementMapping.getDefaultDOMImplementation
 
@@ -58,7 +95,7 @@ final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJa
       if (foObjs == null) {
         foObjs = new java.util.HashMap
 
-        foObjs.put(MathJaxFopPlugin.MathMLElementName, new ElementMapping.Maker {
+        foObjs.put(MathML.math, new ElementMapping.Maker {
           override def make(parent: FONode): FONode = new MathJaxElement(parent, MathJaxFopPlugin.this)
         })
         foObjs.put(ElementMapping.DEFAULT, new ElementMapping.Maker {
@@ -68,9 +105,9 @@ final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJa
     }
   }
 
-  private def xmlHandler: XMLHandler = new XMLHandler {
+  private def xmlHandler(fopPlugin: MathJaxFopPlugin): XMLHandler = new XMLHandler() {
 
-    override def getNamespace: String = MathJaxFopPlugin.MathMLNameSpace
+    override def getNamespace: String = MathML.uri
 
     override def supportsRenderer(renderer: Renderer): Boolean = renderer.getGraphics2DAdapter != null
 
@@ -84,13 +121,13 @@ final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJa
       ns: String
     ): Unit = rendererContext.getRenderer.renderXML(
       rendererContext,
-      mathML2SVG(document),
+      fopPlugin.typeset(document),
       ns
     )
   }
 
   private def imageLoaderFactory: ImageLoaderFactory = new AbstractImageLoaderFactory {
-    override def getSupportedMIMETypes: Array[String] = Array(MathJaxFopPlugin.MathMLMimeType)
+    override def getSupportedMIMETypes: Array[String] = Array(MathML.mimeType)
     override def getSupportedFlavors(mime: String): Array[ImageFlavor] = Array(ImageFlavor.XML_DOM)
     override def getUsagePenalty(mime: String, flavor: ImageFlavor): Int = 0
     override def isAvailable: Boolean = true
@@ -102,9 +139,9 @@ final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJa
         override def getTargetFlavor: ImageFlavor = targetFlavor
 
         override def loadImage(info: ImageInfo, hints: java.util.Map[_, _], session: ImageSessionContext): Image = {
-          require(info.getMimeType == MathJaxFopPlugin.MathMLMimeType)
+          require(info.getMimeType == MathML.mimeType)
           val result: ImageXMLDOM = info.getOriginalImage.asInstanceOf[ImageXMLDOM]
-          require(result.getRootNamespace == MathJaxFopPlugin.MathMLNameSpace)
+          require(MathML.is(result.getRootNamespace))
           result
         }
       }
@@ -113,65 +150,10 @@ final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJa
 }
 
 object MathJaxFopPlugin {
-  val MathMLNameSpace: String = "http://www.w3.org/1998/Math/MathML"
-
-  val MathMLNameSpacePrefix: String = "mathml"
-
-  val MathMLElementName: String = "math"
-
-  val MathMLMimeType: String = "application/mathml+xml"
 
   def configure(fopFactory: FopFactory, nodeModulesRoot: File, mathJaxConfiguration: MathJax.Config): Unit =
-    new MathJaxFopPlugin(nodeModulesRoot, mathJaxConfiguration).configure(fopFactory)
-
-  private def mathML2SVG(mathMLDocument: Document, mathJax: MathJax): SVGDocument = {
-    def unwrap: String = mathMLDocument.getDocumentElement
-      .getElementsByTagName ("mrow").item (0).asInstanceOf[Element]
-      .getElementsByTagName ("mi").item (0).asInstanceOf[Element]
-      .getTextContent
-
-    val parameters: Parameters = Parameters(mathMLDocument)
-    val mode: String = parameters.getMode
-    val fontSize: Float = parameters.getFontSize
-    val ex: Int = parameters.getFontExSize
-
-    val svg: String = mode match {
-      case MathJax.Tex.input =>
-        mathJax.typeset2String(unwrap, MathJax.Tex, ex = ex)
-
-      case MathJax.AsciiMath.input =>
-        mathJax.typeset2String(unwrap, MathJax.AsciiMath, ex = ex)
-
-      case _ =>
-        val mathml: String = Xml.toString(mathMLDocument)
-        mathJax.typeset2String(mathml, MathJax.MathML, ex = ex)
-    }
-
-    val in = new UnclosableInputStream(new StringBufferInputStream(svg))
-    val length: Int = in.available()
-    in.mark(length + 1)
-    val svgDocument: SVGDocument = svgFactory.createSVGDocument(null, in)
-
-    // transplant the parameters
-    parameters.serializeInto(svgDocument.getRootElement)
-
-    // supply (just) the font size for the sizes calculations
-    svgDocument.getDocumentElement.asInstanceOf[SVGOMElement].setSVGContext(new SVGContext {
-      override def getFontSize: Float = fontSize
-
-      override def getPixelUnitToMillimeter: Float = ???
-      override def getPixelToMM: Float = ???
-      override def getBBox: Rectangle2D = ???
-      override def getScreenTransform: AffineTransform = ???
-      override def setScreenTransform(at: AffineTransform): Unit = ???
-      override def getCTM: AffineTransform = ???
-      override def getGlobalTransform: AffineTransform = ???
-      override def getViewportWidth: Float = ???
-      override def getViewportHeight: Float = ???
-    })
-
-    svgDocument
-  }
+    new MathJaxFopPlugin(nodeModulesRoot, mathJaxConfiguration)
+      .configure(fopFactory)
 
   private val svgFactory: SAXSVGDocumentFactory = new SAXSVGDocumentFactory(PreloaderSVG.getParserName)
 }

@@ -8,21 +8,17 @@ import org.xml.sax.{Attributes, Locator}
 
 class MathJaxElement(parent: FONode, fopPlugin: MathJaxFopPlugin) extends MathJaxObj(parent) {
 
-  private var parameters: Option[Parameters] = None
+  private var fontSize: Option[Float] = None
 
   override protected def createPropertyList(
     pList: PropertyList,
     foEventHandler: FOEventHandler
   ): PropertyList = {
-    parameters = Some(new Parameters)
-
     val commonFont = pList.getFontProps
 
-    parameters.get.setParameter(Parameters.FontSize,
-      (commonFont.fontSize.getNumericValue / Sizes.Points2Millipoints).toFloat)
+    fontSize = Some((commonFont.fontSize.getNumericValue / Sizes.Points2Millipoints).toFloat)
 
-    parameters.get.setParameter(Parameters.Fonts,
-      commonFont.getFontState(getFOEventHandler.getFontInfo).toList.map(_.getName))
+    // fonts: commonFont.getFontState(getFOEventHandler.getFontInfo).toList.map(_.getName)
 
     super.createPropertyList(pList, foEventHandler)
   }
@@ -34,7 +30,10 @@ class MathJaxElement(parent: FONode, fopPlugin: MathJaxFopPlugin) extends MathJa
     propertyList: PropertyList
   ): Unit = {
     super.processNode(elementName, locator, attlist, propertyList)
-    parameters.foreach(_.serializeInto(createBasicDocument().getDocumentElement))
+
+    createBasicDocument()
+
+    Parameter.FontSize.set(fontSize.get, getDOMDocument)
   }
 
   // NOTE: It is tempting to typeset MathML to SVG right here to avoid duplicate conversions
@@ -53,7 +52,7 @@ class MathJaxElement(parent: FONode, fopPlugin: MathJaxFopPlugin) extends MathJa
   private var sizes: Option[Sizes] = None
 
   private def getSizes: Sizes = sizes.getOrElse {
-    val result = Sizes(fopPlugin.mathML2SVG(doc))
+    val result = Sizes(fopPlugin.typeset(doc))
     sizes = Some(result)
     result
   }

@@ -43,7 +43,7 @@ final class MathJax(nodeModulesRoot: File) {
 //    args.release()
 //  }
 
-  def typeset2String(math: String, input: MathJax.Input, output: MathJax.Output = MathJax.Svg, ex: Int = 6): String = {
+  def typeset2String(math: String, input: MathJax.Input, output: MathJax.Output, ex: Int): String = {
     val data: V8Object = typeset(math, input, output, isNode = false, ex)
     val result: String = data.getString(output.output)
     data.release()

@@ -15,7 +15,7 @@ final class ImageConverterMathML2G2D(fopPlugin: MathJaxFopPlugin) extends Abstra
 
   override def convert(src: Image, hints: java.util.Map[_, _]): Image = {
     val mathmlDocument: Document = src.asInstanceOf[ImageXMLDOM].getDocument
-    val svgDocument: SVGDocument = fopPlugin.mathML2SVG(mathmlDocument)
+    val svgDocument: SVGDocument = fopPlugin.typeset(mathmlDocument)
     val sizes: Sizes = Sizes(svgDocument)
 
     new ImageGraphics2D(src.getInfo, new Graphics2DImagePainter {

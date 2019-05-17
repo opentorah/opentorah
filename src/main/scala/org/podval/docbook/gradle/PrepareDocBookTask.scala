@@ -8,7 +8,7 @@ import org.gradle.api.tasks.{Input, TaskAction}
 import java.io.File
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
-import DocBookPlugin.DocBookNamespace
+import Namespace.DocBook
 import Util.writeInto
 import section.{DocBook2, HtmlCommon, Section}
 
@@ -63,7 +63,7 @@ class PrepareDocBookTask extends DefaultTask  {
           |  PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN"
           |  "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd">
           |
-          |<article xmlns="$DocBookNamespace" version="5.0"
+          |<article xmlns="${DocBook.uri}" version="5.0"
           |         xmlns:xi="http://www.w3.org/2001/XInclude">
           |</article>
           |"""
@@ -334,7 +334,7 @@ class PrepareDocBookTask extends DefaultTask  {
          |<!-- Customizations go here. -->
          |<xsl:stylesheet
          |  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="${section.xsltVersion}"
-         |  xmlns:db="$DocBookNamespace"
+         |  xmlns:db="${DocBook.uri}"
          |  exclude-result-prefixes="db">
          |
          |${section.customStylesheet}

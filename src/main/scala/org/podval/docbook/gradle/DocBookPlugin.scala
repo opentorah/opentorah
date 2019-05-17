@@ -81,7 +81,3 @@ final class DocBookPlugin extends Plugin[Project] {
     listFontsTask.setDescription("List FOP fonts")
   }
 }
-
-object DocBookPlugin {
-  val DocBookNamespace: String = "http://docbook.org/ns/docbook"
-}
