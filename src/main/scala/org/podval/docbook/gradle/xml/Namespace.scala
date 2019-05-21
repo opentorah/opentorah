@@ -1,9 +1,9 @@
-package org.podval.docbook.gradle
+package org.podval.docbook.gradle.xml
 
 import org.w3c.dom.{Document, Element}
 import org.xml.sax.helpers.AttributesImpl
 
-sealed class Namespace(val uri: String, val prefix: String = "") {
+class Namespace(val uri: String, val prefix: String = "") {
   override def toString: String = s"""$xmlns="$uri""""
 
   def isDefault: Boolean = prefix == ""
@@ -11,6 +11,15 @@ sealed class Namespace(val uri: String, val prefix: String = "") {
   def qName(localName: String): String = if (isDefault) localName else prefix + ":" + localName
 
   val default: Namespace = if (isDefault) this else new Namespace(uri)
+
+  override def equals(other: Any): Boolean = other match {
+    case that: Namespace =>
+      val result: Boolean = this.is(that)
+      if (result) require(this.prefix == that.prefix)
+      result
+
+    case _ => false
+  }
 
   def is(document: Document): Boolean = is(document.getDocumentElement.getNamespaceURI)
 
@@ -27,8 +36,14 @@ sealed class Namespace(val uri: String, val prefix: String = "") {
   private def declare(element: Element): Unit =
     element.setAttributeNS(Namespace.Xmlns.uri, xmlns, uri)
 
+  def ensureDeclared(attributes: AttributesImpl): Unit =
+    if (!isDeclared(attributes)) declare(attributes)
+
+  private def isDeclared(attributes: AttributesImpl): Boolean =
+    attributes.getValue(Namespace.Xmlns.uri, prefix) == uri
+
   def declare(attributes: AttributesImpl): Unit =
-    attributes.addAttribute(Namespace.Xmlns.uri, prefix, xmlns, null, uri)
+    attributes.addAttribute(Namespace.Xmlns.uri, prefix, xmlns, "CDATA", uri)
 
   def xmlns: String =
     if (isDefault) Namespace.Xmlns.prefix else Namespace.Xmlns.qName(prefix)
@@ -43,22 +58,5 @@ object Namespace {
 
   object XLink extends Namespace(uri = "http://www.w3.org/1999/xlink", prefix = "xlink")
 
-  object DocBook extends Namespace(uri = "http://docbook.org/ns/docbook")
-
-  // Note: only MathJaxObj.getNormalNamespacePrefix() needs the prefix;
-  // everywhere else default mapping is assumed.
-  object MathML extends Namespace(uri = "http://www.w3.org/1998/Math/MathML", prefix = "mathml") {
-
-    val mimeType: String = "application/mathml+xml"
-
-    val math: String = "math"
-    val mrow: String = "mrow"
-    val mi: String = "mi"
-  }
-
-  object MathJax extends Namespace(uri = "http://podval.org/mathjax/ns/ext", prefix = "mathjax")
-
-  object SVG extends Namespace(uri = "http://www.w3.org/2000/svg") {
-    val mimeType: String = "image/svg+xml"
-  }
+  object Xsl extends Namespace(uri = "http://www.w3.org/1999/XSL/Transform", prefix = "xsl")
 }

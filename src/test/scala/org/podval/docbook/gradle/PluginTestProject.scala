@@ -3,6 +3,8 @@ package org.podval.docbook.gradle
 import org.gradle.testkit.runner.{BuildResult, GradleRunner}
 import java.io.File
 
+import org.podval.docbook.gradle.xml.Xml
+
 class PluginTestProject(
   val name: String,
   val document: String,
@@ -47,14 +49,11 @@ class PluginTestProject(
   private def prepare(): Unit = {
     projectDir.mkdirs()
 
-    writeInto("build.gradle",
-      buildGradle)
+    writeInto("build.gradle", buildGradle)
 
-    writeInto("settings.gradle",
-      s"includeBuild '$pluginDir'")
+    writeInto("settings.gradle", s"includeBuild '$pluginDir'")
 
-    writeInto(s"src/main/docBook/$documentName.xml",
-      """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" + document)
+    writeInto(s"src/main/docBook/$documentName.xml", s"${Xml.header}\n$document")
   }
 
   private val logger: Logger = new TestLogger

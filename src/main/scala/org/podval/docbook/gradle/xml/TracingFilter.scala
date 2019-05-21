@@ -1,7 +1,7 @@
-package org.podval.docbook.gradle
+package org.podval.docbook.gradle.xml
 
-import org.xml.sax.{Attributes, Locator}
 import org.xml.sax.helpers.XMLFilterImpl
+import org.xml.sax.{Attributes, Locator}
 
 final class TracingFilter extends XMLFilterImpl {
 

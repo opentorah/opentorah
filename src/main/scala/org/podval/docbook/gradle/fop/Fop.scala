@@ -1,14 +1,14 @@
-package org.podval.docbook.gradle
+package org.podval.docbook.gradle.fop
 
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import java.net.URI
 
-import net.sourceforge.jeuclid.fop.plugin.JEuclidFopFactoryConfigurator
 import org.apache.fop.apps.{FOUserAgent, FopConfParser, FopFactory}
-import org.apache.xmlgraphics.util.MimeConstants
 import org.apache.fop.fonts.{FontEventListener, FontTriplet}
 import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
-import org.podval.docbook.gradle.mathjax.{MathJaxFopPlugin, MathJax}
+import org.apache.xmlgraphics.util.MimeConstants
+import org.podval.docbook.gradle.xml.Xml
+import org.podval.docbook.gradle.{Logger, Util}
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.SortedMap
@@ -17,32 +17,25 @@ object Fop {
 
   def run(
     configurationFile: File,
-    nodeModulesRoot: File,
     substitutions: Map[String, String],
-    isMathJaxEnabled: Boolean,
-    isJEuclidEnabled: Boolean,
     inputFile: File,
     inputDirectory: File,
     outputFile: File,
+    plugin: Option[FopPlugin],
     logger: Logger
   ): Unit = {
     logger.info(
       s"""Fop.run(
          |  configurationFile = $configurationFile,
-         |  nodeModulesRoot = $nodeModulesRoot,
          |  inputFile = $inputFile,
          |  inputDirectory = $inputDirectory,
          |  outputFile = $outputFile,
-         |  isMathJaxEnabled = $isMathJaxEnabled,
-         |  isJEuclidEnabled = $isJEuclidEnabled
          |)""".stripMargin
     )
 
     val fopFactory: FopFactory = getFopFactory(configurationFile, inputFile)
 
-    require(!isMathJaxEnabled || !isJEuclidEnabled)
-    if (isMathJaxEnabled) MathJaxFopPlugin.configure(fopFactory, nodeModulesRoot, MathJax.Config())
-    else if (isJEuclidEnabled) JEuclidFopFactoryConfigurator.configure(fopFactory)
+    plugin.foreach(_.configure(fopFactory))
 
     // PDF metadata:
     val foUserAgent: FOUserAgent = fopFactory.newFOUserAgent
@@ -143,8 +136,10 @@ object Fop {
       .mapValues(_.asScala.toList)
   }
 
-  private def getFopFactory(configurationFile: File, inputFile: File): FopFactory =
-    new FopConfParser(configurationFile, inputFile.getParentFile.toURI)
-      .getFopFactoryBuilder
-      .build
+  private def getFopFactory(configurationFile: File, inputFile: File): FopFactory = {
+    val parser: FopConfParser = new FopConfParser(configurationFile, inputFile.getParentFile.toURI)
+    val builder = parser.getFopFactoryBuilder
+    val configuration = new FopFactoryConfigProxy(builder.buildConfig)
+    FopFactory.newInstance(configuration)
+  }
 }

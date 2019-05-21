@@ -1,5 +1,6 @@
-package org.podval.docbook.gradle
+package org.podval.docbook.gradle.xml
 
+import org.podval.docbook.gradle.Logger
 import org.xml.sax.EntityResolver
 import org.xml.sax.helpers.XMLFilterImpl
 

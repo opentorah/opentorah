@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle
+package org.podval.docbook.gradle.xml
 
 import java.io.{File, FileWriter, StringReader}
 
@@ -7,11 +7,16 @@ import javax.xml.transform.dom.DOMResult
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.{StreamResult, StreamSource}
 import javax.xml.transform.{ErrorListener, Result, Source, TransformerException}
+import org.podval.docbook.gradle.Logger
 import org.w3c.dom.Node
 import org.xml.sax.helpers.DefaultHandler
 import org.xml.sax.{InputSource, XMLFilter, XMLReader}
 
 object Xml {
+
+  val header: String = """<?xml version="1.0" encoding="UTF-8"?>"""
+
+  val header16: String = """<?xml version="1.0" encoding="UTF-16"?>"""
 
   def toString(node: Node): String = xmlSerializer.writeToString(node)
 

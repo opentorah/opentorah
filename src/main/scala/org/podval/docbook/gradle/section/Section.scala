@@ -1,5 +1,7 @@
 package org.podval.docbook.gradle.section
 
+import scala.collection.JavaConverters._
+
 trait Section {
 
   def name: String
@@ -31,5 +33,10 @@ object Section {
            |""".stripMargin
       )
     }
+  }
+
+  def getSections(values: java.util.Map[String, java.util.Map[String, String]]): Map[Section, Map[String, String]] = {
+    val result: Map[String, Map[String, String]] = values.asScala.toMap.mapValues(_.asScala.toMap)
+    result.map { case (sectionName, parameters) => forName(sectionName) -> parameters }
   }
 }

@@ -1,92 +1,52 @@
 package org.podval.docbook.gradle.mathjax
 
-import java.io.{File, InputStream, StringBufferInputStream}
+import java.awt.{Dimension, Graphics2D, RenderingHints}
+import java.awt.geom.Rectangle2D
+import java.io.File
 
-import org.apache.batik.anim.dom.SAXSVGDocumentFactory
-import org.apache.fop.apps.FopFactory
+import javax.xml.transform.Source
+import javax.xml.transform.dom.DOMSource
 import org.apache.fop.fo.{ElementMapping, FONode}
-import org.apache.fop.image.loader.batik.PreloaderSVG
 import org.apache.fop.render.{Renderer, RendererContext, XMLHandler}
-import org.apache.fop.util.UnclosableInputStream
-import org.apache.xmlgraphics.image.loader.{Image, ImageFlavor, ImageInfo, ImageSessionContext}
-import org.apache.xmlgraphics.image.loader.impl.{AbstractImageLoader, AbstractImageLoaderFactory, ImageXMLDOM}
-import org.apache.xmlgraphics.image.loader.spi.{ImageImplRegistry, ImageLoader, ImageLoaderFactory}
-import org.podval.docbook.gradle.Xml
-import org.podval.docbook.gradle.Namespace.MathML
-import org.w3c.dom.{DOMImplementation, Document}
+import org.apache.xmlgraphics.image.loader.{Image, ImageContext, ImageFlavor, ImageInfo, ImageSessionContext}
+import org.apache.xmlgraphics.image.loader.impl.{AbstractImageConverter, AbstractImageLoader,
+  AbstractImageLoaderFactory, AbstractImagePreloader, ImageGraphics2D, ImageXMLDOM}
+import org.apache.xmlgraphics.image.loader.spi.{ImageConverter, ImageLoader, ImageLoaderFactory, ImagePreloader}
+import org.apache.xmlgraphics.java2d.Graphics2DImagePainter
+import org.podval.docbook.gradle.fop.FopPlugin
 import org.w3c.dom.svg.SVGDocument
+import org.w3c.dom.{DOMImplementation, Document}
 
 //  Inspired by the JEuclid FOP plugin.
-final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJax.Config = MathJax.Config()) {
+final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJaxConfiguration) extends FopPlugin {
 
-  def typeset(mathMLDocument: Document): SVGDocument = {
-    val mode: String = Parameter.Mode.get(mathMLDocument).getOrElse(MathJax.MathML.input)
-    val isInline: Boolean = Parameter.Display.get(mathMLDocument).getOrElse(false)
-
-    val input: MathJax.Input = mode match {
-      case MathJax.Tex.input => if (isInline) MathJax.TexInline else MathJax.Tex
-      case MathJax.AsciiMath.input => MathJax.AsciiMath
-      case _ => MathJax.MathML
-    }
-
-    typeset(
-      what = if (input == MathJax.MathML) Xml.toString(mathMLDocument) else MathReader.unwrap(mathMLDocument),
-      input = input,
-      fontSize = Parameter.FontSize.get(mathMLDocument).get
-    )
-  }
-
-  def typeset(what: String, input: MathJax.Input, fontSize: Float): SVGDocument = {
-    val svg: String = typeset(what, input, fontSize.toInt, MathJax.Svg)
-
-    val in: InputStream = new UnclosableInputStream(new StringBufferInputStream(svg))
-    val length: Int = in.available()
-    in.mark(length + 1)
-    val result: SVGDocument = MathJaxFopPlugin.svgFactory.createSVGDocument(null, in)
-
-    // set font size on the resulting SVG - it is needed for the sizes calculations:
-    Parameter.FontSize.set(fontSize, result)
-
-    result
-  }
-
-  def typeset(what: String, input: MathJax.Input, fontSize: Float, output: MathJax.Output): String = {
-    // NOTE: some tests failed unless I typeset specific TeX math first; some - even then;
-    // re-configuring and forcibly re-starting MathJax before each typeset call breaks the tests even more;
-    // sometimes, stopping Gradle daemon helped; once, JVM crashed; once, I got:
-    //   Invalid V8 thread access: current thread is Thread[Execution worker for ':',5,main]
-    //   while the locker has thread Thread[Execution worker for ':',5,]
-    // Conclusion: MathJax has to be created, used and disposed by the same thread - duh!
-    // For now, I just create, use and dispose a fresh MathJax instance for every typesetting -
-    // but should probably do the worker thing mentioned in the J2V8 documentation.
-    //
-    // Some tests fail if their order is reversed when mathJax instance is re-used;
-    // this doesn't look like a threading issue - or maybe whatever I "solved" by using fresh MathJax instance
-    // for each typesetting wasn't (just) a threading issue either?
-
-    val mathJax: MathJax = new MathJax(nodeModulesRoot)
+  // NOTE: some tests failed unless I typeset specific TeX math first; some - even then;
+  // re-configuring and forcibly re-starting MathJax before each typeset call breaks the tests even more;
+  // sometimes, stopping Gradle daemon helped; once, JVM crashed; once, I got:
+  //   Invalid V8 thread access: current thread is Thread[Execution worker for ':',5,main]
+  //   while the locker has thread Thread[Execution worker for ':',5,]
+  // Conclusion: MathJax has to be created, used and disposed by the same thread - duh!
+  // For now, I just create, use and dispose a fresh MathJax instance for every typesetting -
+  // but should probably do the worker thing mentioned in the J2V8 documentation.
+  //
+  // Some tests fail if their order is reversed when mathJax instance is re-used;
+  // this doesn't look like a threading issue - or maybe whatever I "solved" by using fresh MathJax instance
+  // for each typesetting wasn't (just) a threading issue either?
+  // NOTE: some tests failed unless I typeset specific TeX math first; some - even then;
+  def withMathJax[T](f: MathJax => T): T = {
+    val mathJax = new MathJax(nodeModulesRoot)
     mathJax.configure(mathJaxConfiguration)
 
-    val result: String = mathJax.typeset2String(what, input, output, fontSize.toInt)
+    val result = f(mathJax)
 
     mathJax.close()
 
     result
   }
 
-  private def configure(fopFactory: FopFactory): Unit = {
-    fopFactory.getElementMappingRegistry.addElementMapping(elementMapping)
-    fopFactory.getXMLHandlerRegistry.addXMLHandler(xmlHandler(this))
+  private def typeset(document: Document): SVGDocument = withMathJax(_.typeset(document))
 
-    val images: ImageImplRegistry = fopFactory.getImageManager.getRegistry
-
-    images.registerPreloader(new PreloaderMathML(this))
-
-    //images.registerLoaderFactory(imageLoaderFactory)
-    //images.registerConverter(new ImageConverterMathML2G2D(this))
-  }
-
-  private def elementMapping: ElementMapping = new ElementMapping {
+  override protected def elementMapping: ElementMapping = new ElementMapping {
     namespaceURI = MathML.uri
 
     override def getDOMImplementation: DOMImplementation = ElementMapping.getDefaultDOMImplementation
@@ -105,10 +65,12 @@ final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJa
     }
   }
 
-  private def xmlHandler(fopPlugin: MathJaxFopPlugin): XMLHandler = new XMLHandler() {
+  // Note: Not sure if I need this - it is probably used to read MathML from a file...
+  // If I end up using it, make sure SVG rendering works properly...
+  override protected def isHandlerNeeded: Boolean = false
 
+  override protected def xmlHandler: XMLHandler = new XMLHandler() {
     override def getNamespace: String = MathML.uri
-
     override def supportsRenderer(renderer: Renderer): Boolean = renderer.getGraphics2DAdapter != null
 
     // From XMLHandler.handleXML() documentation:
@@ -121,12 +83,39 @@ final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJa
       ns: String
     ): Unit = rendererContext.getRenderer.renderXML(
       rendererContext,
-      fopPlugin.typeset(document),
+      typeset(document),
       ns
     )
   }
 
-  private def imageLoaderFactory: ImageLoaderFactory = new AbstractImageLoaderFactory {
+  override protected def imagePreloader: ImagePreloader = new AbstractImagePreloader {
+    override def preloadImage(uri: String, src: Source, context: ImageContext): ImageInfo = {
+      val document: Document = src.asInstanceOf[DOMSource].getNode.asInstanceOf[Document]
+
+      if (!MathML.is(document)) null else  {
+        val svgDocument: SVGDocument = typeset(document)
+
+        val result: ImageInfo = new ImageInfo(uri, Svg.mimeType)
+        result.setSize(Sizes(svgDocument).getImageSize(context.getSourceResolution))
+
+        // Stash the result to avoid typesetting again:
+        result
+          .getCustomObjects.asInstanceOf[java.util.Map[AnyRef, AnyRef]]
+          .put(ImageInfo.ORIGINAL_IMAGE, new ImageXMLDOM(result, svgDocument, Svg.uri))
+
+        result
+      }
+    }
+  }
+
+  /* Note: PreloaderMathML typesets MathML to SVG and hands it over to FOP for rendering;
+     if it turns out to be possible to place/size resulting math correctly in the PDF
+     (it is off the baseline, too much to the left and too short right now) using hints and whatnot - fine;
+     if we *do* need to make the pipeline longer - change this to true and code the loader/converter...
+   */
+  override protected def isPipelineLong: Boolean = false
+
+  override protected def imageLoaderFactory: ImageLoaderFactory = new AbstractImageLoaderFactory {
     override def getSupportedMIMETypes: Array[String] = Array(MathML.mimeType)
     override def getSupportedFlavors(mime: String): Array[ImageFlavor] = Array(ImageFlavor.XML_DOM)
     override def getUsagePenalty(mime: String, flavor: ImageFlavor): Int = 0
@@ -147,13 +136,33 @@ final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJa
       }
     }
   }
-}
 
-object MathJaxFopPlugin {
+  override protected def imageConverter: ImageConverter = new AbstractImageConverter {
+    override def getSourceFlavor: ImageFlavor = ImageFlavor.XML_DOM
+    override def getTargetFlavor: ImageFlavor = ImageFlavor.GRAPHICS2D
 
-  def configure(fopFactory: FopFactory, nodeModulesRoot: File, mathJaxConfiguration: MathJax.Config): Unit =
-    new MathJaxFopPlugin(nodeModulesRoot, mathJaxConfiguration)
-      .configure(fopFactory)
+    override def convert(src: Image, hints: java.util.Map[_, _]): Image = {
+      val mathmlDocument: Document = src.asInstanceOf[ImageXMLDOM].getDocument
+      val svgDocument: SVGDocument = typeset(mathmlDocument)
+      val sizes: Sizes = Sizes(svgDocument)
 
-  private val svgFactory: SAXSVGDocumentFactory = new SAXSVGDocumentFactory(PreloaderSVG.getParserName)
+      new ImageGraphics2D(src.getInfo, new Graphics2DImagePainter {
+        override def getImageSize: Dimension = sizes.getDimension
+
+        override def paint(graphics2d: Graphics2D, rectangle2d: Rectangle2D): Unit = {
+          //val x: Float = 0
+          //val y: Float = sizes.ascent
+          val  hints: RenderingHints = graphics2d.getRenderingHints
+          hints.add(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON))
+          hints.add(new RenderingHints(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE))
+          hints.add(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY))
+          graphics2d.setRenderingHints(hints)
+
+          // see org.apache.fop.image.loader.batik.ImageConverterSVG2G2D for conversion code - but:
+          // "Specialized renderers may want to provide specialized adapters to profit
+          // from target-format features (for example with PDF or PS)."
+        }
+      })
+    }
+  }
 }

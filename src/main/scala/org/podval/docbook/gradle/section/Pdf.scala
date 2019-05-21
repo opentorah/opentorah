@@ -2,8 +2,9 @@ package org.podval.docbook.gradle.section
 
 import java.io.File
 
-import org.podval.docbook.gradle.mathjax.MathReader
-import org.podval.docbook.gradle.{Fop, Layout, Logger}
+import org.podval.docbook.gradle.fop.{Fop, FopPlugin, JEuclidFopPlugin}
+import org.podval.docbook.gradle.mathjax.{MathJaxConfiguration, MathJaxFopPlugin, MathReader}
+import org.podval.docbook.gradle.{Layout, Logger}
 import org.xml.sax.XMLFilter
 
 object Pdf extends DocBook2 {
@@ -35,7 +36,10 @@ object Pdf extends DocBook2 {
        |  </xsl:attribute-set>
        |"""
 
-  override def xmlFilter: Option[XMLFilter] = Some(new MathReader)
+  private def mathJaxConfiguration: MathJaxConfiguration = MathJaxConfiguration()
+
+  override def xmlFilter: Option[XMLFilter] =
+    Some(new MathReader(mathJaxConfiguration))
 
   override def postProcess(
     layout: Layout,
@@ -46,15 +50,22 @@ object Pdf extends DocBook2 {
     inputFile: File,
     outputFile: File,
     logger: Logger
-  ): Unit = Fop.run(
-    configurationFile = layout.fopConfigurationFile,
-    nodeModulesRoot = layout.nodeModulesRoot,
-    substitutions: Map[String, String],
-    isMathJaxEnabled = isMathJaxEnabled,
-    isJEuclidEnabled = isJEuclidEnabled,
-    inputFile = inputFile,
-    inputDirectory = inputDirectory,
-    outputFile = outputFile,
-    logger = logger
-  )
+  ): Unit = {
+    require(!isMathJaxEnabled || !isJEuclidEnabled)
+
+    val plugin: Option[FopPlugin] =
+      if (isJEuclidEnabled) Some(new JEuclidFopPlugin)
+      else if (isMathJaxEnabled) Some(new MathJaxFopPlugin(layout.nodeModulesRoot, mathJaxConfiguration))
+      else None
+
+    Fop.run(
+      configurationFile = layout.fopConfigurationFile,
+      substitutions: Map[String, String],
+      plugin = plugin,
+      inputFile = inputFile,
+      inputDirectory = inputDirectory,
+      outputFile = outputFile,
+      logger = logger
+    )
+  }
 }

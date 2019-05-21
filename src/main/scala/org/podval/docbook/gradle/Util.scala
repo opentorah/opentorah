@@ -1,8 +1,7 @@
 package org.podval.docbook.gradle
 
-import org.gradle.api.provider.{ListProperty, MapProperty, Property}
+import org.gradle.api.provider.{ListProperty, Property}
 import java.io.{BufferedWriter, File, FileWriter, InputStream}
-import section.Section
 
 import scala.collection.JavaConverters._
 
@@ -44,13 +43,6 @@ object Util {
     if (extension.nonEmpty && !extension.contains("xml"))
       throw new IllegalArgumentException(s"Extension must be '$allowedExtension' if present: $nameWihtExtension")
     name
-  }
-
-  def getSections(property: MapProperty[String, java.util.Map[String, String]]): Map[Section, Map[String, String]] = {
-    val result: Map[String, Map[String, String]] = property.get.asScala.toMap.mapValues(_.asScala.toMap)
-    result.map { case (sectionName, parameters) =>
-        Section.forName(sectionName) -> parameters
-    }
   }
 
   def applicationString: String = {

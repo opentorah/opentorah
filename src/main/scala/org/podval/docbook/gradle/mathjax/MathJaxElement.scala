@@ -4,6 +4,8 @@ import java.awt.geom.Point2D
 
 import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.{FOEventHandler, FONode, PropertyList}
+import org.podval.docbook.gradle.xml.{AttributeInfo, Namespace}
+import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
 
 class MathJaxElement(parent: FONode, fopPlugin: MathJaxFopPlugin) extends MathJaxObj(parent) {
@@ -29,11 +31,29 @@ class MathJaxElement(parent: FONode, fopPlugin: MathJaxFopPlugin) extends MathJa
     attlist: Attributes,
     propertyList: PropertyList
   ): Unit = {
-    super.processNode(elementName, locator, attlist, propertyList)
+    super.processNode(elementName, locator, sortAttributes(attlist), propertyList)
 
     createBasicDocument()
 
-    Parameter.FontSize.set(fontSize.get, getDOMDocument)
+    FontSizeAttribute.set(fontSize.get, getDOMDocument)
+  }
+
+  // Note: XMLObj.setAttributes() sets namespace on an attribute only if it already saw
+  // the declarations of that namespace, so I am making sure that they are there (and in the beginning);
+  // even then, XMLObj.setAttributes() sets unprefixed qualifield name for namespaced attributes -
+  // but somehow they are detected correctly in MathJax.typeset()...
+  private def sortAttributes(attlist: Attributes): Attributes = {
+    val attributes: Seq[AttributeInfo] = AttributeInfo(attlist)
+    val nonXmlnsAttributes: Seq[AttributeInfo] = attributes.filterNot(_.isXmlns)
+    val usedNamespaces: Set[Namespace] = nonXmlnsAttributes.flatMap(_.namespace).toSet
+    val declaredNamespaces: Set[Namespace] = attributes.flatMap(_.declaredNamespace).toSet
+
+    val result = new AttributesImpl
+
+    for (namespace <- usedNamespaces -- declaredNamespaces) namespace.declare(result)
+    for (attribute <- nonXmlnsAttributes) attribute.addTo(result)
+
+    result
   }
 
   // NOTE: It is tempting to typeset MathML to SVG right here to avoid duplicate conversions
@@ -52,7 +72,7 @@ class MathJaxElement(parent: FONode, fopPlugin: MathJaxFopPlugin) extends MathJa
   private var sizes: Option[Sizes] = None
 
   private def getSizes: Sizes = sizes.getOrElse {
-    val result = Sizes(fopPlugin.typeset(doc))
+    val result = Sizes(fopPlugin.withMathJax(_.typeset(doc)))
     sizes = Some(result)
     result
   }

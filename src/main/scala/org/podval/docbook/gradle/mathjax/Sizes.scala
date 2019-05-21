@@ -37,7 +37,7 @@ final class Sizes(width: Float, ascent: Float, descent: Float, fontSize: Float) 
 
 object Sizes {
   def apply(svgDocument: SVGDocument): Sizes = {
-    val fontSize: Float = Parameter.FontSize.get(svgDocument).get
+    val fontSize: Float = FontSizeAttribute.get(svgDocument).get
 
     def exsToPixels(value: Float): Float = value * fontSize * 0.5f // assuming source resolution 1:1, 1 point = 1 pixel
     def pixels(name: String): Float = exsToPixels(exs(svgDocument.getRootElement.getAttribute(name)))

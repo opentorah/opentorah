@@ -8,6 +8,8 @@ import java.io.File
 
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.podval.docbook.gradle.section.{DocBook2, Section}
+import org.podval.docbook.gradle.xml.{ProcessingInstructionsFilter, Resolver, Xml}
+
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 
@@ -81,7 +83,7 @@ class ProcessDocBookTask extends DefaultTask {
 
     logger.info(s"Output formats: ${DocBook2.getNames(processors)}")
 
-    val sections: Map[Section, Map[String, String]] = Util.getSections(parameters)
+    val sections: Map[Section, Map[String, String]] = Section.getSections(parameters.get)
 
     val unusedSections: Set[Section] =
       sections.keySet -- processors.flatMap(_.parameterSections).toSet

@@ -4,6 +4,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
+import org.podval.docbook.gradle.fop.Fop
+
 class ListFopFontsTask extends DefaultTask {
   @TaskAction
   def list(): Unit = {

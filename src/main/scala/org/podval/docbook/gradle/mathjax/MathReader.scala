@@ -1,22 +1,24 @@
 package org.podval.docbook.gradle.mathjax
 
+import org.podval.docbook.gradle.DocBook
+import org.podval.docbook.gradle.xml.Namespace
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.{AttributesImpl, XMLFilterImpl}
-import org.podval.docbook.gradle.Namespace
-import Namespace.MathML
 import org.w3c.dom.{Document, Element}
 
 // Note: I am not going to bother trying to find from the FO context what is the appropriate display mode:
 // it is being set here already for all math except for MathML in an included file, in which case the author
 // will have to supply it :)
-final class MathReader extends XMLFilterImpl {
-  import MathReader.Mode
+// (Besides, I am not even registering the handler, so that won't work anyway.)
+final class MathReader(mathJaxConfiguration: MathJaxConfiguration) extends XMLFilterImpl {
+  import MathJaxConfiguration.Mode
 
   private var elementsStack: List[String] = List.empty
   private def pushElement(localName: String): Unit = elementsStack = elementsStack :+ localName
   private def popElement(): Unit = elementsStack = elementsStack.init
 
   private def currentElement: String = elementsStack.last
+  private def currentlyInEquationElement: Boolean = MathReader.equationElements.contains(currentElement)
 
   private var mode: Option[Mode] = None
 
@@ -68,7 +70,7 @@ final class MathReader extends XMLFilterImpl {
 
     val isMathMLMath: Boolean = MathML.is(uri) && (MathML.math == localName)
     val attributes: Attributes = if (!isMathMLMath) atts else setAttributes(
-      isInline = Parameter.Display.get(atts),
+      isInline = DisplayAttribute.get(atts),
       attributes = new AttributesImpl(atts)
     )
 
@@ -105,15 +107,9 @@ final class MathReader extends XMLFilterImpl {
 
   private def characters(chars: String): Unit = mode.fold {
     val currentElementIsExcluded: Boolean = MathReader.notScannedElements.contains(currentElement)
-    val start: Option[(Mode, Int)] = if (currentElementIsExcluded) None else {
-      val starts: Seq[(Mode, Int)] = for {
-        mode <- MathReader.modes
-        index = findUnquoted(mode.start, mode.processEscapes, chars)
-        if index.isDefined
-      } yield mode -> index.get
-
-      starts.sortBy(_._2).headOption
-    }
+    val start: Option[(Mode, Int)] =
+      if (currentElementIsExcluded) None
+      else mathJaxConfiguration.start(chars)
 
     start.fold(sendToParent(chars)) { case (modeStarting: Mode, index: Int) =>
       if (index != 0) sendToParent(chars.take(index))
@@ -122,19 +118,11 @@ final class MathReader extends XMLFilterImpl {
     }
 
   } { mode: Mode =>
-    findUnquoted(mode.end, mode.processEscapes, chars).fold { addToEquation(chars) } { index: Int =>
+    mode.findEnd(chars).fold { addToEquation(chars) } { index: Int =>
       if (index != 0) addToEquation(chars.take(index))
       flush()
       characters(chars.substring(index + mode.end.length))
     }
-  }
-
-  private def findUnquoted(what: String, processEscapes: Boolean, chars: String): Option[Int] = {
-    val index: Int = chars.indexOf(what)
-    if (index == -1) None
-    else if (index == 0) Some(index)
-    else if (processEscapes && chars.charAt(index-1) == '\\') None
-    else Some(index)
   }
 
   private def flush(): Unit = {
@@ -146,7 +134,7 @@ final class MathReader extends XMLFilterImpl {
         // NOTE: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,
         // math element and its children end up having *two* default namespaces - MathML and DocBook.
         prefixMapping(MathML.default) {
-          prefixMapping(Namespace.MathJax) {
+          prefixMapping(MathJaxNamespace) {
             element(MathML.default, MathML.math, atts = attributes) {
               element(MathML.default, MathML.mrow) {
                 element(MathML.default, MathML.mi) {
@@ -154,10 +142,9 @@ final class MathReader extends XMLFilterImpl {
                 }}}}}
       }
 
-      val currentlyInEquationElement: Boolean = MathReader.equationElements.contains(currentElement)
       if (currentlyInEquationElement) {
         mml()
-      } else element(Namespace.DocBook, if (isInline.contains(true)) "inlineequation" else "informalequation") {
+      } else element(DocBook, if (isInline.contains(true)) "inlineequation" else "informalequation") {
         mml()
       }
     }
@@ -175,15 +162,14 @@ final class MathReader extends XMLFilterImpl {
     attributes: AttributesImpl
   ): Attributes = {
     val shouldBeInline: Option[Boolean] =
-      if (!MathReader.equationElements.contains(currentElement)) None
+      if (!currentlyInEquationElement) None
       else Some(MathReader.inlineEquationElements.contains(currentElement))
 
-    // TODO log instead
     val isConflict: Boolean = shouldBeInline.fold(false)(shouldBeInline => isInline.contains(!shouldBeInline))
     if (isConflict) throw new IllegalArgumentException("Wrong display mode!")
 
-    mode.foreach(mode => Parameter.Mode.set(MathML, mode.name, attributes))
-    shouldBeInline.orElse(isInline).foreach(isInline => Parameter.Display.set(MathML, isInline, attributes))
+    mode.foreach(mode => ModeAttribute.set(MathML, mode.name, attributes))
+    shouldBeInline.orElse(isInline).foreach(isInline => DisplayAttribute.set(MathML, isInline, attributes))
     attributes
   }
 }
@@ -198,48 +184,6 @@ object MathReader {
 
   // do not scan code-containing elements for equations
   val notScannedElements: Set[String] = Set()
-
-  sealed trait Mode {
-    def start: String
-    def end: String
-    def processEscapes: Boolean = false
-    def isInline: Option[Boolean]
-    def name: String = MathJax.Tex.input
-  }
-
-  case object TeX extends Mode {
-    def start: String = "$$"
-    def end: String = "$$"
-    def isInline: Option[Boolean] = Some(false)
-  }
-
-  case object LaTeX extends Mode {
-    def start: String = "\\["
-    def end: String = "\\]"
-    def isInline: Option[Boolean] = Some(false)
-  }
-
-  // TODO do not enable by default - and if enabled, process escapes: \$ -> *outside* of TeX math!
-  case object TeXInline extends Mode {
-    def start: String = "$"
-    def end: String = "$"
-    def isInline: Option[Boolean] = Some(true)
-  }
-
-  case object LaTeXInline extends Mode {
-    def start: String = "\\("
-    def end: String = "\\)"
-    def isInline: Option[Boolean] = Some(true)
-  }
-
-  case object AsciiMath extends Mode {
-    def start: String = "`"
-    def end: String = "`"
-    def isInline: Option[Boolean] = None
-    override def name: String = MathJax.AsciiMath.input
-  }
-
-  val modes: Seq[Mode] = Seq(TeX, TeXInline, LaTeX, LaTeXInline, AsciiMath)
 
   def unwrap(mathMLDocument: Document): String = mathMLDocument.getDocumentElement
     .getElementsByTagName(MathML.mrow).item(0).asInstanceOf[Element]
