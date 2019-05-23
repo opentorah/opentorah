@@ -29,7 +29,7 @@ object Util {
     (documentName, documentNames)
   }
 
-  def fileNameAndExtension(nameWithExtension: String): (String, Option[String]) = {
+  private def fileNameAndExtension(nameWithExtension: String): (String, Option[String]) = {
     val lastDot: Int = nameWithExtension.lastIndexOf(".")
     if (lastDot == -1) (nameWithExtension, None)
     else (
@@ -57,14 +57,14 @@ object Util {
       throw new Exception(s"Unable to delete ${file.getAbsolutePath}")
   }
 
-  def readFrom(clazz: Class[_], name: String): String = {
-    val is: InputStream = clazz.getResourceAsStream(name)
-    if (is == null) {
-      val message: String = s"Resource not found:  ${clazz.getCanonicalName}:$name"
-      throw new IllegalArgumentException(message)
-    }
-    scala.io.Source.fromInputStream(is).getLines.mkString("\n")
-  }
+//  def readFrom(clazz: Class[_], name: String): String = {
+//    val is: InputStream = clazz.getResourceAsStream(name)
+//    if (is == null) {
+//      val message: String = s"Resource not found:  ${clazz.getCanonicalName}:$name"
+//      throw new IllegalArgumentException(message)
+//    }
+//    scala.io.Source.fromInputStream(is).getLines.mkString("\n")
+//  }
 
   def readFrom(file: File): String = {
     val source = scala.io.Source.fromFile(file)

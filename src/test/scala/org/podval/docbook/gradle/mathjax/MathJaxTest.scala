@@ -138,9 +138,16 @@ class MathJaxTest extends FlatSpec with Matchers {
       """.stripMargin
 
     val fopPlugin: MathJaxFopPlugin = new MathJaxFopPlugin(getBuildDir, MathJaxConfiguration())
-    val fontSize: Float = 6.0f
-    val svgDocument: SVGDocument = fopPlugin.withMathJax(_.typeset(formula, MathJax.MathML, fontSize))
-    val sizes = Sizes(svgDocument)
+
+    def sizes(what: String, fontSize: Float): Sizes =
+      Sizes(fopPlugin.withMathJax(_.typeset(formula, MathJax.MathML, fontSize)))
+
+    // TODO understand behaviour of the sizes; trace into FOP's SVG rendering and see what affine transform/crop it uses...
+    println(sizes(formula,  6))
+    println(sizes(formula,  8))
+    println(sizes(formula, 10))
+    println(sizes(formula, 12))
+    println(sizes(formula, 14))
   }
 
   "Fop MathJax" should "work" in {

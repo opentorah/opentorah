@@ -56,7 +56,7 @@ class MathJaxElement(parent: FONode, fopPlugin: MathJaxFopPlugin) extends MathJa
     result
   }
 
-  // NOTE: It is tempting to typeset MathML to SVG right here to avoid duplicate conversions
+  // Note: It is tempting to typeset MathML to SVG right here to avoid duplicate conversions
   // - one here in getSizes() and another one in PreloaderMathML -
   // but resulting SVG is then preloaded by FOP itself (our preloader doesn't get called),
   // and since there is no CSSEngine, there is no font size, which crashes in sizes calculations.

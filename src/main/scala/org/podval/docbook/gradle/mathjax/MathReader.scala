@@ -2,7 +2,7 @@ package org.podval.docbook.gradle.mathjax
 
 import org.podval.docbook.gradle.DocBook
 import org.podval.docbook.gradle.xml.Namespace
-import org.xml.sax.Attributes
+import org.xml.sax.{Attributes, Locator, SAXParseException}
 import org.xml.sax.helpers.{AttributesImpl, XMLFilterImpl}
 import org.w3c.dom.{Document, Element}
 
@@ -12,6 +12,9 @@ import org.w3c.dom.{Document, Element}
 // (Besides, I am not even registering the handler, so that won't work anyway.)
 final class MathReader(mathJaxConfiguration: MathJaxConfiguration) extends XMLFilterImpl {
   import MathJaxConfiguration.Mode
+
+  private var locator: Option[Locator] = None
+  private def warning(message: String): Unit = getErrorHandler.warning(new SAXParseException(message, locator.orNull))
 
   private var elementsStack: List[String] = List.empty
   private def pushElement(localName: String): Unit = elementsStack = elementsStack :+ localName
@@ -31,7 +34,7 @@ final class MathReader(mathJaxConfiguration: MathJaxConfiguration) extends XMLFi
   private def element(
     namespace: Namespace,
     localName: String,
-    atts: Attributes = emptyAttributes
+    atts: Attributes = new AttributesImpl
   )(content: => Unit): Unit = {
     val uri = namespace.uri
     val qName = namespace.qName(localName)
@@ -57,6 +60,11 @@ final class MathReader(mathJaxConfiguration: MathJaxConfiguration) extends XMLFi
     flush()
 
     super.startDocument()
+  }
+
+  override def setDocumentLocator(locator: Locator): Unit = {
+    super.setDocumentLocator(locator)
+    this.locator = Some(locator)
   }
 
   override def endDocument(): Unit = {
@@ -120,15 +128,19 @@ final class MathReader(mathJaxConfiguration: MathJaxConfiguration) extends XMLFi
   } { mode: Mode =>
     mode.findEnd(chars).fold { addToEquation(chars) } { index: Int =>
       if (index != 0) addToEquation(chars.take(index))
-      flush()
+      flush(closedByDelimeter = true)
       characters(chars.substring(index + mode.end.length))
     }
   }
 
-  private def flush(): Unit = {
+  private def flush(closedByDelimeter: Boolean = false): Unit = {
     if (mode.isDefined) {
+      if (!closedByDelimeter) warning(s"Equation '$equation' not closed")
       val isInline: Option[Boolean] = mode.get.isInline
-      val attributes: Attributes = setAttributes(isInline, emptyAttributes)
+      val attributes: Attributes = setAttributes(
+        isInline = isInline,
+        attributes = new AttributesImpl
+      )
 
       def mml(): Unit = {
         // NOTE: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,
@@ -153,10 +165,8 @@ final class MathReader(mathJaxConfiguration: MathJaxConfiguration) extends XMLFi
     equation = ""
   }
 
-  // NOTE: in straight XML parsing, empty attribute URI (including the one on the null attribute) is "";
+  // Note: in straight XML parsing, empty attribute URI (including the one on the null attribute) is "";
   // in the elements generated here it is null - but this doesn't seem to break anything :)
-  private def emptyAttributes: AttributesImpl = new AttributesImpl
-
   private def setAttributes(
     isInline: Option[Boolean],
     attributes: AttributesImpl
@@ -165,11 +175,16 @@ final class MathReader(mathJaxConfiguration: MathJaxConfiguration) extends XMLFi
       if (!currentlyInEquationElement) None
       else Some(MathReader.inlineEquationElements.contains(currentElement))
 
-    val isConflict: Boolean = shouldBeInline.fold(false)(shouldBeInline => isInline.contains(!shouldBeInline))
-    if (isConflict) throw new IllegalArgumentException("Wrong display mode!")
+    if (shouldBeInline.isDefined && isInline.isDefined && (shouldBeInline.get != isInline.get)) {
+      val should: String = DisplayAttribute.toString(shouldBeInline.get)
+      val is: String = DisplayAttribute.toString(isInline.get)
+      warning(s"Display mode conflict: based on context, math should be '$should', but it is marked as '$is'")
+    }
 
-    mode.foreach(mode => ModeAttribute.set(MathML, mode.name, attributes))
-    shouldBeInline.orElse(isInline).foreach(isInline => DisplayAttribute.set(MathML, isInline, attributes))
+    DisplayAttribute.setWithDefault(MathML, shouldBeInline.orElse(isInline), attributes)
+
+    ModeAttribute.setWithDefault(MathML, mode.map(_.input).orElse(ModeAttribute.get(attributes)), attributes)
+
     attributes
   }
 }

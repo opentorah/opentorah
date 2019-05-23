@@ -46,7 +46,7 @@ object MathJaxConfiguration {
     def end: String
     def processEscapes: Boolean = false
     def isInline: Option[Boolean]
-    def name: String = MathJax.Tex.input
+    def input: MathJax.Input = MathJax.Tex
 
     final def findStart(chars: String): Option[Int] = findUnquoted(start, processEscapes, chars)
     final def findEnd(chars: String): Option[Int] = findUnquoted(end, processEscapes, chars)
@@ -80,7 +80,7 @@ object MathJaxConfiguration {
     def start: String = "`"
     def end: String = "`"
     def isInline: Option[Boolean] = None
-    override def name: String = MathJax.AsciiMath.input
+    override def input: MathJax.Input = MathJax.AsciiMath
   }
 
   private val modes: Seq[Mode] = Seq(TeX, TeXInline, LaTeX, LaTeXInline, AsciiMath)

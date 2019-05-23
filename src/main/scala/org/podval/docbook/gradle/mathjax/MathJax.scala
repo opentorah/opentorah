@@ -94,20 +94,14 @@ final class MathJax(nodeModulesRoot: File) {
 //  }
 
   def typeset(mathMLDocument: Document): SVGDocument = {
-    val modeAttribute: Option[String] = ModeAttribute.get(mathMLDocument)
-    val mode: String = modeAttribute.getOrElse(MathJax.MathML.input)
-    val isInline: Boolean = DisplayAttribute.get(mathMLDocument).getOrElse(false)
-
-    val input: MathJax.Input = mode match {
-      case MathJax.Tex.input => if (isInline) MathJax.TexInline else MathJax.Tex
-      case MathJax.AsciiMath.input => MathJax.AsciiMath
-      case _ => MathJax.MathML
-    }
+    val isInline: Boolean = DisplayAttribute.getWithDefault(mathMLDocument)
+    val mode: MathJax.Input = ModeAttribute.getWithDefault(mathMLDocument)
+    val input: MathJax.Input = if (isInline && (mode == MathJax.Tex)) MathJax.TexInline else mode
 
     typeset(
       what = if (input == MathJax.MathML) Xml.toString(mathMLDocument) else MathReader.unwrap(mathMLDocument),
       input = input,
-      fontSize = FontSizeAttribute.get(mathMLDocument).get
+      fontSize = FontSizeAttribute.doGet(mathMLDocument)
     )
   }
 
@@ -190,6 +184,10 @@ object MathJax {
     override val output: String = "html"
     override val css: Boolean = true
   }
+
+  private val inputs: Set[Input] = Set(Tex, AsciiMath, MathML) // Tex and TexInline are distinguished by DisplayAttribute
+
+  def inputForName(name: String): Input = inputs.find(_.input == name).get
 
   def j2v8Version: String = "4.8.0"
 

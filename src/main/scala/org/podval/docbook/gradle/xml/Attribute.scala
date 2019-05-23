@@ -22,6 +22,10 @@ trait Attribute[T] {
     get(element.getAttributeNS(namespace.uri, name))
   }
 
+  final def doGet(document: Document): T = get(document).get
+
+  final def getWithDefault(document: Document): T = get(document).getOrElse(default)
+
   final def set(value: T, document: Document): Unit = {
     val element = document.getDocumentElement
     val inDefaultNamespace: Boolean = namespace.is(element.getNamespaceURI)
@@ -62,6 +66,11 @@ trait Attribute[T] {
       toString(value)
     )
   }
+
+  def setWithDefault(defaultNamespace: Namespace, value: Option[T], attributes: AttributesImpl): Unit =
+    set(defaultNamespace, value.getOrElse(default), attributes)
+
+  def default: T
 
   private def get(value: String): Option[T] =
     Option(value).filter(_.nonEmpty).map(fromString)
