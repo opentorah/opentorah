@@ -19,6 +19,7 @@ final class DocBookPlugin extends Plugin[Project] {
     // Node plugin
     project.getPluginManager.apply(classOf[NodePlugin])
     val nodeExtension = project.getExtensions.getByName("node").asInstanceOf[NodeExtension]
+    nodeExtension.setDownload(true)
     nodeExtension.setNodeModulesDir(layout.nodeModulesRoot)
 
     // Install MathJax Task

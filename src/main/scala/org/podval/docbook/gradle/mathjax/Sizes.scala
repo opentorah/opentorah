@@ -6,74 +6,105 @@ import java.awt.geom.Point2D
 import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.properties.FixedLength
 import org.apache.xmlgraphics.image.loader.ImageSize
-import org.apache.xmlgraphics.util.UnitConv
 import org.w3c.dom.svg.SVGDocument
 
+// From the code that creates SVG and sets its sizes
+// (https://github.com/mathjax/MathJax/blob/master/unpacked/jax/output/SVG/jax.js)
+// it became clear that:
+// - viewBox sizes are in milli-ems;
+// - ex height is Sizes.xHeight milli-ems, so scaling from millipoints to exs is: / Sizes.xHeight;
+// - minY is -height;
+// - viewBox height is height+depth;
+// - scaling for the fontSize is: * fontSize (MathJax internally assumes em to be 10 points).
 final class Sizes private(
-  viewPortWidth: Float,
-  viewBoxWidth: Float,
-  viewPortHeight: Float,
-  viewBoxHeight: Float,
-  viewBoxMinX: Float,
-  verticalAlign: Float,
-  viewBoxMinY: Float,
-  fontSize: Float
+  width: Float,          // in milli-ems
+  viewPortWidth: Float,  // in exs; = width / Sizes.xHeight
+  height: Float,         // in milli-ems
+  viewPortHeight: Float, // = height / Sizes.xHeight
+  minX: Float,           // in milli-ems
+  minY: Float,           // in milli-ems
+  verticalAlign: Float,  // in exs
+  fontSize: Float        // in points
 ) {
-  def width: Float = viewPortWidth * xScale
+  def depth: Float = height + minY
 
-  def height: Float = viewPortHeight * yScale
+  private def toPoints(value: Float): Float = value * fontSize / Sizes.points2Millipoints
 
-  def descent: Float = - verticalAlign * yScale // - viewBoxMinY * weirdToPoints * yScale
+  def widthInPoints: Float = toPoints(width)
 
-  def xScale: Float = viewBoxWidth / viewPortWidth * weirdToPoints
+  def heightInPoints: Float = toPoints(height)
 
-  def yScale: Float = viewBoxHeight / viewPortHeight * weirdToPoints
+  def depthInPoints: Float = toPoints(depth)
 
-  def weirdToPoints: Float = fontSize / Sizes.Points2Millipoints
+  private def toMilliPoints(value: Float): Int = Math.round(value * fontSize)
 
   override def toString: String =
-    s"Sizes(vpWidth=$viewPortWidth; vbWidth=$viewBoxWidth; xScale=$xScale; width=$width;" +
-    s"   vpHeight=$viewPortHeight; vbHeight=$viewBoxHeight; yScale=$yScale; height=$height" +
-    s"   minX=$viewBoxMinX; fontSize=$fontSize; verticalAlign=$verticalAlign; minY=$viewBoxMinY; descent=$descent)"
+    s"Sizes(fontSize = $fontSize; minX=$minX; width=$width; minY=$minY; height=$height; depth=$depth)"
 
-  import Sizes.toMilliPoints
+  def getPoint: Point2D = new Point2D.Float(
+    widthInPoints,
+    heightInPoints
+  )
 
-  def getPoint: Point2D = new Point2D.Float(width, height)
-
-  def getIntrinsicAlignmentAdjust: Length = FixedLength.getInstance(-descent, "pt")
+  def getIntrinsicAlignmentAdjust: Length =
+    FixedLength.getInstance(-depthInPoints, "pt")
 
   def getImageSize(sourceResolution: Float): ImageSize = {
-    val scale: Float = UnitConv.IN2PT / sourceResolution
-
+    val scale: Float = Sizes.inches2points / sourceResolution
+    def millipoints(value: Float): Int = toMilliPoints(value * scale)
     val result: ImageSize = new ImageSize
-    result.setSizeInMillipoints(toMilliPoints(width * scale), toMilliPoints(height * scale))
-    result.setBaselinePositionFromBottom(toMilliPoints(descent * scale))
+    result.setSizeInMillipoints(
+      millipoints(width),
+      millipoints(height)
+    )
+    result.setBaselinePositionFromBottom(millipoints(depth))
     result.setResolution(sourceResolution)
     result.calcPixelsFromSize()
     result
   }
 
-  def getDimension: Dimension = new Dimension(toMilliPoints(width), toMilliPoints(height))
+  def getDimension: Dimension = new Dimension(
+    toMilliPoints(width),
+    toMilliPoints(height)
+  )
+
+
+  // MathJax and Batik have different x_height assumptions (430.554f and 500.0f respectively, in milli-ems);
+  // to avoid mis-scaling, I convert values of the "width" and "height" attributes on the SVG document created
+  // by MathJax to points before handing it over to Batik.
+  def set(svgDocument: SVGDocument): Unit = {
+    val element = svgDocument.getRootElement
+    element.setAttribute("width", widthInPoints + "pt")
+    element.setAttribute("height", heightInPoints + "pt")
+  }
 }
 
 object Sizes {
+  // MathJax's value for the ex height; WTF is it?
+  val xHeight: Float = 430.554f
+
+  val inches2points: Int  = 72
+
+  val points2Millipoints: Float = 1000.0f
+
   def apply(svgDocument: SVGDocument): Sizes = {
     val fontSize: Float = FontSizeAttribute.doGet(svgDocument)
 
-    def exsToPixels(value: Float): Float = value * fontSize * 0.5f // assuming source resolution 1:1, 1 point = 1 pixel
-    def pixels(name: String): Float = exsToPixels(exs(svgDocument.getRootElement.getAttribute(name)))
+    // Note: batik assumes x size of 0.5 fontSize, so, assuming source resolution 1point = 1pixel, *fontSize * 0.5f -
+    // but MathJax does not :)
+    def pixels(name: String): Float = exs(svgDocument.getRootElement.getAttribute(name))
 
     val viewBoxStr: String = svgDocument.getRootElement.getAttribute("viewBox")
     val viewBox: Array[Float] = viewBoxStr.split(" ").map(_.toFloat)
 
     val result = new Sizes(
+      minX = viewBox(0),
+      minY = viewBox(1),
+      width = viewBox(2),
+      height = viewBox(3),
       viewPortWidth = pixels("width"),
-      viewBoxWidth = viewBox(2),
       viewPortHeight = pixels("height"),
-      viewBoxHeight = viewBox(3),
-      viewBoxMinX = viewBox(0),
-      verticalAlign = exsToPixels(getVerticalAlign(svgDocument)),
-      viewBoxMinY = viewBox(1),
+      verticalAlign = getVerticalAlign(svgDocument),
       fontSize = fontSize
     )
 
@@ -94,8 +125,4 @@ object Sizes {
     require(value.endsWith(ex))
     value.dropRight(ex.length).trim.toFloat
   }
-
-  private def toMilliPoints(value: Float): Int = Math.round(value * Points2Millipoints)
-
-  val Points2Millipoints: Float = 1000.0f
 }

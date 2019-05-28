@@ -18,7 +18,7 @@ class MathJaxElement(parent: FONode, fopPlugin: MathJaxFopPlugin) extends MathJa
   ): PropertyList = {
     val commonFont = pList.getFontProps
 
-    fontSize = Some((commonFont.fontSize.getNumericValue / Sizes.Points2Millipoints).toFloat)
+    fontSize = Some((commonFont.fontSize.getNumericValue / Sizes.points2Millipoints).toFloat)
 
     // fonts: commonFont.getFontState(getFOEventHandler.getFontInfo).toList.map(_.getName)
 

@@ -94,9 +94,12 @@ final class MathJaxFopPlugin(nodeModulesRoot: File, mathJaxConfiguration: MathJa
 
       if (!MathML.is(document)) null else  {
         val svgDocument: SVGDocument = typeset(document)
+        val sizes: Sizes = Sizes(svgDocument)
+        // convert sizes from exs to points:
+        sizes.set(svgDocument)
 
         val result: ImageInfo = new ImageInfo(uri, Svg.mimeType)
-        result.setSize(Sizes(svgDocument).getImageSize(context.getSourceResolution))
+        result.setSize(sizes.getImageSize(context.getSourceResolution))
 
         // Stash the result to avoid typesetting again:
         result

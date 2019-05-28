@@ -7,7 +7,6 @@ import org.podval.docbook.gradle.TestLogger
 import org.podval.docbook.gradle.fop.{Fop, FopPlugin, JEuclidFopPlugin}
 import org.podval.docbook.gradle.xml.Namespace
 import org.scalatest.{FlatSpec, Matchers}
-import org.w3c.dom.svg.SVGDocument
 
 class MathJaxTest extends FlatSpec with Matchers {
 
@@ -137,17 +136,18 @@ class MathJaxTest extends FlatSpec with Matchers {
          |</math>
       """.stripMargin
 
+    val x: String = "x"
+    val xx: String = "xx"
+
     val fopPlugin: MathJaxFopPlugin = new MathJaxFopPlugin(getBuildDir, MathJaxConfiguration())
 
-    def sizes(what: String, fontSize: Float): Sizes =
-      Sizes(fopPlugin.withMathJax(_.typeset(formula, MathJax.MathML, fontSize)))
+    def sizes(what: String, fontSize: Float): Unit = {
+      val svg = fopPlugin.withMathJax(_.typeset(what, MathJax.MathML, fontSize))
+//      println(Xml.toString(svg))
+//      println(Sizes(svg))
+    }
 
-    // TODO understand behaviour of the sizes; trace into FOP's SVG rendering and see what affine transform/crop it uses...
-    println(sizes(formula,  6))
-    println(sizes(formula,  8))
-    println(sizes(formula, 10))
-    println(sizes(formula, 12))
-    println(sizes(formula, 14))
+    sizes(formula, 10)
   }
 
   "Fop MathJax" should "work" in {
