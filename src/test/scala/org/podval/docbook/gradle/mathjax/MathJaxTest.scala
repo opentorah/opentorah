@@ -2,34 +2,32 @@ package org.podval.docbook.gradle.mathjax
 
 import java.io.File
 
-import com.eclipsesource.v8.{NodeJS, V8}
-import org.podval.docbook.gradle.TestLogger
-import org.podval.docbook.gradle.fop.{Fop, FopPlugin, JEuclidFopPlugin}
+import org.podval.docbook.gradle.{Fixture, PluginTestProject, TestLogger, jeuclid, mathjax}
+import org.podval.docbook.gradle.fop.Fop
 import org.podval.docbook.gradle.xml.Namespace
 import org.scalatest.{FlatSpec, Matchers}
 
 class MathJaxTest extends FlatSpec with Matchers {
 
-  "J2V8 and Node.js" should "be available" in {
-    MathJax.loadV8()
-    val runtime: V8 = V8.createV8Runtime()
-    val result: Int = runtime.executeIntegerScript(
-      "var hello = 'hello, '; var world = 'world!'; hello.concat(world).length;")
-    runtime.release()
-    result shouldBe 13
+  private val testProject: PluginTestProject =
+    new PluginTestProject(new File(Fixture.getBuildDir, "mathJaxTestProject"))
 
-    val nodeJS: NodeJS = NodeJS.createNodeJS()
-    val version: String = nodeJS.getNodeVersion
-    version.nonEmpty shouldBe true
-  }
+  testProject.writeSettingsGradle(Fixture.getProjectDir)
+  testProject.writeBuildGradle()
+  testProject.run("installMathJax")
+
+  private def getMathJax: MathJax = new MathJax(
+    testProject.layout.nodeModulesRoot,
+    MathJax.Configuration()
+  )
 
   "MathJaxNode" should "work" in {
-    val fopPlugin: MathJaxFopPlugin = new MathJaxFopPlugin(getBuildDir, MathJaxConfiguration())
+    val mathJax: MathJax = getMathJax
 
     val text: String = "E = mc^2"
 
     val mml: String =
-     s"""|<math ${MathML.default} display="block">
+     s"""|<math ${MathML.Namespace.default} display="block">
          |  <mi>E</mi>
          |  <mo>=</mo>
          |  <mi>m</mi>
@@ -40,7 +38,7 @@ class MathJaxTest extends FlatSpec with Matchers {
          |</math>""".stripMargin
 
     val svg: String =
-     s"""|<svg ${Namespace.XLink} width="8.976ex" height="2.676ex" style="vertical-align: -0.338ex;" viewBox="0 -1006.6 3864.5 1152.1" role="img" focusable="false" $Svg>
+     s"""|<svg ${Namespace.XLink} width="8.976ex" height="2.676ex" style="vertical-align: -0.338ex;" viewBox="0 -1006.6 3864.5 1152.1" role="img" focusable="false" ${Svg.Namespace}>
          |<defs>
          |<path stroke-width="1" id="E1-MJMATHI-45" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path>
          |<path stroke-width="1" id="E1-MJMAIN-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path>
@@ -60,7 +58,7 @@ class MathJaxTest extends FlatSpec with Matchers {
          |</svg>""".stripMargin
 
     val texsvg: String =
-     s"""|<svg ${Namespace.XLink} width="22.172ex" height="6.176ex" style="vertical-align: -1.838ex;" viewBox="0 -1867.7 9546.4 2659.1" role="img" focusable="false" $Svg>
+     s"""|<svg ${Namespace.XLink} width="22.172ex" height="6.176ex" style="vertical-align: -1.838ex;" viewBox="0 -1867.7 9546.4 2659.1" role="img" focusable="false" ${Svg.Namespace}>
          |<defs>
          |<path stroke-width="1" id="E1-MJMATHI-78" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path>
          |<path stroke-width="1" id="E1-MJMAIN-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path>
@@ -109,18 +107,18 @@ class MathJaxTest extends FlatSpec with Matchers {
 
     val tex: String = "x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}."
 
-    def typeset(what: String, input: MathJax.Input, output: MathJax.Output): String =
-      fopPlugin.withMathJax(_.typeset2String(what, input, output, 6))
+    def typeset(what: String, input: Input, output: Output): String =
+      mathJax.typeset(what, input, output, 6)
 
-    typeset(tex, MathJax.Tex, MathJax.Svg) shouldBe texsvg
-    typeset(text, MathJax.Tex, MathJax.Svg) shouldBe svg
-    typeset(text, MathJax.Tex, MathJax.MathML) shouldBe mml
-    typeset(mml, MathJax.MathML, MathJax.Svg) shouldBe svg
+    typeset(tex, Input.Tex, Output.Svg) shouldBe texsvg
+    typeset(text, Input.Tex, Output.Svg) shouldBe svg
+    typeset(text, Input.Tex, Output.MathML) shouldBe mml
+    typeset(mml, Input.MathML, Output.Svg) shouldBe svg
   }
 
   "SVG sizes" should "be understood" in {
     val formula: String =
-     s"""|<math ${MathML.default} display="inline">
+     s"""|<math ${MathML.Namespace.default} display="inline">
          |  <mrow>
          |    <msup>
          |      <mi>tan</mi>
@@ -136,13 +134,10 @@ class MathJaxTest extends FlatSpec with Matchers {
          |</math>
       """.stripMargin
 
-    val x: String = "x"
-    val xx: String = "xx"
-
-    val fopPlugin: MathJaxFopPlugin = new MathJaxFopPlugin(getBuildDir, MathJaxConfiguration())
+    val mathJax: MathJax = getMathJax
 
     def sizes(what: String, fontSize: Float): Unit = {
-      val svg = fopPlugin.withMathJax(_.typeset(what, MathJax.MathML, fontSize))
+      val svg = mathJax.typeset(what, Input.MathML, fontSize)
 //      println(Xml.toString(svg))
 //      println(Sizes(svg))
     }
@@ -152,16 +147,19 @@ class MathJaxTest extends FlatSpec with Matchers {
 
   "Fop MathJax" should "work" in {
     def doIt(useMathJax: Boolean): Unit = {
-      val plugin: FopPlugin =
-        if (useMathJax) new MathJaxFopPlugin(getBuildDir, MathJaxConfiguration())
-        else new JEuclidFopPlugin
+      val plugin =
+        if (useMathJax) new mathjax.FopPlugin(getMathJax)
+        else new jeuclid.FopPlugin
+
+      val resources: File = Fixture.getTestResources
+
       Fop.run(
-        configurationFile = new File(getTestResources, "fop.xconf"),
+        configurationFile = new File(resources, "fop.xconf"),
         substitutions = Map.empty,
         plugin = Some(plugin),
-        inputFile = new File(getTestResources, "test.fo"),
-        inputDirectory = getTestResources,
-        outputFile = new File(getBuildDir, s"test-${if (useMathJax) "mathjax" else "jeuclid"}.pdf"),
+        inputFile = new File(resources, "test.fo"),
+        inputDirectory = resources,
+        outputFile = new File(Fixture.getBuildDir, s"test-${if (useMathJax) "mathjax" else "jeuclid"}.pdf"),
         logger = new TestLogger
       )
     }
@@ -169,8 +167,4 @@ class MathJaxTest extends FlatSpec with Matchers {
     doIt(true)
     doIt(false)
   }
-
-  private def getTestResources: File = new File(getProjectDir, "src/test/resources")
-  private def getBuildDir: File = new File(getProjectDir, "build")
-  private def getProjectDir: File = new File(".").getAbsoluteFile
 }

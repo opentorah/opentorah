@@ -3,6 +3,7 @@ package org.podval.docbook.gradle.section
 import java.io.File
 
 import org.podval.docbook.gradle.{Layout, Logger}
+import org.podval.docbook.gradle.mathjax.MathJax
 import org.xml.sax.XMLFilter
 
 trait DocBook2 extends Section {
@@ -60,13 +61,14 @@ trait DocBook2 extends Section {
 
   def copyDestinationDirectoryName: Option[String] = None
 
-  def xmlFilter: Option[XMLFilter] = None
+  def xmlFilter(mathJaxConfiguration: MathJax.Configuration): Option[XMLFilter] = None
 
   def postProcess(
     layout: Layout,
     substitutions: Map[String, String],
     isMathJaxEnabled: Boolean,
     isJEuclidEnabled: Boolean,
+    mathJaxConfiguration: MathJax.Configuration,
     inputDirectory: File,
     inputFile: File,
     outputFile: File,

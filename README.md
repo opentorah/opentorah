@@ -270,6 +270,14 @@ are DejaVu and Liberation.
 
 Property `epubEmbeddedFonts` configures font families that should be embedded in EPUB files.
 
+## Mathematics ##
+
+Plugin supports typesetting mathematics using MathJax for HTML and EPUB and
+either MathJax or JEuclid for PDF.
+
+Server-side MathJax is a new feature that is still under
+[development](https://github.com/dubinsky/podval-docbook-gradle/issues?q=is%3Aissue+is%3Aopen+label%3Amath) 
+
 
 ## Oxygen ##
 

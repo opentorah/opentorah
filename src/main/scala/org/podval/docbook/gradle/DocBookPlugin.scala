@@ -1,9 +1,8 @@
 package org.podval.docbook.gradle
 
-import com.moowork.gradle.node.npm.NpmTask
-import com.moowork.gradle.node.{NodeExtension, NodePlugin}
 import org.gradle.api.{Plugin, Project}
 import org.podval.docbook.gradle.section.DocBook2
+import org.podval.docbook.gradle.util.Util
 
 import scala.collection.JavaConverters._
 
@@ -11,21 +10,6 @@ final class DocBookPlugin extends Plugin[Project] {
 
   def apply(project: Project): Unit = {
     new Logger.PluginLogger(project.getLogger).lifecycle(Util.applicationString)
-
-    val layout: Layout = Layout.forProject(project)
-
-    //// MathJax
-
-    // Node plugin
-    project.getPluginManager.apply(classOf[NodePlugin])
-    val nodeExtension = project.getExtensions.getByName("node").asInstanceOf[NodeExtension]
-    nodeExtension.setDownload(true)
-    nodeExtension.setNodeModulesDir(layout.nodeModulesRoot)
-
-    // Install MathJax Task
-    val installMathJaxTask: NpmTask = project.getTasks.create("installMathJax", classOf[NpmTask])
-    installMathJaxTask.setArgs(Seq("install", "mathjax-node", "--no-save", "--silent").asJava)
-    installMathJaxTask.getOutputs.dir(layout.nodeModulesRoot)
 
     // j2v8 bindings
     // doesn't work: project.getBuildscript.getDependencies.add(ScriptHandler.CLASSPATH_CONFIGURATION, MathJax.j2v8dependency)
@@ -48,6 +32,10 @@ final class DocBookPlugin extends Plugin[Project] {
     docBookDataTask.setDescription("Generate data for inclusion in DocBook")
     docBookDataTask.dataGeneratorClass.set(extension.dataGeneratorClass)
     Option(project.getTasks.findByName("classes")).foreach(docBookDataTask.getDependsOn.add)
+
+    // MathJax
+    // TODO submerge into 'prepare' task (and remove as a dependency of the 'process' task)?
+    val installMathJaxTask: InstallMathJaxTask = project.getTasks.create("installMathJax", classOf[InstallMathJaxTask])
 
     // Prepare DocBook.
     val prepareDocBookTask: PrepareDocBookTask = project.getTasks.create("prepareDocBook", classOf[PrepareDocBookTask])

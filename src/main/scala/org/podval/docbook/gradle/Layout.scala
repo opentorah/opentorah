@@ -6,8 +6,14 @@ import org.gradle.api.Project
 import org.podval.docbook.gradle.section.{DocBook2, Section}
 
 final class Layout(projectDir: File, buildDir: File) {
+  // I do not see any point in caching anything under `.gradle`:
+  // - Gradle caches artifacts elsewhere;
+  // - NPM caches packages that it retrieves.
+  // If there turns out a point in this, do it for both Node and DocBook.
+  // private def cacheDirectory(name: String): File = new File(new File(projectDir, ".gradle"), name)
+
   // src/main/
-  private def sourceDir: File = new File(projectDir, "src/main")
+  private def sourceDir: File = new File(new File(projectDir, "src"), "main")
   private def sourceDirectory(name: String): File = new File(sourceDir, name)
 
   // src/main/docBook/
@@ -19,7 +25,7 @@ final class Layout(projectDir: File, buildDir: File) {
   def cssDirectoryName: String = "css"
   def cssDirectory: File = sourceDirectory(cssDirectoryName)
   def cssFile(name: String): File = new File(cssDirectory, name + ".css")
-  def cssFileRelativeToOutputDirectory(name: String): String = cssDirectoryName + "/" + name + ".css"
+  def cssFileRelativeToOutputDirectory(name: String): String = cssDirectoryName + "/" + name + ".css" // TODO file separator!
 
   // src/main/images/
   def imagesDirectoryName: String = "images"
@@ -39,7 +45,7 @@ final class Layout(projectDir: File, buildDir: File) {
   def stylesheetFile(name: String) = new File(stylesheetDirectory, name)
 
   // src/main/xml/
-  def catalogGroupBase: String = "../../.."  // to get to the project root
+  def catalogGroupBase: String = "../../.."  // to get to the project root // TODO file separator
   private def xmlDirectory: File = sourceDirectory("xml")
   def xmlFile(name: String): File = new File(xmlDirectory, name)
   def substitutionsDtdFileName: String = "substitutions.dtd"
@@ -53,9 +59,10 @@ final class Layout(projectDir: File, buildDir: File) {
     else throw new IllegalArgumentException("buildDir that is not a child of projectDir is not yet supported! ")
 
   def buildDirectory(name: String): File = new File(buildDir, name)
-  def buildDirectoryRelative(name: String): String = s"$buildDirRelative/$name/"
+  def buildDirectoryRelative(name: String): String = s"$buildDirRelative/$name/"  // TODO file separator!
 
-  // node modules
+  // Node
+  def nodeRoot: File = /*cacheDirectory*/ buildDirectory("nodejs")
   def nodeModulesRoot: File = buildDir
 
   // build/docBookXslt[2]
@@ -88,10 +95,10 @@ final class Layout(projectDir: File, buildDir: File) {
       section.name + (if (!prefixed) "" else "-" + documentName) + ".xsl"
 
     override def baseDir(docBook2: DocBook2): String =
-      if (!useRelativeBaseDir) saxonOutputDirectory(docBook2).getAbsolutePath + "/" else {
+      if (!useRelativeBaseDir) saxonOutputDirectory(docBook2).getAbsolutePath + "/" else { // TODO file separator
         val directoryName: String = if (docBook2.usesIntermediate) intermediateRootName else outputRootName
-        val directoryNameEffective: String = if (!prefixed) directoryName else s"$directoryName/$documentName"
-        buildDirectoryRelative(s"$directoryNameEffective/${saxonOutputDirectoryName(docBook2)}")
+        val directoryNameEffective: String = if (!prefixed) directoryName else s"$directoryName/$documentName" // TODO file separator
+        buildDirectoryRelative(s"$directoryNameEffective/${saxonOutputDirectoryName(docBook2)}") // TODO file separator
       }
 
     override def saxonOutputDirectory(docBook2: DocBook2): File = outputDirectory(

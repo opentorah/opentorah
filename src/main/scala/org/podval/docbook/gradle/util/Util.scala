@@ -1,7 +1,9 @@
-package org.podval.docbook.gradle
+package org.podval.docbook.gradle.util
+
+import java.io.{BufferedWriter, File, FileWriter}
 
 import org.gradle.api.provider.{ListProperty, Property}
-import java.io.{BufferedWriter, File, FileWriter, InputStream}
+import org.podval.docbook.gradle.Logger
 
 import scala.collection.JavaConverters._
 
@@ -73,7 +75,7 @@ object Util {
     result
   }
 
-  def writeInto(file: File, logger: Logger, replace: Boolean)(content: => String): Unit = {
+  def writeInto(file: File, logger: Logger, replace: Boolean = true)(content: => String): Unit = {
     if (!replace && file.exists) {
       logger.info(s"Already exists: $file")
     } else {

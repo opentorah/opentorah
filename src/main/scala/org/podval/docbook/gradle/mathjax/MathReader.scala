@@ -5,13 +5,14 @@ import org.podval.docbook.gradle.xml.Namespace
 import org.xml.sax.{Attributes, Locator, SAXParseException}
 import org.xml.sax.helpers.{AttributesImpl, XMLFilterImpl}
 import org.w3c.dom.{Document, Element}
+import MathML.DisplayAttribute
+import MathReader.DelimitersAndInput
 
-// Note: I am not going to bother trying to find from the FO context what is the appropriate display mode:
+// Note: I am not going to bother trying to find from the FO context what is the appropriate display delimiters:
 // it is being set here already for all math except for MathML in an included file, in which case the author
 // will have to supply it :)
 // (Besides, I am not even registering the handler, so that won't work anyway.)
-final class MathReader(mathJaxConfiguration: MathJaxConfiguration) extends XMLFilterImpl {
-  import MathJaxConfiguration.Mode
+final class MathReader(configuration: MathJax.Configuration) extends XMLFilterImpl {
 
   private var locator: Option[Locator] = None
   private def warning(message: String): Unit = getErrorHandler.warning(new SAXParseException(message, locator.orNull))
@@ -23,11 +24,11 @@ final class MathReader(mathJaxConfiguration: MathJaxConfiguration) extends XMLFi
   private def currentElement: String = elementsStack.last
   private def currentlyInEquationElement: Boolean = MathReader.equationElements.contains(currentElement)
 
-  private var mode: Option[Mode] = None
+  private val allDelimiters: Seq[DelimitersAndInput] = MathReader.allDelimiters(configuration)
+  private var delimiters: Option[DelimitersAndInput] = None
 
-  private var equation: String = ""
-
-  private def addToEquation(what: String): Unit = equation = equation + what
+  private var math: String = ""
+  private def addToMath(what: String): Unit = math = math + what
 
   private def sendToParent(what: String): Unit = super.characters(what.toCharArray, 0, what.length)
 
@@ -76,11 +77,12 @@ final class MathReader(mathJaxConfiguration: MathJaxConfiguration) extends XMLFi
   override def startElement(uri: String, localName: String, qName: String, atts: Attributes): Unit = {
     flush()
 
-    val isMathMLMath: Boolean = MathML.is(uri) && (MathML.math == localName)
-    val attributes: Attributes = if (!isMathMLMath) atts else setAttributes(
-      isInline = DisplayAttribute.get(atts),
-      attributes = new AttributesImpl(atts)
-    )
+    val isMathMLMath: Boolean = MathML.Namespace.is(uri) && (MathML.math == localName)
+    val attributes: Attributes = if (!isMathMLMath) atts else {
+      val result = new AttributesImpl(atts)
+      DisplayAttribute.setWithDefault(MathML.Namespace, checkInline(DisplayAttribute.get(atts)), result)
+      result
+    }
 
     super.startElement(uri, localName, qName, attributes)
     pushElement(localName)
@@ -106,51 +108,50 @@ final class MathReader(mathJaxConfiguration: MathJaxConfiguration) extends XMLFi
   }
 
   override def ignorableWhitespace(ch: Array[Char], start: Int, length: Int): Unit = {
-    if (mode.isDefined) addToEquation(ch.slice(start, start + length).mkString(""))
+    if (delimiters.isDefined) addToMath(ch.slice(start, start + length).mkString(""))
     else super.ignorableWhitespace(ch, start, length)
   }
 
   override def characters(ch: Array[Char], start: Int, length: Int): Unit =
     characters(ch.slice(start, start + length).mkString(""))
 
-  private def characters(chars: String): Unit = mode.fold {
+  private def characters(chars: String): Unit = delimiters.fold {
     val currentElementIsExcluded: Boolean = MathReader.notScannedElements.contains(currentElement)
-    val start: Option[(Mode, Int)] =
+    val start: Option[(DelimitersAndInput, Int)] =
       if (currentElementIsExcluded) None
-      else mathJaxConfiguration.start(chars)
+      else MathReader.start(allDelimiters, chars)
 
-    start.fold(sendToParent(chars)) { case (modeStarting: Mode, index: Int) =>
+    start.fold(sendToParent(chars)) { case (delimitersStarting: DelimitersAndInput, index: Int) =>
       if (index != 0) sendToParent(chars.take(index))
-      mode = Some(modeStarting)
-      characters(chars.substring(index + modeStarting.start.length))
+      delimiters = Some(delimitersStarting)
+      characters(chars.substring(index + delimitersStarting.start.length))
     }
 
-  } { mode: Mode =>
-    mode.findEnd(chars).fold { addToEquation(chars) } { index: Int =>
-      if (index != 0) addToEquation(chars.take(index))
-      flush(closedByDelimeter = true)
-      characters(chars.substring(index + mode.end.length))
+  } { delimiters: DelimitersAndInput =>
+    MathReader.findUnquoted(delimiters.end, chars).fold { addToMath(chars) } { index: Int =>
+      if (index != 0) addToMath(chars.take(index))
+      flush(closedByDelimiter = true)
+      characters(chars.substring(index + delimiters.end.length))
     }
   }
 
-  private def flush(closedByDelimeter: Boolean = false): Unit = {
-    if (mode.isDefined) {
-      if (!closedByDelimeter) warning(s"Equation '$equation' not closed")
-      val isInline: Option[Boolean] = mode.get.isInline
-      val attributes: Attributes = setAttributes(
-        isInline = isInline,
-        attributes = new AttributesImpl
-      )
+  private def flush(closedByDelimiter: Boolean = false): Unit = {
+    if (delimiters.isDefined) {
+      if (!closedByDelimiter) warning(s"Math '$math' not closed")
+      val input = delimiters.get.input
+      val isInline: Option[Boolean] = checkInline(input.isInline)
+      val attributes = new AttributesImpl
+      Input.Attribute.set(MathML.Namespace, input.withInline(isInline), attributes)
 
       def mml(): Unit = {
         // NOTE: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,
         // math element and its children end up having *two* default namespaces - MathML and DocBook.
-        prefixMapping(MathML.default) {
-          prefixMapping(MathJaxNamespace) {
-            element(MathML.default, MathML.math, atts = attributes) {
-              element(MathML.default, MathML.mrow) {
-                element(MathML.default, MathML.mi) {
-                  sendToParent(equation)
+        prefixMapping(MathML.Namespace.default) {
+          prefixMapping(MathJax.Namespace) {
+            element(MathML.Namespace.default, MathML.math, atts = attributes) {
+              element(MathML.Namespace.default, MathML.mrow) {
+                element(MathML.Namespace.default, MathML.mi) {
+                  sendToParent(math)
                 }}}}}
       }
 
@@ -161,16 +162,11 @@ final class MathReader(mathJaxConfiguration: MathJaxConfiguration) extends XMLFi
       }
     }
 
-    mode = None
-    equation = ""
+    delimiters = None
+    math = ""
   }
 
-  // Note: in straight XML parsing, empty attribute URI (including the one on the null attribute) is "";
-  // in the elements generated here it is null - but this doesn't seem to break anything :)
-  private def setAttributes(
-    isInline: Option[Boolean],
-    attributes: AttributesImpl
-  ): Attributes = {
+  private def checkInline(isInline: Option[Boolean]): Option[Boolean] = {
     val shouldBeInline: Option[Boolean] =
       if (!currentlyInEquationElement) None
       else Some(MathReader.inlineEquationElements.contains(currentElement))
@@ -181,24 +177,53 @@ final class MathReader(mathJaxConfiguration: MathJaxConfiguration) extends XMLFi
       warning(s"Display mode conflict: based on context, math should be '$should', but it is marked as '$is'")
     }
 
-    DisplayAttribute.setWithDefault(MathML, shouldBeInline.orElse(isInline), attributes)
-
-    ModeAttribute.setWithDefault(MathML, mode.map(_.input).orElse(ModeAttribute.get(attributes)), attributes)
-
-    attributes
+    shouldBeInline.orElse(isInline)
   }
 }
 
 object MathReader {
 
-  // do not generate DocBook equation wrapper if we are inside one of those
-  val equationElements: Set[String] = Set("equation", "informalequation", "inlineequation")
+  final class DelimitersAndInput(val delimiters: MathJax.Delimiters, val input: Input) {
+    def start: String = delimiters.start
+    def end: String = delimiters.end
+  }
+
+  // do not generate DocBook math wrapper if we are inside one of those
+  private val equationElements: Set[String] = Set("equation", "informalequation", "inlineequation")
 
   // mark the MathML wrapper as inline if inside this
-  val inlineEquationElements: Set[String] = Set("inlineequation")
+  private val inlineEquationElements: Set[String] = Set("inlineequation")
 
   // do not scan code-containing elements for equations
-  val notScannedElements: Set[String] = Set()
+  private val notScannedElements: Set[String] = Set()
+
+  // TODO verify (upstream) that there is no overlap and sort by length of the start (descending).
+  private def allDelimiters(configuration: MathJax.Configuration): Seq[DelimitersAndInput] = {
+    def withInput(values: Seq[MathJax.Delimiters], input: Input): Seq[DelimitersAndInput] =
+      for (delimiters <- values) yield new DelimitersAndInput(delimiters, input)
+
+    withInput(configuration.texDelimiters, Input.Tex) ++
+      withInput(configuration.texInlineDelimiters, Input.TexInline) ++
+      withInput(configuration.asciiMathDelimiters, Input.AsciiMath)
+  }
+
+  private def start(allDelimiters: Seq[DelimitersAndInput], chars: String): Option[(DelimitersAndInput, Int)] = {
+    val starts: Seq[(DelimitersAndInput, Int)] = for {
+      delimiters <- allDelimiters
+      index = findUnquoted(delimiters.start, chars)
+      if index.isDefined
+    } yield delimiters -> index.get
+
+    starts.sortBy(_._2).headOption
+  }
+
+  private def findUnquoted(what: String, chars: String): Option[Int] = {
+    val index: Int = chars.indexOf(what)
+    if (index == -1) None
+    else if (index == 0) Some(index)
+    else if (chars.charAt(index-1) == '\\') None
+    else Some(index)
+  }
 
   def unwrap(mathMLDocument: Document): String = mathMLDocument.getDocumentElement
     .getElementsByTagName(MathML.mrow).item(0).asInstanceOf[Element]

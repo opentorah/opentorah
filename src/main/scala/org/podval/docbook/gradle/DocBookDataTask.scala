@@ -11,6 +11,7 @@ class DocBookDataTask extends JavaExec {
     getProject.getObjects.property(classOf[String])
 
   private val dataDirectory: File = Layout.forProject(getProject).dataDirectory
+
   getOutputs.dir(dataDirectory)
 
   private val logger: Logger = new Logger.PluginLogger(getProject.getLogger)

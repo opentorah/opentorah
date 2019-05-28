@@ -7,7 +7,9 @@ import org.gradle.api.tasks.{Input, Internal, TaskAction}
 import java.io.File
 
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.podval.docbook.gradle.mathjax.MathJax
 import org.podval.docbook.gradle.section.{DocBook2, Section}
+import org.podval.docbook.gradle.util.Util
 import org.podval.docbook.gradle.xml.{ProcessingInstructionsFilter, Resolver, Xml}
 
 import scala.beans.BeanProperty
@@ -36,7 +38,7 @@ class ProcessDocBookTask extends DefaultTask {
   inputDirectories.foreach { directory: File =>
     logger.info(s"Registering input directory $directory")
     directory.mkdirs()
-    getOutputs.dir(directory)
+    getInputs.dir(directory)
   }
 
   // Register outputs
@@ -96,24 +98,26 @@ class ProcessDocBookTask extends DefaultTask {
 
     val resolver: Resolver = new Resolver(layout.catalogFile,  logger)
 
+    // TODO make configurable via extension
+    val mathJaxConfiguration: MathJax.Configuration = MathJax.Configuration()
+
+    def runIt(docBook2: DocBook2, prefixed: Boolean, documentName: String): Unit =
+      run(docBook2, prefixed, documentName, allSubstitutions, resolver, mathJaxConfiguration)
+
     for (docBook2: DocBook2 <- processors) {
       documentName.foreach { documentName: String =>
-        run(
+        runIt(
           docBook2 = docBook2,
           prefixed = false,
-          documentName = documentName,
-          substitutions = allSubstitutions,
-          resolver = resolver
+          documentName = documentName
         )
       }
 
       documentNames.foreach { documentName: String =>
-        run(
+        runIt(
           docBook2 = docBook2,
           prefixed = true,
-          documentName = documentName,
-          substitutions = allSubstitutions,
-          resolver = resolver
+          documentName = documentName
         )
       }
     }
@@ -124,7 +128,8 @@ class ProcessDocBookTask extends DefaultTask {
     prefixed: Boolean,
     documentName: String,
     substitutions: Map[String, String],
-    resolver: Resolver
+    resolver: Resolver,
+    mathJaxConfiguration: MathJax.Configuration
   ): Unit = {
     logger.lifecycle(s"DocBook: processing '$documentName' to ${docBook2.name}.")
 
@@ -147,7 +152,7 @@ class ProcessDocBookTask extends DefaultTask {
       outputFile = if (docBook2.usesRootFile) Some(saxonOutputFile) else None,
       xmlReader = Xml.getFilteredXMLReader(
         Seq(new ProcessingInstructionsFilter(substitutions, resolver, logger)) ++
-          docBook2.xmlFilter.toSeq // ++ Seq(new TracingFilter)
+          docBook2.xmlFilter(mathJaxConfiguration).toSeq // ++ Seq(new TracingFilter)
       ),
       logger = logger
     )
@@ -185,6 +190,7 @@ class ProcessDocBookTask extends DefaultTask {
         substitutions = substitutions,
         isMathJaxEnabled = isMathJaxEnabled.get,
         isJEuclidEnabled = isJEuclidEnabled.get,
+        mathJaxConfiguration = mathJaxConfiguration,
         inputDirectory = saxonOutputDirectory,
         inputFile = saxonOutputFile,
         outputFile = forDocument.outputFile(docBook2),

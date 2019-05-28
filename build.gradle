@@ -7,24 +7,7 @@ plugins {
   id 'com.gradle.plugin-publish' version "0.10.1"
   id 'com.jfrog.bintray' version "1.8.4"
   id 'idea'
-
-  // This is here only for testing mathematics rendering;
-  // for use in production, plugin declares a compile dependency on the Node plugin. 
-  id "com.moowork.node" version "1.3.1"
 }
-
-// This is here only for testing mathematics rendering.
-node {
-  nodeModulesDir = project.buildDir
-}
-task installMathJaxNode(type: NpmTask) {
-  args = ['install', 'mathjax-node', '--no-save']
-}
-installMathJaxNode.doFirst {
-  project.buildDir.mkdir()
-}
-test.dependsOn(installMathJaxNode)
-
 
 group = 'org.podval.docbook'
 version = '0.7.1'
@@ -61,7 +44,7 @@ dependencies {
   compile 'saxon:saxon:6.5.2' // 6.5.3 is the latest, but - no sources for debugging...
 
   // Saxon 9 (XSLT 2.0)
-  compile 'net.sf.saxon:Saxon-HE:9.9.1-2'
+  compile 'net.sf.saxon:Saxon-HE:9.9.1-3'
 
   // Xerces
   runtime "xerces:xercesImpl:$xercesVersion"
@@ -71,18 +54,13 @@ dependencies {
   compile "org.apache.xmlgraphics:batik-transcoder:$batikVersion"
   compile "org.apache.xmlgraphics:batik-extension:$batikVersion"
 
-
   // Hyphenation patterns
   compile 'net.sf.offo:fop-hyph:2.0'
 
   // JEuclid
   compile 'de.rototor.jeuclid:jeuclid-fop:3.1.14'
-  // without FOP plugin: compile 'de.rototor.jeuclid:jeuclid-core:3.1.13'
-  // obsolete:  'net.sourceforge.jeuclid:jeuclid-fop:3.1.9'
 
-  // This is a plugin that is applied to the project that uses DocBook plugin :)
-  compile "com.moowork.gradle:gradle-node-plugin:1.3.1"
-
+  // NodeJS integration
   compile "com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0"
 
   testImplementation "org.scalatest:scalatest_$scalaVersionMajor:3.0.5"

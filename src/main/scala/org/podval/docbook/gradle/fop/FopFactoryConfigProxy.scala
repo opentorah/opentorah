@@ -34,13 +34,14 @@ class FopFactoryConfigProxy(delegate: FopFactoryConfig) extends FopFactoryConfig
   override def getHyphenationPatternNames: java.util.Map[String, String] = delegate.getHyphenationPatternNames
   override def getFallbackResolver: FallbackResolver = delegate.getFallbackResolver
 
-  // Override imageManager with one where ImageImplRegistry is *not* the (global!) defaultInstance,
-  // but a fresh one (scoped by this object), so that preloaders etc. registered on one FopFactory
-  // do not interfere with another.
-  // I had to tweak the process at this point since ImageManager is not settable on the FopFactory or FopFactoryConfig
-  // and ImageImplRegistry is not settable on the ImageManager.
-  // Fop people use a global (likely to optimize the discovery of the available services) and didn't make it easy to
-  // counteract its effects...
+  /* Note: Override imageManager with one where ImageImplRegistry is *not* the (global!) defaultInstance,
+     but a fresh one (scoped by this object), so that preloaders etc. registered on one FopFactory
+     do not interfere with another.
+     I had to tweak the process at this point since ImageManager is not settable on the FopFactory or FopFactoryConfig
+     and ImageImplRegistry is not settable on the ImageManager.
+     Fop people use a global (likely to optimize the discovery of the available services) and didn't make it easy to
+     counteract its effects...
+   */
   private val imageManager: ImageManager = new ImageManager(
     new ImageImplRegistry,
     new ImageContext() {

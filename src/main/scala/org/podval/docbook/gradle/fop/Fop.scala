@@ -8,7 +8,8 @@ import org.apache.fop.fonts.{FontEventListener, FontTriplet}
 import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
 import org.apache.xmlgraphics.util.MimeConstants
 import org.podval.docbook.gradle.xml.Xml
-import org.podval.docbook.gradle.{Logger, Util}
+import org.podval.docbook.gradle.Logger
+import org.podval.docbook.gradle.util.Util
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.SortedMap

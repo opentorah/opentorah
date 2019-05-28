@@ -9,6 +9,7 @@ trait Logger {
 }
 
 object Logger {
+  // TODO forProject()?
   final class PluginLogger(logger: org.gradle.api.logging.Logger) extends Logger {
     override def lifecycle(message: String) : Unit = logger.lifecycle(message)
     override def info(message: String): Unit = logger.info(message, null, null)

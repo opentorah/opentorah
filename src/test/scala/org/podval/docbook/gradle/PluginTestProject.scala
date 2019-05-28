@@ -1,89 +1,77 @@
 package org.podval.docbook.gradle
 
-import org.gradle.testkit.runner.{BuildResult, GradleRunner}
+import org.gradle.testkit.runner.GradleRunner
 import java.io.File
 
+import org.podval.docbook.gradle.util.Util
 import org.podval.docbook.gradle.xml.Xml
 
-class PluginTestProject(
-  val name: String,
-  val document: String,
-  val documentName: String = "test",
-  val substitutions: Map[String, String] = Map.empty,
-  val taskName: String = "processDocBook"
-) {
-  val pluginDir: File = new File("build").getAbsoluteFile.getParentFile
-  val projectDir: File = new File(s"build/pluginTestProject/$name").getAbsoluteFile
-  val indexHtmlFile: File = new File(projectDir, "build/docBook/html/index.html").getAbsoluteFile
+class PluginTestProject(projectDir: File) {
+  projectDir.mkdirs()
 
-  val buildGradle: String =
+  val layout: Layout = Layout.forRoot(projectDir)
+
+  private val logger: Logger = new TestLogger
+
+  private def writeInto(fileName: String)(content: String): Unit =
+    Util.writeInto(new File(projectDir, fileName), logger)(content)
+
+  def writeSettingsGradle(pluginDir: File): Unit =
+    writeInto("settings.gradle")(s"includeBuild '$pluginDir'")
+
+  private val buildGradleCommon: String =
     s"""plugins {
-       |  id "org.podval.docbook-gradle-plugin" version "1.0.0"
+       |  id 'org.podval.docbook-gradle-plugin' version '1.0.0'
        |  id 'base'
        |}
        |
        |repositories {
        |  jcenter()
        |}
-       |
-       |docBook {
-       |  document = "$documentName"
-       |  outputFormats = ["html"]
-       |$substitutionsFormatted
-       |}
        |"""
 
-  private def substitutionsFormatted: String = if (substitutions.isEmpty) "" else {
-    val contents: String = substitutions.map { case (name: String, value: String) =>
-      s""""$name": $value"""
-    }.mkString(",\n")
-    s"""
-      |  substitutions = [
-      |    $contents
-      |  ]
-      |"""
+  def writeBuildGradle(): Unit =     writeInto("build.gradle")(buildGradleCommon)
+
+  def writeBuildGradleWithDocument(
+    documentName: String,
+    document: String,
+    substitutions: Map[String, String] = Map.empty
+  ): Unit = {
+    writeInto("build.gradle") {
+      val substitutionsFormatted: String = if (substitutions.isEmpty) "" else {
+        val contents: String = substitutions.map { case (name: String, value: String) =>
+          s""""$name": $value"""
+        }.mkString(",\n")
+
+        s"""
+           |  substitutions = [
+           |    $contents
+           |  ]
+           |"""
+      }
+
+      s"""$buildGradleCommon
+         |
+         |docBook {
+         |  document = "$documentName"
+         |  outputFormats = ["html"]
+         |$substitutionsFormatted
+         |}
+         |"""
+    }
+
+    Util.writeInto(layout.inputFile(documentName), logger)(s"${Xml.header}\n$document")
   }
 
   def destroy(): Unit = Util.deleteRecursively(projectDir)
 
-  private def prepare(): Unit = {
-    projectDir.mkdirs()
+  def clean(): String = run("clean")
 
-    writeInto("build.gradle", buildGradle)
+  def run(taskName: String): String = getRunner(taskName).build.getOutput
 
-    writeInto("settings.gradle", s"includeBuild '$pluginDir'")
+  def fail(taskName: String): String = getRunner(taskName).buildAndFail.getOutput
 
-    writeInto(s"src/main/docBook/$documentName.xml", s"${Xml.header}\n$document")
-  }
-
-  private val logger: Logger = new TestLogger
-
-  private def writeInto(fileName: String, what: String): Unit =
-    Util.writeInto(new File(projectDir, fileName), logger, replace = true)(what)
-
-  def getIndexHtml: String = {
-    val result: BuildResult = run
-    indexHtml
-  }
-
-  def getIndexHtmlAndOutput: (String, String) = {
-    val result: BuildResult = run
-    (indexHtml, result.getOutput)
-  }
-
-  def fails: String =
-    getRunner.buildAndFail.getOutput
-
-  private def run: BuildResult =
-    getRunner.build
-
-  private def getRunner: GradleRunner = {
-    prepare()
-
-    GradleRunner.create
-      .withProjectDir(projectDir)
-      .withArguments("-i", "clean", taskName)
-  }
-
-  private def indexHtml: String = Util.readFrom(indexHtmlFile)
+  private def getRunner(taskName: String): GradleRunner = GradleRunner.create
+    .withProjectDir(projectDir)
+    .withArguments("-i", taskName)
 }
