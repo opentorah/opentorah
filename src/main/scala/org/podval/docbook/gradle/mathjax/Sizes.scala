@@ -67,9 +67,10 @@ final class Sizes private(
   )
 
   def setViewPortSizes(svgDocument: SVGDocument): Unit = {
-    val element = svgDocument.getRootElement
-    element.setAttribute("width", toPoints(width) + "pt")
-    element.setAttribute("height", toPoints(height) + "pt")
+    def set(name: String, value: Float): Unit =
+      svgDocument.getRootElement.setAttribute(name, toPoints(value).toString + "pt")
+    set("width", width)
+    set("height", height)
   }
 }
 

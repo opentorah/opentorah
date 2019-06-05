@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle
+package org.podval.docbook.gradle.util
 
 final class TestLogger extends Logger {
   override def lifecycle(message: String) : Unit = println(s"**lifecycle** $message")

@@ -7,7 +7,7 @@ import javax.xml.transform.dom.DOMResult
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.{StreamResult, StreamSource}
 import javax.xml.transform.{ErrorListener, Result, Source, TransformerException}
-import org.podval.docbook.gradle.Logger
+import org.podval.docbook.gradle.util.Logger
 import org.w3c.dom.Node
 import org.xml.sax.helpers.DefaultHandler
 import org.xml.sax.{InputSource, XMLFilter, XMLReader}

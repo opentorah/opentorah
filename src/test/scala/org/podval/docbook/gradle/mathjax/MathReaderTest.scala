@@ -1,6 +1,7 @@
 package org.podval.docbook.gradle.mathjax
 
-import org.podval.docbook.gradle.{DocBook, TestLogger}
+import org.podval.docbook.gradle.plugin.DocBook
+import org.podval.docbook.gradle.util.TestLogger
 import org.podval.docbook.gradle.xml.{Namespace, Xml}
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -11,7 +12,7 @@ class MathReaderTest extends FlatSpec with Matchers {
     // but other than that, the document is the same.
     parse(
      s"""|${Xml.header16}
-         |<article ${DocBook.withVersion} xml:id="test-id" ${Namespace.XInclude}>
+         |<article ${DocBook.Namespace.withVersion} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>
          |    Wrapped display TeX:<informalequation>
          |    <math ${MathML.Namespace.default}
@@ -21,7 +22,7 @@ class MathReaderTest extends FlatSpec with Matchers {
          |  </para>
          |</article>""".stripMargin
     ) shouldBe
-     s"""|${Xml.header16}<article ${DocBook.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
+     s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>
          |    Wrapped display TeX:<informalequation>
          |    <math ${MathML.Namespace.default} display="block" mathjax:input="TeX" ${MathJax.Namespace}>
@@ -38,11 +39,11 @@ class MathReaderTest extends FlatSpec with Matchers {
   it should "work for display TeX" in {
     parse(
      s"""|${Xml.header}
-         |<article xml:id="test-id" ${DocBook.withVersion} ${Namespace.XInclude}>
+         |<article xml:id="test-id" ${DocBook.Namespace.withVersion} ${Namespace.XInclude}>
          |  <para>Display TeX:$$$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$$$</para>
          |</article>""".stripMargin
     ) shouldBe
-     s"""|${Xml.header16}<article ${DocBook.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
+     s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>Display TeX:<informalequation>
          |         <math ${MathML.Namespace.default} mathjax:input="TeX" ${MathJax.Namespace}>
          |            <mrow>
@@ -58,12 +59,12 @@ class MathReaderTest extends FlatSpec with Matchers {
   it should "work for inline TeX" in {
     parse(
      s"""|${Xml.header}
-         |<article xml:id="test-id" ${DocBook.withVersion} ${Namespace.XInclude}>
+         |<article xml:id="test-id" ${DocBook.Namespace.withVersion} ${Namespace.XInclude}>
          |  <para>Inline TeX:$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$</para>
          |</article>
          |""".stripMargin
     ) shouldBe
-     s"""|${Xml.header16}<article ${DocBook.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
+     s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>Inline TeX:<inlineequation>
          |         <math ${MathML.Namespace.default} mathjax:input="inline-TeX" ${MathJax.Namespace}>
          |            <mrow>
@@ -79,11 +80,11 @@ class MathReaderTest extends FlatSpec with Matchers {
   it should "work for equation display TeX" in {
     parse(
      s"""|${Xml.header16}
-         |<article ${DocBook.withVersion} xml:id="test-id" ${Namespace.XInclude}>
+         |<article ${DocBook.Namespace.withVersion} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>Explicit display TeX:<equation>$$$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$$$</equation></para>
          |</article>""".stripMargin
     ) shouldBe
-     s"""|${Xml.header16}<article ${DocBook.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
+     s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>Explicit display TeX:<equation>
          |         <math ${MathML.Namespace.default} mathjax:input="TeX" ${MathJax.Namespace}>
          |            <mrow>

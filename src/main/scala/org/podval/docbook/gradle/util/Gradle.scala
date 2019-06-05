@@ -2,10 +2,13 @@ package org.podval.docbook.gradle.util
 
 import java.io.File
 
-import org.gradle.api.{Action, Project}
+import org.apache.tools.ant.filters.ReplaceTokens
+import org.gradle.api.{Project, Task}
 import org.gradle.api.artifacts.repositories.{ArtifactRepository, IvyArtifactRepository, IvyPatternRepositoryLayout}
 import org.gradle.api.artifacts.{Configuration, Dependency}
 import org.gradle.api.file.{CopySpec, FileCopyDetails, RelativePath}
+
+import scala.jdk.CollectionConverters._
 
 object Gradle {
 
@@ -29,16 +32,12 @@ object Gradle {
     project.getRepositories.clear()
 
     // Add Node repository
-    project.getRepositories.ivy(new Action[IvyArtifactRepository] {
-      override def execute(repository: IvyArtifactRepository): Unit = {
-        repository.setUrl(newRepository.url)
-        repository.layout("pattern", new Action[IvyPatternRepositoryLayout] { // TODO patternLayout
-          override def execute(repositoryLayout: IvyPatternRepositoryLayout): Unit = {
-            repositoryLayout.artifact(newRepository.artifact)
-            repositoryLayout.ivy(newRepository.ivy)
-          }
-        })
-      }
+    project.getRepositories.ivy((repository: IvyArtifactRepository) => {
+      repository.setUrl(newRepository.url)
+      repository.patternLayout((repositoryLayout: IvyPatternRepositoryLayout) => {
+        repositoryLayout.artifact(newRepository.artifact)
+        repositoryLayout.ivy(newRepository.ivy)
+      })
     })
 
     // Resolve the dependency
@@ -73,4 +72,22 @@ object Gradle {
       )
       .setIncludeEmptyDirs(false))
   }
+
+  def copyDirectory(
+    project: Project,
+    into: File,
+    from: File,
+    directoryName: String,
+    substitutions: Map[String, String] = Map.empty
+  ): Unit = project.copy((copySpec: CopySpec) => {
+    copySpec
+      .into(into)
+      .from(from)
+      .include(directoryName + "/**")
+
+    if (substitutions.nonEmpty)
+      copySpec.filter(Map("tokens" -> substitutions.asJava).asJava, classOf[ReplaceTokens])
+  })
+
+  def getClassesTask(project: Project): Option[Task] = Option(project.getTasks.findByName("classes"))
 }

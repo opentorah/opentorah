@@ -4,7 +4,8 @@ import java.io.File
 
 import org.podval.docbook.gradle.fop.{Fop, FopPlugin}
 import org.podval.docbook.gradle.mathjax.{MathJax, MathReader}
-import org.podval.docbook.gradle.{Layout, Logger, mathjax, jeuclid}
+import org.podval.docbook.gradle.util.Logger
+import org.podval.docbook.gradle.{jeuclid, mathjax}
 import org.xml.sax.XMLFilter
 
 object Pdf extends DocBook2 {
@@ -40,7 +41,8 @@ object Pdf extends DocBook2 {
     Some(new MathReader(mathJaxConfiguration))
 
   override def postProcess(
-    layout: Layout,
+    fopConfigurationFile: File,
+    nodeModulesRoot: File,
     substitutions: Map[String, String],
     isMathJaxEnabled: Boolean,
     isJEuclidEnabled: Boolean,
@@ -54,11 +56,11 @@ object Pdf extends DocBook2 {
 
     val plugin: Option[FopPlugin] =
       if (isJEuclidEnabled) Some(new jeuclid.FopPlugin)
-      else if (isMathJaxEnabled) Some(new mathjax.FopPlugin(new MathJax(layout.nodeModulesRoot, mathJaxConfiguration)))
+      else if (isMathJaxEnabled) Some(new mathjax.FopPlugin(new MathJax(nodeModulesRoot, mathJaxConfiguration)))
       else None
 
     Fop.run(
-      configurationFile = layout.fopConfigurationFile,
+      configurationFile = fopConfigurationFile,
       substitutions: Map[String, String],
       plugin = plugin,
       inputFile = inputFile,

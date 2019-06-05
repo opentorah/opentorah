@@ -6,6 +6,8 @@ import org.xml.sax.helpers.AttributesImpl
 class Namespace(val uri: String, val prefix: String = "") {
   override def toString: String = s"""$xmlns="$uri""""
 
+  def withVersion(version: String): String = toString + s""" version="$version""""
+
   def isDefault: Boolean = prefix == ""
 
   def qName(localName: String): String = if (isDefault) localName else prefix + ":" + localName

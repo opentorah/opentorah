@@ -3,7 +3,7 @@ package org.podval.docbook.gradle.xml
 import java.io.File
 
 import javax.xml.transform.{Source, URIResolver}
-import org.podval.docbook.gradle.Logger
+import org.podval.docbook.gradle.util.Logger
 import org.xml.sax.{EntityResolver, InputSource}
 
 final class Resolver(catalogFile: File, logger: Logger) extends URIResolver with EntityResolver {

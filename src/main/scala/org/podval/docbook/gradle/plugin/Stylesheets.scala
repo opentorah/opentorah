@@ -1,27 +1,45 @@
-package org.podval.docbook.gradle
+package org.podval.docbook.gradle.plugin
+
+import java.io.File
+
+import org.gradle.api.Project
+import org.podval.docbook.gradle.util.{Gradle, Logger}
 
 trait Stylesheets {
-  def name: String
+  protected def name: String
 
-  final def dependencyNotation(version: String): String = {
-    val classifierStr: String = classifier.fold("")(classifier => s":$classifier")
-    s"$groupId:$artifactId:$version$classifierStr@$extension"
-  }
-
-  def groupId: String
-  def artifactId: String
-  def classifier: Option[String]
-  def extension: String
+  protected def groupId: String
+  protected def artifactId: String
+  protected def classifier: Option[String]
+  protected def extension: String
 
   def uri: String
 
   def directoryName: String
 
-  def archiveSubdirectoryName: String
+  protected def archiveSubdirectoryName: String
+
+  def unpack(version: String, project: Project, layout: Layout, logger: Logger): Unit = {
+    val directory: File = layout.docBookXslDirectory(directoryName)
+    if (!directory.exists) {
+      val classifierStr: String = classifier.fold("")(classifier => s":$classifier")
+      val dependencyNotation: String = s"$groupId:$artifactId:$version$classifierStr@$extension"
+
+      logger.info(s"Retrieving DocBook $name stylesheets: $dependencyNotation")
+      val file: File = Gradle.getArtifact(project, dependencyNotation)
+      logger.info(s"Unpacking ${file.getName}")
+      Gradle.unpack(
+        project = project,
+        zipFile = file,
+        archiveSubdirectoryName = archiveSubdirectoryName,
+        directory = directory
+      )
+    }
+  }
 }
 
 object Stylesheets {
-  val xslt1: Stylesheets = new Stylesheets {
+  object xslt1 extends Stylesheets {
     override def name: String = "XSLT"
     override def groupId: String = "net.sf.docbook"
     override def artifactId: String = "docbook-xsl"
@@ -38,7 +56,7 @@ object Stylesheets {
     override def archiveSubdirectoryName: String = "docbook"
   }
 
-  val xslt2: Stylesheets = new Stylesheets {
+  object xslt2 extends Stylesheets {
     override def name: String = "XSLT 2.0"
     override def groupId: String = "org.docbook"
     override def artifactId: String = "docbook-xslt2"

@@ -2,24 +2,22 @@ package org.podval.docbook.gradle.mathjax
 
 import java.io.File
 
-import org.podval.docbook.gradle.{Fixture, PluginTestProject, TestLogger, jeuclid, mathjax}
+import org.podval.docbook.gradle.{jeuclid, mathjax}
 import org.podval.docbook.gradle.fop.Fop
+import org.podval.docbook.gradle.plugin.Layout
+import org.podval.docbook.gradle.util.{PluginTestProject, TestLogger}
 import org.podval.docbook.gradle.xml.Namespace
 import org.scalatest.{FlatSpec, Matchers}
 
 class MathJaxTest extends FlatSpec with Matchers {
 
-  private val testProject: PluginTestProject =
-    new PluginTestProject(new File(Fixture.getBuildDir, "mathJaxTestProject"))
-
-  testProject.writeSettingsGradle(Fixture.getProjectDir)
-  testProject.writeBuildGradle()
-  testProject.run("installMathJax")
-
-  private def getMathJax: MathJax = new MathJax(
-    testProject.layout.nodeModulesRoot,
-    MathJax.Configuration()
+  private val testProject: PluginTestProject = PluginTestProject(
+    name = "mathJaxTestProject",
+    substitutions = Map.empty
   )
+  testProject.run()
+
+  private def getMathJax: MathJax = new MathJax(testProject.layout.nodeModulesRoot, MathJax.Configuration())
 
   "MathJaxNode" should "work" in {
     val mathJax: MathJax = getMathJax
@@ -146,20 +144,22 @@ class MathJaxTest extends FlatSpec with Matchers {
   }
 
   "Fop MathJax" should "work" in {
+    val layout: Layout = Layout.forCurrent
+
     def doIt(useMathJax: Boolean): Unit = {
       val plugin =
         if (useMathJax) new mathjax.FopPlugin(getMathJax)
         else new jeuclid.FopPlugin
 
-      val resources: File = Fixture.getTestResources
+      val inputFile: File = layout.testResource("test.fo")
 
       Fop.run(
-        configurationFile = new File(resources, "fop.xconf"),
+        configurationFile = layout.testResource("fop.xconf"),
         substitutions = Map.empty,
         plugin = Some(plugin),
-        inputFile = new File(resources, "test.fo"),
-        inputDirectory = resources,
-        outputFile = new File(Fixture.getBuildDir, s"test-${if (useMathJax) "mathjax" else "jeuclid"}.pdf"),
+        inputFile = layout.testResource("test.fo"),
+        inputDirectory = inputFile.getParentFile,
+        outputFile = layout.buildFile(s"test-${if (useMathJax) "mathjax" else "jeuclid"}.pdf"),
         logger = new TestLogger
       )
     }

@@ -48,8 +48,8 @@ final class Distribution(
   //https://github.com/nodejs/node/pull/5995
   private def hasWindowsZip: Boolean =
     ((majorVersion == 4) && (minorVersion >= 5)) || // >= 4.5.0..6
-      ((majorVersion == 6) && ((minorVersion > 2) || ((minorVersion == 2) && (microVersion >= 1)))) || // >= 6.2.1..7
-      (majorVersion > 6) // 7..
+    ((majorVersion == 6) && ((minorVersion > 2) || ((minorVersion == 2) && (microVersion >= 1)))) || // >= 6.2.1..7
+     (majorVersion >  6) // 7..
 
   private def fixUpOsAndArch: Boolean = isWindows && !hasWindowsZip
   private val dependencyOsName: String = if (fixUpOsAndArch) "linux" else osName

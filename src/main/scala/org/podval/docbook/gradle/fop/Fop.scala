@@ -8,13 +8,28 @@ import org.apache.fop.fonts.{FontEventListener, FontTriplet}
 import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
 import org.apache.xmlgraphics.util.MimeConstants
 import org.podval.docbook.gradle.xml.Xml
-import org.podval.docbook.gradle.Logger
-import org.podval.docbook.gradle.util.Util
+import org.podval.docbook.gradle.util.{Logger, Util}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.immutable.SortedMap
 
 object Fop {
+
+  val defaultConfigurationFile: String =
+    s"""${Xml.header}
+       |<fop version="1.0">
+       |  <renderers>
+       |    <renderer mime="application/pdf">
+       |      <fonts>
+       |        <!-- FOP will detect fonts available in the operating system. -->
+       |        <auto-detect/>
+       |      </fonts>
+       |    </renderer>
+       |  </renderers>
+       |</fop>
+       |"""
+
+  private val dateFormat: java.text.DateFormat = new java.text.SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy")
 
   def run(
     configurationFile: File,
@@ -43,8 +58,7 @@ object Fop {
 
     foUserAgent.setCreator(Util.applicationString)
     substitutions.get("creationDate").foreach { creationDate =>
-      val format: java.text.DateFormat = new java.text.SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy")
-      val value: java.util.Date = format.parse(creationDate)
+      val value: java.util.Date = dateFormat.parse(creationDate)
       foUserAgent.setCreationDate(value)
     }
 
@@ -79,16 +93,14 @@ object Fop {
     for ((firstFamilyName: String, fontSpecs: List[FontSpec]) <- fontFamilies) {
       result.append(s"$firstFamilyName:\n")
       for (fontSpec: FontSpec <- fontSpecs) {
-        val uri: Option[URI] = Option(fontSpec.getFontMetrics.getFontURI)
+        val uriStr: String = Option(fontSpec.getFontMetrics.getFontURI).map(_.toString).getOrElse("---")
+        result.append(s"  ${fontSpec.getKey} ${fontSpec.getFamilyNames} ($uriStr)\n")
+
         val triplets: Seq[FontTriplet] = fontSpec.getTriplets
           .asInstanceOf[java.util.Collection[FontTriplet]]
           .asScala.toSeq
 
-        val uriStr: String = uri.map(_.toString).getOrElse("---")
-        result.append(s"  ${fontSpec.getKey} ${fontSpec.getFamilyNames} ($uriStr)\n")
-
-        for (triplet: FontTriplet <- triplets)
-          result.append(s"    $triplet\n")
+        for (triplet: FontTriplet <- triplets) result.append(s"    $triplet\n")
       }
     }
 
@@ -118,8 +130,8 @@ object Fop {
     result
   }
 
-  def getFontFamilies(configurationFile: File): SortedMap[String, List[FontSpec]] = {
-    val fopFactory: FopFactory = getFopFactory(configurationFile, configurationFile)
+  private def getFontFamilies(configurationFile: File): SortedMap[String, List[FontSpec]] = {
+    val fopFactory: FopFactory = getFopFactory(configurationFile)
 
     val fontEventListener: FontEventListener  = new FontEventListener {
       override def fontLoadingErrorAtAutoDetection(source: AnyRef, fontURL: String, e: Exception): Unit =
@@ -134,13 +146,17 @@ object Fop {
       .listFonts(fopFactory, MimeConstants.MIME_PDF, fontEventListener)
       .asInstanceOf[java.util.SortedMap[String, java.util.List[FontSpec]]]
       .asScala.toMap
-      .mapValues(_.asScala.toList)
+      .view.mapValues(_.asScala.toList).toMap
   }
+
+  def deleteFontCache(configurationFile: File): Unit =
+    getFopFactory(configurationFile).newFOUserAgent.getFontManager.deleteCache()
+
+  private def getFopFactory(configurationFile: File): FopFactory =
+    getFopFactory(configurationFile, configurationFile)
 
   private def getFopFactory(configurationFile: File, inputFile: File): FopFactory = {
     val parser: FopConfParser = new FopConfParser(configurationFile, inputFile.getParentFile.toURI)
-    val builder = parser.getFopFactoryBuilder
-    val configuration = new FopFactoryConfigProxy(builder.buildConfig)
-    FopFactory.newInstance(configuration)
+    FopFactory.newInstance(new FopFactoryConfigProxy(parser.getFopFactoryBuilder.buildConfig))
   }
 }

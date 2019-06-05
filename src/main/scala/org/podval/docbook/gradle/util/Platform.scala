@@ -32,6 +32,7 @@ object Platform {
     case "arm" =>
       // from the Node plugin:
       //   as Java just returns "arm" on all ARM variants, we need a system call to determine the exact arch
+      // TODO do this allways (when on Linux)!
       val systemArch = Process("uname -m").!!.trim
       systemArch match {
         case "armv6l" => Architecture.armv6l

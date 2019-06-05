@@ -6,7 +6,7 @@ import java.nio.file.Files
 import com.eclipsesource.v8.{NodeJS, V8, V8Array, V8Function, V8Object}
 import com.eclipsesource.v8.utils.V8ObjectUtils
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 final class MathJaxJ2V8(nodeModulesRoot: File) {
 
@@ -33,7 +33,7 @@ final class MathJaxJ2V8(nodeModulesRoot: File) {
   //    args.release()
   //  }
 
-  def close() {
+  def close(): Unit = {
     mathJaxNode.release()
     nodeJS.release()
   }
@@ -87,7 +87,7 @@ object MathJaxJ2V8 {
   }
 
   private def map2java(map: Map[String, Any]): java.util.Map[String, Any] =
-    map.mapValues(value2java).asJava
+    map.view.mapValues(value2java).toMap.asJava
 
   private def list2java(list: List[Any]): java.util.List[Any] =
     list.map(value2java).asJava

@@ -10,9 +10,8 @@ trait FopPlugin {
   final def configure(fopFactory: FopFactory): Unit = {
     fopFactory.getElementMappingRegistry.addElementMapping(elementMapping)
 
-    if (isHandlerNeeded) {
+    if (isHandlerNeeded)
       fopFactory.getXMLHandlerRegistry.addXMLHandler(xmlHandler)
-    }
 
     val images: ImageImplRegistry = fopFactory.getImageManager.getRegistry
 

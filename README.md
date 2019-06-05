@@ -95,7 +95,8 @@ its [FOP plugin](http://jeuclid.sourceforge.net/jeuclid-fop/);
 - [MathJax team](https://www.mathjax.org/#about) for [MathJax](https://www.mathjax.org/) and
 [MathJax-node](https://github.com/mathjax/MathJax-node);
 - [Ian Bull](https://github.com/irbull) for [J2V8](https://github.com/eclipsesource/J2V8);
-- [Sten Roger Sandvik](https://github.com/srs) for [Gradle Node plugin](https://github.com/srs/gradle-node-plugin).   
+- [Sten Roger Sandvik](https://github.com/srs) for [Gradle Node plugin](https://github.com/srs/gradle-node-plugin)
+  which served as inspiration for the Node support code.   
 
 
 ## Applying to a Gradle project ##
@@ -105,7 +106,7 @@ on the Gradle Plugin Portal. To apply it to a Gradle project:
 
 ```groovy
 plugins {
-  id "org.podval.docbook-gradle-plugin" version "0.6.7"
+  id "org.podval.docbook-gradle-plugin" version "0.7.1"
 }
 ```
 
@@ -122,7 +123,7 @@ DocBook plugin needs to be applied *after* the Scala/Java plugin - or explicit d
 to be added by hand:
 
 ```groovy
-prepareDocBook.dependsOn classes
+processDocBook.dependsOn classes
 ```
 
 If project does not contain any code nor applies any core Gradle plugins,
@@ -132,10 +133,11 @@ to get basic tasks like "clean" and "build":
 apply plugin: 'base'
 ``` 
 
-Plugin adds to the project Gradle task `prepareDocBook` that writes configuration files,
-substitutions DTD and XML catalog, generates data (if configured) and unpacks DocBook XSLT stylesheets
- 
-Plugin adds to the project Gradle task `processDocBook` that processes DocBook :)
+Plugin adds to the project Gradle task `docBookData` that generates data (if configured).
+
+Plugin adds to the project Gradle task `processDocBook` that writes configuration files,
+substitutions DTD and XML catalog, unpacks DocBook XSLT stylesheets,
+installs Node and MathJax processes DocBook.
 
 To make use of the DocBook processing in a directory-name-independent way:
 ```groovy
@@ -263,7 +265,11 @@ FOP can't use some popular fonts like Roboto and NotoSans, and logs an error
 "coverage set class table not yet supported" during fonts auto-detection;
 see https://issues.apache.org/jira/browse/FOP-2704 for more details.
 
-Plugin adds a Gradle task `listFonts` that can be used to list all the fonts that *are* available to FOP.
+Plugin adds a Gradle task `listFopFonts` that can be used to list all the fonts that *are* available to FOP.
+
+FOP caches fonts it detects, so before a newly-installed fonts can be detected by FOP, fonts cache needs to be deleted.
+
+Plugin adds a Gradle task `deleteFopFontsCache` that can be used to delete that cache.
 
 Some of the fonts that work well enough and support Latin, Russian and Hebrew scripts
 are DejaVu and Liberation.
@@ -282,7 +288,7 @@ Server-side MathJax is a new feature that is still under
 ## Oxygen ##
 
 Plugin's setup should be reproducible in an XML editor like [Oxygen](https://www.oxygenxml.com/):
-- run Gradle task `prepareDocBook`;
+- run Gradle task `processDocBook`;
 - add a project-specific XML catalog `src/main/xml/catalog.xml` in
   Options | Preferences | XML | XML Catalog (check `Project Options`, not `Global Options`);
 - use main format-specific XSL file from `src/main/xsl` (e.g., html.xsl) to configure transformation scenario; 

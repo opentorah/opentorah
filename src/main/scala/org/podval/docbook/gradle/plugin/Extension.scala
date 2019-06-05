@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle
+package org.podval.docbook.gradle.plugin
 
 import org.gradle.api.Project
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}

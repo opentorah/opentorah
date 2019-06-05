@@ -2,35 +2,7 @@ package org.podval.docbook.gradle.util
 
 import java.io.{BufferedWriter, File, FileWriter}
 
-import org.gradle.api.provider.{ListProperty, Property}
-import org.podval.docbook.gradle.Logger
-
-import scala.collection.JavaConverters._
-
 object Util {
-  def documentNames(
-    document: Property[String],
-    documents: ListProperty[String]
-  ): (Option[String], List[String]) = {
-    def ifNotEmpty(string: String): Option[String] =
-      if (string.isEmpty) None else Some(string)
-
-    val documentName: Option[String] = ifNotEmpty(document.get).map(name =>
-      dropAllowedExtension(name, "xml"))
-    val documentNames: List[String] = documents.get.asScala.toList.flatMap(ifNotEmpty).map(name =>
-      dropAllowedExtension(name, "xml"))
-
-    if (documentName.isEmpty && documentNames.isEmpty)
-      throw new IllegalArgumentException(
-        """At least one document name must be specified using
-          |  document = "<document name>"
-          |or
-          |  documents = ["<document name>"]
-          |""".stripMargin)
-
-    (documentName, documentNames)
-  }
-
   private def fileNameAndExtension(nameWithExtension: String): (String, Option[String]) = {
     val lastDot: Int = nameWithExtension.lastIndexOf(".")
     if (lastDot == -1) (nameWithExtension, None)
@@ -59,15 +31,6 @@ object Util {
       throw new Exception(s"Unable to delete ${file.getAbsolutePath}")
   }
 
-//  def readFrom(clazz: Class[_], name: String): String = {
-//    val is: InputStream = clazz.getResourceAsStream(name)
-//    if (is == null) {
-//      val message: String = s"Resource not found:  ${clazz.getCanonicalName}:$name"
-//      throw new IllegalArgumentException(message)
-//    }
-//    scala.io.Source.fromInputStream(is).getLines.mkString("\n")
-//  }
-
   def readFrom(file: File): String = {
     val source = scala.io.Source.fromFile(file)
     val result = source.getLines.mkString("\n")
@@ -75,19 +38,6 @@ object Util {
     result
   }
 
-  def writeInto(file: File, logger: Logger, replace: Boolean = true)(content: => String): Unit = {
-    if (!replace && file.exists) {
-      logger.info(s"Already exists: $file")
-    } else {
-      logger.info(s"Writing $file")
-      file.getParentFile.mkdirs()
-      val writer: BufferedWriter = new BufferedWriter(new FileWriter(file))
-
-      try {
-        writer.write(content.stripMargin)
-      } finally {
-        writer.close()
-      }
-    }
-  }
+  def prefixedDirectory(directory: File, prefix: Option[String]): File =
+    prefix.fold(directory)(prefix => new File(directory, prefix))
 }

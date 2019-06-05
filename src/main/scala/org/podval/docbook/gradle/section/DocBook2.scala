@@ -2,8 +2,8 @@ package org.podval.docbook.gradle.section
 
 import java.io.File
 
-import org.podval.docbook.gradle.{Layout, Logger}
 import org.podval.docbook.gradle.mathjax.MathJax
+import org.podval.docbook.gradle.util.Logger
 import org.xml.sax.XMLFilter
 
 trait DocBook2 extends Section {
@@ -64,7 +64,8 @@ trait DocBook2 extends Section {
   def xmlFilter(mathJaxConfiguration: MathJax.Configuration): Option[XMLFilter] = None
 
   def postProcess(
-    layout: Layout,
+    fopConfigurationFile: File,
+    nodeModulesRoot: File,
     substitutions: Map[String, String],
     isMathJaxEnabled: Boolean,
     isJEuclidEnabled: Boolean,

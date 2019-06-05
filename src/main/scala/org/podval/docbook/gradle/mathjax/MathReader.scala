@@ -1,6 +1,6 @@
 package org.podval.docbook.gradle.mathjax
 
-import org.podval.docbook.gradle.DocBook
+import org.podval.docbook.gradle.plugin.DocBook
 import org.podval.docbook.gradle.xml.Namespace
 import org.xml.sax.{Attributes, Locator, SAXParseException}
 import org.xml.sax.helpers.{AttributesImpl, XMLFilterImpl}
@@ -157,7 +157,7 @@ final class MathReader(configuration: MathJax.Configuration) extends XMLFilterIm
 
       if (currentlyInEquationElement) {
         mml()
-      } else element(DocBook, if (isInline.contains(true)) "inlineequation" else "informalequation") {
+      } else element(DocBook.Namespace, if (isInline.contains(true)) "inlineequation" else "informalequation") {
         mml()
       }
     }

@@ -1,17 +1,14 @@
 package org.podval.docbook.gradle.node
 
-import java.io.File
-
-import org.podval.docbook.gradle.{Fixture, PluginTestProject}
+import org.podval.docbook.gradle.util.PluginTestProject
 import org.scalatest.{FlatSpec, Matchers}
 
 class NodeTest extends FlatSpec with Matchers {
 
-  private val testProject: PluginTestProject =
-    new PluginTestProject(new File(Fixture.getBuildDir, "nodeTestProject"))
+  private val testProject: PluginTestProject = PluginTestProject(name = "nodeTestProject")
 
-  testProject.writeSettingsGradle(Fixture.getProjectDir)
-  testProject.writeBuildGradle()
-  testProject.run("installMathJax")
-  // TODO verify that MathJax module gets installed
+  "Node modules" should "be installed" in {
+    testProject.run()
+    testProject.layout.nodeModulesRoot.exists shouldBe true
+  }
 }
