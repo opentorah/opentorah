@@ -197,47 +197,14 @@ final class Write(val layout: Layout, val logger: Logger) {
   def settingsGradle(pluginDir: File): Unit =
     writeInto(layout.settingsGradle)(s"includeBuild '$pluginDir'")
 
-  def buildGradle(
-    documentName: String,
-    document: String,
-    substitutions: Map[String, String]
-  ): Unit = {
-    writeInto(layout.buildGradle) {
-      val substitutionsFormatted: String = if (substitutions.isEmpty) "" else {
-        val contents: String = substitutions.map { case (name: String, value: String) =>
-          s""""$name": $value"""
-        }.mkString(",\n")
-
-        s"""
-           |  substitutions = [
-           |    $contents
-           |  ]
-           |"""
-      }
-
-     s"""|plugins {
-         |  id 'org.podval.docbook-gradle-plugin' version '1.0.0'
-         |  id 'base'
-         |}
-         |
-         |repositories {
-         |  jcenter()
-         |}
-         |
-         |docBook {
-         |  document = "$documentName"
-         |  outputFormats = ["html"]
-         |$substitutionsFormatted
-         |}
-         |"""
-    }
-  }
+  def buildGradle(content: String): Unit =
+    writeInto(layout.buildGradle)(content)
 
   private def writeInto(file: File, replace: Boolean = true)(content: String): Unit = {
     if (!replace && file.exists) {
-      logger.info(s"Already exists: $file")
+//      logger.info(s"Already exists: $file")
     } else {
-      logger.info(s"Writing $file")
+//      logger.info(s"Writing $file")
       file.getParentFile.mkdirs()
       val writer: BufferedWriter = new BufferedWriter(new FileWriter(file))
 

@@ -12,7 +12,7 @@ import MathReader.DelimitersAndInput
 // it is being set here already for all math except for MathML in an included file, in which case the author
 // will have to supply it :)
 // (Besides, I am not even registering the handler, so that won't work anyway.)
-final class MathReader(configuration: MathJax.Configuration) extends XMLFilterImpl {
+final class MathReader(configuration: Configuration) extends XMLFilterImpl {
 
   private var locator: Option[Locator] = None
   private def warning(message: String): Unit = getErrorHandler.warning(new SAXParseException(message, locator.orNull))
@@ -183,7 +183,7 @@ final class MathReader(configuration: MathJax.Configuration) extends XMLFilterIm
 
 object MathReader {
 
-  final class DelimitersAndInput(val delimiters: MathJax.Delimiters, val input: Input) {
+  final class DelimitersAndInput(val delimiters: Configuration.Delimiters, val input: Input) {
     def start: String = delimiters.start
     def end: String = delimiters.end
   }
@@ -198,8 +198,8 @@ object MathReader {
   private val notScannedElements: Set[String] = Set()
 
   // TODO verify (upstream) that there is no overlap and sort by length of the start (descending).
-  private def allDelimiters(configuration: MathJax.Configuration): Seq[DelimitersAndInput] = {
-    def withInput(values: Seq[MathJax.Delimiters], input: Input): Seq[DelimitersAndInput] =
+  private def allDelimiters(configuration: Configuration): Seq[DelimitersAndInput] = {
+    def withInput(values: Seq[Configuration.Delimiters], input: Input): Seq[DelimitersAndInput] =
       for (delimiters <- values) yield new DelimitersAndInput(delimiters, input)
 
     withInput(configuration.texDelimiters, Input.Tex) ++

@@ -28,11 +28,12 @@ trait Stylesheets {
       logger.info(s"Retrieving DocBook $name stylesheets: $dependencyNotation")
       val file: File = Gradle.getArtifact(project, dependencyNotation)
       logger.info(s"Unpacking ${file.getName}")
-      Gradle.unpack(
-        project = project,
+      Gradle.extract(
+        project,
         zipFile = file,
-        archiveSubdirectoryName = archiveSubdirectoryName,
-        directory = directory
+        toExtract = archiveSubdirectoryName,
+        isDirectory = true,
+        into = directory
       )
     }
   }

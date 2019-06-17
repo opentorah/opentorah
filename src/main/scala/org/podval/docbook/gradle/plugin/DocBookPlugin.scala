@@ -1,6 +1,8 @@
 package org.podval.docbook.gradle.plugin
 
-import org.gradle.api.{Plugin, Project}
+import org.gradle.api.tasks.TaskAction
+import org.gradle.api.{DefaultTask, Plugin, Project}
+import org.podval.docbook.gradle.fop.Fop
 import org.podval.docbook.gradle.section.DocBook2
 import org.podval.docbook.gradle.util.{Gradle, Logger, Util}
 
@@ -12,10 +14,6 @@ final class DocBookPlugin extends Plugin[Project] {
     val logger = Logger.forProject(project)
     logger.lifecycle(Util.applicationString)
 
-    // j2v8 bindings
-    // TODO doesn't work: project.getBuildscript.getDependencies.add(ScriptHandler.CLASSPATH_CONFIGURATION, MathJax.j2v8dependency)
-
-    // Extension for configuring the plugin.
     val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)
     extension.xslt1version.set("+")
     extension.xslt2version.set("+")
@@ -25,10 +23,10 @@ final class DocBookPlugin extends Plugin[Project] {
     extension.outputFormats.set(DocBook2.all.filterNot(_.usesDocBookXslt2).map(_.name).asJava)
     extension.cssFile.set("docBook")
     extension.isMathJaxEnabled.set(false)
+    extension.useJ2V8.set(true)
     extension.isJEuclidEnabled.set(false)
     extension.epubEmbeddedFonts.set(List.empty[String].asJava)
 
-    // Process DocBook.
     val processDocBookTask: ProcessDocBookTask = project.getTasks.create("processDocBook", classOf[ProcessDocBookTask])
     processDocBookTask.setDescription(s"Process DocBook")
     processDocBookTask.setGroup("publishing")
@@ -42,18 +40,30 @@ final class DocBookPlugin extends Plugin[Project] {
     processDocBookTask.epubEmbeddedFonts.set(extension.epubEmbeddedFonts)
     processDocBookTask.outputFormats.set(extension.outputFormats)
     processDocBookTask.isMathJaxEnabled.set(extension.isMathJaxEnabled)
+    processDocBookTask.useJ2V8.set(extension.useJ2V8)
     processDocBookTask.isJEuclidEnabled.set(extension.isJEuclidEnabled)
     processDocBookTask.dataGeneratorClass.set(extension.dataGeneratorClass)
+
     Gradle.getClassesTask(project).foreach(processDocBookTask.getDependsOn.add)
 
-    // List fonts known to FOP.
-    val listFontsTask: ListFopFontsTask = project.getTasks.create("listFopFonts",
-      classOf[ListFopFontsTask])
-    listFontsTask.setDescription("List FOP fonts")
+    project.getTasks.create("listFopFonts", classOf[DocBookPlugin.ListFopFontsTask])
+    project.getTasks.create("deleteFopFontsCache", classOf[DocBookPlugin.DeleteFopFontsCacheTask])
+  }
+}
 
-    // Delete FOP fonts cache.
-    val deleteFopFontsCacheTask: DeleteFopFontsCacheTask = project.getTasks.create("deleteFopFontsCache",
-      classOf[DeleteFopFontsCacheTask])
-    deleteFopFontsCacheTask.setDescription("Delete FOP fonts cache")
+object DocBookPlugin {
+
+  private class ListFopFontsTask extends DefaultTask {
+    setDescription("List FOP fonts")
+
+    @TaskAction def execute(): Unit =
+      Fop.listFonts(Layout.forProject(getProject).fopConfigurationFile)
+  }
+
+  private class DeleteFopFontsCacheTask extends DefaultTask {
+    setDescription("Delete FOP fonts cache")
+
+    @TaskAction def execute(): Unit =
+      Fop.deleteFontCache(Layout.forProject(getProject).fopConfigurationFile)
   }
 }

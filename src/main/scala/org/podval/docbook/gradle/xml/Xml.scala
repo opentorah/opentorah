@@ -107,14 +107,14 @@ object Xml {
     result: Result,
     logger: Logger
   ): Unit = {
-    logger.info(
-      s"""Xml.transform(
-         |  useSaxon9 = $useSaxon9,
-         |  stylesheetFile = $stylesheetFile,
-         |  source = ${source.getSystemId},
-         |  result = ${result.getSystemId}
-         |)""".stripMargin
-    )
+//    logger.info(
+//      s"""Xml.transform(
+//         |  useSaxon9 = $useSaxon9,
+//         |  stylesheetFile = $stylesheetFile,
+//         |  source = ${source.getSystemId},
+//         |  result = ${result.getSystemId}
+//         |)""".stripMargin
+//    )
 
     val transformerFactory =
       if (useSaxon9) new net.sf.saxon.TransformerFactoryImpl

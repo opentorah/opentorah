@@ -2,7 +2,7 @@ package org.podval.docbook.gradle.section
 
 import java.io.File
 
-import org.podval.docbook.gradle.mathjax.MathJax
+import org.podval.docbook.gradle.mathjax
 import org.podval.docbook.gradle.util.Logger
 
 trait Epub extends DocBook2 {
@@ -23,11 +23,9 @@ trait Epub extends DocBook2 {
 
   final override def postProcess(
     fopConfigurationFile: File,
-    nodeModulesRoot: File,
     substitutions: Map[String, String],
-    isMathJaxEnabled: Boolean,
     isJEuclidEnabled: Boolean,
-    mathJaxConfiguration: MathJax.Configuration,
+    mathJaxTypesetter: Option[mathjax.Typesetter],
     inputDirectory: File,
     inputFile: File,
     outputFile: File,

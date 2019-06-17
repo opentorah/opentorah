@@ -1,42 +1,37 @@
-package org.podval.docbook.gradle.mathjax
+package org.podval.docbook.gradle
 
-import java.io.File
-
-import org.podval.docbook.gradle.{jeuclid, mathjax}
-import org.podval.docbook.gradle.fop.Fop
-import org.podval.docbook.gradle.plugin.Layout
-import org.podval.docbook.gradle.util.{PluginTestProject, TestLogger}
+import org.podval.docbook.gradle.mathjax.{Svg, Typesetter}
+import org.podval.docbook.gradle.plugin.DocBook
 import org.podval.docbook.gradle.xml.Namespace
 import org.scalatest.{FlatSpec, Matchers}
 
-class MathJaxTest extends FlatSpec with Matchers {
+class TypesetterTest extends FlatSpec with Matchers {
 
-  private val testProject: PluginTestProject = PluginTestProject(
-    name = "mathJaxTestProject",
-    substitutions = Map.empty
-  )
-  testProject.run()
+  private def test(
+    name: String,
+    tex: String,
+    svgExpected: String
+  ): Unit = {
+    val document: String =
+      s"""<article ${DocBook.Namespace.withVersion}>
+         |  <para>$$$tex$$</para>
+         |</article>
+      """
 
-  private def getMathJax: MathJax = new MathJax(testProject.layout.nodeModulesRoot, MathJax.Configuration())
+    val project = PluginTestProject(name, prefix = Some("mathJaxTestProjects"), document, isPdfEnabled = true)
 
-  "MathJaxNode" should "work" in {
-    val mathJax: MathJax = getMathJax
+    val log: String = project.run(logInfo = true)
+    substring(log, Typesetter.logStart, Typesetter.logSep) shouldBe tex
+    substring(log, Typesetter.logSep, Typesetter.logEnd) shouldBe svgExpected
+  }
 
-    val text: String = "E = mc^2"
+  private def substring(string: String, from: String, to: String): String = {
+    val result: String = string.substring(string.indexOf(from) + from.length)
+    result.substring(0, result.indexOf(to))
+  }
 
-    val mml: String =
-     s"""|<math ${MathML.Namespace.default} display="block">
-         |  <mi>E</mi>
-         |  <mo>=</mo>
-         |  <mi>m</mi>
-         |  <msup>
-         |    <mi>c</mi>
-         |    <mn>2</mn>
-         |  </msup>
-         |</math>""".stripMargin
-
-    val svg: String =
-     s"""|<svg ${Namespace.XLink} width="8.976ex" height="2.676ex" style="vertical-align: -0.338ex;" viewBox="0 -1006.6 3864.5 1152.1" role="img" focusable="false" ${Svg.Namespace}>
+  it should "typeset E = mc^2" in test("emc2", "E = mc^2",
+     s"""|<svg ${Namespace.XLink} width="8.976ex" height="2.309ex" style="vertical-align: -0.205ex;" viewBox="0 -906.2 3864.5 994.3" role="img" focusable="false" ${Svg.Namespace}>
          |<defs>
          |<path stroke-width="1" id="E1-MJMATHI-45" d="M492 213Q472 213 472 226Q472 230 477 250T482 285Q482 316 461 323T364 330H312Q311 328 277 192T243 52Q243 48 254 48T334 46Q428 46 458 48T518 61Q567 77 599 117T670 248Q680 270 683 272Q690 274 698 274Q718 274 718 261Q613 7 608 2Q605 0 322 0H133Q31 0 31 11Q31 13 34 25Q38 41 42 43T65 46Q92 46 125 49Q139 52 144 61Q146 66 215 342T285 622Q285 629 281 629Q273 632 228 634H197Q191 640 191 642T193 659Q197 676 203 680H757Q764 676 764 669Q764 664 751 557T737 447Q735 440 717 440H705Q698 445 698 453L701 476Q704 500 704 528Q704 558 697 578T678 609T643 625T596 632T532 634H485Q397 633 392 631Q388 629 386 622Q385 619 355 499T324 377Q347 376 372 376H398Q464 376 489 391T534 472Q538 488 540 490T557 493Q562 493 565 493T570 492T572 491T574 487T577 483L544 351Q511 218 508 216Q505 213 492 213Z"></path>
          |<path stroke-width="1" id="E1-MJMAIN-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path>
@@ -50,13 +45,14 @@ class MathJaxTest extends FlatSpec with Matchers {
          | <use xlink:href="#E1-MJMATHI-6D" x="2098" y="0"></use>
          |<g transform="translate(2977,0)">
          | <use xlink:href="#E1-MJMATHI-63" x="0" y="0"></use>
-         | <use transform="scale(0.707)" xlink:href="#E1-MJMAIN-32" x="613" y="583"></use>
+         | <use transform="scale(0.707)" xlink:href="#E1-MJMAIN-32" x="613" y="513"></use>
          |</g>
          |</g>
          |</svg>""".stripMargin
+    )
 
-    val texsvg: String =
-     s"""|<svg ${Namespace.XLink} width="22.172ex" height="6.176ex" style="vertical-align: -1.838ex;" viewBox="0 -1867.7 9546.4 2659.1" role="img" focusable="false" ${Svg.Namespace}>
+  it should "typeset quadratic" in test("quadratic", "x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.",
+     s"""|<svg ${Namespace.XLink} width="15.95ex" height="4.109ex" style="vertical-align: -1.005ex;" viewBox="0 -1336.7 6867.2 1769.3" role="img" focusable="false" ${Svg.Namespace}>
          |<defs>
          |<path stroke-width="1" id="E1-MJMATHI-78" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path>
          |<path stroke-width="1" id="E1-MJMAIN-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path>
@@ -75,96 +71,32 @@ class MathJaxTest extends FlatSpec with Matchers {
          | <use xlink:href="#E1-MJMAIN-3D" x="850" y="0"></use>
          |<g transform="translate(1906,0)">
          |<g transform="translate(120,0)">
-         |<rect stroke="none" width="7121" height="60" x="0" y="220"></rect>
-         |<g transform="translate(60,775)">
-         | <use xlink:href="#E1-MJMAIN-2212" x="0" y="0"></use>
-         | <use xlink:href="#E1-MJMATHI-62" x="778" y="0"></use>
-         | <use xlink:href="#E1-MJMAIN-B1" x="1430" y="0"></use>
-         |<g transform="translate(2430,0)">
-         | <use xlink:href="#E1-MJSZ1-221A" x="0" y="94"></use>
-         |<rect stroke="none" width="3569" height="60" x="1000" y="885"></rect>
-         |<g transform="translate(1000,0)">
-         | <use xlink:href="#E1-MJMATHI-62" x="0" y="0"></use>
-         | <use transform="scale(0.707)" xlink:href="#E1-MJMAIN-32" x="607" y="408"></use>
-         | <use xlink:href="#E1-MJMAIN-2212" x="1105" y="0"></use>
-         | <use xlink:href="#E1-MJMAIN-34" x="2106" y="0"></use>
-         | <use xlink:href="#E1-MJMATHI-61" x="2606" y="0"></use>
-         | <use xlink:href="#E1-MJMATHI-63" x="3136" y="0"></use>
+         |<rect stroke="none" width="4442" height="60" x="0" y="220"></rect>
+         |<g transform="translate(60,518)">
+         | <use transform="scale(0.707)" xlink:href="#E1-MJMAIN-2212" x="0" y="0"></use>
+         | <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-62" x="778" y="0"></use>
+         | <use transform="scale(0.707)" xlink:href="#E1-MJMAIN-B1" x="1208" y="0"></use>
+         |<g transform="translate(1404,0)">
+         | <use transform="scale(0.707)" xlink:href="#E1-MJSZ1-221A" x="0" y="169"></use>
+         |<rect stroke="none" width="2209" height="42" x="707" y="679"></rect>
+         |<g transform="translate(707,0)">
+         | <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-62" x="0" y="0"></use>
+         | <use transform="scale(0.5)" xlink:href="#E1-MJMAIN-32" x="607" y="596"></use>
+         | <use transform="scale(0.707)" xlink:href="#E1-MJMAIN-2212" x="883" y="0"></use>
+         | <use transform="scale(0.707)" xlink:href="#E1-MJMAIN-34" x="1661" y="0"></use>
+         | <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-61" x="2162" y="0"></use>
+         | <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-63" x="2691" y="0"></use>
          |</g>
          |</g>
          |</g>
-         |<g transform="translate(3045,-687)">
-         | <use xlink:href="#E1-MJMAIN-32" x="0" y="0"></use>
-         | <use xlink:href="#E1-MJMATHI-61" x="500" y="0"></use>
+         |<g transform="translate(1856,-363)">
+         | <use transform="scale(0.707)" xlink:href="#E1-MJMAIN-32" x="0" y="0"></use>
+         | <use transform="scale(0.707)" xlink:href="#E1-MJMATHI-61" x="500" y="0"></use>
          |</g>
          |</g>
          |</g>
-         | <use xlink:href="#E1-MJMAIN-2E" x="9267" y="0"></use>
+         | <use xlink:href="#E1-MJMAIN-2E" x="6588" y="0"></use>
          |</g>
          |</svg>""".stripMargin
-
-    val tex: String = "x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}."
-
-    def typeset(what: String, input: Input, output: Output): String =
-      mathJax.typeset(what, input, output, 6)
-
-    typeset(tex, Input.Tex, Output.Svg) shouldBe texsvg
-    typeset(text, Input.Tex, Output.Svg) shouldBe svg
-    typeset(text, Input.Tex, Output.MathML) shouldBe mml
-    typeset(mml, Input.MathML, Output.Svg) shouldBe svg
-  }
-
-  "SVG sizes" should "be understood" in {
-    val formula: String =
-     s"""|<math ${MathML.Namespace.default} display="inline">
-         |  <mrow>
-         |    <msup>
-         |      <mi>tan</mi>
-         |      <mrow><mo>-</mo><mn>1</mn></mrow>
-         |    </msup>
-         |    <mo>(</mo>
-         |      <mfrac>
-         |        <mrow><mi>sin</mi><mi>α</mi></mrow>
-         |        <mrow><mi>cos</mi><mi>α</mi><mo>+</mo><mi>ε</mi></mrow>
-         |      </mfrac>
-         |    <mo>)</mo>
-         |  </mrow>
-         |</math>
-      """.stripMargin
-
-    val mathJax: MathJax = getMathJax
-
-    def sizes(what: String, fontSize: Float): Unit = {
-      val svg = mathJax.typeset(what, Input.MathML, fontSize)
-//      println(Xml.toString(svg))
-//      println(Sizes(svg))
-    }
-
-    sizes(formula, 10)
-  }
-
-  "Fop MathJax" should "work" in {
-    val layout: Layout = Layout.forCurrent
-
-    def doIt(useMathJax: Boolean): Unit = {
-      val plugin =
-        if (useMathJax) new mathjax.FopPlugin(getMathJax)
-        else new jeuclid.FopPlugin
-
-      val inputFile: File = layout.testResource("test.fo")
-
-      Fop.run(
-        configurationFile = layout.testResource("fop.xconf"),
-        substitutions = Map.empty,
-        plugin = Some(plugin),
-        inputFile = layout.testResource("test.fo"),
-        inputDirectory = inputFile.getParentFile,
-        outputFile = layout.buildFile(s"test-${if (useMathJax) "mathjax" else "jeuclid"}.pdf"),
-        logger = new TestLogger
-      )
-    }
-
-    doIt(true)
-    doIt(false)
-  }
+  )
 }

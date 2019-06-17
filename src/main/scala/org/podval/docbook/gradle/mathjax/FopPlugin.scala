@@ -11,7 +11,7 @@ import org.w3c.dom.svg.SVGDocument
 import org.w3c.dom.{DOMImplementation, Document}
 
 //  Inspired by the JEuclid FOP plugin.
-final class FopPlugin(mathJax: MathJax) extends org.podval.docbook.gradle.fop.FopPlugin {
+final class FopPlugin(mathJax: Typesetter) extends org.podval.docbook.gradle.fop.FopPlugin {
 
   def typeset(mathMLDocument: Document): SVGDocument = mathJax.typeset(mathMLDocument)
 

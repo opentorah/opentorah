@@ -10,10 +10,12 @@ import org.podval.docbook.gradle.util.{Architecture, Gradle, Os}
 
 // Describes Node distribution's packaging and structure.
 final class Distribution(
-  version: String,
-  os: Os,
-  architecture: Architecture
+  val version: String,
+  val os: Os,
+  val architecture: Architecture
 ) {
+  override def toString: String = s"Node v$version for $os on $architecture"
+
   private val osName: String = os match {
     case Os.Windows => "win"
     case Os.Mac => "darwin"

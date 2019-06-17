@@ -1,13 +1,13 @@
-package org.podval.docbook.gradle.mathjax
+package org.podval.docbook.gradle
 
+import org.podval.docbook.gradle.mathjax.{Configuration, MathJax, MathML, MathReader}
 import org.podval.docbook.gradle.plugin.DocBook
-import org.podval.docbook.gradle.util.TestLogger
 import org.podval.docbook.gradle.xml.{Namespace, Xml}
 import org.scalatest.{FlatSpec, Matchers}
 
 class MathReaderTest extends FlatSpec with Matchers {
 
-  "MathReader" should "work for wrapped display TeX" in {
+  it should "work for wrapped display TeX" in {
     // Serializer outputs UTF-16; xml namespace is made explicit; order of attributes and spacing are different -
     // but other than that, the document is the same.
     parse(
@@ -111,7 +111,7 @@ class MathReaderTest extends FlatSpec with Matchers {
   private def parse(string: String): String = {
     val result = Xml.parse(
       input = string,
-      xmlReader = Xml.getFilteredXMLReader(filters = Seq(new MathReader(MathJax.Configuration()) /* , new TracingFilter */)),
+      xmlReader = Xml.getFilteredXMLReader(filters = Seq(new MathReader(Configuration()) /* , new TracingFilter */)),
       logger = new TestLogger
     )
     Xml.toString(result)

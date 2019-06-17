@@ -1,24 +1,10 @@
-package org.podval.docbook.gradle.plugin
+package org.podval.docbook.gradle
 
-import java.io.File
-
-import org.podval.docbook.gradle.section
-import org.podval.docbook.gradle.util.{PluginTestProject, Util}
+import org.podval.docbook.gradle.plugin.DocBook
 import org.podval.docbook.gradle.xml.Namespace
 import org.scalatest.{FlatSpec, Matchers}
 
 class PluginTest extends FlatSpec with Matchers {
-
-  private def writeTestProject(
-    name: String,
-    substitutions: Map[String, String],
-    document: String
-  ): PluginTestProject = PluginTestProject(
-    name,
-    prefix = Some("pluginTestProjects"),
-    document = document,
-    substitutions = substitutions
-  )
 
   private def test(
     name: String,
@@ -26,20 +12,17 @@ class PluginTest extends FlatSpec with Matchers {
     document: String)(
     inIndexHtml: String*
   ): Unit = {
-    val project = writeTestProject(name, substitutions, document)
+    val project = PluginTestProject(name, prefix = Some("pluginTestProjects"), document, substitutions)
 
     project.run()
 
-    val indexHtmlFile: File =
-      project.layout.forDocument(prefixed = false, "test").saxonOutputFile(section.Html)
-
-    val indexHtml: String = Util.readFrom(indexHtmlFile)
+    val indexHtml: String = project.indexHtml
 
     for (string: String <- inIndexHtml)
       indexHtml.contains(string) shouldBe true
   }
 
-  "Plugin" should "preserve the title" in test(
+  it should "preserve the title" in test(
     name = "title",
     substitutions = Map.empty,
     document =
@@ -91,8 +74,9 @@ class PluginTest extends FlatSpec with Matchers {
   )
 
   it should "fail resolving entity substitutions without DTD enabled" in {
-    val project: PluginTestProject = writeTestProject(
+    val project: PluginTestProject = PluginTestProject(
       name = "substitutions-without-DTD-entity-substitutions",
+      prefix = Some("pluginTestProjects"),
       substitutions = Map[String, String]("version" -> "\"v1.0.0\""),
       document = s"""<article ${DocBook.Namespace.withVersion} ${Namespace.XLink}>
          |  <para>Processing instruction: <?eval version ?>.</para>

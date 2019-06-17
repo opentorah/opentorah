@@ -37,6 +37,9 @@ class Extension(project: Project) {
   @BeanProperty val isMathJaxEnabled: Property[Boolean] =
     project.getObjects.property(classOf[Boolean])
 
+  @BeanProperty val useJ2V8: Property[Boolean] =
+    project.getObjects.property(classOf[Boolean])
+
   @BeanProperty val isJEuclidEnabled: Property[Boolean] =
     project.getObjects.property(classOf[Boolean])
 

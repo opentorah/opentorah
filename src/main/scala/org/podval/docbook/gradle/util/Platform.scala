@@ -18,9 +18,13 @@ object Platform {
       throw new IllegalArgumentException(s"Unsupported OS: $name")
   }
 
+  // Note: Gradle Node plugin's code claims that Java returns "arm" on all ARM variants;
+  // I found 'os.arch' to be unreliable (it has 'amd64' on my Intel laptop)
   def getArchName: String = System.getProperty("os.arch")
 
-  def getArch: Architecture = getArchName.toLowerCase match {
+  def getSystemArchName: String = Process("uname -m").!!.trim
+
+  def getArch: Architecture = getSystemArchName.toLowerCase match {
     case "i686" => Architecture.i686
     case "x86_64" => Architecture.x86_64
     case "amd64" => Architecture.amd64
@@ -29,17 +33,9 @@ object Platform {
     case "s390x" => Architecture.s390x
     case "nacl" => Architecture.nacl
     case "aarch64" => Architecture.aarch64
-    case "arm" =>
-      // from the Node plugin:
-      //   as Java just returns "arm" on all ARM variants, we need a system call to determine the exact arch
-      // TODO do this allways (when on Linux)!
-      val systemArch = Process("uname -m").!!.trim
-      systemArch match {
-        case "armv6l" => Architecture.armv6l
-        case "armv7l" => Architecture.armv7l
-        case "armv8l" => Architecture.armv8l
-        case _ => throw new IllegalArgumentException(s"Unsupported ARM architecture: $systemArch")
-      }
+    case "armv6l" => Architecture.armv6l
+    case "armv7l" => Architecture.armv7l
+    case "armv8l" => Architecture.armv8l
     case name => throw new IllegalArgumentException(s"Unsupported architecture: $name")
   }
 }

@@ -50,23 +50,23 @@ object Gradle {
     result
   }
 
-  def unpack(project: Project, archiveFile: File, isZip: Boolean, directory: File): Unit = {
+  def unpack(project: Project, archiveFile: File, isZip: Boolean, into: File): Unit = {
     project.copy((copySpec: CopySpec) => copySpec
       .from(if (isZip) project.zipTree(archiveFile) else project.tarTree(archiveFile))
-      .into(directory)
+      .into(into)
     )
   }
 
-  def unpack(project: Project, zipFile: File, archiveSubdirectoryName: String, directory: File): Unit = {
-    val toDrop: Int = archiveSubdirectoryName.count(_ == '/') + 1
+  // Extract just the specified directory from a ZIP file.
+  // Gradle 5 did not get the new API to do this easier:
+  //   https://github.com/gradle/gradle/issues/1108
+  //   https://github.com/gradle/gradle/pull/5405
+  def extract(project: Project, zipFile: File, toExtract: String, isDirectory: Boolean, into: File): Unit = {
+    val toDrop: Int = toExtract.count(_ == '/') + (if (isDirectory) 1 else 0)
     project.copy((copySpec: CopySpec) => copySpec
-      .into(directory)
+      .into(into)
       .from(project.zipTree(zipFile))
-      // TODO following code deals with extracting just the "docbook" directory;
-      // this should become easier in Gradle 5.3, see:
-      // https://github.com/gradle/gradle/issues/1108
-      // https://github.com/gradle/gradle/pull/5405
-      .include(archiveSubdirectoryName + "/**")
+      .include(toExtract + (if (isDirectory) "/**" else ""))
       .eachFile((file: FileCopyDetails) =>
         file.setRelativePath(new RelativePath(true, file.getRelativePath.getSegments.drop(toDrop): _*))
       )

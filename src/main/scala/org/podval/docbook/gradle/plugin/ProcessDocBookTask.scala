@@ -8,11 +8,10 @@ import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
 import org.podval.docbook.gradle.fop.Fop
-import org.podval.docbook.gradle.mathjax.MathJax
-import org.podval.docbook.gradle.node.{Distribution, Installation}
+import org.podval.docbook.gradle.mathjax
 import org.podval.docbook.gradle.section.{DocBook2, Section}
-import org.podval.docbook.gradle.util.{Architecture, Gradle, Logger, Os, Platform, Util}
-import org.podval.docbook.gradle.xml.{ProcessingInstructionsFilter, Resolver, Xml}
+import org.podval.docbook.gradle.util.{Gradle, Logger, Util}
+import org.podval.docbook.gradle.xml.Resolver
 
 import scala.beans.BeanProperty
 import scala.jdk.CollectionConverters._
@@ -73,6 +72,9 @@ class ProcessDocBookTask extends DefaultTask {
   @Input @BeanProperty val isMathJaxEnabled: Property[Boolean] =
     getProject.getObjects.property(classOf[Boolean])
 
+  @Input @BeanProperty val useJ2V8: Property[Boolean] =
+    getProject.getObjects.property(classOf[Boolean])
+
   @Input @BeanProperty val isJEuclidEnabled: Property[Boolean] =
     getProject.getObjects.property(classOf[Boolean])
 
@@ -130,15 +132,6 @@ class ProcessDocBookTask extends DefaultTask {
     Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout, logger)
     Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout, logger)
 
-    // Make sure MathJax is installed
-    // TODO only do this if isMathJaxEnabled
-    // TODO try J2V8 and fall back to this
-    // TODO feed resulting MathJax into the process
-    installMathJax
-
-    // TODO make configurable via extension
-    val mathJaxConfiguration: MathJax.Configuration = MathJax.Configuration()
-
     val substitutionsMap: Map[String, String] = substitutions.get.asScala.toMap
 
     write.writeFopConfiguration()
@@ -153,11 +146,6 @@ class ProcessDocBookTask extends DefaultTask {
     for ((name: String, _ /*prefixed*/: Boolean) <- inputDocuments)
       write.inputFile(name)
 
-    val epubEmbeddedFontsStr: String = {
-      val fontNames: List[String] = epubEmbeddedFonts.get.asScala.toList
-      if (fontNames.isEmpty) "" else Fop.getFontFiles(layout.fopConfigurationFile, fontNames, logger)
-    }
-
     for {
       docBook2: DocBook2 <- DocBook2.all
       (documentName: String, prefixed: Boolean) <- inputDocuments
@@ -166,7 +154,7 @@ class ProcessDocBookTask extends DefaultTask {
       prefixed,
       documentName,
       cssFileName,
-      epubEmbeddedFontsStr
+      epubEmbeddedFonts = Fop.getFontFiles(layout.fopConfigurationFile, epubEmbeddedFonts.get.asScala.toList, logger)
     )
 
     for (docBook2: DocBook2 <- DocBook2.all)
@@ -177,45 +165,30 @@ class ProcessDocBookTask extends DefaultTask {
 
     generateData()
 
-    // In processing instructions and CSS, substitute xslParameters also - because why not?
-    val allSubstitutions: Map[String, String] = sections.values.toList.flatten.toMap ++ substitutionsMap
+    // TODO make MathJax configurable via extension
+    val mathJaxConfiguration: mathjax.Configuration = mathjax.Configuration()
 
-    val resolver: Resolver = new Resolver(layout.catalogFile, logger)
+    val processDocBook: ProcessDocBook = new ProcessDocBook(
+      getProject,
+      // In processing instructions and CSS, substitute xslParameters also - because why not?
+      substitutions = sections.values.toList.flatten.toMap ++ substitutionsMap,
+      resolver = new Resolver(layout.catalogFile, logger),
+      isJEuclidEnabled.get,
+      mathJaxTypesetter =
+        if (!isMathJaxEnabled.get) None
+        else Some(MathJax.getTypesetter(getProject, mathJaxConfiguration, useJ2V8.get, layout, logger)),
+      layout,
+      logger
+    )
 
     for {
       docBook2: DocBook2 <- processors
       (documentName: String, prefixed: Boolean) <- inputDocuments
-    } run(
+    } processDocBook.run(
       docBook2,
       prefixed,
-      documentName,
-      allSubstitutions,
-      resolver,
-      isJEuclidEnabled.get,
-      isMathJaxEnabled.get,
-      mathJaxConfiguration
+      documentName
     )
-  }
-
-  private def installMathJax: Installation = {
-    val version: String = Distribution.defaultVersion
-    val os: Os = Platform.getOs
-    val arch: Architecture = Platform.getArch
-
-    val distribution: Distribution = new Distribution(version, os, arch)
-    val installation: Installation = new Installation(distribution, layout.nodeRoot, layout.nodeModulesRoot)
-
-    if (!installation.root.exists()) {
-      info(s"Installing Node v$version for $os on $arch")
-      installation.install(getProject)
-    }
-
-    if (!installation.nodeModules.exists()) {
-      info(s"Installing mathjax-node")
-      installation.npmInstall("mathjax-node")
-    }
-
-    installation
   }
 
   private def getDocumentName(string: String): Option[String] =
@@ -242,90 +215,6 @@ class ProcessDocBookTask extends DefaultTask {
         exec.setMain(mainClass)
         exec.args(dataDirectory.toString)
        })
-    }
-  }
-
-  def run(
-    docBook2: DocBook2,
-    prefixed: Boolean,
-    documentName: String,
-    substitutions: Map[String, String],
-    resolver: Resolver,
-    isJEuclidEnabled: Boolean,
-    isMathJaxEnabled: Boolean,
-    mathJaxConfiguration: MathJax.Configuration
-  ): Unit = {
-    logger.lifecycle(s"DocBook: processing '$documentName' to ${docBook2.name}.")
-
-    val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)
-
-    // Saxon output directory.
-    val saxonOutputDirectory: File = forDocument.saxonOutputDirectory(docBook2)
-    saxonOutputDirectory.mkdirs
-
-    // Saxon output file and target.
-    val saxonOutputFile: File = forDocument.saxonOutputFile(docBook2)
-
-    // Run Saxon.
-    Xml.transform(
-      useSaxon9 = docBook2.usesDocBookXslt2,
-      resolver = resolver,
-      inputFile = layout.inputFile(documentName),
-      stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(docBook2)),
-      // do not output the 'main' file when chunking in XSLT 1.0
-      outputFile = if (docBook2.usesRootFile) Some(saxonOutputFile) else None,
-      xmlReader = Xml.getFilteredXMLReader(
-        Seq(new ProcessingInstructionsFilter(substitutions, resolver, logger)) ++
-          docBook2.xmlFilter(mathJaxConfiguration).toSeq // ++ Seq(new TracingFilter)
-      ),
-      logger = logger
-    )
-
-    copyImagesAndCss(docBook2, saxonOutputDirectory, substitutions)
-
-    // Post-processing.
-    if (docBook2.usesIntermediate) {
-      info(s"Post-processing ${docBook2.name}")
-      val outputDirectory: File = forDocument.outputDirectory(docBook2)
-      outputDirectory.mkdirs
-
-      docBook2.postProcess(
-        fopConfigurationFile = layout.fopConfigurationFile,
-        nodeModulesRoot = layout.nodeModulesRoot,
-        substitutions = substitutions,
-        isMathJaxEnabled = isMathJaxEnabled,
-        isJEuclidEnabled = isJEuclidEnabled,
-        mathJaxConfiguration = mathJaxConfiguration,
-        inputDirectory = saxonOutputDirectory,
-        inputFile = saxonOutputFile,
-        outputFile = forDocument.outputFile(docBook2),
-        logger = logger
-      )
-    }
-  }
-
-  private def copyImagesAndCss(
-    docBook2: DocBook2,
-    saxonOutputDirectory: File,
-    substitutions: Map[String, String]
-  ): Unit = {
-    val into: File = Util.prefixedDirectory(saxonOutputDirectory, docBook2.copyDestinationDirectoryName)
-
-    info(s"Copying images")
-    Gradle.copyDirectory(getProject,
-      into = into,
-      from = layout.imagesDirectory.getParentFile,
-      directoryName = layout.imagesDirectoryName
-    )
-
-    if (docBook2.usesCss) {
-      info(s"Copying CSS")
-      Gradle.copyDirectory(getProject,
-        into = into,
-        from = layout.cssDirectory.getParentFile,
-        directoryName = layout.cssDirectoryName,
-        substitutions = substitutions
-      )
     }
   }
 }

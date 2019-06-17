@@ -3,16 +3,15 @@ package org.podval.docbook.gradle.node
 import java.io.File
 import java.nio.file.{Files, Path, Paths}
 
-import org.gradle.api.Project
-import org.podval.docbook.gradle.util.Gradle
-
 import scala.sys.process.Process
 
 final class Installation(
-  distribution: Distribution,
-  nodeRoot: File,
-  nodeModulesRoot: File)
+  val distribution: Distribution,
+  val nodeRoot: File,
+  val nodeModulesRoot: File)
 {
+  override def toString: String = s"$distribution in $nodeRoot with modules in $nodeModules"
+
   private def isWindows: Boolean = distribution.isWindows
 
   val root: File = new File(nodeRoot, distribution.topDirectory)
@@ -42,11 +41,7 @@ final class Installation(
   def npmInstall(module: String): String =
     npm(Seq("install", "--no-save", "--silent", module), cwd = nodeModulesRoot)
 
-  def install(project: Project): Unit = {
-    val nodeArchive: File = Gradle.getArtifact(project, distribution.dependencyNotation, Distribution.repository)
-
-    Gradle.unpack(project, nodeArchive, distribution.isZip, nodeRoot)
-
+  def postInstall(): Unit = {
     fixNpmSymlink()
   }
 
