@@ -24,8 +24,11 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
     val namesWithLang: Seq[(String, Option[String])] =
       Collection.listNames(teiDirectory, ".xml", Page.checkBase).map(splitLang)
 
-    val translations: Map[String, Seq[String]] =
-      namesWithLang.filter(_._2.isDefined).map(e => (e._1, e._2.get)).groupBy(_._1).mapValues(_.map(_._2))
+    val translations: Map[String, Seq[String]] = namesWithLang
+      .filter(_._2.isDefined)
+      .map(e => (e._1, e._2.get))
+      .groupBy(_._1)
+      .view.mapValues(_.map(_._2)).toMap
 
     val names: Seq[String] = namesWithLang.filter(_._2.isEmpty).map(_._1)
 
