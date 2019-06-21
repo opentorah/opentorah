@@ -10,10 +10,4 @@ class NodeTest extends FlatSpec with Matchers {
     val distribution: Distribution = new Distribution("10.15.3", Platform.getOs, Platform.getArch)
     distribution.hasBinSubdirectory shouldBe true
   }
-
-  it should "install Node modules" in {
-    val testProject: PluginTestProject = PluginTestProject(name = "nodeTestProject")
-    testProject.run()
-    testProject.layout.nodeModulesRoot.exists shouldBe true
-  }
 }

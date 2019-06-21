@@ -20,11 +20,13 @@ object Platform {
 
   // Note: Gradle Node plugin's code claims that Java returns "arm" on all ARM variants;
   // I found 'os.arch' to be unreliable (it has 'amd64' on my Intel laptop)
-  def getArchName: String = System.getProperty("os.arch")
+  def getEnvironmentArchName: String = System.getProperty("os.arch")
 
   def getSystemArchName: String = Process("uname -m").!!.trim
 
-  def getArch: Architecture = getSystemArchName.toLowerCase match {
+  def getArchName: String = if (getOs.hasUname) getSystemArchName else getEnvironmentArchName
+
+  def getArch: Architecture = getArchName.toLowerCase match {
     case "i686" => Architecture.i686
     case "x86_64" => Architecture.x86_64
     case "amd64" => Architecture.amd64

@@ -18,7 +18,14 @@ class TypesetterTest extends FlatSpec with Matchers {
          |</article>
       """
 
-    val project = PluginTestProject(name, prefix = Some("mathJaxTestProjects"), document, isPdfEnabled = true)
+    val project = PluginTestProject(
+      name,
+      prefix = Some("mathJaxTestProjects"),
+      document,
+      isPdfEnabled = true,
+      isMathJaxEnabled = true,
+      useJ2V8 = true
+    )
 
     val log: String = project.run(logInfo = true)
     substring(log, Typesetter.logStart, Typesetter.logSep) shouldBe tex

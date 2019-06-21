@@ -71,7 +71,6 @@ final class Layout(val projectDir: File, val buildDir: File) {
 
   // Node
   def nodeRoot: File = /*cacheDirectory*/ buildDirectory("nodejs")
-  def nodeModulesRoot: File = buildDir
   def j2v8LibraryDirectory: File = buildDirectory("j2v8library")
 
   // build/docBookXslt[2]

@@ -28,11 +28,7 @@ private class MathJax(project: Project, useJ2V8: Boolean, layout: Layout, logger
 
     val distribution: node.Distribution = new node.Distribution(version, os, arch)
 
-    val installation: node.Installation = new node.Installation(
-      distribution,
-      layout.nodeRoot,
-      layout.nodeModulesRoot
-    )
+    val installation: node.Installation = new node.Installation(distribution, layout.nodeRoot)
 
     if (!installation.root.exists()) {
       logger.info(s"Installing $installation")
@@ -110,14 +106,4 @@ private class MathJax(project: Project, useJ2V8: Boolean, layout: Layout, logger
       }
     }
   }
-}
-
-object MathJax {
-  def getTypesetter(
-    project: Project,
-    configuration: mathjax.Configuration,
-    useJ2V8: Boolean,
-    layout: Layout,
-    logger: Logger
-  ): mathjax.Typesetter = new MathJax(project, useJ2V8, layout, logger).getTypesetter(configuration)
 }

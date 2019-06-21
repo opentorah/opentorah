@@ -12,7 +12,12 @@ class PluginTest extends FlatSpec with Matchers {
     document: String)(
     inIndexHtml: String*
   ): Unit = {
-    val project = PluginTestProject(name, prefix = Some("pluginTestProjects"), document, substitutions)
+    val project = PluginTestProject(
+      name,
+      prefix = Some("pluginTestProjects"),
+      document,
+      substitutions
+    )
 
     project.run()
 

@@ -23,7 +23,7 @@ final class DocBookPlugin extends Plugin[Project] {
     extension.outputFormats.set(DocBook2.all.filterNot(_.usesDocBookXslt2).map(_.name).asJava)
     extension.cssFile.set("docBook")
     extension.isMathJaxEnabled.set(false)
-    extension.useJ2V8.set(true)
+    extension.useJ2V8.set(false)
     extension.isJEuclidEnabled.set(false)
     extension.epubEmbeddedFonts.set(List.empty[String].asJava)
 

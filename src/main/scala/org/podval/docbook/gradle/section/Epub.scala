@@ -2,9 +2,6 @@ package org.podval.docbook.gradle.section
 
 import java.io.File
 
-import org.podval.docbook.gradle.mathjax
-import org.podval.docbook.gradle.util.Logger
-
 trait Epub extends DocBook2 {
   final override def outputFileExtension: String = "epub"
   final override def usesRootFile: Boolean = false
@@ -22,14 +19,8 @@ trait Epub extends DocBook2 {
   final override def customStylesheet: String = ""
 
   final override def postProcess(
-    fopConfigurationFile: File,
-    substitutions: Map[String, String],
-    isJEuclidEnabled: Boolean,
-    mathJaxTypesetter: Option[mathjax.Typesetter],
     inputDirectory: File,
-    inputFile: File,
-    outputFile: File,
-    logger: Logger
+    outputFile: File
   ): Unit = {
     val zip = new org.apache.tools.ant.taskdefs.Zip
     zip.setProject(new org.apache.tools.ant.Project)

@@ -44,7 +44,9 @@ object PluginTestProject {
     prefix: Option[String] = None,
     document: String = s"<article ${DocBook.Namespace.withVersion}/>",
     substitutions: Map[String, String] = Map.empty,
-    isPdfEnabled: Boolean = false
+    isPdfEnabled: Boolean = false,
+    isMathJaxEnabled: Boolean = false,
+    useJ2V8: Boolean = false,
   ): PluginTestProject = {
     val layout: Layout = Layout.forCurrent
     val projectDir: File = new File(Util.prefixedDirectory(layout.buildDir, prefix), name)
@@ -79,7 +81,8 @@ object PluginTestProject {
           |docBook {
           |  document = "$documentName"
           |  outputFormats = [$outputFormats]
-          |  isMathJaxEnabled = true
+          |  isMathJaxEnabled = $isMathJaxEnabled
+          |  useJ2V8 = $useJ2V8
           |$substitutionsFormatted
           |}
           |"""

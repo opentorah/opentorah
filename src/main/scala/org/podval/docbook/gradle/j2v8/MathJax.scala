@@ -8,14 +8,14 @@ import org.podval.docbook.gradle.mathjax.Configuration
 
 import scala.jdk.CollectionConverters._
 
-final class MathJax(nodeModulesRoot: File) {
+final class MathJax(nodeModules: File) {
 
   private val nodeJS: NodeJS = NodeJS.createNodeJS()
 
   private def v8: V8 = nodeJS.getRuntime
 
   private val mathJaxNode: V8Object =
-    nodeJS.require(new File(nodeModulesRoot, "node_modules/mathjax-node"))
+    nodeJS.require(new File(nodeModules, "mathjax-node"))
 
   def configure(configuration: Configuration): Unit = {
     val args: V8Array = V8ObjectUtils.toV8Array(v8, List(MathJax.map2java(configuration.toMap)).asJava)

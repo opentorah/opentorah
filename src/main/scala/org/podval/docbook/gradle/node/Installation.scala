@@ -3,12 +3,11 @@ package org.podval.docbook.gradle.node
 import java.io.File
 import java.nio.file.{Files, Path, Paths}
 
-import scala.sys.process.Process
+import scala.sys.process.{Process, ProcessLogger}
 
 final class Installation(
   val distribution: Distribution,
-  val nodeRoot: File,
-  val nodeModulesRoot: File)
+  val nodeRoot: File)
 {
   override def toString: String = s"$distribution in $nodeRoot with modules in $nodeModules"
 
@@ -20,26 +19,39 @@ final class Installation(
 
   private val nodeExec: File = new File(bin, if (isWindows) "node.exe" else "node")
 
-  /////  def node(args)
-  /////  def evaluate(script: String): String = ??? // node -p <script>
+  private def node(args: String*): String = exec(
+    command = nodeExec,
+    args.toSeq,
+    cwd = None,
+    extraEnv = ("NODE_PATH", nodeModules.getAbsolutePath)
+  )
+
+  def evaluate(script: String): String = node("--print", script)
 
   private val npmExec: File = new File(bin, if (isWindows) "npm.cmd" else "npm")
 
-  private def npmScriptFile: File = {
-    val lib: String = if (isWindows) "" else "lib/"
-    new File(root, s"${lib}node_modules/npm/bin/npm-cli.js")
-  }
+  private def npm(args: String*): String = exec(
+    command = npmExec,
+    args.toSeq,
+    cwd = Some(nodeRoot),
+    extraEnv = ("PATH", npmExec.getParentFile.getAbsolutePath)
+  )
 
-  private def npm(args: Seq[String], cwd: File): String = Process(
-    command = npmExec.getAbsolutePath +: args,
-    cwd = Some(cwd),
-    ("PATH", npmExec.getParentFile.getAbsolutePath)
-  ).!!
-
-  val nodeModules: File = new File(nodeModulesRoot, "node_modules")
+  val nodeModules: File = new File(nodeRoot, "node_modules")
 
   def npmInstall(module: String): String =
-    npm(Seq("install", "--no-save", "--silent", module), cwd = nodeModulesRoot)
+    npm("install", "--no-save", "--silent", module)
+
+
+  private def exec(command: File, args: Seq[String], cwd: Option[File], extraEnv: (String, String)*): String = {
+    val out = new StringBuilder
+    Process(
+      command = command.getAbsolutePath +: args,
+      cwd,
+      extraEnv = extraEnv: _*
+    ).!!(ProcessLogger(line => out.append(line), line => out.append(line)))
+    out.toString
+  }
 
   def postInstall(): Unit = {
     fixNpmSymlink()
@@ -52,5 +64,10 @@ final class Installation(
       npm,
       bin.toPath.relativize(Paths.get(npmScriptFile.getAbsolutePath))
     )
+  }
+
+  private def npmScriptFile: File = {
+    val lib: String = if (isWindows) "" else "lib/"
+    new File(root, s"${lib}node_modules/npm/bin/npm-cli.js")
   }
 }

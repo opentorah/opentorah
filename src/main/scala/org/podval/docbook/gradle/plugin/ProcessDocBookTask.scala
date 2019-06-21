@@ -165,6 +165,8 @@ class ProcessDocBookTask extends DefaultTask {
 
     generateData()
 
+    require(!isMathJaxEnabled.get || !isJEuclidEnabled.get)
+
     // TODO make MathJax configurable via extension
     val mathJaxConfiguration: mathjax.Configuration = mathjax.Configuration()
 
@@ -176,7 +178,7 @@ class ProcessDocBookTask extends DefaultTask {
       isJEuclidEnabled.get,
       mathJaxTypesetter =
         if (!isMathJaxEnabled.get) None
-        else Some(MathJax.getTypesetter(getProject, mathJaxConfiguration, useJ2V8.get, layout, logger)),
+        else Some(new MathJax(getProject, useJ2V8.get, layout, logger).getTypesetter(mathJaxConfiguration)),
       layout,
       logger
     )

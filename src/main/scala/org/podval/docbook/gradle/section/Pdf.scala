@@ -1,14 +1,8 @@
 package org.podval.docbook.gradle.section
 
-import java.io.File
-
-import org.podval.docbook.gradle.fop.{Fop, FopPlugin}
-import org.podval.docbook.gradle.util.Logger
-import org.podval.docbook.gradle.{jeuclid, mathjax}
-import org.xml.sax.XMLFilter
-
 object Pdf extends DocBook2 {
   override def name: String = "pdf"
+  override def isPdf: Boolean = true
   override def stylesheetUriName: String = "fo/docbook"
   override def outputFileExtension: String = "pdf"
   override def usesRootFile: Boolean = true
@@ -35,34 +29,4 @@ object Pdf extends DocBook2 {
        |    <xsl:attribute name="break-before">page</xsl:attribute>
        |  </xsl:attribute-set>
        |"""
-
-  override def xmlFilter(mathJaxConfiguration: mathjax.Configuration): Option[XMLFilter] =
-    Some(new mathjax.MathReader(mathJaxConfiguration))
-
-  override def postProcess(
-    fopConfigurationFile: File,
-    substitutions: Map[String, String],
-    isJEuclidEnabled: Boolean,
-    mathJaxTypesetter: Option[mathjax.Typesetter],
-    inputDirectory: File,
-    inputFile: File,
-    outputFile: File,
-    logger: Logger
-  ): Unit = {
-    require(mathJaxTypesetter.isEmpty || !isJEuclidEnabled)
-
-    val plugin: Option[FopPlugin] =
-      if (isJEuclidEnabled) Some(new jeuclid.FopPlugin)
-      else mathJaxTypesetter.map(new mathjax.FopPlugin(_))
-
-    Fop.run(
-      configurationFile = fopConfigurationFile,
-      substitutions: Map[String, String],
-      plugin = plugin,
-      inputFile = inputFile,
-      inputDirectory = inputDirectory,
-      outputFile = outputFile,
-      logger = logger
-    )
-  }
 }
