@@ -21,11 +21,8 @@ object ExternalTypesetterFactory extends Typesetter.Factory {
       )
     }
 
-  private def map2json(map: Map[String, Any]): String = {
-    "{\n" +
-    (for ((key: String, value: Any) <- map.toSeq) yield s"""  "$key": ${value2json(value)}""").mkString(",\n") +
-    "\n}"
-  }
+  private def map2json(map: Map[String, Any]): String =
+    "{\n" + (for ((key, value) <- map.toSeq) yield "\"" + key + "\":" + value2json(value)).mkString(",\n") + "\n}"
 
   private def list2json(list: List[Any]): String =
     "[" + list.map(value2json).mkString(", ") + "]"

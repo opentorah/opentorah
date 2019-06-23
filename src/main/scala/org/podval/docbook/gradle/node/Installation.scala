@@ -3,7 +3,7 @@ package org.podval.docbook.gradle.node
 import java.io.File
 import java.nio.file.{Files, Path, Paths}
 
-import scala.sys.process.{Process, ProcessLogger}
+import scala.sys.process.{Process, ProcessLogger, ProcessBuilder}
 
 final class Installation(
   val distribution: Distribution,
@@ -19,12 +19,17 @@ final class Installation(
 
   private val nodeExec: File = new File(bin, if (isWindows) "node.exe" else "node")
 
-  private def node(args: String*): String = exec(
-    command = nodeExec,
-    args.toSeq,
-    cwd = None,
-    extraEnv = ("NODE_PATH", nodeModules.getAbsolutePath)
-  )
+  private def node(args: String*): String = {
+    var out: Seq[String] = Seq.empty
+    val addLine: String => Unit = (line: String) => out = out :+ line
+    exec(
+      command = nodeExec,
+      args.toSeq,
+      cwd = None,
+      extraEnv = ("NODE_PATH", nodeModules.getAbsolutePath)
+    ).!!(ProcessLogger(addLine, addLine))
+    out.mkString("\n")
+  }
 
   def evaluate(script: String): String = node("--print", script)
 
@@ -35,23 +40,23 @@ final class Installation(
     args.toSeq,
     cwd = Some(nodeRoot),
     extraEnv = ("PATH", npmExec.getParentFile.getAbsolutePath)
-  )
+  ).!!
 
   val nodeModules: File = new File(nodeRoot, "node_modules")
 
   def npmInstall(module: String): String =
     npm("install", "--no-save", "--silent", module)
 
-
-  private def exec(command: File, args: Seq[String], cwd: Option[File], extraEnv: (String, String)*): String = {
-    val out = new StringBuilder
-    Process(
-      command = command.getAbsolutePath +: args,
-      cwd,
-      extraEnv = extraEnv: _*
-    ).!!(ProcessLogger(line => out.append(line), line => out.append(line)))
-    out.toString
-  }
+  private def exec(
+    command: File,
+    args: Seq[String],
+    cwd: Option[File],
+    extraEnv: (String, String)*
+  ): ProcessBuilder = Process(
+    command = command.getAbsolutePath +: args,
+    cwd,
+    extraEnv = extraEnv: _*
+  )
 
   def postInstall(): Unit = {
     fixNpmSymlink()
