@@ -27,7 +27,7 @@ abstract class MathJax(
       math = math,
       inputName = input.name,
       outputName = outputName,
-      ex = fontSize.toInt // TODO ex, not em? do I need to scale fontSize down?
+      ex = fontSize.toInt
     )
 
     val svg: String = typeset(options, outputName)

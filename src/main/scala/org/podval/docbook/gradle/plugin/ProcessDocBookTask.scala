@@ -9,7 +9,6 @@ import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
 import org.podval.docbook.gradle.fop.Fop
 import org.podval.docbook.gradle.mathjax
-import org.podval.docbook.gradle.mathjax.MathJax
 import org.podval.docbook.gradle.section.{DocBook2, Section}
 import org.podval.docbook.gradle.util.{Gradle, Logger, Platform, Util}
 import org.podval.docbook.gradle.xml.Resolver
@@ -58,10 +57,10 @@ class ProcessDocBookTask extends DefaultTask {
   @Input @BeanProperty val document: Property[String] =
     getProject.getObjects.property(classOf[String])
 
-  @BeanProperty val documents: ListProperty[String] =
+  @Input @BeanProperty val documents: ListProperty[String] =
     getProject.getObjects.listProperty(classOf[String])
 
-  @BeanProperty val parameters: MapProperty[String, java.util.Map[String, String]] =
+  @Input @BeanProperty val parameters: MapProperty[String, java.util.Map[String, String]] =
     getProject.getObjects.mapProperty(classOf[String], classOf[java.util.Map[String, String]])
 
   @Input @BeanProperty val substitutions: MapProperty[String, String] =
@@ -76,13 +75,28 @@ class ProcessDocBookTask extends DefaultTask {
   @Input @BeanProperty val useJ2V8: Property[Boolean] =
     getProject.getObjects.property(classOf[Boolean])
 
+  @Input @BeanProperty val mathJaxFont: Property[String] =
+    getProject.getObjects.property(classOf[String])
+
+  @Input @BeanProperty val mathJaxExtensions: ListProperty[String] =
+    getProject.getObjects.listProperty(classOf[String])
+
+  @Input @BeanProperty val texDelimiter: Property[String] =
+    getProject.getObjects.property(classOf[String])
+
+  @Input @BeanProperty val texInlineDelimiter: Property[String] =
+    getProject.getObjects.property(classOf[String])
+
+  @Input @BeanProperty val asciiMathDelimiter: Property[String] =
+    getProject.getObjects.property(classOf[String])
+
   @Input @BeanProperty val isJEuclidEnabled: Property[Boolean] =
     getProject.getObjects.property(classOf[Boolean])
 
-  @BeanProperty val xslt1version: Property[String] =
+  @Input @BeanProperty val xslt1version: Property[String] =
     getProject.getObjects.property(classOf[String])
 
-  @BeanProperty val xslt2version: Property[String] =
+  @Input @BeanProperty val xslt2version: Property[String] =
     getProject.getObjects.property(classOf[String])
 
   @Input @BeanProperty val cssFile: Property[String] =
@@ -130,6 +144,10 @@ class ProcessDocBookTask extends DefaultTask {
     if (unusedSections.nonEmpty)
       info(s"Unused parameter sections: ${unusedSections.map(_.name).mkString(", ")}")
 
+    require(!isMathJaxEnabled.get || !isJEuclidEnabled.get)
+
+    val mathJaxConfiguration: mathjax.Configuration = getMathJaxConfiguration
+
     Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout, logger)
     Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout, logger)
 
@@ -166,13 +184,8 @@ class ProcessDocBookTask extends DefaultTask {
 
     generateData()
 
-    require(!isMathJaxEnabled.get || !isJEuclidEnabled.get)
-
-    // TODO make MathJax configurable via extension
-    val mathJaxConfiguration: mathjax.Configuration = mathjax.Configuration()
-
-    val mathJax: Option[MathJax] =
-      if (!processors.exists(_.isPdf) && !isMathJaxEnabled.get) None else Some(MathJax.get(
+    val mathJax: Option[mathjax.MathJax] =
+      if (!processors.exists(_.isPdf) && !isMathJaxEnabled.get) None else Some(mathjax.MathJax.get(
         getProject,
         Platform.getOs,
         Platform.getArch,
@@ -207,7 +220,6 @@ class ProcessDocBookTask extends DefaultTask {
   private def getDocumentName(string: String): Option[String] =
     if (string.isEmpty) None else Some(Util.dropAllowedExtension(string, "xml"))
 
-  // TODO handle order of application and remove dependency instructions from the README.md
   private def generateData(): Unit = {
     val mainClass: String = dataGeneratorClass.get
     val mainSourceSet: Option[SourceSet] =
@@ -220,7 +232,7 @@ class ProcessDocBookTask extends DefaultTask {
     if (mainClass.isEmpty) skipping("dataGenerationClass is not set") else
     if (mainSourceSet.isEmpty) skipping("no Java plugin in the project") else
     if (classesTask.isEmpty) skipping("no 'classes' task in the project") else
-    if (!classesTask.get.getDidWork) skipping("'classes' task didn't do work") else
+//    if (!classesTask.get.getDidWork) skipping("'classes' task didn't do work") else
 //    if (dataDirectory.exists) info(s"Skipping DocBook data generation: directory $dataDirectory exists") else
     {
       info(s"Running DocBook data generator $mainClass into $dataDirectory")
@@ -230,5 +242,18 @@ class ProcessDocBookTask extends DefaultTask {
         exec.args(dataDirectory.toString)
        })
     }
+  }
+
+  private def getMathJaxConfiguration: mathjax.Configuration = {
+    def delimiters(property: Property[String]): Seq[mathjax.Configuration.Delimiters] =
+      Seq(new mathjax.Configuration.Delimiters(property.get, property.get))
+
+    mathjax.Configuration(
+      font = mathJaxFont.get,
+      extensions = mathJaxExtensions.get.asScala.toList,
+      texDelimiters = delimiters(texDelimiter),
+      texInlineDelimiters = delimiters(texInlineDelimiter),
+      asciiMathDelimiters = delimiters(asciiMathDelimiter)
+    )
   }
 }

@@ -6,12 +6,8 @@ import org.xml.sax.{Attributes, Locator, SAXParseException}
 import org.xml.sax.helpers.{AttributesImpl, XMLFilterImpl}
 import org.w3c.dom.{Document, Element}
 import MathML.DisplayAttribute
-import MathReader.DelimitersAndInput
+import Configuration.DelimitersAndInput
 
-// Note: I am not going to bother trying to find from the FO context what is the appropriate display delimiters:
-// it is being set here already for all math except for MathML in an included file, in which case the author
-// will have to supply it :)
-// (Besides, I am not even registering the handler, so that won't work anyway.)
 final class MathReader(configuration: Configuration) extends XMLFilterImpl {
 
   private var locator: Option[Locator] = None
@@ -24,7 +20,7 @@ final class MathReader(configuration: Configuration) extends XMLFilterImpl {
   private def currentElement: String = elementsStack.last
   private def currentlyInEquationElement: Boolean = MathReader.equationElements.contains(currentElement)
 
-  private val allDelimiters: Seq[DelimitersAndInput] = MathReader.allDelimiters(configuration)
+  private val allDelimiters: Seq[DelimitersAndInput] = configuration.allDelimiters
   private var delimiters: Option[DelimitersAndInput] = None
 
   private var math: String = ""
@@ -183,11 +179,6 @@ final class MathReader(configuration: Configuration) extends XMLFilterImpl {
 
 object MathReader {
 
-  final class DelimitersAndInput(val delimiters: Configuration.Delimiters, val input: Input) {
-    def start: String = delimiters.start
-    def end: String = delimiters.end
-  }
-
   // do not generate DocBook math wrapper if we are inside one of those
   private val equationElements: Set[String] = Set("equation", "informalequation", "inlineequation")
 
@@ -196,16 +187,6 @@ object MathReader {
 
   // do not scan code-containing elements for equations
   private val notScannedElements: Set[String] = Set()
-
-  // TODO verify (upstream) that there is no overlap and sort by length of the start (descending).
-  private def allDelimiters(configuration: Configuration): Seq[DelimitersAndInput] = {
-    def withInput(values: Seq[Configuration.Delimiters], input: Input): Seq[DelimitersAndInput] =
-      for (delimiters <- values) yield new DelimitersAndInput(delimiters, input)
-
-    withInput(configuration.texDelimiters, Input.Tex) ++
-      withInput(configuration.texInlineDelimiters, Input.TexInline) ++
-      withInput(configuration.asciiMathDelimiters, Input.AsciiMath)
-  }
 
   private def start(allDelimiters: Seq[DelimitersAndInput], chars: String): Option[(DelimitersAndInput, Int)] = {
     val starts: Seq[(DelimitersAndInput, Int)] = for {

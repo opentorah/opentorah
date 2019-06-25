@@ -111,7 +111,10 @@ class MathReaderTest extends FlatSpec with Matchers {
   private def parse(string: String): String = {
     val result = Xml.parse(
       input = string,
-      xmlReader = Xml.getFilteredXMLReader(filters = Seq(new MathReader(Configuration()) /* , new TracingFilter */)),
+      xmlReader = Xml.getFilteredXMLReader(filters = Seq(
+        new MathReader(Configuration())
+        /* , new TracingFilter */
+      )),
       logger = new TestLogger
     )
     Xml.toString(result)

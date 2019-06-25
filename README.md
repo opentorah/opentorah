@@ -106,7 +106,7 @@ on the Gradle Plugin Portal. To apply it to a Gradle project:
 
 ```groovy
 plugins {
-  id "org.podval.docbook-gradle-plugin" version "0.7.1"
+  id "org.podval.docbook-gradle-plugin" version "0.7.7"
 }
 ```
 
@@ -201,10 +201,21 @@ docBook {
   epubEmbeddedFonts = [ "Liberation Sans" ]
   // embedded fonts should be OpenType or WOFF!
 
+  mathJax {
+    isMathJaxEnabled = true
+    // MathML processing for PDF is disabled by default
+
+    useJ2V8 = true
+    // use of native J2V8 bindings is disabled by default and
+    // likely only works on (some distributions of) Linux  
+
+    font = "TeX"
+
+    extensions = [ ]
+  }
+
   isJEuclidEnabled = false
-  isMathJaxEnabled = true
-  // MathML processing for PDF is disabled by default;
-  // no more than one of `JEuclid` and `MathJax` can be enabled 
+  // no more than one of `isJEuclidEnabled` and `nathJax.isEnabled` can be `true` 
 }
 
 docBook.parameters.html2 = [
@@ -281,10 +292,6 @@ Property `epubEmbeddedFonts` configures font families that should be embedded in
 Plugin supports typesetting mathematics using MathJax for HTML and EPUB and
 either MathJax or JEuclid for PDF.
 
-Server-side MathJax is a new feature that is still under
-[development](https://github.com/dubinsky/podval-docbook-gradle/issues?q=is%3Aissue+is%3Aopen+label%3Amath) 
-
-
 ## Oxygen ##
 
 Plugin's setup should be reproducible in an XML editor like [Oxygen](https://www.oxygenxml.com/):
@@ -299,7 +306,7 @@ Plugin's setup should be reproducible in an XML editor like [Oxygen](https://www
 
 Overview of the directory layout used by the plugin:
 
-```
+```text
    src/main/
      css/docBook.css
      docBook/<documentName>.xml

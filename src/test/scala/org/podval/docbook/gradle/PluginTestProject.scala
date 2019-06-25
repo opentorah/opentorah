@@ -81,9 +81,12 @@ object PluginTestProject {
           |docBook {
           |  document = "$documentName"
           |  outputFormats = [$outputFormats]
-          |  isMathJaxEnabled = $isMathJaxEnabled
-          |  useJ2V8 = $useJ2V8
           |$substitutionsFormatted
+          |
+          |  mathJax {
+          |    isEnabled = $isMathJaxEnabled
+          |    useJ2V8 = $useJ2V8
+          |  }
           |}
           |"""
     )

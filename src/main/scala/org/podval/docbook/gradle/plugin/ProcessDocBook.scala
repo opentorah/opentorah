@@ -39,12 +39,8 @@ final class ProcessDocBook(
     // do not output the 'main' file when chunking in XSLT 1.0
     val outputFile: Option[File] = if (docBook2.usesRootFile) Some(saxonOutputFile) else None
 
-    val xmlReader: XMLReader = Xml.getFilteredXMLReader(
-      Seq(new ProcessingInstructionsFilter(substitutions, resolver, logger)) ++
-      (if (mathJax.isEmpty || !isPdf) Seq.empty
-       else Seq(new MathReader(mathJax.get.configuration)))
-      // ++ Seq(new TracingFilter)
-    )
+    val mathReader: Option[MathReader] =
+      if (mathJax.isDefined && isPdf) Some(new MathReader(mathJax.get.configuration)) else None
 
     // Run Saxon.
     Xml.transform(
@@ -52,7 +48,11 @@ final class ProcessDocBook(
       resolver,
       inputFile = layout.inputFile(documentName),
       stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(docBook2)),
-      xmlReader,
+      xmlReader = Xml.getFilteredXMLReader(
+        Seq(new ProcessingInstructionsFilter(substitutions, logger)) ++
+        mathReader.toSeq
+        // ++ Seq(new TracingFilter)
+      ),
       outputFile,
       logger
     )

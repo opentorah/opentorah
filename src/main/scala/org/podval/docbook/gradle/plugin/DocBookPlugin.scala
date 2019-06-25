@@ -3,10 +3,7 @@ package org.podval.docbook.gradle.plugin
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.{DefaultTask, Plugin, Project}
 import org.podval.docbook.gradle.fop.Fop
-import org.podval.docbook.gradle.section.DocBook2
 import org.podval.docbook.gradle.util.{Gradle, Logger, Util}
-
-import scala.jdk.CollectionConverters._
 
 final class DocBookPlugin extends Plugin[Project] {
 
@@ -15,17 +12,6 @@ final class DocBookPlugin extends Plugin[Project] {
     logger.lifecycle(Util.applicationString)
 
     val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)
-    extension.xslt1version.set("+")
-    extension.xslt2version.set("+")
-    extension.document.set("")
-    extension.documents.set(List.empty.asJava)
-    extension.dataGeneratorClass.set("")
-    extension.outputFormats.set(DocBook2.all.filterNot(_.usesDocBookXslt2).map(_.name).asJava)
-    extension.cssFile.set("docBook")
-    extension.isMathJaxEnabled.set(false)
-    extension.useJ2V8.set(false)
-    extension.isJEuclidEnabled.set(false)
-    extension.epubEmbeddedFonts.set(List.empty[String].asJava)
 
     val processDocBookTask: ProcessDocBookTask = project.getTasks.create("processDocBook", classOf[ProcessDocBookTask])
     processDocBookTask.setDescription(s"Process DocBook")
@@ -39,10 +25,15 @@ final class DocBookPlugin extends Plugin[Project] {
     processDocBookTask.cssFile.set(extension.cssFile)
     processDocBookTask.epubEmbeddedFonts.set(extension.epubEmbeddedFonts)
     processDocBookTask.outputFormats.set(extension.outputFormats)
-    processDocBookTask.isMathJaxEnabled.set(extension.isMathJaxEnabled)
-    processDocBookTask.useJ2V8.set(extension.useJ2V8)
-    processDocBookTask.isJEuclidEnabled.set(extension.isJEuclidEnabled)
     processDocBookTask.dataGeneratorClass.set(extension.dataGeneratorClass)
+    processDocBookTask.isJEuclidEnabled.set(extension.isJEuclidEnabled)
+    processDocBookTask.isMathJaxEnabled.set(extension.mathJax.isEnabled)
+    processDocBookTask.useJ2V8.set(extension.mathJax.useJ2V8)
+    processDocBookTask.mathJaxFont.set(extension.mathJax.font)
+    processDocBookTask.mathJaxExtensions.set(extension.mathJax.extensions)
+    processDocBookTask.texDelimiter.set(extension.mathJax.texDelimiter)
+    processDocBookTask.texInlineDelimiter.set(extension.mathJax.texInlineDelimiter)
+    processDocBookTask.asciiMathDelimiter.set(extension.mathJax.asciiMathDelimiter)
 
     Gradle.getClassesTask(project).foreach(processDocBookTask.getDependsOn.add)
 

@@ -18,20 +18,23 @@ class MathJaxTest extends FlatSpec with Matchers {
          |</article>
       """
 
-    // TODO run with both useJ2V8 and not!
+    def test(useJ2V8: Boolean): Unit = {
+      val project = PluginTestProject(
+        name = s"$name-useJ2V8-$useJ2V8",
+        prefix = Some("mathJaxTestProjects"),
+        document,
+        isPdfEnabled = true,
+        isMathJaxEnabled = true,
+        useJ2V8 = useJ2V8
+      )
 
-    val project = PluginTestProject(
-      name,
-      prefix = Some("mathJaxTestProjects"),
-      document,
-      isPdfEnabled = true,
-      isMathJaxEnabled = true,
-      useJ2V8 = true
-    )
+      val log: String = project.run(logInfo = true)
+      substring(log, MathJax.logStart, MathJax.logSep) shouldBe tex
+      substring(log, MathJax.logSep, MathJax.logEnd) shouldBe svgExpected
+    }
 
-    val log: String = project.run(logInfo = true)
-    substring(log, MathJax.logStart, MathJax.logSep) shouldBe tex
-    substring(log, MathJax.logSep, MathJax.logEnd) shouldBe svgExpected
+    test(useJ2V8 = true)
+    test(useJ2V8 = false)
   }
 
   private def substring(string: String, from: String, to: String): String = {

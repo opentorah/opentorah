@@ -16,7 +16,8 @@ class PluginTest extends FlatSpec with Matchers {
       name,
       prefix = Some("pluginTestProjects"),
       document,
-      substitutions
+      substitutions,
+      isPdfEnabled = true
     )
 
     project.run()

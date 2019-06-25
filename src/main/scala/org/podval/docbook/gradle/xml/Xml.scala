@@ -49,14 +49,18 @@ object Xml {
     xmlReader: XMLReader,
     outputFile: Option[File],
     logger: Logger
-  ): Unit = transform(
-    useSaxon9 = useSaxon9,
-    resolver = Some(resolver),
-    stylesheetFile = Some(stylesheetFile),
-    source = new SAXSource(xmlReader, new InputSource(inputFile.toURI.toASCIIString)),
-    result = getOutputTarget(outputFile),
-    logger = logger
-  )
+  ): Unit = {
+    xmlReader.setEntityResolver(resolver)
+
+    transform(
+      useSaxon9,
+      resolver = Some(resolver),
+      stylesheetFile = Some(stylesheetFile),
+      source = new SAXSource(xmlReader, new InputSource(inputFile.toURI.toASCIIString)),
+      result = getOutputTarget(outputFile),
+      logger
+    )
+  }
 
   private def getOutputTarget(outputFile: Option[File]): Result = {
     val result = new StreamResult
@@ -120,7 +124,7 @@ object Xml {
       if (useSaxon9) new net.sf.saxon.TransformerFactoryImpl
       else new com.icl.saxon.TransformerFactoryImpl
 
-    // To intercept all network requests, URIResolver has to be set on the transformerFactory,
+    // Note: To intercept all network requests, URIResolver has to be set on the transformerFactory,
     // not the transformer itself: I guess some sub-transformers get created internally ;)
     resolver.foreach(resolver => transformerFactory.setURIResolver(resolver))
 

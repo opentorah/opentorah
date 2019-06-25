@@ -1,9 +1,12 @@
 package org.podval.docbook.gradle.plugin
 
-import org.gradle.api.Project
+import org.gradle.api.{Action, Project}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
+import org.podval.docbook.gradle.mathjax
+import org.podval.docbook.gradle.section.DocBook2
 
 import scala.beans.BeanProperty
+import scala.jdk.CollectionConverters._
 
 // Properties are annotated with @BeanProperty to make them visible to Gradle.
 class Extension(project: Project) {
@@ -34,15 +37,33 @@ class Extension(project: Project) {
   @BeanProperty val cssFile: Property[String] =
     project.getObjects.property(classOf[String])
 
-  @BeanProperty val isMathJaxEnabled: Property[Boolean] =
-    project.getObjects.property(classOf[Boolean])
-
-  @BeanProperty val useJ2V8: Property[Boolean] =
-    project.getObjects.property(classOf[Boolean])
-
   @BeanProperty val isJEuclidEnabled: Property[Boolean] =
     project.getObjects.property(classOf[Boolean])
 
   @BeanProperty val epubEmbeddedFonts: ListProperty[String] =
     project.getObjects.listProperty(classOf[String])
+
+  val mathJax: MathJaxExtension =
+    project.getObjects.newInstance(classOf[MathJaxExtension], project)
+
+  def mathJax(action: Action[MathJaxExtension]): Unit = action.execute(mathJax)
+
+  // Defaults
+  xslt1version.set("+")
+  xslt2version.set("+")
+  document.set("")
+  documents.set(List.empty.asJava)
+  dataGeneratorClass.set("")
+  outputFormats.set(DocBook2.all.filterNot(_.usesDocBookXslt2).map(_.name).asJava)
+  cssFile.set("docBook")
+  isJEuclidEnabled.set(false)
+  epubEmbeddedFonts.set(List.empty.asJava)
+
+  mathJax.isEnabled.set(false)
+  mathJax.useJ2V8.set(false)
+  mathJax.font.set(mathjax.Configuration.defaultFont)
+  mathJax.extensions.set(List.empty.asJava)
+  mathJax.texDelimiter.set("$$")
+  mathJax.texInlineDelimiter.set("$")
+  mathJax.asciiMathDelimiter.set("`")
 }
