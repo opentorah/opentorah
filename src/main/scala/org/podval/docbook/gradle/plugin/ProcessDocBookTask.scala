@@ -9,8 +9,9 @@ import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
 import org.podval.docbook.gradle.fop.Fop
 import org.podval.docbook.gradle.mathjax
+import org.podval.docbook.gradle.mathjax.MathJax
 import org.podval.docbook.gradle.section.{DocBook2, Section}
-import org.podval.docbook.gradle.util.{Gradle, Logger, Util}
+import org.podval.docbook.gradle.util.{Gradle, Logger, Platform, Util}
 import org.podval.docbook.gradle.xml.Resolver
 
 import scala.beans.BeanProperty
@@ -170,15 +171,25 @@ class ProcessDocBookTask extends DefaultTask {
     // TODO make MathJax configurable via extension
     val mathJaxConfiguration: mathjax.Configuration = mathjax.Configuration()
 
+    val mathJax: Option[MathJax] =
+      if (!processors.exists(_.isPdf) && !isMathJaxEnabled.get) None else Some(MathJax.get(
+        getProject,
+        Platform.getOs,
+        Platform.getArch,
+        layout.nodeRoot,
+        useJ2V8.get,
+        layout.j2v8LibraryDirectory,
+        mathJaxConfiguration,
+        logger
+      ))
+
     val processDocBook: ProcessDocBook = new ProcessDocBook(
       getProject,
       // In processing instructions and CSS, substitute xslParameters also - because why not?
       substitutions = sections.values.toList.flatten.toMap ++ substitutionsMap,
       resolver = new Resolver(layout.catalogFile, logger),
       isJEuclidEnabled.get,
-      mathJaxTypesetter =
-        if (!isMathJaxEnabled.get) None
-        else Some(new MathJax(getProject, useJ2V8.get, layout, logger).getTypesetter(mathJaxConfiguration)),
+      mathJax = mathJax,
       layout,
       logger
     )
@@ -205,10 +216,11 @@ class ProcessDocBookTask extends DefaultTask {
     val classesTask: Option[Task] = Gradle.getClassesTask(getProject)
     val dataDirectory: File = layout.dataDirectory
 
-    if (mainClass.isEmpty) info("Skipping DocBook data generation: dataGenerationClass is not set") else
-    if (mainSourceSet.isEmpty) info("Skipping DocBook data generation: no Java plugin in the project") else
-    if (classesTask.isEmpty) info("Skipping DocBook data generation: no 'classes' task in the project") else
-    if (!classesTask.get.getDidWork) info("Skipping DocBook data generation: 'classes' task didn't do work") else
+    def skipping(message: String): Unit = info(s"Skipping DocBook data generation: $message")
+    if (mainClass.isEmpty) skipping("dataGenerationClass is not set") else
+    if (mainSourceSet.isEmpty) skipping("no Java plugin in the project") else
+    if (classesTask.isEmpty) skipping("no 'classes' task in the project") else
+    if (!classesTask.get.getDidWork) skipping("'classes' task didn't do work") else
 //    if (dataDirectory.exists) info(s"Skipping DocBook data generation: directory $dataDirectory exists") else
     {
       info(s"Running DocBook data generator $mainClass into $dataDirectory")

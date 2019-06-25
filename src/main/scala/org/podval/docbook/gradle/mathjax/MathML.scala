@@ -8,7 +8,7 @@ import org.podval.docbook.gradle.xml.{Attribute, AttributeInfo, Namespace}
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
 
-final class MathML(parent: FONode, fopPlugin: FopPlugin) extends MathML.Obj(parent) {
+final class MathML(parent: FONode, fopPlugin: MathJaxFopPlugin) extends MathML.Obj(parent) {
 
   private var fontSize: Option[Float] = None
 
@@ -66,7 +66,7 @@ final class MathML(parent: FONode, fopPlugin: FopPlugin) extends MathML.Obj(pare
   // in the MathJax namespace...
   //
   //   override def finalizeNode(): Unit = {
-  //     doc = FopPlugin.mathML2SVG(doc, mathJax)
+  //     doc = fopPlugin.typeset(doc)
   //   }
 
   private var sizes: Option[Sizes] = None

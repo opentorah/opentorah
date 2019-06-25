@@ -5,8 +5,9 @@ import net.sourceforge.jeuclid.xmlgraphics.{ImageConverterMathML2G2D, ImageLoade
 import org.apache.fop.fo.ElementMapping
 import org.apache.fop.render.XMLHandler
 import org.apache.xmlgraphics.image.loader.spi.{ImageConverter, ImageLoaderFactory, ImagePreloader}
+import org.podval.docbook.gradle.fop.FopPlugin
 
-final class FopPlugin extends org.podval.docbook.gradle.fop.FopPlugin {
+final class JEuclidFopPlugin extends FopPlugin {
   override protected def elementMapping: ElementMapping = new JEuclidElementMapping
   override protected def isHandlerNeeded: Boolean = true
   override protected def xmlHandler: XMLHandler = new JEuclidXMLHandler

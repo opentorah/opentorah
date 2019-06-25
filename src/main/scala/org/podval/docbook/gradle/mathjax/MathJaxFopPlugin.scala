@@ -7,11 +7,12 @@ import org.apache.fop.render.{Renderer, RendererContext, XMLHandler}
 import org.apache.xmlgraphics.image.loader.{ImageContext, ImageInfo}
 import org.apache.xmlgraphics.image.loader.impl.{AbstractImagePreloader, ImageXMLDOM}
 import org.apache.xmlgraphics.image.loader.spi.{ImageConverter, ImageLoaderFactory, ImagePreloader}
+import org.podval.docbook.gradle.fop.FopPlugin
 import org.w3c.dom.svg.SVGDocument
 import org.w3c.dom.{DOMImplementation, Document}
 
 //  Inspired by the JEuclid FOP plugin.
-final class FopPlugin(mathJax: Typesetter) extends org.podval.docbook.gradle.fop.FopPlugin {
+final class MathJaxFopPlugin(mathJax: MathJax) extends FopPlugin {
 
   def typeset(mathMLDocument: Document): SVGDocument = mathJax.typeset(mathMLDocument)
 
@@ -25,7 +26,7 @@ final class FopPlugin(mathJax: Typesetter) extends org.podval.docbook.gradle.fop
         foObjs = new java.util.HashMap
 
         foObjs.put(MathML.math, new ElementMapping.Maker {
-          override def make(parent: FONode): FONode = new MathML(parent, FopPlugin.this)
+          override def make(parent: FONode): FONode = new MathML(parent, MathJaxFopPlugin.this)
         })
         foObjs.put(ElementMapping.DEFAULT, new ElementMapping.Maker {
           override def make(parent: FONode): FONode = new MathML.Obj(parent)

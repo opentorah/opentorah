@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.node
+package org.podval.docbook.gradle.mathjax
 
 import org.podval.docbook.gradle.util.{Architecture, Gradle, Os}
 
@@ -9,7 +9,7 @@ import org.podval.docbook.gradle.util.{Architecture, Gradle, Os}
 // My simplified Node support is under 200 lines.
 
 // Describes Node distribution's packaging and structure.
-final class Distribution(
+final class NodeDistribution(
   val version: String,
   val os: Os,
   val architecture: Architecture
@@ -69,9 +69,7 @@ final class Distribution(
   def hasBinSubdirectory: Boolean = !isWindows
 }
 
-object Distribution {
-  val defaultVersion: String = "10.15.3"
-
+object NodeDistribution {
   val repository: Gradle.Repository = Gradle.Repository(
     url = "https://nodejs.org/dist",
     artifact = "v[revision]/[artifact](-v[revision]-[classifier]).[ext]",

@@ -4,7 +4,8 @@ import java.io.File
 
 import org.gradle.api.Project
 import org.podval.docbook.gradle.fop.{Fop, FopPlugin}
-import org.podval.docbook.gradle.{jeuclid, mathjax}
+import org.podval.docbook.gradle.jeuclid.JEuclidFopPlugin
+import org.podval.docbook.gradle.mathjax.{MathJax, MathJaxFopPlugin, MathReader}
 import org.podval.docbook.gradle.section.DocBook2
 import org.podval.docbook.gradle.util.{Gradle, Logger, Util}
 import org.podval.docbook.gradle.xml.{ProcessingInstructionsFilter, Resolver, Xml}
@@ -15,7 +16,7 @@ final class ProcessDocBook(
   substitutions: Map[String, String],
   resolver: Resolver,
   isJEuclidEnabled: Boolean,
-  mathJaxTypesetter: Option[mathjax.Typesetter],
+  mathJax: Option[MathJax],
   layout: Layout,
   logger: Logger
 ) {
@@ -40,8 +41,8 @@ final class ProcessDocBook(
 
     val xmlReader: XMLReader = Xml.getFilteredXMLReader(
       Seq(new ProcessingInstructionsFilter(substitutions, resolver, logger)) ++
-      (if (mathJaxTypesetter.isEmpty || !isPdf) Seq.empty
-       else Seq(new mathjax.MathReader(mathJaxTypesetter.get.configuration)))
+      (if (mathJax.isEmpty || !isPdf) Seq.empty
+       else Seq(new MathReader(mathJax.get.configuration)))
       // ++ Seq(new TracingFilter)
     )
 
@@ -66,8 +67,8 @@ final class ProcessDocBook(
 
       if (isPdf) {
         val fopPlugin: Option[FopPlugin] =
-          if (isJEuclidEnabled) Some(new jeuclid.FopPlugin)
-          else mathJaxTypesetter.map(new mathjax.FopPlugin(_))
+          if (isJEuclidEnabled) Some(new JEuclidFopPlugin)
+          else mathJax.map(new MathJaxFopPlugin(_))
 
         Fop.run(
           configurationFile = layout.fopConfigurationFile,

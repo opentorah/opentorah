@@ -1,11 +1,11 @@
 package org.podval.docbook.gradle
 
-import org.podval.docbook.gradle.mathjax.{Svg, Typesetter}
+import org.podval.docbook.gradle.mathjax.{Svg, MathJax}
 import org.podval.docbook.gradle.plugin.DocBook
 import org.podval.docbook.gradle.xml.Namespace
 import org.scalatest.{FlatSpec, Matchers}
 
-class TypesetterTest extends FlatSpec with Matchers {
+class MathJaxTest extends FlatSpec with Matchers {
 
   private def test(
     name: String,
@@ -18,6 +18,8 @@ class TypesetterTest extends FlatSpec with Matchers {
          |</article>
       """
 
+    // TODO run with both useJ2V8 and not!
+
     val project = PluginTestProject(
       name,
       prefix = Some("mathJaxTestProjects"),
@@ -28,8 +30,8 @@ class TypesetterTest extends FlatSpec with Matchers {
     )
 
     val log: String = project.run(logInfo = true)
-    substring(log, Typesetter.logStart, Typesetter.logSep) shouldBe tex
-    substring(log, Typesetter.logSep, Typesetter.logEnd) shouldBe svgExpected
+    substring(log, MathJax.logStart, MathJax.logSep) shouldBe tex
+    substring(log, MathJax.logSep, MathJax.logEnd) shouldBe svgExpected
   }
 
   private def substring(string: String, from: String, to: String): String = {

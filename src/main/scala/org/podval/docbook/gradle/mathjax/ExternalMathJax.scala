@@ -1,25 +1,31 @@
 package org.podval.docbook.gradle.mathjax
 
-import org.podval.docbook.gradle.node.Installation
 import org.podval.docbook.gradle.util.Logger
 
-object ExternalTypesetterFactory extends Typesetter.Factory {
+object ExternalMathJax extends MathJax.Factory {
 
-  override def get(installation: Installation, configuration: Configuration, logger: Logger): Typesetter =
-    new Typesetter(configuration, logger) {
+  override def get(
+    node: Node,
+    configuration: Configuration,
+    logger: Logger
+  ): MathJax = new MathJax(node, configuration, logger) {
+
+    override protected def typeset(
+      options: Map[String, Any],
+      outputName: String,
+    ): String =  node.evaluate(
       // I have to use console.error() and not console.log() so that the output gets flushed before the project exist;
       // that is why I collect both out and err in Installation.exec()...
-      override def typeset(optionsMap: Map[String, Any], outputName: String): String = installation.evaluate(
-        s"""
-           |var mjAPI = require("mathjax-node");
-           |mjAPI.config(${map2json(configuration.toMap)});
-           |mjAPI.start();
-           |mjAPI.typeset(${map2json(optionsMap)}, function (data) {
-           |  if (!data.errors) { console.error(data.$outputName); }
-           |});
-           """.stripMargin
-      )
-    }
+      s"""
+         |var mjAPI = require("mathjax-node");
+         |mjAPI.config(${map2json(configuration.toMap)});
+         |mjAPI.start();
+         |mjAPI.typeset(${map2json(options)}, function (data) {
+         |  if (!data.errors) { console.error(data.$outputName); }
+         |});
+         """.stripMargin
+    )
+  }
 
   private def map2json(map: Map[String, Any]): String =
     "{\n" + (for ((key, value) <- map.toSeq) yield "\"" + key + "\":" + value2json(value)).mkString(",\n") + "\n}"
