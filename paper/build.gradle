@@ -1,17 +1,13 @@
 plugins {
-  id "org.podval.docbook-gradle-plugin" version "0.6.8" apply false
+  id 'scala'
+  id 'org.podval.docbook-gradle-plugin' version '0.7.7'
 }
 
-apply plugin: 'scala'
-
 dependencies {
-  zinc    "com.typesafe.zinc:zinc:$zincVersion"
   compile "org.scala-lang:scala-library:$scalaVersion"
 
   compile project(':library')
 }
-
-apply plugin: 'org.podval.docbook-gradle-plugin'
 
 docBook {
   document = "calendar"
@@ -24,50 +20,25 @@ docBook {
     "project.version": project.version
   ]
 
-  isJEuclidEnabled = true
+  parameters.pdf = [
+    "title.font.family"    : "DejaVu Sans",
+    "body.font.family"     : "DejaVu Sans",
+    "sans.font.family"     : "DejaVu Sans",
+    "monospace.font.family": "DejaVu Sans Mono",
+    "symbol.font.family"   : "DejaVu Sans",
+    // "footnote.font.size": "10"
+    "body.font.master": "12",
+    "orderedlist.label.width": "2em" // Some space for the list labels TODO needed?
+  ]
+
+  mathJax {
+    isEnabled = true
+  }
 }
 
-docBook.parameters.common = [
-  // "punct.honorific": "",    // Remove trailing period after honorific
-  "toc.section.depth": "4", // Table of contents
-  "section.autolabel": "0"  // Do not label the sections
-]
+// Remove trailing period after honorific
+// docBook.parameters.common = [ "punct.honorific": "" ]
 
-docBook.parameters.htmlCommon = [
-  "chunk.quietly": "1",
-  "chunker.output.encoding": "UTF-8",
-  "chunker.output.indent": "yes", // Pretty-print the HTML
-  "use.id.as.filename": "yes",    // Use ids as names
-  "chunk.first.sections": "1"     // Chunk first section separately from the start of the chapter
-]
-
-docBook.parameters.html2 = [
-  "toc.section.depth": "4",   // Table of contents
-  "use.id.as.filename": "yes" // Use ids as names
-]
-
-docBook.parameters.pdf = [
-  "title.font.family"    : "DejaVu Sans",
-  "body.font.family"     : "DejaVu Sans",
-  "sans.font.family"     : "DejaVu Sans",
-  "monospace.font.family": "DejaVu Sans Mono",
-  "symbol.font.family"   : "DejaVu Sans",
-  // "footnote.font.size": "10"
-  "body.font.master": "12",
-
-  // Paper size; double-sidedness; not a draft
-  "paper.type": "USletter",
-  "double.sided": "1",
-  "draft.mode": "no",
-
-  // FOP extensions
-  "fop.extensions": "0",
-  "fop1.extensions": "1",
-
-  "body.start.indent": "0pt", // Suppress content indent
-  "orderedlist.label.width": "2em", // Some space for the list labels
-  "keep.relative.image.uris": "1" // XInclude shouldn't affect image URIs
-]
-
-
+// TODO why do I need to do this in addition to the DocBook plugin doing it already?
+processDocBook.dependsOn classes
 build.dependsOn processDocBook

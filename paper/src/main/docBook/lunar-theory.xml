@@ -395,38 +395,17 @@
 
                 <section>
                     <title>Discussion</title>
-                    <para> Formulae: <equation>
-                        <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
-                            <!-- Browsers (and MathJax) do not support Content MathML, so I have to settle for presentation... -->
-                            <!-- TODO doesn't show in the DocBook PDF! -->
-                            <mrow>
-                                <msup>
-                                    <mi>tan</mi>
-                                    <mrow>
-                                        <mo>-</mo>
-                                        <mn>1</mn>
-                                    </mrow>
-                                </msup>
-                                <mo>(</mo>
-                                <mfrac>
-                                    <mrow>
-                                        <mi>sin</mi>
-                                        <mi>α</mi>
-                                    </mrow>
-                                    <mrow>
-                                        <mi>cos</mi>
-                                        <mi>α</mi>
-                                        <mo>+</mo>
-                                        <mi>ε</mi>
-                                    </mrow>
-                                </mfrac>
-                                <mo>)</mo>
-                            </mrow>
-                        </math>
-                    </equation> R - radius of the big circle; r - radius of the small circle; e
-                        = R/r. A little trigonometry, and we get: visible anomaly =
-                        arctg(sin(corrected anomaly)/(cos(corrected anomaly) + e)) and: e =
-                        ctg(visible anomaly)*sin(corrected anomaly) - cos(corrected anomaly) </para>
+                    <para> Formulae:
+                      $$ \tan ^{-1} \left({\sin \alpha \over \cos \alpha + \epsilon} \right) $$
+
+                      $R$ - radius of the big circle;
+                      $r$ - radius of the small circle;
+                      $\epsilon = R/r$.
+                      A little trigonometry, and we get:
+                      visible anomaly = arctg(sin(corrected anomaly)/(cos(corrected anomaly) + e))
+                      and:
+                      e = ctg(visible anomaly)*sin(corrected anomaly) - cos(corrected anomaly)
+                    </para>
                 
                     <para>TODO: Make the diagram! Here?</para>
 
