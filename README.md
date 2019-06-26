@@ -133,11 +133,9 @@ to get basic tasks like "clean" and "build":
 apply plugin: 'base'
 ``` 
 
-Plugin adds to the project Gradle task `docBookData` that generates data (if configured).
-
 Plugin adds to the project Gradle task `processDocBook` that writes configuration files,
-substitutions DTD and XML catalog, unpacks DocBook XSLT stylesheets,
-installs Node and MathJax processes DocBook.
+substitutions DTD and XML catalog, unpacks DocBook XSLT stylesheets, generates data (if configured),
+installs Node and MathJax and processes DocBook.
 
 To make use of the DocBook processing in a directory-name-independent way:
 ```groovy
@@ -202,7 +200,7 @@ docBook {
   // embedded fonts should be OpenType or WOFF!
 
   mathJax {
-    isMathJaxEnabled = true
+    isEnabled = true
     // MathML processing for PDF is disabled by default
 
     useJ2V8 = true
@@ -212,6 +210,11 @@ docBook {
     font = "TeX"
 
     extensions = [ ]
+
+    // delimiters for non-MathML math to be processes by MathJax:
+    texDelimiter = '$$'
+    texInlineDelimiter = '$'
+    asciiMathDelimiter = '`'
   }
 
   isJEuclidEnabled = false
@@ -290,7 +293,9 @@ Property `epubEmbeddedFonts` configures font families that should be embedded in
 ## Mathematics ##
 
 Plugin supports typesetting mathematics using MathJax for HTML and EPUB and
-either MathJax or JEuclid for PDF.
+either MathJax or JEuclid for PDF. JEuclid typesets in document's fonts; MathJax does not.
+MathJax delivers better quality and is under active development; JEuclid is not.
+JEuclid can handle MathML; MathJax can handle MathML, TeX, inline TeX and AsciiMath.
 
 ## Oxygen ##
 
