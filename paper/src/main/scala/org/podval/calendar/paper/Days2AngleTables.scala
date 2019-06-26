@@ -20,7 +20,7 @@ object Days2AngleTables {
     val days = Column[Key]("days", "n", _.number)
     val value = Column[Key]("value", "v(n)", data.value)
     val calculated = Column[Key]("calculated", "v(1)*n", data.calculated)
-    val almagest = Column[Key]("Alamgest", "*n", data.calculatedAlmagest)
+    val almagest = Column[Key]("Almagest", "*n", data.calculatedAlmagest)
     //      val reconstructed = Column("reconstructed 1-day movement", "r(n)", data.reconstructed)
     //      val recalculated = Column("recalculated", "r(10000)*n", data.recalculated)
     //      val recalculated10 = Column("recalculated", "r(10)*n", data.recalculated10)

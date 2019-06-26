@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="goals">
+  <title>Goals</title>
+  <itemizedlist>
+    <listitem>
+      <para>Translate appropriate chapters of Rambam into English. The translation does not have to be literal;
+        literal translations are already available (<biblioref linkend="Yale"/>, <biblioref linkend="Touger"/>). The
+        goal of our translation is to make the text complete and accessible for collaboration by people not proficient
+        enough in Hebrew.</para>
+    </listitem>
+    <listitem>
+      <para>Reconstruct the models and formulae implied in the text.</para>
+    </listitem>
+    <listitem>
+      <para>Implement the algorithms.</para>
+    </listitem>
+    <listitem>
+      <para>Verify consistency of Rambam's numbers.</para>
+    </listitem>
+    <listitem>
+      <para>Compare Rambam's models with contemporary astronomical models.</para>
+    </listitem>
+  </itemizedlist>
+</section>

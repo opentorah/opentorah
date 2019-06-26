@@ -14,7 +14,7 @@ final case class Interval(from: Rotation, to: Rotation) {
       from = if (this.from < that.from) that.from else this.from,
       to = if (this.to > that.to) that.to else this.to
     )
-    println(result)
+    println(s"$this intersect $that = $result")
     result
   }
 }
