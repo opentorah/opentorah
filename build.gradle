@@ -112,7 +112,7 @@ gradlePlugin {
 
 def gitHubRepository    = "dubinsky/podval-docbook-gradle"
 def gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
-def pluginTags = ['Scala', 'DocBook', 'Gradle', 'Plugin', 'Html', 'Pdf', 'Epub', 'MathML', 'JEuclid']
+def pluginTags = ['Scala', 'DocBook', 'Gradle', 'Plugin', 'Html', 'Pdf', 'Epub', 'MathML', 'MathJax', 'JEuclid']
 
 pluginBundle {
   website = "${gitHubRepositoryUrl}"
@@ -144,7 +144,7 @@ publishing {
       from components.java
 
       artifact sourceJar
-      artifact scaladocJar
+//      artifact scaladocJar
 
       pom {
         name = project.name
