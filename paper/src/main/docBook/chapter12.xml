@@ -1,50 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section
-  xmlns="http://docbook.org/ns/docbook" version="5.0"
-  xmlns:xi="http://www.w3.org/2001/XInclude"
->
+<section xmlns="http://docbook.org/ns/docbook" version="5.0">
   <title>Chapter 12</title>
-
+  
   <section>
     <title>Law 1</title>
-
-    <para>The mean rate of movement of the sun in one day - that is, twenty four hours - is 59′8″.</para>
-
-    <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
-
-    <xi:include href="data:slm-original.xml"/>
-
-    <para>
-      And in this way you can calculate it for any number of days and years that you want.
-      And so if you want to calculate movement in 2, 3, 4 - up to 10 days - you can do it.
-      And so if you want to calculate movement in 20, 30, 40 - up to 100 days - you can do it.
-      And it is obvious that once you know the movement in one day.
-      Regular lunar year is 354 days.
+    
+    <para>The mean rate of movement of the sun in 1 day (that is, 24 hours) is 59′8″.
+      It follows that its movement in 10 days is 9°51′23″.
+      It also follows that its movement in 100 days is 98°33′53″.
+      It also follows that remainder of its movement in 1000 days, after you subtract all [multiples of] 360°
+      (as was explained) is 265°38′50″.
+      It also follows that the remainder of its movement in 10000 days is 136°28′20″.
     </para>
-
-    <para>
-      Between two consecutive nights of observation there is 29 full days.
-      Between night of observation of a given month and the night of observation of the same month next year
-      is in a regular year - or one day more.
-      Our goal in all these calculations is solely to determine visibility of the moon.
+    
+    <para>And in this way you can multiply and calculate its movement for any number [of days] that you want.
+      Similarly, if you want to make known to you values of its movement for 2 days, 3, 4 and so on to 10 - do it.
+      Similarly, if you want for to have known and ready values of its movement for 20 days, 30, 40 and so on to 100 - do it.
+      This is clear and known once you know its movement in 1 day.</para>
+    
+    <para>And you should have ready and known to you mean movement of the Sun for 29 days and for 354
+      (which is the number of days in the lunar year when its months are "regular" (TODO link), and it
+      is called "regular year"). The reason is: if you have those movement values ready, this calculations of the
+      visibility of the moon will be easy, because there are 29 complete days from the night of observation to
+      the night of observation of the following month, and so it is every month: no less than 29 days and no more.
+      Since our sole desire in all those calculations is exclusively to determine visibility [of the moon].
+      And between the night of sighting of this month and night of sighting of the same month next year there is either
+      a regular year or a year and 1 day; and the same every year.
+      Mean movement of the Sun in 29 days is 28°35′1″. Its movement in a regular year is 348°55′15″.
     </para>
   </section>
-
+  
   <section>
     <title>Law 2</title>
-
-    <para>
-      There is a point on the Sun's orbit (and on orbits of the other 7 planets)
-      where Sun is the highest above Earth. This point of the Sun's orbit (and so for other planets,
-      except for the moon) rotates with constant speed. Movement of this point is approximately
-      1° every 70 years. This point is called Sun's apogee (gva hashemesh).
+    
+    <para>There is a point on the Sun's orbit (and on orbits of the other 7 planets) such that when the planet is there
+      it is highest above Earth. This point of the Sun's orbit (and so for other planets,
+      except for the moon) rotates with constant speed. Its movement every 70 years is approximately 1°.
+      This point is called <glossterm linkend="gva-hashemesh">Sun's apogee</glossterm>.
+      Its movement in 10 days is one and a half seconds, i.e. 0°0′1″30‴.
+      It follows that its movement in 100 days is 0°0′15″.
+      Its movement in 1000 days is 0°2′30″.
+      Its movement in 10000 days is 0°25′.
+      It also follows that its movement in 29 days is 0°0′4″ and a bit more; and its movement in a regular year is 0°0′53″.
     </para>
-
-    <para>
-      We already said that the epoch that our calculations are based on is beginning of the
+    
+    <para>We already said that the epoch that our calculations start from is beginning of the
       night of the fifth day that is 3rd of Nisan of the year 4938 from the Creation.
-      And mean longitude of the Sun was at the epoch 7°3′32″ in the zodiac of Ram (tele).
-      And apogee of the Sun was 26°45′8″ in the zodiac of Twins.
+      Position of the Sun in its mean movement at the epoch was 7°3′32″ in the constellation of Ram (Tele).
+      Position of the Sun's apogee at the epoch was 26°45′8″ in the constellation of Twins.
+    </para>
+    
+    <para>
+      
     </para>
   </section>
 </section>

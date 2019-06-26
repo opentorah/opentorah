@@ -10,19 +10,19 @@ apply plugin: 'scala'
 // for Tut
 configurations.all {
   resolutionStrategy {
-    force 'org.scala-lang:scala-library:2.12.7'
+    force "org.scala-lang:scala-library:$tutScalaVersion"
   }
 }
 
 dependencies {
-  compile "org.scala-lang:scala-library:2.12.7"
+  compile "org.scala-lang:scala-library:$tutScalaVersion"
 
   runtime project(':library')
-  runtime "org.tpolecat:tut-core_2.12:0.6.10"
+  runtime "org.tpolecat:tut-core_$scalaVersionMajor:$tutVersion"
 }
 
 // Tut
-def tutOutput = "$buildDir/tut"
+final String tutOutput = "$buildDir/tut"
 task tut(type: JavaExec) {
   group = 'documentation'
   main = 'tut.TutMain'
