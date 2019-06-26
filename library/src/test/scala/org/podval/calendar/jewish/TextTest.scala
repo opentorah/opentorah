@@ -30,7 +30,7 @@ class TextTest extends FunSpec with Matchers {
         partsPerHour % 9 shouldBe 0
         partsPerHour % 10 shouldBe 0
       }
-      it("moments") {
+      it("moments") { // KH 10:1
         momentsPerPart shouldBe 76
         range(2) shouldBe 76
       }

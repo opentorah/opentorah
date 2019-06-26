@@ -1,12 +1,12 @@
 package org.podval.calendar.times
 
 import org.scalatest.{FlatSpec, Matchers}
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.podval.calendar.numbers.BigRational
 import SimpleTimes.{Point, Vector}
 import SimpleTimes.Digit
 
-final class SimpleTimesTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matchers {
+final class SimpleTimesTest extends FlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {
 
   "isZero()/isPositive()/isNegative()/signum()/abs()/unary_-()" should "be correct" in {
     Vector(0).isZero shouldBe true

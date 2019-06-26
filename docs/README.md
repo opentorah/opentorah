@@ -1,4 +1,4 @@
-# README #
+# README
 
 ## Understanding the ignored for fun and schar ##
 

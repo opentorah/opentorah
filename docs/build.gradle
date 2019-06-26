@@ -15,7 +15,6 @@ configurations.all {
 }
 
 dependencies {
-  zinc    "com.typesafe.zinc:zinc:$zincVersion"
   compile "org.scala-lang:scala-library:2.12.7"
 
   runtime project(':library')

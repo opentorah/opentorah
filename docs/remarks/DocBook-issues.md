@@ -3,6 +3,8 @@
 _Footnotes_ DocBook stylesheets render each footnote on a separate line; when there are many of
 them, this doesn't look good. Is there a way to render footnotes as a continuous block?
 Which XSLT template renders footnotes to XSL-FO and how do I twist it to not break the line?
+See http://www.sagehill.net/docbookxsl/PrintFootnotes.html;
+footnote.properties attribute-set is applied to the fo:footnote-body
 
 _Honorifics_ DocBook stulesheets render honorifics in bibliography with dots after them,
 which doesn't look good for 'Rabbi' :) It can be removed

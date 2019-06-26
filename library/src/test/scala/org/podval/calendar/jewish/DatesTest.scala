@@ -9,6 +9,7 @@ import Jewish.Month.Name._
 import org.podval.calendar.dates.Calendar
 import org.podval.calendar.gregorian.Gregorian
 import Gregorian.Month.Name._
+import org.podval.calendar.jewish
 
 
 final class DatesTest extends FlatSpec with Matchers {
@@ -209,5 +210,14 @@ final class DatesTest extends FlatSpec with Matchers {
     val day = Year(2448).month(Sivan).day(6)
     day.name shouldBe Rvii
     day.month.newMoon.day.name shouldBe Rvii
+  }
+
+  "Pesach day of the week" should "calculate correctly" in {
+    val days: collection.mutable.Map[Jewish.Day.Name, Int] = new collection.mutable.HashMap[jewish.Jewish.Day.Name, Int]
+    years foreach { year =>
+      val day: Jewish.Day.Name = Pesach(year).name
+      if (days.contains(day)) days.update(day, days(day) + 1) else days.update(day, 1)
+    }
+    println(days)
   }
 }

@@ -1,28 +1,24 @@
 plugins {
-  id "com.github.maiflai.scalatest" version "0.23" apply false
-  id "com.jfrog.bintray" version "1.8.4" apply false
-  id "com.github.ben-manes.versions" version "0.20.0"
+  id 'scala'
+  id 'com.github.maiflai.scalatest' version '0.25'
+  id 'com.jfrog.bintray' version '1.8.4'
+  id 'maven-publish'
 }
 
 description = 'Jewish Calendar Dates.'
 
-apply plugin: 'scala'
-
-def catsVersion = '1.6.0'
-
 dependencies {
-  zinc    "com.typesafe.zinc:zinc:$zincVersion"
   compile "org.scala-lang:scala-library:$scalaVersion"
-  compile "org.scala-lang.modules:scala-xml_$scalaVersionMajor:1.1.1"
+  compile "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
 
 // for cats: scalacOptions += "-Ypartial-unification"
 
-  testCompile "org.scalacheck:scalacheck_$scalaVersionMajor:1.14.0"
-  testCompile "org.scalatest:scalatest_$scalaVersionMajor:3.0.5"
-  testRuntime "org.pegdown:pegdown:1.6.0" // for scalatest reports
+  testCompile "org.scalacheck:scalacheck_$scalaVersionMajor:$scalacheckVersion"
+  testCompile "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
+  testRuntime "org.pegdown:pegdown:$pegdownVersion" // for scalatest reports
 
   testCompile "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
-  testCompile "org.typelevel:algebra-laws_$scalaVersionMajor:1.0.1"
+  testCompile "org.typelevel:algebra-laws_$scalaVersionMajor:$algebraLawsVersion"
 
   //testCompile "org.typelevel:cats-laws_$scalaVersionMajor:$catsVersion"
   //testCompile "org.typelevel:cats-testkit_$scalaVersionMajor:$catsVersion"
@@ -41,10 +37,6 @@ task scaladocJar(type: Jar) {
   archiveClassifier.set('scaladoc')
 }
 scaladocJar.dependsOn scaladoc
-
-apply plugin: 'com.github.maiflai.scalatest'
-
-apply plugin: 'maven-publish'
 
 def gitHubRepository    = "jewish-calendar/calendar"
 def gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
@@ -99,8 +91,6 @@ publishing {
     }
   }
 }
-
-apply plugin: 'com.jfrog.bintray'
 
 bintray {
   user         = 'dubinsky'
