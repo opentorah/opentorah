@@ -27,7 +27,7 @@ final case class AttributeInfo(
   override def toString: String =
     s"AttributeInfo(localName=$localName, qName=$qName, value=$value; type=${`type`}; uri=$uri; namespace=$namespace)"
 
-  def addTo(attributes: AttributesImpl): Unit = attributes.addAttribute(uri,localName, qName, `type`, value)
+  def addTo(attributes: AttributesImpl): Unit = attributes.addAttribute(uri, localName, qName, `type`, value)
 }
 
 object AttributeInfo {

@@ -66,4 +66,5 @@ class Extension(project: Project) {
   mathJax.texDelimiter.set("$$")
   mathJax.texInlineDelimiter.set("$")
   mathJax.asciiMathDelimiter.set("`")
+  mathJax.processEscapes.set(true)
 }

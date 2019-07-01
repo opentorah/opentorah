@@ -75,8 +75,9 @@ final class MathReader(configuration: Configuration) extends XMLFilterImpl {
 
     val isMathMLMath: Boolean = MathML.Namespace.is(uri) && (MathML.math == localName)
     val attributes: Attributes = if (!isMathMLMath) atts else {
-      val result = new AttributesImpl(atts)
-      DisplayAttribute.setWithDefault(MathML.Namespace, checkInline(DisplayAttribute.get(atts)), result)
+      val result: AttributesImpl = new AttributesImpl(atts)
+      val isInline: Option[Boolean] = DisplayAttribute.get(MathML.Namespace, atts)
+      DisplayAttribute.setWithDefault(MathML.Namespace, checkInline(isInline), result)
       result
     }
 
@@ -117,19 +118,22 @@ final class MathReader(configuration: Configuration) extends XMLFilterImpl {
       if (currentElementIsExcluded) None
       else MathReader.start(allDelimiters, chars)
 
-    start.fold(sendToParent(chars)) { case (delimitersStarting: DelimitersAndInput, index: Int) =>
-      if (index != 0) sendToParent(chars.take(index))
+    start.fold(sendToParent(unescape(chars))) { case (delimitersStarting: DelimitersAndInput, index: Int) =>
+      if (index != 0) sendToParent(unescape(chars.take(index)))
       delimiters = Some(delimitersStarting)
       characters(chars.substring(index + delimitersStarting.start.length))
     }
 
   } { delimiters: DelimitersAndInput =>
-    MathReader.findUnquoted(delimiters.end, chars).fold { addToMath(chars) } { index: Int =>
+    MathReader.findUnescaped(delimiters.end, chars).fold { addToMath(chars) } { index: Int =>
       if (index != 0) addToMath(chars.take(index))
       flush(closedByDelimiter = true)
       characters(chars.substring(index + delimiters.end.length))
     }
   }
+
+  private def unescape(chars: String): String =
+    if (!configuration.processEscapes) chars else chars.replace("\\$", "$")
 
   private def flush(closedByDelimiter: Boolean = false): Unit = {
     if (delimiters.isDefined) {
@@ -191,14 +195,14 @@ object MathReader {
   private def start(allDelimiters: Seq[DelimitersAndInput], chars: String): Option[(DelimitersAndInput, Int)] = {
     val starts: Seq[(DelimitersAndInput, Int)] = for {
       delimiters <- allDelimiters
-      index = findUnquoted(delimiters.start, chars)
+      index = findUnescaped(delimiters.start, chars)
       if index.isDefined
     } yield delimiters -> index.get
 
     starts.sortBy(_._2).headOption
   }
 
-  private def findUnquoted(what: String, chars: String): Option[Int] = {
+  private def findUnescaped(what: String, chars: String): Option[Int] = {
     val index: Int = chars.indexOf(what)
     if (index == -1) None
     else if (index == 0) Some(index)

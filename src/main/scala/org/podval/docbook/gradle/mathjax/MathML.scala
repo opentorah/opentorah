@@ -31,29 +31,11 @@ final class MathML(parent: FONode, fopPlugin: MathJaxFopPlugin) extends MathML.O
     attlist: Attributes,
     propertyList: PropertyList
   ): Unit = {
-    super.processNode(elementName, locator, sortAttributes(attlist), propertyList)
+    super.processNode(elementName, locator, MathML.sortAttributes(attlist), propertyList)
 
     createBasicDocument()
 
     Sizes.FontSizeAttribute.set(fontSize.get, getDOMDocument)
-  }
-
-  // Note: XMLObj.setAttributes() sets namespace on an attribute only if it already saw
-  // the declarations of that namespace, so I am making sure that they are there (and in the beginning);
-  // even then, XMLObj.setAttributes() sets unprefixed qualifield name for namespaced attributes -
-  // but somehow they are detected correctly in MathJax.typeset()...
-  private def sortAttributes(attlist: Attributes): Attributes = {
-    val attributes: Seq[AttributeInfo] = AttributeInfo(attlist)
-    val nonXmlnsAttributes: Seq[AttributeInfo] = attributes.filterNot(_.isXmlns)
-    val usedNamespaces: Set[Namespace] = nonXmlnsAttributes.flatMap(_.namespace).toSet
-    val declaredNamespaces: Set[Namespace] = attributes.flatMap(_.declaredNamespace).toSet
-
-    val result = new AttributesImpl
-
-    for (namespace <- usedNamespaces -- declaredNamespaces) namespace.declare(result)
-    for (attribute <- nonXmlnsAttributes) attribute.addTo(result)
-
-    result
   }
 
   // Note: It is tempting to typeset MathML to SVG right here to avoid duplicate conversions
@@ -125,4 +107,23 @@ object MathML {
   val math: String = "math"
   val mrow: String = "mrow"
   val mi: String = "mi"
+
+
+  // Note: XMLObj.setAttributes() sets namespace on an attribute only if it already saw
+  // the declarations of that namespace, so I am making sure that they are there (and in the beginning);
+  // even then, XMLObj.setAttributes() sets unprefixed qualifield name for namespaced attributes -
+  // but somehow they are detected correctly in MathJax.typeset()...
+  def sortAttributes(attlist: Attributes): AttributesImpl = {
+    val attributes: Seq[AttributeInfo] = AttributeInfo(attlist)
+    val nonXmlnsAttributes: Seq[AttributeInfo] = attributes.filterNot(_.isXmlns)
+    val usedNamespaces: Set[Namespace] = nonXmlnsAttributes.flatMap(_.namespace).toSet
+    val declaredNamespaces: Set[Namespace] = attributes.flatMap(_.declaredNamespace).toSet
+
+    val result = new AttributesImpl
+
+    for (namespace <- usedNamespaces -- declaredNamespaces) namespace.declare(result)
+    for (attribute <- nonXmlnsAttributes) attribute.addTo(result)
+
+    result
+  }
 }

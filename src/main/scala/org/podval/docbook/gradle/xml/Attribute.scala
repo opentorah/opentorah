@@ -38,8 +38,17 @@ trait Attribute[T] {
     }
   }
 
-  final def get(attributes: Attributes): Option[T] =
-    get(attributes.getValue(namespace.uri, name))
+  final def get(defaultNamespace: Namespace, attributes: Attributes): Option[T] = {
+    // Note: when attribute is in the default namespace, it need to be retrieved accordingly.
+    // This is needed for the 'display' attribute (the only attribute this method is used for) of the included MathML -
+    // but somehow does not seem to break the inline MathML either :)
+    val inDefaultNamespace: Boolean = namespace.is(defaultNamespace)
+
+    get(attributes.getValue(
+      if (inDefaultNamespace) "" else namespace.uri,
+      name
+    ))
+  }
 
   final def set(defaultNamespace: Namespace, value: T, attributes: AttributesImpl): Unit = {
     // Note: when attribute is added with the default namespace, this is not detected and a new namespace

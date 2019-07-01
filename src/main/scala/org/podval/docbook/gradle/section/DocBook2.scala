@@ -35,7 +35,7 @@ trait DocBook2 extends Section {
 
   def usesRootFile: Boolean
 
-  def parameter(parameter: DocBook2 => Option[String], value: String): Option[(String, String)] =
+  def parameter(parameter: DocBook2 => Option[String], value: => String): Option[(String, String)] =
     parameter(this).map(_ -> value)
 
   def baseDirParameter: Option[String] = None
@@ -49,6 +49,8 @@ trait DocBook2 extends Section {
   def epubEmbeddedFontsParameter: Option[String] = None
 
   def chunkQuietlyParameter: Option[String] = None
+
+  def mathJaxConfigurationParameter: Option[String] = None
 
   final def rootFilename(inputFileName: String): String =
     outputFileNameOverride.getOrElse(inputFileName)

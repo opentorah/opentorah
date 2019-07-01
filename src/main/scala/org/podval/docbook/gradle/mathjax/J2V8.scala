@@ -6,6 +6,8 @@ import com.eclipsesource.v8.V8
 import org.gradle.api.Project
 import org.podval.docbook.gradle.util.{Architecture, Gradle, Logger, Os}
 
+import scala.jdk.CollectionConverters._
+
 object J2V8 {
 
   def load(project: Project, os: Os, arch: Architecture, into: File, logger: Logger): Boolean = {
@@ -95,5 +97,17 @@ object J2V8 {
     val field = classOf[V8].getDeclaredField("nativeLibraryLoaded")
     field.setAccessible(true)
     field.set(null, true)
+  }
+
+  def map2java(map: Map[String, Any]): java.util.Map[String, Any] =
+    map.view.mapValues(value2java).toMap.asJava
+
+  def list2java(list: List[Any]): java.util.List[Any] =
+    list.map(value2java).asJava
+
+  private def value2java(value: Any): Any = value match {
+    case value: Map[String, Any] => map2java(value)
+    case value: List[Any] => list2java(value)
+    case other => other
   }
 }

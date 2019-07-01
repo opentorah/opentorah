@@ -1,6 +1,7 @@
 package org.podval.docbook.gradle.mathjax
 
 import Configuration.{Delimiters, DelimitersAndInput}
+import org.podval.docbook.gradle.util.Json
 
 final case class Configuration(
   displayMessages: Boolean = false,        // determines whether Message.Set() calls are logged
@@ -14,7 +15,8 @@ final case class Configuration(
 
   texDelimiters: Seq[Delimiters] = Seq(new Delimiters("$$", "$$"), new Delimiters("\\[", "\\]")),
   texInlineDelimiters: Seq[Delimiters] = Seq(new Delimiters("$", "$"), new Delimiters("\\(", "\\)")),
-  asciiMathDelimiters: Seq[Delimiters] = Seq(new Delimiters("`", "`"))
+  asciiMathDelimiters: Seq[Delimiters] = Seq(new Delimiters("`", "`")),
+  processEscapes: Boolean = true
 ) {
 
   if (!Configuration.fonts.contains(font)) {
@@ -27,6 +29,7 @@ final case class Configuration(
     if (starts.toSet.size != starts.size) throw new IllegalArgumentException(s"Duplicate start delimiters")
   }
 
+  // Configuring mathjax-node
   def toMap: Map[String, Any] = Map(
     "displayMessages"     -> displayMessages,
     "displayErrors"       -> displayErrors,
@@ -35,14 +38,38 @@ final case class Configuration(
     "fontURL"             -> fontURL,
     // standard MathJax configuration options; see https://docs.mathjax.org for more detail
     "MathJax" -> Map(
-      "jax" -> List("input/TeX", "input/MathML", "input/AsciiMath", "output/SVG"),
-      // matchFontHeight: true
-      // mtextFontInherit: false
-      // scale: 100
-      // minScaleAdjust: 50
+      "jax" -> (Configuration.inputs ++ List("output/SVG")),
+      "TeX" -> Map("extensions" -> Configuration.texExtensions),
       "SVG" -> Map("font" -> font)
     )
   )
+
+  // Configuring MathJax in HTML
+  def toHtmlMap: Map[String, Any] = Map(
+    "jax" -> (Configuration.inputs ++ List("output/CommonHTML", "output/HTML-CSS", "output/NativeMML", "output/SVG")),
+    "extensions" -> List("tex2jax.js", "mml2jax.js", "asciimath2jax.js", "MathMenu.js", "MathZoom.js"),
+    "tex2jax" -> Map(
+      "processEscapes" -> processEscapes,
+      "inlineMath" -> json(texInlineDelimiters),
+      "displayMath" -> json(texDelimiters)
+    ),
+    "mml2jax" -> Map(),
+    "asciimath2jax" -> Map("delimiters" -> json(asciiMathDelimiters)),
+    "TeX" -> Map("extensions" -> Configuration.texExtensions),
+    "MathML" -> Map(),
+    "AsciiMath" -> Map(),
+    "CommonHTML" -> Map(),
+    "HTML-CSS" -> Map(),
+    "NativeMML" -> Map(),
+    "SVG" -> Map("font" -> font),
+    "PreviewHTML" -> Map(),
+    "PlainSource" -> Map()
+  )
+
+  private def json(delimiterss: Seq[Delimiters]): List[Any] = delimiterss.toList.map(delimiters => List(
+    Json.fromString(delimiters.start),
+    Json.fromString(delimiters.end)
+  ))
 
   def allDelimiters: Seq[DelimitersAndInput] = {
     def withInput(values: Seq[Delimiters], input: Input): Seq[DelimitersAndInput] =
@@ -73,4 +100,8 @@ object Configuration {
   // The STIX-Web font is the most complete.
 
   val defaultFont: String = "TeX"
+
+  val inputs: List[String] = List("input/TeX", "input/AsciiMath", "input/MathML")
+
+  val texExtensions: List[String] = List("AMSmath.js", "AMSsymbols.js", "noErrors.js", "noUndefined.js")
 }

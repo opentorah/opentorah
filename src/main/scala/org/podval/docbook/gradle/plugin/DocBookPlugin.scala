@@ -34,6 +34,7 @@ final class DocBookPlugin extends Plugin[Project] {
     processDocBookTask.texDelimiter.set(extension.mathJax.texDelimiter)
     processDocBookTask.texInlineDelimiter.set(extension.mathJax.texInlineDelimiter)
     processDocBookTask.asciiMathDelimiter.set(extension.mathJax.asciiMathDelimiter)
+    processDocBookTask.processMathJaxEscapes.set(extension.mathJax.processEscapes)
 
     Gradle.getClassesTask(project).foreach(processDocBookTask.getDependsOn.add)
 

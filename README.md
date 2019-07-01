@@ -12,22 +12,22 @@ pioneered by the Maven plugin.
 
 ## Summary ##
 
-Plugin uses Saxon with DocBook XSLT stylesheets to process a DocBook document
-(and its includes) into HTML, EPUB, EPUB3 and PDF. Processing using XSLT 2.0
+Plugin uses Saxon with DocBook XSLT stylesheets to process a DocBook document(s)
+(and includes) into HTML, EPUB, EPUB3 and PDF. Processing using XSLT 2.0
 DocBook stylesheets is supported for HTML only ("HTML2"). For PDF, DocBook is
 first processed into XSL-FO, which is post-processed by Apache FOP. For PDF,
-JEuclid or MathJax FOP plugin can be enabled to process MathML. Document
+JEuclid or MathJax FOP plugin can be enabled to process mathematics. Document
 name(s) and the list of the output formats are configurable.
 
 XSL parameters can be configured in the `Gradle` build file using `parameters` map.
-There are sections (and customization files) for each output format, all HTML-like formats
+There are sections (and customization files) for each output format, for all HTML-like formats
 (`htmlCommon`), and for all formats (`common`) (only `html2` applies to `html2`).
 
 Values configured as `substitutions` are available within the DocBook documents by
 their names. This mechanism can be used to insert things like processing date or the
 version of the document into the output.    
 
-If a data generator class is configured, it's `main()` method will be executed with
+If a data generator class is configured, its `main()` method will be executed with
 a directory path as a parameter. References in DocBook documents that are prefixed
 with `data:` are resolved to files in that directory.
 
@@ -41,10 +41,6 @@ Main file imports appropriate official DocBook XSLT stylesheet,
 needs to be imported after plugin sets the values of the parameters; since import
 elements must come before all others, plugin sets the parameters in a separate `-param`
 XSL file that is imported before `-custom`.) 
-
-Plugin sets some parameters in the `-param` stylesheet based on the logging level at the time
-`prepare DocBook` task is executed; for example, `chunk.quietly` is set to `yes` unless
-logging at `info` level is enabled.
 
 Plugin generates an XML catalog `catalog.xml` and a DTD with all the configured substitutions,
 both of which are overwritten at each run; main catalog chains into `catalog-custom.xml`,
@@ -65,7 +61,7 @@ Plugin assumes that images referenced in the DocBook files are in the `images` d
 `img.src.path` XSL parameter accordingly. Images should be referenced *without* the `images/` prefix!
 
 Plugin sets some XSL parameters to reasonable default values, which can be seen in the `-param` XSL files
-and overridden in the `-custom` ones. Parameters that plugin sets in the main XSL file (base.dir, img.src.path)
+and overridden in the `-custom` ones. Parameters that plugin sets in the main XSL file (`base.dir`, `img.src.path`)
 can not be overridden. Plugin also adds some reasonable customizations to the `-custom` XSL files when
 generating them. They can be tweaked/disabled as desired.
 
@@ -76,27 +72,35 @@ file can be added to the `src/main/xsl` and/or `src/main/xml` directory:
 !*-custom.*
 ```
 
+Plugin adds to the project Gradle task `processDocBook` that writes configuration files,
+substitutions DTD and XML catalog, unpacks DocBook XSLT stylesheets, generates data (if configured),
+installs Node and MathJax and processes DocBook.
+
+Plugin sets some parameters in the `-param` stylesheet based on the logging level at the time
+`processDocBook` task is executed; for example, `chunk.quietly` is set to `yes` unless
+logging at `info` level is enabled.
+
 
 ## Credits ##
 
 I want to thank:
-- [Cedric Pronzato](https://github.com/mimil) for the [Maven DocBook plugin](https://github.com/mimil/docbkx-tools);
-- [Norman Walsh](https://nwalsh.com/) for his work on [DocBook](http://www.docbook.org/),
-[XML Catalogs](http://xmlcatalogs.org/) and [XML Resolver](https://xmlresolver.org/);
+- [Cedric Pronzato](https://github.com/mimil) for [Maven DocBook plugin](https://github.com/mimil/docbkx-tools);
+- [Norman Walsh](https://nwalsh.com/) for [DocBook](http://www.docbook.org/), [XML Catalogs](http://xmlcatalogs.org/)
+   and [XML Resolver](https://xmlresolver.org/);
 - [Bob Stayton](http://www.sagehill.net/bobsbio.html) for
 [XSLT stylesheets for DocBook](https://github.com/docbook/xslt10-stylesheets)
 and a [book]((http://www.sagehill.net/docbookxsl/)) about them;
 - [Michael Kay](https://github.com/michaelhkay) for [Saxon 6](http://saxon.sourceforge.net/saxon6.5.5/)
 and [Saxon 9](https://www.saxonica.com/documentation/documentation.xml);
 - [Apache FOP team](https://xmlgraphics.apache.org/fop/) for Apache FOP;
-- [Max Berger](https://github.com/maxberger) for the original work on JEuclid and
+- [Max Berger](https://github.com/maxberger) for JEuclid and
 its [FOP plugin](http://jeuclid.sourceforge.net/jeuclid-fop/);
 - [Emmeran Seehuber](https://github.com/rototor) for [updating JEuclid](https://github.com/rototor/jeuclid);
 - [MathJax team](https://www.mathjax.org/#about) for [MathJax](https://www.mathjax.org/) and
 [MathJax-node](https://github.com/mathjax/MathJax-node);
-- [Ian Bull](https://github.com/irbull) for [J2V8](https://github.com/eclipsesource/J2V8);
 - [Sten Roger Sandvik](https://github.com/srs) for [Gradle Node plugin](https://github.com/srs/gradle-node-plugin)
-  which served as inspiration for the Node support code.   
+  which served as inspiration for the Node support code;
+- [Ian Bull](https://github.com/irbull) for [J2V8](https://github.com/eclipsesource/J2V8).
 
 
 ## Applying to a Gradle project ##
@@ -133,11 +137,7 @@ to get basic tasks like "clean" and "build":
 apply plugin: 'base'
 ``` 
 
-Plugin adds to the project Gradle task `processDocBook` that writes configuration files,
-substitutions DTD and XML catalog, unpacks DocBook XSLT stylesheets, generates data (if configured),
-installs Node and MathJax and processes DocBook.
-
-To make use of the DocBook processing in a directory-name-independent way:
+To make use of the results of the DocBook processing in a directory-name-independent way:
 ```groovy
   project.sync {
     from project.tasks.getByPath(':<subproject with DocBook sources>:processDocBook').outputDirectory
@@ -218,7 +218,7 @@ docBook {
   }
 
   isJEuclidEnabled = false
-  // no more than one of `isJEuclidEnabled` and `nathJax.isEnabled` can be `true` 
+  // no more than one of `isJEuclidEnabled` and `mathJax.isEnabled` can be `true` 
 }
 
 docBook.parameters.html2 = [
@@ -272,28 +272,26 @@ body {
 ## Fonts ##
 
 Default FOP configuration created by the plugin causes FOP to auto-detect available fonts,
-which are then cached by FOP to save time. After installing new fonts, FOP's font cache file
+which are then cached by FOP to save time in the future runs. After installing new fonts, FOP's font cache file
 needs to be removed for them to be detected.
 
 FOP can't use some popular fonts like Roboto and NotoSans, and logs an error
 "coverage set class table not yet supported" during fonts auto-detection;
 see https://issues.apache.org/jira/browse/FOP-2704 for more details.
 
-Plugin adds a Gradle task `listFopFonts` that can be used to list all the fonts that *are* available to FOP.
-
-FOP caches fonts it detects, so before a newly-installed fonts can be detected by FOP, fonts cache needs to be deleted.
-
-Plugin adds a Gradle task `deleteFopFontsCache` that can be used to delete that cache.
-
 Some of the fonts that work well enough and support Latin, Russian and Hebrew scripts
 are DejaVu and Liberation.
 
 Property `epubEmbeddedFonts` configures font families that should be embedded in EPUB files.
 
+Plugin adds a Gradle task `listFopFonts` that can be used to list all the fonts that *are* available to FOP.
+
+Plugin adds a Gradle task `deleteFopFontsCache` that can be used to delete that cache.
+
 ## Mathematics ##
 
 Plugin supports typesetting mathematics using MathJax for HTML and EPUB and
-either MathJax or JEuclid for PDF. JEuclid typesets in document's fonts; MathJax does not.
+either server-side MathJax or JEuclid for PDF. JEuclid typesets in document's fonts; MathJax does not.
 MathJax delivers better quality and is under active development; JEuclid is not.
 JEuclid can handle MathML; MathJax can handle MathML, TeX, inline TeX and AsciiMath.
 
@@ -396,7 +394,7 @@ References to the stylesheets are resolved to the local copies, suppressing retr
 Gradle will retrieve them once when resolving dependency added by the plugin - and cache the JAR;
 unpacking after each `clean` is cheap.
 
-Data generated by the data generator resides under `duild/data`. References to the generated data
+Data generated by the data generator resides under `build/data`. References to the generated data
 encountered in the DocBook documents are resolved to files in that directory. 
 
 For output formats that require post-processing or packing, intermediate output is under `build/docBookTmp`.
@@ -409,6 +407,6 @@ the same name as the document.
 Following features of the Maven Gradle plugin are not supported:
 - non-customized XSL
 - resolve XSL files based on the type of processing 
-- expressions in <?eval?>
-- access to the project and its properties in <?eval?>
+- expressions in `<?eval?>`
+- access to the project and its properties in `<?eval?>`
 - multiple documents with different parameters

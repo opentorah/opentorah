@@ -108,6 +108,9 @@ class ProcessDocBookTask extends DefaultTask {
   @Input @BeanProperty val dataGeneratorClass: Property[String] =
     getProject.getObjects.property(classOf[String])
 
+  @Input @BeanProperty val processMathJaxEscapes: Property[Boolean] =
+    getProject.getObjects.property(classOf[Boolean])
+
   @TaskAction
   def processDocBook(): Unit = {
     val documentName: Option[String] = getDocumentName(document.get)
@@ -153,7 +156,7 @@ class ProcessDocBookTask extends DefaultTask {
 
     val substitutionsMap: Map[String, String] = substitutions.get.asScala.toMap
 
-    write.writeFopConfiguration()
+    write.fopConfiguration()
     write.substitutionsDtd(substitutionsMap)
     write.xmlCatalog()
     write.xmlCatalogCustomization()
@@ -173,7 +176,8 @@ class ProcessDocBookTask extends DefaultTask {
       prefixed,
       documentName,
       cssFileName,
-      epubEmbeddedFonts = Fop.getFontFiles(layout.fopConfigurationFile, epubEmbeddedFonts.get.asScala.toList, logger)
+      epubEmbeddedFonts = Fop.getFontFiles(layout.fopConfigurationFile, epubEmbeddedFonts.get.asScala.toList, logger),
+      mathJaxConfiguration = mathJaxConfiguration
     )
 
     for (docBook2: DocBook2 <- DocBook2.all)
@@ -253,7 +257,8 @@ class ProcessDocBookTask extends DefaultTask {
       extensions = mathJaxExtensions.get.asScala.toList,
       texDelimiters = delimiters(texDelimiter),
       texInlineDelimiters = delimiters(texInlineDelimiter),
-      asciiMathDelimiters = delimiters(asciiMathDelimiter)
+      asciiMathDelimiters = delimiters(asciiMathDelimiter),
+      processEscapes = processMathJaxEscapes.get
     )
   }
 }

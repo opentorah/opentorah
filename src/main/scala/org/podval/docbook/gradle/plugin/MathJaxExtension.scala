@@ -26,4 +26,7 @@ class MathJaxExtension @javax.inject.Inject() (project: Project) {
 
   @BeanProperty val asciiMathDelimiter: Property[String] =
     project.getObjects.property(classOf[String])
+
+  @BeanProperty val processEscapes: Property[Boolean] =
+    project.getObjects.property(classOf[Boolean])
 }

@@ -30,7 +30,7 @@ private final class J2V8MathJax(nodeModules: File) {
     nodeJS.require(new File(nodeModules, "mathjax-node"))
 
   def configure(configuration: Map[String, Any]): Unit = {
-    val args: V8Array = V8ObjectUtils.toV8Array(v8, List(J2V8MathJax.map2java(configuration)).asJava)
+    val args: V8Array = V8ObjectUtils.toV8Array(v8, List(J2V8.map2java(configuration)).asJava)
     mathJaxNode.executeVoidFunction("config", args)
     args.release()
   }
@@ -54,7 +54,7 @@ private final class J2V8MathJax(nodeModules: File) {
       null
     })
 
-    val args: V8Array = V8ObjectUtils.toV8Array(v8, J2V8MathJax.list2java(List(optionsMap, callback)))
+    val args: V8Array = V8ObjectUtils.toV8Array(v8, J2V8.list2java(List(optionsMap, callback)))
     val callResult: V8Object = mathJaxNode.executeObjectFunction("typeset", args)
 
     while (nodeJS.isRunning) nodeJS.handleMessage()
@@ -93,17 +93,5 @@ object J2V8MathJax extends MathJax.Factory {
       mathJax.close()
       result
     }
-  }
-
-  private def map2java(map: Map[String, Any]): java.util.Map[String, Any] =
-    map.view.mapValues(value2java).toMap.asJava
-
-  private def list2java(list: List[Any]): java.util.List[Any] =
-    list.map(value2java).asJava
-
-  private def value2java(value: Any): Any = value match {
-    case value: Map[String, Any] => map2java(value)
-    case value: List[Any] => list2java(value)
-    case other => other
   }
 }
