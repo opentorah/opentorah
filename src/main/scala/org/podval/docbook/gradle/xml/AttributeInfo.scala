@@ -40,6 +40,24 @@ object AttributeInfo {
     uri = attributes.getURI(index)
   )
 
-  def apply(attributes: Attributes): Seq[AttributeInfo] =
-    for (index: Int <- 0 until attributes.getLength) yield AttributeInfo(attributes, index)
+  // Note: XMLObj.setAttributes() sets namespace on an attribute only if it already saw
+  // the declarations of that namespace, so I am making sure that they are there (and in the beginning);
+  // even then, XMLObj.setAttributes() sets un-prefixed qualified name for namespaced attributes -
+  // but somehow they are detected correctly in MathJax.typeset()...
+  def sort(attlist: Attributes): AttributesImpl = {
+    val attributes: Seq[AttributeInfo] =
+      for (index: Int <- 0 until attlist.getLength) yield AttributeInfo(attlist, index)
+
+    val nonXmlnsAttributes: Seq[AttributeInfo] = attributes.filterNot(_.isXmlns)
+    val usedNamespaces: Set[Namespace] = nonXmlnsAttributes.flatMap(_.namespace).toSet
+    val declaredNamespaces: Set[Namespace] = attributes.flatMap(_.declaredNamespace).toSet
+
+    val result: AttributesImpl = new AttributesImpl
+
+    for (namespace: Namespace <- usedNamespaces -- declaredNamespaces) namespace.declare(result)
+
+    for (attribute: AttributeInfo <- nonXmlnsAttributes) attribute.addTo(result)
+
+    result
+  }
 }

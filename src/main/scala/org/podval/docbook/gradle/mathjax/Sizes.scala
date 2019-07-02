@@ -79,6 +79,10 @@ object Sizes {
 
   val points2Millipoints: Float = 1000.0f
 
+  val mathJaxExInEms: Float = 0.430554f
+
+  val batikExInEms: Float = 0.5f
+
   def apply(svgDocument: SVGDocument): Sizes = {
     val viewBox: Array[Float] = svgDocument.getRootElement
       .getAttribute("viewBox")

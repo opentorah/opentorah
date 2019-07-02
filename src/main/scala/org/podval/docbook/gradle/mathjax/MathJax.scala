@@ -23,11 +23,13 @@ abstract class MathJax(
 
     val outputName: String = Output.Svg.name(isNode = false)
 
+    val ex: Int = (fontSize * Sizes.mathJaxExInEms).toInt
+
     val options: Map[String, Any] = MathJax.optionsMap(
       math = math,
       inputName = input.name,
       outputName = outputName,
-      ex = fontSize.toInt
+      ex = ex
     )
 
     val svg: String = typeset(options, outputName)
@@ -78,9 +80,12 @@ object MathJax {
 
     // If J2V8 is configured to be used, is available and actually loads - we use it;
     // otherwise each typesetting is done by calling Node in a separate process.
-    val mathJaxFactory: MathJax.Factory =
-      if (useJ2V8 && J2V8.load(project, os, arch, j2v8LibraryDirectory, logger)) J2V8MathJax
-      else ExternalMathJax
+    val reallyUseJ2V8: Boolean = useJ2V8 && {
+      val result: Either[String, String] = J2V8.load(project, os, arch, j2v8LibraryDirectory)
+      result.fold(logger.warn, logger.info)
+      result.isRight
+    }
+    val mathJaxFactory: MathJax.Factory = if (reallyUseJ2V8) J2V8MathJax else ExternalMathJax
 
     mathJaxFactory.get(node, configuration, logger)
   }
