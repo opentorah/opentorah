@@ -3,13 +3,13 @@ package org.podval.docbook.gradle.plugin
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.{DefaultTask, Plugin, Project}
 import org.podval.docbook.gradle.fop.Fop
-import org.podval.docbook.gradle.util.{Gradle, Logger, Util}
+import org.podval.docbook.gradle.util.Gradle
 
 final class DocBookPlugin extends Plugin[Project] {
 
   def apply(project: Project): Unit = {
-    val logger = Logger.forProject(project)
-    logger.lifecycle(Util.applicationString)
+//    val logger = Logger.forProject(project)
+//    logger.lifecycle(Util.applicationString)
 
     val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)
 

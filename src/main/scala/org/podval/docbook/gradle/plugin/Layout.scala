@@ -58,7 +58,8 @@ final class Layout(val projectDir: File, val buildDir: File) {
   def catalogCustomFileName: String = "catalog-custom.xml"
 
   // src/test
-  def testResource(name: String): File = new File(new File(projectDir, "src/test/resources"), name)
+  def testResource(name: String): File =
+    new File(new File(new File(new File(projectDir, "src"), "test"), "resources"), name)
 
   // build/
   private def buildDirRelative: String =
@@ -70,7 +71,7 @@ final class Layout(val projectDir: File, val buildDir: File) {
   def buildDirectoryRelative(name: String): String = s"$buildDirRelative/$name/"
 
   // Node
-  def nodeRoot: File = /*cacheDirectory*/ buildDirectory("nodejs")
+  def nodeRoot: File = buildDirectory("nodejs")
   def j2v8LibraryDirectory: File = buildDirectory("j2v8library")
 
   // build/docBookXslt[2]

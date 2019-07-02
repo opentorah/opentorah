@@ -1,6 +1,6 @@
 package org.podval.docbook.gradle.util
 
-import java.io.{BufferedWriter, File, FileWriter}
+import java.io.File
 
 object Util {
   private def fileNameAndExtension(nameWithExtension: String): (String, Option[String]) = {
