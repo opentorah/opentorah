@@ -31,7 +31,7 @@ class PluginTestProject(projectDir: File) {
 
   private def getRunner(logInfo: Boolean): GradleRunner = {
     val result = GradleRunner.create.withProjectDir(projectDir)
-    if (logInfo) result.withArguments("-i", "processDocBook") else result.withArguments("processDocBook")
+    if (logInfo) result.withArguments("-d", "processDocBook") else result.withArguments("processDocBook")
   }
 }
 

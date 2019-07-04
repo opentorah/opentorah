@@ -8,7 +8,8 @@ final class ProcessingInstructionsFilter(
 ) extends WarningFilter {
 
   override def processingInstruction(target: String, data: String): Unit = {
-    logger.info(s"ProcessingInstructionsFilter.processingInstruction(target = $target, data = [$data])")
+    logger.debug(s"ProcessingInstructionsFilter.processingInstruction(target = $target, data = [$data])")
+
     if (target == "eval") {
       val expression: String = data.trim
       val result: String = substitutions.getOrElse(expression, {

@@ -4,13 +4,13 @@ import java.io.{File, FileWriter, StringReader}
 
 import javax.xml.parsers.SAXParserFactory
 import javax.xml.transform.dom.DOMResult
-import javax.xml.transform.sax.{SAXResult, SAXSource}
+import javax.xml.transform.sax.{SAXResult, SAXSource, SAXTransformerFactory}
 import javax.xml.transform.stream.{StreamResult, StreamSource}
 import javax.xml.transform.{ErrorListener, Result, Source, TransformerException}
 import org.podval.docbook.gradle.util.Logger
 import org.w3c.dom.Node
 import org.xml.sax.helpers.DefaultHandler
-import org.xml.sax.{InputSource, XMLFilter, XMLReader}
+import org.xml.sax.{ErrorHandler, InputSource, SAXParseException, XMLFilter, XMLReader}
 
 object Xml {
 
@@ -52,6 +52,8 @@ object Xml {
   ): Unit = {
     xmlReader.setEntityResolver(resolver)
 
+    setErrorHandler(xmlReader, logger)
+
     transform(
       useSaxon9,
       resolver = Some(resolver),
@@ -89,6 +91,8 @@ object Xml {
   )
 
   def parse(input: String, xmlReader: XMLReader, logger: Logger): Node = {
+    setErrorHandler(xmlReader, logger)
+
     val result = new DOMResult
 
     transform(
@@ -111,16 +115,16 @@ object Xml {
     result: Result,
     logger: Logger
   ): Unit = {
-//    logger.info(
-//      s"""Xml.transform(
-//         |  useSaxon9 = $useSaxon9,
-//         |  stylesheetFile = $stylesheetFile,
-//         |  source = ${source.getSystemId},
-//         |  result = ${result.getSystemId}
-//         |)""".stripMargin
-//    )
+    logger.debug(
+      s"""Xml.transform(
+         |  useSaxon9 = $useSaxon9,
+         |  stylesheetFile = $stylesheetFile,
+         |  source = ${source.getSystemId},
+         |  result = ${result.getSystemId}
+         |)""".stripMargin
+    )
 
-    val transformerFactory =
+    val transformerFactory: SAXTransformerFactory =
       if (useSaxon9) new net.sf.saxon.TransformerFactoryImpl
       else new com.icl.saxon.TransformerFactoryImpl
 
@@ -128,11 +132,7 @@ object Xml {
     // not the transformer itself: I guess some sub-transformers get created internally ;)
     resolver.foreach(resolver => transformerFactory.setURIResolver(resolver))
 
-    transformerFactory.setErrorListener(new ErrorListener {
-      override def warning(exception: TransformerException): Unit = logger.info(exception.getMessageAndLocation)
-      override def error(exception: TransformerException): Unit = logger.error(exception.getMessageAndLocation)
-      override def fatalError(exception: TransformerException): Unit = logger.error(exception.getMessageAndLocation)
-    })
+    setErrorListener(transformerFactory, logger)
 
     val transformer = stylesheetFile.fold(transformerFactory.newTransformer) {
       stylesheetFile => transformerFactory.newTransformer(new StreamSource(stylesheetFile))
@@ -140,4 +140,18 @@ object Xml {
 
     transformer.transform(source, result)
   }
+
+  private def setErrorHandler(xmlReader: XMLReader, logger: Logger): Unit =
+    xmlReader.setErrorHandler(new ErrorHandler {
+      override def warning(exception: SAXParseException): Unit = logger.warn(exception.toString)
+      override def error(exception: SAXParseException): Unit = logger.error(exception.toString)
+      override def fatalError(exception: SAXParseException): Unit = logger.error(exception.toString)
+    })
+
+  private def setErrorListener(transformerFactory: SAXTransformerFactory, logger: Logger): Unit =
+    transformerFactory.setErrorListener(new ErrorListener {
+      override def warning(exception: TransformerException): Unit = logger.warn(exception.getMessageAndLocation)
+      override def error(exception: TransformerException): Unit = logger.error(exception.getMessageAndLocation)
+      override def fatalError(exception: TransformerException): Unit = logger.error(exception.getMessageAndLocation)
+    })
 }

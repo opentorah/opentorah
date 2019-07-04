@@ -34,7 +34,7 @@ abstract class MathJax(
 
     val svg: String = typeset(options, outputName)
 
-    logger.info(s"${MathJax.logStart}$math${MathJax.logSep}$svg${MathJax.logEnd}")
+    logger.debug(s"${MathJax.logStart}$math${MathJax.logSep}$svg${MathJax.logEnd}")
 
     val result: SVGDocument = Svg.fromString(svg)
 

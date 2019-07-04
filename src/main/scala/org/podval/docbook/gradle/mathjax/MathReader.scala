@@ -133,7 +133,7 @@ final class MathReader(
   private def flush(closedByDelimiter: Boolean = false): Unit = if (delimiters.isDefined) {
     if (!closedByDelimiter) warning(s"Math '$math' not closed")
 
-    logger.info(s"MathReader.flush(): math=$math")
+    logger.debug(s"MathReader.flush(): math=$math")
 
     val input = delimiters.get.input
     val isInline: Option[Boolean] = checkInline(input.isInline)

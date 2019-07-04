@@ -7,6 +7,8 @@ import org.gradle.api.{Project, Task}
 import org.gradle.api.artifacts.repositories.{ArtifactRepository, IvyArtifactRepository, IvyPatternRepositoryLayout}
 import org.gradle.api.artifacts.{Configuration, Dependency}
 import org.gradle.api.file.{CopySpec, FileCopyDetails, RelativePath}
+import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.SourceSet
 
 import scala.jdk.CollectionConverters._
 
@@ -89,5 +91,12 @@ object Gradle {
       copySpec.filter(Map("tokens" -> substitutions.asJava).asJava, classOf[ReplaceTokens])
   })
 
-  def getClassesTask(project: Project): Option[Task] = Option(project.getTasks.findByName("classes"))
+  def getTask(project: Project, name: String): Option[Task] = Option(project.getTasks.findByName(name))
+
+  def mainSourceSet(project: Project): Option[SourceSet] =
+    Option(project.getConvention.findPlugin(classOf[JavaPluginConvention]))
+      .map(_.getSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME))
+
+  def classesDirs(project: Project): Set[File] =
+    Gradle.mainSourceSet(project).fold(Set.empty[File])(_.getOutput.getClassesDirs.getFiles.asScala.toSet)
 }

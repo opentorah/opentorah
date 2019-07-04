@@ -110,7 +110,7 @@ on the Gradle Plugin Portal. To apply it to a Gradle project:
 
 ```groovy
 plugins {
-  id "org.podval.docbook-gradle-plugin" version "0.7.7"
+  id "org.podval.docbook-gradle-plugin" version "0.7.8"
 }
 ```
 
@@ -121,6 +121,11 @@ repositories {
   jcenter()
 }
 ```
+
+If there is `classes` task in the project (for instance, Scala or Java plugin is applied),
+`processDocBook` task will depend on it.
+
+If there is `build` task in the project, it will depend on the `processDocBook` task. 
 
 If project does not contain any code nor applies any core Gradle plugins,
 to get basic tasks like "clean" and "build":

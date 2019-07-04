@@ -38,17 +38,25 @@ final class DocBookPlugin extends Plugin[Project] {
     project.getTasks.create("listFopFonts", classOf[DocBookPlugin.ListFopFontsTask])
     project.getTasks.create("deleteFopFontsCache", classOf[DocBookPlugin.DeleteFopFontsCacheTask])
 
-    project.afterEvaluate((project: Project) => dependOnClasses(project, processDocBookTask))
-  }
+    project.afterEvaluate((project: Project) => {
+      val logger: Logger = Logger.forProject(project)
 
-  private def dependOnClasses(project: Project, processDocBookTask: ProcessDocBookTask): Unit = {
-    // Note: even when DocBook plugin is applied after the Scala one,
-    // there is no 'classes' task during its application; I don't want the users to have to manually add
-    //   processDocBook.dependsOn classes
-    // so I do it in afterEvaluate() :)
-    val logger: Logger = Logger.forProject(project)
-    Gradle.getClassesTask(project)
-      .fold(logger.warn("No 'classes' task found."))(processDocBookTask.getDependsOn.add)
+      // Note: even when DocBook plugin is applied after the Scala one,
+      // there is no 'classes' task during its application - but there is after project evaluation:
+      Gradle.getTask(project, "classes").fold {
+        logger.warn("No 'classes' task found.")
+      }{ classesTask =>
+        logger.info("Found 'classes' task; adding it as dependency of 'processDocBook'.")
+        processDocBookTask.getDependsOn.add(classesTask)
+      }
+
+      Gradle.getTask(project, "build").fold {
+        logger.warn("No 'build' task found.")
+      }{ buildTask =>
+        logger.info("Found 'build' task; adding 'processDocBook' as its dependency.")
+        buildTask.getDependsOn.add(processDocBookTask)
+      }
+    })
   }
 }
 

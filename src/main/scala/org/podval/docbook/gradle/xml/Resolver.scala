@@ -40,7 +40,7 @@ final class Resolver(catalogFile: File, logger: Logger) extends URIResolver with
     result.fold {
       logger.error(s"$parameters\n  unresolved")
     } { result =>
-      logger.info(s"$parameters\n  resolved to: ${id(result)}")
+      logger.debug(s"$parameters\n  resolved to: ${id(result)}")
     }
 
     result.getOrElse(null.asInstanceOf[R])

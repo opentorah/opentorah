@@ -40,7 +40,7 @@ object Fop {
     plugin: Option[FopPlugin],
     logger: Logger
   ): Unit = {
-    logger.info(
+    logger.debug(
       s"""Fop.run(
          |  configurationFile = $configurationFile,
          |  inputFile = $inputFile,

@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.8] - 2019-07-04
+- MathML configuration for HTML;
+- MathJax ex size;
+- parsing errors logging;
+- dependencies and up-to-date determination for the `processDocBook` task;
+
 ## [0.7.7] - 2019-06-26 - MathJax for PDF!
 - wrap TeX and AsciiMath using an XML filter;
 - Node support (inspired by the Gradle Node plugin);

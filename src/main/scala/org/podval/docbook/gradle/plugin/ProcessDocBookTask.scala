@@ -2,8 +2,7 @@ package org.podval.docbook.gradle.plugin
 
 import java.io.File
 
-import org.gradle.api.{DefaultTask, Task}
-import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.{DefaultTask, Project, Task}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
@@ -37,8 +36,18 @@ class ProcessDocBookTask extends DefaultTask {
   ).filter(_.exists)
 
   // Register inputs
-  for (directory: File <- getProcessInputDirectories) {
-    info(s"Registering input directory $directory")
+
+  getProcessInputDirectories.foreach(registerInputDirectory)
+
+  // Note: classesDirs use sourceSets, which are only available after project is evaluated;
+  // with code in Scala only, input directory "build/classes/java/main" doesn't exist (which is a Gradle error), so I
+  // register "build/classes/" (grandparent of all classesDirs) as input directory
+  // (is there a simpler way of getting it?).
+  getProject.afterEvaluate((project: Project) =>
+    Gradle.classesDirs(project).map(_.getParentFile.getParentFile).foreach(registerInputDirectory))
+
+  private def registerInputDirectory(directory: File): Unit = {
+    info(s"processDocBook: registering input directory $directory")
     directory.mkdirs()
     getInputs.dir(directory)
   }
@@ -49,8 +58,8 @@ class ProcessDocBookTask extends DefaultTask {
     layout.outputRoot
   )
   for (directory: File <- getProcessOutputDirectories) {
-    Util.deleteRecursively(directory)
-    info(s"Registering output directory $directory")
+    // Note: deleting directories makes the task not up-to-date: Util.deleteRecursively(directory)
+    info(s"processDocBook: registering output directory $directory")
     getOutputs.dir(directory)
   }
 
@@ -226,10 +235,8 @@ class ProcessDocBookTask extends DefaultTask {
 
   private def generateData(): Unit = {
     val mainClass: String = dataGeneratorClass.get
-    val mainSourceSet: Option[SourceSet] =
-      Option(getProject.getConvention.findPlugin(classOf[JavaPluginConvention]))
-        .map(_.getSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME))
-    val classesTask: Option[Task] = Gradle.getClassesTask(getProject)
+    val mainSourceSet: Option[SourceSet] = Gradle.mainSourceSet(getProject)
+    val classesTask: Option[Task] = Gradle.getTask(getProject, "classes")
     val dataDirectory: File = layout.dataDirectory
 
     def skipping(message: String): Unit = info(s"Skipping DocBook data generation: $message")
@@ -237,7 +244,6 @@ class ProcessDocBookTask extends DefaultTask {
     if (mainSourceSet.isEmpty) skipping("no Java plugin in the project") else
     if (classesTask.isEmpty) skipping("no 'classes' task in the project") else
     if (!didWork(classesTask.get)) skipping("'classes' task didn't do work") else
-//    if (dataDirectory.exists) info(s"Skipping DocBook data generation: directory $dataDirectory exists") else
     {
       info(s"Running DocBook data generator $mainClass into $dataDirectory")
       getProject.javaexec((exec: JavaExecSpec) => {
