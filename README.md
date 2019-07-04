@@ -122,19 +122,13 @@ repositories {
 }
 ```
 
-For projects with code that is used to generate data for inclusion in the DocBook files,
-DocBook plugin needs to be applied *after* the Scala/Java plugin - or explicit dependency needs
-to be added by hand:
-
-```groovy
-processDocBook.dependsOn classes
-```
-
 If project does not contain any code nor applies any core Gradle plugins,
 to get basic tasks like "clean" and "build":
 
 ```groovy
-apply plugin: 'base'
+plugins {
+  id 'base'
+}
 ``` 
 
 To make use of the results of the DocBook processing in a directory-name-independent way:
@@ -144,7 +138,6 @@ To make use of the results of the DocBook processing in a directory-name-indepen
     into '<published directory>'
   }  
 ```
-
 
 ## Configuration ##
 

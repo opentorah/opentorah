@@ -3,12 +3,11 @@ package org.podval.docbook.gradle.plugin
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.{DefaultTask, Plugin, Project}
 import org.podval.docbook.gradle.fop.Fop
-import org.podval.docbook.gradle.util.Gradle
+import org.podval.docbook.gradle.util.{Gradle, Logger}
 
 final class DocBookPlugin extends Plugin[Project] {
 
   def apply(project: Project): Unit = {
-//    val logger = Logger.forProject(project)
 //    logger.lifecycle(Util.applicationString)
 
     val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)
@@ -36,10 +35,20 @@ final class DocBookPlugin extends Plugin[Project] {
     processDocBookTask.asciiMathDelimiter.set(extension.mathJax.asciiMathDelimiter)
     processDocBookTask.processMathJaxEscapes.set(extension.mathJax.processEscapes)
 
-    Gradle.getClassesTask(project).foreach(processDocBookTask.getDependsOn.add)
-
     project.getTasks.create("listFopFonts", classOf[DocBookPlugin.ListFopFontsTask])
     project.getTasks.create("deleteFopFontsCache", classOf[DocBookPlugin.DeleteFopFontsCacheTask])
+
+    project.afterEvaluate((project: Project) => dependOnClasses(project, processDocBookTask))
+  }
+
+  private def dependOnClasses(project: Project, processDocBookTask: ProcessDocBookTask): Unit = {
+    // Note: even when DocBook plugin is applied after the Scala one,
+    // there is no 'classes' task during its application; I don't want the users to have to manually add
+    //   processDocBook.dependsOn classes
+    // so I do it in afterEvaluate() :)
+    val logger: Logger = Logger.forProject(project)
+    Gradle.getClassesTask(project)
+      .fold(logger.warn("No 'classes' task found."))(processDocBookTask.getDependsOn.add)
   }
 }
 

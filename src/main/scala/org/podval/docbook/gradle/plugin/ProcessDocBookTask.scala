@@ -236,7 +236,7 @@ class ProcessDocBookTask extends DefaultTask {
     if (mainClass.isEmpty) skipping("dataGenerationClass is not set") else
     if (mainSourceSet.isEmpty) skipping("no Java plugin in the project") else
     if (classesTask.isEmpty) skipping("no 'classes' task in the project") else
-//    if (!classesTask.get.getDidWork) skipping("'classes' task didn't do work") else
+    if (!didWork(classesTask.get)) skipping("'classes' task didn't do work") else
 //    if (dataDirectory.exists) info(s"Skipping DocBook data generation: directory $dataDirectory exists") else
     {
       info(s"Running DocBook data generator $mainClass into $dataDirectory")
@@ -246,6 +246,12 @@ class ProcessDocBookTask extends DefaultTask {
         exec.args(dataDirectory.toString)
        })
     }
+  }
+
+  private def didWork(classesTask: Task): Boolean = {
+    // Note: 'classes' task itself never does work: it has no action;
+    // at least for Scala, it depends on the tasks that actually do something - when there is something to do.
+    classesTask.getDidWork || classesTask.getTaskDependencies.getDependencies(classesTask).asScala.exists(_.getDidWork)
   }
 
   private def getMathJaxConfiguration: mathjax.Configuration = {
