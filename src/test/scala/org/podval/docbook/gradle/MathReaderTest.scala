@@ -109,13 +109,14 @@ class MathReaderTest extends FlatSpec with Matchers {
 //       |</article>""".stripMargin
 
   private def parse(string: String): String = {
+    var logger = new TestLogger
     val result = Xml.parse(
       input = string,
       xmlReader = Xml.getFilteredXMLReader(filters = Seq(
-        new MathReader(Configuration())
+        new MathReader(Configuration(), logger)
         /* , new TracingFilter */
       )),
-      logger = new TestLogger
+      logger
     )
     Xml.toString(result)
   }

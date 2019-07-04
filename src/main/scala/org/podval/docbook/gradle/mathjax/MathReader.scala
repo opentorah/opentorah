@@ -1,18 +1,18 @@
 package org.podval.docbook.gradle.mathjax
 
 import org.podval.docbook.gradle.plugin.DocBook
-import org.podval.docbook.gradle.xml.Namespace
-import org.xml.sax.{Attributes, Locator, SAXParseException}
-import org.xml.sax.helpers.{AttributesImpl, XMLFilterImpl}
-import org.w3c.dom.{Document, Element}
+import org.podval.docbook.gradle.util.Logger
+import org.podval.docbook.gradle.xml.{Namespace, WarningFilter}
 import MathML.DisplayAttribute
 import Configuration.DelimitersAndInput
+import org.xml.sax.Attributes
+import org.xml.sax.helpers.AttributesImpl
+import org.w3c.dom.{Document, Element}
 
-final class MathReader(configuration: Configuration) extends XMLFilterImpl {
-
-  private var locator: Option[Locator] = None
-  private def warning(message: String): Unit = getErrorHandler.warning(new SAXParseException(message, locator.orNull))
-
+final class MathReader(
+  configuration: Configuration,
+  logger: Logger
+) extends WarningFilter {
   private var elementsStack: List[String] = List.empty
   private def pushElement(localName: String): Unit = elementsStack = elementsStack :+ localName
   private def popElement(): Unit = elementsStack = elementsStack.init
@@ -57,11 +57,6 @@ final class MathReader(configuration: Configuration) extends XMLFilterImpl {
     flush()
 
     super.startDocument()
-  }
-
-  override def setDocumentLocator(locator: Locator): Unit = {
-    super.setDocumentLocator(locator)
-    this.locator = Some(locator)
   }
 
   override def endDocument(): Unit = {
@@ -135,31 +130,32 @@ final class MathReader(configuration: Configuration) extends XMLFilterImpl {
   private def unescape(chars: String): String =
     if (!configuration.processEscapes) chars else chars.replace("\\$", "$")
 
-  private def flush(closedByDelimiter: Boolean = false): Unit = {
-    if (delimiters.isDefined) {
-      if (!closedByDelimiter) warning(s"Math '$math' not closed")
-      val input = delimiters.get.input
-      val isInline: Option[Boolean] = checkInline(input.isInline)
-      val attributes = new AttributesImpl
-      Input.Attribute.set(MathML.Namespace, input.withInline(isInline), attributes)
+  private def flush(closedByDelimiter: Boolean = false): Unit = if (delimiters.isDefined) {
+    if (!closedByDelimiter) warning(s"Math '$math' not closed")
 
-      def mml(): Unit = {
-        // NOTE: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,
-        // math element and its children end up having *two* default namespaces - MathML and DocBook.
-        prefixMapping(MathML.Namespace.default) {
-          prefixMapping(MathJax.Namespace) {
-            element(MathML.Namespace.default, MathML.math, atts = attributes) {
-              element(MathML.Namespace.default, MathML.mrow) {
-                element(MathML.Namespace.default, MathML.mi) {
-                  sendToParent(math)
-                }}}}}
-      }
+    logger.info(s"MathReader.flush(): math=$math")
 
-      if (currentlyInEquationElement) {
-        mml()
-      } else element(DocBook.Namespace, if (isInline.contains(true)) "inlineequation" else "informalequation") {
-        mml()
-      }
+    val input = delimiters.get.input
+    val isInline: Option[Boolean] = checkInline(input.isInline)
+    val attributes = new AttributesImpl
+    Input.Attribute.set(MathML.Namespace, input.withInline(isInline), attributes)
+
+    def mml(): Unit = {
+      // NOTE: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,
+      // math element and its children end up having *two* default namespaces - MathML and DocBook.
+      prefixMapping(MathML.Namespace.default) {
+        prefixMapping(MathJax.Namespace) {
+          element(MathML.Namespace.default, MathML.math, atts = attributes) {
+            element(MathML.Namespace.default, MathML.mrow) {
+              element(MathML.Namespace.default, MathML.mi) {
+                sendToParent(math)
+              }}}}}
+    }
+
+    if (currentlyInEquationElement) {
+      mml()
+    } else element(DocBook.Namespace, if (isInline.contains(true)) "inlineequation" else "informalequation") {
+      mml()
     }
 
     delimiters = None
