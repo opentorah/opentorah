@@ -207,9 +207,9 @@ final class Write(val layout: Layout, val logger: Logger) {
 
   private def writeInto(file: File, replace: Boolean = true)(content: String): Unit = {
     if (!replace && file.exists) {
-//      logger.info(s"Already exists: $file")
+      logger.debug(s"Already exists: $file")
     } else {
-//      logger.info(s"Writing $file")
+      logger.debug(s"Writing $file")
       file.getParentFile.mkdirs()
       val writer: BufferedWriter = new BufferedWriter(new FileWriter(file))
 

@@ -17,11 +17,11 @@ repositories {
   jcenter()
 }
 
-def scalaVersion = '2.13.0'
-def scalaVersionMajor = '2.13'
-def fopVersion = '2.3'
-def batikVersion = '1.11'
-def xercesVersion = '2.12.0'
+final String scalaVersion = '2.13.0'
+final String scalaVersionMajor = '2.13'
+final String fopVersion = '2.3'
+final String batikVersion = '1.11'
+final String xercesVersion = '2.12.0'
 
 // v1.3.04 doesn't have org.w3c.dom.ElementTraversal that Xerces uses:
 configurations.all {
@@ -99,7 +99,7 @@ task scaladocJar(type: Jar) {
 }
 scaladocJar.dependsOn scaladoc
 
-def pluginArtifactId = project.name // jar.baseName
+final String pluginArtifactId = project.name // jar.baseName
 
 gradlePlugin {
   plugins {
@@ -110,9 +110,9 @@ gradlePlugin {
   }
 }
 
-def gitHubRepository    = "dubinsky/podval-docbook-gradle"
-def gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
-def pluginTags = ['Scala', 'DocBook', 'Gradle', 'Plugin', 'Html', 'Pdf', 'Epub', 'MathML', 'MathJax', 'JEuclid']
+final String gitHubRepository    = 'dubinsky/podval-docbook-gradle'
+final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
+final List<String> pluginTags = ['Scala', 'DocBook', 'Gradle', 'Plugin', 'Html', 'Pdf', 'Epub', 'MathML', 'MathJax', 'JEuclid']
 
 pluginBundle {
   website = "${gitHubRepositoryUrl}"

@@ -105,10 +105,6 @@ object MathJax {
     "math"            -> math,       // the math string to typeset
     outputName        -> true,       // which output format to produce
     "css"             -> false       // generate CSS for HTML output?
-
-    // an object to store information from multiple calls
-    // (e.g., <defs> if useGlobalCache, counter for equation numbering if equationNumbers)
-    // state: {}
   )
 
   val logStart: String = "typesetting ["
