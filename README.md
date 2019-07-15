@@ -1,3 +1,5 @@
+* TOC
+{:toc}
 # DocBook plugin for Gradle #
 
 ## Motivation ##
@@ -5,9 +7,10 @@
 There is an excellent [DocBook](http://www.docbook.org/) plugin
 for [Maven](https://maven.apache.org/index.html):
 [docbkx-tools](https://github.com/mimil/docbkx-tools).
-For [Gradle](https://gradle.org/), I found some Groovy scripts floating around,
-but no general-purpose plugins. This is my attempt at one, inspired by the ideas
-pioneered by the Maven plugin.
+This is my attempt to implement a plugin for [Gradle](https://gradle.org/)
+inspired by the ideas pioneered by the Maven plugin. More information about requirements,
+motivation and chosen approach can be found in a
+[blog post](http://dub.podval.org/2019/05/06/publishing-papers-on-web-2.html).
 
 
 ## Summary ##
