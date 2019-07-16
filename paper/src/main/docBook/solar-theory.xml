@@ -59,4 +59,35 @@
     <para><biblioref linkend="Tzikuni"/> quotes Rambam's value for 354 days as 348°55′15″, but calculated value
       as 348°55′9″, and notes that this "requires a little thought".</para>
   </section>
+
+  <section>
+    <title>Questions</title>
+
+    <itemizedlist>
+      <listitem>
+        <para>Exactification: Tzikuni gives the algorithm of such reconstruction:
+          add to the remainder as many times 360 as there were full rotations in given time period,
+          and then divide... find the page for exact reference;
+          use it to calculate intervals for Rambam's values of the angular velocities</para></listitem>
+
+      <listitem><para>Exactify all angular velocities.</para></listitem>
+
+      <listitem><para>
+        Angular movement for 29 days: are Rambam's values reconstructible if value for 29 days is calculated as 3*10-1,
+        not 2*10+9? For any tables other than SunLongitudeMean?</para></listitem>
+
+      <listitem><para>Convert each year length mentioned in the fixed calendar to angular speed.</para></listitem>
+
+      <listitem><para>Where and when was the Sun created? Birchat Hachamo?</para></listitem>
+
+      <listitem><para>make possible calculations for a Moment, not just a Day (at least for the sun);</para></listitem>
+
+      <listitem><para>Math.findZero(): Finish and test the code; use two separate lengths (precisions)?</para></listitem>
+
+      <listitem>
+        <para>calculate true seasons in SeasonsAstronomical;
+          KH 10:7 says that real vernal equinox is approximately two days before the mean one; add a test.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
 </section>
