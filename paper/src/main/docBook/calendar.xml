@@ -10,21 +10,8 @@
   </info>
 
   <xi:include href="introduction.xml"/>
-  <xi:include href="goals.xml"/>
-  <xi:include href="history.xml"/>
-  <xi:include href="acknowledgements.xml"/>
 
-  <!-- SEQUENCE:
-    exactification
-    angular velocities - lunar are optional, but belong here :)
-    length of solar year from velocities (or the other way)
-    length of lunar year from velocities (which one?) - optional, but belongs here :)
-    approximation
-    true seasons
-    leap year cycle structure
-  -->
-
-  <xi:include href="research-questions.xml"/>
+  <xi:include href="new-year-corrections.xml"/>
 
   <xi:include href="solar-theory.xml"/>
   <xi:include href="lunar-theory.xml"/>
