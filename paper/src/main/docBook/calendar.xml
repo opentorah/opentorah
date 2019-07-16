@@ -32,7 +32,8 @@
   <xi:include href="leap-years-cycle.xml"/>
 
   <xi:include href="rambam-summary.xml"/>
-  <xi:include href="rambam-translation.xml"/>
+
+  <xi:include href="translation/translation.xml"/>
 
   <xi:include href="glossary.xml"/>
   <xi:include href="bibliography.xml"/>

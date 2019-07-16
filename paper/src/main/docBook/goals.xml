@@ -1,24 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="goals">
   <title>Goals</title>
+  <para>I want to be able to do various things with the fixed Jewish calendar
+  as described by Rambam in the Laws of the Sanctification of the Moon, Chapters 6-10:</para>
+
   <itemizedlist>
-    <listitem>
-      <para>Translate appropriate chapters of Rambam into English. The translation does not have to be literal;
-        literal translations are already available (<biblioref linkend="Yale"/>, <biblioref linkend="Touger"/>). The
-        goal of our translation is to make the text complete and accessible for collaboration by people not proficient
-        enough in Hebrew.</para>
-    </listitem>
-    <listitem>
-      <para>Reconstruct the models and formulae implied in the text.</para>
-    </listitem>
-    <listitem>
-      <para>Implement the algorithms.</para>
-    </listitem>
-    <listitem>
-      <para>Verify consistency of Rambam's numbers.</para>
-    </listitem>
-    <listitem>
-      <para>Compare Rambam's models with contemporary astronomical models.</para>
-    </listitem>
+    <listitem><para>code Rambam's calculations (and verify Rambam's numerical examples)</para></listitem>
+    <listitem><para>convert dates from Jewish calendar to Gregorian and back</para></listitem>
+    <listitem><para>list <ulink url="https://docs.google.com/document/d/1hpPZ0LYU3p8a-LJRXEqzXig-VQthkQ_MkaY79PMqr-Y/edit?hl=en_US">dates of Birchas Hachamo</ulink></para></listitem>
+    <listitem><para>generate Torah and Haftorah reading schedule</para></listitem>
+    <listitem><para>generate schedule of learning Rambam</para></listitem>
+  </itemizedlist>
+
+  <para>I want to do certain things with the astronomical Jewsih calendar
+  as described by Rambam in the Laws of the Sanctification of the Moon, in Chapters 11-19:</para>
+
+  <itemizedlist>
+    <listitem><para>code Rambam's calculations (and verify Rambam's numerical examples)</para></listitem>
+    <listitem><para>verify Rambam's tables and rounding decisions against his models</para></listitem>
+    <listitem><para>analyze impact of various misprints on the sighting calculations</para></listitem>
+    <listitem><para>analyze correspondence with the fixed calendar</para></listitem>
+    <listitem><para>reconstruct models that Rambam uses, in contemporary (ancient Greek?) terminology and notation</para></listitem>
+    <listitem><para>describe the models with diagrams and formulae</para></listitem>
+    <listitem><para>reconstruct actual parameters of the models from the numbers given by Rambam</para></listitem>
+    <listitem><para>Verify consistency of Rambam's numbers.</para></listitem>
+    <listitem><para>see how Rambam's calculations of the moon visibility compare to the current models</para></listitem>
+    <listitem><para>Translate relevant chapters of Rambam into English. The translation does not have to be literal;
+      literal translations are already available (<biblioref linkend="Yale"/>, <biblioref linkend="Touger"/>). The
+      goal of our translation is to make the text complete and accessible for collaboration by people not proficient
+      enough in Hebrew.</para></listitem>
+    <listitem><para>calculate halachic times (zmanim)</para></listitem>
   </itemizedlist>
 </section>

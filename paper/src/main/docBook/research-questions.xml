@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section xml:id="research-questions" xmlns="http://docbook.org/ns/docbook" version="5.0">
-  <title>Research Questions</title>
+  <title>Research Questions (and TODOs)</title>
   
   <section>
     <title>Fixed Calendar</title>
@@ -24,8 +24,10 @@
           and RoshHashono.</para></listitem>
       </itemizedlist>
       
-      <para>There is an argument concerning some of the Rosh Hashono delays involving r. Saadia Gaon:
-        https://he.wikipedia.org/wiki/%D7%9E%D7%97%D7%9C%D7%95%D7%A7%D7%AA_%D7%A8%D7%91_%D7%A1%D7%A2%D7%93%D7%99%D7%94_%D7%92%D7%90%D7%95%D7%9F_%D7%95%D7%91%D7%9F_%D7%9E%D7%90%D7%99%D7%A8
+      <para>There is an <ulink
+        url="https://he.wikipedia.org/wiki/%D7%9E%D7%97%D7%9C%D7%95%D7%A7%D7%AA_%D7%A8%D7%91_%D7%A1%D7%A2%D7%93%D7%99%D7%94_%D7%92%D7%90%D7%95%D7%9F_%D7%95%D7%91%D7%9F_%D7%9E%D7%90%D7%99%D7%A8">
+        argument</ulink> concerning some of the Rosh Hashono delays involving r. Saadia Gaon:
+
         Спор о размерах "старого молада", когда он отодвигает Рош ашана на следующий день.
         По нашей шите от Расага и дальше - 18 часов
         По шите Аарона Бен Меира - 18 часов и 642/1080 частей часа</para>
@@ -154,6 +156,48 @@
       <title>3-year cycle</title>
       <para>Is anybody orthodox completing Torah cycle in three years?
         If yes, maybe we should generate that schedule too.
-        Here is the list of Haftarot: https://www.google.com/url?q=https://faculty.biu.ac.il/~ofery/papers/haftarot3.pdf</para></section>
+        There is a <ulink url="https://www.google.com/url?q=https://faculty.biu.ac.il/~ofery/papers/haftarot3.pdf">list of Haftarot</ulink>.
+      </para>
+    </section>
+  </section>
+
+  <section>
+    <title>Functionality and Integrations</title>
+
+    <section>
+      <title>Zmanim</title>
+
+      <para>There is an Android application; it references some kind of an "engine".</para>
+
+      <para>
+        Raw data for the hazot calculations is obtainable from the
+        <ulink url="http://www.usno.navy.mil/USNO/astronomical-applications/data-services/rs-one-year-us">Naval Oceanography Portal</ulink>.
+
+        There it is produced in accordance with the algorithm described in the Meese's book, I think...
+        There is <ulink url="http://www.timeanddate.com/worldclock/sunrise.html">another source of data</ulink>.
+      </para>
+    </section>
+
+    <section>
+      <title>Joda Time</title>
+      As a good open-source citizen I probably should integrate my implementation of the Jewish calendar into
+      <ulink url="http://joda-time.sourceforge.net/">Joda Time</ulink> or <ulink url="http://jcp.org/en/jsr/detail?id=310">JSR 130</ulink>
+      (although the latter is inactive, the article
+      <ulink url="http://today.java.net/pub/a/today/2008/09/18/jsr-310-new-java-date-time-api.html">New Java Date and Time API</ulink> notwithstanding).
+    </section>
+
+    <section>
+      <title>Google Calendar Integration</title>
+
+      <para>It'd be nice to integrate with the Google Calendar:
+
+        <ulink url="http://en.wikipedia.org/wiki/ICalendar">iCalendar</ulink>
+        <ulink url="http://tools.ietf.org/html/rfc2445">iCalendar RFC</ulink>
+        <ulink url="http://tools.ietf.org/html/draft-ietf-calsify-rfc2445bis-08">Revised iCalendar RFC</ulink>
+        <ulink url="http://ical4j.sourceforge.net/introduction.html">iCal4j</ulink>
+        <ulink url="http://www.google.com/support/calendar/bin/answer.py?hl=en&amp;answer=48526">Publish web content events in iCalendar format</ulink>
+        <ulink url="http://code.google.com/apis/gdata/client-java.html">GData Java library</ulink>
+      </para>
+    </section>
   </section>
 </section>

@@ -7,9 +7,15 @@
     space and computer equipment when I, as a Yeshiva student, had neither;
     <personname><firstname>Ilia</firstname><surname>Pomansky</surname></personname> - for encouraging this work at
     the early stages, in 1991; my wife Nina - for listening to my wild ideas, for her patience, and for help with
-    math; my daughter Menucha Rochel - for assistance with the translation; Rabbi Michael Koretz - for interesting
-    discussions and help in obtaining texts on the subject; Dr. Michael Partensky - for encouragement and advise;
+    math; my daughter Menucha Rochel - for assistance with the translation; Rabbi Michael Koretz -
+    for stimulating discussions, encouragement, and extensive research into customs of Torah/Haftarah reading;
+    Dr. Michael Partensky - for encouragement and advise;
     Peter Ofman - for asking questions that prodded me to revive this project in 2011, after years of hiatus; Aron
     Matskin - for a discussion during his visit on Rosh Chodesh Mar Cheshvan 5772; Rabbi Chaim Prus - for causing me
-    to investigate which number does the year of Creation has - 0 or 1. </para>
+    to investigate which number does the year of Creation has - 0 or 1;
+    stackoverflow user <ulink url="https://stackoverflow.com/users/837133/ayvango">ayvango</ulink> -
+    for a <ulink url="https://stackoverflow.com/questions/1154571/scala-abstract-types-vs-generics/10891994#10891994">post</ulink>
+    that taught me how to encode family polymorphism in Scala with family members in separate files.
+  </para>
 </section>
+

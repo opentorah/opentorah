@@ -24,24 +24,15 @@ github_username:  dubinsky
 # If you want to link only specific pages in your header, uncomment
 # this and add the path to the pages in order as they should show up
 header_pages:
-  - README.md
+ - CHANGELOG.md
 
-# Build settings
 markdown: kramdown
 theme: minima
 
-include:
-  - README.md
+#include:
+#  - README.md
 
 exclude:
   - Gemfile
   - Gemfile.lock
   - tut
-
-defaults:
-  -
-    scope:
-      path: ""
-    values:
-      layout: "default"
-      math: false
