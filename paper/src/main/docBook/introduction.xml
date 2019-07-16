@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="introduction">
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="introduction">
   <para>Latest version of this paper and the code used to produce it are available from http://www.jewish-calendar.org/.</para>
 
   <title>Introduction</title>
@@ -89,4 +89,4 @@
         to investigate which number does the year of Creation has - 0 or 1;</para></listitem>
     </itemizedlist>
   </para>
-</section>
+</chapter>

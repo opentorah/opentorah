@@ -6,8 +6,26 @@
   exclude-result-prefixes="db">
 
   <!-- Break before each section -->
-  <xsl:attribute-set name="section.title.level1.properties">
-    <xsl:attribute name="break-before">page</xsl:attribute>
-  </xsl:attribute-set>
+<!--  <xsl:attribute-set name="section.title.level1.properties">-->
+<!--    <xsl:attribute name="break-before">page</xsl:attribute>-->
+<!--  </xsl:attribute-set>-->
 
+  <!-- No Appendix in the Book TOC : TODO does not work! -->
+  <xsl:template match="section[@role = 'NotInToc']"  mode="toc" />
+
+  <!-- No TOC in Chapter or Section -->
+  <xsl:param name="generate.toc">
+    appendix  nop
+    article/appendix  nop
+    article   toc,title
+    book      toc,title,figure,table,example,equation
+    chapter   nop
+    part      toc,title
+    preface   toc,title
+    qandadiv  toc
+    qandaset  toc
+    reference toc,title
+    section   nop
+    set       toc,title
+  </xsl:param>
 </xsl:stylesheet>

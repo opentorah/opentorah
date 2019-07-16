@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section xml:id="leap-years-cycle" xmlns="http://docbook.org/ns/docbook" version="5.0">
-  <title>Calculate Meton's cycle</title>
+<chapter xml:id="leap-years-cycle" xmlns="http://docbook.org/ns/docbook" version="5.0">
+  <title>Meton's cycle</title>
 
   <para>
   Show why 19-years cycle is the best.
@@ -38,4 +38,4 @@
 
   <para>QUESTION: in what sense is this an optimal correspondence?
   and for different cycle lengths? It is possible that true Sun calculations are needed to answer those questions...</para>
-</section>
+</chapter>

@@ -54,8 +54,6 @@ trait Time2Rotation {
     calculate(rational.whole) + Rotation.fromRational(rational.fraction*one.toRational, 6)
   }
 
-  final def calculated(key: Key): Rotation = one*key.number
-  final def calculatedAlmagest(key: Key): Rotation = (almagestValue*key.number).roundTo(precision(key))
   protected def precision(key: Key): Digit = Digit.SECONDS
 
   final def calculateExact(days: Int): Rotation = rambamValue*days
