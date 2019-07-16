@@ -1,6 +1,6 @@
 plugins {
+  id 'org.podval.docbook-gradle-plugin' version '0.7.8'
   id 'scala'
-  id 'org.podval.docbook-gradle-plugin' version '0.7.7'
 }
 
 dependencies {
@@ -38,7 +38,3 @@ docBook {
 
 // Remove trailing period after honorific
 // docBook.parameters.common = [ "punct.honorific": "" ]
-
-// TODO why do I need to do this in addition to the DocBook plugin doing it already?
-processDocBook.dependsOn classes
-build.dependsOn processDocBook

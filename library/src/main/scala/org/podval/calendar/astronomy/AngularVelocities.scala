@@ -26,11 +26,12 @@ import org.podval.calendar.numbers.BigRational
 object AngularVelocities {
 
   def main(args: Array[String]): Unit = {
-    MoonAnomalyMean.exactify
+//    SunLongitudeMean.exactify
+    SunApogee.exactify // TODO doesn't work!
+
+//    MoonAnomalyMean.exactify
     //    MoonLongitudeMean.exactify
     //    MoonHeadMean.exactify
-    //    SunLongitudeMean.exactify
-    //    SunApogee.exactify // TODO doesn't work!
   }
 
   def sunLongitudeMean(): Unit = {

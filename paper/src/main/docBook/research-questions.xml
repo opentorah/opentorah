@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section xml:id="research-questions" xmlns="http://docbook.org/ns/docbook" version="5.0">
+  <title>Research Questions</title>
+  
+  <section>
+    <title>Fixed Calendar</title>
+    
+    <section>
+      <title>New moon from 6:7</title>
+      
+      <para>Rambam mentiones Nisan conjunction on Sunday, 5 hours and 107 units parts after sunrise.
+        He doesn't give the year, and there seems to be no such year...</para>
+    </section>
+    
+    <section>
+      <title>RoshHaShono corrections</title>
+      
+      <itemizedlist>
+        <listitem><para>are there meaningful names for the corrections?</para></listitem>
+        <listitem><para>are corrections explained by the desire to not have Yom Kippur on Sunday etc.?</para></listitem>
+        <listitem><para>calculate third correction from the maximum length of a year and the first correction</para></listitem>
+        <listitem><para>KH 7:8 says that postponement of RoshHaShonoh is done to align the calendar better
+          with the true molad; analyze the statistics of distances between mean and true molad
+          and RoshHashono.</para></listitem>
+      </itemizedlist>
+      
+      <para>There is an argument concerning some of the Rosh Hashono delays involving r. Saadia Gaon:
+        https://he.wikipedia.org/wiki/%D7%9E%D7%97%D7%9C%D7%95%D7%A7%D7%AA_%D7%A8%D7%91_%D7%A1%D7%A2%D7%93%D7%99%D7%94_%D7%92%D7%90%D7%95%D7%9F_%D7%95%D7%91%D7%9F_%D7%9E%D7%90%D7%99%D7%A8
+        Спор о размерах "старого молада", когда он отодвигает Рош ашана на следующий день.
+        По нашей шите от Расага и дальше - 18 часов
+        По шите Аарона Бен Меира - 18 часов и 642/1080 частей часа</para>
+      
+      <para>make possible calculating the calendar according to the other opinion and compare the results.</para>
+      
+      <para>Молад года творения человека выходит в пятницу.
+        Это и было Рош а-Шана второго года, ведь тогда принцип ли аду Рош не применялся.
+        Тогда понятней спор Рамбама и Райвада о причине сдвига Рош а-Шана ло аду.
+        Рамбама настаивает, что оно нужно для подсчёта по кибуц эмцаи,
+        а Райвад на него из Талмуда возмущается.
+        Теоретически можно сделать календарь на время до установления календаря без сдвига Рош а-Шана.</para>
+    </section>
+    
+    <section>
+      <title>Sun Cycle</title>
+      
+      <para>Where and when was the Sun created?
+        Compare with Rambam's epoch from the astronomical calendar.
+        Where and how is date of birchat hachamo defined?
+        How would it look according to the other opinion?</para></section>
+    
+    <section>
+      <title>Seasons</title>
+      
+      <para>Rav Ada's tkufos started a week later than Shmuel's! Isn't it readily observable?
+        Analyze the difference in historic periods...</para>
+    </section>
+  </section>
+  
+  
+  <section>
+    <title>Astronomical Calendar</title>
+    
+    <section>
+      <title>Epoch</title>
+      <itemizedlist>
+        <listitem><para>when was the Sun created?</para></listitem>
+        <listitem><para>introduce "creation" epoch.</para></listitem>
+        <listitem><para>compare calculations based on it and on the Rambam's epoch.</para></listitem>
+        <listitem><para>make possible calculations for a Moment, not just a Day (at least for the sun);</para></listitem>
+      </itemizedlist>
+    </section>
+    
+    <section>
+      <title>Math.findZero()</title>
+      <para>Finish and test the code; use two separate lengths (precisions)?</para>
+    </section>
+    
+    <section>
+      <title>Seasons</title>
+      <para>calculate true seasons in SeasonsAstronomical;
+        KH 10:7 says that real vernal equinox is approximately two days before the mean one; add a test.</para></section>
+    
+    <section>
+      <title>Exactification</title>
+      <para>Tzikuni gives the algorithm of such reconstruction:
+        add to the remainder as many times 360 as there were full rotations in given time period,
+        and then divide... find the page for exact reference;
+        use it to calculate intervals for Rambam's values of the angular velocities</para></section>
+    
+    <section>
+      <title>Angular movement for 29 days</title>
+      
+      <para>Are Rambam's values reconstructible if value for 29 days is calculated as 3*10-1, not 2*10+9?
+        For any tables other than SunLongitudeMean?</para></section>
+    
+    <section>
+      <title>Angular speeds from periods</title>
+      
+      <para>Convert each year length mentioned in the fixed calendar to angular speed.
+        Angular speed of the moon = 360 / (1/tropical month + 1/solar year).
+        Moon.meanLunarPeriod - what is it called? Tropical?</para></section>
+    
+    <section>
+      <title>Distance between the mean and true new moons</title>
+      
+      <para>KH 5:1-2 says that the distance is no more than a day.
+        Calculate this difference for all months;
+        Rambam's epoch - two days after molad?! (Petya Ofman).</para></section>
+    
+    <section>
+      <title>Day of sighting</title>
+      
+      <para>How to find the day of sighting given a month?</para></section>
+  </section>
+  
+  <section>
+    <title>Schedule</title>
+    
+    <section>
+      <title>Shulchan Aruch</title>
+      <para>Magen Avraham 428:4 (6): When Pesach falls on Shabbat, so that residents of the Land of Israel
+        read Shmini on the Shabbat following it, there are those that split Tazria and Metzora,
+        and there are those that split Behar and Bechukotai, and if the year is leap, they split
+        Matot and Masai.</para></section>
+    
+    <section>
+      <title>Baladi (Yemenite)</title>
+      <para>instead of Matot and Masai combine Chukat and Balak</para></section>
+    
+    <section>
+      <title>Daradaim</title>
+      <para>(following Rabbi Saadia Gaon): instead of combining Matot and Masai,
+        add to Korach Chukat to 20:21, and next Shabbos read the rest of Chukkat and Balak</para></section>
+    
+    <section>
+      <title>3 small aliyot</title>
+      <para>for 2/5/Shabbos day: look into and implement differences in customs</para></section>
+    
+    <section>
+      <title>Проблемы календаря, который устанавливался по свидетельствам наблюдения новой луны.</title>
+      <para>Отличается от расчитанного:</para>
+      <itemizedlist>
+        <listitem><para>основан не на среднем движении солнца и луны, поэтому к молад надо делать поправку, но не путем отодвигания Рош
+          а-шана, а методами последних глав Кидуш а-ходеш</para></listitem>
+        <listitem><para>другой порядок високосных и простых лет</para></listitem>
+        <listitem><para>другой порядок полных и неполных месяцев</para></listitem>
+        <listitem><para>возможно ли рассчитать по Рамбаму начало месяцев по этим принципам и сравнить с завиксированныму в традиции датами
+          и днями недели?</para></listitem>
+        <listitem><para>Пример: выход из Египта - 15 день от освящения месяца, четверг</para></listitem>
+        <listitem><para>Год рождения Моше: спор был ли год високосным или простым. Шита Ребе - год был високосным.</para></listitem>
+      </itemizedlist></section>
+    
+    <section>
+      <title>3-year cycle</title>
+      <para>Is anybody orthodox completing Torah cycle in three years?
+        If yes, maybe we should generate that schedule too.
+        Here is the list of Haftarot: https://www.google.com/url?q=https://faculty.biu.ac.il/~ofery/papers/haftarot3.pdf</para></section>
+  </section>
+</section>

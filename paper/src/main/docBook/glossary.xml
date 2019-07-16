@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="http://docbook.org/xml/5.0/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<?xml-model href="http://docbook.org/xml/5.0/rng/docbook.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<glossary xmlns="http://docbook.org/ns/docbook" version="5.0">
-    <title>Glossary Database</title>
+<glossary xml:id="glossary" xmlns="http://docbook.org/ns/docbook" version="5.0">
+    <title>Glossary</title>
     
     <glossdiv>
-        <title>Astronomical terms</title>
+      <title>Astronomical terms</title>
 
-        <glossentry xml:id="xml" xreflabel="longitude">
-            <glossterm>Longitude</glossterm>
-            <acronym>XML</acronym>
-            <glossdef>
-                <para>The definition of the XML language goes here.</para>
-                <glossseealso otherterm="sgml">SGML</glossseealso>
-            </glossdef>
-        </glossentry>
+      <glossentry xml:id="gva-hashemesh">
+        <glossterm>Sun's apogee</glossterm>
+        <glossdef>
+          <para>Point on the orbit of the Sun where it is highest above the Earth.</para>
+        </glossdef>
+      </glossentry>
 
+      <glossentry xml:id="mla-term">
+        <glossterm>mean lunar anomaly (אמצע המסלול)</glossterm>
+        <acronym>mla</acronym>
+        <glossdef>
+          <para>Mean angular coordinate of the Moon on its epicicle.</para>
+        </glossdef>
+      </glossentry>
     </glossdiv>
 </glossary>

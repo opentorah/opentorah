@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section xml:id="rambam-summary" xmlns="http://docbook.org/ns/docbook" version="5.0">
+  <title>Table of contents of Rambam's Kiddush HaChodesh</title>
+  
+  <section>
+    <title>General</title>
+    
+    <section>
+      <title>Chapter 1</title>
+      <section><title>Law 1</title> <para>Month is lunar; year is solar.</para></section>
+      <section><title>Law 2</title><para>Solar year is ~11 days longer than the lunar;
+        when discrepancy accumulates to ~30 days, year is made leap.</para></section>
+      <section><title>Law 3</title><para>Moon is not seen for ~1 day before and after the conjunction;
+        first night when the Moon is sighted - Rosh Chodesh; next Rosh Chodesh:
+        if it is sighted on the night of the 30th day - 30th; if not - 31st.</para></section>
+      <section><title>Law 4</title><para>Short/full month.</para></section>
+      <section><title>Laws 5-8</title><para>Court calculates in a manner _resembling_ the calculations of the astronomers.</para></section>
+    </section>
+    
+    <section>
+      <title>Chapter 2</title>
+      <section><title>Laws 1-10</title><para> Court procedure.</para></section>
+    </section>
+    
+    <section>
+      <title>Chapter 3</title>
+      <section><title>Laws 1-19</title><para> Court procedure; messengers.</para></section>
+    </section>
+    
+    <section>
+      <title>Chapter 4</title>
+      <section><title>Laws 1-2</title><para> Leap year - additional Adar;
+        Pesach (15th of Nisan) must in the spring: not before the day of vernal equinox
+        (Sun enters Aries, see 9:3) and before the next summer solstice.</para></section>
+      <section><title>Laws 3-8</title><para> Other reasons for leaping the year;
+        (Succos after the autumnal equinox - not mentioned in Rambam.)</para></section>
+      <section><title>Laws 9-17</title><para> Court procedure.</para></section>
+    </section>
+  </section>
+  
+  <section>
+    <title>Arithmetic calendar</title>
+    
+    <section>
+      <title>Chapter 5</title>
+      <section><title>Laws 1-2</title><para> Introduction; discrepancy with observations: -1…+1 day (+1 - very rare).</para></section>
+      <section><title>Law 2</title><para> Fixed Rosh Hodesh: sighting of the Moon can be +/- 1 day; +2 - extremely rare.</para></section>
+      <section><title>Law 3</title><para> When started.</para></section>
+      <section><title>Laws 4-12</title><para> Second day of festivals.</para></section>
+      <section><title>Law 13</title><para> Conclusion.</para></section>
+    </section>
+    
+    <section>
+      <title>Chapter 6</title>
+      <section><title>Law 1</title><para> "Molad" - approximate conjunction (Sun. Moon and Earth on the same line).</para></section>
+      <section><title>Law 2</title><para> day = 24 hours; 1 hour = 1080 parts.</para></section>
+      <section><title>Law 3</title><para> Lunar month (between conjunctions) = 29d12h793p.</para></section>
+      <section><title>Law 4</title><para> Lunar year (12 lunar months) = 354d8h876p = 354d8h48m40s;
+        Leap lunar year (13 lunar months) = 383d21h589p;
+        Solar year = 365d6h (see also 9:1, 10:6);
+        longer than the lunar year by 10d21h204p.</para></section>
+      <section><title>Law 5</title><para> Lunar month % 7 = 1d12h793p; lunar year % 7 = 4d8h876p; leap year % 7 = 5d21h589p.</para></section>
+      <section><title>Law 7</title><para> if molad Nisan - Sunday, 5h107p after sunrise, next month - Iyar: Tuesday night, 5h900p.</para></section>
+      <section><title>Law 8</title><para> First conjunction - Tishrei, year #1: Monday, 5h204p (just subtract % from the next one :))
+        Conjunction of Rosh Hashono of Adam's creation (year #2, see Shmita and Yovel 10:2): Friday, 6h.</para></section>
+      <section><title>Law 9</title><para> We do not need the number of days, just the remainders.</para></section>
+      <section><title>Law 10</title> <para>19 year cycle (12+7 leap); because the difference between 19 solar years and
+        the cycle is less than a day: 1h485p.</para></section>
+      <section><title>Law 11</title><para> Leap years: 3,6,8,11,14,17,19.</para></section>
+      <section><title>Law 12</title><para> cycle % 7 = 2d16h595p.</para></section>
+    </section>
+    
+    <section>
+      <title>Chapter 7</title>
+      <section><title>Law 1</title><para> Rosh Hashono gets pushed off from Sunday, Wednesday, Friday.</para></section>
+      <section><title>Law 2</title><para> Gets pushed off if molad is after noon (Molad Zoken).</para></section>
+      <section><title>Law 3</title><para> ADU applies after noon push-off also.</para></section>
+      <section><title>Law 4</title><para> Non-leap year, if molad is at night of the 3rd day after 9h204p: push off to Thursday (or the year willbe too long).</para></section>
+      <section><title>Law 5</title><para> Year after leap one, Monday, after 5h589p: push to Tuesday.</para></section>
+      <section><title>Law 7</title><para> ADU - why?</para></section>
+    </section>
+    
+    <section>
+      <title>Chapter 8</title>
+      <section><title>Law 1</title><para> -> 6.3</para></section>
+      <section><title>Law 2</title><para> Month - 29 or 30 days.</para></section>
+      <section><title>Laws 5-6</title><para> Same?</para></section>
+      <section><title>Law 7</title><para> TODO</para></section>
+      <section><title>Law 8</title><para> TODO</para></section>
+    </section>
+    
+    <section>
+      <title>Chapter 9</title>
+      <section><title>Law 2</title><para> 1/4 of the year between seasons (91d 7.5h).</para></section>
+      <section><title>Law 3</title><para> Nisan (Spring) - Aries; Tammuz - Cancer; Tishrei - Libra; Teves - Cap.?
+        Vernal equinox of year #1 = 7d9h642p before conjunction of Nisan. Notes 5,7 in Moznaim edition.
+        Every year seasons move 30h; in 28 years - in the same place.</para></section>
+      <section><title>Law 5</title><para> Vernal equinox, year 4930: midnight, 5th day, 8th of Nisan.</para></section>
+      <section><title>Laws 6-8</title><para> Simplified procedure.</para></section>
+      <section><title>Law 7</title><para> Real seasons - 2 days before average ones.
+        Note 5: 1st hour of the 4th day of creation; 1st vernal equinox.
+        Autumnal: Wednesday, 3 hours after daybreak, 1d23h before conjunction of Tishrei.</para></section>
+    </section>
+    
+    <section>
+      <title>Chapter 10</title>
+      <section><title>Law 1</title><para> More precise length of a solar year. Moments.</para></section>
+      <section><title>Law 2</title><para> Seasons for this year length.</para></section>
+      <section><title>Law 3</title><para> Vernal equinox of year #1 - 9h642p before conjunction of Nisan.
+        (Differenbt from 9:3: Rav Ada follows Rabbi Yehoshua - world created in Nisan;
+        Shmuel (9:3) follows Rabbi Eliezer - world created in Tishrei.)
+        Every first year of the 19-year cycle.</para></section>
+      <section><title>Law 4</title><para> 1/4 of the year between seasons (91d7h519p31m).</para></section>
+      <section><title>Law 5</title><para> Simplified procedure.</para></section>
+      <section><title>Law 6</title><para> This more precise calculation of seasons was used by Sanhedrin to leap the year because of the spring equinox.</para></section>
+      <section><title>Law 7</title><para> Real vernal equinox approximately 2 days before either of these calculations.</para></section>
+    </section>
+  </section>
+  
+  <section>
+    <title>Atronomical Calculations</title>
+    
+    <section>
+      <title>Chapter 11</title>
+      <section><title>Laws 1-4</title><para> Visibility calculations are deep. Fixed calendar can be appreciated even by school children in 3 or 4 days.</para></section>
+      <section><title>Laws 5-6</title><para> Calculations are simplified/approximated to not fluster the inexprerienced; result - visibility of the moon - is not affected.</para></section>
+      <section><title>Laws 7-9</title><para> 360 degrees; 60 minutes, seconds...; order of the 12 constellations.</para></section>
+      <section><title>Laws 10-12</title><para> adding/subtracting angles.</para></section>
+      <section><title>Laws 13-14</title><para> Velocities are constant. Earth encircled by all the spheres but isn't in the center. Notes 14,15 in Moznaim.</para></section>
+      <section><title>Law 15</title><para> Mean and true motion.</para></section>
+      <section><title>Law 16</title><para> Epoch.</para></section>
+      <section><title>Law 17</title><para> Location: Jerusalem; see Chapter 17.</para></section>
+    </section>
+    <section>
+      <title>Chapter 12</title>
+      <section><title>Law 1</title><para> Movement of the Sun. Moznaim Note 6: calculations may be accurate only on the first day of the month; Note 7.
+        59′8.33″ Yale, p.99; Neugeb., p. 388ff</para></section>
+      <section><title>Law 2</title><para> Movement of the Sun's apogee. Moznaim Note 10: over 800 years, apogee moved ~12 degrees and is in constellation of Cancer.
+        Note 11: position - at 6PM.</para></section>
+    </section>
+    <section>
+      <title>Chapter 13</title>
+      <section><title>Laws 1-3</title><para> Tue position of the Sun.</para></section>
+      <section><title>Law 4</title><para> Course correction table.</para></section>
+      <section><title>Laws 5-10</title><para> Examples.</para></section>
+      <section><title>Law 11</title><para> True seasons.</para></section>
+    </section>
+    <section>
+      <title>Chapter 14</title>
+      <section><title>Law 1</title><para> Moon: epicycle and deferent; movement as seen from Earth. See Moznaim notes!</para></section>
+      <section><title>Law 2</title><para> Deferrent table.</para></section>
+      <section><title>Law 3</title><para> Epicycle table.</para></section>
+      <section><title>Law 4</title><para> Epoch.</para></section>
+      <section><title>Law 5</title><para> Time of sighting correction table: ~20 minutes after sunset.</para></section>
+    </section>
+    <section>
+      <title>Chapter 15</title>
+      <section><title>Laws 1-2</title><para> Double elongation and its limits. See Moznaim notes!</para></section>
+      <section><title>Laws 3-5</title><para> Course correction table.</para></section>
+      <section><title>Laws 4-7</title><para> Parallax correction rules and table.</para></section>
+      <section><title>Laws 8-9</title><para> Examples.</para></section>
+    </section>
+    <section>
+      <title>Chapter 16</title>
+      <section><title>Laws 1-4</title><para> Head movement, table and rules.</para></section>
+      <section><title>Law 5</title><para> Example.</para></section>
+      <section><title>Laws 6-18</title><para> Moon latitude.</para></section>
+      <section><title>Law 19</title><para> Example.</para></section>
+    </section>
+    <section>
+      <title>Chapter 17</title>
+    </section>
+    <section>
+      <title>Chapter 18</title>
+    </section>
+    <section>
+      <title>Chapter 19</title>
+    </section></section>
+</section>

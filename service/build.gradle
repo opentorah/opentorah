@@ -1,28 +1,9 @@
-/*
-I do not use 'com.bmuschko.docker-java-application' because I want to separate third-party dependencies in a
-different layer from the org.podval ones to speed up pushes.
-
-I do not use 'com.bmuschko.docker-remote-api' because I don't need to: Google Cloud Build step takes care
-of Docker image creation and push.
-
-If I did, this is how I'd do it:
-  task buildDockerImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage, dependsOn: prepareDockerContext) {
-    group = "docker"
-    inputDir = dockerDir
-    tag = "gcr.io/calendar-service-1/service".toString()
-  }
-
-  id 'com.bmuschko.docker-remote-api' version '4.0.5' apply false
-  id 'com.bmuschko.docker-java-application' version '4.0.5' apply false
-*/
-
 plugins {
   id 'scala'
   id 'application'
 }
 
 description = 'Jewish Calendar Service.'
-
 
 dependencies {
 //    compile "org.scala-lang:scala-library:$scalaVersion"
@@ -49,7 +30,7 @@ dependencies {
 
 mainClassName = 'org.podval.calendar.service.CalendarService'
 
-def dockerDir = file("$buildDir/docker/")
+final File dockerDir = file("$buildDir/docker/")
 
 task prepareDockerContext {
   group = "docker"

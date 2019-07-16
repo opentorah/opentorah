@@ -65,16 +65,18 @@ trait Time2Rotation {
 
   final def exactify: Interval = {
     val exact = Seq(Key.Ten, Key.Hundred, Key.Thousand, Key.TenThousand) // Key.all
-      .map(exactify).reduce(_ intersect _)
+      .filterNot(value(_).isZero)
+      .map(exactify)
+      .reduce(_ intersect _)
     println(s"exact: $exact")
     exact
   }
 
-  final def exactify(key: Key): Interval = {
-    val small = one
+  private final def exactify(key: Key): Interval = {
+    val small = if (!one.isZero) one else ten
     val big = value(key)
     val mult = key.number
-    val exactificator = new Exactify(small, mult, Angles.Digit.SECONDS.position, big)
+    val exactificator = new Exactify(small, if (!one.isZero) mult else mult/10, Angles.Digit.SECONDS.position, big)
     val (fit, fitLength) = exactificator.findFit
     val expanded = exactificator.expand(fit, fitLength, 6)
     println(s"$expanded (6)    $small * $mult -> $big: $fit ($fitLength)")
