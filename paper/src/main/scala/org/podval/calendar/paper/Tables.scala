@@ -1,14 +1,30 @@
 package org.podval.calendar.paper
 
 import org.podval.calendar.angles.Angles.Rotation
-import org.podval.calendar.astronomy.{MoonAnomalyVisible}
-
-import scala.math.{sin, cos, tan, round}
-
+import scala.math.{cos, round, sin, tan}
 import java.io.File
+
+import org.podval.calendar.astronomy.{Time2Rotation, SunLongitudeMean}
+import Time2Rotation.Key
 
 
 object Tables {
+
+  def main(args: Array[String]): Unit = {
+    val directory = new File(if (!args.isEmpty) args(0) else "/tmp/xxx/tables/")
+    directory.mkdirs
+
+    velocityOriginal(SunLongitudeMean).write(directory, "slm-original", Seq(Key.One, Key.Ten, Key.Hundred, Key.Thousand, Key.TenThousand))
+  }
+
+  private def velocityOriginal(data: Time2Rotation): Table[Key] = {
+    val days = Column[Key]("days", "n", _.number)
+    val value = Column[Key]("value", "v(n)", data.value)
+    val calculated = Column[Key]("calculated", "v(1)*n",
+      (key: Key) => (data.one*key.number).canonical)
+
+    new Table(days, value, calculated)
+  }
 
 //  private def mvaTables(data: Map[Angle, Angle]) = {
 //      def e(a: Angle, v: Angle) = {
@@ -40,10 +56,4 @@ object Tables {
 //
 //  private[this] def sort[A <: Ordered[A], B](map: Map[A, B]): List[(A, B)] = map.toList.sortWith((l, r) => (l._1 < r._1))
 //  tables("mva", sort(MoonAnomalyVisible), mvaTables)
-
-  def main(args: Array[String]): Unit = {
-    val directory = new File(if (!args.isEmpty) args(0) else "/tmp/xxx/tables/")
-    directory.mkdirs
-    Days2AngleTables.get foreach (_.write(directory))
-  }
 }
