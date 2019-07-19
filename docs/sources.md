@@ -1,8 +1,5 @@
 # Sources
 
-## Calendar
-Rambam, Laws of the Sanctification of the Moon, Chapters 6-10
-
 ## Torah readings
 
 Shulchan Aruch Orach Chaim (and Mishna Brura):
