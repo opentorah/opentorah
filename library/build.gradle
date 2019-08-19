@@ -15,16 +15,21 @@ dependencies {
 
   testCompile "org.scalacheck:scalacheck_$scalaVersionMajor:$scalacheckVersion"
   testCompile "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
-  testRuntime "org.pegdown:pegdown:$pegdownVersion" // for scalatest reports
+  testCompile "org.typelevel:discipline-scalatest_$scalaVersionMajor:$disciplineScalatestVersion"
+
+  testRuntime "org.pegdown:pegdown:$pegdownVersion" // for scalatest reports; dead...
+  // TODO looks like newer version use this instead:
+  testRuntime "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"
 
   testCompile "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
   testCompile "org.typelevel:algebra-laws_$scalaVersionMajor:$algebraLawsVersion"
+}
 
-  //testCompile "org.typelevel:cats-laws_$scalaVersionMajor:$catsVersion"
-  //testCompile "org.typelevel:cats-testkit_$scalaVersionMajor:$catsVersion"
-  // incompatible with 0.10.1 that http4s uses!
-  //testCompile "org.typelevel:cats-effect_$scalaVersionMajor:1.1.0"
-  //testCompile "org.typelevel:algebra_$scalaVersionMajor:1.0.0"
+// TODO upgrade to latest ScalaTest when it stabilizes; force for now.
+configurations.all {
+  resolutionStrategy {
+    force("org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion")
+  }
 }
 
 task sourceJar(type: Jar) {

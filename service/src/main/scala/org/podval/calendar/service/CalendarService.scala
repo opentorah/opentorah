@@ -1,6 +1,6 @@
 package org.podval.calendar.service
 
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.{Blocker, ExitCode, IO, IOApp}
 import cats.implicits._
 import org.http4s.{Charset, HttpRoutes, QueryParamDecoder, Response, StaticFile}
 import org.http4s.implicits._
@@ -32,14 +32,15 @@ import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
  */
 object CalendarService extends IOApp {
 
-  private val blockingEc: ExecutionContextExecutorService =
+  private val blockingPool: ExecutionContextExecutorService =
     ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(2))
+  private val blocker: Blocker = Blocker.liftExecutorService(blockingPool)
 
   private val staticResourceExtensions: Seq[String] = Seq(".ico", ".css", ".js")
 
   private val calendarService: HttpRoutes[IO] = HttpRoutes.of[IO] {
     case request @ GET -> Root / path if staticResourceExtensions.exists(path.endsWith) =>
-      StaticFile.fromResource("/" + path, blockingEc, Some(request))
+      StaticFile.fromResource("/" + path, blocker, Some(request))
         .getOrElseF(NotFound())
 
     case GET -> Root
