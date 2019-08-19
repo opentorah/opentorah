@@ -1,146 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section xml:id="lunar-theory"
-         xmlns="http://docbook.org/ns/docbook" version="5.0"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
->
+<chapter xml:id="lunar-theory" xmlns="http://docbook.org/ns/docbook" version="5.0">
   <title>Lunar Theory</title>
 
-  <section>
-    <title>Chapter 14</title>
-
-    <section>
-      <title>Law 1: Two Movements of the Moon</title>
-
-      <para>Note: The first is "mean" - because it is corrected by the second, giving "true"?
+      <para>Law 1: Two Movements of the Moon: The first is "mean" - because it is corrected by the second, giving "true"?
         Why is the second "mean"? Because of the effects of the sun?</para>
-      <para>Note: Wrom what and in which direction are the angles measured?</para>
-    </section>
-
-    <section>
-      <title>Law 2: Movement in the Mean Lunar Longitude</title>
-
-      <xi:include href="data:mlm-original.xml"/>
+      <para>Note: From what and in which direction are the angles measured?</para>
 
       <para>
         Rambam uses ‘nimzes’ instead of ‘nimzo’ for 10000 days. Also, Rambam says
         "'ordered' year"; it was rendered as 254 in accordance with Law 12:1.
       </para>
 
-      <para> It is not clear how Rambam arrived at the values he gives. When
-        value of the movement in one day given by Rambam is multiplied by 29, 100 etc.,
-        the result is smaller than that of Rambam.
-        The following table compares printed and calculated values:</para>
-
-      <xi:include href="data:mlm-calculated.xml"/>
-
-      <para>
-        Moreover, the value of the movement of the mean lunar longitude in one day given by
-        <biblioref linkend="Almagest"/> IV 3 (H278)
-        (which, rounded to seconds, becomes Rambam's value) is even smaller, so Rambam's
-        numbers can not be explained by performing calculations with the long value from
-        Almagest and then rounding the results.
-      </para>
-
-      <para>
-        From the printed values it is possible to reconstruct the value of the
-        movement in mean lunar longitude in one day that Rambam used to calculate each of them:</para>
-      <!-- TODO
-      <xi:include href="mlm-reconstructed.xml"/>
-      -->
-
-      <para>
-        Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
-      </para>
-
-      <!-- TODO
-      <xi:include href="mlm-recalculated.xml"/>
-      -->
-
-      <para>
-        Values of the movement in one day apparently used by Rambam, if rounded to the seconds, all give the "official" Rambam's value.
-        Values calculated from the value reconstructed from the printed 10000 days movement, if rounded, produce the values Rambam published -
-        except for 354 days movement, which remains unexplained TODO!
-      </para>
-    </section>
-
-    <section>
-      <title>Law 3: Movement in the Mean Lunar Anomaly</title>
-
-      <xi:include href="data:mam-original.xml"/>
-
       <para>
         Rambam says "'ordered' year"; it was rendered as 254 in accordance with see Law 12:1.
         Also, this value is actually given in Law 4.
       </para>
 
-      <para>
-        It is not clear how Rambam obtained the values he gives.
-        When value of the movement in one day given by Rambam is
-        multiplied by 29, 100 etc., the result is bigger than what Rambam says!
-        The following table compares printed and calculated values:
-      </para>
-
-      <xi:include href="data:mam-calculated.xml"/>
+      <para>14: 5,6 TODO: Compare with 11:9, about Dli... Something is off!</para>
 
       <para>
-        Although the value of the movement of the mean lunar anomaly in one day given by
-        <biblioref linkend="Almagest"/> IV 3 (H278)
-        (which, rounded to seconds, becomes Rambam's value) is smaller, it is not small enough,
-        and Rambam's
-        numbers can not be explained by performing calculations with the long value from
-        Almagest and then rounding the results (TODO: table).
-      </para>
-
-      <para>
-        From the printed values it is possible to reconstruct the value of the
-        movement in mean lunar anomaly in one day that Rambam used to calculate each of them:</para>
-      <!-- TODO
-      <xi:include href="mam-reconstructed.xml"/>
-      -->
-
-      <para>
-        Following table compares the printed values with calculations based on the most "precise" reconstructed value - that for 10000 days.
-      </para>
-
-      <!-- TODO
-      <xi:include href="mam-recalculated.xml"/>
-      -->
-
-      <para>
-        Values of the movement in one day apparently used by Rambam, if rounded to the seconds, all give the "official" Rambam's value.
-        Values calculated from the value reconstructed from the printed 10000 days movement, if rounded, produce the values Rambam published -
-        except for 354 days movement, which remains unexplained TODO!
-      </para>
-
-      <para>
-        Here, everything is worse than in 14:2 TODO!!!
-      </para>
-    </section>
-
-    <section>
-      <title>Law 4: Position of the Moon on the Epoch</title>
-    </section>
-
-    <section>
-      <title>Law 5,6: Mean Lunar Longitude at Observation Time</title>
-
-      <para>
-        TODO: Compare with 11:9, about Dli... Something is off!
-      </para>
-    </section>
-  </section>
-
-  <section>
-    <title>Chapter 15</title>
-
-    <section>
-      <title>Law 1: Doubled Distance</title>
-    </section>
-
-    <section>
-      <title>Law 2,3: Corrected Mean Anomaly (Elongation (TODO: ?))</title>
-
-      <para>
+        15:2,3: Corrected Mean Anomaly (Elongation (TODO: ?)).
         Rambam does not describe the model behind this correction.
         Because the models Rambam did describe until now are the same
         as Almagest's models
@@ -167,12 +46,9 @@
         needs to be calculated correctly.
         TODO: How does Almagest calculate visible anomaly?
       </para>
-    </section>
 
-    <section>
-      <title>Law 4,5,6: True Lunar Longitude</title>
-
-      <para> Formulae:
+      <para>Law 4,5,6: True Lunar Longitude.
+        Formulae:
         $$ \tan ^{-1} \left({\sin \alpha \over \cos \alpha + \epsilon} \right) $$
 
         $R$ - radius of the big circle;
@@ -290,48 +166,42 @@
           </tbody>
         </tgroup>
       </informaltable>
-    </section>
 
+  <section xml:id="moon-questions">
+    <title>Questions</title>
     <section>
-      <title>Law 7,8,9:</title>
-      <para>
-        TODO!!!
+      <title>New moon from 6:7</title>
+      <para>Rambam mentiones Nisan conjunction on Sunday, 5 hours and 107 units parts after sunrise.
+        He doesn't give the year, and there seems to be no such year...
       </para>
     </section>
+    <section>
+      <title>Moon's mean period from astranomical models</title>
+      <para>
+        Angular speed of the moon = 360 / (1/tropical month + 1/solar year).
+        Moon.meanLunarPeriod - what is it called? Tropical?</para>
+    </section>
+    <section>
+      <title>Distance between mean and true new moon</title>
+      <para>
+        KH 5:1-2 says that the distance is no more than a day.
+        Calculate this difference for all months; Rambam's epoch - two days after molad?! (Petya Ofman).</para>
+      <para>How to find the day of sighting given a month?</para>
+    </section>
+    <section>
+      <title>Differences between arithmetic and observational calendars</title>
+      <para>
+        <itemizedlist>
+          <listitem><para>основан не на среднем движении солнца и луны, поэтому к молад надо делать поправку, но не путем отодвигания Рош
+            а-шана, а методами последних глав Кидуш а-ходеш</para></listitem>
+          <listitem><para>другой порядок високосных и простых лет</para></listitem>
+          <listitem><para>другой порядок полных и неполных месяцев</para></listitem>
+          <listitem><para>возможно ли рассчитать по Рамбаму начало месяцев по этим принципам и сравнить с завиксированныму в традиции датами
+            и днями недели?</para></listitem>
+          <listitem><para>Пример: выход из Египта - 15 день от освящения месяца, четверг</para></listitem>
+          <listitem><para>Год рождения Моше: спор был ли год високосным или простым. Шита Ребе - год был високосным.</para></listitem>
+        </itemizedlist>
+      </para>
+    </section>  
   </section>
-
-  <section>
-    <title>Questions</title>
-    <itemizedlist>
-      <listitem><para>New moon from 6:7: Rambam mentiones Nisan conjunction on Sunday, 5 hours and 107 units parts after sunrise.
-        He doesn't give the year, and there seems to be no such year...
-      </para></listitem>
-
-      <listitem>
-        <para>
-          Angular speed of the moon = 360 / (1/tropical month + 1/solar year).
-          Moon.meanLunarPeriod - what is it called? Tropical?</para></listitem>
-
-      <listitem>
-        <para>
-          Distance between the mean and true new moons: KH 5:1-2 says that the distance is no more than a day.
-          Calculate this difference for all months; Rambam's epoch - two days after molad?! (Petya Ofman).</para></listitem>
-
-      <listitem><para>How to find the day of sighting given a month?</para></listitem>
-    </itemizedlist>
-
-    <para>
-      Проблемы календаря, который устанавливался по свидетельствам наблюдения новой луны, в отличие от расчитанного:
-      <itemizedlist>
-        <listitem><para>основан не на среднем движении солнца и луны, поэтому к молад надо делать поправку, но не путем отодвигания Рош
-          а-шана, а методами последних глав Кидуш а-ходеш</para></listitem>
-        <listitem><para>другой порядок високосных и простых лет</para></listitem>
-        <listitem><para>другой порядок полных и неполных месяцев</para></listitem>
-        <listitem><para>возможно ли рассчитать по Рамбаму начало месяцев по этим принципам и сравнить с завиксированныму в традиции датами
-          и днями недели?</para></listitem>
-        <listitem><para>Пример: выход из Египта - 15 день от освящения месяца, четверг</para></listitem>
-        <listitem><para>Год рождения Моше: спор был ли год високосным или простым. Шита Ребе - год был високосным.</para></listitem>
-      </itemizedlist>
-    </para>
-  </section>
-</section>
+</chapter>

@@ -1,16 +1,17 @@
 package org.podval.calendar.service
 
-import cats.effect.IO
-import fs2.{Stream, StreamApp}
-import fs2.StreamApp.ExitCode
-import org.http4s.{Charset, HttpService, QueryParamDecoder, Request, Response, StaticFile}
-import org.http4s.dsl.io._ // missing something for Ok.map(): {GET, Root, OptionalQueryParamDecoderMatcher, Ok, NotFound}
+import cats.effect.{ExitCode, IO, IOApp}
+import cats.implicits._
+import org.http4s.{Charset, HttpRoutes, QueryParamDecoder, Response, StaticFile}
+import org.http4s.implicits._
+import org.http4s.dsl.io._
 import org.http4s.headers.`Content-Type`
 import org.http4s.MediaType
-import org.http4s.server.blaze.BlazeBuilder
+import org.http4s.server.blaze.BlazeServerBuilder
 import org.podval.judaica.metadata.{Language, LanguageSpec}
+import java.util.concurrent.Executors
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
 
 /*
   There is currently no need for the polished, public UI.
@@ -29,15 +30,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
   - communicate selective applicability of Purim/Shushan Purim readings;
   - add Nassi, Molad, Tehillim, Tachanun, Maariv after Shabbos...
  */
-object CalendarService extends StreamApp[IO] {
+object CalendarService extends IOApp {
+
+  private val blockingEc: ExecutionContextExecutorService =
+    ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(2))
 
   private val staticResourceExtensions: Seq[String] = Seq(".ico", ".css", ".js")
-  private def isStaticResource(path: String): Boolean = staticResourceExtensions.exists(path.endsWith)
-  private def serveStaticResource(path: String, request: Request[IO]): IO[Response[IO]] =
-    StaticFile.fromResource("/" + path, Some(request)).getOrElseF(NotFound())
 
-  private val calendarService: HttpService[IO] = HttpService[IO] {
-    case request @ GET -> Root / path if isStaticResource(path) => serveStaticResource(path, request)
+  private val calendarService: HttpRoutes[IO] = HttpRoutes.of[IO] {
+    case request @ GET -> Root / path if staticResourceExtensions.exists(path.endsWith) =>
+      StaticFile.fromResource("/" + path, blockingEc, Some(request))
+        .getOrElseF(NotFound())
 
     case GET -> Root
       :? OptionalLanguageQueryParamMatcher(maybeLanguage)
@@ -90,16 +93,17 @@ object CalendarService extends StreamApp[IO] {
   private def toLocation(location: Option[Location]): Location = location.getOrElse(Location.Diaspora)
 
   def renderHtml(content: String): IO[Response[IO]] = Ok(content).map(
-    _.withContentType(`Content-Type`(MediaType.`text/html`, Charset.`UTF-8`))
+    _.withContentType(`Content-Type`(MediaType.`text`.`html`, Charset.`UTF-8`))
   )
 
   // To be accessible when running in a docker container the server must bind to all IPs, not just 127.0.0.1:
-  private val builder: BlazeBuilder[IO] = BlazeBuilder[IO]
+  override def run(args: List[String]): IO[ExitCode] = BlazeServerBuilder[IO]
     .bindHttp(host = "0.0.0.0", port = getServicePort)
-    .mountService(calendarService, prefix = "/")
-
-  override def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, ExitCode] =
-    builder.serve
+    .withHttpApp(calendarService.orNotFound)
+    .serve
+    .compile
+    .drain
+    .as(ExitCode.Success)
 
   private def getServicePort: Int =
     scala.util.Properties.envOrNone("SERVICE_PORT").map(_.toInt).getOrElse(8090)

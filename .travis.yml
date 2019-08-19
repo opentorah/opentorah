@@ -4,7 +4,7 @@
 # and I am not planning on doing it now.
 language: scala
 scala: 2.12.8
-jdk: oraclejdk8
+#jdk: oraclejdk8
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/

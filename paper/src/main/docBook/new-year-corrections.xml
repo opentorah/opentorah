@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="new-year-corrections">
-  <title>RoshHaShono corrections</title>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="new-year-corrections">
+  <title>New Year corrections</title>
 
   <itemizedlist>
     <listitem><para>are there meaningful names for the corrections?</para></listitem>
@@ -30,4 +30,4 @@
 
   <para>Rav Ada's tkufos started a week later than Shmuel's! Isn't it readily observable?
     Analyze the difference in historic periods...</para>
-</section>
+</chapter>

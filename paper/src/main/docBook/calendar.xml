@@ -1,27 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE article
-  PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN"
-  "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd">
-<article xmlns="http://docbook.org/ns/docbook" version="5.0"
-         xmlns:xi="http://www.w3.org/2001/XInclude">
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "http://www.oasis-open.org/docbook/xml/5.0/docbook.dtd">
+<book xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude">
   <info>
     <title>Rambam on Calendar</title>
     <author><personname>Leonid Dubinsky</personname></author>
   </info>
 
   <xi:include href="introduction.xml"/>
-
   <xi:include href="new-year-corrections.xml"/>
-
   <xi:include href="solar-theory.xml"/>
   <xi:include href="lunar-theory.xml"/>
-
   <xi:include href="leap-years-cycle.xml"/>
-
-  <xi:include href="rambam-summary.xml"/>
-
   <xi:include href="translation/translation.xml"/>
-
   <xi:include href="glossary.xml"/>
   <xi:include href="bibliography.xml"/>
-</article>
+</book>
