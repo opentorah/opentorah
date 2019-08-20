@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section xml:id="laws-summary" xmlns="http://docbook.org/ns/docbook" version="5.0">
-  <title>Summary</title>
+<chapter xml:id="rambam-summary" xmlns="http://docbook.org/ns/docbook" version="5.0">
+  <title>Rambam: Summary</title>
 
   <section>
     <title>General</title>
@@ -207,4 +207,4 @@
     <section>
       <title>Chapter 19 (TODO)</title>
     </section></section>
-</section>
+</chapter>

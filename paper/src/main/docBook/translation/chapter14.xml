@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section
-  xmlns="http://docbook.org/ns/docbook" version="5.0"
-  xmlns:xi="http://www.w3.org/2001/XInclude"
->
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0">
   <title>Chapter 14</title>
 
-  <section>
+  <section role = "NotInToc">
     <title>Law 1</title>
 
     <para>The moon has two mean movements. The moon itself rotates on a small circle
@@ -17,7 +14,7 @@
       is called movement of the <glossterm>mean lunar longitude</glossterm> (אמצע הירח). </para>
   </section>
 
-  <section>
+  <section role = "NotInToc">
     <title>Law 2</title>
 
     <para>
@@ -32,7 +29,7 @@
     </para>
   </section>
 
-  <section>
+  <section role = "NotInToc">
     <title>Law 3</title>
     <para>
       Movement in mean lunar anomaly in one day is 13°3′54″.
@@ -42,7 +39,7 @@
     </para>
   </section>
 
-  <section>
+  <section role = "NotInToc">
     <title>Law 4</title>
 
     <para>
@@ -55,7 +52,7 @@
     </para>
   </section>
 
-  <section>
+  <section role = "NotInToc">
     <title>Law 5,6</title>
 
     <para> After you calculate mean lunar longitude at the
@@ -139,4 +136,4 @@
       <footnote><para>This is Law 6.</para></footnote>
     </para>
   </section>
-</section>
+</chapter>

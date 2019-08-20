@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section xmlns="http://docbook.org/ns/docbook" version="5.0">
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0">
   <title>Chapter 15</title>
 
-  <section>
+  <section role = "NotInToc">
     <title>Law 1</title>
 
     <para>
@@ -14,7 +14,7 @@
     </para>
   </section>
 
-  <section>
+  <section role = "NotInToc">
     <title>Law 2,3</title>
 
     <para>
@@ -82,7 +82,7 @@
     </informaltable>
   </section>
 
-  <section>
+  <section role = "NotInToc">
     <title>Law 4,5,6</title>
 
     <para xml:id="l15-4"> Then, see how many degrees is corrected lunar anomaly. If it
@@ -107,10 +107,10 @@
     </para>
   </section>
 
-  <section>
+  <section role = "NotInToc">
     <title>Law 7,8,9:</title>
     <para>
       TODO!!!
     </para>
   </section>
-</section>
+</chapter>
