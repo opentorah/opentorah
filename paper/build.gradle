@@ -1,5 +1,5 @@
 plugins {
-  id 'org.podval.docbook-gradle-plugin' version '0.7.8'
+  id 'org.podval.docbook-gradle-plugin'
   id 'scala'
 }
 
@@ -28,7 +28,7 @@ docBook {
     "symbol.font.family"   : "DejaVu Sans",
     // "footnote.font.size": "10"
     "body.font.master": "12",
-    "orderedlist.label.width": "2em" // Some space for the list labels TODO needed?
+    "orderedlist.label.width": "2em" // Some space for the list labels (is it needed?)
   ]
 
   mathJax {

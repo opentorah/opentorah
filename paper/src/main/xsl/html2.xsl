@@ -6,6 +6,6 @@
   <xsl:import href="html2-custom.xsl"/>
 
   <xsl:param name="img.src.path">images/</xsl:param>
-  <xsl:param name="base.dir">/home/dub/Projects/calendar/numbers-cleanup/paper/build/docBook/html2/</xsl:param>
+  <xsl:param name="base.dir">/home/dub/Projects/calendar/translation/paper/build/docBook/html2/</xsl:param>
   <xsl:param name="html.stylesheets">css/docBook.css</xsl:param>
 </xsl:stylesheet>
