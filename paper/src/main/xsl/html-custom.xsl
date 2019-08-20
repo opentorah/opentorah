@@ -4,7 +4,6 @@
   xmlns:db="http://docbook.org/ns/docbook"
   exclude-result-prefixes="db">
 
-
   <!-- Add MathJax support -->
   <xsl:template name="user.head.content">
     <script type="text/javascript">
@@ -12,5 +11,4 @@
     </script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML"/>
   </xsl:template>
-
 </xsl:stylesheet>
