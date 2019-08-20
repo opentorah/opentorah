@@ -8,7 +8,7 @@
   <xsl:import href="epub2-custom.xsl"/>
 
   <xsl:param name="img.src.path">images/</xsl:param>
-  <xsl:param name="base.dir">/home/dub/Projects/calendar/numbers-cleanup/paper/build/docBookTmp/epub2/</xsl:param>
+  <xsl:param name="base.dir">/home/dub/Projects/calendar/translation/paper/build/docBookTmp/epub2/</xsl:param>
   <xsl:param name="root.filename">calendar</xsl:param>
   <xsl:param name="epub.embedded.fonts"/>
 </xsl:stylesheet>
