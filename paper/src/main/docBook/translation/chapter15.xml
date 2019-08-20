@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section
-  xmlns="http://docbook.org/ns/docbook" version="5.0"
-  xmlns:xi="http://www.w3.org/2001/XInclude"
->
+<section xmlns="http://docbook.org/ns/docbook" version="5.0">
   <title>Chapter 15</title>
 
   <section>
     <title>Law 1</title>
 
     <para>
-      To find true lunar longitude (הירח האמיתי) on a specific day:
+      To find <glossterm linkend="tll-term">true lunar longitude</glossterm> on a specific day:
       First, calculate mean lunar longitude during observation time of the desired night.
       Also, calculate mean lunar anomaly and mean solar longitude for the same time.
       Then, subtract mean solar longitude from the mean lunar longitude and double the result.
-      This value is called <glossterm>doubled distance</glossterm> (מרחק הכפול).
+      This value is called <glossterm linkend="dd-term">doubled distance</glossterm> .
     </para>
   </section>
 

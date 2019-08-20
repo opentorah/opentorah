@@ -16,7 +16,21 @@
         <glossterm>mean lunar anomaly (אמצע המסלול)</glossterm>
         <acronym>mla</acronym>
         <glossdef>
-          <para>Mean angular coordinate of the Moon on its epicicle.</para>
+          <para>Mean angular coordinate of the Moon on its epicycle.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry xml:id="tll-term">
+        <glossterm>true lunar longitude (הירח האמיתי)</glossterm>
+        <glossdef>
+          <para>???</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry xml:id="dd-term">
+        <glossterm>doubled distance (מרחק הכפול)</glossterm>
+        <glossdef>
+          <para>???</para>
         </glossdef>
       </glossentry>
     </glossdiv>
