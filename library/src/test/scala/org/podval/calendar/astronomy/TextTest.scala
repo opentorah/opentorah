@@ -95,12 +95,10 @@ class TextTest extends FunSpec with Matchers {
         result.elongation shouldBe Rotation(17, 58, 6)
         result.doubleElongation shouldBe Rotation(35, 56, 12)
         result.moonLongitudeDoubleElongationCorrection shouldBe Rotation(5)
-        // TODO printing error in standard editions: 180.
-        // result.moonAnomalyTrue shouldBe Position(108, 21) // TODO got 108°21′46″
+        // result.moonAnomalyTrue shouldBe Position(108, 21)
         result.moonAnomalyTrue shouldBe Position(108)
         // KH 15:9
         result.moonAnomalyVisible shouldBe -Rotation(5, 1)
-        // TODO printing error in standard editions: 33.
         result.moonLongitudeTrueRaw shouldBe Position(48, 35, 39)
         result.moonLongitudeTrue shouldBe Zodiac.Taurus.at(Rotation(18, 36))
       }
@@ -165,7 +163,6 @@ class TextTest extends FunSpec with Matchers {
         result.moonCircuit shouldBe Rotation(1, 1)
         // KH 17:14
         result.longitude3 shouldBe Rotation(11, 28)
-        // TODO "this longitude is in Taurus" - but longitude3 isn't, so I get 1/6 instead of 1/5...
         // Am I supposed to look at moonTrueLongitude?!
         result.moonLongitude3Portion shouldBe BigRational(1, 5)
         result.moonLongitude3Correction shouldBe Rotation(2, 18)

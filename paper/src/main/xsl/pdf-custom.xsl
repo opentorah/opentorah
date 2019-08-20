@@ -10,7 +10,6 @@
 <!--    <xsl:attribute name="break-before">page</xsl:attribute>-->
 <!--  </xsl:attribute-set>-->
 
-  <!-- No Appendix in the Book TOC : TODO does not work! -->
   <xsl:template match="section[@role = 'NotInToc']"  mode="toc" />
 
   <!-- No TOC in Chapter or Section -->

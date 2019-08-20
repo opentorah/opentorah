@@ -25,7 +25,6 @@ object MoonSightable {
 
   // KH 17:16-21
   def forSightingLimits(arcOfSighting: Rotation, longitude1: Rotation): Boolean = {
-    // TODO is that what Rambam is saying?
     ((arcOfSighting > Rotation( 9)) && (longitude1 >= Rotation(13))) || // KH 17:17
     ((arcOfSighting > Rotation(10)) && (longitude1 >= Rotation(12))) || // KH 17:18
     ((arcOfSighting > Rotation(11)) && (longitude1 >= Rotation(11))) || // KH 17:19

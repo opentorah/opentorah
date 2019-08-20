@@ -2,7 +2,6 @@ package org.podval.calendar.astronomy
 
 import org.podval.calendar.angles.Angles.Rotation
 
-// TODO there are some diagrams in the Moznaim Rambam at this point.
 object SunLongitudeCorrection  {
   final val table: InterpolatedTable[Rotation] = new InterpolatedTable[Rotation] {
     // KH 13:4

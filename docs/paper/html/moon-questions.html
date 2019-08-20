@@ -80,7 +80,7 @@
             <div class="titlepage">
                <div>
                   <div>
-                     <h3 class="title"><a name="d0e343"></a>New moon from 6:7
+                     <h3 class="title"><a name="d0e354"></a>New moon from 6:7
                      </h3>
                   </div>
                </div>
@@ -94,7 +94,18 @@
             <div class="titlepage">
                <div>
                   <div>
-                     <h3 class="title"><a name="d0e348"></a>Moon's mean period from astranomical models
+                     <h3 class="title"><a name="d0e359"></a>Moznaim Rambam, KH 13:2f4
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>(13, 3, 53, 53) - as explanation of the value for 100 days (7 missing seconds)</p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="d0e364"></a>Moon's mean period from astronomical models
                      </h3>
                   </div>
                </div>
@@ -102,13 +113,56 @@
             <p>
                        Angular speed of the moon = 360 / (1/tropical month + 1/solar year).
                        Moon.meanLunarPeriod - what is it called? Tropical?
+                     
             </p>
          </div>
          <div class="section">
             <div class="titlepage">
                <div>
                   <div>
-                     <h3 class="title"><a name="d0e353"></a>Distance between mean and true new moon
+                     <h3 class="title"><a name="d0e369"></a>14:5 Moon Longitude Adjustment for Time of Seeing
+                     </h3>
+                  </div>
+               </div>
+            </div>
+                  See notes in Moznaim Rambam
+                  Sun longitude: mean or true?
+                  In 3rd and 7th lines, most editions incorrectly have 15.
+                
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="d0e373"></a>TODO Moznaim Rambam, KH 15:1f2
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                       double elongation = distance between moon's mean and apogee
+                       Moon longitude adjustment for double elongation: Moznaim Rambam, KH 15:2f3: discrepancy in the limits;
+                       encode the limits
+                     
+            </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="d0e378"></a>MoonSightable.forSightingLimits
+                     </h3>
+                  </div>
+               </div>
+            </div>
+                  is that what Rambam is saying?
+                
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="d0e382"></a>Distance between mean and true new moon
                      </h3>
                   </div>
                </div>
@@ -123,7 +177,7 @@
             <div class="titlepage">
                <div>
                   <div>
-                     <h3 class="title"><a name="d0e360"></a>Differences between arithmetic and observational calendars
+                     <h3 class="title"><a name="d0e389"></a>Differences between arithmetic and observational calendars
                      </h3>
                   </div>
                </div>
@@ -160,6 +214,53 @@
             <p>
                      
             </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="d0e414"></a>TimeToRotation.calculate()
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                       without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in KH 15:8-9 (see test);
+                       see if variations in this algorithms are logical: e.g., for 600, add for 1000 and subtract 4*for 100?
+                       see if the end result is stable when Rambam's "real" value is used with straight multiplication and rounding
+                       (abstract away the calculation mechaninsm).
+                     
+            </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="d0e419"></a>TODO Example in 15:8-9
+                     </h3>
+                  </div>
+               </div>
+            </div>
+                  moonAnomalyTrue - printing error in standard editions, 180 instead of 108;
+                  still 108&deg;21&#8242;46&#8243;, which doesn't round to 108&deg;21...
+                  moonLongitudeTrueRaw - printing error in standard editions, 33 instead of 35.
+                
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="d0e423"></a>TODO Example 17:13-14
+                     </h3>
+                  </div>
+               </div>
+            </div>
+                  "this longitude is in Taurus" - but longitude3 isn't, so I get 1/6 instead of 1/5...
+                
+         </div>
+         <div class="section">
+            <div class="titlepage"></div>
+            <p>TODO crescent calculations: KH 18-19!</p>
          </div>
       </div>
       <div class="navfooter">

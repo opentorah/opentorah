@@ -25,7 +25,6 @@ final class Calculation(
     epoch.sunLongitudeMean + calculators.sunLongitudeMean(daysAfterEpoch)
 
   // KH 12:2
-  // TODO Rambam says "the same way", but doesn't give value for 1 day...
   lazy val sunApogee: Position = epoch.sunApogee + calculators.sunApogee(daysAfterEpoch)
 
   // KH 13:1-3,5-6 (maslul; mnas hamaslul)
@@ -49,7 +48,6 @@ final class Calculation(
     epoch.moonAnomalyMean + calculators.moonAnomalyMean(daysAfterEpoch)
 
   // KH 15:1-3
-  // TODO Moznaim Rambam, KH 15:1f2: double elongation = distance between moon's mean and apogee
   lazy val elongation: Rotation = moonLongitudeMeanAtTimeOfSighting - sunLongitudeMean
   lazy val doubleElongation: Rotation = elongation * 2
 
@@ -132,6 +130,4 @@ final class Calculation(
     MoonSightable.forLongitude1(longitude1, inNortherlyInclinedConstellations)
       .orElse(MoonSightable.forArcOfSighting(arcOfSighting))
       .getOrElse(MoonSightable.forSightingLimits(arcOfSighting, longitude1))
-
-  // TODO crescent calculations: KH 18-19!
 }

@@ -6,6 +6,7 @@
     <title>Model (TODO)</title>
     <para>Figure out from the text directions of Sun's movements and what are the position angles from (look at the
       parallax correction stuff: subtract mean apogee from the mean Sun...).</para>
+    <para>TODO diagrams for the correction in Moznaim's Rambam.</para>
   </section>
 
   <section xml:id="exactification">
@@ -31,12 +32,19 @@
     <para>Use it to calculate intervals for Rambam's values of the angular velocities.</para>
     <para><biblioref linkend="Tzikuni"/> quotes Rambam's value for 354 days as 348°55′15″, but calculated value as
       348°55′9″, and notes that this "requires a little thought".</para>
+    <para>
+      TODO About apogee, Rambam says "the same way", but doesn't give value for 1 day...
+      Exactification requires extra attention, since there is no value for 1 day.
+      SunApogee rambamValue and almagestValue.
+    </para>
   </section>
 
   <section  xml:id="solar-movement-29">
     <title>Angular movement for 29 days (TODO)</title>
-    <para>Are Rambam's values reconstructible if value for 29 days is calculated as 3*10-1, not 2*10+9? For any tables
+    <para>Are Rambam's values reconstructible if value for 29 days is calculated as 3*v(10)-v(1), not 2*v(10)+9*v(1),
+      nor 29*vexact(1)? For any tables
       other than SunLongitudeMean?</para>
+
     <para> Values of the movement in one day apparently used by Rambam, if rounded to the seconds, give the "official"
       Rambam's value. Values calculated from the value reconstructed from the printed 10000 days movement, if rounded,
       produce the values Rambam published - except for 29 days, 354 days, and 10000 days which we use to calculate the
@@ -63,10 +71,12 @@
     <title>True seasons (TODO)</title>
     <para>calculate true seasons in SeasonsAstronomical; KH 10:7 says that real vernal equinox is approximately two days
       before the mean one; add a test.</para>
+    <para>SeasonsAstronomical.seasonForYear:  should this always be Nisan?</para>
   </section>
 
   <section xml:id="year-lengths">
     <title>Year lengths (TODO)</title>
     <para>Convert each year length mentioned in the fixed calendar to angular speed.</para>
+    <para>What year length does value for mean anomaly velocity given by Moznaim correspond?</para>
   </section>
 </chapter>

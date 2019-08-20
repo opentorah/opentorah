@@ -31,9 +31,6 @@ trait Time2Rotation {
 
   val rambamValue: Rotation
 
-  // TODO see if variations in this algorithms are logical: e.g., for 600, add for 1000 and subtract 4*for 100?
-  // TODO see if the end result is stable when Rambam's "real" value is used with straight multiplication and rounding
-  //   (abstract away the calculation mechaninsm).
   final def calculate(days: Int): Rotation = {
     val tenThousands: Int =  days          / 10000
     val thousands   : Int = (days % 10000) /  1000
@@ -45,7 +42,6 @@ trait Time2Rotation {
     tenThousand*tenThousands +
       thousand*thousands +
       hundred*hundreds +
-      // TODO without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in KH 15:8-9 (see test).
       (if (lessThanHundred == 29) month else ten*tens + one*ones)
   }
 

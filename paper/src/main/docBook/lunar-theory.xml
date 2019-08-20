@@ -5,8 +5,11 @@
       <para>Law 1: Two Movements of the Moon: The first is "mean" - because it is corrected by the second, giving "true"?
         Why is the second "mean"? Because of the effects of the sun?</para>
       <para>Note: From what and in which direction are the angles measured?</para>
+      <para>Anomaly (and head?): opposite direction!</para>
+  <para>TODO MoonHeadMean rambamValue and almagestValue</para>
 
-      <para>
+
+  <para>
         Rambam uses ‘nimzes’ instead of ‘nimzo’ for 10000 days. Also, Rambam says
         "'ordered' year"; it was rendered as 254 in accordance with Law 12:1.
       </para>
@@ -76,9 +79,6 @@
         value of e for them is way out of range it is in
         for the rest of them.
       </para>
-      <!-- TODO
-      <xi:include href="mva-withe.xml"/>
-      -->
 
       <para>
         TODO Range of e - graph. Range of possible values for each based on the range of e.
@@ -176,10 +176,33 @@
       </para>
     </section>
     <section>
-      <title>Moon's mean period from astranomical models</title>
+      <title>Moznaim Rambam, KH 13:2f4</title>
+      <para>(13, 3, 53, 53) - as explanation of the value for 100 days (7 missing seconds)</para>
+    </section>
+    <section>
+      <title>Moon's mean period from astronomical models</title>
       <para>
         Angular speed of the moon = 360 / (1/tropical month + 1/solar year).
-        Moon.meanLunarPeriod - what is it called? Tropical?</para>
+        Moon.meanLunarPeriod - what is it called? Tropical?
+      </para>
+    </section>
+    <section>
+      <title>14:5 Moon Longitude Adjustment for Time of Seeing</title>
+      See notes in Moznaim Rambam
+      Sun longitude: mean or true?
+      In 3rd and 7th lines, most editions incorrectly have 15.
+    </section>
+    <section>
+      <title>TODO Moznaim Rambam, KH 15:1f2</title>
+      <para>
+        double elongation = distance between moon's mean and apogee
+        Moon longitude adjustment for double elongation: Moznaim Rambam, KH 15:2f3: discrepancy in the limits;
+        encode the limits
+      </para>
+    </section>
+    <section>
+      <title>MoonSightable.forSightingLimits</title>
+      is that what Rambam is saying?
     </section>
     <section>
       <title>Distance between mean and true new moon</title>
@@ -202,6 +225,28 @@
           <listitem><para>Год рождения Моше: спор был ли год високосным или простым. Шита Ребе - год был високосным.</para></listitem>
         </itemizedlist>
       </para>
-    </section>  
+    </section>
+    <section>
+      <title>TimeToRotation.calculate()</title>
+      <para>
+        without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in KH 15:8-9 (see test);
+        see if variations in this algorithms are logical: e.g., for 600, add for 1000 and subtract 4*for 100?
+        see if the end result is stable when Rambam's "real" value is used with straight multiplication and rounding
+        (abstract away the calculation mechaninsm).
+      </para>
+    </section>
+    <section>
+      <title>TODO Example in 15:8-9</title>
+      moonAnomalyTrue - printing error in standard editions, 180 instead of 108;
+      still 108°21′46″, which doesn't round to 108°21...
+      moonLongitudeTrueRaw - printing error in standard editions, 33 instead of 35.
+    </section>
+    <section>
+      <title>TODO Example 17:13-14</title>
+      "this longitude is in Taurus" - but longitude3 isn't, so I get 1/6 instead of 1/5...
+    </section>
+    <section>
+      <para>TODO crescent calculations: KH 18-19!</para>
+    </section>
   </section>
 </chapter>
