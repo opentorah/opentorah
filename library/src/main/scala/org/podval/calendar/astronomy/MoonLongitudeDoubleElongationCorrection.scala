@@ -4,8 +4,6 @@ import org.podval.calendar.angles.Angles.Rotation
 
 object MoonLongitudeDoubleElongationCorrection {
   // KH 15:2-3
-  // TODO Moznaim Rambam, KH 15:2f3: discrepancy in the limits
-  // TODO encode the limits
   def calculate(doubleElongation: Rotation): Rotation = {
     def between(from: Int, to: Int): Boolean =
       (Rotation(from) <= doubleElongation) && (doubleElongation < Rotation(to + 1))

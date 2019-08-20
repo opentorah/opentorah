@@ -6,24 +6,13 @@ plugins {
 description = 'Jewish Calendar Service.'
 
 dependencies {
-//    compile "org.scala-lang:scala-library:$scalaVersion"
-
   compile project(':library')
 
   compile "org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion"
   compile "org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion"
   compile "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion"
-  // http4s -> Scalatags bridge, when included as a dependency, confuses the imports;
-  // doing explicit conversions for now :)    
-//  compile "org.http4s:http4s-scalatags_$scalaVersionMajor:$http4sVersion"
 
   compile "com.lihaoyi:scalatags_$scalaVersionMajor:$scalatagsVersion"
-
-  // Add Circe dependencies when we need JSON.
-//  compile "io.circe:circe-core:$circeVersion"
-//  compile "io.circe:circe-generic:$circeVersion"
-//  compile "io.circe:circe-parser:$circeVersion"
-
 
   runtime "org.slf4j:slf4j-jdk14:$slf4jVersion"
 }

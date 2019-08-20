@@ -2,7 +2,6 @@ package org.podval.calendar.astronomy
 
 import org.podval.calendar.angles.Angles.Rotation
 
-// TODO opposite direction!
 object MoonHeadMean extends Time2Rotation {
 
   // KH 16:2
@@ -15,7 +14,7 @@ object MoonHeadMean extends Time2Rotation {
   final override val month      : Rotation = Rotation(  1, 32,  9)
   final override val year       : Rotation = Rotation( 18, 44, 42)
 
-  final override val rambamValue = Rotation(0) // TODO
+  final override val rambamValue = Rotation(0)
 
-  final override val almagestValue = Rotation(0) // TODO
+  final override val almagestValue = Rotation(0)
 }

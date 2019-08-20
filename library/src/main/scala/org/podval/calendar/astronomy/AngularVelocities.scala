@@ -27,7 +27,7 @@ object AngularVelocities {
 
   def main(args: Array[String]): Unit = {
 //    SunLongitudeMean.exactify
-    SunApogee.exactify // TODO doesn't work!
+    SunApogee.exactify
 
 //    MoonAnomalyMean.exactify
     //    MoonLongitudeMean.exactify

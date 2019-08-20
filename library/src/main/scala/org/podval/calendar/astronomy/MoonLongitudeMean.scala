@@ -14,12 +14,7 @@ object MoonLongitudeMean extends Time2Rotation {
   final override val month      : Rotation = Rotation( 22,  6, 56)
   final override val year       : Rotation = Rotation(344, 26, 43)
 
-  // TODO does this correspond to the lunar period?
-
   final override val rambamValue = Rotation(13, 10, 35, 1, 48, 1)
-
-  // TODO Moznaim Rambam, KH 13:2f4: (13, 10, 35, 3) -
-  // as explanation of the value for 100 days (3 extra seconds)
 
   final override val almagestValue = Rotation(13,10,34,58,33,30,30)
 }
