@@ -5,21 +5,17 @@
   xmlns:db="http://docbook.org/ns/docbook"
   exclude-result-prefixes="db">
 
-  <!-- Break before each section -->
-<!--  <xsl:attribute-set name="section.title.level1.properties">-->
-<!--    <xsl:attribute name="break-before">page</xsl:attribute>-->
-<!--  </xsl:attribute-set>-->
+  <!-- Do not include elements marked with 'role = "NotInToc"' in the TOC -->
+  <xsl:template match="*[@role = 'NotInToc']"  mode="toc" />
 
-  <xsl:template match="section[@role = 'NotInToc']"  mode="toc" />
-
-  <!-- No TOC in Chapter or Section -->
+  <!-- No TOC in Part, Chapter or Section -->
   <xsl:param name="generate.toc">
     appendix  nop
     article/appendix  nop
     article   toc,title
     book      toc,title,figure,table,example,equation
     chapter   nop
-    part      toc,title
+    part      nop
     preface   toc,title
     qandadiv  toc
     qandaset  toc

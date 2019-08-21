@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section xmlns="http://docbook.org/ns/docbook" version="5.0">
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0">
   <title>Chapter 12</title>
   
-  <section>
+  <section role = "NotInToc">
     <title>Law 1</title>
     
     <para>The mean rate of movement of the sun in one day (that is, twenty four hours) is fifty nine minutes and eight seconds, in symbols - 59′8″.
@@ -31,7 +31,7 @@
     </para>
   </section>
   
-  <section>
+  <section role = "NotInToc">
     <title>Law 2</title>
     
     <para>There is a point on the Sun's orbit (and on orbits of the other seven planets) such that when the planet is there
@@ -91,4 +91,4 @@
     And it should be clear to you from the idea of our words that the same way you can find out mean Sun for any day you want from the coming days,
     you can calculate its mean for any day you want from the days that passed.</para>
   </section>
-</section>
+</chapter>
