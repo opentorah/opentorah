@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0">
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="KH15">
   <title>Chapter 15</title>
 
-  <section role = "NotInToc">
+  <section xml:id="KH15-1" role="NotInToc">
     <title>Law 1</title>
 
     <para>
@@ -14,17 +14,19 @@
     </para>
   </section>
 
-  <section role = "NotInToc">
-    <title>Law 2,3</title>
+  <section xml:id="KH15-2" role="NotInToc">
+    <title>Law 2</title>
 
     <para>
       We already stipulated that all the calculations in these chapters are for one purpose only:
       to know if the moon is visible. And it is not possible for this double distance during the night of
       observation when the moon is indeed visible to be outside of the interval from 5° to 62°.
       It cannot be more - nor less.
-      <footnote><para>This is Law 2.</para></footnote>
     </para>
+  </section>
 
+  <section xml:id="KH15-3" role="NotInToc">
+    <title>Law 3</title>
     <para> A correction that depends on the doubled distance is added to the mean lunar
       anomaly, giving  <glossterm>corrected lunar anomaly</glossterm> (מסלול הנכון): </para>
 
@@ -82,8 +84,8 @@
     </informaltable>
   </section>
 
-  <section role = "NotInToc">
-    <title>Law 4,5,6</title>
+  <section xml:id="KH15-4" role="NotInToc">
+    <title>Law 4</title>
 
     <para xml:id="l15-4"> Then, see how many degrees is corrected lunar anomaly. If it
       is less than 180°, subtract visible anomaly of this corrected anomaly from the
@@ -92,25 +94,38 @@
       to the mean lunar longitude the observation time. And mean lunar longitude after
       you add to it or subtract from it is the
       <glossterm>true lunar longitude at the observation time</glossterm>.
-      <footnote><para>This is Law 4.</para></footnote>
     </para>
+  </section>
 
-    <para xml:id="l15-5">
+  <section xml:id="KH15-5" role="NotInToc">
+    <title>Law 5</title>
+    <para>
       If the corrected anomaly is 180° or 360°, there is no visible anomaly,
       so mean lunar longitude at observation time is also true longitude.
       <footnote><para>This is Law 5.</para></footnote>
     </para>
+  </section>
 
-    <para xml:id="l15-6">
+  <section xml:id="KH15-6" role="NotInToc">
+    <title>Law 6</title>
+    <para>
       What is the value of the visible
       anomaly for a given value of the corrected anomaly?
     </para>
   </section>
 
-  <section role = "NotInToc">
-    <title>Law 7,8,9:</title>
-    <para>
-      TODO!!!
-    </para>
+  <section xml:id="KH15-7" role="NotInToc">
+    <title>Law 7</title>
+    <para>TODO</para>
+  </section>
+
+  <section xml:id="KH15-8" role="NotInToc">
+    <title>Law 8</title>
+    <para>TODO</para>
+  </section>
+
+  <section xml:id="KH15-9" role="NotInToc">
+    <title>Law 9</title>
+    <para>TODO</para>
   </section>
 </chapter>

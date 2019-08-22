@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0">
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="KH14">
   <title>Chapter 14</title>
 
-  <section role = "NotInToc">
+  <section xml:id="KH14-1" role="NotInToc">
     <title>Law 1</title>
 
     <para>The moon has two mean movements. The moon itself rotates on a small circle
@@ -14,7 +14,7 @@
       is called movement of the <glossterm>mean lunar longitude</glossterm> (אמצע הירח). </para>
   </section>
 
-  <section role = "NotInToc">
+  <section xml:id="KH14-2" role="NotInToc">
     <title>Law 2</title>
 
     <para>
@@ -29,7 +29,7 @@
     </para>
   </section>
 
-  <section role = "NotInToc">
+  <section xml:id="KH14-3" role="NotInToc">
     <title>Law 3</title>
     <para>
       Movement in mean lunar anomaly in one day is 13°3′54″.
@@ -39,7 +39,7 @@
     </para>
   </section>
 
-  <section role = "NotInToc">
+  <section xml:id="KH14-4" role="NotInToc">
     <title>Law 4</title>
 
     <para>
@@ -52,8 +52,8 @@
     </para>
   </section>
 
-  <section role = "NotInToc">
-    <title>Law 5,6</title>
+  <section xml:id="KH14-5" role="NotInToc">
+    <title>Law 5</title>
 
     <para> After you calculate mean lunar longitude at the
       beginning of the night that you want, contemplate the sun (TODO: longitude?) and figure out which
@@ -61,7 +61,10 @@
       [This is the correction of the mean lunar longitude depending on
       the mean solar longitude:]
     </para>
+  </section>
 
+  <section xml:id="KH14-6" role="NotInToc">
+    <title>Law 6</title>
     <informaltable frame="all">
       <tgroup cols="4">
         <thead>
@@ -133,7 +136,6 @@
       it is - that is mean lunar longitude approximately a third of an hour after sunset on the
       date you are calculating it for. And this is what is called
       <glossterm>mean lunar longitude at observation time</glossterm>.
-      <footnote><para>This is Law 6.</para></footnote>
     </para>
   </section>
 </chapter>
