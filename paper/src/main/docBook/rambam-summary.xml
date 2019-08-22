@@ -2,10 +2,10 @@
 <chapter xml:id="rambam-summary" xmlns="http://docbook.org/ns/docbook" version="5.0">
   <title>Rambam: Summary</title>
 
-  <section>
+  <section xml:id="rambam-summary-general">
     <title>General</title>
 
-    <section>
+    <section xml:id="rambam-summary-chapter-1">
       <title>Chapter 1: Introduction.</title>
       <simplelist>
         <member>Law 1: Month is lunar; year is solar.</member>
@@ -20,21 +20,21 @@
       </simplelist>
     </section>
 
-    <section>
+    <section xml:id="rambam-summary-chapter-2">
       <title>Chapter 2: Court procedure.</title>
       <simplelist>
         <member>Laws 1-10: Court procedure.</member>
       </simplelist>
     </section>
 
-    <section>
+    <section xml:id="rambam-summary-chapter-3">
       <title>Chapter 3: Court procedure.</title>
       <simplelist>
         <member>Laws 1-19: Court procedure; messengers.</member>
       </simplelist>
     </section>
 
-    <section>
+    <section xml:id="rambam-summary-chapter-4">
       <title>Chapter 4: Leap Year.</title>
       <simplelist>
         <member>Laws 1-2: Leap year - additional Adar;
@@ -47,10 +47,10 @@
     </section>
   </section>
 
-  <section>
+  <section xml:id="rambam-summary-arithmetic">
     <title>Arithmetic calendar.</title>
 
-    <section>
+    <section xml:id="rambam-summary-chapter-5">
       <title>Chapter 5: Introduction.</title>
       <simplelist>
         <member>Laws 1-2: Introduction; discrepancy with observations: -1…+1 day (+1 - very rare).</member>
@@ -61,7 +61,7 @@
       </simplelist>
     </section>
 
-    <section>
+    <section xml:id="rambam-summary-chapter-6">
       <title>Chapter 6: Conjunction. Lunar month and year. Leap year cycle.</title>
       <simplelist>
         <member>Law 1: "Molad" - approximate conjunction (Sun. Moon and Earth on the same line).</member>
@@ -81,7 +81,7 @@
       </simplelist>
     </section>
 
-    <section>
+    <section xml:id="rambam-summary-chapter-7">
       <title>Chapter 7: New Year corrections.</title>
       <simplelist>
         <member>Law 1: Rosh Hashono gets pushed off from Sunday, Wednesday, Friday.</member>
@@ -93,7 +93,7 @@
       </simplelist>
     </section>
 
-    <section>
+    <section xml:id="rambam-summary-chapter-8">
       <title>Chapter 8: TODO</title>
       <simplelist>
         <member>Law 1: -> 6.3</member>
@@ -104,7 +104,7 @@
       </simplelist>
     </section>
 
-    <section>
+    <section xml:id="rambam-summary-chapter-9">
       <title>Chapter 9: Seasons.</title>
       <simplelist>
         <member>Law 2: 1/4 of the year between seasons (91d 7.5h).</member>
@@ -119,7 +119,7 @@
       </simplelist>
     </section>
 
-    <section>
+    <section xml:id="rambam-summary-chapter-10">
       <title>Chapter 10: More precise length of the year. Seasons.</title>
       <simplelist>
         <member>Law 1: More precise length of a solar year. Moments.</member>
@@ -136,10 +136,10 @@
     </section>
   </section>
 
-  <section>
+  <section xml:id="rambam-summary-astronomical">
     <title>Atronomical Calculations.</title>
 
-    <section>
+    <section xml:id="rambam-summary-chapter-11">
       <title>Chapter 11. Approximation. Angles. Mean and true motions. Epoch and location.</title>
       <simplelist>
         <member>Laws 1-4: Visibility calculations are deep. Fixed calendar can be appreciated even by school children in 3 or 4 days.</member>
@@ -152,7 +152,8 @@
         <member>Law 17: Location: Jerusalem; see Chapter 17.</member>
       </simplelist>
     </section>
-    <section>
+
+    <section xml:id="rambam-summary-chapter-12">
       <title>Chapter 12: Sun and its apogee.</title>
       <simplelist>
         <member>Law 1: Movement of the Sun. Moznaim Note 6: calculations may be accurate only on the first day of the month; Note 7.
@@ -161,7 +162,8 @@
           Note 11: position - at 6PM.</member>
       </simplelist>
     </section>
-    <section>
+
+    <section xml:id="rambam-summary-chapter-13">
       <title>Chapter 13: True position of the sun. True seasons.</title>
       <simplelist>
         <member>Laws 1-3: Tue position of the Sun.</member>
@@ -170,7 +172,8 @@
         <member>Law 11: True seasons.</member>
       </simplelist>
     </section>
-    <section>
+
+    <section xml:id="rambam-summary-chapter-14">
       <title>Chapter 14</title>
       <simplelist>
         <member>Law 1: Moon: epicycle and deferent; movement as seen from Earth. See Moznaim notes!</member>
@@ -180,7 +183,8 @@
         <member>Law 5: Time of sighting correction table: ~20 minutes after sunset.</member>
       </simplelist>
     </section>
-    <section>
+
+    <section xml:id="rambam-summary-chapter-15">
       <title>Chapter 15</title>
       <simplelist>
         <member>Laws 1-2: Double elongation and its limits. See Moznaim notes!</member>
@@ -189,7 +193,8 @@
         <member>Laws 8-9: Examples.</member>
       </simplelist>
     </section>
-    <section>
+
+    <section xml:id="rambam-summary-chapter-16">
       <title>Chapter 16</title>
       <simplelist>
         <member>Laws 1-4: Head movement, table and rules.</member>
@@ -198,13 +203,16 @@
         <member>Law 19: Example.</member>
       </simplelist>
     </section>
-    <section>
+
+    <section xml:id="rambam-summary-chapter-17">
       <title>Chapter 17 (TODO)</title>
     </section>
-    <section>
+
+    <section xml:id="rambam-summary-chapter-18">
       <title>Chapter 18 (TODO)</title>
     </section>
-    <section>
+
+    <section xml:id="rambam-summary-chapter-19">
       <title>Chapter 19 (TODO)</title>
     </section></section>
 </chapter>
