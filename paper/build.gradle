@@ -20,8 +20,11 @@ docBook {
     "project.version": project.version
   ]
 
-// Remove trailing period after honorific
-// parameters.common = [ "punct.honorific": "" ]
+  parameters.common = [
+    "part.autolabel"       : "0",
+    "chapter.autolabel"    : "0"
+//    "punct.honorific": "" // Remove trailing period after honorific
+  ]
 
   parameters.pdf = [
     "title.font.family"    : "DejaVu Sans",
@@ -30,10 +33,7 @@ docBook {
     "monospace.font.family": "DejaVu Sans Mono",
     "symbol.font.family"   : "DejaVu Sans",
     // "footnote.font.size": "10"
-    "body.font.master": "12",
-//    "orderedlist.label.width": "2em", // Some space for the list labels (is it needed?)
-    "part.autolabel"       : "0",
-    "chapter.autolabel"    : "0"
+    "body.font.master": "12"
   ]
 
   mathJax {
