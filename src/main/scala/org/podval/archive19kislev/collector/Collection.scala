@@ -19,7 +19,7 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
   val documents: Seq[Document] = {
     def splitLang(name: String): (String, Option[String]) = {
       val dash: Int = name.lastIndexOf('-')
-      if (dash != name.length-3) (name, None) else (name.substring(0, dash), Some(name.substring(dash+1)))
+      if ((dash == -1) || (dash != name.length-3)) (name, None) else (name.substring(0, dash), Some(name.substring(dash+1)))
     }
     val namesWithLang: Seq[(String, Option[String])] =
       Collection.listNames(teiDirectory, ".xml", Page.checkBase).map(splitLang)
@@ -135,7 +135,8 @@ object Collection {
     s"${Collection.documentsDirectoryName}/${document.name}.html"
 
   private def listNames(directory: File, extension: String, check: String => Unit): Seq[String] = {
-    val result = directory.listFiles.toSeq.map(_.getName).filter(_.endsWith(extension)).map(_.dropRight(extension.length))
+    val result = directory.listFiles.toSeq.map(_.getName)
+      .filter(_.endsWith(extension)).map(_.dropRight(extension.length))
     //    result.foreach(check)
     result.sorted
   }

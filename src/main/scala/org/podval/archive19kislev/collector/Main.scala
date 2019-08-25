@@ -9,7 +9,9 @@ object Main {
 
   private val collections: Seq[Collection] = Seq(
     new Collection(docsDirectory, "archive", "Архив"),
-    new Collection(docsDirectory, "dubnov", "Дубнов")
+    new Collection(docsDirectory, "dubnov", "Дубнов"),
+    new Collection(docsDirectory, "vilno", "Вильно"),
+    new Collection(docsDirectory, "second", "Второй")
   )
 
   private val names: Names = new Names(docsDirectory, namesFileName)
