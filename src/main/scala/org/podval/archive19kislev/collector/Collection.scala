@@ -106,7 +106,10 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
     ))
   }
 
-  def writeWrappers(): Unit = for (document <- documents) document.writeWrappers()
+  def writeWrappers(): Unit = {
+    // TODO clean out documentsDirectory and viewersDirectory.
+    for (document <- documents) document.writeWrappers()
+  }
 }
 
 object Collection {
