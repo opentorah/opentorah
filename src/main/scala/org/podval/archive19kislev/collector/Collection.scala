@@ -9,13 +9,14 @@ final class Collection(directory: File, xml: Elem) {
   def directoryName: String = directory.getName
 
   def reference: String = xml.optionalChild("reference").map(_.text).getOrElse(directoryName)
+
   def title: String = xml.optionalChild("title").map(_.text).getOrElse(reference)
+
   def description: Seq[Elem] = xml.oneChild("description").elements
 
-  val teiDirectory = new File(directory, Layout.Collection.teiDirectoryName)
+  private val teiDirectory = new File(directory, Layout.Collection.teiDirectoryName)
+
   private val facsimilesDirectory = new File(directory, Layout.Collection.facsimilesDirectoryName)
-  val documentsDirectory = new File(directory, Layout.Collection.docsDirectoryName)
-  val viewersDirectory = new File(directory, Layout.Collection.facsDirectoryName)
 
   def documentUrl(name: String): String =
     "/" + directoryName + "/" + Layout.Collection.docsDirectoryName + "/" + name + ".html"
@@ -44,7 +45,7 @@ final class Collection(directory: File, xml: Elem) {
     }
 
     for ((name, (prev, next)) <- namesWithSiblings)
-    yield new Document(this, name, prev, next, translations.getOrElse(name, Seq.empty))
+    yield new Document(this, teiDirectory, name, prev, next, translations.getOrElse(name, Seq.empty))
   }
 
   private val pages: Seq[Page] = documents.flatMap(_.pages)
@@ -113,8 +114,12 @@ final class Collection(directory: File, xml: Elem) {
   }
 
   private def writeWrappers(): Unit = {
-    // TODO clean out documentsDirectory and viewersDirectory.
-    for (document <- documents) document.writeWrappers()
+    val docsDirectory = new File(directory, Layout.Collection.docsDirectoryName)
+    Util.deleteFiles(docsDirectory)
+    val facsDirectory = new File(directory, Layout.Collection.facsDirectoryName)
+    Util.deleteFiles(facsDirectory)
+
+    for (document <- documents) document.writeWrappers(docsDirectory, facsDirectory)
   }
 
   def process(): Unit = {
