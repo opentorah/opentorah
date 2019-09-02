@@ -60,6 +60,11 @@ object Util {
     }
   }
 
+  def deleteFiles(directory: File): Unit = {
+    directory.mkdirs()
+    for (file <- directory.listFiles()) file.delete()
+  }
+
   def removeConsecutiveDuplicates[T](seq: Seq[T]): Seq[T] = seq match {
     case Nil => Nil
     case x :: y :: xs if x == y => removeConsecutiveDuplicates(y :: xs)

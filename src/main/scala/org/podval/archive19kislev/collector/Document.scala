@@ -1,15 +1,19 @@
 package org.podval.archive19kislev.collector
 
+import java.io.File
+
 import Xml.Ops
+
 import scala.xml.Elem
 
 final class Document(
   val collection: Collection,
+  val teiDirectory: File,
   val name: String,
   val prev: Option[String],
   val next: Option[String],
   val translations: Seq[String]
-) extends DocumentLike(collection.teiDirectory, name) {
+) extends DocumentLike(teiDirectory, name) {
 
   override def url: String = collection.documentUrl(name)
 
@@ -54,7 +58,7 @@ final class Document(
   def addressee: Option[Name] =
     persNames.find(_.role.contains("addressee"))
 
-  def writeWrappers(): Unit = {
+  def writeWrappers(docsDirectory: File, facsDirectory: File): Unit = {
     def quote(what: String): String = s"'$what'"
 
     val navigation: Seq[(String, String)] =
@@ -65,7 +69,7 @@ final class Document(
     def writeTeiWrapper(name: String, lang: Option[String]): Unit = {
       val nameWithLang: String = lang.fold(name)(lang => name + "-" + lang)
 
-      Util.write(collection.documentsDirectory, s"$nameWithLang.html", Seq(
+      Util.write(docsDirectory, s"$nameWithLang.html", Seq(
         "layout" -> "tei",
         "tei" -> s"'../${Layout.Collection.teiDirectoryName}/$nameWithLang.xml'",
         "facs" -> s"'../${Layout.Collection.facsDirectoryName}/$name.html'"
@@ -79,7 +83,7 @@ final class Document(
     for (lang <- translations) writeTeiWrapper(name, Some(lang))
 
     // Facsimile viewer
-    Util.write(collection.viewersDirectory, s"$name.html", Seq(
+    Util.write(facsDirectory, s"$name.html", Seq(
       "layout" -> "facsimile",
       "images" -> pages.filter(_.isPresent).map(_.name).mkString("[", ", ", "]")
     ) ++ navigation
