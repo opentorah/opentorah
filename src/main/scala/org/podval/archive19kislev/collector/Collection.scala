@@ -2,19 +2,23 @@ package org.podval.archive19kislev.collector
 
 import java.io.File
 
-import scala.xml.{Node, Text}
+import scala.xml.{Elem, Node, Text}
+import Xml.Ops
 
-final class Collection(docsDirectory: File, val directoryName: String, val title: String) {
-  override def toString: String = directoryName
+final class Collection(directory: File, xml: Elem) {
+  def directoryName: String = directory.getName
 
-  private val collectionDirectory = new File(docsDirectory, directoryName)
-  val teiDirectory = new File(collectionDirectory, Collection.teiDirectoryName)
-  private val facsimilesDirectory = new File(collectionDirectory, Collection.facsimilesDirectoryName)
-  val documentsDirectory = new File(collectionDirectory, Collection.documentsDirectoryName)
-  val viewersDirectory = new File(collectionDirectory, Collection.viewersDirectoryName)
+  def reference: String = xml.optionalChild("reference").map(_.text).getOrElse(directoryName)
+  def title: String = xml.optionalChild("title").map(_.text).getOrElse(reference)
+  def description: Seq[Elem] = xml.oneChild("description").elements
+
+  val teiDirectory = new File(directory, Layout.Collection.teiDirectoryName)
+  private val facsimilesDirectory = new File(directory, Layout.Collection.facsimilesDirectoryName)
+  val documentsDirectory = new File(directory, Layout.Collection.documentsDirectoryName)
+  val viewersDirectory = new File(directory, Layout.Collection.facsDirectoryName)
 
   def documentUrl(name: String): String =
-    "/" + directoryName + "/" + Collection.documentsDirectoryName + "/" + name + ".html"
+    "/" + directoryName + "/" + Layout.Collection.documentsDirectoryName + "/" + name + ".html"
 
   val documents: Seq[Document] = {
     def splitLang(name: String): (String, Option[String]) = {
@@ -32,7 +36,7 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
 
     val names: Seq[String] = namesWithLang.filter(_._2.isEmpty).map(_._1)
 
-    val namesWithSiblings: Seq[(String, (Option[String], Option[String]))] = {
+    val namesWithSiblings: Seq[(String, (Option[String], Option[String]))] = if (names.isEmpty) Seq.empty else {
       val documentOptions: Seq[Option[String]] = names.map(Some(_))
       val prev = None +: documentOptions.init
       val next = documentOptions.tail :+ None
@@ -67,7 +71,7 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
 
   // TODO check order
 
-  def writeIndex(): Unit = {
+  private def writeIndex(): Unit = {
     val content =
       <TEI xmlns="http://www.tei-c.org/ns/1.0">
         <teiHeader>
@@ -85,6 +89,8 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
         </teiHeader>
         <text>
           <body>
+            <title>{title}</title>
+            {description}
             {Collection.table.toTei(documents)}
             {if (missingPages.isEmpty) Seq.empty
              else <p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>}
@@ -94,11 +100,11 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
 
 
     // Index
-    Xml.write(collectionDirectory, "index", content)
+    content.write(directory, "index")
 
     // Index wrapper
-    Util.write(collectionDirectory, "index.html", Seq(
-      "title" -> title,
+    Util.write(directory, "index.html", Seq(
+      "title" -> reference,
       "layout" -> "tei",
       "tei" -> "index.xml",
       "wide" -> "true",
@@ -106,17 +112,18 @@ final class Collection(docsDirectory: File, val directoryName: String, val title
     ))
   }
 
-  def writeWrappers(): Unit = {
+  private def writeWrappers(): Unit = {
     // TODO clean out documentsDirectory and viewersDirectory.
     for (document <- documents) document.writeWrappers()
+  }
+
+  def process(): Unit = {
+    writeIndex()
+    writeWrappers()
   }
 }
 
 object Collection {
-  val teiDirectoryName: String = "tei"
-  val facsimilesDirectoryName: String = "facsimiles"
-  val documentsDirectoryName: String = "documents" // wrappers for TEI XML
-  val viewersDirectoryName: String = "facs" // facsimile viewers
 
   private val table: Table[Document] = new Table[Document](
     _.partTitle.toSeq.map(partTitle =>  <span rendition="part-title">{partTitle.child}</span>),
@@ -135,11 +142,10 @@ object Collection {
   )
 
   private def documentPath(document: Document): String =
-    s"${Collection.documentsDirectoryName}/${document.name}.html"
+    s"${Layout.Collection.documentsDirectoryName}/${document.name}.html"
 
   private def listNames(directory: File, extension: String, check: String => Unit): Seq[String] = {
-    val result = directory.listFiles.toSeq.map(_.getName)
-      .filter(_.endsWith(extension)).map(_.dropRight(extension.length))
+    val result = Util.filesWithExtensions(directory, extension)
     //    result.foreach(check)
     result.sorted
   }

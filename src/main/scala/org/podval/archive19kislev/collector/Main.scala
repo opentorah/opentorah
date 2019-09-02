@@ -2,62 +2,76 @@ package org.podval.archive19kislev.collector
 
 import java.io.File
 
+import scala.xml.Elem
+import Xml.Ops
+
 object Main {
-  private val docsDirectory: File = new File("docs").getAbsoluteFile
-
-  private val namesFileName: String = "names"
-
-  private val collections: Seq[Collection] = Seq(
-    new Collection(docsDirectory, "archive", "РГАДА"),
-    new Collection(docsDirectory, "second", "РГИА 413"),
-    new Collection(docsDirectory, "dubnov", "Дубнов"),
-    new Collection(docsDirectory, "lvia", "LVIA")
-  )
-
-  private val names: Names = new Names(docsDirectory, namesFileName)
-
-  private val references: Seq[Name] =
-    names.names ++
-    (for { collection <- collections; document <- collection.documents } yield document.names).flatten
-
-  private def report(): Unit = {
-    def section(name: String, references: Seq[Name]): Seq[String] =
-    if (references.isEmpty) Seq.empty
-    else s"## $name references ##" +: (for (reference <- references) yield s" - ${reference.display}")
-
-    val missing: Seq[Name] = references.filter(_.isMissing).filterNot(_.name == "?")
-    val malformed: Seq[Name] = references.filter(_.isMalformed)
-    val unresolved: Seq[Name] = references.filter(_.isResolvable).filter(names.isUnresolved)
-
-    val failed: Boolean = missing.nonEmpty || malformed.nonEmpty || unresolved.nonEmpty
-
-    val toStrings: Seq[String] =
-      section("Missing", missing) ++
-      section("Malformed", malformed) ++
-      section("Unresolved", unresolved)
-
-    Util.write(Main.docsDirectory, "status.md",
-      Seq(
-        "title" ->"Status report",
-        "layout" -> "page"
-      ),
-      toStrings
-    )
-    if (failed)
-      throw new IllegalArgumentException("\nTEI validation failed!\n" + toStrings.mkString("\n"))
-  }
 
   def main(args: Array[String]): Unit = {
-    println("Writing collection index files.")
-    collections.foreach(_.writeIndex())
+    val collections: Seq[Collection] = getCollections
 
-    println("Writing wrappers.")
-    collections.foreach(_.writeWrappers())
+    println("Collections:")
+    println(collections.map { collection =>
+      s"  ${collection.directoryName}: ${collection.title}\n"
+    }.mkString)
 
-    println("Adding back references.")
-    names.addReferenced(references)
+    println("Processing collections.")
+    collections.foreach(_.process())
 
-    println("Validating TEI files.")
-    report()
+    println(s"Splicing ${Layout.indexMdFileName}.")
+    Util.splice(
+      file = Layout.docs(Layout.indexMdFileName),
+      start = """<a name="collections-start">""",
+      end = """<a name="collections-end">""",
+      what = collections.flatMap { collection => Seq(
+        s"""- <a href="/${collection.directoryName}" target="collectionViewer">${collection.reference}</a>:""",
+        s"${collection.title}."
+      )}
+    )
+
+    println(s"Splicing ${Layout.configYmlFileName}.")
+    Util.splice(
+      file = Layout.docs(Layout.configYmlFileName),
+      start = "# collections-start",
+      end = "# collections-end",
+      what = collections.map { collection =>
+        s"  - ${collection.directoryName}/index.html"
+      }
+    )
+
+    println("Processing name references.")
+    val report: Option[Seq[String]] = new Names().processReferences(documentReferences =
+      (for { collection <- collections; document <- collection.documents } yield document.names).flatten)
+
+    report.foreach(report =>
+      throw new IllegalArgumentException("\nTEI validation failed!\n" + report.mkString("\n")))
+  }
+
+  // Collections listed in collections.xml in the order they are listed there -
+  // or directories with collection.xml in alphabetical order.
+  private def getCollections: Seq[Collection] = {
+    def collectionXmlFile(directory: File): File = new File(directory, Layout.collectionXmlFileName)
+    def isFile(file: File): Boolean = file.exists() && file.isFile
+
+    val directoryNames: Seq[String] = {
+      for {
+        file <- Some(Layout.docs(Layout.collectionsXmlFileName))
+        if isFile(file)
+      } yield Xml.load(file)
+        .check(name = "collections")
+        .elems(name = "collection")
+        .map(_.text)
+    }.getOrElse {
+      for {
+        directory <- Layout.docsRoot.listFiles.toSeq.sorted
+        if directory.isDirectory && isFile(collectionXmlFile(directory))
+      } yield directory.getName
+    }
+
+    for (directoryName <- directoryNames) yield {
+      val directory: File = Layout.docs(directoryName)
+      val xml: Elem = Xml.load(collectionXmlFile(directory))
+      new Collection(directory, xml)
+    }
   }
 }

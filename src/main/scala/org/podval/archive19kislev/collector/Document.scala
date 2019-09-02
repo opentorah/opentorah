@@ -67,8 +67,8 @@ final class Document(
 
       Util.write(collection.documentsDirectory, s"$nameWithLang.html", Seq(
         "layout" -> "tei",
-        "tei" -> s"'../${Collection.teiDirectoryName}/$nameWithLang.xml'",
-        "facs" -> s"'../${Collection.viewersDirectoryName}/$name.html'"
+        "tei" -> s"'../${Layout.Collection.teiDirectoryName}/$nameWithLang.xml'",
+        "facs" -> s"'../${Layout.Collection.facsDirectoryName}/$name.html'"
       ) ++ (if (lang.isDefined || translations.isEmpty) Seq.empty else Seq("translations" -> translations.mkString("[", ", ", "]")))
         ++ navigation
       )
