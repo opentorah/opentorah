@@ -7,7 +7,8 @@ import scala.io.Source
 object Util {
 
   def filesWithExtensions(directory: File, extension: String): Seq[String] = {
-    directory.listFiles.toSeq.map(_.getName)
+    (if (!directory.exists) Seq.empty else directory.listFiles.toSeq)
+      .map(_.getName)
       .filter(_.endsWith(extension)).map(_.dropRight(extension.length))
   }
 
