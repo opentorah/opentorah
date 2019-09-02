@@ -14,11 +14,11 @@ final class Collection(directory: File, xml: Elem) {
 
   val teiDirectory = new File(directory, Layout.Collection.teiDirectoryName)
   private val facsimilesDirectory = new File(directory, Layout.Collection.facsimilesDirectoryName)
-  val documentsDirectory = new File(directory, Layout.Collection.documentsDirectoryName)
+  val documentsDirectory = new File(directory, Layout.Collection.docsDirectoryName)
   val viewersDirectory = new File(directory, Layout.Collection.facsDirectoryName)
 
   def documentUrl(name: String): String =
-    "/" + directoryName + "/" + Layout.Collection.documentsDirectoryName + "/" + name + ".html"
+    "/" + directoryName + "/" + Layout.Collection.docsDirectoryName + "/" + name + ".html"
 
   val documents: Seq[Document] = {
     def splitLang(name: String): (String, Option[String]) = {
@@ -142,7 +142,7 @@ object Collection {
   )
 
   private def documentPath(document: Document): String =
-    s"${Layout.Collection.documentsDirectoryName}/${document.name}.html"
+    s"${Layout.Collection.docsDirectoryName}/${document.name}.html"
 
   private def listNames(directory: File, extension: String, check: String => Unit): Seq[String] = {
     val result = Util.filesWithExtensions(directory, extension)
