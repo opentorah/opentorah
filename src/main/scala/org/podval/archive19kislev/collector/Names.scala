@@ -1,15 +1,13 @@
 package org.podval.archive19kislev.collector
 
-import java.io.File
-
 import scala.xml.{Elem, Node}
 import Xml.Ops
 import Names.Named
 
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 
-final class Names(directory: File, fileName: String) extends DocumentLike(directory, fileName) {
-  override def url: String = "/" + fileName + ".html"
+final class Names extends DocumentLike(Layout.docsRoot, Layout.namesFileName) {
+  override def url: String = "/" + Layout.namesFileName + ".html"
 
   private val named2name: Map[String, String] = Map(
     "person" -> "persName",
@@ -35,10 +33,10 @@ final class Names(directory: File, fileName: String) extends DocumentLike(direct
     )
   }
 
-  val nameds: Seq[Named] = (persons ++ places ++ orgs).filter(_.id.isDefined)
+  private val nameds: Seq[Named] = (persons ++ places ++ orgs).filter(_.id.isDefined)
 
-  def isUnresolved(name: Name): Boolean = find(name.ref.get).isEmpty
-  def find(id: String): Option[Named] = nameds.find(_.id.contains(id))
+  private def isUnresolved(name: Name): Boolean = find(name.ref.get).isEmpty
+  private def find(id: String): Option[Named] = nameds.find(_.id.contains(id))
 
   def addReferenced(references: Seq[Name]): Unit = {
     val resolvable: Seq[Name] = references.filter(_.isResolvable)
@@ -72,6 +70,24 @@ final class Names(directory: File, fileName: String) extends DocumentLike(direct
     }
 
     write(new RuleTransformer(rule).transform(tei).head.asInstanceOf[Elem])
+  }
+
+  def processReferences(documentReferences: Seq[Name]): Option[Seq[String]] = {
+    val references: Seq[Name] = names ++ documentReferences
+    addReferenced(references)
+
+    def section(name: String, references: Seq[Name]): Seq[String] =
+      if (references.isEmpty) Seq.empty
+      else s"## $name references ##" +: (for (reference <- references) yield s" - ${reference.display}")
+
+    val missing: Seq[Name] = references.filter(_.isMissing).filterNot(_.name == "?")
+    val malformed: Seq[Name] = references.filter(_.isMalformed)
+    val unresolved: Seq[Name] = references.filter(_.isResolvable).filter(isUnresolved)
+
+    if (missing.isEmpty && malformed.isEmpty && unresolved.isEmpty) None else Some(
+      section("Missing", missing) ++
+        section("Malformed", malformed) ++
+        section("Unresolved", unresolved))
   }
 }
 

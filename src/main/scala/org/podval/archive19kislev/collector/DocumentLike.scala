@@ -10,7 +10,7 @@ abstract class DocumentLike(directory: File, val fileName: String) {
 
   def url: String
 
-  protected final val tei: Elem = Xml.open(Xml.load(directory, fileName), "TEI")
+  protected final val tei: Elem = Xml.load(new File(directory, fileName + ".xml")).check("TEI")
   protected final val teiHeader: Elem = tei.oneChild("teiHeader")
   protected final val fileDesc: Elem = teiHeader.oneChild("fileDesc")
   protected final val profileDesc: Elem = teiHeader.oneChild("profileDesc")
@@ -26,5 +26,5 @@ abstract class DocumentLike(directory: File, val fileName: String) {
 
   final def names: Seq[Name] = persNames ++ placeNames ++ orgNames
 
-  final def write(xml: Elem): Unit = Xml.write(directory, fileName, xml)
+  final def write(xml: Elem): Unit = xml.write(directory, fileName)
 }
