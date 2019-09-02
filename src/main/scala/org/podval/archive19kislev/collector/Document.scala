@@ -7,15 +7,16 @@ import Xml.Ops
 import scala.xml.Elem
 
 final class Document(
-  val collection: Collection,
-  val teiDirectory: File,
+  collectionDirectoryName: String,
+  teiDirectory: File,
   val name: String,
-  val prev: Option[String],
-  val next: Option[String],
+  prev: Option[String],
+  next: Option[String],
   val translations: Seq[String]
 ) extends DocumentLike(teiDirectory, name) {
 
-  override def url: String = collection.documentUrl(name)
+  override def url: String =
+    "/" + collectionDirectoryName + "/" + Layout.Collection.docsDirectoryName + "/" + name + ".html"
 
   private[this] val titleStmt: Elem = fileDesc.oneChild("titleStmt")
 

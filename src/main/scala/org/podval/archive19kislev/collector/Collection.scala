@@ -14,18 +14,14 @@ final class Collection(directory: File, xml: Elem) {
 
   def description: Seq[Elem] = xml.oneChild("description").elements
 
-  private val teiDirectory = new File(directory, Layout.Collection.teiDirectoryName)
-
-  private val facsimilesDirectory = new File(directory, Layout.Collection.facsimilesDirectoryName)
-
-  def documentUrl(name: String): String =
-    "/" + directoryName + "/" + Layout.Collection.docsDirectoryName + "/" + name + ".html"
-
   val documents: Seq[Document] = {
     def splitLang(name: String): (String, Option[String]) = {
       val dash: Int = name.lastIndexOf('-')
       if ((dash == -1) || (dash != name.length-3)) (name, None) else (name.substring(0, dash), Some(name.substring(dash+1)))
     }
+
+    val teiDirectory = new File(directory, Layout.Collection.teiDirectoryName)
+
     val namesWithLang: Seq[(String, Option[String])] =
       Collection.listNames(teiDirectory, ".xml", Page.checkBase).map(splitLang)
 
@@ -45,7 +41,14 @@ final class Collection(directory: File, xml: Elem) {
     }
 
     for ((name, (prev, next)) <- namesWithSiblings)
-    yield new Document(this, teiDirectory, name, prev, next, translations.getOrElse(name, Seq.empty))
+    yield new Document(
+      collectionDirectoryName = directoryName,
+      teiDirectory,
+      name,
+      prev,
+      next,
+      translations = translations.getOrElse(name, Seq.empty)
+    )
   }
 
   private val pages: Seq[Page] = documents.flatMap(_.pages)
@@ -65,7 +68,11 @@ final class Collection(directory: File, xml: Elem) {
     }
 
     // Check that all the images are accounted for
-    val imageNames: Seq[String] = Collection.listNames(facsimilesDirectory, ".jpg", Page.check)
+    val imageNames: Seq[String] = Collection.listNames(
+      directory = new File(directory, Layout.Collection.facsimilesDirectoryName),
+      ".jpg",
+      Page.check
+    )
     val orphanImages: Seq[String] = (imageNames.toSet -- pages.map(_.name).toSet).toSeq.sorted
     if (orphanImages.nonEmpty) throw new IllegalArgumentException(s"Orphan images: $orphanImages")
   }
