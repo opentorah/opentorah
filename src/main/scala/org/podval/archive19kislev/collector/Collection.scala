@@ -14,7 +14,41 @@ final class Collection(directory: File, xml: Elem) {
 
   def description: Seq[Elem] = xml.oneChild("description").elements
 
-  val documents: Seq[Document] = {
+  private val documents: Seq[Document] = getDocuments
+
+  val parts: Seq[Part] = Part.assignDocuments(getPartDescriptors, documents)
+
+  def names: Seq[Name] = documents.flatMap(_.names)
+
+  private val pages: Seq[Page] = documents.flatMap(_.pages)
+
+  private val missingPages: Seq[String] = pages.filterNot(_.isPresent).map(_.displayName)
+
+  /// Check consistency
+  checkPages()
+
+  private def checkPages(): Unit = {
+    // Check for duplicates
+    val name2page = collection.mutable.Map[String, Page]()
+    for (page <- pages) {
+      // TODO allow duplicates in consecutive documents
+      //      if (name2page.contains(page.name)) throw new IllegalArgumentException(s"Duplicate page: ${page.name}")
+      name2page.put(page.name, page)
+    }
+
+    // Check that all the images are accounted for
+    val imageNames: Seq[String] = Collection.listNames(
+      directory = new File(directory, Layout.Collection.facsimilesDirectoryName),
+      ".jpg",
+      Page.check
+    )
+    val orphanImages: Seq[String] = (imageNames.toSet -- pages.map(_.name).toSet).toSeq.sorted
+    if (orphanImages.nonEmpty) throw new IllegalArgumentException(s"Orphan images: $orphanImages")
+  }
+
+  // TODO check order
+
+  private def getDocuments: Seq[Document] = {
     def splitLang(name: String): (String, Option[String]) = {
       val dash: Int = name.lastIndexOf('-')
       if ((dash == -1) || (dash != name.length-3)) (name, None)
@@ -51,39 +85,11 @@ final class Collection(directory: File, xml: Elem) {
     )
   }
 
-  val parts: Seq[Part] = {
+  private def getPartDescriptors: Seq[Part.Descriptor] = {
     val partElements: Seq[Elem] = xml.elemsFilter("part")
-    if (partElements.isEmpty) Seq(new Part(documentNames = Seq.empty))
-    else partElements.map(Part.apply)
+    if (partElements.isEmpty) Seq(Part.catchAllDescriptor)
+    else partElements.map(Part.toDescriptor)
   }
-
-  private val pages: Seq[Page] = documents.flatMap(_.pages)
-
-  private val missingPages: Seq[String] = pages.filterNot(_.isPresent).map(_.displayName)
-
-  /// Check consistency
-  check()
-
-  private def check(): Unit = {
-    // Check for duplicates
-    val name2page = collection.mutable.Map[String, Page]()
-    for (page <- pages) {
-      // TODO allow duplicates in consecutive documents
-      //      if (name2page.contains(page.name)) throw new IllegalArgumentException(s"Duplicate page: ${page.name}")
-      name2page.put(page.name, page)
-    }
-
-    // Check that all the images are accounted for
-    val imageNames: Seq[String] = Collection.listNames(
-      directory = new File(directory, Layout.Collection.facsimilesDirectoryName),
-      ".jpg",
-      Page.check
-    )
-    val orphanImages: Seq[String] = (imageNames.toSet -- pages.map(_.name).toSet).toSeq.sorted
-    if (orphanImages.nonEmpty) throw new IllegalArgumentException(s"Orphan images: $orphanImages")
-  }
-
-  // TODO check order
 
   private def writeIndex(): Unit = {
     val content =
@@ -105,7 +111,7 @@ final class Collection(directory: File, xml: Elem) {
           <body>
             <title>{title}</title>
             {description}
-            {Collection.table.toTei(documents)}
+            {Collection.table.toTei(parts.flatMap(_.documents))}
             {if (missingPages.isEmpty) Seq.empty
              else <p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>}
           </body>
