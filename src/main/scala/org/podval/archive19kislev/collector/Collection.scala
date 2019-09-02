@@ -17,7 +17,8 @@ final class Collection(directory: File, xml: Elem) {
   val documents: Seq[Document] = {
     def splitLang(name: String): (String, Option[String]) = {
       val dash: Int = name.lastIndexOf('-')
-      if ((dash == -1) || (dash != name.length-3)) (name, None) else (name.substring(0, dash), Some(name.substring(dash+1)))
+      if ((dash == -1) || (dash != name.length-3)) (name, None)
+      else (name.substring(0, dash), Some(name.substring(dash+1)))
     }
 
     val teiDirectory = new File(directory, Layout.Collection.teiDirectoryName)
@@ -40,8 +41,7 @@ final class Collection(directory: File, xml: Elem) {
       names.zip(prev.zip(next))
     }
 
-    for ((name, (prev, next)) <- namesWithSiblings)
-    yield new Document(
+    for ((name, (prev, next)) <- namesWithSiblings) yield new Document(
       collectionDirectoryName = directoryName,
       teiDirectory,
       name,
@@ -49,6 +49,12 @@ final class Collection(directory: File, xml: Elem) {
       next,
       translations = translations.getOrElse(name, Seq.empty)
     )
+  }
+
+  val parts: Seq[Part] = {
+    val partElements: Seq[Elem] = xml.elemsFilter("part")
+    if (partElements.isEmpty) Seq(new Part(documentNames = Seq.empty))
+    else partElements.map(Part.apply)
   }
 
   private val pages: Seq[Page] = documents.flatMap(_.pages)
