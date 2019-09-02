@@ -40,8 +40,7 @@ object Main {
     )
 
     println("Processing name references.")
-    val report: Option[Seq[String]] = new Names().processReferences(documentReferences =
-      (for { collection <- collections; document <- collection.documents } yield document.names).flatten)
+    val report: Option[Seq[String]] = new Names().processReferences(documentReferences = collections.flatMap(_.names))
 
     report.foreach(report =>
       throw new IllegalArgumentException("\nTEI validation failed!\n" + report.mkString("\n")))
