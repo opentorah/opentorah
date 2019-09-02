@@ -22,7 +22,7 @@ object Layout {
 
     final val facsimilesDirectoryName: String = "facsimiles"
 
-    final val documentsDirectoryName: String = "documents" // wrappers for TEI XML
+    final val docsDirectoryName: String = "documents" // wrappers for TEI XML
 
     final val facsDirectoryName: String = "facs" // facsimile viewers
   }
