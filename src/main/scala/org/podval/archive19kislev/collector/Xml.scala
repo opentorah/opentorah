@@ -19,7 +19,7 @@ object Xml {
 
     def elemsFilter(name: String): Seq[Elem] = elem.elements.filter(_.label == name)
 
-    def elements: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
+    def elements: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem]).toSeq
 
     def descendants(name: String): Seq[Elem] = elem.flatMap(_ \\ name).filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
