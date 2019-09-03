@@ -20,12 +20,12 @@ final class Document(
 
   private[this] val titleStmt: Elem = fileDesc.oneChild("titleStmt")
 
-  val (partTitle: Option[Elem], title: Option[Elem], subTitle: Option[Elem]) = {
+  val (title: Option[Elem], subTitle: Option[Elem]) = {
     val titles: Seq[Elem] = titleStmt.elemsFilter("title")
     def getTitle(name: String): Option[Elem] =
       titles.find(_.getAttribute("type") == name)
 
-    (getTitle("part"), getTitle("main"), getTitle("sub"))
+    (getTitle("main"), getTitle("sub"))
   }
 
   def author: Option[Elem] =

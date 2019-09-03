@@ -14,9 +14,9 @@ final class Collection(directory: File, xml: Elem) {
 
   def description: Seq[Elem] = xml.oneChild("description").elements
 
-  private val documents: Seq[Document] = getDocuments
+  private val parts: Seq[Part] = Part.splitParts(xml.elemsFilter("part"), getDocuments)
 
-  val parts: Seq[Part] = Part.assignDocuments(getPartDescriptors, documents)
+  private val documents: Seq[Document] = parts.flatMap(_.documents)
 
   def names: Seq[Name] = documents.flatMap(_.names)
 
@@ -85,42 +85,37 @@ final class Collection(directory: File, xml: Elem) {
     )
   }
 
-  private def getPartDescriptors: Seq[Part.Descriptor] = {
-    val partElements: Seq[Elem] = xml.elemsFilter("part")
-    if (partElements.isEmpty) Seq(Part.catchAllDescriptor)
-    else partElements.map(Part.toDescriptor)
-  }
+  private def index: Elem =
+    <TEI xmlns="http://www.tei-c.org/ns/1.0">
+      <teiHeader>
+        <fileDesc>
+          <publicationStmt>
+            <publisher><ptr target="www.alter-rebbe.org"/></publisher>
+            <availability status="free">
+              <licence><ab><ref n="license" target="http://creativecommons.org/licenses/by/4.0/">
+                Creative Commons Attribution 4.0 International License </ref></ab></licence>
+            </availability>
+          </publicationStmt>
+          <sourceDesc><p>Facsimile</p></sourceDesc>
+        </fileDesc>
+        <profileDesc><calendarDesc><calendar xml:id="julian"><p>Julian calendar</p></calendar></calendarDesc></profileDesc>
+      </teiHeader>
+      <text>
+        <body>
+          <title>{title}</title>
+          {description}
+          {Collection.table.toTei(
+            parts.flatMap { part =>  part.title.map(Table.Xml).toSeq ++ part.documents.map(Table.Data[Document]) }
+          )}
+          {if (missingPages.isEmpty) Seq.empty
+           else <p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>}
+        </body>
+      </text>
+    </TEI>
 
-  private def writeIndex(): Unit = {
-    val content =
-      <TEI xmlns="http://www.tei-c.org/ns/1.0">
-        <teiHeader>
-          <fileDesc>
-            <publicationStmt>
-              <publisher><ptr target="www.alter-rebbe.org"/></publisher>
-              <availability status="free">
-                <licence><ab><ref n="license" target="http://creativecommons.org/licenses/by/4.0/">
-                  Creative Commons Attribution 4.0 International License </ref></ab></licence>
-              </availability>
-            </publicationStmt>
-            <sourceDesc><p>Facsimile</p></sourceDesc>
-          </fileDesc>
-          <profileDesc><calendarDesc><calendar xml:id="julian"><p>Julian calendar</p></calendar></calendarDesc></profileDesc>
-        </teiHeader>
-        <text>
-          <body>
-            <title>{title}</title>
-            {description}
-            {Collection.table.toTei(parts.flatMap(_.documents))}
-            {if (missingPages.isEmpty) Seq.empty
-             else <p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>}
-          </body>
-        </text>
-      </TEI>
-
-
+  def process(): Unit = {
     // Index
-    content.write(directory, "index")
+    index.write(directory, "index")
 
     // Index wrapper
     Util.write(directory, "index.html", Seq(
@@ -130,9 +125,8 @@ final class Collection(directory: File, xml: Elem) {
       "wide" -> "true",
       "target" -> "collectionViewer"
     ))
-  }
 
-  private def writeWrappers(): Unit = {
+    // Wrappers
     val docsDirectory = new File(directory, Layout.Collection.docsDirectoryName)
     Util.deleteFiles(docsDirectory)
     val facsDirectory = new File(directory, Layout.Collection.facsDirectoryName)
@@ -140,17 +134,11 @@ final class Collection(directory: File, xml: Elem) {
 
     for (document <- documents) document.writeWrappers(docsDirectory, facsDirectory)
   }
-
-  def process(): Unit = {
-    writeIndex()
-    writeWrappers()
-  }
 }
 
 object Collection {
 
   private val table: Table[Document] = new Table[Document](
-    _.partTitle.toSeq.map(partTitle =>  <span rendition="part-title">{partTitle.child}</span>),
     Column.elem("Описание", "description", _.description),
     Column.string("Дата", "date", _.date),
     Column.elem("Кто", "author", _.author),
