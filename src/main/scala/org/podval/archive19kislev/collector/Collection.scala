@@ -102,7 +102,7 @@ final class Collection(directory: File, xml: Elem) {
       </teiHeader>
       <text>
         <body>
-          <title>{title}</title>
+          <!-- <title>{title}</title> -->
           {description}
           {Collection.table.toTei(
             parts.flatMap { part =>  part.title.map(Table.Xml).toSeq ++ part.documents.map(Table.Data[Document]) }
@@ -119,7 +119,8 @@ final class Collection(directory: File, xml: Elem) {
 
     // Index wrapper
     Util.write(directory, "index.html", Seq(
-      "title" -> reference,
+      "reference" -> reference,
+      "title" -> title,
       "layout" -> "tei",
       "tei" -> "index.xml",
       "wide" -> "true",
