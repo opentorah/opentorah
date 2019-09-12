@@ -8,6 +8,8 @@ import Xml.Ops
 final class Collection(directory: File, xml: Elem) {
   def directoryName: String = directory.getName
 
+  def includeInNavigation: Boolean = xml.attributeOption("includeInNavigation").contains("true")
+
   def reference: String = xml.optionalChild("reference").map(_.text).getOrElse(directoryName)
 
   def title: String = xml.optionalChild("title").map(_.text).getOrElse(reference)
@@ -141,20 +143,32 @@ object Collection {
 
   private val table: Table[Document] = new Table[Document](
     Column.elem("Описание", "description", _.description),
+
     Column.string("Дата", "date", _.date),
+
     Column.elem("Кто", "author", _.author),
+
     new Column("Кому", "addressee",  _.addressee.fold[Seq[Node]](Text(""))(addressee =>
       <persName ref={addressee.ref.map("#" + _).orNull}>{addressee.name}</persName>)),
-    Column.string("Язык", "language", _.language),
+
+    new Column("Язык", "language", { document: Document =>
+      val translations: Seq[Elem] =
+        for (translation <- document.translations) yield
+          <ref target={Layout.documentUrlRelativeToIndex(document.name + "-" + translation)}
+               role="documentViewer">{translation}</ref>
+
+      Seq(Text(document.language.getOrElse("?"))) ++ translations
+    }),
+
     new Column("Документ", "document", document =>
-      <ref target={documentPath(document)} role="documentViewer">{document.name}</ref>),
+      <ref target={Layout.documentUrlRelativeToIndex(document.name)} role="documentViewer">{document.name}</ref>),
+
     new Column("Страницы", "pages", document => for (page <- document.pages) yield
-      <ref target={documentPath(document) + s"#p${page.name}"} role="documentViewer"
+      <ref target={Layout.documentUrlRelativeToIndex(document.name) + s"#p${page.name}"} role="documentViewer"
            rendition={if (page.isPresent) "page" else "missing-page"}>{page.displayName}</ref>),
+
     Column.elem("Расшифровка", "transcriber", _.transcriber)
   )
-
-  private def documentPath(document: Document): String = Layout.documentUrlRelativeToIndex(document.name)
 
   private def listNames(directory: File, extension: String, check: String => Unit): Seq[String] = {
     val result = Util.filesWithExtensions(directory, extension)

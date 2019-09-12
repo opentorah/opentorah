@@ -12,7 +12,7 @@ object Main {
 
     println("Collections:")
     println(collections.map { collection =>
-      s"  ${collection.directoryName}: ${collection.title}\n"
+      s"  ${collection.directoryName}: ${collection.title} [${collection.includeInNavigation}]\n"
     }.mkString)
 
     println("Processing collections.")
@@ -32,7 +32,7 @@ object Main {
       file = Layout.configYml,
       start = "# collections-start",
       end = "# collections-end",
-      what = collections.map { collection =>
+      what = collections.filter(_.includeInNavigation).map { collection =>
         val url: String = Layout.collectionUrl(collection.directoryName)
         // Links with starting slash do not make it into the navigation bar?
         val ref: String = if (url.startsWith("/")) url.substring(1) else url
