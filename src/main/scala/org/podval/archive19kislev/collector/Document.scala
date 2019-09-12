@@ -15,8 +15,7 @@ final class Document(
   val translations: Seq[String]
 ) extends DocumentLike(teiDirectory, name) {
 
-  override def url: String =
-    "/" + collectionDirectoryName + "/" + Layout.Collection.docsDirectoryName + "/" + name + ".html"
+  override def url: String = Layout.documentUrl(collectionDirectoryName, name)
 
   private[this] val titleStmt: Elem = fileDesc.oneChild("titleStmt")
 
@@ -72,8 +71,8 @@ final class Document(
 
       Util.write(docsDirectory, s"$nameWithLang.html", Seq(
         "layout" -> "tei",
-        "tei" -> s"'../${Layout.Collection.teiDirectoryName}/$nameWithLang.xml'",
-        "facs" -> s"'../${Layout.Collection.facsDirectoryName}/$name.html'"
+        "tei" -> s"'../${Layout.teiDirectoryName}/$nameWithLang.xml'",
+        "facs" -> s"'../${Layout.facsDirectoryName}/$name.html'"
       ) ++ (if (lang.isDefined || translations.isEmpty) Seq.empty else Seq("translations" -> translations.mkString("[", ", ", "]")))
         ++ navigation
       )

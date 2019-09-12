@@ -38,7 +38,7 @@ final class Collection(directory: File, xml: Elem) {
 
     // Check that all the images are accounted for
     val imageNames: Seq[String] = Collection.listNames(
-      directory = new File(directory, Layout.Collection.facsimilesDirectoryName),
+      directory = Layout.facsimiles(directory),
       ".jpg",
       Page.check
     )
@@ -55,7 +55,7 @@ final class Collection(directory: File, xml: Elem) {
       else (name.substring(0, dash), Some(name.substring(dash+1)))
     }
 
-    val teiDirectory = new File(directory, Layout.Collection.teiDirectoryName)
+    val teiDirectory = Layout.tei(directory)
 
     val namesWithLang: Seq[(String, Option[String])] =
       Collection.listNames(teiDirectory, ".xml", Page.checkBase).map(splitLang)
@@ -128,9 +128,9 @@ final class Collection(directory: File, xml: Elem) {
     ))
 
     // Wrappers
-    val docsDirectory = new File(directory, Layout.Collection.docsDirectoryName)
+    val docsDirectory = Layout.docs(directory)
     Util.deleteFiles(docsDirectory)
-    val facsDirectory = new File(directory, Layout.Collection.facsDirectoryName)
+    val facsDirectory = Layout.facs(directory)
     Util.deleteFiles(facsDirectory)
 
     for (document <- documents) document.writeWrappers(docsDirectory, facsDirectory)
@@ -154,8 +154,7 @@ object Collection {
     Column.elem("Расшифровка", "transcriber", _.transcriber)
   )
 
-  private def documentPath(document: Document): String =
-    s"${Layout.Collection.docsDirectoryName}/${document.name}.html"
+  private def documentPath(document: Document): String = Layout.documentUrlRelativeToIndex(document.name)
 
   private def listNames(directory: File, extension: String, check: String => Unit): Seq[String] = {
     val result = Util.filesWithExtensions(directory, extension)

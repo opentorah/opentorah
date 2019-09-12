@@ -6,8 +6,8 @@ import Names.Named
 
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 
-final class Names extends DocumentLike(Layout.docsRoot, Layout.namesFileName) {
-  override def url: String = "/" + Layout.namesFileName + ".html"
+final class Names extends DocumentLike(Layout.namesFileDirectory, Layout.namesFileName) {
+  override def url: String = Layout.namesUrl
 
   private val named2name: Map[String, String] = Map(
     "person" -> "persName",
@@ -38,7 +38,7 @@ final class Names extends DocumentLike(Layout.docsRoot, Layout.namesFileName) {
   private def isUnresolved(name: Name): Boolean = find(name.ref.get).isEmpty
   private def find(id: String): Option[Named] = nameds.find(_.id.contains(id))
 
-  def addReferenced(references: Seq[Name]): Unit = {
+  private def addReferenced(references: Seq[Name]): Unit = {
     val resolvable: Seq[Name] = references.filter(_.isResolvable)
 
     val rule: RewriteRule = new RewriteRule {

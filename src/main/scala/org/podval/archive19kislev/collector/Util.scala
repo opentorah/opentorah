@@ -47,10 +47,12 @@ object Util {
     }
   }
 
-  def splice(file: File, start: String, end: String, what: Seq[String]): Unit =
+  def splice(file: File, start: String, end: String, what: Seq[String]): Unit = {
+    println(s"Splicing ${file.getName}.")
     write(file, splice(read(file), start, end, what).mkString("\n"))
+  }
 
-  def splice(lines: Seq[String], start: String, end: String, what: Seq[String]): Seq[String] = {
+  private def splice(lines: Seq[String], start: String, end: String, what: Seq[String]): Seq[String] = {
     val (prefix, tail) = lines.span(_ != start)
     if (tail.isEmpty) lines else {
       val (_, suffix) = tail.tail.span(_ != end)

@@ -18,24 +18,25 @@ object Main {
     println("Processing collections.")
     collections.foreach(_.process())
 
-    println(s"Splicing ${Layout.indexMdFileName}.")
     Util.splice(
-      file = Layout.docs(Layout.indexMdFileName),
+      file = Layout.indexMd,
       start = """<a name="collections-start">""",
       end = """<a name="collections-end">""",
       what = collections.flatMap { collection => Seq(
-        s"""- <a href="/${collection.directoryName}" target="collectionViewer">${collection.reference}</a>:""",
+        s"""- <a href="${Layout.collectionUrl(collection.directoryName)}" target="collectionViewer">${collection.reference}</a>:""",
         s"${collection.title}."
       )}
     )
 
-    println(s"Splicing ${Layout.configYmlFileName}.")
     Util.splice(
-      file = Layout.docs(Layout.configYmlFileName),
+      file = Layout.configYml,
       start = "# collections-start",
       end = "# collections-end",
       what = collections.map { collection =>
-        s"  - ${collection.directoryName}/index.html"
+        val url: String = Layout.collectionUrl(collection.directoryName)
+        // Links with starting slash do not make it into the navigation bar?
+        val ref: String = if (url.startsWith("/")) url.substring(1) else url
+        s"  - $ref"
       }
     )
 
@@ -49,12 +50,11 @@ object Main {
   // Collections listed in collections.xml in the order they are listed there -
   // or directories with collection.xml in alphabetical order.
   private def getCollections: Seq[Collection] = {
-    def collectionXmlFile(directory: File): File = new File(directory, Layout.collectionXmlFileName)
     def isFile(file: File): Boolean = file.exists() && file.isFile
 
-    val directoryNames: Seq[String] = {
+    val collectionNames: Seq[String] = {
       for {
-        file <- Some(Layout.docs(Layout.collectionsXmlFileName))
+        file <- Some(Layout.collectionsXml)
         if isFile(file)
       } yield Xml.load(file)
         .check(name = "collections")
@@ -62,14 +62,14 @@ object Main {
         .map(_.text)
     }.getOrElse {
       for {
-        directory <- Layout.docsRoot.listFiles.toSeq.sorted
-        if directory.isDirectory && isFile(collectionXmlFile(directory))
+        directory <- Layout.collections.listFiles.toSeq.sorted
+        if directory.isDirectory && isFile(Layout.collectionXml(directory))
       } yield directory.getName
     }
 
-    for (directoryName <- directoryNames) yield {
-      val directory: File = Layout.docs(directoryName)
-      val xml: Elem = Xml.load(collectionXmlFile(directory))
+    for (collectionName <- collectionNames) yield {
+      val directory: File = Layout.collections(collectionName)
+      val xml: Elem = Xml.load(Layout.collectionXml(directory))
       new Collection(directory, xml)
     }
   }
