@@ -12,14 +12,19 @@ object Page {
   require(frontSuffix.length == backSuffix.length)
 
   def check(name: String): Unit = {
-    require(name.endsWith(frontSuffix) || name.endsWith(backSuffix), s"Invalid name $name")
-    checkBase(base(name))
+    // Pages in Dubnov do not have -1/-2...
+//    if (!name.endsWith(frontSuffix) && !name.endsWith(backSuffix))
+//      throw new IllegalArgumentException(s"Invalid name $name")
+//    checkBase(base(name))
+    checkBase(name)
   }
 
   def checkBase(name: String): Unit = {
-    require(name.takeWhile(_.isDigit).length == numberOfDigitsInName)
+    if (name.takeWhile(_.isDigit).length != numberOfDigitsInName)
+      throw new IllegalArgumentException()
     val s = base(name).drop(numberOfDigitsInName)
-    require(s.isEmpty || (s == "a"))
+    if (!s.isEmpty && (s != "a"))
+      throw new IllegalArgumentException(s"Illegal image name: $s [$name]")
   }
 
   private def base(name: String): String = name.dropRight(frontSuffix.length)

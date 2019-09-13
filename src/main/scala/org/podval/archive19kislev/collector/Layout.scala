@@ -36,7 +36,7 @@ object Layout {
   // Note: also hard-coded in _layouts/facsimile.html!
   private final val facsimilesDirectoryName: String = "facsimiles"
 
-  def facsimiles(collectionDirectory: File): File = new File(collectionDirectory, facsDirectoryName)
+  def facsimiles(collectionDirectory: File): File = new File(collectionDirectory, facsimilesDirectoryName)
 
   // Note: also hard-coded in _layouts/tei.html!
   final val facsDirectoryName: String = "facs" // facsimile viewers
