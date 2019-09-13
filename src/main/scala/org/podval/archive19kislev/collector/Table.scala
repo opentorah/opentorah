@@ -2,7 +2,7 @@ package org.podval.archive19kislev.collector
 
 import scala.xml.{Elem, Node}
 
-final class Table[D](columns: Column[D]*) {
+final class Table[D](columns: Table.Column[D]*) {
   def toTei(rows: Seq[Table.Row[D]]): Elem =
     <table rendition="collection-index">
       <row>{ for (column <- columns) yield <cell rendition={column.cssClass}>{column.heading}</cell> }</row>{
@@ -17,6 +17,12 @@ final class Table[D](columns: Column[D]*) {
 }
 
 object Table {
+  final case class Column[D](
+    heading: String,
+    cssClass: String,
+    value: D => Seq[Node]
+  )
+
   sealed trait Row[+D]
 
   final case class Data[D](data: D) extends Row[D]

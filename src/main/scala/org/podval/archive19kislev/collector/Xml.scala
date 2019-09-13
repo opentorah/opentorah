@@ -2,12 +2,20 @@ package org.podval.archive19kislev.collector
 
 import java.io.File
 
-import scala.xml.{Elem, PrettyPrinter, Utility, XML}
+import scala.xml.{Elem, Node, PrettyPrinter, Text, TopScope, Utility, XML}
 
 object Xml {
 
   def load(file: File): Elem =
     Utility.trimProper(XML.loadFile(file)).asInstanceOf[Elem]
+
+  def contentOf(element: Option[Elem]): Seq[Node] =
+    element.fold[Seq[Node]](Text(""))(_.child.map(removeNamespace))
+
+  private def removeNamespace(node: Node): Node = node match {
+    case e: Elem => e.copy(scope = TopScope, child = e.child.map(removeNamespace))
+    case n => n
+  }
 
   implicit class Ops(elem: Elem) {
 

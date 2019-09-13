@@ -3,6 +3,7 @@ package org.podval.archive19kislev.collector
 import java.io.File
 
 import scala.xml.{Elem, Node, Text}
+import Table.Column
 import Xml.Ops
 
 final class Collection(directory: File, xml: Elem) {
@@ -14,7 +15,7 @@ final class Collection(directory: File, xml: Elem) {
 
   def title: String = xml.optionalChild("title").map(_.text).getOrElse(reference)
 
-  def description: Seq[Elem] = xml.oneChild("description").elements
+  def description: Seq[Elem] = xml.oneChild("abstract").elements
 
   private val parts: Seq[Part] = Part.splitParts(xml.elemsFilter("part"), getDocuments)
 
@@ -142,32 +143,43 @@ final class Collection(directory: File, xml: Elem) {
 object Collection {
 
   private val table: Table[Document] = new Table[Document](
-    Column.elem("Описание", "description", _.description),
+    Column("Описание", "description", { document: Document =>
+      Xml.contentOf(document.description)
+    }),
 
-    Column.string("Дата", "date", _.date),
+    Column("Дата", "date", { document: Document =>
+      document.date.fold[Seq[Node]](Text(""))(value => Text(value))
+    }),
 
-    Column.elem("Кто", "author", _.author),
+    Column("Кто", "author", { document: Document =>
+      Xml.contentOf(document.author)
+    }),
 
-    new Column("Кому", "addressee",  _.addressee.fold[Seq[Node]](Text(""))(addressee =>
+    Column("Кому", "addressee",  _.addressee.fold[Seq[Node]](Text(""))(addressee =>
       <persName ref={addressee.ref.map("#" + _).orNull}>{addressee.name}</persName>)),
 
-    new Column("Язык", "language", { document: Document =>
-      val translations: Seq[Elem] =
-        for (translation <- document.translations) yield
-          <ref target={Layout.documentUrlRelativeToIndex(document.name + "-" + translation)}
-               role="documentViewer">{translation}</ref>
+    Column("Язык", "language", { document: Document =>
+      val translations: Seq[Elem] = for (translation <- document.translations) yield
+        <ref target={Layout.documentUrlRelativeToIndex(document.name + "-" + translation)}
+             role="documentViewer">{translation}</ref>
 
       Seq(Text(document.language.getOrElse("?"))) ++ translations
     }),
 
-    new Column("Документ", "document", document =>
-      <ref target={Layout.documentUrlRelativeToIndex(document.name)} role="documentViewer">{document.name}</ref>),
+    Column("Документ", "document", { document: Document =>
+      <ref target={Layout.documentUrlRelativeToIndex(document.name)}
+           role="documentViewer">{document.name}</ref>
+    }),
 
-    new Column("Страницы", "pages", document => for (page <- document.pages) yield
-      <ref target={Layout.documentUrlRelativeToIndex(document.name) + s"#p${page.name}"} role="documentViewer"
-           rendition={if (page.isPresent) "page" else "missing-page"}>{page.displayName}</ref>),
+    Column("Страницы", "pages", { document: Document => for (page <- document.pages) yield
+      <ref target={Layout.documentUrlRelativeToIndex(document.name) + s"#p${page.name}"}
+           role="documentViewer"
+           rendition={if (page.isPresent) "page" else "missing-page"}>{page.displayName}</ref>
+    }),
 
-    Column.elem("Расшифровка", "transcriber", _.transcriber)
+    Column("Расшифровка", "transcriber", { document: Document =>
+      Xml.contentOf(document.transcriber)
+    })
   )
 
   private def listNames(directory: File, extension: String, check: String => Unit): Seq[String] = {
