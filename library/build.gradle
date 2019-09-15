@@ -39,7 +39,7 @@ task scaladocJar(type: Jar) {
 }
 scaladocJar.dependsOn scaladoc
 
-def gitHubRepository    = "jewish-calendar/calendar"
+def gitHubRepository    = "digitaljudaica/calendar"
 def gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
 
 def libraryArtifactId = "$project.group-$project.name"
