@@ -24,11 +24,11 @@ for mathematics in DocBook in particular. It also influenced my thinking on
 
 Code that makes possible calculations with dates, time intervals and angles exactly as they are
 described by Rambam is available:
-- [Repository](https://github.com/jewish-calendar/calendar)
+- [Repository](https://github.com/digitaljudaica/calendar)
 - [Changelog](/CHANGELOG.md)
 - [ScalaDoc](/scaladoc/org/podval/calendar/index.html)
 - [Examples](/examples/)
-- [Travis CI](https://travis-ci.com/jewish-calendar/calendar)
+- [Travis CI](https://travis-ci.com/digitaljudaica/calendar)
 - [JCenter](https://jcenter.bintray.com/org/podval/calendar/org.podval.calendar-library/)
 - [Bintray](https://bintray.com/beta/#/dubinsky/org.podval.calendar/org.podval.calendar-library?tab=overview)
 
