@@ -60,23 +60,25 @@ final class MathJaxFopPlugin(mathJax: MathJax) extends FopPlugin {
 
   override protected def imagePreloader: ImagePreloader = new AbstractImagePreloader {
     override def preloadImage(uri: String, src: Source, context: ImageContext): ImageInfo = {
-      val document: Document = src.asInstanceOf[DOMSource].getNode.asInstanceOf[Document]
+      if (!src.isInstanceOf[DOMSource]) null else {
+        val document: Document = src.asInstanceOf[DOMSource].getNode.asInstanceOf[Document]
 
-      if (!MathML.Namespace.is(document)) null else  {
-        val svgDocument: SVGDocument = typeset(document)
-        val sizes: Sizes = Sizes(svgDocument)
-        // convert sizes from exs to points:
-        sizes.setViewPortSizes(svgDocument)
+        if (!MathML.Namespace.is(document)) null else {
+          val svgDocument: SVGDocument = typeset(document)
+          val sizes: Sizes = Sizes(svgDocument)
+          // convert sizes from exs to points:
+          sizes.setViewPortSizes(svgDocument)
 
-        val result: ImageInfo = new ImageInfo(uri, Svg.mimeType)
-        result.setSize(sizes.getImageSize(context.getSourceResolution))
+          val result: ImageInfo = new ImageInfo(uri, Svg.mimeType)
+          result.setSize(sizes.getImageSize(context.getSourceResolution))
 
-        // Stash the result to avoid typesetting again:
-        result
-          .getCustomObjects.asInstanceOf[java.util.Map[AnyRef, AnyRef]]
-          .put(ImageInfo.ORIGINAL_IMAGE, new ImageXMLDOM(result, svgDocument, Svg.Namespace.uri))
+          // Stash the result to avoid typesetting again:
+          result
+            .getCustomObjects.asInstanceOf[java.util.Map[AnyRef, AnyRef]]
+            .put(ImageInfo.ORIGINAL_IMAGE, new ImageXMLDOM(result, svgDocument, Svg.Namespace.uri))
 
-        result
+          result
+        }
       }
     }
   }
