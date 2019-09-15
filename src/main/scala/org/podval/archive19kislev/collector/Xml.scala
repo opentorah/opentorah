@@ -6,8 +6,12 @@ import scala.xml.{Elem, Node, PrettyPrinter, Text, TopScope, Utility, XML}
 
 object Xml {
 
-  def load(file: File): Elem =
+  def load(file: File): Elem = try {
     Utility.trimProper(XML.loadFile(file)).asInstanceOf[Elem]
+  } catch {
+    case e: org.xml.sax.SAXParseException =>
+      throw new IllegalArgumentException(s"In file $file:", e)
+  }
 
   def contentOf(element: Option[Elem]): Seq[Node] =
     element.fold[Seq[Node]](Text(""))(_.child.map(removeNamespace))
