@@ -1,4 +1,4 @@
-package org.podval.archive19kislev.collector
+package org.digitaljudaica.archive.collector
 
 import java.io.File
 

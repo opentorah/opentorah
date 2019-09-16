@@ -1,4 +1,4 @@
-package org.podval.archive19kislev.collector
+package org.digitaljudaica.archive.collector
 
 import scala.xml.{Elem, Node}
 import Xml.Ops
@@ -6,8 +6,8 @@ import Names.Named
 
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 
-final class Names extends DocumentLike(Layout.namesFileDirectory, Layout.namesFileName) {
-  override def url: String = Layout.namesUrl
+final class Names(layout: Layout) extends DocumentLike(layout.namesFileDirectory, layout.namesFileName) {
+  override def url: String = layout.namesUrl
 
   private val named2name: Map[String, String] = Map(
     "person" -> "persName",

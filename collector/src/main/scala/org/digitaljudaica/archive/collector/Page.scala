@@ -1,4 +1,4 @@
-package org.podval.archive19kislev.collector
+package org.digitaljudaica.archive.collector
 
 final case class Page(name: String, isPresent: Boolean, document: Document) {
   def displayName: String = Page.displayName(name)

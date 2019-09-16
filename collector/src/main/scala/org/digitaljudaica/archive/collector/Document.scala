@@ -1,4 +1,4 @@
-package org.podval.archive19kislev.collector
+package org.digitaljudaica.archive.collector
 
 import java.io.File
 
@@ -7,6 +7,7 @@ import Xml.Ops
 import scala.xml.Elem
 
 final class Document(
+  layout: Layout,
   collectionDirectoryName: String,
   teiDirectory: File,
   val name: String,
@@ -15,7 +16,7 @@ final class Document(
   val translations: Seq[String]
 ) extends DocumentLike(teiDirectory, name) {
 
-  override def url: String = Layout.documentUrl(collectionDirectoryName, name)
+  override def url: String = layout.documentUrl(collectionDirectoryName, name)
 
   private[this] val titleStmt: Elem = fileDesc.oneChild("titleStmt")
 
@@ -71,8 +72,8 @@ final class Document(
 
       Util.write(docsDirectory, s"$nameWithLang.html", Seq(
         "layout" -> "tei",
-        "tei" -> s"'../${Layout.teiDirectoryName}/$nameWithLang.xml'",
-        "facs" -> s"'../${Layout.facsDirectoryName}/$name.html'"
+        "tei" -> s"'../${layout.teiDirectoryName}/$nameWithLang.xml'",
+        "facs" -> s"'../${layout.facsDirectoryName}/$name.html'"
       ) ++ (if (lang.isDefined || translations.isEmpty) Seq.empty else Seq("translations" -> translations.mkString("[", ", ", "]")))
         ++ navigation
       )

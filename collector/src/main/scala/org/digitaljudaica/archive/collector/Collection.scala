@@ -1,4 +1,4 @@
-package org.podval.archive19kislev.collector
+package org.digitaljudaica.archive.collector
 
 import java.io.File
 
@@ -6,7 +6,7 @@ import scala.xml.{Elem, Node, Text}
 import Table.Column
 import Xml.Ops
 
-final class Collection(directory: File, xml: Elem) {
+final class Collection(layout: Layout, directory: File, xml: Elem) {
   def directoryName: String = directory.getName
 
   def includeInNavigation: Boolean = xml.attributeOption("includeInNavigation").contains("true")
@@ -41,7 +41,7 @@ final class Collection(directory: File, xml: Elem) {
 
     // Check that all the images are accounted for
     val imageNames: Set[String] = Collection.listNames(
-      directory = Layout.facsimiles(directory),
+      directory = layout.facsimiles(directory),
       ".jpg",
       Page.check
     ).toSet
@@ -61,7 +61,7 @@ final class Collection(directory: File, xml: Elem) {
   }
 
   private def getDocuments: Seq[Document] = {
-    val teiDirectory = Layout.tei(directory)
+    val teiDirectory = layout.tei(directory)
 
     def checkDocumentName(name: String): Unit =
       Page.checkBase(splitLang(name)._1)
@@ -85,6 +85,7 @@ final class Collection(directory: File, xml: Elem) {
     }
 
     for ((name, (prev, next)) <- namesWithSiblings) yield new Document(
+      layout,
       collectionDirectoryName = directoryName,
       teiDirectory,
       name,
@@ -113,7 +114,7 @@ final class Collection(directory: File, xml: Elem) {
         <body>
           <!-- <title>{title}</title> -->
           {description}
-          {Collection.table.toTei(
+          {Collection.table(layout).toTei(
             parts.flatMap { part =>  part.title.map(Table.Xml).toSeq ++ part.documents.map(Table.Data[Document]) }
           )}
           {if (missingPages.isEmpty) Seq.empty
@@ -137,9 +138,9 @@ final class Collection(directory: File, xml: Elem) {
     ))
 
     // Wrappers
-    val docsDirectory = Layout.docs(directory)
+    val docsDirectory = layout.docs(directory)
     Util.deleteFiles(docsDirectory)
-    val facsDirectory = Layout.facs(directory)
+    val facsDirectory = layout.facs(directory)
     Util.deleteFiles(facsDirectory)
 
     for (document <- documents) document.writeWrappers(docsDirectory, facsDirectory)
@@ -148,7 +149,7 @@ final class Collection(directory: File, xml: Elem) {
 
 object Collection {
 
-  private val table: Table[Document] = new Table[Document](
+  private def table(layout: Layout): Table[Document] = new Table[Document](
     Column("Описание", "description", { document: Document =>
       Xml.contentOf(document.description)
     }),
@@ -166,19 +167,19 @@ object Collection {
 
     Column("Язык", "language", { document: Document =>
       val translations: Seq[Elem] = for (translation <- document.translations) yield
-        <ref target={Layout.documentUrlRelativeToIndex(document.name + "-" + translation)}
+        <ref target={layout.documentUrlRelativeToIndex(document.name + "-" + translation)}
              role="documentViewer">{translation}</ref>
 
       Seq(Text(document.language.getOrElse("?"))) ++ translations
     }),
 
     Column("Документ", "document", { document: Document =>
-      <ref target={Layout.documentUrlRelativeToIndex(document.name)}
+      <ref target={layout.documentUrlRelativeToIndex(document.name)}
            role="documentViewer">{document.name}</ref>
     }),
 
     Column("Страницы", "pages", { document: Document => for (page <- document.pages) yield
-      <ref target={Layout.documentUrlRelativeToIndex(document.name) + s"#p${page.name}"}
+      <ref target={layout.documentUrlRelativeToIndex(document.name) + s"#p${page.name}"}
            role="documentViewer"
            rendition={if (page.isPresent) "page" else "missing-page"}>{page.displayName}</ref>
     }),
