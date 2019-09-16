@@ -1,8 +1,8 @@
 plugins {
   id 'scala'
   id 'com.github.maiflai.scalatest'
-  id 'com.jfrog.bintray'
   id 'maven-publish'
+  id 'com.jfrog.bintray'
 }
 
 description = 'Jewish Calendar Dates.'
@@ -39,10 +39,10 @@ task scaladocJar(type: Jar) {
 }
 scaladocJar.dependsOn scaladoc
 
-def gitHubRepository    = "digitaljudaica/calendar"
-def gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
+final String gitHubRepository    = "digitaljudaica/calendar"
+final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
 
-def libraryArtifactId = "$project.group-$project.name"
+final String libraryArtifactId = "$project.group-$project.name"
 jar.archiveBaseName.set(libraryArtifactId)
 
 publishing {

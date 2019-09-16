@@ -1,11 +1,13 @@
+plugins {
+  id 'scala'
+}
+
 // for Tut
 repositories {
   maven {
     url 'https://dl.bintray.com/tpolecat/maven/'
   }
 }
-
-apply plugin: 'scala'
 
 // for Tut
 configurations.all {
