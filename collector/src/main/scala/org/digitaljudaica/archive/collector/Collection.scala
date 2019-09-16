@@ -131,9 +131,8 @@ final class Collection(layout: Layout, directory: File, xml: Elem) {
     Util.write(directory, "index.html", Seq(
       "reference" -> reference,
       "title" -> title,
-      "layout" -> "tei",
+      "layout" -> "collection",
       "tei" -> "index.xml",
-      "wide" -> "true",
       "target" -> "collectionViewer"
     ))
 
