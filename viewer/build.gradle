@@ -1,0 +1,11 @@
+plugins {
+    id 'scala'
+}
+
+dependencies {
+    compile "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+    compile "org.scala-lang:scala-library:$scalaVersion"
+
+    testCompile "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
+    testRuntime "org.pegdown:pegdown:$pegdownVersion" // for scalatest reports; dead...
+}

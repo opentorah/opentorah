@@ -1,3 +1,8 @@
+plugins {
+  id 'com.github.ben-manes.versions'
+  id 'idea'
+}
+
 allprojects {
   repositories {
     jcenter()
@@ -8,40 +13,6 @@ allprojects {
   group = 'org.podval.judaica'
   version = '0.1.1'
 }
-
-def scalaVersion      = '2.12.8'
-def scalaVersionMajor = '2.12'
-
-ext.lib = [
-  zinc      : 'com.typesafe.zinc:zinc:0.3.15',
-//  "org.scala-sbt:zinc_${scalaVersionMajor}:1.0.3"
-  scala     : "org.scala-lang:scala-library:$scalaVersion",
-  scalaXml  : "org.scala-lang.modules:scala-xml_$scalaVersionMajor:1.1.0",
-
-  tagsoup   : 'org.ccil.cowan.tagsoup:tagsoup:+',
-
-  scalaCheck     : "org.scalacheck:scalacheck_$scalaVersionMajor:1.14.0",
-  scalaTest      : "org.scalatest:scalatest_$scalaVersionMajor:3.0.5",
-  pegdown        : 'org.pegdown:pegdown:1.6.0' // for scalatest reports
-]
-
-subprojects {
-  apply plugin: 'scala'
-
-  dependencies {
-    zinc lib.zinc
-    compile lib.scala
-    testCompile lib.scalaCheck, lib.scalaTest
-    testRuntime lib.pegdown
-  }
-
-  task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-  }
-}
-
-apply plugin: 'idea'
 
 idea {
   project {
@@ -56,22 +27,3 @@ idea {
     ]
   }
 }
-
-project(':viewer') {
-  dependencies {
-    compile lib.scalaXml
-  }
-}
-
-project(':importers') {
-  dependencies {
-    compile project(':viewer')
-    compile lib.tagsoup
-  }
-}
-
-//project(':webapp') {
-//  dependencies {
-//    compile lib.scalaXml
-//  }
-//}

@@ -1,38 +1,17 @@
-/*
- *  Copyright 2011-2018 Leonid Dubinsky <dub@podval.org>.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * under the License.
- */
-
 package org.podval.judaica.importers.tanach.jerusalem
 
 import org.podval.judaica.importers.tanach.TanachImporter
-
 import org.podval.judaica.viewer.{Content, SpanContent, AppContent, TextContent, DivContent, HebrewLanguage}
 import org.podval.judaica.parsers.DivContentParser.prependAttribute
-
 import scala.collection.mutable.ArrayBuffer
 import scala.xml.{MetaData, Node}
 import scala.io.Source
-
 import java.io.File
-
 
 object JerusalemTanachImporter {
 
-  def main(args: Array[String]) {
-    val importer = new JerusalemTanachImporter().importWork("/home/dub/Code/judaica/imports/Tanach/jerusalem")
+  def main(args: Array[String]): Unit = {
+//    val importer = new JerusalemTanachImporter().importWork("/home/dub/Code/judaica/imports/Tanach/jerusalem")
   }
 
 
@@ -99,7 +78,7 @@ final class JerusalemTanachImporter extends TanachImporter
             n = Some(chapterNumber.toString),
             attributes = Node.NoAttributes,
             head = None,
-            children = dropStuckChapter(chapter.split(":").map(_.trim)).zipWithIndex.flatMap {
+            children = dropStuckChapter(chapter.split(":").toIndexedSeq.map(_.trim)).zipWithIndex.flatMap {
               case (verse, verseNumberFrom0) =>
                 parseVerse(verse, verseNumberFrom0 + 1)
             }
@@ -134,7 +113,7 @@ final class JerusalemTanachImporter extends TanachImporter
       println(s"*** skipping empty line; verse number $number ***")
     }
 
-    result
+    result.toIndexedSeq
   }
 
 
@@ -164,7 +143,7 @@ final class JerusalemTanachImporter extends TanachImporter
       result += processWord(line)
     }
 
-    result.flatten
+    result.flatten.toIndexedSeq
   }
 
 

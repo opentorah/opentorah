@@ -1,0 +1,8 @@
+plugins {
+    id 'scala'
+}
+
+dependencies {
+    compile project(':viewer')
+    compile "org.ccil.cowan.tagsoup:tagsoup:$tagsoupVersion"
+}
