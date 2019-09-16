@@ -1,25 +1,14 @@
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
-
-# Site settings
-# These are used to personalize your new site. If you look in the HTML files,
-# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
-# You can create any custom variable you would like, and they will be accessible
-# in the templates via {{ site.myvariable }}.
-
-title: Rambam on Jewish Calendar
+title: "Rambam on Jewish Calendar"
 author: "Leonid Dubinsky"
 email: dub@podval.org
 
 description: >- # this means to ignore newlines until "baseurl:"
   Code for working with Jewish calendar, both arithmetic and astronomical.
   Some remarks.
-
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://www.jewish-calendar.org"
 
 github_username:  dubinsky
-# twitter_username: leoniddubinsky
 
 # If you want to link only specific pages in your header, uncomment
 # this and add the path to the pages in order as they should show up
@@ -33,6 +22,11 @@ theme: minima
 #  - README.md
 
 exclude:
+  - build.gradle
+  - build
   - Gemfile
   - Gemfile.lock
+  - CNAME
   - tut
+
+timezone: America/New_York
