@@ -6,13 +6,11 @@ title: Digital Judaica Done Right
 ## Code ##
 
 Code for working with Jewish texts is available on
-[GitHub](https://github.com/digitaljudaica/judaica).
+[GitHub](https://github.com/digitaljudaica/digitaljudaica.org).
 This project is maintained by [Leonid Dubinsky](https://github.com/dubinsky).
 Website hosted on GitHub Pages.
 
 [README](/README.md)
-
-[GitHub](https://github.com/digitaljudaica/judaica) 
 
 
 ## Writings ##

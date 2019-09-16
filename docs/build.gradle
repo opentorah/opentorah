@@ -1,3 +1,7 @@
+plugins {
+  id 'base'
+}
+
 build.dependsOn ':papers:processDocBook'
 build.doLast {
   def result = project.tasks.getByPath(':papers:processDocBook').outputDirectory
