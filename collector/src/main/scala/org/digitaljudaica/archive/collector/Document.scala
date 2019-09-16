@@ -71,7 +71,7 @@ final class Document(
       val nameWithLang: String = lang.fold(name)(lang => name + "-" + lang)
 
       Util.write(docsDirectory, s"$nameWithLang.html", Seq(
-        "layout" -> "tei",
+        "layout" -> "document",
         "tei" -> s"'../${layout.teiDirectoryName}/$nameWithLang.xml'",
         "facs" -> s"'../${layout.facsDirectoryName}/$name.html'"
       ) ++ (if (lang.isDefined || translations.isEmpty) Seq.empty else Seq("translations" -> translations.mkString("[", ", ", "]")))
