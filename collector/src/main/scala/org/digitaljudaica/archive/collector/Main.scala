@@ -56,6 +56,9 @@ object Main {
   private def getCollections(layout: Layout): Seq[Collection] = {
     def isFile(file: File): Boolean = file.exists() && file.isFile
 
+    val collectionDirectories: Seq[File] =
+      layout.collections.listFiles.toSeq.filter(_.isDirectory).sorted
+
     val collectionNames: Seq[String] = {
       for {
         file <- Some(layout.collectionsXml)
@@ -66,10 +69,15 @@ object Main {
         .map(_.text)
     }.getOrElse {
       for {
-        directory <- layout.collections.listFiles.toSeq.sorted
-        if directory.isDirectory && isFile(layout.collectionXml(directory))
+        directory <- collectionDirectories
+        if isFile(layout.collectionXml(directory))
       } yield directory.getName
     }
+
+    val orphanDirectoryNames: Set[String] =
+      collectionDirectories.map(_.getName).toSet -- collectionNames.toSet
+    if (orphanDirectoryNames.nonEmpty)
+      throw new IllegalArgumentException(s"Orphan directories: ${orphanDirectoryNames.mkString(", ")}")
 
     for (collectionName <- collectionNames) yield {
       val directory: File = layout.collections(collectionName)
