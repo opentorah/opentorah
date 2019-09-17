@@ -54,35 +54,26 @@ object Main {
   // Collections listed in collections.xml in the order they are listed there -
   // or directories with collection.xml in alphabetical order.
   private def getCollections(layout: Layout): Seq[Collection] = {
-    def isFile(file: File): Boolean = file.exists() && file.isFile
-
-    val collectionDirectories: Seq[File] =
-      layout.collections.listFiles.toSeq.filter(_.isDirectory).sorted
-
-    val collectionNames: Seq[String] = {
-      for {
-        file <- Some(layout.collectionsXml)
-        if isFile(file)
-      } yield Xml.load(file)
+    val result: Seq[Collection] = for {
+      xml: Elem <- Xml
+        .load(layout.collectionsXml)
         .check(name = "collections")
         .elems(name = "collection")
-        .map(_.text)
-    }.getOrElse {
-      for {
-        directory <- collectionDirectories
-        if isFile(layout.collectionXml(directory))
-      } yield directory.getName
-    }
+      name: String = xml.text
+      directory: File = layout.collections(name)
+    } yield new Collection(
+      layout,
+      directory,
+      Xml.load(layout.collectionXml(directory)),
+      includeInNavigation = xml.attributeOption("includeInNavigation").contains("true")
+    )
 
     val orphanDirectoryNames: Set[String] =
-      collectionDirectories.map(_.getName).toSet -- collectionNames.toSet
+      layout.collections.listFiles.filter(_.isDirectory).map(_.getName).toSet -- result.map(_.directoryName).toSet
+
     if (orphanDirectoryNames.nonEmpty)
       throw new IllegalArgumentException(s"Orphan directories: ${orphanDirectoryNames.mkString(", ")}")
 
-    for (collectionName <- collectionNames) yield {
-      val directory: File = layout.collections(collectionName)
-      val xml: Elem = Xml.load(layout.collectionXml(directory))
-      new Collection(layout, directory, xml)
-    }
+    result
   }
 }

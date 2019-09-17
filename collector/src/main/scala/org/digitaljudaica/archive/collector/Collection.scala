@@ -6,10 +6,8 @@ import scala.xml.{Elem, Node, Text}
 import Table.Column
 import Xml.Ops
 
-final class Collection(layout: Layout, directory: File, xml: Elem) {
+final class Collection(layout: Layout, directory: File, xml: Elem, val includeInNavigation: Boolean) {
   def directoryName: String = directory.getName
-
-  def includeInNavigation: Boolean = xml.attributeOption("includeInNavigation").contains("true")
 
   def reference: String = xml.optionalChild("reference").map(_.text).getOrElse(directoryName)
 
