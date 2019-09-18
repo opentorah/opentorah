@@ -13,7 +13,8 @@ final class Document(
   val name: String,
   prev: Option[String],
   next: Option[String],
-  val translations: Seq[String]
+  val translations: Seq[String],
+  pageType: Page.Type
 ) extends DocumentLike(teiDirectory, name) {
 
   override def url: String = layout.documentUrl(collectionDirectoryName, name)
@@ -46,11 +47,10 @@ final class Document(
   def language: Option[String] =
     profileDesc.oneChild("langUsage").elems("language").map(_.getAttribute("ident")).headOption
 
-  val pages: Seq[Page] = for {
-    pb <- body.descendants("pb")
-    name = pb.getAttribute("n")
+  val pages: Seq[Page] = for (pb <- body.descendants("pb")) yield pageType(
+    name = pb.getAttribute("n"),
     isPresent = pb.attributeOption("facs").isDefined
-  } yield Page(name, isPresent, this)
+  )
 
   override def persNames: Seq[Name] = names(teiDescendants("persName"))
   override def placeNames: Seq[Name] = names(teiDescendants("placeName"))

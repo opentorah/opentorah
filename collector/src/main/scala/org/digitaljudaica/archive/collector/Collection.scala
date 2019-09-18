@@ -6,7 +6,13 @@ import scala.xml.{Elem, Node, Text}
 import Table.Column
 import Xml.Ops
 
-final class Collection(layout: Layout, directory: File, xml: Elem, val includeInNavigation: Boolean) {
+final class Collection(
+  layout: Layout,
+  directory: File,
+  xml: Elem,
+  val includeInNavigation: Boolean,
+  isBook: Boolean)
+{
   def directoryName: String = directory.getName
 
   def reference: String = xml.optionalChild("reference").map(_.text).getOrElse(directoryName)
@@ -14,6 +20,8 @@ final class Collection(layout: Layout, directory: File, xml: Elem, val includeIn
   def title: String = xml.optionalChild("title").map(_.text).getOrElse(reference)
 
   def description: Seq[Elem] = xml.oneChild("abstract").elements
+
+  def pageType: Page.Type = if (isBook) Page.Book else Page.Manuscript
 
   private val parts: Seq[Part] = Part.splitParts(xml.elemsFilter("part"), getDocuments)
 
@@ -38,11 +46,13 @@ final class Collection(layout: Layout, directory: File, xml: Elem, val includeIn
     }
 
     // Check that all the images are accounted for
-    val imageNames: Set[String] = Collection.listNames(
-      directory = layout.facsimiles(directory),
-      ".jpg",
-      Page.check
-    ).toSet
+    val imageNames: Set[String] =
+      Util.filesWithExtensions(
+        directory = layout.facsimiles(directory),
+        ".jpg"
+      )
+      .toSet
+    imageNames.foreach(name => pageType(name, isPresent = true))
 
     val usedImages: Set[String] = pages.filter(_.isPresent).map(_.name).toSet
     val orphanImages: Seq[String] = (imageNames -- usedImages).toSeq.sorted
@@ -61,11 +71,8 @@ final class Collection(layout: Layout, directory: File, xml: Elem, val includeIn
   private def getDocuments: Seq[Document] = {
     val teiDirectory = layout.tei(directory)
 
-    def checkDocumentName(name: String): Unit =
-      Page.checkBase(splitLang(name)._1)
-
     val namesWithLang: Seq[(String, Option[String])] =
-      Collection.listNames(teiDirectory, ".xml", checkDocumentName).map(splitLang)
+      Util.filesWithExtensions(teiDirectory, ".xml").sorted.map(splitLang)
 
     val translations: Map[String, Seq[String]] = namesWithLang
       .filter(_._2.isDefined)
@@ -89,7 +96,8 @@ final class Collection(layout: Layout, directory: File, xml: Elem, val includeIn
       name,
       prev,
       next,
-      translations = translations.getOrElse(name, Seq.empty)
+      translations = translations.getOrElse(name, Seq.empty),
+      pageType
     )
   }
 
@@ -185,10 +193,4 @@ object Collection {
       Xml.contentOf(document.transcriber)
     })
   )
-
-  private def listNames(directory: File, extension: String, check: String => Unit): Seq[String] = {
-    val result = Util.filesWithExtensions(directory, extension)
-    result.foreach(check)
-    result.sorted
-  }
 }
