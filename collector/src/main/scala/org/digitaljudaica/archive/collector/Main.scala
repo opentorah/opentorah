@@ -65,7 +65,8 @@ object Main {
       layout,
       directory,
       Xml.load(layout.collectionXml(directory)),
-      includeInNavigation = xml.attributeOption("includeInNavigation").contains("true")
+      includeInNavigation = xml.attributeOption("includeInNavigation").contains("true"),
+      isBook = xml.attributeOption("isBook").contains("true")
     )
 
     val orphanDirectoryNames: Set[String] =
