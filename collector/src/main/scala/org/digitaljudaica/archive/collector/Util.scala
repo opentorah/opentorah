@@ -12,19 +12,39 @@ object Util {
       .filter(_.endsWith(extension)).map(_.dropRight(extension.length))
   }
 
-  def write(
+  def writeTeiYaml(
     directory: File,
     fileName: String,
-    yaml: Seq[(String, String)],
-    content: Seq[String] = Seq.empty
+    layout: String,
+    tei: String,
+    title: String,
+    target: String
+  ): Unit = writeYaml(directory, fileName, layout, Seq(
+    "tei" -> tei,
+    "title" -> title,
+    "target" -> target
+  ))
+
+  def writeYaml(
+    directory: File,
+    fileName: String,
+    layout: String,
+    yaml: Seq[(String, String)]
+  ): Unit = writeYaml(directory, fileName, ("layout", layout) +: yaml)
+
+  private def writeYaml(
+    directory: File,
+    fileName: String,
+    yaml: Seq[(String, String)]
   ): Unit = {
     val result: Seq[String] =
-      Seq("---") ++
-      (for ((name, value) <- yaml) yield name + ": " + value) ++
-      Seq("---", "") ++
-      content
+      Seq(
+        "---"
+      ) ++
+        (for ((name, value) <- yaml) yield name + ": " + value) ++
+      Seq("---", "")
 
-    write(directory, fileName, result.mkString("\n"))
+    write(directory, fileName + ".html", result.mkString("\n"))
   }
 
   def write(directory: File, fileName: String, content: String): Unit =

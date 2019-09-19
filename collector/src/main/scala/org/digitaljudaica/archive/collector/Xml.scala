@@ -2,6 +2,7 @@ package org.digitaljudaica.archive.collector
 
 import java.io.File
 
+import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Elem, Node, PrettyPrinter, Text, TopScope, Utility, XML}
 
 object Xml {
@@ -20,6 +21,18 @@ object Xml {
     case e: Elem => e.copy(scope = TopScope, child = e.child.map(removeNamespace))
     case n => n
   }
+
+  def rewriteElements(xml: Elem, elementRewriter: Elem => Elem): Elem = {
+    val rule: RewriteRule = new RewriteRule {
+      override def transform(node: Node): Seq[Node] = node match {
+        case element: Elem => elementRewriter(element)
+        case other => other
+      }
+    }
+
+    new RuleTransformer(rule).transform(xml).head.asInstanceOf[Elem]
+  }
+
 
   implicit class Ops(elem: Elem) {
 

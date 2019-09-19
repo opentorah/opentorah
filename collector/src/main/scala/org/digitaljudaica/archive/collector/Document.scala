@@ -52,9 +52,11 @@ final class Document(
     isPresent = pb.attributeOption("facs").isDefined
   )
 
-  override def persNames: Seq[Name] = names(teiDescendants("persName"))
-  override def placeNames: Seq[Name] = names(teiDescendants("placeName"))
-  override def orgNames: Seq[Name] = names(teiDescendants("orgName"))
+  override def persNames: Seq[Name] = namesOf(Entity.Person)
+  override def placeNames: Seq[Name] = namesOf(Entity.Place)
+  override def orgNames: Seq[Name] = namesOf(Entity.Organization)
+
+  private def namesOf(entity: Entity): Seq[Name] = names(teiDescendants(entity.nameElement))
 
   def addressee: Option[Name] =
     persNames.find(_.role.contains("addressee"))
@@ -70,8 +72,7 @@ final class Document(
     def writeTeiWrapper(name: String, lang: Option[String]): Unit = {
       val nameWithLang: String = lang.fold(name)(lang => name + "-" + lang)
 
-      Util.write(docsDirectory, s"$nameWithLang.html", Seq(
-        "layout" -> "document",
+      Util.writeYaml(docsDirectory, nameWithLang, layout = "document", Seq(
         "tei" -> s"'../${layout.teiDirectoryName}/$nameWithLang.xml'",
         "facs" -> s"'../${layout.facsDirectoryName}/$name.html'"
       ) ++ (if (lang.isDefined || translations.isEmpty) Seq.empty else Seq("translations" -> translations.mkString("[", ", ", "]")))
@@ -84,8 +85,7 @@ final class Document(
     for (lang <- translations) writeTeiWrapper(name, Some(lang))
 
     // Facsimile viewer
-    Util.write(facsDirectory, s"$name.html", Seq(
-      "layout" -> "facsimile",
+    Util.writeYaml(facsDirectory, name, layout = "facsimile", Seq(
       "images" -> pages.filter(_.isPresent).map(_.name).mkString("[", ", ", "]")
     ) ++ navigation
     )

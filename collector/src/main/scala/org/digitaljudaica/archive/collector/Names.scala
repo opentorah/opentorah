@@ -4,25 +4,17 @@ import scala.xml.{Elem, Node}
 import Xml.Ops
 import Names.Named
 
-import scala.xml.transform.{RewriteRule, RuleTransformer}
-
 final class Names(layout: Layout) extends DocumentLike(layout.namesFileDirectory, layout.namesFileName) {
   override def url: String = layout.namesUrl
 
-  private val named2name: Map[String, String] = Map(
-    "person" -> "persName",
-    "place" -> "placeName",
-    "org" -> "orgName"
-  )
+  val (persons: Seq[Named], persNames: Seq[Name]) = namedAndNames(Entity.Person)
+  val (places: Seq[Named], placeNames: Seq[Name]) = namedAndNames(Entity.Place)
+  val (orgs: Seq[Named], orgNames: Seq[Name]) = namedAndNames(Entity.Organization)
 
-  val (persons: Seq[Named], persNames: Seq[Name]) = namedAndNames("person")
-  val (places: Seq[Named], placeNames: Seq[Name]) = namedAndNames("place")
-  val (orgs: Seq[Named], orgNames: Seq[Name]) = namedAndNames("org")
-
-  private def namedAndNames(namedElementName: String): (Seq[Named], Seq[Name]) = {
-    val nameElementName: String = named2name(namedElementName)
+  private def namedAndNames(entity: Entity): (Seq[Named], Seq[Name]) = {
+    val nameElementName: String = entity.nameElement
     def namedNameElems(elem: Elem): Seq[Elem] = elem.elemsFilter(nameElementName)
-    val namedElems: Seq[Elem] = teiDescendants(namedElementName)
+    val namedElems: Seq[Elem] = teiDescendants(entity.element)
     val exclude: Set[Elem] = namedElems.flatMap(namedNameElems).toSet
     (
       namedElems.map(elem => new Named(
@@ -38,43 +30,42 @@ final class Names(layout: Layout) extends DocumentLike(layout.namesFileDirectory
   private def isUnresolved(name: Name): Boolean = find(name.ref.get).isEmpty
   private def find(id: String): Option[Named] = nameds.find(_.id.contains(id))
 
-  private def addReferenced(references: Seq[Name]): Unit = {
-    val resolvable: Seq[Name] = references.filter(_.isResolvable)
+  private def rewriteNamedElement(references: Seq[Name])(namedElem: Elem): Elem = {
+    Entity.forElement(namedElem.label).fold(namedElem) { entity =>
+      val (nonMentions, tail) = namedElem.child.span(_ match {
+        case elem: Elem if elem.label == "p" && (elem \ "@rendition").text == "mentions" => false
+        case _ => true
+      })
 
-    val rule: RewriteRule = new RewriteRule {
-      override def transform(node: Node): Seq[Node] = node match {
-        case namedElem: Elem if named2name.keySet.contains(namedElem.label) =>
-          val id: Option[String] = namedElem.attributeOption("xml:id")
-          val mentionsElem: Elem = <p rendition="mentions">
-            {for (ref <- Util.removeConsecutiveDuplicates(resolvable.filter(_.ref == id).map(_.document)))
-              yield <ref target={ref.url} role="documentViewer">{ref.fileName}</ref>}</p>
+      val (before, after) = if (tail.nonEmpty) (nonMentions, tail.tail) else namedElem.child.span(_ match {
+        case elem: Elem => elem.label == entity.nameElement
+        case _ => false
+      })
 
-          val (nonMentions, tail) = namedElem.child.span( _ match {
-              case elem: Elem if elem.label == "p" && (elem \ "@rendition").text == "mentions" => false
-              case _ => true
-            }
-          )
-
-          val newChildren: Seq[Node] =
-            if (tail.nonEmpty) nonMentions ++ Seq(mentionsElem) ++ tail.tail else  {
-              val (names, tail) = namedElem.child.span(_ match {
-                case elem: Elem => elem.label == named2name(namedElem.label)
-                case _ => false
-              })
-              names ++ Seq(mentionsElem) ++ tail
-            }
-
-          namedElem.copy(child = newChildren)
-        case other => other
-      }
+      namedElem.copy(child = before ++ Seq(mentions(references, namedElem)) ++ after)
     }
+  }
 
-    write(new RuleTransformer(rule).transform(tei).head.asInstanceOf[Elem])
+  private def mentions(references: Seq[Name], namedElem: Elem): Elem = {
+    val id: Option[String] = namedElem.attributeOption("xml:id")
+    <p rendition="mentions">
+      {for (ref <- Util.removeConsecutiveDuplicates(references.filter(_.ref == id).map(_.document)))
+        yield <ref target={ref.url} role="documentViewer">{ref.fileName}</ref>}
+    </p>
   }
 
   def processReferences(documentReferences: Seq[Name]): Option[Seq[String]] = {
     val references: Seq[Name] = names ++ documentReferences
-    addReferenced(references)
+    val resolvable: Seq[Name] = references.filter(_.isResolvable)
+    write(Xml.rewriteElements(tei, rewriteNamedElement(resolvable)))
+
+    // Wrapper
+    Util.writeTeiYaml(directory, fileName,
+      layout = "names",
+      tei = "names.xml",
+      title = "Имена",
+      target = "namesViewer"
+    )
 
     def section(name: String, references: Seq[Name]): Seq[String] =
       if (references.isEmpty) Seq.empty

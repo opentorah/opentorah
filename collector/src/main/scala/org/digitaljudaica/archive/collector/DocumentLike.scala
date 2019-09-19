@@ -5,7 +5,7 @@ import java.io.File
 import scala.xml.Elem
 import Xml.Ops
 
-abstract class DocumentLike(directory: File, val fileName: String) {
+abstract class DocumentLike(val directory: File, val fileName: String) {
   override def toString: String = fileName
 
   def url: String
