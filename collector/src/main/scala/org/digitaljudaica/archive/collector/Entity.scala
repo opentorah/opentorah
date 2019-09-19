@@ -26,7 +26,8 @@ object Entity {
     override def listElement: String = "listOrg"
   }
 
-  def forElement(element: String): Option[Entity] = values.find(_.element == element)
+  val values: Seq[Entity] = Seq(Person, Place, Organization)
 
-  private val values: Set[Entity] = Set(Person, Place, Organization)
+  def forElement(element: String): Option[Entity] = values.find(_.element == element)
+  def forList(element: String): Option[Entity] = values.find(_.listElement == element)
 }

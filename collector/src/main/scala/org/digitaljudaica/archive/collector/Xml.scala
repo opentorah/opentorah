@@ -7,11 +7,14 @@ import scala.xml.{Elem, Node, PrettyPrinter, Text, TopScope, Utility, XML}
 
 object Xml {
 
-  def load(file: File): Elem = try {
-    Utility.trimProper(XML.loadFile(file)).asInstanceOf[Elem]
-  } catch {
-    case e: org.xml.sax.SAXParseException =>
-      throw new IllegalArgumentException(s"In file $file:", e)
+  def load(directory: File, fileName: String): Elem = {
+    val file: File = new File(directory, fileName + ".xml")
+    try {
+      Utility.trimProper(XML.loadFile(file)).asInstanceOf[Elem]
+    } catch {
+      case e: org.xml.sax.SAXParseException =>
+        throw new IllegalArgumentException(s"In file $file:", e)
+    }
   }
 
   def contentOf(element: Option[Elem]): Seq[Node] =
@@ -21,6 +24,9 @@ object Xml {
     case e: Elem => e.copy(scope = TopScope, child = e.child.map(removeNamespace))
     case n => n
   }
+
+  def removeNamespace(element: Elem): Elem =
+    element.copy(scope = TopScope, child = element.child.map(removeNamespace))
 
   def rewriteElements(xml: Elem, elementRewriter: Elem => Elem): Elem = {
     val rule: RewriteRule = new RewriteRule {
@@ -44,7 +50,7 @@ object Xml {
 
     def elemsFilter(name: String): Seq[Elem] = elem.elements.filter(_.label == name)
 
-    def elements: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem]).toSeq
+    def elements: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
     def descendants(name: String): Seq[Elem] = elem.flatMap(_ \\ name).filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
@@ -84,9 +90,7 @@ object Xml {
       directory: File,
       fileName: String,
     ): Unit = Util.write(directory, fileName + ".xml", content =
-      """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
-        """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
-        Xml.prettyPrinter.format(elem)
+      """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" + Xml.prettyPrinter.format(elem)
     )
   }
 

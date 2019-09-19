@@ -1,90 +1,68 @@
 package org.digitaljudaica.archive.collector
 
-import scala.xml.{Elem, Node}
-import Xml.Ops
-import Names.Named
+import java.io.File
 
-final class Names(layout: Layout) extends DocumentLike(layout.namesFileDirectory, layout.namesFileName) {
+import scala.xml.Elem
+import Xml.Ops
+
+final class Names(layout: Layout, errors: Errors) extends DocumentLike {
   override def url: String = layout.namesUrl
 
-  val (persons: Seq[Named], persNames: Seq[Name]) = namedAndNames(Entity.Person)
-  val (places: Seq[Named], placeNames: Seq[Name]) = namedAndNames(Entity.Place)
-  val (orgs: Seq[Named], orgNames: Seq[Name]) = namedAndNames(Entity.Organization)
+  override def name: String = layout.namesFileName
 
-  private def namedAndNames(entity: Entity): (Seq[Named], Seq[Name]) = {
-    val nameElementName: String = entity.nameElement
-    def namedNameElems(elem: Elem): Seq[Elem] = elem.elemsFilter(nameElementName)
-    val namedElems: Seq[Elem] = teiDescendants(entity.element)
-    val exclude: Set[Elem] = namedElems.flatMap(namedNameElems).toSet
-    (
-      namedElems.map(elem => new Named(
-        id = elem.attributeOption("xml:id"),
-        names = names(namedNameElems(elem))
-      )),
-      names(teiDescendants(nameElementName).filterNot(exclude.contains))
-    )
+  val xml: Elem = Xml.load(layout.namesDirectory, layout.namesFileName).check("names")
+  val elements: Seq[Elem] = xml.elements
+  val head: String = elements.head.check("head").text
+  // TODO check that there are no orphan directories
+  val lists: Seq[Nameds] = elements.tail.map(element => Nameds.parse(this, element, layout.namesDirectory, errors))
+
+  for (orphanDirectoryName <-
+         layout.namesDirectory.listFiles.filter(_.isDirectory).map(_.getName).toSet -- lists.map(_.name).toSet)
+    errors.error(s"Orphan names directory: $orphanDirectoryName")
+
+  for ((id, nameds) <- lists.groupBy(_.name).filter(_._2.length != 1)) {
+    errors.error(s"Duplicate list ids: $id - $nameds")
   }
 
-  private val nameds: Seq[Named] = (persons ++ places ++ orgs).filter(_.id.isDefined)
+  private val nameds: Seq[Named] = lists.flatMap(_.nameds)
 
-  private def isUnresolved(name: Name): Boolean = find(name.ref.get).isEmpty
-  private def find(id: String): Option[Named] = nameds.find(_.id.contains(id))
+  for ((id, nameds) <- nameds.groupBy(_.id).filter(_._2.length != 1)) {
+    errors.error(s"Duplicate named ids: $id - $nameds")
+  }
 
-  private def rewriteNamedElement(references: Seq[Name])(namedElem: Elem): Elem = {
-    Entity.forElement(namedElem.label).fold(namedElem) { entity =>
-      val (nonMentions, tail) = namedElem.child.span(_ match {
-        case elem: Elem if elem.label == "p" && (elem \ "@rendition").text == "mentions" => false
-        case _ => true
-      })
+  errors.check()
 
-      val (before, after) = if (tail.nonEmpty) (nonMentions, tail.tail) else namedElem.child.span(_ match {
-        case elem: Elem => elem.label == entity.nameElement
-        case _ => false
-      })
+  val references: Seq[Name] = nameds.flatMap(_.references)
 
-      namedElem.copy(child = before ++ Seq(mentions(references, namedElem)) ++ after)
+  def isResolvable(name: Name): Boolean = nameds.exists(_.id.contains(name.ref.get))
+
+  def processReferences(documentReferences: Seq[Name]): Unit = {
+    val references: Seq[Name] = (this.references ++ documentReferences).filterNot(_.name == "?")
+
+    for (reference <- references.filter(_.ref.isEmpty)) {
+      errors.error(s"Missing 'ref' attribute: Name>${reference.name}<")
     }
-  }
 
-  private def mentions(references: Seq[Name], namedElem: Elem): Elem = {
-    val id: Option[String] = namedElem.attributeOption("xml:id")
-    <p rendition="mentions">
-      {for (ref <- Util.removeConsecutiveDuplicates(references.filter(_.ref == id).map(_.document)))
-        yield <ref target={ref.url} role="documentViewer">{ref.fileName}</ref>}
-    </p>
-  }
+    errors.check()
 
-  def processReferences(documentReferences: Seq[Name]): Option[Seq[String]] = {
-    val references: Seq[Name] = names ++ documentReferences
-    val resolvable: Seq[Name] = references.filter(_.isResolvable)
-    write(Xml.rewriteElements(tei, rewriteNamedElement(resolvable)))
+    for (reference <- references.filterNot(reference => isResolvable(reference))) {
+      errors.error(s"""Unresolvable reference: Name ref="${reference.ref.orNull}">${reference.name}< """)
+    }
+
+    errors.check()
+
+    val directory: File = layout.namesFileDirectory
+    val fileName: String = layout.namesFileName
+
+    Tei.tei(head, content = for (list <- lists) yield list.addMentions(references).toXml)
+      .write(directory, fileName)
 
     // Wrapper
     Util.writeTeiYaml(directory, fileName,
       layout = "names",
-      tei = "names.xml",
-      title = "Имена",
+      tei = s"$fileName.xml",
+      title = head,
       target = "namesViewer"
     )
-
-    def section(name: String, references: Seq[Name]): Seq[String] =
-      if (references.isEmpty) Seq.empty
-      else s"## $name references ##" +: (for (reference <- references) yield s" - ${reference.display}")
-
-    val missing: Seq[Name] = references.filter(_.isMissing).filterNot(_.name == "?")
-    val malformed: Seq[Name] = references.filter(_.isMalformed)
-    val unresolved: Seq[Name] = references.filter(_.isResolvable).filter(isUnresolved)
-
-    if (missing.isEmpty && malformed.isEmpty && unresolved.isEmpty) None else Some(
-      section("Missing", missing) ++
-        section("Malformed", malformed) ++
-        section("Unresolved", unresolved))
   }
-}
-
-object Names {
-  final class Named(
-    val id: Option[String],
-    val names: Seq[Name]
-  )
 }

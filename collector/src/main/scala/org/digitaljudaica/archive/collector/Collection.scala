@@ -1,7 +1,6 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-
 import scala.xml.{Elem, Node, Text}
 import Table.Column
 import Xml.Ops
@@ -11,8 +10,9 @@ final class Collection(
   directory: File,
   xml: Elem,
   val includeInNavigation: Boolean,
-  isBook: Boolean)
-{
+  isBook: Boolean,
+  errors: Errors
+) {
   def directoryName: String = directory.getName
 
   def reference: String = xml.optionalChild("reference").map(_.text).getOrElse(directoryName)
@@ -27,7 +27,7 @@ final class Collection(
 
   private val documents: Seq[Document] = parts.flatMap(_.documents)
 
-  def names: Seq[Name] = documents.flatMap(_.names)
+  def references: Seq[Name] = documents.flatMap(_.references)
 
   private val pages: Seq[Page] = documents.flatMap(_.pages)
 
@@ -97,41 +97,21 @@ final class Collection(
       prev,
       next,
       translations = translations.getOrElse(name, Seq.empty),
-      pageType
+      pageType,
+      errors
     )
   }
 
-  private def index: Elem =
-    <TEI xmlns="http://www.tei-c.org/ns/1.0">
-      <teiHeader>
-        <fileDesc>
-          <publicationStmt>
-            <publisher><ptr target="www.alter-rebbe.org"/></publisher>
-            <availability status="free">
-              <licence><ab><ref n="license" target="http://creativecommons.org/licenses/by/4.0/">
-                Creative Commons Attribution 4.0 International License </ref></ab></licence>
-            </availability>
-          </publicationStmt>
-          <sourceDesc><p>Facsimile</p></sourceDesc>
-        </fileDesc>
-        <profileDesc><calendarDesc><calendar xml:id="julian"><p>Julian calendar</p></calendar></calendarDesc></profileDesc>
-      </teiHeader>
-      <text>
-        <body>
-          <head>{title}</head>
-          {description}
-          {Collection.table(layout).toTei(
-            parts.flatMap { part =>  part.title.map(Table.Xml).toSeq ++ part.documents.map(Table.Data[Document]) }
-          )}
-          {if (missingPages.isEmpty) Seq.empty
-           else <p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>}
-        </body>
-      </text>
-    </TEI>
-
   def process(): Unit = {
     // Index
-    index.write(directory, "index")
+    Tei.tei(title, content =
+      description ++
+        Seq[Elem](Collection.table(layout).toTei(
+          parts.flatMap { part =>  part.title.map(Table.Xml).toSeq ++ part.documents.map(Table.Data[Document]) }
+        )) ++
+        (if (missingPages.isEmpty) Seq.empty
+        else Seq(<p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>))
+    ).write(directory, "index")
 
     // Index wrapper
     Util.writeTeiYaml(directory, "index",
