@@ -21,7 +21,7 @@ final class Collection(
 
   def description: Seq[Elem] = xml.oneChild("abstract").elements
 
-  def pageType: Page.Type = if (isBook) Page.Book else Page.Manuscript
+  private def pageType: Page.Type = if (isBook) Page.Book else Page.Manuscript
 
   private val parts: Seq[Part] = Part.splitParts(xml.elemsFilter("part"), getDocuments)
 
@@ -118,7 +118,7 @@ final class Collection(
       </teiHeader>
       <text>
         <body>
-          <!-- <title>{title}</title> -->
+          <head>{title}</head>
           {description}
           {Collection.table(layout).toTei(
             parts.flatMap { part =>  part.title.map(Table.Xml).toSeq ++ part.documents.map(Table.Data[Document]) }
@@ -134,13 +134,12 @@ final class Collection(
     index.write(directory, "index")
 
     // Index wrapper
-    Util.write(directory, "index.html", Seq(
-      "reference" -> reference,
-      "title" -> title,
-      "layout" -> "collection",
-      "tei" -> "index.xml",
-      "target" -> "collectionViewer"
-    ))
+    Util.writeTeiYaml(directory, "index",
+      layout = "collection",
+      tei = "index.xml",
+      title = reference,
+      target = "collectionViewer"
+    )
 
     // Wrappers
     val docsDirectory = layout.docs(directory)
