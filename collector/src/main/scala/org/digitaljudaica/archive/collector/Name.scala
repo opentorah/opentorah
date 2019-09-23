@@ -3,45 +3,53 @@ package org.digitaljudaica.archive.collector
 import scala.xml.Elem
 import Xml.Ops
 
-final class Name(
-  val document: DocumentLike,
-  val name: String,
-  val id: Option[String],
-  val ref: Option[String],
-  val isMalformed: Boolean,
-  val role: Option[String]
+final case class Name(
+  document: DocumentLike,
+  name: String,
+  id: Option[String],
+  role: Option[String],
+  refAttribute: Option[String],
+  ref: Option[String],
+  entity: Entity
 ) {
   override def toString: String = document.toString
 
-  def isMissing: Boolean = ref.isEmpty
-
-  def isResolvable: Boolean = !isMissing && !isMalformed
-
-  def display: String =
-    if (isMissing) s"Name>$name</"
-    else if (isMalformed) s"""ref="${ref.get}" """
-    else s"""ref="#${ref.get}" """
+  def toXml: Elem = {
+    <name ref={refAttribute.orNull} xml:id={id.orNull} role={role.orNull}>{name}</name>
+      .copy(label = entity.nameElement)
+  }
 }
 
 object Name {
-  private val refPrefix: String = "#"
+  def parse(entity: Entity, document: DocumentLike, xml: Elem, errors: Errors): Name = {
+    xml.check(entity.nameElement)
 
-  def apply(document: DocumentLike, elem: Elem): Name = {
-    val (ref: Option[String], isMalformed: Boolean) =
-      elem.attributeOption("ref").fold[(Option[String], Boolean)]((None, false)){ ref =>
-        val (refResult: String, isMalformed: Boolean) =
-          if (!ref.startsWith(refPrefix) || ref.contains(" ")) (ref, true)
-          else (ref.substring(refPrefix.length), false)
-        (Some(refResult), isMalformed)
-      }
+    val refAttribute: Option[String] = xml.attributeOption("ref")
 
-    new Name(
-      document = document,
-      name = elem.text,
-      id = elem.attributeOption("xml:id"),
-      ref = ref,
-      isMalformed = isMalformed,
-      role = elem.attributeOption("role")
+    val ref: Option[String] = refAttribute.flatMap { refAttribute: String =>
+      if (!refAttribute.startsWith("#")) {
+        errors.error(s"""Value of the 'ref' attribute does not start with '#': ref="$refAttribute" """)
+        None
+      } else if (refAttribute.contains(" ")) {
+        errors.error(s"""Value of the ref attribute contains spaces: ref="$refAttribute" """)
+        None
+      } else Some(refAttribute.substring(1))
+    }
+
+    Name(
+      document,
+      name = xml.text,
+      id = xml.attributeOption("xml:id"),
+      role = xml.attributeOption("role"),
+      refAttribute,
+      ref,
+      entity
     )
   }
+
+  def parseNames(entity: Entity, document: DocumentLike, xml: Seq[Elem], errors: Errors): Seq[Name] =
+    xml.map(elem => Name.parse(entity, document, elem, errors))
+
+  def parseAllNames(document: DocumentLike, xml: Elem, errors: Errors): Seq[Name] =
+    Entity.values.flatMap(entity => parseNames(entity, document, xml.descendants(entity.nameElement), errors))
 }

@@ -17,9 +17,13 @@ final class Layout(docs: File) {
 
   def collections(name: String): File = new File(collections, name)
 
-  val collectionsXml: File = collections("collections.xml")
+  val collectionsFileName: String = "collections"
 
   private def url(ref: String): String = s"/$collectionsDirectoryName/$ref"
+
+  private val namesDirectoryName: String = "names"
+
+  val namesDirectory: File = docs(namesDirectoryName)
 
   val namesFileDirectory: File = collections
 
@@ -27,7 +31,7 @@ final class Layout(docs: File) {
 
   val namesUrl: String = url(s"$namesFileName.html")
 
-  def collectionXml(directory: File): File = new File(directory, "collection.xml")
+  val collectionFileName: String = "collection"
 
   def collectionUrl(name: String): String = url(s"$name/index.html")
 

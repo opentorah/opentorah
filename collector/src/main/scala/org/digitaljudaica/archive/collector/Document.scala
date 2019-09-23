@@ -1,65 +1,45 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-
 import Xml.Ops
-
 import scala.xml.Elem
 
 final class Document(
   layout: Layout,
   collectionDirectoryName: String,
   teiDirectory: File,
-  val name: String,
+  override val name: String,
   prev: Option[String],
   next: Option[String],
   val translations: Seq[String],
-  pageType: Page.Type
-) extends DocumentLike(teiDirectory, name) {
+  pageType: Page.Type,
+  errors: Errors
+) extends DocumentLike {
+  private val tei: Tei = Tei.load(teiDirectory, name)
+
+  val references: Seq[Name] = Name.parseAllNames(this, tei.tei, errors)
 
   override def url: String = layout.documentUrl(collectionDirectoryName, name)
 
-  private[this] val titleStmt: Elem = fileDesc.oneChild("titleStmt")
+  val (title: Option[Elem], subTitle: Option[Elem]) = (tei.getTitle("main"), tei.getTitle("sub"))
 
-  val (title: Option[Elem], subTitle: Option[Elem]) = {
-    val titles: Seq[Elem] = titleStmt.elemsFilter("title")
-    def getTitle(name: String): Option[Elem] =
-      titles.find(_.getAttribute("type") == name)
+  def author: Option[Elem] = tei.author
 
-    (getTitle("main"), getTitle("sub"))
-  }
+  def transcriber: Option[Elem] = tei.editors.find(_.attributeOption("role").contains("transcriber"))
 
-  def author: Option[Elem] =
-    titleStmt.optionalChild("author")
+  def date: Option[String] = tei.date
 
-  def transcriber: Option[Elem] =
-    titleStmt.elemsFilter("editor").find(_.attributeOption("role").contains("transcriber"))
+  def description: Option[Elem] = tei.getAbstract.orElse(title)
 
-  def publicationDate: Option[Elem] =
-    fileDesc.oneChild("publicationStmt").optionalChild("date")
+  def language: Option[String] = tei.languageIdents.headOption
 
-  def date: Option[String] =
-    profileDesc.optionalChild("creation").map(_.oneChild("date").getAttribute("when"))
-
-  def description: Option[Elem] =
-    profileDesc.optionalChild("abstract").orElse(title)
-
-  def language: Option[String] =
-    profileDesc.oneChild("langUsage").elems("language").map(_.getAttribute("ident")).headOption
-
-  val pages: Seq[Page] = for (pb <- body.descendants("pb")) yield pageType(
+  val pages: Seq[Page] = for (pb <- tei.pbs) yield pageType(
     name = pb.getAttribute("n"),
     isPresent = pb.attributeOption("facs").isDefined
   )
 
-  override def persNames: Seq[Name] = namesOf(Entity.Person)
-  override def placeNames: Seq[Name] = namesOf(Entity.Place)
-  override def orgNames: Seq[Name] = namesOf(Entity.Organization)
-
-  private def namesOf(entity: Entity): Seq[Name] = names(teiDescendants(entity.nameElement))
-
   def addressee: Option[Name] =
-    persNames.find(_.role.contains("addressee"))
+    references.find(name => (name.entity == Entity.Person) && name.role.contains("addressee"))
 
   def writeWrappers(docsDirectory: File, facsDirectory: File): Unit = {
     def quote(what: String): String = s"'$what'"
