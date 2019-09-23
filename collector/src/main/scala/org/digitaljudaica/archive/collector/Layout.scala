@@ -21,11 +21,11 @@ final class Layout(docs: File) {
 
   private def url(ref: String): String = s"/$collectionsDirectoryName/$ref"
 
-  private val namesDirectoryName: String = "names"
+  val namesDirectoryName: String = "names"
 
   val namesDirectory: File = docs(namesDirectoryName)
 
-  val namesFileDirectory: File = collections
+  val namesFileDirectory: File = docs
 
   val namesFileName: String = "names"
 
