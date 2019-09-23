@@ -38,17 +38,19 @@ object Main {
     )
 
     val navigationRefs: Seq[String] =
-      (for (collection <- collections.filter(_.includeInNavigation)) yield {
-        val url: String = layout.collectionUrl(collection.directoryName)
-        // Links with starting slash do not make it into the navigation bar?
-        if (url.startsWith("/")) url.substring(1) else url
-      }) :+ layout.namesDirectoryName
+      (for (collection <- collections.filter(_.includeInNavigation))
+       yield layout.collectionUrl(collection.directoryName)) :+
+        layout.namesUrl
 
     Util.splice(
       file = layout.configYml,
       start = "header_pages:",
       end = "# header_pages end",
-      what = navigationRefs.map(ref => s"  - $ref")
+      what = navigationRefs.map { url =>
+        // Links with starting slash do not make it into the navigation bar?
+        val ref = if (url.startsWith("/")) url.substring(1) else url
+        s"  - $ref"
+      }
     )
 
     println("Processing name references.")
