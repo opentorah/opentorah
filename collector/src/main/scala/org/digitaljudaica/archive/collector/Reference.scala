@@ -4,14 +4,14 @@ import scala.xml.Elem
 import Xml.Ops
 
 final case class Reference(
-  document: DocumentLike,
+  source: HasReferences,
   name: String,
   id: Option[String],
   role: Option[String],
   ref: Option[String],
   entity: Entity
 ) {
-  override def toString: String = document.toString
+  override def toString: String = source.toString
 
   def toXml: Elem = {
     <name ref={ref.orNull} xml:id={id.orNull} role={role.orNull}>{name}</name>
@@ -20,7 +20,7 @@ final case class Reference(
 }
 
 object Reference {
-  def parseReferences(document: DocumentLike, xml: Elem, errors: Errors): Seq[Reference] =
+  def parseReferences(document: HasReferences, xml: Elem, errors: Errors): Seq[Reference] =
     Entity.values.flatMap { entity =>
       for (elem <- xml.descendants(entity.nameElement)) yield {
         val ref: Option[String] = elem.attributeOption("ref").flatMap { ref: String =>
