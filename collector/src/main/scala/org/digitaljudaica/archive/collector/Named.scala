@@ -17,16 +17,11 @@ final case class Named(
 
   val references: Seq[Reference] = content.flatMap(element => Reference.parseReferences(document, element, errors))
 
-  def isMentions(element: Elem): Boolean =
-    element.label == "p" && (element \ "@rendition").text == "mentions"
+  def addMentions(references: Seq[Reference]): Named =
+    copy(content = content.filterNot(isMentions) :+ mentions(references))
 
-  def addMentions(references: Seq[Reference]): Named = {
-    val (nonMentions: Seq[Elem], tail: Seq[Elem]) = content.span(element => !isMentions(element))
-
-    val (before: Seq[Elem], after: Seq[Elem]) = if (tail.nonEmpty) (nonMentions, tail.tail) else (Nil, content)
-
-    copy(content = before ++ Seq(mentions(references)) ++ after)
-  }
+  private def isMentions(element: Elem): Boolean =
+    (element.label == "p") && ((element \ "@rendition").text == "mentions")
 
   private def mentions(references: Seq[Reference]): Elem = {
     <p rendition="mentions">
