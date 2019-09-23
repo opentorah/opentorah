@@ -15,13 +15,15 @@ final class Collection(
 ) {
   def directoryName: String = directory.getName
 
+  val teiDirectory: File = layout.tei(directory)
+
   def reference: String = xml.optionalChild("reference").map(_.text).getOrElse(directoryName)
 
   def title: String = xml.optionalChild("title").map(_.text).getOrElse(reference)
 
   def description: Seq[Elem] = xml.oneChild("abstract").elements
 
-  private def pageType: Page.Type = if (isBook) Page.Book else Page.Manuscript
+  def pageType: Page.Type = if (isBook) Page.Book else Page.Manuscript
 
   private val parts: Seq[Part] = Part.splitParts(xml.elemsFilter("part"), getDocuments)
 
@@ -69,8 +71,6 @@ final class Collection(
   }
 
   private def getDocuments: Seq[Document] = {
-    val teiDirectory = layout.tei(directory)
-
     val namesWithLang: Seq[(String, Option[String])] =
       Util.filesWithExtensions(teiDirectory, ".xml").sorted.map(splitLang)
 
@@ -91,13 +91,11 @@ final class Collection(
 
     for ((name, (prev, next)) <- namesWithSiblings) yield new Document(
       layout,
-      collectionDirectoryName = directoryName,
-      teiDirectory,
+      collection = this,
       name,
       prev,
       next,
       translations = translations.getOrElse(name, Seq.empty),
-      pageType,
       errors
     )
   }

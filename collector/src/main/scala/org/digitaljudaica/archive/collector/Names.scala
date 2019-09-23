@@ -5,16 +5,12 @@ import java.io.File
 import scala.xml.Elem
 import Xml.Ops
 
-final class Names(layout: Layout, errors: Errors) extends DocumentLike {
-  override def url: String = layout.namesUrl
-
-  override def name: String = layout.namesFileName
-
+final class Names(layout: Layout, errors: Errors) {
   val xml: Elem = Xml.load(layout.namesDirectory, layout.namesFileName).check("names")
   val elements: Seq[Elem] = xml.elements
   val head: String = elements.head.check("head").text
-  // TODO check that there are no orphan directories
-  val lists: Seq[Nameds] = elements.tail.map(element => Nameds.parse(this, element, layout.namesDirectory, errors))
+
+  val lists: Seq[Nameds] = elements.tail.map(element => Nameds.parse(layout, this, element, layout.namesDirectory, errors))
 
   for (orphanDirectoryName <-
          layout.namesDirectory.listFiles.filter(_.isDirectory).map(_.getName).toSet -- lists.map(_.name).toSet)
@@ -54,8 +50,11 @@ final class Names(layout: Layout, errors: Errors) extends DocumentLike {
     val directory: File = layout.namesFileDirectory
     val fileName: String = layout.namesFileName
 
-    Tei.tei(head, content = for (list <- lists) yield list.addMentions(references).toXml)
-      .write(directory, fileName)
+    val content: Seq[Elem] =
+      <p>{for (list <- lists) yield <l><ref target={layout.namedUrl(list.name)} role="namesViewer">{list.head}</ref></l>}</p> +:
+         (for (list <- lists) yield list.addMentions(references).toXml)
+
+    Tei.tei(head, content).write(directory, fileName)
 
     // Wrapper
     Util.writeTeiYaml(directory, fileName,

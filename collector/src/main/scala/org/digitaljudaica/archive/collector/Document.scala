@@ -6,20 +6,24 @@ import scala.xml.Elem
 
 final class Document(
   layout: Layout,
-  collectionDirectoryName: String,
-  teiDirectory: File,
+  collection: Collection,
   override val name: String,
   prev: Option[String],
   next: Option[String],
   val translations: Seq[String],
-  pageType: Page.Type,
   errors: Errors
-) extends DocumentLike {
-  private val tei: Tei = Tei.load(teiDirectory, name)
+) extends HasReferences {
+  private val tei: Tei = Tei.load(collection.teiDirectory, name)
 
-  val references: Seq[Reference] = Reference.parseReferences(this, tei.tei, errors)
+  override val references: Seq[Reference] = Reference.parseReferences(this, tei.tei, errors)
 
-  override def url: String = layout.documentUrl(collectionDirectoryName, name)
+  override def isNames: Boolean = false
+
+  override def collectionReference: String = collection.reference
+
+  override def viewer: String = "documentViewer"
+
+  override def url: String = layout.documentUrl(collection.directoryName, name)
 
   val (title: Option[Elem], subTitle: Option[Elem]) = (tei.getTitle("main"), tei.getTitle("sub"))
 
@@ -33,7 +37,7 @@ final class Document(
 
   def language: Option[String] = tei.languageIdents.headOption
 
-  val pages: Seq[Page] = for (pb <- tei.pbs) yield pageType(
+  val pages: Seq[Page] = for (pb <- tei.pbs) yield collection.pageType(
     name = pb.getAttribute("n"),
     isPresent = pb.attributeOption("facs").isDefined
   )

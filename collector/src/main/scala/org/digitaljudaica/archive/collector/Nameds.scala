@@ -24,14 +24,20 @@ final case class Nameds(
 }
 
 object Nameds {
-  def parse(document: DocumentLike, xml: Elem, directory: File, errors: Errors): Nameds = {
+  def parse(
+    layout: Layout,
+    names: Names,
+    xml: Elem,
+    directory: File,
+    errors: Errors
+  ): Nameds = {
     val entity: Entity = Entity.forList(xml.label).get
     val name: String = xml.getAttribute("xml:id")
     val head: String = xml.oneChild("head").text
     val listDirectory: File = new File(directory, name)
     val nameds: Seq[Named] =
       for (fileName <- Util.filesWithExtensions(listDirectory, ".xml").sorted)
-      yield Named.parse(entity, document, listDirectory, fileName, errors)
+      yield Named.parse(layout, entity, names, listDirectory, fileName, errors)
 
     Nameds(
       name = name,
