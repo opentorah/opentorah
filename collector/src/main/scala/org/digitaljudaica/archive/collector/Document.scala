@@ -17,7 +17,7 @@ final class Document(
 ) extends DocumentLike {
   private val tei: Tei = Tei.load(teiDirectory, name)
 
-  val references: Seq[Name] = Name.parseAllNames(this, tei.tei, errors)
+  val references: Seq[Reference] = Reference.parseReferences(this, tei.tei, errors)
 
   override def url: String = layout.documentUrl(collectionDirectoryName, name)
 
@@ -38,7 +38,7 @@ final class Document(
     isPresent = pb.attributeOption("facs").isDefined
   )
 
-  def addressee: Option[Name] =
+  def addressee: Option[Reference] =
     references.find(name => (name.entity == Entity.Person) && name.role.contains("addressee"))
 
   def writeWrappers(docsDirectory: File, facsDirectory: File): Unit = {

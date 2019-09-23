@@ -27,7 +27,7 @@ final class Collection(
 
   private val documents: Seq[Document] = parts.flatMap(_.documents)
 
-  def references: Seq[Name] = documents.flatMap(_.references)
+  def references: Seq[Reference] = documents.flatMap(_.references)
 
   private val pages: Seq[Page] = documents.flatMap(_.pages)
 

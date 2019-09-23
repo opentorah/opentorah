@@ -10,9 +10,9 @@ final case class Nameds(
   nameds: Seq[Named],
   entity: Entity
 ) {
-  def references: Seq[Name] = nameds.flatMap(_.references)
+  def references: Seq[Reference] = nameds.flatMap(_.references)
 
-  def addMentions(references: Seq[Name]): Nameds =
+  def addMentions(references: Seq[Reference]): Nameds =
     copy(nameds = nameds.map(_.addMentions(references)))
 
   def toXml: Elem =

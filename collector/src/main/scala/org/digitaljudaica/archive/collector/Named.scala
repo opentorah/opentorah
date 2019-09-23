@@ -6,19 +6,21 @@ import scala.xml.Elem
 import Xml.Ops
 
 final case class Named(
-   document: DocumentLike,
-   id: String,
-   names: Seq[Name],
-   content: Seq[Elem],
-   entity: Entity,
-   errors: Errors
+  document: DocumentLike,
+  id: String,
+  names: Seq[Name],
+  content: Seq[Elem],
+  entity: Entity,
+  errors: Errors
 ) {
-  val references: Seq[Name] = content.flatMap(element => Name.parseAllNames(document, element, errors))
+  if (names.isEmpty) errors.error(s"No names for $id")
+
+  val references: Seq[Reference] = content.flatMap(element => Reference.parseReferences(document, element, errors))
 
   def isMentions(element: Elem): Boolean =
     element.label == "p" && (element \ "@rendition").text == "mentions"
 
-  def addMentions(references: Seq[Name]): Named = {
+  def addMentions(references: Seq[Reference]): Named = {
     val (nonMentions: Seq[Elem], tail: Seq[Elem]) = content.span(element => !isMentions(element))
 
     val (before: Seq[Elem], after: Seq[Elem]) = if (tail.nonEmpty) (nonMentions, tail.tail) else (Nil, content)
@@ -26,7 +28,7 @@ final case class Named(
     copy(content = before ++ Seq(mentions(references)) ++ after)
   }
 
-  private def mentions(references: Seq[Name]): Elem = {
+  private def mentions(references: Seq[Reference]): Elem = {
     <p rendition="mentions">
       {for (ref <- Util.removeConsecutiveDuplicates(references.filter(_.ref.get == id).map(_.document)))
       yield <ref target={ref.url} role="documentViewer">{ref.name}</ref>}
@@ -52,7 +54,7 @@ object Named {
     Named(
       document,
       id = fileName,
-      names = Name.parseNames(entity, document, nameElements, errors),
+      names = Name.parseNames(entity, nameElements, errors),
       content = tail.map(Xml.removeNamespace),
       entity,
       errors

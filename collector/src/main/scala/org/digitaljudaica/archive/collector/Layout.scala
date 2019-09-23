@@ -29,7 +29,7 @@ final class Layout(docs: File) {
 
   val namesFileName: String = "names"
 
-  val namesUrl: String = url(s"$namesFileName.html")
+  val namesUrl: String = s"/$namesFileName.html"
 
   val collectionFileName: String = "collection"
 

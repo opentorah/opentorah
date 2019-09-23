@@ -32,12 +32,12 @@ final class Names(layout: Layout, errors: Errors) extends DocumentLike {
 
   errors.check()
 
-  val references: Seq[Name] = nameds.flatMap(_.references)
+  val references: Seq[Reference] = nameds.flatMap(_.references)
 
-  def isResolvable(name: Name): Boolean = nameds.exists(_.id.contains(name.ref.get))
+  def isResolvable(name: Reference): Boolean = nameds.exists(_.id.contains(name.ref.get))
 
-  def processReferences(documentReferences: Seq[Name]): Unit = {
-    val references: Seq[Name] = (this.references ++ documentReferences).filterNot(_.name == "?")
+  def processReferences(documentReferences: Seq[Reference]): Unit = {
+    val references: Seq[Reference] = (this.references ++ documentReferences).filterNot(_.name == "?")
 
     for (reference <- references.filter(_.ref.isEmpty)) {
       errors.error(s"Missing 'ref' attribute: Name>${reference.name}<")
