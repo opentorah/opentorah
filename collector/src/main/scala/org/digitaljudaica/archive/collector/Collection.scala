@@ -15,6 +15,8 @@ final class Collection(
 ) {
   def directoryName: String = directory.getName
 
+  override def toString: String = directoryName
+
   val teiDirectory: File = layout.tei(directory)
 
   def reference: String = xml.optionalChild("reference").map(_.text).getOrElse(directoryName)

@@ -13,6 +13,8 @@ final class Document(
   val translations: Seq[String],
   errors: Errors
 ) extends HasReferences {
+  override def toString: String = s"$collection:$name"
+
   private val tei: Tei = Tei.load(collection.teiDirectory, name)
 
   override val references: Seq[Reference] = Reference.parseReferences(this, tei.tei, errors)
