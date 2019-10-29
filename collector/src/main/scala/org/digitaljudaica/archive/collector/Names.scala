@@ -36,7 +36,7 @@ final class Names(layout: Layout, errors: Errors) {
     val references: Seq[Reference] = (this.references ++ documentReferences).filterNot(_.name == "?")
 
     for (reference <- references.filter(_.ref.isEmpty)) {
-      errors.error(s"Missing 'ref' attribute: Name>${reference.name}<")
+      errors.error(s"Missing 'ref' attribute: Name>${reference.name}< (${reference.source})")
     }
 
     errors.check()
