@@ -147,7 +147,7 @@ object Collection {
     }),
 
     Column("Кому", "addressee",  _.addressee.fold[Seq[Node]](Text(""))(addressee =>
-      <persName ref={addressee.ref.map("#" + _).orNull}>{addressee.name}</persName>)),
+      <persName ref={addressee.ref.orNull}>{addressee.name}</persName>)),
 
     Column("Язык", "language", { document: Document =>
       val translations: Seq[Elem] = for (translation <- document.translations) yield
