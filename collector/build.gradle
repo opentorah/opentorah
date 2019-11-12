@@ -5,6 +5,6 @@ plugins {
 description = 'Archive Collector'
 
 dependencies {
-    compile "org.scala-lang:scala-library:$scalaVersion"
-    compile "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+    implementation "org.scala-lang:scala-library:$scalaVersion"
+    implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
 }
