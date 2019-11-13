@@ -51,6 +51,7 @@ final class Document(
     def quote(what: String): String = s"'$what'"
 
     val navigation: Seq[(String, String)] =
+      Seq("collection" -> quote(collection.reference)) ++
       prev.map(prev => Seq("prev" -> quote(prev))).getOrElse(Seq.empty) ++
       Seq("self" -> quote(name)) ++
       next.map(next => Seq("next" -> quote(next))).getOrElse(Seq.empty)
@@ -58,7 +59,7 @@ final class Document(
     def writeTeiWrapper(name: String, lang: Option[String]): Unit = {
       val nameWithLang: String = lang.fold(name)(lang => name + "-" + lang)
 
-      Util.writeYaml(docsDirectory, nameWithLang, layout = "document", Seq(
+      Util.writeYaml(Util.htmlFile(docsDirectory, nameWithLang), layout = "document", Seq(
         "tei" -> s"'../${layout.teiDirectoryName}/$nameWithLang.xml'",
         "facs" -> s"'../${layout.facsDirectoryName}/$name.html'"
       ) ++ (if (lang.isDefined || translations.isEmpty) Seq.empty else Seq("translations" -> translations.mkString("[", ", ", "]")))
@@ -71,7 +72,7 @@ final class Document(
     for (lang <- translations) writeTeiWrapper(name, Some(lang))
 
     // Facsimile viewer
-    Util.writeYaml(facsDirectory, name, layout = "facsimile", Seq(
+    Util.writeYaml(Util.htmlFile(facsDirectory, name), layout = "facsimile", Seq(
       "images" -> pages.filter(_.isPresent).map(_.name).mkString("[", ", ", "]")
     ) ++ navigation
     )

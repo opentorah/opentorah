@@ -6,6 +6,8 @@ final class Layout(docs: File) {
 
   private def docs(fileName: String): File = new File(docs, fileName)
 
+  val collectionsMd: File = docs("collections.md")
+
   val indexMd: File = docs("index.md")
 
   val configYml: File = docs("_config.yml")

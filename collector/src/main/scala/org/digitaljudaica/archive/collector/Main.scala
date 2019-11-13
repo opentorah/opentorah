@@ -27,15 +27,21 @@ object Main {
 
     errors.check()
 
-    Util.splice(
-      file = layout.indexMd,
-      start = """<a name="collections-start">""",
-      end = """<a name="collections-end">""",
-      what = collections.flatMap { collection => Seq(
-        s"""- <a href="${layout.collectionUrl(collection.directoryName)}" target="collectionViewer">${collection.reference}</a>:""",
-        s"${collection.title}."
-      )}
-    )
+    val collectionLinks: Seq[String] = collections.flatMap { collection => Seq(
+      s"""- <a href="${layout.collectionUrl(collection.directoryName)}" target="collectionViewer">${collection.reference}</a>:""",
+      s"${collection.title}."
+    )}
+
+    Util.writeYaml(layout.collectionsMd, "page", Seq(
+      "title" -> "Дела", "target" -> "collectionViewer"
+    ), collectionLinks)
+
+//    Util.splice(
+//      file = layout.indexMd,
+//      start = """<a name="collections-start">""",
+//      end = """<a name="collections-end">""",
+//      what = collectionLinks
+//    )
 
     val navigationRefs: Seq[String] =
       (for (collection <- collections.filter(_.includeInNavigation))
@@ -44,7 +50,7 @@ object Main {
 
     Util.splice(
       file = layout.configYml,
-      start = "header_pages:",
+      start = "# header_pages start",
       end = "# header_pages end",
       what = navigationRefs.map { url =>
         // Links with starting slash do not make it into the navigation bar?

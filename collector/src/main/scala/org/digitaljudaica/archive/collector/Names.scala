@@ -57,7 +57,7 @@ final class Names(layout: Layout, errors: Errors) {
     Tei.tei(head, content).write(directory, fileName)
 
     // Wrapper
-    Util.writeTeiYaml(directory, fileName,
+    Util.writeTeiYaml(Util.htmlFile(directory, fileName),
       layout = "names",
       tei = s"$fileName.xml",
       title = head,

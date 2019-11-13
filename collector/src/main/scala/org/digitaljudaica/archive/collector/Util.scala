@@ -12,49 +12,33 @@ object Util {
       .filter(_.endsWith(extension)).map(_.dropRight(extension.length))
   }
 
+  def htmlFile(directory: File, fileName: String): File = new File(directory, fileName + ".html")
+
   def writeTeiYaml(
-    directory: File,
-    fileName: String,
+    file: File,
     layout: String,
     tei: String,
     title: String,
     target: String
-  ): Unit = writeYaml(directory, fileName, layout, Seq(
+  ): Unit = writeYaml(file, layout, Seq(
     "tei" -> tei,
     "title" -> title,
     "target" -> target
   ))
 
   def writeYaml(
-    directory: File,
-    fileName: String,
+    file: File,
     layout: String,
-    yaml: Seq[(String, String)]
-  ): Unit = writeYaml(directory, fileName, ("layout", layout) +: yaml)
-
-  private def writeYaml(
-    directory: File,
-    fileName: String,
-    yaml: Seq[(String, String)]
+    yaml: Seq[(String, String)],
+    content: Seq[String] = Seq.empty
   ): Unit = {
     val result: Seq[String] =
-      Seq(
-        "---"
-      ) ++
-        (for ((name, value) <- yaml) yield name + ": " + value) ++
-      Seq("---", "")
+      Seq("---") ++
+        (for ((name, value) <- ("layout", layout) +: yaml) yield name + ": " + value) ++
+        Seq("---") ++
+        Seq("") ++ content
 
-    write(directory, fileName + ".html", result.mkString("\n"))
-  }
-
-  def write(directory: File, fileName: String, content: String): Unit =
-    write(new File(directory, fileName), content)
-
-  def read(file: File): Seq[String] = {
-    val source = Source.fromFile(file)
-    val result = source.getLines.toSeq
-    source.close
-    result
+    write(file, result.mkString("\n"))
   }
 
   def write(file: File, content: String): Unit = {
@@ -65,6 +49,13 @@ object Util {
     } finally {
       writer.close()
     }
+  }
+
+  def read(file: File): Seq[String] = {
+    val source = Source.fromFile(file)
+    val result = source.getLines.toSeq
+    source.close
+    result
   }
 
   def splice(file: File, start: String, end: String, what: Seq[String]): Unit = {

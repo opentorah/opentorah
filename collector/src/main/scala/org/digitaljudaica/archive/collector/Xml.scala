@@ -89,7 +89,7 @@ object Xml {
     def write(
       directory: File,
       fileName: String,
-    ): Unit = Util.write(directory, fileName + ".xml", content =
+    ): Unit = Util.write(new File(directory, fileName + ".xml"), content =
       """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" + Xml.prettyPrinter.format(elem)
     )
   }
