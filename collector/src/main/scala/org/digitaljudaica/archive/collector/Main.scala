@@ -27,21 +27,23 @@ object Main {
 
     errors.check()
 
-    val collectionLinks: Seq[String] = collections.flatMap { collection => Seq(
-      s"""- <a href="${layout.collectionUrl(collection.directoryName)}" target="collectionViewer">${collection.reference}</a>:""",
-      s"${collection.title}"
-    )}
+    val byArchive: Map[String, Seq[Collection]] = collections.groupBy(_.archive)
+    val collectionLinks: Seq[Seq[String]] = for (archive <- byArchive.keys.toList.sorted) yield {
+      val cases: Seq[Seq[String]] = for (collection <- byArchive(archive).sortBy(_.archiveCase)) yield Seq(
+        s"""  - <a href="${layout.collectionUrl(collection.directoryName)}" target="collectionViewer">${collection.archiveCase}</a>:""",
+        s"  ${collection.title}"
+      )
+      s"- [$archive]" +: cases.flatten
+    }
+
+//    val collectionLinks: Seq[String] = collections.flatMap { collection => Seq(
+//      s"""- <a href="${layout.collectionUrl(collection.directoryName)}" target="collectionViewer">${collection.reference}</a>:""",
+//      s"${collection.title}"
+//    )}
 
     Util.writeYaml(layout.collectionsMd, "page", Seq(
       "title" -> "Дела", "target" -> "collectionViewer"
-    ), collectionLinks)
-
-//    Util.splice(
-//      file = layout.indexMd,
-//      start = """<a name="collections-start">""",
-//      end = """<a name="collections-end">""",
-//      what = collectionLinks
-//    )
+    ), collectionLinks.flatten)
 
     val navigationRefs: Seq[String] =
       (for (collection <- collections.filter(_.includeInNavigation))

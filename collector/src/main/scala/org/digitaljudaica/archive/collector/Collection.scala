@@ -19,7 +19,14 @@ final class Collection(
 
   val teiDirectory: File = layout.tei(directory)
 
-  def reference: String = xml.optionalChild("reference").map(_.spacedText).getOrElse(directoryName)
+  def archive: String = xml.oneChild("archive").spacedText
+
+  def archiveCase: String = xml.oneChild("case").spacedText
+
+  def reference: String =
+    if (archive.isEmpty) archiveCase else
+    if (archiveCase.isEmpty) archive else
+      archive + " " + archiveCase
 
   def title: String = xml.optionalChild("title").map(_.spacedText).getOrElse(reference)
 
