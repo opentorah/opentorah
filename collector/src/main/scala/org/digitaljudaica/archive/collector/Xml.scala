@@ -54,6 +54,8 @@ object Xml {
 
     def descendants(name: String): Seq[Elem] = elem.flatMap(_ \\ name).filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
+    def spacedText: String = (elem.child map (_.text)).mkString(" ")
+
     def getAttribute(name: String): String = attributeOption(name).getOrElse(throw new NoSuchElementException(s"No attribute $name"))
 
     def attributeOption(name: String): Option[String] = elem.attributes.asAttrMap.get(name)
