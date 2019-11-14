@@ -29,7 +29,7 @@ object Main {
 
     val collectionLinks: Seq[String] = collections.flatMap { collection => Seq(
       s"""- <a href="${layout.collectionUrl(collection.directoryName)}" target="collectionViewer">${collection.reference}</a>:""",
-      s"${collection.title}."
+      s"${collection.title}"
     )}
 
     Util.writeYaml(layout.collectionsMd, "page", Seq(
