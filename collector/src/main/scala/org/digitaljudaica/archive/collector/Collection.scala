@@ -19,9 +19,9 @@ final class Collection(
 
   val teiDirectory: File = layout.tei(directory)
 
-  def reference: String = xml.optionalChild("reference").map(_.text).getOrElse(directoryName)
+  def reference: String = xml.optionalChild("reference").map(_.spacedText).getOrElse(directoryName)
 
-  def title: String = xml.optionalChild("title").map(_.text).getOrElse(reference)
+  def title: String = xml.optionalChild("title").map(_.spacedText).getOrElse(reference)
 
   def description: Seq[Elem] = xml.oneChild("abstract").elements
 
