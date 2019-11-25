@@ -14,8 +14,5 @@ subject of two papers: general ([HTML](/judaica/html/index.html) [PDF](/judaica/
 [PDF](/typesetting/pdf/judaica.pdf) [EPUB](/typesetting/epub/judaica.epub)).
 Code implementing some of those ideas is in a [GitHub repository](https://github.com/digitaljudaica/digitaljudaica.org).
 
-[Blog post](http://dub.podval.org/2019/05/06/publishing-papers-on-web-2.html) about
-technical details of the publication.
-
 [SBL font](http://www.sbl-site.org/educational/BiblicalFonts_SBLHebrew.aspx) is
  needed for viewing Tanach.

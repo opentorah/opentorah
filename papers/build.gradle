@@ -18,7 +18,7 @@ docBook {
 
   parameters.htmlCommon = [
          // Include page number in cross-references
-         "insert.xref.page.number": "yes"
+    "insert.xref.page.number": "yes"
   ]
 
   parameters.pdf = [
