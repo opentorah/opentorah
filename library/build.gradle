@@ -21,13 +21,6 @@ dependencies {
   testImplementation "org.typelevel:algebra-laws_$scalaVersionMajor:$algebraLawsVersion"
 }
 
-// Do not let 'discipline' drag us into the snapshot releases :)
-configurations.all {
-  resolutionStrategy {
-    force("org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion")
-  }
-}
-
 task sourceJar(type: Jar) {
   from sourceSets.main.allSource
   archiveClassifier.set('sources')
