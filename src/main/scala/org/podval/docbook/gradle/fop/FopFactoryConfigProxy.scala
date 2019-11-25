@@ -2,9 +2,9 @@ package org.podval.docbook.gradle.fop
 
 import java.net.URI
 
-import org.apache.avalon.framework.configuration.Configuration
 import org.apache.fop.apps.FopFactoryConfig
 import org.apache.fop.apps.io.InternalResourceResolver
+import org.apache.fop.configuration.Configuration
 import org.apache.fop.fonts.FontManager
 import org.apache.fop.layoutmgr.LayoutManagerMaker
 import org.apache.xmlgraphics.image.loader.impl.AbstractImageSessionContext.FallbackResolver

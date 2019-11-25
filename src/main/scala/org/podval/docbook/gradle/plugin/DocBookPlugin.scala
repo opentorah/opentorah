@@ -44,7 +44,7 @@ final class DocBookPlugin extends Plugin[Project] {
       // Note: even when DocBook plugin is applied after the Scala one,
       // there is no 'classes' task during its application - but there is after project evaluation:
       Gradle.getTask(project, "classes").fold {
-        logger.warn("No 'classes' task found.")
+        logger.info("No 'classes' task found.")
       }{ classesTask =>
         logger.info("Found 'classes' task; adding it as dependency of 'processDocBook'.")
         processDocBookTask.getDependsOn.add(classesTask)

@@ -52,7 +52,9 @@ object PluginTestProject {
     val projectDir: File = new File(Util.prefixedDirectory(layout.buildDir, prefix), name)
     val result: PluginTestProject = new PluginTestProject(projectDir)
 
-    result.write.settingsGradle(layout.projectDir)
+    result.write.settingsGradle(content =
+      s"""|includeBuild '${layout.projectDir}'
+          |""")
 
     val substitutionsFormatted: String = if (substitutions.isEmpty) "" else {
       val contents: String = substitutions.map { case (name: String, value: String) =>

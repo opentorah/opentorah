@@ -14,12 +14,6 @@ import scala.jdk.CollectionConverters._
 
 object Gradle {
 
-  final case class Repository(
-    url: String,
-    artifact: String,
-    ivy: String
-  )
-
   def getArtifact(project: Project, dependencyNotation: String): File = {
     val dependency: Dependency = project.getDependencies.create(dependencyNotation)
     val configuration: Configuration = project.getConfigurations.detachedConfiguration(dependency)
@@ -27,7 +21,13 @@ object Gradle {
     configuration.getSingleFile
   }
 
-  def getArtifact(project: Project, dependencyNotation: String, newRepository: Repository): File = {
+  def getArtifact(
+    project: Project,
+    repositoryUrl: String,
+    artifactPattern: String,
+    ivy: String,
+    dependencyNotation: String,
+  ): File = {
     // Stash all the repositories
     val allRepositories: java.util.List[ArtifactRepository] = new java.util.ArrayList[ArtifactRepository]()
     allRepositories.addAll(project.getRepositories)
@@ -35,11 +35,19 @@ object Gradle {
 
     // Add Node repository
     project.getRepositories.ivy((repository: IvyArtifactRepository) => {
-      repository.setUrl(newRepository.url)
+      repository.setUrl(repositoryUrl)
       repository.patternLayout((repositoryLayout: IvyPatternRepositoryLayout) => {
-        repositoryLayout.artifact(newRepository.artifact)
-        repositoryLayout.ivy(newRepository.ivy)
+        repositoryLayout.artifact(artifactPattern)
+        repositoryLayout.ivy(ivy)
       })
+
+      // Gradle 6.0 broke NodeJS retrieval;
+      // from https://github.com/gradle/gradle/issues/11006 and code referenced there
+      // https://github.com/gradle/gradle/blob/b189979845c591d8c4a0032527383df0f6d679b2/subprojects/javascript/src/main/java/org/gradle/plugins/javascript/base/JavaScriptRepositoriesExtension.java#L53
+      // it seems that to re-gain Gradle 5.6 behaviour, this needs to be done:
+      repository.metadataSources((metadataSources: IvyArtifactRepository.MetadataSources) => {
+        metadataSources.artifact(); // Indicates that this repository may not contain metadata files...
+      });
     })
 
     // Resolve the dependency

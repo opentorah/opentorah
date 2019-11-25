@@ -1,6 +1,6 @@
 package org.podval.docbook.gradle.mathjax
 
-import org.podval.docbook.gradle.util.{Architecture, Gradle, Os}
+import org.podval.docbook.gradle.util.{Architecture, Os}
 
 // Heavily inspired by (read: copied and reworked from :)) https://github.com/srs/gradle-node-plugin by srs.
 // That plugin is not used directly because its tasks are not reusable unless the plugin is applied to the project,
@@ -67,12 +67,4 @@ final class NodeDistribution(
     s"node-v$version-$dependencyOsName-$dependencyOsArch"
 
   def hasBinSubdirectory: Boolean = !isWindows
-}
-
-object NodeDistribution {
-  val repository: Gradle.Repository = Gradle.Repository(
-    url = "https://nodejs.org/dist",
-    artifact = "v[revision]/[artifact](-v[revision]-[classifier]).[ext]",
-    ivy = "v[revision]/ivy.xml"
-  )
 }

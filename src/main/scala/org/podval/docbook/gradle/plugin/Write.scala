@@ -199,8 +199,8 @@ final class Write(val layout: Layout, val logger: Logger) {
   private def xsl(section: Section): String =
     Namespace.Xsl.withVersion(section.xsltVersion)
 
-  def settingsGradle(pluginDir: File): Unit =
-    writeInto(layout.settingsGradle)(s"includeBuild '$pluginDir'")
+  def settingsGradle(content: String): Unit =
+    writeInto(layout.settingsGradle)(content)
 
   def buildGradle(content: String): Unit =
     writeInto(layout.buildGradle)(content)

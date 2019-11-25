@@ -1,5 +1,5 @@
 plugins {
-  id 'com.github.ben-manes.versions' version "0.25.0"
+  id 'com.github.ben-manes.versions' version "0.27.0"
   id 'scala'
   id 'com.github.maiflai.scalatest' version "0.25"
   id 'java-gradle-plugin'
@@ -10,17 +10,17 @@ plugins {
 }
 
 group = 'org.podval.docbook'
-version = '0.7.10'
+version = '0.7.11'
 description = 'Gradle DocBook plugin'
 
 repositories {
   jcenter()
 }
 
-final String scalaVersion = '2.13.0'
+final String scalaVersion = '2.13.1'
 final String scalaVersionMajor = '2.13'
-final String fopVersion = '2.3'
-final String batikVersion = '1.11'
+final String fopVersion = '2.4'
+final String batikVersion = '1.12'
 final String xercesVersion = '2.12.0'
 
 // v1.3.04 doesn't have org.w3c.dom.ElementTraversal that Xerces uses:
@@ -32,30 +32,41 @@ configurations.all {
 
 dependencies {
   // Scala
-  compile "org.scala-lang:scala-library:$scalaVersion"
+  implementation "org.scala-lang:scala-library:$scalaVersion"
 
   // XMLResolver
-  compile 'org.xmlresolver:xmlresolver:1.0.2'
+  implementation 'org.xmlresolver:xmlresolver:1.0.5'
 
   // Saxon 6 (XSLT 1.0)
-  compile 'saxon:saxon:6.5.2' // Note: 6.5.3 is the latest, but - no sources for debugging...
+  implementation 'saxon:saxon:6.5.2' // Note: 6.5.3 is the latest, but - no sources for debugging...
 
   // Saxon 9 (XSLT 2.0)
-  compile 'net.sf.saxon:Saxon-HE:9.9.1-5'
+  implementation 'net.sf.saxon:Saxon-HE:9.9.1-5'
 
   // Xerces
-  runtime "xerces:xercesImpl:$xercesVersion"
+  runtimeOnly "xerces:xercesImpl:$xercesVersion"
 
   // FOP
-  compile "org.apache.xmlgraphics:fop:$fopVersion"
-  compile "org.apache.xmlgraphics:batik-transcoder:$batikVersion"
-  compile "org.apache.xmlgraphics:batik-extension:$batikVersion"
+  // FOP 2.4 uses JAI and JAI Codec from JBoss repository;
+  // since at plugin application time it is to late to define the repository *or* to substitute JAI modules with the
+  // ones from JCenter, and I do not want every project that uses the plugin to have to do either,
+  // I exclude them and add the ones from JCenter:
+  implementation ("org.apache.xmlgraphics:fop:$fopVersion") {
+    exclude group: 'javax.media', module: 'jai-core'
+    exclude group: 'com.sun.media', module: 'jai-codec'
+  }
+  implementation 'javax.media.jai:com.springsource.javax.media.jai.core:1.1.3'
+  implementation 'javax.media.jai:com.springsource.javax.media.jai.codec:1.1.3'
+
+
+  implementation "org.apache.xmlgraphics:batik-transcoder:$batikVersion"
+  implementation "org.apache.xmlgraphics:batik-extension:$batikVersion"
 
   // Hyphenation patterns
-  compile 'net.sf.offo:fop-hyph:2.0'
+  implementation 'net.sf.offo:fop-hyph:2.0'
 
   // JEuclid
-  compile 'de.rototor.jeuclid:jeuclid-fop:3.1.14'
+  implementation 'de.rototor.jeuclid:jeuclid-fop:3.1.14'
 
   // J2V8 integration
   // Note: Native library (if needed and available) is loaded from a dynamically retrieved artifact,
@@ -63,7 +74,7 @@ dependencies {
   // have to use the same version on all platforms.
   // Since 4.6.0 doesn't work on Linux, and 4.8.0 doesn't work with mathjax-node (see J2V8.scala),
   // this probably won't work on any other platform :(
-  compile 'com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0'
+  implementation 'com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0'
 
   testImplementation "org.scalatest:scalatest_$scalaVersionMajor:3.0.8"
   testImplementation "org.pegdown:pegdown:1.6.0" // for scalatest reports

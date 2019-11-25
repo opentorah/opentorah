@@ -96,8 +96,10 @@ object Node {
 
       val nodeArtifact: File = Gradle.getArtifact(
         project,
-        distribution.dependencyNotation,
-        newRepository = NodeDistribution.repository
+        repositoryUrl = "https://nodejs.org/dist",
+        artifactPattern = "v[revision]/[artifact](-v[revision]-[classifier]).[ext]",
+        ivy = "v[revision]/ivy.xml",
+        distribution.dependencyNotation
       )
 
       Gradle.unpack(
