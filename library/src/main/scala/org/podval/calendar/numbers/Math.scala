@@ -7,6 +7,7 @@ object Math {
     (f: S#Point => V, left: S#Point, right: S#Point, length: Int): S#Point =
     findZero(f, left, f(left), right, f(right), length)
 
+  @scala.annotation.tailrec
   private final def findZero[S <: Numbers[S], V : Zeroable](
     f: S#Point => V,
     left : S#Point, leftValue : V,

@@ -25,12 +25,12 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
 
   final def forParsha(parsha: Parsha): Customs = haftarah(parsha).map(_.from(parsha))
 
-  private lazy val haftarah: Map[Parsha, Customs] = Metadata.loadMetadata(
+  private lazy val haftarah: Map[Parsha, Customs] = Util.mapValues(Metadata.loadMetadata(
     keys = Parsha.values,
     obj = this,
     elementName = "week",
     resourceName = Some("Haftarah")
-  ).mapValues { metadata => parse(metadata.attributes, metadata.elements, full = true) }
+  ))(metadata => parse(metadata.attributes, metadata.elements, full = true))
 
   def parse(attributes: Attributes, elements: Seq[Elem], full: Boolean): Customs = {
     val span: BookSpanParsed = parseSpan(attributes)

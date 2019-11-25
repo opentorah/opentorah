@@ -24,7 +24,7 @@ object WithNumber {
   def overlay[T](base: Seq[WithNumber[T]], differences: Seq[WithNumber[T]]): Seq[WithNumber[T]] = {
     val result = scala.collection.mutable.ArrayBuffer.empty[WithNumber[T]] ++= base
     differences.foreach(value => result(value.n - 1) = value)
-    result
+    result.toSeq
   }
 
   def dropNumbers[T](result: Seq[WithNumber[T]]): Seq[T] = result.map(_.what)

@@ -1,6 +1,7 @@
 package org.podval.judaica.tanach
 
 import org.podval.judaica.metadata.WithNames
+import org.podval.judaica.util.Util
 
 // Other than on Simchas Torah, aliyot are from the same book.
 final case class Torah private(override val spans: Seq[Torah.BookSpan])
@@ -73,7 +74,7 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
     val bookSpan = inBook(book, span)
     val with1 = addImplied1(Custom.common(days), span, book.chapters)
 
-    val result: Custom.Sets[Torah] = days.mapValues { spans: Seq[Numbered] =>
+    val result: Custom.Sets[Torah] = Util.mapValues(days){ spans: Seq[Numbered] =>
       parseAliyot(bookSpan, WithNumber.overlay(with1, spans), Some(7))
     }
 

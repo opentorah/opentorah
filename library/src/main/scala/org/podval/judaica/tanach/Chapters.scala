@@ -70,6 +70,6 @@ object Chapters {
 
     WithNumber.checkConsecutive(chapters, "chapter")
 
-    new Chapters(WithNumber.dropNumbers(chapters).toArray)
+    new Chapters(WithNumber.dropNumbers(chapters))
   }
 }

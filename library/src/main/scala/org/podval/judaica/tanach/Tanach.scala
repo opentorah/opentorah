@@ -3,6 +3,7 @@ package org.podval.judaica.tanach
 import org.podval.judaica.metadata._
 import org.podval.judaica.tanach.Torah.Maftir
 import org.podval.judaica.util.Util
+import org.podval.judaica.util.Util.mapValues
 
 import scala.xml.Elem
 
@@ -158,9 +159,9 @@ object Tanach extends NamedCompanion {
       book -> TanachMetadata(metadata.names, Chapters(chapterElements), elements)
     }
 
-    override def names: Map[TanachBook, Names] = get.mapValues(_.names)
+    override def names: Map[TanachBook, Names] = mapValues(get)(_.names)
 
-    def chapters: Map[TanachBook, Chapters] = get.mapValues(_.chapters)
+    def chapters: Map[TanachBook, Chapters] = mapValues(get)(_.chapters)
 
     def psalmsElements: Seq[Elem] = get(Psalms).elements
   }
@@ -176,14 +177,14 @@ object Tanach extends NamedCompanion {
 
   private final class ChumashBookMetadataHolder(book: ChumashBook) extends Holder[Parsha, ParshaMetadata] {
     protected override def calculate: Map[Parsha, ParshaMetadata] =
-      Metadata.bind(
+      mapValues(Metadata.bind(
         keys = book.parshiot,
         elements = XML.span(Tanach.metadatas.get(book).elements, "week"),
         obj = this
-      ).mapValues { metadata =>
+      )){ metadata =>
 
         def byCustom(days: Seq[Tanach.DayParsed]): Custom.Sets[Seq[Torah.Numbered]] =
-          days.groupBy(_.custom).mapValues(days => days.map(_.span))
+          mapValues(days.groupBy(_.custom))(days => days.map(_.span))
 
         val span = parseSemiResolved(metadata.attributes)
         metadata.attributes.close()
@@ -204,11 +205,11 @@ object Tanach extends NamedCompanion {
         )
       }
 
-    override def names: Map[Parsha, Names] = get.mapValues(_.names)
+    override def names: Map[Parsha, Names] = mapValues(get)(_.names)
 
     def span: Map[Parsha, Span] = Util.inSequence(
       keys = book.parshiot,
-      map = get.mapValues(_.span),
+      map = mapValues(get)(_.span),
       f = (pairs: Seq[(Parsha, SpanSemiResolved)]) =>
         SpanSemiResolved.setImpliedTo(pairs.map(_._2), book.chapters.full, book.chapters)
     )

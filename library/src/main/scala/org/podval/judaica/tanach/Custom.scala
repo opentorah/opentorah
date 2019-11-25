@@ -63,7 +63,7 @@ object Custom extends NamedCompanion {
       new Of[R](all.map { custom => custom -> f(custom, doFind(custom)) }.toMap)
 
     final def map[R](f: T => R, full: Boolean = true): Of[R] =
-      new Of[R](customs.mapValues(f), full = full)
+      new Of[R](Util.mapValues(customs)(f), full = full)
 
     final def ++(other: Of[T]): Of[T] = new Of[T](customs ++ other.customs, full = false)
 

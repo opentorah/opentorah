@@ -40,4 +40,8 @@ object Util {
   // Maybe in JDK 9 and later I won't need to deal with '$'?
   // see https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8057919
   def className(obj: AnyRef): String = obj.getClass.getSimpleName.replace("$", "")
+
+  def mapValues[A, B, C](map: Map[A, B])(f: B => C): Map[A, C] =
+    // map.view.mapValues(f).toMap // Scala 2.13
+    map.mapValues(f) // Scala 2.12
 }
