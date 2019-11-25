@@ -9,15 +9,8 @@ repositories {
   }
 }
 
-// for Tut
-configurations.all {
-  resolutionStrategy {
-    force "org.scala-lang:scala-library:$tutScalaVersion"
-  }
-}
-
 dependencies {
-  compile "org.scala-lang:scala-library:$tutScalaVersion"
+  compile "org.scala-lang:scala-library:$scalaVersion"
 
   runtime project(':library')
   runtime "org.tpolecat:tut-core_$scalaVersionMajor:$tutVersion"
