@@ -14,4 +14,4 @@ include ':docs'
 include ':service'
 include ':paper'
 
-// includeBuild '../../docbook/docbook-gradle'
+includeBuild '../../../docbook/docbook-gradle'

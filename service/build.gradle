@@ -6,15 +6,15 @@ plugins {
 description = 'Jewish Calendar Service.'
 
 dependencies {
-  compile project(':library')
+  implementation project(':library')
 
-  compile "org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion"
-  compile "org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion"
-  compile "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion"
+  implementation "org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion"
+  implementation "org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion"
+  implementation "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion"
 
-  compile "com.lihaoyi:scalatags_$scalaVersionMajor:$scalatagsVersion"
+  implementation "com.lihaoyi:scalatags_$scalaVersionMajor:$scalatagsVersion"
 
-  runtime "org.slf4j:slf4j-jdk14:$slf4jVersion"
+  runtimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
 }
 
 mainClassName = 'org.podval.calendar.service.CalendarService'

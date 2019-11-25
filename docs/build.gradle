@@ -10,10 +10,10 @@ repositories {
 }
 
 dependencies {
-  compile "org.scala-lang:scala-library:$scalaVersion"
+  implementation "org.scala-lang:scala-library:$scalaVersion"
 
-  runtime project(':library')
-  runtime "org.tpolecat:tut-core_$scalaVersionMajor:$tutVersion"
+  runtimeOnly project(':library')
+  runtimeOnly "org.tpolecat:tut-core_$scalaVersionMajor:$tutVersion"
 }
 
 // Tut
