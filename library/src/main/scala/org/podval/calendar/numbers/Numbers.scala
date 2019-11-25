@@ -135,7 +135,7 @@ trait Numbers[S <: Numbers[S]] { this: S =>
     forDigit: (Int, Int, Int) => (Int, Int),
     forHead: Int => Int
   ): Seq[Int] = {
-    val (headCarry: Int, newTail: Seq[Int]) = (digits.tail.zipWithIndex :\(0, Seq.empty[Int])) {
+    val (headCarry: Int, newTail: Seq[Int]) = (digits.tail.zipWithIndex.foldRight(0, Seq.empty[Int])) {
       case ((digit: Int, position: Int), (carry: Int, result: Seq[Int])) =>
         val (resultCarry, resultDigit) = forDigit(digit + carry, position, range(position))
         (resultCarry, resultDigit +: result)
