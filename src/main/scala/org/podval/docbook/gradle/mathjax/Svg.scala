@@ -3,8 +3,8 @@ package org.podval.docbook.gradle.mathjax
 import java.io.{InputStream, StringBufferInputStream}
 
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory
-import org.apache.fop.image.loader.batik.PreloaderSVG
 import org.apache.fop.util.UnclosableInputStream
+import org.podval.docbook.gradle.xml.Xml
 import org.w3c.dom.svg.SVGDocument
 
 object Svg {
@@ -20,5 +20,5 @@ object Svg {
     svgFactory.createSVGDocument(null, in)
   }
 
-  private val svgFactory: SAXSVGDocumentFactory = new SAXSVGDocumentFactory(PreloaderSVG.getParserName)
+  private lazy val svgFactory: SAXSVGDocumentFactory = new SAXSVGDocumentFactory(Xml.saxParserName)
 }

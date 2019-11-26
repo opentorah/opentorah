@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.13] - 2019-11-26
+- force use of Xerces by Saxon always, including SVG;   
+
 ## [0.7.12] - 2019-11-26
 - force use of Xerces by Saxon;   
 

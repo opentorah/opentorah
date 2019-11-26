@@ -33,13 +33,20 @@ object Xml {
     }
 
   private def getXMLReader: XMLReader =
-    getSaxParserFactory.newSAXParser.getXMLReader
+    saxParserFactory.newSAXParser.getXMLReader
 
-  private def getSaxParserFactory: SAXParserFactory = {
+  private val saxParserFactory: SAXParserFactory = {
     val result = new org.apache.xerces.jaxp.SAXParserFactoryImpl
     result.setXIncludeAware(true)
     result
   }
+
+  // Set Xerces parse as a default (org.apache.batik.dom.util.SAXDocumentFactory sets it up
+  // in a class initializer, before it can be overridden in a constructor, so the default should
+  // at least implement properties sit sets up).
+  System.setProperty(classOf[javax.xml.parsers.SAXParserFactory].getName, saxParserFactory.getClass.getName)
+
+  val saxParserName: String = classOf[org.apache.xerces.parsers.SAXParser].getName
 
   def transform(
     useSaxon9: Boolean,
@@ -127,17 +134,17 @@ object Xml {
     val transformerFactory: SAXTransformerFactory =
       if (!useSaxon9) new com.icl.saxon.TransformerFactoryImpl else new net.sf.saxon.TransformerFactoryImpl
 
-    // Saxon needs real Xerces parser, and not the one included in the JDK, to work correctly.
+    // To process DocBook stylesheets (see also Svg.scala), Saxon needs real Xerces parser,
+    // not the one included in the JDK or included with Saxon (com.icl.saxon.aelfred.SAXParserFactoryImpl).
     // Classpath-based discovery is unstable (order changes from one Gradle version to another) and ugly.
     // Tell Saxon to use Xerces parser explicitly:
-    val xercesSaxParser: String = "org.apache.xerces.parsers.SAXParser"
     transformerFactory.setAttribute(
       if (!useSaxon9) com.icl.saxon.FeatureKeys.STYLE_PARSER_CLASS else net.sf.saxon.lib.FeatureKeys.STYLE_PARSER_CLASS,
-      xercesSaxParser
+      saxParserName
     )
     transformerFactory.setAttribute(
       if (!useSaxon9) com.icl.saxon.FeatureKeys.SOURCE_PARSER_CLASS else net.sf.saxon.lib.FeatureKeys.SOURCE_PARSER_CLASS,
-      xercesSaxParser
+      saxParserName
     )
 
     // Note: To intercept all network requests, URIResolver has to be set on the transformerFactory,
