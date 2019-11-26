@@ -4,7 +4,7 @@ import java.io.File
 
 import com.eclipsesource.v8.V8
 import org.gradle.api.Project
-import org.podval.docbook.gradle.util.{Architecture, Gradle, Os}
+import org.podval.docbook.gradle.util.{Architecture, Gradle, Os, Util}
 
 import scala.jdk.CollectionConverters._
 
@@ -98,7 +98,7 @@ object J2V8 {
   }
 
   def map2java(map: Map[String, Any]): java.util.Map[String, Any] =
-    map.view.mapValues(value2java).toMap.asJava
+    Util.mapValues(map)(value2java).asJava
 
   def list2java(list: List[Any]): java.util.List[Any] =
     list.map(value2java).asJava

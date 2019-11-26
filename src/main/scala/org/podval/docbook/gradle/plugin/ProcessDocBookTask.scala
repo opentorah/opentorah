@@ -147,7 +147,7 @@ class ProcessDocBookTask extends DefaultTask {
 
     val sections: Map[Section, Map[String, String]] =
       for ((sectionName: String, sectionParameters: Map[String, String]) <-
-           parameters.get.asScala.toMap.view.mapValues(_.asScala.toMap).toMap)
+           Util.mapValues(parameters.get.asScala.toMap)(_.asScala.toMap))
         yield (Section.forName(sectionName), sectionParameters)
 
     val unusedSections: Set[Section] =

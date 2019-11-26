@@ -6,7 +6,7 @@ import javax.xml.parsers.SAXParserFactory
 import javax.xml.transform.dom.DOMResult
 import javax.xml.transform.sax.{SAXResult, SAXSource, SAXTransformerFactory}
 import javax.xml.transform.stream.{StreamResult, StreamSource}
-import javax.xml.transform.{ErrorListener, Result, Source, TransformerException}
+import javax.xml.transform.{ErrorListener, Result, Source, Transformer, TransformerException}
 import org.podval.docbook.gradle.util.Logger
 import org.w3c.dom.Node
 import org.xml.sax.helpers.DefaultHandler
@@ -134,7 +134,7 @@ object Xml {
 
     setErrorListener(transformerFactory, logger)
 
-    val transformer = stylesheetFile.fold(transformerFactory.newTransformer) {
+    val transformer: Transformer = stylesheetFile.fold(transformerFactory.newTransformer) {
       stylesheetFile => transformerFactory.newTransformer(new StreamSource(stylesheetFile))
     }
 

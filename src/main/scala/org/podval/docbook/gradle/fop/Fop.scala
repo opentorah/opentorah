@@ -143,11 +143,10 @@ object Fop {
       override def svgTextStrokedAsShapes(source: AnyRef, fontFamily: String): Unit = {}
     }
 
-    SortedMap[String, List[FontSpec]]() ++ new FontListGenerator()
+    SortedMap[String, List[FontSpec]]() ++ Util.mapValues(new FontListGenerator()
       .listFonts(fopFactory, MimeConstants.MIME_PDF, fontEventListener)
       .asInstanceOf[java.util.SortedMap[String, java.util.List[FontSpec]]]
-      .asScala.toMap
-      .view.mapValues(_.asScala.toList).toMap
+      .asScala.toMap)(_.asScala.toList)
   }
 
   def deleteFontCache(configurationFile: File): Unit =
