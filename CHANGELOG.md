@@ -6,11 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.7.11] - 2019-11-25
+## [0.7.11] - 2019-11-26
 - update Gradle to 6.0.1; call metadataSources.artifact() explicitly to handle NodeJS
   repository (was done automatically in Gradle <6);
 - update FOP to 2.4; exclude new JAI dependencies that rely on JBoss repository;
   add equivalent dependencies from JCenter;
+- force use of Xerces by Saxon;   
 
 ## [0.7.10] - 2019-09-15
 - MathJax ImagePreloader should refuse to handle non-DOMSource images;

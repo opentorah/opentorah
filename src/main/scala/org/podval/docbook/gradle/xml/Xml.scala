@@ -125,8 +125,20 @@ object Xml {
     )
 
     val transformerFactory: SAXTransformerFactory =
-      if (useSaxon9) new net.sf.saxon.TransformerFactoryImpl
-      else new com.icl.saxon.TransformerFactoryImpl
+      if (!useSaxon9) new com.icl.saxon.TransformerFactoryImpl else new net.sf.saxon.TransformerFactoryImpl
+
+    // Saxon needs real Xerces parser, and not the one included in the JDK, to work correctly.
+    // Classpath-based discovery is unstable (order changes from one Gradle version to another) and ugly.
+    // Tell Saxon to use Xerces parser explicitly:
+    val xercesSaxParser: String = "org.apache.xerces.parsers.SAXParser"
+    transformerFactory.setAttribute(
+      if (!useSaxon9) com.icl.saxon.FeatureKeys.STYLE_PARSER_CLASS else net.sf.saxon.lib.FeatureKeys.STYLE_PARSER_CLASS,
+      xercesSaxParser
+    )
+    transformerFactory.setAttribute(
+      if (!useSaxon9) com.icl.saxon.FeatureKeys.SOURCE_PARSER_CLASS else net.sf.saxon.lib.FeatureKeys.SOURCE_PARSER_CLASS,
+      xercesSaxParser
+    )
 
     // Note: To intercept all network requests, URIResolver has to be set on the transformerFactory,
     // not the transformer itself: I guess some sub-transformers get created internally ;)

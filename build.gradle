@@ -44,7 +44,7 @@ dependencies {
   implementation 'net.sf.saxon:Saxon-HE:9.9.1-5'
 
   // Xerces
-  runtimeOnly "xerces:xercesImpl:$xercesVersion"
+  implementation "xerces:xercesImpl:$xercesVersion"
 
   // FOP
   // FOP 2.4 uses JAI and JAI Codec from JBoss repository;
