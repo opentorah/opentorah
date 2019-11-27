@@ -41,11 +41,7 @@ object Xml {
     result
   }
 
-  // Set Xerces parse as a default (org.apache.batik.dom.util.SAXDocumentFactory sets it up
-  // in a class initializer, before it can be overridden in a constructor, so the default should
-  // at least implement properties sit sets up).
-  System.setProperty(classOf[javax.xml.parsers.SAXParserFactory].getName, saxParserFactory.getClass.getName)
-
+  val saxParserFactoryName: String = saxParserFactory.getClass.getName
   val saxParserName: String = classOf[org.apache.xerces.parsers.SAXParser].getName
 
   def transform(
