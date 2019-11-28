@@ -1,0 +1,211 @@
+plugins {
+  id 'scala'
+  id 'com.github.maiflai.scalatest'
+  id 'java-gradle-plugin'
+  id 'maven-publish'
+  id 'com.gradle.plugin-publish'
+  id 'com.jfrog.bintray'
+}
+
+group = 'org.podval.docbook'
+description = 'Gradle DocBook plugin'
+
+apply from: '../versions.gradle'
+
+dependencies {
+  // Scala
+  implementation "org.scala-lang:scala-library:$scalaVersion"
+
+  // XMLResolver
+  implementation "org.xmlresolver:xmlresolver:$xmlresolverVersion"
+
+  // Saxon 6 (XSLT 1.0)
+  implementation "saxon:saxon:$saxon6Version"
+
+  // Saxon 9 (XSLT 2.0)
+  implementation "net.sf.saxon:Saxon-HE:$saxon9Version"
+
+  // Xerces
+  implementation "xerces:xercesImpl:$xercesVersion"
+
+  // FOP
+  // FOP 2.4 uses JAI and JAI Codec from JBoss repository;
+  // since at plugin application time it is to late to define the repository *or* to substitute JAI modules with the
+  // ones from JCenter, and I do not want every project that uses the plugin to have to do either,
+  // I exclude them and add the ones from JCenter:
+  implementation ("org.apache.xmlgraphics:fop:$fopVersion") {
+    exclude group: 'javax.media', module: 'jai-core'
+    exclude group: 'com.sun.media', module: 'jai-codec'
+  }
+  implementation "javax.media.jai:com.springsource.javax.media.jai.core:$jaiVersion"
+  implementation "javax.media.jai:com.springsource.javax.media.jai.codec:$jaiVersion"
+
+  implementation "org.apache.xmlgraphics:batik-transcoder:$batikVersion"
+  implementation "org.apache.xmlgraphics:batik-extension:$batikVersion"
+
+  // Hyphenation patterns
+  implementation "net.sf.offo:fop-hyph:$fopHyphVersion"
+
+  // JEuclid
+  implementation "de.rototor.jeuclid:jeuclid-fop:$jeuclidFopVersion"
+
+  // J2V8 integration
+  // Note: Native library (if needed and available) is loaded from a dynamically retrieved artifact,
+  // not from this one - but it needs to be compatible with the Java JNI wrappers, so I probably
+  // have to use the same version on all platforms.
+  // Since 4.6.0 doesn't work on Linux, and 4.8.0 doesn't work with mathjax-node (see J2V8.scala),
+  // this probably won't work on any other platform :(
+  implementation "com.eclipsesource.j2v8:j2v8_linux_x86_64:$j2v8Version"
+
+  testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
+  testImplementation "org.pegdown:pegdown:$pegdownVersion" // for scalatest reports
+
+  // added by the 'java-gradle-plugin': testImplementation gradleTestKit()
+}
+
+// run tests sequentially
+test {
+  maxParallelForks = 1
+}
+
+jar {
+  manifest {
+    attributes(
+      'Implementation-Title'  : project.description,
+      'Implementation-Version': project.version
+    )
+  }
+}
+
+// Gradle plugin [publishing?] plugin adds tasks publishPluginJar and
+// publishPluginJavaDocsJar that create sources and javadoc archives;
+// attempts to use them as artifacts in the Maven publication failed,
+// so I make my own, replacing javadoc with scaladoc :)
+task sourceJar(type: Jar) {
+  from sourceSets.main.allSource
+  archiveClassifier.set('sources')
+}
+
+task scaladocJar(type: Jar) {
+  from scaladoc.destinationDir
+  archiveClassifier.set('scaladoc')
+}
+scaladocJar.dependsOn scaladoc
+
+final String pluginArtifactId = project.name // jar.baseName
+
+gradlePlugin {
+  plugins {
+    docBookPlugin {
+      id = pluginArtifactId
+      implementationClass = 'org.podval.docbook.gradle.plugin.DocBookPlugin'
+    }
+  }
+}
+
+final String gitHubRepository    = 'dubinsky/podval-docbook-gradle'
+final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
+final List<String> pluginTags = ['Scala', 'DocBook', 'Gradle', 'Plugin', 'Html', 'Pdf', 'Epub', 'MathML', 'MathJax', 'JEuclid']
+
+pluginBundle {
+  website = "${gitHubRepositoryUrl}"
+  vcsUrl = "${gitHubRepositoryUrl}.git"
+
+  plugins {
+    docBookPlugin {
+      displayName = project.description
+      description = project.description
+      tags        = pluginTags
+    }
+  }
+
+  // If you have an existing plugin deployed to Bintray and would like to keep
+  // your existing group ID and artifact ID for continuity, you can specify
+  // them here (needs manual approval on first publication).
+  mavenCoordinates {
+    groupId    = project.group
+    artifactId = pluginArtifactId
+  }
+}
+
+publishing {
+  publications {
+    mavenPublication(MavenPublication) {
+      groupId project.group
+      artifactId pluginArtifactId
+
+      from components.java
+
+      artifact sourceJar
+//      artifact scaladocJar
+
+      pom {
+        name = project.name
+        description = project.description
+        url = "$gitHubRepositoryUrl"
+        scm {
+          url = "$gitHubRepositoryUrl"
+          connection = "scm:git:git://github.com/${gitHubRepository}.git"
+          developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
+        }
+        licenses {
+          license {
+            name = 'The Apache Software License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution = 'repo'
+            comments = 'A business-friendly OSS license'
+          }
+        }
+        developers {
+          developer {
+            id = 'dub'
+            name = 'Leonid Dubinsky'
+            email = 'dub@podval.org'
+            url = 'http://dub.podval.org'
+            organization = 'Podval Group'
+            organizationUrl = 'http://www.podval.org'
+            timezone = '-5'
+          }
+        }
+      }
+    }
+  }
+}
+
+bintray {
+  user         = 'dubinsky'
+  key          = findProperty('bintrayApiKey')
+  publications = [
+    'mavenPublication',                        // Main: pom, jar, sources, etc.
+    // Gradle plugin [publishing?] plugin adds another publication 'pluginMaven'
+    // that produces the same Jar as the main one - and a POM that has only dependencies.
+    // I do not think I need to publish that :)
+    'docBookPluginPluginMarkerMaven'
+  ]
+  dryRun       = false
+  publish      = true
+  override     = true
+  pkg {
+    repo                   = project.group
+    name                   = pluginArtifactId
+    desc                   = project.description
+    websiteUrl             = "${gitHubRepositoryUrl}"
+    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
+    vcsUrl                 = "${gitHubRepositoryUrl}.git"
+    githubRepo             = gitHubRepository
+    licenses               = ['Apache-2.0']
+    labels                 = pluginTags
+    publicDownloadNumbers  = true
+    githubReleaseNotesFile = 'CHANGELOG.md'
+    version { name         = project.version }
+  }
+}
+
+idea {
+  module {
+    excludeDirs += [
+      file('.idea'),
+      file('gradle')
+    ]
+  }
+}

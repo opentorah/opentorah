@@ -171,5 +171,5 @@ object Layout {
     new Layout(root, new File(root, "build"))
 
   def forCurrent: Layout =
-    forRoot(new File(".").getAbsoluteFile)
+    forRoot(new File(".").getAbsoluteFile.getParentFile)
 }

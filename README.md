@@ -228,7 +228,7 @@ docBook.parameters.html2 = [
 
 ```
 
-### substitutions ###
+## Substitutions ##
 
 Values configured via `substitutions` can be accessed in the DocBook files as XML entities with
 appropriate names. For instance, if a substitution value is defined for `"version"`, it can be

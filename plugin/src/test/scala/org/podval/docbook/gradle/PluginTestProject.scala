@@ -52,8 +52,9 @@ object PluginTestProject {
     val projectDir: File = new File(Util.prefixedDirectory(layout.buildDir, prefix), name)
     val result: PluginTestProject = new PluginTestProject(projectDir)
 
+    // reference plugin's root project
     result.write.settingsGradle(content =
-      s"""|includeBuild '${layout.projectDir}'
+      s"""|includeBuild '${layout.projectDir.getParentFile}'
           |""")
 
     val substitutionsFormatted: String = if (substitutions.isEmpty) "" else {
