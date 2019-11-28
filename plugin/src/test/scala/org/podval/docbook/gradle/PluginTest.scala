@@ -1,7 +1,7 @@
 package org.podval.docbook.gradle
 
 import org.podval.docbook.gradle.plugin.DocBook
-import org.podval.docbook.gradle.xml.Namespace
+import org.podval.fop.xml.Namespace
 import org.scalatest.{FlatSpec, Matchers}
 
 class PluginTest extends FlatSpec with Matchers {

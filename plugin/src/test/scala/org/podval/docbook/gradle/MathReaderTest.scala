@@ -1,8 +1,10 @@
 package org.podval.docbook.gradle
 
-import org.podval.docbook.gradle.mathjax.{Configuration, MathJax, MathML, MathReader}
+import org.podval.docbook.gradle.mathjax.{MathML, MathReader}
 import org.podval.docbook.gradle.plugin.DocBook
-import org.podval.docbook.gradle.xml.{Namespace, Xml}
+import org.podval.docbook.gradle.xml.Xml
+import org.podval.fop.mathjax.{Configuration, MathJax}
+import org.podval.fop.xml.Namespace
 import org.scalatest.{FlatSpec, Matchers}
 
 class MathReaderTest extends FlatSpec with Matchers {

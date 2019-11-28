@@ -9,7 +9,7 @@ import org.w3c.dom.svg.SVGDocument
 
 object Svg {
 
-  object Namespace extends org.podval.docbook.gradle.xml.Namespace(uri = "http://www.w3.org/2000/svg")
+  object Namespace extends org.podval.fop.xml.Namespace(uri = "http://www.w3.org/2000/svg")
 
   val mimeType: String = "image/svg+xml"
 

@@ -7,7 +7,6 @@ import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
 import org.podval.docbook.gradle.fop.Fop
-import org.podval.docbook.gradle.mathjax
 import org.podval.docbook.gradle.section.{DocBook2, Section}
 import org.podval.docbook.gradle.util.{Gradle, Logger, Platform, Util}
 import org.podval.docbook.gradle.xml.Resolver
@@ -158,7 +157,7 @@ class ProcessDocBookTask extends DefaultTask {
 
     require(!isMathJaxEnabled.get || !isJEuclidEnabled.get)
 
-    val mathJaxConfiguration: mathjax.Configuration = getMathJaxConfiguration
+    val mathJaxConfiguration: org.podval.fop.mathjax.Configuration = getMathJaxConfiguration
 
     Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout, logger)
     Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout, logger)
@@ -197,8 +196,8 @@ class ProcessDocBookTask extends DefaultTask {
 
     generateData()
 
-    val mathJax: Option[mathjax.MathJax] =
-      if (!processors.exists(_.isPdf) && !isMathJaxEnabled.get) None else Some(mathjax.MathJax.get(
+    val mathJax: Option[org.podval.docbook.gradle.mathjax.MathJax] =
+      if (!processors.exists(_.isPdf) && !isMathJaxEnabled.get) None else Some(org.podval.docbook.gradle.mathjax.MathJax.get(
         getProject,
         Platform.getOs,
         Platform.getArch,
@@ -260,11 +259,11 @@ class ProcessDocBookTask extends DefaultTask {
     classesTask.getDidWork || classesTask.getTaskDependencies.getDependencies(classesTask).asScala.exists(_.getDidWork)
   }
 
-  private def getMathJaxConfiguration: mathjax.Configuration = {
-    def delimiters(property: Property[String]): Seq[mathjax.Configuration.Delimiters] =
-      Seq(new mathjax.Configuration.Delimiters(property.get, property.get))
+  private def getMathJaxConfiguration: org.podval.fop.mathjax.Configuration = {
+    def delimiters(property: Property[String]): Seq[org.podval.fop.mathjax.Configuration.Delimiters] =
+      Seq(new org.podval.fop.mathjax.Configuration.Delimiters(property.get, property.get))
 
-    mathjax.Configuration(
+    org.podval.fop.mathjax.Configuration(
       font = mathJaxFont.get,
       extensions = mathJaxExtensions.get.asScala.toList,
       texDelimiters = delimiters(texDelimiter),

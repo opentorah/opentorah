@@ -1,7 +1,7 @@
-package org.podval.docbook.gradle.mathjax
+package org.podval.fop.mathjax
 
 import Configuration.{Delimiters, DelimitersAndInput}
-import org.podval.docbook.gradle.util.Json
+import org.podval.fop.util.Json
 
 final case class Configuration(
   displayMessages: Boolean = false,        // determines whether Message.Set() calls are logged

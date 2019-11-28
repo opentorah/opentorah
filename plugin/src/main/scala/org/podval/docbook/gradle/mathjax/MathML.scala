@@ -4,7 +4,7 @@ import java.awt.geom.Point2D
 
 import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.{FOEventHandler, FONode, PropertyList, XMLObj}
-import org.podval.docbook.gradle.xml.{Attribute, AttributeInfo}
+import org.podval.fop.xml.{Attribute, AttributeInfo, Namespace}
 import org.xml.sax.{Attributes, Locator}
 
 final class MathML(parent: FONode, fopPlugin: MathJaxFopPlugin) extends MathML.Obj(parent) {
@@ -67,7 +67,7 @@ object MathML {
 
   // Note: only MathMLObj.getNormalNamespacePrefix() needs the prefix;
   // everywhere else default mapping is assumed.
-  object Namespace extends org.podval.docbook.gradle.xml.Namespace(
+  object Namespace extends org.podval.fop.xml.Namespace(
     uri = "http://www.w3.org/1998/Math/MathML",
     prefix = "mathml"
   )
@@ -81,7 +81,7 @@ object MathML {
     private val block: String = "block"
     private val values: Set[String] = Set(inline, block)
 
-    override def namespace: org.podval.docbook.gradle.xml.Namespace = Namespace
+    override def namespace: org.podval.fop.xml.Namespace = Namespace
     override def name: String = "display"
 
     override def fromString(value: String): Boolean = {

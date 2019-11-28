@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.xml
+package org.podval.fop.xml
 
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl

@@ -5,6 +5,7 @@ import java.io.File
 import org.gradle.api.Project
 import org.podval.docbook.gradle.util.{Architecture, Logger, Os}
 import org.podval.docbook.gradle.xml.Xml
+import org.podval.fop.mathjax.{Configuration, Input, Output}
 import org.w3c.dom.Document
 import org.w3c.dom.svg.SVGDocument
 
@@ -51,11 +52,6 @@ abstract class MathJax(
 }
 
 object MathJax {
-
-  object Namespace extends org.podval.docbook.gradle.xml.Namespace(
-    uri = "http://podval.org/mathjax/ns/ext",
-    prefix = "mathjax"
-  )
 
   trait Factory {
     def get(

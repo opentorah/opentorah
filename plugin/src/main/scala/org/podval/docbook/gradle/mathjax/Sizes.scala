@@ -6,7 +6,7 @@ import java.awt.geom.Point2D
 import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.properties.FixedLength
 import org.apache.xmlgraphics.image.loader.ImageSize
-import org.podval.docbook.gradle.xml.{Attribute, Namespace}
+import org.podval.fop.xml.{Attribute, Namespace}
 import org.w3c.dom.svg.SVGDocument
 
 /* Note:
@@ -103,7 +103,7 @@ object Sizes {
     */
   @SerialVersionUID(1L)
   case object FontSizeAttribute extends Attribute.FloatAttribute {
-    override def namespace: Namespace = MathJax.Namespace
+    override def namespace: Namespace = org.podval.fop.mathjax.MathJax.Namespace
     override def name: String = "fontSize"
     override def default: Float = 12.0f
   }

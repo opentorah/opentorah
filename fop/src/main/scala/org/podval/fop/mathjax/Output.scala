@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.mathjax
+package org.podval.fop.mathjax
 
 sealed trait Output {
   def name: String

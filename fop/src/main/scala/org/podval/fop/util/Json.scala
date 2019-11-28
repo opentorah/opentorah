@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.util
+package org.podval.fop.util
 
 object Json {
 

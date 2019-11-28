@@ -2,9 +2,11 @@ package org.podval.docbook.gradle.mathjax
 
 import org.podval.docbook.gradle.plugin.DocBook
 import org.podval.docbook.gradle.util.Logger
-import org.podval.docbook.gradle.xml.{Namespace, WarningFilter}
+import org.podval.docbook.gradle.xml.WarningFilter
 import MathML.DisplayAttribute
-import Configuration.DelimitersAndInput
+import org.podval.fop.mathjax.{Configuration, Input}
+import org.podval.fop.mathjax.Configuration.DelimitersAndInput
+import org.podval.fop.xml.Namespace
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 import org.w3c.dom.{Document, Element}
@@ -144,7 +146,7 @@ final class MathReader(
       // NOTE: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,
       // math element and its children end up having *two* default namespaces - MathML and DocBook.
       prefixMapping(MathML.Namespace.default) {
-        prefixMapping(MathJax.Namespace) {
+        prefixMapping(org.podval.fop.mathjax.MathJax.Namespace) {
           element(MathML.Namespace.default, MathML.math, atts = attributes) {
             element(MathML.Namespace.default, MathML.mrow) {
               element(MathML.Namespace.default, MathML.mi) {

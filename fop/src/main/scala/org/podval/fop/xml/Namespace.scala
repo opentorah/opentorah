@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.xml
+package org.podval.fop.xml
 
 import org.w3c.dom.{Document, Element}
 import org.xml.sax.helpers.AttributesImpl

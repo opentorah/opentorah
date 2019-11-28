@@ -3,10 +3,11 @@ package org.podval.docbook.gradle.plugin
 import java.io.{BufferedWriter, File, FileWriter}
 
 import org.podval.docbook.gradle.fop.Fop
-import org.podval.docbook.gradle.mathjax
 import org.podval.docbook.gradle.section.{DocBook2, HtmlCommon, Section}
-import org.podval.docbook.gradle.util.{Json, Logger}
-import org.podval.docbook.gradle.xml.{Namespace, Xml}
+import org.podval.docbook.gradle.util.Logger
+import org.podval.docbook.gradle.xml.Xml
+import org.podval.fop.xml.Namespace
+import org.podval.fop.util.Json
 
 final class Write(val layout: Layout, val logger: Logger) {
 
@@ -106,7 +107,7 @@ final class Write(val layout: Layout, val logger: Logger) {
     documentName: String,
     cssFileName: String,
     epubEmbeddedFonts: String,
-    mathJaxConfiguration: mathjax.Configuration
+    mathJaxConfiguration: org.podval.fop.mathjax.Configuration
   ): Unit = {
     val forDocument = layout.forDocument(prefixed, documentName)
 

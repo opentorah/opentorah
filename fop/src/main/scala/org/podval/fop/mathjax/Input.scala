@@ -1,6 +1,6 @@
-package org.podval.docbook.gradle.mathjax
+package org.podval.fop.mathjax
 
-import org.podval.docbook.gradle.xml.Namespace
+import org.podval.fop.xml.Namespace
 
 sealed trait Input {
   def name: String
@@ -40,7 +40,7 @@ object Input {
     * Type of the input: TeX, MathML, AsciiMath.
     */
   @SerialVersionUID(1L)
-  case object Attribute extends org.podval.docbook.gradle.xml.Attribute[Input] {
+  case object Attribute extends org.podval.fop.xml.Attribute[Input] {
     override def namespace: Namespace = MathJax.Namespace
 
     override def name: String = "input"
