@@ -3,13 +3,13 @@ package org.podval.docbook.gradle.fop
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import java.net.URI
 
-import org.apache.fop.apps.{FOUserAgent, FopConfParser, FopFactory}
+import org.apache.fop.apps.{FOUserAgent, FopFactory}
 import org.apache.fop.fonts.{FontEventListener, FontTriplet}
 import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
 import org.apache.xmlgraphics.util.MimeConstants
 import org.podval.docbook.gradle.xml.Xml
 import org.podval.docbook.gradle.util.{Logger, Util}
-import org.podval.fop.FopPlugin
+import org.podval.fop.{FopFactoryFactory, FopPlugin}
 
 import scala.jdk.CollectionConverters._
 import scala.collection.immutable.SortedMap
@@ -50,7 +50,7 @@ object Fop {
          |)""".stripMargin
     )
 
-    val fopFactory: FopFactory = getFopFactory(configurationFile, inputFile)
+    val fopFactory: FopFactory = FopFactoryFactory.newFactory(configurationFile, inputFile)
 
     plugin.foreach(_.configure(fopFactory))
 
@@ -133,7 +133,7 @@ object Fop {
     }
 
   private def getFontFamilies(configurationFile: File): SortedMap[String, List[FontSpec]] = {
-    val fopFactory: FopFactory = getFopFactory(configurationFile)
+    val fopFactory: FopFactory = FopFactoryFactory.newFactory(configurationFile)
 
     val fontEventListener: FontEventListener  = new FontEventListener {
       override def fontLoadingErrorAtAutoDetection(source: AnyRef, fontURL: String, e: Exception): Unit =
@@ -151,13 +151,5 @@ object Fop {
   }
 
   def deleteFontCache(configurationFile: File): Unit =
-    getFopFactory(configurationFile).newFOUserAgent.getFontManager.deleteCache()
-
-  private def getFopFactory(configurationFile: File): FopFactory =
-    getFopFactory(configurationFile, configurationFile)
-
-  private def getFopFactory(configurationFile: File, inputFile: File): FopFactory = {
-    val parser: FopConfParser = new FopConfParser(configurationFile, inputFile.getParentFile.toURI)
-    FopFactory.newInstance(new FopFactoryConfigProxy(parser.getFopFactoryBuilder.buildConfig))
-  }
+    FopFactoryFactory.newFactory(configurationFile).newFOUserAgent.getFontManager.deleteCache()
 }
