@@ -2,8 +2,7 @@ package org.podval.docbook.gradle.plugin
 
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.{DefaultTask, Plugin, Project}
-import org.podval.docbook.gradle.fop.Fop
-import org.podval.docbook.gradle.util.{Gradle, PluginLogger}
+import org.podval.fop.Fop
 import org.podval.fop.util.Logger
 
 final class DocBookPlugin extends Plugin[Project] {

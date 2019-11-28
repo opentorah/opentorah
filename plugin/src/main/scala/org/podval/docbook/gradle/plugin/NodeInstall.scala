@@ -1,9 +1,8 @@
-package org.podval.docbook.gradle.mathjax
+package org.podval.docbook.gradle.plugin
 
 import java.io.File
 
 import org.gradle.api.Project
-import org.podval.docbook.gradle.util.Gradle
 import org.podval.fop.mathjax.{Node, NodeDistribution}
 import org.podval.fop.util.{Architecture, Logger, Os}
 

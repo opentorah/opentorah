@@ -1,14 +1,14 @@
-package org.podval.docbook.gradle.util
+package org.podval.docbook.gradle.plugin
 
 import java.io.File
 
 import org.apache.tools.ant.filters.ReplaceTokens
-import org.gradle.api.{Project, Task}
 import org.gradle.api.artifacts.repositories.{ArtifactRepository, IvyArtifactRepository, IvyPatternRepositoryLayout}
 import org.gradle.api.artifacts.{Configuration, Dependency}
 import org.gradle.api.file.{CopySpec, FileCopyDetails, RelativePath}
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
+import org.gradle.api.{Project, Task}
 
 import scala.jdk.CollectionConverters._
 

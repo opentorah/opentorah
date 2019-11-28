@@ -2,8 +2,8 @@ package org.podval.docbook.gradle.plugin
 
 import java.io.{BufferedWriter, File, FileWriter}
 
-import org.podval.docbook.gradle.fop.Fop
 import org.podval.docbook.gradle.section.{DocBook2, HtmlCommon, Section}
+import org.podval.fop.Fop
 import org.podval.fop.xml.{Namespace, Xml}
 import org.podval.fop.util.{Json, Logger}
 

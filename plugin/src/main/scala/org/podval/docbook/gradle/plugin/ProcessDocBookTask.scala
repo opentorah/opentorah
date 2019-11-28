@@ -6,10 +6,8 @@ import org.gradle.api.{DefaultTask, Project, Task}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
-import org.podval.docbook.gradle.fop.Fop
-import org.podval.docbook.gradle.mathjax.{J2V8Install, NodeInstall}
 import org.podval.docbook.gradle.section.{DocBook2, Section}
-import org.podval.docbook.gradle.util.{Files, Gradle, PluginLogger}
+import org.podval.fop.Fop
 import org.podval.fop.mathjax.{Configuration, ExternalMathJax, J2V8MathJax, MathJax, Node}
 import org.podval.fop.util.{Architecture, Logger, Os, Platform}
 import org.podval.fop.util.Util.mapValues
@@ -281,7 +279,7 @@ class ProcessDocBookTask extends DefaultTask {
     // If J2V8 is configured to be used, is available and actually loads - we use it;
     // otherwise each typesetting is done by calling Node in a separate process.
     val reallyUseJ2V8: Boolean = useJ2V8.get && {
-      val result: Either[String, String] = J2V8Install.load(getProject, os, arch, j2v8LibraryDirectory)
+      val result: Either[String, String] = J2V8Install.install(getProject, os, arch, j2v8LibraryDirectory, logger)
       result.fold(logger.warn, logger.info)
       result.isRight
     }

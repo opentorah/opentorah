@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.fop
+package org.podval.fop
 
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import java.net.URI
@@ -6,14 +6,13 @@ import java.net.URI
 import org.apache.fop.apps.{FOUserAgent, FopFactory}
 import org.apache.fop.fonts.{FontEventListener, FontTriplet}
 import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
-import org.podval.fop.util.{Logger, Util}
-import org.podval.fop.util.Util.mapValues
-import org.podval.fop.xml.Xml
-import org.podval.fop.{FopFactoryFactory, FopPlugin}
 import org.apache.xmlgraphics.util.MimeConstants
+import org.podval.fop.util.Util.mapValues
+import org.podval.fop.util.{Logger, Util}
+import org.podval.fop.xml.Xml
 
-import scala.jdk.CollectionConverters._
 import scala.collection.immutable.SortedMap
+import scala.jdk.CollectionConverters._
 
 object Fop {
 

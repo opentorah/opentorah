@@ -1,21 +1,20 @@
-package org.podval.docbook.gradle.mathjax
+package org.podval.docbook.gradle.plugin
 
 import java.io.File
 
 import com.eclipsesource.v8.V8
 import org.gradle.api.Project
-import org.podval.docbook.gradle.util.Gradle
-import org.podval.fop.mathjax.J2V8
-import org.podval.fop.util.{Architecture, Os}
+import org.podval.fop.mathjax.J2V8Distribution
+import org.podval.fop.util.{Architecture, Logger, Os}
 
 object J2V8Install {
 
-  def load(project: Project, os: Os, arch: Architecture, into: File): Either[String, String] = {
-    val dependencyNotationAndLibraryName: Option[(String, String)] =
-      J2V8.dependencyNotationAndLibraryName(os, arch)
+  def install(project: Project, os: Os, arch: Architecture, into: File, logger: Logger): Either[String, String] = {
+    val j2v8Distribution: J2V8Distribution = new J2V8Distribution(os, arch)
 
-    if (dependencyNotationAndLibraryName.isEmpty) Left(s"No J2V8 distribution for $os on $arch") else {
-      val (dependencyNotation: String, libraryName: String) = dependencyNotationAndLibraryName.get
+    if (j2v8Distribution.version.isEmpty) Left(s"No J2V8 distribution for $os on $arch") else {
+      val dependencyNotation: String = j2v8Distribution.dependencyNotation
+      val libraryName: String = j2v8Distribution.libraryName
 
       val artifact: Option[File] = try Some(Gradle.getArtifact(project, dependencyNotation)) catch {
         case _: IllegalStateException => None
@@ -23,7 +22,7 @@ object J2V8Install {
 
       if (artifact.isEmpty) Left(s"No J2V8 artifact $dependencyNotation") else {
         try {
-          load(project, artifact.get, libraryName, into)
+          install(project, artifact.get, libraryName, into)
 
           Right(s"Loaded J2V8 library $dependencyNotation!$libraryName")
         } catch {
@@ -33,7 +32,7 @@ object J2V8Install {
     }
   }
 
-  private def load(
+  private def install(
     project: Project,
     artifact: File,
     libraryName: String,

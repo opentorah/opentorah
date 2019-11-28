@@ -22,7 +22,7 @@ import scala.jdk.CollectionConverters._
 // this doesn't look like a threading issue - or maybe whatever I "solved" by using fresh MathJax instance
 // for each typesetting wasn't (just) a threading issue either?
 private final class J2V8MathJax(nodeModules: File) {
-  val nodeJS: NodeJS = NodeJS.createNodeJS()
+  val nodeJS: NodeJS = NodeJS.createNodeJS
 
   def v8: V8 = nodeJS.getRuntime
 

@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.util
+package org.podval.docbook.gradle.plugin
 
 import java.io.File
 

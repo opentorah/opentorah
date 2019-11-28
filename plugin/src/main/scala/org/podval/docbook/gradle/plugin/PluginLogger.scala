@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.util
+package org.podval.docbook.gradle.plugin
 
 import org.gradle.api.Project
 import org.podval.fop.util.Logger

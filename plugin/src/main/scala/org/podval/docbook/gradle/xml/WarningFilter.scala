@@ -1,7 +1,7 @@
 package org.podval.docbook.gradle.xml
 
 import org.xml.sax.helpers.XMLFilterImpl
-import org.xml.sax.{Locator, SAXParseException, XMLFilter}
+import org.xml.sax.{Locator, SAXParseException}
 
 trait WarningFilter extends XMLFilterImpl {
   private var locator: Option[Locator] = None
