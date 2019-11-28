@@ -8,7 +8,7 @@ import org.apache.xmlgraphics.image.loader.{ImageContext, ImageInfo}
 import org.apache.xmlgraphics.image.loader.impl.{AbstractImagePreloader, ImageXMLDOM}
 import org.apache.xmlgraphics.image.loader.spi.{ImageConverter, ImageLoaderFactory, ImagePreloader}
 import org.podval.fop.FopPlugin
-import org.podval.fop.mathjax.Sizes
+import org.podval.fop.mathjax.{Sizes, Svg}
 import org.w3c.dom.svg.SVGDocument
 import org.w3c.dom.{DOMImplementation, Document}
 

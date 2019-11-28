@@ -4,8 +4,8 @@ import java.io.File
 
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import com.eclipsesource.v8.{NodeJS, V8, V8Array, V8Function, V8Object}
-import org.podval.docbook.gradle.util.Logger
-import org.podval.fop.mathjax.Configuration
+import org.podval.fop.mathjax.{Configuration, Node}
+import org.podval.fop.util.Logger
 
 import scala.jdk.CollectionConverters._
 

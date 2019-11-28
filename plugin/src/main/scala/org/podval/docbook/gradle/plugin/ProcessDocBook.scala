@@ -7,9 +7,10 @@ import org.podval.docbook.gradle.fop.Fop
 import org.podval.docbook.gradle.jeuclid.JEuclidFopPlugin
 import org.podval.docbook.gradle.mathjax.{MathJax, MathJaxFopPlugin, MathReader}
 import org.podval.docbook.gradle.section.DocBook2
-import org.podval.docbook.gradle.util.{Gradle, Logger, Util}
+import org.podval.docbook.gradle.util.{Gradle, Util}
 import org.podval.docbook.gradle.xml.{ProcessingInstructionsFilter, Resolver, Xml}
 import org.podval.fop.FopPlugin
+import org.podval.fop.util.Logger
 
 final class ProcessDocBook(
   project: Project,

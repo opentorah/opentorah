@@ -3,10 +3,9 @@ package org.podval.docbook.gradle.mathjax
 import java.io.File
 
 import org.gradle.api.Project
-import org.podval.docbook.gradle.util.Logger
 import org.podval.docbook.gradle.xml.Xml
-import org.podval.fop.mathjax.{Configuration, Input, Output, Sizes}
-import org.podval.fop.util.{Architecture, Os}
+import org.podval.fop.mathjax.{Configuration, Input, Node, Output, Sizes, Svg}
+import org.podval.fop.util.{Architecture, Logger, Os}
 import org.w3c.dom.Document
 import org.w3c.dom.svg.SVGDocument
 
@@ -73,7 +72,7 @@ object MathJax {
     logger: Logger
   ): MathJax = {
     // make sure Node and MathJax are installed
-    val node: Node = Node.install(project, os, arch, nodeRoot, logger)
+    val node: Node = NodeInstall.install(project, os, arch, nodeRoot, logger)
 
     // If J2V8 is configured to be used, is available and actually loads - we use it;
     // otherwise each typesetting is done by calling Node in a separate process.

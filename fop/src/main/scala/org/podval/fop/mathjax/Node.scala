@@ -1,12 +1,7 @@
-package org.podval.docbook.gradle.mathjax
+package org.podval.fop.mathjax
 
 import java.io.File
 import java.nio.file.{Files, Path, Paths}
-
-import org.gradle.api.Project
-import org.podval.docbook.gradle.util.{Gradle, Logger}
-import org.podval.fop.mathjax.NodeDistribution
-import org.podval.fop.util.{Architecture, Os}
 
 import scala.sys.process.{Process, ProcessBuilder, ProcessLogger}
 
@@ -79,46 +74,5 @@ final class Node(
   private def npmScriptFile: File = {
     val lib: String = if (isWindows) "" else "lib/"
     new File(root, s"${lib}node_modules/npm/bin/npm-cli.js")
-  }
-}
-
-object Node {
-
-  val defaultVersion: String = "10.15.3"
-
-  def install(project: Project, os: Os, arch: Architecture, into: File, logger: Logger): Node = {
-    val version: String = defaultVersion
-
-    val distribution: NodeDistribution = new NodeDistribution(version, os, arch)
-
-    val installation: Node = new Node(distribution, into)
-
-    if (!installation.root.exists()) {
-      logger.info(s"Installing $installation")
-
-      val nodeArtifact: File = Gradle.getArtifact(
-        project,
-        repositoryUrl = "https://nodejs.org/dist",
-        artifactPattern = "v[revision]/[artifact](-v[revision]-[classifier]).[ext]",
-        ivy = "v[revision]/ivy.xml",
-        distribution.dependencyNotation
-      )
-
-      Gradle.unpack(
-        project,
-        archiveFile = nodeArtifact,
-        isZip = distribution.isZip,
-        into = into
-      )
-
-      installation.postInstall()
-    }
-
-    if (!installation.nodeModules.exists()) {
-      logger.info(s"Installing mathjax-node")
-      installation.npmInstall("mathjax-node")
-    }
-
-    installation
   }
 }

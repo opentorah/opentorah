@@ -8,9 +8,9 @@ import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
 import org.podval.docbook.gradle.fop.Fop
 import org.podval.docbook.gradle.section.{DocBook2, Section}
-import org.podval.docbook.gradle.util.{Gradle, Logger, Util}
+import org.podval.docbook.gradle.util.{Gradle, PluginLogger, Util}
 import org.podval.docbook.gradle.xml.Resolver
-import org.podval.fop.util.Platform
+import org.podval.fop.util.{Logger, Platform}
 
 import scala.beans.BeanProperty
 import scala.jdk.CollectionConverters._
@@ -18,7 +18,7 @@ import scala.jdk.CollectionConverters._
 class ProcessDocBookTask extends DefaultTask {
 
   private val layout: Layout = Layout.forProject(getProject)
-  private val logger: Logger = Logger.forProject(getProject)
+  private val logger: Logger = PluginLogger.forProject(getProject)
   private def info(message: String): Unit = logger.info(message)
 
   private val write: Write = new Write(layout, logger)

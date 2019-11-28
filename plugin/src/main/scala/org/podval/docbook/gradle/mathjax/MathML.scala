@@ -5,7 +5,7 @@ import java.awt.geom.Point2D
 import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.{FOEventHandler, FONode, PropertyList, XMLObj}
 import org.podval.fop.mathjax.Sizes
-import org.podval.fop.xml.{Attribute, AttributeInfo, Namespace}
+import org.podval.fop.xml.{Attribute, AttributeInfo}
 import org.xml.sax.{Attributes, Locator}
 
 final class MathML(parent: FONode, fopPlugin: MathJaxFopPlugin) extends MathML.Obj(parent) {

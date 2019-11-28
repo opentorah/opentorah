@@ -1,6 +1,6 @@
 package org.podval.docbook.gradle.xml
 
-import org.podval.docbook.gradle.util.Logger
+import org.podval.fop.util.Logger
 
 final class ProcessingInstructionsFilter(
   substitutions: Map[String, String],

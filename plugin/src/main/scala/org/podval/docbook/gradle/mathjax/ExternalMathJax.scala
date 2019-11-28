@@ -1,8 +1,7 @@
 package org.podval.docbook.gradle.mathjax
 
-import org.podval.docbook.gradle.util.Logger
-import org.podval.fop.mathjax.Configuration
-import org.podval.fop.util.Json
+import org.podval.fop.mathjax.{Configuration, Node}
+import org.podval.fop.util.{Json, Logger}
 
 object ExternalMathJax extends MathJax.Factory {
 

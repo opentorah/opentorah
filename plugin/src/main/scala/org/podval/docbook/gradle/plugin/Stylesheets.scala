@@ -3,7 +3,8 @@ package org.podval.docbook.gradle.plugin
 import java.io.File
 
 import org.gradle.api.Project
-import org.podval.docbook.gradle.util.{Gradle, Logger}
+import org.podval.docbook.gradle.util.Gradle
+import org.podval.fop.util.Logger
 
 trait Stylesheets {
   protected def name: String

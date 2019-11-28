@@ -3,7 +3,8 @@ package org.podval.docbook.gradle.plugin
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.{DefaultTask, Plugin, Project}
 import org.podval.docbook.gradle.fop.Fop
-import org.podval.docbook.gradle.util.{Gradle, Logger}
+import org.podval.docbook.gradle.util.{Gradle, PluginLogger}
+import org.podval.fop.util.Logger
 
 final class DocBookPlugin extends Plugin[Project] {
 
@@ -39,7 +40,7 @@ final class DocBookPlugin extends Plugin[Project] {
     project.getTasks.create("deleteFopFontsCache", classOf[DocBookPlugin.DeleteFopFontsCacheTask])
 
     project.afterEvaluate((project: Project) => {
-      val logger: Logger = Logger.forProject(project)
+      val logger: Logger = PluginLogger.forProject(project)
 
       // Note: even when DocBook plugin is applied after the Scala one,
       // there is no 'classes' task during its application - but there is after project evaluation:
