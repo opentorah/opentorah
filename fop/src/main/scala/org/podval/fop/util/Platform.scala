@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.util
+package org.podval.fop.util
 
 import scala.sys.process.Process
 

@@ -4,7 +4,9 @@ import java.io.File
 import java.nio.file.{Files, Path, Paths}
 
 import org.gradle.api.Project
-import org.podval.docbook.gradle.util.{Architecture, Gradle, Logger, Os}
+import org.podval.docbook.gradle.util.{Gradle, Logger}
+import org.podval.fop.mathjax.NodeDistribution
+import org.podval.fop.util.{Architecture, Os}
 
 import scala.sys.process.{Process, ProcessBuilder, ProcessLogger}
 

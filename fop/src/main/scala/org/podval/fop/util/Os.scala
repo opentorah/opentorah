@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.util
+package org.podval.fop.util
 
 sealed trait Os {
   def hasUname: Boolean = false

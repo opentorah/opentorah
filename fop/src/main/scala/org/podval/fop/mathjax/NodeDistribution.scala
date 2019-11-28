@@ -1,6 +1,6 @@
-package org.podval.docbook.gradle.mathjax
+package org.podval.fop.mathjax
 
-import org.podval.docbook.gradle.util.{Architecture, Os}
+import org.podval.fop.util.{Architecture, Os}
 
 // Heavily inspired by (read: copied and reworked from :)) https://github.com/srs/gradle-node-plugin by srs.
 // That plugin is not used directly because its tasks are not reusable unless the plugin is applied to the project,

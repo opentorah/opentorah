@@ -3,9 +3,10 @@ package org.podval.docbook.gradle.mathjax
 import java.io.File
 
 import org.gradle.api.Project
-import org.podval.docbook.gradle.util.{Architecture, Logger, Os}
+import org.podval.docbook.gradle.util.Logger
 import org.podval.docbook.gradle.xml.Xml
-import org.podval.fop.mathjax.{Configuration, Input, Output}
+import org.podval.fop.mathjax.{Configuration, Input, Output, Sizes}
+import org.podval.fop.util.{Architecture, Os}
 import org.w3c.dom.Document
 import org.w3c.dom.svg.SVGDocument
 

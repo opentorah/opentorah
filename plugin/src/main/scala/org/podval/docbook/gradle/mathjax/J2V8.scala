@@ -4,7 +4,8 @@ import java.io.File
 
 import com.eclipsesource.v8.V8
 import org.gradle.api.Project
-import org.podval.docbook.gradle.util.{Architecture, Gradle, Os, Util}
+import org.podval.docbook.gradle.util.{Gradle, Util}
+import org.podval.fop.util.{Architecture, Os}
 
 import scala.jdk.CollectionConverters._
 

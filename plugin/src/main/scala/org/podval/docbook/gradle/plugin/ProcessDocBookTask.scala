@@ -8,8 +8,9 @@ import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
 import org.podval.docbook.gradle.fop.Fop
 import org.podval.docbook.gradle.section.{DocBook2, Section}
-import org.podval.docbook.gradle.util.{Gradle, Logger, Platform, Util}
+import org.podval.docbook.gradle.util.{Gradle, Logger, Util}
 import org.podval.docbook.gradle.xml.Resolver
+import org.podval.fop.util.Platform
 
 import scala.beans.BeanProperty
 import scala.jdk.CollectionConverters._

@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.mathjax
+package org.podval.fop.mathjax
 
 import java.awt.Dimension
 import java.awt.geom.Point2D
