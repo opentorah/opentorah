@@ -103,7 +103,7 @@ object Sizes {
     */
   @SerialVersionUID(1L)
   case object FontSizeAttribute extends Attribute.FloatAttribute {
-    override def namespace: Namespace = org.podval.fop.mathjax.MathJax2.Namespace
+    override def namespace: Namespace = org.podval.fop.mathjax.MathJax.Namespace
     override def name: String = "fontSize"
     override def default: Float = 12.0f
   }

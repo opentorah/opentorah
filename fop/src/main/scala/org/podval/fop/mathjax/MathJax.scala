@@ -1,8 +1,7 @@
-package org.podval.docbook.gradle.mathjax
+package org.podval.fop.mathjax
 
-import org.podval.fop.mathjax.{Configuration, Input, Node, Output, Sizes, Svg}
 import org.podval.fop.util.Logger
-import org.podval.fop.xml.Xml
+import org.podval.fop.xml.{Namespace, Xml}
 import org.w3c.dom.Document
 import org.w3c.dom.svg.SVGDocument
 
@@ -49,6 +48,11 @@ abstract class MathJax(
 }
 
 object MathJax {
+
+  object Namespace extends Namespace(
+    uri = "http://podval.org/mathjax/ns/ext",
+    prefix = "mathjax"
+  )
 
   trait Factory {
     def get(

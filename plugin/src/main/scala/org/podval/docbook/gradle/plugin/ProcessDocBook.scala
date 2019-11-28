@@ -5,11 +5,12 @@ import java.io.File
 import org.gradle.api.Project
 import org.podval.docbook.gradle.fop.Fop
 import org.podval.docbook.gradle.jeuclid.JEuclidFopPlugin
-import org.podval.docbook.gradle.mathjax.{MathJax, MathJaxFopPlugin, MathReader}
+import org.podval.docbook.gradle.mathjax.DocBookMathFilter
 import org.podval.docbook.gradle.section.DocBook2
 import org.podval.docbook.gradle.util.{Gradle, Util}
 import org.podval.docbook.gradle.xml.ProcessingInstructionsFilter
 import org.podval.fop.FopPlugin
+import org.podval.fop.mathjax.{MathJax, MathJaxFopPlugin}
 import org.podval.fop.util.Logger
 import org.podval.fop.xml.{Resolver, Xml}
 
@@ -41,8 +42,8 @@ final class ProcessDocBook(
     // do not output the 'main' file when chunking in XSLT 1.0
     val outputFile: Option[File] = if (docBook2.usesRootFile) Some(saxonOutputFile) else None
 
-    val mathReader: Option[MathReader] =
-      if (mathJax.isDefined && isPdf) Some(new MathReader(mathJax.get.configuration, logger)) else None
+    val docBookMathFilter: Option[DocBookMathFilter] =
+      if (mathJax.isDefined && isPdf) Some(new DocBookMathFilter(mathJax.get.configuration, logger)) else None
 
     // Run Saxon.
     Xml.transform(
@@ -52,7 +53,7 @@ final class ProcessDocBook(
       stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(docBook2)),
       xmlReader = Xml.getFilteredXMLReader(
         Seq(new ProcessingInstructionsFilter(substitutions, logger)) ++
-        mathReader.toSeq
+        docBookMathFilter.toSeq
         // ++ Seq(new TracingFilter)
       ),
       outputFile,

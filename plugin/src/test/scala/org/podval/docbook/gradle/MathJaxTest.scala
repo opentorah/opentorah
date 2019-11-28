@@ -1,8 +1,7 @@
 package org.podval.docbook.gradle
 
-import org.podval.docbook.gradle.mathjax.MathJax
 import org.podval.docbook.gradle.plugin.DocBook
-import org.podval.fop.mathjax.Svg
+import org.podval.fop.mathjax.{MathJax, Svg}
 import org.podval.fop.xml.Namespace
 import org.scalatest.{FlatSpec, Matchers}
 

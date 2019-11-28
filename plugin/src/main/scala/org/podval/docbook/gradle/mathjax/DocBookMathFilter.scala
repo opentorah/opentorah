@@ -2,15 +2,15 @@ package org.podval.docbook.gradle.mathjax
 
 import org.podval.docbook.gradle.plugin.DocBook
 import org.podval.docbook.gradle.xml.WarningFilter
-import MathML.DisplayAttribute
-import org.podval.fop.mathjax.{Configuration, Input}
+import org.podval.fop.mathjax.{Configuration, Input, MathJax, MathML}
 import org.podval.fop.mathjax.Configuration.DelimitersAndInput
+import org.podval.fop.mathjax.MathML.DisplayAttribute
 import org.podval.fop.util.Logger
 import org.podval.fop.xml.Namespace
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
-final class MathReader(
+final class DocBookMathFilter(
   configuration: Configuration,
   logger: Logger
 ) extends WarningFilter {
@@ -19,7 +19,7 @@ final class MathReader(
   private def popElement(): Unit = elementsStack = elementsStack.init
 
   private def currentElement: String = elementsStack.last
-  private def currentlyInEquationElement: Boolean = MathReader.equationElements.contains(currentElement)
+  private def currentlyInEquationElement: Boolean = DocBookMathFilter.equationElements.contains(currentElement)
 
   private val allDelimiters: Seq[DelimitersAndInput] = configuration.allDelimiters
   private var delimiters: Option[DelimitersAndInput] = None
@@ -109,10 +109,10 @@ final class MathReader(
     characters(ch.slice(start, start + length).mkString(""))
 
   private def characters(chars: String): Unit = delimiters.fold {
-    val currentElementIsExcluded: Boolean = MathReader.notScannedElements.contains(currentElement)
+    val currentElementIsExcluded: Boolean = DocBookMathFilter.notScannedElements.contains(currentElement)
     val start: Option[(DelimitersAndInput, Int)] =
       if (currentElementIsExcluded) None
-      else MathReader.start(allDelimiters, chars)
+      else DocBookMathFilter.start(allDelimiters, chars)
 
     start.fold(sendToParent(unescape(chars))) { case (delimitersStarting: DelimitersAndInput, index: Int) =>
       if (index != 0) sendToParent(unescape(chars.take(index)))
@@ -121,7 +121,7 @@ final class MathReader(
     }
 
   } { delimiters: DelimitersAndInput =>
-    MathReader.findUnescaped(delimiters.end, chars).fold { addToMath(chars) } { index: Int =>
+    DocBookMathFilter.findUnescaped(delimiters.end, chars).fold { addToMath(chars) } { index: Int =>
       if (index != 0) addToMath(chars.take(index))
       flush(closedByDelimiter = true)
       characters(chars.substring(index + delimiters.end.length))
@@ -134,7 +134,7 @@ final class MathReader(
   private def flush(closedByDelimiter: Boolean = false): Unit = if (delimiters.isDefined) {
     if (!closedByDelimiter) warning(s"Math '$math' not closed")
 
-    logger.debug(s"MathReader.flush(): math=$math")
+    logger.debug(s"DocBookMathFilter.flush(): math=$math")
 
     val input = delimiters.get.input
     val isInline: Option[Boolean] = checkInline(input.isInline)
@@ -145,7 +145,7 @@ final class MathReader(
       // NOTE: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,
       // math element and its children end up having *two* default namespaces - MathML and DocBook.
       prefixMapping(MathML.Namespace.default) {
-        prefixMapping(org.podval.fop.mathjax.MathJax2.Namespace) {
+        prefixMapping(MathJax.Namespace) {
           element(MathML.Namespace.default, MathML.math, atts = attributes) {
             element(MathML.Namespace.default, MathML.mrow) {
               element(MathML.Namespace.default, MathML.mi) {
@@ -166,7 +166,7 @@ final class MathReader(
   private def checkInline(isInline: Option[Boolean]): Option[Boolean] = {
     val shouldBeInline: Option[Boolean] =
       if (!currentlyInEquationElement) None
-      else Some(MathReader.inlineEquationElements.contains(currentElement))
+      else Some(DocBookMathFilter.inlineEquationElements.contains(currentElement))
 
     if (shouldBeInline.isDefined && isInline.isDefined && (shouldBeInline.get != isInline.get)) {
       val should: String = DisplayAttribute.toString(shouldBeInline.get)
@@ -178,7 +178,7 @@ final class MathReader(
   }
 }
 
-object MathReader {
+object DocBookMathFilter {
 
   // do not generate DocBook math wrapper if we are inside one of those
   private val equationElements: Set[String] = Set("equation", "informalequation", "inlineequation")

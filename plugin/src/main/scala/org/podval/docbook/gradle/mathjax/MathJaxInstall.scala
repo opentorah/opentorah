@@ -3,7 +3,7 @@ package org.podval.docbook.gradle.mathjax
 import java.io.File
 
 import org.gradle.api.Project
-import org.podval.fop.mathjax.{Configuration, Node}
+import org.podval.fop.mathjax.{Configuration, MathJax, Node}
 import org.podval.fop.util.{Architecture, Logger, Os}
 
 object MathJaxInstall {

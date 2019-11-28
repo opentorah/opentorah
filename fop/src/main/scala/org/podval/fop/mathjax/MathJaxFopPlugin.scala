@@ -1,14 +1,13 @@
-package org.podval.docbook.gradle.mathjax
+package org.podval.fop.mathjax
 
 import javax.xml.transform.Source
 import javax.xml.transform.dom.DOMSource
 import org.apache.fop.fo.{ElementMapping, FONode}
 import org.apache.fop.render.{Renderer, RendererContext, XMLHandler}
-import org.apache.xmlgraphics.image.loader.{ImageContext, ImageInfo}
 import org.apache.xmlgraphics.image.loader.impl.{AbstractImagePreloader, ImageXMLDOM}
 import org.apache.xmlgraphics.image.loader.spi.{ImageConverter, ImageLoaderFactory, ImagePreloader}
+import org.apache.xmlgraphics.image.loader.{ImageContext, ImageInfo}
 import org.podval.fop.FopPlugin
-import org.podval.fop.mathjax.{Sizes, Svg}
 import org.w3c.dom.svg.SVGDocument
 import org.w3c.dom.{DOMImplementation, Document}
 

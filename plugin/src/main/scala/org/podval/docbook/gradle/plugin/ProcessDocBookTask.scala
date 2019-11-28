@@ -10,6 +10,7 @@ import org.podval.docbook.gradle.fop.Fop
 import org.podval.docbook.gradle.mathjax.MathJaxInstall
 import org.podval.docbook.gradle.section.{DocBook2, Section}
 import org.podval.docbook.gradle.util.{Gradle, PluginLogger, Util}
+import org.podval.fop.mathjax.MathJax
 import org.podval.fop.util.{Logger, Platform}
 import org.podval.fop.xml.Resolver
 
@@ -198,7 +199,7 @@ class ProcessDocBookTask extends DefaultTask {
 
     generateData()
 
-    val mathJax: Option[org.podval.docbook.gradle.mathjax.MathJax] =
+    val mathJax: Option[MathJax] =
       if (!processors.exists(_.isPdf) && !isMathJaxEnabled.get) None else Some(MathJaxInstall.get(
         getProject,
         Platform.getOs,

@@ -1,6 +1,6 @@
 package org.podval.docbook.gradle.mathjax
 
-import org.podval.fop.mathjax.{Configuration, Node}
+import org.podval.fop.mathjax.{Configuration, MathJax, Node}
 import org.podval.fop.util.{Json, Logger}
 
 object ExternalMathJax extends MathJax.Factory {
@@ -16,7 +16,7 @@ object ExternalMathJax extends MathJax.Factory {
       outputName: String,
     ): String =  node.evaluate(
       // I have to use console.error() and not console.log() so that the output gets flushed before the project exist;
-      // that is why I collect both out and err in Installation.exec()...
+      // that is why I collect both out and err in Node.node()...
       s"""
          |var mjAPI = require("mathjax-node");
          |mjAPI.config(${Json.fromMap(configuration.toMap)});

@@ -1,10 +1,9 @@
-package org.podval.docbook.gradle.mathjax
+package org.podval.fop.mathjax
 
 import java.awt.geom.Point2D
 
 import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.{FOEventHandler, FONode, PropertyList, XMLObj}
-import org.podval.fop.mathjax.Sizes
 import org.podval.fop.xml.{Attribute, AttributeInfo}
 import org.w3c.dom.{Document, Element}
 import org.xml.sax.{Attributes, Locator}
