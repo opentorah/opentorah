@@ -3,7 +3,7 @@ package org.podval.docbook.gradle.mathjax
 import java.io.File
 
 import org.gradle.api.Project
-import org.podval.fop.mathjax.{Configuration, MathJax, Node}
+import org.podval.fop.mathjax.{Configuration, ExternalMathJax, J2V8MathJax, MathJax, Node}
 import org.podval.fop.util.{Architecture, Logger, Os}
 
 object MathJaxInstall {
@@ -23,7 +23,7 @@ object MathJaxInstall {
     // If J2V8 is configured to be used, is available and actually loads - we use it;
     // otherwise each typesetting is done by calling Node in a separate process.
     val reallyUseJ2V8: Boolean = useJ2V8 && {
-      val result: Either[String, String] = J2V8.load(project, os, arch, j2v8LibraryDirectory)
+      val result: Either[String, String] = J2V8Install.load(project, os, arch, j2v8LibraryDirectory)
       result.fold(logger.warn, logger.info)
       result.isRight
     }

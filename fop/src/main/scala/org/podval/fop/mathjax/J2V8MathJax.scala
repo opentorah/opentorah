@@ -1,10 +1,9 @@
-package org.podval.docbook.gradle.mathjax
+package org.podval.fop.mathjax
 
 import java.io.File
 
 import com.eclipsesource.v8.utils.V8ObjectUtils
-import com.eclipsesource.v8.{NodeJS, V8, V8Array, V8Function, V8Object}
-import org.podval.fop.mathjax.{Configuration, MathJax, Node}
+import com.eclipsesource.v8._
 import org.podval.fop.util.Logger
 
 import scala.jdk.CollectionConverters._

@@ -1,7 +1,7 @@
 package org.podval.docbook.gradle
 
-import org.podval.docbook.gradle.mathjax.DocBookMathFilter
 import org.podval.docbook.gradle.plugin.DocBook
+import org.podval.docbook.gradle.xml.DocBookMathFilter
 import org.podval.fop.mathjax.{Configuration, MathJax, MathML}
 import org.podval.fop.xml.{Namespace, Xml}
 import org.scalatest.{FlatSpec, Matchers}

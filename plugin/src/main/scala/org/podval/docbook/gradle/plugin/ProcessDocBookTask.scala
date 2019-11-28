@@ -12,6 +12,7 @@ import org.podval.docbook.gradle.section.{DocBook2, Section}
 import org.podval.docbook.gradle.util.{Gradle, PluginLogger, Util}
 import org.podval.fop.mathjax.MathJax
 import org.podval.fop.util.{Logger, Platform}
+import org.podval.fop.util.Util.mapValues
 import org.podval.fop.xml.Resolver
 
 import scala.beans.BeanProperty
@@ -149,7 +150,7 @@ class ProcessDocBookTask extends DefaultTask {
 
     val sections: Map[Section, Map[String, String]] =
       for ((sectionName: String, sectionParameters: Map[String, String]) <-
-           Util.mapValues(parameters.get.asScala.toMap)(_.asScala.toMap))
+           mapValues(parameters.get.asScala.toMap)(_.asScala.toMap))
         yield (Section.forName(sectionName), sectionParameters)
 
     val unusedSections: Set[Section] =

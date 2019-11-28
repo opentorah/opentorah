@@ -3,14 +3,15 @@ package org.podval.docbook.gradle.fop
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import java.net.URI
 
+import org.podval.docbook.gradle.util.Util
 import org.apache.fop.apps.{FOUserAgent, FopFactory}
 import org.apache.fop.fonts.{FontEventListener, FontTriplet}
 import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
-import org.apache.xmlgraphics.util.MimeConstants
-import org.podval.docbook.gradle.util.Util
 import org.podval.fop.util.Logger
+import org.podval.fop.util.Util.mapValues
 import org.podval.fop.xml.Xml
 import org.podval.fop.{FopFactoryFactory, FopPlugin}
+import org.apache.xmlgraphics.util.MimeConstants
 
 import scala.jdk.CollectionConverters._
 import scala.collection.immutable.SortedMap
@@ -145,7 +146,7 @@ object Fop {
       override def svgTextStrokedAsShapes(source: AnyRef, fontFamily: String): Unit = {}
     }
 
-    SortedMap[String, List[FontSpec]]() ++ Util.mapValues(new FontListGenerator()
+    SortedMap[String, List[FontSpec]]() ++ mapValues(new FontListGenerator()
       .listFonts(fopFactory, MimeConstants.MIME_PDF, fontEventListener)
       .asInstanceOf[java.util.SortedMap[String, java.util.List[FontSpec]]]
       .asScala.toMap)(_.asScala.toList)

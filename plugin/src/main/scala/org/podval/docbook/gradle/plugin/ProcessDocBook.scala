@@ -5,10 +5,9 @@ import java.io.File
 import org.gradle.api.Project
 import org.podval.docbook.gradle.fop.Fop
 import org.podval.docbook.gradle.jeuclid.JEuclidFopPlugin
-import org.podval.docbook.gradle.mathjax.DocBookMathFilter
 import org.podval.docbook.gradle.section.DocBook2
 import org.podval.docbook.gradle.util.{Gradle, Util}
-import org.podval.docbook.gradle.xml.ProcessingInstructionsFilter
+import org.podval.docbook.gradle.xml.{DocBookMathFilter, ProcessingInstructionsFilter}
 import org.podval.fop.FopPlugin
 import org.podval.fop.mathjax.{MathJax, MathJaxFopPlugin}
 import org.podval.fop.util.Logger
