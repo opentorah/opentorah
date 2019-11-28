@@ -4,8 +4,7 @@ import java.io.{BufferedWriter, File, FileWriter}
 
 import org.podval.docbook.gradle.fop.Fop
 import org.podval.docbook.gradle.section.{DocBook2, HtmlCommon, Section}
-import org.podval.docbook.gradle.xml.Xml
-import org.podval.fop.xml.Namespace
+import org.podval.fop.xml.{Namespace, Xml}
 import org.podval.fop.util.{Json, Logger}
 
 final class Write(val layout: Layout, val logger: Logger) {

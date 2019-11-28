@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.xml
+package org.podval.fop.xml
 
 import java.io.File
 

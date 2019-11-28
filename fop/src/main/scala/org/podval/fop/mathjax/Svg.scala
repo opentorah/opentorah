@@ -4,7 +4,7 @@ import java.io.{InputStream, StringBufferInputStream}
 
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory
 import org.apache.fop.util.UnclosableInputStream
-import org.podval.fop.xml.Xerces
+import org.podval.fop.xml.Xml
 import org.w3c.dom.svg.SVGDocument
 
 object Svg {
@@ -15,7 +15,7 @@ object Svg {
 
   def fromString(what: String): SVGDocument = {
     val in: InputStream = new UnclosableInputStream(new StringBufferInputStream(what))
-    val length: Int = in.available()
+    val length: Int = in.available
     in.mark(length + 1)
     svgFactory.createSVGDocument(null, in)
   }
@@ -33,8 +33,8 @@ object Svg {
     // So, I bracket the invocation that triggers that code and restore whatever was there (if there was anything).
     val propertyName: String = classOf[javax.xml.parsers.SAXParserFactory].getName
     val original: String = System.getProperty(propertyName)
-    System.setProperty(propertyName, Xerces.saxParserFactoryName)
-    val result = new SAXSVGDocumentFactory(Xerces.saxParserName)
+    System.setProperty(propertyName, Xml.saxParserFactoryName)
+    val result = new SAXSVGDocumentFactory(Xml.saxParserName)
     if (original != null) System.setProperty(propertyName, original)
     result
   }

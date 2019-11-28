@@ -5,7 +5,7 @@ import java.io.File
 import org.gradle.testkit.runner.GradleRunner
 import org.podval.docbook.gradle.plugin.{DocBook, Layout, Write}
 import org.podval.docbook.gradle.util.Util
-import org.podval.docbook.gradle.xml.Xml
+import org.podval.fop.xml.Xml
 
 class PluginTestProject(projectDir: File) {
   projectDir.mkdirs()

@@ -7,10 +7,11 @@ import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
 import org.podval.docbook.gradle.fop.Fop
+import org.podval.docbook.gradle.mathjax.MathJaxInstall
 import org.podval.docbook.gradle.section.{DocBook2, Section}
 import org.podval.docbook.gradle.util.{Gradle, PluginLogger, Util}
-import org.podval.docbook.gradle.xml.Resolver
 import org.podval.fop.util.{Logger, Platform}
+import org.podval.fop.xml.Resolver
 
 import scala.beans.BeanProperty
 import scala.jdk.CollectionConverters._
@@ -198,7 +199,7 @@ class ProcessDocBookTask extends DefaultTask {
     generateData()
 
     val mathJax: Option[org.podval.docbook.gradle.mathjax.MathJax] =
-      if (!processors.exists(_.isPdf) && !isMathJaxEnabled.get) None else Some(org.podval.docbook.gradle.mathjax.MathJax.get(
+      if (!processors.exists(_.isPdf) && !isMathJaxEnabled.get) None else Some(MathJaxInstall.get(
         getProject,
         Platform.getOs,
         Platform.getArch,

@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.xml
+package org.podval.fop.xml
 
 import java.io.{File, FileWriter, StringReader}
 
@@ -8,7 +8,6 @@ import javax.xml.transform.sax.{SAXResult, SAXSource, SAXTransformerFactory}
 import javax.xml.transform.stream.{StreamResult, StreamSource}
 import javax.xml.transform.{ErrorListener, Result, Source, Transformer, TransformerException}
 import org.podval.fop.util.Logger
-import org.podval.fop.xml.Xerces
 import org.w3c.dom.Node
 import org.xml.sax.helpers.DefaultHandler
 import org.xml.sax.{ErrorHandler, InputSource, SAXParseException, XMLFilter, XMLReader}
@@ -34,7 +33,16 @@ object Xml {
     }
 
   private def getXMLReader: XMLReader =
-    Xerces.newSaxParserFactory.newSAXParser.getXMLReader
+    newSaxParserFactory.newSAXParser.getXMLReader
+
+  val saxParserFactoryName: String = classOf[org.apache.xerces.jaxp.SAXParserFactoryImpl].getName
+  val saxParserName: String = classOf[org.apache.xerces.parsers.SAXParser].getName
+
+  def newSaxParserFactory: SAXParserFactory = {
+    val result = new org.apache.xerces.jaxp.SAXParserFactoryImpl
+    result.setXIncludeAware(true)
+    result
+  }
 
   def transform(
     useSaxon9: Boolean,
@@ -128,11 +136,11 @@ object Xml {
     // Tell Saxon to use Xerces parser explicitly:
     transformerFactory.setAttribute(
       if (!useSaxon9) com.icl.saxon.FeatureKeys.STYLE_PARSER_CLASS else net.sf.saxon.lib.FeatureKeys.STYLE_PARSER_CLASS,
-      Xerces.saxParserName
+      saxParserName
     )
     transformerFactory.setAttribute(
       if (!useSaxon9) com.icl.saxon.FeatureKeys.SOURCE_PARSER_CLASS else net.sf.saxon.lib.FeatureKeys.SOURCE_PARSER_CLASS,
-      Xerces.saxParserName
+      saxParserName
     )
 
     // Note: To intercept all network requests, URIResolver has to be set on the transformerFactory,
