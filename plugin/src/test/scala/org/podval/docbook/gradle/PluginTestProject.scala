@@ -4,7 +4,7 @@ import java.io.File
 
 import org.gradle.testkit.runner.GradleRunner
 import org.podval.docbook.gradle.plugin.{DocBook, Layout, Write}
-import org.podval.docbook.gradle.util.Util
+import org.podval.docbook.gradle.util.Files
 import org.podval.fop.xml.Xml
 
 class PluginTestProject(projectDir: File) {
@@ -16,7 +16,7 @@ class PluginTestProject(projectDir: File) {
 
   def layout: Layout = write.layout
 
-  def destroy(): Unit = Util.deleteRecursively(projectDir)
+  def destroy(): Unit = Files.deleteRecursively(projectDir)
 
   def run(logInfo: Boolean = false): String = getRunner(logInfo).build.getOutput
 
@@ -27,7 +27,7 @@ class PluginTestProject(projectDir: File) {
   def fo: String = saxonOutputFile(section.Pdf)
 
   private def saxonOutputFile(docBook2: section.DocBook2): String =
-    Util.readFrom(layout.forDocument(prefixed = false, PluginTestProject.documentName).saxonOutputFile(docBook2))
+    Files.readFrom(layout.forDocument(prefixed = false, PluginTestProject.documentName).saxonOutputFile(docBook2))
 
   private def getRunner(logInfo: Boolean): GradleRunner = {
     val result = GradleRunner.create.withProjectDir(projectDir)
@@ -49,7 +49,7 @@ object PluginTestProject {
     useJ2V8: Boolean = false,
   ): PluginTestProject = {
     val layout: Layout = Layout.forCurrent
-    val projectDir: File = new File(Util.prefixedDirectory(layout.buildDir, prefix), name)
+    val projectDir: File = new File(Files.prefixedDirectory(layout.buildDir, prefix), name)
     val result: PluginTestProject = new PluginTestProject(projectDir)
 
     // reference plugin's root project

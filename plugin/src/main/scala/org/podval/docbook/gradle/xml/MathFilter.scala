@@ -9,7 +9,7 @@ import org.podval.fop.xml.Namespace
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
-final class DocBookMathFilter(
+final class MathFilter(
   configuration: Configuration,
   logger: Logger
 ) extends WarningFilter {
@@ -18,7 +18,7 @@ final class DocBookMathFilter(
   private def popElement(): Unit = elementsStack = elementsStack.init
 
   private def currentElement: String = elementsStack.last
-  private def currentlyInEquationElement: Boolean = DocBookMathFilter.equationElements.contains(currentElement)
+  private def currentlyInEquationElement: Boolean = MathFilter.equationElements.contains(currentElement)
 
   private val allDelimiters: Seq[DelimitersAndInput] = configuration.allDelimiters
   private var delimiters: Option[DelimitersAndInput] = None
@@ -108,10 +108,10 @@ final class DocBookMathFilter(
     characters(ch.slice(start, start + length).mkString(""))
 
   private def characters(chars: String): Unit = delimiters.fold {
-    val currentElementIsExcluded: Boolean = DocBookMathFilter.notScannedElements.contains(currentElement)
+    val currentElementIsExcluded: Boolean = MathFilter.notScannedElements.contains(currentElement)
     val start: Option[(DelimitersAndInput, Int)] =
       if (currentElementIsExcluded) None
-      else DocBookMathFilter.start(allDelimiters, chars)
+      else MathFilter.start(allDelimiters, chars)
 
     start.fold(sendToParent(unescape(chars))) { case (delimitersStarting: DelimitersAndInput, index: Int) =>
       if (index != 0) sendToParent(unescape(chars.take(index)))
@@ -120,7 +120,7 @@ final class DocBookMathFilter(
     }
 
   } { delimiters: DelimitersAndInput =>
-    DocBookMathFilter.findUnescaped(delimiters.end, chars).fold { addToMath(chars) } { index: Int =>
+    MathFilter.findUnescaped(delimiters.end, chars).fold { addToMath(chars) } { index: Int =>
       if (index != 0) addToMath(chars.take(index))
       flush(closedByDelimiter = true)
       characters(chars.substring(index + delimiters.end.length))
@@ -133,7 +133,7 @@ final class DocBookMathFilter(
   private def flush(closedByDelimiter: Boolean = false): Unit = if (delimiters.isDefined) {
     if (!closedByDelimiter) warning(s"Math '$math' not closed")
 
-    logger.debug(s"DocBookMathFilter.flush(): math=$math")
+    logger.debug(s"MathFilter.flush(): math=$math")
 
     val input = delimiters.get.input
     val isInline: Option[Boolean] = checkInline(input.isInline)
@@ -165,7 +165,7 @@ final class DocBookMathFilter(
   private def checkInline(isInline: Option[Boolean]): Option[Boolean] = {
     val shouldBeInline: Option[Boolean] =
       if (!currentlyInEquationElement) None
-      else Some(DocBookMathFilter.inlineEquationElements.contains(currentElement))
+      else Some(MathFilter.inlineEquationElements.contains(currentElement))
 
     if (shouldBeInline.isDefined && isInline.isDefined && (shouldBeInline.get != isInline.get)) {
       val should: String = DisplayAttribute.toString(shouldBeInline.get)
@@ -177,7 +177,7 @@ final class DocBookMathFilter(
   }
 }
 
-object DocBookMathFilter {
+object MathFilter {
 
   // do not generate DocBook math wrapper if we are inside one of those
   private val equationElements: Set[String] = Set("equation", "informalequation", "inlineequation")

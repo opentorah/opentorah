@@ -2,7 +2,8 @@ package org.podval.docbook.gradle.util
 
 import java.io.File
 
-object Util {
+object Files {
+
   private def fileNameAndExtension(nameWithExtension: String): (String, Option[String]) = {
     val lastDot: Int = nameWithExtension.lastIndexOf(".")
     if (lastDot == -1) (nameWithExtension, None)
@@ -35,9 +36,4 @@ object Util {
 
   def prefixedDirectory(directory: File, prefix: Option[String]): File =
     prefix.fold(directory)(prefix => new File(directory, prefix))
-
-  def applicationString: String = {
-    val info = getClass.getPackage
-    info.getImplementationTitle + " version " + info.getImplementationVersion
-  }
 }

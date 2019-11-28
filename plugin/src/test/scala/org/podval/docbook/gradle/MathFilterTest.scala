@@ -1,12 +1,12 @@
 package org.podval.docbook.gradle
 
 import org.podval.docbook.gradle.plugin.DocBook
-import org.podval.docbook.gradle.xml.DocBookMathFilter
+import org.podval.docbook.gradle.xml.MathFilter
 import org.podval.fop.mathjax.{Configuration, MathJax, MathML}
 import org.podval.fop.xml.{Namespace, Xml}
 import org.scalatest.{FlatSpec, Matchers}
 
-class DocBookMathFilterTest extends FlatSpec with Matchers {
+class MathFilterTest extends FlatSpec with Matchers {
 
   it should "work for wrapped display TeX" in {
     // Serializer outputs UTF-16; xml namespace is made explicit; order of attributes and spacing are different -
@@ -114,7 +114,7 @@ class DocBookMathFilterTest extends FlatSpec with Matchers {
     val result = Xml.parse(
       input = string,
       xmlReader = Xml.getFilteredXMLReader(filters = Seq(
-        new DocBookMathFilter(Configuration(), logger)
+        new MathFilter(Configuration(), logger)
         /* , new TracingFilter */
       )),
       logger

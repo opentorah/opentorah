@@ -3,11 +3,10 @@ package org.podval.docbook.gradle.fop
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import java.net.URI
 
-import org.podval.docbook.gradle.util.Util
 import org.apache.fop.apps.{FOUserAgent, FopFactory}
 import org.apache.fop.fonts.{FontEventListener, FontTriplet}
 import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
-import org.podval.fop.util.Logger
+import org.podval.fop.util.{Logger, Util}
 import org.podval.fop.util.Util.mapValues
 import org.podval.fop.xml.Xml
 import org.podval.fop.{FopFactoryFactory, FopPlugin}
@@ -36,9 +35,13 @@ object Fop {
 
   def run(
     configurationFile: File,
-    substitutions: Map[String, String],
+    creationDate: Option[String],
+    author: Option[String],
+    title: Option[String],
+    subject: Option[String],
+    keywords: Option[String],
     inputFile: File,
-    inputDirectory: File,
+    inputDirectory: File, // TODO calculate from the input file
     outputFile: File,
     plugin: Option[FopPlugin],
     logger: Logger
@@ -59,19 +62,51 @@ object Fop {
     // PDF metadata:
     val foUserAgent: FOUserAgent = fopFactory.newFOUserAgent
 
+    setPdfMetadata(
+      foUserAgent,
+      creationDate,
+      author,
+      title,
+      subject,
+      keywords
+    )
+
+    run(
+      fopFactory,
+      foUserAgent,
+      inputFile,
+      outputFile,
+      logger
+    )
+  }
+
+  def setPdfMetadata(
+    foUserAgent: FOUserAgent,
+    creationDate: Option[String],
+    author: Option[String],
+    title: Option[String],
+    subject: Option[String],
+    keywords: Option[String]
+  ): Unit = {
     foUserAgent.setCreator(Util.applicationString)
-    substitutions.get("creationDate").foreach { creationDate =>
+    creationDate.foreach { creationDate =>
       val value: java.util.Date = dateFormat.parse(creationDate)
       foUserAgent.setCreationDate(value)
     }
 
-    def set(name: String, setter: FOUserAgent => String => Unit): Unit =
-      setter(foUserAgent)(substitutions.get(name).orNull)
-    set("author", _.setAuthor)
-    set("title", _.setTitle)
-    set("subject", _.setSubject)
-    set("keywords", _.setKeywords)
+    foUserAgent.setAuthor(author.orNull)
+    foUserAgent.setTitle(title.orNull)
+    foUserAgent.setSubject(subject.orNull)
+    foUserAgent.setKeywords(keywords.orNull)
+  }
 
+  def run(
+    fopFactory: FopFactory,
+    foUserAgent: FOUserAgent,
+    inputFile: File,
+    outputFile: File,
+    logger: Logger
+  ): Unit = {
     val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(outputFile))
     val fop: org.apache.fop.apps.Fop = fopFactory.newFop("application/pdf", foUserAgent, outputStream)
 
@@ -87,7 +122,6 @@ object Fop {
   }
 
   // Inspired by org.apache.fop.tools.fontlist.FontListMain:
-
   def listFonts(configurationFile: File): Unit = {
     val fontFamilies: SortedMap[String, List[FontSpec]] = getFontFamilies(configurationFile)
 

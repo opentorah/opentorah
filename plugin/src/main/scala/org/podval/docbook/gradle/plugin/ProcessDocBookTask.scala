@@ -7,11 +7,11 @@ import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
 import org.podval.docbook.gradle.fop.Fop
-import org.podval.docbook.gradle.mathjax.MathJaxInstall
+import org.podval.docbook.gradle.mathjax.{J2V8Install, NodeInstall}
 import org.podval.docbook.gradle.section.{DocBook2, Section}
-import org.podval.docbook.gradle.util.{Gradle, PluginLogger, Util}
-import org.podval.fop.mathjax.MathJax
-import org.podval.fop.util.{Logger, Platform}
+import org.podval.docbook.gradle.util.{Files, Gradle, PluginLogger}
+import org.podval.fop.mathjax.{Configuration, ExternalMathJax, J2V8MathJax, MathJax, Node}
+import org.podval.fop.util.{Architecture, Logger, Os, Platform}
 import org.podval.fop.util.Util.mapValues
 import org.podval.fop.xml.Resolver
 
@@ -61,7 +61,7 @@ class ProcessDocBookTask extends DefaultTask {
     layout.outputRoot
   )
   for (directory: File <- getProcessOutputDirectories) {
-    // Note: deleting directories makes the task not up-to-date: Util.deleteRecursively(directory)
+    // Note: deleting directories makes the task not up-to-date: Files.deleteRecursively(directory)
     info(s"processDocBook: registering output directory $directory")
     getOutputs.dir(directory)
   }
@@ -173,7 +173,7 @@ class ProcessDocBookTask extends DefaultTask {
     write.xmlCatalog()
     write.xmlCatalogCustomization()
 
-    val cssFileName: String = Util.dropAllowedExtension(cssFile.get, "css")
+    val cssFileName: String = Files.dropAllowedExtension(cssFile.get, "css")
 
     write.css(cssFileName)
 
@@ -201,16 +201,7 @@ class ProcessDocBookTask extends DefaultTask {
     generateData()
 
     val mathJax: Option[MathJax] =
-      if (!processors.exists(_.isPdf) && !isMathJaxEnabled.get) None else Some(MathJaxInstall.get(
-        getProject,
-        Platform.getOs,
-        Platform.getArch,
-        layout.nodeRoot,
-        useJ2V8.get,
-        layout.j2v8LibraryDirectory,
-        mathJaxConfiguration,
-        logger
-      ))
+      if (!processors.exists(_.isPdf) && !isMathJaxEnabled.get) None else Some(installMathJax(mathJaxConfiguration))
 
     val processDocBook: ProcessDocBook = new ProcessDocBook(
       getProject,
@@ -234,7 +225,7 @@ class ProcessDocBookTask extends DefaultTask {
   }
 
   private def getDocumentName(string: String): Option[String] =
-    if (string.isEmpty) None else Some(Util.dropAllowedExtension(string, "xml"))
+    if (string.isEmpty) None else Some(Files.dropAllowedExtension(string, "xml"))
 
   private def generateData(): Unit = {
     val mainClass: String = dataGeneratorClass.get
@@ -275,5 +266,28 @@ class ProcessDocBookTask extends DefaultTask {
       asciiMathDelimiters = delimiters(asciiMathDelimiter),
       processEscapes = processMathJaxEscapes.get
     )
+  }
+
+  private def installMathJax(configuration: Configuration): MathJax = {
+    val os: Os = Platform.getOs
+    val arch: Architecture = Platform.getArch
+    val nodeRoot: File = layout.nodeRoot
+    val j2v8LibraryDirectory: File = layout.j2v8LibraryDirectory
+
+
+    // make sure Node and MathJax are installed
+    val node: Node = NodeInstall.install(getProject, os, arch, nodeRoot, logger)
+
+    // If J2V8 is configured to be used, is available and actually loads - we use it;
+    // otherwise each typesetting is done by calling Node in a separate process.
+    val reallyUseJ2V8: Boolean = useJ2V8.get && {
+      val result: Either[String, String] = J2V8Install.load(getProject, os, arch, j2v8LibraryDirectory)
+      result.fold(logger.warn, logger.info)
+      result.isRight
+    }
+
+    val mathJaxFactory: MathJax.Factory = if (reallyUseJ2V8) J2V8MathJax else ExternalMathJax
+
+    mathJaxFactory.get(node, configuration, logger)
   }
 }

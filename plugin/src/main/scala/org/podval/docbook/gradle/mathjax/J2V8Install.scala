@@ -9,6 +9,7 @@ import org.podval.fop.mathjax.J2V8
 import org.podval.fop.util.{Architecture, Os}
 
 object J2V8Install {
+
   def load(project: Project, os: Os, arch: Architecture, into: File): Either[String, String] = {
     val dependencyNotationAndLibraryName: Option[(String, String)] =
       J2V8.dependencyNotationAndLibraryName(os, arch)

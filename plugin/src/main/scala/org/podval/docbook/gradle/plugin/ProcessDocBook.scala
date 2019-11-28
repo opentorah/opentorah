@@ -6,8 +6,8 @@ import org.gradle.api.Project
 import org.podval.docbook.gradle.fop.Fop
 import org.podval.docbook.gradle.jeuclid.JEuclidFopPlugin
 import org.podval.docbook.gradle.section.DocBook2
-import org.podval.docbook.gradle.util.{Gradle, Util}
-import org.podval.docbook.gradle.xml.{DocBookMathFilter, ProcessingInstructionsFilter}
+import org.podval.docbook.gradle.util.{Gradle, Files}
+import org.podval.docbook.gradle.xml.{MathFilter, ProcessingInstructionsFilter}
 import org.podval.fop.FopPlugin
 import org.podval.fop.mathjax.{MathJax, MathJaxFopPlugin}
 import org.podval.fop.util.Logger
@@ -41,8 +41,8 @@ final class ProcessDocBook(
     // do not output the 'main' file when chunking in XSLT 1.0
     val outputFile: Option[File] = if (docBook2.usesRootFile) Some(saxonOutputFile) else None
 
-    val docBookMathFilter: Option[DocBookMathFilter] =
-      if (mathJax.isDefined && isPdf) Some(new DocBookMathFilter(mathJax.get.configuration, logger)) else None
+    val mathFilter: Option[MathFilter] =
+      if (mathJax.isDefined && isPdf) Some(new MathFilter(mathJax.get.configuration, logger)) else None
 
     // Run Saxon.
     Xml.transform(
@@ -52,7 +52,7 @@ final class ProcessDocBook(
       stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(docBook2)),
       xmlReader = Xml.getFilteredXMLReader(
         Seq(new ProcessingInstructionsFilter(substitutions, logger)) ++
-        docBookMathFilter.toSeq
+        mathFilter.toSeq
         // ++ Seq(new TracingFilter)
       ),
       outputFile,
@@ -74,7 +74,11 @@ final class ProcessDocBook(
 
         Fop.run(
           configurationFile = layout.fopConfigurationFile,
-          substitutions: Map[String, String],
+          substitutions.get("creationDate"),
+          substitutions.get("author"),
+          substitutions.get("title"),
+          substitutions.get("subject"),
+          substitutions.get("keywords"),
           plugin = fopPlugin,
           inputDirectory = saxonOutputDirectory,
           inputFile = saxonOutputFile,
@@ -94,7 +98,7 @@ final class ProcessDocBook(
     docBook2: DocBook2,
     saxonOutputDirectory: File
   ): Unit = {
-    val into: File = Util.prefixedDirectory(saxonOutputDirectory, docBook2.copyDestinationDirectoryName)
+    val into: File = Files.prefixedDirectory(saxonOutputDirectory, docBook2.copyDestinationDirectoryName)
 
     logger.info(s"Copying images")
     Gradle.copyDirectory(project,
