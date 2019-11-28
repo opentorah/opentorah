@@ -2,7 +2,7 @@ package org.podval.docbook.gradle
 
 import org.podval.docbook.gradle.mathjax.{MathML, MathReader}
 import org.podval.docbook.gradle.plugin.DocBook
-import org.podval.fop.mathjax.{Configuration, MathJax}
+import org.podval.fop.mathjax.{Configuration, MathJax2}
 import org.podval.fop.xml.{Namespace, Xml}
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -17,7 +17,7 @@ class MathReaderTest extends FlatSpec with Matchers {
          |  <para>
          |    Wrapped display TeX:<informalequation>
          |    <math ${MathML.Namespace.default}
-         |          ${MathJax.Namespace} mathjax:input="TeX">
+         |          ${MathJax2.Namespace} mathjax:input="TeX">
          |      <mrow><mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi></mrow>
          |    </math></informalequation>
          |  </para>
@@ -26,7 +26,7 @@ class MathReaderTest extends FlatSpec with Matchers {
      s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>
          |    Wrapped display TeX:<informalequation>
-         |    <math ${MathML.Namespace.default} display="block" mathjax:input="TeX" ${MathJax.Namespace}>
+         |    <math ${MathML.Namespace.default} display="block" mathjax:input="TeX" ${MathJax2.Namespace}>
          |      <mrow>
          |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
@@ -46,7 +46,7 @@ class MathReaderTest extends FlatSpec with Matchers {
     ) shouldBe
      s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>Display TeX:<informalequation>
-         |         <math ${MathML.Namespace.default} mathjax:input="TeX" ${MathJax.Namespace}>
+         |         <math ${MathML.Namespace.default} mathjax:input="TeX" ${MathJax2.Namespace}>
          |            <mrow>
          |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
@@ -67,7 +67,7 @@ class MathReaderTest extends FlatSpec with Matchers {
     ) shouldBe
      s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>Inline TeX:<inlineequation>
-         |         <math ${MathML.Namespace.default} mathjax:input="inline-TeX" ${MathJax.Namespace}>
+         |         <math ${MathML.Namespace.default} mathjax:input="inline-TeX" ${MathJax2.Namespace}>
          |            <mrow>
          |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
@@ -87,7 +87,7 @@ class MathReaderTest extends FlatSpec with Matchers {
     ) shouldBe
      s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>Explicit display TeX:<equation>
-         |         <math ${MathML.Namespace.default} mathjax:input="TeX" ${MathJax.Namespace}>
+         |         <math ${MathML.Namespace.default} mathjax:input="TeX" ${MathJax2.Namespace}>
          |            <mrow>
          |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>

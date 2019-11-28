@@ -41,7 +41,7 @@ object Input {
     */
   @SerialVersionUID(1L)
   case object Attribute extends org.podval.fop.xml.Attribute[Input] {
-    override def namespace: Namespace = MathJax.Namespace
+    override def namespace: Namespace = MathJax2.Namespace
 
     override def name: String = "input"
 

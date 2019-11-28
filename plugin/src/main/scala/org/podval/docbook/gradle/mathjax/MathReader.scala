@@ -145,7 +145,7 @@ final class MathReader(
       // NOTE: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,
       // math element and its children end up having *two* default namespaces - MathML and DocBook.
       prefixMapping(MathML.Namespace.default) {
-        prefixMapping(org.podval.fop.mathjax.MathJax.Namespace) {
+        prefixMapping(org.podval.fop.mathjax.MathJax2.Namespace) {
           element(MathML.Namespace.default, MathML.math, atts = attributes) {
             element(MathML.Namespace.default, MathML.mrow) {
               element(MathML.Namespace.default, MathML.mi) {
