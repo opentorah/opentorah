@@ -1,31 +1,21 @@
 plugins {
   id 'scala'
   id 'com.github.maiflai.scalatest'
-  id 'java-gradle-plugin'
   id 'maven-publish'
-  id 'com.gradle.plugin-publish'
-//  id 'com.jfrog.bintray'
+  id 'com.jfrog.bintray'
 }
 
-group = 'org.podval.docbook'
-description = 'Gradle DocBook plugin'
+group = 'org.podval.fop'
+description = 'FOP MathJax plugin'
 
 apply from: '../versions.gradle'
 
 dependencies {
-  implementation project(':org.podval.fop.mathjax')
-
   // Scala
   implementation "org.scala-lang:scala-library:$scalaVersion"
 
   // XMLResolver
   implementation "org.xmlresolver:xmlresolver:$xmlresolverVersion"
-
-  // Saxon 6 (XSLT 1.0)
-  implementation "saxon:saxon:$saxon6Version"
-
-  // Saxon 9 (XSLT 2.0)
-  implementation "net.sf.saxon:Saxon-HE:$saxon9Version"
 
   // Xerces
   implementation "xerces:xercesImpl:$xercesVersion"
@@ -65,11 +55,6 @@ dependencies {
   // added by the 'java-gradle-plugin': testImplementation gradleTestKit()
 }
 
-// run tests sequentially
-test {
-  maxParallelForks = 1
-}
-
 jar {
   manifest {
     attributes(
@@ -79,10 +64,6 @@ jar {
   }
 }
 
-// Gradle plugin [publishing?] plugin adds tasks publishPluginJar and
-// publishPluginJavaDocsJar that create sources and javadoc archives;
-// attempts to use them as artifacts in the Maven publication failed,
-// so I make my own, replacing javadoc with scaladoc :)
 task sourceJar(type: Jar) {
   from sourceSets.main.allSource
   archiveClassifier.set('sources')
@@ -96,39 +77,9 @@ scaladocJar.dependsOn scaladoc
 
 final String pluginArtifactId = project.name // jar.baseName
 
-gradlePlugin {
-  plugins {
-    docBookPlugin {
-      id = pluginArtifactId
-      implementationClass = 'org.podval.docbook.gradle.plugin.DocBookPlugin'
-    }
-  }
-}
-
 final String gitHubRepository    = 'dubinsky/podval-docbook-gradle'
 final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
 final List<String> pluginTags = ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub', 'Gradle', 'Plugin']
-
-pluginBundle {
-  website = "${gitHubRepositoryUrl}"
-  vcsUrl = "${gitHubRepositoryUrl}.git"
-
-  plugins {
-    docBookPlugin {
-      displayName = project.description
-      description = project.description
-      tags        = pluginTags
-    }
-  }
-
-  // If you have an existing plugin deployed to Bintray and would like to keep
-  // your existing group ID and artifact ID for continuity, you can specify
-  // them here (needs manual approval on first publication).
-  mavenCoordinates {
-    groupId    = project.group
-    artifactId = pluginArtifactId
-  }
-}
 
 publishing {
   publications {
@@ -139,7 +90,6 @@ publishing {
       from components.java
 
       artifact sourceJar
-// TODO when Gradle fixes Scaladoc for Scala 2.13:
 //      artifact scaladocJar
 
       pom {
@@ -175,32 +125,27 @@ publishing {
   }
 }
 
-// No need to publish plugin to JCenter: it is published on the plugin portal.
-//bintray {
-//  user         = 'dubinsky'
-//  key          = findProperty('bintrayApiKey')
-//  publications = [
-//    'mavenPublication',                        // Main: pom, jar, sources, etc.
-//    // Gradle plugin [publishing?] plugin adds another publication 'pluginMaven'
-//    // that produces the same Jar as the main one - and a POM that has only dependencies.
-//    // I do not think I need to publish that :)
-//    'docBookPluginPluginMarkerMaven'
-//  ]
-//  dryRun       = false
-//  publish      = true
-//  override     = true
-//  pkg {
-//    repo                   = project.group
-//    name                   = pluginArtifactId
-//    desc                   = project.description
-//    websiteUrl             = "${gitHubRepositoryUrl}"
-//    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
-//    vcsUrl                 = "${gitHubRepositoryUrl}.git"
-//    githubRepo             = gitHubRepository
-//    licenses               = ['Apache-2.0']
-//    labels                 = pluginTags
-//    publicDownloadNumbers  = true
-//    githubReleaseNotesFile = 'CHANGELOG.md'
-//    version { name         = project.version }
-//  }
-//}
+bintray {
+  user         = 'dubinsky'
+  key          = findProperty('bintrayApiKey')
+  publications = [
+    'mavenPublication',                        // Main: pom, jar, sources, etc.
+  ]
+  dryRun       = false
+  publish      = true
+  override     = true
+  pkg {
+    repo                   = project.group
+    name                   = pluginArtifactId
+    desc                   = project.description
+    websiteUrl             = "${gitHubRepositoryUrl}"
+    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
+    vcsUrl                 = "${gitHubRepositoryUrl}.git"
+    githubRepo             = gitHubRepository
+    licenses               = ['Apache-2.0']
+    labels                 = pluginTags
+    publicDownloadNumbers  = true
+    githubReleaseNotesFile = 'CHANGELOG.md'
+    version { name         = project.version }
+  }
+}

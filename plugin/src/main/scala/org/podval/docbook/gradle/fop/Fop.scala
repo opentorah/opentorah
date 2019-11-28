@@ -9,6 +9,7 @@ import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
 import org.apache.xmlgraphics.util.MimeConstants
 import org.podval.docbook.gradle.xml.Xml
 import org.podval.docbook.gradle.util.{Logger, Util}
+import org.podval.fop.FopPlugin
 
 import scala.jdk.CollectionConverters._
 import scala.collection.immutable.SortedMap

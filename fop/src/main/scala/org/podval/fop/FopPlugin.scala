@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.fop
+package org.podval.fop
 
 import org.apache.fop.apps.FopFactory
 import org.apache.fop.fo.ElementMapping
