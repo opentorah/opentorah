@@ -9,7 +9,6 @@ import org.podval.fop.util.Logger
 import org.podval.fop.xml.Namespace
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
-import org.w3c.dom.{Document, Element}
 
 final class MathReader(
   configuration: Configuration,
@@ -207,9 +206,4 @@ object MathReader {
     else if (chars.charAt(index-1) == '\\') None
     else Some(index)
   }
-
-  def unwrap(mathMLDocument: Document): String = mathMLDocument.getDocumentElement
-    .getElementsByTagName(MathML.mrow).item(0).asInstanceOf[Element]
-    .getElementsByTagName(MathML.mi).item(0).asInstanceOf[Element]
-    .getTextContent
 }

@@ -6,6 +6,7 @@ import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.{FOEventHandler, FONode, PropertyList, XMLObj}
 import org.podval.fop.mathjax.Sizes
 import org.podval.fop.xml.{Attribute, AttributeInfo}
+import org.w3c.dom.{Document, Element}
 import org.xml.sax.{Attributes, Locator}
 
 final class MathML(parent: FONode, fopPlugin: MathJaxFopPlugin) extends MathML.Obj(parent) {
@@ -107,4 +108,9 @@ object MathML {
   val math: String = "math"
   val mrow: String = "mrow"
   val mi: String = "mi"
+
+  def unwrap(mathMLDocument: Document): String = mathMLDocument.getDocumentElement
+    .getElementsByTagName(MathML.mrow).item(0).asInstanceOf[Element]
+    .getElementsByTagName(MathML.mi).item(0).asInstanceOf[Element]
+    .getTextContent
 }

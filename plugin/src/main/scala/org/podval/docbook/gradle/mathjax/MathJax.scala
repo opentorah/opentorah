@@ -15,7 +15,7 @@ abstract class MathJax(
   final def typeset(mathMLDocument: Document): SVGDocument = {
     val input: Input = Input.Attribute.getWithDefault(mathMLDocument)
     val math: String =
-      if (input == Input.MathML) Xml.toString(mathMLDocument) else MathReader.unwrap(mathMLDocument)
+      if (input == Input.MathML) Xml.toString(mathMLDocument) else MathML.unwrap(mathMLDocument)
 
     val fontSize: Float = Sizes.FontSizeAttribute.doGet(mathMLDocument)
 
