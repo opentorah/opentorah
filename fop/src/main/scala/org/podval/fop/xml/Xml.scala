@@ -118,29 +118,13 @@ object Xml {
     result: Result,
     logger: Logger
   ): Unit = {
-    logger.debug(
-      s"""Xml.transform(
-         |  useSaxon9 = $useSaxon9,
-         |  stylesheetFile = $stylesheetFile,
-         |  source = ${source.getSystemId},
-         |  result = ${result.getSystemId}
-         |)""".stripMargin
+    (if (!useSaxon9) Saxon.Saxon6 else Saxon.Saxon9).transform(
+      resolver,
+      stylesheetFile,
+      source,
+      result,
+      logger
     )
-
-    val transformerFactory: SAXTransformerFactory =
-      (if (!useSaxon9) Saxon.Saxon6 else Saxon.Saxon9).getTransformerFactory
-
-    // Note: To intercept all network requests, URIResolver has to be set on the transformerFactory,
-    // not the transformer itself: I guess some sub-transformers get created internally ;)
-    resolver.foreach(resolver => transformerFactory.setURIResolver(resolver))
-
-    setErrorListener(transformerFactory, logger)
-
-    val transformer: Transformer = stylesheetFile.fold(transformerFactory.newTransformer) {
-      stylesheetFile => transformerFactory.newTransformer(new StreamSource(stylesheetFile))
-    }
-
-    transformer.transform(source, result)
   }
 
   private def setErrorHandler(xmlReader: XMLReader, logger: Logger): Unit =
@@ -150,7 +134,7 @@ object Xml {
       override def fatalError(exception: SAXParseException): Unit = logger.error(exception.toString)
     })
 
-  private def setErrorListener(transformerFactory: SAXTransformerFactory, logger: Logger): Unit =
+  def setErrorListener(transformerFactory: SAXTransformerFactory, logger: Logger): Unit =
     transformerFactory.setErrorListener(new ErrorListener {
       override def warning(exception: TransformerException): Unit = logger.warn(exception.getMessageAndLocation)
       override def error(exception: TransformerException): Unit = logger.error(exception.getMessageAndLocation)

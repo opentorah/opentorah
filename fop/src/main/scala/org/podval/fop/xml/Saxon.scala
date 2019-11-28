@@ -1,10 +1,17 @@
 package org.podval.fop.xml
 
+import java.io.File
+
+import javax.xml.transform.{Result, Source, Transformer}
 import javax.xml.transform.sax.SAXTransformerFactory
+import javax.xml.transform.stream.StreamSource
+import org.podval.fop.util.Logger
 
-abstract class Saxon(name: String) {
+sealed abstract class Saxon(name: String) {
 
-  val getTransformerFactory: SAXTransformerFactory = {
+  final override def toString: String = name
+
+  def getTransformerFactory: SAXTransformerFactory = {
     val result: SAXTransformerFactory = newTransformerFactory
 
     // To process DocBook stylesheets (see also Svg.scala), Saxon needs real Xerces parser,
@@ -22,6 +29,37 @@ abstract class Saxon(name: String) {
   protected def stylePraserClassAttribute: String
 
   protected def sourcePraserClassAttribute: String
+
+  def transform(
+    resolver: Option[Resolver],
+    stylesheetFile: Option[File],
+    source: Source,
+    result: Result,
+    logger: Logger
+  ): Unit = {
+    logger.debug(
+      s"""Saxon.transform(
+         |  saxon = $this,
+         |  stylesheetFile = $stylesheetFile,
+         |  source = ${source.getSystemId},
+         |  result = ${result.getSystemId}
+         |)""".stripMargin
+    )
+
+    val transformerFactory: SAXTransformerFactory = getTransformerFactory
+
+    // Note: To intercept all network requests, URIResolver has to be set on the transformerFactory,
+    // not the transformer itself: I guess some sub-transformers get created internally ;)
+    resolver.foreach(resolver => transformerFactory.setURIResolver(resolver))
+
+    Xml.setErrorListener(transformerFactory, logger)
+
+    val transformer: Transformer = stylesheetFile.fold(transformerFactory.newTransformer) {
+      stylesheetFile => transformerFactory.newTransformer(new StreamSource(stylesheetFile))
+    }
+
+    transformer.transform(source, result)
+  }
 }
 
 object Saxon {
