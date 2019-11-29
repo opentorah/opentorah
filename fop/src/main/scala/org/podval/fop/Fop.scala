@@ -41,7 +41,6 @@ object Fop {
     subject: Option[String],
     keywords: Option[String],
     inputFile: File,
-    inputDirectory: File, // TODO calculate from the input file
     outputFile: File,
     plugin: Option[FopPlugin],
     logger: Logger
@@ -50,7 +49,6 @@ object Fop {
       s"""Fop.run(
          |  configurationFile = $configurationFile,
          |  inputFile = $inputFile,
-         |  inputDirectory = $inputDirectory,
          |  outputFile = $outputFile,
          |)""".stripMargin
     )

@@ -78,7 +78,6 @@ final class ProcessDocBook(
           substitutions.get("subject"),
           substitutions.get("keywords"),
           plugin = fopPlugin,
-          inputDirectory = saxonOutputDirectory,
           inputFile = saxonOutputFile,
           outputFile = forDocument.outputFile(docBook2),
           logger = logger
