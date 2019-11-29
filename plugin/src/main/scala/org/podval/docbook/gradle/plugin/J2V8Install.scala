@@ -2,9 +2,8 @@ package org.podval.docbook.gradle.plugin
 
 import java.io.File
 
-import com.eclipsesource.v8.V8
 import org.gradle.api.Project
-import org.podval.fop.mathjax.J2V8Distribution
+import org.podval.fop.mathjax.{J2V8, J2V8Distribution}
 import org.podval.fop.util.{Architecture, Logger, Os}
 
 object J2V8Install {
@@ -52,12 +51,6 @@ object J2V8Install {
 
     System.load(libraryPath)
 
-    setNativeLibraryLoaded()
-  }
-
-  private def setNativeLibraryLoaded(): Unit = {
-    val field = classOf[V8].getDeclaredField("nativeLibraryLoaded")
-    field.setAccessible(true)
-    field.set(null, true)
+    J2V8.setNativeLibraryLoaded()
   }
 }
