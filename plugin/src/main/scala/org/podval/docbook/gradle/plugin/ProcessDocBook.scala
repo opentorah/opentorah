@@ -8,7 +8,7 @@ import org.podval.docbook.gradle.xml.{MathFilter, ProcessingInstructionsFilter}
 import org.podval.fop.{Fop, FopPlugin}
 import org.podval.fop.mathjax.{MathJax, MathJaxFopPlugin}
 import org.podval.fop.util.Logger
-import org.podval.fop.xml.{Resolver, Xml}
+import org.podval.fop.xml.{Resolver, Saxon, Xml}
 
 final class ProcessDocBook(
   project: Project,
@@ -42,8 +42,8 @@ final class ProcessDocBook(
       if (mathJax.isDefined && isPdf) Some(new MathFilter(mathJax.get.configuration, logger)) else None
 
     // Run Saxon.
-    Xml.transform(
-      useSaxon9 = docBook2.usesDocBookXslt2,
+    val saxon: Saxon = if (!docBook2.usesDocBookXslt2) Saxon.Saxon6 else Saxon.Saxon9
+    saxon.transform(
       resolver,
       inputFile = layout.inputFile(documentName),
       stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(docBook2)),
@@ -70,6 +70,7 @@ final class ProcessDocBook(
           else mathJax.map(new MathJaxFopPlugin(_))
 
         Fop.run(
+          saxon = Saxon.Saxon6, // Saxon9 should work too?
           configurationFile = layout.fopConfigurationFile,
           substitutions.get("creationDate"),
           substitutions.get("author"),

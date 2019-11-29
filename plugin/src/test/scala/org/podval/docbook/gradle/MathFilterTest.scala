@@ -3,8 +3,9 @@ package org.podval.docbook.gradle
 import org.podval.docbook.gradle.plugin.DocBook
 import org.podval.docbook.gradle.xml.MathFilter
 import org.podval.fop.mathjax.{Configuration, MathJax, MathML}
-import org.podval.fop.xml.{Namespace, Xml}
+import org.podval.fop.xml.{Namespace, Saxon, Xml}
 import org.scalatest.{FlatSpec, Matchers}
+import org.w3c.dom.Node
 
 class MathFilterTest extends FlatSpec with Matchers {
 
@@ -110,8 +111,9 @@ class MathFilterTest extends FlatSpec with Matchers {
 //       |</article>""".stripMargin
 
   private def parse(string: String): String = {
-    var logger = new TestLogger
-    val result = Xml.parse(
+    val logger = new TestLogger
+    // Saxon 6 returns unmodifiable DOM that breaks toString(); using Saxon 9.
+    val result: Node = Saxon.Saxon9.parse(
       input = string,
       xmlReader = Xml.getFilteredXMLReader(filters = Seq(
         new MathFilter(Configuration(), logger)

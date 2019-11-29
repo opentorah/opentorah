@@ -9,7 +9,7 @@ import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
 import org.apache.xmlgraphics.util.MimeConstants
 import org.podval.fop.util.Util.mapValues
 import org.podval.fop.util.{Logger, Util}
-import org.podval.fop.xml.Xml
+import org.podval.fop.xml.{Saxon, Xml}
 
 import scala.collection.immutable.SortedMap
 import scala.jdk.CollectionConverters._
@@ -33,6 +33,7 @@ object Fop {
   private val dateFormat: java.text.DateFormat = new java.text.SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy")
 
   def run(
+    saxon: Saxon,
     configurationFile: File,
     creationDate: Option[String],
     author: Option[String],
@@ -71,6 +72,7 @@ object Fop {
     )
 
     run(
+      saxon,
       fopFactory,
       foUserAgent,
       inputFile,
@@ -100,6 +102,7 @@ object Fop {
   }
 
   def run(
+    saxon: Saxon,
     fopFactory: FopFactory,
     foUserAgent: FOUserAgent,
     inputFile: File,
@@ -110,7 +113,7 @@ object Fop {
     val fop: org.apache.fop.apps.Fop = fopFactory.newFop("application/pdf", foUserAgent, outputStream)
 
     try {
-      Xml.transform(
+      saxon.transform(
         inputFile = inputFile,
         defaultHandler = fop.getDefaultHandler,
         logger = logger

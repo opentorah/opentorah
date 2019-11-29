@@ -9,7 +9,7 @@ final class Layout(val projectDir: File, val buildDir: File) {
   // I do not see any point in caching anything under `.gradle`:
   // - Gradle caches artifacts elsewhere;
   // - NPM caches packages that it retrieves.
-  // If there turns out a point in this, do it for both Node and DocBook.
+  // If there turns out to be a point in this, do it for both Node and DocBook.
   // private def cacheDirectory(name: String): File = new File(new File(projectDir, ".gradle"), name)
 
   def settingsGradle: File = new File(projectDir, "settings.gradle")

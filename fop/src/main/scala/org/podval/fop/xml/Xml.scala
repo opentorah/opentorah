@@ -1,16 +1,8 @@
 package org.podval.fop.xml
 
-import java.io.{File, FileWriter, StringReader}
-
 import javax.xml.parsers.SAXParserFactory
-import javax.xml.transform.dom.DOMResult
-import javax.xml.transform.sax.{SAXResult, SAXSource, SAXTransformerFactory}
-import javax.xml.transform.stream.{StreamResult, StreamSource}
-import javax.xml.transform.{ErrorListener, Result, Source, Transformer, TransformerException}
-import org.podval.fop.util.Logger
 import org.w3c.dom.Node
-import org.xml.sax.helpers.DefaultHandler
-import org.xml.sax.{ErrorHandler, InputSource, SAXParseException, XMLFilter, XMLReader}
+import org.xml.sax.{XMLFilter, XMLReader}
 
 object Xml {
 
@@ -26,6 +18,15 @@ object Xml {
     result
   }
 
+  val saxParserFactoryName: String = classOf[org.apache.xerces.jaxp.SAXParserFactoryImpl].getName
+  val saxParserName: String = classOf[org.apache.xerces.parsers.SAXParser].getName
+
+  private def newSaxParserFactory: SAXParserFactory = {
+    val result = new org.apache.xerces.jaxp.SAXParserFactoryImpl
+    result.setXIncludeAware(true)
+    result
+  }
+
   def getFilteredXMLReader(filters: Seq[XMLFilter]): XMLReader =
     filters.foldLeft(getXMLReader) { case (parent, filter) =>
         filter.setParent(parent)
@@ -34,110 +35,4 @@ object Xml {
 
   private def getXMLReader: XMLReader =
     newSaxParserFactory.newSAXParser.getXMLReader
-
-  val saxParserFactoryName: String = classOf[org.apache.xerces.jaxp.SAXParserFactoryImpl].getName
-  val saxParserName: String = classOf[org.apache.xerces.parsers.SAXParser].getName
-
-  def newSaxParserFactory: SAXParserFactory = {
-    val result = new org.apache.xerces.jaxp.SAXParserFactoryImpl
-    result.setXIncludeAware(true)
-    result
-  }
-
-  def transform(
-    useSaxon9: Boolean,
-    resolver: Resolver,
-    inputFile: File,
-    stylesheetFile: File,
-    xmlReader: XMLReader,
-    outputFile: Option[File],
-    logger: Logger
-  ): Unit = {
-    xmlReader.setEntityResolver(resolver)
-
-    setErrorHandler(xmlReader, logger)
-
-    transform(
-      useSaxon9,
-      resolver = Some(resolver),
-      stylesheetFile = Some(stylesheetFile),
-      source = new SAXSource(xmlReader, new InputSource(inputFile.toURI.toASCIIString)),
-      result = getOutputTarget(outputFile),
-      logger
-    )
-  }
-
-  private def getOutputTarget(outputFile: Option[File]): Result = {
-    val result = new StreamResult
-    outputFile.map { outputFile =>
-      result.setSystemId(outputFile)
-      result.setWriter(new FileWriter(outputFile))
-      result
-    }.getOrElse {
-      result.setSystemId("dev-null")
-      result.setOutputStream((_: Int) => {})
-      result
-    }
-  }
-
-  def transform(
-    inputFile: File,
-    defaultHandler: DefaultHandler,
-    logger: Logger
-  ): Unit = transform(
-    useSaxon9 = false,
-    resolver = None,
-    stylesheetFile = None,
-    source = new StreamSource(inputFile),
-    result = new SAXResult(defaultHandler),
-    logger
-  )
-
-  def parse(input: String, xmlReader: XMLReader, logger: Logger): Node = {
-    setErrorHandler(xmlReader, logger)
-
-    val result = new DOMResult
-
-    transform(
-      useSaxon9 = true, // Saxon 6 returns unmodifiable DOM that breaks toString(); using Saxon 9.
-      resolver = None,
-      stylesheetFile = None,
-      source = new SAXSource(xmlReader, new InputSource(new StringReader(input))),
-      result = result,
-      logger
-    )
-
-    result.getNode
-  }
-
-  private def transform(
-    useSaxon9: Boolean,
-    resolver: Option[Resolver],
-    stylesheetFile: Option[File],
-    source: Source,
-    result: Result,
-    logger: Logger
-  ): Unit = {
-    (if (!useSaxon9) Saxon.Saxon6 else Saxon.Saxon9).transform(
-      resolver,
-      stylesheetFile,
-      source,
-      result,
-      logger
-    )
-  }
-
-  private def setErrorHandler(xmlReader: XMLReader, logger: Logger): Unit =
-    xmlReader.setErrorHandler(new ErrorHandler {
-      override def warning(exception: SAXParseException): Unit = logger.warn(exception.toString)
-      override def error(exception: SAXParseException): Unit = logger.error(exception.toString)
-      override def fatalError(exception: SAXParseException): Unit = logger.error(exception.toString)
-    })
-
-  def setErrorListener(transformerFactory: SAXTransformerFactory, logger: Logger): Unit =
-    transformerFactory.setErrorListener(new ErrorListener {
-      override def warning(exception: TransformerException): Unit = logger.warn(exception.getMessageAndLocation)
-      override def error(exception: TransformerException): Unit = logger.error(exception.getMessageAndLocation)
-      override def fatalError(exception: TransformerException): Unit = logger.error(exception.getMessageAndLocation)
-    })
 }
