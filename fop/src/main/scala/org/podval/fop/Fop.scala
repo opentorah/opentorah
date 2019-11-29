@@ -145,29 +145,6 @@ object Fop {
     System.out.flush()
   }
 
-  def getFontFiles(configurationFile: File, fontFamilyNames: List[String], logger: Logger): String =
-    if (fontFamilyNames.isEmpty) "" else {
-      val fontFamilyNamesStr: String = fontFamilyNames.mkString(", ")
-      val fontFamilies: Map[String, List[FontSpec]] = getFontFamilies(configurationFile)
-      val uris: List[URI] = fontFamilyNames.flatMap { fontFamilyName: String =>
-        fontFamilies.get(fontFamilyName).fold[List[URI]] {
-          logger.error(s"Font family $fontFamilyName not found!")
-          List.empty
-        } { fontSpecs: List[FontSpec] => fontSpecs.flatMap { fontSpec: FontSpec =>
-          val uri: Option[URI] = Option(fontSpec.getFontMetrics.getFontURI)
-          if (uri.isEmpty) logger.error(s"No URI for fontSpec ${fontSpec.getKey}!")
-          uri
-        }}
-      }
-
-      val (files: List[URI], nonFiles: List[URI]) = uris.partition(_.getScheme == "file")
-      if (nonFiles.nonEmpty) logger.error(s"Non-file URIs: $nonFiles")
-
-      val result: String = files.map(uri => new File(uri.getPath).getAbsolutePath).mkString(", ")
-      logger.info(s"Fop.getFontFiles($fontFamilyNamesStr) = $result.")
-      result
-    }
-
   private def getFontFamilies(configurationFile: File): SortedMap[String, List[FontSpec]] = {
     val fopFactory: FopFactory = FopFactoryFactory.newFactory(configurationFile)
 
@@ -185,6 +162,26 @@ object Fop {
       .asInstanceOf[java.util.SortedMap[String, java.util.List[FontSpec]]]
       .asScala.toMap)(_.asScala.toList)
   }
+
+  def getFontFiles(configurationFile: File, fontFamilyNames: List[String], logger: Logger): List[URI] =
+    if (fontFamilyNames.isEmpty) List.empty else {
+      val fontFamilies: Map[String, List[FontSpec]] = getFontFamilies(configurationFile)
+      val uris: List[URI] = fontFamilyNames.flatMap { fontFamilyName: String =>
+        fontFamilies.get(fontFamilyName).fold[List[URI]] {
+          logger.error(s"Font family $fontFamilyName not found!")
+          List.empty
+        } { fontSpecs: List[FontSpec] => fontSpecs.flatMap { fontSpec: FontSpec =>
+          val uri: Option[URI] = Option(fontSpec.getFontMetrics.getFontURI)
+          if (uri.isEmpty) logger.error(s"No URI for fontSpec ${fontSpec.getKey}!")
+          uri
+        }}
+      }
+
+      val (files: List[URI], nonFiles: List[URI]) = uris.partition(_.getScheme == "file")
+      if (nonFiles.nonEmpty) logger.error(s"Non-file URIs: $nonFiles")
+
+      files
+    }
 
   def deleteFontCache(configurationFile: File): Unit =
     FopFactoryFactory.newFactory(configurationFile).newFOUserAgent.getFontManager.deleteCache()

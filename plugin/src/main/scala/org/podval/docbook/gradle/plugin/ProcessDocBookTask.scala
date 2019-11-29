@@ -1,6 +1,7 @@
 package org.podval.docbook.gradle.plugin
 
 import java.io.File
+import java.net.URI
 
 import org.gradle.api.{DefaultTask, Project, Task}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
@@ -178,6 +179,11 @@ class ProcessDocBookTask extends DefaultTask {
     for ((name: String, _ /*prefixed*/: Boolean) <- inputDocuments)
       write.inputFile(name)
 
+    val fontFamilyNames: List[String] = epubEmbeddedFonts.get.asScala.toList
+    val epubEmbededFontsUris: List[URI] = Fop.getFontFiles(layout.fopConfigurationFile, fontFamilyNames, logger)
+    val epubEmbededFonts: String = epubEmbededFontsUris.map(uri => new File(uri.getPath).getAbsolutePath).mkString(", ")
+    logger.info(s"Fop.getFontFiles(${fontFamilyNames.mkString(", ")}) = $epubEmbededFonts.")
+
     for {
       docBook2: DocBook2 <- DocBook2.all
       (documentName: String, prefixed: Boolean) <- inputDocuments
@@ -186,7 +192,7 @@ class ProcessDocBookTask extends DefaultTask {
       prefixed,
       documentName,
       cssFileName,
-      epubEmbeddedFonts = Fop.getFontFiles(layout.fopConfigurationFile, epubEmbeddedFonts.get.asScala.toList, logger),
+      epubEmbeddedFonts = epubEmbededFonts,
       mathJaxConfiguration = mathJaxConfiguration
     )
 
@@ -269,23 +275,19 @@ class ProcessDocBookTask extends DefaultTask {
   private def installMathJax(configuration: Configuration): MathJax = {
     val os: Os = Platform.getOs
     val arch: Architecture = Platform.getArch
-    val nodeRoot: File = layout.nodeRoot
-    val j2v8LibraryDirectory: File = layout.j2v8LibraryDirectory
-
 
     // make sure Node and MathJax are installed
-    val node: Node = NodeInstall.install(getProject, os, arch, nodeRoot, logger)
+    val node: Node = NodeInstall.install(getProject, os, arch, layout.nodeRoot, logger)
 
     // If J2V8 is configured to be used, is available and actually loads - we use it;
     // otherwise each typesetting is done by calling Node in a separate process.
     val reallyUseJ2V8: Boolean = useJ2V8.get && {
-      val result: Either[String, String] = J2V8Install.install(getProject, os, arch, j2v8LibraryDirectory, logger)
+      val result: Either[String, String] = J2V8Install.install(getProject, os, arch, layout.j2v8LibraryDirectory, logger)
       result.fold(logger.warn, logger.info)
       result.isRight
     }
 
     val mathJaxFactory: MathJax.Factory = if (reallyUseJ2V8) J2V8MathJax else ExternalMathJax
-
     mathJaxFactory.get(node, configuration, logger)
   }
 }
