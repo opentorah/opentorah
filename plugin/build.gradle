@@ -18,11 +18,11 @@ dependencies {
   // Scala
   implementation "org.scala-lang:scala-library:$scalaVersion"
 
-//  // Saxon 6 (XSLT 1.0)
-//  implementation "saxon:saxon:$saxon6Version"
-//
-//  // Saxon 9 (XSLT 2.0)
-//  implementation "net.sf.saxon:Saxon-HE:$saxon9Version"
+  // Saxon 6 (XSLT 1.0)
+  implementation "saxon:saxon:$saxon6Version"
+
+  // Saxon 9 (XSLT 2.0)
+  implementation "net.sf.saxon:Saxon-HE:$saxon9Version"
 
   implementation ("org.apache.xmlgraphics:fop:$fopVersion") {
     exclude group: 'javax.media', module: 'jai-core'

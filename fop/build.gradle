@@ -18,10 +18,10 @@ dependencies {
   implementation "org.xmlresolver:xmlresolver:$xmlresolverVersion"
 
   // Saxon 6 (XSLT 1.0)
-  implementation "saxon:saxon:$saxon6Version"
+  compileOnly "saxon:saxon:$saxon6Version"
 
   // Saxon 9 (XSLT 2.0)
-  implementation "net.sf.saxon:Saxon-HE:$saxon9Version"
+  compileOnly "net.sf.saxon:Saxon-HE:$saxon9Version"
 
   // Xerces
   implementation "xerces:xercesImpl:$xercesVersion"
