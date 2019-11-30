@@ -281,11 +281,7 @@ class ProcessDocBookTask extends DefaultTask {
 
     // If J2V8 is configured to be used, is available and actually loads - we use it;
     // otherwise each typesetting is done by calling Node in a separate process.
-    val reallyUseJ2V8: Boolean = useJ2V8.get && {
-      val result: Either[String, String] = J2V8Install.install(getProject, os, arch, layout.j2v8LibraryDirectory, logger)
-      result.fold(logger.warn, logger.info)
-      result.isRight
-    }
+    val reallyUseJ2V8: Boolean = useJ2V8.get && J2V8Install.install(getProject, os, arch, layout.j2v8LibraryDirectory, logger)
 
     val mathJaxFactory: MathJax.Factory = if (reallyUseJ2V8) J2V8MathJax else ExternalMathJax
     mathJaxFactory.get(node, configuration, logger)

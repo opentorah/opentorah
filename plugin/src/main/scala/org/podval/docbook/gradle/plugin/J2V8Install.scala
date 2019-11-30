@@ -8,10 +8,13 @@ import org.podval.fop.util.{Architecture, Logger, Os}
 
 object J2V8Install {
 
-  def install(project: Project, os: Os, arch: Architecture, into: File, logger: Logger): Either[String, String] = {
+  def install(project: Project, os: Os, arch: Architecture, into: File, logger: Logger): Boolean = {
     val j2v8Distribution: J2V8Distribution = new J2V8Distribution(os, arch)
 
-    if (j2v8Distribution.version.isEmpty) Left(s"No J2V8 distribution for $os on $arch") else {
+    if (j2v8Distribution.version.isEmpty) {
+      logger.warn(s"No J2V8 distribution for $os on $arch")
+      false
+    } else {
       val dependencyNotation: String = j2v8Distribution.dependencyNotation
       val libraryName: String = j2v8Distribution.libraryName
 
@@ -19,25 +22,27 @@ object J2V8Install {
         case _: IllegalStateException => None
       }
 
-      artifact.fold[Either[String, String]](Left(s"No J2V8 artifact $dependencyNotation")) { artifact =>
-        try {
-          into.mkdirs()
+      artifact.fold{
+        logger.warn(s"No J2V8 artifact $dependencyNotation")
+        false
+      } { artifact =>
+        into.mkdirs()
 
-          Gradle.extract(
-            project,
-            zipFile = artifact,
-            toExtract = libraryName,
-            isDirectory = false,
-            into
-          )
+        Gradle.extract(
+          project,
+          zipFile = artifact,
+          toExtract = libraryName,
+          isDirectory = false,
+          into
+        )
 
-          val libraryPath: String = new File(into, libraryName).getAbsolutePath
-          J2V8.load(libraryPath)
+        logger.info(s"Extracted J2V8 library $dependencyNotation!$libraryName")
 
-          Right(s"Loaded J2V8 library $dependencyNotation!$libraryName")
-        } catch {
-          case e: UnsatisfiedLinkError => Left(s"Failed to load J2V8 library: ${e.getMessage}")
-        }
+        val libraryPath: String = new File(into, libraryName).getAbsolutePath
+        val j2v8: J2V8 = new J2V8(libraryPath)
+        j2v8.load(logger)
+
+        true
       }
     }
   }
