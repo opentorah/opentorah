@@ -19,9 +19,20 @@ object J2V8Install {
         case _: IllegalStateException => None
       }
 
-      if (artifact.isEmpty) Left(s"No J2V8 artifact $dependencyNotation") else {
+      artifact.fold[Either[String, String]](Left(s"No J2V8 artifact $dependencyNotation")) { artifact =>
         try {
-          install(project, artifact.get, libraryName, into)
+          into.mkdirs()
+
+          Gradle.extract(
+            project,
+            zipFile = artifact,
+            toExtract = libraryName,
+            isDirectory = false,
+            into
+          )
+
+          val libraryPath: String = new File(into, libraryName).getAbsolutePath
+          J2V8.load(libraryPath)
 
           Right(s"Loaded J2V8 library $dependencyNotation!$libraryName")
         } catch {
@@ -29,28 +40,5 @@ object J2V8Install {
         }
       }
     }
-  }
-
-  private def install(
-    project: Project,
-    artifact: File,
-    libraryName: String,
-    into: File
-  ): Unit = {
-    into.mkdirs()
-
-    Gradle.extract(
-      project,
-      zipFile = artifact,
-      toExtract = libraryName,
-      isDirectory = false,
-      into
-    )
-
-    val libraryPath: String = new File(into, libraryName).getAbsolutePath
-
-    System.load(libraryPath)
-
-    J2V8.setNativeLibraryLoaded()
   }
 }

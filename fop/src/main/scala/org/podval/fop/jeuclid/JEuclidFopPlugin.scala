@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.plugin
+package org.podval.fop.jeuclid
 
 import net.sourceforge.jeuclid.fop.{JEuclidElementMapping, JEuclidXMLHandler}
 import net.sourceforge.jeuclid.xmlgraphics.{ImageConverterMathML2G2D, ImageLoaderFactoryMathML, PreloaderMathML}

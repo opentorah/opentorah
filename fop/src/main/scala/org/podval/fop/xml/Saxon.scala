@@ -135,7 +135,7 @@ sealed abstract class Saxon(name: String) {
 
 object Saxon {
   // Only Saxon6 is capable of handling DocBook XSLT stylesheets with their XSLT 1.0 extensions;
-  // Saxon9 is not compatin=ble with that,
+  // Saxon9 is not compatible with that,
   object Saxon6 extends Saxon("Saxon 6") {
     override protected def newTransformerFactory: SAXTransformerFactory = new com.icl.saxon.TransformerFactoryImpl
     override protected def styleParserClassAttribute: String = com.icl.saxon.FeatureKeys.STYLE_PARSER_CLASS

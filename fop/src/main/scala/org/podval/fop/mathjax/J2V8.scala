@@ -6,7 +6,9 @@ import scala.jdk.CollectionConverters._
 
 object J2V8 {
 
-  def setNativeLibraryLoaded(): Unit = {
+  def load(libraryPath: String): Unit = {
+    System.load(libraryPath)
+
     val field = classOf[V8].getDeclaredField("nativeLibraryLoaded")
     field.setAccessible(true)
     field.set(null, true)

@@ -5,6 +5,7 @@ import java.io.File
 import org.gradle.api.Project
 import org.podval.docbook.gradle.section.DocBook2
 import org.podval.docbook.gradle.xml.{MathFilter, ProcessingInstructionsFilter}
+import org.podval.fop.jeuclid.JEuclidFopPlugin
 import org.podval.fop.{Fop, FopPlugin}
 import org.podval.fop.mathjax.{MathJax, MathJaxFopPlugin}
 import org.podval.fop.util.Logger
@@ -70,7 +71,7 @@ final class ProcessDocBook(
           else mathJax.map(new MathJaxFopPlugin(_))
 
         Fop.run(
-          saxon = Saxon.Saxon6, // Saxon9 should work too?
+          saxon = Saxon.Saxon6, // TODO: Saxon9 should work too?
           configurationFile = layout.fopConfigurationFile,
           substitutions.get("creationDate"),
           substitutions.get("author"),
