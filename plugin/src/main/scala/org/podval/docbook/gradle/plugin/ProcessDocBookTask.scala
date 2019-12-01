@@ -10,7 +10,7 @@ import org.gradle.process.JavaExecSpec
 import org.podval.docbook.gradle.section.{DocBook2, Section}
 import org.podval.fop.Fop
 import org.podval.fop.mathjax.MathJax
-import org.podval.fop.util.Logger
+import org.podval.fop.util.{Files, Logger}
 import org.podval.fop.util.Util.mapValues
 import org.podval.fop.xml.Resolver
 

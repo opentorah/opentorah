@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.plugin
+package org.podval.fop.util
 
 import java.io.File
 
@@ -15,7 +15,7 @@ object Files {
 
   def dropAllowedExtension(nameWihtExtension: String, allowedExtension: String): String = {
     val (name: String, extension: Option[String]) = fileNameAndExtension(nameWihtExtension)
-    if (extension.nonEmpty && !extension.contains("xml"))
+    if (extension.nonEmpty && !extension.contains(allowedExtension))
       throw new IllegalArgumentException(s"Extension must be '$allowedExtension' if present: $nameWihtExtension")
     name
   }

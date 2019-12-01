@@ -8,7 +8,7 @@ import org.podval.docbook.gradle.xml.{MathFilter, ProcessingInstructionsFilter}
 import org.podval.fop.jeuclid.JEuclidFopPlugin
 import org.podval.fop.{Fop, FopPlugin}
 import org.podval.fop.mathjax.{MathJax, MathJaxFopPlugin}
-import org.podval.fop.util.Logger
+import org.podval.fop.util.{Files, Logger}
 import org.podval.fop.xml.{Resolver, Saxon, Xml}
 
 final class ProcessDocBook(
