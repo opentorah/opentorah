@@ -29,10 +29,10 @@ final class MathJaxFopPlugin(mathJax: MathJax) extends FopPlugin {
         foObjs = new java.util.HashMap
 
         foObjs.put(MathML.math, new ElementMapping.Maker {
-          override def make(parent: FONode): FONode = new MathML(parent, MathJaxFopPlugin.this)
+          override def make(parent: FONode): FONode = new MathMLObj(parent, MathJaxFopPlugin.this)
         })
         foObjs.put(ElementMapping.DEFAULT, new ElementMapping.Maker {
-          override def make(parent: FONode): FONode = new MathML.Obj(parent)
+          override def make(parent: FONode): FONode = new MathMLObj.Obj(parent)
         })
       }
     }

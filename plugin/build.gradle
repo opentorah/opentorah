@@ -14,26 +14,13 @@ description = 'Gradle DocBook plugin'
 
 apply from: '../versions.gradle'
 
-configurations.all {
-  exclude group: 'javax.media', module: 'jai-core'
-  exclude group: 'com.sun.media', module: 'jai-codec'
-}
-
 dependencies {
   implementation project(':org.podval.fop.mathjax')
 
   // Scala
   implementation "org.scala-lang:scala-library:$scalaVersion"
 
-  // Saxon 6 (XSLT 1.0)
-  implementation "saxon:saxon:$saxon6Version"
-
-  // Saxon 9 (XSLT 2.0)
-  implementation "net.sf.saxon:Saxon-HE:$saxon9Version"
-
-  // JEuclid
-  implementation "de.rototor.jeuclid:jeuclid-fop:$jeuclidFopVersion"
-
+  // Testing
   testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
   testImplementation "org.pegdown:pegdown:$pegdownVersion" // for scalatest reports
 
@@ -82,8 +69,9 @@ gradlePlugin {
 
 final String gitHubRepository    = 'dubinsky/podval-docbook-gradle'
 final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
-final List<String> pluginTags = ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub', 'Gradle', 'Plugin']
+final List<String> pluginTags = ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub']
 
+// TODO not all tags get set for the plugin on the portal...
 pluginBundle {
   website = "${gitHubRepositoryUrl}"
   vcsUrl = "${gitHubRepositoryUrl}.git"
