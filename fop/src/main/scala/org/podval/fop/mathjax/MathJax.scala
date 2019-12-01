@@ -54,14 +54,6 @@ object MathJax {
     prefix = "mathjax"
   )
 
-  trait Factory {
-    def get(
-      node: Node,
-      configuration: Configuration,
-      logger: Logger
-    ): MathJax
-  }
-
   private def optionsMap(math: String, inputName: String, outputName: String, ex: Int): Map[String, Any] = Map(
     "useFontCache"    -> true,       // use <defs> and <use> in svg output ('true' by default)?
     "useGlobalCache"  -> false,      // use common <defs> for all equations?

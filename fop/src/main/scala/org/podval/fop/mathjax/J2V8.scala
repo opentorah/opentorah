@@ -9,18 +9,21 @@ import org.podval.fop.util.Logger
 import scala.jdk.CollectionConverters._
 
 final class J2V8(libraryPath: String) {
+
+  override def toString: String = s"J2V8 library $libraryPath"
+
   def load(logger: Logger): Boolean = {
     try {
       System.load(libraryPath)
 
-      logger.info(s"Loaded J2V8 library $libraryPath")
+      logger.info(s"Loaded $this")
       val field: Field = classOf[V8].getDeclaredField("nativeLibraryLoaded")
       field.setAccessible(true)
       field.set(null, true)
       true
     } catch {
       case e: UnsatisfiedLinkError =>
-        logger.warn(s"Failed to load J2V8 library $libraryPath: ${e.getMessage}")
+        logger.warn(s"Failed to load $this: ${e.getMessage}")
         false
     }
   }

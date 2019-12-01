@@ -6,7 +6,7 @@ import java.nio.file.{Files, Path, Paths}
 import scala.sys.process.{Process, ProcessBuilder, ProcessLogger}
 
 final class Node(
-  distribution: NodeDistribution,
+  val distribution: NodeDistribution,
   nodeRoot: File)
 {
   override def toString: String = s"$distribution in $nodeRoot with modules in $nodeModules"
