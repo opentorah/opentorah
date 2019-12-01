@@ -3,6 +3,7 @@ package org.podval.docbook.gradle
 import org.podval.docbook.gradle.plugin.DocBook
 import org.podval.docbook.gradle.xml.MathFilter
 import org.podval.fop.mathjax.{Configuration, MathJax, MathML}
+import org.podval.fop.util.TestLogger
 import org.podval.fop.xml.{Namespace, Saxon, Xml}
 import org.scalatest.{FlatSpec, Matchers}
 import org.w3c.dom.Node

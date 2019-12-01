@@ -51,7 +51,7 @@ final class DocBookPlugin extends Plugin[Project] {
       }
 
       Gradle.getTask(project, "build").fold {
-        logger.warn("No 'build' task found.")
+        logger.info("No 'build' task found.")
       }{ buildTask =>
         logger.info("Found 'build' task; adding 'processDocBook' as its dependency.")
         buildTask.getDependsOn.add(processDocBookTask)
@@ -65,8 +65,14 @@ object DocBookPlugin {
   private class ListFopFontsTask extends DefaultTask {
     setDescription("List FOP fonts")
 
-    @TaskAction def execute(): Unit =
-      Fop.listFonts(Layout.forProject(getProject).fopConfigurationFile)
+    @TaskAction def execute(): Unit = {
+      val result = Fop.listFonts(
+        configurationFile = Layout.forProject(getProject).fopConfigurationFile,
+        logger = PluginLogger.forProject(getProject)
+      )
+      System.out.print(result)
+      System.out.flush()
+    }
   }
 
   private class DeleteFopFontsCacheTask extends DefaultTask {

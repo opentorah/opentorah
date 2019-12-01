@@ -8,7 +8,8 @@ import org.podval.fop.util.Logger
 
 object MathJaxInstall {
 
-  def installNode(project: Project, distribution: NodeDistribution, into: File, logger: Logger): Node = {
+  def installNode(project: Project, into: File, logger: Logger): Node = {
+    val distribution: NodeDistribution = new NodeDistribution
     val node: NodeFromArtifact = NodeFromArtifact(distribution, into)
 
     if (node.root.exists) {
@@ -41,23 +42,23 @@ object MathJaxInstall {
     node
   }
 
-  def installJ2V8(project: Project, distribution: J2V8Distribution, into: File, logger: Logger): Option[J2V8] =
+  def installJ2V8(project: Project, into: File, logger: Logger): Option[J2V8] = {
+    val distribution: J2V8Distribution = new J2V8Distribution
     if (distribution.version.isEmpty) {
       logger.warn(s"No $distribution")
       None
     } else {
-      val dependencyNotation: String = distribution.dependencyNotation
       val libraryName: String = distribution.libraryName
 
-      val artifact: Option[File] = try Some(Gradle.getArtifact(project, dependencyNotation)) catch {
+      val artifact: Option[File] = try Some(Gradle.getArtifact(project, distribution.dependencyNotation)) catch {
         case _: IllegalStateException => None
       }
 
       artifact.fold[Option[J2V8]] {
-        logger.warn(s"No $distribution artifact $dependencyNotation")
+        logger.warn(s"No artifact: $distribution")
         None
       } { artifact =>
-        logger.info(s"Resolved $distribution artifact $dependencyNotation: $artifact")
+        logger.info(s"Resolved $distribution artifact: $artifact")
 
         into.mkdirs()
 
@@ -69,10 +70,11 @@ object MathJaxInstall {
           into
         )
 
-        logger.info(s"Extracted $distribution ($dependencyNotation!$libraryName) into $into")
+        logger.info(s"Extracted $distribution into $into")
 
         val libraryPath: String = new File(into, libraryName).getAbsolutePath
         Some(new J2V8(libraryPath))
       }
     }
+  }
 }
