@@ -10,9 +10,9 @@ import org.podval.fop.util.{Architecture, Os}
 
 // Describes Node distribution's packaging and structure.
 final class NodeDistribution(
-  val version: String,
   val os: Os,
-  val architecture: Architecture
+  val architecture: Architecture,
+  val version: String = NodeDistribution.defaultVersion
 ) {
   override def toString: String = s"Node v$version for $os on $architecture"
 
@@ -67,4 +67,8 @@ final class NodeDistribution(
     s"node-v$version-$dependencyOsName-$dependencyOsArch"
 
   def hasBinSubdirectory: Boolean = !isWindows
+}
+
+object NodeDistribution {
+  val defaultVersion: String = "10.15.3"
 }

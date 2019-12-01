@@ -1,51 +1,42 @@
 package org.podval.fop.mathjax
 
 import java.io.File
-import java.nio.file.{Files, Path, Paths}
 
 import scala.sys.process.{Process, ProcessBuilder, ProcessLogger}
 
-final class Node(
-  val distribution: NodeDistribution,
-  nodeRoot: File)
-{
-  override def toString: String = s"$distribution in $nodeRoot with modules in $nodeModules"
+class Node(
+  nodeModulesParent: File,
+  val nodeExec: File,
+  val npmExec: File
+) {
+  override def toString: String = s"Node with $nodeExec and $npmExec with modules in $nodeModules"
 
-  private def isWindows: Boolean = distribution.isWindows
+  val nodeModules: File = new File(nodeModulesParent, "node_modules")
 
-  val root: File = new File(nodeRoot, distribution.topDirectory)
+  final def evaluate(script: String): String = node(Seq("--print", script))
 
-  private val bin: File = if (distribution.hasBinSubdirectory) new File(root, "bin") else root
-
-  private val nodeExec: File = new File(bin, if (isWindows) "node.exe" else "node")
-
-  private def node(args: String*): String = {
+  private def node(args: Seq[String]): String = {
     var out: Seq[String] = Seq.empty
     val addLine: String => Unit = (line: String) => out = out :+ line
     exec(
       command = nodeExec,
-      args.toSeq,
+      args,
       cwd = None,
       extraEnv = ("NODE_PATH", nodeModules.getAbsolutePath)
     ).!!(ProcessLogger(addLine, addLine))
     out.mkString("\n")
   }
 
-  def evaluate(script: String): String = node("--print", script)
+  final def npmInstall(module: String): String =
+    npm(Seq("install", "--no-save", "--silent", module))
 
-  private val npmExec: File = new File(bin, if (isWindows) "npm.cmd" else "npm")
-
-  private def npm(args: String*): String = exec(
+  private def npm(args: Seq[String]): String = exec(
     command = npmExec,
-    args.toSeq,
-    cwd = Some(nodeRoot),
+    args,
+    // in local mode, npm puts packages into node_modules under the current working directory
+    cwd = Some(nodeModulesParent),
     extraEnv = ("PATH", npmExec.getParentFile.getAbsolutePath)
   ).!!
-
-  val nodeModules: File = new File(nodeRoot, "node_modules")
-
-  def npmInstall(module: String): String =
-    npm("install", "--no-save", "--silent", module)
 
   private def exec(
     command: File,
@@ -57,22 +48,4 @@ final class Node(
     cwd,
     extraEnv = extraEnv: _*
   )
-
-  def postInstall(): Unit = {
-    fixNpmSymlink()
-  }
-
-  private def fixNpmSymlink(): Unit = if (!isWindows) {
-    val npm: Path = npmExec.toPath
-    val deleted: Boolean = Files.deleteIfExists(npm)
-    if (deleted) Files.createSymbolicLink(
-      npm,
-      bin.toPath.relativize(Paths.get(npmScriptFile.getAbsolutePath))
-    )
-  }
-
-  private def npmScriptFile: File = {
-    val lib: String = if (isWindows) "" else "lib/"
-    new File(root, s"${lib}node_modules/npm/bin/npm-cli.js")
-  }
 }

@@ -8,7 +8,6 @@ import org.podval.fop.util.Logger
 
 import scala.jdk.CollectionConverters._
 
-
 // NOTE: some tests failed unless I typeset specific TeX math first; some - even then;
 // re-configuring and forcibly re-starting MathJax before each typeset call breaks the tests even more;
 // sometimes, stopping Gradle daemon helped; once, JVM crashed; once, I got:
