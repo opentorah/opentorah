@@ -54,14 +54,6 @@ object MathJax {
     prefix = "mathjax"
   )
 
-  trait Factory {
-    def get(
-      node: Node,
-      configuration: Configuration,
-      logger: Logger
-    ): MathJax
-  }
-
   private def optionsMap(math: String, inputName: String, outputName: String, ex: Int): Map[String, Any] = Map(
     "useFontCache"    -> true,       // use <defs> and <use> in svg output ('true' by default)?
     "useGlobalCache"  -> false,      // use common <defs> for all equations?
@@ -82,4 +74,23 @@ object MathJax {
   val logStart: String = "typesetting ["
   val logSep: String = "]; typesetting result ["
   val logEnd: String = "]"
+
+  def get(
+    node: Node,
+    j2v8: Option[J2V8],
+    configuration: Configuration,
+    logger: Logger
+  ): MathJax = {
+    // Make sure MathJax is installed
+    /////if (!node.nodeModules.exists) {
+    logger.info(s"Installing mathjax-node")
+    node.npmInstall("mathjax-node")
+    /////}
+
+    // If J2V8 is configured to be used, is available and actually loads - we use it;
+    // otherwise each typesetting is done by calling Node in a separate process.
+    val useJ2V8: Boolean = j2v8.isDefined && j2v8.get.load(logger)
+    if (useJ2V8) new J2V8MathJax(node, configuration, logger)
+    else new ExternalMathJax(node, configuration, logger)
+  }
 }

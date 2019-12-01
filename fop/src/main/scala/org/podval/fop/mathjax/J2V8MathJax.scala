@@ -8,7 +8,6 @@ import org.podval.fop.util.Logger
 
 import scala.jdk.CollectionConverters._
 
-
 // NOTE: some tests failed unless I typeset specific TeX math first; some - even then;
 // re-configuring and forcibly re-starting MathJax before each typeset call breaks the tests even more;
 // sometimes, stopping Gradle daemon helped; once, JVM crashed; once, I got:
@@ -21,7 +20,25 @@ import scala.jdk.CollectionConverters._
 // Some tests fail if their order is reversed when mathJax instance is re-used;
 // this doesn't look like a threading issue - or maybe whatever I "solved" by using fresh MathJax instance
 // for each typesetting wasn't (just) a threading issue either?
-private final class J2V8MathJax(nodeModules: File) {
+final class J2V8MathJax(
+  node: Node,
+  configuration: Configuration,
+  logger: Logger
+) extends MathJax(node, configuration, logger) {
+  override def typeset(
+    options: Map[String, Any],
+    outputName: String
+  ): String = {
+    val worker: J2V8MathJaxWorker = new J2V8MathJaxWorker(node.nodeModules)
+
+    worker.configure(configuration.toMap)
+    val result = worker.typeset(options, outputName)
+    worker.close()
+    result
+  }
+}
+
+private final class J2V8MathJaxWorker(nodeModules: File) {
   val nodeJS: NodeJS = NodeJS.createNodeJS
 
   def v8: V8 = nodeJS.getRuntime
@@ -71,27 +88,5 @@ private final class J2V8MathJax(nodeModules: File) {
   def close(): Unit = {
     mathJaxNode.release()
     nodeJS.release()
-  }
-}
-
-
-object J2V8MathJax extends MathJax.Factory {
-
-  override def get(
-    node: Node,
-    configuration: Configuration,
-    logger: Logger
-  ): MathJax = new MathJax(node, configuration, logger) {
-    override def typeset(
-      options: Map[String, Any],
-      outputName: String
-    ): String = {
-      val mathJax: J2V8MathJax = new J2V8MathJax(node.nodeModules)
-
-      mathJax.configure(configuration.toMap)
-      val result = mathJax.typeset(options, outputName)
-      mathJax.close()
-      result
-    }
   }
 }

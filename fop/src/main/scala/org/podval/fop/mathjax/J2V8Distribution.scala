@@ -6,6 +6,8 @@ final class J2V8Distribution(
   os: Os,
   arch: Architecture
 ) {
+  override def toString: String = s"J2V8 for $os on $arch"
+
   val version: Option[String] = os match {
     case Os.Windows | Os.Mac => Some("4.6.0")
     // Note: native library needs to be compatible with the Java code used by the plugin (see build.gradle),

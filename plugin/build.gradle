@@ -12,6 +12,11 @@ description = 'Gradle DocBook plugin'
 
 apply from: '../versions.gradle'
 
+configurations.all {
+  exclude group: 'javax.media', module: 'jai-core'
+  exclude group: 'com.sun.media', module: 'jai-codec'
+}
+
 dependencies {
   implementation project(':org.podval.fop.mathjax')
 
@@ -23,11 +28,6 @@ dependencies {
 
   // Saxon 9 (XSLT 2.0)
   implementation "net.sf.saxon:Saxon-HE:$saxon9Version"
-
-  implementation ("org.apache.xmlgraphics:fop:$fopVersion") {
-    exclude group: 'javax.media', module: 'jai-core'
-    exclude group: 'com.sun.media', module: 'jai-codec'
-  }
 
   // JEuclid
   implementation "de.rototor.jeuclid:jeuclid-fop:$jeuclidFopVersion"

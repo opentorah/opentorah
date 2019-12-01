@@ -10,6 +10,18 @@ description = 'FOP MathJax plugin'
 
 apply from: '../versions.gradle'
 
+// FOP 2.4 uses JAI and JAI Codec from JBoss repository;
+// since at plugin application time it is to late to define the repository *or* to substitute JAI modules with the
+// ones from JCenter, and I do not want every project that uses the plugin to have to do either,
+// I exclude them and add the ones from JCenter;
+// Unfortunately, I do not know how to make this exclusion stick,
+// so it has to be repeated in any project depending on this one...
+// TODO try dependency substitution!
+configurations.all {
+  exclude group: 'javax.media', module: 'jai-core'
+  exclude group: 'com.sun.media', module: 'jai-codec'
+}
+
 dependencies {
   // Scala
   implementation "org.scala-lang:scala-library:$scalaVersion"
@@ -27,16 +39,7 @@ dependencies {
   implementation "xerces:xercesImpl:$xercesVersion"
 
   // FOP
-  // FOP 2.4 uses JAI and JAI Codec from JBoss repository;
-  // since at plugin application time it is to late to define the repository *or* to substitute JAI modules with the
-  // ones from JCenter, and I do not want every project that uses the plugin to have to do either,
-  // I exclude them and add the ones from JCenter;
-  // Unfortunately, I do not know how to make this excludion stick,
-  // so it has to be repeated in any project depending on this one...
-  implementation ("org.apache.xmlgraphics:fop:$fopVersion") {
-    exclude group: 'javax.media', module: 'jai-core'
-    exclude group: 'com.sun.media', module: 'jai-codec'
-  }
+  implementation "org.apache.xmlgraphics:fop:$fopVersion"
 
   implementation "javax.media.jai:com.springsource.javax.media.jai.core:$jaiVersion"
   implementation "javax.media.jai:com.springsource.javax.media.jai.codec:$jaiVersion"
@@ -46,6 +49,9 @@ dependencies {
 
   // Hyphenation patterns
   implementation "net.sf.offo:fop-hyph:$fopHyphVersion"
+
+  // JEuclid
+  compileOnly "de.rototor.jeuclid:jeuclid-fop:$jeuclidFopVersion"
 
   // J2V8 integration
   // Note: Native library (if needed and available) is loaded from a dynamically retrieved artifact,
