@@ -1,12 +1,12 @@
 package org.podval.fop.mathjax
 
-import org.podval.fop.util.{Architecture, Os}
+import org.podval.fop.util.{Architecture, Os, Platform}
 
-final class J2V8Distribution(
-  os: Os,
-  arch: Architecture
-) {
-  override def toString: String = s"J2V8 for $os on $arch"
+final class J2V8Distribution {
+  val os: Os = Platform.getOs
+  val architecture: Architecture = Platform.getArch
+
+  override def toString: String = s"J2V8 for $os on $architecture ($dependencyNotation!$libraryName)"
 
   val version: Option[String] = os match {
     case Os.Windows | Os.Mac => Some("4.6.0")
@@ -27,7 +27,7 @@ final class J2V8Distribution(
     case _ => throw new IllegalArgumentException
   }
 
-  val archName: String = arch match {
+  val archName: String = architecture match {
     case Architecture.i686 => "x86"
     case Architecture.x86_64 => "x86_64"
     case Architecture.amd64 => "x86_64"

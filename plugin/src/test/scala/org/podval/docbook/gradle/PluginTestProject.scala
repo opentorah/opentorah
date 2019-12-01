@@ -4,6 +4,7 @@ import java.io.File
 
 import org.gradle.testkit.runner.GradleRunner
 import org.podval.docbook.gradle.plugin.{DocBook, Files, Layout, Write}
+import org.podval.fop.util.TestLogger
 import org.podval.fop.xml.Xml
 
 class PluginTestProject(projectDir: File) {

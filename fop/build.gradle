@@ -63,6 +63,9 @@ dependencies {
   // For reasons that are not clear to me, if I declare this dependency as compileOnly (as I think it should be),
   // tests fail...
   implementation "com.eclipsesource.j2v8:j2v8_linux_x86_64:$j2v8Version"
+
+  testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
+  testImplementation "org.pegdown:pegdown:$pegdownVersion" // for scalatest reports
 }
 
 jar {

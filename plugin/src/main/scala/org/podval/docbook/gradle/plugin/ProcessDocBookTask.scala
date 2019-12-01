@@ -9,8 +9,8 @@ import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
 import org.podval.docbook.gradle.section.{DocBook2, Section}
 import org.podval.fop.Fop
-import org.podval.fop.mathjax.{J2V8, J2V8Distribution, MathJax, Node, NodeDistribution}
-import org.podval.fop.util.{Architecture, Logger, Os, Platform}
+import org.podval.fop.mathjax.MathJax
+import org.podval.fop.util.Logger
 import org.podval.fop.util.Util.mapValues
 import org.podval.fop.xml.Resolver
 
@@ -204,26 +204,12 @@ class ProcessDocBookTask extends DefaultTask {
 
     generateData()
 
-    val mathJax: Option[MathJax] = if (!processors.exists(_.isPdf) && !isMathJaxEnabled.get) None else Some {
-      val os: Os = Platform.getOs
-      val arch: Architecture = Platform.getArch
-
-      val node: Node = MathJaxInstall.installNode(
-        getProject,
-        new NodeDistribution(os, arch),
-        into = layout.nodeRoot,
-        logger
-      )
-
-      val j2v8: Option[J2V8] = if (!useJ2V8.get) None else MathJaxInstall.installJ2V8(
-        getProject,
-        new J2V8Distribution(os, arch),
-        into = layout.j2v8LibraryDirectory,
-        logger
-      )
-
-      MathJax.get(node, j2v8, mathJaxConfiguration, logger)
-    }
+    val mathJax: Option[MathJax] = if (!processors.exists(_.isPdf) && !isMathJaxEnabled.get) None else Some(MathJax.get(
+      node = MathJaxInstall.installNode(getProject, into = layout.nodeRoot, logger),
+      j2v8 = if (!useJ2V8.get) None else MathJaxInstall.installJ2V8(getProject, into = layout.j2v8LibraryDirectory, logger),
+      mathJaxConfiguration,
+      logger
+    ))
 
     val processDocBook: ProcessDocBook = new ProcessDocBook(
       getProject,

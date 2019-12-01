@@ -13,7 +13,7 @@ object NodeFromOs {
       def which(what: String): Option[File] = try {
         Some(new File(Process(s"which $what").!!.trim))
       } catch {
-        case e: Exception => None
+        case _: Exception => None
       }
 
       for {

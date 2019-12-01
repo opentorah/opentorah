@@ -33,7 +33,7 @@ object Gradle {
     allRepositories.addAll(project.getRepositories)
     project.getRepositories.clear()
 
-    // Add Node repository
+    // Add repository
     project.getRepositories.ivy((repository: IvyArtifactRepository) => {
       repository.setUrl(repositoryUrl)
       repository.patternLayout((repositoryLayout: IvyPatternRepositoryLayout) => {
@@ -106,5 +106,5 @@ object Gradle {
       .map(_.getSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME))
 
   def classesDirs(project: Project): Set[File] =
-    Gradle.mainSourceSet(project).fold(Set.empty[File])(_.getOutput.getClassesDirs.getFiles.asScala.toSet)
+    mainSourceSet(project).fold(Set.empty[File])(_.getOutput.getClassesDirs.getFiles.asScala.toSet)
 }

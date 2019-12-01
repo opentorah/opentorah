@@ -1,6 +1,6 @@
 package org.podval.fop.mathjax
 
-import org.podval.fop.util.{Architecture, Os}
+import org.podval.fop.util.{Architecture, Os, Platform}
 
 // Heavily inspired by (read: copied and reworked from :)) https://github.com/srs/gradle-node-plugin by srs.
 // That plugin is not used directly because its tasks are not reusable unless the plugin is applied to the project,
@@ -9,11 +9,10 @@ import org.podval.fop.util.{Architecture, Os}
 // My simplified Node support is under 200 lines.
 
 // Describes Node distribution's packaging and structure.
-final class NodeDistribution(
-  val os: Os,
-  val architecture: Architecture,
-  val version: String = NodeDistribution.defaultVersion
-) {
+final class NodeDistribution(val version: String = NodeDistribution.defaultVersion) {
+  val os: Os = Platform.getOs
+  val architecture: Architecture = Platform.getArch
+
   override def toString: String = s"Node v$version for $os on $architecture"
 
   private val osName: String = os match {
@@ -70,5 +69,6 @@ final class NodeDistribution(
 }
 
 object NodeDistribution {
+  // TODO Support later versions of NodeJS (and changes in the distribution structure)
   val defaultVersion: String = "10.15.3"
 }
