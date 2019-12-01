@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.xml
+package org.podval.fop.xml
 
 import org.xml.sax.helpers.XMLFilterImpl
 import org.xml.sax.{Locator, SAXParseException}

@@ -4,7 +4,6 @@ import java.io.File
 
 import org.gradle.api.Project
 import org.podval.docbook.gradle.section.DocBook2
-import org.podval.docbook.gradle.xml.{MathFilter, ProcessingInstructionsFilter}
 import org.podval.fop.jeuclid.JEuclidFopPlugin
 import org.podval.fop.{Fop, FopPlugin}
 import org.podval.fop.mathjax.{MathJax, MathJaxFopPlugin}
@@ -49,7 +48,7 @@ final class ProcessDocBook(
       inputFile = layout.inputFile(documentName),
       stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(docBook2)),
       xmlReader = Xml.getFilteredXMLReader(
-        Seq(new ProcessingInstructionsFilter(substitutions, logger)) ++
+        Seq(new EvalFilter(substitutions, logger)) ++
         mathFilter.toSeq
         // ++ Seq(new TracingFilter)
       ),

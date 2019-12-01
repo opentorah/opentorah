@@ -1,14 +1,15 @@
-package org.podval.docbook.gradle.xml
+package org.podval.docbook.gradle.plugin
 
 import org.podval.fop.util.Logger
+import org.podval.fop.xml.WarningFilter
 
-final class ProcessingInstructionsFilter(
+final class EvalFilter(
   substitutions: Map[String, String],
   logger: Logger
 ) extends WarningFilter {
 
   override def processingInstruction(target: String, data: String): Unit = {
-    logger.debug(s"ProcessingInstructionsFilter.processingInstruction(target = $target, data = [$data])")
+    logger.debug(s"EvalFilter.processingInstruction(target = $target, data = [$data])")
 
     if (target == "eval") {
       val expression: String = data.trim

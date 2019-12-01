@@ -1,11 +1,10 @@
-package org.podval.docbook.gradle.xml
+package org.podval.docbook.gradle.plugin
 
-import org.podval.docbook.gradle.plugin.DocBook
 import org.podval.fop.mathjax.Configuration.DelimitersAndInput
 import org.podval.fop.mathjax.MathML.DisplayAttribute
 import org.podval.fop.mathjax.{Configuration, Input, MathJax, MathML}
 import org.podval.fop.util.Logger
-import org.podval.fop.xml.Namespace
+import org.podval.fop.xml.{Namespace, WarningFilter}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
