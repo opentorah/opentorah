@@ -13,7 +13,7 @@ motivation and chosen approach can be found in a
 [blog post](http://dub.podval.org/2019/05/06/publishing-papers-on-web-2.html).
 
 Plugin supports typesetting mathematics using [MathJax](https://www.mathjax.org/);
-non-Gradle-related code needed for that is shipped as a separate artifact
+code of the FOP MathJax plugin is shipped as a separate artifact
 `org.podval.fop:org.podval.fop.mathjax` to facilitate its re-use with markup other than DocBook. 
 
 ## Summary ##
