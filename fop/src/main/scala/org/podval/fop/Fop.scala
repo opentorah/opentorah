@@ -24,6 +24,9 @@ object Fop {
 
   private val dateFormat: java.text.DateFormat = new java.text.SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy")
 
+  // To enable mathematics typesetting in Fop.run(), pass in plugin = Some(plugin), where plugin is
+  // - for MathJax: new MathJaxFopPlugin(Mathematics.getMathJax(...))
+  // - for JEuclid: new JEuclidFopPlugin
   def run(
     saxon: Saxon = Saxon.Saxon6,
     configurationFile: File,

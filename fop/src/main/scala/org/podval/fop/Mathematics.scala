@@ -7,9 +7,6 @@ import org.podval.fop.gradle.MathJaxInstall
 import org.podval.fop.mathjax.{Configuration, ExternalMathJax, J2V8, J2V8MathJax, MathJax, Node}
 import org.podval.fop.util.Logger
 
-// To enable mathematics typesetting in Fop.run(), pass in plugin = Some(plugin), where plugin is
-// - for MathJax: new MathJaxFopPlugin(getMathJax(...))
-// - for JEuclid: new JEuclidFopPlugin
 object Mathematics {
 
   def getMathJax(
