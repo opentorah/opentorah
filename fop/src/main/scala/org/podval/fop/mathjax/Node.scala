@@ -2,6 +2,8 @@ package org.podval.fop.mathjax
 
 import java.io.File
 
+import org.podval.fop.util.Logger
+
 import scala.sys.process.{Process, ProcessBuilder, ProcessLogger}
 
 class Node(
@@ -10,6 +12,8 @@ class Node(
   val npmExec: File
 ) {
   override def toString: String = s"Node with $nodeExec and $npmExec with modules in $nodeModules"
+
+  final def exists: Boolean = nodeExec.exists && npmExec.exists
 
   val nodeModules: File = new File(nodeModulesParent, "node_modules")
 
@@ -25,6 +29,14 @@ class Node(
       extraEnv = ("NODE_PATH", nodeModules.getAbsolutePath)
     ).!!(ProcessLogger(addLine, addLine))
     out.mkString("\n")
+  }
+
+  // Make sure MathJax is installed
+  final def installMathJax(overwrite: Boolean, logger: Logger): Unit = {
+    if (overwrite || !nodeModules.exists) {
+      logger.info(s"Installing mathjax-node")
+      npmInstall("mathjax-node")
+    }
   }
 
   final def npmInstall(module: String): String =

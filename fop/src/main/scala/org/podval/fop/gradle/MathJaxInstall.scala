@@ -1,4 +1,4 @@
-package org.podval.docbook.gradle.plugin
+package org.podval.fop.gradle
 
 import java.io.File
 
@@ -8,11 +8,11 @@ import org.podval.fop.util.Logger
 
 object MathJaxInstall {
 
-  def installNode(project: Project, into: File, logger: Logger): Node = {
+  def installNode(project: Project, into: File, overwrite: Boolean, nodeModulesParent: File, logger: Logger): Node = {
     val distribution: NodeDistribution = new NodeDistribution
-    val node: NodeFromArtifact = NodeFromArtifact(distribution, into)
+    val node: NodeFromArtifact = NodeFromArtifact(distribution, into, nodeModulesParent)
 
-    if (node.root.exists) {
+    if (!overwrite && node.exists) {
       logger.info(s"Existing installation detected: $node")
     } else {
       logger.info(s"Installing $node")

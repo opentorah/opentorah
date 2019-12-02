@@ -9,6 +9,7 @@ import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
 import org.podval.docbook.gradle.section.{DocBook2, Section}
 import org.podval.fop.Fop
+import org.podval.fop.gradle.{Gradle, MathJaxInstall, PluginLogger}
 import org.podval.fop.mathjax.MathJax
 import org.podval.fop.util.{Files, Logger}
 import org.podval.fop.util.Util.mapValues
@@ -223,8 +224,17 @@ class ProcessDocBookTask extends DefaultTask {
     generateData()
 
     val mathJax: Option[MathJax] = if (!processors.exists(_.isPdf) && !isMathJaxEnabled.get) None else Some(MathJax.get(
-      node = MathJaxInstall.installNode(getProject, into = layout.nodeRoot, logger),
-      j2v8 = if (!useJ2V8.get) None else MathJaxInstall.installJ2V8(getProject, into = layout.j2v8LibraryDirectory, logger),
+      node = MathJaxInstall.installNode(
+        getProject,
+        into = layout.nodeRoot,
+        overwrite = false,
+        nodeModulesParent = layout.nodeRoot,
+        logger),
+      overwriteMathJax = false,
+      j2v8 = if (!useJ2V8.get) None else MathJaxInstall.installJ2V8(
+        getProject,
+        into = layout.j2v8LibraryDirectory,
+        logger),
       mathJaxConfiguration,
       logger
     ))

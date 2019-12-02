@@ -75,17 +75,15 @@ object MathJax {
   val logSep: String = "]; typesetting result ["
   val logEnd: String = "]"
 
+  // TODO move out of here into top-level facade?
   def get(
     node: Node,
+    overwriteMathJax: Boolean,
     j2v8: Option[J2V8],
     configuration: Configuration,
     logger: Logger
   ): MathJax = {
-    // Make sure MathJax is installed
-    /////if (!node.nodeModules.exists) {
-    logger.info(s"Installing mathjax-node")
-    node.npmInstall("mathjax-node")
-    /////}
+    node.installMathJax(overwriteMathJax, logger)
 
     // If J2V8 is configured to be used, is available and actually loads - we use it;
     // otherwise each typesetting is done by calling Node in a separate process.

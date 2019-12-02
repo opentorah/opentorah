@@ -93,13 +93,17 @@ final class MathJaxFopPlugin(mathJax: MathJax) extends FopPlugin {
 }
 
 object MathJaxFopPlugin {
+
+  // TODO move out of here into top-level facade?
   def get(
     nodeModulesParent: File,
+    overwriteMathJax: Boolean,
     configuration: Configuration = new Configuration,
     logger: Logger
   ): FopPlugin = new MathJaxFopPlugin(
     MathJax.get(
       NodeFromOs.apply(nodeModulesParent).get,
+      overwriteMathJax,
       None,
       configuration,
       logger)

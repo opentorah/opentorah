@@ -3,6 +3,7 @@ package org.podval.docbook.gradle.plugin
 import java.io.File
 
 import org.gradle.api.Project
+import org.podval.fop.gradle.Gradle
 import org.podval.fop.util.Logger
 
 trait Stylesheets {
@@ -27,6 +28,7 @@ trait Stylesheets {
 
       logger.info(s"Retrieving DocBook $name stylesheets: $dependencyNotation")
       val file: File = Gradle.getArtifact(project, dependencyNotation)
+
       logger.info(s"Unpacking ${file.getName}")
       Gradle.extract(
         project,

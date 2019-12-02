@@ -4,6 +4,7 @@ import java.io.File
 
 import org.gradle.api.Project
 import org.podval.docbook.gradle.section.DocBook2
+import org.podval.fop.gradle.Gradle
 import org.podval.fop.jeuclid.JEuclidFopPlugin
 import org.podval.fop.{Fop, FopPlugin}
 import org.podval.fop.mathjax.{MathJax, MathJaxFopPlugin}

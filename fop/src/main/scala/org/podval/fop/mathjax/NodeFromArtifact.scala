@@ -5,7 +5,7 @@ import java.nio.file.{Files, Path, Paths}
 
 final class NodeFromArtifact(
   nodeModulesParent: File,
-  val root: File, // TODO expose via exists(); for FromOs - both paths...
+  root: File,
   bin: File,
   isWindows: Boolean
 ) extends Node(
@@ -33,15 +33,17 @@ final class NodeFromArtifact(
 }
 
 object NodeFromArtifact {
+
   def apply(
     distribution: NodeDistribution,
-    nodeRoot: File
+    nodeRoot: File,
+    nodeModulesParent: File
   ): NodeFromArtifact = {
     val root: File = new File(nodeRoot, distribution.topDirectory)
     val bin: File = if (distribution.hasBinSubdirectory) new File(root, "bin") else root
 
     new NodeFromArtifact(
-      nodeModulesParent = nodeRoot,
+      nodeModulesParent = nodeModulesParent,
       root,
       bin,
       distribution.isWindows

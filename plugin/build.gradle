@@ -1,5 +1,3 @@
-// TODO split Gradle-related code not specific to DocBook into a separate artifact org.podval.fop.mathjax.gradle
-// or into a package with that name in the fop.mathjax artifact, which then gets a Gradle API as a compileOnly dependency.
 plugins {
   id 'scala'
   id 'com.github.maiflai.scalatest'
