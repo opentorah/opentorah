@@ -1,7 +1,5 @@
 package org.podval.fop.mathjax
 
-import java.io.File
-
 import javax.xml.transform.Source
 import javax.xml.transform.dom.DOMSource
 import org.apache.fop.fo.{ElementMapping, FONode}
@@ -10,7 +8,6 @@ import org.apache.xmlgraphics.image.loader.impl.{AbstractImagePreloader, ImageXM
 import org.apache.xmlgraphics.image.loader.spi.{ImageConverter, ImageLoaderFactory, ImagePreloader}
 import org.apache.xmlgraphics.image.loader.{ImageContext, ImageInfo}
 import org.podval.fop.FopPlugin
-import org.podval.fop.util.Logger
 import org.w3c.dom.svg.SVGDocument
 import org.w3c.dom.{DOMImplementation, Document}
 
@@ -90,22 +87,4 @@ final class MathJaxFopPlugin(mathJax: MathJax) extends FopPlugin {
   override protected def isPipelineLong: Boolean = false
   override protected def imageLoaderFactory: ImageLoaderFactory = ???
   override protected def imageConverter: ImageConverter = ???
-}
-
-object MathJaxFopPlugin {
-
-  // TODO move out of here into top-level facade?
-  def get(
-    nodeModulesParent: File,
-    overwriteMathJax: Boolean,
-    configuration: Configuration = new Configuration,
-    logger: Logger
-  ): FopPlugin = new MathJaxFopPlugin(
-    MathJax.get(
-      NodeFromOs.apply(nodeModulesParent).get,
-      overwriteMathJax,
-      None,
-      configuration,
-      logger)
-  )
 }

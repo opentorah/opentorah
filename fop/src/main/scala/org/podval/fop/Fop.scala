@@ -42,6 +42,7 @@ object Fop {
     keywords: Option[String] = None,
     inputFile: File,
     outputFile: File,
+    // TODO update
     // To use installed NodeJS:
     //   plugin = Some(MathJaxFopPlugin.get(nodeModulesParent, logger))
     // To use JEuclid:

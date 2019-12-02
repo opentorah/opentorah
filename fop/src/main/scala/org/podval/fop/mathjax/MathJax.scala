@@ -74,21 +74,4 @@ object MathJax {
   val logStart: String = "typesetting ["
   val logSep: String = "]; typesetting result ["
   val logEnd: String = "]"
-
-  // TODO move out of here into top-level facade?
-  def get(
-    node: Node,
-    overwriteMathJax: Boolean,
-    j2v8: Option[J2V8],
-    configuration: Configuration,
-    logger: Logger
-  ): MathJax = {
-    node.installMathJax(overwriteMathJax, logger)
-
-    // If J2V8 is configured to be used, is available and actually loads - we use it;
-    // otherwise each typesetting is done by calling Node in a separate process.
-    val useJ2V8: Boolean = j2v8.isDefined && j2v8.get.load(logger)
-    if (useJ2V8) new J2V8MathJax(node, configuration, logger)
-    else new ExternalMathJax(node, configuration, logger)
-  }
 }
