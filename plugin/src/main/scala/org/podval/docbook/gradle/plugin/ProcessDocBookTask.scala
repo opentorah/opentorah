@@ -12,7 +12,7 @@ import org.podval.fop.Fop
 import org.podval.fop.mathjax.MathJax
 import org.podval.fop.util.{Files, Logger}
 import org.podval.fop.util.Util.mapValues
-import org.podval.fop.xml.Resolver
+import org.podval.fop.xml.{Namespace, Resolver}
 
 import scala.beans.BeanProperty
 import scala.jdk.CollectionConverters._
@@ -22,8 +22,6 @@ class ProcessDocBookTask extends DefaultTask {
   private val layout: Layout = Layout.forProject(getProject)
   private val logger: Logger = PluginLogger.forProject(getProject)
   private def info(message: String): Unit = logger.info(message)
-
-  private val write: Write = new Write(layout, logger)
 
   // To let projects that use the plugin to not make assumptions about directory names:
   @Internal def getOutputDirectory: File = layout.outputRoot
@@ -124,6 +122,9 @@ class ProcessDocBookTask extends DefaultTask {
 
   @TaskAction
   def processDocBook(): Unit = {
+    def writeInto(file: File, replace: Boolean)(content: String): Unit =
+      Files.writeInto(file, replace, content, logger)
+
     val documentName: Option[String] = getDocumentName(document.get)
     val documentNames: List[String] = documents.get.asScala.toList.flatMap(getDocumentName)
 
@@ -167,40 +168,57 @@ class ProcessDocBookTask extends DefaultTask {
 
     val substitutionsMap: Map[String, String] = substitutions.get.asScala.toMap
 
-    write.fopConfiguration()
-    write.substitutionsDtd(substitutionsMap)
-    write.xmlCatalog()
-    write.xmlCatalogCustomization()
+    writeInto(layout.fopConfigurationFile, replace = false)(Fop.defaultConfigurationFile)
+
+    writeInto(layout.xmlFile(layout.substitutionsDtdFileName), replace = true) {
+      substitutionsMap.toSeq.map {
+        case (name: String, value: String) => s"""<!ENTITY $name "$value">\n"""
+      }.mkString
+    }
+
+    writeInto(layout.catalogFile, replace = true)(Write.xmlCatalog(layout))
+    writeInto(layout.xmlFile(layout.catalogCustomFileName), replace = false)(Write.catalogCustomization)
 
     val cssFileName: String = Files.dropAllowedExtension(cssFile.get, "css")
 
-    write.css(cssFileName)
+    writeInto(layout.cssFile(cssFileName), replace = false) {
+      s"""@namespace xml "${Namespace.Xml.uri}";
+         |"""
+    }
 
     for ((name: String, _ /*prefixed*/: Boolean) <- inputDocuments)
-      write.inputFile(name)
+      writeInto(layout.inputFile(name), replace = false)(Write.defaultInputFile)
 
     val fontFamilyNames: List[String] = epubEmbeddedFonts.get.asScala.toList
-    val epubEmbededFontsUris: List[URI] = Fop.getFontFiles(layout.fopConfigurationFile, fontFamilyNames, logger)
-    val epubEmbededFonts: String = epubEmbededFontsUris.map(uri => new File(uri.getPath).getAbsolutePath).mkString(", ")
-    logger.info(s"Fop.getFontFiles(${fontFamilyNames.mkString(", ")}) = $epubEmbededFonts.")
+    val epubEmbeddedFontsUris: List[URI] = Fop.getFontFiles(layout.fopConfigurationFile, fontFamilyNames, logger)
+    val epubEmbeddedFontsString: String = epubEmbeddedFontsUris.map(uri => new File(uri.getPath).getAbsolutePath).mkString(", ")
+    logger.info(s"Fop.getFontFiles(${fontFamilyNames.mkString(", ")}) = $epubEmbeddedFontsString.")
 
     for {
       docBook2: DocBook2 <- DocBook2.all
       (documentName: String, prefixed: Boolean) <- inputDocuments
-    } write.mainStylesheet(
-      docBook2,
-      prefixed,
-      documentName,
-      cssFileName,
-      epubEmbeddedFonts = epubEmbededFonts,
-      mathJaxConfiguration = mathJaxConfiguration
-    )
+    } writeInto(layout.stylesheetFile(layout.forDocument(prefixed, documentName).mainStylesheet(docBook2)), replace = true) {
+      Write.mainStylesheet(
+        docBook2,
+        prefixed,
+        documentName,
+        cssFileName,
+        epubEmbeddedFontsString,
+        mathJaxConfiguration,
+        layout
+      )
+    }
+
 
     for (docBook2: DocBook2 <- DocBook2.all)
-      write.paramsStylesheet(docBook2, sections)
+      writeInto(layout.stylesheetFile(layout.paramsStylesheet(docBook2)), replace = true) {
+        Write.paramsStylesheet(docBook2, sections, logger.isInfoEnabled)
+      }
 
     for (section: Section <- Section.all)
-      write.customStylesheet(section)
+      writeInto(layout.stylesheetFile(layout.customStylesheet(section)), replace = false) {
+        Write.customStylesheet(layout, section)
+      }
 
     generateData()
 
