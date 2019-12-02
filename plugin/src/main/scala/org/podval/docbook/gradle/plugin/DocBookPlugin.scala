@@ -2,7 +2,7 @@ package org.podval.docbook.gradle.plugin
 
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.{DefaultTask, Plugin, Project}
-import org.podval.fop.Fop
+import org.podval.fop.FopFonts
 import org.podval.fop.gradle.{Gradle, PluginLogger}
 import org.podval.fop.util.Logger
 
@@ -67,7 +67,7 @@ object DocBookPlugin {
     setDescription("List FOP fonts")
 
     @TaskAction def execute(): Unit = {
-      val result = Fop.listFonts(
+      val result = FopFonts.list(
         configurationFile = Layout.forProject(getProject).fopConfigurationFile,
         logger = PluginLogger.forProject(getProject)
       )
@@ -80,6 +80,6 @@ object DocBookPlugin {
     setDescription("Delete FOP fonts cache")
 
     @TaskAction def execute(): Unit =
-      Fop.deleteFontCache(Layout.forProject(getProject).fopConfigurationFile)
+      FopFonts.deleteCache(Layout.forProject(getProject).fopConfigurationFile)
   }
 }

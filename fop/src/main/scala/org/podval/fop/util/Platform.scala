@@ -1,5 +1,7 @@
 package org.podval.fop.util
 
+import java.io.File
+
 import scala.sys.process.Process
 
 object Platform {
@@ -39,5 +41,11 @@ object Platform {
     case "armv7l" => Architecture.armv7l
     case "armv8l" => Architecture.armv8l
     case name => throw new IllegalArgumentException(s"Unsupported architecture: $name")
+  }
+
+  def which(what: String): Option[File] = try {
+    Some(new File(Process(s"which $what").!!.trim))
+  } catch {
+    case _: Exception => None
   }
 }

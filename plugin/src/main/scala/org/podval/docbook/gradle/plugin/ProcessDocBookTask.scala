@@ -8,8 +8,8 @@ import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
 import org.podval.docbook.gradle.section.{DocBook2, Section}
-import org.podval.fop.{Fop, Mathematics}
-import org.podval.fop.gradle.{Gradle, MathJaxInstall, PluginLogger}
+import org.podval.fop.{Fop, FopFonts, Mathematics}
+import org.podval.fop.gradle.{Gradle, PluginLogger}
 import org.podval.fop.mathjax.MathJax
 import org.podval.fop.util.{Files, Logger}
 import org.podval.fop.util.Util.mapValues
@@ -191,7 +191,7 @@ class ProcessDocBookTask extends DefaultTask {
       writeInto(layout.inputFile(name), replace = false)(Write.defaultInputFile)
 
     val fontFamilyNames: List[String] = epubEmbeddedFonts.get.asScala.toList
-    val epubEmbeddedFontsUris: List[URI] = Fop.getFontFiles(layout.fopConfigurationFile, fontFamilyNames, logger)
+    val epubEmbeddedFontsUris: List[URI] = FopFonts.getFiles(layout.fopConfigurationFile, fontFamilyNames, logger)
     val epubEmbeddedFontsString: String = epubEmbeddedFontsUris.map(uri => new File(uri.getPath).getAbsolutePath).mkString(", ")
     logger.info(s"Fop.getFontFiles(${fontFamilyNames.mkString(", ")}) = $epubEmbeddedFontsString.")
 
@@ -210,7 +210,6 @@ class ProcessDocBookTask extends DefaultTask {
       )
     }
 
-
     for (docBook2: DocBook2 <- DocBook2.all)
       writeInto(layout.stylesheetFile(layout.paramsStylesheet(docBook2)), replace = true) {
         Write.paramsStylesheet(docBook2, sections, logger.isInfoEnabled)
@@ -223,22 +222,16 @@ class ProcessDocBookTask extends DefaultTask {
 
     generateData()
 
-    val mathJax: Option[MathJax] = if (!processors.exists(_.isPdf) && !isMathJaxEnabled.get) None else Some(
-      Mathematics.getMathJax(
-        node = MathJaxInstall.installNode(
-          getProject,
-          into = layout.nodeRoot,
-          overwrite = false,
-          nodeModulesParent = layout.nodeRoot,
-          logger),
-        overwriteMathJax = false,
-        j2v8 = if (!useJ2V8.get) None else MathJaxInstall.installJ2V8(
-          getProject,
-          into = layout.j2v8LibraryDirectory,
-          logger),
-        mathJaxConfiguration,
-        logger
-      ))
+    val mathJax: Option[MathJax] = if (!processors.exists(_.isPdf) || !isMathJaxEnabled.get) None
+    else Some(Mathematics.getMathJax(
+      getProject,
+      nodeParent = layout.nodeRoot,
+      overwriteNode = false,
+      nodeModulesParent = layout.nodeRoot,
+      overwriteMathJax = false,
+      j2v8Parent = if (!useJ2V8.get) None else Some(layout.j2v8LibraryDirectory),
+      configuration = mathJaxConfiguration,
+      logger))
 
     val processDocBook: ProcessDocBook = new ProcessDocBook(
       getProject,
@@ -246,7 +239,7 @@ class ProcessDocBookTask extends DefaultTask {
       substitutions = sections.values.toList.flatten.toMap ++ substitutionsMap,
       resolver = new Resolver(layout.catalogFile, logger),
       isJEuclidEnabled.get,
-      mathJax = mathJax,
+      mathJax,
       layout,
       logger
     )

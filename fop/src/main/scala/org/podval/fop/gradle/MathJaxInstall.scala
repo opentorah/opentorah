@@ -27,6 +27,8 @@ object MathJaxInstall {
 
       logger.info(s"Resolved $distribution: $artifact")
 
+      into.mkdirs()
+
       Gradle.unpack(
         project,
         archiveFile = artifact,

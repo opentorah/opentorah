@@ -2,7 +2,7 @@ package org.podval.fop.mathjax
 
 import java.io.File
 
-import org.podval.fop.util.Logger
+import org.podval.fop.util.{Logger, Os, Platform}
 
 import scala.sys.process.{Process, ProcessBuilder, ProcessLogger}
 
@@ -35,6 +35,7 @@ class Node(
   final def installMathJax(overwrite: Boolean, logger: Logger): Unit = {
     if (overwrite || !nodeModules.exists) {
       logger.info(s"Installing mathjax-node")
+      nodeModules.mkdirs()
       npmInstall("mathjax-node")
     }
   }
@@ -60,4 +61,20 @@ class Node(
     cwd,
     extraEnv = extraEnv: _*
   )
+}
+
+object Node {
+
+  def fromOs(nodeModulesParent: File): Option[Node] = {
+    if (Platform.getOs == Os.Windows) None else {
+      for {
+        nodeExec <- Platform.which("node")
+        npmExec <- Platform.which("npm")
+      } yield new Node(
+        nodeModulesParent,
+        nodeExec,
+        npmExec
+      )
+    }
+  }
 }

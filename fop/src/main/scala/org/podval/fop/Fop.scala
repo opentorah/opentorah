@@ -1,18 +1,10 @@
 package org.podval.fop
 
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
-import java.net.URI
 
 import org.apache.fop.apps.{FOUserAgent, FopFactory}
-import org.apache.fop.fonts.{FontEventListener, FontTriplet}
-import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
-import org.apache.xmlgraphics.util.MimeConstants
-import org.podval.fop.util.Util.mapValues
 import org.podval.fop.util.{Logger, TestLogger, Util}
 import org.podval.fop.xml.{Saxon, Xml}
-
-import scala.collection.immutable.SortedMap
-import scala.jdk.CollectionConverters._
 
 object Fop {
 
@@ -42,11 +34,6 @@ object Fop {
     keywords: Option[String] = None,
     inputFile: File,
     outputFile: File,
-    // TODO update
-    // To use installed NodeJS:
-    //   plugin = Some(MathJaxFopPlugin.get(nodeModulesParent, logger))
-    // To use JEuclid:
-    //   plugin = Some(new JEuclidFopPlugin)
     plugin: Option[FopPlugin] = None,
     logger: Logger = new TestLogger
   ): Unit = {
@@ -125,68 +112,4 @@ object Fop {
       outputStream.close()
     }
   }
-
-  // Inspired by org.apache.fop.tools.fontlist.FontListMain:
-  def listFonts(configurationFile: File, logger: Logger): String = {
-    val fontFamilies: SortedMap[String, List[FontSpec]] = getFontFamilies(configurationFile, logger)
-
-    val result: StringBuilder = new StringBuilder
-
-    for ((firstFamilyName: String, fontSpecs: List[FontSpec]) <- fontFamilies) {
-      result.append(s"$firstFamilyName:\n")
-      for (fontSpec: FontSpec <- fontSpecs) {
-        val uriStr: String = Option(fontSpec.getFontMetrics.getFontURI).map(_.toString).getOrElse("---")
-        result.append(s"  ${fontSpec.getKey} ${fontSpec.getFamilyNames} ($uriStr)\n")
-
-        val triplets: Seq[FontTriplet] = fontSpec.getTriplets
-          .asInstanceOf[java.util.Collection[FontTriplet]]
-          .asScala.toSeq
-
-        for (triplet: FontTriplet <- triplets) result.append(s"    $triplet\n")
-      }
-    }
-
-    result.toString
-  }
-
-  def getFontFiles(configurationFile: File, fontFamilyNames: List[String], logger: Logger): List[URI] =
-    if (fontFamilyNames.isEmpty) List.empty else {
-      val fontFamilies: Map[String, List[FontSpec]] = getFontFamilies(configurationFile, logger)
-      val uris: List[URI] = fontFamilyNames.flatMap { fontFamilyName: String =>
-        fontFamilies.get(fontFamilyName).fold[List[URI]] {
-          logger.error(s"Font family $fontFamilyName not found!")
-          List.empty
-        } { fontSpecs: List[FontSpec] => fontSpecs.flatMap { fontSpec: FontSpec =>
-          val uri: Option[URI] = Option(fontSpec.getFontMetrics.getFontURI)
-          if (uri.isEmpty) logger.error(s"No URI for fontSpec ${fontSpec.getKey}!")
-          uri
-        }}
-      }
-
-      val (files: List[URI], nonFiles: List[URI]) = uris.partition(_.getScheme == "file")
-      if (nonFiles.nonEmpty) logger.error(s"Non-file URIs: $nonFiles")
-
-      files
-    }
-
-  private def getFontFamilies(configurationFile: File, logger: Logger): SortedMap[String, List[FontSpec]] = {
-    val fopFactory: FopFactory = FopFactoryFactory.newFactory(configurationFile)
-
-    val fontEventListener: FontEventListener  = new FontEventListener {
-      override def fontLoadingErrorAtAutoDetection(source: AnyRef, fontURL: String, e: Exception): Unit =
-        logger.error(s"Could not load $fontURL (${e.getLocalizedMessage})")
-      override def fontSubstituted(source: AnyRef, requested: FontTriplet, effective: FontTriplet): Unit = {}
-      override def glyphNotAvailable(source: AnyRef, ch: Char, fontName: String): Unit = {}
-      override def fontDirectoryNotFound(source: AnyRef, msg: String): Unit = {}
-      override def svgTextStrokedAsShapes(source: AnyRef, fontFamily: String): Unit = {}
-    }
-
-    SortedMap[String, List[FontSpec]]() ++ mapValues(new FontListGenerator()
-      .listFonts(fopFactory, MimeConstants.MIME_PDF, fontEventListener)
-      .asInstanceOf[java.util.SortedMap[String, java.util.List[FontSpec]]]
-      .asScala.toMap)(_.asScala.toList)
-  }
-
-  def deleteFontCache(configurationFile: File): Unit =
-    FopFactoryFactory.newFactory(configurationFile).newFOUserAgent.getFontManager.deleteCache()
 }
