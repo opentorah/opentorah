@@ -9,23 +9,22 @@ final class Collection(
   layout: Layout,
   directory: File,
   xml: Elem,
-  val includeInNavigation: Boolean,
-  isBook: Boolean,
   errors: Errors
 ) {
   def directoryName: String = directory.getName
 
   override def toString: String = directoryName
 
+  val isBook: Boolean = xml.attributeOption("isBook").contains("true")
+
   val teiDirectory: File = layout.tei(directory)
 
   def archive: String = xml.oneChild("archive").spacedText
 
-  def archiveCase: String = xml.oneChild("case").spacedText
+  def archiveCase: Case = new Case(xml.oneChild("case").spacedText)
 
   def reference: String =
-    if (archive.isEmpty) archiveCase else
-    if (archiveCase.isEmpty) archive else
+    if (archive.isEmpty) archiveCase.name else
       archive + " " + archiveCase
 
   def title: String = xml.optionalChild("title").map(_.spacedText).getOrElse(reference)
