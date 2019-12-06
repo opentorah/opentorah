@@ -13,11 +13,18 @@ object Main {
     val layout: Layout = new Layout(docs)
     val errors: Errors = new Errors
 
-    val collections: Seq[Collection] = getCollections(layout, errors)
+    val collections: Seq[Collection] = for {
+      directory <- layout.collections.listFiles.filter(_.isDirectory)
+    } yield new Collection(
+      layout,
+      directory,
+      Xml.load(directory, layout.collectionFileName),
+      errors
+    )
 
     println("Collections:")
     println(collections.map { collection =>
-      s"  ${collection.directoryName}: ${collection.title} [${collection.includeInNavigation}]\n"
+      s"  ${collection.directoryName}: ${collection.title}\n"
     }.mkString)
 
     errors.check()
@@ -40,52 +47,10 @@ object Main {
       "title" -> "Дела", "target" -> "collectionViewer"
     ), collectionLinks.flatten)
 
-    val navigationRefs: Seq[String] =
-      (for (collection <- collections.filter(_.includeInNavigation))
-       yield layout.collectionUrl(collection.directoryName)) :+
-        layout.namesUrl
-
-    Util.splice(
-      file = layout.configYml,
-      start = "# header_pages start",
-      end = "# header_pages end",
-      what = navigationRefs.map { url =>
-        // Links with starting slash do not make it into the navigation bar?
-        val ref = if (url.startsWith("/")) url.substring(1) else url
-        s"  - $ref"
-      }
-    )
-
     println("Processing name references.")
     val names: Names = new Names(layout, errors)
     names.processReferences(collections.flatMap(_.references))
 
     errors.check()
-  }
-
-  // Collections listed in collections.xml in the order they are listed there -
-  // or directories with collection.xml in alphabetical order.
-  private def getCollections(layout: Layout, errors: Errors): Seq[Collection] = {
-    val result: Seq[Collection] = for {
-      xml: Elem <- Xml
-        .load(layout.collections, layout.collectionsFileName)
-        .check(name = "collections")
-        .elems(name = "collection")
-      name: String = xml.getAttribute("name")
-      directory: File = layout.collections(name)
-    } yield new Collection(
-      layout,
-      directory,
-      Xml.load(directory, layout.collectionFileName),
-      includeInNavigation = xml.attributeOption("includeInNavigation").contains("true"),
-      isBook = xml.attributeOption("isBook").contains("true"),
-      errors
-    )
-
-    for (orphanDirectoryName <-
-           layout.collections.listFiles.filter(_.isDirectory).map(_.getName).toSet -- result.map(_.directoryName).toSet)
-      errors.error(s"Orphan collection directory: $orphanDirectoryName")
-
-    result
   }
 }
