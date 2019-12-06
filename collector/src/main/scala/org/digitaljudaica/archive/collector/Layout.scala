@@ -41,11 +41,6 @@ final class Layout(docs: File) {
 
   // TODO with images on a separate website (facsimiles.alter-rebbe.org), this has to be re-worked...
 
-//  // Note: also hard-coded in _config.yml:facsimile_suffix!
-//  private val facsimilesDirectoryName: String = "facsimiles"
-//
-//  def facsimiles(collectionDirectory: File): File = new File(collectionDirectory, facsimilesDirectoryName)
-
   // Note: also hard-coded in _layouts/tei.html!
   val facsDirectoryName: String = "facs" // facsimile viewers
 
