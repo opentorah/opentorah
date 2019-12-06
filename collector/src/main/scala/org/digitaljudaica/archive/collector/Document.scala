@@ -51,7 +51,10 @@ final class Document(
     def quote(what: String): String = s"'$what'"
 
     val navigation: Seq[(String, String)] =
-      Seq("collection" -> quote(collection.reference)) ++
+      Seq(
+        "collection" -> quote(collection.reference),
+        "collectionDirectory" -> quote(collection.directoryName)
+      ) ++
       prev.map(prev => Seq("prev" -> quote(prev))).getOrElse(Seq.empty) ++
       Seq("self" -> quote(name)) ++
       next.map(next => Seq("next" -> quote(next))).getOrElse(Seq.empty)
