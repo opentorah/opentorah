@@ -56,21 +56,22 @@ final class Collection(
       name2page.put(page.name, page)
     }
 
-    // Check that all the images are accounted for
-    val imageNames: Set[String] =
-      Util.filesWithExtensions(
-        directory = layout.facsimiles(directory),
-        ".jpg"
-      )
-      .toSet
-    imageNames.foreach(name => pageType(name, isPresent = true))
-
-    val usedImages: Set[String] = pages.filter(_.isPresent).map(_.name).toSet
-    val orphanImages: Seq[String] = (imageNames -- usedImages).toSeq.sorted
-    val missingImages: Seq[String] = (usedImages -- imageNames).toSeq.sorted
-    if (orphanImages.nonEmpty) throw new IllegalArgumentException(s"Orphan images: $orphanImages")
-    if (missingImages.nonEmpty)
-      throw new IllegalArgumentException(s"Missing images: $missingImages")
+    // TODO with images on a separate website (facsimiles.alter-rebbe.org), this has to be re-worked...
+//    // Check that all the images are accounted for
+//    val imageNames: Set[String] =
+//      Util.filesWithExtensions(
+//        directory = layout.facsimiles(directory),
+//        ".jpg"
+//      )
+//      .toSet
+//    imageNames.foreach(name => pageType(name, isPresent = true))
+//
+//    val usedImages: Set[String] = pages.filter(_.isPresent).map(_.name).toSet
+//    val orphanImages: Seq[String] = (imageNames -- usedImages).toSeq.sorted
+//    val missingImages: Seq[String] = (usedImages -- imageNames).toSeq.sorted
+//    if (orphanImages.nonEmpty) throw new IllegalArgumentException(s"Orphan images: $orphanImages")
+//    if (missingImages.nonEmpty)
+//      throw new IllegalArgumentException(s"Missing images: $missingImages")
   }
 
   private def splitLang(name: String): (String, Option[String]) = {
