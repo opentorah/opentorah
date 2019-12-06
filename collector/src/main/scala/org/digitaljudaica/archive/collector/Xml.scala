@@ -88,6 +88,8 @@ object Xml {
       elem
     }
 
+    def toPrettyString: String = Xml.prettyPrinter.format(elem)
+
     def write(
       directory: File,
       fileName: String,
