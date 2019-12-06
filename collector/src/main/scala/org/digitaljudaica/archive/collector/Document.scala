@@ -62,11 +62,15 @@ final class Document(
     def writeTeiWrapper(name: String, lang: Option[String]): Unit = {
       val nameWithLang: String = lang.fold(name)(lang => name + "-" + lang)
 
-      Util.writeYaml(Util.htmlFile(docsDirectory, nameWithLang), layout = "document", Seq(
-        "tei" -> s"'../${layout.teiDirectoryName}/$nameWithLang.xml'",
-        "facs" -> s"'../${layout.facsDirectoryName}/$name.html'"
-      ) ++ (if (lang.isDefined || translations.isEmpty) Seq.empty else Seq("translations" -> translations.mkString("[", ", ", "]")))
-        ++ navigation
+      // TODO fold into writeTei....
+      Util.writeYaml(Util.htmlFile(docsDirectory, nameWithLang),
+        layout = "tei",
+        yaml = Seq(
+          "style" -> "document",
+          "tei" -> s"'../${layout.teiDirectoryName}/$nameWithLang.xml'",
+          "facs" -> s"'../${layout.facsDirectoryName}/$name.html'"
+        ) ++ (if (lang.isDefined || translations.isEmpty) Seq.empty else Seq("translations" -> translations.mkString("[", ", ", "]")))
+          ++ navigation
       )
     }
 
@@ -75,9 +79,24 @@ final class Document(
     for (lang <- translations) writeTeiWrapper(name, Some(lang))
 
     // Facsimile viewer
-    Util.writeYaml(Util.htmlFile(facsDirectory, name), layout = "facsimile", Seq(
-      "images" -> pages.filter(_.isPresent).map(_.name).mkString("[", ", ", "]")
-    ) ++ navigation
+    val facsimilePages: Elem =
+      <div class="facsimileViewer">
+        <div class="scroller">{
+          for (page: String <- pages.filter(_.isPresent).map(_.name)) yield {
+            <a target="documentViewer" href={s"../documents/$name.html#p$page"}>
+              <figure>
+                <img id={s"p$page"} alt={s"facsimile for page $page"}
+                     src={s"${layout.facsimilesUrlPrefix}/${collection.directoryName}/$page.jpg"}/>
+                <figcaption>{page}</figcaption>
+              </figure>
+            </a>}}
+        </div>
+      </div>
+
+    Util.writeYaml(Util.htmlFile(facsDirectory, name),
+      layout = "default",
+      yaml = Seq("style" -> "facsimile") ++ navigation,
+      content = Seq(facsimilePages.toPrettyString)
     )
   }
 }

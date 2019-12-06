@@ -51,4 +51,6 @@ final class Layout(docs: File) {
     url(s"$collectionDirectoryName/${documentUrlRelativeToIndex(name)}")
 
   def documentUrlRelativeToIndex(name: String): String =  s"$docsDirectoryName/$name.html"
+
+  def facsimilesUrlPrefix: String = "http://facsimiles.alter-rebbe.org/facsimiles"
 }

@@ -58,7 +58,7 @@ final class Names(layout: Layout, errors: Errors) {
 
     // Wrapper
     Util.writeTeiYaml(Util.htmlFile(directory, fileName),
-      layout = "names",
+      style = "names",
       tei = s"$fileName.xml",
       title = head,
       target = "namesViewer"

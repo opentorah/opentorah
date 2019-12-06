@@ -16,11 +16,12 @@ object Util {
 
   def writeTeiYaml(
     file: File,
-    layout: String,
+    style: String,
     tei: String,
     title: String,
     target: String
-  ): Unit = writeYaml(file, layout, Seq(
+  ): Unit = writeYaml(file, "tei", Seq(
+    "style" -> style,
     "tei" -> tei,
     "title" -> title,
     "target" -> target
