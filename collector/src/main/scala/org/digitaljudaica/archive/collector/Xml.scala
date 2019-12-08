@@ -18,7 +18,7 @@ object Xml {
   }
 
   def contentOf(element: Option[Elem]): Seq[Node] =
-    element.fold[Seq[Node]](Text(""))(_.child.map(removeNamespace))
+    element.fold[Seq[Node]](Text(""))(element => removeNamespace(element).child)
 
   private def removeNamespace(node: Node): Node = node match {
     case e: Elem => e.copy(scope = TopScope, child = e.child.map(removeNamespace))
@@ -94,7 +94,8 @@ object Xml {
       directory: File,
       fileName: String,
     ): Unit = Util.write(new File(directory, fileName + ".xml"), content =
-      """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" + Xml.prettyPrinter.format(elem)
+      """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
+        prettyPrinter.format(elem)
     )
   }
 

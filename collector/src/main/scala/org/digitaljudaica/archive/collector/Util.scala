@@ -19,20 +19,20 @@ object Util {
   def writeTeiWrapper(
     directory: File,
     fileName: String,
-    teiPrefix: String,
+    teiPrefix: Option[String] = None,
     style: String,
     target: String,
     yaml: Seq[(String, String)]
-  ): Unit = {
-    val file: File = Util.htmlFile(directory, fileName)
-    writeYaml(file, layout = "tei", Seq(
+  ): Unit = writeWithYaml(
+    file = htmlFile(directory, fileName),
+    layout = "tei",
+    yaml = Seq(
       "style" -> style,
-      "tei" -> quote(teiPrefix + fileName + ".xml"),
+      "tei" -> quote(teiPrefix.getOrElse("") + fileName + ".xml"),
       "target" -> target
     ) ++ yaml)
-  }
 
-  def writeYaml(
+  def writeWithYaml(
     file: File,
     layout: String,
     yaml: Seq[(String, String)],
@@ -40,9 +40,9 @@ object Util {
   ): Unit = {
     val result: Seq[String] =
       Seq("---") ++
-        (for ((name, value) <- ("layout", layout) +: yaml) yield name + ": " + value) ++
-        Seq("---") ++
-        Seq("") ++ content
+      (for ((name, value) <- ("layout", layout) +: yaml) yield name + ": " + value) ++
+      Seq("---") ++
+      Seq("") ++ content
 
     write(file, result.mkString("\n"))
   }

@@ -43,7 +43,7 @@ object Main {
       s"- [$archive]" +: cases.flatten
     }
 
-    Util.writeYaml(layout.collectionsMd, "page", Seq(
+    Util.writeWithYaml(layout.collectionsMd, "page", Seq(
       "title" -> "Дела", "target" -> "collectionViewer"
     ), collectionLinks.flatten)
 

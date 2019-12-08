@@ -124,7 +124,6 @@ final class Collection(
     Util.writeTeiWrapper(
       directory,
       fileName = "index",
-      teiPrefix = "",
       style = "collection",
       target = "collectionViewer",
       yaml = Seq("documentCollection" -> Util.quote(reference)))

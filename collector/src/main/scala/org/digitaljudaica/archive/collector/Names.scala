@@ -60,7 +60,6 @@ final class Names(layout: Layout, errors: Errors) {
     Util.writeTeiWrapper(
       directory,
       fileName,
-      teiPrefix = "",
       style = "names",
       target = "namesViewer",
       yaml = Seq("title" -> head)

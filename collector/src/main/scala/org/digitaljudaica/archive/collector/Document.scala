@@ -61,7 +61,7 @@ final class Document(
       Util.writeTeiWrapper(
         directory = docsDirectory,
         fileName = nameWithLang,
-        teiPrefix = s"../${layout.teiDirectoryName}/",
+        teiPrefix = Some(s"../${layout.teiDirectoryName}/"),
         style = "document",
         target = "documentViewer",
         yaml = Seq(
@@ -89,7 +89,7 @@ final class Document(
         </div>
       </div>
 
-    Util.writeYaml(
+    Util.writeWithYaml(
       file = Util.htmlFile(facsDirectory, name),
       layout = "default",
       yaml = Seq("style" -> "facsimile") ++ navigation,
