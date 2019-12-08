@@ -10,7 +10,7 @@ final class Layout(docs: File) {
 
   val indexMd: File = docs("index.md")
 
-  // TODO Note: also hard-coded in _layouts/tei.html (for 'names') and in 'index.md'!
+  // TODO Note: also hard-coded in 'index.md'!
   private val collectionsDirectoryName: String = "collections"
 
   val collections: File = docs(collectionsDirectoryName)
@@ -42,8 +42,7 @@ final class Layout(docs: File) {
 
   def tei(collectionDirectory: File): File = new File(collectionDirectory, teiDirectoryName)
 
-  // TODO Note: also hard-coded in _layouts/facsimile.html!
-  val docsDirectoryName: String = "documents" // wrappers for TEI XML
+  private val docsDirectoryName: String = "documents" // wrappers for TEI XML
 
   def docs(collectionDirectory: File): File = new File(collectionDirectory, docsDirectoryName)
 
@@ -51,6 +50,4 @@ final class Layout(docs: File) {
     url(s"$collectionDirectoryName/${documentUrlRelativeToIndex(name)}")
 
   def documentUrlRelativeToIndex(name: String): String =  s"$docsDirectoryName/$name.html"
-
-  def facsimilesUrlPrefix: String = "http://facsimiles.alter-rebbe.org/facsimiles"
 }

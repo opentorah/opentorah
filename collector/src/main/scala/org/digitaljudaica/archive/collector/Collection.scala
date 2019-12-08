@@ -52,7 +52,7 @@ final class Collection(
     for (page <- pages) {
       // allow duplicates in consecutive documents
       //   if (name2page.contains(page.name)) throw new IllegalArgumentException(s"Duplicate page: ${page.name}")
-      name2page.put(page.name, page)
+      name2page.put(page.n, page)
     }
 
     // TODO with images on a separate website (facsimiles.alter-rebbe.org), this has to be re-worked...
@@ -110,8 +110,6 @@ final class Collection(
   }
 
   def process(): Unit = {
-    def quote(what: String): String = s"'$what'"
-
     // Index
     Tei.tei(title, content =
       description ++
@@ -123,12 +121,13 @@ final class Collection(
     ).write(directory, "index")
 
     // Index wrapper
-    Util.writeTeiYaml(Util.htmlFile(directory, "index"),
+    Util.writeTeiWrapper(
+      directory,
+      fileName = "index",
+      teiPrefix = "",
       style = "collection",
-      tei = "index.xml",
-      title = quote(reference),
-      target = "collectionViewer"
-    )
+      target = "collectionViewer",
+      yaml = Seq("documentCollection" -> Util.quote(reference)))
 
     // Wrappers
     val docsDirectory = layout.docs(directory)
@@ -172,7 +171,7 @@ object Collection {
     }),
 
     Column("Страницы", "pages", { document: Document => for (page <- document.pages) yield
-      <ref target={layout.documentUrlRelativeToIndex(document.name) + s"#p${page.name}"}
+      <ref target={layout.documentUrlRelativeToIndex(document.name) + s"#p${page.n}"}
            role="documentViewer"
            rendition={if (page.isPresent) "page" else "missing-page"}>{page.displayName}</ref>
     }),

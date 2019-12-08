@@ -40,34 +40,31 @@ final class Document(
   def language: Option[String] = tei.languageIdents.headOption
 
   val pages: Seq[Page] = for (pb <- tei.pbs) yield collection.pageType(
-    name = pb.getAttribute("n"),
-    isPresent = pb.attributeOption("facs").isDefined
+    n = pb.getAttribute("n"),
+    facs = pb.attributeOption("facs")
   )
 
   def addressee: Option[Reference] =
     references.find(name => (name.entity == Entity.Person) && name.role.contains("addressee"))
 
   def writeWrappers(docsDirectory: File, facsDirectory: File): Unit = {
-    def quote(what: String): String = s"'$what'"
-
+    import Util.quote
     val navigation: Seq[(String, String)] =
-      Seq(
-        "collection" -> quote(collection.reference),
-        "collectionDirectory" -> quote(collection.directoryName)
-      ) ++
-      prev.map(prev => Seq("prev" -> quote(prev))).getOrElse(Seq.empty) ++
-      Seq("self" -> quote(name)) ++
-      next.map(next => Seq("next" -> quote(next))).getOrElse(Seq.empty)
+      Seq("documentCollection" -> quote(collection.reference)) ++
+      prev.map(prev => Seq("prevDocument" -> quote(prev))).getOrElse(Seq.empty) ++
+      Seq("thisDocument" -> quote(name)) ++
+      next.map(next => Seq("nextDocument" -> quote(next))).getOrElse(Seq.empty)
 
     def writeTeiWrapper(name: String, lang: Option[String]): Unit = {
       val nameWithLang: String = lang.fold(name)(lang => name + "-" + lang)
 
-      // TODO fold into writeTei....
-      Util.writeYaml(Util.htmlFile(docsDirectory, nameWithLang),
-        layout = "tei",
+      Util.writeTeiWrapper(
+        directory = docsDirectory,
+        fileName = nameWithLang,
+        teiPrefix = s"../${layout.teiDirectoryName}/",
+        style = "document",
+        target = "documentViewer",
         yaml = Seq(
-          "style" -> "document",
-          "tei" -> s"'../${layout.teiDirectoryName}/$nameWithLang.xml'",
           "facs" -> s"'../${layout.facsDirectoryName}/$name.html'"
         ) ++ (if (lang.isDefined || translations.isEmpty) Seq.empty else Seq("translations" -> translations.mkString("[", ", ", "]")))
           ++ navigation
@@ -81,19 +78,19 @@ final class Document(
     // Facsimile viewer
     val facsimilePages: Elem =
       <div class="facsimileViewer">
-        <div class="scroller">{
-          for (page: String <- pages.filter(_.isPresent).map(_.name)) yield {
-            <a target="documentViewer" href={s"../documents/$name.html#p$page"}>
+        <div class="facsimileScroller">{
+          for (page: Page <- pages.filter(_.isPresent)) yield {
+            <a target="documentViewer" href={s"../documents/$name.html#p${page.n}"}>
               <figure>
-                <img id={s"p$page"} alt={s"facsimile for page $page"}
-                     src={s"${layout.facsimilesUrlPrefix}/${collection.directoryName}/$page.jpg"}/>
-                <figcaption>{page}</figcaption>
+                <img id={s"p${page.n}"} alt={s"facsimile for page ${page.n}"} src={page.facs.orNull}/>
+                <figcaption>{page.n}</figcaption>
               </figure>
             </a>}}
         </div>
       </div>
 
-    Util.writeYaml(Util.htmlFile(facsDirectory, name),
+    Util.writeYaml(
+      file = Util.htmlFile(facsDirectory, name),
       layout = "default",
       yaml = Seq("style" -> "facsimile") ++ navigation,
       content = Seq(facsimilePages.toPrettyString)
