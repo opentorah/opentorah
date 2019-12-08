@@ -2,9 +2,6 @@ package org.digitaljudaica.archive.collector
 
 import java.io.File
 
-import scala.xml.Elem
-import Xml.Ops
-
 object Main {
 
   def main(args: Array[String]): Unit = {
@@ -34,9 +31,9 @@ object Main {
 
     errors.check()
 
-    val byArchive: Map[String, Seq[Collection]] = collections.groupBy(_.archive)
+    val byArchive: Map[String, Seq[Collection]] = collections.sorted.groupBy(_.archive.getOrElse(""))
     val collectionLinks: Seq[Seq[String]] = for (archive <- byArchive.keys.toList.sorted) yield {
-      val cases: Seq[Seq[String]] = for (collection <- byArchive(archive).sortBy(_.archiveCase)) yield Seq(
+      val cases: Seq[Seq[String]] = for (collection <- byArchive(archive)) yield Seq(
         s"""  - <a href="${layout.collectionUrl(collection.directoryName)}" target="collectionViewer">${collection.archiveCase}</a>:""",
         s"  ${collection.title}"
       )

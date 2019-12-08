@@ -10,7 +10,8 @@ final class Collection(
   directory: File,
   xml: Elem,
   errors: Errors
-) {
+) extends Ordered[Collection] {
+
   def directoryName: String = directory.getName
 
   override def toString: String = directoryName
@@ -19,13 +20,33 @@ final class Collection(
 
   val teiDirectory: File = layout.tei(directory)
 
-  def archive: String = xml.oneChild("archive").spacedText
+  def archive: Option[String] = xml.optionalChild("archive").map(_.spacedText)
 
-  def archiveCase: Case = new Case(xml.oneChild("case").spacedText)
+  def prefix: Option[String] = xml.optionalChild("prefix").map(_.spacedText)
 
-  def reference: String =
-    if (archive.isEmpty) archiveCase.name else
-      archive + " " + archiveCase
+  def number: Option[Int] = xml.optionalChild("number").map(_.spacedText).map(_.toInt)
+
+  def archiveCase: String = prefix.getOrElse("") + number.map(_.toString).getOrElse("")
+
+  def reference: String = archive.fold(archiveCase)(archive => archive + " " + archiveCase)
+
+  override def compare(that: Collection): Int = {
+    val archiveComparison: Int = compare(archive, that.archive)
+    if (archiveComparison != 0) archiveComparison else {
+      val prefixComparison: Int = compare(prefix, that.prefix)
+      if (prefixComparison != 0) prefixComparison else {
+        number.getOrElse(0).compare(that.number.getOrElse(0))
+      }
+    }
+  }
+
+  // TODO where is this in the standard library?
+  private def compare(a: Option[String], b: Option[String]): Int = {
+    if (a.isEmpty && b.isEmpty) 0
+    else if (a.isEmpty) -1
+    else if (b.isEmpty) 1
+    else a.get.compare(b.get)
+  }
 
   def title: String = xml.optionalChild("title").map(_.spacedText).getOrElse(reference)
 
