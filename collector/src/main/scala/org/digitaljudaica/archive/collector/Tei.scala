@@ -1,7 +1,8 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-import scala.xml.Elem
+
+import scala.xml.{Elem, Node}
 import Xml.Ops
 
 class Tei(val tei: Elem) {
@@ -33,7 +34,7 @@ object Tei {
   def load(directory: File, fileName: String): Tei =
     new Tei(Xml.load(directory, fileName).check("TEI"))
 
-  def tei(head: String, content: Seq[Elem]): Elem =
+  def tei(head: Seq[Node], content: Seq[Node]): Elem =
     <TEI xmlns="http://www.tei-c.org/ns/1.0">
       <teiHeader>
         <fileDesc>
@@ -50,9 +51,6 @@ object Tei {
               </licence>
             </availability>
           </publicationStmt>
-          <sourceDesc>
-            <p>Facsimile</p>
-          </sourceDesc>
         </fileDesc>
       </teiHeader>
       <text>
@@ -62,5 +60,4 @@ object Tei {
         </body>
       </text>
     </TEI>
-
 }

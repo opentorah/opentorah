@@ -62,7 +62,6 @@ final class Document(
         directory = docsDirectory,
         fileName = nameWithLang,
         teiPrefix = Some(s"../${layout.teiDirectoryName}/"),
-        style = "document",
         target = "documentViewer",
         yaml = Seq(
           "facs" -> s"'../${layout.facsDirectoryName}/$name.html'"
@@ -92,8 +91,8 @@ final class Document(
     Util.writeWithYaml(
       file = Util.htmlFile(facsDirectory, name),
       layout = "default",
-      yaml = Seq("style" -> "facsimile") ++ navigation,
-      content = Seq(facsimilePages.toPrettyString)
+      yaml = navigation,
+      content = Seq(facsimilePages.format)
     )
   }
 }

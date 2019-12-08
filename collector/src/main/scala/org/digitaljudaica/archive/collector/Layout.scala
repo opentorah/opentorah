@@ -2,13 +2,11 @@ package org.digitaljudaica.archive.collector
 
 import java.io.File
 
-final class Layout(docs: File) {
+final class Layout(val docs: File) {
 
   private def docs(fileName: String): File = new File(docs, fileName)
 
-  val collectionsMd: File = docs("collections.md")
-
-  val indexMd: File = docs("index.md")
+  val collectionsFileName: String = "collections"
 
   // TODO Note: also hard-coded in 'index.md'!
   private val collectionsDirectoryName: String = "collections"
@@ -31,6 +29,7 @@ final class Layout(docs: File) {
 
   val collectionFileName: String = "collection"
 
+  // TODO abstract out collectionIndexFileName: String = "index"; mention hard-coded instances.
   def collectionUrl(name: String): String = url(s"$name/index.html")
 
   // TODO Note: also hard-coded in _layouts/tei.html!

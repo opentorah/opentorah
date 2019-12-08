@@ -3,6 +3,7 @@ package org.digitaljudaica.archive.collector
 import java.io.{BufferedWriter, File, FileWriter}
 
 import scala.io.Source
+import scala.xml.Node
 
 object Util {
 
@@ -20,17 +21,19 @@ object Util {
     directory: File,
     fileName: String,
     teiPrefix: Option[String] = None,
-    style: String,
+    style: Option[String] = None,
     target: String,
     yaml: Seq[(String, String)]
   ): Unit = writeWithYaml(
     file = htmlFile(directory, fileName),
     layout = "tei",
-    yaml = Seq(
-      "style" -> style,
-      "tei" -> quote(teiPrefix.getOrElse("") + fileName + ".xml"),
-      "target" -> target
-    ) ++ yaml)
+    yaml =
+      style.fold[Seq[(String, String)]](Seq.empty)(style => Seq("style" -> style)) ++
+      Seq(
+        "tei" -> quote(teiPrefix.getOrElse("") + fileName + ".xml"),
+        "target" -> target
+      ) ++ yaml
+  )
 
   def writeWithYaml(
     file: File,
@@ -45,6 +48,34 @@ object Util {
       Seq("") ++ content
 
     write(file, result.mkString("\n"))
+  }
+
+  def writeTei(
+    directory: File,
+    fileName: String,
+    head: Node,
+    content: Seq[Node],
+    style: Option[String] = None,
+    target: String,
+    yaml: Seq[(String, String)] = Seq.empty
+  ): Unit = {
+    val elem = Tei.tei(head, content)
+    Util.write(
+      file = new File(directory, fileName + ".xml"),
+      content = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
+        Xml.format(elem)
+    )
+
+    val title: String = Xml.spacedText(head)
+
+    writeTeiWrapper(
+      directory,
+      fileName,
+      teiPrefix = None,
+      style,
+      target,
+      yaml = Seq("title" -> quote(title)) ++ yaml
+    )
   }
 
   def write(file: File, content: String): Unit = {

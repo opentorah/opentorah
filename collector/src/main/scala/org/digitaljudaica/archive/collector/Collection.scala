@@ -20,11 +20,11 @@ final class Collection(
 
   val teiDirectory: File = layout.tei(directory)
 
-  def archive: Option[String] = xml.optionalChild("archive").map(_.spacedText)
+  def archive: Option[String] = xml.optionalChild("archive").map(_.text)
 
-  def prefix: Option[String] = xml.optionalChild("prefix").map(_.spacedText)
+  def prefix: Option[String] = xml.optionalChild("prefix").map(_.text)
 
-  def number: Option[Int] = xml.optionalChild("number").map(_.spacedText).map(_.toInt)
+  def number: Option[Int] = xml.optionalChild("number").map(_.text.toInt)
 
   def archiveCase: String = prefix.getOrElse("") + number.map(_.toString).getOrElse("")
 
@@ -48,7 +48,7 @@ final class Collection(
     else a.get.compare(b.get)
   }
 
-  def title: String = xml.optionalChild("title").map(_.spacedText).getOrElse(reference)
+  def title: Node = xml.optionalChild("title").getOrElse(Text(reference))
 
   def description: Seq[Elem] = xml.oneChild("abstract").elements
 
@@ -132,22 +132,20 @@ final class Collection(
 
   def process(): Unit = {
     // Index
-    Tei.tei(title, content =
-      description ++
+    Util.writeTei(
+      directory,
+      fileName = "index",
+      head = title,
+      content = description ++
         Seq[Elem](Collection.table(layout).toTei(
           parts.flatMap { part =>  part.title.map(Table.Xml).toSeq ++ part.documents.map(Table.Data[Document]) }
         )) ++
         (if (missingPages.isEmpty) Seq.empty
-        else Seq(<p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>))
-    ).write(directory, "index")
-
-    // Index wrapper
-    Util.writeTeiWrapper(
-      directory,
-      fileName = "index",
-      style = "collection",
+        else Seq(<p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>)),
+      style = Some("wide"),
       target = "collectionViewer",
-      yaml = Seq("documentCollection" -> Util.quote(reference)))
+      yaml = Seq("documentCollection" -> Util.quote(reference))
+    )
 
     // Wrappers
     val docsDirectory = layout.docs(directory)
@@ -163,7 +161,7 @@ object Collection {
 
   private def table(layout: Layout): Table[Document] = new Table[Document](
     Column("Описание", "description", { document: Document =>
-      Xml.contentOf(document.description)
+      document.description.fold[Seq[Node]](Text(""))(_.withoutNamespace.child)
     }),
 
     Column("Дата", "date", { document: Document =>
@@ -171,7 +169,7 @@ object Collection {
     }),
 
     Column("Кто", "author", { document: Document =>
-      Xml.contentOf(document.author)
+      document.author.fold[Seq[Node]](Text(""))(_.withoutNamespace.child)
     }),
 
     Column("Кому", "addressee",  _.addressee.fold[Seq[Node]](Text(""))(addressee =>
@@ -197,7 +195,7 @@ object Collection {
     }),
 
     Column("Расшифровка", "transcriber", { document: Document =>
-      Xml.contentOf(document.transcriber)
+      document.transcriber.fold[Seq[Node]](Text(""))(_.withoutNamespace.child)
     })
   )
 }
