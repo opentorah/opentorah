@@ -14,18 +14,23 @@ object Util {
 
   def htmlFile(directory: File, fileName: String): File = new File(directory, fileName + ".html")
 
-  def writeTeiYaml(
-    file: File,
+  def quote(what: String): String = s"'$what'"
+
+  def writeTeiWrapper(
+    directory: File,
+    fileName: String,
+    teiPrefix: String,
     style: String,
-    tei: String,
-    collection: String,
-    target: String
-  ): Unit = writeYaml(file, "tei", Seq(
-    "style" -> style,
-    "tei" -> tei,
-    "collection" -> collection,
-    "target" -> target
-  ))
+    target: String,
+    yaml: Seq[(String, String)]
+  ): Unit = {
+    val file: File = Util.htmlFile(directory, fileName)
+    writeYaml(file, layout = "tei", Seq(
+      "style" -> style,
+      "tei" -> quote(teiPrefix + fileName + ".xml"),
+      "target" -> target
+    ) ++ yaml)
+  }
 
   def writeYaml(
     file: File,

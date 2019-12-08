@@ -57,11 +57,13 @@ final class Names(layout: Layout, errors: Errors) {
     Tei.tei(head, content).write(directory, fileName)
 
     // Wrapper
-    Util.writeTeiYaml(Util.htmlFile(directory, fileName),
+    Util.writeTeiWrapper(
+      directory,
+      fileName,
+      teiPrefix = "",
       style = "names",
-      tei = s"$fileName.xml",
-      collection = head,
-      target = "namesViewer"
+      target = "namesViewer",
+      yaml = Seq("title" -> head)
     )
   }
 }
