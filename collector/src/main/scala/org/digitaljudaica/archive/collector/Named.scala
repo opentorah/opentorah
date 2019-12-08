@@ -78,7 +78,7 @@ object Named {
       names,
       id = fileName,
       names = Name.parseNames(entity, nameElements, errors),
-      content = tail.map(Xml.removeNamespace),
+      content = tail.map(_.withoutNamespace),
       entity,
       errors
     )

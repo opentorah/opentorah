@@ -17,16 +17,18 @@ object Xml {
     }
   }
 
-  def contentOf(element: Option[Elem]): Seq[Node] =
-    element.fold[Seq[Node]](Text(""))(_.child.map(removeNamespace))
-
   private def removeNamespace(node: Node): Node = node match {
     case e: Elem => e.copy(scope = TopScope, child = e.child.map(removeNamespace))
     case n => n
   }
 
-  def removeNamespace(element: Elem): Elem =
+  private def removeNamespace(element: Elem): Elem =
     element.copy(scope = TopScope, child = element.child.map(removeNamespace))
+
+  def spacedText(node: Node): String = node match {
+    case elem: Elem => (elem.child map (_.text)).mkString(" ")
+    case node: Node => node.text
+  }
 
   def rewriteElements(xml: Elem, elementRewriter: Elem => Elem): Elem = {
     val rule: RewriteRule = new RewriteRule {
@@ -53,8 +55,6 @@ object Xml {
     def elements: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
     def descendants(name: String): Seq[Elem] = elem.flatMap(_ \\ name).filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
-
-    def spacedText: String = (elem.child map (_.text)).mkString(" ")
 
     def getAttribute(name: String): String = attributeOption(name).getOrElse(throw new NoSuchElementException(s"No attribute $name"))
 
@@ -88,15 +88,31 @@ object Xml {
       elem
     }
 
-    def toPrettyString: String = Xml.prettyPrinter.format(elem)
+    def withoutNamespace: Elem = removeNamespace(elem)
 
-    def write(
-      directory: File,
-      fileName: String,
-    ): Unit = Util.write(new File(directory, fileName + ".xml"), content =
-      """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" + Xml.prettyPrinter.format(elem)
-    )
+    def format: String = Xml.format(elem)
   }
 
   private val prettyPrinter: PrettyPrinter = new PrettyPrinter(120, 2)
+
+  private val join: Set[String] = Set(".", ",", ";", ":", "\"")
+
+  def format(elem: Elem): String = {
+    @scala.annotation.tailrec
+    def merge(result: List[String], lines: List[String]): List[String] = lines match {
+      case l1 :: l2 :: ls =>
+        val l = l2.trim
+        if (join.exists(l.startsWith))
+          merge(result, (l1 ++ l) :: ls)
+        else
+          merge(result :+ l1, l2 :: ls)
+      case l :: Nil => result :+ l
+      case Nil => result
+    }
+
+    val result: String = prettyPrinter.format(elem)
+
+    // pretty-printer splits punctuation from the preceding elements; merge them back :)
+    merge(List.empty, result.split("\n").toList).mkString("\n")
+  }
 }

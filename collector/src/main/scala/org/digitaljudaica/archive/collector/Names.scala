@@ -2,7 +2,7 @@ package org.digitaljudaica.archive.collector
 
 import java.io.File
 
-import scala.xml.Elem
+import scala.xml.{Elem, Text}
 import Xml.Ops
 
 final class Names(layout: Layout, errors: Errors) {
@@ -47,23 +47,16 @@ final class Names(layout: Layout, errors: Errors) {
 
     errors.check()
 
-    val directory: File = layout.namesFileDirectory
-    val fileName: String = layout.namesFileName
-
     val content: Seq[Elem] =
       <p>{for (list <- lists) yield <l><ref target={layout.namedUrl(list.name)} role="namesViewer">{list.head}</ref></l>}</p> +:
          (for (list <- lists) yield list.addMentions(references).toXml)
 
-    Tei.tei(head, content).write(directory, fileName)
-
-    // Wrapper
-    Util.writeTeiWrapper(
-      directory,
-      fileName,
-      teiPrefix = "",
-      style = "names",
-      target = "namesViewer",
-      yaml = Seq("title" -> head)
+    Util.writeTei(
+      directory = layout.namesFileDirectory,
+      fileName = layout.namesFileName,
+      head = Text(head),
+      content,
+      target = "namesViewer"
     )
   }
 }

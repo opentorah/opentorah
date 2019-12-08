@@ -10,7 +10,8 @@ final class Collection(
   directory: File,
   xml: Elem,
   errors: Errors
-) {
+) extends Ordered[Collection] {
+
   def directoryName: String = directory.getName
 
   override def toString: String = directoryName
@@ -19,15 +20,35 @@ final class Collection(
 
   val teiDirectory: File = layout.tei(directory)
 
-  def archive: String = xml.oneChild("archive").spacedText
+  def archive: Option[String] = xml.optionalChild("archive").map(_.text)
 
-  def archiveCase: Case = new Case(xml.oneChild("case").spacedText)
+  def prefix: Option[String] = xml.optionalChild("prefix").map(_.text)
 
-  def reference: String =
-    if (archive.isEmpty) archiveCase.name else
-      archive + " " + archiveCase
+  def number: Option[Int] = xml.optionalChild("number").map(_.text.toInt)
 
-  def title: String = xml.optionalChild("title").map(_.spacedText).getOrElse(reference)
+  def archiveCase: String = prefix.getOrElse("") + number.map(_.toString).getOrElse("")
+
+  def reference: String = archive.fold(archiveCase)(archive => archive + " " + archiveCase)
+
+  override def compare(that: Collection): Int = {
+    val archiveComparison: Int = compare(archive, that.archive)
+    if (archiveComparison != 0) archiveComparison else {
+      val prefixComparison: Int = compare(prefix, that.prefix)
+      if (prefixComparison != 0) prefixComparison else {
+        number.getOrElse(0).compare(that.number.getOrElse(0))
+      }
+    }
+  }
+
+  // TODO where is this in the standard library?
+  private def compare(a: Option[String], b: Option[String]): Int = {
+    if (a.isEmpty && b.isEmpty) 0
+    else if (a.isEmpty) -1
+    else if (b.isEmpty) 1
+    else a.get.compare(b.get)
+  }
+
+  def title: Node = xml.optionalChild("title").getOrElse(Text(reference))
 
   def description: Seq[Elem] = xml.oneChild("abstract").elements
 
@@ -111,23 +132,20 @@ final class Collection(
 
   def process(): Unit = {
     // Index
-    Tei.tei(title, content =
-      description ++
+    Util.writeTei(
+      directory,
+      fileName = "index",
+      head = title,
+      content = description ++
         Seq[Elem](Collection.table(layout).toTei(
           parts.flatMap { part =>  part.title.map(Table.Xml).toSeq ++ part.documents.map(Table.Data[Document]) }
         )) ++
         (if (missingPages.isEmpty) Seq.empty
-        else Seq(<p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>))
-    ).write(directory, "index")
-
-    // Index wrapper
-    Util.writeTeiWrapper(
-      directory,
-      fileName = "index",
-      teiPrefix = "",
-      style = "collection",
+        else Seq(<p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>)),
+      style = Some("wide"),
       target = "collectionViewer",
-      yaml = Seq("documentCollection" -> Util.quote(reference)))
+      yaml = Seq("documentCollection" -> Util.quote(reference))
+    )
 
     // Wrappers
     val docsDirectory = layout.docs(directory)
@@ -143,7 +161,7 @@ object Collection {
 
   private def table(layout: Layout): Table[Document] = new Table[Document](
     Column("Описание", "description", { document: Document =>
-      Xml.contentOf(document.description)
+      document.description.fold[Seq[Node]](Text(""))(_.withoutNamespace.child)
     }),
 
     Column("Дата", "date", { document: Document =>
@@ -151,7 +169,7 @@ object Collection {
     }),
 
     Column("Кто", "author", { document: Document =>
-      Xml.contentOf(document.author)
+      document.author.fold[Seq[Node]](Text(""))(_.withoutNamespace.child)
     }),
 
     Column("Кому", "addressee",  _.addressee.fold[Seq[Node]](Text(""))(addressee =>
@@ -177,7 +195,7 @@ object Collection {
     }),
 
     Column("Расшифровка", "transcriber", { document: Document =>
-      Xml.contentOf(document.transcriber)
+      document.transcriber.fold[Seq[Node]](Text(""))(_.withoutNamespace.child)
     })
   )
 }
