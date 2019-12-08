@@ -79,11 +79,11 @@ final class Document(
     val facsimilePages: Elem =
       <div class="facsimileViewer">
         <div class="facsimileScroller">{
-          for (page: Page <- pages.filter(_.isPresent)) yield {
-            <a target="documentViewer" href={s"../documents/$name.html#p${page.n}"}>
+          for (page: Page <- pages.filter(_.isPresent); n = page.n) yield {
+            <a target="documentViewer" href={s"../documents/$name.html#p$n"}>
               <figure>
-                <img id={s"p${page.n}"} alt={s"facsimile for page ${page.n}"} src={page.facs.orNull}/>
-                <figcaption>{page.n}</figcaption>
+                <img xml:id={s"p$n"} alt={s"facsimile for page $n"} src={page.facs.orNull}/>
+                <figcaption>{n}</figcaption>
               </figure>
             </a>}}
         </div>
