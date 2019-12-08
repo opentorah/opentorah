@@ -18,12 +18,12 @@ object Util {
     file: File,
     style: String,
     tei: String,
-    title: String,
+    collection: String,
     target: String
   ): Unit = writeYaml(file, "tei", Seq(
     "style" -> style,
     "tei" -> tei,
-    "title" -> title,
+    "collection" -> collection,
     "target" -> target
   ))
 

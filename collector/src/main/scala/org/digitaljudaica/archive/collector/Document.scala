@@ -51,13 +51,10 @@ final class Document(
     def quote(what: String): String = s"'$what'"
 
     val navigation: Seq[(String, String)] =
-      Seq(
-        "collection" -> quote(collection.reference),
-        "collectionDirectory" -> quote(collection.directoryName)
-      ) ++
-      prev.map(prev => Seq("prev" -> quote(prev))).getOrElse(Seq.empty) ++
-      Seq("self" -> quote(name)) ++
-      next.map(next => Seq("next" -> quote(next))).getOrElse(Seq.empty)
+      Seq("collection" -> quote(collection.reference)) ++
+      prev.map(prev => Seq("prevDocument" -> quote(prev))).getOrElse(Seq.empty) ++
+      Seq("thisDocument" -> quote(name)) ++
+      next.map(next => Seq("nextDocument" -> quote(next))).getOrElse(Seq.empty)
 
     def writeTeiWrapper(name: String, lang: Option[String]): Unit = {
       val nameWithLang: String = lang.fold(name)(lang => name + "-" + lang)

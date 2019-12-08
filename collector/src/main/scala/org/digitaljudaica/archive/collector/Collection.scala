@@ -126,7 +126,7 @@ final class Collection(
     Util.writeTeiYaml(Util.htmlFile(directory, "index"),
       style = "collection",
       tei = "index.xml",
-      title = quote(reference),
+      collection = quote(reference),
       target = "collectionViewer"
     )
 

@@ -60,7 +60,7 @@ final class Names(layout: Layout, errors: Errors) {
     Util.writeTeiYaml(Util.htmlFile(directory, fileName),
       style = "names",
       tei = s"$fileName.xml",
-      title = head,
+      collection = head,
       target = "namesViewer"
     )
   }
