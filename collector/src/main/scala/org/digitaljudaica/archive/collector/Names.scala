@@ -22,7 +22,14 @@ final class Names(layout: Layout, errors: Errors) {
 
   val references: Seq[Reference] = nameds.flatMap(_.references)
 
-  def isResolvable(name: Reference): Boolean = nameds.exists(_.id.contains(name.ref.get))
+  def isResolvable(name: Reference): Boolean = {
+    val result = nameds.find(_.id == name.ref.get)
+    result.isDefined && {
+      val entity = result.get.entity
+      if (result.get.entity != name.entity) errors.error(s"${name.entity} reference to $entity ${result.get.name}: $name [${name.ref.get}]")
+      true
+    }
+  }
 
   def processReferences(documentReferences: Seq[Reference]): Unit = {
     val references: Seq[Reference] = (this.references ++ documentReferences).filterNot(_.name == "?")

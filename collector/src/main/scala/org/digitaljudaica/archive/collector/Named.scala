@@ -10,7 +10,7 @@ final case class Named(
   override val collectionReference: String,
   id: String,
   role: Option[String],
-  names: Seq[Name],
+  names: Seq[Named.Name],
   content: Seq[Elem],
   entity: Entity,
   errors: Errors
@@ -58,6 +58,17 @@ final case class Named(
 }
 
 object Named {
+
+  final case class Name(
+    name: String,
+    id: Option[String],
+    entity: Entity
+  ) {
+    def toXml: Elem = {
+      <name xml:id={id.orNull}>{name}</name>
+        .copy(label = entity.nameElement)
+    }
+  }
 
   final def parse(
     layout: Layout,
