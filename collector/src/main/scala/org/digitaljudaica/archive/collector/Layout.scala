@@ -27,7 +27,9 @@ final class Layout(val docs: File) {
 
   val namesUrl: String = s"/$namesFileName.html"
 
-  def namedUrl(id: String): String = s"/$namesFileName.html#$id"
+  def namedUrl(id: String): String = s"/$namesDirectoryName/$id.html"
+
+  def namedInTheListUrl(id: String): String = s"/$namesFileName.html#$id"
 
   val collectionFileName: String = "collection"
 

@@ -52,7 +52,7 @@ object Main {
     Util.writeTei(
       directory = layout.docs,
       fileName = layout.collectionsFileName,
-      head = Text("Дела"),
+      head = Some(Text("Дела")),
       content = collectionsContent,
       target = "collectionViewer"
     )

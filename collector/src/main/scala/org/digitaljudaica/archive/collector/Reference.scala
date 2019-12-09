@@ -13,10 +13,9 @@ final case class Reference(
 ) {
   override def toString: String = source.toString
 
-  def toXml: Elem = {
+  def toXml: Elem =
     <name ref={ref.orNull} xml:id={id.orNull} role={role.orNull}>{name}</name>
       .copy(label = entity.nameElement)
-  }
 }
 
 object Reference {

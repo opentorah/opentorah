@@ -135,7 +135,7 @@ final class Collection(
     Util.writeTei(
       directory,
       fileName = "index",
-      head = title,
+      head = Some(title),
       content = description ++
         Seq[Elem](Collection.table(layout).toTei(
           parts.flatMap { part =>  part.title.map(Table.Xml).toSeq ++ part.documents.map(Table.Data[Document]) }

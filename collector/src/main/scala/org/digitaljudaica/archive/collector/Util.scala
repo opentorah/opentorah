@@ -53,7 +53,7 @@ object Util {
   def writeTei(
     directory: File,
     fileName: String,
-    head: Node,
+    head: Option[Node],
     content: Seq[Node],
     style: Option[String] = None,
     target: String,
@@ -66,15 +66,13 @@ object Util {
         Xml.format(elem)
     )
 
-    val title: String = Xml.spacedText(head)
-
     writeTeiWrapper(
       directory,
       fileName,
       teiPrefix = None,
       style,
       target,
-      yaml = Seq("title" -> quote(title)) ++ yaml
+      yaml = head.fold[Seq[(String, String)]](Seq.empty)(head => Seq("title" -> quote(Xml.spacedText(head)))) ++ yaml
     )
   }
 

@@ -13,16 +13,6 @@ final case class NamesList(
   def isEmpty: Boolean = nameds.isEmpty
 
   def references: Seq[Reference] = nameds.flatMap(_.references)
-
-  def addMentions(references: Seq[Reference]): NamesList =
-    copy(nameds = nameds.map(_.addMentions(references)))
-
-  def toXml: Elem =
-    <list xml:id={id}>
-      <head>{head}</head>
-      {for (named <- nameds) yield named.toXml}
-    </list>
-    .copy(label = entity.listElement)
 }
 
 object NamesList {

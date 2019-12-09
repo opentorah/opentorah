@@ -5,6 +5,7 @@ import java.io.File
 import scala.xml.{Elem, Node, Text}
 import Xml.Ops
 
+// TODO structure the TEI file better: the names, information, list reference, mentions...
 final case class Named(
   layout: Layout,
   override val collectionReference: String,
@@ -17,7 +18,7 @@ final case class Named(
 ) extends HasReferences {
   if (names.isEmpty) errors.error(s"No names for $id")
 
-  override val references: Seq[Reference] = content.flatMap(element => Reference.parseReferences(this, element, errors))
+  override val references: Seq[Reference] = content.flatMap(element => Reference.parseReferences(document = this, element, errors))
 
   override def isNames: Boolean = true
 
@@ -27,34 +28,19 @@ final case class Named(
 
   override def url: String = layout.namedUrl(id)
 
-  def addMentions(references: Seq[Reference]): Named = {
-    def isMentions(element: Elem): Boolean =
-      (element.label == "p") && element.attributeOption("rendition").contains("mentions")
+  def toListXml: Elem =
+    <l><ref target={layout.namedUrl(id)} role="namesViewer">{names.head.toXml}</ref></l>
 
-    copy(content = content.filterNot(isMentions) :+ mentions(references.filter(_.ref.get == id)))
-  }
-
-  private def mentions(references: Seq[Reference]): Elem = {
-    val fromNames: Seq[Reference] = references.filter(_.source.isNames)
-    val bySource: Seq[(String, Seq[Reference])] =
-      (if (fromNames.isEmpty) Seq.empty else Seq((fromNames.head.source.collectionReference, fromNames))) ++
-        references.filterNot(_.source.isNames).groupBy(_.source.collectionReference).toSeq.sortBy(_._1)
-
-    <p rendition="mentions">{
-      for ((source, references) <- bySource) yield <l>{
-        Seq[Node](Text(source + ": ")) ++
-          (for (ref <- Util.removeConsecutiveDuplicates(references.map(_.source)))
-           yield <ref target={ref.url} role={ref.viewer}>{ref.name}</ref>)
-        }</l>
-    }</p>
-  }
-
-  def toXml: Elem =
+  def toXml(references: Seq[Reference]): Elem = {
     <named xml:id={id} role={role.orNull}>
       {for (name <- names) yield name.toXml}
-      {content}
+      {content.filterNot(Named.isMentions) :+ Named.mentions(
+        references.filter(_.ref.get == id),
+        <ref target={layout.namedInTheListUrl(id)} role="namesViewer">[...]</ref>
+      )}
     </named>
       .copy(label = entity.element)
+  }
 }
 
 object Named {
@@ -77,7 +63,8 @@ object Named {
     errors: Errors
   ): Seq[Named] = {
     def parse(fileName: String): Named = {
-      val xml: Elem = Xml.load(directory, fileName)
+      val rawXml: Elem = Xml.load(directory, fileName)
+      val xml: Elem = if (rawXml.label != Tei.topElement) rawXml else new Tei(rawXml).body.elements.head
       val entity: Entity = Entity.forElement(xml.label).get
       val id: Option[String] = xml.idOption
       if (id.isDefined && id.get != fileName) errors.error(s"Wrong id $id in file $fileName")
@@ -107,5 +94,24 @@ object Named {
     }
 
     for (fileName <- Util.filesWithExtensions(directory, extension = ".xml").sorted) yield parse(fileName)
+  }
+
+  private def isMentions(element: Elem): Boolean =
+    (element.label == "p") && element.attributeOption("rendition").contains("mentions")
+
+  private def mentions(references: Seq[Reference], toList: Elem): Elem = {
+    val fromNames: Seq[Reference] = references.filter(_.source.isNames)
+    val bySource: Seq[(String, Seq[Reference])] =
+      (if (fromNames.isEmpty) Seq.empty else Seq((fromNames.head.source.collectionReference, fromNames))) ++
+        references.filterNot(_.source.isNames).groupBy(_.source.collectionReference).toSeq.sortBy(_._1)
+
+    <p rendition="mentions">
+      {toList}
+      {for ((source, references) <- bySource) yield <l>{
+        Seq[Node](Text(source + ": ")) ++
+          (for (ref <- Util.removeConsecutiveDuplicates(references.map(_.source)))
+            yield <ref target={ref.url} role={ref.viewer}>{ref.name}</ref>)
+        }</l>
+      }</p>
   }
 }

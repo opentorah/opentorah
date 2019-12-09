@@ -6,7 +6,7 @@ import scala.xml.{Elem, Node}
 import Xml.Ops
 
 class Tei(val tei: Elem) {
-  tei.check("TEI")
+  tei.check(Tei.topElement)
 
   val teiHeader: Elem = tei.oneChild("teiHeader")
   val fileDesc: Elem = teiHeader.oneChild("fileDesc")
@@ -31,10 +31,12 @@ class Tei(val tei: Elem) {
 }
 
 object Tei {
-  def load(directory: File, fileName: String): Tei =
-    new Tei(Xml.load(directory, fileName).check("TEI"))
+  val topElement: String = "TEI"
 
-  def tei(head: Seq[Node], content: Seq[Node]): Elem =
+  def load(directory: File, fileName: String): Tei =
+    new Tei(Xml.load(directory, fileName).check(topElement))
+
+  def tei(head: Option[Node], content: Seq[Node]): Elem =
     <TEI xmlns="http://www.tei-c.org/ns/1.0">
       <teiHeader>
         <fileDesc>
@@ -55,7 +57,7 @@ object Tei {
       </teiHeader>
       <text>
         <body>
-          <head>{head}</head>
+          {head.fold[Seq[Node]](Seq.empty)(head => Seq(<head>{head}</head>))}
           {content}
         </body>
       </text>
