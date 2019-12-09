@@ -60,6 +60,10 @@ object Xml {
 
     def attributeOption(name: String): Option[String] = elem.attributes.asAttrMap.get(name)
 
+    def idOption: Option[String] = attributeOption("xml:id")
+
+    def id: String = getAttribute("xml:id")
+
     def intAttributeOption(name: String): Option[Int] = attributeOption(name).map { value =>
       try { value.toInt } catch { case e: NumberFormatException => throw new IllegalArgumentException(s"$value is not a number", e)}
     }

@@ -4,15 +4,13 @@ import scala.xml.{Elem, Text}
 import Xml.Ops
 
 final class Names(layout: Layout, errors: Errors) {
-  val nameds: Seq[Named] = Named.parse(layout, namesContainer = this, layout.namesDirectory, errors)
-
   val xml: Elem = Xml.load(layout.docs, layout.namesListsFileName).check("names")
   val elements: Seq[Elem] = xml.elements
   val head: String = elements.head.check("head").text
+  val nameds: Seq[Named] = Named.parse(layout, namesContainer = this, layout.namesDirectory, errors)
+  val lists: Seq[NamesList] = elements.tail.map(element => NamesList(element, nameds))
 
-  val lists: Seq[NamesList] = elements.tail.map(element => NamesList.parse(element, nameds))
-
-  for ((id, nameds) <- lists.groupBy(_.name).filter(_._2.length != 1)) {
+  for ((id, nameds) <- lists.groupBy(_.id).filter(_._2.length != 1)) {
     errors.error(s"Duplicate list ids: $id - $nameds")
   }
 
@@ -41,11 +39,11 @@ final class Names(layout: Layout, errors: Errors) {
 
     errors.check()
 
-    val nonEmptyLists = lists.filterNot(_.nameds.isEmpty)
+    val nonEmptyLists = lists.filterNot(_.isEmpty)
     val content: Seq[Elem] =
       <p>{
         for (list <- nonEmptyLists)
-          yield <l><ref target={layout.namedUrl(list.name)} role="namesViewer">{list.head}</ref></l>}
+          yield <l><ref target={layout.namedUrl(list.id)} role="namesViewer">{list.head}</ref></l>}
       </p> +:
          (for (list <- nonEmptyLists) yield list.addMentions(references).toXml)
 

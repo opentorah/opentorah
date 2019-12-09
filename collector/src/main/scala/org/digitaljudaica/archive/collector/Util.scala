@@ -117,7 +117,8 @@ object Util {
 
   def removeConsecutiveDuplicates[T](seq: Seq[T]): Seq[T] = removeConsecutiveDuplicates(Seq.empty, seq.toList)
 
-  def removeConsecutiveDuplicates[T](result: Seq[T], seq: List[T]): Seq[T] = seq match {
+  @scala.annotation.tailrec
+  private def removeConsecutiveDuplicates[T](result: Seq[T], seq: List[T]): Seq[T] = seq match {
     case x :: y :: xs =>
       removeConsecutiveDuplicates(
         if (x == y) result else result :+ x,

@@ -7,7 +7,7 @@ import Xml.Ops
 
 final case class Named(
   layout: Layout,
-  namesContainer: Names,
+  override val collectionReference: String,
   id: String,
   role: Option[String],
   names: Seq[Name],
@@ -20,8 +20,6 @@ final case class Named(
   override val references: Seq[Reference] = content.flatMap(element => Reference.parseReferences(this, element, errors))
 
   override def isNames: Boolean = true
-
-  override def collectionReference: String = namesContainer.head
 
   override def viewer: String = "namesViewer"
 
@@ -67,32 +65,36 @@ object Named {
     directory: File,
     errors: Errors
   ): Seq[Named] = {
-    for (fileName <- Util.filesWithExtensions(directory, ".xml").sorted)
-      yield parse(layout, namesContainer, directory, fileName, errors)
-  }
+    def parse(fileName: String): Named = {
+      val xml: Elem = Xml.load(directory, fileName)
+      val entity: Entity = Entity.forElement(xml.label).get
+      val id: Option[String] = xml.idOption
+      if (id.isDefined && id.get != fileName) errors.error(s"Wrong id $id in file $fileName")
 
-  private def parse(
-    layout: Layout,
-    namesContainer: Names,
-    listDirectory: File,
-    fileName: String,
-    errors: Errors
-  ): Named = {
-    val xml: Elem = Xml.load(listDirectory, fileName)
-    val entity: Entity = Entity.forElement(xml.label).get
-    val id: Option[String] = xml.attributeOption("xml:id")
-    if (id.isDefined && id.get != fileName) errors.error(s"Wrong id $id in file $fileName")
+      def parseName(element: Elem): Name = {
+        element.check(entity.nameElement)
 
-    val (nameElements: Seq[Elem], tail: Seq[Elem]) = xml.elements.span(_.label == entity.nameElement)
-    Named(
-      layout,
-      namesContainer,
-      id = fileName,
-      role = xml.attributeOption("role"),
-      names = Name.parseNames(entity, nameElements, errors),
-      content = tail.map(_.withoutNamespace),
-      entity,
-      errors
-    )
+        Name(
+          name = element.text,
+          id = element.attributeOption("xml:id"),
+          entity
+        )
+      }
+
+      val (nameElements: Seq[Elem], tail: Seq[Elem]) = xml.elements.span(_.label == entity.nameElement)
+
+      Named(
+        layout,
+        collectionReference = namesContainer.head,
+        id = fileName,
+        role = xml.attributeOption("role"),
+        names = for (nameElement <- nameElements) yield parseName(nameElement),
+        content = tail.map(_.withoutNamespace),
+        entity,
+        errors
+      )
+    }
+
+    for (fileName <- Util.filesWithExtensions(directory, extension = ".xml").sorted) yield parse(fileName)
   }
 }

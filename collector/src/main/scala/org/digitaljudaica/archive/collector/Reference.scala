@@ -33,7 +33,7 @@ object Reference {
         Reference(
           document,
           name = elem.text,
-          id = elem.attributeOption("xml:id"),
+          id = elem.idOption,
           role = elem.attributeOption("role"),
           ref,
           entity
