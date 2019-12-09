@@ -8,9 +8,8 @@ import Xml.Ops
 final class Collection(
   layout: Layout,
   directory: File,
-  xml: Elem,
-  errors: Errors
-) extends Ordered[Collection] {
+  xml: Elem
+) extends CollectionLike with Ordered[Collection] {
 
   def directoryName: String = directory.getName
 
@@ -28,7 +27,7 @@ final class Collection(
 
   def archiveCase: String = prefix.getOrElse("") + number.map(_.toString).getOrElse("")
 
-  def reference: String = archive.fold(archiveCase)(archive => archive + " " + archiveCase)
+  override def reference: String = archive.fold(archiveCase)(archive => archive + " " + archiveCase)
 
   override def compare(that: Collection): Int = {
     val archiveComparison: Int = compare(archive, that.archive)
@@ -125,8 +124,7 @@ final class Collection(
       name,
       prev,
       next,
-      translations = translations.getOrElse(name, Seq.empty),
-      errors
+      translations = translations.getOrElse(name, Seq.empty)
     )
   }
 

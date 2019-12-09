@@ -3,43 +3,26 @@ package org.digitaljudaica.archive.collector
 import scala.xml.{Elem, Text}
 import Xml.Ops
 
-final class Names(layout: Layout, errors: Errors) {
+final class Names(layout: Layout, errors: Errors) extends CollectionLike {
   val xml: Elem = Xml.load(layout.docs, layout.namesListsFileName).check("names")
   val elements: Seq[Elem] = xml.elements
+
   val head: String = elements.head.check("head").text
+  override def reference: String = head
+
   val nameds: Seq[Named] = Named.parse(layout, namesContainer = this, layout.namesDirectory, errors)
   val lists: Seq[NamesList] = elements.tail.map(element => NamesList(element, nameds))
-
-  val duplicateIds: Map[String, Seq[String]] = (lists.map(_.id) ++ nameds.map(_.id)).groupBy(id => id).filter(_._2.length != 1)
-  if (duplicateIds.nonEmpty)
-    errors.error(s"Duplicate ids: $duplicateIds")
 
   errors.check()
 
   val references: Seq[Reference] = nameds.flatMap(_.references)
 
-  private def isResolvable(name: Reference): Boolean = {
-    val result = nameds.find(_.id == name.ref.get)
-    result.isDefined && {
-      val entity = result.get.entity
-      if (result.get.entity != name.entity) errors.error(s"${name.entity} reference to $entity ${result.get.name}: $name [${name.ref.get}]")
-      true
-    }
-  }
+  def findByRef(ref: String): Option[Named] = nameds.find(_.id == ref)
 
   def processReferences(documentReferences: Seq[Reference]): Unit = {
     val references: Seq[Reference] = (this.references ++ documentReferences).filterNot(_.name == "?")
 
-    for (reference <- references.filter(_.ref.isEmpty)) {
-      errors.error(s"Missing 'ref' attribute: Name>${reference.name}< (${reference.source})")
-    }
-
-    errors.check()
-
-    for (reference <- references.filterNot(reference => isResolvable(reference))) {
-      errors.error(s"""Unresolvable reference: Name ref="${reference.ref.orNull}">${reference.name}< """)
-    }
-
+    for (reference <- references) reference.check(this, errors)
     errors.check()
 
     // Individual names

@@ -10,18 +10,15 @@ final class Document(
   override val name: String,
   prev: Option[String],
   next: Option[String],
-  val translations: Seq[String],
-  errors: Errors
-) extends HasReferences {
+  val translations: Seq[String]
+) extends DocumentLike(collection) {
   override def toString: String = s"$collection:$name"
 
   private val tei: Tei = Tei.load(collection.teiDirectory, name)
 
-  override val references: Seq[Reference] = Reference.parseReferences(this, tei.tei, errors)
+  override val references: Seq[Reference] = parseReferences(tei.tei)
 
   override def isNames: Boolean = false
-
-  override def collectionReference: String = collection.reference
 
   override def viewer: String = "documentViewer"
 

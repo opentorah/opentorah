@@ -17,8 +17,7 @@ object Main {
     } yield new Collection(
       layout,
       directory,
-      Xml.load(directory, layout.collectionFileName),
-      errors
+      Xml.load(directory, layout.collectionFileName)
     )
 
     println("Collections:")

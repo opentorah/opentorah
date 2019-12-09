@@ -7,18 +7,16 @@ import Xml.Ops
 
 // TODO structure the TEI file better: the names, information, list reference, mentions...
 final case class Named(
+  container: Names,
   layout: Layout,
-  override val collectionReference: String,
   id: String,
   role: Option[String],
   names: Seq[Named.Name],
   content: Seq[Elem],
-  entity: Entity,
-  errors: Errors
-) extends HasReferences {
-  if (names.isEmpty) errors.error(s"No names for $id")
+  entity: Entity
+) extends DocumentLike(container) {
 
-  override val references: Seq[Reference] = content.flatMap(element => Reference.parseReferences(document = this, element, errors))
+  override val references: Seq[Reference] = content.flatMap(element => parseReferences(element))
 
   override def isNames: Boolean = true
 
@@ -56,6 +54,19 @@ object Named {
     }
   }
 
+  object Name {
+
+    def apply(entity: Entity, xml: Elem): Name = {
+      xml.check(entity.nameElement)
+
+      Name(
+        name = xml.text,
+        id = xml.attributeOption("xml:id"),
+        entity
+      )
+    }
+  }
+
   final def parse(
     layout: Layout,
     namesContainer: Names,
@@ -69,27 +80,18 @@ object Named {
       val id: Option[String] = xml.idOption
       if (id.isDefined && id.get != fileName) errors.error(s"Wrong id $id in file $fileName")
 
-      def parseName(element: Elem): Name = {
-        element.check(entity.nameElement)
-
-        Name(
-          name = element.text,
-          id = element.attributeOption("xml:id"),
-          entity
-        )
-      }
-
       val (nameElements: Seq[Elem], tail: Seq[Elem]) = xml.elements.span(_.label == entity.nameElement)
+      val names: Seq[Name] = for (nameElement <- nameElements) yield Name(entity, nameElement)
+      if (names.isEmpty) errors.error(s"No names for $id")
 
       Named(
+        namesContainer,
         layout,
-        collectionReference = namesContainer.head,
         id = fileName,
         role = xml.attributeOption("role"),
-        names = for (nameElement <- nameElements) yield parseName(nameElement),
+        names,
         content = tail.map(_.withoutNamespace),
-        entity,
-        errors
+        entity
       )
     }
 
@@ -102,8 +104,8 @@ object Named {
   private def mentions(references: Seq[Reference], toList: Elem): Elem = {
     val fromNames: Seq[Reference] = references.filter(_.source.isNames)
     val bySource: Seq[(String, Seq[Reference])] =
-      (if (fromNames.isEmpty) Seq.empty else Seq((fromNames.head.source.collectionReference, fromNames))) ++
-        references.filterNot(_.source.isNames).groupBy(_.source.collectionReference).toSeq.sortBy(_._1)
+      (if (fromNames.isEmpty) Seq.empty else Seq((fromNames.head.source.collection.reference, fromNames))) ++
+        references.filterNot(_.source.isNames).groupBy(_.source.collection.reference).toSeq.sortBy(_._1)
 
     <p rendition="mentions">
       {toList}
