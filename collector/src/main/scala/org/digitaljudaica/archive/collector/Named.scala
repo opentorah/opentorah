@@ -9,6 +9,7 @@ final case class Named(
   layout: Layout,
   namesContainer: Names,
   id: String,
+  role: Option[String],
   names: Seq[Name],
   content: Seq[Elem],
   entity: Entity,
@@ -51,7 +52,7 @@ final case class Named(
   }
 
   def toXml: Elem =
-    <named xml:id={id}>
+    <named xml:id={id} role={role.orNull}>
       {for (name <- names) yield name.toXml}
       {content}
     </named>
@@ -59,24 +60,35 @@ final case class Named(
 }
 
 object Named {
+
   final def parse(
     layout: Layout,
-    entity: Entity,
-    names: Names,
+    namesContainer: Names,
+    directory: File,
+    errors: Errors
+  ): Seq[Named] = {
+    for (fileName <- Util.filesWithExtensions(directory, ".xml").sorted)
+      yield parse(layout, namesContainer, directory, fileName, errors)
+  }
+
+  private def parse(
+    layout: Layout,
+    namesContainer: Names,
     listDirectory: File,
     fileName: String,
     errors: Errors
   ): Named = {
     val xml: Elem = Xml.load(listDirectory, fileName)
-    xml.check(entity.element)
+    val entity: Entity = Entity.forElement(xml.label).get
     val id: Option[String] = xml.attributeOption("xml:id")
     if (id.isDefined && id.get != fileName) errors.error(s"Wrong id $id in file $fileName")
 
     val (nameElements: Seq[Elem], tail: Seq[Elem]) = xml.elements.span(_.label == entity.nameElement)
     Named(
       layout,
-      names,
+      namesContainer,
       id = fileName,
+      role = xml.attributeOption("role"),
       names = Name.parseNames(entity, nameElements, errors),
       content = tail.map(_.withoutNamespace),
       entity,

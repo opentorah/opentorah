@@ -115,9 +115,15 @@ object Util {
     for (file <- directory.listFiles()) file.delete()
   }
 
-  def removeConsecutiveDuplicates[T](seq: Seq[T]): Seq[T] = seq match {
-    case Nil => Nil
-    case x :: y :: xs if x == y => removeConsecutiveDuplicates(y :: xs)
-    case x :: xs => x +: removeConsecutiveDuplicates(xs)
+  def removeConsecutiveDuplicates[T](seq: Seq[T]): Seq[T] = removeConsecutiveDuplicates(Seq.empty, seq.toList)
+
+  def removeConsecutiveDuplicates[T](result: Seq[T], seq: List[T]): Seq[T] = seq match {
+    case x :: y :: xs =>
+      removeConsecutiveDuplicates(
+        if (x == y) result else result :+ x,
+        y :: xs
+      )
+    case x :: Nil => result :+ x
+    case Nil => result
   }
 }

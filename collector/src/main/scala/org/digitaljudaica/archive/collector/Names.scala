@@ -1,26 +1,20 @@
 package org.digitaljudaica.archive.collector
 
-import java.io.File
-
 import scala.xml.{Elem, Text}
 import Xml.Ops
 
 final class Names(layout: Layout, errors: Errors) {
-  val xml: Elem = Xml.load(layout.namesDirectory, layout.namesFileName).check("names")
+  val nameds: Seq[Named] = Named.parse(layout, namesContainer = this, layout.namesDirectory, errors)
+
+  val xml: Elem = Xml.load(layout.docs, layout.namesListsFileName).check("names")
   val elements: Seq[Elem] = xml.elements
   val head: String = elements.head.check("head").text
 
-  val lists: Seq[Nameds] = elements.tail.map(element => Nameds.parse(layout, this, element, layout.namesDirectory, errors))
-
-  for (orphanDirectoryName <-
-         layout.namesDirectory.listFiles.filter(_.isDirectory).map(_.getName).toSet -- lists.map(_.name).toSet)
-    errors.error(s"Orphan names directory: $orphanDirectoryName")
+  val lists: Seq[NamesList] = elements.tail.map(element => NamesList.parse(element, nameds))
 
   for ((id, nameds) <- lists.groupBy(_.name).filter(_._2.length != 1)) {
     errors.error(s"Duplicate list ids: $id - $nameds")
   }
-
-  private val nameds: Seq[Named] = lists.flatMap(_.nameds)
 
   for ((id, nameds) <- nameds.groupBy(_.id).filter(_._2.length != 1)) {
     errors.error(s"Duplicate named ids: $id - $nameds")
@@ -47,9 +41,13 @@ final class Names(layout: Layout, errors: Errors) {
 
     errors.check()
 
+    val nonEmptyLists = lists.filterNot(_.nameds.isEmpty)
     val content: Seq[Elem] =
-      <p>{for (list <- lists) yield <l><ref target={layout.namedUrl(list.name)} role="namesViewer">{list.head}</ref></l>}</p> +:
-         (for (list <- lists) yield list.addMentions(references).toXml)
+      <p>{
+        for (list <- nonEmptyLists)
+          yield <l><ref target={layout.namedUrl(list.name)} role="namesViewer">{list.head}</ref></l>}
+      </p> +:
+         (for (list <- nonEmptyLists) yield list.addMentions(references).toXml)
 
     Util.writeTei(
       directory = layout.namesFileDirectory,

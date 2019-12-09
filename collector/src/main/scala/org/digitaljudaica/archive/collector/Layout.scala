@@ -23,6 +23,8 @@ final class Layout(val docs: File) {
 
   val namesFileName: String = "names"
 
+  val namesListsFileName: String = "names-lists"
+
   val namesUrl: String = s"/$namesFileName.html"
 
   def namedUrl(id: String): String = s"/$namesFileName.html#$id"
