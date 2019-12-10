@@ -99,7 +99,7 @@ object Xml {
 
   private val prettyPrinter: PrettyPrinter = new PrettyPrinter(120, 2)
 
-  private val join: Set[String] = Set(".", ",", ";", ":", "\"")
+  private val join: Set[String] = Set(".", ",", ";", ":", "\"", ")")
 
   def format(elem: Elem): String = {
     @scala.annotation.tailrec
