@@ -37,26 +37,15 @@ object Main {
     names.processReferences(collections.flatMap(_.references))
   }
 
-  private def writeIndex(collections: Seq[Collection], layout: Layout): Unit = {
-    val collectionsContent: Elem =
-      <list type="bulleted">{
-        for (collection <- collections.filter(_.publish)) yield
-          <item>
-            <ref target={layout.collectionUrl(collection.directoryName)}
-                 role="collectionViewer">{collection.reference}</ref>: {collection.title}
-            {collection.caseAbstract}
-          </item>}
-      </list>
-
-    Util.writeTei(
-      directory = layout.docs,
-      fileName = layout.indexFileName,
-      head = Some(Text("Дела")),
-      content = collectionsContent,
-      target = "collectionViewer",
-      yaml = Seq("windowName" -> "collectionViewer")
-    )
-  }
+  private def writeIndex(collections: Seq[Collection], layout: Layout): Unit = Util.writeTei(
+    directory = layout.docs,
+    fileName = layout.indexFileName,
+    head = Some(Text("Дела")),
+    content =
+      <list type="bulleted">{for (collection <- collections.filter(_.publish)) yield toXml(collection, layout)}</list>,
+    target = "collectionViewer",
+    yaml = Seq("windowName" -> "collectionViewer")
+  )
 
   private def writeCollectionsTree(collections: Seq[Collection], layout: Layout): Unit = {
     val byArchive: Map[String, Seq[Collection]] = collections.groupBy(_.archive.getOrElse(""))
@@ -65,14 +54,7 @@ object Main {
         for (archive <- byArchive.keys.toList.sorted) yield {
           <item>
             <p>[{archive}]</p>
-            <list type="bulleted">{
-              for (collection <- byArchive(archive)) yield
-                <item>
-                  <ref target={layout.collectionUrl(collection.directoryName)}
-                       role="collectionViewer">{collection.archiveCase}</ref>: {collection.title}
-                  {collection.caseAbstract}
-                </item>}
-            </list>
+            <list type="bulleted">{for (collection <- byArchive(archive)) yield toXml(collection, layout)}</list>
           </item>}}
       </list>
 
@@ -80,8 +62,21 @@ object Main {
       directory = layout.docs,
       fileName = layout.collectionsFileName,
       head = Some(Text("Архивы")),
-      content = collectionsContent,
+      content = <list>{
+        for (archive <- byArchive.keys.toList.sorted) yield {
+          <item>
+            <p>[{archive}]</p>
+            <list type="bulleted">{for (collection <- byArchive(archive)) yield toXml(collection, layout)}</list>
+          </item>}}
+      </list>,
       target = "collectionViewer"
     )
   }
+
+  private def toXml(collection: Collection, layout: Layout): Elem =
+    <item>
+      <ref target={layout.collectionUrl(collection.directoryName)}
+           role="collectionViewer">{collection.reference}</ref>: {collection.title}
+      {collection.caseAbstract}
+    </item>
 }
