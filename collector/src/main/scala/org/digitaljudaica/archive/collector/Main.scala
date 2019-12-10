@@ -10,7 +10,6 @@ object Main {
     val docs: File = new File(args(0))
     println(s"docs: $docs")
     val layout: Layout = new Layout(docs)
-    val errors: Errors = new Errors
 
     val collections: Seq[Collection] = for {
       directory <- layout.collections.listFiles.toSeq.filter(_.isDirectory)
@@ -25,13 +24,10 @@ object Main {
       s"  ${collection.directoryName}: ${Xml.spacedText(collection.title)}\n"
     }.mkString)
 
-    errors.check()
-
     println("Processing collections.")
     collections.foreach(_.process())
 
-    errors.check()
-
+    // Collections tree
     val byArchive: Map[String, Seq[Collection]] = collections.sorted.groupBy(_.archive.getOrElse(""))
     val collectionsContent: Elem =
       <list>{
@@ -57,9 +53,7 @@ object Main {
     )
 
     println("Processing name references.")
-    val names: Names = new Names(layout, errors)
+    val names: Names = new Names(layout.namesDirectory, layout)
     names.processReferences(collections.flatMap(_.references))
-
-    errors.check()
   }
 }

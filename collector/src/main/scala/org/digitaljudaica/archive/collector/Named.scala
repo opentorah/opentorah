@@ -1,20 +1,33 @@
 package org.digitaljudaica.archive.collector
 
-import java.io.File
-
 import scala.xml.{Elem, Node, Text}
 import Xml.Ops
 
 // TODO structure the TEI file better: the names, information, list reference, mentions...
-final case class Named(
+final class Named(
+  rawXml: Elem,
+  fileName: String,
   container: Names,
   layout: Layout,
-  id: String,
-  role: Option[String],
-  names: Seq[Named.Name],
-  content: Seq[Elem],
-  entity: Entity
+  errors: Errors
 ) extends DocumentLike(container) {
+
+  private val xml: Elem = if (rawXml.label != Tei.topElement) rawXml else new Tei(rawXml).body.elements.head
+
+  val entity: Entity = Entity.forElement(xml.label).get
+
+  private val idOption: Option[String] = xml.idOption
+  if (idOption.isDefined && idOption.get != fileName) errors.error(s"Wrong id $id in file $fileName")
+  def id: String = fileName
+
+  val role: Option[String] = xml.attributeOption("role")
+
+  private val (nameElements: Seq[Elem], tail: Seq[Elem]) = xml.elements.span(_.label == entity.nameElement)
+
+  private val names: Seq[Name] = for (nameElement <- nameElements) yield new Name(entity, nameElement)
+  if (names.isEmpty) errors.error(s"No names for $id")
+
+  private val content: Seq[Elem] = tail.map(_.withoutNamespace)
 
   override val references: Seq[Reference] = content.flatMap(element => parseReferences(element))
 
@@ -42,61 +55,6 @@ final case class Named(
 }
 
 object Named {
-
-  final case class Name(
-    name: String,
-    id: Option[String],
-    entity: Entity
-  ) {
-    def toXml: Elem = {
-      <name xml:id={id.orNull}>{name}</name>
-        .copy(label = entity.nameElement)
-    }
-  }
-
-  object Name {
-
-    def apply(entity: Entity, xml: Elem): Name = {
-      xml.check(entity.nameElement)
-
-      Name(
-        name = xml.text,
-        id = xml.attributeOption("xml:id"),
-        entity
-      )
-    }
-  }
-
-  final def parse(
-    layout: Layout,
-    namesContainer: Names,
-    directory: File,
-    errors: Errors
-  ): Seq[Named] = {
-    def parse(fileName: String): Named = {
-      val rawXml: Elem = Xml.load(directory, fileName)
-      val xml: Elem = if (rawXml.label != Tei.topElement) rawXml else new Tei(rawXml).body.elements.head
-      val entity: Entity = Entity.forElement(xml.label).get
-      val id: Option[String] = xml.idOption
-      if (id.isDefined && id.get != fileName) errors.error(s"Wrong id $id in file $fileName")
-
-      val (nameElements: Seq[Elem], tail: Seq[Elem]) = xml.elements.span(_.label == entity.nameElement)
-      val names: Seq[Name] = for (nameElement <- nameElements) yield Name(entity, nameElement)
-      if (names.isEmpty) errors.error(s"No names for $id")
-
-      Named(
-        namesContainer,
-        layout,
-        id = fileName,
-        role = xml.attributeOption("role"),
-        names,
-        content = tail.map(_.withoutNamespace),
-        entity
-      )
-    }
-
-    for (fileName <- Util.filesWithExtensions(directory, extension = ".xml").sorted) yield parse(fileName)
-  }
 
   private def isMentions(element: Elem): Boolean =
     (element.label == "p") && element.attributeOption("rendition").contains("mentions")

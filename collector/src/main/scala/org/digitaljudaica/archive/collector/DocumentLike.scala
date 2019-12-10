@@ -19,5 +19,5 @@ abstract class DocumentLike(val collection: CollectionLike) {
     for {
       entity <- Entity.values
       elem <- xml.descendants(entity.nameElement)
-    } yield Reference(this, elem, entity)
+    } yield new Reference(this, entity, elem)
 }

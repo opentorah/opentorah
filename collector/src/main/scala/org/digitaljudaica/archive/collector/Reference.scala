@@ -3,14 +3,16 @@ package org.digitaljudaica.archive.collector
 import scala.xml.Elem
 import Xml.Ops
 
-final case class Reference(
-  source: DocumentLike,
-  name: String,
-  id: Option[String],
-  role: Option[String],
-  ref: Option[String],
-  entity: Entity
+final class Reference(
+  val source: DocumentLike,
+  val entity: Entity,
+  xml: Elem
 ) {
+  val name: String = xml.text
+  val id: Option[String] = xml.attributeOption("xml:id")
+  val role: Option[String] = xml.attributeOption("role")
+  val ref: Option[String] = xml.attributeOption("ref")
+
   override def toString: String = source.toString
 
   def check(names: Names, errors: Errors): Unit = {
@@ -26,16 +28,4 @@ final case class Reference(
   def toXml: Elem =
     <name ref={ref.orNull} xml:id={id.orNull} role={role.orNull}>{name}</name>
       .copy(label = entity.nameElement)
-}
-
-object Reference {
-
-  def apply(source: DocumentLike, xml: Elem, entity: Entity): Reference = Reference(
-    source,
-    name = xml.text,
-    id = xml.attributeOption("xml:id"),
-    role = xml.attributeOption("role"),
-    ref = xml.attributeOption("ref"),
-    entity
-  )
 }
