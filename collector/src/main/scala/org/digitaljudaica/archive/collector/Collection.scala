@@ -17,6 +17,8 @@ final class Collection(
 
   val isBook: Boolean = xml.attributeOption("isBook").contains("true")
 
+  val publish: Boolean = xml.attributeOption("publish").contains("true")
+
   val teiDirectory: File = layout.tei(directory)
 
   def archive: Option[String] = xml.optionalChild("archive").map(_.text)
@@ -28,6 +30,8 @@ final class Collection(
   def archiveCase: String = prefix.getOrElse("") + number.map(_.toString).getOrElse("")
 
   override def reference: String = archive.fold(archiveCase)(archive => archive + " " + archiveCase)
+
+  def caseAbstract: Elem = xml.oneChild("abstract")
 
   override def compare(that: Collection): Int = {
     val archiveComparison: Int = compare(archive, that.archive)
