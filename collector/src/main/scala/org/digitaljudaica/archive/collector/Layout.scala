@@ -6,9 +6,9 @@ final class Layout(val docs: File) {
 
   private def docs(fileName: String): File = new File(docs, fileName)
 
-  val collectionsFileName: String = "collections"
+  val collectionsFileName: String = "index"
 
-  // TODO Note: also hard-coded in 'index.md'!
+  // TODO Note: also hard-coded in 'index.xml'!
   private val collectionsDirectoryName: String = "collections"
 
   val collections: File = docs(collectionsDirectoryName)
