@@ -67,14 +67,6 @@ final class Collection(
   checkPages()
 
   private def checkPages(): Unit = {
-    // Check for duplicates
-    val name2page = collection.mutable.Map[String, Page]()
-    for (page <- pages) {
-      // allow duplicates in consecutive documents
-      //   if (name2page.contains(page.name)) throw new IllegalArgumentException(s"Duplicate page: ${page.name}")
-      name2page.put(page.n, page)
-    }
-
     // TODO with images on a separate website (facsimiles.alter-rebbe.org), this has to be re-worked...
 //    // Check that all the images are accounted for
 //    val imageNames: Set[String] =
