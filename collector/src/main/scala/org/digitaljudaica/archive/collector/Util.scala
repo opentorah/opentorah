@@ -53,7 +53,7 @@ object Util {
   def writeTei(
     directory: File,
     fileName: String,
-    head: Option[Node],
+    head: Option[Node], // TODO do not supply where not needed
     content: Seq[Node],
     style: Option[String] = None,
     target: String,
