@@ -38,10 +38,9 @@ object Main {
   }
 
   private def writeIndex(collections: Seq[Collection], layout: Layout): Unit = {
-    val byArchive: Map[String, Seq[Collection]] = collections.filter(_.publish).groupBy(_.archive.getOrElse(""))
     val collectionsContent: Elem =
       <list type="bulleted">{
-        for (collection <- collections) yield
+        for (collection <- collections.filter(_.publish)) yield
           <item>
             <ref target={layout.collectionUrl(collection.directoryName)}
                  role="collectionViewer">{collection.reference}</ref>: {collection.title}
