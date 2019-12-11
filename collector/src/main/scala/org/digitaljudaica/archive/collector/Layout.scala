@@ -40,6 +40,8 @@ final class Layout(val docs: File) {
   // TODO Note: also hard-coded in _layouts/tei.html!
   val facsDirectoryName: String = "facs" // facsimile viewers
 
+  val documentsDirectoryName: String = "documents"
+
   def facs(collectionDirectory: File): File = new File(collectionDirectory, facsDirectoryName)
 
   val teiDirectoryName: String = "tei"
