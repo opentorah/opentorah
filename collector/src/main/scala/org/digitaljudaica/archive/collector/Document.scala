@@ -76,7 +76,7 @@ final class Document(
       <div class="facsimileViewer">
         <div class="facsimileScroller">{
           for (page: Page <- pages.filter(_.isPresent); n = page.n) yield {
-            <a target="documentViewer" href={s"../documents/$name.html#p$n"}>
+            <a target="documentViewer" href={s"../${layout.documentsDirectoryName}/$name.html#p$n"}>
               <figure>
                 <img xml:id={s"p$n"} alt={s"facsimile for page $n"} src={page.facs.orNull}/>
                 <figcaption>{n}</figcaption>
@@ -88,7 +88,10 @@ final class Document(
     Util.writeWithYaml(
       file = Util.htmlFile(facsDirectory, name),
       layout = "default",
-      yaml = navigation,
+      yaml = Seq(
+        "transcript" -> s"'../${layout.documentsDirectoryName}/$name.html'"
+      )
+        ++ navigation,
       content = Seq(facsimilePages.format)
     )
   }
