@@ -27,7 +27,7 @@ object Main {
     println("Processing collections.")
     collections.foreach(_.process())
 
-    // Collection lists
+    println("Writing collection lists.")
     val collectionsSorted = collections.sorted
     writeCollectionsTree(collectionsSorted, layout)
     writeIndex(collectionsSorted, layout)
@@ -41,23 +41,13 @@ object Main {
     directory = layout.docs,
     fileName = layout.indexFileName,
     head = Some(Text("Дела")),
-    content =
-      <list type="bulleted">{for (collection <- collections.filter(_.publish)) yield toXml(collection, layout)}</list>,
+    content = <list type="bulleted">{for (collection <- collections.filter(_.publish)) yield toXml(collection, layout)}</list>,
     target = "collectionViewer",
     yaml = Seq("windowName" -> "collectionViewer")
   )
 
   private def writeCollectionsTree(collections: Seq[Collection], layout: Layout): Unit = {
     val byArchive: Map[String, Seq[Collection]] = collections.groupBy(_.archive.getOrElse(""))
-    val collectionsContent: Elem =
-      <list>{
-        for (archive <- byArchive.keys.toList.sorted) yield {
-          <item>
-            <p>[{archive}]</p>
-            <list type="bulleted">{for (collection <- byArchive(archive)) yield toXml(collection, layout)}</list>
-          </item>}}
-      </list>
-
     Util.writeTei(
       directory = layout.docs,
       fileName = layout.collectionsFileName,
@@ -76,7 +66,7 @@ object Main {
   private def toXml(collection: Collection, layout: Layout): Elem =
     <item>
       <ref target={layout.collectionUrl(collection.directoryName)}
-           role="collectionViewer">{collection.reference}</ref>: {collection.title}
+           role="collectionViewer">{collection.reference + ": " + Xml.spacedText(collection.title)}</ref>
       {collection.caseAbstract}
     </item>
 }
