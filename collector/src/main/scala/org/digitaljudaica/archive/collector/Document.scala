@@ -28,7 +28,9 @@ final class Document(
 
   def author: Option[Elem] = tei.author
 
-  def transcriber: Option[Elem] = tei.editors.find(_.attributeOption("role").contains("transcriber"))
+  def transcribers: Seq[Elem] = tei.editors
+    .filter(_.attributeOption("role").contains("transcriber"))
+    .flatMap(_.optionalChild("persName"))
 
   def date: Option[String] = tei.date
 
