@@ -163,7 +163,7 @@ object Collection {
     }),
 
     Column("Кто", "author", { document: Document =>
-      document.author.fold[Seq[Node]](Text(""))(_.withoutNamespace.child)
+      document.author.fold[Seq[Node]](Text(""))(author => multi(author.withoutNamespace.child))
     }),
 
     Column("Кому", "addressee",  _.addressee.fold[Seq[Node]](Text(""))(addressee =>
@@ -188,8 +188,14 @@ object Collection {
            rendition={if (page.isPresent) "page" else "missing-page"}>{page.displayName}</ref>
     }),
 
-    Column("Расшифровка", "transcriber", { document: Document =>
-      document.transcriber.fold[Seq[Node]](Text(""))(_.withoutNamespace.child)
+    Column("Расшифровка", "transcriber", { document: Document => multi(document.transcribers.map(_.withoutNamespace))
     })
   )
+
+  private def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
+    case Nil => Nil
+    case n :: Nil => Seq(n)
+    case n :: ns => Seq(n, Text(", ")) ++ multi(ns)
+    case n => n
+  }
 }
