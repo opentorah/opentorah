@@ -1,10 +1,11 @@
 package org.podval.calendar.astronomy
 
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.podval.calendar.angles.Angles
-import org.scalatest.{FlatSpec, Matchers}
 import org.podval.calendar.jewish.Sun
 
-class SunLongitudeMeanTest extends FlatSpec with Matchers {
+class SunLongitudeMeanTest extends AnyFlatSpec with Matchers {
 
   behavior of "Mean Sun Longitude"
 

@@ -1,6 +1,7 @@
 package org.podval.calendar.jewish
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks.{Table, forAll}
 import Jewish.{Day, Month, Year}
 import Jewish.TimeVector
@@ -11,8 +12,7 @@ import org.podval.calendar.gregorian.Gregorian
 import Gregorian.Month.Name._
 import org.podval.calendar.jewish
 
-
-final class DatesTest extends FlatSpec with Matchers {
+final class DatesTest extends AnyFlatSpec with Matchers {
 
   "Known dates" should "have correct day of the week" in {
     Year(5772).month(Marheshvan).day(24).name shouldBe Sheni

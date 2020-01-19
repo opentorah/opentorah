@@ -1,9 +1,10 @@
 package org.podval.calendar.astronomy
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.podval.calendar.angles.Angles.Rotation
 
-class MoonAnomalyMeanTest extends FlatSpec with Matchers {
+class MoonAnomalyMeanTest extends AnyFlatSpec with Matchers {
   behavior of "Mean Moon Anomaly"
 
   it should "calculate for 29 days in two steps" in {

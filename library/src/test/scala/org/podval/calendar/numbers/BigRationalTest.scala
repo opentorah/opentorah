@@ -1,13 +1,14 @@
 package org.podval.calendar.numbers
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary.arbitrary
 
 import BigRational.{one, oneHalf, zero}
 
-final class BigRationalTest extends FlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {
+final class BigRationalTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {
   import BigRationalTest._
 
   val minusThreeHalfs: BigRational = BigRational(-3, 2)

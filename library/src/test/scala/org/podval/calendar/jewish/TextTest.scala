@@ -1,6 +1,7 @@
 package org.podval.calendar.jewish
 
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 import org.podval.calendar.times.Times.{hoursPerDay, hoursPerHalfDay, momentsPerPart, partsPerHour}
 import Jewish.{Day, Month, TimeVector, Year, range, week}
 import LeapYearsCycle.{leapYear, normalYear}
@@ -11,7 +12,7 @@ import org.podval.calendar.dates.YearsCycle
 /**
   * Tests based on the statements from the text itself.
   */
-class TextTest extends FunSpec with Matchers {
+class TextTest extends AnyFunSpec with Matchers {
   describe("Chapter 6") {
     describe("Law 2: Time Units") {
       it("hours") {

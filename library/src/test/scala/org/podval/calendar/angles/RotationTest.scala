@@ -1,11 +1,12 @@
 package org.podval.calendar.angles
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import Angles.{Position, Rotation}
 
-class RotationTest extends FlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {
+class RotationTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {
 
   behavior of "Rotation"
 

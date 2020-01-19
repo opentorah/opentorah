@@ -1,9 +1,10 @@
 package org.podval.judaica.tanach
 
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.podval.judaica.tanach.Custom._
-import org.scalatest.{FlatSpec, Matchers}
 
-final class CustomTest extends FlatSpec with Matchers {
+final class CustomTest extends AnyFlatSpec with Matchers {
 
   "minimize()" should "remove redundant children" in {
     check(

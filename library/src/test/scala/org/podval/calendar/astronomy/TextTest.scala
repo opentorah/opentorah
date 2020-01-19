@@ -1,6 +1,7 @@
 package org.podval.calendar.astronomy
 
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 import org.podval.calendar.angles.Angles
 import Angles.{Position, Rotation, headRange, range}
 import org.podval.calendar.jewish.{Jewish, LeapYearsCycle}
@@ -8,7 +9,7 @@ import Jewish.{Day, Month, Year}
 import org.podval.calendar.dates.YearsCycle
 import org.podval.calendar.numbers.BigRational
 
-class TextTest extends FunSpec with Matchers {
+class TextTest extends AnyFunSpec with Matchers {
   describe("Chapter 11") {
     describe("Law 7") {
       it("angle units") {

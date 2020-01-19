@@ -1,13 +1,14 @@
 package org.podval.calendar.numbers
 
 import cats.Eq
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import algebra.CommutativeGroup
 import algebra.laws.GroupLaws
 import org.scalacheck.{Arbitrary, Gen}
-import org.typelevel.discipline.scalatest.Discipline
+import org.scalatestplus.scalacheck.Checkers
+import org.typelevel.discipline.scalatest.FunSuiteDiscipline
 
-class NumbersLawsTest[N <: Numbers[N]](numberSystem: N) extends FunSuite with Discipline {
+class NumbersLawsTest[N <: Numbers[N]](numberSystem: N) extends AnyFunSuite with FunSuiteDiscipline with Checkers {
   val headRange: Int = numberSystem.headRangeOpt.getOrElse(Int.MaxValue)
   val ranges: Seq[Int] = headRange +: numberSystem.ranges
 

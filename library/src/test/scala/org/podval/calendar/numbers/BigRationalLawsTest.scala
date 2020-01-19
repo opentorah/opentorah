@@ -1,14 +1,15 @@
 package org.podval.calendar.numbers
 
 import cats.Eq
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import algebra.ring.{AdditiveMonoid, Field}
 import algebra.laws.RingLaws
 import org.scalacheck.Arbitrary
 import org.scalactic.anyvals.PosZDouble
-import org.typelevel.discipline.scalatest.Discipline
+import org.scalatestplus.scalacheck.Checkers
+import org.typelevel.discipline.scalatest.FunSuiteDiscipline
 
-class BigRationalLawsTest extends FunSuite with Discipline {
+class BigRationalLawsTest extends AnyFunSuite with FunSuiteDiscipline with Checkers {
   import BigRationalTest._
 
   // we discard zero denominators, so we need a higher maxDiscardedFactor than the default 5.0:

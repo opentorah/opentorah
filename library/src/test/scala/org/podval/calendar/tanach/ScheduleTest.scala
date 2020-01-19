@@ -1,6 +1,7 @@
 package org.podval.calendar.tanach
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.podval.calendar.jewish.{Jewish, YearType}
 import YearType._
 import Jewish.{Day, Year}
@@ -8,7 +9,7 @@ import org.podval.judaica.tanach.Parsha
 import org.podval.judaica.tanach.Parsha._
 import SpecialDay._
 
-final class ScheduleTest extends FlatSpec with Matchers {
+final class ScheduleTest extends AnyFlatSpec with Matchers {
 
   "Torah readings" should "be assigned correctly" ignore {
     val start = System.currentTimeMillis()

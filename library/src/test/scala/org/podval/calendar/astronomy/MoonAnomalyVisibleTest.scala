@@ -1,9 +1,10 @@
 package org.podval.calendar.astronomy
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.podval.calendar.angles.Angles.Position
 
-class MoonAnomalyVisibleTest extends FlatSpec with Matchers {
+class MoonAnomalyVisibleTest extends AnyFlatSpec with Matchers {
 
   behavior of "Anomaly"
 
