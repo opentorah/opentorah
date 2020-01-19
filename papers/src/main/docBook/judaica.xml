@@ -99,6 +99,7 @@
                 </listitem>
             </itemizedlist>
         </section>
+
         <section>
             <title>Hierarchical Structure</title>
             <para>Store hierarchical structure of texts and use it for references and retrieval of
@@ -109,7 +110,7 @@
                 Shulchan Aruch: division, chapter, paragraph, small paragraph...</para>
             <para>Store page (and line) breaks for multiple editions of the same text.</para>
             <para>A text can have multiple hierarchical structures, some of which can be incompatible with one
-                another: parsha can end inside a verse, weekly portion - iside a chapter, page break can be inside a
+                another: parsha can end inside a verse, weekly portion - inside a chapter, page break can be inside a
                 sentence...</para>
             <para>Some texts have the same structure although the are not commentaries on one another, e.g.:</para>
             <itemizedlist>
@@ -124,15 +125,18 @@
                 </listitem>
             </itemizedlist>
             <para>We need to be able to combine texts with the same structure - e.g., parallel translation.
-                We need to be able to show differences between different editions of the same text - in a form of a text :).</para>
+                Specific edition gets chosen based on the user preferences: langiage, presence of vowel points etc.
+                We need to be able to show differences between different editions of the same text - in a form of a text,
+                with differences highlighted :).</para>
         </section>
+
         <section>
             <title>References</title>
             <para>Texts reference one another. A reference links point or interval in one text with a point or an
                 interval in another (or the same) text.</para>
             <para>References can be external to the texts they link, e.g., parallel statements in Talmud or
                 sources in Shulchan Aruch.</para>
-            <para>References can have different semantics, which we store:</para>
+            <para>References can have different semantics, which we should store:</para>
             <itemizedlist>
                 <listitem>
                     <para>one end comments on the other</para>
@@ -147,12 +151,14 @@
             <para>References can have different "strengths".</para>
             <para>References should be reversable: enumerate references that end in a given interval.</para>
         </section>
+
         <section>
             <title>Corrections</title>
             <para>Correction of one text by another is a specially-handled type of reference.</para>
             <para>Texts can correct other texts (Rashi - Talmud) or themselves (Talmud - quotes from early sources).
                 Text can correct references (from Talmud to Tanach) and structure of another (break up of laws in Rambam).</para>
         </section>
+
         <section>
             <title>Attribution</title>
             <para>We need to store many versions ("editions") of the same text.
@@ -160,14 +166,16 @@
             <para>We need to develop a theory of attribution for Talmud etc.: "A says in the name of B in the name of C",
                 "two students of B say in accordance to B's views". We should be able to retrieve a text "as seen through
                 the eyes of A".</para>
-            <para>So: Chumash, Keter edition, according to Peter; (Rambam through the eyes of Rosh) accordinf to Paul.</para>
+            <para>So: Chumash, Keter edition, according to Peter; ((Rambam through the eyes of Rosh) Romm edition) according to Paul.</para>
             <para>Reference to a text that has different "editions" should be resolved in accordance with the user preferences:
                 language, presence of vowels etc.</para>
         </section>
+
         <section>
             <title>Versioning</title>
             <para>We need to store the history of changes.</para>
         </section>
+
         <section>
             <title>Search</title>
             <para>A query language provided by the API should allows selection of a subset of texts and
@@ -198,11 +206,11 @@
                     <para>by "crowd rating"</para>
                 </listitem>
             </itemizedlist>
-            <para>A paper - "Information retrieval from annotated texts":
-                A.S. Fraenkel, S.T. Klein. J.,
-                http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/annot.ps
+            <para>See <link xlink:href="http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/annot.ps">"Information retrieval from annotated texts"</link>
+                by A.S. Fraenkel, S.T. Klein. J.
             </para>
         </section>
+
         <section>
             <title>Individualization</title>
             <itemizedlist>
@@ -213,10 +221,12 @@
                     <para>Daily study schedule with a list of what you "owe"</para>
                 </listitem>
                 <listitem>
-                    <para>Notebook - selections of text fragments via search of references</para>
+                    <para>Notebook - selections of text fragments via search of references.
+                    Compounding. Storage. Printing.</para>
                 </listitem>
             </itemizedlist>
         </section>
+
         <section>
             <title>Crowdsourcing</title>
             <itemizedlist>
@@ -235,15 +245,17 @@
         </section>
         <section>
             <title>Miscellaneous</title>
-            <para>Integration with blogs etc.</para>
-            <para>Discussion forums</para>
-            <para>Digital libraries</para>
-            <para>User levels: guest, registered, editor; "editor, make an editor"; reputation.</para>
-            <para>Protection from sabotage: Wikipedia</para>
-            <para>Domain name: Koritz suggested "OpenTorah" and "ToratMoshe".</para>
+            <itemizedlist>
+                <listitem><para>Integration with blogs etc.</para></listitem>
+                <listitem><para>Discussion forums</para></listitem>
+                <listitem><para>Digital libraries</para></listitem>
+                <listitem><para>User levels: guest, registered, editor; "editor, make an editor"; reputation.</para></listitem>
+                <listitem><para>Protection from sabotage: Wikipedia</para></listitem>
+                <listitem><para>Domain name: Koritz suggested "OpenTorah" (.org: $550) and "ToratMoshe" (.org: taken).</para></listitem>
+            </itemizedlist>
         </section>
         <section>
-            <title>Интерфейс</title>
+            <title>Interface</title>
             <para>Передвижение по текстам - горизонтальное и через таги (смысловое); поиск; выбор
                 "фокуса": даф/сугъя; заметки: внести/просмотреть мои; недельная глава, последние и
                 ближайшие шиурим, прошлые поиски юзера, последние поступления и т.д. От текста
@@ -266,36 +278,37 @@
                 цензурирования, чтобы досов не спугнуть)</para>
             <para>Презентации.</para>
         </section>
+        <section>
+            <title>Web API</title>
+            <para>Everything doable using the interface should be doable using the Web API.</para>
+            <itemizedlist>
+                <listitem><para>Retrieval and modification via various protocols, primarily - HTTP
+                    (AtomPub, WebDav, XML-RPC?)</para></listitem>
+                <listitem><para>Retrieval and modification in various formats, primarily - TEI.</para></listitem>
+                <listitem><para>Add/change; add/change metadata.</para></listitem>
+                <listitem>It should be possible to work with the text in a text editor.</listitem>
+            </itemizedlist>
+        </section>
 
         <section>
-            <title>Комерциализуемость/Привлекательность</title>
+            <title>Attraction and Commercialization</title>
             <section>
-                <title>Чувство вины</title>
-                <para>Наша система должна стать частью еврейской культуры. Бохур, не взявший шефства
-                    над листом талмуда или главой ришона станет изгоем. С издательством, не
-                    подарившим нам 10 электронных текстов никто не будет иметь дела. Все спонсоры
-                    будут наши - у нас видно всему свету. Заповедь о написании Торы выполнять ходить
-                    будут к нам. Хаскомос давать будут через нас. Хидушим печатать будут у нас - как
-                    физики в arXivе.</para>
-                <para>Увековечивание себя (или других людей) на страницах проекта.</para>
+                <title>Guilt</title>
+                <para>Our system must become a part of Jewish culture.
+                    A bochur that does not curate a folio of Talmud or a chapter of a rishon will be ostracized.
+                    Nobody will deal with a publisher that did not gift us 10 electronic texts.
+                    All sponsors will be ours: we are visible across the world.
+                    We will be the place to perform a commandment of writing the Scroll, give haskomos, print hiddushim
+                    (like the physicists do in arXivе). And to leave a memory of yourself or other people.</para>
             </section>
             <section>
-                <title>Градуированные платные услуги</title>
-                <para>Предоставление дополнительных услуг за деньги. Например, хорошая печать. Или -
-                    доступ к "супервыверенным" текстам.</para>
+                <title>Graduated paid services</title>
+                <para>Additional services for money: quality printing, access to the "super-proofread" texts.</para>
+                <para>Access based on the purchase of the print book.</para>
             </section>
             <section>
                 <title>Google</title>
-                <para>Индивидуализация: GData.</para>
-                <para>Сканы.</para>
-                <para>Хорошо бы - их хостинг.</para>
-                <para>Ещё лучше - за их деньги.</para>
-            </section>
-            <section>
-                <title>Разное</title>
-                <para>Ксюхина идея: Юристы как рынок для серьезных денег?</para>
-                <para>Патент</para>
-                <para>Довесок к бумажной книге</para>
+                <para>They can host and pay for this - but looks like they already did Sefaria :)</para>
             </section>
         </section>
 
@@ -308,11 +321,6 @@
                 <date>1997</date>
                 <biblioid class="uri">http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/trs.ps</biblioid>
                 <biblioid class="uri">http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/pha.ps</biblioid>
-            </biblioentry>
-
-            <biblioentry xml:id="CAB"><title>The Cathedral and the Bazaar</title>
-                <author><personname><firstname>Eric</firstname><othername>S</othername><surname>Raymond</surname></personname> </author>
-                <biblioid class="uri">http://www.catb.org/~esr/writings/homesteading</biblioid>
             </biblioentry>
 
             <biblioentry xml:id="Ontology">
@@ -340,16 +348,6 @@
             </biblioentry>
 
             <biblioentry>
-                <title>JXHTMLEDIT</title>
-                <biblioid class="uri">http://www.tecnick.com/public/code/cp_dpage.php?aiocp_dp=jxhtmledit</biblioid>
-            </biblioentry>
-
-            <biblioentry>
-                <title>Syntext Serna</title>
-                <biblioid class="uri">http://www.syntext.com/products/serna/index.htm</biblioid>
-            </biblioentry>
-
-            <biblioentry>
                 <title>Stylus Studio</title>
                 <biblioid class="uri">http://www.stylusstudio.com/</biblioid>
             </biblioentry>
@@ -365,47 +363,13 @@
             </biblioentry>
 
             <biblioentry>
-                <title>Exchanger XML</title>
-                <biblioid class="uri">http://www.exchangerxml.com/editor/</biblioid>
-            </biblioentry>
-
-            <biblioentry>
                 <title>editix</title>
-                <biblioid class="uri">http://www.editix.com/</biblioid>
-            </biblioentry>
-
-            <biblioentry>
-                <title>topologi</title>
-                <biblioid class="uri">http://www.topologi.com/</biblioid>
+                    <biblioid class="uri">http://www.editix.com/</biblioid>
             </biblioentry>
 
             <biblioentry>
                 <title>Unicode</title>
                 <biblioid class="uri">http://www.unicode.org/</biblioid>
-            </biblioentry>
-
-            <biblioentry>
-                <title>Unicode</title>
-                <biblioid class="uri">http://www.w3.org/International/articles/inline-bidi-markup/</biblioid>
-            </biblioentry>
-
-            <biblioentry>
-                <title>XML</title>
-                <biblioid class="uri">http://www.xml.com/axml/testaxml.htm</biblioid>
-            </biblioentry>
-
-            <biblioentry>
-                <title>XLink</title>
-                <biblioid class="uri">http://www.xml.com/pub/a/2002/03/13/xlink.html</biblioid>
-            </biblioentry>
-
-            <biblioentry>
-                <title>Wikipedia: Tim Bray</title>
-                <biblioid class="uri">http://en.wikipedia.org/wiki/Tim_Bray</biblioid>
-            </biblioentry>
-
-            <biblioentry>
-                <biblioid class="uri">http://www.w3.org/People/cmsmcq/</biblioid>
             </biblioentry>
 
             <biblioentry>
@@ -421,11 +385,6 @@
             <biblioentry>
                 <title>Open Scripture Information Standard</title>
                 <biblioid class="uri">http://en.wikipedia.org/wiki/Open_Scripture_Information_Standard</biblioid>
-            </biblioentry>
-
-            <biblioentry>
-                <title>Project Gutenberg</title>
-                <biblioid class="uri">http://www.gutenberg.org</biblioid>
             </biblioentry>
 
             <biblioentry>
@@ -553,13 +512,8 @@
             <section>
                 <title>Редакторы XMLа</title>
                 <para>Наш web-интерфейс должен поддерживать довольно серьёзное редактирование
-                    документов на XML. Редакторы такого рода существуют. Например: JXHTMLEDIT
-                    (для HTMLа), Syntext Serna (коммерческий). Однако, как ни крути, а надо
-                    мочь редактировать наши тексты (XML, TEI) в нормальном редакторе тоже.
-                    Я слышал много хорошего про Stylus Studio и ALTOVA xmlspy - оба
-                    только для Windows. Есть несколько написаных на Javе - и потому работающих
-                    везде: oXygen, Exchanger XML, editix, Topologi. Мне из них
-                    настолько больше понравился Oxygen, что я его купил.</para>
+                    документов на XML. Редакторы такого рода существуют. Однако, как ни крути, а надо
+                    мочь редактировать наши тексты (XML, TEI) в нормальном редакторе тоже.</para>
             </section>
         </section>
         <section>
@@ -687,126 +641,14 @@
                     прирастить к базе данных готовую version control system (XXX не очевидно), а
                     именно - GIT.</para>
                 <para>К текстохранилищу должен быть доступ через сетевые протоколы, а не только
-                    через web-интерфейс. Програмный доступ к текстохранилищу должен быть возможен
-                    разный: через</para>
-                <itemizedlist>
-                    <listitem>
-                        <para><link xlink:href="http://www.webdav.org/">WebDAV</link></para>
-                    </listitem>
-                    <listitem>
-                        <para>REST</para>
-                    </listitem>
-                    <listitem>
-                        <para><link xlink:href="http://en.wikipedia.org/wiki/XML-RPC"
-                        >XML-RPC</link></para>
-                    </listitem>
-                    <listitem>
-                        <para><link xlink:href="http://xmldb-org.sourceforge.net/"
-                        >XML:DB</link></para>
-                    </listitem>
-                    <listitem>
-                        <para><link xlink:href="http://en.wikipedia.org/wiki/RSS_%28file_format%29"
-                        >RSS</link></para>
-                    </listitem>
-                    <listitem>
-                        <para><link xlink:href="http://en.wikipedia.org/wiki/Atom_%28standard%29"
-                        >Atom</link></para>
-                    </listitem>
-                    <listitem>
-                        <para>GIT<itemizedlist>
-                            <listitem>
-                                <para>Индексация ссылок и меток</para>
-                            </listitem>
-                            <listitem>
-                                <para>Импорт (Хумаш) и прямое использование (сканы) внешних
-                                    ресурсов</para>
-                            </listitem>
-                            <listitem>
-                                <para><link xlink:href="http://www.w3.org/2001/Annotea/"
-                                >Annotea</link></para>
-                            </listitem>
-                            <listitem>
-                                <para>Collate/Anastasia</para>
-                            </listitem>
-                        </itemizedlist></para>
-                    </listitem>
-                </itemizedlist>
+                    через web-интерфейс.</para>
             </section>
+
             <section>
-                <title>WebDAV</title>
-                <para>Look into AtomPub, WebDav, GIT. Citizendium.</para>
+                <title>Look Into</title>
+                <para>AtomPub, WebDav, REST, XML-RPC, XML:DB, GIT, Atom, RSS, Citizendium, Annotea, Collate/Anastasia, XForms</para>
             </section>
-            <section>
-                <title>XML and Wiki</title>
-                <itemizedlist>
-                    <listitem>
-                        <para><link xlink:href="http://code.google.com/p/atomicwiki"
-                        >AtomicWiki</link></para>
-                    </listitem>
-                    <listitem>
-                        <para><link xlink:href="http://code.google.com/p/wikimodel"
-                        >WikiModel</link></para>
-                    </listitem>
-                    <listitem>
-                        <para><link xlink:href="http://wikimodel.sourceforge.net/"
-                        >WikiModel</link></para>
-                    </listitem>
-                    <listitem>
-                        <para><link xlink:href="http://moinmo.in/XmlWiki">XmlWiki</link></para>
-                    </listitem>
-                    <listitem>
-                        <para><link xlink:href="http://www.usemod.com/cgi-bin/mb.pl?WikiXmlDtd"
-                        >WikiXmlDtd</link></para>
-                    </listitem>
-                    <listitem>
-                        <para><link xlink:href="http://doc-book.sourceforge.net/homepage"
-                        >DocBookWiki</link></para>
-                    </listitem>
-                    <listitem>
-                        <para><link xlink:href="http://www.cecc.com.au/cb_pages/publishing.php"
-                        >Single Source Publishing</link></para>
-                    </listitem>
-                </itemizedlist>
-            </section>
-            <section>
-                <title>Java Content Reporitory</title>
-                <para>Добавив к текстохранилищу интерфейс (и кое-что ещё :)), получаем Content
-                    Repository System.</para>
-                <para>Есть стандарт в области доступа к хранилищу из Javы: JSR 170. Это может быть
-                    интересно для нас - а может и не быть. Кстати, в разработке этого стандарта
-                    активное участие принимал Рой Филдинг, автор известной <link
-                            xlink:href="http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_2_3"
-                    >диссертации</link> про <link
-                            xlink:href="http://rest.blueoxen.net/cgi-bin/wiki.pl?FrontPage"
-                    >REST</link> и один из архитекторов Интернета - а в настоящий момент, архитектор
-                    в компании <link xlink:href="http://www.day.com/site/en/index.html">Day</link>,
-                    продающей такое хранилище :). Есть бесплатная реализация: Apache
-                    Jackrabbit.</para>
-                <para>How do I return XML documents as XQJ-valued properties? My stuff is going to
-                    be stored in XML database (or a bunch of files processed by Saxon). I can not
-                    present them as files (because they may not be) that need to be parsed
-                    (especially when they are already parsed and indexed). So my only (standard)
-                    choice to glue the low-level store to Java is XQJ.</para>
-                <para>How do I project one hierarchy on top of another in JCR? Let's say I store
-                    files with texts in the repository. I need to expose the result (both through
-                    WebDAV and locally) as a hierarchy where I can drill into the documents'
-                    hierarchical structure (chapter, paragraph etc). I will do it through XQuery
-                    (likely XPath, but running within XQuery engine). Also, there may be multiple
-                    such structures, and before drilling in I will need to turn main structure into
-                    an alternative one using XSLT. I'd like the *external* view to have the same JCR
-                    API.</para>
-            </section>
-            <section>
-                <title>XForms</title>
-                <itemizedlist>
-                    <listitem>
-                        <para><link xlink:href="http://chiba.sourceforge.net/">Chiba</link></para>
-                    </listitem>
-                    <listitem>
-                        <para><link xlink:href="http://www.orbeon.com/">Orbeon Forms</link></para>
-                    </listitem>
-                </itemizedlist>
-            </section>
+
             <section>
                 <title>URLs</title>
                 <para>XPointer in the URI, not in the fragment! No delimiters, just URI parts -
@@ -987,15 +829,9 @@
         <para>To format "like in a book", we need to optimize the following contradicting
             constraints (the list is probably incomplete):</para>
         <itemizedlist>
-            <listitem>
-                <para>the page must be fully covered with print</para>
-            </listitem>
-            <listitem>
-                <para>comment must start on the same page where what it comments on is</para>
-            </listitem>
-            <listitem>
-                <para>comment must end on the page it started</para>
-            </listitem>
+            <listitem><para>the page must be fully covered with print</para></listitem>
+            <listitem><para>comment must start on the same page where what it comments on is</para></listitem>
+            <listitem><para>comment must end on the page it started</para></listitem>
         </itemizedlist>
         <para>Koritz says that we do not need to print books, but "leaflets" instead: text with
             comments that fit on one page. In the "forum format", whatever that means.</para>
@@ -1099,161 +935,50 @@
             <title>Texts</title>
             <itemizedlist>
                 <listitem>
-                    <para><link xlink:href="http://www.tanach.us/Tanach.xml">Tanach (Leningrad
-                        Codex)</link></para>
+                    <para><link xlink:href="http://www.tanach.us/Tanach.xml">Tanach (Leningrad Codex)</link></para>
                 </listitem>
                 <listitem>
-                    <para><link xlink:href="http://chaver.com/Mishnah/TheMishnah.htm"
-                    >Mishna</link></para>
+                    <para><link xlink:href="http://chaver.com/Mishnah/TheMishnah.htm">Mishna</link></para>
                 </listitem>
                 <listitem>
                     <para><link xlink:href="http://cal1.cn.huc.edu/index.htm">Targumim</link></para>
                 </listitem>
                 <listitem>
-                    <para><link xlink:href="http://www.tsel.org/torah/midrashraba/index.html"
-                    >Midrash Raba</link></para>
+                    <para><link xlink:href="http://www.tsel.org/torah/midrashraba/index.html">Midrash Raba</link></para>
                 </listitem>
                 <listitem>
-                    <para><link xlink:href="http://www.tsel.org/torah/tanhuma/index.html">Midrash
-                        Tanhuma</link></para>
+                    <para><link xlink:href="http://www.tsel.org/torah/tanhuma/index.html">Midrash Tanhuma</link></para>
                 </listitem>
                 <listitem>
-                    <para><link xlink:href="http://www.tsel.org/torah/yalkutsh/index.html">Yalkut
-                        Shimoni</link></para>
+                    <para><link xlink:href="http://www.tsel.org/torah/yalkutsh/index.html">Yalkut Shimoni</link></para>
                 </listitem>
                 <listitem>
-                    <para><link xlink:href="http://www.tsel.org/torah/avotrnatan/index.html">Ovos
-                        DeRabi Noson</link></para>
+                    <para><link xlink:href="http://www.tsel.org/torah/avotrnatan/index.html">Ovos DeRabi Noson</link></para>
                 </listitem>
                 <listitem>
-                    <para><link xlink:href="http://www.daat.ac.il/daat/mahshevt/kitsur/tohen.htm"
-                    >Sefer HaHareidim</link></para>
+                    <para><link xlink:href="http://www.daat.ac.il/daat/mahshevt/kitsur/tohen.htm">Sefer HaHareidim</link></para>
                 </listitem>
             </itemizedlist>
         </section>
         <section>
             <title>Wikisource</title>
-            <itemizedlist>
-                <listitem>
-                    <para>... and <link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%A9%D7%99%D7%97%D7%AA_%D7%95%D7%99%D7%A7%D7%99%D7%98%D7%A7%D7%A1%D7%98:%D7%95%D7%99%D7%A7%D7%99%D7%98%D7%A7%D7%A1%D7%98_%D7%95%D7%9E%D7%9B%D7%95%D7%9F_%D7%9E%D7%9E%D7%A8%D7%90"
-                    >Mechon Mamre</link></para>
-                </listitem>
-                <listitem>
-                    <para><link xlink:href="http://he.wikisource.org/wiki/%D7%9E%D7%A7%D7%A8%D7%90"
-                    >Tanach</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%9E%D7%A7%D7%A8%D7%90%D7%95%D7%AA_%D7%92%D7%93%D7%95%D7%9C%D7%95%D7%AA"
-                    >Mikraot Gdolot</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%AA%D7%A8%D7%92%D7%95%D7%9D"
-                    >Targumim</link></para>
-                </listitem>
-                <listitem>
-                    <para><link xlink:href="http://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%A0%D7%94"
-                    >Mishna</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%AA%D7%95%D7%A1%D7%A4%D7%AA%D7%90"
-                    >Tosefta</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%9E%D7%A1%D7%9B%D7%AA%D7%95%D7%AA_%D7%A7%D7%98%D7%A0%D7%95%D7%AA"
-                    >Masechtos Ktanos</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%9E%D7%9B%D7%99%D7%9C%D7%AA%D7%90"
-                    >Mechilta</link></para>
-                </listitem>
-                <listitem>
-                    <para><link xlink:href="http://he.wikisource.org/wiki/%D7%A1%D7%A4%D7%A8%D7%90"
-                    >Sifro</link></para>
-                </listitem>
-                <listitem>
-                    <para><link xlink:href="http://he.wikisource.org/wiki/%D7%A1%D7%A4%D7%A8%D7%99"
-                    >Sifri</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%9E%D7%93%D7%A8%D7%A9_%D7%A8%D7%91%D7%94"
-                    >Midrash Rabba</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%AA%D7%9C%D7%9E%D7%95%D7%93_%D7%91%D7%91%D7%9C%D7%99"
-                    >Talmud Bavli</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%AA%D7%9C%D7%9E%D7%95%D7%93_%D7%99%D7%A8%D7%95%D7%A9%D7%9C%D7%9E%D7%99"
-                    >Talmud Yerushalmi</link></para>
-                </listitem>
-                <listitem>
-                    <para><link xlink:href="http://he.wikisource.org/wiki/%D7%A8%D7%99%22%D7%A3"
-                    >Rif</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%A0%D7%94_%D7%AA%D7%95%D7%A8%D7%94"
-                    >Rambam</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%90%D7%A8%D7%91%D7%A2%D7%94_%D7%98%D7%95%D7%A8%D7%99%D7%9D"
-                    >Tur</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%A9%D7%95%D7%9C%D7%97%D7%9F_%D7%A2%D7%A8%D7%95%D7%9A"
-                    >Shulchan Oruch</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%A7%D7%99%D7%A6%D7%95%D7%A8_%D7%A9%D7%95%D7%9C%D7%97%D7%9F_%D7%A2%D7%A8%D7%95%D7%9A"
-                    >Kitzur</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%A2%D7%A8%D7%95%D7%9A_%D7%94%D7%A9%D7%95%D7%9C%D7%97%D7%9F"
-                    >Oruch HaShulchan</link> <link
-                            xlink:href="http://he.wikisource.org/wiki/AHS:OCH">and?</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%A9%D7%95%D7%9C%D7%97%D7%9F_%D7%A2%D7%A8%D7%95%D7%9A_%D7%94%D7%A8%D7%91"
-                    >Shulchan Oruch HaRav</link></para>
-                </listitem>
-                <listitem>
-                    <para><link
-                            xlink:href="http://he.wikisource.org/wiki/%D7%A1%D7%99%D7%93%D7%95%D7%A8_%D7%AA%D7%95%D7%A8%D7%94_%D7%90%D7%95%D7%A8"
-                    >Siddur Tora Or</link></para>
-                </listitem>
-            </itemizedlist>
+            <para>... and <link xlink:href="http://he.wikisource.org/wiki/%D7%A9%D7%99%D7%97%D7%AA_%D7%95%D7%99%D7%A7%D7%99%D7%98%D7%A7%D7%A1%D7%98:%D7%95%D7%99%D7%A7%D7%99%D7%98%D7%A7%D7%A1%D7%98_%D7%95%D7%9E%D7%9B%D7%95%D7%9F_%D7%9E%D7%9E%D7%A8%D7%90">Mechon Mamre</link></para>
+            <para>Tanach, Mikraot Gdolot, Targumim, Mishna, Tosefta, Masechtos Ktanos, Mechilta, Sifro, Sifri,
+                    Midrash Rabba, Talmud Bavli, Talmud Yerushalmi, Rif, Rambam, Tur, Shulchan Oruch, Kitzur,
+                Oruch HaShulchan, Shulchan Oruch HaRav, Siddur Tora Or</para>
         </section>
         <section>
             <title>Texts in English</title>
             <itemizedlist>
                 <listitem>
-                    <para>Babylonian Talmud: <link
-                            xlink:href="http://www.come-and-hear.com/talmud/index.html"
-                    >Soncino</link> <link
-                            xlink:href="http://www.sacred-texts.com/jud/talmud.htm"
-                    >Rodkinson</link></para>
+                    <para>Babylonian Talmud: <link xlink:href="http://www.come-and-hear.com/talmud/index.html">Soncino</link>
+                         <link xlink:href="http://www.sacred-texts.com/jud/talmud.htm">Rodkinson</link></para>
                 </listitem>
                 <listitem>
-                    <para>The <link xlink:href="http://www.sacred-texts.com/jud/gfp/index.htm">Guide
-                        for the Perplexed</link></para>
+                    <para>The <link xlink:href="http://www.sacred-texts.com/jud/gfp/index.htm">Guide for the Perplexed</link></para>
                 </listitem>
                 <listitem>
-                    <para><link xlink:href="http://www.torah.org/advanced/shulchan-aruch/">Shulchan
-                        Aruch</link></para>
+                    <para><link xlink:href="http://www.torah.org/advanced/shulchan-aruch/">Shulchan Aruch</link></para>
                 </listitem>
             </itemizedlist>
         </section>
