@@ -16,9 +16,9 @@
 
 package org.podval.judaica.viewer
 
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-final class SimpleTest extends FlatSpec {
+final class SimpleTest extends AnyFlatSpec {
 
   "Works" should "find Хумаш" in {
     assertResult(true)(Works.workByName("Хумаш").isDefined)

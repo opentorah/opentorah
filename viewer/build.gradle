@@ -7,5 +7,5 @@ dependencies {
     implementation "org.scala-lang:scala-library:$scalaVersion"
 
     testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
-    testRuntimeOnly "org.pegdown:pegdown:$pegdownVersion" // for scalatest reports; dead...
+    testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports; only 0.35.10 is supported?
 }

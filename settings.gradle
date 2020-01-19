@@ -1,8 +1,13 @@
 pluginManagement {
+//    repositories {
+//        mavenLocal()
+//        jcenter()
+//        gradlePluginPortal()
+//    }
     plugins {
         id 'com.github.ben-manes.versions' version '0.27.0'
-        id 'com.github.maiflai.scalatest' version '0.25'
-        id 'org.podval.docbook-gradle-plugin' version '0.7.11'
+        id 'com.github.maiflai.scalatest' version '0.26'
+        id 'org.podval.docbook-gradle-plugin' version '0.7.16'
     }
 }
 
@@ -10,8 +15,6 @@ rootProject.name = 'judaica'
 
 include ':viewer'
 include ':importers'
-
-//include ':webapp'
 
 include ':papers'
 include ':docs'

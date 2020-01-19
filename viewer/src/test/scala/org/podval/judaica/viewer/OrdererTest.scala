@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 Leonid Dubinsky <dub@podval.org>.
+ * Copyright 2014-2020 Leonid Dubinsky <dub@podval.org>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.podval.judaica.viewer
 
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-final class OrdererTest extends FlatSpec {
+final class OrdererTest extends AnyFlatSpec {
 
   "Orderer" should "handle empty correctly" in {
     val arcs: Map[String, Seq[String]] = Map.empty
