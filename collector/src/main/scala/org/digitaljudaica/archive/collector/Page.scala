@@ -30,9 +30,10 @@ object Page {
           (n.dropRight(backSuffix.length), true)
         }
 
-      if (base.takeWhile(_.isDigit).length != numberOfDigitsInName)
+      val numberOfDigits = base.takeWhile(_.isDigit).length
+      if (numberOfDigits < numberOfDigitsInName) // LVIA2 has 4-digit page numbers!
         throw new IllegalArgumentException()
-      val s: String = base.drop(numberOfDigitsInName)
+      val s: String = base.drop(numberOfDigits)
       if (!s.isEmpty && (s != "a"))
         throw new IllegalArgumentException(s"Illegal page name: $s [$n]")
 
