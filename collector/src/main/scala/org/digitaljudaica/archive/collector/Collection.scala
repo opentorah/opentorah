@@ -53,7 +53,8 @@ final class Collection(
 
   def title: Node = xml.optionalChild("title").getOrElse(Text(reference))
 
-  def description: Seq[Elem] = xml.oneChild("abstract").elements
+  def description: Seq[Elem] = xml.oneChild("abstract").elements ++
+    xml.optionalChild("notes").map(notes => notes.elements).getOrElse(Seq.empty)
 
   def pageType: Page.Type = if (isBook) Page.Book else Page.Manuscript
 
