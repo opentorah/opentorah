@@ -67,6 +67,7 @@ object Main {
     <item>
       <ref target={layout.collectionUrl(collection.directoryName)}
            role="collectionViewer">{collection.reference + ": " + Xml.spacedText(collection.title)}</ref>
+      <lb/>
       {collection.caseAbstract}
     </item>
 }
