@@ -10,7 +10,7 @@ allprojects {
     mavenLocal()
   }
 
-  group = 'org.podval.judaica'
+  group = 'org.digitaljudaica'
   version = '0.1.1'
 }
 

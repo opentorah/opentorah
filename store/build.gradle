@@ -1,0 +1,38 @@
+plugins {
+    id 'scala'
+    id 'maven-publish'
+}
+
+description = 'Digital Judaica Store'
+final String libraryArtifactId = "$project.group-$project.name"
+jar.archiveBaseName.set(libraryArtifactId)
+
+
+dependencies {
+    implementation "org.scala-lang:scala-library:$scalaVersion"
+    implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/digitaljudaica/digitaljudaica.org")
+            credentials {
+                username = 'dubinsky'
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            groupId project.group
+            artifactId libraryArtifactId
+
+            from components.java
+
+//            artifact sourceJar
+//            artifact scaladocJar
+        }
+    }
+}

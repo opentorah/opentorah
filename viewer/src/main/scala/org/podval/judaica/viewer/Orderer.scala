@@ -2,7 +2,7 @@ package org.podval.judaica.viewer
 
 object Orderer {
 
-  def close[K](arcs: Map[K, Seq[K]]): Map[K, Set[K]] = close(arcs.keySet, arcs.view.mapValues(_.toSet).toMap)
+  def close[K](arcs: Map[K, Seq[K]]): Map[K, Set[K]] = close(arcs.keySet, arcs./*view.*/mapValues(_.toSet)/*.toMap*/)
 
   def close[K](roots: Set[K], arcs: K => Set[K]): Map[K, Set[K]] = {
     def close(root: K): Set[K] = {

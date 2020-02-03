@@ -23,7 +23,7 @@ import org.podval.judaica.parsers.{DirectoryScanner, LazyLoad, WorkParser}
 
 // TODO move parsing into 'parsers'; make not global :)
 object Works {
-  val directory = new File("/home/dub/Projects/judaica/data/texts/")
+  val directory = new File("/home/dub/Projects/digitaljudaica/data/texts/")
 
   def works: Seq[Work] = works_.get
 
