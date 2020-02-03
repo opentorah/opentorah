@@ -1,38 +1,121 @@
 plugins {
     id 'scala'
     id 'maven-publish'
+    id 'com.jfrog.bintray'
 }
 
 description = 'Digital Judaica Store'
-final String libraryArtifactId = "$project.group-$project.name"
-jar.archiveBaseName.set(libraryArtifactId)
-
 
 dependencies {
     implementation "org.scala-lang:scala-library:$scalaVersion"
     implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
 }
 
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    archiveClassifier.set('sources')
+}
+
+task scaladocJar(type: Jar) {
+    from scaladoc.destinationDir
+    archiveClassifier.set('scaladoc')
+}
+scaladocJar.dependsOn scaladoc
+
+
+final String gitHubRepository    = "digitaljudaica/digitaljudaica.org"
+final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
+final String libraryArtifactId   = "$project.group-$project.name"
+jar.archiveBaseName.set(libraryArtifactId)
+
 publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/digitaljudaica/digitaljudaica.org")
-            credentials {
-                username = 'dubinsky'
-                password = System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
+    // GitHub Package Registry
+//    repositories {
+//        maven {
+//            name = "GitHubPackages"
+//            url = uri("https://maven.pkg.github.com/digitaljudaica/digitaljudaica.org")
+//            credentials {
+//                username = 'dubinsky'
+//                password = System.getenv("GITHUB_TOKEN")
+//            }
+//        }
+//    }
     publications {
-        gpr(MavenPublication) {
+        // GitHub Package Registry
+//        gpr(MavenPublication) {
+//            groupId project.group
+//            artifactId libraryArtifactId
+//
+//            from components.java
+//
+////            artifact sourceJar
+////            artifact scaladocJar
+//        }
+        mavenPublication(MavenPublication) {
             groupId project.group
             artifactId libraryArtifactId
 
             from components.java
 
-//            artifact sourceJar
-//            artifact scaladocJar
+            artifact sourceJar
+            artifact scaladocJar
+
+            pom {
+                name = project.name
+                description = project.description
+                url = "$gitHubRepositoryUrl"
+                scm {
+                    url = "$gitHubRepositoryUrl"
+                    connection = "scm:git:git://github.com/${gitHubRepository}.git"
+                    developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
+                }
+                licenses {
+                    license {
+                        name = 'The Apache Software License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution = 'repo'
+                        comments = 'A business-friendly OSS license'
+                    }
+                }
+                organization {
+                    name = 'Digital Judaica'
+                    url = 'http://www.digitaljudaica.org'
+                }
+                developers {
+                    developer {
+                        id = 'dub'
+                        name = 'Leonid Dubinsky'
+                        email = 'dub@podval.org'
+                        url = 'http://dub.podval.org'
+                        organization = 'Podval Group'
+                        organizationUrl = 'http://www.podval.org'
+                        timezone = '-5'
+                    }
+                }
+            }
         }
+    }
+}
+
+bintray {
+    user = 'dubinsky'
+    key = findProperty('bintrayApiKey')
+    publications = ['mavenPublication']
+    dryRun = false
+    publish = true
+    override = true
+    pkg {
+        repo = project.group
+        name = libraryArtifactId
+        desc = project.description
+        websiteUrl = "${gitHubRepositoryUrl}"
+        issueTrackerUrl = "${gitHubRepositoryUrl}/issues"
+        vcsUrl = "${gitHubRepositoryUrl}.git"
+        githubRepo = gitHubRepository
+        licenses = ['Apache-2.0']
+        labels = ['Scala', 'Calendar', 'Jewish']
+        publicDownloadNumbers = true
+//        githubReleaseNotesFile = "${rootProject.projectDir}/docs/CHANGELOG.md"
+        version { name = project.version }
     }
 }

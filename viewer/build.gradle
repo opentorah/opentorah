@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    implementation project(':store')
     implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
     implementation "org.scala-lang:scala-library:$scalaVersion"
 

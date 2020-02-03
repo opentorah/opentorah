@@ -16,10 +16,9 @@
 
 package org.podval.judaica.parsers
 
+import org.digitaljudaica.store.metadata.Xml.Ops
 import org.podval.judaica.viewer.{NamedSelector, Names, NumberedSelector, Parse, Selector}
-
 import scala.xml.Elem
-import Xml.Ops
 
 
 object SelectorParser {

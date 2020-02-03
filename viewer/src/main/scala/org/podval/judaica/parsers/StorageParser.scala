@@ -17,11 +17,9 @@
 package org.podval.judaica.parsers
 
 import java.io.File
-
+import org.digitaljudaica.store.metadata.Xml.Ops
 import org.podval.judaica.viewer.{DirectoryStorage, Div, Exists, FileStorage, NonRootStructure, Selector, Storage, ViewerException}
-
 import scala.xml.Elem
-import Xml.Ops
 
 
 object StorageParser {

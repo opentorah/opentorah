@@ -17,13 +17,11 @@
 package org.podval.judaica.parsers
 
 import java.io.File
-
+import org.digitaljudaica.store.metadata.Xml.Ops
 import ParseException.withMetadataFile
 import org.podval.judaica.viewer.{Div, NamedDiv, NamedSelector, NamedStructure, NonRootStructure, NumberedDiv,
   NumberedSelector, NumberedStructure, Selector, Selectors, StructureSelection, ViewerException}
-
 import scala.xml.Elem
-import Xml.Ops
 
 object StructureParser {
 

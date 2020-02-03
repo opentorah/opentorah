@@ -60,7 +60,7 @@ object HebrewLanguage extends Language {
   private val hundreds = Array(QOF, RESH, SHIN, TAV)
 
 
-  override def numberToString(number: Int): String = {
+  override def toString(number: Int): String = {
     require (number > 0)
     require (number <= 500)
 

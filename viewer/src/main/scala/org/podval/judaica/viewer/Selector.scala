@@ -70,7 +70,7 @@ trait NumberedSelector extends Selector {
   def isSpelledOut: Boolean
 
   final def divName(lang: Language, div: NumberedDiv): String =
-    name(lang, (if (isSpelledOut) lang.numberToSpelledOutString _ else lang.numberToString _)(div.number))
+    name(lang, if (isSpelledOut) lang.numberToSpelledOutString(div.number) else lang.toString(div.number))
 }
 
 

@@ -16,10 +16,10 @@
 
 package org.podval.judaica.viewer
 
-import scala.xml.MetaData
 import java.io.File
-
-import org.podval.judaica.parsers.{DivContentParser, XmlFile}
+import org.digitaljudaica.store.metadata.Xml
+import org.podval.judaica.parsers.DivContentParser
+import scala.xml.MetaData
 
 trait DivContent extends Content {
   def prefix: Seq[Content]
@@ -72,7 +72,7 @@ object DivContent {
   private def replacePrefix(content: DivContent, prefix: Seq[Content]): DivContent =
     ParsedDivContent(prefix, content.sort, content.n, content.attributes, content.head, content.children)
 
-  def select(file: File, path: Div.Path, format: Selector.Format): Content = select(DivContentParser.fromXml(XmlFile.load(file)), path, format)
+  def select(file: File, path: Div.Path, format: Selector.Format): Content = select(DivContentParser.fromXml(Xml.load(file)), path, format)
 
   def select(content: DivContent, path: Div.Path, format: Selector.Format): Content =
     if (path.isEmpty) reformat(content, format) else {

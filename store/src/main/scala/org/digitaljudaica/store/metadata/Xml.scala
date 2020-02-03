@@ -1,7 +1,8 @@
 package org.digitaljudaica.store.metadata
 
-import java.io.File
+import java.io.{File, FileWriter, OutputStream, OutputStreamWriter, PrintWriter, Writer}
 
+import scala.collection.mutable.WeakHashMap
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml._
 
@@ -33,6 +34,25 @@ object Xml {
         throw new IllegalArgumentException(s"In file $file:", e)
     }
   }
+
+
+  def loadResource(clazz: Class[_], name: String, tag: String): Elem =
+    open1(XML.load(clazz.getResourceAsStream(name + ".xml")), tag)
+
+  def loadMetadata(file: File): Elem = load(file, "index")
+
+//  def load(file: File, tag: String): Elem = open(load(file), tag)
+
+  def load(file: File): Elem = {
+    if (!cache.contains(file)) {
+      cache.put(file, Utility.trimProper(XML.loadFile(file)).asInstanceOf[Elem])
+    }
+    cache(file)
+  }
+  private[this] val cache: WeakHashMap[File, Elem] = new WeakHashMap[File, Elem]
+  // TODO Introduce "release" method?
+
+
 
   private def removeNamespace(node: Node): Node = node match {
     case e: Elem => e.copy(scope = TopScope, child = e.child.map(removeNamespace))
@@ -100,6 +120,19 @@ object Xml {
     merge(List.empty, result.split("\n").toList).mkString("\n")
   }
 
+  def print(xml: Node, outStream: OutputStream): Unit = print(xml, new OutputStreamWriter(outStream))
+  def print(xml: Node, outFile: File): Unit = print(xml, new FileWriter(outFile))
+
+  def print(xml: Node, writer: Writer): Unit = {
+    val out = new PrintWriter(writer)
+    val pretty = prettyPrinter.format(xml)
+    // TODO when outputting XML, include <xml> header?
+    out.println(pretty)
+    out.close()
+  }
+
+
+  private def open1(what: Elem, tag: String): Elem = what/*(0).asInstanceOf[Elem].*/check(tag)
 
   def open(element: Elem, name: String): (Attributes, Seq[Elem]) = {
     checkName(element, name)
@@ -188,21 +221,30 @@ object Xml {
 
   implicit class Ops(elem: Elem) {
 
+    def elemsFilter(name: String): Seq[Elem] = elem.elems.filter(_.label == name)
+
+    // TODO dup!
+    def elems: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
+
     def elems(name: String): Seq[Elem] = {
-      val result = elem.elements
+      val result = elem.elems
       result.foreach(_.check(name))
       result
     }
 
-    def elemsFilter(name: String): Seq[Elem] = elem.elements.filter(_.label == name)
-
-    def elements: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
+    def elems(plural: String, singular: String, required: Boolean = true): Seq[Elem] =
+      oneOptionalChild(plural, required).map(_.elems(singular)).getOrElse(Seq.empty)
 
     def descendants(name: String): Seq[Elem] = elem.flatMap(_ \\ name).filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
     def getAttribute(name: String): String = attributeOption(name).getOrElse(throw new NoSuchElementException(s"No attribute $name"))
 
+    // TODO difference?
     def attributeOption(name: String): Option[String] = elem.attributes.asAttrMap.get(name)
+//    def attributeOption(name: String): Option[String] = {
+//      val result: Seq[Node] = elem \ ("@" + name)
+//      if (result.isEmpty) None else Some(result.text)
+//    }
 
     def idOption: Option[String] = attributeOption("xml:id")
 

@@ -15,10 +15,9 @@
  */
 package org.podval.judaica.parsers
 
+import org.digitaljudaica.store.metadata.Xml.Ops
 import org.podval.judaica.viewer.{Exists, Name, Names}
-
 import scala.xml.Elem
-import Xml.Ops
 
 object NamesParser {
 

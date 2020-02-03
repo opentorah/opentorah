@@ -15,8 +15,8 @@
  */
 package org.podval.judaica.parsers
 
+import org.digitaljudaica.store.metadata.Xml.Ops
 import org.podval.judaica.viewer.{AppContent, Content, DivContent, ElemContent, SpanContent, TextContent, ViewerException}
-import Xml.Ops
 import scala.xml.{Elem, Node, Text}
 
 object ContentParser {

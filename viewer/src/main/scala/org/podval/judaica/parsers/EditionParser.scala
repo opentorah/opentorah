@@ -17,9 +17,9 @@ package org.podval.judaica.parsers
 
 import java.io.File
 
+import org.digitaljudaica.store.metadata.Xml.Ops
 import ParseException.withMetadataFile
 import org.podval.judaica.viewer.{DirectoryStorage, Edition, Names, Work}
-import Xml.Ops
 
 object EditionParser {
 

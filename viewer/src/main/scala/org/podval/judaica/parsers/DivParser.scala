@@ -16,12 +16,12 @@
 
 package org.podval.judaica.parsers
 
+import org.digitaljudaica.store.metadata.Xml.Ops
 import org.podval.judaica.parsers.StructureParser.ParsingContext
 import org.podval.judaica.viewer.{Div, DominantDiv, NamedDiv, NamedStructure, NonDominantDiv, NonRootStructure,
   NumberedDiv, NumberedStructure, Selector, Selectors, StructureSelection, ViewerException}
 
 import scala.xml.Elem
-import Xml.Ops
 
 object DivParser {
 

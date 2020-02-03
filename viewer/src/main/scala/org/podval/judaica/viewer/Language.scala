@@ -20,7 +20,7 @@ package org.podval.judaica.viewer
 trait Language {
   def name: String
 
-  def numberToString(number: Int): String
+  def toString(number: Int): String
 
   // TODO introduce gender
   def numberToSpelledOutString(number: Int): String
@@ -34,5 +34,5 @@ trait Language {
 object Languages {
   private val name2lang: Map[String, Language] = List[Language](HebrewLanguage).map(l => (l.name, l)).toMap
 
-  def get(name: String): Language = name2lang.get(name).getOrElse(HebrewLanguage)
+  def get(name: String): Language = name2lang.getOrElse(name, HebrewLanguage)
 }

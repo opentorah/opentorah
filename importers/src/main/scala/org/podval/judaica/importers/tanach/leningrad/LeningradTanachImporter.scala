@@ -2,10 +2,11 @@ package org.podval.judaica.importers.tanach.leningrad
 
 import java.io.File
 
+import org.digitaljudaica.store.metadata.Xml
+import org.digitaljudaica.store.metadata.Xml.Ops
 import org.podval.judaica.importers.tanach.TanachImporter
 import org.podval.judaica.viewer.{DivContent, HebrewLanguage, SpanContent, TextContent}
-import org.podval.judaica.parsers.Xml.Ops
-import org.podval.judaica.parsers.{DivContentParser, XmlFile}
+import org.podval.judaica.parsers.DivContentParser
 
 import scala.xml.{Elem, Node}
 
@@ -20,7 +21,7 @@ final class LeningradTanachImporter extends TanachImporter {
   protected override def getInputExtension: String = "xml"
 
   protected def parseBook(file: File, bookName: String): DivContent = {
-    val chapters = XmlFile.load(file, "Tanach").elemsFilter("tanach").head.elemsFilter("book").head.elemsFilter("c")
+    val chapters = Xml.load(file, "Tanach").elemsFilter("tanach").head.elemsFilter("book").head.elemsFilter("c")
 
     DivContent(
       sort = "book",

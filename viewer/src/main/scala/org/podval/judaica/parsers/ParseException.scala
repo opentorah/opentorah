@@ -2,6 +2,7 @@ package org.podval.judaica.parsers
 
 import java.io.File
 
+import org.digitaljudaica.store.metadata.Xml
 import org.podval.judaica.viewer.ViewerException
 
 import scala.xml.Elem
@@ -10,7 +11,7 @@ class ParseException(file: File, cause: ViewerException) extends Exception(s"In 
 
 object ParseException {
 
-  def withMetadataFile[T](file: File)(body: Elem => T): T = withFile(file)(body(XmlFile.loadMetadata(file)))
+  def withMetadataFile[T](file: File)(body: Elem => T): T = withFile(file)(body(Xml.loadMetadata(file)))
 
 
   private def withFile[T](file: File)(body: => T): T =

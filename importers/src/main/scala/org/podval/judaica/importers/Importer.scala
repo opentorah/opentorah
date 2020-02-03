@@ -1,8 +1,9 @@
 package org.podval.judaica.importers
 
-import org.podval.judaica.viewer.{DivContent, Edition, Works}
 import java.io.File
-import org.podval.judaica.parsers.{ContentParser, Xml}
+import org.podval.judaica.viewer.{DivContent, Edition, Works}
+import org.podval.judaica.parsers.ContentParser
+import org.digitaljudaica.store.metadata.Xml
 
 trait Importer {
   def importWork(inputDirectoryPath: String): Unit = {
