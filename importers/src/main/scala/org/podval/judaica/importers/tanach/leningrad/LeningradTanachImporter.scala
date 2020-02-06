@@ -2,23 +2,13 @@ package org.podval.judaica.importers.tanach.leningrad
 
 import java.io.File
 
+import org.digitaljudaica.store.HebrewLanguage
 import org.digitaljudaica.store.metadata.Xml
 import org.digitaljudaica.store.metadata.Xml.Ops
-import org.podval.judaica.importers.tanach.TanachImporter
-import org.podval.judaica.viewer.{DivContent, HebrewLanguage, SpanContent, TextContent}
-import org.podval.judaica.parsers.DivContentParser
 
 import scala.xml.{Elem, Node}
 
-final class LeningradTanachImporter extends TanachImporter {
-
-  protected override def editionName: String = "Leningrad"
-
-  protected override def books: Map[String, String] = Map(
-    "Genesis" -> "Genesis"
-  )
-
-  protected override def getInputExtension: String = "xml"
+final class LeningradTanachImporter {
 
   protected def parseBook(file: File, bookName: String): DivContent = {
     val chapters = Xml.load(file, "Tanach").elemsFilter("tanach").head.elemsFilter("book").head.elemsFilter("c")
@@ -64,12 +54,5 @@ final class LeningradTanachImporter extends TanachImporter {
       head = None,
       children = Seq(TextContent(result))
     )
-  }
-}
-
-
-object LeningradTanachImporter {
-  def main(args: Array[String]): Unit = {
-    new LeningradTanachImporter().importWork("/home/dub/Projects/judaica/data/imports/Tanach/leningrad")
   }
 }

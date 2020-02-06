@@ -1,9 +1,10 @@
 package org.digitaljudaica.store
 
+import cats.implicits._
 import java.io.File
-import org.digitaljudaica.store.metadata.XmlParser.{Parser, attribute, optionalAttribute, optionalCharacters,
+import org.digitaljudaica.metadata.{Names, Xml, XmlParser}
+import org.digitaljudaica.metadata.XmlParser.{Parser, check, attribute, optionalAttribute, optionalBooleanAttribute,
   element, elements, optionalElement}
-import org.digitaljudaica.store.metadata.{Language, LanguageSpec, Name, Names, Xml, XmlParser}
 import scala.xml.Elem
 
 sealed trait Store {
@@ -36,27 +37,8 @@ final class TextStore(
 
 object Store {
 
-  val languageSpecParser: Parser[LanguageSpec] = for {
-    lang <- optionalAttribute("lang")
-    transliterated <- optionalAttribute("transliterated")
-    flavour <- optionalAttribute("flavour")
-  } yield LanguageSpec(
-    language = lang.map(Language.getForDefaultName),
-    isTransliterated = XmlParser.getBoolean(transliterated),
-    flavour = flavour
-  )
-
-  val nameParser: Parser[Name] = for {
-    n <- optionalAttribute("n")
-    characters <- optionalCharacters
-    name = n.orElse(characters)
-    _ <- XmlParser.addError(n.isEmpty && characters.isEmpty, "Both 'n' attribute and text are absent.")
-    _ <- XmlParser.addError(n.nonEmpty && characters.nonEmpty, "Both 'n' attribute and text are present.")
-    languageSpec <- languageSpecParser
-  } yield Name(name.getOrElse(""), languageSpec)
-
   val namesParser: Parser[Names] = for {
-    names <- elements("name", nameParser)
+    names <- elements("name", XmlParser.nameParser)
   } yield new Names(names)
 
   val selectorParser: Parser[Selector] = for {
@@ -83,8 +65,8 @@ object Store {
     selector = selectorByName(selectors, n)
     texts <- optionalElement("texts", textsParser)
     stores <- elements("store", storeParser(selectors))
-    _ <- XmlParser.addError(texts.isEmpty && stores.isEmpty, "Both 'stores' and 'texts' elements are absent.")
-    _ <- XmlParser.addError(texts.nonEmpty && stores.nonEmpty, "Both 'stores' and 'texts' elements are present.")
+    _ <- check(texts.nonEmpty || stores.nonEmpty, "Both 'stores' and 'texts' elements are absent.")
+    _ <- check(texts.isEmpty || stores.isEmpty, "Both 'stores' and 'texts' elements are present.")
   } yield {
     if (selector.isEmpty) throw new IllegalArgumentException(s"Selector not found: $n")
     if (texts.isDefined) new TextsBy(selector.get, texts.get) else new BaseBy(selector.get, stores)
@@ -97,7 +79,7 @@ object Store {
 
   def main(args: Array[String]): Unit = {
     val xml: Elem = Xml.load(new File("docs").getAbsoluteFile, "store")
-    val store = XmlParser.runToFinish(xml, "store", storeParser(Set.empty))
+    val store = XmlParser.runA(xml, "store", storeParser(Set.empty))
     val y = 0
   }
 }

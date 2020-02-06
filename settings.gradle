@@ -15,8 +15,6 @@ pluginManagement {
 rootProject.name = 'judaica'
 
 include ':store'
-include ':viewer'
-include ':importers'
 
 include ':papers'
 include ':docs'

@@ -2,7 +2,7 @@ package org.digitaljudaica.store
 
 import java.io.File
 
-import org.digitaljudaica.store.util.Files
+import org.digitaljudaica.util.Files
 
 sealed trait By {
   def selector: Selector

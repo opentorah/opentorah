@@ -1,0 +1,12 @@
+interesting elements -->
+join paragraphs split by a note -->
+deal with parentheses -->
+introduce corrections (e.g., in chapter 51 of Tanya, the kind of the note is wrong) -->
+
+peel off the 'span' (in the beginning of a paragraph) -->
+
+Editorial note
+<xsl:template match="html:b" mode="main-text">
+In the beginning of a side-note (only?) there may be a title
+break paragraphs into lines
+
