@@ -2,9 +2,8 @@ package org.digitaljudaica.store
 
 import cats.implicits._
 import java.io.File
-import org.digitaljudaica.metadata.{Names, Xml, XmlParser}
-import org.digitaljudaica.metadata.XmlParser.{Parser, check, attribute, optionalAttribute, optionalBooleanAttribute,
-  element, elements, optionalElement}
+import org.digitaljudaica.metadata.{Names, Xml}
+import org.digitaljudaica.metadata.Xml.{Parser, attribute, check, element, elements, optionalElement}
 import scala.xml.Elem
 
 sealed trait Store {
@@ -37,16 +36,12 @@ final class TextStore(
 
 object Store {
 
-  val namesParser: Parser[Names] = for {
-    names <- elements("name", XmlParser.nameParser)
-  } yield new Names(names)
-
   val selectorParser: Parser[Selector] = for {
-    names <- namesParser
+    names <- Names.parser
   } yield Selector(names)
 
   def storeParser(inheritedSelectors: Set[Selector]): Parser[Store] = for {
-    names <- namesParser
+    names <- Names.parser
     selectors <- elements("selector", selectorParser)
     by <- element("by", byParser(inheritedSelectors ++ selectors.toSet))
   } yield new BaseStore(
@@ -79,7 +74,7 @@ object Store {
 
   def main(args: Array[String]): Unit = {
     val xml: Elem = Xml.load(new File("docs").getAbsoluteFile, "store")
-    val store = XmlParser.runA(xml, "store", storeParser(Set.empty))
+    val store = Xml.runA(xml, "store", storeParser(Set.empty))
     val y = 0
   }
 }

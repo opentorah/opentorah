@@ -1,12 +1,140 @@
 package org.digitaljudaica.metadata
 
 import java.io.{File, FileWriter, OutputStream, OutputStreamWriter, PrintWriter, Writer}
-
-import scala.collection.mutable.WeakHashMap
+import cats.implicits._
+import cats.data.StateT
 import scala.xml.transform.{RewriteRule, RuleTransformer}
-import scala.xml._
+import scala.xml.{Elem, Node, PrettyPrinter, Text, TopScope, Utility, XML}
 
 object Xml {
+
+  final case class Element(
+    name: String,
+    attributes: Map[String, String],
+    elements: Seq[Elem],
+    characters: Option[String]
+  )
+
+  type Error = String
+  type ErrorOr[A] = Either[Error, A]
+  type Parser[A] = StateT[ErrorOr, Element, A]
+
+  private def pure[A](value: A): Parser[A] = StateT.pure[ErrorOr, Element, A](value)
+
+  private def lift[A](value: ErrorOr[A]): Parser[A] = StateT.liftF[ErrorOr, Element, A](value)
+
+  private def inspect[A](f: Element => A): Parser[A] = StateT.inspect[ErrorOr, Element, A](f)
+
+  private def modify(f: Element => Element): Parser[Unit] = StateT.modify[ErrorOr, Element](f)
+
+  def check(condition: Boolean, message: => String): Parser[Unit] =
+    lift(if (condition) Right(()) else Left(message))
+
+  private val getName: Parser[String] = inspect(_.name)
+
+  private val getElements: Parser[Seq[Elem]] = inspect(_.elements)
+
+  private val getCharacters: Parser[Option[String]] = inspect(_.characters)
+
+  def optionalAttribute(name: String): Parser[Option[String]] = for {
+    result <- inspect(_.attributes.get(name))
+    _ <- modify(element => element.copy(attributes = element.attributes - name))
+  } yield result
+
+  def attribute(name: String): Parser[String] = for {
+    resultO <- optionalAttribute(name)
+    _ <- check(resultO.isDefined, s"Required attribute '$name' is missing")
+    result = resultO.get
+  } yield result
+
+  def optionalBooleanAttribute(name: String): Parser[Option[Boolean]] = for {
+    resultO <- optionalAttribute(name)
+    result = resultO.map(value => value == "true" || value == "yes")
+  } yield result
+
+  def optionalIntAttribute(name: String): Parser[Option[Int]] = for {
+    resultO <- optionalAttribute(name)
+    result = resultO.map(_.toInt) // TODO turn exception into our error
+    _ <- check(result.isEmpty || result.get > 0, s"Non-positive integer: ${result.get}")
+  } yield result
+
+  def intAttribute(name: String): Parser[Int] = for {
+    // TODO remove duplication (and cover element also)
+    resultO <- optionalIntAttribute(name)
+    _ <- check(resultO.isDefined, s"Required attribute '$name' is missing")
+    result = resultO.get
+  } yield result
+
+  def optionalCharacters: Parser[Option[String]] = for {
+    result <- getCharacters
+    _ <- modify(_.copy(characters = None))
+  } yield result
+
+  def optionalElement[A](name: String, parser: Parser[A]): Parser[Option[A]] = for {
+    elements <- getElements
+    toParse = elements.headOption.filter(_.label == name)
+    result <- if (toParse.isEmpty) pure(None) else lift(run(toParse.get, name, parser).map(Some(_)))
+    _ <- modify(if (toParse.isEmpty) identity else _.copy(elements = elements.tail))
+  } yield result
+
+  def element[A](name: String, parser: Parser[A]): Parser[A] = for {
+    resultO <- optionalElement(name, parser)
+    _ <- check(resultO.isDefined, s"Required element '$name' is missing")
+    result = resultO.get
+  } yield result
+
+  def getElements[A](name: String): Parser[Seq[Elem]] = for {
+    elements <- getElements
+    (result, tail) = elements.span(_.label == name)
+    _ <- modify(_.copy(elements = tail))
+  } yield result
+
+  def elements[A](name: String, parser: Parser[A]): Parser[Seq[A]] = for {
+    toParse <- getElements(name)
+    result <- toParse.toList.traverse(xml => lift(run(xml, name, parser)))
+  } yield result
+
+  private def run[A](elem: Elem, name: String, parser: Parser[A]): ErrorOr[A] = {
+    val result = for {
+      // check element name
+      elementName <- getName
+      _ <- check(elementName == name, s"Wrong element: $elementName instead of $name")
+
+      // no mixed content
+      elements <- getElements
+      characters <- getCharacters
+      _ <- check(elements.isEmpty || characters.isEmpty, s"Mixed content: [${characters.get}] $elem")
+
+      // parse
+      result <- parser
+
+      // no left-over elements
+      elementsAfter <- getElements
+      _ <- check(elementsAfter.isEmpty, s"Unparsed elements: $elementsAfter")
+
+      // no left-over characters
+      charactersAfter <- getCharacters
+      _ <- check(charactersAfter.isEmpty, s"Unparsed characters: ${charactersAfter.get}")
+    } yield result
+
+    result.runA {
+      val (elements: Seq[Node], nonElements: Seq[Node]) = elem.child.partition(_.isInstanceOf[Elem])
+      Element(
+        name = elem.label,
+        attributes = elem.attributes.map(metadata => metadata.key -> metadata.value.toString).toMap,
+        elements = elements.map(_.asInstanceOf[Elem]),
+        characters = if (nonElements.isEmpty) None else {
+          val result: String = nonElements.map(_.text).mkString.trim
+          if (result.isEmpty) None else Some(result)
+        }
+      )
+    }
+  }
+
+  def runA[A](elem: Elem, name: String, parser: Parser[A]): A =
+    run(elem, name, parser).fold(error => throw new IllegalArgumentException(error), identity)
+
+
 
   // --- Xerces parser with Scala XML:
   // build.gradle:    implementation "xerces:xercesImpl:$xercesVersion"
@@ -39,6 +167,9 @@ object Xml {
   def loadResource(clazz: Class[_], name: String, tag: String): Elem =
     open1(XML.load(clazz.getResourceAsStream(name + ".xml")), tag)
 
+  // TODO switch to Parser[A]
+  private def open1(what: Elem, tag: String): Elem = what/*(0).asInstanceOf[Elem].*/check(tag)
+
   def loadMetadata(file: File): Elem = load(file, "index")
 
   def load(file: File): Elem = Utility.trimProper(XML.loadFile(file)).asInstanceOf[Elem]
@@ -70,15 +201,14 @@ object Xml {
   // --- Pretty printing:
   private val width = 120
 
-  // TODO: it seems that there is abug in PrettyPrinter:
   private val prettyPrinter: PrettyPrinter = new PrettyPrinter(width, 2) {
-    override protected def makeBox(ind: Int, s: String): Unit =
-      if (cur + s.length <= width) { // fits in this line; LMD: changed > to <=...
-        items ::= Box(ind, s)
-        cur += s.length
-      } else try cut(s, ind) foreach (items ::= _) // break it up
-      catch { case _: BrokenException => makePara(ind, s) } // give up, para
-
+    // TODO: it seems that there is a bug in PrettyPrinter, but with this override uncommented stack overflows...
+//    override protected def makeBox(ind: Int, s: String): Unit =
+//      if (cur + s.length <= width) { // fits in this line; LMD: changed > to <=...
+//        items ::= Box(ind, s)
+//        cur += s.length
+//      } else try cut(s, ind) foreach (items ::= _) // break it up
+//      catch { case _: BrokenException => makePara(ind, s) } // give up, para
   }
 
   // TODO PrettyPrinter breaks the line between e1 and e2 in <e1>...</e1><e2>...</e2>
@@ -120,15 +250,14 @@ object Xml {
     out.close()
   }
 
-
-  private def open1(what: Elem, tag: String): Elem = what/*(0).asInstanceOf[Elem].*/check(tag)
-
+  // TODO switch to Parser[A]
   def open(element: Elem, name: String): (Attributes, Seq[Elem]) = {
     checkName(element, name)
     checkNoNonElements(element)
     (Attributes(element), getElements(element))
   }
 
+  // TODO switch to Parser[A]
   def openEmpty(element: Elem, name: String): Attributes = {
     checkName(element, name)
     checkNoElements(element)
@@ -136,6 +265,7 @@ object Xml {
     Attributes(element)
   }
 
+  // TODO switch to Parser[A]
   def openText(element: Elem, name: String): (Attributes, Option[String]) = {
     checkName(element, name)
     checkNoElements(element)
@@ -143,20 +273,25 @@ object Xml {
     (Attributes(element), if (text.isEmpty) None else Some(text))
   }
 
+  // TODO switch to Parser[A]
   private def checkName(element: Elem, name: String): Unit =
     require(element.label == name, s"Wrong element: ${element.label} instead of $name")
 
+  // TODO switch to Parser[A]
   private def checkNoElements(element: Elem): Unit =
     require(getElements(element).isEmpty, "Nested elements present.")
 
+  // TODO switch to Parser[A]
   private def checkNoNonElements(element: Elem): Unit = {
     val nonElements = getNonElements(element)
     require(nonElements.isEmpty, s"Non-element children present on element $element: $nonElements")
   }
 
+  // TODO switch to Parser[A]
   private def getElements(element: Elem): Seq[Elem] =
     element.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
+  // TODO switch to Parser[A]
   private def getNonElements(element: Elem): Seq[Node] = {
     element.child.filterNot(_.isInstanceOf[Elem]).filter { node =>
       !node.isInstanceOf[Text] ||
@@ -164,10 +299,12 @@ object Xml {
     }
   }
 
+  // TODO switch to Parser[A]
   def take(elements: Seq[Elem], name1: String): (Seq[Elem], Seq[Elem]) = {
     elements.span(_.label == name1)
   }
 
+  // TODO switch to Parser[A]
   def parseEmpty[T](element: Elem, name: String, parser: Attributes => T): T = {
     val attributes = openEmpty(element, name)
     val result = parser(attributes)
@@ -175,17 +312,20 @@ object Xml {
     result
   }
 
+  // TODO switch to Parser[A]
   def noMoreThanOne(elements: Seq[Elem]): Option[Elem] = {
     require(elements.length <= 1)
     elements.headOption
   }
 
+  // TODO switch to Parser[A]
   def span(elements: Seq[Elem], name1: String): Seq[Elem] = {
     val (result, tail) = take(elements, name1)
     checkNoMoreElements(tail)
     result
   }
 
+  // TODO switch to Parser[A]
   def span(elements: Seq[Elem], name1: String, name2: String): (Seq[Elem], Seq[Elem]) = {
     val (elements1, tail1) = elements.span(_.label == name1)
     val (elements2, tail2) = tail1.span(_.label == name2)
@@ -193,6 +333,7 @@ object Xml {
     (elements1, elements2)
   }
 
+  // TODO switch to Parser[A]
   def span(elements: Seq[Elem], name1: String, name2: String, name3: String): (Seq[Elem], Seq[Elem], Seq[Elem]) = {
     val (elements1, tail1) = elements.span(_.label == name1)
     val (elements2, tail2) = tail1.span(_.label == name2)
@@ -201,10 +342,9 @@ object Xml {
     (elements1, elements2, elements3)
   }
 
+  // TODO switch to Parser[A]
   def checkNoMoreElements(elements: Seq[Elem]): Unit =
     require(elements.isEmpty, s"Spurious elements: ${elements.head.label}")
-
-
 
 
 
@@ -235,17 +375,6 @@ object Xml {
     def idOption: Option[String] = attributeOption("xml:id")
 
     def id: String = getAttribute("xml:id")
-
-    def intAttributeOption(name: String): Option[Int] = attributeOption(name).map { value =>
-      try { value.toInt } catch { case e: NumberFormatException => throw new IllegalArgumentException(s"$value is not a number", e)}
-    }
-
-    def intAttribute(name: String): Int = intAttributeOption(name).getOrElse(throw new NoSuchElementException(s"No attribute $name"))
-
-    def booleanAttribute(name: String): Boolean = {
-      val value = attributeOption(name)
-      value.isDefined && ((value.get == "true") || (value.get == "yes"))
-    }
 
     def oneChild(name: String): Elem = oneOptionalChild(name, required = true).get
     def optionalChild(name: String): Option[Elem] = oneOptionalChild(name, required = false)

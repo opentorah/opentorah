@@ -1,7 +1,6 @@
 package org.digitaljudaica.store
 
 import java.io.File
-
 import org.digitaljudaica.util.Files
 
 sealed trait By {

@@ -1,11 +1,12 @@
 package org.digitaljudaica.metadata
 
-import org.digitaljudaica.util.Util
-
+import cats.implicits._
+import org.digitaljudaica.metadata.Xml.{Parser, elements}
+import org.digitaljudaica.util.Collections
 import scala.xml.Elem
 
 final class Names(val names: Seq[Name]) extends HasName with LanguageString {
-  Util.checkNoDuplicates(names.map(_.name), "names")
+  Collections.checkNoDuplicates(names.map(_.name), "names")
   // There may be multiple names for the same language (for an example, see Language),
   // so this check is disabled:
   // Util.checkNoDuplicates(names.map(_.copy(name = "")), "name parameters")
@@ -54,6 +55,7 @@ object Names {
     new Names(result.toSeq)
   }
 
+  // TODO switch to Parser[A]
   def parse(attributes: Attributes, elements: Seq[Elem]): (Names, Seq[Elem]) = {
     val defaultName: Option[Name] =
       attributes.get("n").map { defaultName => Name(defaultName, LanguageSpec.empty) }
@@ -65,23 +67,30 @@ object Names {
     (names, tail)
   }
 
+  // TODO switch to Parser[A]
   def parse(elements: Seq[Elem]): (Names, Seq[Elem]) = {
     val (nameElements, tail) = Xml.take(elements, "name")
     (parse(nameElements, None), tail)
   }
 
+  // TODO switch to Parser[A]
   def parse(element: Elem): Names = {
     val (attributes, nameElements) = Xml.open(element, "names")
     attributes.close()
     parse(nameElements, None)
   }
 
+  // TODO switch to Parser[A]
   private def parse(nameElements: Seq[Elem], defaultName: Option[Name]): Names = {
-    val nonDefaultNames: Seq[Name] = nameElements.map(element => XmlParser.runA(element, "name", XmlParser.nameParser))
+    val nonDefaultNames: Seq[Name] = nameElements.map(element => Xml.runA(element, "name", Name.parser))
     val names = defaultName.fold(nonDefaultNames){ defaultName =>
       if (nonDefaultNames.exists(_.name == defaultName.name)) nonDefaultNames
       else nonDefaultNames :+ defaultName
     }
     new Names(names)
   }
+
+  val parser: Parser[Names] = for {
+    names <- elements("name", Name.parser)
+  } yield new Names(names)
 }

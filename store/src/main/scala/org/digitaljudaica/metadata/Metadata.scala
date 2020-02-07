@@ -2,7 +2,7 @@ package org.digitaljudaica.metadata
 
 import java.io.FileNotFoundException
 
-import org.digitaljudaica.util.Util
+import org.digitaljudaica.util.{Collections, Util}
 
 import scala.xml.{Elem, Utility}
 
@@ -100,7 +100,7 @@ object Metadata {
   private def findAndBind[K <: WithName, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Seq[(K, M)] = {
     if (keys.isEmpty) require(metadatas.isEmpty, s"Unmatched metadatas: ${metadatas.mkString("\n")}")
     if (metadatas.isEmpty) require(keys.isEmpty, s"Unmatched keys: $keys")
-    Util.checkNoDuplicates(keys, s"keys")
+    Collections.checkNoDuplicates(keys, s"keys")
 
     if (keys.isEmpty) Nil else {
       val key: K = keys.head
