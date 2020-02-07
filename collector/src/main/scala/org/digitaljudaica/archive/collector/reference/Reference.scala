@@ -1,10 +1,12 @@
-package org.digitaljudaica.archive.collector
+package org.digitaljudaica.archive.collector.reference
+
+import org.digitaljudaica.archive.collector.Errors
+import org.digitaljudaica.metadata.Xml.Ops
 
 import scala.xml.Elem
-import Xml.Ops
 
 final class Reference(
-  val source: DocumentLike,
+  val source: ReferenceSource,
   val entity: Entity,
   xml: Elem
 ) {

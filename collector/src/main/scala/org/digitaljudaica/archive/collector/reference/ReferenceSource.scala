@@ -1,9 +1,10 @@
-package org.digitaljudaica.archive.collector
+package org.digitaljudaica.archive.collector.reference
 
+import org.digitaljudaica.archive.collector.CollectionLike
+import org.digitaljudaica.metadata.Xml.Ops
 import scala.xml.Elem
-import Xml.Ops
 
-abstract class DocumentLike(val collection: CollectionLike) {
+abstract class ReferenceSource(val collection: CollectionLike) {
 
   def references: Seq[Reference]
 

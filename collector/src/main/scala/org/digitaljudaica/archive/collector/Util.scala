@@ -1,17 +1,11 @@
 package org.digitaljudaica.archive.collector
 
-import java.io.{BufferedWriter, File, FileWriter}
-
-import scala.io.Source
+import java.io.File
+import org.digitaljudaica.metadata.Xml
+import org.digitaljudaica.util.Files
 import scala.xml.Node
 
 object Util {
-
-  def filesWithExtensions(directory: File, extension: String): Seq[String] = {
-    (if (!directory.exists) Seq.empty else directory.listFiles.toSeq)
-      .map(_.getName)
-      .filter(_.endsWith(extension)).map(_.dropRight(extension.length))
-  }
 
   def htmlFile(directory: File, fileName: String): File = new File(directory, fileName + ".html")
 
@@ -47,7 +41,7 @@ object Util {
       Seq("---") ++
       Seq("") ++ content
 
-    write(file, result.mkString("\n"))
+    Files.write(file, result.mkString("\n"))
   }
 
   def writeTei(
@@ -60,7 +54,7 @@ object Util {
     yaml: Seq[(String, String)] = Seq.empty
   ): Unit = {
     val elem = Tei.tei(head, content)
-    Util.write(
+    Files.write(
       file = new File(directory, fileName + ".xml"),
       content = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
         Xml.format(elem)
@@ -74,55 +68,5 @@ object Util {
       target,
       yaml = head.fold[Seq[(String, String)]](Seq.empty)(head => Seq("title" -> quote(Xml.spacedText(head)))) ++ yaml
     )
-  }
-
-  def write(file: File, content: String): Unit = {
-    file.getParentFile.mkdirs()
-    val writer: BufferedWriter = new BufferedWriter(new FileWriter(file))
-    try {
-      writer.write(content)
-    } finally {
-      writer.close()
-    }
-  }
-
-  def read(file: File): Seq[String] = {
-    val source = Source.fromFile(file)
-    val result = source.getLines.toSeq
-    source.close
-    result
-  }
-
-  def splice(file: File, start: String, end: String, what: Seq[String]): Unit = {
-    println(s"Splicing ${file.getName}.")
-    write(file, splice(read(file), start, end, what).mkString("\n"))
-  }
-
-  private def splice(lines: Seq[String], start: String, end: String, what: Seq[String]): Seq[String] = {
-    val (prefix, tail) = lines.span(_ != start)
-    if (tail.isEmpty) lines else {
-      val (_, suffix) = tail.tail.span(_ != end)
-      if (suffix.isEmpty) lines else {
-        prefix ++ Seq(start) ++ what ++ suffix
-      }
-    }
-  }
-
-  def deleteFiles(directory: File): Unit = {
-    directory.mkdirs()
-    for (file <- directory.listFiles()) file.delete()
-  }
-
-  def removeConsecutiveDuplicates[T](seq: Seq[T]): Seq[T] = removeConsecutiveDuplicates(Seq.empty, seq.toList)
-
-  @scala.annotation.tailrec
-  private def removeConsecutiveDuplicates[T](result: Seq[T], seq: List[T]): Seq[T] = seq match {
-    case x :: y :: xs =>
-      removeConsecutiveDuplicates(
-        if (x == y) result else result :+ x,
-        y :: xs
-      )
-    case x :: Nil => result :+ x
-    case Nil => result
   }
 }

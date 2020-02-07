@@ -1,7 +1,9 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-import Xml.Ops
+import org.digitaljudaica.archive.collector.reference.{Entity, Reference, ReferenceSource}
+import org.digitaljudaica.metadata.Xml.Ops
+
 import scala.xml.Elem
 
 final class Document(
@@ -11,7 +13,7 @@ final class Document(
   prev: Option[String],
   next: Option[String],
   val translations: Seq[String]
-) extends DocumentLike(collection) {
+) extends ReferenceSource(collection) {
   override def toString: String = s"$collection:$name"
 
   private val tei: Tei = Tei.load(collection.teiDirectory, name)

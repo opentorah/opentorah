@@ -1,9 +1,9 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-
+import org.digitaljudaica.metadata.Xml
+import org.digitaljudaica.metadata.Xml.Ops
 import scala.xml.{Elem, Node}
-import Xml.Ops
 
 class Tei(val tei: Elem) {
   tei.check(Tei.topElement)

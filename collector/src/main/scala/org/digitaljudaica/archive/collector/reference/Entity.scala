@@ -1,4 +1,4 @@
-package org.digitaljudaica.archive.collector
+package org.digitaljudaica.archive.collector.reference
 
 sealed trait Entity {
   def element: String

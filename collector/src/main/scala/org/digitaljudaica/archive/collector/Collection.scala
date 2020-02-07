@@ -1,9 +1,11 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-import scala.xml.{Elem, Node, Text}
+import org.digitaljudaica.metadata.Xml.Ops
+import org.digitaljudaica.util.{Files, Collections}
+import org.digitaljudaica.archive.collector.reference.Reference
 import Table.Column
-import Xml.Ops
+import scala.xml.{Elem, Node, Text}
 
 final class Collection(
   layout: Layout,
@@ -98,13 +100,12 @@ final class Collection(
 
   private def getDocuments: Seq[Document] = {
     val namesWithLang: Seq[(String, Option[String])] =
-      Util.filesWithExtensions(teiDirectory, ".xml").sorted.map(splitLang)
+      Files.filesWithExtensions(teiDirectory, ".xml").sorted.map(splitLang)
 
-    val translations: Map[String, Seq[String]] = namesWithLang
+    val translations: Map[String, Seq[String]] = Collections.mapValues(namesWithLang
       .filter(_._2.isDefined)
       .map(e => (e._1, e._2.get))
-      .groupBy(_._1)
-      .view.mapValues(_.map(_._2)).toMap
+      .groupBy(_._1))(_.map(_._2))
 
     val names: Seq[String] = namesWithLang.filter(_._2.isEmpty).map(_._1)
 
@@ -144,9 +145,9 @@ final class Collection(
 
     // Wrappers
     val docsDirectory = layout.docs(directory)
-    Util.deleteFiles(docsDirectory)
+    Files.deleteFiles(docsDirectory)
     val facsDirectory = layout.facs(directory)
-    Util.deleteFiles(facsDirectory)
+    Files.deleteFiles(facsDirectory)
 
     for (document <- documents) document.writeWrappers(docsDirectory, facsDirectory)
   }

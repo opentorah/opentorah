@@ -1,7 +1,9 @@
-package org.digitaljudaica.archive.collector
+package org.digitaljudaica.archive.collector.reference
 
+import org.digitaljudaica.archive.collector.{Errors, Layout, Tei}
+import org.digitaljudaica.util.Collections
+import org.digitaljudaica.metadata.Xml.Ops
 import scala.xml.{Elem, Node, Text}
-import Xml.Ops
 
 // TODO structure the TEI file better: the names, information, list reference, mentions...
 final class Named(
@@ -10,9 +12,9 @@ final class Named(
   container: Names,
   layout: Layout,
   errors: Errors
-) extends DocumentLike(container) {
+) extends ReferenceSource(container) {
 
-  private val xml: Elem = if (rawXml.label != Tei.topElement) rawXml else new Tei(rawXml).body.elements.head
+  private val xml: Elem = if (rawXml.label != Tei.topElement) rawXml else new Tei(rawXml).body.elems.head
 
   val entity: Entity = Entity.forElement(xml.label).get
 
@@ -22,7 +24,7 @@ final class Named(
 
   val role: Option[String] = xml.attributeOption("role")
 
-  private val (nameElements: Seq[Elem], tail: Seq[Elem]) = xml.elements.span(_.label == entity.nameElement)
+  private val (nameElements: Seq[Elem], tail: Seq[Elem]) = xml.elems.span(_.label == entity.nameElement)
 
   private val names: Seq[Name] = for (nameElement <- nameElements) yield new Name(entity, nameElement)
   if (names.isEmpty) errors.error(s"No names for $id")
@@ -69,7 +71,7 @@ object Named {
       {toList}
       {for ((source, references) <- bySource) yield <l>{
         Seq[Node](Text(source + ": ")) ++
-          (for (ref <- Util.removeConsecutiveDuplicates(references.map(_.source)))
+          (for (ref <- Collections.removeConsecutiveDuplicates(references.map(_.source)))
             yield <ref target={ref.url} role={ref.viewer}>{ref.name}</ref>)
         }</l>
       }</p>

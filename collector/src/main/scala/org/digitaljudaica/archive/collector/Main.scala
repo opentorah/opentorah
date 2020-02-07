@@ -1,7 +1,8 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-
+import org.digitaljudaica.metadata.Xml
+import org.digitaljudaica.archive.collector.reference.Names
 import scala.xml.{Elem, Text}
 
 object Main {
