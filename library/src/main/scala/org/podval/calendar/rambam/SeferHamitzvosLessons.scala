@@ -1,6 +1,6 @@
 package org.podval.calendar.rambam
 
-import org.podval.judaica.metadata.{Attributes, Language, Metadata, Name, Names, WithNames, XML}
+import org.digitaljudaica.metadata.{Attributes, Language, Metadata, Name, Names, WithNames, Xml}
 
 import scala.xml.Elem
 
@@ -48,7 +48,7 @@ object SeferHamitzvosLessons {
   }
 
   private def parseLesson(element: Elem): Lesson = {
-    val (attributes: Attributes, elements: Seq[Elem]) = XML.open(element, "lesson")
+    val (attributes: Attributes, elements: Seq[Elem]) = Xml.open(element, "lesson")
     val number: Int = attributes.doGetInt("n")
     val parts: Seq[Part] = elements.map(parsePart)
     new Lesson(number, parts)
@@ -59,15 +59,15 @@ object SeferHamitzvosLessons {
     case "negative" => new Negative(getNumber(element, "negative"))
 
     case "named" =>
-      val (attributes: Attributes, elements: Seq[Elem]) = XML.open(element, "named")
+      val (attributes: Attributes, elements: Seq[Elem]) = Xml.open(element, "named")
       attributes.close()
       val (names: Names, tail: Seq[Elem]) = Names.parse(elements)
-      XML.checkNoMoreElements(tail)
+      Xml.checkNoMoreElements(tail)
       new NamedPart(names)
   }
 
   private def getNumber(element: Elem, name: String): Int = {
-    val attributes: Attributes = XML.openEmpty(element, name)
+    val attributes: Attributes = Xml.openEmpty(element, name)
     val result = attributes.doGetInt("n")
     attributes.close()
     result

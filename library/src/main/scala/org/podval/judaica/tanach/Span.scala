@@ -1,6 +1,6 @@
 package org.podval.judaica.tanach
 
-import org.podval.judaica.metadata.{LanguageSpec, LanguageString}
+import org.digitaljudaica.metadata.{LanguageSpec, LanguageString}
 
 final case class Span(from: Verse, to: Verse) extends LanguageString {
   require(from <= to, s"Empty span: $from..$to")

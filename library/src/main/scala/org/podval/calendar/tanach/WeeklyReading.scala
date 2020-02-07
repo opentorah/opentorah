@@ -1,12 +1,12 @@
 package org.podval.calendar.tanach
 
+import org.digitaljudaica.metadata.{Names, WithNames}
+import org.digitaljudaica.util.Collections
 import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import SpecialDay.{Pesach, Shavuos, TishaBeAv}
-import org.podval.judaica.metadata.{Names, WithNames}
 import org.podval.judaica.tanach.Parsha
 import org.podval.judaica.tanach.Parsha._
-import org.podval.judaica.util.Util
 
 /**
   * Determine weekly portion read on a given Shabbos.
@@ -151,7 +151,7 @@ object WeeklyReading {
 
     // All Shabbos days that are not festivals from one Shabbos Bereshit until the next.
     val weeks: Seq[Day] =
-      Util.unfoldSimple[Day](fromShabbosBereishis, _ + Calendar.daysPerWeek, _ < toShabbosBereishis)
+      Collections.unfoldSimple[Day](fromShabbosBereishis, _ + Calendar.daysPerWeek, _ < toShabbosBereishis)
       .filterNot(festivals.contains)
 
     val combine: Set[Parsha] = combined(year, weeks)

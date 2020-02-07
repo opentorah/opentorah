@@ -5,11 +5,14 @@ plugins {
   id 'com.jfrog.bintray'
 }
 
-description = 'Jewish Calendar Dates.'
+description = 'Jewish Calendar Dates'
 
 dependencies {
+  implementation "org.digitaljudaica:org.digitaljudaica-store:$storeVersion"
+
   implementation "org.scala-lang:scala-library:$scalaVersion"
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+  implementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
 
   testImplementation "org.scalacheck:scalacheck_$scalaVersionMajor:$scalacheckVersion"
   testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
@@ -17,7 +20,6 @@ dependencies {
 
   testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports; only 0.35.10 is supported?
 
-  testImplementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
   testImplementation "org.typelevel:algebra-laws_$scalaVersionMajor:$algebraLawsVersion"
 }
 
@@ -67,7 +69,7 @@ publishing {
           }
         }
         organization {
-          name = 'Jewish Calendar'
+          name = 'Digital Judaica'
           url = 'http://www.jewish-calendar.org'
         }
         developers {

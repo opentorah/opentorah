@@ -1,7 +1,7 @@
 package org.podval.judaica.tanach
 
-import org.podval.judaica.metadata.{Named, NamedCompanion, Names}
-import org.podval.judaica.util.Util
+import org.digitaljudaica.metadata.{Named, NamedCompanion, Names}
+import org.digitaljudaica.util.Collections
 
 // Assumptions: no cycles; only Common doesn't have parent.
 sealed class Custom(val parent: Option[Custom]) extends Named {
@@ -63,7 +63,7 @@ object Custom extends NamedCompanion {
       new Of[R](all.map { custom => custom -> f(custom, doFind(custom)) }.toMap)
 
     final def map[R](f: T => R, full: Boolean = true): Of[R] =
-      new Of[R](Util.mapValues(customs)(f), full = full)
+      new Of[R](Collections.mapValues(customs)(f), full = full)
 
     final def ++(other: Of[T]): Of[T] = new Of[T](customs ++ other.customs, full = false)
 
@@ -75,7 +75,7 @@ object Custom extends NamedCompanion {
     def apply[T](value: T): Custom.Of[T] = new Of[T](Map(Common -> value))
 
     def apply[T](pairs: Seq[(Set[Custom], T)], full: Boolean): Of[T] = {
-      Util.checkNoDuplicates(pairs.map(_._1), "pre-map Sets[T]")
+      Collections.checkNoDuplicates(pairs.map(_._1), "pre-map Sets[T]")
       apply(pairs.toMap, full)
     }
 
@@ -86,7 +86,7 @@ object Custom extends NamedCompanion {
         require(b.intersect(a).isEmpty, s"Overlaping sets of customs: $a and $b")
       }))
 
-      Util.checkNoDuplicates(map.values.toSeq, "customs")
+      Collections.checkNoDuplicates(map.values.toSeq, "customs")
 
       new Of[T](map.flatMap { case (customs, value) => customs.map(custom => custom -> value) }, full = full)
     }
@@ -148,7 +148,7 @@ object Custom extends NamedCompanion {
 
   def parse(names: String): Set[Custom] = {
     val result: Seq[Custom] = names.split(',').map(_.trim).map(getForName)
-    Util.checkNoDuplicates(result, "customs")
+    Collections.checkNoDuplicates(result, "customs")
     result.toSet
   }
 

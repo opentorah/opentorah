@@ -1,7 +1,6 @@
 package org.podval.judaica.rambam
 
-import org.podval.judaica.metadata.{Attributes, Language, LanguageSpec, Metadata, Name, Names, WithNames, XML}
-
+import org.digitaljudaica.metadata.{Attributes, Language, Metadata, Name, Names, WithNames, Xml}
 import scala.xml.Elem
 
 object MishnehTorah {
@@ -68,10 +67,10 @@ object MishnehTorah {
   }
 
   private def parseBook(element: Elem): Book = {
-    val (attributes: Attributes, elements: Seq[Elem]) = XML.open(element, "book")
+    val (attributes: Attributes, elements: Seq[Elem]) = Xml.open(element, "book")
     val number: Int = attributes.doGet("n").toInt
     val (names: Names, tail: Seq[Elem]) = Names.parse(elements)
-    val parts: Seq[Part] = XML.span(tail, "part").map(parsePart)
+    val parts: Seq[Part] = Xml.span(tail, "part").map(parsePart)
     require(parts.map(_.number) == (1 to parts.length), s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
     val result = new Book(number, names, parts)
     parts.foreach(_.setBook(result))
@@ -79,7 +78,7 @@ object MishnehTorah {
   }
 
   private def parsePart(element: Elem): Part = {
-    val (attributes: Attributes, elements: Seq[Elem]) = XML.open(element, "part")
+    val (attributes: Attributes, elements: Seq[Elem]) = Xml.open(element, "part")
     val number: Int = attributes.doGetInt("n")
     val numChapters: Int = attributes.doGetInt("chapters")
     val (names: Names, tail: Seq[Elem]) = Names.parse(elements)
@@ -101,7 +100,7 @@ object MishnehTorah {
   }
 
   private def parseNamedChapter(element: Elem): NamedChapter = {
-    val (attributes: Attributes, elements: Seq[Elem]) = XML.open(element, "chapter")
+    val (attributes: Attributes, elements: Seq[Elem]) = Xml.open(element, "chapter")
     val (names: Names, tail: Seq[Elem]) = Names.parse(elements)
     require(tail.isEmpty)
     new NamedChapter(names)

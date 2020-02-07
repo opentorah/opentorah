@@ -1,8 +1,8 @@
 package org.podval.calendar.gregorian
 
+import org.digitaljudaica.metadata.LanguageSpec
 import org.podval.calendar.dates.{Calendar, CalendarMember}
 import org.podval.calendar.numbers.Digits
-import org.podval.judaica.metadata.LanguageSpec
 
 class Gregorian private() extends Calendar[Gregorian] {
 

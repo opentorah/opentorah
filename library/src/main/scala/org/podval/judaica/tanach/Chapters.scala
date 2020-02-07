@@ -1,6 +1,6 @@
 package org.podval.judaica.tanach
 
-import org.podval.judaica.metadata.XML
+import org.digitaljudaica.metadata.Xml
 
 import scala.xml.Elem
 
@@ -62,7 +62,7 @@ final class Chapters(chapters: Seq[Int]) {
 object Chapters {
   def apply(elements: Seq[Elem]): Chapters = {
     val chapters: Seq[WithNumber[Int]] = elements.map { element =>
-      val attributes = XML.openEmpty(element, "chapter" )
+      val attributes = Xml.openEmpty(element, "chapter" )
       val result = WithNumber.parse(attributes, attributes => attributes.doGetInt("length"))
       attributes.close()
       result

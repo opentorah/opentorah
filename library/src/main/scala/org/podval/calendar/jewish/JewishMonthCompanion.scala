@@ -1,7 +1,7 @@
 package org.podval.calendar.jewish
 
+import org.digitaljudaica.metadata.{Named, NamedCompanion, Names}
 import org.podval.calendar.dates.MonthCompanion
-import org.podval.judaica.metadata.{NamedCompanion, Named, Names}
 
 abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
   final override val Name: JewishMonthCompanion.type = JewishMonthCompanion

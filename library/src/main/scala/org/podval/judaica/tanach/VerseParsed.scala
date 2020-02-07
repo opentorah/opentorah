@@ -1,6 +1,7 @@
 package org.podval.judaica.tanach
 
-import org.podval.judaica.metadata.Attributes
+import cats.implicits._
+import org.digitaljudaica.metadata.{Attributes, Xml}
 
 final case class VerseParsed(chapter: Option[Int], verse: Option[Int]) {
 
@@ -28,8 +29,18 @@ object VerseParsed {
     verse = attributes.getInt("fromVerse")
   )
 
+  val fromParser: Xml.Parser[VerseParsed] = for {
+    chapter <- Xml.optionalIntAttribute("fromChapter")
+    verse <- Xml.optionalIntAttribute("fromVerse")
+  } yield VerseParsed(chapter, verse)
+
   final def parseTo(attributes: Attributes): VerseParsed = VerseParsed(
     chapter = attributes.getInt("toChapter"),
     verse = attributes.getInt("toVerse")
   )
+
+  val toParser: Xml.Parser[VerseParsed] = for {
+    chapter <- Xml.optionalIntAttribute("toChapter")
+    verse <- Xml.optionalIntAttribute("toVerse")
+  } yield VerseParsed(chapter, verse)
 }
