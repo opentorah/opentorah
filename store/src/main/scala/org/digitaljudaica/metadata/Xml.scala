@@ -19,7 +19,7 @@ object Xml {
   type ErrorOr[A] = Either[Error, A]
   type Parser[A] = StateT[ErrorOr, Element, A]
 
-  private def pure[A](value: A): Parser[A] = StateT.pure[ErrorOr, Element, A](value)
+  def pure[A](value: A): Parser[A] = StateT.pure[ErrorOr, Element, A](value)
 
   private def lift[A](value: ErrorOr[A]): Parser[A] = StateT.liftF[ErrorOr, Element, A](value)
 
@@ -36,16 +36,18 @@ object Xml {
 
   private val getCharacters: Parser[Option[String]] = inspect(_.characters)
 
+  def required[A](what: String, name: String, parser: String => Parser[Option[A]]): Parser[A] = for {
+    result <- parser(name)
+    _ <- check(result.isDefined, s"Required $what '$name' is missing")
+  } yield result.get
+
   def optionalAttribute(name: String): Parser[Option[String]] = for {
     result <- inspect(_.attributes.get(name))
     _ <- modify(element => element.copy(attributes = element.attributes - name))
   } yield result
 
-  def attribute(name: String): Parser[String] = for {
-    resultO <- optionalAttribute(name)
-    _ <- check(resultO.isDefined, s"Required attribute '$name' is missing")
-    result = resultO.get
-  } yield result
+  def attribute(name: String): Parser[String] =
+    required(s"attribute", name, optionalAttribute)
 
   def optionalBooleanAttribute(name: String): Parser[Option[Boolean]] = for {
     resultO <- optionalAttribute(name)
@@ -58,12 +60,8 @@ object Xml {
     _ <- check(result.isEmpty || result.get > 0, s"Non-positive integer: ${result.get}")
   } yield result
 
-  def intAttribute(name: String): Parser[Int] = for {
-    // TODO remove duplication (and cover element also)
-    resultO <- optionalIntAttribute(name)
-    _ <- check(resultO.isDefined, s"Required attribute '$name' is missing")
-    result = resultO.get
-  } yield result
+  def intAttribute(name: String): Parser[Int] =
+    required(s"attribute", name, optionalIntAttribute)
 
   def optionalCharacters: Parser[Option[String]] = for {
     result <- getCharacters
@@ -77,11 +75,11 @@ object Xml {
     _ <- modify(if (toParse.isEmpty) identity else _.copy(elements = elements.tail))
   } yield result
 
-  def element[A](name: String, parser: Parser[A]): Parser[A] = for {
-    resultO <- optionalElement(name, parser)
-    _ <- check(resultO.isDefined, s"Required element '$name' is missing")
-    result = resultO.get
-  } yield result
+  def element[A](toParse: Elem, name: String, parser: Parser[A]): Parser[A] =
+    lift(run(toParse, name, parser))
+
+  def element[A](name: String, parser: Parser[A]): Parser[A] =
+    required(s"element", name, optionalElement(_, parser))
 
   def getElements[A](name: String): Parser[Seq[Elem]] = for {
     elements <- getElements
@@ -89,9 +87,13 @@ object Xml {
     _ <- modify(_.copy(elements = tail))
   } yield result
 
+  def elements[A](toParse: Seq[Elem], name: String, parser: Parser[A]): Parser[Seq[A]] = for {
+    result <- toParse.toList.traverse(xml => lift(run(xml, name, parser)))
+  } yield result
+
   def elements[A](name: String, parser: Parser[A]): Parser[Seq[A]] = for {
     toParse <- getElements(name)
-    result <- toParse.toList.traverse(xml => lift(run(xml, name, parser)))
+    result <- elements(toParse, name, parser)
   } yield result
 
   private def run[A](elem: Elem, name: String, parser: Parser[A]): ErrorOr[A] = {
