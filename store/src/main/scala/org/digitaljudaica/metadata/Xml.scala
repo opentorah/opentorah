@@ -3,8 +3,7 @@ package org.digitaljudaica.metadata
 import cats.implicits._
 import cats.data.StateT
 import org.digitaljudaica.xml.Element
-import scala.xml.transform.{RewriteRule, RuleTransformer}
-import scala.xml.{Elem, Node, Text, TopScope}
+import scala.xml.{Elem, Node, Text}
 
 object Xml {
 
@@ -29,7 +28,7 @@ object Xml {
 
   private val getCharacters: Parser[Option[String]] = inspect(_.characters)
 
-  def required[A](what: String, name: String, parser: String => Parser[Option[A]]): Parser[A] = for {
+  private def required[A](what: String, name: String, parser: String => Parser[Option[A]]): Parser[A] = for {
     result <- parser(name)
     _ <- check(result.isDefined, s"Required $what '$name' is missing")
   } yield result.get

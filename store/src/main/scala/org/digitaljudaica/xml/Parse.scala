@@ -96,6 +96,12 @@ object Parse {
   def element[A](name: String, parser: Parser[A]): Parser[A] =
     required(s"element", name, optionalElement(_, parser))
 
+  def elements[A](name: String, parser: Parser[A]): Parser[Seq[A]] = for {
+    headOption <- optionalElement(name, parser)
+    tail <- if (headOption.isEmpty) pure(Seq.empty[A]) else elements(name, parser)
+    result = headOption.toSeq ++ tail
+  } yield result
+
   def load(toLoad: Load.Result): Parser[Unit] = {
     val (url, what) = toLoad
     what match {
