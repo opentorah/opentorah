@@ -50,25 +50,18 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
     new Custom.Of(result, full = full)
   }
 
-  private def parseCustom(ancestorSpan: BookSpanParsed)(element: Elem): (Set[Custom], Haftarah) = {
-    val (customs, attributes, elements) =  {
-      val (attributes, elements) = Xml.open(element, "custom")
-      val customs: Set[Custom] = Custom.parse(attributes.doGet("n"))
-      (customs, attributes, elements)
-    }
-    customs -> parseCustom(ancestorSpan, attributes, elements)
-  }
+  private def parseCustom(ancestorSpan: BookSpanParsed)(element: Elem): (Set[Custom], Haftarah) =
+    Xml.runA(element, "custom", customParser(ancestorSpan))
 
-  private def parseCustom(
-    ancestorSpan: BookSpanParsed,
-    attributes: Attributes,
-    elements: Seq[Elem]
-  ): Haftarah = {
-    val span = parseSpan(attributes).inheritFrom(ancestorSpan)
-    val partElements = Xml.span(elements, "part")
+  private def customParser(ancestorSpan: BookSpanParsed): Xml.Parser[(Set[Custom], Haftarah)] = for {
+    n <- Xml.attribute("n")
+    customs = Custom.parse(n)
+    bookSpanParsed <- parseSpanNg
+    span = bookSpanParsed.inheritFrom(ancestorSpan)
+    partElements <- Xml.getElements("part")
+    result <- if (partElements.isEmpty) Xml.pure(oneSpan(span)) else parsePartsNg(partElements, span)
+  } yield customs -> result
 
-    if (partElements.isEmpty) oneSpan(span) else parseParts(partElements, span)
-  }
 
   private def oneSpan(span: BookSpanParsed): Haftarah = Haftarah(Seq(span.resolve))
 
@@ -84,4 +77,16 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
     require(result.length > 1)
     Haftarah(WithNumber.dropNumbers(result))
   }
+
+
+  private def parsePartsNg(elements: Seq[Elem], ancestorSpan: BookSpanParsed): Xml.Parser[Haftarah] = for {
+    result <- Xml.elements(elements, "part", WithNumber.parseNg(parsePart(ancestorSpan)))
+    _ <- WithNumber.checkConsecutiveNg(result, "part")
+    _ <- Xml.check(result.length > 1, "too short")
+  } yield Haftarah(WithNumber.dropNumbers(result))
+
+
+  private def parsePart(ancestorSpan: BookSpanParsed): Xml.Parser[BookSpan] = for {
+    result <- parseSpanNg
+  } yield result.inheritFrom(ancestorSpan).resolve
 }

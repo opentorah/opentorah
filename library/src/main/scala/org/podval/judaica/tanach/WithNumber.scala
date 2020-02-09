@@ -21,6 +21,9 @@ object WithNumber {
     result
   }
 
+  def checkConsecutiveNg[T](result: Seq[WithNumber[T]], what: String): Xml.Parser[Unit] =
+    Xml.check(result.map(_.n) == (1 to result.length), s"Wrong $what numbers: $result")
+
   def checkNumber[T](result: Seq[WithNumber[T]], number: Int, what: String): Seq[WithNumber[T]] = {
     checkConsecutive(result, what)
     require(result.length == number, s"Wrong number of ${what}s: ${result.length} != $number")
