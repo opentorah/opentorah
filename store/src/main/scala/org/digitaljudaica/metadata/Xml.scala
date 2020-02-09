@@ -3,17 +3,11 @@ package org.digitaljudaica.metadata
 import java.io.{File, FileWriter, OutputStream, OutputStreamWriter, PrintWriter, Writer}
 import cats.implicits._
 import cats.data.StateT
+import org.digitaljudaica.xml.Element
 import scala.xml.transform.{RewriteRule, RuleTransformer}
-import scala.xml.{Elem, Node, PrettyPrinter, Text, TopScope, Utility, XML}
+import scala.xml.{Elem, Node, PrettyPrinter, Text, TopScope}
 
 object Xml {
-
-  final case class Element(
-    name: String,
-    attributes: Map[String, String],
-    elements: Seq[Elem],
-    characters: Option[String]
-  )
 
   type Error = String
   type ErrorOr[A] = Either[Error, A]
@@ -119,62 +113,12 @@ object Xml {
       _ <- check(charactersAfter.isEmpty, s"Unparsed characters: ${charactersAfter.get}")
     } yield result
 
-    result.runA {
-      val (elements: Seq[Node], nonElements: Seq[Node]) = elem.child.partition(_.isInstanceOf[Elem])
-      Element(
-        name = elem.label,
-        attributes = elem.attributes.map(metadata => metadata.key -> metadata.value.toString).toMap,
-        elements = elements.map(_.asInstanceOf[Elem]),
-        characters = if (nonElements.isEmpty) None else {
-          val result: String = nonElements.map(_.text).mkString.trim
-          if (result.isEmpty) None else Some(result)
-        }
-      )
-    }
+    result.runA(Element(url = None, elem))
   }
 
   def runA[A](elem: Elem, name: String, parser: Parser[A]): A =
     run(elem, name, parser).fold(error => throw new IllegalArgumentException(error), identity)
 
-
-
-  // --- Xerces parser with Scala XML:
-  // build.gradle:    implementation "xerces:xercesImpl:$xercesVersion"
-  //  def newSaxParserFactory: SAXParserFactory = {
-  //    val result = SAXParserFactory.newInstance() // new org.apache.xerces.jaxp.SAXParserFactoryImpl
-  //    result.setNamespaceAware(true)
-  //    result.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
-  //    //    result.setXIncludeAware(true)
-  //    result
-  //  }
-  //
-  //  def getParser: SAXParser = newSaxParserFactory.newSAXParser
-  //  XML.withSAXParser(getParser)
-
-  // --- XML validation with XSD; how do I do RNG?
-  // https://github.com/scala/scala-xml/wiki/XML-validation
-  // https://github.com/EdgeCaseBerg/scala-xsd-validation/blob/master/src/main/scala/LoadXmlWithSchema.scala
-
-  def load(directory: File, fileName: String): Elem = {
-    val file: File = new File(directory, fileName + ".xml")
-    try {
-      scala.xml.Utility.trimProper(scala.xml.XML.loadFile(file)).asInstanceOf[Elem]
-    } catch {
-      case e: org.xml.sax.SAXParseException =>
-        throw new IllegalArgumentException(s"In file $file:", e)
-    }
-  }
-
-
-  def loadResource(clazz: Class[_], name: String, tag: String): Elem =
-    open1(XML.load(clazz.getResourceAsStream(name + ".xml")), tag)
-
-  // TODO switch to Parser[A]
-  private def open1(what: Elem, tag: String): Elem = what/*(0).asInstanceOf[Elem].*/check(tag)
-
-  def loadMetadata(file: File): Elem = load(file, "index")
-
-  def load(file: File): Elem = Utility.trimProper(XML.loadFile(file)).asInstanceOf[Elem]
 
   private def removeNamespace(node: Node): Node = node match {
     case e: Elem => e.copy(scope = TopScope, child = e.child.map(removeNamespace))

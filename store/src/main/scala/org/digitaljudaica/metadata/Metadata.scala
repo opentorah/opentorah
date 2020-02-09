@@ -1,10 +1,8 @@
 package org.digitaljudaica.metadata
 
-import java.io.FileNotFoundException
-
 import org.digitaljudaica.util.{Collections, Util}
-
-import scala.xml.{Elem, Utility}
+import org.digitaljudaica.xml.Loader
+import scala.xml.Elem
 
 final case class Metadata(
   attributes: Attributes, // actual parser needs to call close()!
@@ -52,7 +50,7 @@ object Metadata {
     val (attributes, elements) = Xml.open(element, elementName)
     attributes.get("resource").fold(Metadata(attributes, elements)) { subresourceName: String =>
       attributes.close()
-      val subresource: Elem = loadResource(obj, subresourceName)
+      val subresource: Elem = Loader.doLoadResource(obj, subresourceName)
       val (newAttributes, newElements) = Xml.open(subresource, elementName)
       Metadata(newAttributes, newElements)
     }
@@ -70,27 +68,12 @@ object Metadata {
     elementName: String
   ): Seq[Elem] = {
     val resourceNameEffective = resourceName.getOrElse(Util.className(obj))
-    val element = loadResource(obj, resourceNameEffective)
+    val element = Loader.doLoadResource(obj, resourceNameEffective)
     val (attributes, elements) = Xml.open(element, rootElementName)
     val type_ = attributes.doGet("type")
     attributes.close()
     require(type_ == resourceNameEffective, s"Wrong metadata type: $type_ instead of $resourceNameEffective")
     Xml.span(elements, elementName)
-  }
-
-  private def loadResource(obj: AnyRef, resourceName: String): Elem = {
-    val url = Option(obj.getClass.getResource(resourceName + ".xml"))
-    val result = url.flatMap { url =>
-      try {
-        val result = xml.XML.load(url.openStream())
-        Some(Utility.trimProper(result).asInstanceOf[Elem])
-      } catch {
-        case _: FileNotFoundException => None
-      }
-    }
-
-    require(result.isDefined, s"No resource: $resourceName")
-    result.get
   }
 
   // This is used to bind both Metadata and Names, so - HasName.
