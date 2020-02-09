@@ -1,11 +1,10 @@
 package org.digitaljudaica.metadata
 
-import java.io.{File, FileWriter, OutputStream, OutputStreamWriter, PrintWriter, Writer}
 import cats.implicits._
 import cats.data.StateT
 import org.digitaljudaica.xml.Element
 import scala.xml.transform.{RewriteRule, RuleTransformer}
-import scala.xml.{Elem, Node, PrettyPrinter, Text, TopScope}
+import scala.xml.{Elem, Node, Text, TopScope}
 
 object Xml {
 
@@ -120,81 +119,6 @@ object Xml {
     run(elem, name, parser).fold(error => throw new IllegalArgumentException(error), identity)
 
 
-  private def removeNamespace(node: Node): Node = node match {
-    case e: Elem => e.copy(scope = TopScope, child = e.child.map(removeNamespace))
-    case n => n
-  }
-
-  private def removeNamespace(element: Elem): Elem =
-    element.copy(scope = TopScope, child = element.child.map(removeNamespace))
-
-  def spacedText(node: Node): String = node match {
-    case elem: Elem => (elem.child map (_.text)).mkString(" ")
-    case node: Node => node.text
-  }
-
-  def rewriteElements(xml: Elem, elementRewriter: Elem => Elem): Elem = {
-    val rule: RewriteRule = new RewriteRule {
-      override def transform(node: Node): Seq[Node] = node match {
-        case element: Elem => elementRewriter(element)
-        case other => other
-      }
-    }
-
-    new RuleTransformer(rule).transform(xml).head.asInstanceOf[Elem]
-  }
-
-  // --- Pretty printing:
-  private val width = 120
-
-  private val prettyPrinter: PrettyPrinter = new PrettyPrinter(width, 2) {
-    // TODO: it seems that there is a bug in PrettyPrinter, but with this override uncommented stack overflows...
-//    override protected def makeBox(ind: Int, s: String): Unit =
-//      if (cur + s.length <= width) { // fits in this line; LMD: changed > to <=...
-//        items ::= Box(ind, s)
-//        cur += s.length
-//      } else try cut(s, ind) foreach (items ::= _) // break it up
-//      catch { case _: BrokenException => makePara(ind, s) } // give up, para
-  }
-
-  // TODO PrettyPrinter breaks the line between e1 and e2 in <e1>...</e1><e2>...</e2>
-  // and between e1 and text in: <e1>...<e1>text;
-  // should I try fixing that?
-  // or implement my own based on http://www.lihaoyi.com/post/CompactStreamingPrettyPrintingofHierarchicalData.html ?
-  // or move to DOM and use org.apache.xml.serializer.dom3.LSSerializerImpl?
-  // or move via DOM to ScalaTags (implementation "com.lihaoyi:scalatags_$scalaVersionMajor:$scalaTagsVersion")?
-  // or use `spotless` with the Eclipse formatter?
-  private val join: Set[String] = Set(".", ",", ";", ":", "\"", ")")
-
-  def format(elem: Elem): String = {
-    @scala.annotation.tailrec
-    def merge(result: List[String], lines: List[String]): List[String] = lines match {
-      case l1 :: l2 :: ls =>
-        val l = l2.trim
-        if (join.exists(l.startsWith))
-          merge(result, (l1 ++ l) :: ls)
-        else
-          merge(result :+ l1, l2 :: ls)
-      case l :: Nil => result :+ l
-      case Nil => result
-    }
-
-    val result: String = prettyPrinter.format(elem)
-
-    // pretty-printer splits punctuation from the preceding elements; merge them back :)
-    merge(List.empty, result.split("\n").toList).mkString("\n")
-  }
-
-  def print(xml: Node, outStream: OutputStream): Unit = print(xml, new OutputStreamWriter(outStream))
-  def print(xml: Node, outFile: File): Unit = print(xml, new FileWriter(outFile))
-
-  def print(xml: Node, writer: Writer): Unit = {
-    val out = new PrintWriter(writer)
-    val pretty = prettyPrinter.format(xml)
-    // TODO when outputting XML, include <xml> header?
-    out.println(pretty)
-    out.close()
-  }
 
   // TODO switch to Parser[A]
   def open(element: Elem, name: String): (Attributes, Seq[Elem]) = {
@@ -291,56 +215,4 @@ object Xml {
   // TODO switch to Parser[A]
   def checkNoMoreElements(elements: Seq[Elem]): Unit =
     require(elements.isEmpty, s"Spurious elements: ${elements.head.label}")
-
-
-
-  implicit class Ops(elem: Elem) {
-
-    def elemsFilter(name: String): Seq[Elem] = elem.elems.filter(_.label == name)
-
-    // TODO dup!
-    def elems: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
-
-    def elems(name: String): Seq[Elem] = {
-      val result = elem.elems
-      result.foreach(_.check(name))
-      result
-    }
-
-    def descendants(name: String): Seq[Elem] = elem.flatMap(_ \\ name).filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
-
-    def getAttribute(name: String): String = attributeOption(name).getOrElse(throw new NoSuchElementException(s"No attribute $name"))
-
-    // TODO difference?
-    def attributeOption(name: String): Option[String] = elem.attributes.asAttrMap.get(name)
-//    def attributeOption(name: String): Option[String] = {
-//      val result: Seq[Node] = elem \ ("@" + name)
-//      if (result.isEmpty) None else Some(result.text)
-//    }
-
-    def idOption: Option[String] = attributeOption("xml:id")
-
-    def id: String = getAttribute("xml:id")
-
-    def oneChild(name: String): Elem = oneOptionalChild(name, required = true).get
-    def optionalChild(name: String): Option[Elem] = oneOptionalChild(name, required = false)
-
-    private[this] def oneOptionalChild(name: String, required: Boolean = true): Option[Elem] = {
-      val children = elem \ name
-
-      if (children.size > 1) throw new NoSuchElementException(s"To many children with name '$name'")
-      if (required && children.isEmpty) throw new NoSuchElementException(s"No child with name '$name'")
-
-      if (children.isEmpty) None else Some(children.head.asInstanceOf[Elem])
-    }
-
-    def check(name: String): Elem = {
-      if (elem.label != name) throw new NoSuchElementException(s"Expected name $name but got $elem.label")
-      elem
-    }
-
-    def withoutNamespace: Elem = removeNamespace(elem)
-
-    def format: String = Xml.format(elem)
-  }
 }

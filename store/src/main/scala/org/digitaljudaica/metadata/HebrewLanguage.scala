@@ -1,5 +1,6 @@
 package org.digitaljudaica.metadata
 
+// TODO eliminate?
 object HebrewLanguage extends {
 
 //  override def name: String = "he"

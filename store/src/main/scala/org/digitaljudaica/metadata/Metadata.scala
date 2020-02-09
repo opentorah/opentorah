@@ -1,7 +1,7 @@
 package org.digitaljudaica.metadata
 
 import org.digitaljudaica.util.{Collections, Util}
-import org.digitaljudaica.xml.Loader
+import org.digitaljudaica.xml.Load
 import scala.xml.Elem
 
 final case class Metadata(
@@ -50,7 +50,7 @@ object Metadata {
     val (attributes, elements) = Xml.open(element, elementName)
     attributes.get("resource").fold(Metadata(attributes, elements)) { subresourceName: String =>
       attributes.close()
-      val subresource: Elem = Loader.doLoadResource(obj, subresourceName)
+      val subresource: Elem = Load.fromResourceDo(obj, subresourceName)
       val (newAttributes, newElements) = Xml.open(subresource, elementName)
       Metadata(newAttributes, newElements)
     }
@@ -68,7 +68,7 @@ object Metadata {
     elementName: String
   ): Seq[Elem] = {
     val resourceNameEffective = resourceName.getOrElse(Util.className(obj))
-    val element = Loader.doLoadResource(obj, resourceNameEffective)
+    val element = Load.fromResourceDo(obj, resourceNameEffective)
     val (attributes, elements) = Xml.open(element, rootElementName)
     val type_ = attributes.doGet("type")
     attributes.close()

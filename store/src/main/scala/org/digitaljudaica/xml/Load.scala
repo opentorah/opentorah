@@ -5,7 +5,7 @@ import java.net.URL
 import org.xml.sax.InputSource
 import scala.xml.{Elem, Utility, XML}
 
-object Loader {
+object Load {
 
   type Error = Exception
   type Result = (String, Either[Error, Elem])
@@ -26,27 +26,27 @@ object Loader {
       throw new IllegalArgumentException(s"In ${result._1}", exception)
   }
 
-  def doLoadResource(obj: AnyRef, resourceName: String): Elem =
-    doLoad(loadResource(obj, resourceName))
+  def fromResourceDo(obj: AnyRef, resourceName: String): Elem =
+    doLoad(fromResource(obj, resourceName))
 
-  def loadResource(obj: AnyRef, resourceName: String): Result =
-    load(obj.getClass, resourceName)
+  def fromResource(obj: AnyRef, name: String): Result =
+    fromResource(obj.getClass, name)
 
-  def load(clazz: Class[_], name: String): Result = {
+  def fromResource(clazz: Class[_], name: String): Result = {
     val resourceName = name + ".xml"
     Option(clazz.getResource(resourceName)).fold[Result](
       (s"Resource $clazz/$resourceName", Left(new FileNotFoundException()))
-    )(load)
+    )(fromUrl)
   }
 
-  def load(url: URL): Result =
+  def fromUrl(url: URL): Result =
     load(new InputSource(url.openStream()), url.toString)
 
-  def load(file: File): Result =
+  def fromFile(file: File): Result =
     load(new InputSource(new FileInputStream(file)), s"file $file")
 
-  def doLoad(directory: File, fileName: String): Elem =
-    doLoad(load(new File(directory, fileName + ".xml")))
+  def fromFileDo(directory: File, fileName: String): Elem =
+    doLoad(fromFile(new File(directory, fileName + ".xml")))
 
   // --- Xerces parser with Scala XML:
   // build.gradle:    implementation "xerces:xercesImpl:$xercesVersion"

@@ -4,7 +4,7 @@ import cats.implicits._
 import java.io.File
 import org.digitaljudaica.metadata.{Names, Xml}
 import org.digitaljudaica.metadata.Xml.{Parser, attribute, check, element, elements, optionalElement}
-import org.digitaljudaica.xml.Loader
+import org.digitaljudaica.xml.Load
 import scala.xml.Elem
 
 sealed trait Store {
@@ -27,7 +27,7 @@ final class TextStore(
   private var textCache: Option[Elem] = None
 
   def text: Elem = {
-    if (textCache.isEmpty) textCache = Some(Loader.doLoad(new File(url), s"$name.xml"))
+    if (textCache.isEmpty) textCache = Some(Load.fromFileDo(new File(url), s"$name.xml"))
     textCache.get
   }
 
@@ -74,7 +74,7 @@ object Store {
   }
 
   def main(args: Array[String]): Unit = {
-    val xml: Elem = Loader.doLoad(new File("docs").getAbsoluteFile, "store")
+    val xml: Elem = Load.fromFileDo(new File("docs").getAbsoluteFile, "store")
     val store = Xml.runA(xml, "store", storeParser(Set.empty))
     val y = 0
   }

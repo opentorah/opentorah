@@ -4,7 +4,7 @@ import cats.implicits._
 import cats.data.StateT
 import scala.xml.Elem
 
-object Xml {
+object Parse {
   type Error = String
   type ErrorOr[A] = Either[Error, A]
   type Parser[A] = StateT[ErrorOr, Context, A]
@@ -96,7 +96,7 @@ object Xml {
   def element[A](name: String, parser: Parser[A]): Parser[A] =
     required(s"element", name, optionalElement(_, parser))
 
-  def load(toLoad: Loader.Result): Parser[Unit] = {
+  def load(toLoad: Load.Result): Parser[Unit] = {
     val (url, what) = toLoad
     what match {
       case Left(exception) => lift(Left(exception.toString))
@@ -107,7 +107,7 @@ object Xml {
     }
   }
 
-  def parse[A](toLoad: Loader.Result, parser: Parser[A]): ErrorOr[A] = {
+  def parse[A](toLoad: Load.Result, parser: Parser[A]): ErrorOr[A] = {
     val result: Parser[A] = for {
       _ <- load(toLoad)
       result <- parser
