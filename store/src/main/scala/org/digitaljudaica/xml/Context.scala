@@ -1,36 +1,58 @@
 package org.digitaljudaica.xml
 
+import cats.implicits._
+import org.digitaljudaica.xml.Parse.Parser
 import scala.xml.Elem
 
-final case class Context(stack: List[Element]) {
+final class Context private(stack: List[Element]) {
 
-  def current: Element = stack.head
+  override def toString: String = stack.mkString("\n")
 
-  def getName: String = current.name
+  private def isEmpty: Boolean = stack.isEmpty
 
-  def getAttribute(name: String): Option[String] = current.getAttribute(name)
+  private def current: Element = stack.head
 
-  def forgetAttribute(name: String): Context = modifyCurrent(_.forgetAttribute(name))
+  private[xml] def getName: String = current.getName
 
-  def getElements: Seq[Elem] = current.elements
+  // TODO bring the parsers here!
+  private[xml] def takeAttribute(name: String): (Context, Option[String]) = replaceCurrent(_.takeAttribute(name))
 
-  def getCharacters: Option[String] = current.characters
+  // TODO bring the parsers here!
+  private[xml] def takeCharacters: (Context, Option[String]) = replaceCurrent(_.takeCharacters)
 
-  def forgetCharacters: Context = modifyCurrent(_.forgetCharacters)
-
-  def getNextNestedElementName: Option[String] = current.getNextNestedElementName
-
-  def getNumberOfNestedElementsWithName(name: String): Int = current.getNumberOfNestedElementsWithName(name)
-
-  def push(url: Option[String], elem: Elem): Context = copy(stack = Element(url, elem) :: stack)
-
-  def pushNextNestedElement: Context = {
-    val toPush = current.getNextNestedElement
-    modifyCurrent(_.moveToNextNestedElement).push(url = None, toPush)
+  private def replaceCurrent[A](f: Element => (Element, A)): (Context, A) = {
+    val (newCurrent, result) = f(current)
+    (new Context(stack = newCurrent :: stack.tail), result)
   }
 
-  private def modifyCurrent(f: Element => Element): Context =
-    copy(stack = f(stack.head) :: stack.tail)
+  private[xml] def getNextNestedElementName: Option[String] = current.getNextNestedElementName
 
-  def pop: Context = copy(stack = stack.tail)
+  private def push(element: Element): Context = new Context(element :: stack)
+
+  // TODO bring the parsers here!
+  private[xml] def takeNextNestedElement: (Context, Elem) = replaceCurrent(_.takeNextNestedElement)
+
+  private def pop: Context = new Context(stack.tail)
+
+  private def checkNoMixedContent: Parser[Unit] = current.checkNoMixedContent
+
+  private def checkNoLeftovers: Parser[Unit] = current.checkNoLeftovers
+
+  private[xml] def checkIsEmpty: Parser[Unit] = Parse.check(isEmpty, "Non-empty context")
+}
+
+object Context {
+  private[xml] def empty: Context = new Context(List.empty)
+
+  private[xml] def nested[A](url: Option[String], elem: Elem, parser: Parser[A]): Parser[A] =
+    nested(Element(url, elem), parser)
+
+  private[xml] def nested[A](element: Element, parser: Parser[A]): Parser[A] = for {
+    _ <- Parse.modify(_.push(element))
+    _ <- Parse.runCheck(_.checkNoMixedContent)
+    // TODO allow character content - or not...
+    result <- parser
+    _ <- Parse.runCheck(_.checkNoLeftovers)
+    _ <- Parse.modify(_.pop)
+  } yield result
 }

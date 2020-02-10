@@ -1,17 +1,19 @@
 package org.digitaljudaica.metadata
 
 import org.digitaljudaica.util.Util
+import org.digitaljudaica.xml.{Load, Resource}
 
 trait NamedCompanion {
   type Key <: Named
 
   def values: Seq[Key]
 
-  // This is public so that it can be accessed from the Key type if it isn't defined within the object derived from Named.
+  // This is public so that it can be accessed from the Key type if it isn't defined
+  // within the object derived from NamedCompanion.
   // This isn't final so that it can be overridden in Tanach, for instance.
-  lazy val toNames: Map[Key, Names] = Metadata.loadNames(values, this, resourceName)
+  lazy val toNames: Map[Key, Names] = Load.names(values, Resource(this, resourceName))
 
-  protected def resourceName: String = Util.className(this)
+  protected def resourceName: String = what
 
   final def forDefaultName(name: String): Option[Key] = values.find(_.name == name)
 
@@ -39,9 +41,7 @@ trait NamedCompanion {
 
   final def distance(from: Key, to: Key): Int = indexOf(to) - indexOf(from)
 
-  final val ordering: Ordering[Key] = new Ordering[Key] {
-    final override def compare(x: Key, y: Key): Int = distance(x, y)
-  }
+  final val ordering: Ordering[Key] = (x: Key, y: Key) => distance(x, y)
 
   private def what: String = Util.className(this)
 }

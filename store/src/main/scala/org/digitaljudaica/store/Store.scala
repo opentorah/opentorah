@@ -2,8 +2,9 @@ package org.digitaljudaica.store
 
 import cats.implicits._
 import java.io.File
-import org.digitaljudaica.metadata.{Names, Xml}
-import org.digitaljudaica.metadata.Xml.{Parser, attribute, check, element, elements, optionalElement}
+import org.digitaljudaica.metadata.Names
+import org.digitaljudaica.xml.Parse
+import org.digitaljudaica.xml.Parse.{Parser, requiredAttribute, check, checkName, element, elements, optionalElement}
 import org.digitaljudaica.xml.Load
 import scala.xml.Elem
 
@@ -38,26 +39,26 @@ final class TextStore(
 object Store {
 
   val selectorParser: Parser[Selector] = for {
-    names <- Names.parser
+    names <- Names.parser // TODO handle default name
   } yield Selector(names)
 
-  def storeParser(inheritedSelectors: Set[Selector]): Parser[Store] = for {
-    names <- Names.parser
+  def storeParser(inheritedSelectors: Set[Selector]): Parser[Store] = checkName("store", for {
+    names <- Names.parser // TODO handle default name
     selectors <- elements("selector", selectorParser)
     by <- element("by", byParser(inheritedSelectors ++ selectors.toSet))
   } yield new BaseStore(
     names,
     selectors,
     by
-  )
+  ))
 
   val textsParser: Parser[String] = for {
-    url <- attribute("url")
+    url <- requiredAttribute("url")
   } yield url
 
   // TODO allow 'by' to be named in-line
   def byParser(selectors: Set[Selector]): Parser[By] = for {
-    n <- attribute("n")
+    n <- requiredAttribute("n")
     selector = selectorByName(selectors, n)
     texts <- optionalElement("texts", textsParser)
     stores <- elements("store", storeParser(selectors))
@@ -74,8 +75,8 @@ object Store {
   }
 
   def main(args: Array[String]): Unit = {
-    val xml: Elem = Load.fromFileDo(new File("docs").getAbsoluteFile, "store")
-    val store = Xml.runA(xml, "store", storeParser(Set.empty))
+    val xml = Load.fromFile(new File("docs").getAbsoluteFile, "store")
+    val store = Parse.parse(xml, storeParser(Set.empty))
     val y = 0
   }
 }

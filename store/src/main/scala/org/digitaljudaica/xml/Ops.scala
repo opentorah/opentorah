@@ -17,9 +17,11 @@ object Ops {
       result
     }
 
-    def descendants(name: String): Seq[Elem] = elem.flatMap(_ \\ name).filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
+    def descendants(name: String): Seq[Elem] =
+      elem.flatMap(_ \\ name).filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
-    def getAttribute(name: String): String = attributeOption(name).getOrElse(throw new NoSuchElementException(s"No attribute $name"))
+    def getAttribute(name: String): String =
+      attributeOption(name).getOrElse(throw new NoSuchElementException(s"No requiredAttribute $name"))
 
     // TODO difference?
     def attributeOption(name: String): Option[String] = elem.attributes.asAttrMap.get(name)

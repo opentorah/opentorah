@@ -1,9 +1,9 @@
 package org.digitaljudaica.metadata
 
 import cats.implicits._
-import org.digitaljudaica.metadata.Xml.{Parser, elements}
+import org.digitaljudaica.xml.Parse
+import org.digitaljudaica.xml.Parse.{Parser, elements}
 import org.digitaljudaica.util.Collections
-import scala.xml.Elem
 
 final class Names(val names: Seq[Name]) extends HasName with LanguageString {
   Collections.checkNoDuplicates(names.map(_.name), "names")
@@ -55,42 +55,30 @@ object Names {
     new Names(result.toSeq)
   }
 
-  // TODO switch to Parser[A]
-  def parse(attributes: Attributes, elements: Seq[Elem]): (Names, Seq[Elem]) = {
-    val defaultName: Option[Name] =
-      attributes.get("n").map { defaultName => Name(defaultName, LanguageSpec.empty) }
-    val (nameElements, tail) = Xml.take(elements, "name")
-    val names: Names =
-      if (nameElements.isEmpty) new Names(Seq(defaultName.get))
-      else parse(nameElements, defaultName)
+  def namesParser: Parser[Names] = Parse.element("names", parser)
 
-    (names, tail)
-  }
+  def withDefaultParser: Parse.Parser[Names] = for {
+    n <- Parse.attribute("n")
+    defaultName = n.map(Name(_, LanguageSpec.empty))
+    result <- withDefaultParser(defaultName)
+  } yield result
 
-  // TODO switch to Parser[A]
-  def parse(elements: Seq[Elem]): (Names, Seq[Elem]) = {
-    val (nameElements, tail) = Xml.take(elements, "name")
-    (parse(nameElements, None), tail)
-  }
+  def parser: Parse.Parser[Names] = withDefaultParser(None)
 
-  // TODO switch to Parser[A]
-  def parse(element: Elem): Names = {
-    val (attributes, nameElements) = Xml.open(element, "names")
-    attributes.close()
-    parse(nameElements, None)
-  }
-
-  // TODO switch to Parser[A]
-  private def parse(nameElements: Seq[Elem], defaultName: Option[Name]): Names = {
-    val nonDefaultNames: Seq[Name] = nameElements.map(element => Xml.runA(element, "name", Name.parser))
-    val names = defaultName.fold(nonDefaultNames){ defaultName =>
+  def withDefaultParser(defaultName: Option[Name]): Parser[Names] = for {
+    nonDefaultNames <- elements("name", Name.parser)
+  } yield {
+    val names = if (nonDefaultNames.isEmpty) Seq(defaultName.get) else // TODO handle error more gently
+      defaultName.fold(nonDefaultNames){ defaultName =>
       if (nonDefaultNames.exists(_.name == defaultName.name)) nonDefaultNames
       else nonDefaultNames :+ defaultName
     }
+
     new Names(names)
   }
 
-  val parser: Parser[Names] = for {
-    names <- elements("name", Name.parser)
-  } yield new Names(names)
+  def withNames[A](parser: Parser[A]): Parser[(Names, A)] = for {
+    names <- Names.withDefaultParser
+    result <- parser
+  } yield names -> result
 }
