@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<store n="test">
+  <selector>
+    <name lang="en" n="archive"/>
+    <name lang="ru" n="архив"/>
+  </selector>
+  <selector>
+    <name lang="en" n="fund"/>
+    <name lang="ru" n="фонд"/>
+  </selector>
+  <selector>
+    <name lang="ru">разряд</name>
+  </selector>
+  <selector>
+    <name lang="ru" n="опись"/>
+  </selector>
+  <selector>
+    <name lang="en" n="year"/>
+    <name lang="ru" n="год"/>
+  </selector>
+  <selector>
+    <name lang="en" n="case"/>
+    <name lang="ru" n="дело"/>
+  </selector>
+  <selector>
+    <name lang="en" n="author"/>
+    <name lang="ru" n="автор"/>
+  </selector>
+  <selector>
+    <name lang="en" n="document"/>
+    <name lang="ru" n="документ"/>
+  </selector>
+  <selector>
+    <name lang="en" n="page"/>
+    <name lang="ru" n="страница"/>
+  </selector>
+
+  <by n="archive">
+    <store>
+      <name lang="en" n="books"/>
+      <name lang="ru" n="книги"/>
+      <by n="автор">
+        <store>
+          <name lang="ru" n="Дубнов"/>
+          <by n="документ">
+            <texts url="collections/dubnov/tei"/>
+          </by>
+        </store>
+      </by>
+    </store>
+
+    <store>
+      <name lang="en" n="RGADA"/>
+      <name lang="ru" n="РГАДА"/>
+      <by n="разряд">
+        <store n="VII">
+          <by n="опись">
+            <store n="2">
+              <by n="дело">
+                <store n="3140">
+                  <by n="документ">
+                    <texts url="collections/rgada/tei"/>
+                  </by>
+                </store>
+              </by>
+            </store>
+          </by>
+        </store>
+      </by>
+    </store>
+
+<!--    <store url="rgia.xml"/>-->
+    <!--    <store url="lvia.xml"/>-->
+    <!--    <store url="niab.xml"/>-->
+    <!--    <store url="lna.xml"/>-->
+    <!--    <store url="rnd.xml"/>-->
+  </by>
+</store>

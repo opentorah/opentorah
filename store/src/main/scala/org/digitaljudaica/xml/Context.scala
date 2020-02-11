@@ -1,9 +1,10 @@
 package org.digitaljudaica.xml
 
+import cats.data.StateT
 import cats.implicits._
-import org.digitaljudaica.xml.Parse.Parser
 import scala.xml.Elem
 
+// TODO rename XML, since this is the main entry point for parsing :)
 final class Context private(stack: List[Element]) {
 
   override def toString: String = stack.mkString("\n")
@@ -38,21 +39,59 @@ final class Context private(stack: List[Element]) {
 
   private def checkNoLeftovers: Parser[Unit] = current.checkNoLeftovers
 
+  // TODO this is a programming error - maybe just throw an exception, since it can be proven that it can't happen?
   private[xml] def checkIsEmpty: Parser[Unit] = Parse.check(isEmpty, "Non-empty context")
 }
 
 object Context {
-  private[xml] def empty: Context = new Context(List.empty)
+
+  def parse[A](toLoad: Load.Result, parser: Parser[A]): ErrorOr[A] = run(
+    toLoad match {
+      case (url, what) => what match {
+        case Left(exception) => Parse.lift(Left(exception.toString))
+        case Right(elem) => complete(Context.nested(Some(url), elem, parser))
+      }
+    }
+  )
+
+  //  def loadSubresource[A](obj: AnyRef, parser: Parser[A]): Parser[A] = Parse.element(for {
+  //    name <- getName
+  //    resource <- attribute("resource")
+  //    result <- resource.fold(parser){ resource =>
+  //      Load.fromResource(Resource(obj, resource)) match {
+  //        case (url, what) => what match {
+  //          case Left(exception) => lift(Left(exception.toString))
+  //          case Right(elem) => nested(Some(url), elem, Parse.element(name, parser))
+  //        }
+  //      }
+  //    }
+  //  } yield result)
+
+  private[xml] def parse[A](elem: Elem, parser: Parser[A]): A =
+    runA(run(complete(Context.nested(Element(url = Some("synthetic"), elem), parser))))
+
+  private[xml] def run[A](parser: Parser[A]): ErrorOr[A] =
+    parser.runA(new Context(List.empty))
+
+  def runA[A](result: ErrorOr[A]): A =
+    result.fold(error => throw new IllegalArgumentException(error), identity)
 
   private[xml] def nested[A](url: Option[String], elem: Elem, parser: Parser[A]): Parser[A] =
     nested(Element(url, elem), parser)
 
   private[xml] def nested[A](element: Element, parser: Parser[A]): Parser[A] = for {
-    _ <- Parse.modify(_.push(element))
+    _ <- modify(_.push(element))
     _ <- Parse.runCheck(_.checkNoMixedContent)
     // TODO allow character content - or not...
     result <- parser
     _ <- Parse.runCheck(_.checkNoLeftovers)
-    _ <- Parse.modify(_.pop)
+    _ <- modify(_.pop)
   } yield result
+
+  private def complete[A](parser: Parser[A]): Parser[A] = for {
+    result <- parser
+    _ <- Parse.runCheck(_.checkIsEmpty)
+  } yield result
+
+  private def modify(f: Context => Context): Parser[Unit] = StateT.modify[ErrorOr, Context](f)
 }

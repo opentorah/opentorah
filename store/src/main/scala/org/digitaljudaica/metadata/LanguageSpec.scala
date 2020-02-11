@@ -1,7 +1,7 @@
 package org.digitaljudaica.metadata
 
 import cats.implicits._
-import org.digitaljudaica.xml.Parse.{Parser, attribute, booleanAttribute}
+import org.digitaljudaica.xml.{Parse, Parser}
 
 final case class LanguageSpec(
   language: Option[Language],
@@ -30,9 +30,9 @@ object LanguageSpec {
     new LanguageSpec(language = Some(language), isTransliterated = Some(isTransliterated), flavour = Some(flavour))
 
   val parser: Parser[LanguageSpec] = for {
-    lang <- attribute("lang")
-    isTransliterated <- booleanAttribute("transliterated")
-    flavour <- attribute("flavour")
+    lang <- Parse.attribute("lang")
+    isTransliterated <- Parse.booleanAttribute("transliterated")
+    flavour <- Parse.attribute("flavour")
   } yield LanguageSpec(
     language = lang.map(Language.getForDefaultName),
     isTransliterated = isTransliterated,

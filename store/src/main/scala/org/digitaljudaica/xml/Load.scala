@@ -14,6 +14,8 @@ object Load {
 
   type Result = (String, Either[Error, Elem])
 
+  def fromXml(publicId: String, elem: Elem): Result = (publicId, Right(elem))
+
   def fromResource(resource: Resource): Result = {
     val clazz = resource.obj.getClass
     val name = resource.nameEffective + ".xml"
@@ -51,7 +53,7 @@ object Load {
     keys: Seq[K],
     resource: Resource,
     elementName: String,
-    parser: Parse.Parser[M]
+    parser: Parser[M]
   ): Map[K, M] = {
     val metadatas = metadata(resource, elementName, Names.withNames(parser))
     val result = findAndBind(keys, metadatas, (metadata: (Names, M), name: String) => metadata._1.hasName(name)).toMap
@@ -61,18 +63,18 @@ object Load {
   def metadata[M](
     resource: Resource,
     elementName: String,
-    parser: Parse.Parser[M]
+    parser: Parser[M]
   ): Seq[M] = loadMetadata(resource, wrapped("metadata", resource.nameEffective, elementName, parser))
 
-  def wrapped[A](rootElementName: String, typeName: String, elementName: String, parser: Parse.Parser[A]): Parse.Parser[Seq[A]] =
+  def wrapped[A](rootElementName: String, typeName: String, elementName: String, parser: Parser[A]): Parser[Seq[A]] =
     Parse.checkName(rootElementName, for {
       type_ <- Parse.requiredAttribute("type")
       _ <- Parse.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
       result <- Parse.elements(elementName, parser)
     } yield result)
 
-  def loadMetadata[A](resource: Resource, parser: Parse.Parser[A]): A =
-    Parse.runA(Parse.parse(Load.fromResource(resource), parser))
+  def loadMetadata[A](resource: Resource, parser: Parser[A]): A =
+    Context.runA(Context.parse(Load.fromResource(resource), parser))
 
   def bind[K <: WithName, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Map[K, M] =
     findAndBind(keys, metadatas, (metadata: M, name: String) => metadata.hasName(name)).toMap
@@ -103,8 +105,7 @@ object Load {
 
   def doLoad(result: Result): Elem = result._2 match {
     case Right(elem) => elem
-    case Left(exception) =>
-      throw new IllegalArgumentException(s"In ${result._1}", exception)
+    case Left(exception) => throw new IllegalArgumentException(s"In ${result._1}", exception)
   }
 
   // --- Xerces parser with Scala XML:

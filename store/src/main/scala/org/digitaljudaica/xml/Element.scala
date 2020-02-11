@@ -28,10 +28,10 @@ private[xml] final class Element(
   def takeNextNestedElement: (Element, Elem) =
     (new Element(url, name, attributes, elements.tail, nextElementNumber + 1, characters), elements.head)
 
-  def checkNoMixedContent: Parse.Parser[Unit] =
+  def checkNoMixedContent: Parser[Unit] =
     Parse.check(elements.isEmpty || characters.isEmpty, s"Mixed content: [${characters.get}] $elements")
 
-  def checkNoLeftovers: Parse.Parser[Unit] = for {
+  def checkNoLeftovers: Parser[Unit] = for {
     _ <- Parse.check(elements.isEmpty, s"Unparsed elements: $elements")
     _ <- Parse.check(characters.isEmpty, s"Unparsed characters: ${characters.get}")
   } yield ()
