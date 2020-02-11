@@ -5,66 +5,91 @@ import java.net.URL
 import org.xml.sax.InputSource
 import scala.xml.{Elem, Utility, XML}
 
-trait From {
-  final def load: From.Result = (this, loadElem)
+sealed trait From {
 
-  final def doLoad: Elem = {
-    val result = load
-    result._2 match {
-      case Right(elem) => elem
-      case Left(error) => throw new IllegalArgumentException(s"Error in ${result._1}: $error")
+  def load: ErrorOr[Elem]
+
+  final def loadDo: Elem = runA(load)
+
+  def parse[A](parser: Parser[A]): ErrorOr[A] = Context.run(
+    load match {
+      case Right(elem) => Context.complete(Context.nested(Some(this), elem, parser))
+      case Left(error) => lift(Left(s"Error in $this: $error"))
     }
-  }
+  )
 
-  protected def loadElem: ErrorOr[Elem]
+  def parseDo[A](parser: Parser[A]): A = runA(parse(parser))
 
-  protected final def fromUrl(url: URL): ErrorOr[Elem] =
-    fromInputSource(new InputSource(url.openStream()))
-
-  protected final def fromInputSource(source: InputSource): ErrorOr[Elem] = try {
-    Right(Utility.trimProper(XML.load(source)).asInstanceOf[Elem])
-  } catch {
-    case e: java.io.FileNotFoundException => Left(e.getMessage)
-    case e: org.xml.sax.SAXParseException => Left(e.getMessage)
+  private def runA[A](result: ErrorOr[A]): A = result match {
+    case Right(result) => result
+    case Left(error) => throw new IllegalArgumentException(s"Error in $this: $error")
   }
 }
 
 object From {
 
-  type Result = (From, ErrorOr[Elem])
-
-  final case class FromXml(description: String, elem: Elem) extends From {
-    override protected def loadElem: ErrorOr[Elem] = Right(elem)
+  private final class FromXml(description: String, elem: Elem) extends From {
+    override def load: ErrorOr[Elem] = Right(elem)
   }
 
-  final case class FromUrl(url: URL) extends From {
-    override protected def loadElem: ErrorOr[Elem] = fromUrl(url)
+  def xml(description: String, elem: Elem): From = new FromXml(description, elem)
+
+  private final class FromUrl(url: URL) extends From {
+    override def load: ErrorOr[Elem] = loadFromUrl(url)
   }
 
-  final case class FromFile(file: File) extends From {
-    override protected def loadElem: ErrorOr[Elem] =
-      fromInputSource(new InputSource(new FileInputStream(file)))
+  def url(url: URL): From = new FromUrl(url)
+
+  private final class FromFile(file: File) extends From {
+    override def load: ErrorOr[Elem] = loadFromInputSource(new InputSource(new FileInputStream(file)))
   }
 
-  object FromFile {
-    def apply(directory: File, fileName: String): FromFile =
-      FromFile(new File(directory, fileName + ".xml"))
-  }
+  def file(file: File): From = new FromFile(file)
 
-  final case class FromResource(obj: AnyRef, name: Option[String]) extends From {
+  def file(directory: File, fileName: String): From = new FromFile(new File(directory, fileName + ".xml"))
+
+  // TODO once metadata is generalized, make this class private and make all the methods return From, not FromResource
+  final class FromResource(obj: AnyRef, name: Option[String]) extends From {
     def nameEffective: String = name.getOrElse(org.digitaljudaica.util.Util.className(obj))
 
-    override protected def loadElem: ErrorOr[Elem] = {
+    override def load: ErrorOr[Elem] = {
       val clazz = obj.getClass
       val name = nameEffective + ".xml"
 
-      Option(clazz.getResource(name)).fold[ErrorOr[Elem]](Left("Resource not found"))(fromUrl)
+      Option(clazz.getResource(name)).fold[ErrorOr[Elem]](Left("Resource not found"))(loadFromUrl)
     }
   }
 
-  object FromResource {
-    def apply(obj: AnyRef): FromResource = new FromResource(obj, None)
+  def resource(obj: AnyRef, name: Option[String]): FromResource = new FromResource(obj, name)
 
-    def apply(obj: AnyRef, name: String): FromResource = new FromResource(obj, Some(name))
+  def resource(obj: AnyRef): FromResource = new FromResource(obj, None)
+
+  def resource(obj: AnyRef, name: String): FromResource = new FromResource(obj, Some(name))
+
+  private def loadFromUrl(url: URL): ErrorOr[Elem] =
+    loadFromInputSource(new InputSource(url.openStream()))
+
+  private def loadFromInputSource(source: InputSource): ErrorOr[Elem] = try {
+    Right(Utility.trimProper(XML.load(source)).asInstanceOf[Elem])
+  } catch {
+    case e: java.io.FileNotFoundException => Left(e.getMessage)
+    case e: org.xml.sax.SAXParseException => Left(e.getMessage)
   }
+
+  // --- Xerces parser with Scala XML:
+  // build.gradle:    implementation "xerces:xercesImpl:$xercesVersion"
+  //  def newSaxParserFactory: SAXParserFactory = {
+  //    val result = SAXParserFactory.newInstance() // new org.apache.xerces.jaxp.SAXParserFactoryImpl
+  //    result.setNamespaceAware(true)
+  //    result.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
+  //    //    result.setXIncludeAware(true)
+  //    result
+  //  }
+  //
+  //  def getParser: SAXParser = newSaxParserFactory.newSAXParser
+  //  XML.withSAXParser(getParser) OR BETTER - XML.loadXML(InputSource, SAXParser)
+
+  // --- XML validation with XSD; how do I do RNG?
+  // https://github.com/scala/scala-xml/wiki/XML-validation
+  // https://github.com/EdgeCaseBerg/scala-xsd-validation/blob/master/src/main/scala/LoadXmlWithSchema.scala
 }

@@ -4,27 +4,21 @@ import cats.implicits._
 import org.digitaljudaica.metadata.{HasName, Names, WithName}
 import org.digitaljudaica.util.Collections
 
-// TODO rename Parse!
+// TODO rename Parse - OR BETTER dissolve into From!
 object Load {
-
-  // TODO do I really need to pass the `from` through in the result? Or is it going to always be at hand anyway?
-  def apply[A](from: From, parser: Parser[A]): ErrorOr[A] = Context.run(
-    from.load match {
-      case (from, what) => what match {
-        case Left(exception) => lift(Left(exception.toString))
-        case Right(elem) => Context.complete(Context.nested(Some(from), elem, parser))
-      }
-    }
-  )
 
   // This is lazy to allow correct initialization: the code uses values(),
   // Language metadata file references Language instances by name :)
   def names[K <: WithName](
      keys: Seq[K],
      from: From.FromResource // TODO generalize to just From...
-  ): Map[K, Names] = bind(
-    keys,
-    metadata(from, wrapped(rootElementName = "names", typeName = from.nameEffective, elementName = "names", Names.parser)))
+  ): Map[K, Names] = {
+    val wrappedParser = wrapped(rootElementName = "names", typeName = from.nameEffective, elementName = "names", Names.parser)
+    bind(
+      keys,
+      from.parseDo(wrappedParser)
+    )
+  }
 
   def metadataUsingNames[K <: WithName, M](
     keys: Seq[K],
@@ -41,21 +35,10 @@ object Load {
     from: From.FromResource, // TODO generalize to just From...
     elementName: String,
     parser: Parser[M]
-  ): Seq[M] = metadata(from, wrapped("metadata", from.nameEffective, elementName, parser))
-
-  // TODO move out of here?
-  def wrapped[A](rootElementName: String, typeName: String, elementName: String, parser: Parser[A]): Parser[Seq[A]] =
-    Element.checkName(rootElementName, for {
-      type_ <- Attribute.required("type")
-      _ <- Check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
-      result <- Element.all(elementName, parser)
-    } yield result)
-
-  def metadata[A](from: From, parser: Parser[A]): A =
-    runA(Load(from, parser))
-
-  def runA[A](result: ErrorOr[A]): A =
-    result.fold(error => throw new IllegalArgumentException(error), identity)
+  ): Seq[M] = {
+    val wrappedParser = wrapped("metadata", from.nameEffective, elementName, parser)
+    from.parseDo(wrappedParser)
+  }
 
   def bind[K <: WithName, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Map[K, M] =
     findAndBind(keys, metadatas, (metadata: M, name: String) => metadata.hasName(name)).toMap
@@ -74,20 +57,11 @@ object Load {
     }
   }
 
-  // --- Xerces parser with Scala XML:
-  // build.gradle:    implementation "xerces:xercesImpl:$xercesVersion"
-  //  def newSaxParserFactory: SAXParserFactory = {
-  //    val result = SAXParserFactory.newInstance() // new org.apache.xerces.jaxp.SAXParserFactoryImpl
-  //    result.setNamespaceAware(true)
-  //    result.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
-  //    //    result.setXIncludeAware(true)
-  //    result
-  //  }
-  //
-  //  def getParser: SAXParser = newSaxParserFactory.newSAXParser
-  //  XML.withSAXParser(getParser) OR BETTER - XML.loadXML(InputSource, SAXParser)
-
-  // --- XML validation with XSD; how do I do RNG?
-  // https://github.com/scala/scala-xml/wiki/XML-validation
-  // https://github.com/EdgeCaseBerg/scala-xsd-validation/blob/master/src/main/scala/LoadXmlWithSchema.scala
+  // TODO move out of here?
+  def wrapped[A](rootElementName: String, typeName: String, elementName: String, parser: Parser[A]): Parser[Seq[A]] =
+    Element.checkName(rootElementName, for {
+      type_ <- Attribute.required("type")
+      _ <- Check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
+      result <- Element.all(elementName, parser)
+    } yield result)
 }
