@@ -1,56 +1,66 @@
 package org.digitaljudaica.xml
 
 import cats.implicits._
-import scala.xml.{Elem, Node}
-
-private[xml] final class Element(
-  url: Option[String], // TODO turn into URL and handle includes in Load/Parse
-  name: String,
-  attributes: Map[String, String],
-  elements: Seq[Elem],
-  nextElementNumber: Int,
-  characters: Option[String]
-) {
-  override def toString: String =
-    s"$name, before #$nextElementNumber ($getNextNestedElementName)" + url.fold("")(url => s"  from [$url]")
-
-  def getName: String = name
-
-  def takeAttribute(name: String): (Element, Option[String]) =
-    (new Element(url, name, attributes - name, elements, nextElementNumber, characters), attributes.get(name))
-
-  def takeCharacters: (Element, Option[String]) =
-    (new Element(url, name, attributes, elements, nextElementNumber, characters = None), characters)
-
-  def getNextNestedElementName: Option[String] =
-    elements.headOption.map(_.label)
-
-  def takeNextNestedElement: (Element, Elem) =
-    (new Element(url, name, attributes, elements.tail, nextElementNumber + 1, characters), elements.head)
-
-  def checkNoMixedContent: Parser[Unit] =
-    Parse.check(elements.isEmpty || characters.isEmpty, s"Mixed content: [${characters.get}] $elements")
-
-  def checkNoLeftovers: Parser[Unit] = for {
-    _ <- Parse.check(elements.isEmpty, s"Unparsed elements: $elements")
-    _ <- Parse.check(characters.isEmpty, s"Unparsed characters: ${characters.get}")
-  } yield ()
-}
 
 object Element {
 
-  def apply(url: Option[String], element: Elem): Element = {
-    val (elements: Seq[Node], nonElements: Seq[Node]) = element.child.partition(_.isInstanceOf[Elem])
-    new Element(
-      url = url,
-      name = element.label,
-      attributes = element.attributes.map(metadata => metadata.key -> metadata.value.toString).toMap,
-      elements = elements.map(_.asInstanceOf[Elem]),
-      nextElementNumber = 0,
-      characters = if (nonElements.isEmpty) None else {
-        val result: String = nonElements.map(_.text).mkString.trim
-        if (result.isEmpty) None else Some(result)
-      }
-    )
+  val name: Parser[String] = inspect(_.getName)
+
+  def checkName[A](expected: String, parser: Parser[A]): Parser[A] = for {
+    elementName <- name
+    _  <- Check(elementName == expected, s"Wrong element: $elementName instead of $expected")
+    result <- parser
+  } yield result
+
+  object nextNested {
+    val name: Parser[Option[String]] = inspect(_.getNextNestedElementName)
+
+    def nameIs(expected: String): Parser[Boolean] = name.map(_.contains(expected))
+
+    def nameIsNot(expected: String): Parser[Boolean] = nameIs(expected).map(result => !result)
+
+    def nameIsNot(expected: Option[String]): Parser[Boolean] = for {
+      nextNestedElementName <- name
+    } yield nextNestedElementName.isEmpty || expected.fold(false)(expected => !nextNestedElementName.contains(expected))
+  }
+
+  object optional {
+    def apply[A](name: String, parser: Parser[A]): Parser[Option[A]] =
+      apply(name = Some(name), parser)
+
+    def apply[A](parser: Parser[A]): Parser[Option[A]] =
+      apply(name = None, parser)
+
+    // TODO by default, character content should not be allowed; exceptions should be explicit.
+    // Add `charactersAllowed` parameter.
+    def apply[A](name: Option[String], parser: Parser[A]): Parser[Option[A]] = for {
+      noElement <- nextNested.nameIsNot(name)
+      result <- if (noElement) pure(None) else for {
+        next <- Context.takeNextNestedElement
+        result <- Context.nested(None, next, parser)
+      } yield Some(result)
+    } yield result
+  }
+
+  object required {
+    def apply[A](parser: Parser[A]): Parser[A] =
+      Check.required(s"element", Element.optional(parser))
+
+    def apply[A](name: String, parser: Parser[A]): Parser[A] =
+      Check.required(s"element '$name'", Element.optional(name, parser))
+  }
+
+  object all {
+    def apply[A](name: String, parser: Parser[A]): Parser[Seq[A]] =
+      apply(Some(name), parser)
+
+    def apply[A](parser: Parser[A]): Parser[Seq[A]] =
+      apply(None, parser)
+
+    def apply[A](name: Option[String], parser: Parser[A]): Parser[Seq[A]] = for {
+      headOption <- Element.optional(name, parser)
+      tail <- if (headOption.isEmpty) pure(Seq.empty[A]) else Element.all(name, parser)
+      result = headOption.toSeq ++ tail
+    } yield result
   }
 }

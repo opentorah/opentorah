@@ -3,8 +3,7 @@ package org.digitaljudaica.store
 import cats.implicits._
 import java.io.File
 import org.digitaljudaica.metadata.Names
-import org.digitaljudaica.xml.{Parse, Parser}
-import org.digitaljudaica.xml.Load
+import org.digitaljudaica.xml.{Attribute, Check, Element, From, Parser}
 import scala.xml.Elem
 
 sealed trait Store {
@@ -27,7 +26,7 @@ final class TextStore(
   private var textCache: Option[Elem] = None
 
   def text: Elem = {
-    if (textCache.isEmpty) textCache = Some(Load.fromFileDo(new File(url), s"$name.xml"))
+    if (textCache.isEmpty) textCache = Some(From.FromFile(new File(url), s"$name.xml").doLoad)
     textCache.get
   }
 
@@ -37,10 +36,10 @@ final class TextStore(
 
 object Store {
 
-  def parser(inheritedSelectors: Set[Selector]): Parser[Store] = Parse.checkName("store", for {
+  def parser(inheritedSelectors: Set[Selector]): Parser[Store] = Element.checkName("store", for {
     names <- Names.withDefaultParser // TODO handle default name
-    selectors <- Parse.elements("selector", Selector.parser)
-    by <- Parse.element("by", byParser(inheritedSelectors ++ selectors.toSet))
+    selectors <- Element.all("selector", Selector.parser)
+    by <- Element.required("by", byParser(inheritedSelectors ++ selectors.toSet))
   } yield new BaseStore(
     names,
     selectors,
@@ -48,17 +47,17 @@ object Store {
   ))
 
   val textsParser: Parser[String] = for {
-    url <- Parse.requiredAttribute("url")
+    url <- Attribute.required("url")
   } yield url
 
   // TODO allow 'by' to be named in-line
   def byParser(selectors: Set[Selector]): Parser[By] = for {
-    n <- Parse.requiredAttribute("n")
+    n <- Attribute.required("n")
     selector = selectorByName(selectors, n)
-    texts <- Parse.optionalElement("texts", textsParser)
-    stores <- Parse.elements("store", parser(selectors))
-    _ <- Parse.check(texts.nonEmpty || stores.nonEmpty, "Both 'stores' and 'texts' elements are absent.")
-    _ <- Parse.check(texts.isEmpty || stores.isEmpty, "Both 'stores' and 'texts' elements are present.")
+    texts <- Element.optional("texts", textsParser)
+    stores <- Element.all("store", parser(selectors))
+    _ <- Check(texts.nonEmpty || stores.nonEmpty, "Both 'stores' and 'texts' elements are absent.")
+    _ <- Check(texts.isEmpty || stores.isEmpty, "Both 'stores' and 'texts' elements are present.")
   } yield {
     if (selector.isEmpty) throw new IllegalArgumentException(s"Selector not found: $n")
     if (texts.isDefined) new TextsBy(selector.get, texts.get) else new BaseBy(selector.get, stores)

@@ -1,7 +1,7 @@
 package org.digitaljudaica.metadata
 
 import cats.implicits._
-import org.digitaljudaica.xml.{Parse, Parser}
+import org.digitaljudaica.xml.{Attribute, Characters, Check, Parser}
 
 final case class Name(name: String, languageSpec: LanguageSpec) {
   def satisfies(spec: LanguageSpec): Boolean = {
@@ -14,10 +14,10 @@ final case class Name(name: String, languageSpec: LanguageSpec) {
 object Name {
 
   val parser: Parser[Name] = for {
-    n <- Parse.attribute("n")
-    characters <- Parse.characters
-    _ <- Parse.check(n.nonEmpty || characters.nonEmpty, "Both 'n' requiredAttribute and text are absent.")
-    _ <- Parse.check(n.isEmpty || characters.isEmpty, "Both 'n' requiredAttribute and text are present.")
+    n <- Attribute.optional("n")
+    characters <- Characters()
+    _ <- Check(n.nonEmpty || characters.nonEmpty, "Both 'n' attribute and text are absent.")
+    _ <- Check(n.isEmpty || characters.isEmpty, "Both 'n' attribute and text are present.")
     name = n.orElse(characters)
     languageSpec <- LanguageSpec.parser
   } yield Name(name.get, languageSpec)

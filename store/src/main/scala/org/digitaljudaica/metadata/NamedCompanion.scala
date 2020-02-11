@@ -1,7 +1,7 @@
 package org.digitaljudaica.metadata
 
 import org.digitaljudaica.util.Util
-import org.digitaljudaica.xml.{Load, Resource}
+import org.digitaljudaica.xml.{From, Load}
 
 trait NamedCompanion {
   type Key <: Named
@@ -11,7 +11,7 @@ trait NamedCompanion {
   // This is public so that it can be accessed from the Key type if it isn't defined
   // within the object derived from NamedCompanion.
   // This isn't final so that it can be overridden in Tanach, for instance.
-  lazy val toNames: Map[Key, Names] = Load.names(values, Resource(this, resourceName))
+  lazy val toNames: Map[Key, Names] = Load.names(values, From.FromResource(this, resourceName))
 
   protected def resourceName: String = what
 

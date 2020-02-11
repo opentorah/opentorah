@@ -3,6 +3,7 @@ package org.digitaljudaica.xml
 import scala.xml.{Elem, Node, TopScope}
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 
+// TODO rename and eliminate fully qualified class name in From...
 object Util {
 
   private def removeNamespace(node: Node): Node = node match {

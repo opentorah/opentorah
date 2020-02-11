@@ -1,80 +1,61 @@
 package org.digitaljudaica.xml
 
 import cats.implicits._
-import java.io.{File, FileInputStream, FileNotFoundException}
-import java.net.URL
 import org.digitaljudaica.metadata.{HasName, Names, WithName}
 import org.digitaljudaica.util.Collections
-import org.xml.sax.InputSource
-import scala.xml.{Elem, Utility, XML}
 
+// TODO rename Parse!
 object Load {
 
-  type Error = Exception
-
-  type Result = (String, Either[Error, Elem])
-
-  def fromXml(publicId: String, elem: Elem): Result = (publicId, Right(elem))
-
-  def fromResource(resource: Resource): Result = {
-    val clazz = resource.obj.getClass
-    val name = resource.nameEffective + ".xml"
-
-    Option(clazz.getResource(name)).fold[Result](
-      (s"Resource $clazz/$name", Left(new FileNotFoundException()))
-    )(fromUrl)
-  }
-
-  def fromResourceDo(resource: Resource): Elem =
-    doLoad(fromResource(resource))
-
-  def fromUrl(url: URL): Result =
-    fromInputSource(new InputSource(url.openStream()), url.toString)
-
-  def fromFile(directory: File, fileName: String): Result =
-    fromFile(new File(directory, fileName + ".xml"))
-
-  def fromFile(file: File): Result =
-    fromInputSource(new InputSource(new FileInputStream(file)), s"file $file")
-
-  def fromFileDo(directory: File, fileName: String): Elem =
-    doLoad(fromFile(directory, fileName))
+  // TODO do I really need to pass the `from` through in the result? Or is it going to always be at hand anyway?
+  def apply[A](from: From, parser: Parser[A]): ErrorOr[A] = Context.run(
+    from.load match {
+      case (from, what) => what match {
+        case Left(exception) => lift(Left(exception.toString))
+        case Right(elem) => Context.complete(Context.nested(Some(from), elem, parser))
+      }
+    }
+  )
 
   // This is lazy to allow correct initialization: the code uses values(),
   // Language metadata file references Language instances by name :)
   def names[K <: WithName](
      keys: Seq[K],
-     resource: Resource
+     from: From.FromResource // TODO generalize to just From...
   ): Map[K, Names] = bind(
     keys,
-    loadMetadata(resource, wrapped(rootElementName = "names", typeName = resource.nameEffective, elementName = "names", Names.parser)))
+    metadata(from, wrapped(rootElementName = "names", typeName = from.nameEffective, elementName = "names", Names.parser)))
 
   def metadataUsingNames[K <: WithName, M](
     keys: Seq[K],
-    resource: Resource,
+    from: From.FromResource, // TODO generalize to just From...
     elementName: String,
     parser: Parser[M]
   ): Map[K, M] = {
-    val metadatas = metadata(resource, elementName, Names.withNames(parser))
+    val metadatas = metadata(from, elementName, Names.withNames(parser))
     val result = findAndBind(keys, metadatas, (metadata: (Names, M), name: String) => metadata._1.hasName(name)).toMap
     Collections.mapValues(result)(_._2)
   }
 
   def metadata[M](
-    resource: Resource,
+    from: From.FromResource, // TODO generalize to just From...
     elementName: String,
     parser: Parser[M]
-  ): Seq[M] = loadMetadata(resource, wrapped("metadata", resource.nameEffective, elementName, parser))
+  ): Seq[M] = metadata(from, wrapped("metadata", from.nameEffective, elementName, parser))
 
+  // TODO move out of here?
   def wrapped[A](rootElementName: String, typeName: String, elementName: String, parser: Parser[A]): Parser[Seq[A]] =
-    Parse.checkName(rootElementName, for {
-      type_ <- Parse.requiredAttribute("type")
-      _ <- Parse.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
-      result <- Parse.elements(elementName, parser)
+    Element.checkName(rootElementName, for {
+      type_ <- Attribute.required("type")
+      _ <- Check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
+      result <- Element.all(elementName, parser)
     } yield result)
 
-  def loadMetadata[A](resource: Resource, parser: Parser[A]): A =
-    Context.runA(Context.parse(Load.fromResource(resource), parser))
+  def metadata[A](from: From, parser: Parser[A]): A =
+    runA(Load(from, parser))
+
+  def runA[A](result: ErrorOr[A]): A =
+    result.fold(error => throw new IllegalArgumentException(error), identity)
 
   def bind[K <: WithName, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Map[K, M] =
     findAndBind(keys, metadatas, (metadata: M, name: String) => metadata.hasName(name)).toMap
@@ -91,21 +72,6 @@ object Load {
       require(withName.length == 1)
       (key, withName.head) +: findAndBind(keys.tail, withoutName, hasName)
     }
-  }
-
-  private def fromInputSource(source: InputSource, publicId: String): Result = {
-    val result = try {
-      Right(Utility.trimProper(XML.load(source)).asInstanceOf[Elem])
-    } catch {
-      case e: FileNotFoundException => Left(e)
-      case e: org.xml.sax.SAXParseException => Left(e)
-    }
-    (publicId, result)
-  }
-
-  def doLoad(result: Result): Elem = result._2 match {
-    case Right(elem) => elem
-    case Left(exception) => throw new IllegalArgumentException(s"In ${result._1}", exception)
   }
 
   // --- Xerces parser with Scala XML:

@@ -7,20 +7,20 @@ import org.scalatest.matchers.should.Matchers
 
 final class XmlTest extends AnyFlatSpec with Matchers {
   "fromResource()" should "work" in {
-    Load.fromResourceDo(Resource(Parse, "1"))
+    From.FromResource(Load, "1").doLoad
   }
 
   "error reporting" should "work" in {
-    Context.run(Parse.error("ErRoR")).isLeft shouldBe true
-    Context.run(for { _ <- Parse.error("ErRoR") } yield ()).isLeft shouldBe true
-    Context.parse(Load.fromXml("error test", <store></store>), Names.withDefaultParser(None)).isLeft shouldBe true
+    Context.run(Check.error("ErRoR")).isLeft shouldBe true
+    Context.run(for { _ <- Check.error("ErRoR") } yield ()).isLeft shouldBe true
+    Load(From.FromXml("error test", <store></store>), Names.withDefaultParser(None)).isLeft shouldBe true
   }
 
   "parsing" should "work" in {
-    val byParser: Parser[String] = Parse.checkName("by", Parse.pure("xyz"))
+    val byParser: Parser[String] = Element.checkName("by", pure("xyz"))
 
-    val storeParser: Parser[Option[String]] = Parse.checkName("store", Parse.optionalElement("by", byParser))
+    val storeParser: Parser[Option[String]] = Element.checkName("store", Element.optional("by", byParser))
 
-    Context.parse(Load.fromResource(Resource(Parse, "1")), storeParser)
+    Load(From.FromResource(Load, "1"), storeParser)
   }
 }
