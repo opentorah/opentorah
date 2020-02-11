@@ -32,7 +32,7 @@ private[xml] final class Current(
     Check(elements.isEmpty || characters.isEmpty, s"Mixed content: [${characters.get}] $elements")
 
   def checkNoLeftovers: Parser[Unit] = for {
-    // TODO check attributes too!
+    _ <- Check(attributes.isEmpty, s"Unparsed attributes: $attributes")
     _ <- Check(characters.isEmpty, s"Unparsed characters: ${characters.get}")
     _ <- Check(elements.isEmpty, s"Unparsed elements: $elements")
   } yield ()

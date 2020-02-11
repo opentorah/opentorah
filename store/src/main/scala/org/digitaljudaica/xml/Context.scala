@@ -50,10 +50,6 @@ object Context {
   private[xml] def run[A](parser: Parser[A]): ErrorOr[A] =
     parser.runA(new Context(List.empty))
 
-  // TODO dissolve?
-  private[xml] def nested[A](url: Option[From], elem: Elem, parser: Parser[A]): Parser[A] =
-    nested(Current(url, elem), parser)
-
   private[xml] def takeAttribute(name: String): Parser[Option[String]] =
     take(_.takeAttribute(name))
 
@@ -72,8 +68,8 @@ object Context {
     _ <- set(result._1)
   } yield result._2
 
-  private[xml] def nested[A](element: Current, parser: Parser[A]): Parser[A] = for {
-    _ <- modify(_.push(element))
+  private[xml] def nested[A](from: Option[From], elem: Elem, parser: Parser[A]): Parser[A] = for {
+    _ <- modify(_.push(Current(from, elem)))
     _ <- Check(_.checkNoMixedContent)
     // TODO allow character content - or not...
     result <- parser
