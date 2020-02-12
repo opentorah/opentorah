@@ -3,7 +3,7 @@ package org.digitaljudaica.xml
 import cats.implicits._
 import scala.xml.{Elem, Node}
 
-private[xml] final class Current(
+private[xml] final class Current private(
   from: Option[From],
   name: String,
   attributes: Map[String, String],
@@ -12,14 +12,14 @@ private[xml] final class Current(
   characters: Option[String]
 ) {
   override def toString: String =
-    s"$name, before #$nextElementNumber ($getNextNestedElementName)" + from.fold("")(url => s"  from [$url]")
+    s"$name; before nested element #$nextElementNumber ($getNextNestedElementName)" + from.fold("")(url => s"  $url")
 
   def getName: String = name
 
   def getFrom: Option[From] = from
 
   def takeAttribute(name: String): (Current, Option[String]) =
-    (new Current(from, name, attributes - name, elements, nextElementNumber, characters), attributes.get(name))
+    (new Current(from, this.name, attributes - name, elements, nextElementNumber, characters), attributes.get(name))
 
   def takeCharacters: (Current, Option[String]) =
     (new Current(from, name, attributes, elements, nextElementNumber, characters = None), characters)

@@ -1,5 +1,6 @@
 package org.digitaljudaica.xml
 
+import cats.implicits._
 import org.digitaljudaica.metadata.{HasName, Names, WithName}
 import org.digitaljudaica.util.Collections
 
@@ -9,7 +10,7 @@ object Load {
      keys: Seq[K],
      from: From
   ): Map[K, Names] = {
-    val wrappedParser = Parser.wrapped(
+    val wrappedParser = wrapped(
       rootElementName = "names",
       typeName = from.name,
       elementName = "names",
@@ -39,13 +40,20 @@ object Load {
     elementName: String,
     parser: Parser[M]
   ): Seq[M] = {
-    val wrappedParser = Parser.wrapped(
+    val wrappedParser = wrapped(
       rootElementName = "metadata",
       typeName = from.name,
       elementName = elementName,
       parser = parser)
     from.parseDo(wrappedParser)
   }
+
+  def wrapped[A](rootElementName: String, typeName: String, elementName: String, parser: Parser[A]): Parser[Seq[A]] =
+    Element.withName(rootElementName, for {
+      type_ <- Attribute.required("type")
+      _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
+      result <- Element.all(elementName, parser)
+    } yield result)
 
   def bind[K <: WithName, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Map[K, M] =
     findAndBind(keys, metadatas, (metadata: M, name: String) => metadata.hasName(name)).toMap

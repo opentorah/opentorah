@@ -1,8 +1,28 @@
 package org.digitaljudaica.xml
 
-import scala.xml.Elem
+import scala.xml.transform.{RewriteRule, RuleTransformer}
+import scala.xml.{Elem, Node, TopScope}
 
 object Ops {
+
+  def removeNamespace(element: Elem): Elem =
+    element.copy(scope = TopScope, child = element.child.map(removeNamespace))
+
+  private def removeNamespace(node: Node): Node = node match {
+    case e: Elem => e.copy(scope = TopScope, child = e.child.map(removeNamespace))
+    case n => n
+  }
+
+  def rewriteElements(xml: Elem, elementRewriter: Elem => Elem): Elem = {
+    val rule: RewriteRule = new RewriteRule {
+      override def transform(node: Node): Seq[Node] = node match {
+        case element: Elem => elementRewriter(element)
+        case other => other
+      }
+    }
+
+    new RuleTransformer(rule).transform(xml).head.asInstanceOf[Elem]
+  }
 
   implicit class Ops(elem: Elem) {
 
@@ -51,7 +71,7 @@ object Ops {
       elem
     }
 
-    def withoutNamespace: Elem = Util.removeNamespace(elem)
+    def withoutNamespace: Elem = removeNamespace(elem)
 
     def format: String = Print.format(elem)
   }

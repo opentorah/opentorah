@@ -10,7 +10,7 @@ import org.scalatest.matchers.should.Matchers
 
 final class StoreTest extends AnyFlatSpec with Matchers {
 
-  private val resources: File = new File("./store/src/test/resources/org/digitaljudaica/store").getAbsoluteFile
+  private val resources: File = new File("./src/test/resources/org/digitaljudaica/store").getAbsoluteFile
 
   "Store.parser" should "work" in {
     From.file(resources, "store").parseDo(Store.parser(Set.empty))

@@ -10,9 +10,11 @@ class Element(charactersAllowed: Boolean) {
     final def apply[A](parser: Parser[A]): Parser[Option[A]] =
       apply(name = None, parser)
 
+    // Only nested elements (and not the document element) can have character content allowed;
+    // I do not think this is a problem :)
     final def apply[A](name: Option[String], parser: Parser[A]): Parser[Option[A]] = for {
-      noElement <- Element.nextNested.nameIsNot(name)
-      result <- if (noElement) Parser.pure(None) else for {
+      hasNext <- Element.nextNested.nameIs(name)
+      result <- if (!hasNext) Parser.pure(None) else for {
         next <- Context.takeNextNestedElement
         result <- Context.nested(None, next, parser, charactersAllowed)
       } yield Some(result)
@@ -20,11 +22,11 @@ class Element(charactersAllowed: Boolean) {
   }
 
   object required {
-    final def apply[A](parser: Parser[A]): Parser[A] =
-      Parser.required(s"element", optional(parser))
-
     final def apply[A](name: String, parser: Parser[A]): Parser[A] =
       Parser.required(s"element '$name'", optional(name, parser))
+
+    final def apply[A](parser: Parser[A]): Parser[A] =
+      Parser.required(s"element", optional(parser))
   }
 
   object all {
@@ -46,18 +48,27 @@ object Element extends Element(charactersAllowed = false) {
 
   val name: Parser[String] = Context.getName
 
+  def withName[A](expected: String, parser: Parser[A]): Parser[A] = for {
+    name <- name
+    _  <- Parser.check(name == expected, s"Wrong element: '$name' instead of '$expected'")
+    result <- parser
+  } yield result
+
   object nextNested {
-    val name: Parser[Option[String]] = Context.getNextNestedElementName
+    val name: Parser[Option[String]] =
+      Context.getNextNestedElementName
 
-    def nameIs(expected: String): Parser[Boolean] = name.map(_.contains(expected))
+    def nameIs(expected: String): Parser[Boolean] =
+      name.map(_.contains(expected))
 
-    def nameIsNot(expected: String): Parser[Boolean] = nameIs(expected).map(result => !result)
-
-    // TODO simplify
-    def nameIsNot(expected: Option[String]): Parser[Boolean] = for {
-      nextNestedElementName <- name
-    } yield nextNestedElementName.isEmpty || expected.fold(false)(expected => !nextNestedElementName.contains(expected))
+    def nameIs(expected: Option[String]): Parser[Boolean] =
+      expected.fold(Parser.pure(true))(nameIs)
   }
 
   object withCharacters extends Element(charactersAllowed = true)
+
+  def withInclude[A](attribute: String, parser: Parser[A]): Parser[A] = for {
+    url <- Attribute.optional(attribute)
+    result <- url.fold(parser)(From.include(_, parser))
+  } yield result
 }

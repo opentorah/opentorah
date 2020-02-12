@@ -9,6 +9,4 @@ package object xml {
   type ErrorOr[A] = Either[Error, A]
 
   type Parser[A] = StateT[ErrorOr, Context, A]
-
-  type Operations = Ops.Ops
 }
