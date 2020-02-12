@@ -15,12 +15,9 @@ object Attribute {
     // TODO rename positiveInt
     def int(name: String): Parser[Option[Int]] = for {
       resultO <- Attribute.optional(name)
-      // TODO test; pick up Context trace...
-      // If there is some kind of a combinator hiding here - reuse it for XML loads...
-      result <- lift[Option[Int]](
-        try { Right(resultO.map(_.toInt)) }
-        catch { case e: NumberFormatException => Left(e.getMessage) })
-      //catch { case e: NumberFormatException => Check.error(e.getMessage) }
+      result <-
+        try { Parser.pure(resultO.map(_.toInt)) }
+        catch { case e: NumberFormatException => Parser.error(e.getMessage) }
       _ <- Check(result.isEmpty || result.get > 0, s"Non-positive integer: ${result.get}")
     } yield result
   }

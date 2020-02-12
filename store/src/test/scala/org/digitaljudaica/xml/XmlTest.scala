@@ -11,15 +11,15 @@ final class XmlTest extends AnyFlatSpec with Matchers {
   }
 
   "error reporting" should "work" in {
-    Context.run(Check.error("ErRoR")).isLeft shouldBe true
-    Context.run(for { _ <- Check.error("ErRoR") } yield ()).isLeft shouldBe true
-    From.xml("error test", <store></store>).parse(Names.withDefaultParser(None)).isLeft shouldBe true
+    Context.run(Parser.error("ErRoR")).isLeft shouldBe true
+    Context.run(for { _ <- Parser.error[Unit]("ErRoR") } yield ()).isLeft shouldBe true
+    From.xml(<store></store>).parse(Names.withDefaultParser(None)).isLeft shouldBe true
   }
 
   "parsing" should "work" in {
-    val byParser: Parser[String] = Element.checkName("by", pure("xyz"))
+    val byParser: Parser[String] = Parser.checkName("by", Parser.pure("xyz"))
 
-    val storeParser: Parser[Option[String]] = Element.checkName("store", Element.optional("by", byParser))
+    val storeParser: Parser[Option[String]] = Parser.checkName("store", Element.optional("by", byParser))
 
     From.resource(Load, "1").parse(storeParser)
   }

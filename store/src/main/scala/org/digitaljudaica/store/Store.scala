@@ -36,7 +36,7 @@ final class TextStore(
 
 object Store {
 
-  def parser(inheritedSelectors: Set[Selector]): Parser[Store] = Element.checkName("store", for {
+  def parser(inheritedSelectors: Set[Selector]): Parser[Store] = Parser.checkName("store", for {
     names <- Names.withDefaultParser // TODO handle default name
     selectors <- Element.all("selector", Selector.parser)
     by <- Element.required("by", byParser(inheritedSelectors ++ selectors.toSet))

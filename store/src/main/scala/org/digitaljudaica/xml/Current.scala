@@ -4,7 +4,7 @@ import cats.implicits._
 import scala.xml.{Elem, Node}
 
 private[xml] final class Current(
-  url: Option[From], // TODO handle includes in Load/Parse
+  from: Option[From],
   name: String,
   attributes: Map[String, String],
   elements: Seq[Elem],
@@ -12,24 +12,28 @@ private[xml] final class Current(
   characters: Option[String]
 ) {
   override def toString: String =
-    s"$name, before #$nextElementNumber ($getNextNestedElementName)" + url.fold("")(url => s"  from [$url]")
+    s"$name, before #$nextElementNumber ($getNextNestedElementName)" + from.fold("")(url => s"  from [$url]")
 
   def getName: String = name
 
+  def getFrom: Option[From] = from
+
   def takeAttribute(name: String): (Current, Option[String]) =
-    (new Current(url, name, attributes - name, elements, nextElementNumber, characters), attributes.get(name))
+    (new Current(from, name, attributes - name, elements, nextElementNumber, characters), attributes.get(name))
 
   def takeCharacters: (Current, Option[String]) =
-    (new Current(url, name, attributes, elements, nextElementNumber, characters = None), characters)
+    (new Current(from, name, attributes, elements, nextElementNumber, characters = None), characters)
 
   def getNextNestedElementName: Option[String] =
     elements.headOption.map(_.label)
 
   def takeNextNestedElement: (Current, Elem) =
-    (new Current(url, name, attributes, elements.tail, nextElementNumber + 1, characters), elements.head)
+    (new Current(from, name, attributes, elements.tail, nextElementNumber + 1, characters), elements.head)
 
-  def checkNoMixedContent: Parser[Unit] =
-    Check(elements.isEmpty || characters.isEmpty, s"Mixed content: [${characters.get}] $elements")
+  def checkContent(charactersAllowed: Boolean): Parser[Unit] = for {
+    _ <- Check(elements.isEmpty || characters.isEmpty, s"Mixed content: [${characters.get}] $elements")
+    _ <- Check(characters.isEmpty || charactersAllowed, s"Characters are not allowed: ${characters.get}")
+  } yield ()
 
   def checkNoLeftovers: Parser[Unit] = for {
     _ <- Check(attributes.isEmpty, s"Unparsed attributes: $attributes")
@@ -40,10 +44,10 @@ private[xml] final class Current(
 
 private[xml] object Current {
 
-  def apply(url: Option[From], element: Elem): Current = {
+  def apply(from: Option[From], element: Elem): Current = {
     val (elements: Seq[Node], nonElements: Seq[Node]) = element.child.partition(_.isInstanceOf[Elem])
     new Current(
-      url = url,
+      from,
       name = element.label,
       attributes = element.attributes.map(metadata => metadata.key -> metadata.value.toString).toMap,
       elements = elements.map(_.asInstanceOf[Elem]),

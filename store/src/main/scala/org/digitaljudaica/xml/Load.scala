@@ -4,16 +4,17 @@ import cats.implicits._
 import org.digitaljudaica.metadata.{HasName, Names, WithName}
 import org.digitaljudaica.util.Collections
 
-// TODO rename Parse - OR BETTER dissolve into From!
 object Load {
 
-  // This is lazy to allow correct initialization: the code uses values(),
-  // Language metadata file references Language instances by name :)
   def names[K <: WithName](
      keys: Seq[K],
-     from: From.FromResource // TODO generalize to just From...
+     from: From
   ): Map[K, Names] = {
-    val wrappedParser = wrapped(rootElementName = "names", typeName = from.nameEffective, elementName = "names", Names.parser)
+    val wrappedParser = Parser.wrapped(
+      rootElementName = "names",
+      typeName = from.name,
+      elementName = "names",
+      Names.parser)
     bind(
       keys,
       from.parseDo(wrappedParser)
@@ -22,21 +23,28 @@ object Load {
 
   def metadataUsingNames[K <: WithName, M](
     keys: Seq[K],
-    from: From.FromResource, // TODO generalize to just From...
+    from: From,
     elementName: String,
     parser: Parser[M]
   ): Map[K, M] = {
-    val metadatas = metadata(from, elementName, Names.withNames(parser))
-    val result = findAndBind(keys, metadatas, (metadata: (Names, M), name: String) => metadata._1.hasName(name)).toMap
+    val result = findAndBind(
+      keys,
+      metadata(from, elementName, Names.withNames(parser)),
+      (metadata: (Names, M), name: String) => metadata._1.hasName(name)
+    ).toMap
     Collections.mapValues(result)(_._2)
   }
 
   def metadata[M](
-    from: From.FromResource, // TODO generalize to just From...
+    from: From,
     elementName: String,
     parser: Parser[M]
   ): Seq[M] = {
-    val wrappedParser = wrapped("metadata", from.nameEffective, elementName, parser)
+    val wrappedParser = Parser.wrapped(
+      rootElementName = "metadata",
+      typeName = from.name,
+      elementName = elementName,
+      parser = parser)
     from.parseDo(wrappedParser)
   }
 
@@ -56,12 +64,4 @@ object Load {
       (key, withName.head) +: findAndBind(keys.tail, withoutName, hasName)
     }
   }
-
-  // TODO move out of here?
-  def wrapped[A](rootElementName: String, typeName: String, elementName: String, parser: Parser[A]): Parser[Seq[A]] =
-    Element.checkName(rootElementName, for {
-      type_ <- Attribute.required("type")
-      _ <- Check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
-      result <- Element.all(elementName, parser)
-    } yield result)
 }

@@ -65,7 +65,7 @@ object Names {
   def parser: Parser[Names] = withDefaultParser(None)
 
   def withDefaultParser(defaultName: Option[Name]): Parser[Names] = for {
-    nonDefaultNames <- Element.all("name", Name.parser)
+    nonDefaultNames <- Element.characters.all("name", Name.parser)
     _ <- Check(nonDefaultNames.nonEmpty || defaultName.isDefined, s"No names and no default name")
   } yield {
     val names = if (nonDefaultNames.isEmpty) Seq(defaultName.get) else

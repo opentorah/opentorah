@@ -14,7 +14,7 @@ dependencies {
 //    implementation "org.typelevel:cats-mtl-core_$scalaVersionMajor:$catsMtlVersion"
 
     testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
-    testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports; only 0.35.10 is supported?
+    testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
 }
 
 task sourceJar(type: Jar) {

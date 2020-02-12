@@ -4,17 +4,15 @@ import cats.implicits._
 
 object Check {
 
-  def apply(condition: Boolean, message: => String): Parser[Unit] = if (condition) pure(()) else for {
-    contextStr <- inspect(_.toString)
-    _ <- error(message + "\n" + contextStr)
+  def apply(condition: Boolean, message: => String): Parser[Unit] = if (condition) Parser.pure(()) else for {
+    contextStr <- Parser.inspect(_.toString)
+    _ <- Parser.error[Unit](message + "\n" + contextStr)
   } yield ()
 
   private[xml] def apply(f: Context => Parser[Unit]): Parser[Unit] = for {
-    toRun <- inspect(f)
+    toRun <- Parser.inspect(f)
     _ <- toRun
   } yield ()
-
-  def error(value: Error): Parser[Unit] = lift[Unit](Left(value))
 
   private[xml] def required[A](what: String, parser: Parser[Option[A]]): Parser[A] = for {
     result <- parser
