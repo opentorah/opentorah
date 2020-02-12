@@ -17,7 +17,7 @@ sealed trait From {
 
   def parseDo[A](parser: Parser[A]): A = runA(parse(parser))
 
-  def nest[A](parser: Parser[A]): Parser[A] = load match {
+  private[xml] def nest[A](parser: Parser[A]): Parser[A] = load match {
     case Right(elem) => Context.nested(Some(this), elem, parser)
     case Left(error) => Parser.error(annotateError(error))
   }
@@ -29,7 +29,7 @@ sealed trait From {
 
   private def annotateError(error: String): String = s"Error in $this: $error"
 
-  def include(url: String): From = ??? /// TODO!
+  private[xml] def include(url: String): From = ??? /// TODO!
 }
 
 object From {
