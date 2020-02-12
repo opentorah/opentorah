@@ -31,14 +31,14 @@ private[xml] final class Current(
     (new Current(from, name, attributes, elements.tail, nextElementNumber + 1, characters), elements.head)
 
   def checkContent(charactersAllowed: Boolean): Parser[Unit] = for {
-    _ <- Check(elements.isEmpty || characters.isEmpty, s"Mixed content: [${characters.get}] $elements")
-    _ <- Check(characters.isEmpty || charactersAllowed, s"Characters are not allowed: ${characters.get}")
+    _ <- Parser.check(elements.isEmpty || characters.isEmpty, s"Mixed content: [${characters.get}] $elements")
+    _ <- Parser.check(characters.isEmpty || charactersAllowed, s"Characters are not allowed: ${characters.get}")
   } yield ()
 
   def checkNoLeftovers: Parser[Unit] = for {
-    _ <- Check(attributes.isEmpty, s"Unparsed attributes: $attributes")
-    _ <- Check(characters.isEmpty, s"Unparsed characters: ${characters.get}")
-    _ <- Check(elements.isEmpty, s"Unparsed elements: $elements")
+    _ <- Parser.check(attributes.isEmpty, s"Unparsed attributes: $attributes")
+    _ <- Parser.check(characters.isEmpty, s"Unparsed characters: ${characters.get}")
+    _ <- Parser.check(elements.isEmpty, s"Unparsed elements: $elements")
   } yield ()
 }
 

@@ -58,9 +58,9 @@ object Context {
     charactersAllowed: Boolean = false
   ): Parser[A] = for {
     _ <- Parser.modify(_.push(Current(from, elem)))
-    _ <- Check(_.current.checkContent(charactersAllowed))
+    _ <- Parser.check(_.current.checkContent(charactersAllowed))
     result <- parser
-    _ <- Check(_.current.checkNoLeftovers)
+    _ <- Parser.check(_.current.checkNoLeftovers)
     _ <- Parser.modify(_.pop)
   } yield result
 

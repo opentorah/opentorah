@@ -1,6 +1,5 @@
 package org.digitaljudaica.xml
 
-import cats.implicits._
 import org.digitaljudaica.metadata.{HasName, Names, WithName}
 import org.digitaljudaica.util.Collections
 

@@ -3,7 +3,7 @@ package org.digitaljudaica.store
 import cats.implicits._
 import java.io.File
 import org.digitaljudaica.metadata.Names
-import org.digitaljudaica.xml.{Attribute, Check, Element, From, Parser}
+import org.digitaljudaica.xml.{Attribute, Element, From, Parser}
 import scala.xml.Elem
 
 sealed trait Store {
@@ -56,8 +56,8 @@ object Store {
     selector = selectorByName(selectors, n)
     texts <- Element.optional("texts", textsParser)
     stores <- Element.all("store", parser(selectors))
-    _ <- Check(texts.nonEmpty || stores.nonEmpty, "Both 'stores' and 'texts' elements are absent.")
-    _ <- Check(texts.isEmpty || stores.isEmpty, "Both 'stores' and 'texts' elements are present.")
+    _ <- Parser.check(texts.nonEmpty || stores.nonEmpty, "Both 'stores' and 'texts' elements are absent.")
+    _ <- Parser.check(texts.isEmpty || stores.isEmpty, "Both 'stores' and 'texts' elements are present.")
   } yield {
     if (selector.isEmpty) throw new IllegalArgumentException(s"Selector not found: $n")
     if (texts.isDefined) new TextsBy(selector.get, texts.get) else new BaseBy(selector.get, stores)

@@ -18,18 +18,18 @@ object Attribute {
       result <-
         try { Parser.pure(resultO.map(_.toInt)) }
         catch { case e: NumberFormatException => Parser.error(e.getMessage) }
-      _ <- Check(result.isEmpty || result.get > 0, s"Non-positive integer: ${result.get}")
+      _ <- Parser.check(result.isEmpty || result.get > 0, s"Non-positive integer: ${result.get}")
     } yield result
   }
 
   object required {
     def apply(name: String): Parser[String] =
-      Check.required(s"attribute '$name'", Attribute.optional(name))
+      Parser.required(s"attribute '$name'", Attribute.optional(name))
 
     def boolean(name: String): Parser[Boolean] =
-      Check.required(s"boolean attribute '$name'", Attribute.optional.boolean(name))
+      Parser.required(s"boolean attribute '$name'", Attribute.optional.boolean(name))
 
     def int(name: String): Parser[Int] =
-      Check.required(s"integer attribute '$name'", Attribute.optional.int(name))
+      Parser.required(s"integer attribute '$name'", Attribute.optional.int(name))
   }
 }
