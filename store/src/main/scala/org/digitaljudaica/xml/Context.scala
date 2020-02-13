@@ -51,12 +51,12 @@ object Context {
   private[xml] def include[A](url: String, parser: Parser[A]): Parser[A] = for {
     name <- Element.name
     currentFrom <- currentFrom
-    newFrom <- Parser.toParser(From.url(currentFrom.url.fold(new URL(url))(new URL(_, url))))
-    result <- nested(newFrom, Element.withName(name, parser))
+    from <- Parser.toParser(From.url(currentFrom.url.fold(new URL(url))(new URL(_, url))))
+    result <- nested(from, Element.withName(name, parser))
   } yield result
 
   private[xml] def nested[A](from: From, parser: Parser[A]): Parser[A] = from.load match {
-    case Right(elem) => nested(Some(from), elem, parser, charactersAllowed = false)
+    case Right(elem) => nested(Some(from), elem, parser, charactersAllowed = false, elementsAllowed = true)
     case Left(error) => Parser.error(error)
   }
 
@@ -64,10 +64,11 @@ object Context {
     from: Option[From],
     elem: Elem,
     parser: Parser[A],
-    charactersAllowed: Boolean
+    charactersAllowed: Boolean,
+    elementsAllowed: Boolean
   ): Parser[A] = for {
     _ <- Parser.modify(_.push(Current(from, elem)))
-    _ <- Parser.eval(_.current.checkContent(charactersAllowed))
+    _ <- Parser.eval(_.current.checkContent(charactersAllowed, elementsAllowed))
     result <- parser
     _ <- Parser.eval(_.current.checkNoLeftovers)
     _ <- Parser.modify(_.pop)

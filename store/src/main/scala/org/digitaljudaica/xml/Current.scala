@@ -30,9 +30,10 @@ private[xml] final class Current private(
   def takeNextNestedElement: (Current, Elem) =
     (new Current(from, name, attributes, elements.tail, nextElementNumber + 1, characters), elements.head)
 
-  def checkContent(charactersAllowed: Boolean): Parser[Unit] = for {
-    _ <- Parser.check(elements.isEmpty || characters.isEmpty, s"Mixed content: [${characters.get}] $elements")
+  def checkContent(charactersAllowed: Boolean, elementsAllowed: Boolean): Parser[Unit] = for {
     _ <- Parser.check(characters.isEmpty || charactersAllowed, s"Characters are not allowed: ${characters.get}")
+    _ <- Parser.check(elements.isEmpty || elementsAllowed, s"Nested elements are not allowed: $elements")
+    _ <- Parser.check(elements.isEmpty || characters.isEmpty, s"Mixed content: [${characters.get}] $elements")
   } yield ()
 
   def checkNoLeftovers: Parser[Unit] = for {

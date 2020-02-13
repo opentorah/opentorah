@@ -2,7 +2,7 @@ package org.digitaljudaica.xml
 
 import cats.implicits._
 
-class Element(charactersAllowed: Boolean) {
+class Element(charactersAllowed: Boolean, elementsAllowed: Boolean) {
   object optional {
     final def apply[A](name: String, parser: Parser[A]): Parser[Option[A]] =
       apply(name = Some(name), parser)
@@ -16,7 +16,7 @@ class Element(charactersAllowed: Boolean) {
       hasNext <- Element.nextNested.nameIs(name)
       result <- if (!hasNext) Parser.pure(None) else for {
         next <- Context.takeNextNestedElement
-        result <- Context.nested(None, next, parser, charactersAllowed)
+        result <- Context.nested(None, next, parser, charactersAllowed, elementsAllowed)
       } yield Some(result)
     } yield result
   }
@@ -44,7 +44,8 @@ class Element(charactersAllowed: Boolean) {
   }
 }
 
-object Element extends Element(charactersAllowed = false) {
+// Defaults; same are used in the top-level nested() call.
+object Element extends Element(charactersAllowed = false, elementsAllowed = true) {
 
   val name: Parser[String] = Context.getName
 
@@ -65,7 +66,9 @@ object Element extends Element(charactersAllowed = false) {
       expected.fold(Parser.pure(true))(nameIs)
   }
 
-  object withCharacters extends Element(charactersAllowed = true)
+  object empty extends Element(charactersAllowed = false, elementsAllowed = false)
+  object withCharacters extends Element(charactersAllowed = true, elementsAllowed = true)
+  object withCharactersOnly extends Element(charactersAllowed = true, elementsAllowed = false)
 
   def withInclude[A](attribute: String, parser: Parser[A]): Parser[A] = for {
     url <- Attribute.optional(attribute)
