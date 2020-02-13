@@ -1,18 +1,14 @@
 package org.podval.judaica.tanach
 
 import cats.implicits._
-import org.digitaljudaica.metadata.{Attributes, Xml}
+import org.digitaljudaica.xml.{Attribute, Parser}
 
 final class WithNumber[T](val n: Int, val what: T)
 
 object WithNumber {
-  def parse[T](attributes: Attributes, p: Attributes => T): WithNumber[T] = new WithNumber[T](
-    n = attributes.doGetInt("n"),
-    what = p(attributes)
-  )
 
-  def parseNg[T](parser: Xml.Parser[T]): Xml.Parser[WithNumber[T]] = for {
-    n <- Xml.intAttribute("n")
+  def parse[T](parser: Parser[T]): Parser[WithNumber[T]] = for {
+    n <- Attribute.required.int("n")
     what <- parser
   } yield new WithNumber[T](n, what)
 
@@ -21,8 +17,8 @@ object WithNumber {
     result
   }
 
-  def checkConsecutiveNg[T](result: Seq[WithNumber[T]], what: String): Xml.Parser[Unit] =
-    Xml.check(result.map(_.n) == (1 to result.length), s"Wrong $what numbers: $result")
+  def checkConsecutiveNg[T](result: Seq[WithNumber[T]], what: String): Parser[Unit] =
+    Parser.check(result.map(_.n) == (1 to result.length), s"Wrong $what numbers: $result")
 
   def checkNumber[T](result: Seq[WithNumber[T]], number: Int, what: String): Seq[WithNumber[T]] = {
     checkConsecutive(result, what)

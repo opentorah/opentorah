@@ -1,28 +1,20 @@
 package org.podval.calendar.tanach
 
 import cats.implicits._
-import org.digitaljudaica.metadata.{WithNames, Xml}
-import org.podval.judaica.tanach.{SpanParsed, SpanSemiResolved, Torah, WithNumber}
+import org.digitaljudaica.metadata.WithNames
+import org.digitaljudaica.xml.{From, Element, Parser}
+import org.podval.judaica.tanach.{SpanParsed, Torah, WithNumber}
 
 import scala.xml.Elem
 
 trait ParseTorahRaw { self: WithNames =>
 
-  // TODO switch to Parser[A]
-  final def parseTorah(element: Elem): Torah = Xml.runA[Torah](element, "torah", parser)
+  final def parseTorah(element: Elem): Torah = From.xml(element).parseDo[Torah](Element.withName("torah", parser))
 
-  private val parser: Xml.Parser[Torah] = for {
-    bookSpanParsed <- Torah.parseSpanNg
-    bookSpan = bookSpanParsed.resolve
-    spans <- Xml.elements("aliyah", parseNumbered(bookSpan.span.from.chapter))
-    result = Torah.parseAliyot(bookSpan, spans, number = None)
-  } yield result.fromWithNumbers(this)
-
-  private def parseNumbered(fromChapter: Int): Xml.Parser[Torah.Numbered] = for {
-    result <- WithNumber.parseNg(spanParser(fromChapter))
-  } yield result
-
-  private def spanParser(fromChapter: Int): Xml.Parser[SpanSemiResolved] = for {
-    spanParsed <- SpanParsed.parser
-  } yield spanParsed.defaultFromChapter(fromChapter).semiResolve
+  private val parser: Parser[Torah] = for {
+    bookSpan <- Torah.spanParser.map(_.resolve)
+    spans <- Element.all("aliyah", WithNumber.parse(
+      SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve)
+    ))
+  } yield Torah.parseAliyot(bookSpan, spans, number = None).fromWithNumbers(this)
 }

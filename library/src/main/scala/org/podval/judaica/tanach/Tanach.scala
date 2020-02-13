@@ -1,8 +1,10 @@
 package org.podval.judaica.tanach
 
-import org.digitaljudaica.metadata.{Attributes, Holder, Metadata, Named, NamedCompanion, Names, Xml}
+import cats.implicits._
+import org.digitaljudaica.metadata.{Holder, Named, NamedCompanion, Names}
 import org.digitaljudaica.util.Collections
 import org.digitaljudaica.util.Collections.mapValues
+import org.digitaljudaica.xml.{Attribute, Element, Load, Parser}
 import org.podval.judaica.tanach.Torah.Maftir
 
 import scala.xml.Elem
@@ -102,12 +104,8 @@ object Tanach extends NamedCompanion {
   sealed trait WritingsBook extends NachBook
 
   case object Psalms extends WritingsBook {
-    private def parseNumbered(element: Elem, name: String): WithNumber[SpanParsed] = {
-      val attributes: Attributes = Xml.openEmpty(element, name)
-      val result: WithNumber[SpanParsed] = WithNumber.parse(attributes, SpanParsed.parse)
-      attributes.close()
-      result
-    }
+    private def parseNumbered(name: String): Parser[WithNumber[SpanParsed]] =
+      Element.required(name, WithNumber.parse(SpanParsed.parser))
 
     private def parseSpans(elements: Seq[Elem], name: String, number: Int): Seq[Span] = {
       val spans: Seq[SpanParsed] = WithNumber.dropNumbers(WithNumber.checkNumber(
@@ -116,7 +114,7 @@ object Tanach extends NamedCompanion {
     }
 
     private def allElements: (Seq[Elem], Seq[Elem], Seq[Elem]) =
-      Xml.span(metadatas.psalmsElements, "day", "weekDay", "book")
+      Parse.span(metadatas.psalmsElements, "day", "weekDay", "book")
 
     lazy val days: Seq[Span] = parseSpans(allElements._1, "day", 30)
 
@@ -148,14 +146,14 @@ object Tanach extends NamedCompanion {
   private final case class TanachMetadata(names: Names, chapters: Chapters, elements: Seq[Elem])
 
   private object metadatas extends Holder[TanachBook, TanachMetadata] {
-    protected override def calculate: Map[TanachBook, TanachMetadata] = Metadata.loadMetadata(
+    protected override def calculate: Map[TanachBook, TanachMetadata] = Load.loadMetadata(
       keys = values,
       obj = Tanach.this,
       elementName = "book"
     ).map { case (book, metadata) =>
       metadata.attributes.close()
-      val (chapterElements: Seq[Elem], elements: Seq[Elem]) = Xml.take(metadata.elements, "chapter")
-      if (!book.isInstanceOf[ChumashBook] && (book != Psalms)) Xml.checkNoMoreElements(elements)
+      val (chapterElements: Seq[Elem], elements: Seq[Elem]) = Parse.take(metadata.elements, "chapter")
+      if (!book.isInstanceOf[ChumashBook] && (book != Psalms)) Parse.checkNoMoreElements(elements)
       book -> TanachMetadata(metadata.names, Chapters(chapterElements), elements)
     }
 
@@ -177,9 +175,9 @@ object Tanach extends NamedCompanion {
 
   private final class ChumashBookMetadataHolder(book: ChumashBook) extends Holder[Parsha, ParshaMetadata] {
     protected override def calculate: Map[Parsha, ParshaMetadata] =
-      mapValues(Metadata.bind(
+      mapValues(Load.bind(
         keys = book.parshiot,
-        elements = Xml.span(Tanach.metadatas.get(book).elements, "week"),
+        elements = Parse.span(Tanach.metadatas.get(book).elements, "week"),
         obj = this
       )){ metadata =>
 
@@ -189,7 +187,7 @@ object Tanach extends NamedCompanion {
         val span = parseSemiResolved(metadata.attributes)
         metadata.attributes.close()
 
-        val (aliyahElements, dayElements, maftirElements) = Xml.span(metadata.elements,
+        val (aliyahElements, dayElements, maftirElements) = Parse.span(metadata.elements,
           "aliyah", "day", "maftir")
         require(maftirElements.length == 1)
 
@@ -200,8 +198,8 @@ object Tanach extends NamedCompanion {
           span = span,
           days = byCustom(days),
           daysCombined = byCustom(daysCombined),
-          aliyot = aliyahElements.map(element => Xml.parseEmpty(element, "aliyah", parseNumbered)),
-          maftir = Xml.parseEmpty(maftirElements.head, "maftir", parseSemiResolved)
+          aliyot = aliyahElements.map(element => Parse.parseEmpty(element, "aliyah", parseNumbered)),
+          maftir = Parse.parseEmpty(maftirElements.head, "maftir", parseSemiResolved)
         )
       }
 
@@ -258,21 +256,15 @@ object Tanach extends NamedCompanion {
     isCombined: Boolean
   )
 
-  private def parseDay(element: Elem): DayParsed = {
-    val attributes = Xml.openEmpty(element, "day")
-    val result = DayParsed(
-      span = parseNumbered(attributes),
-      custom = attributes.get("custom").fold[Set[Custom]](Set(Custom.Common))(Custom.parse),
-      isCombined = attributes.doGetBoolean("combined")
-    )
-    attributes.close()
-    result
-  }
+  private def dayParser: Parser[DayParsed] = Element.required("day", for {
+    span <- numberedParser
+    custom <- Attribute.optional("custom").map(_.fold[Set[Custom]](Set(Custom.Common))(Custom.parse))
+    isCombined <- Attribute.required.boolean("combined")
+  } yield DayParsed(span, custom, isCombined))
 
-  private def parseNumbered(attributes: Attributes): Torah.Numbered =
-    WithNumber.parse(attributes, parseSemiResolved)
+  private def numberedParser: Parser[Torah.Numbered] = WithNumber.parse(semiResolvedParser)
 
-  private def parseSemiResolved(attributes: Attributes): SpanSemiResolved = SpanParsed.parse(attributes).semiResolve
+  private def semiResolvedParser: Parser[SpanSemiResolved] = SpanParsed.parser.map(_.semiResolve)
 
   private def combineDays(weeks: Seq[(Parsha, Custom.Sets[Seq[Torah.Numbered]])]): Seq[Option[Torah.Customs]] = weeks match {
     case (parsha, days) :: (parshaNext, daysNext) :: tail =>

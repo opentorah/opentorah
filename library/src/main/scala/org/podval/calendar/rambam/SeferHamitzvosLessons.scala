@@ -1,8 +1,8 @@
 package org.podval.calendar.rambam
 
-import org.digitaljudaica.metadata.{Attributes, Language, Metadata, Name, Names, WithNames, Xml}
-
-import scala.xml.Elem
+import cats.implicits._
+import org.digitaljudaica.metadata.{Language, Name, Names, WithNames}
+import org.digitaljudaica.xml.{Attribute, Element, From, Load, Parser}
 
 object SeferHamitzvosLessons {
 
@@ -38,38 +38,25 @@ object SeferHamitzvosLessons {
   ))
 
   val lessons: Seq[Lesson] = {
-    val result: Seq[Lesson] = Metadata
-      .loadMetadataElements(this, None, "metadata", "lesson")
-      .map(parseLesson)
+    val result: Seq[Lesson] = Load.metadata(From.resource(this), "lesson", lessonParser)
 
     require(result.map(_.number) == (1 to RambamSchedule.numberOfLessons))
 
     result
   }
 
-  private def parseLesson(element: Elem): Lesson = {
-    val (attributes: Attributes, elements: Seq[Elem]) = Xml.open(element, "lesson")
-    val number: Int = attributes.doGetInt("n")
-    val parts: Seq[Part] = elements.map(parsePart)
-    new Lesson(number, parts)
-  }
+  private def lessonParser: Parser[Lesson] = for {
+    number <- Attribute.required.int("n")
+    parts <- Element.all[Part](partParser)
+  } yield new Lesson(number, parts)
 
-  private def parsePart(element: Elem): Part = element.label match {
-    case "positive" => new Positive(getNumber(element, "positive"))
-    case "negative" => new Negative(getNumber(element, "negative"))
-
-    case "named" =>
-      val (attributes: Attributes, elements: Seq[Elem]) = Xml.open(element, "named")
-      attributes.close()
-      val (names: Names, tail: Seq[Elem]) = Names.parse(elements)
-      Xml.checkNoMoreElements(tail)
-      new NamedPart(names)
-  }
-
-  private def getNumber(element: Elem, name: String): Int = {
-    val attributes: Attributes = Xml.openEmpty(element, name)
-    val result = attributes.doGetInt("n")
-    attributes.close()
-    result
-  }
+  private def partParser: Parser[Part] = for {
+    name <- Element.name
+    result <- name match {
+      case "positive" => Attribute.required.int("n").map(new Positive(_))
+      case "negative" => Attribute.required.int("n").map(new Negative(_))
+      case "named" => Names.parser.map(new NamedPart(_))
+// TODO pre-check? Can't do it in the match, since check(): Unit case name => Parse.check(false, s"Unexpected element '$name'")
+    }
+  } yield result
 }

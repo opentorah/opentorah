@@ -1,7 +1,8 @@
 package org.podval.calendar.tanach
 
 import cats.implicits._
-import org.digitaljudaica.metadata.{WithNames, Xml}
+import org.digitaljudaica.metadata.WithNames
+import org.digitaljudaica.xml.{From, Element}
 import org.podval.judaica.tanach.Torah
 import org.podval.judaica.tanach.Torah.Maftir
 
@@ -9,13 +10,8 @@ import scala.xml.Elem
 
 trait ParseMaftir { self: WithNames =>
 
-  // TODO switch to Parser[A]
-  final lazy val maftir: Maftir = Xml.runA(maftirElement, "maftir", parser)
+  final lazy val maftir: Maftir =
+    From.xml(maftirElement).parseDo(Element.withName("maftir", Torah.spanParser.map(_.resolve.from(this))))
 
   protected def maftirElement: Elem
-
-  private val parser: Xml.Parser[Maftir] = for {
-    bookSpanParsed <- Torah.parseSpanNg
-    result = bookSpanParsed.resolve
-  } yield result.from(this)
 }
