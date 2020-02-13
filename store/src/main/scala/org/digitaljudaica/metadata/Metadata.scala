@@ -1,10 +1,10 @@
-package org.digitaljudaica.xml
+package org.digitaljudaica.metadata
 
 import cats.implicits._
-import org.digitaljudaica.metadata.{HasName, Names, WithName}
 import org.digitaljudaica.util.Collections
+import org.digitaljudaica.xml.{Attribute, Element, From, Parser}
 
-object Load {
+object Metadata {
 
   def names[K <: WithName](
      keys: Seq[K],

@@ -2,7 +2,6 @@ package org.digitaljudaica.xml
 
 import java.io.File
 import java.net.URL
-import cats.implicits._
 import org.digitaljudaica.util.{Files, Util}
 import org.xml.sax.InputSource
 import scala.xml.{Elem, Utility, XML}
@@ -17,24 +16,12 @@ sealed trait From {
 
   final def loadDo: Elem = Parser.runA(load)
 
-  def parse[A](parser: Parser[A]): ErrorOr[A] = Context.parse(nested(parser))
+  def parse[A](parser: Parser[A]): ErrorOr[A] = Context.parse(Context.nested(this, parser))
 
   def parseDo[A](parser: Parser[A]): A = Parser.runA(parse(parser))
-
-  private def nested[A](parser: Parser[A]): Parser[A] = load match {
-    case Right(elem) => Context.nested(Some(this), elem, parser, charactersAllowed = false)
-    case Left(error) => Parser.error(error)
-  }
 }
 
 object From {
-
-  private[xml] def include[A](url: String, parser: Parser[A]): Parser[A] = for {
-    name <- Element.name
-    currentFrom <- Context.currentFrom
-    newFrom <- Parser.toParser(From.url(currentFrom.url.fold(new URL(url))(new URL(_, url))))
-    result <- newFrom.nested(Element.withName(name, parser))
-  } yield result
 
   private final class FromXml(override val name: String, elem: Elem) extends From {
     override def toString: String = s"From.xml($name)"

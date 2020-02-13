@@ -1,7 +1,6 @@
 package org.digitaljudaica.xml
 
 import cats.implicits._
-import org.digitaljudaica.metadata.{Language, Names}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -18,19 +17,14 @@ final class XmlTest extends AnyFlatSpec with Matchers {
   }
 
   "From.resource()" should "work" in {
-    From.resource(Load, "1").loadDo
-  }
-
-  "Names parsing and Language" should "work" in {
-    From.xml(<store></store>).parse(Names.withDefaultParser(None)).isLeft shouldBe true
-    Language.English.names.names.length shouldBe 4
+    From.resource(Parser, "1").loadDo
   }
 
   private val file2parser: Parser[String] =
     Element.withName("x", Element.withCharacters.required("name", Characters.required))
 
   "Include" should "work" in {
-    From.resource(Load, "2").parseDo(file2parser) shouldBe "X"
-    From.resource(Load, "1").parseDo(Element.withInclude("to", file2parser)) shouldBe "X"
+    From.resource(Parser, "2").parseDo(file2parser) shouldBe "X"
+    From.resource(Parser, "1").parseDo(Element.withInclude("to", file2parser)) shouldBe "X"
   }
 }

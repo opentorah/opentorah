@@ -69,6 +69,6 @@ object Element extends Element(charactersAllowed = false) {
 
   def withInclude[A](attribute: String, parser: Parser[A]): Parser[A] = for {
     url <- Attribute.optional(attribute)
-    result <- url.fold(parser)(From.include(_, parser))
+    result <- url.fold(parser)(Context.include(_, parser))
   } yield result
 }

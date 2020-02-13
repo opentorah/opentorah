@@ -1,7 +1,6 @@
 package org.digitaljudaica.xml
 
 import java.io.{File, FileWriter, OutputStream, OutputStreamWriter, PrintWriter, Writer}
-
 import scala.xml.{Elem, Node, PrettyPrinter}
 
 object Print {

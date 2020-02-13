@@ -18,8 +18,8 @@ private[xml] final class Current private(
 
   def getFrom: Option[From] = from
 
-  def takeAttribute(name: String): (Current, Option[String]) =
-    (new Current(from, this.name, attributes - name, elements, nextElementNumber, characters), attributes.get(name))
+  def takeAttribute(attribute: String): (Current, Option[String]) =
+    (new Current(from, name, attributes - attribute, elements, nextElementNumber, characters), attributes.get(attribute))
 
   def takeCharacters: (Current, Option[String]) =
     (new Current(from, name, attributes, elements, nextElementNumber, characters = None), characters)

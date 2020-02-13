@@ -1,6 +1,9 @@
 package org.digitaljudaica.xml
 
+import java.net.URL
+
 import cats.implicits._
+
 import scala.xml.Elem
 
 final class Context private(stack: List[Current]) {
@@ -44,6 +47,18 @@ object Context {
 
   private def take[A](f: Current => (Current, A)): Parser[A] =
     Parser.inspectAndSet(_.replaceCurrent(f))
+
+  private[xml] def include[A](url: String, parser: Parser[A]): Parser[A] = for {
+    name <- Element.name
+    currentFrom <- currentFrom
+    newFrom <- Parser.toParser(From.url(currentFrom.url.fold(new URL(url))(new URL(_, url))))
+    result <- nested(newFrom, Element.withName(name, parser))
+  } yield result
+
+  private[xml] def nested[A](from: From, parser: Parser[A]): Parser[A] = from.load match {
+    case Right(elem) => nested(Some(from), elem, parser, charactersAllowed = false)
+    case Left(error) => Parser.error(error)
+  }
 
   private[xml] def nested[A](
     from: Option[From],
