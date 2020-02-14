@@ -12,7 +12,7 @@ private[xml] final class Current private(
   characters: Option[String]
 ) {
   override def toString: String =
-    s"$name; before nested element #$nextElementNumber ($getNextNestedElementName)" + from.fold("")(url => s"  $url")
+    s"$name; nested element #$nextElementNumber; next: $getNextNestedElementName;" + from.fold("")(url => s"  $url")
 
   def getName: String = name
 

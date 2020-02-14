@@ -29,6 +29,7 @@ object Metadata {
   ): Map[K, M] = {
     val result = findAndBind(
       keys,
+      (key: K) => key.name,
       metadata(from, elementName, Names.withNames(parser)),
       (metadata: (Names, M), name: String) => metadata._1.hasName(name)
     ).toMap
@@ -56,19 +57,48 @@ object Metadata {
     } yield result)
 
   def bind[K <: WithName, M <: HasName](keys: Seq[K], metadatas: Seq[M]): Map[K, M] =
-    findAndBind(keys, metadatas, (metadata: M, name: String) => metadata.hasName(name)).toMap
+    findAndBind(keys, (key: K) => key.name,  metadatas, (metadata: M, name: String) => metadata.hasName(name)).toMap
 
-  private def findAndBind[K <: WithName, M](keys: Seq[K], metadatas: Seq[M], hasName: (M, String) => Boolean): Seq[(K, M)] = {
+  private def findAndBind[K, M](
+    keys: Seq[K],
+    getName: K => String,
+    metadatas: Seq[M],
+    hasName: (M, String) => Boolean
+  ): Seq[(K, M)] = {
     if (keys.isEmpty) require(metadatas.isEmpty, s"Unmatched metadatas: ${metadatas.mkString("\n")}")
     if (metadatas.isEmpty) require(keys.isEmpty, s"Unmatched keys: $keys")
     Collections.checkNoDuplicates(keys, s"keys")
 
     if (keys.isEmpty) Nil else {
       val key: K = keys.head
-      val (withName: Seq[M], withoutName: Seq[M]) = metadatas.partition(metadata => hasName(metadata, key.name))
-      require(withName.nonEmpty, s"No metadata for ${key.name}")
+      val (withName: Seq[M], withoutName: Seq[M]) = metadatas.partition(metadata => hasName(metadata, getName(key)))
+      require(withName.nonEmpty, s"No metadata for ${getName(key)}")
       require(withName.length == 1)
-      (key, withName.head) +: findAndBind(keys.tail, withoutName, hasName)
+      (key, withName.head) +: findAndBind(keys.tail, getName, withoutName, hasName)
     }
+  }
+
+  def find[K <: WithName, M <: HasName](keys: Seq[K], metadata: M): K = find(
+    keys,
+    (key: K) => key.name,
+    metadata,
+    (metadata: M, name: String) => metadata.hasName(name)
+  )
+
+  def find[K, M](
+    keys: Seq[K],
+    getName: K => String,
+    metadata: M,
+    hasName: (M, String) => Boolean
+  ): K = {
+    val result: Seq[K] = keys.filter(key => hasName(metadata, getName(key)))
+    require(result.nonEmpty, s"Unmatched metadata $metadata")
+    require(result.length == 1, s"Metadata matched multiple keys: $metadata")
+    result.head
+  }
+
+  def toMap[K, M](keys: Seq[K], metadatas: Seq[M], getKey: M => K): Map[K, M] = {
+    // TODO check that all keys are bound
+    metadatas.map(metadata => getKey(metadata) -> metadata).toMap
   }
 }
