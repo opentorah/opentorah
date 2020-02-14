@@ -11,7 +11,7 @@ import SpecialDay._
 
 final class ScheduleTest extends AnyFlatSpec with Matchers {
 
-  "Torah readings" should "be assigned correctly" ignore {
+  "Torah readings" should "be assigned correctly" in {
     val start = System.currentTimeMillis()
     (2 to 6000) foreach { number =>
       val year = Year(number)

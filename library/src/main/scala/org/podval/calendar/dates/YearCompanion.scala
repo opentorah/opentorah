@@ -1,6 +1,6 @@
 package org.podval.calendar.dates
 
-import org.podval.judaica.util.Cache
+import org.digitaljudaica.util.Cache
 
 /**
   *

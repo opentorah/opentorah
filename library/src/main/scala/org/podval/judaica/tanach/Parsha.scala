@@ -1,28 +1,28 @@
 package org.podval.judaica.tanach
 
-import org.podval.judaica.tanach.Tanach.ChumashBook
-import org.podval.judaica.tanach.Torah.Maftir
-import org.podval.judaica.metadata.{Named, NamedCompanion, Names}
+import org.digitaljudaica.metadata.{Named, NamedCompanion, Names}
 
 sealed trait Parsha extends Named {
-  def book: ChumashBook
+  def book: Tanach.ChumashBook
 
-  final override def names: Names = book.toNames(this)
+  private def metadata: ParshaMetadata = book.metadata.forParsha(this)
 
-  final def span: Span = book.span(this)
+  final override def names: Names = metadata.names
 
-  final def days: Torah.Customs = book.days(this)
+  final def span: Span = metadata.span
 
-  final def daysCombined: Option[Torah.Customs] = book.daysCombined(this)
+  final def days: Torah.Customs = metadata.days
+
+  final def daysCombined: Option[Torah.Customs] = metadata.daysCombined
 
   final def getDaysCombined: Torah.Customs = {
     require(this.combines)
     daysCombined.get
   }
 
-  final def aliyot: Torah = book.aliyot(this)
+  final def aliyot: Torah = metadata.aliyot
 
-  final def maftir: Maftir = book.maftir(this)
+  final def maftir: Torah.Maftir = metadata.maftir
 
   final def combines: Boolean = Parsha.combinable.contains(this)
 }
@@ -30,7 +30,7 @@ sealed trait Parsha extends Named {
 object Parsha extends NamedCompanion {
   override type Key = Parsha
 
-  trait GenesisParsha extends Parsha { final override def book: ChumashBook = Tanach.Genesis }
+  trait GenesisParsha extends Parsha { final override def book: Tanach.ChumashBook = Tanach.Genesis }
 
   case object Bereishis extends GenesisParsha
   case object Noach extends GenesisParsha
@@ -48,7 +48,7 @@ object Parsha extends NamedCompanion {
   val genesis: Seq[Parsha] = Seq(Bereishis, Noach, LechLecha, Vayeira, ChayeiSarah, Toldos,
     Vayeitzei, Vayishlach, Vayeishev, Mikeitz, Vayigash, Vayechi)
 
-  trait ExodusParsha extends Parsha { final override def book: ChumashBook = Tanach.Exodus }
+  trait ExodusParsha extends Parsha { final override def book: Tanach.ChumashBook = Tanach.Exodus }
 
   case object Shemos extends ExodusParsha
   case object Va_eira extends ExodusParsha { override def name: String = "Va'eira" }
@@ -65,7 +65,7 @@ object Parsha extends NamedCompanion {
   val exodus: Seq[Parsha] = Seq(Shemos, Va_eira, Bo, Beshalach, Yisro, Mishpatim, Terumah,
     Tetzaveh, KiSisa, Vayakhel, Pekudei)
 
-  trait LeviticusParsha extends Parsha { final override def book: ChumashBook = Tanach.Leviticus }
+  trait LeviticusParsha extends Parsha { final override def book: Tanach.ChumashBook = Tanach.Leviticus }
 
   case object Vayikra extends LeviticusParsha
   case object Tzav extends LeviticusParsha
@@ -80,7 +80,7 @@ object Parsha extends NamedCompanion {
 
   val leviticus: Seq[Parsha] = Seq(Vayikra, Tzav, Shemini, Tazria, Metzora, Acharei, Kedoshim, Emor, Behar, Bechukosai)
 
-  trait NumbersParsha extends Parsha { final override def book: ChumashBook = Tanach.Numbers }
+  trait NumbersParsha extends Parsha { final override def book: Tanach.ChumashBook = Tanach.Numbers }
 
   case object Bemidbar extends NumbersParsha
   case object Nasso extends NumbersParsha
@@ -95,7 +95,7 @@ object Parsha extends NamedCompanion {
 
   val numbers: Seq[Parsha] = Seq(Bemidbar, Nasso, Beha_aloscha, Shelach, Korach, Chukas, Balak, Pinchas, Mattos, Masei)
 
-  trait DeutoronomyParsha extends Parsha { final override def book: ChumashBook = Tanach.Deuteronomy }
+  trait DeutoronomyParsha extends Parsha { final override def book: Tanach.ChumashBook = Tanach.Deuteronomy }
 
   case object Devarim extends DeutoronomyParsha
   case object Va_eschanan extends DeutoronomyParsha { override def name: String = "Va'eschanan" }

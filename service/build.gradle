@@ -7,6 +7,7 @@ description = 'Jewish Calendar Service.'
 
 dependencies {
   implementation project(':library')
+  implementation "org.digitaljudaica:org.digitaljudaica-store:$storeVersion"
 
   implementation "org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion"
   implementation "org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion"

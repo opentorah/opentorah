@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata type="Tanach">
-    <book resource="Genesis"/>
-    <book resource="Exodus"/>
-    <book resource="Leviticus"/>
-    <book resource="Numbers"/>
-    <book resource="Deuteronomy"/>
+    <book resource="Genesis.xml"/>
+    <book resource="Exodus.xml"/>
+    <book resource="Leviticus.xml"/>
+    <book resource="Numbers.xml"/>
+    <book resource="Deuteronomy.xml"/>
 
     <book>
         <name lang="en" n="Joshua"/>
@@ -493,7 +493,7 @@
         <chapter n="3" length="24"/>
     </book>
 
-    <book resource="Psalms"/>
+    <book resource="Psalms.xml"/>
 
     <book>
       <name lang="en" n="Proverbs"/>

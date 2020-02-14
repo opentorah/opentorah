@@ -1,8 +1,8 @@
 package org.podval.calendar.gregorian
 
+import org.digitaljudaica.metadata.{Named, NamedCompanion, Names}
 import org.podval.calendar.dates.MonthCompanion
 import Gregorian.Year
-import org.podval.judaica.metadata.{NamedCompanion, Named, Names}
 
 abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
   final override val Name: GregorianMonthCompanion.type = GregorianMonthCompanion

@@ -2,7 +2,7 @@ package org.podval.calendar.tanach
 
 import org.podval.judaica.tanach.{Custom, Torah}
 import org.podval.judaica.tanach.Torah.Maftir
-import org.podval.judaica.util.Util.mapValues
+import org.digitaljudaica.util.Collections.mapValues
 
 final class Reading(customs: Map[Custom, Reading.ReadingCustom])
   extends Custom.Of[Reading.ReadingCustom](customs)
