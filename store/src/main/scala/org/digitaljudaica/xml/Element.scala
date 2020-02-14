@@ -70,6 +70,8 @@ object Element extends Element(charactersAllowed = false, elementsAllowed = true
   object withCharacters extends Element(charactersAllowed = true, elementsAllowed = true)
   object withCharactersOnly extends Element(charactersAllowed = true, elementsAllowed = false)
 
+  def withInclude[A](parser: Parser[A]): Parser[A] = withInclude("include", parser)
+
   def withInclude[A](attribute: String, parser: Parser[A]): Parser[A] = for {
     url <- Attribute.optional(attribute)
     result <- url.fold(parser)(Context.include(_, parser))

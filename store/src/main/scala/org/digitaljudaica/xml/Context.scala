@@ -49,6 +49,7 @@ object Context {
     Parser.inspectAndSet(_.replaceCurrent(f))
 
   private[xml] def include[A](url: String, parser: Parser[A]): Parser[A] = for {
+    // TODO check that there is nothing left behind...
     name <- Element.name
     currentFrom <- currentFrom
     from <- Parser.toParser(From.url(currentFrom.url.fold(new URL(url))(new URL(_, url))))

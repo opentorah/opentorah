@@ -19,7 +19,7 @@ object Files {
   }
 
   def nameAndExtension(fullName: String): (String, Option[String]) = {
-    val dot: Int = fullName.indexOf('.')
+    val dot: Int = fullName.lastIndexOf('.')
     if (dot == -1) (fullName, None)
     else (fullName.substring(0, dot), Some(fullName.substring(dot+1)))
   }

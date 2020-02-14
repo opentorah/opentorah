@@ -72,7 +72,5 @@ object Ops {
     }
 
     def withoutNamespace: Elem = removeNamespace(elem)
-
-    def format: String = Print.format(elem)
   }
 }
