@@ -52,10 +52,10 @@ object TanachMetadata {
   }
 
   private def parse: Parsed = {
-    val metadatas: Seq[TanachBookMetadata.Parsed] = Metadata.metadata(
-      From.resource(Tanach),
-      "book",
-      Element.withInclude("resource", bookParser)
+    val metadatas: Seq[TanachBookMetadata.Parsed] = Metadata.load(
+      from = From.resource(Tanach),
+      elementName = "book",
+      parser = Element.withInclude("resource", bookParser)
     )
 
     // TODO check that there is only one name (default) for the Chumash book and that it is among the names of its first parsha
@@ -71,7 +71,7 @@ object TanachMetadata {
   }
 
   private def bookParser: Parser[TanachBookMetadata.Parsed] = for {
-    names <- Names.withDefaultParser
+    names <- Names.withDefaultNameParser
     chapters <- Chapters.parser
     book = Metadata.find[Tanach.TanachBook, Names](Tanach.values, names)
     result <- book match {

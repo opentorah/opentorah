@@ -1171,5 +1171,8 @@ object SpecialDay {
     Omer, LagBaOmer, Shavuos, FastOfTammuz, TishaBeAv
   )
 
-  private val toNames: Map[WithName, Names] = Metadata.names(loadNames, From.resource(this, "SpecialDay"))
+  private val toNames: Map[WithName, Names] = Metadata.loadNames(
+    keys = loadNames,
+    from = From.resource(this, "SpecialDay")
+  )
 }

@@ -1,7 +1,7 @@
 package org.podval.calendar.tanach
 
 import cats.implicits._
-import org.digitaljudaica.metadata.{LanguageSpec, Metadata, WithNumber}
+import org.digitaljudaica.metadata.{LanguageSpec, Metadata, Names, WithNumber}
 import org.digitaljudaica.util.Collections
 import org.digitaljudaica.xml.{Attribute, Element, From, Parser}
 import org.podval.judaica.tanach.{Custom, Parsha, Tanach, WithBookSpans}
@@ -25,12 +25,21 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
 
   final def forParsha(parsha: Parsha): Customs = haftarah(parsha).map(_.from(parsha))
 
-  private lazy val haftarah: Map[Parsha, Customs] = Metadata.metadataUsingNames(
-    keys = Parsha.values,
-    from = From.resource(this),
-    elementName = "week",
-    parser(true)
-  )
+  private lazy val haftarah: Map[Parsha, Customs] = {
+    val metadatas: Seq[(String, Customs)] = Metadata.load(
+      from = From.resource(this),
+      elementName = "week",
+      parser = Names.withDefaultName(parser(true))
+    )
+
+    val result: Seq[(Parsha, (String, Customs))] = Metadata.bind(
+      keys = Parsha.values,
+      metadatas,
+      (metadata: (String, Customs), name: String) => metadata._1 == name
+    )
+
+    Collections.mapValues(result.toMap)(_._2)
+  }
 
   def parser(full: Boolean): Parser[Customs] = for {
     span <- spanParser

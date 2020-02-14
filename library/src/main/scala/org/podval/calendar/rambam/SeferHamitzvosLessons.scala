@@ -38,7 +38,11 @@ object SeferHamitzvosLessons {
   ))
 
   val lessons: Seq[Lesson] = {
-    val result: Seq[Lesson] = Metadata.metadata(From.resource(this), "lesson", lessonParser)
+    val result: Seq[Lesson] = Metadata.load(
+      from = From.resource(this),
+      elementName = "lesson",
+      parser = lessonParser
+    )
 
     require(result.map(_.number) == (1 to RambamSchedule.numberOfLessons))
 

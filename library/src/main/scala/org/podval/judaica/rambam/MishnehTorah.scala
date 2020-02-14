@@ -58,7 +58,11 @@ object MishnehTorah {
   }
 
   val books: Seq[Book] = {
-    val result: Seq[Book] = Metadata.metadata(From.resource(this), "book", bookParser)
+    val result: Seq[Book] = Metadata.load(
+      from = From.resource(this),
+      elementName = "book",
+      parser = bookParser
+    )
 
     require(result.map(_.number) == (0 to 14))
 
