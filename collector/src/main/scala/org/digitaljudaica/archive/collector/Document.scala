@@ -2,6 +2,7 @@ package org.digitaljudaica.archive.collector
 
 import java.io.File
 import org.digitaljudaica.archive.collector.reference.{Entity, Reference, ReferenceSource}
+import org.digitaljudaica.xml.Print
 import org.digitaljudaica.xml.Ops._
 
 import scala.xml.Elem
@@ -96,7 +97,7 @@ final class Document(
         "transcript" -> s"'../${layout.documentsDirectoryName}/$name.html'"
       )
         ++ navigation,
-      content = Seq(facsimilePages.format)
+      content = Seq(Print.format(facsimilePages))
     )
   }
 }
