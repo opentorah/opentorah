@@ -3,45 +3,31 @@ package org.digitaljudaica.xml
 import cats.implicits._
 
 class Element(charactersAllowed: Boolean, elementsAllowed: Boolean) {
-  object optional {
-    final def apply[A](name: String, parser: Parser[A]): Parser[Option[A]] =
-      apply(name = Some(name), parser)
+  final def optional[A](name: String, parser: Parser[A]): Parser[Option[A]] =
+    optional(Some(name), parser)
 
-    final def apply[A](parser: Parser[A]): Parser[Option[A]] =
-      apply(name = None, parser)
+  final def required[A](name: String, parser: Parser[A]): Parser[A] =
+    Parser.required(s"element '$name'", optional(name, parser))
 
-    // Only nested elements (and not the document element) can have character content allowed;
-    // I do not think this is a problem :)
-    final def apply[A](name: Option[String], parser: Parser[A]): Parser[Option[A]] = for {
-      hasNext <- Element.nextNested.nameIs(name)
-      result <- if (!hasNext) Parser.pure(None) else for {
-        next <- Context.takeNextNestedElement
-        result <- Context.nested(None, next, parser, charactersAllowed, elementsAllowed)
-      } yield Some(result)
-    } yield result
-  }
+  final def all[A](name: String, parser: Parser[A]): Parser[Seq[A]] =
+    all(Some(name), parser)
 
-  object required {
-    final def apply[A](name: String, parser: Parser[A]): Parser[A] =
-      Parser.required(s"element '$name'", optional(name, parser))
+  final def all[A](parser: Parser[A]): Parser[Seq[A]] =
+    all(None, parser)
 
-    final def apply[A](parser: Parser[A]): Parser[A] =
-      Parser.required(s"element", optional(parser))
-  }
+  private final def optional[A](name: Option[String], parser: Parser[A]): Parser[Option[A]] = for {
+    hasNext <- Element.nextNested.nameIs(name)
+    result <- if (!hasNext) Parser.pure(None) else for {
+      next <- Context.takeNextNestedElement
+      result <- Context.nested(None, next, parser, charactersAllowed, elementsAllowed)
+    } yield Some(result)
+  } yield result
 
-  object all {
-    final def apply[A](name: String, parser: Parser[A]): Parser[Seq[A]] =
-      apply(Some(name), parser)
-
-    final def apply[A](parser: Parser[A]): Parser[Seq[A]] =
-      apply(None, parser)
-
-    final def apply[A](name: Option[String], parser: Parser[A]): Parser[Seq[A]] = for {
-      headOption <- optional(name, parser)
-      tail <- if (headOption.isEmpty) Parser.pure(Seq.empty[A]) else apply(name, parser)
-      result = headOption.toSeq ++ tail
-    } yield result
-  }
+  private final def all[A](name: Option[String], parser: Parser[A]): Parser[Seq[A]] = for {
+    headOption <- optional(name, parser)
+    tail <- if (headOption.isEmpty) Parser.pure(Seq.empty[A]) else all(name, parser)
+    result = headOption.toSeq ++ tail
+  } yield result
 }
 
 // Defaults; same are used in the top-level nested() call.

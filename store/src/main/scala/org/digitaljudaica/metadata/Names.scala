@@ -54,17 +54,19 @@ object Names {
     new Names(result.toSeq)
   }
 
-  def namesParser: Parser[Names] = Element.required("names", parser)
+  final val defaultNameAttribute: String = "n"
 
-  def withDefaultParser: Parser[Names] = for {
-    n <- Attribute.optional("n")
+  def defaultNameParser: Parser[String] = Attribute.required(defaultNameAttribute)
+
+  def parser: Parser[Names] = parserWithDefaultName(None)
+
+  def withDefaultNameParser: Parser[Names] = for {
+    n <- Attribute.optional(defaultNameAttribute)
     defaultName = n.map(Name(_, LanguageSpec.empty))
-    result <- withDefaultParser(defaultName)
+    result <- parserWithDefaultName(defaultName)
   } yield result
 
-  def parser: Parser[Names] = withDefaultParser(None)
-
-  def withDefaultParser(defaultName: Option[Name]): Parser[Names] = for {
+  def parserWithDefaultName(defaultName: Option[Name]): Parser[Names] = for {
     nonDefaultNames <- Element.withCharacters.all("name", Name.parser)
     _ <- Parser.check(nonDefaultNames.nonEmpty || defaultName.isDefined, s"No names and no default name")
   } yield {
@@ -77,8 +79,13 @@ object Names {
     new Names(names)
   }
 
+  def withDefaultName[A](parser: Parser[A]): Parser[(String, A)] = for {
+    name <- defaultNameParser
+    result <- parser
+  } yield (name, result)
+
   def withNames[A](parser: Parser[A]): Parser[(Names, A)] = for {
-    names <- Names.withDefaultParser
+    names <- withDefaultNameParser
     result <- parser
   } yield names -> result
 }

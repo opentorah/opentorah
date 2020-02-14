@@ -11,7 +11,10 @@ trait NamedCompanion {
   // This is public so that it can be accessed from the Key type if it isn't defined
   // within the object derived from NamedCompanion.
   // This isn't final so that it can be overridden in Tanach, for instance.
-  lazy val toNames: Map[Key, Names] = Metadata.names(values, From.resource(this, resourceName))
+  lazy val toNames: Map[Key, Names] = Metadata.loadNames(
+    keys = values,
+    from = From.resource(this, resourceName)
+  )
 
   protected def resourceName: String = what
 
