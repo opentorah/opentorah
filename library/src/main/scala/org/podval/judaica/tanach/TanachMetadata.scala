@@ -112,7 +112,7 @@ object TanachMetadata {
 
   private var processing: Boolean = false
 
-  private def checkNotProcessing(): Unit = {
+  private def checkNotProcessing(): Unit = this.synchronized {
     if (processing) throw new IllegalStateException()
   }
 
