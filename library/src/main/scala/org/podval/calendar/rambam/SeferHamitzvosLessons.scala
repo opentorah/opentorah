@@ -1,8 +1,8 @@
 package org.podval.calendar.rambam
 
 import cats.implicits._
-import org.digitaljudaica.metadata.{Language, Name, Names, WithNames}
-import org.digitaljudaica.xml.{Attribute, Element, From, Load, Parser}
+import org.digitaljudaica.metadata.{Language, Metadata, Name, Names, WithNames}
+import org.digitaljudaica.xml.{Attribute, Element, From, Parser}
 
 object SeferHamitzvosLessons {
 
@@ -38,7 +38,7 @@ object SeferHamitzvosLessons {
   ))
 
   val lessons: Seq[Lesson] = {
-    val result: Seq[Lesson] = Load.metadata(From.resource(this), "lesson", lessonParser)
+    val result: Seq[Lesson] = Metadata.metadata(From.resource(this), "lesson", lessonParser)
 
     require(result.map(_.number) == (1 to RambamSchedule.numberOfLessons))
 
@@ -46,15 +46,15 @@ object SeferHamitzvosLessons {
   }
 
   private def lessonParser: Parser[Lesson] = for {
-    number <- Attribute.required.int("n")
+    number <- Attribute.required.positiveInt("n")
     parts <- Element.all[Part](partParser)
   } yield new Lesson(number, parts)
 
   private def partParser: Parser[Part] = for {
     name <- Element.name
     result <- name match {
-      case "positive" => Attribute.required.int("n").map(new Positive(_))
-      case "negative" => Attribute.required.int("n").map(new Negative(_))
+      case "positive" => Attribute.required.positiveInt("n").map(new Positive(_))
+      case "negative" => Attribute.required.positiveInt("n").map(new Negative(_))
       case "named" => Names.parser.map(new NamedPart(_))
 // TODO pre-check? Can't do it in the match, since check(): Unit case name => Parse.check(false, s"Unexpected element '$name'")
     }

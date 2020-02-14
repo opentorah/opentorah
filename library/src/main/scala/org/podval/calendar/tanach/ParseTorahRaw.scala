@@ -1,9 +1,9 @@
 package org.podval.calendar.tanach
 
 import cats.implicits._
-import org.digitaljudaica.metadata.WithNames
+import org.digitaljudaica.metadata.{WithNames, WithNumber}
 import org.digitaljudaica.xml.{From, Element, Parser}
-import org.podval.judaica.tanach.{SpanParsed, Torah, WithNumber}
+import org.podval.judaica.tanach.{SpanParsed, Torah}
 
 import scala.xml.Elem
 

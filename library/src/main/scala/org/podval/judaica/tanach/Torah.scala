@@ -1,6 +1,6 @@
 package org.podval.judaica.tanach
 
-import org.digitaljudaica.metadata.WithNames
+import org.digitaljudaica.metadata.{WithNames, WithNumber}
 import org.digitaljudaica.util.Collections
 
 // Other than on Simchas Torah, aliyot are from the same book.

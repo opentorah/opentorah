@@ -1,8 +1,8 @@
 package org.podval.judaica.rambam
 
 import cats.implicits._
-import org.digitaljudaica.metadata.{Language, Name, Names, WithNames}
-import org.digitaljudaica.xml.{Attribute, Element, From, Load, Parser}
+import org.digitaljudaica.metadata.{Language, Metadata, Name, Names, WithNames}
+import org.digitaljudaica.xml.{Attribute, Element, From, Parser}
 
 object MishnehTorah {
 
@@ -58,7 +58,7 @@ object MishnehTorah {
   }
 
   val books: Seq[Book] = {
-    val result: Seq[Book] = Load.metadata(From.resource(this), "book", bookParser)
+    val result: Seq[Book] = Metadata.metadata(From.resource(this), "book", bookParser)
 
     require(result.map(_.number) == (0 to 14))
 
@@ -66,7 +66,7 @@ object MishnehTorah {
   }
 
   private def bookParser: Parser[Book] = for {
-    number <- Attribute.required.int("n")
+    number <- Attribute.required.positiveInt("n")
     names <- Names.parser
     parts <- Element.all("part", partParser)
     _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
@@ -78,8 +78,8 @@ object MishnehTorah {
   }
 
   private def partParser: Parser[Part] = for {
-    number <- Attribute.required.int("n")
-    numChapters <- Attribute.required.int("chapters")
+    number <- Attribute.required.positiveInt("n")
+    numChapters <- Attribute.required.positiveInt("chapters")
     names <- Names.parser
     chapters <- Element.all[NamedChapter]("chapter", for {
       names <- Names.parser

@@ -1,10 +1,10 @@
 package org.podval.calendar.tanach
 
 import cats.implicits._
-import org.digitaljudaica.metadata.LanguageSpec
+import org.digitaljudaica.metadata.{LanguageSpec, Metadata, WithNumber}
 import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{Attribute, Element, From, Load, Parser}
-import org.podval.judaica.tanach.{Custom, Parsha, Tanach, WithBookSpans, WithNumber}
+import org.digitaljudaica.xml.{Attribute, Element, From, Parser}
+import org.podval.judaica.tanach.{Custom, Parsha, Tanach, WithBookSpans}
 
 final case class Haftarah private(override val spans: Seq[Haftarah.BookSpan])
   extends Haftarah.Spans(spans)
@@ -25,7 +25,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
 
   final def forParsha(parsha: Parsha): Customs = haftarah(parsha).map(_.from(parsha))
 
-  private lazy val haftarah: Map[Parsha, Customs] = Load.metadataUsingNames(
+  private lazy val haftarah: Map[Parsha, Customs] = Metadata.metadataUsingNames(
     keys = Parsha.values,
     from = From.resource(this),
     elementName = "week",
