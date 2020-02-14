@@ -1,7 +1,7 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-import org.digitaljudaica.metadata.Xml
+import org.digitaljudaica.xml.{From, Print}
 import org.digitaljudaica.archive.collector.reference.Names
 import scala.xml.{Elem, Text}
 
@@ -17,12 +17,12 @@ object Main {
     } yield new Collection(
       layout,
       directory,
-      Xml.load(directory, layout.collectionFileName)
+      From.file(directory, layout.collectionFileName).loadDo
     )
 
     println("Collections:")
     println(collections.map { collection =>
-      s"  ${collection.directoryName}: ${Xml.spacedText(collection.title)}\n"
+      s"  ${collection.directoryName}: ${Print.spacedText(collection.title)}\n"
     }.mkString)
 
     println("Processing collections.")
@@ -67,7 +67,7 @@ object Main {
   private def toXml(collection: Collection, layout: Layout): Elem =
     <item>
       <ref target={layout.collectionUrl(collection.directoryName)}
-           role="collectionViewer">{collection.reference + ": " + Xml.spacedText(collection.title)}</ref>
+           role="collectionViewer">{collection.reference + ": " + Print.spacedText(collection.title)}</ref>
       <lb/>
       {collection.caseAbstract}
     </item>

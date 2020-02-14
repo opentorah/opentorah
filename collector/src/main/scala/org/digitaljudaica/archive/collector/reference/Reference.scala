@@ -1,7 +1,7 @@
 package org.digitaljudaica.archive.collector.reference
 
 import org.digitaljudaica.archive.collector.Errors
-import org.digitaljudaica.metadata.Xml.Ops
+import org.digitaljudaica.xml.Ops._
 
 import scala.xml.Elem
 

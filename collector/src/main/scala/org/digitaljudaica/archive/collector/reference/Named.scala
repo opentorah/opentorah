@@ -2,7 +2,7 @@ package org.digitaljudaica.archive.collector.reference
 
 import org.digitaljudaica.archive.collector.{Errors, Layout, Tei}
 import org.digitaljudaica.util.Collections
-import org.digitaljudaica.metadata.Xml.Ops
+import org.digitaljudaica.xml.Ops._
 import scala.xml.{Elem, Node, Text}
 
 // TODO structure the TEI file better: the names, information, list reference, mentions...

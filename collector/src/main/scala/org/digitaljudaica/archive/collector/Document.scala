@@ -2,7 +2,7 @@ package org.digitaljudaica.archive.collector
 
 import java.io.File
 import org.digitaljudaica.archive.collector.reference.{Entity, Reference, ReferenceSource}
-import org.digitaljudaica.metadata.Xml.Ops
+import org.digitaljudaica.xml.Ops._
 
 import scala.xml.Elem
 

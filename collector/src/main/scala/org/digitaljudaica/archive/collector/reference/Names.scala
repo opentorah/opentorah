@@ -2,13 +2,13 @@ package org.digitaljudaica.archive.collector.reference
 
 import java.io.File
 import org.digitaljudaica.archive.collector.{CollectionLike, Errors, Layout, Util}
-import org.digitaljudaica.metadata.Xml
-import org.digitaljudaica.metadata.Xml.Ops
+import org.digitaljudaica.xml.Ops._
+import org.digitaljudaica.xml.From
 import org.digitaljudaica.util.Files
 import scala.xml.{Elem, Text}
 
 final class Names(directory: File, layout: Layout) extends CollectionLike {
-  private val xml: Elem = Xml.load(layout.docs, layout.namesListsFileName).check("names")
+  private val xml: Elem = From.file(layout.docs, layout.namesListsFileName).loadDo.check("names")
   private val elements: Seq[Elem] = xml.elems
 
   private val head: String = elements.head.check("head").text
@@ -16,8 +16,8 @@ final class Names(directory: File, layout: Layout) extends CollectionLike {
 
   private val errors: Errors = new Errors
   private val nameds: Seq[Named] = {
-    for (fileName <- Files.filesWithExtensions(directory, extension = ".xml").sorted) yield new Named(
-      rawXml = Xml.load(directory, fileName),
+    for (fileName <- Files.filesWithExtensions(directory, extension = "xml").sorted) yield new Named(
+      rawXml = From.file(directory, fileName).loadDo,
       fileName,
       container = this,
       layout,

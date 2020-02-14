@@ -1,7 +1,7 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-import org.digitaljudaica.metadata.Xml.Ops
+import org.digitaljudaica.xml.Ops._
 import org.digitaljudaica.util.{Files, Collections}
 import org.digitaljudaica.archive.collector.reference.Reference
 import Table.Column
@@ -100,7 +100,7 @@ final class Collection(
 
   private def getDocuments: Seq[Document] = {
     val namesWithLang: Seq[(String, Option[String])] =
-      Files.filesWithExtensions(teiDirectory, ".xml").sorted.map(splitLang)
+      Files.filesWithExtensions(teiDirectory, "xml").sorted.map(splitLang)
 
     val translations: Map[String, Seq[String]] = Collections.mapValues(namesWithLang
       .filter(_._2.isDefined)
@@ -197,7 +197,8 @@ object Collection {
   private def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
     case Nil => Nil
     case n :: Nil => Seq(n)
-    case n :: ns => Seq(n, Text(", ")) ++ multi(ns)
+    case n :: ns if n.isInstanceOf[Elem] => Seq(n, Text(", ")) ++ multi(ns)
+    case n :: ns => Seq(n) ++ multi(ns)
     case n => n
   }
 }

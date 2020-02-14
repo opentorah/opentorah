@@ -1,7 +1,7 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-import org.digitaljudaica.metadata.Xml
+import org.digitaljudaica.xml.Print
 import org.digitaljudaica.util.Files
 import scala.xml.Node
 
@@ -57,7 +57,7 @@ object Util {
     Files.write(
       file = new File(directory, fileName + ".xml"),
       content = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
-        Xml.format(elem)
+        Print.format(elem)
     )
 
     writeTeiWrapper(
@@ -66,7 +66,7 @@ object Util {
       teiPrefix = None,
       style,
       target,
-      yaml = head.fold[Seq[(String, String)]](Seq.empty)(head => Seq("title" -> quote(Xml.spacedText(head)))) ++ yaml
+      yaml = head.fold[Seq[(String, String)]](Seq.empty)(head => Seq("title" -> quote(Print.spacedText(head)))) ++ yaml
     )
   }
 }

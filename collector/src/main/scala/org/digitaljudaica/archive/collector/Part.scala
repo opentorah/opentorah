@@ -1,6 +1,6 @@
 package org.digitaljudaica.archive.collector
 
-import org.digitaljudaica.metadata.Xml.Ops
+import org.digitaljudaica.xml.Ops._
 import scala.xml.{Elem, Node}
 
 final class Part(val title: Option[Seq[Node]], val documents: Seq[Document])
