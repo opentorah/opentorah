@@ -55,7 +55,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
     n <- Attribute.required("n")
     bookSpanParsed <- spanParser.map(_.inheritFrom(ancestorSpan))
     hasParts <- Element.nextNested.nameIs("part")
-    result <- if (hasParts) Parser.pure[Haftarah](oneSpan(bookSpanParsed)) else partsParser(bookSpanParsed)
+    result <- if (!hasParts) Parser.pure[Haftarah](oneSpan(bookSpanParsed)) else partsParser(bookSpanParsed)
   } yield Custom.parse(n) -> result
 
   private def partsParser(ancestorSpan: BookSpanParsed): Parser[Haftarah] = for {

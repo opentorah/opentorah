@@ -18,7 +18,7 @@ object Tanach extends NamedCompanion {
     final override def values: Seq[Parsha] = parshiot
 
     // Parsed names of the book are ignored - names of the first parsha are used instead.
-    final override def names: Names = toNames(parshiot.head)
+    final override def names: Names = parshiot.head.names
 
     final def metadata: ChumashBookMetadata = TanachMetadata.forChumash(this)
   }
