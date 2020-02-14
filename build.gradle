@@ -20,10 +20,6 @@ subprojects {
       force("org.scala-lang:scala-library:$scalaVersion")
       force("org.typelevel:cats-core_$scalaVersionMajor:$catsVersion")
 //      force("org.typelevel:cats-effect_$scalaVersionMajor:$catsVersion")
-      force("org.slf4j:slf4j-jdk14:$slf4jVersion")
-
-      // Do not let 'discipline' drag us into the snapshot releases :)
-      force("org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion")
     }
   }
 }
