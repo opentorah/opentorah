@@ -1,8 +1,8 @@
 package org.podval.judaica.rambam
 
-import org.podval.judaica.metadata.{Attributes, Language, LanguageSpec, Metadata, Name, Names, WithNames, XML}
-
-import scala.xml.Elem
+import cats.implicits._
+import org.digitaljudaica.metadata.{Language, Metadata, Name, Names, WithNames}
+import org.digitaljudaica.xml.{Attribute, Element, From, Parser}
 
 object MishnehTorah {
 
@@ -58,52 +58,37 @@ object MishnehTorah {
   }
 
   val books: Seq[Book] = {
-    val result: Seq[Book] = Metadata
-      .loadMetadataElements(this, None, "metadata", "book")
-      .map(parseBook)
+    val result: Seq[Book] = Metadata.metadata(From.resource(this), "book", bookParser)
 
     require(result.map(_.number) == (0 to 14))
 
     result
   }
 
-  private def parseBook(element: Elem): Book = {
-    val (attributes: Attributes, elements: Seq[Elem]) = XML.open(element, "book")
-    val number: Int = attributes.doGet("n").toInt
-    val (names: Names, tail: Seq[Elem]) = Names.parse(elements)
-    val parts: Seq[Part] = XML.span(tail, "part").map(parsePart)
-    require(parts.map(_.number) == (1 to parts.length), s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
+  private def bookParser: Parser[Book] = for {
+    number <- Attribute.required.positiveInt("n")
+    names <- Names.parser
+    parts <- Element.all("part", partParser)
+    _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
+      s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
+  } yield {
     val result = new Book(number, names, parts)
     parts.foreach(_.setBook(result))
     result
   }
 
-  private def parsePart(element: Elem): Part = {
-    val (attributes: Attributes, elements: Seq[Elem]) = XML.open(element, "part")
-    val number: Int = attributes.doGetInt("n")
-    val numChapters: Int = attributes.doGetInt("chapters")
-    val (names: Names, tail: Seq[Elem]) = Names.parse(elements)
-    if (tail.isEmpty) new PartWithNumberedChapters(
-      number,
-      numChapters,
-      names
-    ) else {
-      val chapters: Seq[NamedChapter] = tail.map(parseNamedChapter)
-      val result = new PartWithNamedChapters(
-        number,
-        numChapters,
-        names,
-        chapters
-      )
+  private def partParser: Parser[Part] = for {
+    number <- Attribute.required.positiveInt("n")
+    numChapters <- Attribute.required.positiveInt("chapters")
+    names <- Names.parser
+    chapters <- Element.all[NamedChapter]("chapter", for {
+      names <- Names.parser
+    } yield new NamedChapter(names))
+  } yield {
+    if (chapters.isEmpty) new PartWithNumberedChapters(number, numChapters, names) else {
+      val result = new PartWithNamedChapters(number, numChapters, names, chapters)
       chapters.foreach(_.setPart(result))
       result
     }
-  }
-
-  private def parseNamedChapter(element: Elem): NamedChapter = {
-    val (attributes: Attributes, elements: Seq[Elem]) = XML.open(element, "chapter")
-    val (names: Names, tail: Seq[Elem]) = Names.parse(elements)
-    require(tail.isEmpty)
-    new NamedChapter(names)
   }
 }

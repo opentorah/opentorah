@@ -1,6 +1,7 @@
 package org.podval.calendar.tanach
 
-import org.podval.judaica.metadata.{Metadata, Names, WithName, WithNames}
+import org.digitaljudaica.metadata.{Metadata, Names, WithName, WithNames}
+import org.digitaljudaica.xml.From
 import org.podval.judaica.tanach.{Custom, Parsha, Source, Torah}
 import org.podval.judaica.tanach.Torah.{Aliyah, Maftir}
 import org.podval.calendar.jewish.Jewish.{Day, Month, Year}
@@ -1170,5 +1171,5 @@ object SpecialDay {
     Omer, LagBaOmer, Shavuos, FastOfTammuz, TishaBeAv
   )
 
-  private val toNames: Map[WithName, Names] = Metadata.loadNames(loadNames, this, "SpecialDay")
+  private val toNames: Map[WithName, Names] = Metadata.names(loadNames, From.resource(this, "SpecialDay"))
 }

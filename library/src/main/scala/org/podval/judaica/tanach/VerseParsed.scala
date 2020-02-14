@@ -1,6 +1,7 @@
 package org.podval.judaica.tanach
 
-import org.podval.judaica.metadata.Attributes
+import cats.implicits._
+import org.digitaljudaica.xml.{Attribute, Parser}
 
 final case class VerseParsed(chapter: Option[Int], verse: Option[Int]) {
 
@@ -23,13 +24,13 @@ final case class VerseParsed(chapter: Option[Int], verse: Option[Int]) {
 
 object VerseParsed {
 
-  final def parseFrom(attributes: Attributes): VerseParsed = VerseParsed(
-    chapter = attributes.getInt("fromChapter"),
-    verse = attributes.getInt("fromVerse")
-  )
+  val fromParser: Parser[VerseParsed] = for {
+    chapter <- Attribute.optional.positiveInt("fromChapter")
+    verse <- Attribute.optional.positiveInt("fromVerse")
+  } yield VerseParsed(chapter, verse)
 
-  final def parseTo(attributes: Attributes): VerseParsed = VerseParsed(
-    chapter = attributes.getInt("toChapter"),
-    verse = attributes.getInt("toVerse")
-  )
+  val toParser: Parser[VerseParsed] = for {
+    chapter <- Attribute.optional.positiveInt("toChapter")
+    verse <- Attribute.optional.positiveInt("toVerse")
+  } yield VerseParsed(chapter, verse)
 }

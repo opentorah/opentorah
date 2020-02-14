@@ -1,6 +1,6 @@
 package org.podval.calendar.jewish
 
-import org.podval.judaica.metadata.{Named, NamedCompanion, Names}
+import org.digitaljudaica.metadata.{Named, NamedCompanion, Names}
 
 // "abstract" is here to help with the exhaustiveness check.
 sealed abstract class Season(override val name: String) extends Named {

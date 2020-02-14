@@ -1,8 +1,8 @@
 package org.podval.judaica.tanach
 
-import org.podval.judaica.metadata.XML
-
-import scala.xml.Elem
+import cats.implicits._
+import org.digitaljudaica.metadata.WithNumber
+import org.digitaljudaica.xml.{Attribute, Element, Parser}
 
 final class Chapters(chapters: Seq[Int]) {
   def length(chapter: Int): Int = chapters(chapter-1)
@@ -60,16 +60,11 @@ final class Chapters(chapters: Seq[Int]) {
 }
 
 object Chapters {
-  def apply(elements: Seq[Elem]): Chapters = {
-    val chapters: Seq[WithNumber[Int]] = elements.map { element =>
-      val attributes = XML.openEmpty(element, "chapter" )
-      val result = WithNumber.parse(attributes, attributes => attributes.doGetInt("length"))
-      attributes.close()
-      result
-    }
 
+  val parser: Parser[Chapters] = for {
+    chapters <- Element.all("chapter", WithNumber.parse(Attribute.required.positiveInt("length")))
+  } yield {
     WithNumber.checkConsecutive(chapters, "chapter")
-
     new Chapters(WithNumber.dropNumbers(chapters))
   }
 }

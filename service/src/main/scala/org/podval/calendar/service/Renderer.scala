@@ -1,15 +1,15 @@
 package org.podval.calendar.service
 
+import org.digitaljudaica.metadata.{Language, LanguageSpec, WithNames}
+import org.digitaljudaica.util.{Collections, Util}
 import org.podval.calendar.dates.{Calendar, DayBase, MonthBase, YearBase, YearsCycle}
 import org.podval.calendar.gregorian.Gregorian
-import org.podval.calendar.jewish.{LeapYearsCycle, Jewish, Season, Sun, Shemittah, YearType}
+import org.podval.calendar.jewish.{Jewish, LeapYearsCycle, Season, Shemittah, Sun, YearType}
 import org.podval.calendar.rambam.{RambamSchedule, SeferHamitzvosLessons}
 import org.podval.calendar.tanach.{Chitas, Haftarah, Reading, Schedule, SpecialDay}
-import org.podval.judaica.metadata.{Language, LanguageSpec, WithNames}
 import org.podval.judaica.rambam.MishnehTorah
 import org.podval.judaica.tanach.{Custom, Span, Torah}
 import org.podval.judaica.tanach.Tanach.Psalms
-import org.podval.judaica.util.Util
 import scalatags.Text.TypedTag
 import scalatags.Text.all._
 
@@ -260,7 +260,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
     haftarah.fold(Seq(tr(td("None")))){ haftarah =>
       val spans = haftarah.spans
       val parts: Seq[Seq[Haftarah.BookSpan]] =
-        Util.group[Haftarah.BookSpan, Option[WithNames]](spans, span => span.source)
+        Collections.group[Haftarah.BookSpan, Option[WithNames]](spans, span => span.source)
       parts map { part: Seq[Haftarah.BookSpan] => tr(
         td(Haftarah.toLanguageString(part)(spec)),
         td(renderSource(part.head.source))

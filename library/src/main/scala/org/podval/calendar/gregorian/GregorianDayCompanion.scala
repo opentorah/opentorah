@@ -1,7 +1,7 @@
 package org.podval.calendar.gregorian
 
+import org.digitaljudaica.metadata.{Named, NamedCompanion, Names}
 import org.podval.calendar.dates.{Calendar, DayCompanion}
-import org.podval.judaica.metadata.{NamedCompanion, Named, Names}
 
 abstract class GregorianDayCompanion extends DayCompanion[Gregorian] {
   final override val Name: GregorianDayCompanion.type = GregorianDayCompanion

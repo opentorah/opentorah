@@ -1,6 +1,7 @@
 package org.podval.judaica.tanach
 
-import org.podval.judaica.metadata.Attributes
+import cats.implicits._
+import org.digitaljudaica.xml.Parser
 
 final case class SpanParsed(from: VerseParsed, to: VerseParsed) {
   def inheritFrom(ancestor: SpanParsed): SpanParsed = SpanParsed(
@@ -40,8 +41,9 @@ final case class SpanParsed(from: VerseParsed, to: VerseParsed) {
 }
 
 object SpanParsed {
-  final def parse(attributes: Attributes): SpanParsed = SpanParsed(
-    from = VerseParsed.parseFrom(attributes),
-    to = VerseParsed.parseTo(attributes)
-  )
+
+  val parser: Parser[SpanParsed] = for {
+    from <- VerseParsed.fromParser
+    to <- VerseParsed.toParser
+  } yield SpanParsed(from, to)
 }

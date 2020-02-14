@@ -1,10 +1,10 @@
 package org.podval.calendar.dates
 
+import org.digitaljudaica.metadata.LanguageSpec
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.Jewish
 import org.podval.calendar.numbers.{Digits, VectorCompanion}
 import org.podval.calendar.times.{TimeVectorBase, Times}
-import org.podval.judaica.metadata.LanguageSpec
 
 trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 

@@ -1,6 +1,8 @@
 package org.podval.judaica.tanach
 
-import org.podval.judaica.metadata.{Attributes, LanguageSpec, LanguageString, WithNames}
+import cats.implicits._
+import org.digitaljudaica.metadata.{LanguageSpec, LanguageString, WithNames}
+import org.digitaljudaica.xml.{Attribute, Parser}
 
 trait WithBookSpans[Book <: Tanach.TanachBook] {
 
@@ -55,14 +57,10 @@ trait WithBookSpans[Book <: Tanach.TanachBook] {
     def resolve: BookSpan = BookSpan(getBook(book.get), span.resolve)
   }
 
-  final def parseSpan(attributes: Attributes): BookSpanParsed = {
-    val result = new BookSpanParsed(
-      book = attributes.get("book"),
-      SpanParsed.parse(attributes)
-    )
-    attributes.close()
-    result
-  }
+  val spanParser: Parser[BookSpanParsed] = for {
+    book <- Attribute.optional("book")
+    spanParsed <- SpanParsed.parser
+  } yield new BookSpanParsed(book, spanParsed)
 
   protected def getBook(name: String): Book
 

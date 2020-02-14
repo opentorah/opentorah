@@ -1,6 +1,6 @@
 package org.podval.calendar.tanach
 
-import org.podval.judaica.metadata.WithNames
+import org.digitaljudaica.metadata.WithNames
 import org.podval.judaica.tanach.Torah
 
 import scala.xml.Elem

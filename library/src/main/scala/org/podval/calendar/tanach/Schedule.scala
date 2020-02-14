@@ -1,9 +1,9 @@
 package org.podval.calendar.tanach
 
+import org.digitaljudaica.metadata.WithNames
+import org.digitaljudaica.util.{Cache, Collections, PairSlider}
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.tanach.SpecialDay.{FestivalOrIntermediate, Omer, ShabbosBereishis}
-import org.podval.judaica.metadata.WithNames
-import org.podval.judaica.util.{Cache, PairSlider, Util}
 
 final case class Schedule private(
   from: Day,
@@ -46,7 +46,7 @@ object Schedule {
       currentWeeklyReadings.reset()
       nextWeeklyReadings.reset()
 
-      val days: Seq[Day] = Util.unfoldSimple[Day](from, _ + 1, _ <= to)
+      val days: Seq[Day] = Collections.unfoldSimple[Day](from, _ + 1, _ <= to)
       new Schedule(from, to, inHolyLand, days = days.map(day => day -> forDay(day, inHolyLand)).toMap)
     }
 
@@ -109,7 +109,7 @@ object Schedule {
   private def createBuilder(from: Day, to: Day, inHolyLand: Boolean): Builder = {
     val fromYear: Year = if (ShabbosBereishis.date(from.year) <= from) from.year else from.year - 1
     val toYear: Year = to.year + 1
-    val years: Seq[Year] = Util.unfoldSimple[Year](fromYear, _ + 1, _ <= toYear)
+    val years: Seq[Year] = Collections.unfoldSimple[Year](fromYear, _ + 1, _ <= toYear)
 
     val yearsData: Seq[YearData] = years.map { year => YearData(
       year = year,

@@ -1,6 +1,6 @@
 package org.podval.calendar.dates
 
-import org.podval.judaica.metadata.NamedCompanion
+import org.digitaljudaica.metadata.NamedCompanion
 
 /**
   *

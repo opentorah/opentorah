@@ -1,8 +1,8 @@
 package org.podval.calendar.astronomy
 
+import org.digitaljudaica.metadata.{Named, NamedCompanion, Names}
 import org.podval.calendar.angles.Angles
 import org.podval.calendar.angles.Angles.{Position, Rotation}
-import org.podval.judaica.metadata.{Named, NamedCompanion, Names}
 
 // KH 11:9
 sealed abstract class Zodiac extends Named {

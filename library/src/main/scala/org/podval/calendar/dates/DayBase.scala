@@ -1,6 +1,6 @@
 package org.podval.calendar.dates
 
-import org.podval.judaica.metadata.{LanguageSpec, LanguageString, Numbered}
+import org.digitaljudaica.metadata.{LanguageSpec, LanguageString, Numbered}
 
 /**
   *
