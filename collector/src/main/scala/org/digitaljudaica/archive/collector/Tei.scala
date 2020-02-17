@@ -25,7 +25,7 @@ class Tei(val tei: Elem) {
   val languages: Seq[Elem] = langUsage.fold[Seq[Elem]](Seq.empty)(_.elems("language"))
   val languageIdents: Seq[String] = languages.map(_.getAttribute("ident"))
   val body: Elem = tei.oneChild("text").oneChild("body")
-  val pbs: Seq[Elem] = body.descendants("pb")
+  val pbs: Seq[Elem] = org.digitaljudaica.xml.Ops.descendants(body, "pb")
 
 /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
 }
@@ -41,9 +41,7 @@ object Tei {
       <teiHeader>
         <fileDesc>
           <publicationStmt>
-            <publisher>
-              <ptr target="www.alter-rebbe.org"/>
-            </publisher>
+            <publisher><ptr target="www.alter-rebbe.org"/></publisher>
             <availability status="free">
               <licence>
                 <ab>

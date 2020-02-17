@@ -1,7 +1,7 @@
 package org.digitaljudaica.archive.collector.reference
 
 import org.digitaljudaica.archive.collector.CollectionLike
-import org.digitaljudaica.xml.Ops._
+import org.digitaljudaica.xml.Ops
 import scala.xml.Elem
 
 abstract class ReferenceSource(val collection: CollectionLike) {
@@ -19,6 +19,6 @@ abstract class ReferenceSource(val collection: CollectionLike) {
   protected final def parseReferences(xml: Elem): Seq[Reference] =
     for {
       entity <- Entity.values
-      elem <- xml.descendants(entity.nameElement)
+      elem <- Ops.descendants(xml, entity.nameElement)
     } yield Reference(this, entity, elem)
 }
