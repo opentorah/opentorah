@@ -5,8 +5,8 @@ import scala.xml.{Elem, Node, TopScope}
 
 object Ops {
 
-  def removeNamespace(element: Elem): Elem =
-    element.copy(scope = TopScope, child = element.child.map(removeNamespace))
+  def removeNamespace(xml: Elem): Elem =
+    xml.copy(scope = TopScope, child = xml.child.map(removeNamespace))
 
   private def removeNamespace(node: Node): Node = node match {
     case e: Elem => e.copy(scope = TopScope, child = e.child.map(removeNamespace))
@@ -24,6 +24,10 @@ object Ops {
     new RuleTransformer(rule).transform(xml).head.asInstanceOf[Elem]
   }
 
+  def descendants(xml: Elem, name: String): Seq[Elem] =
+    xml.flatMap(_ \\ name).filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
+
+
   implicit class Ops(elem: Elem) {
 
     def elemsFilter(name: String): Seq[Elem] = elem.elems.filter(_.label == name)
@@ -36,9 +40,6 @@ object Ops {
       result.foreach(_.check(name))
       result
     }
-
-    def descendants(name: String): Seq[Elem] =
-      elem.flatMap(_ \\ name).filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
     def getAttribute(name: String): String =
       attributeOption(name).getOrElse(throw new NoSuchElementException(s"No requiredAttribute $name"))

@@ -19,7 +19,7 @@ jobs:
         with:
           java-version: 1.8
 
-      - name: "Build with Gradle and publish the packages"
+      - name: "Build with Gradle"
         run: ./gradlew build
 #        env:
 #          GITHUB_TOKEN: ${{github.token}}
