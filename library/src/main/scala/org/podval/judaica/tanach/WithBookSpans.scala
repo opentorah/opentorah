@@ -2,7 +2,7 @@ package org.podval.judaica.tanach
 
 import cats.implicits._
 import org.digitaljudaica.metadata.{LanguageSpec, LanguageString, WithNames}
-import org.digitaljudaica.xml.{Attribute, Parser}
+import org.digitaljudaica.xml.{Parser, Xml}
 
 trait WithBookSpans[Book <: Tanach.TanachBook] {
 
@@ -58,7 +58,7 @@ trait WithBookSpans[Book <: Tanach.TanachBook] {
   }
 
   val spanParser: Parser[BookSpanParsed] = for {
-    book <- Attribute.optional("book")
+    book <- Xml.attribute.optional("book")
     spanParsed <- SpanParsed.parser
   } yield new BookSpanParsed(book, spanParsed)
 

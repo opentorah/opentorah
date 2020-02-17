@@ -2,7 +2,7 @@ package org.podval.judaica.tanach
 
 import cats.implicits._
 import org.digitaljudaica.metadata.WithNumber
-import org.digitaljudaica.xml.{Attribute, Element, Parser}
+import org.digitaljudaica.xml.{Parser, Xml}
 
 final class Chapters(chapters: Seq[Int]) {
   def length(chapter: Int): Int = chapters(chapter-1)
@@ -62,7 +62,7 @@ final class Chapters(chapters: Seq[Int]) {
 object Chapters {
 
   val parser: Parser[Chapters] = for {
-    chapters <- Element.all("chapter", WithNumber.parse(Attribute.required.positiveInt("length")))
+    chapters <- Xml.element.elements.all("chapter", WithNumber.parse(Xml.attribute.required.positiveInt("length")))
   } yield {
     WithNumber.checkConsecutive(chapters, "chapter")
     new Chapters(WithNumber.dropNumbers(chapters))

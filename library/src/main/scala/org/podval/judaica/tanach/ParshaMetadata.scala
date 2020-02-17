@@ -3,7 +3,7 @@ package org.podval.judaica.tanach
 import cats.implicits._
 import org.digitaljudaica.metadata.{Metadata, Names, WithNumber}
 import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{Attribute, Element, Parser}
+import org.digitaljudaica.xml.{Parser, Xml}
 
 final class ParshaMetadata(
   val parsha: Parsha,
@@ -81,9 +81,9 @@ object ParshaMetadata {
   def parser(book: Tanach.ChumashBook): Parser[Parsed] = for {
     names <- Names.parser
     span <- semiResolvedParser
-    aliyot <- Element.empty.all("aliyah", numberedParser)
-    daysParsed <- Element.all("day", dayParser)
-    maftir <- Element.required("maftir", semiResolvedParser)
+    aliyot <- Xml.element.empty.all("aliyah", numberedParser)
+    daysParsed <- Xml.element.elements.all("day", dayParser)
+    maftir <- Xml.element.elements.required("maftir", semiResolvedParser)
     parsha = Metadata.find[Parsha, Names](book.parshiot, names)
   } yield {
     val (days: Seq[DayParsed], daysCombined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
@@ -103,8 +103,8 @@ object ParshaMetadata {
 
   private def dayParser: Parser[DayParsed] = for {
     span <- numberedParser
-    custom <- Attribute.optional("custom").map(_.fold[Set[Custom]](Set(Custom.Common))(Custom.parse))
-    isCombined <- Attribute.optional.boolean("combined").map(_.getOrElse(false))
+    custom <- Xml.attribute.optional("custom").map(_.fold[Set[Custom]](Set(Custom.Common))(Custom.parse))
+    isCombined <- Xml.attribute.optional.boolean("combined").map(_.getOrElse(false))
   } yield DayParsed(span, custom, isCombined)
 
   private def numberedParser: Parser[Torah.Numbered] = WithNumber.parse(semiResolvedParser)

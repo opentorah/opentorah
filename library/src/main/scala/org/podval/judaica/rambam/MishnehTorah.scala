@@ -2,7 +2,7 @@ package org.podval.judaica.rambam
 
 import cats.implicits._
 import org.digitaljudaica.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.digitaljudaica.xml.{Attribute, Element, From, Parser}
+import org.digitaljudaica.xml.{From, Parser, Xml}
 
 object MishnehTorah {
 
@@ -70,9 +70,9 @@ object MishnehTorah {
   }
 
   private def bookParser: Parser[Book] = for {
-    number <- Attribute.required.positiveInt("n")
+    number <- Xml.attribute.required.positiveInt("n")
     names <- Names.parser
-    parts <- Element.all("part", partParser)
+    parts <- Xml.element.elements.all("part", partParser)
     _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
       s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
   } yield {
@@ -82,10 +82,10 @@ object MishnehTorah {
   }
 
   private def partParser: Parser[Part] = for {
-    number <- Attribute.required.positiveInt("n")
-    numChapters <- Attribute.required.positiveInt("chapters")
+    number <- Xml.attribute.required.positiveInt("n")
+    numChapters <- Xml.attribute.required.positiveInt("chapters")
     names <- Names.parser
-    chapters <- Element.all[NamedChapter]("chapter", for {
+    chapters <- Xml.element.elements.all[NamedChapter]("chapter", for {
       names <- Names.parser
     } yield new NamedChapter(names))
   } yield {

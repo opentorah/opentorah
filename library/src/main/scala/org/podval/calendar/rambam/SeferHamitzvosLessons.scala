@@ -2,7 +2,7 @@ package org.podval.calendar.rambam
 
 import cats.implicits._
 import org.digitaljudaica.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.digitaljudaica.xml.{Attribute, Element, From, Parser}
+import org.digitaljudaica.xml.{From, Parser, Xml}
 
 object SeferHamitzvosLessons {
 
@@ -50,15 +50,15 @@ object SeferHamitzvosLessons {
   }
 
   private def lessonParser: Parser[Lesson] = for {
-    number <- Attribute.required.positiveInt("n")
-    parts <- Element.all[Part](partParser)
+    number <- Xml.attribute.required.positiveInt("n")
+    parts <- Xml.element.elements.all[Part](partParser)
   } yield new Lesson(number, parts)
 
   private def partParser: Parser[Part] = for {
-    name <- Element.name
+    name <- Xml.name
     result <- name match {
-      case "positive" => Attribute.required.positiveInt("n").map(new Positive(_))
-      case "negative" => Attribute.required.positiveInt("n").map(new Negative(_))
+      case "positive" => Xml.attribute.required.positiveInt("n").map(new Positive(_))
+      case "negative" => Xml.attribute.required.positiveInt("n").map(new Negative(_))
       case "named" => Names.parser.map(new NamedPart(_))
 // TODO pre-check? Can't do it in the match, since check(): Unit case name => Parse.check(false, s"Unexpected element '$name'")
     }
