@@ -1,18 +1,16 @@
 package org.digitaljudaica.archive.collector.reference
 
-import org.digitaljudaica.xml.Ops._
+import cats.implicits._
+import org.digitaljudaica.xml.{Parser, Xml}
 import scala.xml.Elem
 
-final class NamesList(
-  xml: Elem,
-  allNameds: Seq[Named]
+final class NamesList private(
+  val entity: Entity,
+  val id: String,
+  val role: Option[String],
+  val head: String,
+  val nameds: Seq[Named]
 ) {
-
-  val entity: Entity = Entity.forList(xml.label).get
-  val role: Option[String] = xml.attributeOption("role")
-  val id: String = xml.id
-  val head: String = xml.oneChild("head").text
-  val nameds: Seq[Named] = allNameds.filter(named => named.entity == entity && named.role == role)
 
   def isEmpty: Boolean = nameds.isEmpty
 
@@ -24,4 +22,35 @@ final class NamesList(
       {for (named <- nameds) yield named.toListXml}
     </list>
       .copy(label = entity.listElement)
+}
+
+object NamesList {
+
+  final case class Descriptor(
+    entity: Entity,
+    id: String,
+    role: Option[String],
+    head: String
+  ) {
+    def fillOut(allNameds: Seq[Named]): NamesList = new NamesList(
+      entity,
+      id,
+      role,
+      head,
+      nameds = allNameds.filter(named => named.entity == entity && named.role == role)
+    )
+  }
+
+  val parser: Parser[Descriptor] = for {
+    name <- Xml.name
+    entity: Entity = Entity.forList(name).get
+    id <- Xml.attribute.required.id
+    role <- Xml.attribute.optional("role")
+    head <- Xml.element.characters.required("head", Xml.characters.required)
+  } yield Descriptor(
+    entity,
+    id,
+    role,
+    head
+  )
 }

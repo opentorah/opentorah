@@ -1,39 +1,40 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-import org.digitaljudaica.xml.Ops._
-import org.digitaljudaica.util.{Files, Collections}
+import cats.implicits._
 import org.digitaljudaica.archive.collector.reference.Reference
+import org.digitaljudaica.util.{Collections, Files}
+import org.digitaljudaica.xml.{From, Ops, Parser, Xml}
 import Table.Column
 import scala.xml.{Elem, Node, Text}
 
-final class Collection(
+final class Collection private(
   layout: Layout,
   directory: File,
-  xml: Elem
+  isBook: Boolean,
+  val publish: Boolean,
+  val archive: Option[String],
+  val prefix: Option[String],
+  val number: Option[Int],
+  titleNodes: Option[Seq[Node]],
+  val caseAbstract: Seq[Node],
+  description: Seq[Node],
+  partDescriptors: Seq[Part.Descriptor]
 ) extends CollectionLike with Ordered[Collection] {
 
   def directoryName: String = directory.getName
 
   override def toString: String = directoryName
 
-  val isBook: Boolean = xml.attributeOption("isBook").contains("true")
-
-  val publish: Boolean = xml.attributeOption("publish").contains("true")
-
   val teiDirectory: File = layout.tei(directory)
 
-  def archive: Option[String] = xml.optionalChild("archive").map(_.text)
-
-  def prefix: Option[String] = xml.optionalChild("prefix").map(_.text)
-
-  def number: Option[Int] = xml.optionalChild("number").map(_.text.toInt)
+  private val parts: Seq[Part] = Part.Descriptor.splitParts(partDescriptors, getDocuments)
 
   def archiveCase: String = prefix.getOrElse("") + number.map(_.toString).getOrElse("")
 
   override def reference: String = archive.fold(archiveCase)(archive => archive + " " + archiveCase)
 
-  def caseAbstract: Elem = xml.oneChild("abstract")
+  def title: Node = titleNodes.fold[Node](Text(reference))(nodes => <title>{nodes}</title>)
 
   override def compare(that: Collection): Int = {
     val archiveComparison: Int = compare(archive, that.archive)
@@ -53,14 +54,7 @@ final class Collection(
     else a.get.compare(b.get)
   }
 
-  def title: Node = xml.optionalChild("title").getOrElse(Text(reference))
-
-  def description: Seq[Node] = xml.oneChild("abstract").child ++
-    xml.optionalChild("notes").map(notes => notes.child).getOrElse(Seq.empty)
-
   def pageType: Page.Type = if (isBook) Page.Book else Page.Manuscript
-
-  private val parts: Seq[Part] = Part.splitParts(xml.elemsFilter("part"), getDocuments)
 
   private val documents: Seq[Document] = parts.flatMap(_.documents)
 
@@ -155,9 +149,43 @@ final class Collection(
 
 object Collection {
 
+  def apply(
+    layout: Layout,
+    directory: File
+  ): Collection =
+    From.file(directory, layout.collectionFileName).elements.parseDo(parser(layout, directory))
+
+  private def parser(
+    layout: Layout,
+    directory: File
+  ): Parser[Collection] = for {
+    isBook <- Xml.attribute.optional.booleanOrFalse("isBook")
+    publish <- Xml.attribute.optional.booleanOrFalse("publish")
+    archive <- Xml.element.characters.optional("archive", Xml.characters.required) // TODO common combinator
+    prefix <- Xml.element.characters.optional("prefix", Xml.characters.required)
+    number <- Xml.element.characters.optional("number", Xml.characters.required.map(_.toInt)) // TODO characters.int
+    titleNodes <- Xml.element.mixed.optional("title", Xml.allNodes) // TODO common combinator
+    caseAbstract <- Xml.element.mixed.required("abstract", Xml.allNodes)
+    notes <- Xml.element.mixed.optional("notes", Xml.allNodes)
+    description = caseAbstract ++ notes.getOrElse(Seq.empty)
+    partDescriptors <- Xml.element.elements.all("part", Part.Descriptor.parser)
+  } yield new Collection(
+    layout,
+    directory,
+    isBook,
+    publish,
+    archive,
+    prefix,
+    number,
+    titleNodes,
+    caseAbstract,
+    description,
+    partDescriptors
+  )
+
   private def table(layout: Layout): Table[Document] = new Table[Document](
     Column("Описание", "description", { document: Document =>
-      document.description.fold[Seq[Node]](Text(""))(_.withoutNamespace.child)
+      document.description.fold[Seq[Node]](Text(""))(description => Ops.removeNamespace(description).child)
     }),
 
     Column("Дата", "date", { document: Document =>
@@ -165,7 +193,7 @@ object Collection {
     }),
 
     Column("Кто", "author", { document: Document =>
-      document.author.fold[Seq[Node]](Text(""))(author => multi(author.withoutNamespace.child))
+      document.author.fold[Seq[Node]](Text(""))(author => multi(Ops.removeNamespace(author).child))
     }),
 
     Column("Кому", "addressee",  _.addressee.fold[Seq[Node]](Text(""))(addressee =>
@@ -190,7 +218,8 @@ object Collection {
            rendition={if (page.isPresent) "page" else "missing-page"}>{page.displayName}</ref>
     }),
 
-    Column("Расшифровка", "transcriber", { document: Document => multi(document.transcribers.map(_.withoutNamespace))
+    Column("Расшифровка", "transcriber", { document: Document =>
+      multi(document.transcribers.map(transcriber => Ops.removeNamespace(transcriber)))
     })
   )
 

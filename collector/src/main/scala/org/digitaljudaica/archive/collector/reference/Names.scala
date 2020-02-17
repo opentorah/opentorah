@@ -1,23 +1,24 @@
 package org.digitaljudaica.archive.collector.reference
 
 import java.io.File
+import cats.implicits._
 import org.digitaljudaica.archive.collector.{CollectionLike, Errors, Layout, Util}
-import org.digitaljudaica.xml.Ops._
-import org.digitaljudaica.xml.From
+import org.digitaljudaica.xml.{From, Parser, Xml}
 import org.digitaljudaica.util.Files
+
 import scala.xml.{Elem, Text}
 
-final class Names(directory: File, layout: Layout) extends CollectionLike {
-  private val xml: Elem = From.file(layout.docs, layout.namesListsFileName).loadDo.check("names")
-  private val elements: Seq[Elem] = xml.elems
+final class Names private(
+  directory: File,
+  layout: Layout,
+  override val reference: String,
+  listDescriptors: Seq[NamesList.Descriptor]
+) extends CollectionLike {
 
-  private val head: String = elements.head.check("head").text
-  override def reference: String = head
-
-  private val errors: Errors = new Errors
-  private val nameds: Seq[Named] = {
-    for (fileName <- Files.filesWithExtensions(directory, extension = "xml").sorted) yield new Named(
-      rawXml = From.file(directory, fileName).loadDo,
+  val errors: Errors = new Errors
+  val nameds: Seq[Named] = {
+    for (fileName <- Files.filesWithExtensions(directory, extension = "xml").sorted) yield Named(
+      directory,
       fileName,
       container = this,
       layout,
@@ -26,14 +27,14 @@ final class Names(directory: File, layout: Layout) extends CollectionLike {
   }
   errors.check()
 
-  private val lists: Seq[NamesList] = elements.tail.map(element => new NamesList(element, nameds))
+  private val lists: Seq[NamesList] = listDescriptors.map(_.fillOut(nameds))
 
   private val references: Seq[Reference] = nameds.flatMap(_.references)
 
   def findByRef(ref: String): Option[Named] = nameds.find(_.id == ref)
 
   def processReferences(documentReferences: Seq[Reference]): Unit = {
-    val references: Seq[Reference] = (this.references ++ documentReferences).filterNot(_.name == "?")
+    val references: Seq[Reference] = (this.references ++ documentReferences).filterNot(_.name == Text("?"))
     for (reference <- references) reference.check(this, errors)
     errors.check()
 
@@ -56,9 +57,29 @@ final class Names(directory: File, layout: Layout) extends CollectionLike {
     Util.writeTei(
       directory = layout.namesFileDirectory,
       fileName = layout.namesFileName,
-      head = Some(Text(head)),
+      head = Some(Text(reference)),
       content,
       target = "namesViewer"
     )
   }
+}
+
+object Names {
+
+  private def parser(
+    directory: File,
+    layout: Layout,
+  ): Parser[Names] = for {
+    reference <- Xml.element.characters.required("head", Xml.characters.required)
+    listDescriptors <- Xml.element.elements.all(NamesList.parser)
+  } yield new Names(
+    directory,
+    layout,
+    reference,
+    listDescriptors
+  )
+
+  def apply(directory: File, layout: Layout): Names =
+    From.file(layout.docs, layout.namesListsFileName)
+      .elements.parseDo(Xml.withName("names", parser(directory, layout)))
 }

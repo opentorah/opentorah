@@ -1,7 +1,7 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-import org.digitaljudaica.xml.{From, Print}
+import org.digitaljudaica.xml.Print
 import org.digitaljudaica.archive.collector.reference.Names
 import scala.xml.{Elem, Text}
 
@@ -14,11 +14,7 @@ object Main {
 
     val collections: Seq[Collection] = for {
       directory <- layout.collections.listFiles.toSeq.filter(_.isDirectory)
-    } yield new Collection(
-      layout,
-      directory,
-      From.file(directory, layout.collectionFileName).loadDo
-    )
+    } yield Collection(layout, directory)
 
     println("Collections:")
     println(collections.map { collection =>
@@ -34,7 +30,7 @@ object Main {
     writeIndex(collectionsSorted, layout)
 
     println("Processing name references.")
-    val names: Names = new Names(layout.namesDirectory, layout)
+    val names: Names = Names(layout.namesDirectory, layout)
     names.processReferences(collections.flatMap(_.references))
   }
 
@@ -69,6 +65,6 @@ object Main {
       <ref target={layout.collectionUrl(collection.directoryName)}
            role="collectionViewer">{collection.reference + ": " + Print.spacedText(collection.title)}</ref>
       <lb/>
-      {collection.caseAbstract}
+      <abstract>{collection.caseAbstract}</abstract>
     </item>
 }

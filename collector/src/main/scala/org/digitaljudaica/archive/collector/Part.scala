@@ -1,17 +1,18 @@
 package org.digitaljudaica.archive.collector
 
-import org.digitaljudaica.xml.Ops._
-import scala.xml.{Elem, Node}
+import cats.implicits._
+import org.digitaljudaica.xml.{Parser, Xml}
+import scala.xml.Node
 
 final class Part(val title: Option[Seq[Node]], val documents: Seq[Document])
 
 object Part {
 
-  private sealed abstract class Descriptor(title: Seq[Node]) {
+  sealed abstract class Descriptor(title: Seq[Node]) {
     final def getTitle: Seq[Node] = title
   }
 
-  private object Descriptor {
+  object Descriptor {
 
     final case class Names(names: Seq[String], title: Seq[Node]) extends Descriptor(title)
 
@@ -19,16 +20,16 @@ object Part {
 
     final case class CatchAll(title: Seq[Node]) extends Descriptor(title)
 
-    def apply(xml: Elem): Descriptor = {
-      val nameElements: Seq[Elem] = xml.elemsFilter("document")
-      val from: Option[String] = xml.attributeOption("from")
-      val title: Seq[Node] = xml.oneChild("title").child
-
-      if (nameElements.isEmpty) {
+    val parser: Parser[Descriptor] = for {
+      from <- Xml.attribute.optional("from")
+      names <- Xml.element.elements.all("document", Xml.characters.required)
+      title <- Xml.element.mixed.required("title", Xml.allNodes)
+    } yield {
+      if (names.isEmpty) {
         if (from.isEmpty) CatchAll(title) else From(from.get, title)
       } else {
-        if (from.isDefined) throw new IllegalArgumentException("Both document names and fromDocument are specified")
-        Names(nameElements.map(_.text), title)
+        if (from.isDefined) throw new IllegalArgumentException("Both document names and from are specified")
+        Names(names, title)
       }
     }
 
@@ -83,10 +84,8 @@ object Part {
     private def checkFrom(documents: Seq[Document], from: String): Unit =
       if (documents.head.name != from) throw new IllegalArgumentException("Incorrect From document")
 
-    def splitParts(elements: Seq[Elem], documents: Seq[Document]): Seq[Part] =
-      if (elements.isEmpty) Seq(new Part(None, documents)) else {
-        val descriptors: Seq[Descriptor] = elements.map(apply)
-
+    def splitParts(descriptors: Seq[Descriptor], documents: Seq[Document]): Seq[Part] =
+      if (descriptors.isEmpty) Seq(new Part(None, documents)) else {
         val (names2documents: Map[Descriptor, Seq[Document]], afterNames: Seq[Document]) =
           forNames(descriptors, documents, Map.empty)
 
@@ -105,7 +104,4 @@ object Part {
         )}
       }
   }
-
-  def splitParts(elements: Seq[Elem], documents: Seq[Document]): Seq[Part] =
-    Descriptor.splitParts(elements, documents)
 }

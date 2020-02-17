@@ -1,19 +1,18 @@
 package org.digitaljudaica.archive.collector.reference
 
+import cats.implicits._
 import org.digitaljudaica.archive.collector.Errors
-import org.digitaljudaica.xml.Ops._
+import org.digitaljudaica.xml.{From, Parser, Xml}
+import scala.xml.{Elem, Node}
 
-import scala.xml.Elem
-
-final class Reference(
+final class Reference private(
   val source: ReferenceSource,
   val entity: Entity,
-  xml: Elem
+  val name: Seq[Node],
+  val id: Option[String],
+  val role: Option[String],
+  val ref: Option[String]
 ) {
-  val name: String = xml.text
-  val id: Option[String] = xml.attributeOption("xml:id")
-  val role: Option[String] = xml.attributeOption("role")
-  val ref: Option[String] = xml.attributeOption("ref")
 
   override def toString: String = source.toString
 
@@ -30,4 +29,31 @@ final class Reference(
   def toXml: Elem =
     <name ref={ref.orNull} xml:id={id.orNull} role={role.orNull}>{name}</name>
       .copy(label = entity.nameElement)
+}
+
+object Reference {
+
+  def apply(
+    source: ReferenceSource,
+    entity: Entity,
+    xml: Elem
+  ): Reference = From.xml(xml).mixed.parseDo(parser(source, entity))
+
+  private def parser(
+    source: ReferenceSource,
+    entity: Entity,
+  ): Parser[Reference] = for {
+    id <- Xml.attribute.optional.id
+    role <- Xml.attribute.optional("role")
+    ref <- Xml.attribute.optional("ref")
+    _ <- Xml.attribute.optional("type") // TODO we don't do anything with the type yet
+    name <- Xml.allNodes
+  } yield new Reference(
+    source,
+    entity,
+    name,
+    id,
+    role,
+    ref
+  )
 }

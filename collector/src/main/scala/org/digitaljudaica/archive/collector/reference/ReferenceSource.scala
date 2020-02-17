@@ -20,5 +20,5 @@ abstract class ReferenceSource(val collection: CollectionLike) {
     for {
       entity <- Entity.values
       elem <- xml.descendants(entity.nameElement)
-    } yield new Reference(this, entity, elem)
+    } yield Reference(this, entity, elem)
 }

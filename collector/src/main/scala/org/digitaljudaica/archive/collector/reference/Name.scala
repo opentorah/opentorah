@@ -1,20 +1,25 @@
 package org.digitaljudaica.archive.collector.reference
 
-import org.digitaljudaica.xml.Ops._
+import cats.implicits._
+import org.digitaljudaica.xml.{Parser, Xml}
+
 import scala.xml.Elem
 
-final class Name(
+final class Name private(
   entity: Entity,
-  xml: Elem
+  val id: Option[String],
+  val name: String
 ) {
-  xml.check(entity.nameElement)
-
-  val name: String = xml.text
-
-  val id: Option[String] = xml.attributeOption("xml:id")
-
   def toXml: Elem = {
     <name xml:id={id.orNull}>{name}</name>
       .copy(label = entity.nameElement)
   }
+}
+
+object Name {
+  def parser(entity: Entity): Parser[Name] = for {
+    _ <- Xml.checkName(entity.nameElement)
+    id <- Xml.attribute.optional.id
+    name <- Xml.characters.required
+  } yield new Name(entity, id, name)
 }
