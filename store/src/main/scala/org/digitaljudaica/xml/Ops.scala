@@ -50,10 +50,6 @@ object Ops {
     //      if (result.isEmpty) None else Some(result.text)
     //    }
 
-    def idOption: Option[String] = attributeOption("xml:id")
-
-    def id: String = getAttribute("xml:id")
-
     def oneChild(name: String): Elem = oneOptionalChild(name, required = true).get
     def optionalChild(name: String): Option[Elem] = oneOptionalChild(name, required = false)
 

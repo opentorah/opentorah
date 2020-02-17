@@ -32,7 +32,7 @@ private[xml] object Current {
       new Current(
         from,
         name = element.label,
-        attributes = element.attributes.map(metadata => metadata.key -> metadata.value.toString).toMap,
+        attributes = element.attributes.map(metadata => metadata.prefixedKey -> metadata.value.toString).toMap,
         content
       )
     }

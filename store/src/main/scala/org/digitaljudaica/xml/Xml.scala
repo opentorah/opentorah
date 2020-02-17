@@ -1,7 +1,6 @@
 package org.digitaljudaica.xml
 
 import cats.implicits._
-
 import scala.xml.{Elem, Node}
 
 object Xml {
@@ -90,9 +89,6 @@ object Xml {
 
     def elementNameIs(expected: String): Parser[Boolean] =
       elementName.map(_.contains(expected))
-
-    def elementNameIs(expected: Option[String]): Parser[Boolean] =
-      expected.fold(Parser.pure(true))(elementNameIs)
   }
 
   object element {
@@ -110,8 +106,14 @@ object Xml {
     def optional[A](name: String, parser: Parser[A]): Parser[Option[A]] =
       optional(Some(name), parser)
 
+    def optional[A](parser: Parser[A]): Parser[Option[A]] =
+      optional(None, parser)
+
     def required[A](name: String, parser: Parser[A]): Parser[A] =
       Parser.required(s"element '$name'", optional(name, parser))
+
+    def required[A](parser: Parser[A]): Parser[A] =
+      Parser.required(s"element", optional(parser))
 
     def all[A](name: String, parser: Parser[A]): Parser[Seq[A]] =
       all(Some(name), parser)
@@ -120,7 +122,8 @@ object Xml {
       all(None, parser)
 
     private def optional[A](name: Option[String], parser: Parser[A]): Parser[Option[A]] = for {
-      hasNext <- next.elementNameIs(name)
+      nextElementName <- next.elementName
+      hasNext = name.fold(nextElementName.isDefined)(nextElementName.contains)
       result <- if (!hasNext) Parser.pure(None) else for {
         next <- next.element
         result <- Context.nested(None, next, parser, contentType)
