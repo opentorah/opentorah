@@ -3,7 +3,7 @@ package org.digitaljudaica.store
 import cats.implicits._
 import java.io.File
 import org.digitaljudaica.metadata.Names
-import org.digitaljudaica.xml.{Attribute, Element, From, Parser}
+import org.digitaljudaica.xml.{From, Parser, Xml}
 import scala.xml.Elem
 
 sealed trait Store {
@@ -36,10 +36,12 @@ final class TextStore(
 
 object Store {
 
-  def parser(inheritedSelectors: Set[Selector]): Parser[Store] = Element.withName("store", for {
+  def parser(inheritedSelectors: Set[Selector]): Parser[Store] = Xml.withName("store", for {
     names <- Names.withDefaultNameParser
-    selectors <- Element.all("selector", Selector.parser)
-    by <- Element.required("by", byParser(inheritedSelectors ++ selectors.toSet))
+    selectors <- Xml.element.elements.all("selector", Selector.parser)
+    _ = println(names)
+    _ = println(selectors)
+    by <- Xml.element.elements.required("by", byParser(inheritedSelectors ++ selectors.toSet))
   } yield new BaseStore(
     names,
     selectors,
@@ -47,15 +49,15 @@ object Store {
   ))
 
   val textsParser: Parser[String] = for {
-    url <- Attribute.required("url")
+    url <- Xml.attribute.required("url")
   } yield url
 
   // TODO allow 'by' to be named in-line
   def byParser(selectors: Set[Selector]): Parser[By] = for {
-    n <- Attribute.required("n")
+    n <- Xml.attribute.required("n")
     selector = selectorByName(selectors, n)
-    texts <- Element.optional("texts", textsParser)
-    stores <- Element.all("store", parser(selectors))
+    texts <- Xml.element.elements.optional("texts", textsParser)
+    stores <- Xml.element.elements.all("store", parser(selectors))
     _ <- Parser.check(texts.nonEmpty || stores.nonEmpty, "Both 'stores' and 'texts' elements are absent.")
     _ <- Parser.check(texts.isEmpty || stores.isEmpty, "Both 'stores' and 'texts' elements are present.")
   } yield {

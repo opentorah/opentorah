@@ -1,62 +1,39 @@
 package org.digitaljudaica.xml
 
 import cats.implicits._
-import scala.xml.{Elem, Node}
+
+import scala.xml.Elem
 
 private[xml] final class Current private(
-  from: Option[From],
-  name: String,
+  val from: Option[From],
+  val name: String,
   attributes: Map[String, String],
-  elements: Seq[Elem],
-  nextElementNumber: Int,
-  characters: Option[String]
+  val content: Content
 ) {
   override def toString: String =
-    s"$name; nested element #$nextElementNumber; next: $getNextNestedElementName;" + from.fold("")(url => s"  $url")
+    s"in $name; $content;" + from.fold("")(url => s"  $url")
 
-  def getName: String = name
+  def takeAttribute(attribute: String): ErrorOr[(Current, Option[String])] =
+    Right((new Current(from, name, attributes - attribute, content), attributes.get(attribute)))
 
-  def getFrom: Option[From] = from
+  def replaceContent[A](f: Content => ErrorOr[(Content, A)]): ErrorOr[(Current, A)] =
+    f(content).map { _.leftMap(new Current(from, name, attributes, _)) }
 
-  def takeAttribute(attribute: String): (Current, Option[String]) =
-    (new Current(from, name, attributes - attribute, elements, nextElementNumber, characters), attributes.get(attribute))
-
-  def takeCharacters: (Current, Option[String]) =
-    (new Current(from, name, attributes, elements, nextElementNumber, characters = None), characters)
-
-  def getNextNestedElementName: Option[String] =
-    elements.headOption.map(_.label)
-
-  def takeNextNestedElement: (Current, Elem) =
-    (new Current(from, name, attributes, elements.tail, nextElementNumber + 1, characters), elements.head)
-
-  def checkContent(charactersAllowed: Boolean, elementsAllowed: Boolean): Parser[Unit] = for {
-    _ <- Parser.check(characters.isEmpty || charactersAllowed, s"Characters are not allowed: ${characters.get}")
-    _ <- Parser.check(elements.isEmpty || elementsAllowed, s"Nested elements are not allowed: $elements")
-    _ <- Parser.check(elements.isEmpty || characters.isEmpty, s"Mixed content: [${characters.get}] $elements")
-  } yield ()
-
-  def checkNoLeftovers: Parser[Unit] = for {
-    _ <- Parser.check(attributes.isEmpty, s"Unparsed attributes: $attributes")
-    _ <- Parser.check(characters.isEmpty, s"Unparsed characters: ${characters.get}")
-    _ <- Parser.check(elements.isEmpty, s"Unparsed elements: $elements")
+  def checkNoLeftovers: ErrorOr[Unit] = for {
+    _ <- if (attributes.isEmpty) Right(()) else Left(s"Unparsed attributes: $attributes")
+    _ <- Content.checkNoLeftovers(content)
   } yield ()
 }
 
 private[xml] object Current {
 
-  def apply(from: Option[From], element: Elem): Current = {
-    val (elements: Seq[Node], nonElements: Seq[Node]) = element.child.partition(_.isInstanceOf[Elem])
-    new Current(
-      from,
-      name = element.label,
-      attributes = element.attributes.map(metadata => metadata.key -> metadata.value.toString).toMap,
-      elements = elements.map(_.asInstanceOf[Elem]),
-      nextElementNumber = 0,
-      characters = if (nonElements.isEmpty) None else {
-        val result: String = nonElements.map(_.text).mkString.trim
-        if (result.isEmpty) None else Some(result)
-      }
-    )
-  }
+  def open(from: Option[From], element: Elem, contentType: Content.Type): ErrorOr[Current] =
+    Content.open(element.child, contentType).map { content =>
+      new Current(
+        from,
+        name = element.label,
+        attributes = element.attributes.map(metadata => metadata.key -> metadata.value.toString).toMap,
+        content
+      )
+    }
 }

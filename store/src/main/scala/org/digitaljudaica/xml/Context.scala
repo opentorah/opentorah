@@ -1,86 +1,89 @@
 package org.digitaljudaica.xml
 
 import java.net.URL
-
 import cats.implicits._
-
 import scala.xml.Elem
 
-final class Context private(stack: List[Current]) {
+final class Context private(private val stack: List[Current]) {
 
-  override def toString: String = stack.mkString("\n")
+  override def toString: String =
+    stack.mkString("\n")
 
-  private def current: Current = stack.head
+  private def current: Current =
+    stack.head
 
-  private def currentFrom: From = stack.find(_.getFrom.isDefined).get.getFrom.get
+  private def replaceCurrent[A](newCurrent: Current): Context =
+    new Context(stack = newCurrent :: stack.tail)
 
-  private def replaceCurrent[A](f: Current => (Current, A)): (Context, A) = f(stack.head)
-    .bimap(newCurrent => new Context(stack = newCurrent :: stack.tail), identity)
+  private def push(element: Current): Context =
+    new Context(element :: stack)
 
-  private def push(element: Current): Context = new Context(element :: stack)
-
-  private def pop: Context = new Context(stack.tail)
+  private def pop: Context =
+    new Context(stack.tail)
 
   private def checkIsEmpty(): Unit =
-    if (stack.nonEmpty) throw new IllegalStateException(s"Non-empty context $this")
+    if (stack.nonEmpty) throw new IllegalStateException(s"Non-empty context $this!")
+
+  private def currentFrom: From =
+    stack.flatMap(_.from).head
 }
 
-object Context {
+private[xml] object Context {
 
-  private[xml] def currentFrom: Parser[From] =
+  private val currentFrom: Parser[From] =
     Parser.inspect(_.currentFrom)
 
-  private[xml] def getName: Parser[String] =
-    Parser.inspect(_.current.getName)
+  def inspectCurrent[A](f: Current => A): Parser[A] =
+    Parser.inspect(context => f(context.current))
 
-  private[xml] def getNextNestedElementName: Parser[Option[String]] =
-    Parser.inspect(_.current.getNextNestedElementName)
+  def replaceCurrent[A](f: Current => ErrorOr[(Current, A)]): Parser[A] = for {
+    toRun <- Parser.inspect(context => f(context.current))
+    result <- Parser.lift(toRun)
+    _ <- Parser.modify(_.replaceCurrent(result._1))
+  } yield result._2
 
-  private[xml] def takeAttribute(name: String): Parser[Option[String]] =
-    take(_.takeAttribute(name))
-
-  private[xml] def takeCharacters: Parser[Option[String]] =
-    take(_.takeCharacters)
-
-  private[xml] def takeNextNestedElement: Parser[Elem] =
-    take(_.takeNextNestedElement)
-
-  private def take[A](f: Current => (Current, A)): Parser[A] =
-    Parser.inspectAndSet(_.replaceCurrent(f))
-
-  private[xml] def include[A](url: String, parser: Parser[A]): Parser[A] = for {
-    // TODO check that there is nothing left behind...
-    name <- Element.name
+  def include[A](url: String, parser: Parser[A]): Parser[A] = for {
+    _ <- checkNoLeftovers
+    name <- Xml.name
     currentFrom <- currentFrom
     from <- Parser.toParser(From.url(currentFrom.url.fold(new URL(url))(new URL(_, url))))
-    result <- nested(from, Element.withName(name, parser))
+    result <- nested(from, Content.Type.Elements, Xml.withName(name, parser)) // TODO make changeable?
   } yield result
 
-  private[xml] def nested[A](from: From, parser: Parser[A]): Parser[A] = from.load match {
-    case Right(elem) => nested(Some(from), elem, parser, charactersAllowed = false, elementsAllowed = true)
-    case Left(error) => Parser.error(error)
-  }
+  def nested[A](from: From, contentType: Content.Type, parser: Parser[A]): Parser[A] = from.load.fold(
+    error => Parser.error(error),
+    elem => nested(Some(from), elem, parser, contentType)
+  )
 
-  private[xml] def nested[A](
+  def nested[A](
     from: Option[From],
     elem: Elem,
     parser: Parser[A],
-    charactersAllowed: Boolean,
-    elementsAllowed: Boolean
+    contentType: Content.Type
   ): Parser[A] = for {
-    _ <- Parser.modify(_.push(Current(from, elem)))
-    _ <- Parser.eval(_.current.checkContent(charactersAllowed, elementsAllowed))
+    newCurrent <- Parser.lift(Current.open(from, elem, contentType))
+    _ <- Parser.modify(_.push(newCurrent))
     result <- parser
-    _ <- Parser.eval(_.current.checkNoLeftovers)
+    _ <- checkNoLeftovers
     _ <- Parser.modify(_.pop)
   } yield result
 
-  private[xml] def parse[A](parser: Parser[A]): ErrorOr[A] = {
-    val result = for {
+  private def checkNoLeftovers: Parser[Unit] = for {
+    checkNoLeftovers <- inspectCurrent(_.checkNoLeftovers)
+    _ <- Parser.lift(checkNoLeftovers)
+  } yield ()
+
+  // TODO capture Context in the error message!
+  def parse[A](parser: Parser[A]): ErrorOr[A] = {
+    val toRun = for {
       result <- parser
       _ <- Parser.inspect(_.checkIsEmpty())
     } yield result
 
-    result.runA(new Context(List.empty))
+    // TODO I need to obtain th final Context in case of error, and tack its toString() to the message...
+    // If there i sno way to run the parser and obtain the final state, I'll need to capture the Context
+    // at the time of raising the error, byy turning Parser.error() into a Parser - and use it in From.load(),
+    // convertions etc. ...
+    toRun.runA(new Context(List.empty))
   }
 }

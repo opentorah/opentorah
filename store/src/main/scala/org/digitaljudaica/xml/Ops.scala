@@ -70,7 +70,5 @@ object Ops {
       if (elem.label != name) throw new NoSuchElementException(s"Expected name $name but got $elem.label")
       elem
     }
-
-    def withoutNamespace: Elem = removeNamespace(elem)
   }
 }

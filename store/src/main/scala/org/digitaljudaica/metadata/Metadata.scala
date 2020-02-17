@@ -2,35 +2,37 @@ package org.digitaljudaica.metadata
 
 import cats.implicits._
 import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{Attribute, Element, From, Parser}
+import org.digitaljudaica.xml.{From, Parser, Xml}
 
 object Metadata {
 
   def load[M](
     from: From,
+    rootElementName: Option[String] = None,
     elementName: String,
     parser: Parser[M]
   ): Seq[M] = {
-    val wrappedParser = wrapped(
-      rootElementName = "metadata",
-      typeName = from.name,
-      elementName = elementName,
-      parser = parser)
+    val typeName = from.name
 
-    from.parseDo(wrappedParser)
+    val wrappedParser = for {
+      type_ <- Xml.attribute.required("type")
+      _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
+      result <- Xml.element.elements.all(elementName, parser)
+    } yield result
+
+    from.elements.parseDo(Xml.withName(rootElementName.getOrElse("metadata"), wrappedParser))
   }
 
   def loadNames[K <: WithName](
     keys: Seq[K],
     from: From
   ): Map[K, Names] = {
-    val wrappedParser: Parser[Seq[Names]] = wrapped(
-      rootElementName = "names",
-      typeName = from.name,
+    val metadatas: Seq[Names] = load(
+      from,
+      rootElementName = Some("names"),
       elementName = "names",
-      Names.parser)
-
-    val metadatas: Seq[Names] = from.parseDo(wrappedParser)
+      parser = Names.parser
+    )
 
     bind(
       keys,
@@ -38,13 +40,6 @@ object Metadata {
       (metadata: Names, name: String) => metadata.hasName(name)
     ).toMap
   }
-
-  private def wrapped[A](rootElementName: String, typeName: String, elementName: String, parser: Parser[A]): Parser[Seq[A]] =
-    Element.withName(rootElementName, for {
-      type_ <- Attribute.required("type")
-      _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
-      result <- Element.all(elementName, parser)
-    } yield result)
 
   def bind[K <: WithName, M](
     keys: Seq[K],
@@ -67,6 +62,7 @@ object Metadata {
     if (metadatas.isEmpty) require(keys.isEmpty, s"Unmatched keys: $keys")
     Collections.checkNoDuplicates(keys, s"keys")
 
+    // TODO rework to look for key and reuse find() below...
     if (keys.isEmpty) Nil else {
       val key: K = keys.head
       val (withName: Seq[M], withoutName: Seq[M]) = metadatas.partition(metadata => hasName(metadata, getName(key)))

@@ -6,7 +6,7 @@ import org.digitaljudaica.util.{Files, Util}
 import org.xml.sax.InputSource
 import scala.xml.{Elem, Utility, XML}
 
-sealed trait From {
+sealed abstract class From {
 
   def name: String
 
@@ -14,16 +14,31 @@ sealed trait From {
 
   def load: ErrorOr[Elem]
 
-  final def loadDo: Elem = Parser.runA(load)
+  final def loadDo: Elem = From.runA(load)
 
-  def parse[A](parser: Parser[A]): ErrorOr[A] = Context.parse(Context.nested(this, parser))
+  final class Parse(contentType: Content.Type) {
+    def parse[A](parser: Parser[A]): ErrorOr[A] = Context.parse(Context.nested(From.this, contentType, parser))
 
-  def parseDo[A](parser: Parser[A]): A = Parser.runA(parse(parser))
+    def parseDo[A](parser: Parser[A]): A = From.runA(parse(parser))
+  }
+
+  val empty = new Parse(Content.Type.Empty)
+  val characters = new Parse(Content.Type.Characters)
+  val elements = new Parse(Content.Type.Elements)
+  val mixed = new Parse(Content.Type.Mixed)
 }
 
 object From {
 
-  private final class FromXml(override val name: String, elem: Elem) extends From {
+  private def runA[A](result: ErrorOr[A]): A = result.fold(
+    error => throw new IllegalArgumentException(error),
+    result => result
+  )
+
+  private final class FromXml(
+    override val name: String,
+    elem: Elem
+  ) extends From {
     override def toString: String = s"From.xml($name)"
     override def url: Option[URL] = None
     override def load: ErrorOr[Elem] = Right(elem)
@@ -47,10 +62,10 @@ object From {
   def file(directory: File, fileName: String): From = file(new File(directory, fileName + ".xml"))
 
   private final class FromResource(clazz: Class[_], override val name: String) extends From {
-    override def toString: String = s"From.resource($clazz/$name)"
+    override def toString: String = s"From.resource($clazz:$name.xml)"
     override def url: Option[URL] = Option(clazz.getResource(name + ".xml"))
     override def load: ErrorOr[Elem] =
-      url.fold[ErrorOr[Elem]](Left("Resource not found"))(loadFromUrl)
+      url.fold[ErrorOr[Elem]](Left(s"Resource not found: $this"))(loadFromUrl)
   }
 
   def resource(obj: AnyRef, name: String): From = new FromResource(obj.getClass, name)

@@ -1,17 +1,18 @@
 package org.digitaljudaica.metadata
 
 import cats.implicits._
-import org.digitaljudaica.xml.{Attribute, Parser}
+import org.digitaljudaica.xml.{Parser, Xml}
 
 final class WithNumber[T](val n: Int, val what: T)
 
 object WithNumber {
 
   def parse[T](parser: Parser[T]): Parser[WithNumber[T]] = for {
-    n <- Attribute.required.positiveInt("n")
+    n <- Xml.attribute.required.positiveInt("n")
     what <- parser
   } yield new WithNumber[T](n, what)
 
+  // TODO switch to checkConsecutiveNg?
   def checkConsecutive[T](result: Seq[WithNumber[T]], what: String): Seq[WithNumber[T]] = {
     require(result.map(_.n) == (1 to result.length), s"Wrong $what numbers: $result")
     result
