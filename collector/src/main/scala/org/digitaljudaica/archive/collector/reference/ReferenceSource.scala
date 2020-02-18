@@ -16,6 +16,7 @@ abstract class ReferenceSource(val collection: CollectionLike) {
 
   def url: String
 
+  // TODO eliminate
   protected final def parseReferences(xml: Elem): Seq[Reference] =
     for {
       entity <- Entity.values

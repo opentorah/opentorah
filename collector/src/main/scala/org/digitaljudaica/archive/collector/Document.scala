@@ -2,9 +2,8 @@ package org.digitaljudaica.archive.collector
 
 import java.io.File
 import org.digitaljudaica.archive.collector.reference.{Entity, Reference, ReferenceSource}
+import org.digitaljudaica.archive.collector.tei.Tei
 import org.digitaljudaica.xml.Print
-import org.digitaljudaica.xml.Ops._
-
 import scala.xml.Elem
 
 final class Document(
@@ -19,7 +18,8 @@ final class Document(
 
   private val tei: Tei = Tei.load(collection.teiDirectory, name)
 
-  override val references: Seq[Reference] = parseReferences(tei.tei)
+  override val references: Seq[Reference] =
+    parseReferences(tei.teiHeader) ++ parseReferences(tei.body)
 
   override def isNames: Boolean = false
 
@@ -31,9 +31,7 @@ final class Document(
 
   def author: Option[Elem] = tei.author
 
-  def transcribers: Seq[Elem] = tei.editors
-    .filter(_.attributeOption("role").contains("transcriber"))
-    .flatMap(_.optionalChild("persName"))
+  def transcribers: Seq[Elem] = tei.editors.filter(_.role.contains("transcriber")).flatMap(_.persName)
 
   def date: Option[String] = tei.date
 
@@ -42,8 +40,8 @@ final class Document(
   def language: Option[String] = tei.languageIdents.headOption
 
   val pages: Seq[Page] = for (pb <- tei.pbs) yield collection.pageType(
-    n = pb.getAttribute("n"),
-    facs = pb.attributeOption("facs")
+    n = pb.n,
+    facs = pb.facs
   )
 
   def addressee: Option[Reference] =

@@ -1,11 +1,14 @@
 package org.digitaljudaica.archive.collector.reference
 
 import java.io.File
+
 import cats.implicits._
-import org.digitaljudaica.archive.collector.{Errors, Layout, Tei}
+import org.digitaljudaica.archive.collector.tei.Tei
+import org.digitaljudaica.archive.collector.{Errors, Layout}
 import org.digitaljudaica.util.Collections
 import org.digitaljudaica.xml.{From, Parser, Xml}
 import org.digitaljudaica.xml.Ops._
+
 import scala.xml.{Elem, Node, Text}
 
 // TODO structure the TEI file better: the names, information, list reference, mentions...
@@ -89,14 +92,7 @@ object Named {
 
   private def unwrapTei(parser: Parser[Named]): Parser[Named] = for {
     name <- Xml.name
-    result <- if (name != Tei.topElement) for {result <- parser} yield result else for {
-      _ <- Xml.element.elements.required("teiHeader", Xml.allElements)
-      result <- Xml.element.elements.required("text", for {
-        result <- Xml.element.elements.required("body", for {
-          result <- Xml.element.elements.required(parser)
-        } yield result)
-      } yield result)
-    } yield result
+    result <- if (name == Tei.topElement) Tei.bodyParser(Xml.element.elements.required(parser)) else parser
   } yield result
 
 
