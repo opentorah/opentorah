@@ -39,12 +39,32 @@ object Cutter {
     99 -> 60,
     100 -> 60,
     101 -> 80,
-    102 -> 80
+    102 -> 80,
+    107 -> 100,
+    240 -> 320,
+    241 -> 300,
+    253 -> 200,
+    307 -> 120,
+    310 -> 200,
+    316 -> 200,
+    320 -> 220,
+    367 -> 200
   )
 
   private val rightOverlaps: Map[Int, Int] = Map(
     6 -> 300,
-    30 -> 160
+    30 -> 160,
+    156 -> 300,
+    165 -> 400,
+    239 -> 600,
+    244 -> 200,
+    246 -> 320,
+    323 -> 200,
+    341 -> 400,
+    342 -> 200,
+    344 -> 240,
+    357 -> 120,
+    359 -> 300
   )
 
   def main(args: Array[String]): Unit = {
@@ -57,7 +77,9 @@ object Cutter {
 //    val missing = (1 to 367).toSet -- spreads.toSet
 //    println(missing)
 
-    spreads.filter(n => 1 <= n && n <= 100).foreach(cut)
+    //spreads.filter(n => 300 < n && n <= 400).foreach(cut)
+
+        cut(367)
   }
 
   private def inUncut(fileName: String): String =
