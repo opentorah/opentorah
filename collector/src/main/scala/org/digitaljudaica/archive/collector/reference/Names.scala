@@ -70,7 +70,7 @@ object Names {
     directory: File,
     layout: Layout,
   ): Parser[Names] = for {
-    reference <- Xml.element.characters.required("head", Xml.characters.required)
+    reference <- Xml.element.characters.required("head", Xml.text.required)
     listDescriptors <- Xml.element.elements.all(NamesList.parser)
   } yield new Names(
     directory,

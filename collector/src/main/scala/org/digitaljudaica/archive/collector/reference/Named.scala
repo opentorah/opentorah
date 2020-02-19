@@ -1,14 +1,12 @@
 package org.digitaljudaica.archive.collector.reference
 
 import java.io.File
-
 import cats.implicits._
-import org.digitaljudaica.archive.collector.tei.Tei
 import org.digitaljudaica.archive.collector.{Errors, Layout}
+import org.digitaljudaica.tei.{Entity, Name, Tei}
 import org.digitaljudaica.util.Collections
 import org.digitaljudaica.xml.{From, Parser, Xml}
 import org.digitaljudaica.xml.Ops._
-
 import scala.xml.{Elem, Node, Text}
 
 // TODO structure the TEI file better: the names, information, list reference, mentions...
@@ -27,7 +25,8 @@ final class Named private(
 
   if (names.isEmpty) errors.error(s"No names for $id")
 
-  override val references: Seq[Reference] = content.flatMap(element => parseReferences(element))
+  override val references: Seq[Reference] = bindReferences(content.flatMap(element =>
+    org.digitaljudaica.tei.Reference.all(element)))
 
   override def isNames: Boolean = true
 
@@ -92,7 +91,7 @@ object Named {
 
   private def unwrapTei(parser: Parser[Named]): Parser[Named] = for {
     name <- Xml.name
-    result <- if (name == Tei.topElement) Tei.bodyParser(Xml.element.elements.required(parser)) else parser
+    result <- if (name == Tei.elementName) Tei.bodyParser(Xml.element.elements.required(parser)) else parser
   } yield result
 
 

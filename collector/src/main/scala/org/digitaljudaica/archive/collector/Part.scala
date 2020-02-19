@@ -22,7 +22,7 @@ object Part {
 
     val parser: Parser[Descriptor] = for {
       from <- Xml.attribute.optional("from")
-      names <- Xml.element.elements.all("document", Xml.characters.required)
+      names <- Xml.element.elements.all("document", Xml.text.required)
       title <- Xml.element.mixed.required("title", Xml.allNodes)
     } yield {
       if (names.isEmpty) {
