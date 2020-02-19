@@ -1,11 +1,9 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-
-import org.digitaljudaica.archive.collector.tei.Tei
+import org.digitaljudaica.tei.Tei
 import org.digitaljudaica.xml.Print
 import org.digitaljudaica.util.Files
-
 import scala.xml.Node
 
 object Util {

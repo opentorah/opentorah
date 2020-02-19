@@ -161,9 +161,9 @@ object Collection {
   ): Parser[Collection] = for {
     isBook <- Xml.attribute.optional.booleanOrFalse("isBook")
     publish <- Xml.attribute.optional.booleanOrFalse("publish")
-    archive <- Xml.element.characters.optional("archive", Xml.characters.required) // TODO common combinator
-    prefix <- Xml.element.characters.optional("prefix", Xml.characters.required)
-    number <- Xml.element.characters.optional("number", Xml.characters.required.map(_.toInt)) // TODO characters.int
+    archive <- Xml.element.characters.optional("archive", Xml.text.required) // TODO common combinator
+    prefix <- Xml.element.characters.optional("prefix", Xml.text.required)
+    number <- Xml.element.characters.optional("number", Xml.text.required.map(_.toInt)) // TODO text.int
     titleNodes <- Xml.element.mixed.optional("title", Xml.allNodes) // TODO common combinator
     caseAbstract <- Xml.element.mixed.required("abstract", Xml.allNodes)
     notes <- Xml.element.mixed.optional("notes", Xml.allNodes)
