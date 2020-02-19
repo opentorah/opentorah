@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <editor role="transcriber"><persName ref="ALD">Арье-Лейб Дубинский</persName></editor>
+      </titleStmt>
+      <publicationStmt>
+        <publisher><ptr target="www.alter-rebbe.org"/></publisher>
+        <availability status="free">
+          <licence>
+            <ab>
+              <ref n="license" target="http://creativecommons.org/licenses/by/4.0/">
+                Creative Commons Attribution 4.0 International License
+              </ref>
+            </ab>
+          </licence>
+        </availability>
+      </publicationStmt>
+      <sourceDesc><p>Facsimile</p></sourceDesc>
+    </fileDesc>
+    <profileDesc>
+      <langUsage><language ident="ru"/></langUsage>
+      <calendarDesc><calendar xml:id="julian"><p>Julian calendar</p></calendar></calendarDesc>
+      <correspDesc>
+        <correspAction>
+          <persName ref="Булгаков" role="addressee">Булгакову</persName>
+        </correspAction>
+      </correspDesc>
+      <creation><date when="1798-08-16">августа 16 дня 1798 года</date></creation>
+      <abstract>Страница из описи дел</abstract>
+    </profileDesc>
+  </teiHeader>
+  <text xml:lang="ru">
+    <body>
+      <pb xml:id="p905-1" n="905-1" facs="http://facsimiles.alter-rebbe.org/facsimiles/rgada/905-1.jpg"/>
+      <p><l>3140 О <orgName ref="Хасиды">Еврейской сектѣ Каролиновъ</orgName> и</l>
+        <l>объ учителѣ ихъ <persName ref="alter-rebbe">Раввинѣ Зальманѣ<lb/>
+          Боруховичѣ</persName>, и о доносахъ <persName ref="Гирша_Давыдович">Еврея<lb/>
+          Гирша Давидовича</persName>. 1798 г.</l></p>
+      <fw type="note" place="left">376 л.</fw>
+    </body>
+  </text>
+</TEI>

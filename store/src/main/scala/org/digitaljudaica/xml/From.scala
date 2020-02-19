@@ -22,6 +22,7 @@ sealed abstract class From {
     def parseDo[A](parser: Parser[A]): A = From.runA(parse(parser))
   }
 
+  // TODO with Context scoped by From, maybe Xml's analogues of these can be used at top level and these removed?
   val empty = new Parse(Content.Type.Empty)
   val characters = new Parse(Content.Type.Characters)
   val elements = new Parse(Content.Type.Elements)

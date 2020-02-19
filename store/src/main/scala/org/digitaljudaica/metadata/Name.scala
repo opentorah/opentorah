@@ -15,7 +15,7 @@ object Name {
 
   val parser: Parser[Name] = for {
     n <- Xml.attribute.optional("n")
-    characters <- Xml.characters.optional
+    characters <- Xml.text.optional
     _ <- Parser.check(n.nonEmpty || characters.nonEmpty, "Both 'n' attribute and text are absent.")
     _ <- Parser.check(n.isEmpty || characters.isEmpty, "Both 'n' attribute and text are present.")
     name = n.orElse(characters)

@@ -11,11 +11,11 @@ final class XmlTest extends AnyFlatSpec with Matchers {
     Context.parse(for { _ <- Parser.error[Unit]("ErRoR") } yield ()).isLeft shouldBe true
   }
 
-  "characters parsing" should "work" in {
+  "text parsing" should "work" in {
     From.xml(<s><a>asdjkh</a></s>).elements
-      .parse(Xml.element.elements.required("a", Xml.characters.optional)).isLeft shouldBe true
+      .parse(Xml.element.elements.required("a", Xml.text.optional)).isLeft shouldBe true
     From.xml(<s><a>asdjkh</a></s>).elements
-      .parseDo(Xml.element.characters.required("a", Xml.characters.required)) shouldBe "asdjkh"
+      .parseDo(Xml.element.characters.required("a", Xml.text.required)) shouldBe "asdjkh"
   }
 
   "From.resource()" should "work" in {
@@ -23,7 +23,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
   }
 
   private val file2parser: Parser[String] =
-    Xml.withName("x", Xml.element.characters.required("name", Xml.characters.required))
+    Xml.withName("x", Xml.element.characters.required("name", Xml.text.required))
 
   "Include" should "work" in {
     From.resource(Parser, "2").elements.parseDo(file2parser) shouldBe "X"

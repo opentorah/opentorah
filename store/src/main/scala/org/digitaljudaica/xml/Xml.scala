@@ -73,6 +73,8 @@ object Xml {
     }
   }
 
+  // TODO val allAttributes: Parser[Map[String, String]]
+
   val allElements: Parser[Seq[Elem]] =
     Context.replaceCurrent(_.replaceContent(Content.takeAllElements))
 
@@ -81,28 +83,39 @@ object Xml {
 
   object next {
 
+    val name: Parser[Option[String]] =
+      Context.inspectCurrent(current => Content.getNextElementName(current.content))
+
+    def nameIs(expected: String): Parser[Boolean] =
+      name.map(_.contains(expected))
+
     val element: Parser[Elem] =
       Context.replaceCurrent(_.replaceContent(Content.takeNextElement))
 
-    val elementName: Parser[Option[String]] =
-      Context.inspectCurrent(current => Content.getNextElementName(current.content))
+    def element(expected: String): Parser[Elem] = for {
+      name <- name
+      _  <- Parser.check(name.contains(expected), s"Wrong element: '$name' instead of '$expected'")
+      result <- element
+    } yield result
 
-    def elementNameIs(expected: String): Parser[Boolean] =
-      elementName.map(_.contains(expected))
+    def optional[A](expected: String, parser: Parser[A]): Parser[Option[A]] = for {
+      has <- Xml.next.nameIs(expected)
+      result <- if (!has) Parser.pure(None) else parser.map(Some(_))
+    } yield result
   }
 
   object element {
 
-    val empty = new Element(Content.Type.Empty)
+    val empty = new Nested(Content.Type.Empty)
 
-    val characters = new Element(Content.Type.Characters)
+    val characters = new Nested(Content.Type.Characters)
 
-    val elements = new Element(Content.Type.Elements)
+    val elements = new Nested(Content.Type.Elements)
 
-    val mixed = new Element(Content.Type.Mixed)
+    val mixed = new Nested(Content.Type.Mixed)
   }
 
-  final class Element(contentType: Content.Type) {
+  final class Nested(contentType: Content.Type) {
     def optional[A](name: String, parser: Parser[A]): Parser[Option[A]] =
       optional(Some(name), parser)
 
@@ -122,7 +135,7 @@ object Xml {
       all(None, parser)
 
     private def optional[A](name: Option[String], parser: Parser[A]): Parser[Option[A]] = for {
-      nextElementName <- next.elementName
+      nextElementName <- next.name
       hasNext = name.fold(nextElementName.isDefined)(nextElementName.contains)
       result <- if (!hasNext) Parser.pure(None) else for {
         next <- next.element
@@ -137,11 +150,11 @@ object Xml {
     } yield result
   }
 
-  object characters {
+  object text {
     val optional: Parser[Option[String]] =
       Context.replaceCurrent(_.replaceContent(Content.takeCharacters))
 
     val required: Parser[String] =
-      Parser.required("characters", optional)
+      Parser.required("text", optional)
   }
 }
