@@ -3,7 +3,7 @@ package org.digitaljudaica.archive.collector.reference
 import java.io.File
 import cats.implicits._
 import org.digitaljudaica.archive.collector.{CollectionLike, Errors, Layout, Util}
-import org.digitaljudaica.xml.{From, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, From, Parser, Xml}
 import org.digitaljudaica.util.Files
 
 import scala.xml.{Elem, Text}
@@ -70,8 +70,8 @@ object Names {
     directory: File,
     layout: Layout,
   ): Parser[Names] = for {
-    reference <- Xml.element.characters.required("head", Xml.text.required)
-    listDescriptors <- Xml.element.elements.all(NamesList.parser)
+    reference <- Xml.element.required("head", ContentType.Text, Xml.text.required)
+    listDescriptors <- Xml.element.all(ContentType.Elements, NamesList.parser)
   } yield new Names(
     directory,
     layout,
@@ -81,5 +81,5 @@ object Names {
 
   def apply(directory: File, layout: Layout): Names =
     From.file(layout.docs, layout.namesListsFileName)
-      .elements.parseDo(Xml.withName("names", parser(directory, layout)))
+      .parseDo(ContentType.Elements, Xml.withName("names", parser(directory, layout)))
 }
