@@ -3,7 +3,7 @@ package org.podval.calendar.tanach
 import cats.implicits._
 import org.digitaljudaica.metadata.{LanguageSpec, Metadata, Names, WithNumber}
 import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{From, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, From, Parser, Xml}
 import org.podval.judaica.tanach.{Custom, Parsha, Tanach, WithBookSpans}
 
 final case class Haftarah private(override val spans: Seq[Haftarah.BookSpan])
@@ -44,10 +44,10 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
   // TODO rework to avoid peeking at the name of the next nested element
   def parser(full: Boolean): Parser[Customs] = for {
     span <- spanParser
-    hasParts <- Xml.next.elementNameIs("part")
+    hasParts <- Xml.nextNameIs("part")
     parts <- if (!hasParts) Parser.pure(None) else partsParser(span).map(Some(_))
-    hasCustom <- Xml.next.elementNameIs("custom")
-    customs <- Xml.element.elements.all("custom", customParser(span)).map(customs => Custom.Of(customs, full = false))
+    hasCustom <- Xml.nextNameIs("custom")
+    customs <- Xml.all("custom", ContentType.Elements, customParser(span)).map(customs => Custom.Of(customs, full = false))
   } yield {
     val common: Option[Haftarah] = if (!hasParts && !hasCustom) Some(oneSpan(span)) else parts
 
@@ -64,12 +64,12 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
   private def customParser(ancestorSpan: BookSpanParsed): Parser[(Set[Custom], Haftarah)] = for {
     n <- Xml.attribute.required("n")
     bookSpanParsed <- spanParser.map(_.inheritFrom(ancestorSpan))
-    hasParts <- Xml.next.elementNameIs("part")
+    hasParts <- Xml.nextNameIs("part")
     result <- if (!hasParts) Parser.pure[Haftarah](oneSpan(bookSpanParsed)) else partsParser(bookSpanParsed)
   } yield Custom.parse(n) -> result
 
   private def partsParser(ancestorSpan: BookSpanParsed): Parser[Haftarah] = for {
-    parts <- Xml.element.elements.all("part", WithNumber.parse(
+    parts <- Xml.all("part", ContentType.Elements, WithNumber.parse(
       spanParser.map(_.inheritFrom(ancestorSpan).resolve)))
     _ <- WithNumber.checkConsecutiveNg(parts, "part")
     _ <- Parser.check(parts.length > 1, "too short")

@@ -3,7 +3,7 @@ package org.podval.judaica.tanach
 import cats.implicits._
 import org.digitaljudaica.metadata.{Metadata, Names}
 import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, Parser, Xml}
 
 final class ChumashBookMetadata(
   book: Tanach.ChumashBook,
@@ -78,6 +78,6 @@ object ChumashBookMetadata {
   }
 
   def parser(book: Tanach.ChumashBook, names: Names, chapters: Chapters): Parser[Parsed] = for {
-    weeks <- Xml.element.elements.all("week", ParshaMetadata.parser(book))
+    weeks <- Xml.all("week", ContentType.Elements, ParshaMetadata.parser(book))
   } yield new Parsed(book, names, chapters, weeks)
 }
