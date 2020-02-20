@@ -38,10 +38,10 @@ object Store {
 
   def parser(inheritedSelectors: Set[Selector]): Parser[Store] = Xml.withName("store", for {
     names <- Names.withDefaultNameParser
-    selectors <- Xml.element.all("selector",ContentType.Elements,  Selector.parser)
+    selectors <- Xml.all("selector",  Selector.parser)
     _ = println(names)
     _ = println(selectors)
-    by <- Xml.element.required("by", ContentType.Elements, byParser(inheritedSelectors ++ selectors.toSet))
+    by <- Xml.required("by", byParser(inheritedSelectors ++ selectors.toSet))
   } yield new BaseStore(
     names,
     selectors,
@@ -56,8 +56,8 @@ object Store {
   def byParser(selectors: Set[Selector]): Parser[By] = for {
     n <- Xml.attribute.required("n")
     selector = selectorByName(selectors, n)
-    texts <- Xml.element.optional("texts", ContentType.Elements, textsParser)
-    stores <- Xml.element.all("store", ContentType.Elements, parser(selectors))
+    texts <- Xml.optional("texts", textsParser)
+    stores <- Xml.all("store", parser(selectors))
     _ <- Parser.check(texts.nonEmpty || stores.nonEmpty, "Both 'stores' and 'texts' elements are absent.")
     _ <- Parser.check(texts.isEmpty || stores.isEmpty, "Both 'stores' and 'texts' elements are present.")
   } yield {

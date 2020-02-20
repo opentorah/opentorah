@@ -1,19 +1,23 @@
 package org.digitaljudaica.tei
 
 import cats.implicits._
-import org.digitaljudaica.xml.{Parser, Xml}
-import scala.xml.Elem
+import org.digitaljudaica.xml.Descriptor
 
-// final case class FileDesc(publicationStmt: PublicationStmt, titleStmt: Option[TitleStmt])
+final case class FileDesc(
+  titleStmt: Option[TitleStmt],
+  publicationStmt: PublicationStmt,
+  sourceDesc: SourceDesc
+)
 
-final case class FileDesc(xml: Elem)
-
-object FileDesc {
-  val elementName: String = "fileDesc"
-
-  val parser: Parser[FileDesc] = for {
-    result <- Xml.next.element(elementName)
-  } yield FileDesc(
-    result
+object FileDesc extends Descriptor[FileDesc](
+  elementName = "fileDesc",
+  contentParser = for {
+    titleStmt <- TitleStmt.optional
+    publicationStmt <- PublicationStmt.required
+    sourceDesc <- SourceDesc.required
+  } yield new FileDesc(
+    titleStmt,
+    publicationStmt,
+    sourceDesc
   )
-}
+)

@@ -67,7 +67,7 @@ object Names {
   } yield result
 
   def parserWithDefaultName(defaultName: Option[Name]): Parser[Names] = for {
-    nonDefaultNames <- Xml.element.all("name", ContentType.Text, Name.parser)
+    nonDefaultNames <- Xml.all("name", ContentType.Text, Name.parser)
     _ <- Parser.check(nonDefaultNames.nonEmpty || defaultName.isDefined, s"No names and no default name")
   } yield {
     val names = if (nonDefaultNames.isEmpty) Seq(defaultName.get) else

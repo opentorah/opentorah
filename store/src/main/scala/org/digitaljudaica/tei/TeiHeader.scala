@@ -1,19 +1,17 @@
 package org.digitaljudaica.tei
 
 import cats.implicits._
-import org.digitaljudaica.xml.{Parser, Xml}
+import org.digitaljudaica.xml.Descriptor
 
 final case class TeiHeader(fileDesc: FileDesc, profileDesc: Option[ProfileDesc])
 
-object TeiHeader {
-  val elementName: String = "teiHeader"
-
-  val parser: Parser[TeiHeader] = for {
-    _ <- Xml.checkName(elementName)
-    fileDesc <- FileDesc.parser
-    profileDesc <- ProfileDesc.optionalParser
-  } yield TeiHeader(
+object TeiHeader extends Descriptor[TeiHeader](
+  elementName = "teiHeader",
+  contentParser = for {
+    fileDesc <- FileDesc.required
+    profileDesc <- ProfileDesc.optional
+  } yield new TeiHeader(
     fileDesc,
     profileDesc
   )
-}
+)

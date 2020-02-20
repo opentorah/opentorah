@@ -19,8 +19,14 @@ sealed abstract class From {
   def parse[A](contentType: ContentType, parser: Parser[A]): ErrorOr[A] =
     Context.parse(Context.nested(From.this, contentType, parser))
 
+  def parse[A](parser: Parser[A]): ErrorOr[A] =
+    parse(ContentType.Elements, parser)
+
   def parseDo[A](contentType: ContentType, parser: Parser[A]): A =
     From.runA(parse(contentType, parser))
+
+  def parseDo[A](parser: Parser[A]): A =
+    parseDo(ContentType.Elements, parser)
 }
 
 object From {

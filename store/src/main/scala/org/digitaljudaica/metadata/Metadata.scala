@@ -2,7 +2,7 @@ package org.digitaljudaica.metadata
 
 import cats.implicits._
 import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{ContentType, From, Parser, Xml}
+import org.digitaljudaica.xml.{From, Parser, Xml}
 
 object Metadata {
 
@@ -17,10 +17,10 @@ object Metadata {
     val wrappedParser = for {
       type_ <- Xml.attribute.required("type")
       _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
-      result <- Xml.element.all(elementName, ContentType.Elements, parser)
+      result <- Xml.all(elementName, parser)
     } yield result
 
-    from.parseDo(ContentType.Elements, Xml.withName(rootElementName.getOrElse("metadata"), wrappedParser))
+    from.parseDo(Xml.withName(rootElementName.getOrElse("metadata"), wrappedParser))
   }
 
   def loadNames[K <: WithName](

@@ -1,11 +1,15 @@
 package org.digitaljudaica.xml
 
+import cats.data.State
 import cats.implicits._
 import scala.xml.{Elem, Node}
 
 private[xml] sealed trait Content
 
 private[xml] object Content {
+
+  // TODO monadize :) (State[Content, A])
+  type Modifier[A] = Content => ErrorOr[(Content, A)]
 
   private final case object Empty extends Content
 
@@ -38,7 +42,7 @@ private[xml] object Content {
     }
   }
 
-  def takeCharacters(content: Content): ErrorOr[(Content, Option[String])] = content match {
+  val takeCharacters: Modifier[Option[String]] = {
     case Characters(characters) =>
       Right((Characters(None), characters))
 
@@ -47,31 +51,15 @@ private[xml] object Content {
       if (elements.nonEmpty) Left(s"Elements in $this")
       else Right((Mixed(nextElementNumber, Seq.empty), toCharacters(nonElements)))
 
-    case _ => Left(s"No characters in $content")
+    case content => Left(s"No characters in $content")
   }
 
-  def takeNextElement(content: Content): ErrorOr[(Content, Elem)] = content match {
-    case Elements(nextElementNumber, elements) =>
-      elements.headOption.fold[ErrorOr[(Content, Elem)]](Left(s"No element in $content")) { result =>
-        Right((Elements(nextElementNumber+1, elements.tail), result))
-      }
-
-    case Mixed(nextElementNumber, nodes) =>
-      val noLeadingWhitespace = dropWhitespace(nodes)
-      noLeadingWhitespace.headOption.fold[ErrorOr[(Content, Elem)]](Left(s"No element in $content")) {
-        case result: Elem => Right(Mixed(nextElementNumber + 1, noLeadingWhitespace.tail), result)
-        case _ => Left(s"No element in $content")
-      }
-
-    case _ => Left(s"No element in $content")
-  }
-
-  def getNextElementName(content: Content): Option[String] = content match {
+  val getNextElementName: Content => Option[String] = {
     case Elements(_, elements) =>
-      elements.headOption.fold[Option[String]](None) { result => Some(result.label) }
+      elements.headOption.map(_.label)
 
     case Mixed(_, nodes) =>
-      dropWhitespace(nodes).headOption.fold[Option[String]](None) {
+      dropWhitespace(nodes).headOption.flatMap {
         case result: Elem => Some(result.label)
         case _ => None
       }
@@ -79,40 +67,60 @@ private[xml] object Content {
     case _ => None
   }
 
-  def takeAllNodes(content: Content): ErrorOr[(Content, Seq[Node])] = content match {
+  val takeNextElement: Modifier[Option[Elem]] = {
+    case content@Elements(nextElementNumber, elements) => Right {
+      elements.headOption.fold[(Content, Option[Elem])]((content, None)) { result =>
+        (Elements(nextElementNumber + 1, elements.tail), Some(result))
+      }
+    }
+
+    case content@Mixed(nextElementNumber, nodes) => Right {
+      val noLeadingWhitespace = dropWhitespace(nodes)
+      noLeadingWhitespace.headOption.fold[(Content, Option[Elem])]((content, None)) {
+        case result: Elem => (Mixed(nextElementNumber + 1, noLeadingWhitespace.tail), Some(result))
+        case _ => (content, None)
+      }
+    }
+
+    case content => Left(s"No element in $content")
+  }
+
+  val takeAllNodes: Modifier[Seq[Node]] = {
     case Elements(nextElementNumber: Int, elements: Seq[Elem]) =>
       Right(Elements(nextElementNumber, Seq.empty), elements)
 
     case Mixed(nextElementNumber: Int, nodes: Seq[Node]) =>
       Right(Mixed(nextElementNumber, Seq.empty), nodes)
 
-    case _ => Left(s"No nodes in $content")
+    case content => Left(s"No nodes in $content")
   }
 
-  def takeAllElements(content: Content): ErrorOr[(Content, Seq[Elem])] = content match {
+  val takeAllElements: Modifier[Seq[Elem]] = {
     case Elements(nextElementNumber: Int, elements: Seq[Elem]) =>
       Right(Elements(nextElementNumber, Seq.empty), elements)
 
-    case Mixed(nextElementNumber: Int, nodes: Seq[Node]) =>
+    case content@Mixed(nextElementNumber: Int, nodes: Seq[Node]) =>
       val (elements: Seq[Elem], nonElements: Seq[Node]) = partition(nodes)
       val hasNonWhitespace: Boolean = nonElements.exists(node => !isWhitespace(node))
       if (hasNonWhitespace) Left(s"Non white-space nodes in $content")
       else Right((Mixed(nextElementNumber, Seq.empty), elements))
 
-    case _ => Left(s"No elements in $content")
+    case content => Left(s"No elements in $content")
   }
 
-  def checkNoLeftovers(content: Content): ErrorOr[Unit] = content match {
-    case Empty => Right(())
+  private val ok: ErrorOr[Unit] = Right(())
+
+  val checkNoLeftovers: Content => ErrorOr[Unit] = {
+    case Empty => ok
 
     case Characters(characters) =>
-      characters.fold[ErrorOr[Unit]](Right(()))(characters => Left(s"Unparsed characters: $characters"))
+      characters.fold[ErrorOr[Unit]](ok)(characters => Left(s"Unparsed characters: $characters"))
 
     case Elements(_, elements) =>
-      if (elements.isEmpty) Right(()) else Left(s"Unparsed elements: $elements")
+      if (elements.isEmpty) ok else Left(s"Unparsed elements: $elements")
 
     case Mixed(_, nodes) =>
-      if (nodes.isEmpty) Right(()) else Left(s"Unparsed nodes: $nodes")
+      if (nodes.isEmpty) ok else Left(s"Unparsed nodes: $nodes")
   }
 
   private def partition(nodes: Seq[Node]): (Seq[Elem], Seq[Node]) =

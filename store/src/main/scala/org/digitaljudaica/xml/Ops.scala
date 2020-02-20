@@ -33,7 +33,7 @@ object Ops {
     def elemsFilter(name: String): Seq[Elem] = elem.elems.filter(_.label == name)
 
     // TODO dup!
-    def elems: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
+    private def elems: Seq[Elem] = elem.child.filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
     def elems(name: String): Seq[Elem] = {
       val result = elem.elems

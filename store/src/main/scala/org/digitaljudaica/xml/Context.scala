@@ -4,7 +4,7 @@ import java.net.URL
 import cats.implicits._
 import scala.xml.Elem
 
-final class Context private(private val stack: List[Current]) {
+final private[xml] case class Context private(private val stack: List[Current]) {
 
   override def toString: String =
     stack.mkString("\n")
@@ -36,7 +36,7 @@ private[xml] object Context {
   def inspectCurrent[A](f: Current => A): Parser[A] =
     Parser.inspect(context => f(context.current))
 
-  def replaceCurrent[A](f: Current => ErrorOr[(Current, A)]): Parser[A] = for {
+  def lift[A]: Current.Modifier[A] => Parser[A] = (f: Current.Modifier[A]) => for {
     toRun <- Parser.inspect(context => f(context.current))
     result <- Parser.lift(toRun)
     _ <- Parser.modify(_.replaceCurrent(result._1))
@@ -47,7 +47,7 @@ private[xml] object Context {
     name <- Xml.name
     currentFrom <- currentFrom
     from <- Parser.toParser(From.url(currentFrom.url.fold(new URL(url))(new URL(_, url))))
-    result <- nested(from, ContentType.Elements, Xml.withName(name, parser)) // TODO make changeable?
+    result <- nested(from, ContentType.Elements, Xml.withName(name, parser)) // TODO make ContentType changeable?
   } yield result
 
   def nested[A](from: From, contentType: ContentType, parser: Parser[A]): Parser[A] = from.load.fold(
@@ -69,7 +69,7 @@ private[xml] object Context {
   } yield result
 
   private def checkNoLeftovers: Parser[Unit] = for {
-    checkNoLeftovers <- inspectCurrent(_.checkNoLeftovers)
+    checkNoLeftovers <- inspectCurrent(Current.checkNoLeftovers)
     _ <- Parser.lift(checkNoLeftovers)
   } yield ()
 

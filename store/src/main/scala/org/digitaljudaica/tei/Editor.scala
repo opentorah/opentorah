@@ -1,7 +1,6 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.xml.Ops._
-
 import scala.xml.Elem
 
 final case class Editor(

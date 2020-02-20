@@ -3,7 +3,7 @@ package org.digitaljudaica.tei
 import java.io.File
 import cats.implicits._
 import org.digitaljudaica.xml.Ops._
-import org.digitaljudaica.xml.{ContentType, From, Parser, Xml}
+import org.digitaljudaica.xml.{From, Parser, Xml}
 import scala.xml.{Elem, Node}
 
 // TODO rework by introducing various TEI-related classes (TitleStmt etc.)
@@ -11,13 +11,12 @@ final case class Tei(
   teiHeader: TeiHeader,
   body: Elem
 ) {
-  private val publicationStmt: Elem = teiHeader.fileDesc.xml.oneChild("publicationStmt")
-  private val titleStmt: Option[Elem] = teiHeader.fileDesc.xml.optionalChild("titleStmt")
+  private val titleStmt = teiHeader.fileDesc.titleStmt
 
-  private val titles: Seq[Elem] = titleStmt.fold[Seq[Elem]](Seq.empty)(titleStmt => titleStmt.elemsFilter("title"))
+  private val titles: Seq[Elem] = titleStmt.fold[Seq[Elem]](Seq.empty)(titleStmt => titleStmt.xml.elemsFilter("title"))
   def getTitle(name: String): Option[Elem] = titles.find(_.getAttribute("type") == name)
-  val author: Option[Elem] = titleStmt.flatMap(_.optionalChild("author"))
-  val editors: Seq[Editor] = titleStmt.fold[Seq[Elem]](Seq.empty)(_.elemsFilter("editor")).map(Editor.apply)
+  val author: Option[Elem] = titleStmt.flatMap(_.xml.optionalChild("author"))
+  val editors: Seq[Editor] = titleStmt.fold[Seq[Elem]](Seq.empty)(_.xml.elemsFilter("editor")).map(Editor.apply)
   val getAbstract: Option[Elem] = teiHeader.profileDesc.flatMap(_.documentAbstract.map(_.xml))
 
   private val creation: Option[Elem] = teiHeader.profileDesc.flatMap(_.creation.map(_.xml))
@@ -27,10 +26,10 @@ final case class Tei(
   private val languages: Seq[Elem] = langUsage.fold[Seq[Elem]](Seq.empty)(_.elems("language"))
   val languageIdents: Seq[String] = languages.map(_.getAttribute("ident"))
 
-  val pbs: Seq[Pb] = org.digitaljudaica.xml.Ops.descendants(body, "pb").map(Pb.apply)
+  val pbs: Seq[Pb] = Pb.descendants(body)
 
   def references: Seq[Reference] = (
-    titleStmt.toSeq ++ getAbstract.toSeq ++
+    titleStmt.toSeq.map(_.xml) ++ getAbstract.toSeq ++
     teiHeader.profileDesc.toSeq.flatMap(_.correspDesc.toSeq).map(_.xml) ++
     Seq(body)
   ).flatMap(Reference.all)
@@ -44,10 +43,10 @@ object Tei {
 
   val parser: Parser[Tei] = for {
     _ <- Xml.checkName(elementName)
-    teiHeader <- Xml.element.required(ContentType.Elements, TeiHeader.parser)
-    body <- Xml.element.required("text", ContentType.Elements, for {
+    teiHeader <- TeiHeader.required
+    body <- Xml.required("text", for {
       lang <- Xml.attribute.optional("xml:lang")
-      result <- Xml.next.element("body")
+      result <- Xml.required("body")
     } yield result) // TODO unfold Xml.element!
   } yield new Tei(
     teiHeader,
@@ -55,12 +54,12 @@ object Tei {
   )
 
   def load(directory: File, fileName: String): Tei =
-    From.file(directory, fileName).parseDo(ContentType.Elements, parser)
+    From.file(directory, fileName).parseDo(parser)
 
   def bodyParser[A](parser: Parser[A]): Parser[A] = for {
     _ <- Xml.checkName(elementName)
-    _ <- Xml.element.required("teiHeader", ContentType.Elements, Xml.allElements)
-    result <- Xml.element.required("text", ContentType.Elements, Xml.element.required("body", ContentType.Elements,parser))
+    _ <- Xml.required("teiHeader", Xml.all)
+    result <- Xml.required("text", Xml.required("body", parser))
   } yield result
 
   def tei(head: Option[Node], content: Seq[Node]): Elem =

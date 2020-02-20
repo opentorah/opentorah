@@ -11,6 +11,7 @@ final case class Name(name: String, languageSpec: LanguageSpec) {
   }
 }
 
+// TODO add Descriptor
 object Name {
 
   val parser: Parser[Name] = for {

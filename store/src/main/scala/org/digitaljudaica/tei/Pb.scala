@@ -1,19 +1,24 @@
 package org.digitaljudaica.tei
 
-import org.digitaljudaica.xml.Ops._
-
-import scala.xml.Elem
+import cats.implicits._
+import org.digitaljudaica.xml.{ContentType, Descriptor, Xml}
 
 final case class Pb(
   n: String,
+  id: Option[String],
   facs: Option[String]
 )
 
-object Pb {
-
-  // TODO rework with From/Parser
-  def apply(xml: Elem): Pb = new Pb(
-    n = xml.getAttribute("n"),
-    facs = xml.attributeOption("facs")
+object Pb extends Descriptor[Pb](
+  elementName = "pb",
+  contentType = ContentType.Empty,
+  contentParser = for {
+    n <- Xml.attribute.required("n")
+    id <- Xml.attribute.optional.id
+    facs <- Xml.attribute.optional("facs")
+  } yield new Pb(
+    n,
+    id,
+    facs
   )
-}
+)
