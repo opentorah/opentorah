@@ -82,8 +82,8 @@ object ParshaMetadata {
     names <- Names.parser
     span <- semiResolvedParser
     aliyot <- Xml.all("aliyah", ContentType.Empty, numberedParser)
-    daysParsed <- Xml.all("day", ContentType.Elements, dayParser)
-    maftir <- Xml.required("maftir", ContentType.Elements, semiResolvedParser)
+    daysParsed <- Xml.all("day", dayParser)
+    maftir <- Xml.required("maftir", semiResolvedParser)
     parsha = Metadata.find[Parsha, Names](book.parshiot, names)
   } yield {
     val (days: Seq[DayParsed], daysCombined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
