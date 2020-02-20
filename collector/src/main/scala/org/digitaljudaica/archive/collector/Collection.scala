@@ -153,7 +153,7 @@ object Collection {
     layout: Layout,
     directory: File
   ): Collection =
-    From.file(directory, layout.collectionFileName).parseDo(ContentType.Elements, parser(layout, directory))
+    From.file(directory, layout.collectionFileName).parseDo(parser(layout, directory))
 
   private def parser(
     layout: Layout,
@@ -161,14 +161,14 @@ object Collection {
   ): Parser[Collection] = for {
     isBook <- Xml.attribute.optional.booleanOrFalse("isBook")
     publish <- Xml.attribute.optional.booleanOrFalse("publish")
-    archive <- Xml.element.optional("archive", ContentType.Text, Xml.text.required) // TODO common combinator
-    prefix <- Xml.element.optional("prefix", ContentType.Text, Xml.text.required)
-    number <- Xml.element.optional("number", ContentType.Text, Xml.text.required.map(_.toInt)) // TODO text.int
-    titleNodes <- Xml.element.optional("title", ContentType.Mixed, Xml.allNodes) // TODO common combinator
-    caseAbstract <- Xml.element.required("abstract", ContentType.Mixed, Xml.allNodes)
-    notes <- Xml.element.optional("notes", ContentType.Mixed, Xml.allNodes)
+    archive <- Xml.optional("archive", ContentType.Text, Xml.text.required) // TODO common combinator
+    prefix <- Xml.optional("prefix", ContentType.Text, Xml.text.required)
+    number <- Xml.optional("number", ContentType.Text, Xml.text.required.map(_.toInt)) // TODO text.int
+    titleNodes <- Xml.optional("title", ContentType.Mixed, Xml.allNodes) // TODO common combinator
+    caseAbstract <- Xml.required("abstract", ContentType.Mixed, Xml.allNodes)
+    notes <- Xml.optional("notes", ContentType.Mixed, Xml.allNodes)
     description = caseAbstract ++ notes.getOrElse(Seq.empty)
-    partDescriptors <- Xml.element.all("part", ContentType.Elements, Part.Descriptor.parser)
+    partDescriptors <- Xml.all("part", ContentType.Elements, Part.Descriptor.parser)
   } yield new Collection(
     layout,
     directory,

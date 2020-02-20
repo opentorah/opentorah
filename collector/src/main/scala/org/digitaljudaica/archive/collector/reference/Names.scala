@@ -70,8 +70,8 @@ object Names {
     directory: File,
     layout: Layout,
   ): Parser[Names] = for {
-    reference <- Xml.element.required("head", ContentType.Text, Xml.text.required)
-    listDescriptors <- Xml.element.all(ContentType.Elements, NamesList.parser)
+    reference <- Xml.required("head", ContentType.Text, Xml.text.required)
+    listDescriptors <- Xml.all(NamesList.parser)
   } yield new Names(
     directory,
     layout,
@@ -81,5 +81,5 @@ object Names {
 
   def apply(directory: File, layout: Layout): Names =
     From.file(layout.docs, layout.namesListsFileName)
-      .parseDo(ContentType.Elements, Xml.withName("names", parser(directory, layout)))
+      .parseDo(Xml.withName("names", parser(directory, layout)))
 }

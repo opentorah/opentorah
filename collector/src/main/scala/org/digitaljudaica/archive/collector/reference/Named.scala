@@ -58,7 +58,7 @@ object Named {
     container: Names,
     layout: Layout,
     errors: Errors
-  ): Named = From.file(directory, fileName).parseDo(ContentType.Elements, unwrapTei(parser(
+  ): Named = From.file(directory, fileName).parseDo(unwrapTei(parser(
     fileName,
     container,
     layout,
@@ -76,8 +76,8 @@ object Named {
     idOption <- Xml.attribute.optional.id
     _ = if (idOption.isDefined && idOption.get != fileName) errors.error(s"Wrong id ${idOption.get} in file $fileName")
     role <- Xml.attribute.optional("role")
-    names <- Xml.element.all(entity.nameElement, ContentType.Text, Name.parser(entity))
-    content <- Xml.allElements
+    names <- Xml.all(entity.nameElement, ContentType.Text, Name.parser(entity))
+    content <- Xml.all
   } yield new Named(
     entity,
     fileName,
@@ -91,7 +91,7 @@ object Named {
 
   private def unwrapTei(parser: Parser[Named]): Parser[Named] = for {
     name <- Xml.name
-    result <- if (name == Tei.elementName) Tei.bodyParser(Xml.element.required(ContentType.Elements, parser)) else parser
+    result <- if (name == Tei.elementName) Tei.bodyParser(Xml.required(parser)) else parser
   } yield result
 
 

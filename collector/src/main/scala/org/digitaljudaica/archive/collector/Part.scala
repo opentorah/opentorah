@@ -22,8 +22,8 @@ object Part {
 
     val parser: Parser[Descriptor] = for {
       from <- Xml.attribute.optional("from")
-      names <- Xml.element.all("document", ContentType.Elements, Xml.text.required)
-      title <- Xml.element.required("title", ContentType.Mixed, Xml.allNodes)
+      names <- Xml.all("document", Xml.text.required)
+      title <- Xml.required("title", ContentType.Mixed, Xml.allNodes)
     } yield {
       if (names.isEmpty) {
         if (from.isEmpty) CatchAll(title) else From(from.get, title)
