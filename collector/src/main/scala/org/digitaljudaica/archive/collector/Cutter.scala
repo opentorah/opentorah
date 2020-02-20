@@ -1,7 +1,6 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-
 import org.digitaljudaica.util.Files
 import scala.sys.process._
 

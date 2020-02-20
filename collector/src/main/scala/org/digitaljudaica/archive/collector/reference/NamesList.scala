@@ -47,7 +47,7 @@ object NamesList {
     entity: Entity = Entity.forList(name).get
     id <- Xml.attribute.required.id
     role <- Xml.attribute.optional("role")
-    head <- Xml.element.required("head", ContentType.Text, Xml.text.required)
+    head <- Xml.required("head", ContentType.Text, Xml.text.required)
   } yield Descriptor(
     entity,
     id,
