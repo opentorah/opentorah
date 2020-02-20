@@ -5,7 +5,7 @@ import cats.implicits._
 import org.digitaljudaica.archive.collector.{Errors, Layout}
 import org.digitaljudaica.tei.{Entity, Name, Tei}
 import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{From, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, From, Parser, Xml}
 import org.digitaljudaica.xml.Ops._
 import scala.xml.{Elem, Node, Text}
 
@@ -58,7 +58,7 @@ object Named {
     container: Names,
     layout: Layout,
     errors: Errors
-  ): Named = From.file(directory, fileName).elements.parseDo(unwrapTei(parser(
+  ): Named = From.file(directory, fileName).parseDo(ContentType.Elements, unwrapTei(parser(
     fileName,
     container,
     layout,
@@ -76,7 +76,7 @@ object Named {
     idOption <- Xml.attribute.optional.id
     _ = if (idOption.isDefined && idOption.get != fileName) errors.error(s"Wrong id ${idOption.get} in file $fileName")
     role <- Xml.attribute.optional("role")
-    names <- Xml.element.characters.all(entity.nameElement, Name.parser(entity))
+    names <- Xml.element.all(entity.nameElement, ContentType.Text, Name.parser(entity))
     content <- Xml.allElements
   } yield new Named(
     entity,
@@ -91,7 +91,7 @@ object Named {
 
   private def unwrapTei(parser: Parser[Named]): Parser[Named] = for {
     name <- Xml.name
-    result <- if (name == Tei.elementName) Tei.bodyParser(Xml.element.elements.required(parser)) else parser
+    result <- if (name == Tei.elementName) Tei.bodyParser(Xml.element.required(ContentType.Elements, parser)) else parser
   } yield result
 
 

@@ -2,7 +2,7 @@ package org.digitaljudaica.archive.collector.reference
 
 import cats.implicits._
 import org.digitaljudaica.tei.Entity
-import org.digitaljudaica.xml.{Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, Parser, Xml}
 import scala.xml.Elem
 
 final class NamesList private(
@@ -47,7 +47,7 @@ object NamesList {
     entity: Entity = Entity.forList(name).get
     id <- Xml.attribute.required.id
     role <- Xml.attribute.optional("role")
-    head <- Xml.element.characters.required("head", Xml.text.required)
+    head <- Xml.element.required("head", ContentType.Text, Xml.text.required)
   } yield Descriptor(
     entity,
     id,

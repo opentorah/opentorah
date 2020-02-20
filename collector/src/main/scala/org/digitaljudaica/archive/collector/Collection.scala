@@ -4,7 +4,7 @@ import java.io.File
 import cats.implicits._
 import org.digitaljudaica.archive.collector.reference.Reference
 import org.digitaljudaica.util.{Collections, Files}
-import org.digitaljudaica.xml.{From, Ops, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, From, Ops, Parser, Xml}
 import Table.Column
 import scala.xml.{Elem, Node, Text}
 
@@ -153,7 +153,7 @@ object Collection {
     layout: Layout,
     directory: File
   ): Collection =
-    From.file(directory, layout.collectionFileName).elements.parseDo(parser(layout, directory))
+    From.file(directory, layout.collectionFileName).parseDo(ContentType.Elements, parser(layout, directory))
 
   private def parser(
     layout: Layout,
@@ -161,14 +161,14 @@ object Collection {
   ): Parser[Collection] = for {
     isBook <- Xml.attribute.optional.booleanOrFalse("isBook")
     publish <- Xml.attribute.optional.booleanOrFalse("publish")
-    archive <- Xml.element.characters.optional("archive", Xml.text.required) // TODO common combinator
-    prefix <- Xml.element.characters.optional("prefix", Xml.text.required)
-    number <- Xml.element.characters.optional("number", Xml.text.required.map(_.toInt)) // TODO text.int
-    titleNodes <- Xml.element.mixed.optional("title", Xml.allNodes) // TODO common combinator
-    caseAbstract <- Xml.element.mixed.required("abstract", Xml.allNodes)
-    notes <- Xml.element.mixed.optional("notes", Xml.allNodes)
+    archive <- Xml.element.optional("archive", ContentType.Text, Xml.text.required) // TODO common combinator
+    prefix <- Xml.element.optional("prefix", ContentType.Text, Xml.text.required)
+    number <- Xml.element.optional("number", ContentType.Text, Xml.text.required.map(_.toInt)) // TODO text.int
+    titleNodes <- Xml.element.optional("title", ContentType.Mixed, Xml.allNodes) // TODO common combinator
+    caseAbstract <- Xml.element.required("abstract", ContentType.Mixed, Xml.allNodes)
+    notes <- Xml.element.optional("notes", ContentType.Mixed, Xml.allNodes)
     description = caseAbstract ++ notes.getOrElse(Seq.empty)
-    partDescriptors <- Xml.element.elements.all("part", Part.Descriptor.parser)
+    partDescriptors <- Xml.element.all("part", ContentType.Elements, Part.Descriptor.parser)
   } yield new Collection(
     layout,
     directory,
