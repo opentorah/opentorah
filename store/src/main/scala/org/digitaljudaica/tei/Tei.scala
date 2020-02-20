@@ -3,7 +3,7 @@ package org.digitaljudaica.tei
 import java.io.File
 import cats.implicits._
 import org.digitaljudaica.xml.Ops._
-import org.digitaljudaica.xml.{From, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, From, Parser, Xml}
 import scala.xml.{Elem, Node}
 
 // TODO rework by introducing various TEI-related classes (TitleStmt etc.)
@@ -44,8 +44,8 @@ object Tei {
 
   val parser: Parser[Tei] = for {
     _ <- Xml.checkName(elementName)
-    teiHeader <- Xml.element.elements.required(TeiHeader.parser)
-    body <- Xml.element.elements.required("text", for {
+    teiHeader <- Xml.element.required(ContentType.Elements, TeiHeader.parser)
+    body <- Xml.element.required("text", ContentType.Elements, for {
       lang <- Xml.attribute.optional("xml:lang")
       result <- Xml.next.element("body")
     } yield result) // TODO unfold Xml.element!
@@ -54,12 +54,13 @@ object Tei {
     body
   )
 
-  def load(directory: File, fileName: String): Tei = From.file(directory, fileName).elements.parseDo(parser)
+  def load(directory: File, fileName: String): Tei =
+    From.file(directory, fileName).parseDo(ContentType.Elements, parser)
 
   def bodyParser[A](parser: Parser[A]): Parser[A] = for {
     _ <- Xml.checkName(elementName)
-    _ <- Xml.element.elements.required("teiHeader", Xml.allElements)
-    result <- Xml.element.elements.required("text", Xml.element.elements.required("body", parser))
+    _ <- Xml.element.required("teiHeader", ContentType.Elements, Xml.allElements)
+    result <- Xml.element.required("text", ContentType.Elements, Xml.element.required("body", ContentType.Elements,parser))
   } yield result
 
   def tei(head: Option[Node], content: Seq[Node]): Elem =

@@ -47,10 +47,10 @@ private[xml] object Context {
     name <- Xml.name
     currentFrom <- currentFrom
     from <- Parser.toParser(From.url(currentFrom.url.fold(new URL(url))(new URL(_, url))))
-    result <- nested(from, Content.Type.Elements, Xml.withName(name, parser)) // TODO make changeable?
+    result <- nested(from, ContentType.Elements, Xml.withName(name, parser)) // TODO make changeable?
   } yield result
 
-  def nested[A](from: From, contentType: Content.Type, parser: Parser[A]): Parser[A] = from.load.fold(
+  def nested[A](from: From, contentType: ContentType, parser: Parser[A]): Parser[A] = from.load.fold(
     error => Parser.error(error),
     elem => nested(Some(from), elem, parser, contentType)
   )
@@ -59,7 +59,7 @@ private[xml] object Context {
     from: Option[From],
     elem: Elem,
     parser: Parser[A],
-    contentType: Content.Type
+    contentType: ContentType
   ): Parser[A] = for {
     newCurrent <- Parser.lift(Current.open(from, elem, contentType))
     _ <- Parser.modify(_.push(newCurrent))

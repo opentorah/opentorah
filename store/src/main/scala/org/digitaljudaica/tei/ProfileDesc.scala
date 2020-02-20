@@ -1,7 +1,7 @@
 package org.digitaljudaica.tei
 
 import cats.implicits._
-import org.digitaljudaica.xml.{Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, Parser, Xml}
 
 final case class ProfileDesc(
   langUsage: Option[LangUsage],
@@ -29,5 +29,5 @@ object ProfileDesc {
   )
 
   val optionalParser: Parser[Option[ProfileDesc]] =
-    Xml.element.elements.optional(elementName, parser)
+    Xml.element.optional(elementName, ContentType.Elements, parser)
 }

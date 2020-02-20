@@ -27,7 +27,7 @@ private[xml] final class Current private(
 
 private[xml] object Current {
 
-  def open(from: Option[From], element: Elem, contentType: Content.Type): ErrorOr[Current] =
+  def open(from: Option[From], element: Elem, contentType: ContentType): ErrorOr[Current] =
     Content.open(element.child, contentType).map { content =>
       new Current(
         from,

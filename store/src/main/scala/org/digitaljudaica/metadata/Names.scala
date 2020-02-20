@@ -1,7 +1,7 @@
 package org.digitaljudaica.metadata
 
 import cats.implicits._
-import org.digitaljudaica.xml.{Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, Parser, Xml}
 import org.digitaljudaica.util.Collections
 
 final class Names(val names: Seq[Name]) extends HasName with LanguageString {
@@ -67,7 +67,7 @@ object Names {
   } yield result
 
   def parserWithDefaultName(defaultName: Option[Name]): Parser[Names] = for {
-    nonDefaultNames <- Xml.element.characters.all("name", Name.parser)
+    nonDefaultNames <- Xml.element.all("name", ContentType.Text, Name.parser)
     _ <- Parser.check(nonDefaultNames.nonEmpty || defaultName.isDefined, s"No names and no default name")
   } yield {
     val names = if (nonDefaultNames.isEmpty) Seq(defaultName.get) else

@@ -7,15 +7,6 @@ private[xml] sealed trait Content
 
 private[xml] object Content {
 
-  sealed trait Type
-
-  object Type {
-    final case object Empty extends Type
-    final case object Characters extends Type
-    final case object Elements extends Type
-    final case object Mixed extends Type
-  }
-
   private final case object Empty extends Content
 
   private final case class Characters(characters: Option[String]) extends Content
@@ -24,25 +15,25 @@ private[xml] object Content {
 
   private final case class Mixed(nextElementNumber: Int, nodes: Seq[Node]) extends Content
 
-  def open(nodes: Seq[Node], contentType: Type): ErrorOr[Content] = {
+  def open(nodes: Seq[Node], contentType: ContentType): ErrorOr[Content] = {
     val (elements: Seq[Elem], nonElements: Seq[Node]) = partition(nodes)
     val characters: Option[String] = toCharacters(nonElements)
 
     contentType match {
-      case Type.Empty =>
+      case ContentType.Empty =>
         if (elements.nonEmpty) Left(s"Spurious elements: $elements")
         else if (characters.nonEmpty) Left(s"Spurious characters: '${characters.get}'")
         else Right(Empty)
 
-      case Type.Characters =>
+      case ContentType.Text =>
         if (elements.nonEmpty) Left(s"Spurious elements: $elements")
         else Right(Characters(characters))
 
-      case Type.Elements =>
+      case ContentType.Elements =>
         if (characters.nonEmpty) Left(s"Spurious characters: '${characters.get}'")
         else Right(Elements(0, elements))
 
-      case Type.Mixed =>
+      case ContentType.Mixed =>
         Right(Mixed(0, nodes))
     }
   }

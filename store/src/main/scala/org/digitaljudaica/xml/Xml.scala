@@ -98,6 +98,7 @@ object Xml {
       result <- element
     } yield result
 
+    // TODO optionalElement (without the parser parameter)
     def optional[A](expected: String, parser: Parser[A]): Parser[Option[A]] = for {
       has <- Xml.next.nameIs(expected)
       result <- if (!has) Parser.pure(None) else parser.map(Some(_))
@@ -105,36 +106,25 @@ object Xml {
   }
 
   object element {
+    def optional[A](name: String, contentType: ContentType, parser: Parser[A]): Parser[Option[A]] =
+      optional(Some(name), contentType, parser)
 
-    val empty = new Nested(Content.Type.Empty)
+    def optional[A](contentType: ContentType, parser: Parser[A]): Parser[Option[A]] =
+      optional(None, contentType, parser)
 
-    val characters = new Nested(Content.Type.Characters)
+    def required[A](name: String, contentType: ContentType, parser: Parser[A]): Parser[A] =
+      Parser.required(s"element '$name'", optional(name, contentType, parser))
 
-    val elements = new Nested(Content.Type.Elements)
+    def required[A](contentType: ContentType, parser: Parser[A]): Parser[A] =
+      Parser.required(s"element", optional(contentType, parser))
 
-    val mixed = new Nested(Content.Type.Mixed)
-  }
+    def all[A](name: String, contentType: ContentType, parser: Parser[A]): Parser[Seq[A]] =
+      all(Some(name), contentType, parser)
 
-  final class Nested(contentType: Content.Type) {
-    def optional[A](name: String, parser: Parser[A]): Parser[Option[A]] =
-      optional(Some(name), parser)
+    def all[A](contentType: ContentType, parser: Parser[A]): Parser[Seq[A]] =
+      all(None, contentType, parser)
 
-    def optional[A](parser: Parser[A]): Parser[Option[A]] =
-      optional(None, parser)
-
-    def required[A](name: String, parser: Parser[A]): Parser[A] =
-      Parser.required(s"element '$name'", optional(name, parser))
-
-    def required[A](parser: Parser[A]): Parser[A] =
-      Parser.required(s"element", optional(parser))
-
-    def all[A](name: String, parser: Parser[A]): Parser[Seq[A]] =
-      all(Some(name), parser)
-
-    def all[A](parser: Parser[A]): Parser[Seq[A]] =
-      all(None, parser)
-
-    private def optional[A](name: Option[String], parser: Parser[A]): Parser[Option[A]] = for {
+    private def optional[A](name: Option[String], contentType: ContentType, parser: Parser[A]): Parser[Option[A]] = for {
       nextElementName <- next.name
       hasNext = name.fold(nextElementName.isDefined)(nextElementName.contains)
       result <- if (!hasNext) Parser.pure(None) else for {
@@ -143,9 +133,9 @@ object Xml {
       } yield Some(result)
     } yield result
 
-    private def all[A](name: Option[String], parser: Parser[A]): Parser[Seq[A]] = for {
-      headOption <- optional(name, parser)
-      tail <- if (headOption.isEmpty) Parser.pure(Seq.empty[A]) else all(name, parser)
+    private def all[A](name: Option[String], contentType: ContentType, parser: Parser[A]): Parser[Seq[A]] = for {
+      headOption <- optional(name, contentType, parser)
+      tail <- if (headOption.isEmpty) Parser.pure(Seq.empty[A]) else all(name, contentType, parser)
       result = headOption.toSeq ++ tail
     } yield result
   }

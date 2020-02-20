@@ -3,7 +3,7 @@ package org.digitaljudaica.store
 import cats.implicits._
 import java.io.File
 import org.digitaljudaica.metadata.Names
-import org.digitaljudaica.xml.{From, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, From, Parser, Xml}
 import scala.xml.Elem
 
 sealed trait Store {
@@ -38,10 +38,10 @@ object Store {
 
   def parser(inheritedSelectors: Set[Selector]): Parser[Store] = Xml.withName("store", for {
     names <- Names.withDefaultNameParser
-    selectors <- Xml.element.elements.all("selector", Selector.parser)
+    selectors <- Xml.element.all("selector",ContentType.Elements,  Selector.parser)
     _ = println(names)
     _ = println(selectors)
-    by <- Xml.element.elements.required("by", byParser(inheritedSelectors ++ selectors.toSet))
+    by <- Xml.element.required("by", ContentType.Elements, byParser(inheritedSelectors ++ selectors.toSet))
   } yield new BaseStore(
     names,
     selectors,
@@ -56,8 +56,8 @@ object Store {
   def byParser(selectors: Set[Selector]): Parser[By] = for {
     n <- Xml.attribute.required("n")
     selector = selectorByName(selectors, n)
-    texts <- Xml.element.elements.optional("texts", textsParser)
-    stores <- Xml.element.elements.all("store", parser(selectors))
+    texts <- Xml.element.optional("texts", ContentType.Elements, textsParser)
+    stores <- Xml.element.all("store", ContentType.Elements, parser(selectors))
     _ <- Parser.check(texts.nonEmpty || stores.nonEmpty, "Both 'stores' and 'texts' elements are absent.")
     _ <- Parser.check(texts.isEmpty || stores.isEmpty, "Both 'stores' and 'texts' elements are present.")
   } yield {

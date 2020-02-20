@@ -1,7 +1,8 @@
 package org.digitaljudaica.tei
 
 import cats.implicits._
-import org.digitaljudaica.xml.{From, Ops, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, From, Ops, Parser, Xml}
+
 import scala.xml.{Elem, Node}
 
 final case class Reference(
@@ -21,7 +22,7 @@ object Reference {
   def apply(
     entity: Entity,
     xml: Elem
-  ): Reference = From.xml(xml).mixed.parseDo(parser(entity))
+  ): Reference = From.xml(xml).parseDo(ContentType.Mixed, parser(entity))
 
   private def parser(
     entity: Entity,

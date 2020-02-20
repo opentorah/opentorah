@@ -16,17 +16,11 @@ sealed abstract class From {
 
   final def loadDo: Elem = From.runA(load)
 
-  final class Parse(contentType: Content.Type) {
-    def parse[A](parser: Parser[A]): ErrorOr[A] = Context.parse(Context.nested(From.this, contentType, parser))
+  def parse[A](contentType: ContentType, parser: Parser[A]): ErrorOr[A] =
+    Context.parse(Context.nested(From.this, contentType, parser))
 
-    def parseDo[A](parser: Parser[A]): A = From.runA(parse(parser))
-  }
-
-  // TODO with Context scoped by From, maybe Xml's analogues of these can be used at top level and these removed?
-  val empty = new Parse(Content.Type.Empty)
-  val characters = new Parse(Content.Type.Characters)
-  val elements = new Parse(Content.Type.Elements)
-  val mixed = new Parse(Content.Type.Mixed)
+  def parseDo[A](contentType: ContentType, parser: Parser[A]): A =
+    From.runA(parse(contentType, parser))
 }
 
 object From {

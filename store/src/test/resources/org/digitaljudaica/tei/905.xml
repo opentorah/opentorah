@@ -23,13 +23,13 @@
     <profileDesc>
       <langUsage><language ident="ru"/></langUsage>
       <calendarDesc><calendar xml:id="julian"><p>Julian calendar</p></calendar></calendarDesc>
+      <creation><date when="1798-08-16">августа 16 дня 1798 года</date></creation>
+      <abstract>Страница из описи дел</abstract>
       <correspDesc>
         <correspAction>
           <persName ref="Булгаков" role="addressee">Булгакову</persName>
         </correspAction>
       </correspDesc>
-      <creation><date when="1798-08-16">августа 16 дня 1798 года</date></creation>
-      <abstract>Страница из описи дел</abstract>
     </profileDesc>
   </teiHeader>
   <text xml:lang="ru">
