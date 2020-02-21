@@ -1,7 +1,6 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-import cats.implicits._
 import org.digitaljudaica.archive.collector.reference.Reference
 import org.digitaljudaica.util.{Collections, Files}
 import org.digitaljudaica.xml.{ContentType, From, Ops, Parser, Xml}

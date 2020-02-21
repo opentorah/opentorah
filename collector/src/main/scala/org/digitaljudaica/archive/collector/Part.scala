@@ -1,6 +1,5 @@
 package org.digitaljudaica.archive.collector
 
-import cats.implicits._
 import org.digitaljudaica.xml.{ContentType, Parser, Xml}
 import scala.xml.Node
 
