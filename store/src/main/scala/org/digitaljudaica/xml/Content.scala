@@ -106,17 +106,19 @@ private[xml] object Content {
     case content => IO.fail(s"No elements in $content")
   }
 
+  val ok: IO[Error, Unit] = IO.succeed(())
+
   val checkNoLeftovers: Content => IO[Error, Unit] = {
-    case Empty => Parser.ok
+    case Empty => ok
 
     case Characters(characters) =>
-      characters.fold[IO[Error, Unit]](Parser.ok)(characters => IO.fail(s"Unparsed characters: $characters"))
+      characters.fold[IO[Error, Unit]](ok)(characters => IO.fail(s"Unparsed characters: $characters"))
 
     case Elements(_, elements) =>
-      if (elements.isEmpty) Parser.ok else IO.fail(s"Unparsed elements: $elements")
+      if (elements.isEmpty) ok else IO.fail(s"Unparsed elements: $elements")
 
     case Mixed(_, nodes) =>
-      if (nodes.isEmpty) Parser.ok else IO.fail(s"Unparsed nodes: $nodes")
+      if (nodes.isEmpty) ok else IO.fail(s"Unparsed nodes: $nodes")
   }
 
   private def partition(nodes: Seq[Node]): (Seq[Elem], Seq[Node]) = {

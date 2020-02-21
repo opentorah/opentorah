@@ -35,15 +35,15 @@ private[xml] object Context {
   def lift[A](f: Current => A): Parser[A] =
     ZIO.access[Context](liftCurrentToContext(f))
 
-  private def liftCurrentToContext[A](f: Current => A): Context => A = (context: Context) => f(context.current)
-
   def liftCurrentModifier[A]: Current.Modifier[A] => Parser[A] = (f: Current.Modifier[A]) => for {
     result <- ZIO.accessM[Context](liftCurrentToContext(f))
     _ <- ZIO.access[Context](_.replaceCurrent(result._1))
   } yield result._2
 
   def liftContentModifier[A]: Content.Modifier[A] => Parser[A] =
-    Context.liftCurrentModifier[A] compose liftContentModifierToCurrentModifier[A]
+    liftCurrentModifier[A] compose liftContentModifierToCurrentModifier[A]
+
+  private def liftCurrentToContext[A](f: Current => A): Context => A = (context: Context) => f(context.current)
 
   private def liftContentModifierToCurrentModifier[A](f: Content.Modifier[A]): Current.Modifier[A] = (current: Current) =>
     f(current.content).map { case (content, result) => (current.copy(content = content), result) }
