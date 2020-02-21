@@ -18,9 +18,5 @@ object Parser {
     _ <- check(result.isDefined, s"Required $what is missing")
   } yield result.get
 
-  // TODO remove
-  def toErrorOr[A](f: => A): ErrorOr[A] =
-    try { Right(f) } catch { case e: Exception => Left(e.getMessage) }
-
   def toParser[A](f: => A): Parser[A] = ZIO(f).mapError(_.getMessage)
 }

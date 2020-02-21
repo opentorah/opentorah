@@ -5,13 +5,8 @@ import org.scalatest.matchers.should.Matchers
 
 final class XmlTest extends AnyFlatSpec with Matchers {
 
-  "error reporting" should "work" in {
-    Context.parse(Parser.error("ErRoR")).isLeft shouldBe true
-    Context.parse(for { _ <- Parser.error[Unit]("ErRoR") } yield ()).isLeft shouldBe true
-  }
-
   "text parsing" should "work" in {
-    From.xml(<s><a>asdjkh</a></s>).parse(
+    From.xml(<s><a>asdjkh</a></s>).parseOrError(
       Xml.required("a", ContentType.Elements, Xml.text.optional)).isLeft shouldBe true
     From.xml(<s><a>asdjkh</a></s>).parseDo(
       Xml.required("a", ContentType.Text, Xml.text.required)) shouldBe "asdjkh"

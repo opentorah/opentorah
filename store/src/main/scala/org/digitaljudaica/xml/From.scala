@@ -5,6 +5,7 @@ import java.net.URL
 import org.digitaljudaica.util.{Files, Util}
 import org.xml.sax.InputSource
 import scala.xml.{Elem, Utility, XML}
+import zio.{IO, ZIO}
 
 sealed abstract class From {
 
@@ -12,18 +13,24 @@ sealed abstract class From {
 
   def url: Option[URL]
 
-  def load: ErrorOr[Elem]
+  def load: IO[Error, Elem]
 
-  final def loadDo: Elem = From.runA(load)
+  final def loadDo: Elem = Context.run(load)
 
-  def parse[A](contentType: ContentType, parser: Parser[A]): ErrorOr[A] =
-    Context.parse(Context.nested(From.this, contentType, parser))
+  def parse[A](contentType: ContentType, parser: Parser[A]): Parser[A] =
+    Context.nested(From.this, contentType, parser)
 
-  def parse[A](parser: Parser[A]): ErrorOr[A] =
+  def parse[A](parser: Parser[A]): Parser[A] =
     parse(ContentType.Elements, parser)
 
+  def parseOrError[A](contentType: ContentType, parser: Parser[A]): Either[Error, A] =
+    Context.run(Context.runnable(parse(contentType, parser)).either)
+
+  def parseOrError[A](parser: Parser[A]): Either[Error, A] =
+    parseOrError(ContentType.Elements, parser)
+
   def parseDo[A](contentType: ContentType, parser: Parser[A]): A =
-    From.runA(parse(contentType, parser))
+    Context.run(Context.runnable(parse(contentType, parser)))
 
   def parseDo[A](parser: Parser[A]): A =
     parseDo(ContentType.Elements, parser)
@@ -31,18 +38,13 @@ sealed abstract class From {
 
 object From {
 
-  private def runA[A](result: ErrorOr[A]): A = result.fold(
-    error => throw new IllegalArgumentException(error),
-    result => result
-  )
-
   private final class FromXml(
     override val name: String,
     elem: Elem
   ) extends From {
     override def toString: String = s"From.xml($name)"
     override def url: Option[URL] = None
-    override def load: ErrorOr[Elem] = Right(elem)
+    override def load: IO[Error, Elem] = IO.succeed(elem)
   }
 
   def xml(name: String, elem: Elem): From = new FromXml(name, elem)
@@ -53,7 +55,7 @@ object From {
     override def toString: String = s"From.url($fromUrl)"
     override def name: String = Files.nameAndExtension(fromUrl.getPath)._1
     override def url: Option[URL] = Some(fromUrl)
-    override def load: ErrorOr[Elem] = loadFromUrl(fromUrl)
+    override def load: IO[Error, Elem] = loadFromUrl(fromUrl)
   }
 
   def url(url: URL): From = new FromUrl(url)
@@ -65,8 +67,8 @@ object From {
   private final class FromResource(clazz: Class[_], override val name: String) extends From {
     override def toString: String = s"From.resource($clazz:$name.xml)"
     override def url: Option[URL] = Option(clazz.getResource(name + ".xml"))
-    override def load: ErrorOr[Elem] =
-      url.fold[ErrorOr[Elem]](Left(s"Resource not found: $this"))(loadFromUrl)
+    override def load: IO[Error, Elem] =
+      url.fold[IO[Error, Elem]](IO.fail(s"Resource not found: $this"))(loadFromUrl)
   }
 
   def resource(obj: AnyRef, name: String): From = new FromResource(obj.getClass, name)
@@ -75,11 +77,11 @@ object From {
 
   def resource(obj: AnyRef): From = resource(obj, Util.className(obj))
 
-  private def loadFromUrl(url: URL): ErrorOr[Elem] = Parser.toErrorOr {
+  private def loadFromUrl(url: URL): IO[Error, Elem] = ZIO {
     val source = new InputSource(url.openStream())
     val result = Utility.trimProper(XML.load(source))
     result.asInstanceOf[Elem]
-  }
+  }.mapError(_.getMessage)
 
   // --- Xerces parser with Scala XML:
   // build.gradle:    implementation "xerces:xercesImpl:$xercesVersion"

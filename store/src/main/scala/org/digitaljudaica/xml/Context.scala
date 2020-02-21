@@ -1,7 +1,7 @@
 package org.digitaljudaica.xml
 
 import java.net.URL
-import zio.{DefaultRuntime, ZIO}
+import zio.{DefaultRuntime, IO, ZIO}
 import scala.xml.Elem
 
 final private[xml] class Context {
@@ -49,10 +49,10 @@ private[xml] object Context {
     result <- nested(from, ContentType.Elements, Xml.withName(name, parser)) // TODO make ContentType changeable?
   } yield result
 
-  def nested[A](from: From, contentType: ContentType, parser: Parser[A]): Parser[A] = from.load.fold(
-    error => Parser.error(error),
-    elem => nested(Some(from), elem, parser, contentType)
-  )
+  def nested[A](from: From, contentType: ContentType, parser: Parser[A]): Parser[A] = for {
+    elem <- from.load
+    result <- nested(Some(from), elem, parser, contentType)
+  } yield result
 
   def nested[A](
     from: Option[From],
@@ -72,17 +72,19 @@ private[xml] object Context {
     _ <- ZIO.fromEither(checkNoLeftovers)
   } yield ()
 
-  def parse[A](parser: Parser[A]): ErrorOr[A] = {
+  def runnable[A](parser: Parser[A]): IO[Error, A] = {
     val toRun: Parser[A] = for {
       result <- parser
       _ <- ZIO.access[Context](_.checkIsEmpty())
     } yield result
 
-    val withError: Parser[A] = toRun.flatMapError(error => for {
+    val result: Parser[A] = toRun.flatMapError(error => for {
       contextStr <- ZIO.access[Context](_.toString)
     } yield error + "\n" + contextStr)
 
-    val runtime = new DefaultRuntime {}
-    runtime.unsafeRun(withError.either.provide(new Context))
+    result.provide(new Context)
   }
+
+  final def run[A](toRun: IO[Error, A]): A =
+    new DefaultRuntime {}.unsafeRun(toRun.mapError(error => throw new IllegalArgumentException(error)))
 }
