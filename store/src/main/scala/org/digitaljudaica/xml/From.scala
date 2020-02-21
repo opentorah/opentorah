@@ -5,7 +5,7 @@ import java.net.URL
 import org.digitaljudaica.util.{Files, Util}
 import org.xml.sax.InputSource
 import scala.xml.{Elem, Utility, XML}
-import zio.{IO, ZIO}
+import zio.IO
 
 sealed abstract class From {
 
@@ -15,7 +15,7 @@ sealed abstract class From {
 
   def load: IO[Error, Elem]
 
-  final def loadDo: Elem = Context.run(load)
+  final def loadDo: Elem = Parser.run(load)
 
   def parse[A](contentType: ContentType, parser: Parser[A]): Parser[A] =
     Context.nested(From.this, contentType, parser)
@@ -24,13 +24,13 @@ sealed abstract class From {
     parse(ContentType.Elements, parser)
 
   def parseOrError[A](contentType: ContentType, parser: Parser[A]): Either[Error, A] =
-    Context.run(Context.runnable(parse(contentType, parser)).either)
+    Parser.run(Context.runnable(parse(contentType, parser)).either)
 
   def parseOrError[A](parser: Parser[A]): Either[Error, A] =
     parseOrError(ContentType.Elements, parser)
 
   def parseDo[A](contentType: ContentType, parser: Parser[A]): A =
-    Context.run(Context.runnable(parse(contentType, parser)))
+    Parser.run(Context.runnable(parse(contentType, parser)))
 
   def parseDo[A](parser: Parser[A]): A =
     parseDo(ContentType.Elements, parser)
@@ -77,11 +77,11 @@ object From {
 
   def resource(obj: AnyRef): From = resource(obj, Util.className(obj))
 
-  private def loadFromUrl(url: URL): IO[Error, Elem] = ZIO {
+  private def loadFromUrl(url: URL): IO[Error, Elem] = Parser.effect {
     val source = new InputSource(url.openStream())
     val result = Utility.trimProper(XML.load(source))
     result.asInstanceOf[Elem]
-  }.mapError(_.getMessage)
+  }
 
   // --- Xerces parser with Scala XML:
   // build.gradle:    implementation "xerces:xercesImpl:$xercesVersion"

@@ -1,7 +1,7 @@
 package org.digitaljudaica.xml
 
 import java.net.URL
-import zio.{DefaultRuntime, IO, ZIO}
+import zio.{IO, ZIO}
 import scala.xml.Elem
 
 final private[xml] class Context {
@@ -32,45 +32,49 @@ final private[xml] class Context {
 
 private[xml] object Context {
 
-  def inspectCurrent[A](f: Current => A): Parser[A] =
-    ZIO.access[Context](context => f(context.current))
+  def lift[A](f: Current => A): Parser[A] =
+    ZIO.access[Context](liftCurrentToContext(f))
 
-  def lift[A]: Current.Modifier[A] => Parser[A] = (f: Current.Modifier[A]) => for {
-    toRun <- inspectCurrent[ErrorOr[(Current, A)]](f) // TODO use accessM...
-    result <- Parser.lift(toRun)
+  private def liftCurrentToContext[A](f: Current => A): Context => A = (context: Context) => f(context.current)
+
+  def liftCurrentModifier[A]: Current.Modifier[A] => Parser[A] = (f: Current.Modifier[A]) => for {
+    result <- ZIO.accessM[Context](liftCurrentToContext(f))
     _ <- ZIO.access[Context](_.replaceCurrent(result._1))
   } yield result._2
 
-  def include[A](url: String, parser: Parser[A]): Parser[A] = for {
+  def liftContentModifier[A]: Content.Modifier[A] => Parser[A] =
+    Context.liftCurrentModifier[A] compose liftContentModifierToCurrentModifier[A]
+
+  private def liftContentModifierToCurrentModifier[A](f: Content.Modifier[A]): Current.Modifier[A] = (current: Current) =>
+    f(current.content).map { case (content, result) => (current.copy(content = content), result) }
+
+  def include[A](url: String, contentType: ContentType, parser: Parser[A]): Parser[A] = for {
     _ <- checkNoLeftovers
-    name <- Xml.name
     currentFrom <- ZIO.access[Context](_.currentFrom)
-    from <- Parser.toParser(From.url(currentFrom.url.fold(new URL(url))(new URL(_, url))))
-    result <- nested(from, ContentType.Elements, Xml.withName(name, parser)) // TODO make ContentType changeable?
+    from <- Parser.effect(From.url(currentFrom.url.fold(new URL(url))(new URL(_, url))))
+    result <- nested(from, contentType, parser)
   } yield result
 
   def nested[A](from: From, contentType: ContentType, parser: Parser[A]): Parser[A] = for {
     elem <- from.load
-    result <- nested(Some(from), elem, parser, contentType)
+    result <- nested(Some(from), elem, contentType, parser)
   } yield result
 
   def nested[A](
     from: Option[From],
     elem: Elem,
-    parser: Parser[A],
-    contentType: ContentType
+    contentType: ContentType,
+    parser: Parser[A]
   ): Parser[A] = for {
-    newCurrent <- Parser.lift(Current.open(from, elem, contentType))
+    newCurrent <- Current.open(from, elem, contentType)
     _ <- ZIO.access[Context](_.push(newCurrent))
     result <- parser
     _ <- checkNoLeftovers
     _ <- ZIO.access[Context](_.pop())
   } yield result
 
-  private def checkNoLeftovers: Parser[Unit] = for {
-    checkNoLeftovers <- inspectCurrent(Current.checkNoLeftovers) // TODO use accessM...
-    _ <- ZIO.fromEither(checkNoLeftovers)
-  } yield ()
+  private def checkNoLeftovers: Parser[Unit] =
+    ZIO.accessM(liftCurrentToContext(Current.checkNoLeftovers))
 
   def runnable[A](parser: Parser[A]): IO[Error, A] = {
     val toRun: Parser[A] = for {
@@ -84,7 +88,4 @@ private[xml] object Context {
 
     result.provide(new Context)
   }
-
-  final def run[A](toRun: IO[Error, A]): A =
-    new DefaultRuntime {}.unsafeRun(toRun.mapError(error => throw new IllegalArgumentException(error)))
 }

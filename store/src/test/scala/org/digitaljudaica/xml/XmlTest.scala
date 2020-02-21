@@ -21,6 +21,6 @@ final class XmlTest extends AnyFlatSpec with Matchers {
 
   "Include" should "work" in {
     From.resource(Parser, "2").parseDo(file2parser) shouldBe "X"
-    From.resource(Parser, "1").parseDo(Xml.withInclude("to", file2parser)) shouldBe "X"
+    From.resource(Parser, "1").parseDo(Xml.withInclude("to", ContentType.Elements, file2parser)) shouldBe "X"
   }
 }

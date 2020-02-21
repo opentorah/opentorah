@@ -1,6 +1,7 @@
 package org.digitaljudaica.xml
 
 import scala.xml.Elem
+import zio.IO
 
 private[xml] final case class Current(
   from: Option[From],
@@ -11,10 +12,9 @@ private[xml] final case class Current(
 
 private[xml] object Current {
 
-  // TODO ZIOize :)
-  type Modifier[A] = Current => ErrorOr[(Current, A)]
+  type Modifier[A] = Current => IO[Error, (Current, A)]
 
-  def open(from: Option[From], element: Elem, contentType: ContentType): ErrorOr[Current] = for {
+  def open(from: Option[From], element: Elem, contentType: ContentType): IO[Error, Current] = for {
     content <- Content.open(element.child, contentType)
   } yield Current(
     from,
@@ -23,18 +23,14 @@ private[xml] object Current {
     content
   )
 
-  // TODO ZIOize :)
-  def lift[A](f: Content.Modifier[A]): Modifier[A] = (current: Current) =>
-    f(current.content).map { case (content, result) => (current.copy(content = content), result) }
-
   def takeAttribute(attribute: String): Modifier[Option[String]] = (current: Current) =>
-    Right((current.copy(attributes = current.attributes - attribute), current.attributes.get(attribute)))
+    IO.succeed((current.copy(attributes = current.attributes - attribute), current.attributes.get(attribute)))
 
   val takeAllAttributes: Modifier[Map[String, String]] = (current: Current) =>
-    Right((current.copy(attributes = Map.empty), current.attributes))
+    IO.succeed((current.copy(attributes = Map.empty), current.attributes))
 
-  val checkNoLeftovers: Current => ErrorOr[Unit] = (current: Current) => for {
-    _ <- if (current.attributes.isEmpty) Right(()) else Left(s"Unparsed attributes: ${current.attributes}")
+  val checkNoLeftovers: Current => IO[Error, Unit] = (current: Current) => for {
+    _ <- if (current.attributes.isEmpty) IO.succeed(()) else IO.fail(s"Unparsed attributes: ${current.attributes}")
     _ <- Content.checkNoLeftovers(current.content)
   } yield ()
 }

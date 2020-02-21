@@ -1,13 +1,13 @@
 package org.digitaljudaica.xml
 
 import scala.xml.{Elem, Node}
+import zio.IO
 
 private[xml] sealed trait Content
 
 private[xml] object Content {
 
-  // TODO ZIOize :)
-  type Modifier[A] = Content => ErrorOr[(Content, A)]
+  type Modifier[A] = Content => IO[Error, (Content, A)]
 
   private final case object Empty extends Content
 
@@ -17,39 +17,39 @@ private[xml] object Content {
 
   private final case class Mixed(nextElementNumber: Int, nodes: Seq[Node]) extends Content
 
-  def open(nodes: Seq[Node], contentType: ContentType): ErrorOr[Content] = {
+  def open(nodes: Seq[Node], contentType: ContentType): IO[Error, Content] = {
     val (elements: Seq[Elem], nonElements: Seq[Node]) = partition(nodes)
     val characters: Option[String] = toCharacters(nonElements)
 
     contentType match {
       case ContentType.Empty =>
-        if (elements.nonEmpty) Left(s"Spurious elements: $elements")
-        else if (characters.nonEmpty) Left(s"Spurious characters: '${characters.get}'")
-        else Right(Empty)
+        if (elements.nonEmpty) IO.fail(s"Spurious elements: $elements")
+        else if (characters.nonEmpty) IO.fail(s"Spurious characters: '${characters.get}'")
+        else IO.succeed(Empty)
 
       case ContentType.Text =>
-        if (elements.nonEmpty) Left(s"Spurious elements: $elements")
-        else Right(Characters(characters))
+        if (elements.nonEmpty) IO.fail(s"Spurious elements: $elements")
+        else IO.succeed(Characters(characters))
 
       case ContentType.Elements =>
-        if (characters.nonEmpty) Left(s"Spurious characters: '${characters.get}'")
-        else Right(Elements(0, elements))
+        if (characters.nonEmpty) IO.fail(s"Spurious characters: '${characters.get}'")
+        else IO.succeed(Elements(0, elements))
 
       case ContentType.Mixed =>
-        Right(Mixed(0, nodes))
+        IO.succeed(Mixed(0, nodes))
     }
   }
 
   val takeCharacters: Modifier[Option[String]] = {
     case Characters(characters) =>
-      Right((Characters(None), characters))
+      IO.succeed((Characters(None), characters))
 
     case Mixed(nextElementNumber, nodes) =>
       val (elements: Seq[Elem], nonElements: Seq[Node]) = partition(nodes)
-      if (elements.nonEmpty) Left(s"Elements in $this")
-      else Right((Mixed(nextElementNumber, Seq.empty), toCharacters(nonElements)))
+      if (elements.nonEmpty) IO.fail(s"Elements in $this")
+      else IO.succeed((Mixed(nextElementNumber, Seq.empty), toCharacters(nonElements)))
 
-    case content => Left(s"No characters in $content")
+    case content => IO.fail(s"No characters in $content")
   }
 
   val getNextElementName: Content => Option[String] = {
@@ -66,13 +66,13 @@ private[xml] object Content {
   }
 
   val takeNextElement: Modifier[Option[Elem]] = {
-    case content@Elements(nextElementNumber, elements) => Right {
+    case content@Elements(nextElementNumber, elements) => IO.succeed {
       elements.headOption.fold[(Content, Option[Elem])]((content, None)) { result =>
         (Elements(nextElementNumber + 1, elements.tail), Some(result))
       }
     }
 
-    case content@Mixed(nextElementNumber, nodes) => Right {
+    case content@Mixed(nextElementNumber, nodes) => IO.succeed {
       val noLeadingWhitespace = dropWhitespace(nodes)
       noLeadingWhitespace.headOption.fold[(Content, Option[Elem])]((content, None)) {
         case result: Elem => (Mixed(nextElementNumber + 1, noLeadingWhitespace.tail), Some(result))
@@ -80,45 +80,43 @@ private[xml] object Content {
       }
     }
 
-    case content => Left(s"No element in $content")
+    case content => IO.fail(s"No element in $content")
   }
 
   val takeAllNodes: Modifier[Seq[Node]] = {
     case Elements(nextElementNumber: Int, elements: Seq[Elem]) =>
-      Right(Elements(nextElementNumber, Seq.empty), elements)
+      IO.succeed(Elements(nextElementNumber, Seq.empty), elements)
 
     case Mixed(nextElementNumber: Int, nodes: Seq[Node]) =>
-      Right(Mixed(nextElementNumber, Seq.empty), nodes)
+      IO.succeed(Mixed(nextElementNumber, Seq.empty), nodes)
 
-    case content => Left(s"No nodes in $content")
+    case content => IO.fail(s"No nodes in $content")
   }
 
   val takeAllElements: Modifier[Seq[Elem]] = {
     case Elements(nextElementNumber: Int, elements: Seq[Elem]) =>
-      Right(Elements(nextElementNumber, Seq.empty), elements)
+      IO.succeed(Elements(nextElementNumber, Seq.empty), elements)
 
     case content@Mixed(nextElementNumber: Int, nodes: Seq[Node]) =>
       val (elements: Seq[Elem], nonElements: Seq[Node]) = partition(nodes)
       val hasNonWhitespace: Boolean = nonElements.exists(node => !isWhitespace(node))
-      if (hasNonWhitespace) Left(s"Non white-space nodes in $content")
-      else Right((Mixed(nextElementNumber, Seq.empty), elements))
+      if (hasNonWhitespace) IO.fail(s"Non white-space nodes in $content")
+      else IO.succeed((Mixed(nextElementNumber, Seq.empty), elements))
 
-    case content => Left(s"No elements in $content")
+    case content => IO.fail(s"No elements in $content")
   }
 
-  private val ok: ErrorOr[Unit] = Right(())
-
-  val checkNoLeftovers: Content => ErrorOr[Unit] = {
-    case Empty => ok
+  val checkNoLeftovers: Content => IO[Error, Unit] = {
+    case Empty => Parser.ok
 
     case Characters(characters) =>
-      characters.fold[ErrorOr[Unit]](ok)(characters => Left(s"Unparsed characters: $characters"))
+      characters.fold[IO[Error, Unit]](Parser.ok)(characters => IO.fail(s"Unparsed characters: $characters"))
 
     case Elements(_, elements) =>
-      if (elements.isEmpty) ok else Left(s"Unparsed elements: $elements")
+      if (elements.isEmpty) Parser.ok else IO.fail(s"Unparsed elements: $elements")
 
     case Mixed(_, nodes) =>
-      if (nodes.isEmpty) ok else Left(s"Unparsed nodes: $nodes")
+      if (nodes.isEmpty) Parser.ok else IO.fail(s"Unparsed nodes: $nodes")
   }
 
   private def partition(nodes: Seq[Node]): (Seq[Elem], Seq[Node]) = {

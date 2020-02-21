@@ -1,22 +1,26 @@
 package org.digitaljudaica.xml
 
-import zio.ZIO
+import zio.{DefaultRuntime, IO}
 
+// TODO move all this stuff into non-Parser-related class (or util package?) for reuse in 'collector'...
 object Parser {
 
-  def pure[A](value: A): Parser[A] = ZIO.succeed(value)
+  def succeed[A](value: A): Parser[A] = IO.succeed(value)
 
-  def lift[A](value: ErrorOr[A]): Parser[A] = ZIO.fromEither(value)
+  val ok: IO[Error, Unit] = IO.succeed(())
 
-  def error[A](value: Error): Parser[A] = ZIO.fail(value)
+  private[xml] def effect[A](f: => A): IO[Error, A] = IO(f).mapError(_.getMessage)
 
-  def check(condition: Boolean, message: => String): Parser[Unit] =
-    if (condition) pure(()) else error[Unit](message)
+  def fail[A](value: Error): IO[Error, A] = IO.fail(value)
+
+  def check(condition: Boolean, message: => String): IO[Error, Unit] =
+    if (condition) ok else fail(message)
 
   private[xml] def required[A](what: String, parser: Parser[Option[A]]): Parser[A] = for {
     result <- parser
     _ <- check(result.isDefined, s"Required $what is missing")
   } yield result.get
 
-  def toParser[A](f: => A): Parser[A] = ZIO(f).mapError(_.getMessage)
+  final def run[A](toRun: IO[Error, A]): A =
+    new DefaultRuntime {}.unsafeRun(toRun.mapError(error => throw new IllegalArgumentException(error)))
 }
