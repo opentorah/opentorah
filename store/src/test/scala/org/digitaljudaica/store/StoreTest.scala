@@ -1,6 +1,5 @@
 package org.digitaljudaica.store
 
-import cats.implicits._
 import org.digitaljudaica.xml.{ContentType, From}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

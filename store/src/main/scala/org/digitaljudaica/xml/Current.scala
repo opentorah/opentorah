@@ -1,6 +1,5 @@
 package org.digitaljudaica.xml
 
-import cats.implicits._
 import scala.xml.Elem
 
 private[xml] final case class Current(
@@ -12,7 +11,7 @@ private[xml] final case class Current(
 
 private[xml] object Current {
 
-  // TODO monadize :)
+  // TODO ZIOize :)
   type Modifier[A] = Current => ErrorOr[(Current, A)]
 
   def open(from: Option[From], element: Elem, contentType: ContentType): ErrorOr[Current] = for {
@@ -24,9 +23,9 @@ private[xml] object Current {
     content
   )
 
-  // TODO monadize :)
+  // TODO ZIOize :)
   def lift[A](f: Content.Modifier[A]): Modifier[A] = (current: Current) =>
-    f(current.content).map { _.leftMap(content => current.copy(content = content)) }
+    f(current.content).map { case (content, result) => (current.copy(content = content), result) }
 
   def takeAttribute(attribute: String): Modifier[Option[String]] = (current: Current) =>
     Right((current.copy(attributes = current.attributes - attribute), current.attributes.get(attribute)))

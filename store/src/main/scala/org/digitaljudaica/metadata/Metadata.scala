@@ -1,6 +1,5 @@
 package org.digitaljudaica.metadata
 
-import cats.implicits._
 import org.digitaljudaica.util.Collections
 import org.digitaljudaica.xml.{From, Parser, Xml}
 

@@ -1,6 +1,5 @@
 package org.digitaljudaica.tei
 
-import cats.implicits._
 import org.digitaljudaica.xml.{ContentType, From, Ops, Parser, Xml}
 
 import scala.xml.{Elem, Node}

@@ -1,6 +1,5 @@
 package org.digitaljudaica.metadata
 
-import cats.implicits._
 import org.digitaljudaica.xml.{Parser, Xml}
 
 final case class LanguageSpec(

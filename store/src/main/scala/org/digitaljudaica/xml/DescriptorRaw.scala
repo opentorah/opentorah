@@ -1,6 +1,5 @@
 package org.digitaljudaica.xml
 
-import cats.implicits._
 import scala.xml.Elem
 
 class DescriptorRaw[A](

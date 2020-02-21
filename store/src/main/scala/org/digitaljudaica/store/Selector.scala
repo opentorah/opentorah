@@ -1,6 +1,5 @@
 package org.digitaljudaica.store
 
-import cats.implicits._
 import org.digitaljudaica.metadata.Names
 import org.digitaljudaica.xml.Parser
 
