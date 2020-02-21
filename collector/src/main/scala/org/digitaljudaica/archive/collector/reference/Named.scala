@@ -1,7 +1,6 @@
 package org.digitaljudaica.archive.collector.reference
 
 import java.io.File
-import cats.implicits._
 import org.digitaljudaica.archive.collector.{Errors, Layout}
 import org.digitaljudaica.tei.{Entity, Name, Tei}
 import org.digitaljudaica.util.Collections
