@@ -1,14 +1,12 @@
 package org.digitaljudaica.xml
 
-import cats.data.State
-import cats.implicits._
 import scala.xml.{Elem, Node}
 
 private[xml] sealed trait Content
 
 private[xml] object Content {
 
-  // TODO monadize :) (State[Content, A])
+  // TODO ZIOize :)
   type Modifier[A] = Content => ErrorOr[(Content, A)]
 
   private final case object Empty extends Content
@@ -123,8 +121,10 @@ private[xml] object Content {
       if (nodes.isEmpty) ok else Left(s"Unparsed nodes: $nodes")
   }
 
-  private def partition(nodes: Seq[Node]): (Seq[Elem], Seq[Node]) =
-    nodes.partition(_.isInstanceOf[Elem]).leftMap(_.map(_.asInstanceOf[Elem]))
+  private def partition(nodes: Seq[Node]): (Seq[Elem], Seq[Node]) = {
+    val (elems, nonElems) = nodes.partition(_.isInstanceOf[Elem])
+    (elems.map(_.asInstanceOf[Elem]), nonElems)
+  }
 
   private def toCharacters(nodes: Seq[Node]): Option[String] = {
     val result = nodes.map(_.text).mkString.trim

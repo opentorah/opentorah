@@ -1,10 +1,12 @@
 package org.digitaljudaica.xml
 
 import java.net.URL
-import cats.implicits._
+import zio.{DefaultRuntime, ZIO}
 import scala.xml.Elem
 
-final private[xml] case class Context private(private val stack: List[Current]) {
+final private[xml] class Context {
+
+  private var stack: List[Current] = List.empty
 
   override def toString: String =
     stack.mkString("\n")
@@ -12,14 +14,14 @@ final private[xml] case class Context private(private val stack: List[Current]) 
   private def current: Current =
     stack.head
 
-  private def replaceCurrent[A](newCurrent: Current): Context =
-    new Context(stack = newCurrent :: stack.tail)
+  private def replaceCurrent[A](newCurrent: Current): Unit =
+    stack = newCurrent :: stack.tail
 
-  private def push(element: Current): Context =
-    new Context(element :: stack)
+  private def push(element: Current): Unit =
+    stack = element :: stack
 
-  private def pop: Context =
-    new Context(stack.tail)
+  private def pop(): Unit =
+    stack = stack.tail
 
   private def checkIsEmpty(): Unit =
     if (stack.nonEmpty) throw new IllegalStateException(s"Non-empty context $this!")
@@ -30,22 +32,19 @@ final private[xml] case class Context private(private val stack: List[Current]) 
 
 private[xml] object Context {
 
-  private val currentFrom: Parser[From] =
-    Parser.inspect(_.currentFrom)
-
   def inspectCurrent[A](f: Current => A): Parser[A] =
-    Parser.inspect(context => f(context.current))
+    ZIO.access[Context](context => f(context.current))
 
   def lift[A]: Current.Modifier[A] => Parser[A] = (f: Current.Modifier[A]) => for {
-    toRun <- Parser.inspect(context => f(context.current))
+    toRun <- inspectCurrent[ErrorOr[(Current, A)]](f) // TODO use accessM...
     result <- Parser.lift(toRun)
-    _ <- Parser.modify(_.replaceCurrent(result._1))
+    _ <- ZIO.access[Context](_.replaceCurrent(result._1))
   } yield result._2
 
   def include[A](url: String, parser: Parser[A]): Parser[A] = for {
     _ <- checkNoLeftovers
     name <- Xml.name
-    currentFrom <- currentFrom
+    currentFrom <- ZIO.access[Context](_.currentFrom)
     from <- Parser.toParser(From.url(currentFrom.url.fold(new URL(url))(new URL(_, url))))
     result <- nested(from, ContentType.Elements, Xml.withName(name, parser)) // TODO make ContentType changeable?
   } yield result
@@ -62,28 +61,28 @@ private[xml] object Context {
     contentType: ContentType
   ): Parser[A] = for {
     newCurrent <- Parser.lift(Current.open(from, elem, contentType))
-    _ <- Parser.modify(_.push(newCurrent))
+    _ <- ZIO.access[Context](_.push(newCurrent))
     result <- parser
     _ <- checkNoLeftovers
-    _ <- Parser.modify(_.pop)
+    _ <- ZIO.access[Context](_.pop())
   } yield result
 
   private def checkNoLeftovers: Parser[Unit] = for {
-    checkNoLeftovers <- inspectCurrent(Current.checkNoLeftovers)
-    _ <- Parser.lift(checkNoLeftovers)
+    checkNoLeftovers <- inspectCurrent(Current.checkNoLeftovers) // TODO use accessM...
+    _ <- ZIO.fromEither(checkNoLeftovers)
   } yield ()
 
-  // TODO capture Context in the error message!
   def parse[A](parser: Parser[A]): ErrorOr[A] = {
-    val toRun = for {
+    val toRun: Parser[A] = for {
       result <- parser
-      _ <- Parser.inspect(_.checkIsEmpty())
+      _ <- ZIO.access[Context](_.checkIsEmpty())
     } yield result
 
-    // TODO I need to obtain th final Context in case of error, and tack its toString() to the message...
-    // If there i sno way to run the parser and obtain the final state, I'll need to capture the Context
-    // at the time of raising the error, byy turning Parser.error() into a Parser - and use it in From.load(),
-    // convertions etc. ...
-    toRun.runA(new Context(List.empty))
+    val withError: Parser[A] = toRun.flatMapError(error => for {
+      contextStr <- ZIO.access[Context](_.toString)
+    } yield error + "\n" + contextStr)
+
+    val runtime = new DefaultRuntime {}
+    runtime.unsafeRun(withError.either.provide(new Context))
   }
 }

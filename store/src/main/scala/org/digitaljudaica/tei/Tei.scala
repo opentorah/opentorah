@@ -1,7 +1,6 @@
 package org.digitaljudaica.tei
 
 import java.io.File
-import cats.implicits._
 import org.digitaljudaica.xml.Ops._
 import org.digitaljudaica.xml.{From, Parser, Xml}
 import scala.xml.{Elem, Node}

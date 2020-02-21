@@ -1,6 +1,5 @@
 package org.digitaljudaica.metadata
 
-import cats.implicits._
 import org.digitaljudaica.xml.{Parser, Xml}
 
 final class WithNumber[T](val n: Int, val what: T)

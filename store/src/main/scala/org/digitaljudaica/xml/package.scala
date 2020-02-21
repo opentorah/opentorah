@@ -1,12 +1,13 @@
 package org.digitaljudaica
 
-import cats.data.StateT
+import zio.ZIO
 
 package object xml {
 
   type Error = String
 
+  // TODO eliminate
   type ErrorOr[A] = Either[Error, A]
 
-  type Parser[A] = StateT[ErrorOr, Context, A]
+  type Parser[A] = ZIO[Context, Error, A]
 }

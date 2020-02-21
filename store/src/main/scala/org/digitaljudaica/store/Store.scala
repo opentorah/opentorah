@@ -1,9 +1,8 @@
 package org.digitaljudaica.store
 
-import cats.implicits._
 import java.io.File
 import org.digitaljudaica.metadata.Names
-import org.digitaljudaica.xml.{ContentType, From, Parser, Xml}
+import org.digitaljudaica.xml.{From, Parser, Xml}
 import scala.xml.Elem
 
 sealed trait Store {

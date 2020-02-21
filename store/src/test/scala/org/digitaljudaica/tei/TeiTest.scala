@@ -1,6 +1,5 @@
 package org.digitaljudaica.tei
 
-import cats.implicits._
 import org.digitaljudaica.xml.From
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

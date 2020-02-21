@@ -1,6 +1,5 @@
 package org.digitaljudaica.tei
 
-import cats.implicits._
 import org.digitaljudaica.xml.Descriptor
 
 final case class FileDesc(
