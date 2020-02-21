@@ -1,6 +1,5 @@
 package org.podval.judaica.tanach
 
-import cats.implicits._
 import org.digitaljudaica.xml.Parser
 
 final case class SpanParsed(from: VerseParsed, to: VerseParsed) {

@@ -1,6 +1,5 @@
 package org.podval.judaica.tanach
 
-import cats.implicits._
 import Tanach.TanachBook
 import org.digitaljudaica.metadata.{Metadata, Names}
 import org.digitaljudaica.util.Collections

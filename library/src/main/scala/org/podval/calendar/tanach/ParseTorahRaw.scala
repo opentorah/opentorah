@@ -1,6 +1,5 @@
 package org.podval.calendar.tanach
 
-import cats.implicits._
 import org.digitaljudaica.metadata.{WithNames, WithNumber}
 import org.digitaljudaica.xml.{From, Parser, Xml}
 import org.podval.judaica.tanach.{SpanParsed, Torah}

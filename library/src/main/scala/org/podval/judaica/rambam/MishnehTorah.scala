@@ -1,6 +1,5 @@
 package org.podval.judaica.rambam
 
-import cats.implicits._
 import org.digitaljudaica.metadata.{Language, Metadata, Name, Names, WithNames}
 import org.digitaljudaica.xml.{From, Parser, Xml}
 

@@ -1,6 +1,5 @@
 package org.podval.judaica.tanach
 
-import cats.implicits._
 import org.digitaljudaica.metadata.{Names, WithNumber}
 import org.digitaljudaica.xml.{ContentType, Parser, Xml}
 

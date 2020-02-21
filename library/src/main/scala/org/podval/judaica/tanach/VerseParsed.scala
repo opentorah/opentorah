@@ -1,6 +1,5 @@
 package org.podval.judaica.tanach
 
-import cats.implicits._
 import org.digitaljudaica.xml.{Parser, Xml}
 
 final case class VerseParsed(chapter: Option[Int], verse: Option[Int]) {
