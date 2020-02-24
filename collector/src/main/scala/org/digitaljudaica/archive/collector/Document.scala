@@ -2,8 +2,9 @@ package org.digitaljudaica.archive.collector
 
 import java.io.File
 import org.digitaljudaica.archive.collector.reference.{Reference, ReferenceSource}
-import org.digitaljudaica.tei.{Tei, Entity}
-import org.digitaljudaica.xml.Print
+import org.digitaljudaica.reference.Entity
+import org.digitaljudaica.tei.Tei
+import org.digitaljudaica.xml.{From, Parser, Print}
 import scala.xml.Elem
 
 final class Document(
@@ -16,7 +17,7 @@ final class Document(
 ) extends ReferenceSource(collection) {
   override def toString: String = s"$collection:$name"
 
-  private val tei: Tei = Tei.load(collection.teiDirectory, name)
+  private val tei: Tei = Parser.parseDo(Tei.parse(From.file(collection.teiDirectory, name)))
 
   override val references: Seq[Reference] = bindReferences(tei.references)
 

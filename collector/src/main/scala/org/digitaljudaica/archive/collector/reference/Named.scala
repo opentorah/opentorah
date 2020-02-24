@@ -1,31 +1,25 @@
 package org.digitaljudaica.archive.collector.reference
 
-import java.io.File
-import org.digitaljudaica.archive.collector.{Errors, Layout}
-import org.digitaljudaica.tei.{Entity, Name, Tei}
+import org.digitaljudaica.archive.collector.Layout
+import org.digitaljudaica.reference.{Entity, Name}
 import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{ContentType, From, Parser, Xml}
 import org.digitaljudaica.xml.Ops._
 import scala.xml.{Elem, Node, Text}
 
-// TODO structure the TEI file better: the names, information, list reference, mentions...
-final class Named private(
-  val entity: Entity,
-  fileName: String,
+final class Named(
+  named: org.digitaljudaica.reference.Named,
   container: Names,
-  val role: Option[String],
-  names: Seq[Name],
-  content: Seq[Elem],
-  layout: Layout,
-  errors: Errors
+  layout: Layout
 ) extends ReferenceSource(container) {
 
-  def id: String = fileName
-
-  if (names.isEmpty) errors.error(s"No names for $id")
+  def entity: Entity = named.entity
+  def id: String = named.id
+  def role: Option[String] = named.role
+  def names: Seq[Name] = named.names
+  def content: Seq[Elem] = named.content
 
   override val references: Seq[Reference] = bindReferences(content.flatMap(element =>
-    org.digitaljudaica.tei.Reference.all(element)))
+    org.digitaljudaica.reference.Reference.all(element)))
 
   override def isNames: Boolean = true
 
@@ -51,48 +45,6 @@ final class Named private(
 }
 
 object Named {
-  def apply(
-    directory: File,
-    fileName: String,
-    container: Names,
-    layout: Layout,
-    errors: Errors
-  ): Named = From.file(directory, fileName).parseDo(unwrapTei(parser(
-    fileName,
-    container,
-    layout,
-    errors
-  )))
-
-  private def parser(
-    fileName: String,
-    container: Names,
-    layout: Layout,
-    errors: Errors
-  ): Parser[Named] = for {
-    name <- Xml.name
-    entity = Entity.forElement(name).get
-    idOption <- Xml.attribute.optional.id
-    _ = if (idOption.isDefined && idOption.get != fileName) errors.error(s"Wrong id ${idOption.get} in file $fileName")
-    role <- Xml.attribute.optional("role")
-    names <- Xml.all(entity.nameElement, ContentType.Text, Name.parser(entity))
-    content <- Xml.all
-  } yield new Named(
-    entity,
-    fileName,
-    container,
-    role,
-    names,
-    content = content.map(elem => org.digitaljudaica.xml.Ops.removeNamespace(elem)),
-    layout,
-    errors
-  )
-
-  private def unwrapTei(parser: Parser[Named]): Parser[Named] = for {
-    name <- Xml.name
-    result <- if (name == Tei.elementName) Tei.bodyParser(Xml.required(parser)) else parser
-  } yield result
-
 
   private def isMentions(element: Elem): Boolean =
     (element.label == "p") && element.attributeOption("rendition").contains("mentions")

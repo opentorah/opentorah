@@ -1,6 +1,6 @@
 package org.digitaljudaica.archive.collector.reference
 
-import org.digitaljudaica.tei.Entity
+import org.digitaljudaica.reference.Entity
 import org.digitaljudaica.xml.{ContentType, Parser, Xml}
 import scala.xml.Elem
 

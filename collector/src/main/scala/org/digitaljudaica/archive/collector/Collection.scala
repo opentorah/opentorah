@@ -152,7 +152,7 @@ object Collection {
     layout: Layout,
     directory: File
   ): Collection =
-    From.file(directory, layout.collectionFileName).parseDo(parser(layout, directory))
+    Parser.parseDo(From.file(directory, layout.collectionFileName).parse(ContentType.Elements, parser(layout, directory)))
 
   private def parser(
     layout: Layout,

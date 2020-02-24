@@ -1,19 +1,20 @@
 package org.digitaljudaica.archive.collector.reference
 
 import org.digitaljudaica.archive.collector.Errors
-import org.digitaljudaica.tei.Entity
+import org.digitaljudaica.reference.Entity
 import scala.xml.{Elem, Node}
 
 final case class Reference(
   source: ReferenceSource,
-  entity: Entity,
-  name: Seq[Node],
-  id: Option[String],
-  role: Option[String],
-  ref: Option[String]
+  reference: org.digitaljudaica.reference.Reference
 ) {
-
   override def toString: String = source.toString
+
+  def entity: Entity = reference.entity
+  def name: Seq[Node] = reference.name
+  def id: Option[String] = reference.id
+  def role: Option[String] = reference.role
+  def ref: Option[String] = reference.ref
 
   def check(names: Names, errors: Errors): Unit = {
     ref.fold(errors.error(s"Missing 'ref' attribute: Name>$name< ($source)")) { ref =>
@@ -31,12 +32,9 @@ final case class Reference(
 }
 
 object Reference {
-  def apply(source: ReferenceSource, teiReference: org.digitaljudaica.tei.Reference): Reference = new Reference(
+  // TODO unfold
+  def apply(source: ReferenceSource, teiReference: org.digitaljudaica.reference.Reference): Reference = new Reference(
     source,
-    teiReference.entity,
-    teiReference.name,
-    teiReference.id,
-    teiReference.role,
-    teiReference.ref
+    teiReference
   )
 }
