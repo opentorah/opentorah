@@ -1,14 +1,15 @@
 package org.digitaljudaica.tei
 
-import java.io.File
+import org.digitaljudaica.reference.Reference
+import org.digitaljudaica.xml.{ContentType, Descriptor}
 import org.digitaljudaica.xml.Ops._
-import org.digitaljudaica.xml.{From, Parser, Xml}
+
 import scala.xml.{Elem, Node}
 
 // TODO rework by introducing various TEI-related classes (TitleStmt etc.)
 final case class Tei(
   teiHeader: TeiHeader,
-  body: Elem
+  text: Text
 ) {
   private val titleStmt = teiHeader.fileDesc.titleStmt
 
@@ -25,41 +26,29 @@ final case class Tei(
   private val languages: Seq[Elem] = langUsage.fold[Seq[Elem]](Seq.empty)(_.elems("language"))
   val languageIdents: Seq[String] = languages.map(_.getAttribute("ident"))
 
-  val pbs: Seq[Pb] = Pb.descendants(body)
+  val body: Body = text.body
+  val pbs: Seq[Pb] = Pb.descendants(body.xml)
 
   def references: Seq[Reference] = (
     titleStmt.toSeq.map(_.xml) ++ getAbstract.toSeq ++
     teiHeader.profileDesc.toSeq.flatMap(_.correspDesc.toSeq).map(_.xml) ++
-    Seq(body)
+    Seq(body.xml)
   ).flatMap(Reference.all)
 
   /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
 }
 
-object Tei {
-
-  val elementName: String = "TEI"
-
-  val parser: Parser[Tei] = for {
-    _ <- Xml.checkName(elementName)
+object Tei extends Descriptor[Tei](
+  elementName = "TEI",
+  contentType = ContentType.Elements,
+  contentParser = for {
     teiHeader <- TeiHeader.required
-    body <- Xml.required("text", for {
-      lang <- Xml.attribute.optional("xml:lang")
-      result <- Xml.required("body")
-    } yield result) // TODO unfold Xml.element!
+    text <- Text.required
   } yield new Tei(
     teiHeader,
-    body
+    text
   )
-
-  def load(directory: File, fileName: String): Tei =
-    From.file(directory, fileName).parseDo(parser)
-
-  def bodyParser[A](parser: Parser[A]): Parser[A] = for {
-    _ <- Xml.checkName(elementName)
-    _ <- Xml.required("teiHeader", Xml.all)
-    result <- Xml.required("text", Xml.required("body", parser))
-  } yield result
+) {
 
   def tei(head: Option[Node], content: Seq[Node]): Elem =
     <TEI xmlns="http://www.tei-c.org/ns/1.0">

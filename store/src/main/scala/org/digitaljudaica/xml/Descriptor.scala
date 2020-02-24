@@ -16,9 +16,12 @@ abstract class Descriptor[A](
   final def all: Parser[Seq[A]] =
     Xml.all(elementName, contentType, contentParser)
 
-  final def fromXml(xml: Elem): A =
-    From.xml(xml).parseDo(contentType, Xml.withName(elementName, contentParser))
+  final def parse(from: From): Parser[A] =
+    from.parse(contentType, Xml.withName(elementName, contentParser))
 
+  // TODO move elsewhere
   final def descendants(xml: Elem): Seq[A] =
-    org.digitaljudaica.xml.Ops.descendants(xml, elementName).map(fromXml)
+    org.digitaljudaica.xml.Ops.descendants(xml, elementName).map( xml =>
+      Parser.parseDo(parse(From.xml(xml)))
+    )
 }

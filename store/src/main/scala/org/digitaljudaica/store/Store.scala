@@ -25,7 +25,7 @@ final class TextStore(
   private var textCache: Option[Elem] = None
 
   def text: Elem = {
-    if (textCache.isEmpty) textCache = Some(From.file(new File(url), s"$name.xml").loadDo)
+    if (textCache.isEmpty) textCache = Some(Parser.run(From.file(new File(url), s"$name.xml").load))
     textCache.get
   }
 

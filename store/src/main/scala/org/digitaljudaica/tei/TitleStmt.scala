@@ -5,5 +5,4 @@ import scala.xml.Elem
 
 final case class TitleStmt(xml: Elem)
 
-object TitleStmt
-  extends DescriptorRaw[TitleStmt]("titleStmt", xml => new TitleStmt(xml))
+object TitleStmt extends DescriptorRaw[TitleStmt]("titleStmt", new TitleStmt(_))

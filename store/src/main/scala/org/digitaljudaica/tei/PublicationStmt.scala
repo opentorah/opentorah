@@ -5,5 +5,4 @@ import scala.xml.Elem
 
 final case class PublicationStmt(xml: Elem)
 
-object PublicationStmt
-  extends DescriptorRaw[PublicationStmt]("publicationStmt", xml => new PublicationStmt(xml))
+object PublicationStmt extends DescriptorRaw[PublicationStmt]("publicationStmt", new PublicationStmt(_))

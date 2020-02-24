@@ -1,13 +1,13 @@
 package org.digitaljudaica.store
 
-import org.digitaljudaica.xml.{ContentType, From}
+import org.digitaljudaica.xml.{ContentType, From, Parser}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 final class StoreTest extends AnyFlatSpec with Matchers {
 
   "Store.parser" should "work" ignore {
-    val result = From.resource(Store, "store").parseOrError(ContentType.Mixed, Store.parser(Set.empty))
+    val result = Parser.parseOrError(From.resource(Store, "store").parse( ContentType.Mixed, Store.parser(Set.empty)))
     println(result)
     result.isRight shouldBe true
     val store = result.right.get

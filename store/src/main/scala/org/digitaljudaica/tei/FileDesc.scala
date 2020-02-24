@@ -5,7 +5,7 @@ import org.digitaljudaica.xml.Descriptor
 final case class FileDesc(
   titleStmt: Option[TitleStmt],
   publicationStmt: PublicationStmt,
-  sourceDesc: SourceDesc
+  sourceDesc: Option[SourceDesc]
 )
 
 object FileDesc extends Descriptor[FileDesc](
@@ -13,7 +13,7 @@ object FileDesc extends Descriptor[FileDesc](
   contentParser = for {
     titleStmt <- TitleStmt.optional
     publicationStmt <- PublicationStmt.required
-    sourceDesc <- SourceDesc.required
+    sourceDesc <- SourceDesc.optional
   } yield new FileDesc(
     titleStmt,
     publicationStmt,

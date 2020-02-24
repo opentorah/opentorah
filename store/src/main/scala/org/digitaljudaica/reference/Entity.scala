@@ -1,6 +1,5 @@
-package org.digitaljudaica.tei
+package org.digitaljudaica.reference
 
-// TODO fold Name and Reference in here.
 sealed trait Entity {
   def element: String
   def nameElement: String

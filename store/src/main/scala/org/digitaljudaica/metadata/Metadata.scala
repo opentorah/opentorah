@@ -1,7 +1,7 @@
 package org.digitaljudaica.metadata
 
 import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{From, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, From, Parser, Xml}
 
 object Metadata {
 
@@ -19,7 +19,7 @@ object Metadata {
       result <- Xml.all(elementName, parser)
     } yield result
 
-    from.parseDo(Xml.withName(rootElementName.getOrElse("metadata"), wrappedParser))
+    Parser.parseDo(from.parse(ContentType.Elements, Xml.withName(rootElementName.getOrElse("metadata"), wrappedParser)))
   }
 
   def loadNames[K <: WithName](

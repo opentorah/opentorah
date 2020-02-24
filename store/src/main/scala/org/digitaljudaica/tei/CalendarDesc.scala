@@ -5,7 +5,4 @@ import scala.xml.Elem
 
 final case class CalendarDesc(xml: Elem)
 
-object CalendarDesc extends DescriptorRaw[CalendarDesc](
-  elementName = "calendarDesc",
-  create = xml => new CalendarDesc(xml)
-)
+object CalendarDesc extends DescriptorRaw[CalendarDesc]("calendarDesc", new CalendarDesc(_))

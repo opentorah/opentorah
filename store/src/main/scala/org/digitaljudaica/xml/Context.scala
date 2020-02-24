@@ -23,11 +23,11 @@ final private[xml] class Context {
   private def pop(): Unit =
     stack = stack.tail
 
-  private def checkIsEmpty(): Unit =
-    if (stack.nonEmpty) throw new IllegalStateException(s"Non-empty context $this!")
+  def isEmpty: Boolean =
+    stack.isEmpty
 
-  private def currentFrom: From =
-    stack.flatMap(_.from).head
+  private def currentFromUrl: Option[URL] =
+    stack.flatMap(_.from).head.url
 }
 
 private[xml] object Context {
@@ -43,19 +43,18 @@ private[xml] object Context {
   def liftContentModifier[A]: Content.Modifier[A] => Parser[A] =
     liftCurrentModifier[A] compose liftContentModifierToCurrentModifier[A]
 
-  private def liftCurrentToContext[A](f: Current => A): Context => A = (context: Context) => f(context.current)
+  private def liftCurrentToContext[A](f: Current => A): Context => A =
+    (context: Context) => f(context.current)
 
-  private def liftContentModifierToCurrentModifier[A](f: Content.Modifier[A]): Current.Modifier[A] = (current: Current) =>
-    f(current.content).map { case (content, result) => (current.copy(content = content), result) }
+  private def liftContentModifierToCurrentModifier[A](f: Content.Modifier[A]): Current.Modifier[A] =
+    (current: Current) =>
+      f(current.content).map { case (content, result) => (current.copy(content = content), result) }
 
-  def include[A](url: String, contentType: ContentType, parser: Parser[A]): Parser[A] = for {
-    _ <- checkNoLeftovers
-    currentFrom <- ZIO.access[Context](_.currentFrom)
-    from <- Parser.effect(From.url(currentFrom.url.fold(new URL(url))(new URL(_, url))))
-    result <- nested(from, contentType, parser)
-  } yield result
+  def currentFromUrl: Parser[Option[URL]] =
+    ZIO.access[Context](_.currentFromUrl)
 
   def nested[A](from: From, contentType: ContentType, parser: Parser[A]): Parser[A] = for {
+    _ <- checkNoLeftovers
     elem <- from.load
     result <- nested(Some(from), elem, contentType, parser)
   } yield result
@@ -67,25 +66,20 @@ private[xml] object Context {
     parser: Parser[A]
   ): Parser[A] = for {
     newCurrent <- Current.open(from, elem, contentType)
-    _ <- ZIO.access[Context](_.push(newCurrent))
-    result <- parser
-    _ <- checkNoLeftovers
-    _ <- ZIO.access[Context](_.pop())
+    result <- nested(newCurrent, parser)
   } yield result
 
-  private def checkNoLeftovers: Parser[Unit] =
-    ZIO.accessM(liftCurrentToContext(Current.checkNoLeftovers))
+  private def nested[A](newCurrent: Current, parser: Parser[A]): Parser[A] =
+    ZIO.access[Context](_.push(newCurrent)).bracket[Context, Error, A](
+      release = (_: Unit) => ZIO.access[Context](_.pop()),
+      use = (_: Unit) => for {
+        result <- parser
+        _ <- checkNoLeftovers
+      } yield result
+    )
 
-  def runnable[A](parser: Parser[A]): IO[Error, A] = {
-    val toRun: Parser[A] = for {
-      result <- parser
-      _ <- ZIO.access[Context](_.checkIsEmpty())
-    } yield result
-
-    val result: Parser[A] = toRun.flatMapError(error => for {
-      contextStr <- ZIO.access[Context](_.toString)
-    } yield error + "\n" + contextStr)
-
-    result.provide(new Context)
-  }
+  private def checkNoLeftovers: Parser[Unit] = for {
+    isEmpty <- ZIO.access[Context](_.isEmpty)
+    _ <- if (isEmpty) IO.succeed(()) else ZIO.accessM(liftCurrentToContext(Current.checkNoLeftovers))
+  } yield ()
 }

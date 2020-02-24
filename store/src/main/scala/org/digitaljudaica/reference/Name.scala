@@ -1,4 +1,4 @@
-package org.digitaljudaica.tei
+package org.digitaljudaica.reference
 
 import org.digitaljudaica.xml.{Parser, Xml}
 import scala.xml.Elem

@@ -5,7 +5,4 @@ import scala.xml.Elem
 
 final case class Abstract(xml: Elem)
 
-object Abstract extends DescriptorRaw[Abstract](
-  elementName = "abstract",
-  create = xml => new Abstract(xml)
-)
+object Abstract extends DescriptorRaw[Abstract]("abstract", new Abstract(_))

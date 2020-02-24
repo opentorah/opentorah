@@ -15,25 +15,8 @@ sealed abstract class From {
 
   def load: IO[Error, Elem]
 
-  final def loadDo: Elem = Parser.run(load)
-
   def parse[A](contentType: ContentType, parser: Parser[A]): Parser[A] =
     Context.nested(From.this, contentType, parser)
-
-  def parse[A](parser: Parser[A]): Parser[A] =
-    parse(ContentType.Elements, parser)
-
-  def parseOrError[A](contentType: ContentType, parser: Parser[A]): Either[Error, A] =
-    Parser.run(Context.runnable(parse(contentType, parser)).either)
-
-  def parseOrError[A](parser: Parser[A]): Either[Error, A] =
-    parseOrError(ContentType.Elements, parser)
-
-  def parseDo[A](contentType: ContentType, parser: Parser[A]): A =
-    Parser.run(Context.runnable(parse(contentType, parser)))
-
-  def parseDo[A](parser: Parser[A]): A =
-    parseDo(ContentType.Elements, parser)
 }
 
 object From {

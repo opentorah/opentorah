@@ -1,7 +1,6 @@
-package org.digitaljudaica.tei
+package org.digitaljudaica.reference
 
 import org.digitaljudaica.xml.{ContentType, From, Ops, Parser, Xml}
-
 import scala.xml.{Elem, Node}
 
 final case class Reference(
@@ -10,18 +9,15 @@ final case class Reference(
   id: Option[String],
   role: Option[String],
   ref: Option[String]
-) {
-
-  def toXml: Elem =
-    <name ref={ref.orNull} xml:id={id.orNull} role={role.orNull}>{name}</name>
-      .copy(label = entity.nameElement)
-}
+)
 
 object Reference {
+
+  // TODO ZIOize
   def apply(
     entity: Entity,
     xml: Elem
-  ): Reference = From.xml(xml).parseDo(ContentType.Mixed, parser(entity))
+  ): Reference = Parser.parseDo(From.xml(xml).parse(ContentType.Mixed, parser(entity)))
 
   private def parser(
     entity: Entity,

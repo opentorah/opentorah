@@ -5,7 +5,4 @@ import scala.xml.Elem
 
 final case class CorrespDesc(xml: Elem)
 
-object CorrespDesc extends DescriptorRaw[CorrespDesc](
-  "correspDesc",
-  xml => new CorrespDesc(xml)
-)
+object CorrespDesc extends DescriptorRaw[CorrespDesc]("correspDesc", new CorrespDesc(_))

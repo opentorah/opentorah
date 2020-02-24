@@ -1,5 +1,8 @@
 package org.digitaljudaica.xml
 
+import java.net.URL
+import zio.IO
+
 import scala.xml.{Elem, Node}
 
 object Xml {
@@ -21,9 +24,13 @@ object Xml {
     withInclude("include", ContentType.Elements, parser)
 
   def withInclude[A](attributeName: String, contentType: ContentType, parser: Parser[A]): Parser[A] = for {
-    name <- name
     url <- attribute.optional(attributeName)
-    result <- url.fold(parser)(Context.include(_, contentType, withName(name, parser)))
+    result <- url.fold(parser) { url => for {
+      name <- name
+      currentFromUrl <- Context.currentFromUrl
+      from <- Parser.effect(From.url(currentFromUrl.fold(new URL(url))(new URL(_, url))))
+      result <- nested(from, contentType, withName(name, parser))
+    } yield result}
   } yield result
 
   object attribute {
@@ -35,7 +42,7 @@ object Xml {
         apply("xml:id")
 
       def boolean(name: String): Parser[Option[Boolean]] =
-        convert(name, resultO => Parser.succeed(resultO.map(value => value == "true" || value == "yes")))
+        convert(name, resultO => IO.succeed(resultO.map(value => value == "true" || value == "yes")))
 
       def int(name: String): Parser[Option[Int]] =
         convert(name, resultO => Parser.effect(resultO.map(_.toInt)))
@@ -93,7 +100,7 @@ object Xml {
 
   def optional(name: String): Parser[Option[Elem]] = for {
     has <- nextNameIs(name)
-    result <- if (!has) Parser.succeed(None) else optional
+    result <- if (!has) IO.succeed(None) else optional
   } yield result
 
   def required(name: String): Parser[Elem] =
@@ -126,7 +133,7 @@ object Xml {
   private def optional[A](name: Option[String], contentType: ContentType, parser: Parser[A]): Parser[Option[A]] = for {
     nextElementName <- nextName
     hasNext = name.fold(nextElementName.isDefined)(nextElementName.contains)
-    result <- if (!hasNext) Parser.succeed(None) else for {
+    result <- if (!hasNext) IO.succeed(None) else for {
       next <- required
       result <- Context.nested(None, next, contentType, parser)
     } yield Some(result)
@@ -149,7 +156,7 @@ object Xml {
 
   private def all[A](name: Option[String], contentType: ContentType, parser: Parser[A]): Parser[Seq[A]] = for {
     headOption <- optional(name, contentType, parser)
-    tail <- if (headOption.isEmpty) Parser.succeed(Seq.empty[A]) else all(name, contentType, parser)
+    tail <- if (headOption.isEmpty) IO.succeed(Seq.empty[A]) else all(name, contentType, parser)
     result = headOption.toSeq ++ tail
   } yield result
 
@@ -160,4 +167,10 @@ object Xml {
     val required: Parser[String] =
       Parser.required("text", optional)
   }
+
+  def nested[A](name: String, xml: Elem, contentType: ContentType, parser: Parser[A]): Parser[A] =
+    nested(From.xml(name, xml), contentType, parser)
+
+  def nested[A](from: From, contentType: ContentType, parser: Parser[A]): Parser[A] =
+    Context.nested(from, contentType, parser)
 }
