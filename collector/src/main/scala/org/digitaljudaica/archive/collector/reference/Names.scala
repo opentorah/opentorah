@@ -65,14 +65,11 @@ object Names {
   ): Parser[Names] = for {
     reference <- Xml.required("head", ContentType.Text, Xml.text.required)
     listDescriptors <- Xml.all(NamesList.parser)
-    teiNamedResults <-
-      ZIO.collectAll(Files.filesWithExtensions(directory, extension = "xml").sorted.map(fileName =>
+    teiNamedResults <- ZIO.collectAll(Files.filesWithExtensions(directory, extension = "xml").sorted.map(fileName =>
         From.file(directory, fileName).parse(org.digitaljudaica.reference.Named.parser(fileName)).either))
-    teiNameds <- {
-      val errors: Seq[Error] = teiNamedResults.flatMap(_.left.toOption)
-      val results: Seq[org.digitaljudaica.reference.Named] = teiNamedResults.flatMap(_.right.toOption)
-      if (errors.nonEmpty) IO.fail(errors.mkString("--", "\n--", "")) else IO.succeed(results)
-    }
+    errors: Seq[Error] = teiNamedResults.flatMap(_.left.toOption)
+    results: Seq[org.digitaljudaica.reference.Named] = teiNamedResults.flatMap(_.right.toOption)
+    teiNameds <- if (errors.nonEmpty) IO.fail(errors.mkString("--", "\n--", "")) else IO.succeed(results)
   } yield new Names(
     layout,
     reference,
