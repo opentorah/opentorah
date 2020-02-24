@@ -3,7 +3,7 @@ package org.digitaljudaica.archive.collector
 import java.io.File
 import org.digitaljudaica.archive.collector.reference.Reference
 import org.digitaljudaica.util.{Collections, Files}
-import org.digitaljudaica.xml.{ContentType, From, Ops, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, From, XmlUtil, Parser, Xml}
 import Table.Column
 import scala.xml.{Elem, Node, Text}
 
@@ -152,7 +152,7 @@ object Collection {
     layout: Layout,
     directory: File
   ): Collection =
-    Parser.parseDo(From.file(directory, layout.collectionFileName).parse(ContentType.Elements, parser(layout, directory)))
+    Parser.parseDo(From.file(directory, layout.collectionFileName).parse(parser(layout, directory)))
 
   private def parser(
     layout: Layout,
@@ -184,7 +184,7 @@ object Collection {
 
   private def table(layout: Layout): Table[Document] = new Table[Document](
     Column("Описание", "description", { document: Document =>
-      document.description.fold[Seq[Node]](Text(""))(description => Ops.removeNamespace(description).child)
+      document.description.fold[Seq[Node]](Text(""))(_.map(XmlUtil.removeNamespace))
     }),
 
     Column("Дата", "date", { document: Document =>
@@ -192,7 +192,7 @@ object Collection {
     }),
 
     Column("Кто", "author", { document: Document =>
-      document.author.fold[Seq[Node]](Text(""))(author => multi(Ops.removeNamespace(author).child))
+      multi(document.authors.flatMap(author => XmlUtil.removeNamespace(author).child))
     }),
 
     Column("Кому", "addressee",  _.addressee.fold[Seq[Node]](Text(""))(addressee =>
@@ -218,7 +218,7 @@ object Collection {
     }),
 
     Column("Расшифровка", "transcriber", { document: Document =>
-      multi(document.transcribers.map(transcriber => Ops.removeNamespace(transcriber)))
+      multi(document.transcribers.map(XmlUtil.removeNamespace))
     })
   )
 

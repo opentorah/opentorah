@@ -3,7 +3,7 @@ package org.digitaljudaica.archive.collector.reference
 import org.digitaljudaica.archive.collector.Layout
 import org.digitaljudaica.reference.{Entity, Name}
 import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.Ops._
+import org.digitaljudaica.xml.XmlUtil
 import scala.xml.{Elem, Node, Text}
 
 final class Named(
@@ -47,7 +47,7 @@ final class Named(
 object Named {
 
   private def isMentions(element: Elem): Boolean =
-    (element.label == "p") && element.attributeOption("rendition").contains("mentions")
+    (element.label == "p") && XmlUtil.hasAttribute(element, "rendition", "mentions")
 
   private def mentions(references: Seq[Reference], toList: Elem): Elem = {
     val fromNames: Seq[Reference] = references.filter(_.source.isNames)
