@@ -6,9 +6,9 @@ import org.scalatest.matchers.should.Matchers
 final class XmlTest extends AnyFlatSpec with Matchers {
 
   "text parsing" should "work" in {
-    Parser.parseOrError(From.xml(<s><a>asdjkh</a></s>).parse(ContentType.Elements,
+    Parser.parseOrError(From.xml(<s><a>asdjkh</a></s>).parse(
       Xml.required("a", ContentType.Elements, Xml.text.optional))).isLeft shouldBe true
-    Parser.parseDo(From.xml(<s><a>asdjkh</a></s>).parse(ContentType.Elements,
+    Parser.parseDo(From.xml(<s><a>asdjkh</a></s>).parse(
       Xml.required("a", ContentType.Text, Xml.text.required))) shouldBe "asdjkh"
   }
 
@@ -20,9 +20,9 @@ final class XmlTest extends AnyFlatSpec with Matchers {
     Xml.withName("x", Xml.required("name", ContentType.Text, Xml.text.required))
 
   "Include" should "work" in {
-    Parser.parseDo(From.resource(Parser, "2").parse(ContentType.Elements,
+    Parser.parseDo(From.resource(Parser, "2").parse(
       file2parser)) shouldBe "X"
-    Parser.parseDo(From.resource(Parser, "1").parse(ContentType.Elements,
+    Parser.parseDo(From.resource(Parser, "1").parse(
       Xml.withInclude("to", ContentType.Elements, file2parser))) shouldBe "X"
   }
 }

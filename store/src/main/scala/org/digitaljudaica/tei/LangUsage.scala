@@ -1,8 +1,16 @@
 package org.digitaljudaica.tei
 
-import org.digitaljudaica.xml.DescriptorRaw
-import scala.xml.Elem
+import org.digitaljudaica.xml.Descriptor
 
-final case class LangUsage(xml: Elem)
+final case class LangUsage(
+  languages: Seq[Language]
+)
 
-object LangUsage extends DescriptorRaw[LangUsage]("langUsage", new LangUsage(_))
+object LangUsage extends Descriptor[LangUsage](
+  elementName = "langUsage",
+  contentParser = for {
+    languages <- Language.all
+  } yield new LangUsage(
+    languages
+  )
+)

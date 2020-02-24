@@ -1,7 +1,7 @@
 package org.digitaljudaica.reference
 
 import org.digitaljudaica.tei.Tei
-import org.digitaljudaica.xml.{ContentType, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, XmlUtil, Parser, Xml}
 import scala.xml.Elem
 
 final case class Named private(
@@ -32,7 +32,7 @@ object Named {
     id,
     role,
     names,
-    content = content.map(elem => org.digitaljudaica.xml.Ops.removeNamespace(elem)),
+    content = content.map(XmlUtil.removeNamespace),
   )
 
   private def unwrapTei(parser: Parser[Named]): Parser[Named] = for {

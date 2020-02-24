@@ -8,9 +8,6 @@ final private[xml] class Context {
 
   private var stack: List[Current] = List.empty
 
-  override def toString: String =
-    stack.mkString("\n")
-
   private def current: Current =
     stack.head
 
@@ -28,6 +25,9 @@ final private[xml] class Context {
 
   private def currentFromUrl: Option[URL] =
     stack.flatMap(_.from).head.url
+
+  private def currentToString: String =
+    stack.headOption.map(_.toString).getOrElse("")
 }
 
 private[xml] object Context {
@@ -72,11 +72,15 @@ private[xml] object Context {
   private def nested[A](newCurrent: Current, parser: Parser[A]): Parser[A] =
     ZIO.access[Context](_.push(newCurrent)).bracket[Context, Error, A](
       release = (_: Unit) => ZIO.access[Context](_.pop()),
-      use = (_: Unit) => for {
+      use = (_: Unit) => addErrorTrace(for {
         result <- parser
         _ <- checkNoLeftovers
-      } yield result
+      } yield result)
     )
+
+  private def addErrorTrace[A](parser: Parser[A]): Parser[A] = parser.flatMapError(error => for {
+    contextStr <- ZIO.access[Context](_.currentToString)
+  } yield error + "\n" + contextStr)
 
   private def checkNoLeftovers: Parser[Unit] = for {
     isEmpty <- ZIO.access[Context](_.isEmpty)

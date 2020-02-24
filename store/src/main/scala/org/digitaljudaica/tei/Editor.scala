@@ -1,6 +1,6 @@
 package org.digitaljudaica.tei
 
-import org.digitaljudaica.xml.Ops._
+import org.digitaljudaica.xml.{Descriptor, Xml}
 import scala.xml.Elem
 
 final case class Editor(
@@ -8,11 +8,13 @@ final case class Editor(
   persName: Option[Elem]
 )
 
-object Editor {
-
-  // TODO rework with From/Parser
-  def apply(xml: Elem): Editor = new Editor(
-    role = xml.attributeOption("role"),
-    persName = xml.optionalChild("persName")
+object Editor extends Descriptor[Editor](
+  elementName = "editor",
+  contentParser = for {
+    role <- Xml.attribute.optional("role")
+    persName <- Xml.optional("persName")
+  } yield new Editor(
+    role,
+    persName
   )
-}
+)

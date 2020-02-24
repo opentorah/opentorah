@@ -12,6 +12,8 @@ class DescriptorRaw[A](
   final val optional: Parser[Option[A]] =
     Xml.optional(elementName).map(_.map[A](fromXml))
 
+  final def all: Parser[Seq[A]] =
+    Xml.all(elementName).map[Seq[A]](_.map(xml => fromXml(xml)))
+
   private def fromXml(xml: Elem): A = create(xml)
-  // TODO add all()
 }

@@ -19,7 +19,7 @@ object Metadata {
       result <- Xml.all(elementName, parser)
     } yield result
 
-    Parser.parseDo(from.parse(ContentType.Elements, Xml.withName(rootElementName.getOrElse("metadata"), wrappedParser)))
+    Parser.parseDo(from.parse(Xml.withName(rootElementName.getOrElse("metadata"), wrappedParser)))
   }
 
   def loadNames[K <: WithName](

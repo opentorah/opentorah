@@ -1,6 +1,6 @@
 package org.digitaljudaica.reference
 
-import org.digitaljudaica.xml.{ContentType, From, Ops, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, From, XmlUtil, Parser, Xml}
 import scala.xml.{Elem, Node}
 
 final case class Reference(
@@ -35,8 +35,8 @@ object Reference {
     ref
   )
 
-  def all(xml: Elem): Seq[Reference] = for {
+  def all(xml: Node): Seq[Reference] = for {
     entity <- Entity.values
-    elem <- Ops.descendants(xml, entity.nameElement)
+    elem <- XmlUtil.descendants(xml, entity.nameElement)
   } yield Reference(entity, elem)
 }

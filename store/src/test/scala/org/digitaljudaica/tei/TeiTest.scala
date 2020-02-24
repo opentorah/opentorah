@@ -1,7 +1,7 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.reference.Named
-import org.digitaljudaica.xml.{ContentType, From, Parser}
+import org.digitaljudaica.xml.{From, Parser}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -14,7 +14,7 @@ final class TeiTest extends AnyFlatSpec with Matchers {
 
   "Named parsing" should "work" in {
     val result: Named = Parser.parseDo(
-      From.resource(Tei, "Баал_Шем_Тов").parse(ContentType.Elements, Named.parser("Баал_Шем_Тов")))
+      From.resource(Tei, "Баал_Шем_Тов").parse(Named.parser("Баал_Шем_Тов")))
 
     result.role shouldBe Some("jew")
     result.names.head.name shouldBe "Израиль из Мезбича"

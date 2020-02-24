@@ -3,20 +3,32 @@ package org.digitaljudaica.tei
 import org.digitaljudaica.xml.Descriptor
 
 final case class FileDesc(
-  titleStmt: Option[TitleStmt],
+  titleStmt: TitleStmt,
+  editionStmt: Option[EditionStmt],
+  extent: Option[Extent],
   publicationStmt: PublicationStmt,
-  sourceDesc: Option[SourceDesc]
+  seriesStmt: Option[SeriesStmt],
+  notesStmt: Option[NotesStmt],
+  sourceDesc: SourceDesc
 )
 
 object FileDesc extends Descriptor[FileDesc](
   elementName = "fileDesc",
   contentParser = for {
-    titleStmt <- TitleStmt.optional
+    titleStmt <- TitleStmt.required
+    editionStmt <- EditionStmt.optional
+    extent <- Extent.optional
     publicationStmt <- PublicationStmt.required
-    sourceDesc <- SourceDesc.optional
+    seriesStmt <- SeriesStmt.optional
+    notesStmt <- NotesStmt.optional
+    sourceDesc <- SourceDesc.required
   } yield new FileDesc(
     titleStmt,
+    editionStmt,
+    extent,
     publicationStmt,
+    seriesStmt,
+    notesStmt,
     sourceDesc
   )
 )

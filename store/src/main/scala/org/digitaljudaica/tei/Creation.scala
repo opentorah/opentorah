@@ -1,8 +1,20 @@
 package org.digitaljudaica.tei
 
-import org.digitaljudaica.xml.DescriptorRaw
-import scala.xml.Elem
+import org.digitaljudaica.xml.{Descriptor, Xml}
+import scala.xml.Node
 
-final case class Creation(xml: Elem)
+final case class Creation(
+  date: Date,
+  xml: Seq[Node]
+)
 
-object Creation extends DescriptorRaw[Creation]("creation", new Creation(_))
+object Creation extends Descriptor[Creation](
+  elementName = "creation",
+  contentParser = for {
+    date <- Date.required
+    xml <- Xml.allNodes
+  } yield new Creation(
+    date,
+    xml
+  )
+)

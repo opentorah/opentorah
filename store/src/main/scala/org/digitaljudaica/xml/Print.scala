@@ -1,13 +1,13 @@
 package org.digitaljudaica.xml
 
 import java.io.{File, FileWriter, OutputStream, OutputStreamWriter, PrintWriter, Writer}
-import scala.xml.{Elem, Node, PrettyPrinter}
+import scala.xml.{Elem, Node}
 
 object Print {
 
   private val width = 120
 
-  private val prettyPrinter: PrettyPrinter = new PrettyPrinter(width, 2) {
+  private val prettyPrinter: scala.xml.PrettyPrinter = new scala.xml.PrettyPrinter(width, 2) {
     // TODO: it seems that there is a bug in PrettyPrinter, but with this override uncommented stack overflows...
     //    override protected def makeBox(ind: Int, s: String): Unit =
     //      if (cur + s.length <= width) { // fits in this line; LMD: changed > to <=...

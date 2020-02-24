@@ -106,6 +106,13 @@ object Xml {
   def required(name: String): Parser[Elem] =
     Parser.required(s"element $name", optional(name))
 
+  def all(name: String): Parser[Seq[Elem]] = for {
+    headOption <- optional(name)
+    tail <- if (headOption.isEmpty) IO.succeed(Seq.empty[Elem]) else all(name)
+    result = headOption.toSeq ++ tail
+  } yield result
+
+
   def required[A](name: String, contentType: ContentType, parser: Parser[A]): Parser[A] =
     Parser.required(s"element '$name'", optional(name, contentType, parser))
 

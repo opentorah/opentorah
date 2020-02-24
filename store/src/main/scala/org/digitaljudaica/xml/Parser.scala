@@ -24,12 +24,8 @@ object Parser {
       _ <- if (isEmpty) IO.succeed(()) else throw new IllegalStateException(s"Non-empty context $this!")
     } yield result
 
-    addErrorTrace(result).provide(new Context)
+    result.provide(new Context)
   }
-
-  private def addErrorTrace[A](parser: Parser[A]): Parser[A] = parser.flatMapError(error => for {
-    contextStr <- ZIO.access[Context](_.toString)
-  } yield error + "\n" + contextStr)
 
   // TODO move into non-Parser-related class (or util package?) for reuse (in 'collector' etc.)
 

@@ -17,6 +17,9 @@ sealed abstract class From {
 
   def parse[A](contentType: ContentType, parser: Parser[A]): Parser[A] =
     Context.nested(From.this, contentType, parser)
+
+  def parse[A](parser: Parser[A]): Parser[A] =
+    Context.nested(From.this, ContentType.Elements, parser)
 }
 
 object From {

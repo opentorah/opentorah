@@ -3,26 +3,30 @@ package org.digitaljudaica.tei
 import org.digitaljudaica.xml.Descriptor
 
 final case class ProfileDesc(
-  langUsage: Option[LangUsage],
-  calendarDesc: Option[CalendarDesc],
-  correspDesc: Option[CorrespDesc],
+  documentAbstract: Option[Abstract],
   creation: Option[Creation],
-  documentAbstract: Option[Abstract]
+  langUsage: Option[LangUsage],
+  textClass: Option[TextClass],
+  correspDesc: Option[CorrespDesc],
+  calendarDesc: Option[CalendarDesc]
 )
 
 object ProfileDesc extends Descriptor[ProfileDesc](
   elementName = "profileDesc",
   contentParser = for {
+    // TODO the order is wrong; once I can write TEI XML decently, re-order in the existing documents:
     langUsage <- LangUsage.optional
     calendarDesc <- CalendarDesc.optional
     creation <- Creation.optional
     documentAbstract <- Abstract.optional
+    textClass <- TextClass.optional
     correspDesc <- CorrespDesc.optional
   } yield new ProfileDesc(
-    langUsage,
-    calendarDesc,
-    correspDesc,
+    documentAbstract,
     creation,
-    documentAbstract
+    langUsage,
+    textClass,
+    correspDesc,
+    calendarDesc
   )
 )
