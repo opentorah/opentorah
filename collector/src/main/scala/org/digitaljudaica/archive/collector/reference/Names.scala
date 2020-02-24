@@ -59,7 +59,7 @@ final class Names private(
 object Names {
 
   def apply(directory: File, layout: Layout): Names =
-    Parser.parseDo(From.file(layout.docs, layout.namesListsFileName).parse(ContentType.Elements,
+    Parser.parseDo(From.file(layout.docs, layout.namesListsFileName).parse(
       Xml.withName("names", parser(directory, layout))))
 
   private def parser(
@@ -70,8 +70,7 @@ object Names {
     listDescriptors <- Xml.all(NamesList.parser)
     teiNamedResults <-
       ZIO.collectAll(Files.filesWithExtensions(directory, extension = "xml").sorted.map(fileName =>
-        From.file(directory, fileName).parse(ContentType.Elements,
-          org.digitaljudaica.reference.Named.parser(fileName)).either))
+        From.file(directory, fileName).parse(org.digitaljudaica.reference.Named.parser(fileName)).either))
     teiNameds <- {
       val errors: Seq[Error] = teiNamedResults.flatMap(_.left.toOption)
       val results: Seq[org.digitaljudaica.reference.Named] = teiNamedResults.flatMap(_.right.toOption)

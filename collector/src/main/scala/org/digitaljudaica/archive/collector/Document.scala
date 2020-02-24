@@ -5,7 +5,7 @@ import org.digitaljudaica.archive.collector.reference.{Reference, ReferenceSourc
 import org.digitaljudaica.reference.Entity
 import org.digitaljudaica.tei.Tei
 import org.digitaljudaica.xml.{From, Parser, Print}
-import scala.xml.Elem
+import scala.xml.{Elem, Node}
 
 final class Document(
   layout: Layout,
@@ -27,17 +27,17 @@ final class Document(
 
   override def url: String = layout.documentUrl(collection.directoryName, name)
 
-  val (title: Option[Elem], subTitle: Option[Elem]) = (tei.getTitle("main"), tei.getTitle("sub"))
+  val title: Option[Seq[Node]] = tei.titleStmt.titles.headOption.map(_.content)
 
-  def author: Option[Elem] = tei.author
+  def authors: Seq[Elem] = tei.titleStmt.authors.map(_.xml)
 
-  def transcribers: Seq[Elem] = tei.editors.filter(_.role.contains("transcriber")).flatMap(_.persName)
+  def transcribers: Seq[Elem] = tei.titleStmt.editors.filter(_.role.contains("transcriber")).flatMap(_.persName)
 
-  def date: Option[String] = tei.date
+  def date: Option[String] = tei.teiHeader.profileDesc.flatMap(_.creation.map(_.date.when))
 
-  def description: Option[Elem] = tei.getAbstract.orElse(title)
+  def description: Option[Seq[Node]] = tei.getAbstract.map(_.child).orElse(title)
 
-  def language: Option[String] = tei.languageIdents.headOption
+  def language: Option[String] = tei.teiHeader.profileDesc.flatMap(_.langUsage).toSeq.flatMap(_.languages).map(_.ident).headOption
 
   val pages: Seq[Page] = for (pb <- tei.pbs) yield collection.pageType(
     n = pb.n,
