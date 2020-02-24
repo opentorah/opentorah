@@ -4,6 +4,7 @@ import Tanach.TanachBook
 import org.digitaljudaica.metadata.{Metadata, Names}
 import org.digitaljudaica.util.Collections
 import org.digitaljudaica.xml.{From, Parser, Xml}
+import zio.IO
 
 object TanachMetadata {
 
@@ -53,7 +54,7 @@ object TanachMetadata {
     val metadatas: Seq[TanachBookMetadata.Parsed] = Metadata.load(
       from = From.resource(Tanach),
       elementName = "book",
-      parser = Xml.withInclude("resource", bookParser)
+      parser = Xml.withInclude(bookParser)
     )
 
     // TODO check that there is only one name (default) for the Chumash book and that it is among the names of its first parsha
@@ -75,7 +76,7 @@ object TanachMetadata {
     result <- book match {
       case book: Tanach.ChumashBook => ChumashBookMetadata.parser(book, names, chapters)
       case book: Tanach.Psalms.type => PsalmsMetadata.parser(book, names, chapters)
-      case book: Tanach.NachBook =>  Parser.pure(new NachBookMetadata.Parsed(book, names, chapters))
+      case book: Tanach.NachBook => IO.succeed(new NachBookMetadata.Parsed(book, names, chapters))
     }
   } yield result
 

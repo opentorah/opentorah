@@ -4,6 +4,7 @@ import org.digitaljudaica.metadata.{LanguageSpec, Metadata, Names, WithNumber}
 import org.digitaljudaica.util.Collections
 import org.digitaljudaica.xml.{From, Parser, Xml}
 import org.podval.judaica.tanach.{Custom, Parsha, Tanach, WithBookSpans}
+import zio.IO
 
 final case class Haftarah private(override val spans: Seq[Haftarah.BookSpan])
   extends Haftarah.Spans(spans)
@@ -44,7 +45,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
   def parser(full: Boolean): Parser[Customs] = for {
     span <- spanParser
     hasParts <- Xml.nextNameIs("part")
-    parts <- if (!hasParts) Parser.pure(None) else partsParser(span).map(Some(_))
+    parts <- if (!hasParts) IO.succeed(None) else partsParser(span).map(Some(_))
     hasCustom <- Xml.nextNameIs("custom")
     customs <- Xml.all("custom", customParser(span)).map(customs => Custom.Of(customs, full = false))
   } yield {
@@ -64,7 +65,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
     n <- Xml.attribute.required("n")
     bookSpanParsed <- spanParser.map(_.inheritFrom(ancestorSpan))
     hasParts <- Xml.nextNameIs("part")
-    result <- if (!hasParts) Parser.pure[Haftarah](oneSpan(bookSpanParsed)) else partsParser(bookSpanParsed)
+    result <- if (!hasParts) IO.succeed[Haftarah](oneSpan(bookSpanParsed)) else partsParser(bookSpanParsed)
   } yield Custom.parse(n) -> result
 
   private def partsParser(ancestorSpan: BookSpanParsed): Parser[Haftarah] = for {
