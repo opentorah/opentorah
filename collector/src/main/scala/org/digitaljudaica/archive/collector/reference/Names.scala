@@ -2,8 +2,9 @@ package org.digitaljudaica.archive.collector.reference
 
 import java.io.File
 import org.digitaljudaica.archive.collector.{CollectionLike, Errors, Layout, Util}
-import org.digitaljudaica.xml.{ContentType, From, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, Error, From, Parser, Xml}
 import org.digitaljudaica.util.Files
+import zio.{IO, ZIO}
 
 import scala.xml.{Elem, Text}
 
@@ -11,20 +12,11 @@ final class Names private(
   directory: File,
   layout: Layout,
   override val reference: String,
+  teiNameds: Seq[org.digitaljudaica.reference.Named],
   listDescriptors: Seq[NamesList.Descriptor]
 ) extends CollectionLike {
 
-  val errors: Errors = new Errors
-  val nameds: Seq[Named] = {
-    for (fileName <- Files.filesWithExtensions(directory, extension = "xml").sorted) yield Named(
-      directory,
-      fileName,
-      container = this,
-      layout,
-      errors
-    )
-  }
-  errors.check()
+  val nameds: Seq[Named] = for (teiNamed <- teiNameds) yield new Named(teiNamed, container = this, layout)
 
   private val lists: Seq[NamesList] = listDescriptors.map(_.fillOut(nameds))
 
@@ -33,6 +25,7 @@ final class Names private(
   def findByRef(ref: String): Option[Named] = nameds.find(_.id == ref)
 
   def processReferences(documentReferences: Seq[Reference]): Unit = {
+    val errors: Errors = new Errors
     val references: Seq[Reference] = (this.references ++ documentReferences).filterNot(_.name == Text("?"))
     for (reference <- references) reference.check(this, errors)
     errors.check()
@@ -65,20 +58,30 @@ final class Names private(
 
 object Names {
 
+  def apply(directory: File, layout: Layout): Names =
+    Parser.parseDo(From.file(layout.docs, layout.namesListsFileName).parse(ContentType.Elements,
+      Xml.withName("names", parser(directory, layout))))
+
   private def parser(
     directory: File,
     layout: Layout,
   ): Parser[Names] = for {
     reference <- Xml.required("head", ContentType.Text, Xml.text.required)
     listDescriptors <- Xml.all(NamesList.parser)
+    teiNamedResults <-
+      ZIO.collectAll(Files.filesWithExtensions(directory, extension = "xml").sorted.map(fileName =>
+        From.file(directory, fileName).parse(ContentType.Elements,
+          org.digitaljudaica.reference.Named.parser(fileName)).either))
+    teiNameds <- {
+      val errors: Seq[Error] = teiNamedResults.flatMap(_.left.toOption)
+      val results: Seq[org.digitaljudaica.reference.Named] = teiNamedResults.flatMap(_.right.toOption)
+      if (errors.nonEmpty) IO.fail(errors.mkString("--", "\n--", "")) else IO.succeed(results)
+    }
   } yield new Names(
     directory,
     layout,
     reference,
+    teiNameds,
     listDescriptors
   )
-
-  def apply(directory: File, layout: Layout): Names =
-    From.file(layout.docs, layout.namesListsFileName)
-      .parseDo(Xml.withName("names", parser(directory, layout)))
 }
