@@ -1,7 +1,7 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-import org.digitaljudaica.xml.Print
+import org.digitaljudaica.xml.{From, Parser, Print, Xml}
 import org.digitaljudaica.archive.collector.reference.Names
 import scala.xml.{Elem, Text}
 
@@ -29,9 +29,16 @@ object Main {
     writeCollectionsTree(collectionsSorted, layout)
     writeIndex(collectionsSorted, layout)
 
+    println("Reading names.")
+    val names: Names =
+      Parser.parseDo(From.file(layout.docs, layout.namesListsFileName).parse(
+        Xml.withName("names", Names.parser(layout.namesDirectory, layout))))
+
     println("Processing name references.")
-    val names: Names = Names(layout.namesDirectory, layout)
-    names.processReferences(collections.flatMap(_.references))
+    names.addDocumentReferences(collections.flatMap(_.references))
+    names.checkReferences()
+    names.writeNames(layout.namesDirectory)
+    names.writeList(layout.namesFileDirectory, layout.namesFileName, layout)
   }
 
   private def writeIndex(collections: Seq[Collection], layout: Layout): Unit = Util.writeTei(

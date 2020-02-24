@@ -1,15 +1,13 @@
 package org.digitaljudaica.archive.collector.reference
 
 import java.io.File
-import org.digitaljudaica.archive.collector.{CollectionLike, Errors, Layout, Util}
+import org.digitaljudaica.archive.collector.{CollectionLike, Layout, Util}
 import org.digitaljudaica.xml.{ContentType, Error, From, Parser, Xml}
 import org.digitaljudaica.util.Files
 import zio.{IO, ZIO}
-
 import scala.xml.{Elem, Text}
 
 final class Names private(
-  directory: File,
   layout: Layout,
   override val reference: String,
   teiNameds: Seq[org.digitaljudaica.reference.Named],
@@ -20,25 +18,28 @@ final class Names private(
 
   private val lists: Seq[NamesList] = listDescriptors.map(_.fillOut(nameds))
 
-  private val references: Seq[Reference] = nameds.flatMap(_.references)
-
   def findByRef(ref: String): Option[Named] = nameds.find(_.id == ref)
 
-  def processReferences(documentReferences: Seq[Reference]): Unit = {
-    val errors: Errors = new Errors
-    val references: Seq[Reference] = (this.references ++ documentReferences).filterNot(_.name == Text("?"))
-    for (reference <- references) reference.check(this, errors)
-    errors.check()
+  private var references: Seq[Reference] = null
 
-    // Individual names
-    for (named <- nameds) Util.writeTei(
-      directory,
-      fileName = named.id,
-      head = None,
-      content = named.toXml(references),
-      target = "namesViewer"
-    )
+  def addDocumentReferences(documentReferences: Seq[Reference]): Unit = {
+    references = (nameds.flatMap(_.references) ++ documentReferences).filterNot(_.name == Text("?"))
+  }
 
+  def checkReferences(): Unit = {
+    val errors: Seq[String] = references.flatMap(_.check(this))
+    if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
+  }
+
+  def writeNames(directory: File): Unit = for (named <- nameds) Util.writeTei(
+    directory,
+    fileName = named.id,
+    head = None,
+    content = named.toXml(references),
+    target = "namesViewer"
+  )
+
+  def writeList(directory: File, fileName: String, layout: Layout): Unit = {
     // List of all names
     val nonEmptyLists = lists.filterNot(_.isEmpty)
     val content: Seq[Elem] =
@@ -47,8 +48,8 @@ final class Names private(
         (for (list <- nonEmptyLists) yield list.toXml)
 
     Util.writeTei(
-      directory = layout.namesFileDirectory,
-      fileName = layout.namesFileName,
+      directory = directory,
+      fileName = fileName,
       head = Some(Text(reference)),
       content,
       target = "namesViewer"
@@ -58,11 +59,7 @@ final class Names private(
 
 object Names {
 
-  def apply(directory: File, layout: Layout): Names =
-    Parser.parseDo(From.file(layout.docs, layout.namesListsFileName).parse(
-      Xml.withName("names", parser(directory, layout))))
-
-  private def parser(
+  def parser(
     directory: File,
     layout: Layout,
   ): Parser[Names] = for {
@@ -77,7 +74,6 @@ object Names {
       if (errors.nonEmpty) IO.fail(errors.mkString("--", "\n--", "")) else IO.succeed(results)
     }
   } yield new Names(
-    directory,
     layout,
     reference,
     teiNameds,
