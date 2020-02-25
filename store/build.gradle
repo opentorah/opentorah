@@ -10,6 +10,7 @@ description = 'Digital Judaica Store'
 dependencies {
     implementation "org.scala-lang:scala-library:$scalaVersion"
     implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+    implementation "org.typelevel:paiges-core_$scalaVersionMajor:$paigesVersion"
 
     compile "dev.zio:zio_$scalaVersionMajor:$zioVersion"
 

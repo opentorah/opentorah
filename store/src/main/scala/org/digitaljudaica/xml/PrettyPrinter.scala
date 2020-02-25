@@ -1,8 +1,8 @@
 package org.digitaljudaica.xml
 
 import scala.collection.Seq
-import scala.xml.{Atom, Comment, EntityRef, Group, MinimizeMode, NamespaceBinding, Node, ProcInstr, Text,
-  TextBuffer, TopScope, Utility, XML}
+import scala.xml.{Atom, Comment, EntityRef, Group, MinimizeMode, NamespaceBinding, Node, ProcInstr,
+  Text, TextBuffer, TopScope, Utility, XML}
 
 /**
  * Class for pretty printing. After instantiating, you can use the
@@ -17,16 +17,26 @@ import scala.xml.{Atom, Comment, EntityRef, Group, MinimizeMode, NamespaceBindin
  *  @note   This class is not threadsafe and should not be accessed by
  *          multiple threads at the same time.
  */
+/*
+  It seems that there is a bug in PrettyPrinter, but with this override uncommented stack overflows...
+    override protected def makeBox(ind: Int, s: String): Unit =
+      if (cur + s.length <= width) { // fits in this line; LMD: changed > to <=...
+        items ::= Box(ind, s)
+        cur += s.length
+      } else try cut(s, ind) foreach (items ::= _) // break it up
+    catch { case _: BrokenException => makePara(ind, s) } // give up, para
+  }
+ */
 class PrettyPrinter(width: Int, step: Int, minimizeEmpty: Boolean) {
 
   def this(width: Int, step: Int) = this(width, step, minimizeEmpty = false)
 
-  val minimizeMode = if (minimizeEmpty) MinimizeMode.Always else MinimizeMode.Default
-  class BrokenException() extends java.lang.Exception
+  val minimizeMode: MinimizeMode.Value = if (minimizeEmpty) MinimizeMode.Always else MinimizeMode.Default
+  final class BrokenException() extends java.lang.Exception
 
-  class Item
+  sealed class Item
   case object Break extends Item {
-    override def toString() = "\\"
+    override def toString = "\\"
   }
   case class Box(col: Int, s: String) extends Item
   case class Para(s: String) extends Item
@@ -35,7 +45,7 @@ class PrettyPrinter(width: Int, step: Int, minimizeEmpty: Boolean) {
 
   protected var cur = 0
 
-  protected def reset() = {
+  protected def reset(): Unit = {
     cur = 0
     items = Nil
   }
@@ -71,26 +81,26 @@ class PrettyPrinter(width: Int, step: Int, minimizeEmpty: Boolean) {
   /**
    * Try to make indented box, if possible, else para.
    */
-  protected def makeBox(ind: Int, s: String) =
-    if (cur + s.length > width) { // fits in this line
+  protected def makeBox(ind: Int, s: String): Unit =
+    if (cur + s.length <= width) { // fits in this line   TODO: LMD: was '>' - by mistake?
       items ::= Box(ind, s)
       cur += s.length
     } else try cut(s, ind) foreach (items ::= _) // break it up
     catch { case _: BrokenException => makePara(ind, s) } // give up, para
 
   // dont respect indent in para, but afterwards
-  protected def makePara(ind: Int, s: String) = {
+  protected def makePara(ind: Int, s: String): Unit = {
     items = Break :: Para(s) :: Break :: items
     cur = ind
   }
 
   // respect indent
-  protected def makeBreak() = { // using wrapping here...
+  protected def makeBreak(): Unit = { // using wrapping here...
     items = Break :: items
     cur = 0
   }
 
-  protected def leafTag(n: Node) = {
+  protected def leafTag(n: Node): String = {
     def mkLeaf(sb: StringBuilder): Unit = {
       sb append '<'
       n nameToString sb
@@ -113,7 +123,7 @@ class PrettyPrinter(width: Int, step: Int, minimizeEmpty: Boolean) {
     (sbToString(mkStart), i)
   }
 
-  protected def endTag(n: Node) = {
+  protected def endTag(n: Node): String = {
     def mkEnd(sb: StringBuilder): Unit = {
       sb append "</"
       n nameToString sb
@@ -130,11 +140,11 @@ class PrettyPrinter(width: Int, step: Int, minimizeEmpty: Boolean) {
     n.child forall isLeaf
   }
 
-  protected def fits(test: String) =
+  protected def fits(test: String): Boolean =
     test.length < width - cur
 
-  private def doPreserve(node: Node) =
-    node.attribute(XML.namespace, XML.space).map(_.toString == XML.preserve) getOrElse false
+  private def doPreserve(node: Node): Boolean =
+    node.attribute(XML.namespace, XML.space).exists(_.toString == XML.preserve)
 
   protected def traverse(node: Node, pscope: NamespaceBinding, ind: Int): Unit = node match {
 
@@ -166,8 +176,8 @@ class PrettyPrinter(width: Int, step: Int, minimizeEmpty: Boolean) {
 
         if (stg.length < width - cur) { // start tag fits
           makeBox(ind, stg)
-          makeBreak()
-          traverse(node.child.iterator, node.scope, ind + step)
+          /////makeBreak()
+          traverse(node.child.iterator, node.scope, ind /* + step*/)
           makeBox(ind, etg)
         } else if (len2 < width - cur) {
           // <start label + attrs + tag + content + end tag
@@ -199,7 +209,7 @@ class PrettyPrinter(width: Int, step: Int, minimizeEmpty: Boolean) {
   protected def traverse(it: Iterator[Node], scope: NamespaceBinding, ind: Int): Unit =
     for (c <- it) {
       traverse(c, scope, ind)
-      makeBreak()
+      /////makeBreak()
     }
 
   /**
@@ -274,7 +284,7 @@ class PrettyPrinter(width: Int, step: Int, minimizeEmpty: Boolean) {
   def formatNodes(nodes: Seq[Node], pscope: NamespaceBinding, sb: StringBuilder): Unit =
     nodes foreach (n => sb append format(n, pscope))
 
-  private def sbToString(f: (StringBuilder) => Unit): String = {
+  private def sbToString(f: StringBuilder => Unit): String = {
     val sb = new StringBuilder
     f(sb)
     sb.toString
