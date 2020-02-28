@@ -24,67 +24,62 @@ final class PaigesPrettyPrinter(
   def fromNode(node: Node, pscope: NamespaceBinding = TopScope): Doc = node match {
     case element: Elem =>
       fromElement(element, pscope)
+
     case special: SpecialNode =>
       Doc.paragraph(sbToString(special.buildString))
+
     case node: Node =>
       Doc.paragraph(node.text)
   }
 
-  // TODO add Doc.lineBreak after each chunk if there are more than one and there are no atoms in them.
-  // TODO add Doc.lineBreak after </l> and <lb/> and before <l>.
   private def fromElement(element: Elem, pscope: NamespaceBinding): Doc = {
     val name: String = sbToString(element.nameToString)
 
-    val header: Doc = {
-      val attributes: Seq[Doc] = element.attributes.toSeq.map(fromAttribute)
-      val scopeStr: String = element.scope.buildString(pscope).trim
-      val docs = if (scopeStr.isEmpty) attributes else attributes :+ Doc.text(scopeStr)
-      Doc.intercalate(Doc.lineOrSpace, docs)
+    val attributes: Doc = {
+      val docs: Seq[Doc] = PaigesPrettyPrinter.fromAttributes(element, pscope)
+      if (docs.isEmpty) Doc.empty
+      else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, docs)
     }
 
     val children: Doc = fromChildren(element.child, element.scope)
 
-    // TODO make work tests that fail now with spurious spaces or lines (with spaces) in the output.
-    if (header.isEmpty && children.isEmpty)
-      Doc.text(s"<$name") + Doc.lineOrEmpty + Doc.text("/>")
-    else if (children.isEmpty)
-          header.tightBracketBy(Doc.text(s"<$name") + Doc.lineOrSpace, Doc.text("/>"), indent)
-//      Doc.text(s"<$name") + Doc.lineOrSpace + header + Doc.lineOrEmpty + Doc.text("/>")
-    else if (header.isEmpty) children.tightBracketBy(
-      left = Doc.text(s"<$name") + Doc.lineOrEmpty + Doc.text(">"),
-      right = Doc.text(s"</$name>"),
-      indent
-    ) else children.tightBracketBy(
-      left = header.tightBracketBy(Doc.text(s"<$name") + Doc.lineOrSpace, Doc.text(">"), indent),
+    if (children.isEmpty)
+      Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>")
+    else children.tightBracketBy(
+      left = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">"),
       right = Doc.text(s"</$name>"),
       indent
     )
   }
 
   // TODO preserve unbreakability when there was no whitespace before (same for after).
+  // TODO add Doc.lineBreak after each chunk if there are more than one and there are no atoms in them.
+  // TODO add Doc.lineBreak after </l> and <lb/> and before <l>.
   private def fromChildren(nodes: Seq[Node], pscope: NamespaceBinding): Doc = {
+    def fromChunk(nodes: Seq[Node]): Doc = Doc.intercalate(Doc.empty, nodes.map(fromNode(_, pscope)))
+
     val whitespaceBefore = nodes.headOption.exists(XmlUtil.isWhitespace)
     val whitespaceAfter = nodes.lastOption.exists(XmlUtil.isWhitespace)
-    val chunks: Seq[Seq[Node]] = chunkify(Seq.empty, nodes)
+    val chunks: Seq[Seq[Node]] = PaigesPrettyPrinter.chunkify(Seq.empty, nodes)
 
     if (chunks.isEmpty) Doc.empty else {
-      Doc.intercalate(Doc.empty,
-        chunks.map((nodes: Seq[Node]) =>
-          Doc.intercalate(Doc.lineOrEmpty,
-            nodes.map(fromNode(_, pscope))
-          )
-        )
-      )
+      val noAtoms: Boolean = chunks.forall(_.forall(node => !XmlUtil.isAtom(node)))
+      val hardLine: Boolean = false // (chunks.size >= 2) && noAtoms // TODO propagate upstream!
+      // println(chunks.map(_.map(_.label).mkString("[", ", ", "]")).mkString(";"))
+      // println(s"hardLine: $hardLine")
+
+      if (hardLine) Doc.hardLine + Doc.intercalate(Doc.hardLine, chunks.map(fromChunk)) + Doc.hardLine
+      else Doc.intercalate(Doc.lineOrEmpty, chunks.map(fromChunk))
     }
   }
+}
 
-  @scala.annotation.tailrec
-  private def chunkify(result: Seq[Seq[Node]], nodes: Seq[Node]): Seq[Seq[Node]] = {
-    val (chunk, tail) = nodes.dropWhile(XmlUtil.isWhitespace).span(node => !XmlUtil.isWhitespace(node))
-    require(chunk.nonEmpty || tail.isEmpty)
-    if (chunk.isEmpty) result
-    else if (tail.forall(XmlUtil.isWhitespace)) result :+ chunk
-    else chunkify(result :+ chunk, tail)
+object PaigesPrettyPrinter {
+
+  private def fromAttributes(element: Elem, pscope: NamespaceBinding): Seq[Doc] = {
+    val attributes: Seq[Doc] = element.attributes.toSeq.map(fromAttribute)
+    val scopeStr: String = element.scope.buildString(pscope).trim
+    if (scopeStr.isEmpty) attributes else attributes :+ Doc.text(scopeStr)
   }
 
   private def fromAttribute(attribute: MetaData): Doc = attribute match {
@@ -98,9 +93,15 @@ final class PaigesPrettyPrinter(
     case _ =>
       Doc.empty
   }
-}
 
-object PaigesPrettyPrinter {
+  @scala.annotation.tailrec
+  private def chunkify(result: Seq[Seq[Node]], nodes: Seq[Node]): Seq[Seq[Node]] = {
+    val (chunk, tail) = nodes.dropWhile(XmlUtil.isWhitespace).span(node => !XmlUtil.isWhitespace(node))
+    require(chunk.nonEmpty || tail.isEmpty)
+    if (chunk.isEmpty) result
+    else if (tail.forall(XmlUtil.isWhitespace)) result :+ chunk
+    else chunkify(result :+ chunk, tail)
+  }
 
   private def sbToString(f: StringBuilder => Unit): String = {
     val sb = new StringBuilder

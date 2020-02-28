@@ -16,7 +16,6 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
   // TODO see that PaigesPrettyPrinter doesn't lose anything
   // (compare serialization of the input and of the parsed pretty-print...).
 
-
   private def render(from: From, width: Int): String =
     new PaigesPrettyPrinter(indent, width).render(Parser.run(from.load))
 
@@ -29,11 +28,11 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
     check(From.xml(xml), width, expected)
 
   private def print(from: From, width: Int): Unit = {
-    println(new PaigesPrettyPrinter(indent, width)
-      .fromNode(Parser.run(from.load))
-      .representation(true)
-      .render(120)
-    )
+//    println(new PaigesPrettyPrinter(indent, width)
+//      .fromNode(Parser.run(from.load))
+//      .representation(true)
+//      .render(120)
+//    )
 
     println("                                                                                                                                   ".take(width-1) + "|")
     println("0         1         2         3         4         5         6         7         8         9         0         1         2         3")
@@ -41,8 +40,9 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
     println(render(from, width))
   }
 
-  val from: From =
-   From.resource(Parser, "print1")
+  "PaigesPrettyPrinter" should "work nicely" in {
+    print(From.resource(Parser, "print"), 120)
+  }
 
   "PaigesPrettyPrinter" should "work" in {
     check(<a><b></b></a>, 4, expected =
@@ -61,22 +61,18 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
 
     check(<el a1="v1" a2="v2"/>, 21, """<el a1="v1" a2="v2"/>""")
 
-    // TODO with tightBracket for empty children, there is an unexpected space after '<el'...
-//    check(<el a1="v1" a2="v2"/>, 20, expected =
-//      """|<el a1="v1" a2="v2"
-//         |/>""")
+    check(<el a1="v1" a2="v2"/>, 20, expected =
+      """|<el a1="v1" a2="v2"
+         |/>""")
 
-    // TODO without tightBracket() for empty children, attributes are not aligned...
-//    check(<el a1="v1" a2="v2"/>, 18, expected = // there is an unexpected space after '<el'...
-//      """|<el
-//         |  a1="v1" a2="v2"
-//         |/>""")
+    check(<el a1="v1" a2="v2"/>, 18, expected =
+      """|<el a1="v1"
+         |a2="v2"/>""")
 
-    //    check(<el a1="v1" a2="v2"/>, 16, expected = // there is an unexpected space after '<el'...
-//      """|<el
-//         |  a1="v1"
-//         |  a2="v2"
-//         |/>""")
+    check(<el a1="v1" a2="v2"/>, 10, expected =
+      """|<el
+         |a1="v1"
+         |a2="v2"/>""")
 
     check(<creation><date when="2020-02-24"/><note/></creation>, 53,
       expected = """<creation><date when="2020-02-24"/><note/></creation>""")
@@ -92,12 +88,12 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
          |  />
          |</creation>""")
 
-//    check(<creation><date when="2020-02-24"/><note/></creation>, 31, expected = // there is a space after <date.
-//      """|<creation>
-//         |  <date
-//         |    when="2020-02-24"
-//         |  /><note/>
-//         |</creation>""")
+    check(<creation><date when="2020-02-24"/><note/></creation>, 24, expected =
+      """|<creation>
+         |  <date
+         |  when="2020-02-24"
+         |  /><note/>
+         |</creation>""")
 
     check(<creation><date when="2020-02-24"/>blah</creation>, 50,
       expected = """<creation><date when="2020-02-24"/>blah</creation>""")
@@ -107,11 +103,17 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
          |  <date when="2020-02-24"/>blah
          |</creation>""")
 
-//    check(<creation><date when="2020-02-24"/>blah</creation>, 30, expected = // there is a space after <date.
-//      """|<creation>
-//         |  <date
-//         |    when="2020-02-24"
-//         |  />blah
-//         |</creation>""")
+    check(<creation><date when="2020-02-24"/>blah</creation>, 30, expected = // there is a space after <date.
+      """|<creation>
+         |  <date when="2020-02-24"
+         |  />blah
+         |</creation>""")
+
+    check(<creation><date when="2020-02-24"/>blah</creation>, 24, expected = // there is a space after <date.
+      """|<creation>
+         |  <date
+         |  when="2020-02-24"
+         |  />blah
+         |</creation>""")
   }
 }
