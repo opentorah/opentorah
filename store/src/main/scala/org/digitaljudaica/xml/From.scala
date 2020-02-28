@@ -65,12 +65,19 @@ object From {
 
   private def loadFromUrl(url: URL): IO[Error, Elem] = Parser.effect {
     val source = new InputSource(url.openStream())
-    val result = Utility.trimProper(XML.load(source))
+//    val result = Utility.trimProper(XML.load(source))
+    val result = XML.load(source)
     result.asInstanceOf[Elem]
   }
 
-  // --- Xerces parser with Scala XML:
+  // Turns out, it wasn't the parser that eliminated whitespace from the files -
+  // it was the call to Utility.trimproper!
+  // TODO verify that archive and calendar work without it.
+  //
+  // If for some other reason Xerces will be needed - here is how to hook it in:
+  //
   // build.gradle:    implementation "xerces:xercesImpl:$xercesVersion"
+  //
   //  def newSaxParserFactory: SAXParserFactory = {
   //    val result = SAXParserFactory.newInstance() // new org.apache.xerces.jaxp.SAXParserFactoryImpl
   //    result.setNamespaceAware(true)

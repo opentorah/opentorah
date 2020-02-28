@@ -1,7 +1,7 @@
 package org.digitaljudaica.xml
 
 import scala.xml.transform.{RewriteRule, RuleTransformer}
-import scala.xml.{Elem, Node, TopScope}
+import scala.xml.{Atom, Elem, Node, TopScope}
 
 object XmlUtil {
 
@@ -34,4 +34,16 @@ object XmlUtil {
   //      val result: Seq[Node] = elem \ ("@" + name)
   //      if (result.isEmpty) None else Some(result.text)
   //    }
+
+  def dropWhitespace(nodes: Seq[Node]): Seq[Node] =
+    nodes.dropWhile(isWhitespace)
+
+  def isWhitespace(node: Node): Boolean =
+    isAtom(node) && node.text.trim.isEmpty
+
+  def isElement(node: Node): Boolean =
+    node.isInstanceOf[Elem]
+
+  def isAtom(node: Node): Boolean =
+    node.isInstanceOf[Atom[String]]
 }

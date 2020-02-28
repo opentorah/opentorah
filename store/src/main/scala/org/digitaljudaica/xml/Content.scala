@@ -57,7 +57,7 @@ private[xml] object Content {
       elements.headOption.map(_.label)
 
     case Mixed(_, nodes) =>
-      dropWhitespace(nodes).headOption.flatMap {
+      XmlUtil.dropWhitespace(nodes).headOption.flatMap {
         case result: Elem => Some(result.label)
         case _ => None
       }
@@ -73,7 +73,7 @@ private[xml] object Content {
     }
 
     case content@Mixed(nextElementNumber, nodes) => IO.succeed {
-      val noLeadingWhitespace = dropWhitespace(nodes)
+      val noLeadingWhitespace = XmlUtil.dropWhitespace(nodes)
       noLeadingWhitespace.headOption.fold[(Content, Option[Elem])]((content, None)) {
         case result: Elem => (Mixed(nextElementNumber + 1, noLeadingWhitespace.tail), Some(result))
         case _ => (content, None)
@@ -99,7 +99,7 @@ private[xml] object Content {
 
     case content@Mixed(nextElementNumber: Int, nodes: Seq[Node]) =>
       val (elements: Seq[Elem], nonElements: Seq[Node]) = partition(nodes)
-      val hasNonWhitespace: Boolean = nonElements.exists(node => !isWhitespace(node))
+      val hasNonWhitespace: Boolean = nonElements.exists(node => !XmlUtil.isWhitespace(node))
       if (hasNonWhitespace) IO.fail(s"Non white-space nodes in $content")
       else IO.succeed((Mixed(nextElementNumber, Seq.empty), elements))
 
@@ -130,10 +130,4 @@ private[xml] object Content {
     val result = nodes.map(_.text).mkString.trim
     if (result.isEmpty) None else Some(result)
   }
-
-  private def dropWhitespace(nodes: Seq[Node]): Seq[Node] =
-    nodes.dropWhile(isWhitespace)
-
-  private def isWhitespace(node: Node): Boolean =
-    node.text.trim.isEmpty
 }
