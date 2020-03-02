@@ -6,6 +6,10 @@ final class Layout(val docs: File) {
 
   private def docs(fileName: String): File = new File(docs, fileName)
 
+  val store: File = new File(docs, "store")
+
+  private def store(fileName: String): File = new File(store, fileName)
+
   val indexFileName: String = "index"
   val collectionsFileName: String = "collections"
 
@@ -19,6 +23,8 @@ final class Layout(val docs: File) {
   val namesDirectoryName: String = "names"
 
   val namesDirectory: File = docs(namesDirectoryName)
+
+  val storeNamesDirectory: File = store(namesDirectoryName)
 
   val namesFileDirectory: File = docs
 

@@ -5,7 +5,7 @@ import org.digitaljudaica.archive.collector.{CollectionLike, Layout, Util}
 import org.digitaljudaica.xml.{ContentType, Error, From, Parser, Xml}
 import org.digitaljudaica.util.Files
 import zio.{IO, ZIO}
-import scala.xml.{Elem, Text}
+import scala.xml.{Node, Text}
 
 final class Names private(
   layout: Layout,
@@ -20,7 +20,7 @@ final class Names private(
 
   def findByRef(ref: String): Option[Named] = nameds.find(_.id == ref)
 
-  private var references: Seq[Reference] = null
+  private var references: Seq[Reference] = _
 
   def addDocumentReferences(documentReferences: Seq[Reference]): Unit = {
     references = (nameds.flatMap(_.references) ++ documentReferences).filterNot(_.name == Text("?"))
@@ -42,16 +42,17 @@ final class Names private(
   def writeList(directory: File, fileName: String, layout: Layout): Unit = {
     // List of all names
     val nonEmptyLists = lists.filterNot(_.isEmpty)
-    val content: Seq[Elem] =
-      <p>{for (list <- nonEmptyLists)
-        yield <l><ref target={layout.namedInTheListUrl(list.id)} role="namesViewer">{list.head}</ref></l>}</p> +:
-        (for (list <- nonEmptyLists) yield list.toXml)
+
+    val listOfLists: Seq[Node] =
+      <p>{for (list <- nonEmptyLists) yield
+        <l>{<ref target={layout.namedInTheListUrl(list.id)} role="namesViewer">{list.head}</ref>}</l>
+      }</p>
 
     Util.writeTei(
       directory = directory,
       fileName = fileName,
       head = Some(Text(reference)),
-      content,
+      content = listOfLists ++ nonEmptyLists.flatMap(_.toXml),
       target = "namesViewer"
     )
   }
@@ -66,7 +67,8 @@ object Names {
     reference <- Xml.required("head", ContentType.Text, Xml.text.required)
     listDescriptors <- Xml.all(NamesList.parser)
     teiNamedResults <- ZIO.collectAll(Files.filesWithExtensions(directory, extension = "xml").sorted.map(fileName =>
-        From.file(directory, fileName).parse(org.digitaljudaica.reference.Named.parser(fileName)).either))
+        From.file(directory, fileName)
+          .parse(ContentType.Elements, org.digitaljudaica.reference.Named.parser(fileName)).either))
     errors: Seq[Error] = teiNamedResults.flatMap(_.left.toOption)
     results: Seq[org.digitaljudaica.reference.Named] = teiNamedResults.flatMap(_.right.toOption)
     teiNameds <- if (errors.nonEmpty) IO.fail(errors.mkString("--", "\n--", "")) else IO.succeed(results)
