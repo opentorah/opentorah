@@ -95,7 +95,7 @@ final class Document(
         "transcript" -> s"'../${layout.documentsDirectoryName}/$name.html'"
       )
         ++ navigation,
-      content = Seq(Print.format(facsimilePages))
+      content = Seq(Print.render(facsimilePages) + "\n")
     )
   }
 }
