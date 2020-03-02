@@ -68,7 +68,7 @@ object Names {
     listDescriptors <- Xml.all(NamesList.parser)
     teiNamedResults <- ZIO.collectAll(Files.filesWithExtensions(directory, extension = "xml").sorted.map(fileName =>
         From.file(directory, fileName)
-          .parse(ContentType.Elements, org.digitaljudaica.reference.Named.parser(fileName)).either))
+          .parse(ContentType.Elements, org.digitaljudaica.reference.Named.contentParser(fileName)).either))
     errors: Seq[Error] = teiNamedResults.flatMap(_.left.toOption)
     results: Seq[org.digitaljudaica.reference.Named] = teiNamedResults.flatMap(_.right.toOption)
     teiNameds <- if (errors.nonEmpty) IO.fail(errors.mkString("--", "\n--", "")) else IO.succeed(results)

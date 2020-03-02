@@ -29,13 +29,13 @@ final class Document(
 
   val title: Option[Seq[Node]] = tei.titleStmt.titles.headOption.map(_.content)
 
-  def authors: Seq[Elem] = tei.titleStmt.authors.map(_.xml)
+  def authors: Seq[Seq[Node]] = tei.titleStmt.authors.map(_.xml)
 
   def transcribers: Seq[Elem] = tei.titleStmt.editors.filter(_.role.contains("transcriber")).flatMap(_.persName)
 
   def date: Option[String] = tei.teiHeader.profileDesc.flatMap(_.creation.map(_.date.when))
 
-  def description: Option[Seq[Node]] = tei.getAbstract.map(_.child).orElse(title)
+  def description: Option[Seq[Node]] = tei.getAbstract.orElse(title)
 
   def language: Option[String] = tei.teiHeader.profileDesc.flatMap(_.langUsage).toSeq.flatMap(_.languages).map(_.ident).headOption
 
