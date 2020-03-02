@@ -19,5 +19,6 @@ object Date extends Descriptor[Date](
     when,
     calendar,
     text
-  )
+  ),
+  toXml = (value: Date) => <date when={value.when} calendar={value.calendar.orNull}>{value.text.orNull}</date>
 )

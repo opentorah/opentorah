@@ -1,8 +1,8 @@
 package org.digitaljudaica.tei
 
-import org.digitaljudaica.xml.DescriptorRaw
+import org.digitaljudaica.xml.{DescriptorRawXml, RawXml}
 import scala.xml.Elem
 
-final case class SourceDesc(xml: Elem)
+final case class SourceDesc(xml: Elem) extends RawXml(xml)
 
-object SourceDesc extends DescriptorRaw[SourceDesc]("sourceDesc", new SourceDesc(_))
+object SourceDesc extends DescriptorRawXml[SourceDesc]("sourceDesc", new SourceDesc(_))

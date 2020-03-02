@@ -2,7 +2,7 @@ package org.digitaljudaica.xml
 
 import scala.xml.Elem
 
-class DescriptorRaw[A](
+class DescriptorRawXml[A <: RawXml](
   val elementName: String,
   create: Elem => A
 ) {
@@ -16,4 +16,10 @@ class DescriptorRaw[A](
     Xml.all(elementName).map[Seq[A]](_.map(xml => fromXml(xml)))
 
   private def fromXml(xml: Elem): A = create(xml)
+
+  final def toXml(value: A): Elem = value.getXml
+
+  final def toXml(value: Option[A]): Elem = value.map(_.getXml).orNull
+
+  final def toXml(values: Seq[A]): Seq[Elem] = values.map(toXml)
 }

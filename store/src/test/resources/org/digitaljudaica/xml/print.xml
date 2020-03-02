@@ -35,10 +35,12 @@
   <text xml:lang="ru">
     <body>
       <pb xml:id="p905-1" n="905-1" facs="http://facsimiles.alter-rebbe.org/facsimiles/rgada/905-1.jpg"/>
-      <p><l>3140 О <orgName ref="Хасиды">Еврейской сектѣ Каролиновъ</orgName> и</l>
+      <p>
+        <l>3140 О <orgName ref="Хасиды">Еврейской сектѣ Каролиновъ</orgName> и</l>
         <l>объ учителѣ ихъ <persName ref="alter-rebbe">Раввинѣ Зальманѣ<lb/>
-          Боруховичѣ</persName>, и о доносахъ <persName ref="Гирша_Давыдович">Еврея<lb/>
-          Гирша Давидовича</persName>. 1798 г.</l></p>
+        Боруховичѣ</persName><note>test note</note>, и о доносахъ <persName ref="Гирша_Давыдович">Еврея<lb/>
+        Гирша Давидовича</persName>. 1798 г.</l>
+      </p>
       <fw type="note" place="left">376 л.</fw>
     </body>
   </text>

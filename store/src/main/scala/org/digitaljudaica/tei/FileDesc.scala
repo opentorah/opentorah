@@ -30,5 +30,15 @@ object FileDesc extends Descriptor[FileDesc](
     seriesStmt,
     notesStmt,
     sourceDesc
-  )
+  ),
+  toXml = (value: FileDesc) =>
+    <fileDesc>
+      {TitleStmt.toXml(value.titleStmt)}
+      {EditionStmt.toXml(value.editionStmt)}
+      {Extent.toXml(value.extent)}
+      {PublicationStmt.toXml(value.publicationStmt)}
+      {SeriesStmt.toXml(value.seriesStmt)}
+      {NotesStmt.toXml(value.notesStmt)}
+      {SourceDesc.toXml(value.sourceDesc)}
+    </fileDesc>
 )

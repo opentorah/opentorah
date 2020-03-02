@@ -31,14 +31,20 @@ object Tei extends Descriptor[Tei](
   } yield new Tei(
     teiHeader,
     text
-  )
-) {
-
-  def tei(head: Option[Node], content: Seq[Node]): Elem =
+  ),
+  toXml = (value: Tei) =>
     <TEI xmlns="http://www.tei-c.org/ns/1.0">
-      <teiHeader>
-        <fileDesc>
-          <titleStmt/>
+      {TeiHeader.toXml(value.teiHeader)}
+      {Text.toXml(value.text)}
+  </TEI>
+) {
+  def tei(head: Option[Node], content: Seq[Node]): Tei = Tei(
+    teiHeader = TeiHeader(
+      fileDesc = new FileDesc(
+        titleStmt = TitleStmt(Seq.empty, Seq.empty, Seq.empty, Seq.empty, Seq.empty, Seq.empty, Seq.empty),
+        editionStmt =  None,
+        extent = None,
+        publicationStmt = PublicationStmt(
           <publicationStmt>
             <publisher><ptr target="www.alter-rebbe.org"/></publisher>
             <availability status="free">
@@ -50,14 +56,24 @@ object Tei extends Descriptor[Tei](
               </licence>
             </availability>
           </publicationStmt>
-          <sourceDesc><p>Facsimile</p></sourceDesc>
-        </fileDesc>
-      </teiHeader>
-      <text>
+        ),
+        seriesStmt = None,
+        notesStmt = None,
+        sourceDesc = SourceDesc(<sourceDesc><p>Facsimile</p></sourceDesc>)
+      ),
+      encodingDesc = None,
+      profileDesc = None,
+      xenoData = None,
+      revisionDesc = None
+    ),
+    text = Text(
+      lang = None,
+      body = Body(
         <body>
           {head.fold[Seq[Node]](Seq.empty)(head => Seq(<head>{head}</head>))}
           {content}
         </body>
-      </text>
-    </TEI>
+      )
+    )
+  )
 }

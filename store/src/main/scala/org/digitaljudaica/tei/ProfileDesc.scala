@@ -28,5 +28,14 @@ object ProfileDesc extends Descriptor[ProfileDesc](
     textClass,
     correspDesc,
     calendarDesc
-  )
+  ),
+  toXml = (value: ProfileDesc) =>
+    <profileDesc>
+      {Abstract.toXml(value.documentAbstract)}
+      {Creation.toXml(value.creation)}
+      {LangUsage.toXml(value.langUsage)}
+      {TextClass.toXml(value.textClass)}
+      {CorrespDesc.toXml(value.correspDesc)}
+      {CalendarDesc.toXml(value.calendarDesc)}
+    </profileDesc>
 )

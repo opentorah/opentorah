@@ -45,5 +45,15 @@ object TitleStmt extends Descriptor[TitleStmt](
     funders,
     principals,
     respStmts
-  )
+  ),
+  toXml = (value: TitleStmt) =>
+    <titleStmt>
+      {Title.toXml(value.titles)}
+      {Author.toXml(value.authors)}
+      {Editor.toXml(value.editors)}
+      {Sponsor.toXml(value.sponsors)}
+      {Funder.toXml(value.funders)}
+      {Principal.toXml(value.principals)}
+      {RespStmt.toXml(value.respStmts)}
+    </titleStmt>
 )

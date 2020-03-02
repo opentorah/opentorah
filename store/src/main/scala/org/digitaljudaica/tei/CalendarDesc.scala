@@ -1,8 +1,8 @@
 package org.digitaljudaica.tei
 
-import org.digitaljudaica.xml.DescriptorRaw
+import org.digitaljudaica.xml.{DescriptorRawXml, RawXml}
 import scala.xml.Elem
 
-final case class CalendarDesc(xml: Elem)
+final case class CalendarDesc(xml: Elem) extends RawXml(xml)
 
-object CalendarDesc extends DescriptorRaw[CalendarDesc]("calendarDesc", new CalendarDesc(_))
+object CalendarDesc extends DescriptorRawXml[CalendarDesc]("calendarDesc", new CalendarDesc(_))

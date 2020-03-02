@@ -19,5 +19,6 @@ object Language extends Descriptor[Language](
     ident,
     usage,
     text
-  )
+  ),
+  toXml = (value: Language) => <language ident={value.ident} usage={value.usage.map(_.toString).orNull}>{value.text.orNull}</language>
 )

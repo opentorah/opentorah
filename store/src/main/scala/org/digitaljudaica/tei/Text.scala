@@ -16,5 +16,6 @@ object Text extends Descriptor[Text](
   } yield new Text(
     lang,
     body
-  )
+  ),
+  toXml = (value: Text) => <text xml:lang={value.lang.orNull}>{Body.toXml(value.body)}</text>
 )

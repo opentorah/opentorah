@@ -1,8 +1,8 @@
 package org.digitaljudaica.tei
 
-import org.digitaljudaica.xml.DescriptorRaw
+import org.digitaljudaica.xml.{DescriptorRawXml, RawXml}
 import scala.xml.Elem
 
-final case class Extent(xml: Elem)
+final case class Extent(xml: Elem) extends RawXml(xml)
 
-object Extent extends DescriptorRaw[Extent]("extent", new Extent(_))
+object Extent extends DescriptorRawXml[Extent]("extent", new Extent(_))

@@ -1,8 +1,9 @@
 package org.digitaljudaica.tei
 
-import org.digitaljudaica.xml.DescriptorRaw
+import org.digitaljudaica.xml.{DescriptorRawXml, RawXml}
 import scala.xml.Elem
 
-final case class PublicationStmt(xml: Elem)
+// TODO elaborate according to TEI Guidelines.
+final case class PublicationStmt(xml: Elem) extends RawXml(xml)
 
-object PublicationStmt extends DescriptorRaw[PublicationStmt]("publicationStmt", new PublicationStmt(_))
+object PublicationStmt extends DescriptorRawXml[PublicationStmt]("publicationStmt", new PublicationStmt(_))

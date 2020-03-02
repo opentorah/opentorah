@@ -1,10 +1,10 @@
 package org.digitaljudaica.xml
 
-import java.io.File
+import java.io.{File, StringReader}
 import java.net.URL
 import org.digitaljudaica.util.{Files, Util}
 import org.xml.sax.InputSource
-import scala.xml.{Elem, Utility, XML}
+import scala.xml.{Elem, XML}
 import zio.IO
 
 sealed abstract class From {
@@ -37,6 +37,19 @@ object From {
 
   def xml(elem: Elem): From = new FromXml("unnamed", elem)
 
+  private final class FromString(
+    override val name: String,
+    string: String
+  ) extends From {
+    override def toString: String = s"From.string($name)"
+    override def url: Option[URL] = None
+    override def load: IO[Error, Elem] = fromSource(new InputSource(new StringReader(string)))
+  }
+
+  def string(name: String, string: String): From = new FromString(name, string)
+
+  def string(string: String): From = new FromString("unnamed", string)
+
   private final class FromUrl(fromUrl: URL) extends From {
     override def toString: String = s"From.url($fromUrl)"
     override def name: String = Files.nameAndExtension(fromUrl.getPath)._1
@@ -63,12 +76,11 @@ object From {
 
   def resource(obj: AnyRef): From = resource(obj, Util.className(obj))
 
-  private def loadFromUrl(url: URL): IO[Error, Elem] = Parser.effect {
-    val source = new InputSource(url.openStream())
-//    val result = Utility.trimProper(XML.load(source))
-    val result = XML.load(source)
-    result.asInstanceOf[Elem]
-  }
+  private def loadFromUrl(url: URL): IO[Error, Elem] =
+    fromSource(new InputSource(url.openStream()))
+
+  private def fromSource(source: InputSource): IO[Error, Elem] =
+    Parser.effect(XML.load(source))
 
   // Turns out, it wasn't the parser that eliminated whitespace from the files -
   // it was the call to Utility.trimproper!

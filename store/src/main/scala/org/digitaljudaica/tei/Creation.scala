@@ -16,5 +16,6 @@ object Creation extends Descriptor[Creation](
   } yield new Creation(
     date,
     xml
-  )
+  ),
+  toXml = (value: Creation) => <creation>{Date.toXml(value.date)}{value.xml}</creation>
 )

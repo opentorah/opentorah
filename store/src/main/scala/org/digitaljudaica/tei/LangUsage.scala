@@ -12,5 +12,6 @@ object LangUsage extends Descriptor[LangUsage](
     languages <- Language.all
   } yield new LangUsage(
     languages
-  )
+  ),
+  toXml = (value: LangUsage) => <langUsage>{Language.toXml(value.languages)}</langUsage>
 )

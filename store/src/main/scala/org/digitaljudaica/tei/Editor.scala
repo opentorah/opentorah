@@ -16,5 +16,6 @@ object Editor extends Descriptor[Editor](
   } yield new Editor(
     role,
     persName
-  )
+  ),
+  toXml = (value: Editor) => <editor role={value.role.orNull}>{value.persName.orNull}</editor>
 )

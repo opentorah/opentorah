@@ -24,5 +24,13 @@ object TeiHeader extends Descriptor[TeiHeader](
     profileDesc,
     xenoData,
     revisionDesc
-  )
+  ),
+  toXml = (value: TeiHeader) =>
+    <teiHeader>
+      {FileDesc.toXml(value.fileDesc)}
+      {EncodingDesc.toXml(value.encodingDesc)}
+      {ProfileDesc.toXml(value.profileDesc)}
+      {XenoData.toXml(value.xenoData)}
+      {RevisionDesc.toXml(value.revisionDesc)}
+    </teiHeader>
 )

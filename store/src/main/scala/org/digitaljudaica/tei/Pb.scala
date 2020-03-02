@@ -19,5 +19,6 @@ object Pb extends Descriptor[Pb](
     n,
     id,
     facs
-  )
+  ),
+  toXml = (value: Pb) => <pb n={value.n} id={value.id.orNull} facs={value.facs.orNull}/>
 )

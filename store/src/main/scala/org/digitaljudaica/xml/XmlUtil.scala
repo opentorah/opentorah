@@ -1,7 +1,7 @@
 package org.digitaljudaica.xml
 
 import scala.xml.transform.{RewriteRule, RuleTransformer}
-import scala.xml.{Atom, Elem, Node, TopScope}
+import scala.xml.{Atom, Elem, Node, Text, TopScope}
 
 object XmlUtil {
 
@@ -27,13 +27,22 @@ object XmlUtil {
   def descendants(xml: Node, name: String): Seq[Elem] =
     xml.flatMap(_ \\ name).filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
-  // TODO difference?
-  def hasAttribute(elem: Elem, name: String, value: String): Boolean =
-    elem.attributes.asAttrMap.get(name).contains(value)
-  //    def attributeOption(name: String): Option[String] = {
-  //      val result: Seq[Node] = elem \ ("@" + name)
-  //      if (result.isEmpty) None else Some(result.text)
-  //    }
+  def spacedText(node: Node): String = {
+    val result = node match {
+      case elem: Elem => (elem.child map (_.text)).mkString(" ")
+      case node: Node => node.text
+    }
+    result
+      .replace('\n', ' ')
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+  }
 
   def dropWhitespace(nodes: Seq[Node]): Seq[Node] =
     nodes.dropWhile(isWhitespace)
@@ -46,4 +55,7 @@ object XmlUtil {
 
   def isAtom(node: Node): Boolean =
     node.isInstanceOf[Atom[String]]
+
+  def isText(node: Node): Boolean =
+    node.isInstanceOf[Text]
 }

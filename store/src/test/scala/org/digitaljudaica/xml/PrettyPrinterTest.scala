@@ -17,7 +17,7 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
   // (compare serialization of the input and of the parsed pretty-print...).
 
   private def render(from: From, width: Int): String =
-    new PaigesPrettyPrinter(indent, width).render(Parser.run(from.load))
+    new PaigesPrettyPrinter(width, indent).render(Parser.run(from.load))
 
   private def check(from: From, width: Int, expected: String): Unit = {
     val result = render(from, width)
@@ -40,8 +40,8 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
     println(render(from, width))
   }
 
-  "PaigesPrettyPrinter" should "work nicely" in {
-    print(From.resource(Parser, "print"), 120)
+  "Chunking" should "work" in {
+    print(From.resource(this, "alter-rebbe"), 120)
   }
 
   "PaigesPrettyPrinter" should "work" in {

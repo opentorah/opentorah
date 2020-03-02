@@ -1,13 +1,14 @@
 package org.digitaljudaica.xml
 
-import java.io.{File, FileWriter, OutputStream, OutputStreamWriter, PrintWriter, Writer}
-import scala.xml.{Elem, Node}
+import scala.xml.Elem
 
 object Print {
 
-  private val width = 120
+  private val width: Int = 120
 
-  private val prettyPrinter: scala.xml.PrettyPrinter = new scala.xml.PrettyPrinter(width, 2)
+  private val indent: Int = 2
+
+  private val prettyPrinter: scala.xml.PrettyPrinter = new scala.xml.PrettyPrinter(width, indent)
 
   private val join: Set[String] = Set(".", ",", ";", ":", "\"", ")")
 
@@ -18,8 +19,22 @@ object Print {
     merge(List.empty, result.split("\n").toList).mkString("\n")
   }
 
+  def render(elem: Elem): String = {
+    def serialize(string: String): String =
+      //scala.xml.Utility.serialize(Parser.run(From.string(string).load)).toString
+      Parser.run(From.string(string).load).toString
+
+    val result: String = new PaigesPrettyPrinter(width, indent).render(elem)
+    val oldSerialized: String = serialize(format(elem))
+    val newSerialized: String = serialize(result)
+    if (oldSerialized != newSerialized) {
+      val x = 0
+    }
+    result
+  }
+
   @scala.annotation.tailrec
-  def merge(result: List[String], lines: List[String]): List[String] = lines match {
+  private def merge(result: List[String], lines: List[String]): List[String] = lines match {
     case l1 :: l2 :: ls =>
       val l = l2.trim
       if (join.exists(l.startsWith))
@@ -28,21 +43,5 @@ object Print {
         merge(result :+ l1, l2 :: ls)
     case l :: Nil => result :+ l
     case Nil => result
-  }
-
-  def print(xml: Node, outStream: OutputStream): Unit = print(xml, new OutputStreamWriter(outStream))
-  def print(xml: Node, outFile: File): Unit = print(xml, new FileWriter(outFile))
-
-  def print(xml: Node, writer: Writer): Unit = {
-    val out = new PrintWriter(writer)
-    val pretty = prettyPrinter.format(xml)
-    // TODO when outputting XML, include <xml> header?
-    out.println(pretty)
-    out.close()
-  }
-
-  def spacedText(node: Node): String = node match {
-    case elem: Elem => (elem.child map (_.text)).mkString(" ")
-    case node: Node => node.text
   }
 }

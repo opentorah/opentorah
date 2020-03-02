@@ -1,15 +1,15 @@
 package org.digitaljudaica.reference
 
 import org.digitaljudaica.tei.Tei
-import org.digitaljudaica.xml.{ContentType, XmlUtil, Parser, Xml}
-import scala.xml.Elem
+import org.digitaljudaica.xml.{ContentType, Parser, Xml, XmlUtil}
+import scala.xml.Node
 
 final case class Named private(
   entity: Entity,
   id: String,
   role: Option[String],
   names: Seq[Name], // TODO split ito main and alternatives
-  content: Seq[Elem] // TODO switch to Seq[Node]
+  content: Seq[Node]
 )
 
 object Named {
@@ -26,7 +26,7 @@ object Named {
     role <- Xml.attribute.optional("role")
     names <- Xml.all(entity.nameElement, ContentType.Text, Name.parser(entity))
     _ <- Parser.check(names.nonEmpty, s"No names in $id")
-    content <- Xml.all // TODO allNodes
+    content <- Xml.allNodes
   } yield new Named(
     entity,
     id,
