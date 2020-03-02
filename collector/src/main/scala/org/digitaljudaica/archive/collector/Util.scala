@@ -72,6 +72,6 @@ object Util {
     elem: Elem
   ): Unit = Files.write(
     file = new File(directory, fileName + ".xml"),
-    content = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" + Print.render(elem)
+    content = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" + Print.render(elem) + "\n"
   )
 }

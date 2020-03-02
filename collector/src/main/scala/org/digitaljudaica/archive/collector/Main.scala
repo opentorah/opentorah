@@ -60,7 +60,7 @@ object Main {
       content = <list>{
         for (archive <- byArchive.keys.toList.sorted) yield {
           <item>
-            <p>[{archive}]</p>
+            <p>{s"[$archive]"}</p>
             <list type="bulleted">{for (collection <- byArchive(archive)) yield toXml(collection, layout)}</list>
           </item>}}
       </list>,
