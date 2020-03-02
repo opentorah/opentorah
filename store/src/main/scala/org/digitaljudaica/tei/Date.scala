@@ -1,11 +1,12 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.xml.{ContentType, Descriptor, Xml}
+import scala.xml.Node
 
 final case class Date(
   when: String,
   calendar: Option[String],
-  text: Option[String]
+  xml: Seq[Node]
 )
 
 object Date extends Descriptor[Date](
@@ -14,11 +15,11 @@ object Date extends Descriptor[Date](
   contentParser = for {
     when <- Xml.attribute.required("when")
     calendar <- Xml.attribute.optional("calendar")
-    text <- Xml.text.optional
+    xml <- Xml.allNodes
   } yield new Date(
     when,
     calendar,
-    text
+    xml
   ),
-  toXml = (value: Date) => <date when={value.when} calendar={value.calendar.orNull}>{value.text.orNull}</date>
+  toXml = (value: Date) => <date when={value.when} calendar={value.calendar.orNull}>{value.xml}</date>
 )

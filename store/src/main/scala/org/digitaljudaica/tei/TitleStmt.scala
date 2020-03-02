@@ -15,12 +15,12 @@ final case class TitleStmt(
 ) {
   def references: Seq[Reference] = {
     val xml: Seq[Node] = Seq(titles.flatMap(_.content) ++
-      authors.map(_.xml) ++
+      authors.map(Author.toXml) ++
       editors.flatMap(_.persName.toSeq) ++
-      sponsors.map(_.xml) ++
-      funders.map(_.xml) ++
-      principals.map(_.xml) ++
-      respStmts.map(_.xml)
+      sponsors.map(Sponsor.toXml) ++
+      funders.map(Funder.toXml) ++
+      principals.map(Principal.toXml) ++
+      respStmts.map(RespStmt.toXml)
     ).flatten
 
     xml.flatMap(Reference.all)

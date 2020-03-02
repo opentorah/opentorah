@@ -1,6 +1,5 @@
 package org.digitaljudaica.reference
 
-import org.digitaljudaica.tei.Tei
 import org.digitaljudaica.xml.{ContentType, Parser, Xml, XmlUtil}
 import scala.xml.Node
 
@@ -13,10 +12,8 @@ final case class Named private(
 )
 
 object Named {
-  def parser(id: String): Parser[Named] =
-    unwrapTei(contentParser(id))
 
-  private def contentParser(id: String): Parser[Named] = for {
+  def contentParser(id: String): Parser[Named] = for {
     name <- Xml.name
     entityOption = Entity.forElement(name)
     _ <- Parser.check(entityOption.isDefined, s"No such entity type: $name")
@@ -34,12 +31,4 @@ object Named {
     names,
     content = content.map(XmlUtil.removeNamespace),
   )
-
-  private def unwrapTei(parser: Parser[Named]): Parser[Named] = for {
-    name <- Xml.name
-    result <- if (name != Tei.elementName) parser else for {
-      tei <- Tei.contentParser
-      result <- Xml.nested("TEI Wrapper", tei.body.xml, ContentType.Elements, Xml.required(parser))
-    } yield result
-  } yield result
 }

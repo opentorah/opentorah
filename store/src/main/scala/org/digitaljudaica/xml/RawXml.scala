@@ -1,7 +1,7 @@
 package org.digitaljudaica.xml
 
-import scala.xml.Elem
+import scala.xml.Node
 
-abstract class RawXml(xml: Elem) {
-  def getXml: Elem = xml
+abstract class RawXml(xml: Seq[Node]) {
+  def getXml: Seq[Node] = xml
 }
