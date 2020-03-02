@@ -2,9 +2,9 @@ package org.digitaljudaica.archive.collector
 
 import java.io.File
 import org.digitaljudaica.tei.Tei
-import org.digitaljudaica.xml.Print
+import org.digitaljudaica.xml.{Print, XmlUtil}
 import org.digitaljudaica.util.Files
-import scala.xml.Node
+import scala.xml.{Elem, Node}
 
 object Util {
 
@@ -54,12 +54,7 @@ object Util {
     target: String,
     yaml: Seq[(String, String)] = Seq.empty
   ): Unit = {
-    val elem = Tei.tei(head, content)
-    Files.write(
-      file = new File(directory, fileName + ".xml"),
-      content = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
-        Print.format(elem)
-    )
+    writeXml(directory, fileName, Tei.toXml(Tei.tei(head, content)))
 
     writeTeiWrapper(
       directory,
@@ -67,7 +62,16 @@ object Util {
       teiPrefix = None,
       style,
       target,
-      yaml = head.fold[Seq[(String, String)]](Seq.empty)(head => Seq("title" -> quote(Print.spacedText(head)))) ++ yaml
+      yaml = head.fold[Seq[(String, String)]](Seq.empty)(head => Seq("title" -> quote(XmlUtil.spacedText(head)))) ++ yaml
     )
   }
+
+  def writeXml(
+    directory: File,
+    fileName: String,
+    elem: Elem
+  ): Unit = Files.write(
+    file = new File(directory, fileName + ".xml"),
+    content = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" + Print.render(elem) + "\n"
+  )
 }
