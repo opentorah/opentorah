@@ -184,7 +184,7 @@ object Collection {
 
   private def table(layout: Layout): Table[Document] = new Table[Document](
     Column("Описание", "description", { document: Document =>
-      document.description.fold[Seq[Node]](Text(""))(_.map(XmlUtil.removeNamespace))
+      document.description.getOrElse(Seq.empty).map(XmlUtil.removeNamespace)
     }),
 
     Column("Дата", "date", { document: Document =>
@@ -192,7 +192,7 @@ object Collection {
     }),
 
     Column("Кто", "author", { document: Document =>
-      multi(document.authors.flatMap(author => XmlUtil.removeNamespace(author).child))
+      multi(document.authors.flatMap(_.map(XmlUtil.removeNamespace)))
     }),
 
     Column("Кому", "addressee",  _.addressee.fold[Seq[Node]](Text(""))(addressee =>
