@@ -2,15 +2,12 @@ package org.digitaljudaica.archive.collector.reference
 
 import java.io.File
 import org.digitaljudaica.archive.collector.{CollectionLike, Util}
-import org.digitaljudaica.xml.{ContentType, Error, From, Parser, Xml}
-import org.digitaljudaica.util.Files
-import zio.{IO, ZIO}
 import scala.xml.{Node, Text}
 
-final class Names private(
+final class Names(
   override val reference: String,
   teiNameds: Seq[org.digitaljudaica.reference.Named],
-  listDescriptors: Seq[NamesList.Descriptor],
+  listDescriptors: Seq[NamesListDescriptor],
   namedUrl: String => String,
   namedInTheListUrl: String => String
 ) extends CollectionLike {
@@ -63,28 +60,4 @@ final class Names private(
       target = "namesViewer"
     )
   }
-}
-
-object Names {
-
-  def parser(
-    directory: File,
-    namedUrl: String => String,
-    namedInTheListUrl: String => String
-  ): Parser[Names] = for {
-    reference <- Xml.required("head", ContentType.Text, Xml.text.required)
-    listDescriptors <- Xml.all(NamesList.parser)
-    teiNamedResults <- ZIO.collectAll(Files.filesWithExtensions(directory, extension = "xml").sorted.map(fileName =>
-        From.file(directory, fileName)
-          .parse(ContentType.Elements, org.digitaljudaica.reference.Named.contentParser(fileName)).either))
-    errors: Seq[Error] = teiNamedResults.flatMap(_.left.toOption)
-    results: Seq[org.digitaljudaica.reference.Named] = teiNamedResults.flatMap(_.right.toOption)
-    teiNameds <- if (errors.nonEmpty) IO.fail(errors.mkString("--", "\n--", "")) else IO.succeed(results)
-  } yield new Names(
-    reference,
-    teiNameds,
-    listDescriptors,
-    namedUrl,
-    namedInTheListUrl
-  )
 }
