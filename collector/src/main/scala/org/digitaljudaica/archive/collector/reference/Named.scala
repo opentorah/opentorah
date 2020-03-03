@@ -1,6 +1,5 @@
 package org.digitaljudaica.archive.collector.reference
 
-import org.digitaljudaica.archive.collector.Layout
 import org.digitaljudaica.reference.{Entity, Name}
 import org.digitaljudaica.util.Collections
 import scala.xml.{Elem, Node}
@@ -8,7 +7,8 @@ import scala.xml.{Elem, Node}
 final class Named(
   named: org.digitaljudaica.reference.Named,
   container: Names,
-  layout: Layout
+  namedUrl: String => String,
+  namedInTheListUrl: String => String
 ) extends ReferenceSource(container) {
 
   def entity: Entity = named.entity
@@ -26,17 +26,17 @@ final class Named(
 
   override def name: String = names.head.name
 
-  override def url: String = layout.namedUrl(id)
+  override def url: String = namedUrl(id)
 
   def toListXml: Elem =
-    <l> <ref target={layout.namedUrl(id)} role="namesViewer">{names.head.toXml}</ref> </l>
+    <l><ref target={url} role="namesViewer">{names.head.toXml}</ref></l>
 
   def toXml(references: Seq[Reference]): Seq[Node] =
     <named xml:id={id} role={role.orNull}>
       {for (name <- names) yield name.toXml}
       {content :+ Named.mentions(
       references.filter(_.ref.get == id),
-      <ref target={layout.namedInTheListUrl(id)} role="namesViewer">[...]</ref>
+      <ref target={namedInTheListUrl(id)} role="namesViewer">[...]</ref>
     )}
     </named>
       .copy(label = entity.element)
