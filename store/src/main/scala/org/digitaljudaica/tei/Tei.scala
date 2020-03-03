@@ -42,35 +42,26 @@ object Tei extends Descriptor[Tei](
       {Text.toXml(value.text)}
     </TEI>
 ) {
-  def tei(head: Option[Node], content: Seq[Node]): Tei = Tei(
+
+  def apply(
+    publisher: Seq[Node],
+    availabilityStatus: String,
+    availability: Seq[Node],
+    sourceDesc: Seq[Node],
+    body: Seq[Node]
+  ): Tei = new Tei(
     teiHeader = TeiHeader(
-      fileDesc = new FileDesc(
-        titleStmt = TitleStmt(Seq.empty, Seq.empty, Seq.empty, Seq.empty, Seq.empty, Seq.empty, Seq.empty),
-        editionStmt =  None,
-        extent = None,
+      fileDesc = FileDesc(
         publicationStmt = PublicationStmt(
-          publisher = Some(Publisher(<ptr target="www.alter-rebbe.org"/>)),
-          availability = Some(Availability(
-            status = Some("free"), xml =
-              <licence>
-                <ab>
-                  <ref n="license" target="http://creativecommons.org/licenses/by/4.0/">
-                    Creative Commons Attribution 4.0 International License</ref>
-                </ab>
-              </licence>))
+          publisher,
+          availability = Availability(
+            availabilityStatus,
+            availability
+          )
         ),
-        seriesStmt = None,
-        notesStmt = None,
-        sourceDesc = SourceDesc(<p>Facsimile</p>)
-      ),
-      encodingDesc = None,
-      profileDesc = None,
-      xenoData = None,
-      revisionDesc = None
+        sourceDesc
+      )
     ),
-    text = Text(
-      lang = None,
-      body = Body(head.fold[Seq[Node]](Seq.empty)(head => Seq(<head>{head}</head>)) ++ content)
-    )
+    text = Text(body)
   )
 }

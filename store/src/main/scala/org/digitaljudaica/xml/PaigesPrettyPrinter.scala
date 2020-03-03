@@ -45,9 +45,6 @@ final class PaigesPrettyPrinter(
       Doc.paragraph(node.text)
   }
 
-  // TODO add Doc.hardLine after </l> and <lb/> and before <l>.
-  // TODO insert breaks into paragraphs; remove leading whitespace before "Creative Commons...".
-  // TODO preserve unbreakability when there was no whitespace before (same for after).
   private def fromElement(
     element: Elem,
     pscope: NamespaceBinding,
@@ -64,25 +61,27 @@ final class PaigesPrettyPrinter(
 
     val (chunks: Seq[Doc], noAtoms: Boolean) = fromChildren(element, canBreakLeft, canBreakRight)
 
-//            println(s"Chunks for $name ($noAtoms, $canBreakLeft, $canBreakRight):")
-//            for (chunk <- chunks) {
-//              println("chunk: " + chunk.map(scala.xml.Utility.serialize(_, pscope)))
-//            }
-//            println("-----")
-
     if (chunks.isEmpty) {
       Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>")
-    } else if (noAtoms && (chunks.length >= 2) && canBreakLeft && canBreakRight) {
-        // TODO this stops inter-word lineOrSpaces in the chunks from folding when width demands it!!!
+
+    // If this is clearly a bunch of elements - stack 'em with an indent:
+    } else if (canBreakLeft && canBreakRight && noAtoms && (chunks.length >= 2)) {
         Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">") +
         Doc.cat(chunks.map(chunk => (Doc.hardLine + chunk).nested(indent))) +
         Doc.hardLine + Doc.text(s"</$name>")
+
+    // Mixed content or non-break-offable attachments on the side(s) cause flow-style:
     } else {
-      ((if (canBreakLeft) Doc.lineOrEmpty else Doc.empty) + Doc.intercalate(Doc.lineOrSpace, chunks)).tightBracketBy(
-        left = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">"),
-        right = (if (canBreakRight) Doc.lineOrEmpty else Doc.empty) + Doc.text(s"</$name>"),
-        indent
-      )
+//      ((if (canBreakLeft) Doc.lineOrEmpty else Doc.empty) + Doc.intercalate(Doc.lineOrSpace, chunks)).tightBracketBy(
+//        left = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">"),
+//        right = (if (canBreakRight) Doc.lineOrEmpty else Doc.empty) + Doc.text(s"</$name>"),
+//        indent
+//      )
+      Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">") +
+      (if (canBreakLeft) Doc.lineOrEmpty else Doc.empty) +
+      Doc.intercalate(Doc.lineOrSpace, chunks) +
+      (if (canBreakRight) Doc.lineOrEmpty else Doc.empty) +
+      Doc.text(s"</$name>")
     }
   }
 
@@ -94,8 +93,7 @@ final class PaigesPrettyPrinter(
     val nodes = PaigesPrettyPrinter.atomize(Seq.empty, element.child)
     val whitespaceLeft = nodes.headOption.exists(XmlUtil.isWhitespace)
     val whitespaceRight = nodes.lastOption.exists(XmlUtil.isWhitespace)
-    val chunks: Seq[Seq[Node]] =
-      PaigesPrettyPrinter.chunkify(Seq.empty, nodes)
+    val chunks: Seq[Seq[Node]] = PaigesPrettyPrinter.chunkify(Seq.empty, nodes)
     val noAtoms: Boolean = chunks.forall(_.forall(node => !XmlUtil.isAtom(node)))
     val result = fromChunks(
       chunks,
@@ -132,8 +130,6 @@ final class PaigesPrettyPrinter(
     if (nodes.length == 1) {
       fromNode(nodes.head, pscope, canBreakLeft, canBreakRight)
     } else {
-//      val what = nodes.map(node => Utility.serialize(node, pscope)).mkString("; ")
-//      println(s"No breaks: $what")
       val result: Seq[Doc] =
         fromNode(nodes.head, pscope, canBreakLeft, canBreakRight = false) +:
         nodes.tail.init.map(node => fromNode(node, pscope, canBreakLeft = false, canBreakRight = false)) :+

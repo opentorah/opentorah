@@ -41,12 +41,19 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
   }
 
   "Chunking" should "work" in {
-    print(From.resource(this, "alter-rebbe"), 120)
+    print(From.resource(this, "rgada"), 90)
   }
 
   "PaigesPrettyPrinter" should "work" in {
     check(<a><b></b></a>, 4, expected =
       """|<a>
+         |<b/>
+         |</a>""")
+
+    check(<a><b></b><b></b></a>, 4, expected =
+      """|<a>
+         |  <b
+         |  />
          |  <b
          |  />
          |</a>""")
@@ -78,42 +85,33 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
       expected = """<creation><date when="2020-02-24"/><note/></creation>""")
 
     check(<creation><date when="2020-02-24"/><note/></creation>, 52, expected =
-        """|<creation>
-           |  <date when="2020-02-24"/><note/>
+        """|<creation><date when="2020-02-24"/><note/>
            |</creation>""")
 
     check(<creation><date when="2020-02-24"/><note/></creation>, 33, expected =
-      """|<creation>
-         |  <date when="2020-02-24"/><note
-         |  />
-         |</creation>""")
+      """|<creation><date when="2020-02-24"
+         |/><note/></creation>""")
 
     check(<creation><date when="2020-02-24"/><note/></creation>, 24, expected =
-      """|<creation>
-         |  <date
-         |  when="2020-02-24"
-         |  /><note/>
-         |</creation>""")
+      """|<creation><date
+         |when="2020-02-24"/><note
+         |/></creation>""")
 
     check(<creation><date when="2020-02-24"/>blah</creation>, 50,
       expected = """<creation><date when="2020-02-24"/>blah</creation>""")
 
     check(<creation><date when="2020-02-24"/>blah</creation>, 49, expected =
-      """|<creation>
-         |  <date when="2020-02-24"/>blah
+      """|<creation><date when="2020-02-24"/>blah
          |</creation>""")
 
     check(<creation><date when="2020-02-24"/>blah</creation>, 30, expected = // there is a space after <date.
-      """|<creation>
-         |  <date when="2020-02-24"
-         |  />blah
+      """|<creation><date
+         |when="2020-02-24"/>blah
          |</creation>""")
 
     check(<creation><date when="2020-02-24"/>blah</creation>, 24, expected = // there is a space after <date.
-      """|<creation>
-         |  <date
-         |  when="2020-02-24"
-         |  />blah
+      """|<creation><date
+         |when="2020-02-24"/>blah
          |</creation>""")
   }
 }

@@ -33,4 +33,13 @@ object TeiHeader extends Descriptor[TeiHeader](
       {XenoData.toXml(value.xenoData)}
       {RevisionDesc.toXml(value.revisionDesc)}
     </teiHeader>
-)
+) {
+
+  def apply(fileDesc: FileDesc): TeiHeader = new TeiHeader(
+    fileDesc,
+    encodingDesc = None,
+    profileDesc = None,
+    xenoData = None,
+    revisionDesc = None
+  )
+}

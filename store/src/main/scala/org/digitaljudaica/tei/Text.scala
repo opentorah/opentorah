@@ -1,6 +1,7 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.xml.{ContentType, Descriptor, Xml}
+import scala.xml.Node
 
 final case class Text(
   lang: Option[String],
@@ -18,4 +19,10 @@ object Text extends Descriptor[Text](
     body
   ),
   toXml = (value: Text) => <text xml:lang={value.lang.orNull}>{Body.toXml(value.body)}</text>
-)
+) {
+
+  def apply(xml: Seq[Node]): Text = new Text(
+    lang = None,
+    body = Body(xml)
+  )
+}

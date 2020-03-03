@@ -1,6 +1,7 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.xml.Descriptor
+import scala.xml.Node
 
 final case class FileDesc(
   titleStmt: TitleStmt,
@@ -41,4 +42,15 @@ object FileDesc extends Descriptor[FileDesc](
       {NotesStmt.toXml(value.notesStmt)}
       {SourceDesc.toXml(value.sourceDesc)}
     </fileDesc>
-)
+) {
+
+  def apply(publicationStmt: PublicationStmt, sourceDesc: Seq[Node]): FileDesc = new FileDesc(
+    titleStmt = TitleStmt(),
+    editionStmt =  None,
+    extent = None,
+    publicationStmt,
+    seriesStmt = None,
+    notesStmt = None,
+    sourceDesc = SourceDesc(sourceDesc)
+  )
+}

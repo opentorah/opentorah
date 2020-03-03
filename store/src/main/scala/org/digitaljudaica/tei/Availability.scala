@@ -19,4 +19,10 @@ object Availability extends Descriptor[Availability](
     xml
   ),
   toXml = (value: Availability) => <availability status={value.status.orNull}>{value.xml}</availability>
-)
+) {
+
+  def apply(status: String, xml: Seq[Node]): Availability = new Availability(
+    status = Some(status),
+    xml
+  )
+}

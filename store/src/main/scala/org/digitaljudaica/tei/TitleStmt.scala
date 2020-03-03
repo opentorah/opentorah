@@ -56,4 +56,15 @@ object TitleStmt extends Descriptor[TitleStmt](
       {Principal.toXml(value.principals)}
       {RespStmt.toXml(value.respStmts)}
     </titleStmt>
-)
+) {
+  def apply(): TitleStmt =
+    new TitleStmt(
+      titles = Seq.empty,
+      authors = Seq.empty,
+      editors = Seq.empty,
+      sponsors = Seq.empty,
+      funders = Seq.empty,
+      principals = Seq.empty,
+      respStmts = Seq.empty
+    )
+}
