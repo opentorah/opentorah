@@ -1,20 +1,24 @@
 package org.digitaljudaica.archive.collector.reference
 
 import java.io.File
-import org.digitaljudaica.archive.collector.{CollectionLike, Layout, Util}
-import org.digitaljudaica.xml.{ContentType, Error, From, Parser, Xml}
-import org.digitaljudaica.util.Files
-import zio.{IO, ZIO}
+import org.digitaljudaica.archive.collector.{CollectionLike, Util}
 import scala.xml.{Node, Text}
 
-final class Names private(
-  layout: Layout,
+final class Names(
   override val reference: String,
   teiNameds: Seq[org.digitaljudaica.reference.Named],
-  listDescriptors: Seq[NamesList.Descriptor]
+  listDescriptors: Seq[NamesListDescriptor],
+  namedUrl: String => String,
+  namedInTheListUrl: String => String
 ) extends CollectionLike {
 
-  val nameds: Seq[Named] = for (teiNamed <- teiNameds) yield new Named(teiNamed, container = this, layout)
+  val nameds: Seq[Named] =
+    for (teiNamed <- teiNameds) yield new Named(
+      teiNamed,
+      container = this,
+      namedUrl,
+      namedInTheListUrl
+    )
 
   private val lists: Seq[NamesList] = listDescriptors.map(_.fillOut(nameds))
 
@@ -39,13 +43,13 @@ final class Names private(
     target = "namesViewer"
   )
 
-  def writeList(directory: File, fileName: String, layout: Layout): Unit = {
+  def writeList(directory: File, fileName: String, namedInTheListUrl: String => String): Unit = {
     // List of all names
     val nonEmptyLists = lists.filterNot(_.isEmpty)
 
     val listOfLists: Seq[Node] =
       <p>{for (list <- nonEmptyLists) yield
-        <l>{<ref target={layout.namedInTheListUrl(list.id)} role="namesViewer">{list.head}</ref>}</l>
+        <l>{<ref target={namedInTheListUrl(list.id)} role="namesViewer">{list.head}</ref>}</l>
       }</p>
 
     Util.writeTei(
@@ -56,26 +60,4 @@ final class Names private(
       target = "namesViewer"
     )
   }
-}
-
-object Names {
-
-  def parser(
-    directory: File,
-    layout: Layout,
-  ): Parser[Names] = for {
-    reference <- Xml.required("head", ContentType.Text, Xml.text.required)
-    listDescriptors <- Xml.all(NamesList.parser)
-    teiNamedResults <- ZIO.collectAll(Files.filesWithExtensions(directory, extension = "xml").sorted.map(fileName =>
-        From.file(directory, fileName)
-          .parse(ContentType.Elements, org.digitaljudaica.reference.Named.contentParser(fileName)).either))
-    errors: Seq[Error] = teiNamedResults.flatMap(_.left.toOption)
-    results: Seq[org.digitaljudaica.reference.Named] = teiNamedResults.flatMap(_.right.toOption)
-    teiNameds <- if (errors.nonEmpty) IO.fail(errors.mkString("--", "\n--", "")) else IO.succeed(results)
-  } yield new Names(
-    layout,
-    reference,
-    teiNameds,
-    listDescriptors
-  )
 }

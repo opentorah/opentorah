@@ -1,8 +1,11 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-import org.digitaljudaica.xml.{From, Parser, Print, Xml, XmlUtil}
-import org.digitaljudaica.archive.collector.reference.Names
+import org.digitaljudaica.xml.{ContentType, Error, From, Parser, Xml, XmlUtil}
+import org.digitaljudaica.archive.collector.reference.{Names, NamesListDescriptor}
+import org.digitaljudaica.util.Files
+import zio.{IO, ZIO}
+
 import scala.xml.{Elem, Text}
 
 object Main {
@@ -12,15 +15,44 @@ object Main {
     println(s"docs: $docs")
     val layout: Layout = new Layout(docs)
 
-    val collections: Seq[Collection] = for {
+    val collections: Seq[Collection] = readCollections(layout)
+    processCollections(collections, layout)
+
+    val names: Names = readNames(layout)
+
+    println("Verifying names' ids.")
+    for (named <- names.nameds) {
+      val id = named.id
+      val name = named.name
+      val expectedId = name.replace(' ', '_')
+      if (id != expectedId) println(s"id $id should be $expectedId")
+    }
+
+    println("Processing name references.")
+    names.addDocumentReferences(collections.flatMap(_.references))
+    names.checkReferences()
+    names.writeNames(layout.namesDirectory)
+    names.writeList(
+      directory = layout.namesFileDirectory,
+      fileName = layout.namesFileName,
+      namedInTheListUrl = layout.namedInTheListUrl
+    )
+  }
+
+  private def readCollections(layout: Layout): Seq[Collection] = {
+    val result: Seq[Collection] = for {
       directory <- layout.collections.listFiles.toSeq.filter(_.isDirectory)
     } yield Collection(layout, directory)
 
-//    println("Collections:")
-//    println(collections.map { collection =>
-//      s"  ${collection.directoryName}: ${XmlUtil.spacedText(collection.title)}\n"
-//    }.mkString)
+    //    println("Collections:")
+    //    println(result.map { collection =>
+    //      s"  ${collection.directoryName}: ${XmlUtil.spacedText(collection.title)}\n"
+    //    }.mkString)
 
+    result
+  }
+
+  private def processCollections(collections: Seq[Collection], layout: Layout): Unit = {
     println("Processing collections.")
     collections.foreach(_.process())
 
@@ -28,19 +60,38 @@ object Main {
     val collectionsSorted = collections.sorted
     writeCollectionsTree(collectionsSorted, layout)
     writeIndex(collectionsSorted, layout)
-
-    println("Reading names.")
-    val names: Names =
-      Parser.parseDo(From.file(layout.store, layout.namesListsFileName).parse(
-        Xml.withName("names", Names.parser(layout.storeNamesDirectory, layout))))
-
-    println("Processing name references.")
-    names.addDocumentReferences(collections.flatMap(_.references))
-    names.checkReferences()
-/////    names.writeStoreNames(layout.storeNamesDirectory)
-    names.writeNames(layout.namesDirectory)
-    names.writeList(layout.namesFileDirectory, layout.namesFileName, layout)
   }
+
+  private def readNames(layout: Layout): Names = {
+    println("Reading names.")
+
+    val (listsHead: String, listDescriptors: Seq[NamesListDescriptor]) =
+      NamesListDescriptor.readAll(layout.store, layout.namesListsFileName)
+
+    new Names(
+      reference = listsHead,
+      teiNameds = readNameds(layout.storeNamesDirectory),
+      listDescriptors,
+      namedUrl = layout.namedUrl,
+      namedInTheListUrl = layout.namedInTheListUrl
+    )
+  }
+
+  // TODO Move into store
+  private def readNameds(directory: File): Seq[org.digitaljudaica.reference.Named] = Parser.parseDo(collectAll(
+    for {
+      fileName <- Files.filesWithExtensions(directory, extension = "xml").sorted
+    } yield From.file(directory, fileName)
+      .parse(org.digitaljudaica.reference.Named.contentParser(fileName))
+  ))
+
+  // TODO Move into Parser
+  def collectAll[A](parsers: Seq[Parser[A]]): Parser[Seq[A]] = for {
+    runs <- ZIO.collectAll(parsers.map(_.either))
+    errors: Seq[Error] = runs.flatMap(_.left.toOption)
+    results: Seq[A] = runs.flatMap(_.right.toOption)
+    results <- if (errors.nonEmpty) IO.fail(errors.mkString("Errors:\n  ", "\n  ", "\n.")) else IO.succeed(results)
+  } yield results
 
   private def writeIndex(collections: Seq[Collection], layout: Layout): Unit = Util.writeTei(
     directory = layout.docs,
