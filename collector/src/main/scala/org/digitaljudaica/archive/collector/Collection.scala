@@ -166,7 +166,7 @@ object Collection {
     titleNodes <- Xml.optional("title", ContentType.Mixed, Xml.allNodes) // TODO common combinator
     caseAbstract <- Xml.required("abstract", ContentType.Mixed, Xml.allNodes)
     notes <- Xml.optional("notes", ContentType.Mixed, Xml.allNodes)
-    description = caseAbstract ++ notes.getOrElse(Seq.empty)
+    description = Seq(<span>{caseAbstract}</span>) ++ notes.getOrElse(Seq.empty)
     partDescriptors <- Xml.all("part", ContentType.Elements, Part.Descriptor.parser)
   } yield new Collection(
     layout,

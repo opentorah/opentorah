@@ -54,7 +54,7 @@ object Util {
     target: String,
     yaml: Seq[(String, String)] = Seq.empty
   ): Unit = {
-    writeXml(directory, fileName, Tei.toXml(Tei.tei(head, content)))
+    writeXml(directory, fileName, Tei.toXml(tei(head, content)))
 
     writeTeiWrapper(
       directory,
@@ -65,6 +65,19 @@ object Util {
       yaml = head.fold[Seq[(String, String)]](Seq.empty)(head => Seq("title" -> quote(XmlUtil.spacedText(head)))) ++ yaml
     )
   }
+
+  private def tei(head: Option[Node], content: Seq[Node]): Tei = Tei(
+    publisher = <ptr target="www.alter-rebbe.org"/>,
+    availabilityStatus = "free", availability =
+      <licence>
+        <ab>
+          <ref n="license" target="http://creativecommons.org/licenses/by/4.0/">
+            Creative Commons Attribution 4.0 International License</ref>
+        </ab>
+      </licence>,
+    sourceDesc = <p>Facsimile</p>,
+    body = head.fold[Seq[Node]](Seq.empty)(head => Seq(<head>{head}</head>)) ++ content
+  )
 
   def writeXml(
     directory: File,
