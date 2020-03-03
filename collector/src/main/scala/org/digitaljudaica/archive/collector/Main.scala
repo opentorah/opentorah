@@ -5,7 +5,6 @@ import org.digitaljudaica.xml.{ContentType, Error, From, Parser, Xml, XmlUtil}
 import org.digitaljudaica.archive.collector.reference.{Names, NamesListDescriptor}
 import org.digitaljudaica.util.Files
 import zio.{IO, ZIO}
-
 import scala.xml.{Elem, Text}
 
 object Main {
