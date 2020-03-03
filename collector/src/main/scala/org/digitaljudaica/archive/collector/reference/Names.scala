@@ -1,20 +1,27 @@
 package org.digitaljudaica.archive.collector.reference
 
 import java.io.File
-import org.digitaljudaica.archive.collector.{CollectionLike, Layout, Util}
+import org.digitaljudaica.archive.collector.{CollectionLike, Util}
 import org.digitaljudaica.xml.{ContentType, Error, From, Parser, Xml}
 import org.digitaljudaica.util.Files
 import zio.{IO, ZIO}
 import scala.xml.{Node, Text}
 
 final class Names private(
-  layout: Layout,
   override val reference: String,
   teiNameds: Seq[org.digitaljudaica.reference.Named],
-  listDescriptors: Seq[NamesList.Descriptor]
+  listDescriptors: Seq[NamesList.Descriptor],
+  namedUrl: String => String,
+  namedInTheListUrl: String => String
 ) extends CollectionLike {
 
-  val nameds: Seq[Named] = for (teiNamed <- teiNameds) yield new Named(teiNamed, container = this, layout)
+  val nameds: Seq[Named] =
+    for (teiNamed <- teiNameds) yield new Named(
+      teiNamed,
+      container = this,
+      namedUrl,
+      namedInTheListUrl
+    )
 
   private val lists: Seq[NamesList] = listDescriptors.map(_.fillOut(nameds))
 
@@ -39,13 +46,13 @@ final class Names private(
     target = "namesViewer"
   )
 
-  def writeList(directory: File, fileName: String, layout: Layout): Unit = {
+  def writeList(directory: File, fileName: String, namedInTheListUrl: String => String): Unit = {
     // List of all names
     val nonEmptyLists = lists.filterNot(_.isEmpty)
 
     val listOfLists: Seq[Node] =
       <p>{for (list <- nonEmptyLists) yield
-        <l>{<ref target={layout.namedInTheListUrl(list.id)} role="namesViewer">{list.head}</ref>}</l>
+        <l>{<ref target={namedInTheListUrl(list.id)} role="namesViewer">{list.head}</ref>}</l>
       }</p>
 
     Util.writeTei(
@@ -62,7 +69,8 @@ object Names {
 
   def parser(
     directory: File,
-    layout: Layout,
+    namedUrl: String => String,
+    namedInTheListUrl: String => String
   ): Parser[Names] = for {
     reference <- Xml.required("head", ContentType.Text, Xml.text.required)
     listDescriptors <- Xml.all(NamesList.parser)
@@ -73,9 +81,10 @@ object Names {
     results: Seq[org.digitaljudaica.reference.Named] = teiNamedResults.flatMap(_.right.toOption)
     teiNameds <- if (errors.nonEmpty) IO.fail(errors.mkString("--", "\n--", "")) else IO.succeed(results)
   } yield new Names(
-    layout,
     reference,
     teiNameds,
-    listDescriptors
+    listDescriptors,
+    namedUrl,
+    namedInTheListUrl
   )
 }
