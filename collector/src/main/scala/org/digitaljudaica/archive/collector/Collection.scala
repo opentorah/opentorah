@@ -148,13 +148,7 @@ final class Collection private(
 
 object Collection {
 
-  def apply(
-    layout: Layout,
-    directory: File
-  ): Collection =
-    Parser.parseDo(From.file(directory, layout.collectionFileName).parse(parser(layout, directory)))
-
-  private def parser(
+  def parser(
     layout: Layout,
     directory: File
   ): Parser[Collection] = for {
