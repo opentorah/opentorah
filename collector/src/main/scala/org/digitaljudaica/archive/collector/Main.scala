@@ -28,7 +28,16 @@ object Main {
     println("Processing name references.")
     names.addDocumentReferences(collections.flatMap(_.references))
     names.checkReferences()
-    names.writeNames(layout.namesDirectory)
+
+    println("Writing names")
+    for (named <- names.nameds) Util.writeTei(
+      layout.namesDirectory,
+      fileName = named.id,
+      head = None,
+      content = Seq(named.toXml(names.getReferences)),
+      target = "namesViewer"
+    )
+
     names.writeList(
       directory = layout.namesFileDirectory,
       fileName = layout.namesFileName,

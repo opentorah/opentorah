@@ -167,6 +167,7 @@ object Collection {
     caseAbstract <- Xml.required("abstract", ContentType.Mixed, Xml.allNodes) // TODO common combinator
     notes <- Xml.optional("notes", ContentType.Mixed, Xml.allNodes) // TODO common combinator
     description = Seq(<span>{caseAbstract}</span>) ++ notes.getOrElse(Seq.empty)
+    // TODO swap parts and notes; remove notes wrapper element; simplify parts; see how to generalize parts...
     partDescriptors <- Xml.all("part", ContentType.Elements, Part.Descriptor.parser)
   } yield new Collection(
     layout,
