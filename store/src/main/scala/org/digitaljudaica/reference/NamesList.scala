@@ -8,9 +8,10 @@ final case class NamesList(
   id: String,
   role: Option[String],
   head: String
-)
+) {
+  def includes(named: Named): Boolean = (named.entity == entity) && (named.role == role)
+}
 
-// TODO extend Descriptor; normalize parsers
 object NamesList {
 
   val parser: Parser[NamesList] = for {
@@ -26,6 +27,7 @@ object NamesList {
     head
   )
 
+  // TODO provide just the parser and just for the lists; move head and parseDo into the callers.
   def readAll(directory: File, fileName: String): (String, Seq[NamesList]) = Parser.parseDo(
     From.file(directory, fileName)
       .parse(Xml.withName("names", for {

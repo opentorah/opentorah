@@ -54,7 +54,7 @@ object XmlUtil {
     node.isInstanceOf[Elem]
 
   def isAtom(node: Node): Boolean =
-    node.isInstanceOf[Atom[String]]
+    node.isInstanceOf[Atom[_]]
 
   def isText(node: Node): Boolean =
     node.isInstanceOf[Text]

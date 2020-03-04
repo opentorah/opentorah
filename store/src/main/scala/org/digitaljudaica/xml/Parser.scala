@@ -1,6 +1,6 @@
 package org.digitaljudaica.xml
 
-import zio.{DefaultRuntime, IO, ZIO}
+import zio.{Runtime, IO, ZIO}
 
 object Parser {
 
@@ -41,5 +41,5 @@ object Parser {
     else IO.fail(message)
 
   final def run[A](toRun: IO[Error, A]): A =
-    new DefaultRuntime {}.unsafeRun(toRun.mapError(error => throw new IllegalArgumentException(error)))
+    Runtime.default.unsafeRun(toRun.mapError(error => throw new IllegalArgumentException(error)))
 }
