@@ -14,6 +14,7 @@ abstract class ReferenceSource(val collection: CollectionLike) {
 
   def url: String
 
-  protected final def bindReferences(teiReferences: Seq[org.digitaljudaica.reference.Reference]): Seq[Reference] =
-    teiReferences.map(teiReference => Reference(this, teiReference))
+  // TODO unfold
+  protected final def bindReferences(storeReferences: Seq[org.digitaljudaica.reference.Reference]): Seq[Reference] =
+    storeReferences.map(storeReference => Reference(source = this, storeReference))
 }

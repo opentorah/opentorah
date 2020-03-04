@@ -1,10 +1,8 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-import org.digitaljudaica.xml.{ContentType, Error, From, Parser, Xml, XmlUtil}
-import org.digitaljudaica.archive.collector.reference.{Names, NamesListDescriptor}
-import org.digitaljudaica.util.Files
-import zio.{IO, ZIO}
+import org.digitaljudaica.xml.XmlUtil
+import org.digitaljudaica.archive.collector.reference.Names
 import scala.xml.{Elem, Text}
 
 object Main {
@@ -64,33 +62,17 @@ object Main {
   private def readNames(layout: Layout): Names = {
     println("Reading names.")
 
-    val (listsHead: String, listDescriptors: Seq[NamesListDescriptor]) =
-      NamesListDescriptor.readAll(layout.store, layout.namesListsFileName)
+    val (listsHead: String, storeNamesLists: Seq[org.digitaljudaica.reference.NamesList]) =
+      org.digitaljudaica.reference.NamesList.readAll(layout.store, layout.namesListsFileName)
 
     new Names(
       reference = listsHead,
-      teiNameds = readNameds(layout.storeNamesDirectory),
-      listDescriptors,
+      storeNameds = org.digitaljudaica.reference.Named.readAll(layout.storeNamesDirectory),
+      storeNamesLists,
       namedUrl = layout.namedUrl,
       namedInTheListUrl = layout.namedInTheListUrl
     )
   }
-
-  // TODO Move into store
-  private def readNameds(directory: File): Seq[org.digitaljudaica.reference.Named] = Parser.parseDo(collectAll(
-    for {
-      fileName <- Files.filesWithExtensions(directory, extension = "xml").sorted
-    } yield From.file(directory, fileName)
-      .parse(org.digitaljudaica.reference.Named.contentParser(fileName))
-  ))
-
-  // TODO Move into Parser
-  def collectAll[A](parsers: Seq[Parser[A]]): Parser[Seq[A]] = for {
-    runs <- ZIO.collectAll(parsers.map(_.either))
-    errors: Seq[Error] = runs.flatMap(_.left.toOption)
-    results: Seq[A] = runs.flatMap(_.right.toOption)
-    results <- if (errors.nonEmpty) IO.fail(errors.mkString("Errors:\n  ", "\n  ", "\n.")) else IO.succeed(results)
-  } yield results
 
   private def writeIndex(collections: Seq[Collection], layout: Layout): Unit = Util.writeTei(
     directory = layout.docs,

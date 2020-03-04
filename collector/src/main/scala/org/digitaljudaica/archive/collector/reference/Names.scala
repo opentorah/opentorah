@@ -6,21 +6,23 @@ import scala.xml.{Node, Text}
 
 final class Names(
   override val reference: String,
-  teiNameds: Seq[org.digitaljudaica.reference.Named],
-  listDescriptors: Seq[NamesListDescriptor],
+  storeNameds: Seq[org.digitaljudaica.reference.Named],
+  storeNamesLists: Seq[org.digitaljudaica.reference.NamesList],
   namedUrl: String => String,
   namedInTheListUrl: String => String
 ) extends CollectionLike {
 
-  val nameds: Seq[Named] =
-    for (teiNamed <- teiNameds) yield new Named(
-      teiNamed,
-      container = this,
-      namedUrl,
-      namedInTheListUrl
-    )
+  val nameds: Seq[Named] = for (teiNamed <- storeNameds) yield new Named(
+    teiNamed,
+    container = this,
+    namedUrl,
+    namedInTheListUrl
+  )
 
-  private val lists: Seq[NamesList] = listDescriptors.map(_.fillOut(nameds))
+  private val lists: Seq[NamesList] = for (storeNamesList <- storeNamesLists) yield new NamesList(
+    storeNamesList = storeNamesList,
+    nameds = nameds.filter(named => storeNamesList.includes(named.storeNamed))
+  )
 
   def findByRef(ref: String): Option[Named] = nameds.find(_.id == ref)
 

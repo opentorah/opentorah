@@ -4,12 +4,13 @@ import org.digitaljudaica.reference.Entity
 import scala.xml.Elem
 
 final class NamesList(
-  val entity: Entity,
-  val id: String,
-  val role: Option[String],
-  val head: String,
+  storeNamesList: org.digitaljudaica.reference.NamesList,
   val nameds: Seq[Named]
 ) {
+  def entity: Entity = storeNamesList.entity
+  def id: String = storeNamesList.id
+  def role: Option[String] = storeNamesList.role
+  def head: String = storeNamesList.head
 
   def isEmpty: Boolean = nameds.isEmpty
 

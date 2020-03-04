@@ -33,11 +33,11 @@ final class Document(
 
   def transcribers: Seq[Elem] = tei.titleStmt.editors.filter(_.role.contains("transcriber")).flatMap(_.persName)
 
-  def date: Option[String] = tei.teiHeader.profileDesc.flatMap(_.creation.map(_.date.when))
+  def date: Option[String] = tei.creationDate.map(_.when)
 
   def description: Option[Seq[Node]] = tei.getAbstract.orElse(title)
 
-  def language: Option[String] = tei.teiHeader.profileDesc.flatMap(_.langUsage).toSeq.flatMap(_.languages).map(_.ident).headOption
+  def language: Option[String] = tei.languages.map(_.ident).headOption
 
   val pages: Seq[Page] = for (pb <- tei.pbs) yield collection.pageType(
     n = pb.n,

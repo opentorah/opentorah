@@ -30,11 +30,3 @@ final case class Reference(
     <name ref={ref.orNull} xml:id={id.orNull} role={role.orNull}>{name}</name>
       .copy(label = entity.nameElement)
 }
-
-object Reference {
-  // TODO unfold
-  def apply(source: ReferenceSource, teiReference: org.digitaljudaica.reference.Reference): Reference = new Reference(
-    source,
-    teiReference
-  )
-}
