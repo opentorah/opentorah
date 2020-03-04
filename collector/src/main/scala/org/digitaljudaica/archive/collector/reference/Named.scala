@@ -12,6 +12,8 @@ final class Named(
 ) extends ReferenceSource(container) {
 
   def entity: Entity = storeNamed.entity
+
+  // TODO remove id from the store Named: it is only used in the list...
   def id: String = storeNamed.id
   def role: Option[String] = storeNamed.role
   def names: Seq[Name] = storeNamed.names
@@ -31,7 +33,7 @@ final class Named(
   def toListXml: Elem =
     <l><ref target={url} role="namesViewer">{names.head.toXml}</ref></l>
 
-  def toXml(references: Seq[Reference]): Seq[Node] =
+  def toXml(references: Seq[Reference]): Elem =
     <named xml:id={id} role={role.orNull}>
       {for (name <- names) yield name.toXml}
       {content :+ Named.mentions(
@@ -43,6 +45,13 @@ final class Named(
 }
 
 object Named {
+
+  def toXml(value: Named): Elem =
+    <named role={value.role.orNull}>
+      {for (name <- value.names) yield name.toXml}
+      {value.content}
+    </named>
+      .copy(label = value.entity.element)
 
   private def mentions(references: Seq[Reference], toList: Elem): Elem = {
     val fromNames: Seq[Reference] = references.filter(_.source.isNames)

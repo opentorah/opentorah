@@ -27,6 +27,7 @@ final class Names(
   def findByRef(ref: String): Option[Named] = nameds.find(_.id == ref)
 
   private var references: Seq[Reference] = _
+  def getReferences: Seq[Reference] = references
 
   def addDocumentReferences(documentReferences: Seq[Reference]): Unit = {
     references = (nameds.flatMap(_.references) ++ documentReferences).filterNot(_.name == Text("?"))
@@ -36,14 +37,6 @@ final class Names(
     val errors: Seq[String] = references.flatMap(_.check(this))
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
   }
-
-  def writeNames(directory: File): Unit = for (named <- nameds) Util.writeTei(
-    directory,
-    fileName = named.id,
-    head = None,
-    content = named.toXml(references),
-    target = "namesViewer"
-  )
 
   def writeList(directory: File, fileName: String, namedInTheListUrl: String => String): Unit = {
     // List of all names
