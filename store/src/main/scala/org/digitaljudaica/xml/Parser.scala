@@ -27,7 +27,12 @@ object Parser {
     result.provide(new Context)
   }
 
-  // TODO move into non-Parser-related class (or util package?) for reuse (in 'collector' etc.)
+  def collectAll[A](parsers: Seq[Parser[A]]): Parser[Seq[A]] = for {
+    runs <- ZIO.collectAll(parsers.map(_.either))
+    errors: Seq[Error] = runs.flatMap(_.left.toOption)
+    results: Seq[A] = runs.flatMap(_.right.toOption)
+    results <- if (errors.nonEmpty) IO.fail(errors.mkString("Errors:\n  ", "\n  ", "\n.")) else IO.succeed(results)
+  } yield results
 
   private[xml] def effect[A](f: => A): IO[Error, A] = IO(f).mapError(_.getMessage)
 

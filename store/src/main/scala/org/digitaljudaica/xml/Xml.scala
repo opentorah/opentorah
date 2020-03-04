@@ -173,6 +173,12 @@ object Xml {
 
     val required: Parser[String] =
       Parser.required("text", optional)
+
+    def optional(name: String): Parser[Option[String]] =
+      Xml.optional(name, ContentType.Text, required)
+
+    def required(name: String): Parser[String] =
+      Xml.required(name, ContentType.Text, required)
   }
 
   def nested[A](name: String, xml: Elem, contentType: ContentType, parser: Parser[A]): Parser[A] =

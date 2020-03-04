@@ -33,6 +33,7 @@ final class PaigesPrettyPrinter(
   ): Doc = node match {
     case element: Elem =>
       val result = fromElement(element, pscope, canBreakLeft, canBreakRight)
+      // TODO suppress extra hardLine when in stack
       if (canBreakRight && element.label == "lb") result + Doc.hardLine else result
 
     case text: Text =>
@@ -70,13 +71,17 @@ final class PaigesPrettyPrinter(
         Doc.cat(chunks.map(chunk => (Doc.hardLine + chunk).nested(indent))) +
         Doc.hardLine + Doc.text(s"</$name>")
 
-    // Mixed content or non-break-offable attachments on the side(s) cause flow-style:
+    // If this is a paragraph (<p>) - nest its chunks unless there is only one:
+    // TODO remove lineOrEmpty in chunks and right?
+    } else if (canBreakLeft && canBreakRight && (element.label == "p") && (chunks.length >= 2)) {
+      (Doc.lineOrEmpty + Doc.intercalate(Doc.lineOrSpace, chunks)).tightBracketBy(
+        left = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">"),
+        right = Doc.lineOrEmpty + Doc.text(s"</$name>"),
+        indent
+      )
+
+    // Mixed content or non-break-off-able attachments on the side(s) cause flow-style:
     } else {
-//      ((if (canBreakLeft) Doc.lineOrEmpty else Doc.empty) + Doc.intercalate(Doc.lineOrSpace, chunks)).tightBracketBy(
-//        left = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">"),
-//        right = (if (canBreakRight) Doc.lineOrEmpty else Doc.empty) + Doc.text(s"</$name>"),
-//        indent
-//      )
       Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">") +
       (if (canBreakLeft) Doc.lineOrEmpty else Doc.empty) +
       Doc.intercalate(Doc.lineOrSpace, chunks) +

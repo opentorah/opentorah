@@ -11,6 +11,8 @@ final case class Tei(
   def titleStmt: TitleStmt = teiHeader.fileDesc.titleStmt
   val correspDesc: Option[CorrespDesc] = teiHeader.profileDesc.flatMap(_.correspDesc)
   def getAbstract: Option[Seq[Node]] = teiHeader.profileDesc.flatMap(_.documentAbstract.map(_.xml))
+  def creationDate: Option[Date] = teiHeader.profileDesc.flatMap(_.creation.map(_.date))
+  def languages: Seq[Language] = teiHeader.profileDesc.flatMap(_.langUsage).toSeq.flatMap(_.languages)
   val body: Body = text.body
   val pbs: Seq[Pb] = body.xml.flatMap(Pb.descendants)
 

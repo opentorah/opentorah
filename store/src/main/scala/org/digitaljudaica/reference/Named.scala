@@ -1,13 +1,15 @@
 package org.digitaljudaica.reference
 
-import org.digitaljudaica.xml.{ContentType, Parser, Xml, XmlUtil}
+import java.io.File
+import org.digitaljudaica.util.Files
+import org.digitaljudaica.xml.{ContentType, From, Parser, Xml, XmlUtil}
 import scala.xml.Node
 
 final case class Named private(
   entity: Entity,
   id: String,
   role: Option[String],
-  names: Seq[Name], // TODO split ito main and alternatives
+  names: Seq[Name],
   content: Seq[Node]
 )
 
@@ -31,4 +33,11 @@ object Named {
     names,
     content = content.map(XmlUtil.removeNamespace),
   )
+
+  def readAll(directory: File): Seq[org.digitaljudaica.reference.Named] = Parser.parseDo(Parser.collectAll(
+    for {
+      fileName <- Files.filesWithExtensions(directory, extension = "xml").sorted
+    } yield From.file(directory, fileName)
+      .parse(org.digitaljudaica.reference.Named.contentParser(fileName))
+  ))
 }
