@@ -18,6 +18,8 @@ final class Layout(val docs: File) {
 
   val collections: File = docs(collectionsDirectoryName)
 
+  val storeCollections: File = store(collectionsDirectoryName)
+
   private def url(ref: String): String = s"/$collectionsDirectoryName/$ref"
 
   val namesDirectoryName: String = "names"

@@ -1,8 +1,7 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
-
-import org.digitaljudaica.xml.XmlUtil
+import org.digitaljudaica.xml.{From, Parser, XmlUtil}
 import org.digitaljudaica.archive.collector.reference.{Named, Names, Reference}
 import org.digitaljudaica.util.Files
 import scala.xml.{Elem, Text}
@@ -46,8 +45,14 @@ object Main {
 
   private def readCollections(layout: Layout): Seq[Collection] = {
     val result: Seq[Collection] = for {
-      directory <- layout.collections.listFiles.toSeq.filter(_.isDirectory)
-    } yield Collection(layout, directory)
+      directory <- layout.storeCollections.listFiles.toSeq.filter(_.isDirectory)
+    } yield {
+      Parser.parseDo(
+        From.file(directory, layout.collectionFileName)
+          .parse(Collection.parser(layout, new File(layout.collections, directory.getName)))
+      )
+    }
+
 
     //    println("Collections:")
     //    println(result.map { collection =>
