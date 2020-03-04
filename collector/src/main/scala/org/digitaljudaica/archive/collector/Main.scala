@@ -31,11 +31,11 @@ object Main {
     names.addDocumentReferences(collections.flatMap(_.references))
     names.checkReferences()
 
-    writeNames(
-      layout.namesDirectory,
-      names.nameds,
-      names.getReferences
-    )
+    writeNames(layout.namesDirectory, names.nameds, names.getReferences)
+
+    println("Pretty-printing names")
+    for (named <- names.nameds)
+      Util.writeXml(layout.storeNamesDirectory, named.id, Named.toXml(named))
 
     names.writeList(
       directory = layout.namesFileDirectory,
