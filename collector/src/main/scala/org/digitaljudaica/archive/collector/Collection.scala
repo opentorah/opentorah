@@ -3,13 +3,15 @@ package org.digitaljudaica.archive.collector
 import java.io.File
 import org.digitaljudaica.archive.collector.reference.Reference
 import org.digitaljudaica.util.{Collections, Files}
-import org.digitaljudaica.xml.{ContentType, From, XmlUtil, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, From, Parser, Xml, XmlUtil}
 import Table.Column
+import org.digitaljudaica.tei.Tei
 import scala.xml.{Elem, Node, Text}
 
 final class Collection private(
   layout: Layout,
-  directory: File,
+  val directoryName: String,
+  sourceDirectory: File,
   isBook: Boolean,
   val publish: Boolean,
   val archive: Option[String],
@@ -17,17 +19,13 @@ final class Collection private(
   val number: Option[Int],
   titleNodes: Option[Seq[Node]],
   val caseAbstract: Seq[Node],
-  description: Seq[Node],
+  val description: Seq[Node],
   partDescriptors: Seq[Part.Descriptor]
 ) extends CollectionLike with Ordered[Collection] {
 
-  def directoryName: String = directory.getName
-
   override def toString: String = directoryName
 
-  val teiDirectory: File = layout.tei(directory)
-
-  private val parts: Seq[Part] = Part.Descriptor.splitParts(partDescriptors, getDocuments)
+  val parts: Seq[Part] = Part.Descriptor.splitParts(partDescriptors, getDocuments(sourceDirectory))
 
   def archiveCase: String = prefix.getOrElse("") + number.map(_.toString).getOrElse("")
 
@@ -55,13 +53,13 @@ final class Collection private(
 
   def pageType: Page.Type = if (isBook) Page.Book else Page.Manuscript
 
-  private val documents: Seq[Document] = parts.flatMap(_.documents)
+  val documents: Seq[Document] = parts.flatMap(_.documents)
 
   def references: Seq[Reference] = documents.flatMap(_.references)
 
   private val pages: Seq[Page] = documents.flatMap(_.pages)
 
-  private val missingPages: Seq[String] = pages.filterNot(_.isPresent).map(_.displayName)
+  val missingPages: Seq[String] = pages.filterNot(_.isPresent).map(_.displayName)
 
   /// Check consistency
   checkPages()
@@ -91,9 +89,9 @@ final class Collection private(
     else (name.substring(0, dash), Some(name.substring(dash+1)))
   }
 
-  private def getDocuments: Seq[Document] = {
+  private def getDocuments(sourceDirectory: File): Seq[Document] = {
     val namesWithLang: Seq[(String, Option[String])] =
-      Files.filesWithExtensions(teiDirectory, "xml").sorted.map(splitLang)
+      Files.filesWithExtensions(sourceDirectory, "xml").sorted.map(splitLang)
 
     val translations: Map[String, Seq[String]] = Collections.mapValues(namesWithLang
       .filter(_._2.isDefined)
@@ -112,37 +110,12 @@ final class Collection private(
     for ((name, (prev, next)) <- namesWithSiblings) yield new Document(
       layout,
       collection = this,
+      tei = Parser.parseDo(Tei.parse(From.file(sourceDirectory, name))),
       name,
       prev,
       next,
       translations = translations.getOrElse(name, Seq.empty)
     )
-  }
-
-  def process(): Unit = {
-    // Index
-    Util.writeTei(
-      directory,
-      fileName = "index",
-      head = Some(title),
-      content = description ++
-        Seq[Elem](Collection.table(layout).toTei(
-          parts.flatMap { part =>  part.title.map(Table.Xml).toSeq ++ part.documents.map(Table.Data[Document]) }
-        )) ++
-        (if (missingPages.isEmpty) Seq.empty
-        else Seq(<p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>)),
-      style = Some("wide"),
-      target = "collectionViewer",
-      yaml = Seq("documentCollection" -> Util.quote(reference))
-    )
-
-    // Wrappers
-    val docsDirectory = layout.docs(directory)
-    Files.deleteFiles(docsDirectory)
-    val facsDirectory = layout.facs(directory)
-    Files.deleteFiles(facsDirectory)
-
-    for (document <- documents) document.writeWrappers(docsDirectory, facsDirectory)
   }
 }
 
@@ -165,19 +138,20 @@ object Collection {
     partDescriptors <- Xml.all("part", ContentType.Elements, Part.Descriptor.parser)
   } yield new Collection(
     layout,
-    directory,
+    directoryName = directory.getName,
+    sourceDirectory = layout.tei(directory),
     isBook,
     publish,
     archive,
     prefix,
-    numberStr.map(_.toInt),
+    number = numberStr.map(_.toInt),
     titleNodes,
     caseAbstract,
     description,
     partDescriptors
   )
 
-  private def table(layout: Layout): Table[Document] = new Table[Document](
+  def table(documentUrlRelativeToIndex: String => String): Table[Document] = new Table[Document](
     Column("Описание", "description", { document: Document =>
       document.description.getOrElse(Seq.empty).map(XmlUtil.removeNamespace)
     }),
@@ -195,19 +169,19 @@ object Collection {
 
     Column("Язык", "language", { document: Document =>
       val translations: Seq[Elem] = for (translation <- document.translations) yield
-        <ref target={layout.documentUrlRelativeToIndex(document.name + "-" + translation)}
+        <ref target={documentUrlRelativeToIndex(document.name + "-" + translation)}
              role="documentViewer">{translation}</ref>
 
       Seq(Text(document.language.getOrElse("?"))) ++ translations
     }),
 
     Column("Документ", "document", { document: Document =>
-      <ref target={layout.documentUrlRelativeToIndex(document.name)}
+      <ref target={documentUrlRelativeToIndex(document.name)}
            role="documentViewer">{document.name}</ref>
     }),
 
     Column("Страницы", "pages", { document: Document => for (page <- document.pages) yield
-      <ref target={layout.documentUrlRelativeToIndex(document.name) + s"#p${page.n}"}
+      <ref target={documentUrlRelativeToIndex(document.name) + s"#p${page.n}"}
            role="documentViewer"
            rendition={if (page.isPresent) "page" else "missing-page"}>{page.displayName}</ref>
     }),
