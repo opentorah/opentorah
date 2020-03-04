@@ -160,12 +160,12 @@ object Collection {
   ): Parser[Collection] = for {
     isBook <- Xml.attribute.optional.booleanOrFalse("isBook")
     publish <- Xml.attribute.optional.booleanOrFalse("publish")
-    archive <- Xml.optional("archive", ContentType.Text, Xml.text.required) // TODO common combinator
-    prefix <- Xml.optional("prefix", ContentType.Text, Xml.text.required)
-    number <- Xml.optional("number", ContentType.Text, Xml.text.required.map(_.toInt)) // TODO text.int
+    archive <- Xml.text.optional("archive")
+    prefix <- Xml.text.optional("prefix")
+    numberStr <- Xml.text.optional("number") // TODO text.int
     titleNodes <- Xml.optional("title", ContentType.Mixed, Xml.allNodes) // TODO common combinator
-    caseAbstract <- Xml.required("abstract", ContentType.Mixed, Xml.allNodes)
-    notes <- Xml.optional("notes", ContentType.Mixed, Xml.allNodes)
+    caseAbstract <- Xml.required("abstract", ContentType.Mixed, Xml.allNodes) // TODO common combinator
+    notes <- Xml.optional("notes", ContentType.Mixed, Xml.allNodes) // TODO common combinator
     description = Seq(<span>{caseAbstract}</span>) ++ notes.getOrElse(Seq.empty)
     partDescriptors <- Xml.all("part", ContentType.Elements, Part.Descriptor.parser)
   } yield new Collection(
@@ -175,7 +175,7 @@ object Collection {
     publish,
     archive,
     prefix,
-    number,
+    numberStr.map(_.toInt),
     titleNodes,
     caseAbstract,
     description,

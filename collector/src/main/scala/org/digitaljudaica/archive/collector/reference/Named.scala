@@ -5,17 +5,17 @@ import org.digitaljudaica.util.Collections
 import scala.xml.{Elem, Node}
 
 final class Named(
-  named: org.digitaljudaica.reference.Named,
+  val storeNamed: org.digitaljudaica.reference.Named,
   container: Names,
   namedUrl: String => String,
   namedInTheListUrl: String => String
 ) extends ReferenceSource(container) {
 
-  def entity: Entity = named.entity
-  def id: String = named.id
-  def role: Option[String] = named.role
-  def names: Seq[Name] = named.names
-  def content: Seq[Node] = named.content
+  def entity: Entity = storeNamed.entity
+  def id: String = storeNamed.id
+  def role: Option[String] = storeNamed.role
+  def names: Seq[Name] = storeNamed.names
+  def content: Seq[Node] = storeNamed.content
 
   override val references: Seq[Reference] = bindReferences(content.flatMap(element =>
     org.digitaljudaica.reference.Reference.all(element)))
