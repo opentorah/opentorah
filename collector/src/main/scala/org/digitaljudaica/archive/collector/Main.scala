@@ -1,8 +1,10 @@
 package org.digitaljudaica.archive.collector
 
 import java.io.File
+
 import org.digitaljudaica.xml.XmlUtil
-import org.digitaljudaica.archive.collector.reference.Names
+import org.digitaljudaica.archive.collector.reference.{Named, Names, Reference}
+import org.digitaljudaica.util.Files
 import scala.xml.{Elem, Text}
 
 object Main {
@@ -29,13 +31,10 @@ object Main {
     names.addDocumentReferences(collections.flatMap(_.references))
     names.checkReferences()
 
-    println("Writing names")
-    for (named <- names.nameds) Util.writeTei(
+    writeNames(
       layout.namesDirectory,
-      fileName = named.id,
-      head = None,
-      content = Seq(named.toXml(names.getReferences)),
-      target = "namesViewer"
+      names.nameds,
+      names.getReferences
     )
 
     names.writeList(
@@ -80,6 +79,22 @@ object Main {
       storeNamesLists,
       namedUrl = layout.namedUrl,
       namedInTheListUrl = layout.namedInTheListUrl
+    )
+  }
+
+  private def writeNames(
+    directory: File,
+    nameds: Seq[Named],
+    references: Seq[Reference]
+  ): Unit = {
+    println("Writing names")
+    Files.deleteFiles(directory)
+    for (named <- nameds) Util.writeTei(
+      directory,
+      fileName = named.id,
+      head = None,
+      content = Seq(named.toXml(references)),
+      target = "namesViewer"
     )
   }
 
