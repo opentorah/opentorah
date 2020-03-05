@@ -11,12 +11,36 @@ import scala.xml.{Elem, Node, Text}
 
 object Main {
 
+  private val migrated: Boolean = false
+
   def main(args: Array[String]): Unit = {
     val docs: File = new File(args(0))
     println(s"docs: $docs")
     val layout: Layout = new Layout(docs)
 
-    val collections: Seq[Collection] = readCollections(layout)
+    val collections: Seq[Collection] = for {
+      directory <- layout.storeCollections.listFiles.toSeq.filter(_.isDirectory)
+    } yield {
+      // Read from 'docs/store/collections'
+      val sourceDirectory: File =
+        new File(if (migrated) layout.storeCollections else layout.collections, directory.getName)
+      Parser.parseDo(
+        From.file(directory, layout.collectionFileName).parse(Collection.parser(layout, sourceDirectory))
+      )
+    }
+
+    // Write to 'docs/collections'
+    for (collection <- collections; document <- collection.documents) Util.writeXml(
+      new File(if (migrated) layout.collections else layout.storeCollections, collection.directoryName),
+      document.name,
+      Tei.toXml(document.tei)
+    )
+
+    //    println("Collections:")
+    //    println(result.map { collection =>
+    //      s"  ${collection.directoryName}: ${XmlUtil.spacedText(collection.title)}\n"
+    //    }.mkString)
+
     processCollections(collections, layout)
 
     val names: Names = readNames(layout)
@@ -45,25 +69,6 @@ object Main {
       fileName = layout.namesFileName,
       namedInTheListUrl = layout.namedInTheListUrl
     )
-  }
-
-  private def readCollections(layout: Layout): Seq[Collection] = {
-    val result: Seq[Collection] = for {
-      directory <- layout.storeCollections.listFiles.toSeq.filter(_.isDirectory)
-    } yield {
-      Parser.parseDo(
-        From.file(directory, layout.collectionFileName)
-          .parse(Collection.parser(layout, new File(layout.collections, directory.getName)))
-      )
-    }
-
-
-    //    println("Collections:")
-    //    println(result.map { collection =>
-    //      s"  ${collection.directoryName}: ${XmlUtil.spacedText(collection.title)}\n"
-    //    }.mkString)
-
-    result
   }
 
   private def processCollections(collections: Seq[Collection], layout: Layout): Unit = {
