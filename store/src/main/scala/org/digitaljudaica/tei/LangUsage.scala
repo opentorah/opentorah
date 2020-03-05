@@ -1,6 +1,7 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.xml.Descriptor
+import scala.xml.Elem
 
 final case class LangUsage(
   languages: Seq[Language]
@@ -12,6 +13,8 @@ object LangUsage extends Descriptor[LangUsage](
     languages <- Language.all
   } yield new LangUsage(
     languages
-  ),
-  toXml = (value: LangUsage) => <langUsage>{Language.toXml(value.languages)}</langUsage>
-)
+  )
+) {
+  override def toXml(value: LangUsage): Elem =
+    <langUsage>{Language.toXml(value.languages)}</langUsage>
+}

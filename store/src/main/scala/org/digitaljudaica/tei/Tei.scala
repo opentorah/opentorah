@@ -2,7 +2,7 @@ package org.digitaljudaica.tei
 
 import org.digitaljudaica.reference.Reference
 import org.digitaljudaica.xml.{ContentType, Descriptor, XmlUtil}
-import scala.xml.Node
+import scala.xml.{Elem, Node}
 
 final case class Tei(
   teiHeader: TeiHeader,
@@ -37,12 +37,7 @@ object Tei extends Descriptor[Tei](
   } yield new Tei(
     teiHeader,
     text
-  ),
-  toXml = (value: Tei) =>
-    <TEI xmlns="http://www.tei-c.org/ns/1.0">
-      {XmlUtil.removeNamespace(TeiHeader.toXml(value.teiHeader))}
-      {XmlUtil.removeNamespace(Text.toXml(value.text))}
-    </TEI>
+  )
 ) {
 
   def apply(
@@ -66,4 +61,10 @@ object Tei extends Descriptor[Tei](
     ),
     text = Text(body)
   )
+
+  override def toXml(value: Tei): Elem =
+    <TEI xmlns="http://www.tei-c.org/ns/1.0">
+      {XmlUtil.removeNamespace(TeiHeader.toXml(value.teiHeader))}
+      {XmlUtil.removeNamespace(Text.toXml(value.text))}
+    </TEI>
 }

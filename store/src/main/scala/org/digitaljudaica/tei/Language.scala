@@ -1,6 +1,7 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.xml.{ContentType, Descriptor, Xml}
+import scala.xml.Elem
 
 final case class Language(
   ident: String,
@@ -19,6 +20,8 @@ object Language extends Descriptor[Language](
     ident,
     usage,
     text
-  ),
-  toXml = (value: Language) => <language ident={value.ident} usage={value.usage.map(_.toString).orNull}>{value.text.orNull}</language>
-)
+  )
+) {
+  override def toXml(value: Language): Elem =
+    <language ident={value.ident} usage={value.usage.map(_.toString).orNull}>{value.text.orNull}</language>
+}

@@ -1,6 +1,7 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.xml.{ContentType, Descriptor, Xml}
+import scala.xml.Elem
 
 final case class Pb(
   n: String,
@@ -19,6 +20,8 @@ object Pb extends Descriptor[Pb](
     n,
     id,
     facs
-  ),
-  toXml = (value: Pb) => <pb n={value.n} id={value.id.orNull} facs={value.facs.orNull}/>
-)
+  )
+) {
+  override def toXml(value: Pb): Elem =
+    <pb n={value.n} id={value.id.orNull} facs={value.facs.orNull}/>
+}

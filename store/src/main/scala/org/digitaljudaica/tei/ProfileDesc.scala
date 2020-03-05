@@ -1,9 +1,9 @@
 package org.digitaljudaica.tei
 
-import org.digitaljudaica.xml.Descriptor
+import org.digitaljudaica.xml.{Descriptor, Parsable}
+import scala.xml.Elem
 
 // TODO also: abstract handNotes listTranspose particDesc settingDesc textDesc
-// TODO parse multiple instances in ANY ORDER
 final case class ProfileDesc(
   documentAbstract: Option[Abstract],
   creation: Option[Creation],
@@ -16,22 +16,25 @@ final case class ProfileDesc(
 object ProfileDesc extends Descriptor[ProfileDesc](
   elementName = "profileDesc",
   contentParser = for {
-    // TODO the order is wrong; once I can write TEI XML decently, re-order in the existing documents:
-    langUsage <- LangUsage.optional
-    calendarDesc <- CalendarDesc.optional
-    creation <- Creation.optional
-    documentAbstract <- Abstract.optional
-    textClass <- TextClass.optional
-    correspDesc <- CorrespDesc.optional
-  } yield new ProfileDesc(
-    documentAbstract,
-    creation,
-    langUsage,
-    textClass,
-    correspDesc,
-    calendarDesc
-  ),
-  toXml = (value: ProfileDesc) =>
+      values <- Parsable.allAtMostOnce(Seq(
+        LangUsage,
+        CalendarDesc,
+        Creation,
+        Abstract,
+        TextClass,
+        CorrespDesc
+      ))
+    } yield new ProfileDesc(
+      // TODO yuck!!!
+      values.get(Abstract).map(_.asInstanceOf[Abstract]),
+      values.get(Creation).map(_.asInstanceOf[Creation]),
+      values.get(LangUsage).map(_.asInstanceOf[LangUsage]),
+      values.get(TextClass).map(_.asInstanceOf[TextClass]),
+      values.get(CorrespDesc).map(_.asInstanceOf[CorrespDesc]),
+      values.get(CalendarDesc).map(_.asInstanceOf[CalendarDesc])
+    )
+) {
+  override def toXml(value: ProfileDesc): Elem =
     <profileDesc>
       {Abstract.toXml(value.documentAbstract)}
       {Creation.toXml(value.creation)}
@@ -40,4 +43,4 @@ object ProfileDesc extends Descriptor[ProfileDesc](
       {CorrespDesc.toXml(value.correspDesc)}
       {CalendarDesc.toXml(value.calendarDesc)}
     </profileDesc>
-)
+}

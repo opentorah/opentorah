@@ -4,10 +4,35 @@ import zio.{Runtime, IO, ZIO}
 
 object Parser {
 
-  private[xml] def required[A](what: String, parser: Parser[Option[A]]): Parser[A] = for {
-    result <- parser
+  private[xml] def required[A](optional: Parser[Option[A]]): Parser[A] =
+    required("parsable", optional)
+
+  private[xml] def required[A](what: String, optional: Parser[Option[A]]): Parser[A] = for {
+    result <- optional
     _ <- check(result.isDefined, s"Required $what is missing")
   } yield result.get
+
+
+  def all[A](optional: Parser[Option[A]]): Parser[Seq[A]] =
+    all(Seq.empty, optional)
+
+  private def all[A](acc: Seq[A], optional: Parser[Option[A]]): Parser[Seq[A]] = for {
+    next <- optional
+    result <- next.fold[Parser[Seq[A]]](IO.succeed(acc))(next => all(acc :+ next, optional))
+  } yield result
+
+  def collectAll[A](parsers: Seq[Parser[A]]): Parser[Seq[A]] = for {
+    runs <- ZIO.collectAll(parsers.map(_.either))
+    errors: Seq[Error] = runs.flatMap(_.left.toOption)
+    results: Seq[A] = runs.flatMap(_.right.toOption)
+    results <- if (errors.nonEmpty) IO.fail(errors.mkString("Errors:\n  ", "\n  ", "\n.")) else IO.succeed(results)
+  } yield results
+
+  private[xml] def effect[A](f: => A): IO[Error, A] = IO(f).mapError(_.getMessage)
+
+  def check(condition: Boolean, message: => String): IO[Error, Unit] =
+    if (condition) IO.succeed(())
+    else IO.fail(message)
 
   // TODO eliminate
   def parseDo[A](parser: Parser[A]): A =
@@ -26,19 +51,6 @@ object Parser {
 
     result.provide(new Context)
   }
-
-  def collectAll[A](parsers: Seq[Parser[A]]): Parser[Seq[A]] = for {
-    runs <- ZIO.collectAll(parsers.map(_.either))
-    errors: Seq[Error] = runs.flatMap(_.left.toOption)
-    results: Seq[A] = runs.flatMap(_.right.toOption)
-    results <- if (errors.nonEmpty) IO.fail(errors.mkString("Errors:\n  ", "\n  ", "\n.")) else IO.succeed(results)
-  } yield results
-
-  private[xml] def effect[A](f: => A): IO[Error, A] = IO(f).mapError(_.getMessage)
-
-  def check(condition: Boolean, message: => String): IO[Error, Unit] =
-    if (condition) IO.succeed(())
-    else IO.fail(message)
 
   final def run[A](toRun: IO[Error, A]): A =
     Runtime.default.unsafeRun(toRun.mapError(error => throw new IllegalArgumentException(error)))

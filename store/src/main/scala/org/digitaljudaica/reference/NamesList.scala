@@ -1,8 +1,8 @@
 package org.digitaljudaica.reference
 
-import java.io.File
-import org.digitaljudaica.xml.{From, Parser, Xml}
+import org.digitaljudaica.xml.{Element, Parser, Xml}
 
+// TODO extend Parsable
 final case class NamesList(
   entity: Entity,
   id: String,
@@ -27,12 +27,5 @@ object NamesList {
     head
   )
 
-  // TODO provide just the parser and just for the lists; move head and parseDo into the callers.
-  def readAll(directory: File, fileName: String): (String, Seq[NamesList]) = Parser.parseDo(
-    From.file(directory, fileName)
-      .parse(Xml.withName("names", for {
-        head <- Xml.text.required("head")
-        listDescriptors <- Xml.all(parser)
-      } yield (head, listDescriptors)))
-  )
+  val all: Parser[Seq[NamesList]] = Element(parser).all
 }

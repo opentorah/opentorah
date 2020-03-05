@@ -13,9 +13,6 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
   private def formatStandard(from: From): String =
     new scala.xml.PrettyPrinter(width, 2).format(Parser.run(from.load))
 
-  // TODO see that PaigesPrettyPrinter doesn't lose anything
-  // (compare serialization of the input and of the parsed pretty-print...).
-
   private def render(from: From, width: Int): String =
     new PaigesPrettyPrinter(width, indent).render(Parser.run(from.load))
 

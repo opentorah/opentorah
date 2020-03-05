@@ -1,7 +1,7 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.xml.Descriptor
-import scala.xml.Node
+import scala.xml.{Elem, Node}
 
 final case class FileDesc(
   titleStmt: TitleStmt,
@@ -31,17 +31,7 @@ object FileDesc extends Descriptor[FileDesc](
     seriesStmt,
     notesStmt,
     sourceDesc
-  ),
-  toXml = (value: FileDesc) =>
-    <fileDesc>
-      {TitleStmt.toXml(value.titleStmt)}
-      {EditionStmt.toXml(value.editionStmt)}
-      {Extent.toXml(value.extent)}
-      {PublicationStmt.toXml(value.publicationStmt)}
-      {SeriesStmt.toXml(value.seriesStmt)}
-      {NotesStmt.toXml(value.notesStmt)}
-      {SourceDesc.toXml(value.sourceDesc)}
-    </fileDesc>
+  )
 ) {
 
   def apply(publicationStmt: PublicationStmt, sourceDesc: Seq[Node]): FileDesc = new FileDesc(
@@ -53,4 +43,15 @@ object FileDesc extends Descriptor[FileDesc](
     notesStmt = None,
     sourceDesc = SourceDesc(sourceDesc)
   )
+
+  override def toXml(value: FileDesc): Elem =
+    <fileDesc>
+      {TitleStmt.toXml(value.titleStmt)}
+      {EditionStmt.toXml(value.editionStmt)}
+      {Extent.toXml(value.extent)}
+      {PublicationStmt.toXml(value.publicationStmt)}
+      {SeriesStmt.toXml(value.seriesStmt)}
+      {NotesStmt.toXml(value.notesStmt)}
+      {SourceDesc.toXml(value.sourceDesc)}
+    </fileDesc>
 }

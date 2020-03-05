@@ -1,6 +1,6 @@
 package org.digitaljudaica.tei
 
-import org.digitaljudaica.xml.{Descriptor, Xml}
+import org.digitaljudaica.xml.{Descriptor, Raw, Xml}
 import scala.xml.Elem
 
 final case class Editor(
@@ -12,10 +12,12 @@ object Editor extends Descriptor[Editor](
   elementName = "editor",
   contentParser = for {
     role <- Xml.attribute.optional("role")
-    persName <- Xml.optional("persName")
+    persName <- Raw("persName").optional
   } yield new Editor(
     role,
     persName
-  ),
-  toXml = (value: Editor) => <editor role={value.role.orNull}>{value.persName.orNull}</editor>
-)
+  )
+) {
+  override def toXml(value: Editor): Elem =
+    <editor role={value.role.orNull}>{value.persName.orNull}</editor>
+}

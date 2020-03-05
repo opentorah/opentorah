@@ -2,7 +2,7 @@ package org.digitaljudaica.store
 
 import java.io.File
 import org.digitaljudaica.metadata.Names
-import org.digitaljudaica.xml.{From, Parser, Xml}
+import org.digitaljudaica.xml.{Element, From, Parser, Xml}
 import scala.xml.Elem
 
 sealed trait Store {
@@ -37,10 +37,10 @@ object Store {
 
   def parser(inheritedSelectors: Set[Selector]): Parser[Store] = Xml.withName("store", for {
     names <- Names.withDefaultNameParser
-    selectors <- Xml.all("selector",  Selector.parser)
+    selectors <- Element("selector",  Selector.parser).all
     _ = println(names)
     _ = println(selectors)
-    by <- Xml.required("by", byParser(inheritedSelectors ++ selectors.toSet))
+    by <- Element("by", byParser(inheritedSelectors ++ selectors.toSet)).required
   } yield new BaseStore(
     names,
     selectors,
@@ -55,8 +55,8 @@ object Store {
   def byParser(selectors: Set[Selector]): Parser[By] = for {
     n <- Xml.attribute.required("n")
     selector = selectorByName(selectors, n)
-    texts <- Xml.optional("texts", textsParser)
-    stores <- Xml.all("store", parser(selectors))
+    texts <- Element("texts", textsParser).optional
+    stores <- Element("store", parser(selectors)).all
     _ <- Parser.check(texts.nonEmpty || stores.nonEmpty, "Both 'stores' and 'texts' elements are absent.")
     _ <- Parser.check(texts.isEmpty || stores.isEmpty, "Both 'stores' and 'texts' elements are present.")
   } yield {

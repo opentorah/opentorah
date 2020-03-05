@@ -1,8 +1,7 @@
 package org.digitaljudaica.xml
 
 import java.net.URL
-import zio.IO
-
+import zio.ZIO
 import scala.xml.{Elem, Node}
 
 object Xml {
@@ -42,11 +41,12 @@ object Xml {
         apply("xml:id")
 
       def boolean(name: String): Parser[Option[Boolean]] =
-        convert(name, resultO => IO.succeed(resultO.map(value => value == "true" || value == "yes")))
+        convert(name, resultO => ZIO.succeed(resultO.map(value => value == "true" || value == "yes")))
 
       def int(name: String): Parser[Option[Int]] =
         convert(name, resultO => Parser.effect(resultO.map(_.toInt)))
 
+      // TODO expose and reuse for text...
       private def convert[A](name: String, f: Option[String] => Parser[A]): Parser[A] = for {
         resultO <- optional(name)
         result <- f(resultO)
@@ -92,81 +92,6 @@ object Xml {
   def nextNameIs(name: String): Parser[Boolean] =
     nextName.map(_.contains(name))
 
-  val optional: Parser[Option[Elem]] =
-    Context.liftContentModifier(Content.takeNextElement)
-
-  val required: Parser[Elem] =
-    Parser.required(s"element", optional)
-
-  def optional(name: String): Parser[Option[Elem]] = for {
-    has <- nextNameIs(name)
-    result <- if (!has) IO.succeed(None) else optional
-  } yield result
-
-  def required(name: String): Parser[Elem] =
-    Parser.required(s"element $name", optional(name))
-
-  def all(name: String): Parser[Seq[Elem]] = for {
-    headOption <- optional(name)
-    tail <- if (headOption.isEmpty) IO.succeed(Seq.empty[Elem]) else all(name)
-    result = headOption.toSeq ++ tail
-  } yield result
-
-
-  def required[A](name: String, contentType: ContentType, parser: Parser[A]): Parser[A] =
-    Parser.required(s"element '$name'", optional(name, contentType, parser))
-
-  def required[A](name: String, parser: Parser[A]): Parser[A] =
-    required(name, ContentType.Elements, parser)
-
-  def required[A](contentType: ContentType, parser: Parser[A]): Parser[A] =
-    Parser.required(s"element", optional(contentType, parser))
-
-  def required[A](parser: Parser[A]): Parser[A] =
-    required(ContentType.Elements, parser)
-
-  def optional[A](parser: Parser[A]): Parser[Option[A]] =
-    optional(ContentType.Elements, parser)
-
-  def optional[A](name: String, contentType: ContentType, parser: Parser[A]): Parser[Option[A]] =
-    optional(Some(name), contentType, parser)
-
-  def optional[A](name: String, parser: Parser[A]): Parser[Option[A]] =
-    optional(Some(name), ContentType.Elements, parser)
-
-  def optional[A](contentType: ContentType, parser: Parser[A]): Parser[Option[A]] =
-    optional(None, contentType, parser)
-
-  private def optional[A](name: Option[String], contentType: ContentType, parser: Parser[A]): Parser[Option[A]] = for {
-    nextElementName <- nextName
-    hasNext = name.fold(nextElementName.isDefined)(nextElementName.contains)
-    result <- if (!hasNext) IO.succeed(None) else for {
-      next <- required
-      result <- Context.nested(None, next, contentType, parser)
-    } yield Some(result)
-  } yield result
-
-  val all: Parser[Seq[Elem]] =
-    Context.liftContentModifier(Content.takeAllElements)
-
-  def all[A](name: String, contentType: ContentType, parser: Parser[A]): Parser[Seq[A]] =
-    all(Some(name), contentType, parser)
-
-  def all[A](name: String, parser: Parser[A]): Parser[Seq[A]] =
-    all(Some(name), ContentType.Elements, parser)
-
-  def all[A](contentType: ContentType, parser: Parser[A]): Parser[Seq[A]] =
-    all(None, contentType, parser)
-
-  def all[A](parser: Parser[A]): Parser[Seq[A]] =
-    all(None, ContentType.Elements, parser)
-
-  private def all[A](name: Option[String], contentType: ContentType, parser: Parser[A]): Parser[Seq[A]] = for {
-    headOption <- optional(name, contentType, parser)
-    tail <- if (headOption.isEmpty) IO.succeed(Seq.empty[A]) else all(name, contentType, parser)
-    result = headOption.toSeq ++ tail
-  } yield result
-
   object text {
     val optional: Parser[Option[String]] =
       Context.liftContentModifier(Content.takeCharacters)
@@ -175,10 +100,10 @@ object Xml {
       Parser.required("text", optional)
 
     def optional(name: String): Parser[Option[String]] =
-      Xml.optional(name, ContentType.Text, required)
+      Element(name, ContentType.Text, required).optional
 
     def required(name: String): Parser[String] =
-      Xml.required(name, ContentType.Text, required)
+      Element(name, ContentType.Text, required).required
   }
 
   def nested[A](name: String, xml: Elem, contentType: ContentType, parser: Parser[A]): Parser[A] =

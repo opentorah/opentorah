@@ -2,7 +2,7 @@ package org.digitaljudaica.tei
 
 import org.digitaljudaica.reference.Reference
 import org.digitaljudaica.xml.Descriptor
-import scala.xml.Node
+import scala.xml.{Elem, Node}
 
 final case class TitleStmt(
   titles: Seq[Title],
@@ -45,8 +45,19 @@ object TitleStmt extends Descriptor[TitleStmt](
     funders,
     principals,
     respStmts
-  ),
-  toXml = (value: TitleStmt) =>
+  )
+) {
+  def apply(): TitleStmt = new TitleStmt(
+    titles = Seq.empty,
+    authors = Seq.empty,
+    editors = Seq.empty,
+    sponsors = Seq.empty,
+    funders = Seq.empty,
+    principals = Seq.empty,
+    respStmts = Seq.empty
+  )
+
+  override def toXml(value: TitleStmt): Elem =
     <titleStmt>
       {Title.toXml(value.titles)}
       {Author.toXml(value.authors)}
@@ -56,15 +67,4 @@ object TitleStmt extends Descriptor[TitleStmt](
       {Principal.toXml(value.principals)}
       {RespStmt.toXml(value.respStmts)}
     </titleStmt>
-) {
-  def apply(): TitleStmt =
-    new TitleStmt(
-      titles = Seq.empty,
-      authors = Seq.empty,
-      editors = Seq.empty,
-      sponsors = Seq.empty,
-      funders = Seq.empty,
-      principals = Seq.empty,
-      respStmts = Seq.empty
-    )
 }

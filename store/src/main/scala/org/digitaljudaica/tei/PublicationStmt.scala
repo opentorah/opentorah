@@ -1,7 +1,7 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.xml.Descriptor
-import scala.xml.Node
+import scala.xml.{Elem, Node}
 
 final case class PublicationStmt(
   publisher: Option[Publisher],
@@ -16,16 +16,17 @@ object PublicationStmt extends Descriptor[PublicationStmt](
   } yield new PublicationStmt(
     publisher,
     availability
-  ),
-  toXml = (value: PublicationStmt) =>
-    <publicationStmt>
-      {Publisher.toXml(value.publisher)}
-      {Availability.toXml(value.availability)}
-    </publicationStmt>
+  )
 ) {
 
   def apply(publisher: Seq[Node], availability: Availability): PublicationStmt = new PublicationStmt(
     publisher = Some(Publisher(publisher)),
     availability = Some(availability)
   )
+
+  override def toXml(value: PublicationStmt): Elem =
+    <publicationStmt>
+      {Publisher.toXml(value.publisher)}
+      {Availability.toXml(value.availability)}
+    </publicationStmt>
 }

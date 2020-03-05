@@ -1,7 +1,7 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.xml.{ContentType, Descriptor, Xml}
-import scala.xml.Node
+import scala.xml.{Elem, Node}
 
 final case class Date(
   when: String,
@@ -20,6 +20,8 @@ object Date extends Descriptor[Date](
     when,
     calendar,
     xml
-  ),
-  toXml = (value: Date) => <date when={value.when} calendar={value.calendar.orNull}>{value.xml}</date>
-)
+  )
+) {
+  override def toXml(value: Date): Elem =
+    <date when={value.when} calendar={value.calendar.orNull}>{value.xml}</date>
+}

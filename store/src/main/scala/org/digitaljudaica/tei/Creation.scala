@@ -1,7 +1,7 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.xml.{Descriptor, Xml}
-import scala.xml.Node
+import scala.xml.{Elem, Node}
 
 final case class Creation(
   date: Date,
@@ -16,6 +16,8 @@ object Creation extends Descriptor[Creation](
   } yield new Creation(
     date,
     xml
-  ),
-  toXml = (value: Creation) => <creation>{Date.toXml(value.date)}{value.xml}</creation>
-)
+  )
+) {
+  override def toXml(value: Creation): Elem =
+    <creation>{Date.toXml(value.date)}{value.xml}</creation>
+}

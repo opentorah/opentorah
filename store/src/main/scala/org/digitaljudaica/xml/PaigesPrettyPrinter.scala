@@ -33,8 +33,7 @@ final class PaigesPrettyPrinter(
   ): Doc = node match {
     case element: Elem =>
       val result = fromElement(element, pscope, canBreakLeft, canBreakRight)
-      // TODO suppress extra hardLine when in stack
-      // TODO suppress space before :)
+      // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
       if (canBreakRight && element.label == "lb") result + Doc.hardLine else result
 
     case text: Text =>
@@ -65,29 +64,22 @@ final class PaigesPrettyPrinter(
 
     if (chunks.isEmpty) {
       Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>")
-
-    // If this is clearly a bunch of elements - stack 'em with an indent:
-    // TODO nest if just one chunk?
     } else if (canBreakLeft && canBreakRight && noAtoms && (chunks.length >= 2) &&
       !PaigesPrettyPrinter.nonStackableElements.contains(element.label)
     ) {
+      // If this is clearly a bunch of elements - stack 'em with an indent:
         Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">") +
         Doc.cat(chunks.map(chunk => (Doc.hardLine + chunk).nested(indent))) +
         Doc.hardLine + Doc.text(s"</$name>")
-
-    // If this is forced-nested element - nest its chunks unless there is only one:
-    // TODO remove lineOrEmpty in chunks and right?
-    // TODO nest regardless of the number of chunks?
-    } else if (canBreakLeft && canBreakRight && (chunks.length >= 2) &&
-      PaigesPrettyPrinter.nestedElements.contains(element.label)) {
-      (Doc.lineOrEmpty + Doc.intercalate(Doc.lineOrSpace, chunks)).tightBracketBy(
+    } else if (canBreakLeft && canBreakRight && PaigesPrettyPrinter.nestedElements.contains(element.label)) {
+      // If this is forced-nested element - nest it:
+      Doc.intercalate(Doc.lineOrSpace, chunks).tightBracketBy(
         left = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">"),
-        right = Doc.lineOrEmpty + Doc.text(s"</$name>"),
+        right = Doc.text(s"</$name>"),
         indent
       )
-
-    // Mixed content or non-break-off-able attachments on the side(s) cause flow-style:
     } else {
+      // Mixed content or non-break-off-able attachments on the side(s) cause flow-style:
       Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">") +
       (if (canBreakLeft) Doc.lineOrEmpty else Doc.empty) +
       Doc.intercalate(Doc.lineOrSpace, chunks) +
@@ -153,10 +145,12 @@ final class PaigesPrettyPrinter(
 
 object PaigesPrettyPrinter {
 
-  // TODO do not stack "l"?
+  // Note: not stacking "l" doesn't buy much prettiness and makes "mentions" lines uglier.
   val nonStackableElements: Set[String] = Set("choice")
 
-  val nestedElements: Set[String] = Set("p", "abstract", "head", "salute", "dateline", "item")
+  val nestedElements: Set[String] = Set("p", /*"abstract",*/ "head", "salute", "dateline", "item")
+
+  val clingyElements: Set[String] = Set("note", "lb")
 
   private def fromAttributes(element: Elem, pscope: NamespaceBinding): Seq[Doc] = {
     val attributes: Seq[Doc] = element.attributes.toSeq.map(fromAttribute)
@@ -189,12 +183,10 @@ object PaigesPrettyPrinter {
   @scala.annotation.tailrec
   private def splitChunk(result: Seq[Seq[Node]], current: Seq[Node], chunk: Seq[Node]): Seq[Seq[Node]] = chunk match {
     case Nil => result :+ current
-    case n :: ns if XmlUtil.isText(n) || isNote(n) => splitChunk(result, current :+ n, ns)
+    case n :: ns if XmlUtil.isText(n) || clingyElements.contains(n.label) => splitChunk(result, current :+ n, ns)
     case n1 :: n2 :: ns if XmlUtil.isElement(n1) && XmlUtil.isText(n2) => splitChunk(result, current ++ Seq(n1, n2), ns)
     case n :: ns => splitChunk(if (current.isEmpty) result else result :+ current, Seq(n), ns)
   }
-
-  private def isNote(node: Node): Boolean = XmlUtil.isElement(node) && (node.label == "note")
 
   @scala.annotation.tailrec
   private def atomize(result: Seq[Node], nodes: Seq[Node]): Seq[Node] = if (nodes.isEmpty) result else {

@@ -1,7 +1,7 @@
 package org.digitaljudaica.metadata
 
 import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{ContentType, From, Parser, Xml}
+import org.digitaljudaica.xml.{Element, From, Parser, Xml}
 
 object Metadata {
 
@@ -16,7 +16,7 @@ object Metadata {
     val wrappedParser = for {
       type_ <- Xml.attribute.required("type")
       _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
-      result <- Xml.all(elementName, parser)
+      result <- Element(elementName, parser).all
     } yield result
 
     Parser.parseDo(from.parse(Xml.withName(rootElementName.getOrElse("metadata"), wrappedParser)))

@@ -1,6 +1,7 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.xml.Descriptor
+import scala.xml.Elem
 
 final case class TeiHeader(
   fileDesc: FileDesc,
@@ -24,15 +25,7 @@ object TeiHeader extends Descriptor[TeiHeader](
     profileDesc,
     xenoData,
     revisionDesc
-  ),
-  toXml = (value: TeiHeader) =>
-    <teiHeader>
-      {FileDesc.toXml(value.fileDesc)}
-      {EncodingDesc.toXml(value.encodingDesc)}
-      {ProfileDesc.toXml(value.profileDesc)}
-      {XenoData.toXml(value.xenoData)}
-      {RevisionDesc.toXml(value.revisionDesc)}
-    </teiHeader>
+  )
 ) {
 
   def apply(fileDesc: FileDesc): TeiHeader = new TeiHeader(
@@ -42,4 +35,13 @@ object TeiHeader extends Descriptor[TeiHeader](
     xenoData = None,
     revisionDesc = None
   )
+
+  override def toXml(value: TeiHeader): Elem =
+    <teiHeader>
+      {FileDesc.toXml(value.fileDesc)}
+      {EncodingDesc.toXml(value.encodingDesc)}
+      {ProfileDesc.toXml(value.profileDesc)}
+      {XenoData.toXml(value.xenoData)}
+      {RevisionDesc.toXml(value.revisionDesc)}
+    </teiHeader>
 }

@@ -1,7 +1,7 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.xml.{ContentType, Descriptor, Xml}
-import scala.xml.Node
+import scala.xml.{Elem, Node}
 
 final case class Title(
   titleType: Option[String],
@@ -17,6 +17,8 @@ object Title extends Descriptor[Title](
   } yield new Title(
     titleType,
     content
-  ),
-  toXml = (value: Title) => <title type={value.titleType.orNull}>{value.content}</title>
-)
+  )
+) {
+  override def toXml(value: Title): Elem =
+    <title type={value.titleType.orNull}>{value.content}</title>
+}
