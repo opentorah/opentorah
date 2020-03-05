@@ -5,7 +5,7 @@ import java.io.File
 import org.digitaljudaica.archive.collector.reference.{Named, Names, Reference}
 import org.digitaljudaica.tei.Tei
 import org.digitaljudaica.util.Files
-import org.digitaljudaica.xml.{From, Parser, XmlUtil}
+import org.digitaljudaica.xml.{From, Parser, Xml, XmlUtil}
 
 import scala.xml.{Elem, Node, Text}
 
@@ -31,7 +31,7 @@ object Main {
 
     // Write to 'docs/collections'
     for (collection <- collections; document <- collection.documents) Util.writeXml(
-      new File(if (migrated) layout.collections else layout.storeCollections, collection.directoryName),
+      layout.tei(new File(if (migrated) layout.collections else layout.storeCollections, collection.directoryName)),
       document.name,
       Tei.toXml(document.tei)
     )
@@ -116,6 +116,13 @@ object Main {
 
     val (listsHead: String, storeNamesLists: Seq[org.digitaljudaica.reference.NamesList]) =
       org.digitaljudaica.reference.NamesList.readAll(layout.store, layout.namesListsFileName)
+
+//    val (listsHead: String, storeNamesLists: Seq[org.digitaljudaica.reference.NamesList]) =
+//      Parser.parseDo(From.file(layout.store, layout.namesListsFileName)
+//        .parse(Xml.withName("names", for {
+//          head <- Xml.text.required("head")
+//          listDescriptors <- org.digitaljudaica.reference.NamesList.all
+//        } yield (head, listDescriptors))))
 
     new Names(
       reference = listsHead,
