@@ -34,6 +34,7 @@ final class PaigesPrettyPrinter(
     case element: Elem =>
       val result = fromElement(element, pscope, canBreakLeft, canBreakRight)
       // TODO suppress extra hardLine when in stack
+      // TODO suppress space before :)
       if (canBreakRight && element.label == "lb") result + Doc.hardLine else result
 
     case text: Text =>
@@ -66,14 +67,19 @@ final class PaigesPrettyPrinter(
       Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>")
 
     // If this is clearly a bunch of elements - stack 'em with an indent:
-    } else if (canBreakLeft && canBreakRight && noAtoms && (chunks.length >= 2)) {
+    // TODO nest if just one chunk?
+    } else if (canBreakLeft && canBreakRight && noAtoms && (chunks.length >= 2) &&
+      !PaigesPrettyPrinter.nonStackableElements.contains(element.label)
+    ) {
         Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">") +
         Doc.cat(chunks.map(chunk => (Doc.hardLine + chunk).nested(indent))) +
         Doc.hardLine + Doc.text(s"</$name>")
 
-    // If this is a paragraph (<p>) - nest its chunks unless there is only one:
+    // If this is forced-nested element - nest its chunks unless there is only one:
     // TODO remove lineOrEmpty in chunks and right?
-    } else if (canBreakLeft && canBreakRight && (element.label == "p") && (chunks.length >= 2)) {
+    // TODO nest regardless of the number of chunks?
+    } else if (canBreakLeft && canBreakRight && (chunks.length >= 2) &&
+      PaigesPrettyPrinter.nestedElements.contains(element.label)) {
       (Doc.lineOrEmpty + Doc.intercalate(Doc.lineOrSpace, chunks)).tightBracketBy(
         left = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">"),
         right = Doc.lineOrEmpty + Doc.text(s"</$name>"),
@@ -146,6 +152,11 @@ final class PaigesPrettyPrinter(
 }
 
 object PaigesPrettyPrinter {
+
+  // TODO do not stack "l"?
+  val nonStackableElements: Set[String] = Set("choice")
+
+  val nestedElements: Set[String] = Set("p", "abstract", "head", "salute", "dateline", "item")
 
   private def fromAttributes(element: Elem, pscope: NamespaceBinding): Seq[Doc] = {
     val attributes: Seq[Doc] = element.attributes.toSeq.map(fromAttribute)

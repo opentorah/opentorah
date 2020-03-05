@@ -5,6 +5,7 @@ import scala.xml.{Atom, Elem, Node, Text, TopScope}
 
 object XmlUtil {
 
+  // TODO figure out where and why is this needed and what is the real way to handle this...
   def removeNamespace(xml: Elem): Elem =
     xml.copy(scope = TopScope, child = xml.child.map(removeNamespace))
 

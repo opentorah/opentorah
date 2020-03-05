@@ -2,6 +2,8 @@ package org.digitaljudaica.tei
 
 import org.digitaljudaica.xml.Descriptor
 
+// TODO also: abstract handNotes listTranspose particDesc settingDesc textDesc
+// TODO parse multiple instances in ANY ORDER
 final case class ProfileDesc(
   documentAbstract: Option[Abstract],
   creation: Option[Creation],

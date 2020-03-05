@@ -1,7 +1,7 @@
 package org.digitaljudaica.tei
 
 import org.digitaljudaica.reference.Reference
-import org.digitaljudaica.xml.{ContentType, Descriptor}
+import org.digitaljudaica.xml.{ContentType, Descriptor, XmlUtil}
 import scala.xml.Node
 
 final case class Tei(
@@ -40,8 +40,8 @@ object Tei extends Descriptor[Tei](
   ),
   toXml = (value: Tei) =>
     <TEI xmlns="http://www.tei-c.org/ns/1.0">
-      {TeiHeader.toXml(value.teiHeader)}
-      {Text.toXml(value.text)}
+      {XmlUtil.removeNamespace(TeiHeader.toXml(value.teiHeader))}
+      {XmlUtil.removeNamespace(Text.toXml(value.text))}
     </TEI>
 ) {
 

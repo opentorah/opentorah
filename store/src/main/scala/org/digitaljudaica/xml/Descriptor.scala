@@ -30,4 +30,6 @@ abstract class Descriptor[A](
   final def toXml(values: Seq[A]): Seq[Elem] = values.map(toXml)
 
   final def toXml(value: Option[A]): Seq[Elem] = toXml(value.toSeq)
+
+  // TODO parse multiple instances in ANY ORDER for a list of Descriptors!
 }
