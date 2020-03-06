@@ -4,7 +4,6 @@ import java.io.File
 import org.digitaljudaica.archive.collector.reference.{Reference, ReferenceSource}
 import org.digitaljudaica.reference.Entity
 import org.digitaljudaica.tei.Tei
-import org.digitaljudaica.xml.Print
 import scala.xml.{Elem, Node}
 
 final class Document(

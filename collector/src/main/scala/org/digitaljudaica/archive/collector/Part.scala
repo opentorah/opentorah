@@ -1,6 +1,6 @@
 package org.digitaljudaica.archive.collector
 
-import org.digitaljudaica.xml.{ContentType, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, Element, Parser, Xml}
 import scala.xml.Node
 
 final class Part(val title: Option[Seq[Node]], val documents: Seq[Document])
@@ -21,8 +21,8 @@ object Part {
 
     val parser: Parser[Descriptor] = for {
       from <- Xml.attribute.optional("from")
-      names <- Xml.all("document", Xml.text.required)
-      title <- Xml.required("title", ContentType.Mixed, Xml.allNodes)
+      names <- Element("document", Xml.text.required).all
+      title <- Element("title", ContentType.Mixed, Xml.allNodes).required
     } yield {
       if (names.isEmpty) {
         if (from.isEmpty) CatchAll(title) else From(from.get, title)
