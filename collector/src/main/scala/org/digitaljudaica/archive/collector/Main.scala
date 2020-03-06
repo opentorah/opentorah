@@ -115,14 +115,11 @@ object Main {
     println("Reading names.")
 
     val (listsHead: String, storeNamesLists: Seq[org.digitaljudaica.reference.NamesList]) =
-      org.digitaljudaica.reference.NamesList.readAll(layout.store, layout.namesListsFileName)
-
-//    val (listsHead: String, storeNamesLists: Seq[org.digitaljudaica.reference.NamesList]) =
-//      Parser.parseDo(From.file(layout.store, layout.namesListsFileName)
-//        .parse(Xml.withName("names", for {
-//          head <- Xml.text.required("head")
-//          listDescriptors <- org.digitaljudaica.reference.NamesList.all
-//        } yield (head, listDescriptors))))
+      Parser.parseDo(From.file(layout.store, layout.namesListsFileName)
+        .parse(Xml.withName("names", for {
+          head <- Xml.text.required("head")
+          listDescriptors <- org.digitaljudaica.reference.NamesList.all
+        } yield (head, listDescriptors))))
 
     new Names(
       reference = listsHead,

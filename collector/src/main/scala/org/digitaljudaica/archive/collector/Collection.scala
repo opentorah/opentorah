@@ -3,7 +3,7 @@ package org.digitaljudaica.archive.collector
 import java.io.File
 import org.digitaljudaica.archive.collector.reference.Reference
 import org.digitaljudaica.util.{Collections, Files}
-import org.digitaljudaica.xml.{ContentType, From, Parser, Xml, XmlUtil}
+import org.digitaljudaica.xml.{ContentType, Element, From, Parser, Xml, XmlUtil}
 import Table.Column
 import org.digitaljudaica.tei.Tei
 import scala.xml.{Elem, Node, Text}
@@ -130,12 +130,12 @@ object Collection {
     archive <- Xml.text.optional("archive")
     prefix <- Xml.text.optional("prefix")
     numberStr <- Xml.text.optional("number") // TODO text.int
-    titleNodes <- Xml.optional("title", ContentType.Mixed, Xml.allNodes) // TODO common combinator
-    caseAbstract <- Xml.required("abstract", ContentType.Mixed, Xml.allNodes) // TODO common combinator
-    notes <- Xml.optional("notes", ContentType.Mixed, Xml.allNodes) // TODO common combinator
+    titleNodes <- Element("title", ContentType.Mixed, Xml.allNodes).optional // TODO common combinator
+    caseAbstract <- Element("abstract", ContentType.Mixed, Xml.allNodes).required // TODO common combinator
+    notes <- Element("notes", ContentType.Mixed, Xml.allNodes).optional // TODO common combinator
     description = Seq(<span>{caseAbstract}</span>) ++ notes.getOrElse(Seq.empty)
     // TODO swap parts and notes; remove notes wrapper element; simplify parts; see how to generalize parts...
-    partDescriptors <- Xml.all("part", ContentType.Elements, Part.Descriptor.parser)
+    partDescriptors <- Element("part", ContentType.Elements, Part.Descriptor.parser).all
   } yield new Collection(
     layout,
     directoryName = directory.getName,
