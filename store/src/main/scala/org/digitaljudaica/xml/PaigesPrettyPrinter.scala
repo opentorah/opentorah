@@ -67,14 +67,12 @@ final class PaigesPrettyPrinter(
 
     if (chunks.isEmpty) {
       Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>")
-    } else if (canBreakLeft && canBreakRight && noAtoms && (chunks.length >= 2) &&
-      !doNotStackElements.contains(element.label)
-    ) {
+    } else if (noAtoms && (chunks.length >= 2) && !doNotStackElements.contains(element.label)) {
       // If this is clearly a bunch of elements - stack 'em with an indent:
         Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">") +
         Doc.cat(chunks.map(chunk => (Doc.hardLine + chunk).nested(indent))) +
         Doc.hardLine + Doc.text(s"</$name>")
-    } else if (canBreakLeft && canBreakRight && nestElements.contains(element.label)) {
+    } else if (nestElements.contains(element.label)) {
       // If this is forced-nested element - nest it:
       Doc.intercalate(Doc.lineOrSpace, chunks).tightBracketBy(
         left = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">"),
@@ -158,6 +156,13 @@ final class PaigesPrettyPrinter(
   @scala.annotation.tailrec
   private def splitChunk(result: Seq[Seq[Node]], current: Seq[Node], chunk: Seq[Node]): Seq[Seq[Node]] = chunk match {
     case Nil => result :+ current
+
+      // TODO commented out is too strong; uncommented - too weak!
+      // see Dubnov 262.1: "[ "; abstract in Dubnov 268.1: ">- "; <sic>...
+//    case n1 :: n2 :: ns if (XmlUtil.isElement(n1) && XmlUtil.isText(n2)) || (XmlUtil.isText(n1) && XmlUtil.isElement(n2)) =>
+//      splitChunk(result, current ++ Seq(n1, n2), ns)
+//    case n :: ns if XmlUtil.isText(n) || clingyElements.contains(n.label) => splitChunk(result, current :+ n, ns)
+
     case n :: ns if XmlUtil.isText(n) || clingyElements.contains(n.label) => splitChunk(result, current :+ n, ns)
     case n1 :: n2 :: ns if XmlUtil.isElement(n1) && XmlUtil.isText(n2) => splitChunk(result, current ++ Seq(n1, n2), ns)
     case n :: ns => splitChunk(if (current.isEmpty) result else result :+ current, Seq(n), ns)
