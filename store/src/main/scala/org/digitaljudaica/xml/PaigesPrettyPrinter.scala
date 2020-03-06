@@ -21,6 +21,8 @@ final class PaigesPrettyPrinter(
 ) {
   import PaigesPrettyPrinter.sbToString
 
+  private def isClingy(node: Node): Boolean = XmlUtil.isElement(node) && clingyElements.contains(node.label)
+
   def render(node: Node, pscope: NamespaceBinding = TopScope): String = fromNode(
     node,
     pscope,
@@ -153,19 +155,16 @@ final class PaigesPrettyPrinter(
     }
   }
 
+  // TODO simplify: isEmpty; newCurrent, ...
   @scala.annotation.tailrec
   private def splitChunk(result: Seq[Seq[Node]], current: Seq[Node], chunk: Seq[Node]): Seq[Seq[Node]] = chunk match {
-    case Nil => result :+ current
+    case n1 :: n2 :: ns if XmlUtil.isText(n1) => splitChunk(result, current :+ n1, n2 :: ns)
+    case n1 :: n2 :: ns if XmlUtil.isText(n2) => splitChunk(result, current :+ n1, n2 :: ns)
+    case n1 :: n2 :: ns if isClingy(n2)       => splitChunk(result, current :+ n1, n2 :: ns)
+    case n1 :: n2 :: ns                       => splitChunk(result :+ (current :+ n1), Seq.empty, n2 :: ns)
 
-      // TODO commented out is too strong; uncommented - too weak!
-      // see Dubnov 262.1: "[ "; abstract in Dubnov 268.1: ">- "; <sic>...
-//    case n1 :: n2 :: ns if (XmlUtil.isElement(n1) && XmlUtil.isText(n2)) || (XmlUtil.isText(n1) && XmlUtil.isElement(n2)) =>
-//      splitChunk(result, current ++ Seq(n1, n2), ns)
-//    case n :: ns if XmlUtil.isText(n) || clingyElements.contains(n.label) => splitChunk(result, current :+ n, ns)
-
-    case n :: ns if XmlUtil.isText(n) || clingyElements.contains(n.label) => splitChunk(result, current :+ n, ns)
-    case n1 :: n2 :: ns if XmlUtil.isElement(n1) && XmlUtil.isText(n2) => splitChunk(result, current ++ Seq(n1, n2), ns)
-    case n :: ns => splitChunk(if (current.isEmpty) result else result :+ current, Seq(n), ns)
+    case n :: Nil => result :+ (current :+ n)
+    case Nil      => result :+ current
   }
 }
 

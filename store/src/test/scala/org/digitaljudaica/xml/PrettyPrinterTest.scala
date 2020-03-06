@@ -29,7 +29,25 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
   }
 
   "Chunking" should "work" in {
-    print(From.resource(this, "rgada"), 90)
+//    print(From.resource(this, "print1"), 120)
+
+    check(<a>X<b/> </a>, 120, expected =
+    """|<a>X<b/></a>""")
+
+    check(<a><b/><b/><b/></a>, 120, expected =
+      """|<a>
+         |  <b/>
+         |  <b/>
+         |  <b/>
+         |</a>""")
+
+    check(<a><b/><b/><b/><b/></a>, 120, expected =
+      """|<a>
+         |  <b/>
+         |  <b/>
+         |  <b/>
+         |  <b/>
+         |</a>""")
   }
 
   "PaigesPrettyPrinter" should "work" in {
