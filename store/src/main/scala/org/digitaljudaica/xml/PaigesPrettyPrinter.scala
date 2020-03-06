@@ -13,8 +13,11 @@ import scala.xml.{Attribute, Elem, MetaData, NamespaceBinding, Node, SpecialNode
   so I don't have to write my own :)
  */
 final class PaigesPrettyPrinter(
-  width: Int,
-  indent: Int
+  width: Int = 120,
+  indent: Int = 2,
+  doNotStackElements: Set[String] = Set(),
+  nestElements: Set[String] = Set(),
+  clingyElements: Set[String] = Set()
 ) {
   import PaigesPrettyPrinter.sbToString
 
@@ -65,13 +68,13 @@ final class PaigesPrettyPrinter(
     if (chunks.isEmpty) {
       Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>")
     } else if (canBreakLeft && canBreakRight && noAtoms && (chunks.length >= 2) &&
-      !PaigesPrettyPrinter.nonStackableElements.contains(element.label)
+      !doNotStackElements.contains(element.label)
     ) {
       // If this is clearly a bunch of elements - stack 'em with an indent:
         Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">") +
         Doc.cat(chunks.map(chunk => (Doc.hardLine + chunk).nested(indent))) +
         Doc.hardLine + Doc.text(s"</$name>")
-    } else if (canBreakLeft && canBreakRight && PaigesPrettyPrinter.nestedElements.contains(element.label)) {
+    } else if (canBreakLeft && canBreakRight && nestElements.contains(element.label)) {
       // If this is forced-nested element - nest it:
       Doc.intercalate(Doc.lineOrSpace, chunks).tightBracketBy(
         left = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">"),
@@ -96,7 +99,7 @@ final class PaigesPrettyPrinter(
     val nodes = PaigesPrettyPrinter.atomize(Seq.empty, element.child)
     val whitespaceLeft = nodes.headOption.exists(XmlUtil.isWhitespace)
     val whitespaceRight = nodes.lastOption.exists(XmlUtil.isWhitespace)
-    val chunks: Seq[Seq[Node]] = PaigesPrettyPrinter.chunkify(Seq.empty, nodes)
+    val chunks: Seq[Seq[Node]] = chunkify(Seq.empty, nodes)
     val noAtoms: Boolean = chunks.forall(_.forall(node => !XmlUtil.isAtom(node)))
     val result = fromChunks(
       chunks,
@@ -141,34 +144,6 @@ final class PaigesPrettyPrinter(
       Doc.intercalate(Doc.empty, result)
     }
   }
-}
-
-object PaigesPrettyPrinter {
-
-  // Note: not stacking "l" doesn't buy much prettiness and makes "mentions" lines uglier.
-  val nonStackableElements: Set[String] = Set("choice")
-
-  val nestedElements: Set[String] = Set("p", /*"abstract",*/ "head", "salute", "dateline", "item")
-
-  val clingyElements: Set[String] = Set("note", "lb")
-
-  private def fromAttributes(element: Elem, pscope: NamespaceBinding): Seq[Doc] = {
-    val attributes: Seq[Doc] = element.attributes.toSeq.map(fromAttribute)
-    val scopeStr: String = element.scope.buildString(pscope).trim
-    if (scopeStr.isEmpty) attributes else attributes :+ Doc.text(scopeStr)
-  }
-
-  private def fromAttribute(attribute: MetaData): Doc = attribute match {
-    case attribute: Attribute if attribute.value != null =>
-      val key: Doc =
-        Doc.text((if (attribute.isPrefixed) s"${attribute.pre}:" else "") + s"${attribute.key}=")
-      val value = Doc.text(sbToString(Utility.appendQuoted(
-        sbToString(Utility.sequenceToXML(attribute.value, TopScope, _, stripComments = true)), _)))
-      key + value
-
-    case _ =>
-      Doc.empty
-  }
 
   @scala.annotation.tailrec
   private def chunkify(result: Seq[Seq[Node]], nodes: Seq[Node]): Seq[Seq[Node]] = if (nodes.isEmpty) Seq.empty else {
@@ -186,6 +161,27 @@ object PaigesPrettyPrinter {
     case n :: ns if XmlUtil.isText(n) || clingyElements.contains(n.label) => splitChunk(result, current :+ n, ns)
     case n1 :: n2 :: ns if XmlUtil.isElement(n1) && XmlUtil.isText(n2) => splitChunk(result, current ++ Seq(n1, n2), ns)
     case n :: ns => splitChunk(if (current.isEmpty) result else result :+ current, Seq(n), ns)
+  }
+}
+
+object PaigesPrettyPrinter {
+
+  private def fromAttributes(element: Elem, pscope: NamespaceBinding): Seq[Doc] = {
+    val attributes: Seq[Doc] = element.attributes.toSeq.map(fromAttribute)
+    val scopeStr: String = element.scope.buildString(pscope).trim
+    if (scopeStr.isEmpty) attributes else attributes :+ Doc.text(scopeStr)
+  }
+
+  private def fromAttribute(attribute: MetaData): Doc = attribute match {
+    case attribute: Attribute if attribute.value != null =>
+      val key: Doc =
+        Doc.text((if (attribute.isPrefixed) s"${attribute.pre}:" else "") + s"${attribute.key}=")
+      val value = Doc.text(sbToString(Utility.appendQuoted(
+        sbToString(Utility.sequenceToXML(attribute.value, TopScope, _, stripComments = true)), _)))
+      key + value
+
+    case _ =>
+      Doc.empty
   }
 
   @scala.annotation.tailrec

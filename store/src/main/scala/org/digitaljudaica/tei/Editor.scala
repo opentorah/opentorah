@@ -1,6 +1,6 @@
 package org.digitaljudaica.tei
 
-import org.digitaljudaica.xml.{Descriptor, Raw, Xml}
+import org.digitaljudaica.xml.{Descriptor, ElementRaw, Xml}
 import scala.xml.Elem
 
 final case class Editor(
@@ -12,7 +12,7 @@ object Editor extends Descriptor[Editor](
   elementName = "editor",
   contentParser = for {
     role <- Xml.attribute.optional("role")
-    persName <- Raw("persName").optional
+    persName <- ElementRaw("persName").optional
   } yield new Editor(
     role,
     persName

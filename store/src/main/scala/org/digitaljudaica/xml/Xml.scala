@@ -83,14 +83,20 @@ object Xml {
   def allAttributes: Parser[Map[String, String]] =
     Context.liftCurrentModifier(Current.takeAllAttributes)
 
-  val allNodes: Parser[Seq[Node]] =
-    Context.liftContentModifier(Content.takeAllNodes)
-
   val nextName: Parser[Option[String]] =
     Context.lift(current => Content.getNextElementName(current.content))
 
   def nextNameIs(name: String): Parser[Boolean] =
     nextName.map(_.contains(name))
+
+  val nextElement: Parser[Option[Elem]] =
+    Context.liftContentModifier(Content.takeNextElement)
+
+  val allElements: Parser[Seq[Elem]] =
+    Context.liftContentModifier(Content.takeAllElements)
+
+  val allNodes: Parser[Seq[Node]] =
+    Context.liftContentModifier(Content.takeAllNodes)
 
   object text {
     val optional: Parser[Option[String]] =

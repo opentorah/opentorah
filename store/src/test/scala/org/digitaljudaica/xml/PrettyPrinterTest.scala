@@ -2,19 +2,16 @@ package org.digitaljudaica.xml
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-
 import scala.xml.Elem
 
 final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
 
-  private val indent: Int = 2
-  private val width: Int = 120
-
-  private def formatStandard(from: From): String =
-    new scala.xml.PrettyPrinter(width, 2).format(Parser.run(from.load))
-
   private def render(from: From, width: Int): String =
-    new PaigesPrettyPrinter(width, indent).render(Parser.run(from.load))
+    new PaigesPrettyPrinter(
+      width,
+      indent = 2,
+      clingyElements = Set("note")
+    ).render(Parser.run(from.load))
 
   private def check(from: From, width: Int, expected: String): Unit = {
     val result = render(from, width)
@@ -25,12 +22,6 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
     check(From.xml(xml), width, expected)
 
   private def print(from: From, width: Int): Unit = {
-//    println(new PaigesPrettyPrinter(indent, width)
-//      .fromNode(Parser.run(from.load))
-//      .representation(true)
-//      .render(120)
-//    )
-
     println("                                                                                                                                   ".take(width-1) + "|")
     println("0         1         2         3         4         5         6         7         8         9         0         1         2         3")
     println("01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890")

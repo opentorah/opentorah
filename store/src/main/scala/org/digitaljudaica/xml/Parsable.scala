@@ -11,20 +11,11 @@ trait Parsable[A] {
 
   def all: Parser[Seq[A]] =
     Parser.all(optional)
-
-  final def map[B](f: A => B): Parsable[B] = new Parsable[B] {
-    override def optional: Parser[Option[B]] =
-      Parsable.this.optional.map(_.map[B](f))
-
-    override def required: Parser[B] =
-      Parsable.this.required.map[B](f)
-
-    override def all: Parser[Seq[B]] =
-      Parsable.this.all.map[Seq[B]](_.map(f))
-  }
 }
 
 object Parsable {
+
+  // TODO eliminate casts of results!
 
   // TODO use in calendar...
   def optional(parsables: Seq[Parsable[_]]): Parser[Option[(Parsable[_], _)]] =
@@ -33,12 +24,10 @@ object Parsable {
       result <- if (next.isEmpty) optional(parsables.tail) else ZIO.some(parsables.head -> next.get)
     } yield result
 
-  // TODO use in Tei parsing :)
   def all(parsables: Seq[Parsable[_]]): Parser[Map[Parsable[_], Seq[_]]] =
     Parser.all(optional(parsables))
       .map(result => result.groupBy(_._1).mapValues(_.map(_._2)))
 
-  // TODO use in Tei parsing :)
   def allAtMostOnce(parsables: Seq[Parsable[_]]): Parser[Map[Parsable[_], _]] =
     all(parsables).flatMap { result: Map[Parsable[_], Seq[_]] =>
       val tooMany: Seq[Parsable[_]] = result.filter(_._2.length > 1).keys.toSeq

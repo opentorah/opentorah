@@ -5,17 +5,14 @@ import scala.xml.Node
 abstract class Descriptor[A](
   val elementName: String,
   val contentType: ContentType = ContentType.Elements,
-  val contentParser: Parser[A]
-) extends Parsable[A] with ToXml[A] {
-  final override def required: Parser[A] =
-    Element(elementName, contentType, contentParser).required
+  val contentParser: Parser[A] // TODO rename 'parser'?
+) extends Element[A](
+  elementName = Some(elementName),
+  contentType,
+  parser = contentParser
+) with ToXml[A] {
 
-  final override def optional: Parser[Option[A]] =
-    Element(elementName, contentType, contentParser).optional
-
-  final override def all: Parser[Seq[A]] =
-    Element(elementName, contentType, contentParser).all
-
+  // TODO move elsewhere?
   final def parse(from: From): Parser[A] =
     from.parse(contentType, Xml.withName(elementName, contentParser))
 
