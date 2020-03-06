@@ -1,7 +1,7 @@
 package org.podval.judaica.tanach
 
 import org.digitaljudaica.metadata.{Names, WithNumber}
-import org.digitaljudaica.xml.{ContentType, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, Element, Parser, Xml}
 
 final class PsalmsMetadata(
   book: Tanach.Psalms.type,
@@ -36,7 +36,7 @@ object PsalmsMetadata {
   } yield new Parsed(book, names, chapters, days, weekDays, books)
 
   private def spansParser(chapters: Chapters, name: String, number: Int): Parser[Seq[Span]] = for {
-    numbered <- Xml.all(name, ContentType.Empty, WithNumber.parse(SpanParsed.parser))
+    numbered <- Element(name, ContentType.Empty, WithNumber.parse(SpanParsed.parser)).all
   } yield {
     val spans: Seq[SpanParsed] = WithNumber.dropNumbers(WithNumber.checkNumber(numbered, number, name))
     SpanSemiResolved.setImpliedTo(spans.map(_.semiResolve), chapters.full, chapters)

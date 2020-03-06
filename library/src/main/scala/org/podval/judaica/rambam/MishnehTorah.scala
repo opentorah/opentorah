@@ -1,7 +1,7 @@
 package org.podval.judaica.rambam
 
 import org.digitaljudaica.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.digitaljudaica.xml.{From, Parser, Xml}
+import org.digitaljudaica.xml.{Element, From, Parser, Xml}
 
 object MishnehTorah {
 
@@ -71,7 +71,7 @@ object MishnehTorah {
   private def bookParser: Parser[Book] = for {
     number <- Xml.attribute.required.positiveInt("n")
     names <- Names.parser
-    parts <- Xml.all("part", partParser)
+    parts <- Element("part", partParser).all
     _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
       s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
   } yield {
@@ -84,9 +84,9 @@ object MishnehTorah {
     number <- Xml.attribute.required.positiveInt("n")
     numChapters <- Xml.attribute.required.positiveInt("chapters")
     names <- Names.parser
-    chapters <- Xml.all[NamedChapter]("chapter", for {
+    chapters <- Element[NamedChapter]("chapter", for {
       names <- Names.parser
-    } yield new NamedChapter(names))
+    } yield new NamedChapter(names)).all
   } yield {
     if (chapters.isEmpty) new PartWithNumberedChapters(number, numChapters, names) else {
       val result = new PartWithNamedChapters(number, numChapters, names, chapters)

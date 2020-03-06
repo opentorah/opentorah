@@ -1,7 +1,7 @@
 package org.podval.calendar.tanach
 
 import org.digitaljudaica.metadata.{WithNames, WithNumber}
-import org.digitaljudaica.xml.{From, Parser, Xml}
+import org.digitaljudaica.xml.{Element, From, Parser, Xml}
 import org.podval.judaica.tanach.{SpanParsed, Torah}
 import scala.xml.Elem
 
@@ -12,8 +12,8 @@ trait ParseTorahRaw { self: WithNames =>
 
   private val parser: Parser[Torah] = for {
     bookSpan <- Torah.spanParser.map(_.resolve)
-    spans <- Xml.all("aliyah", WithNumber.parse(
+    spans <- Element("aliyah", WithNumber.parse(
       SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve)
-    ))
+    )).all
   } yield Torah.parseAliyot(bookSpan, spans, number = None).fromWithNumbers(this)
 }

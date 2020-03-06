@@ -21,7 +21,7 @@ include ':paper'
 
 // includeBuild '../../../docbook/docbook-gradle'
 
-//includeBuild ('../../store/zio') {
+//includeBuild ('../../store/master') {
 //  dependencySubstitution {
 //    substitute module('org.digitaljudaica:org.digitaljudaica-store') with project(':store')
 //  }

@@ -1,7 +1,7 @@
 package org.podval.calendar.rambam
 
 import org.digitaljudaica.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.digitaljudaica.xml.{From, Parser, Xml}
+import org.digitaljudaica.xml.{Element, From, Parser, Xml}
 
 object SeferHamitzvosLessons {
 
@@ -50,7 +50,7 @@ object SeferHamitzvosLessons {
 
   private def lessonParser: Parser[Lesson] = for {
     number <- Xml.attribute.required.positiveInt("n")
-    parts <- Xml.all[Part](partParser)
+    parts <- Element(partParser).all
   } yield new Lesson(number, parts)
 
   private def partParser: Parser[Part] = for {

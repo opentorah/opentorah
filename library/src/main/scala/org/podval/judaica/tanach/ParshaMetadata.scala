@@ -2,7 +2,7 @@ package org.podval.judaica.tanach
 
 import org.digitaljudaica.metadata.{Metadata, Names, WithNumber}
 import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{ContentType, Parser, Xml}
+import org.digitaljudaica.xml.{ContentType, Element, Parser, Xml}
 
 final class ParshaMetadata(
   val parsha: Parsha,
@@ -80,9 +80,9 @@ object ParshaMetadata {
   def parser(book: Tanach.ChumashBook): Parser[Parsed] = for {
     names <- Names.parser
     span <- semiResolvedParser
-    aliyot <- Xml.all("aliyah", ContentType.Empty, numberedParser)
-    daysParsed <- Xml.all("day", dayParser)
-    maftir <- Xml.required("maftir", semiResolvedParser)
+    aliyot <- Element("aliyah", ContentType.Empty, numberedParser).all
+    daysParsed <- Element("day", dayParser).all
+    maftir <- Element("maftir", semiResolvedParser).required
     parsha = Metadata.find[Parsha, Names](book.parshiot, names)
   } yield {
     val (days: Seq[DayParsed], daysCombined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
