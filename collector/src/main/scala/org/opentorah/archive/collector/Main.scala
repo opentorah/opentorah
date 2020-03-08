@@ -4,8 +4,8 @@ import java.io.File
 import org.opentorah.archive.collector.reference.{Named, Names, Reference}
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
-import org.opentorah.xml.{From, Parser, Xml, XmlUtil}
-import scala.xml.{Elem, Node, Text}
+import org.opentorah.xml.{From, Parser, Text, Xml, XmlUtil}
+import scala.xml.{Elem, Node}
 
 object Main {
 
@@ -115,7 +115,7 @@ object Main {
     val (listsHead: String, storeNamesLists: Seq[org.opentorah.reference.NamesList]) =
       Parser.parseDo(From.file(layout.store, layout.namesListsFileName)
         .parse(Xml.withName("names", for {
-          head <- Xml.text.required("head")
+          head <- Text("head").required
           listDescriptors <- org.opentorah.reference.NamesList.all
         } yield (head, listDescriptors))))
 
@@ -147,7 +147,7 @@ object Main {
   private def writeIndex(collections: Seq[Collection], layout: Layout): Unit = writeTei(
     directory = layout.docs,
     fileName = layout.indexFileName,
-    head = Some(Text("Дела")),
+    head = Some(scala.xml.Text("Дела")),
     content = <list type="bulleted">{for (collection <- collections.filter(_.publish)) yield toXml(collection, layout)}</list>,
     target = "collectionViewer",
     yaml = Seq("windowName" -> "collectionViewer")
@@ -158,7 +158,7 @@ object Main {
     writeTei(
       directory = layout.docs,
       fileName = layout.collectionsFileName,
-      head = Some(Text("Архивы")),
+      head = Some(scala.xml.Text("Архивы")),
       content = <list>{
         for (archive <- byArchive.keys.toList.sorted) yield {
           <item>
@@ -195,7 +195,7 @@ object Main {
     writeTei(
       directory = directory,
       fileName = fileName,
-      head = Some(Text(names.reference)),
+      head = Some(scala.xml.Text(names.reference)),
       content = listOfLists ++ nonEmptyLists.flatMap(_.toXml),
       target = "namesViewer"
     )

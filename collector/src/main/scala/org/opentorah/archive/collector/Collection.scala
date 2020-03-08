@@ -4,10 +4,9 @@ import java.io.File
 import org.opentorah.archive.collector.reference.Reference
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
-import org.opentorah.xml.{ContentType, Element, From, Parser, Xml, XmlUtil}
+import org.opentorah.xml.{Attribute, ContentType, Element, From, Parser, Text, Xml, XmlUtil}
 import Table.Column
-
-import scala.xml.{Elem, Node, Text}
+import scala.xml.{Elem, Node}
 
 final class Collection private(
   layout: Layout,
@@ -32,7 +31,7 @@ final class Collection private(
 
   override def reference: String = archive.fold(archiveCase)(archive => archive + " " + archiveCase)
 
-  def title: Node = titleNodes.fold[Node](Text(reference))(nodes => <title>{nodes}</title>)
+  def title: Node = titleNodes.fold[Node](scala.xml.Text(reference))(nodes => <title>{nodes}</title>)
 
   override def compare(that: Collection): Int = {
     val archiveComparison: Int = compare(archive, that.archive)
@@ -126,11 +125,11 @@ object Collection {
     layout: Layout,
     directory: File
   ): Parser[Collection] = for {
-    isBook <- Xml.attribute.optional.booleanOrFalse("isBook")
-    publish <- Xml.attribute.optional.booleanOrFalse("publish")
-    archive <- Xml.text.optional("archive")
-    prefix <- Xml.text.optional("prefix")
-    numberStr <- Xml.text.optional("number") // TODO text.int
+    isBook <- Attribute("isBook").boolean.orFalse
+    publish <- Attribute("publish").boolean.orFalse
+    archive <- Text("archive").optional
+    prefix <- Text("prefix").optional
+    number <- Text("number").int.optional
     titleNodes <- Element("title", ContentType.Mixed, Xml.allNodes).optional // TODO common combinator
     caseAbstract <- Element("abstract", ContentType.Mixed, Xml.allNodes).required // TODO common combinator
     notes <- Element("notes", ContentType.Mixed, Xml.allNodes).optional // TODO common combinator
@@ -145,7 +144,7 @@ object Collection {
     publish,
     archive,
     prefix,
-    number = numberStr.map(_.toInt),
+    number,
     titleNodes,
     caseAbstract,
     description,
@@ -158,14 +157,14 @@ object Collection {
     }),
 
     Column("Дата", "date", { document: Document =>
-      document.date.fold[Seq[Node]](Text(""))(value => Text(value))
+      document.date.fold[Seq[Node]](scala.xml.Text(""))(value => scala.xml.Text(value))
     }),
 
     Column("Кто", "author", { document: Document =>
       multi(document.authors.flatMap(_.map(XmlUtil.removeNamespace)))
     }),
 
-    Column("Кому", "addressee",  _.addressee.fold[Seq[Node]](Text(""))(addressee =>
+    Column("Кому", "addressee",  _.addressee.fold[Seq[Node]](scala.xml.Text(""))(addressee =>
       <persName ref={addressee.ref.orNull}>{addressee.name}</persName>)),
 
     Column("Язык", "language", { document: Document =>
@@ -173,7 +172,7 @@ object Collection {
         <ref target={documentUrlRelativeToIndex(document.name + "-" + translation)}
              role="documentViewer">{translation}</ref>
 
-      Seq(Text(document.language.getOrElse("?"))) ++ translations
+      Seq(scala.xml.Text(document.language.getOrElse("?"))) ++ translations
     }),
 
     Column("Документ", "document", { document: Document =>
@@ -195,7 +194,7 @@ object Collection {
   private def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
     case Nil => Nil
     case n :: Nil => Seq(n)
-    case n :: ns if n.isInstanceOf[Elem] => Seq(n, Text(", ")) ++ multi(ns)
+    case n :: ns if n.isInstanceOf[Elem] => Seq(n, scala.xml.Text(", ")) ++ multi(ns)
     case n :: ns => Seq(n) ++ multi(ns)
     case n => n
   }

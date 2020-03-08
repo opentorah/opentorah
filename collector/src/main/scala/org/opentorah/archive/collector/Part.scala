@@ -1,6 +1,6 @@
 package org.opentorah.archive.collector
 
-import org.opentorah.xml.{ContentType, Element, Parser, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parser, Text, Xml}
 import scala.xml.Node
 
 final class Part(val title: Option[Seq[Node]], val documents: Seq[Document])
@@ -20,9 +20,9 @@ object Part {
     final case class CatchAll(title: Seq[Node]) extends Descriptor(title)
 
     val parser: Parser[Descriptor] = for {
-      from <- Xml.attribute.optional("from")
-      names <- Element("document", Xml.text.required).all
-      title <- Element("title", ContentType.Mixed, Xml.allNodes).required
+      from <- Attribute("from").optional
+      names <- Element("document", Text().required).all // TODO common combinator?
+      title <- Element("title", ContentType.Mixed, Xml.allNodes).required // TODO common combinator?
     } yield {
       if (names.isEmpty) {
         if (from.isEmpty) CatchAll(title) else From(from.get, title)
