@@ -22,15 +22,16 @@ for mathematics in DocBook in particular. It also influenced my thinking on
 
 ## The Code ##
 
+![](https://github.com/opentorah/calendar/workflows/CI/badge.svg)
+
 Code that makes possible calculations with dates, time intervals and angles exactly as they are
 described by Rambam is available:
-- [Repository](https://github.com/digitaljudaica/calendar)
+- [Repository](https://github.com/opentorah/calendar)
 - [Changelog](/CHANGELOG.md)
 - [ScalaDoc](/scaladoc/org/podval/calendar/index.html)
 - [Examples](/examples/)
-- [Travis CI](https://travis-ci.com/digitaljudaica/calendar)
-- [JCenter](https://jcenter.bintray.com/org/podval/calendar/org.podval.calendar-library/)
-- [Bintray](https://bintray.com/beta/#/dubinsky/org.podval.calendar/org.podval.calendar-library?tab=overview)
+- [Bintray](https://bintray.com/beta/#/dubinsky/org.opentorah/calendar?tab=overview)
+- [JCenter](https://jcenter.bintray.com/org/opentorah/calendar/)
 
 The code is written in Scala and uses extendable family polymorphism encoding with family members in
 separate files inspired by a Stackoverflow
