@@ -2,10 +2,10 @@ package org.opentorah.calendar
 
 /** Number System.
   *
-  * Each number system `S` (derived from [[org.podval.calendar.numbers.Number]])
-  * supports two flavors of [[org.podval.calendar.numbers.Number]]:
-  * `S#Point` (derived from [[org.podval.calendar.numbers.PointNumber]] and
-  * `S#Vector` (derived from [[org.podval.calendar.numbers.VectorNumber]].
+  * Each number system `S` (derived from [[org.opentorah.calendar.numbers.Number]])
+  * supports two flavors of [[org.opentorah.calendar.numbers.Number]]:
+  * `S#Point` (derived from [[org.opentorah.calendar.numbers.PointNumber]] and
+  * `S#Vector` (derived from [[org.opentorah.calendar.numbers.VectorNumber]].
   *
   * This distinction allows definitions of operations to be constrained to the types where
   * a give operation makes sense:

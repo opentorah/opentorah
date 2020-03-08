@@ -18,7 +18,7 @@ dependencies {
   runtimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
 }
 
-mainClassName = 'org.podval.calendar.service.CalendarService'
+mainClassName = 'org.opentorah.calendar.service.CalendarService'
 
 final File dockerDir = file("$buildDir/docker/")
 
@@ -27,8 +27,8 @@ task prepareDockerContext {
   dependsOn installDist
 
   doLast {
-    copy { from "$installDist.destinationDir/lib" into "$dockerDir/project-libs" include "**/org.podval.*" }
-    copy { from "$installDist.destinationDir/lib" into "$dockerDir/dependencies" exclude "**/org.podval.*" }
+    copy { from "$installDist.destinationDir/lib" into "$dockerDir/project-libs" include "**/org.opentorah.*" }
+    copy { from "$installDist.destinationDir/lib" into "$dockerDir/dependencies" exclude "**/org.opentorah.*" }
     copy { from "$installDist.destinationDir/bin" into "$dockerDir/bin" }
     copy { from "$projectDir/Dockerfile" into dockerDir }
   }

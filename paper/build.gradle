@@ -13,7 +13,7 @@ dependencies {
 docBook {
   document = "calendar"
 
-  dataGeneratorClass = "org.podval.calendar.paper.Tables"
+  dataGeneratorClass = "org.opentorah.calendar.paper.Tables"
 
   outputFormats = ["html", "pdf", "epub2"]
 
