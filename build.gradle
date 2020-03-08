@@ -8,9 +8,12 @@ allprojects {
     jcenter()
     mavenCentral()
     mavenLocal()
+
+    // For some reason the 'store' package isn't included in JCenter...
+    maven { url  "https://dl.bintray.com/dubinsky/org.opentorah" }
   }
 
-  group = 'org.podval.calendar'
+  group = 'org.opentorah'
   version = projectVersion
 }
 

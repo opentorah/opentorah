@@ -3,7 +3,11 @@ pluginManagement {
     mavenLocal()
     jcenter()
     gradlePluginPortal()
+
+    // For some reason the 'store' package isn't included in JCenter...
+    maven { url  "https://dl.bintray.com/dubinsky/org.opentorah" }
   }
+
   plugins {
     id 'com.github.ben-manes.versions' version '0.28.0'
     id 'com.github.maiflai.scalatest' version '0.26'
@@ -21,8 +25,8 @@ include ':paper'
 
 // includeBuild '../../../docbook/docbook-gradle'
 
-//includeBuild ('../../store/master') {
+//includeBuild ('../../store') {
 //  dependencySubstitution {
-//    substitute module('org.digitaljudaica:org.digitaljudaica-store') with project(':store')
+//    substitute module('org.opentorah:store') with project(':store')
 //  }
 //}

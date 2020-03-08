@@ -8,7 +8,7 @@ plugins {
 description = 'Jewish Calendar Dates'
 
 dependencies {
-  implementation "org.digitaljudaica:org.digitaljudaica-store:$storeVersion"
+  implementation "org.opentorah:store:$storeVersion"
 
   implementation "org.scala-lang:scala-library:$scalaVersion"
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
@@ -34,10 +34,9 @@ task scaladocJar(type: Jar) {
 }
 scaladocJar.dependsOn scaladoc
 
-final String gitHubRepository    = "digitaljudaica/calendar"
+final String gitHubRepository    = "opentorah/calendar"
 final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
-
-final String libraryArtifactId = "$project.group-$project.name"
+final String libraryArtifactId = "calendar"
 jar.archiveBaseName.set(libraryArtifactId)
 
 publishing {
@@ -69,7 +68,7 @@ publishing {
           }
         }
         organization {
-          name = 'Digital Judaica'
+          name = 'Open Torah'
           url = 'http://www.jewish-calendar.org'
         }
         developers {
@@ -99,14 +98,14 @@ bintray {
     repo                   = project.group
     name                   = libraryArtifactId
     desc                   = project.description
-    websiteUrl             = "${gitHubRepositoryUrl}"
+    websiteUrl             = "http://www.jewish-calendar.org"
     issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
     vcsUrl                 = "${gitHubRepositoryUrl}.git"
     githubRepo             = gitHubRepository
     licenses               = ['Apache-2.0']
     labels                 = ['Scala', 'Calendar', 'Jewish']
     publicDownloadNumbers  = true
-    githubReleaseNotesFile = "${rootProject.projectDir}/docs/CHANGELOG.md"
+    githubReleaseNotesFile = "docs/CHANGELOG.md"
     version { name         = project.version }
   }
 }
