@@ -5,7 +5,7 @@ email: dub@podval.org
 description: >- # this means to ignore newlines until "baseurl:"
   Digital Judaica Done Right :)
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://www.digitaljudaica.org" # the base hostname & protocol for your site, e.g. http://example.com
+url: "http://www.opentorah.org" # the base hostname & protocol for your site, e.g. http://example.com
 
 github_username:  dubinsky
 
