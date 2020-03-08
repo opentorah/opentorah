@@ -1,6 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Parser, Xml}
+import org.opentorah.xml.{Attribute, Parser}
 
 final case class LanguageSpec(
   language: Option[Language],
@@ -29,9 +29,9 @@ object LanguageSpec {
     new LanguageSpec(language = Some(language), isTransliterated = Some(isTransliterated), flavour = Some(flavour))
 
   val parser: Parser[LanguageSpec] = for {
-    lang <- Xml.attribute.optional("lang")
-    isTransliterated <- Xml.attribute.optional.boolean("transliterated")
-    flavour <- Xml.attribute.optional("flavour")
+    lang <- Attribute("lang").optional
+    isTransliterated <- Attribute("transliterated").boolean.optional
+    flavour <- Attribute("flavour").optional
   } yield LanguageSpec(
     language = lang.map(Language.getForDefaultName),
     isTransliterated = isTransliterated,

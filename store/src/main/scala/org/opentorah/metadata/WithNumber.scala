@@ -1,13 +1,13 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Parser, Xml}
+import org.opentorah.xml.{Attribute, Parser}
 
 final class WithNumber[T](val n: Int, val what: T)
 
 object WithNumber {
 
   def parse[T](parser: Parser[T]): Parser[WithNumber[T]] = for {
-    n <- Xml.attribute.required.positiveInt("n")
+    n <- Attribute("n").positiveInt.required
     what <- parser
   } yield new WithNumber[T](n, what)
 

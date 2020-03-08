@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{ContentType, Descriptor, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Descriptor, Xml}
 import scala.xml.{Elem, Node}
 
 final case class Date(
@@ -13,8 +13,8 @@ object Date extends Descriptor[Date](
   elementName = "date",
   contentType = ContentType.Mixed,
   contentParser = for {
-    when <- Xml.attribute.required("when")
-    calendar <- Xml.attribute.optional("calendar")
+    when <- Attribute("when").required
+    calendar <- Attribute("calendar").optional
     xml <- Xml.allNodes
   } yield new Date(
     when,

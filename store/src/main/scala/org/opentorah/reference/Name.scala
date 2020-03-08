@@ -1,6 +1,6 @@
 package org.opentorah.reference
 
-import org.opentorah.xml.{Parser, Xml}
+import org.opentorah.xml.{Attribute, Parser, Text, Xml}
 import scala.xml.Elem
 
 final class Name private(
@@ -17,7 +17,7 @@ final class Name private(
 object Name {
   def parser(entity: Entity): Parser[Name] = for {
     _ <- Xml.checkName(entity.nameElement)
-    id <- Xml.attribute.optional.id
-    name <- Xml.text.required
+    id <- Attribute.id.optional
+    name <- Text().required
   } yield new Name(entity, id, name)
 }

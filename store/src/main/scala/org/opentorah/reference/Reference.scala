@@ -1,6 +1,6 @@
 package org.opentorah.reference
 
-import org.opentorah.xml.{ContentType, From, XmlUtil, Parser, Xml}
+import org.opentorah.xml.{Attribute, ContentType, From, Parser, Xml, XmlUtil}
 import scala.xml.{Elem, Node}
 
 final case class Reference(
@@ -22,10 +22,10 @@ object Reference {
   private def parser(
     entity: Entity,
   ): Parser[Reference] = for {
-    id <- Xml.attribute.optional.id
-    role <- Xml.attribute.optional("role")
-    ref <- Xml.attribute.optional("ref")
-    _ <- Xml.attribute.optional("type") // TODO we don't do anything with the type yet
+    id <- Attribute.id.optional
+    role <- Attribute("role").optional
+    ref <- Attribute("ref").optional
+    _ <- Attribute("type").optional // TODO we don't do anything with the type yet
     name <- Xml.allNodes
   } yield new Reference(
     entity,

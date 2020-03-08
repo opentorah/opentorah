@@ -1,7 +1,7 @@
 package org.opentorah.xml
 
 import scala.xml.transform.{RewriteRule, RuleTransformer}
-import scala.xml.{Atom, Elem, Node, Text, TopScope}
+import scala.xml.{Atom, Elem, Node, TopScope}
 
 object XmlUtil {
 
@@ -58,5 +58,5 @@ object XmlUtil {
     node.isInstanceOf[Atom[_]]
 
   def isText(node: Node): Boolean =
-    node.isInstanceOf[Text]
+    node.isInstanceOf[scala.xml.Text]
 }

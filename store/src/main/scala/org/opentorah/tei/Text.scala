@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{ContentType, Descriptor, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Descriptor}
 import scala.xml.{Elem, Node}
 
 final case class Text(
@@ -12,7 +12,7 @@ object Text extends Descriptor[Text](
   elementName = "text",
   contentType = ContentType.Elements,
   contentParser = for {
-    lang <- Xml.attribute.optional("xml:lang")
+    lang <- Attribute("xml:lang").optional
     body <- Body.required
   } yield new Text(
     lang,

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{ContentType, Descriptor, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Descriptor}
 import scala.xml.Elem
 
 final case class Language(
@@ -13,9 +13,9 @@ object Language extends Descriptor[Language](
   elementName = "language",
   contentType = ContentType.Mixed,
   contentParser = for {
-    ident <- Xml.attribute.required("ident")
-    usage <- Xml.attribute.optional.positiveInt("usage")
-    text <- Xml.text.optional
+    ident <- Attribute("ident").required
+    usage <- Attribute("usage").positiveInt.optional
+    text <- org.opentorah.xml.Text().optional
   } yield new Language(
     ident,
     usage,

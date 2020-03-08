@@ -1,7 +1,7 @@
 package org.opentorah.metadata
 
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Element, From, Parser, Xml}
+import org.opentorah.xml.{Attribute, Element, From, Parser, Xml}
 
 object Metadata {
 
@@ -14,7 +14,7 @@ object Metadata {
     val typeName = from.name
 
     val wrappedParser = for {
-      type_ <- Xml.attribute.required("type")
+      type_ <- Attribute("type").required
       _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
       result <- Element(elementName, parser).all
     } yield result

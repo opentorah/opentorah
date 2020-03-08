@@ -1,6 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{ContentType, Element, Parser, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parser}
 import org.opentorah.util.Collections
 
 final class Names(val names: Seq[Name]) extends HasName with LanguageString {
@@ -55,12 +55,12 @@ object Names {
 
   final val defaultNameAttribute: String = "n"
 
-  def defaultNameParser: Parser[String] = Xml.attribute.required(defaultNameAttribute)
+  def defaultNameParser: Parser[String] = Attribute(defaultNameAttribute).required
 
   def parser: Parser[Names] = parserWithDefaultName(None)
 
   def withDefaultNameParser: Parser[Names] = for {
-    n <- Xml.attribute.optional(defaultNameAttribute)
+    n <- Attribute(defaultNameAttribute).optional
     defaultName = n.map(Name(_, LanguageSpec.empty))
     result <- parserWithDefaultName(defaultName)
   } yield result

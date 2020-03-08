@@ -2,7 +2,7 @@ package org.opentorah.reference
 
 import java.io.File
 import org.opentorah.util.Files
-import org.opentorah.xml.{ContentType, Element, From, Parser, Xml, XmlUtil}
+import org.opentorah.xml.{Attribute, ContentType, Element, From, Parser, Xml, XmlUtil}
 import scala.xml.Node
 
 // TODO extend Parsable
@@ -21,7 +21,7 @@ object Named {
     entityOption = Entity.forElement(name)
     _ <- Parser.check(entityOption.isDefined, s"No such entity type: $name")
     entity = entityOption.get
-    role <- Xml.attribute.optional("role")
+    role <- Attribute("role").optional
     names <- Element(entity.nameElement, ContentType.Text, Name.parser(entity)).all
     _ <- Parser.check(names.nonEmpty, s"No names in $id")
     content <- Xml.allNodes

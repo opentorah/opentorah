@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{ContentType, Descriptor, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Descriptor, Xml}
 import scala.xml.Elem
 
 final case class Pb(
@@ -13,9 +13,9 @@ object Pb extends Descriptor[Pb](
   elementName = "pb",
   contentType = ContentType.Empty,
   contentParser = for {
-    n <- Xml.attribute.required("n")
-    id <- Xml.attribute.optional.id
-    facs <- Xml.attribute.optional("facs")
+    n <- Attribute("n").required
+    id <- Attribute.id.optional
+    facs <- Attribute("facs").optional
   } yield new Pb(
     n,
     id,

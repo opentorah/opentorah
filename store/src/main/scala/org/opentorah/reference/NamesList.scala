@@ -1,6 +1,6 @@
 package org.opentorah.reference
 
-import org.opentorah.xml.{Element, Parser, Xml}
+import org.opentorah.xml.{Attribute, Element, Parser, Text, Xml}
 
 // TODO extend Parsable
 final case class NamesList(
@@ -17,9 +17,9 @@ object NamesList {
   val parser: Parser[NamesList] = for {
     name <- Xml.name
     entity: Entity = Entity.forList(name).get
-    id <- Xml.attribute.required.id
-    role <- Xml.attribute.optional("role")
-    head <- Xml.text.required("head")
+    id <- Attribute.id.required
+    role <- Attribute("role").optional
+    head <- Text("head").required
   } yield NamesList(
     entity,
     id,

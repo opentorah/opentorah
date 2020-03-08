@@ -2,7 +2,7 @@ package org.opentorah.store
 
 import java.io.File
 import org.opentorah.metadata.Names
-import org.opentorah.xml.{Element, From, Parser, Xml}
+import org.opentorah.xml.{Attribute, Element, From, Parser, Xml}
 import scala.xml.Elem
 
 sealed trait Store {
@@ -48,12 +48,12 @@ object Store {
   ))
 
   val textsParser: Parser[String] = for {
-    url <- Xml.attribute.required("url")
+    url <- Attribute("url").required
   } yield url
 
   // TODO allow 'by' to be named in-line
   def byParser(selectors: Set[Selector]): Parser[By] = for {
-    n <- Xml.attribute.required("n")
+    n <- Attribute("n").required
     selector = selectorByName(selectors, n)
     texts <- Element("texts", textsParser).optional
     stores <- Element("store", parser(selectors)).all

@@ -1,7 +1,7 @@
 package org.opentorah.xml
 
 import org.typelevel.paiges.Doc
-import scala.xml.{Attribute, Elem, MetaData, NamespaceBinding, Node, SpecialNode, Text, TopScope, Utility}
+import scala.xml.{Elem, MetaData, NamespaceBinding, Node, SpecialNode, TopScope, Utility}
 
 /*
   scala.xml.PrettyPrinter breaks the line
@@ -41,7 +41,7 @@ final class PaigesPrettyPrinter(
       // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
       if (canBreakRight && element.label == "lb") result + Doc.hardLine else result
 
-    case text: Text =>
+    case text: scala.xml.Text =>
       Doc.text(text.data)
 
     case special: SpecialNode =>
@@ -192,7 +192,7 @@ object PaigesPrettyPrinter {
   }
 
   private def fromAttribute(attribute: MetaData): Doc = attribute match {
-    case attribute: Attribute if attribute.value != null =>
+    case attribute: scala.xml.Attribute if attribute.value != null =>
       val key: Doc =
         Doc.text((if (attribute.isPrefixed) s"${attribute.pre}:" else "") + s"${attribute.key}=")
       val value = Doc.text(sbToString(Utility.appendQuoted(
@@ -208,7 +208,7 @@ object PaigesPrettyPrinter {
     val (atoms: Seq[Node], tail: Seq[Node]) = nodes.span(XmlUtil.isText)
 
     val newResult: Seq[Node] = if (atoms.isEmpty) result else {
-      val text: String = atoms.map(_.asInstanceOf[Text].data).mkString("")
+      val text: String = atoms.map(_.asInstanceOf[scala.xml.Text].data).mkString("")
         .replace('\n', ' ')
         .replace('\t', ' ')
 
@@ -220,13 +220,13 @@ object PaigesPrettyPrinter {
   }
 
   @scala.annotation.tailrec
-  private def processText(result: Seq[Text], text: String): Seq[Text] = if (text.isEmpty) result else {
+  private def processText(result: Seq[scala.xml.Text], text: String): Seq[scala.xml.Text] = if (text.isEmpty) result else {
     val (spaces: String, tail: String) = text.span(_ == ' ')
-    val newResult = if (spaces.isEmpty) result else result :+ Text(" ")
+    val newResult = if (spaces.isEmpty) result else result :+ scala.xml.Text(" ")
     val (word: String, tail2: String) = tail.span(_ != ' ')
 
     if (word.isEmpty) newResult
-    else processText(newResult :+ Text(word), tail2)
+    else processText(newResult :+ scala.xml.Text(word), tail2)
   }
 
   private def sbToString(f: StringBuilder => Unit): String = {

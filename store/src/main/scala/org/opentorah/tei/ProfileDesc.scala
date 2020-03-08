@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Descriptor, Parsable}
+import org.opentorah.xml.{Descriptor, Repeatable}
 import scala.xml.Elem
 
 // TODO also: abstract handNotes listTranspose particDesc settingDesc textDesc
@@ -16,14 +16,14 @@ final case class ProfileDesc(
 object ProfileDesc extends Descriptor[ProfileDesc](
   elementName = "profileDesc",
   contentParser = for {
-      values <- Parsable.allAtMostOnce(Seq(
+      values <- Repeatable.choice(Seq(
         LangUsage,
         CalendarDesc,
         Creation,
         Abstract,
         TextClass,
         CorrespDesc
-      ))
+      )).toMap
     } yield new ProfileDesc(
       // TODO yuck!!!
       values.get(Abstract).map(_.asInstanceOf[Abstract]),

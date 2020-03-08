@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Descriptor, ElementRaw, Xml}
+import org.opentorah.xml.{Attribute, Descriptor, ElementRaw}
 import scala.xml.Elem
 
 final case class Editor(
@@ -11,7 +11,7 @@ final case class Editor(
 object Editor extends Descriptor[Editor](
   elementName = "editor",
   contentParser = for {
-    role <- Xml.attribute.optional("role")
+    role <- Attribute("role").optional
     persName <- ElementRaw("persName").optional
   } yield new Editor(
     role,
