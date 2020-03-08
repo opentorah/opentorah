@@ -1,4 +1,4 @@
-package org.digitaljudaica.archive.collector
+package org.opentorah.archive.collector
 
 import scala.xml.{Elem, Node}
 

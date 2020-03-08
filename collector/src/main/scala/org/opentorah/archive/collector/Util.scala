@@ -1,7 +1,7 @@
-package org.digitaljudaica.archive.collector
+package org.opentorah.archive.collector
 
 import java.io.File
-import org.digitaljudaica.util.Files
+import org.opentorah.util.Files
 import scala.xml.Elem
 
 object Util {

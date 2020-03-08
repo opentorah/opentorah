@@ -1,12 +1,12 @@
-package org.digitaljudaica.archive.collector.reference
+package org.opentorah.archive.collector.reference
 
-import org.digitaljudaica.archive.collector.CollectionLike
+import org.opentorah.archive.collector.CollectionLike
 import scala.xml.Text
 
 final class Names(
   override val reference: String,
-  storeNameds: Seq[org.digitaljudaica.reference.Named],
-  storeNamesLists: Seq[org.digitaljudaica.reference.NamesList],
+  storeNameds: Seq[org.opentorah.reference.Named],
+  storeNamesLists: Seq[org.opentorah.reference.NamesList],
   namedUrl: String => String,
   namedInTheListUrl: String => String
 ) extends CollectionLike {

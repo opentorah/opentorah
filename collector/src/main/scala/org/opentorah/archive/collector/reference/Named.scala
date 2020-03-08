@@ -1,11 +1,11 @@
-package org.digitaljudaica.archive.collector.reference
+package org.opentorah.archive.collector.reference
 
-import org.digitaljudaica.reference.{Entity, Name}
-import org.digitaljudaica.util.Collections
+import org.opentorah.reference.{Entity, Name}
+import org.opentorah.util.Collections
 import scala.xml.{Elem, Node}
 
 final class Named(
-  val storeNamed: org.digitaljudaica.reference.Named,
+  val storeNamed: org.opentorah.reference.Named,
   container: Names,
   namedUrl: String => String,
   namedInTheListUrl: String => String
@@ -20,7 +20,7 @@ final class Named(
   def content: Seq[Node] = storeNamed.content
 
   override val references: Seq[Reference] = bindReferences(content.flatMap(element =>
-    org.digitaljudaica.reference.Reference.all(element)))
+    org.opentorah.reference.Reference.all(element)))
 
   override def isNames: Boolean = true
 

@@ -1,11 +1,11 @@
-package org.digitaljudaica.archive.collector.reference
+package org.opentorah.archive.collector.reference
 
-import org.digitaljudaica.reference.Entity
+import org.opentorah.reference.Entity
 import scala.xml.{Elem, Node}
 
 final case class Reference(
   source: ReferenceSource,
-  reference: org.digitaljudaica.reference.Reference
+  reference: org.opentorah.reference.Reference
 ) {
   override def toString: String = source.toString
 

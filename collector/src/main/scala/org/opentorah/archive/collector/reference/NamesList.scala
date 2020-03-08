@@ -1,10 +1,10 @@
-package org.digitaljudaica.archive.collector.reference
+package org.opentorah.archive.collector.reference
 
-import org.digitaljudaica.reference.Entity
+import org.opentorah.reference.Entity
 import scala.xml.Elem
 
 final class NamesList(
-  storeNamesList: org.digitaljudaica.reference.NamesList,
+  storeNamesList: org.opentorah.reference.NamesList,
   val nameds: Seq[Named]
 ) {
   def entity: Entity = storeNamesList.entity

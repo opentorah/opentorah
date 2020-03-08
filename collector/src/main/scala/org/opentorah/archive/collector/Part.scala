@@ -1,6 +1,6 @@
-package org.digitaljudaica.archive.collector
+package org.opentorah.archive.collector
 
-import org.digitaljudaica.xml.{ContentType, Element, Parser, Xml}
+import org.opentorah.xml.{ContentType, Element, Parser, Xml}
 import scala.xml.Node
 
 final class Part(val title: Option[Seq[Node]], val documents: Seq[Document])

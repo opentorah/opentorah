@@ -1,12 +1,10 @@
-package org.digitaljudaica.archive.collector
+package org.opentorah.archive.collector
 
 import java.io.File
-
-import org.digitaljudaica.archive.collector.reference.{Named, Names, Reference}
-import org.digitaljudaica.tei.Tei
-import org.digitaljudaica.util.Files
-import org.digitaljudaica.xml.{From, Parser, Xml, XmlUtil}
-
+import org.opentorah.archive.collector.reference.{Named, Names, Reference}
+import org.opentorah.tei.Tei
+import org.opentorah.util.Files
+import org.opentorah.xml.{From, Parser, Xml, XmlUtil}
 import scala.xml.{Elem, Node, Text}
 
 object Main {
@@ -114,16 +112,16 @@ object Main {
   private def readNames(layout: Layout): Names = {
     println("Reading names.")
 
-    val (listsHead: String, storeNamesLists: Seq[org.digitaljudaica.reference.NamesList]) =
+    val (listsHead: String, storeNamesLists: Seq[org.opentorah.reference.NamesList]) =
       Parser.parseDo(From.file(layout.store, layout.namesListsFileName)
         .parse(Xml.withName("names", for {
           head <- Xml.text.required("head")
-          listDescriptors <- org.digitaljudaica.reference.NamesList.all
+          listDescriptors <- org.opentorah.reference.NamesList.all
         } yield (head, listDescriptors))))
 
     new Names(
       reference = listsHead,
-      storeNameds = org.digitaljudaica.reference.Named.readAll(layout.storeNamesDirectory),
+      storeNameds = org.opentorah.reference.Named.readAll(layout.storeNamesDirectory),
       storeNamesLists,
       namedUrl = layout.namedUrl,
       namedInTheListUrl = layout.namedInTheListUrl

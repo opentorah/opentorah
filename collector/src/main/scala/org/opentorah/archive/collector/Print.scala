@@ -1,10 +1,9 @@
-package org.digitaljudaica.archive.collector
+package org.opentorah.archive.collector
 
-import org.digitaljudaica.xml.PaigesPrettyPrinter
-
+import org.opentorah.xml.PaigesPrettyPrinter
 import scala.xml.Elem
 
-// TODO move back into store after fine-tuning
+// TODO unfold into Main
 object Print {
 
   private val prettyPrinter = new PaigesPrettyPrinter(

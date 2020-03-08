@@ -1,11 +1,12 @@
-package org.digitaljudaica.archive.collector
+package org.opentorah.archive.collector
 
 import java.io.File
-import org.digitaljudaica.archive.collector.reference.Reference
-import org.digitaljudaica.util.{Collections, Files}
-import org.digitaljudaica.xml.{ContentType, Element, From, Parser, Xml, XmlUtil}
+import org.opentorah.archive.collector.reference.Reference
+import org.opentorah.tei.Tei
+import org.opentorah.util.{Collections, Files}
+import org.opentorah.xml.{ContentType, Element, From, Parser, Xml, XmlUtil}
 import Table.Column
-import org.digitaljudaica.tei.Tei
+
 import scala.xml.{Elem, Node, Text}
 
 final class Collection private(
