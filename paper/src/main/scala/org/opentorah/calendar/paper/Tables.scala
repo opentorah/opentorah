@@ -1,12 +1,10 @@
-package org.podval.calendar.paper
+package org.opentorah.calendar.paper
 
-import org.podval.calendar.angles.Angles.Rotation
+import org.opentorah.calendar.angles.Angles.Rotation
 import scala.math.{cos, round, sin, tan}
 import java.io.File
-
-import org.podval.calendar.astronomy.{Time2Rotation, SunLongitudeMean}
+import org.opentorah.calendar.astronomy.{Time2Rotation, SunLongitudeMean}
 import Time2Rotation.Key
-
 
 object Tables {
 

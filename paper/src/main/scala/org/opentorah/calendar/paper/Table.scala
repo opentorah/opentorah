@@ -1,4 +1,4 @@
-package org.podval.calendar.paper
+package org.opentorah.calendar.paper
 
 import scala.xml.{Elem, PrettyPrinter}
 import java.io.{File, FileOutputStream, PrintStream}
