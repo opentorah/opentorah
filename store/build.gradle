@@ -30,7 +30,7 @@ task scaladocJar(type: Jar) {
 scaladocJar.dependsOn scaladoc
 
 
-final String gitHubRepository    = "digitaljudaica/digitaljudaica.org"
+final String gitHubRepository    = "digitaljudaica/store"
 final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
 final String libraryArtifactId   = "$project.group-$project.name"
 jar.archiveBaseName.set(libraryArtifactId)
@@ -65,7 +65,7 @@ publishing {
                 }
                 organization {
                     name = 'Digital Judaica'
-                    url = 'http://www.digitaljudaica.org'
+                    url = 'http://www.opentorah.org'
                 }
                 developers {
                     developer {

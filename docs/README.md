@@ -1,5 +1,5 @@
 # Digital Judaica Done Right :)
 
-![](https://github.com/digitaljudaica/digitaljudaica.org/workflows/CI/badge.svg)
+![](https://github.com/digitaljudaica/store/workflows/CI/badge.svg)
 
-[Writings](http://www.digitaljudaica.org) on the subject.
+[Writings](http://www.opentorah.org) on the subject.

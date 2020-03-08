@@ -5,7 +5,7 @@ import scala.xml.Node
 import scala.io.Source
 import java.io.File
 
-import org.digitaljudaica.store.HebrewLanguage
+import org.opentorah.store.HebrewLanguage
 
 object JerusalemTanachImporter {
 

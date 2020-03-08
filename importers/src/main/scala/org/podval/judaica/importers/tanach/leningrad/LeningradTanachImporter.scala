@@ -2,9 +2,9 @@ package org.podval.judaica.importers.tanach.leningrad
 
 import java.io.File
 
-import org.digitaljudaica.store.HebrewLanguage
-import org.digitaljudaica.store.metadata.Xml
-import org.digitaljudaica.store.metadata.Xml.Ops
+import org.opentorah.store.HebrewLanguage
+import org.opentorah.store.metadata.Xml
+import org.opentorah.store.metadata.Xml.Ops
 
 import scala.xml.{Elem, Node}
 
