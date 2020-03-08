@@ -6,7 +6,7 @@ plugins {
 description = 'Archive Collector'
 
 dependencies {
-    implementation "org.digitaljudaica:org.digitaljudaica-store:$storeVersion"
+    implementation "org.opentorah:org.opentorah-store:$storeVersion"
     implementation "org.scala-lang:scala-library:$scalaVersion"
     implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
 

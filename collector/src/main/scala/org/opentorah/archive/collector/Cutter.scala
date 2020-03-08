@@ -6,9 +6,9 @@ import scala.sys.process._
 
 object Cutter {
 
-  val uncutDirectory: File = new File("/home/dub/Projects/digitaljudaica/rgada")
+  val uncutDirectory: File = new File("/home/dub/Projects/opentorah/rgada")
 
-  val cutDirectory: File = new File("/home/dub/Projects/digitaljudaica/rgada-cut")
+  val cutDirectory: File = new File("/home/dub/Projects/opentorah/rgada-cut")
 
   private val defaultOverlap: Int = 0
 
