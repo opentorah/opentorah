@@ -1,7 +1,7 @@
 package org.opentorah.judaica.tanach
 
 import org.opentorah.metadata.WithNumber
-import org.opentorah.xml.{Element, Parser, Xml}
+import org.opentorah.xml.{Attribute, Element, Parser}
 
 final class Chapters(chapters: Seq[Int]) {
   def length(chapter: Int): Int = chapters(chapter-1)
@@ -62,7 +62,7 @@ object Chapters {
 
   val parser: Parser[Chapters] = for {
     chapters <- Element("chapter",
-      WithNumber.parse(Xml.attribute.required.positiveInt("length"))).all
+      WithNumber.parse(Attribute("length").positiveInt.required)).all
   } yield {
     WithNumber.checkConsecutive(chapters, "chapter")
     new Chapters(WithNumber.dropNumbers(chapters))

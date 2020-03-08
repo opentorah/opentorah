@@ -2,7 +2,7 @@ package org.opentorah.judaica.tanach
 
 import org.opentorah.metadata.{Metadata, Names, WithNumber}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{ContentType, Element, Parser, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parser}
 
 final class ParshaMetadata(
   val parsha: Parsha,
@@ -102,8 +102,8 @@ object ParshaMetadata {
 
   private def dayParser: Parser[DayParsed] = for {
     span <- numberedParser
-    custom <- Xml.attribute.optional("custom").map(_.fold[Set[Custom]](Set(Custom.Common))(Custom.parse))
-    isCombined <- Xml.attribute.optional.boolean("combined").map(_.getOrElse(false))
+    custom <- Attribute("custom").optional.map(_.fold[Set[Custom]](Set(Custom.Common))(Custom.parse))
+    isCombined <- Attribute("combined").boolean.optional.map(_.getOrElse(false))
   } yield DayParsed(span, custom, isCombined)
 
   private def numberedParser: Parser[Torah.Numbered] = WithNumber.parse(semiResolvedParser)

@@ -1,7 +1,7 @@
 package org.opentorah.judaica.tanach
 
 import org.opentorah.metadata.{LanguageSpec, LanguageString, WithNames}
-import org.opentorah.xml.{Parser, Xml}
+import org.opentorah.xml.{Attribute, Parser}
 
 trait WithBookSpans[Book <: Tanach.TanachBook] {
 
@@ -57,7 +57,7 @@ trait WithBookSpans[Book <: Tanach.TanachBook] {
   }
 
   val spanParser: Parser[BookSpanParsed] = for {
-    book <- Xml.attribute.optional("book")
+    book <- Attribute("book").optional
     spanParsed <- SpanParsed.parser
   } yield new BookSpanParsed(book, spanParsed)
 

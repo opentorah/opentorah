@@ -1,7 +1,7 @@
 package org.opentorah.judaica.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Element, From, Parser, Xml}
+import org.opentorah.xml.{Attribute, Element, From, Parser}
 
 object MishnehTorah {
 
@@ -69,7 +69,7 @@ object MishnehTorah {
   }
 
   private def bookParser: Parser[Book] = for {
-    number <- Xml.attribute.required.positiveInt("n")
+    number <- Attribute("n").positiveInt.required
     names <- Names.parser
     parts <- Element("part", partParser).all
     _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
@@ -81,8 +81,8 @@ object MishnehTorah {
   }
 
   private def partParser: Parser[Part] = for {
-    number <- Xml.attribute.required.positiveInt("n")
-    numChapters <- Xml.attribute.required.positiveInt("chapters")
+    number <- Attribute("n").positiveInt.required
+    numChapters <- Attribute("chapters").positiveInt.required
     names <- Names.parser
     chapters <- Element[NamedChapter]("chapter", for {
       names <- Names.parser

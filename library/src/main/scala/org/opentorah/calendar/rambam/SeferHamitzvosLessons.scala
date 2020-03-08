@@ -1,7 +1,7 @@
 package org.opentorah.calendar.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Element, From, Parser, Xml}
+import org.opentorah.xml.{Attribute, Element, From, Parser, Xml}
 
 object SeferHamitzvosLessons {
 
@@ -49,15 +49,15 @@ object SeferHamitzvosLessons {
   }
 
   private def lessonParser: Parser[Lesson] = for {
-    number <- Xml.attribute.required.positiveInt("n")
+    number <- Attribute("n").positiveInt.required
     parts <- Element(partParser).all
   } yield new Lesson(number, parts)
 
   private def partParser: Parser[Part] = for {
     name <- Xml.name
     result <- name match {
-      case "positive" => Xml.attribute.required.positiveInt("n").map(new Positive(_))
-      case "negative" => Xml.attribute.required.positiveInt("n").map(new Negative(_))
+      case "positive" => Attribute("n").positiveInt.required.map(new Positive(_))
+      case "negative" => Attribute("n").positiveInt.required.map(new Negative(_))
       case "named" => Names.parser.map(new NamedPart(_))
 // TODO pre-check? Can't do it in the match, since check(): Unit case name => Parse.check(false, s"Unexpected element '$name'")
     }

@@ -2,7 +2,7 @@ package org.opentorah.calendar.tanach
 
 import org.opentorah.metadata.{LanguageSpec, Metadata, Names, WithNumber}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Element, From, Parser, Xml}
+import org.opentorah.xml.{Attribute, Element, From, Parser, Xml}
 import org.opentorah.judaica.tanach.{Custom, Parsha, Tanach, WithBookSpans}
 import zio.ZIO
 
@@ -62,7 +62,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
   private def oneSpan(span: BookSpanParsed): Haftarah = Haftarah(Seq(span.resolve))
 
   private def customParser(ancestorSpan: BookSpanParsed): Parser[(Set[Custom], Haftarah)] = for {
-    n <- Xml.attribute.required("n")
+    n <- Attribute("n").required
     bookSpanParsed <- spanParser.map(_.inheritFrom(ancestorSpan))
     hasParts <- Xml.nextNameIs("part")
     result <- if (!hasParts) ZIO.succeed[Haftarah](oneSpan(bookSpanParsed)) else partsParser(bookSpanParsed)

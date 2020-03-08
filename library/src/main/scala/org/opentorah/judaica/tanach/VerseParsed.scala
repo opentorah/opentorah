@@ -1,6 +1,6 @@
 package org.opentorah.judaica.tanach
 
-import org.opentorah.xml.{Parser, Xml}
+import org.opentorah.xml.{Attribute, Parser}
 
 final case class VerseParsed(chapter: Option[Int], verse: Option[Int]) {
 
@@ -24,12 +24,12 @@ final case class VerseParsed(chapter: Option[Int], verse: Option[Int]) {
 object VerseParsed {
 
   val fromParser: Parser[VerseParsed] = for {
-    chapter <- Xml.attribute.optional.positiveInt("fromChapter")
-    verse <- Xml.attribute.optional.positiveInt("fromVerse")
+    chapter <- Attribute("fromChapter").positiveInt.optional
+    verse <- Attribute("fromVerse").positiveInt.optional
   } yield VerseParsed(chapter, verse)
 
   val toParser: Parser[VerseParsed] = for {
-    chapter <- Xml.attribute.optional.positiveInt("toChapter")
-    verse <- Xml.attribute.optional.positiveInt("toVerse")
+    chapter <- Attribute("toChapter").positiveInt.optional
+    verse <- Attribute("toVerse").positiveInt.optional
   } yield VerseParsed(chapter, verse)
 }
