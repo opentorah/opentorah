@@ -32,7 +32,7 @@ scaladocJar.dependsOn scaladoc
 
 final String gitHubRepository    = "opentorah/store"
 final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
-final String libraryArtifactId   = "$project.group-$project.name"
+final String libraryArtifactId   = project.name
 jar.archiveBaseName.set(libraryArtifactId)
 
 publishing {
@@ -99,7 +99,7 @@ bintray {
         vcsUrl = "${gitHubRepositoryUrl}.git"
         githubRepo = gitHubRepository
         licenses = ['Apache-2.0']
-        labels = ['Scala', 'TEI', 'Jewish']
+        labels = ['Jewish', 'TEI', "Scala"]
         publicDownloadNumbers = true
 //        githubReleaseNotesFile = "${rootProject.projectDir}/docs/CHANGELOG.md"
         version { name = project.version }
