@@ -1,7 +1,7 @@
 Import angles-related classes:
 
 ```scala
-import org.podval.calendar.angles.Angles
+import org.opentorah.calendar.angles.Angles
 import Angles.{Position, Rotation}
 ```
 
@@ -9,10 +9,10 @@ Create some angles:
 
 ```scala
 val fullCircle = Rotation(360)
-// fullCircle: org.podval.calendar.angles.Angles#Vector = 360°
+// fullCircle: org.opentorah.calendar.angles.Angles#Vector = 360°
 
 val zero = Position(360)
-// zero: org.podval.calendar.angles.Angles#Point = 0°
+// zero: org.opentorah.calendar.angles.Angles#Point = 0°
 ```
 
 Look at them - inside and out:

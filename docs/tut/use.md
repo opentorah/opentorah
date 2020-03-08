@@ -1,7 +1,7 @@
 Import angles-related classes:
 
 ```tut:silent
-import org.podval.calendar.angles.Angles
+import org.opentorah.calendar.angles.Angles
 import Angles.{Position, Rotation}
 ```
 
