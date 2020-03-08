@@ -5,7 +5,7 @@ plugins {
     id 'com.jfrog.bintray'
 }
 
-description = 'Digital Judaica Store'
+description = 'Open Torah Store'
 
 dependencies {
     implementation "org.scala-lang:scala-library:$scalaVersion"
@@ -30,7 +30,7 @@ task scaladocJar(type: Jar) {
 scaladocJar.dependsOn scaladoc
 
 
-final String gitHubRepository    = "digitaljudaica/store"
+final String gitHubRepository    = "opentorah/store"
 final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
 final String libraryArtifactId   = "$project.group-$project.name"
 jar.archiveBaseName.set(libraryArtifactId)
@@ -64,7 +64,7 @@ publishing {
                     }
                 }
                 organization {
-                    name = 'Digital Judaica'
+                    name = 'Open Torah'
                     url = 'http://www.opentorah.org'
                 }
                 developers {

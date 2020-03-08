@@ -1,4 +1,4 @@
-package org.podval.judaica.importers.tanach.jerusalem
+package org.opentorah.importers.tanach.jerusalem
 
 import scala.collection.mutable.ArrayBuffer
 import scala.xml.Node

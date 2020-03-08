@@ -1,4 +1,4 @@
-package org.podval.judaica.importers.tanach.jerusalem
+package org.opentorah.importers.tanach.jerusalem
 
 final class Line(var line: String) {
   def isEmpty: Boolean = line.isEmpty

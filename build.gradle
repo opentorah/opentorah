@@ -10,7 +10,7 @@ allprojects {
     mavenLocal()
   }
 
-  group = 'org.digitaljudaica'
+  group = 'org.opentorah'
   version = projectVersion
 }
 

@@ -1,4 +1,4 @@
-package org.podval.judaica.importers.tanach.leningrad
+package org.opentorah.importers.tanach.leningrad
 
 import java.io.File
 

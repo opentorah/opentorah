@@ -1,4 +1,4 @@
-package org.podval.judaica.importers.tanach
+package org.opentorah.importers.tanach
 
 import scala.xml.factory.XMLLoader
 import scala.xml.{Elem, XML}
