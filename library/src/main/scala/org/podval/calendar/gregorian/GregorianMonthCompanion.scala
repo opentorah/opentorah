@@ -1,6 +1,6 @@
 package org.podval.calendar.gregorian
 
-import org.digitaljudaica.metadata.{Named, NamedCompanion, Names}
+import org.opentorah.metadata.{Named, NamedCompanion, Names}
 import org.podval.calendar.dates.MonthCompanion
 import Gregorian.Year
 

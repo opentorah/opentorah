@@ -1,6 +1,6 @@
 package org.podval.calendar.jewish
 
-import org.digitaljudaica.metadata.{Named, NamedCompanion, Names}
+import org.opentorah.metadata.{Named, NamedCompanion, Names}
 import org.podval.calendar.dates.MonthCompanion
 
 abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {

@@ -1,9 +1,9 @@
 package org.podval.judaica.tanach
 
 import Tanach.TanachBook
-import org.digitaljudaica.metadata.{Metadata, Names}
-import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{From, Parser, Xml}
+import org.opentorah.metadata.{Metadata, Names}
+import org.opentorah.util.Collections
+import org.opentorah.xml.{From, Parser, Xml}
 import zio.IO
 
 object TanachMetadata {

@@ -1,8 +1,8 @@
 package org.podval.judaica.tanach
 
-import org.digitaljudaica.metadata.{Metadata, Names, WithNumber}
-import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{ContentType, Element, Parser, Xml}
+import org.opentorah.metadata.{Metadata, Names, WithNumber}
+import org.opentorah.util.Collections
+import org.opentorah.xml.{ContentType, Element, Parser, Xml}
 
 final class ParshaMetadata(
   val parsha: Parsha,

@@ -1,8 +1,8 @@
 package org.podval.judaica.tanach
 
-import org.digitaljudaica.metadata.{Metadata, Names}
-import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{Element, Parser, Xml}
+import org.opentorah.metadata.{Metadata, Names}
+import org.opentorah.util.Collections
+import org.opentorah.xml.{Element, Parser, Xml}
 
 final class ChumashBookMetadata(
   book: Tanach.ChumashBook,

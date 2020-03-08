@@ -1,7 +1,7 @@
 package org.podval.judaica.tanach
 
-import org.digitaljudaica.metadata.{WithNames, WithNumber}
-import org.digitaljudaica.util.Collections
+import org.opentorah.metadata.{WithNames, WithNumber}
+import org.opentorah.util.Collections
 
 // Other than on Simchas Torah, aliyot are from the same book.
 final case class Torah private(override val spans: Seq[Torah.BookSpan])

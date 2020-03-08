@@ -1,7 +1,7 @@
 package org.podval.judaica.tanach
 
-import org.digitaljudaica.metadata.WithNumber
-import org.digitaljudaica.xml.{Element, Parser, Xml}
+import org.opentorah.metadata.WithNumber
+import org.opentorah.xml.{Element, Parser, Xml}
 
 final class Chapters(chapters: Seq[Int]) {
   def length(chapter: Int): Int = chapters(chapter-1)

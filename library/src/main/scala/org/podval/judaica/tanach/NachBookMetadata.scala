@@ -1,6 +1,6 @@
 package org.podval.judaica.tanach
 
-import org.digitaljudaica.metadata.Names
+import org.opentorah.metadata.Names
 
 final class NachBookMetadata(
   book: Tanach.NachBook

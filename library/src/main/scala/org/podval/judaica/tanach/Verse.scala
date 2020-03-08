@@ -1,6 +1,6 @@
 package org.podval.judaica.tanach
 
-import org.digitaljudaica.metadata.{LanguageSpec, LanguageString}
+import org.opentorah.metadata.{LanguageSpec, LanguageString}
 
 final case class Verse(chapter: Int, verse: Int) extends Ordered[Verse] with LanguageString {
   require(chapter > 0)

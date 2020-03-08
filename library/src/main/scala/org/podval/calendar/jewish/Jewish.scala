@@ -1,6 +1,6 @@
 package org.podval.calendar.jewish
 
-import org.digitaljudaica.metadata.LanguageSpec
+import org.opentorah.metadata.LanguageSpec
 import org.podval.calendar.dates.{Calendar, CalendarMember}
 import org.podval.calendar.numbers.Digits
 

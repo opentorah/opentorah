@@ -3,7 +3,7 @@ package org.podval.calendar.tanach
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.judaica.tanach.{Custom, Parsha, Torah}
 import org.podval.judaica.tanach.Parsha.{Bereishis, VezosHaberachah}
-import org.digitaljudaica.util.Cache
+import org.opentorah.util.Cache
 
 // only on SimchasTorah is there a second fragment
 final case class Chitas private(first: Torah.Fragment, second: Option[Torah.Fragment])

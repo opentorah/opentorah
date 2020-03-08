@@ -1,7 +1,7 @@
 package org.podval.judaica.tanach
 
-import org.digitaljudaica.metadata.{LanguageSpec, LanguageString, WithNames}
-import org.digitaljudaica.xml.{Parser, Xml}
+import org.opentorah.metadata.{LanguageSpec, LanguageString, WithNames}
+import org.opentorah.xml.{Parser, Xml}
 
 trait WithBookSpans[Book <: Tanach.TanachBook] {
 

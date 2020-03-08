@@ -1,6 +1,6 @@
 package org.podval.judaica.tanach
 
-import org.digitaljudaica.xml.Parser
+import org.opentorah.xml.Parser
 
 final case class SpanParsed(from: VerseParsed, to: VerseParsed) {
   def inheritFrom(ancestor: SpanParsed): SpanParsed = SpanParsed(

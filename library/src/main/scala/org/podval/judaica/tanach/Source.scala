@@ -1,6 +1,6 @@
 package org.podval.judaica.tanach
 
-import org.digitaljudaica.metadata.{Names, WithNames}
+import org.opentorah.metadata.{Names, WithNames}
 
 object Source {
   trait Numbers extends WithNames {

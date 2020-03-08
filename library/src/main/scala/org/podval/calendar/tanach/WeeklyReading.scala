@@ -1,7 +1,7 @@
 package org.podval.calendar.tanach
 
-import org.digitaljudaica.metadata.{Names, WithNames}
-import org.digitaljudaica.util.Collections
+import org.opentorah.metadata.{Names, WithNames}
+import org.opentorah.util.Collections
 import org.podval.calendar.dates.Calendar
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import SpecialDay.{Pesach, Shavuos, TishaBeAv}

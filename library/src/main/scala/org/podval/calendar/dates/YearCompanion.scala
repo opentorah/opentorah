@@ -1,6 +1,6 @@
 package org.podval.calendar.dates
 
-import org.digitaljudaica.util.Cache
+import org.opentorah.util.Cache
 
 /**
   *

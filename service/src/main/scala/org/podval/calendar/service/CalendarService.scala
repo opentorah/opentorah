@@ -2,7 +2,7 @@ package org.podval.calendar.service
 
 import cats.effect.{Blocker, ExitCode, IO, IOApp}
 import cats.implicits._
-import org.digitaljudaica.metadata.{Language, LanguageSpec}
+import org.opentorah.metadata.{Language, LanguageSpec}
 import org.http4s.{Charset, HttpRoutes, QueryParamDecoder, Response, StaticFile}
 import org.http4s.implicits._
 import org.http4s.dsl.io._

@@ -1,7 +1,7 @@
 package org.podval.calendar.tanach
 
-import org.digitaljudaica.metadata.{WithNames, WithNumber}
-import org.digitaljudaica.xml.{Element, From, Parser, Xml}
+import org.opentorah.metadata.{WithNames, WithNumber}
+import org.opentorah.xml.{Element, From, Parser, Xml}
 import org.podval.judaica.tanach.{SpanParsed, Torah}
 import scala.xml.Elem
 

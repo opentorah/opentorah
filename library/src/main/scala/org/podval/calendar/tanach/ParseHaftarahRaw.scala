@@ -1,7 +1,7 @@
 package org.podval.calendar.tanach
 
-import org.digitaljudaica.metadata.WithNames
-import org.digitaljudaica.xml.{From, Parser, Xml}
+import org.opentorah.metadata.WithNames
+import org.opentorah.xml.{From, Parser, Xml}
 import scala.xml.Elem
 
 trait ParseHaftarahRaw { self: WithNames =>

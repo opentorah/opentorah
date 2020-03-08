@@ -1,6 +1,6 @@
 package org.podval.calendar.astronomy
 
-import org.digitaljudaica.metadata.{Named, NamedCompanion, Names}
+import org.opentorah.metadata.{Named, NamedCompanion, Names}
 import org.podval.calendar.angles.Angles
 import org.podval.calendar.angles.Angles.{Position, Rotation}
 

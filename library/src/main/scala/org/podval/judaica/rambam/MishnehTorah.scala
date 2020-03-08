@@ -1,7 +1,7 @@
 package org.podval.judaica.rambam
 
-import org.digitaljudaica.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.digitaljudaica.xml.{Element, From, Parser, Xml}
+import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
+import org.opentorah.xml.{Element, From, Parser, Xml}
 
 object MishnehTorah {
 

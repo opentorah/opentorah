@@ -1,6 +1,6 @@
 package org.podval.judaica.tanach
 
-import org.digitaljudaica.xml.{Parser, Xml}
+import org.opentorah.xml.{Parser, Xml}
 
 final case class VerseParsed(chapter: Option[Int], verse: Option[Int]) {
 

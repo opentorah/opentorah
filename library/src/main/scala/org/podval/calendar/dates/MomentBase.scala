@@ -1,6 +1,6 @@
 package org.podval.calendar.dates
 
-import org.digitaljudaica.metadata.{LanguageSpec, LanguageString}
+import org.opentorah.metadata.{LanguageSpec, LanguageString}
 import org.podval.calendar.times.TimePointBase
 
 trait MomentBase[C <: Calendar[C]] extends TimePointBase[C] with CalendarMember[C] with LanguageString

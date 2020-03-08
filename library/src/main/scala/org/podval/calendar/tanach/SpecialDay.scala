@@ -1,7 +1,7 @@
 package org.podval.calendar.tanach
 
-import org.digitaljudaica.metadata.{Metadata, Names, WithName, WithNames}
-import org.digitaljudaica.xml.From
+import org.opentorah.metadata.{Metadata, Names, WithName, WithNames}
+import org.opentorah.xml.From
 import org.podval.judaica.tanach.{Custom, Parsha, Source, Torah}
 import org.podval.judaica.tanach.Torah.{Aliyah, Maftir}
 import org.podval.calendar.jewish.Jewish.{Day, Month, Year}

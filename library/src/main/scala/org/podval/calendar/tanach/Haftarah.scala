@@ -1,8 +1,8 @@
 package org.podval.calendar.tanach
 
-import org.digitaljudaica.metadata.{LanguageSpec, Metadata, Names, WithNumber}
-import org.digitaljudaica.util.Collections
-import org.digitaljudaica.xml.{Element, From, Parser, Xml}
+import org.opentorah.metadata.{LanguageSpec, Metadata, Names, WithNumber}
+import org.opentorah.util.Collections
+import org.opentorah.xml.{Element, From, Parser, Xml}
 import org.podval.judaica.tanach.{Custom, Parsha, Tanach, WithBookSpans}
 import zio.ZIO
 

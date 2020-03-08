@@ -1,7 +1,7 @@
 package org.podval.calendar.tanach
 
-import org.digitaljudaica.metadata.WithNames
-import org.digitaljudaica.util.{Cache, Collections, PairSlider}
+import org.opentorah.metadata.WithNames
+import org.opentorah.util.{Cache, Collections, PairSlider}
 import org.podval.calendar.jewish.Jewish.{Day, Year}
 import org.podval.calendar.tanach.SpecialDay.{FestivalOrIntermediate, Omer, ShabbosBereishis}
 

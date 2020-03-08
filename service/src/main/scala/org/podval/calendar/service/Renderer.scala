@@ -1,7 +1,7 @@
 package org.podval.calendar.service
 
-import org.digitaljudaica.metadata.{Language, LanguageSpec, WithNames}
-import org.digitaljudaica.util.{Collections, Util}
+import org.opentorah.metadata.{Language, LanguageSpec, WithNames}
+import org.opentorah.util.{Collections, Util}
 import org.podval.calendar.dates.{Calendar, DayBase, MonthBase, YearBase, YearsCycle}
 import org.podval.calendar.gregorian.Gregorian
 import org.podval.calendar.jewish.{Jewish, LeapYearsCycle, Season, Shemittah, Sun, YearType}
