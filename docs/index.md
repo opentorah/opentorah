@@ -12,7 +12,7 @@ Ideas (dating from 1991) for the dream environment for working with Jewish texts
 subject of two papers: general ([HTML](/judaica/html/index.html) [PDF](/judaica/pdf/judaica.pdf)
 [EPUB](/judaica/epub/judaica.epub)) and typesetting-rekated ([HTML](/typesetting/html/index.html)
 [PDF](/typesetting/pdf/judaica.pdf) [EPUB](/typesetting/epub/judaica.epub)).
-Code implementing some of those ideas is in a [GitHub repository](https://github.com/digitaljudaica/store).
+Code implementing some of those ideas is in a [GitHub repository](https://github.com/opentorah/store).
 
 [SBL font](http://www.sbl-site.org/educational/BiblicalFonts_SBLHebrew.aspx) is
  needed for viewing Tanach.
