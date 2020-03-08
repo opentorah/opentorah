@@ -94,12 +94,12 @@ bintray {
         repo = project.group
         name = libraryArtifactId
         desc = project.description
-        websiteUrl = "${gitHubRepositoryUrl}"
+        websiteUrl = "http://www.opentorah.org"
         issueTrackerUrl = "${gitHubRepositoryUrl}/issues"
         vcsUrl = "${gitHubRepositoryUrl}.git"
         githubRepo = gitHubRepository
         licenses = ['Apache-2.0']
-        labels = ['Scala', 'Calendar', 'Jewish']
+        labels = ['Scala', 'TEI', 'Jewish']
         publicDownloadNumbers = true
 //        githubReleaseNotesFile = "${rootProject.projectDir}/docs/CHANGELOG.md"
         version { name = project.version }
