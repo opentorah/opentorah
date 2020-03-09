@@ -113,7 +113,7 @@ object Main {
   def reportReferencesWithoutRef(names: Names, file: File): Unit = {
     val content: Seq[String] =
       for (reference <- names.getReferences.filter(_.ref.isEmpty))
-      yield "- " + render(reference.toXml) + s" в ${reference.source}"
+      yield "- " + reference.name.map(_.text.trim).mkString(" ") + s" в ${reference.source}"
 
     Util.writeWithYaml(
       file,

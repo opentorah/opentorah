@@ -33,27 +33,36 @@ final class Named(
     <l><ref target={url} role="namesViewer">{names.head.toXml}</ref></l>
 
   def toXml(references: Seq[Reference]): Elem = {
-    val usedBy = references.filter(_.ref.contains(id))
-    val fromNames: Seq[Reference] = usedBy.filter(_.source.isNames)
-    val bySource: Seq[(String, Seq[Reference])] =
-      (if (fromNames.isEmpty) Seq.empty else Seq((fromNames.head.source.collection.reference, fromNames))) ++
-        usedBy.filterNot(_.source.isNames).groupBy(_.source.collection.reference).toSeq.sortBy(_._1)
+    def sources(references: Seq[Reference]): Seq[Elem] =
+      for (ref <- Collections.removeConsecutiveDuplicates(references.map(_.source)))
+      yield <ref target={ref.url} role={ref.viewer}>{ref.name}</ref>
 
-    // TODO add usage statistics
+    val usedBy: Seq[Reference] = references.filter(_.ref.contains(id))
+    val fromNames: Seq[Reference] = usedBy.filter(_.source.isNames)
+    val bySource: Seq[(String, Seq[Reference])] = usedBy.filterNot(_.source.isNames)
+          .groupBy(_.source.collection.reference).toSeq.sortBy(_._1)
+
+    // TODO calculate numbers correctly: dups in "Alexander I"...
+    val numbers: Seq[(String, Int)] =
+      usedBy.groupBy(_.name.map(_.text.trim).mkString(" ")).mapValues(_.length).toSeq.sortBy(_._2).reverse
+    //      <p rendition="usage">
+    //        {for ((name, number) <- numbers) yield <l>{s"$name ($number)"}</l>}
+    //      </p>
 
     <named xml:id={id} role={role.orNull}>
       {for (name <- names) yield name.toXml}
       {content}
       <p rendition="mentions">
         <ref target={namedInTheListUrl(id)} role="namesViewer">[...]</ref>
-        {for ((source, references) <- bySource) yield
+        {if (fromNames.isEmpty) Seq.empty else
         <l>
-          <emph>{source}:</emph>
-          {Collections.removeConsecutiveDuplicates(references.map(_.source)).flatMap { ref =>
-          // TODO add commas more intelligently :)
-          val body = /*if (ref.name.contains(" ")) ref.name + "," else*/ ref.name
-          <ref target={ref.url} role={ref.viewer}>{body}</ref>}}
+          <emph>{fromNames.head.source.collection.reference}:</emph>
+          {
+          val result = sources(fromNames)
+          result.init.map(elem => <span>{elem},</span>) :+ result.last
+          }
         </l>}
+        {for ((source, references) <- bySource) yield <l><emph>{source}:</emph>{sources(references)}</l>}
       </p>
     </named>
       .copy(label = entity.element)
