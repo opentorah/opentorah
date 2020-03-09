@@ -31,9 +31,4 @@ final class Names(
   def addDocumentReferences(documentReferences: Seq[Reference]): Unit = {
     references = (nameds.flatMap(_.references) ++ documentReferences).filterNot(_.name == Text("?"))
   }
-
-  def checkReferences(): Unit = {
-    val errors: Seq[String] = references.flatMap(_.check(this))
-    if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
-  }
 }

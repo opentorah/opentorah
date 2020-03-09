@@ -64,4 +64,8 @@ final class Layout(val docs: File) {
     url(s"$collectionDirectoryName/${documentUrlRelativeToIndex(name)}")
 
   def documentUrlRelativeToIndex(name: String): String =  s"$docsDirectoryName/$name.html"
+
+  val reportsDirectory: File = docs("reports")
+
+  def reportFile(name: String) = new File(reportsDirectory, name + ".md")
 }

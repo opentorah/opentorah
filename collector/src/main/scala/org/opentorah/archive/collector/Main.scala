@@ -54,17 +54,13 @@ object Main {
 
     val names: Names = readNames(layout)
 
-    println("Verifying names' ids.")
-    for (named <- names.nameds) {
-      val id = named.id
-      val name = named.name
-      val expectedId = name.replace(' ', '_')
-      if (id != expectedId) println(s"id $id should be $expectedId")
-    }
+    reportMisnamedNameds(names, layout.reportFile("misnamed-nameds"))
 
     println("Processing name references.")
     names.addDocumentReferences(collections.flatMap(_.references))
-    names.checkReferences()
+
+    checkReferences(names)
+    reportReferencesWithoutRef(names, layout.reportFile("no-refs"))
 
     writeNames(layout.namesDirectory, names.nameds, names.getReferences)
 
@@ -77,6 +73,53 @@ object Main {
       directory = layout.namesFileDirectory,
       fileName = layout.namesFileName,
       namedInTheListUrl = layout.namedInTheListUrl
+    )
+  }
+
+  def reportMisnamedNameds(names: Names, file: File): Unit = {
+    val content: Seq[Option[String]] =
+      for (named <- names.nameds) yield {
+        val id = named.id
+        val name = named.name
+        val expectedId = name.replace(' ', '_')
+        if (id == expectedId) None else Some(s"- '$id' должен по идее называться '$expectedId'")
+      }
+
+    Util.writeWithYaml(
+      file,
+      layout = "page",
+      yaml = Seq("title" -> "Неправильно названные файлы с именами"),
+      content.flatten :+ "\n"
+    )
+  }
+
+  def checkReferences(names: Names): Unit = {
+    def check(reference: Reference): Option[String] = {
+      val name = reference.name
+      reference.ref.fold[Option[String]](None) { ref =>
+        if (ref.contains(" ")) Some(s"""Value of the ref attribute contains spaces: ref="$ref" """) else {
+          names.findByRef(ref).fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${name.text}< """)) { named =>
+            if (named.entity != reference.entity) Some(s"${reference.entity} reference to ${named.entity} ${named.name}: $name [$ref]")
+            else None
+          }
+        }
+      }
+    }
+
+    val errors: Seq[String] = names.getReferences.flatMap(check)
+    if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
+  }
+
+  def reportReferencesWithoutRef(names: Names, file: File): Unit = {
+    val content: Seq[String] =
+      for (reference <- names.getReferences.filter(_.ref.isEmpty))
+      yield "- " + render(reference.toXml) + s" [${reference.source}]"
+
+    Util.writeWithYaml(
+      file,
+      layout = "page",
+      yaml = Seq("title" -> "Имена без аттрибута 'ref'"),
+      content :+ "\n"
     )
   }
 
