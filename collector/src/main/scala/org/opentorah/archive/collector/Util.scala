@@ -2,7 +2,6 @@ package org.opentorah.archive.collector
 
 import java.io.File
 import org.opentorah.util.Files
-import scala.xml.Elem
 
 object Util {
 
@@ -42,13 +41,4 @@ object Util {
 
     Files.write(file, result.mkString("\n"))
   }
-
-  def writeXml(
-    directory: File,
-    fileName: String,
-    elem: Elem
-  ): Unit = Files.write(
-    file = new File(directory, fileName + ".xml"),
-    content = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" + Print.render(elem) + "\n"
-  )
 }
