@@ -36,7 +36,7 @@ final class Named(
     <named xml:id={id} role={role.orNull}>
       {for (name <- names) yield name.toXml}
       {content :+ Named.mentions(
-      references.filter(_.ref.get == id),
+      references.filter(_.ref.contains(id)),
       <ref target={namedInTheListUrl(id)} role="namesViewer">[...]</ref>
     )}
     </named>
