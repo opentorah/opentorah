@@ -14,21 +14,25 @@ final case class NamesList(
 
 object NamesList extends Repeatable[NamesList] {
 
-  // TODO generalize name recognizer
+  // TODO generalize name recognizer; use it in both optional() and required() - to get better error messages!
   def optional: Parser[Option[NamesList]] = for {
     name <- Element.nextName
     result <- if (name.isEmpty) ZIO.none else {
       val entityO = Entity.forList(name.get)
       if (entityO.isEmpty) ZIO.none else for {
-        id <- Attribute.id.required
-        role <- Attribute("role").optional
-        head <- Text("head").required
-      } yield Some(NamesList(
-        entityO.get,
-        id,
-        role,
-        head
-      ))
+        result <- Element(name.get, contentParser(entityO.get)).required
+      } yield Some(result)
     }
   } yield result
+
+  private def contentParser(entity: Entity): Parser[NamesList] = for {
+    id <- Attribute.id.required
+    role <- Attribute("role").optional
+    head <- Text("head").required
+  } yield NamesList(
+    entity,
+    id,
+    role,
+    head
+  )
 }
