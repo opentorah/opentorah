@@ -9,8 +9,6 @@ import scala.xml.{Elem, Node}
 
 object Main {
 
-  private val migrated: Boolean = false
-
   def main(args: Array[String]): Unit = {
     val docs: File = new File(args(0))
     println(s"docs: $docs")
@@ -21,7 +19,7 @@ object Main {
     } yield {
       // Read from 'docs/store/collections'
       val sourceDirectory: File =
-        new File(if (migrated) layout.storeCollections else layout.collections, directory.getName)
+        new File(layout.storeCollections, directory.getName)
       Parser.parseDo(
         From.file(directory, layout.collectionFileName).parse(Collection.parser(layout, sourceDirectory))
       )
@@ -29,6 +27,7 @@ object Main {
 
     for (collection <- collections; document <- collection.documents) {
       // Pretty-print to 'docs/store/collections'.
+      // TODO do translations also!
       writeXml(
         layout.tei(new File(layout.storeCollections, collection.directoryName)),
         document.name,
@@ -36,14 +35,14 @@ object Main {
       )
 
       // Write to 'docs/collections'.
-      // TODO remove repetitive TEI header componenets from the source document - and add them when writing the generated ones.
-      if (migrated) {
-        writeXml(
-          layout.tei(new File(layout.collections, collection.directoryName)),
-          document.name,
-          Tei.toXml(document.tei)
-        )
-      }
+      // TODO do translations also!
+      // TODO wipe out the directory first.
+      // TODO remove repetitive TEI header components from the source document - and add them when writing the generated ones.
+      writeXml(
+        layout.tei(new File(layout.collections, collection.directoryName)),
+        document.name,
+        Tei.toXml(document.tei)
+      )
     }
 
     //    println("Collections:")
