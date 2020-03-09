@@ -4,12 +4,10 @@ import java.io.File
 import org.opentorah.archive.collector.reference.{Named, Names, Reference}
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
-import org.opentorah.xml.{From, Parser, Text, Xml, XmlUtil}
+import org.opentorah.xml.{From, PaigesPrettyPrinter, Parser, Text, Xml, XmlUtil}
 import scala.xml.{Elem, Node}
 
 object Main {
-
-  private val migrated: Boolean = false
 
   def main(args: Array[String]): Unit = {
     val docs: File = new File(args(0))
@@ -21,18 +19,31 @@ object Main {
     } yield {
       // Read from 'docs/store/collections'
       val sourceDirectory: File =
-        new File(if (migrated) layout.storeCollections else layout.collections, directory.getName)
+        new File(layout.storeCollections, directory.getName)
       Parser.parseDo(
         From.file(directory, layout.collectionFileName).parse(Collection.parser(layout, sourceDirectory))
       )
     }
 
-    // Write to 'docs/collections'
-    for (collection <- collections; document <- collection.documents) Util.writeXml(
-      layout.tei(new File(if (migrated) layout.collections else layout.storeCollections, collection.directoryName)),
-      document.name,
-      Tei.toXml(document.tei)
-    )
+    for (collection <- collections; document <- collection.documents) {
+      // Pretty-print to 'docs/store/collections'.
+      // TODO do translations also!
+      writeXml(
+        layout.tei(new File(layout.storeCollections, collection.directoryName)),
+        document.name,
+        Tei.toXml(document.tei)
+      )
+
+      // Write to 'docs/collections'.
+      // TODO do translations also!
+      // TODO wipe out the directory first.
+      // TODO remove repetitive TEI header components from the source document - and add them when writing the generated ones.
+      writeXml(
+        layout.tei(new File(layout.collections, collection.directoryName)),
+        document.name,
+        Tei.toXml(document.tei)
+      )
+    }
 
     //    println("Collections:")
     //    println(result.map { collection =>
@@ -59,7 +70,7 @@ object Main {
 
     println("Pretty-printing names")
     for (named <- names.nameds)
-      Util.writeXml(layout.storeNamesDirectory, named.id, Named.toXml(named))
+      writeXml(layout.storeNamesDirectory, named.id, Named.toXml(named))
 
     writeNamesList(
       names,
@@ -81,7 +92,14 @@ object Main {
       Files.deleteFiles(docsDirectory)
       Files.deleteFiles(facsDirectory)
 
-      for (document <- collection.documents) document.writeWrappers(docsDirectory, facsDirectory)
+      for (document <- collection.documents) writeDocumentWrappers(
+        document,
+        docsDirectory,
+        facsDirectory,
+        layout.teiDirectoryName,
+        layout.facsDirectoryName,
+        layout.documentsDirectoryName
+      )
     }
 
     println("Writing collection lists.")
@@ -201,6 +219,67 @@ object Main {
     )
   }
 
+  def writeDocumentWrappers(
+    document: Document,
+    docsDirectory: File,
+    facsDirectory: File,
+    teiDirectoryName: String,
+    facsDirectoryName: String,
+    documentsDirectoryName: String
+  ): Unit = {
+    import Util.quote
+    val navigation: Seq[(String, String)] =
+      Seq("documentCollection" -> quote(document.collection.reference)) ++
+        document.prev.map(prev => Seq("prevDocument" -> quote(prev))).getOrElse(Seq.empty) ++
+        Seq("thisDocument" -> quote(document.name)) ++
+        document.next.map(next => Seq("nextDocument" -> quote(next))).getOrElse(Seq.empty)
+
+    def writeTeiWrapper(name: String, lang: Option[String]): Unit = {
+      val nameWithLang: String = lang.fold(name)(lang => name + "-" + lang)
+
+      Util.writeTeiWrapper(
+        directory = docsDirectory,
+        fileName = nameWithLang,
+        teiPrefix = Some(s"../$teiDirectoryName/"),
+        target = "documentViewer",
+        yaml = Seq(
+          "facs" -> s"'../$facsDirectoryName/$name.html'"
+        ) ++ (
+          if (lang.isDefined || document.translations.isEmpty) Seq.empty
+          else Seq("translations" -> document.translations.mkString("[", ", ", "]")))
+          ++ navigation
+      )
+    }
+
+    // TEI wrapper(s)
+    writeTeiWrapper(document.name, None)
+    for (lang <- document.translations) writeTeiWrapper(document.name, Some(lang))
+
+    // Facsimile viewer
+    val facsimilePages: Elem =
+      <div class="facsimileViewer">
+        <div class="facsimileScroller">{
+          for (page: Page <- document.pages.filter(_.isPresent); n = page.n) yield {
+            <a target="documentViewer" href={s"../$documentsDirectoryName/${document.name}.html#p$n"}>
+              <figure>
+                <img xml:id={s"p$n"} alt={s"facsimile for page $n"} src={page.facs.orNull}/>
+                <figcaption>{n}</figcaption>
+              </figure>
+            </a>}}
+        </div>
+      </div>
+
+    Util.writeWithYaml(
+      file = Util.htmlFile(facsDirectory, document.name),
+      layout = "default",
+      yaml = Seq(
+        "transcript" -> s"'../$documentsDirectoryName/${document.name}.html'"
+      )
+        ++ navigation,
+      content = Seq(render(facsimilePages) + "\n")
+    )
+  }
+
   private def writeTei(
     directory: File,
     fileName: String,
@@ -223,7 +302,7 @@ object Main {
       body = head.fold[Seq[Node]](Seq.empty)(head => Seq(<head>{head}</head>)) ++ content
     )
 
-    Util.writeXml(directory, fileName, Tei.toXml(tei))
+    writeXml(directory, fileName, Tei.toXml(tei))
 
     Util.writeTeiWrapper(
       directory,
@@ -234,4 +313,21 @@ object Main {
       yaml = head.fold[Seq[(String, String)]](Seq.empty)(head => Seq("title" -> Util.quote(XmlUtil.spacedText(head)))) ++ yaml
     )
   }
+
+  private def writeXml(
+    directory: File,
+    fileName: String,
+    elem: Elem
+  ): Unit = Files.write(
+    file = new File(directory, fileName + ".xml"),
+    content = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" + render(elem) + "\n"
+  )
+
+  private def render(elem: Elem): String = new PaigesPrettyPrinter(
+    width = 120,
+    indent = 2,
+    doNotStackElements = Set("choice"),
+    nestElements = Set("p", /*"abstract",*/ "head", "salute", "dateline", "item"),
+    clingyElements = Set("note", "lb", "sic", "corr") // TODO unclingify sic and corr?
+  ).render(elem)
 }
