@@ -9,7 +9,7 @@ final case class LangUsage(
 
 object LangUsage extends Descriptor[LangUsage](
   elementName = "langUsage",
-  contentParser = for {
+  parser = for {
     languages <- Language.all
   } yield new LangUsage(
     languages

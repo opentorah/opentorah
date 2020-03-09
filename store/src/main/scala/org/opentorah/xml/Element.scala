@@ -1,36 +1,51 @@
 package org.opentorah.xml
 
-import zio.ZIO
+import scala.xml.{Elem, Node}
 
 class Element[A](
-  elementName: Option[String],
+  elementName: String,
   contentType: ContentType,
   parser: Parser[A]
-) extends Repeatable[A] {
+) extends Repeatable.WithElementName[A](elementName) {
 
   override def toString: String = s"element $elementName"
 
-  override def optional: Parser[Option[A]] = for {
-    nextElementName <- Xml.nextName
-    hasNext = elementName.fold(nextElementName.isDefined)(nextElementName.contains)
-    result <- if (!hasNext) ZIO.none else for {
-      next <- Xml.nextElement
-      result <- Context.nested(None, next.get, contentType, parser)
-    } yield Some(result)
-  } yield result
+  final override protected def parse(elem: Elem): Parser[A] =
+    Context.nested(None, elem, contentType, parser)
 }
 
 object Element {
   def apply[A](name: String, contentType: ContentType, parser: Parser[A]): Repeatable[A] =
-    new Element(Some(name), contentType, parser)
+    new Element(name, contentType, parser)
 
   def apply[A](name: String, parser: Parser[A]): Repeatable[A] =
     apply(name, ContentType.Elements, parser)
 
-  // TODO eliminate uses without element name (NamesList); merge with Descriptor (and ElementRaw's optional()?).
-//  def apply[A](contentType: ContentType, parser: Parser[A]): Parsable[A] =
-//    new Element(None, contentType, parser)
-  def apply[A](parser: Parser[A]): Repeatable[A] =
-//    apply(ContentType.Elements, parser)
-    new Element(None, ContentType.Elements, parser)
+  def allNodes(name: String): Repeatable[Seq[Node]] =
+    new Element(name, ContentType.Mixed, Parser.allNodes)
+
+  val name: Parser[String] =
+    Context.lift(_.name)
+
+  def checkName(expected: String): Parser[Unit] = for {
+    name <- name
+    _  <- Parser.check(name == expected, s"Wrong element: '$name' instead of '$expected'")
+  } yield ()
+
+  def withName[A](expected: String, parser: Parser[A]): Parser[A] = for {
+    _ <- checkName(expected)
+    result <- parser
+  } yield result
+
+  val nextName: Parser[Option[String]] =
+    Context.lift(current => Content.getNextElementName(current.content))
+
+  def nextNameIs(name: String): Parser[Boolean] =
+    nextName.map(_.contains(name))
+
+  val nextElement: Parser[Option[Elem]] =
+    Context.liftContentModifier(Content.takeNextElement)
+
+  val allElements: Parser[Seq[Elem]] =
+    Context.liftContentModifier(Content.takeAllElements)
 }

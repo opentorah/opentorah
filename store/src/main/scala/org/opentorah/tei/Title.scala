@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, ContentType, Descriptor, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Descriptor, Parser}
 import scala.xml.{Elem, Node}
 
 final case class Title(
@@ -11,9 +11,9 @@ final case class Title(
 object Title extends Descriptor[Title](
   elementName = "title",
   contentType = ContentType.Mixed,
-  contentParser = for {
+  parser = for {
     titleType <- Attribute("type").optional
-    content <- Xml.allNodes
+    content <- Parser.allNodes
   } yield new Title(
     titleType,
     content

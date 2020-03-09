@@ -2,10 +2,10 @@ package org.opentorah.reference
 
 import java.io.File
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, ContentType, Element, From, Parser, Xml, XmlUtil}
+import org.opentorah.xml.{Attribute, ContentType, Element, From, Parser, XmlUtil}
 import scala.xml.Node
 
-// TODO extend Parsable
+// TODO extend Repeatable
 final case class Named private(
   id: String,
   entity: Entity,
@@ -17,14 +17,14 @@ final case class Named private(
 object Named {
 
   def contentParser(id: String): Parser[Named] = for {
-    name <- Xml.name
+    name <- Element.name
     entityOption = Entity.forElement(name)
     _ <- Parser.check(entityOption.isDefined, s"No such entity type: $name")
     entity = entityOption.get
     role <- Attribute("role").optional
     names <- Element(entity.nameElement, ContentType.Text, Name.parser(entity)).all
     _ <- Parser.check(names.nonEmpty, s"No names in $id")
-    content <- Xml.allNodes
+    content <- Parser.allNodes
   } yield new Named(
     id,
     entity,

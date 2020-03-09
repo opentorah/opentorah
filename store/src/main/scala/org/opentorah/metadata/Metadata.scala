@@ -1,7 +1,7 @@
 package org.opentorah.metadata
 
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, Element, From, Parser, Xml}
+import org.opentorah.xml.{Attribute, Element, From, Parser}
 
 object Metadata {
 
@@ -19,7 +19,7 @@ object Metadata {
       result <- Element(elementName, parser).all
     } yield result
 
-    Parser.parseDo(from.parse(Xml.withName(rootElementName.getOrElse("metadata"), wrappedParser)))
+    Parser.parseDo(from.parse(Element.withName(rootElementName.getOrElse("metadata"), wrappedParser)))
   }
 
   def loadNames[K <: WithName](

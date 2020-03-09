@@ -1,6 +1,6 @@
 package org.opentorah.reference
 
-import org.opentorah.xml.{Attribute, ContentType, From, Parser, Xml, XmlUtil}
+import org.opentorah.xml.{Attribute, ContentType, From, Parser, XmlUtil}
 import scala.xml.{Elem, Node}
 
 final case class Reference(
@@ -26,7 +26,7 @@ object Reference {
     role <- Attribute("role").optional
     ref <- Attribute("ref").optional
     _ <- Attribute("type").optional // TODO we don't do anything with the type yet
-    name <- Xml.allNodes
+    name <- Parser.allNodes
   } yield new Reference(
     entity,
     name,

@@ -1,6 +1,8 @@
 package org.opentorah.xml
 
-import zio.{Runtime, IO, ZIO}
+import java.net.URL
+import zio.{IO, Runtime, ZIO}
+import scala.xml.{Elem, Node}
 
 object Parser {
 
@@ -16,6 +18,29 @@ object Parser {
   def check(condition: Boolean, message: => String): IO[Error, Unit] =
     if (condition) IO.succeed(())
     else IO.fail(message)
+
+
+  def withInclude[A](parser: Parser[A]): Parser[A] =
+    withInclude("include", ContentType.Elements, parser)
+
+  def withInclude[A](attributeName: String, contentType: ContentType, parser: Parser[A]): Parser[A] = for {
+    url <- Attribute(attributeName).optional
+    result <- url.fold(parser) { url => for {
+      name <- Element.name
+      currentFromUrl <- Context.currentFromUrl
+      from <- Parser.effect(From.url(currentFromUrl.fold(new URL(url))(new URL(_, url))))
+      result <- nested(from, contentType, Element.withName(name, parser))
+    } yield result}
+  } yield result
+
+  def nested[A](name: String, xml: Elem, contentType: ContentType, parser: Parser[A]): Parser[A] =
+    nested(From.xml(name, xml), contentType, parser)
+
+  def nested[A](from: From, contentType: ContentType, parser: Parser[A]): Parser[A] =
+    Context.nested(from, contentType, parser)
+
+  val allNodes: Parser[Seq[Node]] =
+    Context.liftContentModifier(Content.takeAllNodes)
 
   // TODO eliminate
   def parseDo[A](parser: Parser[A]): A =

@@ -12,4 +12,7 @@ object Attribute {
   }
 
   val id: AttributeLike.StringAttributeLike = Attribute("xml:id")
+
+  def allAttributes: Parser[Map[String, String]] =
+    Context.liftCurrentModifier(Current.takeAllAttributes)
 }

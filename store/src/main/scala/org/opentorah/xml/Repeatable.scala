@@ -1,12 +1,13 @@
 package org.opentorah.xml
 
 import zio.{IO, ZIO}
+import scala.xml.Elem
 
 trait Repeatable[A] extends Optional[A] {
 
   def optional: Parser[Option[A]]
 
-  def all: Parser[Seq[A]] =
+  final def all: Parser[Seq[A]] =
     all(Seq.empty)
 
   private def all(acc: Seq[A]): Parser[Seq[A]] = for {
@@ -16,6 +17,19 @@ trait Repeatable[A] extends Optional[A] {
 }
 
 object Repeatable {
+
+  abstract class WithElementName[A](elementName: String) extends Repeatable[A] {
+
+    final override def optional: Parser[Option[A]] = for {
+      hasNext <- Element.nextNameIs(elementName)
+      result <- if (!hasNext) ZIO.none else for {
+        nextElement <- Element.nextElement.map(_.get)
+        result <- parse(nextElement)
+      } yield Some(result)
+    } yield result
+
+    protected def parse(elem: Elem): Parser[A]
+  }
 
   // TODO eliminate casts of results!
   // TODO use in calendar...

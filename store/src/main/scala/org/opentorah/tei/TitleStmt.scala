@@ -29,7 +29,7 @@ final case class TitleStmt(
 
 object TitleStmt extends Descriptor[TitleStmt](
   elementName = "titleStmt",
-  contentParser = for {
+  parser = for {
     titles <- Title.all
     authors <- Author.all
     editors <- Editor.all

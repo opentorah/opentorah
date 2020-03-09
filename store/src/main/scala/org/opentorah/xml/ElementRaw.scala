@@ -6,13 +6,12 @@ import scala.xml.Elem
 class ElementRaw[A](
   elementName: String,
   fromXml: Elem => A
-) extends Repeatable[A] {
+) extends Repeatable.WithElementName[A](elementName) {
+
   override def toString: String = s"raw element $elementName"
 
-  final override def optional: Parser[Option[A]] = for {
-    hasNext <- Xml.nextNameIs(elementName)
-    result <- if (!hasNext) ZIO.none else Xml.nextElement.map(_.map(fromXml))
-  } yield result
+  final override protected def parse(elem: Elem): Parser[A] =
+    ZIO.succeed(fromXml(elem))
 }
 
 object ElementRaw {

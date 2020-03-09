@@ -31,7 +31,7 @@ final case class Tei(
 object Tei extends Descriptor[Tei](
   elementName = "TEI",
   contentType = ContentType.Elements,
-  contentParser = for {
+  parser = for {
     teiHeader <- TeiHeader.required
     text <- Text.required
   } yield new Tei(

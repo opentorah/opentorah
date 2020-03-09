@@ -2,7 +2,7 @@ package org.opentorah.store
 
 import java.io.File
 import org.opentorah.metadata.Names
-import org.opentorah.xml.{Attribute, Element, From, Parser, Xml}
+import org.opentorah.xml.{Attribute, Element, From, Parser}
 import scala.xml.Elem
 
 sealed trait Store {
@@ -35,7 +35,7 @@ final class TextStore(
 
 object Store {
 
-  def parser(inheritedSelectors: Set[Selector]): Parser[Store] = Xml.withName("store", for {
+  def parser(inheritedSelectors: Set[Selector]): Parser[Store] = Element.withName("store", for {
     names <- Names.withDefaultNameParser
     selectors <- Element("selector",  Selector.parser).all
     _ = println(names)

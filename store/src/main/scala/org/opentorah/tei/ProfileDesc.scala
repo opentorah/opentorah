@@ -15,7 +15,7 @@ final case class ProfileDesc(
 
 object ProfileDesc extends Descriptor[ProfileDesc](
   elementName = "profileDesc",
-  contentParser = for {
+  parser = for {
       values <- Repeatable.choice(Seq(
         LangUsage,
         CalendarDesc,

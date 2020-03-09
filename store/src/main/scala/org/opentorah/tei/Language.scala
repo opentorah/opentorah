@@ -12,7 +12,7 @@ final case class Language(
 object Language extends Descriptor[Language](
   elementName = "language",
   contentType = ContentType.Mixed,
-  contentParser = for {
+  parser = for {
     ident <- Attribute("ident").required
     usage <- Attribute("usage").positiveInt.optional
     text <- org.opentorah.xml.Text().optional

@@ -15,7 +15,7 @@ final case class FileDesc(
 
 object FileDesc extends Descriptor[FileDesc](
   elementName = "fileDesc",
-  contentParser = for {
+  parser = for {
     titleStmt <- TitleStmt.required
     editionStmt <- EditionStmt.optional
     extent <- Extent.optional

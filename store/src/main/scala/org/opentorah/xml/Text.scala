@@ -11,6 +11,7 @@ object Text {
       Context.liftContentModifier(Content.takeCharacters)
   }
 
+  // TODO move to Element and make Repeatable...
   def apply(elementName: String): AttributeLike.StringAttributeLike = new AttributeLike.StringAttributeLike {
     override def toString: Error = s"text element $elementName"
 

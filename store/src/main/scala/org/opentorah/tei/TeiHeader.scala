@@ -13,7 +13,7 @@ final case class TeiHeader(
 
 object TeiHeader extends Descriptor[TeiHeader](
   elementName = "teiHeader",
-  contentParser = for {
+  parser = for {
     fileDesc <- FileDesc.required
     encodingDesc <- EncodingDesc.optional
     profileDesc <- ProfileDesc.optional

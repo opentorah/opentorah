@@ -10,7 +10,7 @@ final case class Editor(
 
 object Editor extends Descriptor[Editor](
   elementName = "editor",
-  contentParser = for {
+  parser = for {
     role <- Attribute("role").optional
     persName <- ElementRaw("persName").optional
   } yield new Editor(

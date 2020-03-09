@@ -11,7 +11,7 @@ final case class Text(
 object Text extends Descriptor[Text](
   elementName = "text",
   contentType = ContentType.Elements,
-  contentParser = for {
+  parser = for {
     lang <- Attribute("xml:lang").optional
     body <- Body.required
   } yield new Text(

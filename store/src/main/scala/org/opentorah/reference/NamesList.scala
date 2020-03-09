@@ -1,8 +1,8 @@
 package org.opentorah.reference
 
-import org.opentorah.xml.{Attribute, Element, Parser, Text, Xml}
+import org.opentorah.xml.{Attribute, Element, Parser, Repeatable, Text}
+import zio.ZIO
 
-// TODO extend Parsable
 final case class NamesList(
   entity: Entity,
   id: String,
@@ -12,20 +12,23 @@ final case class NamesList(
   def includes(named: Named): Boolean = (named.entity == entity) && (named.role == role)
 }
 
-object NamesList {
+object NamesList extends Repeatable[NamesList] {
 
-  val parser: Parser[NamesList] = for {
-    name <- Xml.name
-    entity: Entity = Entity.forList(name).get
-    id <- Attribute.id.required
-    role <- Attribute("role").optional
-    head <- Text("head").required
-  } yield NamesList(
-    entity,
-    id,
-    role,
-    head
-  )
-
-  val all: Parser[Seq[NamesList]] = Element(parser).all
+  // TODO generalize name recognizer
+  def optional: Parser[Option[NamesList]] = for {
+    name <- Element.nextName
+    result <- if (name.isEmpty) ZIO.none else {
+      val entityO = Entity.forList(name.get)
+      if (entityO.isEmpty) ZIO.none else for {
+        id <- Attribute.id.required
+        role <- Attribute("role").optional
+        head <- Text("head").required
+      } yield Some(NamesList(
+        entityO.get,
+        id,
+        role,
+        head
+      ))
+    }
+  } yield result
 }

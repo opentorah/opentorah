@@ -10,7 +10,7 @@ final case class PublicationStmt(
 
 object PublicationStmt extends Descriptor[PublicationStmt](
   elementName = "publicationStmt",
-  contentParser = for {
+  parser = for {
     publisher <- Publisher.optional
     availability <- Availability.optional
   } yield new PublicationStmt(

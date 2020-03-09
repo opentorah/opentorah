@@ -17,12 +17,12 @@ final class XmlTest extends AnyFlatSpec with Matchers {
   }
 
   private val file2parser: Parser[String] =
-    Xml.withName("x", Element("name", ContentType.Text, Text().required).required)
+    Element.withName("x", Element("name", ContentType.Text, Text().required).required)
 
   "Include" should "work" in {
     Parser.parseDo(From.resource(Parser, "2").parse(
       file2parser)) shouldBe "X"
     Parser.parseDo(From.resource(Parser, "1").parse(
-      Xml.withInclude("to", ContentType.Elements, file2parser))) shouldBe "X"
+      Parser.withInclude("to", ContentType.Elements, file2parser))) shouldBe "X"
   }
 }

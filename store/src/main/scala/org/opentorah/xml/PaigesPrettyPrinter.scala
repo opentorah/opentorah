@@ -158,7 +158,6 @@ final class PaigesPrettyPrinter(
     }
   }
 
-  // TODO simplify: isEmpty; newCurrent, ...
   private def splitChunk(chunk: Seq[Node]): Seq[Seq[Node]] =
     if (chunk.isEmpty) Seq.empty else splitChunk(Seq.empty, Seq.empty, chunk)
 
