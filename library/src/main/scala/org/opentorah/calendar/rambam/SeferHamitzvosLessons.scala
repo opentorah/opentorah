@@ -1,7 +1,8 @@
 package org.opentorah.calendar.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Attribute, Element, From, Parser, Xml}
+import org.opentorah.xml.{Attribute, Element, From, Parser, Repeatable}
+import zio.ZIO
 
 object SeferHamitzvosLessons {
 
@@ -50,11 +51,22 @@ object SeferHamitzvosLessons {
 
   private def lessonParser: Parser[Lesson] = for {
     number <- Attribute("n").positiveInt.required
-    parts <- Element(partParser).all
+    parts <- Part.all
   } yield new Lesson(number, parts)
 
+  object Part extends Repeatable[Part] {
+    def optional: Parser[Option[Part]] = for {
+      name <- Element.nextName
+      result <- if (name.isEmpty) ZIO.none else {
+        for {
+          result <- Element(name.get, partParser).required
+        } yield Some(result)
+      }
+    } yield result
+  }
+
   private def partParser: Parser[Part] = for {
-    name <- Xml.name
+    name <- Element.name
     result <- name match {
       case "positive" => Attribute("n").positiveInt.required.map(new Positive(_))
       case "negative" => Attribute("n").positiveInt.required.map(new Negative(_))

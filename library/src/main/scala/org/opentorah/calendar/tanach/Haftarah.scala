@@ -2,7 +2,7 @@ package org.opentorah.calendar.tanach
 
 import org.opentorah.metadata.{LanguageSpec, Metadata, Names, WithNumber}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, Element, From, Parser, Xml}
+import org.opentorah.xml.{Attribute, Element, From, Parser}
 import org.opentorah.judaica.tanach.{Custom, Parsha, Tanach, WithBookSpans}
 import zio.ZIO
 
@@ -44,9 +44,9 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
   // TODO rework to avoid peeking at the name of the next nested element
   def parser(full: Boolean): Parser[Customs] = for {
     span <- spanParser
-    hasParts <- Xml.nextNameIs("part")
+    hasParts <- Element.nextNameIs("part")
     parts <- if (!hasParts) ZIO.none else partsParser(span).map(Some(_))
-    hasCustom <- Xml.nextNameIs("custom")
+    hasCustom <- Element.nextNameIs("custom")
     customs <- Element("custom", customParser(span)).all.map(customs => Custom.Of(customs, full = false))
   } yield {
     val common: Option[Haftarah] = if (!hasParts && !hasCustom) Some(oneSpan(span)) else parts
@@ -64,7 +64,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
   private def customParser(ancestorSpan: BookSpanParsed): Parser[(Set[Custom], Haftarah)] = for {
     n <- Attribute("n").required
     bookSpanParsed <- spanParser.map(_.inheritFrom(ancestorSpan))
-    hasParts <- Xml.nextNameIs("part")
+    hasParts <- Element.nextNameIs("part")
     result <- if (!hasParts) ZIO.succeed[Haftarah](oneSpan(bookSpanParsed)) else partsParser(bookSpanParsed)
   } yield Custom.parse(n) -> result
 

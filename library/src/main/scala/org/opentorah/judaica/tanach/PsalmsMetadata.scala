@@ -1,7 +1,7 @@
 package org.opentorah.judaica.tanach
 
 import org.opentorah.metadata.{Names, WithNumber}
-import org.opentorah.xml.{ContentType, Element, Parser, Xml}
+import org.opentorah.xml.{ContentType, Element, Parser}
 
 final class PsalmsMetadata(
   book: Tanach.Psalms.type,

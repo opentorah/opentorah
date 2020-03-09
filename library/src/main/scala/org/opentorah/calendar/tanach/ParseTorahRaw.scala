@@ -1,14 +1,14 @@
 package org.opentorah.calendar.tanach
 
 import org.opentorah.metadata.{WithNames, WithNumber}
-import org.opentorah.xml.{Element, From, Parser, Xml}
+import org.opentorah.xml.{Element, From, Parser}
 import org.opentorah.judaica.tanach.{SpanParsed, Torah}
 import scala.xml.Elem
 
 trait ParseTorahRaw { self: WithNames =>
 
   final def parseTorah(element: Elem): Torah = Parser.parseDo(From.xml(element)
-    .parse(Xml.withName("torah", parser)))
+    .parse(Element.withName("torah", parser)))
 
   private val parser: Parser[Torah] = for {
     bookSpan <- Torah.spanParser.map(_.resolve)

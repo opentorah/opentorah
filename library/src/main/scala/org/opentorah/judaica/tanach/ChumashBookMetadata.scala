@@ -2,7 +2,7 @@ package org.opentorah.judaica.tanach
 
 import org.opentorah.metadata.{Metadata, Names}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Element, Parser, Xml}
+import org.opentorah.xml.{Element, Parser}
 
 final class ChumashBookMetadata(
   book: Tanach.ChumashBook,
