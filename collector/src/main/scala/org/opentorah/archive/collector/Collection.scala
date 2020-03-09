@@ -4,7 +4,7 @@ import java.io.File
 import org.opentorah.archive.collector.reference.Reference
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
-import org.opentorah.xml.{Attribute, ContentType, Element, From, Parser, Text, Xml, XmlUtil}
+import org.opentorah.xml.{Attribute, ContentType, Element, From, Parser, Text, XmlUtil}
 import Table.Column
 import scala.xml.{Elem, Node}
 
@@ -130,9 +130,9 @@ object Collection {
     archive <- Text("archive").optional
     prefix <- Text("prefix").optional
     number <- Text("number").int.optional
-    titleNodes <- Element("title", ContentType.Mixed, Xml.allNodes).optional // TODO common combinator
-    caseAbstract <- Element("abstract", ContentType.Mixed, Xml.allNodes).required // TODO common combinator
-    notes <- Element("notes", ContentType.Mixed, Xml.allNodes).optional // TODO common combinator
+    titleNodes <- Element.allNodes("title").optional
+    caseAbstract <- Element.allNodes("abstract").required
+    notes <- Element.allNodes("notes").optional
     description = Seq(<span>{caseAbstract}</span>) ++ notes.getOrElse(Seq.empty)
     // TODO swap parts and notes; remove notes wrapper element; simplify parts; see how to generalize parts...
     partDescriptors <- Element("part", ContentType.Elements, Part.Descriptor.parser).all

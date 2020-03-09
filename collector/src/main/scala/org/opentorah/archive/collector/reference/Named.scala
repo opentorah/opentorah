@@ -13,7 +13,6 @@ final class Named(
 
   def entity: Entity = storeNamed.entity
 
-  // TODO remove id from the store Named: it is only used in the list...
   def id: String = storeNamed.id
   def role: Option[String] = storeNamed.role
   def names: Seq[Name] = storeNamed.names

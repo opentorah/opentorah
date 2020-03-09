@@ -4,7 +4,7 @@ import java.io.File
 import org.opentorah.archive.collector.reference.{Named, Names, Reference}
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
-import org.opentorah.xml.{From, PaigesPrettyPrinter, Parser, Text, Xml, XmlUtil}
+import org.opentorah.xml.{Element, From, PaigesPrettyPrinter, Parser, Text, XmlUtil}
 import scala.xml.{Elem, Node}
 
 object Main {
@@ -132,7 +132,7 @@ object Main {
 
     val (listsHead: String, storeNamesLists: Seq[org.opentorah.reference.NamesList]) =
       Parser.parseDo(From.file(layout.store, layout.namesListsFileName)
-        .parse(Xml.withName("names", for {
+        .parse(Element.withName("names", for {
           head <- Text("head").required
           listDescriptors <- org.opentorah.reference.NamesList.all
         } yield (head, listDescriptors))))
