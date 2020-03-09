@@ -32,15 +32,32 @@ final class Named(
   def toListXml: Elem =
     <l><ref target={url} role="namesViewer">{names.head.toXml}</ref></l>
 
-  def toXml(references: Seq[Reference]): Elem =
+  def toXml(references: Seq[Reference]): Elem = {
+    val usedBy = references.filter(_.ref.contains(id))
+    val fromNames: Seq[Reference] = usedBy.filter(_.source.isNames)
+    val bySource: Seq[(String, Seq[Reference])] =
+      (if (fromNames.isEmpty) Seq.empty else Seq((fromNames.head.source.collection.reference, fromNames))) ++
+        usedBy.filterNot(_.source.isNames).groupBy(_.source.collection.reference).toSeq.sortBy(_._1)
+
+    // TODO add usage statistics
+
     <named xml:id={id} role={role.orNull}>
       {for (name <- names) yield name.toXml}
-      {content :+ Named.mentions(
-      references.filter(_.ref.contains(id)),
-      <ref target={namedInTheListUrl(id)} role="namesViewer">[...]</ref>
-    )}
+      {content}
+      <p rendition="mentions">
+        <ref target={namedInTheListUrl(id)} role="namesViewer">[...]</ref>
+        {for ((source, references) <- bySource) yield
+        <l>
+          <emph>{source}:</emph>
+          {Collections.removeConsecutiveDuplicates(references.map(_.source)).flatMap { ref =>
+          // TODO add commas more intelligently :)
+          val body = /*if (ref.name.contains(" ")) ref.name + "," else*/ ref.name
+          <ref target={ref.url} role={ref.viewer}>{body}</ref>}}
+        </l>}
+      </p>
     </named>
       .copy(label = entity.element)
+  }
 }
 
 object Named {
@@ -52,20 +69,14 @@ object Named {
     </named>
       .copy(label = value.entity.element)
 
-  private def mentions(references: Seq[Reference], toList: Elem): Elem = {
-    val fromNames: Seq[Reference] = references.filter(_.source.isNames)
-    val bySource: Seq[(String, Seq[Reference])] =
-      (if (fromNames.isEmpty) Seq.empty else Seq((fromNames.head.source.collection.reference, fromNames))) ++
-        references.filterNot(_.source.isNames).groupBy(_.source.collection.reference).toSeq.sortBy(_._1)
-
-    <p rendition="mentions">
-      {toList}
+  private def mentions(bySource: Seq[(String, Seq[Reference])]): Seq[Elem] = {
       {for ((source, references) <- bySource) yield
       <l>
         <emph>{source}:</emph>
-        {Collections.removeConsecutiveDuplicates(references.map(_.source)).flatMap(ref =>
-          <ref target={ref.url} role={ref.viewer}>{ref.name}</ref>)}
+        {Collections.removeConsecutiveDuplicates(references.map(_.source)).flatMap { ref =>
+        // TODO add commas more intelligently :)
+          val body = /*if (ref.name.contains(" ")) ref.name + "," else*/ ref.name
+          <ref target={ref.url} role={ref.viewer}>{body}</ref>}}
       </l>}
-    </p>
   }
 }

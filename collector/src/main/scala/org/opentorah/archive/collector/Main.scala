@@ -113,12 +113,12 @@ object Main {
   def reportReferencesWithoutRef(names: Names, file: File): Unit = {
     val content: Seq[String] =
       for (reference <- names.getReferences.filter(_.ref.isEmpty))
-      yield "- " + render(reference.toXml) + s" [${reference.source}]"
+      yield "- " + render(reference.toXml) + s" в ${reference.source}"
 
     Util.writeWithYaml(
       file,
       layout = "page",
-      yaml = Seq("title" -> "Имена без аттрибута 'ref'"),
+      yaml = Seq("title" -> "Имена без атрибута 'ref'"),
       content :+ "\n"
     )
   }
