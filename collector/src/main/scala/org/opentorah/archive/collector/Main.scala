@@ -371,6 +371,6 @@ object Main {
     indent = 2,
     doNotStackElements = Set("choice"),
     nestElements = Set("p", /*"abstract",*/ "head", "salute", "dateline", "item"),
-    clingyElements = Set("note", "lb", "sic", "corr") // TODO unclingify sic and corr?
+    clingyElements = Set("note", "lb", "sic", "corr")
   ).render(elem)
 }

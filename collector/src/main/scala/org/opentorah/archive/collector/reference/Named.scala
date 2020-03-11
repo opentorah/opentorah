@@ -37,6 +37,16 @@ final class Named(
       for (ref <- Collections.removeConsecutiveDuplicates(references.map(_.source)))
       yield <ref target={ref.url} role={ref.viewer}>{ref.name}</ref>
 
+    // TODO move into Reference
+    def name(reference: Reference): String = reference.name
+      .map(_.text.replace("\n", "").trim
+        .replace("  ", " ")
+        .replace("  ", " ")
+        .replace("  ", " ")
+        .replace("  ", " ")
+      )
+      .filterNot(_.isEmpty).mkString(" ")
+
     val usedBy: Seq[Reference] = references.filter(_.ref.contains(id))
     val fromNames: Seq[Reference] = usedBy.filter(_.source.isNames)
     val bySource: Seq[(String, Seq[Reference])] = usedBy.filterNot(_.source.isNames)
@@ -44,10 +54,10 @@ final class Named(
 
     // TODO calculate numbers correctly: dups in "Alexander I"...
     val numbers: Seq[(String, Int)] =
-      usedBy.groupBy(_.name.map(_.text.trim).mkString(" ")).mapValues(_.length).toSeq.sortBy(_._2).reverse
-    //      <p rendition="usage">
-    //        {for ((name, number) <- numbers) yield <l>{s"$name ($number)"}</l>}
-    //      </p>
+      usedBy.groupBy(name).mapValues(_.length).toSeq.sortBy(_._2).reverse
+//    <p rendition="usage">
+//      {for ((name, number) <- numbers) yield <l>{s"$name ($number)"}</l>}
+//    </p>
 
     <named xml:id={id} role={role.orNull}>
       {for (name <- names) yield name.toXml}
