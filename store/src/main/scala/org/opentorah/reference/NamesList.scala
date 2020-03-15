@@ -1,7 +1,7 @@
 package org.opentorah.reference
 
-import org.opentorah.xml.{Attribute, Element, Parser, Repeatable, Text}
-import zio.ZIO
+import org.opentorah.xml.{Attribute, ContentType, Parsable, Parser, Text}
+import scala.xml.Elem
 
 final case class NamesList(
   entity: Entity,
@@ -12,18 +12,12 @@ final case class NamesList(
   def includes(named: Named): Boolean = (named.entity == entity) && (named.role == role)
 }
 
-object NamesList extends Repeatable[NamesList] {
+object NamesList extends Parsable[NamesList] {
 
-  // TODO generalize name recognizer; use it in both optional() and required() - to get better error messages!
-  def optional: Parser[Option[NamesList]] = for {
-    name <- Element.nextName
-    result <- if (name.isEmpty) ZIO.none else {
-      val entityO = Entity.forList(name.get)
-      if (entityO.isEmpty) ZIO.none else for {
-        result <- Element(name.get, contentParser(entityO.get)).required
-      } yield Some(result)
-    }
-  } yield result
+  override def contentType: ContentType = ContentType.Elements
+
+  override def name2parser(elementName: String): Option[Parser[NamesList]] =
+    Entity.forList(elementName).map(contentParser)
 
   private def contentParser(entity: Entity): Parser[NamesList] = for {
     id <- Attribute.id.required
@@ -35,4 +29,10 @@ object NamesList extends Repeatable[NamesList] {
     role,
     head
   )
+
+  override def toXml(value: NamesList): Elem =
+    <elem id={value.id} role={value.role.orNull}>
+      <head>{value.head}</head>
+    </elem>
+    .copy(label = value.entity.listElement)
 }

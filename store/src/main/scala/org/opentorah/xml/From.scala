@@ -15,11 +15,16 @@ sealed abstract class From {
 
   def load: IO[Error, Elem]
 
+  // TODO remove
   def parse[A](contentType: ContentType, parser: Parser[A]): Parser[A] =
     Context.nested(From.this, contentType, parser)
 
+  // TODO remove
   def parse[A](parser: Parser[A]): Parser[A] =
-    Context.nested(From.this, ContentType.Elements, parser)
+    parse(ContentType.Elements, parser)
+
+  def parse[A](parsable: Parsable[A]): Parser[A] =
+    parse(parsable.contentType, parsable.topLevel)
 }
 
 object From {

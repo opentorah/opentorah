@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, ContentType, Descriptor}
+import org.opentorah.xml.{Attribute, ContentType, Element}
 import scala.xml.Elem
 
 final case class Language(
@@ -9,7 +9,7 @@ final case class Language(
   text: Option[String]
 )
 
-object Language extends Descriptor[Language](
+object Language extends Element[Language](
   elementName = "language",
   contentType = ContentType.Mixed,
   parser = for {

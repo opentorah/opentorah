@@ -1,21 +1,16 @@
 package org.opentorah.xml
 
-trait Text extends AttributeLike.StringAttributeLike
+trait Text extends StringAttributeLike
 
 object Text {
 
-  def apply(): AttributeLike.StringAttributeLike = new AttributeLike.StringAttributeLike {
+  def apply(): StringAttributeLike = new StringAttributeLike {
     override def toString: String = s"element text"
 
     override def optional: Parser[Option[String]] =
       Context.liftContentModifier(Content.takeCharacters)
   }
 
-  // TODO move to Element and make Repeatable...
-  def apply(elementName: String): AttributeLike.StringAttributeLike = new AttributeLike.StringAttributeLike {
-    override def toString: Error = s"text element $elementName"
-
-    override def optional: Parser[Option[String]] =
-      Element(elementName, ContentType.Text, Text().required).optional
-  }
+  // TODO move to Element?
+  def apply(elementName: String): StringElement = new StringElement(elementName)
 }

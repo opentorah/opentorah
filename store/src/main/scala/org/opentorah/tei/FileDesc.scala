@@ -1,28 +1,28 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.Descriptor
+import org.opentorah.xml.Element
 import scala.xml.{Elem, Node}
 
 final case class FileDesc(
   titleStmt: TitleStmt,
-  editionStmt: Option[EditionStmt],
-  extent: Option[Extent],
+  editionStmt: Option[EditionStmt.Value],
+  extent: Option[Extent.Value],
   publicationStmt: PublicationStmt,
-  seriesStmt: Option[SeriesStmt],
-  notesStmt: Option[NotesStmt],
-  sourceDesc: SourceDesc
+  seriesStmt: Option[SeriesStmt.Value],
+  notesStmt: Option[NotesStmt.Value],
+  sourceDesc: SourceDesc.Value
 )
 
-object FileDesc extends Descriptor[FileDesc](
+object FileDesc extends Element[FileDesc](
   elementName = "fileDesc",
   parser = for {
     titleStmt <- TitleStmt.required
-    editionStmt <- EditionStmt.optional
-    extent <- Extent.optional
+    editionStmt <- EditionStmt.parsable.optional
+    extent <- Extent.parsable.optional
     publicationStmt <- PublicationStmt.required
-    seriesStmt <- SeriesStmt.optional
-    notesStmt <- NotesStmt.optional
-    sourceDesc <- SourceDesc.required
+    seriesStmt <- SeriesStmt.parsable.optional
+    notesStmt <- NotesStmt.parsable.optional
+    sourceDesc <- SourceDesc.parsable.required
   } yield new FileDesc(
     titleStmt,
     editionStmt,
@@ -41,17 +41,17 @@ object FileDesc extends Descriptor[FileDesc](
     publicationStmt,
     seriesStmt = None,
     notesStmt = None,
-    sourceDesc = SourceDesc(sourceDesc)
+    sourceDesc = new SourceDesc.Value(sourceDesc)
   )
 
   override def toXml(value: FileDesc): Elem =
     <fileDesc>
       {TitleStmt.toXml(value.titleStmt)}
-      {EditionStmt.toXml(value.editionStmt)}
-      {Extent.toXml(value.extent)}
+      {EditionStmt.parsable.toXml(value.editionStmt)}
+      {Extent.parsable.toXml(value.extent)}
       {PublicationStmt.toXml(value.publicationStmt)}
-      {SeriesStmt.toXml(value.seriesStmt)}
-      {NotesStmt.toXml(value.notesStmt)}
-      {SourceDesc.toXml(value.sourceDesc)}
+      {SeriesStmt.parsable.toXml(value.seriesStmt)}
+      {NotesStmt.parsable.toXml(value.notesStmt)}
+      {SourceDesc.parsable.toXml(value.sourceDesc)}
     </fileDesc>
 }

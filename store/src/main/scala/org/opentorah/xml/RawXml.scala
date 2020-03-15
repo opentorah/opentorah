@@ -2,21 +2,15 @@ package org.opentorah.xml
 
 import scala.xml.{Elem, Node}
 
-abstract class RawXml(xml: Seq[Node]) {
-  final def getXml: Seq[Node] = xml
-}
+// TODO when Parsable starts carrying the type (for Choice), collapse this:
+class RawXml(elementName: String) {
 
-object RawXml {
-  class Descriptor[A <: RawXml](
-    val elementName: String,
-    create: Seq[Node] => A
-  ) extends ElementRaw[A](
-    elementName,
-    fromXml = (xml: Elem) => create(xml.child)
-  ) with ToXml[A] {
+  final class Value(val xml: Seq[Node])
 
-    final override def toXml(value: A): Elem =
-      <elem>{value.getXml}</elem>
-        .copy(label = elementName)
+  object parsable extends Element[Value](elementName, ContentType.Mixed, Parser.allNodes.map(new Value(_))) {
+
+    override def toString: String = s"raw element $elementName"
+
+    override def toXml(value: Value): Elem = <elem>{value.xml}</elem>.copy(label = elementName)
   }
 }

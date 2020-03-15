@@ -1,42 +1,41 @@
 package org.opentorah.tei
 
 import org.opentorah.reference.Reference
-import org.opentorah.xml.Descriptor
+import org.opentorah.xml.Element
 import scala.xml.{Elem, Node}
 
 final case class TitleStmt(
   titles: Seq[Title],
-  authors: Seq[Author],
+  authors: Seq[Author.Value],
   editors: Seq[Editor],
-  sponsors: Seq[Sponsor],
-  funders: Seq[Funder],
-  principals: Seq[Principal],
-  respStmts: Seq[RespStmt]
+  sponsors: Seq[Sponsor.Value],
+  funders: Seq[Funder.Value],
+  principals: Seq[Principal.Value],
+  respStmts: Seq[RespStmt.Value]
 ) {
   def references: Seq[Reference] = {
     val xml: Seq[Node] = Seq(titles.flatMap(_.content) ++
-      authors.map(Author.toXml) ++
-      editors.flatMap(_.persName.toSeq) ++
-      sponsors.map(Sponsor.toXml) ++
-      funders.map(Funder.toXml) ++
-      principals.map(Principal.toXml) ++
-      respStmts.map(RespStmt.toXml)
+      authors.map(Author.parsable.toXml) ++
+      sponsors.map(Sponsor.parsable.toXml) ++
+      funders.map(Funder.parsable.toXml) ++
+      principals.map(Principal.parsable.toXml) ++
+      respStmts.map(RespStmt.parsable.toXml)
     ).flatten
 
-    xml.flatMap(Reference.all)
+    xml.flatMap(Reference.all) ++  editors.flatMap(_.persName.toSeq)
   }
 }
 
-object TitleStmt extends Descriptor[TitleStmt](
+object TitleStmt extends Element[TitleStmt](
   elementName = "titleStmt",
   parser = for {
     titles <- Title.all
-    authors <- Author.all
+    authors <- Author.parsable.all
     editors <- Editor.all
-    sponsors <- Sponsor.all
-    funders <- Funder.all
-    principals <- Principal.all
-    respStmts <- RespStmt.all
+    sponsors <- Sponsor.parsable.all
+    funders <- Funder.parsable.all
+    principals <- Principal.parsable.all
+    respStmts <- RespStmt.parsable.all
   } yield new TitleStmt(
     titles,
     authors,
@@ -60,11 +59,11 @@ object TitleStmt extends Descriptor[TitleStmt](
   override def toXml(value: TitleStmt): Elem =
     <titleStmt>
       {Title.toXml(value.titles)}
-      {Author.toXml(value.authors)}
+      {Author.parsable.toXml(value.authors)}
       {Editor.toXml(value.editors)}
-      {Sponsor.toXml(value.sponsors)}
-      {Funder.toXml(value.funders)}
-      {Principal.toXml(value.principals)}
-      {RespStmt.toXml(value.respStmts)}
+      {Sponsor.parsable.toXml(value.sponsors)}
+      {Funder.parsable.toXml(value.funders)}
+      {Principal.parsable.toXml(value.principals)}
+      {RespStmt.parsable.toXml(value.respStmts)}
     </titleStmt>
 }

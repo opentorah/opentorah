@@ -2,27 +2,30 @@ package org.opentorah.reference
 
 import java.io.File
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, ContentType, Element, From, Parser, XmlUtil}
-import scala.xml.Node
+import org.opentorah.xml.{Attribute, ContentType, From, Parsable, Parser, XmlUtil}
+import scala.xml.{Elem, Node}
 
-// TODO extend Repeatable
 final case class Named private(
-  id: String,
+  id: Option[String],
   entity: Entity,
   role: Option[String],
   names: Seq[Name],
   content: Seq[Node]
 )
 
-object Named {
+object Named extends Parsable[Named] {
 
-  def contentParser(id: String): Parser[Named] = for {
-    name <- Element.name
-    entityOption = Entity.forElement(name)
-    _ <- Parser.check(entityOption.isDefined, s"No such entity type: $name")
-    entity = entityOption.get
+  override def toString: String = "Named"
+
+  override def contentType: ContentType = ContentType.Elements
+
+  override def name2parser(elementName: String): Option[Parser[Named]] =
+    Entity.forElement(elementName).map(contentParser)
+
+  private def contentParser(entity: Entity): Parser[Named] = for {
+    id <- Attribute("id").optional
     role <- Attribute("role").optional
-    names <- Element(entity.nameElement, ContentType.Text, Name.parser(entity)).all
+    names <- Name.parsable(entity).all
     _ <- Parser.check(names.nonEmpty, s"No names in $id")
     content <- Parser.allNodes
   } yield new Named(
@@ -36,7 +39,20 @@ object Named {
   def readAll(directory: File): Seq[Named] = Parser.parseDo(Parser.collectAll(
     for {
       fileName <- Files.filesWithExtensions(directory, extension = "xml").sorted
-    } yield From.file(directory, fileName)
-      .parse(contentParser(fileName))
+    } yield checkId(fileName, From.file(directory, fileName).parse(Named))
   ))
+
+  private def checkId(fileName: String, parser: Parser[Named]): Parser[Named] = for {
+    result <- parser
+    _ <- Parser.check(result.id.isEmpty || result.id.contains(fileName),
+      s"Incorrect id: ${result.id.get} instead of $fileName")
+  } yield result.copy(id = Some(fileName))
+
+  override def toXml(value: Named): Elem = {
+    <elem id={value.id.orNull} role={value.role.orNull}>
+      {value.names.map(_.toXml)}
+      {value.content}
+    </elem>
+      .copy(label = value.entity.element)
+  }
 }

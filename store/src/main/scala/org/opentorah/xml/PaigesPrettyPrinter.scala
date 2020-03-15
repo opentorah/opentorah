@@ -4,6 +4,8 @@ import org.typelevel.paiges.Doc
 import scala.xml.{Elem, MetaData, NamespaceBinding, Node, SpecialNode, TopScope, Utility}
 
 /*
+  TODO blog about XML parsing, ZIO, Cats; XML pretty-printing, Wadler's paper; alternatives (and ScalaTags).
+
   scala.xml.PrettyPrinter breaks the line
    - between e1 and e2 in <e1>...</e1><e2>...</e2>
    - between e1 and text in: <e1>...</e1>text,

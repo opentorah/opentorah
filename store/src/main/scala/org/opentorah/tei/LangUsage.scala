@@ -1,13 +1,13 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.Descriptor
+import org.opentorah.xml.Element
 import scala.xml.Elem
 
 final case class LangUsage(
   languages: Seq[Language]
 )
 
-object LangUsage extends Descriptor[LangUsage](
+object LangUsage extends Element[LangUsage](
   elementName = "langUsage",
   parser = for {
     languages <- Language.all

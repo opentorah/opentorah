@@ -1,24 +1,24 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.Descriptor
+import org.opentorah.xml.Element
 import scala.xml.Elem
 
 final case class TeiHeader(
   fileDesc: FileDesc,
-  encodingDesc: Option[EncodingDesc],
+  encodingDesc: Option[EncodingDesc.Value],
   profileDesc: Option[ProfileDesc],
-  xenoData: Option[XenoData],
-  revisionDesc: Option[RevisionDesc]
+  xenoData: Option[XenoData.Value],
+  revisionDesc: Option[RevisionDesc.Value]
 )
 
-object TeiHeader extends Descriptor[TeiHeader](
+object TeiHeader extends Element[TeiHeader](
   elementName = "teiHeader",
   parser = for {
     fileDesc <- FileDesc.required
-    encodingDesc <- EncodingDesc.optional
+    encodingDesc <- EncodingDesc.parsable.optional
     profileDesc <- ProfileDesc.optional
-    xenoData <- XenoData.optional
-    revisionDesc <- RevisionDesc.optional
+    xenoData <- XenoData.parsable.optional
+    revisionDesc <- RevisionDesc.parsable.optional
   } yield new TeiHeader(
     fileDesc,
     encodingDesc,
@@ -39,9 +39,9 @@ object TeiHeader extends Descriptor[TeiHeader](
   override def toXml(value: TeiHeader): Elem =
     <teiHeader>
       {FileDesc.toXml(value.fileDesc)}
-      {EncodingDesc.toXml(value.encodingDesc)}
+      {EncodingDesc.parsable.toXml(value.encodingDesc)}
       {ProfileDesc.toXml(value.profileDesc)}
-      {XenoData.toXml(value.xenoData)}
-      {RevisionDesc.toXml(value.revisionDesc)}
+      {XenoData.parsable.toXml(value.xenoData)}
+      {RevisionDesc.parsable.toXml(value.revisionDesc)}
     </teiHeader>
 }

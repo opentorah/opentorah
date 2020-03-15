@@ -2,27 +2,34 @@ package org.opentorah.xml
 
 import scala.xml.{Elem, Node}
 
-class Element[A](
-  elementName: String,
-  contentType: ContentType,
-  parser: Parser[A]
-) extends Repeatable.WithElementName[A](elementName) {
+abstract class Element[A](
+  val elementName: String,
+  override val contentType: ContentType = ContentType.Elements,
+  val parser: Parser[A]
+) extends Parsable[A] {
 
   override def toString: String = s"element $elementName"
 
-  final override protected def parse(elem: Elem): Parser[A] =
-    Context.nested(None, elem, contentType, parser)
+  final override def name2parser(elementName: String): Option[Parser[A]] =
+    if (elementName == this.elementName) Some(parser) else None
+
+
+  // TODO move elsewhere?
+  final def parse(from: From): Parser[A] =
+    from.parse(contentType, Element.withName(elementName, parser))
+
+  // TODO move elsewhere
+  final def descendants(xml: Node): Seq[A] =
+    XmlUtil.descendants(xml, elementName).map(xml =>
+      Parser.parseDo(parse(From.xml(xml)))
+    )
 }
 
 object Element {
-  def apply[A](name: String, contentType: ContentType, parser: Parser[A]): Repeatable[A] =
-    new Element(name, contentType, parser)
 
-  def apply[A](name: String, parser: Parser[A]): Repeatable[A] =
-    apply(name, ContentType.Elements, parser)
-
-  def allNodes(name: String): Repeatable[Seq[Node]] =
-    new Element(name, ContentType.Mixed, Parser.allNodes)
+  // TODO use converting wrapper?
+//  def allNodes(name: String): Element[Seq[Node]] =
+//    new Element(name, ContentType.Mixed, Parser.allNodes)
 
   val name: Parser[String] =
     Context.lift(_.name)

@@ -1,6 +1,7 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Attribute, Parser, Text}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parser, Text}
+import scala.xml.Elem
 
 final case class Name(name: String, languageSpec: LanguageSpec) {
   def satisfies(spec: LanguageSpec): Boolean = {
@@ -10,15 +11,18 @@ final case class Name(name: String, languageSpec: LanguageSpec) {
   }
 }
 
-// TODO add Descriptor
-object Name {
-
-  val parser: Parser[Name] = for {
+object Name extends Element[Name](
+  elementName = "name",
+  contentType = ContentType.Text,
+  parser = for {
     n <- Attribute("n").optional
     characters <- Text().optional
     _ <- Parser.check(n.nonEmpty || characters.nonEmpty, "Both 'n' attribute and text are absent.")
     _ <- Parser.check(n.isEmpty || characters.isEmpty, "Both 'n' attribute and text are present.")
     name = n.orElse(characters)
     languageSpec <- LanguageSpec.parser
-  } yield Name(name.get, languageSpec)
+  } yield new Name(name.get, languageSpec)
+) {
+
+  override def toXml(value: Name): Elem = ??? // TODO
 }

@@ -14,7 +14,7 @@ final class TeiTest extends AnyFlatSpec with Matchers {
 
   "Named parsing" should "work" in {
     val result: Named = Parser.parseDo(
-      From.resource(Tei, "Баал_Шем_Тов").parse(Named.contentParser("Баал_Шем_Тов")))
+      From.resource(Tei, "Баал_Шем_Тов").parse(Named))
 
     result.role shouldBe Some("jew")
     result.names.head.name shouldBe "Израиль из Мезбича"

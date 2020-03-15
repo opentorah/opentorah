@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Descriptor, Parser}
+import org.opentorah.xml.{Element, Parser}
 import scala.xml.{Elem, Node}
 
 final case class Creation(
@@ -8,7 +8,7 @@ final case class Creation(
   xml: Seq[Node]
 )
 
-object Creation extends Descriptor[Creation](
+object Creation extends Element[Creation](
   elementName = "creation",
   parser = for {
     date <- Date.required

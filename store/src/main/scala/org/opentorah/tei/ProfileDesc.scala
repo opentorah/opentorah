@@ -1,46 +1,47 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Descriptor, Repeatable}
+import org.opentorah.xml.{Choice, Element}
+
 import scala.xml.Elem
 
 // TODO also: abstract handNotes listTranspose particDesc settingDesc textDesc
 final case class ProfileDesc(
-  documentAbstract: Option[Abstract],
+  documentAbstract: Option[Abstract.Value],
   creation: Option[Creation],
   langUsage: Option[LangUsage],
-  textClass: Option[TextClass],
-  correspDesc: Option[CorrespDesc],
-  calendarDesc: Option[CalendarDesc]
+  textClass: Option[TextClass.Value],
+  correspDesc: Option[CorrespDesc.Value],
+  calendarDesc: Option[CalendarDesc.Value]
 )
 
-object ProfileDesc extends Descriptor[ProfileDesc](
+object ProfileDesc extends Element[ProfileDesc](
   elementName = "profileDesc",
   parser = for {
-      values <- Repeatable.choice(Seq(
+      values <- Choice(Seq(
         LangUsage,
-        CalendarDesc,
+        CalendarDesc.parsable,
         Creation,
-        Abstract,
-        TextClass,
-        CorrespDesc
+        Abstract.parsable,
+        TextClass.parsable,
+        CorrespDesc.parsable
       )).toMap
     } yield new ProfileDesc(
       // TODO yuck!!!
-      values.get(Abstract).map(_.asInstanceOf[Abstract]),
+      values.get(Abstract.parsable).map(_.asInstanceOf[Abstract.Value]),
       values.get(Creation).map(_.asInstanceOf[Creation]),
       values.get(LangUsage).map(_.asInstanceOf[LangUsage]),
-      values.get(TextClass).map(_.asInstanceOf[TextClass]),
-      values.get(CorrespDesc).map(_.asInstanceOf[CorrespDesc]),
-      values.get(CalendarDesc).map(_.asInstanceOf[CalendarDesc])
+      values.get(TextClass.parsable).map(_.asInstanceOf[TextClass.Value]),
+      values.get(CorrespDesc.parsable).map(_.asInstanceOf[CorrespDesc.Value]),
+      values.get(CalendarDesc.parsable).map(_.asInstanceOf[CalendarDesc.Value])
     )
 ) {
   override def toXml(value: ProfileDesc): Elem =
     <profileDesc>
-      {Abstract.toXml(value.documentAbstract)}
+      {Abstract.parsable.toXml(value.documentAbstract)}
       {Creation.toXml(value.creation)}
       {LangUsage.toXml(value.langUsage)}
-      {TextClass.toXml(value.textClass)}
-      {CorrespDesc.toXml(value.correspDesc)}
-      {CalendarDesc.toXml(value.calendarDesc)}
+      {TextClass.parsable.toXml(value.textClass)}
+      {CorrespDesc.parsable.toXml(value.correspDesc)}
+      {CalendarDesc.parsable.toXml(value.calendarDesc)}
     </profileDesc>
 }

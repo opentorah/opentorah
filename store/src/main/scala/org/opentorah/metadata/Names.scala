@@ -1,6 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Attribute, ContentType, Element, Parser}
+import org.opentorah.xml.{Attribute, Parser}
 import org.opentorah.util.Collections
 
 final class Names(val names: Seq[Name]) extends HasName with LanguageString {
@@ -66,7 +66,7 @@ object Names {
   } yield result
 
   def parserWithDefaultName(defaultName: Option[Name]): Parser[Names] = for {
-    nonDefaultNames <- Element("name", ContentType.Text, Name.parser).all
+    nonDefaultNames <- Name.all
     _ <- Parser.check(nonDefaultNames.nonEmpty || defaultName.isDefined, s"No names and no default name")
   } yield {
     val names = if (nonDefaultNames.isEmpty) Seq(defaultName.get) else

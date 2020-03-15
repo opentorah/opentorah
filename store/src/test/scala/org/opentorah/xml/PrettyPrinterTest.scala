@@ -21,12 +21,12 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
   private def check(xml: Elem, width: Int, expected: String): Unit =
     check(From.xml(xml), width, expected)
 
-  private def print(from: From, width: Int): Unit = {
-    println("                                                                                                                                   ".take(width-1) + "|")
-    println("0         1         2         3         4         5         6         7         8         9         0         1         2         3")
-    println("01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890")
-    println(render(from, width))
-  }
+//  private def print(from: From, width: Int): Unit = {
+//    println("                                                                                                                                   ".take(width-1) + "|")
+//    println("0         1         2         3         4         5         6         7         8         9         0         1         2         3")
+//    println("01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890")
+//    println(render(from, width))
+//  }
 
   "Chunking" should "work" in {
 //    print(From.resource(this, "print1"), 120)

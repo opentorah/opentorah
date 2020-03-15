@@ -129,7 +129,7 @@ private[xml] object Content {
       if (nodes.forall(XmlUtil.isWhitespace)) ok else IO.fail(s"Unparsed elements: $nodes")
 
     case Mixed(_, nodes) =>
-      if (nodes.isEmpty) ok else IO.fail(s"Unparsed nodes: $nodes")
+      if (nodes.forall(XmlUtil.isWhitespace)) ok else IO.fail(s"Unparsed nodes: $nodes")
   }
 
   private def partition(nodes: Seq[Node]): (Seq[Elem], Seq[Node]) = {

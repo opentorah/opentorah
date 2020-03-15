@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.reference.Reference
-import org.opentorah.xml.{ContentType, Descriptor, XmlUtil}
+import org.opentorah.xml.{ContentType, Element, XmlUtil}
 import scala.xml.{Elem, Node}
 
 final case class Tei(
@@ -9,11 +9,11 @@ final case class Tei(
   text: Text
 ) {
   def titleStmt: TitleStmt = teiHeader.fileDesc.titleStmt
-  val correspDesc: Option[CorrespDesc] = teiHeader.profileDesc.flatMap(_.correspDesc)
+  val correspDesc: Option[CorrespDesc.Value] = teiHeader.profileDesc.flatMap(_.correspDesc)
   def getAbstract: Option[Seq[Node]] = teiHeader.profileDesc.flatMap(_.documentAbstract.map(_.xml))
   def creationDate: Option[Date] = teiHeader.profileDesc.flatMap(_.creation.map(_.date))
   def languages: Seq[Language] = teiHeader.profileDesc.flatMap(_.langUsage).toSeq.flatMap(_.languages)
-  val body: Body = text.body
+  val body: Body.Value = text.body
   val pbs: Seq[Pb] = body.xml.flatMap(Pb.descendants)
 
   def references: Seq[Reference] = {
@@ -28,7 +28,7 @@ final case class Tei(
   /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
 }
 
-object Tei extends Descriptor[Tei](
+object Tei extends Element[Tei](
   elementName = "TEI",
   contentType = ContentType.Elements,
   parser = for {
