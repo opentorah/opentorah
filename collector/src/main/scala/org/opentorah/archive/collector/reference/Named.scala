@@ -13,7 +13,7 @@ final class Named(
 
   def entity: Entity = storeNamed.entity
 
-  def id: String = storeNamed.id
+  def id: String = storeNamed.id.get
   def role: Option[String] = storeNamed.role
   def names: Seq[Name] = storeNamed.names
   def content: Seq[Node] = storeNamed.content
@@ -81,21 +81,11 @@ final class Named(
 
 object Named {
 
+  // TODO collapse into the underlying - but provide a way to make id undefined...
   def toXml(value: Named): Elem =
     <named role={value.role.orNull}>
       {for (name <- value.names) yield name.toXml}
       {value.content}
     </named>
       .copy(label = value.entity.element)
-
-  private def mentions(bySource: Seq[(String, Seq[Reference])]): Seq[Elem] = {
-      {for ((source, references) <- bySource) yield
-      <l>
-        <emph>{source}:</emph>
-        {Collections.removeConsecutiveDuplicates(references.map(_.source)).flatMap { ref =>
-        // TODO add commas more intelligently :)
-          val body = /*if (ref.name.contains(" ")) ref.name + "," else*/ ref.name
-          <ref target={ref.url} role={ref.viewer}>{body}</ref>}}
-      </l>}
-  }
 }

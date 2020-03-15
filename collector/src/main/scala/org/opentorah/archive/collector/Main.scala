@@ -236,7 +236,7 @@ object Main {
       <ref target={layout.collectionUrl(collection.directoryName)}
            role="collectionViewer">{collection.reference + ": " + XmlUtil.spacedText(collection.title)}</ref>
       <lb/>
-      <abstract>{collection.caseAbstract}</abstract>
+      <abstract>{collection.caseAbstract.xml}</abstract>
     </item>
 
   private def writeNamesList(

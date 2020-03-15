@@ -1,39 +1,43 @@
 package org.opentorah.archive.collector
 
-import org.opentorah.xml.{Attribute, ContentType, Element, Parser, Text}
-import scala.xml.Node
+import org.opentorah.xml.{Attribute, ContentType, Element, RawXml, Text}
+import scala.xml.{Elem, Node}
 
 final class Part(val title: Option[Seq[Node]], val documents: Seq[Document])
 
 object Part {
 
-  sealed abstract class Descriptor(title: Seq[Node]) {
-    final def getTitle: Seq[Node] = title
+  object Title extends RawXml(elementName = "title")
+
+  object parsable extends Element[Descriptor]("part", ContentType.Elements, for {
+    from <- Attribute("from").optional
+    names <- Text("document").all
+    title <- Title.parsable.required
+  } yield {
+    if (names.isEmpty) {
+      if (from.isEmpty) Descriptor.CatchAll(title) else Descriptor.From(from.get, title)
+    } else {
+      if (from.isDefined) throw new IllegalArgumentException("Both document names and from are specified")
+      Descriptor.Names(names, title)
+    }
+  }) {
+    override def toXml(value: Descriptor): Elem = ??? // TODO
+  }
+
+  sealed abstract class Descriptor(title: Title.Value) {
+    final def getTitle: Seq[Node] = title.xml
   }
 
   object Descriptor {
 
-    final case class Names(names: Seq[String], title: Seq[Node]) extends Descriptor(title)
+    final case class Names(names: Seq[String], title: Title.Value) extends Descriptor(title)
 
-    final case class From(name: String, title: Seq[Node]) extends Descriptor(title)
+    final case class From(name: String, title: Title.Value) extends Descriptor(title)
 
-    final case class CatchAll(title: Seq[Node]) extends Descriptor(title)
-
-    val parser: Parser[Descriptor] = for {
-      from <- Attribute("from").optional
-      names <- Element("document", Text().required).all // TODO common combinator?
-      title <- Element.allNodes("title").required
-    } yield {
-      if (names.isEmpty) {
-        if (from.isEmpty) CatchAll(title) else From(from.get, title)
-      } else {
-        if (from.isDefined) throw new IllegalArgumentException("Both document names and from are specified")
-        Names(names, title)
-      }
-    }
+    final case class CatchAll(title: Title.Value) extends Descriptor(title)
 
     @scala.annotation.tailrec
-    def forNames(descriptors: Seq[Descriptor], documents: Seq[Document], result: Map[Descriptor, Seq[Document]]):
+    private def forNames(descriptors: Seq[Descriptor], documents: Seq[Document], result: Map[Descriptor, Seq[Document]]):
     (Map[Descriptor, Seq[Document]], Seq[Document]) = descriptors match {
       case Nil => (result, documents)
 
@@ -49,7 +53,7 @@ object Part {
     }
 
     @scala.annotation.tailrec
-    def forFromAndCatchAll(descriptors: Seq[Descriptor], documents: Seq[Document], result: Map[Descriptor, Seq[Document]]):
+    private def forFromAndCatchAll(descriptors: Seq[Descriptor], documents: Seq[Document], result: Map[Descriptor, Seq[Document]]):
     (Map[Descriptor, Seq[Document]], Seq[Document]) = descriptors match {
       case Nil => (result, documents)
 
