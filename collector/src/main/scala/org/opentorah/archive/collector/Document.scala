@@ -3,7 +3,7 @@ package org.opentorah.archive.collector
 import org.opentorah.archive.collector.reference.{Reference, ReferenceSource}
 import org.opentorah.reference.Entity
 import org.opentorah.tei.Tei
-import scala.xml.{Elem, Node}
+import scala.xml.Node
 
 final class Document(
   override val url: String,
@@ -27,7 +27,8 @@ final class Document(
 
   def authors: Seq[Seq[Node]] = tei.titleStmt.authors.map(_.xml)
 
-  def transcribers: Seq[Elem] = tei.titleStmt.editors.filter(_.role.contains("transcriber")).flatMap(_.persName)
+  def transcribers: Seq[org.opentorah.reference.Reference] =
+    tei.titleStmt.editors.filter(_.role.contains("transcriber")).flatMap(_.persName)
 
   def date: Option[String] = tei.creationDate.map(_.when)
 

@@ -1,7 +1,7 @@
 package org.opentorah.archive.collector.reference
 
 import org.opentorah.reference.Entity
-import scala.xml.{Elem, Node}
+import scala.xml.Node
 
 final case class Reference(
   source: ReferenceSource,
@@ -14,8 +14,4 @@ final case class Reference(
   def id: Option[String] = reference.id
   def role: Option[String] = reference.role
   def ref: Option[String] = reference.ref
-
-  def toXml: Elem =
-    <name ref={ref.orNull} xml:id={id.orNull} role={role.orNull}>{name}</name>
-      .copy(label = entity.nameElement)
 }

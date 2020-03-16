@@ -4,7 +4,7 @@ import java.io.File
 import org.opentorah.archive.collector.reference.Reference
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
-import org.opentorah.xml.{Attribute, ContentType, Element, From, Parser, Text, XmlUtil}
+import org.opentorah.xml.{Attribute, ContentType, Element, From, Parser, RawXml, Text, XmlUtil}
 import Table.Column
 import scala.xml.{Elem, Node}
 
@@ -17,8 +17,8 @@ final class Collection private(
   val archive: Option[String],
   val prefix: Option[String],
   val number: Option[Int],
-  titleNodes: Option[Seq[Node]],
-  val caseAbstract: Seq[Node],
+  titleRaw: Option[Collection.Title.Value],
+  val caseAbstract: Collection.Abstract.Value,
   val description: Seq[Node],
   partDescriptors: Seq[Part.Descriptor]
 ) extends CollectionLike with Ordered[Collection] {
@@ -31,7 +31,7 @@ final class Collection private(
 
   override def reference: String = archive.fold(archiveCase)(archive => archive + " " + archiveCase)
 
-  def title: Node = titleNodes.fold[Node](scala.xml.Text(reference))(nodes => <title>{nodes}</title>)
+  def title: Node = titleRaw.fold[Node](scala.xml.Text(reference))(title => <title>{title.xml}</title>)
 
   override def compare(that: Collection): Int = {
     val archiveComparison: Int = compare(archive, that.archive)
@@ -121,6 +121,10 @@ final class Collection private(
 
 object Collection {
 
+  object Title extends RawXml("title")
+  object Abstract extends RawXml("abstract")
+  object Notes extends RawXml("notes")
+
   def parser(
     layout: Layout,
     directory: File
@@ -130,12 +134,12 @@ object Collection {
     archive <- Text("archive").optional
     prefix <- Text("prefix").optional
     number <- Text("number").int.optional
-    titleNodes <- Element.allNodes("title").optional
-    caseAbstract <- Element.allNodes("abstract").required
-    notes <- Element.allNodes("notes").optional
-    description = Seq(<span>{caseAbstract}</span>) ++ notes.getOrElse(Seq.empty)
+    titleRaw <- Title.parsable.optional
+    caseAbstract <- Abstract.parsable.required
+    notes <- Notes.parsable.optional
+    description = Seq(<span>{caseAbstract.xml}</span>) ++ notes.map(_.xml).getOrElse(Seq.empty)
     // TODO swap parts and notes; remove notes wrapper element; simplify parts; see how to generalize parts...
-    partDescriptors <- Element("part", ContentType.Elements, Part.Descriptor.parser).all
+    partDescriptors <- Part.parsable.all
   } yield new Collection(
     layout,
     directoryName = directory.getName,
@@ -145,7 +149,7 @@ object Collection {
     archive,
     prefix,
     number,
-    titleNodes,
+    titleRaw,
     caseAbstract,
     description,
     partDescriptors
@@ -187,7 +191,7 @@ object Collection {
     }),
 
     Column("Расшифровка", "transcriber", { document: Document =>
-      multi(document.transcribers.map(XmlUtil.removeNamespace))
+      multi(document.transcribers.map(transcriber => XmlUtil.removeNamespace(org.opentorah.reference.Reference.parsable.toXml(transcriber))))
     })
   )
 
