@@ -1,6 +1,6 @@
 package org.opentorah.reference
 
-import org.opentorah.xml.{Attribute, ContentType, From, Parsable, Parser, XmlUtil}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parser}
 import scala.xml.{Elem, Node}
 
 final case class Reference(
@@ -13,22 +13,15 @@ final case class Reference(
 
 object Reference {
 
-  sealed class ReferenceParsable extends Parsable[Reference] {
-    override def contentType: ContentType = ContentType.Mixed
-
-    override def name2parser(elementName: String): Option[Parser[Reference]] =
-      Entity.forName(elementName).flatMap { entity =>
-        if (isAcceptable(entity)) Some(parser(entity)) else None
-      }
-
-    protected def isAcceptable(entity: Entity): Boolean = true
-
+  final class ReferenceParsable(entity: Entity) extends Element[Reference](
+    elementName = entity.nameElement,
+    contentType = ContentType.Mixed,
+    parser = parser(entity)
+  ) {
     override def toXml(value: Reference): Elem =
       <name ref={value.ref.orNull} xml:id={value.id.orNull} role={value.role.orNull}>{value.name}</name>
         .copy(label = value.entity.nameElement)
   }
-
-  object parsable extends ReferenceParsable
 
   private def parser(entity: Entity): Parser[Reference] = for {
     id <- Attribute.id.optional
@@ -44,12 +37,10 @@ object Reference {
     ref
   )
 
-  def all(xml: Node): Seq[Reference] = for {
-    entity <- Entity.values
-    elem <- XmlUtil.descendants(xml, entity.nameElement)
-  } yield Parser.parseDo(From.xml(elem).parse(parsable))
+  final val personParsable = new ReferenceParsable(Entity.Person)
+  final val organizationParsable = new ReferenceParsable(Entity.Organization)
+  final val placeParsable = new ReferenceParsable(Entity.Place)
 
-  object persReference extends ReferenceParsable {
-    override protected def isAcceptable(entity: Entity): Boolean = entity == Entity.Person
-  }
+  def all(xml: Node): Seq[Reference] =
+    Seq(personParsable, organizationParsable, placeParsable).flatMap(_.descendants(xml))
 }

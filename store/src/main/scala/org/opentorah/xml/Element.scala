@@ -13,40 +13,20 @@ abstract class Element[A](
   final override def name2parser(elementName: String): Option[Parser[A]] =
     if (elementName == this.elementName) Some(parser) else None
 
-
-  // TODO move elsewhere?
-  final def parse(from: From): Parser[A] =
-    from.parse(contentType, Element.withName(elementName, parser))
-
-  // TODO move elsewhere
   final def descendants(xml: Node): Seq[A] =
-    XmlUtil.descendants(xml, elementName).map(xml =>
-      Parser.parseDo(parse(From.xml(xml)))
-    )
+    for (xml <- XmlUtil.descendants(xml, elementName))
+    yield Parser.parseDo(From.xml("descendants", xml).parse(this))
 }
 
 object Element {
 
-  // TODO use converting wrapper?
-//  def allNodes(name: String): Element[Seq[Node]] =
-//    new Element(name, ContentType.Mixed, Parser.allNodes)
-
   val name: Parser[String] =
     Context.lift(_.name)
-
-  def checkName(expected: String): Parser[Unit] = for {
-    name <- name
-    _  <- Parser.check(name == expected, s"Wrong element: '$name' instead of '$expected'")
-  } yield ()
-
-  def withName[A](expected: String, parser: Parser[A]): Parser[A] = for {
-    _ <- checkName(expected)
-    result <- parser
-  } yield result
 
   val nextName: Parser[Option[String]] =
     Context.lift(current => Content.getNextElementName(current.content))
 
+  // TODO eliminate
   def nextNameIs(name: String): Parser[Boolean] =
     nextName.map(_.contains(name))
 

@@ -15,16 +15,11 @@ sealed abstract class From {
 
   def load: IO[Error, Elem]
 
-  // TODO remove
-  def parse[A](contentType: ContentType, parser: Parser[A]): Parser[A] =
-    Context.nested(From.this, contentType, parser)
-
-  // TODO remove
-  def parse[A](parser: Parser[A]): Parser[A] =
-    parse(ContentType.Elements, parser)
-
-  def parse[A](parsable: Parsable[A]): Parser[A] =
-    parse(parsable.contentType, parsable.topLevel)
+  def parse[A](parsable: Parsable[A]): Parser[A] = for {
+    _ <- Context.checkNoLeftovers
+    elem <- load
+    result <- Context.nested(Some(this), elem, parsable.contentType, parsable.topLevel)
+  } yield result
 }
 
 object From {
@@ -40,8 +35,6 @@ object From {
 
   def xml(name: String, elem: Elem): From = new FromXml(name, elem)
 
-  def xml(elem: Elem): From = new FromXml("unnamed", elem)
-
   private final class FromString(
     override val name: String,
     string: String
@@ -52,8 +45,6 @@ object From {
   }
 
   def string(name: String, string: String): From = new FromString(name, string)
-
-  def string(string: String): From = new FromString("unnamed", string)
 
   private final class FromUrl(fromUrl: URL) extends From {
     override def toString: String = s"From.url($fromUrl)"

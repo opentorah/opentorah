@@ -63,6 +63,8 @@ trait Parsable[A] {
   private final val nextElement: Parser[Option[Elem]] =
     Context.liftContentModifier(Content.takeNextElement)
 
+  // TODO separate ToXml...
+
   def toXml(value: A): Elem
 
   final def toXml(value: Option[A]): Seq[Elem] = toXml(value.toSeq)

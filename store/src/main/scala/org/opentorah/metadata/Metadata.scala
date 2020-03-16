@@ -1,7 +1,7 @@
 package org.opentorah.metadata
 
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, ContentType, Element, From, Parser}
+import org.opentorah.xml.{Attribute, Element, From, Parser}
 import scala.xml.Elem
 
 object Metadata {
@@ -14,15 +14,25 @@ object Metadata {
   ): Seq[M] = {
     val typeName = from.name
 
-    val wrappedParser = for {
-      type_ <- Attribute("type").required
-      _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
-      result <- new Element[M](elementName, ContentType.Elements, parser) {
-        override def toXml(value: M): Elem = ??? // TODO!
-      }.all
-    } yield result
+    val metadataParsable: Element[M] = new Element[M](
+      elementName,
+      parser = parser
+    ) {
+      override def toXml(value: M): Elem = ??? // TODO!
+    }
 
-    Parser.parseDo(from.parse(Element.withName(rootElementName.getOrElse("metadata"), wrappedParser)))
+    val parsable: Element[Seq[M]] = new Element[Seq[M]](
+      elementName = rootElementName.getOrElse("metadata"),
+      parser = for {
+        type_ <- Attribute("type").required
+        _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
+        result <- metadataParsable.all
+      } yield result
+    ) {
+      override def toXml(value: Seq[M]): Elem = ??? // TODO
+    }
+
+    Parser.parseDo(from.parse(parsable))
   }
 
   def loadNames[K <: WithName](

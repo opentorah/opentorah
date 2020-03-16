@@ -8,8 +8,7 @@ import org.scalatest.matchers.should.Matchers
 final class TeiTest extends AnyFlatSpec with Matchers {
 
   "Parsing" should "work" in {
-    val result: Tei = Parser.parseDo(
-      Tei.parse(From.resource(Tei, "905")))
+    val result: Tei = Parser.parseDo(From.resource(Tei, "905").parse(Tei))
   }
 
   "Named parsing" should "work" in {

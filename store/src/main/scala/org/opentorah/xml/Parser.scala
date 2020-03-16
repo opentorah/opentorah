@@ -19,25 +19,28 @@ object Parser {
     if (condition) IO.succeed(())
     else IO.fail(message)
 
-
   def withInclude[A](parser: Parser[A]): Parser[A] =
     withInclude("include", ContentType.Elements, parser)
 
-  def withInclude[A](attributeName: String, contentType: ContentType, parser: Parser[A]): Parser[A] = for {
-    url <- Attribute(attributeName).optional
-    result <- url.fold(parser) { url => for {
-      name <- Element.name
-      currentFromUrl <- Context.currentFromUrl
-      from <- Parser.effect(From.url(currentFromUrl.fold(new URL(url))(new URL(_, url))))
-      result <- nested(from, contentType, Element.withName(name, parser))
-    } yield result}
-  } yield result
+  def withInclude[A](attributeName: String, contentType: ContentType, parser: Parser[A]): Parser[A] = {
+    def parsable(elementName: String): Element[A] = new Element[A](
+      elementName,
+      contentType,
+      parser
+    ) {
+      override def toXml(value: A): Elem = ??? // TODO
+    }
 
-  def nested[A](name: String, xml: Elem, contentType: ContentType, parser: Parser[A]): Parser[A] =
-    nested(From.xml(name, xml), contentType, parser)
-
-  def nested[A](from: From, contentType: ContentType, parser: Parser[A]): Parser[A] =
-    Context.nested(from, contentType, parser)
+    for {
+      url <- Attribute(attributeName).optional
+      result <- url.fold(parser) { url => for {
+        elementName <- Element.name
+        currentFromUrl <- Context.currentFromUrl
+        from <- Parser.effect(From.url(currentFromUrl.fold(new URL(url))(new URL(_, url))))
+        result <- from.parse(parsable(elementName))
+      } yield result}
+    } yield result
+  }
 
   val allNodes: Parser[Seq[Node]] =
     Context.liftContentModifier(Content.takeAllNodes)

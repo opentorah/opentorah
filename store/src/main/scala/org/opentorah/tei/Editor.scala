@@ -13,12 +13,14 @@ object Editor extends Element[Editor](
   elementName = "editor",
   parser = for {
     role <- Attribute("role").optional
-    persName <- Reference.persReference.optional
+    persName <- Reference.personParsable.optional
   } yield new Editor(
     role,
     persName
   )
 ) {
   override def toXml(value: Editor): Elem =
-    <editor role={value.role.orNull}>{value.persName.map(reference => Reference.parsable.toXml(reference)).orNull}</editor>
+    <editor role={value.role.orNull}>
+      {value.persName.map(reference => Reference.personParsable.toXml(reference)).orNull}
+    </editor>
 }

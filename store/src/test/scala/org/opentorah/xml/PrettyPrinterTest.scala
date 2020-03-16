@@ -19,7 +19,7 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
   }
 
   private def check(xml: Elem, width: Int, expected: String): Unit =
-    check(From.xml(xml), width, expected)
+    check(From.xml("test XML", xml), width, expected)
 
 //  private def print(from: From, width: Int): Unit = {
 //    println("                                                                                                                                   ".take(width-1) + "|")
