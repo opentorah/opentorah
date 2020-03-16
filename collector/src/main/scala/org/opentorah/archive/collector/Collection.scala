@@ -4,7 +4,7 @@ import java.io.File
 import org.opentorah.archive.collector.reference.Reference
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
-import org.opentorah.xml.{Attribute, ContentType, Element, From, Parser, RawXml, Text, XmlUtil}
+import org.opentorah.xml.{Attribute, Element, From, Parser, RawXml, Text, XmlUtil}
 import Table.Column
 import scala.xml.{Elem, Node}
 
@@ -110,7 +110,7 @@ final class Collection private(
     for ((name, (prev, next)) <- namesWithSiblings) yield new Document(
       url = layout.documentUrl(directoryName, name),
       collection = this,
-      tei = Parser.parseDo(Tei.parse(From.file(sourceDirectory, name))),
+      tei = Parser.parseDo(From.file(sourceDirectory, name).parse(Tei)),
       name,
       prev,
       next,
@@ -125,7 +125,10 @@ object Collection {
   object Abstract extends RawXml("abstract")
   object Notes extends RawXml("notes")
 
-  def parser(
+  final def parsable(layout: Layout, directory: File): Element[Collection] =
+    new Element[Collection](elementName = "collection", parser = parser(layout, directory))
+
+  private def parser(
     layout: Layout,
     directory: File
   ): Parser[Collection] = for {
@@ -191,7 +194,7 @@ object Collection {
     }),
 
     Column("Расшифровка", "transcriber", { document: Document =>
-      multi(document.transcribers.map(transcriber => XmlUtil.removeNamespace(org.opentorah.reference.Reference.parsable.toXml(transcriber))))
+      multi(document.transcribers.map(transcriber => XmlUtil.removeNamespace(org.opentorah.reference.Reference.toXml(transcriber))))
     })
   )
 

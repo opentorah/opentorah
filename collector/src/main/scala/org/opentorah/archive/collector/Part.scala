@@ -1,7 +1,7 @@
 package org.opentorah.archive.collector
 
 import org.opentorah.xml.{Attribute, ContentType, Element, RawXml, Text}
-import scala.xml.{Elem, Node}
+import scala.xml.Node
 
 final class Part(val title: Option[Seq[Node]], val documents: Seq[Document])
 
@@ -20,9 +20,7 @@ object Part {
       if (from.isDefined) throw new IllegalArgumentException("Both document names and from are specified")
       Descriptor.Names(names, title)
     }
-  }) {
-    override def toXml(value: Descriptor): Elem = ??? // TODO
-  }
+  })
 
   sealed abstract class Descriptor(title: Title.Value) {
     final def getTitle: Seq[Node] = title.xml
