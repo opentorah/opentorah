@@ -3,6 +3,7 @@ package org.opentorah.judaica.tanach
 import org.opentorah.metadata.{Metadata, Names, WithNumber}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, ContentType, Element, Parser}
+import scala.xml.Elem
 
 final class ParshaMetadata(
   val parsha: Parsha,
@@ -80,9 +81,9 @@ object ParshaMetadata {
   def parser(book: Tanach.ChumashBook): Parser[Parsed] = for {
     names <- Names.parser
     span <- semiResolvedParser
-    aliyot <- Element("aliyah", ContentType.Empty, numberedParser).all
-    daysParsed <- Element("day", dayParser).all
-    maftir <- Element("maftir", semiResolvedParser).required
+    aliyot <- AliyahParsable.all
+    daysParsed <- DayParsable.all
+    maftir <- MaftirParsable.required
     parsha = Metadata.find[Parsha, Names](book.parshiot, names)
   } yield {
     val (days: Seq[DayParsed], daysCombined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
@@ -95,6 +96,28 @@ object ParshaMetadata {
       aliyot,
       maftir
     )
+  }
+
+  private object AliyahParsable extends Element[Torah.Numbered](
+    elementName = "aliyah",
+    ContentType.Empty,
+    parser = numberedParser
+  ) {
+    override def toXml(value: Torah.Numbered): Elem = ??? // TODO
+  }
+
+  private object DayParsable extends Element[DayParsed](
+    elementName = "day",
+    parser = dayParser
+  ) {
+    override def toXml(value: DayParsed): Elem = ??? // TODO
+  }
+
+  private object MaftirParsable extends Element[SpanSemiResolved](
+    elementName = "maftir",
+    parser = semiResolvedParser
+  ) {
+    override def toXml(value: SpanSemiResolved): Elem = ??? // TODO
   }
 
   private def byCustom(days: Seq[DayParsed]): Custom.Sets[Seq[Torah.Numbered]] =

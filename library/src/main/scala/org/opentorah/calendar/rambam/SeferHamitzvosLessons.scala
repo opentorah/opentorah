@@ -1,8 +1,8 @@
 package org.opentorah.calendar.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Attribute, Element, From, Parser, Repeatable}
-import zio.ZIO
+import org.opentorah.xml.{Attribute, ContentType, From, Parsable, Parser}
+import scala.xml.Elem
 
 object SeferHamitzvosLessons {
 
@@ -51,27 +51,19 @@ object SeferHamitzvosLessons {
 
   private def lessonParser: Parser[Lesson] = for {
     number <- Attribute("n").positiveInt.required
-    parts <- Part.all
+    parts <- Part.allMustBe
   } yield new Lesson(number, parts)
 
-  object Part extends Repeatable[Part] {
-    def optional: Parser[Option[Part]] = for {
-      name <- Element.nextName
-      result <- if (name.isEmpty) ZIO.none else {
-        for {
-          result <- Element(name.get, partParser).required
-        } yield Some(result)
-      }
-    } yield result
-  }
+  object Part extends Parsable[Part] {
+    override def contentType: ContentType = ContentType.Elements
 
-  private def partParser: Parser[Part] = for {
-    name <- Element.name
-    result <- name match {
-      case "positive" => Attribute("n").positiveInt.required.map(new Positive(_))
-      case "negative" => Attribute("n").positiveInt.required.map(new Negative(_))
-      case "named" => Names.parser.map(new NamedPart(_))
-// TODO pre-check? Can't do it in the match, since check(): Unit case name => Parse.check(false, s"Unexpected element '$name'")
+    override def name2parser(elementName: String): Option[Parser[Part]] = elementName match {
+      case "positive" => Some(Attribute("n").positiveInt.required.map(new Positive(_)))
+      case "negative" => Some(Attribute("n").positiveInt.required.map(new Negative(_)))
+      case "named" => Some(Names.parser.map(new NamedPart(_)))
+      case _ => None
     }
-  } yield result
+
+    override def toXml(value: Part): Elem = ??? // TODO
+  }
 }

@@ -2,6 +2,7 @@ package org.opentorah.judaica.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
 import org.opentorah.xml.{Attribute, Element, From, Parser}
+import scala.xml.Elem
 
 object MishnehTorah {
 
@@ -71,7 +72,7 @@ object MishnehTorah {
   private def bookParser: Parser[Book] = for {
     number <- Attribute("n").positiveInt.required
     names <- Names.parser
-    parts <- Element("part", partParser).all
+    parts <- partParsable.all
     _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
       s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
   } yield {
@@ -80,18 +81,32 @@ object MishnehTorah {
     result
   }
 
+  object partParsable extends Element[Part](
+    elementName = "part",
+    parser = partParser
+  ) {
+    override def toXml(value: Part): Elem = ??? // TODO
+  }
+
   private def partParser: Parser[Part] = for {
     number <- Attribute("n").positiveInt.required
     numChapters <- Attribute("chapters").positiveInt.required
     names <- Names.parser
-    chapters <- Element[NamedChapter]("chapter", for {
-      names <- Names.parser
-    } yield new NamedChapter(names)).all
+    chapters <- chapterParsable.all
   } yield {
     if (chapters.isEmpty) new PartWithNumberedChapters(number, numChapters, names) else {
       val result = new PartWithNamedChapters(number, numChapters, names, chapters)
       chapters.foreach(_.setPart(result))
       result
     }
+  }
+
+  object chapterParsable extends Element[NamedChapter](
+    elementName = "chapter",
+    parser = for {
+      names <- Names.parser
+    } yield new NamedChapter(names)
+  ) {
+    override def toXml(value: NamedChapter): Elem = ??? // TODO
   }
 }

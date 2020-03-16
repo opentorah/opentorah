@@ -25,7 +25,7 @@ include ':paper'
 
 // includeBuild '../../../docbook/docbook-gradle'
 
-//includeBuild ('../../store') {
+//includeBuild ('../store') {
 //  dependencySubstitution {
 //    substitute module('org.opentorah:store') with project(':store')
 //  }
