@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parser, ToXml}
+import org.opentorah.xml.{Attribute, Element, ToXml}
 import scala.xml.{Elem, Node}
 
 final case class Availability(
@@ -12,7 +12,7 @@ object Availability extends Element[Availability](
   elementName = "availability",
   parser = for {
     status <- Attribute("status").optional
-    xml <- Parser.allNodes
+    xml <- Element.allNodes
   } yield new Availability(
     status,
     xml

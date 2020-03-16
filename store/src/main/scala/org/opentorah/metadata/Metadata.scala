@@ -22,7 +22,7 @@ object Metadata {
       } yield result
     )
 
-    Parser.parseDo(from.parse(parsable))
+    Parser.parseDo(parsable.parse(from))
   }
 
   def loadNames[K <: WithName](

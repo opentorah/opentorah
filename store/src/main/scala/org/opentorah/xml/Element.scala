@@ -1,38 +1,27 @@
 package org.opentorah.xml
 
-import scala.xml.{Elem, Node}
+import org.opentorah.xml
+import scala.xml.Node
 
 class Element[A](
   val elementName: String,
-  override val contentType: ContentType = ContentType.Elements,
-  val parser: Parser[A]
+  contentType: ContentType = ContentType.Elements,
+  parser: Parser[A]
 ) extends Parsable[A] {
 
   override def toString: String = s"element '$elementName'"
 
-  final override def name2parser(elementName: String): Option[Parser[A]] =
-    if (elementName == this.elementName) Some(parser) else None
+  final override val name2parser: Map[String, Parsable.ContentTypeAndParser[A]] =
+    Map(elementName -> new xml.Parsable.ContentTypeAndParser[A](contentType, parser))
 
+  // TODO lift into Parsable?
   final def descendants(xml: Node): Seq[A] =
     for (xml <- XmlUtil.descendants(xml, elementName))
-    yield Parser.parseDo(From.xml("descendants", xml).parse(this))
+    yield Parser.parseDo(parse(From.xml("descendants", xml)))
 }
 
 object Element {
 
-  val name: Parser[String] =
-    Context.lift(_.name)
-
-  val nextName: Parser[Option[String]] =
-    Context.lift(current => Content.getNextElementName(current.content))
-
-  // TODO eliminate
-  def nextNameIs(name: String): Parser[Boolean] =
-    nextName.map(_.contains(name))
-
-  val nextElement: Parser[Option[Elem]] =
-    Context.liftContentModifier(Content.takeNextElement)
-
-  val allElements: Parser[Seq[Elem]] =
-    Context.liftContentModifier(Content.takeAllElements)
+  val allNodes: Parser[Seq[Node]] =
+    Context.allNodes
 }

@@ -2,7 +2,7 @@ package org.opentorah.reference
 
 import java.io.File
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, ContentType, From, Parsable, Parser, ToXml, XmlUtil}
+import org.opentorah.xml.{Attribute, ContentType, Element, From, Parsable, Parser, ToXml, XmlUtil}
 import scala.xml.{Elem, Node}
 
 final case class Named private(
@@ -17,17 +17,16 @@ object Named extends Parsable[Named] with ToXml[Named] {
 
   override def toString: String = "Named"
 
-  override def contentType: ContentType = ContentType.Elements
-
-  override def name2parser(elementName: String): Option[Parser[Named]] =
-    Entity.forElement(elementName).map(contentParser)
+  override val name2parser: Map[String, Parsable.ContentTypeAndParser[Named]] =
+    (for (entity <- Entity.values)
+    yield entity.element -> new Parsable.ContentTypeAndParser[Named](ContentType.Elements, contentParser(entity))).toMap
 
   private def contentParser(entity: Entity): Parser[Named] = for {
     id <- Attribute("id").optional
     role <- Attribute("role").optional
     names <- Name.parsable(entity).all
     _ <- Parser.check(names.nonEmpty, s"No names in $id")
-    content <- Parser.allNodes
+    content <- Element.allNodes
   } yield new Named(
     id,
     entity,
@@ -39,7 +38,7 @@ object Named extends Parsable[Named] with ToXml[Named] {
   def readAll(directory: File): Seq[Named] = Parser.parseDo(Parser.collectAll(
     for {
       fileName <- Files.filesWithExtensions(directory, extension = "xml").sorted
-    } yield checkId(fileName, From.file(directory, fileName).parse(Named))
+    } yield checkId(fileName, Named.parse(From.file(directory, fileName)))
   ))
 
   private def checkId(fileName: String, parser: Parser[Named]): Parser[Named] = for {

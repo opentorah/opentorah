@@ -8,7 +8,7 @@ object Text {
     override def toString: String = s"element text"
 
     override def optional: Parser[Option[String]] =
-      Context.liftContentModifier(Content.takeCharacters)
+      Context.takeCharacters
   }
 
   // TODO move to Element?

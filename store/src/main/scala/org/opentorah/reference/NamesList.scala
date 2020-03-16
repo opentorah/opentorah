@@ -14,10 +14,9 @@ final case class NamesList(
 
 object NamesList extends Parsable[NamesList] with ToXml[NamesList] {
 
-  override def contentType: ContentType = ContentType.Elements
-
-  override def name2parser(elementName: String): Option[Parser[NamesList]] =
-    Entity.forList(elementName).map(contentParser)
+  override val name2parser: Map[String, Parsable.ContentTypeAndParser[NamesList]] =
+    (for (entity <- Entity.values)
+      yield entity.listElement -> new Parsable.ContentTypeAndParser[NamesList](ContentType.Elements, contentParser(entity))).toMap
 
   private def contentParser(entity: Entity): Parser[NamesList] = for {
     id <- Attribute.id.required

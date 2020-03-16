@@ -8,11 +8,11 @@ object Attribute {
     override def toString: String = s"attribute $name"
 
     override def optional: Parser[Option[String]] =
-      Context.liftCurrentModifier(Current.takeAttribute(name))
+      Context.takeAttribute(name)
   }
 
   val id: AttributeLike[String] = Attribute("xml:id")
 
-  def allAttributes: Parser[Map[String, String]] =
-    Context.liftCurrentModifier(Current.takeAllAttributes)
+  val allAttributes: Parser[Map[String, String]] =
+    Context.takeAllAttributes
 }

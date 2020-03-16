@@ -1,6 +1,6 @@
 package org.opentorah.reference
 
-import org.opentorah.xml.{Attribute, ContentType, Element, Parser, ToXml}
+import org.opentorah.xml.{Attribute, ContentType, Element, ToXml}
 import scala.xml.{Elem, Node}
 
 final case class Reference(
@@ -16,21 +16,19 @@ object Reference extends ToXml[Reference] {
   final class ReferenceParsable(entity: Entity) extends Element[Reference](
     elementName = entity.nameElement,
     contentType = ContentType.Mixed,
-    parser = parser(entity)
-  )
-
-  private def parser(entity: Entity): Parser[Reference] = for {
-    id <- Attribute.id.optional
-    role <- Attribute("role").optional
-    ref <- Attribute("ref").optional
-    _ <- Attribute("type").optional // TODO we don't do anything with the type yet
-    name <- Parser.allNodes
-  } yield new Reference(
-    entity,
-    name,
-    id,
-    role,
-    ref
+    parser = for {
+      id <- Attribute.id.optional
+      role <- Attribute("role").optional
+      ref <- Attribute("ref").optional
+      _ <- Attribute("type").optional // TODO we don't do anything with the type yet
+      name <- Element.allNodes
+    } yield new Reference(
+      entity,
+      name,
+      id,
+      role,
+      ref
+    )
   )
 
   final val personParsable = new ReferenceParsable(Entity.Person)

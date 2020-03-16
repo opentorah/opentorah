@@ -2,7 +2,7 @@ package org.opentorah.xml
 
 import java.net.URL
 import zio.{IO, ZIO}
-import scala.xml.Elem
+import scala.xml.{Elem, Node}
 
 final private[xml] class Context {
 
@@ -20,7 +20,7 @@ final private[xml] class Context {
   private def pop(): Unit =
     stack = stack.tail
 
-  def isEmpty: Boolean =
+  private def isEmpty: Boolean =
     stack.isEmpty
 
   private def currentFromUrl: Option[URL] =
@@ -31,16 +31,42 @@ final private[xml] class Context {
 }
 
 private[xml] object Context {
+  val isEmpty: Parser[Boolean] =
+    ZIO.access[Context](_.isEmpty)
 
-  def lift[A](f: Current => A): Parser[A] =
+  val nextElementName: Parser[Option[String]] =
+    lift(current => Content.getNextElementName(current.content))
+
+  val nextElement: Parser[Option[Elem]] =
+    liftContentModifier(Content.takeNextElement)
+
+  val elementName: Parser[String] =
+    lift(_.name)
+
+  def takeAttribute(name: String): Parser[Option[String]] =
+    liftCurrentModifier(Current.takeAttribute(name))
+
+  val takeAllAttributes: Parser[Map[String, String]] =
+    liftCurrentModifier(Current.takeAllAttributes)
+
+  val takeCharacters: Parser[Option[String]] =
+    liftContentModifier(Content.takeCharacters)
+
+  val allNodes: Parser[Seq[Node]] =
+    liftContentModifier(Content.takeAllNodes)
+
+//  val allElements: Parser[Seq[Elem]] =
+//    liftContentModifier(Content.takeAllElements)
+
+  private def lift[A](f: Current => A): Parser[A] =
     ZIO.access[Context](liftCurrentToContext(f))
 
-  def liftCurrentModifier[A]: Current.Modifier[A] => Parser[A] = (f: Current.Modifier[A]) => for {
+  private def liftCurrentModifier[A]: Current.Modifier[A] => Parser[A] = (f: Current.Modifier[A]) => for {
     result <- ZIO.accessM[Context](liftCurrentToContext(f))
     _ <- ZIO.access[Context](_.replaceCurrent(result._1))
   } yield result._2
 
-  def liftContentModifier[A]: Content.Modifier[A] => Parser[A] =
+  private def liftContentModifier[A]: Content.Modifier[A] => Parser[A] =
     liftCurrentModifier[A] compose liftContentModifierToCurrentModifier[A]
 
   private def liftCurrentToContext[A](f: Current => A): Context => A =
@@ -53,7 +79,7 @@ private[xml] object Context {
   def currentFromUrl: Parser[Option[URL]] =
     ZIO.access[Context](_.currentFromUrl)
 
-  private[xml] def nested[A](
+  def nested[A](
     from: Option[From],
     elem: Elem,
     contentType: ContentType,
@@ -78,7 +104,7 @@ private[xml] object Context {
     contextStr <- ZIO.access[Context](_.currentToString)
   } yield error + "\n" + contextStr)
 
-  private[xml] def checkNoLeftovers: Parser[Unit] = for {
+  def checkNoLeftovers: Parser[Unit] = for {
     isEmpty <- ZIO.access[Context](_.isEmpty)
     _ <- if (isEmpty) IO.succeed(()) else ZIO.accessM(liftCurrentToContext(Current.checkNoLeftovers))
   } yield ()

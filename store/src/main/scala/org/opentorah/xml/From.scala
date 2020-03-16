@@ -14,16 +14,11 @@ sealed abstract class From {
   def url: Option[URL]
 
   def load: IO[Error, Elem]
-
-  def parse[A](parsable: Parsable[A]): Parser[A] = for {
-    _ <- Context.checkNoLeftovers
-    elem <- load
-    result <- Context.nested(Some(this), elem, parsable.contentType, parsable.topLevel)
-  } yield result
 }
 
 object From {
 
+  // TODO unfold?
   private final class FromXml(
     override val name: String,
     elem: Elem
@@ -35,6 +30,7 @@ object From {
 
   def xml(name: String, elem: Elem): From = new FromXml(name, elem)
 
+  // TODO unfold?
   private final class FromString(
     override val name: String,
     string: String
@@ -46,6 +42,8 @@ object From {
 
   def string(name: String, string: String): From = new FromString(name, string)
 
+  // TODO unfold?
+  // TODO add name parameter to From; expand subclasses; rename fromUrl parameter to url.
   private final class FromUrl(fromUrl: URL) extends From {
     override def toString: String = s"From.url($fromUrl)"
     override def name: String = Files.nameAndExtension(fromUrl.getPath)._1
@@ -59,6 +57,7 @@ object From {
 
   def file(directory: File, fileName: String): From = file(new File(directory, fileName + ".xml"))
 
+  // TODO unfold?
   private final class FromResource(clazz: Class[_], override val name: String) extends From {
     override def toString: String = s"From.resource($clazz:$name.xml)"
     override def url: Option[URL] = Option(clazz.getResource(name + ".xml"))

@@ -5,6 +5,9 @@ import org.scalatest.matchers.should.Matchers
 
 final class XmlTest extends AnyFlatSpec with Matchers {
 
+  //  def parseOrError[A](parser: Parser[A]): Either[Error, A] =
+  //    run(runnable(parser).either)
+
   // TODO
 //  "text parsing" should "work" in {
 //    Parser.parseOrError(From.xml(<s><a>asdjkh</a></s>).parse(

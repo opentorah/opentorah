@@ -10,7 +10,7 @@ class RawXml(elementName: String) {
   object parsable extends Element[Value](
     elementName,
     ContentType.Mixed,
-    Parser.allNodes.map(new Value(_))
+    Element.allNodes.map(new Value(_))
   ) with ToXml[Value] {
 
     override def toString: String = s"raw element $elementName"
