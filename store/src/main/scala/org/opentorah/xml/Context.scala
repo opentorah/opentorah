@@ -53,13 +53,7 @@ private[xml] object Context {
   def currentFromUrl: Parser[Option[URL]] =
     ZIO.access[Context](_.currentFromUrl)
 
-  def nested[A](from: From, contentType: ContentType, parser: Parser[A]): Parser[A] = for {
-    _ <- checkNoLeftovers
-    elem <- from.load
-    result <- nested(Some(from), elem, contentType, parser)
-  } yield result
-
-  def nested[A](
+  private[xml] def nested[A](
     from: Option[From],
     elem: Elem,
     contentType: ContentType,
@@ -69,6 +63,7 @@ private[xml] object Context {
     result <- nested(newCurrent, parser)
   } yield result
 
+  // TODO unfold
   private def nested[A](newCurrent: Current, parser: Parser[A]): Parser[A] =
     ZIO.access[Context](_.push(newCurrent)).bracket[Context, Error, A](
       release = (_: Unit) => ZIO.access[Context](_.pop()),
@@ -78,11 +73,12 @@ private[xml] object Context {
       } yield result)
     )
 
+  // TODO unfold
   private def addErrorTrace[A](parser: Parser[A]): Parser[A] = parser.flatMapError(error => for {
     contextStr <- ZIO.access[Context](_.currentToString)
   } yield error + "\n" + contextStr)
 
-  private def checkNoLeftovers: Parser[Unit] = for {
+  private[xml] def checkNoLeftovers: Parser[Unit] = for {
     isEmpty <- ZIO.access[Context](_.isEmpty)
     _ <- if (isEmpty) IO.succeed(()) else ZIO.accessM(liftCurrentToContext(Current.checkNoLeftovers))
   } yield ()

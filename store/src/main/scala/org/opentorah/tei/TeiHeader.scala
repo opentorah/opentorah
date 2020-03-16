@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.Element
+import org.opentorah.xml.{Element, ToXml}
 import scala.xml.Elem
 
 final case class TeiHeader(
@@ -26,7 +26,7 @@ object TeiHeader extends Element[TeiHeader](
     xenoData,
     revisionDesc
   )
-) {
+) with ToXml[TeiHeader] {
 
   def apply(fileDesc: FileDesc): TeiHeader = new TeiHeader(
     fileDesc,

@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.reference.Reference
-import org.opentorah.xml.Element
+import org.opentorah.xml.{Element, ToXml}
 import scala.xml.{Elem, Node}
 
 final case class TitleStmt(
@@ -45,7 +45,7 @@ object TitleStmt extends Element[TitleStmt](
     principals,
     respStmts
   )
-) {
+) with ToXml[TitleStmt] {
   def apply(): TitleStmt = new TitleStmt(
     titles = Seq.empty,
     authors = Seq.empty,

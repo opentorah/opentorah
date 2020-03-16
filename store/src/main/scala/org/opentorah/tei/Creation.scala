@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Element, Parser}
+import org.opentorah.xml.{Element, Parser, ToXml}
 import scala.xml.{Elem, Node}
 
 final case class Creation(
@@ -17,7 +17,7 @@ object Creation extends Element[Creation](
     date,
     xml
   )
-) {
+) with ToXml[Creation] {
   override def toXml(value: Creation): Elem =
     <creation>{Date.toXml(value.date)}{value.xml}</creation>
 }

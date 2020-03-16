@@ -1,6 +1,6 @@
 package org.opentorah.reference
 
-import org.opentorah.xml.{Attribute, ContentType, Parsable, Parser, Text}
+import org.opentorah.xml.{Attribute, ContentType, Parsable, Parser, Text, ToXml}
 import scala.xml.Elem
 
 final case class NamesList(
@@ -12,7 +12,7 @@ final case class NamesList(
   def includes(named: Named): Boolean = (named.entity == entity) && (named.role == role)
 }
 
-object NamesList extends Parsable[NamesList] {
+object NamesList extends Parsable[NamesList] with ToXml[NamesList] {
 
   override def contentType: ContentType = ContentType.Elements
 

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, ContentType, Element, Parser}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parser, ToXml}
 import scala.xml.{Elem, Node}
 
 final case class Date(
@@ -21,7 +21,7 @@ object Date extends Element[Date](
     calendar,
     xml
   )
-) {
+) with ToXml[Date] {
   override def toXml(value: Date): Elem =
     <date when={value.when} calendar={value.calendar.orNull}>{value.xml}</date>
 }

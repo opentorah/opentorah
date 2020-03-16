@@ -2,7 +2,7 @@ package org.opentorah.xml
 
 import java.net.URL
 import zio.{IO, Runtime, ZIO}
-import scala.xml.{Elem, Node}
+import scala.xml.Node
 
 object Parser {
 
@@ -27,9 +27,7 @@ object Parser {
       elementName,
       contentType,
       parser
-    ) {
-      override def toXml(value: A): Elem = ??? // TODO
-    }
+    )
 
     for {
       url <- Attribute(attributeName).optional

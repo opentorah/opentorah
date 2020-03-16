@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.reference.Reference
-import org.opentorah.xml.{Attribute, Element}
+import org.opentorah.xml.{Attribute, Element, ToXml}
 import scala.xml.Elem
 
 final case class Editor(
@@ -18,9 +18,9 @@ object Editor extends Element[Editor](
     role,
     persName
   )
-) {
+) with ToXml[Editor] {
   override def toXml(value: Editor): Elem =
     <editor role={value.role.orNull}>
-      {value.persName.map(reference => Reference.personParsable.toXml(reference)).orNull}
+      {value.persName.map(reference => Reference.toXml(reference)).orNull}
     </editor>
 }

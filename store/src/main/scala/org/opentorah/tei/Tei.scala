@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.reference.Reference
-import org.opentorah.xml.{ContentType, Element, XmlUtil}
+import org.opentorah.xml.{ContentType, Element, ToXml, XmlUtil}
 import scala.xml.{Elem, Node}
 
 final case class Tei(
@@ -38,7 +38,7 @@ object Tei extends Element[Tei](
     teiHeader,
     text
   )
-) {
+) with ToXml[Tei] {
 
   def apply(
     publisher: Seq[Node],

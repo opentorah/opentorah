@@ -1,7 +1,6 @@
 package org.opentorah.metadata
 
 import org.opentorah.xml.{Attribute, ContentType, Element, Parser, Text}
-import scala.xml.Elem
 
 final case class Name(name: String, languageSpec: LanguageSpec) {
   def satisfies(spec: LanguageSpec): Boolean = {
@@ -22,7 +21,4 @@ object Name extends Element[Name](
     name = n.orElse(characters)
     languageSpec <- LanguageSpec.parser
   } yield new Name(name.get, languageSpec)
-) {
-
-  override def toXml(value: Name): Elem = ??? // TODO
-}
+)

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, ContentType, Element, Parser}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parser, ToXml}
 import scala.xml.{Elem, Node}
 
 final case class Title(
@@ -18,7 +18,7 @@ object Title extends Element[Title](
     titleType,
     content
   )
-) {
+) with ToXml[Title] {
   override def toXml(value: Title): Elem =
     <title type={value.titleType.orNull}>{value.content}</title>
 }

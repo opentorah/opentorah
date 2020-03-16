@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.Element
+import org.opentorah.xml.{Element, ToXml}
 import scala.xml.{Elem, Node}
 
 final case class PublicationStmt(
@@ -17,7 +17,7 @@ object PublicationStmt extends Element[PublicationStmt](
     publisher,
     availability
   )
-) {
+) with ToXml[PublicationStmt] {
 
   def apply(publisher: Seq[Node], availability: Availability): PublicationStmt = new PublicationStmt(
     publisher = Some(new Publisher.Value(publisher)),

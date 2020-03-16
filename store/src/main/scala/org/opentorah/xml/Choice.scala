@@ -1,7 +1,6 @@
 package org.opentorah.xml
 
 import zio.ZIO
-import scala.xml.Elem
 
 // TODO eliminate casts of results!
 // TODO use in calendar...
@@ -33,8 +32,6 @@ final class Choice(parsables: Seq[Parsable[_]]) extends Parsable[(Parsable[_], _
       if (tooMany.nonEmpty) ZIO.fail("Too many values for: " + tooMany.mkString(", "))
       else ZIO.succeed(result.mapValues(_.head))
     }
-
-  override def toXml(value: Tuple2[Parsable[_], _]): Elem = ??? // TODO
 }
 
 object Choice {

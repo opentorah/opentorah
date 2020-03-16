@@ -1,6 +1,6 @@
 package org.opentorah.reference
 
-import org.opentorah.xml.{Attribute, ContentType, Element, Parser}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parser, ToXml}
 import scala.xml.{Elem, Node}
 
 final case class Reference(
@@ -11,17 +11,13 @@ final case class Reference(
   ref: Option[String]
 )
 
-object Reference {
+object Reference extends ToXml[Reference] {
 
   final class ReferenceParsable(entity: Entity) extends Element[Reference](
     elementName = entity.nameElement,
     contentType = ContentType.Mixed,
     parser = parser(entity)
-  ) {
-    override def toXml(value: Reference): Elem =
-      <name ref={value.ref.orNull} xml:id={value.id.orNull} role={value.role.orNull}>{value.name}</name>
-        .copy(label = value.entity.nameElement)
-  }
+  )
 
   private def parser(entity: Entity): Parser[Reference] = for {
     id <- Attribute.id.optional
@@ -43,4 +39,8 @@ object Reference {
 
   def all(xml: Node): Seq[Reference] =
     Seq(personParsable, organizationParsable, placeParsable).flatMap(_.descendants(xml))
+
+  override def toXml(value: Reference): Elem =
+    <name ref={value.ref.orNull} xml:id={value.id.orNull} role={value.role.orNull}>{value.name}</name>
+      .copy(label = value.entity.nameElement)
 }

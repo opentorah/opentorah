@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Choice, Element}
-
+import org.opentorah.xml.{Choice, Element, ToXml}
 import scala.xml.Elem
 
 // TODO also: abstract handNotes listTranspose particDesc settingDesc textDesc
@@ -34,7 +33,7 @@ object ProfileDesc extends Element[ProfileDesc](
       values.get(CorrespDesc.parsable).map(_.asInstanceOf[CorrespDesc.Value]),
       values.get(CalendarDesc.parsable).map(_.asInstanceOf[CalendarDesc.Value])
     )
-) {
+) with ToXml[ProfileDesc] {
   override def toXml(value: ProfileDesc): Elem =
     <profileDesc>
       {Abstract.parsable.toXml(value.documentAbstract)}

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parser}
+import org.opentorah.xml.{Attribute, Element, Parser, ToXml}
 import scala.xml.{Elem, Node}
 
 final case class Availability(
@@ -17,7 +17,7 @@ object Availability extends Element[Availability](
     status,
     xml
   )
-) {
+) with ToXml[Availability] {
   def apply(status: String, xml: Seq[Node]): Availability = new Availability(
     status = Some(status),
     xml

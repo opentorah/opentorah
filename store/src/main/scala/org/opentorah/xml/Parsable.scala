@@ -53,7 +53,7 @@ trait Parsable[A] {
   } yield result
 
   private def notRecognized[B](nextName: String): Parser[B] =
-    ZIO.fail(s"$this required, but $nextName found")
+    ZIO.fail(s"$this required, but '$nextName' found")
 
   private final def nested(parser: Parser[A]): Parser[A] = for {
     nextElement <- nextElement.map(_.get)
@@ -62,12 +62,4 @@ trait Parsable[A] {
 
   private final val nextElement: Parser[Option[Elem]] =
     Context.liftContentModifier(Content.takeNextElement)
-
-  // TODO separate ToXml...
-
-  def toXml(value: A): Elem
-
-  final def toXml(value: Option[A]): Seq[Elem] = toXml(value.toSeq)
-
-  final def toXml(values: Seq[A]): Seq[Elem] = values.map(toXml)
 }

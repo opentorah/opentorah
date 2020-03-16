@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.Element
+import org.opentorah.xml.{Element, ToXml}
 import scala.xml.Elem
 
 final case class LangUsage(
@@ -14,7 +14,7 @@ object LangUsage extends Element[LangUsage](
   } yield new LangUsage(
     languages
   )
-) {
+) with ToXml[LangUsage] {
   override def toXml(value: LangUsage): Elem =
     <langUsage>{Language.toXml(value.languages)}</langUsage>
 }

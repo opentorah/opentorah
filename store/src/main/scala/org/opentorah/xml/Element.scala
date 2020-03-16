@@ -2,13 +2,13 @@ package org.opentorah.xml
 
 import scala.xml.{Elem, Node}
 
-abstract class Element[A](
+class Element[A](
   val elementName: String,
   override val contentType: ContentType = ContentType.Elements,
   val parser: Parser[A]
 ) extends Parsable[A] {
 
-  override def toString: String = s"element $elementName"
+  override def toString: String = s"element '$elementName'"
 
   final override def name2parser(elementName: String): Option[Parser[A]] =
     if (elementName == this.elementName) Some(parser) else None

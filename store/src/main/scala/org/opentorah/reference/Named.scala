@@ -2,7 +2,7 @@ package org.opentorah.reference
 
 import java.io.File
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, ContentType, From, Parsable, Parser, XmlUtil}
+import org.opentorah.xml.{Attribute, ContentType, From, Parsable, Parser, ToXml, XmlUtil}
 import scala.xml.{Elem, Node}
 
 final case class Named private(
@@ -13,7 +13,7 @@ final case class Named private(
   content: Seq[Node]
 )
 
-object Named extends Parsable[Named] {
+object Named extends Parsable[Named] with ToXml[Named] {
 
   override def toString: String = "Named"
 

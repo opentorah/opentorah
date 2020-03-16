@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, ContentType, Element}
+import org.opentorah.xml.{Attribute, ContentType, Element, ToXml}
 import scala.xml.Elem
 
 final case class Pb(
@@ -21,7 +21,7 @@ object Pb extends Element[Pb](
     id,
     facs
   )
-) {
+) with ToXml[Pb] {
   override def toXml(value: Pb): Elem =
     <pb n={value.n} id={value.id.orNull} facs={value.facs.orNull}/>
 }
