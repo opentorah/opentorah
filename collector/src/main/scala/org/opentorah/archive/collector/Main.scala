@@ -21,7 +21,7 @@ object Main {
       val sourceDirectory: File =
         new File(layout.storeCollections, directory.getName)
       Parser.parseDo(
-        From.file(directory, layout.collectionFileName).parse(Collection.parsable(layout, sourceDirectory))
+        Collection.parsable(layout, sourceDirectory).parse(From.file(directory, layout.collectionFileName))
       )
     }
 
@@ -182,7 +182,7 @@ object Main {
     )
 
     val (listsHead: String, storeNamesLists: Seq[org.opentorah.reference.NamesList]) =
-      Parser.parseDo(From.file(layout.store, layout.namesListsFileName).parse(parsable))
+      Parser.parseDo(parsable.parse(From.file(layout.store, layout.namesListsFileName)))
 
     new Names(
       reference = listsHead,

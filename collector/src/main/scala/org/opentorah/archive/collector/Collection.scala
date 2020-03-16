@@ -110,7 +110,7 @@ final class Collection private(
     for ((name, (prev, next)) <- namesWithSiblings) yield new Document(
       url = layout.documentUrl(directoryName, name),
       collection = this,
-      tei = Parser.parseDo(From.file(sourceDirectory, name).parse(Tei)),
+      tei = Parser.parseDo(Tei.parse(From.file(sourceDirectory, name))),
       name,
       prev,
       next,
