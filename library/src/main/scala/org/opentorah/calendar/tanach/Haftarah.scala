@@ -48,7 +48,8 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
     hasParts <- Element.nextNameIs("part")
     parts <- if (!hasParts) ZIO.none else partsParser(span).map(Some(_))
     hasCustom <- Element.nextNameIs("custom")
-    customs <- customParsable(span).all.map(customs => Custom.Of(customs, full = false))
+    customs <- new Element[(Set[Custom], Haftarah)]("custom", parser = customParser(span)).all
+      .map(customs => Custom.Of(customs, full = false))
   } yield {
     val common: Option[Haftarah] = if (!hasParts && !hasCustom) Some(oneSpan(span)) else parts
 
@@ -60,14 +61,6 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
     new Custom.Of(result, full = full)
   }
 
-  private def customParsable(span: BookSpanParsed): Element[(Set[Custom], Haftarah)] =
-    new Element[(Set[Custom], Haftarah)](
-      "custom",
-      parser = customParser(span)
-    ) {
-      override def toXml(value: (Set[Custom], Haftarah)): Elem = ??? // TODO
-    }
-
   private def oneSpan(span: BookSpanParsed): Haftarah = Haftarah(Seq(span.resolve))
 
   private def customParser(ancestorSpan: BookSpanParsed): Parser[(Set[Custom], Haftarah)] = for {
@@ -78,16 +71,11 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
   } yield Custom.parse(n) -> result
 
   private def partsParser(ancestorSpan: BookSpanParsed): Parser[Haftarah] = for {
-    parts <- partParsable(ancestorSpan).all
+    parts <- new Element[WithNumber[BookSpan]](
+      elementName = "part",
+      parser = WithNumber.parse(spanParser.map(_.inheritFrom(ancestorSpan).resolve))
+    ).all
     _ <- WithNumber.checkConsecutiveNg(parts, "part")
     _ <- Parser.check(parts.length > 1, "too short")
   } yield Haftarah(WithNumber.dropNumbers(parts))
-
-  private def partParsable(ancestorSpan: BookSpanParsed): Element[WithNumber[BookSpan]] =
-    new Element[WithNumber[BookSpan]](
-    elementName = "part",
-    parser = WithNumber.parse(spanParser.map(_.inheritFrom(ancestorSpan).resolve))
-  ) {
-      override def toXml(value: WithNumber[Haftarah.BookSpan]): Elem = ??? // TODO
-    }
 }

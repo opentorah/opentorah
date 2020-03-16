@@ -4,8 +4,8 @@ pluginManagement {
     jcenter()
     gradlePluginPortal()
 
-    // For some reason the 'store' package isn't included in JCenter...
-    maven { url  "https://dl.bintray.com/dubinsky/org.opentorah" }
+//    // For some reason the 'store' package isn't included in JCenter...
+//    maven { url  "https://dl.bintray.com/dubinsky/org.opentorah" }
   }
 
   plugins {

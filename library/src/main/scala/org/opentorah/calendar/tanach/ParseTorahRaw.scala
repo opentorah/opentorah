@@ -8,22 +8,16 @@ import scala.xml.Elem
 trait ParseTorahRaw { self: WithNames =>
 
   final def parseTorah(element: Elem): Torah =
-    Parser.parseDo(From.xml(element).parse(TorahParsable))
+    Parser.parseDo(From.xml("Torah", element).parse(TorahParsable))
 
   private object TorahParsable extends Element[Torah](
     elementName = "torah",
     parser = for {
       bookSpan <- Torah.spanParser.map(_.resolve)
-      spans <- aliyahParsable(bookSpan).all
+      spans <- new Element[Torah.Numbered](
+        elementName = "aliyah",
+        parser = WithNumber.parse(SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve))
+      ).all
     } yield Torah.parseAliyot(bookSpan, spans, number = None).fromWithNumbers(this)
-  ) {
-    override def toXml(value: Torah): Elem = ??? // TODO
-  }
-
-  private def aliyahParsable(bookSpan: Torah.BookSpan): Element[Torah.Numbered] = new Element[Torah.Numbered](
-    elementName = "aliyah",
-    parser = WithNumber.parse(SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve))
-  ) {
-    override def toXml(value: Torah.Numbered): Elem = ??? // TODO
-  }
+  )
 }

@@ -3,7 +3,6 @@ package org.opentorah.judaica.tanach
 import org.opentorah.metadata.{Metadata, Names}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Element, Parser}
-import scala.xml.Elem
 
 final class ChumashBookMetadata(
   book: Tanach.ChumashBook,
@@ -77,14 +76,10 @@ object ChumashBookMetadata {
     }
   }
 
-  private def weekParsable(book: Tanach.ChumashBook): Element[ParshaMetadata.Parsed] = new Element[ParshaMetadata.Parsed](
-    elementName = "week",
-    parser = ParshaMetadata.parser(book)
-  ) {
-    override def toXml(value: ParshaMetadata.Parsed): Elem = ??? // TODO
-  }
-
   def parser(book: Tanach.ChumashBook, names: Names, chapters: Chapters): Parser[Parsed] = for {
-    weeks <- weekParsable(book).all
+    weeks <- new Element[ParshaMetadata.Parsed](
+      elementName = "week",
+      parser = ParshaMetadata.parser(book)
+    ).all
   } yield new Parsed(book, names, chapters, weeks)
 }

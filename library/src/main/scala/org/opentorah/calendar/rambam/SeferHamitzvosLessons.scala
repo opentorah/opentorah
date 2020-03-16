@@ -2,7 +2,6 @@ package org.opentorah.calendar.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
 import org.opentorah.xml.{Attribute, ContentType, From, Parsable, Parser}
-import scala.xml.Elem
 
 object SeferHamitzvosLessons {
 
@@ -63,7 +62,5 @@ object SeferHamitzvosLessons {
       case "named" => Some(Names.parser.map(new NamedPart(_)))
       case _ => None
     }
-
-    override def toXml(value: Part): Elem = ??? // TODO
   }
 }

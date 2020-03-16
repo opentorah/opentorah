@@ -2,7 +2,6 @@ package org.opentorah.judaica.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
 import org.opentorah.xml.{Attribute, Element, From, Parser}
-import scala.xml.Elem
 
 object MishnehTorah {
 
@@ -72,20 +71,13 @@ object MishnehTorah {
   private def bookParser: Parser[Book] = for {
     number <- Attribute("n").positiveInt.required
     names <- Names.parser
-    parts <- partParsable.all
+    parts <- new Element[Part](elementName = "part", parser = partParser).all
     _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
       s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
   } yield {
     val result = new Book(number, names, parts)
     parts.foreach(_.setBook(result))
     result
-  }
-
-  object partParsable extends Element[Part](
-    elementName = "part",
-    parser = partParser
-  ) {
-    override def toXml(value: Part): Elem = ??? // TODO
   }
 
   private def partParser: Parser[Part] = for {
@@ -106,7 +98,5 @@ object MishnehTorah {
     parser = for {
       names <- Names.parser
     } yield new NamedChapter(names)
-  ) {
-    override def toXml(value: NamedChapter): Elem = ??? // TODO
-  }
+  )
 }

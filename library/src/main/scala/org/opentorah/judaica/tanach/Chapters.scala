@@ -2,7 +2,6 @@ package org.opentorah.judaica.tanach
 
 import org.opentorah.metadata.WithNumber
 import org.opentorah.xml.{Attribute, Element, Parser}
-import scala.xml.Elem
 
 final class Chapters(chapters: Seq[Int]) {
   def length(chapter: Int): Int = chapters(chapter-1)
@@ -61,15 +60,11 @@ final class Chapters(chapters: Seq[Int]) {
 
 object Chapters {
 
-  private object ChapterParsable extends Element[WithNumber[Int]](
-    "chapter",
-    parser = WithNumber.parse(Attribute("length").positiveInt.required)
-  ) {
-    override def toXml(value: WithNumber[Int]): Elem = ??? // TODO
-  }
-
   val parser: Parser[Chapters] = for {
-    chapters <- ChapterParsable.all
+    chapters <- new Element[WithNumber[Int]](
+      "chapter",
+      parser = WithNumber.parse(Attribute("length").positiveInt.required)
+    ).all
   } yield {
     WithNumber.checkConsecutive(chapters, "chapter") // TODO move into ZIO
     new Chapters(WithNumber.dropNumbers(chapters))
