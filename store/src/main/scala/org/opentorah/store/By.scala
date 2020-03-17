@@ -1,5 +1,12 @@
 package org.opentorah.store
 
+//  import org.opentorah.metadata.Names
+//  Selector(names: Names)
+//import org.opentorah.xml.Parser
+//  val parser: Parser[Selector] = for {
+//    names <- Names.parser // TODO handle default name
+//  } yield Selector(names)
+
 import java.io.File
 import org.opentorah.util.Files
 

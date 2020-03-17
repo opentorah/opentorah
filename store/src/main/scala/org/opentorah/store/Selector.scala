@@ -1,13 +1,14 @@
 package org.opentorah.store
 
-import org.opentorah.metadata.Names
-import org.opentorah.xml.Parser
+import org.opentorah.metadata.Named
 
-final case class Selector(names: Names)
+trait Selector extends Named
 
 object Selector {
 
-  val parser: Parser[Selector] = for {
-    names <- Names.parser // TODO handle default name
-  } yield Selector(names)
+  trait Numbered extends Selector
+
+  trait Named extends Selector
+
+  trait Nullary extends Selector
 }

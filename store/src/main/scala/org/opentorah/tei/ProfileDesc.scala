@@ -16,22 +16,28 @@ final case class ProfileDesc(
 object ProfileDesc extends Element[ProfileDesc](
   elementName = "profileDesc",
   parser = for {
-      values <- Choice(Seq(
-        LangUsage,
-        CalendarDesc.parsable,
-        Creation,
-        Abstract.parsable,
-        TextClass.parsable,
-        CorrespDesc.parsable
-      ))
-    } yield new ProfileDesc(
-      values.one(Abstract.parsable),
-      values.one(Creation),
-      values.one(LangUsage),
-      values.one(TextClass.parsable),
-      values.one(CorrespDesc.parsable),
-      values.one(CalendarDesc.parsable)
-    )
+    values <- Choice(Seq(
+      Abstract.parsable,
+      Creation,
+      LangUsage,
+      TextClass.parsable,
+      CorrespDesc.parsable,
+      CalendarDesc.parsable
+    ))
+    documentAbstract <- values.optional(Abstract.parsable)
+    creation <- values.optional(Creation)
+    langUsage <- values.optional(LangUsage)
+    textClass <- values.optional(TextClass.parsable)
+    correspDesc <- values.optional(CorrespDesc.parsable)
+    calendarDesc <- values.optional(CalendarDesc.parsable)
+  } yield new ProfileDesc(
+    documentAbstract,
+    creation,
+    langUsage,
+    textClass,
+    correspDesc,
+    calendarDesc
+  )
 ) with ToXml[ProfileDesc] {
   override def toXml(value: ProfileDesc): Elem =
     <profileDesc>

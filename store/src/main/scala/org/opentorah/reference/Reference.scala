@@ -1,19 +1,23 @@
 package org.opentorah.reference
 
-import org.opentorah.xml.{Attribute, ContentType, Element, ToXml, UnionParsable}
+import org.opentorah.store.Path
+import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, ToXml, UnionParsable}
 import scala.xml.{Elem, Node}
 
 final case class Reference(
+  source: Path,
   entity: Entity,
   name: Seq[Node],
   id: Option[String],
   role: Option[String],
   ref: Option[String]
-)
+) {
+  def at(path: Path): Reference = copy(source = path ++ this.source)
+}
 
 object Reference extends ToXml[Reference] {
 
-  final class ReferenceParsable(entity: Entity) extends Element[Reference](
+  private def parsable(entity: Entity): Parsable[Reference] = new Element[Reference](
     elementName = entity.nameElement,
     contentType = ContentType.Mixed,
     parser = for {
@@ -23,6 +27,7 @@ object Reference extends ToXml[Reference] {
       _ <- Attribute("type").optional // TODO we don't do anything with the type yet
       name <- Element.allNodes
     } yield new Reference(
+      Path.empty,
       entity,
       name,
       id,
@@ -31,9 +36,9 @@ object Reference extends ToXml[Reference] {
     )
   )
 
-  final val personParsable = new ReferenceParsable(Entity.Person)
-  final val organizationParsable = new ReferenceParsable(Entity.Organization)
-  final val placeParsable = new ReferenceParsable(Entity.Place)
+  final val personParsable: Parsable[Reference] = parsable(Entity.Person)
+  final val organizationParsable: Parsable[Reference] = parsable(Entity.Organization)
+  final val placeParsable: Parsable[Reference] = parsable(Entity.Place)
 
   final val parsable = new UnionParsable[Reference](Seq(
     personParsable, organizationParsable, placeParsable

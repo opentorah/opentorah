@@ -11,6 +11,5 @@ object Text {
       Context.takeCharacters
   }
 
-  // TODO move to Element?
   def apply(elementName: String): StringElement = new StringElement(elementName)
 }

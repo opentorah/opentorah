@@ -7,18 +7,27 @@ final case class NamesList(
   entity: Entity,
   id: String,
   role: Option[String],
-  head: String
+  head: String,
+  nameds: Seq[Named]
 ) {
+  def take(nameds: Seq[Named]): NamesList = copy(nameds = nameds.filter(includes))
+
   def includes(named: Named): Boolean = (named.entity == entity) && (named.role == role)
+
+  def isEmpty: Boolean = nameds.isEmpty
+
+  def references: Seq[Reference] = nameds.flatMap(_.references)
 }
 
 object NamesList extends Parsable[NamesList] with ToXml[NamesList] {
 
-  override val name2parser: Map[String, Parsable.ContentTypeAndParser[NamesList]] =
-    (for (entity <- Entity.values)
-      yield entity.listElement -> new Parsable.ContentTypeAndParser[NamesList](ContentType.Elements, contentParser(entity))).toMap
+  override def toString: String = "NamesList"
 
-  private def contentParser(entity: Entity): Parser[NamesList] = for {
+  override val name2parser: Map[String, Parsable.ContentTypeAndParser[NamesList]] = Entity.values.map { entity =>
+    entity.listElement -> new Parsable.ContentTypeAndParser[NamesList](ContentType.Elements, parser(entity))
+  }.toMap
+
+  private def parser(entity: Entity): Parser[NamesList] = for {
     id <- Attribute.id.required
     role <- Attribute("role").optional
     head <- Text("head").required
@@ -26,7 +35,8 @@ object NamesList extends Parsable[NamesList] with ToXml[NamesList] {
     entity,
     id,
     role,
-    head
+    head,
+    Seq.empty
   )
 
   override def toXml(value: NamesList): Elem =

@@ -7,7 +7,7 @@ final class Names(val names: Seq[Name]) extends HasName with LanguageString {
   Collections.checkNoDuplicates(names.map(_.name), "names")
   // There may be multiple names for the same language (for an example, see Language),
   // so this check is disabled:
-  // Util.checkNoDuplicates(names.map(_.copy(name = "")), "name parameters")
+  // Collections.checkNoDuplicates(names.map(_.copy(name = "")), "name parameters")
 
   def isEmpty: Boolean = names.isEmpty
 
@@ -23,6 +23,8 @@ final class Names(val names: Seq[Name]) extends HasName with LanguageString {
       .orElse(find(spec.dropFlavour.dropIsTransliterated))
       .orElse(find(spec.dropFlavour.dropIsTransliterated.dropLanguage))
       .get
+
+  def name: String = doFind(LanguageSpec.empty).name
 
   def toLanguageString(implicit spec: LanguageSpec): String = doFind(spec).name.toString
 

@@ -2,7 +2,6 @@ package org.opentorah.xml
 
 import scala.xml.{Elem, Node}
 
-// TODO when Parsable starts carrying the type (for Choice), collapse this:
 class RawXml(elementName: String) {
 
   final class Value(val xml: Seq[Node])

@@ -8,21 +8,16 @@ object Metadata {
   def load[M](
     from: From,
     rootElementName: Option[String] = None,
-    elementName: String,
-    parser: Parser[M],
-    withInclude: Boolean = false
+    elementParsable: Parsable[M]
   ): Seq[M] = {
     val typeName = from.name
-
-    val elementParsable = new Element[M](elementName, parser = parser)
-    val maybeInclude = if (!withInclude) elementParsable else Parsable.withInclude(elementParsable)
 
     val parsable: Element[Seq[M]] = new Element[Seq[M]](
       elementName = rootElementName.getOrElse("metadata"),
       parser = for {
         type_ <- Attribute("type").required
         _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
-        result <- maybeInclude.all
+        result <- elementParsable.all
       } yield result
     )
 
@@ -36,8 +31,7 @@ object Metadata {
     val metadatas: Seq[Names] = load(
       from,
       rootElementName = Some("names"),
-      elementName = "names",
-      parser = Names.parser
+      elementParsable = new Element(elementName = "names", parser = Names.parser)
     )
 
     bind(

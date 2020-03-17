@@ -7,7 +7,6 @@ trait StringAttributeLike extends AttributeLike[String] {
   class Converted[B](convert: String => Parser[B]) extends AttributeLike[B] {
     override def toString: Error = StringAttributeLike.this.toString
 
-    // TODO simplify...
     override def optional: Parser[Option[B]] = StringAttributeLike.this.optional.flatMap { value =>
       value.fold[Parser[Option[B]]](ZIO.none)(value => convert(value).map(Some(_)))
     }

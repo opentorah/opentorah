@@ -21,7 +21,7 @@ object Parser {
   def parseDo[A](parser: Parser[A]): A =
     run(runnable(parser))
 
-  private def runnable[A](parser: Parser[A]): IO[Error, A] = {
+  private[xml] def runnable[A](parser: Parser[A]): IO[Error, A] = {
     val result: Parser[A] = for {
       result <- parser
       isEmpty <- Context.isEmpty
