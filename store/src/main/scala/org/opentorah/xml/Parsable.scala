@@ -88,7 +88,7 @@ object Parsable {
   def withInclude[A](parsable: Parsable[A], attributeName: String = "include"): Parsable[A] = new Parsable[A] {
     override def toString: String = parsable.toString + s" with include [$attributeName]"
 
-    override def name2parser: Map[String, ContentTypeAndParser[A]] =
+    override val name2parser: Map[String, ContentTypeAndParser[A]] =
       (for {
         (elementName, contentTypeAndParser) <- parsable.name2parser
         contentType = contentTypeAndParser.contentType

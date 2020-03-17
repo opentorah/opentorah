@@ -1,7 +1,7 @@
 package org.opentorah.metadata
 
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, Element, From, Parser}
+import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser}
 
 object Metadata {
 
@@ -9,16 +9,20 @@ object Metadata {
     from: From,
     rootElementName: Option[String] = None,
     elementName: String,
-    parser: Parser[M]
+    parser: Parser[M],
+    withInclude: Boolean = false
   ): Seq[M] = {
     val typeName = from.name
+
+    val elementParsable = new Element[M](elementName, parser = parser)
+    val maybeInclude = if (!withInclude) elementParsable else Parsable.withInclude(elementParsable)
 
     val parsable: Element[Seq[M]] = new Element[Seq[M]](
       elementName = rootElementName.getOrElse("metadata"),
       parser = for {
         type_ <- Attribute("type").required
         _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
-        result <- new Element[M](elementName, parser = parser).all
+        result <- maybeInclude.all
       } yield result
     )
 
