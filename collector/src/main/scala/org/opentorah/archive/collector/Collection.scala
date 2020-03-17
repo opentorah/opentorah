@@ -1,7 +1,10 @@
 package org.opentorah.archive.collector
 
 import java.io.File
-import org.opentorah.archive.collector.reference.Reference
+import org.opentorah.archive.collector.selectors.{CollectionSelector, DocumentSelector}
+import org.opentorah.metadata.{Language, Name}
+import org.opentorah.reference.Reference
+import org.opentorah.store.{Binding, Path}
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
 import org.opentorah.xml.{Attribute, Element, From, Parser, RawXml, Text, XmlUtil}
@@ -9,6 +12,7 @@ import Table.Column
 import scala.xml.{Elem, Node}
 
 final class Collection private(
+  val path: Path,
   layout: Layout,
   val directoryName: String,
   sourceDirectory: File,
@@ -17,21 +21,19 @@ final class Collection private(
   val archive: Option[String],
   val prefix: Option[String],
   val number: Option[Int],
+  val archiveCase: String,
   titleRaw: Option[Collection.Title.Value],
   val caseAbstract: Collection.Abstract.Value,
   val description: Seq[Node],
   partDescriptors: Seq[Part.Descriptor]
-) extends CollectionLike with Ordered[Collection] {
+) extends Ordered[Collection] {
 
   override def toString: String = directoryName
 
   val parts: Seq[Part] = Part.Descriptor.splitParts(partDescriptors, getDocuments(sourceDirectory))
 
-  def archiveCase: String = prefix.getOrElse("") + number.map(_.toString).getOrElse("")
-
-  override def reference: String = archive.fold(archiveCase)(archive => archive + " " + archiveCase)
-
-  def title: Node = titleRaw.fold[Node](scala.xml.Text(reference))(title => <title>{title.xml}</title>)
+  def title: Node = titleRaw.fold[Node](scala.xml.Text(path.reference(Language.Russian.toSpec)))(title =>
+    <title>{title.xml}</title>)
 
   override def compare(that: Collection): Int = {
     val archiveComparison: Int = compare(archive, that.archive)
@@ -108,7 +110,9 @@ final class Collection private(
     }
 
     for ((name, (prev, next)) <- namesWithSiblings) yield new Document(
-      url = layout.documentUrl(directoryName, name),
+      path = path :+ Binding.Named(DocumentSelector, new org.opentorah.metadata.Names(Seq(
+        new Name(name, Language.Russian.toSpec)
+      ))),
       collection = this,
       tei = Parser.parseDo(Tei.parse(From.file(sourceDirectory, name))),
       name,
@@ -143,20 +147,30 @@ object Collection {
     description = Seq(<span>{caseAbstract.xml}</span>) ++ notes.map(_.xml).getOrElse(Seq.empty)
     // TODO swap parts and notes; remove notes wrapper element; simplify parts; see how to generalize parts...
     partDescriptors <- Part.parsable.all
-  } yield new Collection(
-    layout,
-    directoryName = directory.getName,
-    sourceDirectory = layout.tei(directory),
-    isBook,
-    publish,
-    archive,
-    prefix,
-    number,
-    titleRaw,
-    caseAbstract,
-    description,
-    partDescriptors
-  )
+  } yield {
+    val archiveCase = prefix.getOrElse("") + number.map(_.toString).getOrElse("")
+    val reference: String = archive.fold(archiveCase)(archive => archive + " " + archiveCase)
+
+    new Collection(
+      new Path(Seq(Binding.Named(CollectionSelector, new org.opentorah.metadata.Names(Seq(
+        new Name(reference, Language.Russian.toSpec),
+        new Name(directory.getName, Language.English.toSpec)
+      ))))),
+      layout,
+      directoryName = directory.getName,
+      sourceDirectory = layout.tei(directory),
+      isBook,
+      publish,
+      archive,
+      prefix,
+      number,
+      archiveCase,
+      titleRaw,
+      caseAbstract,
+      description,
+      partDescriptors
+    )
+  }
 
   def table(documentUrlRelativeToIndex: String => String): Table[Document] = new Table[Document](
     Column("Описание", "description", { document: Document =>

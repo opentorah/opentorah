@@ -1,10 +1,15 @@
 package org.opentorah.archive.collector
 
 import java.io.File
-import org.opentorah.archive.collector.reference.{Named, Names, Reference}
+
+import org.opentorah.archive.collector.selectors.NamesSelector
+import org.opentorah.metadata.Language
+import org.opentorah.reference.{Named, Reference}
+import org.opentorah.store.{Binding, Path}
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
 import org.opentorah.xml.{Element, From, PaigesPrettyPrinter, Parser, Text, XmlUtil}
+
 import scala.xml.{Elem, Node}
 
 object Main {
@@ -62,16 +67,17 @@ object Main {
     checkReferences(names)
     reportReferencesWithoutRef(names, layout.reportFile("no-refs"))
 
-    writeNames(layout.namesDirectory, names.nameds, names.getReferences)
+    writeNames(layout, layout.namesDirectory, names.nameds, names.getReferences)
 
     println("Pretty-printing names")
     for (named <- names.nameds)
-      writeXml(layout.storeNamesDirectory, named.id, Named.toXml(named))
+      writeXml(layout.storeNamesDirectory, named.id.get, NamedToXml.toXml(named))
 
     writeNamesList(
       names,
       directory = layout.namesFileDirectory,
       fileName = layout.namesFileName,
+      namedUrl = layout.namedUrl,
       namedInTheListUrl = layout.namedInTheListUrl
     )
   }
@@ -82,7 +88,7 @@ object Main {
         val id = named.id
         val name = named.name
         val expectedId = name.replace(' ', '_')
-        if (id == expectedId) None else Some(s"- '$id' должен по идее называться '$expectedId'")
+        if (id.get == expectedId) None else Some(s"- '${id.get}' должен по идее называться '$expectedId'")
       }
 
     Util.writeWithYaml(
@@ -113,7 +119,11 @@ object Main {
   def reportReferencesWithoutRef(names: Names, file: File): Unit = {
     val content: Seq[String] =
       for (reference <- names.getReferences.filter(_.ref.isEmpty))
-      yield "- " + reference.name.map(_.text.trim).mkString(" ") + s" в ${reference.source}"
+      yield {
+        val in: String = reference.source.init.reference(Language.Russian.toSpec) + ":" +
+          reference.source.reference(Language.Russian.toSpec)
+        "- " + reference.name.map(_.text.trim).mkString(" ") + s" в $in"
+      }
 
     Util.writeWithYaml(
       file,
@@ -167,7 +177,7 @@ object Main {
       else Seq(<p>Отсутствуют фотографии {collection.missingPages.length} страниц: {collection.missingPages.mkString(" ")}</p>)),
     style = Some("wide"),
     target = "collectionViewer",
-    yaml = Seq("documentCollection" -> Util.quote(collection.reference))
+    yaml = Seq("documentCollection" -> Util.quote(collection.path.reference(Language.Russian.toSpec)))
   )
 
   private def readNames(layout: Layout): Names = {
@@ -185,15 +195,17 @@ object Main {
       Parser.parseDo(parsable.parse(From.file(layout.store, layout.namesListsFileName)))
 
     new Names(
-      reference = listsHead,
+      path = new Path(Seq(Binding.Nullary(NamesSelector))),
       storeNameds = org.opentorah.reference.Named.readAll(layout.storeNamesDirectory),
       storeNamesLists,
       namedUrl = layout.namedUrl,
-      namedInTheListUrl = layout.namedInTheListUrl
+      namedInTheListUrl = layout.namedInTheListUrl,
+      documentUrl = layout.documentUrl
     )
   }
 
   private def writeNames(
+    layout: Layout,
     directory: File,
     nameds: Seq[Named],
     references: Seq[Reference]
@@ -202,9 +214,9 @@ object Main {
     Files.deleteFiles(directory)
     for (named <- nameds) writeTei(
       directory,
-      fileName = named.id,
+      fileName = named.id.get,
       head = None,
-      content = Seq(named.toXml(references)),
+      content = Seq(NamedToXml.toXml(named, references, layout.namedUrl, layout.namedInTheListUrl, layout.documentUrl)),
       target = "namesViewer"
     )
   }
@@ -238,7 +250,8 @@ object Main {
   private def toXml(collection: Collection, layout: Layout): Elem =
     <item>
       <ref target={layout.collectionUrl(collection.directoryName)}
-           role="collectionViewer">{collection.reference + ": " + XmlUtil.spacedText(collection.title)}</ref>
+           role="collectionViewer">{collection.path.reference(Language.Russian.toSpec) + ": " +
+        XmlUtil.spacedText(collection.title)}</ref>
       <lb/>
       <abstract>{collection.caseAbstract.xml}</abstract>
     </item>
@@ -247,6 +260,7 @@ object Main {
     names: Names,
     directory: File,
     fileName: String,
+    namedUrl: String => String,
     namedInTheListUrl: String => String
   ): Unit = {
     // List of all names
@@ -260,8 +274,8 @@ object Main {
     writeTei(
       directory = directory,
       fileName = fileName,
-      head = Some(scala.xml.Text(names.reference)),
-      content = listOfLists ++ nonEmptyLists.flatMap(_.toXml),
+      head = Some(scala.xml.Text(names.path.reference(Language.Russian.toSpec))),
+      content = listOfLists ++ nonEmptyLists.flatMap(NamedToXml.toXml(_, namedUrl)),
       target = "namesViewer"
     )
   }
@@ -276,7 +290,7 @@ object Main {
   ): Unit = {
     import Util.quote
     val navigation: Seq[(String, String)] =
-      Seq("documentCollection" -> quote(document.collection.reference)) ++
+      Seq("documentCollection" -> quote(document.path.init.reference(Language.Russian.toSpec))) ++
         document.prev.map(prev => Seq("prevDocument" -> quote(prev))).getOrElse(Seq.empty) ++
         Seq("thisDocument" -> quote(document.name)) ++
         document.next.map(next => Seq("nextDocument" -> quote(next))).getOrElse(Seq.empty)

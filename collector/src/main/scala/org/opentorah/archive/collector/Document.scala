@@ -1,27 +1,23 @@
 package org.opentorah.archive.collector
 
-import org.opentorah.archive.collector.reference.{Reference, ReferenceSource}
-import org.opentorah.reference.Entity
+import org.opentorah.reference.{Entity, Reference}
+import org.opentorah.store.Path
 import org.opentorah.tei.Tei
 import scala.xml.Node
 
 final class Document(
-  override val url: String,
+  val path: Path,
   collection: Collection,
   val tei: Tei,
-  override val name: String,
+  val name: String,
   // TODO move prev and next out of here
   val prev: Option[String],
   val next: Option[String],
   val translations: Seq[String]
-) extends ReferenceSource(collection) {
+) {
   override def toString: String = s"$collection:$name"
 
-  override val references: Seq[Reference] = bindReferences(tei.references)
-
-  override def isNames: Boolean = false
-
-  override def viewer: String = "documentViewer"
+  val references: Seq[Reference] = tei.references.map(_.at(path))
 
   val title: Option[Seq[Node]] = tei.titleStmt.titles.headOption.map(_.content)
 
