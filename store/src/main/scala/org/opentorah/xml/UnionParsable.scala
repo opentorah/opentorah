@@ -1,8 +1,11 @@
 package org.opentorah.xml
 
+import org.opentorah.util.Collections
+
 final class UnionParsable[A](parsables: Seq[Parsable[A]]) extends Parsable[A] {
 
-  // TODO require that name2parser maps do not overlap
+  Collections.checkNoDuplicates(parsables.flatMap(_.name2parser.keys),
+    "element names among the parsers of the union")
 
   override def toString: Error =
     parsables.map(_.toString).mkString("[", "] or [", "]")

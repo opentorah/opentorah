@@ -1,6 +1,8 @@
 package org.opentorah.xml
 
+import java.net.URL
 import zio.ZIO
+import scala.xml.{Elem, Node}
 
 trait Parsable[A] {
 
@@ -40,10 +42,10 @@ trait Parsable[A] {
 
   final def parse(from: From): Parser[A] = for {
     _ <- Context.checkNoLeftovers
-    elem <- from.load
-    name = elem.label
+    nextElement <- from.load
+    name = nextElement.label
     result <- name2parser.get(name).fold[Parser[A]](notRecognized(name))(contentTypeAndParser =>
-      Context.nested(Some(from), elem, contentTypeAndParser.contentType, contentTypeAndParser.parser))
+      nested(Some(from), nextElement, contentTypeAndParser))
   } yield result
 
   private def notRecognized[B](nextName: String): Parser[B] =
@@ -51,8 +53,21 @@ trait Parsable[A] {
 
   private final def nested(contentTypeAndParser: Parsable.ContentTypeAndParser[A]): Parser[A] = for {
     nextElement <- Context.nextElement.map(_.get)
-    result <- Context.nested(None, nextElement, contentTypeAndParser.contentType, contentTypeAndParser.parser)
+    result <- nested(None, nextElement, contentTypeAndParser)
   } yield result
+
+  private def nested(
+    from: Option[From],
+    nextElement: Elem,
+    contextTypeAndParser: Parsable.ContentTypeAndParser[A]
+  ): Parser[A] = for {
+    newCurrent <- Current.open(from, nextElement, contextTypeAndParser.contentType)
+    result <- Context.nested(newCurrent, contextTypeAndParser.parser)
+  } yield result
+
+  final def descendants(xml: Node): Seq[A] =
+    for (xml <- name2parser.keys.toSeq.flatMap(XmlUtil.descendants(xml, _)))
+    yield Parser.parseDo(parse(From.xml("descendants", xml)))
 }
 
 object Parsable {
@@ -62,11 +77,31 @@ object Parsable {
     override def toString: Error = "annotated " + parsable.toString
 
     override def name2parser: Map[String, ContentTypeAndParser[(Parsable[A], A)]] =
-      parsable.name2parser.mapValues[ContentTypeAndParser[(Parsable[A], A)]] { contentTypeAndParser: ContentTypeAndParser[A] =>
+      parsable.name2parser.mapValues { contentTypeAndParser: ContentTypeAndParser[A] =>
         new Parsable.ContentTypeAndParser[(Parsable[A], A)](
           contentTypeAndParser.contentType,
-          contentTypeAndParser.parser.map { result: A => parsable -> result }
+          contentTypeAndParser.parser.map { result => parsable -> result }
         )
       }
+  }
+
+  def withInclude[A](parsable: Parsable[A], attributeName: String = "include"): Parsable[A] = new Parsable[A] {
+    override def toString: String = parsable.toString + s" with include [$attributeName]"
+
+    override def name2parser: Map[String, ContentTypeAndParser[A]] =
+      (for {
+        (elementName, contentTypeAndParser) <- parsable.name2parser
+        contentType = contentTypeAndParser.contentType
+        parser = contentTypeAndParser.parser
+      } yield (elementName, new ContentTypeAndParser[A](contentType,
+        for {
+          url <- Attribute(attributeName).optional
+          result <- url.fold(parser) { url => for {
+            currentFromUrl <- Context.currentFromUrl
+            from <- Parser.effect(From.url(currentFromUrl.fold(new URL(url))(new URL(_, url))))
+            result <- new Element[A](elementName, contentType, parser).parse(from)
+          } yield result}
+        } yield result
+      ))).toMap
   }
 }

@@ -23,15 +23,14 @@ object ProfileDesc extends Element[ProfileDesc](
         Abstract.parsable,
         TextClass.parsable,
         CorrespDesc.parsable
-      )).toMap
+      ))
     } yield new ProfileDesc(
-      // TODO yuck!!!
-      values.get(Abstract.parsable).map(_.asInstanceOf[Abstract.Value]),
-      values.get(Creation).map(_.asInstanceOf[Creation]),
-      values.get(LangUsage).map(_.asInstanceOf[LangUsage]),
-      values.get(TextClass.parsable).map(_.asInstanceOf[TextClass.Value]),
-      values.get(CorrespDesc.parsable).map(_.asInstanceOf[CorrespDesc.Value]),
-      values.get(CalendarDesc.parsable).map(_.asInstanceOf[CalendarDesc.Value])
+      values.one(Abstract.parsable),
+      values.one(Creation),
+      values.one(LangUsage),
+      values.one(TextClass.parsable),
+      values.one(CorrespDesc.parsable),
+      values.one(CalendarDesc.parsable)
     )
 ) with ToXml[ProfileDesc] {
   override def toXml(value: ProfileDesc): Elem =

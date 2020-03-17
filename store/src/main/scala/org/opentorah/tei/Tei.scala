@@ -22,7 +22,7 @@ final case class Tei(
       correspDesc.map(_.xml).getOrElse(Seq.empty) ++
       body.xml
 
-    titleStmt.references ++ lookInto.flatMap(Reference.all)
+    titleStmt.references ++ lookInto.flatMap(Reference.parsable.descendants)
   }
 
   /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +

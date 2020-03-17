@@ -1,9 +1,7 @@
 package org.opentorah.xml
 
-import java.net.URL
 import zio.{IO, Runtime, ZIO}
 
-// TODO dissolve?
 object Parser {
 
   def collectAll[A](parsers: Seq[Parser[A]]): Parser[Seq[A]] = for {
@@ -18,22 +16,6 @@ object Parser {
   def check(condition: Boolean, message: => String): IO[Error, Unit] =
     if (condition) IO.succeed(())
     else IO.fail(message)
-
-  def withInclude[A](parser: Parser[A]): Parser[A] =
-    withInclude("include", ContentType.Elements, parser)
-
-  // TODO rework with Parsable, so that Context.elementName is not needed
-  def withInclude[A](attributeName: String, contentType: ContentType, parser: Parser[A]): Parser[A] = {
-    for {
-      url <- Attribute(attributeName).optional
-      result <- url.fold(parser) { url => for {
-        elementName <- Context.elementName
-        currentFromUrl <- Context.currentFromUrl
-        from <- effect(From.url(currentFromUrl.fold(new URL(url))(new URL(_, url))))
-        result <- new Element[A](elementName,  contentType, parser).parse(from)
-      } yield result}
-    } yield result
-  }
 
   // TODO eliminate
   def parseDo[A](parser: Parser[A]): A =

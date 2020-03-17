@@ -1,6 +1,6 @@
 package org.opentorah.reference
 
-import org.opentorah.xml.{Attribute, ContentType, Element, ToXml}
+import org.opentorah.xml.{Attribute, ContentType, Element, ToXml, UnionParsable}
 import scala.xml.{Elem, Node}
 
 final case class Reference(
@@ -35,8 +35,9 @@ object Reference extends ToXml[Reference] {
   final val organizationParsable = new ReferenceParsable(Entity.Organization)
   final val placeParsable = new ReferenceParsable(Entity.Place)
 
-  def all(xml: Node): Seq[Reference] =
-    Seq(personParsable, organizationParsable, placeParsable).flatMap(_.descendants(xml))
+  final val parsable = new UnionParsable[Reference](Seq(
+    personParsable, organizationParsable, placeParsable
+  ))
 
   override def toXml(value: Reference): Elem =
     <name ref={value.ref.orNull} xml:id={value.id.orNull} role={value.role.orNull}>{value.name}</name>

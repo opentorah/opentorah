@@ -7,9 +7,7 @@ import org.xml.sax.InputSource
 import scala.xml.{Elem, XML}
 import zio.IO
 
-sealed abstract class From {
-
-  def name: String
+sealed abstract class From(val name: String) {
 
   def url: Option[URL]
 
@@ -18,11 +16,10 @@ sealed abstract class From {
 
 object From {
 
-  // TODO unfold?
   private final class FromXml(
-    override val name: String,
+    name: String,
     elem: Elem
-  ) extends From {
+  ) extends From(name) {
     override def toString: String = s"From.xml($name)"
     override def url: Option[URL] = None
     override def load: IO[Error, Elem] = IO.succeed(elem)
@@ -30,23 +27,19 @@ object From {
 
   def xml(name: String, elem: Elem): From = new FromXml(name, elem)
 
-  // TODO unfold?
   private final class FromString(
-    override val name: String,
+    name: String,
     string: String
-  ) extends From {
+  ) extends From(name) {
     override def toString: String = s"From.string($name)"
     override def url: Option[URL] = None
-    override def load: IO[Error, Elem] = fromSource(new InputSource(new StringReader(string)))
+    override def load: IO[Error, Elem] = loadFromSource(new InputSource(new StringReader(string)))
   }
 
   def string(name: String, string: String): From = new FromString(name, string)
 
-  // TODO unfold?
-  // TODO add name parameter to From; expand subclasses; rename fromUrl parameter to url.
-  private final class FromUrl(fromUrl: URL) extends From {
+  private final class FromUrl(fromUrl: URL) extends From(Files.nameAndExtension(fromUrl.getPath)._1) {
     override def toString: String = s"From.url($fromUrl)"
-    override def name: String = Files.nameAndExtension(fromUrl.getPath)._1
     override def url: Option[URL] = Some(fromUrl)
     override def load: IO[Error, Elem] = loadFromUrl(fromUrl)
   }
@@ -57,8 +50,10 @@ object From {
 
   def file(directory: File, fileName: String): From = file(new File(directory, fileName + ".xml"))
 
-  // TODO unfold?
-  private final class FromResource(clazz: Class[_], override val name: String) extends From {
+  private final class FromResource(
+    clazz: Class[_],
+    name: String
+  ) extends From(name) {
     override def toString: String = s"From.resource($clazz:$name.xml)"
     override def url: Option[URL] = Option(clazz.getResource(name + ".xml"))
     override def load: IO[Error, Elem] =
@@ -72,9 +67,9 @@ object From {
   def resource(obj: AnyRef): From = resource(obj, Util.className(obj))
 
   private def loadFromUrl(url: URL): IO[Error, Elem] =
-    fromSource(new InputSource(url.openStream()))
+    loadFromSource(new InputSource(url.openStream()))
 
-  private def fromSource(source: InputSource): IO[Error, Elem] =
+  private def loadFromSource(source: InputSource): IO[Error, Elem] =
     Parser.effect(XML.load(source))
 
   // Turns out, it wasn't the parser that eliminated whitespace from the files -

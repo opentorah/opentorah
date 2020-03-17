@@ -5,13 +5,12 @@ import org.scalatest.matchers.should.Matchers
 
 final class XmlTest extends AnyFlatSpec with Matchers {
 
-  //  def parseOrError[A](parser: Parser[A]): Either[Error, A] =
-  //    run(runnable(parser).either)
-
-  // TODO
+//  def parseOrError[A](parser: Parser[A]): Either[Error, A] =
+//    Parser.run(Parser.runnable(parser).either)
+//
 //  "text parsing" should "work" in {
-//    Parser.parseOrError(From.xml(<s><a>asdjkh</a></s>).parse(
-//      Element("a", ContentType.Elements, Text().optional).required)).isLeft shouldBe true
+//    parseOrError(From.xml(<s><a>asdjkh</a></s>).parse(
+//      new Element("a", ContentType.Elements, Text().optional).required)).isLeft shouldBe true
 //    Parser.parseDo(From.xml(<s><a>asdjkh</a></s>).parse(
 //      Element("a", ContentType.Text, Text().required).required)) shouldBe "asdjkh"
 //  }
@@ -20,14 +19,14 @@ final class XmlTest extends AnyFlatSpec with Matchers {
     Parser.run(From.resource(Parser, "1").load)
   }
 
-  // TODO
-//  private val file2parser: Parser[String] =
-//    Element.withName("x", Element("name", ContentType.Text, Text().required).required)
-//
-//  "Include" should "work" in {
-//    Parser.parseDo(From.resource(Parser, "2").parse(
-//      file2parser)) shouldBe "X"
-//    Parser.parseDo(From.resource(Parser, "1").parse(
-//      Parser.withInclude("to", ContentType.Elements, file2parser))) shouldBe "X"
-//  }
+  private val file2parsable: Parsable[String] =
+    new Element("x", ContentType.Elements,
+      new Element("name", ContentType.Text, Text().required).required)
+
+  "Include" should "work" in {
+    Parser.parseDo(file2parsable
+      .parse(From.resource(Parser, "2"))) shouldBe "X"
+    Parser.parseDo(Parsable.withInclude(file2parsable, "to")
+      .parse(From.resource(Parser, "1"))) shouldBe "X"
+  }
 }
