@@ -19,7 +19,7 @@ final class Named(
   def content: Seq[Node] = storeNamed.content
 
   override val references: Seq[Reference] = bindReferences(content.flatMap(element =>
-    org.opentorah.reference.Reference.all(element)))
+    org.opentorah.reference.Reference.parsable.descendants(element)))
 
   override def isNames: Boolean = true
 
@@ -52,9 +52,8 @@ final class Named(
     val bySource: Seq[(String, Seq[Reference])] = usedBy.filterNot(_.source.isNames)
           .groupBy(_.source.collection.reference).toSeq.sortBy(_._1)
 
-    // TODO calculate numbers correctly: dups in "Alexander I"...
-    val numbers: Seq[(String, Int)] =
-      usedBy.groupBy(name).mapValues(_.length).toSeq.sortBy(_._2).reverse
+//    val numbers: Seq[(String, Int)] =
+//      usedBy.groupBy(name).mapValues(_.length).toSeq.sortBy(_._2).reverse
 //    <p rendition="usage">
 //      {for ((name, number) <- numbers) yield <l>{s"$name ($number)"}</l>}
 //    </p>
