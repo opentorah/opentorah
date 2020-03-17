@@ -5,7 +5,6 @@ import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, From, Parser}
 import org.opentorah.judaica.tanach.{Custom, Parsha, Tanach, WithBookSpans}
 import zio.ZIO
-import scala.xml.Elem
 
 final case class Haftarah private(override val spans: Seq[Haftarah.BookSpan])
   extends Haftarah.Spans(spans)
@@ -42,16 +41,14 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
     Collections.mapValues(result.toMap)(_._2)
   }
 
-  // TODO rework to avoid peeking at the name of the next nested element
   def parser(full: Boolean): Parser[Customs] = for {
     span <- spanParser
-    hasParts <- Element.nextNameIs("part")
-    parts <- if (!hasParts) ZIO.none else partsParser(span).map(Some(_))
-    hasCustom <- Element.nextNameIs("custom")
-    customs <- new Element[(Set[Custom], Haftarah)]("custom", parser = customParser(span)).all
-      .map(customs => Custom.Of(customs, full = false))
+    parts <- partParsable(span).all
+    parts <- if (parts.isEmpty) ZIO.none else partsParser(parts).map(Some(_))
+    customsElements <- new Element[(Set[Custom], Haftarah)]("custom", parser = customParser(span)).all
+    customs = Custom.Of(customsElements, full = false)
   } yield {
-    val common: Option[Haftarah] = if (!hasParts && !hasCustom) Some(oneSpan(span)) else parts
+    val common: Option[Haftarah] = if (parts.isEmpty && customsElements.isEmpty) Some(oneSpan(span)) else parts
 
     val result = common.fold(customs.customs) { common =>
       require(customs.find(Custom.Common).isEmpty)
@@ -66,15 +63,16 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
   private def customParser(ancestorSpan: BookSpanParsed): Parser[(Set[Custom], Haftarah)] = for {
     n <- Attribute("n").required
     bookSpanParsed <- spanParser.map(_.inheritFrom(ancestorSpan))
-    hasParts <- Element.nextNameIs("part")
-    result <- if (!hasParts) ZIO.succeed[Haftarah](oneSpan(bookSpanParsed)) else partsParser(bookSpanParsed)
+    parts <- partParsable(bookSpanParsed).all
+    result <- if (parts.isEmpty) ZIO.succeed[Haftarah](oneSpan(bookSpanParsed)) else partsParser(parts)
   } yield Custom.parse(n) -> result
 
-  private def partsParser(ancestorSpan: BookSpanParsed): Parser[Haftarah] = for {
-    parts <- new Element[WithNumber[BookSpan]](
-      elementName = "part",
-      parser = WithNumber.parse(spanParser.map(_.inheritFrom(ancestorSpan).resolve))
-    ).all
+  private def partParsable(ancestorSpan: BookSpanParsed) = new Element[WithNumber[BookSpan]](
+    elementName = "part",
+    parser = WithNumber.parse(spanParser.map(_.inheritFrom(ancestorSpan).resolve))
+  )
+
+  private def partsParser(parts: Seq[WithNumber[BookSpan]]): Parser[Haftarah] = for {
     _ <- WithNumber.checkConsecutiveNg(parts, "part")
     _ <- Parser.check(parts.length > 1, "too short")
   } yield Haftarah(WithNumber.dropNumbers(parts))

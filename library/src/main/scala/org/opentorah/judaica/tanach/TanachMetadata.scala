@@ -54,7 +54,8 @@ object TanachMetadata {
     val metadatas: Seq[TanachBookMetadata.Parsed] = Metadata.load(
       from = From.resource(Tanach),
       elementName = "book",
-      parser = Parser.withInclude(bookParser)
+      parser = bookParser,
+      withInclude = true
     )
 
     // TODO check that there is only one name (default) for the Chumash book and that it is among the names of its first parsha

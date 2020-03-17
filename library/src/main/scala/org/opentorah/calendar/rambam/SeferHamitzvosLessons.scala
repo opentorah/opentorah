@@ -1,7 +1,7 @@
 package org.opentorah.calendar.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Attribute, ContentType, From, Parsable, Parser}
+import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, UnionParsable}
 
 object SeferHamitzvosLessons {
 
@@ -48,19 +48,14 @@ object SeferHamitzvosLessons {
     result
   }
 
+  private val partParsable: Parsable[Part] = new UnionParsable[Part](Seq(
+    new Element("positive", parser = Attribute("n").positiveInt.required.map(new Positive(_))),
+    new Element("negative", parser = Attribute("n").positiveInt.required.map(new Negative(_))),
+    new Element("named", parser = Names.parser.map(new NamedPart(_)))
+  ))
+
   private def lessonParser: Parser[Lesson] = for {
     number <- Attribute("n").positiveInt.required
-    parts <- Part.allMustBe
+    parts <- partParsable.allMustBe
   } yield new Lesson(number, parts)
-
-  object Part extends Parsable[Part] {
-    override def contentType: ContentType = ContentType.Elements
-
-    override def name2parser(elementName: String): Option[Parser[Part]] = elementName match {
-      case "positive" => Some(Attribute("n").positiveInt.required.map(new Positive(_)))
-      case "negative" => Some(Attribute("n").positiveInt.required.map(new Negative(_)))
-      case "named" => Some(Names.parser.map(new NamedPart(_)))
-      case _ => None
-    }
-  }
 }

@@ -8,7 +8,7 @@ import scala.xml.Elem
 trait ParseTorahRaw { self: WithNames =>
 
   final def parseTorah(element: Elem): Torah =
-    Parser.parseDo(From.xml("Torah", element).parse(TorahParsable))
+    Parser.parseDo(TorahParsable.parse(From.xml("Torah", element)))
 
   private object TorahParsable extends Element[Torah](
     elementName = "torah",

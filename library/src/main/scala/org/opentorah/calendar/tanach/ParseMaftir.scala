@@ -7,13 +7,12 @@ import scala.xml.Elem
 
 trait ParseMaftir { self: WithNames =>
 
-  final lazy val maftir: Torah.Maftir =
-    Parser.parseDo(From.xml("Maftir", maftirElement)
-      .parse(new Element[Torah.BookSpan](
-        elementName = "maftir",
-        parser = Torah.spanParser.map(_.resolve.from(this))
-      ))
-    )
+  final lazy val maftir: Torah.Maftir = Parser.parseDo(
+    new Element[Torah.BookSpan](
+      elementName = "maftir",
+      parser = Torah.spanParser.map(_.resolve.from(this))
+    ).parse(From.xml("Maftir", maftirElement))
+  )
 
   protected def maftirElement: Elem
 }
