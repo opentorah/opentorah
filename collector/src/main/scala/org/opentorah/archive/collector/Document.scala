@@ -1,23 +1,34 @@
 package org.opentorah.archive.collector
 
+import java.net.URL
+import org.opentorah.metadata.{LanguageSpec, Name, Names}
 import org.opentorah.reference.{Entity, Reference}
-import org.opentorah.store.Path
+import org.opentorah.store.{By, Nameds, Path, Selector}
 import org.opentorah.tei.Tei
 import scala.xml.Node
 
 final class Document(
-  val path: Path,
-  collection: Collection,
+  val url: URL,
+  val pageType: Page.Type,
   val tei: Tei,
   val name: String,
-  // TODO move prev and next out of here
-  val prev: Option[String],
-  val next: Option[String],
   val translations: Seq[String]
-) {
-  override def toString: String = s"$collection:$name"
+) extends org.opentorah.store.Store {
 
-  val references: Seq[Reference] = tei.references.map(_.at(path))
+  override def toString: String = name
+
+  override def names: Names = new Names(Seq(new Name(name, LanguageSpec.empty)))
+
+  override def selectors: Seq[Selector] = Seq.empty
+
+  override def nameds: Option[Nameds] = None
+
+  override def by: Option[By] = None
+
+  override def references(at: Path): Seq[Reference] = tei.references.map(_.at(at))
+
+  def addressee: Option[Reference] =
+    references(Path.empty).find(name => (name.entity == Entity.Person) && name.role.contains("addressee"))
 
   val title: Option[Seq[Node]] = tei.titleStmt.titles.headOption.map(_.content)
 
@@ -32,11 +43,8 @@ final class Document(
 
   def language: Option[String] = tei.languages.map(_.ident).headOption
 
-  val pages: Seq[Page] = for (pb <- tei.pbs) yield collection.pageType(
+  val pages: Seq[Page] = for (pb <- tei.pbs) yield pageType(
     n = pb.n,
     facs = pb.facs
   )
-
-  def addressee: Option[Reference] =
-    references.find(name => (name.entity == Entity.Person) && name.role.contains("addressee"))
 }
