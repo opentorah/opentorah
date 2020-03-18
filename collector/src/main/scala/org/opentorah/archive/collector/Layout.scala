@@ -10,51 +10,28 @@ final class Layout(val docs: File) {
 
   private def store(fileName: String): File = new File(store, fileName)
 
-  val indexFileName: String = "index"
-  val collectionsFileName: String = "collections"
+  val collections: File = docs(Layout.collectionsDirectoryName)
 
-  // TODO Note: also hard-coded in 'index.xml'!
-  private val collectionsDirectoryName: String = "collections"
+  val storeCollections: File = store(Layout.collectionsDirectoryName)
 
-  val collections: File = docs(collectionsDirectoryName)
+  private def url(ref: String): String = s"/${Layout.collectionsDirectoryName}/$ref"
 
-  val storeCollections: File = store(collectionsDirectoryName)
+  val namesDirectory: File = docs(Layout.namesDirectoryName)
 
-  private def url(ref: String): String = s"/$collectionsDirectoryName/$ref"
-
-  val namesDirectoryName: String = "names"
-
-  val namesDirectory: File = docs(namesDirectoryName)
-
-  val storeNamesDirectory: File = store(namesDirectoryName)
+  val storeNamesDirectory: File = store(Layout.namesDirectoryName)
 
   val namesFileDirectory: File = docs
 
-  val namesFileName: String = "names"
+  def namedUrl(id: String): String = s"/${Layout.namesDirectoryName}/$id.html"
 
-  val namesListsFileName: String = "names-lists"
-
-  val namesUrl: String = s"/$namesFileName.html"
-
-  def namedUrl(id: String): String = s"/$namesDirectoryName/$id.html"
-
-  def namedInTheListUrl(id: String): String = s"/$namesFileName.html#$id"
-
-  val collectionFileName: String = "collection"
+  def namedInTheListUrl(id: String): String = s"/${Layout.namesFileName}.html#$id"
 
   // TODO abstract out collectionIndexFileName: String = "index"; mention hard-coded instances.
   def collectionUrl(name: String): String = url(s"$name/index.html")
 
-  // TODO Note: also hard-coded in _layouts/tei.html!
-  val facsDirectoryName: String = "facs" // facsimile viewers
+  def facs(collectionDirectory: File): File = new File(collectionDirectory, Layout.facsDirectoryName)
 
-  val documentsDirectoryName: String = "documents"
-
-  def facs(collectionDirectory: File): File = new File(collectionDirectory, facsDirectoryName)
-
-  val teiDirectoryName: String = "tei"
-
-  def tei(collectionDirectory: File): File = new File(collectionDirectory, teiDirectoryName)
+  def tei(collectionDirectory: File): File = new File(collectionDirectory, Layout.teiDirectoryName)
 
   private val docsDirectoryName: String = "documents" // wrappers for TEI XML
 
@@ -68,4 +45,29 @@ final class Layout(val docs: File) {
   val reportsDirectory: File = docs("reports")
 
   def reportFile(name: String) = new File(reportsDirectory, name + ".md")
+}
+
+object Layout {
+  val indexFileName: String = "index"
+  val collectionsFileName: String = "collections"
+
+  // TODO Note: also hard-coded in 'index.xml'!
+  private val collectionsDirectoryName: String = "collections"
+
+  val namesDirectoryName: String = "names"
+
+  val namesFileName: String = "names"
+
+  val namesListsFileName: String = "names-lists"
+
+  val namesUrl: String = s"/$namesFileName.html"
+
+  val collectionFileName: String = "collection"
+
+  // TODO Note: also hard-coded in _layouts/tei.html!
+  val facsDirectoryName: String = "facs" // facsimile viewers
+
+  val documentsDirectoryName: String = "documents"
+
+  val teiDirectoryName: String = "tei"
 }

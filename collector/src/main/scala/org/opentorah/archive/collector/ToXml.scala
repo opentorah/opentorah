@@ -1,21 +1,11 @@
 package org.opentorah.archive.collector
 
-import org.opentorah.archive.collector.selectors.{CollectionSelector, NameSelector, NamesSelector}
 import org.opentorah.metadata.Language
 import org.opentorah.reference.{Name, Named, NamesList, Reference}
 import org.opentorah.util.Collections
-
 import scala.xml.Elem
 
-object NamedToXml {
-
-  // TODO collapse into the underlying - but provide a way to make id undefined...
-  def toXml(value: Named): Elem =
-    <named role={value.role.orNull}>
-      {for (name <- value.names) yield Name.toXml(name)}
-      {value.content}
-    </named>
-      .copy(label = value.entity.element)
+object ToXml {
 
   def toXml(
     value: NamesList,
@@ -23,18 +13,12 @@ object NamedToXml {
   ): Elem =
     <list xml:id={value.id} role={value.role.orNull}>
       <head>{value.head}</head>
-      {for (named <- value.nameds) yield toListXml(named, namedUrl)}
+      {for (named <- value.nameds) yield {
+      val url: String = namedUrl(named.path.last.selectedName(Language.English.toSpec)) //namedUrl(id)
+      <l><ref target={url} role="namesViewer">{Name.toXml(named.names.head)}</ref></l>
+    }}
     </list>
       .copy(label = value.entity.listElement)
-
-  // TODO unfold
-  def toListXml(
-    value: Named,
-    namedUrl: String => String
-  ): Elem = {
-    val url: String = namedUrl(value.path.last.selectedName(Language.English.toSpec)) //namedUrl(id)
-    <l><ref target={url} role="namesViewer">{Name.toXml(value.names.head)}</ref></l>
-  }
 
   def toXml(
     value: Named,
@@ -45,13 +29,14 @@ object NamedToXml {
   ): Elem = {
     def sources(viewer: String, references: Seq[Reference]): Seq[Elem] =
       for (source <- Collections.removeConsecutiveDuplicates(references.map(_.source))) yield {
+        // TODO move and reuse
         val name = source.last.selectedName(Language.Russian.toSpec)
         val collectionLike = source.init.last
 
         val url =
-          if (collectionLike.getSelector == NamesSelector)
+          if (collectionLike.getSelector == Selectors.Names)
             namedUrl(source.last.selectedName(Language.English.toSpec))
-          else if (collectionLike.getSelector == CollectionSelector)
+          else if (collectionLike.getSelector == Selectors.Collection)
             documentUrl(
               collectionLike.selectedName(Language.English.toSpec),
               source.last.selectedName(Language.English.toSpec))
@@ -71,7 +56,7 @@ object NamedToXml {
     //      .filterNot(_.isEmpty).mkString(" ")
 
     def isFromNames(reference: Reference): Boolean =
-      reference.source.last.getSelector == NameSelector
+      reference.source.last.getSelector == Selectors.Name
 
     val usedBy: Seq[Reference] = references.filter(_.ref.contains(value.id.get))
     val fromNames: Seq[Reference] = usedBy.filter(isFromNames)
