@@ -28,8 +28,10 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
   private lazy val haftarah: Map[Parsha, Customs] = {
     val metadatas: Seq[(String, Customs)] = Metadata.load(
       from = From.resource(this),
-      elementName = "week",
-      parser = Names.withDefaultName(parser(true))
+      elementParsable = new Element(
+        elementName = "week",
+        parser = Names.withDefaultName(parser(true))
+      )
     )
 
     val result: Seq[(Parsha, (String, Customs))] = Metadata.bind(

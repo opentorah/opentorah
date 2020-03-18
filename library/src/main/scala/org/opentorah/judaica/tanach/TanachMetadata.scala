@@ -3,7 +3,7 @@ package org.opentorah.judaica.tanach
 import Tanach.TanachBook
 import org.opentorah.metadata.{Metadata, Names}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{From, Parser}
+import org.opentorah.xml.{Element, From, Parsable, Parser}
 import zio.IO
 
 object TanachMetadata {
@@ -53,9 +53,7 @@ object TanachMetadata {
   private def parse: Parsed = {
     val metadatas: Seq[TanachBookMetadata.Parsed] = Metadata.load(
       from = From.resource(Tanach),
-      elementName = "book",
-      parser = bookParser,
-      withInclude = true
+      elementParsable = Parsable.withInclude(new Element(elementName = "book", parser = bookParser))
     )
 
     // TODO check that there is only one name (default) for the Chumash book and that it is among the names of its first parsha
