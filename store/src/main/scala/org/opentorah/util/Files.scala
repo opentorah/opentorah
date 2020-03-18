@@ -1,6 +1,7 @@
 package org.opentorah.util
 
 import java.io.{BufferedWriter, File, FileWriter}
+import java.net.URL
 import scala.io.Source
 
 object Files {
@@ -41,23 +42,18 @@ object Files {
     result
   }
 
-  def splice(file: File, start: String, end: String, what: Seq[String]): Unit = {
-    println(s"Splicing ${file.getName}.")
-    write(file, splice(read(file), start, end, what).mkString("\n"))
-  }
-
-  private def splice(lines: Seq[String], start: String, end: String, what: Seq[String]): Seq[String] = {
-    val (prefix, tail) = lines.span(_ != start)
-    if (tail.isEmpty) lines else {
-      val (_, suffix) = tail.tail.span(_ != end)
-      if (suffix.isEmpty) lines else {
-        prefix ++ Seq(start) ++ what ++ suffix
-      }
-    }
-  }
-
   def deleteFiles(directory: File): Unit = {
     directory.mkdirs()
     for (file <- directory.listFiles()) file.delete()
   }
+
+  def url2file(url: URL): File = java.nio.file.Paths.get(url.toURI).toFile
+
+  def file2url(file: File): URL = file.toURI.toURL
+
+  def subdirectory(url: URL, subdirectoryName: String): URL = new URL(url, subdirectoryName + "/")
+
+  def fileInDirectory(url: URL, fileName: String): URL = new URL(url, fileName)
+
+  def isFile(url: URL): Boolean = url.getProtocol == "file"
 }

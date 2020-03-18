@@ -1,71 +1,25 @@
 package org.opentorah.store
 
-import java.io.File
 import org.opentorah.metadata.Names
-import org.opentorah.xml.{Attribute, Element, From, Parser}
-import scala.xml.Elem
+import org.opentorah.reference.Reference
 
-sealed trait Store {
+// TODO pass in selectorsFromAbove
+trait Store {
   def names: Names
+
+  def selectors: Seq[Selector]
+
+  final def selectorByName(name: String): Selector =
+    selectors.find(_.names.hasName(name)).get
+
+  def nameds: Option[Nameds]
+
   def by: Option[By]
-}
 
-final class BaseStore(
-  override val names: Names,
-  selectors: Seq[Selector],
-  baseBy: By
-) extends Store {
-  override def by: Option[By] = Some(baseBy)
-}
-
-final class TextStore(
-  name: String,
-  url: String
-) extends Store {
-  private var textCache: Option[Elem] = None
-
-  def text: Elem = {
-    if (textCache.isEmpty) textCache = Some(Parser.run(From.file(new File(url), s"$name.xml").load))
-    textCache.get
+  // TODO overriden in Named
+  def references(at: Path): Seq[Reference] = {
+    val fromNameds: Seq[Reference] = nameds.toSeq.flatMap(_.references(at))
+    val fromBy: Seq[Reference] = by.toSeq.flatMap(_.references(at))
+    (fromNameds ++ fromBy).filterNot(_.name == scala.xml.Text("?")) // TODO get rid of the filter
   }
-
-  override def names: Names = ??? // TODO based on name
-  override def by: Option[By] = None // TODO internal structure of the text (pages, chapters...)
-}
-
-object Store {
-
-//  def parser(inheritedSelectors: Set[Selector]): Parser[Store] = Element.withName("store", for {
-//    names <- Names.withDefaultNameParser
-//    selectors <- Element("selector",  Selector.parser).all
-//    _ = println(names)
-//    _ = println(selectors)
-//    by <- Element("by", byParser(inheritedSelectors ++ selectors.toSet)).required
-//  } yield new BaseStore(
-//    names,
-//    selectors,
-//    by
-//  ))
-//
-//  val textsParser: Parser[String] = for {
-//    url <- Attribute("url").required
-//  } yield url
-//
-//  // TODO allow 'by' to be named in-line
-//  def byParser(selectors: Set[Selector]): Parser[By] = for {
-//    n <- Attribute("n").required
-//    selector = selectorByName(selectors, n)
-//    texts <- Element("texts", textsParser).optional
-//    stores <- Element("store", parser(selectors)).all
-//    _ <- Parser.check(texts.nonEmpty || stores.nonEmpty, "Both 'stores' and 'texts' elements are absent.")
-//    _ <- Parser.check(texts.isEmpty || stores.isEmpty, "Both 'stores' and 'texts' elements are present.")
-//  } yield {
-//    if (selector.isEmpty) throw new IllegalArgumentException(s"Selector not found: $n")
-//    if (texts.isDefined) new TextsBy(selector.get, texts.get) else new BaseBy(selector.get, stores)
-//  }
-//
-//  def selectorByName(selectors: Set[Selector], name: String): Option[Selector] = {
-//    val result = selectors.find(_.names.hasName(name))
-//    result
-//  }
 }

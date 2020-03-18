@@ -1,25 +1,40 @@
 package org.opentorah.reference
 
-import java.io.File
-import org.opentorah.store.Path
+import java.net.URL
+import org.opentorah.metadata.{Language, Names}
+import org.opentorah.store.{By, FilesList, Nameds, Path, Selector, Store}
 import org.opentorah.util.Files
 import org.opentorah.xml.{Attribute, ContentType, Element, From, Parsable, Parser, ToXml, XmlUtil}
 import scala.xml.{Elem, Node}
 
 final case class Named private(
-  path: Path,
-  id: Option[String],
+  url: Option[URL],
+  id: Option[String], // TODO make id non-optional and provide toXml() flavour that drops id.
   entity: Entity,
   role: Option[String],
-  names: Seq[Name],
+  namedNames: Seq[Name],
   content: Seq[Node]
-) {
-  def name: String = names.head.name
+) extends Store {
 
-  def at(path: Path): Named = copy(path = path ++ this.path)
+  def name: String = namedNames.head.name
 
-  def references: Seq[Reference] =
-    content.flatMap(element => Reference.parsable.descendants(element)).map(_.at(path))
+  override def names: Names = {
+    val russianName = name
+    val englishName = id.get
+    new Names(
+      Seq(org.opentorah.metadata.Name(russianName, Language.Russian)) ++
+      (if (englishName == russianName) Seq.empty else Seq(org.opentorah.metadata.Name(englishName, Language.English)))
+    )
+  }
+
+  override def selectors: Seq[Selector] = Seq.empty
+
+  override def nameds: Option[Nameds] = None
+
+  override def by: Option[By] = None
+
+  override def references(at: Path): Seq[Reference] =
+    content.flatMap(element => Reference.parsable.descendants(element)).map(_.at(at))
 }
 
 object Named extends Parsable[Named] with ToXml[Named] {
@@ -37,7 +52,7 @@ object Named extends Parsable[Named] with ToXml[Named] {
     _ <- Parser.check(names.nonEmpty, s"No names in $id")
     content <- Element.allNodes
   } yield new Named(
-    Path.empty,
+    url = None,
     id,
     entity,
     role,
@@ -45,21 +60,32 @@ object Named extends Parsable[Named] with ToXml[Named] {
     content = content.map(XmlUtil.removeNamespace),
   )
 
-  def readAll(directory: File): Seq[Named] = Parser.parseDo(Parser.collectAll(
-    for {
-      fileName <- Files.filesWithExtensions(directory, extension = "xml").sorted
-    } yield checkId(fileName, Named.parse(From.file(directory, fileName)))
-  ))
+  def parseAll(baseUrl: URL, directory: String, list: String): Parser[Seq[Named]] = {
+    val directoryUrl = Files.subdirectory(baseUrl, directory)
+    val fileNames: Seq[String] = FilesList.filesWithExtensions(
+      directoryUrl,
+      Files.fileInDirectory(baseUrl, list),
+      extension = "xml"
+    )
 
-  private def checkId(fileName: String, parser: Parser[Named]): Parser[Named] = for {
-    result <- parser
-    _ <- Parser.check(result.id.isEmpty || result.id.contains(fileName),
-      s"Incorrect id: ${result.id.get} instead of $fileName")
-  } yield result.copy(id = Some(fileName))
+    Parser.collectAll(
+      for (fileName <- fileNames) yield {
+        val url: URL = Files.fileInDirectory(directoryUrl, fileName + ".xml")
+        for {
+          result <- Named.parse(From.url(url))
+          _ <- Parser.check(result.id.isEmpty || result.id.contains(fileName),
+            s"Incorrect id: ${result.id.get} instead of $fileName")
+        } yield result.copy(
+          url = Some(url),
+          id = Some(fileName)
+        )
+      }
+    )
+  }
 
   override def toXml(value: Named): Elem = {
     <elem id={value.id.orNull} role={value.role.orNull}>
-      {value.names.map(Name.toXml)}
+      {value.namedNames.map(Name.toXml)}
       {value.content}
     </elem>
       .copy(label = value.entity.element)

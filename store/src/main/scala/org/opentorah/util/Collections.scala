@@ -52,4 +52,19 @@ object Collections {
   def mapValues[A, B, C](map: Map[A, B])(f: B => C): Map[A, C] =
   // map.view.mapValues(f).toMap // Scala 2.13
     map.mapValues(f) // Scala 2.12
+
+  // where is this in the standard library?
+  def compare(a: Option[String], b: Option[String]): Int = {
+    if (a.isEmpty && b.isEmpty) 0
+    else if (a.isEmpty) -1
+    else if (b.isEmpty) 1
+    else a.get.compare(b.get)
+  }
+
+  def prevAndNext[A](as: Seq[A]): Seq[(A, (Option[A], Option[A]))] = if (as.isEmpty) Seq.empty else {
+    val options: Seq[Option[A]] = as.map(Some(_))
+    val prev = None +: options.init
+    val next = options.tail :+ None
+    as.zip(prev.zip(next))
+  }
 }

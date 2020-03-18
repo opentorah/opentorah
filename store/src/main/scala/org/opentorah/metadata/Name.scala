@@ -21,4 +21,10 @@ object Name extends Element[Name](
     name = n.orElse(characters)
     languageSpec <- LanguageSpec.parser
   } yield new Name(name.get, languageSpec)
-)
+) {
+  def apply(name: String, language: Language): Name =
+    new Name(name, language.toSpec)
+
+  def apply(name: String): Name =
+    new Name(name, LanguageSpec.empty)
+}

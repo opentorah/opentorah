@@ -16,6 +16,6 @@ final class TeiTest extends AnyFlatSpec with Matchers {
       Named.parse(From.resource(Tei, "Баал_Шем_Тов")))
 
     result.role shouldBe Some("jew")
-    result.names.head.name shouldBe "Израиль из Мезбича"
+    result.name shouldBe "Израиль из Мезбича"
   }
 }

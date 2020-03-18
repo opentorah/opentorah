@@ -3,10 +3,11 @@ package org.opentorah.store
 import org.opentorah.metadata.{LanguageSpec, Names}
 
 sealed trait Binding {
+
   def selectedName(languageSpec: LanguageSpec): String = this match {
     case Binding.Named(_, names) => names.doFind(languageSpec).name
     case Binding.Numbered(_, number) => number.toString
-    case Binding.Nullary(selector) => selector.names.name
+    case Binding.Nullary(selector) => selector.names.doFind(languageSpec).name
   }
 
   def getSelector: Selector = this match {
