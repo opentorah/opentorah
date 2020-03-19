@@ -1,15 +1,12 @@
 package org.opentorah.archive.collector
 
 import java.io.File
-
-import org.opentorah.archive.collector.selectors.NamesSelector
 import org.opentorah.metadata.Language
-import org.opentorah.reference.{Named, Reference}
+import org.opentorah.reference.{Named, NamesList, Reference}
 import org.opentorah.store.{Binding, Path}
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
 import org.opentorah.xml.{Element, From, PaigesPrettyPrinter, Parser, Text, XmlUtil}
-
 import scala.xml.{Elem, Node}
 
 object Main {
@@ -19,23 +16,22 @@ object Main {
     println(s"docs: $docs")
     val layout: Layout = new Layout(docs)
 
-    val collections: Seq[Collection] = for {
-      directory <- layout.storeCollections.listFiles.toSeq.filter(_.isDirectory)
-    } yield {
-      // Read from 'docs/store/collections'
-      val sourceDirectory: File =
-        new File(layout.storeCollections, directory.getName)
-      Parser.parseDo(
-        Collection.parsable(layout, sourceDirectory).parse(From.file(directory, layout.collectionFileName))
-      )
+    val collectionNames: Seq[String] = Parser.parseDo(
+      new Element("collections", parser = Text("collection").allMustBe)
+        .parse(From.file(layout.store, "collections")))
+
+    val collections: Seq[Collection] = for (collectionName <- collectionNames) yield {
+      Parser.parseDo(Collection.parse(
+        collectionName,
+        from = From.file(layout.storeCollections, collectionName)
+      ))
     }
 
     for (collection <- collections; document <- collection.documents) {
-      // Pretty-print to 'docs/store/collections'.
+      // Pretty-print TEI files.
       // TODO do translations also!
       writeXml(
-        layout.tei(new File(layout.storeCollections, collection.directoryName)),
-        document.name,
+        Files.toFile(document.url),
         Tei.toXml(document.tei)
       )
 
@@ -71,12 +67,12 @@ object Main {
 
     println("Pretty-printing names")
     for (named <- names.nameds)
-      writeXml(layout.storeNamesDirectory, named.id.get, NamedToXml.toXml(named))
+      writeXml(layout.storeNamesDirectory, named.id.get, Named.toXml(named.copy(id = None)))
 
     writeNamesList(
       names,
       directory = layout.namesFileDirectory,
-      fileName = layout.namesFileName,
+      fileName = Layout.namesFileName,
       namedUrl = layout.namedUrl,
       namedInTheListUrl = layout.namedInTheListUrl
     )
@@ -149,9 +145,9 @@ object Main {
         document,
         docsDirectory,
         facsDirectory,
-        layout.teiDirectoryName,
-        layout.facsDirectoryName,
-        layout.documentsDirectoryName
+        Layout.teiDirectoryName,
+        Layout.facsDirectoryName,
+        Layout.documentsDirectoryName
       )
     }
 
@@ -183,24 +179,21 @@ object Main {
   private def readNames(layout: Layout): Names = {
     println("Reading names.")
 
-    val parsable = new Element[(String, Seq[org.opentorah.reference.NamesList])](
+    val parsable = new Element[(String, Seq[NamesList])](
       elementName = "names",
       parser = for {
         head <- Text("head").required
-        listDescriptors <- org.opentorah.reference.NamesList.all
+        listDescriptors <- NamesList.all
       } yield (head, listDescriptors)
     )
 
-    val (listsHead: String, storeNamesLists: Seq[org.opentorah.reference.NamesList]) =
-      Parser.parseDo(parsable.parse(From.file(layout.store, layout.namesListsFileName)))
+    val (listsHead: String, storeNamesLists: Seq[NamesList]) =
+      Parser.parseDo(parsable.parse(From.file(layout.store, Layout.namesListsFileName)))
 
     new Names(
-      path = new Path(Seq(Binding.Nullary(NamesSelector))),
-      storeNameds = org.opentorah.reference.Named.readAll(layout.storeNamesDirectory),
-      storeNamesLists,
-      namedUrl = layout.namedUrl,
-      namedInTheListUrl = layout.namedInTheListUrl,
-      documentUrl = layout.documentUrl
+      path = new Path(Seq(Binding.Nullary(Selectors.Names))),
+      storeNameds = Named.readAll(layout.storeNamesDirectory),
+      storeNamesLists
     )
   }
 
@@ -216,14 +209,14 @@ object Main {
       directory,
       fileName = named.id.get,
       head = None,
-      content = Seq(NamedToXml.toXml(named, references, layout.namedUrl, layout.namedInTheListUrl, layout.documentUrl)),
+      content = Seq(ToXml.toXml(named, references, layout.namedUrl, layout.namedInTheListUrl, layout.documentUrl)),
       target = "namesViewer"
     )
   }
 
   private def writeIndex(collections: Seq[Collection], layout: Layout): Unit = writeTei(
     directory = layout.docs,
-    fileName = layout.indexFileName,
+    fileName = Layout.indexFileName,
     head = Some(scala.xml.Text("Дела")),
     content = <list type="bulleted">{for (collection <- collections.filter(_.publish)) yield toXml(collection, layout)}</list>,
     target = "collectionViewer",
@@ -234,7 +227,7 @@ object Main {
     val byArchive: Map[String, Seq[Collection]] = collections.groupBy(_.archive.getOrElse(""))
     writeTei(
       directory = layout.docs,
-      fileName = layout.collectionsFileName,
+      fileName = Layout.collectionsFileName,
       head = Some(scala.xml.Text("Архивы")),
       content = <list>{
         for (archive <- byArchive.keys.toList.sorted) yield {
@@ -275,7 +268,7 @@ object Main {
       directory = directory,
       fileName = fileName,
       head = Some(scala.xml.Text(names.path.reference(Language.Russian.toSpec))),
-      content = listOfLists ++ nonEmptyLists.flatMap(NamedToXml.toXml(_, namedUrl)),
+      content = listOfLists ++ nonEmptyLists.flatMap(ToXml.toXml(_, namedUrl)),
       target = "namesViewer"
     )
   }
@@ -379,8 +372,16 @@ object Main {
     directory: File,
     fileName: String,
     elem: Elem
-  ): Unit = Files.write(
+  ): Unit = writeXml(
     file = new File(directory, fileName + ".xml"),
+    elem
+  )
+
+  private def writeXml(
+    file: File,
+    elem: Elem
+  ): Unit = Files.write(
+    file,
     content = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" + render(elem) + "\n"
   )
 

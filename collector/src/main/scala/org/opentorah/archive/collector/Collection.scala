@@ -1,59 +1,43 @@
 package org.opentorah.archive.collector
 
 import java.io.File
-import org.opentorah.archive.collector.selectors.{CollectionSelector, DocumentSelector}
-import org.opentorah.metadata.{Language, Name}
+import java.net.URL
+import org.opentorah.metadata.Language
 import org.opentorah.reference.Reference
-import org.opentorah.store.{Binding, Path}
+import org.opentorah.store.Path
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
 import org.opentorah.xml.{Attribute, Element, From, Parser, RawXml, Text, XmlUtil}
 import Table.Column
 import scala.xml.{Elem, Node}
 
+// TODO add toXml and pretty-print collection descriptors;
+// TODO fish references out of the collection descriptors too!
 final class Collection private(
+  val url: URL,
   val path: Path,
-  layout: Layout,
-  val directoryName: String,
-  sourceDirectory: File,
-  isBook: Boolean,
   val publish: Boolean,
   val archive: Option[String],
   val prefix: Option[String],
   val number: Option[Int],
   val archiveCase: String,
-  titleRaw: Option[Collection.Title.Value],
+  val title: Node,
   val caseAbstract: Collection.Abstract.Value,
   val description: Seq[Node],
-  partDescriptors: Seq[Part.Descriptor]
+  val parts: Seq[Part]
 ) extends Ordered[Collection] {
 
-  override def toString: String = directoryName
-
-  val parts: Seq[Part] = Part.Descriptor.splitParts(partDescriptors, getDocuments(sourceDirectory))
-
-  def title: Node = titleRaw.fold[Node](scala.xml.Text(path.reference(Language.Russian.toSpec)))(title =>
-    <title>{title.xml}</title>)
+  def directoryName: String = path.reference(Language.English.toSpec)
 
   override def compare(that: Collection): Int = {
-    val archiveComparison: Int = compare(archive, that.archive)
+    val archiveComparison: Int = Collections.compare(archive, that.archive)
     if (archiveComparison != 0) archiveComparison else {
-      val prefixComparison: Int = compare(prefix, that.prefix)
+      val prefixComparison: Int = Collections.compare(prefix, that.prefix)
       if (prefixComparison != 0) prefixComparison else {
         number.getOrElse(0).compare(that.number.getOrElse(0))
       }
     }
   }
-
-  // TODO where is this in the standard library?
-  private def compare(a: Option[String], b: Option[String]): Int = {
-    if (a.isEmpty && b.isEmpty) 0
-    else if (a.isEmpty) -1
-    else if (b.isEmpty) 1
-    else a.get.compare(b.get)
-  }
-
-  def pageType: Page.Type = if (isBook) Page.Book else Page.Manuscript
 
   val documents: Seq[Document] = parts.flatMap(_.documents)
 
@@ -84,16 +68,70 @@ final class Collection private(
 //    if (missingImages.nonEmpty)
 //      throw new IllegalArgumentException(s"Missing images: $missingImages")
   }
+}
 
-  private def splitLang(name: String): (String, Option[String]) = {
-    val dash: Int = name.lastIndexOf('-')
-    if ((dash == -1) || (dash != name.length-3)) (name, None)
-    else (name.substring(0, dash), Some(name.substring(dash+1)))
+object Collection {
+
+  object Title extends RawXml("title")
+  object Abstract extends RawXml("abstract")
+  object Notes extends RawXml("notes")
+
+  def parse(
+    collectionName: String,
+    from: From
+  ): Parser[Collection] = new Element[Collection](
+    elementName = "collection",
+    parser = parser(collectionName, from.url.get)
+  ).parse(from)
+
+  private def parser(
+    collectionName: String,
+    url: URL
+  ): Parser[Collection] = for {
+    isBook <- Attribute("isBook").boolean.orFalse
+    publish <- Attribute("publish").boolean.orFalse
+    archive <- Text("archive").optional
+    prefix <- Text("prefix").optional
+    number <- Text("number").int.optional
+    teiUrlString <- Text("tei").optional
+    titleRaw <- Title.parsable.optional
+    caseAbstract <- Abstract.parsable.required
+    notes <- Notes.parsable.optional
+    description = Seq(<span>{caseAbstract.xml}</span>) ++ notes.map(_.xml).getOrElse(Seq.empty)
+    // TODO swap parts and notes; remove notes wrapper element; simplify parts; see how to generalize parts...
+    partDescriptors <- Part.parsable.all
+  } yield {
+    val archiveCase = prefix.getOrElse("") + number.map(_.toString).getOrElse("")
+    val reference: String = archive.fold(archiveCase)(archive => archive + " " + archiveCase)
+
+    val teiUrl: URL = new URL(url, teiUrlString.getOrElse(s"$collectionName/"))
+
+    val path: Path = Selectors.collectionPath(collectionName, reference)
+
+    new Collection(
+      url,
+      path,
+      publish,
+      archive,
+      prefix,
+      number,
+      archiveCase,
+      title = titleRaw.fold[Node](scala.xml.Text(reference))(title => <title>{title.xml}</title>),
+      caseAbstract,
+      description,
+      parts = Part.Descriptor.splitParts(partDescriptors, getDocuments(path, teiUrl, isBook))
+    )
   }
 
-  private def getDocuments(sourceDirectory: File): Seq[Document] = {
+  private def getDocuments(
+    path: Path,
+    teiUrl: URL,
+    isBook: Boolean
+  ): Seq[Document] = {
+    val teiDirectory: File = Files.toFile(teiUrl)
+
     val namesWithLang: Seq[(String, Option[String])] =
-      Files.filesWithExtensions(sourceDirectory, "xml").sorted.map(splitLang)
+      Files.filesWithExtensions(teiDirectory, "xml").sorted.map(splitLang)
 
     val translations: Map[String, Seq[String]] = Collections.mapValues(namesWithLang
       .filter(_._2.isDefined)
@@ -110,66 +148,21 @@ final class Collection private(
     }
 
     for ((name, (prev, next)) <- namesWithSiblings) yield new Document(
-      path = path :+ Binding.Named(DocumentSelector, new org.opentorah.metadata.Names(Seq(
-        new Name(name, Language.Russian.toSpec)
-      ))),
-      collection = this,
-      tei = Parser.parseDo(Tei.parse(From.file(sourceDirectory, name))),
+      url = new URL(teiUrl, name + ".xml"),
+      path = path ++ Selectors.documentPath(name),
+      pageType = if (isBook) Page.Book else Page.Manuscript,
+      tei = Parser.parseDo(Tei.parse(From.file(teiDirectory, name))),
       name,
       prev,
       next,
       translations = translations.getOrElse(name, Seq.empty)
     )
   }
-}
 
-object Collection {
-
-  object Title extends RawXml("title")
-  object Abstract extends RawXml("abstract")
-  object Notes extends RawXml("notes")
-
-  final def parsable(layout: Layout, directory: File): Element[Collection] =
-    new Element[Collection](elementName = "collection", parser = parser(layout, directory))
-
-  private def parser(
-    layout: Layout,
-    directory: File
-  ): Parser[Collection] = for {
-    isBook <- Attribute("isBook").boolean.orFalse
-    publish <- Attribute("publish").boolean.orFalse
-    archive <- Text("archive").optional
-    prefix <- Text("prefix").optional
-    number <- Text("number").int.optional
-    titleRaw <- Title.parsable.optional
-    caseAbstract <- Abstract.parsable.required
-    notes <- Notes.parsable.optional
-    description = Seq(<span>{caseAbstract.xml}</span>) ++ notes.map(_.xml).getOrElse(Seq.empty)
-    // TODO swap parts and notes; remove notes wrapper element; simplify parts; see how to generalize parts...
-    partDescriptors <- Part.parsable.all
-  } yield {
-    val archiveCase = prefix.getOrElse("") + number.map(_.toString).getOrElse("")
-    val reference: String = archive.fold(archiveCase)(archive => archive + " " + archiveCase)
-
-    new Collection(
-      new Path(Seq(Binding.Named(CollectionSelector, new org.opentorah.metadata.Names(Seq(
-        new Name(reference, Language.Russian.toSpec),
-        new Name(directory.getName, Language.English.toSpec)
-      ))))),
-      layout,
-      directoryName = directory.getName,
-      sourceDirectory = layout.tei(directory),
-      isBook,
-      publish,
-      archive,
-      prefix,
-      number,
-      archiveCase,
-      titleRaw,
-      caseAbstract,
-      description,
-      partDescriptors
-    )
+  private def splitLang(name: String): (String, Option[String]) = {
+    val dash: Int = name.lastIndexOf('-')
+    if ((dash == -1) || (dash != name.length-3)) (name, None)
+    else (name.substring(0, dash), Some(name.substring(dash+1)))
   }
 
   def table(documentUrlRelativeToIndex: String => String): Table[Document] = new Table[Document](
