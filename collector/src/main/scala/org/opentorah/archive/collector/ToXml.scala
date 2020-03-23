@@ -1,31 +1,37 @@
 package org.opentorah.archive.collector
 
 import org.opentorah.metadata.Language
-import org.opentorah.reference.{Name, Named, NamesList, Reference}
+import org.opentorah.reference.{Name, Named, NamedsList, Reference}
+import org.opentorah.store.Selector
 import org.opentorah.util.Collections
+import org.opentorah.xml.XmlUtil
 import scala.xml.Elem
 
 object ToXml {
 
-  def toXml(
-    value: NamesList,
-    namedUrl: String => String
-  ): Elem =
+  def toXml(collection: Collection): Elem = {
+    val url = Site.collectionUrl(collection.name)
+    <item>
+      <ref target={url} role="collectionViewer">{collection.reference + ": " + XmlUtil.spacedText(collection.title)}</ref><lb/>
+      <abstract>{collection.caseAbstract.xml}</abstract>
+    </item>
+  }
+
+  def toXml(value: NamedsList): Elem =
     <list xml:id={value.id} role={value.role.orNull}>
       <head>{value.head}</head>
       {for (named <- value.nameds) yield {
-      val url: String = namedUrl(named.path.last.selectedName(Language.English.toSpec)) //namedUrl(id)
-      <l><ref target={url} role="namesViewer">{Name.toXml(named.names.head)}</ref></l>
+      val url: String = Site.namedUrl(named.id.get)
+      <l><ref target={url} role="namesViewer">{Name.toXml(named.namedNames.head)}</ref></l>
     }}
     </list>
       .copy(label = value.entity.listElement)
 
   def toXml(
+    namesSelector: Selector.Nullary,
+    caseSelector: Selector.Named,
     value: Named,
-    references: Seq[Reference],
-    namedUrl: String => String,
-    namedInTheListUrl: String => String,
-    documentUrl: (String, String) => String
+    references: Seq[Reference]
   ): Elem = {
     def sources(viewer: String, references: Seq[Reference]): Seq[Elem] =
       for (source <- Collections.removeConsecutiveDuplicates(references.map(_.source))) yield {
@@ -34,10 +40,10 @@ object ToXml {
         val collectionLike = source.init.last
 
         val url =
-          if (collectionLike.getSelector == Selectors.Names)
-            namedUrl(source.last.selectedName(Language.English.toSpec))
-          else if (collectionLike.getSelector == Selectors.Collection)
-            documentUrl(
+          if (collectionLike.getSelector == namesSelector)
+            Site.namedUrl(source.last.selectedName(Language.English.toSpec))
+          else if (collectionLike.getSelector == caseSelector)
+            Site.documentUrl(
               collectionLike.selectedName(Language.English.toSpec),
               source.last.selectedName(Language.English.toSpec))
           else throw new IllegalArgumentException(s"Wrong selector: $collectionLike")
@@ -56,7 +62,7 @@ object ToXml {
     //      .filterNot(_.isEmpty).mkString(" ")
 
     def isFromNames(reference: Reference): Boolean =
-      reference.source.last.getSelector == Selectors.Name
+      reference.source.init.last.getSelector == namesSelector
 
     val usedBy: Seq[Reference] = references.filter(_.ref.contains(value.id.get))
     val fromNames: Seq[Reference] = usedBy.filter(isFromNames)
@@ -70,18 +76,20 @@ object ToXml {
     //    </p>
 
     <named xml:id={value.id.get} role={value.role.orNull}>
-      {for (name <- value.names) yield Name.toXml(name)}
+      {for (name <- value.namedNames) yield Name.toXml(name)}
       {value.content}
       <p rendition="mentions">
-        <ref target={namedInTheListUrl(value.id.get)} role="namesViewer">[...]</ref>
-        {if (fromNames.isEmpty) Seq.empty else
+        <ref target={Site.namedInTheListUrl(value.id.get)} role="namesViewer">[...]</ref>
+        {if (fromNames.isEmpty) Seq.empty else {
+        val names: String = namesSelector.names.doFind(Language.Russian.toSpec).name
+
         <l>
-          <emph>{fromNames.head.source.init.reference(Language.Russian.toSpec)}:</emph>
+          <emph>{names}:</emph>
           {
           val result = sources("namesViewer", fromNames)
           result.init.map(elem => <span>{elem},</span>) :+ result.last
           }
-        </l>}
+        </l>}}
         {for ((source, references) <- bySource) yield <l><emph>{source}:</emph>{sources("documentViewer", references)}</l>}
       </p>
     </named>

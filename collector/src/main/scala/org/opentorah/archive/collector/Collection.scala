@@ -1,33 +1,54 @@
 package org.opentorah.archive.collector
 
-import java.io.File
 import java.net.URL
-import org.opentorah.metadata.Language
+import org.opentorah.metadata.{Language, Name, Names}
 import org.opentorah.reference.Reference
-import org.opentorah.store.Path
+import org.opentorah.store.{By, FilesList, Nameds, Path, Selector}
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
-import org.opentorah.xml.{Attribute, Element, From, Parser, RawXml, Text, XmlUtil}
-import Table.Column
-import scala.xml.{Elem, Node}
+import org.opentorah.xml.{Attribute, Element, From, Parser, RawXml, Text}
+import scala.xml.Node
 
 // TODO add toXml and pretty-print collection descriptors;
 // TODO fish references out of the collection descriptors too!
 final class Collection private(
   val url: URL,
-  val path: Path,
+  val documentSelector: Selector.Named,
+  val name: String,
   val publish: Boolean,
   val archive: Option[String],
   val prefix: Option[String],
   val number: Option[Int],
   val archiveCase: String,
+  val reference: String,
   val title: Node,
   val caseAbstract: Collection.Abstract.Value,
   val description: Seq[Node],
   val parts: Seq[Part]
-) extends Ordered[Collection] {
+) extends org.opentorah.store.Store with Ordered[Collection] {
 
-  def directoryName: String = path.reference(Language.English.toSpec)
+  override def toString: String = reference
+
+  override def names: Names = new Names(Seq(
+    Name(reference, Language.Russian),
+    Name(name, Language.English)
+  ))
+
+  override def nameds: Option[Nameds] = None
+
+  override def selectors: Seq[Selector] = Seq.empty
+
+  val documents: Seq[Document] = parts.flatMap(_.documents)
+
+  private val byDocument = new By {
+    override def selector: Selector.Named = documentSelector
+
+    override def stores: Seq[org.opentorah.store.Store] = documents
+  }
+
+  override def by: Option[By] = Some(byDocument)
+
+  override def references(at: Path): Seq[Reference] = byDocument.references(at)
 
   override def compare(that: Collection): Int = {
     val archiveComparison: Int = Collections.compare(archive, that.archive)
@@ -38,10 +59,6 @@ final class Collection private(
       }
     }
   }
-
-  val documents: Seq[Document] = parts.flatMap(_.documents)
-
-  def references: Seq[Reference] = documents.flatMap(_.references)
 
   private val pages: Seq[Page] = documents.flatMap(_.pages)
 
@@ -78,22 +95,25 @@ object Collection {
 
   def parse(
     collectionName: String,
+    documentSelector: Selector.Named,
     from: From
   ): Parser[Collection] = new Element[Collection](
     elementName = "collection",
-    parser = parser(collectionName, from.url.get)
+    parser = parser(from.url.get, documentSelector, collectionName)
   ).parse(from)
 
   private def parser(
-    collectionName: String,
-    url: URL
+    url: URL,
+    documentSelector: Selector.Named,
+    collectionName: String
   ): Parser[Collection] = for {
     isBook <- Attribute("isBook").boolean.orFalse
     publish <- Attribute("publish").boolean.orFalse
+    directory <- Attribute("directory").optional
+    list <- Attribute("list").optional
     archive <- Text("archive").optional
     prefix <- Text("prefix").optional
     number <- Text("number").int.optional
-    teiUrlString <- Text("tei").optional
     titleRaw <- Title.parsable.optional
     caseAbstract <- Abstract.parsable.required
     notes <- Notes.parsable.optional
@@ -104,34 +124,36 @@ object Collection {
     val archiveCase = prefix.getOrElse("") + number.map(_.toString).getOrElse("")
     val reference: String = archive.fold(archiveCase)(archive => archive + " " + archiveCase)
 
-    val teiUrl: URL = new URL(url, teiUrlString.getOrElse(s"$collectionName/"))
-
-    val path: Path = Selectors.collectionPath(collectionName, reference)
+    val documents: Seq[Document] = getDocuments(
+      baseUrl = Files.subdirectory(url, directory.getOrElse(s"$collectionName")),
+      list = Files.fileInDirectory(url, list.getOrElse(s"$collectionName-list-generated.xml")),
+      isBook
+    )
 
     new Collection(
       url,
-      path,
+      documentSelector,
+      collectionName,
       publish,
       archive,
       prefix,
       number,
       archiveCase,
+      reference,
       title = titleRaw.fold[Node](scala.xml.Text(reference))(title => <title>{title.xml}</title>),
       caseAbstract,
       description,
-      parts = Part.Descriptor.splitParts(partDescriptors, getDocuments(path, teiUrl, isBook))
+      parts = Part.Descriptor.splitParts(partDescriptors, documents)
     )
   }
 
   private def getDocuments(
-    path: Path,
-    teiUrl: URL,
+    baseUrl: URL,
+    list: URL,
     isBook: Boolean
   ): Seq[Document] = {
-    val teiDirectory: File = Files.toFile(teiUrl)
-
-    val namesWithLang: Seq[(String, Option[String])] =
-      Files.filesWithExtensions(teiDirectory, "xml").sorted.map(splitLang)
+    val fileNames = FilesList.filesWithExtensions(baseUrl, list, "xml")
+    val namesWithLang: Seq[(String, Option[String])] = fileNames.map(splitLang)
 
     val translations: Map[String, Seq[String]] = Collections.mapValues(namesWithLang
       .filter(_._2.isDefined)
@@ -140,76 +162,21 @@ object Collection {
 
     val names: Seq[String] = namesWithLang.filter(_._2.isEmpty).map(_._1)
 
-    val namesWithSiblings: Seq[(String, (Option[String], Option[String]))] = if (names.isEmpty) Seq.empty else {
-      val documentOptions: Seq[Option[String]] = names.map(Some(_))
-      val prev = None +: documentOptions.init
-      val next = documentOptions.tail :+ None
-      names.zip(prev.zip(next))
+    for (name <- names) yield {
+      val url: URL = Files.fileInDirectory(baseUrl, name + ".xml")
+      new Document(
+        url,
+        pageType = if (isBook) Page.Book else Page.Manuscript,
+        tei = Parser.parseDo(Tei.parse(From.url(url))),
+        name,
+        translations = translations.getOrElse(name, Seq.empty)
+      )
     }
-
-    for ((name, (prev, next)) <- namesWithSiblings) yield new Document(
-      url = new URL(teiUrl, name + ".xml"),
-      path = path ++ Selectors.documentPath(name),
-      pageType = if (isBook) Page.Book else Page.Manuscript,
-      tei = Parser.parseDo(Tei.parse(From.file(teiDirectory, name))),
-      name,
-      prev,
-      next,
-      translations = translations.getOrElse(name, Seq.empty)
-    )
   }
 
   private def splitLang(name: String): (String, Option[String]) = {
     val dash: Int = name.lastIndexOf('-')
     if ((dash == -1) || (dash != name.length-3)) (name, None)
     else (name.substring(0, dash), Some(name.substring(dash+1)))
-  }
-
-  def table(documentUrlRelativeToIndex: String => String): Table[Document] = new Table[Document](
-    Column("Описание", "description", { document: Document =>
-      document.description.getOrElse(Seq.empty).map(XmlUtil.removeNamespace)
-    }),
-
-    Column("Дата", "date", { document: Document =>
-      document.date.fold[Seq[Node]](scala.xml.Text(""))(value => scala.xml.Text(value))
-    }),
-
-    Column("Кто", "author", { document: Document =>
-      multi(document.authors.flatMap(_.map(XmlUtil.removeNamespace)))
-    }),
-
-    Column("Кому", "addressee",  _.addressee.fold[Seq[Node]](scala.xml.Text(""))(addressee =>
-      <persName ref={addressee.ref.orNull}>{addressee.name}</persName>)),
-
-    Column("Язык", "language", { document: Document =>
-      val translations: Seq[Elem] = for (translation <- document.translations) yield
-        <ref target={documentUrlRelativeToIndex(document.name + "-" + translation)}
-             role="documentViewer">{translation}</ref>
-
-      Seq(scala.xml.Text(document.language.getOrElse("?"))) ++ translations
-    }),
-
-    Column("Документ", "document", { document: Document =>
-      <ref target={documentUrlRelativeToIndex(document.name)}
-           role="documentViewer">{document.name}</ref>
-    }),
-
-    Column("Страницы", "pages", { document: Document => for (page <- document.pages) yield
-      <ref target={documentUrlRelativeToIndex(document.name) + s"#p${page.n}"}
-           role="documentViewer"
-           rendition={if (page.isPresent) "page" else "missing-page"}>{page.displayName}</ref>
-    }),
-
-    Column("Расшифровка", "transcriber", { document: Document =>
-      multi(document.transcribers.map(transcriber => XmlUtil.removeNamespace(org.opentorah.reference.Reference.toXml(transcriber))))
-    })
-  )
-
-  private def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
-    case Nil => Nil
-    case n :: Nil => Seq(n)
-    case n :: ns if n.isInstanceOf[Elem] => Seq(n, scala.xml.Text(", ")) ++ multi(ns)
-    case n :: ns => Seq(n) ++ multi(ns)
-    case n => n
   }
 }
