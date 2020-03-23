@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.reference.Reference
+import org.opentorah.entity.EntityReference
 import org.opentorah.xml.{ContentType, Element, ToXml, XmlUtil}
 import scala.xml.{Elem, Node}
 
@@ -16,13 +16,13 @@ final case class Tei(
   val body: Body.Value = text.body
   val pbs: Seq[Pb] = body.xml.flatMap(Pb.descendants)
 
-  def references: Seq[Reference] = {
+  def references: Seq[EntityReference] = {
     val lookInto: Seq[Node] =
       getAbstract.getOrElse(Seq.empty) ++
       correspDesc.map(_.xml).getOrElse(Seq.empty) ++
       body.xml
 
-    titleStmt.references ++ lookInto.flatMap(Reference.parsable.descendants)
+    titleStmt.references ++ lookInto.flatMap(EntityReference.parsable.descendants)
   }
 
   /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.reference.Reference
+import org.opentorah.entity.EntityReference
 import org.opentorah.xml.{Element, ToXml}
 import scala.xml.{Elem, Node}
 
@@ -13,7 +13,7 @@ final case class TitleStmt(
   principals: Seq[Principal.Value],
   respStmts: Seq[RespStmt.Value]
 ) {
-  def references: Seq[Reference] = {
+  def references: Seq[EntityReference] = {
     val xml: Seq[Node] = Seq(titles.flatMap(_.content) ++
       authors.map(Author.parsable.toXml) ++
       sponsors.map(Sponsor.parsable.toXml) ++
@@ -22,7 +22,7 @@ final case class TitleStmt(
       respStmts.map(RespStmt.parsable.toXml)
     ).flatten
 
-    xml.flatMap(Reference.parsable.descendants) ++  editors.flatMap(_.persName.toSeq)
+    xml.flatMap(EntityReference.parsable.descendants) ++  editors.flatMap(_.persName.toSeq)
   }
 }
 

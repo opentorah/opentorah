@@ -31,7 +31,7 @@ object Selector extends Element[Selector]("selector", parser = for {
     def asNumbered: Numbered = throw new IllegalArgumentException
     def asNullary: Nullary = throw new IllegalArgumentException
 
-    def bind(names: Names): Binding.Named = Binding.Named(this, names)
+    def bind(store: Store): Binding.Named = Binding.Named(this, store)
   }
 
   final class Nullary(names: Names) extends Selector(names) {

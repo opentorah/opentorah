@@ -1,18 +1,22 @@
 package org.opentorah.store
 
-import org.opentorah.xml.{Attribute, Element}
+import org.opentorah.xml.{Attribute, Element, Parser}
 
 final case class ByElement(
   selector: String,
-  files: Seq[String]
+  directory: Option[String],
+  list: Option[String],
+  stores: Seq[StoreElement]
 )
 
 object ByElement extends Element[ByElement]("by", parser = for {
   selector <- Attribute("selector").required
-  files <- ByElement.storeParsable.allMustBe
+  directory <- Attribute("directory").optional
+  list <- Attribute("list").optional
+  stores <- StoreElement.allMustBe
 } yield ByElement(
   selector,
-  files
-)) {
-  object storeParsable extends Element[String]("store", parser = Attribute("file").required)
-}
+  directory,
+  list,
+  stores
+))
