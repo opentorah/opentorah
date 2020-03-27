@@ -1,6 +1,5 @@
 package org.opentorah.entity
 
-import org.opentorah.store.Path
 import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, ToXml, XmlUtil}
 import scala.xml.{Elem, Node}
 
@@ -14,8 +13,8 @@ final case class Entity private(
 
   def name: String = names.head.name
 
-  def references(at: Path): Seq[EntityReference] =
-    content.flatMap(element => EntityReference.parsable.descendants(element)).map(_.at(at))
+  def references: Seq[EntityReference] =
+    content.flatMap(EntityReference.parsable.descendants)
 }
 
 object Entity extends Parsable[Entity] with ToXml[Entity] {

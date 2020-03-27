@@ -29,8 +29,8 @@ object StoreElement extends Element[StoreElement](elementName = "store", parser 
 
   final case class Inline(
     names: Names,
-    // TODO this is here only to allow reuse of StoreElement for Collections;
-    // it should be removed or generalized :)
+    // TODO this is here only to allow reuse of StoreElement for Collection's parts;
+    // it should be removed or generalized - but I am not ready to make StoreElement parsing extendable yet ;)
     from: Option[String],
     selectors: Seq[Selector],
     by: Option[ByElement],

@@ -1,40 +1,42 @@
 package org.opentorah.store
 
-import java.io.File
 import java.net.URL
-import org.opentorah.entity.EntityReference
 import org.opentorah.util.Files
 import org.opentorah.xml.{Element, From, PaigesPrettyPrinter, Parser, Text, ToXml}
 import scala.xml.Elem
 
-abstract class By(val store: Store) {
+// TODO it seems that I need to add type parameter to the By before I can:
+// - add caching to the By.stores()/load();
+// - turn Entities into Store (with two Bys);
+// - get rid of the Nullary selectors and remove Selector.type;
+abstract class By(inheritedSelectors: Seq[Selector]) extends WithSelectors(inheritedSelectors) {
   def selector: Selector.Named
 
   def stores: Seq[Store]
 
-  final def references(at: Path): Seq[EntityReference] = stores.flatMap { store: Store =>
-    store.references(at :+ selector.bind(store))
-  }
+  final def withPath[R](path: Path, values: Store => Seq[R]): Seq[WithPath[R]] =
+    stores.flatMap(store => store.withPath[R](path :+ selector.bind(store), values))
 }
 
 object By {
 
   class FromElement(
-    store: Store,
+    inheritedSelectors: Seq[Selector],
+    url: URL,
     element: ByElement
-  ) extends By(store) {
+  ) extends By(inheritedSelectors) {
     final override def selector: Selector.Named =
-      store.selectorByName(element.selector).asNamed
+      selectorByName(element.selector).asNamed
 
     override def stores: Seq[Store] =
       for (storeElement <- element.stores) yield {
         val (resolvedUrl: URL, resolvedElement: StoreElement.Inline) =
-          StoreElement.resolve(store.url, storeElement)
+          StoreElement.resolve(url, storeElement)
 
-        Store.fromElement(Some(store), resolvedUrl, resolvedElement)
+        Store.fromElement(selectors, resolvedUrl, resolvedElement)
     }
 
-    // TODO use Parsable.parse(from) or Parsable.allMustBe()?
+    // TODO allow for inline parsing with Parsable.allMustBe() and from-file parsing with Parsable.parse(from)?
     protected final def filesWithExtensions(url: URL, extension: String): Seq[String] = {
       val directoryName = element.directory.get
       val directory: URL =
@@ -44,17 +46,22 @@ object By {
 
       if (!Files.isFile(directory)) Parser.parseDo(FilesList.parse(From.url(list))) else {
         val result: Seq[String] = Files.filesWithExtensions(Files.url2file(directory), extension).sorted
-        if (Files.isFile(list)) writeXml(FilesList.toXml(result), Files.url2file(list))
+        if (Files.isFile(list))
+          new PaigesPrettyPrinter().writeXml(Files.url2file(list), FilesList.toXml(result))
         result
       }
     }
   }
 
   def fromElement(
-    store: Store,
+    inheritedSelectors: Seq[Selector],
+    url: URL,
     element: ByElement
-  ): By = new FromElement(store, element)
-
+  ): By = new FromElement(
+    inheritedSelectors,
+    url,
+    element
+  )
 
   object FilesList extends Element[Seq[String]](
     elementName = "filesList",
@@ -66,15 +73,4 @@ object By {
         {for (file <- value) yield <file>{file}</file>}
       </filesList>
   }
-
-  // TODO dup!
-  def writeXml(
-    elem: Elem,
-    file: File
-  ): Unit = Files.write(
-    file,
-    content = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
-      new PaigesPrettyPrinter().render(elem) +
-      "\n"
-  )
 }

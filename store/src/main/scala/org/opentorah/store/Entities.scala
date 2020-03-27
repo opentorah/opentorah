@@ -1,30 +1,31 @@
 package org.opentorah.store
 
 import java.net.URL
-import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
+import org.opentorah.entity.{EntitiesList, Entity}
 import org.opentorah.util.Files
 import org.opentorah.xml.{From, Parser}
 
-// TODO turn into Store (with two Bys) (and then filesWithExtensions()'s url parameter will always be store.url :))
 final class Entities(
-  store: Store,
+  inheritedSelectors: Seq[Selector],
   url: URL,
   element: EntitiesElement
-) {
-  def selector: Selector.Nullary = store.selectorByName(element.selector).asNullary
+) extends WithSelectors(inheritedSelectors) {
+  def selector: Selector.Nullary = selectorByName(element.selector).asNullary
 
-  val by: Entities.EntitiesBy = new Entities.EntitiesBy(store, url, element.by)
+  val by: Entities.EntitiesBy = new Entities.EntitiesBy(selectors, url, element.by)
 
   val lists: Seq[EntitiesList] = element.lists.map(_.take(by.stores.map(_.entity)))
 
   def findByRef(ref: String): Option[Entity] = by.stores.find(_.entity.id.get == ref).map(_.entity)
-
-  def references(at: Path): Seq[EntityReference] = by.references(at :+ selector.bind)
 }
 
 object Entities {
 
-  final class EntitiesBy(store: Store, url: URL, element: ByElement) extends By.FromElement(store, element) {
+  final class EntitiesBy(
+    inheritedSelectors: Seq[Selector],
+    url: URL,
+    element: ByElement
+  ) extends By.FromElement(inheritedSelectors, url, element) {
 
     override val stores: Seq[EntityStore] = {
       val directoryUrl: URL = Files.subdirectory(url, element.directory.get)
@@ -45,7 +46,7 @@ object Entities {
         id = Some(fileName)
       )
 
-      result.map(entity => new EntityStore(parent = None, url, entity))
+      result.map(entity => new EntityStore(selectors, url, entity))
     }
   }
 }

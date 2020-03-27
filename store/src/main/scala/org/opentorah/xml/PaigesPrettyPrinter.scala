@@ -1,5 +1,7 @@
 package org.opentorah.xml
 
+import java.io.File
+import org.opentorah.util.Files
 import org.typelevel.paiges.Doc
 import scala.xml.{Elem, MetaData, NamespaceBinding, Node, SpecialNode, TopScope, Utility}
 
@@ -182,6 +184,13 @@ final class PaigesPrettyPrinter(
           splitChunk(result :+ newCurrent, Seq.empty, tail)
       }
     }
+
+  def writeXml(file: File, elem: Elem): Unit = Files.write(
+    file,
+    content = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
+    render(elem) +
+    "\n"
+  )
 }
 
 object PaigesPrettyPrinter {

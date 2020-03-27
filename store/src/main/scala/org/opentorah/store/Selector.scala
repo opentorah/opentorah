@@ -47,4 +47,6 @@ object Selector extends Element[Selector]("selector", parser = for {
     case "numbered" => new Numbered(names)
     case "nullary" => new Nullary(names)
   }
+
+  val predefinedSelectors: Seq[Selector] = Seq.empty
 }

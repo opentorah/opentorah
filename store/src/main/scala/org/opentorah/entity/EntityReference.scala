@@ -5,15 +5,12 @@ import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, ToXml, Unio
 import scala.xml.{Elem, Node}
 
 final case class EntityReference(
-  source: Path,
   entityType: EntityType,
   name: Seq[Node],
   id: Option[String],
   role: Option[String],
   ref: Option[String]
-) {
-  def at(path: Path): EntityReference = copy(source = path ++ this.source)
-}
+)
 
 object EntityReference extends ToXml[EntityReference] {
 
@@ -27,7 +24,6 @@ object EntityReference extends ToXml[EntityReference] {
       _ <- Attribute("type").optional // TODO we don't do anything with the type yet
       name <- Element.allNodes
     } yield new EntityReference(
-      Path.empty,
       entityType,
       name,
       id,
