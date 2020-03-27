@@ -2,7 +2,7 @@ package org.opentorah.archive.collector
 
 import java.io.File
 import org.opentorah.entity.{EntitiesList, Entity, EntityName, EntityReference, EntityType}
-import org.opentorah.store.{EntityStore, Store, WithPath}
+import org.opentorah.store.{Entities, Store, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
 import org.opentorah.xml.XmlUtil
@@ -17,10 +17,10 @@ object Site {
   private val unpublished: Set[String] = Set("derzhavin", "lna208", "niab5", "niab19", "niab24", "rnb203", "rnb211")
 
   private def fileName(store: Store): String =
-    Files.nameAndExtension(Files.pathAndName(store.url.getPath)._2)._1
+    Files.nameAndExtension(Files.pathAndName(store.fromUrl.get.getPath)._2)._1
 
   private def referenceCollectionName(reference: WithPath[EntityReference]): String =
-    reference.path.init.last.getStore.fold(namesHead)(_.names.name)
+    reference.path.init.last.store.names.name
 
   // TODO this yuck is temporary :)
 
@@ -165,7 +165,7 @@ object Site {
         for (reference <- references.filter(_.value.ref.isEmpty)) yield
           "- " + reference.value.name.map(_.text.trim).mkString(" ") + " в " +
             referenceCollectionName(reference) + ":" +
-            reference.path.last.getStore.get.names.name
+            reference.path.last.store.names.name
     )
   }
 
@@ -346,7 +346,7 @@ object Site {
   )
 
   private def toXml(collection: Collection): Elem = {
-    val url = collectionUrl(collectionName(collection))
+    val url = collectionUrl(collection)
     <item>
       <ref target={url} role="collectionViewer">{collectionReference(collection) + ": " +
         XmlUtil.spacedText(collectionTitle(collection))}</ref><lb/>
@@ -359,23 +359,32 @@ object Site {
     value: Entity,
     references: Seq[WithPath[EntityReference]]
   ): Elem = {
-    def sources(viewer: String, references: Seq[WithPath[EntityReference]]): Seq[Elem] =
-      for (source <- Collections.removeConsecutiveDuplicates(references.map(_.path))) yield {
-        val sourceStore: Store = source.last.getStore.get
-        val url: String = sourceStore match {
-          case entity: EntityStore => entityUrl(entity.entity)
-          case document: Document => documentUrl(source.init.last.getStore.get, document)
+    def sources(viewer: String, references: Seq[WithPath[EntityReference]]): Seq[Elem] = {
+      // TODO grouping needs to be adjusted to handle references from collection descriptors;
+      // once fund, опись etc. have their own URLs, they should be included too.
+      val result: Seq[Option[Elem]] =
+        for (source <- Collections.removeConsecutiveDuplicates(references.map(_.path))) yield {
+        val sourceStore: Store = source.last.store
+        val url: Option[String] = sourceStore match {
+          case entity: Entities.EntityStore => Some(entityUrl(entity.entity))
+          case document: Document => Some(documentUrl(source.init.last.store, document))
+          case collection: Collection => None // TODO Some(collectionUrl(collection)) when grouping is adjusted
+          case _ => None
         }
-
-        <ref target={url} role={viewer}>{sourceStore.names.name}</ref>
+        url.map(url => <ref target={url} role={viewer}>{sourceStore.names.name}</ref>)
       }
 
-    val (fromNames, notFromNames) = references
+      result.flatten
+    }
+
+    val (fromNames: Seq[WithPath[EntityReference]], notFromNames: Seq[WithPath[EntityReference]]) = references
       .filter(_.value.ref.contains(value.id.get))
-      .partition(_.path.last.getStore.get.isInstanceOf[EntityStore])
+      .partition(_.path.last.store.isInstanceOf[Entities.EntityStore])
 
     val bySource: Seq[(String, Seq[WithPath[EntityReference]])] =
-      notFromNames.groupBy(referenceCollectionName).toSeq.sortBy(_._1)
+      notFromNames
+        .filter(_.path.init.last.store.isInstanceOf[Collection])  // TODO remove when grouping is adjusted
+        .groupBy(referenceCollectionName).toSeq.sortBy(_._1)
 
     <p rendition="mentions">
       <ref target={entityInTheListUrl(value.id.get)} role="namesViewer">[...]</ref>
@@ -530,7 +539,8 @@ object Site {
 
   private val docsDirectoryName: String = "documents" // wrappers for TEI XML
 
-  private def collectionUrl(collectionName: String): String = url(s"$collectionName/index.html")
+  private def collectionUrl(collection: Collection): String =
+    url(s"${collectionName(collection)}/index.html")
 
   private def url(ref: String): String = s"/$collectionsDirectoryName/$ref"
 }
