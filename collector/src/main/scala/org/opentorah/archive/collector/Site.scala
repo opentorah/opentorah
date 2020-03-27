@@ -42,31 +42,10 @@ object Site {
   private def collectionName(collection: Collection): String =
     fileName(collection)
 
-  private def collectionPrefix(collection: Collection): Option[String] =
-    if (isBook(collection)) Some(collectionReference(collection)) else None
-
   private def collectionArchive(collection: Collection): Option[String] = {
     val reference = collectionReference(collection)
     val space = reference.lastIndexOf(' ')
     if (space == -1) None else Some(reference.substring(0, space))
-  }
-
-  private def collectionNumber(collection: Collection): Option[Int] = {
-    val reference = collectionReference(collection)
-    val space = reference.lastIndexOf(' ')
-    if (space == -1) None else Some(reference.substring(space + 1).toInt)
-  }
-
-  private object collectionOrdering extends Ordering[Collection] {
-    override def compare(x: Collection, y: Collection): Int = {
-      val archiveComparison: Int = Collections.compare(collectionArchive(x), collectionArchive(y))
-      if (archiveComparison != 0) archiveComparison else {
-        val prefixComparison: Int = Collections.compare(collectionPrefix(x), collectionPrefix(y))
-        if (prefixComparison != 0) prefixComparison else {
-          collectionNumber(x).getOrElse(0).compare(collectionNumber(y).getOrElse(0))
-        }
-      }
-    }
   }
 
   // TODO with images on a separate website (facsimiles.alter-rebbe.org), this has to be re-worked...
@@ -162,9 +141,8 @@ object Site {
 
     writeIndex(collections.map(_.value), directory)
 
-    // TODO collections are already split into archives; retrieve them for each and eliminate sorting
-    val collectionsSorted: Seq[Collection] = collections.map(_.value).sorted(collectionOrdering)
-    writeCollectionsTree(collectionsSorted, directory)
+    // TODO write new, truly hierarchical index!
+    writeCollectionsTree(collections.map(_.value), directory)
 
     println("Writing reports.")
 
