@@ -1,52 +1,60 @@
 package org.opentorah.store
 
 import java.net.URL
-import org.opentorah.entity.{EntitiesList, Entity}
-import org.opentorah.util.Files
-import org.opentorah.xml.{From, Parser}
+import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
+import org.opentorah.metadata.{Name, Names}
+import org.opentorah.xml.Parser
 
+// TODO this should have two Bys.
 final class Entities(
   inheritedSelectors: Seq[Selector],
-  url: URL,
+  baseUrl: URL,
   element: EntitiesElement
-) extends WithSelectors(inheritedSelectors) {
-  def selector: Selector.Nullary = selectorByName(element.selector).asNullary
+) extends Store(
+  inheritedSelectors,
+  fromUrl = None,
+  baseUrl
+) {
+  def selector: Selector = selectorByName(element.selector)
 
-  val by: Entities.EntitiesBy = new Entities.EntitiesBy(selectors, url, element.by)
+  override def names: Names = selector.names
 
-  val lists: Seq[EntitiesList] = element.lists.map(_.take(by.stores.map(_.entity)))
+  override val by: Option[By[Entities.EntityStore]] =
+    Some(new Entities.EntitiesBy(selectors, baseUrl, element.by))
 
-  def findByRef(ref: String): Option[Entity] = by.stores.find(_.entity.id.get == ref).map(_.entity)
+  val lists: Seq[EntitiesList] = element.lists.map(_.take(by.get.stores.map(_.entity)))
+
+  override def references: Seq[EntityReference] = Seq.empty
+
+  def findByRef(ref: String): Option[Entity] = by.get.stores.find(_.entity.id.get == ref).map(_.entity)
 }
 
 object Entities {
 
+  final class EntityStore(
+    inheritedSelectors: Seq[Selector],
+    fromUrl: URL,
+    val entity: Entity
+  ) extends Store(inheritedSelectors, Some(fromUrl), fromUrl) {
+
+    override def names: Names = new Names(Seq(Name(entity.name)))
+
+    override def references: Seq[EntityReference] = entity.references
+  }
+
   final class EntitiesBy(
     inheritedSelectors: Seq[Selector],
-    url: URL,
+    baseUrl: URL,
     element: ByElement
-  ) extends By.FromElement(inheritedSelectors, url, element) {
+  ) extends By[EntityStore](inheritedSelectors, baseUrl, element) {
 
-    override val stores: Seq[EntityStore] = {
-      val directoryUrl: URL = Files.subdirectory(url, element.directory.get)
-      Parser.parseDo(Parser.collectAll(
-        for (fileName <- filesWithExtensions(url, extension = "xml")) yield parseStore(
-          Files.fileInDirectory(directoryUrl, fileName + ".xml"),
-          fileName
-        )
-      ))
-    }
-
-    private def parseStore(url: URL, fileName: String): Parser[EntityStore] = {
-      val result: Parser[Entity] = for {
-        result <- Entity.parse(From.url(url))
-        _ <- Parser.check(result.id.isEmpty || result.id.contains(fileName),
-          s"Incorrect id: ${result.id.get} instead of $fileName")
-      } yield result.copy(
-        id = Some(fileName)
-      )
-
-      result.map(entity => new EntityStore(selectors, url, entity))
+    override protected def loadFromDirectory(
+      fileNames: Seq[String],
+      fileInDirectory: String => URL
+    ): Seq[Parser[EntityStore]] = for (fileName <- fileNames) yield {
+      val fromUrl: URL = fileInDirectory(fileName)
+      Entity.parseWithId(fromUrl, id = fileName)
+        .map(entity => new EntityStore(inheritedSelectors, fromUrl, entity))
     }
   }
 }

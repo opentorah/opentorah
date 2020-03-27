@@ -1,5 +1,6 @@
 package org.opentorah.entity
 
+import java.net.URL
 import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, ToXml, XmlUtil}
 import scala.xml.{Elem, Node}
 
@@ -46,4 +47,15 @@ object Entity extends Parsable[Entity] with ToXml[Entity] {
     </elem>
       .copy(label = value.entityType.element)
   }
+
+  def parseWithId(
+    fromUrl: URL,
+    id: String,
+  ): Parser[Entity] = for {
+    result <- parse(fromUrl)
+    _ <- Parser.check(result.id.isEmpty || result.id.contains(id),
+      s"Incorrect id: ${result.id.get} instead of $id")
+  } yield result.copy(
+    id = Some(id)
+  )
 }

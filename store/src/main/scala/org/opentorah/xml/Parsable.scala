@@ -40,6 +40,8 @@ trait Parsable[A] {
     }
   } yield result
 
+  final def parse(fromUrl: URL): Parser[A] = parse(From.url(fromUrl))
+
   final def parse(from: From): Parser[A] = for {
     _ <- Context.checkNoLeftovers
     nextElement <- from.load

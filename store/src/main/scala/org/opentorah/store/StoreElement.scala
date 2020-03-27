@@ -1,9 +1,7 @@
 package org.opentorah.store
 
-import java.net.URL
 import org.opentorah.metadata.Names
-import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Element, From, Parser, RawXml}
+import org.opentorah.xml.{Attribute, Element, Parser, RawXml}
 import zio.ZIO
 import scala.xml.Node
 
@@ -44,13 +42,13 @@ object StoreElement extends Element[StoreElement](elementName = "store", parser 
   private val inlineParser: Parser[Inline] = for {
     names <- Names.withDefaultNameParser
     from <- Attribute("from").optional
+    storeType <- Attribute("type").optional
     selectors <- Selector.all
-    by <- ByElement.optional
     entities <- EntitiesElement.optional
     title <- Title.parsable.optional
     storeAbstract <- Abstract.parsable.optional
+    by <- ByElement.optional
     notes <- Element.allNodes
-    storeType <- Attribute("type").optional
   } yield StoreElement.Inline(
     names,
     from,
@@ -62,18 +60,4 @@ object StoreElement extends Element[StoreElement](elementName = "store", parser 
     new Notes(notes),
     storeType
   )
-
-  @scala.annotation.tailrec
-  def resolve(url: URL, element: StoreElement): (URL, StoreElement.Inline) = element match {
-    case result: StoreElement.Inline =>
-      (url, result)
-
-    case FromFile(file) =>
-      val nextUrl = Files.fileInDirectory(url, file)
-      val next: StoreElement = Parser.parseDo(StoreElement.parse(From.url(nextUrl)))
-      resolve(nextUrl, next)
-  }
-
-  def read(url: URL): StoreElement =
-    Parser.parseDo(StoreElement.parse(From.url(url)))
 }

@@ -3,19 +3,23 @@ package org.opentorah.store
 import java.net.URL
 import org.opentorah.entity.EntityReference
 import org.opentorah.metadata.Names
+import org.opentorah.util.Files
+import org.opentorah.xml.Parser
+import scala.xml.Node
 
-// TODO make the base URL transient;
-// factor the URL the file was read from into a FromUrl trait;
-// pretty-print everything that was read from a file.
 abstract class Store(
   inheritedSelectors: Seq[Selector],
-  val url: URL
+  val fromUrl: Option[URL],
+  val baseUrl: URL
 ) extends WithSelectors(inheritedSelectors) {
+
   def names: Names
+
+  override def toString: String = names.name
 
   def entities: Option[Entities] = None
 
-  def by: Option[By] = None
+  def by: Option[By[_]] = None
 
   def title: Option[StoreElement.Title.Value] = None
 
@@ -23,9 +27,8 @@ abstract class Store(
 
   def notes: StoreElement.Notes = new StoreElement.Notes(Seq.empty)
 
-  def references: Seq[EntityReference] = Seq.empty
+  def references: Seq[EntityReference]
 
-  // TODO fish references out of the title, abstract and notes too!
   final def withPath[R](
     path: Path = Path.empty,
     values: Store => Seq[R]
@@ -33,8 +36,8 @@ abstract class Store(
     val fromStore: Seq[WithPath[R]] =
       values(this).map(WithPath[R](path, _))
 
-    val fromEntities: Seq[WithPath[R]] =
-      entities.toSeq.flatMap(entities => entities.by.withPath[R](path :+ entities.selector.bind, values))
+    val fromEntities: Seq[WithPath[R]] = entities.toSeq.flatMap(entities =>
+      entities.withPath[R](path :+ entities.selector.bind(entities), values))
 
     val fromBy: Seq[WithPath[R]] =
       by.toSeq.flatMap(_.withPath[R](path, values))
@@ -47,9 +50,10 @@ object Store {
 
   class FromElement(
     inheritedSelectors: Seq[Selector],
-    url: URL,
+    fromUrl: Option[URL],
+    baseUrl: URL,
     element: StoreElement.Inline
-  ) extends Store(inheritedSelectors, url) {
+  ) extends Store(inheritedSelectors, fromUrl, baseUrl) {
 
     final override def names: Names =
       element.names
@@ -58,7 +62,7 @@ object Store {
       element.selectors
 
     final override val entities: Option[Entities] =
-      element.entities.map(entities => new Entities(selectors, url, entities))
+      element.entities.map(entities => new Entities(selectors, baseUrl, entities))
 
     final override def title: Option[StoreElement.Title.Value] =
       element.title
@@ -69,32 +73,61 @@ object Store {
     final override def notes: StoreElement.Notes =
       element.notes
 
-    override def by: Option[By] =
-      element.by.map(byElement => By.fromElement(selectors, url, byElement))
+    override def by: Option[By[_]] =
+      element.by.map(byElement => new By(selectors, baseUrl, byElement))
+
+    final override def references: Seq[EntityReference] = {
+      val lookInto: Seq[Node] =
+        title.map(_.xml).getOrElse(Seq.empty) ++
+        storeAbstract.map(_.xml).getOrElse(Seq.empty) ++
+        notes.xml
+
+      lookInto.flatMap(EntityReference.parsable.descendants)
+    }
   }
 
-  def fromElement(
+  def read[S <: Store](
+    fromUrl: URL,
+    inheritedSelectors: Seq[Selector] = Selector.predefinedSelectors
+  ): S = fromElement[S](
+    inheritedSelectors,
+    fromUrl = Some(fromUrl),
+    baseUrl = fromUrl,
+    element = Parser.parseDo(StoreElement.parse(fromUrl))
+  )
+
+  private [store] def fromElement[S <: Store](
     inheritedSelectors: Seq[Selector],
-    url: URL,
-    element: StoreElement.Inline
-  ): Store = {
-    if (element.storeType.isDefined) Class.forName(element.storeType.get)
-      .getConstructor(classOf[Seq[Selector]], classOf[URL], classOf[StoreElement.Inline])
-      .newInstance(inheritedSelectors, url, element)
-      .asInstanceOf[Store]
-    else new FromElement(
-      inheritedSelectors,
-      url,
-      element
+    fromUrl: Option[URL],
+    baseUrl: URL,
+    element: StoreElement
+  ): S = element match {
+    case StoreElement.FromFile(file) => read[S](
+      fromUrl = Files.fileInDirectory(baseUrl, file),
+      inheritedSelectors
     )
-  }
 
-  def fromUrl(url: URL): Store = {
-    val (storeUrl, storeElement) = StoreElement.resolve(url, StoreElement.read(url))
-    fromElement(
-      inheritedSelectors = Selector.predefinedSelectors,
-      storeUrl,
-      storeElement
-    )
+    case element: StoreElement.Inline =>
+      if (element.storeType.isDefined) Class.forName(element.storeType.get)
+        .getConstructor(
+          classOf[Seq[Selector]],
+          classOf[Option[URL]],
+          classOf[URL],
+          classOf[StoreElement.Inline]
+        )
+        .newInstance(
+          inheritedSelectors,
+          fromUrl,
+          baseUrl,
+          element
+        )
+        .asInstanceOf[S]
+      else new FromElement(
+        inheritedSelectors,
+        fromUrl,
+        baseUrl,
+        element
+      )
+        .asInstanceOf[S]
   }
 }
