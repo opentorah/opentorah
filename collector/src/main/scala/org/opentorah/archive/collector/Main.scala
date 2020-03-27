@@ -1,82 +1,78 @@
 package org.opentorah.archive.collector
 
 import java.io.File
-import org.opentorah.metadata.Language
-import org.opentorah.reference.{Named, Reference}
-import org.opentorah.store.Path
+import java.net.URL
+import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
+import org.opentorah.store.{Path, Store}
+import org.opentorah.tei.Tei
+import org.opentorah.util.Files
 import org.opentorah.xml.From
 
 object Main {
 
   def main(args: Array[String]): Unit = {
-    val docs: File = new File(args(0))
-    println(s"docs: $docs.")
+    doIt(args(0))
+  }
 
+  def doIt(docsStr: String): Unit = {
     println("Reading store.")
-    val store: Store = Store.read(From.file(new File(new File(docs, "store"), "store.xml")))
 
-    val namesSelector = store.nameds.get.selector
-    val lists = store.nameds.get.lists
-    val nameds = store.nameds.get.by.stores
-    val caseSelector = store.by.get.selector
-    val collections: Seq[Collection] = store.by.get.stores
-    val references: Seq[Reference] = store.references(Path.empty)
+    // TODO separate URL for store and directory for site!
+    val docs: File = new File(docsStr)
+    val url: URL = From.file(new File(new File(docs, "store"), "store.xml")).url.get
+    val store: Store = Store.fromUrl(url)
+
+    val lists: Seq[EntitiesList] = store.entities.get.lists
+    val entities: Seq[Entity] = store.entities.get.by.stores.map(_.entity)
+    val collections: Seq[Collection] = getCollections(store)
+    val references: Seq[EntityReference] = store.references(Path.empty)
 
     println("Checking store.")
-    val errors: Seq[String] = checkReferences(references, store.nameds.get.findByRef)
+    def findByRef(ref: String) = store.entities.get.findByRef(ref)
+    val errors: Seq[String] = references.flatMap(reference => checkReference(reference, findByRef))
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
 
     println("Pretty-printing store.")
-    store.prettyPrint()
+    // TODO do translations also!
+    // TODO only if the URL is a file URL
+    // TODO remove common stuff (calendarDescriptor etc.)
+    for {
+      collection <- collections
+      document <- collection.documents
+    } Util.writeXml(
+      Files.url2file(document.url),
+      Tei.toXml(document.tei)
+    )
 
-    println("Writing site.")
-    val site: Site = new Site(docs)
-    site.write(
-      namesSelector,
+    // TODO only if the URL is a file URL
+    for (entityStore <- store.entities.get.by.stores) Util.writeXml(
+      Files.url2file(entityStore.url),
+      Entity.toXml(entityStore.entity.copy(id = None))
+    )
+
+    Site.write(
+      docs,
       lists,
-      nameds,
-      caseSelector,
+      entities,
       collections,
       references
     )
-
-    println("Writing reports.")
-    site.writeReport(
-      name = "misnamed-nameds",
-      title = "Неправильно названные файлы с именами",
-      content = misnamedNamedsReport(store.nameds.get.by.stores)
-    )
-
-    site.writeReport(
-      name = "no-refs",
-      title = "Имена без атрибута 'ref'",
-      content = noRefsReport(references)
-    )
   }
 
-  private def checkReferences(references: Seq[Reference], findByRef: String => Option[Named]): Seq[String] = {
-    def check(reference: Reference): Option[String] = {
-      val name = reference.name
-      reference.ref.fold[Option[String]](None) { ref =>
-        if (ref.contains(" ")) Some(s"""Value of the ref attribute contains spaces: ref="$ref" """) else {
-          findByRef(ref).fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${name.text}< """)) { named =>
-            if (named.entity != reference.entity) Some(s"${reference.entity} reference to ${named.entity} ${named.name}: $name [$ref]")
-            else None
-          }
+  private def getCollections(store: Store): Seq[Collection] = store match {
+    case collection: Collection => Seq(collection)
+    case _ => store.by.fold(Seq.empty[Collection])(by => by.stores.flatMap(getCollections))
+  }
+
+  private def checkReference(reference: EntityReference,  findByRef: String => Option[Entity]): Option[String] = {
+    val name = reference.name
+    reference.ref.fold[Option[String]](None) { ref =>
+      if (ref.contains(" ")) Some(s"""Value of the ref attribute contains spaces: ref="$ref" """) else {
+        findByRef(ref).fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${name.text}< """)) { named =>
+          if (named.entityType == reference.entityType) None
+          else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: $name [$ref]")
         }
       }
     }
-
-    references.flatMap(check)
   }
-
-  private def misnamedNamedsReport(nameds: Seq[Named]): Seq[String] = nameds.flatMap { named =>
-    val id = named.id.get
-    val expectedId = named.name.replace(' ', '_')
-    if (id == expectedId) None else Some(s"- '$id' должен по идее называться '$expectedId'")
-  }
-
-  private def noRefsReport(references: Seq[Reference]): Seq[String] = for (reference <- references.filter(_.ref.isEmpty)) yield
-    "- " + reference.name.map(_.text.trim).mkString(" ") + " в " +
-      reference.source.init.reference(Language.Russian.toSpec) + ":" + reference.source.reference(Language.Russian.toSpec)
 }
