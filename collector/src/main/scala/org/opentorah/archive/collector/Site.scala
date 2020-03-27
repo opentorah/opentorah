@@ -2,7 +2,7 @@ package org.opentorah.archive.collector
 
 import java.io.File
 import org.opentorah.entity.{EntitiesList, Entity, EntityName, EntityReference, EntityType}
-import org.opentorah.store.{EntityStore, Path, Store}
+import org.opentorah.store.{EntityStore, Store, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
 import org.opentorah.xml.XmlUtil
@@ -19,8 +19,8 @@ object Site {
   private def fileName(store: Store): String =
     Files.nameAndExtension(Files.pathAndName(store.url.getPath)._2)._1
 
-  private def referenceCollectionName(reference: EntityReference): String =
-    reference.source.init.last.getStore.fold(namesHead)(_.names.name)
+  private def referenceCollectionName(reference: WithPath[EntityReference]): String =
+    reference.path.init.last.getStore.fold(namesHead)(_.names.name)
 
   // TODO this yuck is temporary :)
 
@@ -95,10 +95,10 @@ object Site {
 
   def write(
     directory: File,
+    store: Store,
     lists: Seq[EntitiesList],
     entities: Seq[Entity],
-    collections: Seq[Collection],
-    references: Seq[EntityReference]
+    references: Seq[WithPath[EntityReference]]
   ): Unit = {
 
     println("Writing site.")
@@ -124,25 +124,27 @@ object Site {
     val collectionsDirectory: File = new File(directory, collectionsDirectoryName)
     Files.deleteFiles(collectionsDirectory)
 
-    for (collection <- collections) {
-      val collectionDirectory: File = new File(collectionsDirectory, collectionName(collection))
-      writeCollectionIndex(collection, collectionDirectory)
+    val collections: Seq[WithPath[Collection]] = Util.getCollections(store)
 
-      for ((document, (prev, next)) <- Collections.prevAndNext(collection.documents)) {
+    for (collection <- collections) {
+      val collectionDirectory: File = new File(collectionsDirectory, collectionName(collection.value))
+      writeCollectionIndex(collection.value, collectionDirectory)
+
+      for ((document, (prev, next)) <- Collections.prevAndNext(collection.value.documents)) {
         // Documents
         val teiDirectory: File = new File(collectionDirectory, teiDirectoryName)
-        Util.writeXml(
+        Util.teiPrettyPrinter.writeXml(
           new File(teiDirectory, document.name + ".xml"),
           Tei.toXml(document.tei)
         )
-        for ((language: String, translation: Tei) <- document.translations) Util.writeXml(
+        for ((language: String, translation: Tei) <- document.translations) Util.teiPrettyPrinter.writeXml(
           new File(teiDirectory, document.name + "-" + language + ".xml"),
           Tei.toXml(translation)
         )
 
         // Wrappers
         val navigation: Seq[(String, String)] =
-          Seq("documentCollection" -> quote(collectionReference(collection))) ++
+          Seq("documentCollection" -> quote(collectionReference(collection.value))) ++
           prev.map(prev => Seq("prevDocument" -> quote(prev.name))).getOrElse(Seq.empty) ++
           Seq("thisDocument" -> quote(document.name)) ++
           next.map(next => Seq("nextDocument" -> quote(next.name))).getOrElse(Seq.empty)
@@ -151,16 +153,18 @@ object Site {
 
         writeFacsViewer(
           facsDirectory = new File(collectionDirectory, facsDirectoryName),
-          pageType = collectionPageType(collection),
+          pageType = collectionPageType(collection.value),
           document,
           navigation
         )
       }
     }
 
-    val collectionsSorted: Seq[Collection] = collections.sorted(collectionOrdering)
+    writeIndex(collections.map(_.value), directory)
+
+    // TODO collections are already split into archives; retrieve them for each and eliminate sorting
+    val collectionsSorted: Seq[Collection] = collections.map(_.value).sorted(collectionOrdering)
     writeCollectionsTree(collectionsSorted, directory)
-    writeIndex(collectionsSorted, directory)
 
     println("Writing reports.")
 
@@ -180,10 +184,10 @@ object Site {
       name = "no-refs",
       title = "Имена без атрибута 'ref'",
       content =
-        for (reference <- references.filter(_.ref.isEmpty)) yield
-          "- " + reference.name.map(_.text.trim).mkString(" ") + " в " +
+        for (reference <- references.filter(_.value.ref.isEmpty)) yield
+          "- " + reference.value.name.map(_.text.trim).mkString(" ") + " в " +
             referenceCollectionName(reference) + ":" +
-            reference.source.last.getStore.get.names.name
+            reference.path.last.getStore.get.names.name
     )
   }
 
@@ -236,7 +240,7 @@ object Site {
     }),
 
     Table.Column("Кому", "addressee",  { document =>
-      val addressee = document.references(Path.empty)
+      val addressee = document.references
         .find(name => (name.entityType == EntityType.Person) && name.role.contains("addressee"))
       addressee.fold[Seq[Node]](scala.xml.Text(""))(addressee =>
         <persName ref={addressee.ref.orNull}>{addressee.name}</persName>)
@@ -329,7 +333,7 @@ object Site {
         "transcript" -> s"'../$documentsDirectoryName/${document.name}.html'"
       )
         ++ navigation,
-      content = Seq(Util.renderHtml(facsimilePages) + "\n")
+      content = Seq(Util.htmlPrettyPrinter.render(facsimilePages) + "\n")
     )
   }
 
@@ -375,24 +379,24 @@ object Site {
   // TODO clean up!
   private def mentions(
     value: Entity,
-    references: Seq[EntityReference]
+    references: Seq[WithPath[EntityReference]]
   ): Elem = {
-    def sources(viewer: String, references: Seq[EntityReference]): Seq[Elem] =
-      for (source <- Collections.removeConsecutiveDuplicates(references.map(_.source))) yield {
+    def sources(viewer: String, references: Seq[WithPath[EntityReference]]): Seq[Elem] =
+      for (source <- Collections.removeConsecutiveDuplicates(references.map(_.path))) yield {
         val sourceStore: Store = source.last.getStore.get
         val url: String = sourceStore match {
           case entity: EntityStore => entityUrl(entity.entity)
-          case document: Document => documentUrl(document)
+          case document: Document => documentUrl(source.init.last.getStore.get, document)
         }
 
         <ref target={url} role={viewer}>{sourceStore.names.name}</ref>
       }
 
     val (fromNames, notFromNames) = references
-      .filter(_.ref.contains(value.id.get))
-      .partition(_.source.last.getStore.get.isInstanceOf[EntityStore])
+      .filter(_.value.ref.contains(value.id.get))
+      .partition(_.path.last.getStore.get.isInstanceOf[EntityStore])
 
-    val bySource: Seq[(String, Seq[EntityReference])] =
+    val bySource: Seq[(String, Seq[WithPath[EntityReference]])] =
       notFromNames.groupBy(referenceCollectionName).toSeq.sortBy(_._1)
 
     <p rendition="mentions">
@@ -457,7 +461,7 @@ object Site {
       body = head.fold[Seq[Node]](Seq.empty)(head => Seq(<head>{head}</head>)) ++ content
     )
 
-    Util.writeXml(new File(directory, fileName + ".xml"), Tei.toXml(tei))
+    Util.teiPrettyPrinter.writeXml(new File(directory, fileName + ".xml"), Tei.toXml(tei))
 
     writeTeiWrapper(
       directory,
@@ -538,8 +542,8 @@ object Site {
 
   private def entityInTheListUrl(id: String): String = s"/$namesFileName.html#$id"
 
-  private def documentUrl(document: Document): String = {
-    val collectionDirectoryName: String = fileName(document.parent.get)
+  private def documentUrl(collection: Store, document: Document): String = {
+    val collectionDirectoryName: String = fileName(collection)
     val name: String = fileName(document)
     url(s"$collectionDirectoryName/${documentUrlRelativeToIndex(name)}")
   }

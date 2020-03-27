@@ -3,7 +3,7 @@ package org.opentorah.archive.collector
 import java.io.File
 import java.net.URL
 import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
-import org.opentorah.store.{Path, Store}
+import org.opentorah.store.{Store, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
 import org.opentorah.xml.From
@@ -24,12 +24,12 @@ object Main {
 
     val lists: Seq[EntitiesList] = store.entities.get.lists
     val entities: Seq[Entity] = store.entities.get.by.stores.map(_.entity)
-    val collections: Seq[Collection] = getCollections(store)
-    val references: Seq[EntityReference] = store.references(Path.empty)
+    val collections: Seq[WithPath[Collection]] = Util.getCollections(store)
+    val references: Seq[WithPath[EntityReference]] = store.withPath[EntityReference](values = _.references)
 
     println("Checking store.")
-    def findByRef(ref: String) = store.entities.get.findByRef(ref)
-    val errors: Seq[String] = references.flatMap(reference => checkReference(reference, findByRef))
+    def findByRef(ref: String): Option[Entity] = store.entities.get.findByRef(ref)
+    val errors: Seq[String] = references.flatMap(reference => checkReference(reference.value, findByRef))
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
 
     println("Pretty-printing store.")
@@ -38,30 +38,25 @@ object Main {
     // TODO remove common stuff (calendarDescriptor etc.)
     for {
       collection <- collections
-      document <- collection.documents
-    } Util.writeXml(
+      document <- collection.value.documents
+    } Util.teiPrettyPrinter.writeXml(
       Files.url2file(document.url),
       Tei.toXml(document.tei)
     )
 
     // TODO only if the URL is a file URL
-    for (entityStore <- store.entities.get.by.stores) Util.writeXml(
+    for (entityStore <- store.entities.get.by.stores) Util.teiPrettyPrinter.writeXml(
       Files.url2file(entityStore.url),
       Entity.toXml(entityStore.entity.copy(id = None))
     )
 
     Site.write(
       docs,
+      store,
       lists,
       entities,
-      collections,
       references
     )
-  }
-
-  private def getCollections(store: Store): Seq[Collection] = store match {
-    case collection: Collection => Seq(collection)
-    case _ => store.by.fold(Seq.empty[Collection])(by => by.stores.flatMap(getCollections))
   }
 
   private def checkReference(reference: EntityReference,  findByRef: String => Option[Entity]): Option[String] = {
