@@ -1,21 +1,21 @@
 package org.opentorah.archive.collector
 
 import java.net.URL
-import org.opentorah.store.{By, ByElement, Store, StoreElement}
+import org.opentorah.store.{By, ByElement, Selector, Store, StoreElement}
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
 import org.opentorah.xml.{From, Parser}
 
 final class Collection(
-  parent: Option[Store],
+  inheritedSelectors: Seq[Selector],
   url: URL,
   element: StoreElement.Inline
-) extends Store.FromElement(parent, url, element) {
+) extends Store.FromElement(inheritedSelectors, url, element) {
 
   private def byElement: ByElement = element.by.get
 
   override val by: Option[Collection.DocumentBy] =
-    Some(new Collection.DocumentBy(this, byElement))
+    Some(new Collection.DocumentBy(selectors, url, byElement))
 
   def documents: Seq[Document] = by.get.stores
 
@@ -33,25 +33,28 @@ object Collection {
   )
 
   final class DocumentBy(
-    store: Store,
+    inheritedSelectors: Seq[Selector],
+    url: URL,
     element: ByElement
-  ) extends By.FromElement(store, element) {
+  ) extends By.FromElement(inheritedSelectors, url, element) {
 
     override val stores: Seq[Document] = getDocuments(
-      parent = store,
+      inheritedSelectors,
+      url,
       element,
-      filesWithExtensions(store.url, "xml")
+      filesWithExtensions(url, "xml")
     )
   }
 
   private def getDocuments(
-    parent: Store,
+    inheritedSelectors: Seq[Selector],
+    url: URL,
     element: ByElement,
     filesWithExtensions: Seq[String]
   ): Seq[Document] = {
 
     def fileInDirectory(name: String): URL =
-      Files.fileInDirectory(Files.subdirectory(parent.url, element.directory.get), name + ".xml")
+      Files.fileInDirectory(Files.subdirectory(url, element.directory.get), name + ".xml")
 
     val namesWithLang: Seq[(String, Option[String])] =
       filesWithExtensions.map(splitLang)
@@ -68,7 +71,7 @@ object Collection {
     for (name <- names) yield {
       val url: URL = fileInDirectory(name)
       new Document(
-        parent = Some(parent),
+        inheritedSelectors,
         url,
         tei = readTei(url),
         name,
