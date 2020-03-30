@@ -18,6 +18,7 @@ object Creation extends Element[Creation](
     xml
   )
 ) with ToXml[Creation] {
+
   override def toXml(value: Creation): Elem =
     <creation>{Date.toXml(value.date)}{value.xml}</creation>
 }

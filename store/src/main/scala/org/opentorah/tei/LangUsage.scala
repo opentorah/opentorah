@@ -15,6 +15,7 @@ object LangUsage extends Element[LangUsage](
     languages
   )
 ) with ToXml[LangUsage] {
+
   override def toXml(value: LangUsage): Elem =
     <langUsage>{Language.toXml(value.languages)}</langUsage>
 }

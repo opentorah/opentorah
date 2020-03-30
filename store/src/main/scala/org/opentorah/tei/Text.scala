@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.xml.{Attribute, ContentType, Element, ToXml}
-import scala.xml.{Elem, Node}
+import scala.xml.Elem
 
 final case class Text(
   lang: Option[String],
@@ -19,11 +19,6 @@ object Text extends Element[Text](
     body
   )
 ) with ToXml[Text] {
-
-  def apply(xml: Seq[Node]): Text = new Text(
-    lang = None,
-    body = new Body.Value(xml)
-  )
 
   override def toXml(value: Text): Elem =
     <text xml:lang={value.lang.orNull}>{Body.parsable.toXml(value.body)}</text>

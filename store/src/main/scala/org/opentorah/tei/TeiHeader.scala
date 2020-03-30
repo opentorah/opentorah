@@ -28,14 +28,6 @@ object TeiHeader extends Element[TeiHeader](
   )
 ) with ToXml[TeiHeader] {
 
-  def apply(fileDesc: FileDesc): TeiHeader = new TeiHeader(
-    fileDesc,
-    encodingDesc = None,
-    profileDesc = None,
-    xenoData = None,
-    revisionDesc = None
-  )
-
   override def toXml(value: TeiHeader): Elem =
     <teiHeader>
       {FileDesc.toXml(value.fileDesc)}
@@ -44,4 +36,12 @@ object TeiHeader extends Element[TeiHeader](
       {XenoData.parsable.toXml(value.xenoData)}
       {RevisionDesc.parsable.toXml(value.revisionDesc)}
     </teiHeader>
+
+  def apply(): TeiHeader = new TeiHeader(
+    fileDesc = FileDesc(),
+    encodingDesc = None,
+    profileDesc = None,
+    xenoData = None,
+    revisionDesc = None
+  )
 }

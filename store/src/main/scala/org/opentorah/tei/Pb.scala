@@ -22,6 +22,7 @@ object Pb extends Element[Pb](
     facs
   )
 ) with ToXml[Pb] {
+
   override def toXml(value: Pb): Elem =
     <pb n={value.n} id={value.id.orNull} facs={value.facs.orNull}/>
 }

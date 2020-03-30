@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.entity.EntityReference
+import org.opentorah.entity.{EntityReference, EntityType}
 import org.opentorah.xml.{ContentType, Element, ToXml, XmlUtil}
 import scala.xml.{Elem, Node}
 
@@ -22,8 +22,12 @@ final case class Tei(
       correspDesc.map(_.xml).getOrElse(Seq.empty) ++
       body.xml
 
-    titleStmt.references ++ lookInto.flatMap(EntityReference.parsable.descendants)
+    titleStmt.references ++ EntityReference.from(lookInto)
   }
+
+  def addressee: Option[EntityReference] =
+    EntityReference.from(correspDesc.map(_.xml).getOrElse(Seq.empty))
+      .find(name => (name.entityType == EntityType.Person) && name.role.contains("addressee"))
 
   /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
 }
@@ -40,31 +44,17 @@ object Tei extends Element[Tei](
   )
 ) with ToXml[Tei] {
 
-  def apply(
-    publisher: Seq[Node],
-    availabilityStatus: String,
-    availability: Seq[Node],
-    sourceDesc: Seq[Node],
-    body: Seq[Node]
-  ): Tei = new Tei(
-    teiHeader = TeiHeader(
-      fileDesc = FileDesc(
-        publicationStmt = PublicationStmt(
-          publisher,
-          availability = Availability(
-            availabilityStatus,
-            availability
-          )
-        ),
-        sourceDesc
-      )
-    ),
-    text = Text(body)
-  )
-
   override def toXml(value: Tei): Elem =
     <TEI xmlns="http://www.tei-c.org/ns/1.0">
       {XmlUtil.removeNamespace(TeiHeader.toXml(value.teiHeader))}
       {XmlUtil.removeNamespace(Text.toXml(value.text))}
     </TEI>
+
+  def apply(body: Seq[Node]): Tei = new Tei(
+    teiHeader = TeiHeader(),
+    text = new Text(
+      lang = None,
+      new Body.Value(body)
+    )
+  )
 }

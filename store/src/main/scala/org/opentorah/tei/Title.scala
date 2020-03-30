@@ -19,6 +19,7 @@ object Title extends Element[Title](
     content
   )
 ) with ToXml[Title] {
+
   override def toXml(value: Title): Elem =
     <title type={value.titleType.orNull}>{value.content}</title>
 }

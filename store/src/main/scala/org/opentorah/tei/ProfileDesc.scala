@@ -39,6 +39,7 @@ object ProfileDesc extends Element[ProfileDesc](
     calendarDesc
   )
 ) with ToXml[ProfileDesc] {
+
   override def toXml(value: ProfileDesc): Elem =
     <profileDesc>
       {Abstract.parsable.toXml(value.documentAbstract)}
@@ -48,4 +49,13 @@ object ProfileDesc extends Element[ProfileDesc](
       {CorrespDesc.parsable.toXml(value.correspDesc)}
       {CalendarDesc.parsable.toXml(value.calendarDesc)}
     </profileDesc>
+
+  def apply(): ProfileDesc = new ProfileDesc(
+    documentAbstract = None,
+    creation = None,
+    langUsage = None,
+    textClass = None,
+    correspDesc = None,
+    calendarDesc = None
+  )
 }

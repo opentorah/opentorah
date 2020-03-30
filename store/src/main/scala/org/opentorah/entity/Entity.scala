@@ -14,8 +14,7 @@ final case class Entity private(
 
   def name: String = names.head.name
 
-  def references: Seq[EntityReference] =
-    content.flatMap(EntityReference.parsable.descendants)
+  def references: Seq[EntityReference] = EntityReference.from(content)
 }
 
 object Entity extends Parsable[Entity] with ToXml[Entity] {

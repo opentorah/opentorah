@@ -69,7 +69,8 @@ final class PaigesPrettyPrinter(
       else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, docs)
     }
 
-    val (chunks: Seq[Doc], noAtoms: Boolean) = fromChildren(element, canBreakLeft, canBreakRight)
+    val (chunks: Seq[Doc], noAtoms: Boolean, charactersLeft: Boolean, charactersRight: Boolean) =
+      fromChildren(element, canBreakLeft, canBreakRight)
 
     if (chunks.isEmpty) Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>") else  {
       val start: Doc = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">")
@@ -88,11 +89,12 @@ final class PaigesPrettyPrinter(
           indent
         )
       } else {
-        // Mixed content or non-break-off-able attachments on the side(s) cause flow-style:
+        // Mixed content or non-break-off-able attachments on the side(s) cause flow-style;
+        // character content should stick to the opening and closing tags:
         start +
-        (if (canBreakLeft) Doc.lineOrEmpty else Doc.empty) +
+        (if (canBreakLeft && !charactersLeft) Doc.lineOrEmpty else Doc.empty) +
         Doc.intercalate(Doc.lineOrSpace, chunks) +
-        (if (canBreakRight) Doc.lineOrEmpty else Doc.empty) +
+        (if (canBreakRight && !charactersRight) Doc.lineOrEmpty else Doc.empty) +
         end
       }
     }
@@ -102,10 +104,12 @@ final class PaigesPrettyPrinter(
     element: Elem,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  ): (Seq[Doc], Boolean) = {
-    val nodes = PaigesPrettyPrinter.atomize(Seq.empty, element.child)
-    val whitespaceLeft = nodes.headOption.exists(XmlUtil.isWhitespace)
-    val whitespaceRight = nodes.lastOption.exists(XmlUtil.isWhitespace)
+  ): (Seq[Doc], Boolean, Boolean, Boolean) = {
+    val nodes: Seq[Node] = PaigesPrettyPrinter.atomize(Seq.empty, element.child)
+    val whitespaceLeft: Boolean = nodes.headOption.exists(XmlUtil.isWhitespace)
+    val whitespaceRight: Boolean = nodes.lastOption.exists(XmlUtil.isWhitespace)
+    val charactersLeft: Boolean = nodes.headOption.exists(node => XmlUtil.isAtom(node) && !XmlUtil.isWhitespace(node))
+    val charactersRight: Boolean = nodes.lastOption.exists(node => XmlUtil.isAtom(node) && !XmlUtil.isWhitespace(node))
     val chunks: Seq[Seq[Node]] = chunkify(Seq.empty, nodes)
     val noAtoms: Boolean = chunks.forall(_.forall(node => !XmlUtil.isAtom(node)))
     val result = fromChunks(
@@ -114,7 +118,7 @@ final class PaigesPrettyPrinter(
       canBreakLeft = canBreakLeft || whitespaceLeft,
       canBreakRight = canBreakRight || whitespaceRight
     )
-    (result, noAtoms)
+    (result, noAtoms, charactersLeft, charactersRight)
   }
 
   private def fromChunks(

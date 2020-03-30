@@ -22,6 +22,7 @@ object Date extends Element[Date](
     xml
   )
 ) with ToXml[Date] {
+
   override def toXml(value: Date): Elem =
     <date when={value.when} calendar={value.calendar.orNull}>{value.xml}</date>
 }

@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.xml.{Element, ToXml}
-import scala.xml.{Elem, Node}
+import scala.xml.Elem
 
 final case class PublicationStmt(
   publisher: Option[Publisher.Value],
@@ -19,14 +19,14 @@ object PublicationStmt extends Element[PublicationStmt](
   )
 ) with ToXml[PublicationStmt] {
 
-  def apply(publisher: Seq[Node], availability: Availability): PublicationStmt = new PublicationStmt(
-    publisher = Some(new Publisher.Value(publisher)),
-    availability = Some(availability)
-  )
-
   override def toXml(value: PublicationStmt): Elem =
     <publicationStmt>
       {Publisher.parsable.toXml(value.publisher)}
       {Availability.toXml(value.availability)}
     </publicationStmt>
+
+  def apply(): PublicationStmt = new PublicationStmt(
+    publisher = None,
+    availability = None
+  )
 }

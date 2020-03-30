@@ -36,9 +36,12 @@ object EntityReference extends ToXml[EntityReference] {
   final val organizationParsable: Parsable[EntityReference] = parsable(EntityType.Organization)
   final val placeParsable: Parsable[EntityReference] = parsable(EntityType.Place)
 
-  final val parsable = new UnionParsable[EntityReference](Seq(
+  final val parsable: UnionParsable[EntityReference] = new UnionParsable[EntityReference](Seq(
     personParsable, organizationParsable, placeParsable
   ))
+
+  final def from(xml: Seq[Node]): Seq[EntityReference] =
+    xml.flatMap(parsable.descendants)
 
   override def toXml(value: EntityReference): Elem =
     <name ref={value.ref.orNull} xml:id={value.id.orNull} role={value.role.orNull}>{value.name}</name>

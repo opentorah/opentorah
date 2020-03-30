@@ -3,6 +3,7 @@ package org.opentorah.store
 import org.opentorah.xml.{Attribute, Element, ToXml}
 import scala.xml.Elem
 
+// TODO introduce ByElement.FromFile and By.read() etc..
 final case class ByElement(
   selector: String,
   directory: Option[String],

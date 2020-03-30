@@ -22,7 +22,7 @@ final case class TitleStmt(
       respStmts.map(RespStmt.parsable.toXml)
     ).flatten
 
-    xml.flatMap(EntityReference.parsable.descendants) ++  editors.flatMap(_.persName.toSeq)
+    EntityReference.from(xml) ++ editors.flatMap(_.persName.toSeq)
   }
 }
 

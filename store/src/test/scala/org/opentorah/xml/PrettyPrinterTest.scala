@@ -107,17 +107,17 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
       expected = """<creation><date when="2020-02-24"/>blah</creation>""")
 
     check(<creation><date when="2020-02-24"/>blah</creation>, 49, expected =
-      """|<creation><date when="2020-02-24"/>blah
-         |</creation>""")
+      """|<creation><date when="2020-02-24"
+         |/>blah</creation>""")
 
-    check(<creation><date when="2020-02-24"/>blah</creation>, 30, expected = // there is a space after <date.
+    check(<creation><date when="2020-02-24"/>blah</creation>, 30, expected =
       """|<creation><date
-         |when="2020-02-24"/>blah
-         |</creation>""")
+         |when="2020-02-24"
+         |/>blah</creation>""")
 
-    check(<creation><date when="2020-02-24"/>blah</creation>, 24, expected = // there is a space after <date.
+    check(<creation><date when="2020-02-24"/>blah</creation>, 24, expected =
       """|<creation><date
-         |when="2020-02-24"/>blah
-         |</creation>""")
+         |when="2020-02-24"
+         |/>blah</creation>""")
   }
 }

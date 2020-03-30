@@ -5,7 +5,7 @@ import org.opentorah.entity.EntityReference
 import org.opentorah.metadata.Names
 import org.opentorah.util.Files
 import org.opentorah.xml.Parser
-import scala.xml.{Elem, Node}
+import scala.xml.Node
 
 abstract class Store(
   inheritedSelectors: Seq[Selector],
@@ -44,8 +44,6 @@ abstract class Store(
 
     fromEntities ++ fromStore ++ fromBy
   }
-
-  def toXml: Elem
 }
 
 object Store {
@@ -54,7 +52,7 @@ object Store {
     inheritedSelectors: Seq[Selector],
     fromUrl: Option[URL],
     baseUrl: URL,
-    element: StoreElement.Inline
+    val element: StoreElement.Inline
   ) extends Store(inheritedSelectors, fromUrl, baseUrl) {
 
     final override def names: Names =
@@ -76,7 +74,7 @@ object Store {
       element.notes
 
     override def by: Option[By[_]] =
-      element.by.map(byElement => new By(selectors, baseUrl, byElement))
+      element.by.map(byElement => new By.FromElement(selectors, baseUrl, byElement))
 
     final override def references: Seq[EntityReference] = {
       val lookInto: Seq[Node] =
@@ -84,10 +82,8 @@ object Store {
         storeAbstract.map(_.xml).getOrElse(Seq.empty) ++
         notes.xml
 
-      lookInto.flatMap(EntityReference.parsable.descendants)
+      EntityReference.from(lookInto)
     }
-
-    final override def toXml: Elem = StoreElement.toXml(element)
   }
 
   def read[S <: Store](

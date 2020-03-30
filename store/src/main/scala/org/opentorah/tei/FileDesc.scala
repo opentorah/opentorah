@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.xml.{Element, ToXml}
-import scala.xml.{Elem, Node}
+import scala.xml.Elem
 
 final case class FileDesc(
   titleStmt: TitleStmt,
@@ -34,16 +34,6 @@ object FileDesc extends Element[FileDesc](
   )
 ) with ToXml[FileDesc] {
 
-  def apply(publicationStmt: PublicationStmt, sourceDesc: Seq[Node]): FileDesc = new FileDesc(
-    titleStmt = TitleStmt(),
-    editionStmt =  None,
-    extent = None,
-    publicationStmt,
-    seriesStmt = None,
-    notesStmt = None,
-    sourceDesc = new SourceDesc.Value(sourceDesc)
-  )
-
   override def toXml(value: FileDesc): Elem =
     <fileDesc>
       {TitleStmt.toXml(value.titleStmt)}
@@ -54,4 +44,14 @@ object FileDesc extends Element[FileDesc](
       {NotesStmt.parsable.toXml(value.notesStmt)}
       {SourceDesc.parsable.toXml(value.sourceDesc)}
     </fileDesc>
+
+  def apply(): FileDesc = new FileDesc(
+    titleStmt = TitleStmt(),
+    editionStmt =  None,
+    extent = None,
+    publicationStmt = PublicationStmt(),
+    seriesStmt = None,
+    notesStmt = None,
+    sourceDesc = new SourceDesc.Value(Seq.empty)
+  )
 }

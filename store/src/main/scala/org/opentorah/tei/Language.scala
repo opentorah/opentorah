@@ -22,6 +22,7 @@ object Language extends Element[Language](
     text
   )
 ) with ToXml[Language] {
+
   override def toXml(value: Language): Elem =
     <language ident={value.ident} usage={value.usage.map(_.toString).orNull}>{value.text.orNull}</language>
 }

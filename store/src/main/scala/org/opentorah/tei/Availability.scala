@@ -18,10 +18,6 @@ object Availability extends Element[Availability](
     xml
   )
 ) with ToXml[Availability] {
-  def apply(status: String, xml: Seq[Node]): Availability = new Availability(
-    status = Some(status),
-    xml
-  )
 
   override def toXml(value: Availability): Elem =
     <availability status={value.status.orNull}>{value.xml}</availability>

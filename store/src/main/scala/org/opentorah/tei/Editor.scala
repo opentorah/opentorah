@@ -19,6 +19,7 @@ object Editor extends Element[Editor](
     persName
   )
 ) with ToXml[Editor] {
+
   override def toXml(value: Editor): Elem =
     <editor role={value.role.orNull}>
       {value.persName.map(reference => EntityReference.toXml(reference)).orNull}
