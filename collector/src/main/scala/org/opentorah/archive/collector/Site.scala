@@ -90,9 +90,7 @@ object Site {
       fileName = entity.id.get,
       head = None,
       target = "namesViewer",
-      content = Seq(Entity.toXml(entity.copy(content =
-        entity.content :+ mentions(entity, references)
-      )))
+      content = Seq(Entity.toXml(entity.copy(content = entity.content :+ mentions(entity, references))))
     )
 
     writeNamesList(
@@ -103,23 +101,16 @@ object Site {
     val collectionsDirectory: File = new File(directory, collectionsDirectoryName)
     Files.deleteFiles(collectionsDirectory)
 
-    val collections: Seq[WithPath[Collection]] = Util.getCollections(store)
+    val collections: Seq[WithPath[Collection]] = getCollections(store)
 
     for (collection <- collections) {
+      // TODO insert path information into the case descriptors.
       val collectionDirectory: File = new File(collectionsDirectory, collectionName(collection.value))
       writeCollectionIndex(collection.value, collectionDirectory)
 
+      val teiDirectory: File = new File(collectionDirectory, teiDirectoryName)
       for ((document, (prev, next)) <- Collections.prevAndNext(collection.value.documents)) {
-        // Documents
-        val teiDirectory: File = new File(collectionDirectory, teiDirectoryName)
-        Util.teiPrettyPrinter.writeXml(
-          new File(teiDirectory, document.name + ".xml"),
-          Tei.toXml(document.tei)
-        )
-        for ((language: String, translation: Tei) <- document.translations) Util.teiPrettyPrinter.writeXml(
-          new File(teiDirectory, document.name + "-" + language + ".xml"),
-          Tei.toXml(translation)
-        )
+        Document.writeDocument(document, teiDirectory)
 
         // Wrappers
         val navigation: Seq[(String, String)] =
@@ -168,6 +159,12 @@ object Site {
             reference.path.last.store.names.name
     )
   }
+
+  private def getCollections(store: Store): Seq[WithPath[Collection]] =
+    store.withPath[Collection](values = {
+      case collection: Collection => Seq(collection)
+      case _ => Seq.empty
+    })
 
   private def writeCollectionIndex(
     collection: Collection,
@@ -435,6 +432,7 @@ object Site {
     target: String,
     yaml: Seq[(String, String)] = Seq.empty
   ): Unit = {
+    // TODO remove the apply() used here and do it by hand here:
     val tei = Tei(
       publisher = <ptr target="www.alter-rebbe.org"/>,
       availabilityStatus = "free", availability =
