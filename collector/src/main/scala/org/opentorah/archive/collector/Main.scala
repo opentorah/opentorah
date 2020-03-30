@@ -4,9 +4,8 @@ import java.io.File
 import java.net.URL
 import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
 import org.opentorah.store.{Store, WithPath}
-import org.opentorah.tei.Tei
 import org.opentorah.util.Files
-import org.opentorah.xml.From
+import org.opentorah.xml.{From, PaigesPrettyPrinter}
 
 object Main {
 
@@ -33,23 +32,11 @@ object Main {
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
 
     println("Pretty-printing store.")
-    // TODO do all stores with defined fromUrl.
     // TODO do translations also!
-    // TODO only if the URL is a file URL
     // TODO remove common stuff (calendarDescriptor etc.)
-    for {
-      collection <- collections
-      document <- collection.value.documents
-    } Util.teiPrettyPrinter.writeXml(
-      Files.url2file(document.fromUrl.get),
-      Tei.toXml(document.tei)
-    )
-
-    // TODO only if the URL is a file URL
-    for (entityStore <- store.entities.get.by.get.stores) Util.teiPrettyPrinter.writeXml(
-      Files.url2file(entityStore.fromUrl.get),
-      Entity.toXml(entityStore.entity.copy(id = None))
-    )
+    // TODO closing tag should stick to preceding characters! see niab 611:
+    //   ... доходов</title>
+    prettyPrint(store, Util.teiPrettyPrinter)
 
     Site.write(
       docs,
@@ -58,6 +45,17 @@ object Main {
       entities,
       references
     )
+  }
+
+  private def prettyPrint(store: Store, prettyPrinter: PaigesPrettyPrinter): Unit = {
+    if (store.fromUrl.isDefined && Files.isFile(store.fromUrl.get)) Util.teiPrettyPrinter.writeXml(
+      file = Files.url2file(store.fromUrl.get),
+      elem = store.toXml
+    )
+    if (store.entities.isDefined)
+      prettyPrint(store.entities.get, prettyPrinter)
+    if (store.by.isDefined) // TODO get rid of the cast:
+      store.by.get.stores.foreach[Unit] { store => prettyPrint(store.asInstanceOf[Store], prettyPrinter) }
   }
 
   private def checkReference(reference: EntityReference,  findByRef: String => Option[Entity]): Option[String] = {
