@@ -1,16 +1,16 @@
 package org.opentorah.store
 
 import org.opentorah.metadata.Names
-import org.opentorah.xml.{Attribute, Element, Parser, RawXml}
+import org.opentorah.xml.{Attribute, Element, Parser, RawXml, ToXml}
 import zio.ZIO
-import scala.xml.Node
+import scala.xml.{Elem, Node}
 
 sealed trait StoreElement
 
 object StoreElement extends Element[StoreElement](elementName = "store", parser = for {
   file <- Attribute("file").optional
   result <- if (file.isDefined) StoreElement.fromFileParser(file.get) else StoreElement.inlineParser
-} yield result) {
+} yield result) with ToXml[StoreElement] {
 
   final case class FromFile(
     file: String
@@ -60,4 +60,29 @@ object StoreElement extends Element[StoreElement](elementName = "store", parser 
     new Notes(notes),
     storeType
   )
+
+  override def toXml(value: StoreElement): Elem = value match {
+    case fromFile: FromFile => toXmlFromFile(fromFile)
+    case inline: Inline => toXmlInline(inline)
+  }
+
+  private def toXmlFromFile(value: FromFile): Elem =
+    <store file={value.file}/>
+
+  private def toXmlInline(value: StoreElement.Inline): Elem = {
+    val defaultName: Option[String] = value.names.getDefaultName
+    <store
+      n={defaultName.orNull}
+      from={value.from.orNull}
+      type={value.storeType.orNull}
+    >
+      {if (defaultName.isDefined) Seq.empty else Names.toXml(value.names)}
+      {Selector.toXml(value.selectors)}
+      {EntitiesElement.toXml(value.entities)}
+      {Title.parsable.toXml(value.title)}
+      {Abstract.parsable.toXml(value.storeAbstract)}
+      {ByElement.toXml(value.by)}
+      {value.notes.xml}
+    </store>
+  }
 }

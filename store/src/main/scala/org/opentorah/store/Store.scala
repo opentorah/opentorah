@@ -5,7 +5,7 @@ import org.opentorah.entity.EntityReference
 import org.opentorah.metadata.Names
 import org.opentorah.util.Files
 import org.opentorah.xml.Parser
-import scala.xml.Node
+import scala.xml.{Elem, Node}
 
 abstract class Store(
   inheritedSelectors: Seq[Selector],
@@ -44,6 +44,8 @@ abstract class Store(
 
     fromEntities ++ fromStore ++ fromBy
   }
+
+  def toXml: Elem
 }
 
 object Store {
@@ -84,6 +86,8 @@ object Store {
 
       lookInto.flatMap(EntityReference.parsable.descendants)
     }
+
+    final override def toXml: Elem = StoreElement.toXml(element)
   }
 
   def read[S <: Store](

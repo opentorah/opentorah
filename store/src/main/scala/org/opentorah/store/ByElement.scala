@@ -1,6 +1,7 @@
 package org.opentorah.store
 
-import org.opentorah.xml.{Attribute, Element, Parser}
+import org.opentorah.xml.{Attribute, Element, ToXml}
+import scala.xml.Elem
 
 final case class ByElement(
   selector: String,
@@ -19,4 +20,14 @@ object ByElement extends Element[ByElement]("by", parser = for {
   directory,
   list,
   stores
-))
+)) with ToXml[ByElement] {
+
+  override def toXml(value: ByElement): Elem =
+    <by
+      selector={value.selector}
+      directory={value.directory.orNull}
+      list={value.list.orNull}
+    >
+      {StoreElement.toXml(value.stores)}
+    </by>
+}

@@ -38,7 +38,7 @@ object EntitiesList extends Parsable[EntitiesList] with ToXml[EntitiesList] {
   )
 
   override def toXml(value: EntitiesList): Elem =
-    <elem id={value.id} role={value.role.orNull}>
+    <elem xml:id={value.id} role={value.role.orNull}>
       <head>{value.head}</head>
     </elem>
     .copy(label = value.entityType.listElement)

@@ -2,6 +2,7 @@ package org.opentorah.metadata
 
 import org.opentorah.xml.{Attribute, Parser}
 import org.opentorah.util.Collections
+import scala.xml.Elem
 
 // TODO clean this up - from the calendar project :)
 final class Names(val names: Seq[Name]) extends HasName with LanguageString {
@@ -11,6 +12,10 @@ final class Names(val names: Seq[Name]) extends HasName with LanguageString {
   // Collections.checkNoDuplicates(names.map(_.copy(name = "")), "name parameters")
 
   def isEmpty: Boolean = names.isEmpty
+
+
+  def getDefaultName: Option[String] =
+    if ((names.length == 1) && (names.head.languageSpec == LanguageSpec.empty)) Some(names.head.name) else None
 
   def find(name: String): Option[Name] = names.find(_.name == name)
 
@@ -90,4 +95,7 @@ object Names {
     names <- withDefaultNameParser
     result <- parser
   } yield names -> result
+
+  def toXml(value: Names): Seq[Elem] =
+    Name.toXml(value.names)
 }

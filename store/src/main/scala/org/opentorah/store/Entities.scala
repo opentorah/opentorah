@@ -4,6 +4,7 @@ import java.net.URL
 import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
 import org.opentorah.metadata.{Name, Names}
 import org.opentorah.xml.Parser
+import scala.xml.Elem
 
 // TODO this should have two Bys.
 final class Entities(
@@ -27,6 +28,9 @@ final class Entities(
   override def references: Seq[EntityReference] = Seq.empty
 
   def findByRef(ref: String): Option[Entity] = by.get.stores.find(_.entity.id.get == ref).map(_.entity)
+
+  override def toXml: Elem =
+    throw new IllegalArgumentException("Not implemented since fromXml is never defined")
 }
 
 object Entities {
@@ -40,6 +44,8 @@ object Entities {
     override def names: Names = new Names(Seq(Name(entity.name)))
 
     override def references: Seq[EntityReference] = entity.references
+
+    override def toXml: Elem = Entity.toXml(entity.copy(id = None))
   }
 
   final class EntitiesBy(
