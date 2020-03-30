@@ -2,7 +2,7 @@ package org.opentorah.archive.collector
 
 import java.io.File
 import java.net.URL
-import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
+import org.opentorah.entity.{Entity, EntityReference}
 import org.opentorah.store.{Store, WithPath}
 import org.opentorah.util.Files
 import org.opentorah.xml.{From, PaigesPrettyPrinter}
@@ -20,10 +20,6 @@ object Main {
     val docs: File = new File(docsStr)
     val fromUrl: URL = From.file(new File(new File(docs, "store"), "store.xml")).url.get
     val store: Store = Store.read(fromUrl)
-
-    val lists: Seq[EntitiesList] = store.entities.get.lists
-    val entities: Seq[Entity] = store.entities.get.by.get.stores.map(_.entity)
-    val collections: Seq[WithPath[Collection]] = Util.getCollections(store)
     val references: Seq[WithPath[EntityReference]] = store.withPath[EntityReference](values = _.references)
 
     println("Checking store.")
@@ -31,18 +27,17 @@ object Main {
     val errors: Seq[String] = references.flatMap(reference => checkReference(reference.value, findByRef))
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
 
-    println("Pretty-printing store.")
     // TODO do translations also!
     // TODO remove common stuff (calendarDescriptor etc.)
-    // TODO closing tag should stick to preceding characters! see niab 611:
-    //   ... доходов</title>
+    // TODO closing tag should stick to preceding characters! see niab 611:  ... доходов</title>
+    println("Pretty-printing store.")
     prettyPrint(store, Util.teiPrettyPrinter)
 
     Site.write(
       docs,
       store,
-      lists,
-      entities,
+      lists = store.entities.get.lists,
+      entities = store.entities.get.by.get.stores.map(_.entity),
       references
     )
   }
