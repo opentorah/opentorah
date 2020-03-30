@@ -1,8 +1,8 @@
 package org.opentorah.archive.collector
 
 import java.io.File
-import org.opentorah.entity.{EntitiesList, Entity, EntityName, EntityReference, EntityType}
-import org.opentorah.store.{Entities, Store, WithPath}
+import org.opentorah.entity.{EntitiesList, Entity, EntityName, EntityReference}
+import org.opentorah.store.{EntityHolder, Store, TeiHolder, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
 import org.opentorah.xml.XmlUtil
@@ -20,7 +20,7 @@ object Site {
     Files.nameAndExtension(Files.pathAndName(store.fromUrl.get.getPath)._2)._1
 
   private def referenceCollectionName(reference: WithPath[EntityReference]): String =
-    reference.path.init.last.store.names.name
+    reference.path.init.init.last.store.names.name
 
   // TODO this yuck is temporary :)
 
@@ -67,18 +67,19 @@ object Site {
   //      throw new IllegalArgumentException(s"Missing images: $missingImages")
   //  }
 
-  private def pages(pageType: Page.Type, document: Document): Seq[Page] = for (pb <- document.tei.pbs) yield pageType(
-    n = pb.n,
-    facs = pb.facs
-  )
+  private def pages(pageType: Page.Type, document: Document): Seq[Page] =
+    for (pb <- document.tei.pbs) yield pageType(
+      n = pb.n,
+      facs = pb.facs
+    )
 
   def write(
     directory: File,
     store: Store,
-    lists: Seq[EntitiesList],
-    entities: Seq[Entity],
     references: Seq[WithPath[EntityReference]]
   ): Unit = {
+    val lists: Seq[EntitiesList] = store.entities.get.lists
+    val entities: Seq[Entity] = store.entities.get.by.get.stores.map(_.entity)
 
     println("Writing site.")
 
@@ -110,7 +111,10 @@ object Site {
 
       val teiDirectory: File = new File(collectionDirectory, teiDirectoryName)
       for ((document, (prev, next)) <- Collections.prevAndNext(collection.value.documents)) {
-        Document.writeDocument(document, teiDirectory)
+        for (teiHolder: TeiHolder <- document.by.get.stores) TeiUtil.teiPrettyPrinter.writeXml(
+          file = new File(teiDirectory, teiHolder.name + ".xml"),
+          elem = Tei.toXml(TeiUtil.addCommon(teiHolder.tei))
+        )
 
         // Wrappers
         val navigation: Seq[(String, String)] =
@@ -215,14 +219,12 @@ object Site {
     }),
 
     Table.Column("Кому", "addressee",  { document =>
-      val addressee = document.references
-        .find(name => (name.entityType == EntityType.Person) && name.role.contains("addressee"))
-      addressee.fold[Seq[Node]](scala.xml.Text(""))(addressee =>
+      document.tei.addressee.fold[Seq[Node]](scala.xml.Text(""))(addressee =>
         <persName ref={addressee.ref.orNull}>{addressee.name}</persName>)
     }),
 
     Table.Column("Язык", "language", { document: Document =>
-      val translations: Seq[Elem] = for (translation <- document.translations.keys.toSeq) yield
+      val translations: Seq[Elem] = for (translation <- document.languages) yield
         <ref target={documentUrlRelativeToIndex(document.name + "-" + translation)}
              role="documentViewer">{translation}</ref>
 
@@ -273,13 +275,13 @@ object Site {
       yaml = Seq(
         "facs" -> s"'../$facsDirectoryName/$name.html'"
       ) ++ (
-        if (lang.isDefined || document.translations.isEmpty) Seq.empty
-        else Seq("translations" -> document.translations.keys.mkString("[", ", ", "]"))) ++ navigation
+        if (lang.isDefined || document.languages.isEmpty) Seq.empty
+        else Seq("translations" -> document.languages.mkString("[", ", ", "]"))) ++ navigation
       )
 
     // TEI wrapper(s)
     writeTeiWrapperForLang(document.name, None)
-    for (lang <- document.translations.keys) writeTeiWrapperForLang(document.name, Some(lang))
+    for (lang <- document.languages) writeTeiWrapperForLang(document.name, Some(lang))
   }
 
   private def writeFacsViewer(
@@ -308,7 +310,7 @@ object Site {
         "transcript" -> s"'../$documentsDirectoryName/${document.name}.html'"
       )
         ++ navigation,
-      content = Seq(Util.htmlPrettyPrinter.render(facsimilePages) + "\n")
+      content = Seq(TeiUtil.htmlPrettyPrinter.render(facsimilePages) + "\n")
     )
   }
 
@@ -363,8 +365,9 @@ object Site {
         for (source <- Collections.removeConsecutiveDuplicates(references.map(_.path))) yield {
         val sourceStore: Store = source.last.store
         val url: Option[String] = sourceStore match {
-          case entity: Entities.EntityStore => Some(entityUrl(entity.entity))
-          case document: Document => Some(documentUrl(source.init.last.store, document))
+          case entityHolder: EntityHolder => Some(entityUrl(entityHolder.entity))
+          case teiHolder: TeiHolder => Some(documentUrl(source.init.init.last.store, fileName(teiHolder)))
+          case document: Document => Some(documentUrl(source.init.last.store, fileName(document)))
           case collection: Collection => None // TODO Some(collectionUrl(collection)) when grouping is adjusted
           case _ => None
         }
@@ -376,11 +379,11 @@ object Site {
 
     val (fromNames: Seq[WithPath[EntityReference]], notFromNames: Seq[WithPath[EntityReference]]) = references
       .filter(_.value.ref.contains(value.id.get))
-      .partition(_.path.last.store.isInstanceOf[Entities.EntityStore])
+      .partition(_.path.last.store.isInstanceOf[EntityHolder])
 
     val bySource: Seq[(String, Seq[WithPath[EntityReference]])] =
       notFromNames
-        .filter(_.path.init.last.store.isInstanceOf[Collection])  // TODO remove when grouping is adjusted
+        .filter(reference => (reference.path.path.length >=3) && reference.path.init.init.last.store.isInstanceOf[Collection])  // TODO remove when grouping is adjusted
         .groupBy(referenceCollectionName).toSeq.sortBy(_._1)
 
     <p rendition="mentions">
@@ -426,27 +429,19 @@ object Site {
   private def writeTei(
     directory: File,
     fileName: String,
-    head: Option[Node], // TODO do not supply where not needed
+    head: Option[Node],
     content: Seq[Node],
     style: Option[String] = None,
     target: String,
     yaml: Seq[(String, String)] = Seq.empty
   ): Unit = {
-    // TODO remove the apply() used here and do it by hand here:
-    val tei = Tei(
-      publisher = <ptr target="www.alter-rebbe.org"/>,
-      availabilityStatus = "free", availability =
-        <licence>
-          <ab>
-            <ref n="license" target="http://creativecommons.org/licenses/by/4.0/">
-              Creative Commons Attribution 4.0 International License</ref>
-          </ab>
-        </licence>,
-      sourceDesc = <p>Facsimile</p>,
-      body = head.fold[Seq[Node]](Seq.empty)(head => Seq(<head>{head}</head>)) ++ content
-    )
+    val body: Seq[Node] =
+      head.fold[Seq[Node]](Seq.empty)(head => Seq(<head>{head}</head>)) ++ content
 
-    Util.teiPrettyPrinter.writeXml(new File(directory, fileName + ".xml"), Tei.toXml(tei))
+    TeiUtil.teiPrettyPrinter.writeXml(
+      file = new File(directory, fileName + ".xml"),
+      elem = Tei.toXml(TeiUtil.addCommonNoCalendar(Tei(body)))
+    )
 
     writeTeiWrapper(
       directory,
@@ -527,10 +522,9 @@ object Site {
 
   private def entityInTheListUrl(id: String): String = s"/$namesFileName.html#$id"
 
-  private def documentUrl(collection: Store, document: Document): String = {
+  private def documentUrl(collection: Store, documentName: String): String = {
     val collectionDirectoryName: String = fileName(collection)
-    val name: String = fileName(document)
-    url(s"$collectionDirectoryName/${documentUrlRelativeToIndex(name)}")
+    url(s"$collectionDirectoryName/${documentUrlRelativeToIndex(documentName)}")
   }
 
   private def documentUrlRelativeToIndex(name: String): String =  s"$docsDirectoryName/$name.html"

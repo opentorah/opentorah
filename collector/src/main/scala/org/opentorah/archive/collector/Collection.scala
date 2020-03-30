@@ -2,9 +2,9 @@ package org.opentorah.archive.collector
 
 import java.net.URL
 import org.opentorah.store.{By, ByElement, Selector, Store, StoreElement}
-import org.opentorah.tei.Tei
 import org.opentorah.util.Collections
 import org.opentorah.xml.Parser
+import zio.ZIO
 
 final class Collection(
   inheritedSelectors: Seq[Selector],
@@ -37,7 +37,7 @@ object Collection {
     inheritedSelectors: Seq[Selector],
     baseUrl: URL,
     element: ByElement
-  ) extends By[Document](inheritedSelectors, baseUrl, element) {
+  ) extends By.FromElement[Document](inheritedSelectors, baseUrl, element) {
 
     override protected def loadFromDirectory(
       fileNames: Seq[String],
@@ -52,35 +52,14 @@ object Collection {
 
       val names: Seq[String] = namesWithLang.filter(_._2.isEmpty).map(_._1)
 
-      for (name <- names) yield getDocument(
-        selectors,
+      for (name <- names) yield ZIO.succeed(new Document(
+        inheritedSelectors,
+        baseUrl,
         fileInDirectory,
         name,
-        translationLanguages = translations.getOrElse(name, Seq.empty)
-      )
-    }
-  }
-
-  private def getDocument(
-    inheritedSelectors: Seq[Selector],
-    fileInDirectory: String => URL,
-    name: String,
-    translationLanguages: Seq[String]
-  ): Parser[Document] = {
-    val fromUrl: URL = fileInDirectory(name)
-    for {
-      tei <- Tei.parse(fromUrl)
-      translations <- Parser.collectAll(translationLanguages.map(language =>
-        Tei.parse(fileInDirectory(name + "-" + language))
-          .map(tei => language -> tei)
+        languages = translations.getOrElse(name, Seq.empty)
       ))
-    } yield new Document(
-      inheritedSelectors,
-      fromUrl,
-      tei,
-      name,
-      translations = translations.toMap
-    )
+    }
   }
 
   private def splitLang(name: String): (String, Option[String]) = {
