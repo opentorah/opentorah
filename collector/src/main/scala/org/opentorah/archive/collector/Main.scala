@@ -19,11 +19,11 @@ object Main {
 
     // TODO separate URL for store and directory for site!
     val docs: File = new File(docsStr)
-    val url: URL = From.file(new File(new File(docs, "store"), "store.xml")).url.get
-    val store: Store = Store.fromUrl(url)
+    val fromUrl: URL = From.file(new File(new File(docs, "store"), "store.xml")).url.get
+    val store: Store = Store.read(fromUrl)
 
     val lists: Seq[EntitiesList] = store.entities.get.lists
-    val entities: Seq[Entity] = store.entities.get.by.stores.map(_.entity)
+    val entities: Seq[Entity] = store.entities.get.by.get.stores.map(_.entity)
     val collections: Seq[WithPath[Collection]] = Util.getCollections(store)
     val references: Seq[WithPath[EntityReference]] = store.withPath[EntityReference](values = _.references)
 
@@ -33,6 +33,7 @@ object Main {
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
 
     println("Pretty-printing store.")
+    // TODO do all stores with defined fromUrl.
     // TODO do translations also!
     // TODO only if the URL is a file URL
     // TODO remove common stuff (calendarDescriptor etc.)
@@ -40,13 +41,13 @@ object Main {
       collection <- collections
       document <- collection.value.documents
     } Util.teiPrettyPrinter.writeXml(
-      Files.url2file(document.url),
+      Files.url2file(document.fromUrl.get),
       Tei.toXml(document.tei)
     )
 
     // TODO only if the URL is a file URL
-    for (entityStore <- store.entities.get.by.stores) Util.teiPrettyPrinter.writeXml(
-      Files.url2file(entityStore.url),
+    for (entityStore <- store.entities.get.by.get.stores) Util.teiPrettyPrinter.writeXml(
+      Files.url2file(entityStore.fromUrl.get),
       Entity.toXml(entityStore.entity.copy(id = None))
     )
 

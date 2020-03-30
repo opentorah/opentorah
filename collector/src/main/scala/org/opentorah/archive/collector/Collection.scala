@@ -3,19 +3,20 @@ package org.opentorah.archive.collector
 import java.net.URL
 import org.opentorah.store.{By, ByElement, Selector, Store, StoreElement}
 import org.opentorah.tei.Tei
-import org.opentorah.util.{Collections, Files}
-import org.opentorah.xml.{From, Parser}
+import org.opentorah.util.Collections
+import org.opentorah.xml.Parser
 
 final class Collection(
   inheritedSelectors: Seq[Selector],
-  url: URL,
+  fromUrl: Option[URL],
+  baseUrl: URL,
   element: StoreElement.Inline
-) extends Store.FromElement(inheritedSelectors, url, element) {
+) extends Store.FromElement(inheritedSelectors, fromUrl, baseUrl, element) {
 
   private def byElement: ByElement = element.by.get
 
-  override val by: Option[Collection.DocumentBy] =
-    Some(new Collection.DocumentBy(selectors, url, byElement))
+  override val by: Option[By[Document]] =
+    Some(new Collection.DocumentBy(selectors, baseUrl, byElement))
 
   def documents: Seq[Document] = by.get.stores
 
@@ -34,52 +35,52 @@ object Collection {
 
   final class DocumentBy(
     inheritedSelectors: Seq[Selector],
-    url: URL,
+    baseUrl: URL,
     element: ByElement
-  ) extends By.FromElement(inheritedSelectors, url, element) {
+  ) extends By[Document](inheritedSelectors, baseUrl, element) {
 
-    override val stores: Seq[Document] = getDocuments(
-      inheritedSelectors,
-      url,
-      element,
-      filesWithExtensions(url, "xml")
-    )
-  }
+    override protected def loadFromDirectory(
+      fileNames: Seq[String],
+      fileInDirectory: String => URL
+    ): Seq[Parser[Document]] = {
+      val namesWithLang: Seq[(String, Option[String])] = fileNames.map(splitLang)
 
-  private def getDocuments(
-    inheritedSelectors: Seq[Selector],
-    url: URL,
-    element: ByElement,
-    filesWithExtensions: Seq[String]
-  ): Seq[Document] = {
+      val translations: Map[String, Seq[String]] = Collections.mapValues(namesWithLang
+        .filter(_._2.isDefined)
+        .map(e => (e._1, e._2.get))
+        .groupBy(_._1))(_.map(_._2))
 
-    def fileInDirectory(name: String): URL =
-      Files.fileInDirectory(Files.subdirectory(url, element.directory.get), name + ".xml")
+      val names: Seq[String] = namesWithLang.filter(_._2.isEmpty).map(_._1)
 
-    val namesWithLang: Seq[(String, Option[String])] =
-      filesWithExtensions.map(splitLang)
-
-    val translations: Map[String, Seq[String]] = Collections.mapValues(namesWithLang
-      .filter(_._2.isDefined)
-      .map(e => (e._1, e._2.get))
-      .groupBy(_._1))(_.map(_._2))
-
-    val names: Seq[String] = namesWithLang.filter(_._2.isEmpty).map(_._1)
-
-    def readTei(url: URL): Tei = Parser.parseDo(Tei.parse(From.url(url)))
-
-    for (name <- names) yield {
-      val url: URL = fileInDirectory(name)
-      new Document(
-        inheritedSelectors,
-        url,
-        tei = readTei(url),
+      for (name <- names) yield getDocument(
+        selectors,
+        fileInDirectory,
         name,
-        translations = translations.getOrElse(name, Seq.empty).map(language =>
-          language -> readTei(fileInDirectory(name + "-" + language))
-        ).toMap
+        translationLanguages = translations.getOrElse(name, Seq.empty)
       )
     }
+  }
+
+  private def getDocument(
+    inheritedSelectors: Seq[Selector],
+    fileInDirectory: String => URL,
+    name: String,
+    translationLanguages: Seq[String]
+  ): Parser[Document] = {
+    val fromUrl: URL = fileInDirectory(name)
+    for {
+      tei <- Tei.parse(fromUrl)
+      translations <- Parser.collectAll(translationLanguages.map(language =>
+        Tei.parse(fileInDirectory(name + "-" + language))
+          .map(tei => language -> tei)
+      ))
+    } yield new Document(
+      inheritedSelectors,
+      fromUrl,
+      tei,
+      name,
+      translations = translations.toMap
+    )
   }
 
   private def splitLang(name: String): (String, Option[String]) = {
