@@ -10,11 +10,47 @@ import scala.xml.{Elem, Node}
 
 object Site {
 
+  private val indexFileName: String = "index"
+
+  private val collectionsFileName: String = "collections"
+
+  // TODO Note: also hard-coded in 'index.xml'!
+  private val collectionsDirectoryName: String = "collections"
+
+  private val namesDirectoryName: String = "names"
+
+  private val namesFileName: String = "names"
+
+  // TODO Note: also hard-coded in _layouts/tei.html!
+  private val facsDirectoryName: String = "facs" // facsimile viewers
+
+  private val documentsDirectoryName: String = "documents"
+
+  private val teiDirectoryName: String = "tei"
+
+  private def entityUrl(entity: Entity): String = s"/$namesDirectoryName/${entity.id.get}.html"
+
+  private def entityInTheListUrl(id: String): String = s"/$namesFileName.html#$id"
+
+  private def documentUrl(collection: Store, documentName: String): String =
+    url(s"${fileName(collection)}/${documentUrlRelativeToIndex(documentName)}")
+
+  private def documentUrlRelativeToIndex(name: String): String =  s"$docsDirectoryName/$name.html"
+
+  private val docsDirectoryName: String = "documents" // wrappers for TEI XML
+
+  private def collectionUrl(collection: Collection): String =
+    url(s"${collectionName(collection)}/index.html")
+
+  private def url(ref: String): String = s"/$collectionsDirectoryName/$ref"
+
   private val namesHead: String = "Имена"
 
   private val books: Set[String] = Set("Державин", "Дубнов")
 
   private val unpublished: Set[String] = Set("derzhavin", "lna208", "niab5", "niab19", "niab24", "rnb203", "rnb211")
+
+  private val namesViewer: String = "namesViewer"
 
   private def fileName(store: Store): String =
     Files.nameAndExtension(Files.pathAndName(store.fromUrl.get.getPath)._2)._1
@@ -33,11 +69,8 @@ object Site {
   private def collectionDescription(collection: Collection): Seq[Node] =
     Seq(<span>{collection.storeAbstract.get.xml}</span>) ++ collection.notes.xml
 
-  private def isBook(collection: Collection): Boolean =
-    books.contains(collectionReference(collection))
-
   private def collectionPageType(collection: Collection): Page.Type =
-    if (isBook(collection)) Page.Book else Page.Manuscript
+    if (books.contains(collectionReference(collection))) Page.Book else Page.Manuscript
 
   private def collectionName(collection: Collection): String =
     fileName(collection)
@@ -67,12 +100,6 @@ object Site {
   //      throw new IllegalArgumentException(s"Missing images: $missingImages")
   //  }
 
-  private def pages(pageType: Page.Type, document: Document): Seq[Page] =
-    for (pb <- document.tei.pbs) yield pageType(
-      n = pb.n,
-      facs = pb.facs
-    )
-
   def write(
     directory: File,
     store: Store,
@@ -90,7 +117,7 @@ object Site {
       namesDirectory,
       fileName = entity.id.get,
       head = None,
-      target = "namesViewer",
+      target = namesViewer,
       content = Seq(Entity.toXml(entity.copy(content = entity.content :+ mentions(entity, references))))
     )
 
@@ -102,7 +129,10 @@ object Site {
     val collectionsDirectory: File = new File(directory, collectionsDirectoryName)
     Files.deleteFiles(collectionsDirectory)
 
-    val collections: Seq[WithPath[Collection]] = getCollections(store)
+    val collections: Seq[WithPath[Collection]] = store.withPath[Collection](values = {
+      case collection: Collection => Seq(collection)
+      case _ => Seq.empty
+    })
 
     for (collection <- collections) {
       // TODO insert path information into the case descriptors.
@@ -164,18 +194,12 @@ object Site {
     )
   }
 
-  private def getCollections(store: Store): Seq[WithPath[Collection]] =
-    store.withPath[Collection](values = {
-      case collection: Collection => Seq(collection)
-      case _ => Seq.empty
-    })
-
   private def writeCollectionIndex(
     collection: Collection,
     directory: File
   ): Unit = {
     val missingPages: Seq[String] = collection.documents
-      .flatMap(document => pages(collectionPageType(collection), document))
+      .flatMap(document => document.pages(collectionPageType(collection)))
       .filterNot(_.isPresent)
       .map(_.displayName)
 
@@ -209,8 +233,7 @@ object Site {
     }),
 
     Table.Column("Дата", "date", { document: Document =>
-      val date: Option[String] = document.tei.creationDate.map(_.when)
-      date.fold[Seq[Node]](scala.xml.Text(""))(value => scala.xml.Text(value))
+      scala.xml.Text(document.tei.creationDate.map(_.when).getOrElse(""))
     }),
 
     Table.Column("Кто", "author", { document: Document =>
@@ -224,26 +247,15 @@ object Site {
     }),
 
     Table.Column("Язык", "language", { document: Document =>
-      val translations: Seq[Elem] = for (translation <- document.languages) yield
-        <ref target={documentUrlRelativeToIndex(document.name + "-" + translation)}
-             role="documentViewer">{translation}</ref>
-
+      val translations: Seq[Elem] = for (language <- document.languages) yield translationRef(document, language)
       val language: Option[String] = document.tei.languages.map(_.ident).headOption
-
       Seq(scala.xml.Text(language.getOrElse("?"))) ++ translations
     }),
 
-    Table.Column("Документ", "document", { document: Document =>
-      <ref target={documentUrlRelativeToIndex(document.name)}
-           role="documentViewer">{document.name}</ref>
-    }),
+    Table.Column("Документ", "document", { document: Document => documentRef(document) }),
 
     Table.Column("Страницы", "pages", { document: Document =>
-      for (page <- pages(pageType, document)) yield
-        <ref target={documentUrlRelativeToIndex(document.name) + s"#p${page.n}"}
-             role="documentViewer"
-             rendition={if (page.isPresent) "page" else "missing-page"}>{page.displayName}</ref>
-    }),
+      for (page <- document.pages(pageType)) yield documentPageRef(document, page) }),
 
     Table.Column("Расшифровка", "transcriber", { document: Document =>
       val transcribers = document.tei.titleStmt.editors
@@ -252,14 +264,6 @@ object Site {
       multi(transcribers)
     })
   )
-
-  private def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
-    case Nil => Nil
-    case n :: Nil => Seq(n)
-    case n :: ns if n.isInstanceOf[Elem] => Seq(n, scala.xml.Text(", ")) ++ multi(ns)
-    case n :: ns => Seq(n) ++ multi(ns)
-    case n => n
-  }
 
   private def writeTeiWrappers(
     docsDirectory: File,
@@ -293,7 +297,7 @@ object Site {
     val facsimilePages: Elem =
       <div class="facsimileViewer">
         <div class="facsimileScroller">{
-          for (page: Page <- pages(pageType, document).filter(_.isPresent); n = page.n) yield {
+          for (page: Page <- document.pages(pageType).filter(_.isPresent); n = page.n) yield {
             <a target="documentViewer" href={s"../$documentsDirectoryName/${document.name}.html#p$n"}>
               <figure>
                 <img xml:id={s"p$n"} alt={s"facsimile for page $n"} src={page.facs.orNull}/>
@@ -344,11 +348,12 @@ object Site {
     yaml = Seq("windowName" -> "collectionViewer")
   )
 
+  // TODO moveXmlUtil.spacedText() here :)
   private def toXml(collection: Collection): Elem = {
     val url = collectionUrl(collection)
     <item>
-      <ref target={url} role="collectionViewer">{collectionReference(collection) + ": " +
-        XmlUtil.spacedText(collectionTitle(collection))}</ref><lb/>
+      {ref(url, "collectionViewer", collectionReference(collection) + ": " +
+        XmlUtil.spacedText(collectionTitle(collection)))}<lb/>
       <abstract>{collection.storeAbstract.get.xml}</abstract>
     </item>
   }
@@ -358,26 +363,26 @@ object Site {
     value: Entity,
     references: Seq[WithPath[EntityReference]]
   ): Elem = {
+
     def sources(viewer: String, references: Seq[WithPath[EntityReference]]): Seq[Elem] = {
       // TODO grouping needs to be adjusted to handle references from collection descriptors;
       // once fund, опись etc. have their own URLs, they should be included too.
       val result: Seq[Option[Elem]] =
-        for (source <- Collections.removeConsecutiveDuplicates(references.map(_.path))) yield {
+      for (source <- Collections.removeConsecutiveDuplicates(references.map(_.path))) yield {
         val sourceStore: Store = source.last.store
         val url: Option[String] = sourceStore match {
-          case entityHolder: EntityHolder => Some(entityUrl(entityHolder.entity))
           case teiHolder: TeiHolder => Some(documentUrl(source.init.init.last.store, fileName(teiHolder)))
           case document: Document => Some(documentUrl(source.init.last.store, fileName(document)))
           case collection: Collection => None // TODO Some(collectionUrl(collection)) when grouping is adjusted
           case _ => None
         }
-        url.map(url => <ref target={url} role={viewer}>{sourceStore.names.name}</ref>)
+        url.map(url => ref(url, viewer, sourceStore.names.name))
       }
 
       result.flatten
     }
 
-    val (fromNames: Seq[WithPath[EntityReference]], notFromNames: Seq[WithPath[EntityReference]]) = references
+    val (fromEntities: Seq[WithPath[EntityReference]], notFromNames: Seq[WithPath[EntityReference]]) = references
       .filter(_.value.ref.contains(value.id.get))
       .partition(_.path.last.store.isInstanceOf[EntityHolder])
 
@@ -387,12 +392,14 @@ object Site {
         .groupBy(referenceCollectionName).toSeq.sortBy(_._1)
 
     <p rendition="mentions">
-      <ref target={entityInTheListUrl(value.id.get)} role="namesViewer">[...]</ref>
-      {if (fromNames.isEmpty) Seq.empty else {
+      {ref(entityInTheListUrl(value.id.get), namesViewer, "[...]")}
+      {if (fromEntities.isEmpty) Seq.empty else {
       <l>
         <emph>{namesHead}:</emph>
         {
-        val result = sources("namesViewer", fromNames)
+        val result =
+          for (source <- Collections.removeConsecutiveDuplicates(fromEntities.map(_.path)))
+          yield entityRef(source.last.store.asInstanceOf[EntityHolder])
         result.init.map(elem => <span>{elem},</span>) :+ result.last
         }
       </l>}}
@@ -403,16 +410,13 @@ object Site {
 
   private def writeNamesList(nonEmptyLists: Seq[EntitiesList], directory: File): Unit = {
     val listOfLists: Seq[Node] =
-      <p>{for (list <- nonEmptyLists) yield
-        <l>{<ref target={entityInTheListUrl(list.id)} role="namesViewer">{list.head}</ref>}</l>
-        }</p>
+      <p>{for (list <- nonEmptyLists) yield <l>{ref(entityInTheListUrl(list.id), namesViewer, list.head)}</l>}</p>
 
     def toXml(value: EntitiesList): Elem =
       <list xml:id={value.id} role={value.role.orNull}>
         <head>{value.head}</head>
         {for (entity <- value.entities) yield {
-        val url: String = entityUrl(entity)
-        <l><ref target={url} role="namesViewer">{EntityName.toXml(entity.names.head)}</ref></l>
+        <l>{ref(entityUrl(entity), namesViewer, EntityName.toXml(entity.names.head))}</l>
       }}
       </list>
         .copy(label = value.entityType.listElement)
@@ -422,9 +426,38 @@ object Site {
       fileName = namesFileName,
       head = Some(scala.xml.Text(namesHead)),
       content = listOfLists ++ nonEmptyLists.flatMap(toXml),
-      target = "namesViewer"
+      target = namesViewer
     )
   }
+
+  private def entityRef(entityHolder: EntityHolder): Elem = ref(
+    url = entityUrl(entityHolder.entity),
+    viewer = namesViewer,
+    text = entityHolder.names.name
+  )
+
+  private def documentRef(document: Document): Elem =
+    ref(documentUrlRelativeToIndex(document.name), "documentViewer", document.name)
+
+  private def translationRef(document: Document, language: String): Elem =
+    ref(documentUrlRelativeToIndex(document.name + "-" + language), "documentViewer", language)
+
+  private def documentPageRef(document: Document, page: Page): Elem =
+    ref(documentUrlRelativeToIndex(document.name) + s"#p${page.n}", "documentViewer", page.displayName,
+      Some(if (page.isPresent) "page" else "missing-page"))
+
+  private def ref(
+    url: String,
+    viewer: String,
+    text: String,
+    css: Option[String] = None
+  ): Elem = <ref target={url} role={viewer} rendition={css.orNull}>{text}</ref>
+
+  private def ref(
+    url: String,
+    viewer: String,
+    text: Elem
+  ): Elem = <ref target={url} role={viewer}>{text}</ref>
 
   private def writeTei(
     directory: File,
@@ -443,13 +476,16 @@ object Site {
       elem = Tei.toXml(TeiUtil.addCommonNoCalendar(Tei(body)))
     )
 
+    val titleYaml: Seq[(String, String)] =
+      head.fold[Seq[(String, String)]](Seq.empty)(head => Seq("title" -> quote(XmlUtil.spacedText(head))))
+
     writeTeiWrapper(
       directory,
       fileName,
       teiPrefix = None,
       style,
       target,
-      yaml = head.fold[Seq[(String, String)]](Seq.empty)(head => Seq("title" -> quote(XmlUtil.spacedText(head)))) ++ yaml
+      yaml = titleYaml ++ yaml
     )
   }
 
@@ -498,41 +534,13 @@ object Site {
     content :+ "\n"
   )
 
-  private def quote(what: String): String = s"'$what'"
-
-  private val indexFileName: String = "index"
-
-  private val collectionsFileName: String = "collections"
-
-  // TODO Note: also hard-coded in 'index.xml'!
-  private val collectionsDirectoryName: String = "collections"
-
-  private val namesDirectoryName: String = "names"
-
-  private val namesFileName: String = "names"
-
-  // TODO Note: also hard-coded in _layouts/tei.html!
-  private val facsDirectoryName: String = "facs" // facsimile viewers
-
-  private val documentsDirectoryName: String = "documents"
-
-  private val teiDirectoryName: String = "tei"
-
-  private def entityUrl(entity: Entity): String = s"/$namesDirectoryName/${entity.id.get}.html"
-
-  private def entityInTheListUrl(id: String): String = s"/$namesFileName.html#$id"
-
-  private def documentUrl(collection: Store, documentName: String): String = {
-    val collectionDirectoryName: String = fileName(collection)
-    url(s"$collectionDirectoryName/${documentUrlRelativeToIndex(documentName)}")
+  private def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
+    case Nil => Nil
+    case n :: Nil => Seq(n)
+    case n :: ns if n.isInstanceOf[Elem] => Seq(n, scala.xml.Text(", ")) ++ multi(ns)
+    case n :: ns => Seq(n) ++ multi(ns)
+    case n => n
   }
 
-  private def documentUrlRelativeToIndex(name: String): String =  s"$docsDirectoryName/$name.html"
-
-  private val docsDirectoryName: String = "documents" // wrappers for TEI XML
-
-  private def collectionUrl(collection: Collection): String =
-    url(s"${collectionName(collection)}/index.html")
-
-  private def url(ref: String): String = s"/$collectionsDirectoryName/$ref"
+  private def quote(what: String): String = s"'$what'"
 }

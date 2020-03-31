@@ -23,10 +23,18 @@ final class Document(
   override def names: Names = new Names(Seq(Name(name)))
 
   override def references: Seq[EntityReference] = Seq.empty
+
+  def pages(pageType: Page.Type): Seq[Page] =
+    for (pb <- tei.pbs) yield pageType(
+      n = pb.n,
+      facs = pb.facs
+    )
 }
 
 object Document {
 
+  // TODO to avoid name concatenations and aloow clearer separation between main document and translation,
+  // switch to an extended holder that has language code...
   final class TeiBy(
     inheritedSelectors: Seq[Selector],
     baseUrl: URL,
