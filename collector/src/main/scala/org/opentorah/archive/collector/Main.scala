@@ -3,22 +3,28 @@ package org.opentorah.archive.collector
 import java.io.File
 import java.net.URL
 import org.opentorah.entity.{Entity, EntityReference}
-import org.opentorah.store.{Store, WithPath}
+import org.opentorah.store.{EntityHolder, Store, StoreElement, TeiHolder, WithPath}
+import org.opentorah.tei.Tei
 import org.opentorah.util.Files
 import org.opentorah.xml.{From, PaigesPrettyPrinter}
+import scala.xml.Elem
 
 object Main {
 
   def main(args: Array[String]): Unit = {
-    doIt(args(0))
+    val docs: File = new File(args(0))
+    doIt(
+      fromUrl = From.file(new File(new File(docs, "store"), "store.xml")).url.get,
+      siteRoot = docs
+    )
   }
 
-  def doIt(docsStr: String): Unit = {
+  def doIt(
+    fromUrl: URL,
+    siteRoot: File
+  ): Unit = {
     println("Reading store.")
 
-    // TODO separate URL for store and directory for site!
-    val docs: File = new File(docsStr)
-    val fromUrl: URL = From.file(new File(new File(docs, "store"), "store.xml")).url.get
     val store: Store = Store.read(fromUrl)
     val references: Seq[WithPath[EntityReference]] = store.withPath[EntityReference](values = _.references)
 
@@ -27,30 +33,32 @@ object Main {
     val errors: Seq[String] = references.flatMap(reference => checkReference(reference.value, findByRef))
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
 
-    // TODO do translations also!
-    // TODO remove common stuff (calendarDescriptor etc.)
-    // TODO closing tag should stick to preceding characters! see niab 611:  ... доходов</title>
     println("Pretty-printing store.")
-    prettyPrint(store, Util.teiPrettyPrinter)
+    prettyPrint(store, TeiUtil.teiPrettyPrinter)
 
     Site.write(
-      docs,
+      siteRoot,
       store,
-      lists = store.entities.get.lists,
-      entities = store.entities.get.by.get.stores.map(_.entity),
       references
     )
   }
 
   private def prettyPrint(store: Store, prettyPrinter: PaigesPrettyPrinter): Unit = {
-    if (store.fromUrl.isDefined && Files.isFile(store.fromUrl.get)) Util.teiPrettyPrinter.writeXml(
-      file = Files.url2file(store.fromUrl.get),
-      elem = store.toXml
+    for (fromUrl <- store.fromUrl) if (Files.isFile(fromUrl)) TeiUtil.teiPrettyPrinter.writeXml(
+      file = Files.url2file(fromUrl),
+      elem = toXml(store)
     )
-    if (store.entities.isDefined)
-      prettyPrint(store.entities.get, prettyPrinter)
-    if (store.by.isDefined) // TODO get rid of the cast:
-      store.by.get.stores.foreach[Unit] { store => prettyPrint(store.asInstanceOf[Store], prettyPrinter) }
+
+    for (entities <- store.entities) prettyPrint(entities, prettyPrinter)
+
+    // TODO get rid of the cast:
+    for (by <- store.by; store <- by.stores) prettyPrint(store.asInstanceOf[Store], prettyPrinter)
+  }
+
+  private def toXml(store: Store): Elem = store match {
+    case fromElement: Store.FromElement => StoreElement.toXml(fromElement.element)
+    case entityHolder: EntityHolder => Entity.toXml(entityHolder.entity.copy(id = None))
+    case teiHolder: TeiHolder => Tei.toXml(TeiUtil.removeCommon(teiHolder.tei))
   }
 
   private def checkReference(reference: EntityReference,  findByRef: String => Option[Entity]): Option[String] = {
