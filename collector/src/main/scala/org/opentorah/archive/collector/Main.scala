@@ -3,7 +3,7 @@ package org.opentorah.archive.collector
 import java.io.File
 import java.net.URL
 import org.opentorah.entity.{Entity, EntityReference}
-import org.opentorah.store.{EntityHolder, Store, StoreElement, TeiHolder, WithPath}
+import org.opentorah.store.{EntityHolder, Store, StoreElement, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
 import org.opentorah.xml.{From, PaigesPrettyPrinter}

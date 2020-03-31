@@ -23,17 +23,17 @@ object TeiUtil {
   val addPublicationStatement: Tei => Tei = tei =>
     tei.copy(teiHeader = tei.teiHeader.copy(
       fileDesc = tei.teiHeader.fileDesc.copy(
-        publicationStmt = new PublicationStmt(
+        publicationStmt = Some(new PublicationStmt(
           publisher = Some(new Publisher.Value(<ptr target="www.alter-rebbe.org"/>)),
           availability = Some(new Availability(
             status = Some("free"),
             xml = <licence><ab><ref n="license" target="http://creativecommons.org/licenses/by/4.0/">
-                  Creative Commons Attribution 4.0 International License</ref></ab></licence>))))))
+                  Creative Commons Attribution 4.0 International License</ref></ab></licence>)))))))
 
   val addSourceDesc: Tei => Tei = tei =>
     tei.copy(teiHeader = tei.teiHeader.copy(
       fileDesc = tei.teiHeader.fileDesc.copy(
-        sourceDesc = new SourceDesc.Value(<p>Facsimile</p>))))
+        sourceDesc = Some(new SourceDesc.Value(<p>Facsimile</p>)))))
 
   val addCalendarDesc: Tei => Tei = tei =>
     tei.copy(teiHeader = tei.teiHeader.copy(
@@ -46,18 +46,9 @@ object TeiUtil {
   val addCommonNoCalendar: Tei => Tei =
     addPublicationStatement compose addSourceDesc
 
-  def removeCommon(tei: Tei): Tei = {
+  def removeCommon(tei: Tei): Tei =
     tei.copy(teiHeader = tei.teiHeader.copy(
-      fileDesc = tei.teiHeader.fileDesc.copy(
-        publicationStmt = new PublicationStmt(
-          publisher = None,
-          availability = None
-        ),
-        sourceDesc = new SourceDesc.Value(Seq.empty)
-      ),
-      profileDesc = Some(tei.teiHeader.profileDesc.get.copy(
-        calendarDesc = None
-      ))
+      fileDesc = tei.teiHeader.fileDesc.copy(publicationStmt = None, sourceDesc = None),
+      profileDesc = Some(tei.teiHeader.profileDesc.get.copy(calendarDesc = None))
     ))
-  }
 }

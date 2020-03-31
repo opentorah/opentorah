@@ -3,7 +3,7 @@ package org.opentorah.archive.collector
 import java.net.URL
 import org.opentorah.entity.EntityReference
 import org.opentorah.metadata.{Name, Names}
-import org.opentorah.store.{By, Selector, Store, TeiHolder}
+import org.opentorah.store.{By, Selector, Store}
 import org.opentorah.tei.Tei
 import org.opentorah.xml.Parser
 
@@ -35,6 +35,7 @@ object Document {
 
   // TODO to avoid name concatenations and aloow clearer separation between main document and translation,
   // switch to an extended holder that has language code...
+  // TODO check correspondence with the Tei language element.
   final class TeiBy(
     inheritedSelectors: Seq[Selector],
     baseUrl: URL,

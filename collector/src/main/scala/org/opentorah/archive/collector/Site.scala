@@ -2,7 +2,7 @@ package org.opentorah.archive.collector
 
 import java.io.File
 import org.opentorah.entity.{EntitiesList, Entity, EntityName, EntityReference}
-import org.opentorah.store.{EntityHolder, Store, TeiHolder, WithPath}
+import org.opentorah.store.{EntityHolder, Store, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
 import org.opentorah.xml.XmlUtil
@@ -227,7 +227,7 @@ object Site {
   ): Table[Document] = new Table[Document](
     Table.Column("Описание", "description", { document: Document =>
         document.tei.getAbstract
-          .orElse(document.tei.titleStmt.titles.headOption.map(_.content))
+// Ignoring the titles:          .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
           .getOrElse(Seq.empty)
           .map(XmlUtil.removeNamespace)
     }),
@@ -348,12 +348,11 @@ object Site {
     yaml = Seq("windowName" -> "collectionViewer")
   )
 
-  // TODO moveXmlUtil.spacedText() here :)
   private def toXml(collection: Collection): Elem = {
     val url = collectionUrl(collection)
     <item>
       {ref(url, "collectionViewer", collectionReference(collection) + ": " +
-        XmlUtil.spacedText(collectionTitle(collection)))}<lb/>
+        spacedText(collectionTitle(collection)))}<lb/>
       <abstract>{collection.storeAbstract.get.xml}</abstract>
     </item>
   }
@@ -477,7 +476,7 @@ object Site {
     )
 
     val titleYaml: Seq[(String, String)] =
-      head.fold[Seq[(String, String)]](Seq.empty)(head => Seq("title" -> quote(XmlUtil.spacedText(head))))
+      head.fold[Seq[(String, String)]](Seq.empty)(head => Seq("title" -> quote(spacedText(head))))
 
     writeTeiWrapper(
       directory,
@@ -540,6 +539,23 @@ object Site {
     case n :: ns if n.isInstanceOf[Elem] => Seq(n, scala.xml.Text(", ")) ++ multi(ns)
     case n :: ns => Seq(n) ++ multi(ns)
     case n => n
+  }
+
+  def spacedText(node: Node): String = {
+    val result = node match {
+      case elem: Elem => (elem.child map (_.text)).mkString(" ")
+      case node: Node => node.text
+    }
+    result
+      .replace('\n', ' ')
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
   }
 
   private def quote(what: String): String = s"'$what'"
