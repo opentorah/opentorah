@@ -28,26 +28,6 @@ object XmlUtil {
   def descendants(xml: Node, name: String): Seq[Elem] =
     xml.flatMap(_ \\ name).filter(_.isInstanceOf[Elem]).map(_.asInstanceOf[Elem])
 
-  def spacedText(node: Node): String = {
-    val result = node match {
-      case elem: Elem => (elem.child map (_.text)).mkString(" ")
-      case node: Node => node.text
-    }
-    result
-      .replace('\n', ' ')
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-  }
-
-  def dropWhitespace(nodes: Seq[Node]): Seq[Node] =
-    nodes.dropWhile(isWhitespace)
-
   def isWhitespace(node: Node): Boolean =
     isAtom(node) && node.text.trim.isEmpty
 

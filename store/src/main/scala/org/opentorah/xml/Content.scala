@@ -60,7 +60,7 @@ private[xml] object Content {
   }
 
   private def getNextElementName(nodes: Seq[Node]): Option[String] =
-    XmlUtil.dropWhitespace(nodes).headOption.flatMap {
+    nodes.dropWhile(XmlUtil.isWhitespace).headOption.flatMap {
       case result: Elem => Some(result.label)
       case _ => None
     }
@@ -80,7 +80,7 @@ private[xml] object Content {
   }
 
   private def takeNextElement(nodes: Seq[Node]): (Option[Elem], Seq[Node]) = {
-    val noLeadingWhitespace = XmlUtil.dropWhitespace(nodes)
+    val noLeadingWhitespace = nodes.dropWhile(XmlUtil.isWhitespace)
     noLeadingWhitespace.headOption.fold[(Option[Elem], Seq[Node])]((None, nodes)) {
       case result: Elem => (Some(result), noLeadingWhitespace.tail)
       case _ => (None, nodes)

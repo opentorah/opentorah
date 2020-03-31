@@ -3,14 +3,17 @@ package org.opentorah.tei
 import org.opentorah.xml.{Element, ToXml}
 import scala.xml.Elem
 
+// PublicationStmt and SourceDesc are mandatory (TEI Guidelines),
+// but I made them optional so that they can be removed from the editable pre-TEI files
+// (and added programmatically to the version published on the site).
 final case class FileDesc(
   titleStmt: TitleStmt,
   editionStmt: Option[EditionStmt.Value],
   extent: Option[Extent.Value],
-  publicationStmt: PublicationStmt,
+  publicationStmt: Option[PublicationStmt],
   seriesStmt: Option[SeriesStmt.Value],
   notesStmt: Option[NotesStmt.Value],
-  sourceDesc: SourceDesc.Value
+  sourceDesc: Option[SourceDesc.Value]
 )
 
 object FileDesc extends Element[FileDesc](
@@ -19,10 +22,10 @@ object FileDesc extends Element[FileDesc](
     titleStmt <- TitleStmt.required
     editionStmt <- EditionStmt.parsable.optional
     extent <- Extent.parsable.optional
-    publicationStmt <- PublicationStmt.required
+    publicationStmt <- PublicationStmt.optional
     seriesStmt <- SeriesStmt.parsable.optional
     notesStmt <- NotesStmt.parsable.optional
-    sourceDesc <- SourceDesc.parsable.required
+    sourceDesc <- SourceDesc.parsable.optional
   } yield new FileDesc(
     titleStmt,
     editionStmt,
@@ -49,9 +52,9 @@ object FileDesc extends Element[FileDesc](
     titleStmt = TitleStmt(),
     editionStmt =  None,
     extent = None,
-    publicationStmt = PublicationStmt(),
+    publicationStmt = None,
     seriesStmt = None,
     notesStmt = None,
-    sourceDesc = new SourceDesc.Value(Seq.empty)
+    sourceDesc = None
   )
 }
