@@ -33,8 +33,6 @@ final class Document(
 
 object Document {
 
-  // TODO to avoid name concatenations and aloow clearer separation between main document and translation,
-  // switch to an extended holder that has language code...
   // TODO check correspondence with the Tei language element.
   final class TeiBy(
     inheritedSelectors: Seq[Selector],
@@ -47,18 +45,20 @@ object Document {
     override def selector: Selector = selectorByName("language") // TODO hard-coded...
 
     override protected def load: Seq[Parser[TeiHolder]] = {
-      val names: Seq[String] = name +: (for (language <- languages) yield s"$name-$language")
-      for (fileName <- names) yield {
-        val fromUrl: URL = fileInDirectory(fileName)
+      def teiHolder(name: String, language: Option[String]): Parser[TeiHolder] = {
+        val fromUrl: URL = fileInDirectory(name)
         for {
           tei <- Tei.parse(fromUrl)
         } yield new TeiHolder(
           selectors,
           fromUrl,
-          fileName,
+          name,
+          language,
           tei
         )
       }
+      teiHolder(name, None) +:
+        (for (language <- languages) yield teiHolder(s"$name-$language", Some(language)))
     }
   }
 }

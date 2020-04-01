@@ -9,7 +9,7 @@ object TeiUtil {
     width = 120,
     indent = 2,
     doNotStackElements = Set("choice"),
-    nestElements = Set("p", /*"abstract",*/ "head", "salute", "dateline", "item"),
+    nestElements = Set("p", /*"abstract",*/ "head", "salute", "dateline"),
     clingyElements = Set("note", "lb", "sic", "corr")
   )
 

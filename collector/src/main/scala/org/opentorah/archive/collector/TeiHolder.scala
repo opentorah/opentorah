@@ -10,6 +10,7 @@ final class TeiHolder(
   inheritedSelectors: Seq[Selector],
   fromUrl: URL,
   val name: String,
+  val language: Option[String],
   val tei: Tei
 ) extends Store(inheritedSelectors, Some(fromUrl), fromUrl) {
 

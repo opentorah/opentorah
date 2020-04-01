@@ -2,13 +2,16 @@ package org.opentorah.archive.collector
 
 import java.io.File
 import org.opentorah.entity.{EntitiesList, Entity, EntityName, EntityReference}
-import org.opentorah.store.{EntityHolder, Store, WithPath}
+import org.opentorah.metadata.{Language, Names}
+import org.opentorah.store.{By, Entities, EntityHolder, Path, Store, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
 import org.opentorah.xml.XmlUtil
 import scala.xml.{Elem, Node}
 
 object Site {
+
+  private val hierarchyDirectoryName: String = "by"
 
   private val indexFileName: String = "index"
 
@@ -39,7 +42,7 @@ object Site {
 
   private val docsDirectoryName: String = "documents" // wrappers for TEI XML
 
-  private def collectionUrl(collection: Collection): String =
+  private def collectionUrl(collection: WithPath[Collection]): String =
     url(s"${collectionName(collection)}/index.html")
 
   private def url(ref: String): String = s"/$collectionsDirectoryName/$ref"
@@ -52,30 +55,34 @@ object Site {
 
   private val namesViewer: String = "namesViewer"
 
+  private val collectionViewer: String = "collectionViewer"
+
   private def fileName(store: Store): String =
     Files.nameAndExtension(Files.pathAndName(store.fromUrl.get.getPath)._2)._1
 
   private def referenceCollectionName(reference: WithPath[EntityReference]): String =
     reference.path.init.init.last.store.names.name
 
+  private def getName(names: Names): String = names.doFind(Language.Russian.toSpec).name
+
   // TODO this yuck is temporary :)
 
-  private def collectionReference(collection: Collection): String =
-    collection.names.name
+  private def collectionReference(collection: WithPath[Collection]): String =
+    collection.value.names.name
 
-  private def collectionTitle(collection: Collection): Node =
-    collection.title.fold[Node](scala.xml.Text(collectionReference(collection)))(title => <title>{title.xml}</title>)
+  private def collectionTitle(collection: WithPath[Collection]): Node =
+    collection.value.title.fold[Node](scala.xml.Text(collectionReference(collection)))(title => <title>{title.xml}</title>)
 
-  private def collectionDescription(collection: Collection): Seq[Node] =
-    Seq(<span>{collection.storeAbstract.get.xml}</span>) ++ collection.notes.xml
+  private def collectionDescription(collection: WithPath[Collection]): Seq[Node] =
+    Seq(<span>{collection.value.storeAbstract.get.xml}</span>) ++ collection.value.notes.xml
 
-  private def collectionPageType(collection: Collection): Page.Type =
+  private def collectionPageType(collection: WithPath[Collection]): Page.Type =
     if (books.contains(collectionReference(collection))) Page.Book else Page.Manuscript
 
-  private def collectionName(collection: Collection): String =
-    fileName(collection)
+  private def collectionName(collection: WithPath[Collection]): String =
+    fileName(collection.value)
 
-  private def collectionArchive(collection: Collection): Option[String] = {
+  private def collectionArchive(collection: WithPath[Collection]): Option[String] = {
     val reference = collectionReference(collection)
     val space = reference.lastIndexOf(' ')
     if (space == -1) None else Some(reference.substring(0, space))
@@ -135,9 +142,8 @@ object Site {
     })
 
     for (collection <- collections) {
-      // TODO insert path information into the case descriptors.
-      val collectionDirectory: File = new File(collectionsDirectory, collectionName(collection.value))
-      writeCollectionIndex(collection.value, collectionDirectory)
+      val collectionDirectory: File = new File(collectionsDirectory, collectionName(collection))
+      writeCollectionIndex(collection, collectionDirectory)
 
       val teiDirectory: File = new File(collectionDirectory, teiDirectoryName)
       for ((document, (prev, next)) <- Collections.prevAndNext(collection.value.documents)) {
@@ -148,7 +154,7 @@ object Site {
 
         // Wrappers
         val navigation: Seq[(String, String)] =
-          Seq("documentCollection" -> quote(collectionReference(collection.value))) ++
+          Seq("documentCollection" -> quote(collectionReference(collection))) ++
           prev.map(prev => Seq("prevDocument" -> quote(prev.name))).getOrElse(Seq.empty) ++
           Seq("thisDocument" -> quote(document.name)) ++
           next.map(next => Seq("nextDocument" -> quote(next.name))).getOrElse(Seq.empty)
@@ -157,17 +163,18 @@ object Site {
 
         writeFacsViewer(
           facsDirectory = new File(collectionDirectory, facsDirectoryName),
-          pageType = collectionPageType(collection.value),
+          pageType = collectionPageType(collection),
           document,
           navigation
         )
       }
     }
 
-    writeIndex(collections.map(_.value), directory)
+    writeIndex(collections, directory)
 
-    // TODO write new, truly hierarchical index!
-    writeCollectionsTree(collections.map(_.value), directory)
+    writeCollectionsTree(collections, directory)
+
+    writeHierarchy(store, directory)
 
     println("Writing reports.")
 
@@ -194,11 +201,93 @@ object Site {
     )
   }
 
+  private def writeHierarchy(store: Store, directory: File): Unit = {
+    val stores: Seq[WithPath[Store]] = store.withPath[Store](values = {
+      case _: Collection | _: Document | _: Entities | _: EntityHolder | _: TeiHolder => Seq.empty
+      case store => Seq(store)
+    })
+
+    val hierarchyDirectory: File = new File(directory, hierarchyDirectoryName)
+    Files.deleteFiles(hierarchyDirectory)
+    for (store <- stores) writeTei(
+      directory = file(hierarchyDirectory, store.path),
+      fileName = "index",
+      head = None,
+      target = collectionViewer,
+      content = store2xml(store)
+    )
+  }
+
+  private def store2xml(store: WithPath[Store]): Seq[Node] = {
+    storeHeader(store) ++
+    store.value.by.toSeq.flatMap { by: By[_] =>
+      <p>
+      <l>{getName(by.selector.names)}:</l>
+      <list type="bulleted">
+      {by.stores.map { storeX =>
+        val subStore = storeX.asInstanceOf[Store]  // TODO get rid of the cast!!!
+        <item>
+          {ref(
+          url =
+            if (subStore.isInstanceOf[Collection]) s"/$collectionsDirectoryName/${fileName(subStore)}"
+            else path2url(store.path :+ by.selector.bind(subStore)),
+          viewer = collectionViewer,
+          text = getName(subStore.names)
+        )}</item>
+      }}
+      </list>
+      </p>
+    }
+  }
+
+  private def storeHeader(store: WithPath[Store]): Seq[Node] = {
+    println(segments(store.path).mkString("/"))
+    val isTop: Boolean = store.path.path.isEmpty
+    pathLinks(if (isTop) store.path else store.path.init) ++
+    <head>
+      {if (isTop) Seq.empty else getName(store.path.last.selector.names)}
+      {getName(store.value.names)}:
+      {store.value.title.map(_.xml).getOrElse(Seq.empty)}
+    </head> ++
+    store.value.storeAbstract.map(value => <span>{value.xml}</span>).getOrElse(Seq.empty) ++
+    store.value.notes.xml
+  }
+
+  private def pathLinks(path: Path): Seq[Elem] = {
+    for (ancestor <- path.path.inits.toSeq.reverse.tail) yield {
+      val binding = ancestor.last
+      val ancestorTitle: Seq[Node] = binding.store.title.map(_.xml).getOrElse(Seq.empty)
+      val link = ref(
+        url = "/" + hierarchyDirectoryName + "/" + path2url(Path(ancestor)),
+        viewer = collectionViewer,
+        text = getName(binding.store.names)
+      )
+      <l>{getName(binding.selector.names)} {link}: {ancestorTitle}</l>
+    }
+  }
+
+  private def file(directory: File, path: Path): File =
+    file(directory, segments(path))
+
+  @scala.annotation.tailrec
+  private def file(directory: File, segments: Seq[String]): File =
+    if (segments.isEmpty) directory
+    else file(new File(directory, segments.head), segments.tail)
+
+  private def path2url(path: Path): String =
+      "/" + hierarchyDirectoryName + "/" + segments(path).mkString("", "/", "/")
+
+  private def segments(path: Path): Seq[String] =
+    path.path.flatMap(binding => Seq(binding.selector.names, binding.store.names))
+      .map(getName)
+      .map(_.replace(' ', '_'))
+
+  // TODO insert path information into the case descriptors.
   private def writeCollectionIndex(
-    collection: Collection,
+    collection: WithPath[Collection],
     directory: File
   ): Unit = {
-    val missingPages: Seq[String] = collection.documents
+    val missingPages: Seq[String] = collection.value.documents
       .flatMap(document => document.pages(collectionPageType(collection)))
       .filterNot(_.isPresent)
       .map(_.displayName)
@@ -206,17 +295,19 @@ object Site {
     writeTei(
       directory,
       fileName = "index",
-      head = Some(collectionTitle(collection)),
-      content = collectionDescription(collection) ++
+      head = Some(collectionTitle(collection)), ///// None
+      content =
+// and remove next line        storeHeader(collection.asInstanceOf[WithPath[Store]]) ++  // TODO make WithPath covariant!
+        collectionDescription(collection) ++
         Seq[Elem](table(collectionPageType(collection), documentUrlRelativeToIndex).toTei(
-          collection.parts.flatMap { part =>
+          collection.value.parts.flatMap { part =>
             part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Xml) ++
               part.documents.map(Table.Data[Document]) }
         )) ++
         (if (missingPages.isEmpty) Seq.empty
         else Seq(<p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>)),
       style = Some("wide"),
-      target = "collectionViewer",
+      target = collectionViewer,
       yaml = Seq("documentCollection" -> quote(collectionReference(collection)))
     )
   }
@@ -247,7 +338,8 @@ object Site {
     }),
 
     Table.Column("Язык", "language", { document: Document =>
-      val translations: Seq[Elem] = for (language <- document.languages) yield translationRef(document, language)
+      val translations: Seq[Elem] =
+        for (teiHolder <- document.by.get.stores.filter(_.language.isDefined)) yield translationRef(teiHolder)
       val language: Option[String] = document.tei.languages.map(_.ident).headOption
       Seq(scala.xml.Text(language.getOrElse("?"))) ++ translations
     }),
@@ -271,21 +363,22 @@ object Site {
     navigation: Seq[(String, String)]
   ): Unit = {
 
-    def writeTeiWrapperForLang(name: String, lang: Option[String]): Unit = writeTeiWrapper(
-      directory = docsDirectory,
-      fileName = lang.fold(name)(lang => name + "-" + lang),
-      teiPrefix = Some(s"../$teiDirectoryName/"),
-      target = "documentViewer",
-      yaml = Seq(
-        "facs" -> s"'../$facsDirectoryName/$name.html'"
-      ) ++ (
-        if (lang.isDefined || document.languages.isEmpty) Seq.empty
-        else Seq("translations" -> document.languages.mkString("[", ", ", "]"))) ++ navigation
+    def forTeiHolder(teiHolder: TeiHolder): Unit = {
+      val name: String = teiHolder.name
+      writeTeiWrapper(
+        directory = docsDirectory,
+        fileName = name,
+        teiPrefix = Some(s"../$teiDirectoryName/"),
+        target = "documentViewer",
+        yaml = Seq(
+          "facs" -> s"'../$facsDirectoryName/${document.name}.html'"
+        ) ++ (
+          if (teiHolder.language.isDefined || document.languages.isEmpty) Seq.empty
+          else Seq("translations" -> document.languages.mkString("[", ", ", "]"))) ++ navigation
       )
+    }
 
-    // TEI wrapper(s)
-    writeTeiWrapperForLang(document.name, None)
-    for (lang <- document.languages) writeTeiWrapperForLang(document.name, Some(lang))
+    for (teiHolder <- document.by.get.stores) forTeiHolder(teiHolder)
   }
 
   private def writeFacsViewer(
@@ -318,8 +411,10 @@ object Site {
     )
   }
 
-  private def writeCollectionsTree(collections: Seq[Collection], directory: File): Unit = {
-    val byArchive: Map[String, Seq[Collection]] = collections.groupBy(collection => collectionArchive(collection).getOrElse(""))
+  // TODO write new, truly hierarchical index!
+  private def writeCollectionsTree(collections: Seq[WithPath[Collection]], directory: File): Unit = {
+    val byArchive: Map[String, Seq[WithPath[Collection]]] =
+      collections.groupBy(collection => collectionArchive(collection).getOrElse(""))
     writeTei(
       directory,
       fileName = collectionsFileName,
@@ -331,11 +426,12 @@ object Site {
             <list type="bulleted">{for (collection <- byArchive(archive)) yield toXml(collection)}</list>
           </item>}}
       </list>,
-      target = "collectionViewer"
+      target = collectionViewer
     )
   }
 
-  private def writeIndex(collections: Seq[Collection], directory: File): Unit = writeTei(
+  // TODO add nomenclature from the path to the info line:
+  private def writeIndex(collections: Seq[WithPath[Collection]], directory: File): Unit = writeTei(
     directory,
     fileName = indexFileName,
     head = Some(scala.xml.Text("Дела")),
@@ -344,16 +440,16 @@ object Site {
       {for (collection <- collections.filterNot(collection => unpublished.contains(collectionName(collection))))
        yield toXml(collection)}
       </list>,
-    target = "collectionViewer",
-    yaml = Seq("windowName" -> "collectionViewer")
+    target = collectionViewer,
+    yaml = Seq("windowName" -> collectionViewer)
   )
 
-  private def toXml(collection: Collection): Elem = {
+  private def toXml(collection: WithPath[Collection]): Elem = {
     val url = collectionUrl(collection)
     <item>
-      {ref(url, "collectionViewer", collectionReference(collection) + ": " +
+      {ref(url, collectionViewer, collectionReference(collection) + ": " +
         spacedText(collectionTitle(collection)))}<lb/>
-      <abstract>{collection.storeAbstract.get.xml}</abstract>
+      <abstract>{collection.value.storeAbstract.get.xml}</abstract>
     </item>
   }
 
@@ -438,8 +534,8 @@ object Site {
   private def documentRef(document: Document): Elem =
     ref(documentUrlRelativeToIndex(document.name), "documentViewer", document.name)
 
-  private def translationRef(document: Document, language: String): Elem =
-    ref(documentUrlRelativeToIndex(document.name + "-" + language), "documentViewer", language)
+  private def translationRef(teiHolder: TeiHolder): Elem =
+    ref(documentUrlRelativeToIndex(teiHolder.name), "documentViewer", teiHolder.language.get)
 
   private def documentPageRef(document: Document, page: Page): Elem =
     ref(documentUrlRelativeToIndex(document.name) + s"#p${page.n}", "documentViewer", page.displayName,
