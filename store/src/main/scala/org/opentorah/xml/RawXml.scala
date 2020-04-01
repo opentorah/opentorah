@@ -17,3 +17,8 @@ class RawXml(elementName: String) {
     override def toXml(value: Value): Elem = <elem>{value.xml}</elem>.copy(label = elementName)
   }
 }
+
+object RawXml {
+
+  def getXml(value: Option[RawXml#Value]): Seq[Node] = value.map(_.xml).getOrElse(Seq.empty)
+}

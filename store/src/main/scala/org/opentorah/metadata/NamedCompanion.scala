@@ -8,9 +8,12 @@ trait NamedCompanion {
 
   def values: Seq[Key]
 
-  // This is public so that it can be accessed from the Key type if it isn't defined
-  // within the object derived from NamedCompanion.
-  // This isn't final so that it can be overridden in Tanach, for instance.
+  // This is:
+  // - lazy to allow correct initialization: the code uses values(),
+  //   Language metadata file references Language instances by name :)
+  // - public so that it can be accessed from the Key type if it isn't defined
+  //   within the object derived from NamedCompanion;
+  // - not final so that it can be overridden in Tanach, for instance.
   lazy val toNames: Map[Key, Names] = Metadata.loadNames(
     keys = values,
     from = From.resource(this, resourceName)

@@ -3,9 +3,9 @@ package org.opentorah.store
 import java.net.URL
 import org.opentorah.entity.EntityReference
 import org.opentorah.metadata.Names
-import org.opentorah.util.Files
-import org.opentorah.xml.Parser
-import scala.xml.Node
+import org.opentorah.tei.{Abstract, Body, Title}
+import org.opentorah.xml.{Attribute, Parser}
+import scala.xml.{Elem, Node}
 
 abstract class Store(
   inheritedSelectors: Seq[Selector],
@@ -17,15 +17,15 @@ abstract class Store(
 
   override def toString: String = names.name
 
+  def title: Option[Title.Value] = None
+
+  def storeAbstract: Option[Abstract.Value] = None
+
+  def body: Option[Body.Value] = None
+
   def entities: Option[Entities] = None
 
-  def by: Option[By[_]] = None
-
-  def title: Option[StoreElement.Title.Value] = None
-
-  def storeAbstract: Option[StoreElement.Abstract.Value] = None
-
-  def notes: StoreElement.Notes = new StoreElement.Notes(Seq.empty)
+  def by: Option[By[Store]] = None
 
   def references: Seq[EntityReference]
 
@@ -46,17 +46,74 @@ abstract class Store(
   }
 }
 
-object Store {
+object Store extends Component("store") {
+
+  final case class Inline(
+    names: Names,
+    from: Option[String],
+    title: Option[Title.Value],
+    storeAbstract: Option[Abstract.Value],
+    body: Option[Body.Value],
+    selectors: Seq[Selector],
+    entities: Option[EntitiesElement],
+    by: Option[By.Element],
+    className: Option[String]
+  ) extends Element with WithClassName
+
+  override def classOfInline: Class[Inline] = classOf[Inline]
+
+  override def inlineParser(className: Option[String]): Parser[Inline] = for {
+    names <- Names.withDefaultNameParser
+    from <- Attribute("from").optional
+    title <- Title.parsable.optional
+    storeAbstract <- Abstract.parsable.optional
+    body <- Body.parsable.optional
+    selectors <- Selector.all
+    entities <- EntitiesElement.optional
+    by <- By.parsable.optional
+  } yield Inline(
+    names,
+    from,
+    title,
+    storeAbstract,
+    body,
+    selectors,
+    entities,
+    by,
+    className
+  )
+
+  override def inlineToXml(value: Inline): Elem = {
+    val defaultName: Option[String] = value.names.getDefaultName
+    <store n={defaultName.orNull} from={value.from.orNull} type={value.className.orNull}>
+      {if (defaultName.isDefined) Seq.empty else Names.toXml(value.names)}
+      {Title.parsable.toXml(value.title)}
+      {Abstract.parsable.toXml(value.storeAbstract)}
+      {Body.parsable.toXml(value.body)}
+      {Selector.toXml(value.selectors)}
+      {EntitiesElement.toXml(value.entities)}
+      {By.parsable.toXml(value.by)}
+    </store>
+  }
 
   class FromElement(
     inheritedSelectors: Seq[Selector],
     fromUrl: Option[URL],
     baseUrl: URL,
-    val element: StoreElement.Inline
+    val element: Inline
   ) extends Store(inheritedSelectors, fromUrl, baseUrl) {
 
     final override def names: Names =
       element.names
+
+    final override def title: Option[Title.Value] =
+      element.title
+
+    final override def storeAbstract: Option[Abstract.Value] =
+      element.storeAbstract
+
+    final override def body: Option[Body.Value] =
+      element.body
 
     final override protected def definedSelectors: Seq[Selector] =
       element.selectors
@@ -64,70 +121,24 @@ object Store {
     final override val entities: Option[Entities] =
       element.entities.map(entities => new Entities(selectors, baseUrl, entities))
 
-    final override def title: Option[StoreElement.Title.Value] =
-      element.title
-
-    final override def storeAbstract: Option[StoreElement.Abstract.Value] =
-      element.storeAbstract
-
-    final override def notes: StoreElement.Notes =
-      element.notes
-
-    override def by: Option[By[_]] =
-      element.by.map(byElement => new By.FromElement(selectors, baseUrl, byElement))
+    override def by: Option[By[Store]] = element.by.map(byElement => By.fromElement[By[Store]](
+      selectors,
+      fromUrl = None,
+      baseUrl,
+      byElement,
+      creator = By.creator
+    ))
 
     final override def references: Seq[EntityReference] = {
       val lookInto: Seq[Node] =
         title.map(_.xml).getOrElse(Seq.empty) ++
         storeAbstract.map(_.xml).getOrElse(Seq.empty) ++
-        notes.xml
+        body.map(_.xml).getOrElse(Seq.empty)
 
       EntityReference.from(lookInto)
     }
   }
 
-  def read[S <: Store](
-    fromUrl: URL,
-    inheritedSelectors: Seq[Selector] = Selector.predefinedSelectors
-  ): S = fromElement[S](
-    inheritedSelectors,
-    fromUrl = Some(fromUrl),
-    baseUrl = fromUrl,
-    element = Parser.parseDo(StoreElement.parse(fromUrl))
-  )
-
-  private [store] def fromElement[S <: Store](
-    inheritedSelectors: Seq[Selector],
-    fromUrl: Option[URL],
-    baseUrl: URL,
-    element: StoreElement
-  ): S = element match {
-    case StoreElement.FromFile(file) => read[S](
-      fromUrl = Files.fileInDirectory(baseUrl, file),
-      inheritedSelectors
-    )
-
-    case element: StoreElement.Inline =>
-      if (element.storeType.isDefined) Class.forName(element.storeType.get)
-        .getConstructor(
-          classOf[Seq[Selector]],
-          classOf[Option[URL]],
-          classOf[URL],
-          classOf[StoreElement.Inline]
-        )
-        .newInstance(
-          inheritedSelectors,
-          fromUrl,
-          baseUrl,
-          element
-        )
-        .asInstanceOf[S]
-      else new FromElement(
-        inheritedSelectors,
-        fromUrl,
-        baseUrl,
-        element
-      )
-        .asInstanceOf[S]
-  }
+  def creator: Creator[Store] =
+    new FromElement(_, _, _, _)
 }

@@ -5,8 +5,6 @@ import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
 import org.opentorah.metadata.Names
 import org.opentorah.xml.Parser
 
-// TODO allow for inline parsing of Entities with Parsable.allMustBe() and from-file parsing with Parsable.parse(from);
-// require xml:id on Entities when parsing from file.
 // TODO this should have two Bys.
 final class Entities(
   inheritedSelectors: Seq[Selector],
@@ -21,8 +19,13 @@ final class Entities(
 
   override def names: Names = selector.names
 
-  override val by: Option[By[EntityHolder]] =
-    Some(new Entities.EntitiesBy(selectors, baseUrl, element.by))
+  override val by: Option[By[EntityHolder]] = Some(By.fromElement[By[EntityHolder]](
+    selectors,
+    fromUrl = None,
+    baseUrl,
+    element.by.asInstanceOf[By.Inline],
+    creator = new Entities.EntitiesBy(_, _, _, _)
+  ))
 
   val lists: Seq[EntitiesList] = element.lists.map(_.take(by.get.stores.map(_.entity)))
 
@@ -35,17 +38,42 @@ object Entities {
 
   final class EntitiesBy(
     inheritedSelectors: Seq[Selector],
+    fromUrl: Option[URL],
     baseUrl: URL,
-    element: ByElement
-  ) extends By.FromElement[EntityHolder](inheritedSelectors, baseUrl, element) {
+    element: By.Inline
+  ) extends By.FromElement[EntityHolder](inheritedSelectors, fromUrl, baseUrl, element) {
+
+    // TODO to allow for inline parsing of Entities
+    // (with Parsable.allMustBe() or .all(), requiring xml:id on Entities),
+    // it is not enough to have creators generalized (as is already done):
+    // parsing needs to be interleaved with creation of the Stores
+    // (add 'parser' attribute?).
+    // When (if?) that is done, Store.inline.from
+    // (which is there only to allow reuse of StoreElement for Collection's parts)
+    // can be generalized away too.
+    // Also, it is possible that then it will be easier to merge into EntityElement into Store.Element
+    // ("parse, do not validate" be damned ;)).
+    protected def storeCreator: Store.Creator[EntityHolder] =
+      throw new IllegalArgumentException("Entities can not (yet?) be loaded inline.")
 
     override protected def loadFromDirectory(
       fileNames: Seq[String],
       fileInDirectory: String => URL
     ): Seq[Parser[EntityHolder]] = for (fileName <- fileNames) yield {
       val fromUrl: URL = fileInDirectory(fileName)
-      Entity.parseWithId(fromUrl, id = fileName)
+      parseWithKnownId(fromUrl, id = fileName)
         .map(entity => new EntityHolder(inheritedSelectors, fromUrl, entity))
     }
   }
+
+  def parseWithKnownId(
+    fromUrl: URL,
+    id: String,
+  ): Parser[Entity] = for {
+    result <- Entity.parse(fromUrl)
+    _ <- Parser.check(result.id.isEmpty || result.id.contains(id),
+      s"Incorrect id: ${result.id.get} instead of $id")
+  } yield result.copy(
+    id = Some(id)
+  )
 }

@@ -53,7 +53,6 @@ object Files {
 
   def subdirectory(url: URL, subdirectoryName: String): URL = new URL(url, subdirectoryName + "/")
 
-  // TODO rename relativeUrl()
   def fileInDirectory(url: URL, fileName: String): URL = new URL(url, fileName)
 
   def isFile(url: URL): Boolean = url.getProtocol == "file"

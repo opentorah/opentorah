@@ -21,7 +21,7 @@ object EntityReference extends ToXml[EntityReference] {
       id <- Attribute.id.optional
       role <- Attribute("role").optional
       ref <- Attribute("ref").optional
-      _ <- Attribute("type").optional // TODO we don't do anything with the type yet
+      _ <- Attribute("type").optional // We don't do anything with the type yet...
       name <- Element.allNodes
     } yield new EntityReference(
       entityType,

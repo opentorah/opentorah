@@ -13,9 +13,6 @@ sealed class Language(code: String) extends Named {
 object Language extends NamedCompanion {
   override type Key = Language
 
-  // TODO: where does this comment belong?
-  // This is lazy to allow correct initialization: the code uses values(),
-  // Language metadata file references Language instances by name :)
   override val values: Seq[Language] = Seq(English, Hebrew, Russian)
 
   case object English extends Language("en")

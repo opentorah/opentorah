@@ -17,7 +17,6 @@ object Parser {
     if (condition) IO.succeed(())
     else IO.fail(message)
 
-  // TODO eliminate
   def parseDo[A](parser: Parser[A]): A =
     run(runnable(parser))
 
@@ -31,7 +30,6 @@ object Parser {
     result.provide(new Context)
   }
 
-  // TODO make private
-  final def run[A](toRun: IO[Error, A]): A =
+  private[xml] final def run[A](toRun: IO[Error, A]): A =
     Runtime.default.unsafeRun(toRun.mapError(error => throw new IllegalArgumentException(error)))
 }
