@@ -3,7 +3,7 @@ package org.opentorah.archive.collector
 import java.io.File
 import java.net.URL
 import org.opentorah.entity.{Entity, EntityReference}
-import org.opentorah.store.{EntityHolder, Store, StoreElement, WithPath}
+import org.opentorah.store.{EntityHolder, Store, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
 import org.opentorah.xml.{From, PaigesPrettyPrinter}
@@ -25,7 +25,7 @@ object Main {
   ): Unit = {
     println("Reading store.")
 
-    val store: Store = Store.read(fromUrl)
+    val store: Store = Store.read[Store](fromUrl, creator = Store.creator)
     val references: Seq[WithPath[EntityReference]] = store.withPath[EntityReference](values = _.references)
 
     println("Checking store.")
@@ -56,7 +56,7 @@ object Main {
   }
 
   private def toXml(store: Store): Elem = store match {
-    case fromElement: Store.FromElement => StoreElement.toXml(fromElement.element)
+    case fromElement: Store.FromElement => Store.parsable.toXml(fromElement.element)
     case entityHolder: EntityHolder => Entity.toXml(entityHolder.entity.copy(id = None))
     case teiHolder: TeiHolder => Tei.toXml(TeiUtil.removeCommon(teiHolder.tei))
   }

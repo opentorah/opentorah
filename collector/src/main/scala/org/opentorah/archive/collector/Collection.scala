@@ -1,7 +1,8 @@
 package org.opentorah.archive.collector
 
 import java.net.URL
-import org.opentorah.store.{By, ByElement, Selector, Store, StoreElement}
+import org.opentorah.store.{By, Selector, Store}
+import org.opentorah.tei.Title
 import org.opentorah.util.Collections
 import org.opentorah.xml.Parser
 import zio.ZIO
@@ -10,18 +11,21 @@ final class Collection(
   inheritedSelectors: Seq[Selector],
   fromUrl: Option[URL],
   baseUrl: URL,
-  element: StoreElement.Inline
+  element: Store.Inline
 ) extends Store.FromElement(inheritedSelectors, fromUrl, baseUrl, element) {
 
-  private def byElement: ByElement = element.by.get
-
-  override val by: Option[By[Document]] =
-    Some(new Collection.DocumentBy(selectors, baseUrl, byElement))
+  override val by: Option[By.FromElement[Document]] = Some(By.fromElement(
+    selectors,
+    fromUrl = None,
+    baseUrl,
+    element = element.by.get,
+    creator = new Collection.DocumentBy(_, _, _, _)
+  ))
 
   def documents: Seq[Document] = by.get.stores
 
   val parts: Seq[Collection.Part] = Collection.getParts(
-    descriptors = byElement.stores.map(_.asInstanceOf[StoreElement.Inline]),
+    descriptors = by.get.element.stores.map(_.asInstanceOf[Store.Inline]),
     documents
   )
 }
@@ -29,15 +33,19 @@ final class Collection(
 object Collection {
 
   final class Part(
-    val title: Option[StoreElement.Title.Value],
+    val title: Option[Title.Value],
     val documents: Seq[Document]
   )
 
   final class DocumentBy(
     inheritedSelectors: Seq[Selector],
+    fromUrl: Option[URL],
     baseUrl: URL,
-    element: ByElement
-  ) extends By.FromElement[Document](inheritedSelectors, baseUrl, element) {
+    inline: By.Inline
+  ) extends By.FromElement[Document](inheritedSelectors, fromUrl, baseUrl, inline) {
+
+    protected def storeCreator: Store.Creator[Document] =
+      throw new IllegalArgumentException("Documents can not be loaded inline.")
 
     override protected def loadFromDirectory(
       fileNames: Seq[String],
@@ -69,14 +77,14 @@ object Collection {
   }
 
   private def getParts(
-    descriptors: Seq[StoreElement.Inline],
+    descriptors: Seq[Store.Inline],
     documents: Seq[Document]
   ): Seq[Part] = {
 
     @scala.annotation.tailrec
     def splitParts(
       result: Seq[Part],
-      descriptors: Seq[StoreElement.Inline],
+      descriptors: Seq[Store.Inline],
       documents: Seq[Document]
     ): (Seq[Part], Seq[Document]) = descriptors match {
       case Nil => (result, documents)
@@ -90,7 +98,7 @@ object Collection {
     }
 
     def mkPart(
-      descriptor: StoreElement.Inline,
+      descriptor: Store.Inline,
       documents: Seq[Document]
     ): Part = {
       if (documents.isEmpty) throw new IllegalArgumentException("No documents for Part!")

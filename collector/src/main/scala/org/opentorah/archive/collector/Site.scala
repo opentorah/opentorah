@@ -3,10 +3,10 @@ package org.opentorah.archive.collector
 import java.io.File
 import org.opentorah.entity.{EntitiesList, Entity, EntityName, EntityReference}
 import org.opentorah.metadata.{Language, Names}
-import org.opentorah.store.{By, Entities, EntityHolder, Path, Store, WithPath}
+import org.opentorah.store.{Binding, By, Entities, EntityHolder, Path, Store, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
-import org.opentorah.xml.XmlUtil
+import org.opentorah.xml.{RawXml, XmlUtil}
 import scala.xml.{Elem, Node}
 
 object Site {
@@ -74,7 +74,8 @@ object Site {
     collection.value.title.fold[Node](scala.xml.Text(collectionReference(collection)))(title => <title>{title.xml}</title>)
 
   private def collectionDescription(collection: WithPath[Collection]): Seq[Node] =
-    Seq(<span>{collection.value.storeAbstract.get.xml}</span>) ++ collection.value.notes.xml
+    Seq(<span>{collection.value.storeAbstract.get.xml}</span>) ++
+      RawXml.getXml(collection.value.body)
 
   private def collectionPageType(collection: WithPath[Collection]): Page.Type =
     if (books.contains(collectionReference(collection))) Page.Book else Page.Manuscript
@@ -242,28 +243,29 @@ object Site {
 
   private def storeHeader(store: WithPath[Store]): Seq[Node] = {
     println(segments(store.path).mkString("/"))
-    val isTop: Boolean = store.path.path.isEmpty
+    val isTop: Boolean = store.path.isEmpty
+    val title: Seq[Node] = RawXml.getXml(store.value.title)
+    val titlePrefix: Seq[Node] =
+      if (isTop) Seq.empty else scala.xml.Text(
+        getName(store.path.last.selector.names) + " " + getName(store.value.names) + (if (title.isEmpty) "" else ": ")
+      )
+
     pathLinks(if (isTop) store.path else store.path.init) ++
-    <head>
-      {if (isTop) Seq.empty else getName(store.path.last.selector.names)}
-      {getName(store.value.names)}:
-      {store.value.title.map(_.xml).getOrElse(Seq.empty)}
-    </head> ++
+    <head>{titlePrefix ++ title}</head> ++
     store.value.storeAbstract.map(value => <span>{value.xml}</span>).getOrElse(Seq.empty) ++
-    store.value.notes.xml
+    RawXml.getXml(store.value.body)
   }
 
-  private def pathLinks(path: Path): Seq[Elem] = {
-    for (ancestor <- path.path.inits.toSeq.reverse.tail) yield {
-      val binding = ancestor.last
-      val ancestorTitle: Seq[Node] = binding.store.title.map(_.xml).getOrElse(Seq.empty)
-      val link = ref(
-        url = "/" + hierarchyDirectoryName + "/" + path2url(Path(ancestor)),
-        viewer = collectionViewer,
-        text = getName(binding.store.names)
-      )
-      <l>{getName(binding.selector.names)} {link}: {ancestorTitle}</l>
-    }
+  private def pathLinks(path: Path): Seq[Elem] = for (ancestor <- path.path.inits.toSeq.reverse.tail) yield {
+    val binding: Binding = ancestor.last
+    val link: Elem = ref(
+      url = path2url(Path(ancestor)),
+      viewer = collectionViewer,
+      text = getName(binding.store.names)
+    )
+    val title: Seq[Node] = RawXml.getXml(binding.store.title)
+    val titlePrefix: Seq[Node] = if (title.isEmpty) Seq.empty else Seq(scala.xml.Text(": "))
+    <l>{getName(binding.selector.names)} {link ++ titlePrefix ++ title}</l>
   }
 
   private def file(directory: File, path: Path): File =
@@ -282,7 +284,6 @@ object Site {
       .map(getName)
       .map(_.replace(' ', '_'))
 
-  // TODO insert path information into the case descriptors.
   private def writeCollectionIndex(
     collection: WithPath[Collection],
     directory: File
@@ -297,7 +298,8 @@ object Site {
       fileName = "index",
       head = Some(collectionTitle(collection)), ///// None
       content =
-// and remove next line        storeHeader(collection.asInstanceOf[WithPath[Store]]) ++  // TODO make WithPath covariant!
+// TODO insert path information into the case descriptors:
+// and remove next line storeHeader(collection) ++
         collectionDescription(collection) ++
         Seq[Elem](table(collectionPageType(collection), documentUrlRelativeToIndex).toTei(
           collection.value.parts.flatMap { part =>
@@ -483,7 +485,7 @@ object Site {
 
     val bySource: Seq[(String, Seq[WithPath[EntityReference]])] =
       notFromNames
-        .filter(reference => (reference.path.path.length >=3) && reference.path.init.init.last.store.isInstanceOf[Collection])  // TODO remove when grouping is adjusted
+        .filter(reference => (reference.path.length >=3) && reference.path.init.init.last.store.isInstanceOf[Collection])  // TODO remove when grouping is adjusted
         .groupBy(referenceCollectionName).toSeq.sortBy(_._1)
 
     <p rendition="mentions">

@@ -40,7 +40,7 @@ object Document {
     fileInDirectory: String => URL,
     name: String,
     languages: Seq[String]
-  ) extends By[TeiHolder](inheritedSelectors, baseUrl) {
+  ) extends By[TeiHolder](inheritedSelectors, fromUrl = None, baseUrl) {
 
     override def selector: Selector = selectorByName("language") // TODO hard-coded...
 
