@@ -1,6 +1,7 @@
 package org.opentorah.archive.collector
 
-import org.opentorah.tei.{Availability, CalendarDesc, ProfileDesc, PublicationStmt, Publisher, SourceDesc, Tei}
+import org.opentorah.tei.{Availability, CalendarDesc, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher,
+  SourceDesc, Tei}
 import org.opentorah.xml.PaigesPrettyPrinter
 
 object TeiUtil {
@@ -17,8 +18,6 @@ object TeiUtil {
     width = 120,
     indent = 2,
   )
-
-  // TODO generate langUsage from xml:lang in the body.
 
   val addPublicationStatement: Tei => Tei = tei =>
     tei.copy(teiHeader = tei.teiHeader.copy(
@@ -40,15 +39,42 @@ object TeiUtil {
       profileDesc = Some(tei.teiHeader.profileDesc.getOrElse(ProfileDesc()).copy(
         calendarDesc = Some(new CalendarDesc.Value(<calendar xml:id="julian"><p>Julian calendar</p></calendar>))))))
 
+  val addLanguage: Tei => Tei = tei => {
+    val textLang: Option[String] = tei.text.lang
+    val langUsage: Option[LangUsage] = tei.teiHeader.profileDesc.flatMap(_.langUsage)
+    val add: Boolean = langUsage.isEmpty && textLang.isDefined
+    if (!add) tei else tei.copy(teiHeader = tei.teiHeader.copy(
+      profileDesc = Some(tei.teiHeader.profileDesc.getOrElse(ProfileDesc()).copy(langUsage =
+        Some(LangUsage(languages = Seq(Language(
+          ident = textLang.get,
+          usage = None,
+          text = None
+        ))))))
+    ))
+  }
+
   val addCommon: Tei => Tei =
-    addPublicationStatement compose addSourceDesc compose addCalendarDesc
+    addPublicationStatement compose addSourceDesc compose addCalendarDesc compose addLanguage
 
   val addCommonNoCalendar: Tei => Tei =
-    addPublicationStatement compose addSourceDesc
+    addPublicationStatement compose addSourceDesc compose addLanguage
 
-  def removeCommon(tei: Tei): Tei =
-    tei.copy(teiHeader = tei.teiHeader.copy(
-      fileDesc = tei.teiHeader.fileDesc.copy(publicationStmt = None, sourceDesc = None),
-      profileDesc = Some(tei.teiHeader.profileDesc.get.copy(calendarDesc = None))
+  val removeLanguage: Tei => Tei = tei => {
+    val textLang: Option[String] = tei.text.lang
+    val langUsage: Option[LangUsage] = tei.teiHeader.profileDesc.flatMap(_.langUsage)
+    val languages: Seq[Language] = langUsage.toSeq.flatMap(_.languages)
+    val remove: Boolean = (languages.length == 1) && textLang.contains(languages.head.ident)
+    if (!remove) tei else tei.copy(teiHeader = tei.teiHeader.copy(
+      profileDesc = Some(tei.teiHeader.profileDesc.get.copy(langUsage = None))
     ))
+  }
+
+  def removeCommon(tei: Tei): Tei = {
+    removeLanguage(tei)
+
+//    tei.copy(teiHeader = tei.teiHeader.copy(
+//      fileDesc = tei.teiHeader.fileDesc.copy(publicationStmt = None, sourceDesc = None),
+//      profileDesc = Some(tei.teiHeader.profileDesc.get.copy(calendarDesc = None))
+//    ))
+  }
 }
