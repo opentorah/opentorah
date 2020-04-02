@@ -70,8 +70,8 @@ object Site {
   private def collectionReference(collection: WithPath[Collection]): String =
     collection.value.names.name
 
-  private def collectionTitle(collection: WithPath[Collection]): Node =
-    collection.value.title.fold[Node](scala.xml.Text(collectionReference(collection)))(title => <title>{title.xml}</title>)
+  private def collectionTitle(collection: WithPath[Collection]): Seq[Node] =
+    collection.value.title.fold[Seq[Node]](scala.xml.Text(collectionReference(collection)))(_.xml)
 
   private def collectionDescription(collection: WithPath[Collection]): Seq[Node] =
     Seq(<span>{collection.value.storeAbstract.get.xml}</span>) ++
@@ -124,7 +124,6 @@ object Site {
     for (entity <- entities) writeTei(
       namesDirectory,
       fileName = entity.id.get,
-      head = None,
       target = namesViewer,
       content = Seq(Entity.toXml(entity.copy(content = entity.content :+ mentions(entity, references))))
     )
@@ -213,7 +212,6 @@ object Site {
     for (store <- stores) writeTei(
       directory = file(hierarchyDirectory, store.path),
       fileName = "index",
-      head = None,
       target = collectionViewer,
       content = store2xml(store)
     )
@@ -296,11 +294,10 @@ object Site {
     writeTei(
       directory,
       fileName = "index",
-      head = Some(collectionTitle(collection)), ///// None
       content =
 // TODO insert path information into the case descriptors:
 // and remove next line storeHeader(collection) ++
-        collectionDescription(collection) ++
+        <head>{collectionTitle(collection)}</head> ++ collectionDescription(collection) ++
         Seq[Elem](table(collectionPageType(collection), documentUrlRelativeToIndex).toTei(
           collection.value.parts.flatMap { part =>
             part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Xml) ++
@@ -420,8 +417,9 @@ object Site {
     writeTei(
       directory,
       fileName = collectionsFileName,
-      head = Some(scala.xml.Text("Архивы")),
-      content = <list>{
+      content =
+        <head>Архивы</head> ++
+        <list>{
         for (archive <- byArchive.keys.toList.sorted) yield {
           <item>
             <p>{s"[$archive]"}</p>
@@ -436,8 +434,8 @@ object Site {
   private def writeIndex(collections: Seq[WithPath[Collection]], directory: File): Unit = writeTei(
     directory,
     fileName = indexFileName,
-    head = Some(scala.xml.Text("Дела")),
     content =
+      <head>Дела</head> ++
       <list type="bulleted">
       {for (collection <- collections.filterNot(collection => unpublished.contains(collectionName(collection))))
        yield toXml(collection)}
@@ -448,6 +446,7 @@ object Site {
 
   private def toXml(collection: WithPath[Collection]): Elem = {
     val url = collectionUrl(collection)
+    // If I do this, parts of the line click to the names... {ref(url, collectionViewer, scala.xml.Text(collectionReference(collection) + ": ") ++ collectionTitle(collection))}<lb/>
     <item>
       {ref(url, collectionViewer, collectionReference(collection) + ": " +
         spacedText(collectionTitle(collection)))}<lb/>
@@ -521,8 +520,7 @@ object Site {
     writeTei(
       directory,
       fileName = namesFileName,
-      head = Some(scala.xml.Text(namesHead)),
-      content = listOfLists ++ nonEmptyLists.flatMap(toXml),
+      content = <head>{namesHead}</head> ++ listOfLists ++ nonEmptyLists.flatMap(toXml),
       target = namesViewer
     )
   }
@@ -553,28 +551,21 @@ object Site {
   private def ref(
     url: String,
     viewer: String,
-    text: Elem
+    text: Seq[Node]
   ): Elem = <ref target={url} role={viewer}>{text}</ref>
 
   private def writeTei(
     directory: File,
     fileName: String,
-    head: Option[Node],
     content: Seq[Node],
     style: Option[String] = None,
     target: String,
     yaml: Seq[(String, String)] = Seq.empty
   ): Unit = {
-    val body: Seq[Node] =
-      head.fold[Seq[Node]](Seq.empty)(head => Seq(<head>{head}</head>)) ++ content
-
     TeiUtil.teiPrettyPrinter.writeXml(
       file = new File(directory, fileName + ".xml"),
-      elem = Tei.toXml(TeiUtil.addCommonNoCalendar(Tei(body)))
+      elem = Tei.toXml(TeiUtil.addCommonNoCalendar(Tei(content)))
     )
-
-    val titleYaml: Seq[(String, String)] =
-      head.fold[Seq[(String, String)]](Seq.empty)(head => Seq("title" -> quote(spacedText(head))))
 
     writeTeiWrapper(
       directory,
@@ -582,7 +573,7 @@ object Site {
       teiPrefix = None,
       style,
       target,
-      yaml = titleYaml ++ yaml
+      yaml
     )
   }
 
@@ -639,6 +630,7 @@ object Site {
     case n => n
   }
 
+  def spacedText(nodes: Seq[Node]): String = nodes.map(spacedText).mkString("")
   def spacedText(node: Node): String = {
     val result = node match {
       case elem: Elem => (elem.child map (_.text)).mkString(" ")
