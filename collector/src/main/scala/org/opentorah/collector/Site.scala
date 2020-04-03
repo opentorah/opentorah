@@ -429,7 +429,8 @@ object Site {
             <list type="bulleted">{for (collection <- byArchive(archive)) yield toXml(collection)}</list>
           </item>}}
       </list>,
-      target = collectionViewer
+      target = collectionViewer,
+      yaml = Seq("title" -> "Архивы")
     )
   }
 
@@ -524,7 +525,8 @@ object Site {
       directory,
       fileName = namesFileName,
       content = <head>{namesHead}</head> ++ listOfLists ++ nonEmptyLists.flatMap(toXml),
-      target = namesViewer
+      target = namesViewer,
+      yaml = Seq("title" -> namesHead)
     )
   }
 
