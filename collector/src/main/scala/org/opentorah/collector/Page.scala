@@ -8,7 +8,6 @@ sealed trait Page {
   def isPresent: Boolean = facs.isDefined
 }
 
-// TODO incorporate into Collection subtype...
 object Page {
 
   sealed trait Type {
