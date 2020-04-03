@@ -1,14 +1,13 @@
 package org.opentorah.store
 
-import java.net.URL
 import org.opentorah.entity.{Entity, EntityReference}
 import org.opentorah.metadata.{Name, Names}
 
 final class EntityHolder(
   inheritedSelectors: Seq[Selector],
-  fromUrl: URL,
+  urls: Urls,
   val entity: Entity
-) extends Store(inheritedSelectors, Some(fromUrl), fromUrl) {
+) extends Store(inheritedSelectors, urls) {
 
   override def names: Names = new Names(Seq(Name(entity.name)))
 

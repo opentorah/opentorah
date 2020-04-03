@@ -39,66 +39,61 @@ abstract class Component(elementName: String) {
 
   def inlineParser(className: Option[String]): Parser[Inline]
 
-  // TODO with some generalization of Attributes it should be possible to factor parts of inlineToXml() into here:
   def inlineToXml(value: Inline): Elem
 
   final type Creator[+R] = (
     /* inheritedSelectors: */ Seq[Selector],
-    /* fromUrl: */ Option[URL],
-    /* baseUrl: */ URL,
+    /* urls: */ Urls,
     /* inline: */ Inline) => R
 
-  final def read[R](
+  private [store] final def read[R](
     fromUrl: URL,
     inheritedSelectors: Seq[Selector] = Selector.predefinedSelectors,
     creator: Creator[R]
   ): R = fromElement[R](
     inheritedSelectors,
-    fromUrl = Some(fromUrl),
-    baseUrl = fromUrl,
+    urls = Urls.fromUrl(fromUrl),
     element = Parser.parseDo(parsable.parse(fromUrl)),
     creator
   )
 
   final def fromElement[R](
     inheritedSelectors: Seq[Selector],
-    fromUrl: Option[URL],
-    baseUrl: URL,
+    urls: Urls,
     element: Element,
     creator: Creator[R]
   ): R = element match {
 
     case FromFile(file) => read[R](
-      fromUrl = Files.fileInDirectory(baseUrl, file),
+      fromUrl = Files.fileInDirectory(urls.baseUrl, file),
       inheritedSelectors,
       creator
     )
 
     case element =>
       val inline = element.asInstanceOf[Inline]
-      inline.className match {
-
-      case None => creator(
+      inline.className.map(reflectedCreator[R]).getOrElse(creator)(
         inheritedSelectors,
-        fromUrl,
-        baseUrl,
+        urls,
         inline
       )
+  }
 
-      case Some(className) => Class.forName(className)
-        .getConstructor(
-          classOf[Seq[Selector]],
-          classOf[Option[URL]],
-          classOf[URL],
-          classOfInline
-        )
-        .newInstance(
-          inheritedSelectors,
-          fromUrl,
-          baseUrl,
-          element
-        )
-        .asInstanceOf[R]
-    }
+  private def reflectedCreator[R](className: String): Creator[R] = {
+    val constructor = Class.forName(className).getConstructor(
+      classOf[Seq[Selector]],
+      classOf[Urls],
+      classOfInline
+    )
+
+    (
+      inheritedSelectors: Seq[Selector],
+      urls: Urls,
+      inline: Inline
+    ) => constructor.newInstance(
+      inheritedSelectors,
+      urls,
+      inline
+    ).asInstanceOf[R]
   }
 }

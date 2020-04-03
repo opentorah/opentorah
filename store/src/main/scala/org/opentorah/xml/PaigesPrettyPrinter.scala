@@ -5,17 +5,6 @@ import org.opentorah.util.Files
 import org.typelevel.paiges.Doc
 import scala.xml.{Elem, MetaData, NamespaceBinding, Node, SpecialNode, TopScope, Utility}
 
-/*
-  TODO blog about XML parsing, ZIO, Cats; XML pretty-printing, Wadler's paper; alternatives (and ScalaTags).
-
-  scala.xml.PrettyPrinter breaks the line
-   - between e1 and e2 in <e1>...</e1><e2>...</e2>
-   - between e1 and text in: <e1>...</e1>text,
-  separating notes from what they are notes on and punctuation from what its content by spaces.
-  I decided to see if Wadler's "Prettier Printer" can help avoid ugly "fix" (Print.merge) and
-  have more control over the result. Paiges is a Scala implementation of the "Prettier Printer",
-  so I don't have to write my own :)
- */
 final class PaigesPrettyPrinter(
   width: Int = 120,
   indent: Int = 2,

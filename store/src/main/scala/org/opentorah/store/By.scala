@@ -8,9 +8,8 @@ import scala.xml.Elem
 
 abstract class By[+S <: Store](
   inheritedSelectors: Seq[Selector],
-  val fromUrl: Option[URL],
-  baseUrl: URL
-) extends WithSelectors(inheritedSelectors) {
+  urls: Urls
+) extends ComponentBase(inheritedSelectors, urls) {
 
   def selector: Selector
 
@@ -54,10 +53,9 @@ object By extends Component("by") {
 
   abstract class FromElement[+S <: Store](
     inheritedSelectors: Seq[Selector],
-    fromUrl: Option[URL],
-    baseUrl: URL,
+    urls: Urls,
     val element: Inline
-  ) extends By[S](inheritedSelectors, fromUrl, baseUrl) {
+  ) extends By[S](inheritedSelectors, urls) {
 
     final override def selector: Selector = selectorByName(element.selector)
 
@@ -65,19 +63,17 @@ object By extends Component("by") {
 
     final override protected def load: Seq[Parser[S]] =
       if (element.directory.isEmpty) {
-        // TODO Parserify;
         for (storeElement <- element.stores) yield ZIO.succeed(Store.fromElement[S](
           selectors,
-          fromUrl = None,
-          baseUrl,
+          urls.inline,
           element = storeElement,
           creator = storeCreator
         ))
 
       } else {
         val directoryName: String = element.directory.get
-        val directory: URL = Files.subdirectory(baseUrl, directoryName)
-        val list: URL = Files.fileInDirectory(baseUrl, element.list.getOrElse(directoryName + "-list-generated.xml"))
+        val directory: URL = Files.subdirectory(urls.baseUrl, directoryName)
+        val list: URL = Files.fileInDirectory(urls.baseUrl, element.list.getOrElse(directoryName + "-list-generated.xml"))
 
         val fileNames: Seq[String] = if (!Files.isFile(directory)) Parser.parseDo(filesList.parse(list)) else {
           val result: Seq[String] = Files.filesWithExtensions(Files.url2file(directory), "xml").sorted
@@ -100,7 +96,7 @@ object By extends Component("by") {
   }
 
   def creator: Creator[By[Store]] =
-    new FromElement[Store](_, _, _, _) {
+    new FromElement[Store](_, _, _) {
       override protected def storeCreator: Store.Creator[Store] = Store.creator
     }
 

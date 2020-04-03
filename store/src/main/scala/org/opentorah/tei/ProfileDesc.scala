@@ -3,7 +3,6 @@ package org.opentorah.tei
 import org.opentorah.xml.{Choice, Element, ToXml}
 import scala.xml.Elem
 
-// TODO also: abstract handNotes listTranspose particDesc settingDesc textDesc
 final case class ProfileDesc(
   documentAbstract: Option[Abstract.Value],
   creation: Option[Creation],

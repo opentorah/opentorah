@@ -3,17 +3,16 @@ package org.opentorah.store
 import java.net.URL
 import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
 import org.opentorah.metadata.Names
-import org.opentorah.xml.Parser
+import org.opentorah.xml.{Attribute, Parser, ToXml}
+import scala.xml.Elem
 
-// TODO this should have two Bys.
 final class Entities(
   inheritedSelectors: Seq[Selector],
-  baseUrl: URL,
-  element: EntitiesElement
+  urls: Urls,
+  element: Entities.Element
 ) extends Store(
   inheritedSelectors,
-  fromUrl = None,
-  baseUrl
+  urls
 ) {
   def selector: Selector = selectorByName(element.selector)
 
@@ -21,10 +20,9 @@ final class Entities(
 
   override val by: Option[By[EntityHolder]] = Some(By.fromElement[By[EntityHolder]](
     selectors,
-    fromUrl = None,
-    baseUrl,
+    urls,
     element.by.asInstanceOf[By.Inline],
-    creator = new Entities.EntitiesBy(_, _, _, _)
+    creator = new Entities.EntitiesBy(_, _, _)
   ))
 
   val lists: Seq[EntitiesList] = element.lists.map(_.take(by.get.stores.map(_.entity)))
@@ -36,23 +34,35 @@ final class Entities(
 
 object Entities {
 
+  final case class Element(
+    selector: String,
+    by: By.Element,
+    lists: Seq[EntitiesList]
+  )
+
+  object parsable extends org.opentorah.xml.Element[Element]("entities", parser = for {
+    selector <- Attribute("selector").required
+    by <- By.parsable.required
+    lists <- EntitiesList.all
+  } yield Element(
+    selector,
+    by,
+    lists
+  )) with ToXml[Element] {
+
+    override def toXml(value: Element): Elem =
+      <entities selector={value.selector}>
+        {By.parsable.toXml(value.by)}
+        {EntitiesList.toXml(value.lists)}
+      </entities>
+  }
+
   final class EntitiesBy(
     inheritedSelectors: Seq[Selector],
-    fromUrl: Option[URL],
-    baseUrl: URL,
+    urls: Urls,
     element: By.Inline
-  ) extends By.FromElement[EntityHolder](inheritedSelectors, fromUrl, baseUrl, element) {
+  ) extends By.FromElement[EntityHolder](inheritedSelectors, urls, element) {
 
-    // TODO to allow for inline parsing of Entities
-    // (with Parsable.allMustBe() or .all(), requiring xml:id on Entities),
-    // it is not enough to have creators generalized (as is already done):
-    // parsing needs to be interleaved with creation of the Stores
-    // (add 'parser' attribute?).
-    // When (if?) that is done, Store.inline.from
-    // (which is there only to allow reuse of StoreElement for Collection's parts)
-    // can be generalized away too.
-    // Also, it is possible that then it will be easier to merge into EntityElement into Store.Element
-    // ("parse, do not validate" be damned ;)).
     protected def storeCreator: Store.Creator[EntityHolder] =
       throw new IllegalArgumentException("Entities can not (yet?) be loaded inline.")
 
@@ -62,7 +72,7 @@ object Entities {
     ): Seq[Parser[EntityHolder]] = for (fileName <- fileNames) yield {
       val fromUrl: URL = fileInDirectory(fileName)
       parseWithKnownId(fromUrl, id = fileName)
-        .map(entity => new EntityHolder(inheritedSelectors, fromUrl, entity))
+        .map(entity => new EntityHolder(inheritedSelectors, Urls.fromUrl(fromUrl), entity))
     }
   }
 

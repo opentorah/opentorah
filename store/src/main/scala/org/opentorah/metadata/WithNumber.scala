@@ -11,7 +11,6 @@ object WithNumber {
     what <- parser
   } yield new WithNumber[T](n, what)
 
-  // TODO switch to checkConsecutiveNg?
   def checkConsecutive[T](result: Seq[WithNumber[T]], what: String): Seq[WithNumber[T]] = {
     require(result.map(_.n) == (1 to result.length), s"Wrong $what numbers: $result")
     result

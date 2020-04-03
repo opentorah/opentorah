@@ -9,9 +9,8 @@ import scala.xml.{Elem, Node}
 
 abstract class Store(
   inheritedSelectors: Seq[Selector],
-  val fromUrl: Option[URL],
-  val baseUrl: URL
-) extends WithSelectors(inheritedSelectors) {
+  urls: Urls
+) extends ComponentBase(inheritedSelectors, urls) {
 
   def names: Names
 
@@ -55,7 +54,7 @@ object Store extends Component("store") {
     storeAbstract: Option[Abstract.Value],
     body: Option[Body.Value],
     selectors: Seq[Selector],
-    entities: Option[EntitiesElement],
+    entities: Option[Entities.Element],
     by: Option[By.Element],
     className: Option[String]
   ) extends Element with WithClassName
@@ -69,7 +68,7 @@ object Store extends Component("store") {
     storeAbstract <- Abstract.parsable.optional
     body <- Body.parsable.optional
     selectors <- Selector.all
-    entities <- EntitiesElement.optional
+    entities <- Entities.parsable.optional
     by <- By.parsable.optional
   } yield Inline(
     names,
@@ -91,17 +90,16 @@ object Store extends Component("store") {
       {Abstract.parsable.toXml(value.storeAbstract)}
       {Body.parsable.toXml(value.body)}
       {Selector.toXml(value.selectors)}
-      {EntitiesElement.toXml(value.entities)}
+      {Entities.parsable.toXml(value.entities)}
       {By.parsable.toXml(value.by)}
     </store>
   }
 
   class FromElement(
     inheritedSelectors: Seq[Selector],
-    fromUrl: Option[URL],
-    baseUrl: URL,
+    urls: Urls,
     val element: Inline
-  ) extends Store(inheritedSelectors, fromUrl, baseUrl) {
+  ) extends Store(inheritedSelectors, urls) {
 
     final override def names: Names =
       element.names
@@ -119,12 +117,11 @@ object Store extends Component("store") {
       element.selectors
 
     final override val entities: Option[Entities] =
-      element.entities.map(entities => new Entities(selectors, baseUrl, entities))
+      element.entities.map(entities => new Entities(selectors, urls.inline, entities))
 
     override def by: Option[By[Store]] = element.by.map(byElement => By.fromElement[By[Store]](
       selectors,
-      fromUrl = None,
-      baseUrl,
+      urls.inline,
       byElement,
       creator = By.creator
     ))
@@ -140,5 +137,8 @@ object Store extends Component("store") {
   }
 
   def creator: Creator[Store] =
-    new FromElement(_, _, _, _)
+    new FromElement(_, _, _)
+
+  def read(fromUrl: URL): Store =
+    read[Store](fromUrl, creator = Store.creator)
 }
