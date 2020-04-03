@@ -340,6 +340,7 @@ object Site {
       val translations: Seq[Elem] =
         for (teiHolder <- document.by.get.stores.filter(_.language.isDefined)) yield translationRef(teiHolder)
       val language: Option[String] = document.tei.languages.map(_.ident).headOption
+        .orElse(document.tei.text.lang)
       Seq(scala.xml.Text(language.getOrElse("?"))) ++ translations
     }),
 
