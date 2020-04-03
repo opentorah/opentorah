@@ -33,7 +33,9 @@ final class Document(
 
 object Document {
 
-  // TODO check correspondence with the Tei language element.
+  // TODO check correspondence with the Tei language element - and codify the fact that the first
+  // TeiHolder is the original: retrieve the languages of translations from tei.text.lang.get of the other ones,
+  // remove TeiHolder.language, and move it into the store.
   final class TeiBy(
     inheritedSelectors: Seq[Selector],
     urls: Urls,
