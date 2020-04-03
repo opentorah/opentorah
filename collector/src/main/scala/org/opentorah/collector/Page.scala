@@ -1,4 +1,4 @@
-package org.opentorah.archive.collector
+package org.opentorah.collector
 
 sealed trait Page {
   def n: String

@@ -1,4 +1,4 @@
-package org.opentorah.archive.collector
+package org.opentorah.collector
 
 import java.io.File
 import java.net.URL
@@ -25,7 +25,7 @@ object Main {
   ): Unit = {
     println("Reading store.")
 
-    val store: Store = Store.read[Store](fromUrl, creator = Store.creator)
+    val store: Store = Store.read(fromUrl)
     val references: Seq[WithPath[EntityReference]] = store.withPath[EntityReference](values = _.references)
 
     println("Checking store.")
@@ -44,7 +44,7 @@ object Main {
   }
 
   private def prettyPrint(store: Store, prettyPrinter: PaigesPrettyPrinter): Unit = {
-    for (fromUrl <- store.fromUrl) if (Files.isFile(fromUrl)) TeiUtil.teiPrettyPrinter.writeXml(
+    for (fromUrl <- store.urls.fromUrl) if (Files.isFile(fromUrl)) TeiUtil.teiPrettyPrinter.writeXml(
       file = Files.url2file(fromUrl),
       elem = toXml(store)
     )

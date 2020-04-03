@@ -1,22 +1,22 @@
-package org.opentorah.archive.collector
+package org.opentorah.collector
 
 import java.net.URL
 import org.opentorah.entity.EntityReference
 import org.opentorah.metadata.{Name, Names}
-import org.opentorah.store.{By, Selector, Store}
+import org.opentorah.store.{By, Selector, Store, Urls}
 import org.opentorah.tei.Tei
 import org.opentorah.xml.Parser
 
 final class Document(
   inheritedSelectors: Seq[Selector],
-  baseUrl: URL,
+  urls: Urls,
   fileInDirectory: String => URL,
   val name: String,
   val languages: Seq[String]
-) extends Store(inheritedSelectors, None, baseUrl) {
+) extends Store(inheritedSelectors, urls) {
 
   override val by: Option[By[TeiHolder]] =
-    Some(new Document.TeiBy(selectors, baseUrl, fileInDirectory, name, languages))
+    Some(new Document.TeiBy(selectors, urls, fileInDirectory, name, languages))
 
   def tei: Tei = by.get.stores.head.tei
 
@@ -36,11 +36,11 @@ object Document {
   // TODO check correspondence with the Tei language element.
   final class TeiBy(
     inheritedSelectors: Seq[Selector],
-    baseUrl: URL,
+    urls: Urls,
     fileInDirectory: String => URL,
     name: String,
     languages: Seq[String]
-  ) extends By[TeiHolder](inheritedSelectors, fromUrl = None, baseUrl) {
+  ) extends By[TeiHolder](inheritedSelectors, urls) {
 
     override def selector: Selector = selectorByName("language") // TODO hard-coded...
 
@@ -51,7 +51,7 @@ object Document {
           tei <- Tei.parse(fromUrl)
         } yield new TeiHolder(
           selectors,
-          fromUrl,
+          urls = Urls.fromUrl(fromUrl),
           name,
           language,
           tei

@@ -1,8 +1,8 @@
-package org.opentorah.archive.collector
+package org.opentorah.collector
 
 import java.io.File
 import org.opentorah.util.Files
-import scala.sys.process._
+//import scala.sys.process._
 
 object Cutter {
 

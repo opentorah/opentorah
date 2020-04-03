@@ -1,4 +1,4 @@
-package org.opentorah.archive.collector
+package org.opentorah.collector
 
 import java.io.File
 import org.opentorah.entity.{EntitiesList, Entity, EntityName, EntityReference}
@@ -58,7 +58,7 @@ object Site {
   private val collectionViewer: String = "collectionViewer"
 
   private def fileName(store: Store): String =
-    Files.nameAndExtension(Files.pathAndName(store.fromUrl.get.getPath)._2)._1
+    Files.nameAndExtension(Files.pathAndName(store.urls.fromUrl.get.getPath)._2)._1
 
   private def referenceCollectionName(reference: WithPath[EntityReference]): String =
     reference.path.init.init.last.store.names.name

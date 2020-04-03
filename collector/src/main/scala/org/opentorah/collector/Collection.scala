@@ -1,7 +1,7 @@
-package org.opentorah.archive.collector
+package org.opentorah.collector
 
 import java.net.URL
-import org.opentorah.store.{By, Selector, Store}
+import org.opentorah.store.{By, Selector, Store, Urls}
 import org.opentorah.tei.Title
 import org.opentorah.util.Collections
 import org.opentorah.xml.Parser
@@ -9,17 +9,15 @@ import zio.ZIO
 
 final class Collection(
   inheritedSelectors: Seq[Selector],
-  fromUrl: Option[URL],
-  baseUrl: URL,
+  urls: Urls,
   element: Store.Inline
-) extends Store.FromElement(inheritedSelectors, fromUrl, baseUrl, element) {
+) extends Store.FromElement(inheritedSelectors, urls, element) {
 
   override val by: Option[By.FromElement[Document]] = Some(By.fromElement(
     selectors,
-    fromUrl = None,
-    baseUrl,
+    urls = urls.inline,
     element = element.by.get,
-    creator = new Collection.DocumentBy(_, _, _, _)
+    creator = new Collection.DocumentBy(_, _, _)
   ))
 
   def documents: Seq[Document] = by.get.stores
@@ -39,10 +37,9 @@ object Collection {
 
   final class DocumentBy(
     inheritedSelectors: Seq[Selector],
-    fromUrl: Option[URL],
-    baseUrl: URL,
+    urls: Urls,
     inline: By.Inline
-  ) extends By.FromElement[Document](inheritedSelectors, fromUrl, baseUrl, inline) {
+  ) extends By.FromElement[Document](inheritedSelectors, urls, inline) {
 
     protected def storeCreator: Store.Creator[Document] =
       throw new IllegalArgumentException("Documents can not be loaded inline.")
@@ -62,7 +59,7 @@ object Collection {
 
       for (name <- names) yield ZIO.succeed(new Document(
         inheritedSelectors,
-        baseUrl,
+        urls.inline,
         fileInDirectory,
         name,
         languages = translations.getOrElse(name, Seq.empty)

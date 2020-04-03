@@ -1,4 +1,4 @@
-package org.opentorah.archive.collector
+package org.opentorah.collector
 
 import org.opentorah.tei.{Availability, CalendarDesc, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher,
   SourceDesc, Tei}
