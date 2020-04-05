@@ -49,8 +49,6 @@ object Site {
 
   private val namesHead: String = "Имена"
 
-  private val books: Set[String] = Set("Державин", "Дубнов")
-
   private val unpublished: Set[String] = Set("derzhavin6", "derzhavin7", "lna208",
     "niab5", "niab19", "niab24", "rnb203", "rnb211")
 
@@ -77,9 +75,6 @@ object Site {
   private def collectionDescription(collection: WithPath[Collection]): Seq[Node] =
     Seq(<span>{collection.value.storeAbstract.get.xml}</span>) ++
       RawXml.getXml(collection.value.body)
-
-  private def collectionPageType(collection: WithPath[Collection]): Page.Type =
-    if (books.contains(collectionReference(collection))) Page.Book else Page.Manuscript
 
   private def collectionName(collection: WithPath[Collection]): String =
     fileName(collection.value)
@@ -164,7 +159,7 @@ object Site {
 
         writeFacsViewer(
           facsDirectory = new File(collectionDirectory, facsDirectoryName),
-          pageType = collectionPageType(collection),
+          pageType = collection.value.pageType,
           document,
           navigation
         )
@@ -290,7 +285,7 @@ object Site {
     directory: File
   ): Unit = {
     val missingPages: Seq[String] = collection.value.documents
-      .flatMap(document => document.pages(collectionPageType(collection)))
+      .flatMap(document => document.pages(collection.value.pageType))
       .filterNot(_.isPresent)
       .map(_.displayName)
 
@@ -301,7 +296,7 @@ object Site {
 // TODO insert path information into the case descriptors:
 // and remove next line storeHeader(collection) ++
         <head>{collectionTitle(collection)}</head> ++ collectionDescription(collection) ++
-        Seq[Elem](table(collectionPageType(collection), documentUrlRelativeToIndex).toTei(
+        Seq[Elem](table(collection.value.pageType, documentUrlRelativeToIndex).toTei(
           collection.value.parts.flatMap { part =>
             part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Xml) ++
               part.documents.map(Table.Data[Document]) }
