@@ -26,97 +26,92 @@ final class Site(store: Store) {
 
   def resolve(url: String): Option[Site.SiteFile] = {
     if (!url.startsWith("/")) None else {
-      val parts: Seq[String] = url.substring(1).split("/")
-      parts.head match {
-        case Site.hierarchyDirectoryName =>
-          if (parts.tail.isEmpty) None
-          else resolveInHierarchy(store, parts.tail)
-
-        case Site.collectionsDirectoryName =>
-          if (parts.tail.isEmpty) None
-          else resolveCollection(parts.tail)
-
-        case Site.namesDirectoryName =>
-          val (fileName, extension) = Files.nameAndExtension(parts(1))
-          for {
-            entity <- store.entities.get.findByRef(fileName)
-            teiFacet <- Site.TeiFacet.forExtension(extension.get)
-          } yield Site.SiteFile.EntityFile(entity, teiFacet)
-
-        case file =>
-          if (!file.startsWith(Site.namesFileNameWithExtension)) None else {
-            val name = file.substring(Site.namesFileNameWithExtension.length)
-            if (name.isEmpty) {
-              Some(Site.SiteFile.NamesFile)
-            } else if (name.startsWith("#")) {
-              Some(Site.SiteFile.NamesFile) // TODO
-            } else None
-          }
+      val parts: Seq[String] = Site.removePart(url).substring(1).split("/")
+      if (parts.isEmpty) None /* TODO site index... */ else {
+        val tail: Seq[String] = parts.tail
+        parts.head match {
+          case Site.hierarchyDirectoryName => resolveHierarchy(Path.empty, store, tail)
+          case Site.collectionsDirectoryName => resolveCollection(tail)
+          case Site.namesDirectoryName => resolveEntity(tail)
+          case file if file.startsWith(Site.namesFileName) =>
+            resolveNamesFile(file.substring(Site.namesFileName.length), tail)
+          case _ => None
+        }
       }
     }
   }
 
-  @scala.annotation.tailrec
-  def resolveInHierarchy(store: Store, parts: Seq[String]): Option[Site.SiteFile] = {
-    if (parts.isEmpty) Some(Site.SiteFile.HierarchyFile(store, Site.TeiFacet.Html)) else {
-      val part: String = parts.head
-      val (fileName, extension) = Files.nameAndExtension(part)
-      if (fileName == "index") {
-        for {
-          teiFacet <- Site.TeiFacet.forExtension(extension.get)
-        } yield Site.SiteFile.HierarchyFile(store, teiFacet)
-      } else {
-        if (store.by.get.selector.names.find(part).isEmpty) None else {
-          if (store.isInstanceOf[Collection]) {
-            Some(Site.SiteFile.CollectionIndex(store.asInstanceOf[Collection], Site.TeiFacet.Html))
-          } else {
-            if (parts.tail.isEmpty) None else {
-              val name = parts.tail.head.replace('_', ' ')
-              val nextO = store.by.get.stores.find(_.names.find(name).isDefined)
-              if (nextO.isEmpty) None
-              else resolveInHierarchy(nextO.get, parts.tail.tail)
+  private def resolveHierarchy(path: Path, store: Store, parts: Seq[String]): Option[Site.SiteFile] =
+    if (parts.isEmpty) Some(Site.SiteFile.HierarchyFile(store, Site.TeiFacet.Html)) else parts.head match {
+      case "index.html" => Some(Site.SiteFile.HierarchyFile(store, Site.TeiFacet.Html))
+      case "index.xml" => Some(Site.SiteFile.HierarchyFile(store, Site.TeiFacet.Xml))
+      case _ =>
+        val selector = store.by.get.selector
+        val selectorName: String = parts.head
+        if (selector.names.find(selectorName).isEmpty) None else store match {
+          case collection: Collection =>
+            if (parts.tail.nonEmpty) None
+            else Some(Site.SiteFile.CollectionIndex(WithPath(path, collection), Site.TeiFacet.Html))
+
+          case _ => if (parts.tail.isEmpty) None else {
+            val storeName: String = parts.tail.head.replace('_', ' ')
+            store.by.get.stores.find(_.names.find(storeName).isDefined).flatMap { nextStore =>
+              resolveHierarchy(path :+ selector.bind(nextStore), nextStore, parts.tail.tail)
             }
           }
         }
+    }
+
+  def resolveCollection(parts: Seq[String]): Option[Site.SiteFile] = if (parts.isEmpty) None else {
+    val collectionName: String = parts.head
+    collections.find(collection => Site.fileName(collection.value) == collectionName).flatMap { collection =>
+      if (parts.tail.isEmpty) Some(Site.SiteFile.CollectionIndex(collection, Site.TeiFacet.Html))
+      else parts.tail.head match {
+        case "index.html" =>
+          if (parts.tail.tail.nonEmpty) None
+          else Some(Site.SiteFile.CollectionIndex(collection, Site.TeiFacet.Html))
+        case "index.xml" =>
+          if (parts.tail.tail.nonEmpty) None
+          else Some(Site.SiteFile.CollectionIndex(collection, Site.TeiFacet.Xml))
+
+        case Site.documentsDirectoryName => resolveDocument(collection, parts.tail.tail, Site.DocumentFacet.Document)
+        case Site.teiDirectoryName => resolveDocument(collection, parts.tail.tail, Site.DocumentFacet.Tei)
+        case Site.facsDirectoryName => resolveDocument(collection, parts.tail.tail, Site.DocumentFacet.Facs)
+
+        case _ => None
       }
     }
   }
-
-  def resolveCollection(parts: Seq[String]): Option[Site.SiteFile] = {
-    val collectionName = parts.head
-    val collection: Option[WithPath[Collection]] =
-      collections.find(collection => Site.fileName(collection.value) == collectionName)
-    if (collection.isEmpty) None else {
-      if (parts.tail.isEmpty) Some(Site.SiteFile.CollectionIndex(collection.get.value, Site.TeiFacet.Html)) else {
-        parts.tail.head match {
-          case "index.html" => Some(Site.SiteFile.CollectionIndex(collection.get.value, Site.TeiFacet.Html))
-          case Site.documentsDirectoryName => resolveDocument(collection, parts, Site.DocumentFacet.Document)
-          case Site.teiDirectoryName => resolveDocument(collection, parts, Site.DocumentFacet.Tei)
-          case Site.facsDirectoryName => resolveDocument(collection, parts, Site.DocumentFacet.Facs)
-          case _ =>
-            // TODO         None
-            throw new IllegalArgumentException(s"parts: $parts")
-        }
-      }
-    }
-  }
-
 
   def resolveDocument(
-    collectionO: Option[WithPath[Collection]],
-    partsLong: Seq[String],
+    collection: WithPath[Collection],
+    parts: Seq[String],
     documentFacet: Site.DocumentFacet
-  ): Option[Site.SiteFile] = {
-    val collection: WithPath[Collection] = collectionO.get
-    val parts: Seq[String] = partsLong.tail.tail
-    if (parts.isEmpty) None else {
-      val (fileName, extension) = Files.nameAndExtension(parts.head)
-      if (!extension.contains(documentFacet.extension)) None else {
-        val document: Option[Document] = collection.value.by.get.stores.find { document =>
-          document.by.get.stores.exists(teiHolder => teiHolder.name == fileName)
-        }
-        Some(Site.SiteFile.DocumentFile(document.get, documentFacet))
+  ): Option[Site.SiteFile] = if (parts.isEmpty || parts.tail.nonEmpty) None else {
+    val (fileName: String, extension: Option[String]) = Files.nameAndExtension(parts.head)
+    if (!extension.contains(documentFacet.extension)) None else {
+      val document: Option[Document] = collection.value.by.get.stores.find { document =>
+        document.by.get.stores.exists(teiHolder => teiHolder.name == fileName)
       }
+      document.map(document => Site.SiteFile.DocumentFile(document, documentFacet))
+    }
+  }
+
+  private def resolveEntity(parts: Seq[String]): Option[Site.SiteFile] = if (parts.isEmpty || parts.tail.nonEmpty) None else {
+    val (fileName: String, extension: Option[String]) = Files.nameAndExtension(parts.head)
+    store.entities.get.findByRef(fileName).flatMap { entity => extension match {
+      case Some("html") => Some(Site.SiteFile.EntityFile(entity, Site.TeiFacet.Html))
+      case Some("xml") => Some(Site.SiteFile.EntityFile(entity, Site.TeiFacet.Xml))
+      case _ => None
+    }}
+  }
+
+  private def resolveNamesFile(name: String, parts: Seq[String]): Option[Site.SiteFile] = if (parts.nonEmpty) None else {
+    val (restOfTheName, extension) = Files.nameAndExtension(name)
+    if (restOfTheName.nonEmpty) None else extension match {
+      case Some("html") => Some(Site.SiteFile.NamesFile(Site.TeiFacet.Html))
+      case Some("xml") => Some(Site.SiteFile.NamesFile(Site.TeiFacet.Xml))
+      case _ => None
     }
   }
 }
@@ -127,9 +122,6 @@ object Site {
   object TeiFacet {
     final case object Xml extends TeiFacet("xml")
     final case object Html extends TeiFacet("html")
-
-    val values: Seq[TeiFacet] = Seq(Xml, Html)
-    final def forExtension(extension: String): Option[TeiFacet] = values.find(_.extension == extension)
   }
 
   sealed abstract class DocumentFacet(val extension: String)
@@ -139,15 +131,36 @@ object Site {
     final case object Facs extends DocumentFacet("html")
   }
 
-  sealed trait SiteFile
-  object SiteFile {
-    final case class HierarchyFile(store: Store, teiFacet: TeiFacet) extends SiteFile
-    final case class CollectionIndex(collection: Collection, teiFacet: TeiFacet) extends SiteFile
-    final case class DocumentFile(document: Document, teiFacet: DocumentFacet) extends SiteFile
-    final case class EntityFile(entity: Entity, teiFacet: TeiFacet) extends SiteFile
-    final case object NamesFile extends SiteFile
+  sealed trait SiteFile {
+    def viewer: String
   }
 
+  object SiteFile {
+    final case class HierarchyFile(store: Store, teiFacet: TeiFacet) extends SiteFile {
+      override def viewer: String = Site.collectionViewer
+    }
+
+    final case class CollectionIndex(collection: WithPath[Collection], teiFacet: TeiFacet) extends SiteFile {
+      override def viewer: String = Site.collectionViewer
+    }
+
+    final case class DocumentFile(document: Document, teiFacet: DocumentFacet) extends SiteFile {
+      override def viewer: String = Site.documentViewer
+    }
+
+    final case class EntityFile(entity: Entity, teiFacet: TeiFacet) extends SiteFile {
+      override def viewer: String = Site.namesViewer
+    }
+
+    final case class NamesFile(teiFacet: TeiFacet) extends SiteFile {
+      override def viewer: String = Site.namesViewer
+    }
+  }
+
+  def removePart(from: String): String = {
+    val sharp = from.indexOf('#')
+    if (sharp == -1) from else from.substring(0, sharp)
+  }
   private val hierarchyDirectoryName: String = "by"
 
   private val indexFileName: String = "index"
@@ -160,12 +173,11 @@ object Site {
   private val namesDirectoryName: String = "names"
 
   private val namesFileName: String = "names"
-  private val namesFileNameWithExtension: String = namesFileName + ".html"
 
   // Note: also hard-coded in _layouts/tei.html!
   private val facsDirectoryName: String = "facs" // facsimile viewers
 
-  private val documentsDirectoryName: String = "documents"
+  private val documentsDirectoryName: String = "documents" // wrappers for TEI XML
 
   private val teiDirectoryName: String = "tei"
 
@@ -174,11 +186,7 @@ object Site {
   private def entityInTheListUrl(id: String): String = s"/$namesFileName.html#$id"
 
   private def documentUrl(collection: Store, documentName: String): String =
-    url(s"${fileName(collection)}/${documentUrlRelativeToIndex(documentName)}")
-
-  private def documentUrlRelativeToIndex(name: String): String =  s"$docsDirectoryName/$name.html"
-
-  private val docsDirectoryName: String = "documents" // wrappers for TEI XML
+    url(s"${fileName(collection)}/$documentsDirectoryName/$documentName.html")
 
   private def collectionUrl(collection: WithPath[Collection]): String =
     url(s"${collectionName(collection)}/index.html")
@@ -288,7 +296,7 @@ object Site {
           Seq("thisDocument" -> quote(document.name)) ++
           next.map(next => Seq("nextDocument" -> quote(next.name))).getOrElse(Seq.empty)
 
-        writeTeiWrappers(new File(collectionDirectory, docsDirectoryName), document, navigation)
+        writeTeiWrappers(new File(collectionDirectory, documentsDirectoryName), document, navigation)
 
         writeFacsViewer(
           facsDirectory = new File(collectionDirectory, facsDirectoryName),
@@ -357,7 +365,6 @@ object Site {
           url =
             if (subStore.isInstanceOf[Collection]) s"/$collectionsDirectoryName/${fileName(subStore)}"
             else path2url(store.path :+ by.selector.bind(subStore)),
-          viewer = collectionViewer,
           text = titlePrefix ++ title
         )}</item>
       }}
@@ -385,7 +392,6 @@ object Site {
     val binding: Binding = ancestor.last
     val link: Elem = ref(
       url = path2url(Path(ancestor)),
-      viewer = collectionViewer,
       text = getName(binding.store.names)
     )
     val title: Seq[Node] = RawXml.getXml(binding.store.title)
@@ -427,7 +433,7 @@ object Site {
 // TODO insert path information into the case descriptors:
 // and remove next line storeHeader(collection) ++
         <head>{collectionTitle(collection)}</head> ++ collectionDescription(collection) ++
-        Seq[Elem](table(collection.value.pageType, documentUrlRelativeToIndex).toTei(
+        Seq[Elem](table(collection.value).toTei(
           collection.value.parts.flatMap { part =>
             part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Xml) ++
               part.documents.map(Table.Data[Document]) }
@@ -440,10 +446,7 @@ object Site {
     )
   }
 
-  private def table(
-    pageType: Page.Type,
-    documentUrlRelativeToIndex: String => String
-  ): Table[Document] = new Table[Document](
+  private def table(collection: Collection): Table[Document] = new Table[Document](
     Table.Column("Описание", "description", { document: Document =>
         document.tei.getAbstract
 // Ignoring the titles:          .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
@@ -467,16 +470,16 @@ object Site {
 
     Table.Column("Язык", "language", { document: Document =>
       val translations: Seq[Elem] =
-        for (teiHolder <- document.by.get.stores.filter(_.language.isDefined)) yield translationRef(teiHolder)
+        for (teiHolder <- document.by.get.stores.filter(_.language.isDefined)) yield translationRef(collection, teiHolder)
       val language: Option[String] = document.tei.languages.map(_.ident).headOption
         .orElse(document.tei.text.lang)
       Seq(textNode(language.getOrElse("?"))) ++ translations
     }),
 
-    Table.Column("Документ", "document", { document: Document => documentRef(document) }),
+    Table.Column("Документ", "document", { document: Document => documentRef(collection, document) }),
 
     Table.Column("Страницы", "pages", { document: Document =>
-      for (page <- document.pages(pageType)) yield documentPageRef(document, page) }),
+      for (page <- document.pages(collection.pageType)) yield documentPageRef(collection, document, page) }),
 
     Table.Column("Расшифровка", "transcriber", { document: Document =>
       val transcribers = document.tei.titleStmt.editors
@@ -497,10 +500,10 @@ object Site {
       writeTeiWrapper(
         directory = docsDirectory,
         fileName = name,
-        teiPrefix = Some(s"../$teiDirectoryName/"),
+        teiPrefix = Some(s"../$teiDirectoryName/"), // TODO get rid of the relative URLs
         target = documentViewer,
         yaml = Seq(
-          "facs" -> s"'../$facsDirectoryName/${document.name}.html'"
+          "facs" -> s"'../$facsDirectoryName/${document.name}.html'"  // TODO get rid of the relative URLs
         ) ++ (
           if (teiHolder.language.isDefined || document.languages.isEmpty) Seq.empty
           else Seq("translations" -> document.languages.mkString("[", ", ", "]"))) ++ navigation
@@ -516,6 +519,7 @@ object Site {
     document: Document,
     navigation: Seq[(String, String)]
   ): Unit = {
+    // TODO get rid of the relative URLs
     val facsimilePages: Elem =
       <div class="facsimileViewer">
         <div class="facsimileScroller">{
@@ -529,6 +533,7 @@ object Site {
         </div>
       </div>
 
+    // TODO get rid of the relative URLs
     writeWithYaml(
       file = new File(facsDirectory, document.name + ".html"),
       layout = "default",
@@ -581,7 +586,7 @@ object Site {
     val url = collectionUrl(collection)
     // If I do this, parts of the line click to the names... {ref(url, collectionViewer, textNode(collectionReference(collection) + ": ") ++ collectionTitle(collection))}<lb/>
     <item>
-      {ref(url, collectionViewer, collectionReference(collection) + ": " +
+      {ref(url, collectionReference(collection) + ": " +
         spacedText(collectionTitle(collection)))}<lb/>
       <abstract>{collection.value.storeAbstract.get.xml}</abstract>
     </item>
@@ -593,7 +598,7 @@ object Site {
     references: Seq[WithPath[EntityReference]]
   ): Elem = {
 
-    def sources(viewer: String, references: Seq[WithPath[EntityReference]]): Seq[Elem] = {
+    def sources(references: Seq[WithPath[EntityReference]]): Seq[Elem] = {
       // TODO grouping needs to be adjusted to handle references from collection descriptors;
       // once fund, опись etc. have their own URLs, they should be included too.
       val result: Seq[Option[Elem]] =
@@ -605,7 +610,7 @@ object Site {
           case collection: Collection => None // TODO Some(collectionUrl(collection)) when grouping is adjusted
           case _ => None
         }
-        url.map(url => ref(url, viewer, sourceStore.names.name))
+        url.map(url => ref(url, sourceStore.names.name))
       }
 
       result.flatten
@@ -621,7 +626,7 @@ object Site {
         .groupBy(referenceCollectionName).toSeq.sortBy(_._1)
 
     <p rendition="mentions">
-      {ref(entityInTheListUrl(value.id.get), namesViewer, "[...]")}
+      {ref(entityInTheListUrl(value.id.get), "[...]")}
       {if (fromEntities.isEmpty) Seq.empty else {
       <l>
         <emph>{namesHead}:</emph>
@@ -633,7 +638,7 @@ object Site {
         }
       </l>}}
       {for ((source, references) <- bySource)
-       yield <l><emph>{source}:</emph>{sources(documentViewer, references)}</l>}
+       yield <l><emph>{source}:</emph>{sources(references)}</l>}
     </p>
   }
 
@@ -643,13 +648,13 @@ object Site {
   ): Unit = {
     val nonEmptyLists: Seq[EntitiesList] = site.entitiesLists.filterNot(_.isEmpty)
     val listOfLists: Seq[Node] =
-      <p>{for (list <- nonEmptyLists) yield <l>{ref(entityInTheListUrl(list.id), namesViewer, list.head)}</l>}</p>
+      <p>{for (list <- nonEmptyLists) yield <l>{ref(entityInTheListUrl(list.id), list.head)}</l>}</p>
 
     def toXml(value: EntitiesList): Elem =
       <list xml:id={value.id} role={value.role.orNull}>
         <head>{value.head}</head>
         {for (entity <- value.entities) yield {
-        <l>{ref(entityUrl(entity), namesViewer, EntityName.toXml(entity.names.head))}</l>
+        <l>{ref(entityUrl(entity), EntityName.toXml(entity.names.head))}</l>
       }}
       </list>
         .copy(label = value.entityType.listElement)
@@ -666,32 +671,29 @@ object Site {
 
   private def entityRef(entityHolder: EntityHolder): Elem = ref(
     url = entityUrl(entityHolder.entity),
-    viewer = namesViewer,
     text = entityHolder.names.name
   )
 
-  private def documentRef(document: Document): Elem =
-    ref(documentUrlRelativeToIndex(document.name), documentViewer, document.name)
+  private def documentRef(collection: Collection, document: Document): Elem =
+    ref(documentUrl(collection, document.name), document.name)
 
-  private def translationRef(teiHolder: TeiHolder): Elem =
-    ref(documentUrlRelativeToIndex(teiHolder.name), documentViewer, teiHolder.language.get)
+  private def translationRef(collection: Collection, teiHolder: TeiHolder): Elem =
+    ref(documentUrl(collection, teiHolder.name), teiHolder.language.get)
 
-  private def documentPageRef(document: Document, page: Page): Elem =
-    ref(documentUrlRelativeToIndex(document.name) + s"#p${page.n}", documentViewer, page.displayName,
+  private def documentPageRef(collection: Collection, document: Document, page: Page): Elem =
+    ref(documentUrl(collection, document.name) + s"#p${page.n}", page.displayName,
       Some(if (page.isPresent) "page" else "missing-page"))
 
   private def ref(
     url: String,
-    viewer: String,
     text: String,
     css: Option[String] = None
-  ): Elem = <ref target={url} role={viewer} rendition={css.orNull}>{text}</ref>
+  ): Elem = <ref target={url} rendition={css.orNull}>{text}</ref>
 
   private def ref(
     url: String,
-    viewer: String,
     text: Seq[Node]
-  ): Elem = <ref target={url} role={viewer}>{text}</ref>
+  ): Elem = <ref target={url}>{text}</ref>
 
   private def writeTei(
     site: Site,
@@ -717,33 +719,24 @@ object Site {
     )
   }
 
-  private def processTei(elem: Elem, site: Site): Elem = {
-    val rewriter: Elem => Elem = elem =>
-      if (elem.label != "ref") elem else {
-        val target = elem.attribute("target").map(_.text)
-        if (target.isEmpty) throw new IllegalArgumentException("empty target!") else {
-          val roleShouldBe: Option[String] = site.resolve(target.get).map(viewerFor)
-          val role = elem.attribute("role").map(_.text)
-          if (role == roleShouldBe) elem else {
-            if (roleShouldBe.isDefined && role.isEmpty) {
-//              println(s" for ${target.get}: role should be $roleShouldBe but is not defined; adding")
-              elem % scala.xml.Attribute(None, "role", scala.xml.Text(roleShouldBe.get), scala.xml.Null)
-            } else elem
-          }
+  private def refRoleRewriter(site: Site): Elem => Elem = elem =>
+    if (elem.label != "ref") elem else {
+      elem.attribute("target").map(_.text).fold(throw new IllegalArgumentException("empty target!")) { target =>
+        if (!target.startsWith("/")) elem else {
+          val roleShouldBe: Option[String] = site.resolve(target).map(_.viewer)
+          val role: Option[String] = elem.attribute("role").map(_.text)
+          if (roleShouldBe.isEmpty) println(s"did not resolve: $target")
+          if (roleShouldBe.isDefined && role.isDefined && (role != roleShouldBe)) println(s"role discrepancy")
+          if ((role == roleShouldBe) || roleShouldBe.isEmpty || role.isDefined) elem
+          else elem % scala.xml.Attribute(None, "role", textNode(roleShouldBe.get), scala.xml.Null)
         }
       }
+    }
 
-    XmlUtil.rewriteElements(elem, rewriter)
-  }
+  private def processTei(elem: Elem, site: Site): Elem =
+    XmlUtil.rewriteElements(elem, refRoleRewriter(site))
 
-  private def viewerFor(siteFile: SiteFile): String = siteFile match {
-    case SiteFile.HierarchyFile(store: Store, teiFacet: TeiFacet) => Site.collectionViewer
-    case SiteFile.CollectionIndex(collection: Collection, teiFacet: TeiFacet) => Site.collectionViewer
-    case SiteFile.DocumentFile(document: Document, teiFacet: DocumentFacet) => Site.documentViewer
-    case SiteFile.EntityFile(entity: Entity, teiFacet: TeiFacet) => Site.namesViewer
-    case SiteFile.NamesFile => Site.namesViewer
-  }
-
+  // TODO calculate viewer from the URL when writing Site.SiteFile:
   private def writeTeiWrapper(
     directory: File,
     fileName: String,
