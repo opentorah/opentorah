@@ -51,7 +51,8 @@ object Site {
 
   private val books: Set[String] = Set("Державин", "Дубнов")
 
-  private val unpublished: Set[String] = Set("derzhavin", "lna208", "niab5", "niab19", "niab24", "rnb203", "rnb211")
+  private val unpublished: Set[String] = Set("derzhavin6", "derzhavin7", "lna208",
+    "niab5", "niab19", "niab24", "rnb203", "rnb211")
 
   private val namesViewer: String = "namesViewer"
 
