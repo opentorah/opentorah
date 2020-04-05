@@ -1,15 +1,16 @@
 package org.opentorah.collector
 
 import java.io.File
-import org.opentorah.entity.{EntitiesList, Entity, EntityName, EntityReference}
+import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
 import org.opentorah.metadata.{Language, Names}
-import org.opentorah.store.{Binding, By, Entities, EntityHolder, Path, Store, WithPath}
+import org.opentorah.store.{Entities, EntityHolder, Path, Store, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
 import org.opentorah.xml.{RawXml, XmlUtil}
 import scala.xml.{Elem, Node}
 
-final class Site(store: Store) {
+final class Site(store: Store, val references: Seq[WithPath[EntityReference]]) {
+
   val stores: Seq[WithPath[Store]] = store.withPath[Store](values = {
     case _: Collection | _: Document | _: Entities | _: EntityHolder | _: TeiHolder => Seq.empty
     case store => Seq(store)
@@ -22,170 +23,59 @@ final class Site(store: Store) {
 
   val entities: Seq[Entity] = store.entities.get.by.get.stores.map(_.entity)
 
+  def findByRef(fileName: String): Option[Entity] =  store.entities.get.findByRef(fileName)
+
   val entitiesLists: Seq[EntitiesList] = store.entities.get.lists.filterNot(_.isEmpty)
 
-  def resolve(url: String): Option[Site.SiteFile] = {
+  def namesObject: NamesObject = new NamesObject(this)
+
+  def resolve(url: String): Option[SiteFile] = {
     if (!url.startsWith("/")) None else {
       val parts: Seq[String] = Site.removePart(url).substring(1).split("/")
       if (parts.isEmpty) None /* TODO site index... */ else {
         val tail: Seq[String] = parts.tail
         parts.head match {
-          case Site.hierarchyDirectoryName => resolveHierarchy(Path.empty, store, tail)
-          case Site.collectionsDirectoryName => resolveCollection(tail)
-          case Site.namesDirectoryName => resolveEntity(tail)
-          case file if file.startsWith(Site.namesFileName) =>
-            resolveNamesFile(file.substring(Site.namesFileName.length), tail)
-          case _ => None
+          case HierarchyObject.hierarchyDirectoryName =>
+            HierarchyObject.resolve(this, Path.empty, store, tail)
+
+          case Site.collectionsDirectoryName =>
+            CollectionObject.resolve(this, tail)
+
+          case EntityObject.namesDirectoryName =>
+            EntityObject.resolve(this, tail)
+
+          case file =>
+            val (fileName: String, extension: Option[String]) = Files.nameAndExtension(file)
+            if (fileName == NamesObject.namesFileName) NamesObject.resolve(this, extension, tail)
+            else None
         }
       }
-    }
-  }
-
-  private def resolveHierarchy(path: Path, store: Store, parts: Seq[String]): Option[Site.SiteFile] =
-    if (parts.isEmpty) Some(Site.SiteFile.HierarchyFile(store, Site.TeiFacet.Html)) else parts.head match {
-      case "index.html" => Some(Site.SiteFile.HierarchyFile(store, Site.TeiFacet.Html))
-      case "index.xml" => Some(Site.SiteFile.HierarchyFile(store, Site.TeiFacet.Xml))
-      case _ =>
-        val selector = store.by.get.selector
-        val selectorName: String = parts.head
-        if (selector.names.find(selectorName).isEmpty) None else store match {
-          case collection: Collection =>
-            if (parts.tail.nonEmpty) None
-            else Some(Site.SiteFile.CollectionIndex(WithPath(path, collection), Site.TeiFacet.Html))
-
-          case _ => if (parts.tail.isEmpty) None else {
-            val storeName: String = parts.tail.head.replace('_', ' ')
-            store.by.get.stores.find(_.names.find(storeName).isDefined).flatMap { nextStore =>
-              resolveHierarchy(path :+ selector.bind(nextStore), nextStore, parts.tail.tail)
-            }
-          }
-        }
-    }
-
-  def resolveCollection(parts: Seq[String]): Option[Site.SiteFile] = if (parts.isEmpty) None else {
-    val collectionName: String = parts.head
-    collections.find(collection => Site.fileName(collection.value) == collectionName).flatMap { collection =>
-      if (parts.tail.isEmpty) Some(Site.SiteFile.CollectionIndex(collection, Site.TeiFacet.Html))
-      else parts.tail.head match {
-        case "index.html" =>
-          if (parts.tail.tail.nonEmpty) None
-          else Some(Site.SiteFile.CollectionIndex(collection, Site.TeiFacet.Html))
-        case "index.xml" =>
-          if (parts.tail.tail.nonEmpty) None
-          else Some(Site.SiteFile.CollectionIndex(collection, Site.TeiFacet.Xml))
-
-        case Site.documentsDirectoryName => resolveDocument(collection, parts.tail.tail, Site.DocumentFacet.Document)
-        case Site.teiDirectoryName => resolveDocument(collection, parts.tail.tail, Site.DocumentFacet.Tei)
-        case Site.facsDirectoryName => resolveDocument(collection, parts.tail.tail, Site.DocumentFacet.Facs)
-
-        case _ => None
-      }
-    }
-  }
-
-  def resolveDocument(
-    collection: WithPath[Collection],
-    parts: Seq[String],
-    documentFacet: Site.DocumentFacet
-  ): Option[Site.SiteFile] = if (parts.isEmpty || parts.tail.nonEmpty) None else {
-    val (fileName: String, extension: Option[String]) = Files.nameAndExtension(parts.head)
-    if (!extension.contains(documentFacet.extension)) None else {
-      val document: Option[Document] = collection.value.by.get.stores.find { document =>
-        document.by.get.stores.exists(teiHolder => teiHolder.name == fileName)
-      }
-      document.map(document => Site.SiteFile.DocumentFile(document, documentFacet))
-    }
-  }
-
-  private def resolveEntity(parts: Seq[String]): Option[Site.SiteFile] = if (parts.isEmpty || parts.tail.nonEmpty) None else {
-    val (fileName: String, extension: Option[String]) = Files.nameAndExtension(parts.head)
-    store.entities.get.findByRef(fileName).flatMap { entity => extension match {
-      case Some("html") => Some(Site.SiteFile.EntityFile(entity, Site.TeiFacet.Html))
-      case Some("xml") => Some(Site.SiteFile.EntityFile(entity, Site.TeiFacet.Xml))
-      case _ => None
-    }}
-  }
-
-  private def resolveNamesFile(name: String, parts: Seq[String]): Option[Site.SiteFile] = if (parts.nonEmpty) None else {
-    val (restOfTheName, extension) = Files.nameAndExtension(name)
-    if (restOfTheName.nonEmpty) None else extension match {
-      case Some("html") => Some(Site.SiteFile.NamesFile(Site.TeiFacet.Html))
-      case Some("xml") => Some(Site.SiteFile.NamesFile(Site.TeiFacet.Xml))
-      case _ => None
     }
   }
 }
 
 object Site {
 
-  sealed abstract class TeiFacet(val extension: String)
-  object TeiFacet {
-    final case object Xml extends TeiFacet("xml")
-    final case object Html extends TeiFacet("html")
-  }
-
-  sealed abstract class DocumentFacet(val extension: String)
-  object DocumentFacet {
-    final case object Tei extends DocumentFacet("xml")
-    final case object Document extends DocumentFacet("html")
-    final case object Facs extends DocumentFacet("html")
-  }
-
-  sealed trait SiteFile {
-    def viewer: String
-  }
-
-  object SiteFile {
-    final case class HierarchyFile(store: Store, teiFacet: TeiFacet) extends SiteFile {
-      override def viewer: String = Site.collectionViewer
-    }
-
-    final case class CollectionIndex(collection: WithPath[Collection], teiFacet: TeiFacet) extends SiteFile {
-      override def viewer: String = Site.collectionViewer
-    }
-
-    final case class DocumentFile(document: Document, teiFacet: DocumentFacet) extends SiteFile {
-      override def viewer: String = Site.documentViewer
-    }
-
-    final case class EntityFile(entity: Entity, teiFacet: TeiFacet) extends SiteFile {
-      override def viewer: String = Site.namesViewer
-    }
-
-    final case class NamesFile(teiFacet: TeiFacet) extends SiteFile {
-      override def viewer: String = Site.namesViewer
-    }
-  }
-
   def removePart(from: String): String = {
     val sharp = from.indexOf('#')
     if (sharp == -1) from else from.substring(0, sharp)
   }
-  private val hierarchyDirectoryName: String = "by"
 
   private val indexFileName: String = "index"
 
   private val collectionsFileName: String = "collections"
 
   // Note: also hard-coded in 'index.xml'!
-  private val collectionsDirectoryName: String = "collections"
-
-  private val namesDirectoryName: String = "names"
-
-  private val namesFileName: String = "names"
+  val collectionsDirectoryName: String = "collections"
 
   // Note: also hard-coded in _layouts/tei.html!
-  private val facsDirectoryName: String = "facs" // facsimile viewers
+  val facsDirectoryName: String = "facs" // facsimile viewers
 
-  private val documentsDirectoryName: String = "documents" // wrappers for TEI XML
+  val documentsDirectoryName: String = "documents" // wrappers for TEI XML
 
-  private val teiDirectoryName: String = "tei"
+  val teiDirectoryName: String = "tei"
 
-  private def entityUrl(entity: Entity): String = s"/$namesDirectoryName/${entity.id.get}.html"
-
-  private def entityInTheListUrl(id: String): String = s"/$namesFileName.html#$id"
-
-  private def documentUrl(collection: Store, documentName: String): String =
+  def documentUrl(collection: Store, documentName: String): String =
     url(s"${fileName(collection)}/$documentsDirectoryName/$documentName.html")
 
   private def collectionUrl(collection: WithPath[Collection]): String =
@@ -193,24 +83,20 @@ object Site {
 
   private def url(ref: String): String = s"/$collectionsDirectoryName/$ref"
 
-  private val namesHead: String = "Имена"
-
   private val unpublished: Set[String] = Set("derzhavin6", "derzhavin7", "lna208",
     "niab5", "niab19", "niab24", "rnb203", "rnb211")
 
-  private val namesViewer: String = "namesViewer"
+  val collectionViewer: String = "collectionViewer"
 
-  private val collectionViewer: String = "collectionViewer"
+  val documentViewer: String = "documentViewer"
 
-  private val documentViewer: String = "documentViewer"
-
-  private def fileName(store: Store): String =
+  def fileName(store: Store): String =
     Files.nameAndExtension(Files.pathAndName(store.urls.fromUrl.get.getPath)._2)._1
 
-  private def referenceCollectionName(reference: WithPath[EntityReference]): String =
+  def referenceCollectionName(reference: WithPath[EntityReference]): String =
     reference.path.init.init.last.store.names.name
 
-  private def getName(names: Names): String = names.doFind(Language.Russian.toSpec).name
+  def getName(names: Names): String = names.doFind(Language.Russian.toSpec).name
 
   // TODO this yuck is temporary :)
 
@@ -252,28 +138,24 @@ object Site {
   //      throw new IllegalArgumentException(s"Missing images: $missingImages")
   //  }
 
+  // TODO make a method on Site
   def write(
     directory: File,
-    site: Site,
-    references: Seq[WithPath[EntityReference]]
+    site: Site
   ): Unit = {
     println("Writing site.")
 
-    val namesDirectory: File = new File(directory, namesDirectoryName)
+    writeSiteObject(site.namesObject, directory)
+
+    val namesDirectory: File = new File(directory, EntityObject.namesDirectoryName)
     Files.deleteFiles(namesDirectory)
+    for (entity <- site.entities) {
+      writeSiteObject(new EntityObject(site, entity), directory)
+    }
 
-    for (entity <- site.entities) writeTei(
-      site,
-      namesDirectory,
-      fileName = entity.id.get,
-      target = namesViewer,
-      content = Seq(Entity.toXml(entity.copy(content = entity.content :+ mentions(entity, references))))
-    )
-
-    writeNamesList(
-      site,
-      directory
-    )
+    val hierarchyDirectory: File = new File(directory, HierarchyObject.hierarchyDirectoryName)
+    Files.deleteFiles(hierarchyDirectory)
+    for (store <- site.stores) writeSiteObject(new HierarchyObject(site, store.path, store.value), directory)
 
     val collectionsDirectory: File = new File(directory, collectionsDirectoryName)
     Files.deleteFiles(collectionsDirectory)
@@ -281,7 +163,10 @@ object Site {
     for (collection <- site.collections) {
       val collectionDirectory: File = new File(collectionsDirectory, collectionName(collection))
       writeCollectionIndex(site, collection, collectionDirectory)
+    }
 
+    for (collection <- site.collections) {
+      val collectionDirectory: File = new File(collectionsDirectory, collectionName(collection))
       val teiDirectory: File = new File(collectionDirectory, teiDirectoryName)
       for ((document, (prev, next)) <- Collections.prevAndNext(collection.value.documents)) {
         for (teiHolder: TeiHolder <- document.by.get.stores) TeiUtil.teiPrettyPrinter.writeXml(
@@ -311,8 +196,6 @@ object Site {
 
     writeCollectionsTree(site, directory)
 
-    writeHierarchy(site, directory)
-
     println("Writing reports.")
 
     writeReport(
@@ -320,8 +203,8 @@ object Site {
       name = "misnamed-entities",
       title = "Неправильно названные файлы с именами",
       content = site.entities.flatMap { entity =>
-        val id = entity.id.get
-        val expectedId = entity.name.replace(' ', '_')
+        val id: String = entity.id.get
+        val expectedId: String = entity.name.replace(' ', '_')
         if (id == expectedId) None else Some(s"- '$id' должен по идее называться '$expectedId'")
       }
     )
@@ -331,89 +214,17 @@ object Site {
       name = "no-refs",
       title = "Имена без атрибута 'ref'",
       content =
-        for (reference <- references.filter(_.value.ref.isEmpty)) yield
+        for (reference <- site.references.filter(_.value.ref.isEmpty)) yield
           "- " + reference.value.name.map(_.text.trim).mkString(" ") + " в " +
             referenceCollectionName(reference) + ":" +
             reference.path.last.store.names.name
     )
   }
 
-  private def writeHierarchy(site: Site, directory: File): Unit = {
-    val hierarchyDirectory: File = new File(directory, hierarchyDirectoryName)
-    Files.deleteFiles(hierarchyDirectory)
-    for (store <- site.stores) writeTei(
-      site,
-      directory = file(hierarchyDirectory, store.path),
-      fileName = "index",
-      target = collectionViewer,
-      content = store2xml(store)
-    )
-  }
-
-  private def store2xml(store: WithPath[Store]): Seq[Node] = {
-    storeHeader(store) ++
-    store.value.by.toSeq.flatMap { by: By[_] =>
-      <p>
-      <l>{getName(by.selector.names)}:</l>
-      <list type="bulleted">
-      {by.stores.map { storeX =>
-        val subStore = storeX.asInstanceOf[Store]  // TODO get rid of the cast!!!
-        val title: Seq[Node] = RawXml.getXml(subStore.title)
-        val titlePrefix: Seq[Node] = textNode(getName(subStore.names) + (if (title.isEmpty) "" else ": "))
-        <item>
-          {ref(
-          url =
-            if (subStore.isInstanceOf[Collection]) s"/$collectionsDirectoryName/${fileName(subStore)}"
-            else path2url(store.path :+ by.selector.bind(subStore)),
-          text = titlePrefix ++ title
-        )}</item>
-      }}
-      </list>
-      </p>
-    }
-  }
-
-  private def storeHeader(store: WithPath[Store]): Seq[Node] = {
-//    println(segments(store.path).mkString("/"))
-    val isTop: Boolean = store.path.isEmpty
-    val title: Seq[Node] = RawXml.getXml(store.value.title)
-    val titlePrefix: Seq[Node] =
-      if (isTop) Seq.empty else textNode(
-        getName(store.path.last.selector.names) + " " + getName(store.value.names) + (if (title.isEmpty) "" else ": ")
-      )
-
-    pathLinks(if (isTop) store.path else store.path.init) ++
-    <head>{titlePrefix ++ title}</head> ++
-    store.value.storeAbstract.map(value => <span>{value.xml}</span>).getOrElse(Seq.empty) ++
-    RawXml.getXml(store.value.body)
-  }
-
-  private def pathLinks(path: Path): Seq[Elem] = for (ancestor <- path.path.inits.toSeq.reverse.tail) yield {
-    val binding: Binding = ancestor.last
-    val link: Elem = ref(
-      url = path2url(Path(ancestor)),
-      text = getName(binding.store.names)
-    )
-    val title: Seq[Node] = RawXml.getXml(binding.store.title)
-    val titlePrefix: Seq[Node] = if (title.isEmpty) Seq.empty else Seq(textNode(": "))
-    <l>{getName(binding.selector.names)} {link ++ titlePrefix ++ title}</l>
-  }
-
-  private def file(directory: File, path: Path): File =
-    file(directory, segments(path))
-
   @scala.annotation.tailrec
   private def file(directory: File, segments: Seq[String]): File =
     if (segments.isEmpty) directory
     else file(new File(directory, segments.head), segments.tail)
-
-  private def path2url(path: Path): String =
-      "/" + hierarchyDirectoryName + "/" + segments(path).mkString("", "/", "/")
-
-  private def segments(path: Path): Seq[String] =
-    path.path.flatMap(binding => Seq(binding.selector.names, binding.store.names))
-      .map(getName)
-      .map(_.replace(' ', '_'))
 
   private def writeCollectionIndex(
     site: Site,
@@ -592,88 +403,6 @@ object Site {
     </item>
   }
 
-  // TODO clean up!
-  private def mentions(
-    value: Entity,
-    references: Seq[WithPath[EntityReference]]
-  ): Elem = {
-
-    def sources(references: Seq[WithPath[EntityReference]]): Seq[Elem] = {
-      // TODO grouping needs to be adjusted to handle references from collection descriptors;
-      // once fund, опись etc. have their own URLs, they should be included too.
-      val result: Seq[Option[Elem]] =
-      for (source <- Collections.removeConsecutiveDuplicates(references.map(_.path))) yield {
-        val sourceStore: Store = source.last.store
-        val url: Option[String] = sourceStore match {
-          case teiHolder: TeiHolder => Some(documentUrl(source.init.init.last.store, fileName(teiHolder)))
-          case document: Document => Some(documentUrl(source.init.last.store, fileName(document)))
-          case collection: Collection => None // TODO Some(collectionUrl(collection)) when grouping is adjusted
-          case _ => None
-        }
-        url.map(url => ref(url, sourceStore.names.name))
-      }
-
-      result.flatten
-    }
-
-    val (fromEntities: Seq[WithPath[EntityReference]], notFromNames: Seq[WithPath[EntityReference]]) = references
-      .filter(_.value.ref.contains(value.id.get))
-      .partition(_.path.last.store.isInstanceOf[EntityHolder])
-
-    val bySource: Seq[(String, Seq[WithPath[EntityReference]])] =
-      notFromNames
-        .filter(reference => (reference.path.length >=3) && reference.path.init.init.last.store.isInstanceOf[Collection])  // TODO remove when grouping is adjusted
-        .groupBy(referenceCollectionName).toSeq.sortBy(_._1)
-
-    <p rendition="mentions">
-      {ref(entityInTheListUrl(value.id.get), "[...]")}
-      {if (fromEntities.isEmpty) Seq.empty else {
-      <l>
-        <emph>{namesHead}:</emph>
-        {
-        val result =
-          for (source <- Collections.removeConsecutiveDuplicates(fromEntities.map(_.path)))
-          yield entityRef(source.last.store.asInstanceOf[EntityHolder])
-        result.init.map(elem => <span>{elem},</span>) :+ result.last
-        }
-      </l>}}
-      {for ((source, references) <- bySource)
-       yield <l><emph>{source}:</emph>{sources(references)}</l>}
-    </p>
-  }
-
-  private def writeNamesList(
-    site: Site,
-    directory: File
-  ): Unit = {
-    val nonEmptyLists: Seq[EntitiesList] = site.entitiesLists.filterNot(_.isEmpty)
-    val listOfLists: Seq[Node] =
-      <p>{for (list <- nonEmptyLists) yield <l>{ref(entityInTheListUrl(list.id), list.head)}</l>}</p>
-
-    def toXml(value: EntitiesList): Elem =
-      <list xml:id={value.id} role={value.role.orNull}>
-        <head>{value.head}</head>
-        {for (entity <- value.entities) yield {
-        <l>{ref(entityUrl(entity), EntityName.toXml(entity.names.head))}</l>
-      }}
-      </list>
-        .copy(label = value.entityType.listElement)
-
-    writeTei(
-      site,
-      directory,
-      fileName = namesFileName,
-      content = <head>{namesHead}</head> ++ listOfLists ++ nonEmptyLists.flatMap(toXml),
-      target = namesViewer,
-      yaml = Seq("title" -> namesHead)
-    )
-  }
-
-  private def entityRef(entityHolder: EntityHolder): Elem = ref(
-    url = entityUrl(entityHolder.entity),
-    text = entityHolder.names.name
-  )
-
   private def documentRef(collection: Collection, document: Document): Elem =
     ref(documentUrl(collection, document.name), document.name)
 
@@ -684,16 +413,66 @@ object Site {
     ref(documentUrl(collection, document.name) + s"#p${page.n}", page.displayName,
       Some(if (page.isPresent) "page" else "missing-page"))
 
-  private def ref(
+  def ref(
     url: String,
     text: String,
     css: Option[String] = None
   ): Elem = <ref target={url} rendition={css.orNull}>{text}</ref>
 
-  private def ref(
+  def refNg(
+    url: Seq[String],
+    text: String,
+    css: Option[String] = None
+  ): Elem = <ref target={mkUrl(url)} rendition={css.orNull}>{text}</ref>
+
+  def ref(
     url: String,
     text: Seq[Node]
   ): Elem = <ref target={url}>{text}</ref>
+
+  def refNg(
+    url: Seq[String],
+    text: Seq[Node]
+  ): Elem = <ref target={mkUrl(url)}>{text}</ref>
+
+  private def writeSiteObject(siteObject: SiteObject, directory: File): Unit = {
+    val teiFile: TeiFile = siteObject.teiFile
+    Files.write(file(directory, teiFile.url), teiFile.content)
+
+    val teiWrapperFile: TeiWrapperFile = siteObject.teiWrapperFile
+    // TODO separate generation of content and writing:
+    writeWithYaml(
+      file = file(directory, teiWrapperFile.url),
+      layout = "tei",
+      yaml =
+        teiWrapperFile.style.fold[Seq[(String, String)]](Seq.empty)(style => Seq("style" -> style)) ++
+        Seq(
+          "tei" -> quote(mkUrl(teiFile.url)),
+          "target" -> siteObject.viewer
+        ) ++ teiWrapperFile.yaml
+    )
+  }
+
+  def mkUrl(segments: Seq[String]): String = segments.mkString("/", "/", "")
+
+  // TODO calculate viewer from the URL when writing Site.SiteObject:
+  private def writeTeiWrapper(
+    directory: File,
+    fileName: String,
+    teiPrefix: Option[String] = None,
+    style: Option[String] = None,
+    target: String,
+    yaml: Seq[(String, String)]
+  ): Unit = writeWithYaml(
+    file = new File(directory, fileName + ".html"),
+    layout = "tei",
+    yaml =
+      style.fold[Seq[(String, String)]](Seq.empty)(style => Seq("style" -> style)) ++
+        Seq(
+          "tei" -> quote(teiPrefix.getOrElse("") + fileName + ".xml"),
+          "target" -> target
+        ) ++ yaml
+  )
 
   private def writeTei(
     site: Site,
@@ -723,7 +502,7 @@ object Site {
     if (elem.label != "ref") elem else {
       elem.attribute("target").map(_.text).fold(throw new IllegalArgumentException("empty target!")) { target =>
         if (!target.startsWith("/")) elem else {
-          val roleShouldBe: Option[String] = site.resolve(target).map(_.viewer)
+          val roleShouldBe: Option[String] = site.resolve(target).map(_.siteObject.viewer)
           val role: Option[String] = elem.attribute("role").map(_.text)
           if (roleShouldBe.isEmpty) println(s"did not resolve: $target")
           if (roleShouldBe.isDefined && role.isDefined && (role != roleShouldBe)) println(s"role discrepancy")
@@ -733,27 +512,8 @@ object Site {
       }
     }
 
-  private def processTei(elem: Elem, site: Site): Elem =
+  def processTei(elem: Elem, site: Site): Elem =
     XmlUtil.rewriteElements(elem, refRoleRewriter(site))
-
-  // TODO calculate viewer from the URL when writing Site.SiteFile:
-  private def writeTeiWrapper(
-    directory: File,
-    fileName: String,
-    teiPrefix: Option[String] = None,
-    style: Option[String] = None,
-    target: String,
-    yaml: Seq[(String, String)]
-  ): Unit = writeWithYaml(
-    file = new File(directory, fileName + ".html"),
-    layout = "tei",
-    yaml =
-      style.fold[Seq[(String, String)]](Seq.empty)(style => Seq("style" -> style)) ++
-        Seq(
-          "tei" -> quote(teiPrefix.getOrElse("") + fileName + ".xml"),
-          "target" -> target
-        ) ++ yaml
-  )
 
   private def writeWithYaml(
     file: File,
