@@ -7,11 +7,13 @@ import org.opentorah.util.Collections
 import org.opentorah.xml.Parser
 import zio.ZIO
 
-final class Collection(
+abstract class Collection(
   inheritedSelectors: Seq[Selector],
   urls: Urls,
   element: Store.Inline
 ) extends Store.FromElement(inheritedSelectors, urls, element) {
+
+  def pageType: Page.Type
 
   override val by: Option[By.FromElement[Document]] = Some(By.fromElement(
     selectors,
