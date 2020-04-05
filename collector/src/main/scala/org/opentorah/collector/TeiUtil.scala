@@ -59,22 +59,23 @@ object TeiUtil {
   val addCommonNoCalendar: Tei => Tei =
     addPublicationStatement compose addSourceDesc compose addLanguage
 
-  val removeLanguage: Tei => Tei = tei => {
-    val textLang: Option[String] = tei.text.lang
-    val langUsage: Option[LangUsage] = tei.teiHeader.profileDesc.flatMap(_.langUsage)
-    val languages: Seq[Language] = langUsage.toSeq.flatMap(_.languages)
-    val remove: Boolean = (languages.length == 1) && textLang.contains(languages.head.ident)
-    if (!remove) tei else tei.copy(teiHeader = tei.teiHeader.copy(
-      profileDesc = Some(tei.teiHeader.profileDesc.get.copy(langUsage = None))
-    ))
-  }
+//  val removeLanguage: Tei => Tei = tei => {
+//    val textLang: Option[String] = tei.text.lang
+//    val langUsage: Option[LangUsage] = tei.teiHeader.profileDesc.flatMap(_.langUsage)
+//    val languages: Seq[Language] = langUsage.toSeq.flatMap(_.languages)
+//    val remove: Boolean = (languages.length == 1) && textLang.contains(languages.head.ident)
+//    if (!remove) tei else tei.copy(teiHeader = tei.teiHeader.copy(
+//      profileDesc = Some(tei.teiHeader.profileDesc.get.copy(langUsage = None))
+//    ))
+//  }
 
   def removeCommon(tei: Tei): Tei = {
-    removeLanguage(tei)
+//    removeLanguage(tei)
 
 //    tei.copy(teiHeader = tei.teiHeader.copy(
 //      fileDesc = tei.teiHeader.fileDesc.copy(publicationStmt = None, sourceDesc = None),
 //      profileDesc = Some(tei.teiHeader.profileDesc.get.copy(calendarDesc = None))
 //    ))
+    tei
   }
 }

@@ -36,9 +36,11 @@ object Main {
     println("Pretty-printing store.")
     prettyPrint(store, TeiUtil.teiPrettyPrinter)
 
+    val site = new Site(store)
+
     Site.write(
       siteRoot,
-      store,
+      site,
       references
     )
   }
