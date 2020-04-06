@@ -36,15 +36,15 @@ object Main {
     println("Pretty-printing store.")
     prettyPrint(store, TeiUtil.teiPrettyPrinter)
 
-    val site = new Site(store)
+    val site = new Site(store, references)
 
     Site.write(
       siteRoot,
-      site,
-      references
+      site
     )
   }
 
+  // TODO move into Store
   private def prettyPrint(store: Store, prettyPrinter: PaigesPrettyPrinter): Unit = {
     for (fromUrl <- store.urls.fromUrl) if (Files.isFile(fromUrl)) TeiUtil.teiPrettyPrinter.writeXml(
       file = Files.url2file(fromUrl),
