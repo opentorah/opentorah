@@ -8,16 +8,11 @@ import scala.xml.{Elem, Node}
 final class EntityObject(site: Site, entity: Entity) extends SiteObject(site) {
   override def viewer: String = NamesObject.namesViewer
 
-  override def teiFile: TeiFile = new TeiFile(this) {
-    override def url: Seq[String] = Seq(EntityObject.namesDirectoryName, id + ".xml")
-    override protected def xml: Seq[Node] = Seq(Entity.toXml(entity.copy(content = entity.content :+ mentions)))
-  }
+  override protected def teiUrl: Seq[String] = EntityObject.teiUrl(entity)
 
-  override def teiWrapperFile: TeiWrapperFile = new TeiWrapperFile(this) {
-    override def url: Seq[String] = Seq(EntityObject.namesDirectoryName, id + ".html")
-  }
+  override protected def teiWrapperUrl: Seq[String] = EntityObject.teiWrapperUrl(entity)
 
-  private def id: String = entity.id.get
+  override protected def xml: Seq[Node] = Seq(Entity.toXml(entity.copy(content = entity.content :+ mentions)))
 
   // TODO clean up!
   private def mentions: Elem = {
@@ -40,6 +35,8 @@ final class EntityObject(site: Site, entity: Entity) extends SiteObject(site) {
       result.flatten
     }
 
+    val id: String = entity.id.get
+
     val (fromEntities: Seq[WithPath[EntityReference]], notFromNames: Seq[WithPath[EntityReference]]) =
       site.references
       .filter(_.value.ref.contains(id))
@@ -59,7 +56,7 @@ final class EntityObject(site: Site, entity: Entity) extends SiteObject(site) {
         val result = for (source <- Collections.removeConsecutiveDuplicates(fromEntities.map(_.path))) yield {
           val entityHolder: EntityHolder = source.last.store.asInstanceOf[EntityHolder]
           Site.refNg(
-            url = EntityObject.entityUrl(entityHolder.entity),
+            url = EntityObject.teiWrapperUrl(entityHolder.entity),
             text = entityHolder.names.name
           )
         }
@@ -77,7 +74,9 @@ object EntityObject {
 
   val namesDirectoryName: String = "names"
 
-  def entityUrl(entity: Entity): Seq[String] = Seq(namesDirectoryName, s"${entity.id.get}.html")
+  def teiUrl(entity: Entity): Seq[String] = Seq(namesDirectoryName, entity.id.get + ".xml")
+
+  def teiWrapperUrl(entity: Entity): Seq[String] = Seq(namesDirectoryName, entity.id.get + ".html")
 
   def resolve(site: Site, parts: Seq[String]): Option[SiteFile] =
     if (parts.isEmpty || parts.tail.nonEmpty) None else {

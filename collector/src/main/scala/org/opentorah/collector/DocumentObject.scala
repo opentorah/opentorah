@@ -4,20 +4,16 @@ import org.opentorah.store.WithPath
 import org.opentorah.util.Files
 import scala.xml.Node
 
-// TODO path, collection etc.
-final class DocumentObject(site: Site, document: Document) extends SiteObject(site) {
+final class DocumentObject(site: Site, collection: WithPath[Collection], document: Document) extends SiteObject(site) {
   override def viewer: String = Site.documentViewer
 
-  override def teiFile: TeiFile = new TeiFile(this) {
-    override def url: Seq[String] = ???
-    override protected def xml: Seq[Node] = ???
-  }
+  def facsFile: SiteFile = ???
 
-  override def teiWrapperFile: TeiWrapperFile = new TeiWrapperFile(this) {
-    override def url: Seq[String] = ???
-  }
+  override protected def teiUrl: Seq[String] = ???
 
-  def facsFile: FacsFile = ???
+  override protected def xml: Seq[Node] = ???
+
+  override protected def teiWrapperUrl: Seq[String] = ???
 }
 
 object DocumentObject {
@@ -30,10 +26,11 @@ object DocumentObject {
   ): Option[DocumentObject] = if (parts.isEmpty || parts.tail.nonEmpty) None else {
     val (fileName: String, extension: Option[String]) = Files.nameAndExtension(parts.head)
     if (!extension.contains(requiredExtension)) None else {
+      // TODO move search into Collection (and other searches like this into appropriate classes)
       val document: Option[Document] = collection.value.by.get.stores.find { document =>
         document.by.get.stores.exists(teiHolder => teiHolder.name == fileName)
       }
-      document.map(document => new DocumentObject(site, document))
+      document.map(document => new DocumentObject(site, collection, document))
     }
   }
 }

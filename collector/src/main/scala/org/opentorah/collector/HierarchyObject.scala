@@ -5,24 +5,44 @@ import org.opentorah.xml.RawXml
 import scala.xml.{Elem, Node}
 
 final class HierarchyObject(site: Site, path: Path, store: Store) extends SiteObject(site) {
-  override def viewer: String = Site.collectionViewer
+  override def viewer: String = CollectionObject.collectionViewer
 
-  override def teiFile: TeiFile = new TeiFile(this) {
-    override def url: Seq[String] = HierarchyObject.hierarchyDirectoryName +: HierarchyObject.segments(path) :+ "index.xml"
+  protected def teiUrl: Seq[String] = url("index.xml")
 
-    override protected def xml: Seq[Node] = HierarchyObject.store2xml(WithPath(path, store))
-  }
+  protected def teiWrapperUrl: Seq[String] = url("index.html")
 
-  override def teiWrapperFile: TeiWrapperFile = new TeiWrapperFile(this) {
-    override def url: Seq[String] =  HierarchyObject.hierarchyDirectoryName +: HierarchyObject.segments(path) :+ "index.html"
-  }
+  private def url(file: String): Seq[String] =
+    HierarchyObject.hierarchyDirectoryName +: HierarchyObject.segments(path) :+ file
+
+  // TODO clean up; do Seq() for URLs...
+  protected def xml: Seq[Node] =
+    HierarchyObject.storeHeader(path, store) ++
+    store.by.toSeq.flatMap { by: By[_] =>
+      <p>
+        <l>{Site.getName(by.selector.names)}:</l>
+        <list type="bulleted">
+          {by.stores.map { storeX =>
+          val subStore = storeX.asInstanceOf[Store]  // TODO get rid of the cast!!!
+          val title: Seq[Node] = RawXml.getXml(subStore.title)
+          val titlePrefix: Seq[Node] = Site.textNode(Site.getName(subStore.names) + (if (title.isEmpty) "" else ": "))
+          <item>
+            {Site.ref(
+            url =
+              if (subStore.isInstanceOf[Collection]) s"/${CollectionObject.collectionsDirectoryName}/${Site.fileName(subStore)}"
+              else HierarchyObject.path2url(path :+ by.selector.bind(subStore)),
+            text = titlePrefix ++ title
+          )}</item>
+        }}
+        </list>
+      </p>
+    }
 }
 
 object HierarchyObject {
 
   val hierarchyDirectoryName: String = "by"
 
-  // TODO I need to be able to start the Path with a top-level store in there (using "top" pseudo-selector?).
+  // TODO I'd like to be able to start the Path with a top-level store in there (using "top" pseudo-selector?).
   def resolve(site: Site, path: Path, store: Store, parts: Seq[String]): Option[SiteFile] =
     if (parts.isEmpty) Some(new HierarchyObject(site, path, store).teiWrapperFile) else parts.head match {
       case "index.html" => Some(new HierarchyObject(site, path, store).teiWrapperFile)
@@ -44,43 +64,19 @@ object HierarchyObject {
         }
     }
 
-  // TODO clean up; do Seq() for URLs...
-  def store2xml(store: WithPath[Store]): Seq[Node] = {
-    storeHeader(store) ++
-      store.value.by.toSeq.flatMap { by: By[_] =>
-        <p>
-          <l>{Site.getName(by.selector.names)}:</l>
-          <list type="bulleted">
-            {by.stores.map { storeX =>
-            val subStore = storeX.asInstanceOf[Store]  // TODO get rid of the cast!!!
-            val title: Seq[Node] = RawXml.getXml(subStore.title)
-            val titlePrefix: Seq[Node] = Site.textNode(Site.getName(subStore.names) + (if (title.isEmpty) "" else ": "))
-            <item>
-              {Site.ref(
-              url =
-                if (subStore.isInstanceOf[Collection]) s"/${Site.collectionsDirectoryName}/${Site.fileName(subStore)}"
-                else path2url(store.path :+ by.selector.bind(subStore)),
-              text = titlePrefix ++ title
-            )}</item>
-          }}
-          </list>
-        </p>
-      }
-  }
-
-  private def storeHeader(store: WithPath[Store]): Seq[Node] = {
+  private def storeHeader(path: Path, store: Store): Seq[Node] = {
     //    println(segments(store.path).mkString("/"))
-    val isTop: Boolean = store.path.isEmpty
-    val title: Seq[Node] = RawXml.getXml(store.value.title)
+    val isTop: Boolean = path.isEmpty
+    val title: Seq[Node] = RawXml.getXml(store.title)
     val titlePrefix: Seq[Node] =
       if (isTop) Seq.empty else Site.textNode(
-        Site.getName(store.path.last.selector.names) + " " + Site.getName(store.value.names) + (if (title.isEmpty) "" else ": ")
+        Site.getName(path.last.selector.names) + " " + Site.getName(store.names) + (if (title.isEmpty) "" else ": ")
       )
 
-    pathLinks(if (isTop) store.path else store.path.init) ++
+    pathLinks(if (isTop) path else path.init) ++
       <head>{titlePrefix ++ title}</head> ++
-      store.value.storeAbstract.map(value => <span>{value.xml}</span>).getOrElse(Seq.empty) ++
-      RawXml.getXml(store.value.body)
+      store.storeAbstract.map(value => <span>{value.xml}</span>).getOrElse(Seq.empty) ++
+      RawXml.getXml(store.body)
   }
 
   private def pathLinks(path: Path): Seq[Elem] = for (ancestor <- path.path.inits.toSeq.reverse.tail) yield {
