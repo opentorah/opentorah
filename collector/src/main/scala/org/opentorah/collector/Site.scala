@@ -212,7 +212,7 @@ object Site {
 
   private def refRoleRewriter(site: Site): Elem => Elem = elem =>
     if (elem.label != "ref") elem else {
-      elem.attribute("target").map(_.text).fold(throw new IllegalArgumentException("empty target!")) { target =>
+      elem.attribute("target").map(_.text).fold(throw new IllegalArgumentException(s"empty target: $elem")) { target =>
         if (!target.startsWith("/")) elem else {
           val roleShouldBe: Option[String] = site.resolve(target).map(_.siteObject.viewer)
           val role: Option[String] = elem.attribute("role").map(_.text)
