@@ -28,6 +28,8 @@ abstract class Collection(
     descriptors = by.get.element.stores.map(_.asInstanceOf[Store.Inline]),
     documents
   )
+
+  val siblings: Map[Document, (Option[Document], Option[Document])] = Collections.prevAndNext(documents).toMap
 }
 
 object Collection {

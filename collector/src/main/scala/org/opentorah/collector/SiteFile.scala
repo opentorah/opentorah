@@ -1,7 +1,12 @@
 package org.opentorah.collector
 
-abstract class SiteFile(val siteObject: SiteObject) {
+trait SiteFile {
+
+  def siteObject: SiteObject
+
   def url: Seq[String]
+
+  def content: String
 }
 
 object SiteFile {
