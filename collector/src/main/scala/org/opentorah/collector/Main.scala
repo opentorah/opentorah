@@ -44,7 +44,6 @@ object Main {
     )
   }
 
-  // TODO move into Store
   private def prettyPrint(store: Store, prettyPrinter: PaigesPrettyPrinter): Unit = {
     for (fromUrl <- store.urls.fromUrl) if (Files.isFile(fromUrl)) TeiUtil.teiPrettyPrinter.writeXml(
       file = Files.url2file(fromUrl),
@@ -52,8 +51,6 @@ object Main {
     )
 
     for (entities <- store.entities) prettyPrint(entities, prettyPrinter)
-
-    // TODO get rid of the cast:
     for (by <- store.by; store <- by.stores) prettyPrint(store.asInstanceOf[Store], prettyPrinter)
   }
 

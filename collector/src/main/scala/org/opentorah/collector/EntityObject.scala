@@ -15,19 +15,16 @@ final class EntityObject(site: Site, entity: Entity) extends SiteObject(site) {
 
   override protected def tei: Tei = Tei(Seq(Entity.toXml(entity.copy(content = entity.content :+ mentions))))
 
-  // TODO clean up!
   private def mentions: Elem = {
 
     def sources(references: Seq[WithPath[EntityReference]]): Seq[Elem] = {
-      // TODO grouping needs to be adjusted to handle references from collection descriptors;
-      // once fund, опись etc. have their own URLs, they should be included too.
       val result: Seq[Option[Elem]] =
       for (source <- Collections.removeConsecutiveDuplicates(references.map(_.path))) yield {
         val sourceStore: Store = source.last.store
         val url: Option[Seq[String]] = sourceStore match {
           case teiHolder: TeiHolder => Some(DocumentObject.documentUrl(source.init.init.last.store, Site.fileName(teiHolder)))
           case document: Document => Some(DocumentObject.documentUrl(source.init.last.store, Site.fileName(document)))
-          case collection: Collection => None // TODO Some(collectionUrl(collection)) when grouping is adjusted
+          case collection: Collection => None // Some(collectionUrl(collection)) when grouping is adjusted?
           case _ => None
         }
         url.map(url => Site.ref(url, sourceStore.names.name))
@@ -45,7 +42,6 @@ final class EntityObject(site: Site, entity: Entity) extends SiteObject(site) {
 
     val bySource: Seq[(String, Seq[WithPath[EntityReference]])] =
       notFromNames
-        // TODO remove when grouping is adjusted
         .filter(reference => (reference.path.length >=3) && reference.path.init.init.last.store.isInstanceOf[Collection])
         .groupBy(Site.referenceCollectionName).toSeq.sortBy(_._1)
 
