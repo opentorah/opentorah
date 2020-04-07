@@ -29,7 +29,12 @@ abstract class Collection(
     documents
   )
 
-  val siblings: Map[Document, (Option[Document], Option[Document])] = Collections.prevAndNext(documents).toMap
+  def findDocumentByName(documentName: String): Option[(Document, TeiHolder)] =
+    documents.find(_.findTeiHolderByName(documentName).isDefined)
+      .map(document => document -> document.findTeiHolderByName(documentName).get)
+
+  val siblings: Map[Document, (Option[Document], Option[Document])] =
+    Collections.prevAndNext(documents).toMap
 }
 
 object Collection {

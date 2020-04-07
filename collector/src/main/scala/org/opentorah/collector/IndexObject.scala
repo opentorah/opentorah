@@ -1,6 +1,6 @@
 package org.opentorah.collector
 
-import scala.xml.Node
+import org.opentorah.tei.Tei
 
 final class IndexObject(site: Site) extends SiteObject(site) {
   override def viewer: String = CollectionObject.collectionViewer
@@ -12,11 +12,15 @@ final class IndexObject(site: Site) extends SiteObject(site) {
   override protected def yaml: Seq[(String, String)] = Seq("windowName" -> CollectionObject.collectionViewer)
 
   // TODO add nomenclature from the path to the info line:
-  override protected def xml: Seq[Node] =
-    <head>Дела</head> ++
-    <list type="bulleted">
-      {for (collection <- site.collections.filterNot(collection =>
-        Site.unpublished.contains(Site.collectionName(collection))))
-      yield Site.toXml(collection)}
-    </list>
+  override protected def tei: Tei = {
+    val result =
+      <head>Дела</head> ++
+      <list type="bulleted">
+        {for (collection <- site.collections.filterNot(collection =>
+          Site.unpublished.contains(Site.collectionName(collection))))
+        yield Site.toXml(collection)}
+      </list>
+
+    Tei(result)
+  }
 }

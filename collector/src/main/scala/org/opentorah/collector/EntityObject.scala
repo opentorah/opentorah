@@ -2,8 +2,9 @@ package org.opentorah.collector
 
 import org.opentorah.entity.{Entity, EntityReference}
 import org.opentorah.store.{EntityHolder, Store, WithPath}
+import org.opentorah.tei.Tei
 import org.opentorah.util.{Collections, Files}
-import scala.xml.{Elem, Node}
+import scala.xml.Elem
 
 final class EntityObject(site: Site, entity: Entity) extends SiteObject(site) {
   override def viewer: String = NamesObject.namesViewer
@@ -12,7 +13,7 @@ final class EntityObject(site: Site, entity: Entity) extends SiteObject(site) {
 
   override protected def teiWrapperUrl: Seq[String] = EntityObject.teiWrapperUrl(entity)
 
-  override protected def xml: Seq[Node] = Seq(Entity.toXml(entity.copy(content = entity.content :+ mentions)))
+  override protected def tei: Tei = Tei(Seq(Entity.toXml(entity.copy(content = entity.content :+ mentions))))
 
   // TODO clean up!
   private def mentions: Elem = {
@@ -23,9 +24,9 @@ final class EntityObject(site: Site, entity: Entity) extends SiteObject(site) {
       val result: Seq[Option[Elem]] =
       for (source <- Collections.removeConsecutiveDuplicates(references.map(_.path))) yield {
         val sourceStore: Store = source.last.store
-        val url: Option[String] = sourceStore match {
-          case teiHolder: TeiHolder => Some(Site.documentUrl(source.init.init.last.store, Site.fileName(teiHolder)))
-          case document: Document => Some(Site.documentUrl(source.init.last.store, Site.fileName(document)))
+        val url: Option[Seq[String]] = sourceStore match {
+          case teiHolder: TeiHolder => Some(DocumentObject.documentUrl(source.init.init.last.store, Site.fileName(teiHolder)))
+          case document: Document => Some(DocumentObject.documentUrl(source.init.last.store, Site.fileName(document)))
           case collection: Collection => None // TODO Some(collectionUrl(collection)) when grouping is adjusted
           case _ => None
         }
@@ -44,7 +45,8 @@ final class EntityObject(site: Site, entity: Entity) extends SiteObject(site) {
 
     val bySource: Seq[(String, Seq[WithPath[EntityReference]])] =
       notFromNames
-        .filter(reference => (reference.path.length >=3) && reference.path.init.init.last.store.isInstanceOf[Collection])  // TODO remove when grouping is adjusted
+        // TODO remove when grouping is adjusted
+        .filter(reference => (reference.path.length >=3) && reference.path.init.init.last.store.isInstanceOf[Collection])
         .groupBy(Site.referenceCollectionName).toSeq.sortBy(_._1)
 
     <p rendition="mentions">
@@ -55,7 +57,7 @@ final class EntityObject(site: Site, entity: Entity) extends SiteObject(site) {
         {
         val result = for (source <- Collections.removeConsecutiveDuplicates(fromEntities.map(_.path))) yield {
           val entityHolder: EntityHolder = source.last.store.asInstanceOf[EntityHolder]
-          Site.refNg(
+          Site.ref(
             url = EntityObject.teiWrapperUrl(entityHolder.entity),
             text = entityHolder.names.name
           )
