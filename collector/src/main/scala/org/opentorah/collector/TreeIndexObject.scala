@@ -12,7 +12,6 @@ final class TreeIndexObject(site: Site) extends SiteObject(site) {
 
   override protected def yaml: Seq[(String, String)] = Seq("title" -> "Архивы")
 
-  // TODO write new, truly hierarchical index!
   override protected def tei: Tei = {
     val byArchive: Map[String, Seq[WithPath[Collection]]] =
       site.collections.groupBy(collection => Site.collectionArchive(collection).getOrElse(""))

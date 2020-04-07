@@ -11,7 +11,6 @@ final class IndexObject(site: Site) extends SiteObject(site) {
 
   override protected def yaml: Seq[(String, String)] = Seq("windowName" -> CollectionObject.collectionViewer)
 
-  // TODO add nomenclature from the path to the info line:
   override protected def tei: Tei = {
     val result =
       <head>Дела</head> ++

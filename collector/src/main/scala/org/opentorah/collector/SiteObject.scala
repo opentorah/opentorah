@@ -3,7 +3,6 @@ package org.opentorah.collector
 import org.opentorah.tei.Tei
 import scala.xml.Elem
 
-// TODO remove duplication in the url definitions: Co-located?
 abstract class SiteObject(val site: Site) {
 
   def viewer: String

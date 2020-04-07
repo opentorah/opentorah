@@ -46,7 +46,6 @@ final class DocumentObject(
     override def url: Seq[String] = facsUrl
 
     override def content: String = {
-      // TODO get rid of the relative URLs
       // TODO do pages of the appropriate teiHolder!
       val facsimilePages: Elem =
         <div class="facsimileViewer">
@@ -74,7 +73,6 @@ object DocumentObject {
 
   val documentViewer: String = "documentViewer"
 
-  // TODO take WithPath[Collection] and simplify using CollectionObject.xxxUrl:
   def documentUrl(collection: Store, documentName: String): Seq[String] =
     Seq(CollectionObject.collectionsDirectoryName, Site.fileName(collection)) :+ CollectionObject.documentsDirectoryName :+ (documentName + ".html")
 

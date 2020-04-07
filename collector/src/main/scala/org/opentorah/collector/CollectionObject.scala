@@ -25,8 +25,6 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
       .filterNot(_.isPresent)
       .map(_.displayName)
 
-    // TODO insert path information into the case descriptors:
-    // and remove next line storeHeader(collection) ++
     val result =
       <head>{Site.collectionTitle(collection)}</head> ++
       Site.collectionDescription(collection) ++
@@ -45,7 +43,6 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
 object CollectionObject {
 
   // Note: also hard-coded in 'index.xml'!
-  // TODO use via url-building methods only!
   val collectionsDirectoryName: String = "collections"
 
   val collectionViewer: String = "collectionViewer"

@@ -39,6 +39,5 @@ object NamesObject {
 
   val namesViewer: String = "namesViewer"
 
-  // TODO express in terms of url and addPart
   def entityInTheListUrl(id: String): Seq[String] = Seq(s"$namesFileName.html#$id")
 }

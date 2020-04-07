@@ -73,7 +73,6 @@ object Site {
     if (sharp == -1) from else from.substring(0, sharp)
   }
 
-  // TODO use in facs wrappers.
   def addPart(url: Seq[String], part: String): Seq[String] =
     url.init :+ (url.last + "#" + part)
 
@@ -149,8 +148,6 @@ object Site {
       writeSiteFile(documentObject.teiWrapperFile, directory)
       writeSiteFile(documentObject.facsFile, directory)
     }
-
-    // TODO turn reports into TEI :)
 
     println("Writing reports.")
 
