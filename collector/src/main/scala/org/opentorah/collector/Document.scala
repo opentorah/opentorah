@@ -18,11 +18,16 @@ final class Document(
   override val by: Option[By[TeiHolder]] =
     Some(new Document.TeiBy(selectors, urls, fileInDirectory, name, languages))
 
-  def tei: Tei = by.get.stores.head.tei
-
   override def names: Names = new Names(Seq(Name(name)))
 
   override def references: Seq[EntityReference] = Seq.empty
+
+  def teiHolders: Seq[TeiHolder] = by.get.stores
+
+  def tei: Tei = teiHolders.head.tei
+
+  def findTeiHolderByName(documentName: String): Option[TeiHolder] =
+    teiHolders.find(_.name == documentName)
 
   def pages(pageType: Page.Type): Seq[Page] =
     for (pb <- tei.pbs) yield pageType(

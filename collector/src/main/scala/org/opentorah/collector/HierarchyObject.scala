@@ -1,6 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.{Binding, By, Path, Store, WithPath}
+import org.opentorah.tei.Tei
 import org.opentorah.xml.RawXml
 import scala.xml.{Elem, Node}
 
@@ -14,28 +15,32 @@ final class HierarchyObject(site: Site, path: Path, store: Store) extends SiteOb
   private def url(file: String): Seq[String] =
     HierarchyObject.hierarchyDirectoryName +: HierarchyObject.segments(path) :+ file
 
-  // TODO clean up; do Seq() for URLs...
-  protected def xml: Seq[Node] =
-    HierarchyObject.storeHeader(path, store) ++
-    store.by.toSeq.flatMap { by: By[_] =>
-      <p>
-        <l>{Site.getName(by.selector.names)}:</l>
-        <list type="bulleted">
-          {by.stores.map { storeX =>
-          val subStore = storeX.asInstanceOf[Store]  // TODO get rid of the cast!!!
-          val title: Seq[Node] = RawXml.getXml(subStore.title)
-          val titlePrefix: Seq[Node] = Site.textNode(Site.getName(subStore.names) + (if (title.isEmpty) "" else ": "))
-          <item>
-            {Site.ref(
-            url =
-              if (subStore.isInstanceOf[Collection]) s"/${CollectionObject.collectionsDirectoryName}/${Site.fileName(subStore)}"
-              else HierarchyObject.path2url(path :+ by.selector.bind(subStore)),
-            text = titlePrefix ++ title
-          )}</item>
-        }}
-        </list>
-      </p>
-    }
+  // TODO clean up:
+  protected def tei: Tei = {
+    val result =
+      HierarchyObject.storeHeader(path, store) ++
+      store.by.toSeq.flatMap { by: By[_] =>
+        <p>
+          <l>{Site.getName(by.selector.names)}:</l>
+          <list type="bulleted">
+            {by.stores.map { storeX =>
+            val subStore = storeX.asInstanceOf[Store]  // TODO get rid of the cast!!!
+            val title: Seq[Node] = RawXml.getXml(subStore.title)
+            val titlePrefix: Seq[Node] = Site.textNode(Site.getName(subStore.names) + (if (title.isEmpty) "" else ": "))
+            <item>
+              {Site.ref(
+              url =
+                if (subStore.isInstanceOf[Collection]) Seq(CollectionObject.collectionsDirectoryName, Site.fileName(subStore))
+                else HierarchyObject.path2url(path :+ by.selector.bind(subStore)),
+              text = titlePrefix ++ title
+            )}</item>
+          }}
+          </list>
+        </p>
+      }
+
+    Tei(result)
+  }
 }
 
 object HierarchyObject {
@@ -64,6 +69,7 @@ object HierarchyObject {
         }
     }
 
+  // TODO move into general area
   private def storeHeader(path: Path, store: Store): Seq[Node] = {
     //    println(segments(store.path).mkString("/"))
     val isTop: Boolean = path.isEmpty
@@ -79,6 +85,7 @@ object HierarchyObject {
       RawXml.getXml(store.body)
   }
 
+  // TODO move into general area
   private def pathLinks(path: Path): Seq[Elem] = for (ancestor <- path.path.inits.toSeq.reverse.tail) yield {
     val binding: Binding = ancestor.last
     val link: Elem = Site.ref(
@@ -90,9 +97,10 @@ object HierarchyObject {
     <l>{Site.getName(binding.selector.names)} {link ++ titlePrefix ++ title}</l>
   }
 
-  def path2url(path: Path): String =
-    "/" + hierarchyDirectoryName + "/" + segments(path).mkString("", "/", "/")
+  // TODO move into general area
+  def path2url(path: Path): Seq[String] = hierarchyDirectoryName +: segments(path)
 
+  // TODO move into general area
   def segments(path: Path): Seq[String] =
     path.path.flatMap(binding => Seq(binding.selector.names, binding.store.names))
       .map(Site.getName)

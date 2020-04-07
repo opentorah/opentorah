@@ -2,6 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.entity.EntityReference
 import org.opentorah.store.WithPath
+import org.opentorah.tei.Tei
 import org.opentorah.util.Files
 import org.opentorah.xml.XmlUtil
 import scala.xml.{Elem, Node}
@@ -9,19 +10,16 @@ import scala.xml.{Elem, Node}
 final class CollectionObject(site: Site, collection: WithPath[Collection]) extends SiteObject(site) {
   override def viewer: String = CollectionObject.collectionViewer
 
-  override protected def teiUrl: Seq[String] = url("index.xml")
+  override protected def teiUrl: Seq[String] = CollectionObject.teiUrl(collection)
 
-  override protected def teiWrapperUrl: Seq[String] = url("index.html")
-
-  private def url(file: String): Seq[String] =
-    Seq(CollectionObject.collectionsDirectoryName, Site.fileName(collection.value), file)
+  override protected def teiWrapperUrl: Seq[String] = CollectionObject.teiWrapperUrl(collection)
 
   override protected def style: Option[String] = Some("wide")
 
   override protected def yaml: Seq[(String, String)] =
-    Seq("documentCollection" -> Site.quote(Site.collectionReference(collection)))
+    Seq("documentCollection" -> Site.collectionReference(collection))
 
-  override protected def xml: Seq[Node] = {
+  override protected def tei: Tei = {
     val missingPages: Seq[String] = collection.value.documents
       .flatMap(document => document.pages(collection.value.pageType))
       .filterNot(_.isPresent)
@@ -29,34 +27,54 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
 
     // TODO insert path information into the case descriptors:
     // and remove next line storeHeader(collection) ++
-    <head>{Site.collectionTitle(collection)}</head> ++ Site.collectionDescription(collection) ++
-      Seq[Elem](CollectionObject.table(collection.value).toTei(
+    val result =
+      <head>{Site.collectionTitle(collection)}</head> ++
+      Site.collectionDescription(collection) ++
+      Seq[Elem](CollectionObject.table(collection).toTei(
         collection.value.parts.flatMap { part =>
           part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Xml) ++
-            part.documents.map(Table.Data[Document]) }
+          part.documents.map(Table.Data[Document]) }
       )) ++
       (if (missingPages.isEmpty) Seq.empty
       else Seq(<p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>))
+
+    Tei(result)
   }
 }
 
 object CollectionObject {
 
   // Note: also hard-coded in 'index.xml'!
+  // TODO use via url-building methods only!
   val collectionsDirectoryName: String = "collections"
 
   val collectionViewer: String = "collectionViewer"
 
-  def resolve(site: Site, parts: Seq[String]): Option[SiteFile] = if (parts.isEmpty) None else {
-    val collectionName: String = parts.head
-    site.collections.find(collection => Site.fileName(collection.value) == collectionName).flatMap { collection =>
+  // Note: also hard-coded in _layouts/tei.html!
+  val facsDirectoryName: String = "facs" // facsimile viewers
+
+  val documentsDirectoryName: String = "documents" // wrappers for TEI XML
+
+  val teiDirectoryName: String = "tei"
+
+  def collectionUrl(collection: WithPath[Collection]): Seq[String] =
+    Seq(CollectionObject.collectionsDirectoryName, Site.fileName(collection.value))
+
+  def teiUrl(collection: WithPath[Collection]): Seq[String] =
+    collectionUrl(collection) :+ "index.xml"
+
+  def teiWrapperUrl(collection: WithPath[Collection]): Seq[String] =
+    collectionUrl(collection) :+ "index.html"
+
+  def resolve(site: Site, parts: Seq[String]): Option[SiteFile] = if (parts.isEmpty) None else
+    site.findCollectionByName(parts.head).flatMap { collection =>
       if (parts.tail.isEmpty) Some(new CollectionObject(site, collection).teiWrapperFile)
       else parts.tail.head match {
-        case Site.documentsDirectoryName =>
+        case CollectionObject.documentsDirectoryName =>
           DocumentObject.resolve(site, collection, parts.tail.tail, "html").map(_.teiWrapperFile)
-        case Site.teiDirectoryName =>
+        case CollectionObject.teiDirectoryName =>
           DocumentObject.resolve(site, collection, parts.tail.tail, "xml").map(_.teiFile)
-        case Site.facsDirectoryName =>
+        case CollectionObject.facsDirectoryName =>
           DocumentObject.resolve(site, collection, parts.tail.tail, "html").map(_.facsFile)
 
         case file => if (parts.tail.tail.nonEmpty) None else {
@@ -66,9 +84,8 @@ object CollectionObject {
         }
       }
     }
-  }
 
-  def table(collection: Collection): Table[Document] = new Table[Document](
+  def table(collection: WithPath[Collection]): Table[Document] = new Table[Document](
     Table.Column("Описание", "description", { document: Document =>
       document.tei.getAbstract
         // Ignoring the titles:          .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
@@ -92,16 +109,22 @@ object CollectionObject {
 
     Table.Column("Язык", "language", { document: Document =>
       val translations: Seq[Elem] =
-        for (teiHolder <- document.by.get.stores.filter(_.language.isDefined)) yield translationRef(collection, teiHolder)
+        for (teiHolder <- document.by.get.stores.filter(_.language.isDefined))
+        yield Site.ref(DocumentObject.documentUrl(collection.value, teiHolder.name), teiHolder.language.get)
       val language: Option[String] = document.tei.languages.map(_.ident).headOption
         .orElse(document.tei.text.lang)
       Seq(Site.textNode(language.getOrElse("?"))) ++ translations
     }),
 
-    Table.Column("Документ", "document", { document: Document => documentRef(collection, document) }),
+    Table.Column("Документ", "document", { document: Document =>
+      Site.ref(DocumentObject.documentUrl(collection.value, document.name), document.name)
+    }),
 
     Table.Column("Страницы", "pages", { document: Document =>
-      for (page <- document.pages(collection.pageType)) yield documentPageRef(collection, document, page) }),
+      for (page <- document.pages(collection.value.pageType))
+      yield Site.ref(Site.addPart(DocumentObject.documentUrl(collection.value, document.name), s"p${page.n}"), page.displayName,
+        Some(if (page.isPresent) "page" else "missing-page"))
+    }),
 
     Table.Column("Расшифровка", "transcriber", { document: Document =>
       val transcribers = document.tei.titleStmt.editors
@@ -110,14 +133,4 @@ object CollectionObject {
       Site.multi(transcribers)
     })
   )
-
-  def documentRef(collection: Collection, document: Document): Elem =
-    Site.ref(Site.documentUrl(collection, document.name), document.name)
-
-  def translationRef(collection: Collection, teiHolder: TeiHolder): Elem =
-    Site.ref(Site.documentUrl(collection, teiHolder.name), teiHolder.language.get)
-
-  private def documentPageRef(collection: Collection, document: Document, page: Page): Elem =
-    Site.ref(Site.documentUrl(collection, document.name) + s"#p${page.n}", page.displayName,
-      Some(if (page.isPresent) "page" else "missing-page"))
 }

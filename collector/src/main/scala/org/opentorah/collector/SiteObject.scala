@@ -1,37 +1,35 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.Tei
-import scala.xml.{Elem, Node}
+import scala.xml.Elem
 
+// TODO remove duplication in the url definitions: Co-located?
 abstract class SiteObject(val site: Site) {
 
   def viewer: String
 
-  // TODO rename xmlFile
   def teiFile: SiteFile = new SiteFile {
     override def siteObject: SiteObject = SiteObject.this
 
     override def url: Seq[String] = teiUrl
 
     override def content: String = {
-      val elem: Elem = Site.processTei(Tei.toXml(TeiUtil.addCommonNoCalendar(Tei(xml))), siteObject.site)
-
+      val elem: Elem = Site.processTei(Tei.toXml(teiTransformer(tei)), siteObject.site)
       """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
-        TeiUtil.teiPrettyPrinter.render(elem) +
-        "\n"
+      TeiUtil.teiPrettyPrinter.render(elem) +  "\n"
     }
   }
 
-  // TODO rename htmlFile
   def teiWrapperFile: SiteFile = new SiteFile {
     override def siteObject: SiteObject = SiteObject.this
 
     override def url: Seq[String] = teiWrapperUrl
 
-    final def content: String = Site.withYaml("tei",
+    final def content: String = Site.withYaml(
       yaml = style.fold[Seq[(String, String)]](Seq.empty)(style => Seq("style" -> style)) ++
         Seq(
-          "tei" -> Site.quote(Site.mkUrl(siteObject.teiFile.url)),
+          "layout" -> "tei",
+          "tei" -> Site.mkUrl(siteObject.teiFile.url),
           "target" -> siteObject.viewer
         ) ++ yaml
     )
@@ -39,7 +37,9 @@ abstract class SiteObject(val site: Site) {
 
   protected def teiUrl: Seq[String]
 
-  protected def xml: Seq[Node]
+  protected def teiTransformer: Tei => Tei = TeiUtil.addCommonNoCalendar
+
+  protected def tei: Tei
 
   protected def teiWrapperUrl: Seq[String]
 

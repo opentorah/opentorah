@@ -4,7 +4,6 @@ import java.io.File
 import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
 import org.opentorah.metadata.{Language, Names}
 import org.opentorah.store.{Entities, EntityHolder, Path, Store, WithPath}
-import org.opentorah.tei.Tei
 import org.opentorah.util.Files
 import org.opentorah.xml.{RawXml, XmlUtil}
 import scala.xml.{Elem, Node}
@@ -21,13 +20,14 @@ final class Site(store: Store, val references: Seq[WithPath[EntityReference]]) {
     case _ => Seq.empty
   })
 
+  def findCollectionByName(collectionName: String): Option[WithPath[Collection]] =
+    collections.find(collection => Site.fileName(collection.value) == collectionName)
+
   val entities: Seq[Entity] = store.entities.get.by.get.stores.map(_.entity)
 
   def findByRef(fileName: String): Option[Entity] =  store.entities.get.findByRef(fileName)
 
   val entitiesLists: Seq[EntitiesList] = store.entities.get.lists.filterNot(_.isEmpty)
-
-  def namesObject: NamesObject = new NamesObject(this)
 
   def resolve(url: String): Option[SiteFile] = {
     if (!url.startsWith("/")) None else {
@@ -50,7 +50,7 @@ final class Site(store: Store, val references: Seq[WithPath[EntityReference]]) {
                 case "index" =>
                   SiteFile.resolve(extension, new IndexObject(this))
 
-                case Site.collectionsFileName =>
+                case TreeIndexObject.collectionsFileName =>
                   SiteFile.resolve(extension, new TreeIndexObject(this))
 
                 case NamesObject.namesFileName =>
@@ -73,27 +73,12 @@ object Site {
     if (sharp == -1) from else from.substring(0, sharp)
   }
 
-  val collectionsFileName: String = "collections"
-
-  // Note: also hard-coded in _layouts/tei.html!
-  val facsDirectoryName: String = "facs" // facsimile viewers
-
-  val documentsDirectoryName: String = "documents" // wrappers for TEI XML
-
-  val teiDirectoryName: String = "tei"
-
-  def documentUrl(collection: Store, documentName: String): String =
-    url(s"${fileName(collection)}/$documentsDirectoryName/$documentName.html")
-
-  private def collectionUrl(collection: WithPath[Collection]): String =
-    url(s"${collectionName(collection)}/index.html")
-
-  private def url(ref: String): String = s"/${CollectionObject.collectionsDirectoryName}/$ref"
+  // TODO use in facs wrappers.
+  def addPart(url: Seq[String], part: String): Seq[String] =
+    url.init :+ (url.last + "#" + part)
 
   val unpublished: Set[String] = Set("derzhavin6", "derzhavin7", "lna208",
     "niab5", "niab19", "niab24", "rnb203", "rnb211")
-
-  val documentViewer: String = "documentViewer"
 
   def fileName(store: Store): String =
     Files.nameAndExtension(Files.pathAndName(store.urls.fromUrl.get.getPath)._2)._1
@@ -126,21 +111,13 @@ object Site {
 
   // TODO with images on a separate website (facsimiles.alter-rebbe.org), this has to be re-worked...
   //  private def checkPages(): Unit = {
-  //    // Check that all the images are accounted for
-  //    val imageNames: Set[String] =
-  //      Util.filesWithExtensions(
-  //        directory = layout.facsimiles(directory),
-  //        ".jpg"
-  //      )
-  //      .toSet
+  //    val imageNames: Set[String] = Util.filesWithExtensions(directory = layout.facsimiles(directory), ".jpg").toSet
   //    imageNames.foreach(name => pageType(name, isPresent = true))
-  //
   //    val usedImages: Set[String] = pages.filter(_.isPresent).map(_.name).toSet
   //    val orphanImages: Seq[String] = (imageNames -- usedImages).toSeq.sorted
   //    val missingImages: Seq[String] = (usedImages -- imageNames).toSeq.sorted
   //    if (orphanImages.nonEmpty) throw new IllegalArgumentException(s"Orphan images: $orphanImages")
-  //    if (missingImages.nonEmpty)
-  //      throw new IllegalArgumentException(s"Missing images: $missingImages")
+  //    if (missingImages.nonEmpty) throw new IllegalArgumentException(s"Missing images: $missingImages")
   //  }
 
   def write(
@@ -149,7 +126,9 @@ object Site {
   ): Unit = {
     println("Writing site.")
 
-    writeSiteObject(site.namesObject, directory)
+    writeSiteObject(new IndexObject(site), directory)
+    writeSiteObject(new TreeIndexObject(site), directory)
+    writeSiteObject(new NamesObject(site), directory)
 
     Files.deleteFiles(new File(directory, EntityObject.namesDirectoryName))
     for (entity <- site.entities) writeSiteObject(new EntityObject(site, entity), directory)
@@ -157,43 +136,18 @@ object Site {
     Files.deleteFiles(new File(directory, HierarchyObject.hierarchyDirectoryName))
     for (store <- site.stores) writeSiteObject(new HierarchyObject(site, store.path, store.value), directory)
 
-    writeSiteObject(new IndexObject(site), directory)
-    writeSiteObject(new TreeIndexObject(site), directory)
-
-    val collectionsDirectory: File = new File(directory, CollectionObject.collectionsDirectoryName)
-    Files.deleteFiles(collectionsDirectory)
+    Files.deleteFiles(new File(directory, CollectionObject.collectionsDirectoryName))
     for (collection <- site.collections) writeSiteObject(new CollectionObject(site, collection), directory)
 
-    for (collection <- site.collections) {
-      val collectionDirectory: File = new File(collectionsDirectory, collectionName(collection))
-      val teiDirectory: File = new File(collectionDirectory, teiDirectoryName)
-      val docsDirectory: File = new File(collectionDirectory, documentsDirectoryName)
-
-      for (document <- collection.value.documents) {
-        // Wrappers
-        val (prev: Option[Document], next: Option[Document]) = collection.value.siblings(document)
-        val navigation: Seq[(String, String)] =
-          Seq("documentCollection" -> quote(collectionReference(collection))) ++
-          prev.map(prev => Seq("prevDocument" -> quote(prev.name))).getOrElse(Seq.empty) ++
-          Seq("thisDocument" -> quote(document.name)) ++
-          next.map(next => Seq("nextDocument" -> quote(next.name))).getOrElse(Seq.empty)
-
-        for (teiHolder: TeiHolder <- document.by.get.stores) {
-          TeiUtil.teiPrettyPrinter.writeXml(
-            file = new File(teiDirectory, teiHolder.name + ".xml"),
-            elem = processTei(Tei.toXml(TeiUtil.addCommon(teiHolder.tei)), site)
-          )
-
-          forTeiHolder(docsDirectory, document, navigation, teiHolder)
-        }
-
-        writeFacsViewer(
-          facsDirectory = new File(collectionDirectory, facsDirectoryName),
-          pageType = collection.value.pageType,
-          document,
-          navigation
-        )
-      }
+    for {
+      collection <- site.collections
+      document <- collection.value.documents
+      teiHolder: TeiHolder <- document.teiHolders
+    } {
+      val documentObject = new DocumentObject(site, collection, document, teiHolder)
+      writeSiteFile(documentObject.teiFile, directory)
+      writeSiteFile(documentObject.teiWrapperFile, directory)
+      writeSiteFile(documentObject.facsFile, directory)
     }
 
     // TODO turn reports into TEI :)
@@ -214,7 +168,7 @@ object Site {
     writeReport(
       directory,
       name = "no-refs",
-      title = "Имена без атрибута 'ref'",
+      title = "Имена без атрибута /ref/",
       content =
         for (reference <- site.references.filter(_.value.ref.isEmpty)) yield
           "- " + reference.value.name.map(_.text.trim).mkString(" ") + " в " +
@@ -236,60 +190,8 @@ object Site {
     if (segments.isEmpty) directory
     else file(new File(directory, segments.head), segments.tail)
 
-  def forTeiHolder(
-    docsDirectory: File,
-    document: Document,
-    navigation: Seq[(String, String)],
-    teiHolder: TeiHolder
-  ): Unit = {
-    val name: String = teiHolder.name
-    writeTeiWrapper(
-      directory = docsDirectory,
-      fileName = name,
-      teiPrefix = Some(s"../$teiDirectoryName/"), // TODO get rid of the relative URLs
-      target = documentViewer,
-      yaml = Seq(
-        "facs" -> s"'../$facsDirectoryName/${document.name}.html'"  // TODO get rid of the relative URLs
-      ) ++ (
-        if (teiHolder.language.isDefined || document.languages.isEmpty) Seq.empty
-        else Seq("translations" -> document.languages.mkString("[", ", ", "]"))) ++ navigation
-    )
-  }
-
-  private def writeFacsViewer(
-    facsDirectory: File,
-    pageType: Page.Type,
-    document: Document,
-    navigation: Seq[(String, String)]
-  ): Unit = {
-    // TODO get rid of the relative URLs
-    val facsimilePages: Elem =
-      <div class="facsimileViewer">
-        <div class="facsimileScroller">{
-          for (page: Page <- document.pages(pageType).filter(_.isPresent); n = page.n) yield {
-            <a target={documentViewer} href={s"../$documentsDirectoryName/${document.name}.html#p$n"}>
-              <figure>
-                <img xml:id={s"p$n"} alt={s"facsimile for page $n"} src={page.facs.orNull}/>
-                <figcaption>{n}</figcaption>
-              </figure>
-            </a>}}
-        </div>
-      </div>
-
-    // TODO get rid of the relative URLs
-    writeWithYaml(
-      file = new File(facsDirectory, document.name + ".html"),
-      layout = "default",
-      yaml = Seq(
-        "transcript" -> s"'../$documentsDirectoryName/${document.name}.html'"
-      )
-        ++ navigation,
-      content = Seq(TeiUtil.htmlPrettyPrinter.render(facsimilePages) + "\n")
-    )
-  }
-
   def toXml(collection: WithPath[Collection]): Elem = {
-    val url = collectionUrl(collection)
+    val url = CollectionObject.teiWrapperUrl(collection)
     // If I do this, parts of the line click to the names... {ref(url, collectionViewer, textNode(collectionReference(collection) + ": ") ++ collectionTitle(collection))}<lb/>
     <item>
       {ref(url, collectionReference(collection) + ": " +
@@ -299,47 +201,17 @@ object Site {
   }
 
   def ref(
-    url: String,
-    text: String,
-    css: Option[String] = None
-  ): Elem = <ref target={url} rendition={css.orNull}>{text}</ref>
-
-  def refNg(
     url: Seq[String],
     text: String,
     css: Option[String] = None
   ): Elem = <ref target={mkUrl(url)} rendition={css.orNull}>{text}</ref>
 
   def ref(
-    url: String,
-    text: Seq[Node]
-  ): Elem = <ref target={url}>{text}</ref>
-
-  def refNg(
     url: Seq[String],
     text: Seq[Node]
   ): Elem = <ref target={mkUrl(url)}>{text}</ref>
 
   def mkUrl(segments: Seq[String]): String = segments.mkString("/", "/", "")
-
-  // TODO calculate viewer from the URL when writing Site.SiteObject:
-  private def writeTeiWrapper(
-    directory: File,
-    fileName: String,
-    teiPrefix: Option[String] = None,
-    style: Option[String] = None,
-    target: String,
-    yaml: Seq[(String, String)]
-  ): Unit = writeWithYaml(
-    file = new File(directory, fileName + ".html"),
-    layout = "tei",
-    yaml =
-      style.fold[Seq[(String, String)]](Seq.empty)(style => Seq("style" -> style)) ++
-        Seq(
-          "tei" -> quote(teiPrefix.getOrElse("") + fileName + ".xml"),
-          "target" -> target
-        ) ++ yaml
-  )
 
   private def refRoleRewriter(site: Site): Elem => Elem = elem =>
     if (elem.label != "ref") elem else {
@@ -358,39 +230,32 @@ object Site {
   def processTei(elem: Elem, site: Site): Elem =
     XmlUtil.rewriteElements(elem, refRoleRewriter(site))
 
-  private def writeWithYaml(
-    file: File,
-    layout: String,
-    yaml: Seq[(String, String)],
-    content: Seq[String] = Seq.empty
-  ): Unit =
-    Files.write(file, withYaml(layout, yaml, content))
-
   def withYaml(
-    layout: String,
     yaml: Seq[(String, String)],
     content: Seq[String] = Seq.empty
   ): String = {
     val result: Seq[String] =
       Seq("---") ++
-        (for ((name, value) <- ("layout", layout) +: yaml) yield name + ": " + value) ++
-        Seq("---") ++
-        Seq("") ++ content
+      (for ((name, value) <- yaml) yield name + ": " + quote(value)) ++
+      Seq("---") ++
+      Seq("") ++ content
 
-    result.mkString("\n")
+    result.mkString("", "\n", if (content.nonEmpty) "\n" else "")
   }
+
+  private def quote(what: String): String = s"'$what'"
 
   private def writeReport(
     directory: File,
     name: String,
     title: String,
     content: Seq[String]
-  ): Unit = writeWithYaml(
+  ): Unit = Files.write(
     file = new File(new File(directory, "reports"), name + ".md"),
-    layout = "page",
-    yaml = Seq("title" -> title),
-    content :+ "\n"
-  )
+    withYaml(
+      yaml = Seq("layout" -> "page", "title" -> title),
+      content
+    ))
 
   def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
     case Nil => Nil
@@ -419,6 +284,4 @@ object Site {
       .replace("  ", " ")
       .replace("  ", " ")
   }
-
-  def quote(what: String): String = s"'$what'"
 }
