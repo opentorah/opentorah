@@ -3,12 +3,10 @@ package org.opentorah.collector
 import java.io.File
 import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
 import org.opentorah.metadata.{Language, Names}
-import org.opentorah.store.{Entities, EntityHolder, Path, Store, WithPath}
+import org.opentorah.store.{Entities, EntityHolder, Store, WithPath}
 import org.opentorah.util.Files
-import org.opentorah.xml.{RawXml, XmlUtil}
-import scala.xml.{Elem, Node}
 
-final class Site(store: Store, val references: Seq[WithPath[EntityReference]]) {
+final class Site(val store: Store, val references: Seq[WithPath[EntityReference]]) {
 
   val stores: Seq[WithPath[Store]] = store.withPath[Store](values = {
     case _: Collection | _: Document | _: Entities | _: EntityHolder | _: TeiHolder => Seq.empty
@@ -29,84 +27,22 @@ final class Site(store: Store, val references: Seq[WithPath[EntityReference]]) {
 
   val entitiesLists: Seq[EntitiesList] = store.entities.get.lists.filterNot(_.isEmpty)
 
-  def resolve(url: String): Option[SiteFile] = {
-    if (!url.startsWith("/")) None else {
-      val parts: Seq[String] = Site.removePart(url).substring(1).split("/")
-      if (parts.isEmpty) Some(new IndexObject(this).teiWrapperFile) else {
-        val tail: Seq[String] = parts.tail
-        parts.head match {
-          case HierarchyObject.hierarchyDirectoryName =>
-            HierarchyObject.resolve(this, Path.empty, store, tail)
-
-          case CollectionObject.collectionsDirectoryName =>
-            CollectionObject.resolve(this, tail)
-
-          case EntityObject.namesDirectoryName =>
-            EntityObject.resolve(this, tail)
-
-          case file if parts.tail.isEmpty  =>
-              val (fileName: String, extension: Option[String]) = Files.nameAndExtension(file)
-              fileName match {
-                case IndexObject.fileName =>
-                  SimpleSiteObject.resolve(extension, new IndexObject(this))
-
-                case TreeIndexObject.collectionsFileName =>
-                  SimpleSiteObject.resolve(extension, new TreeIndexObject(this))
-
-                case NamesObject.fileName =>
-                  SimpleSiteObject.resolve(extension, new NamesObject(this))
-
-                case _ => None
-              }
-
-          case _ => None
-        }
-      }
-    }
-  }
+  def resolve(url: String): Option[SiteFile] =
+    if (!url.startsWith("/")) None
+    else SiteObject.resolve(this, Files.removePart(url).substring(1).split("/"))
 }
 
 object Site {
 
-  def removePart(from: String): String = {
-    val sharp = from.indexOf('#')
-    if (sharp == -1) from else from.substring(0, sharp)
-  }
+  val facsimileBucket: String = "http://facsimiles.alter-rebbe.org/facsimiles/"
 
-  def addPart(url: Seq[String], part: String): Seq[String] =
-    url.init :+ (url.last + "#" + part)
-
-  val unpublished: Set[String] = Set("derzhavin6", "derzhavin7", "lna208",
-    "niab5", "niab19", "niab24", "rnb203", "rnb211")
+  val unpublishedCollections: Set[String] =
+    Set("derzhavin6", "derzhavin7", "lna208", "niab5", "niab19", "niab24", "rnb203", "rnb211")
 
   def fileName(store: Store): String =
     Files.nameAndExtension(Files.pathAndName(store.urls.fromUrl.get.getPath)._2)._1
 
-  def referenceCollectionName(reference: WithPath[EntityReference]): String =
-    reference.path.init.init.last.store.names.name
-
   def getName(names: Names): String = names.doFind(Language.Russian.toSpec).name
-
-  // TODO this yuck is temporary :)
-
-  def collectionReference(collection: WithPath[Collection]): String =
-    collection.value.names.name
-
-  def collectionTitle(collection: WithPath[Collection]): Seq[Node] =
-    collection.value.title.fold[Seq[Node]](TeiUtil.textNode(collectionReference(collection)))(_.xml)
-
-  def collectionDescription(collection: WithPath[Collection]): Seq[Node] =
-    Seq(<span>{collection.value.storeAbstract.get.xml}</span>) ++
-      RawXml.getXml(collection.value.body)
-
-  def collectionName(collection: WithPath[Collection]): String =
-    fileName(collection.value)
-
-  def collectionArchive(collection: WithPath[Collection]): Option[String] = {
-    val reference = collectionReference(collection)
-    val space = reference.lastIndexOf(' ')
-    if (space == -1) None else Some(reference.substring(0, space))
-  }
 
   // TODO with images on a separate website (facsimiles.alter-rebbe.org), this has to be re-worked...
   //  private def checkPages(): Unit = {
@@ -129,13 +65,13 @@ object Site {
     writeSiteObject(new TreeIndexObject(site), directory)
     writeSiteObject(new NamesObject(site), directory)
 
-    Files.deleteFiles(new File(directory, EntityObject.namesDirectoryName))
+    Files.deleteFiles(new File(directory, EntityObject.directoryName))
     for (entity <- site.entities) writeSiteObject(new EntityObject(site, entity), directory)
 
-    Files.deleteFiles(new File(directory, HierarchyObject.hierarchyDirectoryName))
+    Files.deleteFiles(new File(directory, HierarchyObject.directoryName))
     for (store <- site.stores) writeSiteObject(new HierarchyObject(site, store.path, store.value), directory)
 
-    Files.deleteFiles(new File(directory, CollectionObject.collectionsDirectoryName))
+    Files.deleteFiles(new File(directory, CollectionObject.directoryName))
     for (collection <- site.collections) writeSiteObject(new CollectionObject(site, collection), directory)
 
     for {
@@ -157,7 +93,7 @@ object Site {
       title = "Неправильно названные файлы с именами",
       content = site.entities.flatMap { entity =>
         val id: String = entity.id.get
-        val expectedId: String = entity.name.replace(' ', '_')
+        val expectedId: String = Files.spacesToUnderscores(entity.name)
         if (id == expectedId) None else Some(s"- '$id' должен по идее называться '$expectedId'")
       }
     )
@@ -169,7 +105,7 @@ object Site {
       content =
         for (reference <- site.references.filter(_.value.ref.isEmpty)) yield
           "- " + reference.value.name.map(_.text.trim).mkString(" ") + " в " +
-            referenceCollectionName(reference) + ":" +
+            EntityObject.referenceCollectionName(reference) + ":" +
             reference.path.last.store.names.name
     )
   }
@@ -180,53 +116,7 @@ object Site {
   }
 
   private final def writeSiteFile(siteFile: SiteFile, directory: File): Unit =
-    Files.write(Site.file(directory, siteFile.url), siteFile.content)
-
-  @scala.annotation.tailrec
-  def file(directory: File, segments: Seq[String]): File =
-    if (segments.isEmpty) directory
-    else file(new File(directory, segments.head), segments.tail)
-
-  def toXml(collection: WithPath[Collection]): Elem = {
-    val url = CollectionObject.teiWrapperUrl(collection)
-    // If I do this, parts of the line click to the names... {ref(url, collectionViewer, textNode(collectionReference(collection) + ": ") ++ collectionTitle(collection))}<lb/>
-    <item>
-      {ref(url, collectionReference(collection) + ": " +
-      TeiUtil.spacedText(collectionTitle(collection)))}<lb/>
-      <abstract>{collection.value.storeAbstract.get.xml}</abstract>
-    </item>
-  }
-
-  def ref(
-    url: Seq[String],
-    text: String,
-    css: Option[String] = None
-  ): Elem = <ref target={mkUrl(url)} rendition={css.orNull}>{text}</ref>
-
-  def ref(
-    url: Seq[String],
-    text: Seq[Node]
-  ): Elem = <ref target={mkUrl(url)}>{text}</ref>
-
-  def mkUrl(segments: Seq[String]): String = segments.mkString("/", "/", "")
-
-  def processTei(elem: Elem, site: Site): Elem =
-    XmlUtil.rewriteElements(elem, TeiUtil.refRoleRewriter(site))
-
-  def withYaml(
-    yaml: Seq[(String, String)],
-    content: Seq[String] = Seq.empty
-  ): String = {
-    val result: Seq[String] =
-      Seq("---") ++
-      (for ((name, value) <- yaml) yield name + ": " + quote(value)) ++
-      Seq("---") ++
-      Seq("") ++ content
-
-    result.mkString("", "\n", if (content.nonEmpty) "\n" else "")
-  }
-
-  private def quote(what: String): String = s"'$what'"
+    Files.write(Files.file(directory, siteFile.url), siteFile.content)
 
   private def writeReport(
     directory: File,
@@ -235,7 +125,7 @@ object Site {
     content: Seq[String]
   ): Unit = Files.write(
     file = new File(new File(directory, "reports"), name + ".md"),
-    withYaml(
+    SiteObject.withYaml(
       yaml = Seq("layout" -> "page", "title" -> title),
       content
     ))

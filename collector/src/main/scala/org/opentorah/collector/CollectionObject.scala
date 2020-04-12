@@ -2,13 +2,13 @@ package org.opentorah.collector
 
 import org.opentorah.entity.EntityReference
 import org.opentorah.store.WithPath
-import org.opentorah.tei.Tei
-import org.opentorah.util.Files
-import org.opentorah.xml.XmlUtil
+import org.opentorah.tei.{Ref, Tei}
+import org.opentorah.util.{Files, Xml}
+import org.opentorah.xml.RawXml
 import scala.xml.{Elem, Node}
 
 final class CollectionObject(site: Site, collection: WithPath[Collection]) extends SimpleSiteObject(site) {
-  override def viewer: String = CollectionObject.collectionViewer
+  override def viewer: String = CollectionObject.viewer
 
   override protected def urlPrefix: Seq[String] = CollectionObject.urlPrefix(collection)
 
@@ -17,17 +17,17 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
   override protected def style: Option[String] = Some("wide")
 
   override protected def yaml: Seq[(String, String)] =
-    Seq("documentCollection" -> Site.collectionReference(collection))
+    Seq("documentCollection" -> CollectionObject.collectionReference(collection))
 
   override protected def tei: Tei = {
     val missingPages: Seq[String] = collection.value.documents
       .flatMap(document => document.pages(collection.value.pageType))
-      .filterNot(_.isPresent)
+      .filter(_.pb.isMissing)
       .map(_.displayName)
 
     val result =
-      <head>{Site.collectionTitle(collection)}</head> ++
-      Site.collectionDescription(collection) ++
+      <head>{CollectionObject.collectionTitle(collection)}</head> ++
+        CollectionObject.collectionDescription(collection) ++
       Seq[Elem](CollectionObject.table(collection).toTei(
         collection.value.parts.flatMap { part =>
           part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Xml) ++
@@ -45,17 +45,16 @@ object CollectionObject {
   val fileName: String = "index"
 
   def urlPrefix(collection: WithPath[Collection]): Seq[String] =
-    Seq(CollectionObject.collectionsDirectoryName, Site.fileName(collection.value))
+    Seq(CollectionObject.directoryName, Site.fileName(collection.value))
 
   def teiWrapperUrl(collection: WithPath[Collection]): Seq[String] =
     urlPrefix(collection) :+ (fileName + ".html")
 
   // Note: also hard-coded in 'index.xml'!
-  val collectionsDirectoryName: String = "collections"
+  val directoryName: String = "collections"
 
-  val collectionViewer: String = "collectionViewer"
+  val viewer: String = "collectionViewer"
 
-  // Note: also hard-coded in _layouts/tei.html!
   val facsDirectoryName: String = "facs" // facsimile viewers
 
   val documentsDirectoryName: String = "documents" // wrappers for TEI XML
@@ -86,47 +85,89 @@ object CollectionObject {
       document.tei.getAbstract
         // Ignoring the titles:          .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
         .getOrElse(Seq.empty)
-        .map(XmlUtil.removeNamespace)
+        .map(Xml.removeNamespace)
     }),
 
     Table.Column("Дата", "date", { document: Document =>
-      TeiUtil.textNode(document.tei.creationDate.map(_.when).getOrElse(""))
+      Xml.textNode(document.tei.creationDate.map(_.when).getOrElse(""))
     }),
 
     Table.Column("Кто", "author", { document: Document =>
-      val authors = document.tei.titleStmt.authors.map(_.xml).flatMap(_.map(XmlUtil.removeNamespace))
-      TeiUtil.multi(authors)
+      val authors = document.tei.titleStmt.authors.map(_.xml).flatMap(_.map(Xml.removeNamespace))
+      multi(authors)
     }),
 
     Table.Column("Кому", "addressee",  { document =>
-      document.tei.addressee.fold[Seq[Node]](TeiUtil.textNode(""))(addressee =>
+      document.tei.addressee.fold[Seq[Node]](Xml.textNode(""))(addressee =>
         <persName ref={addressee.ref.orNull}>{addressee.name}</persName>)
     }),
 
     Table.Column("Язык", "language", { document: Document =>
       val translations: Seq[Elem] =
         for (teiHolder <- document.by.get.stores.filter(_.language.isDefined))
-        yield Site.ref(DocumentObject.documentUrl(collection, teiHolder.name), teiHolder.language.get)
+        yield Ref.toXml(DocumentObject.documentUrl(collection, teiHolder.name), teiHolder.language.get)
       val language: Option[String] = document.tei.languages.map(_.ident).headOption
         .orElse(document.tei.text.lang)
-      Seq(TeiUtil.textNode(language.getOrElse("?"))) ++ translations
+      Seq(Xml.textNode(language.getOrElse("?"))) ++ translations
     }),
 
     Table.Column("Документ", "document", { document: Document =>
-      Site.ref(DocumentObject.documentUrl(collection, document.name), document.name)
+      Ref.toXml(DocumentObject.documentUrl(collection, document.name), document.name)
     }),
 
     Table.Column("Страницы", "pages", { document: Document =>
       for (page <- document.pages(collection.value.pageType))
-      yield Site.ref(Site.addPart(DocumentObject.documentUrl(collection, document.name), s"p${page.n}"), page.displayName,
-        Some(if (page.isPresent) "page" else "missing-page"))
+      yield Ref.toXml(
+        target = DocumentObject.pageUrl(collection, document.name, page),
+        text = page.displayName,
+        rendition = Some(Page.pageRendition(page.pb.isMissing))
+      )
     }),
 
     Table.Column("Расшифровка", "transcriber", { document: Document =>
       val transcribers = document.tei.titleStmt.editors
         .filter(_.role.contains("transcriber")).flatMap(_.persName)
-        .map(transcriber => XmlUtil.removeNamespace(EntityReference.toXml(transcriber)))
-      TeiUtil.multi(transcribers)
+        .map(transcriber => Xml.removeNamespace(EntityReference.toXml(transcriber)))
+      multi(transcribers)
     })
   )
+
+  private def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
+    case Nil => Nil
+    case n :: Nil => Seq(n)
+    case n :: ns if n.isInstanceOf[Elem] => Seq(n, Xml.textNode(", ")) ++ multi(ns)
+    case n :: ns => Seq(n) ++ multi(ns)
+    case n => n
+  }
+
+  // TODO this yuck is temporary :)
+
+  def collectionReference(collection: WithPath[Collection]): String =
+    collection.value.names.name
+
+  def collectionTitle(collection: WithPath[Collection]): Seq[Node] =
+    collection.value.title.fold[Seq[Node]](Xml.textNode(collectionReference(collection)))(_.xml)
+
+  def collectionDescription(collection: WithPath[Collection]): Seq[Node] =
+    Seq(<span>{collection.value.storeAbstract.get.xml}</span>) ++
+      RawXml.getXml(collection.value.body)
+
+  def collectionName(collection: WithPath[Collection]): String =
+    Site.fileName(collection.value)
+
+  def collectionArchive(collection: WithPath[Collection]): Option[String] = {
+    val reference = collectionReference(collection)
+    val space = reference.lastIndexOf(' ')
+    if (space == -1) None else Some(reference.substring(0, space))
+  }
+
+  def collectionXml(collection: WithPath[Collection]): Elem = {
+    val url = CollectionObject.teiWrapperUrl(collection)
+    // If I do this, parts of the line click to the names... {ref(url, collectionViewer, textNode(collectionReference(collection) + ": ") ++ collectionTitle(collection))}<lb/>
+    <item>
+      {Ref.toXml(url, collectionReference(collection) + ": " +
+      Xml.toString(collectionTitle(collection)))}<lb/>
+      <abstract>{collection.value.storeAbstract.get.xml}</abstract>
+    </item>
+  }
 }

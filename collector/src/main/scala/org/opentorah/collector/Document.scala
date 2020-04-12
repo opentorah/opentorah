@@ -30,10 +30,7 @@ final class Document(
     teiHolders.find(_.name == documentName)
 
   def pages(pageType: Page.Type): Seq[Page] =
-    for (pb <- tei.pbs) yield pageType(
-      n = pb.n,
-      facs = pb.facs
-    )
+    for (pb <- tei.pbs) yield pageType(pb)
 }
 
 object Document {

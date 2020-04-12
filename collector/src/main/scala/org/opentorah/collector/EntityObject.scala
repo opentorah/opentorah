@@ -2,12 +2,12 @@ package org.opentorah.collector
 
 import org.opentorah.entity.{Entity, EntityReference}
 import org.opentorah.store.{EntityHolder, Store, WithPath}
-import org.opentorah.tei.Tei
+import org.opentorah.tei.{Ref, Tei}
 import org.opentorah.util.{Collections, Files}
 import scala.xml.Elem
 
 final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(site) {
-  override def viewer: String = NamesObject.namesViewer
+  override def viewer: String = NamesObject.viewer
 
   override protected def urlPrefix: Seq[String] = EntityObject.urlPrefix
 
@@ -31,7 +31,7 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
           case collection: Collection => None // Some(collectionUrl(collection)) when grouping is adjusted?
           case _ => None
         }
-        url.map(url => Site.ref(url, sourceStore.names.name))
+        url.map(url => Ref.toXml(url, sourceStore.names.name))
       }
 
       result.flatten
@@ -47,18 +47,18 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
     val bySource: Seq[(String, Seq[WithPath[EntityReference]])] =
       notFromNames
         .filter(reference => (reference.path.length >=3) && reference.path.init.init.last.store.isInstanceOf[Collection])
-        .groupBy(Site.referenceCollectionName).toSeq.sortBy(_._1)
+        .groupBy(EntityObject.referenceCollectionName).toSeq.sortBy(_._1)
 
     <p rendition="mentions">
-      {Site.ref(NamesObject.entityInTheListUrl(id), "[...]")}
+      {Ref.toXml(NamesObject.entityInTheListUrl(id), "[...]")}
       {if (fromEntities.isEmpty) Seq.empty else {
       <l>
         <emph>{NamesObject.title}:</emph>
         {
         val result = for (source <- Collections.removeConsecutiveDuplicates(fromEntities.map(_.path))) yield {
           val entityHolder: EntityHolder = source.last.store.asInstanceOf[EntityHolder]
-          Site.ref(
-            url = EntityObject.teiWrapperUrl(entityHolder.entity),
+          Ref.toXml(
+            target = EntityObject.teiWrapperUrl(entityHolder.entity),
             text = entityHolder.names.name
           )
         }
@@ -74,9 +74,9 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
 
 object EntityObject {
 
-  val namesDirectoryName: String = "names"
+  val directoryName: String = "names"
 
-  private val urlPrefix: Seq[String] = Seq(namesDirectoryName)
+  private val urlPrefix: Seq[String] = Seq(directoryName)
 
   private def fileName(entity: Entity): String = entity.id.get
 
@@ -87,4 +87,7 @@ object EntityObject {
       val (fileName: String, extension: Option[String]) = Files.nameAndExtension(parts.head)
       site.findByRef(fileName).flatMap(entity => SimpleSiteObject.resolve(extension, new EntityObject(site, entity)))
     }
+
+  def referenceCollectionName(reference: WithPath[EntityReference]): String =
+    reference.path.init.init.last.store.names.name
 }

@@ -1,24 +1,25 @@
 package org.opentorah.collector
 
 import org.opentorah.entity.{EntitiesList, EntityName}
-import org.opentorah.tei.Tei
+import org.opentorah.tei.{Ref, Tei}
+import org.opentorah.util.Files
 import scala.xml.{Elem, Node}
 
 final class NamesObject(site: Site) extends SimpleSiteObject(site) {
-  override def viewer: String = NamesObject.namesViewer
+  override def viewer: String = NamesObject.viewer
 
   override protected def fileName: String = NamesObject.fileName
 
   override protected def tei: Tei = {
     val nonEmptyLists: Seq[EntitiesList] = site.entitiesLists.filterNot(_.isEmpty)
     val listOfLists: Seq[Node] =
-      <p>{for (list <- nonEmptyLists) yield <l>{Site.ref(NamesObject.entityInTheListUrl(list.id), list.head)}</l>}</p>
+      <p>{for (list <- nonEmptyLists) yield <l>{Ref.toXml(NamesObject.entityInTheListUrl(list.id), list.head)}</l>}</p>
 
     def toXml(value: EntitiesList): Elem =
       <list xml:id={value.id} role={value.role.orNull}>
         <head>{value.head}</head>
         {for (entity <- value.entities) yield {
-        <l>{Site.ref(EntityObject.teiWrapperUrl(entity), EntityName.toXml(entity.names.head))}</l>
+        <l>{Ref.toXml(EntityObject.teiWrapperUrl(entity), EntityName.toXml(entity.names.head))}</l>
       }}
       </list>
         .copy(label = value.entityType.listElement)
@@ -35,7 +36,7 @@ object NamesObject {
 
   val title: String = "Имена"
 
-  val namesViewer: String = "namesViewer"
+  val viewer: String = "namesViewer"
 
-  def entityInTheListUrl(id: String): Seq[String] = Site.addPart(Seq(fileName + ".html"), id)
+  def entityInTheListUrl(id: String): Seq[String] = Files.addPart(Seq(fileName + ".html"), id)
 }
