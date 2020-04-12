@@ -1,19 +1,16 @@
 package org.opentorah.collector
 
-import org.opentorah.store.{Binding, By, Path, Store, WithPath}
+import org.opentorah.store.{Binding, By, Path, Selector, Store, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.xml.RawXml
 import scala.xml.{Elem, Node}
 
-final class HierarchyObject(site: Site, path: Path, store: Store) extends SiteObject(site) {
+final class HierarchyObject(site: Site, path: Path, store: Store) extends SimpleSiteObject(site) {
   override def viewer: String = CollectionObject.collectionViewer
 
-  protected def teiUrl: Seq[String] = url("index.xml")
+  override protected def fileName: String = HierarchyObject.fileName
 
-  protected def teiWrapperUrl: Seq[String] = url("index.html")
-
-  private def url(file: String): Seq[String] =
-    HierarchyObject.hierarchyDirectoryName +: HierarchyObject.segments(path) :+ file
+  override protected def urlPrefix: Seq[String] = HierarchyObject.urlPrefix(path)
 
   // TODO clean up:
   protected def tei: Tei = {
@@ -27,11 +24,12 @@ final class HierarchyObject(site: Site, path: Path, store: Store) extends SiteOb
             val subStore = storeX.asInstanceOf[Store]  // TODO get rid of the cast!!!
             val title: Seq[Node] = RawXml.getXml(subStore.title)
             val titlePrefix: Seq[Node] = Site.textNode(Site.getName(subStore.names) + (if (title.isEmpty) "" else ": "))
+            // TODO the path in the call to urlPrefix is not really correct...
             <item>
               {Site.ref(
               url =
-                if (subStore.isInstanceOf[Collection]) Seq(CollectionObject.collectionsDirectoryName, Site.fileName(subStore))
-                else HierarchyObject.path2url(path :+ by.selector.bind(subStore)),
+                if (subStore.isInstanceOf[Collection]) CollectionObject.urlPrefix(WithPath(path, subStore.asInstanceOf[Collection]))
+                else HierarchyObject.urlPrefix(path :+ by.selector.bind(subStore)),
               text = titlePrefix ++ title
             )}</item>
           }}
@@ -45,15 +43,17 @@ final class HierarchyObject(site: Site, path: Path, store: Store) extends SiteOb
 
 object HierarchyObject {
 
+  private def urlPrefix(path: Path): Seq[String] = hierarchyDirectoryName +: segments(path)
+
+  val fileName: String = "index"
+
   val hierarchyDirectoryName: String = "by"
 
   // TODO I'd like to be able to start the Path with a top-level store in there (using "top" pseudo-selector?).
   def resolve(site: Site, path: Path, store: Store, parts: Seq[String]): Option[SiteFile] =
-    if (parts.isEmpty) Some(new HierarchyObject(site, path, store).teiWrapperFile) else parts.head match {
-      case "index.html" => Some(new HierarchyObject(site, path, store).teiWrapperFile)
-      case "index.xml" => Some(new HierarchyObject(site, path, store).teiFile)
-      case _ =>
-        val selector = store.by.get.selector
+    if (parts.isEmpty) Some(new HierarchyObject(site, path, store).teiWrapperFile) else
+      SimpleSiteObject.resolve(Some(parts.head), new HierarchyObject(site, path, store)).orElse {
+        val selector: Selector = store.by.get.selector
         val selectorName: String = parts.head
         if (selector.names.find(selectorName).isEmpty) None else store match {
           case collection: Collection =>
@@ -67,7 +67,7 @@ object HierarchyObject {
             }
           }
         }
-    }
+      }
 
   // TODO move into general area
   private def storeHeader(path: Path, store: Store): Seq[Node] = {
@@ -89,7 +89,7 @@ object HierarchyObject {
   private def pathLinks(path: Path): Seq[Elem] = for (ancestor <- path.path.inits.toSeq.reverse.tail) yield {
     val binding: Binding = ancestor.last
     val link: Elem = Site.ref(
-      url = path2url(Path(ancestor)),
+      url = urlPrefix(Path(ancestor)),
       text = Site.getName(binding.store.names)
     )
     val title: Seq[Node] = RawXml.getXml(binding.store.title)
@@ -98,10 +98,7 @@ object HierarchyObject {
   }
 
   // TODO move into general area
-  def path2url(path: Path): Seq[String] = hierarchyDirectoryName +: segments(path)
-
-  // TODO move into general area
-  def segments(path: Path): Seq[String] =
+  private def segments(path: Path): Seq[String] =
     path.path.flatMap(binding => Seq(binding.selector.names, binding.store.names))
       .map(Site.getName)
       .map(_.replace(' ', '_'))

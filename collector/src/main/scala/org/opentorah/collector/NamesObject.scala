@@ -4,12 +4,10 @@ import org.opentorah.entity.{EntitiesList, EntityName}
 import org.opentorah.tei.Tei
 import scala.xml.{Elem, Node}
 
-final class NamesObject(site: Site) extends SiteObject(site) {
+final class NamesObject(site: Site) extends SimpleSiteObject(site) {
   override def viewer: String = NamesObject.namesViewer
 
-  override protected def teiUrl: Seq[String] = Seq(NamesObject.namesFileName + ".xml")
-
-  override protected def teiWrapperUrl: Seq[String] = Seq(NamesObject.namesFileName + ".html")
+  override protected def fileName: String = NamesObject.fileName
 
   override protected def tei: Tei = {
     val nonEmptyLists: Seq[EntitiesList] = site.entitiesLists.filterNot(_.isEmpty)
@@ -25,19 +23,19 @@ final class NamesObject(site: Site) extends SiteObject(site) {
       </list>
         .copy(label = value.entityType.listElement)
 
-    Tei(<head>{NamesObject.namesHead}</head> ++ listOfLists ++ nonEmptyLists.flatMap(toXml))
+    Tei(<head>{NamesObject.title}</head> ++ listOfLists ++ nonEmptyLists.flatMap(toXml))
   }
 
-  override protected def yaml: Seq[(String, String)] = Seq("title" -> NamesObject.namesHead)
+  override protected def yaml: Seq[(String, String)] = Seq("title" -> NamesObject.title)
 }
 
 object NamesObject {
 
-  val namesFileName: String = "names"
+  val fileName: String = "names"
 
-  val namesHead: String = "Имена"
+  val title: String = "Имена"
 
   val namesViewer: String = "namesViewer"
 
-  def entityInTheListUrl(id: String): Seq[String] = Seq(s"$namesFileName.html#$id")
+  def entityInTheListUrl(id: String): Seq[String] = Site.addPart(Seq(fileName + ".html"), id)
 }
