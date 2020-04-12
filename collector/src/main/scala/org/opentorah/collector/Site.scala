@@ -93,7 +93,7 @@ object Site {
     collection.value.names.name
 
   def collectionTitle(collection: WithPath[Collection]): Seq[Node] =
-    collection.value.title.fold[Seq[Node]](textNode(collectionReference(collection)))(_.xml)
+    collection.value.title.fold[Seq[Node]](TeiUtil.textNode(collectionReference(collection)))(_.xml)
 
   def collectionDescription(collection: WithPath[Collection]): Seq[Node] =
     Seq(<span>{collection.value.storeAbstract.get.xml}</span>) ++
@@ -192,7 +192,7 @@ object Site {
     // If I do this, parts of the line click to the names... {ref(url, collectionViewer, textNode(collectionReference(collection) + ": ") ++ collectionTitle(collection))}<lb/>
     <item>
       {ref(url, collectionReference(collection) + ": " +
-        spacedText(collectionTitle(collection)))}<lb/>
+      TeiUtil.spacedText(collectionTitle(collection)))}<lb/>
       <abstract>{collection.value.storeAbstract.get.xml}</abstract>
     </item>
   }
@@ -210,22 +210,8 @@ object Site {
 
   def mkUrl(segments: Seq[String]): String = segments.mkString("/", "/", "")
 
-  private def refRoleRewriter(site: Site): Elem => Elem = elem =>
-    if (elem.label != "ref") elem else {
-      elem.attribute("target").map(_.text).fold(throw new IllegalArgumentException(s"empty target: $elem")) { target =>
-        if (!target.startsWith("/")) elem else {
-          val roleShouldBe: Option[String] = site.resolve(target).map(_.siteObject.viewer)
-          val role: Option[String] = elem.attribute("role").map(_.text)
-          if (roleShouldBe.isEmpty) println(s"did not resolve: $target")
-          if (roleShouldBe.isDefined && role.isDefined && (role != roleShouldBe)) println(s"role discrepancy")
-          if ((role == roleShouldBe) || roleShouldBe.isEmpty || role.isDefined) elem
-          else elem % scala.xml.Attribute(None, "role", textNode(roleShouldBe.get), scala.xml.Null)
-        }
-      }
-    }
-
   def processTei(elem: Elem, site: Site): Elem =
-    XmlUtil.rewriteElements(elem, refRoleRewriter(site))
+    XmlUtil.rewriteElements(elem, TeiUtil.refRoleRewriter(site))
 
   def withYaml(
     yaml: Seq[(String, String)],
@@ -253,32 +239,4 @@ object Site {
       yaml = Seq("layout" -> "page", "title" -> title),
       content
     ))
-
-  def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
-    case Nil => Nil
-    case n :: Nil => Seq(n)
-    case n :: ns if n.isInstanceOf[Elem] => Seq(n, textNode(", ")) ++ multi(ns)
-    case n :: ns => Seq(n) ++ multi(ns)
-    case n => n
-  }
-
-  def textNode(text: String): Node = new scala.xml.Text(text)
-
-  def spacedText(nodes: Seq[Node]): String = nodes.map(spacedText).mkString("")
-  def spacedText(node: Node): String = {
-    val result = node match {
-      case elem: Elem => (elem.child map (_.text)).mkString(" ")
-      case node: Node => node.text
-    }
-    result
-      .replace('\n', ' ')
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-  }
 }
