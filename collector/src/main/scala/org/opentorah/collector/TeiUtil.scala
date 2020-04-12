@@ -3,8 +3,11 @@ package org.opentorah.collector
 import org.opentorah.tei.{Availability, CalendarDesc, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher,
   SourceDesc, Tei}
 import org.opentorah.xml.PaigesPrettyPrinter
+import scala.xml.{Elem, Node}
 
 object TeiUtil {
+
+  val xmlHeader: String = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n"
 
   val teiPrettyPrinter: PaigesPrettyPrinter = new PaigesPrettyPrinter(
     width = 120,
@@ -77,5 +80,56 @@ object TeiUtil {
 //      profileDesc = Some(tei.teiHeader.profileDesc.get.copy(calendarDesc = None))
 //    ))
     tei
+  }
+
+  def refRoleRewriter(site: Site): Elem => Elem = elem =>
+    if (elem.label != "ref") elem else {
+      elem.attribute("target").map(_.text).fold(throw new IllegalArgumentException(s"empty target: $elem")) { target =>
+        if (!target.startsWith("/")) elem else {
+          val roleShouldBe: Option[String] = site.resolve(target).map(_.siteObject.viewer)
+          val role: Option[String] = elem.attribute("role").map(_.text)
+          if (roleShouldBe.isEmpty) println(s"did not resolve: $target")
+          if (roleShouldBe.isDefined && role.isDefined && (role != roleShouldBe)) println(s"role discrepancy")
+          if ((role == roleShouldBe) || roleShouldBe.isEmpty || role.isDefined) elem
+          else elem % scala.xml.Attribute(None, "role", textNode(roleShouldBe.get), scala.xml.Null)
+        }
+      }
+    }
+
+  def sourcePbsRewriter(collectionName: String): Elem => Elem = elem =>
+    if (elem.label != "pb") elem else {
+      val n: String = elem.attribute("n").map(_.text).get
+      val facs: Option[String] = elem.attribute("facs").map(_.text)
+      val shouldBe = "http://facsimiles.alter-rebbe.org/facsimiles/" + collectionName + "/" + n + ".jpg"
+      if (facs.isDefined && !facs.contains(shouldBe)) println(s"shouldBe $shouldBe but got $facs")
+      elem
+    }
+
+  def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
+    case Nil => Nil
+    case n :: Nil => Seq(n)
+    case n :: ns if n.isInstanceOf[Elem] => Seq(n, textNode(", ")) ++ multi(ns)
+    case n :: ns => Seq(n) ++ multi(ns)
+    case n => n
+  }
+
+  def textNode(text: String): Node = new scala.xml.Text(text)
+
+  def spacedText(nodes: Seq[Node]): String = nodes.map(spacedText).mkString("")
+  def spacedText(node: Node): String = {
+    val result = node match {
+      case elem: Elem => (elem.child map (_.text)).mkString(" ")
+      case node: Node => node.text
+    }
+    result
+      .replace('\n', ' ')
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
+      .replace("  ", " ")
   }
 }

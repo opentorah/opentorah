@@ -23,7 +23,7 @@ final class HierarchyObject(site: Site, path: Path, store: Store) extends Simple
             {by.stores.map { storeX =>
             val subStore = storeX.asInstanceOf[Store]  // TODO get rid of the cast!!!
             val title: Seq[Node] = RawXml.getXml(subStore.title)
-            val titlePrefix: Seq[Node] = Site.textNode(Site.getName(subStore.names) + (if (title.isEmpty) "" else ": "))
+            val titlePrefix: Seq[Node] = TeiUtil.textNode(Site.getName(subStore.names) + (if (title.isEmpty) "" else ": "))
             // TODO the path in the call to urlPrefix is not really correct...
             <item>
               {Site.ref(
@@ -75,7 +75,7 @@ object HierarchyObject {
     val isTop: Boolean = path.isEmpty
     val title: Seq[Node] = RawXml.getXml(store.title)
     val titlePrefix: Seq[Node] =
-      if (isTop) Seq.empty else Site.textNode(
+      if (isTop) Seq.empty else TeiUtil.textNode(
         Site.getName(path.last.selector.names) + " " + Site.getName(store.names) + (if (title.isEmpty) "" else ": ")
       )
 
@@ -93,7 +93,7 @@ object HierarchyObject {
       text = Site.getName(binding.store.names)
     )
     val title: Seq[Node] = RawXml.getXml(binding.store.title)
-    val titlePrefix: Seq[Node] = if (title.isEmpty) Seq.empty else Seq(Site.textNode(": "))
+    val titlePrefix: Seq[Node] = if (title.isEmpty) Seq.empty else Seq(TeiUtil.textNode(": "))
     <l>{Site.getName(binding.selector.names)} {link ++ titlePrefix ++ title}</l>
   }
 

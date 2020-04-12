@@ -3,10 +3,10 @@ package org.opentorah.collector
 import java.io.File
 import java.net.URL
 import org.opentorah.entity.{Entity, EntityReference}
-import org.opentorah.store.{EntityHolder, Store, WithPath}
+import org.opentorah.store.{Store, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
-import org.opentorah.xml.{From, PaigesPrettyPrinter}
+import org.opentorah.xml.{From, PaigesPrettyPrinter, XmlUtil}
 import scala.xml.Elem
 
 object Main {
@@ -34,6 +34,8 @@ object Main {
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
 
     println("Pretty-printing store.")
+    for (entityHolder <- store.entities.get.by.get.stores)
+      prettyPrint(entityHolder, TeiUtil.teiPrettyPrinter, Entity.toXml(entityHolder.entity.copy(id = None)))
     prettyPrint(store, TeiUtil.teiPrettyPrinter)
 
     val site = new Site(store, references)
@@ -45,20 +47,27 @@ object Main {
   }
 
   private def prettyPrint(store: Store, prettyPrinter: PaigesPrettyPrinter): Unit = {
-    for (fromUrl <- store.urls.fromUrl) if (Files.isFile(fromUrl)) TeiUtil.teiPrettyPrinter.writeXml(
+    prettyPrint(store, prettyPrinter, Store.parsable.toXml(store.asInstanceOf[Store.FromElement].element))
+
+    store match {
+      case collection: Collection =>
+        for (by <- collection.by; document <- by.stores; by <- document.by; teiHolder <- by.stores) {
+          val elem = XmlUtil.rewriteElements(
+            Tei.toXml(teiHolder.tei),
+            TeiUtil.sourcePbsRewriter(Site.fileName(collection))
+          )
+          prettyPrint(teiHolder, prettyPrinter, elem)
+        }
+      case _ =>
+        for (by <- store.by; store <- by.stores) prettyPrint(store.asInstanceOf[Store], prettyPrinter)
+    }
+  }
+
+  private def prettyPrint(store: Store, prettyPrinter: PaigesPrettyPrinter, toXml: => Elem): Unit =
+    for (fromUrl <- store.urls.fromUrl) if (Files.isFile(fromUrl)) Files.write(
       file = Files.url2file(fromUrl),
-      elem = toXml(store)
+      content = TeiUtil.xmlHeader + prettyPrinter.render(toXml) + "\n"
     )
-
-    for (entities <- store.entities) prettyPrint(entities, prettyPrinter)
-    for (by <- store.by; store <- by.stores) prettyPrint(store.asInstanceOf[Store], prettyPrinter)
-  }
-
-  private def toXml(store: Store): Elem = store match {
-    case fromElement: Store.FromElement => Store.parsable.toXml(fromElement.element)
-    case entityHolder: EntityHolder => Entity.toXml(entityHolder.entity.copy(id = None))
-    case teiHolder: TeiHolder => Tei.toXml(TeiUtil.removeCommon(teiHolder.tei))
-  }
 
   private def checkReference(reference: EntityReference,  findByRef: String => Option[Entity]): Option[String] = {
     val name = reference.name

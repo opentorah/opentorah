@@ -14,7 +14,7 @@ abstract class SiteObject(val site: Site) {
 
     override def content: String = {
       val elem: Elem = Site.processTei(Tei.toXml(teiTransformer(tei)), siteObject.site)
-      """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
+      TeiUtil.xmlHeader +
       TeiUtil.teiPrettyPrinter.render(elem) +  "\n"
     }
   }

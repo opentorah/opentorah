@@ -90,16 +90,16 @@ object CollectionObject {
     }),
 
     Table.Column("Дата", "date", { document: Document =>
-      Site.textNode(document.tei.creationDate.map(_.when).getOrElse(""))
+      TeiUtil.textNode(document.tei.creationDate.map(_.when).getOrElse(""))
     }),
 
     Table.Column("Кто", "author", { document: Document =>
       val authors = document.tei.titleStmt.authors.map(_.xml).flatMap(_.map(XmlUtil.removeNamespace))
-      Site.multi(authors)
+      TeiUtil.multi(authors)
     }),
 
     Table.Column("Кому", "addressee",  { document =>
-      document.tei.addressee.fold[Seq[Node]](Site.textNode(""))(addressee =>
+      document.tei.addressee.fold[Seq[Node]](TeiUtil.textNode(""))(addressee =>
         <persName ref={addressee.ref.orNull}>{addressee.name}</persName>)
     }),
 
@@ -109,7 +109,7 @@ object CollectionObject {
         yield Site.ref(DocumentObject.documentUrl(collection, teiHolder.name), teiHolder.language.get)
       val language: Option[String] = document.tei.languages.map(_.ident).headOption
         .orElse(document.tei.text.lang)
-      Seq(Site.textNode(language.getOrElse("?"))) ++ translations
+      Seq(TeiUtil.textNode(language.getOrElse("?"))) ++ translations
     }),
 
     Table.Column("Документ", "document", { document: Document =>
@@ -126,7 +126,7 @@ object CollectionObject {
       val transcribers = document.tei.titleStmt.editors
         .filter(_.role.contains("transcriber")).flatMap(_.persName)
         .map(transcriber => XmlUtil.removeNamespace(EntityReference.toXml(transcriber)))
-      Site.multi(transcribers)
+      TeiUtil.multi(transcribers)
     })
   )
 }
