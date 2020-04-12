@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import java.net.URL
-import org.opentorah.util.Files
+import org.opentorah.util.{Files, Xml}
 import org.opentorah.xml.{Attribute, PaigesPrettyPrinter, Parser, Text, ToXml}
 import zio.ZIO
 import scala.xml.Elem
@@ -77,9 +77,9 @@ object By extends Component("by") {
 
         val fileNames: Seq[String] = if (!Files.isFile(directory)) Parser.parseDo(filesList.parse(list)) else {
           val result: Seq[String] = Files.filesWithExtensions(Files.url2file(directory), "xml").sorted
-          if (Files.isFile(list)) new PaigesPrettyPrinter().writeXml(
+          if (Files.isFile(list)) Files.write(
             file = Files.url2file(list),
-            elem = filesList.toXml(result)
+            content = Xml.xmlHeader + new PaigesPrettyPrinter().render(filesList.toXml(result)) + "\n"
           )
           result
         }

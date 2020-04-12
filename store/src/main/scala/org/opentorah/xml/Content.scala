@@ -1,5 +1,6 @@
 package org.opentorah.xml
 
+import org.opentorah.util.Xml
 import scala.xml.{Elem, Node}
 import zio.IO
 
@@ -60,18 +61,18 @@ private[xml] object Content {
   }
 
   private def getNextElementName(nodes: Seq[Node]): Option[String] =
-    nodes.dropWhile(XmlUtil.isWhitespace).headOption.flatMap {
+    nodes.dropWhile(Xml.isWhitespace).headOption.flatMap {
       case result: Elem => Some(result.label)
       case _ => None
     }
 
   val takeNextElement: Modifier[Option[Elem]] = {
-    case content@Elements(nextElementNumber, nodes) => IO.succeed {
+    case Elements(nextElementNumber, nodes) => IO.succeed {
       val (result: Option[Elem], newNodes: Seq[Node]) = takeNextElement(nodes)
       (Elements(nextElementNumber + (if (result.isEmpty) 0 else 1), newNodes), result)
     }
 
-    case content@Mixed(nextElementNumber, nodes) => IO.succeed {
+    case Mixed(nextElementNumber, nodes) => IO.succeed {
       val (result: Option[Elem], newNodes: Seq[Node]) = takeNextElement(nodes)
       (Mixed(nextElementNumber + (if (result.isEmpty) 0 else 1), newNodes), result)
     }
@@ -80,7 +81,7 @@ private[xml] object Content {
   }
 
   private def takeNextElement(nodes: Seq[Node]): (Option[Elem], Seq[Node]) = {
-    val noLeadingWhitespace = nodes.dropWhile(XmlUtil.isWhitespace)
+    val noLeadingWhitespace = nodes.dropWhile(Xml.isWhitespace)
     noLeadingWhitespace.headOption.fold[(Option[Elem], Seq[Node])]((None, nodes)) {
       case result: Elem => (Some(result), noLeadingWhitespace.tail)
       case _ => (None, nodes)
@@ -113,7 +114,7 @@ private[xml] object Content {
 
   private def takeAllElements(nodes: Seq[Node]): Option[Seq[Elem]] = {
     val (elements: Seq[Elem], nonElements: Seq[Node]) = partition(nodes)
-    val hasNonWhitespace: Boolean = nonElements.exists(node => !XmlUtil.isWhitespace(node))
+    val hasNonWhitespace: Boolean = nonElements.exists(node => !Xml.isWhitespace(node))
     if (hasNonWhitespace) None else Some(elements)
   }
 
@@ -126,10 +127,10 @@ private[xml] object Content {
       characters.fold[IO[Error, Unit]](ok)(characters => IO.fail(s"Unparsed characters: $characters"))
 
     case Elements(_, nodes) =>
-      if (nodes.forall(XmlUtil.isWhitespace)) ok else IO.fail(s"Unparsed elements: $nodes")
+      if (nodes.forall(Xml.isWhitespace)) ok else IO.fail(s"Unparsed elements: $nodes")
 
     case Mixed(_, nodes) =>
-      if (nodes.forall(XmlUtil.isWhitespace)) ok else IO.fail(s"Unparsed nodes: $nodes")
+      if (nodes.forall(Xml.isWhitespace)) ok else IO.fail(s"Unparsed nodes: $nodes")
   }
 
   private def partition(nodes: Seq[Node]): (Seq[Elem], Seq[Node]) = {

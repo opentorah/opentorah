@@ -1,6 +1,7 @@
 package org.opentorah.entity
 
-import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, ToXml, XmlUtil}
+import org.opentorah.util.Xml
+import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, ToXml}
 import scala.xml.{Elem, Node}
 
 final case class Entity private(
@@ -35,7 +36,7 @@ object Entity extends Parsable[Entity] with ToXml[Entity] {
     entityType,
     role,
     names,
-    content = content.map(XmlUtil.removeNamespace),
+    content = content.map(Xml.removeNamespace),
   )
 
   override def toXml(value: Entity): Elem = {

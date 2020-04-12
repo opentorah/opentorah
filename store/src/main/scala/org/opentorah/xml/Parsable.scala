@@ -1,6 +1,7 @@
 package org.opentorah.xml
 
 import java.net.URL
+import org.opentorah.util.Xml
 import zio.ZIO
 import scala.xml.{Elem, Node}
 
@@ -68,7 +69,7 @@ trait Parsable[A] {
   } yield result
 
   final def descendants(xml: Node): Seq[A] =
-    for (xml <- name2parser.keys.toSeq.flatMap(XmlUtil.descendants(xml, _)))
+    for (xml <- name2parser.keys.toSeq.flatMap(Xml.descendants(xml, _)))
     yield Parser.parseDo(parse(From.xml("descendants", xml)))
 }
 

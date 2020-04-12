@@ -1,7 +1,8 @@
 package org.opentorah.tei
 
 import org.opentorah.entity.{EntityReference, EntityType}
-import org.opentorah.xml.{ContentType, Element, ToXml, XmlUtil}
+import org.opentorah.util.Xml
+import org.opentorah.xml.{ContentType, Element, ToXml}
 import scala.xml.{Elem, Node}
 
 final case class Tei(
@@ -44,10 +45,12 @@ object Tei extends Element[Tei](
   )
 ) with ToXml[Tei] {
 
+  type Transformer = Tei => Tei
+
   override def toXml(value: Tei): Elem =
     <TEI xmlns="http://www.tei-c.org/ns/1.0">
-      {XmlUtil.removeNamespace(TeiHeader.toXml(value.teiHeader))}
-      {XmlUtil.removeNamespace(Text.toXml(value.text))}
+      {Xml.removeNamespace(TeiHeader.toXml(value.teiHeader))}
+      {Xml.removeNamespace(Text.toXml(value.text))}
     </TEI>
 
   def apply(body: Seq[Node]): Tei = new Tei(

@@ -56,4 +56,23 @@ object Files {
   def fileInDirectory(url: URL, fileName: String): URL = new URL(url, fileName)
 
   def isFile(url: URL): Boolean = url.getProtocol == "file"
+
+  def removePart(from: String): String = {
+    val sharp = from.indexOf('#')
+    if (sharp == -1) from else from.substring(0, sharp)
+  }
+
+  def addPart(url: Seq[String], part: String): Seq[String] =
+    url.init :+ (url.last + "#" + part)
+
+  def mkUrl(segments: Seq[String]): String = segments.mkString("/", "/", "")
+
+  @scala.annotation.tailrec
+  def file(directory: File, segments: Seq[String]): File =
+    if (segments.isEmpty) directory
+    else file(new File(directory, segments.head), segments.tail)
+
+  def spacesToUnderscores(what: String): String = what.replace(' ', '_')
+
+  def underscoresToSpaces(what: String): String = what.replace('_', ' ')
 }

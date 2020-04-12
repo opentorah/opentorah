@@ -1,7 +1,6 @@
 package org.opentorah.xml
 
-import java.io.File
-import org.opentorah.util.Files
+import org.opentorah.util.Xml
 import org.typelevel.paiges.Doc
 import scala.xml.{Elem, MetaData, NamespaceBinding, Node, SpecialNode, TopScope, Utility}
 
@@ -14,7 +13,7 @@ final class PaigesPrettyPrinter(
 ) {
   import PaigesPrettyPrinter.sbToString
 
-  private def isClingy(node: Node): Boolean = XmlUtil.isElement(node) && clingyElements.contains(node.label)
+  private def isClingy(node: Node): Boolean = Xml.isElement(node) && clingyElements.contains(node.label)
 
   def render(node: Node, pscope: NamespaceBinding = TopScope): String = fromNode(
     node,
@@ -95,12 +94,12 @@ final class PaigesPrettyPrinter(
     canBreakRight: Boolean
   ): (Seq[Doc], Boolean, Boolean, Boolean) = {
     val nodes: Seq[Node] = PaigesPrettyPrinter.atomize(Seq.empty, element.child)
-    val whitespaceLeft: Boolean = nodes.headOption.exists(XmlUtil.isWhitespace)
-    val whitespaceRight: Boolean = nodes.lastOption.exists(XmlUtil.isWhitespace)
-    val charactersLeft: Boolean = nodes.headOption.exists(node => XmlUtil.isAtom(node) && !XmlUtil.isWhitespace(node))
-    val charactersRight: Boolean = nodes.lastOption.exists(node => XmlUtil.isAtom(node) && !XmlUtil.isWhitespace(node))
+    val whitespaceLeft: Boolean = nodes.headOption.exists(Xml.isWhitespace)
+    val whitespaceRight: Boolean = nodes.lastOption.exists(Xml.isWhitespace)
+    val charactersLeft: Boolean = nodes.headOption.exists(node => Xml.isAtom(node) && !Xml.isWhitespace(node))
+    val charactersRight: Boolean = nodes.lastOption.exists(node => Xml.isAtom(node) && !Xml.isWhitespace(node))
     val chunks: Seq[Seq[Node]] = chunkify(Seq.empty, nodes)
-    val noAtoms: Boolean = chunks.forall(_.forall(node => !XmlUtil.isAtom(node)))
+    val noAtoms: Boolean = chunks.forall(_.forall(node => !Xml.isAtom(node)))
     val result = fromChunks(
       chunks,
       element.scope,
@@ -147,10 +146,10 @@ final class PaigesPrettyPrinter(
 
   @scala.annotation.tailrec
   private def chunkify(result: Seq[Seq[Node]], nodes: Seq[Node]): Seq[Seq[Node]] = if (nodes.isEmpty) Seq.empty else {
-    val (chunk: Seq[Node], tail: Seq[Node]) = nodes.dropWhile(XmlUtil.isWhitespace).span(node => !XmlUtil.isWhitespace(node))
+    val (chunk: Seq[Node], tail: Seq[Node]) = nodes.dropWhile(Xml.isWhitespace).span(node => !Xml.isWhitespace(node))
     if (chunk.isEmpty) result else {
       val newResult = result ++ splitChunk(chunk)
-      if (tail.forall(XmlUtil.isWhitespace)) newResult
+      if (tail.forall(Xml.isWhitespace)) newResult
       else chunkify(newResult, tail)
     }
   }
@@ -171,19 +170,12 @@ final class PaigesPrettyPrinter(
       if (tail.isEmpty) result :+ newCurrent else {
         val next = tail.head
 
-        if (XmlUtil.isText(head) || XmlUtil.isText(next) || isClingy(next))
+        if (Xml.isText(head) || Xml.isText(next) || isClingy(next))
           splitChunk(result, newCurrent, tail)
         else
           splitChunk(result :+ newCurrent, Seq.empty, tail)
       }
     }
-
-  def writeXml(file: File, elem: Elem): Unit = Files.write(
-    file,
-    content = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n" +
-    render(elem) +
-    "\n"
-  )
 }
 
 object PaigesPrettyPrinter {
@@ -208,7 +200,7 @@ object PaigesPrettyPrinter {
 
   @scala.annotation.tailrec
   private def atomize(result: Seq[Node], nodes: Seq[Node]): Seq[Node] = if (nodes.isEmpty) result else {
-    val (atoms: Seq[Node], tail: Seq[Node]) = nodes.span(XmlUtil.isText)
+    val (atoms: Seq[Node], tail: Seq[Node]) = nodes.span(Xml.isText)
 
     val newResult: Seq[Node] = if (atoms.isEmpty) result else {
       val text: String = atoms.map(_.asInstanceOf[scala.xml.Text].data).mkString("")
