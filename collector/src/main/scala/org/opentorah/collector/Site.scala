@@ -47,14 +47,14 @@ final class Site(store: Store, val references: Seq[WithPath[EntityReference]]) {
           case file if parts.tail.isEmpty  =>
               val (fileName: String, extension: Option[String]) = Files.nameAndExtension(file)
               fileName match {
-                case "index" =>
-                  SiteFile.resolve(extension, new IndexObject(this))
+                case IndexObject.fileName =>
+                  SimpleSiteObject.resolve(extension, new IndexObject(this))
 
                 case TreeIndexObject.collectionsFileName =>
-                  SiteFile.resolve(extension, new TreeIndexObject(this))
+                  SimpleSiteObject.resolve(extension, new TreeIndexObject(this))
 
-                case NamesObject.namesFileName =>
-                  SiteFile.resolve(extension, new NamesObject(this))
+                case NamesObject.fileName =>
+                  SimpleSiteObject.resolve(extension, new NamesObject(this))
 
                 case _ => None
               }

@@ -1,6 +1,6 @@
 package org.opentorah.collector
 
-import org.opentorah.store.{Store, WithPath}
+import org.opentorah.store.WithPath
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
 import scala.xml.Elem
@@ -20,7 +20,7 @@ final class DocumentObject(
   private def facsUrl: Seq[String] = url(CollectionObject.facsDirectoryName, "html")
 
   private def url(directoryName: String, extension: String): Seq[String] =
-    CollectionObject.collectionUrl(collection) :+ directoryName :+ (teiHolder.name + "." + extension)
+    CollectionObject.urlPrefix(collection) :+ directoryName :+ (teiHolder.name + "." + extension)
 
   override protected def tei: Tei = teiHolder.tei
 
@@ -51,7 +51,8 @@ final class DocumentObject(
         <div class="facsimileViewer">
           <div class="facsimileScroller">
             {for (page: Page <- document.pages(collection.value.pageType).filter(_.isPresent); n = page.n) yield {
-            <a target={viewer} href={s"../${CollectionObject.documentsDirectoryName}/${document.name}.html#p$n"}>
+            val href: Seq[String] = DocumentObject.documentUrl(collection, document.name)
+            <a target={viewer} href={Site.mkUrl(Site.addPart(href, s"p$n"))}>
               <figure>
                 <img xml:id={s"p$n"} alt={s"facsimile for page $n"} src={page.facs.orNull}/>
                 <figcaption>{n}</figcaption>
@@ -73,8 +74,8 @@ object DocumentObject {
 
   val documentViewer: String = "documentViewer"
 
-  def documentUrl(collection: Store, documentName: String): Seq[String] =
-    Seq(CollectionObject.collectionsDirectoryName, Site.fileName(collection)) :+ CollectionObject.documentsDirectoryName :+ (documentName + ".html")
+  def documentUrl(collection: WithPath[Collection], documentName: String): Seq[String] =
+    CollectionObject.urlPrefix(collection) :+ CollectionObject.documentsDirectoryName :+ (documentName + ".html")
 
   def resolve(
     site: Site,

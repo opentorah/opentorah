@@ -7,12 +7,12 @@ import org.opentorah.util.Files
 import org.opentorah.xml.XmlUtil
 import scala.xml.{Elem, Node}
 
-final class CollectionObject(site: Site, collection: WithPath[Collection]) extends SiteObject(site) {
+final class CollectionObject(site: Site, collection: WithPath[Collection]) extends SimpleSiteObject(site) {
   override def viewer: String = CollectionObject.collectionViewer
 
-  override protected def teiUrl: Seq[String] = CollectionObject.teiUrl(collection)
+  override protected def urlPrefix: Seq[String] = CollectionObject.urlPrefix(collection)
 
-  override protected def teiWrapperUrl: Seq[String] = CollectionObject.teiWrapperUrl(collection)
+  override protected def fileName: String = CollectionObject.fileName
 
   override protected def style: Option[String] = Some("wide")
 
@@ -42,6 +42,14 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
 
 object CollectionObject {
 
+  val fileName: String = "index"
+
+  def urlPrefix(collection: WithPath[Collection]): Seq[String] =
+    Seq(CollectionObject.collectionsDirectoryName, Site.fileName(collection.value))
+
+  def teiWrapperUrl(collection: WithPath[Collection]): Seq[String] =
+    urlPrefix(collection) :+ (fileName + ".html")
+
   // Note: also hard-coded in 'index.xml'!
   val collectionsDirectoryName: String = "collections"
 
@@ -53,15 +61,6 @@ object CollectionObject {
   val documentsDirectoryName: String = "documents" // wrappers for TEI XML
 
   val teiDirectoryName: String = "tei"
-
-  def collectionUrl(collection: WithPath[Collection]): Seq[String] =
-    Seq(CollectionObject.collectionsDirectoryName, Site.fileName(collection.value))
-
-  def teiUrl(collection: WithPath[Collection]): Seq[String] =
-    collectionUrl(collection) :+ "index.xml"
-
-  def teiWrapperUrl(collection: WithPath[Collection]): Seq[String] =
-    collectionUrl(collection) :+ "index.html"
 
   def resolve(site: Site, parts: Seq[String]): Option[SiteFile] = if (parts.isEmpty) None else
     site.findCollectionByName(parts.head).flatMap { collection =>
@@ -76,8 +75,8 @@ object CollectionObject {
 
         case file => if (parts.tail.tail.nonEmpty) None else {
           val (fileName: String, extension: Option[String]) = Files.nameAndExtension(file)
-          if (fileName != "index") None
-          else SiteFile.resolve(extension, new CollectionObject(site, collection))
+          if (fileName != fileName) None
+          else SimpleSiteObject.resolve(extension, new CollectionObject(site, collection))
         }
       }
     }
@@ -107,19 +106,19 @@ object CollectionObject {
     Table.Column("Язык", "language", { document: Document =>
       val translations: Seq[Elem] =
         for (teiHolder <- document.by.get.stores.filter(_.language.isDefined))
-        yield Site.ref(DocumentObject.documentUrl(collection.value, teiHolder.name), teiHolder.language.get)
+        yield Site.ref(DocumentObject.documentUrl(collection, teiHolder.name), teiHolder.language.get)
       val language: Option[String] = document.tei.languages.map(_.ident).headOption
         .orElse(document.tei.text.lang)
       Seq(Site.textNode(language.getOrElse("?"))) ++ translations
     }),
 
     Table.Column("Документ", "document", { document: Document =>
-      Site.ref(DocumentObject.documentUrl(collection.value, document.name), document.name)
+      Site.ref(DocumentObject.documentUrl(collection, document.name), document.name)
     }),
 
     Table.Column("Страницы", "pages", { document: Document =>
       for (page <- document.pages(collection.value.pageType))
-      yield Site.ref(Site.addPart(DocumentObject.documentUrl(collection.value, document.name), s"p${page.n}"), page.displayName,
+      yield Site.ref(Site.addPart(DocumentObject.documentUrl(collection, document.name), s"p${page.n}"), page.displayName,
         Some(if (page.isPresent) "page" else "missing-page"))
     }),
 

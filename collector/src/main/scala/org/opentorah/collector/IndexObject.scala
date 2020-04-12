@@ -2,18 +2,16 @@ package org.opentorah.collector
 
 import org.opentorah.tei.Tei
 
-final class IndexObject(site: Site) extends SiteObject(site) {
+final class IndexObject(site: Site) extends SimpleSiteObject(site) {
   override def viewer: String = CollectionObject.collectionViewer
 
-  override protected def teiUrl: Seq[String] = Seq("index.xml")
-
-  override protected def teiWrapperUrl: Seq[String] = Seq("index.html")
+  override protected def fileName: String = IndexObject.fileName
 
   override protected def yaml: Seq[(String, String)] = Seq("windowName" -> CollectionObject.collectionViewer)
 
   override protected def tei: Tei = {
     val result =
-      <head>Дела</head> ++
+      <head>{IndexObject.title}</head> ++
       <list type="bulleted">
         {for (collection <- site.collections.filterNot(collection =>
           Site.unpublished.contains(Site.collectionName(collection))))
@@ -22,4 +20,10 @@ final class IndexObject(site: Site) extends SiteObject(site) {
 
     Tei(result)
   }
+}
+
+object IndexObject {
+  val fileName: String = "index"
+
+  val title: String = "Дела"
 }
