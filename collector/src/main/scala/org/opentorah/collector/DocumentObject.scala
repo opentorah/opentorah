@@ -27,7 +27,7 @@ final class DocumentObject(
   override protected def teiTransformer: Tei => Tei = Transformations.addCommon
 
   override protected def xmlTransformer: Xml.Transformer =
-    Transformations.refRoleRewriter(site) compose Transformations.pbTransformer(facsUrl)
+    super.xmlTransformer compose Transformations.pbTransformer(facsUrl)
 
   override protected def yaml: Seq[(String, String)] =
     Seq("facs" -> Files.mkUrl(facsUrl)) ++

@@ -14,10 +14,10 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
 
   override protected def fileName: String = CollectionObject.fileName
 
-  override protected def style: Option[String] = Some("wide")
-
-  override protected def yaml: Seq[(String, String)] =
-    Seq("documentCollection" -> CollectionObject.collectionReference(collection))
+  override protected def yaml: Seq[(String, String)] = Seq(
+    "style" -> "wide",
+    "documentCollection" -> CollectionObject.collectionReference(collection)
+  )
 
   override protected def tei: Tei = {
     val missingPages: Seq[String] = collection.value.documents
