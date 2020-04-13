@@ -4,11 +4,15 @@ import org.opentorah.store.WithPath
 import org.opentorah.tei.Tei
 
 final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
-  override def viewer: String = CollectionObject.viewer
 
   override protected def fileName: String = TreeIndexObject.fileName
 
-  override protected def yaml: Seq[(String, String)] = Seq("title" -> TreeIndexObject.title)
+  override protected def teiWrapperViewer: Viewer = Viewer.Collection
+
+  override protected def yaml: Seq[(String, String)] = Seq(
+    "windowName" -> teiWrapperViewer.name,
+    "title" -> TreeIndexObject.title
+  )
 
   override protected def tei: Tei = {
     val byArchive: Map[String, Seq[WithPath[Collection]]] =

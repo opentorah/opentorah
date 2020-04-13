@@ -7,11 +7,12 @@ import org.opentorah.util.{Collections, Files}
 import scala.xml.Elem
 
 final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(site) {
-  override def viewer: String = NamesObject.viewer
 
   override protected def urlPrefix: Seq[String] = EntityObject.urlPrefix
 
   override protected def fileName: String = EntityObject.fileName(entity)
+
+  override protected def teiWrapperViewer: Viewer = Viewer.Names
 
   override protected def tei: Tei = Tei(Seq(Entity.toXml(entity.copy(content = entity.content :+ mentions))))
 

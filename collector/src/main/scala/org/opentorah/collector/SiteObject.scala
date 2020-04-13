@@ -7,11 +7,7 @@ import scala.xml.Elem
 
 abstract class SiteObject(val site: Site) {
 
-  def viewer: String
-
-  def teiFile: SiteFile = new SiteFile {
-    override def siteObject: SiteObject = SiteObject.this
-
+  final val teiFile: SiteFile = new SiteFile {
     override def url: Seq[String] = teiUrl
 
     override def content: String = {
@@ -23,14 +19,14 @@ abstract class SiteObject(val site: Site) {
     }
   }
 
-  def teiWrapperFile: SiteFile = new SiteFile {
-    override def siteObject: SiteObject = SiteObject.this
+  final val teiWrapperFile: SiteFile = new TeiWrapperFile {
+    override def viewer: Viewer = teiWrapperViewer
 
     override def url: Seq[String] = teiWrapperUrl
 
     final def content: String = SiteObject.withYaml(
-      yaml = Seq("layout" -> "default", "target" -> siteObject.viewer) ++ yaml,
-      content = Seq(Site.loadTei(Files.mkUrl(siteObject.teiFile.url)))
+      yaml = Seq("layout" -> "default", "target" -> viewer.name) ++ yaml,
+      content = Seq(Site.loadTei(Files.mkUrl(teiFile.url)))
     )
   }
 
@@ -38,9 +34,11 @@ abstract class SiteObject(val site: Site) {
 
   protected def teiTransformer: Tei.Transformer = Transformations.addCommonNoCalendar
 
-  protected def xmlTransformer: Xml.Transformer = Transformations.refRoleRewriter(site)
+  protected def xmlTransformer: Xml.Transformer = Transformations.refTransformer(site)
 
   protected def tei: Tei
+
+  protected def teiWrapperViewer: Viewer
 
   protected def teiWrapperUrl: Seq[String]
 
