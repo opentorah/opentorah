@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.entity.{EntitiesList, EntityName}
-import org.opentorah.tei.{Ref, Tei}
+import org.opentorah.tei.Ref
 import org.opentorah.util.Files
 import scala.xml.{Elem, Node}
 
@@ -11,7 +11,7 @@ final class NamesObject(site: Site) extends SimpleSiteObject(site) {
 
   override protected def teiWrapperViewer: Viewer = Viewer.Names
 
-  override protected def tei: Tei = {
+  override protected def teiBody: Seq[Node] = {
     val nonEmptyLists: Seq[EntitiesList] = site.entitiesLists.filterNot(_.isEmpty)
     val listOfLists: Seq[Node] =
       <p>{for (list <- nonEmptyLists) yield <l>{Ref.toXml(NamesObject.entityInTheListUrl(list.id), list.head)}</l>}</p>
@@ -25,7 +25,7 @@ final class NamesObject(site: Site) extends SimpleSiteObject(site) {
       </list>
         .copy(label = value.entityType.listElement)
 
-    Tei(<head>{NamesObject.title}</head> ++ listOfLists ++ nonEmptyLists.flatMap(toXml))
+    <head>{NamesObject.title}</head> ++ listOfLists ++ nonEmptyLists.flatMap(toXml)
   }
 
   override protected def yaml: Seq[(String, String)] = Seq("title" -> NamesObject.title)

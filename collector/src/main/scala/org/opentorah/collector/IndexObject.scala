@@ -1,6 +1,6 @@
 package org.opentorah.collector
 
-import org.opentorah.tei.Tei
+import scala.xml.Node
 
 final class IndexObject(site: Site) extends SimpleSiteObject(site) {
 
@@ -10,16 +10,13 @@ final class IndexObject(site: Site) extends SimpleSiteObject(site) {
 
   override protected def yaml: Seq[(String, String)] = Seq("windowName" -> teiWrapperViewer.name)
 
-  override protected def tei: Tei = {
-    val result =
-      <head>{IndexObject.title}</head> ++
-      <list type="bulleted">
-        {for (collection <- site.collections.filterNot(collection =>
-          Site.unpublishedCollections.contains(CollectionObject.collectionName(collection))))
-        yield CollectionObject.collectionXml(collection)}
-      </list>
-
-    Tei(result)
+  override protected def teiBody: Seq[Node] = {
+    <head>{IndexObject.title}</head> ++
+    <list type="bulleted">
+      {for (collection <- site.collections.filterNot(collection =>
+        Site.unpublishedCollections.contains(CollectionObject.collectionName(collection))))
+      yield CollectionObject.collectionXml(collection)}
+    </list>
   }
 }
 

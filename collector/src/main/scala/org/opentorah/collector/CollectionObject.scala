@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.entity.EntityReference
 import org.opentorah.store.WithPath
-import org.opentorah.tei.{Ref, Tei}
+import org.opentorah.tei.Ref
 import org.opentorah.util.{Files, Xml}
 import org.opentorah.xml.RawXml
 import scala.xml.{Elem, Node}
@@ -20,24 +20,21 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
     "documentCollection" -> CollectionObject.collectionReference(collection)
   )
 
-  override protected def tei: Tei = {
+  override protected def teiBody: Seq[Node] = {
     val missingPages: Seq[String] = collection.value.documents
       .flatMap(document => document.pages(collection.value.pageType))
       .filter(_.pb.isMissing)
       .map(_.displayName)
 
-    val result =
-      <head>{CollectionObject.collectionTitle(collection)}</head> ++
-        CollectionObject.collectionDescription(collection) ++
+    <head>{CollectionObject.collectionTitle(collection)}</head> ++
+      CollectionObject.collectionDescription(collection) ++
       Seq[Elem](CollectionObject.table(collection).toTei(
-        collection.value.parts.flatMap { part =>
+      collection.value.parts.flatMap { part =>
           part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Xml) ++
           part.documents.map(Table.Data[Document]) }
       )) ++
       (if (missingPages.isEmpty) Seq.empty
       else Seq(<p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>))
-
-    Tei(result)
   }
 }
 

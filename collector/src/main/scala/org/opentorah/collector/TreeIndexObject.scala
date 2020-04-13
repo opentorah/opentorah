@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.WithPath
-import org.opentorah.tei.Tei
+import scala.xml.Node
 
 final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
 
@@ -14,21 +14,18 @@ final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
     "title" -> TreeIndexObject.title
   )
 
-  override protected def tei: Tei = {
+  override protected def teiBody: Seq[Node] = {
     val byArchive: Map[String, Seq[WithPath[Collection]]] =
       site.collections.groupBy(collection => CollectionObject.collectionArchive(collection).getOrElse(""))
 
-    val result =
-      <head>{TreeIndexObject.title}</head> ++
-      <list>{
-        for (archive <- byArchive.keys.toList.sorted) yield {
-          <item>
-            <p>{s"[$archive]"}</p>
-            <list type="bulleted">{for (collection <- byArchive(archive)) yield CollectionObject.collectionXml(collection)}</list>
-          </item>}}
-      </list>
-
-    Tei(result)
+    <head>{TreeIndexObject.title}</head> ++
+    <list>{
+      for (archive <- byArchive.keys.toList.sorted) yield {
+        <item>
+          <p>{s"[$archive]"}</p>
+          <list type="bulleted">{for (collection <- byArchive(archive)) yield CollectionObject.collectionXml(collection)}</list>
+        </item>}}
+    </list>
   }
 }
 

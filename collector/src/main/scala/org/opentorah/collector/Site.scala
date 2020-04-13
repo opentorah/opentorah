@@ -88,29 +88,9 @@ object Site {
       writeSiteFile(documentObject.facsFile, directory)
     }
 
-    println("Writing reports.")
-
-    writeReport(
-      directory,
-      name = "misnamed-entities",
-      title = "Неправильно названные файлы с именами",
-      content = site.entities.flatMap { entity =>
-        val id: String = entity.id.get
-        val expectedId: String = Files.spacesToUnderscores(entity.name)
-        if (id == expectedId) None else Some(s"- '$id' должен по идее называться '$expectedId'")
-      }
-    )
-
-    writeReport(
-      directory,
-      name = "no-refs",
-      title = "Имена без атрибута /ref/",
-      content =
-        for (reference <- site.references.filter(_.value.ref.isEmpty)) yield
-          "- " + reference.value.name.map(_.text.trim).mkString(" ") + " в " +
-            EntityObject.referenceCollectionName(reference) + ":" +
-            reference.path.last.store.names.name
-    )
+    Files.deleteFiles(new File(directory, ReportObject.directoryName))
+    writeSiteObject(new MisnamedEntitiesReport(site), directory)
+    writeSiteObject(new NoRefsReport(site), directory)
   }
 
   private def writeSiteObject(siteObject: SiteObject, directory: File): Unit = {
@@ -120,16 +100,4 @@ object Site {
 
   private final def writeSiteFile(siteFile: SiteFile, directory: File): Unit =
     Files.write(Files.file(directory, siteFile.url), siteFile.content)
-
-  private def writeReport(
-    directory: File,
-    name: String,
-    title: String,
-    content: Seq[String]
-  ): Unit = Files.write(
-    file = new File(new File(directory, "reports"), name + ".md"),
-    SiteObject.withYaml(
-      yaml = Seq("layout" -> "page", "title" -> title),
-      content
-    ))
 }

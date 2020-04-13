@@ -25,7 +25,7 @@ abstract class SiteObject(val site: Site) {
     override def url: Seq[String] = teiWrapperUrl
 
     final def content: String = SiteObject.withYaml(
-      yaml = Seq("layout" -> "default", "target" -> viewer.name) ++ yaml,
+      yaml = Seq("target" -> viewer.name) ++ yaml,
       content = Seq(Site.loadTei(Files.mkUrl(teiFile.url)))
     )
   }
@@ -51,16 +51,17 @@ object SiteObject {
       if (parts.isEmpty) Some(new IndexObject(site).teiWrapperFile) else {
         val tail: Seq[String] = parts.tail
         parts.head match {
-          case HierarchyObject.directoryName  => HierarchyObject.resolve(site, Path.empty, site.store, tail)
+          case HierarchyObject.directoryName  => HierarchyObject .resolve(site, Path.empty, site.store, tail)
           case CollectionObject.directoryName => CollectionObject.resolve(site, tail)
-          case EntityObject.directoryName     => EntityObject.resolve(site, tail)
+          case EntityObject    .directoryName => EntityObject    .resolve(site, tail)
+          case ReportObject    .directoryName => ReportObject    .resolve(site, tail)
 
           case file if parts.tail.isEmpty =>
             val (fileName: String, extension: Option[String]) = Files.nameAndExtension(file)
             val result: Option[SimpleSiteObject] = fileName match {
-              case IndexObject.fileName     => Some(new IndexObject    (site))
+              case IndexObject    .fileName => Some(new IndexObject    (site))
               case TreeIndexObject.fileName => Some(new TreeIndexObject(site))
-              case NamesObject.fileName     => Some(new NamesObject    (site))
+              case NamesObject    .fileName => Some(new NamesObject    (site))
               case _ => None
             }
             result.flatMap(k => SimpleSiteObject.resolve(extension, k))
@@ -76,7 +77,7 @@ object SiteObject {
   ): String = {
     val result: Seq[String] =
       Seq("---") ++
-      (for ((name, value) <- yaml) yield name + ": " + quote(value)) ++
+      (for ((name, value) <- ("layout" -> "default") +: yaml) yield name + ": " + quote(value)) ++
       Seq("---") ++
       Seq("") ++ content
 

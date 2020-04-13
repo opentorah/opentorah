@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.{Binding, By, Path, Selector, Store, WithPath}
-import org.opentorah.tei.{Ref, Tei}
+import org.opentorah.tei.Ref
 import org.opentorah.util.{Files, Xml}
 import org.opentorah.xml.RawXml
 import scala.xml.{Elem, Node}
@@ -15,32 +15,29 @@ final class HierarchyObject(site: Site, path: Path, store: Store) extends Simple
   override protected def teiWrapperViewer: Viewer = Viewer.Collection
 
   // TODO clean up:
-  protected def tei: Tei = {
-    val result =
-      HierarchyObject.storeHeader(path, store) ++
-      store.by.toSeq.flatMap { by: By[_] =>
-        <p>
-          <l>{Site.getName(by.selector.names)}:</l>
-          <list type="bulleted">
-            {by.stores.map { storeX =>
-            val subStore = storeX.asInstanceOf[Store]  // TODO get rid of the cast!!!
-            val title: Seq[Node] = RawXml.getXml(subStore.title)
-            val titlePrefix: Seq[Node] = Xml.textNode(Site.getName(subStore.names) + (if (title.isEmpty) "" else ": "))
-            // TODO the path in the call to urlPrefix is not really correct...
-            <item>
-              {Ref.toXml(
-              target = subStore match {
-                case collection: Collection => CollectionObject.urlPrefix(WithPath(path, collection))
-                case _ => HierarchyObject.urlPrefix(path :+ by.selector.bind(subStore))
-              },
-              text = titlePrefix ++ title
-            )}</item>
-          }}
-          </list>
-        </p>
-      }
-
-    Tei(result)
+  protected def teiBody: Seq[Node] = {
+    HierarchyObject.storeHeader(path, store) ++
+    store.by.toSeq.flatMap { by: By[_] =>
+      <p>
+        <l>{Site.getName(by.selector.names)}:</l>
+        <list type="bulleted">
+          {by.stores.map { storeX =>
+          val subStore = storeX.asInstanceOf[Store]  // TODO get rid of the cast!!!
+          val title: Seq[Node] = RawXml.getXml(subStore.title)
+          val titlePrefix: Seq[Node] = Xml.textNode(Site.getName(subStore.names) + (if (title.isEmpty) "" else ": "))
+          // TODO the path in the call to urlPrefix is not really correct...
+          <item>
+            {Ref.toXml(
+            target = subStore match {
+              case collection: Collection => CollectionObject.urlPrefix(WithPath(path, collection))
+              case _ => HierarchyObject.urlPrefix(path :+ by.selector.bind(subStore))
+            },
+            text = titlePrefix ++ title
+          )}</item>
+        }}
+        </list>
+      </p>
+    }
   }
 }
 
