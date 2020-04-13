@@ -11,13 +11,14 @@ final class DocumentObject(
   document: Document,
   teiHolder: TeiHolder
 ) extends SiteObject(site) {
-  override def viewer: String = DocumentObject.documentViewer
 
   override protected def teiUrl: Seq[String] = url(CollectionObject.teiDirectoryName, "xml")
 
   override protected def teiWrapperUrl: Seq[String] = url(CollectionObject.documentsDirectoryName, "html")
 
   private def facsUrl: Seq[String] = url(CollectionObject.facsDirectoryName, "html")
+
+  override protected def teiWrapperViewer: Viewer = Viewer.Document
 
   private def url(directoryName: String, extension: String): Seq[String] =
     CollectionObject.urlPrefix(collection) :+ directoryName :+ (teiHolder.name + "." + extension)
@@ -44,21 +45,19 @@ final class DocumentObject(
   }
 
   def facsFile: SiteFile = new SiteFile {
-    override def siteObject: SiteObject = DocumentObject.this
-
     override def url: Seq[String] = facsUrl
 
     override def content: String = {
       // TODO do pages of the appropriate teiHolder!
       val facsimilePages: Elem =
-        <div class="facsimileViewer">
+        <div class={Viewer.Facsimile.name}>
           <div class="facsimileScroller">
             {for (page: Page <- document.pages(collection.value.pageType).filterNot(_.pb.isMissing)) yield {
             val n: String = page.pb.n
             val href: Seq[String] = DocumentObject.pageUrl(collection, document.name, page)
             val facs: String = page.pb.facs
               .getOrElse(Site.facsimileBucket + Site.fileName(collection.value) + "/" + n + ".jpg")
-            <a target={viewer} href={Files.mkUrl(href)}>
+            <a target={Viewer.Document.name} href={Files.mkUrl(href)}>
               <figure>
                 <img xml:id={Page.pageId(n)} alt={s"facsimile for page $n"} src={facs}/>
                 <figcaption>{n}</figcaption>
@@ -78,10 +77,6 @@ final class DocumentObject(
 
 object DocumentObject {
 
-  val documentViewer: String = "documentViewer"
-
-  val facsimileViewer: String = "facsimileViewer"
-
   def documentUrl(collection: WithPath[Collection], documentName: String): Seq[String] =
     CollectionObject.urlPrefix(collection) :+ CollectionObject.documentsDirectoryName :+ (documentName + ".html")
 
@@ -95,7 +90,7 @@ object DocumentObject {
     requiredExtension: String
   ): Option[DocumentObject] = if (parts.isEmpty || parts.tail.nonEmpty) None else {
     val (fileName: String, extension: Option[String]) = Files.nameAndExtension(parts.head)
-    if (!extension.contains(requiredExtension)) None else {
+    if (extension.isDefined && !extension.contains(requiredExtension)) None else {
       collection.value.findDocumentByName(fileName).map { case (document, teiHolder) =>
         new DocumentObject(site, collection, document, teiHolder)
       }

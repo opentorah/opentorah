@@ -16,7 +16,7 @@ abstract class SimpleSiteObject(site: Site) extends SiteObject(site) {
 object SimpleSiteObject {
 
   def resolve(extension: Option[String], k: => SimpleSiteObject): Option[SiteFile] = extension match {
-    case Some("html") => Some(k.teiWrapperFile)
+    case Some("html") | None => Some(k.teiWrapperFile)
     case Some("xml") => Some(k.teiFile)
     case _ => None
   }

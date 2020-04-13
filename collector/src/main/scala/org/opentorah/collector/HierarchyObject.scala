@@ -7,11 +7,12 @@ import org.opentorah.xml.RawXml
 import scala.xml.{Elem, Node}
 
 final class HierarchyObject(site: Site, path: Path, store: Store) extends SimpleSiteObject(site) {
-  override def viewer: String = CollectionObject.viewer
 
   override protected def fileName: String = HierarchyObject.fileName
 
   override protected def urlPrefix: Seq[String] = HierarchyObject.urlPrefix(path)
+
+  override protected def teiWrapperViewer: Viewer = Viewer.Collection
 
   // TODO clean up:
   protected def tei: Tei = {

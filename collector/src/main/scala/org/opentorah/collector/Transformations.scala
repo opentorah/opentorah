@@ -60,10 +60,13 @@ object Transformations {
   val addCommonNoCalendar: Tei.Transformer =
     addPublicationStatement compose addSourceDesc compose addLanguage
 
-  def refRoleRewriter(site: Site): Xml.Transformer = elem => if (elem.label != "ref") elem else
+  def refTransformer(site: Site): Xml.Transformer = elem => if (elem.label != "ref") elem else
     elem.attribute("target").map(_.text).fold(throw new IllegalArgumentException(s"empty target: $elem")) { target =>
       if (!target.startsWith("/")) elem else {
-        val roleShouldBe: Option[String] = site.resolve(target).map(_.siteObject.viewer)
+        val roleShouldBe: Option[String] = site.resolve(target).flatMap {
+          case teiWrapperFile: TeiWrapperFile => Some(teiWrapperFile.viewer.name)
+          case _ => None
+        }
         val role: Option[String] = elem.attribute("role").map(_.text)
         if (roleShouldBe.isEmpty) println(s"did not resolve: $target")
         if (roleShouldBe.isDefined && role.isDefined && (role != roleShouldBe)) println(s"role discrepancy")
@@ -73,16 +76,13 @@ object Transformations {
     }
 
 
-  def pbTransformer(facsUrl: Seq[String]): Xml.Transformer = elem =>
-    if (elem.label != "pb") elem else {
-      val pageId: String = Page.pageId(elem.attribute("n").get.text)
-      val isMissing: Boolean = elem.attribute("missing").map(_.text).contains("true")
-      val target: Seq[String] = Files.addPart(facsUrl, pageId)
-      <pb
-        xml:id={pageId}
-        rendition={Page.pageRendition(isMissing)}
-        role={DocumentObject.facsimileViewer}
-        target={Files.mkUrl(target)}
-      />
-    }
+  def pbTransformer(facsUrl: Seq[String]): Xml.Transformer = elem => if (elem.label != "pb") elem else {
+    val pageId: String = Page.pageId(elem.attribute("n").get.text)
+    <pb
+      xml:id={pageId}
+      rendition={Page.pageRendition(elem.attribute("missing").map(_.text).contains("true"))}
+      role={Viewer.Facsimile.name}
+      target={Files.mkUrl(Files.addPart(facsUrl, pageId))}
+    />
+  }
 }

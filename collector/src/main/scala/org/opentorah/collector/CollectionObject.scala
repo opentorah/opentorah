@@ -8,11 +8,12 @@ import org.opentorah.xml.RawXml
 import scala.xml.{Elem, Node}
 
 final class CollectionObject(site: Site, collection: WithPath[Collection]) extends SimpleSiteObject(site) {
-  override def viewer: String = CollectionObject.viewer
 
   override protected def urlPrefix: Seq[String] = CollectionObject.urlPrefix(collection)
 
   override protected def fileName: String = CollectionObject.fileName
+
+  override protected def teiWrapperViewer: Viewer = Viewer.Collection
 
   override protected def yaml: Seq[(String, String)] = Seq(
     "style" -> "wide",
@@ -52,8 +53,6 @@ object CollectionObject {
 
   // Note: also hard-coded in 'index.xml'!
   val directoryName: String = "collections"
-
-  val viewer: String = "collectionViewer"
 
   val facsDirectoryName: String = "facs" // facsimile viewers
 

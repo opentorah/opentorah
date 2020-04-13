@@ -3,11 +3,12 @@ package org.opentorah.collector
 import org.opentorah.tei.Tei
 
 final class IndexObject(site: Site) extends SimpleSiteObject(site) {
-  override def viewer: String = CollectionObject.viewer
 
   override protected def fileName: String = IndexObject.fileName
 
-  override protected def yaml: Seq[(String, String)] = Seq("windowName" -> viewer)
+  override protected def teiWrapperViewer: Viewer = Viewer.Collection
+
+  override protected def yaml: Seq[(String, String)] = Seq("windowName" -> teiWrapperViewer.name)
 
   override protected def tei: Tei = {
     val result =

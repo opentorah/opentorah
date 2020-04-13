@@ -6,9 +6,10 @@ import org.opentorah.util.Files
 import scala.xml.{Elem, Node}
 
 final class NamesObject(site: Site) extends SimpleSiteObject(site) {
-  override def viewer: String = NamesObject.viewer
 
   override protected def fileName: String = NamesObject.fileName
+
+  override protected def teiWrapperViewer: Viewer = Viewer.Names
 
   override protected def tei: Tei = {
     val nonEmptyLists: Seq[EntitiesList] = site.entitiesLists.filterNot(_.isEmpty)
@@ -35,8 +36,6 @@ object NamesObject {
   val fileName: String = "names"
 
   val title: String = "Имена"
-
-  val viewer: String = "namesViewer"
 
   def entityInTheListUrl(id: String): Seq[String] = Files.addPart(Seq(fileName + ".html"), id)
 }
