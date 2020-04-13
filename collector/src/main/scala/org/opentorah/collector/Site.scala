@@ -39,6 +39,9 @@ object Site {
   val unpublishedCollections: Set[String] =
     Set("derzhavin6", "derzhavin7", "lna208", "niab5", "niab19", "niab24", "rnb203", "rnb211")
 
+  def loadTei(tei: String): String =
+    s"<script type='module'>import loadTei from '/js/tei.js'; loadTei('$tei');</script>"
+
   def fileName(store: Store): String =
     Files.nameAndExtension(Files.pathAndName(store.urls.fromUrl.get.getPath)._2)._1
 
