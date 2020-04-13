@@ -29,10 +29,7 @@ abstract class SiteObject(val site: Site) {
     override def url: Seq[String] = teiWrapperUrl
 
     final def content: String = SiteObject.withYaml(
-      yaml = style.map(style => "style" -> style).toSeq ++ Seq(
-        "layout" -> "default",
-        "target" -> siteObject.viewer
-      ) ++ yaml,
+      yaml = Seq("layout" -> "default", "target" -> siteObject.viewer) ++ yaml,
       content = Seq(Site.loadTei(Files.mkUrl(siteObject.teiFile.url)))
     )
   }
@@ -46,8 +43,6 @@ abstract class SiteObject(val site: Site) {
   protected def tei: Tei
 
   protected def teiWrapperUrl: Seq[String]
-
-  protected def style: Option[String] = None
 
   protected def yaml: Seq[(String, String)] = Seq.empty
 }
