@@ -29,12 +29,11 @@ abstract class SiteObject(val site: Site) {
     override def url: Seq[String] = teiWrapperUrl
 
     final def content: String = SiteObject.withYaml(
-      yaml = style.fold[Seq[(String, String)]](Seq.empty)(style => Seq("style" -> style)) ++
-        Seq(
-          "layout" -> "tei",
-          "tei" -> Files.mkUrl(siteObject.teiFile.url),
-          "target" -> siteObject.viewer
-        ) ++ yaml
+      yaml = style.map(style => "style" -> style).toSeq ++ Seq(
+        "layout" -> "default",
+        "target" -> siteObject.viewer
+      ) ++ yaml,
+      content = Seq(Site.loadTei(Files.mkUrl(siteObject.teiFile.url)))
     )
   }
 
