@@ -5,8 +5,8 @@ import java.net.URL
 import org.opentorah.entity.{Entity, EntityReference}
 import org.opentorah.store.{Store, WithPath}
 import org.opentorah.tei.Tei
-import org.opentorah.util.Files
-import org.opentorah.xml.{From, PaigesPrettyPrinter, XmlUtil}
+import org.opentorah.util.{Files, Xml}
+import org.opentorah.xml.{From, PaigesPrettyPrinter}
 import scala.xml.Elem
 
 object Main {
@@ -35,8 +35,8 @@ object Main {
 
     println("Pretty-printing store.")
     for (entityHolder <- store.entities.get.by.get.stores)
-      prettyPrint(entityHolder, TeiUtil.teiPrettyPrinter, Entity.toXml(entityHolder.entity.copy(id = None)))
-    prettyPrint(store, TeiUtil.teiPrettyPrinter)
+      prettyPrint(entityHolder, Transformations.teiPrettyPrinter, Entity.toXml(entityHolder.entity.copy(id = None)))
+    prettyPrint(store, Transformations.teiPrettyPrinter)
 
     val site = new Site(store, references)
 
@@ -51,13 +51,8 @@ object Main {
 
     store match {
       case collection: Collection =>
-        for (by <- collection.by; document <- by.stores; by <- document.by; teiHolder <- by.stores) {
-          val elem = XmlUtil.rewriteElements(
-            Tei.toXml(teiHolder.tei),
-            TeiUtil.sourcePbsRewriter(Site.fileName(collection))
-          )
-          prettyPrint(teiHolder, prettyPrinter, elem)
-        }
+        for (by <- collection.by; document <- by.stores; by <- document.by; teiHolder <- by.stores)
+          prettyPrint(teiHolder, prettyPrinter, Tei.toXml(teiHolder.tei))
       case _ =>
         for (by <- store.by; store <- by.stores) prettyPrint(store.asInstanceOf[Store], prettyPrinter)
     }
@@ -66,7 +61,7 @@ object Main {
   private def prettyPrint(store: Store, prettyPrinter: PaigesPrettyPrinter, toXml: => Elem): Unit =
     for (fromUrl <- store.urls.fromUrl) if (Files.isFile(fromUrl)) Files.write(
       file = Files.url2file(fromUrl),
-      content = TeiUtil.xmlHeader + prettyPrinter.render(toXml) + "\n"
+      content = Xml.xmlHeader + prettyPrinter.render(toXml) + "\n"
     )
 
   private def checkReference(reference: EntityReference,  findByRef: String => Option[Entity]): Option[String] = {

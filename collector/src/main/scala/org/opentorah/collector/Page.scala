@@ -1,17 +1,16 @@
 package org.opentorah.collector
 
-sealed trait Page {
-  def n: String
+import org.opentorah.tei.Pb
+
+sealed abstract class Page(val pb: Pb) {
   def base: String
   def displayName: String
-  def facs: Option[String]
-  def isPresent: Boolean = facs.isDefined
 }
 
 object Page {
 
   sealed trait Type {
-    def apply(n: String, facs: Option[String]): Page
+    def apply(pb: Pb): Page
   }
 
   object Manuscript extends Type {
@@ -23,7 +22,8 @@ object Page {
 
     def base(name: String): String = name.dropRight(frontSuffix.length)
 
-    override def apply(n: String, facs: Option[String]): Page = {
+    override def apply(pb: Pb): Page = {
+      val n = pb.n
       val (base: String, back: Boolean) =
         if (n.endsWith(frontSuffix)) (n.dropRight(frontSuffix.length), false) else {
           if (!n.endsWith(backSuffix)) throw new IllegalArgumentException(s"No suffix: $n")
@@ -37,32 +37,35 @@ object Page {
       if (!s.isEmpty && (s != "a"))
         throw new IllegalArgumentException(s"Illegal page name: $s [$n]")
 
-      new Manuscript(base, back, facs)
+      new Manuscript(base, back, pb)
     }
   }
 
   private final class Manuscript(
     override val base: String,
     back: Boolean,
-    override val facs: Option[String]
-  ) extends Page {
-    override def n: String = base + (if (back) Manuscript.backSuffix else Manuscript.frontSuffix)
+    pb: Pb
+  ) extends Page(pb) {
     override def displayName: String = base + (if (back) "об" else "")
   }
 
   object Book extends Type {
-    override def apply(n: String, facs: Option[String]): Page = {
+    override def apply(pb: Pb): Page = {
+      val n = pb.n
       if (!n.dropWhile(_.isDigit).isEmpty)
         throw new IllegalArgumentException()
-      new Book(n, facs)
+      new Book(pb)
     }
   }
 
   private final class Book(
-    override val n: String,
-    override val facs: Option[String]
-  ) extends Page {
-    override val base: String = n
-    override def displayName: String = n
+    pb: Pb
+  ) extends Page(pb) {
+    override def base: String = pb.n
+    override def displayName: String = pb.n
   }
+
+  def pageId(n: String): String = s"p$n"
+
+  def pageRendition(isMissing: Boolean): String = if (isMissing) "missing-page" else "page"
 }

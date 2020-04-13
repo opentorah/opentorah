@@ -1,12 +1,13 @@
 package org.opentorah.collector
 
 import org.opentorah.store.{Binding, By, Path, Selector, Store, WithPath}
-import org.opentorah.tei.Tei
+import org.opentorah.tei.{Ref, Tei}
+import org.opentorah.util.{Files, Xml}
 import org.opentorah.xml.RawXml
 import scala.xml.{Elem, Node}
 
 final class HierarchyObject(site: Site, path: Path, store: Store) extends SimpleSiteObject(site) {
-  override def viewer: String = CollectionObject.collectionViewer
+  override def viewer: String = CollectionObject.viewer
 
   override protected def fileName: String = HierarchyObject.fileName
 
@@ -23,13 +24,14 @@ final class HierarchyObject(site: Site, path: Path, store: Store) extends Simple
             {by.stores.map { storeX =>
             val subStore = storeX.asInstanceOf[Store]  // TODO get rid of the cast!!!
             val title: Seq[Node] = RawXml.getXml(subStore.title)
-            val titlePrefix: Seq[Node] = TeiUtil.textNode(Site.getName(subStore.names) + (if (title.isEmpty) "" else ": "))
+            val titlePrefix: Seq[Node] = Xml.textNode(Site.getName(subStore.names) + (if (title.isEmpty) "" else ": "))
             // TODO the path in the call to urlPrefix is not really correct...
             <item>
-              {Site.ref(
-              url =
-                if (subStore.isInstanceOf[Collection]) CollectionObject.urlPrefix(WithPath(path, subStore.asInstanceOf[Collection]))
-                else HierarchyObject.urlPrefix(path :+ by.selector.bind(subStore)),
+              {Ref.toXml(
+              target = subStore match {
+                case collection: Collection => CollectionObject.urlPrefix(WithPath(path, collection))
+                case _ => HierarchyObject.urlPrefix(path :+ by.selector.bind(subStore))
+              },
               text = titlePrefix ++ title
             )}</item>
           }}
@@ -43,11 +45,11 @@ final class HierarchyObject(site: Site, path: Path, store: Store) extends Simple
 
 object HierarchyObject {
 
-  private def urlPrefix(path: Path): Seq[String] = hierarchyDirectoryName +: segments(path)
+  val directoryName: String = "by"
+
+  private def urlPrefix(path: Path): Seq[String] = directoryName +: segments(path)
 
   val fileName: String = "index"
-
-  val hierarchyDirectoryName: String = "by"
 
   // TODO I'd like to be able to start the Path with a top-level store in there (using "top" pseudo-selector?).
   def resolve(site: Site, path: Path, store: Store, parts: Seq[String]): Option[SiteFile] =
@@ -61,7 +63,7 @@ object HierarchyObject {
             else Some(new CollectionObject(site, WithPath(path, collection)).teiWrapperFile)
 
           case _ => if (parts.tail.isEmpty) None else {
-            val storeName: String = parts.tail.head.replace('_', ' ')
+            val storeName: String = Files.underscoresToSpaces(parts.tail.head)
             store.by.get.stores.find(_.names.find(storeName).isDefined).flatMap { nextStore =>
               resolve(site, path :+ selector.bind(nextStore), nextStore, parts.tail.tail)
             }
@@ -75,7 +77,7 @@ object HierarchyObject {
     val isTop: Boolean = path.isEmpty
     val title: Seq[Node] = RawXml.getXml(store.title)
     val titlePrefix: Seq[Node] =
-      if (isTop) Seq.empty else TeiUtil.textNode(
+      if (isTop) Seq.empty else Xml.textNode(
         Site.getName(path.last.selector.names) + " " + Site.getName(store.names) + (if (title.isEmpty) "" else ": ")
       )
 
@@ -88,12 +90,12 @@ object HierarchyObject {
   // TODO move into general area
   private def pathLinks(path: Path): Seq[Elem] = for (ancestor <- path.path.inits.toSeq.reverse.tail) yield {
     val binding: Binding = ancestor.last
-    val link: Elem = Site.ref(
-      url = urlPrefix(Path(ancestor)),
+    val link: Elem = Ref.toXml(
+      target = urlPrefix(Path(ancestor)),
       text = Site.getName(binding.store.names)
     )
     val title: Seq[Node] = RawXml.getXml(binding.store.title)
-    val titlePrefix: Seq[Node] = if (title.isEmpty) Seq.empty else Seq(TeiUtil.textNode(": "))
+    val titlePrefix: Seq[Node] = if (title.isEmpty) Seq.empty else Seq(Xml.textNode(": "))
     <l>{Site.getName(binding.selector.names)} {link ++ titlePrefix ++ title}</l>
   }
 
@@ -101,5 +103,5 @@ object HierarchyObject {
   private def segments(path: Path): Seq[String] =
     path.path.flatMap(binding => Seq(binding.selector.names, binding.store.names))
       .map(Site.getName)
-      .map(_.replace(' ', '_'))
+      .map(Files.spacesToUnderscores)
 }

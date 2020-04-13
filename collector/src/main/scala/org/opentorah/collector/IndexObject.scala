@@ -3,19 +3,19 @@ package org.opentorah.collector
 import org.opentorah.tei.Tei
 
 final class IndexObject(site: Site) extends SimpleSiteObject(site) {
-  override def viewer: String = CollectionObject.collectionViewer
+  override def viewer: String = CollectionObject.viewer
 
   override protected def fileName: String = IndexObject.fileName
 
-  override protected def yaml: Seq[(String, String)] = Seq("windowName" -> CollectionObject.collectionViewer)
+  override protected def yaml: Seq[(String, String)] = Seq("windowName" -> viewer)
 
   override protected def tei: Tei = {
     val result =
       <head>{IndexObject.title}</head> ++
       <list type="bulleted">
         {for (collection <- site.collections.filterNot(collection =>
-          Site.unpublished.contains(Site.collectionName(collection))))
-        yield Site.toXml(collection)}
+          Site.unpublishedCollections.contains(CollectionObject.collectionName(collection))))
+        yield CollectionObject.collectionXml(collection)}
       </list>
 
     Tei(result)
