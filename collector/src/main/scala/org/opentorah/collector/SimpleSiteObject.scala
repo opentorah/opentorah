@@ -1,5 +1,8 @@
 package org.opentorah.collector
 
+import org.opentorah.tei.Tei
+import scala.xml.Node
+
 // When TEI file and its wrapper are in the same directory.
 abstract class SimpleSiteObject(site: Site) extends SiteObject(site) {
   final override protected def teiUrl: Seq[String] =
@@ -11,6 +14,10 @@ abstract class SimpleSiteObject(site: Site) extends SiteObject(site) {
   protected def urlPrefix: Seq[String] = Seq.empty
 
   protected def fileName: String
+
+  final override protected def tei: Tei = Tei(teiBody)
+
+  protected def teiBody: Seq[Node]
 }
 
 object SimpleSiteObject {

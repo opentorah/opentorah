@@ -2,9 +2,9 @@ package org.opentorah.collector
 
 import org.opentorah.entity.{Entity, EntityReference}
 import org.opentorah.store.{EntityHolder, Store, WithPath}
-import org.opentorah.tei.{Ref, Tei}
+import org.opentorah.tei.Ref
 import org.opentorah.util.{Collections, Files}
-import scala.xml.Elem
+import scala.xml.{Elem, Node}
 
 final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(site) {
 
@@ -14,7 +14,7 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
 
   override protected def teiWrapperViewer: Viewer = Viewer.Names
 
-  override protected def tei: Tei = Tei(Seq(Entity.toXml(entity.copy(content = entity.content :+ mentions))))
+  override protected def teiBody: Seq[Node] = Seq(Entity.toXml(entity.copy(content = entity.content :+ mentions)))
 
   private def mentions: Elem = {
 

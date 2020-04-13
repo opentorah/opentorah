@@ -68,7 +68,7 @@ final class DocumentObject(
         </div>
 
       SiteObject.withYaml(
-        yaml = Seq("layout" -> "default", "transcript" -> Files.mkUrl(teiWrapperUrl)) ++ navigation,
+        yaml = Seq("transcript" -> Files.mkUrl(teiWrapperUrl)) ++ navigation,
         content = Seq(Transformations.htmlPrettyPrinter.render(facsimilePages))
       )
     }
