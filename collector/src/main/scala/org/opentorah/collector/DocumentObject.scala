@@ -25,10 +25,14 @@ final class DocumentObject(
 
   override protected def tei: Tei = teiHolder.tei
 
-  override protected def teiTransformer: Tei => Tei = Transformations.addCommon
+  override protected def teiTransformer: Tei => Tei =
+    Transformers.addPublicationStatement compose
+    Transformers.addSourceDesc compose
+    Transformers.addCalendarDesc compose
+    Transformers.addLanguage
 
   override protected def xmlTransformer: Xml.Transformer =
-    super.xmlTransformer compose Transformations.pbTransformer(facsUrl)
+    super.xmlTransformer compose Transformers.pbTransformer(facsUrl)
 
   override protected def yaml: Seq[(String, String)] =
     Seq("facs" -> Files.mkUrl(facsUrl)) ++
@@ -69,7 +73,7 @@ final class DocumentObject(
 
       SiteObject.withYaml(
         yaml = Seq("transcript" -> Files.mkUrl(teiWrapperUrl)) ++ navigation,
-        content = Seq(Transformations.htmlPrettyPrinter.render(facsimilePages))
+        content = Seq(Transformers.htmlPrettyPrinter.render(facsimilePages))
       )
     }
   }

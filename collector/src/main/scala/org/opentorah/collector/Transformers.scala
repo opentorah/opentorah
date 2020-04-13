@@ -1,11 +1,12 @@
 package org.opentorah.collector
 
-import org.opentorah.tei.{Availability, CalendarDesc, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher,
-  SourceDesc, Tei}
+import org.opentorah.entity.EntityType
+import org.opentorah.tei.{Availability, CalendarDesc, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher, SourceDesc, Tei}
 import org.opentorah.util.{Files, Xml}
 import org.opentorah.xml.PaigesPrettyPrinter
+import scala.xml.Attribute
 
-object Transformations {
+object Transformers {
 
   val teiPrettyPrinter: PaigesPrettyPrinter = new PaigesPrettyPrinter(
     width = 120,
@@ -54,12 +55,6 @@ object Transformations {
     ))
   }
 
-  val addCommon: Tei.Transformer =
-    addPublicationStatement compose addSourceDesc compose addCalendarDesc compose addLanguage
-
-  val addCommonNoCalendar: Tei.Transformer =
-    addPublicationStatement compose addSourceDesc compose addLanguage
-
   def refTransformer(site: Site): Xml.Transformer = elem => if (elem.label != "ref") elem else
     elem.attribute("target").map(_.text).fold(throw new IllegalArgumentException(s"empty target: $elem")) { target =>
       if (!target.startsWith("/")) elem else {
@@ -75,7 +70,6 @@ object Transformations {
       }
     }
 
-
   def pbTransformer(facsUrl: Seq[String]): Xml.Transformer = elem => if (elem.label != "pb") elem else {
     val pageId: String = Page.pageId(elem.attribute("n").get.text)
     <pb
@@ -84,5 +78,19 @@ object Transformations {
       role={Viewer.Facsimile.name}
       target={Files.mkUrl(Files.addPart(facsUrl, pageId))}
     />
+  }
+
+  def nameTransformer(site: Site): Xml.Transformer = elem => if (EntityType.forName(elem.label).isEmpty) elem else {
+    elem.attribute("ref").map(_.text).fold(elem){ ref =>
+      site.findByRef(ref).fold {
+        println(s"did not find reference: $ref")
+        elem
+      }{ entity =>
+        val target: String = Files.mkUrl(EntityObject.teiWrapperUrl(entity))
+        elem.copy(attributes =
+          Attribute("role", Xml.textNode(Viewer.Names.name),
+          Attribute("target", Xml.textNode(target), scala.xml.Null)))
+      }
+    }
   }
 }

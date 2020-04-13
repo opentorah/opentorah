@@ -35,8 +35,8 @@ object Main {
 
     println("Pretty-printing store.")
     for (entityHolder <- store.entities.get.by.get.stores)
-      prettyPrint(entityHolder, Transformations.teiPrettyPrinter, Entity.toXml(entityHolder.entity.copy(id = None)))
-    prettyPrint(store, Transformations.teiPrettyPrinter)
+      prettyPrint(entityHolder, Transformers.teiPrettyPrinter, Entity.toXml(entityHolder.entity.copy(id = None)))
+    prettyPrint(store, Transformers.teiPrettyPrinter)
 
     val site = new Site(store, references)
 

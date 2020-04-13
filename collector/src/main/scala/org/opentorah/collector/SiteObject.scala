@@ -15,7 +15,7 @@ abstract class SiteObject(val site: Site) {
         xml = Tei.toXml(teiTransformer(tei)),
         transformer = xmlTransformer
       )
-      Xml.xmlHeader + Transformations.teiPrettyPrinter.render(elem) +  "\n"
+      Xml.xmlHeader + Transformers.teiPrettyPrinter.render(elem) +  "\n"
     }
   }
 
@@ -32,9 +32,11 @@ abstract class SiteObject(val site: Site) {
 
   protected def teiUrl: Seq[String]
 
-  protected def teiTransformer: Tei.Transformer = Transformations.addCommonNoCalendar
+  protected def teiTransformer: Tei.Transformer =
+    Transformers.addPublicationStatement compose Transformers.addSourceDesc compose Transformers.addLanguage
 
-  protected def xmlTransformer: Xml.Transformer = Transformations.refTransformer(site)
+  protected def xmlTransformer: Xml.Transformer =
+    Transformers.refTransformer(site) compose Transformers.nameTransformer(site)
 
   protected def tei: Tei
 
