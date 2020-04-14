@@ -14,8 +14,8 @@ final class IndexObject(site: Site) extends SimpleSiteObject(site) {
     <head>{IndexObject.title}</head> ++
     <list type="bulleted">
       {for (collection <- site.collections.filterNot(collection =>
-        Site.unpublishedCollections.contains(CollectionObject.collectionName(collection))))
-      yield CollectionObject.collectionXml(collection)}
+        Site.unpublishedCollections.contains(Hierarchy.collectionName(collection))))
+      yield Hierarchy.collectionXml(collection)}
     </list>
   }
 }

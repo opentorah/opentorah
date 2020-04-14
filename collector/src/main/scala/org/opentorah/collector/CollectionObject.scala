@@ -4,7 +4,6 @@ import org.opentorah.entity.EntityReference
 import org.opentorah.store.WithPath
 import org.opentorah.tei.Ref
 import org.opentorah.util.{Files, Xml}
-import org.opentorah.xml.RawXml
 import scala.xml.{Elem, Node}
 
 final class CollectionObject(site: Site, collection: WithPath[Collection]) extends SimpleSiteObject(site) {
@@ -17,7 +16,7 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
 
   override protected def yaml: Seq[(String, String)] = Seq(
     "style" -> "wide",
-    "documentCollection" -> CollectionObject.collectionReference(collection)
+    "documentCollection" -> Hierarchy.collectionReference(collection)
   )
 
   override protected def teiBody: Seq[Node] = {
@@ -26,8 +25,8 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
       .filter(_.pb.isMissing)
       .map(_.displayName)
 
-    <head>{CollectionObject.collectionTitle(collection)}</head> ++
-      CollectionObject.collectionDescription(collection) ++
+    <head>{Hierarchy.collectionTitle(collection)}</head> ++
+      Hierarchy.collectionDescription(collection) ++
       Seq[Elem](CollectionObject.table(collection).toTei(
       collection.value.parts.flatMap { part =>
           part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Xml) ++
@@ -134,36 +133,5 @@ object CollectionObject {
     case n :: ns if n.isInstanceOf[Elem] => Seq(n, Xml.textNode(", ")) ++ multi(ns)
     case n :: ns => Seq(n) ++ multi(ns)
     case n => n
-  }
-
-  // TODO this yuck is temporary :)
-
-  def collectionReference(collection: WithPath[Collection]): String =
-    collection.value.names.name
-
-  def collectionTitle(collection: WithPath[Collection]): Seq[Node] =
-    collection.value.title.fold[Seq[Node]](Xml.textNode(collectionReference(collection)))(_.xml)
-
-  def collectionDescription(collection: WithPath[Collection]): Seq[Node] =
-    Seq(<span>{collection.value.storeAbstract.get.xml}</span>) ++
-      RawXml.getXml(collection.value.body)
-
-  def collectionName(collection: WithPath[Collection]): String =
-    Site.fileName(collection.value)
-
-  def collectionArchive(collection: WithPath[Collection]): Option[String] = {
-    val reference = collectionReference(collection)
-    val space = reference.lastIndexOf(' ')
-    if (space == -1) None else Some(reference.substring(0, space))
-  }
-
-  def collectionXml(collection: WithPath[Collection]): Elem = {
-    val url = CollectionObject.teiWrapperUrl(collection)
-    // If I do this, parts of the line click to the names... {ref(url, collectionViewer, textNode(collectionReference(collection) + ": ") ++ collectionTitle(collection))}<lb/>
-    <item>
-      {Ref.toXml(url, collectionReference(collection) + ": " +
-      Xml.toString(collectionTitle(collection)))}<lb/>
-      <abstract>{collection.value.storeAbstract.get.xml}</abstract>
-    </item>
   }
 }

@@ -16,14 +16,14 @@ final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
 
   override protected def teiBody: Seq[Node] = {
     val byArchive: Map[String, Seq[WithPath[Collection]]] =
-      site.collections.groupBy(collection => CollectionObject.collectionArchive(collection).getOrElse(""))
+      site.collections.groupBy(collection => Hierarchy.collectionArchive(collection).getOrElse(""))
 
     <head>{TreeIndexObject.title}</head> ++
     <list>{
       for (archive <- byArchive.keys.toList.sorted) yield {
         <item>
           <p>{s"[$archive]"}</p>
-          <list type="bulleted">{for (collection <- byArchive(archive)) yield CollectionObject.collectionXml(collection)}</list>
+          <list type="bulleted">{for (collection <- byArchive(archive)) yield Hierarchy.collectionXml(collection)}</list>
         </item>}}
     </list>
   }
