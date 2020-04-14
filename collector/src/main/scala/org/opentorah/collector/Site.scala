@@ -71,7 +71,7 @@ object Site {
     Files.deleteFiles(new File(directory, EntityObject.directoryName))
     for (entity <- site.entities) writeSiteObject(new EntityObject(site, entity), directory)
 
-    Files.deleteFiles(new File(directory, HierarchyObject.directoryName))
+    Files.deleteFiles(new File(directory, Hierarchy.directoryName))
     for (store <- site.stores) writeSiteObject(new HierarchyObject(site, store.path, store.value), directory)
 
     Files.deleteFiles(new File(directory, CollectionObject.directoryName))

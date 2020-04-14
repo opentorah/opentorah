@@ -53,7 +53,7 @@ object SiteObject {
       if (parts.isEmpty) Some(new IndexObject(site).teiWrapperFile) else {
         val tail: Seq[String] = parts.tail
         parts.head match {
-          case HierarchyObject.directoryName  => HierarchyObject .resolve(site, Path.empty, site.store, tail)
+          case Hierarchy       .directoryName => HierarchyObject .resolve(site, Path.empty, site.store, tail)
           case CollectionObject.directoryName => CollectionObject.resolve(site, tail)
           case EntityObject    .directoryName => EntityObject    .resolve(site, tail)
           case ReportObject    .directoryName => ReportObject    .resolve(site, tail)
