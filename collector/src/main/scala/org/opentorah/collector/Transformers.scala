@@ -1,7 +1,8 @@
 package org.opentorah.collector
 
 import org.opentorah.entity.EntityType
-import org.opentorah.tei.{Availability, CalendarDesc, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher, SourceDesc, Tei}
+import org.opentorah.tei.{Availability, CalendarDesc, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher,
+  SourceDesc, Tei}
 import org.opentorah.util.{Files, Xml}
 import org.opentorah.xml.PaigesPrettyPrinter
 import scala.xml.Attribute
@@ -58,15 +59,31 @@ object Transformers {
   def refTransformer(site: Site): Xml.Transformer = elem => if (elem.label != "ref") elem else
     elem.attribute("target").map(_.text).fold(throw new IllegalArgumentException(s"empty target: $elem")) { target =>
       if (!target.startsWith("/")) elem else {
-        val roleShouldBe: Option[String] = site.resolve(target).flatMap {
-          case teiWrapperFile: TeiWrapperFile => Some(teiWrapperFile.viewer.name)
-          case _ => None
+        if (target == "/collections/rgada/103") {
+          val x = 0
         }
-        val role: Option[String] = elem.attribute("role").map(_.text)
-        if (roleShouldBe.isEmpty) println(s"did not resolve: $target")
-        if (roleShouldBe.isDefined && role.isDefined && (role != roleShouldBe)) println(s"role discrepancy")
-        if ((role == roleShouldBe) || roleShouldBe.isEmpty || role.isDefined) elem
-        else elem % scala.xml.Attribute(None, "role", Xml.textNode(roleShouldBe.get), scala.xml.Null)
+        val (url, part) = urlAndPart(target)
+        site.resolve(url).fold {
+          println(s"did not resolve: $target")
+          elem
+        } { resolved =>
+          val roleShouldBe: Option[String] = resolved match {
+            case teiWrapperFile: TeiWrapperFile => Some(teiWrapperFile.viewer.name)
+            case _ => None
+          }
+          val role: Option[String] = elem.attribute("role").map(_.text)
+          if (role.isDefined) println(s"role discrepancy")
+          if ((role == roleShouldBe) || roleShouldBe.isEmpty || role.isDefined) elem
+          else {
+            val target: String = Files.mkUrl(addPart(resolved.url, part))
+            val rendition: Option[String] = elem.attribute("rendition").map(_.text)
+            elem.copy(attributes =
+              Attribute("role", Xml.textNode(roleShouldBe.get),
+              Attribute("target", Xml.textNode(target),
+              rendition.fold[scala.xml.MetaData](scala.xml.Null)(rendition =>
+                Attribute("rendition", Xml.textNode(rendition), scala.xml.Null)))))
+          }
+        }
       }
     }
 
@@ -93,4 +110,13 @@ object Transformers {
       }
     }
   }
+
+  // TODO move to Files
+  def urlAndPart(from: String): (String, Option[String]) = {
+    val sharp = from.indexOf('#')
+    if (sharp == -1) (from, None) else (from.substring(0, sharp), Some(from.substring(sharp+1)))
+  }
+
+  def addPart(url: Seq[String], part: Option[String]): Seq[String] =
+    part.fold(url){ part => url.init :+ (url.last + "#" + part) }
 }

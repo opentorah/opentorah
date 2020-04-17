@@ -69,8 +69,8 @@ object CollectionObject {
 
         case file => if (parts.tail.tail.nonEmpty) None else {
           val (fileName: String, extension: Option[String]) = Files.nameAndExtension(file)
-          if (fileName != fileName) None
-          else SimpleSiteObject.resolve(extension, new CollectionObject(site, collection))
+          if (fileName == CollectionObject.fileName) SimpleSiteObject.resolve(extension, new CollectionObject(site, collection))
+          else DocumentObject.resolve(site, collection, parts.tail, "html").map(_.teiWrapperFile)
         }
       }
     }
