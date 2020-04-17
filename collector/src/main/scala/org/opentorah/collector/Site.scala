@@ -42,6 +42,8 @@ object Site {
   def loadTei(tei: String): String =
     s"<script type='module'>import loadTei from '/js/tei.js'; loadTei('$tei');</script>"
 
+  //val root: Selector = new Selector(new Names(Seq(Name("Корень", Language.Russian))))
+
   def fileName(store: Store): String =
     Files.nameAndExtension(Files.pathAndName(store.urls.fromUrl.get.getPath)._2)._1
 

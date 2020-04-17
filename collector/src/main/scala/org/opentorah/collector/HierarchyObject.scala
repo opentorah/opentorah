@@ -17,11 +17,11 @@ final class HierarchyObject(site: Site, path: Path, store: Store) extends Simple
     <p>
       <l>{Site.getName(by.selector.names)}:</l>
       <list type="bulleted">{by.stores.map(_.asInstanceOf[Store]).map { store => // TODO get rid of the cast!!!
+        val storePath: Path = path :+ by.selector.bind(store)
         <item>{Ref.toXml(
           target = store match {
-            // TODO the path in the call to urlPrefix is not really correct...
-            case collection: Collection => CollectionObject.urlPrefix(WithPath(path, collection))
-            case _ => Hierarchy.urlPrefix(path :+ by.selector.bind(store))
+            case collection: Collection => CollectionObject.urlPrefix(WithPath(storePath, collection))
+            case _ => Hierarchy.urlPrefix(storePath)
           },
           text = Xml.textNode(Site.getName(store.names)) ++ Hierarchy.storeTitle(store)
         )}</item>
@@ -38,7 +38,8 @@ object HierarchyObject {
   def resolve(site: Site, path: Path, store: Store, parts: Seq[String]): Option[SiteFile] =
     if (parts.isEmpty) Some(new HierarchyObject(site, path, store).teiWrapperFile)
     else SimpleSiteObject.resolve(Some(parts.head), new HierarchyObject(site, path, store)).orElse {
-      val selector: Selector = store.by.get.selector
+      val by = store.by.get
+      val selector: Selector = by.selector
       val selectorName: String = parts.head
       if (selector.names.find(selectorName).isEmpty) None else store match {
         case collection: Collection =>
@@ -47,7 +48,7 @@ object HierarchyObject {
 
         case _ => if (parts.tail.isEmpty) None else {
           val storeName: String = Files.underscoresToSpaces(parts.tail.head)
-          store.by.get.stores.find(_.names.find(storeName).isDefined).flatMap { nextStore =>
+          by.stores.find(_.names.find(storeName).isDefined).flatMap { nextStore =>
             resolve(site, path :+ selector.bind(nextStore), nextStore, parts.tail.tail)
           }
         }
