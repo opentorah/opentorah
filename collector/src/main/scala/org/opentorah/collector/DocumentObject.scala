@@ -94,10 +94,13 @@ object DocumentObject {
     requiredExtension: String
   ): Option[DocumentObject] = if (parts.isEmpty || parts.tail.nonEmpty) None else {
     val (fileName: String, extension: Option[String]) = Files.nameAndExtension(parts.head)
-    if (extension.isDefined && !extension.contains(requiredExtension)) None else {
-      collection.value.findDocumentByName(fileName).map { case (document, teiHolder) =>
-        new DocumentObject(site, collection, document, teiHolder)
-      }
+    // Document name can have dots (e.g., 273.2), so if it is referenced without the extension, we end up here -
+    // and assume the required extension is implied, and the one found is part of the document name:
+    val documentName: String =
+    if (extension.isDefined && !extension.contains(requiredExtension)) parts.head else fileName
+
+    collection.value.findDocumentByName(documentName).map { case (document, teiHolder) =>
+      new DocumentObject(site, collection, document, teiHolder)
     }
   }
 }
