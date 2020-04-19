@@ -56,12 +56,10 @@ object Transformers {
     ))
   }
 
-  def refTransformer(site: Site): Xml.Transformer = elem => if (elem.label != "ref") elem else
+  def refTransformer(site: Site): Xml.Transformer = elem => if (elem.label != "ref") elem else {
+    if (elem.child.forall(Xml.isWhitespace)) println(s"No reference text: $elem")
     elem.attribute("target").map(_.text).fold(throw new IllegalArgumentException(s"empty target: $elem")) { target =>
       if (!target.startsWith("/")) elem else {
-        if (target == "/collections/rgada/103") {
-          val x = 0
-        }
         val (url, part) = urlAndPart(target)
         site.resolve(url).fold {
           println(s"did not resolve: $target")
@@ -86,6 +84,7 @@ object Transformers {
         }
       }
     }
+  }
 
   def pbTransformer(facsUrl: Seq[String]): Xml.Transformer = elem => if (elem.label != "pb") elem else {
     val pageId: String = Page.pageId(elem.attribute("n").get.text)

@@ -105,7 +105,7 @@ object CollectionObject {
         yield Ref.toXml(DocumentObject.documentUrl(collection, teiHolder.name), teiHolder.language.get)
       val language: Option[String] = document.tei.languages.map(_.ident).headOption
         .orElse(document.tei.text.lang)
-      Seq(Xml.textNode(language.getOrElse("?"))) ++ translations
+      Seq(Xml.textNode(language.getOrElse("?"))) ++ translations.flatMap(r => Seq(Xml.textNode(" "), r))
     }),
 
     Table.Column("Документ", "document", { document: Document =>
