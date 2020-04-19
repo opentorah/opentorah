@@ -17,12 +17,10 @@ object Hierarchy {
       .map(Site.getName)
       .map(Files.spacesToUnderscores)
 
-  def storeHeader(path: Path, store: Store): Seq[Node] = {
+  def storeHeader(path: Path, store: Store): Seq[Node] =
     pathLinks(path) ++
     <head>{storeTitle(path, store)}</head> ++
-    store.storeAbstract.map(value => <span>{value.xml}</span>).getOrElse(Seq.empty) ++
-    RawXml.getXml(store.body)
-  }
+    storeDescription(store)
 
   def pathLinks(pathRaw: Path): Seq[Elem] = {
     val path: Path = if (pathRaw.isEmpty) pathRaw else pathRaw.init
@@ -56,12 +54,13 @@ object Hierarchy {
   def collectionReference(collection: WithPath[Collection]): String =
     collection.value.names.name
 
+  // TODO eliminate
   def collectionTitle(collection: WithPath[Collection]): Seq[Node] =
     collection.value.title.fold[Seq[Node]](Xml.textNode(collectionReference(collection)))(_.xml)
 
-  def collectionDescription(collection: WithPath[Collection]): Seq[Node] =
-    Seq(<span>{collection.value.storeAbstract.get.xml}</span>) ++
-      RawXml.getXml(collection.value.body)
+  def storeDescription(store: Store): Seq[Node] =
+    store.storeAbstract.map(value => Seq(<span>{value.xml}</span>)).getOrElse(Seq.empty) ++
+      RawXml.getXml(store.body)
 
   def collectionName(collection: WithPath[Collection]): String =
     Site.fileName(collection.value)

@@ -26,7 +26,7 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
       .map(_.displayName)
 
     <head>{Hierarchy.collectionTitle(collection)}</head> ++
-      Hierarchy.collectionDescription(collection) ++
+      Hierarchy.storeDescription(collection.value) ++
       Seq[Elem](CollectionObject.table(collection).toTei(
       collection.value.parts.flatMap { part =>
           part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Xml) ++
