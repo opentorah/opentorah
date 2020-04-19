@@ -60,7 +60,7 @@ object Transformers {
     if (elem.child.forall(Xml.isWhitespace)) println(s"No reference text: $elem")
     elem.attribute("target").map(_.text).fold(throw new IllegalArgumentException(s"empty target: $elem")) { target =>
       if (!target.startsWith("/")) elem else {
-        val (url, part) = urlAndPart(target)
+        val (url, part) = Files.urlAndPart(target)
         site.resolve(url).fold {
           println(s"did not resolve: $target")
           elem
@@ -73,7 +73,7 @@ object Transformers {
           if (role.isDefined) println(s"role discrepancy")
           if ((role == roleShouldBe) || roleShouldBe.isEmpty || role.isDefined) elem
           else {
-            val target: String = Files.mkUrl(addPart(resolved.url, part))
+            val target: String = Files.mkUrl(Files.addPart(resolved.url, part))
             val rendition: Option[String] = elem.attribute("rendition").map(_.text)
             elem.copy(attributes =
               Attribute("role", Xml.textNode(roleShouldBe.get),
@@ -109,13 +109,4 @@ object Transformers {
       }
     }
   }
-
-  // TODO move to Files
-  def urlAndPart(from: String): (String, Option[String]) = {
-    val sharp = from.indexOf('#')
-    if (sharp == -1) (from, None) else (from.substring(0, sharp), Some(from.substring(sharp+1)))
-  }
-
-  def addPart(url: Seq[String], part: Option[String]): Seq[String] =
-    part.fold(url){ part => url.init :+ (url.last + "#" + part) }
 }

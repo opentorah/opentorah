@@ -70,13 +70,13 @@ object Site {
     writeSiteObject(new TreeIndexObject(site), directory)
     writeSiteObject(new NamesObject(site), directory)
 
-    deleteFiles(new File(directory, EntityObject.directoryName))
+    Files.deleteFiles(new File(directory, EntityObject.directoryName))
     for (entity <- site.entities) writeSiteObject(new EntityObject(site, entity), directory)
 
-    deleteFiles(new File(directory, Hierarchy.directoryName))
+    Files.deleteFiles(new File(directory, Hierarchy.directoryName))
     for (store <- site.stores) writeSiteObject(new HierarchyObject(site, store.path, store.value), directory)
 
-    deleteFiles(new File(directory, CollectionObject.directoryName))
+    Files.deleteFiles(new File(directory, CollectionObject.directoryName))
     for (collection <- site.collections) writeSiteObject(new CollectionObject(site, collection), directory)
 
     for {
@@ -90,7 +90,7 @@ object Site {
       writeSiteFile(documentObject.facsFile, directory)
     }
 
-    deleteFiles(new File(directory, ReportObject.directoryName))
+    Files.deleteFiles(new File(directory, ReportObject.directoryName))
     writeSiteObject(new MisnamedEntitiesReport(site), directory)
     writeSiteObject(new NoRefsReport(site), directory)
   }
@@ -102,11 +102,4 @@ object Site {
 
   private final def writeSiteFile(siteFile: SiteFile, directory: File): Unit =
     Files.write(Files.file(directory, siteFile.url), siteFile.content)
-
-  // TODO move into Files:
-  def deleteFiles(directory: File): Unit =
-    if (directory.exists()) {
-      if (directory.isDirectory) for (file <- directory.listFiles()) deleteFiles(file)
-      directory.delete()
-    }
 }
