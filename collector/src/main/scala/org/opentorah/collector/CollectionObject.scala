@@ -25,15 +25,16 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
       .filter(_.pb.isMissing)
       .map(_.displayName)
 
+//    Hierarchy.storeHeader(collection.path, collection.value) ++
     <head>{Hierarchy.collectionTitle(collection)}</head> ++
-      Hierarchy.collectionDescription(collection) ++
-      Seq[Elem](CollectionObject.table(collection).toTei(
+    Hierarchy.storeDescription(collection.value) ++
+    Seq[Elem](CollectionObject.table(collection).toTei(
       collection.value.parts.flatMap { part =>
           part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Xml) ++
           part.documents.map(Table.Data[Document]) }
-      )) ++
-      (if (missingPages.isEmpty) Seq.empty
-      else Seq(<p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>))
+    )) ++
+    (if (missingPages.isEmpty) Seq.empty
+     else Seq(<p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>))
   }
 }
 
