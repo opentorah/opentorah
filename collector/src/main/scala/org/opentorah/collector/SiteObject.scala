@@ -67,8 +67,11 @@ object SiteObject {
               case _ => None
             }
             result.flatMap(k => SimpleSiteObject.resolve(extension, k))
+              // Assume that this is a collection reference:
+              .orElse(CollectionObject.resolve(site, parts))
 
-          case _ => None
+          // Assume that this is a collection reference:
+          case _ => CollectionObject.resolve(site, parts)
         }
       }
     }
