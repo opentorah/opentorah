@@ -5,7 +5,7 @@ import org.opentorah.tei.{Availability, CalendarDesc, LangUsage, Language, Profi
   SourceDesc, Tei}
 import org.opentorah.util.{Files, Xml}
 import org.opentorah.xml.PaigesPrettyPrinter
-import scala.xml.Attribute
+import scala.xml.{Attribute, Elem, Node}
 
 object Transformers {
 
@@ -21,6 +21,14 @@ object Transformers {
     width = 120,
     indent = 2,
   )
+
+  def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
+    case Nil => Nil
+    case n :: Nil => Seq(n)
+    case n :: ns if n.isInstanceOf[Elem] => Seq(n, Xml.textNode(", ")) ++ multi(ns)
+    case n :: ns => Seq(n) ++ multi(ns)
+    case n => n
+  }
 
   val addPublicationStatement: Tei.Transformer = tei =>
     tei.copy(teiHeader = tei.teiHeader.copy(

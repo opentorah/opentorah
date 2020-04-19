@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.entity.{Entity, EntityReference}
-import org.opentorah.store.{EntityHolder, Store, WithPath}
+import org.opentorah.store.{Binding, EntityHolder, Path, Store, WithPath}
 import org.opentorah.tei.Ref
 import org.opentorah.util.{Collections, Files}
 import scala.xml.{Elem, Node}
@@ -25,14 +25,14 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
         val url: Option[Seq[String]] = sourceStore match {
           case teiHolder: TeiHolder => Some(DocumentObject.documentUrl(
             WithPath(source.init.init, source.init.init.last.store.asInstanceOf[Collection]),
-            Site.fileName(teiHolder)))
+            Hierarchy.fileName(teiHolder)))
           case document: Document => Some(DocumentObject.documentUrl(
             WithPath(source.init, source.init.last.store.asInstanceOf[Collection]),
-            Site.fileName(document)))
-          case collection: Collection => None // Some(collectionUrl(collection)) when grouping is adjusted?
+            Hierarchy.fileName(document)))
+          case collection: Collection => None // TODO Some(collectionUrl(collection)) when grouping is adjusted?
           case _ => None
         }
-        url.map(url => Ref.toXml(url, sourceStore.names.name))
+        url.map(url => Ref.toXml(url, Hierarchy.storeName(sourceStore)))
       }
 
       result.flatten
@@ -40,15 +40,15 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
 
     val id: String = EntityObject.fileName(entity)
 
-    val (fromEntities: Seq[WithPath[EntityReference]], notFromNames: Seq[WithPath[EntityReference]]) =
+    val (fromEntities: Seq[WithPath[EntityReference]], notFromEntities: Seq[WithPath[EntityReference]]) =
       site.references
       .filter(_.value.ref.contains(id))
       .partition(_.path.last.store.isInstanceOf[EntityHolder])
 
-    val bySource: Seq[(String, Seq[WithPath[EntityReference]])] =
-      notFromNames
+    val bySource: Seq[(Path, Seq[WithPath[EntityReference]])] =
+      notFromEntities
         .filter(reference => (reference.path.length >=3) && reference.path.init.init.last.store.isInstanceOf[Collection])
-        .groupBy(EntityObject.referenceCollectionName).toSeq.sortBy(_._1)
+        .groupBy(reference => reference.path.init.init).toSeq.sortBy(_._1)(EntityObject.pathOrdering)
 
     <p rendition="mentions">
       {Ref.toXml(NamesObject.entityInTheListUrl(id), "[...]")}
@@ -60,7 +60,7 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
           val entityHolder: EntityHolder = source.last.store.asInstanceOf[EntityHolder]
           Ref.toXml(
             target = EntityObject.teiWrapperUrl(entityHolder.entity),
-            text = entityHolder.names.name
+            text = Hierarchy.storeName(entityHolder)
           )
         }
 
@@ -68,7 +68,7 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
         }
       </l>}}
       {for ((source, references) <- bySource)
-      yield <l><emph>{source}:</emph>{sources(references)}</l>}
+      yield <l><emph>{Hierarchy.fullName(source)}:</emph>{sources(references)}</l>}
     </p>
   }
 }
@@ -89,6 +89,10 @@ object EntityObject {
       site.findByRef(fileName).flatMap(entity => SimpleSiteObject.resolve(extension, new EntityObject(site, entity)))
     }
 
-  def referenceCollectionName(reference: WithPath[EntityReference]): String =
-    reference.path.init.init.last.store.names.name
+  // TODO move into store
+  val pathOrdering: Ordering[Path] = (x: Path, y: Path) => Ordering.Iterable[Binding]((x: Binding, y: Binding) => {
+    val selectorCompare: Int = x.selector.names.name.toLowerCase compare y.selector.names.name.toLowerCase
+    if (selectorCompare != 0) selectorCompare
+    else x.store.names.name.toLowerCase compare y.store.names.name.toLowerCase
+  }).compare(x.path, y.path)
 }

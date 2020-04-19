@@ -1,31 +1,26 @@
 package org.opentorah.collector
 
 import java.io.File
-import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
-import org.opentorah.metadata.{Language, Names}
+import org.opentorah.entity.{Entity, EntityReference}
 import org.opentorah.store.{Entities, EntityHolder, Store, WithPath}
 import org.opentorah.util.Files
 
 final class Site(val store: Store, val references: Seq[WithPath[EntityReference]]) {
 
-  val stores: Seq[WithPath[Store]] = store.withPath[Store](values = {
-    case _: Collection | _: Document | _: Entities | _: EntityHolder | _: TeiHolder => Seq.empty
-    case store => Seq(store)
-  })
-
-  val collections: Seq[WithPath[Collection]] = store.withPath[Collection](values = {
+  private val collections: Seq[WithPath[Collection]] = store.withPath[Collection](values = {
     case collection: Collection => Seq(collection)
     case _ => Seq.empty
   })
 
+  def publishedCollections: Seq[WithPath[Collection]] = collections.filterNot(collection =>
+    Site.unpublishedCollections.contains(Hierarchy.fileName(collection.value)))
+
   def findCollectionByName(collectionName: String): Option[WithPath[Collection]] =
-    collections.find(collection => Site.fileName(collection.value) == collectionName)
+    collections.find(collection => Hierarchy.fileName(collection.value) == collectionName)
 
   val entities: Seq[Entity] = store.entities.get.by.get.stores.map(_.entity)
 
   def findByRef(fileName: String): Option[Entity] =  store.entities.get.findByRef(fileName)
-
-  val entitiesLists: Seq[EntitiesList] = store.entities.get.lists.filterNot(_.isEmpty)
 
   def resolve(url: String): Option[SiteFile] =
     if (!url.startsWith("/")) None
@@ -36,18 +31,8 @@ object Site {
 
   val facsimileBucket: String = "http://facsimiles.alter-rebbe.org/facsimiles/"
 
-  val unpublishedCollections: Set[String] =
+  private val unpublishedCollections: Set[String] =
     Set("derzhavin6", "derzhavin7", "lna208", "niab5", "niab19", "niab24", "rnb203", "rnb211")
-
-  def loadTei(tei: String): String =
-    s"<script type='module'>import loadTei from '/js/tei.js'; loadTei('$tei');</script>"
-
-  //val root: Selector = new Selector(new Names(Seq(Name("Корень", Language.Russian))))
-
-  def fileName(store: Store): String =
-    Files.nameAndExtension(Files.pathAndName(store.urls.fromUrl.get.getPath)._2)._1
-
-  def getName(names: Names): String = names.doFind(Language.Russian.toSpec).name
 
   // TODO with images on a separate website (facsimiles.alter-rebbe.org), this has to be re-worked...
   //  private def checkPages(): Unit = {
@@ -74,7 +59,11 @@ object Site {
     for (entity <- site.entities) writeSiteObject(new EntityObject(site, entity), directory)
 
     Files.deleteFiles(new File(directory, Hierarchy.directoryName))
-    for (store <- site.stores) writeSiteObject(new HierarchyObject(site, store.path, store.value), directory)
+    val stores: Seq[WithPath[Store]] = site.store.withPath[Store](values = {
+      case _: Collection | _: Document | _: Entities | _: EntityHolder | _: TeiHolder => Seq.empty
+      case store => Seq(store)
+    })
+    for (store <- stores) writeSiteObject(new HierarchyObject(site, store.path, store.value), directory)
 
     Files.deleteFiles(new File(directory, CollectionObject.directoryName))
     for (collection <- site.collections) writeSiteObject(new CollectionObject(site, collection), directory)

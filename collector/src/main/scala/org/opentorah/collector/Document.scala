@@ -5,7 +5,9 @@ import org.opentorah.entity.EntityReference
 import org.opentorah.metadata.{Name, Names}
 import org.opentorah.store.{By, Selector, Store, Urls}
 import org.opentorah.tei.Tei
+import org.opentorah.util.Xml
 import org.opentorah.xml.Parser
+import scala.xml.Node
 
 final class Document(
   inheritedSelectors: Seq[Selector],
@@ -31,6 +33,22 @@ final class Document(
 
   def pages(pageType: Page.Type): Seq[Page] =
     for (pb <- tei.pbs) yield pageType(pb)
+
+  def description: Seq[Node] =
+    tei.getAbstract
+    // Ignoring the titles:          .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
+    .getOrElse(Seq.empty)
+    .map(Xml.removeNamespace)
+
+  def date: Seq[Node] =
+    Xml.textNode(tei.creationDate.map(_.when).getOrElse(""))
+
+  def author: Seq[Node] =
+    Transformers.multi(tei.titleStmt.authors.map(_.xml).flatMap(_.map(Xml.removeNamespace)))
+
+  def addressee: Seq[Node] =
+    tei.addressee.fold[Seq[Node]](Xml.textNode(""))(addressee =>
+      <persName ref={addressee.ref.orNull}>{addressee.name}</persName>)
 }
 
 object Document {
