@@ -19,11 +19,7 @@ object Files {
     else (Some(path.substring(lastSlash)), path.substring(lastSlash+1))
   }
 
-  def nameAndExtension(fullName: String): (String, Option[String]) = {
-    val dot: Int = fullName.lastIndexOf('.')
-    if (dot == -1) (fullName, None)
-    else (fullName.substring(0, dot), Some(fullName.substring(dot+1)))
-  }
+  def nameAndExtension(fullName: String): (String, Option[String]) = split(fullName, '.')
 
   def write(file: File, content: String): Unit = {
     file.getParentFile.mkdirs()
@@ -42,9 +38,9 @@ object Files {
     result
   }
 
-  def deleteFiles(directory: File): Unit = {
-    directory.mkdirs()
-    for (file <- directory.listFiles()) file.delete()
+  def deleteFiles(directory: File): Unit = if (directory.exists()) {
+    if (directory.isDirectory) for (file <- directory.listFiles()) deleteFiles(file)
+    directory.delete()
   }
 
   def url2file(url: URL): File = java.nio.file.Paths.get(url.toURI).toFile
@@ -57,13 +53,21 @@ object Files {
 
   def isFile(url: URL): Boolean = url.getProtocol == "file"
 
-  def removePart(from: String): String = {
-    val sharp = from.indexOf('#')
-    if (sharp == -1) from else from.substring(0, sharp)
-  }
+  def urlAndPart(what: String): (String, Option[String]) = split(what, '#')
+
+  def removePart(from: String): String = urlAndPart(from)._1
+
+  def addPart(url: Seq[String], part: Option[String]): Seq[String] =
+    part.fold(url){ part => addPart(url, part) }
 
   def addPart(url: Seq[String], part: String): Seq[String] =
     url.init :+ (url.last + "#" + part)
+
+  def split(what: String, on: Char): (String, Option[String]) = {
+    val index: Int = what.lastIndexOf(on)
+    if (index == -1) (what, None)
+    else (what.substring(0, index), Some(what.substring(index+1)))
+  }
 
   def mkUrl(segments: Seq[String]): String = segments.mkString("/", "/", "")
 
