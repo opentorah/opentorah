@@ -65,9 +65,10 @@ object Hierarchy {
     storeName(reference.path.init.init.last.store)
 
   // TODO eliminate
-  def collectionXml(collection: WithPath[Collection]): Elem =
+  def collectionXml(site: Site, collection: WithPath[Collection]): Elem =
+  // TODO make a Ref serializer that takes SiteObject...
     <item>{Ref.toXml(
-      target = CollectionObject.teiWrapperUrl(collection),
+      target = new CollectionObject(site, collection).teiWrapperFile.url,
       text = fullName(collection.path) + Xml.toString(storeTitle(collection.value))
       )}<lb/>
       <abstract>{collection.value.storeAbstract.get.xml}</abstract>

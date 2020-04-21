@@ -33,6 +33,7 @@ abstract class Collection(
     documents.find(_.findTeiHolderByName(documentName).isDefined)
       .map(document => document -> document.findTeiHolderByName(documentName).get)
 
+  // TODO do it in Store for all of them
   val siblings: Map[Document, (Option[Document], Option[Document])] =
     Collections.prevAndNext(documents).toMap
 }

@@ -34,7 +34,6 @@ object HierarchyObject {
 
   val fileName: String = "index"
 
-  // TODO I'd like to be able to start the Path with a top-level store in there (using "top" pseudo-selector?).
   def resolve(site: Site, path: Path, store: Store, parts: Seq[String]): Option[SiteFile] =
     if (parts.isEmpty) Some(new HierarchyObject(site, path, store).teiWrapperFile) else {
       val head: String = parts.head

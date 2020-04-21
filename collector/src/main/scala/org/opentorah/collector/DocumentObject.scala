@@ -103,9 +103,11 @@ final class DocumentObject(
 
 object DocumentObject {
 
+  // TODO eliminate
   def documentUrl(collection: WithPath[Collection], documentName: String): Seq[String] =
     CollectionObject.urlPrefix(collection) :+ CollectionObject.documentsDirectoryName :+ (documentName + ".html")
 
+  // TODO eliminate
   def pageUrl(collection: WithPath[Collection], documentName: String, page: Page): Seq[String] =
     Files.addPart(documentUrl(collection, documentName), Page.pageId(page.pb.n))
 

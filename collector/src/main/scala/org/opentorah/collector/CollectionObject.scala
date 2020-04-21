@@ -38,13 +38,12 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
 
 object CollectionObject {
 
+  // TODO aren't they all?
   val fileName: String = "index"
 
+  // TODO eliminate
   def urlPrefix(collection: WithPath[Collection]): Seq[String] =
     Seq(CollectionObject.directoryName, Hierarchy.fileName(collection.value))
-
-  def teiWrapperUrl(collection: WithPath[Collection]): Seq[String] =
-    urlPrefix(collection) :+ (fileName + ".html")
 
   // Note: also hard-coded in 'index.xml'!
   val directoryName: String = "collections"
@@ -57,14 +56,14 @@ object CollectionObject {
 
   def resolve(site: Site, parts: Seq[String]): Option[SiteFile] = if (parts.isEmpty) None else
     site.findCollectionByName(parts.head).flatMap { collection =>
+      def resolveDocument(requiredExtension: String, f: DocumentObject => SiteFile): Option[SiteFile] =
+        DocumentObject.resolve(site, collection, parts.tail.tail, requiredExtension).map(f)
+
       if (parts.tail.isEmpty) Some(new CollectionObject(site, collection).teiWrapperFile)
       else parts.tail.head match {
-        case CollectionObject.documentsDirectoryName =>
-          DocumentObject.resolve(site, collection, parts.tail.tail, "html").map(_.teiWrapperFile)
-        case CollectionObject.teiDirectoryName =>
-          DocumentObject.resolve(site, collection, parts.tail.tail, "xml").map(_.teiFile)
-        case CollectionObject.facsDirectoryName =>
-          DocumentObject.resolve(site, collection, parts.tail.tail, "html").map(_.facsFile)
+        case CollectionObject.documentsDirectoryName => resolveDocument("html", _.teiWrapperFile)
+        case CollectionObject.teiDirectoryName       => resolveDocument("xml" , _.teiFile)
+        case CollectionObject.facsDirectoryName      => resolveDocument("html", _.facsFile)
 
         case file => if (parts.tail.tail.nonEmpty) None else {
           val (fileName: String, extension: Option[String]) = Files.nameAndExtension(file)

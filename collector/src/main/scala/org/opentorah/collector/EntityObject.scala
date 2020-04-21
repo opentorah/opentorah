@@ -77,6 +77,7 @@ object EntityObject {
 
   val directoryName: String = "names"
 
+  // TODO eliminate
   private val urlPrefix: Seq[String] = Seq(directoryName)
 
   private def fileName(entity: Entity): String = entity.id.get
