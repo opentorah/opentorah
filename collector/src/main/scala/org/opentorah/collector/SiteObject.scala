@@ -26,7 +26,7 @@ abstract class SiteObject(val site: Site) {
 
     final def content: String = SiteObject.withYaml(
       yaml = Seq("target" -> viewer.name) ++ yaml,
-      content = Seq(Site.loadTei(Files.mkUrl(teiFile.url)))
+      content = Seq(SiteObject.loadTei(Files.mkUrl(teiFile.url)))
     )
   }
 
@@ -49,32 +49,35 @@ abstract class SiteObject(val site: Site) {
 
 object SiteObject {
 
+  def loadTei(tei: String): String =
+    s"<script type='module'>import loadTei from '/js/tei.js'; loadTei('$tei');</script>"
+
   def resolve(site: Site, parts: Seq[String]): Option[SiteFile] = {
-      if (parts.isEmpty) Some(new IndexObject(site).teiWrapperFile) else {
-        val tail: Seq[String] = parts.tail
-        parts.head match {
-          case Hierarchy       .directoryName => HierarchyObject .resolve(site, Path.empty, site.store, tail)
-          case CollectionObject.directoryName => CollectionObject.resolve(site, tail)
-          case EntityObject    .directoryName => EntityObject    .resolve(site, tail)
-          case ReportObject    .directoryName => ReportObject    .resolve(site, tail)
+    if (parts.isEmpty) Some(new IndexObject(site).teiWrapperFile) else {
+      val tail: Seq[String] = parts.tail
+      parts.head match {
+        case Hierarchy       .directoryName => HierarchyObject .resolve(site, Path.empty, site.store, tail)
+        case CollectionObject.directoryName => CollectionObject.resolve(site, tail)
+        case EntityObject    .directoryName => EntityObject    .resolve(site, tail)
+        case ReportObject    .directoryName => ReportObject    .resolve(site, tail)
 
-          case file if parts.tail.isEmpty =>
-            val (fileName: String, extension: Option[String]) = Files.nameAndExtension(file)
-            val result: Option[SimpleSiteObject] = fileName match {
-              case IndexObject    .fileName => Some(new IndexObject    (site))
-              case TreeIndexObject.fileName => Some(new TreeIndexObject(site))
-              case NamesObject    .fileName => Some(new NamesObject    (site))
-              case _ => None
-            }
-            result.flatMap(k => SimpleSiteObject.resolve(extension, k))
-              // Assume that this is a collection reference:
-              .orElse(CollectionObject.resolve(site, parts))
+        case file if parts.tail.isEmpty =>
+          val (fileName: String, extension: Option[String]) = Files.nameAndExtension(file)
+          val result: Option[SimpleSiteObject] = fileName match {
+            case IndexObject    .fileName => Some(new IndexObject    (site))
+            case TreeIndexObject.fileName => Some(new TreeIndexObject(site))
+            case NamesObject    .fileName => Some(new NamesObject    (site))
+            case _ => None
+          }
+          result.flatMap(k => SimpleSiteObject.resolve(extension, k))
+            // Assume that this is a collection reference:
+            .orElse(CollectionObject.resolve(site, parts))
 
-          // Assume that this is a collection reference:
-          case _ => CollectionObject.resolve(site, parts)
-        }
+        // Assume that this is a collection reference:
+        case _ => CollectionObject.resolve(site, parts)
       }
     }
+  }
 
   def withYaml(
     yaml: Seq[(String, String)],

@@ -15,7 +15,7 @@ final class HierarchyObject(site: Site, path: Path, store: Store) extends Simple
 
   protected def teiBody: Seq[Node] = Hierarchy.storeHeader(path, store) ++ store.by.toSeq.flatMap { by: By[_] =>
     <p>
-      <l>{Site.getName(by.selector.names)}:</l>
+      <l>{Hierarchy.getName(by.selector.names)}:</l>
       <list type="bulleted">{by.stores.map(_.asInstanceOf[Store]).map { store => // TODO get rid of the cast!!!
         val storePath: Path = path :+ by.selector.bind(store)
         <item>{Ref.toXml(
@@ -23,7 +23,7 @@ final class HierarchyObject(site: Site, path: Path, store: Store) extends Simple
             case collection: Collection => CollectionObject.urlPrefix(WithPath(storePath, collection))
             case _ => Hierarchy.urlPrefix(storePath)
           },
-          text = Xml.textNode(Site.getName(store.names)) ++ Hierarchy.storeTitle(store)
+          text = Xml.textNode(Hierarchy.getName(store.names)) ++ Hierarchy.storeTitle(store)
         )}</item>
       }}</list>
     </p>
@@ -36,22 +36,29 @@ object HierarchyObject {
 
   // TODO I'd like to be able to start the Path with a top-level store in there (using "top" pseudo-selector?).
   def resolve(site: Site, path: Path, store: Store, parts: Seq[String]): Option[SiteFile] =
-    if (parts.isEmpty) Some(new HierarchyObject(site, path, store).teiWrapperFile)
-    else SimpleSiteObject.resolve(Some(parts.head), new HierarchyObject(site, path, store)).orElse {
-      val by = store.by.get
-      val selector: Selector = by.selector
-      val selectorName: String = parts.head
-      if (selector.names.find(selectorName).isEmpty) None else store match {
-        case collection: Collection =>
-          if (parts.tail.nonEmpty) None
-          else Some(new CollectionObject(site, WithPath(path, collection)).teiWrapperFile)
+    if (parts.isEmpty) Some(new HierarchyObject(site, path, store).teiWrapperFile) else {
+      val head: String = parts.head
+      SimpleSiteObject.resolve(Some(head), new HierarchyObject(site, path, store)) orElse {
+        if (store.by.isEmpty) None else {
+          val by: By[Store] = store.by.get
+          val selector: Selector = by.selector
+          if (selector.names.find(head).isEmpty) None else store match {
+            case collection: Collection =>
+              if (parts.tail.nonEmpty) None
+              else Some(new CollectionObject(site, WithPath(path, collection)).teiWrapperFile)
 
-        case _ => if (parts.tail.isEmpty) None else {
-          val storeName: String = Files.underscoresToSpaces(parts.tail.head)
-          by.stores.find(_.names.find(storeName).isDefined).flatMap { nextStore =>
-            resolve(site, path :+ selector.bind(nextStore), nextStore, parts.tail.tail)
+            case _ => if (parts.tail.isEmpty) None else {
+              val storeName: String = Files.underscoresToSpaces(parts.tail.head)
+              by.stores.find(_.names.find(storeName).isDefined).flatMap { nextStore =>
+                resolve(site, path :+ selector.bind(nextStore), nextStore, parts.tail.tail)
+              }
+            }
           }
         }
+      } orElse {
+        val (fileName: String, extension: Option[String]) = Files.nameAndExtension(head)
+        if (fileName != HierarchyObject.fileName) None
+        else SimpleSiteObject.resolve(extension, new HierarchyObject(site, path, store))
       }
     }
 }

@@ -16,7 +16,7 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
 
   override protected def yaml: Seq[(String, String)] = Seq(
     "style" -> "wide",
-    "documentCollection" -> Hierarchy.collectionReference(collection)
+    "documentCollection" -> Hierarchy.storeName(collection.value)
   )
 
   override protected def teiBody: Seq[Node] = {
@@ -25,9 +25,7 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
       .filter(_.pb.isMissing)
       .map(_.displayName)
 
-//    Hierarchy.storeHeader(collection.path, collection.value) ++
-    <head>{Hierarchy.collectionTitle(collection)}</head> ++
-    Hierarchy.storeDescription(collection.value) ++
+    Hierarchy.storeHeader(collection.path, collection.value) ++
     Seq[Elem](CollectionObject.table(collection).toTei(
       collection.value.parts.flatMap { part =>
           part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Xml) ++
@@ -43,7 +41,7 @@ object CollectionObject {
   val fileName: String = "index"
 
   def urlPrefix(collection: WithPath[Collection]): Seq[String] =
-    Seq(CollectionObject.directoryName, Site.fileName(collection.value))
+    Seq(CollectionObject.directoryName, Hierarchy.fileName(collection.value))
 
   def teiWrapperUrl(collection: WithPath[Collection]): Seq[String] =
     urlPrefix(collection) :+ (fileName + ".html")
@@ -79,26 +77,10 @@ object CollectionObject {
     }
 
   def table(collection: WithPath[Collection]): Table[Document] = new Table[Document](
-    Table.Column("Описание", "description", { document: Document =>
-      document.tei.getAbstract
-        // Ignoring the titles:          .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
-        .getOrElse(Seq.empty)
-        .map(Xml.removeNamespace)
-    }),
-
-    Table.Column("Дата", "date", { document: Document =>
-      Xml.textNode(document.tei.creationDate.map(_.when).getOrElse(""))
-    }),
-
-    Table.Column("Кто", "author", { document: Document =>
-      val authors = document.tei.titleStmt.authors.map(_.xml).flatMap(_.map(Xml.removeNamespace))
-      multi(authors)
-    }),
-
-    Table.Column("Кому", "addressee",  { document =>
-      document.tei.addressee.fold[Seq[Node]](Xml.textNode(""))(addressee =>
-        <persName ref={addressee.ref.orNull}>{addressee.name}</persName>)
-    }),
+    Table.Column("Описание", "description", _.description),
+    Table.Column("Дата", "date", _.date),
+    Table.Column("Кто", "author", _.author),
+    Table.Column("Кому", "addressee", _.addressee),
 
     Table.Column("Язык", "language", { document: Document =>
       val translations: Seq[Elem] =
@@ -114,8 +96,7 @@ object CollectionObject {
     }),
 
     Table.Column("Страницы", "pages", { document: Document =>
-      for (page <- document.pages(collection.value.pageType))
-      yield Ref.toXml(
+      for (page <- document.pages(collection.value.pageType)) yield Ref.toXml(
         target = DocumentObject.pageUrl(collection, document.name, page),
         text = page.displayName,
         rendition = Some(Page.pageRendition(page.pb.isMissing))
@@ -126,15 +107,7 @@ object CollectionObject {
       val transcribers = document.tei.titleStmt.editors
         .filter(_.role.contains("transcriber")).flatMap(_.persName)
         .map(transcriber => Xml.removeNamespace(EntityReference.toXml(transcriber)))
-      multi(transcribers)
+      Transformers.multi(transcribers)
     })
   )
-
-  private def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
-    case Nil => Nil
-    case n :: Nil => Seq(n)
-    case n :: ns if n.isInstanceOf[Elem] => Seq(n, Xml.textNode(", ")) ++ multi(ns)
-    case n :: ns => Seq(n) ++ multi(ns)
-    case n => n
-  }
 }

@@ -12,7 +12,7 @@ final class NamesObject(site: Site) extends SimpleSiteObject(site) {
   override protected def teiWrapperViewer: Viewer = Viewer.Names
 
   override protected def teiBody: Seq[Node] = {
-    val nonEmptyLists: Seq[EntitiesList] = site.entitiesLists.filterNot(_.isEmpty)
+    val nonEmptyLists: Seq[EntitiesList] = site.store.entities.get.lists.filterNot(_.isEmpty)
     val listOfLists: Seq[Node] =
       <p>{for (list <- nonEmptyLists) yield <l>{Ref.toXml(NamesObject.entityInTheListUrl(list.id), list.head)}</l>}</p>
 

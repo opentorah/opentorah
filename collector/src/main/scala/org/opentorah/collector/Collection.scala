@@ -25,7 +25,7 @@ abstract class Collection(
   def documents: Seq[Document] = by.get.stores
 
   val parts: Seq[Collection.Part] = Collection.getParts(
-    descriptors = by.get.element.stores.map(_.asInstanceOf[Store.Inline]),
+    descriptors = by.get.element.stores.filter(_.isInstanceOf[Store.Inline]).map(_.asInstanceOf[Store.Inline]),
     documents
   )
 

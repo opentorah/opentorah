@@ -13,9 +13,7 @@ final class IndexObject(site: Site) extends SimpleSiteObject(site) {
   override protected def teiBody: Seq[Node] = {
     <head>{IndexObject.title}</head> ++
     <list type="bulleted">
-      {for (collection <- site.collections.filterNot(collection =>
-        Site.unpublishedCollections.contains(Hierarchy.collectionName(collection))))
-      yield Hierarchy.collectionXml(collection)}
+      {for (collection <- site.publishedCollections) yield Hierarchy.collectionXml(collection)}
     </list>
   }
 }

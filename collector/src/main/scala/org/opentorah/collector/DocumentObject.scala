@@ -1,9 +1,9 @@
 package org.opentorah.collector
 
 import org.opentorah.store.WithPath
-import org.opentorah.tei.Tei
+import org.opentorah.tei.{Body, Tei}
 import org.opentorah.util.{Files, Xml}
-import scala.xml.Elem
+import scala.xml.{Elem, Node}
 
 final class DocumentObject(
   site: Site,
@@ -23,7 +23,28 @@ final class DocumentObject(
   private def url(directoryName: String, extension: String): Seq[String] =
     CollectionObject.urlPrefix(collection) :+ directoryName :+ (teiHolder.name + "." + extension)
 
-  override protected def tei: Tei = teiHolder.tei
+  override protected def tei: Tei = {
+    val tei = teiHolder.tei
+    tei.copy(text = tei.text.copy(body = new Body.Value(headerTei ++ tei.body.xml)))
+  }
+
+  private def headerTei: Seq[Node] =
+    <p rendition="document-header">
+      <l>{document.description}</l>
+      <l>Дата: {document.date}</l>
+      <l>Кто: {document.author}</l>
+      <l>Кому: {document.addressee}</l>
+    </p>
+
+  // TODO links are not live since they are targeting TEI :)
+  // Skip the header in facsimile altogether?
+  private def headerFacs: Seq[Node] =
+    <div class="document-header">
+      <span>{document.description}</span><br/>
+      <span>Дата: {document.date}</span><br/>
+      <span>Кто: {document.author}</span><br/>
+      <span>Кому: {document.addressee}</span>
+    </div>
 
   override protected def teiTransformer: Tei => Tei =
     Transformers.addPublicationStatement compose
@@ -42,7 +63,7 @@ final class DocumentObject(
 
   private def navigation: Seq[(String, String)] = {
     val (prev: Option[Document], next: Option[Document]) = collection.value.siblings(document)
-    Seq("documentCollection" -> Hierarchy.collectionReference(collection)) ++
+    Seq("documentCollection" -> Hierarchy.storeName(collection.value)) ++
     prev.map(prev => Seq("prevDocument" -> prev.name)).getOrElse(Seq.empty) ++
     Seq("thisDocument" -> document.name) ++
     next.map(next => Seq("nextDocument" -> next.name)).getOrElse(Seq.empty)
@@ -55,12 +76,13 @@ final class DocumentObject(
       // TODO do pages of the appropriate teiHolder!
       val facsimilePages: Elem =
         <div class={Viewer.Facsimile.name}>
+          {headerFacs}
           <div class="facsimileScroller">
             {for (page: Page <- document.pages(collection.value.pageType).filterNot(_.pb.isMissing)) yield {
             val n: String = page.pb.n
             val href: Seq[String] = DocumentObject.pageUrl(collection, document.name, page)
             val facs: String = page.pb.facs
-              .getOrElse(Site.facsimileBucket + Site.fileName(collection.value) + "/" + n + ".jpg")
+              .getOrElse(Site.facsimileBucket + Hierarchy.fileName(collection.value) + "/" + n + ".jpg")
             <a target={Viewer.Document.name} href={Files.mkUrl(href)}>
               <figure>
                 <img xml:id={Page.pageId(n)} alt={s"facsimile for page $n"} src={facs}/>

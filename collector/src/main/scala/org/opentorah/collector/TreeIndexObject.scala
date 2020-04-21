@@ -1,6 +1,8 @@
 package org.opentorah.collector
 
-import org.opentorah.store.WithPath
+import org.opentorah.store.{By, Path, Store, WithPath}
+import org.opentorah.tei.Ref
+import org.opentorah.util.Xml
 import scala.xml.Node
 
 final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
@@ -14,17 +16,26 @@ final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
     "title" -> TreeIndexObject.title
   )
 
-  override protected def teiBody: Seq[Node] = {
-    val byArchive: Map[String, Seq[WithPath[Collection]]] =
-      site.collections.groupBy(collection => Hierarchy.collectionArchive(collection).getOrElse(""))
+  override protected def teiBody: Seq[Node] =
+    <head>{Ref.toXml(new HierarchyObject(site, Path.empty, site.store).teiWrapperFile.url, TreeIndexObject.title)}</head> ++
+    listForStore(Path.empty, site.store)
 
-    <head>{TreeIndexObject.title}</head> ++
-    <list>{
-      for (archive <- byArchive.keys.toList.sorted) yield {
-        <item>
-          <p>{s"[$archive]"}</p>
-          <list type="bulleted">{for (collection <- byArchive(archive)) yield Hierarchy.collectionXml(collection)}</list>
-        </item>}}
+  private def listForStore(path: Path, store: Store): Seq[Node] = store.by.toSeq.flatMap { by: By[_] =>
+    <list type="none">
+      <item><emph>{Hierarchy.getName(by.selector.names)}</emph></item>
+      <item><list type="none">
+          {by.stores.map(_.asInstanceOf[Store]).map { store => // TODO get rid of the cast!!!
+            val isCollection: Boolean = store.isInstanceOf[Collection]
+            val storePath: Path = path :+ by.selector.bind(store)
+            val siteObject: SiteObject =
+              if (isCollection) new CollectionObject(site, WithPath(path, store.asInstanceOf[Collection]))
+              else new HierarchyObject(site, storePath, store)
+            <item>
+              {Ref.toXml(siteObject.teiWrapperFile.url, Hierarchy.getName(store.names) + Xml.toString(Hierarchy.storeTitle(store)))}
+              {if (isCollection) Seq.empty else listForStore(storePath, store)}
+            </item>
+        }}
+      </list></item>
     </list>
   }
 }
