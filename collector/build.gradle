@@ -1,15 +1,41 @@
 plugins {
     id 'scala'
+    id 'application'
     id 'com.github.maiflai.scalatest'
+    id 'com.google.cloud.tools.jib'
+}
+
+jib {
+    to {
+        image = 'gcr.io/alter-rebbe/collector'
+    }
+    container {
+        mainClass = 'org.opentorah.collector.Service'
+    }
 }
 
 description = 'Archive Collector'
 
 dependencies {
     implementation "org.opentorah:store:$storeVersion"
+
     implementation "org.scala-lang:scala-library:$scalaVersion"
     implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+
+    implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
+    implementation "dev.zio:zio-interop-cats_$scalaVersionMajor:$zioInteropCatsVersion"
+
+    implementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
+    implementation "org.typelevel:cats-effect_$scalaVersionMajor:$catsVersion"
+
+    implementation "org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion"
+    implementation "org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion"
+    implementation "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion"
+
+    runtimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
 
     testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
     testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
 }
+
+mainClassName = 'org.opentorah.collector.Service'
