@@ -1,107 +1,108 @@
 plugins {
-    id 'scala'
-    id 'com.github.maiflai.scalatest'
-    id 'maven-publish'
-    id 'com.jfrog.bintray'
+  id 'scala'
+  id 'com.github.maiflai.scalatest'
+  id 'maven-publish'
+  id 'com.jfrog.bintray'
 }
 
 description = 'Open Torah Store'
 
 dependencies {
-    implementation "org.scala-lang:scala-library:$scalaVersion"
-    implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
-    implementation "org.typelevel:paiges-core_$scalaVersionMajor:$paigesVersion"
+  implementation "org.scala-lang:scala-library:$scalaVersion"
+  implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
 
-    implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
+  implementation "org.typelevel:paiges-core_$scalaVersionMajor:$paigesVersion"
 
-    testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
-    testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
+  implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
+
+  testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
+  testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
 }
 
 task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    archiveClassifier.set('sources')
+  from sourceSets.main.allSource
+  archiveClassifier.set('sources')
 }
 
 task scaladocJar(type: Jar) {
-    from scaladoc.destinationDir
-    archiveClassifier.set('scaladoc')
+  from scaladoc.destinationDir
+  archiveClassifier.set('scaladoc')
 }
 scaladocJar.dependsOn scaladoc
 
 
 final String gitHubRepository    = "opentorah/store"
 final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
-final String libraryArtifactId   = project.name
+final String libraryArtifactId   = "opentorah-store"
 jar.archiveBaseName.set(libraryArtifactId)
 
 publishing {
-    publications {
-        mavenPublication(MavenPublication) {
-            groupId project.group
-            artifactId libraryArtifactId
+  publications {
+    mavenPublication(MavenPublication) {
+      groupId project.group
+      artifactId libraryArtifactId
 
-            from components.java
+      from components.java
 
-            artifact sourceJar
-            artifact scaladocJar
+      artifact sourceJar
+      artifact scaladocJar
 
-            pom {
-                name = project.name
-                description = project.description
-                url = "$gitHubRepositoryUrl"
-                scm {
-                    url = "$gitHubRepositoryUrl"
-                    connection = "scm:git:git://github.com/${gitHubRepository}.git"
-                    developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
-                }
-                licenses {
-                    license {
-                        name = 'The Apache Software License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution = 'repo'
-                        comments = 'A business-friendly OSS license'
-                    }
-                }
-                organization {
-                    name = 'Open Torah'
-                    url = 'http://www.opentorah.org'
-                }
-                developers {
-                    developer {
-                        id = 'dub'
-                        name = 'Leonid Dubinsky'
-                        email = 'dub@podval.org'
-                        url = 'http://dub.podval.org'
-                        organization = 'Podval Group'
-                        organizationUrl = 'http://www.podval.org'
-                        timezone = '-5'
-                    }
-                }
-            }
+      pom {
+        name = project.name
+        description = project.description
+        url = "$gitHubRepositoryUrl"
+        scm {
+          url = "$gitHubRepositoryUrl"
+          connection = "scm:git:git://github.com/${gitHubRepository}.git"
+          developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
         }
+        licenses {
+          license {
+            name = 'The Apache Software License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution = 'repo'
+            comments = 'A business-friendly OSS license'
+          }
+        }
+        organization {
+          name = 'Open Torah'
+          url = 'http://www.opentorah.org'
+        }
+        developers {
+          developer {
+            id = 'dub'
+            name = 'Leonid Dubinsky'
+            email = 'dub@podval.org'
+            url = 'http://dub.podval.org'
+            organization = 'Podval Group'
+            organizationUrl = 'http://www.podval.org'
+            timezone = '-5'
+          }
+        }
+      }
     }
+  }
 }
 
 bintray {
-    user = 'dubinsky'
-    key = findProperty('bintrayApiKey')
-    publications = ['mavenPublication']
-    dryRun = false
-    publish = true
-    override = true
-    pkg {
-        repo = project.group
-        name = libraryArtifactId
-        desc = project.description
-        websiteUrl = "http://www.opentorah.org"
-        issueTrackerUrl = "${gitHubRepositoryUrl}/issues"
-        vcsUrl = "${gitHubRepositoryUrl}.git"
-        githubRepo = gitHubRepository
-        licenses = ['Apache-2.0']
-        labels = ['Jewish', 'TEI', "Scala"]
-        publicDownloadNumbers = true
-//        githubReleaseNotesFile = "${rootProject.projectDir}/docs/CHANGELOG.md"
-        version { name = project.version }
-    }
+  user         = 'dubinsky'
+  key          = findProperty('bintrayApiKey')
+  publications = ['mavenPublication']
+  dryRun       = false
+  publish      = true
+  override     = true
+  pkg {
+    repo                  = project.group
+    name                  = libraryArtifactId
+    desc                  = project.description
+    websiteUrl            = "http://www.opentorah.org"
+    issueTrackerUrl       = "${gitHubRepositoryUrl}/issues"
+    vcsUrl                = "${gitHubRepositoryUrl}.git"
+    githubRepo            = gitHubRepository
+    licenses              = ['Apache-2.0']
+    labels                = ['Jewish', 'TEI', "Scala"]
+    publicDownloadNumbers = true
+//    githubReleaseNotesFile = "${rootProject.projectDir}/docs/CHANGELOG.md"
+    version { name        = project.version }
+  }
 }
