@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.entity.{Entity, EntityReference}
-import org.opentorah.store.{Binding, EntityHolder, Path, Store, WithPath}
+import org.opentorah.store.{EntityHolder, Path, Store, WithPath}
 import org.opentorah.tei.Ref
 import org.opentorah.util.{Collections, Files}
 import scala.xml.{Elem, Node}
@@ -48,7 +48,7 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
     val bySource: Seq[(Path, Seq[WithPath[EntityReference]])] =
       notFromEntities
         .filter(reference => (reference.path.length >=3) && reference.path.init.init.last.store.isInstanceOf[Collection])
-        .groupBy(reference => reference.path.init.init).toSeq.sortBy(_._1)(EntityObject.pathOrdering)
+        .groupBy(reference => reference.path.init.init).toSeq.sortBy(_._1)(Hierarchy.pathOrdering)
 
     <p rendition="mentions">
       {Ref.toXml(NamesObject.entityInTheListUrl(id), "[...]")}
@@ -89,11 +89,4 @@ object EntityObject {
       val (fileName: String, extension: Option[String]) = Files.nameAndExtension(parts.head)
       site.findByRef(fileName).flatMap(entity => SimpleSiteObject.resolve(extension, new EntityObject(site, entity)))
     }
-
-  // TODO move into store
-  val pathOrdering: Ordering[Path] = (x: Path, y: Path) => Ordering.Iterable[Binding]((x: Binding, y: Binding) => {
-    val selectorCompare: Int = x.selector.names.name.toLowerCase compare y.selector.names.name.toLowerCase
-    if (selectorCompare != 0) selectorCompare
-    else x.store.names.name.toLowerCase compare y.store.names.name.toLowerCase
-  }).compare(x.path, y.path)
 }

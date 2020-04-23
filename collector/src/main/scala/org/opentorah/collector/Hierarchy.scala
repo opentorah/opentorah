@@ -78,4 +78,10 @@ object Hierarchy {
 
   def fileName(store: Store): String =
     Files.nameAndExtension(Files.pathAndName(store.urls.fromUrl.get.getPath)._2)._1
+
+  val pathOrdering: Ordering[Path] = (x: Path, y: Path) => Ordering.Iterable[Binding]((x: Binding, y: Binding) => {
+    val selectorCompare: Int = x.selector.names.name.toLowerCase compare y.selector.names.name.toLowerCase
+    if (selectorCompare != 0) selectorCompare
+    else x.store.names.name.toLowerCase compare y.store.names.name.toLowerCase
+  }).compare(x.path, y.path)
 }
