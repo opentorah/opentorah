@@ -15,7 +15,7 @@ import zio.{App, Task, URIO, ZEnv, ZIO}
 import zio.interop.catz._
 import zio.interop.catz.implicits._
 
-// TODO start with proxying for store.alter-rebe.org :)
+// TODO start with proxying for store.alter-rebbe.org :)
 
 object Service extends App {
 
