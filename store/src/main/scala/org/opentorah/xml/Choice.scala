@@ -1,5 +1,7 @@
 package org.opentorah.xml
 
+import org.opentorah.util.Collections
+
 final class Choice(result: Map[Parsable[_], Seq[_]]) {
 
   def all[A](parsable: Parsable[A]): Seq[A] =
@@ -20,7 +22,8 @@ object Choice {
       Parsable.annotate(parsable).asInstanceOf[Parsable[(Parsable[_], _)]]
     })
     val results: Parser[Map[Parsable[_], Seq[_]]] =
-      parsable.all.map(_.groupBy(_._1).mapValues(_.map(_._2)))
+      parsable.all.map(parsable =>
+        Collections.mapValues(parsable.groupBy(_._1))(_.map(_._2)))
 
     results.map(new Choice(_))
   }

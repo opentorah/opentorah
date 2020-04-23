@@ -1,7 +1,7 @@
 package org.opentorah.xml
 
 import java.net.URL
-import org.opentorah.util.Xml
+import org.opentorah.util.{Collections, Xml}
 import zio.ZIO
 import scala.xml.{Elem, Node}
 
@@ -80,7 +80,7 @@ object Parsable {
     override def toString: Error = "annotated " + parsable.toString
 
     override def name2parser: Map[String, ContentTypeAndParser[(Parsable[A], A)]] =
-      parsable.name2parser.mapValues { contentTypeAndParser: ContentTypeAndParser[A] =>
+      Collections.mapValues(parsable.name2parser) { contentTypeAndParser: ContentTypeAndParser[A] =>
         new Parsable.ContentTypeAndParser[(Parsable[A], A)](
           contentTypeAndParser.contentType,
           contentTypeAndParser.parser.map { result => parsable -> result }
