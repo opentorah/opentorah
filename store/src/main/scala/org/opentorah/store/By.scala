@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import java.net.URL
-import org.opentorah.util.{Files, Xml}
+import org.opentorah.util.{Collections, Files, Xml}
 import org.opentorah.xml.{Attribute, PaigesPrettyPrinter, Parser, Text, ToXml}
 import zio.ZIO
 import scala.xml.Elem
@@ -14,6 +14,9 @@ abstract class By[+S <: Store](
   def selector: Selector
 
   final lazy val stores: Seq[S] = Parser.parseDo(Parser.collectAll(load))
+
+  final lazy val siblings: Map[Store, (Option[S], Option[S])] =
+    Collections.prevAndNext(stores).toMap
 
   protected def load: Seq[Parser[S]]
 

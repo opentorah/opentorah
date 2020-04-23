@@ -1,5 +1,6 @@
 package org.opentorah.util
 
+// TODO move to what uses it
 object Util {
   // Maybe in JDK 9 and later I won't need to deal with '$'?
   // see https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8057919

@@ -12,7 +12,7 @@ dependencies {
     implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
     implementation "org.typelevel:paiges-core_$scalaVersionMajor:$paigesVersion"
 
-    compile "dev.zio:zio_$scalaVersionMajor:$zioVersion"
+    implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
 
     testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
     testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
