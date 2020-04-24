@@ -62,7 +62,7 @@ final class DocumentObject(
     navigation
 
   private def navigation: Seq[(String, String)] = {
-    val (prev: Option[Document], next: Option[Document]) = collection.value.siblings(document)
+    val (prev: Option[Document], next: Option[Document]) = collection.value.by.get.siblings(document)
     Seq("documentCollection" -> Hierarchy.storeName(collection.value)) ++
     prev.map(prev => Seq("prevDocument" -> prev.name)).getOrElse(Seq.empty) ++
     Seq("thisDocument" -> document.name) ++
