@@ -1,6 +1,7 @@
 plugins {
   id 'scala'
-  id 'application'
+  id 'com.github.maiflai.scalatest'
+  id 'com.google.cloud.tools.jib'
 }
 
 description = 'Jewish Calendar Service.'
@@ -20,18 +21,11 @@ dependencies {
   runtimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
 }
 
-mainClassName = 'org.opentorah.calendar.service.CalendarService'
-
-final File dockerDir = file("$buildDir/docker/")
-
-task prepareDockerContext {
-  group = "docker"
-  dependsOn installDist
-
-  doLast {
-    copy { from "$installDist.destinationDir/lib" into "$dockerDir/project-libs" include "**/org.opentorah.*" }
-    copy { from "$installDist.destinationDir/lib" into "$dockerDir/dependencies" exclude "**/org.opentorah.*" }
-    copy { from "$installDist.destinationDir/bin" into "$dockerDir/bin" }
-    copy { from "$projectDir/Dockerfile" into dockerDir }
+jib {
+  to {
+    image = 'gcr.io/calendar/calendar'
+  }
+  container {
+    mainClass = 'org.opentorah.calendar.service.CalendarService'
   }
 }
