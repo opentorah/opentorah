@@ -8,9 +8,6 @@ allprojects {
     jcenter()
     mavenCentral()
     mavenLocal()
-
-//    // For some reason the 'store' package isn't included in JCenter...
-//    maven { url  "https://dl.bintray.com/dubinsky/org.opentorah" }
   }
 
   group = 'org.opentorah'
@@ -28,14 +25,5 @@ idea {
       file('.idea'),
       file('gradle')
     ]
-  }
-}
-
-subprojects {
-  configurations.all {
-    resolutionStrategy {
-      force("org.scala-lang:scala-library:$scalaVersion")
-      force("org.typelevel:cats-core_$scalaVersionMajor:$catsVersion")
-    }
   }
 }

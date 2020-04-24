@@ -10,6 +10,8 @@ repositories {
 }
 
 dependencies {
+  zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
+
   implementation "org.scala-lang:scala-library:$scalaVersion"
 
   runtimeOnly project(':library')

@@ -6,6 +6,8 @@ plugins {
 description = 'Jewish Calendar Service.'
 
 dependencies {
+  zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
+
   implementation project(':library')
   implementation "org.opentorah:store:$storeVersion"
 
