@@ -13,7 +13,7 @@ dependencies {
   implementation "org.scala-lang:scala-library:$scalaVersion"
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
 
-  implementation project(":xml")
+  implementation "org.typelevel:paiges-core_$scalaVersionMajor:$paigesVersion"
 
   implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
 
@@ -24,7 +24,7 @@ dependencies {
 apply from: '../bintray.gradle'
 
 configureBintray(
-  "opentorah-store",           // jarArtifactId
-  "opentorah/store",           // gitHubRepository
-  ['Scala', 'Jewish', 'TEI']   // tags
+  "opentorah-xml",    // jarArtifactId
+  "opentorah/store",  // gitHubRepository
+  ['Scala', 'XML']     // tags
 )
