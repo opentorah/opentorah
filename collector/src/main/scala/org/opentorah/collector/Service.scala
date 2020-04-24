@@ -1,16 +1,14 @@
 package org.opentorah.collector
 
 import java.util.concurrent.Executors
-
 import cats.effect.{Blocker, ExitCode}
 import org.http4s.{HttpRoutes, StaticFile}
 //import org.http4s.{Charset, Response}
 import org.http4s.dsl.Http4sDsl
 //import org.http4s.headers.`Content-Type`
 //import org.http4s.MediaType
-//import org.http4s.dsl.io._   // GET, Root, Ok
 import org.http4s.implicits._  // orNotFound :)
-import org.http4s.server.blaze._
+import org.http4s.server.blaze.BlazeServerBuilder
 import zio.{App, Task, URIO, ZEnv, ZIO}
 import zio.interop.catz._
 import zio.interop.catz.implicits._
@@ -27,14 +25,14 @@ object Service extends App {
   import dsl._
 
   private val service = HttpRoutes.of[Task] {
+    case GET -> Root / "hello" => Ok("hello!")
+
     case request @ GET -> Root / path if staticResourceExtensions.exists(path.endsWith) =>
       StaticFile.fromResource("/" + path, blocker, Some(request))
         .getOrElseF(NotFound("Not found!!!"))
-
-    //    case GET -> Root => Ok("hello1!")
   }
 
-  //  def renderHtml(content: String): IO[Response[IO]] = Ok(content).map(
+  //  def renderHtml(content: String): Task[Response[Task]] = Ok(content).map(
   //    _.withContentType(`Content-Type`(MediaType.`text`.`html`, Charset.`UTF-8`))
   //  )
 

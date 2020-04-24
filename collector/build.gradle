@@ -9,7 +9,7 @@ description = 'Archive Collector'
 dependencies {
   zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
 
-  implementation "org.opentorah:store:$storeVersion"
+  implementation "org.opentorah:opentorah-store:$storeVersion"
 
   implementation "org.scala-lang:scala-library:$scalaVersion"
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
