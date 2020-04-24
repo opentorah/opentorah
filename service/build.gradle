@@ -10,7 +10,7 @@ dependencies {
   zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
 
   implementation project(':library')
-  implementation "org.opentorah:store:$storeVersion"
+  implementation "org.opentorah:opentorah-store:$storeVersion"
 
   implementation "org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion"
   implementation "org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion"

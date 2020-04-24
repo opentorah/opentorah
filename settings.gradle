@@ -25,6 +25,6 @@ include ':paper'
 
 //includeBuild ('../store') {
 //  dependencySubstitution {
-//    substitute module('org.opentorah:store') with project(':store')
+//    substitute module('org.opentorah:opentorah-store') with project(':store')
 //  }
 //}
