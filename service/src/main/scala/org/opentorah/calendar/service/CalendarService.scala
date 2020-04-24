@@ -1,17 +1,18 @@
 package org.opentorah.calendar.service
 
-import cats.effect.{Blocker, ExitCode, IO, IOApp}
-import cats.implicits._
+import cats.effect.{Blocker, ExitCode}
 import org.opentorah.metadata.{Language, LanguageSpec}
 import org.http4s.{Charset, HttpRoutes, QueryParamDecoder, Response, StaticFile}
+import org.http4s.dsl.Http4sDsl
 import org.http4s.implicits._
-import org.http4s.dsl.io._
 import org.http4s.headers.`Content-Type`
 import org.http4s.MediaType
 import org.http4s.server.blaze.BlazeServerBuilder
+import zio.{App, Task, URIO, ZEnv, ZIO}
+import zio.interop.catz._
+import zio.interop.catz.implicits._
 import java.util.concurrent.Executors
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
 
 /*
   There is currently no need for the polished, public UI.
@@ -28,17 +29,18 @@ import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
   be designed to accommodate the needs of the real consumer.
   Then, we'll:
   - communicate selective applicability of Purim/Shushan Purim readings;
-  - add Nassi, Molad, Tehillim, Tachanun, Maariv after Shabbos...
+  - add Nassi, Tachanun, Maariv after Shabbos...
  */
-object CalendarService extends IOApp {
+object CalendarService extends App {
 
-  private val blockingPool: ExecutionContextExecutorService =
-    ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(2))
-  private val blocker: Blocker = Blocker.liftExecutorService(blockingPool)
+  private val blocker: Blocker = Blocker.liftExecutorService(Executors.newFixedThreadPool(2))
 
   private val staticResourceExtensions: Seq[String] = Seq(".ico", ".css", ".js")
 
-  private val calendarService: HttpRoutes[IO] = HttpRoutes.of[IO] {
+  private val dsl = Http4sDsl[Task]
+  import dsl._
+
+  private val service: HttpRoutes[Task] = HttpRoutes.of[Task] {
     case request @ GET -> Root / path if staticResourceExtensions.exists(path.endsWith) =>
       StaticFile.fromResource("/" + path, blocker, Some(request))
         .getOrElseF(NotFound())
@@ -93,19 +95,24 @@ object CalendarService extends IOApp {
 
   private def toLocation(location: Option[Location]): Location = location.getOrElse(Location.Diaspora)
 
-  def renderHtml(content: String): IO[Response[IO]] = Ok(content).map(
+  def renderHtml(content: String): Task[Response[Task]] = Ok(content).map(
     _.withContentType(`Content-Type`(MediaType.`text`.`html`, Charset.`UTF-8`))
   )
 
   // To be accessible when running in a docker container the server must bind to all IPs, not just 127.0.0.1:
-  override def run(args: List[String]): IO[ExitCode] = BlazeServerBuilder[IO]
-    .bindHttp(host = "0.0.0.0", port = getServicePort)
-    .withHttpApp(calendarService.orNotFound)
-    .serve
-    .compile
-    .drain
-    .as(ExitCode.Success)
+  val server: ZIO[ZEnv, Throwable, Unit] = ZIO.runtime[ZEnv].flatMap { implicit rts =>
+    BlazeServerBuilder[Task]
+      .bindHttp(host = "0.0.0.0", port = getServicePort)
+      .withWebSockets(false)
+      .withHttpApp(service.orNotFound)
+      .serve
+      .compile[Task, Task, ExitCode]
+      .drain
+  }
 
   private def getServicePort: Int =
-    scala.util.Properties.envOrNone("SERVICE_PORT").map(_.toInt).getOrElse(8090)
+    scala.util.Properties.envOrNone("PORT").map(_.toInt).getOrElse(8090)
+
+  def run(args: List[String]): URIO[ZEnv, Int] =
+    server.fold(_ => 1, _ => 0)
 }
