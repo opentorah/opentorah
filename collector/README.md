@@ -11,10 +11,10 @@ To support self-contained dynamic site we need to replicate some of the Jekyll's
 - compile SCSS into CSS: compass/jsass?;
 - convert Markdown to HTML (blog, notes): flexmark-java or Laika (planet42.github.io/Laika).
 
-## Storabe and Caching ##
+## Storage and Caching ##
 
 Facsimiles displayed on the site are in the Google Storage bucket `facsimiles.alter-rebbe.org`,
-where member "allUsers" has the role "Storag Object Viewer".
+where member "allUsers" has the role "Storage Object Viewer".
 DNS has CNAME record for it that points to `c.storage.googleapis.com`,
 so the files can be retrieved by anyone who has the correct URL.
 
@@ -62,7 +62,7 @@ I am using [Cloud Run](https://cloud.google.com/run#key-features).
 Service `collector` (`940416907592-compute@developer.gserviceaccount.com`;
 URL `https://collector-qfkasghxtq-uk.a.run.app`) runs in us-eat4 and allows
 unauthenticated requests.
-DNS has CNAME record for `app.alter-rebbe.org` that points to `ghs.googlehosted.com.`
+DNS has CNAME record for `app.alter-rebbe.org` that points to `ghs.googlehosted.com.`.
 
 For monitoring, there is Stackdriver (Logging, Monitoring, Error reporting),
 Cloud Debugger and Cloud Profiler.
