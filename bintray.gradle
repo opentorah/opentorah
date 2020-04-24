@@ -1,0 +1,95 @@
+ext.configureBintray = {
+  final String jarArtifactId,
+  final String gitHubRepository,
+  final List<String> tags
+    ->
+
+  // Read more from project properties, gardle.properties (or a file)?
+  final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
+  final String orgName = 'Open Torah'
+  final String orgUrl = 'http://www.opentorah.org'
+
+  task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    archiveClassifier.set('sources')
+  }
+
+  task scaladocJar(type: Jar) {
+    from scaladoc.destinationDir
+    archiveClassifier.set('scaladoc')
+  }
+  scaladocJar.dependsOn scaladoc
+
+  jar.archiveBaseName.set(jarArtifactId)
+
+  publishing {
+    publications {
+      mavenPublication(MavenPublication) {
+        groupId project.group
+        artifactId jarArtifactId
+
+        from components.java
+
+        artifact sourceJar
+        artifact scaladocJar
+
+        pom {
+          name = project.name
+          description = project.description
+          url = "$gitHubRepositoryUrl"
+          scm {
+            url = "$gitHubRepositoryUrl"
+            connection = "scm:git:git://github.com/${gitHubRepository}.git"
+            developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
+          }
+          licenses {
+            license {
+              name = 'The Apache Software License, Version 2.0'
+              url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+              distribution = 'repo'
+              comments = 'A business-friendly OSS license'
+            }
+          }
+          organization {
+            name = orgName
+            url = orgUrl
+          }
+          developers {
+            developer {
+              id = 'dub'
+              name = 'Leonid Dubinsky'
+              email = 'dub@podval.org'
+              url = 'http://dub.podval.org'
+              organization = 'Podval Group'
+              organizationUrl = 'http://www.podval.org'
+              timezone = '-5'
+            }
+          }
+        }
+      }
+    }
+  }
+
+  bintray {
+    user = 'dubinsky'
+    key = findProperty('bintrayApiKey')
+    publications = ['mavenPublication']
+    dryRun = false
+    publish = true
+    override = true
+    pkg {
+      repo = project.group
+      name = jarArtifactId
+      desc = project.description
+      websiteUrl = orgUrl
+      issueTrackerUrl = "${gitHubRepositoryUrl}/issues"
+      vcsUrl = "${gitHubRepositoryUrl}.git"
+      githubRepo = gitHubRepository
+      licenses = ['Apache-2.0']
+      labels = tags
+      publicDownloadNumbers = true
+//    githubReleaseNotesFile = "${rootProject.projectDir}/docs/CHANGELOG.md"
+      version { name = project.version }
+    }
+  }
+}
