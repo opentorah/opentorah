@@ -1,40 +1,46 @@
 package org.opentorah.collector
 
 import java.util.concurrent.Executors
-
 import cats.effect.{Blocker, ExitCode}
-import org.http4s.{HttpRoutes, StaticFile}
+import org.http4s.{HttpRoutes, StaticFile, Uri}
 //import org.http4s.{Charset, Response}
 import org.http4s.dsl.Http4sDsl
 //import org.http4s.headers.`Content-Type`
 //import org.http4s.MediaType
-//import org.http4s.dsl.io._   // GET, Root, Ok
 import org.http4s.implicits._  // orNotFound :)
-import org.http4s.server.blaze._
+import org.http4s.server.blaze.BlazeServerBuilder
 import zio.{App, Task, URIO, ZEnv, ZIO}
 import zio.interop.catz._
 import zio.interop.catz.implicits._
-
-// TODO start with proxying for www.alter-rebbe.org :)
 
 object Service extends App {
 
   private val blocker: Blocker = Blocker.liftExecutorService(Executors.newFixedThreadPool(2))
 
-  private val staticResourceExtensions: Seq[String] = Seq(".ico", ".css", ".js", ".jpeg")
+//  private val staticResourceExtensions: Seq[String] = Seq(".ico", ".css", ".js", ".jpeg")
 
   private val dsl = Http4sDsl[Task]
   import dsl._
 
   private val service = HttpRoutes.of[Task] {
-    case request @ GET -> Root / path if staticResourceExtensions.exists(path.endsWith) =>
-      StaticFile.fromResource("/" + path, blocker, Some(request))
+    case GET -> Root / "hello" => Ok("hello!")
+
+    // Proxy www.alter-rebbe.org :)
+    case request @ GET -> _ =>
+      val requested = request.uri
+      val target = requested.copy(
+        scheme = Some(Uri.Scheme.http),
+        authority = Some(Uri.Authority(host = Uri.RegName(getOtherHost)))
+      )
+      StaticFile.fromURL(new java.net.URL(target.toString), blocker, Some(request))
         .getOrElseF(NotFound("Not found!!!"))
 
-    //    case GET -> Root => Ok("hello1!")
+//    case request @ GET -> Root / path if staticResourceExtensions.exists(path.endsWith) =>
+//      StaticFile.fromResource("/" + path, blocker, Some(request))
+//        .getOrElseF(NotFound("Not found!!!"))
   }
 
-  //  def renderHtml(content: String): IO[Response[IO]] = Ok(content).map(
+  //  def renderHtml(content: String): Task[Response[Task]] = Ok(content).map(
   //    _.withContentType(`Content-Type`(MediaType.`text`.`html`, Charset.`UTF-8`))
   //  )
 
@@ -50,7 +56,10 @@ object Service extends App {
   }
 
   private def getServicePort: Int =
-    scala.util.Properties.envOrNone("SERVICE_PORT").map(_.toInt).getOrElse(8090)
+    scala.util.Properties.envOrNone("PORT").map(_.toInt).getOrElse(8090)
+
+  private def getOtherHost: String =
+    scala.util.Properties.envOrNone("OTHER_HOST").getOrElse("www.alter-rebbe.org")
 
   def run(args: List[String]): URIO[ZEnv, Int] =
     server.fold(_ => 1, _ => 0)
