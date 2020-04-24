@@ -11,7 +11,7 @@ To support self-contained dynamic site we need to replicate some of the Jekyll's
 - compile SCSS into CSS: compass/jsass?;
 - convert Markdown to HTML (blog, notes): flexmark-java or Laika (planet42.github.io/Laika).
 
-## Facsimiles ##
+## Storabe and Caching ##
 
 Facsimiles displayed on the site are in the Google Storage bucket `facsimiles.alter-rebbe.org`,
 where member "allUsers" has the role "Storag Object Viewer".
@@ -21,7 +21,13 @@ so the files can be retrieved by anyone who has the correct URL.
 To validate that facsimiles referenced from the site are in one-to-one correspondence with
 the files in the bucket, we probably need to use Google Cloud Storage client to retrieve
 (and cache) the list of them.
+
 We also might want to use Google's CDN for them (Firebase Hosting?).
+
+Memorystore/Redis turned out to be too expensive (Google charges for *provisioned* capacity),
+so the fact that Cloud Run probably can't talk to it even now (4/2020) isn't important :(
+I may end up using [Cloud Firestore](https://firebase.google.com/docs/firestore)
+for caching generated (and maybe even source) files.
 
 (I used BFG Repocleaner to remove facsimiles and their Git history from this repository
 once they moved out.)
@@ -49,7 +55,7 @@ To sync with the bucket:
   $ gsutil -m rsync -r -c -d <path-to-local-copy-of-the-bucket> gs://facsimiles.alter-rebbe.org
 ```
 
-## Running on GCP ##
+## Compute ##
 
 I am using [Cloud Run](https://cloud.google.com/run#key-features).
 
@@ -58,29 +64,18 @@ URL `https://collector-qfkasghxtq-uk.a.run.app`) runs in us-eat4 and allows
 unauthenticated requests.
 DNS has CNAME record for `app.alter-rebbe.org` that points to `ghs.googlehosted.com.`
 
-Memorystore/Redis turned out to be too expensive
-(Google charges for *provisioned* capacity),
-so the fact that Cloud Run probably can't talk to it even now (4/2020) isn't important :(
-I may end up using [Cloud Firestore](https://firebase.google.com/docs/firestore)
-for caching generated (and maybe even source) files.
-
-### Docker ###
+For monitoring, there is Stackdriver (Logging, Monitoring, Error reporting),
+Cloud Debugger and Cloud Profiler.
 
 I am using [jib](https://github.com/GoogleContainerTools/jib) Gradle Plugin to
 build and deploy my Docker image (`gcr.io/alter-rebbe/collector`).
 
-To run the container locally:
+It is possible to tag the image with a timestamp:
 ```
-  $ ./gradlew jibDockerBuild`
-```
-
-To push to Cloud Run via Container Registry:
-```
-  $ ./gradlew jib
+  jib.to.image = 'gcr.io/my-gcp-project/my-app:' + System.nanoTime()
 ```
 
-(I do not see the need to set up [Cloud Build](https://cloud.google.com/cloud-build),
-but if I do - it runs locally too!)
+Locally, is possible to run [javaagent](https://github.com/GoogleContainerTools/jib/blob/master/docs/faq.md#i-would-like-to-run-my-application-with-a-javaagent).
 
 To make docker work locally, [I had to](https://linuxconfig.org/how-to-install-docker-on-fedora-31)
 revert back to cgroup v1:
@@ -89,20 +84,61 @@ revert back to cgroup v1:
   $ sudo grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
   $ sudo reboot
 ```
+I do not see the need to set up [Cloud Build](https://cloud.google.com/cloud-build),
+but if I do - it runs locally too!
 
-## Monitoring ##
 
-Stackdriver: Logging, Monitoring, Error reporting.
+### Docker and Cloud Run Commands ###
 
-Cloud Debugger and Cloud Profiler.
+To push to the GCP Container (Artifact) Registry (and thus make available for Cloud Run):
+```
+  $ ./gradlew jib
+```
+To run the container locally, build it to local Docker:
+```
+  $ ./gradlew jibDockerBuild`
+```
+or, if pushed to a repository, pull it from there:
+```
+  $ docker pull <image name>
+```
+and then:
+```app engine dockerfile template
+  $ docker run <image name>
+```
 
-### Logging ###
+To deploy on the Cloud Run:
+```
+  $ gcloud run deploy collector --image gcr.io/alter-rebbe/collector --platform managed --region=us-east4
+```
 
-GCP supports Logback and java.util.logging; I use slf4j (with slf4j-jdk14.jar?).
-How do I configure it to work with Cloud Logging? Just by adding
-`'com.google.cloud:google-cloud-logging:1.101.1'` as a dependency?
+Arguments to the entry point:
 
-Should I maybe switch to Typelevel's Scala Logging or `log4s` ?
-How does ZIO handle logging?
+Locally:
+```
+  $ docker run <image name> <arg1> <arg2> <arg3>
+```
 
-I need to take care of the `http4s` access log.
+Can be set in the Cloud Run Console or in CLI:
+
+```
+--args=[ARG,...]
+        Comma-separated arguments passed to the command run by the container
+        image. To reset this field to its default, pass an empty string.
+```
+
+Environment variables:
+
+Locally:
+```
+  $ docker run -e "NAME=VALUE" <image name>
+```
+Can also be set in the Cloud Run Console or in CLI:
+```
+  --clear-env-vars                   Remove all environment variables.
+  --set-env-vars=[KEY=VALUE,...]     All existing environment variables will be removed first.
+  --remove-env-vars=[KEY,...]        List of environment variables to be removed.
+  --update-env-vars=[KEY=VALUE,...]  List of key-value pairs to set as environment variables.
+At most one of 'clear' and 'set' may be specified.
+If both 'remove' and 'update' are specified, 'remove' will be applied first.
+```
