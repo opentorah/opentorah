@@ -7,11 +7,7 @@ pluginManagement {
   }
 }
 
-rootProject.name = 'store'
-
 include ':xml'
 include ':store'
-include ':papers'
-include ':docs'
 
 //includeBuild '../../docbook/docbook-gradle'
