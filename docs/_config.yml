@@ -9,16 +9,11 @@ url: "http://www.opentorah.org" # the base hostname & protocol for your site, e.
 
 github_username:  dubinsky
 
-# If you want to link only specific pages in your header, uncomment
-# this and add the path to the pages in order as they should show up
 header_pages:
   - index.md
 
 markdown: kramdown
 theme: minima
-
-#include:
-#  - README.md
 
 exclude:
   - build.gradle
