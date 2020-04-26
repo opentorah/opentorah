@@ -1,0 +1,37 @@
+<names type="GregorianDay">
+    <names>
+      <name lang="en" n="Sunday"/>
+      <name lang="ru" n="воскресенье"/>
+      <name lang="he" n="ראשון"/>
+    </names>
+    <names>
+      <name lang="en" n="Monday"/>
+      <name lang="ru" n="понедельник"/>
+      <name lang="he" n="שני"/>
+    </names>
+    <names>
+      <name lang="en" n="Tuesday"/>
+      <name lang="ru" n="вторник"/>
+      <name lang="he" n="שלישי"/>
+    </names>
+    <names>
+      <name lang="en" n="Wednesday"/>
+      <name lang="ru" n="среда"/>
+      <name lang="he" n="רביעי"/>
+    </names>
+    <names>
+      <name lang="en" n="Thursday"/>
+      <name lang="ru" n="четверг"/>
+      <name lang="he" n="חמישי"/>
+    </names>
+    <names>
+      <name lang="en" n="Friday"/>
+      <name lang="ru" n="пятница"/>
+      <name lang="he" n="ששי"/>
+    </names>
+    <names>
+      <name lang="en" n="Saturday"/>
+      <name lang="ru" n="суббота"/>
+      <name lang="he" n="שבת"/>
+    </names>
+</names>

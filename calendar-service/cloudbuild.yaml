@@ -1,0 +1,45 @@
+steps:
+# gradle: prepare docker context
+# Latest Gradle builder on Google Cloud Build
+#  - name: 'gcr.io/cloud-builders/gradle'
+# is obsolete; for a while I used custom builder that I had to build myself for each Gradle update:
+#  - name: 'gcr.io/calendar-service-1/gradle:5.1.1-jdk-8'
+# https://github.com/GoogleCloudPlatform/cloud-builders/pull/452
+# was supposed to make official Gradle images available on GCB; it is now August of 2019, and - nothing.
+# gavingolden explained how to run Gradle version set in the wrapper (although Gradle distribution gets downloaded every time):
+# https://github.com/GoogleCloudPlatform/cloud-builders/pull/452#issuecomment-485148016.
+# That's what I do now.
+  - name: 'java:8'
+    entrypoint: "bash"
+    args: [ "-c", "./gradlew :service:prepareDockerContext"]
+#  - name: 'gcr.io/calendar-service-1/gradle:5.1.1-jdk-8'
+#    args: [':service:prepareDockerContext']
+
+# docker: build docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+    - 'build'
+    - '--tag=gcr.io/$PROJECT_ID/service'
+    - './service/build/docker'
+#waitFor: ['-']
+
+# docker: push the image (as part of the build)
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+    - 'push'
+    - 'gcr.io/$PROJECT_ID/service'
+#waitFor: ['-']
+
+# gcloud: update VM instance's image
+#   this is specific to my particular setup: one VM instance named 'instance-1' in a specific zone.
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+    - 'compute'
+    - 'instances'
+    - 'update-container'
+    - '--zone=us-east1-b'
+    - 'instance-1'
+    - '--container-image=gcr.io/$PROJECT_ID/service'
+
+# also display the image in the build results
+images: ['gcr.io/$PROJECT_ID/service']

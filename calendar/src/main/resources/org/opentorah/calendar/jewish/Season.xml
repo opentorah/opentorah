@@ -1,0 +1,26 @@
+<names type="Season">
+  <names>
+    <name lang="he" n="תקופת תשרי"/>
+    <name lang="en" n="Autumnal Equinox"/>
+    <name lang="en" transliterated="yes" n="Tkufas Tishrei"/>
+    <name lang="ru" n="осеннее равноденствие"/>
+  </names>
+  <names>
+    <name lang="he" n="תקופת טבת"/>
+    <name lang="en" n="Winter Solstice"/>
+    <name lang="en" transliterated="yes" n="Tkufas Teves"/>
+    <name lang="ru" n="зимнее солнцестояние"/>
+  </names>
+  <names>
+    <name lang="he" n="תקופת ניסן"/>
+    <name lang="en" n="Spring Equinox"/>
+    <name lang="en" transliterated="yes" n="Tkufas Nisan"/>
+    <name lang="ru" n="весеннее равноденствие"/>
+  </names>
+  <names>
+    <name lang="he" n="תקופת תמוז"/>
+    <name lang="en" n="Summer Solstice"/>
+    <name lang="en" transliterated="yes" n="Tkufas Tammuz"/>
+    <name lang="ru" n="летнее солнцестояние"/>
+  </names>
+</names>

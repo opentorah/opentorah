@@ -1,0 +1,46 @@
+<names type="JewishDay">
+    <names>
+        <name lang="he" n="ראשון"/>
+        <name lang="en" transliterated="yes" n="Rishon"/>
+        <name lang="en" n="Sunday"/>
+        <name lang="ru" n="воскресенье"/>
+    </names>
+    <names>
+        <name lang="he" n="שני"/>
+        <name lang="en" transliterated="yes" n="Sheni"/>
+        <name lang="en" n="Monday"/>
+        <name lang="ru" n="понедельник"/>
+    </names>
+    <names>
+        <name lang="he" n="שלישי"/>
+        <name lang="en" transliterated="yes" n="Shlishi"/>
+        <name lang="en" n="Tuesday"/>
+        <name lang="ru" n="вторник"/>
+    </names>
+    <names>
+        <name lang="he" n="רביעי"/>
+        <name lang="en" transliterated="yes" n="Rvii"/>
+        <name lang="en" n="Wednesday"/>
+        <name lang="ru" n="среда"/>
+    </names>
+    <names>
+        <name lang="he" n="חמישי"/>
+        <name lang="en" transliterated="yes" n="Chamishi"/>
+        <name lang="en" n="Thursday"/>
+        <name lang="ru" n="четверг"/>
+    </names>
+    <names>
+        <name lang="he" n="ששי"/>
+        <name lang="en" transliterated="yes" n="Shishi"/>
+        <name lang="en" n="Friday"/>
+        <name lang="ru" n="пятница"/>
+    </names>
+    <names>
+        <name lang="he" n="שבת"/>
+      <!-- flavour="aliyah" - שביעי -->
+        <name lang="en" transliterated="yes" n="Shabbos"/>
+        <name lang="en" n="Saturday"/>
+        <name lang="en" transliterated="no" n="Sabbath"/>
+        <name lang="ru" n="суббота"/>
+    </names>
+</names>

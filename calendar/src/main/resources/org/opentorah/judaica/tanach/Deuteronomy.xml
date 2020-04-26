@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book n="Deuteronomy">
+  <chapter n="1" length="46"/>
+  <chapter n="2" length="37"/>
+  <chapter n="3" length="29"/>
+  <chapter n="4" length="49"/>
+  <chapter n="5" length="30"/>
+  <chapter n="6" length="25"/>
+  <chapter n="7" length="26"/>
+  <chapter n="8" length="20"/>
+  <chapter n="9" length="29"/>
+  <chapter n="10" length="22"/>
+  <chapter n="11" length="32"/>
+  <chapter n="12" length="31"/>
+  <chapter n="13" length="19"/>
+  <chapter n="14" length="29"/>
+  <chapter n="15" length="23"/>
+  <chapter n="16" length="22"/>
+  <chapter n="17" length="20"/>
+  <chapter n="18" length="22"/>
+  <chapter n="19" length="21"/>
+  <chapter n="20" length="20"/>
+  <chapter n="21" length="23"/>
+  <chapter n="22" length="29"/>
+  <chapter n="23" length="26"/>
+  <chapter n="24" length="22"/>
+  <chapter n="25" length="19"/>
+  <chapter n="26" length="19"/>
+  <chapter n="27" length="26"/>
+  <chapter n="28" length="69"/>
+  <chapter n="29" length="28"/>
+  <chapter n="30" length="20"/>
+  <chapter n="31" length="30"/>
+  <chapter n="32" length="52"/>
+  <chapter n="33" length="29"/>
+  <chapter n="34" length="12"/>
+
+  <week fromChapter="1" fromVerse="1">
+    <name lang="he">דברים</name>
+    <name lang="en">Deuteronomy</name>
+    <name lang="en" transliterated="true">Devarim</name>
+    <name lang="ru" transliterated="true">Дварим</name>
+
+    <aliyah n="2" fromChapter="1" fromVerse="4"/>
+    <aliyah n="3" fromChapter="1" fromVerse="8"/>
+
+    <day n="1" fromChapter="1" fromVerse="1"/>
+    <day n="2" fromChapter="1" fromVerse="11"/>
+    <day n="2" fromChapter="1" fromVerse="12" custom="Chabad"/>
+    <day n="3" fromChapter="1" fromVerse="22"/>
+    <day n="4" fromChapter="1" fromVerse="39"/>
+    <day n="5" fromChapter="2" fromVerse="2"/>
+    <day n="6" fromChapter="2" fromVerse="31"/>
+    <day n="7" fromChapter="3" fromVerse="15"/>
+    <maftir fromChapter="3" fromVerse="20"/>
+  </week>
+
+  <week fromChapter="3" fromVerse="23">
+    <name lang="he">ואתחנן</name>
+    <name lang="en" transliterated="true">Va'eschanan</name>
+    <name lang="ru" transliterated="true">Ваэтханан</name>
+
+    <aliyah n="2" fromChapter="3" fromVerse="26"/>
+    <aliyah n="3" fromChapter="4" fromVerse="5" toVerse="8"/>
+
+    <day n="1" fromChapter="3" fromVerse="23"/>
+    <day n="2" fromChapter="4" fromVerse="5"/>
+    <day n="3" fromChapter="4" fromVerse="41"/>
+    <day n="4" fromChapter="5" fromVerse="1"/>
+    <day n="5" fromChapter="5" fromVerse="19"/>
+    <day n="6" fromChapter="6" fromVerse="4"/>
+    <day n="7" fromChapter="7" fromVerse="1"/>
+    <maftir fromChapter="7" fromVerse="9"/>
+  </week>
+
+  <week fromChapter="7" fromVerse="12">
+    <name lang="he">עקב</name>
+    <name lang="en" transliterated="true">Eikev</name>
+    <name lang="ru" transliterated="true">Эйкев</name>
+
+    <aliyah n="2" fromChapter="7" fromVerse="22"/>
+    <aliyah n="3" fromChapter="8" fromVerse="4"/>
+
+    <day n="1" fromChapter="7" fromVerse="12"/>
+    <day n="2" fromChapter="8" fromVerse="11"/>
+    <day n="3" fromChapter="9" fromVerse="4"/>
+    <day n="4" fromChapter="10" fromVerse="1"/>
+    <day n="5" fromChapter="10" fromVerse="12"/>
+    <day n="6" fromChapter="11" fromVerse="10"/>
+    <day n="7" fromChapter="11" fromVerse="22"/>
+    <maftir fromChapter="11" fromVerse="22"/>
+  </week>
+
+  <week fromChapter="11" fromVerse="26">
+    <name lang="he">ראה</name>
+    <name lang="en" transliterated="true">Re'eh</name>
+    <name lang="ru" transliterated="true">Рээ</name>
+
+    <aliyah n="2" fromChapter="11" fromVerse="32"/>
+    <aliyah n="3" fromChapter="12" fromVerse="6"/>
+
+    <day n="1" fromChapter="11" fromVerse="26"/>
+    <day n="2" fromChapter="12" fromVerse="11"/>
+    <day n="3" fromChapter="12" fromVerse="29"/>
+    <day n="4" fromChapter="14" fromVerse="1"/>
+    <day n="5" fromChapter="14" fromVerse="22"/>
+    <day n="6" fromChapter="15" fromVerse="1"/>
+    <day n="7" fromChapter="15" fromVerse="19"/>
+    <maftir fromChapter="16" fromVerse="13"/>
+  </week>
+
+  <week fromChapter="16" fromVerse="18">
+    <name lang="he">שופטים</name>
+    <name lang="en" transliterated="true">Shoftim</name>
+    <name lang="ru" transliterated="true">Шофтим</name>
+
+    <aliyah n="2" fromChapter="16" fromVerse="21"/>
+    <aliyah n="3" fromChapter="17" fromVerse="11"/>
+
+    <day n="1" fromChapter="16" fromVerse="18"/>
+    <day n="2" fromChapter="17" fromVerse="14"/>
+    <day n="3" fromChapter="18" fromVerse="1"/>
+    <day n="4" fromChapter="18" fromVerse="6"/>
+    <day n="5" fromChapter="18" fromVerse="14"/>
+    <day n="6" fromChapter="19" fromVerse="14"/>
+    <day n="7" fromChapter="20" fromVerse="10"/>
+    <maftir fromChapter="21" fromVerse="7"/>
+  </week>
+
+  <week fromChapter="21" fromVerse="10">
+    <name lang="he">כי תצא</name>
+    <name lang="en" transliterated="true">Ki Seitzei</name>
+    <name lang="ru" transliterated="true">Ки-Теце</name>
+
+    <aliyah n="2" fromChapter="21" fromVerse="15"/>
+    <aliyah n="3" fromChapter="21" fromVerse="18"/>
+
+    <day n="1" fromChapter="21" fromVerse="10"/>
+    <day n="2" fromChapter="21" fromVerse="22"/>
+    <day n="3" fromChapter="22" fromVerse="8"/>
+    <day n="4" fromChapter="23" fromVerse="8"/>
+    <day n="5" fromChapter="23" fromVerse="25"/>
+    <day n="6" fromChapter="24" fromVerse="5"/>
+    <day n="7" fromChapter="24" fromVerse="14"/>
+    <maftir fromChapter="25" fromVerse="17"/>
+  </week>
+
+  <week fromChapter="26" fromVerse="1">
+    <name lang="he">כי תבוא</name>
+    <name lang="en" transliterated="true">Ki Savo</name>
+    <name lang="ru" transliterated="true">Ки-Таво</name>
+
+    <aliyah n="2" fromChapter="26" fromVerse="4"/>
+    <aliyah n="3" fromChapter="26" fromVerse="12" toVerse="15"/>
+
+    <day n="1" fromChapter="26" fromVerse="1"/>
+    <day n="2" fromChapter="26" fromVerse="12"/>
+    <day n="3" fromChapter="26" fromVerse="16"/>
+    <day n="4" fromChapter="27" fromVerse="1"/>
+    <day n="5" fromChapter="27" fromVerse="11"/>
+    <day n="6" fromChapter="28" fromVerse="7"/>
+    <day n="7" fromChapter="29" fromVerse="1"/>
+    <maftir fromChapter="29" fromVerse="6"/>
+  </week>
+
+  <week fromChapter="29" fromVerse="9">
+    <name lang="he">נצבים</name>
+    <name lang="en" transliterated="true">Nitzavim</name>
+    <name lang="ru" transliterated="true">Ницавим</name>
+
+    <aliyah n="2" fromChapter="29" fromVerse="12"/>
+    <aliyah n="3" fromChapter="29" fromVerse="15" toVerse="28"/>
+
+    <day n="1" fromChapter="29" fromVerse="9"/>
+    <day n="2" fromChapter="29" fromVerse="12"/>
+    <day n="3" fromChapter="29" fromVerse="15"/>
+    <day n="4" fromChapter="30" fromVerse="1"/>
+    <day n="2" fromChapter="30" fromVerse="1"  combined="true"/>
+    <day n="5" fromChapter="30" fromVerse="7"/>
+    <day n="3" fromChapter="30" fromVerse="7" combined="true"/>
+    <day n="6" fromChapter="30" fromVerse="11"/>
+    <day n="7" fromChapter="30" fromVerse="15"/>
+    <day n="4" fromChapter="30" fromVerse="15" combined="true"/>
+    <maftir fromChapter="30" fromVerse="15"/>
+  </week>
+
+  <week fromChapter="31" fromVerse="1">
+    <name lang="he">וילך</name>
+    <name lang="en" transliterated="true">Vayeilech</name>
+    <name lang="ru" transliterated="true">Вайэлех</name>
+
+    <aliyah n="2" fromChapter="31" fromVerse="4"/>
+    <aliyah n="3" fromChapter="31" fromVerse="7" toVerse="13"/>
+
+    <day n="1" fromChapter="31" fromVerse="1"/>
+    <day n="2" fromChapter="31" fromVerse="4"/>
+    <day n="3" fromChapter="31" fromVerse="7"/>
+    <day n="5" fromChapter="31" fromVerse="7" combined="true"/>
+    <day n="4" fromChapter="31" fromVerse="10"/>
+    <day n="5" fromChapter="31" fromVerse="14"/>
+    <day n="6" fromChapter="31" fromVerse="14" combined="true"/>
+    <day n="6" fromChapter="31" fromVerse="20"/>
+    <day n="7" fromChapter="31" fromVerse="20" combined="true"/>
+    <day n="7" fromChapter="31" fromVerse="25"/>
+    <maftir fromChapter="31" fromVerse="28"/>
+  </week>
+
+
+  <week fromChapter="32" fromVerse="1">
+    <name lang="he">האזינו</name>
+    <name lang="en" transliterated="true">Haazinu</name>
+    <name lang="en" transliterated="true">Ha'azinu</name>
+    <name lang="ru" transliterated="true">Ѓаазину</name>
+
+    <aliyah n="2" fromChapter="32" fromVerse="4"/>
+    <aliyah n="3" fromChapter="32" fromVerse="7" toVerse="12"/>
+
+    <day n="1" fromChapter="32" fromVerse="1"/>
+    <day n="2" fromChapter="32" fromVerse="7"/>
+    <day n="3" fromChapter="32" fromVerse="13"/>
+    <day n="4" fromChapter="32" fromVerse="19"/>
+    <day n="5" fromChapter="32" fromVerse="29"/>
+    <day n="6" fromChapter="32" fromVerse="40"/>
+    <day n="7" fromChapter="32" fromVerse="44"/>
+    <maftir fromChapter="32" fromVerse="48"/>
+  </week>
+
+  <week fromChapter="33" fromVerse="1">
+    <name lang="he">וזאת הברכה</name>
+    <name lang="en" transliterated="true">Vezos Haberachah</name>
+    <name lang="en" transliterated="true">Vezos Habrachah</name>
+    <name lang="ru" transliterated="true">Вэзот ѓа-браха</name>
+
+    <aliyah n="2" fromChapter="33" fromVerse="8"/>
+    <aliyah n="3" fromChapter="33" fromVerse="13" toVerse="17"/>
+
+    <day n="1" fromChapter="33" fromVerse="1"/>
+    <day n="2" fromChapter="33" fromVerse="8"/>
+    <day n="3" fromChapter="33" fromVerse="13"/>
+    <day n="4" fromChapter="33" fromVerse="18"/>
+    <day n="5" fromChapter="33" fromVerse="22"/>
+    <day n="6" fromChapter="33" fromVerse="27"/>
+    <day n="7" fromChapter="34" fromVerse="1"/>
+    <!-- Maftir SimchasTorah is NOT what it says here :) -->
+    <maftir fromChapter="34" fromVerse="1"/>
+  </week>
+</book>

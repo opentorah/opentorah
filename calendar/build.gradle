@@ -1,0 +1,116 @@
+plugins {
+  id 'scala'
+  id 'com.github.maiflai.scalatest'
+  id 'maven-publish'
+  id 'com.jfrog.bintray'
+}
+
+description = 'Jewish Calendar Dates'
+
+dependencies {
+  implementation "org.opentorah:opentorah-store:$storeVersion"
+  implementation "org.opentorah:opentorah-xml:$storeVersion"
+
+  zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
+
+  implementation "org.scala-lang:scala-library:$scalaVersion"
+  implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+
+  implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
+
+  testImplementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
+
+  testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
+  testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports; only 0.35.10 is supported?
+
+  testImplementation "org.scalacheck:scalacheck_$scalaVersionMajor:$scalacheckVersion"
+  testImplementation "org.typelevel:discipline-scalatest_$scalaVersionMajor:$disciplineScalatestVersion"
+  testImplementation "org.typelevel:algebra-laws_$scalaVersionMajor:$algebraLawsVersion"
+}
+
+task sourceJar(type: Jar) {
+  from sourceSets.main.allSource
+  archiveClassifier.set('sources')
+}
+
+task scaladocJar(type: Jar) {
+  from scaladoc.destinationDir
+  archiveClassifier.set('scaladoc')
+}
+scaladocJar.dependsOn scaladoc
+
+final String gitHubRepository    = "opentorah/calendar"
+final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
+final String libraryArtifactId   = "opentorah-calendar"
+jar.archiveBaseName.set(libraryArtifactId)
+
+publishing {
+  publications {
+    mavenPublication(MavenPublication) {
+      groupId project.group
+      artifactId libraryArtifactId
+      
+      from components.java
+
+      artifact sourceJar
+      artifact scaladocJar
+
+      pom {
+        name = project.name
+        description = project.description
+        url = "$gitHubRepositoryUrl"
+        scm {
+          url = "$gitHubRepositoryUrl"
+          connection = "scm:git:git://github.com/${gitHubRepository}.git"
+          developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
+        }
+        licenses {
+          license {
+            name = 'The Apache Software License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution = 'repo'
+            comments = 'A business-friendly OSS license'
+          }
+        }
+        organization {
+          name = 'Open Torah'
+          url = 'http://www.opentorah.org'
+        }
+        developers {
+          developer {
+            id = 'dub'
+            name = 'Leonid Dubinsky'
+            email = 'dub@podval.org'
+            url = 'http://dub.podval.org'
+            organization = 'Podval Group'
+            organizationUrl = 'http://www.podval.org'
+            timezone = '-5'
+          }
+        }
+      }
+    }
+  }
+}
+
+bintray {
+  user         = 'dubinsky'
+  key          = findProperty('bintrayApiKey')
+  publications = ['mavenPublication']
+  dryRun       = false
+  publish      = true
+  override     = true
+  pkg {
+    repo                   = project.group
+    name                   = libraryArtifactId
+    desc                   = project.description
+    websiteUrl             = "http://www.jewish-calendar.org"
+    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
+    vcsUrl                 = "${gitHubRepositoryUrl}.git"
+    githubRepo             = gitHubRepository
+    licenses               = ['Apache-2.0']
+    labels                 = ['Scala', 'Calendar', 'Jewish']
+    publicDownloadNumbers  = true
+    githubReleaseNotesFile = "docs/CHANGELOG.md"
+    version { name         = project.version }
+  }
+}

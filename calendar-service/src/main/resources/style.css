@@ -1,0 +1,49 @@
+.picker {
+  padding-right: 10px;
+}
+
+.nav {
+  padding-right: 10px;
+}
+
+.name {
+  font-style: italic;
+  padding-right: 10px;
+}
+
+.heading {
+  font-size: large;
+  padding-right: 15px;
+}
+
+.subheading {
+  font-size: medium;
+  padding-top: 10px;
+  padding-right: 10px;
+}
+
+.custom {
+//  float: left;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+
+caption {
+  text-align: start;
+  padding-bottom: 5px;
+}
+
+td {
+  text-align: start;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+tr:nth-child(even) { background-color: #f2f2f2; }
+tr:hover { background-color: #9cbbf5; }

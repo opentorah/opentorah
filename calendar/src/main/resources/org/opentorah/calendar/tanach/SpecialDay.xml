@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<names type="SpecialDay">
+  <names>
+    <name lang="en" transliterated="yes" n="Festival End"/>
+    <name lang="he" n="סוף יום טוב"/>
+    <name lang="ru" transliterated="yes" n="Конец праздника"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Intermediate Shabbos"/>
+    <name lang="he" n="שבת חול המועד"/>
+    <name lang="ru" transliterated="yes" n="Шабос Холь а-моэд"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Rosh Chodesh"/>
+     <name lang="he" n="ראש חודש"/>
+     <name lang="ru" n="Новомесячье"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Erev Rosh Chodesh"/>
+     <name lang="he" n="ערב ראש חודש"/>
+     <name lang="ru" n="Канун новомесячья"/>
+  </names>
+
+  <names>
+    <name lang="en" n="Public Fast"/>
+    <name lang="he" n="תענית"/>
+    <name lang="ru" n="Пост"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Rosh Hashanah"/>
+     <name lang="he" n="ראש השנה"/>
+     <name lang="ru" transliterated="yes" n="Рош а-шана"/>
+  </names>
+
+  <names>
+    <name lang="en" n="Fast of Gedalia"/>
+     <name lang="he" n="צום גדליה"/>
+     <name lang="ru" n="Пост Гедалии"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Yom Kippur"/>
+     <name lang="he" n="יום כיפור"/>
+     <name lang="ru" transliterated="yes" n="Йом Кипур"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Succos"/>
+     <name lang="he" n="סוכות"/>
+     <name lang="ru" transliterated="yes" n="Суккот"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Succos Intermediate"/>
+     <name lang="he" n="חול המועד סוכות"/>
+     <name lang="ru" transliterated="yes" n="Холь а-моэд Суккот"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Shemini Atzeres"/>
+     <name lang="he" n="שמימי עצרת"/>
+     <name lang="ru" transliterated="yes" n="Шмини Ацерет"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Simchas Torah"/>
+     <name lang="he" n="שימחת תורה"/>
+     <name lang="ru" transliterated="yes" n="Симхат Тора"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Shemini Atzeres and Simchas Torah"/>
+     <name lang="he" n="שמיני עצרת ושימחת תורה"/>
+     <name lang="ru" transliterated="yes" n="Симхат Тора и Шмини Ацерет"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Shabbos Bereishis"/>
+     <name lang="he" n="שבת בראשית"/>
+     <name lang="ru" transliterated="yes" n="Шабат Берешит"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Chanukah"/>
+     <name lang="he" n="חנוכה"/>
+     <name lang="ru" transliterated="yes" n="Ханука"/>
+  </names>
+
+  <names>
+    <name lang="en" n="Fast of 10th of Teves"/>
+     <name lang="he" n="צום עשרה בטבת"/>
+     <name lang="ru" n="Пост 10 тевета"/>
+  </names>
+
+  <names>
+    <name lang="en" n="Fast of Ester"/>
+     <name lang="he" n="תענית אסתר"/>
+     <name lang="ru" n="Пост Эстер"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Parshas Shekalim"/>
+     <name lang="he" n="פרשת שקלים"/>
+     <name lang="ru" transliterated="yes" n="Шабат Шкалим"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Parshas Zachor"/>
+     <name lang="he" n="שבת זכור"/>
+     <name lang="ru" transliterated="yes" n="Шабат Захор"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Parshas Parah"/>
+     <name lang="he" n="שבת פרה"/>
+     <name lang="ru" transliterated="yes" n="Шабат Пара"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Parshas Hachodesh"/>
+     <name lang="he" n="שבת החודש"/>
+     <name lang="ru" transliterated="yes" n="Шабат а-ходеш"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Shabbos Hagodol"/>
+     <name lang="he" n="שבת הגדול"/>
+     <name lang="ru" transliterated="yes" n="Шабат а-гадол"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Purim"/>
+     <name lang="he" n="פורים"/>
+     <name lang="ru" transliterated="yes" n="Пурим"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Shushan Purim"/>
+     <name lang="he" n="שושן פורים"/>
+     <name lang="ru" transliterated="yes" n="Шушан Пурим"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Pesach"/>
+     <name lang="he" n="פסח"/>
+     <name lang="ru" transliterated="yes" n="Песах"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Pesach Intermediate"/>
+     <name lang="he" n="חןל המועד פסח"/>
+     <name lang="ru" transliterated="yes" n="Хол а-моэд Песах"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Pesach 7"/>
+     <name lang="he" n="שביעי של פסח"/>
+     <name lang="ru" n="Седьмой день Песаха"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Pesach 8"/>
+     <name lang="he" n="אחרון של פסח"/>
+     <name lang="ru" n="Последний день Песаха"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Omer"/>
+     <name lang="he" n="עומר"/>
+     <name lang="ru" transliterated="yes" n="Омер"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Lag Ba Omer"/>
+     <name lang="he">ל"ג בעומר</name>
+     <name lang="ru" transliterated="yes" n="Лаг ба-омер"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Shavuos"/>
+     <name lang="he" n="שבועות"/>
+     <name lang="ru" transliterated="yes" n="Шавуот"/>
+  </names>
+
+  <names>
+    <name lang="en" n="Fast of Tammuz"/>
+     <name lang="he">צום י"ז תמוז</name>
+     <name lang="ru" n="Пост 17 тамуза"/>
+  </names>
+
+  <names>
+    <name lang="en" transliterated="yes" n="Tisha BeAv"/>
+     <name lang="he" n="תשע באב"/>
+     <name lang="ru" transliterated="yes" n="Тиша беав"/>
+  </names>
+</names>

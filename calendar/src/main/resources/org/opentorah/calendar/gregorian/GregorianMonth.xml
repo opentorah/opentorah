@@ -1,0 +1,62 @@
+<names type="GregorianMonth">
+    <names>
+        <name lang="en" n="January"/>
+        <name lang="he" transliterated="yes" n="ינואר"/>
+        <name lang="ru" n="январь"/>
+    </names>
+    <names>
+        <name lang="en" n="February"/>
+        <name lang="he" transliterated="yes" n="פברואר"/>
+        <name lang="ru" n="февраль"/>
+    </names>
+    <names>
+        <name lang="en" n="March"/>
+        <name lang="he" transliterated="yes" n="מרץ"/>
+        <name lang="ru" n="март"/>
+    </names>
+    <names>
+        <name lang="en" n="April"/>
+        <name lang="he" transliterated="yes" n="אפריל"/>
+        <name lang="ru" n="апрель"/>
+    </names>
+    <names>
+        <name lang="en" n="May"/>
+        <name lang="he" transliterated="yes" n="מאי"/>
+        <name lang="ru" n="май"/>
+    </names>
+    <names>
+        <name lang="en" n="June"/>
+        <name lang="he" transliterated="yes" n="יוני"/>
+        <name lang="ru" n="июнь"/>
+    </names>
+    <names>
+        <name lang="en" n="July"/>
+        <name lang="he" transliterated="yes" n="יולי"/>
+        <name lang="ru" n="июль"/>
+    </names>
+    <names>
+        <name lang="en" n="August"/>
+        <name lang="he" transliterated="yes" n="אוגוסט"/>
+        <name lang="ru" n="август"/>
+    </names>
+    <names>
+        <name lang="en" n="September"/>
+        <name lang="he" transliterated="yes" n="ספטמבר"/>
+        <name lang="ru" n="сентябрь"/>
+    </names>
+    <names>
+        <name lang="en" n="October"/>
+        <name lang="he" transliterated="yes" n="אוקטובר"/>
+        <name lang="ru" n="октябрь"/>
+    </names>
+    <names>
+        <name lang="en" n="November"/>
+        <name lang="he" transliterated="yes" n="נובמבר"/>
+        <name lang="ru" n="ноябрь"/>
+    </names>
+    <names>
+        <name lang="en" n="December"/>
+        <name lang="he" transliterated="yes" n="דצמבר"/>
+        <name lang="ru" n="декабрь"/>
+    </names>
+</names>
