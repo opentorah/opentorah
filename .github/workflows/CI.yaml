@@ -4,7 +4,6 @@ on:
     branches:
       - 'master'
 
-
 jobs:
   build:
     name: "Build"
@@ -21,5 +20,3 @@ jobs:
 
       - name: "Build with Gradle"
         run: ./gradlew build
-#        env:
-#          GITHUB_TOKEN: ${{github.token}}

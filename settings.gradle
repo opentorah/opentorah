@@ -1,4 +1,10 @@
 pluginManagement {
+  repositories {
+    mavenLocal()
+    jcenter()
+    gradlePluginPortal()
+  }
+
   plugins {
     id 'com.github.ben-manes.versions' version '0.28.0'
     id 'com.github.maiflai.scalatest' version '0.26'
@@ -9,5 +15,7 @@ pluginManagement {
 
 include ':xml'
 include ':store'
+include ':calendar'
+include ':calendar-service'
 include ':collector'
 include ':collector-service'
