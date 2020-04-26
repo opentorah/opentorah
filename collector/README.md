@@ -30,7 +30,7 @@ I may end up using [Cloud Firestore](https://firebase.google.com/docs/firestore)
 for caching generated (and maybe even source) files.
 
 (I used BFG Repocleaner to remove facsimiles and their Git history from this repository
-once they moved out.)
+once they moved out; current tool for things like that is `git-filter-repo`.)
    
 ### Image Processing Commands ###
 
