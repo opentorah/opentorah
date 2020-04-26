@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="KH14">
+  <title>Chapter 14</title>
+
+  <section xml:id="KH14-1" role="NotInToc">
+    <title>Law 1</title>
+
+    <para>The moon has two mean movements. The moon itself rotates on a small circle
+      that does not surround all of the Earth. Moon's movement on that small circle is
+      called <glossterm linkend="mla-term">mean lunar anomaly</glossterm> (אמצע המסלול). The small circle
+      (epicycle TODO link to Wikipedia) itself rotates on a big circle (deferent TODO link to Wikipedia)
+      that encircles the Earth.
+      The mean movement of the small circle on the big circle that encircles the Earth
+      is called movement of the <glossterm>mean lunar longitude</glossterm> (אמצע הירח). </para>
+  </section>
+
+  <section xml:id="KH14-2" role="NotInToc">
+    <title>Law 2</title>
+
+    <para>
+      Movement in mean lunar longitude in one day is 13°10′35″
+      <footnote><para>This is part of Law 1.</para></footnote>.
+    </para>
+
+    <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
+
+    <para>
+      And in this way you can calculate it for any number of days and years that you want.
+    </para>
+  </section>
+
+  <section xml:id="KH14-3" role="NotInToc">
+    <title>Law 3</title>
+    <para>
+      Movement in mean lunar anomaly in one day is 13°3′54″.
+    </para>
+    <para>
+      For longer periods, (remainder) of the movement in mean lunar anomaly is:
+    </para>
+  </section>
+
+  <section xml:id="KH14-4" role="NotInToc">
+    <title>Law 4</title>
+
+    <para>
+      In the beginning of the night to Thursday that is the epoch (TODO measured from what? Chapter 11?) [TODO: link to definition]
+      for these calculations, mean lunar longitude was 1°14′43″ into the constellation of Ram.
+      And mean lunar anomaly on the epoch was 84°28′42″.
+      Now that you know rate of movement in the mean lunar longitude and its value on the epoch
+      to which you add, you'll calculate mean lunar longitude on any day that you want the same
+      way as you did for the mean solar longitude. TODO: reference
+    </para>
+  </section>
+
+  <section xml:id="KH14-5" role="NotInToc">
+    <title>Law 5</title>
+
+    <para> After you calculate mean lunar longitude at the
+      beginning of the night that you want, contemplate the sun (TODO: longitude?) and figure out which
+      constellation (zodiac) is it in <footnote><para>This is part of Law 4.</para></footnote>.
+      [This is the correction of the mean lunar longitude depending on
+      the mean solar longitude:]
+    </para>
+  </section>
+
+  <section xml:id="KH14-6" role="NotInToc">
+    <title>Law 6</title>
+    <informaltable frame="all">
+      <tgroup cols="4">
+        <thead>
+          <row>
+            <entry>Solar Longitude on the Zodiac</entry>
+            <entry>from</entry>
+            <entry>to, not including<footnote><para>My understanding of the word usage in the original.</para></footnote></entry>
+            <entry>Lunar longitude correction</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>middle of Pisces-middle of Taurus
+              <footnote><para>See Chapter 11, Law 7 on the start of Jewish Zodiac. (TODO reference)</para></footnote>
+            </entry>
+            <entry>315°</entry>
+            <entry>15°</entry>
+            <entry>0°</entry>
+          </row>
+          <row>
+            <entry>middle of Taurus-beginning of Gemini</entry>
+            <entry>15°</entry>
+            <entry>30°</entry>
+            <entry>0°15′</entry>
+          </row>
+          <row>
+            <entry>beginning of Gemini-beginning of Leo</entry>
+            <entry>30°</entry>
+            <entry>90°</entry>
+            <entry>0°15′</entry>
+          </row>
+          <row>
+            <entry>beginning of Leo-middle of Virgo</entry>
+            <entry>90°</entry>
+            <entry>135°</entry>
+            <entry>0°15′</entry>
+          </row>
+          <row>
+            <entry>middle of Virgo-middle of Libra</entry>
+            <entry>135°</entry>
+            <entry>165°</entry>
+            <entry>0°</entry>
+          </row>
+          <row>
+            <entry>middle of Libra-beginning of Sagittarius</entry>
+            <entry>165°</entry>
+            <entry>210°</entry>
+            <entry>-0°15′</entry>
+          </row>
+          <row>
+            <entry>beginning of Sagittarius-beginning of Aquarius</entry>
+            <entry>210°</entry>
+            <entry>270°</entry>
+            <entry>-0°30′</entry>
+          </row>
+          <row>
+            <entry>beginning of Aquarius-middle of Pisces</entry>
+            <entry>270°</entry>
+            <entry>315°</entry>
+            <entry>-0°15′</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+
+    <para>
+      The value of mean [lunar longitude]
+      after you add to it or subtract from it or leave it as
+      it is - that is mean lunar longitude approximately a third of an hour after sunset on the
+      date you are calculating it for. And this is what is called
+      <glossterm>mean lunar longitude at observation time</glossterm>.
+    </para>
+  </section>
+</chapter>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xml:id="solar-theory" xmlns="http://docbook.org/ns/docbook" version="5.0">
+  <title>Solar Theory</title>
+
+  <section xml:id="solar-model">
+    <title>Model (TODO)</title>
+    <para>Figure out from the text directions of Sun's movements and what are the position angles from (look at the
+      parallax correction stuff: subtract mean apogee from the mean Sun...).</para>
+    <para>TODO diagrams for the correction in Moznaim's Rambam.</para>
+  </section>
+
+  <section xml:id="exactification">
+    <title>Exactification (TODO)</title>
+    <para> It is not clear how Rambam arrived at the values he gives. When value of the movement in one day given by
+      Rambam is multiplied by 29, 100 etc., the result is smaller than that of Rambam. The following table compares
+      printed and calculated values: TODO</para>
+    <para> Although the value of the movement of the mean solar longitude in one day given by <biblioref
+        linkend="Almagest"/> III 1 (H209) (which, rounded to seconds, becomes Rambam's value) is bigger, it is not big
+      enough, and Rambam's numbers (for more than 10 days) can not be explained by performing calculations with the long
+      value from Almagest and then rounding the results to the precision of the Rambam's values.</para>
+    <para>
+      <biblioref linkend="Tzikuni"/> (TODO p. XXX) gives the algorithm of such reconstruction: add to the remainder as
+      many times 360 as there were full rotations in given time period, and then divide. It also gives a value
+      reconstructed from the printed values for 10,000, 1000 and 100 days: 59′8.33″, or 0.9856472 degrees, and the
+      current "scientific" value of 0.9856473 degrees. It seems that origins of the Rambam's value were questioned by
+      his commentators, including "Pirush". Value that can be derived from the tradition that 19 years = 6939 days 16
+      hours and 595 parts is 0.9856348. </para>
+    <para>This algorithm can be modified to produce an interval of possible values, taking into account precision of the
+      numbers.</para>
+    <para> From the printed values it is possible to reconstruct the value of the movement in mean solar longitude in
+      one day that Rambam used to calculate each of them:</para>
+    <para>Use it to calculate intervals for Rambam's values of the angular velocities.</para>
+    <para><biblioref linkend="Tzikuni"/> quotes Rambam's value for 354 days as 348°55′15″, but calculated value as
+      348°55′9″, and notes that this "requires a little thought".</para>
+    <para>
+      TODO About apogee, Rambam says "the same way", but doesn't give value for 1 day...
+      Exactification requires extra attention, since there is no value for 1 day.
+      SunApogee rambamValue and almagestValue.
+    </para>
+  </section>
+
+  <section  xml:id="solar-movement-29">
+    <title>Angular movement for 29 days (TODO)</title>
+    <para>Are Rambam's values reconstructible if value for 29 days is calculated as 3*v(10)-v(1), not 2*v(10)+9*v(1),
+      nor 29*vexact(1)? For any tables
+      other than SunLongitudeMean?</para>
+
+    <para> Values of the movement in one day apparently used by Rambam, if rounded to the seconds, give the "official"
+      Rambam's value. Values calculated from the value reconstructed from the printed 10000 days movement, if rounded,
+      produce the values Rambam published - except for 29 days, 354 days, and 10000 days which we use to calculate the
+      exact value that Rambam used! TODO! </para>
+  </section>
+
+  <section xml:id="zeros">
+    <title>Zeros (TODO)</title>
+    <para>Math.findZero(): Finish and test the code; use two separate lengths (precisions)?</para>
+  </section>
+
+  <section xml:id="sun-precise">
+    <title>Sun for a precise time (TODO)</title>
+    <para>make possible calculations for a Moment, not just a Day (at least for the sun);</para>
+  </section>
+
+  <section xml:id="sun-creation">
+    <title>Sun at Creation (TODO)</title>
+    <para>Where and when was the Sun created? (Birchat Hachamo is on a different opinion.) Does it let us get more
+      precise values of Sun's angular velocities?</para>
+  </section>
+
+  <section xml:id="true-seasons">
+    <title>True seasons (TODO)</title>
+    <para>calculate true seasons in SeasonsAstronomical; KH 10:7 says that real vernal equinox is approximately two days
+      before the mean one; add a test.</para>
+    <para>SeasonsAstronomical.seasonForYear:  should this always be Nisan?</para>
+  </section>
+
+  <section xml:id="year-lengths">
+    <title>Year lengths (TODO)</title>
+    <para>Convert each year length mentioned in the fixed calendar to angular speed.</para>
+    <para>What year length does value for mean anomaly velocity given by Moznaim correspond?</para>
+  </section>
+
+  <section xml:id="interesting">
+    <title>Interesting</title>
+    <para>От Корица: интересный линк на тему благословения на солнце и в конце обсуждение концепции Рамбама в
+      астрономии - https://www.yeshiva.org.il/midrash/11088</para>
+  </section>
+</chapter>
