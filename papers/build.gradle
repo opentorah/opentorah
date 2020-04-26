@@ -39,3 +39,14 @@ docBook {
 }
 
 build.dependsOn processDocBook
+
+build.doLast {
+  project.sync {
+    from "${processDocBook.outputDirectory}/judaica"
+    into "$rootDir/docs/judaica"
+  }
+  project.sync {
+    from "${processDocBook.outputDirectory}/typesetting"
+    into "$rootDir/docs/typesetting"
+  }
+}

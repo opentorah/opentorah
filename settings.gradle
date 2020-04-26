@@ -6,6 +6,5 @@ pluginManagement {
 }
 
 include ':papers'
-include ':docs'
 
 //includeBuild '../../docbook/docbook-gradle'
