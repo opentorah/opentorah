@@ -11,6 +11,7 @@ dependencies {
 
   implementation project(':library')
   implementation "org.opentorah:opentorah-store:$storeVersion"
+  implementation "org.opentorah:opentorah-xml:$storeVersion"
 
   implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
   implementation "dev.zio:zio-interop-cats_$scalaVersionMajor:$zioInteropCatsVersion"

@@ -9,6 +9,7 @@ description = 'Jewish Calendar Dates'
 
 dependencies {
   implementation "org.opentorah:opentorah-store:$storeVersion"
+  implementation "org.opentorah:opentorah-xml:$storeVersion"
 
   zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
 
