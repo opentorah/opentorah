@@ -1,0 +1,38 @@
+plugins {
+  id 'scala'
+  id 'com.github.maiflai.scalatest'
+  id 'com.google.cloud.tools.jib'
+}
+
+description = 'Jewish Calendar Service.'
+
+dependencies {
+  zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
+
+  implementation project(':calendar')
+  implementation "org.opentorah:opentorah-store:$storeVersion"
+  implementation "org.opentorah:opentorah-xml:$storeVersion"
+
+  implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
+  implementation "dev.zio:zio-interop-cats_$scalaVersionMajor:$zioInteropCatsVersion"
+
+  implementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
+  implementation "org.typelevel:cats-effect_$scalaVersionMajor:$catsVersion"
+
+  implementation "org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion"
+  implementation "org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion"
+  implementation "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion"
+
+  implementation "com.lihaoyi:scalatags_$scalaVersionMajor:$scalatagsVersion"
+
+  runtimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
+}
+
+jib {
+  to {
+    image = 'gcr.io/calendar/calendar'
+  }
+  container {
+    mainClass = 'org.opentorah.calendar.service.CalendarService'
+  }
+}

@@ -1,0 +1,41 @@
+plugins {
+  id 'scala'
+}
+
+repositories {
+  maven {
+    url 'https://dl.bintray.com/tpolecat/maven/'
+  }
+}
+
+dependencies {
+  zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
+
+  implementation "org.scala-lang:scala-library:$scalaVersion"
+
+  runtimeOnly "org.tpolecat:tut-core_$scalaVersionMajor:$tutVersion"
+
+  // TODO migrate from tut to mdoc;
+  // there is no official Gradle integration :(
+  // https://scalameta.org/mdoc/docs/installation.html#library
+  // https://github.com/scalameta/mdoc/blob/v2.0.0/mdoc-sbt/src/main/scala/mdoc/MdocPlugin.scala
+  // runtimeOnly "org.scalameta:mdoc_$scalaVersionMajor:$mdocVersion"
+}
+
+// Tut
+final String tutOutput = "$buildDir/tut"
+task tut(type: JavaExec) {
+  group = 'documentation'
+  main = 'tut.TutMain'
+  args = ["$projectDir/tut", tutOutput, ".*\\.(md|markdown|txt|htm|html)"]
+  classpath = sourceSets.main.runtimeClasspath
+}
+
+build.dependsOn tut
+build.dependsOn ':library:scaladoc'
+build.doLast {
+  project.sync {
+    from tutOutput
+    into 'examples'
+  }
+}
