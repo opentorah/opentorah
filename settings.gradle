@@ -1,0 +1,11 @@
+pluginManagement {
+  plugins {
+    id 'com.github.ben-manes.versions' version '0.28.0'
+    id 'org.podval.docbook-gradle-plugin' version '0.7.16'
+  }
+}
+
+include ':papers'
+include ':docs'
+
+//includeBuild '../../docbook/docbook-gradle'
