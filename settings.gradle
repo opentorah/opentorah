@@ -10,3 +10,4 @@ pluginManagement {
 include ':xml'
 include ':store'
 include ':collector'
+include ':collector-service'
