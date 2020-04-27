@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="KH4">
+    <title>Chapter 4</title>
+    
+    <section xml:id="KH4-1" role="NotInToc">
+        <title>Law 1</title>
+        <para>TODO</para>
+    </section>
+    
+    <section xml:id="KH4-2" role="NotInToc">
+        <title>Law 2</title>
+        <para>TODO</para>
+    </section>
+</chapter>

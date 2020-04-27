@@ -1,0 +1,27 @@
+plugins {
+  id 'com.github.ben-manes.versions'
+  id 'idea'
+  id 'base'
+}
+
+allprojects {
+  repositories {
+    jcenter()
+    mavenCentral()
+    mavenLocal()
+  }
+}
+
+idea {
+  project {
+    jdkName = '1.8'
+    vcs = 'Git'
+  }
+
+  module {
+    excludeDirs += [
+      file('.idea'),
+      file('gradle')
+    ]
+  }
+}
