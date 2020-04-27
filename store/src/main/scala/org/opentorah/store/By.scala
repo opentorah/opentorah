@@ -1,8 +1,8 @@
 package org.opentorah.store
 
 import java.net.URL
-import org.opentorah.util.{Collections, Files, Xml}
-import org.opentorah.xml.{Attribute, PaigesPrettyPrinter, Parser, Text, ToXml}
+import org.opentorah.util.{Collections, Files}
+import org.opentorah.xml.{Attribute, PaigesPrettyPrinter, Parser, Text, ToXml, Xml}
 import zio.ZIO
 import scala.xml.Elem
 

@@ -2,7 +2,8 @@ package org.opentorah.collector
 
 import org.opentorah.store.{By, Path, Selector, Store, WithPath}
 import org.opentorah.tei.Ref
-import org.opentorah.util.{Files, Xml}
+import org.opentorah.util.Files
+import org.opentorah.xml.Xml
 import scala.xml.Node
 
 final class HierarchyObject(site: Site, path: Path, store: Store) extends SimpleSiteObject(site) {

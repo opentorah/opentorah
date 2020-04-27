@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
-import org.opentorah.util.{Files, Xml}
-import org.opentorah.xml.{Attribute, ContentType, Element, ToXml}
+import org.opentorah.util.Files
+import org.opentorah.xml.{Attribute, ContentType, Element, ToXml, Xml}
 import scala.xml.{Elem, Node}
 
 final case class Ref(

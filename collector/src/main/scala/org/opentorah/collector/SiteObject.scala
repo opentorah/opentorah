@@ -2,7 +2,8 @@ package org.opentorah.collector
 
 import org.opentorah.store.Path
 import org.opentorah.tei.Tei
-import org.opentorah.util.{Files, Xml}
+import org.opentorah.util.Files
+import org.opentorah.xml.Xml
 import scala.xml.Elem
 
 abstract class SiteObject(val site: Site) {

@@ -1,7 +1,7 @@
 package org.opentorah.xml
 
 import java.net.URL
-import org.opentorah.util.{Collections, Xml}
+import org.opentorah.util.Collections
 import zio.ZIO
 import scala.xml.{Elem, Node}
 

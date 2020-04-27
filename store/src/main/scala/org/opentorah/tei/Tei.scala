@@ -1,8 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.entity.{EntityReference, EntityType}
-import org.opentorah.util.Xml
-import org.opentorah.xml.{ContentType, Element, ToXml}
+import org.opentorah.xml.{ContentType, Element, ToXml, Xml}
 import scala.xml.{Elem, Node}
 
 final case class Tei(

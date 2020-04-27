@@ -2,7 +2,8 @@ package org.opentorah.collector
 
 import org.opentorah.store.WithPath
 import org.opentorah.tei.{Body, Tei}
-import org.opentorah.util.{Files, Xml}
+import org.opentorah.util.Files
+import org.opentorah.xml.Xml
 import scala.xml.{Elem, Node}
 
 final class DocumentObject(

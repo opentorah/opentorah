@@ -5,8 +5,7 @@ import org.opentorah.entity.EntityReference
 import org.opentorah.metadata.{Name, Names}
 import org.opentorah.store.{By, Selector, Store, Urls}
 import org.opentorah.tei.Tei
-import org.opentorah.util.Xml
-import org.opentorah.xml.Parser
+import org.opentorah.xml.{Parser, Xml}
 import scala.xml.Node
 
 final class Document(

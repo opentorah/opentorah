@@ -1,6 +1,5 @@
 package org.opentorah.xml
 
-import org.opentorah.util.Xml
 import scala.xml.{Elem, Node}
 import zio.IO
 

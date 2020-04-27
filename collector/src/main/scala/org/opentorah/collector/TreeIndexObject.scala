@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.store.{By, Path, Store, WithPath}
 import org.opentorah.tei.Ref
-import org.opentorah.util.Xml
+import org.opentorah.xml.Xml
 import scala.xml.Node
 
 final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {

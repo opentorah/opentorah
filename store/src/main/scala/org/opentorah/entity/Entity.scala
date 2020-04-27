@@ -1,7 +1,6 @@
 package org.opentorah.entity
 
-import org.opentorah.util.Xml
-import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, ToXml}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, ToXml, Xml}
 import scala.xml.{Elem, Node}
 
 final case class Entity private(

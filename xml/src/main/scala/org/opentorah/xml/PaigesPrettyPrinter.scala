@@ -1,6 +1,5 @@
 package org.opentorah.xml
 
-import org.opentorah.util.Xml
 import org.typelevel.paiges.Doc
 import scala.xml.{Elem, MetaData, NamespaceBinding, Node, SpecialNode, TopScope, Utility}
 

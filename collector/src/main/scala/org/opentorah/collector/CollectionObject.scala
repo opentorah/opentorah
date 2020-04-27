@@ -3,7 +3,8 @@ package org.opentorah.collector
 import org.opentorah.entity.EntityReference
 import org.opentorah.store.WithPath
 import org.opentorah.tei.Ref
-import org.opentorah.util.{Files, Xml}
+import org.opentorah.util.Files
+import org.opentorah.xml.Xml
 import scala.xml.{Elem, Node}
 
 final class CollectionObject(site: Site, collection: WithPath[Collection]) extends SimpleSiteObject(site) {

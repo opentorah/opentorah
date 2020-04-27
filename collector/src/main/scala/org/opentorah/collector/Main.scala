@@ -5,8 +5,8 @@ import java.net.URL
 import org.opentorah.entity.{Entity, EntityReference}
 import org.opentorah.store.{Store, WithPath}
 import org.opentorah.tei.Tei
-import org.opentorah.util.{Files, Xml}
-import org.opentorah.xml.{From, PaigesPrettyPrinter}
+import org.opentorah.util.Files
+import org.opentorah.xml.{From, PaigesPrettyPrinter, Xml}
 import scala.xml.Elem
 
 object Main {

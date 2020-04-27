@@ -3,8 +3,8 @@ package org.opentorah.collector
 import org.opentorah.entity.EntityType
 import org.opentorah.tei.{Availability, CalendarDesc, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher,
   SourceDesc, Tei}
-import org.opentorah.util.{Files, Xml}
-import org.opentorah.xml.PaigesPrettyPrinter
+import org.opentorah.util.Files
+import org.opentorah.xml.{PaigesPrettyPrinter, Xml}
 import scala.xml.{Attribute, Elem, Node}
 
 object Transformers {

@@ -1,4 +1,4 @@
-package org.opentorah.util
+package org.opentorah.xml
 
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Atom, Elem, Node, TopScope}
