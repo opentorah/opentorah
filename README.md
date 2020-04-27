@@ -9,7 +9,7 @@
 
 Inspired by [Advantages of monorepos](https://danluu.com/monorepo/) and
 [Unorthodocs: Abandon your DVCS and Return to Sanity](https://www.bitquabit.com/post/unorthodocs-abandon-your-dvcs-and-return-to-sanity/)
-(what a jem!), I switched to using monorepo for the opentorah.org projects
+(what a gem!), I switched to using monorepo for the opentorah.org projects
 (with the number and sizes of projects, I think I am safe from the issues that
 Google and FaceBook experienced ;)).
 
