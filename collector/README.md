@@ -57,7 +57,8 @@ To sync with the bucket:
 
 ## Compute ##
 
-I am using [Cloud Run](https://cloud.google.com/run#key-features).
+I am using [Cloud Run](https://cloud.google.com/run#key-features)
+([Unofficial FAQ](https://github.com/ahmetb/cloud-run-faq)).
 
 Service `collector` (`940416907592-compute@developer.gserviceaccount.com`;
 URL `https://collector-qfkasghxtq-uk.a.run.app`) runs in us-eat4 and allows
