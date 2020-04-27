@@ -8,12 +8,13 @@ plugins {
 description = 'Open Torah Store'
 
 dependencies {
+  implementation project(':util')
+  implementation project(":xml")
+
   zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
 
   implementation "org.scala-lang:scala-library:$scalaVersion"
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
-
-  implementation project(":xml")
 
   implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
 

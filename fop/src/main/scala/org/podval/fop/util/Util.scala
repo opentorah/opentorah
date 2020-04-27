@@ -7,6 +7,7 @@ object Util {
     // map.view.mapValues(f).toMap // TODO for Scala 2.13
       map.mapValues(f) // Scala 2.12
 
+  // TODO move into util.Util
   def applicationString: String = {
     val info = getClass.getPackage
     info.getImplementationTitle + " version " + info.getImplementationVersion

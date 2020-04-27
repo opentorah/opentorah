@@ -5,19 +5,13 @@ plugins {
   id 'com.jfrog.bintray'
 }
 
-description = 'Open Torah XML'
+description = 'Open Torah Utilities'
 
 dependencies {
-  implementation project(':util')
-
   zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
 
   implementation "org.scala-lang:scala-library:$scalaVersion"
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
-
-  implementation "org.typelevel:paiges-core_$scalaVersionMajor:$paigesVersion"
-
-  implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
 
   testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
   testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
@@ -25,6 +19,6 @@ dependencies {
 
 apply from: '../bintray.gradle'
 configureBintray(
-  "opentorah-xml",    // jarArtifactId
+  "opentorah-util",   // jarArtifactId
   ['Scala', 'XML']    // tags
 )

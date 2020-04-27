@@ -15,6 +15,7 @@ pluginManagement {
   }
 }
 
+include ':util'
 include ':xml'
 include ':store'
 include ':calendar'

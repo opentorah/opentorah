@@ -18,6 +18,7 @@ repositories {
 dependencies {
   implementation project(':store')
   implementation project(':xml')
+  implementation project(':util')
 
   zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
 
