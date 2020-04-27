@@ -6,6 +6,7 @@ plugins {
 }
 
 description = 'Jewish Calendar Dates'
+version = calendarProjectVersion
 
 dependencies {
   implementation project(':store')
@@ -28,89 +29,8 @@ dependencies {
   testImplementation "org.typelevel:algebra-laws_$scalaVersionMajor:$algebraLawsVersion"
 }
 
-task sourceJar(type: Jar) {
-  from sourceSets.main.allSource
-  archiveClassifier.set('sources')
-}
-
-task scaladocJar(type: Jar) {
-  from scaladoc.destinationDir
-  archiveClassifier.set('scaladoc')
-}
-scaladocJar.dependsOn scaladoc
-
-final String gitHubRepository    = "opentorah/calendar"
-final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
-final String libraryArtifactId   = "opentorah-calendar"
-jar.archiveBaseName.set(libraryArtifactId)
-
-publishing {
-  publications {
-    mavenPublication(MavenPublication) {
-      groupId project.group
-      artifactId libraryArtifactId
-      
-      from components.java
-
-      artifact sourceJar
-      artifact scaladocJar
-
-      pom {
-        name = project.name
-        description = project.description
-        url = "$gitHubRepositoryUrl"
-        scm {
-          url = "$gitHubRepositoryUrl"
-          connection = "scm:git:git://github.com/${gitHubRepository}.git"
-          developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
-        }
-        licenses {
-          license {
-            name = 'The Apache Software License, Version 2.0'
-            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-            distribution = 'repo'
-            comments = 'A business-friendly OSS license'
-          }
-        }
-        organization {
-          name = 'Open Torah'
-          url = 'http://www.opentorah.org'
-        }
-        developers {
-          developer {
-            id = 'dub'
-            name = 'Leonid Dubinsky'
-            email = 'dub@podval.org'
-            url = 'http://dub.podval.org'
-            organization = 'Podval Group'
-            organizationUrl = 'http://www.podval.org'
-            timezone = '-5'
-          }
-        }
-      }
-    }
-  }
-}
-
-bintray {
-  user         = 'dubinsky'
-  key          = findProperty('bintrayApiKey')
-  publications = ['mavenPublication']
-  dryRun       = false
-  publish      = true
-  override     = true
-  pkg {
-    repo                   = project.group
-    name                   = libraryArtifactId
-    desc                   = project.description
-    websiteUrl             = "http://www.jewish-calendar.org"
-    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
-    vcsUrl                 = "${gitHubRepositoryUrl}.git"
-    githubRepo             = gitHubRepository
-    licenses               = ['Apache-2.0']
-    labels                 = ['Scala', 'Calendar', 'Jewish']
-    publicDownloadNumbers  = true
-    githubReleaseNotesFile = "docs/CHANGELOG.md"
-    version { name         = project.version }
-  }
-}
+apply from: '../bintray.gradle'
+configureBintray(
+  'opentorah-calendar',              // jarArtifactId
+  ['Scala', 'Calendar', 'Jewish']    // tags
+)

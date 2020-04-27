@@ -29,6 +29,5 @@ apply from: '../bintray.gradle'
 
 configureBintray(
   "opentorah-collector",       // jarArtifactId
-  "opentorah/store",           // gitHubRepository
   ['Scala', 'Jewish', 'TEI']   // tags
 )

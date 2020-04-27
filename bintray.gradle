@@ -1,13 +1,18 @@
 ext.configureBintray = {
   final String jarArtifactId,
-  final String gitHubRepository,
   final List<String> tags
     ->
 
-  // Read more from project properties, gardle.properties (or a file)?
+  // Read more from project properties?
+  final String gitHubRepository = "opentorah/opentorah"
   final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
   final String orgName = 'Open Torah'
   final String orgUrl = 'http://www.opentorah.org'
+
+  // Gradle plugin [publishing?] plugin, if it is applied, adds tasks publishPluginJar and
+  // publishPluginJavaDocsJar that create sources and javadoc archives;
+  // attempts to use them as artifacts in the Maven publication failed,
+  // so I make my own, replacing javadoc with ScalaDoc :)
 
   task sourceJar(type: Jar) {
     from sourceSets.main.allSource
@@ -31,6 +36,7 @@ ext.configureBintray = {
         from components.java
 
         artifact sourceJar
+        // TODO didn't work for Scala 2.13 in Gradle 6.0...
         artifact scaladocJar
 
         pom {
@@ -71,25 +77,26 @@ ext.configureBintray = {
   }
 
   bintray {
-    user = 'dubinsky'
-    key = findProperty('bintrayApiKey')
+    user         = 'dubinsky'
+    key          = findProperty('bintrayApiKey')
     publications = ['mavenPublication']
-    dryRun = false
-    publish = true
-    override = true
+    dryRun       = false
+    publish      = true
+    override     = true
     pkg {
-      repo = project.group
-      name = jarArtifactId
-      desc = project.description
-      websiteUrl = orgUrl
-      issueTrackerUrl = "${gitHubRepositoryUrl}/issues"
-      vcsUrl = "${gitHubRepositoryUrl}.git"
-      githubRepo = gitHubRepository
-      licenses = ['Apache-2.0']
-      labels = tags
+      repo                  = project.group
+      name                  = jarArtifactId
+      desc                  = project.description
+      websiteUrl            = orgUrl
+      issueTrackerUrl       = "${gitHubRepositoryUrl}/issues"
+      vcsUrl                = "${gitHubRepositoryUrl}.git"
+      githubRepo            = gitHubRepository
+      licenses              = ['Apache-2.0']
+      labels                = tags
       publicDownloadNumbers = true
+// TODO take a path to the CHANGELOG.md for the artifact!
 //    githubReleaseNotesFile = "${rootProject.projectDir}/docs/CHANGELOG.md"
-      version { name = project.version }
+      version { name        = project.version }
     }
   }
 }

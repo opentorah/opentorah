@@ -6,7 +6,8 @@ import com.eclipsesource.v8.utils.V8ObjectUtils
 import com.eclipsesource.v8._
 import org.podval.fop.util.Logger
 
-import scala.jdk.CollectionConverters._
+// TODO for Scala 2.13: import scala.jdk.CollectionConverters._
+import scala.collection.JavaConverters._
 
 // NOTE: some tests failed unless I typeset specific TeX math first; some - even then;
 // re-configuring and forcibly re-starting MathJax before each typeset call breaks the tests even more;

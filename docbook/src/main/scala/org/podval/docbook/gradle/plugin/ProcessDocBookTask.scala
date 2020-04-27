@@ -16,7 +16,8 @@ import org.podval.fop.util.Util.mapValues
 import org.podval.fop.xml.{Namespace, Resolver}
 
 import scala.beans.BeanProperty
-import scala.jdk.CollectionConverters._
+// TODO for Scala 2.13: import scala.jdk.CollectionConverters._
+import scala.collection.JavaConverters._
 
 class ProcessDocBookTask extends DefaultTask {
 

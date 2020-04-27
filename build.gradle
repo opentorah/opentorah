@@ -13,6 +13,14 @@ allprojects {
 
   group = 'org.opentorah'
   version = projectVersion
+
+  // TODO not on the top level!
+  configurations.all {
+    resolutionStrategy {
+      // v1.3.04 doesn't have org.w3c.dom.ElementTraversal that Xerces uses:
+      force "xml-apis:xml-apis:$xmlApisVersion"
+    }
+  }
 }
 
 idea {

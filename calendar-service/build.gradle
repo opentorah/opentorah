@@ -5,6 +5,7 @@ plugins {
 }
 
 description = 'Jewish Calendar Service.'
+version = calendarProjectVersion
 
 dependencies {
   zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"

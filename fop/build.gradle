@@ -6,9 +6,8 @@ plugins {
 }
 
 group = 'org.podval.fop'
+version = docBookProjectVersion
 description = 'FOP MathJax plugin'
-
-apply from: '../versions.gradle'
 
 dependencies {
   // Scala
@@ -64,9 +63,8 @@ dependencies {
 
   implementation gradleApi()
 
-  // Testing
   testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
-  testImplementation "org.pegdown:pegdown:$pegdownVersion" // for scalatest reports
+  testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
 }
 
 jar {
@@ -78,88 +76,8 @@ jar {
   }
 }
 
-task sourceJar(type: Jar) {
-  from sourceSets.main.allSource
-  archiveClassifier.set('sources')
-}
-
-task scaladocJar(type: Jar) {
-  from scaladoc.destinationDir
-  archiveClassifier.set('scaladoc')
-}
-scaladocJar.dependsOn scaladoc
-
-final String pluginArtifactId = project.name // jar.baseName
-
-final String gitHubRepository    = 'dubinsky/podval-docbook-gradle'
-final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
-final List<String> pluginTags = ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub']
-
-publishing {
-  publications {
-    mavenPublication(MavenPublication) {
-      groupId project.group
-      artifactId pluginArtifactId
-
-      from components.java
-
-      artifact sourceJar
-//      artifact scaladocJar
-
-      pom {
-        name = project.name
-        description = project.description
-        url = "$gitHubRepositoryUrl"
-        scm {
-          url = "$gitHubRepositoryUrl"
-          connection = "scm:git:git://github.com/${gitHubRepository}.git"
-          developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
-        }
-        licenses {
-          license {
-            name = 'The Apache Software License, Version 2.0'
-            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-            distribution = 'repo'
-            comments = 'A business-friendly OSS license'
-          }
-        }
-        developers {
-          developer {
-            id = 'dub'
-            name = 'Leonid Dubinsky'
-            email = 'dub@podval.org'
-            url = 'http://dub.podval.org'
-            organization = 'Podval Group'
-            organizationUrl = 'http://www.podval.org'
-            timezone = '-5'
-          }
-        }
-      }
-    }
-  }
-}
-
-bintray {
-  user         = 'dubinsky'
-  key          = findProperty('bintrayApiKey')
-  publications = [
-    'mavenPublication',                        // Main: pom, jar, sources, etc.
-  ]
-  dryRun       = false
-  publish      = true
-  override     = true
-  pkg {
-    repo                   = project.group
-    name                   = pluginArtifactId
-    desc                   = project.description
-    websiteUrl             = "${gitHubRepositoryUrl}"
-    issueTrackerUrl        = "${gitHubRepositoryUrl}/issues"
-    vcsUrl                 = "${gitHubRepositoryUrl}.git"
-    githubRepo             = gitHubRepository
-    licenses               = ['Apache-2.0']
-    labels                 = pluginTags
-    publicDownloadNumbers  = true
-    githubReleaseNotesFile = 'CHANGELOG.md'
-    version { name         = project.version }
-  }
-}
+apply from: '../bintray.gradle'
+configureBintray(
+  'org.podval.fop.mathjax',
+  ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub']
+)

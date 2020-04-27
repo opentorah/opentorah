@@ -1,0 +1,79 @@
+plugins {
+  id 'scala'
+  id 'com.github.maiflai.scalatest'
+  id 'java-gradle-plugin'
+  id 'maven-publish'
+  id 'com.jfrog.bintray'
+  id 'com.gradle.plugin-publish'
+}
+
+group = 'org.podval.docbook'
+version = docBookProjectVersion
+description = 'Gradle DocBook plugin'
+
+dependencies {
+  implementation project(':fop')
+
+  // Scala
+  implementation "org.scala-lang:scala-library:$scalaVersion"
+
+  // Testing
+  testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
+  testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
+
+  // added by the 'java-gradle-plugin': testImplementation gradleTestKit()
+}
+
+// run tests sequentially
+test {
+  maxParallelForks = 1
+}
+
+jar {
+  manifest {
+    attributes(
+      'Implementation-Title'  : project.description,
+      'Implementation-Version': project.version
+    )
+  }
+}
+
+final String jarArtifactId = 'org.podval.docbook-gradle-plugin'
+final String gitHubRepositoryUrl = 'https://github.com/opentorah/opentorah'
+final List<String> artifactTags = ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub']
+
+apply from: '../bintray.gradle'
+configureBintray(
+  jarArtifactId,
+  artifactTags
+)
+
+gradlePlugin {
+  plugins {
+    docBookPlugin {
+      id = jarArtifactId
+      implementationClass = 'org.podval.docbook.gradle.plugin.DocBookPlugin'
+    }
+  }
+}
+
+pluginBundle {
+  website = "${gitHubRepositoryUrl}"
+  vcsUrl = "${gitHubRepositoryUrl}.git"
+
+  plugins {
+    docBookPlugin {
+      displayName = project.description
+      description = project.description
+      tags        = artifactTags
+    }
+  }
+
+  // If you have an existing plugin deployed to Bintray and would like to keep
+  // your existing group ID and artifact ID for continuity, you can specify
+  // them here (needs manual approval on first publication).
+  mavenCoordinates {
+    groupId    = project.group
+    artifactId = jarArtifactId
+  }
+}

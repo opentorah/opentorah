@@ -11,7 +11,8 @@ import org.podval.fop.util.Logger
 import org.podval.fop.util.Util.mapValues
 
 import scala.collection.immutable.SortedMap
-import scala.jdk.CollectionConverters._
+// TODO for Scala 2.13: import scala.jdk.CollectionConverters._
+import scala.collection.JavaConverters._
 
 object FopFonts {
 

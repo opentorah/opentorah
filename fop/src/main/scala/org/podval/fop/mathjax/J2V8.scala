@@ -6,7 +6,8 @@ import org.podval.fop.util.Util.mapValues
 import com.eclipsesource.v8.V8
 import org.podval.fop.util.Logger
 
-import scala.jdk.CollectionConverters._
+// TODO for Scala 2.13: import scala.jdk.CollectionConverters._
+import scala.collection.JavaConverters._
 
 final class J2V8(libraryPath: String) {
 
@@ -38,7 +39,10 @@ object J2V8 {
     list.map(value2java).asJava
 
   private def value2java(value: Any): Any = value match {
-    case value: Map[String, Any] => map2java(value)
+    // with value: Map[String, Any] I get:
+    //   non-variable type argument String in type pattern scala.collection.immutable.Map[String,Any]
+    //   (the underlying of Map[String,Any]) is unchecked since it is eliminated by erasure
+    case value: Map[_, Any] => map2java(value.asInstanceOf[Map[String, Any]])
     case value: List[Any] => list2java(value)
     case other => other
   }

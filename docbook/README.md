@@ -1,7 +1,5 @@
 # DocBook plugin for Gradle #
 
-[![](https://github.com/dubinsky/podval-docbook-gradle/workflows/CI/badge.svg)](https://github.com/dubinsky/podval-docbook-gradle/actions)
-
 ## Motivation ##
 
 There is an excellent [DocBook](http://www.docbook.org/) plugin

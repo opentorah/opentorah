@@ -6,7 +6,8 @@ import org.podval.fop.mathjax
 import org.podval.docbook.gradle.section.DocBook2
 
 import scala.beans.BeanProperty
-import scala.jdk.CollectionConverters._
+// TODO for Scala 2.13: import scala.jdk.CollectionConverters._
+import scala.collection.JavaConverters._
 
 // Properties are annotated with @BeanProperty to make them visible to Gradle.
 class Extension(project: Project) {
