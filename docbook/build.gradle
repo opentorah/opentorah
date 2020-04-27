@@ -54,7 +54,7 @@ gradlePlugin {
   plugins {
     docBookPlugin {
       id = jarArtifactId
-      implementationClass = 'org.podval.docbook.gradle.plugin.DocBookPlugin'
+      implementationClass = 'org.opentorah.docbook.plugin.DocBookPlugin'
     }
   }
 }
