@@ -1,14 +1,14 @@
 package org.podval.docbook.gradle.plugin
 
 import java.io.File
-
 import org.gradle.api.Project
 import org.podval.docbook.gradle.section.DocBook2
+import org.opentorah.util.Files
 import org.podval.fop.gradle.Gradle
 import org.podval.fop.jeuclid.JEuclidFopPlugin
 import org.podval.fop.{Fop, FopPlugin}
 import org.podval.fop.mathjax.{MathJax, MathJaxFopPlugin}
-import org.podval.fop.util.{Files, Logger}
+import org.podval.fop.util.Logger
 import org.podval.fop.xml.{Resolver, Saxon, Xml}
 
 final class ProcessDocBook(

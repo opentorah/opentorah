@@ -1,9 +1,8 @@
 package org.podval.fop.mathjax
 
 import java.lang.reflect.Field
-
-import org.podval.fop.util.Util.mapValues
 import com.eclipsesource.v8.V8
+import org.opentorah.util.Collections.mapValues
 import org.podval.fop.util.Logger
 
 // TODO for Scala 2.13: import scala.jdk.CollectionConverters._

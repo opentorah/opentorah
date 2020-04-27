@@ -2,19 +2,11 @@
 
 Understanding the ignored for fun and schar.
 
+Paper on Rambam's Laws of the Sanctification of the available at opentorah.org.
+
 Code for working with Jewish calendar, both arithmetic and astronomical.
-Paper on Rambam's Laws of the Sanctification of the available at jewish-calendar.org.
-
-## The Code ##
-
-Code that makes possible calculations with dates, time intervals and angles exactly as they are
-described by Rambam is available:
-- [Repository](https://github.com/opentorah/calendar)
-- [Changelog](/CHANGELOG.md)
-- [ScalaDoc](/scaladoc/org/podval/calendar/index.html)
-- [Examples](/examples/)
-- [Bintray](https://bintray.com/beta/#/dubinsky/org.opentorah/calendar?tab=overview)
-- [JCenter](https://jcenter.bintray.com/org/opentorah/calendar/)
+Makes possible calculations with dates, time intervals and angles exactly as they are
+described by Rambam.
 
 The code is written in Scala and uses extendable family polymorphism encoding with family members in
 separate files inspired by a Stackoverflow

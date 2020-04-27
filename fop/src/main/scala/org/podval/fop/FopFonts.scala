@@ -7,8 +7,8 @@ import org.apache.fop.apps.FopFactory
 import org.apache.fop.fonts.{FontEventListener, FontTriplet}
 import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
 import org.apache.xmlgraphics.util.MimeConstants
+import org.opentorah.util.Collections.mapValues
 import org.podval.fop.util.Logger
-import org.podval.fop.util.Util.mapValues
 
 import scala.collection.immutable.SortedMap
 // TODO for Scala 2.13: import scala.jdk.CollectionConverters._

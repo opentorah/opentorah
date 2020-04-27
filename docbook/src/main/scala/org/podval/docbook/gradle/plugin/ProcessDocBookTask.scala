@@ -2,17 +2,17 @@ package org.podval.docbook.gradle.plugin
 
 import java.io.File
 import java.net.URI
-
 import org.gradle.api.{DefaultTask, Project, Task}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
+import org.opentorah.util.Collections.mapValues
+import org.opentorah.util.Files
 import org.podval.docbook.gradle.section.{DocBook2, Section}
 import org.podval.fop.{Fop, FopFonts, Mathematics}
 import org.podval.fop.gradle.{Gradle, PluginLogger}
 import org.podval.fop.mathjax.MathJax
-import org.podval.fop.util.{Files, Logger}
-import org.podval.fop.util.Util.mapValues
+import org.podval.fop.util.Logger
 import org.podval.fop.xml.{Namespace, Resolver}
 
 import scala.beans.BeanProperty
@@ -125,7 +125,7 @@ class ProcessDocBookTask extends DefaultTask {
   @TaskAction
   def processDocBook(): Unit = {
     def writeInto(file: File, replace: Boolean)(content: String): Unit =
-      Files.writeInto(file, replace, content, logger)
+      org.podval.fop.util.Files.writeInto(file, replace, content, logger)
 
     val documentName: Option[String] = getDocumentName(document.get)
     val documentNames: List[String] = documents.get.asScala.toList.flatMap(getDocumentName)

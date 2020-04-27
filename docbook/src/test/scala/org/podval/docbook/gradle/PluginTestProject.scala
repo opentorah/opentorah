@@ -3,8 +3,9 @@ package org.podval.docbook.gradle
 import java.io.File
 
 import org.gradle.testkit.runner.GradleRunner
+import org.opentorah.util.Files
 import org.podval.docbook.gradle.plugin.{DocBook, Layout}
-import org.podval.fop.util.{Files, Logger, TestLogger}
+import org.podval.fop.util.{Logger, TestLogger}
 import org.podval.fop.xml.Xml
 
 class PluginTestProject private(
@@ -24,7 +25,7 @@ class PluginTestProject private(
     val logger: Logger = new TestLogger
 
     def writeInto(file: File, replace: Boolean)(content: String): Unit =
-      Files.writeInto(file, replace, content, logger)
+      org.podval.fop.util.Files.writeInto(file, replace, content, logger)
 
     val documentName: String = "test"
 
@@ -73,7 +74,7 @@ class PluginTestProject private(
     writeInto(layout.inputFile(documentName), replace = false)(s"${Xml.header}\n$document")
   }
 
-  def destroy(): Unit = Files.deleteRecursively(projectDir)
+  def destroy(): Unit = Files.deleteFiles(projectDir)
 
   def run(logInfo: Boolean = false): String = getRunner(logInfo).build.getOutput
 
@@ -84,7 +85,9 @@ class PluginTestProject private(
   def fo: String = saxonOutputFile(section.Pdf)
 
   private def saxonOutputFile(docBook2: section.DocBook2): String =
-    Files.readFrom(layout.forDocument(prefixed = false, PluginTestProject.documentName).saxonOutputFile(docBook2))
+    Files
+      .read(layout.forDocument(prefixed = false, PluginTestProject.documentName).saxonOutputFile(docBook2))
+      .mkString("\n")
 
   private def getRunner(logInfo: Boolean): GradleRunner = {
     val result = GradleRunner.create.withProjectDir(projectDir)

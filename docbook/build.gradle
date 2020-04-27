@@ -13,8 +13,10 @@ description = 'Gradle DocBook plugin'
 
 dependencies {
   implementation project(':fop')
+  implementation project(':util')
 
   // Scala
+  zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
   implementation "org.scala-lang:scala-library:$scalaVersion"
 
   // Testing

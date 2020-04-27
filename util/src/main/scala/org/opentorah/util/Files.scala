@@ -13,6 +13,13 @@ object Files {
       if result._2.contains(extension)
     } yield result._1
 
+  def dropAllowedExtension(nameWihtExtension: String, allowedExtension: String): String = {
+    val (name: String, extension: Option[String]) = nameAndExtension(nameWihtExtension)
+    if (extension.nonEmpty && !extension.contains(allowedExtension))
+      throw new IllegalArgumentException(s"Extension must be '$allowedExtension' if present: $nameWihtExtension")
+    name
+  }
+
   def pathAndName(path: String): (Option[String], String) = {
     val lastSlash: Int = path.lastIndexOf('/')
     if (lastSlash == -1) (None, path)
@@ -20,6 +27,9 @@ object Files {
   }
 
   def nameAndExtension(fullName: String): (String, Option[String]) = split(fullName, '.')
+
+  def prefixedDirectory(directory: File, prefix: Option[String]): File =
+    prefix.fold(directory)(prefix => new File(directory, prefix))
 
   def write(file: File, content: String): Unit = {
     file.getParentFile.mkdirs()

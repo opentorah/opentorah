@@ -3,7 +3,8 @@ package org.podval.fop
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 
 import org.apache.fop.apps.{FOUserAgent, FopFactory}
-import org.podval.fop.util.{Logger, TestLogger, Util}
+import org.opentorah.util.Util
+import org.podval.fop.util.{Logger, TestLogger}
 import org.podval.fop.xml.{Saxon, Xml}
 
 object Fop {

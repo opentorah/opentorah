@@ -5,12 +5,14 @@ plugins {
   id 'com.jfrog.bintray'
 }
 
-group = 'org.podval.fop'
 version = docBookProjectVersion
 description = 'FOP MathJax plugin'
 
 dependencies {
+  implementation project(':util')
+
   // Scala
+  zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
   implementation "org.scala-lang:scala-library:$scalaVersion"
 
   // XMLResolver
@@ -78,6 +80,6 @@ jar {
 
 apply from: '../bintray.gradle'
 configureBintray(
-  'org.podval.fop.mathjax',
+  'opentorah-fop',
   ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub']
 )
