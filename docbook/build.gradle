@@ -7,7 +7,6 @@ plugins {
   id 'com.gradle.plugin-publish'
 }
 
-group = 'org.podval.docbook'
 version = docBookProjectVersion
 description = 'Gradle DocBook plugin'
 
@@ -40,20 +39,20 @@ jar {
   }
 }
 
-final String jarArtifactId = 'org.podval.docbook-gradle-plugin'
 final String gitHubRepositoryUrl = 'https://github.com/opentorah/opentorah'
 final List<String> artifactTags = ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub']
 
 apply from: '../bintray.gradle'
 configureBintray(
-  jarArtifactId,
+  'opentorah-docbook',
   artifactTags
 )
 
 gradlePlugin {
   plugins {
     docBookPlugin {
-      id = jarArtifactId
+      // TODO change to org.opentorah.docbook:
+      id = 'org.podval.docbook-gradle-plugin'
       implementationClass = 'org.opentorah.docbook.plugin.DocBookPlugin'
     }
   }
@@ -74,8 +73,9 @@ pluginBundle {
   // If you have an existing plugin deployed to Bintray and would like to keep
   // your existing group ID and artifact ID for continuity, you can specify
   // them here (needs manual approval on first publication).
+  // TODO change to org.opentorah:opentorah-docbook:
   mavenCoordinates {
-    groupId    = project.group
-    artifactId = jarArtifactId
+    groupId    = 'org.podval.docbook'
+    artifactId = 'org.podval.docbook-gradle-plugin'
   }
 }

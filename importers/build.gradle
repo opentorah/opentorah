@@ -3,10 +3,15 @@ plugins {
 }
 
 dependencies {
+    implementation project(':store')
+
     zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
 
-    implementation project(':store')
-    implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
     implementation "org.scala-lang:scala-library:$scalaVersion"
+    implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+
     implementation "org.ccil.cowan.tagsoup:tagsoup:$tagsoupVersion"
+
+    testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
+    testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
 }
