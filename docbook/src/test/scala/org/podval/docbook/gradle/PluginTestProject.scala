@@ -5,8 +5,8 @@ import java.io.File
 import org.gradle.testkit.runner.GradleRunner
 import org.opentorah.util.Files
 import org.podval.docbook.gradle.plugin.{DocBook, Layout}
-import org.podval.fop.util.{Logger, TestLogger}
-import org.podval.fop.xml.Xml
+import org.opentorah.fop.util.{Logger, TestLogger}
+import org.opentorah.fop.xml.Xml
 
 class PluginTestProject private(
   projectDir: File,
@@ -25,7 +25,7 @@ class PluginTestProject private(
     val logger: Logger = new TestLogger
 
     def writeInto(file: File, replace: Boolean)(content: String): Unit =
-      org.podval.fop.util.Files.writeInto(file, replace, content, logger)
+      org.opentorah.fop.util.Files.writeInto(file, replace, content, logger)
 
     val documentName: String = "test"
 

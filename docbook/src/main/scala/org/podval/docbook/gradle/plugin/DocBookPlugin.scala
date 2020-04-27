@@ -2,9 +2,9 @@ package org.podval.docbook.gradle.plugin
 
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.{DefaultTask, Plugin, Project}
-import org.podval.fop.FopFonts
-import org.podval.fop.gradle.{Gradle, PluginLogger}
-import org.podval.fop.util.Logger
+import org.opentorah.fop.FopFonts
+import org.opentorah.fop.gradle.{Gradle, PluginLogger}
+import org.opentorah.fop.util.Logger
 
 final class DocBookPlugin extends Plugin[Project] {
 

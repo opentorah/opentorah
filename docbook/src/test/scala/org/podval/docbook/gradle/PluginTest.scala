@@ -1,7 +1,7 @@
 package org.podval.docbook.gradle
 
 import org.podval.docbook.gradle.plugin.DocBook
-import org.podval.fop.xml.Namespace
+import org.opentorah.fop.xml.Namespace
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 

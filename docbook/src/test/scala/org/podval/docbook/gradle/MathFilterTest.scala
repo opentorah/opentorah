@@ -1,9 +1,9 @@
 package org.podval.docbook.gradle
 
 import org.podval.docbook.gradle.plugin.{DocBook, MathFilter}
-import org.podval.fop.mathjax.{Configuration, MathJax, MathML}
-import org.podval.fop.util.TestLogger
-import org.podval.fop.xml.{Namespace, Saxon, Xml}
+import org.opentorah.fop.mathjax.{Configuration, MathJax, MathML}
+import org.opentorah.fop.util.TestLogger
+import org.opentorah.fop.xml.{Namespace, Saxon, Xml}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.w3c.dom.Node

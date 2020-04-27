@@ -8,7 +8,7 @@ object DocBook {
 
   val doctype: String = s"""<!DOCTYPE article PUBLIC "$dtdId" "$dtdUri">"""
 
-  object Namespace extends org.podval.fop.xml.Namespace(uri = "http://docbook.org/ns/docbook") {
+  object Namespace extends org.opentorah.fop.xml.Namespace(uri = "http://docbook.org/ns/docbook") {
     def withVersion: String = withVersion("5.0")
   }
 }

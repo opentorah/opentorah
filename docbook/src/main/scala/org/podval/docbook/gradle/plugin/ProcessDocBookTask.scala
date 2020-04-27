@@ -6,14 +6,14 @@ import org.gradle.api.{DefaultTask, Project, Task}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
+import org.opentorah.fop.{Fop, FopFonts, Mathematics}
+import org.opentorah.fop.gradle.{Gradle, PluginLogger}
+import org.opentorah.fop.mathjax.MathJax
+import org.opentorah.fop.util.Logger
+import org.opentorah.fop.xml.{Namespace, Resolver}
 import org.opentorah.util.Collections.mapValues
 import org.opentorah.util.Files
 import org.podval.docbook.gradle.section.{DocBook2, Section}
-import org.podval.fop.{Fop, FopFonts, Mathematics}
-import org.podval.fop.gradle.{Gradle, PluginLogger}
-import org.podval.fop.mathjax.MathJax
-import org.podval.fop.util.Logger
-import org.podval.fop.xml.{Namespace, Resolver}
 
 import scala.beans.BeanProperty
 // TODO for Scala 2.13: import scala.jdk.CollectionConverters._
@@ -125,7 +125,7 @@ class ProcessDocBookTask extends DefaultTask {
   @TaskAction
   def processDocBook(): Unit = {
     def writeInto(file: File, replace: Boolean)(content: String): Unit =
-      org.podval.fop.util.Files.writeInto(file, replace, content, logger)
+      org.opentorah.fop.util.Files.writeInto(file, replace, content, logger)
 
     val documentName: Option[String] = getDocumentName(document.get)
     val documentNames: List[String] = documents.get.asScala.toList.flatMap(getDocumentName)
@@ -163,7 +163,7 @@ class ProcessDocBookTask extends DefaultTask {
 
     require(!isMathJaxEnabled.get || !isJEuclidEnabled.get)
 
-    val mathJaxConfiguration: org.podval.fop.mathjax.Configuration = getMathJaxConfiguration
+    val mathJaxConfiguration: org.opentorah.fop.mathjax.Configuration = getMathJaxConfiguration
 
     Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout, logger)
     Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout, logger)
@@ -285,11 +285,11 @@ class ProcessDocBookTask extends DefaultTask {
     classesTask.getDidWork || classesTask.getTaskDependencies.getDependencies(classesTask).asScala.exists(_.getDidWork)
   }
 
-  private def getMathJaxConfiguration: org.podval.fop.mathjax.Configuration = {
-    def delimiters(property: Property[String]): Seq[org.podval.fop.mathjax.Configuration.Delimiters] =
-      Seq(new org.podval.fop.mathjax.Configuration.Delimiters(property.get, property.get))
+  private def getMathJaxConfiguration: org.opentorah.fop.mathjax.Configuration = {
+    def delimiters(property: Property[String]): Seq[org.opentorah.fop.mathjax.Configuration.Delimiters] =
+      Seq(new org.opentorah.fop.mathjax.Configuration.Delimiters(property.get, property.get))
 
-    org.podval.fop.mathjax.Configuration(
+    org.opentorah.fop.mathjax.Configuration(
       font = mathJaxFont.get,
       extensions = mathJaxExtensions.get.asScala.toList,
       texDelimiters = delimiters(texDelimiter),

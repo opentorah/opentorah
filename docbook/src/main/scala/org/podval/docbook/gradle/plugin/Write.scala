@@ -1,8 +1,8 @@
 package org.podval.docbook.gradle.plugin
 
 import org.podval.docbook.gradle.section.{DocBook2, HtmlCommon, Section}
-import org.podval.fop.xml.{Namespace, Xml}
-import org.podval.fop.util.Json
+import org.opentorah.fop.xml.{Namespace, Xml}
+import org.opentorah.fop.util.Json
 
 object Write {
 
@@ -83,7 +83,7 @@ object Write {
     documentName: String,
     cssFileName: String,
     epubEmbeddedFonts: String,
-    mathJaxConfiguration: org.podval.fop.mathjax.Configuration,
+    mathJaxConfiguration: org.opentorah.fop.mathjax.Configuration,
     layout: Layout
   ): String = {
     val forDocument = layout.forDocument(prefixed, documentName)

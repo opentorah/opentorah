@@ -3,8 +3,8 @@ package org.podval.docbook.gradle.plugin
 import java.io.File
 
 import org.gradle.api.Project
-import org.podval.fop.gradle.Gradle
-import org.podval.fop.util.Logger
+import org.opentorah.fop.gradle.Gradle
+import org.opentorah.fop.util.Logger
 
 trait Stylesheets {
   protected def name: String

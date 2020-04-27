@@ -1,7 +1,7 @@
 package org.podval.docbook.gradle.plugin
 
-import org.podval.fop.util.Logger
-import org.podval.fop.xml.WarningFilter
+import org.opentorah.fop.util.Logger
+import org.opentorah.fop.xml.WarningFilter
 
 final class EvalFilter(
   substitutions: Map[String, String],

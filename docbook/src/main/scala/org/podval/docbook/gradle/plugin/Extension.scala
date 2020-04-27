@@ -2,7 +2,7 @@ package org.podval.docbook.gradle.plugin
 
 import org.gradle.api.{Action, Project}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
-import org.podval.fop.mathjax
+import org.opentorah.fop.mathjax
 import org.podval.docbook.gradle.section.DocBook2
 
 import scala.beans.BeanProperty

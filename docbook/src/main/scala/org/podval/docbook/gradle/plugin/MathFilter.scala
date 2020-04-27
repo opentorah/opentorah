@@ -1,10 +1,10 @@
 package org.podval.docbook.gradle.plugin
 
-import org.podval.fop.mathjax.Configuration.DelimitersAndInput
-import org.podval.fop.mathjax.MathML.DisplayAttribute
-import org.podval.fop.mathjax.{Configuration, Input, MathJax, MathML}
-import org.podval.fop.util.Logger
-import org.podval.fop.xml.{Namespace, WarningFilter}
+import org.opentorah.fop.mathjax.Configuration.DelimitersAndInput
+import org.opentorah.fop.mathjax.MathML.DisplayAttribute
+import org.opentorah.fop.mathjax.{Configuration, Input, MathJax, MathML}
+import org.opentorah.fop.util.Logger
+import org.opentorah.fop.xml.{Namespace, WarningFilter}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
