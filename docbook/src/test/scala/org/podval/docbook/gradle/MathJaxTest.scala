@@ -3,9 +3,10 @@ package org.podval.docbook.gradle
 import org.podval.docbook.gradle.plugin.DocBook
 import org.podval.fop.mathjax.{MathJax, Svg}
 import org.podval.fop.xml.Namespace
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpecLike
+import org.scalatest.matchers.should.Matchers
 
-class MathJaxTest extends FlatSpec with Matchers {
+class MathJaxTest extends AnyFlatSpecLike with Matchers {
 
   private def test(
     name: String,

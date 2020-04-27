@@ -4,10 +4,11 @@ import org.podval.docbook.gradle.plugin.{DocBook, MathFilter}
 import org.podval.fop.mathjax.{Configuration, MathJax, MathML}
 import org.podval.fop.util.TestLogger
 import org.podval.fop.xml.{Namespace, Saxon, Xml}
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpecLike
+import org.scalatest.matchers.should.Matchers
 import org.w3c.dom.Node
 
-class MathFilterTest extends FlatSpec with Matchers {
+class MathFilterTest extends AnyFlatSpecLike with Matchers {
 
   it should "work for wrapped display TeX" in {
     // Serializer outputs UTF-16; xml namespace is made explicit; order of attributes and spacing are different -

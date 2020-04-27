@@ -1,8 +1,9 @@
 package org.podval.fop.mathjax
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpecLike
+import org.scalatest.matchers.should.Matchers
 
-class NodeDistributionTest extends FlatSpec with Matchers {
+class NodeDistributionTest extends AnyFlatSpecLike with Matchers {
 
   it should "calculate bin directory correctly" in {
     val distribution: NodeDistribution = new NodeDistribution(version = NodeDistribution.defaultVersion)

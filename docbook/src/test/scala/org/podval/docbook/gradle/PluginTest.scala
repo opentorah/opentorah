@@ -2,9 +2,10 @@ package org.podval.docbook.gradle
 
 import org.podval.docbook.gradle.plugin.DocBook
 import org.podval.fop.xml.Namespace
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpecLike
+import org.scalatest.matchers.should.Matchers
 
-class PluginTest extends FlatSpec with Matchers {
+class PluginTest extends AnyFlatSpecLike with Matchers {
 
   private def test(
     name: String,
