@@ -48,6 +48,14 @@ object Files {
     result
   }
 
+  // TODO read eagerly, so that mkString() could be done on the outside:
+  def read1(file: File): String = {
+    val source = Source.fromFile(file)
+    val result = source.getLines.toSeq.mkString("\n")
+    source.close
+    result
+  }
+
   def deleteFiles(directory: File): Unit = if (directory.exists()) {
     if (directory.isDirectory) for (file <- directory.listFiles()) deleteFiles(file)
     directory.delete()

@@ -85,9 +85,7 @@ class PluginTestProject private(
   def fo: String = saxonOutputFile(section.Pdf)
 
   private def saxonOutputFile(docBook2: section.DocBook2): String =
-    Files
-      .read(layout.forDocument(prefixed = false, PluginTestProject.documentName).saxonOutputFile(docBook2))
-      .mkString("\n")
+    Files.read1(layout.forDocument(prefixed = false, PluginTestProject.documentName).saxonOutputFile(docBook2))
 
   private def getRunner(logInfo: Boolean): GradleRunner = {
     val result = GradleRunner.create.withProjectDir(projectDir)
