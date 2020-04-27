@@ -71,7 +71,7 @@ final class ProcessDocBook(
           else mathJax.map(new MathJaxFopPlugin(_))
 
         Fop.run(
-          saxon = Saxon.Saxon6, // TODO: Saxon9 should work too?
+          saxon = Saxon.Saxon6,
           configurationFile = layout.fopConfigurationFile,
           substitutions.get("creationDate"),
           substitutions.get("author"),

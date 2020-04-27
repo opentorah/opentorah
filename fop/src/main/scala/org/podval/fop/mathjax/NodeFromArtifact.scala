@@ -3,6 +3,7 @@ package org.podval.fop.mathjax
 import java.io.File
 import java.nio.file.{Files, Path, Paths}
 
+// TODO stick NodeDistribution into Node (again?); make names of the executables methods on it...
 final class NodeFromArtifact(
   nodeModulesParent: File,
   root: File,

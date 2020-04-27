@@ -10,7 +10,6 @@ description = 'FOP MathJax plugin'
 
 apply from: '../versions.gradle'
 
-// TODO use Gradle's `registerFeature` to make Saxon, JEuclid and J2V8 dependencies optional?
 dependencies {
   // Scala
   implementation "org.scala-lang:scala-library:$scalaVersion"

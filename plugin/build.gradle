@@ -69,7 +69,6 @@ final String gitHubRepository    = 'dubinsky/podval-docbook-gradle'
 final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
 final List<String> pluginTags = ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub']
 
-// TODO not all tags get set for the plugin on the portal...
 pluginBundle {
   website = "${gitHubRepositoryUrl}"
   vcsUrl = "${gitHubRepositoryUrl}.git"
@@ -100,7 +99,6 @@ publishing {
       from components.java
 
       artifact sourceJar
-// TODO when Gradle fixes Scaladoc for Scala 2.13:
 //      artifact scaladocJar
 
       pom {

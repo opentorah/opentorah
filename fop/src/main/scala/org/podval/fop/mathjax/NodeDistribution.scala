@@ -69,6 +69,5 @@ final class NodeDistribution(val version: String = NodeDistribution.defaultVersi
 }
 
 object NodeDistribution {
-  // TODO Support later versions of NodeJS (and changes in the distribution structure)
   val defaultVersion: String = "10.15.3"
 }
