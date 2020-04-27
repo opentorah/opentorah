@@ -1,4 +1,4 @@
-title: "Digital Judaica Done Right"
+title: "Open Torah Project"
 author: "Leonid Dubinsky"
 email: dub@podval.org
 
@@ -11,6 +11,7 @@ github_username:  dubinsky
 
 header_pages:
   - index.md
+  - CHANGELOG.md
 
 markdown: kramdown
 theme: minima

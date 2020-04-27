@@ -9,9 +9,6 @@ allprojects {
     mavenCentral()
     mavenLocal()
   }
-
-  group = 'org.opentorah'
-  version = '0.1.0'
 }
 
 idea {
