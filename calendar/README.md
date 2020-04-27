@@ -1,11 +1,9 @@
-# README
+# Calendar #
 
 Understanding the ignored for fun and schar.
 
 Code for working with Jewish calendar, both arithmetic and astronomical.
 Paper on Rambam's Laws of the Sanctification of the available at jewish-calendar.org.
-
-![](https://github.com/opentorah/calendar/workflows/CI/badge.svg)
 
 ## The Code ##
 

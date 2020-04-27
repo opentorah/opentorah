@@ -35,9 +35,7 @@ docBook {
   }
 }
 
-build.dependsOn processDocBook
-
-build.doLast {
+processDocBook.doLast {
   project.sync {
     from processDocBook.outputDirectory
     into "$rootDir/docs/calendar"

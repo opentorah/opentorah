@@ -1,6 +1,6 @@
 # Digital Judaica Done Right :)
 
-![](https://github.com/opentorah/store/workflows/CI/badge.svg)
+![](https://github.com/opentorah/opentorah/workflows/CI/badge.svg)
 
 [Writings](http://www.opentorah.org) on the subject.
 
@@ -36,3 +36,8 @@ To merge repository `old` into repository `new` preserving history (one hopes!):
   $ git remote add -f old <old>
   $ git merge ald/master --allow-unrelated-histories
 ```
+
+Since it is impossible to have a file in Git where only the last revision is kept
+but revision history is automatically discarded, and for the generated files
+(like HTML, PDF and EPUB of the papers) to be visible on the site they need to be checked in,
+I might end up pruning their history periodically using `$ git filter-repo`...

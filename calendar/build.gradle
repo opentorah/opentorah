@@ -8,6 +8,13 @@ plugins {
 description = 'Jewish Calendar Dates'
 version = calendarProjectVersion
 
+// for tut
+repositories {
+  maven {
+    url 'https://dl.bintray.com/tpolecat/maven/'
+  }
+}
+
 dependencies {
   implementation project(':store')
   implementation project(':xml')
@@ -20,6 +27,8 @@ dependencies {
   implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
 
   testImplementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
+
+  runtimeOnly "org.tpolecat:tut-core_$scalaVersionMajor:$tutVersion"
 
   testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
   testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports; only 0.35.10 is supported?
@@ -34,3 +43,18 @@ configureBintray(
   'opentorah-calendar',              // jarArtifactId
   ['Scala', 'Calendar', 'Jewish']    // tags
 )
+
+// Tut
+final String tutOutputDirectory = "$buildDir/tut"
+task tut(type: JavaExec) {
+  group = 'documentation'
+  main = 'tut.TutMain'
+  args = ["$projectDir/src/site", tutOutputDirectory, ".*\\.(md|markdown|txt|htm|html)"]
+  classpath = sourceSets.main.runtimeClasspath
+}
+tut.doLast {
+  project.sync {
+    from tutOutputDirectory
+    into "$rootDir/docs/calendar-examples"
+  }
+}

@@ -14,7 +14,6 @@ allprojects {
   group = 'org.opentorah'
   version = projectVersion
 
-  // TODO not on the top level!
   configurations.all {
     resolutionStrategy {
       // v1.3.04 doesn't have org.w3c.dom.ElementTraversal that Xerces uses:
@@ -36,3 +35,10 @@ idea {
     ]
   }
 }
+
+task site
+site.description('Generates the website')
+site.group('publishing')
+site.dependsOn ':calendar:tut'
+site.dependsOn ':papers:processDocBook'
+site.dependsOn ':calendar-paper:processDocBook'
