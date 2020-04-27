@@ -11,6 +11,7 @@ pluginManagement {
     id 'com.jfrog.bintray' version '1.8.5'
     id 'com.google.cloud.tools.jib' version '2.2.0'
     id 'com.gradle.plugin-publish' version '0.10.1'
+    id 'org.podval.docbook-gradle-plugin' version '0.7.16'
   }
 }
 
@@ -22,3 +23,10 @@ include ':collector'
 include ':collector-service'
 include ':fop'
 include ':docbook'
+
+include ':papers'
+include ':calendar-paper'
+
+// I can no longer use the plugin via composite build, since it is in the same build as the site;
+// I guess I'll have to debug it on the side...
+//   includeBuild '../../docbook/docbook-gradle'
