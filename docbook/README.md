@@ -12,7 +12,7 @@ motivation and chosen approach can be found in a
 
 Plugin supports typesetting mathematics using [MathJax](https://www.mathjax.org/);
 code of the FOP MathJax plugin is shipped as a separate artifact
-`org.podval.fop:org.podval.fop.mathjax` to facilitate its re-use with markup other than DocBook. 
+`org.opentorah:opentorah-fop` to facilitate its re-use with markup other than DocBook. 
 
 ## Summary ##
 

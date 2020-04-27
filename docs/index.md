@@ -30,8 +30,8 @@ Goals of the paper:
 - see how Rambam's calculations of the moon visibility compare to the current models.
 
 Desire to publishing this paper in multiple formats was part of the motivation for writing
-[Gradle DocBook plugin](https://github.com/dubinsky/podval-docbook-gradle) in general and its support
-for mathematics in DocBook in particular. It also influenced my thinking on
+[Gradle DocBook plugin](https://github.com/opentorah/opentorah/tree/master/docbook) in general
+and its support for mathematics in DocBook in particular. It also influenced my thinking on
 [publishing papers on the web](http://dub.podval.org/2019/05/06/publishing-papers-on-web-2.html).
 
 Code that makes possible calculations with dates, time intervals and angles exactly as they are
