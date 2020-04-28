@@ -41,7 +41,7 @@ ext.configureBintray = {
 
   publishing {
     publications {
-      mavenPublication(MavenPublication) {
+      bintrayMavenPublication(MavenPublication) {
         groupId projectGroup
         artifactId projectArtifact
         version projectVersion
@@ -92,7 +92,7 @@ ext.configureBintray = {
   bintray {
     user         = 'dubinsky'
     key          = findProperty('bintrayApiKey')
-    publications = ['mavenPublication']
+    publications = ['bintrayMavenPublication']
     dryRun       = false
     publish      = true
     override     = true
@@ -107,6 +107,8 @@ ext.configureBintray = {
       licenses              = ['Apache-2.0']
       labels                = tags
       publicDownloadNumbers = true
+      // Note: there seems to be no way to supply per-module CHANGELOG.md -
+      // and package creation fails unless there is an overall one...
       githubReleaseNotesFile= 'CHANGELOG.md'
       version { name        = projectVersion }
     }

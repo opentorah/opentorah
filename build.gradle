@@ -2,6 +2,19 @@ plugins {
   id 'com.github.ben-manes.versions'
   id 'idea'
   id 'base'
+  // Note: Bintray plugin applied to a module reaches into other modules,
+  // which in some cases results in the following exception
+  //   Cannot cast object ... with class ... to class ...
+  // for some class within the Bintray plugin
+  // (class-loader issue; see http://forums.jfrog.org/Gradle-plugin-and-multi-projects-td7580521.html).
+  // For instance, this happens when:
+  // - `bintrayUpload` task for a specific module is run;
+  // - a module has both Bintray and Gradle Plugin Portal publishing plugin.
+  // It doesn't seem to be likely that Bintray will ever fix the problem;
+  // the workaround is: add Bintray plugin on the top level of the project *in addition* to the modules
+  // that actually use it, but mark it as not applied (there is no Bintray configuration on the top level,
+  // so plugin will fail with an NPE if applied):
+  id 'com.jfrog.bintray' apply false
 }
 
 allprojects {
