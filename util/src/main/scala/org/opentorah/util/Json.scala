@@ -22,5 +22,4 @@ object Json {
     .replace("\\", "\\\\") // first, so that newly-introduced '\' do not get escaped!
     .replace("\"", "\\\"")
     .replace("\n", "\\n")
-
 }
