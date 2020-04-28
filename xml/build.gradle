@@ -24,7 +24,4 @@ dependencies {
 }
 
 apply from: '../bintray.gradle'
-configureBintray(
-  "opentorah-xml",    // jarArtifactId
-  ['Scala', 'XML']    // tags
-)
+configureBintray(['Scala', 'XML'])

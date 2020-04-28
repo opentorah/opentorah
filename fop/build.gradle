@@ -79,7 +79,4 @@ jar {
 }
 
 apply from: '../bintray.gradle'
-configureBintray(
-  'opentorah-fop',
-  ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub']
-)
+configureBintray(['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub'])

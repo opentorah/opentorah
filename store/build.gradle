@@ -23,8 +23,4 @@ dependencies {
 }
 
 apply from: '../bintray.gradle'
-
-configureBintray(
-  "opentorah-store",           // jarArtifactId
-  ['Scala', 'Jewish', 'TEI']   // tags
-)
+configureBintray(['Scala', 'Jewish', 'TEI'])

@@ -8,13 +8,6 @@ plugins {
 description = 'Jewish Calendar Dates'
 version = calendarProjectVersion
 
-// for tut
-repositories {
-  maven {
-    url 'https://dl.bintray.com/tpolecat/maven/'
-  }
-}
-
 dependencies {
   implementation project(':store')
   implementation project(':xml')
@@ -40,10 +33,7 @@ dependencies {
 }
 
 apply from: '../bintray.gradle'
-configureBintray(
-  'opentorah-calendar',              // jarArtifactId
-  ['Scala', 'Calendar', 'Jewish']    // tags
-)
+configureBintray(['Scala', 'Calendar', 'Jewish'])
 
 // Tut
 final String tutOutputDirectory = "$buildDir/tut"

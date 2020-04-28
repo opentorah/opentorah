@@ -9,6 +9,8 @@ allprojects {
     jcenter()
     mavenCentral()
     mavenLocal()
+    // for tut
+    maven { url 'https://dl.bintray.com/tpolecat/maven/' }
   }
 
   group = 'org.opentorah'

@@ -1,13 +1,26 @@
 ext.configureBintray = {
-  final String jarArtifactId,
   final List<String> tags
     ->
 
-  // Read more from project properties?
+  final String projectName = project.name
+  final String projectDescription = project.description
+  final String projectGroup = project.group
+  final String projectArtifact = "opentorah-$projectName"
+  final String projectVersion = project.version
   final String gitHubRepository = "opentorah/opentorah"
   final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
+  final String codeUrl = "$gitHubRepositoryUrl/tree/master/$projectName"
+  final String releaseNotesUrl = "$codeUrl/CHANGELOG.md"
   final String orgName = 'Open Torah'
   final String orgUrl = 'http://www.opentorah.org'
+
+//  logger.lifecycle(
+//    "Configuring Bintray for project '$projectName':\n" +
+//    "  description=$projectDescription;\n" +
+//    "  groupId    =$projectGroup;\n" +
+//    "  codeUrl    =$codeUrl;\n" +
+//    "  artifactId =$projectArtifact;\n"
+//  )
 
   // Gradle plugin [publishing?] plugin, if it is applied, adds tasks publishPluginJar and
   // publishPluginJavaDocsJar that create sources and javadoc archives;
@@ -25,13 +38,14 @@ ext.configureBintray = {
   }
   scaladocJar.dependsOn scaladoc
 
-  jar.archiveBaseName.set(jarArtifactId)
+  jar.archiveBaseName.set(projectArtifact)
 
   publishing {
     publications {
       mavenPublication(MavenPublication) {
-        groupId project.group
-        artifactId jarArtifactId
+        groupId projectGroup
+        artifactId projectArtifact
+        version projectVersion
 
         from components.java
 
@@ -40,9 +54,9 @@ ext.configureBintray = {
         artifact scaladocJar
 
         pom {
-          name = project.name
-          description = project.description
-          url = "$gitHubRepositoryUrl"
+          name = projectName
+          description = projectDescription
+          url = codeUrl
           scm {
             url = "$gitHubRepositoryUrl"
             connection = "scm:git:git://github.com/${gitHubRepository}.git"
@@ -84,19 +98,19 @@ ext.configureBintray = {
     publish      = true
     override     = true
     pkg {
-      repo                  = project.group
-      name                  = jarArtifactId
-      desc                  = project.description
-      websiteUrl            = orgUrl
+      repo                  = projectGroup
+      name                  = projectArtifact
+      desc                  = projectDescription
+      websiteUrl            = codeUrl
       issueTrackerUrl       = "${gitHubRepositoryUrl}/issues"
       vcsUrl                = "${gitHubRepositoryUrl}.git"
       githubRepo            = gitHubRepository
       licenses              = ['Apache-2.0']
       labels                = tags
       publicDownloadNumbers = true
-// TODO take a path to the CHANGELOG.md for the artifact!
-//    githubReleaseNotesFile = "${rootProject.projectDir}/docs/CHANGELOG.md"
-      version { name        = project.version }
+// CHANGELOG.md?
+      githubReleaseNotesFile= releaseNotesUrl
+      version { name        = projectVersion }
     }
   }
 }

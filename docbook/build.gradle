@@ -4,11 +4,11 @@ plugins {
   id 'java-gradle-plugin'
   id 'maven-publish'
   id 'com.jfrog.bintray'
-  id 'com.gradle.plugin-publish'
+//  id 'com.gradle.plugin-publish'
 }
 
 version = docBookProjectVersion
-description = 'Gradle DocBook plugin'
+description = 'Gradle DocBook Plugin'
 
 dependencies {
   implementation project(':fop')
@@ -43,39 +43,36 @@ final String gitHubRepositoryUrl = 'https://github.com/opentorah/opentorah'
 final List<String> artifactTags = ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub']
 
 apply from: '../bintray.gradle'
-configureBintray(
-  'opentorah-docbook',
-  artifactTags
-)
+configureBintray(artifactTags)
 
-gradlePlugin {
-  plugins {
-    docBookPlugin {
-      // TODO change to org.opentorah.docbook:
-      id = 'org.podval.docbook-gradle-plugin'
-      implementationClass = 'org.opentorah.docbook.plugin.DocBookPlugin'
-    }
-  }
-}
-
-pluginBundle {
-  website = "${gitHubRepositoryUrl}"
-  vcsUrl = "${gitHubRepositoryUrl}.git"
-
-  plugins {
-    docBookPlugin {
-      displayName = project.description
-      description = project.description
-      tags        = artifactTags
-    }
-  }
-
-  // If you have an existing plugin deployed to Bintray and would like to keep
-  // your existing group ID and artifact ID for continuity, you can specify
-  // them here (needs manual approval on first publication).
-  // TODO change to org.opentorah:opentorah-docbook:
-  mavenCoordinates {
-    groupId    = 'org.podval.docbook'
-    artifactId = 'org.podval.docbook-gradle-plugin'
-  }
-}
+//gradlePlugin {
+//  plugins {
+//    docBookPlugin {
+//      // TODO change to org.opentorah.docbook:
+//      id = 'org.podval.docbook-gradle-plugin'
+//      implementationClass = 'org.opentorah.docbook.plugin.DocBookPlugin'
+//    }
+//  }
+//}
+//
+//pluginBundle {
+//  website = "${gitHubRepositoryUrl}"
+//  vcsUrl = "${gitHubRepositoryUrl}.git"
+//
+//  plugins {
+//    docBookPlugin {
+//      displayName = project.description
+//      description = project.description
+//      tags        = artifactTags
+//    }
+//  }
+//
+//  // If you have an existing plugin deployed to Bintray and would like to keep
+//  // your existing group ID and artifact ID for continuity, you can specify
+//  // them here (needs manual approval on first publication).
+//  // TODO change to org.opentorah:opentorah-docbook:
+//  mavenCoordinates {
+//    groupId    = 'org.podval.docbook'
+//    artifactId = 'org.podval.docbook-gradle-plugin'
+//  }
+//}
