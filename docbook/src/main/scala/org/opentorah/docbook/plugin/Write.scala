@@ -2,7 +2,7 @@ package org.opentorah.docbook.plugin
 
 import org.opentorah.docbook.section.{DocBook2, HtmlCommon, Section}
 import org.opentorah.fop.xml.{Namespace, Xml}
-import org.opentorah.fop.util.Json
+import org.opentorah.util.Json
 
 object Write {
 

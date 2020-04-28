@@ -1,6 +1,7 @@
 package org.opentorah.fop.mathjax
 
-import org.opentorah.fop.util.{Json, Logger}
+import org.opentorah.fop.util.Logger
+import org.opentorah.util.Json
 
 final class ExternalMathJax(
   node: Node,

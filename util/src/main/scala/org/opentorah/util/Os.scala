@@ -1,4 +1,4 @@
-package org.opentorah.fop.util
+package org.opentorah.util
 
 sealed trait Os {
   def hasUname: Boolean = false

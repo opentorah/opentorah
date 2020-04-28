@@ -1,6 +1,6 @@
 package org.opentorah.fop.mathjax
 
-import org.opentorah.fop.util.{Architecture, Os, Platform}
+import org.opentorah.util.{Architecture, Os, Platform}
 
 // Heavily inspired by (read: copied and reworked from :)) https://github.com/srs/gradle-node-plugin by srs.
 // That plugin is not used directly because its tasks are not reusable unless the plugin is applied to the project,
