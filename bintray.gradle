@@ -10,7 +10,6 @@ ext.configureBintray = {
   final String gitHubRepository = "opentorah/opentorah"
   final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
   final String codeUrl = "$gitHubRepositoryUrl/tree/master/$projectName"
-  final String releaseNotesUrl = "$codeUrl/CHANGELOG.md"
   final String orgName = 'Open Torah'
   final String orgUrl = 'http://www.opentorah.org'
 
@@ -108,8 +107,7 @@ ext.configureBintray = {
       licenses              = ['Apache-2.0']
       labels                = tags
       publicDownloadNumbers = true
-// CHANGELOG.md?
-      githubReleaseNotesFile= releaseNotesUrl
+      githubReleaseNotesFile= 'CHANGELOG.md'
       version { name        = projectVersion }
     }
   }
