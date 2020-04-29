@@ -13,7 +13,7 @@ object Write {
        |<article ${DocBook.Namespace.withVersion}
        |         ${Namespace.XInclude}>
        |</article>
-       |"""
+       |""".stripMargin
 
   def xmlCatalog(layout: Layout): String = {
     val data: String = layout.dataDirectoryRelative
@@ -62,7 +62,7 @@ object Write {
        |
        |  <nextCatalog catalog="${layout.catalogCustomFileName}"/>
        |</catalog>
-       |"""
+       |""".stripMargin
   }
 
   val catalogCustomization: String =
@@ -75,7 +75,7 @@ object Write {
        |<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="public">
        |  <nextCatalog catalog="/etc/xml/catalog"/>
        |</catalog>
-       |"""
+       |""".stripMargin
 
   def mainStylesheet(
     docBook2: DocBook2,
@@ -88,7 +88,7 @@ object Write {
   ): String = {
     val forDocument = layout.forDocument(prefixed, documentName)
 
-    val mainStylesheetName: String = forDocument.mainStylesheet(docBook2)
+/////    val mainStylesheetName: String = forDocument.mainStylesheet(docBook2)
     val paramsStylesheetName: String = layout.paramsStylesheet(docBook2)
     val stylesheetUri: String = s"${Stylesheets(docBook2.usesDocBookXslt2).uri}/${docBook2.stylesheetUriName}.xsl"
 
@@ -118,7 +118,7 @@ object Write {
        |
        |${toString(nonOverridableParameters)}
        |</xsl:stylesheet>
-       |"""
+       |""".stripMargin
   }
 
   private def toString(parameters: Map[String, String]): String = parameters.map { case (name: String, value: String) =>
@@ -154,7 +154,7 @@ object Write {
        |<xsl:stylesheet ${xsl(docBook2)}>
        |$parametersStr
        |</xsl:stylesheet>
-       |"""
+       |""".stripMargin
   }
 
   def customStylesheet(layout: Layout, section: Section): String =
@@ -166,7 +166,7 @@ object Write {
        |
        |${section.customStylesheet}
        |</xsl:stylesheet>
-       |"""
+       |""".stripMargin
 
   private def xsl(section: Section): String =
     Namespace.Xsl.withVersion(section.xsltVersion)

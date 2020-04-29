@@ -30,8 +30,9 @@ dependencies {
   testImplementation "org.typelevel:algebra-laws_$scalaVersionMajor:$algebraLawsVersion"
 }
 
-apply from: '../bintray.gradle'
 configureBintray(['Scala', 'Calendar', 'Jewish'])
-
-apply from: '../mdoc.gradle'
 configureMdoc()
+
+task site
+site.group('publishing')
+site.dependsOn mdoc

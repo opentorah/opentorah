@@ -264,11 +264,12 @@ class ProcessDocBookTask extends DefaultTask {
     val classesTask: Option[Task] = Gradle.getTask(getProject, "classes")
     val dataDirectory: File = layout.dataDirectory
 
-    def skipping(message: String): Unit = info(s"Skipping DocBook data generation: $message")
-    if (mainClass.isEmpty) skipping("dataGenerationClass is not set") else
+    def skipping(message: String): Unit = logger.lifecycle(s"Skipping DocBook data generation: $message")
+    if (mainClass.isEmpty) info("Skipping DocBook data generation: dataGenerationClass is not set") else
     if (mainSourceSet.isEmpty) skipping("no Java plugin in the project") else
     if (classesTask.isEmpty) skipping("no 'classes' task in the project") else
-    if (!didWork(classesTask.get)) skipping("'classes' task didn't do work") else
+// data generation class doesn't have to reside in the same project where DocBook plugin is configured:
+//    if (!didWork(classesTask.get)) skipping("'classes' task didn't do work") else
     {
       info(s"Running DocBook data generator $mainClass into $dataDirectory")
       getProject.javaexec((exec: JavaExecSpec) => {

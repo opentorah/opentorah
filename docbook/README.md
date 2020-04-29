@@ -109,12 +109,12 @@ its [FOP plugin](http://jeuclid.sourceforge.net/jeuclid-fop/);
 
 ## Applying to a Gradle project ##
 
-Plugin is [published](https://plugins.gradle.org/plugin/org.podval.docbook-gradle-plugin)
+Plugin is [published](https://plugins.gradle.org/plugin/org.opentorah.docbook)
 on the Gradle Plugin Portal. To apply it to a Gradle project:
 
 ```groovy
 plugins {
-  id "org.podval.docbook-gradle-plugin" version "0.7.8"
+  id "org.opentorah.docbook" version "0.7.18"
 }
 ```
 

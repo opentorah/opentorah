@@ -22,12 +22,15 @@ allprojects {
     jcenter()
     mavenCentral()
     mavenLocal()
-    // for tut
-    maven { url 'https://dl.bintray.com/tpolecat/maven/' }
   }
 
   group = 'org.opentorah'
   version = projectVersion
+}
+
+subprojects {
+  apply from: '../bintray.gradle'
+  apply from: '../mdoc.gradle'
 
   configurations.all {
     resolutionStrategy {
@@ -50,10 +53,3 @@ idea {
     ]
   }
 }
-
-task site
-site.description('Generates the website')
-site.group('publishing')
-site.dependsOn ':calendar:tut'
-site.dependsOn ':papers:processDocBook'
-site.dependsOn ':calendar-paper:processDocBook'

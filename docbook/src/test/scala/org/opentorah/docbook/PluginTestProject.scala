@@ -49,7 +49,7 @@ class PluginTestProject private(
 
     writeInto(layout.buildGradle, replace = true)(content =
       s"""|plugins {
-          |  id 'org.podval.docbook-gradle-plugin' version '1.0.0'
+          |  id 'org.opentorah.docbook' version '1.0.0'
           |  id 'base'
           |}
           |

@@ -41,7 +41,6 @@ jar {
 
 final List<String> projectTags = ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub']
 
-apply from: '../bintray.gradle'
 configureBintray(projectTags)
 
 gradlePlugin {

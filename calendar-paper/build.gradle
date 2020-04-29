@@ -1,6 +1,10 @@
 plugins {
-  id 'base'
-  id 'org.podval.docbook-gradle-plugin'
+  id 'java'
+  id 'org.opentorah.docbook'
+}
+
+dependencies {
+  runtimeOnly project(':calendar')
 }
 
 docBook {
@@ -35,7 +39,10 @@ docBook {
   }
 }
 
-processDocBook.doLast {
+task site
+site.dependsOn processDocBook
+site.group('publishing')
+site.doLast {
   project.sync {
     from processDocBook.outputDirectory
     into "$rootDir/docs/calendar"

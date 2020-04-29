@@ -1,6 +1,6 @@
 plugins {
   id 'base'
-  id "org.podval.docbook-gradle-plugin"
+  id 'org.opentorah.docbook'
 }
 
 docBook {
@@ -38,7 +38,10 @@ docBook {
   ]
 }
 
-processDocBook.doLast {
+task site
+site.group('publishing')
+site.dependsOn processDocBook
+site.doLast {
   project.sync {
     from "${processDocBook.outputDirectory}/judaica"
     into "$rootDir/docs/judaica"

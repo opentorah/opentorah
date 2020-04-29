@@ -26,5 +26,4 @@ dependencies {
   testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
 }
 
-apply from: '../bintray.gradle'
 configureBintray(['Scala', 'Jewish', 'TEI'])
