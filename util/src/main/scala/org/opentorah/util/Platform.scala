@@ -1,10 +1,8 @@
-package org.opentorah.fop.util
+package org.opentorah.util
 
 import java.io.File
-
 import scala.sys.process.Process
 
-// TODO move into opentirah.util
 object Platform {
   def getOsName: String = System.getProperty("os.name")
 

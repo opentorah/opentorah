@@ -1,4 +1,4 @@
-package org.opentorah.fop.util
+package org.opentorah.util
 
 object Json {
 
@@ -22,5 +22,4 @@ object Json {
     .replace("\\", "\\\\") // first, so that newly-introduced '\' do not get escaped!
     .replace("\"", "\\\"")
     .replace("\n", "\\n")
-
 }

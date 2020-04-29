@@ -1,7 +1,7 @@
 package org.opentorah.fop.mathjax
 
 import Configuration.{Delimiters, DelimitersAndInput}
-import org.opentorah.fop.util.Json
+import org.opentorah.util.Json
 
 final case class Configuration(
   displayMessages: Boolean = false,        // determines whether Message.Set() calls are logged

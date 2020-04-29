@@ -3,6 +3,7 @@ package org.opentorah.fop.xml
 import org.w3c.dom.{Document, Element}
 import org.xml.sax.helpers.AttributesImpl
 
+// TODO move into org.opentorah.xml package
 class Namespace(val uri: String, val prefix: String = "") {
   override def toString: String = s"""$xmlns="$uri""""
 

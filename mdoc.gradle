@@ -1,0 +1,27 @@
+ext.configureMdoc = {
+  final String projectName = project.name
+
+  dependencies {
+    runtimeOnly "org.scalameta:mdoc_$scalaVersionMajor:$mdocVersion"
+  }
+
+  final String outputDirectory = "$buildDir/docs/mdoc"
+  task mdoc(type: JavaExec) {
+    group = 'documentation'
+    main = 'mdoc.Main'
+    args = [
+      // '--verbose',
+      '--in', "$projectDir/src/docs",
+      '--out', outputDirectory
+      // default is 'md' and 'html' - and I do not know how to set a set of them...
+      //, '--markdown-extensions', 'md,html'
+    ]
+    classpath = sourceSets.main.runtimeClasspath
+  }
+  mdoc.doLast {
+    project.sync {
+      from outputDirectory
+      into "$rootDir/docs/docs/$projectName"
+    }
+  }
+}

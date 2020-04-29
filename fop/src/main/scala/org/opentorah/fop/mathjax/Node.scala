@@ -1,7 +1,8 @@
 package org.opentorah.fop.mathjax
 
 import java.io.File
-import org.opentorah.fop.util.{Logger, Os, Platform}
+import org.opentorah.fop.util.Logger
+import org.opentorah.util.{Os, Platform}
 import scala.sys.process.{Process, ProcessBuilder, ProcessLogger}
 
 class Node(

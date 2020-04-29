@@ -1,6 +1,6 @@
 package org.opentorah.fop.mathjax
 
-import org.opentorah.fop.util.{Architecture, Os, Platform}
+import org.opentorah.util.{Architecture, Os, Platform}
 
 final class J2V8Distribution {
   val os: Os = Platform.getOs

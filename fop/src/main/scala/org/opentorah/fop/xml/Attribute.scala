@@ -4,6 +4,7 @@ import org.w3c.dom.{Document, Element}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
+// TODO merge into org.opentorah.xml package
 // Type-safe XML attribute get/set - for use in DOM and SAX.
 // Inspired by net.sourceforge.jeuclid.context.Parameter and friends.
 trait Attribute[T] {
