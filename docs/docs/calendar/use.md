@@ -1,20 +1,24 @@
 Import angles-related classes:
 
-```tut:silent
+```scala
 import org.opentorah.calendar.angles.Angles
 import Angles.{Position, Rotation}
 ```
 
 Create some angles:
 
-```tut:book
+```scala
 val fullCircle = Rotation(360)
+// fullCircle: Angles#Vector = 360°
 val zero = Position(360)
+// zero: Angles#Point = 0°
 ```
 
 Look at them - inside and out:
 
-```tut:book
+```scala
 println(fullCircle.digits)
+// List(360)
 println(zero.digits)
+// List(0)
 ```
