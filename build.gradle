@@ -33,6 +33,7 @@ subprojects {
   apply from: '../bintray.gradle'
   apply from: '../mdoc.gradle'
   apply from: '../paper.gradle'
+  apply from: '../service.gradle'
 
   task site
   site.group('publishing')

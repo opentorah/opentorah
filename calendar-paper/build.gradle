@@ -7,6 +7,9 @@ dependencies {
   runtimeOnly project(':calendar')
 }
 
+// To ensure calendar library is built before it is used:
+site.dependsOn(':calendar:build')
+
 configurePaper(
   'org.opentorah.calendar.paper.Tables',
   true
