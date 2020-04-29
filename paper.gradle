@@ -23,9 +23,15 @@ ext.configurePaper = {
     ]
 
     parameters.common = [
-      "part.autolabel"       : "0",
-      "chapter.autolabel"    : "0"
+      "part.autolabel"       : "0",       // was only in calendar paper
+      "chapter.autolabel"    : "0",       // was only in calendar paper
+      "section.autolabel.max.depth": "6"  // was only in the non-calendar papers
 //      "punct.honorific": "" // Remove trailing period after honorific
+    ]
+
+    parameters.htmlCommon = [
+      // Include page number in cross-references
+      "insert.xref.page.number": "yes"  // was only in the non-calendar papers
     ]
 
     parameters.pdf = [
@@ -34,8 +40,14 @@ ext.configurePaper = {
       "sans.font.family"     : "DejaVu Sans",
       "monospace.font.family": "DejaVu Sans Mono",
       "symbol.font.family"   : "DejaVu Sans",
-      // "footnote.font.size": "10"
-      "body.font.master": "12"
+      "body.font.master"     : "12",
+      "footnote.font.size"   : "10",  // was only in the non-calendar papers
+
+      // Suppress content indent
+      "body.start.indent"    : "0pt",  // was only in the non-calendar papers
+
+      // Some space for the list labels
+      "orderedlist.label.width": "2em"  // was only in the non-calendar papers
     ]
 
     mathJax {

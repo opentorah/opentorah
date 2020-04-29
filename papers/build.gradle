@@ -42,10 +42,10 @@ site.dependsOn processDocBook
 site.doLast {
   project.sync {
     from "${processDocBook.outputDirectory}/judaica"
-    into "$rootDir/docs/judaica"
+    into "$rootDir/docs/judaica/paper"
   }
   project.sync {
     from "${processDocBook.outputDirectory}/typesetting"
-    into "$rootDir/docs/typesetting"
+    into "$rootDir/docs/typesetting/paper"
   }
 }
