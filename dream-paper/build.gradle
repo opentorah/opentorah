@@ -4,7 +4,7 @@ plugins {
 }
 
 docBook {
-  documents = ["judaica", "typesetting"]
+  document = "dream"
 
   outputFormats = ["html", "pdf", "epub2"]
 

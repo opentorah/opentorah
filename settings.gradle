@@ -25,8 +25,9 @@ include ':collector-service'
 include ':fop'
 include ':docbook'
 
-include ':papers'
 include ':calendar-paper'
+include ':dream-paper'
+include ':typesetting-paper'
 
 // I can no longer use the plugin via composite build, since it is in the same build as the site;
 // I guess I'll have to debug it on the side...
