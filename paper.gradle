@@ -1,0 +1,53 @@
+ext.configurePaper = {
+  final String dataGeneratorClassName,
+  final Boolean isMathJaxEnabled
+    ->
+
+  final String projectName = project.name
+  final String projectVersion = project.version
+  final String documentName = (projectName.endsWith('-paper')) ?
+    projectName.substring(0, projectName.length() - '-paper'.length()) :
+    projectName
+
+  // println("documentName: $documentName")
+
+  docBook {
+    document = documentName
+
+    dataGeneratorClass = dataGeneratorClassName
+
+    outputFormats = ["html", "pdf", "epub2"]
+
+    substitutions = [
+      "project.version": projectVersion
+    ]
+
+    parameters.common = [
+      "part.autolabel"       : "0",
+      "chapter.autolabel"    : "0"
+//      "punct.honorific": "" // Remove trailing period after honorific
+    ]
+
+    parameters.pdf = [
+      "title.font.family"    : "DejaVu Sans",
+      "body.font.family"     : "DejaVu Sans",
+      "sans.font.family"     : "DejaVu Sans",
+      "monospace.font.family": "DejaVu Sans Mono",
+      "symbol.font.family"   : "DejaVu Sans",
+      // "footnote.font.size": "10"
+      "body.font.master": "12"
+    ]
+
+    mathJax {
+      isEnabled = isMathJaxEnabled
+    }
+  }
+
+  site.dependsOn processDocBook
+  site.doLast {
+    project.sync {
+      from processDocBook.outputDirectory
+      into "$rootDir/docs/$documentName/paper"
+    }
+  }
+}
