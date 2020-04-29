@@ -29,8 +29,12 @@ allprojects {
 }
 
 subprojects {
+  apply from: '../scala.gradle'
   apply from: '../bintray.gradle'
   apply from: '../mdoc.gradle'
+
+  task site
+  site.group('publishing')
 
   configurations.all {
     resolutionStrategy {

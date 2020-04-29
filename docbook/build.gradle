@@ -14,16 +14,10 @@ dependencies {
   implementation project(':fop')
   implementation project(':util')
 
-  // Scala
-  zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
-  implementation "org.scala-lang:scala-library:$scalaVersion"
-
-  // Testing
-  testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
-  testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
-
   // added by the 'java-gradle-plugin': testImplementation gradleTestKit()
 }
+
+configureScala()
 
 // run tests sequentially
 test {

@@ -38,8 +38,6 @@ docBook {
   ]
 }
 
-task site
-site.group('publishing')
 site.dependsOn processDocBook
 site.doLast {
   project.sync {

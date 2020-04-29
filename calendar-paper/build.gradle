@@ -39,12 +39,10 @@ docBook {
   }
 }
 
-task site
 site.dependsOn processDocBook
-site.group('publishing')
 site.doLast {
   project.sync {
     from processDocBook.outputDirectory
-    into "$rootDir/docs/calendar"
+    into "$rootDir/docs/calendar/paper"
   }
 }

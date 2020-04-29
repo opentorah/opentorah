@@ -12,11 +12,8 @@ dependencies {
   implementation project(':store')
   implementation project(':util')
 
-  zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
-
   implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
   implementation "dev.zio:zio-interop-cats_$scalaVersionMajor:$zioInteropCatsVersion"
-
   implementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
   implementation "org.typelevel:cats-effect_$scalaVersionMajor:$catsVersion"
 
@@ -28,6 +25,8 @@ dependencies {
 
   runtimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
 }
+
+configureScala()
 
 jib {
   to {

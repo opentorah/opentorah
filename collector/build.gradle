@@ -12,18 +12,12 @@ dependencies {
   implementation project(':xml')
   implementation project(':util')
 
-  zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
-
-  implementation "org.scala-lang:scala-library:$scalaVersion"
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
-
   implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
   implementation "dev.zio:zio-interop-cats_$scalaVersionMajor:$zioInteropCatsVersion"
 
   runtimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
-
-  testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
-  testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
 }
 
+configureScala()
 configureBintray(['Scala', 'Jewish', 'TEI'])

@@ -27,10 +27,12 @@ ext.configureMdoc = {
     ]
     classpath = (sourceSets.main.runtimeClasspath + configurations.mdoc)
   }
-  mdoc.doLast {
+
+  site.dependsOn mdoc
+  site.doLast {
     project.sync {
       from outputDirectory
-      into "$rootDir/docs/docs/$projectName"
+      into "$rootDir/docs/$projectName/docs"
     }
   }
 }

@@ -7,16 +7,12 @@ plugins {
 description = 'Archive Collector Service'
 
 dependencies {
-  zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
-
   implementation project(':collector')
 
-  implementation "org.scala-lang:scala-library:$scalaVersion"
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
 
   implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
   implementation "dev.zio:zio-interop-cats_$scalaVersionMajor:$zioInteropCatsVersion"
-
   implementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
   implementation "org.typelevel:cats-effect_$scalaVersionMajor:$catsVersion"
 
@@ -25,10 +21,9 @@ dependencies {
   implementation "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion"
 
   runtimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
-
-  testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
-  testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
 }
+
+configureScala()
 
 jib {
   to {
