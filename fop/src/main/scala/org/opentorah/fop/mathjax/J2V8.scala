@@ -3,7 +3,7 @@ package org.opentorah.fop.mathjax
 import java.lang.reflect.Field
 import com.eclipsesource.v8.V8
 import org.opentorah.util.Collections.mapValues
-import org.opentorah.fop.util.Logger
+import org.slf4j.{Logger, LoggerFactory}
 
 // TODO for Scala 2.13: import scala.jdk.CollectionConverters._
 import scala.collection.JavaConverters._
@@ -12,24 +12,25 @@ final class J2V8(libraryPath: String) {
 
   override def toString: String = s"J2V8 library $libraryPath"
 
-  def load(logger: Logger): Boolean = {
+  def load(): Boolean = {
     try {
       System.load(libraryPath)
 
-      logger.info(s"Loaded $this")
+      J2V8.logger.info(s"Loaded $this")
       val field: Field = classOf[V8].getDeclaredField("nativeLibraryLoaded")
       field.setAccessible(true)
       field.set(null, true)
       true
     } catch {
       case e: UnsatisfiedLinkError =>
-        logger.warn(s"Failed to load $this: ${e.getMessage}")
+        J2V8.logger.warn(s"Failed to load $this: ${e.getMessage}")
         false
     }
   }
 }
 
 object J2V8 {
+  private val logger: Logger = LoggerFactory.getLogger(classOf[J2V8])
 
   def map2java(map: Map[String, Any]): java.util.Map[String, Any] =
     mapValues(map)(value2java).asJava

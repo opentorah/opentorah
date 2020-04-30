@@ -3,7 +3,6 @@ package org.opentorah.docbook
 import java.io.File
 import org.gradle.testkit.runner.GradleRunner
 import org.opentorah.docbook.plugin.{DocBook, Layout}
-import org.opentorah.fop.util.{Logger, TestLogger}
 import org.opentorah.fop.xml.Xml
 import org.opentorah.util.Files
 
@@ -21,10 +20,9 @@ class PluginTestProject private(
   val layout: Layout = Layout.forRoot(projectDir)
 
   def write(): Unit = {
-    val logger: Logger = new TestLogger
-
+    // TODO when I was using custom Logger, I set it to 'test' here: print everything other than debug...
     def writeInto(file: File, replace: Boolean)(content: String): Unit =
-      org.opentorah.fop.util.Files.writeInto(file, replace, content, logger)
+      org.opentorah.fop.util.Files.writeInto(file, replace, content)
 
     val documentName: String = "test"
 

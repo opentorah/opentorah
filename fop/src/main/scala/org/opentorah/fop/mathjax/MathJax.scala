@@ -1,14 +1,12 @@
 package org.opentorah.fop.mathjax
 
-import org.opentorah.fop.util.Logger
 import org.opentorah.fop.xml.{Namespace, Xml}
+import org.slf4j.{Logger, LoggerFactory}
 import org.w3c.dom.Document
 import org.w3c.dom.svg.SVGDocument
 
 abstract class MathJax(
-  node: Node,
-  val configuration: Configuration,
-  logger: Logger
+  val configuration: Configuration
 ) {
 
   final def typeset(mathMLDocument: Document): SVGDocument = {
@@ -31,7 +29,7 @@ abstract class MathJax(
 
     val svg: String = typeset(options, outputName)
 
-    logger.debug(s"${MathJax.logStart}$math${MathJax.logSep}$svg${MathJax.logEnd}")
+    MathJax.logger.debug(s"${MathJax.logStart}$math${MathJax.logSep}$svg${MathJax.logEnd}")
 
     val result: SVGDocument = Svg.fromString(svg)
 
@@ -48,6 +46,8 @@ abstract class MathJax(
 }
 
 object MathJax {
+
+  private val logger: Logger = LoggerFactory.getLogger(classOf[MathJax])
 
   object Namespace extends Namespace(
     uri = "http://podval.org/mathjax/ns/ext",

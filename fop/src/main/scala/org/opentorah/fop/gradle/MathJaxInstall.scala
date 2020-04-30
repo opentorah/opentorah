@@ -1,14 +1,15 @@
 package org.opentorah.fop.gradle
 
 import java.io.File
-
 import org.gradle.api.Project
 import org.opentorah.fop.mathjax.{J2V8, J2V8Distribution, Node, NodeDistribution, NodeFromArtifact}
-import org.opentorah.fop.util.Logger
+import org.slf4j.{Logger, LoggerFactory}
 
 object MathJaxInstall {
 
-  def installNode(project: Project, into: File, overwrite: Boolean, nodeModulesParent: File, logger: Logger): Node = {
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
+  def installNode(project: Project, into: File, overwrite: Boolean, nodeModulesParent: File): Node = {
     val distribution: NodeDistribution = new NodeDistribution
     val node: NodeFromArtifact = NodeFromArtifact(distribution, into, nodeModulesParent)
 
@@ -44,7 +45,7 @@ object MathJaxInstall {
     node
   }
 
-  def installJ2V8(project: Project, into: File, logger: Logger): Option[J2V8] = {
+  def installJ2V8(project: Project, into: File): Option[J2V8] = {
     val distribution: J2V8Distribution = new J2V8Distribution
     if (distribution.version.isEmpty) {
       logger.warn(s"No $distribution")

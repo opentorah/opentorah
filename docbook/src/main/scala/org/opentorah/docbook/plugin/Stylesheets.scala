@@ -1,10 +1,9 @@
 package org.opentorah.docbook.plugin
 
 import java.io.File
-
 import org.gradle.api.Project
 import org.opentorah.fop.gradle.Gradle
-import org.opentorah.fop.util.Logger
+import org.slf4j.{Logger, LoggerFactory}
 
 trait Stylesheets {
   protected def name: String
@@ -20,16 +19,16 @@ trait Stylesheets {
 
   protected def archiveSubdirectoryName: String
 
-  def unpack(version: String, project: Project, layout: Layout, logger: Logger): Unit = {
+  def unpack(version: String, project: Project, layout: Layout): Unit = {
     val directory: File = layout.docBookXslDirectory(directoryName)
     if (!directory.exists) {
       val classifierStr: String = classifier.fold("")(classifier => s":$classifier")
       val dependencyNotation: String = s"$groupId:$artifactId:$version$classifierStr@$extension"
 
-      logger.info(s"Retrieving DocBook $name stylesheets: $dependencyNotation")
+      Stylesheets.logger.info(s"Retrieving DocBook $name stylesheets: $dependencyNotation")
       val file: File = Gradle.getArtifact(project, dependencyNotation)
 
-      logger.info(s"Unpacking ${file.getName}")
+      Stylesheets.logger.info(s"Unpacking ${file.getName}")
       Gradle.extract(
         project,
         zipFile = file,
@@ -42,6 +41,8 @@ trait Stylesheets {
 }
 
 object Stylesheets {
+  private val logger: Logger = LoggerFactory.getLogger(classOf[Stylesheets])
+
   object xslt1 extends Stylesheets {
     override def name: String = "XSLT"
     override def groupId: String = "net.sf.docbook"

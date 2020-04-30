@@ -1,13 +1,11 @@
 package org.opentorah.fop.mathjax
 
-import org.opentorah.fop.util.Logger
 import org.opentorah.util.Json
 
 final class ExternalMathJax(
   node: Node,
-  configuration: Configuration,
-  logger: Logger
-) extends MathJax(node, configuration, logger) {
+  configuration: Configuration
+) extends MathJax(configuration) {
 
   override protected def typeset(
     options: Map[String, Any],

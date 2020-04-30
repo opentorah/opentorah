@@ -6,17 +6,19 @@ import org.apache.fop.apps.FopFactory
 import org.apache.fop.fonts.{FontEventListener, FontTriplet}
 import org.apache.fop.tools.fontlist.{FontListGenerator, FontSpec}
 import org.apache.xmlgraphics.util.MimeConstants
-import org.opentorah.fop.util.Logger
 import org.opentorah.util.Collections.mapValues
+import org.slf4j.{Logger, LoggerFactory}
+
 import scala.collection.immutable.SortedMap
 // TODO for Scala 2.13: import scala.jdk.CollectionConverters._
 import scala.collection.JavaConverters._
 
 object FopFonts {
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   // Inspired by org.apache.fop.tools.fontlist.FontListMain:
-  def list(configurationFile: File, logger: Logger): String = {
-    val fontFamilies: SortedMap[String, List[FontSpec]] = getFamilies(configurationFile, logger)
+  def list(configurationFile: File): String = {
+    val fontFamilies: SortedMap[String, List[FontSpec]] = getFamilies(configurationFile)
 
     val result: StringBuilder = new StringBuilder
 
@@ -37,9 +39,9 @@ object FopFonts {
     result.toString
   }
 
-  def getFiles(configurationFile: File, fontFamilyNames: List[String], logger: Logger): List[URI] =
+  def getFiles(configurationFile: File, fontFamilyNames: List[String]): List[URI] =
     if (fontFamilyNames.isEmpty) List.empty else {
-      val fontFamilies: Map[String, List[FontSpec]] = getFamilies(configurationFile, logger)
+      val fontFamilies: Map[String, List[FontSpec]] = getFamilies(configurationFile)
       val uris: List[URI] = fontFamilyNames.flatMap { fontFamilyName: String =>
         fontFamilies.get(fontFamilyName).fold[List[URI]] {
           logger.error(s"Font family $fontFamilyName not found!")
@@ -57,7 +59,7 @@ object FopFonts {
       files
     }
 
-  private def getFamilies(configurationFile: File, logger: Logger): SortedMap[String, List[FontSpec]] = {
+  private def getFamilies(configurationFile: File): SortedMap[String, List[FontSpec]] = {
     val fopFactory: FopFactory = FopFactoryFactory.newFactory(configurationFile)
 
     val fontEventListener: FontEventListener  = new FontEventListener {

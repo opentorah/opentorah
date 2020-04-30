@@ -1,11 +1,8 @@
 package org.opentorah.fop.mathjax
 
 import java.io.File
-
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import com.eclipsesource.v8._
-import org.opentorah.fop.util.Logger
-
 // TODO for Scala 2.13: import scala.jdk.CollectionConverters._
 import scala.collection.JavaConverters._
 
@@ -23,9 +20,9 @@ import scala.collection.JavaConverters._
 // for each typesetting wasn't (just) a threading issue either?
 final class J2V8MathJax(
   node: Node,
-  configuration: Configuration,
-  logger: Logger
-) extends MathJax(node, configuration, logger) {
+  configuration: Configuration
+) extends MathJax(configuration) {
+
   override def typeset(
     options: Map[String, Any],
     outputName: String

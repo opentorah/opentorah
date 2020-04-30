@@ -1,12 +1,13 @@
 package org.opentorah.fop.xml
 
 import java.io.File
-
 import javax.xml.transform.{Source, URIResolver}
-import org.opentorah.fop.util.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.{EntityResolver, InputSource}
 
-final class Resolver(catalogFile: File, logger: Logger) extends URIResolver with EntityResolver {
+final class Resolver(catalogFile: File) extends URIResolver with EntityResolver {
+
+  private val logger: Logger = LoggerFactory.getLogger(classOf[Resolver])
 
   logger.info(s"Resolver(catalogFile = $catalogFile)")
 

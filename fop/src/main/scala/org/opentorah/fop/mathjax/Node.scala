@@ -1,8 +1,8 @@
 package org.opentorah.fop.mathjax
 
 import java.io.File
-import org.opentorah.fop.util.Logger
 import org.opentorah.util.{Os, Platform}
+import org.slf4j.{Logger, LoggerFactory}
 import scala.sys.process.{Process, ProcessBuilder, ProcessLogger}
 
 class Node(
@@ -31,9 +31,9 @@ class Node(
   }
 
   // Make sure MathJax is installed
-  final def installMathJax(overwrite: Boolean, logger: Logger): Unit = {
+  final def installMathJax(overwrite: Boolean): Unit = {
     if (overwrite || !nodeModules.exists) {
-      logger.info(s"Installing mathjax-node")
+      Node.logger.info(s"Installing mathjax-node")
       nodeModules.mkdirs()
       npmInstall("mathjax-node")
     }
@@ -63,6 +63,8 @@ class Node(
 }
 
 object Node {
+
+  private val logger: Logger = LoggerFactory.getLogger(classOf[Node])
 
   def fromOs(nodeModulesParent: File): Option[Node] = {
     if (Platform.getOs == Os.Windows) None else {

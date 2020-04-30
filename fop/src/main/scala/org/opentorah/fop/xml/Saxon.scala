@@ -1,12 +1,11 @@
 package org.opentorah.fop.xml
 
 import java.io.{File, FileWriter, StringReader}
-
 import javax.xml.transform.dom.DOMResult
 import javax.xml.transform.{ErrorListener, Result, Source, Transformer, TransformerException}
 import javax.xml.transform.sax.{SAXResult, SAXSource, SAXTransformerFactory}
 import javax.xml.transform.stream.{StreamResult, StreamSource}
-import org.opentorah.fop.util.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import org.w3c.dom.Node
 import org.xml.sax.{ErrorHandler, InputSource, SAXParseException, XMLReader}
 import org.xml.sax.helpers.DefaultHandler
@@ -39,19 +38,18 @@ sealed abstract class Saxon(name: String) {
     inputFile: File,
     stylesheetFile: File,
     xmlReader: XMLReader,
-    outputFile: Option[File],
-    logger: Logger
+    outputFile: Option[File]
   ): Unit = {
     xmlReader.setEntityResolver(resolver)
 
-    Saxon.setErrorHandler(xmlReader, logger)
+    // TODO push down into the ground-level transform() (build Source there...)
+    Saxon.setErrorHandler(xmlReader, Saxon.logger)
 
     transform(
       resolver = Some(resolver),
       stylesheetFile = Some(stylesheetFile),
       source = new SAXSource(xmlReader, new InputSource(inputFile.toURI.toASCIIString)),
-      result = getOutputTarget(outputFile),
-      logger
+      result = getOutputTarget(outputFile)
     )
   }
 
@@ -70,23 +68,21 @@ sealed abstract class Saxon(name: String) {
 
   def transform(
     inputFile: File,
-    defaultHandler: DefaultHandler,
-    logger: Logger
+    defaultHandler: DefaultHandler
   ): Unit = transform(
     resolver = None,
     stylesheetFile = None,
     source = new StreamSource(inputFile),
-    result = new SAXResult(defaultHandler),
-    logger
+    result = new SAXResult(defaultHandler)
   )
 
   // Saxon 6 returns unmodifiable DOM, Saxon 9 - modifiable.
   def parse(
     input: String,
-    xmlReader: XMLReader,
-    logger: Logger
+    xmlReader: XMLReader
   ): Node = {
-    Saxon.setErrorHandler(xmlReader, logger)
+    // TODO push down into the ground-level transform() (build Source there...)
+    Saxon.setErrorHandler(xmlReader, Saxon.logger)
 
     val result = new DOMResult
 
@@ -94,8 +90,7 @@ sealed abstract class Saxon(name: String) {
       resolver = None,
       stylesheetFile = None,
       source = new SAXSource(xmlReader, new InputSource(new StringReader(input))),
-      result = result,
-      logger
+      result = result
     )
 
     result.getNode
@@ -105,10 +100,9 @@ sealed abstract class Saxon(name: String) {
     resolver: Option[Resolver],
     stylesheetFile: Option[File],
     source: Source,
-    result: Result,
-    logger: Logger
+    result: Result
   ): Unit = {
-    logger.debug(
+    Saxon.logger.debug(
       s"""Saxon.transform(
          |  saxon = $this,
          |  stylesheetFile = $stylesheetFile,
@@ -123,7 +117,7 @@ sealed abstract class Saxon(name: String) {
     // not the transformer itself: I guess some sub-transformers get created internally ;)
     resolver.foreach(resolver => transformerFactory.setURIResolver(resolver))
 
-    Saxon.setErrorListener(transformerFactory, logger)
+    Saxon.setErrorListener(transformerFactory, Saxon.logger)
 
     val transformer: Transformer = stylesheetFile.fold(transformerFactory.newTransformer) {
       stylesheetFile => transformerFactory.newTransformer(new StreamSource(stylesheetFile))
@@ -134,6 +128,9 @@ sealed abstract class Saxon(name: String) {
 }
 
 object Saxon {
+
+  private val logger: Logger = LoggerFactory.getLogger(classOf[Saxon])
+
   // Only Saxon6 is capable of handling DocBook XSLT stylesheets with their XSLT 1.0 extensions;
   // Saxon9 is not compatible with that. (TODO what about Saxon 10?)
   object Saxon6 extends Saxon("Saxon 6") {
