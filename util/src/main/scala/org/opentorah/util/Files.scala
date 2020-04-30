@@ -2,9 +2,11 @@ package org.opentorah.util
 
 import java.io.{BufferedWriter, File, FileWriter}
 import java.net.URL
+import org.slf4j.{Logger, LoggerFactory}
 import scala.io.Source
 
 object Files {
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def filesWithExtensions(directory: File, extension: String): Seq[String] =
     if (!directory.exists) Seq.empty else for {
@@ -40,6 +42,14 @@ object Files {
       writer.close()
     }
   }
+
+  def writeInto(file: File, replace: Boolean, content: String): Unit =
+    if (!replace && file.exists) {
+      logger.debug(s"Already exists: $file")
+    } else {
+      logger.debug(s"Writing $file")
+      org.opentorah.util.Files.write(file, content)
+    }
 
   def read(file: File): Seq[String] = {
     val source = Source.fromFile(file)

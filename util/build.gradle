@@ -11,4 +11,5 @@ configureLibrary(['Scala'])
 
 dependencies {
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+  compileOnly    "org.slf4j:slf4j-api:$slf4jVersion"
 }

@@ -22,7 +22,7 @@ class PluginTestProject private(
   def write(): Unit = {
     // TODO when I was using custom Logger, I set it to 'test' here: print everything other than debug...
     def writeInto(file: File, replace: Boolean)(content: String): Unit =
-      org.opentorah.fop.util.Files.writeInto(file, replace, content)
+      Files.writeInto(file, replace, content)
 
     val documentName: String = "test"
 

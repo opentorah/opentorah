@@ -127,7 +127,7 @@ class ProcessDocBookTask extends DefaultTask {
   @TaskAction
   def processDocBook(): Unit = {
     def writeInto(file: File, replace: Boolean)(content: String): Unit =
-      org.opentorah.fop.util.Files.writeInto(file, replace, content)
+      Files.writeInto(file, replace, content)
 
     val documentName: Option[String] = getDocumentName(document.get)
     val documentNames: List[String] = documents.get.asScala.toList.flatMap(getDocumentName)
