@@ -2,7 +2,7 @@ package org.opentorah.docbook.plugin
 
 import java.io.File
 import java.net.URI
-import org.gradle.api.{DefaultTask, Project, Task}
+import org.gradle.api.{DefaultTask, Task}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
@@ -132,13 +132,12 @@ class ProcessDocBookTask extends DefaultTask {
     val documentName: Option[String] = getDocumentName(document.get)
     val documentNames: List[String] = documents.get.asScala.toList.flatMap(getDocumentName)
 
-    if (documentName.isEmpty && documentNames.isEmpty)
-      throw new IllegalArgumentException(
-        """At least one document name must be specified using
-          |  document = "<document name>"
-          |or
-          |  documents = ["<document name>"]
-          |""".stripMargin)
+    if (documentName.isEmpty && documentNames.isEmpty) throw new IllegalArgumentException(
+      """At least one document name must be specified using
+        |  document = "<document name>"
+        |or
+        |  documents = ["<document name>"]
+        |""".stripMargin)
 
     val inputDocuments: List[(String, Boolean)] =
       documentName.toList.map(name => name -> false) ++
@@ -215,7 +214,7 @@ class ProcessDocBookTask extends DefaultTask {
 
     for (docBook2: DocBook2 <- DocBook2.all)
       writeInto(layout.stylesheetFile(layout.paramsStylesheet(docBook2)), replace = true) {
-        Write.paramsStylesheet(docBook2, sections, logger.isInfoEnabled)
+        Write.paramsStylesheet(docBook2, sections, getProject.getLogger.isInfoEnabled)
       }
 
     for (section: Section <- Section.all)
@@ -250,11 +249,14 @@ class ProcessDocBookTask extends DefaultTask {
     for {
       docBook2: DocBook2 <- processors
       (documentName: String, prefixed: Boolean) <- inputDocuments
-    } processDocBook.run(
-      docBook2,
-      prefixed,
-      documentName
-    )
+    } {
+      getProject.getLogger.lifecycle(s"DocBook: processing '$documentName' to ${docBook2.name}.")
+      processDocBook.run(
+        docBook2,
+        prefixed,
+        documentName
+      )
+    }
   }
 
   private def getDocumentName(string: String): Option[String] =
@@ -266,7 +268,7 @@ class ProcessDocBookTask extends DefaultTask {
 //    val classesTask: Option[Task] = Gradle.getTask(getProject, "classes")
     val dataDirectory: File = layout.dataDirectory
 
-    def skipping(message: String): Unit = logger.lifecycle(s"Skipping DocBook data generation: $message")
+    def skipping(message: String): Unit = getProject.getLogger.lifecycle(s"Skipping DocBook data generation: $message")
     if (mainClass.isEmpty) info("Skipping DocBook data generation: dataGenerationClass is not set") else
 // TODO maybe instead of the Java plugin use special configuration (docBook :))?
     if (mainSourceSet.isEmpty) skipping("no Java plugin in the project") else

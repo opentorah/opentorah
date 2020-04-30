@@ -25,8 +25,6 @@ final class ProcessDocBook(
     prefixed: Boolean,
     documentName: String
   ): Unit = {
-    logger.lifecycle(s"DocBook: processing '$documentName' to ${docBook2.name}.")
-
     val isPdf: Boolean = docBook2.isPdf
 
     val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)

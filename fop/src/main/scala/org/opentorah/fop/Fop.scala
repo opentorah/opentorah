@@ -28,7 +28,7 @@ object Fop {
   // - for MathJax: new MathJaxFopPlugin(Mathematics.getMathJax(...))
   // - for JEuclid: new JEuclidFopPlugin
   def run(
-    saxon: Saxon = Saxon.Saxon6,
+    saxon: Saxon,
     configurationFile: File,
     creationDate: Option[String] = None,
     author: Option[String] = None,
