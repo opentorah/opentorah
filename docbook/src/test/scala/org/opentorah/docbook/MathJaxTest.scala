@@ -17,7 +17,7 @@ class MathJaxTest extends AnyFlatSpecLike with Matchers {
       s"""<article ${DocBook.Namespace.withVersion}>
          |  <para>$$$tex$$</para>
          |</article>
-      """
+         |""".stripMargin
 
     def test(useJ2V8: Boolean): Unit = {
       val project = PluginTestProject(

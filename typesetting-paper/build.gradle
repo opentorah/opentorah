@@ -1,0 +1,9 @@
+plugins {
+  id 'base'
+  id 'org.opentorah.docbook'
+}
+
+configurePaper(
+  '',
+  false
+)

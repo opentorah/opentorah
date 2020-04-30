@@ -31,7 +31,7 @@ class PluginTestProject private(
     // reference plugin's root project
     writeInto(layout.settingsGradle, replace = true)(content =
       s"""|includeBuild '$pluginRootDir'
-          |""")
+          |""".stripMargin)
 
     val substitutionsFormatted: String = if (substitutions.isEmpty) "" else {
       val contents: String = substitutions.map { case (name: String, value: String) =>
@@ -42,14 +42,14 @@ class PluginTestProject private(
          |  substitutions = [
          |    $contents
          |  ]
-         |"""
+         |""".stripMargin
     }
 
     val outputFormats: String = if (isPdfEnabled) """ "html", "pdf" """ else """ "html" """
 
     writeInto(layout.buildGradle, replace = true)(content =
       s"""|plugins {
-          |  id 'org.podval.docbook-gradle-plugin' version '1.0.0'
+          |  id 'org.opentorah.docbook' version '1.0.0'
           |  id 'base'
           |}
           |
@@ -67,7 +67,7 @@ class PluginTestProject private(
           |    useJ2V8 = $useJ2V8
           |  }
           |}
-          |"""
+          |""".stripMargin
     )
 
     writeInto(layout.inputFile(documentName), replace = false)(s"${Xml.header}\n$document")

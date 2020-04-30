@@ -1,27 +1,42 @@
 ext.configureMdoc = {
   final String projectName = project.name
 
-  dependencies {
-    runtimeOnly "org.scalameta:mdoc_$scalaVersionMajor:$mdocVersion"
+  // To run mdoc I have to have it on JavaExec task's classpath, but I can't just put it on
+  // runtimeOnly classpath, because it brings in version of FlexMark that breaks ScalaTest
+  // (that only works with a specific, much earlier version).
+  // So I put mdoc and its dependencies into a separate configuration
+  // and combine it with the main runtime classpath when executing mdoc.
+  configurations {
+    mdoc
   }
 
-  final String outputDirectory = "$buildDir/docs/mdoc"
-  task mdoc(type: JavaExec) {
-    group = 'documentation'
-    main = 'mdoc.Main'
-    args = [
-      // '--verbose',
-      '--in', "$projectDir/src/docs",
-      '--out', outputDirectory
-      // default is 'md' and 'html' - and I do not know how to set a set of them...
-      //, '--markdown-extensions', 'md,html'
-    ]
-    classpath = sourceSets.main.runtimeClasspath
+  dependencies {
+    mdoc "org.scalameta:mdoc_$scalaVersionMajor:$mdocVersion"
   }
-  mdoc.doLast {
-    project.sync {
-      from outputDirectory
-      into "$rootDir/docs/docs/$projectName"
+
+  final inputDirectory = "$projectDir/src/docs"
+  final String outputDirectory = "$buildDir/docs/mdoc"
+
+  if (file(inputDirectory).exists()) {
+    task mdoc(type: JavaExec) {
+      group = 'documentation'
+      main = 'mdoc.Main'
+      args = [
+        // '--verbose',
+        '--in', "$projectDir/src/docs",
+        '--out', outputDirectory
+        // default is 'md' and 'html' - and I do not know how to set a set of them...
+        //, '--markdown-extensions', 'md,html'
+      ]
+      classpath = (sourceSets.main.runtimeClasspath + configurations.mdoc)
+    }
+
+    site.dependsOn mdoc
+    site.doLast {
+      project.sync {
+        from outputDirectory
+        into "$rootDir/docs/$projectName/docs"
+      }
     }
   }
 }

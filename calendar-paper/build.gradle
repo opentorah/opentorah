@@ -1,43 +1,16 @@
 plugins {
-  id 'base'
-  id 'org.podval.docbook-gradle-plugin'
+  id 'java'
+  id 'org.opentorah.docbook'
 }
 
-docBook {
-  document = "calendar"
+configurePaper(
+  'org.opentorah.calendar.paper.Tables',
+  true
+)
 
-  dataGeneratorClass = "org.opentorah.calendar.paper.Tables"
-
-  outputFormats = ["html", "pdf", "epub2"]
-
-  substitutions = [
-    "project.version": project.version
-  ]
-
-  parameters.common = [
-    "part.autolabel"       : "0",
-    "chapter.autolabel"    : "0"
-//    "punct.honorific": "" // Remove trailing period after honorific
-  ]
-
-  parameters.pdf = [
-    "title.font.family"    : "DejaVu Sans",
-    "body.font.family"     : "DejaVu Sans",
-    "sans.font.family"     : "DejaVu Sans",
-    "monospace.font.family": "DejaVu Sans Mono",
-    "symbol.font.family"   : "DejaVu Sans",
-    // "footnote.font.size": "10"
-    "body.font.master": "12"
-  ]
-
-  mathJax {
-    isEnabled = true
-  }
+dependencies {
+  runtimeOnly project(':calendar')
 }
 
-processDocBook.doLast {
-  project.sync {
-    from processDocBook.outputDirectory
-    into "$rootDir/docs/calendar"
-  }
-}
+// To ensure calendar library is built before it is used:
+site.dependsOn(':calendar:assemble')

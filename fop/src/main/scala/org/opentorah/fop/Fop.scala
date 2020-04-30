@@ -20,7 +20,7 @@ object Fop {
        |    </renderer>
        |  </renderers>
        |</fop>
-       |"""
+       |""".stripMargin
 
   private val dateFormat: java.text.DateFormat = new java.text.SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy")
 

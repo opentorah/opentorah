@@ -8,12 +8,10 @@ plugins {
 version = docBookProjectVersion
 description = 'FOP MathJax plugin'
 
+configureLibrary(['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub'])
+
 dependencies {
   implementation project(':util')
-
-  // Scala
-  zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
-  implementation "org.scala-lang:scala-library:$scalaVersion"
 
   // XMLResolver
   implementation "org.xmlresolver:xmlresolver:$xmlresolverVersion"
@@ -64,9 +62,6 @@ dependencies {
   implementation "com.eclipsesource.j2v8:j2v8_linux_x86_64:$j2v8Version"
 
   implementation gradleApi()
-
-  testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
-  testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
 }
 
 jar {
@@ -77,6 +72,3 @@ jar {
     )
   }
 }
-
-apply from: '../bintray.gradle'
-configureBintray(['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub'])

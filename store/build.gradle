@@ -7,20 +7,13 @@ plugins {
 
 description = 'Open Torah Store'
 
+configureLibrary(['Scala', 'Jewish', 'TEI'])
+
 dependencies {
   implementation project(':util')
   implementation project(":xml")
 
-  zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
-
-  implementation "org.scala-lang:scala-library:$scalaVersion"
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
 
   implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
-
-  testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
-  testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
 }
-
-apply from: '../bintray.gradle'
-configureBintray(['Scala', 'Jewish', 'TEI'])
