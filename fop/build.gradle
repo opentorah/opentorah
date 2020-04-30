@@ -8,7 +8,7 @@ plugins {
 version = docBookProjectVersion
 description = 'FOP MathJax plugin'
 
-configureLibrary(['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub'])
+configureLibrary(['Scala', 'MathML', 'MathJax', 'JEuclid', 'FOP', 'Pdf'])
 
 dependencies {
   implementation project(':util')

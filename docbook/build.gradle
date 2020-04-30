@@ -10,7 +10,7 @@ plugins {
 version = docBookProjectVersion
 description = 'Gradle DocBook Plugin'
 
-final List<String> projectTags = ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub']
+final List<String> projectTags = ['Scala', 'DocBook', 'Html', 'Epub', 'Pdf', 'FOP', 'MathML', 'MathJax', 'JEuclid']
 configureLibrary(projectTags)
 
 dependencies {

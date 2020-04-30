@@ -7,7 +7,7 @@ plugins {
 
 description = 'Open Torah Utilities'
 
-configureLibrary(['Scala', 'XML'])
+configureLibrary(['Scala'])
 
 dependencies {
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
