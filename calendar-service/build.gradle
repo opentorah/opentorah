@@ -7,6 +7,11 @@ plugins {
 description = 'Jewish Calendar Service.'
 version = calendarProjectVersion
 
+configureService(
+  'gcr.io/calendar/calendar',
+  'org.opentorah.calendar.service.CalendarService'
+)
+
 dependencies {
   implementation project(':calendar')
   implementation project(':store')
@@ -14,9 +19,3 @@ dependencies {
 
   implementation "com.lihaoyi:scalatags_$scalaVersionMajor:$scalatagsVersion"
 }
-
-configureScala()
-configureService(
-   'gcr.io/calendar/calendar',
-   'org.opentorah.calendar.service.CalendarService'
-)

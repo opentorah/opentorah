@@ -7,6 +7,8 @@ plugins {
 
 description = 'Archive Collector'
 
+configureLibrary(['Scala', 'Jewish', 'TEI'])
+
 dependencies {
   implementation project(':store')
   implementation project(':xml')
@@ -18,6 +20,3 @@ dependencies {
 
   runtimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
 }
-
-configureScala()
-configureBintray(['Scala', 'Jewish', 'TEI'])

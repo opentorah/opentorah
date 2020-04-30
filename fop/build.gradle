@@ -8,6 +8,8 @@ plugins {
 version = docBookProjectVersion
 description = 'FOP MathJax plugin'
 
+configureLibrary(['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub'])
+
 dependencies {
   implementation project(':util')
 
@@ -62,8 +64,6 @@ dependencies {
   implementation gradleApi()
 }
 
-configureScala()
-
 jar {
   manifest {
     attributes(
@@ -72,5 +72,3 @@ jar {
     )
   }
 }
-
-configureBintray(['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub'])

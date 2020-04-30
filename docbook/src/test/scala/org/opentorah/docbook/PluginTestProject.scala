@@ -31,7 +31,7 @@ class PluginTestProject private(
     // reference plugin's root project
     writeInto(layout.settingsGradle, replace = true)(content =
       s"""|includeBuild '$pluginRootDir'
-          |""")
+          |""".stripMargin)
 
     val substitutionsFormatted: String = if (substitutions.isEmpty) "" else {
       val contents: String = substitutions.map { case (name: String, value: String) =>
@@ -42,7 +42,7 @@ class PluginTestProject private(
          |  substitutions = [
          |    $contents
          |  ]
-         |"""
+         |""".stripMargin
     }
 
     val outputFormats: String = if (isPdfEnabled) """ "html", "pdf" """ else """ "html" """
@@ -67,7 +67,7 @@ class PluginTestProject private(
           |    useJ2V8 = $useJ2V8
           |  }
           |}
-          |"""
+          |""".stripMargin
     )
 
     writeInto(layout.inputFile(documentName), replace = false)(s"${Xml.header}\n$document")

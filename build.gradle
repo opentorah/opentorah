@@ -30,7 +30,7 @@ allprojects {
 
 subprojects {
   apply from: '../scala.gradle'
-  apply from: '../bintray.gradle'
+  apply from: '../library.gradle'
   apply from: '../mdoc.gradle'
   apply from: '../paper.gradle'
   apply from: '../service.gradle'

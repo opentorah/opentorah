@@ -38,7 +38,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
        |    <title>Test DocBook File</title>
        |  </info>
        |</article>
-      """
+      """.stripMargin
   )(
     "Test DocBook File"
   )
@@ -55,7 +55,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
        |  <para>Entity: &version;.</para>
        |  <para>Entity in an attribute:<link xlink:href="http://&version;">link!</link>.</para>
        |</article>
-      """
+       |""".stripMargin
   )(
     "Processing instruction: v1.0.0.",
     "Processing instruction with unknown substitution: Evaluation failed for [version1].",
@@ -73,7 +73,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
        |  <para>Processing instruction with unknown substitution: <?eval version1 ?>.</para>
        |  <para>Unknown processing instruction:<?eval1 XXX ?>.</para>
        |</article>
-      """
+      """.stripMargin
   )(
     "Processing instruction: v1.0.0.",
     "Processing instruction with unknown substitution: Evaluation failed for [version1].",
@@ -90,7 +90,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
          |  <para>Entity: &version;.</para>
          |  <para>Entity in an attribute:<link xlink:href="http://&version;">link!</link>.</para>
          |</article>
-      """
+         |""".stripMargin
     )
 
     project.fail().contains(

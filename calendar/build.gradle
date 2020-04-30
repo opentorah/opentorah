@@ -8,6 +8,8 @@ plugins {
 description = 'Jewish Calendar Dates'
 version = calendarProjectVersion
 
+configureLibrary(['Scala', 'Calendar', 'Jewish'])
+
 dependencies {
   implementation project(':store')
   implementation project(':xml')
@@ -17,7 +19,3 @@ dependencies {
   implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
   testImplementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
 }
-
-configureScala()
-configureBintray(['Scala', 'Calendar', 'Jewish'])
-configureMdoc()

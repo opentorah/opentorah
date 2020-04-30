@@ -3,7 +3,9 @@ ext.configureService = {
   final String mainClassName
     ->
 
-  dependencise {
+  configureScala()
+
+  dependencies {
     implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
     implementation "dev.zio:zio-interop-cats_$scalaVersionMajor:$zioInteropCatsVersion"
     implementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"

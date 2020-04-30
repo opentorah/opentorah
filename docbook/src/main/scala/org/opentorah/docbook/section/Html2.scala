@@ -32,5 +32,5 @@ object Html2 extends DocBook2 {
        |    <db:section/>
        |    <db:refsection/>
        |  </xsl:param>
-       |"""
+       |""".stripMargin
 }

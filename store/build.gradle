@@ -7,6 +7,8 @@ plugins {
 
 description = 'Open Torah Store'
 
+configureLibrary(['Scala', 'Jewish', 'TEI'])
+
 dependencies {
   implementation project(':util')
   implementation project(":xml")
@@ -15,6 +17,3 @@ dependencies {
 
   implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
 }
-
-configureScala()
-configureBintray(['Scala', 'Jewish', 'TEI'])

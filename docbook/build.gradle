@@ -10,14 +10,15 @@ plugins {
 version = docBookProjectVersion
 description = 'Gradle DocBook Plugin'
 
+final List<String> projectTags = ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub']
+configureLibrary(projectTags)
+
 dependencies {
   implementation project(':fop')
   implementation project(':util')
 
   // added by the 'java-gradle-plugin': testImplementation gradleTestKit()
 }
-
-configureScala()
 
 // run tests sequentially
 test {
@@ -32,10 +33,6 @@ jar {
     )
   }
 }
-
-final List<String> projectTags = ['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub']
-
-configureBintray(projectTags)
 
 gradlePlugin {
   plugins {

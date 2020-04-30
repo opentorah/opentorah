@@ -28,5 +28,5 @@ object Pdf extends DocBook2 {
        |  <xsl:attribute-set name="section.title.level1.properties">
        |    <xsl:attribute name="break-before">page</xsl:attribute>
        |  </xsl:attribute-set>
-       |"""
+       |""".stripMargin
 }

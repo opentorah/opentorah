@@ -6,14 +6,13 @@ plugins {
 
 description = 'Archive Collector Service'
 
+configureService(
+  'gcr.io/alter-rebbe/collector',
+  'org.opentorah.collector.Service'
+)
+
 dependencies {
   implementation project(':collector')
 
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
 }
-
-configureScala()
-configureService(
-  'gcr.io/alter-rebbe/collector',
-  'org.opentorah.collector.Service'
-)

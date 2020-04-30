@@ -1,6 +1,9 @@
-ext.configureBintray = {
+ext.configureLibrary = {
   final List<String> tags
     ->
+
+  configureScala()
+  configureMdoc()
 
   final String projectName = project.name
   final String projectDescription = project.description

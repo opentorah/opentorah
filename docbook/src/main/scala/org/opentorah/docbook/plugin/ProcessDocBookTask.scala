@@ -45,8 +45,10 @@ class ProcessDocBookTask extends DefaultTask {
   // with code in Scala only, input directory "build/classes/java/main" doesn't exist (which is a Gradle error), so I
   // register "build/classes/" (grandparent of all classesDirs) as input directory
   // (is there a simpler way of getting it?).
-  getProject.afterEvaluate((project: Project) =>
-    Gradle.classesDirs(project).map(_.getParentFile.getParentFile).foreach(registerInputDirectory))
+  // TODO update plugin instructions.
+  // Data generation class doesn't have to reside in the same project where DocBook plugin is configured:
+//  getProject.afterEvaluate((project: Project) =>
+//    Gradle.classesDirs(project).map(_.getParentFile.getParentFile).foreach(registerInputDirectory))
 
   private def registerInputDirectory(directory: File): Unit = {
     info(s"processDocBook: registering input directory $directory")
@@ -185,7 +187,7 @@ class ProcessDocBookTask extends DefaultTask {
 
     writeInto(layout.cssFile(cssFileName), replace = false) {
       s"""@namespace xml "${Namespace.Xml.uri}";
-         |"""
+         |""".stripMargin
     }
 
     for ((name: String, _ /*prefixed*/: Boolean) <- inputDocuments)
@@ -261,14 +263,16 @@ class ProcessDocBookTask extends DefaultTask {
   private def generateData(): Unit = {
     val mainClass: String = dataGeneratorClass.get
     val mainSourceSet: Option[SourceSet] = Gradle.mainSourceSet(getProject)
-    val classesTask: Option[Task] = Gradle.getTask(getProject, "classes")
+//    val classesTask: Option[Task] = Gradle.getTask(getProject, "classes")
     val dataDirectory: File = layout.dataDirectory
 
     def skipping(message: String): Unit = logger.lifecycle(s"Skipping DocBook data generation: $message")
     if (mainClass.isEmpty) info("Skipping DocBook data generation: dataGenerationClass is not set") else
+// TODO maybe instead of the Java plugin use special configuration (docBook :))?
     if (mainSourceSet.isEmpty) skipping("no Java plugin in the project") else
-    if (classesTask.isEmpty) skipping("no 'classes' task in the project") else
-// data generation class doesn't have to reside in the same project where DocBook plugin is configured:
+// TODO update plugin instructions.
+// Data generation class doesn't have to reside in the same project where DocBook plugin is configured:
+//    if (classesTask.isEmpty) skipping("no 'classes' task in the project") else
 //    if (!didWork(classesTask.get)) skipping("'classes' task didn't do work") else
     {
       info(s"Running DocBook data generator $mainClass into $dataDirectory")
