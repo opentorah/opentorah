@@ -1,4 +1,4 @@
-package org.opentorah.fop.gradle
+package org.opentorah.util
 
 import java.io.File
 import org.apache.tools.ant.filters.ReplaceTokens
@@ -12,7 +12,6 @@ import org.gradle.api.{Project, Task}
 // TODO for Scala 2.13: import scala.jdk.CollectionConverters._
 import scala.collection.JavaConverters._
 
-// TODO move to utils (and add gradleApi() dependency there)
 object Gradle {
 
   def getArtifact(project: Project, dependencyNotation: String): File = {

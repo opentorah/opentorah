@@ -10,6 +10,9 @@ description = 'Open Torah Utilities'
 configureLibrary(['Scala'])
 
 dependencies {
-  implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
   compileOnly    "org.slf4j:slf4j-api:$slf4jVersion"
+  implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+
+  // Needed to compile classes using Gradle, but does not become a dependency:
+  implementation gradleApi()
 }

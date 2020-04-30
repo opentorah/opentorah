@@ -2,7 +2,7 @@ package org.opentorah.docbook.plugin
 
 import java.io.File
 import org.gradle.api.Project
-import org.opentorah.fop.gradle.Gradle
+import org.opentorah.util.Gradle
 import org.slf4j.{Logger, LoggerFactory}
 
 trait Stylesheets {

@@ -4,11 +4,10 @@ import java.io.File
 import org.gradle.api.Project
 import org.opentorah.docbook.section.DocBook2
 import org.opentorah.fop.{Fop, FopPlugin}
-import org.opentorah.fop.gradle.Gradle
 import org.opentorah.fop.jeuclid.JEuclidFopPlugin
 import org.opentorah.fop.mathjax.{MathJax, MathJaxFopPlugin}
 import org.opentorah.fop.xml.{Resolver, Saxon, Xml}
-import org.opentorah.util.Files
+import org.opentorah.util.{Files, Gradle}
 import org.slf4j.{Logger, LoggerFactory}
 
 final class ProcessDocBook(

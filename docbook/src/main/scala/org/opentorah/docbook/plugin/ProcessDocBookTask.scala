@@ -8,11 +8,10 @@ import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
 import org.opentorah.fop.{Fop, FopFonts, Mathematics}
-import org.opentorah.fop.gradle.Gradle
 import org.opentorah.fop.mathjax.MathJax
 import org.opentorah.fop.xml.{Namespace, Resolver}
 import org.opentorah.util.Collections.mapValues
-import org.opentorah.util.Files
+import org.opentorah.util.{Files, Gradle}
 import org.opentorah.docbook.section.{DocBook2, Section}
 
 import scala.beans.BeanProperty

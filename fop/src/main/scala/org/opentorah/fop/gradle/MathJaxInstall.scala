@@ -3,6 +3,7 @@ package org.opentorah.fop.gradle
 import java.io.File
 import org.gradle.api.Project
 import org.opentorah.fop.mathjax.{J2V8, J2V8Distribution, Node, NodeDistribution, NodeFromArtifact}
+import org.opentorah.util.Gradle
 import org.slf4j.{Logger, LoggerFactory}
 
 object MathJaxInstall {
