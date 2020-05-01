@@ -1,6 +1,6 @@
 package org.opentorah.docbook.plugin
 
-import org.opentorah.fop.xml.WarningFilter
+import org.opentorah.xml.WarningFilter
 import org.slf4j.{Logger, LoggerFactory}
 
 final class EvalFilter(

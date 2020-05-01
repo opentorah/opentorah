@@ -2,8 +2,8 @@ package org.opentorah.fop
 
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import org.apache.fop.apps.{FOUserAgent, FopFactory}
-import org.opentorah.fop.xml.{Saxon, Xml}
 import org.opentorah.util.Util
+import org.opentorah.xml.{Saxon, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 
 object Fop {

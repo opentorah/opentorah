@@ -1,9 +1,9 @@
 package org.opentorah.docbook.plugin
 
-import org.opentorah.fop.mathjax.Configuration.DelimitersAndInput
-import org.opentorah.fop.mathjax.MathML.DisplayAttribute
-import org.opentorah.fop.mathjax.{Configuration, Input, MathJax, MathML}
-import org.opentorah.fop.xml.{Namespace, WarningFilter}
+import org.opentorah.mathjax.Configuration.DelimitersAndInput
+import org.opentorah.mathjax.MathML.DisplayAttribute
+import org.opentorah.mathjax.{Configuration, Input, MathJax, MathML}
+import org.opentorah.xml.{Namespace, WarningFilter}
 import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl

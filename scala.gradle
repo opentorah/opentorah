@@ -3,6 +3,8 @@ ext.configureScala = {
     zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
     implementation "org.scala-lang:scala-library:$scalaVersion"
 
+    compileOnly "org.slf4j:slf4j-api:$slf4jVersion"
+
     testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
     testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
 

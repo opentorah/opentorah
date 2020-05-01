@@ -3,8 +3,8 @@ package org.opentorah.docbook
 import java.io.File
 import org.gradle.testkit.runner.GradleRunner
 import org.opentorah.docbook.plugin.{DocBook, Layout}
-import org.opentorah.fop.xml.Xml
 import org.opentorah.util.Files
+import org.opentorah.xml.Xml
 
 class PluginTestProject private(
   projectDir: File,

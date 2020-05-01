@@ -7,12 +7,13 @@ import org.gradle.api.{DefaultTask, Task}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
-import org.opentorah.fop.{Fop, FopFonts, Mathematics}
-import org.opentorah.fop.mathjax.MathJax
-import org.opentorah.fop.xml.{Namespace, Resolver}
+import org.opentorah.docbook.section.{DocBook2, Section}
+import org.opentorah.fop.{Fop, FopFonts}
+import org.opentorah.mathjax
+import org.opentorah.mathjax.MathJax
 import org.opentorah.util.Collections.mapValues
 import org.opentorah.util.{Files, Gradle}
-import org.opentorah.docbook.section.{DocBook2, Section}
+import org.opentorah.xml.{Namespace, Resolver}
 
 import scala.beans.BeanProperty
 // TODO for Scala 2.13: import scala.jdk.CollectionConverters._
@@ -163,7 +164,7 @@ class ProcessDocBookTask extends DefaultTask {
 
     require(!isMathJaxEnabled.get || !isJEuclidEnabled.get)
 
-    val mathJaxConfiguration: org.opentorah.fop.mathjax.Configuration = getMathJaxConfiguration
+    val mathJaxConfiguration: mathjax.Configuration = getMathJaxConfiguration
 
     Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout)
     Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout)
@@ -224,7 +225,7 @@ class ProcessDocBookTask extends DefaultTask {
     generateData()
 
     val mathJax: Option[MathJax] = if (!processors.exists(_.isPdf) || !isMathJaxEnabled.get) None
-    else Some(Mathematics.getMathJax(
+    else Some(MathJax.get(
       getProject,
       nodeParent = layout.nodeRoot,
       overwriteNode = false,
@@ -289,11 +290,11 @@ class ProcessDocBookTask extends DefaultTask {
     classesTask.getDidWork || classesTask.getTaskDependencies.getDependencies(classesTask).asScala.exists(_.getDidWork)
   }
 
-  private def getMathJaxConfiguration: org.opentorah.fop.mathjax.Configuration = {
-    def delimiters(property: Property[String]): Seq[org.opentorah.fop.mathjax.Configuration.Delimiters] =
-      Seq(new org.opentorah.fop.mathjax.Configuration.Delimiters(property.get, property.get))
+  private def getMathJaxConfiguration: mathjax.Configuration = {
+    def delimiters(property: Property[String]): Seq[mathjax.Configuration.Delimiters] =
+      Seq(new mathjax.Configuration.Delimiters(property.get, property.get))
 
-    org.opentorah.fop.mathjax.Configuration(
+    mathjax.Configuration(
       font = mathJaxFont.get,
       extensions = mathJaxExtensions.get.asScala.toList,
       texDelimiters = delimiters(texDelimiter),

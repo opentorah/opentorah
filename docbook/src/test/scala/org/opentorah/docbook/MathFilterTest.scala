@@ -1,8 +1,8 @@
 package org.opentorah.docbook
 
 import org.opentorah.docbook.plugin.{DocBook, MathFilter}
-import org.opentorah.fop.mathjax.{Configuration, MathJax, MathML}
-import org.opentorah.fop.xml.{Namespace, Saxon, Xml}
+import org.opentorah.mathjax.{Configuration, MathJax, MathML}
+import org.opentorah.xml.{Namespace, Saxon, Xml}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.w3c.dom.Node

@@ -2,7 +2,7 @@ package org.opentorah.docbook.plugin
 
 import org.gradle.api.{Action, Project}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
-import org.opentorah.fop.mathjax
+import org.opentorah.mathjax
 import org.opentorah.docbook.section.DocBook2
 
 import scala.beans.BeanProperty
