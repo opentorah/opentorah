@@ -1,16 +1,15 @@
 package org.opentorah.docbook.plugin
 
-import org.opentorah.fop.mathjax.Configuration.DelimitersAndInput
-import org.opentorah.fop.mathjax.MathML.DisplayAttribute
-import org.opentorah.fop.mathjax.{Configuration, Input, MathJax, MathML}
-import org.opentorah.fop.util.Logger
-import org.opentorah.fop.xml.{Namespace, WarningFilter}
+import org.opentorah.mathjax.Configuration.DelimitersAndInput
+import org.opentorah.mathjax.MathML.DisplayAttribute
+import org.opentorah.mathjax.{Configuration, Input, MathJax, MathML}
+import org.opentorah.xml.{Namespace, WarningFilter}
+import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
 final class MathFilter(
-  configuration: Configuration,
-  logger: Logger
+  configuration: Configuration
 ) extends WarningFilter {
   private var elementsStack: List[String] = List.empty
   private def pushElement(localName: String): Unit = elementsStack = elementsStack :+ localName
@@ -132,7 +131,7 @@ final class MathFilter(
   private def flush(closedByDelimiter: Boolean = false): Unit = if (delimiters.isDefined) {
     if (!closedByDelimiter) warning(s"Math '$math' not closed")
 
-    logger.debug(s"MathFilter.flush(): math=$math")
+    MathFilter.logger.debug(s"MathFilter.flush(): math=$math")
 
     val input = delimiters.get.input
     val isInline: Option[Boolean] = checkInline(input.isInline)
@@ -177,6 +176,8 @@ final class MathFilter(
 }
 
 object MathFilter {
+
+  private val logger: Logger = LoggerFactory.getLogger(classOf[MathFilter])
 
   // do not generate DocBook math wrapper if we are inside one of those
   private val equationElements: Set[String] = Set("equation", "informalequation", "inlineequation")

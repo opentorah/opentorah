@@ -2,11 +2,13 @@ package org.opentorah.fop
 
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import org.apache.fop.apps.{FOUserAgent, FopFactory}
-import org.opentorah.fop.util.{Logger, TestLogger}
-import org.opentorah.fop.xml.{Saxon, Xml}
 import org.opentorah.util.Util
+import org.opentorah.xml.{Saxon, Xml}
+import org.slf4j.{Logger, LoggerFactory}
 
 object Fop {
+
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   val defaultConfigurationFile: String =
     s"""${Xml.header}
@@ -28,7 +30,7 @@ object Fop {
   // - for MathJax: new MathJaxFopPlugin(Mathematics.getMathJax(...))
   // - for JEuclid: new JEuclidFopPlugin
   def run(
-    saxon: Saxon = Saxon.Saxon6,
+    saxon: Saxon,
     configurationFile: File,
     creationDate: Option[String] = None,
     author: Option[String] = None,
@@ -37,8 +39,7 @@ object Fop {
     keywords: Option[String] = None,
     inputFile: File,
     outputFile: File,
-    plugin: Option[FopPlugin] = None,
-    logger: Logger = new TestLogger
+    plugin: Option[FopPlugin] = None
   ): Unit = {
     logger.debug(
       s"""Fop.run(
@@ -69,8 +70,7 @@ object Fop {
       fopFactory,
       foUserAgent,
       inputFile,
-      outputFile,
-      logger
+      outputFile
     )
   }
 
@@ -99,8 +99,7 @@ object Fop {
     fopFactory: FopFactory,
     foUserAgent: FOUserAgent,
     inputFile: File,
-    outputFile: File,
-    logger: Logger
+    outputFile: File
   ): Unit = {
     val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(outputFile))
     val fop: org.apache.fop.apps.Fop = fopFactory.newFop("application/pdf", foUserAgent, outputStream)
@@ -108,8 +107,7 @@ object Fop {
     try {
       saxon.transform(
         inputFile = inputFile,
-        defaultHandler = fop.getDefaultHandler,
-        logger = logger
+        defaultHandler = fop.getDefaultHandler
       )
     } finally {
       outputStream.close()

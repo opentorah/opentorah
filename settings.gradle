@@ -11,7 +11,7 @@ pluginManagement {
     id 'com.jfrog.bintray' version '1.8.5'
     id 'com.google.cloud.tools.jib' version '2.2.0'
     id 'com.gradle.plugin-publish' version '0.11.0'
-    id 'org.opentorah.docbook' version docBookProjectVersion
+    id 'org.opentorah.docbook' version docBookPluginVersion
   }
 }
 

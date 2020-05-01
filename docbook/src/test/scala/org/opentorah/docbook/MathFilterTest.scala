@@ -1,9 +1,8 @@
 package org.opentorah.docbook
 
 import org.opentorah.docbook.plugin.{DocBook, MathFilter}
-import org.opentorah.fop.mathjax.{Configuration, MathJax, MathML}
-import org.opentorah.fop.util.TestLogger
-import org.opentorah.fop.xml.{Namespace, Saxon, Xml}
+import org.opentorah.mathjax.{Configuration, MathJax, MathML}
+import org.opentorah.xml.{Namespace, Saxon, Xml}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.w3c.dom.Node
@@ -112,15 +111,14 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
 //       |</article>""".stripMargin
 
   private def parse(string: String): String = {
-    val logger = new TestLogger
+    // TODO when I was using custom Logger, I set it to 'test' here: print everything other than debug...
     // Saxon 6 returns unmodifiable DOM that breaks toString(); using Saxon 9.
     val result: Node = Saxon.Saxon9.parse(
       input = string,
       xmlReader = Xml.getFilteredXMLReader(filters = Seq(
-        new MathFilter(Configuration(), logger)
+        new MathFilter(Configuration())
         /* , new TracingFilter */
-      )),
-      logger
+      ))
     )
     Xml.toString(result)
   }

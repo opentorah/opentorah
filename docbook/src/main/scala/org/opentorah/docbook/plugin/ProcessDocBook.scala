@@ -3,13 +3,11 @@ package org.opentorah.docbook.plugin
 import java.io.File
 import org.gradle.api.Project
 import org.opentorah.docbook.section.DocBook2
-import org.opentorah.fop.{Fop, FopPlugin}
-import org.opentorah.fop.gradle.Gradle
-import org.opentorah.fop.jeuclid.JEuclidFopPlugin
-import org.opentorah.fop.mathjax.{MathJax, MathJaxFopPlugin}
-import org.opentorah.fop.util.Logger
-import org.opentorah.fop.xml.{Resolver, Saxon, Xml}
-import org.opentorah.util.Files
+import org.opentorah.fop.{Fop, FopPlugin, JEuclidFopPlugin, MathJaxFopPlugin}
+import org.opentorah.mathjax.MathJax
+import org.opentorah.util.{Files, Gradle}
+import org.opentorah.xml.{Resolver, Saxon, Xml}
+import org.slf4j.{Logger, LoggerFactory}
 
 final class ProcessDocBook(
   project: Project,
@@ -17,16 +15,15 @@ final class ProcessDocBook(
   resolver: Resolver,
   isJEuclidEnabled: Boolean,
   mathJax: Option[MathJax],
-  layout: Layout,
-  logger: Logger
+  layout: Layout
 ) {
+  private val logger: Logger = LoggerFactory.getLogger(classOf[ProcessDocBook])
+
   def run(
     docBook2: DocBook2,
     prefixed: Boolean,
     documentName: String
   ): Unit = {
-    logger.lifecycle(s"DocBook: processing '$documentName' to ${docBook2.name}.")
-
     val isPdf: Boolean = docBook2.isPdf
 
     val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)
@@ -40,7 +37,7 @@ final class ProcessDocBook(
     val outputFile: Option[File] = if (docBook2.usesRootFile) Some(saxonOutputFile) else None
 
     val mathFilter: Option[MathFilter] =
-      if (mathJax.isDefined && isPdf) Some(new MathFilter(mathJax.get.configuration, logger)) else None
+      if (mathJax.isDefined && isPdf) Some(new MathFilter(mathJax.get.configuration)) else None
 
     // Run Saxon.
     val saxon: Saxon = if (!docBook2.usesDocBookXslt2) Saxon.Saxon6 else Saxon.Saxon9
@@ -49,12 +46,11 @@ final class ProcessDocBook(
       inputFile = layout.inputFile(documentName),
       stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(docBook2)),
       xmlReader = Xml.getFilteredXMLReader(
-        Seq(new EvalFilter(substitutions, logger)) ++
+        Seq(new EvalFilter(substitutions)) ++
         mathFilter.toSeq
         // ++ Seq(new TracingFilter)
       ),
-      outputFile,
-      logger
+      outputFile
     )
 
     copyImagesAndCss(docBook2, saxonOutputDirectory)
@@ -71,7 +67,7 @@ final class ProcessDocBook(
           else mathJax.map(new MathJaxFopPlugin(_))
 
         Fop.run(
-          saxon = Saxon.Saxon6,
+          saxon = Saxon.Saxon9,
           configurationFile = layout.fopConfigurationFile,
           substitutions.get("creationDate"),
           substitutions.get("author"),
@@ -80,8 +76,7 @@ final class ProcessDocBook(
           substitutions.get("keywords"),
           plugin = fopPlugin,
           inputFile = saxonOutputFile,
-          outputFile = forDocument.outputFile(docBook2),
-          logger = logger
+          outputFile = forDocument.outputFile(docBook2)
         )
       }
 

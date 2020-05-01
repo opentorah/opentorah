@@ -8,7 +8,7 @@ plugins {
 description = 'Jewish Calendar Dates'
 version = calendarProjectVersion
 
-configureLibrary(['Scala', 'Calendar', 'Jewish'])
+configureLibrary(['Scala', 'Jewish', 'Calendar', 'Torah'])
 
 dependencies {
   implementation project(':store')

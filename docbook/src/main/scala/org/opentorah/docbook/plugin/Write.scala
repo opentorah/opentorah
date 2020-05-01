@@ -1,8 +1,9 @@
 package org.opentorah.docbook.plugin
 
 import org.opentorah.docbook.section.{DocBook2, HtmlCommon, Section}
-import org.opentorah.fop.xml.{Namespace, Xml}
+import org.opentorah.mathjax.Configuration
 import org.opentorah.util.Json
+import org.opentorah.xml.{Namespace, Xml}
 
 object Write {
 
@@ -83,7 +84,7 @@ object Write {
     documentName: String,
     cssFileName: String,
     epubEmbeddedFonts: String,
-    mathJaxConfiguration: org.opentorah.fop.mathjax.Configuration,
+    mathJaxConfiguration: Configuration,
     layout: Layout
   ): String = {
     val forDocument = layout.forDocument(prefixed, documentName)

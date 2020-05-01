@@ -8,9 +8,10 @@ plugins {
 version = docBookProjectVersion
 description = 'FOP MathJax plugin'
 
-configureLibrary(['Scala', 'DocBook', 'MathML', 'MathJax', 'JEuclid', 'Html', 'Pdf', 'Epub'])
+configureLibrary(['Scala', 'MathML', 'MathJax', 'JEuclid', 'FOP', 'Pdf'])
 
 dependencies {
+/// TODO resolve name-clash with xml.Attribute (xml.Xml) - and then, implementation project(':xml')!
   implementation project(':util')
 
   // XMLResolver

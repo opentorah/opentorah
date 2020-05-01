@@ -1,7 +1,7 @@
 package org.opentorah.docbook
 
 import org.opentorah.docbook.plugin.DocBook
-import org.opentorah.fop.xml.Namespace
+import org.opentorah.xml.Namespace
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 

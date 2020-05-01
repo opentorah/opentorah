@@ -101,7 +101,7 @@ object CalendarService extends App {
 
   // To be accessible when running in a docker container the server must bind to all IPs, not just 127.0.0.1:
   val server: ZIO[ZEnv, Throwable, Unit] = ZIO.runtime[ZEnv].flatMap { implicit rts =>
-    BlazeServerBuilder[Task]
+    BlazeServerBuilder[Task](executionContext = scala.concurrent.ExecutionContext.global)
       .bindHttp(host = "0.0.0.0", port = getServicePort)
       .withWebSockets(false)
       .withHttpApp(service.orNotFound)

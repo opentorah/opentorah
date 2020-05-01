@@ -2,18 +2,18 @@ package org.opentorah.docbook.plugin
 
 import java.io.File
 import java.net.URI
-import org.gradle.api.{DefaultTask, Project, Task}
+import org.gradle.api.logging.Logger
+import org.gradle.api.{DefaultTask, Task}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
 import org.gradle.process.JavaExecSpec
-import org.opentorah.fop.{Fop, FopFonts, Mathematics}
-import org.opentorah.fop.gradle.{Gradle, PluginLogger}
-import org.opentorah.fop.mathjax.MathJax
-import org.opentorah.fop.util.Logger
-import org.opentorah.fop.xml.{Namespace, Resolver}
-import org.opentorah.util.Collections.mapValues
-import org.opentorah.util.Files
 import org.opentorah.docbook.section.{DocBook2, Section}
+import org.opentorah.fop.{Fop, FopFonts}
+import org.opentorah.mathjax
+import org.opentorah.mathjax.MathJax
+import org.opentorah.util.Collections.mapValues
+import org.opentorah.util.{Files, Gradle}
+import org.opentorah.xml.{Namespace, Resolver}
 
 import scala.beans.BeanProperty
 // TODO for Scala 2.13: import scala.jdk.CollectionConverters._
@@ -22,8 +22,8 @@ import scala.collection.JavaConverters._
 class ProcessDocBookTask extends DefaultTask {
 
   private val layout: Layout = Layout.forProject(getProject)
-  private val logger: Logger = PluginLogger.forProject(getProject)
-  private def info(message: String): Unit = logger.info(message)
+  private val logger: Logger = getProject.getLogger
+  private def info(message: String): Unit = logger.info(message, null, null, null)
 
   // To let projects that use the plugin to not make assumptions about directory names:
   @Internal def getOutputDirectory: File = layout.outputRoot
@@ -127,18 +127,17 @@ class ProcessDocBookTask extends DefaultTask {
   @TaskAction
   def processDocBook(): Unit = {
     def writeInto(file: File, replace: Boolean)(content: String): Unit =
-      org.opentorah.fop.util.Files.writeInto(file, replace, content, logger)
+      Files.writeInto(file, replace, content)
 
     val documentName: Option[String] = getDocumentName(document.get)
     val documentNames: List[String] = documents.get.asScala.toList.flatMap(getDocumentName)
 
-    if (documentName.isEmpty && documentNames.isEmpty)
-      throw new IllegalArgumentException(
-        """At least one document name must be specified using
-          |  document = "<document name>"
-          |or
-          |  documents = ["<document name>"]
-          |""".stripMargin)
+    if (documentName.isEmpty && documentNames.isEmpty) throw new IllegalArgumentException(
+      """At least one document name must be specified using
+        |  document = "<document name>"
+        |or
+        |  documents = ["<document name>"]
+        |""".stripMargin)
 
     val inputDocuments: List[(String, Boolean)] =
       documentName.toList.map(name => name -> false) ++
@@ -165,10 +164,10 @@ class ProcessDocBookTask extends DefaultTask {
 
     require(!isMathJaxEnabled.get || !isJEuclidEnabled.get)
 
-    val mathJaxConfiguration: org.opentorah.fop.mathjax.Configuration = getMathJaxConfiguration
+    val mathJaxConfiguration: mathjax.Configuration = getMathJaxConfiguration
 
-    Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout, logger)
-    Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout, logger)
+    Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout)
+    Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout)
 
     val substitutionsMap: Map[String, String] = substitutions.get.asScala.toMap
 
@@ -194,9 +193,9 @@ class ProcessDocBookTask extends DefaultTask {
       writeInto(layout.inputFile(name), replace = false)(Write.defaultInputFile)
 
     val fontFamilyNames: List[String] = epubEmbeddedFonts.get.asScala.toList
-    val epubEmbeddedFontsUris: List[URI] = FopFonts.getFiles(layout.fopConfigurationFile, fontFamilyNames, logger)
+    val epubEmbeddedFontsUris: List[URI] = FopFonts.getFiles(layout.fopConfigurationFile, fontFamilyNames)
     val epubEmbeddedFontsString: String = epubEmbeddedFontsUris.map(uri => new File(uri.getPath).getAbsolutePath).mkString(", ")
-    logger.info(s"Fop.getFontFiles(${fontFamilyNames.mkString(", ")}) = $epubEmbeddedFontsString.")
+    info(s"Fop.getFontFiles(${fontFamilyNames.mkString(", ")}) = $epubEmbeddedFontsString.")
 
     for {
       docBook2: DocBook2 <- DocBook2.all
@@ -215,7 +214,7 @@ class ProcessDocBookTask extends DefaultTask {
 
     for (docBook2: DocBook2 <- DocBook2.all)
       writeInto(layout.stylesheetFile(layout.paramsStylesheet(docBook2)), replace = true) {
-        Write.paramsStylesheet(docBook2, sections, logger.isInfoEnabled)
+        Write.paramsStylesheet(docBook2, sections, getProject.getLogger.isInfoEnabled)
       }
 
     for (section: Section <- Section.all)
@@ -226,35 +225,36 @@ class ProcessDocBookTask extends DefaultTask {
     generateData()
 
     val mathJax: Option[MathJax] = if (!processors.exists(_.isPdf) || !isMathJaxEnabled.get) None
-    else Some(Mathematics.getMathJax(
+    else Some(MathJax.get(
       getProject,
       nodeParent = layout.nodeRoot,
       overwriteNode = false,
       nodeModulesParent = layout.nodeRoot,
       overwriteMathJax = false,
       j2v8Parent = if (!useJ2V8.get) None else Some(layout.j2v8LibraryDirectory),
-      configuration = mathJaxConfiguration,
-      logger))
+      configuration = mathJaxConfiguration))
 
     val processDocBook: ProcessDocBook = new ProcessDocBook(
       getProject,
       // In processing instructions and CSS, substitute xslParameters also - because why not?
       substitutions = sections.values.toList.flatten.toMap ++ substitutionsMap,
-      resolver = new Resolver(layout.catalogFile, logger),
+      resolver = new Resolver(layout.catalogFile),
       isJEuclidEnabled.get,
       mathJax,
-      layout,
-      logger
+      layout
     )
 
     for {
       docBook2: DocBook2 <- processors
       (documentName: String, prefixed: Boolean) <- inputDocuments
-    } processDocBook.run(
-      docBook2,
-      prefixed,
-      documentName
-    )
+    } {
+      getProject.getLogger.lifecycle(s"DocBook: processing '$documentName' to ${docBook2.name}.")
+      processDocBook.run(
+        docBook2,
+        prefixed,
+        documentName
+      )
+    }
   }
 
   private def getDocumentName(string: String): Option[String] =
@@ -266,7 +266,7 @@ class ProcessDocBookTask extends DefaultTask {
 //    val classesTask: Option[Task] = Gradle.getTask(getProject, "classes")
     val dataDirectory: File = layout.dataDirectory
 
-    def skipping(message: String): Unit = logger.lifecycle(s"Skipping DocBook data generation: $message")
+    def skipping(message: String): Unit = getProject.getLogger.lifecycle(s"Skipping DocBook data generation: $message")
     if (mainClass.isEmpty) info("Skipping DocBook data generation: dataGenerationClass is not set") else
 // TODO maybe instead of the Java plugin use special configuration (docBook :))?
     if (mainSourceSet.isEmpty) skipping("no Java plugin in the project") else
@@ -290,11 +290,11 @@ class ProcessDocBookTask extends DefaultTask {
     classesTask.getDidWork || classesTask.getTaskDependencies.getDependencies(classesTask).asScala.exists(_.getDidWork)
   }
 
-  private def getMathJaxConfiguration: org.opentorah.fop.mathjax.Configuration = {
-    def delimiters(property: Property[String]): Seq[org.opentorah.fop.mathjax.Configuration.Delimiters] =
-      Seq(new org.opentorah.fop.mathjax.Configuration.Delimiters(property.get, property.get))
+  private def getMathJaxConfiguration: mathjax.Configuration = {
+    def delimiters(property: Property[String]): Seq[mathjax.Configuration.Delimiters] =
+      Seq(new mathjax.Configuration.Delimiters(property.get, property.get))
 
-    org.opentorah.fop.mathjax.Configuration(
+    mathjax.Configuration(
       font = mathJaxFont.get,
       extensions = mathJaxExtensions.get.asScala.toList,
       texDelimiters = delimiters(texDelimiter),

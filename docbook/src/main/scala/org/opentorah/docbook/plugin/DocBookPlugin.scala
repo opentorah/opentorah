@@ -3,8 +3,6 @@ package org.opentorah.docbook.plugin
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.{DefaultTask, Plugin, Project}
 import org.opentorah.fop.FopFonts
-import org.opentorah.fop.gradle.{Gradle, PluginLogger}
-import org.opentorah.fop.util.Logger
 
 final class DocBookPlugin extends Plugin[Project] {
 
@@ -72,10 +70,8 @@ object DocBookPlugin {
     setDescription("List FOP fonts")
 
     @TaskAction def execute(): Unit = {
-      val result = FopFonts.list(
-        configurationFile = Layout.forProject(getProject).fopConfigurationFile,
-        logger = PluginLogger.forProject(getProject)
-      )
+      val result = FopFonts.list(configurationFile = Layout.forProject(getProject).fopConfigurationFile)
+      // TODO logger.lifecycle()?
       System.out.print(result)
       System.out.flush()
     }
