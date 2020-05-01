@@ -5,6 +5,9 @@ import scala.xml.{Atom, Elem, Node, TopScope}
 
 object Xml {
 
+  val header: String    = """<?xml version="1.0" encoding="UTF-8"?>"""
+  val header16: String = """<?xml version="1.0" encoding="UTF-16"?>"""
+
   type Transformer = Elem => Elem
 
   def transform(xml: Elem, transformer: Transformer): Elem = {
@@ -17,8 +20,6 @@ object Xml {
 
     new RuleTransformer(rule).transform(xml).head.asInstanceOf[Elem]
   }
-
-  val xmlHeader: String = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n"
 
   def removeNamespace(xml: Elem): Elem =
     xml.copy(scope = TopScope, child = xml.child.map(removeNamespace))

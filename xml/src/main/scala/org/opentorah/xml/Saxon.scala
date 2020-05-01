@@ -2,9 +2,9 @@ package org.opentorah.xml
 
 import java.io.{File, FileWriter, StringReader}
 import javax.xml.transform.dom.DOMResult
-import javax.xml.transform.{ErrorListener, Result, Source, Transformer, TransformerException}
 import javax.xml.transform.sax.{SAXResult, SAXSource, SAXTransformerFactory}
 import javax.xml.transform.stream.{StreamResult, StreamSource}
+import javax.xml.transform.{ErrorListener, Result, Source, Transformer, TransformerException}
 import org.slf4j.{Logger, LoggerFactory}
 import org.w3c.dom.Node
 import org.xml.sax.helpers.DefaultHandler
@@ -21,8 +21,8 @@ sealed abstract class Saxon(name: String) {
     // not the one included in the JDK or included with Saxon (com.icl.saxon.aelfred.SAXParserFactoryImpl).
     // Classpath-based discovery is unstable (order changes from one Gradle version to another) and ugly.
     // Tell Saxon to use Xerces parser explicitly:
-    result.setAttribute(styleParserClassAttribute, Xml.saxParserName)
-    result.setAttribute(sourceParserClassAttribute, Xml.saxParserName)
+    result.setAttribute(styleParserClassAttribute, Xerces.saxParserName)
+    result.setAttribute(sourceParserClassAttribute, Xerces.saxParserName)
 
     result
   }

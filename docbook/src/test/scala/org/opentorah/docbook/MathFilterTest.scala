@@ -2,7 +2,7 @@ package org.opentorah.docbook
 
 import org.opentorah.docbook.plugin.{DocBook, MathFilter}
 import org.opentorah.mathjax.{Configuration, MathJax, MathML}
-import org.opentorah.xml.{Namespace, Saxon, Xml}
+import org.opentorah.xml.{Namespace, Saxon, Xerces, Xml}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.w3c.dom.Node
@@ -115,11 +115,11 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
     // Saxon 6 returns unmodifiable DOM that breaks toString(); using Saxon 9.
     val result: Node = Saxon.Saxon9.parse(
       input = string,
-      xmlReader = Xml.getFilteredXMLReader(filters = Seq(
+      xmlReader = Xerces.getFilteredXMLReader(filters = Seq(
         new MathFilter(Configuration())
         /* , new TracingFilter */
       ))
     )
-    Xml.toString(result)
+    Xerces.toString(result)
   }
 }

@@ -3,6 +3,7 @@ package org.opentorah.mathjax
 import org.opentorah.mathjax.Configuration.{Delimiters, DelimitersAndInput}
 import org.opentorah.util.Json
 
+// Rename MathJaxConfiguration
 final case class Configuration(
   displayMessages: Boolean = false,        // determines whether Message.Set() calls are logged
   displayErrors: Boolean = true,           // determines whether error messages are shown on the console

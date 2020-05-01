@@ -1,6 +1,6 @@
 package org.opentorah.xml
 
-import org.w3c.dom.{Document, Element}
+import org.w3c.dom.{Document, Element => DomElement}
 import org.xml.sax.helpers.AttributesImpl
 
 // TODO move into org.opentorah.xml package
@@ -30,13 +30,13 @@ class Namespace(val uri: String, val prefix: String = "") {
 
   def is(namespaceUri: String): Boolean = namespaceUri == uri
 
-  def ensureDeclared(element: Element): Unit =
+  def ensureDeclared(element: DomElement): Unit =
     if (!isDeclared(element)) declare(element)
 
-  private def isDeclared(element: Element): Boolean =
+  private def isDeclared(element: DomElement): Boolean =
     element.getAttributeNS(Namespace.Xmlns.uri, prefix) == uri
 
-  private def declare(element: Element): Unit =
+  private def declare(element: DomElement): Unit =
     element.setAttributeNS(Namespace.Xmlns.uri, xmlns, uri)
 
   def ensureDeclared(attributes: AttributesImpl): Unit =

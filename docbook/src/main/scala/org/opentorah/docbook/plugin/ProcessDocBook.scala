@@ -6,7 +6,7 @@ import org.opentorah.docbook.section.DocBook2
 import org.opentorah.fop.{Fop, FopPlugin, JEuclidFopPlugin, MathJaxFopPlugin}
 import org.opentorah.mathjax.MathJax
 import org.opentorah.util.{Files, Gradle}
-import org.opentorah.xml.{Resolver, Saxon, Xml}
+import org.opentorah.xml.{Resolver, Saxon, Xerces}
 import org.slf4j.{Logger, LoggerFactory}
 
 final class ProcessDocBook(
@@ -45,7 +45,7 @@ final class ProcessDocBook(
       resolver,
       inputFile = layout.inputFile(documentName),
       stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(docBook2)),
-      xmlReader = Xml.getFilteredXMLReader(
+      xmlReader = Xerces.getFilteredXMLReader(
         Seq(new EvalFilter(substitutions)) ++
         mathFilter.toSeq
         // ++ Seq(new TracingFilter)

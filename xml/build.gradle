@@ -15,4 +15,19 @@ dependencies {
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
   implementation "org.typelevel:paiges-core_$scalaVersionMajor:$paigesVersion"
   implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
+
+  // XMLResolver
+  compileOnly "org.xmlresolver:xmlresolver:$xmlresolverVersion"
+
+  // Saxon 6 (XSLT 1.0)
+  compileOnly "saxon:saxon:$saxon6Version"
+
+  // Saxon 9 (XSLT 2.0)
+  compileOnly "net.sf.saxon:Saxon-HE:$saxon9Version"
+
+  // Xerces
+  compileOnly "xerces:xercesImpl:$xercesVersion"
+
+  // Xalan
+  compileOnly "xalan:xalan:$xalanVersion"
 }

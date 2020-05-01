@@ -1,6 +1,6 @@
 package org.opentorah.mathjax
 
-import org.opentorah.xml.{Attribute, Namespace}
+import org.opentorah.xml.AttributeX
 import org.w3c.dom.{Document, Element}
 
 object MathML {
@@ -16,7 +16,7 @@ object MathML {
     * Display mode: inline or block (display math).
     */
   @SerialVersionUID(1L)
-  case object DisplayAttribute extends Attribute[Boolean] {
+  case object DisplayAttribute extends AttributeX[Boolean] {
     private val inline: String = "inline"
     private val block: String = "block"
     private val values: Set[String] = Set(inline, block)

@@ -11,7 +11,7 @@ description = 'FOP MathJax plugin'
 configureLibrary(['Scala', 'MathML', 'MathJax', 'JEuclid', 'FOP', 'Pdf'])
 
 dependencies {
-/// TODO resolve name-clash with xml.Attribute (xml.Xml) - and then, implementation project(':xml')!
+  implementation project(':xml')
   implementation project(':util')
 
   // XMLResolver
@@ -63,13 +63,4 @@ dependencies {
   implementation "com.eclipsesource.j2v8:j2v8_linux_x86_64:$j2v8Version"
 
   implementation gradleApi()
-}
-
-jar {
-  manifest {
-    attributes(
-      'Implementation-Title'  : project.description,
-      'Implementation-Version': project.version
-    )
-  }
 }

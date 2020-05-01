@@ -34,6 +34,16 @@ ext.configureLibrary = {
     archiveClassifier.set('sources')
   }
 
+    // Because why not?
+  jar {
+    manifest {
+      attributes(
+        'Implementation-Title'  : projectDescription,
+        'Implementation-Version': projectVersion
+      )
+    }
+  }
+
   task scaladocJar(type: Jar) {
     from scaladoc.destinationDir
     archiveClassifier.set('scaladoc')
@@ -53,7 +63,7 @@ ext.configureLibrary = {
 
         artifact sourceJar
         // TODO didn't work for Scala 2.13 in Gradle 6.0...
-        artifact scaladocJar
+        ///// artifact scaladocJar
 
         pom {
           name = projectName
