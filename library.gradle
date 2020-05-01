@@ -24,6 +24,18 @@ ext.configureLibrary = {
 //    "  artifactId =$projectArtifact;\n"
 //  )
 
+  // Because why not?
+  jar {
+    manifest {
+      attributes(
+        'Implementation-Title'  : projectDescription,
+        'Implementation-Version': projectVersion
+      )
+    }
+  }
+
+  jar.archiveBaseName.set(projectArtifact)
+
   // Gradle plugin [publishing?] plugin, if it is applied, adds tasks publishPluginJar and
   // publishPluginJavaDocsJar that create sources and javadoc archives;
   // attempts to use them as artifacts in the Maven publication failed,
@@ -34,23 +46,11 @@ ext.configureLibrary = {
     archiveClassifier.set('sources')
   }
 
-    // Because why not?
-  jar {
-    manifest {
-      attributes(
-        'Implementation-Title'  : projectDescription,
-        'Implementation-Version': projectVersion
-      )
-    }
-  }
-
   task scaladocJar(type: Jar) {
     from scaladoc.destinationDir
     archiveClassifier.set('scaladoc')
   }
   scaladocJar.dependsOn scaladoc
-
-  jar.archiveBaseName.set(projectArtifact)
 
   publishing {
     publications {

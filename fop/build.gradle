@@ -11,19 +11,11 @@ description = 'FOP MathJax plugin'
 configureLibrary(['Scala', 'MathML', 'MathJax', 'JEuclid', 'FOP', 'Pdf'])
 
 dependencies {
-  implementation project(':xml')
   implementation project(':util')
 
-  // XMLResolver
   implementation "org.xmlresolver:xmlresolver:$xmlresolverVersion"
-
-  // Saxon 6 (XSLT 1.0)
   implementation "saxon:saxon:$saxon6Version"
-
-  // Saxon 9 (XSLT 2.0)
   implementation "net.sf.saxon:Saxon-HE:$saxon9Version"
-
-  // Xerces
   implementation "xerces:xercesImpl:$xercesVersion"
 
   // FOP
@@ -37,6 +29,12 @@ dependencies {
     exclude group: 'com.sun.media', module: 'jai-codec'
   }
 
+  // Hyphenation patterns
+  implementation "net.sf.offo:fop-hyph:$fopHyphVersion"
+
+  implementation "org.apache.xmlgraphics:batik-transcoder:$batikVersion"
+  implementation "org.apache.xmlgraphics:batik-extension:$batikVersion"
+
   implementation "javax.media.jai:com.springsource.javax.media.jai.core:$jaiVersion"
   implementation "javax.media.jai:com.springsource.javax.media.jai.codec:$jaiVersion"
 
@@ -44,12 +42,6 @@ dependencies {
   implementation ("de.rototor.jeuclid:jeuclid-fop:$jeuclidFopVersion") {
     exclude group: 'org.apache.xmlgraphics', module: 'fop'
   }
-
-  implementation "org.apache.xmlgraphics:batik-transcoder:$batikVersion"
-  implementation "org.apache.xmlgraphics:batik-extension:$batikVersion"
-
-  // Hyphenation patterns
-  implementation "net.sf.offo:fop-hyph:$fopHyphVersion"
 
   // J2V8 integration
   // Note: Native library (if needed and available) is loaded from a dynamically retrieved artifact,
