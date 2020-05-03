@@ -280,6 +280,8 @@ FOP can't use some popular fonts like Roboto and NotoSans, and logs an error
 "coverage set class table not yet supported" during fonts auto-detection;
 see https://issues.apache.org/jira/browse/FOP-2704 for more details.
 
+TODO that issue is marked as "resolved" now!
+
 Some of the fonts that work well enough and support Latin, Russian and Hebrew scripts
 are DejaVu and Liberation.
 

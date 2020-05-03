@@ -247,7 +247,7 @@ class ProcessDocBookTask extends DefaultTask {
     val mathJax: Option[MathJax] = if (!processors.exists(_.isPdf) || !isMathJaxEnabled.get) None
     else Some(MathJax.get(
       getProject,
-      nodeParent = layout.nodeRoot,
+      nodeRoot = layout.nodeRoot,
       nodeVersion = NodeDistribution.defaultVersion,
       overwriteNode = false,
       nodeModulesParent = layout.nodeRoot,

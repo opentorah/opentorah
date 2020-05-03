@@ -82,7 +82,7 @@ object MathJax {
 
   def get(
     project: Project,
-    nodeParent: File,
+    nodeRoot: File,
     nodeVersion: String,
     overwriteNode: Boolean,
     nodeModulesParent: File,
@@ -91,7 +91,7 @@ object MathJax {
     configuration: Configuration
   ): MathJax = {
     val node: NodeFromArtifact = new NodeFromArtifact(
-      nodeParent,
+      into = nodeRoot,
       distribution = new NodeDistribution(nodeVersion),
       nodeModulesParent
     )
