@@ -2,7 +2,7 @@ package org.opentorah.mathjax
 
 import java.io.File
 import org.gradle.api.Project
-import org.opentorah.node.{J2V8, Node}
+import org.opentorah.node.{J2V8, Node, NodeDistribution, NodeFromArtifact}
 import org.opentorah.xml.{Namespace, Xerces}
 import org.slf4j.{Logger, LoggerFactory}
 import org.w3c.dom.Document
@@ -83,23 +83,29 @@ object MathJax {
   def get(
     project: Project,
     nodeParent: File,
+    nodeVersion: String,
     overwriteNode: Boolean,
     nodeModulesParent: File,
     overwriteMathJax: Boolean,
     j2v8Parent: Option[File],
     configuration: Configuration
-  ): MathJax = get(
-    node = Node.install(
-      project,
-      into = nodeParent,
-      overwrite = overwriteNode,
-      nodeModulesParent),
-    overwriteMathJax,
-    j2v8 = j2v8Parent.flatMap(j2v8Parent => J2V8.install(
-      project,
-      into = j2v8Parent)),
-    configuration
-  )
+  ): MathJax = {
+    val node: NodeFromArtifact = new NodeFromArtifact(
+      nodeParent,
+      distribution = new NodeDistribution(nodeVersion),
+      nodeModulesParent
+    )
+    node.install(project, overwriteNode)
+
+    get(
+      node,
+      overwriteMathJax,
+      j2v8 = j2v8Parent.flatMap(j2v8Parent => J2V8.install(
+        project,
+        into = j2v8Parent)),
+      configuration
+    )
+  }
 
   def get(
     nodeModulesParent: File,
@@ -119,7 +125,7 @@ object MathJax {
     configuration: Configuration
   ): MathJax = {
     // Make sure MathJax is installed
-    node.install(MathJax.packageName, overwriteMathJax)
+    node.npmInstall(MathJax.packageName, overwriteMathJax)
 
     // If J2V8 is configured to be used, is available and actually loads - we use it;
     // otherwise each typesetting is done by calling Node in a separate process.

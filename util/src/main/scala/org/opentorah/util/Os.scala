@@ -1,6 +1,7 @@
 package org.opentorah.util
 
 sealed trait Os {
+  final def name: String = Util.className(this)
   def hasUname: Boolean = false
   def libraryExtension: String = "so"
 }
@@ -25,4 +26,6 @@ object Os {
   }
 
   case object Android extends Os
+
+  val values: Seq[Os] = Seq(Windows, Aix, Mac, FreeBSD, SunOS, Linux, Android)
 }

@@ -6,7 +6,6 @@ import org.opentorah.mathjax
 import org.opentorah.docbook.section.DocBook2
 
 import scala.beans.BeanProperty
-// TODO for Scala 2.13: import scala.jdk.CollectionConverters._
 import scala.collection.JavaConverters._
 
 // Properties are annotated with @BeanProperty to make them visible to Gradle.

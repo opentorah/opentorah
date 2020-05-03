@@ -3,20 +3,18 @@ package org.opentorah.docbook.plugin
 import java.io.File
 import java.net.URI
 import org.gradle.api.logging.Logger
-import org.gradle.api.{DefaultTask, Task}
+import org.gradle.api.DefaultTask
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
-import org.gradle.process.JavaExecSpec
 import org.opentorah.docbook.section.{DocBook2, Section}
 import org.opentorah.fop.{Fop, FopFonts}
 import org.opentorah.mathjax
 import org.opentorah.mathjax.MathJax
+import org.opentorah.node.NodeDistribution
 import org.opentorah.util.Collections.mapValues
 import org.opentorah.util.{Files, Gradle}
 import org.opentorah.xml.{Namespace, Resolver}
-
 import scala.beans.BeanProperty
-// TODO for Scala 2.13: import scala.jdk.CollectionConverters._
 import scala.collection.JavaConverters._
 
 class ProcessDocBookTask extends DefaultTask {
@@ -126,9 +124,6 @@ class ProcessDocBookTask extends DefaultTask {
 
   @TaskAction
   def processDocBook(): Unit = {
-    def writeInto(file: File, replace: Boolean)(content: String): Unit =
-      Files.writeInto(file, replace, content)
-
     val documentName: Option[String] = getDocumentName(document.get)
     val documentNames: List[String] = documents.get.asScala.toList.flatMap(getDocumentName)
 
@@ -171,26 +166,47 @@ class ProcessDocBookTask extends DefaultTask {
 
     val substitutionsMap: Map[String, String] = substitutions.get.asScala.toMap
 
-    writeInto(layout.fopConfigurationFile, replace = false)(Fop.defaultConfigurationFile)
+    Files.write(
+      file = layout.fopConfigurationFile,
+      replace = false,
+      content = Fop.defaultConfigurationFile
+    )
 
-    writeInto(layout.xmlFile(layout.substitutionsDtdFileName), replace = true) {
-      substitutionsMap.toSeq.map {
+    Files.write(
+      file = layout.xmlFile(layout.substitutionsDtdFileName),
+      replace = true,
+      content = substitutionsMap.toSeq.map {
         case (name: String, value: String) => s"""<!ENTITY $name "$value">\n"""
       }.mkString
-    }
+    )
 
-    writeInto(layout.catalogFile, replace = true)(Write.xmlCatalog(layout))
-    writeInto(layout.xmlFile(layout.catalogCustomFileName), replace = false)(Write.catalogCustomization)
+    Files.write(
+      file = layout.catalogFile,
+      replace = true,
+      content = Write.xmlCatalog(layout)
+    )
+
+    Files.write(
+      file = layout.xmlFile(layout.catalogCustomFileName),
+      replace = false,
+      content = Write.catalogCustomization
+    )
 
     val cssFileName: String = Files.dropAllowedExtension(cssFile.get, "css")
 
-    writeInto(layout.cssFile(cssFileName), replace = false) {
-      s"""@namespace xml "${Namespace.Xml.uri}";
-         |""".stripMargin
-    }
+    Files.write(
+      file = layout.cssFile(cssFileName),
+      replace = false,
+      content =
+        s"""@namespace xml "${Namespace.Xml.uri}";
+           |""".stripMargin
+    )
 
-    for ((name: String, _ /*prefixed*/: Boolean) <- inputDocuments)
-      writeInto(layout.inputFile(name), replace = false)(Write.defaultInputFile)
+    for ((name: String, _ /*prefixed*/: Boolean) <- inputDocuments) Files.write(
+      file = layout.inputFile(name),
+      replace = false,
+      content = Write.defaultInputFile
+    )
 
     val fontFamilyNames: List[String] = epubEmbeddedFonts.get.asScala.toList
     val epubEmbeddedFontsUris: List[URI] = FopFonts.getFiles(layout.fopConfigurationFile, fontFamilyNames)
@@ -200,8 +216,10 @@ class ProcessDocBookTask extends DefaultTask {
     for {
       docBook2: DocBook2 <- DocBook2.all
       (documentName: String, prefixed: Boolean) <- inputDocuments
-    } writeInto(layout.stylesheetFile(layout.forDocument(prefixed, documentName).mainStylesheet(docBook2)), replace = true) {
-      Write.mainStylesheet(
+    } Files.write(
+      file = layout.stylesheetFile(layout.forDocument(prefixed, documentName).mainStylesheet(docBook2)),
+      replace = true,
+      content = Write.mainStylesheet(
         docBook2,
         prefixed,
         documentName,
@@ -210,17 +228,19 @@ class ProcessDocBookTask extends DefaultTask {
         mathJaxConfiguration,
         layout
       )
-    }
+    )
 
-    for (docBook2: DocBook2 <- DocBook2.all)
-      writeInto(layout.stylesheetFile(layout.paramsStylesheet(docBook2)), replace = true) {
-        Write.paramsStylesheet(docBook2, sections, getProject.getLogger.isInfoEnabled)
-      }
+    for (docBook2: DocBook2 <- DocBook2.all) Files.write(
+      file = layout.stylesheetFile(layout.paramsStylesheet(docBook2)),
+      replace = true,
+      content = Write.paramsStylesheet(docBook2, sections, getProject.getLogger.isInfoEnabled)
+    )
 
-    for (section: Section <- Section.all)
-      writeInto(layout.stylesheetFile(layout.customStylesheet(section)), replace = false) {
-        Write.customStylesheet(layout, section)
-      }
+    for (section: Section <- Section.all) Files.write(
+      file = layout.stylesheetFile(layout.customStylesheet(section)),
+      replace = false,
+      content = Write.customStylesheet(layout, section)
+    )
 
     generateData()
 
@@ -228,6 +248,7 @@ class ProcessDocBookTask extends DefaultTask {
     else Some(MathJax.get(
       getProject,
       nodeParent = layout.nodeRoot,
+      nodeVersion = NodeDistribution.defaultVersion,
       overwriteNode = false,
       nodeModulesParent = layout.nodeRoot,
       overwriteMathJax = false,
@@ -263,10 +284,10 @@ class ProcessDocBookTask extends DefaultTask {
   private def generateData(): Unit = {
     val mainClass: String = dataGeneratorClass.get
     val mainSourceSet: Option[SourceSet] = Gradle.mainSourceSet(getProject)
-//    val classesTask: Option[Task] = Gradle.getTask(getProject, "classes")
     val dataDirectory: File = layout.dataDirectory
 
     def skipping(message: String): Unit = getProject.getLogger.lifecycle(s"Skipping DocBook data generation: $message")
+    //    val classesTask: Option[Task] = Gradle.getClassesTask(getProject)
     if (mainClass.isEmpty) info("Skipping DocBook data generation: dataGenerationClass is not set") else
 // TODO maybe instead of the Java plugin use special configuration (docBook :))?
     if (mainSourceSet.isEmpty) skipping("no Java plugin in the project") else
@@ -276,18 +297,13 @@ class ProcessDocBookTask extends DefaultTask {
 //    if (!didWork(classesTask.get)) skipping("'classes' task didn't do work") else
     {
       info(s"Running DocBook data generator $mainClass into $dataDirectory")
-      getProject.javaexec((exec: JavaExecSpec) => {
-        exec.setClasspath(mainSourceSet.get.getRuntimeClasspath)
-        exec.setMain(mainClass)
-        exec.args(dataDirectory.toString)
-       })
+      Gradle.javaexec(
+        getProject,
+        mainClass,
+        mainSourceSet.get.getRuntimeClasspath,
+        dataDirectory.toString
+       )
     }
-  }
-
-  private def didWork(classesTask: Task): Boolean = {
-    // Note: 'classes' task itself never does work: it has no action;
-    // at least for Scala, it depends on the tasks that actually do something - when there is something to do.
-    classesTask.getDidWork || classesTask.getTaskDependencies.getDependencies(classesTask).asScala.exists(_.getDidWork)
   }
 
   private def getMathJaxConfiguration: mathjax.Configuration = {

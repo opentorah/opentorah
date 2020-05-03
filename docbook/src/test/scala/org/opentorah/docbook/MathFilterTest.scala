@@ -111,7 +111,6 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
 //       |</article>""".stripMargin
 
   private def parse(string: String): String = {
-    // TODO when I was using custom Logger, I set it to 'test' here: print everything other than debug...
     // Saxon 6 returns unmodifiable DOM that breaks toString(); using Saxon 9.
     val result: Node = Saxon.Saxon9.parse(
       input = string,

@@ -71,7 +71,6 @@ object DocBookPlugin {
 
     @TaskAction def execute(): Unit = {
       val result = FopFonts.list(configurationFile = Layout.forProject(getProject).fopConfigurationFile)
-      // TODO logger.lifecycle()?
       System.out.print(result)
       System.out.flush()
     }

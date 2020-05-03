@@ -20,16 +20,16 @@ class PluginTestProject private(
   val layout: Layout = Layout.forRoot(projectDir)
 
   def write(): Unit = {
-    // TODO when I was using custom Logger, I set it to 'test' here: print everything other than debug...
-    def writeInto(file: File, replace: Boolean)(content: String): Unit =
-      Files.writeInto(file, replace, content)
-
     val documentName: String = "test"
 
     // reference plugin's root project
-    writeInto(layout.settingsGradle, replace = true)(content =
-      s"""|includeBuild '$pluginRootDir'
-          |""".stripMargin)
+    Files.write(
+      file = layout.settingsGradle,
+      replace = true,
+      content =
+        s"""|includeBuild '$pluginRootDir'
+            |""".stripMargin
+    )
 
     val substitutionsFormatted: String = if (substitutions.isEmpty) "" else {
       val contents: String = substitutions.map { case (name: String, value: String) =>
@@ -45,7 +45,10 @@ class PluginTestProject private(
 
     val outputFormats: String = if (isPdfEnabled) """ "html", "pdf" """ else """ "html" """
 
-    writeInto(layout.buildGradle, replace = true)(content =
+    Files.write(
+      file = layout.buildGradle,
+      replace = true,
+      content =
       s"""|plugins {
           |  id 'org.opentorah.docbook' version '1.0.0'
           |  id 'base'
@@ -68,7 +71,11 @@ class PluginTestProject private(
           |""".stripMargin
     )
 
-    writeInto(layout.inputFile(documentName), replace = false)(s"${Xml.header}\n$document")
+    Files.write(
+      file = layout.inputFile(documentName),
+      replace = false,
+      content = s"${Xml.header}\n$document"
+    )
   }
 
   def destroy(): Unit = Files.deleteFiles(projectDir)
