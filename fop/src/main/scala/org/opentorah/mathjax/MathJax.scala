@@ -91,7 +91,7 @@ object MathJax {
     configuration: Configuration
   ): MathJax = {
     val node: NodeFromArtifact = new NodeFromArtifact(
-      into = nodeRoot,
+      nodeRoot,
       distribution = new NodeDistribution(nodeVersion),
       nodeModulesParent
     )
