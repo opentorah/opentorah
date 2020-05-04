@@ -161,8 +161,8 @@ class ProcessDocBookTask extends DefaultTask {
 
     val mathJaxConfiguration: mathjax.Configuration = getMathJaxConfiguration
 
-    Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout)
-    Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout)
+    val xslt1artifact = Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout)
+    val xslt2artifact = Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout)
 
     val substitutionsMap: Map[String, String] = substitutions.get.asScala.toMap
 
@@ -183,7 +183,7 @@ class ProcessDocBookTask extends DefaultTask {
     Files.write(
       file = layout.catalogFile,
       replace = true,
-      content = Write.xmlCatalog(layout)
+      content = Write.xmlCatalog(layout, xslt1artifact, xslt2artifact)
     )
 
     Files.write(

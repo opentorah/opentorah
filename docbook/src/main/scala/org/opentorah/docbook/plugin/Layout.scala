@@ -3,6 +3,7 @@ package org.opentorah.docbook.plugin
 import java.io.File
 import org.gradle.api.Project
 import org.opentorah.docbook.section.{DocBook2, Section}
+import org.opentorah.util.Files
 
 // There seems to be no point in caching anything under `.gradle`:
 // - Gradle caches artifacts elsewhere;
@@ -80,8 +81,8 @@ final class Layout(val frameworksDir: File, val projectDir: File, val buildDir: 
   def j2v8LibraryDirectory: File = frameworkDirectory("j2v8library")
 
   // build/docBookXslt[2]
-  def docBookXslDirectory(docBookXslDirectoryName: String): File = buildDirectory(docBookXslDirectoryName)
-  def docBookXslDirectoryRelative(docBookXslDirectoryName: String): String = buildDirectoryRelative(docBookXslDirectoryName)
+  def docBookXslDirectory(artifactName: String): File =
+    Files.file(frameworksDir, Seq("docBookXsl", artifactName))
 
   // build/data
   private def dataDirectoryName: String = "data"

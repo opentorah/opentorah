@@ -16,7 +16,7 @@ object Write {
        |</article>
        |""".stripMargin
 
-  def xmlCatalog(layout: Layout): String = {
+  def xmlCatalog(layout: Layout, xslt1artifact: String, xslt2artifact: String): String = {
     val data: String = layout.dataDirectoryRelative
 
     s"""${Xml.header}
@@ -36,11 +36,11 @@ object Write {
        |
        |    <!-- DocBook XSLT 1.0 stylesheets  -->
        |    <rewriteURI uriStartString="http://docbook.sourceforge.net/release/xsl-ns/current/"
-       |                rewritePrefix="${layout.docBookXslDirectoryRelative(Stylesheets.xslt1.directoryName)}"/>
+       |                rewritePrefix="${layout.docBookXslDirectory(xslt1artifact)}/"/>
        |
        |    <!-- DocBook XSLT 2.0 stylesheets  -->
        |    <rewriteURI uriStartString="https://cdn.docbook.org/release/latest/xslt/"
-       |                rewritePrefix="${layout.docBookXslDirectoryRelative(Stylesheets.xslt2.directoryName)}"/>
+       |                rewritePrefix="${layout.docBookXslDirectory(xslt2artifact)}/"/>
        |
        |    <!-- generated data -->
        |    <rewriteSystem systemIdStartString="data:/"
