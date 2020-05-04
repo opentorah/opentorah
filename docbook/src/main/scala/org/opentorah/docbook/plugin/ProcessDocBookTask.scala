@@ -252,7 +252,6 @@ class ProcessDocBookTask extends DefaultTask {
       nodeRoot = layout.nodeRoot,
       nodeVersion = nodeVersion.get,
       overwriteNode = false,
-      nodeModulesParent = layout.nodeRoot,
       overwriteMathJax = false,
       j2v8Parent = if (!useJ2V8.get) None else Some(layout.j2v8LibraryDirectory),
       configuration = mathJaxConfiguration))

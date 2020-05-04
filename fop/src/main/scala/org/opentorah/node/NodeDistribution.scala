@@ -1,7 +1,10 @@
 package org.opentorah.node
 
 import java.io.File
-import org.opentorah.util.{Architecture, Os, Platform}
+import java.nio.file.{Files, Path, Paths}
+import org.gradle.api.Project
+import org.opentorah.util.{Architecture, Gradle, Os, Platform}
+import org.slf4j.{Logger, LoggerFactory}
 
 // Heavily inspired by (read: copied and reworked from :)) https://github.com/srs/gradle-node-plugin by srs.
 // That plugin is not used directly because its tasks are not reusable unless the plugin is applied to the project,
@@ -11,6 +14,8 @@ import org.opentorah.util.{Architecture, Os, Platform}
 
 // Describes Node distribution's packaging and structure.
 final class NodeDistribution(val version: String) {
+  private val logger: Logger = LoggerFactory.getLogger(classOf[NodeDistribution])
+
   val os: Os = Platform.getOs
   val architecture: Architecture = Platform.getArch
 
@@ -68,14 +73,51 @@ final class NodeDistribution(val version: String) {
 
   def hasBinSubdirectory: Boolean = !isWindows
 
-  def root(nodeRoot: File): File = new File(nodeRoot, topDirectory)
+  def install(
+    project: Project,
+    into: File,
+    overwrite: Boolean
+  ): Node = {
+    val root: File = new File(into, topDirectory)
+    val bin: File = if (hasBinSubdirectory) new File(root, "bin") else root
 
-  def bin(into: File): File = {
-    val result = root(into)
-    if (hasBinSubdirectory) new File(result, "bin") else result
+    val result = new Node(
+      nodeModulesParent = root,
+      nodeExec = new File(bin, if (isWindows) "node.exe" else "node"),
+      npmExec = new File(bin, if (isWindows) "npm.cmd" else "npm")
+    )
+
+    if (!overwrite && result.exists) logger.info(s"Existing installation detected: $result") else {
+      logger.info(s"Installing $this as $result")
+
+      val artifact: File = Gradle.getArtifact(
+        project,
+        repositoryUrl = "https://nodejs.org/dist",
+        artifactPattern = "v[revision]/[artifact](-v[revision]-[classifier]).[ext]",
+        ivy = "v[revision]/ivy.xml",
+        dependencyNotation
+      )
+
+      Gradle.unpack(
+        project,
+        archiveFile = artifact,
+        isZip,
+        into
+      )
+
+      if (!isWindows) {
+        val npm: Path = result.npmExec.toPath
+        val deleted: Boolean = Files.deleteIfExists(npm)
+        if (deleted) {
+          val npmCliJs: String = new File(root, s"lib/node_modules/npm/bin/npm-cli.js").getAbsolutePath
+          Files.createSymbolicLink(
+            npm,
+            bin.toPath.relativize(Paths.get(npmCliJs))
+          )
+        }
+      }
+    }
+
+    result
   }
-
-  def nodeExec(into: File): File = new File(bin(into), if (isWindows) "node.exe" else "node")
-
-  def npmExec(into: File): File = new File(bin(into), if (isWindows) "npm.cmd" else "npm")
 }

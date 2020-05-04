@@ -71,13 +71,12 @@ final class Layout(val frameworksDir: File, val projectDir: File, val buildDir: 
   def buildFile(name: String): File = new File(buildDir, name)
   def buildDirectoryRelative(name: String): String = s"$buildDirRelative/$name/"
 
-  // Node
+  // Node: ~/.gradle/nodejs
   def nodeRoot: File = frameworkDirectory("nodejs")
   def j2v8LibraryDirectory: File = frameworkDirectory("j2v8library")
 
-  // build/docBookXslt[2]
-  def docBookXslDirectory(artifactName: String): File =
-    Files.file(frameworksDir, Seq("docbook", artifactName))
+  // DocBook XSLT: ~/.gradle/docbook
+  val docBookXslDirectory: File = Files.file(frameworksDir, Seq("docbook"))
 
   // build/data
   private def dataDirectoryName: String = "data"

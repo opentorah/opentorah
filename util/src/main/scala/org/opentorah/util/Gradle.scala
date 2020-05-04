@@ -23,7 +23,10 @@ object Gradle {
     val dependency: Dependency = project.getDependencies.create(dependencyNotation)
     val configuration: Configuration = project.getConfigurations.detachedConfiguration(dependency)
     configuration.setTransitive(false)
-    configuration.getSingleFile
+    val result: File = configuration.getSingleFile
+
+    logger.info(s"Resolved: $result")
+    result
   }
 
   def getArtifact(

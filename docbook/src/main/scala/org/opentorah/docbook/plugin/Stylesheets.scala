@@ -21,7 +21,7 @@ trait Stylesheets {
     val dependencyNotation: String = s"$groupId:$artifactId:$version$classifierStr@$extension"
 
     val file: File = Gradle.getArtifact(project, dependencyNotation)
-    val into: File = layout.docBookXslDirectory(file.getName)
+    val into: File = new File(layout.docBookXslDirectory, file.getName)
     val directory: File = Files.file(into, archiveSubdirectoryPath)
     if (!directory.exists) Gradle.unpack(
       project,
