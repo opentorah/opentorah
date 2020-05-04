@@ -82,7 +82,7 @@ object By extends Component("by") {
           val result: Seq[String] = Files.filesWithExtensions(Files.url2file(directory), "xml").sorted
           if (Files.isFile(list)) Files.write(
             file = Files.url2file(list),
-            content = Xml.xmlHeader + new PaigesPrettyPrinter().render(filesList.toXml(result)) + "\n"
+            content = Xml.header + "\n" + new PaigesPrettyPrinter().render(filesList.toXml(result)) + "\n"
           )
           result
         }

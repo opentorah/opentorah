@@ -15,6 +15,7 @@ configureLibrary(projectTags)
 
 dependencies {
   implementation project(':fop')
+  implementation project(':xml')
   implementation project(':util')
 
   // added by the 'java-gradle-plugin': testImplementation gradleTestKit()
@@ -23,15 +24,6 @@ dependencies {
 // run tests sequentially
 test {
   maxParallelForks = 1
-}
-
-jar {
-  manifest {
-    attributes(
-      'Implementation-Title'  : project.description,
-      'Implementation-Version': project.version
-    )
-  }
 }
 
 gradlePlugin {

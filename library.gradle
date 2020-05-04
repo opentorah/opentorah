@@ -24,6 +24,18 @@ ext.configureLibrary = {
 //    "  artifactId =$projectArtifact;\n"
 //  )
 
+  // Because why not?
+  jar {
+    manifest {
+      attributes(
+        'Implementation-Title'  : projectDescription,
+        'Implementation-Version': projectVersion
+      )
+    }
+  }
+
+  jar.archiveBaseName.set(projectArtifact)
+
   // Gradle plugin [publishing?] plugin, if it is applied, adds tasks publishPluginJar and
   // publishPluginJavaDocsJar that create sources and javadoc archives;
   // attempts to use them as artifacts in the Maven publication failed,
@@ -40,8 +52,6 @@ ext.configureLibrary = {
   }
   scaladocJar.dependsOn scaladoc
 
-  jar.archiveBaseName.set(projectArtifact)
-
   publishing {
     publications {
       bintrayMavenPublication(MavenPublication) {
@@ -53,7 +63,7 @@ ext.configureLibrary = {
 
         artifact sourceJar
         // TODO didn't work for Scala 2.13 in Gradle 6.0...
-        artifact scaladocJar
+        ///// artifact scaladocJar
 
         pom {
           name = projectName

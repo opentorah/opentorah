@@ -2,8 +2,7 @@ package org.opentorah.docbook.plugin
 
 import java.io.File
 import org.gradle.api.Project
-import org.opentorah.util.Gradle
-import org.slf4j.{Logger, LoggerFactory}
+import org.opentorah.util.{Files, Gradle}
 
 trait Stylesheets {
   protected def name: String
@@ -15,34 +14,27 @@ trait Stylesheets {
 
   def uri: String
 
-  def directoryName: String
+  protected def archiveSubdirectoryPath: Seq[String]
 
-  protected def archiveSubdirectoryName: String
+  def unpack(version: String, project: Project, layout: Layout): File = {
+    val classifierStr: String = classifier.fold("")(classifier => s":$classifier")
+    val dependencyNotation: String = s"$groupId:$artifactId:$version$classifierStr@$extension"
 
-  def unpack(version: String, project: Project, layout: Layout): Unit = {
-    val directory: File = layout.docBookXslDirectory(directoryName)
-    if (!directory.exists) {
-      val classifierStr: String = classifier.fold("")(classifier => s":$classifier")
-      val dependencyNotation: String = s"$groupId:$artifactId:$version$classifierStr@$extension"
+    val file: File = Gradle.getArtifact(project, dependencyNotation)
+    val into: File = layout.docBookXslDirectory(file.getName)
+    val directory: File = Files.file(into, archiveSubdirectoryPath)
+    if (!directory.exists) Gradle.unpack(
+      project,
+      file,
+      isZip = true,
+      into
+    )
 
-      Stylesheets.logger.info(s"Retrieving DocBook $name stylesheets: $dependencyNotation")
-      val file: File = Gradle.getArtifact(project, dependencyNotation)
-
-      Stylesheets.logger.info(s"Unpacking ${file.getName}")
-      Gradle.extract(
-        project,
-        zipFile = file,
-        toExtract = archiveSubdirectoryName,
-        isDirectory = true,
-        into = directory
-      )
-    }
+    directory
   }
 }
 
 object Stylesheets {
-  private val logger: Logger = LoggerFactory.getLogger(classOf[Stylesheets])
-
   object xslt1 extends Stylesheets {
     override def name: String = "XSLT"
     override def groupId: String = "net.sf.docbook"
@@ -56,8 +48,7 @@ object Stylesheets {
     override def extension: String = "zip"
 
     override def uri: String = "http://docbook.sourceforge.net/release/xsl-ns/current"
-    override def directoryName: String = "docBookXsl"
-    override def archiveSubdirectoryName: String = "docbook"
+    override def archiveSubdirectoryPath: Seq[String] = Seq("docbook")
   }
 
   object xslt2 extends Stylesheets {
@@ -68,8 +59,7 @@ object Stylesheets {
     override def extension: String = "jar"
 
     override def uri: String = "https://cdn.docbook.org/release/latest/xslt"
-    override def directoryName: String = "docBookXsl2"
-    override def archiveSubdirectoryName: String = "xslt/base"
+    override def archiveSubdirectoryPath: Seq[String] = Seq("xslt", "base")
   }
 
   def apply(useXslt2: Boolean): Stylesheets = if (useXslt2) xslt2 else xslt1

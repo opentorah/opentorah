@@ -11,24 +11,17 @@ description = 'FOP MathJax plugin'
 configureLibrary(['Scala', 'MathML', 'MathJax', 'JEuclid', 'FOP', 'Pdf'])
 
 dependencies {
-/// TODO resolve name-clash with xml.Attribute (xml.Xml) - and then, implementation project(':xml')!
   implementation project(':util')
+  implementation project(':xml')
 
-  // XMLResolver
   implementation "org.xmlresolver:xmlresolver:$xmlresolverVersion"
-
-  // Saxon 6 (XSLT 1.0)
   implementation "saxon:saxon:$saxon6Version"
-
-  // Saxon 9 (XSLT 2.0)
   implementation "net.sf.saxon:Saxon-HE:$saxon9Version"
-
-  // Xerces
   implementation "xerces:xercesImpl:$xercesVersion"
 
   // FOP
   // FOP 2.4 uses JAI and JAI Codec from JBoss repository;
-  // since at plugin application time it is to late to define the repository *or* to substitute JAI modules with the
+  // since at plugin application time it is too late to define the repository *or* to substitute JAI modules with the
   // ones from JCenter, and I do not want every project that uses the plugin to have to do either,
   // I exclude them and add the ones from JCenter;
   // I have to also exclude FOP from the JEuclid dependencies lest it drags the JAI back in...
@@ -40,16 +33,16 @@ dependencies {
   implementation "javax.media.jai:com.springsource.javax.media.jai.core:$jaiVersion"
   implementation "javax.media.jai:com.springsource.javax.media.jai.codec:$jaiVersion"
 
-  // JEuclid
-  implementation ("de.rototor.jeuclid:jeuclid-fop:$jeuclidFopVersion") {
-    exclude group: 'org.apache.xmlgraphics', module: 'fop'
-  }
+  // Hyphenation patterns
+  implementation "net.sf.offo:fop-hyph:$fopHyphVersion"
 
   implementation "org.apache.xmlgraphics:batik-transcoder:$batikVersion"
   implementation "org.apache.xmlgraphics:batik-extension:$batikVersion"
 
-  // Hyphenation patterns
-  implementation "net.sf.offo:fop-hyph:$fopHyphVersion"
+  // JEuclid
+  implementation ("de.rototor.jeuclid:jeuclid-fop:$jeuclidFopVersion") {
+    exclude group: 'org.apache.xmlgraphics', module: 'fop'
+  }
 
   // J2V8 integration
   // Note: Native library (if needed and available) is loaded from a dynamically retrieved artifact,
@@ -63,13 +56,4 @@ dependencies {
   implementation "com.eclipsesource.j2v8:j2v8_linux_x86_64:$j2v8Version"
 
   implementation gradleApi()
-}
-
-jar {
-  manifest {
-    attributes(
-      'Implementation-Title'  : project.description,
-      'Implementation-Version': project.version
-    )
-  }
 }

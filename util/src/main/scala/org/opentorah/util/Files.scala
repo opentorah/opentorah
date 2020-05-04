@@ -33,7 +33,12 @@ object Files {
   def prefixedDirectory(directory: File, prefix: Option[String]): File =
     prefix.fold(directory)(prefix => new File(directory, prefix))
 
+  def write(file: File, replace: Boolean, content: String): Unit =
+    if (!replace && file.exists) logger.debug(s"Already exists: $file")
+    else write(file, content)
+
   def write(file: File, content: String): Unit = {
+    logger.debug(s"Writing $file")
     file.getParentFile.mkdirs()
     val writer: BufferedWriter = new BufferedWriter(new FileWriter(file))
     try {
@@ -42,14 +47,6 @@ object Files {
       writer.close()
     }
   }
-
-  def writeInto(file: File, replace: Boolean, content: String): Unit =
-    if (!replace && file.exists) {
-      logger.debug(s"Already exists: $file")
-    } else {
-      logger.debug(s"Writing $file")
-      org.opentorah.util.Files.write(file, content)
-    }
 
   def read(file: File): Seq[String] = {
     val source = Source.fromFile(file)

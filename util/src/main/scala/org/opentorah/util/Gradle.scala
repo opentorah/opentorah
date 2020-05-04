@@ -4,17 +4,22 @@ import java.io.File
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.artifacts.repositories.{ArtifactRepository, IvyArtifactRepository, IvyPatternRepositoryLayout}
 import org.gradle.api.artifacts.{Configuration, Dependency}
-import org.gradle.api.file.{CopySpec, FileCopyDetails, RelativePath}
+import org.gradle.api.file.{CopySpec, FileCollection, FileCopyDetails, RelativePath}
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.{Project, Task}
+import org.gradle.process.{ExecResult, JavaExecSpec}
+import org.slf4j.{Logger, LoggerFactory}
 
-// TODO for Scala 2.13: import scala.jdk.CollectionConverters._
 import scala.collection.JavaConverters._
 
 object Gradle {
 
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
   def getArtifact(project: Project, dependencyNotation: String): File = {
+    logger.info(s"Resolving $dependencyNotation")
+
     val dependency: Dependency = project.getDependencies.create(dependencyNotation)
     val configuration: Configuration = project.getConfigurations.detachedConfiguration(dependency)
     configuration.setTransitive(false)
@@ -61,6 +66,9 @@ object Gradle {
   }
 
   def unpack(project: Project, archiveFile: File, isZip: Boolean, into: File): Unit = {
+    logger.info(s"Unpacking $archiveFile into $into")
+
+    into.mkdir()
     project.copy((copySpec: CopySpec) => copySpec
       .from(if (isZip) project.zipTree(archiveFile) else project.tarTree(archiveFile))
       .into(into)
@@ -71,6 +79,7 @@ object Gradle {
   // Gradle 5 did not get the new API to do this easier:
   //   https://github.com/gradle/gradle/issues/1108
   //   https://github.com/gradle/gradle/pull/5405
+  // Anyway, I ended up not using it (currently)...
   def extract(project: Project, zipFile: File, toExtract: String, isDirectory: Boolean, into: File): Unit = {
     val toDrop: Int = toExtract.count(_ == '/') + (if (isDirectory) 1 else 0)
     project.copy((copySpec: CopySpec) => copySpec
@@ -101,10 +110,29 @@ object Gradle {
 
   def getTask(project: Project, name: String): Option[Task] = Option(project.getTasks.findByName(name))
 
+  def getClassesTask(project: Project): Option[Task] = getTask(project, "classes")
+
+  // Note: 'classes' task itself never does work: it has no action;
+  // at least for Scala, it depends on the tasks that actually do something - when there is something to do.
+  def didWork(classesTask: Task): Boolean = {
+    classesTask.getDidWork || classesTask.getTaskDependencies.getDependencies(classesTask).asScala.exists(_.getDidWork)
+  }
+
   def mainSourceSet(project: Project): Option[SourceSet] =
     Option(project.getConvention.findPlugin(classOf[JavaPluginConvention]))
       .map(_.getSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME))
 
   def classesDirs(project: Project): Set[File] =
     mainSourceSet(project).fold(Set.empty[File])(_.getOutput.getClassesDirs.getFiles.asScala.toSet)
+
+  def javaexec(
+    project: Project,
+    mainClass: String,
+    classpath: FileCollection,
+    args: String*
+  ): ExecResult = project.javaexec((exec: JavaExecSpec) => {
+    exec.setClasspath(classpath)
+    exec.setMain(mainClass)
+    exec.args(args: _*)
+  })
 }

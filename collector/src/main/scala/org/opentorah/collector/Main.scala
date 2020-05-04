@@ -61,7 +61,7 @@ object Main {
   private def prettyPrint(store: Store, prettyPrinter: PaigesPrettyPrinter, toXml: => Elem): Unit =
     for (fromUrl <- store.urls.fromUrl) if (Files.isFile(fromUrl)) Files.write(
       file = Files.url2file(fromUrl),
-      content = Xml.xmlHeader + prettyPrinter.render(toXml) + "\n"
+      content = Xml.header + "\n" + prettyPrinter.render(toXml) + "\n"
     )
 
   private def checkReference(reference: EntityReference,  findByRef: String => Option[Entity]): Option[String] = {

@@ -1,5 +1,6 @@
 package org.opentorah.docbook.plugin
 
+import java.io.File
 import org.opentorah.docbook.section.{DocBook2, HtmlCommon, Section}
 import org.opentorah.mathjax.Configuration
 import org.opentorah.util.Json
@@ -16,7 +17,7 @@ object Write {
        |</article>
        |""".stripMargin
 
-  def xmlCatalog(layout: Layout): String = {
+  def xmlCatalog(layout: Layout, xslt1: File, xslt2: File): String = {
     val data: String = layout.dataDirectoryRelative
 
     s"""${Xml.header}
@@ -36,11 +37,11 @@ object Write {
        |
        |    <!-- DocBook XSLT 1.0 stylesheets  -->
        |    <rewriteURI uriStartString="http://docbook.sourceforge.net/release/xsl-ns/current/"
-       |                rewritePrefix="${layout.docBookXslDirectoryRelative(Stylesheets.xslt1.directoryName)}"/>
+       |                rewritePrefix="$xslt1/"/>
        |
        |    <!-- DocBook XSLT 2.0 stylesheets  -->
        |    <rewriteURI uriStartString="https://cdn.docbook.org/release/latest/xslt/"
-       |                rewritePrefix="${layout.docBookXslDirectoryRelative(Stylesheets.xslt2.directoryName)}"/>
+       |                rewritePrefix="$xslt2/"/>
        |
        |    <!-- generated data -->
        |    <rewriteSystem systemIdStartString="data:/"
@@ -53,7 +54,7 @@ object Write {
        |                   rewritePrefix="$data"/>
        |    <rewriteSystem systemIdStartString="urn:docbook:data/"
        |                   rewritePrefix="$data"/>
-       |    <rewriteSystem systemIdStartString="http://podval.org/docbook/data/"
+       |    <rewriteSystem systemIdStartString="http://opentorah.org/docbook/data/"
        |                   rewritePrefix="$data"/>
        |  </group>
        |

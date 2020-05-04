@@ -6,7 +6,6 @@ import org.opentorah.mathjax
 import org.opentorah.docbook.section.DocBook2
 
 import scala.beans.BeanProperty
-// TODO for Scala 2.13: import scala.jdk.CollectionConverters._
 import scala.collection.JavaConverters._
 
 // Properties are annotated with @BeanProperty to make them visible to Gradle.
@@ -61,6 +60,7 @@ class Extension(project: Project) {
   epubEmbeddedFonts.set(List.empty.asJava)
 
   mathJax.isEnabled.set(false)
+  mathJax.nodeVersion.set("14.1.0")
   mathJax.useJ2V8.set(false)
   mathJax.font.set(mathjax.Configuration.defaultFont)
   mathJax.extensions.set(List.empty.asJava)

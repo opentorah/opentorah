@@ -40,7 +40,7 @@ object Input {
     * Type of the input: TeX, MathML, AsciiMath.
     */
   @SerialVersionUID(1L)
-  case object Attribute extends org.opentorah.xml.Attribute[Input] {
+  case object Attribute extends org.opentorah.xml.AttributeX[Input] {
     override def namespace: Namespace = MathJax.Namespace
 
     override def name: String = "input"

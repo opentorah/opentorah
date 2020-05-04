@@ -7,8 +7,6 @@ import org.gradle.api.Project
 import org.opentorah.util.Collections.mapValues
 import org.opentorah.util.Gradle
 import org.slf4j.{Logger, LoggerFactory}
-
-// TODO for Scala 2.13: import scala.jdk.CollectionConverters._
 import scala.collection.JavaConverters._
 
 final class J2V8(libraryPath: String) {
@@ -69,12 +67,10 @@ object J2V8 {
         logger.info(s"Resolved $distribution artifact: $artifact")
 
         into.mkdirs()
-
-        Gradle.extract(
+        Gradle.unpack(
           project,
-          zipFile = artifact,
-          toExtract = libraryName,
-          isDirectory = false,
+          artifact,
+          isZip = true,
           into
         )
 

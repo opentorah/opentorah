@@ -3,7 +3,7 @@ package org.opentorah.mathjax
 import java.io.{InputStream, StringBufferInputStream}
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory
 import org.apache.fop.util.UnclosableInputStream
-import org.opentorah.xml.Xml
+import org.opentorah.xml.Xerces
 import org.w3c.dom.svg.SVGDocument
 
 object Svg {
@@ -32,8 +32,8 @@ object Svg {
     // So, I bracket the invocation that triggers that code and restore whatever was there (if there was anything).
     val propertyName: String = classOf[javax.xml.parsers.SAXParserFactory].getName
     val original: String = System.getProperty(propertyName)
-    System.setProperty(propertyName, Xml.saxParserFactoryName)
-    val result = new SAXSVGDocumentFactory(Xml.saxParserName)
+    System.setProperty(propertyName, Xerces.saxParserFactoryName)
+    val result = new SAXSVGDocumentFactory(Xerces.saxParserName)
     if (original != null) System.setProperty(propertyName, original)
     result
   }

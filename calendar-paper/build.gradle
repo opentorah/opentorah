@@ -13,4 +13,4 @@ dependencies {
 }
 
 // To ensure calendar library is built before it is used:
-site.dependsOn(':calendar:assemble')
+processDocBook.dependsOn(':calendar:assemble')

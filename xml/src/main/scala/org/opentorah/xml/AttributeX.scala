@@ -1,13 +1,12 @@
 package org.opentorah.xml
 
-import org.w3c.dom.{Document, Element}
+import org.w3c.dom.{Document, Element => DomElement}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
-// TODO merge into org.opentorah.xml package
 // Type-safe XML attribute get/set - for use in DOM and SAX.
 // Inspired by net.sourceforge.jeuclid.context.Parameter and friends.
-trait Attribute[T] {
+trait AttributeX[T] {
   def namespace: Namespace
 
   def name: String
@@ -19,7 +18,7 @@ trait Attribute[T] {
   def toString(value: T): String
 
   final def get(document: Document): Option[T] = {
-    val element: Element = document.getDocumentElement
+    val element: DomElement = document.getDocumentElement
     get(element.getAttributeNS(namespace.uri, name))
   }
 
@@ -86,33 +85,33 @@ trait Attribute[T] {
     Option(value).filter(_.nonEmpty).map(fromString)
 }
 
-object Attribute {
+object AttributeX {
 
-  trait BooleanAttribute extends Attribute[Boolean] {
+  trait BooleanAttribute extends AttributeX[Boolean] {
     override def fromString(value: String): Boolean = value.toBoolean
 
     override def toString(value: Boolean): String = value.toString
   }
 
-  trait StringAttribute extends Attribute[String] {
+  trait StringAttribute extends AttributeX[String] {
     override def fromString(value: String): String = value
 
     override def toString(value: String): String = value
   }
 
-  trait FloatAttribute extends Attribute[Float] {
+  trait FloatAttribute extends AttributeX[Float] {
     override def fromString(value: String): Float = value.toFloat
 
     override def toString(value: Float): String = value.toString
   }
 
-  trait IntAttribute extends Attribute[Int] {
+  trait IntAttribute extends AttributeX[Int] {
     override def fromString(value: String): Int = value.toInt
 
     override def toString(value: Int): String = value.toString
   }
 
-  trait StringListAttribute extends Attribute[List[String]] {
+  trait StringListAttribute extends AttributeX[List[String]] {
     override def fromString(value: String): List[String] = value.split(",").toList.map(_.trim)
 
     override def toString(value: List[String]): String = value.mkString(",")

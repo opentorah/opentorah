@@ -4,14 +4,9 @@ import javax.xml.parsers.SAXParserFactory
 import org.w3c.dom.Node
 import org.xml.sax.{XMLFilter, XMLReader}
 
-object Xml {
+object Xerces {
 
-  // TODO move into org.opentorah.xml package
-  val header: String = """<?xml version="1.0" encoding="UTF-8"?>"""
-
-  // TODO move into org.opentorah.xml package
-  val header16: String = """<?xml version="1.0" encoding="UTF-16"?>"""
-
+  // TODO switch to PaigesPrettyPrinter...
   def toString(node: Node): String = xmlSerializer.writeToString(node)
 
   private val xmlSerializer: org.apache.xml.serializer.dom3.LSSerializerImpl = {

@@ -1,17 +1,15 @@
 package org.opentorah.docbook.plugin
 
 import java.io.File
-
 import org.gradle.api.Project
 import org.opentorah.docbook.section.{DocBook2, Section}
+import org.opentorah.util.Files
 
-final class Layout(val projectDir: File, val buildDir: File) {
-  // I do not see any point in caching anything under `.gradle`:
-  // - Gradle caches artifacts elsewhere;
-  // - NPM caches packages that it retrieves.
-  // If there turns out to be a point in this, do it for both Node and DocBook.
-  // private def cacheDirectory(name: String): File = new File(new File(projectDir, ".gradle"), name)
+// Although Gradle caches resolved artifacts and npm caches packages that it retrieves,
+// unpacking frameworks under `/build` after each `./gradlew clean` takes noticeable time -
+// around 14 seconds; so, I am caching unpacked frameworks under `~/.gradle`.
 
+final class Layout(val frameworksDir: File, val projectDir: File, val buildDir: File) {
   def settingsGradle: File = new File(projectDir, "settings.gradle")
   def buildGradle: File = new File(projectDir, "build.gradle")
 
@@ -61,6 +59,9 @@ final class Layout(val projectDir: File, val buildDir: File) {
   def testResource(name: String): File =
     new File(new File(new File(new File(projectDir, "src"), "test"), "resources"), name)
 
+  // frameworks
+  def frameworkDirectory(name: String): File = new File(frameworksDir, name)
+
   // build/
   private def buildDirRelative: String =
     if (buildDir.getParentFile == projectDir) buildDir.getName
@@ -71,12 +72,12 @@ final class Layout(val projectDir: File, val buildDir: File) {
   def buildDirectoryRelative(name: String): String = s"$buildDirRelative/$name/"
 
   // Node
-  def nodeRoot: File = buildDirectory("nodejs")
-  def j2v8LibraryDirectory: File = buildDirectory("j2v8library")
+  def nodeRoot: File = frameworkDirectory("nodejs")
+  def j2v8LibraryDirectory: File = frameworkDirectory("j2v8library")
 
   // build/docBookXslt[2]
-  def docBookXslDirectory(docBookXslDirectoryName: String): File = buildDirectory(docBookXslDirectoryName)
-  def docBookXslDirectoryRelative(docBookXslDirectoryName: String): String = buildDirectoryRelative(docBookXslDirectoryName)
+  def docBookXslDirectory(artifactName: String): File =
+    Files.file(frameworksDir, Seq("docbook", artifactName))
 
   // build/data
   private def dataDirectoryName: String = "data"
@@ -164,11 +165,17 @@ object Layout {
     def outputFile(docBook2: DocBook2): File
   }
 
-  def forProject(project: Project): Layout =
-    new Layout(project.getProjectDir, project.getBuildDir)
+  def forProject(project: Project): Layout = new Layout(
+    frameworksDir = project.getGradle.getGradleUserHomeDir,
+    projectDir = project.getProjectDir,
+    buildDir = project.getBuildDir
+  )
 
-  def forRoot(root: File): Layout =
-    new Layout(root, new File(root, "build"))
+  def forRoot(root: File): Layout = new Layout(
+    frameworksDir = new File(root, "build"),
+    projectDir = root,
+    buildDir = new File(root, "build")
+  )
 
   def forCurrent: Layout =
     forRoot(new File(".").getAbsoluteFile.getParentFile)

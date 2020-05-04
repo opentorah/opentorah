@@ -34,7 +34,7 @@ class MathJaxTest extends AnyFlatSpecLike with Matchers {
       substring(log, MathJax.logSep, MathJax.logEnd) shouldBe svgExpected
     }
 
-    test(useJ2V8 = true)
+///    test(useJ2V8 = true)
     test(useJ2V8 = false)
   }
 

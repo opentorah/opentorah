@@ -4,7 +4,6 @@ import java.io.File
 import com.eclipsesource.v8._
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.opentorah.node.{J2V8, Node}
-// TODO for Scala 2.13: import scala.jdk.CollectionConverters._
 import scala.collection.JavaConverters._
 
 // NOTE: some tests failed unless I typeset specific TeX math first; some - even then;

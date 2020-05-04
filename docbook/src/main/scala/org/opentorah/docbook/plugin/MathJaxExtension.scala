@@ -9,6 +9,9 @@ class MathJaxExtension @javax.inject.Inject() (project: Project) {
   @BeanProperty val isEnabled: Property[Boolean] =
     project.getObjects.property(classOf[Boolean])
 
+  @BeanProperty val nodeVersion: Property[String] =
+    project.getObjects.property(classOf[String])
+
   @BeanProperty val useJ2V8: Property[Boolean] =
     project.getObjects.property(classOf[Boolean])
 
