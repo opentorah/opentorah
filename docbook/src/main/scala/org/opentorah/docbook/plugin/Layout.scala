@@ -5,14 +5,9 @@ import org.gradle.api.Project
 import org.opentorah.docbook.section.{DocBook2, Section}
 import org.opentorah.util.Files
 
-// There seems to be no point in caching anything under `.gradle`:
-// - Gradle caches artifacts elsewhere;
-// - NPM caches packages that it retrieves.
-// On the other hand, Node installation after `./gradlew clean` takes a while:
-// - maybe it gets retrieved every time instead of re-using cached artifact?
-// - maybe Node modules caching doesn't work?
-// - maybe unpacking and npmInstall take their time even if everything is cached?
-// Let's try caching the frameworks under ~/.gradle for project-based layouts...
+// Although Gradle caches resolved artifacts and npm caches packages that it retrieves,
+// unpacking frameworks under `/build` after each `./gradlew clean` takes noticeable time -
+// around 14 seconds; so, I am caching unpacked frameworks under `~/.gradle`.
 
 final class Layout(val frameworksDir: File, val projectDir: File, val buildDir: File) {
   def settingsGradle: File = new File(projectDir, "settings.gradle")
@@ -82,7 +77,7 @@ final class Layout(val frameworksDir: File, val projectDir: File, val buildDir: 
 
   // build/docBookXslt[2]
   def docBookXslDirectory(artifactName: String): File =
-    Files.file(frameworksDir, Seq("docBookXsl", artifactName))
+    Files.file(frameworksDir, Seq("docbook", artifactName))
 
   // build/data
   private def dataDirectoryName: String = "data"

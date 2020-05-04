@@ -55,7 +55,7 @@ object MathJax {
   val packageName: String = "mathjax-node"
 
   object Namespace extends Namespace(
-    uri = "http://podval.org/mathjax/ns/ext",
+    uri = "http://opentorah.org/mathjax/ns/ext",
     prefix = "mathjax"
   )
 

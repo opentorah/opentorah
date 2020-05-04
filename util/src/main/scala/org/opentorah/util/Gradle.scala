@@ -9,12 +9,17 @@ import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.{Project, Task}
 import org.gradle.process.{ExecResult, JavaExecSpec}
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
 
 object Gradle {
 
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
   def getArtifact(project: Project, dependencyNotation: String): File = {
+    logger.info(s"Resolving $dependencyNotation")
+
     val dependency: Dependency = project.getDependencies.create(dependencyNotation)
     val configuration: Configuration = project.getConfigurations.detachedConfiguration(dependency)
     configuration.setTransitive(false)
@@ -61,6 +66,8 @@ object Gradle {
   }
 
   def unpack(project: Project, archiveFile: File, isZip: Boolean, into: File): Unit = {
+    logger.info(s"Unpacking $archiveFile into $into")
+
     into.mkdir()
     project.copy((copySpec: CopySpec) => copySpec
       .from(if (isZip) project.zipTree(archiveFile) else project.tarTree(archiveFile))
@@ -72,6 +79,7 @@ object Gradle {
   // Gradle 5 did not get the new API to do this easier:
   //   https://github.com/gradle/gradle/issues/1108
   //   https://github.com/gradle/gradle/pull/5405
+  // Anyway, I ended up not using it (currently)...
   def extract(project: Project, zipFile: File, toExtract: String, isDirectory: Boolean, into: File): Unit = {
     val toDrop: Int = toExtract.count(_ == '/') + (if (isDirectory) 1 else 0)
     project.copy((copySpec: CopySpec) => copySpec

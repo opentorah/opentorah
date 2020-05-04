@@ -10,7 +10,6 @@ import org.opentorah.docbook.section.{DocBook2, Section}
 import org.opentorah.fop.{Fop, FopFonts}
 import org.opentorah.mathjax
 import org.opentorah.mathjax.MathJax
-import org.opentorah.node.NodeDistribution
 import org.opentorah.util.Collections.mapValues
 import org.opentorah.util.{Files, Gradle}
 import org.opentorah.xml.{Namespace, Resolver}
@@ -110,6 +109,9 @@ class ProcessDocBookTask extends DefaultTask {
   @Input @BeanProperty val xslt2version: Property[String] =
     getProject.getObjects.property(classOf[String])
 
+  @Input @BeanProperty val nodeVersion: Property[String] =
+    getProject.getObjects.property(classOf[String])
+
   @Input @BeanProperty val cssFile: Property[String] =
     getProject.getObjects.property(classOf[String])
 
@@ -161,9 +163,6 @@ class ProcessDocBookTask extends DefaultTask {
 
     val mathJaxConfiguration: mathjax.Configuration = getMathJaxConfiguration
 
-    val xslt1artifact = Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout)
-    val xslt2artifact = Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout)
-
     val substitutionsMap: Map[String, String] = substitutions.get.asScala.toMap
 
     Files.write(
@@ -183,7 +182,10 @@ class ProcessDocBookTask extends DefaultTask {
     Files.write(
       file = layout.catalogFile,
       replace = true,
-      content = Write.xmlCatalog(layout, xslt1artifact, xslt2artifact)
+      content = Write.xmlCatalog(layout,
+        xslt1 = Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout),
+        xslt2 = Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout)
+      )
     )
 
     Files.write(
@@ -248,7 +250,7 @@ class ProcessDocBookTask extends DefaultTask {
     else Some(MathJax.get(
       getProject,
       nodeRoot = layout.nodeRoot,
-      nodeVersion = NodeDistribution.defaultVersion,
+      nodeVersion = nodeVersion.get,
       overwriteNode = false,
       nodeModulesParent = layout.nodeRoot,
       overwriteMathJax = false,

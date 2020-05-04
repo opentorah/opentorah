@@ -79,7 +79,3 @@ final class NodeDistribution(val version: String) {
 
   def npmExec(into: File): File = new File(bin(into), if (isWindows) "npm.cmd" else "npm")
 }
-
-object NodeDistribution {
-  val defaultVersion: String = "10.15.3"
-}

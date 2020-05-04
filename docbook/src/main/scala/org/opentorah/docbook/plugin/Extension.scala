@@ -60,6 +60,7 @@ class Extension(project: Project) {
   epubEmbeddedFonts.set(List.empty.asJava)
 
   mathJax.isEnabled.set(false)
+  mathJax.nodeVersion.set("14.1.0")
   mathJax.useJ2V8.set(false)
   mathJax.font.set(mathjax.Configuration.defaultFont)
   mathJax.extensions.set(List.empty.asJava)

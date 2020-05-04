@@ -67,12 +67,10 @@ object J2V8 {
         logger.info(s"Resolved $distribution artifact: $artifact")
 
         into.mkdirs()
-
-        Gradle.extract(
+        Gradle.unpack(
           project,
-          zipFile = artifact,
-          toExtract = libraryName,
-          isDirectory = false,
+          artifact,
+          isZip = true,
           into
         )
 
