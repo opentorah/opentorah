@@ -10,18 +10,22 @@ inspired by the ideas pioneered by the Maven plugin. More information about requ
 motivation and chosen approach can be found in a
 [blog post](http://dub.podval.org/2019/05/06/publishing-papers-on-web-2.html).
 
-Plugin supports typesetting mathematics using [MathJax](https://www.mathjax.org/);
-code of the FOP MathJax plugin is shipped as a separate artifact
+Plugin supports typesetting mathematics using [MathJax](https://www.mathjax.org/).
+To make this possible, integration with [Node.js](https://nodejs.org/en/) was developed.
+Code of the FOP MathJax plugin is shipped as a separate artifact
 `org.opentorah:opentorah-fop` to facilitate its re-use with markup other than DocBook. 
 
 ## Summary ##
 
-Plugin uses Saxon with DocBook XSLT stylesheets to process a DocBook document(s)
-(and includes) into HTML, EPUB, EPUB3 and PDF. Processing using XSLT 2.0
-DocBook stylesheets is supported for HTML only ("HTML2"). For PDF, DocBook is
-first processed into XSL-FO, which is post-processed by Apache FOP. For PDF,
-JEuclid or MathJax FOP plugin can be enabled to process mathematics. Document
-name(s) and the list of the output formats are configurable.
+Plugin uses [Saxon](https://www.saxonica.com/html/documentation/about/whatis.html)
+with DocBook [XSLT stylesheets](https://docbook.org/tools/) to process a DocBook document(s)
+(and includes) into HTML, EPUB, EPUB3 and PDF. Processing using DocBook
+[XSLT 2.0 stylesheets](https://github.com/docbook/xslt20-stylesheets) is supported for HTML
+only ("HTML2"). For PDF, DocBook is first processed into
+[XSL-FO](https://www.xml.com/articles/2017/01/01/what-is-xsl-fo/), which is post-processed by
+[Apache FOP](https://xmlgraphics.apache.org/fop/). For PDF,
+[JEuclid](http://jeuclid.sourceforge.net/) or MathJax FOP plugin can be enabled to process mathematics.
+Document name(s) and the list of the output formats are configurable.
 
 XSL parameters can be configured in the `Gradle` build file using `parameters` map.
 There are sections (and customization files) for each output format, for all HTML-like formats
@@ -77,8 +81,8 @@ file can be added to the `src/main/xsl` and/or `src/main/xml` directory:
 ```
 
 Plugin adds to the project Gradle task `processDocBook` that writes configuration files,
-substitutions DTD and XML catalog, unpacks DocBook XSLT stylesheets, generates data (if configured),
-installs Node and MathJax and processes DocBook.
+substitutions DTD and XML catalog, generates data (if configured),
+installs DocBook XSLT stylesheets, Node and MathJax and processes DocBook.
 
 Plugin sets some parameters in the `-param` stylesheet based on the logging level at the time
 `processDocBook` task is executed; for example, `chunk.quietly` is set to `yes` unless
@@ -114,7 +118,7 @@ on the Gradle Plugin Portal. To apply it to a Gradle project:
 
 ```groovy
 plugins {
-  id "org.opentorah.docbook" version "0.7.18"
+  id 'org.opentorah.docbook' version '0.7.49'
 }
 ```
 
@@ -129,8 +133,6 @@ repositories {
 If there is `classes` task in the project (for instance, Scala or Java plugin is applied),
 `processDocBook` task will depend on it.
 
-If there is `build` task in the project, it will depend on the `processDocBook` task. 
-
 If project does not contain any code nor applies any core Gradle plugins,
 to get basic tasks like "clean" and "build":
 
@@ -143,7 +145,7 @@ plugins {
 To make use of the results of the DocBook processing in a directory-name-independent way:
 ```groovy
   project.sync {
-    from project.tasks.getByPath(':<subproject with DocBook sources>:processDocBook').outputDirectory
+    from processDocBook.outputDirectory
     into '<published directory>'
   }  
 ```
@@ -154,21 +156,21 @@ Plugin adds to the project an extension that can be configured using `docBook` c
 
 ```groovy
 docBook {
-  xslt1version = "1.79.1"
-  xslt2version = "2.3.10"
+  xslt1version = '1.79.1'
+  xslt2version = '2.4.3'
   // by default, latest versions of the DocBook XSLT stylesheets are used ("+");
   // above properties can be used to set a specific version 
 
-  document = "paper"
-  documents = [ "paper", "paper2" ]
-  // .xml is assumed
+  document = 'paper'
+  documents = [ 'paper', 'paper2' ]
+  // .xml extension is assumed
   // for `documents`, final (and intermediate, if any) output is placed under a subdirectory
   // with the same name as the document;
   // if both `document` and `documents` are configured, and one of the `documents` is named
   // the same as one of the configured output formats, effect is undefined :)
 
-  dataGeneratorClass = "org.sample.stuff.paper.Tables"
-  // by default, no data is generated 
+  dataGeneratorClass = 'org.sample.stuff.paper.DataGenerator'
+  // by default, no data is generated (`dataGeneratorClass` is empty)
 
   outputFormats = ["html", "pdf", "epub2", "epub3", "html2"]
   // by default, all supported formats except html2 are generated;
@@ -196,7 +198,7 @@ docBook {
   // names get replaced with configured values in DocBook documents
 
   cssFile = "main"
-  // defaults to "docBook"; .css is assumed 
+  // defaults to "docBook"; .css extension is assumed 
 
   epubEmbeddedFonts = [ "Liberation Sans" ]
   // embedded fonts should be OpenType or WOFF!
@@ -276,12 +278,10 @@ Default FOP configuration created by the plugin causes FOP to auto-detect availa
 which are then cached by FOP to save time in the future runs. After installing new fonts, FOP's font cache file
 needs to be removed for them to be detected.
 
-FOP can't use some popular fonts like Roboto and NotoSans, and logs an error
+FOP v.4 can't use some popular fonts like Roboto and NotoSans, and logs an error
 "coverage set class table not yet supported" during fonts auto-detection;
-see https://issues.apache.org/jira/browse/FOP-2704 for more details.
-
-TODO that issue is marked as "resolved" now!
-
+see https://issues.apache.org/jira/browse/FOP-2704 for more details;
+The issue was fixed in April 2020, so FOP v2.5 is likely to support those fonts.
 Some of the fonts that work well enough and support Latin, Russian and Hebrew scripts
 are DejaVu and Liberation.
 
@@ -289,7 +289,7 @@ Property `epubEmbeddedFonts` configures font families that should be embedded in
 
 Plugin adds a Gradle task `listFopFonts` that can be used to list all the fonts that *are* available to FOP.
 
-Plugin adds a Gradle task `deleteFopFontsCache` that can be used to delete that cache.
+Plugin adds a Gradle task `deleteFopFontsCache` that can be used to delete FOP fonts cache.
 
 ## Mathematics ##
 
@@ -304,7 +304,7 @@ Plugin's setup should be reproducible in an XML editor like [Oxygen](https://www
 - run Gradle task `processDocBook`;
 - add a project-specific XML catalog `src/main/xml/catalog.xml` in
   Options | Preferences | XML | XML Catalog (check `Project Options`, not `Global Options`);
-- use main format-specific XSL file from `src/main/xsl` (e.g., html.xsl) to configure transformation scenario; 
+- use main format-specific XSL file from `src/main/xsl` (e.g., `html.xsl`) to configure transformation scenario; 
 - define `img.src.path` parameter as `../images`.
 
 
@@ -327,9 +327,6 @@ Overview of the directory layout used by the plugin:
        catalog.xml
        catalog-custom.xml
        substitutions.dtd  
-
-   build/docBookXsl/
-   build/docBookXsl2/
 
    build/docBook/
      epub2/<documentName>.epub
@@ -373,7 +370,6 @@ Sources (under `src/main`) contain:
 Plugin will create CSS stylesheet, XSL customizations, XML catalog customization and FOP configuration file if
 they are not present.  
 
-
 ### Output ###
 
 Final output of the plugin is deposited under `build/docBook`,
@@ -382,17 +378,18 @@ in a separate directory for each output format:
 - PDF - in `pdf/<documentName>.pdf`;
 - EPUB file - in `epub/<documentName>.epub`.
 
-For documents listed in the `documents` property, final output is placed under a subdirectory
+For documents listed in the `documents` property, final output can be found under a subdirectory
 with the same name as the document.
 
 For HTML and EPUB, CSS stylesheets and images are included in the output.
-For `html2`, main output file will be called `index.html` *only* if main input file has `xml:id="index"` on the root
-element *and* `use.id.as.filename` parameter is set (plugin sets it by default).
+For `html2`, main output file will be called `index.html` *only* if main input file has `xml:id="index"`
+on the root element *and* `use.id.as.filename` parameter is set (plugin sets it by default).
 
 
 ### Build ###
 
-Plugin unpacks official DocBook XSLT 1.0 stylesheets under `build/docBookXsl/` and XSLT 2.0 stylesheets under `build/docBookXsl2/`.
+Plugin unpacks official DocBook XSLT 1.0 stylesheets under `build/docBookXsl/` and XSLT 2.0 stylesheets
+under `build/docBookXsl2/`.
 References to the stylesheets are resolved to the local copies, suppressing retrieval of the stylesheets for each build.
 Gradle will retrieve them once when resolving dependency added by the plugin - and cache the JAR;
 unpacking after each `clean` is cheap.
@@ -404,6 +401,15 @@ For output formats that require post-processing or packing, intermediate output 
 For documents listed in the `documents` property, intermediate output is placed under a subdirectory with
 the same name as the document.
 
+### Frameworks ###
+
+Frameworks used by the plugin are cached under `~/.gradle.
+Distribution for each version of the framework is unpacked into its own folder:
+- DocBook XSLT 1.0 and XSLT 2.0 stylesheets - under `docbook`;
+- Node.js - under `nodejs`, with modules in `node_modules` subfolder;
+- J2V8 library - under `j2v8library`.
+With this caching, build time is significantly shorter than when the frameworks are
+unpacked under the project's `build` directory, which gets wiped out with every `./gradlew clean`. 
 
 ## Past ##
 
