@@ -20,7 +20,7 @@ trait Stylesheets {
     val classifierStr: String = classifier.fold("")(classifier => s":$classifier")
     val dependencyNotation: String = s"$groupId:$artifactId:$version$classifierStr@$extension"
 
-    val file: File = Gradle.getArtifact(project, dependencyNotation)
+    val file: File = Gradle.getArtifact(project, dependencyNotation).get
     val into: File = new File(layout.docBookXslDirectory, file.getName)
     val directory: File = Files.file(into, archiveSubdirectoryPath)
     if (!directory.exists) Gradle.unpack(

@@ -1,8 +1,14 @@
 package org.opentorah.node
 
-import org.opentorah.util.{Architecture, Os, Platform}
+import java.io.File
+import org.gradle.api.Project
+import org.opentorah.util.{Architecture, Gradle, Os, Platform}
+import org.slf4j.{Logger, LoggerFactory}
 
 final class J2V8Distribution {
+
+  private val logger: Logger = LoggerFactory.getLogger(classOf[J2V8Distribution])
+
   val os: Os = Platform.getOs
   val architecture: Architecture = Platform.getArch
 
@@ -41,4 +47,18 @@ final class J2V8Distribution {
 
   def libraryName: String =
     s"libj2v8_${osName}_$archName.${os.libraryExtension}"
+
+  def install(project: Project, into: File): Option[J2V8] =
+    if (version.isEmpty) {
+      logger.warn(s"No $this")
+      None
+    } else Gradle.getArtifact(project, dependencyNotation).map { artifact =>
+      Gradle.unpack(
+        project,
+        artifact,
+        isZip = true,
+        into
+      )
+      new J2V8(libraryPath = new File(into, libraryName).getAbsolutePath)
+    }
 }

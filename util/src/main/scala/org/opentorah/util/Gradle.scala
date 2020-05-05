@@ -10,23 +10,28 @@ import org.gradle.api.tasks.SourceSet
 import org.gradle.api.{Project, Task}
 import org.gradle.process.{ExecResult, JavaExecSpec}
 import org.slf4j.{Logger, LoggerFactory}
-
 import scala.collection.JavaConverters._
 
 object Gradle {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  def getArtifact(project: Project, dependencyNotation: String): File = {
+  def getArtifact(project: Project, dependencyNotation: String): Option[File] = {
     logger.info(s"Resolving $dependencyNotation")
 
     val dependency: Dependency = project.getDependencies.create(dependencyNotation)
     val configuration: Configuration = project.getConfigurations.detachedConfiguration(dependency)
     configuration.setTransitive(false)
-    val result: File = configuration.getSingleFile
 
-    logger.info(s"Resolved: $result")
-    result
+    try {
+      val result: File = configuration.getSingleFile
+      logger.info(s"Resolved: $result")
+      Some(result)
+    } catch {
+      case _: IllegalStateException =>
+        logger.warn(s"Failed to resolve: $dependencyNotation")
+        None
+    }
   }
 
   def getArtifact(
@@ -55,11 +60,11 @@ object Gradle {
       // it seems that to re-gain Gradle 5.6 behaviour, this needs to be done:
       repository.metadataSources((metadataSources: IvyArtifactRepository.MetadataSources) => {
         metadataSources.artifact(); // Indicates that this repository may not contain metadata files...
-      });
+      })
     })
 
     // Resolve the dependency
-    val result: File = getArtifact(project, dependencyNotation)
+    val result: File = getArtifact(project, dependencyNotation).get
 
     // Restore original repositories
     project.getRepositories.clear()

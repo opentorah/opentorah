@@ -2,7 +2,7 @@ package org.opentorah.mathjax
 
 import java.io.File
 import org.gradle.api.Project
-import org.opentorah.node.{J2V8, Node, NodeDistribution}
+import org.opentorah.node.{J2V8, J2V8Distribution, Node, NodeDistribution}
 import org.opentorah.xml.{Namespace, Xerces}
 import org.slf4j.{Logger, LoggerFactory}
 import org.w3c.dom.Document
@@ -96,7 +96,7 @@ object MathJax {
         overwrite = overwriteNode
       ),
       overwriteMathJax,
-      j2v8 = j2v8Parent.flatMap(j2v8Parent => J2V8.install(
+      j2v8 = j2v8Parent.flatMap(j2v8Parent => (new J2V8Distribution).install(
         project,
         into = j2v8Parent
       )),
