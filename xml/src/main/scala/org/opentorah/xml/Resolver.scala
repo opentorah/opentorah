@@ -12,10 +12,10 @@ final class Resolver(catalogFile: File) extends URIResolver with EntityResolver 
   logger.info(s"Resolver(catalogFile = $catalogFile)")
 
   private val parentResolver: org.xmlresolver.Resolver = {
-    val properties = new java.util.Properties
+    val properties: java.util.Properties = new java.util.Properties
     properties.setProperty("cacheUnderHome", "yes")
-    val configuration = new org.xmlresolver.Configuration(properties, null)
-    val catalog = new org.xmlresolver.Catalog(configuration, catalogFile.getAbsolutePath)
+    val configuration: org.xmlresolver.Configuration = new org.xmlresolver.Configuration(properties, null)
+    val catalog: org.xmlresolver.Catalog = new org.xmlresolver.Catalog(configuration, catalogFile.getAbsolutePath)
     new org.xmlresolver.Resolver(catalog)
   }
 
