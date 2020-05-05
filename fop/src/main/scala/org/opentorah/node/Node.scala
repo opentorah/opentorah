@@ -9,7 +9,7 @@ class Node(
   val nodeExec: File,
   val npmExec: File
 ) {
-  override def toString: String = s"Node with $nodeExec and $npmExec with modules in $nodeModules"
+  final override def toString: String = s"Node with $nodeExec and $npmExec with modules in $nodeModules"
 
   final def exists: Boolean = nodeExec.exists && npmExec.exists
 

@@ -13,6 +13,16 @@ final class Layout(val frameworksDir: File, val projectDir: File, val buildDir: 
   def settingsGradle: File = new File(projectDir, "settings.gradle")
   def buildGradle: File = new File(projectDir, "build.gradle")
 
+  // frameworks
+  def frameworkDirectory(name: String): File = new File(frameworksDir, name)
+
+  // Node: ~/.gradle/nodejs
+  def nodeRoot: File = frameworkDirectory("nodejs")
+  def j2v8LibraryDirectory: File = frameworkDirectory("j2v8library")
+
+  // DocBook XSLT: ~/.gradle/docbook
+  val docBookXslDirectory: File = Files.file(frameworksDir, Seq("docbook"))
+
   // src/main/
   private def sourceDir: File = new File(new File(projectDir, "src"), "main")
   private def sourceDirectory(name: String): File = new File(sourceDir, name)
@@ -59,9 +69,6 @@ final class Layout(val frameworksDir: File, val projectDir: File, val buildDir: 
   def testResource(name: String): File =
     new File(new File(new File(new File(projectDir, "src"), "test"), "resources"), name)
 
-  // frameworks
-  def frameworkDirectory(name: String): File = new File(frameworksDir, name)
-
   // build/
   private def buildDirRelative: String =
     if (buildDir.getParentFile == projectDir) buildDir.getName
@@ -70,14 +77,6 @@ final class Layout(val frameworksDir: File, val projectDir: File, val buildDir: 
   def buildDirectory(name: String): File = new File(buildDir, name)
   def buildFile(name: String): File = new File(buildDir, name)
   def buildDirectoryRelative(name: String): String = s"$buildDirRelative/$name/"
-
-  // Node
-  def nodeRoot: File = frameworkDirectory("nodejs")
-  def j2v8LibraryDirectory: File = frameworkDirectory("j2v8library")
-
-  // build/docBookXslt[2]
-  def docBookXslDirectory(artifactName: String): File =
-    Files.file(frameworksDir, Seq("docbook", artifactName))
 
   // build/data
   private def dataDirectoryName: String = "data"

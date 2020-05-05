@@ -1,11 +1,8 @@
 package org.opentorah.node
 
-import java.io.File
 import java.lang.reflect.Field
 import com.eclipsesource.v8.V8
-import org.gradle.api.Project
 import org.opentorah.util.Collections.mapValues
-import org.opentorah.util.Gradle
 import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConverters._
 
@@ -46,39 +43,5 @@ object J2V8 {
     case value: Map[_, Any] => map2java(value.asInstanceOf[Map[String, Any]])
     case value: List[Any] => list2java(value)
     case other => other
-  }
-
-  def install(project: Project, into: File): Option[J2V8] = {
-    val distribution: J2V8Distribution = new J2V8Distribution
-    if (distribution.version.isEmpty) {
-      logger.warn(s"No $distribution")
-      None
-    } else {
-      val libraryName: String = distribution.libraryName
-
-      val artifact: Option[File] = try Some(Gradle.getArtifact(project, distribution.dependencyNotation)) catch {
-        case _: IllegalStateException => None
-      }
-
-      artifact.fold[Option[J2V8]] {
-        logger.warn(s"No artifact: $distribution")
-        None
-      } { artifact =>
-        logger.info(s"Resolved $distribution artifact: $artifact")
-
-        into.mkdirs()
-        Gradle.unpack(
-          project,
-          artifact,
-          isZip = true,
-          into
-        )
-
-        logger.info(s"Extracted $distribution into $into")
-
-        val libraryPath: String = new File(into, libraryName).getAbsolutePath
-        Some(new J2V8(libraryPath))
-      }
-    }
   }
 }

@@ -69,7 +69,8 @@ object Platform {
     val errStr = err.mkString("\n")
     val outStr = out.mkString("\n")
 
-    logger.debug(s"Platform.exec() => exitCode=$exitCode; err=$errStr; out=$outStr")
+    val result = s"Platform.exec() => exitCode=$exitCode; err=$errStr; out=$outStr"
+    if (exitCode == 0) logger.debug(result) else logger.error(result)
     if (exitCode == 0) outStr else throw new IllegalArgumentException(s"Platfor.exec() => exitCode=$exitCode")
   }
 }
