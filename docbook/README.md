@@ -298,6 +298,13 @@ either server-side MathJax or JEuclid for PDF. JEuclid typesets in document's fo
 MathJax delivers better quality and is under active development; JEuclid is not.
 JEuclid can handle MathML; MathJax can handle MathML, TeX, inline TeX and AsciiMath.
 
+## Data ##
+
+Data generation class doesn't have to reside in the same project where DocBook plugin is configured;
+in such a case, its artifact needs to be added as a `runtimeOnly` dependency of the main sourceset.
+If it is produced by another module of the same multi-module project, `processDocBook` task should depend
+on the `assemble` task of that module. 
+
 ## Oxygen ##
 
 Plugin's setup should be reproducible in an XML editor like [Oxygen](https://www.oxygenxml.com/):

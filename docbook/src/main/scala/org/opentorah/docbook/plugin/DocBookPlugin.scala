@@ -3,11 +3,12 @@ package org.opentorah.docbook.plugin
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.{DefaultTask, Plugin, Project}
 import org.opentorah.fop.FopFonts
+import org.opentorah.util.Gradle
 
 final class DocBookPlugin extends Plugin[Project] {
 
   def apply(project: Project): Unit = {
-//    logger.lifecycle(Util.applicationString)
+//    project.logger.lifecycle(Util.applicationString)
 
     val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)
 
@@ -38,30 +39,17 @@ final class DocBookPlugin extends Plugin[Project] {
     project.getTasks.create("listFopFonts", classOf[DocBookPlugin.ListFopFontsTask])
     project.getTasks.create("deleteFopFontsCache", classOf[DocBookPlugin.DeleteFopFontsCacheTask])
 
-// TODO update plugin instructions.
-// Data generation class doesn't have to reside in the same project where DocBook plugin is configured,
-// so not adding dependency on 'classes';
-// also, to include processDocBook in the 'build' or not - is a policy decision best left to the user
-// of the plugin...
-//    project.afterEvaluate((project: Project) => {
-//      val logger: Logger = PluginLogger.forProject(project)
-//
-//      // Note: even when DocBook plugin is applied after the Scala one,
-//      // there is no 'classes' task during its application - but there is after project evaluation:
-//      Gradle.getTask(project, "classes").fold {
-//        logger.info("No 'classes' task found.")
-//      }{ classesTask =>
-//        logger.info("Found 'classes' task; adding it as dependency of 'processDocBook'.")
-//        processDocBookTask.getDependsOn.add(classesTask)
-//      }
-//
-//      Gradle.getTask(project, "build").fold {
-//        logger.info("No 'build' task found.")
-//      }{ buildTask =>
-//        logger.info("Found 'build' task; adding 'processDocBook' as its dependency.")
-//        buildTask.getDependsOn.add(processDocBookTask)
-//      }
-//    })
+    project.afterEvaluate((project: Project) => {
+      val logger = project.getLogger
+      def info(message: String): Unit = logger.info(message, null, null, null)
+
+      // Note: even when DocBook plugin is applied after the Scala one,
+      // there is no 'classes' task during its application - but there is after project evaluation:
+      Gradle.getClassesTask(project).fold(info("No 'classes' task found.")){ classesTask =>
+        info("Found 'classes' task; adding it as dependency of 'processDocBook'.")
+        processDocBookTask.getDependsOn.add(classesTask)
+      }
+    })
   }
 }
 

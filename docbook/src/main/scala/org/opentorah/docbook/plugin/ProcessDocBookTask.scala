@@ -38,14 +38,14 @@ class ProcessDocBookTask extends DefaultTask {
 
   getProcessInputDirectories.foreach(registerInputDirectory)
 
-  // Note: classesDirs use sourceSets, which are only available after project is evaluated;
+  // Data generation class doesn't have to reside in the same project where DocBook plugin is configured,
+  // so I don't bother registering classes as input directory, butif I did:
+  // classesDirs use sourceSets, which are only available after project is evaluated;
   // with code in Scala only, input directory "build/classes/java/main" doesn't exist (which is a Gradle error), so I
   // register "build/classes/" (grandparent of all classesDirs) as input directory
   // (is there a simpler way of getting it?).
-  // TODO update plugin instructions.
-  // Data generation class doesn't have to reside in the same project where DocBook plugin is configured:
-//  getProject.afterEvaluate((project: Project) =>
-//    Gradle.classesDirs(project).map(_.getParentFile.getParentFile).foreach(registerInputDirectory))
+  //  getProject.afterEvaluate((project: Project) =>
+  //    Gradle.classesDirs(project).map(_.getParentFile.getParentFile).foreach(registerInputDirectory))
 
   private def registerInputDirectory(directory: File): Unit = {
     info(s"processDocBook: registering input directory $directory")
@@ -244,7 +244,9 @@ class ProcessDocBookTask extends DefaultTask {
       content = Write.customStylesheet(layout, section)
     )
 
-    generateData()
+    val mainClass: String = dataGeneratorClass.get
+    if (mainClass.isEmpty) info("Skipping DocBook data generation: dataGenerationClass is not set")
+    else generateData(mainClass)
 
     val mathJax: Option[MathJax] = if (!processors.exists(_.isPdf) || !isMathJaxEnabled.get) None
     else Some(MathJax.get(
@@ -282,21 +284,12 @@ class ProcessDocBookTask extends DefaultTask {
   private def getDocumentName(string: String): Option[String] =
     if (string.isEmpty) None else Some(Files.dropAllowedExtension(string, "xml"))
 
-  private def generateData(): Unit = {
-    val mainClass: String = dataGeneratorClass.get
+  private def generateData(mainClass: String): Unit = {
     val mainSourceSet: Option[SourceSet] = Gradle.mainSourceSet(getProject)
-    val dataDirectory: File = layout.dataDirectory
-
-    def skipping(message: String): Unit = getProject.getLogger.lifecycle(s"Skipping DocBook data generation: $message")
-    //    val classesTask: Option[Task] = Gradle.getClassesTask(getProject)
-    if (mainClass.isEmpty) info("Skipping DocBook data generation: dataGenerationClass is not set") else
-// TODO maybe instead of the Java plugin use special configuration (docBook :))?
-    if (mainSourceSet.isEmpty) skipping("no Java plugin in the project") else
-// TODO update plugin instructions.
-// Data generation class doesn't have to reside in the same project where DocBook plugin is configured:
-//    if (classesTask.isEmpty) skipping("no 'classes' task in the project") else
-//    if (!didWork(classesTask.get)) skipping("'classes' task didn't do work") else
+    if (mainSourceSet.isEmpty) getProject.getLogger.warn(
+      s"Skipping DocBook data generation: no Java plugin in the project") else
     {
+      val dataDirectory: File = layout.dataDirectory
       info(s"Running DocBook data generator $mainClass into $dataDirectory")
       Gradle.javaexec(
         getProject,
