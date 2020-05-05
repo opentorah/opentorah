@@ -5,7 +5,6 @@
   xmlns:db="http://docbook.org/ns/docbook"
   exclude-result-prefixes="db">
 
-
   <xsl:param name="autolabel.elements">
     <db:appendix format="A"/>
     <db:chapter/>
