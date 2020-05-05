@@ -50,8 +50,8 @@ object Collections {
     keys.zip(f(keys.map { key => key -> map(key) })).toMap
 
   def mapValues[A, B, C](map: Map[A, B])(f: B => C): Map[A, C] =
-    // map.view.mapValues(f).toMap // Scala 2.13
-    map.mapValues(f) // Scala 2.12
+    map.view.mapValues(f).toMap // TODO for Scala 2.13
+    //map.mapValues(f) // Scala 2.12
 
   def pruneSequenceOfMaps[K, A, B](tail: Seq[(K, Map[A, B])]): Seq[(K, Map[A, B])] = pruneSequenceOfMaps(Seq.empty, tail)
 
