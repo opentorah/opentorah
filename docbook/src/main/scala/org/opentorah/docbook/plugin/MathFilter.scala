@@ -44,7 +44,7 @@ final class MathFilter(
   }
 
   private def prefixMapping(namespace: Namespace)(content: => Unit): Unit = {
-    val prefix = namespace.prefix
+    val prefix: String = namespace.prefix
 
     super.startPrefixMapping(prefix, namespace.uri)
     content
@@ -139,8 +139,11 @@ final class MathFilter(
     Input.Attribute.set(MathML.Namespace, input.withInline(isInline), attributes)
 
     def mml(): Unit = {
-      // NOTE: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,
+      // Note: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,
       // math element and its children end up having *two* default namespaces - MathML and DocBook.
+      //
+      // Note: On Saxon 10 (but not 9!), XInclude namespace, if present on the `<article>`,
+      // is added to the `<math>` element - but not its children.
       prefixMapping(MathML.Namespace.default) {
         prefixMapping(MathJax.Namespace) {
           element(MathML.Namespace.default, MathML.math, atts = attributes) {
