@@ -85,6 +85,7 @@ object Write {
     documentName: String,
     cssFileName: String,
     epubEmbeddedFonts: String,
+    isMathJaxEnabled: Boolean,
     mathJaxConfiguration: Configuration,
     layout: Layout
   ): String = {
@@ -100,7 +101,8 @@ object Write {
       docBook2.parameter(_.rootFilenameParameter, docBook2.rootFilename(documentName)),
       docBook2.parameter(_.epubEmbeddedFontsParameter, epubEmbeddedFonts),
       docBook2.parameter(_.htmlStylesheetsParameter, layout.cssFileRelativeToOutputDirectory(cssFileName)),
-      docBook2.parameter(_.mathJaxConfigurationParameter, Json.fromMap(mathJaxConfiguration.toHtmlMap))
+      docBook2.parameter(docBook2 => if (!isMathJaxEnabled) None else docBook2.mathJaxConfigurationParameter,
+        Json.fromMap(mathJaxConfiguration.toHtmlMap))
     ).flatten.toMap
 
     // xsl:param has the last value assigned to it, so customization must come last;
@@ -118,7 +120,9 @@ object Write {
        |  <xsl:import href="$paramsStylesheetName"/>
        |$imports
        |
+       |<!-- Non-overridable parameters -->
        |${toString(nonOverridableParameters)}
+       |${docBook2.mainStylesheet(isMathJaxEnabled)}
        |</xsl:stylesheet>
        |""".stripMargin
   }

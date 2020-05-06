@@ -227,6 +227,7 @@ class ProcessDocBookTask extends DefaultTask {
         documentName,
         cssFileName,
         epubEmbeddedFontsString,
+        isMathJaxEnabled = isMathJaxEnabled.get || isJEuclidEnabled.get,
         mathJaxConfiguration,
         layout
       )

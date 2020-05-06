@@ -10,5 +10,7 @@ object HtmlCommon extends Section {
     "chunk.first.sections" -> "1"
   )
 
+  override def mainStylesheet(isMathJaxEnabled: Boolean): String = ""
+
   override def customStylesheet: String = ""
 }

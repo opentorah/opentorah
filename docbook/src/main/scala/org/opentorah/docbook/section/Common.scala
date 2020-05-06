@@ -9,6 +9,8 @@ object Common extends Section {
     "runinhead.default.title.end.punct" -> ""
   )
 
+  override def mainStylesheet(isMathJaxEnabled: Boolean): String = ""
+
   override def customStylesheet: String =
     s"""  <!-- This is needed (?) for template-tweaking customizations, like removal of "Chapter" in chapter title -->
        |  <xsl:param name="local.l10n.xml" select="document('')"/>

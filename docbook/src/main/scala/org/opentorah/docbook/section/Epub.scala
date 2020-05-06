@@ -16,6 +16,8 @@ trait Epub extends DocBook2 {
   final override def defaultParameters: Map[String, String] = Map(
   )
 
+  final override def mainStylesheet(isMathJaxEnabled: Boolean): String = ""
+
   final override def customStylesheet: String = ""
 
   final override def postProcess(
