@@ -1,5 +1,14 @@
 package org.opentorah.docbook.section
 
+// MathJax 2
+//<script async src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_CHTML"></script>
+
+// MathJax 3
+//<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+//<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+//or
+//<script id="MathJax-script" defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" type="text/javascript"></script>
+
 object Html extends DocBook2 {
   override def name: String = "html"
   override def stylesheetUriName: String = "html/chunkfast"
@@ -18,14 +27,16 @@ object Html extends DocBook2 {
 
   val mathJaxConfigurationParameterName: String = "mathjax.configuration"
 
-  override def customStylesheet: String =
+  override def mainStylesheet(isMathJaxEnabled: Boolean): String = if (!isMathJaxEnabled) "" else
     s"""
        |  <!-- Add MathJax support -->
        |  <xsl:template name="user.head.content">
        |    <script type="text/javascript">
        |      window.MathJax = <xsl:value-of select = "$$$mathJaxConfigurationParameterName" />;
        |    </script>
-       |    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML"/>
+       |    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=MML_HTMLorMML"/>
        |  </xsl:template>
        |""".stripMargin
+
+  override def customStylesheet: String = ""
 }

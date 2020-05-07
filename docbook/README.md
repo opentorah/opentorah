@@ -77,7 +77,8 @@ To prevent generated XSL files (other than the `-custom`) from being checked in,
 file can be added to the `src/main/xsl` and/or `src/main/xml` directory:
 ```git
 *
-!*-custom.*
+!*-custom.xml
+!.gitignore
 ```
 
 Plugin adds to the project Gradle task `processDocBook` that writes configuration files,

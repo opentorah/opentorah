@@ -10,6 +10,8 @@ trait Section {
 
   def defaultParameters: Map[String, String]
 
+  def mainStylesheet(isMathJaxEnabled: Boolean): String
+
   def customStylesheet: String
 }
 

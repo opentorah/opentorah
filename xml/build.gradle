@@ -40,7 +40,7 @@ dependencies {
 
   compileOnly "org.xmlresolver:xmlresolver:$xmlresolverVersion"
   compileOnly "saxon:saxon:$saxon6Version" // Saxon 6 (XSLT 1.0)
-  compileOnly "net.sf.saxon:Saxon-HE:$saxon9Version" // Saxon 9 (XSLT 2.0)
+  compileOnly "net.sf.saxon:Saxon-HE:$saxon10Version" // Saxon 10 (XSLT 2.0)
   compileOnly "xerces:xercesImpl:$xercesVersion"
   compileOnly "xalan:xalan:$xalanVersion"
 }

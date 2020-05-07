@@ -16,6 +16,8 @@ object Html2 extends DocBook2 {
     "toc.section.depth" -> "4"
   )
 
+  override def mainStylesheet(isMathJaxEnabled: Boolean): String = ""
+
   override def customStylesheet: String =
     s"""
        |  <xsl:param name="autolabel.elements">

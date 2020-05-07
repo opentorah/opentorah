@@ -40,7 +40,9 @@ final class ProcessDocBook(
       if (mathJax.isDefined && isPdf) Some(new MathFilter(mathJax.get.configuration)) else None
 
     // Run Saxon.
-    val saxon: Saxon = if (!docBook2.usesDocBookXslt2) Saxon.Saxon6 else Saxon.Saxon9
+    // Note: DocBook XSLT uses Saxon 6 XSLT 1.0 extensions and doesn't work on later Saxon versions
+    // ("Don't know how to chunk with Saxonica").
+    val saxon: Saxon = if (!docBook2.usesDocBookXslt2) Saxon.Saxon6 else Saxon.Saxon10
     saxon.transform(
       resolver,
       inputFile = layout.inputFile(documentName),
@@ -67,7 +69,7 @@ final class ProcessDocBook(
           else mathJax.map(new MathJaxFopPlugin(_))
 
         Fop.run(
-          saxon = Saxon.Saxon9,
+          saxon = Saxon.Saxon10,
           configurationFile = layout.fopConfigurationFile,
           substitutions.get("creationDate"),
           substitutions.get("author"),

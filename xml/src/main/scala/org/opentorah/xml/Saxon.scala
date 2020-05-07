@@ -130,16 +130,14 @@ object Saxon {
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[Saxon])
 
-  // Only Saxon6 is capable of handling DocBook XSLT stylesheets with their XSLT 1.0 extensions;
-  // Saxon9 is not compatible with that. (TODO what about Saxon 10?)
   object Saxon6 extends Saxon("Saxon 6") {
     override protected def newTransformerFactory: SAXTransformerFactory = new com.icl.saxon.TransformerFactoryImpl
     override protected def styleParserClassAttribute: String = com.icl.saxon.FeatureKeys.STYLE_PARSER_CLASS
     override protected def sourceParserClassAttribute: String = com.icl.saxon.FeatureKeys.SOURCE_PARSER_CLASS
   }
 
-  // Saxon6 produces unmodifiable DOM, which can not be serialized; Saxon9's DOM can.
-  object Saxon9 extends Saxon("Saxon 9") {
+  // Saxon6 produces unmodifiable DOM, which can not be serialized; Saxon 10's DOM can.
+  object Saxon10 extends Saxon("Saxon 10") {
     override protected def newTransformerFactory: SAXTransformerFactory = new net.sf.saxon.TransformerFactoryImpl
     override protected def styleParserClassAttribute: String = net.sf.saxon.lib.FeatureKeys.STYLE_PARSER_CLASS
     override protected def sourceParserClassAttribute: String = net.sf.saxon.lib.FeatureKeys.SOURCE_PARSER_CLASS

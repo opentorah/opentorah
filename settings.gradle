@@ -32,3 +32,10 @@ include ':typesetting-paper'
 // I can no longer use the plugin via composite build, since it is in the same build as the site;
 // I guess I'll have to debug it on the side...
 //   includeBuild '../../docbook/docbook-gradle'
+
+// Debugging spurious network accesses from the xmlresolver:
+//includeBuild('../xmlresolver') {
+//  dependencySubstitution {
+//    substitute module('org.xmlresolver:xmlresolver') with project(':core')
+//  }
+//}

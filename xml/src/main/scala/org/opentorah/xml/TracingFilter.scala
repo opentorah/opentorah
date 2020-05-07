@@ -11,17 +11,17 @@ final class TracingFilter extends XMLFilterImpl {
   }
 
   override def startDocument(): Unit = {
-    println(s"startDocument()")
+    println(s"startDocument")
     super.startDocument()
   }
 
   override def endDocument(): Unit = {
-    println(s"endDocument()")
+    println(s"endDocument")
     super.endDocument()
   }
 
   override def startPrefixMapping(prefix: String, uri: String): Unit = {
-    println(s"startPrefixMapping($prefix, $uri)")
+    println(s"""startPrefixMapping(xmlns${if (prefix.isEmpty) "" else ":" + prefix}="$uri")""")
     super.startPrefixMapping(prefix, uri)
   }
 
@@ -31,22 +31,22 @@ final class TracingFilter extends XMLFilterImpl {
   }
 
   override def startElement(uri: String, localName: String, qName: String, atts: Attributes): Unit = {
-    println(s"startElement($uri, $localName, $qName")
-    for (i <- 0 to atts.getLength) {
-      println(s"  ${atts.getURI(i)}, ${atts.getLocalName(i)}, ${atts.getQName(i)}, ${atts.getType(i)}, ${atts.getValue(i)}")
+    println(s"""startElement(uri="$uri", localName="$localName", qName="$qName" """)
+    for (i <- 0 until atts.getLength) {
+      println(s"""  attribute: uri="${atts.getURI(i)}", localName="${atts.getLocalName(i)}", qName="${atts.getQName(i)}", type=${atts.getType(i)}, value="${atts.getValue(i)}" """)
     }
     println(")")
     super.startElement(uri, localName, qName, atts)
   }
 
   override def endElement(uri: String, localName: String, qName: String): Unit = {
-    println(s"endElement($uri, $localName, $qName)")
+    println(s"""endElement(uri="$uri", localName="$localName", qName="$qName")""")
     super.endElement(uri, localName, qName)
   }
 
   override def characters(ch: Array[Char], start: Int, length: Int): Unit = {
     val chars = ch.slice(start, start + length).mkString("")
-    println(s"characters($chars)")
+    println(s"""characters("$chars")""")
     super.characters(ch, start, length)
   }
 

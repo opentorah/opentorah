@@ -16,7 +16,7 @@ dependencies {
 
   implementation "org.xmlresolver:xmlresolver:$xmlresolverVersion"
   implementation "saxon:saxon:$saxon6Version"
-  implementation "net.sf.saxon:Saxon-HE:$saxon9Version"
+  implementation "net.sf.saxon:Saxon-HE:$saxon10Version"
   implementation "xerces:xercesImpl:$xercesVersion"
 
   // FOP

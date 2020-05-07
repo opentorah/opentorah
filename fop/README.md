@@ -10,3 +10,10 @@ source formats other than DocBook, but so far nobody did :)
 This code also contains integration with Node.js, which can be split into
 yet another separate module if the need to use it for running Node.js packages
 other than mathjax arises.
+
+I should look into alternative ways of integrating with Node:
+[GraalVM](https://www.graalvm.org/) and
+[Rhino](https://github.com/mozilla/rhino) / [Trireme](https://github.com/apigee/trireme).
+
+Support fo J2V8 should probably be dropped...
+

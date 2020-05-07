@@ -22,6 +22,8 @@ object Pdf extends DocBook2 {
     "fop1.extensions" -> "1"
   )
 
+  override def mainStylesheet(isMathJaxEnabled: Boolean): String = ""
+
   override def customStylesheet: String =
     s"""
        |  <!-- Break before each section -->
