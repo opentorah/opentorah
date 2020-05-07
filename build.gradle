@@ -25,6 +25,9 @@ allprojects {
   }
 }
 
+// There is no Java in the project :)
+project.gradle.startParameter.excludedTaskNames.add('compileJava')
+
 subprojects {
   group = 'org.opentorah'
   version = projectVersion
