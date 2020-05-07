@@ -1,4 +1,4 @@
-package org.opentorah.calendar.rambam
+package org.opentorah.schedule.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
 import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, UnionParsable}

@@ -1,4 +1,4 @@
-package org.opentorah.calendar.rambam
+package org.opentorah.schedule.rambam
 
 import org.opentorah.calendar.jewish.Jewish.{Day, Month, Year}
 import org.opentorah.texts.rambam.MishnehTorah

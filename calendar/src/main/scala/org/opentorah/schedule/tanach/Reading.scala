@@ -1,4 +1,4 @@
-package org.opentorah.calendar.tanach
+package org.opentorah.schedule.tanach
 
 import org.opentorah.texts.tanach.{Custom, Torah}
 import org.opentorah.texts.tanach.Torah.Maftir

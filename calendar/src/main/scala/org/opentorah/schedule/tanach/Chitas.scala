@@ -1,4 +1,4 @@
-package org.opentorah.calendar.tanach
+package org.opentorah.schedule.tanach
 
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
 import org.opentorah.texts.tanach.{Custom, Parsha, Torah}

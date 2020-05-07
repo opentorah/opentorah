@@ -1,4 +1,4 @@
-package org.opentorah.calendar.tanach
+package org.opentorah.schedule.tanach
 
 import org.opentorah.metadata.{LanguageSpec, Metadata, Names, WithNumber}
 import org.opentorah.util.Collections

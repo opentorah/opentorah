@@ -1,4 +1,4 @@
-package org.opentorah.calendar.tanach
+package org.opentorah.schedule.tanach
 
 /*
 Days without Tachanun

@@ -1,4 +1,4 @@
-package org.opentorah.calendar.rambam
+package org.opentorah.schedule.rambam
 
 trait Formatter {
   def formatLesson(

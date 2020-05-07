@@ -1,9 +1,9 @@
-package org.opentorah.calendar.tanach
+package org.opentorah.schedule.tanach
 
 import org.opentorah.metadata.WithNames
 import org.opentorah.util.{Cache, Collections, PairSlider}
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
-import org.opentorah.calendar.tanach.SpecialDay.{FestivalOrIntermediate, Omer, ShabbosBereishis}
+import SpecialDay.{FestivalOrIntermediate, Omer, ShabbosBereishis}
 
 final case class Schedule private(
   from: Day,

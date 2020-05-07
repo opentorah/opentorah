@@ -1,4 +1,4 @@
-package org.opentorah.calendar.tanach.books
+package org.opentorah.schedule.tanach.books
 
 import scala.xml.Elem
 

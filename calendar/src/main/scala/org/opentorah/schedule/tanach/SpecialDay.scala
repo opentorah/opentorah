@@ -1,4 +1,4 @@
-package org.opentorah.calendar.tanach
+package org.opentorah.schedule.tanach
 
 import org.opentorah.metadata.{Metadata, Names, WithName, WithNames}
 import org.opentorah.xml.From
@@ -7,7 +7,7 @@ import org.opentorah.texts.tanach.Torah.{Aliyah, Maftir}
 import org.opentorah.calendar.jewish.Jewish.{Day, Month, Year}
 import org.opentorah.calendar.jewish.Jewish.Month.Name._
 import org.opentorah.calendar.jewish.{JewishDay, JewishYear}
-import org.opentorah.calendar.tanach.books._
+import org.opentorah.schedule.tanach.books._
 
 import scala.xml.Elem
 
