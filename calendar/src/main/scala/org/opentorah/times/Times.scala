@@ -1,4 +1,4 @@
-package org.opentorah.calendar.times
+package org.opentorah.times
 
 import org.opentorah.numbers.{Digit, DigitsDescriptor, NonPeriodicNumbers}
 

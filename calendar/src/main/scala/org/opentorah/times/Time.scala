@@ -1,4 +1,4 @@
-package org.opentorah.calendar.times
+package org.opentorah.times
 
 import Times.{hoursPerHalfDay, partsPerHalfHour, partsPerMinute}
 import org.opentorah.numbers.Number

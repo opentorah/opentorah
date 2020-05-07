@@ -1,7 +1,7 @@
 package org.opentorah.calendar.dates
 
 import org.opentorah.metadata.{LanguageSpec, LanguageString}
-import org.opentorah.calendar.times.TimePointBase
+import org.opentorah.times.TimePointBase
 
 trait MomentBase[C <: Calendar[C]] extends TimePointBase[C] with CalendarMember[C] with LanguageString
 { this: C#Moment =>
