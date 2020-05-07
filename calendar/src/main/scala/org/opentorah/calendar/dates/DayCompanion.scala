@@ -25,6 +25,4 @@ abstract class DayCompanion[C <: Calendar[C]] extends CalendarMember[C] {
     ((dayNumber + firstDayNumberInWeek - 1 - 1) % Calendar.daysPerWeek) + 1
 
   val firstDayNumberInWeek: Int
-
-  final def now: C#Day = calendar.Moment.now.day
 }

@@ -1,6 +1,6 @@
 package org.opentorah.calendar.rambam
 
-import org.opentorah.calendar.dates.Calendar
+import org.opentorah.calendar.Calendars
 import org.opentorah.calendar.jewish.Jewish.{Day, Month, Year}
 
 object Schedule {
@@ -8,7 +8,7 @@ object Schedule {
     def scheduleMonth(month: Month): Seq[String] = {
       val lessons = for {
         day <- month.days
-        gDay = Calendar.fromJewish(day)
+        gDay = Calendars.fromJewish(day)
       } yield formatter.formatLesson(
         day.numberInMonth,
         gDay.month.numberInYear,

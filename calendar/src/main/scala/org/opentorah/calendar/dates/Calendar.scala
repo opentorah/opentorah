@@ -1,8 +1,6 @@
 package org.opentorah.calendar.dates
 
 import org.opentorah.metadata.LanguageSpec
-import org.opentorah.calendar.gregorian.Gregorian
-import org.opentorah.calendar.jewish.Jewish
 import org.opentorah.numbers.{Digits, VectorCompanion}
 import org.opentorah.times.{TimeVectorBase, Times}
 
@@ -74,36 +72,4 @@ object Calendar {
 
   final val firstDayNumberInWeekGregorian: Int =
     (((firstDayNumberInWeekJewish - 1) + epoch % daysPerWeek) % daysPerWeek) + 1
-
-  //  Jewish  :   6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0  1  2  3  4  5  6
-  //  Georgian:  |0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0
-  private final val dayStartHoursJewish = 18
-
-  private final val dayStartHoursGregorian: Int = Times.hoursPerDay - dayStartHoursJewish
-
-  final def toJewish(moment: Gregorian.Moment): Jewish.Moment = {
-    val hours = moment.hours
-
-    val (newDay, newHours) =
-      if (hours >= dayStartHoursJewish)
-        (moment.day.next, hours - dayStartHoursJewish) else
-        (moment.day     , hours + dayStartHoursGregorian)
-
-    toJewish(newDay).toMoment.hours(newHours).parts(moment.parts)
-  }
-
-  final def fromJewish(moment: Jewish.Moment): Gregorian.Moment = {
-    val hours = moment.hours
-
-    val (newDay, newHours) =
-      if (hours < dayStartHoursGregorian)
-        (moment.day.prev, hours + dayStartHoursJewish) else
-        (moment.day     , hours - dayStartHoursGregorian)
-
-    fromJewish(newDay).toMoment.hours(newHours).parts(moment.parts)
-  }
-
-  final def fromJewish(day: Jewish   .Day): Gregorian.Day = Gregorian.Day(day.number - epoch)
-
-  final def toJewish  (day: Gregorian.Day): Jewish   .Day = Jewish   .Day(day.number + epoch)
 }

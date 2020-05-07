@@ -1,7 +1,6 @@
 package org.opentorah.calendar.service
 
-import org.opentorah.metadata.{Language, LanguageSpec, WithNames}
-import org.opentorah.util.Collections
+import org.opentorah.calendar.Calendars
 import org.opentorah.calendar.dates.{Calendar, DayBase, MonthBase, YearBase, YearsCycle}
 import org.opentorah.calendar.gregorian.Gregorian
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Season, Shemittah, Sun, YearType}
@@ -10,6 +9,8 @@ import org.opentorah.calendar.tanach.{Chitas, Haftarah, Reading, Schedule, Speci
 import org.opentorah.judaica.rambam.MishnehTorah
 import org.opentorah.judaica.tanach.{Custom, Span, Torah}
 import org.opentorah.judaica.tanach.Tanach.Psalms
+import org.opentorah.metadata.{Language, LanguageSpec, WithNames}
+import org.opentorah.util.Collections
 import scalatags.Text.TypedTag
 import scalatags.Text.all._
 
@@ -23,8 +24,6 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
   protected def name: String
 
   protected def otherName: String
-
-  private final def now: C#Day = calendar.Day.now
 
   private final def getYear(yearStr: String): C#Year = calendar.Year(yearStr.toInt)
 
@@ -83,7 +82,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
   )
 
   def renderLanding: String = {
-    val day: DayBase[_] = now
+    val day: DayBase[_] = Calendars.now(calendar).day
     renderHtml(s"/$name", dayLinks(day, other = false))
   }
 
@@ -310,7 +309,7 @@ object Renderer {
 
     override protected def gregorian(day: DayBase[_]): Gregorian.Day = {
       try {
-        Calendar.fromJewish(jewish(day))
+        Calendars.fromJewish(jewish(day))
       } catch {
         case _: IllegalArgumentException => Gregorian.Year(1).month(1).day(1)
       }
@@ -399,7 +398,7 @@ object Renderer {
 
     override protected def otherName: String = jewishRendererName
 
-    override protected def jewish(day: DayBase[_]): Jewish.Day = Calendar.toJewish(gregorian(day))
+    override protected def jewish(day: DayBase[_]): Jewish.Day = Calendars.toJewish(gregorian(day))
 
     override protected def gregorian(day: DayBase[_]): Gregorian.Day = day.asInstanceOf[Gregorian.Day]
 
