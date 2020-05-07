@@ -6,7 +6,7 @@ import org.opentorah.metadata.{LanguageSpec, Numbered}
   *
   * @param number  of the Month
   */
-abstract class MonthBase[C <: Calendar[C]] private[calendar](private var yearOpt: Option[C#Year], number: Int)
+abstract class MonthBase[C <: Calendar[C]] private[opentorah](private var yearOpt: Option[C#Year], number: Int)
   extends Numbered[C#Month](number) with CalendarMember[C]
 { this: C#Month =>
   require(0 < number)

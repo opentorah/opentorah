@@ -6,7 +6,7 @@ import org.opentorah.metadata.{LanguageSpec, LanguageString, Numbered}
   *
   * @param number  of the Day
   */
-abstract class DayBase[C <: Calendar[C]] private[calendar](private var monthOpt: Option[C#Month], number: Int)
+abstract class DayBase[C <: Calendar[C]] private[opentorah](private var monthOpt: Option[C#Month], number: Int)
   extends Numbered[C#Day](number) with CalendarMember[C] with LanguageString
 { this: C#Day =>
   require(0 < number)

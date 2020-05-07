@@ -6,9 +6,9 @@ import org.opentorah.metadata.{Named, NamedCompanion, Names}
 abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
   final override val Name: JewishMonthCompanion.type = JewishMonthCompanion
 
-  private[calendar] final override def yearNumber(monthNumber: Int): Int = LeapYearsCycle.monthYear(monthNumber)
+  private[opentorah] final override def yearNumber(monthNumber: Int): Int = LeapYearsCycle.monthYear(monthNumber)
 
-  private[calendar] final override def numberInYear(monthNumber: Int): Int = LeapYearsCycle.monthNumberInYear(monthNumber)
+  private[opentorah] final override def numberInYear(monthNumber: Int): Int = LeapYearsCycle.monthNumberInYear(monthNumber)
 }
 
 object JewishMonthCompanion extends NamedCompanion {

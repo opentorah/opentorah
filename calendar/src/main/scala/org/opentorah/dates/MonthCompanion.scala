@@ -12,14 +12,14 @@ abstract class MonthCompanion[C <: Calendar[C]] extends CalendarMember[C] {
 
   final def apply(number: Int): C#Month = apply(None, number)
 
-  private[dates] def yearNumber(monthNumber: Int): Int
+  private[opentorah] def yearNumber(monthNumber: Int): Int
 
-  private[dates] final def withNumberInYear(year: C#Year, numberInYear: Int): C#Month = {
+  private[opentorah] final def withNumberInYear(year: C#Year, numberInYear: Int): C#Month = {
     require(0 < numberInYear && numberInYear <= year.lengthInMonths)
     apply(Some(year), year.firstMonthNumber + numberInYear - 1)
   }
 
-  private[dates] def apply(yearOpt: Option[C#Year], number: Int): C#Month
+  private[opentorah] def apply(yearOpt: Option[C#Year], number: Int): C#Month
 
-  private[dates] def numberInYear(monthNumber: Int): Int
+  private[opentorah] def numberInYear(monthNumber: Int): Int
 }

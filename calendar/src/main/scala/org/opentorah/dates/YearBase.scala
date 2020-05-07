@@ -53,12 +53,12 @@ abstract class YearBase[C <: Calendar[C]](number: Int)
   final def monthAndDay(when: MonthAndDay[C]): C#Day =
     month(when.monthName).day(when.numberInMonth)
 
-  private[dates] final def monthForDay(day: Int): C#Month = {
+  private[opentorah] final def monthForDay(day: Int): C#Month = {
     require(0 < day && day <= lengthInDays)
     month(monthDescriptors.count(_.daysBefore < day))
   }
 
-  private[dates] final def monthDescriptors: Seq[C#MonthDescriptor] =
+  private[opentorah] final def monthDescriptors: Seq[C#MonthDescriptor] =
     calendar.Year.monthDescriptors(character)
 
   final override def toLanguageString(implicit spec: LanguageSpec): String = calendar.toString(number)

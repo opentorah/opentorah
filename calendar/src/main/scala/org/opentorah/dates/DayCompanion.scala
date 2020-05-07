@@ -14,12 +14,12 @@ abstract class DayCompanion[C <: Calendar[C]] extends CalendarMember[C] {
 
   final def apply(number: Int): C#Day = apply(None, number)
 
-  private[dates] final def witNumberInMonth(month: C#Month, numberInMonth: Int): C#Day = {
+  private[opentorah] final def witNumberInMonth(month: C#Month, numberInMonth: Int): C#Day = {
     require (0 < numberInMonth && numberInMonth <= month.length)
     apply(Some(month), month.firstDayNumber + numberInMonth - 1)
   }
 
-  private[dates] def apply(monthOpt: Option[C#Month], number: Int): C#Day
+  private[opentorah] def apply(monthOpt: Option[C#Month], number: Int): C#Day
 
   final def numberInWeek(dayNumber: Int): Int =
     ((dayNumber + firstDayNumberInWeek - 1 - 1) % Calendar.daysPerWeek) + 1
