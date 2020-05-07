@@ -1,6 +1,7 @@
-package org.opentorah.schedule.rambam
+package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
+import org.opentorah.schedule.rambam.RambamSchedule
 import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, UnionParsable}
 
 object SeferHamitzvosLessons {

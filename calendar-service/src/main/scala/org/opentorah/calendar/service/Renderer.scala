@@ -4,11 +4,11 @@ import org.opentorah.calendar.Calendars
 import org.opentorah.calendar.gregorian.Gregorian
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Season, Shemittah, Sun, YearType}
 import org.opentorah.dates.{Calendar, DayBase, MonthBase, YearBase, YearsCycle}
-import org.opentorah.texts.rambam.MishnehTorah
+import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
 import org.opentorah.texts.tanach.{Custom, Span, Torah}
 import org.opentorah.texts.tanach.Tanach.Psalms
 import org.opentorah.metadata.{Language, LanguageSpec, WithNames}
-import org.opentorah.schedule.rambam.{RambamSchedule, SeferHamitzvosLessons}
+import org.opentorah.schedule.rambam.RambamSchedule
 import org.opentorah.schedule.tanach.{Chitas, Haftarah, Reading, Schedule, SpecialDay}
 import org.opentorah.util.Collections
 import scalatags.Text.TypedTag
