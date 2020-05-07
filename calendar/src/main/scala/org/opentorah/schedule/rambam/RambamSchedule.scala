@@ -33,6 +33,8 @@ object RambamSchedule {
   private val numberOfChapters: Int = chapters.length
 
   final val numberOfLessons: Int = 339
+  require(SeferHamitzvosLessons.lessons.map(_.number) == (1 to numberOfLessons))
+
 
   require(numberOfLessons*3 == numberOfChapters)
 

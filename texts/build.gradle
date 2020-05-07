@@ -5,18 +5,15 @@ plugins {
   id 'com.jfrog.bintray'
 }
 
-description = 'Jewish Calendar Dates'
-version = calendarProjectVersion
+description = 'Jewish Texts'
 
-configureLibrary(['Scala', 'Jewish', 'Calendar', 'Torah'])
+configureLibrary(['Scala', 'Jewish', 'Torah', 'Rambam'])
 
 dependencies {
-  implementation project(':texts')
   implementation project(':store')
   implementation project(':xml')
   implementation project(':util')
 
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
   implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
-  testImplementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
 }

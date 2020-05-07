@@ -1,7 +1,6 @@
 package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.schedule.rambam.RambamSchedule
 import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, UnionParsable}
 
 object SeferHamitzvosLessons {
@@ -37,16 +36,10 @@ object SeferHamitzvosLessons {
     Name("לא תעשה", Language.Hebrew.toSpec)
   ))
 
-  val lessons: Seq[Lesson] = {
-    val result: Seq[Lesson] = Metadata.load(
-      from = From.resource(this),
-      elementParsable = new Element[Lesson](elementName = "lesson", parser = lessonParser)
-    )
-
-    require(result.map(_.number) == (1 to RambamSchedule.numberOfLessons))
-
-    result
-  }
+  val lessons: Seq[Lesson] = Metadata.load(
+    from = From.resource(this),
+    elementParsable = new Element[Lesson](elementName = "lesson", parser = lessonParser)
+  )
 
   private val partParsable: Parsable[Part] = new UnionParsable[Part](Seq(
     new Element("positive", parser = Attribute("n").positiveInt.required.map(new Positive(_))),
