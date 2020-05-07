@@ -40,6 +40,8 @@ final class ProcessDocBook(
       if (mathJax.isDefined && isPdf) Some(new MathFilter(mathJax.get.configuration)) else None
 
     // Run Saxon.
+    // Note: DocBook XSLT uses Saxon 6 XSLT 1.0 extensions and doesn't work on later Saxon versions
+    // ("Don't know how to chunk with Saxonica").
     val saxon: Saxon = if (!docBook2.usesDocBookXslt2) Saxon.Saxon6 else Saxon.Saxon10
     saxon.transform(
       resolver,
