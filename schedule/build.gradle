@@ -6,18 +6,12 @@ plugins {
 }
 
 description = 'Jewish Readings and Learning Schedules'
-version = calendarProjectVersion
 
 configureLibrary(['Scala', 'Jewish', 'Calendar', 'Torah'])
 
 dependencies {
-  implementation project(':calendar')
-  implementation project(':texts')
-  implementation project(':store')
-  implementation project(':xml')
-  implementation project(':util')
+  compile project(':calendar')
+  compile project(':texts')
 
-  implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
-  implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
-  testImplementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
+  implementation project(':util')
 }

@@ -14,9 +14,6 @@ configureService(
 
 dependencies {
   implementation project(':schedule')
-  implementation project(':calendar')
-  implementation project(':texts')
-  implementation project(':store')
   implementation project(':util')
 
   implementation "com.lihaoyi:scalatags_$scalaVersionMajor:$scalatagsVersion"

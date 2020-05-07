@@ -10,10 +10,7 @@ description = 'Jewish Texts'
 configureLibrary(['Scala', 'Jewish', 'Torah', 'Rambam'])
 
 dependencies {
-  implementation project(':store')
-  implementation project(':xml')
-  implementation project(':util')
+  compile project(':store')
 
-  implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
-  implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
+  implementation project(':util')
 }
