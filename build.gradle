@@ -35,15 +35,15 @@ subprojects {
   apply from: '../paper.gradle'
   apply from: '../service.gradle'
 
-  task site
-  site.group('publishing')
-
   configurations.all {
     resolutionStrategy {
       // v1.3.04 doesn't have org.w3c.dom.ElementTraversal that Xerces uses:
       force "xml-apis:xml-apis:$xmlApisVersion"
     }
   }
+
+  task site
+  site.group('publishing')
 }
 
 idea {

@@ -1,7 +1,6 @@
 package org.opentorah.calendar.paper
 
 import java.io.{File, FileOutputStream, PrintStream}
-
 import scala.xml.{Elem, PrettyPrinter}
 
 final case class Column[A](heading: String, subheading: String, f: A => Any)
@@ -25,6 +24,7 @@ final class Table[A](columns: Column[A]*) {
 
     val out: PrintStream = new PrintStream(new FileOutputStream(new File(directory, name + ".xml")))
     out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+    // TODO use my pretty-printer
     out.print(new PrettyPrinter(80, 2).format(xml))
     out.println()
   }

@@ -10,7 +10,8 @@ object Tables {
     val directory = new File(if (!args.isEmpty) args(0) else "/tmp/xxx/tables/")
     directory.mkdirs
 
-    velocityOriginal(SunLongitudeMean).write(directory, "slm-original", Seq(Key.One, Key.Ten, Key.Hundred, Key.Thousand, Key.TenThousand))
+    velocityOriginal(SunLongitudeMean).write(directory, "slm-original",
+      Seq(Key.One, Key.Ten, Key.Hundred, Key.Thousand, Key.TenThousand))
   }
 
   private def velocityOriginal(data: Time2Rotation): Table[Key] = {

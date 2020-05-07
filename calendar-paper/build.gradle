@@ -9,7 +9,8 @@ configurePaper(
 )
 
 dependencies {
-  runtimeOnly project(':calendar')
+  implementation project(':calendar')
+  implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
 }
 
 // To ensure calendar library is built before it is used:
