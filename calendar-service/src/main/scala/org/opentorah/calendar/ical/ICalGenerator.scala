@@ -1,9 +1,8 @@
 package org.opentorah.calendar.ical
 
 import java.io.{FileOutputStream, OutputStream}
-import org.opentorah.calendar.dates.Calendar
+import org.opentorah.calendar.Calendars
 import org.opentorah.calendar.gregorian.Gregorian
-
 
 final class ICalGenerator private(os: OutputStream) {
   import ICal._
@@ -28,7 +27,7 @@ final class ICalGenerator private(os: OutputStream) {
   }
 
   private def day(dayG: Gregorian.Day): Properties = {
-    val dayJ = Calendar.toJewish(dayG)
+    val dayJ = Calendars.toJewish(dayG)
     val monthName: String = dayJ.month.name.name
     val dayNumber = dayJ.numberInMonth
     val summaryText = monthName + " " + dayNumber

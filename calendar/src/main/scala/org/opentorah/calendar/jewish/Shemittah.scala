@@ -1,6 +1,6 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.calendar.dates.YearsCycle
+import org.opentorah.dates.YearsCycle
 
 object Shemittah extends YearsCycle {
   override val first: Int = 1

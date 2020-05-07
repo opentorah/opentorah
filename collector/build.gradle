@@ -1,6 +1,7 @@
 plugins {
-    id 'scala'
-    id 'com.github.maiflai.scalatest'
+  id 'java-library'
+  id 'scala'
+  id 'com.github.maiflai.scalatest'
   id 'maven-publish'
   id 'com.jfrog.bintray'
 }
@@ -11,12 +12,7 @@ configureLibrary(['Scala', 'Jewish', 'TEI'])
 
 dependencies {
   implementation project(':store')
-  implementation project(':xml')
   implementation project(':util')
-
-  implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
-  implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
-  implementation "dev.zio:zio-interop-cats_$scalaVersionMajor:$zioInteropCatsVersion"
 
   runtimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
 }

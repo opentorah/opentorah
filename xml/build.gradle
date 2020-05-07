@@ -1,4 +1,5 @@
 plugins {
+  id 'java-library'
   id 'scala'
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
@@ -34,9 +35,10 @@ configureLibrary(['Scala', 'XML'])
 dependencies {
   implementation project(':util')
 
-  implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+  api "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+  api "dev.zio:zio_$scalaVersionMajor:$zioVersion"
+
   implementation "org.typelevel:paiges-core_$scalaVersionMajor:$paigesVersion"
-  implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
 
   compileOnly "org.xmlresolver:xmlresolver:$xmlresolverVersion"
   compileOnly "saxon:saxon:$saxon6Version" // Saxon 6 (XSLT 1.0)

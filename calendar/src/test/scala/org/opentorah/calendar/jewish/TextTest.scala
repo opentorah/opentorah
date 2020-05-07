@@ -1,13 +1,13 @@
 package org.opentorah.calendar.jewish
 
-import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers
-import org.opentorah.calendar.times.Times.{hoursPerDay, hoursPerHalfDay, momentsPerPart, partsPerHour}
+import org.opentorah.dates.YearsCycle
+import org.opentorah.times.Times.{hoursPerDay, hoursPerHalfDay, momentsPerPart, partsPerHour}
 import Jewish.{Day, Month, TimeVector, Year, range, week}
 import LeapYearsCycle.{leapYear, normalYear}
 import Moon.meanLunarPeriod
 import Sun.{RavAda, Shmuel}
-import org.opentorah.calendar.dates.YearsCycle
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Tests based on the statements from the text itself.

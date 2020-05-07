@@ -1,4 +1,5 @@
 plugins {
+  id 'java-library'
   id 'scala'
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
@@ -10,10 +11,7 @@ description = 'Open Torah Store'
 configureLibrary(['Scala', 'Jewish', 'TEI'])
 
 dependencies {
+  api project(":xml")
+
   implementation project(':util')
-  implementation project(":xml")
-
-  implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
-
-  implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
 }

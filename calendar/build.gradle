@@ -1,4 +1,5 @@
 plugins {
+  id 'java-library'
   id 'scala'
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
@@ -11,11 +12,8 @@ version = calendarProjectVersion
 configureLibrary(['Scala', 'Jewish', 'Calendar', 'Torah'])
 
 dependencies {
-  implementation project(':store')
-  implementation project(':xml')
+  implementation project(':texts')
   implementation project(':util')
 
-  implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
-  implementation "dev.zio:zio_$scalaVersionMajor:$zioVersion"
   testImplementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
 }

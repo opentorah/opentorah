@@ -1,12 +1,18 @@
 plugins {
-    id 'scala'
+  id 'java-library'
+  id 'scala'
+  id 'com.github.maiflai.scalatest'
+//  id 'maven-publish'
+//  id 'com.jfrog.bintray'
 }
 
-configureLibrary(TODO)
+description = 'Open Torah Importers'
+
+configureScala()
+// TODO configureLibrary(['Scala', 'TEI'])
 
 dependencies {
-    implementation project(':store')
+  implementation project(':store')
 
-    implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
-    implementation "org.ccil.cowan.tagsoup:tagsoup:$tagsoupVersion"
+  implementation "org.ccil.cowan.tagsoup:tagsoup:$tagsoupVersion"
 }

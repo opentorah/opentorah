@@ -1,0 +1,21 @@
+package org.opentorah.angles
+
+import Angles.Rotation
+
+// TODO move into 'numbers'
+final case class Interval(from: Rotation, to: Rotation) {
+  require(from <= to)
+
+  override def toString: String = s"[$from..$to]"
+
+  def contains(value: Rotation): Boolean = (from <= value) && (value <= to)
+
+  def intersect(that: Interval): Interval = {
+    val result = Interval(
+      from = if (this.from < that.from) that.from else this.from,
+      to = if (this.to > that.to) that.to else this.to
+    )
+    println(s"$this intersect $that = $result")
+    result
+  }
+}

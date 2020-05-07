@@ -1,16 +1,15 @@
 package org.opentorah.calendar.jewish
 
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.prop.TableDrivenPropertyChecks.{Table, forAll}
 import Jewish.{Day, Month, Year}
 import Jewish.TimeVector
 import Jewish.Day.Name._
 import Jewish.Month.Name._
-import org.opentorah.calendar.dates.Calendar
 import org.opentorah.calendar.gregorian.Gregorian
 import Gregorian.Month.Name._
-import org.opentorah.calendar.jewish
+import org.opentorah.calendar.Calendars
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.prop.TableDrivenPropertyChecks.{Table, forAll}
 
 final class DatesTest extends AnyFlatSpec with Matchers {
 
@@ -80,8 +79,8 @@ final class DatesTest extends AnyFlatSpec with Matchers {
         molad.day.name shouldBe dayOfWeek
         molad.day shouldBe dayJ
 
-        Calendar.toJewish(dateG).day shouldBe dayJ
-        Calendar.fromJewish(molad) shouldBe dateG
+        Calendars.toJewish(dateG).day shouldBe dayJ
+        Calendars.fromJewish(molad) shouldBe dateG
     }
   }
 
@@ -213,7 +212,7 @@ final class DatesTest extends AnyFlatSpec with Matchers {
   }
 
   "Pesach day of the week" should "calculate correctly" in {
-    val days: collection.mutable.Map[Jewish.Day.Name, Int] = new collection.mutable.HashMap[jewish.Jewish.Day.Name, Int]
+    val days: collection.mutable.Map[Jewish.Day.Name, Int] = new collection.mutable.HashMap[Jewish.Day.Name, Int]
     years foreach { year =>
       val day: Jewish.Day.Name = Pesach(year).name
       if (days.contains(day)) days.update(day, days(day) + 1) else days.update(day, 1)

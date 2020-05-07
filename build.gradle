@@ -23,20 +23,20 @@ allprojects {
     mavenCentral()
     mavenLocal()
   }
-
-  group = 'org.opentorah'
-  version = projectVersion
 }
 
+// There is no Java in the project :)
+project.gradle.startParameter.excludedTaskNames.add('compileJava')
+
 subprojects {
+  group = 'org.opentorah'
+  version = projectVersion
+
   apply from: '../scala.gradle'
   apply from: '../library.gradle'
   apply from: '../mdoc.gradle'
   apply from: '../paper.gradle'
   apply from: '../service.gradle'
-
-  task site
-  site.group('publishing')
 
   configurations.all {
     resolutionStrategy {
@@ -44,6 +44,9 @@ subprojects {
       force "xml-apis:xml-apis:$xmlApisVersion"
     }
   }
+
+  task site
+  site.group('publishing')
 }
 
 idea {

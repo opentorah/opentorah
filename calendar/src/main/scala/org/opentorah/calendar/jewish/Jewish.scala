@@ -1,8 +1,8 @@
 package org.opentorah.calendar.jewish
 
 import org.opentorah.metadata.LanguageSpec
-import org.opentorah.calendar.dates.{Calendar, CalendarMember}
-import org.opentorah.calendar.numbers.Digits
+import org.opentorah.dates.{Calendar, CalendarMember}
+import org.opentorah.numbers.Digits
 
 class Jewish private() extends Calendar[Jewish] {
 
@@ -24,14 +24,14 @@ class Jewish private() extends Calendar[Jewish] {
   final override type Month = JewishMonth
 
   final override object Month extends JewishMonthCompanion with JewishCalendarMember {
-    private[calendar] override def apply(yearOpt: Option[Year], number: Int): Month =
+    private[opentorah] override def apply(yearOpt: Option[Year], number: Int): Month =
       new JewishMonth(yearOpt, number) with JewishCalendarMember
   }
 
   final override type Day = JewishDay
 
   final override object Day extends JewishDayCompanion with JewishCalendarMember {
-    private[calendar] override def apply(monthOpt: Option[Month], number: Int): Day =
+    private[opentorah] override def apply(monthOpt: Option[Month], number: Int): Day =
       new JewishDay(monthOpt, number) with JewishCalendarMember
   }
 

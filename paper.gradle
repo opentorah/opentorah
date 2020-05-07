@@ -3,6 +3,8 @@ ext.configurePaper = {
   final Boolean isMathJaxEnabled
     ->
 
+  configureScala()
+
   final String projectName = project.name
   final String projectVersion = project.version
   final String documentName = (projectName.endsWith('-paper')) ?

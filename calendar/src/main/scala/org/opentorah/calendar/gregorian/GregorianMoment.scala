@@ -1,6 +1,6 @@
 package org.opentorah.calendar.gregorian
 
-import org.opentorah.calendar.dates.MomentBase
+import org.opentorah.dates.MomentBase
 import Gregorian.Moment
 
 trait GregorianMoment extends MomentBase[Gregorian] {

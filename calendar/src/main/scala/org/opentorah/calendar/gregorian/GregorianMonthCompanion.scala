@@ -1,15 +1,15 @@
 package org.opentorah.calendar.gregorian
 
+import org.opentorah.dates.MonthCompanion
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
-import org.opentorah.calendar.dates.MonthCompanion
 import Gregorian.Year
 
 abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
   final override val Name: GregorianMonthCompanion.type = GregorianMonthCompanion
 
-  private[calendar] final override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Year.monthsInYear + 1
+  private[opentorah] final override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Year.monthsInYear + 1
 
-  private[calendar] final override def numberInYear(monthNumber: Int): Int =
+  private[opentorah] final override def numberInYear(monthNumber: Int): Int =
     monthNumber - Year.firstMonth(yearNumber(monthNumber)) + 1
 }
 

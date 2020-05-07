@@ -1,4 +1,5 @@
 plugins {
+  id 'java-library'
   id 'scala'
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
@@ -11,8 +12,8 @@ description = 'FOP MathJax plugin'
 configureLibrary(['Scala', 'MathML', 'MathJax', 'JEuclid', 'FOP', 'Pdf'])
 
 dependencies {
-  implementation project(':util')
   implementation project(':xml')
+  implementation project(':util')
 
   implementation "org.xmlresolver:xmlresolver:$xmlresolverVersion"
   implementation "saxon:saxon:$saxon6Version"

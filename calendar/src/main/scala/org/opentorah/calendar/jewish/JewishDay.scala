@@ -1,6 +1,6 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.calendar.dates.DayBase
+import org.opentorah.dates.DayBase
 
 abstract class JewishDay private[jewish](monthOpt: Option[Jewish.Month], number: Int)
   extends DayBase[Jewish](monthOpt, number)

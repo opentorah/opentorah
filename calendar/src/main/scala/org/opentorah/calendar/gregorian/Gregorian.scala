@@ -1,8 +1,8 @@
 package org.opentorah.calendar.gregorian
 
 import org.opentorah.metadata.LanguageSpec
-import org.opentorah.calendar.dates.{Calendar, CalendarMember}
-import org.opentorah.calendar.numbers.Digits
+import org.opentorah.dates.{Calendar, CalendarMember}
+import org.opentorah.numbers.Digits
 
 class Gregorian private() extends Calendar[Gregorian] {
 
@@ -24,14 +24,14 @@ class Gregorian private() extends Calendar[Gregorian] {
   final override type Month = GregorianMonth
 
   final override object Month extends GregorianMonthCompanion with GregorianCalendarMember {
-    private[calendar] override def apply(yearOpt: Option[Year], number: Int): Month =
+    private[opentorah] override def apply(yearOpt: Option[Year], number: Int): Month =
       new GregorianMonth(yearOpt, number) with GregorianCalendarMember
   }
 
   final override type Day = GregorianDay
 
   final override object Day extends GregorianDayCompanion with GregorianCalendarMember {
-    private[calendar] override def apply(monthOpt: Option[Month], number: Int): Day =
+    private[opentorah] override def apply(monthOpt: Option[Month], number: Int): Day =
       new GregorianDay(monthOpt, number) with GregorianCalendarMember
   }
 

@@ -1,6 +1,6 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.calendar.dates.MonthBase
+import org.opentorah.dates.MonthBase
 import Jewish.Moment
 
 abstract class JewishMonth private[jewish](yearOpt: Option[Jewish#Year], number: Int)
