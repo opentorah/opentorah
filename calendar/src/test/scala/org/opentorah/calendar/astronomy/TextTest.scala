@@ -1,11 +1,11 @@
 package org.opentorah.calendar.astronomy
 
 import org.opentorah.angles.Angles
-import Angles.{Position, Rotation, headRange, range}
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle}
-import Jewish.{Day, Month, Year}
-import org.opentorah.calendar.dates.YearsCycle
+import org.opentorah.dates.YearsCycle
 import org.opentorah.numbers.BigRational
+import Angles.{Position, Rotation, headRange, range}
+import Jewish.{Day, Month, Year}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 

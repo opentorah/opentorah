@@ -1,7 +1,7 @@
 package org.opentorah.calendar.jewish
 
+import org.opentorah.dates.MonthCompanion
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
-import org.opentorah.calendar.dates.MonthCompanion
 
 abstract class JewishMonthCompanion extends MonthCompanion[Jewish] {
   final override val Name: JewishMonthCompanion.type = JewishMonthCompanion

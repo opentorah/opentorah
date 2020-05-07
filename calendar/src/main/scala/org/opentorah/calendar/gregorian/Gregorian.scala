@@ -1,7 +1,7 @@
 package org.opentorah.calendar.gregorian
 
 import org.opentorah.metadata.LanguageSpec
-import org.opentorah.calendar.dates.{Calendar, CalendarMember}
+import org.opentorah.dates.{Calendar, CalendarMember}
 import org.opentorah.numbers.Digits
 
 class Gregorian private() extends Calendar[Gregorian] {

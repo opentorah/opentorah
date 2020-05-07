@@ -1,6 +1,6 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.calendar.dates.MomentBase
+import org.opentorah.dates.MomentBase
 import Jewish.Moment
 
 trait JewishMoment extends MomentBase[Jewish] {

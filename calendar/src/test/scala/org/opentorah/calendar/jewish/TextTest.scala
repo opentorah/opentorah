@@ -1,6 +1,6 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.calendar.dates.YearsCycle
+import org.opentorah.dates.YearsCycle
 import org.opentorah.times.Times.{hoursPerDay, hoursPerHalfDay, momentsPerPart, partsPerHour}
 import Jewish.{Day, Month, TimeVector, Year, range, week}
 import LeapYearsCycle.{leapYear, normalYear}

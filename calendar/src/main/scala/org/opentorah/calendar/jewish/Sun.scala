@@ -1,6 +1,6 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.calendar.dates.YearsCycle
+import org.opentorah.dates.YearsCycle
 import Jewish.{Moment, TimeVector, Year}
 
 abstract class Sun extends Season.ForYear {

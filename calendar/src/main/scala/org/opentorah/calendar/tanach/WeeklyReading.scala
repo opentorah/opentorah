@@ -1,12 +1,12 @@
 package org.opentorah.calendar.tanach
 
-import org.opentorah.metadata.{Names, WithNames}
-import org.opentorah.util.Collections
-import org.opentorah.calendar.dates.Calendar
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
-import SpecialDay.{Pesach, Shavuos, TishaBeAv}
+import org.opentorah.dates.Calendar
 import org.opentorah.judaica.tanach.Parsha
 import org.opentorah.judaica.tanach.Parsha._
+import org.opentorah.metadata.{Names, WithNames}
+import org.opentorah.util.Collections
+import SpecialDay.{Pesach, Shavuos, TishaBeAv}
 
 /**
   * Determine weekly portion read on a given Shabbos.

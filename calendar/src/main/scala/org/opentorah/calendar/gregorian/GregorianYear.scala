@@ -1,6 +1,6 @@
 package org.opentorah.calendar.gregorian
 
-import org.opentorah.calendar.dates.YearBase
+import org.opentorah.dates.YearBase
 import Gregorian.{Year, YearCharacter}
 
 abstract class GregorianYear(number: Int)

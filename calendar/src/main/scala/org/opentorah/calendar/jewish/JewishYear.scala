@@ -1,6 +1,6 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.calendar.dates.YearBase
+import org.opentorah.dates.YearBase
 import Jewish.{Moment, Month, Year, YearCharacter}
 
 abstract class JewishYear(number: Int) extends YearBase[Jewish](number) {

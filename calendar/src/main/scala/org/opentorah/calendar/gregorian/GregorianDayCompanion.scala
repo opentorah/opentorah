@@ -1,7 +1,7 @@
 package org.opentorah.calendar.gregorian
 
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
-import org.opentorah.calendar.dates.{Calendar, DayCompanion}
+import org.opentorah.dates.{Calendar, DayCompanion}
 
 abstract class GregorianDayCompanion extends DayCompanion[Gregorian] {
   final override val Name: GregorianDayCompanion.type = GregorianDayCompanion

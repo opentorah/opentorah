@@ -2,8 +2,8 @@ package org.opentorah.calendar
 
 import java.util.{GregorianCalendar, Calendar => Cal}
 import org.opentorah.calendar.gregorian.Gregorian
-import org.opentorah.calendar.dates.{Calendar, MomentBase}
 import org.opentorah.calendar.jewish.Jewish
+import org.opentorah.dates.{Calendar, MomentBase}
 import org.opentorah.times.Times
 
 object Calendars {

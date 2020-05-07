@@ -1,6 +1,6 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.calendar.dates.YearCompanion
+import org.opentorah.dates.YearCompanion
 import Jewish.{Month, MonthNameAndLength, YearCharacter}
 import Month.Name._
 

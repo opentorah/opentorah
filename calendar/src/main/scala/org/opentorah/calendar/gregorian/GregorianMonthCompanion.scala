@@ -1,7 +1,7 @@
 package org.opentorah.calendar.gregorian
 
+import org.opentorah.dates.MonthCompanion
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
-import org.opentorah.calendar.dates.MonthCompanion
 import Gregorian.Year
 
 abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
