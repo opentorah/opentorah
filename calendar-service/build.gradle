@@ -13,6 +13,7 @@ configureService(
 )
 
 dependencies {
+  implementation project(':schedule')
   implementation project(':calendar')
   implementation project(':texts')
   implementation project(':store')
