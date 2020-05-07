@@ -1,9 +1,8 @@
 package org.opentorah.calendar.paper
 
 import java.io.File
-
-import org.opentorah.calendar.astronomy.Time2Rotation.Key
-import org.opentorah.calendar.astronomy.{SunLongitudeMean, Time2Rotation}
+import org.opentorah.astronomy.{SunLongitudeMean, Time2Rotation}
+import Time2Rotation.Key
 
 object Tables {
 

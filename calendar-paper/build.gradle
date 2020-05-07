@@ -1,5 +1,5 @@
 plugins {
-  id 'java'
+  id 'scala'
   id 'org.opentorah.docbook'
 }
 

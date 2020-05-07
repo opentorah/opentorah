@@ -1,7 +1,7 @@
 package org.opentorah.calendar.tanach
 
-import org.opentorah.judaica.tanach.{Custom, Torah}
-import org.opentorah.judaica.tanach.Torah.Maftir
+import org.opentorah.texts.tanach.{Custom, Torah}
+import org.opentorah.texts.tanach.Torah.Maftir
 import org.opentorah.util.Collections.mapValues
 
 final class Reading(customs: Map[Custom, Reading.ReadingCustom])

@@ -2,8 +2,8 @@ package org.opentorah.calendar.tanach
 
 import org.opentorah.metadata.{Metadata, Names, WithName, WithNames}
 import org.opentorah.xml.From
-import org.opentorah.judaica.tanach.{Custom, Parsha, Source, Torah}
-import org.opentorah.judaica.tanach.Torah.{Aliyah, Maftir}
+import org.opentorah.texts.tanach.{Custom, Parsha, Source, Torah}
+import org.opentorah.texts.tanach.Torah.{Aliyah, Maftir}
 import org.opentorah.calendar.jewish.Jewish.{Day, Month, Year}
 import org.opentorah.calendar.jewish.Jewish.Month.Name._
 import org.opentorah.calendar.jewish.{JewishDay, JewishYear}

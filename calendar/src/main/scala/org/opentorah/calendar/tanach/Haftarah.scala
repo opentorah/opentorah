@@ -3,7 +3,7 @@ package org.opentorah.calendar.tanach
 import org.opentorah.metadata.{LanguageSpec, Metadata, Names, WithNumber}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, From, Parser}
-import org.opentorah.judaica.tanach.{Custom, Parsha, Tanach, WithBookSpans}
+import org.opentorah.texts.tanach.{Custom, Parsha, Tanach, WithBookSpans}
 import zio.ZIO
 
 final case class Haftarah private(override val spans: Seq[Haftarah.BookSpan])

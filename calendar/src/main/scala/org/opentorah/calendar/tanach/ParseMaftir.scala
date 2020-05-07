@@ -2,7 +2,7 @@ package org.opentorah.calendar.tanach
 
 import org.opentorah.metadata.WithNames
 import org.opentorah.xml.{Element, From, Parser}
-import org.opentorah.judaica.tanach.Torah
+import org.opentorah.texts.tanach.Torah
 import scala.xml.Elem
 
 trait ParseMaftir { self: WithNames =>

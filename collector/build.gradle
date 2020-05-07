@@ -1,6 +1,6 @@
 plugins {
-    id 'scala'
-    id 'com.github.maiflai.scalatest'
+  id 'scala'
+  id 'com.github.maiflai.scalatest'
   id 'maven-publish'
   id 'com.jfrog.bintray'
 }

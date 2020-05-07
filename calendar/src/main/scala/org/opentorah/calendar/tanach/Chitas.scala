@@ -1,8 +1,8 @@
 package org.opentorah.calendar.tanach
 
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
-import org.opentorah.judaica.tanach.{Custom, Parsha, Torah}
-import org.opentorah.judaica.tanach.Parsha.{Bereishis, VezosHaberachah}
+import org.opentorah.texts.tanach.{Custom, Parsha, Torah}
+import org.opentorah.texts.tanach.Parsha.{Bereishis, VezosHaberachah}
 import org.opentorah.util.Cache
 
 // only on SimchasTorah is there a second fragment

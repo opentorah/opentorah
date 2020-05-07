@@ -5,8 +5,8 @@ import org.scalatest.matchers.should.Matchers
 import org.opentorah.calendar.jewish.{Jewish, YearType}
 import YearType._
 import Jewish.{Day, Year}
-import org.opentorah.judaica.tanach.Parsha
-import org.opentorah.judaica.tanach.Parsha._
+import org.opentorah.texts.tanach.Parsha
+import org.opentorah.texts.tanach.Parsha._
 import SpecialDay._
 
 final class ScheduleTest extends AnyFlatSpec with Matchers {

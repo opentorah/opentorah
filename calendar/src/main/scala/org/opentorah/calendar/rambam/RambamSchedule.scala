@@ -1,7 +1,7 @@
 package org.opentorah.calendar.rambam
 
 import org.opentorah.calendar.jewish.Jewish.{Day, Month, Year}
-import org.opentorah.judaica.rambam.MishnehTorah
+import org.opentorah.texts.rambam.MishnehTorah
 
 /**
  * Rambam study schedule for MishnehTorah and Sefer HaMitzvos
