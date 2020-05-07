@@ -1,7 +1,8 @@
-package org.opentorah.calendar.angles
+package org.opentorah.angles
 
-import org.opentorah.calendar.angles.Angles.Rotation
+import Angles.Rotation
 
+// TODO move into 'numbers'
 final case class Interval(from: Rotation, to: Rotation) {
   require(from <= to)
 

@@ -1,6 +1,6 @@
 package org.opentorah.calendar.astronomy
 
-import org.opentorah.calendar.angles.Angles.Rotation
+import org.opentorah.angles.Angles.Rotation
 
 object SunLongitudeCorrection  {
   final val table: InterpolatedTable[Rotation] = new InterpolatedTable[Rotation] {

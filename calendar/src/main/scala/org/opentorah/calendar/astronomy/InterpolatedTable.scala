@@ -1,7 +1,7 @@
 package org.opentorah.calendar.astronomy
 
-import org.opentorah.calendar.angles.Angles
-import org.opentorah.calendar.angles.Angles.Rotation
+import org.opentorah.angles.Angles
+import Angles.Rotation
 import org.opentorah.numbers.{BigRational, Number}
 
 trait InterpolatedTable[N <: Number[Angles, N]] {

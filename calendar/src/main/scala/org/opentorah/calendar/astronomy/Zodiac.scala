@@ -1,8 +1,8 @@
 package org.opentorah.calendar.astronomy
 
+import org.opentorah.angles.Angles
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
-import org.opentorah.calendar.angles.Angles
-import org.opentorah.calendar.angles.Angles.{Position, Rotation}
+import Angles.{Position, Rotation}
 
 // KH 11:9
 sealed abstract class Zodiac extends Named {

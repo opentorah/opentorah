@@ -2,7 +2,7 @@ package org.opentorah.calendar.astronomy
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.opentorah.calendar.angles.Angles.Position
+import org.opentorah.angles.Angles.Position
 
 class MoonAnomalyVisibleTest extends AnyFlatSpec with Matchers {
 

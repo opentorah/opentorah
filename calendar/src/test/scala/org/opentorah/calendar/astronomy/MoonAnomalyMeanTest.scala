@@ -2,7 +2,7 @@ package org.opentorah.calendar.astronomy
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.opentorah.calendar.angles.Angles.Rotation
+import org.opentorah.angles.Angles.Rotation
 
 class MoonAnomalyMeanTest extends AnyFlatSpec with Matchers {
   behavior of "Mean Moon Anomaly"

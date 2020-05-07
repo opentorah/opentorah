@@ -1,6 +1,6 @@
 package org.opentorah.calendar.astronomy
 
-import org.opentorah.calendar.angles.Angles.{Position, Rotation}
+import org.opentorah.angles.Angles.{Position, Rotation}
 
 // KH 14:5
 object MoonLongitudeAdjustmentForTimeOfSighting {

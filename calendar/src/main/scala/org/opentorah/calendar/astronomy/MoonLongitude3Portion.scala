@@ -1,6 +1,6 @@
 package org.opentorah.calendar.astronomy
 
-import org.opentorah.calendar.angles.Angles.Position
+import org.opentorah.angles.Angles.Position
 import org.opentorah.numbers.BigRational
 
 object MoonLongitude3Portion {

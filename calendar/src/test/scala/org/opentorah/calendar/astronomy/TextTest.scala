@@ -1,13 +1,13 @@
 package org.opentorah.calendar.astronomy
 
-import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers
-import org.opentorah.calendar.angles.Angles
+import org.opentorah.angles.Angles
 import Angles.{Position, Rotation, headRange, range}
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle}
 import Jewish.{Day, Month, Year}
 import org.opentorah.calendar.dates.YearsCycle
 import org.opentorah.numbers.BigRational
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
 class TextTest extends AnyFunSpec with Matchers {
   describe("Chapter 11") {

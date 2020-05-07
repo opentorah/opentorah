@@ -1,7 +1,7 @@
 package org.opentorah.calendar.astronomy
 
-import org.opentorah.calendar.angles.Angles
-import org.opentorah.calendar.angles.Angles.{Position, Rotation}
+import org.opentorah.angles.Angles
+import Angles.{Position, Rotation}
 
 import scala.math.{abs, asin, cos, pow, round, sin, sqrt}
 

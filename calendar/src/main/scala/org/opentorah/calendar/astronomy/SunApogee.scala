@@ -1,6 +1,6 @@
 package org.opentorah.calendar.astronomy
 
-import org.opentorah.calendar.angles.Angles.{Digit, Rotation}
+import org.opentorah.angles.Angles.{Digit, Rotation}
 import Time2Rotation.Key
 import org.opentorah.numbers.Digit
 

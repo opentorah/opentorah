@@ -1,6 +1,6 @@
-package org.opentorah.calendar.angles
+package org.opentorah.angles
 
-import org.opentorah.calendar.angles.Angles.Rotation
+import Angles.Rotation
 
 final class Exactify(small: Rotation, mult: Int, round: Int, big: Rotation) {
 

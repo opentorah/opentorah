@@ -1,4 +1,4 @@
-package org.opentorah.calendar.angles
+package org.opentorah.angles
 
 import org.opentorah.numbers.NumberCompanion
 

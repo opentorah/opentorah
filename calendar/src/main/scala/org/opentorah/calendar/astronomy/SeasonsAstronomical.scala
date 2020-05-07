@@ -1,6 +1,6 @@
 package org.opentorah.calendar.astronomy
 
-import org.opentorah.calendar.angles.Angles.{Position, Rotation}
+import org.opentorah.angles.Angles.{Position, Rotation}
 import org.opentorah.calendar.jewish.{Jewish, Season}
 import Jewish.{Moment, Month, Year}
 import org.opentorah.numbers.Math

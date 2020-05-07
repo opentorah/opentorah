@@ -1,9 +1,9 @@
 package org.opentorah.calendar.astronomy
 
-import org.opentorah.calendar.angles.{Angles, Exactify, Interval}
-import Angles.{Digit, Rotation}
+import org.opentorah.angles.{Angles, Exactify, Interval}
 import org.opentorah.calendar.jewish.Jewish
 import org.opentorah.numbers.Digit
+import Angles.{Digit, Rotation}
 
 trait Time2Rotation {
   import Time2Rotation.Key
