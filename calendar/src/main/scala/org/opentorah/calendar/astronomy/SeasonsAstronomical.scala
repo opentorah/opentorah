@@ -3,7 +3,7 @@ package org.opentorah.calendar.astronomy
 import org.opentorah.calendar.angles.Angles.{Position, Rotation}
 import org.opentorah.calendar.jewish.{Jewish, Season}
 import Jewish.{Moment, Month, Year}
-import org.opentorah.calendar.numbers.Math
+import org.opentorah.numbers.Math
 
 // In KH 13:11, calculation of true solstices/equinoxes is mentioned, but no algorithm is given.
 final class SeasonsAstronomical(calculator: Calculator) extends Season.ForYear {

@@ -1,6 +1,6 @@
 package org.opentorah.calendar.times
 
-import org.opentorah.calendar.numbers.{Digits, NumbersMember, PointCompanion, VectorCompanion}
+import org.opentorah.numbers.{Digits, NumbersMember, PointCompanion, VectorCompanion}
 
 // For stand-alone testing of Times.
 class SimpleTimes extends Times[SimpleTimes] {

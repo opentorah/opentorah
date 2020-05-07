@@ -1,4 +1,4 @@
-package org.opentorah.calendar.numbers
+package org.opentorah.numbers
 
 abstract class Digits(val digits: Seq[Int]) {
   // at leastthe head digit is present

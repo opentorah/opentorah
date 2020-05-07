@@ -1,4 +1,4 @@
-package org.opentorah.calendar.numbers
+package org.opentorah.numbers
 
 /**
   * Arbitrary precision Rational number.

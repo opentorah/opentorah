@@ -1,11 +1,10 @@
-package org.opentorah.calendar.numbers
+package org.opentorah.numbers
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary.arbitrary
-
 import BigRational.{one, oneHalf, zero}
 
 final class BigRationalTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {

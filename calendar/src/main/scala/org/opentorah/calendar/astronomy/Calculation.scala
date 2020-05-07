@@ -3,7 +3,7 @@ package org.opentorah.calendar.astronomy
 import org.opentorah.calendar.angles.Angles
 import org.opentorah.calendar.angles.Angles.{Position, Rotation}
 import org.opentorah.calendar.jewish.Jewish.Day
-import org.opentorah.calendar.numbers.BigRational
+import org.opentorah.numbers.BigRational
 
 final class Calculation(
   val calculator: Calculator,

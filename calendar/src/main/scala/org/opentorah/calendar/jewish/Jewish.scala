@@ -2,7 +2,7 @@ package org.opentorah.calendar.jewish
 
 import org.opentorah.metadata.LanguageSpec
 import org.opentorah.calendar.dates.{Calendar, CalendarMember}
-import org.opentorah.calendar.numbers.Digits
+import org.opentorah.numbers.Digits
 
 class Jewish private() extends Calendar[Jewish] {
 

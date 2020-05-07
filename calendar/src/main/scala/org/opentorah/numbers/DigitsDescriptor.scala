@@ -1,4 +1,4 @@
-package org.opentorah.calendar.numbers
+package org.opentorah.numbers
 
 trait DigitsDescriptor {
   class DigitBase(override val sign: String) extends Digit {

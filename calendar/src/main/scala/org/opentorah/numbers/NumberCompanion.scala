@@ -1,4 +1,4 @@
-package org.opentorah.calendar.numbers
+package org.opentorah.numbers
 
 trait NumberCompanion[S <: Numbers[S], N <: Number[S, N]] extends NumbersMember[S] {
   final val zero: N = apply(0)

@@ -1,6 +1,6 @@
 package org.opentorah.calendar.angles
 
-import org.opentorah.calendar.numbers.{Digit, Digits, DigitsDescriptor, NumbersMember, PeriodicNumbers,
+import org.opentorah.numbers.{Digit, Digits, DigitsDescriptor, NumbersMember, PeriodicNumbers,
   PointCompanion, VectorCompanion}
 
 trait Angles extends PeriodicNumbers[Angles] {

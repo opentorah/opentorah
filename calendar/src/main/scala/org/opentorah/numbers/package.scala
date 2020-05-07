@@ -1,11 +1,11 @@
-package org.opentorah.calendar
+package org.opentorah
 
 /** Number System.
   *
-  * Each number system `S` (derived from [[org.opentorah.calendar.numbers.Number]])
-  * supports two flavors of [[org.opentorah.calendar.numbers.Number]]:
-  * `S#Point` (derived from [[org.opentorah.calendar.numbers.PointNumber]] and
-  * `S#Vector` (derived from [[org.opentorah.calendar.numbers.VectorNumber]].
+  * Each number system `S` (derived from [[org.opentorah.numbers.Number]])
+  * supports two flavors of [[org.opentorah.numbers.Number]]:
+  * `S#Point` (derived from [[org.opentorah.numbers.PointNumber]] and
+  * `S#Vector` (derived from [[org.opentorah.numbers.VectorNumber]].
   *
   * This distinction allows definitions of operations to be constrained to the types where
   * a give operation makes sense:

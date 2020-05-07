@@ -1,7 +1,7 @@
 package org.opentorah.calendar.astronomy
 
 import org.opentorah.calendar.angles.Angles.{Position, Rotation}
-import org.opentorah.calendar.numbers.BigRational
+import org.opentorah.numbers.BigRational
 
 trait Calculators {
   def sunLongitudeMean: Int => Rotation

@@ -1,6 +1,6 @@
 package org.opentorah.calendar.times
 
-import org.opentorah.calendar.numbers.{Digit, DigitsDescriptor, NonPeriodicNumbers}
+import org.opentorah.numbers.{Digit, DigitsDescriptor, NonPeriodicNumbers}
 
 trait Times[S <: Times[S]] extends NonPeriodicNumbers[S] { this: S =>
   override type Point <: TimePointBase[S]

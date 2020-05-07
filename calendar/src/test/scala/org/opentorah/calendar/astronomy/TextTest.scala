@@ -7,7 +7,7 @@ import Angles.{Position, Rotation, headRange, range}
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle}
 import Jewish.{Day, Month, Year}
 import org.opentorah.calendar.dates.YearsCycle
-import org.opentorah.calendar.numbers.BigRational
+import org.opentorah.numbers.BigRational
 
 class TextTest extends AnyFunSpec with Matchers {
   describe("Chapter 11") {

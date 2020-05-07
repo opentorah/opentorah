@@ -1,4 +1,4 @@
-package org.opentorah.calendar.numbers
+package org.opentorah.numbers
 
 object Math {
   import Zeroable.ZeroableOps

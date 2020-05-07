@@ -1,5 +1,5 @@
 package org.opentorah.calendar.times
 
-import org.opentorah.calendar.numbers.NumbersLawsTest
+import org.opentorah.numbers.NumbersLawsTest
 
 class SimpleTimesLawsTest extends NumbersLawsTest[SimpleTimes](SimpleTimes)

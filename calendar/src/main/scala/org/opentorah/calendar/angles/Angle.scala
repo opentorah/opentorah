@@ -1,7 +1,7 @@
 package org.opentorah.calendar.angles
 
-import org.opentorah.calendar.numbers.Number
 import Angles.Digit
+import org.opentorah.numbers.Number
 
 trait Angle[N <: Angle[N]] extends Number[Angles, N] { this: N =>
   def degrees: Int = get(Digit.DEGREES)

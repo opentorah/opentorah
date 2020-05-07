@@ -1,4 +1,4 @@
-package org.opentorah.calendar.numbers
+package org.opentorah.numbers
 
 trait VectorCompanion[S <: Numbers[S]] extends NumberCompanion[S, S#Vector] {
   protected final override def isCanonical: Boolean = false

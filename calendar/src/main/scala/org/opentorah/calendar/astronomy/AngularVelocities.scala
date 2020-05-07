@@ -3,7 +3,7 @@ package org.opentorah.calendar.astronomy
 import org.opentorah.calendar.angles.Angles
 import org.opentorah.calendar.angles.Angles.Rotation
 import org.opentorah.calendar.jewish.{Jewish, Sun}
-import org.opentorah.calendar.numbers.BigRational
+import org.opentorah.numbers.BigRational
 
 /*
  Al-Battani, WikiPedia:

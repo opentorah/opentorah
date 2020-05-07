@@ -3,7 +3,7 @@ package org.opentorah.calendar.astronomy
 import org.opentorah.calendar.angles.{Angles, Exactify, Interval}
 import Angles.{Digit, Rotation}
 import org.opentorah.calendar.jewish.Jewish
-import org.opentorah.calendar.numbers.Digit
+import org.opentorah.numbers.Digit
 
 trait Time2Rotation {
   import Time2Rotation.Key

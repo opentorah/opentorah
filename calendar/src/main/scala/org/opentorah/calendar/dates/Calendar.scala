@@ -3,8 +3,8 @@ package org.opentorah.calendar.dates
 import org.opentorah.metadata.LanguageSpec
 import org.opentorah.calendar.gregorian.Gregorian
 import org.opentorah.calendar.jewish.Jewish
-import org.opentorah.calendar.numbers.{Digits, VectorCompanion}
 import org.opentorah.calendar.times.{TimeVectorBase, Times}
+import org.opentorah.numbers.{Digits, VectorCompanion}
 
 trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 

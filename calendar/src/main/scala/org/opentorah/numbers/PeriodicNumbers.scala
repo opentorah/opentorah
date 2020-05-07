@@ -1,4 +1,4 @@
-package org.opentorah.calendar.numbers
+package org.opentorah.numbers
 
 trait PeriodicNumbers[S <: PeriodicNumbers[S]] extends Numbers[S] { this: S =>
   final override def headRangeOpt: Option[Int] = Some(headRange)

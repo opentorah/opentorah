@@ -3,9 +3,9 @@ package org.opentorah.calendar.times
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
-import org.opentorah.calendar.numbers.BigRational
 import SimpleTimes.{Point, Vector}
 import SimpleTimes.Digit
+import org.opentorah.numbers.BigRational
 
 final class SimpleTimesTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {
 

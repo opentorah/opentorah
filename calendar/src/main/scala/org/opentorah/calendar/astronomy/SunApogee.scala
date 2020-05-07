@@ -2,7 +2,7 @@ package org.opentorah.calendar.astronomy
 
 import org.opentorah.calendar.angles.Angles.{Digit, Rotation}
 import Time2Rotation.Key
-import org.opentorah.calendar.numbers.Digit
+import org.opentorah.numbers.Digit
 
 object SunApogee extends Time2Rotation {
   // KH 12:2

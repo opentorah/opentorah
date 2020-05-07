@@ -1,4 +1,4 @@
-package org.opentorah.calendar.numbers
+package org.opentorah.numbers
 
 /** Number (Point or Vector) from the number system `S`.
   * Number is a sequence of fractions where numerator is the `digit` and denominator

@@ -1,7 +1,7 @@
 package org.opentorah.calendar.dates
 
-import org.opentorah.calendar.numbers.PointCompanion
 import java.util.GregorianCalendar
+import org.opentorah.numbers.PointCompanion
 
 abstract class MomentCompanion[C <: Calendar[C]] extends PointCompanion[C] with CalendarMember[C] {
   def from(value: GregorianCalendar): C#Moment

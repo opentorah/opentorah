@@ -1,4 +1,4 @@
-package org.opentorah.calendar.numbers
+package org.opentorah.numbers
 
 import cats.Eq
 import org.scalatest.funsuite.AnyFunSuite

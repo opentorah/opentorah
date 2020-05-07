@@ -1,4 +1,4 @@
-package org.opentorah.calendar.numbers
+package org.opentorah.numbers
 
 /**
   * Operations needed to find a zero crossing of a function.
