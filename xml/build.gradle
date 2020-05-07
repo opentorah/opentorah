@@ -1,4 +1,5 @@
 plugins {
+  id 'java-library'
   id 'scala'
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
@@ -34,8 +35,8 @@ configureLibrary(['Scala', 'XML'])
 dependencies {
   implementation project(':util')
 
-  compile "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
-  compile "dev.zio:zio_$scalaVersionMajor:$zioVersion"
+  api "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+  api "dev.zio:zio_$scalaVersionMajor:$zioVersion"
 
   implementation "org.typelevel:paiges-core_$scalaVersionMajor:$paigesVersion"
 

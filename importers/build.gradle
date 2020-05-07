@@ -1,12 +1,13 @@
 plugins {
-    id 'scala'
+  id 'java-library'
+  id 'scala'
 }
 
 configureLibrary(TODO)
 
 dependencies {
-    implementation project(':store')
+  implementation project(':store')
 
-    implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
-    implementation "org.ccil.cowan.tagsoup:tagsoup:$tagsoupVersion"
+  implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+  implementation "org.ccil.cowan.tagsoup:tagsoup:$tagsoupVersion"
 }

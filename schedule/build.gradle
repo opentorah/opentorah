@@ -1,4 +1,5 @@
 plugins {
+  id 'java-library'
   id 'scala'
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
@@ -10,8 +11,8 @@ description = 'Jewish Readings and Learning Schedules'
 configureLibrary(['Scala', 'Jewish', 'Calendar', 'Torah'])
 
 dependencies {
-  compile project(':calendar')
-  compile project(':texts')
+  api project(':calendar')
+  api project(':texts')
 
   implementation project(':util')
 }
