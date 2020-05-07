@@ -18,12 +18,15 @@ pluginManagement {
 include ':util'
 include ':xml'
 include ':store'
-include ':calendar'
 include ':texts'
+// TODO include ':importers'
+
+include ':calendar'
 include ':schedule'
 include ':calendar-service'
 include ':collector'
 include ':collector-service'
+
 include ':fop'
 include ':docbook'
 
