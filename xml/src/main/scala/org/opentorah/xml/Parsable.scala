@@ -27,7 +27,7 @@ trait Parsable[A] {
     all(Seq.empty, mustBe = false)
 
   final def allMustBe: Parser[Seq[A]] =
-    all(Seq.empty, mustBe = false)
+    all(Seq.empty, mustBe = true)
 
   private def all(acc: Seq[A], mustBe: Boolean): Parser[Seq[A]] = for {
     nextName <- Context.nextElementName
