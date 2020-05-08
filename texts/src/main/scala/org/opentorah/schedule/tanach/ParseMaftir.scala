@@ -1,8 +1,8 @@
 package org.opentorah.schedule.tanach
 
 import org.opentorah.metadata.WithNames
-import org.opentorah.xml.{Element, From, Parser}
 import org.opentorah.texts.tanach.Torah
+import org.opentorah.xml.{Element, From, Parser}
 import scala.xml.Elem
 
 trait ParseMaftir { self: WithNames =>

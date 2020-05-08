@@ -11,6 +11,7 @@ import org.opentorah.schedule.tanach.books._
 
 import scala.xml.Elem
 
+// TODO split; move one into 'calendar', another into 'texts'?
 object SpecialDay {
 
   sealed class LoadNames(override val name: String) extends WithName with WithNames {
