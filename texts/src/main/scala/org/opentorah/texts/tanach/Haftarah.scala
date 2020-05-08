@@ -60,11 +60,10 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
     new Custom.Of(result, full = full)
   }
 
-  def parse(element: Elem, full: Boolean = true): Customs = Parser.parseDo(
-    new Element[Customs](
-      elementName = "haftarah",
-      parser = parser(full)
-    ).parse(From.xml("Haftarah", element)))
+  def haftarahParsable(full: Boolean): Element[Customs] = new Element[Customs](
+    elementName = "haftarah",
+    parser = parser(full)
+  )
 
   private def oneSpan(span: BookSpanParsed): Haftarah = Haftarah(Seq(span.resolve))
 
