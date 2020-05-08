@@ -1,6 +1,5 @@
 package org.opentorah.util
 
-// TODO move to what uses it
 abstract class Cache[S, T] extends Function[S, T] {
   private val values = new collection.mutable.WeakHashMap[S, T]
 

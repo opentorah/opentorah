@@ -39,19 +39,13 @@ sealed abstract class Saxon(name: String) {
     stylesheetFile: File,
     xmlReader: XMLReader,
     outputFile: Option[File]
-  ): Unit = {
-    xmlReader.setEntityResolver(resolver)
-
-    // TODO push down into the ground-level transform() (build Source there...)
-    Saxon.setErrorHandler(xmlReader, Saxon.logger)
-
-    transform(
-      resolver = Some(resolver),
-      stylesheetFile = Some(stylesheetFile),
-      source = new SAXSource(xmlReader, new InputSource(inputFile.toURI.toASCIIString)),
-      result = getOutputTarget(outputFile)
-    )
-  }
+  ): Unit = transform(
+    resolver = Some(resolver),
+    stylesheetFile = Some(stylesheetFile),
+    inputSource = new InputSource(inputFile.toURI.toASCIIString),
+    xmlReader,
+    result = getOutputTarget(outputFile)
+  )
 
   private def getOutputTarget(outputFile: Option[File]): Result = {
     val result = new StreamResult
@@ -80,19 +74,35 @@ sealed abstract class Saxon(name: String) {
     input: String,
     xmlReader: XMLReader
   ): Node = {
-    // TODO push down into the ground-level transform() (build Source there...)
-    Saxon.setErrorHandler(xmlReader, Saxon.logger)
-
     val result = new DOMResult
 
     transform(
       resolver = None,
       stylesheetFile = None,
-      source = new SAXSource(xmlReader, new InputSource(new StringReader(input))),
-      result = result
+      inputSource = new InputSource(new StringReader(input)),
+      xmlReader,
+      result
     )
 
     result.getNode
+  }
+
+  private def transform(
+    resolver: Option[Resolver],
+    stylesheetFile: Option[File],
+    inputSource: InputSource,
+    xmlReader: XMLReader,
+    result: Result
+  ): Unit = {
+    resolver.foreach(resolver => xmlReader.setEntityResolver(resolver))
+    Saxon.setErrorHandler(xmlReader, Saxon.logger)
+
+    transform(
+      resolver,
+      stylesheetFile,
+      source = new SAXSource(xmlReader, inputSource),
+      result
+    )
   }
 
   private def transform(

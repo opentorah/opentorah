@@ -3,7 +3,6 @@ package org.opentorah.xml
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
-// TODO move into org.opentorah.xml package
 object AttributeInfo {
 
   private final case class AttributeInfo(

@@ -50,15 +50,8 @@ object Files {
 
   def read(file: File): Seq[String] = {
     val source = Source.fromFile(file)
-    val result = source.getLines.toSeq
-    source.close
-    result
-  }
-
-  // TODO read eagerly, so that mkString() could be done on the outside:
-  def read1(file: File): String = {
-    val source = Source.fromFile(file)
-    val result = source.getLines.toSeq.mkString("\n")
+    // Note: toList materializes the iterator before closing the source
+    val result = source.getLines.toList
     source.close
     result
   }
