@@ -12,7 +12,7 @@ version = calendarProjectVersion
 configureLibrary(['Scala', 'Jewish', 'Calendar', 'Torah'])
 
 dependencies {
-  implementation project(':texts')
+  implementation project(':store')
   implementation project(':util')
 
   testImplementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"

@@ -1,6 +1,5 @@
-package org.opentorah.schedule.tanach
+package org.opentorah.texts.tanach
 
-import org.opentorah.texts.tanach.{Custom, Torah}
 import org.opentorah.texts.tanach.Torah.Maftir
 import org.opentorah.util.Collections.mapValues
 

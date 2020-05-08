@@ -2,9 +2,9 @@ package org.opentorah.schedule.tanach
 
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
 import org.opentorah.dates.Calendar
-import org.opentorah.texts.tanach.Parsha
-import org.opentorah.texts.tanach.Parsha._
 import org.opentorah.metadata.{Names, WithNames}
+import org.opentorah.texts.tanach.{Haftarah, Parsha, Reading}
+import org.opentorah.texts.tanach.Parsha._
 import org.opentorah.util.Collections
 import SpecialDay.{Pesach, Shavuos, TishaBeAv}
 

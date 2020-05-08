@@ -17,6 +17,8 @@ pluginManagement {
 
 include ':util'
 include ':xml'
+include ':metadata'
+
 include ':store'
 include ':texts'
 // TODO include ':importers'

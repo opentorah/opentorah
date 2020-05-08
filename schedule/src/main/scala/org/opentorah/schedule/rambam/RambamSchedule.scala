@@ -1,5 +1,6 @@
 package org.opentorah.schedule.rambam
 
+import org.opentorah.calendar.Calendars
 import org.opentorah.calendar.jewish.Jewish.{Day, Month, Year}
 import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
 
@@ -28,14 +29,11 @@ object RambamSchedule {
     val chapter: MishnehTorah.Chapter
   )
 
-  private val chapters: Seq[MishnehTorah.Chapter] = MishnehTorah.books.flatMap(_.parts.flatMap(_.chapters))
-
-  private val numberOfChapters: Int = chapters.length
-
   final val numberOfLessons: Int = 339
   require(SeferHamitzvosLessons.lessons.map(_.number) == (1 to numberOfLessons))
 
-
+  private val chapters: Seq[MishnehTorah.Chapter] = MishnehTorah.books.flatMap(_.parts.flatMap(_.chapters))
+  private val numberOfChapters: Int = chapters.length
   require(numberOfLessons*3 == numberOfChapters)
 
   final val epoch: Day = Year(5744).month(Month.Name.Nisan).day(27)
@@ -62,12 +60,34 @@ object RambamSchedule {
     )
   }
 
-  def main(args: Array[String]): Unit = {
-    // printSchedule(Formatter.narrow)(5777)
-  }
+  def main(args: Array[String]): Unit =
+    scheduleYear(Year(5777), Formatter.narrow).foreach(println)
 
-  def printSchedule(formatter: Formatter)(numYear: Int): Unit = {
-    def lessonNumber(day: Day): Int = (day - epoch) % numberOfLessons + 1
-    Schedule.scheduleYear(Year(numYear), (day: Day) => lessonNumber(day).toString, formatter).foreach(println)
+  def scheduleYear(year: Year, formatter: Formatter): Iterator[String] = {
+    def lesson(day: Day): String = ((day - epoch) % numberOfLessons + 1).toString
+
+    def scheduleMonth(month: Month): Seq[String] = {
+      val lessons = for {
+        day <- month.days
+        gDay = Calendars.fromJewish(day)
+      } yield formatter.formatLesson(
+        day.numberInMonth,
+        gDay.month.numberInYear,
+        gDay.numberInMonth,
+        lesson(day)
+      )
+
+      val result = month.name.toString +: (if (lessons.size == 30) lessons else lessons ++ Seq(""))
+      result.map(formatter.formatLine)
+    }
+
+    def scheduleMonths(months: Seq[Month]): Seq[String] = {
+      def combine(what: Seq[String]): String =
+        what.reduce((acc: String, r: String) => acc ++ "    " ++ r)
+      val schedules: Seq[Seq[String]] = months.map(scheduleMonth)
+      schedules.transpose.map(combine) ++ Seq("")
+    }
+
+    year.months.sliding(formatter.numColumns, formatter.numColumns).flatMap(scheduleMonths)
   }
 }

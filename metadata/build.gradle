@@ -6,12 +6,12 @@ plugins {
   id 'com.jfrog.bintray'
 }
 
-description = 'Open Torah Store'
+description = 'Open Torah Metadata'
 
-configureLibrary(['Scala', 'Jewish', 'TEI'])
+configureLibrary(['Scala'])
 
 dependencies {
-  api project(":metadata")
+  api project(":xml")
 
   implementation project(':util')
 }
