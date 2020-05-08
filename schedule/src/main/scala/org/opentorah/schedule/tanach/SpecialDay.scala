@@ -309,9 +309,7 @@ object SpecialDay {
     protected override def dropOnWeekday: Set[Int] = Set(3, 5)
 
     protected override def maftirElement: Elem = Numbers.roshHashanahMaftir
-
-    protected override val haftarahElement: Elem =
-        <haftarah book="I Samuel" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
+    protected override def haftarahElement: Elem = Genesis.roshHashanah1haftarah
   }
 
   case object RoshHashanah2 extends Festival with NonFirstDayOf with WeekdayReadingSimple
@@ -324,11 +322,8 @@ object SpecialDay {
     override lazy val names: Names = namesWithNumber(RoshHashanah1, 2)
 
     protected override val torahElement: Elem = Genesis.roshHashanah2torah
-
     protected override def maftir: Maftir = RoshHashanah1.maftir
-
-    protected override def haftarahElement: Elem =
-      <haftarah book="Jeremiah" fromChapter="31" fromVerse="1" toVerse="19"/>
+    protected override def haftarahElement: Elem = Genesis.roshHashanah2haftarah
   }
 
   case object FastOfGedalia extends LoadNames("Fast of Gedalia")

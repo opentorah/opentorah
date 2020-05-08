@@ -18,6 +18,9 @@ object Genesis {
       <aliyah n="7" fromVerse="28"/>
     </torah>
 
+  val roshHashanah1haftarah: Elem =
+    <haftarah book="I Samuel" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
+
   val roshHashanah2torah: Elem =
     <torah book="Genesis" fromChapter="22" fromVerse="1" toVerse="24">
       <aliyah n="2" fromVerse="4"/>
@@ -25,4 +28,7 @@ object Genesis {
       <aliyah n="4" fromVerse="15"/>
       <aliyah n="5" fromVerse="20"/>
     </torah>
+
+  val roshHashanah2haftarah: Elem =
+    <haftarah book="Jeremiah" fromChapter="31" fromVerse="1" toVerse="19"/>
 }
