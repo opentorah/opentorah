@@ -2,6 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{WithNames, WithNumber}
 import org.opentorah.util.Collections
+import org.opentorah.xml.Element
 
 // Other than on Simchas Torah, aliyot are from the same book.
 final case class Torah private(override val spans: Seq[Torah.BookSpan])
@@ -63,6 +64,17 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
     val bookSpans: Seq[Aliyah] = spans.map(inBook(bookSpan.book, _))
     Torah(bookSpans)
   }
+
+  val torahParsable: Element[Torah] = new Element[Torah](
+    elementName = "torah",
+    parser = for {
+      bookSpan <- Torah.spanParser.map(_.resolve)
+      spans <- new Element[Torah.Numbered](
+        elementName = "aliyah",
+        parser = WithNumber.parse(SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve))
+      ).all
+    } yield Torah.parseAliyot(bookSpan, spans, number = None)
+  )
 
   def inBook(book: Tanach.ChumashBook, span: Span): BookSpan = BookSpan(book, span)
 
