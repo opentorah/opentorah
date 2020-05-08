@@ -1,7 +1,6 @@
-package org.opentorah.schedule.tanach
+package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{WithNames, WithNumber}
-import org.opentorah.texts.tanach.{SpanParsed, Torah}
 import org.opentorah.xml.{Element, From, Parser}
 import scala.xml.Elem
 

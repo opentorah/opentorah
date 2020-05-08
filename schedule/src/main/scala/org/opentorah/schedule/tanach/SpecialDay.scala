@@ -1,17 +1,16 @@
 package org.opentorah.schedule.tanach
 
-import org.opentorah.metadata.{Metadata, Names, WithName, WithNames}
-import org.opentorah.xml.From
-import org.opentorah.texts.tanach.{Custom, Parsha, Source, Torah}
-import org.opentorah.texts.tanach.Torah.{Aliyah, Maftir}
 import org.opentorah.calendar.jewish.Jewish.{Day, Month, Year}
 import org.opentorah.calendar.jewish.Jewish.Month.Name._
 import org.opentorah.calendar.jewish.{JewishDay, JewishYear}
-import org.opentorah.schedule.tanach.books._
-
+import org.opentorah.texts.tanach.{Custom, Haftarah, ParseHaftarah, ParseHaftarahRaw, ParseMaftir, ParseTorah,
+  ParseTorahRaw, Parsha, Reading, Source, Torah}
+import org.opentorah.texts.tanach.Torah.{Aliyah, Maftir}
+import org.opentorah.texts.tanach.books._
+import org.opentorah.metadata.{Metadata, Names, WithName, WithNames}
+import org.opentorah.xml.From
 import scala.xml.Elem
 
-// TODO split; move one into 'calendar', another into 'texts'?
 object SpecialDay {
 
   sealed class LoadNames(override val name: String) extends WithName with WithNames {

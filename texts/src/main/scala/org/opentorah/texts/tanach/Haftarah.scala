@@ -1,7 +1,6 @@
-package org.opentorah.schedule.tanach
+package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{LanguageSpec, Metadata, Names, WithNumber}
-import org.opentorah.texts.tanach.{Custom, Parsha, Tanach, WithBookSpans}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, From, Parser}
 import zio.ZIO
