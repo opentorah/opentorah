@@ -7,7 +7,6 @@ import org.opentorah.texts.tanach.{Custom, Haftarah, Parsha, Reading, Source, Sp
 import org.opentorah.texts.tanach.Torah.{Aliyah, Maftir}
 import org.opentorah.metadata.{Metadata, Names, WithName, WithNames}
 import org.opentorah.xml.{From, Parser}
-
 import scala.xml.Elem
 
 object SpecialDay {
@@ -16,7 +15,7 @@ object SpecialDay {
     final override def names: Names = toNames(this)
   }
 
-  trait ParseRaw { self: WithNames =>
+  trait Parse { self: WithNames =>
 
     protected final def parseTorah(element: Elem): Torah =
       Parser.parseDo(Torah.torahParsable.parse(From.xml("Torah", element)))
@@ -29,11 +28,6 @@ object SpecialDay {
     protected final def parseHaftarah(element: Elem, full: Boolean = true): Haftarah.Customs =
       Parser.parseDo(Haftarah.haftarahParsable(full).parse(From.xml("Haftarah", element)))
         .map(_.from(this), full)
-  }
-
-  trait ParseHaftarah extends ParseRaw { self: WithNames =>
-    final lazy val haftarah: Haftarah.Customs = parseHaftarah(haftarahElement)
-    protected def haftarahElement: Elem
   }
 
   sealed trait Date extends WithNames {
@@ -96,10 +90,7 @@ object SpecialDay {
     protected def weekdayTorah: Torah
   }
 
-  sealed trait ShabbosAndWeekdayReadingParse extends ShabbosAndWeekdayReading with ParseRaw { self: WithNames =>
-    final override lazy val shabbosTorah: Torah = parseTorah(shabbosTorahElement)
-    protected def shabbosTorahElement: Elem
-
+  sealed trait ShabbosAndWeekdayReadingParse extends ShabbosAndWeekdayReading with Parse { self: WithNames =>
     final override lazy val weekdayTorah: Torah = shabbosTorah.drop(dropOnWeekday)
     protected def dropOnWeekday: Set[Int]
   }
@@ -112,14 +103,14 @@ object SpecialDay {
 
   sealed trait Festival extends FestivalOrIntermediate with WeekdayReading
 
-  private object FestivalEnd extends LoadNames("Festival End") with ParseRaw {
+  private object FestivalEnd extends LoadNames("Festival End") with Parse {
     val endShabbosTorah: Torah = parseTorah(SpecialReadings.festivalEndShabbosTorah)
     val endWeekdayTorah: Torah = Torah(endShabbosTorah.spans.drop(2))
     val sheminiAtzeresWeekdayTorah: Torah = endShabbosTorah.drop(Set(2, 3))
   }
 
-  private object IntermediateShabbos extends LoadNames("Intermediate Shabbos") with ParseRaw {
-    final lazy val torah: Torah = parseTorah(SpecialReadings.intermediateShabbosTorah)
+  private object IntermediateShabbos extends LoadNames("Intermediate Shabbos") with Parse {
+    lazy val torah: Torah = parseTorah(SpecialReadings.intermediateShabbosTorah)
   }
 
   sealed abstract class Intermediate(intermediateDayNumber: Int, inHolyLand: Boolean)
@@ -176,9 +167,9 @@ object SpecialDay {
   }
 
   case object RoshChodesh extends LoadNames("Rosh Chodesh")
-    with WeekdayReading with MaftirAndHaftarahTransform with ParseRaw
+    with WeekdayReading with MaftirAndHaftarahTransform with Parse
   {
-    final lazy val torah: Torah = parseTorah(SpecialReadings.roshChodesh)
+    lazy val torah: Torah = parseTorah(SpecialReadings.roshChodesh)
 
     override val weekday: Reading = {
       val all = torah.spans
@@ -235,8 +226,9 @@ object SpecialDay {
   }
 
   case object ErevRoshChodesh extends LoadNames("Erev Rosh Chodesh") with MaftirAndHaftarahTransform
-    with ParseRaw
+    with Parse
   {
+    // TODO isSpecialShabbos is not used?
     def correct(month: Month.Name, isSpecialShabbos: Boolean, isRoshChodesh: Boolean, reading: Reading): Reading = {
       val allowReplace: Boolean = specialShabbos.isEmpty && !isRoshChodesh &&
         (month != Teves) && (month != Av) && (month != Elul)
@@ -262,7 +254,7 @@ object SpecialDay {
       parseHaftarah(full = false, element = SpecialReadings.erevRoshChodeshShabbosAdditionalHaftarah)
   }
 
-  private object Fast extends LoadNames("Public Fast") with ParseRaw {
+  private object Fast extends LoadNames("Public Fast") with Parse {
     val torah: Torah = Torah.aliyot(
       parseTorah(SpecialReadings.fastAfternoonTorahPart1).spans.head, // Exodus 32:11-14
       IntermediateShabbos.torah.spans(3),                             // Exodus 34:1-3
@@ -300,48 +292,48 @@ object SpecialDay {
   }
 
   case object RoshHashanah1 extends LoadNames("Rosh Hashanah") with Festival
-    with ShabbosAndWeekdayReadingParse with ParseHaftarah
+    with ShabbosAndWeekdayReadingParse with Parse
   {
     override def date(year: JewishYear): JewishDay = year.month(Tishrei).day(1)
 
-    protected override def shabbosTorahElement: Elem = SpecialReadings.roshHashana1torah
-    protected override def dropOnWeekday: Set[Int] = Set(3, 5)
+    override lazy val shabbosTorah: Torah = parseTorah(SpecialReadings.roshHashana1torah)
+    override protected def dropOnWeekday: Set[Int] = Set(3, 5)
 
-    final lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.roshHashanahMaftir)
-    protected override def haftarahElement: Elem = SpecialReadings.roshHashanah1haftarah
+    lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.roshHashanahMaftir)
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.roshHashanah1haftarah)
   }
 
-  case object RoshHashanah2 extends Festival with NonFirstDayOf with WeekdayReadingSimple with ParseHaftarah {
+  case object RoshHashanah2 extends Festival with NonFirstDayOf with WeekdayReadingSimple with Parse {
     override def firstDay: Date = RoshHashanah1
 
     override def dayNumber: Int = 2
 
     override lazy val names: Names = namesWithNumber(RoshHashanah1, 2)
 
-    final lazy val torah: Torah = parseTorah(SpecialReadings.roshHashanah2torah)
+    lazy val torah: Torah = parseTorah(SpecialReadings.roshHashanah2torah)
     protected override def maftir: Maftir = RoshHashanah1.maftir
-    protected override def haftarahElement: Elem = SpecialReadings.roshHashanah2haftarah
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.roshHashanah2haftarah)
   }
 
   case object FastOfGedalia extends LoadNames("Fast of Gedalia")
-    with NonTishaBeAvFast with PostponeOnShabbos with ParseRaw
+    with NonTishaBeAvFast with PostponeOnShabbos with Parse
   {
-    final override def date(year: Year): Day = year.month(Tishrei).day(3)
+    override def date(year: Year): Day = year.month(Tishrei).day(3)
 
     protected override val afternoonHaftarahExceptions: Option[Haftarah.Customs] =
       Some(parseHaftarah(full = false, element = SpecialReadings.fasOfGedaliaAfternoonHaftarahExceptions))
   }
 
   case object YomKippur extends LoadNames("Yom Kippur") with Festival with ShabbosAndWeekdayReadingParse
-    with AfternoonReading with ParseHaftarah
+    with AfternoonReading with Parse
   {
     override def date(year: JewishYear): JewishDay = year.month(Tishrei).day(10)
 
-    protected override def shabbosTorahElement: Elem = SpecialReadings.yomKippurTorah
+    override lazy val shabbosTorah: Torah = parseTorah(SpecialReadings.yomKippurTorah)
     protected override val dropOnWeekday: Set[Int] = Set(2)
 
-    final lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.yomKippurMaftir)
-    protected override def haftarahElement: Elem = SpecialReadings.yomKippurHaftarah
+    lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.yomKippurMaftir)
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.yomKippurHaftarah)
 
     override lazy val afternoon: Reading = Reading(torah = afternoonTorah, maftir = None, haftarah = afternoonHaftarah)
 
@@ -352,17 +344,17 @@ object SpecialDay {
   }
 
   case object Succos1 extends LoadNames("Succos") with Festival with FirstDayOf
-    with ShabbosAndWeekdayReadingParse with ParseHaftarah
+    with ShabbosAndWeekdayReadingParse with Parse
   {
     override def date(year: JewishYear): JewishDay = year.month(Tishrei).day(15)
 
-    override def shabbosTorahElement: Elem = SpecialReadings.succos1and2torah
+    override lazy val shabbosTorah: Torah = parseTorah(SpecialReadings.succos1and2torah)
     override val dropOnWeekday: Set[Int] = Set(2, 4)
-    protected override def haftarahElement: Elem = SpecialReadings.succos1haftarah
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.succos1haftarah)
     override def maftir: Maftir = SuccosIntermediate.korbanot.head
   }
 
-  case object Succos2 extends Festival with NonFirstDayOf with ShabbosAndWeekdayReading with ParseHaftarah {
+  case object Succos2 extends Festival with NonFirstDayOf with ShabbosAndWeekdayReading with Parse {
     override def names: Names = namesWithNumber(Succos1, 2)
 
     override def firstDay: Date = Succos1
@@ -372,10 +364,10 @@ object SpecialDay {
     protected override def shabbosTorah: Torah = Succos1.shabbosTorah
     protected override def weekdayTorah: Torah = Succos1.weekdayTorah
     protected override def maftir: Maftir = Succos1.maftir
-    protected override def haftarahElement: Elem = SpecialReadings.succos2haftarah
+    final lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.succos2haftarah)
   }
 
-  private object SuccosIntermediate extends LoadNames("Succos Intermediate") with ParseRaw {
+  private object SuccosIntermediate extends LoadNames("Succos Intermediate") with Parse {
     val korbanot: Seq[Torah.Fragment] = parseTorah(SpecialReadings.succosKorbanot).spans
     val shabbosHaftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.succosIntermediateShabbosHaftarah)
   }
@@ -434,7 +426,7 @@ object SpecialDay {
   case object HoshanahRabbahInHolyLand      extends SuccosIntermediate(6, true)
 
   case object SheminiAtzeres extends LoadNames("Shemini Atzeres")
-    with Festival with NonFirstDayOf with ShabbosAndWeekdayReading with ParseHaftarah
+    with Festival with NonFirstDayOf with ShabbosAndWeekdayReading with Parse
   {
     override def firstDay: Date = Succos1
     override def dayNumber: Int = 8
@@ -442,17 +434,17 @@ object SpecialDay {
     protected override def shabbosTorah: Torah = FestivalEnd.endShabbosTorah
     protected override def weekdayTorah: Torah = FestivalEnd.sheminiAtzeresWeekdayTorah
     override val maftir: Maftir = SuccosIntermediate.korbanot.last
-    protected override def haftarahElement: Elem = SpecialReadings.sheminiAtzeresHaftarah
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.sheminiAtzeresHaftarah)
   }
 
-  sealed trait SimchasTorahCommon extends Festival with NonFirstDayOf with WeekdayReadingSimple with ParseHaftarah {
+  sealed trait SimchasTorahCommon extends Festival with NonFirstDayOf with WeekdayReadingSimple with Parse {
     final override def firstDay: Date = Succos1
 
     protected override def maftir: Maftir = SheminiAtzeres.maftir
-    protected override def haftarahElement: Elem = SpecialReadings.simchasTorahHaftarah
+    final lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.simchasTorahHaftarah)
   }
 
-  case object SimchasTorah extends LoadNames("Simchas Torah") with SimchasTorahCommon with ParseRaw {
+  case object SimchasTorah extends LoadNames("Simchas Torah") with SimchasTorahCommon with Parse {
     override def dayNumber: Int = 9
 
     val chassanBereishis: Torah.Fragment = parseTorah(SpecialReadings.chassanBereishis).spans.head
@@ -476,7 +468,7 @@ object SpecialDay {
     override def date(year: Year): Day = SimchasTorah.date(year).shabbosAfter
   }
 
-  private object Chanukah extends LoadNames("Chanukah") with ParseRaw {
+  private object Chanukah extends LoadNames("Chanukah") with Parse {
     val day1Cohen: Torah = parseTorah(SpecialReadings.chanukahFirst)
 
     val korbanot: Seq[Torah.Fragment] = parseTorah(SpecialReadings.chanukahKorbanotSpans).spans
@@ -562,9 +554,9 @@ object SpecialDay {
         result
   }
 
-  sealed trait SpecialShabbos extends Date with ParseRaw with ParseHaftarah
+  sealed trait SpecialShabbos extends Date with Parse
 
-  sealed trait SpecialParsha extends SpecialShabbos with MaftrirAndHaftarah with ParseRaw {
+  sealed trait SpecialParsha extends SpecialShabbos with MaftrirAndHaftarah with Parse {
     final def transform(reading: Reading, isRoshChodesh: Boolean): Reading = {
       val result = replaceMaftirAndHaftarah(reading, maftir, haftarah)
       if (!isRoshChodesh) result else RoshChodesh.addShabbosMaftirAs7thAliyah(result)
@@ -577,22 +569,22 @@ object SpecialDay {
       if (result.isShabbos) result else result.shabbosBefore
     }
 
-    final lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.parshasShekalimMaftir)
-    protected override def haftarahElement: Elem = SpecialReadings.parshasShekalimHaftarah
+    lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.parshasShekalimMaftir)
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.parshasShekalimHaftarah)
   }
 
   case object ParshasZachor extends LoadNames("Parshas Zachor") with SpecialParsha {
     override def date(year: Year): Day = Purim.date(year).shabbosBefore
 
-    final lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.parshasZachorMaftir)
-    protected override def haftarahElement: Elem = SpecialReadings.parshasZachorHaftarah
+    lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.parshasZachorMaftir)
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.parshasZachorHaftarah)
   }
 
   case object ParshasParah extends LoadNames("Parshas Parah") with SpecialParsha {
     override def date(year: Year): Day = ParshasHachodesh.date(year).shabbosBefore
 
-    final lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.parshasParahMaftir)
-    protected override def haftarahElement: Elem = SpecialReadings.parshasParahHaftarah
+    lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.parshasParahMaftir)
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.parshasParahHaftarah)
   }
 
   case object ParshasHachodesh extends LoadNames("Parshas Hachodesh") with SpecialParsha {
@@ -601,8 +593,8 @@ object SpecialDay {
       if (result.isShabbos) result else result.shabbosBefore
     }
 
-    final lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.parshasHachodeshMaftir)
-    protected override def haftarahElement: Elem = SpecialReadings.parshasHachodeshHaftarah
+    lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.parshasHachodeshMaftir)
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.parshasHachodeshHaftarah)
   }
 
   case object ShabbosHagodol extends LoadNames("Shabbos Hagodol") with SpecialShabbos {
@@ -615,15 +607,15 @@ object SpecialDay {
           else readingCustom.replaceHaftarah(haftarah)
       })
 
-    protected override def haftarahElement: Elem = SpecialReadings.shabbosHagodolHaftarah
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.shabbosHagodolHaftarah)
   }
 
   sealed trait PurimCommon extends RabbinicFestival with WeekdayReading
 
-  case object Purim extends LoadNames("Purim") with PurimCommon with ParseRaw {
+  case object Purim extends LoadNames("Purim") with PurimCommon with Parse {
     override def date(year: Year): Day = year.latestAdar.day(14)
 
-    final lazy val torah: Torah = parseTorah(SpecialReadings.purimTorah)
+    lazy val torah: Torah = parseTorah(SpecialReadings.purimTorah)
     override def weekday: Reading = Reading(torah)
   }
 
@@ -632,7 +624,7 @@ object SpecialDay {
 
     override def weekday: Reading = Reading(Purim.torah)
 
-    final def shabbos(weeklyReading: WeeklyReading): Reading = {
+    def shabbos(weeklyReading: WeeklyReading): Reading = {
       replaceMaftirAndHaftarah(weeklyReading.getMorningReading,
         maftir = shushanPurimShabbosMaftir,
         haftarah = ParshasZachor.haftarah)
@@ -643,17 +635,17 @@ object SpecialDay {
   }
 
   case object Pesach extends LoadNames("Pesach") with Festival with FirstDayOf
-    with ShabbosAndWeekdayReadingParse with ParseHaftarah
+    with ShabbosAndWeekdayReadingParse with Parse
   {
-    final def date(year: Year): Day = year.month(Nisan).day(15)
+    def date(year: Year): Day = year.month(Nisan).day(15)
 
-    protected override def shabbosTorahElement: Elem = SpecialReadings.pesach1torah
+    override lazy val shabbosTorah: Torah = parseTorah(SpecialReadings.pesach1torah)
     protected override val dropOnWeekday: Set[Int] = Set(4, 7)
-    final lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.pesachMaftir)
-    protected override def haftarahElement: Elem = SpecialReadings.pesachHaftarah
+    lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.pesachMaftir)
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.pesachHaftarah)
   }
 
-  case object Pesach2 extends Festival with NonFirstDayOf with WeekdayReadingSimple with ParseHaftarah {
+  case object Pesach2 extends Festival with NonFirstDayOf with WeekdayReadingSimple with Parse {
     override lazy val names: Names = namesWithNumber(Pesach, 2)
 
     override def firstDay: Date = Pesach
@@ -662,10 +654,10 @@ object SpecialDay {
 
     override def torah: Torah = Succos1.weekdayTorah
     protected override val maftir: Maftir = Pesach.maftir
-    protected override def haftarahElement: Elem = SpecialReadings.pesach2Haftarah
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.pesach2Haftarah)
   }
 
-  private object PesachIntermediate extends LoadNames("Pesach Intermediate") with ParseRaw {
+  private object PesachIntermediate extends LoadNames("Pesach Intermediate") with Parse {
     def first5(realDayNumber: Int): Torah = realDayNumber match {
       case 2 => day2
       case 3 => day3
@@ -720,19 +712,19 @@ object SpecialDay {
   case object PesachIntermediate5InHolyLand extends PesachIntermediate(5, true)
 
   case object Pesach7 extends LoadNames("Pesach 7") with Festival with NonFirstDayOf
-    with ShabbosAndWeekdayReadingParse with ParseHaftarah
+    with ShabbosAndWeekdayReadingParse with Parse
   {
     override def firstDay: Date = Pesach
     override def dayNumber: Int = 7
 
-    protected override def shabbosTorahElement: Elem = SpecialReadings.pesach7torah
+    override lazy val shabbosTorah: Torah = parseTorah(SpecialReadings.pesach7torah)
     protected override val dropOnWeekday: Set[Int] = Set(2, 4)
-    final lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.pesachEndMaftir)
-    protected override def haftarahElement: Elem = SpecialReadings.pesach7Hhaftarah
+    lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.pesachEndMaftir)
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.pesach7Hhaftarah)
   }
 
   case object Pesach8 extends LoadNames("Pesach 8")
-    with Festival with NonFirstDayOf with ShabbosAndWeekdayReading with ParseHaftarah
+    with Festival with NonFirstDayOf with ShabbosAndWeekdayReading with Parse
   {
     override def firstDay: Date = Pesach
     override def dayNumber: Int = 8
@@ -740,7 +732,7 @@ object SpecialDay {
     protected override val shabbosTorah: Torah = FestivalEnd.endShabbosTorah
     protected override val weekdayTorah: Torah = FestivalEnd.endWeekdayTorah
     protected override val maftir: Maftir = Pesach7.maftir
-    protected override def haftarahElement: Elem = SpecialReadings.pesach8Haftarah
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.pesach8Haftarah)
   }
 
   case class Omer(number: Int) extends WithNames {
@@ -761,15 +753,15 @@ object SpecialDay {
   }
 
   case object Shavuos extends LoadNames("Shavuos")
-    with Festival with FirstDayOf with WeekdayReadingSimple with ParseHaftarah {
+    with Festival with FirstDayOf with WeekdayReadingSimple with Parse {
     override def date(year: Year): Day = Pesach.date(year) + 50
 
-    final lazy val torah: Torah = parseTorah(SpecialReadings.shavuosTorah)
-    final lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.shavuosMaftir)
-    protected override val haftarahElement: Elem = SpecialReadings.shavuosHaftarah
+    lazy val torah: Torah = parseTorah(SpecialReadings.shavuosTorah)
+    lazy val maftir: Torah.Maftir = parseMaftir(SpecialReadings.shavuosMaftir)
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.shavuosHaftarah)
   }
 
-  case object Shavuos2 extends Festival with NonFirstDayOf with ShabbosAndWeekdayReading with ParseHaftarah {
+  case object Shavuos2 extends Festival with NonFirstDayOf with ShabbosAndWeekdayReading with Parse {
     override lazy val names: Names = namesWithNumber(Shavuos, 2)
 
     override def firstDay: Date = Shavuos
@@ -779,20 +771,20 @@ object SpecialDay {
     protected override val shabbosTorah: Torah = FestivalEnd.endShabbosTorah
     protected override val weekdayTorah: Torah = FestivalEnd.endWeekdayTorah
     protected override val maftir: Maftir = Shavuos.maftir
-    protected override val haftarahElement: Elem = SpecialReadings.shavuos2Haftarah
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.shavuos2Haftarah)
   }
 
   case object FastOfTammuz extends LoadNames("Fast of Tammuz") with NonTishaBeAvFast with PostponeOnShabbos {
     override def date(year: Year): Day = year.month(Tammuz).day(17)
   }
 
-  case object TishaBeAv extends LoadNames("Tisha BeAv") with Fast with PostponeOnShabbos with ParseHaftarah {
+  case object TishaBeAv extends LoadNames("Tisha BeAv") with Fast with PostponeOnShabbos with Parse {
     override def date(year: Year): Day = year.month(Av).day(9)
 
     override def weekday: Reading = Reading(torah = torah, maftir = None, haftarah = haftarah)
 
-    final lazy val torah: Torah = parseTorah(SpecialReadings.tishaBeAvTorah)
-    protected override def haftarahElement: Elem = SpecialReadings.tishaBeAvHaftarah
+    lazy val torah: Torah = parseTorah(SpecialReadings.tishaBeAvTorah)
+    lazy val haftarah: Haftarah.Customs = parseHaftarah(SpecialReadings.tishaBeAvHaftarah)
   }
 
   private def namesWithNumber(withNames: WithNames, number: Int): Names = withNames.names.withNumber(number)
