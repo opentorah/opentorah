@@ -7,11 +7,11 @@ object SpecialReadings {
   def parse[R](parsable: Parsable[R], what: String, element: Elem): R =
     Parser.parseDo(parsable.parse(From.xml(what, element)))
 
-  def torah(element: Elem): Torah = parse(Torah.torahParsable, "Torah", element)
+  def parseTorah(element: Elem): Torah = parse(Torah.torahParsable, "Torah", element)
 
-  def maftir(element: Elem): Torah.BookSpan = parse(Torah.maftirParsable, "Maftir", element)
+  def parseMaftir(element: Elem): Torah.Maftir = parse(Torah.maftirParsable, "Maftir", element)
 
-  def haftarah(element: Elem, full: Boolean = true): Haftarah.Customs =
+  def parseHaftarah(element: Elem, full: Boolean = true): Haftarah.Customs =
     parse(Haftarah.haftarahParsable(full), "Haftarah", element)
 
   object ErevRoshChodesh {
@@ -28,14 +28,14 @@ object SpecialReadings {
   }
 
   object RoshChodesh {
-    val torah: Elem =
+    val torah: Torah = parseTorah(
       <torah book="Numbers" fromChapter="28" fromVerse="1" toVerse="15">
         <aliyah n="2" fromVerse="3"/>
         <aliyah n="3" fromVerse="4"/>
         <aliyah n="4" fromVerse="6"/>
         <aliyah n="5" fromVerse="9"/>
         <aliyah n="6" fromVerse="11"/>
-      </torah>
+      </torah>)
 
     val shabbosHaftarah: Elem =
       <haftarah book="Isaiah" fromChapter="66">
@@ -54,7 +54,7 @@ object SpecialReadings {
   }
 
   object FestivalEnd {
-    val shabbosTorah: Elem =
+    val shabbosTorah: Torah = parseTorah(
       <torah book="Deuteronomy" fromChapter="14" fromVerse="22" toChapter="16" toVerse="17">
         <aliyah n="2" fromChapter="15" fromVerse="1"/>
         <aliyah n="3" fromChapter="15" fromVerse="19"/>
@@ -62,11 +62,15 @@ object SpecialReadings {
         <aliyah n="5" fromChapter="16" fromVerse="4"/>
         <aliyah n="6" fromChapter="16" fromVerse="9"/>
         <aliyah n="7" fromChapter="16" fromVerse="13"/>
-      </torah>
+      </torah>)
+
+    val weekdayTorah: Torah = Torah(shabbosTorah.spans.drop(2))
+
+    val sheminiAtzeresWeekdayTorah: Torah = shabbosTorah.drop(Set(2, 3)) // TODO move to sheminiAtzeres
   }
 
   object IntermediateShabbos {
-    val torah: Elem =
+    val torah: Torah = parseTorah(
       <torah book="Exodus" fromChapter="33" fromVerse="12" toChapter="34" toVerse="26">
         <aliyah n="2" fromChapter="33" fromVerse="17"/>
         <aliyah n="3" fromChapter="33" fromVerse="20"/>
@@ -74,11 +78,11 @@ object SpecialReadings {
         <aliyah n="5" fromChapter="34" fromVerse="4"/>
         <aliyah n="6" fromChapter="34" fromVerse="11"/>
         <aliyah n="7" fromChapter="34" fromVerse="18"/>
-      </torah>
+      </torah>)
   }
 
   object RoshHashanah {
-    val torah1: Elem =
+    val torah1shabbos: Torah = parseTorah(
       <torah book="Genesis" fromChapter="21" fromVerse="1" toVerse="34">
         <aliyah n="2" fromVerse="5"/>
         <aliyah n="3" fromVerse="9"/>
@@ -86,28 +90,30 @@ object SpecialReadings {
         <aliyah n="5" fromVerse="18"/>
         <aliyah n="6" fromVerse="22"/>
         <aliyah n="7" fromVerse="28"/>
-      </torah>
+      </torah>)
+
+    val torah1weekday: Torah = torah1shabbos.drop(Set(3, 5))
 
     val haftarah1: Elem =
-        <haftarah book="I Samuel" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
+      <haftarah book="I Samuel" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
 
-    val torah2: Elem =
+    val torah2: Torah = parseTorah(
       <torah book="Genesis" fromChapter="22" fromVerse="1" toVerse="24">
         <aliyah n="2" fromVerse="4"/>
         <aliyah n="3" fromVerse="9"/>
         <aliyah n="4" fromVerse="15"/>
         <aliyah n="5" fromVerse="20"/>
-      </torah>
+      </torah>)
 
     val haftarah2: Elem =
       <haftarah book="Jeremiah" fromChapter="31" fromVerse="1" toVerse="19"/>
 
-    val maftir: Elem =
-      <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>
+    val maftir: Torah.Maftir = parseMaftir(
+      <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>)
   }
 
   object YomKippur {
-    val torah: Elem =
+    val torahShabbos: Torah = parseTorah(
       <torah book="Leviticus" fromChapter="16" fromVerse="1" toVerse="34">
         <aliyah n="2" fromVerse="4"/>
         <aliyah n="3" fromVerse="7"/>
@@ -115,7 +121,9 @@ object SpecialReadings {
         <aliyah n="5" fromVerse="18"/>
         <aliyah n="6" fromVerse="25"/>
         <aliyah n="7" fromVerse="31"/>
-      </torah>
+      </torah>)
+
+    val torahWeekday: Torah = torahShabbos.drop(Set(2))
 
     val haftarah: Elem =
       <haftarah book="Isaiah">
@@ -126,14 +134,14 @@ object SpecialReadings {
         </custom>
       </haftarah>
 
-    val maftir: Elem =
-        <maftir book="Numbers" fromChapter="29" fromVerse="7" toVerse="11"/>
+    val maftir: Torah.Maftir = parseMaftir(
+      <maftir book="Numbers" fromChapter="29" fromVerse="7" toVerse="11"/>)
 
-    val afternoonTorah: Elem =
+    val afternoonTorah: Torah = parseTorah(
       <torah book="Leviticus" fromChapter="18" fromVerse="1" toVerse="30">
         <aliyah n="2" fromVerse="6"/>
         <aliyah n="3" fromVerse="22"/>
-      </torah>
+      </torah>)
 
     val afternoonHaftarah: Elem =
       <haftarah>
@@ -150,7 +158,7 @@ object SpecialReadings {
   }
 
   object Succos {
-    val torah1and2: Elem =
+    val torah1and2Shabbos: Torah = parseTorah(
       <torah book="Leviticus" fromChapter="22" fromVerse="26" toChapter="23" toVerse="44">
         <aliyah n="2" fromChapter="23" fromVerse="1"/>
         <aliyah n="3" fromChapter="23" fromVerse="4"/>
@@ -158,7 +166,9 @@ object SpecialReadings {
         <aliyah n="5" fromChapter="23" fromVerse="15"/>
         <aliyah n="6" fromChapter="23" fromVerse="23"/>
         <aliyah n="7" fromChapter="23" fromVerse="33"/>
-      </torah>
+      </torah>)
+
+    val torah1and2Weekday: Torah = torah1and2Shabbos.drop(Set(2, 4))
 
     val haftarah1: Elem =
       <haftarah book="Zechariah" toChapter="14" toVerse="21">
@@ -173,7 +183,7 @@ object SpecialReadings {
         <custom n="Teiman" fromChapter="7" fromVerse="51" toChapter="8" toVerse="21"/>
       </haftarah>
 
-    val korbanot: Elem =
+    val korbanot: Torah = parseTorah(
       <torah book="Numbers" fromChapter="29" fromVerse="12" toChapter="30" toVerse="1">
         <aliyah n="2" fromVerse="17"/>
         <aliyah n="3" fromVerse="20"/>
@@ -182,7 +192,7 @@ object SpecialReadings {
         <aliyah n="6" fromVerse="29"/>
         <aliyah n="7" fromVerse="32"/>
         <aliyah n="8" fromVerse="35"/>
-      </torah>
+      </torah>)
 
     val intermediateShabbosHaftarah: Elem =
       <haftarah book="Ezekiel" fromChapter="38">
@@ -200,10 +210,10 @@ object SpecialReadings {
         <custom n="Italki, Chabad" toChapter="9" toVerse="1"/>
       </haftarah>
 
-    val chassanBereishis: Elem =
+    val chassanBereishis: Torah = parseTorah(
       <torah book="Genesis" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3">
         <aliyah n="1" fromVerse="1"/>
-      </torah>
+      </torah>)
 
     val simchasTorahHaftarah: Elem =
       <haftarah book="Joshua">
@@ -216,12 +226,12 @@ object SpecialReadings {
   }
 
   object Chanukah {
-    val first: Elem =
+    val first: Torah = parseTorah(
       <torah book="Numbers" fromChapter="6" fromVerse="22" toChapter="7" toVerse="11">
         <aliyah n="2" fromChapter="7" fromVerse="1"/>
-      </torah>
+      </torah>)
 
-    val korbanot: Elem =
+    val korbanot: Torah = parseTorah(
       <torah book="Numbers" fromChapter="7" fromVerse="12" toChapter="8" toVerse="4">
         <aliyah n="1" fromVerse="12"/>
         <aliyah n="2" fromVerse="15"/>
@@ -240,7 +250,7 @@ object SpecialReadings {
         <aliyah n="15" fromVerse="54"/>
         <aliyah n="16" fromVerse="57"/>
         <aliyah n="17" fromVerse="60"/>
-      </torah>
+      </torah>)
 
     val shabbos1Haftarah: Elem =
       <haftarah book="Zechariah" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>
@@ -253,8 +263,8 @@ object SpecialReadings {
   }
 
   object ParshasShekalim {
-    val maftir: Elem =
-      <maftir book="Exodus" fromChapter="30" fromVerse="11" toVerse="16"/>
+    val maftir: Torah.Maftir = parseMaftir(
+      <maftir book="Exodus" fromChapter="30" fromVerse="11" toVerse="16"/>)
 
     val haftarah: Elem =
       <haftarah book="II Kings">
@@ -264,8 +274,8 @@ object SpecialReadings {
   }
 
   object ParshasZachor {
-    val maftir: Elem =
-      <maftir book="Deuteronomy" fromChapter="25" fromVerse="17" toVerse="19"/>
+    val maftir: Torah.Maftir = parseMaftir(
+      <maftir book="Deuteronomy" fromChapter="25" fromVerse="17" toVerse="19"/>)
 
     val haftarah: Elem =
       <haftarah book="I Samuel">
@@ -276,16 +286,16 @@ object SpecialReadings {
   }
 
   object Purim {
-    val torah: Elem =
+    val torah: Torah = parseTorah(
       <torah book="Exodus" fromChapter="17" fromVerse="8" toVerse="16">
         <aliyah n="2" fromVerse="11"/>
         <aliyah n="3" fromVerse="14"/>
-      </torah>
+      </torah>)
   }
 
   object ParshasParah {
-    val maftir: Elem =
-      <maftir book="Numbers" fromChapter="19" fromVerse="1" toVerse="22"/>
+    val maftir: Torah.Maftir = parseMaftir(
+      <maftir book="Numbers" fromChapter="19" fromVerse="1" toVerse="22"/>)
 
     val haftarah: Elem =
       <haftarah book="Ezekiel" fromChapter="36" fromVerse="16">
@@ -295,8 +305,8 @@ object SpecialReadings {
   }
 
   object ParshasHachodesh {
-    val maftir: Elem =
-      <maftir book="Exodus" fromChapter="12" fromVerse="1" toVerse="20"/>
+    val maftir: Torah.Maftir = parseMaftir(
+      <maftir book="Exodus" fromChapter="12" fromVerse="1" toVerse="20"/>)
 
     val haftarah: Elem =
       <haftarah book="Ezekiel" fromChapter="45" toChapter="46">
@@ -313,7 +323,7 @@ object SpecialReadings {
   }
 
   object Pesach {
-    val torah1: Elem =
+    val torah1Shabbos: Torah = parseTorah(
       <torah book="Exodus" fromChapter="12" fromVerse="21" toVerse="51">
         <aliyah n="2" fromVerse="25"/>
         <aliyah n="3" fromVerse="29"/>
@@ -321,10 +331,12 @@ object SpecialReadings {
         <aliyah n="5" fromVerse="37"/>
         <aliyah n="6" fromVerse="43"/>
         <aliyah n="7" fromVerse="48"/>
-      </torah>
+      </torah>)
 
-    val maftir: Elem =
-        <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>
+    val torah1Weekday: Torah = torah1Shabbos.drop(Set(4, 7))
+
+    val maftir: Torah.Maftir = parseMaftir(
+        <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>)
 
     val haftarah1: Elem =
       <haftarah book="Joshua">
@@ -353,25 +365,25 @@ object SpecialReadings {
         </custom>
       </haftarah>
 
-    val torah3: Elem =
+    val torah3: Torah = parseTorah(
       <torah book="Exodus" fromChapter="13" fromVerse="1" toVerse="16">
         <aliyah n="2" fromVerse="5"/>
         <aliyah n="3" fromVerse="11"/>
-      </torah>
+      </torah>)
 
-    val torah4: Elem =
+    val torah4: Torah = parseTorah(
       <torah book="Exodus" fromChapter="22" fromVerse="24" toChapter="23" toVerse="19">
         <aliyah n="2" fromChapter="22" fromVerse="27"/>
         <aliyah n="3" fromChapter="23" fromVerse="6"/>
-      </torah>
+      </torah>)
 
-    val torah6: Elem =
+    val torah6: Torah = parseTorah(
       <torah book="Numbers" fromChapter="9" fromVerse="1" toVerse="14">
         <aliyah n="2" fromVerse="7"/>
         <aliyah n="3" fromVerse="9"/>
-      </torah>
+      </torah>)
 
-    val torah7: Elem =
+    val torah7Shabbos: Torah = parseTorah(
       <torah book="Exodus" fromChapter="13" fromVerse="17" toChapter="15" toVerse="26">
         <aliyah n="2" fromChapter="13" fromVerse="20"/>
         <aliyah n="3" fromChapter="14" fromVerse="1"/>
@@ -379,7 +391,9 @@ object SpecialReadings {
         <aliyah n="5" fromChapter="14" fromVerse="9"/>
         <aliyah n="6" fromChapter="14" fromVerse="15"/>
         <aliyah n="7" fromChapter="14" fromVerse="26"/>
-      </torah>
+      </torah>)
+
+    val torah7Weekday: Torah = torah7Shabbos.drop(Set(2, 4))
 
     val haftarah7: Elem =
       <haftarah book="II Samuel" fromChapter="22" fromVerse="1" toVerse="51"/>
@@ -388,8 +402,8 @@ object SpecialReadings {
       <haftarah book="Isaiah" fromChapter="10" fromVerse="32" toChapter="12" toVerse="6"/>
 
     // Maftir for Pesach Intermediate Shabbos and last two days of Pesach
-    val maftirEnd: Elem =
-      <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>
+    val maftirEnd: Torah.Maftir = parseMaftir(
+      <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>)
 
     val intermediateShabbosHaftarah: Elem =
       <haftarah book="Ezekiel">
@@ -399,16 +413,16 @@ object SpecialReadings {
   }
 
   object Shavuos {
-    val torah: Elem =
+    val torah: Torah = parseTorah(
       <torah book="Exodus" fromChapter="19" fromVerse="1" toChapter="20" toVerse="22">
         <aliyah n="2" fromChapter="19" fromVerse="7"/>
         <aliyah n="3" fromChapter="19" fromVerse="14"/>
         <aliyah n="4" fromChapter="19" fromVerse="20"/>
         <aliyah n="5" fromChapter="20" fromVerse="15"/>
-      </torah>
+      </torah>)
 
-    val maftir: Elem =
-      <maftir book="Numbers" fromChapter="28" fromVerse="26" toVerse="31"/>
+    val maftir: Torah.Maftir = parseMaftir(
+      <maftir book="Numbers" fromChapter="28" fromVerse="26" toVerse="31"/>)
 
     val haftarah1: Elem =
       <haftarah book="Ezekiel">
@@ -430,10 +444,10 @@ object SpecialReadings {
   }
 
   object Fast {
-    val afternoonTorahPart1: Elem =
+    val afternoonTorahPart1: Torah = parseTorah(
       <torah book="Exodus" fromChapter="32" fromVerse="11" toVerse="14">
         <aliyah n="1" fromVerse="11"/>
-      </torah>
+      </torah>)
 
     val defaultAfternoonHaftarah: Elem =
       <haftarah>
@@ -456,11 +470,11 @@ object SpecialReadings {
   }
 
   object TishaBeAv {
-    val torah: Elem =
+    val torah: Torah = parseTorah(
       <torah book="Deuteronomy" fromChapter="4" fromVerse="25" toVerse="40">
         <aliyah n="2" fromVerse="30"/>
         <aliyah n="3" fromVerse="36"/>
-      </torah>
+      </torah>)
 
     val haftarah: Elem =
       <haftarah book="Jeremiah">
