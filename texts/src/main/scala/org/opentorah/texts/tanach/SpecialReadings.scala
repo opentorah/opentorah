@@ -15,16 +15,16 @@ object SpecialReadings {
     parse(Haftarah.haftarahParsable(full), "Haftarah", element)
 
   object ErevRoshChodesh {
-    val shabbosHaftarah: Elem =
-      <haftarah book="I Samuel" fromChapter="20" fromVerse="18" toVerse="42"/>
+    val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
+      <haftarah book="I Samuel" fromChapter="20" fromVerse="18" toVerse="42"/>)
 
-    val shabbosAdditionalHaftarah: Elem =
+    val shabbosAdditionalHaftarah: Haftarah.Customs = parseHaftarah(full = false, element =
       <haftarah>
         <custom n="Chabad, Fes" book="I Samuel" fromChapter="20">
           <part n="1" fromVerse="18" toVerse="18"/>
           <part n="2" fromVerse="42" toVerse="42"/>
         </custom>
-      </haftarah>
+      </haftarah>)
   }
 
   object RoshChodesh {
@@ -37,20 +37,20 @@ object SpecialReadings {
         <aliyah n="6" fromVerse="11"/>
       </torah>)
 
-    val shabbosHaftarah: Elem =
+    val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Isaiah" fromChapter="66">
         <part n="1" fromVerse="1" toVerse="24"/>
         <part n="2" fromVerse="23" toVerse="23"/>
-      </haftarah>
+      </haftarah>)
 
-    val shabbosAdditionalHaftarah: Elem =
+    val shabbosAdditionalHaftarah: Haftarah.Customs = parseHaftarah(full = false, element =
       <haftarah>
         <custom n="Chabad" book="Isaiah" fromChapter="66">
           <part n="1" fromVerse="1" toVerse="1"/>
           <part n="2" fromVerse="23" toVerse="24"/>
           <part n="3" fromVerse="23" toVerse="23"/>
         </custom>
-      </haftarah>
+      </haftarah>)
   }
 
   object FestivalEnd {
@@ -94,8 +94,8 @@ object SpecialReadings {
 
     val torah1weekday: Torah = torah1shabbos.drop(Set(3, 5))
 
-    val haftarah1: Elem =
-      <haftarah book="I Samuel" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>
+    val haftarah1: Haftarah.Customs = parseHaftarah(
+      <haftarah book="I Samuel" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>)
 
     val torah2: Torah = parseTorah(
       <torah book="Genesis" fromChapter="22" fromVerse="1" toVerse="24">
@@ -105,8 +105,8 @@ object SpecialReadings {
         <aliyah n="5" fromVerse="20"/>
       </torah>)
 
-    val haftarah2: Elem =
-      <haftarah book="Jeremiah" fromChapter="31" fromVerse="1" toVerse="19"/>
+    val haftarah2: Haftarah.Customs = parseHaftarah(
+      <haftarah book="Jeremiah" fromChapter="31" fromVerse="1" toVerse="19"/>)
 
     val maftir: Torah.Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>)
@@ -125,14 +125,14 @@ object SpecialReadings {
 
     val torahWeekday: Torah = torahShabbos.drop(Set(2))
 
-    val haftarah: Elem =
+    val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Isaiah">
         <custom n="Common" fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
         <custom n="Italki, Teiman">
           <part n="1" fromChapter="57" fromVerse="14" toChapter="58" toVerse="14"/>
           <part n="2" fromChapter="59" fromVerse="20" toVerse="21"/>
         </custom>
-      </haftarah>
+      </haftarah>)
 
     val maftir: Torah.Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="29" fromVerse="7" toVerse="11"/>)
@@ -143,7 +143,7 @@ object SpecialReadings {
         <aliyah n="3" fromVerse="22"/>
       </torah>)
 
-    val afternoonHaftarah: Elem =
+    val afternoonHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah>
         <custom n="Common">
           <part n="1" book="Jonah" fromChapter="1" fromVerse="1" toChapter="4" toVerse="11"/>
@@ -154,7 +154,7 @@ object SpecialReadings {
           <part n="2" book="Jonah" fromChapter="1" fromVerse="1" toChapter="4" toVerse="11"/>
           <part n="3" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
         </custom>
-      </haftarah>
+      </haftarah>)
   }
 
   object Succos {
@@ -170,18 +170,18 @@ object SpecialReadings {
 
     val torah1and2Weekday: Torah = torah1and2Shabbos.drop(Set(2, 4))
 
-    val haftarah1: Elem =
+    val haftarah1: Haftarah.Customs = parseHaftarah(
       <haftarah book="Zechariah" toChapter="14" toVerse="21">
         <custom n="Common" fromChapter="14" fromVerse="1"/>
         <custom n="Teiman" fromChapter="13" fromVerse="9"/>
-      </haftarah>
+      </haftarah>)
 
-    val haftarah2: Elem =
+    val haftarah2: Haftarah.Customs = parseHaftarah(
       <haftarah book="I Kings">
         <custom n="Common" fromChapter="8" fromVerse="2" toVerse="21"/>
         <custom n="Italki" fromChapter="7" fromVerse="51" toChapter="8" toVerse="15"/>
         <custom n="Teiman" fromChapter="7" fromVerse="51" toChapter="8" toVerse="21"/>
-      </haftarah>
+      </haftarah>)
 
     val korbanot: Torah = parseTorah(
       <torah book="Numbers" fromChapter="29" fromVerse="12" toChapter="30" toVerse="1">
@@ -194,35 +194,35 @@ object SpecialReadings {
         <aliyah n="8" fromVerse="35"/>
       </torah>)
 
-    val intermediateShabbosHaftarah: Elem =
+    val intermediateShabbosHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Ezekiel" fromChapter="38">
         <custom n="Common" fromVerse="18" toChapter="39" toVerse="16"/>
         <custom n="Italki, Teiman" fromVerse="1" toChapter="38" toVerse="23"/>
-      </haftarah>
+      </haftarah>)
 
     /* Artscroll gives custom Ashkenaz ending at 9:1,
      but @michaelko58 insists that it is the same as Sefard and ends at 8:66.
      His explanation: "there are some ashkenazic communities that follow custom Italki.
      It is possible that this is a difference between chassidim and litaim." */
-    val sheminiAtzeresHaftarah: Elem =
+    val sheminiAtzeresHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="I Kings" fromChapter="8" fromVerse="54">
         <custom n="Common" toChapter="8" toVerse="66"/>
         <custom n="Italki, Chabad" toChapter="9" toVerse="1"/>
-      </haftarah>
+      </haftarah>)
 
     val chassanBereishis: Torah = parseTorah(
       <torah book="Genesis" fromChapter="1" fromVerse="1" toChapter="2" toVerse="3">
         <aliyah n="1" fromVerse="1"/>
       </torah>)
 
-    val simchasTorahHaftarah: Elem =
+    val simchasTorahHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Joshua">
         <custom n="Common, Italki" fromChapter="1" fromVerse="1" toVerse="18"/>
         <custom n="Teiman">
           <part n="1" fromChapter="1" fromVerse="1" toVerse="9"/>
           <part n="2" fromChapter="6" fromVerse="27"/>
         </custom>
-      </haftarah>
+      </haftarah>)
   }
 
   object Chanukah {
@@ -252,37 +252,37 @@ object SpecialReadings {
         <aliyah n="17" fromVerse="60"/>
       </torah>)
 
-    val shabbos1Haftarah: Elem =
-      <haftarah book="Zechariah" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>
+    val shabbos1Haftarah: Haftarah.Customs = parseHaftarah(
+      <haftarah book="Zechariah" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>)
 
-    val shabbos2Haftarah: Elem =
+    val shabbos2Haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="I Kings" fromChapter="7" fromVerse="40" toChapter="7">
         <custom n="Common" toVerse="50"/>
         <custom n="Italki" toVerse="51"/>
-      </haftarah>
+      </haftarah>)
   }
 
   object ParshasShekalim {
     val maftir: Torah.Maftir = parseMaftir(
       <maftir book="Exodus" fromChapter="30" fromVerse="11" toVerse="16"/>)
 
-    val haftarah: Elem =
+    val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="II Kings">
         <custom n="Ashkenaz, Italki, Teiman, Chabad" fromChapter="12" fromVerse="1" toVerse="17"/>
         <custom n="Sefard" fromChapter="11" fromVerse="17" toChapter="12" toVerse="17"/>
-      </haftarah>
+      </haftarah>)
   }
 
   object ParshasZachor {
     val maftir: Torah.Maftir = parseMaftir(
       <maftir book="Deuteronomy" fromChapter="25" fromVerse="17" toVerse="19"/>)
 
-    val haftarah: Elem =
+    val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="I Samuel">
         <custom n="Ashkenaz, Chabad" fromChapter="15" fromVerse="2" toVerse="34"/>
         <custom n="Sefard" fromChapter="15" fromVerse="1" toVerse="34"/>
         <custom n="Teiman" fromChapter="14" fromVerse="52" toChapter="15" toVerse="33"/>
-      </haftarah>
+      </haftarah>)
   }
 
   object Purim {
@@ -297,29 +297,29 @@ object SpecialReadings {
     val maftir: Torah.Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="19" fromVerse="1" toVerse="22"/>)
 
-    val haftarah: Elem =
+    val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Ezekiel" fromChapter="36" fromVerse="16">
         <custom n="Ashkenaz, Italki" toVerse="38"/>
         <custom n="Sefard" toVerse="36"/>
-      </haftarah>
+      </haftarah>)
   }
 
   object ParshasHachodesh {
     val maftir: Torah.Maftir = parseMaftir(
       <maftir book="Exodus" fromChapter="12" fromVerse="1" toVerse="20"/>)
 
-    val haftarah: Elem =
+    val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Ezekiel" fromChapter="45" toChapter="46">
         <custom n="Ashkenaz" fromVerse="16" toVerse="18"/>
         <custom n="Italki" fromVerse="18" toVerse="11"/>
         <custom n="Sefard" fromVerse="18" toVerse="15"/>
         <custom n="Teiman" fromVerse="9" toVerse="11"/>
-      </haftarah>
+      </haftarah>)
   }
 
   object ShabbosHagodol {
-    val haftarah: Elem =
-      <haftarah book="Malachi" fromChapter="3" fromVerse="4" toVerse="24"/>
+    val haftarah: Haftarah.Customs = parseHaftarah(
+      <haftarah book="Malachi" fromChapter="3" fromVerse="4" toVerse="24"/>)
   }
 
   object Pesach {
@@ -338,7 +338,7 @@ object SpecialReadings {
     val maftir: Torah.Maftir = parseMaftir(
         <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>)
 
-    val haftarah1: Elem =
+    val haftarah1: Haftarah.Customs = parseHaftarah(
       <haftarah book="Joshua">
         <custom n="Ashkenaz, Chabad">
           <part n="1" fromChapter="3" fromVerse="5" toVerse="7"/>
@@ -350,9 +350,9 @@ object SpecialReadings {
           <part n="2" fromChapter="6" fromVerse="27"/>
         </custom>
         <custom n="Frankfurt, Hagra" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
-      </haftarah>
+      </haftarah>)
 
-    val haftarah2: Elem =
+    val haftarah2: Haftarah.Customs = parseHaftarah(
       <haftarah book="II Kings">
         <custom n="Common">
           <part n="1" fromChapter="23" fromVerse="1" toVerse="9"/>
@@ -363,7 +363,7 @@ object SpecialReadings {
           <part n="1" fromChapter="22" fromVerse="1" toVerse="7"/>
           <part n="2" fromChapter="23" fromVerse="21" toVerse="25"/>
         </custom>
-      </haftarah>
+      </haftarah>)
 
     val torah3: Torah = parseTorah(
       <torah book="Exodus" fromChapter="13" fromVerse="1" toVerse="16">
@@ -395,21 +395,21 @@ object SpecialReadings {
 
     val torah7Weekday: Torah = torah7Shabbos.drop(Set(2, 4))
 
-    val haftarah7: Elem =
-      <haftarah book="II Samuel" fromChapter="22" fromVerse="1" toVerse="51"/>
+    val haftarah7: Haftarah.Customs = parseHaftarah(
+      <haftarah book="II Samuel" fromChapter="22" fromVerse="1" toVerse="51"/>)
 
-    val haftarah8: Elem =
-      <haftarah book="Isaiah" fromChapter="10" fromVerse="32" toChapter="12" toVerse="6"/>
+    val haftarah8: Haftarah.Customs = parseHaftarah(
+      <haftarah book="Isaiah" fromChapter="10" fromVerse="32" toChapter="12" toVerse="6"/>)
 
     // Maftir for Pesach Intermediate Shabbos and last two days of Pesach
     val maftirEnd: Torah.Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>)
 
-    val intermediateShabbosHaftarah: Elem =
+    val intermediateShabbosHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Ezekiel">
         <custom n="Common" fromChapter="37" fromVerse="1" toVerse="14"/>
         <custom n="Teiman" fromChapter="36" fromVerse="37" toChapter="37" toVerse="14"/>
-      </haftarah>
+      </haftarah>)
   }
 
   object Shavuos {
@@ -424,7 +424,7 @@ object SpecialReadings {
     val maftir: Torah.Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="28" fromVerse="26" toVerse="31"/>)
 
-    val haftarah1: Elem =
+    val haftarah1: Haftarah.Customs = parseHaftarah(
       <haftarah book="Ezekiel">
         <custom n="Common">
           <part n="1" fromChapter="1" fromVerse="1" toVerse="28"/>
@@ -434,13 +434,13 @@ object SpecialReadings {
           <part n="1" fromChapter="1" fromVerse="1" toChapter="2" toVerse="2"/>
           <part n="2" fromChapter="3" fromVerse="12"/>
         </custom>
-      </haftarah>
+      </haftarah>)
 
-    val haftarah2: Elem =
+    val haftarah2: Haftarah.Customs = parseHaftarah(
       <haftarah book="Habakkuk">
         <custom n="Ashkenaz" fromChapter="3" fromVerse="1" toVerse="19"/>
         <custom n="Sefard" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
-      </haftarah>
+      </haftarah>)
   }
 
   object Fast {
@@ -449,24 +449,24 @@ object SpecialReadings {
         <aliyah n="1" fromVerse="11"/>
       </torah>)
 
-    val defaultAfternoonHaftarah: Elem =
+    val defaultAfternoonHaftarah: Haftarah.Customs = parseHaftarah(full = false, element =
       <haftarah>
         <custom n="Ashkenaz, Chabad, Morocco" book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56" toVerse="8"/>
         <custom n="Algeria">
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
           <part n="2" book="Joel" fromChapter="2" fromVerse="11" toVerse="27"/>
         </custom>
-      </haftarah>
+      </haftarah>)
   }
 
   object FastOfGedalia {
-    val afternoonHaftarahExceptions: Elem =
+    val afternoonHaftarahExceptions: Haftarah.Customs = parseHaftarah(full = false, element =
       <haftarah>
         <custom n="Morocco">
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
           <part n="2" book="Joel" fromChapter="2" fromVerse="11" toVerse="27"/>
         </custom>
-      </haftarah>
+      </haftarah>)
   }
 
   object TishaBeAv {
@@ -476,13 +476,13 @@ object SpecialReadings {
         <aliyah n="3" fromVerse="36"/>
       </torah>)
 
-    val haftarah: Elem =
+    val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Jeremiah">
         <custom n="Common" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
         <custom n="Teiman">
           <part n="1" fromChapter="6" fromVerse="16" toVerse="17"/>
           <part n="2" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
         </custom>
-      </haftarah>
+      </haftarah>)
   }
 }
