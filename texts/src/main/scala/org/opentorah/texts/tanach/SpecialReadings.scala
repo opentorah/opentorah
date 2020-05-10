@@ -183,7 +183,7 @@ object SpecialReadings {
         <custom n="Teiman" fromChapter="7" fromVerse="51" toChapter="8" toVerse="21"/>
       </haftarah>)
 
-    val korbanot: Torah = parseTorah(
+    val korbanot: Seq[Torah.Fragment] = parseTorah(
       <torah book="Numbers" fromChapter="29" fromVerse="12" toChapter="30" toVerse="1">
         <aliyah n="2" fromVerse="17"/>
         <aliyah n="3" fromVerse="20"/>
@@ -192,7 +192,7 @@ object SpecialReadings {
         <aliyah n="6" fromVerse="29"/>
         <aliyah n="7" fromVerse="32"/>
         <aliyah n="8" fromVerse="35"/>
-      </torah>)
+      </torah>).spans
 
     val intermediateShabbosHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Ezekiel" fromChapter="38">
@@ -231,7 +231,7 @@ object SpecialReadings {
         <aliyah n="2" fromChapter="7" fromVerse="1"/>
       </torah>)
 
-    val korbanot: Torah = parseTorah(
+    val korbanot: Seq[Torah.Fragment] = parseTorah(
       <torah book="Numbers" fromChapter="7" fromVerse="12" toChapter="8" toVerse="4">
         <aliyah n="1" fromVerse="12"/>
         <aliyah n="2" fromVerse="15"/>
@@ -250,7 +250,7 @@ object SpecialReadings {
         <aliyah n="15" fromVerse="54"/>
         <aliyah n="16" fromVerse="57"/>
         <aliyah n="17" fromVerse="60"/>
-      </torah>)
+      </torah>).spans
 
     val shabbos1Haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Zechariah" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>)
@@ -335,6 +335,9 @@ object SpecialReadings {
 
     val torah1Weekday: Torah = torah1Shabbos.drop(Set(4, 7))
 
+    val torah2Weekday: Torah = Succos.torah1and2Weekday
+    val torah2Intermediate: Torah = torah2Weekday.drop(Set(4, 5))
+
     val maftir: Torah.Maftir = parseMaftir(
         <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>)
 
@@ -376,6 +379,15 @@ object SpecialReadings {
         <aliyah n="2" fromChapter="22" fromVerse="27"/>
         <aliyah n="3" fromChapter="23" fromVerse="6"/>
       </torah>)
+
+    val torah5: Torah = {
+      val all = IntermediateShabbos.torah.spans
+      Torah.aliyot(
+        all(3),         // Exodus 34:1-3
+        all(4)+all(5),  // Exodus 34:4-17
+        all(6)          // Exodus 34:18-26
+      )
+    }
 
     val torah6: Torah = parseTorah(
       <torah book="Numbers" fromChapter="9" fromVerse="1" toVerse="14">
