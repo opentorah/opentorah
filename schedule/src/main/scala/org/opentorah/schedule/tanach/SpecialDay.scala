@@ -89,10 +89,6 @@ object SpecialDay {
     )
   }
 
-  sealed trait AfternoonReading {
-    def afternoon: Reading
-  }
-
   sealed trait FestivalOrIntermediate extends Date
 
   sealed trait Festival extends FestivalOrIntermediate with WeekdayReading
@@ -244,28 +240,25 @@ object SpecialDay {
     val defaultAfternoonHaftarah: Haftarah.Customs = SpecialReadings.Fast.defaultAfternoonHaftarah
   }
 
-  def fastAfternoonHaftarah(afternoonHaftarahExceptions: Option[Haftarah.Customs]): Haftarah.Customs =
-    afternoonHaftarahExceptions.fold(Fast.defaultAfternoonHaftarah) { afternoonHaftarahExceptions =>
-      Fast.defaultAfternoonHaftarah ++ afternoonHaftarahExceptions }
-
-  sealed trait Fast extends Date with WeekdayReading with AfternoonReading {
-    final override def afternoon: Reading = {
-      val torah: Torah = fromDay(this, Fast.torah)
-      val haftarah: Haftarah.Customs = fromDay(this, fastAfternoonHaftarah(afternoonHaftarahExceptions))
-      new Reading(
-        customs = haftarah.lift { case (_: Custom, haftarah: Option[Haftarah]) =>
-          haftarah.fold(Reading.ReadingCustom(torah, None)) { haftarah: Haftarah =>
-            Reading.ReadingCustom(
-              torah = Torah(torah.spans),
-              maftirAndHaftarah = Some(Reading.MaftirAndHaftarah(None, haftarah))
-            )
-          }
-        }.customs
-      )
-    }
-
-    protected val afternoonHaftarahExceptions: Option[Haftarah.Customs] = None
+  def fastAfternoonReading(day: WithNames, afternoonHaftarahExceptions: Option[Haftarah.Customs]): Reading = {
+    val torah: Torah = fromDay(day, Fast.torah)
+    val fastAfternoonHaftarah: Haftarah.Customs =
+      afternoonHaftarahExceptions.fold(Fast.defaultAfternoonHaftarah) { afternoonHaftarahExceptions =>
+        Fast.defaultAfternoonHaftarah ++ afternoonHaftarahExceptions }
+    val haftarah: Haftarah.Customs = fromDay(day, fastAfternoonHaftarah)
+    new Reading(
+      customs = haftarah.lift { case (_: Custom, haftarah: Option[Haftarah]) =>
+        haftarah.fold(Reading.ReadingCustom(torah, None)) { haftarah: Haftarah =>
+          Reading.ReadingCustom(
+            torah = Torah(torah.spans),
+            maftirAndHaftarah = Some(Reading.MaftirAndHaftarah(None, haftarah))
+          )
+        }
+      }.customs
+    )
   }
+
+  sealed trait Fast extends Date with WeekdayReading
 
   sealed trait NonTishaBeAvFast extends Fast {
     final override def weekday: Reading = Reading(
@@ -296,12 +289,9 @@ object SpecialDay {
 
   case object FastOfGedalia extends LoadNames("Fast of Gedalia") with NonTishaBeAvFast with PostponeOnShabbos {
     override def date(year: Year): Day = year.month(Tishrei).day(3)
-
-    protected override val afternoonHaftarahExceptions: Option[Haftarah.Customs] =
-      Some(SpecialReadings.FastOfGedalia.afternoonHaftarahExceptions)
   }
 
-  case object YomKippur extends LoadNames("Yom Kippur") with Festival with ShabbosAndWeekdayReading with AfternoonReading {
+  case object YomKippur extends LoadNames("Yom Kippur") with Festival with ShabbosAndWeekdayReading {
     override def date(year: JewishYear): JewishDay = year.month(Tishrei).day(10)
 
     override def shabbosTorah: Torah = SpecialReadings.YomKippur.torahShabbos
@@ -309,7 +299,7 @@ object SpecialDay {
     override def maftir: Torah.Maftir = SpecialReadings.YomKippur.maftir
     override def haftarah: Haftarah.Customs = SpecialReadings.YomKippur.haftarah
 
-    override lazy val afternoon: Reading = Reading(
+    lazy val afternoon: Reading = Reading(
       torah = fromDay(this, SpecialReadings.YomKippur.afternoonTorah),
       maftir = None,
       haftarah = fromDay(this, SpecialReadings.YomKippur.afternoonHaftarah)
@@ -904,10 +894,14 @@ object SpecialDay {
     nextWeeklyReading: WeeklyReading
   ): Option[Reading] = {
     val specialReading: Option[Reading] = specialDay flatMap {
-      case specialDay: AfternoonReading =>
-        Some(specialDay.afternoon)
-
-      case _ => None
+      case FastOfGedalia =>
+        Some(fastAfternoonReading(FastOfGedalia, Some(SpecialReadings.FastOfGedalia.afternoonHaftarahExceptions)))
+      case fast: Fast =>
+        Some(fastAfternoonReading(fast, None))
+      case YomKippur =>
+        Some(YomKippur.afternoon)
+      case _ =>
+        None
     }
 
     val result = specialReading.orElse { if (!day.isShabbos) None else Some(nextWeeklyReading.getAfternoonReading) }
