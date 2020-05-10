@@ -336,7 +336,7 @@ object SpecialReadings {
     val torah1Weekday: Torah = torah1Shabbos.drop(Set(4, 7))
 
     val torah2Weekday: Torah = Succos.torah1and2Weekday
-    val torah2Intermediate: Torah = torah2Weekday.drop(Set(4, 5))
+    private val torah2Intermediate: Torah = torah2Weekday.drop(Set(4, 5))
 
     val maftir: Torah.Maftir = parseMaftir(
         <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>)
@@ -368,19 +368,27 @@ object SpecialReadings {
         </custom>
       </haftarah>)
 
-    val torah3: Torah = parseTorah(
+    def first5(realDayNumber: Int): Torah = realDayNumber match {
+      case 2 => torah2Intermediate
+      case 3 => torah3
+      case 4 => torah4
+      case 5 => torah5
+      case 6 => torah6
+    }
+
+    private val torah3: Torah = parseTorah(
       <torah book="Exodus" fromChapter="13" fromVerse="1" toVerse="16">
         <aliyah n="2" fromVerse="5"/>
         <aliyah n="3" fromVerse="11"/>
       </torah>)
 
-    val torah4: Torah = parseTorah(
+    private val torah4: Torah = parseTorah(
       <torah book="Exodus" fromChapter="22" fromVerse="24" toChapter="23" toVerse="19">
         <aliyah n="2" fromChapter="22" fromVerse="27"/>
         <aliyah n="3" fromChapter="23" fromVerse="6"/>
       </torah>)
 
-    val torah5: Torah = {
+    private val torah5: Torah = {
       val all = IntermediateShabbos.torah.spans
       Torah.aliyot(
         all(3),         // Exodus 34:1-3
@@ -389,7 +397,7 @@ object SpecialReadings {
       )
     }
 
-    val torah6: Torah = parseTorah(
+    private val torah6: Torah = parseTorah(
       <torah book="Numbers" fromChapter="9" fromVerse="1" toVerse="14">
         <aliyah n="2" fromVerse="7"/>
         <aliyah n="3" fromVerse="9"/>

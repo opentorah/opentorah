@@ -244,15 +244,16 @@ object SpecialDay {
     val defaultAfternoonHaftarah: Haftarah.Customs = SpecialReadings.Fast.defaultAfternoonHaftarah
   }
 
+  def fastAfternoonHaftarah(afternoonHaftarahExceptions: Option[Haftarah.Customs]): Haftarah.Customs =
+    afternoonHaftarahExceptions.fold(Fast.defaultAfternoonHaftarah) { afternoonHaftarahExceptions =>
+      Fast.defaultAfternoonHaftarah ++ afternoonHaftarahExceptions }
+
   sealed trait Fast extends Date with WeekdayReading with AfternoonReading {
     final override def afternoon: Reading = {
       val torah: Torah = fromDay(this, Fast.torah)
-      val haftarah: Haftarah.Customs =
-        afternoonHaftarahExceptions.fold(Fast.defaultAfternoonHaftarah) { afternoonHaftarahExceptions =>
-          Fast.defaultAfternoonHaftarah ++ afternoonHaftarahExceptions }
-
+      val haftarah: Haftarah.Customs = fromDay(this, fastAfternoonHaftarah(afternoonHaftarahExceptions))
       new Reading(
-        customs = fromDay(this, haftarah).lift { case (_: Custom, haftarah: Option[Haftarah]) =>
+        customs = haftarah.lift { case (_: Custom, haftarah: Option[Haftarah]) =>
           haftarah.fold(Reading.ReadingCustom(torah, None)) { haftarah: Haftarah =>
             Reading.ReadingCustom(
               torah = Torah(torah.spans),
@@ -617,15 +618,7 @@ object SpecialDay {
     override def haftarah: Haftarah.Customs = SpecialReadings.Pesach.haftarah2
   }
 
-  private object PesachIntermediate extends LoadNames("Pesach Intermediate") {
-    def first5(realDayNumber: Int): Torah = realDayNumber match {
-      case 2 => SpecialReadings.Pesach.torah2Intermediate
-      case 3 => SpecialReadings.Pesach.torah3
-      case 4 => SpecialReadings.Pesach.torah4
-      case 5 => SpecialReadings.Pesach.torah5
-      case 6 => SpecialReadings.Pesach.torah6
-    }
-  }
+  private object PesachIntermediate extends LoadNames("Pesach Intermediate")
 
   sealed class PesachIntermediate(intermediateDayNumber: Int, inHolyLand: Boolean)
     extends Intermediate(intermediateDayNumber, inHolyLand)
@@ -641,7 +634,7 @@ object SpecialDay {
     final def weekday(isPesachOnChamishi: Boolean): Reading = {
       val realDayNumber: Int =
         if (isPesachOnChamishi && ((dayNumber == 4) || (dayNumber == 5))) dayNumber-1 else dayNumber
-      Reading(fromDay(this, PesachIntermediate.first5(realDayNumber) :+ shabbosMaftir))
+      Reading(fromDay(this, SpecialReadings.Pesach.first5(realDayNumber) :+ shabbosMaftir))
     }
   }
 
