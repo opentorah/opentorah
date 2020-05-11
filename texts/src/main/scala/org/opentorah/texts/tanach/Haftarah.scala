@@ -3,6 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{LanguageSpec, Metadata, Names, WithNumber}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, From, Parser}
+import scala.xml.Elem
 import zio.ZIO
 
 final case class Haftarah private(override val spans: Seq[Haftarah.BookSpan])
@@ -58,6 +59,11 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
 
     new Custom.Of(result, full = full)
   }
+
+  def haftarahParsable(full: Boolean): Element[Customs] = new Element[Customs](
+    elementName = "haftarah",
+    parser = parser(full)
+  )
 
   private def oneSpan(span: BookSpanParsed): Haftarah = Haftarah(Seq(span.resolve))
 

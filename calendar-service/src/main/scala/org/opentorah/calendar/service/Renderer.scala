@@ -2,14 +2,14 @@ package org.opentorah.calendar.service
 
 import org.opentorah.calendar.Calendars
 import org.opentorah.calendar.gregorian.Gregorian
-import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Season, Shemittah, Sun, YearType}
+import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Season, Shemittah, SpecialDay, Sun, YearType}
 import org.opentorah.dates.{Calendar, DayBase, MonthBase, YearBase, YearsCycle}
+import org.opentorah.metadata.{Language, LanguageSpec, WithNames}
+import org.opentorah.schedule.rambam.RambamSchedule
+import org.opentorah.schedule.tanach.{Chitas, Readings, Schedule}
 import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
 import org.opentorah.texts.tanach.{Custom, Haftarah, Reading, Span, Torah}
 import org.opentorah.texts.tanach.Tanach.Psalms
-import org.opentorah.metadata.{Language, LanguageSpec, WithNames}
-import org.opentorah.schedule.rambam.RambamSchedule
-import org.opentorah.schedule.tanach.{Chitas, Schedule, SpecialDay}
 import org.opentorah.util.Collections
 import scalatags.Text.TypedTag
 import scalatags.Text.all._
@@ -364,7 +364,7 @@ object Renderer {
       }
 
       val festivalDays: Seq[(SpecialDay.Date, Jewish.Day)] =
-        SpecialDay.daysWithSpecialReadings(location == Location.HolyLand)
+        Readings.daysWithSpecialReadings(location == Location.HolyLand)
           .map(specialDay => specialDay -> specialDay.correctedDate(year))
           .toSeq.sortBy(_._2)
 

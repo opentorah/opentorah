@@ -6,7 +6,6 @@ import org.xml.sax.{XMLFilter, XMLReader}
 
 object Xerces {
 
-  // TODO switch to PaigesPrettyPrinter...
   def toString(node: Node): String = xmlSerializer.writeToString(node)
 
   private val xmlSerializer: org.apache.xml.serializer.dom3.LSSerializerImpl = {

@@ -1,6 +1,5 @@
 package org.opentorah.util
 
-// TODO move to what uses it - or into Collections
 class Slider[Q, S, T](seq: Seq[Q], isCurrent: (Q, S) => Boolean, value: Q => T) {
   private var current: Seq[Q] = seq
 

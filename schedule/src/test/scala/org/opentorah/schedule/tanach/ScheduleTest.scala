@@ -1,10 +1,10 @@
 package org.opentorah.schedule.tanach
 
 import org.opentorah.calendar.jewish.{Jewish, YearType}
-import org.opentorah.texts.tanach.Parsha
+import org.opentorah.calendar.jewish.SpecialDay._
+import org.opentorah.texts.tanach.{Parsha, WeeklyReading}
 import org.opentorah.texts.tanach.Parsha._
 import Jewish.{Day, Year}
-import SpecialDay._
 import YearType._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -29,14 +29,14 @@ final class ScheduleTest extends AnyFlatSpec with Matchers {
     def isCombined(parsha: Parsha): Boolean = readings.exists(_._2.secondParsha.contains(parsha))
 
     // Pesach
-    val readingsBeforePesach: WeeklyReading = findReadings(Pesach.date(year).shabbosBefore)
+    val readingsBeforePesach: WeeklyReading = findReadings(Pesach1.date(year).shabbosBefore)
     readingsBeforePesach.isCombined shouldBe false
     readingsBeforePesach.parsha shouldBe {
       if (!year.isLeap) Tzav else if (RoshHashanah1.date(year).is(Day.Name.Chamishi)) Acharei else Metzora
     }
 
     // Shavuot
-    val readingsBeforeShavuot = findReadings(Shavuos.date(year).shabbosBefore)
+    val readingsBeforeShavuot = findReadings(Shavuos1.date(year).shabbosBefore)
     readingsBeforeShavuot.isCombined shouldBe false
     Set[Parsha](Bemidbar, Nasso).contains(readingsBeforeShavuot.parsha) shouldBe true
 

@@ -1,8 +1,9 @@
 package org.opentorah.schedule.tanach
 
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
+import org.opentorah.calendar.jewish.SpecialDay
 import org.opentorah.metadata.WithNames
-import org.opentorah.texts.tanach.Reading
+import org.opentorah.texts.tanach.{Reading, WeeklyReading}
 import org.opentorah.util.{Cache, Collections, PairSlider}
 import SpecialDay.{FestivalOrIntermediate, Omer, ShabbosBereishis}
 
@@ -56,7 +57,7 @@ object Schedule {
     private val nextWeeklyReadings = new PairSlider[Day, WeeklyReading](weeklyReadingsList, _ > _)
 
     private val pesachOnChamishi = new Cache[Year, Boolean] {
-      override def calculate(year: Year): Boolean = SpecialDay.Pesach.date(year).is(Day.Name.Chamishi)
+      override def calculate(year: Year): Boolean = SpecialDay.Pesach1.date(year).is(Day.Name.Chamishi)
     }
 
     private def forDay(day: Day, inHolyLand: Boolean): DaySchedule = {
@@ -73,7 +74,7 @@ object Schedule {
           (if (day.next.isRoshChodesh) Seq(SpecialDay.ErevRoshChodesh) else Seq.empty) ++
           (if (day.isRoshChodesh) Seq(SpecialDay.RoshChodesh) else Seq.empty) ++
           Omer.dayOf(day).toSeq,
-        morning = SpecialDay.getMorningReading(
+        morning = Readings.getMorningReading(
           day = day,
           specialDay = specialDay,
           specialShabbos = specialShabbos,
@@ -81,7 +82,7 @@ object Schedule {
           nextWeeklyReading = nextWeeklyReading,
           isPesachOnChamishi = pesachOnChamishi.get(day.year)
         ),
-        purimAlternativeMorning = SpecialDay.getPurimAlternativeMorningReading(
+        purimAlternativeMorning = Readings.getPurimAlternativeMorningReading(
           day = day,
           specialDay = specialDay,
           specialShabbos = specialShabbos,
@@ -89,7 +90,7 @@ object Schedule {
           nextWeeklyReading = nextWeeklyReading,
           isPesachOnChamishi = pesachOnChamishi.get(day.year)
         ),
-        afternoon = SpecialDay.getAfternoonReading(
+        afternoon = Readings.getAfternoonReading(
           day = day,
           specialDay = specialDay,
           nextWeeklyReading = nextWeeklyReading
@@ -119,7 +120,7 @@ object Schedule {
     )}
 
     val weeklyReadingCycles: Seq[Seq[(Day, WeeklyReading)]] = (yearsData zip yearsData.tail).map { case (current, next) =>
-      WeeklyReading.getCycle(
+      WeeklyReadingCalculator.getCycle(
         year = current.year,
         fromShabbosBereishis = current.shabbosBereishis,
         toShabbosBereishis = next.shabbosBereishis,
@@ -156,7 +157,7 @@ object Schedule {
       weeklyReadings = weeklyReadings.toMap,
       weeklyReadingsList = weeklyReadings :+ extraWeeklyReading,
       festivals = filter(yearsData.map(_.festivals), to+7), // to get festivals for Tachanun and Motzoei Shabbos
-      daysWithSpecialReadingsNotFestivals = filterDates(SpecialDay.daysWithSpecialReadingsNotFestivals),
+      daysWithSpecialReadingsNotFestivals = filterDates(Readings.daysWithSpecialReadingsNotFestivals),
       specialShabboses = filterDates(SpecialDay.specialShabbos)
     )
   }

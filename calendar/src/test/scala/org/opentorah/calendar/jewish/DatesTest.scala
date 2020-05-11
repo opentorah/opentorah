@@ -109,6 +109,7 @@ final class DatesTest extends AnyFlatSpec with Matchers {
     for (year <- years; month <- year.months) month.year shouldBe year
   }
 
+  // TODO use SpecialDay etc. instead of the home-grown thingies:
   private def RoshHashanah: Year => Day = year => specialDay(year, Tishrei, 1)
   private def YomKippur: Year => Day = year => specialDay(year, Tishrei, 10)
   private def HoshanahRabbah: Year => Day = year => specialDay(year, Tishrei, 21)
