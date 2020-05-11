@@ -268,12 +268,6 @@ object SpecialReadings {
         <aliyah n="7" fromVerse="32"/>
         <aliyah n="8" fromVerse="35"/>
       </torah>).spans
-
-    val intermediateShabbosHaftarah: Haftarah.Customs = parseHaftarah(
-      <haftarah book="Ezekiel" fromChapter="38">
-        <custom n="Common" fromVerse="18" toChapter="39" toVerse="16"/>
-        <custom n="Italki, Teiman" fromVerse="1" toChapter="38" toVerse="23"/>
-      </haftarah>)
   }
 
   object Succos1 extends ShabbosAndWeekdayReading {
@@ -310,6 +304,50 @@ object SpecialReadings {
         <custom n="Common" fromChapter="8" fromVerse="2" toVerse="21"/>
         <custom n="Italki" fromChapter="7" fromVerse="51" toChapter="8" toVerse="15"/>
         <custom n="Teiman" fromChapter="7" fromVerse="51" toChapter="8" toVerse="21"/>
+      </haftarah>)
+  }
+
+  object SuccosIntermediate {
+
+
+    def weekday(day: WithNames, intermediateDayNumber: Int, inHolyLand: Boolean): Reading = {
+      if (intermediateDayNumber == 6) require(inHolyLand)
+
+      // Do not go beyond 6th fragment of korbanot.
+      val n: Int = Math.min(intermediateDayNumber, 4)
+
+      val today = korbanotToday(intermediateDayNumber, inHolyLand)
+
+      val ashkenazAndChabad: Torah = Torah.aliyot(
+        korbanot(n),
+        korbanot(n+1),
+        korbanot(n+2),
+        today
+      )
+      val sefard: Torah = Torah.aliyot(today, today, today, today)
+
+      Reading(
+        Custom.Ashkenaz -> fromDay(day, ashkenazAndChabad),
+        Custom.Chabad -> fromDay(day, ashkenazAndChabad),
+        Custom.Sefard -> fromDay(day, sefard)
+      )
+    }
+
+    def shabbos(day: WithNames, intermediateDayNumber: Int, inHolyLand: Boolean): Reading = Reading(
+      torah = fromDay(day, IntermediateShabbos.torah), // TODO maybe from() "IntermediateShabbos"?
+      maftir = Some(fromDay(day, korbanotToday(intermediateDayNumber, inHolyLand))),
+      haftarah = fromDay(day, shabbosHaftarah)
+    )
+
+    private def korbanot(n: Int): Torah.Fragment = Succos.korbanot(n)
+
+    private def korbanotToday(n: Int, inHolyLand: Boolean): Maftir =
+      if (inHolyLand) korbanot(n) else korbanot(n) + korbanot(n+1)
+
+    private val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
+      <haftarah book="Ezekiel" fromChapter="38">
+        <custom n="Common" fromVerse="18" toChapter="39" toVerse="16"/>
+        <custom n="Italki, Teiman" fromVerse="1" toChapter="38" toVerse="23"/>
       </haftarah>)
   }
 
@@ -373,9 +411,6 @@ object SpecialReadings {
 
     override def shabbos(day: WithNames): Reading = weekday(day)
   }
-
-
-
 
   object Chanukah {
     val first: Torah = parseTorah(
@@ -501,7 +536,7 @@ object SpecialReadings {
       <haftarah book="Malachi" fromChapter="3" fromVerse="4" toVerse="24"/>)
   }
 
-  object Pesach {
+  object PesachIntermediate extends ShabbosReading {
 
     def first5(realDayNumber: Int): Torah = realDayNumber match {
       case 2 => torah2Intermediate
@@ -543,12 +578,19 @@ object SpecialReadings {
     // Maftir for Pesach Intermediate Shabbos and last two days of Pesach
     val maftirEnd: Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>)
+    val shabbosMaftir: Maftir = maftirEnd
 
-    val intermediateShabbosHaftarah: Haftarah.Customs = parseHaftarah(
+    val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Ezekiel">
         <custom n="Common" fromChapter="37" fromVerse="1" toVerse="14"/>
         <custom n="Teiman" fromChapter="36" fromVerse="37" toChapter="37" toVerse="14"/>
       </haftarah>)
+
+    final override def shabbos(day: WithNames): Reading = Reading(
+      torah = fromDay(day, SpecialReadings.IntermediateShabbos.torah), // TODO maybe from() "IntermediateShabbos"?
+      maftir = Some(fromDay(day, shabbosMaftir)),
+      haftarah = fromDay(day, shabbosHaftarah)
+    )
   }
 
   object Pesach1 extends ShabbosAndWeekdayReading {
@@ -621,7 +663,7 @@ object SpecialReadings {
 
     override protected val weekdayTorah: Torah = shabbosTorah.drop(Set(2, 4))
 
-    override val maftir: Maftir = Pesach.maftirEnd
+    override val maftir: Maftir = PesachIntermediate.maftirEnd
 
     override protected val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="II Samuel" fromChapter="22" fromVerse="1" toVerse="51"/>)
