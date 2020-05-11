@@ -3,7 +3,6 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{LanguageSpec, Metadata, Names, WithNumber}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, From, Parser}
-import scala.xml.Elem
 import zio.ZIO
 
 final case class Haftarah private(override val spans: Seq[Haftarah.BookSpan])
@@ -43,27 +42,27 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
     Collections.mapValues(result.toMap)(_._2)
   }
 
-  def parser(full: Boolean): Parser[Customs] = for {
+  def haftarahParsable(full: Boolean): Element[Customs] = new Element[Customs](
+    elementName = "haftarah",
+    parser = parser(full)
+  )
+
+  private def parser(full: Boolean): Parser[Customs] = for {
     span <- spanParser
     parts <- partParsable(span).all
     parts <- if (parts.isEmpty) ZIO.none else partsParser(parts).map(Some(_))
     customsElements <- new Element[(Set[Custom], Haftarah)]("custom", parser = customParser(span)).all
-    customs = Custom.Of(customsElements, full = false)
   } yield {
+    val customs: Custom.Of[Haftarah] = Custom.Of(customsElements, full = false)
     val common: Option[Haftarah] = if (parts.isEmpty && customsElements.isEmpty) Some(oneSpan(span)) else parts
 
-    val result = common.fold(customs.customs) { common =>
+    val result: Map[Custom, Haftarah] = common.fold(customs.customs) { common =>
       require(customs.find(Custom.Common).isEmpty)
       customs.customs.updated(Custom.Common, common)
     }
 
     new Custom.Of(result, full = full)
   }
-
-  def haftarahParsable(full: Boolean): Element[Customs] = new Element[Customs](
-    elementName = "haftarah",
-    parser = parser(full)
-  )
 
   private def oneSpan(span: BookSpanParsed): Haftarah = Haftarah(Seq(span.resolve))
 

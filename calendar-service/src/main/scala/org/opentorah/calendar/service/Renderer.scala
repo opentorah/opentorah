@@ -363,8 +363,8 @@ object Renderer {
         )
       }
 
-      val festivalDays: Seq[(SpecialDay.Date, Jewish.Day)] =
-        Readings.daysWithSpecialReadings(location == Location.HolyLand)
+      val festivalDays: Seq[(SpecialDay, Jewish.Day)] =
+        SpecialDay.daysWithSpecialReadings(location == Location.HolyLand)
           .map(specialDay => specialDay -> specialDay.correctedDate(year))
           .toSeq.sortBy(_._2)
 

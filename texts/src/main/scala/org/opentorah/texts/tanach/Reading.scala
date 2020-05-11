@@ -59,9 +59,7 @@ object Reading {
 
   def apply(torah: Torah): Reading = apply(Custom.Of(torah))
 
-  def apply(customs: (Custom, Torah)*): Reading = apply(new Custom.Of(customs.toMap))
-
-  private def apply(torah: Torah.Customs): Reading =
+  def apply(torah: Torah.Customs): Reading =
     new Reading(mapValues(torah.customs)(torah => ReadingCustom(torah, maftirAndHaftarah = None)))
 
   def apply(torah: Torah, maftir: Option[Maftir], haftarah: Haftarah.Customs): Reading =
