@@ -5,7 +5,7 @@ import org.opentorah.dates.Calendar
 import org.opentorah.texts.tanach.{Parsha, WeeklyReading}
 import org.opentorah.texts.tanach.Parsha._
 import org.opentorah.util.Collections
-import SpecialDay.{Pesach1, Shavuos1, TishaBeAv}
+import org.opentorah.schedule.tanach.SpecialDay.{Pesach1, Shavuos1, TishaBeAv}
 
 /**
   * Determine weekly portion read on a given Shabbos.

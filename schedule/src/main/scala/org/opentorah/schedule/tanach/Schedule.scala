@@ -73,7 +73,7 @@ object Schedule {
           (if (day.next.isRoshChodesh) Seq(SpecialDay.ErevRoshChodesh) else Seq.empty) ++
           (if (day.isRoshChodesh) Seq(SpecialDay.RoshChodesh) else Seq.empty) ++
           Omer.dayOf(day).toSeq,
-        morning = SpecialDay.getMorningReading(
+        morning = Readings.getMorningReading(
           day = day,
           specialDay = specialDay,
           specialShabbos = specialShabbos,
@@ -81,7 +81,7 @@ object Schedule {
           nextWeeklyReading = nextWeeklyReading,
           isPesachOnChamishi = pesachOnChamishi.get(day.year)
         ),
-        purimAlternativeMorning = SpecialDay.getPurimAlternativeMorningReading(
+        purimAlternativeMorning = Readings.getPurimAlternativeMorningReading(
           day = day,
           specialDay = specialDay,
           specialShabbos = specialShabbos,
@@ -89,7 +89,7 @@ object Schedule {
           nextWeeklyReading = nextWeeklyReading,
           isPesachOnChamishi = pesachOnChamishi.get(day.year)
         ),
-        afternoon = SpecialDay.getAfternoonReading(
+        afternoon = Readings.getAfternoonReading(
           day = day,
           specialDay = specialDay,
           nextWeeklyReading = nextWeeklyReading
@@ -156,7 +156,7 @@ object Schedule {
       weeklyReadings = weeklyReadings.toMap,
       weeklyReadingsList = weeklyReadings :+ extraWeeklyReading,
       festivals = filter(yearsData.map(_.festivals), to+7), // to get festivals for Tachanun and Motzoei Shabbos
-      daysWithSpecialReadingsNotFestivals = filterDates(SpecialDay.daysWithSpecialReadingsNotFestivals),
+      daysWithSpecialReadingsNotFestivals = filterDates(Readings.daysWithSpecialReadingsNotFestivals),
       specialShabboses = filterDates(SpecialDay.specialShabbos)
     )
   }
