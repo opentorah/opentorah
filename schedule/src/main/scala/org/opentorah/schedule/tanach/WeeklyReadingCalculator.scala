@@ -5,7 +5,7 @@ import org.opentorah.dates.Calendar
 import org.opentorah.texts.tanach.{Parsha, WeeklyReading}
 import org.opentorah.texts.tanach.Parsha._
 import org.opentorah.util.Collections
-import org.opentorah.schedule.tanach.SpecialDay.{Pesach1, Shavuos1, TishaBeAv}
+import org.opentorah.calendar.jewish.SpecialDay.{Pesach1, Shavuos1, TishaBeAv}
 
 /**
   * Determine weekly portion read on a given Shabbos.
@@ -191,9 +191,9 @@ object WeeklyReadingCalculator {
     val combineFromVa_eschanan: Int = fromVa_eschanan - weeksFromVa_eschanan
 
     take(combinableFromBereishisToVayikra, combineFromBereishisToVayikra) ++
-      take(combinableFromVayikraToBemidbar, combineFromVayikraToBemidbar) ++
-      take(combinableFromBemidbarToVa_eschanan, combineFromBemidbarToVa_eschanan) ++
-      take(combinableFromVa_eschanan, combineFromVa_eschanan)
+    take(combinableFromVayikraToBemidbar, combineFromVayikraToBemidbar) ++
+    take(combinableFromBemidbarToVa_eschanan, combineFromBemidbarToVa_eschanan) ++
+    take(combinableFromVa_eschanan, combineFromVa_eschanan)
   }
 
   private def take(what: Seq[Parsha], number: Int): Set[Parsha] = {

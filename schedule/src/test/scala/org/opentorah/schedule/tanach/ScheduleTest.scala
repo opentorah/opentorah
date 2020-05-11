@@ -1,10 +1,10 @@
 package org.opentorah.schedule.tanach
 
 import org.opentorah.calendar.jewish.{Jewish, YearType}
+import org.opentorah.calendar.jewish.SpecialDay._
 import org.opentorah.texts.tanach.{Parsha, WeeklyReading}
 import org.opentorah.texts.tanach.Parsha._
 import Jewish.{Day, Year}
-import SpecialDay._
 import YearType._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

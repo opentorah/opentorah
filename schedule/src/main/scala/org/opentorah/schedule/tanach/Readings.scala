@@ -2,7 +2,7 @@ package org.opentorah.schedule.tanach
 
 import org.opentorah.calendar.jewish.Jewish.{Day, Month}
 import org.opentorah.calendar.jewish.Jewish.Month.Name._
-import org.opentorah.schedule.tanach.SpecialDay._
+import org.opentorah.calendar.jewish.SpecialDay._
 import org.opentorah.texts.tanach.{Custom, Haftarah, Parsha, Reading, SpecialReadings, WeeklyReading}
 
 object Readings {
