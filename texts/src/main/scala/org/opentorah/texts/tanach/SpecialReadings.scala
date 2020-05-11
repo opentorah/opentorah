@@ -9,15 +9,6 @@ import scala.xml.Elem
 
 object SpecialReadings {
 
-  def replaceMaftirAndHaftarah(
-    reading: Reading,
-    maftir: Maftir,
-    haftarah: Haftarah.Customs
-  ): Reading = reading.transform[Haftarah](haftarah, transformer = {
-    case (_: Custom, readingCustom: Reading.ReadingCustom, haftarah: Haftarah) =>
-      readingCustom.replaceMaftirAndHaftarah(maftir, haftarah)
-  })
-
   private def parse[R](parsable: Parsable[R], what: String, element: Elem): R =
     Parser.parseDo(parsable.parse(From.xml(what, element)))
 
@@ -76,10 +67,39 @@ object SpecialReadings {
   )
 
   object ErevRoshChodesh {
-    val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
+    def correct(
+      day: WithNames,
+      isSpecialShabbos: Boolean,
+      isRoshChodesh: Boolean,
+      isMonthTevesAvElul: Boolean,
+      reading: Reading
+    ): Reading = {
+      val allowReplace: Boolean = !isSpecialShabbos && !isRoshChodesh && ! isMonthTevesAvElul
+
+      def transformer(
+        custom: Custom,
+        reading: Reading.ReadingCustom,
+        haftarah: Haftarah,
+        addition: Option[Haftarah]
+      ): Reading.ReadingCustom =
+        if (allowReplace && (custom != Custom.Fes))
+          reading.replaceHaftarah(haftarah)
+        else
+          reading.addHaftarah(addition)
+
+      SpecialReadings.transformMaftirAndHaftarah(
+        day,
+        transformer,
+        reading,
+        shabbosHaftarah,
+        shabbosAdditionalHaftarah
+      )
+    }
+
+    private val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="I Samuel" fromChapter="20" fromVerse="18" toVerse="42"/>)
 
-    val shabbosAdditionalHaftarah: Haftarah.Customs = parseHaftarah(full = false, element =
+    private val shabbosAdditionalHaftarah: Haftarah.Customs = parseHaftarah(full = false, element =
       <haftarah>
         <custom n="Chabad, Fes" book="I Samuel" fromChapter="20">
           <part n="1" fromVerse="18" toVerse="18"/>
@@ -88,7 +108,13 @@ object SpecialReadings {
       </haftarah>)
   }
 
-  object RoshChodesh {
+  object RoshChodesh extends WeekdayReading {
+    def weekday(day: WithNames): Reading = Reading(
+      Custom.Ashkenaz -> fromDay(day, ashkenazSefard),
+      Custom.Sefard   -> fromDay(day, ashkenazSefard),
+      Custom.Hagra    -> fromDay(day, hagra)
+    )
+
     val torah: Torah = parseTorah(
       <torah book="Numbers" fromChapter="28" fromVerse="1" toVerse="15">
         <aliyah n="2" fromVerse="3"/>
@@ -122,13 +148,42 @@ object SpecialReadings {
 
     val shabbosMaftir: Maftir = all(4)+all(5) // 9-15
 
-    val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
+    def correct(
+      day: WithNames,
+      isSpecialShabbos: Boolean,
+      isMonthTevesAv: Boolean,
+      isMonthElul: Boolean,
+      reading: Reading
+    ): Reading = {
+      val allowReplace: Boolean = !isSpecialShabbos && !isMonthTevesAv
+
+      def transformer(
+        custom: Custom,
+        reading: Reading.ReadingCustom,
+        haftarah: Haftarah,
+        addition: Option[Haftarah]
+      ): Reading.ReadingCustom =
+        if (allowReplace && (!isMonthElul || (custom == Custom.Chabad)))
+          reading.replaceMaftirAndHaftarah(fromDay(day, shabbosMaftir), haftarah)
+        else
+          reading.addHaftarah(addition)
+
+      transformMaftirAndHaftarah(
+        day,
+        transformer,
+        reading,
+        shabbosHaftarah,
+        shabbosAdditionalHaftarah
+      )
+    }
+
+    private val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Isaiah" fromChapter="66">
         <part n="1" fromVerse="1" toVerse="24"/>
         <part n="2" fromVerse="23" toVerse="23"/>
       </haftarah>)
 
-    val shabbosAdditionalHaftarah: Haftarah.Customs = parseHaftarah(full = false, element =
+    private val shabbosAdditionalHaftarah: Haftarah.Customs = parseHaftarah(full = false, element =
       <haftarah>
         <custom n="Chabad" book="Isaiah" fromChapter="66">
           <part n="1" fromVerse="1" toVerse="1"/>
@@ -532,13 +587,26 @@ object SpecialReadings {
   }
 
   object ShabbosHagodol {
-    val haftarah: Haftarah.Customs = parseHaftarah(
+    def transform(day: WithNames, isErevPesach: Boolean, reading: Reading): Reading =
+      reading.transform[Haftarah](fromDay(day, haftarah), {
+        case (custom: Custom, readingCustom: Reading.ReadingCustom, haftarah: Haftarah) =>
+          if ((custom == Custom.Chabad) && !isErevPesach) readingCustom
+          else readingCustom.replaceHaftarah(haftarah)
+      })
+
+    private val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Malachi" fromChapter="3" fromVerse="4" toVerse="24"/>)
   }
 
   object PesachIntermediate extends ShabbosReading {
 
-    def first5(realDayNumber: Int): Torah = realDayNumber match {
+    final def weekday(day: WithNames, isPesachOnChamishi: Boolean, dayNumber: Int): Reading = {
+      val realDayNumber: Int =
+        if (isPesachOnChamishi && ((dayNumber == 4) || (dayNumber == 5))) dayNumber-1 else dayNumber
+      Reading(fromDay(day, first5(realDayNumber) :+ shabbosMaftir))
+    }
+
+    private def first5(realDayNumber: Int): Torah = realDayNumber match {
       case 2 => torah2Intermediate
       case 3 => torah3
       case 4 => torah4
@@ -580,7 +648,7 @@ object SpecialReadings {
       <maftir book="Numbers" fromChapter="28" fromVerse="19" toVerse="25"/>)
     val shabbosMaftir: Maftir = maftirEnd
 
-    val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
+    private val shabbosHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Ezekiel">
         <custom n="Common" fromChapter="37" fromVerse="1" toVerse="14"/>
         <custom n="Teiman" fromChapter="36" fromVerse="37" toChapter="37" toVerse="14"/>
@@ -813,5 +881,39 @@ object SpecialReadings {
           <part n="2" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
         </custom>
       </haftarah>)
+  }
+
+  def replaceMaftirAndHaftarah(
+    reading: Reading,
+    maftir: Maftir,
+    haftarah: Haftarah.Customs
+  ): Reading = reading.transform[Haftarah](haftarah, transformer = {
+    case (_: Custom, readingCustom: Reading.ReadingCustom, haftarah: Haftarah) =>
+      readingCustom.replaceMaftirAndHaftarah(maftir, haftarah)
+  })
+
+  private def transformMaftirAndHaftarah(
+    day: WithNames,
+    transformer: (
+      Custom,
+      Reading.ReadingCustom,
+      Haftarah,
+      Option[Haftarah]
+    ) => Reading.ReadingCustom,
+    reading: Reading,
+    shabbosHaftarah: Haftarah.Customs,
+    shabbosAdditionalHaftarah: Haftarah.Customs
+  ): Reading = {
+    val haftarahs: Custom.Of[(Haftarah, Option[Haftarah])] =
+      fromDay(day, shabbosHaftarah) * fromDay(day, shabbosAdditionalHaftarah)
+
+    reading.transform[(Haftarah, Option[Haftarah])](haftarahs, { case (
+      custom: Custom,
+      reading: Reading.ReadingCustom,
+      haftarahs: (Haftarah, Option[Haftarah])
+      ) =>
+      val (haftarah: Haftarah, addition: Option[Haftarah]) = haftarahs
+      transformer(custom, reading, haftarah, addition)
+    })
   }
 }
