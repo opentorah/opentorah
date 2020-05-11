@@ -2,8 +2,7 @@ package org.opentorah.schedule.tanach
 
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
 import org.opentorah.dates.Calendar
-import org.opentorah.metadata.{Names, WithNames}
-import org.opentorah.texts.tanach.{Haftarah, Parsha, Reading}
+import org.opentorah.texts.tanach.{Parsha, WeeklyReading}
 import org.opentorah.texts.tanach.Parsha._
 import org.opentorah.util.Collections
 import SpecialDay.{Pesach1, Shavuos1, TishaBeAv}
@@ -102,28 +101,7 @@ import SpecialDay.{Pesach1, Shavuos1, TishaBeAv}
   assumptions of the algorithm itself hold is verified by the unit tests for the years 1-6000;
   I am too lazy to prove the theorems :)
  */
-final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) extends WithNames {
-  def isCombined: Boolean = secondParsha.isDefined
-
-  override def names: Names = if (!isCombined) parsha.names else
-    Names.combine(parsha.names, secondParsha.get.names, { case (_, one, other) =>
-        one + "-" + other
-    })
-
-  def getMorningReading: Reading = {
-    val haftarahParsha = if (isCombined && (parsha != Mattos) && (parsha != Nitzavim)) secondParsha.get else parsha
-    Reading(
-      torah = (if (isCombined) parsha.daysCombined.get else parsha.days).map(_.fromWithNumbers(this)),
-      maftir = Some((if (isCombined) secondParsha.get else parsha).maftir.from(this)),
-      haftarah = Haftarah.forParsha(haftarahParsha)
-    )
-  }
-
-  def getAfternoonReading: Reading =
-    Reading(torah = parsha.aliyot.from(this))
-}
-
-object WeeklyReading {
+object WeeklyReadingCalculator {
   private final val fromBereishisToBemidbar: Int = Parsha.distance(Bereishis, Bemidbar)
   private final val allowedBeforePesach: Set[Parsha] = Set[Parsha](Tzav, Metzora, Acharei)
   private final val fromBemidbarToVa_eschanan: Int = Parsha.distance(Bemidbar, Va_eschanan)
@@ -152,7 +130,7 @@ object WeeklyReading {
     // All Shabbos days that are not festivals from one Shabbos Bereshit until the next.
     val weeks: Seq[Day] =
       Collections.unfoldSimple[Day](fromShabbosBereishis, _ + Calendar.daysPerWeek, _ < toShabbosBereishis)
-      .filterNot(festivals.contains)
+        .filterNot(festivals.contains)
 
     val combine: Set[Parsha] = combined(year, weeks)
 
@@ -193,11 +171,11 @@ object WeeklyReading {
       else {
         // and maybe rename it to ...beforTzav or something?
         val doCombineVayakhelPekudei: Boolean =
-        (combinefromBereishisToBemidbar == combinableFromBereishisToVayikra.length + combinableFromVayikraToBemidbar.length) || {
-          // This tweak is required only for the Holy Land (and never for AchareiMot) for some reason?
-          val parshahBeforePesach: Parsha = Parsha.forIndex(weeksBeforePesach)
-          !allowedBeforePesach.contains(parshahBeforePesach)
-        }
+          (combinefromBereishisToBemidbar == combinableFromBereishisToVayikra.length + combinableFromVayikraToBemidbar.length) || {
+            // This tweak is required only for the Holy Land (and never for AchareiMot) for some reason?
+            val parshahBeforePesach: Parsha = Parsha.forIndex(weeksBeforePesach)
+            !allowedBeforePesach.contains(parshahBeforePesach)
+          }
 
         val combineFromBereishisToVayikra: Int = if (doCombineVayakhelPekudei) 1 else 0
 
@@ -213,9 +191,9 @@ object WeeklyReading {
     val combineFromVa_eschanan: Int = fromVa_eschanan - weeksFromVa_eschanan
 
     take(combinableFromBereishisToVayikra, combineFromBereishisToVayikra) ++
-    take(combinableFromVayikraToBemidbar, combineFromVayikraToBemidbar) ++
-    take(combinableFromBemidbarToVa_eschanan, combineFromBemidbarToVa_eschanan) ++
-    take(combinableFromVa_eschanan, combineFromVa_eschanan)
+      take(combinableFromVayikraToBemidbar, combineFromVayikraToBemidbar) ++
+      take(combinableFromBemidbarToVa_eschanan, combineFromBemidbarToVa_eschanan) ++
+      take(combinableFromVa_eschanan, combineFromVa_eschanan)
   }
 
   private def take(what: Seq[Parsha], number: Int): Set[Parsha] = {

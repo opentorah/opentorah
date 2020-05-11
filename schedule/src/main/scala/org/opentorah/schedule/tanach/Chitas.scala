@@ -1,7 +1,7 @@
 package org.opentorah.schedule.tanach
 
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
-import org.opentorah.texts.tanach.{Custom, Parsha, Torah}
+import org.opentorah.texts.tanach.{Custom, Parsha, Torah, WeeklyReading}
 import org.opentorah.texts.tanach.Parsha.{Bereishis, VezosHaberachah}
 import org.opentorah.util.Cache
 

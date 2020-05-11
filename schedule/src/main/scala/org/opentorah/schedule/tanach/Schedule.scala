@@ -2,7 +2,7 @@ package org.opentorah.schedule.tanach
 
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
 import org.opentorah.metadata.WithNames
-import org.opentorah.texts.tanach.Reading
+import org.opentorah.texts.tanach.{Reading, WeeklyReading}
 import org.opentorah.util.{Cache, Collections, PairSlider}
 import SpecialDay.{FestivalOrIntermediate, Omer, ShabbosBereishis}
 
@@ -119,7 +119,7 @@ object Schedule {
     )}
 
     val weeklyReadingCycles: Seq[Seq[(Day, WeeklyReading)]] = (yearsData zip yearsData.tail).map { case (current, next) =>
-      WeeklyReading.getCycle(
+      WeeklyReadingCalculator.getCycle(
         year = current.year,
         fromShabbosBereishis = current.shabbosBereishis,
         toShabbosBereishis = next.shabbosBereishis,

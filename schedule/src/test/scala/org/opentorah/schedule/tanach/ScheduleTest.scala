@@ -1,7 +1,7 @@
 package org.opentorah.schedule.tanach
 
 import org.opentorah.calendar.jewish.{Jewish, YearType}
-import org.opentorah.texts.tanach.Parsha
+import org.opentorah.texts.tanach.{Parsha, WeeklyReading}
 import org.opentorah.texts.tanach.Parsha._
 import Jewish.{Day, Year}
 import SpecialDay._
