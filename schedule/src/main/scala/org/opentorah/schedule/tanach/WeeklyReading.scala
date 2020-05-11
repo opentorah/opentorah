@@ -6,7 +6,7 @@ import org.opentorah.metadata.{Names, WithNames}
 import org.opentorah.texts.tanach.{Haftarah, Parsha, Reading}
 import org.opentorah.texts.tanach.Parsha._
 import org.opentorah.util.Collections
-import SpecialDay.{Pesach, Shavuos, TishaBeAv}
+import SpecialDay.{Pesach1, Shavuos1, TishaBeAv}
 
 /**
   * Determine weekly portion read on a given Shabbos.
@@ -177,8 +177,8 @@ object WeeklyReading {
   private def combined(year: Year, weeks: Seq[Day]): Set[Parsha] = {
     def weeksTo(day: Day): Int = weeks.takeWhile(_ < day).length
 
-    val weeksBeforePesach: Int = weeksTo(Pesach.date(year).shabbosBefore)
-    val weeksToShavuot: Int = weeksTo(Shavuos.date(year).shabbosBefore)
+    val weeksBeforePesach: Int = weeksTo(Pesach1.date(year).shabbosBefore)
+    val weeksToShavuot: Int = weeksTo(Shavuos1.date(year).shabbosBefore)
     val weeksFromShavuotToAfterTishaBeAv: Int = weeksTo(TishaBeAv.date(year).shabbosAfter) - weeksToShavuot
 
     // When there are to many Saturdays before Shavuot to assign Bemidbar to the one immediately before Shavuot,

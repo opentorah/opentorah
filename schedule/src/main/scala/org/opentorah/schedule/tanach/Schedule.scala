@@ -56,7 +56,7 @@ object Schedule {
     private val nextWeeklyReadings = new PairSlider[Day, WeeklyReading](weeklyReadingsList, _ > _)
 
     private val pesachOnChamishi = new Cache[Year, Boolean] {
-      override def calculate(year: Year): Boolean = SpecialDay.Pesach.date(year).is(Day.Name.Chamishi)
+      override def calculate(year: Year): Boolean = SpecialDay.Pesach1.date(year).is(Day.Name.Chamishi)
     }
 
     private def forDay(day: Day, inHolyLand: Boolean): DaySchedule = {
