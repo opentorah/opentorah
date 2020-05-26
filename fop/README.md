@@ -15,5 +15,7 @@ I should look into alternative ways of integrating with Node:
 [GraalVM](https://www.graalvm.org/) and
 [Rhino](https://github.com/mozilla/rhino) / [Trireme](https://github.com/apigee/trireme).
 
+Dyno?
+
 Support fo J2V8 should probably be dropped...
 

@@ -27,7 +27,7 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
      s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>
          |    Wrapped display TeX:<informalequation>
-         |    <math ${MathML.Namespace.default} display="block" mathjax:input="TeX" ${MathJax.Namespace} ${Namespace.XInclude}>
+         |    <math ${MathML.Namespace.default} display="block" mathjax:input="TeX" ${MathJax.Namespace}>
          |      <mrow>
          |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
@@ -47,7 +47,7 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
     ) shouldBe
      s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>Display TeX:<informalequation>
-         |         <math ${MathML.Namespace.default} mathjax:input="TeX" ${MathJax.Namespace} ${Namespace.XInclude}>
+         |         <math ${MathML.Namespace.default} mathjax:input="TeX" ${MathJax.Namespace}>
          |            <mrow>
          |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
@@ -68,7 +68,7 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
     ) shouldBe
      s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>Inline TeX:<inlineequation>
-         |         <math ${MathML.Namespace.default} mathjax:input="inline-TeX" ${MathJax.Namespace} ${Namespace.XInclude}>
+         |         <math ${MathML.Namespace.default} mathjax:input="inline-TeX" ${MathJax.Namespace}>
          |            <mrow>
          |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
@@ -88,7 +88,7 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
     ) shouldBe
      s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
          |  <para>Explicit display TeX:<equation>
-         |         <math ${MathML.Namespace.default} mathjax:input="TeX" ${MathJax.Namespace} ${Namespace.XInclude}>
+         |         <math ${MathML.Namespace.default} mathjax:input="TeX" ${MathJax.Namespace}>
          |            <mrow>
          |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
