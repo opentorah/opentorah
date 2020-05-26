@@ -57,6 +57,7 @@ object FopFactoryFactory {
     override def getImageManager: ImageManager = imageManager
 
     override def isAccessibilityEnabled: Boolean = delegate.isAccessibilityEnabled
+    override def isKeepEmptyTags: Boolean = delegate.isKeepEmptyTags
     override def getLayoutManagerMakerOverride: org.apache.fop.layoutmgr.LayoutManagerMaker = delegate.getLayoutManagerMakerOverride
     override def getResourceResolver: org.apache.xmlgraphics.io.ResourceResolver = delegate.getResourceResolver
     override def getBaseURI: URI = delegate.getBaseURI

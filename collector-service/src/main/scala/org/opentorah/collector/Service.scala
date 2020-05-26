@@ -61,6 +61,6 @@ object Service extends App {
   private def getOtherHost: String =
     scala.util.Properties.envOrNone("OTHER_HOST").getOrElse("www.alter-rebbe.org")
 
-  def run(args: List[String]): URIO[ZEnv, Int] =
-    server.fold(_ => 1, _ => 0)
+  def run(args: List[String]): ZIO[ZEnv, Nothing, zio.ExitCode] =
+    server.fold(_ => zio.ExitCode.failure, _ => zio.ExitCode.success)
 }

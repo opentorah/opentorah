@@ -8,7 +8,7 @@ import org.http4s.implicits._
 import org.http4s.headers.`Content-Type`
 import org.http4s.MediaType
 import org.http4s.server.blaze.BlazeServerBuilder
-import zio.{App, Task, URIO, ZEnv, ZIO}
+import zio.{App, Task, ZEnv, ZIO}
 import zio.interop.catz._
 import zio.interop.catz.implicits._
 import java.util.concurrent.Executors
@@ -112,6 +112,6 @@ object CalendarService extends App {
   private def getServicePort: Int =
     scala.util.Properties.envOrNone("PORT").map(_.toInt).getOrElse(8090)
 
-  def run(args: List[String]): URIO[ZEnv, Int] =
-    server.fold(_ => 1, _ => 0)
+  def run(args: List[String]): ZIO[ZEnv, Nothing, zio.ExitCode] =
+    server.fold(_ => zio.ExitCode.failure, _ => zio.ExitCode.success)
 }
