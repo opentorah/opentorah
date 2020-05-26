@@ -5,29 +5,29 @@ import org.opentorah.xml.From
 import Jewish.{Day, Year}
 import Jewish.Month.Name._
 
+sealed trait SpecialDay extends WithNames {
+  def date(year: Year): Day
+  final def correctedDate(year: Year): Day = correctDate(date(year))
+  protected def correctDate(date: Day): Day = date
+}
+
 object SpecialDay {
 
   sealed class LoadNames(override val name: String) extends WithName with WithNames {
     final override def names: Names = toNames(this)
   }
 
-  sealed trait Date extends WithNames {
-    def date(year: Year): Day
-    final def correctedDate(year: Year): Day = correctDate(date(year))
-    protected def correctDate(date: Day): Day = date
-  }
-
-  sealed trait PostponeOnShabbos extends Date {
+  sealed trait PostponeOnShabbos extends SpecialDay {
     final override protected def correctDate(result: Day): Day = if (result.isShabbos) result+1 else result
   }
 
-  sealed trait DayOf extends Date {
-    def firstDay: Date
+  sealed trait DayOf extends SpecialDay {
+    def firstDay: SpecialDay
     def dayNumber: Int
   }
 
   sealed trait FirstDayOf extends DayOf {
-    final override def firstDay: Date = this
+    final override def firstDay: SpecialDay = this
     final override def dayNumber: Int = 1
   }
 
@@ -35,13 +35,14 @@ object SpecialDay {
     final override def date(year: Year): Day = firstDay.date(year) + (dayNumber-1)
   }
 
-  sealed trait FestivalOrIntermediate extends Date
+  sealed trait FestivalOrIntermediate extends SpecialDay
 
   sealed trait Festival extends FestivalOrIntermediate
 
+  // TODO remove if not needed:
   private object FestivalEnd extends LoadNames("Festival End")
-
   private object IntermediateShabbos extends LoadNames("Intermediate Shabbos")
+  private object Fast extends LoadNames("Public Fast")
 
   sealed abstract class Intermediate(val intermediateDayNumber: Int, val inHolyLand: Boolean)
     extends FestivalOrIntermediate with NonFirstDayOf
@@ -49,22 +50,20 @@ object SpecialDay {
     final override def dayNumber: Int = intermediateDayNumber + (if (inHolyLand) 1 else 2)
   }
 
-  sealed trait RabbinicFestival extends Date
+  sealed trait RabbinicFestival extends SpecialDay
 
   case object RoshChodesh extends LoadNames("Rosh Chodesh")
 
   case object ErevRoshChodesh extends LoadNames("Erev Rosh Chodesh")
 
-  private object Fast extends LoadNames("Public Fast")
-
-  sealed trait Fast extends Date
+  sealed trait Fast extends SpecialDay
 
   case object RoshHashanah1 extends LoadNames("Rosh Hashanah") with Festival {
     override def date(year: JewishYear): JewishDay = year.month(Tishrei).day(1)
   }
 
   case object RoshHashanah2 extends Festival with NonFirstDayOf {
-    override def firstDay: Date = RoshHashanah1
+    override def firstDay: SpecialDay = RoshHashanah1
     override def dayNumber: Int = 2
     override lazy val names: Names = namesWithNumber(RoshHashanah1, 2)
   }
@@ -83,7 +82,7 @@ object SpecialDay {
 
   case object Succos2 extends Festival with NonFirstDayOf {
     override def names: Names = namesWithNumber(Succos1, 2)
-    override def firstDay: Date = Succos1
+    override def firstDay: SpecialDay = Succos1
     override def dayNumber: Int = 2
   }
 
@@ -93,7 +92,7 @@ object SpecialDay {
     extends Intermediate(intermediateDayNumber, inHolyLand)
   {
     final override lazy val names: Names = namesWithNumber(SuccosIntermediate, intermediateDayNumber)
-    override def firstDay: Date = Succos1
+    override def firstDay: SpecialDay = Succos1
   }
 
   case object SuccosIntermediate1 extends SuccosIntermediate(1, false)
@@ -110,23 +109,23 @@ object SpecialDay {
   case object HoshanahRabbahInHolyLand      extends SuccosIntermediate(6, true)
 
   case object SheminiAtzeres extends LoadNames("Shemini Atzeres") with Festival with NonFirstDayOf {
-    override def firstDay: Date = Succos1
+    override def firstDay: SpecialDay = Succos1
     override def dayNumber: Int = 8
   }
 
   case object SimchasTorah extends LoadNames("Simchas Torah") with Festival with NonFirstDayOf {
-    final override def firstDay: Date = Succos1
+    final override def firstDay: SpecialDay = Succos1
     override def dayNumber: Int = 9
   }
 
   case object SheminiAtzeresAndSimchasTorahInHolyLand extends LoadNames("Shemini Atzeres and Simchas Torah")
     with Festival with NonFirstDayOf
   {
-    final override def firstDay: Date = Succos1
+    final override def firstDay: SpecialDay = Succos1
     override def dayNumber: Int = 8
   }
 
-  case object ShabbosBereishis extends LoadNames("Shabbos Bereishis") with Date {
+  case object ShabbosBereishis extends LoadNames("Shabbos Bereishis") with SpecialDay {
     override def date(year: Year): Day = SimchasTorah.date(year).shabbosAfter
   }
 
@@ -134,7 +133,7 @@ object SpecialDay {
 
   sealed class Chanukah(override val dayNumber: Int) extends WithNames with DayOf with RabbinicFestival {
     final override lazy val names: Names = namesWithNumber(Chanukah, dayNumber)
-    final override def firstDay: Date = Chanukah1
+    final override def firstDay: SpecialDay = Chanukah1
     final override def date(year: Year): Day = year.month(Kislev).day(25)+(dayNumber-1)
   }
 
@@ -161,7 +160,7 @@ object SpecialDay {
         result
   }
 
-  sealed trait SpecialShabbos extends Date
+  sealed trait SpecialShabbos extends SpecialDay
 
   sealed trait SpecialParsha extends SpecialShabbos
 
@@ -205,7 +204,7 @@ object SpecialDay {
 
   case object Pesach2 extends Festival with NonFirstDayOf {
     override lazy val names: Names = namesWithNumber(Pesach1, 2)
-    override def firstDay: Date = Pesach1
+    override def firstDay: SpecialDay = Pesach1
     override def dayNumber: Int = 2
   }
 
@@ -215,7 +214,7 @@ object SpecialDay {
     extends Intermediate(intermediateDayNumber, inHolyLand)
   {
     final override lazy val names: Names = namesWithNumber(PesachIntermediate, intermediateDayNumber)
-    final override def firstDay: Date = Pesach1
+    final override def firstDay: SpecialDay = Pesach1
   }
 
   case object PesachIntermediate1 extends PesachIntermediate(1, false)
@@ -230,12 +229,12 @@ object SpecialDay {
   case object PesachIntermediate5InHolyLand extends PesachIntermediate(5, true)
 
   case object Pesach7 extends LoadNames("Pesach 7") with Festival with NonFirstDayOf {
-    override def firstDay: Date = Pesach1
+    override def firstDay: SpecialDay = Pesach1
     override def dayNumber: Int = 7
   }
 
   case object Pesach8 extends LoadNames("Pesach 8") with Festival with NonFirstDayOf {
-    override def firstDay: Date = Pesach1
+    override def firstDay: SpecialDay = Pesach1
     override def dayNumber: Int = 8
   }
 
@@ -245,14 +244,14 @@ object SpecialDay {
 
   object Omer extends LoadNames("Omer") {
     def dayOf(day: Day): Option[Omer] = {
-      val year = day.year
-      val pesach = Pesach1.date(year)
-      val shavous = Shavuos1.date(year)
+      val year: Year = day.year
+      val pesach: Day = Pesach1.date(year)
+      val shavous: Day = Shavuos1.date(year)
       if ((day <= pesach) || (day >= shavous)) None else Some(Omer(day - pesach))
     }
   }
 
-  case object LagBaOmer extends LoadNames("Lag Ba Omer") with Date {
+  case object LagBaOmer extends LoadNames("Lag Ba Omer") with SpecialDay {
     override def date(year: Year): Day = Pesach1.date(year) + 33
   }
 
@@ -262,7 +261,7 @@ object SpecialDay {
 
   case object Shavuos2 extends Festival with NonFirstDayOf {
     override lazy val names: Names = namesWithNumber(Shavuos1, 2)
-    override def firstDay: Date = Shavuos1
+    override def firstDay: SpecialDay = Shavuos1
     override def dayNumber: Int = 2
   }
 
@@ -309,6 +308,11 @@ object SpecialDay {
 
   val specialShabbos: Set[SpecialShabbos] =
     Set(ParshasShekalim, ParshasZachor, ParshasParah, ParshasHachodesh, ShabbosHagodol)
+
+  val daysWithSpecialReadingsNotFestivals: Set[SpecialDay] = rabbinicFestivals ++ fasts
+
+  def daysWithSpecialReadings(inHolyLand: Boolean): Set[SpecialDay] =
+    festivals(inHolyLand) ++ daysWithSpecialReadingsNotFestivals
 
   private val loadNames: Seq[LoadNames] = Seq(
     FestivalEnd, IntermediateShabbos, RoshChodesh, ErevRoshChodesh, Fast,

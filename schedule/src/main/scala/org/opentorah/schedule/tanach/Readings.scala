@@ -2,17 +2,15 @@ package org.opentorah.schedule.tanach
 
 import org.opentorah.calendar.jewish.Jewish.{Day, Month}
 import org.opentorah.calendar.jewish.Jewish.Month.Name._
+import org.opentorah.calendar.jewish.SpecialDay
 import org.opentorah.calendar.jewish.SpecialDay._
-import org.opentorah.texts.tanach.{Custom, Haftarah, Parsha, Reading, SpecialReadings, WeeklyReading}
+import org.opentorah.metadata.WithNames
+import org.opentorah.texts.tanach.{Reading, SpecialReadings, WeeklyReading}
 
 object Readings {
-  val daysWithSpecialReadingsNotFestivals: Set[Date] = rabbinicFestivals ++ fasts
-
-  def daysWithSpecialReadings(inHolyLand: Boolean): Set[Date] = festivals(inHolyLand) ++ daysWithSpecialReadingsNotFestivals
-
   final def getMorningReading(
     day: Day,
-    specialDay: Option[Date],
+    specialDay: Option[SpecialDay],
     specialShabbos: Option[SpecialShabbos],
     weeklyReading: Option[WeeklyReading],
     nextWeeklyReading: WeeklyReading,
@@ -45,99 +43,41 @@ object Readings {
 
   final def getPurimAlternativeMorningReading(
     day: Day,
-    specialDay: Option[Date],
+    specialDay: Option[SpecialDay],
     specialShabbos: Option[SpecialShabbos],
     weeklyReading: Option[WeeklyReading],
     nextWeeklyReading: WeeklyReading,
     isPesachOnChamishi: Boolean
   ): Option[Reading] = {
     val isAlternative = specialDay.contains(Purim) || specialDay.contains(ShushanPurim)
-    if (!isAlternative) None else getMorningReading(day, None, specialShabbos, weeklyReading, nextWeeklyReading, isPesachOnChamishi)
+    if (isAlternative) getMorningReading(day, None, specialShabbos, weeklyReading, nextWeeklyReading, isPesachOnChamishi)
+    else None
   }
 
   private final def getShabbosMorningReading(
     day: Day,
-    specialDay: Option[Date],
+    specialDay: Option[SpecialDay],
     weeklyReading: Option[WeeklyReading],
     specialShabbos: Option[SpecialShabbos],
   ): Reading = {
     require(day.isShabbos)
 
     val isRoshChodesh: Boolean = day.isRoshChodesh
+    val roshChodeshDay = if (isRoshChodesh) Some(RoshChodesh) else None
 
-    val normal: Reading = specialDay.map {
-      case day: Chanukah =>
-        require(weeklyReading.isDefined)
-        SpecialReadings.Chanukah.shabbos(
-          day,
-          roshChodeshDay = if (isRoshChodesh) Some(RoshChodesh) else None,
-          weeklyReading = weeklyReading.get,
-          dayNumber = day.dayNumber
-        )
+    val weekly: Reading = specialDay.fold {
+      require(weeklyReading.isDefined)
+      SpecialReadings.correctKiSeitzei(
+        reading = weeklyReading.get.getMorningReading,
+        isMonthElul = day.month.name == Elul,
+        dayNumber = day.numberInMonth
+      )
+    } (specialDay => getShabbosMorningReading(specialDay, weeklyReading, roshChodeshDay))
 
-      case ShushanPurim =>
-        require(weeklyReading.isDefined)
-        SpecialReadings.ShushanPurim.shabbos(ShushanPurim, weeklyReading.get)
+    val result: Reading = specialShabbos.fold(weekly)(specialShabbos =>
+      applySpecialShabbos(specialShabbos, weekly, day, roshChodeshDay))
 
-      // TODO for all below:  require(weeklyReading.isEmpty)
-
-      case day: SuccosIntermediate =>
-        SpecialReadings.SuccosIntermediate.shabbos(day, day.intermediateDayNumber, day.inHolyLand)
-
-      case day =>
-        val reading: SpecialReadings.ShabbosReading = day match {
-          case _: PesachIntermediate => SpecialReadings.PesachIntermediate
-          case RoshHashanah1 => SpecialReadings.RoshHashanah1
-          case YomKippur => SpecialReadings.YomKippur
-          case Succos1 => SpecialReadings.Succos1
-          case Succos2 => SpecialReadings.Succos2
-          case SheminiAtzeres => SpecialReadings.SheminiAtzeres
-          case SheminiAtzeresAndSimchasTorahInHolyLand => SpecialReadings.SheminiAtzeresAndSimchasTorahInHolyLand
-          case Pesach1 => SpecialReadings.Pesach1
-          case Pesach7 => SpecialReadings.Pesach7
-          case Pesach8 => SpecialReadings.Pesach8
-          case Shavuos2 => SpecialReadings.Shavuos2
-          case _ => throw new IllegalArgumentException("Must have Shabbos reading!")
-        }
-        reading.shabbos(day)
-    }
-      .getOrElse {
-        require(weeklyReading.isDefined)
-        val result = weeklyReading.get.getMorningReading
-        val isKiSeitzei: Boolean = (day.month.name == Elul) && (day.numberInMonth == 14)
-        if (!isKiSeitzei) result else {
-          val customs: Custom.Of[Reading.ReadingCustom] = result.liftR {
-            case (custom: Custom, readingCustom: Reading.ReadingCustom) =>
-              if (custom != Custom.Chabad) readingCustom
-              else readingCustom.addHaftarah(Haftarah.forParsha(Parsha.Re_eh).doFind(Custom.Chabad))
-          }
-          new Reading(customs.customs)
-        }
-      }
-
-    val result = specialShabbos.fold(normal) {
-      case ShabbosHagodol =>
-        SpecialReadings.ShabbosHagodol.transform(
-          day = ShabbosHagodol,
-          isErevPesach = day.next == Pesach1.date(day.year),
-          reading = normal
-        )
-
-      case specialParsha: SpecialParsha =>
-        val reading = specialParsha match {
-          case ParshasShekalim  => SpecialReadings.ParshasShekalim
-          case ParshasZachor    => SpecialReadings.ParshasZachor
-          case ParshasParah     => SpecialReadings.ParshasParah
-          case ParshasHachodesh => SpecialReadings.ParshasHachodesh
-        }
-        reading.transform(normal, specialParsha, if (isRoshChodesh) Some(RoshChodesh) else None) // TODO name of the month?
-    }
-
-    val roshChodeshOf: Option[Month.Name] = {
-      val result = day.roshChodeshOf
-      // We do not mention Rosh Chodesh on Rosh Hashanah
-      if (result.contains(Tishrei)) None else result
-    }
+    val roshChodeshOf: Option[Month.Name] = day.roshChodeshOf
 
     val isSpecialShabbos: Boolean = specialShabbos.isDefined
 
@@ -147,6 +87,7 @@ object Readings {
         isSpecialShabbos,
         isMonthTevesAv = (month == Teves) || (month == Av),
         isMonthElul = month == Elul,
+        isMonthTishrei = month == Tishrei,
         result
       )}
 
@@ -156,24 +97,93 @@ object Readings {
         isSpecialShabbos,
         isRoshChodesh = roshChodeshOf.isDefined,
         isMonthTevesAvElul = (month == Teves) || (month == Av) || (month == Elul),
+        isMonthTishrei = month == Tishrei,
         correctedForRoshChodesh
       )}
+  }
+
+  private def getShabbosMorningReading(
+    specialDay: SpecialDay,
+    weeklyReading: Option[WeeklyReading],
+    roshChodeshDay: Option[WithNames]
+  ): Reading = specialDay match {
+    case day: Chanukah =>
+      require(weeklyReading.isDefined)
+      SpecialReadings.Chanukah.shabbos(
+        day,
+        roshChodeshDay,
+        weeklyReading = weeklyReading.get,
+        dayNumber = day.dayNumber
+      )
+
+    case ShushanPurim =>
+      require(weeklyReading.isDefined)
+      SpecialReadings.ShushanPurim.shabbos(ShushanPurim, weeklyReading.get)
+
+    case day: SuccosIntermediate =>
+      require(weeklyReading.isEmpty)
+      SpecialReadings.SuccosIntermediate.shabbos(day, day.intermediateDayNumber, day.inHolyLand)
+
+    case day =>
+      val reading: SpecialReadings.ShabbosReading = day match {
+        case _: PesachIntermediate => SpecialReadings.PesachIntermediate
+        case RoshHashanah1 => SpecialReadings.RoshHashanah1
+        case YomKippur => SpecialReadings.YomKippur
+        case Succos1 => SpecialReadings.Succos1
+        case Succos2 => SpecialReadings.Succos2
+        case SheminiAtzeres => SpecialReadings.SheminiAtzeres
+        case SheminiAtzeresAndSimchasTorahInHolyLand => SpecialReadings.SheminiAtzeresAndSimchasTorahInHolyLand
+        case Pesach1 => SpecialReadings.Pesach1
+        case Pesach7 => SpecialReadings.Pesach7
+        case Pesach8 => SpecialReadings.Pesach8
+        case Shavuos2 => SpecialReadings.Shavuos2
+        case _ => throw new IllegalArgumentException("Must have Shabbos reading!")
+      }
+      require(weeklyReading.isEmpty)
+      reading.shabbos(day)
+  }
+
+  private def applySpecialShabbos(
+    specialShabbos: SpecialShabbos,
+    weekly: Reading,
+    day: Day,
+    roshChodeshDay: Option[WithNames]
+  ): Reading = specialShabbos match {
+    case ShabbosHagodol =>
+      SpecialReadings.ShabbosHagodol.transform(
+        day = ShabbosHagodol,
+        isErevPesach = day.next == Pesach1.date(day.year),
+        reading = weekly
+      )
+
+    case day: SpecialParsha =>
+      val reading: SpecialReadings.SpecialParsha = day match {
+        case ParshasShekalim  => SpecialReadings.ParshasShekalim
+        case ParshasZachor    => SpecialReadings.ParshasZachor
+        case ParshasParah     => SpecialReadings.ParshasParah
+        case ParshasHachodesh => SpecialReadings.ParshasHachodesh
+      }
+      reading.transform(weekly, day, roshChodeshDay)
   }
 
   private final val sheniAndChamishi: Set[Day.Name] = Set(Day.Name.Sheni, Day.Name.Chamishi)
 
   private final def getWeekdayMorningReading(
     day: Day,
-    specialDay: Option[Date],
+    specialDay: Option[SpecialDay],
     nextWeeklyReading: WeeklyReading,
     isPesachOnChamishi: Boolean
   ): Option[Reading] = {
     val isRoshChodesh: Boolean = day.isRoshChodesh
+    val roshChodeshDay: Option[WithNames] = if (isRoshChodesh) Some(RoshChodesh) else None
 
-    val specialReading: Option[Reading] = specialDay.map {
-      case day: SuccosIntermediate => SpecialReadings.SuccosIntermediate.weekday(day, day.intermediateDayNumber, day.inHolyLand)
-      case day: Chanukah => SpecialReadings.Chanukah.weekday(day, if (isRoshChodesh) Some(RoshChodesh) else None, day.dayNumber)
-      case day: PesachIntermediate => SpecialReadings.PesachIntermediate.weekday(day, isPesachOnChamishi, day.dayNumber)
+    specialDay.map {
+      case day: SuccosIntermediate =>
+        SpecialReadings.SuccosIntermediate.weekday(day, day.intermediateDayNumber, day.inHolyLand)
+      case day: Chanukah =>
+        SpecialReadings.Chanukah.weekday(day, roshChodeshDay, day.dayNumber)
+      case day: PesachIntermediate =>
+        SpecialReadings.PesachIntermediate.weekday(day, isPesachOnChamishi, day.dayNumber)
 
       case day =>
         val reading: SpecialReadings.WeekdayReading = day match {
@@ -197,20 +207,21 @@ object Readings {
         }
         reading.weekday(day)
     }
-
-    specialReading
-      .orElse { if (!isRoshChodesh) None else Some(SpecialReadings.RoshChodesh.weekday(RoshChodesh)) }
-      .orElse { if (!sheniAndChamishi.contains(day.name)) None else Some(nextWeeklyReading.getAfternoonReading) }
+      .orElse(
+        if (isRoshChodesh) Some(SpecialReadings.RoshChodesh.weekday(RoshChodesh))
+        else if (sheniAndChamishi.contains(day.name)) Some(nextWeeklyReading.getAfternoonReading) else None
+      )
   }
 
   // On Festival that falls on Shabbos, afternoon reading is that of the Shabbos - except on Yom Kippur.
   def getAfternoonReading(
     day: Day,
-    specialDay: Option[Date],
+    specialDay: Option[SpecialDay],
     nextWeeklyReading: WeeklyReading
   ): Option[Reading] = {
     val specialReading: Option[Reading] = specialDay flatMap {
-      case YomKippur => Some(SpecialReadings.YomKippur.afternoon(YomKippur))
+      case YomKippur =>
+        Some(SpecialReadings.YomKippur.afternoon(YomKippur))
 
       case fast: Fast =>
         val reading: SpecialReadings.Fast = fast match {
@@ -225,7 +236,8 @@ object Readings {
       case _ => None
     }
 
-    val result = specialReading.orElse { if (!day.isShabbos) None else Some(nextWeeklyReading.getAfternoonReading) }
+    val result: Option[Reading] = specialReading
+      .orElse(if (day.isShabbos) Some(nextWeeklyReading.getAfternoonReading) else None)
 
     result.foreach { _.torah.customs.values.foreach { torah => require(torah.length == 3) }}
 

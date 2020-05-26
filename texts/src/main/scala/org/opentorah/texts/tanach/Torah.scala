@@ -30,6 +30,7 @@ final case class Torah private(override val spans: Seq[Torah.BookSpan])
     Torah(result)
   }
 
+  // TODO move to SpecialReadings
   def to6withLast(last: Torah.Aliyah): Torah = drop(Set(7)) :+ last
 }
 

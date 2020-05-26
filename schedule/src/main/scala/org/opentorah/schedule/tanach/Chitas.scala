@@ -10,13 +10,13 @@ import org.opentorah.util.Cache
 final case class Chitas private(first: Torah.Fragment, second: Option[Torah.Fragment])
 
 object Chitas {
-  def apply(day: Day, currentWeeklyReading: WeeklyReading, inHolyLand: Boolean): Chitas = {
+  def apply(day: Day, weeklyReading: WeeklyReading, inHolyLand: Boolean): Chitas = {
     val numberInWeek: Int = day.numberInWeek
 
-    val isBereishis = currentWeeklyReading.parsha == Bereishis
+    val isBereishis = weeklyReading.parsha == Bereishis
     val simchasTorah = simchasTorahs.get((day.year, inHolyLand))
     if (!isBereishis || day > simchasTorah) Chitas(
-      first = currentWeeklyReading.getMorningReading.torah.doFind(Custom.Chabad).spans(numberInWeek-1),
+      first = weeklyReading.getMorningReading.torah.doFind(Custom.Chabad).spans(numberInWeek-1),
       second = None
     ) else if (day < simchasTorah) Chitas(
       first = chabadFragments(VezosHaberachah)(numberInWeek-1),
@@ -37,7 +37,7 @@ object Chitas {
   private val simchasTorahs = new Cache[(Year, Boolean), Day] {
     override def calculate(args: (Year, Boolean)): Day = args match {
       case (year: Year, inHolyLand: Boolean) =>
-        val specialDay: SpecialDay.Date =
+        val specialDay: SpecialDay =
           if (inHolyLand) SpecialDay.SheminiAtzeresAndSimchasTorahInHolyLand else SpecialDay.SimchasTorah
         specialDay.date(year)
     }

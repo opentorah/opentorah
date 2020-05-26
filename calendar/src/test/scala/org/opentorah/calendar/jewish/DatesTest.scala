@@ -7,6 +7,8 @@ import Jewish.Month.Name._
 import org.opentorah.calendar.gregorian.Gregorian
 import Gregorian.Month.Name._
 import org.opentorah.calendar.Calendars
+import org.opentorah.calendar.jewish.SpecialDay.{Chanukah1, FastOfEster, FastOfTammuz, HoshanahRabbah, LagBaOmer,
+  Pesach1, Purim, RoshHashanah1, Shavuos1, SimchasTorah, TishaBeAv, YomKippur}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks.{Table, forAll}
@@ -109,37 +111,20 @@ final class DatesTest extends AnyFlatSpec with Matchers {
     for (year <- years; month <- year.months) month.year shouldBe year
   }
 
-  // TODO use SpecialDay etc. instead of the home-grown thingies:
-  private def RoshHashanah: Year => Day = year => specialDay(year, Tishrei, 1)
-  private def YomKippur: Year => Day = year => specialDay(year, Tishrei, 10)
-  private def HoshanahRabbah: Year => Day = year => specialDay(year, Tishrei, 21)
-  private def SimchasTorah: Year => Day = year => specialDay(year, Tishrei, 23)
-  private def Chanukah: Year => Day = year => specialDay(year, Kislev, 25)
-  private def FastOfEster: Year => Day = year => Purim(year)-1
-  private def Purim: Year => Day = _.latestAdar.day(14)
-  private def Pesach: Year => Day = year => specialDay(year, Nisan, 15)
-  private def LagBaOmer: Year => Day = year => specialDay(year, Iyar, 18)
-  private def Shavuos: Year => Day = year => specialDay(year, Sivan, 6)
-  private def FastOfTammuz: Year => Day = year => specialDay(year, Tammuz, 17)
-  private def TishaBeAv: Year => Day = year => specialDay(year, Av, 9)
-
-  private def specialDay(year: Year, month: Month.Name, day: Int): Day =
-    year.month(month).day(day)
-
   // Shulchan Aruch, Orach Chaim, 428:1
   "Festivals" should "not fall on the proscribed days" in {
-    val data = Table(
+    val data = Table[Year => Day, Seq[Day.Name]](
       ("specialDay", "notOn"),
-      (RoshHashanah, Seq(Rishon, Rvii, Shishi)),
-      (YomKippur, Seq(Shlishi, Rishon, Shishi)),
-      (Purim, Seq(Shabbos, Sheni, Rvii)),
-      (Pesach, Seq(Sheni, Rvii, Shishi)),
-      (Shavuos, Seq(Shlishi, Chamishi, Shabbos)),
-      (HoshanahRabbah, Seq(Shlishi, Chamishi, Shabbos)),
-      (Chanukah, Seq(Shlishi)),
-      (FastOfEster, Seq(Rishon, Shlishi, Shishi)),
-      (FastOfTammuz, Seq(Sheni, Rvii, Shishi)),
-      (TishaBeAv, Seq(Sheni, Rvii, Shishi))
+      (RoshHashanah1.date, Seq(Rishon, Rvii, Shishi)),
+      (YomKippur.date, Seq(Shlishi, Rishon, Shishi)),
+      (Purim.date, Seq(Shabbos, Sheni, Rvii)),
+      (Pesach1.date, Seq(Sheni, Rvii, Shishi)),
+      (Shavuos1.date, Seq(Shlishi, Chamishi, Shabbos)),
+      (HoshanahRabbah.date, Seq(Shlishi, Chamishi, Shabbos)),
+      (Chanukah1.date, Seq(Shlishi)),
+      (FastOfEster.date, Seq(Rishon, Shlishi, Shishi)),
+      (FastOfTammuz.date, Seq(Sheni, Rvii, Shishi)),
+      (TishaBeAv.date, Seq(Sheni, Rvii, Shishi))
     )
     years foreach { year =>
       forAll(data) {
@@ -147,7 +132,7 @@ final class DatesTest extends AnyFlatSpec with Matchers {
         days contains specialDay(year).name shouldBe false
       }
 
-      Purim(year).name shouldBe LagBaOmer(year).name
+      Purim.date(year).name shouldBe LagBaOmer.date(year).name
       // misprint, see Taz 1, Magen Avraham 1
       // Chanukah(year).name shouldBe Shavuos(year.name)
     }
@@ -188,18 +173,18 @@ final class DatesTest extends AnyFlatSpec with Matchers {
   // Shulchan Aruch, Orach Chaim, 428:3
   "Festivals" should "satisfy the rules" in {
     years foreach { year =>
-      val pesach: Day = Pesach(year)
-      TishaBeAv(year).name shouldBe pesach.name
-      Shavuos(year).name shouldBe (pesach+1).name
-      RoshHashanah(year+1).name shouldBe (pesach+2).name
-      SimchasTorah(year+1).name shouldBe (pesach+3).name
-      YomKippur(year+1).name shouldBe (pesach+4).name
-      Purim(year).name shouldBe (pesach+5).name
+      val pesach: Day = Pesach1.date(year)
+      TishaBeAv.date(year).name shouldBe pesach.name
+      Shavuos1.date(year).name shouldBe (pesach+1).name
+      RoshHashanah1.date(year+1).name shouldBe (pesach+2).name
+      SimchasTorah.date(year+1).name shouldBe (pesach+3).name
+      YomKippur.date(year+1).name shouldBe (pesach+4).name
+      Purim.date(year).name shouldBe (pesach+5).name
     }
   }
 
   "Jewish Year" should "have allowed type with Pesach on correct day of the week" in {
-    years foreach { year => Pesach(year).name shouldBe YearType.forYear(year).pesach }
+    years foreach { year => Pesach1.date(year).name shouldBe YearType.forYear(year).pesach }
   }
 
   "Giving of the Torah" should "be off by the fixed calendar :)" in {
@@ -215,7 +200,7 @@ final class DatesTest extends AnyFlatSpec with Matchers {
   "Pesach day of the week" should "calculate correctly" in {
     val days: collection.mutable.Map[Jewish.Day.Name, Int] = new collection.mutable.HashMap[Jewish.Day.Name, Int]
     years foreach { year =>
-      val day: Jewish.Day.Name = Pesach(year).name
+      val day: Jewish.Day.Name = Pesach1.date(year).name
       if (days.contains(day)) days.update(day, days(day) + 1) else days.update(day, 1)
     }
     println(days)

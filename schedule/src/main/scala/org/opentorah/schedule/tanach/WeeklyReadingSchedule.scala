@@ -101,7 +101,7 @@ import org.opentorah.calendar.jewish.SpecialDay.{Pesach1, Shavuos1, TishaBeAv}
   assumptions of the algorithm itself hold is verified by the unit tests for the years 1-6000;
   I am too lazy to prove the theorems :)
  */
-object WeeklyReadingCalculator {
+object WeeklyReadingSchedule {
   private final val fromBereishisToBemidbar: Int = Parsha.distance(Bereishis, Bemidbar)
   private final val allowedBeforePesach: Set[Parsha] = Set[Parsha](Tzav, Metzora, Acharei)
   private final val fromBemidbarToVa_eschanan: Int = Parsha.distance(Bemidbar, Va_eschanan)

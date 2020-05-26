@@ -57,17 +57,20 @@
         <custom n="Teiman" toChapter="3" toVerse="4"/>
     </week>
     <week n="Vayeitzei" >
-        <custom n="Ashkenaz" book="Hosea" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
+        <custom n="Ashkenaz" book="Hosea" fromChapter="12" fromVerse="13"
+                toChapter="14" toVerse="10"/> <!-- includes Vayeilech -->
         <custom n="Lita">
           <part n="1" book="Hosea" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
-          <part n="2" book="Joel" fromChapter="2" fromVerse="26" toVerse="27"/>
+          <part n="2" book="Joel" fromChapter="2" fromVerse="26"
+                toVerse="27"/> <!-- end of Vayeilech Ashkenaz -->
         </custom>
         <custom n="Sefard" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="12"/>
         <custom n="Magreb" book="Hosea" fromChapter="11" fromVerse="7" toChapter="13" toVerse="5"/> 
         <custom n="Chabad, Teiman, Italki, Djerba" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="14"/>
     </week>
     <week n="Vayishlach">
-       <custom n="Common" book="Obadiah" fromChapter="1" fromVerse="1" toVerse="21"/>
+       <custom n="Common" book="Obadiah" fromChapter="1" fromVerse="1"
+               toVerse="21"/> <!-- Yom Kippur afternoon Italki part 1 -->
        <custom n="Lita" book="Hosea" fromChapter="11" fromVerse="7" toChapter="12" toVerse="12"/>
        <custom n="Chayey Odom" book="Hosea" fromChapter="11" fromVerse="7" toChapter="13" toVerse="4"/>
     </week>
@@ -128,14 +131,14 @@
         <custom n="Teiman" fromVerse="1" toVerse="45"/>
     </week>
     <week n="Vayakhel" book="I Kings" fromChapter="7">
-        <custom n="Ashkenaz" fromVerse="40" toVerse="50"/> <!-- Chanukkah II -->
+        <custom n="Ashkenaz" fromVerse="40" toVerse="50"/> <!-- = Chanukkah Shabbos 2 Common -->
         <custom n="Sefard, Italki" fromVerse="13" toVerse="26"/>
         <custom n="Teiman" fromVerse="13" toVerse="22"/>
     </week>
     <week n="Pekudei" book="I Kings" fromChapter="7">
-        <custom n="Ashkenaz, Chabad" fromVerse="51" toChapter="8" toVerse="21"/>
-        <custom n="Italki" fromVerse="40" toVerse="51"/>
-        <custom n="Sefard" fromVerse="40" toVerse="50"/> <!-- Chanukkah II -->
+        <custom n="Ashkenaz, Chabad" fromVerse="51" toChapter="8" toVerse="21"/>  <!-- = Succos 2 Teiman -->
+        <custom n="Italki" fromVerse="40" toVerse="51"/> <!-- = Chanukkah Shabbos 2 Italki -->
+        <custom n="Sefard" fromVerse="40" toVerse="50"/> <!-- = Chanukkah Shabbos 2 Common -->
     </week>
 
     <week n="Vayikra" book="Isaiah" >
@@ -152,7 +155,7 @@
             <part n="2" fromChapter="9" fromVerse="22" toVerse="23"/>
         </custom>
         <custom n="Chabad, Teiman, Toshbim">
-            <part n="1" fromChapter="7" fromVerse="21"  toVerse="28"/>
+            <part n="1" fromChapter="7" fromVerse="21"  toVerse="28"/>  <!-- = Italki part 1 -->
             <part n="2" fromChapter="9" fromVerse="22" toVerse="23"/>
         </custom>
         <custom n="Italki">
@@ -175,7 +178,8 @@
     </week>
     <week n="Acharei">
         <custom n="Ashkenaz, Chabad" book="Amos" fromChapter="9" fromVerse="7" toVerse="15"/>
-        <custom n="Sefard, Italki" book="Ezekiel" fromChapter="22" fromVerse="1" toVerse="16"/> <!-- = Kedoshim:Ashkenaz -->
+        <custom n="Sefard, Italki" book="Ezekiel" fromChapter="22" fromVerse="1"
+                toVerse="16"/> <!-- = Kedoshim:Ashkenaz, Lita -->
     </week>
     <week n="Kedoshim" book="Ezekiel">
         <custom n="Ashkenaz, Lita" fromChapter="22" fromVerse="1" toVerse="16"/> <!-- Lita: Ahkenaz when Acharei - rosh hodesh Iyar -->
@@ -187,7 +191,8 @@
     <week n="Behar" book="Jeremiah" >
         <custom n="Common" fromChapter="32" fromVerse="6" toVerse="27"/>
         <custom n="Chabad" fromChapter="32" fromVerse="6" toVerse="22"/>
-        <custom n="Italki, Teiman" fromChapter="16" fromVerse="19" toChapter="17" toVerse="14"/>
+        <custom n="Italki, Teiman" fromChapter="16" fromVerse="19" toChapter="17"
+                toVerse="14"/> <!-- = Bechukosai.Common -->
     </week>
     <week n="Bechukosai">
         <custom n="Common" book="Jeremiah" fromChapter="16" fromVerse="19" toChapter="17" toVerse="14"/>
@@ -202,7 +207,7 @@
     <week n="Beha'aloscha" book="Zechariah" fromChapter="2" fromVerse="14" toChapter="4">
         <custom n="Teiman" toVerse="9"/>
         <custom n="Toshbim" toVerse="10"/>
-        <custom n="Common" toVerse="7"/>  <!-- On Chanuka - Chanukah I -->
+        <custom n="Common" toVerse="7"/>  <!-- = Chanukah Shabbos I -->
     </week>
     <week n="Shelach" book="Joshua" fromChapter="2" fromVerse="1" toVerse="24"/>
     <week n="Korach" book="I Samuel" fromChapter="11" fromVerse="14" toChapter="12" toVerse="22"/>
@@ -263,15 +268,17 @@
           <custom n="Teiman" book="Isaiah" fromChapter="61" fromVerse="9" toChapter="63" toVerse="9"/>
     </week>
     <week n="Vayeilech"> <!-- = Shabbos Shuvah -->
-        <custom n="Ashkenaz">
-          <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
+        <custom n="Ashkenaz"> <!-- = Fast afternoon Algeria; Fast of Gedalia afternoon Morocco -->
+          <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/> <!-- = Sefard part 1; Teiman -->
           <part n="2" book="Joel" fromChapter="2" fromVerse="11" toVerse="27"/>
         </custom>
         <custom n="Sefard">
             <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
-            <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
+            <part n="2" book="Micah" fromChapter="7" fromVerse="18"
+                  toVerse="20"/> <!-- Yom Kippur afternoon common part 2-->
         </custom>
-        <custom n="Italki" book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56" toVerse="8"/>
+        <custom n="Italki" book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56"
+                toVerse="8"/> <!-- Fast afternoon Ashkenaz, Chabad, Morocco -->
         <custom n="Teiman" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
     </week>
     <week n="Haazinu">
@@ -283,7 +290,7 @@
         <custom n="Sefard" fromChapter="1" fromVerse="1" toVerse="9"/>
         <custom n="Teiman">
             <part n="1" fromChapter="1" fromVerse="1" toVerse="9"/>
-            <part n="2" fromChapter="6" fromVerse="27"/>
+            <part n="2" fromChapter="6" fromVerse="27"/> <!-- reused in Pesach1 -->
         </custom>
     </week>
 </metadata>

@@ -41,7 +41,7 @@ object Schedule {
     weeklyReadings: Map[Day, WeeklyReading],
     weeklyReadingsList: Seq[(Day, WeeklyReading)],
     festivals: Map[Day, FestivalOrIntermediate],
-    daysWithSpecialReadingsNotFestivals: Map[Day, SpecialDay.Date],
+    daysWithSpecialReadingsNotFestivals: Map[Day, SpecialDay],
     specialShabboses: Map[Day, SpecialDay.SpecialShabbos]
   ) {
     def build: Schedule = {
@@ -62,7 +62,7 @@ object Schedule {
 
     private def forDay(day: Day, inHolyLand: Boolean): DaySchedule = {
       val weeklyReading: Option[WeeklyReading] = weeklyReadings.get(day)
-      val specialDay: Option[SpecialDay.Date] = festivals.get(day).orElse(daysWithSpecialReadingsNotFestivals.get(day))
+      val specialDay: Option[SpecialDay] = festivals.get(day).orElse(daysWithSpecialReadingsNotFestivals.get(day))
       val specialShabbos: Option[SpecialDay.SpecialShabbos] = specialShabboses.get(day)
       val nextWeeklyReading: WeeklyReading = nextWeeklyReadings.get(day)
 
@@ -120,7 +120,7 @@ object Schedule {
     )}
 
     val weeklyReadingCycles: Seq[Seq[(Day, WeeklyReading)]] = (yearsData zip yearsData.tail).map { case (current, next) =>
-      WeeklyReadingCalculator.getCycle(
+      WeeklyReadingSchedule.getCycle(
         year = current.year,
         fromShabbosBereishis = current.shabbosBereishis,
         toShabbosBereishis = next.shabbosBereishis,
@@ -147,7 +147,7 @@ object Schedule {
     def filterLast[T](data: Set[(Day, T)], to: Day): Set[(Day, T)] = data.filter(_._1 <= to)
     def filter[T](data: Seq[Set[(Day, T)]], to: Day): Map[Day, T] =
       (filterFirst(data.head) +: data.tail.init :+ filterLast(data.last, to)).flatten.toMap
-    def filterDates[T <: SpecialDay.Date](dates: Set[T]): Map[Day, T] =
+    def filterDates[T <: SpecialDay](dates: Set[T]): Map[Day, T] =
       filter(years.map(year => dates.map(day => day.correctedDate(year) -> day)), to)
 
     Builder(
@@ -157,7 +157,7 @@ object Schedule {
       weeklyReadings = weeklyReadings.toMap,
       weeklyReadingsList = weeklyReadings :+ extraWeeklyReading,
       festivals = filter(yearsData.map(_.festivals), to+7), // to get festivals for Tachanun and Motzoei Shabbos
-      daysWithSpecialReadingsNotFestivals = filterDates(Readings.daysWithSpecialReadingsNotFestivals),
+      daysWithSpecialReadingsNotFestivals = filterDates(SpecialDay.daysWithSpecialReadingsNotFestivals),
       specialShabboses = filterDates(SpecialDay.specialShabbos)
     )
   }
