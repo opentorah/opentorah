@@ -6,13 +6,12 @@ import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Season, Shemittah,
 import org.opentorah.dates.{Calendar, DayBase, MonthBase, YearBase, YearsCycle}
 import org.opentorah.metadata.{Language, LanguageSpec, WithNames}
 import org.opentorah.schedule.rambam.RambamSchedule
-import org.opentorah.schedule.tanach.{Chitas, Readings, Schedule}
+import org.opentorah.schedule.tanach.{Chitas, Schedule}
 import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
 import org.opentorah.texts.tanach.{Custom, Haftarah, Reading, Span, Torah}
 import org.opentorah.texts.tanach.Tanach.Psalms
 import org.opentorah.util.Collections
-import scalatags.Text.TypedTag
-import scalatags.Text.all._
+import scala.xml.Elem
 
 sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
   protected type C <: Calendar[C]
@@ -56,30 +55,31 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
   private def dayUrl(day: DayBase[_], other: Boolean = false): String =
     s"/${getName(other)}/${day.year.number}/${day.month.numberInYear}/${day.numberInMonth}"
 
-  private def yearLink(year: YearBase[_], other: Boolean = false, text: Option[String] = None): TypedTag[String] =
+  private def yearLink(year: YearBase[_], other: Boolean = false, text: Option[String] = None): Elem =
     navLink(yearUrl(year, other = other), text.getOrElse(year.toLanguageString(spec)))
 
-  private def monthLink(month: MonthBase[_]): TypedTag[String] =
+  private def monthLink(month: MonthBase[_]): Elem =
     navLink(monthUrl(month), month.numberInYearToLanguageString(spec))
 
-  private def monthNameLink(month: MonthBase[_], other: Boolean = false, text: Option[String] = None): TypedTag[String] =
+  private def monthNameLink(month: MonthBase[_], other: Boolean = false, text: Option[String] = None): Elem =
     navLink(monthNameUrl(month, other = other), text.getOrElse(month.name.toLanguageString(spec)))
 
-  private def dayLink(day: DayBase[_], other: Boolean = false, text: Option[String] = None): TypedTag[String] =
+  private def dayLink(day: DayBase[_], other: Boolean = false, text: Option[String] = None): Elem =
     navLink(dayUrl(day, other = other), text.getOrElse(day.numberInMonthToLanguageString(spec)))
 
-  private def navLink(url: String, text: String): TypedTag[String] =
-    a(cls := "nav", href := s"$url$suffix")(text)
+  private def navLink(url: String, text: String): Elem =
+    <a class="nav" href={s"$url$suffix"}>{text}</a>
 
   private def suffix: String = Renderer.suffix(location, spec)
 
-  private def dayLinks(day: DayBase[_], other: Boolean): TypedTag[String] = span(
-    yearLink(day.year, other = other),
-    monthNameLink(day.month, other = other),
-    if (day.number > 1) dayLink(day-1, other = other, text = Some("<")) else span(Renderer.earlyGregorianMessage, " "),
-    dayLink(day, other = other),
-    dayLink(day+1, other = other, text = Some(">"))
-  )
+  private def dayLinks(day: DayBase[_], other: Boolean): Elem =
+    <span>
+    {yearLink(day.year, other = other)}
+    {monthNameLink(day.month, other = other)}
+    {if (day.number > 1) dayLink(day-1, other = other, text = Some("<")) else <span>{Renderer.earlyGregorianMessage} </span>}
+    {dayLink(day, other = other)}
+    {dayLink(day+1, other = other, text = Some(">"))}
+    </span>
 
   def renderLanding: String = {
     val day: DayBase[_] = Calendars.now(calendar).day
@@ -90,32 +90,42 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
     val year: YearBase[_] = getYear(yearStr)
     renderHtml(
       yearUrl(year),
-      div(
-        yearLink(year-1, text = Some("<")),
-        yearLink(year),
-        yearLink(year+1, text = Some(">")),
-        table(tbody(year.months.map { month: MonthBase[_] =>
-          tr(
-            td(monthLink(month)),
-            td(monthNameLink(month))
-          )
-        })),
-        renderYearInformation(year)
-      )
+      <div>
+        {yearLink(year-1, text = Some("<"))}
+        {yearLink(year)}
+        {yearLink(year+1, text = Some(">"))}
+        <table>
+          <tbody>
+            {year.months.map { month: MonthBase[_] =>
+            <tr>
+              <td>{monthLink(month)}</td>
+              <td>{monthNameLink(month)}</td>
+            </tr>
+          }}
+          </tbody>
+        </table>
+        {renderYearInformation(year)}
+      </div>
     )
   }
 
-  protected def renderYearInformation(year: YearBase[_]): Seq[TypedTag[String]] = Seq.empty
+  protected def renderYearInformation(year: YearBase[_]): Seq[Elem] = Seq.empty
 
   def renderMonth(yearStr: String, monthStr: String): String = {
     val month: MonthBase[_] = getMonth(yearStr, monthStr)
-    renderHtml(monthNameUrl(month), div(
-      yearLink(month.year),
-      monthNameLink(month-1, text = Some("<")),
-      monthNameLink(month),
-      monthNameLink( month+1, text = Some(">")),
-      table(tbody(month.days.map { day: DayBase[_] => tr(td(dayLink(day))) }))
-    ))
+    renderHtml(monthNameUrl(month),
+      <div>
+      {yearLink(month.year)}
+      {monthNameLink(month-1, text = Some("<"))}
+      {monthNameLink(month)}
+      {monthNameLink(month+1, text = Some(">"))}
+      <table>
+        <tbody>
+        {month.days.map { day: DayBase[_] => <tr><td>{dayLink(day)}</td></tr>}}
+        </tbody>
+      </table>
+      </div>
+    )
   }
 
   def renderDay(yearStr: String, monthStr: String, dayStr: String): String = {
@@ -126,44 +136,49 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
 
     val daySchedule = Schedule.get(jewishDay, inHolyLand = location.inHolyLand)
 
-    renderHtml(dayUrl(firstDay), div(
-      div(dayLinks(firstDay, other = false), " ", firstDay.name.toLanguageString(spec)),
-      div(dayLinks(secondDay, other = true), " ", secondDay.name.toLanguageString(spec)),
-      div(daySchedule.dayNames.map { withNames: WithNames => span(cls := "name", withNames.names.doFind(spec).name) }),
-      renderOptionalReading("Morning", daySchedule.morning),
-      renderOptionalReading("Purim morning alternative", daySchedule.purimAlternativeMorning),
-      if (!jewishDay.isShabbosMevarchim) Seq.empty[TypedTag[String]] else renderShabbosMevarchim(jewishDay.month.next),
-      span(cls := "heading")("Chitas"),
-      renderChitas(daySchedule.chitas),
-      span(cls := "heading")("Tehillim"),
-      renderTehillim(jewishDay),
-      div(cls := "heading")("Rambam"),
-      renderRambam(RambamSchedule.forDay(jewishDay)),
-      renderOptionalReading("Afternoon", daySchedule.afternoon)
-    ))
+    renderHtml(dayUrl(firstDay),
+      <div>
+      <div>{dayLinks(firstDay, other = false)} {firstDay.name.toLanguageString(spec)}</div>
+      <div>{dayLinks(secondDay, other = true)} {secondDay.name.toLanguageString(spec)}</div>
+      <div>{daySchedule.dayNames.map { withNames: WithNames =>
+        <span class="name">{withNames.names.doFind(spec).name}</span>}}</div>
+      {renderOptionalReading("Morning", daySchedule.morning)}
+      {renderOptionalReading("Purim morning alternative", daySchedule.purimAlternativeMorning)}
+      {if (!jewishDay.isShabbosMevarchim) Seq.empty[Elem] else renderShabbosMevarchim(jewishDay.month.next)}
+      <span class="heading">Chitas</span>
+      {renderChitas(daySchedule.chitas)}
+      <span class="heading">Tehillim</span>
+      {renderTehillim(jewishDay)}
+      <div class="heading">Rambam</div>
+      {renderRambam(RambamSchedule.forDay(jewishDay))}
+      {renderOptionalReading("Afternoon", daySchedule.afternoon)}
+      </div>
+    )
   }
 
-  private def renderShabbosMevarchim(month: Jewish.Month): Seq[TypedTag[String]] = Seq(
-    span(cls := "subheading")("Shabbos Mevarchim"),
-    table(tr(
-      td(month.name.toLanguageString(spec)),
-      if (month.prev.length == 30) td(month.prev.lastDay.name.toLanguageString(spec)) else td(),
-      td(month.firstDay.name.toLanguageString(spec)),
-      td(month.newMoon.toLanguageString(spec))
-    ))
+  private def renderShabbosMevarchim(month: Jewish.Month): Seq[Elem] = Seq(
+    <span class="subheading">Shabbos Mevarchim</span>,
+    <table><tr>
+      <td>{month.name.toLanguageString(spec)}</td>
+      {if (month.prev.length == 30) <td>{month.prev.lastDay.name.toLanguageString(spec)}</td> else <td/>}
+      <td>{month.firstDay.name.toLanguageString(spec)}</td>
+      <td>{month.newMoon.toLanguageString(spec)}</td>
+    </tr></table>
   )
 
-  private def renderChitas(chitas: Chitas): TypedTag[String] = {
-    def renderFragment(fragment: Torah.Fragment) =
-      Seq(td(span(fragment.toLanguageString(spec))), td(renderSource(fragment.source)))
+  private def renderChitas(chitas: Chitas): Elem = {
+    def renderFragment(fragment: Torah.Fragment): Seq[Elem] = Seq(
+      <td><span>{fragment.toLanguageString(spec)}</span></td>,
+      <td>{renderSource(fragment.source)}</td>
+    )
 
-    table(tbody(
-      tr(renderFragment(chitas.first)) +:
-        chitas.second.fold(Seq.empty[TypedTag[String]])(fragment => Seq(tr(renderFragment(fragment))))
-    ))
+    <table><tbody>
+      <tr>{renderFragment(chitas.first)}</tr> +:
+      {chitas.second.fold(Seq.empty[Elem])(fragment => Seq(<tr>{renderFragment(fragment)}</tr>))}
+    </tbody></table>
   }
 
-  private def renderTehillim(day: Jewish.Day): TypedTag[String] = {
+  private def renderTehillim(day: Jewish.Day): Elem = {
     val forDayOfMonth: Span =
       if ((day.numberInMonth == 29) && day.month.length == 29) Span(Psalms.days(29-1).from, Psalms.days(30-1).to)
       else Psalms.days(day.numberInMonth-1)
@@ -171,57 +186,57 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
     val forDayOfWeek: Span =
       Psalms.weekDays(day.numberInWeek-1)
 
-    table(
-      tr(td("for day of month"), td(span(forDayOfMonth.toLanguageString(spec)))),
-      tr(td("for day of week"), td(span(forDayOfWeek.toLanguageString(spec))))
-    )
+    <table>
+      <tr><td>for day of month</td><td><span>{forDayOfMonth.toLanguageString(spec)}</span></td></tr>
+      <tr><td>for day of week</td><td><span>{forDayOfWeek.toLanguageString(spec)}</span></td></tr>
+    </table>
   }
 
-  private def renderRambam(schedule: RambamSchedule): Seq[TypedTag[String]] = Seq(
-    span(cls := "subheading")("3 chapters"),
-    table(
-      tr(td("Cycle"), td("Lesson")),
-      tr(
-        td(spec.toString(schedule.threeChapters.cycle)),
-        td(spec.toString(schedule.threeChapters.lesson))
-      )
-    ),
-    span(cls := "subheading")("chapters"),
-    table(
-      tr(td(), td("Book"), td("Part"), td("Chapter")),
-      tr(td(spec.toString(1)), renderRambamChapter(schedule.threeChapters.chapter1)),
-      tr(td(spec.toString(2)), renderRambamChapter(schedule.threeChapters.chapter2)),
-      tr(td(spec.toString(3)), renderRambamChapter(schedule.threeChapters.chapter3))
-    ),
-    span(cls := "subheading")("Sefer Hamitzvos"),
-    table(schedule.seferHamitzvos.parts.map { part: SeferHamitzvosLessons.Part =>
-      tr(td(part.toLanguageString(spec)))
-    }),
-    span(cls := "subheading")("1 chapter"),
-    table(
-      tr(td("Cycle"), td("Year"), td("Chapter number")),
-      tr(
-        td(spec.toString(schedule.oneChapter.cycle)),
-        td(spec.toString(schedule.oneChapter.year)),
-        td(spec.toString(schedule.oneChapter.chapterNumber))
-      )
-    ),
-    span(cls := "subheading")("chapter"),
-    table(
-      tr(td("Book"), td("Part"), td("Chapter")),
-      tr(renderRambamChapter(schedule.oneChapter.chapter))
-    )
+  private def renderRambam(schedule: RambamSchedule): Seq[Elem] = Seq(
+    <span class="subheading">3 chapters</span>,
+    <table>
+      <tr><td>Cycle</td><td>Lesson</td></tr>
+      <tr>
+        <td>{spec.toString(schedule.threeChapters.cycle)}</td>
+        <td>{spec.toString(schedule.threeChapters.lesson)}</td>
+      </tr>
+    </table>,
+    <span class="subheading">chapters</span>,
+    <table>
+      <tr><td/><td>Book</td><td>Part</td><td>Chapter</td></tr>
+      <tr><td>{spec.toString(1)}</td>{renderRambamChapter(schedule.threeChapters.chapter1)}</tr>
+      <tr><td>{spec.toString(2)}</td>{renderRambamChapter(schedule.threeChapters.chapter2)}</tr>
+      <tr><td>{spec.toString(3)}</td>{renderRambamChapter(schedule.threeChapters.chapter3)}</tr>
+    </table>,
+    <span class="subheading">Sefer Hamitzvos</span>,
+    <table>{schedule.seferHamitzvos.parts.map { part: SeferHamitzvosLessons.Part =>
+      <tr><td>{part.toLanguageString(spec)}</td></tr>
+    }}</table>,
+    <span class="subheading">1 chapter</span>,
+    <table>
+      <tr><td>Cycle</td><td>Year</td><td>Chapter number</td></tr>
+      <tr>
+        <td>{spec.toString(schedule.oneChapter.cycle)}</td>
+        <td>{spec.toString(schedule.oneChapter.year)}</td>
+        <td>{spec.toString(schedule.oneChapter.chapterNumber)}</td>
+      </tr>
+    </table>,
+    <span class="subheading">chapter</span>,
+    <table>
+      <tr><td>Book</td><td>Part</td><td>Chapter</td></tr>
+      <tr>{renderRambamChapter(schedule.oneChapter.chapter)}</tr>
+    </table>
   )
 
-  private def renderRambamChapter(chapter: MishnehTorah.Chapter): Seq[TypedTag[String]] = Seq(
-    td(chapter.part.book.toLanguageString(spec)),
-    td(chapter.part.toLanguageString(spec)),
-    td(chapter.toLanguageString(spec)),
+  private def renderRambamChapter(chapter: MishnehTorah.Chapter): Seq[Elem] = Seq(
+    <td>{chapter.part.book.toLanguageString(spec)}</td>,
+    <td>{chapter.part.toLanguageString(spec)}</td>,
+    <td>{chapter.toLanguageString(spec)}</td>
   )
 
-  private def renderOptionalReading(name: String, reading: Option[Reading]): Seq[TypedTag[String]] = {
-    reading.fold(Seq.empty[TypedTag[String]]) { reading => Seq(div(
-      span(cls := "heading")(name),
+  private def renderOptionalReading(name: String, reading: Option[Reading]): Seq[Elem] = {
+    reading.fold(Seq.empty[Elem]) { reading => Seq(<div>
+      <span class="heading">{name}</span>
       {
         val maftirCommonOnly = reading.maftir.commonOnly
         val haftarahCommonOnly = reading.haftarah.commonOnly
@@ -229,43 +244,50 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
           maftirCommonOnly.fold(false)(_.isEmpty) && haftarahCommonOnly.fold(false)(_.isEmpty)
         val varyingMaftirAndHaftarah: Boolean = maftirCommonOnly.isEmpty && haftarahCommonOnly.isEmpty
 
-        div(
-          renderCustoms("Torah", reading.torah, renderTorah),
-          if (noMaftirHaftarah) Seq.empty[TypedTag[String]] else
+        <div>
+          {renderCustoms("Torah", reading.torah, renderTorah)}
+          {if (noMaftirHaftarah) Seq.empty[Elem] else
           if (varyingMaftirAndHaftarah)
             renderCustoms("Maftir and Haftarah", reading.maftirAndHaftarah, renderMaftirAndHaftarah)
           else
             renderCustoms("Maftir", reading.maftir, renderMaftir) ++
-              renderCustoms("Haftarah", reading.haftarah, renderHaftarah)
-        )
+            renderCustoms("Haftarah", reading.haftarah, renderHaftarah)
+          }
+        </div>
       }
-    ))}
+    </div>)}
   }
 
-  private def renderTorah(torah: Torah): Seq[TypedTag[String]] =
-    torah.spans.zipWithIndex map { case (fragment, index) => tr(
-      td(spec.toString(index + 1)),
-      td(fragment.toLanguageString(spec)),
-      td(renderSource(fragment.source))
-    )}
+  private def renderTorah(torah: Torah): Seq[Elem] =
+    torah.spans.zipWithIndex map { case (fragment, index) =>
+      <tr>
+        <td>{spec.toString(index + 1)}</td>
+        <td>{fragment.toLanguageString(spec)}</td>
+        <td>{renderSource(fragment.source)}</td>
+      </tr>
+    }
 
-  private def renderMaftir(maftir: Option[Torah.Maftir]): Seq[TypedTag[String]] =
-    Seq(maftir.fold(tr(td("None")))(maftir => tr(
-      td(maftir.toLanguageString(spec)),
-      td(renderSource(maftir.source)))
+  private def renderMaftir(maftir: Option[Torah.Maftir]): Seq[Elem] =
+    Seq(maftir.fold(<tr><td>None</td></tr>)(maftir =>
+      <tr>
+        <td>{maftir.toLanguageString(spec)}</td>
+        <td>{renderSource(maftir.source)}</td>
+      </tr>
     ))
 
-  private def renderHaftarah(haftarah: Option[Haftarah]): Seq[TypedTag[String]] =
-    haftarah.fold(Seq(tr(td("None")))){ haftarah =>
+  private def renderHaftarah(haftarah: Option[Haftarah]): Seq[Elem] =
+    haftarah.fold(Seq(<tr><td>None</td></tr>)){ haftarah =>
       val spans = haftarah.spans
       val parts: Seq[Seq[Haftarah.BookSpan]] =
         Collections.group[Haftarah.BookSpan, Option[WithNames]](spans, span => span.source)
-      parts map { part: Seq[Haftarah.BookSpan] => tr(
-        td(Haftarah.toLanguageString(part)(spec)),
-        td(renderSource(part.head.source))
-      )}}
+      parts map { part: Seq[Haftarah.BookSpan] =>
+        <tr>
+          <td>{Haftarah.toLanguageString(part)(spec)}</td>
+          <td>{renderSource(part.head.source)}</td>
+        </tr>
+      }}
 
-  private def renderMaftirAndHaftarah(maftirAndHaftarah: Option[Reading.MaftirAndHaftarah]): Seq[TypedTag[String]] =
+  private def renderMaftirAndHaftarah(maftirAndHaftarah: Option[Reading.MaftirAndHaftarah]): Seq[Elem] =
     renderMaftir(maftirAndHaftarah.flatMap(_.maftir)) ++
       renderHaftarah(maftirAndHaftarah.map(_.haftarah))
 
@@ -275,17 +297,17 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
   private def renderCustoms[T](
     what: String,
     customs: Custom.Of[T],
-    renderer: T => Seq[TypedTag[String]]
-  ): Seq[TypedTag[String]] =
-    span(cls := "subheading")(what) +:
-      customs.customs.toSeq.map { case (custom: Custom, valueForCustom /*: T*/) =>
-        table(cls := "custom")(
-          caption(custom.toLanguageString(spec)),
-          tbody(renderer(valueForCustom))
-        )
-      }
+    renderer: T => Seq[Elem]
+  ): Seq[Elem] =
+    <span class="subheading">{what}</span> +:
+    customs.customs.toSeq.map { case (custom: Custom, valueForCustom /*: T*/) =>
+      <table class="custom">
+        <caption>{custom.toLanguageString(spec)}</caption>
+        <tbody>{renderer(valueForCustom)}</tbody>
+      </table>
+    }
 
-  private def renderHtml(url: String, content: TypedTag[String]): String =
+  private def renderHtml(url: String, content: Elem): String =
     Renderer.renderHtml(url, content, location, spec)
 }
 
@@ -319,48 +341,51 @@ object Renderer {
 
     override protected def second(day: DayBase[_]): DayBase[_] = gregorian(day)
 
-    override protected def renderYearInformation(yearRaw: YearBase[_]): Seq[TypedTag[String]] = {
+    override protected def renderYearInformation(yearRaw: YearBase[_]): Seq[Elem] = {
       val year: Jewish.Year = yearRaw.asInstanceOf[Jewish.Year]
       val delay = year.newYearDelay
 
-      val numbers: TypedTag[String] = table(
-        tr(td("from creation"), td(year.toLanguageString(spec))),
-        tr(td("is leap"), td(year.isLeap.toString())),
-        tr(td("months"), td(spec.toString(year.lengthInMonths))),
-        tr(td("days"), td(spec.toString(year.lengthInDays))),
-        tr(td("type"), td(YearType.forYear(year).toString)),
-        tr(td("Molad"), td(year.newMoon.toLanguageString(spec))),
-        tr(td("New Year Delay"), td(s"$delay (${delay.days})"))
-      )
+      val numbers: Elem =
+        <table>
+          <tr><td>from creation</td><td>{year.toLanguageString(spec)}</td></tr>
+          <tr><td>is leap</td><td>{year.isLeap.toString}</td></tr>
+          <tr><td>months</td><td>{spec.toString(year.lengthInMonths)}</td></tr>
+          <tr><td>days</td><td>{spec.toString(year.lengthInDays)}</td></tr>
+          <tr><td>type</td><td>{YearType.forYear(year).toString}</td></tr>
+          <tr><td>Molad</td><td>{year.newMoon.toLanguageString(spec)}</td></tr>
+          <tr><td>New Year Delay</td><td>{s"$delay (${delay.days})"}</td></tr>
+        </table>
 
-      def cycle(name: String, yearsCycle: YearsCycle): TypedTag[String] = {
+      def cycle(name: String, yearsCycle: YearsCycle): Elem = {
         val in = yearsCycle.forYear(year)
-        tr(
-          td(name),
-          td(spec.toString(in.cycleNumber)),
-          td(spec.toString(in.numberInCycle))
-        )
+        <tr>
+          <td>{name}</td>
+          <td>{spec.toString(in.cycleNumber)}</td>
+          <td>{spec.toString(in.numberInCycle)}</td>
+        </tr>
       }
 
-      val cycles: TypedTag[String] = table(
-        tr(td("Cycle"), td("Number"), td("In Cycle")),
-        cycle("Leap Years", LeapYearsCycle),
-        cycle("Shemittah", Shemittah),
-        cycle("Birchas Hachamo", Sun.Shmuel)
-      )
+      val cycles: Elem =
+        <table>
+          <tr><td>Cycle"</td><td>Number</td><td>In Cycle"</td></tr>
+          {cycle("Leap Years", LeapYearsCycle)}
+          {cycle("Shemittah", Shemittah)}
+          {cycle("Birchas Hachamo", Sun.Shmuel)}
+        </table>
 
-      val tkufot: TypedTag[String] = {
+      val tkufot: Elem = {
         def tkufa(flavor: Season.ForYear, season: Season): String =
           flavor.seasonForYear(season, year).toLanguageString(spec)
 
-        table(
-          tr(td("Tkufa"), td("Shmuel"), td("Rav Ada")),
-          Season.values.map { season => tr(
-            td(season.toLanguageString(spec)),
-            td(tkufa(Sun.Shmuel, season)),
-            td(tkufa(Sun.RavAda, season))
-          )}
-        )
+        <table>
+          <tr><td>Tkufa</td><td>Shmuel</td><td>Rav Ada"</td></tr>
+          {Season.values.map { season =>
+          <tr>
+            <td>{season.toLanguageString(spec)}</td>
+            <td>{tkufa(Sun.Shmuel, season)}</td>
+            <td>{tkufa(Sun.RavAda, season)}</td>
+          </tr>}}
+        </table>
       }
 
       val festivalDays: Seq[(SpecialDay, Jewish.Day)] =
@@ -368,22 +393,24 @@ object Renderer {
           .map(specialDay => specialDay -> specialDay.correctedDate(year))
           .toSeq.sortBy(_._2)
 
-      val festivals: TypedTag[String] = table(
-        festivalDays.map { case (specialDay, day) => tr(
-          td(specialDay.toLanguageString(spec)),
-          td(day.toLanguageString(spec)),
-          td(day.name.toLanguageString(spec))
-        )}
-      )
+      val festivals: Elem =
+        <table>
+        {festivalDays.map { case (specialDay, day) =>
+        <tr>
+          <td>{specialDay.toLanguageString(spec)}</td>
+          <td>{day.toLanguageString(spec)}</td>
+          <td>{day.name.toLanguageString(spec)}</td>
+        </tr>}}
+      </table>
 
       Seq(
-        span(cls := "heading")("Year"),
+        <span class="heading">Year</span>,
         numbers,
-        span(cls := "heading")("Cycles"),
+        <span class="heading">Cycles</span>,
         cycles,
-        span(cls := "heading")("Tkufot"),
+        <span class="heading">Tkufot</span>,
         tkufot,
-        span(cls := "heading")("Special Days"),
+        <span class="heading">Special Days</span>,
         festivals
       )
     }
@@ -415,44 +442,47 @@ object Renderer {
 
   def renderRoot(location: Location, spec: LanguageSpec): String = renderHtml(
     url = "/",
-    content = div(
-      div(a(href := s"/$jewishRendererName")("jewish")),
-      div(a(href := s"/$gregorianRenderername")("gregorian"))
-    ),
+    content =
+      <div>
+        <div><a href={s"/$jewishRendererName"}>jewish"</a></div>,
+        <div><a href={s"/$gregorianRenderername"}>gregorian</a></div>
+      </div>,
     location = location,
     spec = spec
   )
 
   def renderHtml(
     url: String,
-    content: TypedTag[String],
+    content: Elem,
     location: Location,
     spec: LanguageSpec
   ): String = {
-    val languages = Language.values.map(_.toSpec) map { spec1 =>
+    val languages: Seq[Elem] = Language.values.map(_.toSpec) map { spec1 =>
       val languageName = spec1.languageName
-      if (spec1.language == spec.language) span(cls := "picker", languageName)
-      else a(cls := "picker", href := s"$url${suffix(location, spec1)}")(languageName)
+      if (spec1.language == spec.language) <span class="picker">{languageName}</span>
+      else <a class="picker" href={s"$url${suffix(location, spec1)}"}>{languageName}</a>
     }
 
-    val locations = Seq(Location.HolyLand, Location.Diaspora).map { location1 =>
-      if (location1 == location) span(cls := "picker", location1.name)
-      else a(cls := "picker", href := s"$url${suffix(location1, spec)}")(location1.name)
+    val locations: Seq[Elem] = Seq(Location.HolyLand, Location.Diaspora).map { location1 =>
+      if (location1 == location) <span class="picker">{location1.name}</span>
+      else <a class="picker" href={s"$url${suffix(location1, spec)}"}>{location1.name}</a>
     }
 
-    val result = html(dir := direction(spec))(
-      head(
-        //        title("Reading Schedule"),
-        link(rel := "stylesheet", `type` := "text/css", href := "/style.css")
-      ),
-      body(
-        languages,
-        locations,
-        content
-      )
-    )
+    //        title("Reading Schedule")?
+    val result =
+      <html dir={direction(spec)}>
+        <head>
+          <link rel="stylesheet" type="text/css" href="/style.css"/>
+        </head>
+        <body>
+          {languages}
+          {locations}
+          {content}
+        </body>
+      </html>
 
-    result.render
+    // TODO use prettyprinter
+    result.toString()
   }
 
   private def direction(spec: LanguageSpec): String =

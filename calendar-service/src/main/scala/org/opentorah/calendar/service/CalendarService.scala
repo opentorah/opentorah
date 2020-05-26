@@ -13,7 +13,6 @@ import zio.interop.catz._
 import zio.interop.catz.implicits._
 import java.util.concurrent.Executors
 
-
 /*
   There is currently no need for the polished, public UI.
   This UI was done just for testing the underlying calculations, not for public consumption.

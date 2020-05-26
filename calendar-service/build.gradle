@@ -15,6 +15,4 @@ configureService(
 dependencies {
   implementation project(':schedule')
   implementation project(':util')
-
-  implementation "com.lihaoyi:scalatags_$scalaVersionMajor:$scalatagsVersion"
 }
