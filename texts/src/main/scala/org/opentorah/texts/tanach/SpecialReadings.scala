@@ -6,10 +6,14 @@ import Torah.{Fragment, Maftir}
 import org.opentorah.texts.tanach
 import scala.xml.Elem
 
-// All the special readings and their rules are here.
-// Readings are annotated with their reason.
-// This module is date-independent, so the names to use in annotations and date information comes
-// from the 'schedule' module: it ties the knot between this and SpecialDay defined in the Jewish calendar.
+/* All the special readings and their rules are here.
+ Readings are annotated with their reason.
+ This module is date-independent, so the names to use in annotations and date information comes
+ from the 'schedule' module: it ties the knot between this and SpecialDay defined in the Jewish calendar.
+
+ Some special haftarahs are related to some regular ones etc.
+ I am not sure that coding all those relationships will increase clarity, so they are left in the comments.
+ */
 object SpecialReadings {
 
   private def parseTorah(element: Elem): Torah = parse(Torah.torahParsable, "Torah", element)
@@ -181,9 +185,9 @@ object SpecialReadings {
     private val shabbosAdditionalHaftarah: Haftarah.Customs = parseHaftarah(full = false, element =
       <haftarah>
         <custom n="Chabad" book="Isaiah" fromChapter="66">
-          <part n="1" fromVerse="1" toVerse="1"/>
-          <part n="2" fromVerse="23" toVerse="24"/>
-          <part n="3" fromVerse="23" toVerse="23"/>
+          <part n="1" fromVerse="1" toVerse="1"/>     // first verse of the common haftarah
+          <part n="2" fromVerse="23" toVerse="24"/>   // last verse of the common haftarah
+          <part n="3" fromVerse="23" toVerse="23"/>   // TODO isn't this a part of the common haftarah already?
         </custom>
       </haftarah>)
   }
@@ -227,11 +231,11 @@ object SpecialReadings {
 
     override protected val weekdayTorah: Torah = shabbosTorah.drop(Set(3, 5))
 
+    override val maftir: Maftir = parseMaftir(
+        <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>)
+
     override protected val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="I Samuel" fromChapter="1" fromVerse="1" toChapter="2" toVerse="10"/>)
-
-    override val maftir: Maftir = parseMaftir(
-      <maftir book="Numbers" fromChapter="29" fromVerse="1" toVerse="6"/>)
   }
 
   object RoshHashanah2 extends WeekdayReading {
@@ -296,11 +300,11 @@ object SpecialReadings {
     private val afternoonHaftarah: Haftarah.Customs = parseHaftarah(
       <haftarah>
         <custom n="Common">
-          <part n="1" book="Jonah" fromChapter="1" fromVerse="1" toChapter="4" toVerse="11"/>
-          <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
+          <part n="1" book="Jonah" fromChapter="1" fromVerse="1" toChapter="4" toVerse="11"/> // = Italki part 2
+          <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/> // = Italki part 3; Vayeilech Sefard part 2
         </custom>
         <custom n="Italki">
-          <part n="1" book="Obadiah" fromChapter="1" fromVerse="21"/>
+          <part n="1" book="Obadiah" fromChapter="1" fromVerse="21"/>  // Vayishlach Common
           <part n="2" book="Jonah" fromChapter="1" fromVerse="1" toChapter="4" toVerse="11"/>
           <part n="3" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
         </custom>
@@ -353,7 +357,7 @@ object SpecialReadings {
       <haftarah book="I Kings">
         <custom n="Common" fromChapter="8" fromVerse="2" toVerse="21"/>
         <custom n="Italki" fromChapter="7" fromVerse="51" toChapter="8" toVerse="15"/>
-        <custom n="Teiman" fromChapter="7" fromVerse="51" toChapter="8" toVerse="21"/>
+        <custom n="Teiman" fromChapter="7" fromVerse="51" toChapter="8" toVerse="21"/>  // Pekudei Ashkenaz, Chabad
       </haftarah>)
   }
 
@@ -431,14 +435,7 @@ object SpecialReadings {
 
     private def maftir: Maftir = SheminiAtzeres.maftir
 
-    private val haftarah: Haftarah.Customs = parseHaftarah(
-      <haftarah book="Joshua">
-        <custom n="Common, Italki" fromChapter="1" fromVerse="1" toVerse="18"/>
-        <custom n="Teiman">
-          <part n="1" fromChapter="1" fromVerse="1" toVerse="9"/>
-          <part n="2" fromChapter="6" fromVerse="27"/>
-        </custom>
-      </haftarah>)
+    private def haftarah: Haftarah.Customs = Haftarah.forParsha(Parsha.VezosHaberachah)
   }
 
 
@@ -528,12 +525,12 @@ object SpecialReadings {
       </torah>).spans
 
     private val shabbos1Haftarah: Haftarah.Customs = parseHaftarah(
-      <haftarah book="Zechariah" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>)
+      <haftarah book="Zechariah" fromChapter="2" fromVerse="14" toChapter="4" toVerse="7"/>) // = Beha'aloscha Common
 
     private val shabbos2Haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="I Kings" fromChapter="7" fromVerse="40" toChapter="7">
-        <custom n="Common" toVerse="50"/>
-        <custom n="Italki" toVerse="51"/>
+        <custom n="Common" toVerse="50"/>  // Vayakhel Ashkenaz, Pekudei Sefard
+        <custom n="Italki" toVerse="51"/>  // Pekudei Italki
       </haftarah>)
   }
 
@@ -716,18 +713,19 @@ object SpecialReadings {
     override val maftir: Maftir = parseMaftir(
       <maftir book="Numbers" fromChapter="28" fromVerse="16" toVerse="25"/>)
 
+    // Piece 2 below is also Vezos Haberachah/Simchas Torah Teiman part 2.
     override protected val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Joshua">
         <custom n="Ashkenaz, Chabad">
           <part n="1" fromChapter="3" fromVerse="5" toVerse="7"/>
-          <part n="2" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
-          <part n="3" fromChapter="6" fromVerse="27"/>
+          <part n="2" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/> // piece 1
+          <part n="3" fromChapter="6" fromVerse="27"/> // piece 2
         </custom>
         <custom n="Sefard">
-          <part n="1" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
-          <part n="2" fromChapter="6" fromVerse="27"/>
+          <part n="1" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/> // piece 1
+          <part n="2" fromChapter="6" fromVerse="27"/> // piece 2
         </custom>
-        <custom n="Frankfurt, Hagra" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/>
+        <custom n="Frankfurt, Hagra" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/> // piece 1
       </haftarah>)
   }
 
@@ -847,8 +845,9 @@ object SpecialReadings {
 
     val defaultAfternoonHaftarah: Haftarah.Customs = parseHaftarah(full = false, element =
       <haftarah>
-        <custom n="Ashkenaz, Chabad, Morocco" book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56" toVerse="8"/>
-        <custom n="Algeria">
+        <custom n="Ashkenaz, Chabad, Morocco" book="Isaiah" fromChapter="55" fromVerse="6"
+                toChapter="56" toVerse="8"/> // = Vayeilech Italki
+        <custom n="Algeria"> // = Vayeilech Ashkenaz
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
           <part n="2" book="Joel" fromChapter="2" fromVerse="11" toVerse="27"/>
         </custom>
@@ -884,7 +883,7 @@ object SpecialReadings {
   object FastOfGedalia extends NonTishaBeAvFast {
     override protected val afternoonHaftarahExceptions: Option[Haftarah.Customs] = Some(parseHaftarah(full = false, element =
       <haftarah>
-        <custom n="Morocco">
+        <custom n="Morocco"> // = Vayeilech Ashkenaz
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
           <part n="2" book="Joel" fromChapter="2" fromVerse="11" toVerse="27"/>
         </custom>
@@ -915,7 +914,7 @@ object SpecialReadings {
         <custom n="Common" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
         <custom n="Teiman">
           <part n="1" fromChapter="6" fromVerse="16" toVerse="17"/>
-          <part n="2" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>
+          <part n="2" fromChapter="8" fromVerse="13" toChapter="9" toVerse="23"/>  // same as common
         </custom>
       </haftarah>)
   }
