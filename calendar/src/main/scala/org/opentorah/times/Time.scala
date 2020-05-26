@@ -4,7 +4,7 @@ import Times.{hoursPerHalfDay, partsPerHalfHour, partsPerMinute}
 import org.opentorah.numbers.Number
 
 trait Time[S <: Times[S], N <: Time[S, N]] extends Number[S, N] { this: N =>
-  private def Digit = numbers.Digit  // TODO type annotation!
+  private def Digit = numbers.Digit
 
   final def days: Int = get(Digit.DAYS)
 

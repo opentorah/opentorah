@@ -279,12 +279,11 @@ Default FOP configuration created by the plugin causes FOP to auto-detect availa
 which are then cached by FOP to save time in the future runs. After installing new fonts, FOP's font cache file
 needs to be removed for them to be detected.
 
-FOP v.4 can't use some popular fonts like Roboto and NotoSans, and logs an error
-"coverage set class table not yet supported" during fonts auto-detection;
-see https://issues.apache.org/jira/browse/FOP-2704 for more details;
-The issue was fixed in April 2020, so FOP v2.5 is likely to support those fonts.
-Some of the fonts that work well enough and support Latin, Russian and Hebrew scripts
-are DejaVu and Liberation.
+FOP v2.4 can't use some popular fonts like Roboto and NotoSans, and logs an error
+"coverage set class table not yet supported" during fonts auto-detection
+(see https://issues.apache.org/jira/browse/FOP-2704 for more details);
+I had to use fonts that work well enough and support Latin, Russian and Hebrew scripts: DejaVu and Liberation.
+This is no longer an issue in FOP v2.5.
 
 Property `epubEmbeddedFonts` configures font families that should be embedded in EPUB files.
 

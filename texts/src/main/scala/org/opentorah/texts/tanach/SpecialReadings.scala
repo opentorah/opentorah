@@ -143,7 +143,7 @@ object SpecialReadings {
     private val shabbosMaftir: Maftir = torah(4)+torah(5) // 9-15
 
     def addShabbosMaftirAs7thAliyah(reading: Reading, day: WithNames): Reading =
-      reading.transformTorah(_.to6withLast(fromDay(day, shabbosMaftir)))
+      reading.transformTorah(torah => to6withLast(torah, fromDay(day, shabbosMaftir)))
 
     def correct(
       day: WithNames,
@@ -187,7 +187,7 @@ object SpecialReadings {
         <custom n="Chabad" book="Isaiah" fromChapter="66">
           <part n="1" fromVerse="1" toVerse="1"/>     // first verse of the common haftarah
           <part n="2" fromVerse="23" toVerse="24"/>   // last verse of the common haftarah
-          <part n="3" fromVerse="23" toVerse="23"/>   // TODO isn't this a part of the common haftarah already?
+          <part n="3" fromVerse="23" toVerse="23"/>
         </custom>
       </haftarah>)
   }
@@ -430,8 +430,7 @@ object SpecialReadings {
       </torah>).spans.head
 
     private def torah(day: WithNames): Torah =
-      fromDay(day, Parsha.VezosHaberachah.days.common)
-      .to6withLast(fromDay(day, chassanBereishis))
+      to6withLast(fromDay(day, Parsha.VezosHaberachah.days.common), fromDay(day, chassanBereishis))
 
     private def maftir: Maftir = SheminiAtzeres.maftir
 
@@ -930,6 +929,8 @@ object SpecialReadings {
       new Reading(customs.customs)
     }
   }
+
+  private def to6withLast(torah: Torah, last: Torah.Aliyah): Torah = torah.drop(Set(7)) :+ last
 
   private def readingByCutom(day: WithNames, customs: (Custom, Torah)*): Reading =
     Reading(new Custom.Of(customs.map { case (custom, torah) => (custom, fromDay(day, torah))}.toMap))

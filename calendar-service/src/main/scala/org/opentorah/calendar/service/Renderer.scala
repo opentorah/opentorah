@@ -481,7 +481,6 @@ object Renderer {
         </body>
       </html>
 
-    // TODO use prettyprinter
     result.toString()
   }
 

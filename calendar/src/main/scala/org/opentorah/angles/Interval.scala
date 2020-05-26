@@ -2,7 +2,6 @@ package org.opentorah.angles
 
 import Angles.Rotation
 
-// TODO move into 'numbers'
 final case class Interval(from: Rotation, to: Rotation) {
   require(from <= to)
 
