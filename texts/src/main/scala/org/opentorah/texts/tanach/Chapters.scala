@@ -66,7 +66,7 @@ object Chapters {
       parser = WithNumber.parse(Attribute("length").positiveInt.required)
     ).all
   } yield {
-    WithNumber.checkConsecutive(chapters, "chapter") // TODO move into ZIO
+    WithNumber.checkConsecutive(chapters, "chapter")
     new Chapters(WithNumber.dropNumbers(chapters))
   }
 }

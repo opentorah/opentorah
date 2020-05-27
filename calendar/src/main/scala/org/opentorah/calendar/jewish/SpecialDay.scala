@@ -39,7 +39,6 @@ object SpecialDay {
 
   sealed trait Festival extends FestivalOrIntermediate
 
-  // TODO remove if not needed:
   private object FestivalEnd extends LoadNames("Festival End")
   private object IntermediateShabbos extends LoadNames("Intermediate Shabbos")
   private object Fast extends LoadNames("Public Fast")

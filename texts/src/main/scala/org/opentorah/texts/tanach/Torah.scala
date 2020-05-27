@@ -13,7 +13,7 @@ final case class Torah private(override val spans: Seq[Torah.BookSpan])
       case (a1, d1) :: (a2, d2) :: tail =>
         if (d2) drop((a1+a2, d1) +: tail)
         else a1 +: drop((a2, d2) +: tail)
-      case (a1, d1) :: Nil =>
+      case (a1, _) :: Nil =>
         Seq(a1)
     }
 
@@ -29,9 +29,6 @@ final case class Torah private(override val spans: Seq[Torah.BookSpan])
 
     Torah(result)
   }
-
-  // TODO move to SpecialReadings
-  def to6withLast(last: Torah.Aliyah): Torah = drop(Set(7)) :+ last
 }
 
 object Torah extends WithBookSpans[Tanach.ChumashBook] {

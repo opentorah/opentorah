@@ -56,8 +56,6 @@ object TanachMetadata {
       elementParsable = Parsable.withInclude(new Element(elementName = "book", parser = bookParser))
     )
 
-    // TODO check that there is only one name (default) for the Chumash book and that it is among the names of its first parsha
-
     val metadata: Map[Tanach.TanachBook, TanachBookMetadata.Parsed] =
       Metadata.toMap(Tanach.values, metadatas, (metadata: TanachBookMetadata.Parsed) =>  metadata.book)
 

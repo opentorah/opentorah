@@ -22,7 +22,6 @@ object ChumashBookMetadata {
   ) extends TanachBookMetadata.Parsed(book, names, chapters) {
 
     def resolve: ChumashBookMetadata = {
-      // TODO re-read and understand ;)
       val parsha2metadataParsed = Metadata.toMap(book.parshiot, weeks, (metadata: ParshaMetadata.Parsed) => metadata.parsha)
 
       val chaptersFull = chapters.full
