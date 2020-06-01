@@ -6,9 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [ ] - 2020-05-03
+## [0.7.50] - 2020-05-31
 - merged into opentorah.org monorepo;
 - moved common code to appropriate modules;
+- caching frameworks for DocBook processing;
+- cleaned up data generation;
+- cleaned up generated catalog etc.;
+- updated FOP to 2.5;
+- updated to Saxon 10 and used it for FOP; 
 
 ## [ ] - 2019-12-02
 - split FOP plugin into a separate module;

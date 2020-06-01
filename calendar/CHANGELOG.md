@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.3] - 2020-05-31
+- merged into monorepo
+- moved common code to appropriate modules
+- simplified directory structure
+- cleaned up and updated some dependencies
+- cleaned up SpecialDay
+
 ## [0.3.1] - 2020-04-26
 - split out jewish-calendar.org website
 
