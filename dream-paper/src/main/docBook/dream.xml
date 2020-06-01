@@ -861,6 +861,11 @@
             Requirements</link></para>
     </section>
 
+    <section xml:id="fonts">
+        <title>Fonts</title>
+        <para><link xlink:href="http://www.sbl-site.org/educational/BiblicalFonts_SBLHebrew.aspx">SBL font</link> is
+            needed for viewing Tanach.</para>
+    </section>
     <section xml:id="texts">
         <title>Sources of Free Texts</title>
         <section>
