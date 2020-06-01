@@ -3,16 +3,18 @@ package org.opentorah.xml
 import org.typelevel.paiges.Doc
 import scala.xml.{Elem, MetaData, NamespaceBinding, Node, SpecialNode, TopScope, Utility}
 
-final class PaigesPrettyPrinter(
+final class PrettyPrinter(
   width: Int = 120,
   indent: Int = 2,
   doNotStackElements: Set[String] = Set(),
   nestElements: Set[String] = Set(),
   clingyElements: Set[String] = Set()
 ) {
-  import PaigesPrettyPrinter.sbToString
+  import PrettyPrinter.sbToString
 
   private def isClingy(node: Node): Boolean = Xml.isElement(node) && clingyElements.contains(node.label)
+
+  def renderXml(node: Node): String = Xml.header + "\n" + render(node) + "\n"
 
   def render(node: Node, pscope: NamespaceBinding = TopScope): String = fromNode(
     node,
@@ -51,7 +53,7 @@ final class PaigesPrettyPrinter(
     val name: String = sbToString(element.nameToString)
 
     val attributes: Doc = {
-      val docs: Seq[Doc] = PaigesPrettyPrinter.fromAttributes(element, pscope)
+      val docs: Seq[Doc] = PrettyPrinter.fromAttributes(element, pscope)
       if (docs.isEmpty) Doc.empty
       else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, docs)
     }
@@ -92,7 +94,7 @@ final class PaigesPrettyPrinter(
     canBreakLeft: Boolean,
     canBreakRight: Boolean
   ): (Seq[Doc], Boolean, Boolean, Boolean) = {
-    val nodes: Seq[Node] = PaigesPrettyPrinter.atomize(Seq.empty, element.child)
+    val nodes: Seq[Node] = PrettyPrinter.atomize(Seq.empty, element.child)
     val whitespaceLeft: Boolean = nodes.headOption.exists(Xml.isWhitespace)
     val whitespaceRight: Boolean = nodes.lastOption.exists(Xml.isWhitespace)
     val charactersLeft: Boolean = nodes.headOption.exists(node => Xml.isAtom(node) && !Xml.isWhitespace(node))
@@ -177,7 +179,7 @@ final class PaigesPrettyPrinter(
     }
 }
 
-object PaigesPrettyPrinter {
+object PrettyPrinter {
 
   private def fromAttributes(element: Elem, pscope: NamespaceBinding): Seq[Doc] = {
     val attributes: Seq[Doc] = element.attributes.toSeq.map(fromAttribute)

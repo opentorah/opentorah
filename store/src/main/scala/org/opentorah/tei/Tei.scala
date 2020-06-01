@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.entity.{EntityReference, EntityType}
-import org.opentorah.xml.{ContentType, Element, ToXml, Xml}
+import org.opentorah.xml.{ContentType, Element, PrettyPrinter, ToXml, Xml}
 import scala.xml.{Elem, Node}
 
 final case class Tei(
@@ -58,5 +58,11 @@ object Tei extends Element[Tei](
       lang = None,
       new Body.Value(body)
     )
+  )
+
+  val prettyPrinter: PrettyPrinter = new PrettyPrinter(
+    doNotStackElements = Set("choice"),
+    nestElements = Set("p", /*"abstract",*/ "head", "salute", "dateline"),
+    clingyElements = Set("note", "lb", "sic", "corr")
   )
 }

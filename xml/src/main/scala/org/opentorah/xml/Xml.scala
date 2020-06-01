@@ -63,4 +63,6 @@ object Xml {
       .replace("  ", " ")
       .replace("  ", " ")
   }
+
+  val prettyPrinter: PrettyPrinter = new PrettyPrinter
 }

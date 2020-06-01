@@ -6,7 +6,7 @@ import org.opentorah.entity.{Entity, EntityReference}
 import org.opentorah.store.{Store, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
-import org.opentorah.xml.{From, PaigesPrettyPrinter, Xml}
+import org.opentorah.xml.From
 import scala.xml.Elem
 
 object Main {
@@ -35,8 +35,8 @@ object Main {
 
     println("Pretty-printing store.")
     for (entityHolder <- store.entities.get.by.get.stores)
-      prettyPrint(entityHolder, Transformers.teiPrettyPrinter, Entity.toXml(entityHolder.entity.copy(id = None)))
-    prettyPrint(store, Transformers.teiPrettyPrinter)
+      prettyPrint(entityHolder, Entity.toXml(entityHolder.entity.copy(id = None)))
+    prettyPrint(store)
 
     val site = new Site(store, references)
 
@@ -46,22 +46,22 @@ object Main {
     )
   }
 
-  private def prettyPrint(store: Store, prettyPrinter: PaigesPrettyPrinter): Unit = {
-    prettyPrint(store, prettyPrinter, Store.parsable.toXml(store.asInstanceOf[Store.FromElement].element))
+  private def prettyPrint(store: Store): Unit = {
+    prettyPrint(store, Store.parsable.toXml(store.asInstanceOf[Store.FromElement].element))
 
     store match {
       case collection: Collection =>
         for (by <- collection.by; document <- by.stores; by <- document.by; teiHolder <- by.stores)
-          prettyPrint(teiHolder, prettyPrinter, Tei.toXml(teiHolder.tei))
+          prettyPrint(teiHolder, Tei.toXml(teiHolder.tei))
       case _ =>
-        for (by <- store.by; store <- by.stores) prettyPrint(store.asInstanceOf[Store], prettyPrinter)
+        for (by <- store.by; store <- by.stores) prettyPrint(store)
     }
   }
 
-  private def prettyPrint(store: Store, prettyPrinter: PaigesPrettyPrinter, toXml: => Elem): Unit =
+  private def prettyPrint(store: Store, toXml: => Elem): Unit =
     for (fromUrl <- store.urls.fromUrl) if (Files.isFile(fromUrl)) Files.write(
       file = Files.url2file(fromUrl),
-      content = Xml.header + "\n" + prettyPrinter.render(toXml) + "\n"
+      content = Tei.prettyPrinter.renderXml(toXml)
     )
 
   private def checkReference(reference: EntityReference,  findByRef: String => Option[Entity]): Option[String] = {

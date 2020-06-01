@@ -96,7 +96,7 @@ final class DocumentObject(
 
       SiteObject.withYaml(
         yaml = Seq("transcript" -> Files.mkUrl(teiWrapperUrl)) ++ navigation,
-        content = Seq(Transformers.htmlPrettyPrinter.render(facsimilePages))
+        content = Seq(Xml.prettyPrinter.render(facsimilePages))
       )
     }
   }
