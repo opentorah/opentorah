@@ -7,7 +7,7 @@ import scala.xml.Elem
 final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
 
   private def render(from: From, width: Int): String =
-    new PaigesPrettyPrinter(
+    new PrettyPrinter(
       width,
       indent = 2,
       clingyElements = Set("note")
@@ -50,7 +50,7 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
          |</a>""")
   }
 
-  "PaigesPrettyPrinter" should "work" in {
+  "PrettyPrinter" should "work" in {
     check(<a><b></b></a>, 4, expected =
       """|<a>
          |<b/>

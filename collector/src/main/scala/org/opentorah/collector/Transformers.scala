@@ -4,23 +4,10 @@ import org.opentorah.entity.EntityType
 import org.opentorah.tei.{Availability, CalendarDesc, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher,
   SourceDesc, Tei}
 import org.opentorah.util.Files
-import org.opentorah.xml.{PaigesPrettyPrinter, Xml}
+import org.opentorah.xml.Xml
 import scala.xml.{Attribute, Elem, Node}
 
 object Transformers {
-
-  val teiPrettyPrinter: PaigesPrettyPrinter = new PaigesPrettyPrinter(
-    width = 120,
-    indent = 2,
-    doNotStackElements = Set("choice"),
-    nestElements = Set("p", /*"abstract",*/ "head", "salute", "dateline"),
-    clingyElements = Set("note", "lb", "sic", "corr")
-  )
-
-  val htmlPrettyPrinter: PaigesPrettyPrinter = new PaigesPrettyPrinter(
-    width = 120,
-    indent = 2,
-  )
 
   def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
     case Nil => Nil

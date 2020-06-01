@@ -16,7 +16,7 @@ abstract class SiteObject(val site: Site) {
         xml = Tei.toXml(teiTransformer(tei)),
         transformer = xmlTransformer
       )
-      Xml.header + "\n" + Transformers.teiPrettyPrinter.render(elem) +  "\n"
+      Tei.prettyPrinter.renderXml(elem)
     }
   }
 
