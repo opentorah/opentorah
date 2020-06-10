@@ -4,7 +4,7 @@ import scala.xml.Elem
 
 class StringElement(elementName: String) extends Element[String](
   elementName,
-  ContentType.Text,
+  ContentType.Characters,
   Text().required
 ) with ToXml[String] {
   override def toString: Error = s"text element $elementName"
@@ -14,7 +14,7 @@ class StringElement(elementName: String) extends Element[String](
 
   class Converted[B](convert: String => Parser[B]) extends Element[B](
     elementName,
-    contentType = ContentType.Text,
+    contentType = ContentType.Characters,
     parser = Text().required.flatMap(convert)
   )  with ToXml[B] {
     override def toString: Error = StringElement.this.toString

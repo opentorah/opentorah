@@ -9,36 +9,22 @@ trait Parsable[A] {
 
   def name2parser: Map[String, Parsable.ContentTypeAndParser[A]]
 
-  final def optional: Parser[Option[A]] = for {
-    nextName <- Context.nextElementName
-    result <- nextName.fold[Parser[Option[A]]](ZIO.none) { nextName =>
-      name2parser.get(nextName).fold[Parser[Option[A]]](ZIO.none)(nested(_).map(Some(_)))
-    }
+  final val optional: Parser[Option[A]] = for {
+    elementOpt <- Context.nextElement(element => name2parser.keySet.contains(element.label))
+    result <- elementOpt.fold[Parser[Option[A]]](ZIO.none)(element =>
+      nested(None, element, name2parser(element.label)).map(Some(_)))
   } yield result
 
-  final def required: Parser[A] = for {
-    nextName <- Context.nextElementName
-    result <- nextName.fold[Parser[A]](ZIO.fail(s"$this required, bot none found")) { nextName =>
-      name2parser.get(nextName).fold[Parser[A]](notRecognized(nextName))(nested)
-    }
+  final val required: Parser[A] = for {
+    opt <- optional
+    result <- opt.fold[Parser[A]](ZIO.fail(s"$this required, bot none found"))(ZIO.succeed[A](_))
   } yield result
 
-  final def all: Parser[Seq[A]] =
-    all(Seq.empty, mustBe = false)
+  final def all: Parser[Seq[A]] = all(Seq.empty)
 
-  final def allMustBe: Parser[Seq[A]] =
-    all(Seq.empty, mustBe = true)
-
-  private def all(acc: Seq[A], mustBe: Boolean): Parser[Seq[A]] = for {
-    nextName <- Context.nextElementName
-    result <- nextName.fold[Parser[Seq[A]]](ZIO.succeed(acc)) { nextName =>
-      name2parser.get(nextName).fold[Parser[Seq[A]]](if (!mustBe) ZIO.succeed(acc) else notRecognized(nextName)) {
-        contentTypeAndParser => for {
-          next <- nested(contentTypeAndParser)
-          result <- all(acc :+ next, mustBe)
-        } yield result
-      }
-    }
+  private def all(acc: Seq[A]): Parser[Seq[A]] = for {
+    opt <- optional
+    result <- opt.fold[Parser[Seq[A]]](ZIO.succeed(acc))(next => all(acc :+ next))
   } yield result
 
   final def parse(fromUrl: URL): Parser[A] = parse(From.url(fromUrl))
@@ -47,16 +33,9 @@ trait Parsable[A] {
     _ <- Context.checkNoLeftovers
     nextElement <- from.load
     name = nextElement.label
-    result <- name2parser.get(name).fold[Parser[A]](notRecognized(name))(contentTypeAndParser =>
-      nested(Some(from), nextElement, contentTypeAndParser))
-  } yield result
-
-  private def notRecognized[B](nextName: String): Parser[B] =
-    ZIO.fail(s"$this required, but '$nextName' found")
-
-  private final def nested(contentTypeAndParser: Parsable.ContentTypeAndParser[A]): Parser[A] = for {
-    nextElement <- Context.nextElement.map(_.get)
-    result <- nested(None, nextElement, contentTypeAndParser)
+    result <- name2parser.get(name)
+      .fold[Parser[A]](ZIO.fail(s"$this required, but '$name' found"))(contentTypeAndParser =>
+        nested(Some(from), nextElement, contentTypeAndParser))
   } yield result
 
   private def nested(
@@ -79,7 +58,7 @@ object Parsable {
   final def annotate[A](parsable: Parsable[A]): Parsable[(Parsable[A], A)] = new Parsable[(Parsable[A], A)] {
     override def toString: Error = "annotated " + parsable.toString
 
-    override def name2parser: Map[String, ContentTypeAndParser[(Parsable[A], A)]] =
+    override val name2parser: Map[String, ContentTypeAndParser[(Parsable[A], A)]] =
       Collections.mapValues(parsable.name2parser) { contentTypeAndParser: ContentTypeAndParser[A] =>
         new Parsable.ContentTypeAndParser[(Parsable[A], A)](
           contentTypeAndParser.contentType,

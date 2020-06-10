@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 
 final class RambamScheduleTest extends AnyFlatSpec with Matchers {
 
-  "Rambam schedule" should "work" ignore {
+  "Rambam schedule" should "work" in {
     val result = RambamSchedule.scheduleYear(Year(5777), Formatter.narrow)
   }
 }

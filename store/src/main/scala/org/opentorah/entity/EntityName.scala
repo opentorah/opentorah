@@ -13,7 +13,7 @@ object EntityName extends ToXml[EntityName] {
 
   def parsable(entityType: EntityType): Parsable[EntityName] = new Element[EntityName](
     elementName = entityType.nameElement,
-    contentType = ContentType.Text,
+    contentType = ContentType.Characters,
     parser = for {
       id <- Attribute.id.optional
       name <- Text().required

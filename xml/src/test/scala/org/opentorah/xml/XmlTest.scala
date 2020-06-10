@@ -15,7 +15,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
     ).isLeft shouldBe true
 
     Parser.parseDo(
-      new Element("a", ContentType.Text, Text().required)
+      new Element("a", ContentType.Characters, Text().required)
         .parse(From.xml("test", <a>asdjkh</a>))
     ) shouldBe "asdjkh"
   }
@@ -26,7 +26,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
 
   private val file2parsable: Parsable[String] =
     new Element("x", ContentType.Elements,
-      new Element("name", ContentType.Text, Text().required).required)
+      new Element("name", ContentType.Characters, Text().required).required)
 
   "Include" should "work" in {
     Parser.parseDo(file2parsable

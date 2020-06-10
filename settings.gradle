@@ -9,7 +9,7 @@ pluginManagement {
     id 'com.github.ben-manes.versions' version '0.28.0'
     id 'com.github.maiflai.scalatest' version '0.26'
     id 'com.jfrog.bintray' version '1.8.5'
-    id 'com.google.cloud.tools.jib' version '2.3.0'
+    id 'com.google.cloud.tools.jib' version '2.4.0'
     id 'com.gradle.plugin-publish' version '0.12.0'
     id 'org.opentorah.docbook' version docBookPluginVersion
   }
