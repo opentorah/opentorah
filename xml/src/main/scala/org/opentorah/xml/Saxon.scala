@@ -4,7 +4,7 @@ import java.io.{File, FileWriter, StringReader}
 import javax.xml.transform.dom.DOMResult
 import javax.xml.transform.sax.{SAXResult, SAXSource, SAXTransformerFactory}
 import javax.xml.transform.stream.{StreamResult, StreamSource}
-import javax.xml.transform.{ErrorListener, Result, Source, Transformer, TransformerException}
+import javax.xml.transform.{ErrorListener, Result => TransformResult, Source, Transformer, TransformerException}
 import org.slf4j.{Logger, LoggerFactory}
 import org.w3c.dom.Node
 import org.xml.sax.helpers.DefaultHandler
@@ -47,7 +47,7 @@ sealed abstract class Saxon(name: String) {
     result = getOutputTarget(outputFile)
   )
 
-  private def getOutputTarget(outputFile: Option[File]): Result = {
+  private def getOutputTarget(outputFile: Option[File]): TransformResult = {
     val result = new StreamResult
     outputFile.map { outputFile =>
       result.setSystemId(outputFile)
@@ -92,7 +92,7 @@ sealed abstract class Saxon(name: String) {
     stylesheetFile: Option[File],
     inputSource: InputSource,
     xmlReader: XMLReader,
-    result: Result
+    result: TransformResult
   ): Unit = {
     resolver.foreach(resolver => xmlReader.setEntityResolver(resolver))
     Saxon.setErrorHandler(xmlReader, Saxon.logger)
@@ -109,7 +109,7 @@ sealed abstract class Saxon(name: String) {
     resolver: Option[Resolver],
     stylesheetFile: Option[File],
     source: Source,
-    result: Result
+    result: TransformResult
   ): Unit = {
     Saxon.logger.debug(
       s"""Saxon.transform(

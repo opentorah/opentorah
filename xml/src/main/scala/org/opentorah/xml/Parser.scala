@@ -13,9 +13,8 @@ object Parser {
 
   private[xml] def effect[A](f: => A): IO[Error, A] = IO(f).mapError(_.getMessage)
 
-  def check(condition: Boolean, message: => String): IO[Error, Unit] =
-    if (condition) IO.succeed(())
-    else IO.fail(message)
+  def check(condition: Boolean, message: => String): Result =
+    if (condition) ok else IO.fail(message)
 
   def parseDo[A](parser: Parser[A]): A =
     run(runnable(parser))
@@ -24,7 +23,7 @@ object Parser {
     val result: Parser[A] = for {
       result <- parser
       isEmpty <- Context.isEmpty
-      _ <- if (isEmpty) IO.succeed(()) else throw new IllegalStateException(s"Non-empty context $this!")
+      _ <- if (isEmpty) ok else throw new IllegalStateException(s"Non-empty context $this!")
     } yield result
 
     result.provide(new Context)
