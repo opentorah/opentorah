@@ -37,40 +37,36 @@ private[xml] object Context {
   val elementName: Parser[String] =
     lift(_.name)
 
-  // TODO remove!
-  val nextElementName: Parser[Option[String]] =
-    lift(current => Content.getNextElementName(current.content))
-
   def nextElement(p: Elem => Boolean): Parser[Option[Elem]] =
-    liftContentModifier(Content.takeNextElement(p))
+    liftContentModifier(_.takeNextElement(p))
 
   def takeAttribute(name: String): Parser[Option[String]] =
-    liftCurrentModifier(Current.takeAttribute(name))
+    liftCurrentModifier(_.takeAttribute(name))
 
   val takeAllAttributes: Parser[Map[String, String]] =
-    liftCurrentModifier(Current.takeAllAttributes)
+    liftCurrentModifier(_.takeAllAttributes)
 
   val takeCharacters: Parser[Option[String]] =
-    liftContentModifier(Content.takeCharacters)
+    liftContentModifier(_.takeCharacters)
 
   val allNodes: Parser[Seq[Node]] =
-    liftContentModifier(Content.takeAllNodes)
+    liftContentModifier(_.takeAllNodes)
 
   private def lift[A](f: Current => A): Parser[A] =
     ZIO.access[Context](liftCurrentToContext(f))
 
-  private def liftCurrentModifier[A]: Current.Modifier[A] => Parser[A] = (f: Current.Modifier[A]) => for {
+  private def liftCurrentModifier[A]: (Current => Current.Next[A]) => Parser[A] = (f: Current => Current.Next[A]) => for {
     result <- ZIO.accessM[Context](liftCurrentToContext(f))
     _ <- ZIO.access[Context](_.replaceCurrent(result._1))
   } yield result._2
 
-  private def liftContentModifier[A]: Content.Modifier[A] => Parser[A] =
+  private def liftContentModifier[A]: (Content => Content.Next[A]) => Parser[A] =
     liftCurrentModifier[A] compose liftContentModifierToCurrentModifier[A]
 
   private def liftCurrentToContext[A](f: Current => A): Context => A =
     (context: Context) => f(context.current)
 
-  private def liftContentModifierToCurrentModifier[A](f: Content.Modifier[A]): Current.Modifier[A] =
+  private def liftContentModifierToCurrentModifier[A](f: Content => Content.Next[A]): Current => Current.Next[A] =
     (current: Current) =>
       f(current.content).map { case (content, result) => (current.copy(content = content), result) }
 
@@ -89,6 +85,6 @@ private[xml] object Context {
 
   def checkNoLeftovers: Parser[Unit] = for {
     isEmpty <- ZIO.access[Context](_.isEmpty)
-    _ <- if (isEmpty) IO.succeed(()) else ZIO.accessM(liftCurrentToContext(Current.checkNoLeftovers))
+    _ <- if (isEmpty) ok else ZIO.accessM(liftCurrentToContext(_.checkNoLeftovers))
   } yield ()
 }

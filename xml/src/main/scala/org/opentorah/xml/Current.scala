@@ -8,11 +8,22 @@ private[xml] final case class Current(
   name: String,
   attributes: Map[String, String],
   content: Content
-)
+) {
+  def takeAttribute(attribute: String): Current.Next[Option[String]] =
+    IO.succeed((copy(attributes = attributes - attribute), attributes.get(attribute)))
+
+  def takeAllAttributes: Current.Next[Map[String, String]] =
+    IO.succeed((copy(attributes = Map.empty), attributes))
+
+  def checkNoLeftovers: Result = for {
+    _ <- Parser.check(attributes.isEmpty, s"Unparsed attributes: $attributes")
+    _ <- content.checkNoLeftovers
+  } yield ()
+}
 
 private[xml] object Current {
 
-  type Modifier[A] = Current => IO[Error, (Current, A)]
+  type Next[A] = IO[Error, (Current, A)]
 
   def open(from: Option[From], element: Elem, contentType: ContentType): IO[Error, Current] = for {
     content <- Content.open(element.child, contentType)
@@ -22,15 +33,4 @@ private[xml] object Current {
     attributes = element.attributes.map(metadata => metadata.prefixedKey -> metadata.value.toString).toMap,
     content
   )
-
-  def takeAttribute(attribute: String): Modifier[Option[String]] = (current: Current) =>
-    IO.succeed((current.copy(attributes = current.attributes - attribute), current.attributes.get(attribute)))
-
-  val takeAllAttributes: Modifier[Map[String, String]] = (current: Current) =>
-    IO.succeed((current.copy(attributes = Map.empty), current.attributes))
-
-  val checkNoLeftovers: Current => IO[Error, Unit] = (current: Current) => for {
-    _ <- if (current.attributes.isEmpty) IO.succeed(()) else IO.fail(s"Unparsed attributes: ${current.attributes}")
-    _ <- Content.checkNoLeftovers(current.content)
-  } yield ()
 }
