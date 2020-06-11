@@ -27,7 +27,7 @@ private[xml] object Content {
         else if (characters.nonEmpty) IO.fail(s"Spurious characters: '${characters.get}'")
         else IO.succeed(Empty)
 
-      case ContentType.Text =>
+      case ContentType.Characters =>
         if (elements.nonEmpty) IO.fail(s"Spurious elements: $elements")
         else IO.succeed(Characters(characters))
 
@@ -65,24 +65,24 @@ private[xml] object Content {
       case _ => None
     }
 
-  val takeNextElement: Modifier[Option[Elem]] = {
+  def takeNextElement(p: Elem => Boolean): Modifier[Option[Elem]] = {
     case Elements(nextElementNumber, nodes) => IO.succeed {
-      val (result: Option[Elem], newNodes: Seq[Node]) = takeNextElement(nodes)
+      val (result: Option[Elem], newNodes: Seq[Node]) = takeNextElement(nodes, p)
       (Elements(nextElementNumber + (if (result.isEmpty) 0 else 1), newNodes), result)
     }
 
     case Mixed(nextElementNumber, nodes) => IO.succeed {
-      val (result: Option[Elem], newNodes: Seq[Node]) = takeNextElement(nodes)
+      val (result: Option[Elem], newNodes: Seq[Node]) = takeNextElement(nodes, p)
       (Mixed(nextElementNumber + (if (result.isEmpty) 0 else 1), newNodes), result)
     }
 
     case content => IO.fail(s"No element in $content")
   }
 
-  private def takeNextElement(nodes: Seq[Node]): (Option[Elem], Seq[Node]) = {
+  private def takeNextElement(nodes: Seq[Node], p: Elem => Boolean): (Option[Elem], Seq[Node]) = {
     val noLeadingWhitespace = nodes.dropWhile(Xml.isWhitespace)
     noLeadingWhitespace.headOption.fold[(Option[Elem], Seq[Node])]((None, nodes)) {
-      case result: Elem => (Some(result), noLeadingWhitespace.tail)
+      case result: Elem if p(result) => (Some(result), noLeadingWhitespace.tail)
       case _ => (None, nodes)
     }
   }
@@ -96,28 +96,6 @@ private[xml] object Content {
 
     case content => IO.fail(s"No nodes in $content")
   }
-
-  val takeAllElements: Modifier[Seq[Elem]] = {
-    case content@Elements(nextElementNumber: Int, nodes: Seq[Node]) =>
-      val result = takeAllElements(nodes)
-      if (result.isEmpty) IO.fail(s"Non white-space nodes in $content")
-      else IO.succeed((Elements(nextElementNumber, Seq.empty), result.get))
-
-    case content@Mixed(nextElementNumber: Int, nodes: Seq[Node]) =>
-      val result = takeAllElements(nodes)
-      if (result.isEmpty) IO.fail(s"Non white-space nodes in $content")
-      else IO.succeed((Mixed(nextElementNumber, Seq.empty), result.get))
-
-    case content => IO.fail(s"No elements in $content")
-  }
-
-  private def takeAllElements(nodes: Seq[Node]): Option[Seq[Elem]] = {
-    val (elements: Seq[Elem], nonElements: Seq[Node]) = partition(nodes)
-    val hasNonWhitespace: Boolean = nonElements.exists(node => !Xml.isWhitespace(node))
-    if (hasNonWhitespace) None else Some(elements)
-  }
-
-  val ok: IO[Error, Unit] = IO.succeed(())
 
   val checkNoLeftovers: Content => IO[Error, Unit] = {
     case Empty => ok
@@ -141,4 +119,6 @@ private[xml] object Content {
     val result = nodes.map(_.text).mkString.trim
     if (result.isEmpty) None else Some(result)
   }
+
+  private val ok: IO[Error, Unit] = IO.succeed(())
 }

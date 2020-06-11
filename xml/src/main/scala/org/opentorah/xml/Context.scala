@@ -34,14 +34,15 @@ private[xml] object Context {
   val isEmpty: Parser[Boolean] =
     ZIO.access[Context](_.isEmpty)
 
+  val elementName: Parser[String] =
+    lift(_.name)
+
+  // TODO remove!
   val nextElementName: Parser[Option[String]] =
     lift(current => Content.getNextElementName(current.content))
 
-  val nextElement: Parser[Option[Elem]] =
-    liftContentModifier(Content.takeNextElement)
-
-  val elementName: Parser[String] =
-    lift(_.name)
+  def nextElement(p: Elem => Boolean): Parser[Option[Elem]] =
+    liftContentModifier(Content.takeNextElement(p))
 
   def takeAttribute(name: String): Parser[Option[String]] =
     liftCurrentModifier(Current.takeAttribute(name))
@@ -54,9 +55,6 @@ private[xml] object Context {
 
   val allNodes: Parser[Seq[Node]] =
     liftContentModifier(Content.takeAllNodes)
-
-//  val allElements: Parser[Seq[Elem]] =
-//    liftContentModifier(Content.takeAllElements)
 
   private def lift[A](f: Current => A): Parser[A] =
     ZIO.access[Context](liftCurrentToContext(f))

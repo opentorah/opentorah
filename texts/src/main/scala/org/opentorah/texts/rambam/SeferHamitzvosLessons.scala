@@ -5,9 +5,9 @@ import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, UnionParsa
 
 object SeferHamitzvosLessons {
 
-  final class Lesson(
-    val number: Int,
-    val parts: Seq[Part]
+  final case class Lesson(
+    number: Int,
+    parts: Seq[Part]
   )
 
   sealed trait Part extends WithNames
@@ -46,10 +46,11 @@ object SeferHamitzvosLessons {
 
   private val lessonParser: Parser[Lesson] = for {
     number <- Attribute("n").positiveInt.required
-    parts <- partParsable.allMustBe
-  } yield new Lesson(number, parts)
+    parts <- partParsable.all
+  } yield Lesson(number, parts)
 
-  val lessons: Seq[Lesson] = Metadata.load(
+  // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
+  lazy val lessons: Seq[Lesson] = Metadata.load(
     from = From.resource(this),
     elementParsable = new Element[Lesson](elementName = "lesson", parser = lessonParser)
   )

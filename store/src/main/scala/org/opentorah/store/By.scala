@@ -40,7 +40,7 @@ object By extends Component("by") {
     selector <- Attribute("selector").required
     directory <- Attribute("directory").optional
     list <- Attribute("list").optional
-    stores <- Store.parsable.allMustBe
+    stores <- Store.parsable.all
   } yield Inline(
     selector,
     directory,
@@ -105,7 +105,7 @@ object By extends Component("by") {
 
   private object filesList extends org.opentorah.xml.Element[Seq[String]](
     elementName = "filesList",
-    parser = Text("file").allMustBe
+    parser = Text("file").all
   ) with ToXml[Seq[String]] {
 
     override def toXml(value: Seq[String]): Elem =

@@ -13,7 +13,7 @@ final case class Name(name: String, languageSpec: LanguageSpec) {
 
 object Name extends Element[Name](
   elementName = "name",
-  contentType = ContentType.Text,
+  contentType = ContentType.Characters,
   parser = for {
     n <- Attribute("n").optional
     characters <- Text().optional

@@ -56,7 +56,8 @@ object MishnehTorah {
     override def part: PartWithNamedChapters = part_.get
   }
 
-  val books: Seq[Book] = {
+  // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
+  lazy val books: Seq[Book] = {
     val result: Seq[Book] = Metadata.load(
       from = From.resource(this),
       elementParsable = new Element(elementName = "book",  parser = bookParser)
@@ -68,7 +69,7 @@ object MishnehTorah {
   }
 
   private def bookParser: Parser[Book] = for {
-    number <- Attribute("n").positiveInt.required
+    number <- Attribute("n").int.required
     names <- Names.parser
     parts <- new Element[Part](elementName = "part", parser = partParser).all
     _ <- Parser.check(parts.map(_.number) == (1 to parts.length),

@@ -10,6 +10,6 @@ final class UnionParsable[A](parsables: Seq[Parsable[A]]) extends Parsable[A] {
   override def toString: Error =
     parsables.map(_.toString).mkString("[", "] or [", "]")
 
-  def name2parser: Map[String, Parsable.ContentTypeAndParser[A]] =
+  override val name2parser: Map[String, Parsable.ContentTypeAndParser[A]] =
     parsables.flatMap(_.name2parser).toMap
 }
