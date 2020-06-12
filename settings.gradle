@@ -21,7 +21,6 @@ include ':metadata'
 
 include ':store'
 include ':texts'
-// TODO include ':importers'
 
 include ':calendar'
 include ':schedule'

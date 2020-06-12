@@ -1,0 +1,25 @@
+Using TagSoup with Scala XML:
+
+import org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl
+import scala.xml.factory.XMLLoader
+import scala.xml.{Elem, XML}
+
+object TagSoupXmlLoader {
+  def get(): XMLLoader[Elem] =
+    XML.withSAXParser(new SAXFactoryImpl().newSAXParser())
+}
+
+
+join paragraphs split by a note
+deal with parentheses
+introduce corrections (e.g., in chapter 51 of Tanya, the kind of the note is wrong)
+
+peel off the 'span' (in the beginning of a paragraph)
+
+Editorial note
+In the beginning of a side-note (only?) there may be a title
+break paragraphs into lines
+
+
+Jerusalem Tanach is (?) in "UTF-16BE".
+There are (?) stuck chapters in the Jerusalem Tanach.
