@@ -29,5 +29,3 @@ There are a few ongoing projects:
 - desire to publishing this paper in multiple formats was part of the motivation for writing
   [Gradle DocBook plugin](https://github.com/opentorah/opentorah/tree/master/docbook) in general
   and its support for [mathematics](https://github.com/opentorah/opentorah/tree/master/fop) in DocBook in particular;
-  it also influenced my thinking on
-  [publishing papers on the web](http://dub.podval.org/2019/05/06/publishing-papers-on-web-2.html);
