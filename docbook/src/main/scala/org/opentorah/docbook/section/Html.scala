@@ -13,21 +13,22 @@ object Html extends DocBook2 {
   override def name: String = "html"
   override def stylesheetUriName: String = "html/chunkfast"
   override def outputFileExtension: String = "html"
-  override def outputFileNameOverride: Option[String] = Some("index")
+  override protected def outputFileNameOverride: Option[String] = Some("index")
   override def usesRootFile: Boolean = false
-  override def additionalSections: List[Section] = List(HtmlCommon, Common)
-  override def baseDirParameter: Option[String] = Some("base.dir")
-  override def rootFilenameParameter: Option[String] = Some("root.filename")
-  override def htmlStylesheetsParameter: Option[String] = Some("html.stylesheet")
-  override def chunkQuietlyParameter: Option[String] = Some("chunk.quietly")
-  override def mathJaxConfigurationParameter: Option[String] = Some(mathJaxConfigurationParameterName)
+  override def commonSections: List[CommonSection] = List(Common, HtmlCommon)
 
-  override def defaultParameters: Map[String, String] = Map(
+  override protected def baseDirParameter: Option[String] = Some("base.dir")
+  override protected def rootFilenameParameter: Option[String] = Some("root.filename")
+  override protected def htmlStylesheetsParameter: Option[String] = Some("html.stylesheet")
+  override protected def chunkQuietlyParameter: Option[String] = Some("chunk.quietly")
+  override protected def mathJaxConfigurationParameter: Option[String] = Some(mathJaxConfigurationParameterName)
+
+  override def defaultParameters: Section.Parameters = Map(
   )
 
   val mathJaxConfigurationParameterName: String = "mathjax.configuration"
 
-  override def mainStylesheet(isMathJaxEnabled: Boolean): String = if (!isMathJaxEnabled) "" else
+  override protected def mainStylesheetBody(isMathJaxEnabled: Boolean): String = if (!isMathJaxEnabled) "" else
     s"""
        |  <!-- Add MathJax support -->
        |  <xsl:template name="user.head.content">
@@ -38,5 +39,5 @@ object Html extends DocBook2 {
        |  </xsl:template>
        |""".stripMargin
 
-  override def customStylesheet: String = ""
+  override protected def customStylesheetBody: String = ""
 }

@@ -9,4 +9,10 @@ object Util {
     val info = getClass.getPackage
     info.getImplementationTitle + " version " + info.getImplementationVersion
   }
+
+  def split(what: String, on: Char): (String, Option[String]) = {
+    val index: Int = what.lastIndexOf(on)
+    if (index == -1) (what, None)
+    else (what.substring(0, index), Some(what.substring(index+1)))
+  }
 }

@@ -7,11 +7,10 @@ object Pdf extends DocBook2 {
   override def outputFileExtension: String = "pdf"
   override def usesRootFile: Boolean = true
   override def usesIntermediate: Boolean = true
-  override def intermediateDirectoryName: String = "fo"
   override def intermediateFileExtension: String = "fo"
-  override def additionalSections: List[Section] = List( Common)
+  override def commonSections: List[CommonSection] = List(Common)
 
-  override def defaultParameters: Map[String, String] = Map(
+  override def defaultParameters: Section.Parameters = Map(
     // Paper size; double-sidedness; not a draft
     "paper.type" -> "USletter",
     "double.sided" -> "yes",
@@ -22,9 +21,9 @@ object Pdf extends DocBook2 {
     "fop1.extensions" -> "1"
   )
 
-  override def mainStylesheet(isMathJaxEnabled: Boolean): String = ""
+  override protected def mainStylesheetBody(isMathJaxEnabled: Boolean): String = ""
 
-  override def customStylesheet: String =
+  override protected def customStylesheetBody: String =
     s"""
        |  <!-- Break before each section -->
        |  <xsl:attribute-set name="section.title.level1.properties">

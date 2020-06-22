@@ -2,7 +2,7 @@ package org.opentorah.docbook.plugin
 
 import java.io.File
 import org.gradle.api.Project
-import org.opentorah.docbook.section.DocBook2
+import org.opentorah.docbook.section.{DocBook2, Variant}
 import org.opentorah.fop.{Fop, FopPlugin, JEuclidFopPlugin, MathJaxFopPlugin}
 import org.opentorah.mathjax.MathJax
 import org.opentorah.util.{Files, Gradle}
@@ -20,21 +20,19 @@ final class ProcessDocBook(
   private val logger: Logger = LoggerFactory.getLogger(classOf[ProcessDocBook])
 
   def run(
-    docBook2: DocBook2,
+    variant: Variant,
     prefixed: Boolean,
     documentName: String
   ): Unit = {
+    val docBook2: DocBook2 = variant.docBook2
+
     val isPdf: Boolean = docBook2.isPdf
 
     val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)
 
-    val saxonOutputDirectory: File = forDocument.saxonOutputDirectory(docBook2)
+    val saxonOutputDirectory: File = forDocument.saxonOutputDirectory(variant)
     saxonOutputDirectory.mkdirs
-
-    val saxonOutputFile: File = forDocument.saxonOutputFile(docBook2)
-
-    // do not output the 'main' file when chunking in XSLT 1.0
-    val outputFile: Option[File] = if (docBook2.usesRootFile) Some(saxonOutputFile) else None
+    val saxonOutputFile: File = forDocument.saxonOutputFile(variant)
 
     val mathFilter: Option[MathFilter] =
       if (mathJax.isDefined && isPdf) Some(new MathFilter(mathJax.get.configuration)) else None
@@ -46,13 +44,14 @@ final class ProcessDocBook(
     saxon.transform(
       resolver,
       inputFile = layout.inputFile(documentName),
-      stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(docBook2)),
+      stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(variant)),
       xmlReader = Xerces.getFilteredXMLReader(
         Seq(new EvalFilter(substitutions)) ++
         mathFilter.toSeq
         // ++ Seq(new TracingFilter)
       ),
-      outputFile
+      // do not output the 'main' file when chunking in XSLT 1.0
+      outputFile = if (docBook2.usesRootFile) Some(saxonOutputFile) else None
     )
 
     copyImagesAndCss(docBook2, saxonOutputDirectory)
@@ -60,8 +59,9 @@ final class ProcessDocBook(
     // Post-processing.
     if (docBook2.usesIntermediate) {
       logger.info(s"Post-processing ${docBook2.name}")
-      val outputDirectory: File = forDocument.outputDirectory(docBook2)
+      val outputDirectory: File = forDocument.outputDirectory(variant)
       outputDirectory.mkdirs
+      val outputFile = forDocument.outputFile(variant)
 
       if (isPdf) {
         val fopPlugin: Option[FopPlugin] =
@@ -71,20 +71,20 @@ final class ProcessDocBook(
         Fop.run(
           saxon = Saxon.Saxon10,
           configurationFile = layout.fopConfigurationFile,
-          substitutions.get("creationDate"),
-          substitutions.get("author"),
-          substitutions.get("title"),
-          substitutions.get("subject"),
-          substitutions.get("keywords"),
-          plugin = fopPlugin,
+          creationDate = substitutions.get("creationDate"),
+          author = substitutions.get("author"),
+          title = substitutions.get("title"),
+          subject = substitutions.get("subject"),
+          keywords = substitutions.get("keywords"),
           inputFile = saxonOutputFile,
-          outputFile = forDocument.outputFile(docBook2)
+          outputFile,
+          fopPlugin,
         )
       }
 
       docBook2.postProcess(
         inputDirectory = saxonOutputDirectory,
-        outputFile = forDocument.outputFile(docBook2)
+        outputFile
       )
     }
   }

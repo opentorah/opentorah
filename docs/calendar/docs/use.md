@@ -1,7 +1,7 @@
 Import angles-related classes:
 
 ```scala
-import org.opentorah.calendar.angles.Angles
+import org.opentorah.angles.Angles
 import Angles.{Position, Rotation}
 ```
 
