@@ -7,18 +7,19 @@ trait Epub extends DocBook2 {
   final override def usesRootFile: Boolean = false
   final override def copyDestinationDirectoryName: Option[String] = Some("OEBPS")
   final override def usesIntermediate: Boolean = true
-  final override def additionalSections: List[Section] =  List(HtmlCommon, Common)
-  final override def epubEmbeddedFontsParameter: Option[String] = Some("epub.embedded.fonts")
-  final override def baseDirParameter: Option[String] = Some("base.dir")
-  final override def rootFilenameParameter: Option[String] = Some("root.filename")
-  final override def chunkQuietlyParameter: Option[String] = Some("chunk.quietly")
+  final override def commonSections: List[CommonSection] =  List(Common, HtmlCommon)
 
-  final override def defaultParameters: Map[String, String] = Map(
+  final override protected def epubEmbeddedFontsParameter: Option[String] = Some("epub.embedded.fonts")
+  final override protected def baseDirParameter: Option[String] = Some("base.dir")
+  final override protected def rootFilenameParameter: Option[String] = Some("root.filename")
+  final override protected def chunkQuietlyParameter: Option[String] = Some("chunk.quietly")
+
+  final override def defaultParameters: Section.Parameters = Map(
   )
 
-  final override def mainStylesheet(isMathJaxEnabled: Boolean): String = ""
+  final override protected def mainStylesheetBody(isMathJaxEnabled: Boolean): String = ""
 
-  final override def customStylesheet: String = ""
+  final override protected def customStylesheetBody: String = ""
 
   final override def postProcess(
     inputDirectory: File,

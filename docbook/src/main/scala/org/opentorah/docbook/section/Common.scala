@@ -1,17 +1,15 @@
 package org.opentorah.docbook.section
 
-object Common extends Section {
+object Common extends CommonSection {
   override def name: String = "common"
 
-  override def defaultParameters: Map[String, String] = Map(
+  override def defaultParameters: Section.Parameters = Map(
     "toc.section.depth" -> "4",
     "section.autolabel" -> "0",
     "runinhead.default.title.end.punct" -> ""
   )
 
-  override def mainStylesheet(isMathJaxEnabled: Boolean): String = ""
-
-  override def customStylesheet: String =
+  override protected def customStylesheetBody: String =
     s"""  <!-- This is needed (?) for template-tweaking customizations, like removal of "Chapter" in chapter title -->
        |  <xsl:param name="local.l10n.xml" select="document('')"/>
        |

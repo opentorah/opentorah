@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.51] - 2020-06-23
+- added output format `variants` (like `pdf-a4`);
+
 ## [0.7.50] - 2020-05-31
 - merged into opentorah.org monorepo;
 - moved common code to appropriate modules;

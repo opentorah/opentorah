@@ -1,16 +1,14 @@
 package org.opentorah.docbook.section
 
-object HtmlCommon extends Section {
+object HtmlCommon extends CommonSection {
   override def name: String = "htmlCommon"
 
-  override def defaultParameters: Map[String, String] = Map(
+  override def defaultParameters: Section.Parameters = Map(
     "use.id.as.filename" -> "yes",
     "chunker.output.encoding" -> "UTF-8",
     "chunker.output.indent" -> "yes",
     "chunk.first.sections" -> "1"
   )
 
-  override def mainStylesheet(isMathJaxEnabled: Boolean): String = ""
-
-  override def customStylesheet: String = ""
+  override protected def customStylesheetBody: String = ""
 }

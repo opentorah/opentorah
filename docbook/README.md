@@ -25,11 +25,13 @@ only ("HTML2"). For PDF, DocBook is first processed into
 [XSL-FO](https://www.xml.com/articles/2017/01/01/what-is-xsl-fo/), which is post-processed by
 [Apache FOP](https://xmlgraphics.apache.org/fop/). For PDF,
 [JEuclid](http://jeuclid.sourceforge.net/) or MathJax FOP plugin can be enabled to process mathematics.
-Document name(s) and the list of the output formats are configurable.
+Document name(s) and the list of the output formats are configurable; variants with different settings
+for the same output format are supported.
 
 XSL parameters can be configured in the `Gradle` build file using `parameters` map.
-There are sections (and customization files) for each output format, for all HTML-like formats
-(`htmlCommon`), and for all formats (`common`) (only `html2` applies to `html2`).
+There are sections (and customization files) for each output format, for variants of a format,
+for all HTML-like formats (`htmlCommon`), and for all formats (`common`) (only `html2` applies to `html2`).
+Parameters set in a more general section can be overridden in a more specific one.
 
 Values configured as `substitutions` are available within the DocBook documents by
 their names. This mechanism can be used to insert things like processing date or the
@@ -39,16 +41,17 @@ If a data generator class is configured, its `main()` method will be executed wi
 a directory path as a parameter. References in DocBook documents that are prefixed
 with `data:` are resolved to files in that directory.
 
-For each output format, plugin uses three XSL files: main, `-custom` and `-params`.
+For each output format or its variant, plugin uses three XSL files: main, `-custom` and `-params`.
 Main and `-params` files are overwritten by the plugin at each run; `-custom` stylesheet
-can be used to override templates that need customization, define attribute sets (and to
-set parameters, although it seems cleaner to set them in the `Gradle` build file).
+can be used to override templates that need customization, define attribute sets and to
+set parameters (although it seems cleaner to set them in the `Gradle` build file).
 Main file imports appropriate official DocBook XSLT stylesheet,
 `-param` file and customization files for all applicable sections (from general to specific).
 (Since XSL parameters have the value assigned to them last, `-custom`
 needs to be imported after plugin sets the values of the parameters; since import
 elements must come before all others, plugin sets the parameters in a separate `-param`
 XSL file that is imported before `-custom`.) 
+Customizations shared between formats are in `common-custom` and `htmlCommon-custom`.
 
 Plugin generates an XML catalog `catalog.xml` and a DTD with all the configured substitutions,
 both of which are overwritten at each run; main catalog chains into `catalog-custom.xml`,
@@ -109,7 +112,8 @@ its [FOP plugin](http://jeuclid.sourceforge.net/jeuclid-fop/);
 [MathJax-node](https://github.com/mathjax/MathJax-node);
 - [Sten Roger Sandvik](https://github.com/srs) for [Gradle Node plugin](https://github.com/srs/gradle-node-plugin)
   which served as inspiration for the Node support code;
-- [Ian Bull](https://github.com/irbull) for [J2V8](https://github.com/eclipsesource/J2V8).
+- [Ian Bull](https://github.com/irbull) for [J2V8](https://github.com/eclipsesource/J2V8);
+- [Stuart Johnston](https://github.com/sgjohnston) for inspiring variants functionality.
 
 
 ## Applying to a Gradle project ##
@@ -190,7 +194,14 @@ docBook {
     "pdf" : [
       "symbol.font.family": "DejaVu Sans",
       "body.font.master"  : "12"
+    ],
+    "pdf-letter" : [
+      "paper.type": "USletter"
+    ],
+    "pdf-a4" : [
+      "paper.type": "A4"
     ]
+    // if variants are used and one of the `documents` is named the same as one of the configured variants, effect is undefined :)
   ]
 
   substitutions = [
@@ -231,6 +242,9 @@ docBook.parameters.html2 = [
 ]
 
 ```
+
+Default variant of an output format (e.g., `pdf`) is processed only if there are no named variants configured for the
+same output format (e.g. `pdf-a4`).
 
 ## Substitutions ##
 
@@ -348,16 +362,20 @@ Overview of the directory layout used by the plugin:
        epub3/<documents 1>.epub
        html/...
        pdf/<documents 1>.pdf
+     pdf-<variant 1>/
+       ...
      ...  
 
    build/docBookTmp/
      data/
      epub/
-     fo/
-     <documents 1>/
+     pdf/
+     <document 1>/
        data/
        epub/
-       fo/
+       pdf/
+     pdf-<variant 1>/
+       ...
      ...  
 ```
 
@@ -370,7 +388,7 @@ Sources (under `src/main`) contain:
 - images used in the DocBook files - in `images/`;
 - CSS stylesheet that is used for HTML and EPUB - in `css/docBook.css`;
 - additional CSS files imported by the main one - in `css/`  
-- DocBook XSLT customizations (specific to the output format) - in `xsl/html.xsl` and the like;
+- DocBook XSLT customizations (specific to the output format or a variant) - in `xsl/html.xsl` and the like;
 - FOP configuration - in `fop/fop.xconf`;
 - XML catalog and substitutions DTD - in `xml/catalog.xml`, `xml/catalog-custom.xml` and `xml/substitutions.dtd`;
 
