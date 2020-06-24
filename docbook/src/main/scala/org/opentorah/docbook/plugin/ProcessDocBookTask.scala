@@ -6,7 +6,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
-import org.opentorah.docbook.section.{CommonSection, DocBook2, Sections, Section, Variant}
+import org.opentorah.docbook.section.{CommonSection, DocBook2, Section, Sections, Variant}
 import org.opentorah.fop.{Fop, FopFonts}
 import org.opentorah.mathjax
 import org.opentorah.mathjax.MathJax
@@ -245,6 +245,10 @@ class ProcessDocBookTask extends DefaultTask {
         mathJaxConfiguration
       )
 
+      val customStylesheets: Seq[String] =
+        docBook2.commonSections.map(layout.customStylesheet) ++
+        (variant.baseVariant.toSeq :+ variant).map(layout.customStylesheet)
+
       // xsl:param has the last value assigned to it, so customization must come last;
       // since it is imported (so as not to be overwritten), and import elements must come first,
       // a separate "-param" file is written with the "default" values for the parameters :)
@@ -255,7 +259,7 @@ class ProcessDocBookTask extends DefaultTask {
           paramsStylesheetName = layout.paramsStylesheet(variant),
           stylesheetUri = s"${Stylesheets(docBook2.usesDocBookXslt2).uri}/${docBook2.stylesheetUriName}.xsl",
           nonOverridableParameters,
-          customStylesheets = docBook2.commonSections.map(layout.customStylesheet) :+ layout.customStylesheet(variant),
+          customStylesheets,
           enableMathJax
         )
       )
