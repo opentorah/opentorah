@@ -7,7 +7,7 @@ plugins {
 description = 'Archive Collector Service'
 
 configureService(
-  'gcr.io/alter-rebbe/collector',
+  'gcr.io/alter-rebbe-2/collector',
   'org.opentorah.collector.Service'
 )
 

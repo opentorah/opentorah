@@ -3,7 +3,7 @@ package org.opentorah.mathjax
 import java.io.{InputStream, StringBufferInputStream}
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory
 import org.apache.fop.util.UnclosableInputStream
-import org.opentorah.xml.Xerces
+import org.opentorah.xml.{Namespace, Xerces}
 import org.w3c.dom.svg.SVGDocument
 
 object Svg {
