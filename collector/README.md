@@ -52,7 +52,7 @@ To compress facsimiles:
 
 To sync with the bucket:
 ```
-  $ gsutil -m rsync -r -c -d <path-to-local-copy-of-the-bucket> gs://facsimiles.alter-rebbe.org
+  $ gsutil -m rsync -r -d <path-to-local-copy-of-the-bucket> gs://facsimiles.alter-rebbe.org
 ```
 
 ## Compute ##
@@ -60,20 +60,18 @@ To sync with the bucket:
 I am using [Cloud Run](https://cloud.google.com/run#key-features)
 ([Unofficial FAQ](https://github.com/ahmetb/cloud-run-faq)).
 
-Service `collector` (`940416907592-compute@developer.gserviceaccount.com`;
-URL `https://collector-qfkasghxtq-uk.a.run.app`) runs in us-eat4 and allows
-unauthenticated requests.
+Service `collector` runs in us-eat4 and allows unauthenticated requests.
 DNS has CNAME record for `app.alter-rebbe.org` that points to `ghs.googlehosted.com.`.
 
 For monitoring, there is Stackdriver (Logging, Monitoring, Error reporting),
 Cloud Debugger and Cloud Profiler.
 
 I am using [jib](https://github.com/GoogleContainerTools/jib) Gradle Plugin to
-build and deploy my Docker image (`gcr.io/alter-rebbe/collector`).
+build and deploy my Docker image (`gcr.io/alter-rebbe-2/collector`).
 
 It is possible to tag the image with a timestamp:
 ```
-  jib.to.image = 'gcr.io/my-gcp-project/my-app:' + System.nanoTime()
+  jib.to.image = 'gcr.io/my-gcp-project-id/my-app:' + System.nanoTime()
 ```
 
 Locally, is possible to run [javaagent](https://github.com/GoogleContainerTools/jib/blob/master/docs/faq.md#i-would-like-to-run-my-application-with-a-javaagent).
@@ -110,7 +108,7 @@ and then:
 
 To deploy on the Cloud Run:
 ```
-  $ gcloud run deploy collector --image gcr.io/alter-rebbe/collector --platform managed --region=us-east4
+  $ gcloud run deploy collector --image gcr.io/alter-rebbe-2/collector --platform managed --region=us-east4
 ```
 
 Arguments to the entry point:

@@ -90,10 +90,9 @@ ext.configureLibrary = {
             developer {
               id = 'dub'
               name = 'Leonid Dubinsky'
-              email = 'dub@podval.org'
-              url = 'http://dub.podval.org'
-              organization = 'Podval Group'
-              organizationUrl = 'http://www.podval.org'
+              email = 'dub@opentorah.org'
+              organization = 'Open Torah Project'
+              organizationUrl = 'http://www.opentorah.org'
               timezone = '-5'
             }
           }

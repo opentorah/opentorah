@@ -13,6 +13,4 @@ configureLibrary(['Scala', 'Jewish', 'TEI'])
 dependencies {
   implementation project(':store')
   implementation project(':util')
-
-  runtimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
 }
