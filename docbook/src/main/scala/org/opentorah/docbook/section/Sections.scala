@@ -65,7 +65,7 @@ object Sections {
     for ((name: String, sectionParameters: Parameters) <- parameters) {
       val (sectionName: String, variantName: Option[String]) = Util.split(name, '-')
       if (variantName.isEmpty) {
-        val docBook2 = DocBook2.find(sectionName)
+        val docBook2: Option[DocBook2] = DocBook2.find(sectionName)
         if (docBook2.isEmpty) commonSections += ((CommonSection.forName(sectionName), sectionParameters))
         else docBook2s += ((docBook2.get, sectionParameters))
       } else {

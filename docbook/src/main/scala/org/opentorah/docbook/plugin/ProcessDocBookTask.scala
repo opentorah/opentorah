@@ -183,8 +183,8 @@ class ProcessDocBookTask extends DefaultTask {
       file = layout.catalogFile,
       replace = true,
       content = ProcessDocBookTask.xmlCatalog(
-        xslt1 = Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout),
-        xslt2 = Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout),
+        xslt1 = Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout.docBookXslDirectory),
+        xslt2 = Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout.docBookXslDirectory),
         catalogGroupBase = layout.catalogGroupBase,
         substitutionsDtdFileName = layout.substitutionsDtdFileName,
         catalogCustomFileName = layout.catalogCustomFileName,
@@ -305,13 +305,17 @@ class ProcessDocBookTask extends DefaultTask {
     logger.lifecycle("Output variants: " + variants.map(_.fullName).mkString("[", ", ", "]"))
 
     val processDocBook: ProcessDocBook = new ProcessDocBook(
-      getProject,
+      project = getProject,
       // In processing instructions and CSS, substitute xslParameters also - because why not?
       substitutions = sections.substitutions ++ substitutionsMap,
       resolver = new Resolver(layout.catalogFile),
-      isJEuclidEnabled.get,
+      isJEuclidEnabled = isJEuclidEnabled.get,
       mathJax,
-      layout
+      fopConfigurationFile = layout.fopConfigurationFile,
+      imagesDirectory = layout.imagesDirectory,
+      imagesDirectoryName = layout.imagesDirectoryName,
+      cssDirectory = layout.cssDirectory,
+      cssDirectoryName = layout.cssDirectoryName
     )
 
     // Process DocBook :)
@@ -320,7 +324,16 @@ class ProcessDocBookTask extends DefaultTask {
       (documentName: String, prefixed: Boolean) <- inputDocuments
     } {
       logger.lifecycle(s"DocBook: processing '$documentName' to ${variant.fullName}.")
-      processDocBook.run(variant, prefixed, documentName)
+      val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)
+      processDocBook.run(
+        docBook2 = variant.docBook2,
+        inputFile = layout.inputFile(documentName),
+        stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(variant)),
+        saxonOutputDirectory = forDocument.saxonOutputDirectory(variant),
+        saxonOutputFile = forDocument.saxonOutputFile(variant),
+        outputDirectory = forDocument.outputDirectory(variant),
+        outputFile = forDocument.outputFile(variant)
+      )
     }
   }
 
