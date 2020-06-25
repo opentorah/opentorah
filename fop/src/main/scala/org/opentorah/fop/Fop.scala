@@ -2,6 +2,7 @@ package org.opentorah.fop
 
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import org.apache.fop.apps.{FOUserAgent, FopFactory}
+import org.opentorah.mathjax.Svg
 import org.opentorah.util.Util
 import org.opentorah.xml.{Saxon, Xml}
 import org.slf4j.{Logger, LoggerFactory}
@@ -49,6 +50,8 @@ object Fop {
          |)""".stripMargin
     )
 
+    Svg.forceXerces()
+
     val fopFactory: FopFactory = FopFactoryFactory.newFactory(configurationFile, inputFile)
 
     plugin.foreach(_.configure(fopFactory))
@@ -74,7 +77,7 @@ object Fop {
     )
   }
 
-  def setPdfMetadata(
+  private def setPdfMetadata(
     foUserAgent: FOUserAgent,
     creationDate: Option[String],
     author: Option[String],
@@ -94,7 +97,7 @@ object Fop {
     foUserAgent.setKeywords(keywords.orNull)
   }
 
-  def run(
+  private def run(
     saxon: Saxon,
     fopFactory: FopFactory,
     foUserAgent: FOUserAgent,

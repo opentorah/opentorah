@@ -10,12 +10,12 @@ There are a few ongoing projects:
 - paper ([HTML](/dream/paper/html/index.html), [PDF](/dream/paper/pdf/dream.pdf),
   [EPUB](/dream/paper/epub2/dream.epub)) describing ideas (dating from 1991) for the dream environment for
    working with Jewish texts;
-- companion paper ([HTML](/typesetting/paper/html/index.html), [PDF](/typesetting/paper/pdf/dream.pdf),
-  [EPUB](/typesetting/paper/epub2/dream.epub)) on typesetting Jewish texts;
+- companion paper ([HTML](/typesetting/paper/html/index.html), [PDF](/typesetting/paper/pdf/typesetting.pdf),
+  [EPUB](/typesetting/paper/epub2/typesetting.epub)) on typesetting Jewish texts;
 - [code](https://github.com/opentorah/opentorah/tree/master/store) implementing some of those ideas and
   [code](https://github.com/opentorah/opentorah/tree/master/texts) for working with specific Jewish texts;
-- paper ([HTML](/calendar/paper/html/index.html), [PDF](/calendar/paper/pdf/dream.pdf),
-  [EPUB](/calendar/paper/epub2/dream.epub)) on Rambam's Laws of the Sanctification of the Moon;
+- paper ([HTML](/calendar/paper/html/index.html), [PDF](/calendar/paper/pdf/calendar.pdf),
+  [EPUB](/calendar/paper/epub2/calendar.epub)) on Rambam's Laws of the Sanctification of the Moon;
   goals of the paper:
   - reconstruct models that Rambam uses and their parameters from the Rambam's text;
   - identify misprints in the traditional editions; 
