@@ -86,7 +86,7 @@ trait DocBook2 extends Section {
     ).flatten.toMap)
 
   def nonOverridableParameters(
-    baseDir: String,
+    saxonOutputDirectory: File,
     documentName: String,
     epubEmbeddedFontsString: String,
     cssFile: String,
@@ -95,7 +95,7 @@ trait DocBook2 extends Section {
     mathJaxConfiguration: mathjax.Configuration
   ): Section.Parameters = Seq[Option[(String, String)]](
     Some("img.src.path", imagesDirectoryName + "/"),
-    parameter(_.baseDirParameter, baseDir),
+    parameter(_.baseDirParameter, saxonOutputDirectory.getAbsolutePath + "/"),
     parameter(_.rootFilenameParameter, rootFilename(documentName)),
     parameter(_.epubEmbeddedFontsParameter, epubEmbeddedFontsString),
     parameter(_.htmlStylesheetsParameter, cssFile),

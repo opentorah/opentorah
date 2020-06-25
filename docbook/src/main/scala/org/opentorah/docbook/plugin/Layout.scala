@@ -128,8 +128,6 @@ object Layout {
   trait ForDocument {
     def mainStylesheet(variant: Variant): String
 
-    final def baseDir(variant: Variant): String = saxonOutputDirectory(variant).getAbsolutePath + "/"
-
     final def saxonOutputDirectory(variant: Variant): File = outputDirectory(variant, isSaxon = true)
 
     final def outputDirectory(variant: Variant): File = outputDirectory(variant, isSaxon = false)
