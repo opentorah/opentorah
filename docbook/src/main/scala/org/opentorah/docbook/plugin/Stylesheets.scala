@@ -16,12 +16,12 @@ trait Stylesheets {
 
   protected def archiveSubdirectoryPath: Seq[String]
 
-  def unpack(version: String, project: Project, layout: Layout): File = {
+  def unpack(version: String, project: Project, docBookXslDirectory: File): File = {
     val classifierStr: String = classifier.fold("")(classifier => s":$classifier")
     val dependencyNotation: String = s"$groupId:$artifactId:$version$classifierStr@$extension"
 
     val file: File = Gradle.getArtifact(project, dependencyNotation).get
-    val into: File = new File(layout.docBookXslDirectory, file.getName)
+    val into: File = new File(docBookXslDirectory, file.getName)
     val directory: File = Files.file(into, archiveSubdirectoryPath)
     if (!directory.exists) Gradle.unpack(
       project,

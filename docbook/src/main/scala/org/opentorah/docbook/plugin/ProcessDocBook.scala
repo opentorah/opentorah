@@ -2,7 +2,7 @@ package org.opentorah.docbook.plugin
 
 import java.io.File
 import org.gradle.api.Project
-import org.opentorah.docbook.section.{DocBook2, Variant}
+import org.opentorah.docbook.section.DocBook2
 import org.opentorah.fop.{Fop, FopPlugin, JEuclidFopPlugin, MathJaxFopPlugin}
 import org.opentorah.mathjax.MathJax
 import org.opentorah.util.{Files, Gradle}
@@ -15,24 +15,26 @@ final class ProcessDocBook(
   resolver: Resolver,
   isJEuclidEnabled: Boolean,
   mathJax: Option[MathJax],
-  layout: Layout
+  fopConfigurationFile: File,
+  imagesDirectory: File,
+  imagesDirectoryName: String,
+  cssDirectory: File,
+  cssDirectoryName: String
 ) {
   private val logger: Logger = LoggerFactory.getLogger(classOf[ProcessDocBook])
 
   def run(
-    variant: Variant,
-    prefixed: Boolean,
-    documentName: String
+    docBook2: DocBook2,
+    inputFile: File,
+    stylesheetFile: File,
+    saxonOutputDirectory: File,
+    saxonOutputFile: File,
+    outputDirectory: File,
+    outputFile: File
   ): Unit = {
-    val docBook2: DocBook2 = variant.docBook2
-
     val isPdf: Boolean = docBook2.isPdf
 
-    val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)
-
-    val saxonOutputDirectory: File = forDocument.saxonOutputDirectory(variant)
     saxonOutputDirectory.mkdirs
-    val saxonOutputFile: File = forDocument.saxonOutputFile(variant)
 
     val mathFilter: Option[MathFilter] =
       if (mathJax.isDefined && isPdf) Some(new MathFilter(mathJax.get.configuration)) else None
@@ -43,8 +45,8 @@ final class ProcessDocBook(
     val saxon: Saxon = if (!docBook2.usesDocBookXslt2) Saxon.Saxon6 else Saxon.Saxon10
     saxon.transform(
       resolver,
-      inputFile = layout.inputFile(documentName),
-      stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(variant)),
+      inputFile,
+      stylesheetFile,
       xmlReader = Xerces.getFilteredXMLReader(
         Seq(new EvalFilter(substitutions)) ++
         mathFilter.toSeq
@@ -59,9 +61,7 @@ final class ProcessDocBook(
     // Post-processing.
     if (docBook2.usesIntermediate) {
       logger.info(s"Post-processing ${docBook2.name}")
-      val outputDirectory: File = forDocument.outputDirectory(variant)
       outputDirectory.mkdirs
-      val outputFile = forDocument.outputFile(variant)
 
       if (isPdf) {
         val fopPlugin: Option[FopPlugin] =
@@ -70,7 +70,7 @@ final class ProcessDocBook(
 
         Fop.run(
           saxon = Saxon.Saxon10,
-          configurationFile = layout.fopConfigurationFile,
+          configurationFile = fopConfigurationFile,
           creationDate = substitutions.get("creationDate"),
           author = substitutions.get("author"),
           title = substitutions.get("title"),
@@ -98,16 +98,16 @@ final class ProcessDocBook(
     logger.info(s"Copying images")
     Gradle.copyDirectory(project,
       into,
-      from = layout.imagesDirectory.getParentFile,
-      directoryName = layout.imagesDirectoryName
+      from = imagesDirectory.getParentFile,
+      directoryName = imagesDirectoryName
     )
 
     if (docBook2.usesCss) {
       logger.info(s"Copying CSS")
       Gradle.copyDirectory(project,
         into,
-        from = layout.cssDirectory.getParentFile,
-        directoryName = layout.cssDirectoryName,
+        from = cssDirectory.getParentFile,
+        directoryName = cssDirectoryName,
         substitutions = substitutions
       )
     }
