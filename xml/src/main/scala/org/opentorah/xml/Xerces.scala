@@ -14,6 +14,7 @@ object Xerces {
     result
   }
 
+  val saxParserFactoryProperty: String = classOf[javax.xml.parsers.SAXParserFactory].getName
   val saxParserFactoryName: String = classOf[org.apache.xerces.jaxp.SAXParserFactoryImpl].getName
   val saxParserName: String = classOf[org.apache.xerces.parsers.SAXParser].getName
 
