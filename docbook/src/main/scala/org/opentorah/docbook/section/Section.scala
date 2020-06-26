@@ -7,7 +7,7 @@ trait Section {
 
   def name: String
 
-  def defaultParameters: Section.Parameters
+  def parameters(isInfoEnabled: Boolean): Section.Parameters
 
   final def customStylesheet: String =
     s"""${Xml.header}

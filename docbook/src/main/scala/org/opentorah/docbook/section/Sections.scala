@@ -19,11 +19,9 @@ final class Sections(
     isInfoEnabled: Boolean
   ): Seq[(String, Parameters)] = {
     val docBook2: DocBook2 = variant.docBook2
-    val dynamicParameters: Map[Section, Section.Parameters] = docBook2.dynamicParameters(isInfoEnabled)
 
     def bracket(section: Section, nonDefaultParameters: Option[Parameters]): Parameters =
-      section.defaultParameters ++
-      dynamicParameters.getOrElse(section, Map.empty) ++
+      section.parameters(isInfoEnabled) ++
       nonDefaultParameters.getOrElse(Map.empty)
 
     @scala.annotation.tailrec
@@ -34,15 +32,12 @@ final class Sections(
         prune(acc :+ (sectionName, sectionParameters -- overriden), nextTail)
     }
 
-    val variantResult: Seq[(String, Parameters)] =
-      if (variant.name.isEmpty) Seq.empty else Seq(variant.fullName -> find(variant))
-
     val result: Seq[(String, Parameters)] =
       docBook2.commonSections.map { commonSection: CommonSection =>
         commonSection.name -> bracket(commonSection, commonSections.get(commonSection))
       } ++ Seq(
         docBook2.name -> bracket(docBook2, docBook2s.get(docBook2))
-      ) ++ variantResult
+      ) ++ (if (variant.name.isEmpty) Seq.empty else Seq(variant.fullName -> find(variant)))
 
     prune(Seq.empty, result)
   }

@@ -20,11 +20,9 @@ object Html extends DocBook2 {
   override protected def baseDirParameter: Option[String] = Some("base.dir")
   override protected def rootFilenameParameter: Option[String] = Some("root.filename")
   override protected def htmlStylesheetsParameter: Option[String] = Some("html.stylesheet")
-  override protected def chunkQuietlyParameter: Option[String] = Some("chunk.quietly")
   override protected def mathJaxConfigurationParameter: Option[String] = Some(mathJaxConfigurationParameterName)
 
-  override def defaultParameters: Section.Parameters = Map(
-  )
+  override def parameters(isInfoEnabled: Boolean): Section.Parameters = Map.empty
 
   val mathJaxConfigurationParameterName: String = "mathjax.configuration"
 

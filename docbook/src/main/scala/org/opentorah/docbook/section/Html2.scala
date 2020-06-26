@@ -12,7 +12,7 @@ object Html2 extends DocBook2 {
   override protected def baseDirParameter: Option[String] = Some("base.dir")
   override protected def htmlStylesheetsParameter: Option[String] = Some("html.stylesheets")
 
-  override def defaultParameters: Section.Parameters = Map(
+  override def parameters(isInfoEnabled: Boolean): Section.Parameters = Map(
     "use.id.as.filename" -> "yes",
     "toc.section.depth" -> "4"
   )

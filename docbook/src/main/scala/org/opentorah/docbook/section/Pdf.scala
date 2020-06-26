@@ -10,7 +10,7 @@ object Pdf extends DocBook2 {
   override protected def intermediateFileExtension: String = "fo"
   override def commonSections: List[CommonSection] = List(Common)
 
-  override def defaultParameters: Section.Parameters = Map(
+  override def parameters(isInfoEnabled: Boolean): Section.Parameters = Map(
     // Paper size; double-sidedness; not a draft
     "paper.type" -> "USletter",
     "double.sided" -> "yes",

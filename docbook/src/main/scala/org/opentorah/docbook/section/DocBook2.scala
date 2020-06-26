@@ -80,11 +80,6 @@ trait DocBook2 extends Section {
     else s"""  <xsl:param name="$name"/>"""
   }.mkString("\n")
 
-  def dynamicParameters(isInfoEnabled: Boolean): Map[Section, Section.Parameters] = Map.empty
-    .updated(HtmlCommon, Seq[Option[(String, String)]](
-      if (isInfoEnabled) None else parameter(_.chunkQuietlyParameter, "1")
-    ).flatten.toMap)
-
   def nonOverridableParameters(
     saxonOutputDirectory: File,
     documentName: String,
@@ -113,7 +108,6 @@ trait DocBook2 extends Section {
   final def usesCss: Boolean = htmlStylesheetsParameter.nonEmpty
   protected def htmlStylesheetsParameter: Option[String] = None
   protected def epubEmbeddedFontsParameter: Option[String] = None
-  protected def chunkQuietlyParameter: Option[String] = None
   protected def mathJaxConfigurationParameter: Option[String] = None
 
   final def rootFileNameWithExtension(inputFileName: String, isIntermediate: Boolean): String =

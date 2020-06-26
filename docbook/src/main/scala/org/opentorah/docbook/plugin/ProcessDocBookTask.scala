@@ -224,6 +224,25 @@ class ProcessDocBookTask extends DefaultTask {
 
     val enableMathJax: Boolean = isMathJaxEnabled.get || isJEuclidEnabled.get
 
+    // Custom stylesheet
+    for (section: CommonSection <- CommonSection.all) Files.write(
+      file = layout.stylesheetFile(layout.customStylesheet(section)),
+      replace = false,
+      content = section.customStylesheet
+    )
+    for (variant: Variant <- sections.allVariants) Files.write(
+      file = layout.stylesheetFile(layout.customStylesheet(variant)),
+      replace = false,
+      content = variant.docBook2.customStylesheet
+    )
+
+    // Parameters stylesheet
+    for (variant: Variant <- sections.allVariants) Files.write(
+      file = layout.stylesheetFile(layout.paramsStylesheet(variant)),
+      replace = true,
+      content = variant.docBook2.paramsStylesheet(sections.parameters(variant, logger.isInfoEnabled))
+    )
+
     // Main stylesheet
     for {
       variant: Variant <- sections.allVariants
@@ -262,25 +281,6 @@ class ProcessDocBookTask extends DefaultTask {
         )
       )
     }
-
-    // Parameters stylesheet
-    for (variant: Variant <- sections.allVariants) Files.write(
-      file = layout.stylesheetFile(layout.paramsStylesheet(variant)),
-      replace = true,
-      content = variant.docBook2.paramsStylesheet(sections.parameters(variant, logger.isInfoEnabled))
-    )
-
-    // Custom stylesheet
-    for (section: CommonSection <- CommonSection.all) Files.write(
-      file = layout.stylesheetFile(layout.customStylesheet(section)),
-      replace = false,
-      content = section.customStylesheet
-    )
-    for (variant: Variant <- sections.allVariants) Files.write(
-      file = layout.stylesheetFile(layout.customStylesheet(variant)),
-      replace = false,
-      content = variant.docBook2.customStylesheet
-    )
 
     // Data generation
     val mainClass: String = dataGeneratorClass.get
