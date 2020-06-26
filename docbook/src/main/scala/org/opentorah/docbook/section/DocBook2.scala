@@ -12,9 +12,9 @@ trait DocBook2 extends Section {
 
   def usesIntermediate: Boolean = false
 
-  def outputFileExtension: String
+  protected def outputFileExtension: String
 
-  def intermediateFileExtension: String = outputFileExtension
+  protected def intermediateFileExtension: String = outputFileExtension
 
   // From general to specific
   final def parameterSections: List[Section] =  commonSections :+ this
@@ -80,13 +80,8 @@ trait DocBook2 extends Section {
     else s"""  <xsl:param name="$name"/>"""
   }.mkString("\n")
 
-  def dynamicParameters(isInfoEnabled: Boolean): Map[Section, Section.Parameters] = Map.empty
-    .updated(HtmlCommon, Seq[Option[(String, String)]](
-      if (isInfoEnabled) None else parameter(_.chunkQuietlyParameter, "1")
-    ).flatten.toMap)
-
   def nonOverridableParameters(
-    baseDir: String,
+    saxonOutputDirectory: File,
     documentName: String,
     epubEmbeddedFontsString: String,
     cssFile: String,
@@ -95,7 +90,7 @@ trait DocBook2 extends Section {
     mathJaxConfiguration: mathjax.Configuration
   ): Section.Parameters = Seq[Option[(String, String)]](
     Some("img.src.path", imagesDirectoryName + "/"),
-    parameter(_.baseDirParameter, baseDir),
+    parameter(_.baseDirParameter, saxonOutputDirectory.getAbsolutePath + "/"),
     parameter(_.rootFilenameParameter, rootFilename(documentName)),
     parameter(_.epubEmbeddedFontsParameter, epubEmbeddedFontsString),
     parameter(_.htmlStylesheetsParameter, cssFile),
@@ -113,8 +108,10 @@ trait DocBook2 extends Section {
   final def usesCss: Boolean = htmlStylesheetsParameter.nonEmpty
   protected def htmlStylesheetsParameter: Option[String] = None
   protected def epubEmbeddedFontsParameter: Option[String] = None
-  protected def chunkQuietlyParameter: Option[String] = None
   protected def mathJaxConfigurationParameter: Option[String] = None
+
+  final def rootFileNameWithExtension(inputFileName: String, isIntermediate: Boolean): String =
+    rootFilename(inputFileName) + "." + (if (isIntermediate) intermediateFileExtension else outputFileExtension)
 
   final def rootFilename(inputFileName: String): String =
     outputFileNameOverride.getOrElse(inputFileName)

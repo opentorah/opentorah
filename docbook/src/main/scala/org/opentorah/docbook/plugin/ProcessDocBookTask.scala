@@ -224,6 +224,25 @@ class ProcessDocBookTask extends DefaultTask {
 
     val enableMathJax: Boolean = isMathJaxEnabled.get || isJEuclidEnabled.get
 
+    // Custom stylesheet
+    for (section: CommonSection <- CommonSection.all) Files.write(
+      file = layout.stylesheetFile(layout.customStylesheet(section)),
+      replace = false,
+      content = section.customStylesheet
+    )
+    for (variant: Variant <- sections.allVariants) Files.write(
+      file = layout.stylesheetFile(layout.customStylesheet(variant)),
+      replace = false,
+      content = variant.docBook2.customStylesheet
+    )
+
+    // Parameters stylesheet
+    for (variant: Variant <- sections.allVariants) Files.write(
+      file = layout.stylesheetFile(layout.paramsStylesheet(variant)),
+      replace = true,
+      content = variant.docBook2.paramsStylesheet(sections.parameters(variant, logger.isInfoEnabled))
+    )
+
     // Main stylesheet
     for {
       variant: Variant <- sections.allVariants
@@ -232,11 +251,9 @@ class ProcessDocBookTask extends DefaultTask {
       val docBook2: DocBook2 = variant.docBook2
 
       val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)
-      val baseDir: String = forDocument.baseDir(variant)
-      val mainStylesheetFile: String = forDocument.mainStylesheet(variant)
 
       val nonOverridableParameters: Section.Parameters = docBook2.nonOverridableParameters(
-        baseDir,
+        saxonOutputDirectory = forDocument.saxonOutputDirectory(variant),
         documentName,
         epubEmbeddedFontsString,
         cssFile = layout.cssFileRelativeToOutputDirectory(cssFileName),
@@ -253,7 +270,7 @@ class ProcessDocBookTask extends DefaultTask {
       // since it is imported (so as not to be overwritten), and import elements must come first,
       // a separate "-param" file is written with the "default" values for the parameters :)
       Files.write(
-        file = layout.stylesheetFile(mainStylesheetFile),
+        file = layout.stylesheetFile(forDocument.mainStylesheet(variant)),
         replace = true,
         content = docBook2.mainStylesheet(
           paramsStylesheetName = layout.paramsStylesheet(variant),
@@ -264,25 +281,6 @@ class ProcessDocBookTask extends DefaultTask {
         )
       )
     }
-
-    // Parameters stylesheet
-    for (variant: Variant <- sections.allVariants) Files.write(
-      file = layout.stylesheetFile(layout.paramsStylesheet(variant)),
-      replace = true,
-      content = variant.docBook2.paramsStylesheet(sections.parameters(variant, logger.isInfoEnabled))
-    )
-
-    // Custom stylesheet
-    for (section: CommonSection <- CommonSection.all) Files.write(
-      file = layout.stylesheetFile(layout.customStylesheet(section)),
-      replace = false,
-      content = section.customStylesheet
-    )
-    for (variant: Variant <- sections.allVariants) Files.write(
-      file = layout.stylesheetFile(layout.customStylesheet(variant)),
-      replace = false,
-      content = variant.docBook2.customStylesheet
-    )
 
     // Data generation
     val mainClass: String = dataGeneratorClass.get
@@ -324,7 +322,9 @@ class ProcessDocBookTask extends DefaultTask {
       (documentName: String, prefixed: Boolean) <- inputDocuments
     } {
       logger.lifecycle(s"DocBook: processing '$documentName' to ${variant.fullName}.")
+
       val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)
+
       processDocBook.run(
         docBook2 = variant.docBook2,
         inputFile = layout.inputFile(documentName),

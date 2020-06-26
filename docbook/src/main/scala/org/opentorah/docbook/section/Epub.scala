@@ -3,7 +3,7 @@ package org.opentorah.docbook.section
 import java.io.File
 
 trait Epub extends DocBook2 {
-  final override def outputFileExtension: String = "epub"
+  final override protected def outputFileExtension: String = "epub"
   final override def usesRootFile: Boolean = false
   final override def copyDestinationDirectoryName: Option[String] = Some("OEBPS")
   final override def usesIntermediate: Boolean = true
@@ -12,10 +12,8 @@ trait Epub extends DocBook2 {
   final override protected def epubEmbeddedFontsParameter: Option[String] = Some("epub.embedded.fonts")
   final override protected def baseDirParameter: Option[String] = Some("base.dir")
   final override protected def rootFilenameParameter: Option[String] = Some("root.filename")
-  final override protected def chunkQuietlyParameter: Option[String] = Some("chunk.quietly")
 
-  final override def defaultParameters: Section.Parameters = Map(
-  )
+  final override def parameters(isInfoEnabled: Boolean): Section.Parameters = Map.empty
 
   final override protected def mainStylesheetBody(isMathJaxEnabled: Boolean): String = ""
 

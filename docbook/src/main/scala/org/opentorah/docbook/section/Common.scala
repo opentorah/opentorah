@@ -3,7 +3,7 @@ package org.opentorah.docbook.section
 object Common extends CommonSection {
   override def name: String = "common"
 
-  override def defaultParameters: Section.Parameters = Map(
+  override def parameters(isInfoEnabled: Boolean): Section.Parameters = Map(
     "toc.section.depth" -> "4",
     "section.autolabel" -> "0",
     "runinhead.default.title.end.punct" -> ""

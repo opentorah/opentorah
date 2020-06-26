@@ -12,7 +12,7 @@ package org.opentorah.docbook.section
 object Html extends DocBook2 {
   override def name: String = "html"
   override def stylesheetUriName: String = "html/chunkfast"
-  override def outputFileExtension: String = "html"
+  override protected def outputFileExtension: String = "html"
   override protected def outputFileNameOverride: Option[String] = Some("index")
   override def usesRootFile: Boolean = false
   override def commonSections: List[CommonSection] = List(Common, HtmlCommon)
@@ -20,11 +20,9 @@ object Html extends DocBook2 {
   override protected def baseDirParameter: Option[String] = Some("base.dir")
   override protected def rootFilenameParameter: Option[String] = Some("root.filename")
   override protected def htmlStylesheetsParameter: Option[String] = Some("html.stylesheet")
-  override protected def chunkQuietlyParameter: Option[String] = Some("chunk.quietly")
   override protected def mathJaxConfigurationParameter: Option[String] = Some(mathJaxConfigurationParameterName)
 
-  override def defaultParameters: Section.Parameters = Map(
-  )
+  override def parameters(isInfoEnabled: Boolean): Section.Parameters = Map.empty
 
   val mathJaxConfigurationParameterName: String = "mathjax.configuration"
 
