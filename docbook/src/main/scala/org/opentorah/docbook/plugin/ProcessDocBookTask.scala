@@ -252,6 +252,8 @@ class ProcessDocBookTask extends DefaultTask {
 
       val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)
 
+      val stylesheets: Stylesheets = if (docBook2.usesDocBookXslt2) Stylesheets.xslt2 else Stylesheets.xslt1
+
       val nonOverridableParameters: Section.Parameters = docBook2.nonOverridableParameters(
         saxonOutputDirectory = forDocument.saxonOutputDirectory(variant),
         documentName,
@@ -274,7 +276,7 @@ class ProcessDocBookTask extends DefaultTask {
         replace = true,
         content = docBook2.mainStylesheet(
           paramsStylesheetName = layout.paramsStylesheet(variant),
-          stylesheetUri = s"${Stylesheets(docBook2.usesDocBookXslt2).uri}/${docBook2.stylesheetUriName}.xsl",
+          stylesheetUri = s"${stylesheets.uri}/${docBook2.stylesheetUriName}.xsl",
           nonOverridableParameters,
           customStylesheets,
           enableMathJax
