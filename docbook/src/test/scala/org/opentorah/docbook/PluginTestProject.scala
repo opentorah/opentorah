@@ -24,7 +24,7 @@ class PluginTestProject private(
 
     // reference plugin's root project
     Files.write(
-      file = layout.settingsGradle,
+      file = new File(projectDir, "settings.gradle"),
       replace = true,
       content =
         s"""|includeBuild '$pluginRootDir'
@@ -46,7 +46,7 @@ class PluginTestProject private(
     val outputFormats: String = if (isPdfEnabled) """ "html", "pdf" """ else """ "html" """
 
     Files.write(
-      file = layout.buildGradle,
+      file = new File(projectDir, "build.gradle"),
       replace = true,
       content =
       s"""|plugins {

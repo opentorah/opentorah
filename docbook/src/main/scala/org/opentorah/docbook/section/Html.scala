@@ -12,7 +12,7 @@ package org.opentorah.docbook.section
 object Html extends DocBook2 {
   override def name: String = "html"
   override def stylesheetUriName: String = "html/chunkfast"
-  override def outputFileExtension: String = "html"
+  override protected def outputFileExtension: String = "html"
   override protected def outputFileNameOverride: Option[String] = Some("index")
   override def usesRootFile: Boolean = false
   override def commonSections: List[CommonSection] = List(Common, HtmlCommon)

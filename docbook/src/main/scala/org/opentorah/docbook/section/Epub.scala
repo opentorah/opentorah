@@ -3,7 +3,7 @@ package org.opentorah.docbook.section
 import java.io.File
 
 trait Epub extends DocBook2 {
-  final override def outputFileExtension: String = "epub"
+  final override protected def outputFileExtension: String = "epub"
   final override def usesRootFile: Boolean = false
   final override def copyDestinationDirectoryName: Option[String] = Some("OEBPS")
   final override def usesIntermediate: Boolean = true

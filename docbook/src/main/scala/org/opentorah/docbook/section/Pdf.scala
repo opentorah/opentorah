@@ -4,10 +4,10 @@ object Pdf extends DocBook2 {
   override def name: String = "pdf"
   override def isPdf: Boolean = true
   override def stylesheetUriName: String = "fo/docbook"
-  override def outputFileExtension: String = "pdf"
+  override protected def outputFileExtension: String = "pdf"
   override def usesRootFile: Boolean = true
   override def usesIntermediate: Boolean = true
-  override def intermediateFileExtension: String = "fo"
+  override protected def intermediateFileExtension: String = "fo"
   override def commonSections: List[CommonSection] = List(Common)
 
   override def defaultParameters: Section.Parameters = Map(

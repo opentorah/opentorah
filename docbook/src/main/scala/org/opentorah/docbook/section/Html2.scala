@@ -3,7 +3,7 @@ package org.opentorah.docbook.section
 object Html2 extends DocBook2 {
   override def name: String = "html2"
   override def stylesheetUriName: String = "html/chunk"
-  override def outputFileExtension: String = "html"
+  override protected def outputFileExtension: String = "html"
   override protected def outputFileNameOverride: Option[String] = Some("index")
   override def usesRootFile: Boolean = true
   override def usesDocBookXslt2: Boolean = true

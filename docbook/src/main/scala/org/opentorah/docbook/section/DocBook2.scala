@@ -12,9 +12,9 @@ trait DocBook2 extends Section {
 
   def usesIntermediate: Boolean = false
 
-  def outputFileExtension: String
+  protected def outputFileExtension: String
 
-  def intermediateFileExtension: String = outputFileExtension
+  protected def intermediateFileExtension: String = outputFileExtension
 
   // From general to specific
   final def parameterSections: List[Section] =  commonSections :+ this
@@ -115,6 +115,9 @@ trait DocBook2 extends Section {
   protected def epubEmbeddedFontsParameter: Option[String] = None
   protected def chunkQuietlyParameter: Option[String] = None
   protected def mathJaxConfigurationParameter: Option[String] = None
+
+  final def rootFileNameWithExtension(inputFileName: String, isIntermediate: Boolean): String =
+    rootFilename(inputFileName) + "." + (if (isIntermediate) intermediateFileExtension else outputFileExtension)
 
   final def rootFilename(inputFileName: String): String =
     outputFileNameOverride.getOrElse(inputFileName)
