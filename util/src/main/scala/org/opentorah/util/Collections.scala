@@ -53,6 +53,14 @@ object Collections {
     // map.view.mapValues(f).toMap // Scala 2.13
     map.mapValues(f) // Scala 2.12
 
+  def pruneSequenceOfMaps[K, A, B](tail: Seq[(K, Map[A, B])]): Seq[(K, Map[A, B])] = pruneSequenceOfMaps(Seq.empty, tail)
+
+  @scala.annotation.tailrec
+  def pruneSequenceOfMaps[K, A, B](acc: Seq[(K, Map[A, B])], tail: Seq[(K, Map[A, B])]): Seq[(K, Map[A, B])] = tail match {
+    case Nil => acc
+    case (key, map) :: nextTail => pruneSequenceOfMaps(acc :+ (key, map -- nextTail.flatMap(_._2.keys).toSet), nextTail)
+  }
+
   // where is this in the standard library?
   def compare(a: Option[String], b: Option[String]): Int = {
     if (a.isEmpty && b.isEmpty) 0

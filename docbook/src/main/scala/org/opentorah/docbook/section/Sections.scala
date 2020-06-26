@@ -1,6 +1,6 @@
 package org.opentorah.docbook.section
 
-import org.opentorah.util.Util
+import org.opentorah.util.{Collections, Util}
 import Section.Parameters
 
 final class Sections(
@@ -12,34 +12,22 @@ final class Sections(
 
   def substitutions: Parameters = (commonSections.values ++ docBook2s.values).toList.flatten.toMap
 
-  def find(variant: Variant): Parameters = variants.find(_._1 == variant).get._2
-
   def parameters(
     variant: Variant,
     isInfoEnabled: Boolean
   ): Seq[(String, Parameters)] = {
     val docBook2: DocBook2 = variant.docBook2
 
-    def bracket(section: Section, nonDefaultParameters: Option[Parameters]): Parameters =
-      section.parameters(isInfoEnabled) ++
-      nonDefaultParameters.getOrElse(Map.empty)
-
-    @scala.annotation.tailrec
-    def prune(acc: Seq[(String, Parameters)], tail: Seq[(String, Parameters)]): Seq[(String, Parameters)] = tail match {
-      case Nil => acc
-      case (sectionName, sectionParameters) :: nextTail =>
-        val overriden: Set[String] = nextTail.flatMap(_._2.keys).toSet
-        prune(acc :+ (sectionName, sectionParameters -- overriden), nextTail)
-    }
-
     val result: Seq[(String, Parameters)] =
-      docBook2.commonSections.map { commonSection: CommonSection =>
-        commonSection.name -> bracket(commonSection, commonSections.get(commonSection))
+      docBook2.commonSections.map { section: CommonSection =>
+        section.name -> (section.parameters(isInfoEnabled) ++ commonSections.getOrElse(section, Map.empty))
       } ++ Seq(
-        docBook2.name -> bracket(docBook2, docBook2s.get(docBook2))
-      ) ++ (if (variant.name.isEmpty) Seq.empty else Seq(variant.fullName -> find(variant)))
+        docBook2.name -> (docBook2.parameters(isInfoEnabled) ++ docBook2s.getOrElse(docBook2, Map.empty))
+      ) ++ (if (variant.name.isEmpty) Seq.empty else Seq(
+        variant.fullName -> variants.find(_._1 == variant).get._2
+      ))
 
-    prune(Seq.empty, result)
+    Collections.pruneSequenceOfMaps(result)
   }
 
   def allVariants: Seq[Variant] = DocBook2.all.map(_.defaultVariant) ++ variants.map(_._1)
