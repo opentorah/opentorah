@@ -61,6 +61,4 @@ object Stylesheets {
     override def uri: String = "https://cdn.docbook.org/release/latest/xslt"
     override def archiveSubdirectoryPath: Seq[String] = Seq("xslt", "base")
   }
-
-  def apply(useXslt2: Boolean): Stylesheets = if (useXslt2) xslt2 else xslt1
 }
