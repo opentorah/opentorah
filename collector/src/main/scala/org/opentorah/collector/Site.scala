@@ -32,7 +32,7 @@ object Site {
   val facsimileBucket: String = "http://facsimiles.alter-rebbe.org/facsimiles/"
 
   private val unpublishedCollections: Set[String] =
-    Set("derzhavin6", "derzhavin7", "lna208", "niab5", "niab19", "niab24", "rnb203", "rnb211")
+    Set("derzhavin6", "derzhavin7", "lna208", "niab5", "niab19", "rnb203", "rnb211")
 
   // TODO with images on a separate website (facsimiles.alter-rebbe.org), this has to be re-worked...
   //  private def checkPages(): Unit = {
