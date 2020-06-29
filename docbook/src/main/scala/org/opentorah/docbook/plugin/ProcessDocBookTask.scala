@@ -6,7 +6,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
-import org.opentorah.docbook.section.{CommonSection, DocBook2, Section, Sections, Variant}
+import org.opentorah.docbook.section.{CommonSection, DocBook2, NonOverridableParameters, Section, Sections, Variant}
 import org.opentorah.fop.{Fop, FopFonts}
 import org.opentorah.mathjax
 import org.opentorah.mathjax.MathJax
@@ -240,7 +240,7 @@ class ProcessDocBookTask extends DefaultTask {
     for (variant: Variant <- sections.allVariants) Files.write(
       file = layout.stylesheetFile(layout.paramsStylesheet(variant)),
       replace = true,
-      content = variant.docBook2.paramsStylesheet(sections.parameters(variant, logger.isInfoEnabled))
+      content = variant.docBook2.paramsStylesheet(sections.parameters(variant))
     )
 
     // Main stylesheet
@@ -248,25 +248,7 @@ class ProcessDocBookTask extends DefaultTask {
       variant: Variant <- sections.allVariants
       (documentName: String, prefixed: Boolean) <- inputDocuments
     } {
-      val docBook2: DocBook2 = variant.docBook2
-
       val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)
-
-      val stylesheets: Stylesheets = if (docBook2.usesDocBookXslt2) Stylesheets.xslt2 else Stylesheets.xslt1
-
-      val nonOverridableParameters: Section.Parameters = docBook2.nonOverridableParameters(
-        saxonOutputDirectory = forDocument.saxonOutputDirectory(variant),
-        documentName,
-        epubEmbeddedFontsString,
-        cssFile = layout.cssFileRelativeToOutputDirectory(cssFileName),
-        imagesDirectoryName = layout.imagesDirectoryName,
-        enableMathJax,
-        mathJaxConfiguration
-      )
-
-      val customStylesheets: Seq[String] =
-        docBook2.commonSections.map(layout.customStylesheet) ++
-        (variant.baseVariant.toSeq :+ variant).map(layout.customStylesheet)
 
       // xsl:param has the last value assigned to it, so customization must come last;
       // since it is imported (so as not to be overwritten), and import elements must come first,
@@ -274,12 +256,21 @@ class ProcessDocBookTask extends DefaultTask {
       Files.write(
         file = layout.stylesheetFile(forDocument.mainStylesheet(variant)),
         replace = true,
-        content = docBook2.mainStylesheet(
+        content = variant.docBook2.mainStylesheet(
           paramsStylesheetName = layout.paramsStylesheet(variant),
-          stylesheetUri = s"${stylesheets.uri}/${docBook2.stylesheetUriName}.xsl",
-          nonOverridableParameters,
-          customStylesheets,
-          enableMathJax
+          stylesheetUriBase = (if (variant.docBook2.usesDocBookXslt2) Stylesheets.xslt2 else Stylesheets.xslt1).uri,
+          customStylesheets =
+            variant.docBook2.commonSections.map(layout.customStylesheet) ++
+            (variant.baseVariant.toSeq :+ variant).map(layout.customStylesheet),
+          values = new NonOverridableParameters(
+            isInfoEnabled = logger.isInfoEnabled,
+            embeddedFonts = epubEmbeddedFontsString,
+            cssFile = layout.cssFileRelativeToOutputDirectory(cssFileName),
+            imagesDirectoryName = layout.imagesDirectoryName,
+            mathJaxConfiguration = if(!enableMathJax) None else Some(mathJaxConfiguration),
+            documentName = documentName,
+            saxonOutputDirectory = forDocument.saxonOutputDirectory(variant)
+          )
         )
       )
     }

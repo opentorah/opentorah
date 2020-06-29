@@ -1,16 +1,18 @@
 package org.opentorah.docbook.section
 
+import Section.Parameters
+
 object Pdf extends DocBook2 {
   override def name: String = "pdf"
   override def isPdf: Boolean = true
-  override def stylesheetUriName: String = "fo/docbook"
+  override protected def stylesheetUriName: String = "fo/docbook"
   override protected def outputFileExtension: String = "pdf"
   override def usesRootFile: Boolean = true
   override def usesIntermediate: Boolean = true
   override protected def intermediateFileExtension: String = "fo"
   override def commonSections: List[CommonSection] = List(Common)
 
-  override def parameters(isInfoEnabled: Boolean): Section.Parameters = Map(
+  override def parameters: Parameters = Map(
     // Paper size; double-sidedness; not a draft
     "paper.type" -> "USletter",
     "double.sided" -> "yes",
@@ -21,7 +23,11 @@ object Pdf extends DocBook2 {
     "fop1.extensions" -> "1"
   )
 
-  override protected def mainStylesheetBody(isMathJaxEnabled: Boolean): String = ""
+  override def nonOverridableParameters(values: NonOverridableParameters): Parameters = Map.empty
+
+  override def usesCss: Boolean = false
+
+  override protected def mainStylesheetBody(values: NonOverridableParameters): String = ""
 
   override protected def customStylesheetBody: String =
     s"""

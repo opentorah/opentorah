@@ -1,5 +1,6 @@
 package org.opentorah.docbook.section
 
+import Section.Parameters
 import java.io.File
 
 trait Epub extends DocBook2 {
@@ -9,13 +10,16 @@ trait Epub extends DocBook2 {
   final override def usesIntermediate: Boolean = true
   final override def commonSections: List[CommonSection] =  List(Common, HtmlCommon)
 
-  final override protected def epubEmbeddedFontsParameter: Option[String] = Some("epub.embedded.fonts")
-  final override protected def baseDirParameter: Option[String] = Some("base.dir")
-  final override protected def rootFilenameParameter: Option[String] = Some("root.filename")
+  final override def parameters: Parameters = Map.empty
 
-  final override def parameters(isInfoEnabled: Boolean): Section.Parameters = Map.empty
+  final override def nonOverridableParameters(values: NonOverridableParameters): Parameters = Map(
+    "root.filename" -> rootFilename(values.documentName),
+    "epub.embedded.fonts" -> values.embeddedFonts
+  )
 
-  final override protected def mainStylesheetBody(isMathJaxEnabled: Boolean): String = ""
+  override def usesCss: Boolean = false
+
+  final override protected def mainStylesheetBody(values: NonOverridableParameters): String = ""
 
   final override protected def customStylesheetBody: String = ""
 

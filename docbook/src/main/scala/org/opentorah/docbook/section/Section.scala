@@ -2,12 +2,15 @@ package org.opentorah.docbook.section
 
 import org.opentorah.docbook.plugin.DocBook
 import org.opentorah.xml.{Namespace, Xml}
+import Section.Parameters
 
 trait Section {
 
   def name: String
 
-  def parameters(isInfoEnabled: Boolean): Section.Parameters
+  def parameters: Parameters
+
+  def nonOverridableParameters(values: NonOverridableParameters): Parameters
 
   final def customStylesheet: String =
     s"""${Xml.header}

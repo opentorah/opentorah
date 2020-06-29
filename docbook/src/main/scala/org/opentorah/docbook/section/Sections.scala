@@ -1,6 +1,6 @@
 package org.opentorah.docbook.section
 
-import org.opentorah.util.{Collections, Util}
+import org.opentorah.util.Util
 import Section.Parameters
 
 final class Sections(
@@ -12,22 +12,16 @@ final class Sections(
 
   def substitutions: Parameters = (commonSections.values ++ docBook2s.values).toList.flatten.toMap
 
-  def parameters(
-    variant: Variant,
-    isInfoEnabled: Boolean
-  ): Seq[(String, Parameters)] = {
+  def parameters(variant: Variant): Seq[(String, Parameters)] = {
     val docBook2: DocBook2 = variant.docBook2
 
-    val result: Seq[(String, Parameters)] =
-      docBook2.commonSections.map { section: CommonSection =>
-        section.name -> (section.parameters(isInfoEnabled) ++ commonSections.getOrElse(section, Map.empty))
-      } ++ Seq(
-        docBook2.name -> (docBook2.parameters(isInfoEnabled) ++ docBook2s.getOrElse(docBook2, Map.empty))
-      ) ++ (if (variant.name.isEmpty) Seq.empty else Seq(
-        variant.fullName -> variants.find(_._1 == variant).get._2
-      ))
-
-    Collections.pruneSequenceOfMaps(result)
+    docBook2.commonSections.map { section: CommonSection =>
+      section.name -> (section.parameters ++ commonSections.getOrElse(section, Map.empty))
+    } ++ Seq(
+      docBook2.name -> (docBook2.parameters ++ docBook2s.getOrElse(docBook2, Map.empty))
+    ) ++ (if (variant.name.isEmpty) Seq.empty else Seq(
+      variant.fullName -> variants.find(_._1 == variant).get._2
+    ))
   }
 
   def allVariants: Seq[Variant] = DocBook2.all.map(_.defaultVariant) ++ variants.map(_._1)
