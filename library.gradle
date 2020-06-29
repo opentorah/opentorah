@@ -13,7 +13,7 @@ ext.configureLibrary = {
   final String gitHubRepository = "opentorah/opentorah"
   final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
   final String codeUrl = "$gitHubRepositoryUrl/tree/master/$projectName"
-  final String orgName = 'Open Torah'
+  final String orgName = 'Open Torah Project'
   final String orgUrl = 'http://www.opentorah.org'
 
 //  logger.lifecycle(
@@ -91,8 +91,8 @@ ext.configureLibrary = {
               id = 'dub'
               name = 'Leonid Dubinsky'
               email = 'dub@opentorah.org'
-              organization = 'Open Torah Project'
-              organizationUrl = 'http://www.opentorah.org'
+              organization = orgName
+              organizationUrl = orgUrl
               timezone = '-5'
             }
           }
