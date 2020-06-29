@@ -1,12 +1,17 @@
 package org.opentorah.docbook.section
+import Section.Parameters
 
 object Common extends CommonSection {
   override def name: String = "common"
 
-  override def parameters(isInfoEnabled: Boolean): Section.Parameters = Map(
+  override def parameters: Parameters = Map(
     "toc.section.depth" -> "4",
     "section.autolabel" -> "0",
     "runinhead.default.title.end.punct" -> ""
+  )
+
+  override def nonOverridableParameters(values: NonOverridableParameters): Parameters = Map(
+    "img.src.path" -> (values.imagesDirectoryName + "/")
   )
 
   override protected def customStylesheetBody: String =

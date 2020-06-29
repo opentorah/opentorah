@@ -1,23 +1,29 @@
 package org.opentorah.docbook.section
 
+import Section.Parameters
+
 object Html2 extends DocBook2 {
   override def name: String = "html2"
-  override def stylesheetUriName: String = "html/chunk"
+  override protected def stylesheetUriName: String = "html/chunk"
   override protected def outputFileExtension: String = "html"
   override protected def outputFileNameOverride: Option[String] = Some("index")
   override def usesRootFile: Boolean = true
   override def usesDocBookXslt2: Boolean = true
   override def commonSections: List[CommonSection] = List.empty
 
-  override protected def baseDirParameter: Option[String] = Some("base.dir")
-  override protected def htmlStylesheetsParameter: Option[String] = Some("html.stylesheets")
-
-  override def parameters(isInfoEnabled: Boolean): Section.Parameters = Map(
+  override def parameters: Parameters = Map(
     "use.id.as.filename" -> "yes",
     "toc.section.depth" -> "4"
   )
 
-  override protected def mainStylesheetBody(isMathJaxEnabled: Boolean): String = ""
+  override def nonOverridableParameters(values: NonOverridableParameters): Parameters = Map(
+    "base.dir" -> (values.saxonOutputDirectory.getAbsolutePath + "/"),
+    "html.stylesheet" -> values.cssFile
+  )
+
+  override def usesCss: Boolean = true
+
+  override protected def mainStylesheetBody(values: NonOverridableParameters): String = ""
 
   override protected def customStylesheetBody: String =
     s"""

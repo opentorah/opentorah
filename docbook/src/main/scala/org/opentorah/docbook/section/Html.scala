@@ -1,5 +1,8 @@
 package org.opentorah.docbook.section
 
+import Section.Parameters
+import org.opentorah.util.Json
+
 // MathJax 2
 //<script async src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_CHTML"></script>
 
@@ -11,27 +14,32 @@ package org.opentorah.docbook.section
 
 object Html extends DocBook2 {
   override def name: String = "html"
-  override def stylesheetUriName: String = "html/chunkfast"
+  override protected def stylesheetUriName: String = "html/chunkfast"
   override protected def outputFileExtension: String = "html"
   override protected def outputFileNameOverride: Option[String] = Some("index")
   override def usesRootFile: Boolean = false
   override def commonSections: List[CommonSection] = List(Common, HtmlCommon)
 
-  override protected def baseDirParameter: Option[String] = Some("base.dir")
-  override protected def rootFilenameParameter: Option[String] = Some("root.filename")
-  override protected def htmlStylesheetsParameter: Option[String] = Some("html.stylesheet")
-  override protected def mathJaxConfigurationParameter: Option[String] = Some(mathJaxConfigurationParameterName)
+  override def parameters: Parameters = Map.empty
 
-  override def parameters(isInfoEnabled: Boolean): Section.Parameters = Map.empty
+  override def nonOverridableParameters(values: NonOverridableParameters): Parameters = Map(
+    "root.filename" -> rootFilename(values.documentName),
+    "html.stylesheet" -> values.cssFile
+  ) ++ values.mathJaxConfiguration.fold[Parameters](Map.empty)(mathJaxConfiguration => Map(
+     mathJaxConfigurationParameterName -> Json.fromMap(mathJaxConfiguration.toHtmlMap)
+  ))
+
+  override def usesCss: Boolean = true
 
   val mathJaxConfigurationParameterName: String = "mathjax.configuration"
 
-  override protected def mainStylesheetBody(isMathJaxEnabled: Boolean): String = if (!isMathJaxEnabled) "" else
+  override protected def mainStylesheetBody(values: NonOverridableParameters): String =
+    if (values.mathJaxConfiguration.isEmpty) "" else
     s"""
        |  <!-- Add MathJax support -->
        |  <xsl:template name="user.head.content">
        |    <script type="text/javascript">
-       |      window.MathJax = <xsl:value-of select = "$$$mathJaxConfigurationParameterName" />;
+       |      window.MathJax = <xsl:value-of select = "$$$mathJaxConfigurationParameterName"/>;
        |    </script>
        |    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=MML_HTMLorMML"/>
        |  </xsl:template>
