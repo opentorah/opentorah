@@ -113,5 +113,5 @@ object CalendarService extends App {
     scala.util.Properties.envOrNone("PORT").map(_.toInt).getOrElse(8090)
 
   def run(args: List[String]): ZIO[ZEnv, Nothing, zio.ExitCode] =
-    server.fold(_ => zio.ExitCode.failure, _ => zio.ExitCode.success)
+    server.exitCode
 }

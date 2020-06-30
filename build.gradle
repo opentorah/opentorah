@@ -46,7 +46,16 @@ subprojects {
   }
 
   task site
+  site.description('Generate project website')
   site.group('publishing')
+
+  task upload
+  upload.description('Upload artifacts and plugins')
+  upload.group('publishing')
+
+  task deploy
+  deploy.description('Publish containers and re-deploy services')
+  deploy.group('publishing')
 }
 
 idea {

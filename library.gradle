@@ -1,8 +1,9 @@
 ext.configureLibrary = {
-  final List<String> tags
+  final List<String> tags,
+  final boolean addSlf4jImplementationForTests = true
     ->
 
-  configureScala()
+  configureScala(addSlf4jImplementationForTests)
   configureMdoc()
 
   final String projectName = project.name
@@ -125,4 +126,6 @@ ext.configureLibrary = {
       version { name        = projectVersion }
     }
   }
+
+  upload.dependsOn(bintrayUpload)
 }

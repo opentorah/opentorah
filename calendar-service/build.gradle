@@ -1,18 +1,22 @@
 plugins {
   id 'scala'
   id 'com.github.maiflai.scalatest'
-  id 'com.google.cloud.tools.jib'
+//  id 'com.google.cloud.tools.jib'
 }
 
 description = 'Jewish Calendar Service.'
 version = calendarProjectVersion
 
-configureService(
-  'gcr.io/calendar/calendar',
-  'org.opentorah.calendar.service.CalendarService'
-)
+configureService()
+
+//jib {
+//  to { image = 'gcr.io/calendar/calendar' }
+//  container { mainClass = 'org.opentorah.calendar.service.CalendarService' }
+//}
 
 dependencies {
   implementation project(':schedule')
   implementation project(':util')
+
+  runtimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
 }
