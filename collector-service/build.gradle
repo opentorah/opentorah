@@ -29,11 +29,12 @@ gcloudConfigure.doLast {
 }
 
 task gcloudDeploy
-gcloudDeploy.dependsOn(gcloudConfigure)
 gcloudDeploy.doLast {
   exec { commandLine 'gcloud', 'run', 'deploy',  gcloudService, '--image', serviceImage }
 }
 
 // Note: regrettably, JIB plugin names its task and extension the same.
 tasks.getByPath('jib').dependsOn(gcloudConfigure)
+gcloudDeploy.dependsOn(gcloudConfigure)
+gcloudDeploy.mustRunAfter(tasks.getByPath('jib'))
 deploy.dependsOn('jib', gcloudDeploy)
