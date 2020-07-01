@@ -15,9 +15,15 @@ ext.configureScala = {
     testImplementation "org.typelevel:algebra-laws_$scalaVersionMajor:$algebraLawsVersion"
   }
 
-   if (addSlf4jImplementationForTests) {
-     dependencies {
-       testRuntimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
-     }
-   }
+  if (addSlf4jImplementationForTests) {
+    dependencies {
+      testRuntimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
+    }
+  }
+
+  tasks.withType(ScalaCompile) {
+    scalaCompileOptions.with {
+      additionalParameters = ['-feature']
+    }
+  }
 }
