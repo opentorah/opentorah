@@ -60,7 +60,7 @@ To sync with the bucket:
 I am using [Cloud Run](https://cloud.google.com/run#key-features)
 ([Unofficial FAQ](https://github.com/ahmetb/cloud-run-faq)).
 
-Service `collector` runs in us-eat4 and allows unauthenticated requests.
+Service `collector` runs in us-east4 and allows unauthenticated requests.
 DNS has CNAME record for `app.alter-rebbe.org` that points to `ghs.googlehosted.com.`.
 
 For monitoring, there is Stackdriver (Logging, Monitoring, Error reporting),
@@ -89,26 +89,30 @@ but if I do - it runs locally too!
 
 ### Docker and Cloud Run Commands ###
 
-To push to the GCP Container (Artifact) Registry (and thus make available for Cloud Run):
+To push to the GCP Container (Artifact) Registry (and thus make it available for Cloud Run):
 ```
   $ ./gradlew jib
 ```
 To run the container locally, build it to local Docker:
 ```
-  $ ./gradlew jibDockerBuild`
+  $ ./gradlew jibDockerBuild
 ```
 or, if pushed to a repository, pull it from there:
 ```
   $ docker pull <image name>
 ```
 and then:
-```app engine dockerfile template
+```
   $ docker run <image name>
 ```
 
 To deploy on the Cloud Run:
 ```
-  $ gcloud run deploy collector --image gcr.io/alter-rebbe-2/collector --platform managed --region=us-east4
+  $ gcloud run deploy collector
+      --image gcr.io/alter-rebbe-2/collector
+      --platform managed
+      --region=us-east4
+      --allow-unauthenticated
 ```
 
 Arguments to the entry point:
@@ -117,9 +121,7 @@ Locally:
 ```
   $ docker run <image name> <arg1> <arg2> <arg3>
 ```
-
-Can be set in the Cloud Run Console or in CLI:
-
+For GCP - can be set in the Cloud Run Console or in CLI:
 ```
 --args=[ARG,...]
         Comma-separated arguments passed to the command run by the container
@@ -132,7 +134,7 @@ Locally:
 ```
   $ docker run -e "NAME=VALUE" <image name>
 ```
-Can also be set in the Cloud Run Console or in CLI:
+For GCP - can be set in the Cloud Run Console or in CLI:
 ```
   --clear-env-vars                   Remove all environment variables.
   --set-env-vars=[KEY=VALUE,...]     All existing environment variables will be removed first.

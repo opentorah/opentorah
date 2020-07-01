@@ -1,4 +1,6 @@
 ext.configureScala = {
+  final boolean addSlf4jImplementationForTests = true
+  ->
   dependencies {
     zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
     implementation "org.scala-lang:scala-library:$scalaVersion"
@@ -11,5 +13,17 @@ ext.configureScala = {
     testImplementation "org.scalacheck:scalacheck_$scalaVersionMajor:$scalacheckVersion"
     testImplementation "org.typelevel:discipline-scalatest_$scalaVersionMajor:$disciplineScalatestVersion"
     testImplementation "org.typelevel:algebra-laws_$scalaVersionMajor:$algebraLawsVersion"
+  }
+
+  if (addSlf4jImplementationForTests) {
+    dependencies {
+      testRuntimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
+    }
+  }
+
+  tasks.withType(ScalaCompile) {
+    scalaCompileOptions.with {
+      additionalParameters = ['-feature']
+    }
   }
 }

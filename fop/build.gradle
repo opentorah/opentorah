@@ -56,5 +56,6 @@ dependencies {
   // tests fail...
   implementation "com.eclipsesource.j2v8:j2v8_linux_x86_64:$j2v8Version"
 
-  implementation gradleApi()
+  // Needed to compile classes using Gradle, but does not become a dependency:
+  compileOnly gradleApi()
 }

@@ -6,7 +6,7 @@ import org.opentorah.entity.{Entity, EntityReference}
 import org.opentorah.store.{Store, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
-import org.opentorah.xml.From
+import org.opentorah.xml.{From, PrettyPrinter}
 import scala.xml.Elem
 
 object Main {
@@ -35,7 +35,7 @@ object Main {
 
     println("Pretty-printing store.")
     for (entityHolder <- store.entities.get.by.get.stores)
-      prettyPrint(entityHolder, Entity.toXml(entityHolder.entity.copy(id = None)))
+      prettyPrint(entityHolder, Entity.toXml(entityHolder.entity.copy(id = None)), Tei.prettyPrinter)
     prettyPrint(store)
 
     val site = new Site(store, references)
@@ -47,21 +47,21 @@ object Main {
   }
 
   private def prettyPrint(store: Store): Unit = {
-    prettyPrint(store, Store.parsable.toXml(store.asInstanceOf[Store.FromElement].element))
+    prettyPrint(store, Store.parsable.toXml(store.asInstanceOf[Store.FromElement].element), prettyPrinter)
 
     store match {
       case collection: Collection =>
         for (by <- collection.by; document <- by.stores; by <- document.by; teiHolder <- by.stores)
-          prettyPrint(teiHolder, Tei.toXml(teiHolder.tei))
+          prettyPrint(teiHolder, Tei.toXml(teiHolder.tei), Tei.prettyPrinter)
       case _ =>
         for (by <- store.by; store <- by.stores) prettyPrint(store)
     }
   }
 
-  private def prettyPrint(store: Store, toXml: => Elem): Unit =
+  private def prettyPrint(store: Store, toXml: => Elem, prettyPrinter: PrettyPrinter): Unit =
     for (fromUrl <- store.urls.fromUrl) if (Files.isFile(fromUrl)) Files.write(
       file = Files.url2file(fromUrl),
-      content = Tei.prettyPrinter.renderXml(toXml)
+      content = prettyPrinter.renderXml(toXml)
     )
 
   private def checkReference(reference: EntityReference,  findByRef: String => Option[Entity]): Option[String] = {
@@ -75,4 +75,9 @@ object Main {
       }
     }
   }
+
+  private val prettyPrinter: PrettyPrinter = new PrettyPrinter(
+    nestElements = Set(/*"title", "abstract",*/ "p"),
+    allwaysStackElements = Set("store", "by")
+  )
 }

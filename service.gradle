@@ -1,8 +1,9 @@
+// Configure Scala and servoce dependencies, leaving to the modules to apply JIB plugin and do this:
+//  jib {
+//    to { image = imageName }
+//    container { mainClass = mainClassName }
+//  }
 ext.configureService = {
-  final String imageName,
-  final String mainClassName
-    ->
-
   configureScala()
 
   dependencies {
@@ -14,18 +15,5 @@ ext.configureService = {
     implementation "org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion"
     implementation "org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion"
     implementation "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion"
-
-    runtimeOnly "org.slf4j:slf4j-jdk14:$slf4jVersion"
-  }
-
-  jib {
-    to {
-      image = imageName
-//      credHelper = 'gcr'
-    }
-    container {
-      mainClass = mainClassName
-    }
-//      allowInsecureRegistries = true
   }
 }

@@ -92,6 +92,6 @@ object Cutter {
 
   private def execute(command: String): Unit = {
     println(s"running $command")
-    command !!
+    command.!!
   }
 }

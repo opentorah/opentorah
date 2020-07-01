@@ -12,5 +12,5 @@ configureLibrary(['Scala'])
 
 dependencies {
   // Needed to compile classes using Gradle, but does not become a dependency:
-  implementation gradleApi()
+  compileOnly gradleApi()
 }

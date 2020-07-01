@@ -7,6 +7,7 @@ final class PrettyPrinter(
   width: Int = 120,
   indent: Int = 2,
   doNotStackElements: Set[String] = Set(),
+  allwaysStackElements: Set[String] = Set(),
   nestElements: Set[String] = Set(),
   clingyElements: Set[String] = Set()
 ) {
@@ -65,7 +66,10 @@ final class PrettyPrinter(
       val start: Doc = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">")
       val end: Doc = Doc.text(s"</$name>")
 
-      if (noAtoms && (chunks.length >= 2) && !doNotStackElements.contains(element.label)) {
+      val stackElements: Boolean = noAtoms &&
+        ((chunks.length >= 2) || ((chunks.length == 1) && (allwaysStackElements.contains(element.label)))) &&
+        !doNotStackElements.contains(element.label)
+      if (stackElements) {
         // If this is clearly a bunch of elements - stack 'em with an indent:
         start +
         Doc.cat(chunks.map(chunk => (Doc.hardLine + chunk).nested(indent))) +

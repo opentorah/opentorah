@@ -12,7 +12,7 @@ version = docBookProjectVersion
 description = 'Gradle DocBook Plugin'
 
 final List<String> projectTags = ['Scala', 'DocBook', 'Html', 'Epub', 'Pdf', 'FOP', 'MathML', 'MathJax', 'JEuclid']
-configureLibrary(projectTags)
+configureLibrary(projectTags, false)
 
 dependencies {
   implementation project(':fop')
@@ -56,3 +56,5 @@ pluginBundle {
     artifactId = 'opentorah-docbook'
   }
 }
+
+upload.dependsOn(publishPlugins)

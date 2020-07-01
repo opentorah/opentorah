@@ -6,11 +6,35 @@ plugins {
 
 description = 'Archive Collector Service'
 
-configureService(
-  'gcr.io/alter-rebbe-2/collector',
-  'org.opentorah.collector.Service'
-)
+configureService()
 
 dependencies {
   implementation project(':collector')
 }
+
+final String gcloudAccount = 'dub@opentorah.org'
+final String gcloudProject = 'alter-rebbe-2'
+final String gcloudService = 'collector'
+final String serviceImage  = "gcr.io/$gcloudProject/$gcloudService"
+
+jib {
+  to { image = serviceImage }
+  container { mainClass = 'org.opentorah.collector.Service' }
+}
+
+task gcloudConfigure
+gcloudConfigure.doLast {
+  exec { commandLine 'gcloud', 'config', 'set', 'account', gcloudAccount }
+  exec { commandLine 'gcloud', 'config', 'set', 'project', gcloudProject }
+}
+
+task gcloudDeploy
+gcloudDeploy.doLast {
+  exec { commandLine 'gcloud', 'run', 'deploy',  gcloudService, '--image', serviceImage }
+}
+
+// Note: regrettably, JIB plugin names its task and extension the same.
+tasks.getByPath('jib').dependsOn(gcloudConfigure)
+gcloudDeploy.dependsOn(gcloudConfigure)
+gcloudDeploy.mustRunAfter(tasks.getByPath('jib'))
+deploy.dependsOn('jib', gcloudDeploy)

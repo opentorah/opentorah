@@ -55,12 +55,12 @@ object Service extends App {
       .drain
   }
 
-  private def getServicePort: Int =
-    scala.util.Properties.envOrNone("PORT").map(_.toInt).getOrElse(8090)
-
   private def getOtherHost: String =
     scala.util.Properties.envOrNone("OTHER_HOST").getOrElse("www.alter-rebbe.org")
 
+  private def getServicePort: Int =
+    scala.util.Properties.envOrNone("PORT").map(_.toInt).getOrElse(8090)
+
   def run(args: List[String]): ZIO[ZEnv, Nothing, zio.ExitCode] =
-    server.fold(_ => zio.ExitCode.failure, _ => zio.ExitCode.success)
+    server.exitCode
 }
