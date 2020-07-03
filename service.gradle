@@ -15,5 +15,8 @@ ext.configureService = {
     implementation "org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion"
     implementation "org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion"
     implementation "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion"
+
+    runtimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
+    implementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
   }
 }
