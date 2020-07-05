@@ -5,6 +5,7 @@ import java.util.concurrent.Executors
 import org.http4s.{HttpRoutes, Request, Response, StaticFile, Uri}
 import org.http4s.dsl.Http4sDsl
 import cats.effect.Blocker
+//import cats.implicits._
 import org.slf4j.{Logger, LoggerFactory}
 import zio.duration.Duration
 //import zio._
@@ -24,18 +25,21 @@ final class Api(otherHost: String) {
 
   private val blocker: Blocker = Blocker.liftExecutorService(Executors.newFixedThreadPool(2))
 
-  private def fromUrl(url: URL, request: Request[ServiceTask]): ServiceTask[Response[ServiceTask]] = StaticFile
-    .fromURL(url, blocker, Some(request))
-    .getOrElseF {
+  private def fromUrl(url: URL, request: Request[ServiceTask]): ServiceTask[Response[ServiceTask]] = {
+    def notFound: ServiceTask[Response[ServiceTask]] = {
       val message: String = s"Not found: $url"
       Log.warning(logger, request, message)
       NotFound(message)
     }
-    .timed.mapEffect { case (duration: Duration, result: Response[ServiceTask]) =>
-    result.body
+
+    MyStaticFile
+      .fromURL(url, blocker, Some(request))
+      .getOrElseF(notFound)
+      .timed.mapEffect { case (duration: Duration, result: Response[ServiceTask]) =>
       Log.info(logger, request, s"GOT ${formatDuration(duration)} $url")
       result
     }
+  }
 
   private def reTarget(uri: Uri): URL = {
     val result = uri.copy(

@@ -203,11 +203,15 @@ under the request's entry.
 ```
   $ gcloud services enable cloudscheduler.googleapis.com
   $ gcloud scheduler jobs create http collector-service-warmer
-      --schedule="every 3 hours"
+      --description "Keep the Collector Service warm"
+      --schedule="every 1 hours"
       --http-method GET
-      --uri="http://app.alter-rebbe.org"
+      --uri="https://app.alter-rebbe.org"
 ```
 
+
 Before the first job si created, service has to be initialized. I did it via Console
-(in the same region - us-east4 - my service is running). This created App Engine
-application `alter-rebbe-2.appspot.com`...
+(in the same region - us-east4 - my service is running). This created an empty App Engine
+application `alter-rebbe-2.appspot.com` and an empty bucket with the same name...
+
+gcloud does not require time zone, but the Console does...
