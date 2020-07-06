@@ -22,11 +22,7 @@ object Files {
     name
   }
 
-  def pathAndName(path: String): (Option[String], String) = {
-    val lastSlash: Int = path.lastIndexOf('/')
-    if (lastSlash == -1) (None, path)
-    else (Some(path.substring(lastSlash)), path.substring(lastSlash+1))
-  }
+  def pathAndName(path: String): (Option[String], String) = Util.splitRight(path, '/')
 
   def nameAndExtension(fullName: String): (String, Option[String]) = Util.split(fullName, '.')
 

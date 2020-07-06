@@ -10,6 +10,7 @@ configureService()
 
 dependencies {
   implementation project(':collector')
+  implementation project(':util')
 }
 
 final String gcloudAccount = 'dub@opentorah.org'
