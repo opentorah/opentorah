@@ -44,11 +44,7 @@ object MyStaticFile {
             else `Transfer-Encoding`(TransferCoding.chunked)
           val headers = Headers(lenHeader :: lastModHeader ::: contentType)
 
-          Some(
-            Response(
-              headers = headers,
-              body = readInputStream[F](F.delay(url.openStream), DefaultBufferSize, blocker)
-            ))
+          fromStream(F.delay(url.openStream), headers, blocker)
         } else {
           urlConn.getInputStream.close()
           Some(Response(NotModified))
@@ -57,6 +53,15 @@ object MyStaticFile {
     })
   }
 
+  private def fromStream[F[_]](inputStream: F[InputStream], headers: Headers, blocker: Blocker)(implicit
+                                                            F: Sync[F],
+                                                            cs: ContextShift[F]): Option[Response[F]] = {
+    Some(
+      Response(
+        headers = headers,
+        body = readInputStream[F](F.suspend(inputStream), DefaultBufferSize, blocker)
+      ))
+  }
   private def nameToContentType(name: String): Option[`Content-Type`] =
     name.lastIndexOf('.') match {
       case -1 => None
