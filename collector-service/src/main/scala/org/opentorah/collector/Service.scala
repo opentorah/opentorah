@@ -22,6 +22,8 @@ object Service extends App {
         .drain
     }
 
-    server.exitCode
+    server
+      .mapError(err => zio.console.putStrLn(s"Execution failed with: $err"))
+      .exitCode
   }
 }

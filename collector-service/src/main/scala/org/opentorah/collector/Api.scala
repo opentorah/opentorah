@@ -36,9 +36,9 @@ final class Api(otherHost: String) {
       .fromURL(url, blocker, Some(request))
       .getOrElseF(notFound)
       .timed.mapEffect { case (duration: Duration, result: Response[ServiceTask]) =>
-      Log.info(logger, request, s"GOT ${formatDuration(duration)} $url")
-      result
-    }
+        Log.info(logger, request, s"GOT ${formatDuration(duration)} $url")
+        result
+      }
   }
 
   private def reTarget(uri: Uri): URL = {

@@ -3,20 +3,18 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-// TODO url.openStream() throws FileNotFoundException that kills the fiber - and the Cloud Run instance.
-// 1) open an issue; 2) find a temporary work-around.
 package org.opentorah.collector
 
 import cats.data.OptionT
-import cats.effect.{Blocker, ContextShift, IO, Sync}
+import cats.effect.{Blocker, ContextShift, Sync}
 import cats.implicits._
 import fs2.io._
 import java.io._
 import java.net.URL
-
 import org.http4s.{Header, Headers, HttpDate, MediaType, Request, Response, TransferCoding}
 import org.http4s.Status.NotModified
 import org.http4s.headers._
+import org.opentorah.util.Files
 
 object MyStaticFile {
   val DefaultBufferSize = 10240
@@ -37,18 +35,15 @@ object MyStaticFile {
 
         if (expired) {
           val lastModHeader: List[Header] = lastmod.map(`Last-Modified`(_)).toList
-          val contentType = nameToContentType(url.getPath).toList
+          val contentType = Files.nameAndExtension(url.getPath)._2
+            .flatMap(extension => MediaType.forExtension(extension).map(`Content-Type`(_))).toList
           val len = urlConn.getContentLengthLong
           val lenHeader =
             if (len >= 0) `Content-Length`.unsafeFromLong(len)
             else `Transfer-Encoding`(TransferCoding.chunked)
           val headers = Headers(lenHeader :: lastModHeader ::: contentType)
 
-          Some(
-            Response(
-              headers = headers,
-              body = readInputStream[F](F.delay(url.openStream), DefaultBufferSize, blocker)
-            ))
+          fromStream(F.delay(url.openStream), headers, blocker)
         } else {
           urlConn.getInputStream.close()
           Some(Response(NotModified))
@@ -57,9 +52,13 @@ object MyStaticFile {
     })
   }
 
-  private def nameToContentType(name: String): Option[`Content-Type`] =
-    name.lastIndexOf('.') match {
-      case -1 => None
-      case i => MediaType.forExtension(name.substring(i + 1)).map(`Content-Type`(_))
-    }
+  private def fromStream[F[_]](inputStream: F[InputStream], headers: Headers, blocker: Blocker)(implicit
+                                                            F: Sync[F],
+                                                            cs: ContextShift[F]): Option[Response[F]] = {
+    Some(
+      Response(
+        headers = headers,
+        body = readInputStream[F](F.suspend(inputStream), DefaultBufferSize, blocker)
+      ))
+  }
 }

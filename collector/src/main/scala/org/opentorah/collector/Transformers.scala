@@ -5,9 +5,12 @@ import org.opentorah.tei.{Availability, CalendarDesc, LangUsage, Language, Profi
   SourceDesc, Tei}
 import org.opentorah.util.Files
 import org.opentorah.xml.Xml
+import org.slf4j.{Logger, LoggerFactory}
 import scala.xml.{Attribute, Elem, Node}
 
 object Transformers {
+
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
     case Nil => Nil
@@ -57,7 +60,7 @@ object Transformers {
       if (!target.startsWith("/")) elem else {
         val (url, part) = Files.urlAndPart(target)
         site.resolve(url).fold {
-          println(s"did not resolve: $target")
+          logger.warn(s"did not resolve: $target")
           elem
         } { resolved =>
           val roleShouldBe: Option[String] = resolved match {

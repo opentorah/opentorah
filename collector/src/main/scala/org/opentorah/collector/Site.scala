@@ -49,8 +49,6 @@ object Site {
     directory: File,
     site: Site
   ): Unit = {
-    println("Writing site.")
-
     writeSiteObject(new IndexObject(site), directory)
     writeSiteObject(new TreeIndexObject(site), directory)
     writeSiteObject(new NamesObject(site), directory)

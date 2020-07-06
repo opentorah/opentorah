@@ -7,9 +7,15 @@ import org.opentorah.store.{Store, WithPath}
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
 import org.opentorah.xml.{From, PrettyPrinter}
+import org.slf4j.{Logger, LoggerFactory}
 import scala.xml.Elem
 
 object Main {
+
+  LoggerFactory.getILoggerFactory.asInstanceOf[ch.qos.logback.classic.LoggerContext]
+    .getLogger(Logger.ROOT_LOGGER_NAME).setLevel(ch.qos.logback.classic.Level.INFO)
+
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def main(args: Array[String]): Unit = {
     val docs: File = new File(args(0))
@@ -23,23 +29,24 @@ object Main {
     fromUrl: URL,
     siteRoot: File
   ): Unit = {
-    println("Reading store.")
+    logger.info("Reading store.")
 
     val store: Store = Store.read(fromUrl)
     val references: Seq[WithPath[EntityReference]] = store.withPath[EntityReference](values = _.references)
 
-    println("Checking store.")
+    logger.info("Checking store.")
     def findByRef(ref: String): Option[Entity] = store.entities.get.findByRef(ref)
     val errors: Seq[String] = references.flatMap(reference => checkReference(reference.value, findByRef))
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
 
-    println("Pretty-printing store.")
+    logger.info("Pretty-printing store.")
     for (entityHolder <- store.entities.get.by.get.stores)
       prettyPrint(entityHolder, Entity.toXml(entityHolder.entity.copy(id = None)), Tei.prettyPrinter)
     prettyPrint(store)
 
     val site = new Site(store, references)
 
+    logger.info("Writing site.")
     Site.write(
       siteRoot,
       site

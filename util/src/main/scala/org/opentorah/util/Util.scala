@@ -10,9 +10,13 @@ object Util {
     info.getImplementationTitle + " version " + info.getImplementationVersion
   }
 
-  def split(what: String, on: Char): (String, Option[String]) = {
-    val index: Int = what.lastIndexOf(on)
-    if (index == -1) (what, None)
-    else (what.substring(0, index), Some(what.substring(index+1)))
+  def split(what: String, on: Char): (String, Option[String]) = what.lastIndexOf(on) match {
+    case -1 => (what, None)
+    case index => (what.substring(0, index), Some(what.substring(index+1)))
+  }
+
+  def splitRight(what: String, on: Char): (Option[String], String) = what.lastIndexOf(on) match {
+    case -1 => (None, what)
+    case index => (Some(what.substring(0, index)), what.substring(index+1))
   }
 }

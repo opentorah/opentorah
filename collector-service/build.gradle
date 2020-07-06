@@ -9,9 +9,8 @@ description = 'Archive Collector Service'
 configureService()
 
 dependencies {
-  implementation (project(':collector')) {
-    exclude group: 'org.slf4j', module: 'slf4j-jdk14'
-  }
+  implementation project(':collector')
+  implementation project(':util')
 }
 
 final String gcloudAccount = 'dub@opentorah.org'
