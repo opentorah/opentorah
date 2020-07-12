@@ -9,7 +9,9 @@ final case class ProfileDesc(
   langUsage: Option[LangUsage],
   textClass: Option[TextClass.Value],
   correspDesc: Option[CorrespDesc.Value],
-  calendarDesc: Option[CalendarDesc.Value]
+  calendarDesc: Option[CalendarDesc.Value],
+  handNotes: Option[HandNotes],
+  listTranspose: Option[ListTranspose.Value]
 )
 
 object ProfileDesc extends Element[ProfileDesc](
@@ -21,7 +23,9 @@ object ProfileDesc extends Element[ProfileDesc](
       LangUsage,
       TextClass.parsable,
       CorrespDesc.parsable,
-      CalendarDesc.parsable
+      CalendarDesc.parsable,
+      HandNotes,
+      ListTranspose.parsable
     ))
     documentAbstract <- values.optional(Abstract.parsable)
     creation <- values.optional(Creation)
@@ -29,13 +33,17 @@ object ProfileDesc extends Element[ProfileDesc](
     textClass <- values.optional(TextClass.parsable)
     correspDesc <- values.optional(CorrespDesc.parsable)
     calendarDesc <- values.optional(CalendarDesc.parsable)
+    handNotes <- values.optional(HandNotes)
+    listTranspose <- values.optional(ListTranspose.parsable)
   } yield new ProfileDesc(
     documentAbstract,
     creation,
     langUsage,
     textClass,
     correspDesc,
-    calendarDesc
+    calendarDesc,
+    handNotes,
+    listTranspose
   )
 ) with ToXml[ProfileDesc] {
 
@@ -47,6 +55,8 @@ object ProfileDesc extends Element[ProfileDesc](
       {TextClass.parsable.toXml(value.textClass)}
       {CorrespDesc.parsable.toXml(value.correspDesc)}
       {CalendarDesc.parsable.toXml(value.calendarDesc)}
+      {HandNotes.toXml(value.handNotes)}
+      {ListTranspose.parsable.toXml(value.listTranspose)}
     </profileDesc>
 
   def apply(): ProfileDesc = new ProfileDesc(
@@ -55,6 +65,8 @@ object ProfileDesc extends Element[ProfileDesc](
     langUsage = None,
     textClass = None,
     correspDesc = None,
-    calendarDesc = None
+    calendarDesc = None,
+    handNotes = None,
+    listTranspose = None
   )
 }
