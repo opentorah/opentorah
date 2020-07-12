@@ -87,33 +87,9 @@ trait AttributeX[T] {
 
 object AttributeX {
 
-  trait BooleanAttribute extends AttributeX[Boolean] {
-    override def fromString(value: String): Boolean = value.toBoolean
-
-    override def toString(value: Boolean): String = value.toString
-  }
-
-  trait StringAttribute extends AttributeX[String] {
-    override def fromString(value: String): String = value
-
-    override def toString(value: String): String = value
-  }
-
   trait FloatAttribute extends AttributeX[Float] {
     override def fromString(value: String): Float = value.toFloat
 
     override def toString(value: Float): String = value.toString
-  }
-
-  trait IntAttribute extends AttributeX[Int] {
-    override def fromString(value: String): Int = value.toInt
-
-    override def toString(value: Int): String = value.toString
-  }
-
-  trait StringListAttribute extends AttributeX[List[String]] {
-    override def fromString(value: String): List[String] = value.split(",").toList.map(_.trim)
-
-    override def toString(value: List[String]): String = value.mkString(",")
   }
 }

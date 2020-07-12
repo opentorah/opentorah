@@ -36,22 +36,22 @@ object SeferHamitzvosLessons {
     override def names: Names = negative.withNumber(number)
   }
 
-  private val numberedParser: Parser[Int] = Attribute("n").positiveInt.required
+  private val numberedParser: Parser[Int] = Attribute.positiveInt("n").required
 
   private val partParsable: Parsable[Part] = new UnionParsable[Part](Seq(
-    new Element("positive", parser = numberedParser.map(Positive)),
-    new Element("negative", parser = numberedParser.map(Negative)),
-    new Element("named", parser = Names.parser.map(NamedPart))
+    new Element[Part]("positive") { override protected def parser: Parser[Positive] = numberedParser.map(Positive) },
+    new Element[Part]("negative") { override protected def parser: Parser[Negative] = numberedParser.map(Negative) },
+    new Element[Part]("named") { override protected def parser: Parser[NamedPart] = Names.parser.map(NamedPart) }
   ))
 
   private val lessonParser: Parser[Lesson] = for {
-    number <- Attribute("n").positiveInt.required
+    number <- Attribute.positiveInt("n").required
     parts <- partParsable.all
   } yield Lesson(number, parts)
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
   lazy val lessons: Seq[Lesson] = Metadata.load(
     from = From.resource(this),
-    elementParsable = new Element[Lesson](elementName = "lesson", parser = lessonParser)
+    elementParsable = new Element[Lesson]("lesson") { override protected def parser: Parser[Lesson] = lessonParser }
   )
 }

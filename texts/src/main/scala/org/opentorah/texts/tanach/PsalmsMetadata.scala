@@ -36,11 +36,10 @@ object PsalmsMetadata {
   } yield new Parsed(book, names, chapters, days, weekDays, books)
 
   private def spansParser(chapters: Chapters, name: String, number: Int): Parser[Seq[Span]] = for {
-    numbered <- new Element[WithNumber[SpanParsed]](
-      elementName = name,
-      ContentType.Empty,
-      WithNumber.parse(SpanParsed.parser)
-    ).all
+    numbered <- new Element[WithNumber[SpanParsed]](name) {
+      override protected def contentType: ContentType = ContentType.Empty
+      override protected def parser: Parser[WithNumber[SpanParsed]] = WithNumber.parse(SpanParsed.parser)
+    }.all
   } yield {
     val spans: Seq[SpanParsed] = WithNumber.dropNumbers(WithNumber.checkNumber(numbered, number, name))
     SpanSemiResolved.setImpliedTo(spans.map(_.semiResolve), chapters.full, chapters)

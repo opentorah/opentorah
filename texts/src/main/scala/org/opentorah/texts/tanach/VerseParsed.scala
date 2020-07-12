@@ -24,12 +24,12 @@ final case class VerseParsed(chapter: Option[Int], verse: Option[Int]) {
 object VerseParsed {
 
   val fromParser: Parser[VerseParsed] = for {
-    chapter <- Attribute("fromChapter").positiveInt.optional
-    verse <- Attribute("fromVerse").positiveInt.optional
+    chapter <- Attribute.positiveInt("fromChapter").optional
+    verse <- Attribute.positiveInt("fromVerse").optional
   } yield VerseParsed(chapter, verse)
 
   val toParser: Parser[VerseParsed] = for {
-    chapter <- Attribute("toChapter").positiveInt.optional
-    verse <- Attribute("toVerse").positiveInt.optional
+    chapter <- Attribute.positiveInt("toChapter").optional
+    verse <- Attribute.positiveInt("toVerse").optional
   } yield VerseParsed(chapter, verse)
 }

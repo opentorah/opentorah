@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.entity.{EntityReference, EntityType}
-import org.opentorah.xml.{ContentType, Element, PrettyPrinter, ToXml, Xml}
+import org.opentorah.xml.{Attribute, Element, Namespace, Parser, PrettyPrinter, Xml}
 import scala.xml.{Elem, Node}
 
 final case class Tei(
@@ -32,25 +32,28 @@ final case class Tei(
   /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
 }
 
-object Tei extends Element[Tei](
-  elementName = "TEI",
-  contentType = ContentType.Elements,
-  parser = for {
+object Tei extends Element.WithToXml[Tei]("TEI") {
+
+  object Namespace extends Namespace(uri = "http://www.tei-c.org/ns/1.0")
+
+  type Transformer = Tei => Tei
+
+  override protected def parser: Parser[Tei] = for {
     teiHeader <- TeiHeader.required
     text <- Text.required
   } yield new Tei(
     teiHeader,
     text
   )
-) with ToXml[Tei] {
 
-  type Transformer = Tei => Tei
+  override protected def attributes(value: Tei): Seq[Attribute.Value[_]] = Seq(
+    Namespace.xmlnsAttribute
+  )
 
-  override def toXml(value: Tei): Elem =
-    <TEI xmlns="http://www.tei-c.org/ns/1.0">
-      {Xml.removeNamespace(TeiHeader.toXml(value.teiHeader))}
-      {Xml.removeNamespace(Text.toXml(value.text))}
-    </TEI>
+  override protected def content(value: Tei): Seq[Elem] = Seq(
+    Xml.removeNamespace(TeiHeader.toXml(value.teiHeader)),
+    Xml.removeNamespace(Text.toXml(value.text))
+  )
 
   def apply(body: Seq[Node]): Tei = new Tei(
     teiHeader = TeiHeader(),

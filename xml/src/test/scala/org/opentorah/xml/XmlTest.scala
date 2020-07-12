@@ -10,13 +10,20 @@ final class XmlTest extends AnyFlatSpec with Matchers {
 
   "text parsing" should "work" in {
     parseOrError(
-      new Element("a", ContentType.Elements, Text().optional)
-        .parse(From.xml("test", <s><a>asdjkh</a></s>))
+      new Element[Option[String]]("a") {
+        override protected def contentType: ContentType = ContentType.Elements
+        override protected def parser: Parser[Option[String]] = Text().optional
+      }
+        .parse(From.xml("test", <s>
+          <a>asdjkh</a>
+        </s>))
     ).isLeft shouldBe true
 
     Parser.parseDo(
-      new Element("a", ContentType.Characters, Text().required)
-        .parse(From.xml("test", <a>asdjkh</a>))
+      new Element[String]("a") {
+        override protected def contentType: ContentType = ContentType.Characters
+        override protected def parser: Parser[String] = Text().required
+      }.parse(From.xml("test", <a>asdjkh</a>))
     ) shouldBe "asdjkh"
   }
 
@@ -25,8 +32,13 @@ final class XmlTest extends AnyFlatSpec with Matchers {
   }
 
   private val file2parsable: Parsable[String] =
-    new Element("x", ContentType.Elements,
-      new Element("name", ContentType.Characters, Text().required).required)
+    new Element[String]("x") {
+      override protected def contentType: ContentType = ContentType.Elements
+      override protected def parser: Parser[String] = new Element[String]("name") {
+        override protected def contentType: ContentType = ContentType.Characters
+        override protected def parser: Parser[String] = Text().required
+      }.required
+    }
 
   "Include" should "work" in {
     Parser.parseDo(file2parsable

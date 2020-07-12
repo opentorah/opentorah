@@ -71,17 +71,17 @@ object Parsable {
     override def toString: String = parsable.toString + s" with include [$attributeName]"
 
     override val name2parser: Map[String, ContentTypeAndParser[A]] =
-      (for {
-        (elementName, contentTypeAndParser) <- parsable.name2parser
-        contentType = contentTypeAndParser.contentType
-        parser = contentTypeAndParser.parser
-      } yield (elementName, new ContentTypeAndParser[A](contentType,
+      (for { (elementName, contentTypeAndParser) <- parsable.name2parser }
+       yield (elementName, new ContentTypeAndParser[A](contentTypeAndParser.contentType,
         for {
           url <- Attribute(attributeName).optional
-          result <- url.fold(parser) { url => for {
+          result <- url.fold(contentTypeAndParser.parser) { url: String => for {
             currentFromUrl <- Context.currentFromUrl
             from <- Parser.effect(From.url(currentFromUrl.fold(new URL(url))(new URL(_, url))))
-            result <- new Element[A](elementName, contentType, parser).parse(from)
+            result <- new Element[A](elementName) {
+              override protected def contentType: ContentType = contentTypeAndParser.contentType
+              override protected def parser: Parser[A] = contentTypeAndParser.parser
+            }.parse(from)
           } yield result}
         } yield result
       ))).toMap

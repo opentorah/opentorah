@@ -18,6 +18,7 @@ final case class EntitiesList(
 }
 
 object EntitiesList extends Parsable[EntitiesList] with ToXml[EntitiesList] {
+  private val roleAttribute: Attribute[String] = Attribute("role")
 
   override def toString: String = "EntitiesList"
 
@@ -27,7 +28,7 @@ object EntitiesList extends Parsable[EntitiesList] with ToXml[EntitiesList] {
 
   private def parser(entityType: EntityType): Parser[EntitiesList] = for {
     id <- Attribute.id.required
-    role <- Attribute("role").optional
+    role <- roleAttribute.optional
     head <- Text("head").required
   } yield EntitiesList(
     entityType,
@@ -37,9 +38,13 @@ object EntitiesList extends Parsable[EntitiesList] with ToXml[EntitiesList] {
     Seq.empty
   )
 
-  override def toXml(value: EntitiesList): Elem =
-    <elem xml:id={value.id} role={value.role.orNull}>
-      <head>{value.head}</head>
-    </elem>
-    .copy(label = value.entityType.listElement)
+
+  override protected def elementName(value: EntitiesList): String = value.entityType.listElement
+
+  override protected def attributes(value: EntitiesList): Seq[Attribute.Value[_]] = Seq(
+    Attribute.id.withValue(value.id),
+    roleAttribute.withValue(value.role)
+  )
+
+  override protected def content(value: EntitiesList): Seq[Elem] = Seq(<head>{value.head}</head>)
 }

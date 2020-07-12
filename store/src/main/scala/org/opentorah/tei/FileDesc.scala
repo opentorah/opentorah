@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Element, ToXml}
+import org.opentorah.xml.{Attribute, Element, Parser}
 import scala.xml.Elem
 
 // PublicationStmt and SourceDesc are mandatory (TEI Guidelines),
@@ -16,9 +16,9 @@ final case class FileDesc(
   sourceDesc: Option[SourceDesc.Value]
 )
 
-object FileDesc extends Element[FileDesc](
-  elementName = "fileDesc",
-  parser = for {
+object FileDesc extends Element.WithToXml[FileDesc]("fileDesc") {
+
+  override protected def parser: Parser[FileDesc] = for {
     titleStmt <- TitleStmt.required
     editionStmt <- EditionStmt.parsable.optional
     extent <- Extent.parsable.optional
@@ -35,18 +35,17 @@ object FileDesc extends Element[FileDesc](
     notesStmt,
     sourceDesc
   )
-) with ToXml[FileDesc] {
 
-  override def toXml(value: FileDesc): Elem =
-    <fileDesc>
-      {TitleStmt.toXml(value.titleStmt)}
-      {EditionStmt.parsable.toXml(value.editionStmt)}
-      {Extent.parsable.toXml(value.extent)}
-      {PublicationStmt.toXml(value.publicationStmt)}
-      {SeriesStmt.parsable.toXml(value.seriesStmt)}
-      {NotesStmt.parsable.toXml(value.notesStmt)}
-      {SourceDesc.parsable.toXml(value.sourceDesc)}
-    </fileDesc>
+  override protected def attributes(value: FileDesc): Seq[Attribute.Value[_]] = Seq.empty
+
+  override protected def content(value: FileDesc): Seq[Elem] =
+    Seq(TitleStmt.toXml(value.titleStmt)) ++
+    EditionStmt.parsable.toXml(value.editionStmt) ++
+    Extent.parsable.toXml(value.extent) ++
+    PublicationStmt.toXml(value.publicationStmt) ++
+    SeriesStmt.parsable.toXml(value.seriesStmt) ++
+    NotesStmt.parsable.toXml(value.notesStmt) ++
+    SourceDesc.parsable.toXml(value.sourceDesc)
 
   def apply(): FileDesc = new FileDesc(
     titleStmt = TitleStmt(),

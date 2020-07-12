@@ -1,20 +1,22 @@
 package org.opentorah.xml
 
-import scala.xml.{Elem, Node}
+import scala.xml.Node
 
 class RawXml(elementName: String) {
 
   final class Value(val xml: Seq[Node])
 
-  object parsable extends Element[Value](
-    elementName,
-    ContentType.Mixed,
-    Element.allNodes.map(new Value(_))
-  ) with ToXml[Value] {
+  object parsable extends Element.WithToXml[Value](elementName) {
 
-    override def toString: String = s"raw element $elementName"
+    override def toString: String = s"raw element ${RawXml.this.elementName}"
 
-    override def toXml(value: Value): Elem = <elem>{value.xml}</elem>.copy(label = elementName)
+    override protected def contentType: ContentType = ContentType.Mixed
+
+    override protected def parser: Parser[Value] = Element.allNodes.map(new Value(_))
+
+    override protected def attributes(value: Value): Seq[Attribute.Value[_]] = Seq.empty
+
+    override protected def content(value: Value): Seq[Node] = value.xml
   }
 }
 

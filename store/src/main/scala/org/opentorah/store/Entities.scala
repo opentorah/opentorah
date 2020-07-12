@@ -3,7 +3,8 @@ package org.opentorah.store
 import java.net.URL
 import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
 import org.opentorah.metadata.Names
-import org.opentorah.xml.{Attribute, Parser, ToXml}
+import org.opentorah.xml.{Attribute, Parser}
+
 import scala.xml.Elem
 
 final class Entities(
@@ -40,21 +41,27 @@ object Entities {
     lists: Seq[EntitiesList]
   )
 
-  object parsable extends org.opentorah.xml.Element[Element]("entities", parser = for {
-    selector <- Attribute("selector").required
-    by <- By.parsable.required
-    lists <- EntitiesList.all
-  } yield Element(
-    selector,
-    by,
-    lists
-  )) with ToXml[Element] {
+  object parsable extends org.opentorah.xml.Element.WithToXml[Element]("entities") {
 
-    override def toXml(value: Element): Elem =
-      <entities selector={value.selector}>
-        {By.parsable.toXml(value.by)}
-        {EntitiesList.toXml(value.lists)}
-      </entities>
+    private val selectorAttribute: Attribute[String] = Attribute("selector")
+
+    override protected def parser: Parser[Element] = for {
+      selector <- selectorAttribute.required
+      by <- By.parsable.required
+      lists <- EntitiesList.all
+    } yield Element(
+      selector,
+      by,
+      lists
+    )
+
+    override protected def attributes(value: Element): Seq[Attribute.Value[_]] = Seq(
+      selectorAttribute.withValue(value.selector)
+    )
+
+    override protected def content(value: Element): Seq[Elem] =
+      Seq(By.parsable.toXml(value.by)) ++
+      EntitiesList.toXml(value.lists)
   }
 
   final class EntitiesBy(

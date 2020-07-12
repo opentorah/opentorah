@@ -2,7 +2,7 @@ package org.opentorah.store
 
 import java.net.URL
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Parser, ToXml}
+import org.opentorah.xml.{Attribute, Parser}
 import zio.ZIO
 import scala.xml.Elem
 
@@ -23,23 +23,31 @@ abstract class Component(elementName: String) {
 
   def classOfInline: Class[_]
 
-  object parsable extends org.opentorah.xml.Element[Element](elementName, parser = for {
-    file <- Attribute("file").optional
-    result <- if (file.isDefined) ZIO.succeed(FromFile(file.get)) else  for {
-      className <- Attribute("type").optional
-      result <- inlineParser(className)
+  object parsable extends org.opentorah.xml.Element.WithToXml[Element](elementName) {
+    override protected def parser: Parser[Element] = for {
+      file <- Component.fileAttribute.optional
+      result <- if (file.isDefined) ZIO.succeed(FromFile(file.get)) else  for {
+        className <- Attribute("type").optional
+        result <- inlineParser(className)
+      } yield result
     } yield result
-  } yield result) with ToXml[Element] {
 
-    override def toXml(value: Element): Elem = value match {
-      case FromFile(file) => <element file={file}/>.copy(label = elementName)
-      case inline => inlineToXml(inline.asInstanceOf[Inline])
+    override protected def attributes(value: Element): Seq[Attribute.Value[_]] = value match {
+      case FromFile(file) => Seq(Component.fileAttribute.withValue(file))
+      case inline => inlineAttributes(inline.asInstanceOf[Inline])
+    }
+
+    override protected def content(value: Element): Seq[Elem] = value match {
+      case FromFile(_) => Seq.empty
+      case inline => inlineContent(inline.asInstanceOf[Inline])
     }
   }
 
   def inlineParser(className: Option[String]): Parser[Inline]
 
-  def inlineToXml(value: Inline): Elem
+  protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]]
+
+  protected def inlineContent(value: Inline): Seq[Elem]
 
   final type Creator[+R] = (
     /* inheritedSelectors: */ Seq[Selector],
@@ -96,4 +104,10 @@ abstract class Component(elementName: String) {
       inline
     ).asInstanceOf[R]
   }
+}
+
+object Component {
+  val fileAttribute: Attribute[String] = Attribute("file")
+
+  val typeAttribute: Attribute[String] = Attribute("type")
 }

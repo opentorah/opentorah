@@ -1,8 +1,7 @@
 package org.opentorah.entity
 
-import org.opentorah.store.Path
-import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, ToXml, UnionParsable}
-import scala.xml.{Elem, Node}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, ToXml, UnionParsable}
+import scala.xml.Node
 
 final case class EntityReference(
   entityType: EntityType,
@@ -14,14 +13,18 @@ final case class EntityReference(
 
 object EntityReference extends ToXml[EntityReference] {
 
-  private def parsable(entityType: EntityType): Parsable[EntityReference] = new Element[EntityReference](
-    elementName = entityType.nameElement,
-    contentType = ContentType.Mixed,
-    parser = for {
+  private val roleAttribute: Attribute[String] = Attribute("role")
+  private val refAttribute: Attribute[String] = Attribute("ref")
+  private val typeAttribute: Attribute[String] = Attribute("type")
+
+  private def parsable(entityType: EntityType): Parsable[EntityReference] = new Element[EntityReference](entityType.nameElement) {
+    override protected def contentType: ContentType = ContentType.Mixed
+
+    override protected def parser: Parser[EntityReference] = for {
       id <- Attribute.id.optional
-      role <- Attribute("role").optional
-      ref <- Attribute("ref").optional
-      _ <- Attribute("type").optional // We don't do anything with the type yet...
+      role <- roleAttribute.optional
+      ref <- refAttribute.optional
+      _ <- typeAttribute.optional // We don't do anything with the type yet...
       name <- Element.allNodes
     } yield new EntityReference(
       entityType,
@@ -30,7 +33,7 @@ object EntityReference extends ToXml[EntityReference] {
       role,
       ref
     )
-  )
+  }
 
   final val personParsable: Parsable[EntityReference] = parsable(EntityType.Person)
   final val organizationParsable: Parsable[EntityReference] = parsable(EntityType.Organization)
@@ -43,7 +46,13 @@ object EntityReference extends ToXml[EntityReference] {
   final def from(xml: Seq[Node]): Seq[EntityReference] =
     xml.flatMap(parsable.descendants)
 
-  override def toXml(value: EntityReference): Elem =
-    <name ref={value.ref.orNull} xml:id={value.id.orNull} role={value.role.orNull}>{value.name}</name>
-      .copy(label = value.entityType.nameElement)
+  override protected def elementName(value: EntityReference): String = value.entityType.nameElement
+
+  override protected def attributes(value: EntityReference): Seq[Attribute.Value[_]] = Seq(
+    refAttribute.withValue(value.ref),
+    Attribute.id.withValue(value.id),
+    roleAttribute.withValue(value.role)
+  )
+
+  override protected def content(value: EntityReference): Seq[Node] = value.name
 }

@@ -49,6 +49,9 @@ class Namespace(val uri: String, val prefix: String = "") {
 
   def xmlns: String =
     if (isDefault) Namespace.Xmlns.prefix else Namespace.Xmlns.qName(prefix)
+
+  def xmlnsAttribute: Attribute.Value[String] =
+    Attribute(xmlns).withValue(uri)
 }
 
 object Namespace {
