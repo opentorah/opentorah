@@ -10,7 +10,8 @@ import cats.effect.{Blocker, ContextShift, Sync}
 import cats.implicits._
 import fs2.io._
 import java.io._
-import java.net.URL
+import java.net.{URL, URLConnection}
+
 import org.http4s.{Header, Headers, HttpDate, MediaType, Request, Response, TransferCoding}
 import org.http4s.Status.NotModified
 import org.http4s.headers._
@@ -22,43 +23,44 @@ object MyStaticFile {
   def fromURL[F[_]](url: URL, blocker: Blocker, req: Option[Request[F]] = None)(implicit
                                                                                 F: Sync[F],
                                                                                 cs: ContextShift[F]): OptionT[F, Response[F]] = {
-    val fileUrl = url.getFile
-    val file = new File(fileUrl)
-    OptionT.apply(F.delay {
-      if (file.isDirectory)
-        None
-      else {
-        val urlConn = url.openConnection
-        val lastmod = HttpDate.fromEpochSecond(urlConn.getLastModified / 1000).toOption
-        val ifModifiedSince = req.flatMap(_.headers.get(`If-Modified-Since`))
-        val expired = (ifModifiedSince, lastmod).mapN(_.date < _).getOrElse(true)
+    val file = new File(url.getFile)
+    OptionT.apply(F.delay[Option[Response[F]]] {
+      if (file.isDirectory) None else {
+        val urlConn: URLConnection = url.openConnection
+        val lastmod: Option[HttpDate] = HttpDate.fromEpochSecond(urlConn.getLastModified / 1000).toOption
+        val ifModifiedSince: Option[`If-Modified-Since`] = req.flatMap(_.headers.get(`If-Modified-Since`))
+        val expired: Boolean = (ifModifiedSince, lastmod).mapN(_.date < _).getOrElse(true)
 
-        if (expired) {
-          val lastModHeader: List[Header] = lastmod.map(`Last-Modified`(_)).toList
-          val contentType = Files.nameAndExtension(url.getPath)._2
-            .flatMap(extension => MediaType.forExtension(extension).map(`Content-Type`(_))).toList
-          val len = urlConn.getContentLengthLong
-          val lenHeader =
-            if (len >= 0) `Content-Length`.unsafeFromLong(len)
-            else `Transfer-Encoding`(TransferCoding.chunked)
-          val headers = Headers(lenHeader :: lastModHeader ::: contentType)
-
-          fromStream(F.delay(url.openStream), headers, blocker)
-        } else {
+        if (!expired) {
           urlConn.getInputStream.close()
           Some(Response(NotModified))
+        } else {
+//          F.delay(url.openStream).redeem({ case e: FileNotFoundException => None }, stream => Some(Response(
+//            headers = headers(lastmod, url, urlConn.getContentLengthLong),
+//            body = readInputStream[F](F.pure(stream), DefaultBufferSize, blocker
+//          ))))
+          Some(Response(
+            headers = headers(lastmod, url, urlConn.getContentLengthLong),
+            body = readInputStream[F](F.delay(url.openStream), DefaultBufferSize, blocker)
+          ))
         }
       }
-    })
+    }
+//    .recover({ case e: FileNotFoundException => None: Option[Response[F]] })
+    )
   }
 
-  private def fromStream[F[_]](inputStream: F[InputStream], headers: Headers, blocker: Blocker)(implicit
-                                                            F: Sync[F],
-                                                            cs: ContextShift[F]): Option[Response[F]] = {
-    Some(
-      Response(
-        headers = headers,
-        body = readInputStream[F](F.suspend(inputStream), DefaultBufferSize, blocker)
-      ))
+  private def headers(
+    lastmod: Option[HttpDate],
+    url: URL,
+    len: Long
+  ): Headers = {
+    val lastModHeader: List[Header] = lastmod.map(`Last-Modified`(_)).toList
+    val contentType = Files.nameAndExtension(url.getPath)._2
+      .flatMap(extension => MediaType.forExtension(extension).map(`Content-Type`(_))).toList
+    val lenHeader =
+      if (len >= 0) `Content-Length`.unsafeFromLong(len)
+      else `Transfer-Encoding`(TransferCoding.chunked)
+    Headers(lenHeader :: lastModHeader ::: contentType)
   }
 }

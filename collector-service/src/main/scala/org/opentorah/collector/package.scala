@@ -8,5 +8,5 @@ import zio.console.Console
 package object collector {
   type ServiceEnvironment = Console with Clock with Blocking
 
-  type ServiceTask[A] = RIO[ServiceEnvironment, A]
+  type ServiceTask[+A] = RIO[ServiceEnvironment, A]
 }

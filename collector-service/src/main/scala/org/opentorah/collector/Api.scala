@@ -32,13 +32,33 @@ final class Api(otherHost: String) {
       NotFound(message)
     }
 
+//    val x = SyncServiceTask[_]].suspend(MyStaticFile
+//      .fromURL(url, blocker, Some(request)))
+
     MyStaticFile
-      .fromURL(url, blocker, Some(request))
+      .fromURL/*[ServiceTask]*/(url, blocker, Some(request))
       .getOrElseF(notFound)
       .timed.mapEffect { case (duration: Duration, result: Response[ServiceTask]) =>
         Log.info(logger, request, s"GOT ${formatDuration(duration)} $url")
         result
       }
+
+
+//    StaticFile.fromURL[F](url, blocker)
+//      .semiflatMap { res =>
+//        res.body.chunks // chunks for better efficiency
+//          .pull // start pulling to replay the original body stream
+//          .fold(Stream.empty.covaryAll[F, Byte]) { _ ++ Stream.chunk(_) }
+//          .flatMap { restream =>
+//            Pull.output1(res.withBodyStream(restream))
+//          }
+//          .recoverWith { case ex: FileNotFoundException =>
+//            Pull.output1(Response[F](status = Status.NotFound).withEntity("not found: " + ex.getMessage))
+//          }
+//          .stream // Stream[F, Response[F]]
+//          .compile
+//          .lastOrError // there should be a single `Response` entity after all
+//      }
   }
 
   private def reTarget(uri: Uri): URL = {
