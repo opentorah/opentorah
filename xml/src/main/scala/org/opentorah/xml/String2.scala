@@ -2,6 +2,7 @@ package org.opentorah.xml
 
 import zio.ZIO
 
+// TODO dissolve into Conversion
 object String2 {
 
   val boolean: String => Parser[Boolean] =

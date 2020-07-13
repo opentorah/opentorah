@@ -71,7 +71,7 @@ object MishnehTorah {
   }
 
   private def bookParser: Parser[Book] = for {
-    number <- Attribute.int("n").required
+    number <- Attribute.IntAttribute("n").required
     names <- Names.parser
     parts <- new Element[Part]("part") { override protected def parser: Parser[Part] = partParser }.all
     _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
@@ -83,8 +83,8 @@ object MishnehTorah {
   }
 
   private def partParser: Parser[Part] = for {
-    number <- Attribute.positiveInt("n").required
-    numChapters <- Attribute.positiveInt("chapters").required
+    number <- Attribute.PositiveIntAttribute("n").required
+    numChapters <- Attribute.PositiveIntAttribute("chapters").required
     names <- Names.parser
     chapters <- chapterParsable.all
   } yield {

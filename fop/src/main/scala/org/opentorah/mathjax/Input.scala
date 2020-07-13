@@ -1,6 +1,6 @@
 package org.opentorah.mathjax
 
-import org.opentorah.xml.Namespace
+import org.opentorah.xml.{Attribute, Namespace}
 
 sealed trait Input {
   def name: String
@@ -40,10 +40,8 @@ object Input {
     * Type of the input: TeX, MathML, AsciiMath.
     */
   @SerialVersionUID(1L)
-  case object Attribute extends org.opentorah.xml.AttributeX[Input] {
-    override def namespace: Namespace = MathJax.Namespace
-
-    override def name: String = "input"
+  case object Attribute extends Attribute[Input]("input") {
+    override def namespace: Option[Namespace] = Some(MathJax.Namespace)
 
     override def toString(value: Input): String = value.name
 

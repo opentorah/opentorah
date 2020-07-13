@@ -1,6 +1,6 @@
 package org.opentorah.mathjax
 
-import org.opentorah.xml.{AttributeX, Namespace}
+import org.opentorah.xml.{Attribute, Namespace}
 import org.w3c.dom.{Document, Element}
 
 object MathML {
@@ -16,13 +16,12 @@ object MathML {
     * Display mode: inline or block (display math).
     */
   @SerialVersionUID(1L)
-  case object DisplayAttribute extends AttributeX[Boolean] {
+  case object DisplayAttribute extends Attribute[Boolean]("display") {
     private val inline: String = "inline"
     private val block: String = "block"
     private val values: Set[String] = Set(inline, block)
 
-    override def namespace: org.opentorah.xml.Namespace = Namespace
-    override def name: String = "display"
+    override def namespace: Option[Namespace] = Some(Namespace)
 
     override def fromString(value: String): Boolean = {
       require(values.contains(value))
@@ -31,7 +30,7 @@ object MathML {
 
     override def toString(value: Boolean): String = if (value) inline else block
 
-    def default: Boolean = false
+    override def default: Boolean = false
   }
 
   val mimeType: String = "application/mathml+xml"

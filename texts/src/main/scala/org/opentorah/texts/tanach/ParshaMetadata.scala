@@ -111,7 +111,7 @@ object ParshaMetadata {
   private def dayParser: Parser[DayParsed] = for {
     span <- numberedParser
     custom <- Attribute("custom").optional.map(_.fold[Set[Custom]](Set(Custom.Common))(Custom.parse))
-    isCombined <- Attribute.boolean("combined").optional.map(_.getOrElse(false))
+    isCombined <- Attribute.BooleanAttribute("combined").optional.map(_.getOrElse(false))
   } yield DayParsed(span, custom, isCombined)
 
   private def numberedParser: Parser[Torah.Numbered] = WithNumber.parse(semiResolvedParser)

@@ -12,7 +12,7 @@ final case class Language(
 object Language extends Element.WithToXml[Language]("language") {
 
   private val identAttribute: Attribute[String] = Attribute("ident")
-  private val usageAttribute: Attribute.PositiveIntAttribute = Attribute.positiveInt("usage")
+  private val usageAttribute: Attribute.PositiveIntAttribute = Attribute.PositiveIntAttribute("usage")
 
   override protected def contentType: ContentType = ContentType.Mixed
 

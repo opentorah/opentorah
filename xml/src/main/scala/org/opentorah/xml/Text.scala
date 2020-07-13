@@ -1,15 +1,10 @@
 package org.opentorah.xml
 
-final class Text {
+final class Text extends Requireable[String] {
   override def toString: String = s"element text"
 
-  def optional: Parser[Option[String]] =
+  override def optional: Parser[Option[String]] =
     Context.takeCharacters
-
-  def required: Parser[String] = for {
-    result <- optional
-    _ <- Parser.check(result.isDefined, s"Required $this is missing")
-  } yield result.get
 }
 
 object Text {

@@ -36,7 +36,7 @@ object SeferHamitzvosLessons {
     override def names: Names = negative.withNumber(number)
   }
 
-  private val numberedParser: Parser[Int] = Attribute.positiveInt("n").required
+  private val numberedParser: Parser[Int] = Attribute.PositiveIntAttribute("n").required
 
   private val partParsable: Parsable[Part] = new UnionParsable[Part](Seq(
     new Element[Part]("positive") { override protected def parser: Parser[Positive] = numberedParser.map(Positive) },
@@ -45,7 +45,7 @@ object SeferHamitzvosLessons {
   ))
 
   private val lessonParser: Parser[Lesson] = for {
-    number <- Attribute.positiveInt("n").required
+    number <- Attribute.PositiveIntAttribute("n").required
     parts <- partParsable.all
   } yield Lesson(number, parts)
 

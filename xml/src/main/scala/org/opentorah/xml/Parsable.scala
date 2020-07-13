@@ -5,19 +5,14 @@ import org.opentorah.util.Collections
 import zio.ZIO
 import scala.xml.{Elem, Node}
 
-trait Parsable[A] {
+trait Parsable[A] extends Requireable[A] {
 
   def name2parser: Map[String, Parsable.ContentTypeAndParser[A]]
 
-  final val optional: Parser[Option[A]] = for {
+  final override val optional: Parser[Option[A]] = for {
     elementOpt <- Context.nextElement(element => name2parser.keySet.contains(element.label))
     result <- elementOpt.fold[Parser[Option[A]]](ZIO.none)(element =>
       nested(None, element, name2parser(element.label)).map(Some(_)))
-  } yield result
-
-  final val required: Parser[A] = for {
-    opt <- optional
-    result <- opt.fold[Parser[A]](ZIO.fail(s"$this required, bot none found"))(ZIO.succeed[A](_))
   } yield result
 
   final def all: Parser[Seq[A]] = all(Seq.empty)

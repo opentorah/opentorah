@@ -14,8 +14,8 @@ final case class Pb(
 object Pb extends Element.WithToXml[Pb]("pb") {
 
   private val nAttribute: Attribute[String] = Attribute("n")
-  private val missingAttribute: Attribute.BooleanAttribute = Attribute.boolean("missing")
-  private val emptyAttribute: Attribute.BooleanAttribute = Attribute.boolean("empty")
+  private val missingAttribute: Attribute.BooleanAttribute = Attribute.BooleanAttribute("missing")
+  private val emptyAttribute: Attribute.BooleanAttribute = Attribute.BooleanAttribute("empty")
   private val facsAttribute: Attribute[String] = Attribute("facs")
 
   override protected def contentType: ContentType = ContentType.Empty
