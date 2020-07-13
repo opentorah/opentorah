@@ -1,13 +1,13 @@
 package org.opentorah.mathjax
 
-import org.opentorah.xml.AttributeX
+import org.opentorah.xml.{AttributeX, Namespace}
 import org.w3c.dom.{Document, Element}
 
 object MathML {
 
   // Note: only MathMLObj.getNormalNamespacePrefix() needs the prefix;
   // everywhere else default mapping is assumed.
-  object Namespace extends org.opentorah.xml.Namespace(
+  object Namespace extends Namespace(
     uri = "http://www.w3.org/1998/Math/MathML",
     prefix = "mathml"
   )

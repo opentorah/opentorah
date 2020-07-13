@@ -61,10 +61,9 @@ final class Chapters(chapters: Seq[Int]) {
 object Chapters {
 
   val parser: Parser[Chapters] = for {
-    chapters <- new Element[WithNumber[Int]](
-      "chapter",
-      parser = WithNumber.parse(Attribute("length").positiveInt.required)
-    ).all
+    chapters <- new Element[WithNumber[Int]]("chapter") {
+      override protected def parser: Parser[WithNumber[Int]] = WithNumber.parse(Attribute.positiveInt("length").required)
+    }.all
   } yield {
     WithNumber.checkConsecutive(chapters, "chapter")
     new Chapters(WithNumber.dropNumbers(chapters))

@@ -1,5 +1,7 @@
 package org.opentorah.docbook.plugin
 
+import org.opentorah.xml.Namespace
+
 object DocBook {
 
   val dtdId: String = "-//OASIS//DTD DocBook XML V5.0//EN"
@@ -8,7 +10,7 @@ object DocBook {
 
   val doctype: String = s"""<!DOCTYPE article PUBLIC "$dtdId" "$dtdUri">"""
 
-  object Namespace extends org.opentorah.xml.Namespace(uri = "http://docbook.org/ns/docbook") {
+  object Namespace extends Namespace(uri = "http://docbook.org/ns/docbook") {
     def withVersion: String = withVersion("5.0")
   }
 }

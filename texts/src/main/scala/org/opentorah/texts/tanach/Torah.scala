@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{WithNames, WithNumber}
 import org.opentorah.util.Collections
-import org.opentorah.xml.Element
+import org.opentorah.xml.{Element, Parser}
 
 // Other than on Simchas Torah, aliyot are from the same book.
 final case class Torah private(override val spans: Seq[Torah.BookSpan])
@@ -63,21 +63,19 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
     Torah(bookSpans)
   }
 
-  val torahParsable: Element[Torah] = new Element[Torah](
-    elementName = "torah",
-    parser = for {
+  val torahParsable: Element[Torah] = new Element[Torah]("torah") {
+    override protected def parser: Parser[Torah] = for {
       bookSpan <- spanParser.map(_.resolve)
-      spans <- new Element[Numbered](
-        elementName = "aliyah",
-        parser = WithNumber.parse(SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve))
-      ).all
+      spans <- new Element[Numbered]("aliyah") {
+        override protected def parser: Parser[WithNumber[SpanSemiResolved]] =
+          WithNumber.parse(SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve))
+      }.all
     } yield parseAliyot(bookSpan, spans, number = None)
-  )
+  }
 
-  val maftirParsable: Element[BookSpan] = new Element[BookSpan](
-    elementName = "maftir",
-    parser = spanParser.map(_.resolve)
-  )
+  val maftirParsable: Element[BookSpan] = new Element[BookSpan]("maftir") {
+    override protected def parser: Parser[BookSpan] = spanParser.map(_.resolve)
+  }
 
   def inBook(book: Tanach.ChumashBook, span: Span): BookSpan = BookSpan(book, span)
 

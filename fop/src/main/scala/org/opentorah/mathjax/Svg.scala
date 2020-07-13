@@ -33,7 +33,7 @@ object Svg {
 
   def forceXerces(): Unit = svgFactory
 
-  object Namespace extends org.opentorah.xml.Namespace(uri = "http://www.w3.org/2000/svg")
+  object Namespace extends Namespace(uri = "http://www.w3.org/2000/svg")
 
   val mimeType: String = "image/svg+xml"
 

@@ -53,7 +53,9 @@ object TanachMetadata {
   private def parse: Parsed = {
     val metadatas: Seq[TanachBookMetadata.Parsed] = Metadata.load(
       from = From.resource(Tanach),
-      elementParsable = Parsable.withInclude(new Element(elementName = "book", parser = bookParser))
+      elementParsable = Parsable.withInclude(new Element[TanachBookMetadata.Parsed]("book") {
+        override protected def parser: Parser[TanachBookMetadata.Parsed] = bookParser
+      })
     )
 
     val metadata: Map[Tanach.TanachBook, TanachBookMetadata.Parsed] =

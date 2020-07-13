@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, ContentType, Element, ToXml}
-import scala.xml.{Elem, Node}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parser}
+import scala.xml.Node
 
 final case class Date(
   when: String,
@@ -9,20 +9,28 @@ final case class Date(
   xml: Seq[Node]
 )
 
-object Date extends Element[Date](
-  elementName = "date",
-  contentType = ContentType.Mixed,
-  parser = for {
-    when <- Attribute("when").required
-    calendar <- Attribute("calendar").optional
+object Date extends Element.WithToXml[Date]("date") {
+
+  private val whenAttribute: Attribute[String] = Attribute("when")
+  private val calendarAttribute: Attribute[String] = Attribute("calendar")
+
+  override protected def contentType: ContentType = ContentType.Mixed
+
+  override protected def parser: Parser[Date] = for {
+    when <- whenAttribute.required
+    calendar <- calendarAttribute.optional
     xml <- Element.allNodes
   } yield new Date(
     when,
     calendar,
     xml
   )
-) with ToXml[Date] {
 
-  override def toXml(value: Date): Elem =
-    <date when={value.when} calendar={value.calendar.orNull}>{value.xml}</date>
+  override protected def attributes(value: Date): Seq[Attribute.Value[_]] = Seq(
+    whenAttribute.withValue(value.when),
+    calendarAttribute.withValue(value.calendar)
+  )
+
+  override protected def content(value: Date): Seq[Node] =
+    value.xml
 }

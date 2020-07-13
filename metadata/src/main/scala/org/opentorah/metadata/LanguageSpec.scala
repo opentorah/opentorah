@@ -28,13 +28,23 @@ object LanguageSpec {
   def apply(language: Language, isTransliterated: Boolean, flavour: String): LanguageSpec =
     new LanguageSpec(language = Some(language), isTransliterated = Some(isTransliterated), flavour = Some(flavour))
 
+  private val langAttribute: Attribute[String] = Attribute("lang")
+  private val transliteratedAttribute: Attribute.BooleanAttribute = Attribute.boolean("transliterated")
+  private val flavourAttribute: Attribute[String] = Attribute("flavour")
+
   val parser: Parser[LanguageSpec] = for {
-    lang <- Attribute("lang").optional
-    isTransliterated <- Attribute("transliterated").boolean.optional
-    flavour <- Attribute("flavour").optional
+    lang <- langAttribute.optional
+    isTransliterated <- transliteratedAttribute.optional
+    flavour <- flavourAttribute.optional
   } yield LanguageSpec(
     language = lang.map(Language.getForDefaultName),
     isTransliterated = isTransliterated,
     flavour = flavour
+  )
+
+  def attributes(value: LanguageSpec): Seq[Attribute.Value[_]] = Seq(
+    langAttribute.withValue(value.language.map(_.name)),
+    transliteratedAttribute.withValue(if (value.isTransliterated.contains(true)) Some(true) else None),
+    flavourAttribute.withValue(value.flavour)
   )
 }

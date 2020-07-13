@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, ContentType, Element, ToXml}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parser}
 import scala.xml.Elem
 
 final case class Pb(
@@ -11,15 +11,21 @@ final case class Pb(
   isEmpty: Boolean = false
 )
 
-object Pb extends Element[Pb](
-  elementName = "pb",
-  contentType = ContentType.Empty,
-  parser = for {
-    n <- Attribute("n").required
+object Pb extends Element.WithToXml[Pb]("pb") {
+
+  private val nAttribute: Attribute[String] = Attribute("n")
+  private val missingAttribute: Attribute.BooleanAttribute = Attribute.boolean("missing")
+  private val emptyAttribute: Attribute.BooleanAttribute = Attribute.boolean("empty")
+  private val facsAttribute: Attribute[String] = Attribute("facs")
+
+  override protected def contentType: ContentType = ContentType.Empty
+
+  override protected def parser: Parser[Pb] = for {
+    n <- nAttribute.required
     id <- Attribute.id.optional
-    facs <- Attribute("facs").optional
-    isMissing <- Attribute("missing").boolean.orFalse
-    isEmpty <- Attribute("empty").boolean.orFalse
+    facs <- facsAttribute.optional
+    isMissing <- missingAttribute.orFalse
+    isEmpty <- emptyAttribute.orFalse
   } yield new Pb(
     n,
     id,
@@ -27,14 +33,14 @@ object Pb extends Element[Pb](
     isMissing,
     isEmpty
   )
-) with ToXml[Pb] {
 
-  override def toXml(value: Pb): Elem =
-    <pb
-      n={value.n}
-      id={value.id.orNull}
-      facs={value.facs.orNull}
-      missing={if (value.isMissing) "true" else null}
-      empty={if (value.isEmpty) "true" else null}
-    />
+  override protected def attributes(value: Pb): Seq[Attribute.Value[_]] = Seq(
+    nAttribute.withValue(value.n),
+    Attribute.id.withValue(value.id),
+    facsAttribute.withValue(value.facs),
+    missingAttribute.withValue(if (value.isMissing) Some(true) else None),
+    emptyAttribute.withValue(if (value.isEmpty) Some(true) else None)
+  )
+
+  override protected def content(value: Pb): Seq[Elem] = Seq.empty
 }

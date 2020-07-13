@@ -76,9 +76,8 @@ object ChumashBookMetadata {
   }
 
   def parser(book: Tanach.ChumashBook, names: Names, chapters: Chapters): Parser[Parsed] = for {
-    weeks <- new Element[ParshaMetadata.Parsed](
-      elementName = "week",
-      parser = ParshaMetadata.parser(book)
-    ).all
+    weeks <- new Element[ParshaMetadata.Parsed]("week") {
+      override protected def parser: Parser[ParshaMetadata.Parsed] = ParshaMetadata.parser(book)
+    }.all
   } yield new Parsed(book, names, chapters, weeks)
 }

@@ -60,7 +60,9 @@ object MishnehTorah {
   lazy val books: Seq[Book] = {
     val result: Seq[Book] = Metadata.load(
       from = From.resource(this),
-      elementParsable = new Element(elementName = "book",  parser = bookParser)
+      elementParsable = new Element[Book]("book") {
+        override protected def parser: Parser[Book] = bookParser
+      }
     )
 
     require(result.map(_.number) == (0 to 14))
@@ -69,9 +71,9 @@ object MishnehTorah {
   }
 
   private def bookParser: Parser[Book] = for {
-    number <- Attribute("n").int.required
+    number <- Attribute.int("n").required
     names <- Names.parser
-    parts <- new Element[Part](elementName = "part", parser = partParser).all
+    parts <- new Element[Part]("part") { override protected def parser: Parser[Part] = partParser }.all
     _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
       s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
   } yield {
@@ -81,8 +83,8 @@ object MishnehTorah {
   }
 
   private def partParser: Parser[Part] = for {
-    number <- Attribute("n").positiveInt.required
-    numChapters <- Attribute("chapters").positiveInt.required
+    number <- Attribute.positiveInt("n").required
+    numChapters <- Attribute.positiveInt("chapters").required
     names <- Names.parser
     chapters <- chapterParsable.all
   } yield {
@@ -93,10 +95,9 @@ object MishnehTorah {
     }
   }
 
-  object chapterParsable extends Element[NamedChapter](
-    elementName = "chapter",
-    parser = for {
+  object chapterParsable extends Element[NamedChapter]("chapter") {
+    override protected def parser: Parser[NamedChapter] = for {
       names <- Names.parser
     } yield new NamedChapter(names)
-  )
+  }
 }

@@ -1,8 +1,8 @@
 package org.opentorah.tei
 
 import org.opentorah.entity.EntityReference
-import org.opentorah.xml.{Element, ToXml}
-import scala.xml.{Elem, Node}
+import org.opentorah.xml.{Attribute, Element, Parser}
+import scala.xml.Elem
 
 final case class TitleStmt(
   titles: Seq[Title.Value],
@@ -14,7 +14,7 @@ final case class TitleStmt(
   respStmts: Seq[RespStmt.Value]
 ) {
   def references: Seq[EntityReference] = {
-    val xml: Seq[Node] = Seq(
+    val xml: Seq[Elem] = Seq(
       titles.map(Title.parsable.toXml) ++
       authors.map(Author.parsable.toXml) ++
       sponsors.map(Sponsor.parsable.toXml) ++
@@ -27,9 +27,18 @@ final case class TitleStmt(
   }
 }
 
-object TitleStmt extends Element[TitleStmt](
-  elementName = "titleStmt",
-  parser = for {
+object TitleStmt extends Element.WithToXml[TitleStmt]("titleStmt") {
+  def apply(): TitleStmt = new TitleStmt(
+    titles = Seq.empty,
+    authors = Seq.empty,
+    editors = Seq.empty,
+    sponsors = Seq.empty,
+    funders = Seq.empty,
+    principals = Seq.empty,
+    respStmts = Seq.empty
+  )
+
+  override protected def parser: Parser[TitleStmt] = for {
     titles <- Title.parsable.all
     authors <- Author.parsable.all
     editors <- Editor.all
@@ -46,25 +55,15 @@ object TitleStmt extends Element[TitleStmt](
     principals,
     respStmts
   )
-) with ToXml[TitleStmt] {
-  def apply(): TitleStmt = new TitleStmt(
-    titles = Seq.empty,
-    authors = Seq.empty,
-    editors = Seq.empty,
-    sponsors = Seq.empty,
-    funders = Seq.empty,
-    principals = Seq.empty,
-    respStmts = Seq.empty
-  )
 
-  override def toXml(value: TitleStmt): Elem =
-    <titleStmt>
-      {Title.parsable.toXml(value.titles)}
-      {Author.parsable.toXml(value.authors)}
-      {Editor.toXml(value.editors)}
-      {Sponsor.parsable.toXml(value.sponsors)}
-      {Funder.parsable.toXml(value.funders)}
-      {Principal.parsable.toXml(value.principals)}
-      {RespStmt.parsable.toXml(value.respStmts)}
-    </titleStmt>
+  override protected def attributes(value: TitleStmt): Seq[Attribute.Value[_]] = Seq.empty
+
+  override protected def content(value: TitleStmt): Seq[Elem] =
+    Title.parsable.toXml(value.titles) ++
+    Author.parsable.toXml(value.authors) ++
+    Editor.toXml(value.editors) ++
+    Sponsor.parsable.toXml(value.sponsors) ++
+    Funder.parsable.toXml(value.funders) ++
+    Principal.parsable.toXml(value.principals) ++
+    RespStmt.parsable.toXml(value.respStmts)
 }

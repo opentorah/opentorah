@@ -1,24 +1,25 @@
 package org.opentorah.xml
 
-import scala.xml.Elem
+import scala.xml.Node
 
-class StringElement(elementName: String) extends Element[String](
-  elementName,
-  ContentType.Characters,
-  Text().required
-) with ToXml[String] {
+class StringElement(elementName: String) extends Element.WithToXml[String](elementName) {
   override def toString: Error = s"text element $elementName"
 
-  override def toXml(value: String): Elem =
-    <elem>{value}</elem>.copy(label = elementName)
+  override protected def contentType: ContentType = ContentType.Characters
 
-  class Converted[B](convert: String => Parser[B]) extends Element[B](
-    elementName,
-    contentType = ContentType.Characters,
-    parser = Text().required.flatMap(convert)
-  )  with ToXml[B] {
+  override protected def parser: Parser[String] = Text().required
+
+  override protected def attributes(value: String): Seq[Attribute.Value[_]] = Seq.empty
+
+  override protected def content(value: String): Seq[Node] =
+    Seq(Xml.textNode(value))
+
+  class Converted[B](convert: String => Parser[B]) extends Element.WithToXml[B](elementName) {
     override def toString: Error = StringElement.this.toString
-    override def toXml(value: B): Elem = StringElement.this.toXml(value.toString)
+    override protected def contentType: ContentType = ContentType.Characters
+    override protected def parser: Parser[B] = Text().required.flatMap(convert)
+    override protected def attributes(value: B): Seq[Attribute.Value[_]] = Seq.empty
+    override protected def content(value: B): Seq[Node] = StringElement.this.content(value.toString)
   }
 
   final class BooleanElement extends Converted[Boolean](String2.boolean) {

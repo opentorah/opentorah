@@ -1,7 +1,7 @@
 package org.opentorah.entity
 
 import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, ToXml, Xml}
-import scala.xml.{Elem, Node}
+import scala.xml.Node
 
 final case class Entity private(
   id: Option[String],
@@ -18,6 +18,8 @@ final case class Entity private(
 
 object Entity extends Parsable[Entity] with ToXml[Entity] {
 
+  private val roleAttribute: Attribute[String] = Attribute("role")
+
   override def toString: String = "Entity"
 
   override val name2parser: Map[String, Parsable.ContentTypeAndParser[Entity]] = EntityType.values.map { entity =>
@@ -25,8 +27,8 @@ object Entity extends Parsable[Entity] with ToXml[Entity] {
   }.toMap
 
   private def parser(entityType: EntityType): Parser[Entity] = for {
-    id <- Attribute("id").optional
-    role <- Attribute("role").optional
+    id <- Attribute.id.optional
+    role <- roleAttribute.optional
     names <- EntityName.parsable(entityType).all
     _ <- Parser.check(names.nonEmpty, s"No names in $id")
     content <- Element.allNodes
@@ -38,11 +40,14 @@ object Entity extends Parsable[Entity] with ToXml[Entity] {
     content = content.map(Xml.removeNamespace),
   )
 
-  override def toXml(value: Entity): Elem = {
-    <elem xml:id={value.id.orNull} role={value.role.orNull}>
-      {value.names.map(EntityName.toXml)}
-      {value.content}
-    </elem>
-      .copy(label = value.entityType.element)
-  }
+  override protected def elementName(value: Entity): String = value.entityType.element
+
+  override protected def attributes(value: Entity): Seq[Attribute.Value[_]] = Seq(
+    Attribute.id.withValue(value.id),
+    roleAttribute.withValue(value.role)
+  )
+
+  override protected def content(value: Entity): Seq[Node] =
+    value.names.map(EntityName.toXml) ++
+    value.content
 }

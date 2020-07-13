@@ -12,14 +12,13 @@ object Metadata {
   ): Seq[M] = {
     val typeName = from.name
 
-    val parsable: Element[Seq[M]] = new Element[Seq[M]](
-      elementName = rootElementName.getOrElse("metadata"),
-      parser = for {
+    val parsable: Element[Seq[M]] = new Element[Seq[M]](rootElementName.getOrElse("metadata")) {
+      override protected def parser: Parser[Seq[M]] = for {
         type_ <- Attribute("type").required
         _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
         result <- elementParsable.all
       } yield result
-    )
+    }
 
     Parser.parseDo(parsable.parse(from))
   }
@@ -31,7 +30,9 @@ object Metadata {
     val metadatas: Seq[Names] = load(
       from,
       rootElementName = Some("names"),
-      elementParsable = new Element(elementName = "names", parser = Names.parser)
+      elementParsable = new Element[Names]("names") {
+        override protected def parser: Parser[Names] = Names.parser
+      }
     )
 
     bind(

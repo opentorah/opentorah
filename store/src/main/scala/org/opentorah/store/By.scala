@@ -2,7 +2,7 @@ package org.opentorah.store
 
 import java.net.URL
 import org.opentorah.util.{Collections, Files}
-import org.opentorah.xml.{Attribute, Parser, Text, ToXml, Xml}
+import org.opentorah.xml.{Attribute, Parser, Text, Xml}
 import zio.ZIO
 import scala.xml.Elem
 
@@ -26,6 +26,10 @@ abstract class By[+S <: Store](
 
 object By extends Component("by") {
 
+  private val selectorAttribute: Attribute[String] = Attribute("selector")
+  private val directoryAttribute: Attribute[String] = Attribute("directory")
+  private val listAttribute: Attribute[String] = Attribute("list")
+
   final case class Inline(
     selector: String,
     directory: Option[String],
@@ -37,9 +41,9 @@ object By extends Component("by") {
   override def classOfInline: Class[Inline] = classOf[Inline]
 
   override def inlineParser(className: Option[String]): Parser[Inline] = for {
-    selector <- Attribute("selector").required
-    directory <- Attribute("directory").optional
-    list <- Attribute("list").optional
+    selector <- selectorAttribute.required
+    directory <- directoryAttribute.optional
+    list <- listAttribute.optional
     stores <- Store.parsable.all
   } yield Inline(
     selector,
@@ -49,10 +53,15 @@ object By extends Component("by") {
     className
   )
 
-  override def inlineToXml(value: Inline): Elem =
-    <by selector={value.selector} directory={value.directory.orNull} list={value.list.orNull} type={value.className.orNull}>
-      {Store.parsable.toXml(value.stores)}
-    </by>
+  override protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]] = Seq(
+    selectorAttribute.withValue(value.selector),
+    directoryAttribute.withValue(value.directory),
+    listAttribute.withValue(value.list),
+    Component.typeAttribute.withValue(value.className)
+  )
+
+  override protected def inlineContent(value: Inline): Seq[Elem] =
+    Store.parsable.toXml(value.stores)
 
   abstract class FromElement[+S <: Store](
     inheritedSelectors: Seq[Selector],
@@ -103,14 +112,13 @@ object By extends Component("by") {
       override protected def storeCreator: Store.Creator[Store] = Store.creator
     }
 
-  private object filesList extends org.opentorah.xml.Element[Seq[String]](
-    elementName = "filesList",
-    parser = Text("file").all
-  ) with ToXml[Seq[String]] {
+  private object filesList extends org.opentorah.xml.Element.WithToXml[Seq[String]]("filesList") {
 
-    override def toXml(value: Seq[String]): Elem =
-      <filesList>
-        {for (file <- value) yield <file>{file}</file>}
-      </filesList>
+    override protected def parser: Parser[Seq[String]] = Text("file").all
+
+    override protected def attributes(value: Seq[String]): Seq[Attribute.Value[_]] = Seq.empty
+
+    override protected def content(value: Seq[String]): Seq[Elem] =
+      for (file <- value) yield <file>{file}</file>
   }
 }

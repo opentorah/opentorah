@@ -47,6 +47,9 @@ abstract class Store(
 
 object Store extends Component("store") {
 
+  private val nAttribute: Attribute[String] = Attribute("n")
+  private val fromAttribute: Attribute[String] = Attribute("from")
+
   final case class Inline(
     names: Names,
     from: Option[String],
@@ -63,7 +66,7 @@ object Store extends Component("store") {
 
   override def inlineParser(className: Option[String]): Parser[Inline] = for {
     names <- Names.withDefaultNameParser
-    from <- Attribute("from").optional
+    from <- fromAttribute.optional
     title <- Title.parsable.optional
     storeAbstract <- Abstract.parsable.optional
     body <- Body.parsable.optional
@@ -82,18 +85,20 @@ object Store extends Component("store") {
     className
   )
 
-  override def inlineToXml(value: Inline): Elem = {
-    val defaultName: Option[String] = value.names.getDefaultName
-    <store n={defaultName.orNull} from={value.from.orNull} type={value.className.orNull}>
-      {if (defaultName.isDefined) Seq.empty else Names.toXml(value.names)}
-      {Title.parsable.toXml(value.title)}
-      {Abstract.parsable.toXml(value.storeAbstract)}
-      {Body.parsable.toXml(value.body)}
-      {Selector.toXml(value.selectors)}
-      {Entities.parsable.toXml(value.entities)}
-      {By.parsable.toXml(value.by)}
-    </store>
-  }
+  override protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]] = Seq(
+    nAttribute.withValue(value.names.getDefaultName),
+    fromAttribute.withValue(value.from),
+    Component.typeAttribute.withValue(value.className)
+  )
+
+  override protected def inlineContent(value: Inline): Seq[Elem] =
+    (if (value.names.getDefaultName.isDefined) Seq.empty else Names.toXml(value.names)) ++
+    Title.parsable.toXml(value.title) ++
+    Abstract.parsable.toXml(value.storeAbstract) ++
+    Body.parsable.toXml(value.body) ++
+    Selector.toXml(value.selectors) ++
+    Entities.parsable.toXml(value.entities) ++
+    By.parsable.toXml(value.by)
 
   class FromElement(
     inheritedSelectors: Seq[Selector],
