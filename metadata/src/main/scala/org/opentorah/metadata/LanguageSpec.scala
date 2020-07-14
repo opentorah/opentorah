@@ -44,7 +44,7 @@ object LanguageSpec {
 
   def attributes(value: LanguageSpec): Seq[Attribute.Value[_]] = Seq(
     langAttribute.withValue(value.language.map(_.name)),
-    transliteratedAttribute.withValue(if (value.isTransliterated.contains(true)) Some(true) else None),
+    transliteratedAttribute.withNonDefaultValue(value.isTransliterated),
     flavourAttribute.withValue(value.flavour)
   )
 }

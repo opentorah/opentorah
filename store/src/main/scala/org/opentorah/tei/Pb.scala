@@ -24,8 +24,8 @@ object Pb extends Element.WithToXml[Pb]("pb") {
     n <- nAttribute.required
     id <- Attribute.id.optional
     facs <- facsAttribute.optional
-    isMissing <- missingAttribute.orFalse
-    isEmpty <- emptyAttribute.orFalse
+    isMissing <- missingAttribute.optionalOrDefault
+    isEmpty <- emptyAttribute.optionalOrDefault
   } yield new Pb(
     n,
     id,
@@ -38,8 +38,8 @@ object Pb extends Element.WithToXml[Pb]("pb") {
     nAttribute.withValue(value.n),
     Attribute.id.withValue(value.id),
     facsAttribute.withValue(value.facs),
-    missingAttribute.withValue(if (value.isMissing) Some(true) else None),
-    emptyAttribute.withValue(if (value.isEmpty) Some(true) else None)
+    missingAttribute.withNonDefaultValue(value.isMissing),
+    emptyAttribute.withNonDefaultValue(value.isEmpty)
   )
 
   override protected def content(value: Pb): Seq[Elem] = Seq.empty

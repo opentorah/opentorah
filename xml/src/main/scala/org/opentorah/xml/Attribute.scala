@@ -21,9 +21,16 @@ abstract class Attribute[T](val name: String) extends Conversion[T] with Require
     value.fold[Parser[Option[T]]](ZIO.none)(parseFromString(_).map(Some(_)))
   }
 
+  final def optionalOrDefault: Parser[T] = optional.map(_.getOrElse(default))
+
   final def withValue(value: Option[T]): Attribute.Value[T] = new Attribute.Value[T](this, value)
 
   final def withValue(value: T): Attribute.Value[T] = withValue(Some(value))
+
+  final def withNonDefaultValue(value: Option[T]): Attribute.Value[T] =
+    new Attribute.Value[T](this, if (value.contains(default)) None else value)
+
+  final def withNonDefaultValue(value: T): Attribute.Value[T] = withNonDefaultValue(Some(value))
 
   // DOM
 
@@ -114,7 +121,6 @@ object Attribute {
 
   final class BooleanAttribute(name: String) extends Attribute[Boolean](name) with Conversion.BooleanConversion {
     override def default: Boolean = false
-    def orFalse: Parser[Boolean] = optional.map(_.getOrElse(false))
   }
 
   object BooleanAttribute {
