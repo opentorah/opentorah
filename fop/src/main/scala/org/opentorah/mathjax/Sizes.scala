@@ -5,7 +5,7 @@ import java.awt.geom.Point2D
 import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.properties.FixedLength
 import org.apache.xmlgraphics.image.loader.ImageSize
-import org.opentorah.xml.{AttributeX, Namespace}
+import org.opentorah.xml.{Attribute, Namespace}
 import org.w3c.dom.svg.SVGDocument
 
 /* Note:
@@ -101,9 +101,8 @@ object Sizes {
     * Font size (in points) used for the output.
     */
   @SerialVersionUID(1L)
-  case object FontSizeAttribute extends AttributeX.FloatAttribute {
-    override def namespace: Namespace = org.opentorah.mathjax.MathJax.Namespace
-    override def name: String = "fontSize"
+  case object FontSizeAttribute extends Attribute.FloatAttribute("fontSize") {
+    override def namespace: Option[Namespace] = Some(MathJax.Namespace)
     override def default: Float = 12.0f
   }
 }

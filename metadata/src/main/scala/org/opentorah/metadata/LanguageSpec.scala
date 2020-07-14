@@ -29,7 +29,7 @@ object LanguageSpec {
     new LanguageSpec(language = Some(language), isTransliterated = Some(isTransliterated), flavour = Some(flavour))
 
   private val langAttribute: Attribute[String] = Attribute("lang")
-  private val transliteratedAttribute: Attribute.BooleanAttribute = Attribute.boolean("transliterated")
+  private val transliteratedAttribute: Attribute.BooleanAttribute = Attribute.BooleanAttribute("transliterated")
   private val flavourAttribute: Attribute[String] = Attribute("flavour")
 
   val parser: Parser[LanguageSpec] = for {

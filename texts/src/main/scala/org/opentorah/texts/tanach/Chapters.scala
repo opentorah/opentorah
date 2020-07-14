@@ -62,7 +62,7 @@ object Chapters {
 
   val parser: Parser[Chapters] = for {
     chapters <- new Element[WithNumber[Int]]("chapter") {
-      override protected def parser: Parser[WithNumber[Int]] = WithNumber.parse(Attribute.positiveInt("length").required)
+      override protected def parser: Parser[WithNumber[Int]] = WithNumber.parse(Attribute.PositiveIntAttribute("length").required)
     }.all
   } yield {
     WithNumber.checkConsecutive(chapters, "chapter")

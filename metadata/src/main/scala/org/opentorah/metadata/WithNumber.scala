@@ -7,7 +7,7 @@ final class WithNumber[T](val n: Int, val what: T)
 object WithNumber {
 
   def parse[T](parser: Parser[T]): Parser[WithNumber[T]] = for {
-    n <- Attribute.positiveInt("n").required
+    n <- Attribute.PositiveIntAttribute("n").required
     what <- parser
   } yield new WithNumber[T](n, what)
 
