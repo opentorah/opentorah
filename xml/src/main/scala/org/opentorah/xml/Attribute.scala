@@ -36,8 +36,8 @@ abstract class Attribute[T](val name: String) extends Conversion[T] with Require
 
   final def get(document: Document): Option[T] = {
     val element: DomElement = document.getDocumentElement
-    val inDefaultNamespace: Boolean = namespace.isEmpty
-    get(if (inDefaultNamespace) element.getAttribute(name) else element.getAttributeNS(namespace.get.uri, name))
+    val namespaceEffective = namespace
+    get(namespaceEffective.fold(element.getAttribute(name))(namespace => element.getAttributeNS(namespace.uri, name)))
   }
 
   final def doGet(document: Document): T = get(document).get
@@ -46,13 +46,12 @@ abstract class Attribute[T](val name: String) extends Conversion[T] with Require
 
   final def set(value: T, document: Document): Unit = {
     val element = document.getDocumentElement
-    val inDefaultNamespace: Boolean = namespace.isEmpty || namespace.get.is(element.getNamespaceURI)
-    if (inDefaultNamespace) element.setAttribute(name, toString(value))
-    else {
+    val namespaceEffective = namespace.filterNot(_.is(element.getNamespaceURI))
+    namespaceEffective.fold(element.setAttribute(name, toString(value))){ namespace =>
       // declare the attribute's namespace if it is not declared
-      namespace.get.ensureDeclared(element)
+      namespace.ensureDeclared(element)
 
-      element.setAttributeNS(namespace.get.uri, namespace.get.qName(name), toString(value))
+      element.setAttributeNS(namespace.uri, namespace.qName(name), toString(value))
     }
   }
 
@@ -62,10 +61,10 @@ abstract class Attribute[T](val name: String) extends Conversion[T] with Require
     // Note: when attribute is in the default namespace, it needs to be retrieved accordingly.
     // This is needed for the 'display' attribute (the only attribute this method is used for) of the included MathML -
     // but somehow does not seem to break the inline MathML either :)
-    val inDefaultNamespace: Boolean = namespace.isEmpty || namespace.get.is(defaultNamespace)
+    val namespaceEffective = namespace.filterNot(_.is(defaultNamespace))
 
     get(attributes.getValue(
-      if (inDefaultNamespace) "" else namespace.get.uri,
+      namespaceEffective.fold("")(_.uri),
       name
     ))
   }
@@ -74,7 +73,7 @@ abstract class Attribute[T](val name: String) extends Conversion[T] with Require
     // Note: when attribute is added with the default namespace, this is not detected and a new namespace
     // with the same URI gets auto-declared - is this a bug or a feature?
     // Work-around: set the attribute *without* the namespace when I know that it is the default one!
-    val inDefaultNamespace: Boolean = namespace.isEmpty || namespace.get.is(defaultNamespace)
+    val namespaceEffective = namespace.filterNot(_.is(defaultNamespace))
 
     /* Note: if namespace.ensureDeclared() *is* called, I get error parsing the resulting fo:
       org.xml.sax.SAXParseException
@@ -87,12 +86,12 @@ abstract class Attribute[T](val name: String) extends Conversion[T] with Require
       if (!inDefaultNamespace) namespace.ensureDeclared(attributes)
      */
 
-    attributes.addAttribute(
-      if (inDefaultNamespace) "" else namespace.get.uri,
-      name,
-      if (inDefaultNamespace) name else namespace.get.qName(name),
-      "CDATA",
-      toString(value)
+    Attribute.addAttribute(
+      uri = namespaceEffective.fold("")(_.uri),
+      localName = name,
+      qName = namespaceEffective.fold(name)(_.qName(name)),
+      value = toString(value),
+      attributes
     )
   }
 
@@ -103,7 +102,6 @@ abstract class Attribute[T](val name: String) extends Conversion[T] with Require
 
   private def get(value: String): Option[T] =
     Option(value).filter(_.nonEmpty).map(fromString)
-
 }
 
 object Attribute {
@@ -149,4 +147,18 @@ object Attribute {
 
   val allAttributes: Parser[Map[String, String]] =
     Context.takeAllAttributes
+
+  def addAttribute(
+    uri: String,
+    localName: String,
+    qName: String,
+    value: String,
+    attributes: AttributesImpl
+  ): Unit = attributes.addAttribute(
+    uri,
+    localName,
+    qName,
+    "CDATA",
+    value
+  )
 }

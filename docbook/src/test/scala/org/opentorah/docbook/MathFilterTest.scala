@@ -119,7 +119,7 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
 //        , new org.opentorah.xml.TracingFilter
       ))
     )
-    val result = Xerces.toString(node)
+    val result = Xml.toString(node)
 //    println(result)
     result
   }

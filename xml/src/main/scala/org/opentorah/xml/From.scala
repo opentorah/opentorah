@@ -69,28 +69,8 @@ object From {
   private def loadFromUrl(url: URL): IO[Error, Elem] =
     loadFromSource(new InputSource(url.openStream()))
 
+  val useXerces: Boolean = true
+
   private def loadFromSource(source: InputSource): IO[Error, Elem] =
-    Parser.effect(XML.load(source))
-
-  // Turns out, it wasn't the parser that eliminated whitespace from the files -
-  // it was the call to Utility.trimproper!
-  //
-  // If for some other reason Xerces will be needed - here is how to hook it in:
-  //
-  // build.gradle:    implementation "xerces:xercesImpl:$xercesVersion"
-  //
-  //  def newSaxParserFactory: SAXParserFactory = {
-  //    val result = SAXParserFactory.newInstance() // new org.apache.xerces.jaxp.SAXParserFactoryImpl
-  //    result.setNamespaceAware(true)
-  //    result.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
-  //    //    result.setXIncludeAware(true)
-  //    result
-  //  }
-  //
-  //  def getParser: SAXParser = newSaxParserFactory.newSAXParser
-  //  XML.withSAXParser(getParser) OR BETTER - XML.loadXML(InputSource, SAXParser)
-
-  // --- XML validation with XSD; how do I do RNG?
-  // https://github.com/scala/scala-xml/wiki/XML-validation
-  // https://github.com/EdgeCaseBerg/scala-xsd-validation/blob/master/src/main/scala/LoadXmlWithSchema.scala
+    Parser.effect(XML.loadXML(source, if (useXerces) Xerces.getParser else XML.parser))
 }

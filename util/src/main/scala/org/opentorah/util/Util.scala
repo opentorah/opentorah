@@ -19,4 +19,15 @@ object Util {
     case -1 => (None, what)
     case index => (Some(what.substring(0, index)), what.substring(index+1))
   }
+
+  def squashWhitespace(what: String): String = what
+    .replace('\n', ' ')
+    .replace("  ", " ")
+    .replace("  ", " ")
+    .replace("  ", " ")
+    .replace("  ", " ")
+    .replace("  ", " ")
+    .replace("  ", " ")
+    .replace("  ", " ")
+    .replace("  ", " ")
 }

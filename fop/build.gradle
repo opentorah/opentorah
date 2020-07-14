@@ -18,7 +18,6 @@ dependencies {
   implementation "org.xmlresolver:xmlresolver:$xmlresolverVersion"
   implementation "saxon:saxon:$saxon6Version"
   implementation "net.sf.saxon:Saxon-HE:$saxon10Version"
-  implementation "xerces:xercesImpl:$xercesVersion"
 
   // FOP
   // FOP 2.4 uses JAI and JAI Codec from JBoss repository;

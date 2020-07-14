@@ -861,7 +861,7 @@ object SpecialReadings {
           Fast.defaultAfternoonHaftarah ++ afternoonHaftarahExceptions }
       val haftarah: Haftarah.Customs = fromDay(day, fastAfternoonHaftarah)
       new Reading(
-        customs = haftarah.lift { case (_: Custom, haftarah: Option[Haftarah]) =>
+        customs = haftarah.lift[Reading.ReadingCustom] { case (_: Custom, haftarah: Option[Haftarah]) =>
           haftarah.fold(Reading.ReadingCustom(torah, None)) { haftarah: Haftarah =>
             Reading.ReadingCustom(
               torah = Torah(torah.spans),
