@@ -3,7 +3,7 @@ package org.opentorah.mathjax
 import java.io.File
 import org.gradle.api.Project
 import org.opentorah.node.{J2V8, J2V8Distribution, Node, NodeDistribution}
-import org.opentorah.xml.{Namespace, Xerces}
+import org.opentorah.xml.{Namespace, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import org.w3c.dom.Document
 import org.w3c.dom.svg.SVGDocument
@@ -15,7 +15,7 @@ abstract class MathJax(
   final def typeset(mathMLDocument: Document): SVGDocument = {
     val input: Input = Input.Attribute.getWithDefault(mathMLDocument)
     val math: String =
-      if (input == Input.MathML) Xerces.toString(mathMLDocument) else MathML.unwrap(mathMLDocument)
+      if (input == Input.MathML) Xml.toString(mathMLDocument) else MathML.unwrap(mathMLDocument)
 
     val fontSize: Float = Sizes.FontSizeAttribute.doGet(mathMLDocument)
 

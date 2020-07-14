@@ -4,17 +4,7 @@ import org.w3c.dom.{Document, Element => DomElement}
 import org.xml.sax.helpers.AttributesImpl
 
 class Namespace(val uri: String, val prefix: String = "") {
-  override def toString: String = s"""$xmlns="$uri""""
-
-  def withVersion(version: String): String = toString + s""" version="$version""""
-
-  def isDefault: Boolean = prefix == ""
-
-  def qName(localName: String): String = if (isDefault) localName else prefix + ":" + localName
-
-  val default: Namespace = if (isDefault) this else new Namespace(uri)
-
-  override def equals(other: Any): Boolean = other match {
+  final override def equals(other: Any): Boolean = other match {
     case that: Namespace =>
       val result: Boolean = this.is(that)
       if (result) require(this.prefix == that.prefix)
@@ -23,11 +13,21 @@ class Namespace(val uri: String, val prefix: String = "") {
     case _ => false
   }
 
-  def is(document: Document): Boolean = is(document.getDocumentElement.getNamespaceURI)
+  final def is(document: Document): Boolean = is(document.getDocumentElement.getNamespaceURI)
 
-  def is(namespace: Namespace): Boolean = is(namespace.uri)
+  final def is(namespace: Namespace): Boolean = is(namespace.uri)
 
-  def is(namespaceUri: String): Boolean = namespaceUri == uri
+  final def is(namespaceUri: String): Boolean = namespaceUri == uri
+
+  final override def toString: String = s"""$xmlns="$uri""""
+
+  final def withVersion(version: String): String = toString + s""" version="$version""""
+
+  final def isDefault: Boolean = prefix == ""
+
+  final def qName(localName: String): String = if (isDefault) localName else prefix + ":" + localName
+
+  final lazy val default: Namespace = if (isDefault) this else new Namespace(uri, prefix = "")
 
   def ensureDeclared(element: DomElement): Unit =
     if (!isDeclared(element)) declare(element)
@@ -38,19 +38,26 @@ class Namespace(val uri: String, val prefix: String = "") {
   private def declare(element: DomElement): Unit =
     element.setAttributeNS(Namespace.Xmlns.uri, xmlns, uri)
 
-  def ensureDeclared(attributes: AttributesImpl): Unit =
+  final def ensureDeclared(attributes: AttributesImpl): Unit =
     if (!isDeclared(attributes)) declare(attributes)
 
   private def isDeclared(attributes: AttributesImpl): Boolean =
     attributes.getValue(Namespace.Xmlns.uri, prefix) == uri
 
-  def declare(attributes: AttributesImpl): Unit =
-    attributes.addAttribute(Namespace.Xmlns.uri, prefix, xmlns, "CDATA", uri)
+  final def declare(attributes: AttributesImpl): Unit = Attribute.addAttribute(
+    uri = Namespace.Xmlns.uri,
+    localName = prefix,
+    qName = xmlns,
+    value = uri,
+    attributes
+  )
 
-  def xmlns: String =
+  final def isXmlns: Boolean = prefix == Namespace.Xmlns.prefix
+
+  private def xmlns: String =
     if (isDefault) Namespace.Xmlns.prefix else Namespace.Xmlns.qName(prefix)
 
-  def xmlnsAttribute: Attribute.Value[String] =
+  final def xmlnsAttribute: Attribute.Value[String] =
     Attribute(xmlns).withValue(uri)
 }
 

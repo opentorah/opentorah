@@ -1,11 +1,13 @@
 package org.opentorah.xml
 
+import org.apache.xml.serializer.dom3.LSSerializerImpl
+import org.opentorah.util.Util
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Atom, Elem, Node, TopScope}
 
 object Xml {
 
-  val header: String    = """<?xml version="1.0" encoding="UTF-8"?>"""
+  val header: String   = """<?xml version="1.0" encoding="UTF-8"?>"""
   val header16: String = """<?xml version="1.0" encoding="UTF-16"?>"""
 
   type Transformer = Elem => Elem
@@ -47,22 +49,20 @@ object Xml {
   def textNode(text: String): Node = new scala.xml.Text(text)
 
   def toString(nodes: Seq[Node]): String = nodes.map(toString).mkString("")
-  def toString(node: Node): String = {
-    val result = node match {
+  def toString(node: Node): String = Util.squashWhitespace {
+    node match {
       case elem: Elem => (elem.child map (_.text)).mkString(" ")
       case node: Node => node.text
     }
-    result
-      .replace('\n', ' ')
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
-      .replace("  ", " ")
   }
 
   val prettyPrinter: PrettyPrinter = new PrettyPrinter
+
+  def toString(node: org.w3c.dom.Node): String = serializer.writeToString(node)
+
+  private val serializer: LSSerializerImpl = {
+    val result = new LSSerializerImpl
+    result.setParameter("format-pretty-print", true)
+    result
+  }
 }

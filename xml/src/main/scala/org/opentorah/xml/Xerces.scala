@@ -1,18 +1,9 @@
 package org.opentorah.xml
 
-import javax.xml.parsers.SAXParserFactory
-import org.w3c.dom.Node
+import javax.xml.parsers.{SAXParser, SAXParserFactory}
 import org.xml.sax.{XMLFilter, XMLReader}
 
 object Xerces {
-
-  def toString(node: Node): String = xmlSerializer.writeToString(node)
-
-  private val xmlSerializer: org.apache.xml.serializer.dom3.LSSerializerImpl = {
-    val result = new org.apache.xml.serializer.dom3.LSSerializerImpl
-    result.setParameter("format-pretty-print", true)
-    result
-  }
 
   val saxParserFactoryProperty: String = classOf[javax.xml.parsers.SAXParserFactory].getName
   val saxParserFactoryName: String = classOf[org.apache.xerces.jaxp.SAXParserFactoryImpl].getName
@@ -21,15 +12,18 @@ object Xerces {
   private def newSaxParserFactory: SAXParserFactory = {
     val result = new org.apache.xerces.jaxp.SAXParserFactoryImpl
     result.setXIncludeAware(true)
+    // result.setNamespaceAware(true)
+    // result.setFeature("http://xml.org/sax/features/namespace-prefixes", true)
     result
   }
 
+  def getParser: SAXParser = newSaxParserFactory.newSAXParser
+
+  def getXMLReader: XMLReader = getParser.getXMLReader
+
   def getFilteredXMLReader(filters: Seq[XMLFilter]): XMLReader =
     filters.foldLeft(getXMLReader) { case (parent, filter) =>
-        filter.setParent(parent)
-        filter
+      filter.setParent(parent)
+      filter
     }
-
-  private def getXMLReader: XMLReader =
-    newSaxParserFactory.newSAXParser.getXMLReader
 }
