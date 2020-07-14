@@ -7,16 +7,15 @@ trait ToXml[A] {
 
   final def toXml(values: Seq[A]): Seq[Elem] = values.map(toXml)
 
-  // TODO create it without copying:
-  final def toXml(value: A): Elem =
-    <elem>{content(value)}</elem>.copy(
-      label = elementName(value),
-      attributes = attributes(value).foldRight[MetaData](Null){ case (current, result) => new UnprefixedAttribute(
-        current.attribute.name,
-        current.valueToString.orNull,
-        result
-      )}
-    )
+  final def toXml(value: A): Elem = <elem/>.copy(
+    label = elementName(value),
+    attributes = attributes(value).foldRight[MetaData](Null){ case (current, result) => new UnprefixedAttribute(
+      current.attribute.name,
+      current.valueToString.orNull,
+      result
+    )},
+    child = content(value)
+  )
 
   protected def elementName(value: A): String
 
