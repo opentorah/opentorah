@@ -1,7 +1,6 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{WithNames, WithNumber}
-import org.opentorah.util.Collections
 import org.opentorah.xml.{Element, Parser}
 
 // Other than on Simchas Torah, aliyot are from the same book.
@@ -50,27 +49,30 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
 
   def parseAliyot(
     bookSpan: BookSpan,
-    aliyotRaw: Seq[Numbered],
+    aliyot: Seq[Numbered],
     number: Option[Int]
-  ): Torah = {
+  ): Parser[Torah] = {
     val span: Span = bookSpan.span
     val chapters: Chapters = bookSpan.book.chapters
-    val with1: Seq[Numbered] = addImplied1(aliyotRaw, span, chapters)
-    val numberedSpans: Seq[Numbered] = WithNumber.checkNumber(with1, number.getOrElse(with1.length), "span")
-    val spans: Seq[Span] = SpanSemiResolved.setImpliedTo(WithNumber.dropNumbers(numberedSpans), span, chapters)
-    require(bookSpan.book.chapters.consecutive(spans))
-    val bookSpans: Seq[Aliyah] = spans.map(inBook(bookSpan.book, _))
-    Torah(bookSpans)
+    val with1: Seq[Numbered] = addImplied1(aliyot, span, chapters)
+    for {
+      _ <- WithNumber.checkNumber(with1, number.getOrElse(with1.length), "span")
+      spans: Seq[Span] = SpanSemiResolved.setImpliedTo(WithNumber.dropNumbers(with1), span, chapters)
+      _ <- Parser.check(bookSpan.book.chapters.consecutive(spans), s"Non-consecutive: $spans")
+    } yield Torah(spans.map(inBook(bookSpan.book, _)))
   }
 
   val torahParsable: Element[Torah] = new Element[Torah]("torah") {
     override protected def parser: Parser[Torah] = for {
       bookSpan <- spanParser.map(_.resolve)
-      spans <- new Element[Numbered]("aliyah") {
-        override protected def parser: Parser[WithNumber[SpanSemiResolved]] =
-          WithNumber.parse(SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve))
-      }.all
-    } yield parseAliyot(bookSpan, spans, number = None)
+      spans <- aliyahParsable(bookSpan).all
+      result <- parseAliyot(bookSpan, spans, number = None)
+    } yield result
+  }
+
+  private def aliyahParsable(bookSpan: BookSpan): Element[Numbered] = new Element[Numbered]("aliyah") {
+    override protected def parser: Parser[WithNumber[SpanSemiResolved]] =
+      WithNumber.parse(SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve))
   }
 
   val maftirParsable: Element[BookSpan] = new Element[BookSpan]("maftir") {
@@ -83,15 +85,15 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
     book: Tanach.ChumashBook,
     days: Custom.Sets[Seq[Numbered]],
     span: Span
-  ): Torah.Customs = {
+  ): Parser[Torah.Customs] = {
     val bookSpan = inBook(book, span)
     val with1 = addImplied1(Custom.common(days), span, book.chapters)
 
-    val result: Custom.Sets[Torah] = Collections.mapValues(days){ spans: Seq[Numbered] =>
+    val result: Parser[Custom.Sets[Torah]] = Parser.mapValues(days){ spans: Seq[Numbered] =>
       parseAliyot(bookSpan, WithNumber.overlay(with1, spans), Some(7))
     }
 
-    Custom.Of(result)
+    result.map(Custom.Of(_))
   }
 
   private def addImplied1(

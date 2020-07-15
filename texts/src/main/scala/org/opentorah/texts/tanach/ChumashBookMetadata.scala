@@ -21,7 +21,7 @@ object ChumashBookMetadata {
     weeks: Seq[ParshaMetadata.Parsed]
   ) extends TanachBookMetadata.Parsed(book, names, chapters) {
 
-    def resolve: ChumashBookMetadata = {
+    def resolve: Parser[ChumashBookMetadata] = {
       val parsha2metadataParsed = Metadata.toMap(book.parshiot, weeks, (metadata: ParshaMetadata.Parsed) => metadata.parsha)
 
       val chaptersFull = chapters.full
@@ -38,12 +38,12 @@ object ChumashBookMetadata {
         f = combineDays(parsha2span, _)
       )
 
-      val parsha2metadata = Collections.mapValues(parsha2metadataParsed)(metadata => metadata.resolve(
+      val parsha2metadata = Parser.mapValues(parsha2metadataParsed)(metadata => metadata.resolve(
         parshaSpan = parsha2span(metadata.parsha),
         daysCombined = parsha2daysCombined(metadata.parsha)
       ))
 
-      new ChumashBookMetadata(book, parsha2metadata)
+      parsha2metadata.map(new ChumashBookMetadata(book, _))
     }
 
     private def combineDays(parsha2span: Map[Parsha, Span],
@@ -56,13 +56,13 @@ object ChumashBookMetadata {
           }
 
           val book = parsha.book
-          Some(Torah.processDays(
+          Some(Parser.parseDo(Torah.processDays(
             book,
             combined,
             book.chapters.merge(
               parsha2span(parsha),
               parsha2span(parshaNext)
-            )))
+            ))))
         }
 
         result +: combineDays(parsha2span, (parshaNext, daysNext) +: tail)
@@ -76,8 +76,11 @@ object ChumashBookMetadata {
   }
 
   def parser(book: Tanach.ChumashBook, names: Names, chapters: Chapters): Parser[Parsed] = for {
-    weeks <- new Element[ParshaMetadata.Parsed]("week") {
-      override protected def parser: Parser[ParshaMetadata.Parsed] = ParshaMetadata.parser(book)
-    }.all
+    weeks <- weekParsable(book).all
   } yield new Parsed(book, names, chapters, weeks)
+
+  private def weekParsable(book: Tanach.ChumashBook): Element[ParshaMetadata.Parsed] =
+    new Element[ParshaMetadata.Parsed]("week") {
+      override protected def parser: Parser[ParshaMetadata.Parsed] = ParshaMetadata.parser(book)
+    }
 }

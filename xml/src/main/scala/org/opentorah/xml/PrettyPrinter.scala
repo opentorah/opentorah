@@ -1,5 +1,7 @@
 package org.opentorah.xml
 
+import org.opentorah.util.Strings
+import org.opentorah.util.Strings.sbToString
 import org.typelevel.paiges.Doc
 import scala.xml.{Elem, MetaData, NamespaceBinding, Node, SpecialNode, TopScope, Utility}
 
@@ -11,8 +13,6 @@ final class PrettyPrinter(
   nestElements: Set[String] = Set(),
   clingyElements: Set[String] = Set()
 ) {
-  import PrettyPrinter.sbToString
-
   private def isClingy(node: Node): Boolean = Xml.isElement(node) && clingyElements.contains(node.label)
 
   def renderXml(node: Node): String = Xml.header + "\n" + render(node) + "\n"
@@ -67,7 +67,7 @@ final class PrettyPrinter(
       val end: Doc = Doc.text(s"</$name>")
 
       val stackElements: Boolean = noAtoms &&
-        ((chunks.length >= 2) || ((chunks.length == 1) && (allwaysStackElements.contains(element.label)))) &&
+        ((chunks.length >= 2) || ((chunks.length == 1) && allwaysStackElements.contains(element.label))) &&
         !doNotStackElements.contains(element.label)
       if (stackElements) {
         // If this is clearly a bunch of elements - stack 'em with an indent:
@@ -207,13 +207,8 @@ object PrettyPrinter {
   private def atomize(result: Seq[Node], nodes: Seq[Node]): Seq[Node] = if (nodes.isEmpty) result else {
     val (atoms: Seq[Node], tail: Seq[Node]) = nodes.span(Xml.isText)
 
-    val newResult: Seq[Node] = if (atoms.isEmpty) result else {
-      val text: String = atoms.map(_.asInstanceOf[scala.xml.Text].data).mkString("")
-        .replace('\n', ' ')
-        .replace('\t', ' ')
-
-      result ++ processText(Seq.empty, text)
-    }
+    val newResult: Seq[Node] = if (atoms.isEmpty) result else result ++
+      processText(Seq.empty, Strings.squashBigWhitespace(atoms.map(_.asInstanceOf[scala.xml.Text].data).mkString("")))
 
     if (tail.isEmpty) newResult
     else atomize(newResult :+ tail.head, tail.tail)
@@ -227,11 +222,5 @@ object PrettyPrinter {
 
     if (word.isEmpty) newResult
     else processText(newResult :+ scala.xml.Text(word), tail2)
-  }
-
-  private def sbToString(f: StringBuilder => Unit): String = {
-    val sb = new StringBuilder
-    f(sb)
-    sb.toString
   }
 }

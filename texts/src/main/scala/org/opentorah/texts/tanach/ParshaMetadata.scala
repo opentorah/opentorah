@@ -29,13 +29,12 @@ object ParshaMetadata {
     def resolve(
       parshaSpan: Span,
       daysCombined: Option[Torah.Customs]
-    ): ParshaMetadata = {
-
-      val days = daysResolved(parshaSpan)
-      val aliyot = aliyotResolved(parshaSpan, days)
-      val maftir = maftirResolved(parshaSpan)
-
-      new ParshaMetadata(
+    ): Parser[ParshaMetadata] = {
+      for {
+        days <- daysResolved(parshaSpan)
+        aliyot <- aliyotResolved(parshaSpan, days)
+        maftir = maftirResolved(parshaSpan)
+      } yield new ParshaMetadata(
         parsha,
         names,
         parshaSpan,
@@ -46,10 +45,10 @@ object ParshaMetadata {
       )
     }
 
-    private def daysResolved(parshaSpan: Span): Torah.Customs =
+    private def daysResolved(parshaSpan: Span): Parser[Torah.Customs] =
       Torah.processDays(parsha.book, days, parshaSpan)
 
-    private def aliyotResolved(parshaSpan: Span, days: Torah.Customs): Torah = {
+    private def aliyotResolved(parshaSpan: Span, days: Torah.Customs): Parser[Torah] = {
       val bookSpan = Torah.inBook(parsha.book,
         Span(
           parshaSpan.from,

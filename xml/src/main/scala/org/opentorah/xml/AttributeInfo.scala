@@ -1,6 +1,6 @@
 package org.opentorah.xml
 
-import org.opentorah.util.Util
+import org.opentorah.util.Strings
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -18,7 +18,7 @@ object AttributeInfo {
       s"AttributeInfo(localName=$localName, qName=$qName, value=$value; type=${`type`}; uri=$uri; namespace=$namespace)"
 
     val namespace: Option[Namespace] = {
-      val (prefix: Option[String], tail: String) = Util.splitRight(qName, ':')
+      val (prefix: Option[String], tail: String) = Strings.splitRight(qName, ':')
       prefix.map { prefix =>
         require(tail == localName)
         new Namespace(prefix = prefix, uri = uri)

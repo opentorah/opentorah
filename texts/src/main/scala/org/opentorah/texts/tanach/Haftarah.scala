@@ -78,7 +78,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
   }
 
   private def partsParser(parts: Seq[WithNumber[BookSpan]]): Parser[Haftarah] = for {
-    _ <- WithNumber.checkConsecutiveNg(parts, "part")
+    _ <- WithNumber.checkConsecutive(parts, "part")
     _ <- Parser.check(parts.length > 1, "too short")
   } yield Haftarah(WithNumber.dropNumbers(parts))
 }

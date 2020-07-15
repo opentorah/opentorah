@@ -1,6 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Attribute, Parser}
+import org.opentorah.xml.{Attribute, Parser, Result}
 
 final class WithNumber[T](val n: Int, val what: T)
 
@@ -11,19 +11,13 @@ object WithNumber {
     what <- parser
   } yield new WithNumber[T](n, what)
 
-  def checkConsecutive[T](result: Seq[WithNumber[T]], what: String): Seq[WithNumber[T]] = {
-    require(result.map(_.n) == (1 to result.length), s"Wrong $what numbers: $result")
-    result
-  }
-
-  def checkConsecutiveNg[T](result: Seq[WithNumber[T]], what: String): Parser[Unit] =
+  def checkConsecutive[T](result: Seq[WithNumber[T]], what: String): Result =
     Parser.check(result.map(_.n) == (1 to result.length), s"Wrong $what numbers: $result")
 
-  def checkNumber[T](result: Seq[WithNumber[T]], number: Int, what: String): Seq[WithNumber[T]] = {
-    checkConsecutive(result, what)
-    require(result.length == number, s"Wrong number of ${what}s: ${result.length} != $number")
-    result
-  }
+  def checkNumber[T](result: Seq[WithNumber[T]], number: Int, what: String): Result = for {
+    _ <- checkConsecutive(result, what)
+    _ <- Parser.check(result.length == number, s"Wrong number of ${what}s: ${result.length} != $number")
+  } yield ()
 
   def overlay[T](base: Seq[WithNumber[T]], differences: Seq[WithNumber[T]]): Seq[WithNumber[T]] = {
     val result = scala.collection.mutable.ArrayBuffer.empty[WithNumber[T]] ++= base

@@ -11,6 +11,9 @@ object Parser {
     results <- if (errors.nonEmpty) IO.fail(errors.mkString("Errors:\n  ", "\n  ", "\n.")) else IO.succeed(results)
   } yield results
 
+  def mapValues[A, B, C](map: Map[A, B])(f: B => Parser[C]): Parser[Map[A, C]] =
+    collectAll(map.toSeq.map { case (a, b) => f(b).map(a -> _) }).map(_.toMap)
+
   private[xml] def effect[A](f: => A): IO[Error, A] = IO(f).mapError(_.getMessage)
 
   def check(condition: Boolean, message: => String): Result =
