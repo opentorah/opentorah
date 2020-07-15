@@ -60,12 +60,13 @@ final class Chapters(chapters: Seq[Int]) {
 
 object Chapters {
 
-  val parser: Parser[Chapters] = for {
-    chapters <- new Element[WithNumber[Int]]("chapter") {
-      override protected def parser: Parser[WithNumber[Int]] = WithNumber.parse(Attribute.PositiveIntAttribute("length").required)
-    }.all
-  } yield {
-    WithNumber.checkConsecutive(chapters, "chapter")
-    new Chapters(WithNumber.dropNumbers(chapters))
+  private val chapterParsable = new Element[WithNumber[Int]]("chapter") {
+    override protected def parser: Parser[WithNumber[Int]] =
+      WithNumber.parse(Attribute.PositiveIntAttribute("length").required)
   }
+
+  val parser: Parser[Chapters] = for {
+    chapters <- chapterParsable.all
+    _ <- WithNumber.checkConsecutive(chapters, "chapter")
+  } yield new Chapters(WithNumber.dropNumbers(chapters))
 }

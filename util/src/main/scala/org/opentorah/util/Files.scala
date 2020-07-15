@@ -22,9 +22,9 @@ object Files {
     name
   }
 
-  def pathAndName(path: String): (Option[String], String) = Util.splitRight(path, '/')
+  def pathAndName(path: String): (Option[String], String) = Strings.splitRight(path, '/')
 
-  def nameAndExtension(fullName: String): (String, Option[String]) = Util.split(fullName, '.')
+  def nameAndExtension(fullName: String): (String, Option[String]) = Strings.split(fullName, '.')
 
   def prefixedDirectory(directory: File, prefix: Option[String]): File =
     prefix.fold(directory)(prefix => new File(directory, prefix))
@@ -67,7 +67,7 @@ object Files {
 
   def isFile(url: URL): Boolean = url.getProtocol == "file"
 
-  def urlAndPart(what: String): (String, Option[String]) = Util.split(what, '#')
+  def urlAndPart(what: String): (String, Option[String]) = Strings.split(what, '#')
 
   def removePart(from: String): String = urlAndPart(from)._1
 

@@ -1,6 +1,6 @@
 package org.opentorah.docbook.section
 
-import org.opentorah.util.Util
+import org.opentorah.util.Strings
 import Section.Parameters
 
 final class Sections(
@@ -40,7 +40,7 @@ object Sections {
     val docBook2s: collection.mutable.Map[DocBook2, Parameters] = collection.mutable.HashMap.empty
     val variants: collection.mutable.ListBuffer[(Variant, Parameters)] = collection.mutable.ListBuffer.empty
     for ((name: String, sectionParameters: Parameters) <- parameters) {
-      val (sectionName: String, variantName: Option[String]) = Util.split(name, '-')
+      val (sectionName: String, variantName: Option[String]) = Strings.split(name, '-')
       if (variantName.isEmpty) {
         val docBook2: Option[DocBook2] = DocBook2.find(sectionName)
         if (docBook2.isEmpty) commonSections += ((CommonSection.forName(sectionName), sectionParameters))

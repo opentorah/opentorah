@@ -11,14 +11,14 @@ object TanachMetadata {
   sealed trait State
   final case object Empty extends State
   final case class Parsed(
-    names: Map[Tanach.TanachBook, Names],
-    chapters: Map[Tanach.TanachBook, Chapters],
-    metadata: Map[Tanach.TanachBook, TanachBookMetadata.Parsed]
+    names: Map[TanachBook, Names],
+    chapters: Map[TanachBook, Chapters],
+    metadata: Map[TanachBook, TanachBookMetadata.Parsed]
   ) extends State
   final case class Resolved(
-    names: Map[Tanach.TanachBook, Names],
-    chapters: Map[Tanach.TanachBook, Chapters],
-    metadata: Map[Tanach.TanachBook, TanachBookMetadata]
+    names: Map[TanachBook, Names],
+    chapters: Map[TanachBook, Chapters],
+    metadata: Map[TanachBook, TanachBookMetadata]
   ) extends State
 
   private var state: State = Empty
@@ -32,7 +32,7 @@ object TanachMetadata {
     }
   }
 
-  def getChapters(book: Tanach.TanachBook): Chapters = {
+  def getChapters(book: TanachBook): Chapters = {
     ensureParsed()
     state match {
       case Parsed(_, chapters, _) => chapters(book)
@@ -58,7 +58,7 @@ object TanachMetadata {
       })
     )
 
-    val metadata: Map[Tanach.TanachBook, TanachBookMetadata.Parsed] =
+    val metadata: Map[TanachBook, TanachBookMetadata.Parsed] =
       Metadata.toMap(Tanach.values, metadatas, (metadata: TanachBookMetadata.Parsed) =>  metadata.book)
 
     Parsed(
@@ -71,7 +71,7 @@ object TanachMetadata {
   private def bookParser: Parser[TanachBookMetadata.Parsed] = for {
     names <- Names.withDefaultNameParser
     chapters <- Chapters.parser
-    book = Metadata.find[Tanach.TanachBook, Names](Tanach.values, names)
+    book = Metadata.find[TanachBook, Names](Tanach.values, names)
     result <- book match {
       case book: Tanach.ChumashBook => ChumashBookMetadata.parser(book, names, chapters)
       case book: Tanach.Psalms.type => PsalmsMetadata.parser(book, names, chapters)
@@ -105,7 +105,7 @@ object TanachMetadata {
   private def resolve(parsed: Parsed): Resolved = Resolved(
     names = parsed.names,
     chapters = parsed.chapters,
-    metadata = Collections.mapValues(parsed.metadata)(_.resolve)
+    metadata = Collections.mapValues(parsed.metadata)(metadata => Parser.parseDo(metadata.resolve))
   )
 
   private var processing: Boolean = false

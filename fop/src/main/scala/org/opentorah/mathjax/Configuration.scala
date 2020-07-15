@@ -1,7 +1,7 @@
 package org.opentorah.mathjax
 
 import org.opentorah.mathjax.Configuration.{Delimiters, DelimitersAndInput}
-import org.opentorah.util.Json
+import org.opentorah.util.Strings
 
 // Rename MathJaxConfiguration
 final case class Configuration(
@@ -68,8 +68,8 @@ final case class Configuration(
   )
 
   private def json(delimiterss: Seq[Delimiters]): List[Any] = delimiterss.toList.map(delimiters => List(
-    Json.fromString(delimiters.start),
-    Json.fromString(delimiters.end)
+    Strings.escape(delimiters.start),
+    Strings.escape(delimiters.end)
   ))
 
   def allDelimiters: Seq[DelimitersAndInput] = {

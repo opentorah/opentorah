@@ -1,6 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.Names
+import org.opentorah.xml.Parser
 
 class TanachBookMetadata(
   val book: Tanach.TanachBook
@@ -13,6 +14,6 @@ object TanachBookMetadata {
     val names: Names,
     val chapters: Chapters
   ) {
-    def resolve: TanachBookMetadata
+    def resolve: Parser[TanachBookMetadata]
   }
 }

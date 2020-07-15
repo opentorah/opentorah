@@ -1,6 +1,8 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.Names
+import org.opentorah.xml.Parser
+import zio.ZIO
 
 final class NachBookMetadata(
   book: Tanach.NachBook
@@ -14,8 +16,8 @@ object NachBookMetadata {
      chapters: Chapters
   ) extends TanachBookMetadata.Parsed(book, names, chapters) {
 
-    override def resolve: NachBookMetadata = new NachBookMetadata(
+    override def resolve: Parser[NachBookMetadata] = ZIO.succeed(new NachBookMetadata(
       book
-    )
+    ))
   }
 }

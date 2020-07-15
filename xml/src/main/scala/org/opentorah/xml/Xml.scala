@@ -1,7 +1,7 @@
 package org.opentorah.xml
 
 import org.apache.xml.serializer.dom3.LSSerializerImpl
-import org.opentorah.util.Util
+import org.opentorah.util.Strings
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Atom, Elem, Node, TopScope}
 
@@ -49,7 +49,7 @@ object Xml {
   def textNode(text: String): Node = new scala.xml.Text(text)
 
   def toString(nodes: Seq[Node]): String = nodes.map(toString).mkString("")
-  def toString(node: Node): String = Util.squashWhitespace {
+  def toString(node: Node): String = Strings.squashWhitespace {
     node match {
       case elem: Elem => (elem.child map (_.text)).mkString(" ")
       case node: Node => node.text
