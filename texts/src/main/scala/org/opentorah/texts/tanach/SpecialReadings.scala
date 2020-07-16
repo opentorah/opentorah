@@ -21,7 +21,7 @@ object SpecialReadings {
   private def parseMaftir(element: Elem): Maftir = parse(Torah.maftirParsable, "Maftir", element)
 
   private def parseHaftarah(element: Elem, full: Boolean = true): Haftarah.Customs =
-    parse(Haftarah.haftarahParsable(full), "Haftarah", element)
+    parse(Haftarah.parsable(full), "Haftarah", element)
 
   private def parse[R](parsable: Parsable[R], what: String, element: Elem): R =
     Parser.parseDo(parsable.parse(From.xml(what, element)))

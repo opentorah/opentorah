@@ -78,7 +78,7 @@ object ParshaMetadata {
   )
 
   def parser(book: Tanach.ChumashBook): Parser[Parsed] = for {
-    names <- Names.parser
+    names <- Names.withoutDefaultNameParser
     span <- semiResolvedParser
     aliyot <- new Element[Torah.Numbered]("aliyah") {
       override protected def contentType: ContentType = ContentType.Empty
@@ -90,7 +90,7 @@ object ParshaMetadata {
     maftir <- new Element[SpanSemiResolved]("maftir") {
       override protected def parser: Parser[SpanSemiResolved] = semiResolvedParser
     }.required
-    parsha = Metadata.find[Parsha, Names](book.parshiot, names)
+    parsha <- Metadata.find[Parsha](book.parshiot, names)
   } yield {
     val (days: Seq[DayParsed], daysCombined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
     new Parsed(

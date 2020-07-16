@@ -21,30 +21,31 @@ object ChumashBookMetadata {
     weeks: Seq[ParshaMetadata.Parsed]
   ) extends TanachBookMetadata.Parsed(book, names, chapters) {
 
-    def resolve: Parser[ChumashBookMetadata] = {
-      val parsha2metadataParsed = Metadata.toMap(book.parshiot, weeks, (metadata: ParshaMetadata.Parsed) => metadata.parsha)
+    def resolve: Parser[ChumashBookMetadata] = for {
+      parsha2metadataParsed <- Metadata.bind(
+        keys = book.parshiot,
+        metadatas = weeks,
+        getKey = (metadata: ParshaMetadata.Parsed) => metadata.parsha)
 
-      val chaptersFull = chapters.full
-      val parsha2span: Map[Parsha, Span] = Collections.inSequence(
+      chaptersFull = chapters.full
+      parsha2span = Collections.inSequence(
         keys = book.parshiot,
         map = Collections.mapValues(parsha2metadataParsed)(_.span),
         f = (pairs: Seq[(Parsha, SpanSemiResolved)]) =>
           SpanSemiResolved.setImpliedTo(pairs.map(_._2), chaptersFull, chapters)
       )
 
-      val parsha2daysCombined: Map[Parsha, Option[Torah.Customs]] = Collections.inSequence(
+      parsha2daysCombined: Map[Parsha, Option[Torah.Customs]] = Collections.inSequence(
         keys = book.parshiot,
         map = Collections.mapValues(parsha2metadataParsed)(_.daysCombined),
         f = combineDays(parsha2span, _)
       )
 
-      val parsha2metadata = Parser.mapValues(parsha2metadataParsed)(metadata => metadata.resolve(
+      parsha2metadata <- Parser.mapValues(parsha2metadataParsed)(metadata => metadata.resolve(
         parshaSpan = parsha2span(metadata.parsha),
         daysCombined = parsha2daysCombined(metadata.parsha)
       ))
-
-      parsha2metadata.map(new ChumashBookMetadata(book, _))
-    }
+    } yield new ChumashBookMetadata(book, parsha2metadata)
 
     private def combineDays(parsha2span: Map[Parsha, Span],
       weeks: Seq[(Parsha, Custom.Sets[Seq[Torah.Numbered]])]

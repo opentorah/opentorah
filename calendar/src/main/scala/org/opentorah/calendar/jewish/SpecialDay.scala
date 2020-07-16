@@ -1,9 +1,9 @@
 package org.opentorah.calendar.jewish
 
 import org.opentorah.metadata.{Metadata, Names, WithName, WithNames}
-import org.opentorah.xml.From
 import Jewish.{Day, Year}
 import Jewish.Month.Name._
+import org.opentorah.xml.Parser
 
 sealed trait SpecialDay extends WithNames {
   def date(year: Year): Day
@@ -323,8 +323,9 @@ object SpecialDay {
     Omer, LagBaOmer, Shavuos1, FastOfTammuz, TishaBeAv
   )
 
-  private val toNames: Map[WithName, Names] = Metadata.loadNames(
-    keys = loadNames,
-    from = From.resource(this, "SpecialDay")
-  )
+  private val toNames: Map[WithName, Names] = Parser.parseDo(Metadata.loadNames(
+    obj = this,
+    resourceName = "SpecialDay",
+    keys = loadNames
+  ))
 }

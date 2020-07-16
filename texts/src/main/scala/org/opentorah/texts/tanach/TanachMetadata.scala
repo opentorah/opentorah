@@ -46,32 +46,33 @@ object TanachMetadata {
     state match {
       case Parsed(_, _, _) =>
       case Resolved(_, _, _) =>
-      case Empty => process(parse)
+      case Empty => process(Parser.parseDo(parse))
     }
   }
 
-  private def parse: Parsed = {
-    val metadatas: Seq[TanachBookMetadata.Parsed] = Metadata.load(
+  private def parse: Parser[Parsed] = for {
+    metadatas <- Metadata.load(
       from = From.resource(Tanach),
       elementParsable = Parsable.withInclude(new Element[TanachBookMetadata.Parsed]("book") {
         override protected def parser: Parser[TanachBookMetadata.Parsed] = bookParser
       })
     )
 
-    val metadata: Map[TanachBook, TanachBookMetadata.Parsed] =
-      Metadata.toMap(Tanach.values, metadatas, (metadata: TanachBookMetadata.Parsed) =>  metadata.book)
-
-    Parsed(
-      Collections.mapValues(metadata)(_.names),
-      Collections.mapValues(metadata)(_.chapters),
-      metadata
+    metadata <- Metadata.bind(
+      keys = Tanach.values,
+      metadatas,
+      getKey = (metadata: TanachBookMetadata.Parsed) => metadata.book
     )
-  }
+  } yield Parsed(
+    Collections.mapValues(metadata)(_.names),
+    Collections.mapValues(metadata)(_.chapters),
+    metadata
+  )
 
   private def bookParser: Parser[TanachBookMetadata.Parsed] = for {
     names <- Names.withDefaultNameParser
     chapters <- Chapters.parser
-    book = Metadata.find[TanachBook, Names](Tanach.values, names)
+    book <- Metadata.find[TanachBook](Tanach.values, names)
     result <- book match {
       case book: Tanach.ChumashBook => ChumashBookMetadata.parser(book, names, chapters)
       case book: Tanach.Psalms.type => PsalmsMetadata.parser(book, names, chapters)
