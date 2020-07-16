@@ -54,7 +54,7 @@ object Main {
   }
 
   private def prettyPrint(store: Store): Unit = {
-    prettyPrint(store, Store.parsable.toXml(store.asInstanceOf[Store.FromElement].element), prettyPrinter)
+    prettyPrint(store, Store.parsable.toXml(store.asInstanceOf[Store.FromElement].element), Store.prettyPrinter)
 
     store match {
       case collection: Collection =>
@@ -82,9 +82,4 @@ object Main {
       }
     }
   }
-
-  private val prettyPrinter: PrettyPrinter = new PrettyPrinter(
-    nestElements = Set(/*"title", "abstract",*/ "p"),
-    allwaysStackElements = Set("store", "by")
-  )
 }

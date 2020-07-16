@@ -4,7 +4,8 @@ import java.net.URL
 import org.opentorah.entity.EntityReference
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Title}
-import org.opentorah.xml.{Attribute, Parser}
+import org.opentorah.xml.{Attribute, Parser, PrettyPrinter}
+
 import scala.xml.{Elem, Node}
 
 abstract class Store(
@@ -146,4 +147,9 @@ object Store extends Component("store") {
 
   def read(fromUrl: URL): Store =
     read[Store](fromUrl, creator = Store.creator)
+
+  val prettyPrinter: PrettyPrinter = new PrettyPrinter(
+    nestElements = Set("p"),
+    allwaysStackElements = Set("store", "by")
+  )
 }
