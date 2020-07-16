@@ -103,7 +103,7 @@ final class PrettyPrinter(
     val whitespaceRight: Boolean = nodes.lastOption.exists(Xml.isWhitespace)
     val charactersLeft: Boolean = nodes.headOption.exists(node => Xml.isAtom(node) && !Xml.isWhitespace(node))
     val charactersRight: Boolean = nodes.lastOption.exists(node => Xml.isAtom(node) && !Xml.isWhitespace(node))
-    val chunks: Seq[Seq[Node]] = chunkify(Seq.empty, nodes)
+    val chunks: Seq[Seq[Node]] = chunkify(Seq.empty, Seq.empty, nodes)
     val noAtoms: Boolean = chunks.forall(_.forall(node => !Xml.isAtom(node)))
     val result = fromChunks(
       chunks,
@@ -149,38 +149,20 @@ final class PrettyPrinter(
     }
   }
 
-  @scala.annotation.tailrec
-  private def chunkify(result: Seq[Seq[Node]], nodes: Seq[Node]): Seq[Seq[Node]] = if (nodes.isEmpty) Seq.empty else {
-    val (chunk: Seq[Node], tail: Seq[Node]) = nodes.dropWhile(Xml.isWhitespace).span(node => !Xml.isWhitespace(node))
-    if (chunk.isEmpty) result else {
-      val newResult = result ++ splitChunk(chunk)
-      if (tail.forall(Xml.isWhitespace)) newResult
-      else chunkify(newResult, tail)
+  private def chunkify(result: Seq[Seq[Node]], current: Seq[Node], nodes: Seq[Node]): Seq[Seq[Node]] = {
+    def cling(c: Node, n: Node): Boolean = Xml.isText(c) || Xml.isText(n) || isClingy(n)
+    def flush(nodes: Seq[Node]): Seq[Seq[Node]] = chunkify(result :+ current.reverse, Nil, nodes)
+
+    (current, nodes) match {
+      case (Nil    , Nil    ) => result
+      case (c :: cs, Nil    ) => flush(Nil)
+      case (Nil    , n :: ns) if  Xml.isWhitespace(n) => chunkify(result, Nil, ns)
+      case (c :: cs, n :: ns) if  Xml.isWhitespace(n) => flush(ns)
+      case (Nil    , n :: ns) if !Xml.isWhitespace(n) => chunkify(result, n :: Nil, ns)
+      case (c :: cs, n :: ns) if !Xml.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns)
+      case (c :: cs, n :: ns) if !Xml.isWhitespace(n) && !cling(c, n) => flush(n :: ns)
     }
   }
-
-  private def splitChunk(chunk: Seq[Node]): Seq[Seq[Node]] =
-    if (chunk.isEmpty) Seq.empty else splitChunk(Seq.empty, Seq.empty, chunk)
-
-  @scala.annotation.tailrec
-  private def splitChunk(result: Seq[Seq[Node]], current: Seq[Node], chunk: Seq[Node]): Seq[Seq[Node]] =
-  // If chunk was empty to begin with, this recursive function doesn't get called (see above);
-  // otherwise, current is never empty here, so we are guaranteed to not return empty sequences.
-    if (chunk.isEmpty) result :+ current else {
-      // Head of the chunk always gets included; breaks are possible only after it
-      val head = chunk.head
-      val tail = chunk.tail
-      val newCurrent = current :+ head
-
-      if (tail.isEmpty) result :+ newCurrent else {
-        val next = tail.head
-
-        if (Xml.isText(head) || Xml.isText(next) || isClingy(next))
-          splitChunk(result, newCurrent, tail)
-        else
-          splitChunk(result :+ newCurrent, Seq.empty, tail)
-      }
-    }
 }
 
 object PrettyPrinter {
