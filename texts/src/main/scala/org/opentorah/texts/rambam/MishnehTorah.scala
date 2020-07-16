@@ -58,12 +58,12 @@ object MishnehTorah {
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
   lazy val books: Seq[Book] = {
-    val result: Seq[Book] = Metadata.load(
+    val result: Seq[Book] = Parser.parseDo(Metadata.load(
       from = From.resource(this),
       elementParsable = new Element[Book]("book") {
         override protected def parser: Parser[Book] = bookParser
       }
-    )
+    ))
 
     require(result.map(_.number) == (0 to 14))
 
@@ -72,7 +72,7 @@ object MishnehTorah {
 
   private def bookParser: Parser[Book] = for {
     number <- Attribute.IntAttribute("n").required
-    names <- Names.parser
+    names <- Names.withoutDefaultNameParser
     parts <- new Element[Part]("part") { override protected def parser: Parser[Part] = partParser }.all
     _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
       s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
@@ -85,7 +85,7 @@ object MishnehTorah {
   private def partParser: Parser[Part] = for {
     number <- Attribute.PositiveIntAttribute("n").required
     numChapters <- Attribute.PositiveIntAttribute("chapters").required
-    names <- Names.parser
+    names <- Names.withoutDefaultNameParser
     chapters <- chapterParsable.all
   } yield {
     if (chapters.isEmpty) new PartWithNumberedChapters(number, numChapters, names) else {
@@ -97,7 +97,7 @@ object MishnehTorah {
 
   object chapterParsable extends Element[NamedChapter]("chapter") {
     override protected def parser: Parser[NamedChapter] = for {
-      names <- Names.parser
+      names <- Names.withoutDefaultNameParser
     } yield new NamedChapter(names)
   }
 }

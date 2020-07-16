@@ -1,7 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser}
+import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Result}
 
 object Metadata {
 
@@ -9,89 +8,90 @@ object Metadata {
     from: From,
     rootElementName: Option[String] = None,
     elementParsable: Parsable[M]
-  ): Seq[M] = {
-    val typeName = from.name
-
-    val parsable: Element[Seq[M]] = new Element[Seq[M]](rootElementName.getOrElse("metadata")) {
-      override protected def parser: Parser[Seq[M]] = for {
-        type_ <- Attribute("type").required
-        _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
-        result <- elementParsable.all
-      } yield result
-    }
-
-    Parser.parseDo(parsable.parse(from))
-  }
+  ): Parser[Seq[M]] = new Element[Seq[M]](rootElementName.getOrElse("metadata")) {
+    private val typeName = from.name
+    override protected def parser: Parser[Seq[M]] = for {
+      type_ <- Attribute("type").required
+      _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
+      result <- elementParsable.all
+    } yield result
+  }.parse(from)
 
   def loadNames[K <: WithName](
-    keys: Seq[K],
-    from: From
-  ): Map[K, Names] = {
-    val metadatas: Seq[Names] = load(
-      from,
+    obj: AnyRef,
+    resourceName: String,
+    keys: Seq[K]
+  ): Parser[Map[K, Names]] = for {
+    metadatas <- load(
+      from = From.resource(obj, resourceName),
       rootElementName = Some("names"),
       elementParsable = new Element[Names]("names") {
-        override protected def parser: Parser[Names] = Names.parser
+        override protected def parser: Parser[Names] = Names.withoutDefaultNameParser
       }
     )
 
-    bind(
+    result <- bind(
       keys,
       metadatas,
-      (metadata: Names, name: String) => metadata.hasName(name)
-    ).toMap
-  }
+      hasName = (metadata: Names, name: String) => metadata.hasName(name)
+    )
+  } yield result.toMap
 
   def bind[K <: WithName, M](
     keys: Seq[K],
     metadatas: Seq[M],
     hasName: (M, String) => Boolean
-  ): Seq[(K, M)] = bind(
+  ): Parser[Seq[(K, M)]] = bind(
     keys,
-    (key: WithName) => key.name,
+    getName = (key: WithName) => key.name,
     metadatas,
     hasName
   )
 
-  def bind[K, M](
+  private def bind[K, M](
     keys: Seq[K],
     getName: K => String,
     metadatas: Seq[M],
     hasName: (M, String) => Boolean
-  ): Seq[(K, M)] = {
-    if (keys.isEmpty) require(metadatas.isEmpty, s"Unmatched metadatas: ${metadatas.mkString("\n")}")
-    if (metadatas.isEmpty) require(keys.isEmpty, s"Unmatched keys: $keys")
-    Collections.checkNoDuplicates(keys, s"keys")
+  ): Parser[Seq[(K, M)]] = for {
+    result <- Parser.collectAll(metadatas.map(metadata => find(keys, getName, metadata, hasName).map(_ -> metadata)))
+    _ <- checkNoUnmatchedKeys(keys.toSet -- result.map(_._1).toSet)
+  } yield result
 
-    if (keys.isEmpty) Nil else {
-      val key: K = keys.head
-      val (withName: Seq[M], withoutName: Seq[M]) = metadatas.partition(metadata => hasName(metadata, getName(key)))
-      require(withName.nonEmpty, s"No metadata for ${getName(key)}")
-      require(withName.length == 1)
-      (key, withName.head) +: bind(keys.tail, getName, withoutName, hasName)
-    }
+  def bind[K, M](
+    keys: Seq[K],
+    metadatas: Seq[M],
+    getKey: M => K
+  ): Parser[Map[K, M]] = {
+    val result = metadatas.map(metadata => getKey(metadata) -> metadata).toMap
+    for {
+      _ <- checkNoUnmatchedKeys(keys.toSet -- result.keySet)
+    } yield result
   }
 
-  def find[K <: WithName, M <: HasName](keys: Seq[K], metadata: M): K = find(
+  private def checkNoUnmatchedKeys[K](unmatchedKeys: Set[K]): Result =
+    Parser.check(unmatchedKeys.isEmpty, s"Unmatched keys: $unmatchedKeys")
+
+  def find[K <: WithName](
+    keys: Seq[K],
+    names: Names
+  ): Parser[K] = find(
     keys = keys,
     getName = (key: K) => key.name,
-    metadata = metadata,
-    hasName = (metadata: M, name: String) => metadata.hasName(name)
+    metadata = names,
+    hasName = (names: Names, name: String) => names.hasName(name)
   )
 
-  def find[K, M](
+  private def find[K, M](
     keys: Seq[K],
     getName: K => String,
     metadata: M,
     hasName: (M, String) => Boolean
-  ): K = {
+  ): Parser[K] = {
     val result: Seq[K] = keys.filter(key => hasName(metadata, getName(key)))
-    require(result.nonEmpty, s"Unmatched metadata $metadata")
-    require(result.length == 1, s"Metadata matched multiple keys: $metadata")
-    result.head
-  }
-
-  def toMap[K, M](keys: Seq[K], metadatas: Seq[M], getKey: M => K): Map[K, M] = {
-    metadatas.map(metadata => getKey(metadata) -> metadata).toMap
+    for {
+      _ <- Parser.check(result.nonEmpty, s"Unmatched metadata: $metadata")
+      _ <- Parser.check(result.length == 1, s"Metadata matched multiple keys: $metadata")
+    } yield result.head
   }
 }

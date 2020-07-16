@@ -3,15 +3,15 @@ package org.opentorah.metadata
 import org.opentorah.xml.{Attribute, Parser}
 import org.opentorah.util.Collections
 import scala.xml.Elem
+import zio.ZIO
 
-final class Names(val names: Seq[Name]) extends HasName with LanguageString {
+final class Names(val names: Seq[Name]) extends LanguageString {
   Collections.checkNoDuplicates(names.map(_.name), "names")
   // There may be multiple names for the same language (for an example, see Language),
   // so this check is disabled:
   // Collections.checkNoDuplicates(names.map(_.copy(name = "")), "name parameters")
 
   def isEmpty: Boolean = names.isEmpty
-
 
   def getDefaultName: Option[String] =
     if ((names.length == 1) && (names.head.languageSpec == LanguageSpec.empty)) Some(names.head.name) else None
@@ -31,7 +31,7 @@ final class Names(val names: Seq[Name]) extends HasName with LanguageString {
 
   def name: String = doFind(LanguageSpec.empty).name
 
-  def toLanguageString(implicit spec: LanguageSpec): String = doFind(spec).name.toString
+  def toLanguageString(implicit spec: LanguageSpec): String = doFind(spec).name
 
   def isDisjoint(other: Names): Boolean = names.forall(name => !other.hasName(name.name))
 
@@ -60,19 +60,15 @@ object Names {
     new Names(result.toSeq)
   }
 
-  final val defaultNameAttribute: String = "n"
+  final val defaultNameAttribute: Attribute[String] = Attribute("n")
 
-  def defaultNameParser: Parser[String] = Attribute(defaultNameAttribute).required
+  val withoutDefaultNameParser: Parser[Names] = parser(isDefaultNameAllowed = false)
 
-  def parser: Parser[Names] = parserWithDefaultName(None)
+  val withDefaultNameParser: Parser[Names] = parser(isDefaultNameAllowed = true)
 
-  def withDefaultNameParser: Parser[Names] = for {
-    n <- Attribute(defaultNameAttribute).optional
+  def parser(isDefaultNameAllowed: Boolean): Parser[Names] = for {
+    n <- if (!isDefaultNameAllowed) ZIO.none else defaultNameAttribute.optional
     defaultName = n.map(Name(_, LanguageSpec.empty))
-    result <- parserWithDefaultName(defaultName)
-  } yield result
-
-  def parserWithDefaultName(defaultName: Option[Name]): Parser[Names] = for {
     nonDefaultNames <- Name.all
     _ <- Parser.check(nonDefaultNames.nonEmpty || defaultName.isDefined, s"No names and no default name")
   } yield {
@@ -84,16 +80,6 @@ object Names {
 
     new Names(names)
   }
-
-  def withDefaultName[A](parser: Parser[A]): Parser[(String, A)] = for {
-    name <- defaultNameParser
-    result <- parser
-  } yield (name, result)
-
-  def withNames[A](parser: Parser[A]): Parser[(Names, A)] = for {
-    names <- withDefaultNameParser
-    result <- parser
-  } yield names -> result
 
   def toXml(value: Names): Seq[Elem] =
     Name.toXml(value.names)

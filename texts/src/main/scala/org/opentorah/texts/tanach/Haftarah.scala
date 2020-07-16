@@ -24,28 +24,31 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
 
   final def forParsha(parsha: Parsha): Customs = haftarah(parsha).map(_.from(parsha))
 
-  private lazy val haftarah: Map[Parsha, Customs] = {
-    val metadatas: Seq[(String, Customs)] = Metadata.load(
+  private lazy val haftarah: Map[Parsha, Customs] = Parser.parseDo(for {
+    metadatas <- Metadata.load(
       from = From.resource(this),
       elementParsable = new Element[(String, Customs)]("week") {
-        override protected def parser: Parser[(String, Customs)] = Names.withDefaultName(parserX(true))
+        private val elementParser = Haftarah.parser(full = true)
+        override protected def parser: Parser[(String, Customs)] = for {
+          name <- Names.defaultNameAttribute.required
+          result <- elementParser
+        } yield (name, result)
       }
     )
 
-    val result: Seq[(Parsha, (String, Customs))] = Metadata.bind(
+    result <- Metadata.bind(
       keys = Parsha.values,
       metadatas,
-      (metadata: (String, Customs), name: String) => metadata._1 == name
+      hasName = (metadata: (String, Customs), name: String) => metadata._1 == name
     )
+  } yield Collections.mapValues(result.toMap)(_._2))
 
-    Collections.mapValues(result.toMap)(_._2)
+
+  def parsable(full: Boolean): Element[Customs] = new Element[Customs]("haftarah") {
+    override protected def parser: Parser[Customs] = Haftarah.parser(full)
   }
 
-  def haftarahParsable(full: Boolean): Element[Customs] = new Element[Customs]("haftarah") {
-    override protected def parser: Parser[Customs] = parserX(full)
-  }
-
-  private def parserX(full: Boolean): Parser[Customs] = for {
+  private def parser(full: Boolean): Parser[Customs] = for {
     span <- spanParser
     parts <- partParsable(span).all
     parts <- if (parts.isEmpty) ZIO.none else partsParser(parts).map(Some(_))
@@ -73,9 +76,11 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
     result <- if (parts.isEmpty) ZIO.succeed[Haftarah](oneSpan(bookSpanParsed)) else partsParser(parts)
   } yield Custom.parse(n) -> result
 
-  private def partParsable(ancestorSpan: BookSpanParsed): Element[WithNumber[BookSpan]] = new Element[WithNumber[BookSpan]]("part") {
-    override protected def parser: Parser[WithNumber[BookSpan]] = WithNumber.parse(spanParser.map(_.inheritFrom(ancestorSpan).resolve))
-  }
+  private def partParsable(ancestorSpan: BookSpanParsed): Element[WithNumber[BookSpan]] =
+    new Element[WithNumber[BookSpan]]("part") {
+      override protected def parser: Parser[WithNumber[BookSpan]] =
+        WithNumber.parse(spanParser.map(_.inheritFrom(ancestorSpan).resolve))
+    }
 
   private def partsParser(parts: Seq[WithNumber[BookSpan]]): Parser[Haftarah] = for {
     _ <- WithNumber.checkConsecutive(parts, "part")

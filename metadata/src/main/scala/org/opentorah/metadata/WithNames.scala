@@ -1,10 +1,8 @@
 package org.opentorah.metadata
 
-trait WithNames extends HasName {
+trait WithNames {
   def names: Names
-
-  final override def hasName(name: String): Boolean = names.hasName(name)
-
+  
   def merge(that: WithNames): WithNames = {
     require(this == that)
     this
