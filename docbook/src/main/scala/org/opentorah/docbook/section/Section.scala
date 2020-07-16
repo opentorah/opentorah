@@ -1,8 +1,8 @@
 package org.opentorah.docbook.section
 
-import org.opentorah.docbook.plugin.DocBook
-import org.opentorah.xml.{Namespace, Xml}
 import Section.Parameters
+import org.opentorah.xml.Namespace
+import scala.xml.{Elem, Node}
 
 trait Section {
 
@@ -12,21 +12,15 @@ trait Section {
 
   def nonOverridableParameters(values: NonOverridableParameters): Parameters
 
-  final def customStylesheet: String =
-    s"""${Xml.header}
-       |<!-- Customizations go here. -->
-       |<xsl:stylesheet $xslWithVersion
-       |  xmlns:db="${DocBook.Namespace.uri}"
-       |  exclude-result-prefixes="db">
-       |
-       |$customStylesheetBody
-       |</xsl:stylesheet>
-       |""".stripMargin
+  final def customStylesheet: Elem =
+    <xsl:stylesheet xmlns:xsl={Namespace.Xsl.uri} version={Namespace.Xsl.version(usesDocBookXslt2)}
+      xmlns:db={Namespace.DocBook.uri}
+      exclude-result-prefixes="db">
+      <!-- Customizations go here. -->
+      {customStylesheetBody}
+    </xsl:stylesheet>
 
-  protected def customStylesheetBody: String
-
-  protected final def xslWithVersion: String =
-    Namespace.Xsl.withVersion(if (usesDocBookXslt2) "2.0" else "1.0")
+  protected def customStylesheetBody: Seq[Node]
 
   def usesDocBookXslt2: Boolean = false
 }

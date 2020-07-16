@@ -2,9 +2,8 @@ package org.opentorah.docbook
 
 import java.io.File
 import org.gradle.testkit.runner.GradleRunner
-import org.opentorah.docbook.plugin.{DocBook, Layout}
+import org.opentorah.docbook.plugin.Layout
 import org.opentorah.util.Files
-import org.opentorah.xml.Xml
 
 class PluginTestProject private(
   projectDir: File,
@@ -74,7 +73,7 @@ class PluginTestProject private(
     Files.write(
       file = layout.inputFile(documentName),
       replace = false,
-      content = s"${Xml.header}\n$document"
+      content = document
     )
   }
 
@@ -105,17 +104,18 @@ object PluginTestProject {
   private val documentName: String = "test"
 
   def apply(
+    prefix: String,
     name: String,
-    prefix: Option[String] = None,
-    document: String = s"<article ${DocBook.Namespace.withVersion}/>",
+    document: String,
     substitutions: Map[String, String] = Map.empty,
     isPdfEnabled: Boolean = false,
     isMathJaxEnabled: Boolean = false,
     useJ2V8: Boolean = false
   ): PluginTestProject = {
     val layout: Layout = Layout.forCurrent
+
     val result: PluginTestProject = new PluginTestProject(
-      projectDir = new File(Files.prefixedDirectory(layout.buildDir, prefix), name),
+      projectDir = Files.file(layout.buildDir, Seq(prefix, name)),
       pluginRootDir = layout.projectDir.getParentFile,
       document,
       substitutions,

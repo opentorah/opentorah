@@ -3,7 +3,7 @@ package org.opentorah.mathjax
 import java.awt.geom.Point2D
 import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.{FOEventHandler, FONode, PropertyList, XMLObj}
-import org.opentorah.xml.AttributeInfo
+import org.opentorah.xml.{AttributeInfo, Namespace}
 import org.xml.sax.{Attributes, Locator}
 
 final class MathMLObj(parent: FONode, mathJax: MathJax) extends MathMLObj.Obj(parent) {
@@ -65,8 +65,8 @@ final class MathMLObj(parent: FONode, mathJax: MathJax) extends MathMLObj.Obj(pa
 object MathMLObj {
   class Obj(parent: FONode) extends XMLObj(parent) {
 
-    override def getNamespaceURI: String = MathML.Namespace.uri
+    override def getNamespaceURI: String = Namespace.MathML.uri
 
-    override def getNormalNamespacePrefix: String = MathML.Namespace.prefix
+    override def getNormalNamespacePrefix: String = Namespace.MathML.prefix
   }
 }

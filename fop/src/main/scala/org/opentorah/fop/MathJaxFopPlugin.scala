@@ -8,6 +8,7 @@ import org.apache.xmlgraphics.image.loader.impl.{AbstractImagePreloader, ImageXM
 import org.apache.xmlgraphics.image.loader.spi.{ImageConverter, ImageLoaderFactory, ImagePreloader}
 import org.apache.xmlgraphics.image.loader.{ImageContext, ImageInfo}
 import org.opentorah.mathjax.{MathJax, MathML, MathMLObj, Sizes, Svg}
+import org.opentorah.xml.Namespace
 import org.w3c.dom.svg.SVGDocument
 import org.w3c.dom.{DOMImplementation, Document}
 
@@ -15,7 +16,7 @@ import org.w3c.dom.{DOMImplementation, Document}
 final class MathJaxFopPlugin(mathJax: MathJax) extends FopPlugin {
 
   override protected def elementMapping: ElementMapping = new ElementMapping {
-    namespaceURI = MathML.Namespace.uri
+    namespaceURI = Namespace.MathML.uri
 
     override def getDOMImplementation: DOMImplementation = ElementMapping.getDefaultDOMImplementation
 
@@ -38,7 +39,7 @@ final class MathJaxFopPlugin(mathJax: MathJax) extends FopPlugin {
   override protected def isHandlerNeeded: Boolean = false
 
   override protected def xmlHandler: XMLHandler = new XMLHandler() {
-    override def getNamespace: String = MathML.Namespace.uri
+    override def getNamespace: String = Namespace.MathML.uri
     override def supportsRenderer(renderer: Renderer): Boolean = renderer.getGraphics2DAdapter != null
 
     // From XMLHandler.handleXML() documentation:
@@ -61,19 +62,19 @@ final class MathJaxFopPlugin(mathJax: MathJax) extends FopPlugin {
       if (!src.isInstanceOf[DOMSource]) null else {
         val document: Document = src.asInstanceOf[DOMSource].getNode.asInstanceOf[Document]
 
-        if (!MathML.Namespace.is(document)) null else {
+        if (!Namespace.MathML.is(document)) null else {
           val svgDocument: SVGDocument = mathJax.typeset(document)
           val sizes: Sizes = Sizes(svgDocument)
           // convert sizes from exs to points:
           sizes.setViewPortSizes(svgDocument)
 
-          val result: ImageInfo = new ImageInfo(uri, Svg.mimeType)
+          val result: ImageInfo = new ImageInfo(uri, Namespace.Svg.mimeType)
           result.setSize(sizes.getImageSize(context.getSourceResolution))
 
           // Stash the result to avoid typesetting again:
           result
             .getCustomObjects.asInstanceOf[java.util.Map[AnyRef, AnyRef]]
-            .put(ImageInfo.ORIGINAL_IMAGE, new ImageXMLDOM(result, svgDocument, Svg.Namespace.uri))
+            .put(ImageInfo.ORIGINAL_IMAGE, new ImageXMLDOM(result, svgDocument, Namespace.Svg.uri))
 
           result
         }

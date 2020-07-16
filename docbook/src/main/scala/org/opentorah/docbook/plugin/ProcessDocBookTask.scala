@@ -15,6 +15,7 @@ import org.opentorah.util.{Files, Gradle}
 import org.opentorah.xml.{Namespace, Resolver, Xml}
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
+import scala.xml.{Comment, Elem}
 
 class ProcessDocBookTask extends DefaultTask {
 
@@ -163,26 +164,25 @@ class ProcessDocBookTask extends DefaultTask {
     val substitutionsMap: Map[String, String] = substitutions.get.asScala.toMap
 
     // FOP configuration
-    Files.write(
+    ProcessDocBookTask.write(
       file = layout.fopConfigurationFile,
       replace = false,
-      content = Fop.defaultConfigurationFile
+      elem = Fop.defaultConfigurationFile
     )
 
     // Substitutions DTD
     Files.write(
       file = layout.xmlFile(layout.substitutionsDtdFileName),
       replace = true,
-      content = substitutionsMap.toSeq.map {
-        case (name: String, value: String) => s"""<!ENTITY $name "$value">\n"""
-      }.mkString
+      content = ProcessDocBookTask.substitutionsDtd(substitutionsMap)
     )
 
     // XML catalog
-    Files.write(
+    ProcessDocBookTask.write(
       file = layout.catalogFile,
       replace = true,
-      content = ProcessDocBookTask.xmlCatalog(
+      doctype = Some(Namespace.Catalog.doctype),
+      elem = ProcessDocBookTask.xmlCatalog(
         xslt1 = Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout.docBookXslDirectory),
         xslt2 = Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout.docBookXslDirectory),
         catalogGroupBase = layout.catalogGroupBase,
@@ -193,10 +193,11 @@ class ProcessDocBookTask extends DefaultTask {
     )
 
     // Custom XML catalog
-    Files.write(
+    ProcessDocBookTask.write(
       file = layout.xmlFile(layout.catalogCustomFileName),
       replace = false,
-      content = ProcessDocBookTask.catalogCustomization
+      doctype = Some(Namespace.Catalog.doctype),
+      elem = ProcessDocBookTask.catalogCustomization
     )
 
     val cssFileName: String = Files.dropAllowedExtension(cssFile.get, "css")
@@ -205,16 +206,15 @@ class ProcessDocBookTask extends DefaultTask {
     Files.write(
       file = layout.cssFile(cssFileName),
       replace = false,
-      content =
-        s"""@namespace xml "${Namespace.Xml.uri}";
-           |""".stripMargin
+      content = ProcessDocBookTask.defaultCssFile
     )
 
     // Input documents
-    for ((name: String, _ /*prefixed*/: Boolean) <- inputDocuments) Files.write(
+    for ((name: String, _ /*prefixed*/: Boolean) <- inputDocuments) ProcessDocBookTask.write(
       file = layout.inputFile(name),
       replace = false,
-      content = ProcessDocBookTask.defaultInputFile
+      doctype = Some(Namespace.DocBook.doctype),
+      elem = ProcessDocBookTask.defaultInputFile
     )
 
     val fontFamilyNames: List[String] = epubEmbeddedFonts.get.asScala.toList
@@ -225,22 +225,22 @@ class ProcessDocBookTask extends DefaultTask {
     val enableMathJax: Boolean = isMathJaxEnabled.get || isJEuclidEnabled.get
 
     // Custom stylesheet
-    for (section: CommonSection <- CommonSection.all) Files.write(
+    for (section: CommonSection <- CommonSection.all) ProcessDocBookTask.write(
       file = layout.stylesheetFile(layout.customStylesheet(section)),
       replace = false,
-      content = section.customStylesheet
+      elem = section.customStylesheet
     )
-    for (variant: Variant <- sections.allVariants) Files.write(
+    for (variant: Variant <- sections.allVariants) ProcessDocBookTask.write(
       file = layout.stylesheetFile(layout.customStylesheet(variant)),
       replace = false,
-      content = variant.docBook2.customStylesheet
+      elem = variant.docBook2.customStylesheet
     )
 
     // Parameters stylesheet
-    for (variant: Variant <- sections.allVariants) Files.write(
+    for (variant: Variant <- sections.allVariants) ProcessDocBookTask.write(
       file = layout.stylesheetFile(layout.paramsStylesheet(variant)),
       replace = true,
-      content = variant.docBook2.paramsStylesheet(sections.parameters(variant))
+      elem = variant.docBook2.paramsStylesheet(sections.parameters(variant))
     )
 
     // Main stylesheet
@@ -253,10 +253,10 @@ class ProcessDocBookTask extends DefaultTask {
       // xsl:param has the last value assigned to it, so customization must come last;
       // since it is imported (so as not to be overwritten), and import elements must come first,
       // a separate "-param" file is written with the "default" values for the parameters :)
-      Files.write(
+      ProcessDocBookTask.write(
         file = layout.stylesheetFile(forDocument.mainStylesheet(variant)),
         replace = true,
-        content = variant.docBook2.mainStylesheet(
+        elem = variant.docBook2.mainStylesheet(
           paramsStylesheetName = layout.paramsStylesheet(variant),
           stylesheetUriBase = (if (variant.docBook2.usesDocBookXslt2) Stylesheets.xslt2 else Stylesheets.xslt1).uri,
           customStylesheets =
@@ -364,82 +364,80 @@ class ProcessDocBookTask extends DefaultTask {
   }
 }
 
-object ProcessDocBookTask {
+private object ProcessDocBookTask {
 
-  private def xmlCatalog(
+  def write(
+    file: File,
+    replace: Boolean,
+    doctype: Option[String] = None,
+    elem: Elem
+  ): Unit = Files.write(
+    file,
+    replace,
+    content = Xml.prettyPrinter.renderXml(doctype = doctype, node = elem)
+  )
+
+  def xmlCatalog(
     xslt1: File,
     xslt2: File,
     catalogGroupBase: String,
     substitutionsDtdFileName: String,
     catalogCustomFileName: String,
     data: String
-  ): String = {
+  ): Elem =
+    <catalog xmlns={Namespace.Catalog.uri} prefer="public">
+      {Comment(s" DO NOT EDIT! Generated by the DocBook plugin. Customizations go into $catalogCustomFileName. ")}
+      <group xml:base={catalogGroupBase}>
+        <!--
+          There seems to be some confusion with the rewriteURI form:
+          Catalog DTD requires 'uriIdStartString' attribute (and that is what IntelliJ wants),
+          but XMLResolver looks for the 'uriStartString' attribute (and this seems to work in Oxygen).
+        -->
 
-    s"""${Xml.header}
-       |<!DOCTYPE catalog
-       |  PUBLIC "-//OASIS//DTD XML Catalogs V1.1//EN"
-       |  "http://www.oasis-open.org/committees/entity/release/1.1/catalog.dtd">
-       |
-       |<!-- DO NOT EDIT! Generated by the DocBook plugin.
-       |     Customizations go into $catalogCustomFileName. -->
-       |<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="public">
-       |  <group xml:base="$catalogGroupBase">
-       |    <!--
-       |      There seems to be some confusion with the rewriteURI form:
-       |      Catalog DTD requires 'uriIdStartString' attribute (and that is what IntelliJ wants),
-       |      but XMLResolver looks for the 'uriStartString' attribute (and this seems to work in Oxygen).
-       |    -->
-       |
-       |    <!-- DocBook XSLT 1.0 stylesheets  -->
-       |    <rewriteURI uriStartString="http://docbook.sourceforge.net/release/xsl-ns/current/"
-       |                rewritePrefix="$xslt1/"/>
-       |
-       |    <!-- DocBook XSLT 2.0 stylesheets  -->
-       |    <rewriteURI uriStartString="https://cdn.docbook.org/release/latest/xslt/"
-       |                rewritePrefix="$xslt2/"/>
-       |
-       |    <!-- generated data -->
-       |    <rewriteSystem systemIdStartString="data:/"
-       |                   rewritePrefix="$data"/>
-       |    <rewriteSystem systemIdStartString="data:"
-       |                   rewritePrefix="$data"/>
-       |    <rewriteSystem systemIdStartString="urn:docbook:data:/"
-       |                   rewritePrefix="$data"/>
-       |    <rewriteSystem systemIdStartString="urn:docbook:data:"
-       |                   rewritePrefix="$data"/>
-       |    <rewriteSystem systemIdStartString="urn:docbook:data/"
-       |                   rewritePrefix="$data"/>
-       |    <rewriteSystem systemIdStartString="http://opentorah.org/docbook/data/"
-       |                   rewritePrefix="$data"/>
-       |  </group>
-       |
-       |  <!-- substitutions DTD -->
-       |  <public publicId="${DocBook.dtdId}"
-       |          uri="$substitutionsDtdFileName"/>
-       |
-       |  <nextCatalog catalog="$catalogCustomFileName"/>
-       |</catalog>
-       |""".stripMargin
-  }
+        <!-- DocBook XSLT 1.0 stylesheets  -->
+        <rewriteURI uriStartString="http://docbook.sourceforge.net/release/xsl-ns/current/"
+                    rewritePrefix={s"$xslt1/"}/>
 
-  private val catalogCustomization: String =
-    s"""${Xml.header}
-       |<!DOCTYPE catalog
-       |  PUBLIC "-//OASIS//DTD XML Catalogs V1.1//EN"
-       |  "http://www.oasis-open.org/committees/entity/release/1.1/catalog.dtd">
-       |
-       |<!-- Customizations go here. -->
-       |<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="public">
-       |  <nextCatalog catalog="/etc/xml/catalog"/>
-       |</catalog>
-       |""".stripMargin
+        <!-- DocBook XSLT 2.0 stylesheets  -->
+        <rewriteURI uriStartString="https://cdn.docbook.org/release/latest/xslt/"
+                    rewritePrefix={s"$xslt2/"}/>
 
-  private val defaultInputFile: String =
-    s"""${Xml.header}
-       |${DocBook.doctype}
-       |
-       |<article ${DocBook.Namespace.withVersion}
-       |         ${Namespace.XInclude}>
-       |</article>
-       |""".stripMargin
+        <!-- generated data -->
+        <rewriteSystem systemIdStartString="data:/"
+                       rewritePrefix={data}/>
+        <rewriteSystem systemIdStartString="data:"
+                       rewritePrefix={data}/>
+        <rewriteSystem systemIdStartString="urn:docbook:data:/"
+                       rewritePrefix={data}/>
+        <rewriteSystem systemIdStartString="urn:docbook:data:"
+                       rewritePrefix={data}/>
+        <rewriteSystem systemIdStartString="urn:docbook:data/"
+                       rewritePrefix={data}/>
+        <rewriteSystem systemIdStartString="http://opentorah.org/docbook/data/"
+                       rewritePrefix={data}/>
+      </group>
+
+      <!-- substitutions DTD -->
+      <public publicId={Namespace.DocBook.dtdId}
+              uri={substitutionsDtdFileName}/>
+
+      <nextCatalog catalog={catalogCustomFileName}/>
+    </catalog>
+
+  val catalogCustomization: Elem =
+    <catalog xmlns={Namespace.Catalog.uri} prefer="public">
+      <!-- Customizations go here. -->
+      <nextCatalog catalog="/etc/xml/catalog"/>
+    </catalog>
+
+  def substitutionsDtd(substitutions: Map[String, String]): String = substitutions.toSeq.map {
+    case (name: String, value: String) => s"""<!ENTITY $name "$value">\n"""
+  }.mkString
+
+  val defaultInputFile: Elem =
+    <article xmlns={Namespace.DocBook.uri} version={Namespace.DocBook.version} xmlns:xi={Namespace.XInclude.uri}/>
+
+  val defaultCssFile: String =
+    s"""@namespace xml "${Namespace.Xml.uri}";
+        |""".stripMargin
 }

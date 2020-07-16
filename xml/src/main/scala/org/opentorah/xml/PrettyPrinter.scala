@@ -15,7 +15,10 @@ final class PrettyPrinter(
 ) {
   private def isClingy(node: Node): Boolean = Xml.isElement(node) && clingyElements.contains(node.label)
 
-  def renderXml(node: Node): String = Xml.header + "\n" + render(node) + "\n"
+  def renderXml(node: Node, doctype: Option[String] = None): String =
+    Xml.header + "\n" +
+    doctype.fold("")(doctype => doctype + "\n") +
+    render(node) + "\n"
 
   def render(node: Node, pscope: NamespaceBinding = TopScope): String = fromNode(
     node,
