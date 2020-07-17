@@ -6,6 +6,7 @@ import org.typelevel.paiges.Doc
 import scala.xml.{Elem, MetaData, NamespaceBinding, Node, SpecialNode, TopScope, Utility}
 
 // TODO turn all Model[Node] into [N]... Model[N]
+// TODO remove the casts once everything is parameterized in N!
 final class PrettyPrinter(
   width: Int = 120,
   indent: Int = 2,
@@ -22,21 +23,21 @@ final class PrettyPrinter(
     doctype.fold("")(doctype => doctype + "\n") +
     render(node)(N) + "\n"
 
-  def render(node: Node, pscope: NamespaceBinding = TopScope)(implicit N: Model[Node]): String = fromNode(
-    node,
-    pscope,
+  def render[N](node: N)(implicit N: Model[Node]): String = fromNode(N)(
+    node.asInstanceOf[Node],
+    pscope = N.topNamespaceBinding,
     canBreakLeft = true,
     canBreakRight = true
   ).render(width)
 
-  private def fromNode(
-    node: Node,
-    pscope: NamespaceBinding,
+  private def fromNode[N](N: Model[N])(
+    node: N,
+    pscope: N.NamespaceBinding,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  )(implicit N: Model[Node]): Doc = node match {
+  ): Doc = node match {
     case element: Elem =>
-      val result = fromElement(element, pscope, canBreakLeft, canBreakRight)
+      val result = fromElement(N)(element.asInstanceOf[N.Element], pscope.asInstanceOf[N.NamespaceBinding], canBreakLeft, canBreakRight)
       // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
       if (canBreakRight && element.label == "lb") result + Doc.hardLine else result
 
@@ -50,36 +51,36 @@ final class PrettyPrinter(
       Doc.paragraph(node.text)
   }
 
-  private def fromElement(
-    element: Elem,
-    pscope: NamespaceBinding,
+  private def fromElement[N](N: Model[N])(
+    element: N.Element,
+    pscope: N.NamespaceBinding,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  )(implicit N: Model[Node]): Doc = {
-    val name: String = sbToString(element.nameToString)
+  ): Doc = {
+    val name: String = N.getNameString(element)
 
     val attributes: Doc = {
-      val docs: Seq[Doc] = PrettyPrinter.fromAttributes(element, pscope)
+      val docs: Seq[Doc] = PrettyPrinter.fromAttributes(N)(element, pscope)
       if (docs.isEmpty) Doc.empty
       else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, docs)
     }
 
     val (chunks: Seq[Doc], noAtoms: Boolean, charactersLeft: Boolean, charactersRight: Boolean) =
-      fromChildren(element, canBreakLeft, canBreakRight)
+      fromChildren(N)(element, canBreakLeft, canBreakRight)
 
     if (chunks.isEmpty) Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>") else  {
       val start: Doc = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">")
       val end: Doc = Doc.text(s"</$name>")
 
       val stackElements: Boolean = noAtoms &&
-        ((chunks.length >= 2) || ((chunks.length == 1) && allwaysStackElements.contains(element.label))) &&
-        !doNotStackElements.contains(element.label)
+        ((chunks.length >= 2) || ((chunks.length == 1) && allwaysStackElements.contains(N.label(element)))) &&
+        !doNotStackElements.contains(N.label(element))
       if (stackElements) {
         // If this is clearly a bunch of elements - stack 'em with an indent:
         start +
         Doc.cat(chunks.map(chunk => (Doc.hardLine + chunk).nested(indent))) +
         Doc.hardLine + end
-      } else if (nestElements.contains(element.label)) {
+      } else if (nestElements.contains(N.label(element))) {
         // If this is forced-nested element - nest it:
         Doc.intercalate(Doc.lineOrSpace, chunks).tightBracketBy(
           left = start,
@@ -98,58 +99,47 @@ final class PrettyPrinter(
     }
   }
 
-  private def fromChildren(
-    element: Elem,
+  private def fromChildren[N](N: Model[N])(
+    element: N.Element,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  )(implicit N: Model[Node]): (Seq[Doc], Boolean, Boolean, Boolean) = {
-    val nodes: Seq[Node] = PrettyPrinter.atomize(Seq.empty, element.child)
+  ): (Seq[Doc], Boolean, Boolean, Boolean) = {
+    val nodes: Seq[N] = PrettyPrinter.atomize(Seq.empty, N.getChildren(element))(N)
     val whitespaceLeft: Boolean = nodes.headOption.exists(N.isWhitespace)
     val whitespaceRight: Boolean = nodes.lastOption.exists(N.isWhitespace)
     val charactersLeft: Boolean = nodes.headOption.exists(node => N.isAtom(node) && !N.isWhitespace(node))
     val charactersRight: Boolean = nodes.lastOption.exists(node => N.isAtom(node) && !N.isWhitespace(node))
-    val chunks: Seq[Seq[Node]] = chunkify(Seq.empty, Seq.empty, nodes)(N)
+    val chunks: Seq[Seq[N]] = chunkify(Seq.empty, Seq.empty, nodes)(N)
     val noAtoms: Boolean = chunks.forall(_.forall(node => !N.isAtom(node)))
-    val result = fromChunks(
-      chunks,
-      element.scope,
-      canBreakLeft = canBreakLeft || whitespaceLeft,
-      canBreakRight = canBreakRight || whitespaceRight
-    )
+    val pscope: N.NamespaceBinding = N.getNamespaceBinding(element)
+    val canBreakLeft1 = canBreakLeft || whitespaceLeft
+    val canBreakRight1 = canBreakRight || whitespaceRight
+    val result: Seq[Doc] =
+      if (chunks.isEmpty) Seq.empty
+      else if (chunks.length == 1) Seq(
+        fromChunk(N)(chunks.head, pscope, canBreakLeft1, canBreakRight1)
+      ) else {
+        fromChunk(N)(chunks.head, pscope, canBreakLeft = canBreakLeft1, canBreakRight = true) +:
+        chunks.tail.init.map(chunk => fromChunk(N)(chunk, pscope, canBreakLeft = true, canBreakRight = true)) :+
+        fromChunk(N)(chunks.last, pscope, canBreakLeft = true, canBreakRight = canBreakRight1)
+      }
     (result, noAtoms, charactersLeft, charactersRight)
   }
 
-  // TODO unfold
-  private def fromChunks(
-    chunks: Seq[Seq[Node]],
-    pscope: NamespaceBinding,
+  private def fromChunk[N](N: Model[N])(
+    nodes: Seq[N],
+    pscope: N.NamespaceBinding,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  )(implicit N: Model[Node]): Seq[Doc] = {
-    if (chunks.isEmpty) Seq.empty
-    else if (chunks.length == 1) Seq(
-      fromChunk(chunks.head, pscope, canBreakLeft, canBreakRight)
-    ) else {
-      fromChunk(chunks.head, pscope, canBreakLeft = canBreakLeft, canBreakRight = true) +:
-      chunks.tail.init.map(chunk => fromChunk(chunk, pscope, canBreakLeft = true, canBreakRight = true)) :+
-      fromChunk(chunks.last, pscope, canBreakLeft = true, canBreakRight = canBreakRight)
-    }
-  }
-
-  private def fromChunk(
-    nodes: Seq[Node],
-    pscope: NamespaceBinding,
-    canBreakLeft: Boolean,
-    canBreakRight: Boolean
-  )(implicit N: Model[Node]): Doc = {
+  ): Doc = {
     require(nodes.nonEmpty)
     if (nodes.length == 1) {
-      fromNode(nodes.head, pscope, canBreakLeft, canBreakRight)
+      fromNode(N)(nodes.head, pscope, canBreakLeft, canBreakRight)
     } else {
       val result: Seq[Doc] =
-        fromNode(nodes.head, pscope, canBreakLeft, canBreakRight = false) +:
-        nodes.tail.init.map(node => fromNode(node, pscope, canBreakLeft = false, canBreakRight = false)) :+
-        fromNode(nodes.last, pscope, canBreakLeft = false, canBreakRight)
+        fromNode(N)(nodes.head, pscope, canBreakLeft, canBreakRight = false) +:
+        nodes.tail.init.map(node => fromNode(N)(node, pscope, canBreakLeft = false, canBreakRight = false)) :+
+        fromNode(N)(nodes.last, pscope, canBreakLeft = false, canBreakRight)
 
       Doc.intercalate(Doc.empty, result)
     }
@@ -177,42 +167,38 @@ final class PrettyPrinter(
 
 object PrettyPrinter {
 
-  private def fromAttributes(element: Elem, pscope: NamespaceBinding): Seq[Doc] = {
-    val attributes: Seq[Doc] = element.attributes.toSeq.map(fromAttribute)
-    val scopeStr: String = element.scope.buildString(pscope).trim
+  private def fromAttributes[N](N: Model[N])(element: N.Element, pscope: N.NamespaceBinding): Seq[Doc] = {
+    val attributes: Seq[Doc] = N.getAttributes(element).filterNot(_.value.isEmpty).map {
+      case N.AttributeDescriptor(prefix, key, value) =>
+        Doc.text(prefix.fold("")(prefix => s"$prefix:") + s"$key=") +
+        Doc.text(N.getAttributeValueText(value.get))
+    }
+    val scopeStr: String = N.getNamespaceBindingString(element, pscope)
     if (scopeStr.isEmpty) attributes else attributes :+ Doc.text(scopeStr)
   }
 
-  private def fromAttribute(attribute: MetaData): Doc = attribute match {
-    case attribute: scala.xml.Attribute if attribute.value != null =>
-      val key: Doc =
-        Doc.text((if (attribute.isPrefixed) s"${attribute.pre}:" else "") + s"${attribute.key}=")
-      val value = Doc.text(sbToString(Utility.appendQuoted(
-        sbToString(Utility.sequenceToXML(attribute.value, TopScope, _, stripComments = true)), _)))
-      key + value
-
-    case _ =>
-      Doc.empty
-  }
-
   @scala.annotation.tailrec
-  private def atomize(result: Seq[Node], nodes: Seq[Node]): Seq[Node] = if (nodes.isEmpty) result else {
-    val (atoms: Seq[Node], tail: Seq[Node]) = nodes.span(Xml.isText)
+  private def atomize[N](result: Seq[N], nodes: Seq[N])(implicit N: Model[N]): Seq[N] = if (nodes.isEmpty) result else {
+    val (atoms: Seq[N], tail: Seq[N]) = nodes.span(N.isText)
 
-    val newResult: Seq[Node] = if (atoms.isEmpty) result else result ++
-      processText(Seq.empty, Strings.squashBigWhitespace(atoms.map(_.asInstanceOf[scala.xml.Text].data).mkString("")))
+    val newResult: Seq[N] = if (atoms.isEmpty) result else result ++
+      processText(Strings.squashBigWhitespace(atoms.map(N.getText).mkString("")))
 
     if (tail.isEmpty) newResult
     else atomize(newResult :+ tail.head, tail.tail)
   }
 
-  @scala.annotation.tailrec
-  private def processText(result: Seq[scala.xml.Text], text: String): Seq[scala.xml.Text] = if (text.isEmpty) result else {
-    val (spaces: String, tail: String) = text.span(_ == ' ')
-    val newResult = if (spaces.isEmpty) result else result :+ scala.xml.Text(" ")
-    val (word: String, tail2: String) = tail.span(_ != ' ')
+  private def processText[N](text: String)(implicit N: Model[N]): Seq[N.Text] = {
+    @scala.annotation.tailrec
+    def processText(result: Seq[N.Text], text: String): Seq[N.Text] = if (text.isEmpty) result else {
+      val (spaces: String, tail: String) = text.span(_ == ' ')
+      val newResult = if (spaces.isEmpty) result else result :+ N.mkText(" ")
+      val (word: String, tail2: String) = tail.span(_ != ' ')
 
-    if (word.isEmpty) newResult
-    else processText(newResult :+ scala.xml.Text(word), tail2)
+      if (word.isEmpty) newResult
+      else processText(newResult :+ N.mkText(word), tail2)
+    }
+
+    processText(Seq.empty, text)
   }
 }
