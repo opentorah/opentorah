@@ -2,6 +2,7 @@ package org.opentorah.xml
 
 import org.opentorah.util.Strings
 import org.opentorah.util.Strings.sbToString
+import org.opentorah.xml.Model.scalaModel
 import org.typelevel.paiges.Doc
 import scala.xml.{Elem, MetaData, NamespaceBinding, Node, SpecialNode, TopScope, Utility}
 
@@ -16,26 +17,26 @@ final class PrettyPrinter(
   private def isClingy[N](node: N)(N: Model[N]): Boolean =
     N.isElement(node) && clingyElements.contains(N.label(node))
 
-  def renderXml(node: Node, doctype: Option[String] = None): String =
+  def renderXml(node: Node, doctype: Option[String] = None)(implicit N: Model[Node]): String =
     Xml.header + "\n" +
     doctype.fold("")(doctype => doctype + "\n") +
-    render(node) + "\n"
+    render(node)(N) + "\n"
 
-  def render(node: Node, pscope: NamespaceBinding = TopScope): String = fromNode(
+  def render(node: Node, pscope: NamespaceBinding = TopScope)(implicit N: Model[Node]): String = fromNode(
     node,
     pscope,
     canBreakLeft = true,
     canBreakRight = true
-  ).render(width)
+  )(N).render(width)
 
   private def fromNode(
     node: Node,
     pscope: NamespaceBinding,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  ): Doc = node match {
+  )(N: Model[Node]): Doc = node match {
     case element: Elem =>
-      val result = fromElement(element, pscope, canBreakLeft, canBreakRight)
+      val result = fromElement(element, pscope, canBreakLeft, canBreakRight)(N)
       // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
       if (canBreakRight && element.label == "lb") result + Doc.hardLine else result
 
@@ -54,7 +55,7 @@ final class PrettyPrinter(
     pscope: NamespaceBinding,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  ): Doc = {
+  )(N: Model[Node]): Doc = {
     val name: String = sbToString(element.nameToString)
 
     val attributes: Doc = {
@@ -64,7 +65,7 @@ final class PrettyPrinter(
     }
 
     val (chunks: Seq[Doc], noAtoms: Boolean, charactersLeft: Boolean, charactersRight: Boolean) =
-      fromChildren(element, canBreakLeft, canBreakRight)(Model.scalaModel)
+      fromChildren(element, canBreakLeft, canBreakRight)(N)
 
     if (chunks.isEmpty) Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>") else  {
       val start: Doc = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">")
@@ -114,7 +115,7 @@ final class PrettyPrinter(
       element.scope,
       canBreakLeft = canBreakLeft || whitespaceLeft,
       canBreakRight = canBreakRight || whitespaceRight
-    )
+    )(N)
     (result, noAtoms, charactersLeft, charactersRight)
   }
 
@@ -123,14 +124,14 @@ final class PrettyPrinter(
     pscope: NamespaceBinding,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  ): Seq[Doc] = {
+  )(N: Model[Node]): Seq[Doc] = {
     if (chunks.isEmpty) Seq.empty
     else if (chunks.length == 1) Seq(
-      fromChunk(chunks.head, pscope, canBreakLeft, canBreakRight)
+      fromChunk(chunks.head, pscope, canBreakLeft, canBreakRight)(N)
     ) else {
-      fromChunk(chunks.head, pscope, canBreakLeft = canBreakLeft, canBreakRight = true) +:
-      chunks.tail.init.map(chunk => fromChunk(chunk, pscope, canBreakLeft = true, canBreakRight = true)) :+
-      fromChunk(chunks.last, pscope, canBreakLeft = true, canBreakRight = canBreakRight)
+      fromChunk(chunks.head, pscope, canBreakLeft = canBreakLeft, canBreakRight = true)(N) +:
+      chunks.tail.init.map(chunk => fromChunk(chunk, pscope, canBreakLeft = true, canBreakRight = true)(N)) :+
+      fromChunk(chunks.last, pscope, canBreakLeft = true, canBreakRight = canBreakRight)(N)
     }
   }
 
@@ -139,15 +140,15 @@ final class PrettyPrinter(
     pscope: NamespaceBinding,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  ): Doc = {
+  )(N: Model[Node]): Doc = {
     require(nodes.nonEmpty)
     if (nodes.length == 1) {
-      fromNode(nodes.head, pscope, canBreakLeft, canBreakRight)
+      fromNode(nodes.head, pscope, canBreakLeft, canBreakRight)(N)
     } else {
       val result: Seq[Doc] =
-        fromNode(nodes.head, pscope, canBreakLeft, canBreakRight = false) +:
-        nodes.tail.init.map(node => fromNode(node, pscope, canBreakLeft = false, canBreakRight = false)) :+
-        fromNode(nodes.last, pscope, canBreakLeft = false, canBreakRight)
+        fromNode(nodes.head, pscope, canBreakLeft, canBreakRight = false)(N) +:
+        nodes.tail.init.map(node => fromNode(node, pscope, canBreakLeft = false, canBreakRight = false)(N)) :+
+        fromNode(nodes.last, pscope, canBreakLeft = false, canBreakRight)(N)
 
       Doc.intercalate(Doc.empty, result)
     }

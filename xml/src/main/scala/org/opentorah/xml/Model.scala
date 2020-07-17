@@ -15,7 +15,7 @@ trait Model[N] {
 }
 
 object Model {
-  val scalaModel: Model[ScalaNode] = new Model[ScalaNode] {
+  implicit val scalaModel: Model[ScalaNode] = new Model[ScalaNode] {
     override type Text = scala.xml.Text
 
     override def isElement(node: ScalaNode): Boolean = Xml.isElement(node)
