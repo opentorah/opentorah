@@ -13,7 +13,8 @@ final class PrettyPrinter(
   nestElements: Set[String] = Set(),
   clingyElements: Set[String] = Set()
 ) {
-  private def isClingy(node: Node): Boolean = Xml.isElement(node) && clingyElements.contains(node.label)
+  private def isClingy[N](node: N)(N: Model[N]): Boolean =
+    N.isElement(node) && clingyElements.contains(N.label(node))
 
   def renderXml(node: Node, doctype: Option[String] = None): String =
     Xml.header + "\n" +
@@ -63,7 +64,7 @@ final class PrettyPrinter(
     }
 
     val (chunks: Seq[Doc], noAtoms: Boolean, charactersLeft: Boolean, charactersRight: Boolean) =
-      fromChildren(element, canBreakLeft, canBreakRight)
+      fromChildren(element, canBreakLeft, canBreakRight)(Model.scalaModel)
 
     if (chunks.isEmpty) Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>") else  {
       val start: Doc = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">")
@@ -100,14 +101,14 @@ final class PrettyPrinter(
     element: Elem,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  ): (Seq[Doc], Boolean, Boolean, Boolean) = {
+  )(N: Model[Node]): (Seq[Doc], Boolean, Boolean, Boolean) = {
     val nodes: Seq[Node] = PrettyPrinter.atomize(Seq.empty, element.child)
-    val whitespaceLeft: Boolean = nodes.headOption.exists(Xml.isWhitespace)
-    val whitespaceRight: Boolean = nodes.lastOption.exists(Xml.isWhitespace)
-    val charactersLeft: Boolean = nodes.headOption.exists(node => Xml.isAtom(node) && !Xml.isWhitespace(node))
-    val charactersRight: Boolean = nodes.lastOption.exists(node => Xml.isAtom(node) && !Xml.isWhitespace(node))
-    val chunks: Seq[Seq[Node]] = chunkify(Seq.empty, Seq.empty, nodes)
-    val noAtoms: Boolean = chunks.forall(_.forall(node => !Xml.isAtom(node)))
+    val whitespaceLeft: Boolean = nodes.headOption.exists(N.isWhitespace)
+    val whitespaceRight: Boolean = nodes.lastOption.exists(N.isWhitespace)
+    val charactersLeft: Boolean = nodes.headOption.exists(node => N.isAtom(node) && !N.isWhitespace(node))
+    val charactersRight: Boolean = nodes.lastOption.exists(node => N.isAtom(node) && !N.isWhitespace(node))
+    val chunks: Seq[Seq[Node]] = chunkify(Seq.empty, Seq.empty, nodes)(N)
+    val noAtoms: Boolean = chunks.forall(_.forall(node => !N.isAtom(node)))
     val result = fromChunks(
       chunks,
       element.scope,
@@ -152,18 +153,22 @@ final class PrettyPrinter(
     }
   }
 
-  private def chunkify(result: Seq[Seq[Node]], current: Seq[Node], nodes: Seq[Node]): Seq[Seq[Node]] = {
-    def cling(c: Node, n: Node): Boolean = Xml.isText(c) || Xml.isText(n) || isClingy(n)
-    def flush(nodes: Seq[Node]): Seq[Seq[Node]] = chunkify(result :+ current.reverse, Nil, nodes)
+  private def chunkify[N](
+    result: Seq[Seq[N]],
+    current: Seq[N],
+    nodes: Seq[N]
+  )(N: Model[N]): Seq[Seq[N]] = {
+    def cling(c: N, n: N): Boolean = N.isText(c) || N.isText(n) || isClingy(n)(N)
+    def flush(nodes: Seq[N]): Seq[Seq[N]] = chunkify(result :+ current.reverse, Nil, nodes)(N)
 
     (current, nodes) match {
       case (Nil    , Nil    ) => result
       case (c :: cs, Nil    ) => flush(Nil)
-      case (Nil    , n :: ns) if  Xml.isWhitespace(n) => chunkify(result, Nil, ns)
-      case (c :: cs, n :: ns) if  Xml.isWhitespace(n) => flush(ns)
-      case (Nil    , n :: ns) if !Xml.isWhitespace(n) => chunkify(result, n :: Nil, ns)
-      case (c :: cs, n :: ns) if !Xml.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns)
-      case (c :: cs, n :: ns) if !Xml.isWhitespace(n) && !cling(c, n) => flush(n :: ns)
+      case (Nil    , n :: ns) if  N.isWhitespace(n) => chunkify(result, Nil, ns)(N)
+      case (c :: cs, n :: ns) if  N.isWhitespace(n) => flush(ns)
+      case (Nil    , n :: ns) if !N.isWhitespace(n) => chunkify(result, n :: Nil, ns)(N)
+      case (c :: cs, n :: ns) if !N.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns)(N)
+      case (c :: cs, n :: ns) if !N.isWhitespace(n) && !cling(c, n) => flush(n :: ns)
     }
   }
 }
