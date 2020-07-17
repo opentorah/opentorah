@@ -1,12 +1,11 @@
 package org.opentorah.xml
 
 import org.opentorah.util.Strings
-import org.opentorah.util.Strings.sbToString
 import org.typelevel.paiges.Doc
-import scala.xml.{Elem, Node, SpecialNode}
+import scala.xml.Node
 
 // TODO turn all Model[Node] into [N]... Model[N]
-// TODO remove all the casts once everything is parameterized in N!
+// TODO remove the cast in render() and figure out how to call it ;)
 final class PrettyPrinter(
   width: Int = 120,
   indent: Int = 2,
@@ -35,20 +34,15 @@ final class PrettyPrinter(
     pscope: N.NamespaceBinding,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  ): Doc = node match {
-    case element: Elem =>
-      val result = fromElement(N)(element.asInstanceOf[N.Element], pscope.asInstanceOf[N.NamespaceBinding], canBreakLeft, canBreakRight)
+  ): Doc = {
+    if (N.isElement(node)) {
+      val element: N.Element = N.asElement(node)
+      val result = fromElement(N)(element, pscope, canBreakLeft, canBreakRight)
       // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
-      if (canBreakRight && element.label == "lb") result + Doc.hardLine else result
-
-    case text: scala.xml.Text =>
-      Doc.text(text.data)
-
-    case special: SpecialNode =>
-      Doc.paragraph(sbToString(special.buildString))
-
-    case node: Node =>
-      Doc.paragraph(node.text)
+      if (canBreakRight && N.label(element) == "lb") result + Doc.hardLine else result
+    }
+    else if (N.isText(node)) Doc.text(N.getText(node))
+    else Doc.paragraph(N.getNodeText(node))
   }
 
   private def fromElement[N](N: Model[N])(

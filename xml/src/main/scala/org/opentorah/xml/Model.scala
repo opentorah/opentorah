@@ -18,12 +18,14 @@ trait Model[N] {
   )
 
   def isElement(node: N): Boolean
+  def asElement(node: N): Element
   def label(node: N): String // TODO getLabel() - for Elements only...
   def isWhitespace(node: N): Boolean
   def isText(node: N): Boolean
   def getText(node: N): String
   def mkText(text: String): Text
   def isAtom(node: N): Boolean
+  def getNodeText(node: N): String
   def topNamespaceBinding: NamespaceBinding
   def getNamespaceBinding(element: Element): NamespaceBinding
   def getNamespaceBindingString(element: Element, namespaceBinding: NamespaceBinding): String
@@ -43,12 +45,17 @@ object Model {
     override type Text = scala.xml.Text
 
     override def isElement(node: ScalaNode): Boolean = Xml.isElement(node)
+    override def asElement(node: ScalaNode): Element = node.asInstanceOf[Element]
     override def label(node: ScalaNode): String = node.label
     override def isWhitespace(node: ScalaNode): Boolean = Xml.isWhitespace(node)
     override def isText(node: ScalaNode): Boolean = Xml.isText(node)
     override def getText(node: ScalaNode): String = node.asInstanceOf[Text].data
     override def mkText(text: String): Text = scala.xml.Text(text)
     override def isAtom(node: ScalaNode): Boolean = Xml.isAtom(node)
+    override def getNodeText(node: ScalaNode): String = node match {
+      case special: scala.xml.SpecialNode => sbToString(special.buildString)
+      case node: scala.xml.Node => node.text
+    }
 
     override def topNamespaceBinding: NamespaceBinding = scala.xml.TopScope
     override def getNamespaceBinding(element: Element): NamespaceBinding = element.scope
