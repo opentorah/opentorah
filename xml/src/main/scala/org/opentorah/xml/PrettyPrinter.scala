@@ -2,10 +2,10 @@ package org.opentorah.xml
 
 import org.opentorah.util.Strings
 import org.opentorah.util.Strings.sbToString
-import org.opentorah.xml.Model.scalaModel
 import org.typelevel.paiges.Doc
 import scala.xml.{Elem, MetaData, NamespaceBinding, Node, SpecialNode, TopScope, Utility}
 
+// TODO turn all Model[Node] into [N]... Model[N]
 final class PrettyPrinter(
   width: Int = 120,
   indent: Int = 2,
@@ -14,7 +14,7 @@ final class PrettyPrinter(
   nestElements: Set[String] = Set(),
   clingyElements: Set[String] = Set()
 ) {
-  private def isClingy[N](node: N)(N: Model[N]): Boolean =
+  private def isClingy[N](node: N)(implicit N: Model[N]): Boolean =
     N.isElement(node) && clingyElements.contains(N.label(node))
 
   def renderXml(node: Node, doctype: Option[String] = None)(implicit N: Model[Node]): String =
@@ -27,16 +27,16 @@ final class PrettyPrinter(
     pscope,
     canBreakLeft = true,
     canBreakRight = true
-  )(N).render(width)
+  ).render(width)
 
   private def fromNode(
     node: Node,
     pscope: NamespaceBinding,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  )(N: Model[Node]): Doc = node match {
+  )(implicit N: Model[Node]): Doc = node match {
     case element: Elem =>
-      val result = fromElement(element, pscope, canBreakLeft, canBreakRight)(N)
+      val result = fromElement(element, pscope, canBreakLeft, canBreakRight)
       // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
       if (canBreakRight && element.label == "lb") result + Doc.hardLine else result
 
@@ -55,7 +55,7 @@ final class PrettyPrinter(
     pscope: NamespaceBinding,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  )(N: Model[Node]): Doc = {
+  )(implicit N: Model[Node]): Doc = {
     val name: String = sbToString(element.nameToString)
 
     val attributes: Doc = {
@@ -65,7 +65,7 @@ final class PrettyPrinter(
     }
 
     val (chunks: Seq[Doc], noAtoms: Boolean, charactersLeft: Boolean, charactersRight: Boolean) =
-      fromChildren(element, canBreakLeft, canBreakRight)(N)
+      fromChildren(element, canBreakLeft, canBreakRight)
 
     if (chunks.isEmpty) Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>") else  {
       val start: Doc = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">")
@@ -102,7 +102,7 @@ final class PrettyPrinter(
     element: Elem,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  )(N: Model[Node]): (Seq[Doc], Boolean, Boolean, Boolean) = {
+  )(implicit N: Model[Node]): (Seq[Doc], Boolean, Boolean, Boolean) = {
     val nodes: Seq[Node] = PrettyPrinter.atomize(Seq.empty, element.child)
     val whitespaceLeft: Boolean = nodes.headOption.exists(N.isWhitespace)
     val whitespaceRight: Boolean = nodes.lastOption.exists(N.isWhitespace)
@@ -115,23 +115,24 @@ final class PrettyPrinter(
       element.scope,
       canBreakLeft = canBreakLeft || whitespaceLeft,
       canBreakRight = canBreakRight || whitespaceRight
-    )(N)
+    )
     (result, noAtoms, charactersLeft, charactersRight)
   }
 
+  // TODO unfold
   private def fromChunks(
     chunks: Seq[Seq[Node]],
     pscope: NamespaceBinding,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  )(N: Model[Node]): Seq[Doc] = {
+  )(implicit N: Model[Node]): Seq[Doc] = {
     if (chunks.isEmpty) Seq.empty
     else if (chunks.length == 1) Seq(
-      fromChunk(chunks.head, pscope, canBreakLeft, canBreakRight)(N)
+      fromChunk(chunks.head, pscope, canBreakLeft, canBreakRight)
     ) else {
-      fromChunk(chunks.head, pscope, canBreakLeft = canBreakLeft, canBreakRight = true)(N) +:
-      chunks.tail.init.map(chunk => fromChunk(chunk, pscope, canBreakLeft = true, canBreakRight = true)(N)) :+
-      fromChunk(chunks.last, pscope, canBreakLeft = true, canBreakRight = canBreakRight)(N)
+      fromChunk(chunks.head, pscope, canBreakLeft = canBreakLeft, canBreakRight = true) +:
+      chunks.tail.init.map(chunk => fromChunk(chunk, pscope, canBreakLeft = true, canBreakRight = true)) :+
+      fromChunk(chunks.last, pscope, canBreakLeft = true, canBreakRight = canBreakRight)
     }
   }
 
@@ -140,15 +141,15 @@ final class PrettyPrinter(
     pscope: NamespaceBinding,
     canBreakLeft: Boolean,
     canBreakRight: Boolean
-  )(N: Model[Node]): Doc = {
+  )(implicit N: Model[Node]): Doc = {
     require(nodes.nonEmpty)
     if (nodes.length == 1) {
-      fromNode(nodes.head, pscope, canBreakLeft, canBreakRight)(N)
+      fromNode(nodes.head, pscope, canBreakLeft, canBreakRight)
     } else {
       val result: Seq[Doc] =
-        fromNode(nodes.head, pscope, canBreakLeft, canBreakRight = false)(N) +:
-        nodes.tail.init.map(node => fromNode(node, pscope, canBreakLeft = false, canBreakRight = false)(N)) :+
-        fromNode(nodes.last, pscope, canBreakLeft = false, canBreakRight)(N)
+        fromNode(nodes.head, pscope, canBreakLeft, canBreakRight = false) +:
+        nodes.tail.init.map(node => fromNode(node, pscope, canBreakLeft = false, canBreakRight = false)) :+
+        fromNode(nodes.last, pscope, canBreakLeft = false, canBreakRight)
 
       Doc.intercalate(Doc.empty, result)
     }
@@ -158,17 +159,17 @@ final class PrettyPrinter(
     result: Seq[Seq[N]],
     current: Seq[N],
     nodes: Seq[N]
-  )(N: Model[N]): Seq[Seq[N]] = {
-    def cling(c: N, n: N): Boolean = N.isText(c) || N.isText(n) || isClingy(n)(N)
-    def flush(nodes: Seq[N]): Seq[Seq[N]] = chunkify(result :+ current.reverse, Nil, nodes)(N)
+  )(implicit N: Model[N]): Seq[Seq[N]] = {
+    def cling(c: N, n: N): Boolean = N.isText(c) || N.isText(n) || isClingy(n)
+    def flush(nodes: Seq[N]): Seq[Seq[N]] = chunkify(result :+ current.reverse, Nil, nodes)
 
     (current, nodes) match {
       case (Nil    , Nil    ) => result
       case (c :: cs, Nil    ) => flush(Nil)
-      case (Nil    , n :: ns) if  N.isWhitespace(n) => chunkify(result, Nil, ns)(N)
+      case (Nil    , n :: ns) if  N.isWhitespace(n) => chunkify(result, Nil, ns)
       case (c :: cs, n :: ns) if  N.isWhitespace(n) => flush(ns)
-      case (Nil    , n :: ns) if !N.isWhitespace(n) => chunkify(result, n :: Nil, ns)(N)
-      case (c :: cs, n :: ns) if !N.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns)(N)
+      case (Nil    , n :: ns) if !N.isWhitespace(n) => chunkify(result, n :: Nil, ns)
+      case (c :: cs, n :: ns) if !N.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns)
       case (c :: cs, n :: ns) if !N.isWhitespace(n) && !cling(c, n) => flush(n :: ns)
     }
   }

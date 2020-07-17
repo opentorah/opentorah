@@ -4,6 +4,9 @@ import org.w3c.dom.{Node => DomNode}
 import scala.xml.{Node => ScalaNode}
 
 trait Model[N] {
+  type NamespaceBinding
+  type Element
+  type Attribute
   type Text
 
   def isElement(node: N): Boolean
@@ -16,6 +19,9 @@ trait Model[N] {
 
 object Model {
   implicit val scalaModel: Model[ScalaNode] = new Model[ScalaNode] {
+    override type NamespaceBinding = scala.xml.NamespaceBinding
+    override type Element = scala.xml.Elem
+    override type Attribute = scala.xml.MetaData
     override type Text = scala.xml.Text
 
     override def isElement(node: ScalaNode): Boolean = Xml.isElement(node)
