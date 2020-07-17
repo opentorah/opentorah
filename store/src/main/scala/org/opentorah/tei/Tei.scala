@@ -34,8 +34,6 @@ final case class Tei(
 
 object Tei extends Element.WithToXml[Tei]("TEI") {
 
-  object Namespace extends Namespace(uri = "http://www.tei-c.org/ns/1.0")
-
   type Transformer = Tei => Tei
 
   override protected def parser: Parser[Tei] = for {
@@ -47,7 +45,7 @@ object Tei extends Element.WithToXml[Tei]("TEI") {
   )
 
   override protected def attributes(value: Tei): Seq[Attribute.Value[_]] = Seq(
-    Namespace.xmlnsAttribute
+    Namespace.Tei.xmlnsAttribute
   )
 
   override protected def content(value: Tei): Seq[Elem] = Seq(

@@ -3,7 +3,7 @@ package org.opentorah.mathjax
 import java.io.{InputStream, StringBufferInputStream}
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory
 import org.apache.fop.util.UnclosableInputStream
-import org.opentorah.xml.{Namespace, Xerces}
+import org.opentorah.xml.Xerces
 import org.w3c.dom.svg.SVGDocument
 
 object Svg {
@@ -32,10 +32,6 @@ object Svg {
   }
 
   def forceXerces(): Unit = svgFactory
-
-  object Namespace extends Namespace(uri = "http://www.w3.org/2000/svg")
-
-  val mimeType: String = "image/svg+xml"
 
   def fromString(what: String): SVGDocument = {
     val in: InputStream = new UnclosableInputStream(new StringBufferInputStream(what))

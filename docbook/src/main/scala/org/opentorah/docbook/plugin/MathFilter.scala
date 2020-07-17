@@ -66,11 +66,11 @@ final class MathFilter(
   override def startElement(uri: String, localName: String, qName: String, atts: Attributes): Unit = {
     flush()
 
-    val isMathMLMath: Boolean = MathML.Namespace.is(uri) && (MathML.math == localName)
+    val isMathMLMath: Boolean = Namespace.MathML.is(uri) && (MathML.math == localName)
     val attributes: Attributes = if (!isMathMLMath) atts else {
       val result: AttributesImpl = new AttributesImpl(atts)
-      val isInline: Option[Boolean] = DisplayAttribute.get(MathML.Namespace, atts)
-      DisplayAttribute.setWithDefault(MathML.Namespace, checkInline(isInline), result)
+      val isInline: Option[Boolean] = DisplayAttribute.get(Namespace.MathML, atts)
+      DisplayAttribute.setWithDefault(Namespace.MathML, checkInline(isInline), result)
       result
     }
 
@@ -136,7 +136,7 @@ final class MathFilter(
     val input = delimiters.get.input
     val isInline: Option[Boolean] = checkInline(input.isInline)
     val attributes = new AttributesImpl
-    Input.Attribute.set(MathML.Namespace, input.withInline(isInline), attributes)
+    Input.Attribute.set(Namespace.MathML, input.withInline(isInline), attributes)
 
     def mml(): Unit = {
       // Note: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,
@@ -144,18 +144,18 @@ final class MathFilter(
       //
       // Note: On Saxon 10 (but not 9!), XInclude namespace, if present on the `<article>`,
       // is added to the `<math>` element - but not its children.
-      prefixMapping(MathML.Namespace.default) {
+      prefixMapping(Namespace.MathML.default) {
         prefixMapping(MathJax.Namespace) {
-          element(MathML.Namespace.default, MathML.math, atts = attributes) {
-            element(MathML.Namespace.default, MathML.mrow) {
-              element(MathML.Namespace.default, MathML.mi) {
+          element(Namespace.MathML.default, MathML.math, atts = attributes) {
+            element(Namespace.MathML.default, MathML.mrow) {
+              element(Namespace.MathML.default, MathML.mi) {
                 sendToParent(math)
               }}}}}
     }
 
     if (currentlyInEquationElement) {
       mml()
-    } else element(DocBook.Namespace, if (isInline.contains(true)) "inlineequation" else "informalequation") {
+    } else element(Namespace.DocBook, if (isInline.contains(true)) "inlineequation" else "informalequation") {
       mml()
     }
 

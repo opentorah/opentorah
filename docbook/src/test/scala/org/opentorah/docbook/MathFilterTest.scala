@@ -1,6 +1,6 @@
 package org.opentorah.docbook
 
-import org.opentorah.docbook.plugin.{DocBook, MathFilter}
+import org.opentorah.docbook.plugin.MathFilter
 import org.opentorah.mathjax.{Configuration, MathJax, MathML}
 import org.opentorah.xml.{Namespace, Saxon, Xerces, Xml}
 import org.scalatest.flatspec.AnyFlatSpecLike
@@ -14,20 +14,20 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
     // but other than that, the document is the same.
     parse(
      s"""|${Xml.header16}
-         |<article xml:id="test-id" ${DocBook.Namespace.withVersion} ${Namespace.XInclude}>
+         |<article xml:id="test-id" xmlns="${Namespace.DocBook.uri}" version="${Namespace.DocBook.version}" xmlns:xi="${Namespace.XInclude.uri}">
          |  <para>
          |    Wrapped display TeX:<informalequation>
-         |    <math ${MathML.Namespace.default}
-         |          ${MathJax.Namespace} mathjax:input="TeX">
+         |    <math xmlns="${Namespace.MathML.uri}"
+         |          xmlns:mathjax="${MathJax.Namespace.uri}" mathjax:input="TeX">
          |      <mrow><mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi></mrow>
          |    </math></informalequation>
          |  </para>
          |</article>""".stripMargin
     ) shouldBe
-     s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
+     s"""|${Xml.header16}<article xmlns="${Namespace.DocBook.uri}" version="${Namespace.DocBook.version}" xmlns:xml="${Namespace.Xml.uri}" xml:id="test-id" xmlns:xi="${Namespace.XInclude.uri}">
          |  <para>
          |    Wrapped display TeX:<informalequation>
-         |    <math ${MathML.Namespace.default} display="block" mathjax:input="TeX" ${MathJax.Namespace}>
+         |    <math xmlns="${Namespace.MathML.uri}" display="block" mathjax:input="TeX" xmlns:mathjax="${MathJax.Namespace.uri}">
          |      <mrow>
          |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
@@ -41,13 +41,13 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
   it should "work for display TeX" in {
     parse(
      s"""|${Xml.header}
-         |<article xml:id="test-id" ${DocBook.Namespace.withVersion} ${Namespace.XInclude}>
+         |<article xml:id="test-id" xmlns="${Namespace.DocBook.uri}" version="${Namespace.DocBook.version}" xmlns:xi="${Namespace.XInclude.uri}">
          |  <para>Display TeX:$$$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$$$</para>
          |</article>""".stripMargin
     ) shouldBe
-     s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
+     s"""|${Xml.header16}<article xmlns="${Namespace.DocBook.uri}" version="${Namespace.DocBook.version}" xmlns:xml="${Namespace.Xml.uri}" xml:id="test-id" xmlns:xi="${Namespace.XInclude.uri}">
          |  <para>Display TeX:<informalequation>
-         |         <math ${MathML.Namespace.default} mathjax:input="TeX" ${MathJax.Namespace}>
+         |         <math xmlns="${Namespace.MathML.uri}" mathjax:input="TeX" xmlns:mathjax="${MathJax.Namespace.uri}">
          |            <mrow>
          |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
@@ -61,14 +61,14 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
   it should "work for inline TeX" in {
     parse(
      s"""|${Xml.header}
-         |<article xml:id="test-id" ${DocBook.Namespace.withVersion} ${Namespace.XInclude}>
+         |<article xml:id="test-id" xmlns="${Namespace.DocBook.uri}" version="${Namespace.DocBook.version}" xmlns:xi="${Namespace.XInclude.uri}">
          |  <para>Inline TeX:$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$</para>
          |</article>
          |""".stripMargin
     ) shouldBe
-     s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
+     s"""|${Xml.header16}<article xmlns="${Namespace.DocBook.uri}" version="${Namespace.DocBook.version}" xmlns:xml="${Namespace.Xml.uri}" xml:id="test-id" xmlns:xi="${Namespace.XInclude.uri}">
          |  <para>Inline TeX:<inlineequation>
-         |         <math ${MathML.Namespace.default} mathjax:input="inline-TeX" ${MathJax.Namespace}>
+         |         <math xmlns="${Namespace.MathML.uri}" mathjax:input="inline-TeX" xmlns:mathjax="${MathJax.Namespace.uri}">
          |            <mrow>
          |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
@@ -82,13 +82,13 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
   it should "work for equation display TeX" in {
     parse(
      s"""|${Xml.header16}
-         |<article ${DocBook.Namespace.withVersion} xml:id="test-id" ${Namespace.XInclude}>
+         |<article xmlns="${Namespace.DocBook.uri}" version="${Namespace.DocBook.version}" xml:id="test-id" xmlns:xi="${Namespace.XInclude.uri}">
          |  <para>Explicit display TeX:<equation>$$$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$$$</equation></para>
          |</article>""".stripMargin
     ) shouldBe
-     s"""|${Xml.header16}<article ${DocBook.Namespace.withVersion} ${Namespace.Xml} xml:id="test-id" ${Namespace.XInclude}>
+     s"""|${Xml.header16}<article xmlns="${Namespace.DocBook.uri}" version="${Namespace.DocBook.version}" xmlns:xml="${Namespace.Xml.uri}" xml:id="test-id" xmlns:xi="${Namespace.XInclude.uri}">
          |  <para>Explicit display TeX:<equation>
-         |         <math ${MathML.Namespace.default} mathjax:input="TeX" ${MathJax.Namespace}>
+         |         <math xmlns="${Namespace.MathML.uri}" mathjax:input="TeX" xmlns:mathjax="${MathJax.Namespace.uri}">
          |            <mrow>
          |               <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |            </mrow>
@@ -99,19 +99,8 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
          |""".stripMargin
   }
 
-//  val wrappedInlineTex: String =
-//   s"""|${Xml.header}
-//       |<article xml:id="test-id" ${DocBook.withVersion} ${Namespace.XInclude}>
-//       |  <para>
-//       |    Wrapped display TeX:<inlineequation>
-//       |    <math ${MathML.default} ${MathJaxNamespace } mathjax:input="TeX">
-//       |      <mrow><mi>x = {-b \pm \sqrt{b^2-4ac} \over 2a}.</mi></mrow>
-//       |    </math></inlineequation>
-//       |  </para>
-//       |</article>""".stripMargin
-
   private def parse(string: String): String = {
-    // Saxon 6 returns unmodifiable DOM that breaks toString(); using Saxon 10.
+    // Saxon6 returns unmodifiable DOM that breaks toString(); using Saxon10.
     val node: Node = Saxon.Saxon10.parse(
       input = string,
       xmlReader = Xerces.getFilteredXMLReader(filters = Seq(

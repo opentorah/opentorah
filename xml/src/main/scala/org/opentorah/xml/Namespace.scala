@@ -3,7 +3,8 @@ package org.opentorah.xml
 import org.w3c.dom.{Document, Element => DomElement}
 import org.xml.sax.helpers.AttributesImpl
 
-class Namespace(val uri: String, val prefix: String = "") {
+class Namespace(val uri: String, val prefix: String) {
+
   final override def equals(other: Any): Boolean = other match {
     case that: Namespace =>
       val result: Boolean = this.is(that)
@@ -20,8 +21,6 @@ class Namespace(val uri: String, val prefix: String = "") {
   final def is(namespaceUri: String): Boolean = namespaceUri == uri
 
   final override def toString: String = s"""$xmlns="$uri""""
-
-  final def withVersion(version: String): String = toString + s""" version="$version""""
 
   final def isDefault: Boolean = prefix == ""
 
@@ -70,5 +69,35 @@ object Namespace {
 
   object XLink extends Namespace(uri = "http://www.w3.org/1999/xlink", prefix = "xlink")
 
-  object Xsl extends Namespace(uri = "http://www.w3.org/1999/XSL/Transform", prefix = "xsl")
+  object Xsl extends Namespace(uri = "http://www.w3.org/1999/XSL/Transform", prefix = "xsl") {
+    def version(usesDocBookXslt2: Boolean): String = if (usesDocBookXslt2) "2.0" else "1.0"
+  }
+
+  object Catalog extends Namespace(uri = "urn:oasis:names:tc:entity:xmlns:xml:catalog", prefix = "") {
+    val dtdId: String = "-//OASIS//DTD XML Catalogs V1.1//EN"
+
+    val dtdUri: String = "http://www.oasis-open.org/committees/entity/release/1.1/catalog.dtd"
+
+    val doctype: String = s"""<!DOCTYPE catalog PUBLIC "$dtdId" "$dtdUri">"""
+  }
+
+  object MathML extends Namespace(uri = "http://www.w3.org/1998/Math/MathML", prefix = "mathml") {
+    val mimeType: String = "application/mathml+xml"
+  }
+
+  object Svg extends Namespace(uri="http://www.w3.org/2000/svg", prefix="") {
+    val mimeType: String = "image/svg+xml"
+  }
+
+  object DocBook extends Namespace(uri = "http://docbook.org/ns/docbook", prefix="") {
+    val dtdId: String = "-//OASIS//DTD DocBook XML V5.0//EN"
+
+    val dtdUri: String = "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd"
+
+    val doctype: String = s"""<!DOCTYPE article PUBLIC "$dtdId" "$dtdUri">"""
+
+    val version: String = "5.0"
+  }
+
+  object Tei extends Namespace(uri = "http://www.tei-c.org/ns/1.0", prefix="")
 }

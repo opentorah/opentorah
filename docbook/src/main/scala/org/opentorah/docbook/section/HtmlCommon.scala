@@ -1,6 +1,7 @@
 package org.opentorah.docbook.section
 
 import Section.Parameters
+import scala.xml.Node
 
 object HtmlCommon extends CommonSection {
   override def name: String = "htmlCommon"
@@ -17,5 +18,5 @@ object HtmlCommon extends CommonSection {
     "chunk.quietly" -> (if (values.isInfoEnabled) "0" else "1")
   )
 
-  override protected def customStylesheetBody: String = ""
+  override protected def customStylesheetBody: Seq[Node] = Seq.empty
 }

@@ -1,6 +1,7 @@
 package org.opentorah.docbook.section
 
 import Section.Parameters
+import scala.xml.Node
 
 object Html2 extends DocBook2 {
   override def name: String = "html2"
@@ -23,23 +24,22 @@ object Html2 extends DocBook2 {
 
   override def usesCss: Boolean = true
 
-  override protected def mainStylesheetBody(values: NonOverridableParameters): String = ""
+  override protected def mainStylesheetBody(values: NonOverridableParameters): Seq[Node] = Seq.empty
 
-  override protected def customStylesheetBody: String =
-    s"""
-       |  <xsl:param name="autolabel.elements">
-       |    <db:appendix format="A"/>
-       |    <db:chapter/>
-       |    <db:figure/>
-       |    <db:example/>
-       |    <db:table/>
-       |    <db:equation/>
-       |    <db:part format="I"/>
-       |    <db:reference format="I"/>
-       |    <db:preface/>
-       |    <db:qandadiv/>
-       |    <db:section/>
-       |    <db:refsection/>
-       |  </xsl:param>
-       |""".stripMargin
+  override protected def customStylesheetBody: Seq[Node] = Seq(
+    <xsl:param name="autolabel.elements">
+      <db:appendix format="A"/>
+      <db:chapter/>
+      <db:figure/>
+      <db:example/>
+      <db:table/>
+      <db:equation/>
+      <db:part format="I"/>
+      <db:reference format="I"/>
+      <db:preface/>
+      <db:qandadiv/>
+      <db:section/>
+      <db:refsection/>
+    </xsl:param>
+  )
 }

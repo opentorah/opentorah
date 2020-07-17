@@ -4,26 +4,25 @@ import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import org.apache.fop.apps.{FOUserAgent, FopFactory}
 import org.opentorah.mathjax.Svg
 import org.opentorah.util.Util
-import org.opentorah.xml.{Saxon, Xml}
+import org.opentorah.xml.Saxon
 import org.slf4j.{Logger, LoggerFactory}
+import scala.xml.Elem
 
 object Fop {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  val defaultConfigurationFile: String =
-    s"""${Xml.header}
-       |<fop version="1.0">
-       |  <renderers>
-       |    <renderer mime="application/pdf">
-       |      <fonts>
-       |        <!-- FOP will detect fonts available in the operating system. -->
-       |        <auto-detect/>
-       |      </fonts>
-       |    </renderer>
-       |  </renderers>
-       |</fop>
-       |""".stripMargin
+  val defaultConfigurationFile: Elem =
+    <fop version="1.0">
+      <renderers>
+        <renderer mime="application/pdf">
+          <fonts>
+            <!-- FOP will detect fonts available in the operating system. -->
+            <auto-detect/>
+          </fonts>
+        </renderer>
+      </renderers>
+    </fop>
 
   private val dateFormat: java.text.DateFormat = new java.text.SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy")
 
