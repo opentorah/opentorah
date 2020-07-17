@@ -19,7 +19,7 @@ trait Model[N] {
 
   def isElement(node: N): Boolean
   def asElement(node: N): Element
-  def label(node: N): String // TODO getLabel() - for Elements only...
+  def getLabel(element: Element): String
   def isWhitespace(node: N): Boolean
   def isText(node: N): Boolean
   def getText(node: N): String
@@ -44,13 +44,13 @@ object Model {
     override type AttributeValue = Seq[ScalaNode]
     override type Text = scala.xml.Text
 
-    override def isElement(node: ScalaNode): Boolean = Xml.isElement(node)
+    override def isElement(node: ScalaNode): Boolean = node.isInstanceOf[Element]
     override def asElement(node: ScalaNode): Element = node.asInstanceOf[Element]
-    override def label(node: ScalaNode): String = node.label
+    override def getLabel(element: Element): String = element.label
     override def isWhitespace(node: ScalaNode): Boolean = Xml.isWhitespace(node)
-    override def isText(node: ScalaNode): Boolean = Xml.isText(node)
+    override def isText(node: ScalaNode): Boolean = node.isInstanceOf[Text]
     override def getText(node: ScalaNode): String = node.asInstanceOf[Text].data
-    override def mkText(text: String): Text = scala.xml.Text(text)
+    override def mkText(text: String): Text = Xml.textNode(text)
     override def isAtom(node: ScalaNode): Boolean = Xml.isAtom(node)
     override def getNodeText(node: ScalaNode): String = node match {
       case special: scala.xml.SpecialNode => sbToString(special.buildString)
@@ -63,16 +63,16 @@ object Model {
     override def getNamespaceBindingString(element: Element, namespaceBinding: NamespaceBinding): String =
       element.scope.buildString(namespaceBinding).trim
 
-    override def getAttributes(element: Element): Seq[AttributeDescriptor] = {
+    override def getAttributes(element: Element): Seq[AttributeDescriptor] =
       element.attributes.toSeq
-        .filter(_.isInstanceOf[scala.xml.Attribute]).map(_.asInstanceOf[scala.xml.Attribute]).map { attribute =>
-        AttributeDescriptor(
+        .filter(_.isInstanceOf[scala.xml.Attribute])
+        .map(_.asInstanceOf[scala.xml.Attribute]).map { attribute => AttributeDescriptor(
           prefix = Option(attribute.pre),
           key = attribute.key,
           value = Option(attribute.value)
         )
       }
-    }
+
 
     override def getAttributeValueText(value: Seq[ScalaNode]): String =
       sbToString(scala.xml.Utility.appendQuoted(

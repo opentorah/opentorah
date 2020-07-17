@@ -4,8 +4,6 @@ import org.opentorah.util.Strings
 import org.typelevel.paiges.Doc
 import scala.xml.Node
 
-// TODO turn all Model[Node] into [N]... Model[N]
-// TODO remove the cast in render() and figure out how to call it ;)
 final class PrettyPrinter(
   width: Int = 120,
   indent: Int = 2,
@@ -15,15 +13,19 @@ final class PrettyPrinter(
   clingyElements: Set[String] = Set()
 ) {
   private def isClingy[N](node: N)(implicit N: Model[N]): Boolean =
-    N.isElement(node) && clingyElements.contains(N.label(node))
+    N.isElement(node) && clingyElements.contains(N.getLabel(N.asElement(node)))
 
-  def renderXml(node: Node, doctype: Option[String] = None)(implicit N: Model[Node]): String =
+  def renderXml(node: Node, doctype: Option[String] = None): String = renderXmlN(node)
+
+  def renderXmlN[N](node: N, doctype: Option[String] = None)(implicit N: Model[N]): String =
     Xml.header + "\n" +
     doctype.fold("")(doctype => doctype + "\n") +
-    render(node)(N) + "\n"
+    renderN(node) + "\n"
 
-  def render[N](node: N)(implicit N: Model[Node]): String = fromNode(N)(
-    node.asInstanceOf[Node],
+  def render(node: Node): String = renderN(node)
+
+  def renderN[N](node: N)(implicit N: Model[N]): String = fromNode(N)(
+    node,
     pscope = N.topNamespaceBinding,
     canBreakLeft = true,
     canBreakRight = true
@@ -39,7 +41,7 @@ final class PrettyPrinter(
       val element: N.Element = N.asElement(node)
       val result = fromElement(N)(element, pscope, canBreakLeft, canBreakRight)
       // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
-      if (canBreakRight && N.label(element) == "lb") result + Doc.hardLine else result
+      if (canBreakRight && N.getLabel(element) == "lb") result + Doc.hardLine else result
     }
     else if (N.isText(node)) Doc.text(N.getText(node))
     else Doc.paragraph(N.getNodeText(node))
@@ -66,15 +68,18 @@ final class PrettyPrinter(
       val start: Doc = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">")
       val end: Doc = Doc.text(s"</$name>")
 
+      val label: String = N.getLabel(element)
+
       val stackElements: Boolean = noAtoms &&
-        ((chunks.length >= 2) || ((chunks.length == 1) && allwaysStackElements.contains(N.label(element)))) &&
-        !doNotStackElements.contains(N.label(element))
+        ((chunks.length >= 2) || ((chunks.length == 1) && allwaysStackElements.contains(label))) &&
+        !doNotStackElements.contains(label)
+
       if (stackElements) {
         // If this is clearly a bunch of elements - stack 'em with an indent:
         start +
         Doc.cat(chunks.map(chunk => (Doc.hardLine + chunk).nested(indent))) +
         Doc.hardLine + end
-      } else if (nestElements.contains(N.label(element))) {
+      } else if (nestElements.contains(label)) {
         // If this is forced-nested element - nest it:
         Doc.intercalate(Doc.lineOrSpace, chunks).tightBracketBy(
           left = start,
@@ -163,7 +168,7 @@ object PrettyPrinter {
 
   private def fromAttributes[N](N: Model[N])(element: N.Element, pscope: N.NamespaceBinding): Seq[Doc] = {
     val attributes: Seq[Doc] = N.getAttributes(element).filterNot(_.value.isEmpty).map {
-      case N.AttributeDescriptor(prefix, key, value) =>
+      case N.AttributeDescriptor(prefix, key, value: Option[N.AttributeValue]) =>
         Doc.text(prefix.fold("")(prefix => s"$prefix:") + s"$key=") +
         Doc.text(N.getAttributeValueText(value.get))
     }

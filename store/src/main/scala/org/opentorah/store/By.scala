@@ -3,7 +3,6 @@ package org.opentorah.store
 import java.net.URL
 import org.opentorah.util.{Collections, Files}
 import org.opentorah.xml.{Attribute, Parser, Text, Xml}
-import org.opentorah.xml.Model.scalaModel
 import zio.ZIO
 import scala.xml.Elem
 

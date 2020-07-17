@@ -3,7 +3,7 @@ package org.opentorah.xml
 import org.apache.xml.serializer.dom3.LSSerializerImpl
 import org.opentorah.util.Strings
 import scala.xml.transform.{RewriteRule, RuleTransformer}
-import scala.xml.{Atom, Elem, Node, TopScope}
+import scala.xml.{Elem, Node}
 
 object Xml {
 
@@ -24,10 +24,10 @@ object Xml {
   }
 
   def removeNamespace(xml: Elem): Elem =
-    xml.copy(scope = TopScope, child = xml.child.map(removeNamespace))
+    xml.copy(scope = scala.xml.TopScope, child = xml.child.map(removeNamespace))
 
   def removeNamespace(node: Node): Node = node match {
-    case e: Elem => e.copy(scope = TopScope, child = e.child.map(removeNamespace))
+    case e: Elem => e.copy(scope = scala.xml.TopScope, child = e.child.map(removeNamespace))
     case n => n
   }
 
@@ -37,16 +37,10 @@ object Xml {
   def isWhitespace(node: Node): Boolean =
     isAtom(node) && node.text.trim.isEmpty
 
-  def isElement(node: Node): Boolean =
-    node.isInstanceOf[Elem]
-
   def isAtom(node: Node): Boolean =
-    node.isInstanceOf[Atom[_]]
+    node.isInstanceOf[scala.xml.Atom[_]]
 
-  def isText(node: Node): Boolean =
-    node.isInstanceOf[scala.xml.Text]
-
-  def textNode(text: String): Node = new scala.xml.Text(text)
+  def textNode(text: String): scala.xml.Text = new scala.xml.Text(text)
 
   def toString(nodes: Seq[Node]): String = nodes.map(toString).mkString("")
   def toString(node: Node): String = Strings.squashWhitespace {
