@@ -3,10 +3,10 @@ package org.opentorah.xml
 import org.opentorah.util.Strings
 import org.opentorah.util.Strings.sbToString
 import org.typelevel.paiges.Doc
-import scala.xml.{Elem, MetaData, NamespaceBinding, Node, SpecialNode, TopScope, Utility}
+import scala.xml.{Elem, Node, SpecialNode}
 
 // TODO turn all Model[Node] into [N]... Model[N]
-// TODO remove the casts once everything is parameterized in N!
+// TODO remove all the casts once everything is parameterized in N!
 final class PrettyPrinter(
   width: Int = 120,
   indent: Int = 2,
