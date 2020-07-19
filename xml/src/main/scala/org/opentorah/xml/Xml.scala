@@ -62,14 +62,13 @@ object Xml extends Model[Node] {
   override def getNamespaceBindingString(element: Element, namespaceBinding: NamespaceBinding): String =
     element.scope.buildString(namespaceBinding).trim
 
-  override def getAttributes(element: Element): Seq[Model.AttributeDescriptor] = element.attributes.toSeq
+  override def getAttributes(element: Element): Seq[Attribute.Value[String]] = element.attributes.toSeq
     .filter(_.isInstanceOf[scala.xml.Attribute])
     .map(_.asInstanceOf[scala.xml.Attribute])
-    .map(attribute => Model.AttributeDescriptor(
-      prefix = Option(attribute.pre),
-      key = attribute.key,
-      value = Option(attribute.value).map(getAttributeValueText)
-    ))
+    .map(attribute => Attribute(
+      name = attribute.key,
+      prefix = Option(attribute.pre)
+    ).withValue(Option(attribute.value).map(getAttributeValueText)))
 
   // TODO maybe just value.text?
   private def getAttributeValueText(value: Seq[Node]): String =
