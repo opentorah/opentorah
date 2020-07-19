@@ -7,7 +7,9 @@ trait ToXml[A] {
 
   final def toXml(values: Seq[A]): Seq[Elem] = values.map(toXml)
 
-  final def toXml(value: A): Elem = <elem/>.copy(
+  final def toXml(value: A): Elem =
+    // TODO move into Xml:
+      <elem/>.copy(
     label = elementName(value),
     attributes = attributes(value).foldRight[MetaData](Null){ case (current, result) => new UnprefixedAttribute(
       current.attribute.name,

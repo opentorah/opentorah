@@ -30,6 +30,7 @@ private[xml] object Current {
   } yield Current(
     from,
     name = element.label,
+    // TODO merge with Xml.getAttributes()
     attributes = element.attributes.map(metadata => metadata.prefixedKey -> metadata.value.toString).toMap,
     content
   )

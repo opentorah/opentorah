@@ -15,14 +15,14 @@ final class PrettyPrinter(
   private def isClingy[N](node: N)(implicit N: Model[N]): Boolean =
     N.isElement(node) && clingyElements.contains(N.getLabel(N.asElement(node)))
 
-  def renderXml(node: Node, doctype: Option[String] = None): String = renderXmlN(node)
+  def renderXml(node: Node, doctype: Option[String] = None): String = renderXmlN(node, doctype)(Xml)
 
   def renderXmlN[N](node: N, doctype: Option[String] = None)(implicit N: Model[N]): String =
     Xml.header + "\n" +
     doctype.fold("")(doctype => doctype + "\n") +
     renderN(node) + "\n"
 
-  def render(node: Node): String = renderN(node)
+  def render(node: Node): String = renderN(node)(Xml)
 
   def renderN[N](node: N)(implicit N: Model[N]): String = fromNode(N)(
     node,
@@ -191,11 +191,11 @@ object PrettyPrinter {
     @scala.annotation.tailrec
     def processText(result: Seq[N.Text], text: String): Seq[N.Text] = if (text.isEmpty) result else {
       val (spaces: String, tail: String) = text.span(_ == ' ')
-      val newResult = if (spaces.isEmpty) result else result :+ N.mkText(" ")
+      val newResult = if (spaces.isEmpty) result else result :+ N.textNode(" ")
       val (word: String, tail2: String) = tail.span(_ != ' ')
 
       if (word.isEmpty) newResult
-      else processText(newResult :+ N.mkText(word), tail2)
+      else processText(newResult :+ N.textNode(word), tail2)
     }
 
     processText(Seq.empty, text)

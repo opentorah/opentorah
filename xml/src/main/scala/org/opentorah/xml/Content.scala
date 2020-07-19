@@ -108,8 +108,8 @@ private[xml] object Content {
   }
 
   private def partition(nodes: Seq[Node]): (Seq[Elem], Option[String]) = {
-    val (elems, nonElems) = nodes.partition(_.isInstanceOf[Elem])
+    val (elems, nonElems) = nodes.partition(Xml.isElement)
     val characters = nonElems.map(_.text).mkString.trim
-    (elems.map(_.asInstanceOf[Elem]), if (characters.isEmpty) None else Some(characters))
+    (elems.map(Xml.asElement), if (characters.isEmpty) None else Some(characters))
   }
 }
