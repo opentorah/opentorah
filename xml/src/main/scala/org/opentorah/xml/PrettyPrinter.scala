@@ -79,7 +79,8 @@ object PrettyPrinter {
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): Doc = {
-      val name: String = N.getPrefix(element).fold("")(_ + ":") + N.getName(element)
+      val label: String = N.getName(element)
+      val name: String = N.getPrefix(element).fold("")(_ + ":") + label
       val elementNamespaces: Seq[Namespace] = N.getNamespaces(element)
 
       val attributes: Doc = {
@@ -87,37 +88,36 @@ object PrettyPrinter {
           if ((elementNamespace == Namespace.Top) || namespaces.contains(elementNamespace)) None
           else Some(elementNamespace.xmlnsAttribute))
 
-        val docs: Seq[Doc] =
+        val result: Seq[Doc] =
           (N.getAttributes(element) ++ namespaceAttributes).filterNot(_.value.isEmpty).map(attributeValue =>
             // TODO use '' instead of "" if value contains "?
             Doc.text(attributeValue.attribute.prefixedName + "=" + "\"" + attributeValue.value.get + "\"")
           )
 
-        if (docs.isEmpty) Doc.empty
-        else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, docs)
+        if (result.isEmpty) Doc.empty
+        else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, result)
       }
 
-      val (chunks: Seq[Doc], noAtoms: Boolean, charactersLeft: Boolean, charactersRight: Boolean) =
-        fromChildren(element, elementNamespaces, canBreakLeft, canBreakRight)
+      val nodes: Seq[N] = atomize(Seq.empty, N.getChildren(element))
+      val (children: Seq[Doc], noAtoms: Boolean, charactersLeft: Boolean, charactersRight: Boolean) =
+        fromChildren(elementNamespaces, nodes, canBreakLeft, canBreakRight)
 
-      if (chunks.isEmpty) Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>") else  {
+      if (children.isEmpty) Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>") else {
         val start: Doc = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">")
         val end: Doc = Doc.text(s"</$name>")
 
-        val label: String = N.getName(element)
-
         val stackElements: Boolean = noAtoms &&
-          ((chunks.length >= 2) || ((chunks.length == 1) && allwaysStackElements.contains(label))) &&
+          ((children.length >= 2) || ((children.length == 1) && allwaysStackElements.contains(label))) &&
           !doNotStackElements.contains(label)
 
         if (stackElements) {
           // If this is clearly a bunch of elements - stack 'em with an indent:
           start +
-          Doc.cat(chunks.map(chunk => (Doc.hardLine + chunk).nested(indent))) +
+          Doc.cat(children.map(child => (Doc.hardLine + child).nested(indent))) +
           Doc.hardLine + end
         } else if (nestElements.contains(label)) {
           // If this is forced-nested element - nest it:
-          Doc.intercalate(Doc.lineOrSpace, chunks).tightBracketBy(
+          Doc.intercalate(Doc.lineOrSpace, children).tightBracketBy(
             left = start,
             right = end,
             indent
@@ -127,7 +127,7 @@ object PrettyPrinter {
           // character content should stick to the opening and closing tags:
           start +
           (if (canBreakLeft && !charactersLeft) Doc.lineOrEmpty else Doc.empty) +
-          Doc.intercalate(Doc.lineOrSpace, chunks) +
+          Doc.intercalate(Doc.lineOrSpace, children) +
           (if (canBreakRight && !charactersRight) Doc.lineOrEmpty else Doc.empty) +
           end
         }
@@ -135,21 +135,20 @@ object PrettyPrinter {
     }
 
     private def fromChildren(
-      element: N.Element,
       elementNamespaces: Seq[Namespace],
+      nodes: Seq[N],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): (Seq[Doc], Boolean, Boolean, Boolean) = {
-      val nodes: Seq[N] = atomize(Seq.empty, N.getChildren(element))
       val whitespaceLeft: Boolean = nodes.headOption.exists(N.isWhitespace)
       val whitespaceRight: Boolean = nodes.lastOption.exists(N.isWhitespace)
-      val charactersLeft: Boolean = nodes.headOption.exists(node => N.isAtom(node) && !N.isWhitespace(node))
+      val charactersLeft: Boolean = nodes.exists(node => N.isAtom(node) && !N.isWhitespace(node))
       val charactersRight: Boolean = nodes.lastOption.exists(node => N.isAtom(node) && !N.isWhitespace(node))
       val chunks: Seq[Seq[N]] = chunkify(Seq.empty, Seq.empty, nodes)
       val noAtoms: Boolean = chunks.forall(_.forall(node => !N.isAtom(node)))
       val canBreakLeft1 = canBreakLeft || whitespaceLeft
       val canBreakRight1 = canBreakRight || whitespaceRight
-      val result: Seq[Doc] =
+      val children: Seq[Doc] =
         if (chunks.isEmpty) Seq.empty
         else if (chunks.length == 1) Seq(
           fromChunk(chunks.head, elementNamespaces, canBreakLeft1, canBreakRight1)
@@ -158,7 +157,7 @@ object PrettyPrinter {
           chunks.tail.init.map(chunk => fromChunk(chunk, elementNamespaces, canBreakLeft = true, canBreakRight = true)) :+
           fromChunk(chunks.last, elementNamespaces, canBreakLeft = true, canBreakRight = canBreakRight1)
         }
-      (result, noAtoms, charactersLeft, charactersRight)
+      (children, noAtoms, charactersLeft, charactersRight)
     }
 
     private def fromChunk(
@@ -177,27 +176,6 @@ object PrettyPrinter {
           fromNode(nodes.last, namespaces, canBreakLeft = false, canBreakRight)
 
         Doc.intercalate(Doc.empty, result)
-      }
-    }
-
-    private def chunkify(
-      result: Seq[Seq[N]],
-      current: Seq[N],
-      nodes: Seq[N]
-    ): Seq[Seq[N]] = {
-      def cling(c: N, n: N): Boolean = N.isText(c) || N.isText(n) ||
-        (N.isElement(n) && clingyElements.contains(N.getName(N.asElement(n))))
-
-      def flush(nodes: Seq[N]): Seq[Seq[N]] = chunkify(result :+ current.reverse, Nil, nodes)
-
-      (current, nodes) match {
-        case (Nil    , Nil    ) => result
-        case (c :: cs, Nil    ) => flush(Nil)
-        case (Nil    , n :: ns) if  N.isWhitespace(n) => chunkify(result, Nil, ns)
-        case (c :: cs, n :: ns) if  N.isWhitespace(n) => flush(ns)
-        case (Nil    , n :: ns) if !N.isWhitespace(n) => chunkify(result, n :: Nil, ns)
-        case (c :: cs, n :: ns) if !N.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns)
-        case (c :: cs, n :: ns) if !N.isWhitespace(n) && !cling(c, n) => flush(n :: ns)
       }
     }
 
@@ -220,6 +198,27 @@ object PrettyPrinter {
 
       if (word.isEmpty) newResult
       else processText(newResult :+ N.mkText(word), tail2)
+    }
+
+    private def chunkify(
+      result: Seq[Seq[N]],
+      current: Seq[N],
+      nodes: Seq[N]
+    ): Seq[Seq[N]] = {
+      def cling(c: N, n: N): Boolean = N.isText(c) || N.isText(n) ||
+        (N.isElement(n) && clingyElements.contains(N.getName(N.asElement(n))))
+
+      def flush(nodes: Seq[N]): Seq[Seq[N]] = chunkify(result :+ current.reverse, Nil, nodes)
+
+      (current, nodes) match {
+        case (Nil    , Nil    ) => result
+        case (c :: cs, Nil    ) => flush(Nil)
+        case (Nil    , n :: ns) if  N.isWhitespace(n) => chunkify(result, Nil, ns)
+        case (c :: cs, n :: ns) if  N.isWhitespace(n) => flush(ns)
+        case (Nil    , n :: ns) if !N.isWhitespace(n) => chunkify(result, n :: Nil, ns)
+        case (c :: cs, n :: ns) if !N.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns)
+        case (c :: cs, n :: ns) if !N.isWhitespace(n) && !cling(c, n) => flush(n :: ns)
+      }
     }
   }
 
