@@ -44,8 +44,6 @@ object PrettyPrinter {
     nestElements: Set[String],
     clingyElements: Set[String]
   )(N: Model[N]) {
-    private def isClingy(node: N): Boolean =
-      N.isElement(node) && clingyElements.contains(N.getName(N.asElement(node)))
 
     def renderXml(node: N, doctype: Option[String] = None): String =
       Xml.header + "\n" +
@@ -82,15 +80,25 @@ object PrettyPrinter {
       canBreakRight: Boolean
     ): Doc = {
       val name: String = N.getPrefix(element).fold("")(_ + ":") + N.getName(element)
+      val elementNamespaces: Seq[Namespace] = N.getNamespaces(element)
 
       val attributes: Doc = {
-        val docs: Seq[Doc] = fromAttributes(element, namespaces)
+        val namespaceAttributes: Seq[Attribute.Value[String]] = elementNamespaces.flatMap(elementNamespace =>
+          if ((elementNamespace == Namespace.Top) || namespaces.contains(elementNamespace)) None
+          else Some(elementNamespace.xmlnsAttribute))
+
+        val docs: Seq[Doc] =
+          (N.getAttributes(element) ++ namespaceAttributes).filterNot(_.value.isEmpty).map(attributeValue =>
+            // TODO use '' instead of "" if value contains "?
+            Doc.text(attributeValue.attribute.prefixedName + "=" + "\"" + attributeValue.value.get + "\"")
+          )
+
         if (docs.isEmpty) Doc.empty
         else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, docs)
       }
 
       val (chunks: Seq[Doc], noAtoms: Boolean, charactersLeft: Boolean, charactersRight: Boolean) =
-        fromChildren(element, canBreakLeft, canBreakRight)
+        fromChildren(element, elementNamespaces, canBreakLeft, canBreakRight)
 
       if (chunks.isEmpty) Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>") else  {
         val start: Doc = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">")
@@ -128,6 +136,7 @@ object PrettyPrinter {
 
     private def fromChildren(
       element: N.Element,
+      elementNamespaces: Seq[Namespace],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): (Seq[Doc], Boolean, Boolean, Boolean) = {
@@ -138,17 +147,16 @@ object PrettyPrinter {
       val charactersRight: Boolean = nodes.lastOption.exists(node => N.isAtom(node) && !N.isWhitespace(node))
       val chunks: Seq[Seq[N]] = chunkify(Seq.empty, Seq.empty, nodes)
       val noAtoms: Boolean = chunks.forall(_.forall(node => !N.isAtom(node)))
-      val namespaces: Seq[Namespace] = N.getNamespaces(element)
       val canBreakLeft1 = canBreakLeft || whitespaceLeft
       val canBreakRight1 = canBreakRight || whitespaceRight
       val result: Seq[Doc] =
         if (chunks.isEmpty) Seq.empty
         else if (chunks.length == 1) Seq(
-          fromChunk(chunks.head, namespaces, canBreakLeft1, canBreakRight1)
+          fromChunk(chunks.head, elementNamespaces, canBreakLeft1, canBreakRight1)
         ) else {
-          fromChunk(chunks.head, namespaces, canBreakLeft = canBreakLeft1, canBreakRight = true) +:
-          chunks.tail.init.map(chunk => fromChunk(chunk, namespaces, canBreakLeft = true, canBreakRight = true)) :+
-          fromChunk(chunks.last, namespaces, canBreakLeft = true, canBreakRight = canBreakRight1)
+          fromChunk(chunks.head, elementNamespaces, canBreakLeft = canBreakLeft1, canBreakRight = true) +:
+          chunks.tail.init.map(chunk => fromChunk(chunk, elementNamespaces, canBreakLeft = true, canBreakRight = true)) :+
+          fromChunk(chunks.last, elementNamespaces, canBreakLeft = true, canBreakRight = canBreakRight1)
         }
       (result, noAtoms, charactersLeft, charactersRight)
     }
@@ -177,7 +185,9 @@ object PrettyPrinter {
       current: Seq[N],
       nodes: Seq[N]
     ): Seq[Seq[N]] = {
-      def cling(c: N, n: N): Boolean = N.isText(c) || N.isText(n) || isClingy(n)
+      def cling(c: N, n: N): Boolean = N.isText(c) || N.isText(n) ||
+        (N.isElement(n) && clingyElements.contains(N.getName(N.asElement(n))))
+
       def flush(nodes: Seq[N]): Seq[Seq[N]] = chunkify(result :+ current.reverse, Nil, nodes)
 
       (current, nodes) match {
@@ -189,18 +199,6 @@ object PrettyPrinter {
         case (c :: cs, n :: ns) if !N.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns)
         case (c :: cs, n :: ns) if !N.isWhitespace(n) && !cling(c, n) => flush(n :: ns)
       }
-    }
-
-    private def fromAttributes(element: N.Element, namespaces: Seq[Namespace]): Seq[Doc] = {
-      val elementNamespaces: Seq[Namespace] = N.getNamespaces(element)
-      val namespaceAttributes: Seq[Attribute.Value[String]] = elementNamespaces.flatMap(elementNamespace =>
-        if ((elementNamespace == Namespace.Top) || namespaces.contains(elementNamespace)) None
-        else Some(elementNamespace.xmlnsAttribute))
-
-      (N.getAttributes(element) ++ namespaceAttributes).filterNot(_.value.isEmpty).map(attributeValue =>
-        // TODO use '' instead of "" if value contains "?
-        Doc.text(attributeValue.attribute.prefixedName + "=" + "\"" + attributeValue.value.get + "\"")
-      )
     }
 
     @scala.annotation.tailrec
