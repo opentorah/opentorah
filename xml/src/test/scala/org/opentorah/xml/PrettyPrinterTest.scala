@@ -79,13 +79,13 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
          |/>""")
 
     check(<el a1="v1" a2="v2"/>, 18, expected =
-      """|<el a1="v1"
-         |a2="v2"/>""")
+      """|<el a1="v1" a2=
+         |"v2"/>""".stripMargin)
 
     check(<el a1="v1" a2="v2"/>, 10, expected =
-      """|<el
-         |a1="v1"
-         |a2="v2"/>""")
+      """|<el a1=
+         |"v1" a2=
+         |"v2"/>""")
 
     check(<creation><date when="2020-02-24"/><note/></creation>, 53,
       expected = """<creation><date when="2020-02-24"/><note/></creation>""")
@@ -99,9 +99,9 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
          |/><note/></creation>""")
 
     check(<creation><date when="2020-02-24"/><note/></creation>, 24, expected =
-      """|<creation><date
-         |when="2020-02-24"/><note
-         |/></creation>""")
+      """|<creation><date when=
+         |"2020-02-24"/><note/>
+         |</creation>""")
 
     check(<creation><date when="2020-02-24"/>blah</creation>, 50,
       expected = """<creation><date when="2020-02-24"/>blah</creation>""")
@@ -111,13 +111,12 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
          |/>blah</creation>""")
 
     check(<creation><date when="2020-02-24"/>blah</creation>, 30, expected =
-      """|<creation><date
-         |when="2020-02-24"
-         |/>blah</creation>""")
+      """|<creation><date when=
+         |"2020-02-24"/>blah</creation>""")
 
     check(<creation><date when="2020-02-24"/>blah</creation>, 24, expected =
-      """|<creation><date
-         |when="2020-02-24"
+      """|<creation><date when=
+         |"2020-02-24"
          |/>blah</creation>""")
 
     check(
@@ -128,8 +127,8 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
         <!-- dummy -->
       </xsl:stylesheet>,
       width = 120, expected =
-      """|<xsl:stylesheet version="1.0" exclude-result-prefixes="db" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         |xmlns:db="http://docbook.org/ns/docbook">
+      """|<xsl:stylesheet version="1.0" exclude-result-prefixes="db" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:db=
+         |"http://docbook.org/ns/docbook">
          |  <!-- Customizations go here. -->
          |  <!-- dummy -->
          |</xsl:stylesheet>""")
