@@ -15,7 +15,7 @@ object Transformers {
   def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
     case Nil => Nil
     case n :: Nil => Seq(n)
-    case n :: ns if n.isInstanceOf[Elem] => Seq(n, Xml.textNode(", ")) ++ multi(ns)
+    case n :: ns if n.isInstanceOf[Elem] => Seq(n, Xml.mkText(", ")) ++ multi(ns)
     case n :: ns => Seq(n) ++ multi(ns)
     case n => n
   }
@@ -74,10 +74,10 @@ object Transformers {
             val target: String = Files.mkUrl(Files.addPart(resolved.url, part))
             val rendition: Option[String] = elem.attribute("rendition").map(_.text)
             elem.copy(attributes =
-              Attribute("role", Xml.textNode(roleShouldBe.get),
-              Attribute("target", Xml.textNode(target),
+              Attribute("role", Xml.mkText(roleShouldBe.get),
+              Attribute("target", Xml.mkText(target),
               rendition.fold[scala.xml.MetaData](scala.xml.Null)(rendition =>
-                Attribute("rendition", Xml.textNode(rendition), scala.xml.Null)))))
+                Attribute("rendition", Xml.mkText(rendition), scala.xml.Null)))))
           }
         }
       }
@@ -102,8 +102,8 @@ object Transformers {
       }{ entity =>
         val target: String = Files.mkUrl(EntityObject.teiWrapperUrl(entity))
         elem.copy(attributes =
-          Attribute("role", Xml.textNode(Viewer.Names.name),
-          Attribute("target", Xml.textNode(target), scala.xml.Null)))
+          Attribute("role", Xml.mkText(Viewer.Names.name),
+          Attribute("target", Xml.mkText(target), scala.xml.Null)))
       }
     }
   }

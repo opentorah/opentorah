@@ -1,8 +1,8 @@
 package org.opentorah.docbook
 
 import org.opentorah.docbook.plugin.MathFilter
-import org.opentorah.mathjax.{Configuration, MathJax, MathML}
-import org.opentorah.xml.{Namespace, Saxon, Xerces, Xml}
+import org.opentorah.mathjax.{Configuration, MathJax}
+import org.opentorah.xml.{Namespace, PrettyPrinter, Saxon, Xerces, Xml}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.w3c.dom.Node
@@ -108,7 +108,7 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
 //        , new org.opentorah.xml.TracingFilter
       ))
     )
-    val result = Xml.toString(node)
+    val result = PrettyPrinter.render(node)
 //    println(result)
     result
   }

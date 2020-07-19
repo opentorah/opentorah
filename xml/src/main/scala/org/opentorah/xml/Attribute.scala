@@ -7,7 +7,12 @@ import zio.ZIO
 
 // Type-safe XML attribute get/set - for use in DOM and SAX inspired by
 //   net.sourceforge.jeuclid.context.Parameter and friends.
-abstract class Attribute[T](val name: String) extends Conversion[T] with Requireable[T] {
+abstract class Attribute[T](
+  val name: String,
+  val prefix: Option[String] = None
+) extends Conversion[T] with Requireable[T] {
+
+  final def prefixedName: String = prefix.fold("")(prefix => s"$prefix:") + s"$name"
 
   final override def toString: String = s"attribute $name"
 
@@ -108,12 +113,15 @@ object Attribute {
 
   final class Value[A](
     val attribute: Attribute[A],
-    value: Option[A]
+    val value: Option[A]
   ) {
     def valueToString: Option[String] = value.map(attribute.toString)
   }
 
-  def apply(name: String): Attribute[String] = new Attribute[String](name) with Conversion.StringConversion {
+  def apply(
+    name: String,
+    prefix: Option[String] = None
+  ): Attribute[String] = new Attribute[String](name, prefix) with Conversion.StringConversion {
     override def default: String = ""
   }
 

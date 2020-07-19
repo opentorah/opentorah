@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.store.WithPath
 import org.opentorah.tei.{Body, Tei}
 import org.opentorah.util.Files
-import org.opentorah.xml.Xml
+import org.opentorah.xml.{PrettyPrinter, Xml}
 import scala.xml.{Elem, Node}
 
 final class DocumentObject(
@@ -96,7 +96,7 @@ final class DocumentObject(
 
       SiteObject.withYaml(
         yaml = Seq("transcript" -> Files.mkUrl(teiWrapperUrl)) ++ navigation,
-        content = Seq(Xml.prettyPrinter.render(facsimilePages))
+        content = Seq(PrettyPrinter.default.render(facsimilePages))
       )
     }
   }

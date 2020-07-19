@@ -43,7 +43,7 @@ object Hierarchy {
 
   private def storeTitle(path: Path, store: Store): Seq[Node] = {
     val title: Seq[Node] = RawXml.getXml(store.title)
-    val titlePrefix: Seq[Node] = if (path.isEmpty) Seq.empty else Xml.textNode(
+    val titlePrefix: Seq[Node] = if (path.isEmpty) Seq.empty else Xml.mkText(
       getName(path.last.selector.names) + " " + getName(store.names) + (if (title.isEmpty) "" else ": ")
     )
 
@@ -52,7 +52,7 @@ object Hierarchy {
 
   def storeTitle(store: Store): Seq[Node] = {
     val title: Seq[Node] = RawXml.getXml(store.title)
-    val titlePrefix: Seq[Node] = if (title.isEmpty) Seq.empty else Seq(Xml.textNode(": "))
+    val titlePrefix: Seq[Node] = if (title.isEmpty) Seq.empty else Seq(Xml.mkText(": "))
     titlePrefix ++ title
   }
 

@@ -2,7 +2,7 @@ package org.opentorah.store
 
 import java.net.URL
 import org.opentorah.util.{Collections, Files}
-import org.opentorah.xml.{Attribute, Parser, Text, Xml}
+import org.opentorah.xml.{Attribute, Parser, PrettyPrinter, Text}
 import zio.ZIO
 import scala.xml.Elem
 
@@ -91,7 +91,7 @@ object By extends Component("by") {
           val result: Seq[String] = Files.filesWithExtensions(Files.url2file(directory), "xml").sorted
           if (Files.isFile(list)) Files.write(
             file = Files.url2file(list),
-            content = Xml.prettyPrinter.renderXml(filesList.toXml(result))
+            content = PrettyPrinter.default.renderXml(filesList.toXml(result))
           )
           result
         }

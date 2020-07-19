@@ -24,7 +24,7 @@ final class HierarchyObject(site: Site, path: Path, store: Store) extends Simple
             case collection: Collection => CollectionObject.urlPrefix(WithPath(storePath, collection))
             case _ => Hierarchy.urlPrefix(storePath)
           },
-          text = Xml.textNode(Hierarchy.getName(store.names)) ++ Hierarchy.storeTitle(store)
+          text = Xml.mkText(Hierarchy.getName(store.names)) ++ Hierarchy.storeTitle(store)
         )}</item>
       }}</list>
     </p>

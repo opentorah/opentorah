@@ -40,13 +40,13 @@ final class Document(
     .map(Xml.removeNamespace)
 
   def date: Seq[Node] =
-    Xml.textNode(tei.creationDate.map(_.when).getOrElse(""))
+    Xml.mkText(tei.creationDate.map(_.when).getOrElse(""))
 
   def author: Seq[Node] =
     Transformers.multi(tei.titleStmt.authors.map(_.xml).flatMap(_.map(Xml.removeNamespace)))
 
   def addressee: Seq[Node] =
-    tei.addressee.fold[Seq[Node]](Xml.textNode(""))(addressee =>
+    tei.addressee.fold[Seq[Node]](Xml.mkText(""))(addressee =>
       <persName ref={addressee.ref.orNull}>{addressee.name}</persName>)
 }
 

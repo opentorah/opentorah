@@ -12,7 +12,7 @@ import org.opentorah.mathjax
 import org.opentorah.mathjax.MathJax
 import org.opentorah.util.Collections.mapValues
 import org.opentorah.util.{Files, Gradle}
-import org.opentorah.xml.{Namespace, Resolver, Xml}
+import org.opentorah.xml.{Namespace, PrettyPrinter, Resolver}
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 import scala.xml.{Comment, Elem}
@@ -374,7 +374,7 @@ private object ProcessDocBookTask {
   ): Unit = Files.write(
     file,
     replace,
-    content = Xml.prettyPrinter.renderXml(doctype = doctype, node = elem)
+    content = PrettyPrinter.default.renderXml(doctype = doctype, node = elem)
   )
 
   def xmlCatalog(

@@ -27,5 +27,5 @@ object EntityName extends ToXml[EntityName] {
     Attribute.id.withValue(value.id)
   )
 
-  override protected def content(value: EntityName): Seq[Node] = Seq(Xml.textNode(value.name))
+  override protected def content(value: EntityName): Seq[Node] = Seq(Xml.mkText(value.name))
 }
