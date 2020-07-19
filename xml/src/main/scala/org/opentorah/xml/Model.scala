@@ -1,7 +1,7 @@
 package org.opentorah.xml
 
+// This abstracts over the XML model, allowing pretty-printing of not just Scala XML. DOM support is planned ;)
 trait Model[N] {
-  type NamespaceBinding // TODO merge with Namespace
   type Element <: N
   type Text <: N
 
@@ -12,13 +12,11 @@ trait Model[N] {
   def getText(text: Text): String
   def mkText(text: String): Text
   def getNodeText(node: N): String
-  def topNamespaceBinding: NamespaceBinding
-  def getNamespaceBinding(element: Element): NamespaceBinding
-  def getNamespaceBindingString(elementNamespace: NamespaceBinding, namespace: NamespaceBinding): String
   def isElement(node: N): Boolean
   def asElement(node: N): Element
-  def getLabel(element: Element): String
+  def getNamespaces(element: Element): Seq[Namespace]
+  def getName(element: Element): String
+  def getPrefix(element: Element): Option[String]
   def getAttributes(element: Element): Seq[Attribute.Value[String]]
   def getChildren(element: Element): Seq[N]
-  def getNameString(element: Element): String // TODO dissolve
 }

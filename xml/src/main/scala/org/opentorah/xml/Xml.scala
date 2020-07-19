@@ -5,7 +5,6 @@ import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Elem, MetaData, Node, Null, UnprefixedAttribute}
 
 object Xml extends Model[Node] {
-  override type NamespaceBinding = scala.xml.NamespaceBinding
   override type Element = scala.xml.Elem
   override type Text = scala.xml.Text
 
@@ -55,15 +54,24 @@ object Xml extends Model[Node] {
     case node: scala.xml.Node => node.text
   }
 
-  override def topNamespaceBinding: NamespaceBinding = scala.xml.TopScope
-  override def getNamespaceBinding(element: Element): NamespaceBinding = element.scope
-
-  override def getNamespaceBindingString(elementNamespace: NamespaceBinding, namespace: NamespaceBinding): String =
-    elementNamespace.buildString(namespace).trim
-
   override def isElement(node: Node): Boolean = node.isInstanceOf[Element]
   override def asElement(node: Node): Element = node.asInstanceOf[Element]
-  override def getLabel(element: Element): String = element.label
+
+  override def getNamespaces(element: Element): Seq[Namespace] = {
+    def get(result: Seq[Namespace], namespaceBinding: scala.xml.NamespaceBinding): Seq[Namespace] =
+      if (namespaceBinding == null) result
+      else get(toNamespace(namespaceBinding) +: result, namespaceBinding.parent)
+    get(Seq.empty, element.scope)
+  }
+
+  private def toNamespace(namespaceBinding: scala.xml.NamespaceBinding): Namespace = new Namespace(
+    prefix = Option(namespaceBinding.prefix).getOrElse(""),
+    uri = Option(namespaceBinding.uri).getOrElse("")
+  )
+
+  override def getName(element: Element): String = element.label
+  override def getPrefix(element: Element): Option[String] = Option(element.prefix)
+
   override def getAttributes(element: Element): Seq[Attribute.Value[String]] = element.attributes.toSeq
     .filter(_.isInstanceOf[scala.xml.Attribute])
     .map(_.asInstanceOf[scala.xml.Attribute])
@@ -74,11 +82,9 @@ object Xml extends Model[Node] {
 
   // TODO maybe just value.text?
   private def getAttributeValueText(value: Seq[Node]): String =
-      Strings.sbToString(scala.xml.Utility.sequenceToXML(value, scala.xml.TopScope, _, stripComments = true))
+    Strings.sbToString(scala.xml.Utility.sequenceToXML(value, scala.xml.TopScope, _, stripComments = true))
 
   override def getChildren(element: Element): Seq[Node] = element.child
-
-  override def getNameString(element: Element): String = Strings.sbToString(element.nameToString)
 
   def element(name: String, attributes: Seq[Attribute.Value[_]], content: Seq[Node]): Elem = <elem/>.copy(
     label = name,

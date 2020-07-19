@@ -45,7 +45,7 @@ object PrettyPrinter {
     clingyElements: Set[String]
   )(N: Model[N]) {
     private def isClingy(node: N): Boolean =
-      N.isElement(node) && clingyElements.contains(N.getLabel(N.asElement(node)))
+      N.isElement(node) && clingyElements.contains(N.getName(N.asElement(node)))
 
     def renderXml(node: N, doctype: Option[String] = None): String =
       Xml.header + "\n" +
@@ -54,22 +54,22 @@ object PrettyPrinter {
 
     def render(node: N): String = fromNode(
       node,
-      namespace = N.topNamespaceBinding,
+      namespaces = Seq(Namespace.Top),
       canBreakLeft = true,
       canBreakRight = true
     ).render(width)
 
     private def fromNode(
       node: N,
-      namespace: N.NamespaceBinding,
+      namespaces: Seq[Namespace],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): Doc = {
       if (N.isElement(node)) {
         val element: N.Element = N.asElement(node)
-        val result = fromElement(element, namespace, canBreakLeft, canBreakRight)
+        val result = fromElement(element, namespaces, canBreakLeft, canBreakRight)
         // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
-        if (canBreakRight && N.getLabel(element) == "lb") result + Doc.hardLine else result
+        if (canBreakRight && N.getName(element) == "lb") result + Doc.hardLine else result
       }
       else if (N.isText(node)) Doc.text(N.getText(N.asText(node)))
       else Doc.paragraph(N.getNodeText(node))
@@ -77,14 +77,14 @@ object PrettyPrinter {
 
     private def fromElement(
       element: N.Element,
-      namespace: N.NamespaceBinding,
+      namespaces: Seq[Namespace],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): Doc = {
-      val name: String = N.getNameString(element)
+      val name: String = N.getPrefix(element).fold("")(_ + ":") + N.getName(element)
 
       val attributes: Doc = {
-        val docs: Seq[Doc] = fromAttributes(element, namespace)
+        val docs: Seq[Doc] = fromAttributes(element, namespaces)
         if (docs.isEmpty) Doc.empty
         else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, docs)
       }
@@ -96,7 +96,7 @@ object PrettyPrinter {
         val start: Doc = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">")
         val end: Doc = Doc.text(s"</$name>")
 
-        val label: String = N.getLabel(element)
+        val label: String = N.getName(element)
 
         val stackElements: Boolean = noAtoms &&
           ((chunks.length >= 2) || ((chunks.length == 1) && allwaysStackElements.contains(label))) &&
@@ -138,35 +138,35 @@ object PrettyPrinter {
       val charactersRight: Boolean = nodes.lastOption.exists(node => N.isAtom(node) && !N.isWhitespace(node))
       val chunks: Seq[Seq[N]] = chunkify(Seq.empty, Seq.empty, nodes)
       val noAtoms: Boolean = chunks.forall(_.forall(node => !N.isAtom(node)))
-      val namespace: N.NamespaceBinding = N.getNamespaceBinding(element)
+      val namespaces: Seq[Namespace] = N.getNamespaces(element)
       val canBreakLeft1 = canBreakLeft || whitespaceLeft
       val canBreakRight1 = canBreakRight || whitespaceRight
       val result: Seq[Doc] =
         if (chunks.isEmpty) Seq.empty
         else if (chunks.length == 1) Seq(
-          fromChunk(chunks.head, namespace, canBreakLeft1, canBreakRight1)
+          fromChunk(chunks.head, namespaces, canBreakLeft1, canBreakRight1)
         ) else {
-          fromChunk(chunks.head, namespace, canBreakLeft = canBreakLeft1, canBreakRight = true) +:
-          chunks.tail.init.map(chunk => fromChunk(chunk, namespace, canBreakLeft = true, canBreakRight = true)) :+
-          fromChunk(chunks.last, namespace, canBreakLeft = true, canBreakRight = canBreakRight1)
+          fromChunk(chunks.head, namespaces, canBreakLeft = canBreakLeft1, canBreakRight = true) +:
+          chunks.tail.init.map(chunk => fromChunk(chunk, namespaces, canBreakLeft = true, canBreakRight = true)) :+
+          fromChunk(chunks.last, namespaces, canBreakLeft = true, canBreakRight = canBreakRight1)
         }
       (result, noAtoms, charactersLeft, charactersRight)
     }
 
     private def fromChunk(
       nodes: Seq[N],
-      namespace: N.NamespaceBinding,
+      namespaces: Seq[Namespace],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): Doc = {
       require(nodes.nonEmpty)
       if (nodes.length == 1) {
-        fromNode(nodes.head, namespace, canBreakLeft, canBreakRight)
+        fromNode(nodes.head, namespaces, canBreakLeft, canBreakRight)
       } else {
         val result: Seq[Doc] =
-          fromNode(nodes.head, namespace, canBreakLeft, canBreakRight = false) +:
-          nodes.tail.init.map(node => fromNode(node, namespace, canBreakLeft = false, canBreakRight = false)) :+
-          fromNode(nodes.last, namespace, canBreakLeft = false, canBreakRight)
+          fromNode(nodes.head, namespaces, canBreakLeft, canBreakRight = false) +:
+          nodes.tail.init.map(node => fromNode(node, namespaces, canBreakLeft = false, canBreakRight = false)) :+
+          fromNode(nodes.last, namespaces, canBreakLeft = false, canBreakRight)
 
         Doc.intercalate(Doc.empty, result)
       }
@@ -191,13 +191,16 @@ object PrettyPrinter {
       }
     }
 
-    private def fromAttributes(element: N.Element, namespace: N.NamespaceBinding): Seq[Doc] = {
-      val attributes: Seq[Doc] = N.getAttributes(element).filterNot(_.value.isEmpty).map(attributeValue =>
+    private def fromAttributes(element: N.Element, namespaces: Seq[Namespace]): Seq[Doc] = {
+      val elementNamespaces: Seq[Namespace] = N.getNamespaces(element)
+      val namespaceAttributes: Seq[Attribute.Value[String]] = elementNamespaces.flatMap(elementNamespace =>
+        if ((elementNamespace == Namespace.Top) || namespaces.contains(elementNamespace)) None
+        else Some(elementNamespace.xmlnsAttribute))
+
+      (N.getAttributes(element) ++ namespaceAttributes).filterNot(_.value.isEmpty).map(attributeValue =>
         // TODO use '' instead of "" if value contains "?
         Doc.text(attributeValue.attribute.prefixedName + "=" + "\"" + attributeValue.value.get + "\"")
       )
-      val scopeStr: String = N.getNamespaceBindingString(N.getNamespaceBinding(element), namespace)
-      if (scopeStr.isEmpty) attributes else attributes :+ Doc.text(scopeStr)
     }
 
     @scala.annotation.tailrec

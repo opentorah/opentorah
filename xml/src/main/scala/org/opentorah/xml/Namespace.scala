@@ -24,6 +24,8 @@ class Namespace(val uri: String, val prefix: String) {
 
   final def isDefault: Boolean = prefix == ""
 
+  final def isTop: Boolean = isDefault && (uri == "")
+
   final def qName(localName: String): String = if (isDefault) localName else prefix + ":" + localName
 
   final lazy val default: Namespace = if (isDefault) this else new Namespace(uri, prefix = "")
@@ -61,6 +63,8 @@ class Namespace(val uri: String, val prefix: String) {
 }
 
 object Namespace {
+  object Top extends Namespace(uri = "", prefix = "")
+
   object Xmlns extends Namespace(uri = "http://www.w3.org/2000/xmlns/", prefix = "xmlns")
 
   object Xml extends Namespace(uri = "http://www.w3.org/XML/1998/namespace", prefix = "xml")
