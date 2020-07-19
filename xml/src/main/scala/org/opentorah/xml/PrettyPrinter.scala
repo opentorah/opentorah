@@ -71,7 +71,7 @@ object PrettyPrinter {
         // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
         if (canBreakRight && N.getLabel(element) == "lb") result + Doc.hardLine else result
       }
-      else if (N.isText(node)) Doc.text(N.getText(node))
+      else if (N.isText(node)) Doc.text(N.getText(N.asText(node)))
       else Doc.paragraph(N.getNodeText(node))
     }
 
@@ -193,8 +193,8 @@ object PrettyPrinter {
 
     private def fromAttributes(element: N.Element, pscope: N.NamespaceBinding): Seq[Doc] = {
       val attributes: Seq[Doc] = N.getAttributes(element).filterNot(_.value.isEmpty).map(attributeValue =>
-        Doc.text(attributeValue.attribute.prefixedName) +
-        Doc.text(attributeValue.value.get)
+        // TODO use '' instead of "" if value contains "?
+        Doc.text(attributeValue.attribute.prefixedName + "=" + "\"" + attributeValue.value.get + "\"")
       )
       val scopeStr: String = N.getNamespaceBindingString(element, pscope)
       if (scopeStr.isEmpty) attributes else attributes :+ Doc.text(scopeStr)
@@ -205,7 +205,7 @@ object PrettyPrinter {
       val (atoms: Seq[N], tail: Seq[N]) = nodes.span(N.isText)
 
       val newResult: Seq[N] = if (atoms.isEmpty) result else result ++
-        processText(Seq.empty, Strings.squashBigWhitespace(atoms.map(N.getText).mkString("")))
+        processText(Seq.empty, Strings.squashBigWhitespace(atoms.map(N.asText).map(N.getText).mkString("")))
 
       if (tail.isEmpty) newResult
       else atomize(newResult :+ tail.head, tail.tail)
@@ -214,11 +214,11 @@ object PrettyPrinter {
     @scala.annotation.tailrec
     private def processText(result: Seq[N.Text], text: String): Seq[N.Text] = if (text.isEmpty) result else {
       val (spaces: String, tail: String) = text.span(_ == ' ')
-      val newResult = if (spaces.isEmpty) result else result :+ N.textNode(" ")
+      val newResult = if (spaces.isEmpty) result else result :+ N.mkText(" ")
       val (word: String, tail2: String) = tail.span(_ != ' ')
 
       if (word.isEmpty) newResult
-      else processText(newResult :+ N.textNode(word), tail2)
+      else processText(newResult :+ N.mkText(word), tail2)
     }
   }
 

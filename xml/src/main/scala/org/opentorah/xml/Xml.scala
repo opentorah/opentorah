@@ -43,15 +43,14 @@ object Xml extends Model[Node] {
     }
   }
 
-  override def isElement(node: Node): Boolean = node.isInstanceOf[Element]
-  override def asElement(node: Node): Element = node.asInstanceOf[Element]
-  override def getLabel(element: Element): String = element.label
+  override def isAtom(node: Node): Boolean = node.isInstanceOf[scala.xml.Atom[_]]
   override def isWhitespace(node: Node): Boolean = isAtom(node) && node.text.trim.isEmpty
   override def isText(node: Node): Boolean = node.isInstanceOf[Text]
-  override def getText(node: Node): String = node.asInstanceOf[Text].data
-  override def textNode(text: String): scala.xml.Text = new scala.xml.Text(text)
-  override def isAtom(node: Node): Boolean = node.isInstanceOf[scala.xml.Atom[_]]
+  override def asText(node: Node): Text = node.asInstanceOf[Text]
+  override def getText(text: Text): String = text.data
+  override def mkText(text: String): scala.xml.Text = new scala.xml.Text(text)
   override def getNodeText(node: Node): String = node match {
+    case text: Text => text.data
     case special: scala.xml.SpecialNode => Strings.sbToString(special.buildString)
     case node: scala.xml.Node => node.text
   }
@@ -62,6 +61,9 @@ object Xml extends Model[Node] {
   override def getNamespaceBindingString(element: Element, namespaceBinding: NamespaceBinding): String =
     element.scope.buildString(namespaceBinding).trim
 
+  override def isElement(node: Node): Boolean = node.isInstanceOf[Element]
+  override def asElement(node: Node): Element = node.asInstanceOf[Element]
+  override def getLabel(element: Element): String = element.label
   override def getAttributes(element: Element): Seq[Attribute.Value[String]] = element.attributes.toSeq
     .filter(_.isInstanceOf[scala.xml.Attribute])
     .map(_.asInstanceOf[scala.xml.Attribute])
@@ -72,8 +74,7 @@ object Xml extends Model[Node] {
 
   // TODO maybe just value.text?
   private def getAttributeValueText(value: Seq[Node]): String =
-    Strings.sbToString(scala.xml.Utility.appendQuoted(
-      Strings.sbToString(scala.xml.Utility.sequenceToXML(value, scala.xml.TopScope, _, stripComments = true)), _))
+      Strings.sbToString(scala.xml.Utility.sequenceToXML(value, scala.xml.TopScope, _, stripComments = true))
 
   override def getChildren(element: Element): Seq[Node] = element.child
 

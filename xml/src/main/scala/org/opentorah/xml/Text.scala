@@ -21,7 +21,7 @@ object Text {
     override protected def attributes(value: String): Seq[Attribute.Value[_]] = Seq.empty
 
     override protected def content(value: String): Seq[Node] =
-      Seq(Xml.textNode(value))
+      Seq(Xml.mkText(value))
   }
 
   def apply(): Text = new Text

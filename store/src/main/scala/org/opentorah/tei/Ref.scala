@@ -39,7 +39,7 @@ object Ref extends Element.WithToXml[Ref]("ref") {
     target: Seq[String],
     text: String,
     rendition: Option[String] = None
-  ): Elem = toXml(new Ref(Files.mkUrl(target), rendition, Xml.textNode(text)))
+  ): Elem = toXml(new Ref(Files.mkUrl(target), rendition, Xml.mkText(text)))
 
   def toXml(
     target: Seq[String],

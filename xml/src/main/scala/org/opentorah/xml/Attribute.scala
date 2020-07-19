@@ -12,7 +12,7 @@ abstract class Attribute[T](
   val prefix: Option[String] = None
 ) extends Conversion[T] with Requireable[T] {
 
-  final def prefixedName: String = prefix.fold("")(prefix => s"$prefix:") + s"$name="
+  final def prefixedName: String = prefix.fold("")(prefix => s"$prefix:") + s"$name"
 
   final override def toString: String = s"attribute $name"
 

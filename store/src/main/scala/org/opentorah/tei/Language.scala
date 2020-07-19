@@ -32,5 +32,5 @@ object Language extends Element.WithToXml[Language]("language") {
   )
 
   override protected def content(value: Language): Seq[Node] =
-    value.text.toSeq.map(Xml.textNode)
+    value.text.toSeq.map(Xml.mkText)
 }
