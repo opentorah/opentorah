@@ -150,6 +150,6 @@ object Store extends Component("store") {
 
   val prettyPrinter: PrettyPrinter = new PrettyPrinter(
     nestElements = Set("p"),
-    allwaysStackElements = Set("store", "by")
+    alwaysStackElements = Set("store", "by")
   )
 }

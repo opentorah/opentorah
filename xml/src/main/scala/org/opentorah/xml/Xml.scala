@@ -13,10 +13,10 @@ object Xml extends Model[Node] {
 
   type Transformer = Elem => Elem
 
-  def transform(xml: Elem, transformer: Transformer): Elem = {
+  def transform(xml: Elem, transformer: Transformer): Element = {
     val rule: RewriteRule = new RewriteRule {
       override def transform(node: Node): Seq[Node] = node match {
-        case element: Elem => transformer(element)
+        case element: Element => transformer(element)
         case other => other
       }
     }
@@ -24,7 +24,7 @@ object Xml extends Model[Node] {
     new RuleTransformer(rule).transform(xml).head.asInstanceOf[Elem]
   }
 
-  def removeNamespace(xml: Elem): Elem =
+  def removeNamespace(xml: Element): Element =
     xml.copy(scope = scala.xml.TopScope, child = xml.child.map(removeNamespace))
   def removeNamespace(node: Node): Node = node match {
     case e: Elem => e.copy(scope = scala.xml.TopScope, child = e.child.map(removeNamespace))
@@ -44,10 +44,11 @@ object Xml extends Model[Node] {
 
   override def isAtom(node: Node): Boolean = node.isInstanceOf[scala.xml.Atom[_]]
   override def isWhitespace(node: Node): Boolean = isAtom(node) && node.text.trim.isEmpty
+  override def isCharacters(node: Node): Boolean = isAtom(node) && node.text.trim.nonEmpty
   override def isText(node: Node): Boolean = node.isInstanceOf[Text]
-  override def asText(node: Node): Text = node.asInstanceOf[Text]
+  override def asText(node: Node): Text    = node.asInstanceOf[Text]
   override def getText(text: Text): String = text.data
-  override def mkText(text: String): scala.xml.Text = new scala.xml.Text(text)
+  override def mkText(text: String): Text = new Text(text)
   override def getNodeText(node: Node): String = node match {
     case text: Text => text.data
     case special: scala.xml.SpecialNode => Strings.sbToString(special.buildString)
@@ -58,6 +59,7 @@ object Xml extends Model[Node] {
   override def asElement(node: Node): Element = node.asInstanceOf[Element]
 
   override def getNamespaces(element: Element): Seq[Namespace] = {
+    @scala.annotation.tailrec
     def get(result: Seq[Namespace], namespaceBinding: scala.xml.NamespaceBinding): Seq[Namespace] =
       if (namespaceBinding == null) result
       else get(toNamespace(namespaceBinding) +: result, namespaceBinding.parent)
@@ -86,7 +88,7 @@ object Xml extends Model[Node] {
 
   override def getChildren(element: Element): Seq[Node] = element.child
 
-  def element(name: String, attributes: Seq[Attribute.Value[_]], content: Seq[Node]): Elem = <elem/>.copy(
+  def element(name: String, attributes: Seq[Attribute.Value[_]], content: Seq[Node]): Element = <elem/>.copy(
     label = name,
     attributes = attributes.foldRight[MetaData](Null){ case (current, result) => new UnprefixedAttribute(
       current.attribute.name,

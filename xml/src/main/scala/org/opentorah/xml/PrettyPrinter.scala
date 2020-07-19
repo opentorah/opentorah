@@ -7,7 +7,7 @@ final class PrettyPrinter(
   width: Int = 120,
   indent: Int = 2,
   doNotStackElements: Set[String] = Set(),
-  allwaysStackElements: Set[String] = Set(),
+  alwaysStackElements: Set[String] = Set(),
   nestElements: Set[String] = Set(),
   clingyElements: Set[String] = Set()
 ) {
@@ -22,28 +22,28 @@ final class PrettyPrinter(
   def render(node: scala.xml.Node): String =
     mkRun(Xml).render(node)
 
-  private def mkRun[N](N: Model[N]): PrettyPrinter.Run[N] = new PrettyPrinter.Run(
+  private def mkRun[N](N: Model[N]): PrettyPrinter.Run[N] = new PrettyPrinter.Run(N)(
     width,
     indent,
     doNotStackElements,
-    allwaysStackElements,
+    alwaysStackElements,
     nestElements,
     clingyElements
-  )(N)
+  )
 }
 
 object PrettyPrinter {
 
   // Note: methods below all need access to N: Model[N], often - for the types of parameters, so parameter N
   // must come first, and can not be implicit; it is cleaner to scope them in a class with N a constructor parameter.
-  private final class Run[N](
+  private final class Run[N](N: Model[N])(
     width: Int,
     indent: Int,
     doNotStackElements: Set[String],
-    allwaysStackElements: Set[String],
+    alwaysStackElements: Set[String],
     nestElements: Set[String],
     clingyElements: Set[String]
-  )(N: Model[N]) {
+  ) {
 
     def renderXml(node: N, doctype: Option[String] = None): String =
       Xml.header + "\n" +
@@ -83,31 +83,48 @@ object PrettyPrinter {
       val name: String = N.getPrefix(element).fold("")(_ + ":") + label
       val elementNamespaces: Seq[Namespace] = N.getNamespaces(element)
 
-      val attributes: Doc = {
-        val namespaceAttributes: Seq[Attribute.Value[String]] = elementNamespaces.flatMap(elementNamespace =>
-          if ((elementNamespace == Namespace.Top) || namespaces.contains(elementNamespace)) None
-          else Some(elementNamespace.xmlnsAttribute))
+      val namespaceAttributeValues: Seq[Attribute.Value[String]] = elementNamespaces.flatMap(elementNamespace =>
+        if ((elementNamespace == Namespace.Top) || namespaces.contains(elementNamespace)) None
+        else Some(elementNamespace.xmlnsAttribute))
 
-        val result: Seq[Doc] =
-          (N.getAttributes(element) ++ namespaceAttributes).filterNot(_.value.isEmpty).map(attributeValue =>
-            // TODO use '' instead of "" if value contains "?
-            Doc.text(attributeValue.attribute.prefixedName + "=" + "\"" + attributeValue.value.get + "\"")
-          )
+      val attributeValues: Seq[Attribute.Value[String]] =
+        (N.getAttributes(element) ++ namespaceAttributeValues).filterNot(_.value.isEmpty)
 
-        if (result.isEmpty) Doc.empty
-        else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, result)
-      }
+      val attributes: Doc =
+        if (attributeValues.isEmpty) Doc.empty
+        else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, attributeValues.map(attributeValue =>
+          // TODO use '' instead of "" if value contains "?
+          Doc.text(attributeValue.attribute.prefixedName + "=" + "\"" + attributeValue.value.get + "\"")
+        ))
 
       val nodes: Seq[N] = atomize(Seq.empty, N.getChildren(element))
-      val (children: Seq[Doc], noAtoms: Boolean, charactersLeft: Boolean, charactersRight: Boolean) =
-        fromChildren(elementNamespaces, nodes, canBreakLeft, canBreakRight)
+      val whitespaceLeft: Boolean = nodes.headOption.exists(N.isWhitespace)
+      val whitespaceRight: Boolean = nodes.lastOption.exists(N.isWhitespace)
+      val charactersLeft: Boolean = nodes.headOption.exists(N.isCharacters)
+      val charactersRight: Boolean = nodes.lastOption.exists(N.isCharacters)
+      val chunks: Seq[Seq[N]] = chunkify(Seq.empty, Seq.empty, nodes)
+      val noAtoms: Boolean = chunks.forall(_.forall(!N.isAtom(_)))
+
+      val children: Seq[Doc] = {
+        val canBreakLeft1 = canBreakLeft || whitespaceLeft
+        val canBreakRight1 = canBreakRight || whitespaceRight
+
+        if (chunks.isEmpty) Seq.empty
+        else if (chunks.length == 1) Seq(
+          fromChunk(chunks.head, elementNamespaces, canBreakLeft1, canBreakRight1)
+        ) else {
+          fromChunk(chunks.head, elementNamespaces, canBreakLeft = canBreakLeft1, canBreakRight = true) +:
+          chunks.tail.init.map(chunk => fromChunk(chunk, elementNamespaces, canBreakLeft = true, canBreakRight = true)) :+
+          fromChunk(chunks.last, elementNamespaces, canBreakLeft = true, canBreakRight = canBreakRight1)
+        }
+      }
 
       if (children.isEmpty) Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>") else {
         val start: Doc = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">")
         val end: Doc = Doc.text(s"</$name>")
 
         val stackElements: Boolean = noAtoms &&
-          ((children.length >= 2) || ((children.length == 1) && allwaysStackElements.contains(label))) &&
+          ((children.length >= 2) || ((children.length == 1) && alwaysStackElements.contains(label))) &&
           !doNotStackElements.contains(label)
 
         if (stackElements) {
@@ -117,11 +134,7 @@ object PrettyPrinter {
           Doc.hardLine + end
         } else if (nestElements.contains(label)) {
           // If this is forced-nested element - nest it:
-          Doc.intercalate(Doc.lineOrSpace, children).tightBracketBy(
-            left = start,
-            right = end,
-            indent
-          )
+          Doc.intercalate(Doc.lineOrSpace, children).tightBracketBy(left = start, right = end, indent)
         } else {
           // Mixed content or non-break-off-able attachments on the side(s) cause flow-style;
           // character content should stick to the opening and closing tags:
@@ -131,51 +144,6 @@ object PrettyPrinter {
           (if (canBreakRight && !charactersRight) Doc.lineOrEmpty else Doc.empty) +
           end
         }
-      }
-    }
-
-    private def fromChildren(
-      elementNamespaces: Seq[Namespace],
-      nodes: Seq[N],
-      canBreakLeft: Boolean,
-      canBreakRight: Boolean
-    ): (Seq[Doc], Boolean, Boolean, Boolean) = {
-      val whitespaceLeft: Boolean = nodes.headOption.exists(N.isWhitespace)
-      val whitespaceRight: Boolean = nodes.lastOption.exists(N.isWhitespace)
-      val charactersLeft: Boolean = nodes.exists(node => N.isAtom(node) && !N.isWhitespace(node))
-      val charactersRight: Boolean = nodes.lastOption.exists(node => N.isAtom(node) && !N.isWhitespace(node))
-      val chunks: Seq[Seq[N]] = chunkify(Seq.empty, Seq.empty, nodes)
-      val noAtoms: Boolean = chunks.forall(_.forall(node => !N.isAtom(node)))
-      val canBreakLeft1 = canBreakLeft || whitespaceLeft
-      val canBreakRight1 = canBreakRight || whitespaceRight
-      val children: Seq[Doc] =
-        if (chunks.isEmpty) Seq.empty
-        else if (chunks.length == 1) Seq(
-          fromChunk(chunks.head, elementNamespaces, canBreakLeft1, canBreakRight1)
-        ) else {
-          fromChunk(chunks.head, elementNamespaces, canBreakLeft = canBreakLeft1, canBreakRight = true) +:
-          chunks.tail.init.map(chunk => fromChunk(chunk, elementNamespaces, canBreakLeft = true, canBreakRight = true)) :+
-          fromChunk(chunks.last, elementNamespaces, canBreakLeft = true, canBreakRight = canBreakRight1)
-        }
-      (children, noAtoms, charactersLeft, charactersRight)
-    }
-
-    private def fromChunk(
-      nodes: Seq[N],
-      namespaces: Seq[Namespace],
-      canBreakLeft: Boolean,
-      canBreakRight: Boolean
-    ): Doc = {
-      require(nodes.nonEmpty)
-      if (nodes.length == 1) {
-        fromNode(nodes.head, namespaces, canBreakLeft, canBreakRight)
-      } else {
-        val result: Seq[Doc] =
-          fromNode(nodes.head, namespaces, canBreakLeft, canBreakRight = false) +:
-          nodes.tail.init.map(node => fromNode(node, namespaces, canBreakLeft = false, canBreakRight = false)) :+
-          fromNode(nodes.last, namespaces, canBreakLeft = false, canBreakRight)
-
-        Doc.intercalate(Doc.empty, result)
       }
     }
 
@@ -219,6 +187,22 @@ object PrettyPrinter {
         case (c :: cs, n :: ns) if !N.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns)
         case (c :: cs, n :: ns) if !N.isWhitespace(n) && !cling(c, n) => flush(n :: ns)
       }
+    }
+
+    private def fromChunk(
+      nodes: Seq[N],
+      namespaces: Seq[Namespace],
+      canBreakLeft: Boolean,
+      canBreakRight: Boolean
+    ): Doc = {
+      require(nodes.nonEmpty)
+      if (nodes.length == 1) {
+        fromNode(nodes.head, namespaces, canBreakLeft, canBreakRight)
+      } else Doc.intercalate(Doc.empty, {
+        fromNode(nodes.head, namespaces, canBreakLeft, canBreakRight = false) +:
+        nodes.tail.init.map(node => fromNode(node, namespaces, canBreakLeft = false, canBreakRight = false)) :+
+        fromNode(nodes.last, namespaces, canBreakLeft = false, canBreakRight)
+      })
     }
   }
 
