@@ -210,7 +210,7 @@ under the request's entry.
 ```
 
 
-Before the first job si created, service has to be initialized. I did it via Console
+Before the first job is created, service has to be initialized. I did it via Console
 (in the same region - us-east4 - my service is running). This created an empty App Engine
 application `alter-rebbe-2.appspot.com` and an empty bucket with the same name...
 
