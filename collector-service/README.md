@@ -1,6 +1,6 @@
 ## Static / Dynamic ##
 
-Code in the `collector` module pre-generates the static www.alter-rebbe.org site,
+Code in the `collector` module pre-generates the static store.alter-rebbe.org site,
 which is then further processed by Jekyll when published on GitHub Pages.
 
 We are moving towards making the site dynamic, so that we can add:  
@@ -157,6 +157,9 @@ To add a domain mapping:
 Certificate provisioning spinner starts spinning once DNS record (`app CNAME ghs.googlehosted.com.`)
 is in place; mine was there from the previous incarnation. I was getting “unexpectedly closed the
 connection” while it was spinning and for a few minutes after it stopped; http 302-redirects to https.
+
+I pointed `www.alter-rebbe.org` at the dynamic app, and configured it to proxy for
+`store.alter-rebbe.org` on 19-07-2020.
 
 I do not see the need to set up [Cloud Build](https://cloud.google.com/cloud-build),
 but if I do - it runs locally too!
