@@ -193,9 +193,9 @@ object PrettyPrinter {
 
     private def fromAttributes(element: N.Element, pscope: N.NamespaceBinding): Seq[Doc] = {
       val attributes: Seq[Doc] = N.getAttributes(element).filterNot(_.value.isEmpty).map {
-        case N.AttributeDescriptor(prefix, key, value: Option[N.AttributeValue]) =>
+        case Model.AttributeDescriptor(prefix: Option[String], key: String, Some(value: String)) =>
           Doc.text(prefix.fold("")(prefix => s"$prefix:") + s"$key=") +
-          Doc.text(N.getAttributeValueText(value.get))
+          Doc.text(value)
       }
       val scopeStr: String = N.getNamespaceBindingString(element, pscope)
       if (scopeStr.isEmpty) attributes else attributes :+ Doc.text(scopeStr)

@@ -4,13 +4,6 @@ trait Model[N] {
   type NamespaceBinding // TODO merge with Namespace
   type Element <: N
   type Text <: N
-  type AttributeValue // TODO merge with Attribute.Value
-
-  case class AttributeDescriptor(
-    prefix: Option[String],
-    key: String,
-    value: Option[AttributeValue]
-  )
 
   def isElement(node: N): Boolean
   def asElement(node: N): Element
@@ -24,8 +17,16 @@ trait Model[N] {
   def topNamespaceBinding: NamespaceBinding
   def getNamespaceBinding(element: Element): NamespaceBinding
   def getNamespaceBindingString(element: Element, namespaceBinding: NamespaceBinding): String
-  def getAttributes(element: Element): Seq[AttributeDescriptor]
-  def getAttributeValueText(value: AttributeValue): String
+  def getAttributes(element: Element): Seq[Model.AttributeDescriptor]
   def getChildren(element: Element): Seq[N]
   def getNameString(element: Element): String
+}
+
+object Model {
+  // TODO merge with Attribute.Value
+  case class AttributeDescriptor(
+    prefix: Option[String],
+    key: String,
+    value: Option[String]
+  )
 }

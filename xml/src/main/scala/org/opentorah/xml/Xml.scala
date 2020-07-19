@@ -7,7 +7,6 @@ import scala.xml.{Elem, MetaData, Node, Null, UnprefixedAttribute}
 object Xml extends Model[Node] {
   override type NamespaceBinding = scala.xml.NamespaceBinding
   override type Element = scala.xml.Elem
-  override type AttributeValue = Seq[Node]
   override type Text = scala.xml.Text
 
   val header: String   = """<?xml version="1.0" encoding="UTF-8"?>"""
@@ -63,17 +62,17 @@ object Xml extends Model[Node] {
   override def getNamespaceBindingString(element: Element, namespaceBinding: NamespaceBinding): String =
     element.scope.buildString(namespaceBinding).trim
 
-  override def getAttributes(element: Element): Seq[AttributeDescriptor] = element.attributes.toSeq
+  override def getAttributes(element: Element): Seq[Model.AttributeDescriptor] = element.attributes.toSeq
     .filter(_.isInstanceOf[scala.xml.Attribute])
     .map(_.asInstanceOf[scala.xml.Attribute])
-    .map(attribute => AttributeDescriptor(
+    .map(attribute => Model.AttributeDescriptor(
       prefix = Option(attribute.pre),
       key = attribute.key,
-      value = Option(attribute.value)
+      value = Option(attribute.value).map(getAttributeValueText)
     ))
 
-
-  override def getAttributeValueText(value: Seq[Node]): String =
+  // TODO maybe just value.text?
+  private def getAttributeValueText(value: Seq[Node]): String =
     Strings.sbToString(scala.xml.Utility.appendQuoted(
       Strings.sbToString(scala.xml.Utility.sequenceToXML(value, scala.xml.TopScope, _, stripComments = true)), _))
 
