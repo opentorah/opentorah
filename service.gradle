@@ -1,4 +1,4 @@
-// Configure Scala and servoce dependencies, leaving to the modules to apply JIB plugin and do this:
+// Configure Scala and service dependencies, leaving to the modules to apply JIB plugin and do this:
 //  jib {
 //    to { image = imageName }
 //    container { mainClass = mainClassName }

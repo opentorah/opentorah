@@ -11,7 +11,7 @@ description = 'Open Torah Metadata'
 configureLibrary(['Scala'])
 
 dependencies {
-  api project(":xml")
+  api project(':xml')
 
   implementation project(':util')
 }
