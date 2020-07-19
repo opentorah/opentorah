@@ -16,11 +16,30 @@ final class PrettyPrinter(
   // so implicit search fails - unless value for the 'node' parameter is passed in with ascription: '...: Node';
   // it is cleaner to just provide Model-specific entry points...
 
-  def renderXml(node: scala.xml.Node, doctype: Option[String] = None): String =
+  def renderXmlWithDoctype(node: scala.xml.Node, doctype: String): String =
+    mkRun(Xml).renderXml(node, Some(doctype))
+
+  def renderXml(node: scala.xml.Node, doctype: Option[String]): String =
     mkRun(Xml).renderXml(node, doctype)
+
+  def renderXml(node: scala.xml.Node): String =
+    mkRun(Xml).renderXml(node, None)
 
   def render(node: scala.xml.Node): String =
     mkRun(Xml).render(node)
+
+
+  def renderXmlWithDoctype(node: org.w3c.dom.Node, doctype: String): String =
+    mkRun(Dom).renderXml(node, Some(doctype))
+
+  def renderXml(node: org.w3c.dom.Node, doctype: Option[String]): String =
+    mkRun(Dom).renderXml(node, doctype)
+
+  def renderXml(node: org.w3c.dom.Node): String =
+    mkRun(Dom).renderXml(node, None)
+
+  def render(node: org.w3c.dom.Node): String =
+    mkRun(Dom).render(node)
 
   private def mkRun[N](N: Model[N]): PrettyPrinter.Run[N] = new PrettyPrinter.Run(N)(
     width,
@@ -93,8 +112,8 @@ object PrettyPrinter {
       val attributes: Doc =
         if (attributeValues.isEmpty) Doc.empty
         else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, attributeValues.map(attributeValue =>
-          // TODO use '' instead of "" if value contains "?
-          Doc.text(attributeValue.attribute.prefixedName + "=" + "\"" + attributeValue.value.get + "\"")
+          Doc.text(attributeValue.attribute.prefixedName + "=") + Doc.lineOrEmpty +
+          Doc.text("\"" + attributeValue.value.get + "\"")
         ))
 
       val nodes: Seq[N] = atomize(Seq.empty, N.getChildren(element))

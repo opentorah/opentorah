@@ -82,7 +82,6 @@ object Xml extends Model[Node] {
       prefix = Option(attribute.pre)
     ).withValue(Option(attribute.value).map(getAttributeValueText)))
 
-  // TODO maybe just value.text?
   private def getAttributeValueText(value: Seq[Node]): String =
     Strings.sbToString(scala.xml.Utility.sequenceToXML(value, scala.xml.TopScope, _, stripComments = true))
 
