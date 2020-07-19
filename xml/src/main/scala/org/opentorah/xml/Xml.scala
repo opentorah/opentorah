@@ -58,8 +58,8 @@ object Xml extends Model[Node] {
   override def topNamespaceBinding: NamespaceBinding = scala.xml.TopScope
   override def getNamespaceBinding(element: Element): NamespaceBinding = element.scope
 
-  override def getNamespaceBindingString(element: Element, namespaceBinding: NamespaceBinding): String =
-    element.scope.buildString(namespaceBinding).trim
+  override def getNamespaceBindingString(elementNamespace: NamespaceBinding, namespace: NamespaceBinding): String =
+    elementNamespace.buildString(namespace).trim
 
   override def isElement(node: Node): Boolean = node.isInstanceOf[Element]
   override def asElement(node: Node): Element = node.asInstanceOf[Element]
