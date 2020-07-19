@@ -1,6 +1,6 @@
 package org.opentorah.docbook
 
-import org.opentorah.xml.{Namespace, Xml}
+import org.opentorah.xml.{Namespace, PrettyPrinter}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import scala.xml.Elem
@@ -17,7 +17,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
     val project = PluginTestProject(
       prefix = "pluginTestProjects",
       name,
-      document = Xml.prettyPrinter.renderXml(document, doctype),
+      document = PrettyPrinter.default.renderXml(document, doctype),
       substitutions,
       isPdfEnabled = true
     )
@@ -34,11 +34,11 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
     // Entity reference in the attribute value trips up IntelliJ's Scala XML parser:
     // it reports "No closing tag" and underlines XML literal around the entity reference in red.
     // In reality, everything works as intended:
-    Xml.prettyPrinter.render(<e a="http://&version;"/>) shouldBe """<e a="http://&version;"/>"""
+    PrettyPrinter.default.render(<e a="http://&version;"/>) shouldBe """<e a="http://&version;"/>"""
 
     // If the attribute value is enclosed in {}, making it dynamic, IntelliJ does not complain any longer -
     // but Scala XML encodes the entity reference, so nothing works:
-    Xml.prettyPrinter.render(<e a={"http://&version;"}/>) shouldBe """<e a="http://&amp;version;"/>"""
+    PrettyPrinter.default.render(<e a={"http://&version;"}/>) shouldBe """<e a="http://&amp;version;"/>"""
 
     // In the tests below, I am thus forced to forego the {} - and suffer redness from IntelliJ...
   }
@@ -98,7 +98,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
       prefix = "pluginTestProjects",
       name = "substitutions-without-DTD-entity-substitutions",
       substitutions = Map[String, String]("version" -> "\"v1.0.0\""),
-      document = Xml.prettyPrinter.renderXml(
+      document = PrettyPrinter.default.renderXml(
         <article xmlns={Namespace.DocBook.uri} version={Namespace.DocBook.version} xmlns:xlink={Namespace.XLink.uri}>
           <para>Processing instruction: <?eval version ?>.</para>
           <para>Entity: &version;.</para>

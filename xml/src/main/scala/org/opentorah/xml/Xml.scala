@@ -1,9 +1,8 @@
 package org.opentorah.xml
 
-import org.apache.xml.serializer.dom3.LSSerializerImpl
 import org.opentorah.util.Strings
 import scala.xml.transform.{RewriteRule, RuleTransformer}
-import scala.xml.{Elem, Node}
+import scala.xml.{Elem, MetaData, Node, Null, UnprefixedAttribute}
 
 object Xml extends Model[Node] {
   override type NamespaceBinding = scala.xml.NamespaceBinding
@@ -27,7 +26,6 @@ object Xml extends Model[Node] {
     new RuleTransformer(rule).transform(xml).head.asInstanceOf[Elem]
   }
 
-  // TODO move to Namespace
   def removeNamespace(xml: Elem): Elem =
     xml.copy(scope = scala.xml.TopScope, child = xml.child.map(removeNamespace))
   def removeNamespace(node: Node): Node = node match {
@@ -44,15 +42,6 @@ object Xml extends Model[Node] {
       case elem: Elem => (elem.child map (_.text)).mkString(" ")
       case node: Node => node.text
     }
-  }
-
-  // TODO move out of here
-  val prettyPrinter: PrettyPrinter = new PrettyPrinter
-  def toString(node: org.w3c.dom.Node): String = serializer.writeToString(node)
-  private val serializer: LSSerializerImpl = {
-    val result = new LSSerializerImpl
-    result.setParameter("format-pretty-print", true)
-    result
   }
 
   override def isElement(node: Node): Boolean = node.isInstanceOf[Element]
@@ -91,4 +80,14 @@ object Xml extends Model[Node] {
   override def getChildren(element: Element): Seq[Node] = element.child
 
   override def getNameString(element: Element): String = Strings.sbToString(element.nameToString)
+
+  def element(name: String, attributes: Seq[Attribute.Value[_]], content: Seq[Node]): Elem = <elem/>.copy(
+    label = name,
+    attributes = attributes.foldRight[MetaData](Null){ case (current, result) => new UnprefixedAttribute(
+      current.attribute.name,
+      current.valueToString.orNull,
+      result
+    )},
+    child = content
+  )
 }

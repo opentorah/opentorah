@@ -11,7 +11,7 @@ import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
 import org.opentorah.texts.tanach.{Custom, Haftarah, Reading, Span, Torah}
 import org.opentorah.texts.tanach.Tanach.Psalms
 import org.opentorah.util.Collections
-import org.opentorah.xml.Xml
+import org.opentorah.xml.PrettyPrinter
 
 import scala.xml.Elem
 
@@ -483,7 +483,7 @@ object Renderer {
         </body>
       </html>
 
-    Xml.prettyPrinter.render(result)
+    PrettyPrinter.default.render(result)
   }
 
   private def direction(spec: LanguageSpec): String =

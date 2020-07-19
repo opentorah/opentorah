@@ -222,4 +222,14 @@ object PrettyPrinter {
       else processText(newResult :+ N.textNode(word), tail2)
     }
   }
+
+  val default: PrettyPrinter = new PrettyPrinter
+
+  def render(node: org.w3c.dom.Node): String = serializer.writeToString(node)
+
+  private val serializer: org.apache.xml.serializer.dom3.LSSerializerImpl = {
+    val result = new org.apache.xml.serializer.dom3.LSSerializerImpl
+    result.setParameter("format-pretty-print", true)
+    result
+  }
 }

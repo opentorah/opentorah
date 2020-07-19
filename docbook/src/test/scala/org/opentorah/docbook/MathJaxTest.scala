@@ -1,10 +1,9 @@
 package org.opentorah.docbook
 
 import org.opentorah.mathjax.MathJax
-import org.opentorah.xml.{Namespace, Xml}
+import org.opentorah.xml.{Namespace, PrettyPrinter}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
-import scala.xml.Elem
 
 class MathJaxTest extends AnyFlatSpecLike with Matchers {
 
@@ -17,7 +16,7 @@ class MathJaxTest extends AnyFlatSpecLike with Matchers {
       val project = PluginTestProject(
         prefix = "mathJaxTestProjects",
         name = s"$name-useJ2V8-$useJ2V8",
-        document = Xml.prettyPrinter.renderXml(
+        document = PrettyPrinter.default.renderXml(
           <article xmlns={Namespace.DocBook.uri} version={Namespace.DocBook.version}>
             <para>{s"$$$tex$$"}</para>
           </article>
