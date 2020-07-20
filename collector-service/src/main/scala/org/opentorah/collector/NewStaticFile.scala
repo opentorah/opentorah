@@ -54,10 +54,10 @@ object NewStaticFile {
   }
 
   private def headers(
-                       lastmod: Option[HttpDate],
-                       url: URL,
-                       len: Long
-                     ): Headers = {
+    lastmod: Option[HttpDate],
+    url: URL,
+    len: Long
+  ): Headers = {
     val lastModHeader: List[Header] = lastmod.map(`Last-Modified`(_)).toList
     val contentType = Files.nameAndExtension(url.getPath)._2
       .flatMap(extension => MediaType.forExtension(extension).map(`Content-Type`(_))).toList
