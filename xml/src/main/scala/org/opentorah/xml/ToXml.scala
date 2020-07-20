@@ -7,7 +7,7 @@ trait ToXml[A] {
 
   final def toXml(values: Seq[A]): Seq[Elem] = values.map(toXml)
 
-  final def toXml(value: A): Elem = Xml.element(
+  final def toXml(value: A): Elem = Xml.mkElement(
     name = elementName(value),
     attributes = attributes(value),
     content = content(value)

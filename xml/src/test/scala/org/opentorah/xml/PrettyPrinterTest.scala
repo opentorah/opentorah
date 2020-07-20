@@ -121,16 +121,30 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
 
     check(
       <xsl:stylesheet xmlns:xsl={Namespace.Xsl.uri} version={Namespace.Xsl.version(false)}
-                          xmlns:db={Namespace.DocBook.uri}
-                          exclude-result-prefixes="db">
+                      xmlns:db={Namespace.DocBook.uri}
+                      exclude-result-prefixes="db">
         <!-- Customizations go here. -->
         <!-- dummy -->
       </xsl:stylesheet>,
       width = 120, expected =
-      """|<xsl:stylesheet version="1.0" exclude-result-prefixes="db" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:db=
-         |"http://docbook.org/ns/docbook">
-         |  <!-- Customizations go here. -->
-         |  <!-- dummy -->
-         |</xsl:stylesheet>""")
+        """|<xsl:stylesheet version="1.0" exclude-result-prefixes="db" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:db=
+           |"http://docbook.org/ns/docbook">
+           |  <!-- Customizations go here. -->
+           |  <!-- dummy -->
+           |</xsl:stylesheet>""")
+
+    check(
+      <xsl:stylesheet xmlns:xsl={Namespace.Xsl.uri} version={Namespace.Xsl.version(false)}
+                      xmlns:db={Namespace.DocBook.uri}
+                      exclude-result-prefixes="db">
+        <xsl:param value="x"/>
+        <d:y xmlns:y="zzz"/>
+      </xsl:stylesheet>,
+      width = 120, expected =
+        """|<xsl:stylesheet version="1.0" exclude-result-prefixes="db" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:db=
+           |"http://docbook.org/ns/docbook">
+           |  <xsl:param value="x"/>
+           |  <d:y xmlns:y="zzz"/>
+           |</xsl:stylesheet>""")
   }
 }

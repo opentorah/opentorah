@@ -15,7 +15,8 @@ abstract class MathJax(
   final def typeset(mathMLDocument: Document): SVGDocument = {
     val input: Input = Input.Attribute.getWithDefault(mathMLDocument)
     val math: String =
-      if (input == Input.MathML) PrettyPrinter.render(mathMLDocument) else MathML.unwrap(mathMLDocument)
+      if (input == Input.MathML) MathJax.prettyPrinter.render(mathMLDocument.getDocumentElement)
+      else MathML.unwrap(mathMLDocument)
 
     val fontSize: Float = Sizes.FontSizeAttribute.doGet(mathMLDocument)
 
@@ -58,6 +59,9 @@ object MathJax {
     uri = "http://opentorah.org/mathjax/ns/ext",
     prefix = "mathjax"
   )
+
+  private val prettyPrinter: PrettyPrinter = new PrettyPrinter(alwaysStackElements =
+    Set("math", "mrow", "mi"))
 
   private def optionsMap(math: String, inputName: String, outputName: String, ex: Int): Map[String, Any] = Map(
     "useFontCache"    -> true,       // use <defs> and <use> in svg output ('true' by default)?

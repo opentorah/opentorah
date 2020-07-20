@@ -39,7 +39,6 @@ dependencies {
   api "dev.zio:zio_$scalaVersionMajor:$zioVersion"
 
   implementation "xerces:xercesImpl:$xercesVersion"
-  implementation "xalan:serializer:$xalanVersion"
   implementation "org.typelevel:paiges-core_$scalaVersionMajor:$paigesVersion"
 
   compileOnly "org.xmlresolver:xmlresolver:$xmlresolverVersion"

@@ -30,7 +30,7 @@ private[xml] object Current {
   } yield Current(
     from,
     name = element.label,
-    attributes = Xml.getAttributes(element).map(attributeValue =>
+    attributes = Xml.getNonXmlnsAttributes(element).map(attributeValue =>
       attributeValue.attribute.prefixedName -> attributeValue.valueToString.get
     ).toMap,
     content

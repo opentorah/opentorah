@@ -40,7 +40,7 @@ class ProcessDocBookTask extends DefaultTask {
   getProcessInputDirectories.foreach(registerInputDirectory)
 
   // Data generation class doesn't have to reside in the same project where DocBook plugin is configured,
-  // so I don't bother registering classes as input directory, butif I did:
+  // so I don't bother registering classes as input directory, but if I did:
   // classesDirs use sourceSets, which are only available after project is evaluated;
   // with code in Scala only, input directory "build/classes/java/main" doesn't exist (which is a Gradle error), so I
   // register "build/classes/" (grandparent of all classesDirs) as input directory
@@ -374,7 +374,7 @@ private object ProcessDocBookTask {
   ): Unit = Files.write(
     file,
     replace,
-    content = PrettyPrinter.default.renderXml(doctype = doctype, node = elem)
+    content = PrettyPrinter.default.renderXml(doctype = doctype, element = elem)
   )
 
   def xmlCatalog(
