@@ -10,7 +10,7 @@ case class ServiceConfiguration(
 object ServiceConfiguration {
 
   def load(args: List[String]): ServiceConfiguration = ServiceConfiguration(
-    otherHost = get("OTHER_HOST", "www.alter-rebbe.org"),
+    otherHost = get("OTHER_HOST", "store.alter-rebbe.org"),
     port = get("PORT", "8090").toInt
   )
 

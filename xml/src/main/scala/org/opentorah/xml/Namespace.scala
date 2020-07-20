@@ -67,7 +67,10 @@ object Namespace {
 
   object Xmlns extends Namespace(uri = "http://www.w3.org/2000/xmlns/", prefix = "xmlns")
 
-  object Xml extends Namespace(uri = "http://www.w3.org/XML/1998/namespace", prefix = "xml")
+  object Xml extends Namespace(uri = "http://www.w3.org/XML/1998/namespace", prefix = "xml") {
+    val header: String   = """<?xml version="1.0" encoding="UTF-8"?>"""
+    val header16: String = """<?xml version="1.0" encoding="UTF-16"?>"""
+  }
 
   object XInclude extends Namespace(uri = "http://www.w3.org/2001/XInclude", prefix = "xi")
 

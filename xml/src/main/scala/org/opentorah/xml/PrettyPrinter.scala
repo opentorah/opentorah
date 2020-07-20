@@ -12,34 +12,41 @@ final class PrettyPrinter(
   clingyElements: Set[String] = Set()
 ) {
   // Note: making entry points generic in N and taking implicit N: Model[N] does not work,
-  // since what is passed in for the 'node' parameter is usually an Elem, but Xml: Model[Node],
-  // so implicit search fails - unless value for the 'node' parameter is passed in with ascription: '...: Node';
+  // since 'elem' parameter is of type Elem, but Xml: Model[Node];
   // it is cleaner to just provide Model-specific entry points...
 
-  def renderXmlWithDoctype(node: scala.xml.Node, doctype: String): String =
-    mkRun(Xml).renderXml(node, Some(doctype))
+  def renderXml(element: scala.xml.Elem, doctype: String): String =
+    renderXml(element, Some(doctype))
 
-  def renderXml(node: scala.xml.Node, doctype: Option[String]): String =
-    mkRun(Xml).renderXml(node, doctype)
+  def renderXml(element: scala.xml.Elem): String =
+    renderXml(element, None)
 
-  def renderXml(node: scala.xml.Node): String =
-    mkRun(Xml).renderXml(node, None)
+  def renderXml(element: scala.xml.Elem, doctype: Option[String]): String = {
+    val run = mkRun(Xml)
+    run.renderXml(element.asInstanceOf[run.N.Element], doctype)
+  }
 
-  def render(node: scala.xml.Node): String =
-    mkRun(Xml).render(node)
+  def render(element: scala.xml.Elem): String = {
+    val run = mkRun(Xml)
+    run.render(element.asInstanceOf[run.N.Element])
+  }
 
 
-  def renderXmlWithDoctype(node: org.w3c.dom.Node, doctype: String): String =
-    mkRun(Dom).renderXml(node, Some(doctype))
+  def renderXml(element: org.w3c.dom.Element, doctype: String): String =
+    renderXml(element, Some(doctype))
 
-  def renderXml(node: org.w3c.dom.Node, doctype: Option[String]): String =
-    mkRun(Dom).renderXml(node, doctype)
+  def renderXml(element: org.w3c.dom.Element): String =
+    renderXml(element, None)
 
-  def renderXml(node: org.w3c.dom.Node): String =
-    mkRun(Dom).renderXml(node, None)
+  private def renderXml(element: org.w3c.dom.Element, doctype: Option[String]): String = {
+    val run = mkRun(Dom)
+    run.renderXml(element.asInstanceOf[run.N.Element], doctype)
+  }
 
-  def render(node: org.w3c.dom.Node): String =
-    mkRun(Dom).render(node)
+  def render(element: org.w3c.dom.Element): String = {
+    val run = mkRun(Dom)
+    run.render(element.asInstanceOf[run.N.Element])
+  }
 
   private def mkRun[N](N: Model[N]): PrettyPrinter.Run[N] = new PrettyPrinter.Run(N)(
     width,
@@ -55,7 +62,7 @@ object PrettyPrinter {
 
   // Note: methods below all need access to N: Model[N], often - for the types of parameters, so parameter N
   // must come first, and can not be implicit; it is cleaner to scope them in a class with N a constructor parameter.
-  private final class Run[N](N: Model[N])(
+  private final class Run[N](val N: Model[N])(
     width: Int,
     indent: Int,
     doNotStackElements: Set[String],
@@ -64,51 +71,28 @@ object PrettyPrinter {
     clingyElements: Set[String]
   ) {
 
-    def renderXml(node: N, doctype: Option[String] = None): String =
-      Xml.header + "\n" +
+    def renderXml(node: N.Element, doctype: Option[String]): String =
+      Namespace.Xml.header + "\n" +
       doctype.fold("")(doctype => doctype + "\n") +
       render(node) + "\n"
 
-    def render(node: N): String = fromNode(
-      node,
-      namespaces = Seq(Namespace.Top),
+    def render(element: N.Element): String = fromElement(
+      element,
+      parent = None,
       canBreakLeft = true,
       canBreakRight = true
     ).render(width)
 
-    private def fromNode(
-      node: N,
-      namespaces: Seq[Namespace],
-      canBreakLeft: Boolean,
-      canBreakRight: Boolean
-    ): Doc = {
-      if (N.isElement(node)) {
-        val element: N.Element = N.asElement(node)
-        val result = fromElement(element, namespaces, canBreakLeft, canBreakRight)
-        // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
-        if (canBreakRight && N.getName(element) == "lb") result + Doc.hardLine else result
-      }
-      else if (N.isText(node)) Doc.text(N.getText(N.asText(node)))
-      else Doc.paragraph(N.getNodeText(node))
-    }
-
     private def fromElement(
       element: N.Element,
-      namespaces: Seq[Namespace],
+      parent: Option[N.Element],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): Doc = {
       val label: String = N.getName(element)
       val name: String = N.getPrefix(element).fold("")(_ + ":") + label
-      val elementNamespaces: Seq[Namespace] = N.getNamespaces(element)
 
-      val namespaceAttributeValues: Seq[Attribute.Value[String]] = elementNamespaces.flatMap(elementNamespace =>
-        if ((elementNamespace == Namespace.Top) || namespaces.contains(elementNamespace)) None
-        else Some(elementNamespace.xmlnsAttribute))
-
-      val attributeValues: Seq[Attribute.Value[String]] =
-        (N.getAttributes(element) ++ namespaceAttributeValues).filterNot(_.value.isEmpty)
-
+      val attributeValues: Seq[Attribute.Value[String]] = N.getAttributes(element, parent).filterNot(_.value.isEmpty)
       val attributes: Doc =
         if (attributeValues.isEmpty) Doc.empty
         else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, attributeValues.map(attributeValue =>
@@ -122,7 +106,7 @@ object PrettyPrinter {
       val charactersLeft: Boolean = nodes.headOption.exists(N.isCharacters)
       val charactersRight: Boolean = nodes.lastOption.exists(N.isCharacters)
       val chunks: Seq[Seq[N]] = chunkify(Seq.empty, Seq.empty, nodes)
-      val noAtoms: Boolean = chunks.forall(_.forall(!N.isAtom(_)))
+      val noText: Boolean = chunks.forall(_.forall(!N.isText(_)))
 
       val children: Seq[Doc] = {
         val canBreakLeft1 = canBreakLeft || whitespaceLeft
@@ -130,11 +114,11 @@ object PrettyPrinter {
 
         if (chunks.isEmpty) Seq.empty
         else if (chunks.length == 1) Seq(
-          fromChunk(chunks.head, elementNamespaces, canBreakLeft1, canBreakRight1)
+          fromChunk(chunks.head, Some(element), canBreakLeft1, canBreakRight1)
         ) else {
-          fromChunk(chunks.head, elementNamespaces, canBreakLeft = canBreakLeft1, canBreakRight = true) +:
-          chunks.tail.init.map(chunk => fromChunk(chunk, elementNamespaces, canBreakLeft = true, canBreakRight = true)) :+
-          fromChunk(chunks.last, elementNamespaces, canBreakLeft = true, canBreakRight = canBreakRight1)
+          fromChunk(chunks.head, Some(element), canBreakLeft = canBreakLeft1, canBreakRight = true) +:
+          chunks.tail.init.map(chunk => fromChunk(chunk, Some(element), canBreakLeft = true, canBreakRight = true)) :+
+          fromChunk(chunks.last, Some(element), canBreakLeft = true, canBreakRight = canBreakRight1)
         }
       }
 
@@ -142,7 +126,7 @@ object PrettyPrinter {
         val start: Doc = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">")
         val end: Doc = Doc.text(s"</$name>")
 
-        val stackElements: Boolean = noAtoms &&
+        val stackElements: Boolean = noText &&
           ((children.length >= 2) || ((children.length == 1) && alwaysStackElements.contains(label))) &&
           !doNotStackElements.contains(label)
 
@@ -168,23 +152,24 @@ object PrettyPrinter {
 
     @scala.annotation.tailrec
     private def atomize(result: Seq[N], nodes: Seq[N]): Seq[N] = if (nodes.isEmpty) result else {
-      val (atoms: Seq[N], tail: Seq[N]) = nodes.span(N.isText)
+      val (texts: Seq[N], tail: Seq[N]) = nodes.span(N.isText)
 
-      val newResult: Seq[N] = if (atoms.isEmpty) result else result ++
-        processText(Seq.empty, Strings.squashBigWhitespace(atoms.map(N.asText).map(N.getText).mkString("")))
+      val newResult: Seq[N] = if (texts.isEmpty) result else result ++
+        processText(Seq.empty, texts.head,
+          Strings.squashBigWhitespace(texts.map(N.asText).map(N.getText).mkString("")))
 
       if (tail.isEmpty) newResult
       else atomize(newResult :+ tail.head, tail.tail)
     }
 
     @scala.annotation.tailrec
-    private def processText(result: Seq[N.Text], text: String): Seq[N.Text] = if (text.isEmpty) result else {
+    private def processText(result: Seq[N.Text], seed: N, text: String): Seq[N.Text] = if (text.isEmpty) result else {
       val (spaces: String, tail: String) = text.span(_ == ' ')
-      val newResult = if (spaces.isEmpty) result else result :+ N.mkText(" ")
+      val newResult = if (spaces.isEmpty) result else result :+ N.mkText(" ", seed)
       val (word: String, tail2: String) = tail.span(_ != ' ')
 
       if (word.isEmpty) newResult
-      else processText(newResult :+ N.mkText(word), tail2)
+      else processText(newResult :+ N.mkText(word, seed), seed, tail2)
     }
 
     private def chunkify(
@@ -210,28 +195,46 @@ object PrettyPrinter {
 
     private def fromChunk(
       nodes: Seq[N],
-      namespaces: Seq[Namespace],
+      parent: Option[N.Element],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): Doc = {
       require(nodes.nonEmpty)
       if (nodes.length == 1) {
-        fromNode(nodes.head, namespaces, canBreakLeft, canBreakRight)
+        fromNode(nodes.head, parent, canBreakLeft, canBreakRight)
       } else Doc.intercalate(Doc.empty, {
-        fromNode(nodes.head, namespaces, canBreakLeft, canBreakRight = false) +:
-        nodes.tail.init.map(node => fromNode(node, namespaces, canBreakLeft = false, canBreakRight = false)) :+
-        fromNode(nodes.last, namespaces, canBreakLeft = false, canBreakRight)
+        fromNode(nodes.head, parent, canBreakLeft, canBreakRight = false) +:
+        nodes.tail.init.map(node => fromNode(node, parent, canBreakLeft = false, canBreakRight = false)) :+
+        fromNode(nodes.last, parent, canBreakLeft = false, canBreakRight)
       })
+    }
+
+    private def fromNode(
+      node: N,
+      parent: Option[N.Element],
+      canBreakLeft: Boolean,
+      canBreakRight: Boolean
+    ): Doc = {
+      if (N.isElement(node)) {
+        val element: N.Element = N.asElement(node)
+        val result = fromElement(element, parent, canBreakLeft, canBreakRight)
+        // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
+        if (canBreakRight && N.getName(element) == "lb") result + Doc.hardLine else result
+      }
+      else if (N.isText(node)) Doc.text(N.getText(N.asText(node)))
+      else Doc.paragraph(N.toString(node))
     }
   }
 
   val default: PrettyPrinter = new PrettyPrinter
 
-  def render(node: org.w3c.dom.Node): String = serializer.writeToString(node)
-
-  private val serializer: org.apache.xml.serializer.dom3.LSSerializerImpl = {
-    val result = new org.apache.xml.serializer.dom3.LSSerializerImpl
-    result.setParameter("format-pretty-print", true)
-    result
-  }
+  // Note: to use LSSerializer instead of my DOM pretty-printing:
+  // add dependency:  implementation "xalan:serializer:$xalanVersion"
+  //
+  // def render(node: org.w3c.dom.Node): String = serializer.writeToString(node)
+  // private val serializer: org.apache.xml.serializer.dom3.LSSerializerImpl = {
+  //  val result = new org.apache.xml.serializer.dom3.LSSerializerImpl
+  //  result.setParameter("format-pretty-print", true)
+  //  result
+  //}
 }
