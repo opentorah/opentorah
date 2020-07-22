@@ -1,20 +1,23 @@
 # Changelog
-All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Modules covered: `calendar`, `calendar-service`, `schedule` and `calendar-paper`.
 
 ## [Unreleased]
 
 ## [0.3.3] - 2020-05-31
-- merged into monorepo
-- moved common code to appropriate modules
 - simplified directory structure
+- moved common code to appropriate modules
+- moved Tanach and Rambam structures and support into the `texts` module
+- moved schedule-related stuff into the `schedule` module
+- cleaned up SpecialDay (`schedule`)
 - cleaned up and updated some dependencies
-- cleaned up SpecialDay
+- removed ScalaTags (`calendar-service`)
 
 ## [0.3.1] - 2020-04-26
+- packages renamed to org.opentorah
 - split out jewish-calendar.org website
+- merged into the `opentorah` monorepo
+- converted service to ZIO
 
 ## [0.3.0] - 2019-02-13
 - Psalms for the day of the week, year's molad and delay
@@ -28,111 +31,96 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.9] - 2019-01-23
 - using Cats and Algebra for testing the laws
 - optimization: Years are cached; Month/Day get their Year/Month at construction if it is known
-- moved jewish-calendar.org into the docs directory in *this* repository
+- merged jewish-calendar.org site into this repository
 - configuring Jekyll (and MathJax) for the project's site
 - more documentation 
-- moved docbook plugin into a separate repository
+- moved DocBook plugin into a separate repository
 - added to schedule: Sefer Hamitzvos, Molad, Shabbos Mevarchim, seasons, year type and cycles
 - normal forms of numbers simplified and normalization centralized
 - exactification
 - cleanup
 
 ## [0.2.5] - 2018-12-31
-- metadata for Rambam's Mishneh Torah
-- parse Mishneh Torah metadata
-- metadata mapping from lessons in Mishneh Torah to Sefer Hamitzvos
-- parse the mapping
-- calculate Rambam learning schedules
-- parse Psalms metadata
+- structure of the Rambam's Mishneh Torah and mapping of the lessons to Sefer Hamitzvos
+- Rambam learning schedules
 - Psalms schedule
 - CHANGELOG.md
 
 ## [0.2.0] - 2018-12-16
-- updated dependencies
-- POM improvements 
-- simplified Bintray publishing
+- simplified POM configuration and Bintray publishing
 - built and uploaded custom Google Cloud Build Gradle builder that supports Gradle 5.0
-- cleaned up cloudbuild.yaml
-- code reorganization and cleanup
-- moved TODOs into issues
 - credits and sources
 - "caches"
 - annotate readings with their sources (Shabbos, special day, etc.)
-- chapters for the Writings books
-- full metadata for the Book of Psalms
+- chapters for the Writings books and day of the month/week divisions for the Book of Psalms
+- code reorganization
 
 ## [] - 2018-12-06
-- using http4s
-- using Scalatags
-- CalendarService
-- packaging service as Docker image (with configurable port)
-- configure Google Cloud Build: cloudbuild.yaml
-- integrate with Google Cloud Build on pull request merge
-- restart VM instance from the Cloud Build
+- Calendar service using http4s with Scalatags
+- deploy the service as a Docker image via pull-triggered Google CloudBuild that resstarts the VM
+- multi-lingual bi-directional UI 
 - better Custom minimization
 - Chumash Chitas
-- multi-lingual UI; LTR/RTL 
 
-## [] - 2018-11-14
-- added metadata-related stuff from the "Digital Judaica" project
-- Language, LanguageSpec and Custom 
-- parsing metadata using Holders
-- binding metadata 
-- Tanach metadata
-- metadata for regular Haftarot
+## [] - 2018-08-03 - 2018-11-14
+- schedule-related data, including some quotes from Shulchan Aruch
+- Chumash book structures and metadata support from the "Digital Judaica" project (Names, Name, Language, Numbered)
+- Tanach and Haftarot structure
 - special days of the Jewish calendar and their effect on the Torah reading
+- parsing and binding metadata
+- introduced XML utilities (based on the ones from the Store project?)
+- Chapters, Verse, Span
+- Custom
 - generate Torah reading schedule
-- translated of the relevant paragraph from Shulchan Aruch;
 - tests based on Shulchan Aruch
 - tests using calendar tables
-- code reorganization
-- CODEOWNERS 
+- added CODEOWNERS 
 
 ## [] - 2018-07-30
 - finished "tying the knot" cleanup
 - NonPeriodicNumberSystem, NonPeriodicPoint and NonPeriodicVector
-- renamed AngleVector to Rotation
-- renamed AngleNumberSystem.Point to Position
-- renamed NumberSystem.Interval to Vector
-- added some home-grown typeclasses
+- renamed AngleVector to Rotation, AngleNumberSystem.Point to Position, NumberSystem.Interval to Vector
+- added some home-grown type-classes
+- more property-based tests
 - converted TODOs into issues
 - cleanup
-- more property-based tests
 
-## [] - 2018-04-13
-- switched from Hg to GIT
+## [] - 2018-04-12
 - merged the paper repository back into the monorepo
-- started on a Gradle DocBook plugin based on Gradle scripts floating around 
 - found a version of Saxon that can handle DocBook XSLT
 
 ## [0.1.1] - 2017-12-03
 - split calculations from roundings 
 - Moon calculations
 - very rough first attempt at finding sign reversal point of a function
-- position names
+- using ScalaTest plugin (com.github.maiflai.scalatest)
 - added some property-based tests
 - publishing to Bintray
 
 ## [] - 2017-09-17
 - switched to Gradle
+- switched to Git
 - added LICENSE
 - added Travis configuration
-- used F-bounded type parameters and projections to encode family polymorphism for Calendar and NumberSystem 
+- used F-bounded type parameters, projections and self-types to encode family polymorphism for Calendar and NumberSystem 
 - used type parameters to encode Interval and Point in the NumberSystem family
-- split family members out of the familty trait
+- [yay!] split family members out of the family trait
 - derived Calendar from TimeNumberSystem to tie the knot
 - merged everything other than the paper into the same repository again
 - introduced BigRational and used it for the NumberSystem's operations
-- Number is a sum of (a sequence of) signed terms which is not assummed to be in 'normal' form
-- all operations in NumberSystem are done in terms of sequences in 
-- more tests.
+- [yay!] Number is a sum of (a sequence of) signed terms which is not assumed to be in 'normal' form
+- all operations in NumberSystem are done in terms of sequences
+- Rosh Hashana corrections *really* externalized
+- introduced Zodiac
+- coded more astronomical calculations from Rambam
+- more tests
 - cleanup
 
 NOTE: Scala compiler crashed (!!!) with the typing on Number/TimeNumber.
 When family members are inside the family trait, it gets in the way (Family.this.T...);
 To work around it, I tried using [T <: NumberSystem[T], N <: T#Number[T, N]].
-It did the trick - I think - on the NumberSystem,
-but once I modified TimeNumberSystem in this way - I got compiler crash!
+It did the trick - I think - on the NumberSystem, but once I modified TimeNumberSystem in this way,
+I got compiler crash!
 Splitting the NumberSystem and TimeNumberSystem *helped* the knot-tying:
 everything compiles and works!
 
@@ -142,45 +130,50 @@ everything compiles and works!
 ## [] - 2015-02-08
 - split the paper and dates into separate repositories
 - expressed head digit range constraints in types
-- no more Servlets
+- Rosh Hashana corrections externalized
 
 ## [] - 2014-06-23
 - introduced ScalaTest
-- code cleanup
-- updated dependencies
 - adding tests directly from Rambam's text
 - added scala-xml dependency
-- generalizing mixed-range numbers: NumberSystem, Point, Interval, ScalarNumber
-- TimeNumberSystem
-- AngleNumberSystem
+- Angle enhancements
+- generalizing mixed-range numbers: Point, Interval, ScalarNumber
+- NumberSystem, TimeNumberSystem, AngleNumberSystem
 - Calendar ties the family polymorphism knot
 
 ## [] - 2013-02-27
 - completed conversion to Scala
 - code reorganization and cleanup
-- code reorganization
+- no more webapp
+- playing with family polymorphism
+- more generated tables
 - PDF and HTML generation tweaks
-- playing with family polymorphism.
 
 ## [] - 2011-11-24
-- converted to Scala
+- conversion to Scala
+- Angle enhancements
+- introduced Numbered[T <: Numbered[T]] and MomentT[..., T <: MomentT[...,T]]
 - paper in DocBook format
 - DocBook processing with Maven plugin
 - generating tables and including them in the paper
-- Angle enhancements
+
+## [] - 2011-01-20
+- sun module
 
 ## [] - 2010-04-04
+- specialized JewishDate and GregorianDate
 - modularization
 
 ## [] - 2009-10-25
-- Rosh Hashanah delays
+- webapp
+
+## [] - 2009-05-08
 - molad
-- seasons
+- Rosh Hashanah corrections
 - Birkat HaChama
-- Gregorian calendar
+- Gregorian calendar and conversions
+- seasons
 - Google-importable iCal
-- checkstyle and findbugs
-- tests
 
 ## [] - 2009-04-02
 - Initial check-in
