@@ -24,31 +24,28 @@ object NewStaticFile {
                                                                                 F: Sync[F],
                                                                                 cs: ContextShift[F]): OptionT[F, Response[F]] = {
     val file = new File(url.getFile)
-    OptionT.apply(F.delay[Option[Response[F]]] {
-      if (file.isDirectory) None else {
+    OptionT.apply(F.suspend[Option[Response[F]]] {
+      if (file.isDirectory) F.pure(None) else {
         val urlConn: URLConnection = url.openConnection
         val lastmod: Option[HttpDate] = HttpDate.fromEpochSecond(urlConn.getLastModified / 1000).toOption
         val ifModifiedSince: Option[`If-Modified-Since`] = req.flatMap(_.headers.get(`If-Modified-Since`))
         val expired: Boolean = (ifModifiedSince, lastmod).mapN(_.date < _).getOrElse(true)
 
-        if (!expired) {
-          urlConn.getInputStream.close()
-          Some(Response(NotModified))
-        } else {
-
-          Try(url.openStream()).fold(
-            fa = {
+        if (!expired) blocker
+          .delay(urlConn.getInputStream.close())
+          .as(Some(Response(NotModified)))
+        else blocker
+          .delay(url.openStream())
+          .redeem(
+            recover = {
               case _: FileNotFoundException => None
+              case other => throw other
             },
-            fb = { inputStream =>
-              Some(
-                Response(
-                  headers = headers(lastmod, url, urlConn.getContentLengthLong),
-                  body = readInputStream[F](F.delay(inputStream), DefaultBufferSize, blocker)
-                ))
-            }
+            f = { inputStream => Some(Response(
+              headers = headers(lastmod, url, urlConn.getContentLengthLong),
+              body = readInputStream[F](F.pure(inputStream), DefaultBufferSize, blocker)
+            ))}
           )
-        }
       }
     })
   }

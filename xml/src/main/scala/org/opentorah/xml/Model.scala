@@ -1,7 +1,6 @@
 package org.opentorah.xml
 
-// This abstracts over the XML model, allowing processing of not just Scala XML.
-// Support for pretty-printing DOM is planned; support for DOM in Parser is not (yet?) planned ;)
+// This abstracts over the XML model, allowing pretty-printing of both Scala XML and DOM.
 trait Model[N] {
   type Element <: N
   type Text <: N
