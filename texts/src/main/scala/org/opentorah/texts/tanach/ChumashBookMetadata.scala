@@ -78,6 +78,10 @@ object ChumashBookMetadata {
 
   def parser(book: Tanach.ChumashBook, names: Names, chapters: Chapters): Parser[Parsed] = for {
     weeks <- weekParsable(book).all
+    _ <- Parser.check(names.getDefaultName.isDefined,
+      "Only default name is allowed for a Chumash book")
+    _ <- Parser.check(weeks.head.names.hasName(names.getDefaultName.get),
+      "Chumash book name must be a name of the book's first parsha")
   } yield new Parsed(book, names, chapters, weeks)
 
   private def weekParsable(book: Tanach.ChumashBook): Element[ParshaMetadata.Parsed] =
