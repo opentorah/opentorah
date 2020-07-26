@@ -336,8 +336,8 @@ class ProcessDocBookTask extends DefaultTask {
   private def generateData(mainClass: String): Unit = {
     val mainSourceSet: Option[SourceSet] = Gradle.mainSourceSet(getProject)
     if (mainSourceSet.isEmpty) logger.warn(
-      s"Skipping DocBook data generation: no Java plugin in the project") else
-    {
+      s"Skipping DocBook data generation: no Java plugin in the project")
+    else {
       val dataDirectory: File = layout.dataDirectory
       info(s"Running DocBook data generator $mainClass into $dataDirectory")
       Gradle.javaexec(
