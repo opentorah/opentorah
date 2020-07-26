@@ -2,12 +2,45 @@ package org.opentorah.collector
 
 import java.io.File
 import org.opentorah.entity.{Entity, EntityReference}
-import org.opentorah.store.{Entities, EntityHolder, Store, WithPath}
+import org.opentorah.store.{Entities, EntityHolder, Path, Store, WithPath}
 import org.opentorah.util.Files
+import scala.xml.Node
 
-final class Site(val store: Store, val references: Seq[WithPath[EntityReference]]) {
+final class Site(val store: Store) {
 
-  private val collections: Seq[WithPath[Collection]] = store.withPath[Collection](values = {
+  private def withPath[R](values: Store => Seq[R]): Seq[WithPath[R]] =
+    Site.withPath(Path.empty, values, store)
+
+  val references: Seq[WithPath[EntityReference]] = withPath[EntityReference](values = references(_))
+
+  private def references(store: Store): Seq[EntityReference] = store match {
+    case _: Entities =>
+      Seq.empty
+
+    case entityHolder: EntityHolder =>
+      EntityReference.from(entityHolder.entity.content)
+
+    case _: Document =>
+      Seq.empty
+
+    case teiHolder: TeiHolder =>
+      val lookInto: Seq[Node] =
+        teiHolder.tei.getAbstract.getOrElse(Seq.empty) ++
+        teiHolder.tei.correspDesc.map(_.xml).getOrElse(Seq.empty) ++
+        teiHolder.tei.body.xml
+
+      teiHolder.tei.titleStmt.references ++ EntityReference.from(lookInto)
+
+    case fromElement: Store.FromElement =>
+      val lookInto: Seq[Node] =
+        fromElement.title.map(_.xml).getOrElse(Seq.empty) ++
+        fromElement.storeAbstract.map(_.xml).getOrElse(Seq.empty) ++
+        fromElement.body.map(_.xml).getOrElse(Seq.empty)
+
+      EntityReference.from(lookInto)
+  }
+
+  private val collections: Seq[WithPath[Collection]] = withPath[Collection](values = {
     case collection: Collection => Seq(collection)
     case _ => Seq.empty
   })
@@ -45,6 +78,23 @@ object Site {
   //    if (missingImages.nonEmpty) throw new IllegalArgumentException(s"Missing images: $missingImages")
   //  }
 
+  private def withPath[R](
+    path: Path,
+    values: Store => Seq[R],
+    store: Store
+  ): Seq[WithPath[R]] = {
+    val fromStore: Seq[WithPath[R]] =
+      values(store).map(WithPath[R](path, _))
+
+    val fromEntities: Seq[WithPath[R]] = store.entities.toSeq.flatMap(entities =>
+      withPath[R](path :+ entities.selector.bind(entities), values, entities))
+
+    val fromBy: Seq[WithPath[R]] = store.by.toSeq.flatMap(by =>
+      by.stores.flatMap(store => withPath[R](path :+ by.selector.bind(store), values, store)))
+
+    fromEntities ++ fromStore ++ fromBy
+  }
+
   def write(
     directory: File,
     site: Site
@@ -57,7 +107,7 @@ object Site {
     for (entity <- site.entities) writeSiteObject(new EntityObject(site, entity), directory)
 
     Files.deleteFiles(new File(directory, Hierarchy.directoryName))
-    val stores: Seq[WithPath[Store]] = site.store.withPath[Store](values = {
+    val stores: Seq[WithPath[Store]] = site.withPath[Store](values = {
       case _: Collection | _: Document | _: Entities | _: EntityHolder | _: TeiHolder => Seq.empty
       case store => Seq(store)
     })

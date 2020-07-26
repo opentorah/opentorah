@@ -19,9 +19,6 @@ abstract class By[+S <: Store](
     Collections.prevAndNext(stores).toMap
 
   protected def load: Seq[Parser[S]]
-
-  final def withPath[R](path: Path, values: Store => Seq[R]): Seq[WithPath[R]] =
-    stores.flatMap(store => store.withPath[R](path :+ selector.bind(store), values))
 }
 
 object By extends Component("by") {

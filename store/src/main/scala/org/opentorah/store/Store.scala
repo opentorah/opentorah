@@ -1,12 +1,10 @@
 package org.opentorah.store
 
 import java.net.URL
-import org.opentorah.entity.EntityReference
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Title}
 import org.opentorah.xml.{Attribute, Parser, PrettyPrinter}
-
-import scala.xml.{Elem, Node}
+import scala.xml.Elem
 
 abstract class Store(
   inheritedSelectors: Seq[Selector],
@@ -26,24 +24,6 @@ abstract class Store(
   def entities: Option[Entities] = None
 
   def by: Option[By[Store]] = None
-
-  def references: Seq[EntityReference]
-
-  final def withPath[R](
-    path: Path = Path.empty,
-    values: Store => Seq[R]
-  ): Seq[WithPath[R]] = {
-    val fromStore: Seq[WithPath[R]] =
-      values(this).map(WithPath[R](path, _))
-
-    val fromEntities: Seq[WithPath[R]] = entities.toSeq.flatMap(entities =>
-      entities.withPath[R](path :+ entities.selector.bind(entities), values))
-
-    val fromBy: Seq[WithPath[R]] =
-      by.toSeq.flatMap(_.withPath[R](path, values))
-
-    fromEntities ++ fromStore ++ fromBy
-  }
 }
 
 object Store extends Component("store") {
@@ -131,15 +111,6 @@ object Store extends Component("store") {
       byElement,
       creator = By.creator
     ))
-
-    final override def references: Seq[EntityReference] = {
-      val lookInto: Seq[Node] =
-        title.map(_.xml).getOrElse(Seq.empty) ++
-        storeAbstract.map(_.xml).getOrElse(Seq.empty) ++
-        body.map(_.xml).getOrElse(Seq.empty)
-
-      EntityReference.from(lookInto)
-    }
   }
 
   def creator: Creator[Store] =

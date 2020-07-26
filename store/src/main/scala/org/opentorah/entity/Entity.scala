@@ -10,10 +10,7 @@ final case class Entity private(
   names: Seq[EntityName],
   content: Seq[Node]
 ) {
-
   def name: String = names.head.name
-
-  def references: Seq[EntityReference] = EntityReference.from(content)
 }
 
 object Entity extends Parsable[Entity] with ToXml[Entity] {

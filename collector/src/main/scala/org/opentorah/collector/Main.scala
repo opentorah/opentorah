@@ -32,11 +32,11 @@ object Main {
     logger.info("Reading store.")
 
     val store: Store = Store.read(fromUrl)
-    val references: Seq[WithPath[EntityReference]] = store.withPath[EntityReference](values = _.references)
+    val site = new Site(store)
 
     logger.info("Checking store.")
     def findByRef(ref: String): Option[Entity] = store.entities.get.findByRef(ref)
-    val errors: Seq[String] = references.flatMap(reference => checkReference(reference.value, findByRef))
+    val errors: Seq[String] = site.references.flatMap(reference => checkReference(reference.value, findByRef))
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
 
     logger.info("Pretty-printing store.")
@@ -44,7 +44,6 @@ object Main {
       prettyPrint(entityHolder, Entity.toXml(entityHolder.entity.copy(id = None)), Tei.prettyPrinter)
     prettyPrint(store)
 
-    val site = new Site(store, references)
 
     logger.info("Writing site.")
     Site.write(

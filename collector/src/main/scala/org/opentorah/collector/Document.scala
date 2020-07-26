@@ -1,7 +1,6 @@
 package org.opentorah.collector
 
 import java.net.URL
-import org.opentorah.entity.EntityReference
 import org.opentorah.metadata.{Name, Names}
 import org.opentorah.store.{By, Selector, Store, Urls}
 import org.opentorah.tei.Tei
@@ -20,8 +19,6 @@ final class Document(
     Some(new Document.TeiBy(selectors, urls, fileInDirectory, name, languages))
 
   override def names: Names = new Names(Seq(Name(name)))
-
-  override def references: Seq[EntityReference] = Seq.empty
 
   def teiHolders: Seq[TeiHolder] = by.get.stores
 

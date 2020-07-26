@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import java.net.URL
-import org.opentorah.entity.{EntitiesList, Entity, EntityReference}
+import org.opentorah.entity.{EntitiesList, Entity}
 import org.opentorah.metadata.Names
 import org.opentorah.xml.{Attribute, Parser}
 
@@ -27,8 +27,6 @@ final class Entities(
   ))
 
   val lists: Seq[EntitiesList] = element.lists.map(_.take(by.get.stores.map(_.entity)))
-
-  override def references: Seq[EntityReference] = Seq.empty
 
   def findByRef(ref: String): Option[Entity] = by.get.stores.find(_.entity.id.get == ref).map(_.entity)
 }
