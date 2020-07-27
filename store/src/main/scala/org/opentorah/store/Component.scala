@@ -28,7 +28,10 @@ abstract class Component(elementName: String) {
       file <- Component.fileAttribute.optional
       result <- if (file.isDefined) ZIO.succeed(FromFile(file.get)) else  for {
         className <- Attribute("type").optional
-        result <- inlineParser(className)
+        result <- className.flatMap(delegate)
+          .getOrElse(Component.this)
+          .inlineParser(className)
+          .map(_.asInstanceOf[Element])
       } yield result
     } yield result
 
@@ -42,6 +45,8 @@ abstract class Component(elementName: String) {
       case inline => inlineContent(inline.asInstanceOf[Inline])
     }
   }
+
+  private def delegate(className: String): Option[Component] = None
 
   def inlineParser(className: Option[String]): Parser[Inline]
 
