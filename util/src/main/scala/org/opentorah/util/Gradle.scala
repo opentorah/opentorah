@@ -116,15 +116,15 @@ object Gradle {
       copySpec.filter(Map("tokens" -> substitutions.asJava).asJava, classOf[ReplaceTokens])
   })
 
-  def getTask(project: Project, name: String): Option[Task] = Option(project.getTasks.findByName(name))
+  private def getTask(project: Project, name: String): Option[Task] = Option(project.getTasks.findByName(name))
 
-  def getClassesTask(project: Project): Option[Task] = getTask(project, "classes")
+  def getClassesTask(project: Project): Option[Task] =
+    mainSourceSet(project).flatMap(mainSourceSet => getTask(project, mainSourceSet.getClassesTaskName))
 
   // Note: 'classes' task itself never does work: it has no action;
   // at least for Scala, it depends on the tasks that actually do something - when there is something to do.
-  def didWork(classesTask: Task): Boolean = {
+  def didWork(classesTask: Task): Boolean =
     classesTask.getDidWork || classesTask.getTaskDependencies.getDependencies(classesTask).asScala.exists(_.getDidWork)
-  }
 
   def mainSourceSet(project: Project): Option[SourceSet] =
     Option(project.getConvention.findPlugin(classOf[JavaPluginConvention]))

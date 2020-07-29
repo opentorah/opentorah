@@ -16,15 +16,6 @@ final case class Tei(
   val body: Body.Value = text.body
   val pbs: Seq[Pb] = body.xml.flatMap(Pb.descendants)
 
-  def references: Seq[EntityReference] = {
-    val lookInto: Seq[Node] =
-      getAbstract.getOrElse(Seq.empty) ++
-      correspDesc.map(_.xml).getOrElse(Seq.empty) ++
-      body.xml
-
-    titleStmt.references ++ EntityReference.from(lookInto)
-  }
-
   def addressee: Option[EntityReference] =
     EntityReference.from(correspDesc.map(_.xml).getOrElse(Seq.empty))
       .find(name => (name.entityType == EntityType.Person) && name.role.contains("addressee"))

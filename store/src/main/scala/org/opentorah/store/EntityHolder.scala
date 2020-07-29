@@ -1,6 +1,6 @@
 package org.opentorah.store
 
-import org.opentorah.entity.{Entity, EntityReference}
+import org.opentorah.entity.Entity
 import org.opentorah.metadata.{Name, Names}
 
 final class EntityHolder(
@@ -10,6 +10,4 @@ final class EntityHolder(
 ) extends Store(inheritedSelectors, urls) {
 
   override def names: Names = new Names(Seq(Name(entity.name)))
-
-  override def references: Seq[EntityReference] = entity.references
 }
