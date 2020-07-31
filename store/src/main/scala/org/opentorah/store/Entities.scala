@@ -1,10 +1,9 @@
 package org.opentorah.store
 
 import java.net.URL
-import org.opentorah.entity.{EntitiesList, Entity}
 import org.opentorah.metadata.Names
+import org.opentorah.tei.{EntitiesList, Entity}
 import org.opentorah.xml.{Attribute, Parser}
-
 import scala.xml.Elem
 
 final class Entities(

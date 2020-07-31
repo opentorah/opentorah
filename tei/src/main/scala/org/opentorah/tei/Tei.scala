@@ -1,6 +1,5 @@
 package org.opentorah.tei
 
-import org.opentorah.entity.{EntityReference, EntityType}
 import org.opentorah.xml.{Attribute, Element, Namespace, Parser, PrettyPrinter, Xml}
 import scala.xml.{Elem, Node}
 

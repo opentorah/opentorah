@@ -1,9 +1,8 @@
 package org.opentorah.collector
 
-import org.opentorah.entity.EntityReference
 import org.opentorah.metadata.{Language, Names}
 import org.opentorah.store.{Binding, Path, Store, WithPath}
-import org.opentorah.tei.Ref
+import org.opentorah.tei.{EntityReference, Ref}
 import org.opentorah.util.Files
 import org.opentorah.xml.{RawXml, Xml}
 import scala.xml.{Elem, Node}

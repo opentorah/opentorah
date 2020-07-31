@@ -1,7 +1,6 @@
 package org.opentorah.collector
 
-import org.opentorah.entity.{EntitiesList, EntityName}
-import org.opentorah.tei.Ref
+import org.opentorah.tei.{EntitiesList, EntityName, Ref}
 import org.opentorah.util.Files
 import scala.xml.{Elem, Node}
 

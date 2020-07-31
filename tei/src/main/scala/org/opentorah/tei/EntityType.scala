@@ -1,4 +1,4 @@
-package org.opentorah.entity
+package org.opentorah.tei
 
 sealed trait EntityType {
   def element: String

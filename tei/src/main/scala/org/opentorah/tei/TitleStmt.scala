@@ -1,6 +1,5 @@
 package org.opentorah.tei
 
-import org.opentorah.entity.EntityReference
 import org.opentorah.xml.{Attribute, Element, Parser}
 import scala.xml.Elem
 

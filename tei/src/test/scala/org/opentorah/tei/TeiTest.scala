@@ -1,6 +1,5 @@
 package org.opentorah.tei
 
-import org.opentorah.entity.Entity
 import org.opentorah.xml.{From, Parser}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

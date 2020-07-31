@@ -1,6 +1,6 @@
-package org.opentorah.entity
+package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, Text, ToXml, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, ToXml, Xml}
 import scala.xml.Node
 
 final class EntityName private(
@@ -16,7 +16,7 @@ object EntityName extends ToXml[EntityName] {
 
     override protected def parser: Parser[EntityName] = for {
       id <- Attribute.id.optional
-      name <- Text().required
+      name <- org.opentorah.xml.Text().required
     } yield new EntityName(entityType, id, name)
   }
 

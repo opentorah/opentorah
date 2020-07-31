@@ -1,8 +1,7 @@
 package org.opentorah.collector
 
-import org.opentorah.entity.EntityType
-import org.opentorah.tei.{Availability, CalendarDesc, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher,
-  SourceDesc, Tei}
+import org.opentorah.tei.{Availability, CalendarDesc, EntityType, LangUsage, Language, ProfileDesc, PublicationStmt,
+  Publisher, SourceDesc, Tei}
 import org.opentorah.util.Files
 import org.opentorah.xml.Xml
 import org.slf4j.{Logger, LoggerFactory}

@@ -1,4 +1,4 @@
-package org.opentorah.entity
+package org.opentorah.tei
 
 import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, ToXml, Xml}
 import scala.xml.Node

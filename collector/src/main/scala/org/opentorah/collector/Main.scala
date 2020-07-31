@@ -2,9 +2,8 @@ package org.opentorah.collector
 
 import java.io.File
 import java.net.URL
-import org.opentorah.entity.{Entity, EntityReference}
-import org.opentorah.store.{Store, WithPath}
-import org.opentorah.tei.Tei
+import org.opentorah.store.Store
+import org.opentorah.tei.{Entity, EntityReference, Tei}
 import org.opentorah.util.Files
 import org.opentorah.xml.{From, PrettyPrinter}
 import org.slf4j.{Logger, LoggerFactory}

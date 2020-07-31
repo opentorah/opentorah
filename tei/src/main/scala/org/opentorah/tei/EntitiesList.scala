@@ -1,6 +1,6 @@
-package org.opentorah.entity
+package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, ContentType, Parsable, Parser, Text, ToXml}
+import org.opentorah.xml.{Attribute, ContentType, Parsable, Parser, ToXml}
 import scala.xml.Elem
 
 final case class EntitiesList(
@@ -29,7 +29,7 @@ object EntitiesList extends Parsable[EntitiesList] with ToXml[EntitiesList] {
   private def parser(entityType: EntityType): Parser[EntitiesList] = for {
     id <- Attribute.id.required
     role <- roleAttribute.optional
-    head <- Text("head").required
+    head <- org.opentorah.xml.Text("head").required
   } yield EntitiesList(
     entityType,
     id,
