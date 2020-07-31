@@ -28,7 +28,5 @@ object EntityType {
 
   val values: Seq[EntityType] = Seq(Person, Place, Organization)
 
-  def forElement(element: String): Option[EntityType] = values.find(_.element == element)
-  def forName(element: String): Option[EntityType] = values.find(_.nameElement == element)
-  def forList(element: String): Option[EntityType] = values.find(_.listElement == element)
+  def isName(elementName: String): Boolean = values.exists(_.nameElement == elementName)
 }

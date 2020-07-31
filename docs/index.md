@@ -24,7 +24,8 @@ There are a few ongoing projects:
   with dates, time intervals and angles and related algorithms;   
 - [code](https://github.com/opentorah/opentorah/tree/master/schedule) for calculating Torah reading/learning schedules;
 - code re-used in multiple projects for processing [metadata](https://github.com/opentorah/opentorah/tree/master/metadata),
-  [XML](https://github.com/opentorah/opentorah/tree/master/xml) and general
+  [XML](https://github.com/opentorah/opentorah/tree/master/xml),
+  [TEI](https://github.com/opentorah/opentorah/tree/master/tei) and general
   [utilities](https://github.com/opentorah/opentorah/tree/master/util);   
 - desire to publishing this paper in multiple formats was part of the motivation for writing
   [Gradle DocBook plugin](https://github.com/opentorah/opentorah/tree/master/docbook) in general

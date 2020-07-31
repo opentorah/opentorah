@@ -94,13 +94,15 @@ object Transformers {
     />
   }
 
-  def nameTransformer(site: Site): Xml.Transformer = elem => if (EntityType.forName(elem.label).isEmpty) elem else {
+  def nameTransformer(site: Site): Xml.Transformer = elem => if (!EntityType.isName(elem.label)) elem else {
+    // TODO rework to use xml.Attribute:
     elem.attribute("ref").map(_.text).fold(elem){ ref =>
       site.findByRef(ref).fold {
         println(s"did not find reference: $ref")
         elem
       }{ entity =>
         val target: String = Files.mkUrl(EntityObject.teiWrapperUrl(entity))
+        // TODO rework to use xml.Attribute:
         elem.copy(attributes =
           Attribute("role", Xml.mkText(Viewer.Names.name),
           Attribute("target", Xml.mkText(target), scala.xml.Null)))
