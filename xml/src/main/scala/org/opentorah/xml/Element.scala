@@ -8,12 +8,12 @@ abstract class Element[A](
 
   override def toString: String = s"element '$elementName'"
 
+  final override lazy val name2parser: Map[String, Parsable.ContentTypeAndParser[A]] =
+    Map(elementName -> new Parsable.ContentTypeAndParser[A](contentType, parser))
+
   protected def contentType: ContentType = ContentType.Elements
 
   protected def parser: Parser[A]
-
-  final override lazy val name2parser: Map[String, Parsable.ContentTypeAndParser[A]] =
-    Map(elementName -> new Parsable.ContentTypeAndParser[A](contentType, parser))
 }
 
 object Element {

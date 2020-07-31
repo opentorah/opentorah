@@ -8,7 +8,6 @@ import scala.xml.Elem
 
 class StoreComponent extends Component("store") {
 
-  protected final val nAttribute: Attribute[String] = Attribute("n")
   protected final val fromAttribute: Attribute[String] = Attribute("from")
 
   final case class InlineClass(
@@ -48,20 +47,20 @@ class StoreComponent extends Component("store") {
     className
   )
 
-  override protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]] = Seq(
-    nAttribute.withValue(value.names.getDefaultName),
-    fromAttribute.withValue(value.from),
-    Component.typeAttribute.withValue(value.className)
-  )
+  override protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]] =
+    Names.attributes(value.names) ++ Seq(
+      fromAttribute.withValue(value.from),
+      Component.typeAttribute.withValue(value.className)
+    )
 
   override protected def inlineContent(value: Inline): Seq[Elem] =
-    (if (value.names.getDefaultName.isDefined) Seq.empty else Names.toXml(value.names)) ++
-      Title.parsable.toXml(value.title) ++
-      Abstract.parsable.toXml(value.storeAbstract) ++
-      Body.parsable.toXml(value.body) ++
-      Selector.toXml(value.selectors) ++
-      Entities.parsable.toXml(value.entities) ++
-      By.parsable.toXml(value.by)
+    Names.content(value.names) ++
+    Title.parsable.toXml(value.title) ++
+    Abstract.parsable.toXml(value.storeAbstract) ++
+    Body.parsable.toXml(value.body) ++
+    Selector.toXml(value.selectors) ++
+    Entities.parsable.toXml(value.entities) ++
+    By.parsable.toXml(value.by)
 
   class FromElement(
     inheritedSelectors: Seq[Selector],

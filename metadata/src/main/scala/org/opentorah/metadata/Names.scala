@@ -81,6 +81,12 @@ object Names {
     new Names(names)
   }
 
+  def attributes(value: Names): Seq[Attribute.Value[_]] =
+    Seq(defaultNameAttribute.withValue(value.getDefaultName))
+
+  def content(value: Names): Seq[Elem] =
+    if (value.getDefaultName.isDefined) Seq.empty else toXml(value)
+
   def toXml(value: Names): Seq[Elem] =
     Name.toXml(value.names)
 }
