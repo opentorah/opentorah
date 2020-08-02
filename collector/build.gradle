@@ -15,4 +15,6 @@ dependencies {
   implementation project(':util')
 
   implementation "ch.qos.logback:logback-classic:$logbackVersion"
+
+  testImplementation "org.podval.tools:org.podval.tools.run:$podvalRunVersion"
 }

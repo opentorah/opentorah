@@ -6,8 +6,8 @@ object Util {
   def className(obj: AnyRef): String = obj.getClass.getSimpleName.replace("$", "")
 
   def getSingleton(className: String): AnyRef = Class.forName(className + "$")
-    .getMethod("MODULE$")
-    .invoke(null)
+    .getField("MODULE$")
+    .get(null)
 
   def getSingletonClassName(obj: AnyRef): String = ???
 

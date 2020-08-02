@@ -5,7 +5,6 @@ import org.opentorah.metadata.Names
 abstract class StoreNg extends ComponentNg("store") {
 
   override type Instance <: StoreNg.Base
-
 }
 
 object StoreNg {

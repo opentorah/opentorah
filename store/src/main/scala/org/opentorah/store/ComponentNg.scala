@@ -57,21 +57,24 @@ object ComponentNg {
     elementName: String,
     fromUrl: Urls.FromUrl,
     inheritedSelectors: Seq[Selector]
-  ): Parser[Base] = new Element[Base](elementName) {
-    override protected def parser: Parser[Base] = for {
-      file <- Redirect.fileAttribute.optional
-      result <-
-        if (file.isDefined) read(
-          elementName,
-          fromUrl.redirect(file.get),
-          inheritedSelectors
-        ) else for {
-          className <- typeAttribute.required
-          result <- Util.getSingleton(className).asInstanceOf[ComponentNg].parser(
-            fromUrl,
+  ): Parser[Base] = {
+    val parsable = new Element[Base](elementName) {
+      override protected def parser: Parser[Base] = for {
+        file <- Redirect.fileAttribute.optional
+        result <-
+          if (file.isDefined) read(
+            elementName,
+            fromUrl.redirect(file.get),
             inheritedSelectors
-          )
-        } yield result
-    } yield result
-  }.required
+          ) else for {
+            className <- typeAttribute.required
+            result <- Util.getSingleton(className).asInstanceOf[ComponentNg].parser(
+              fromUrl,
+              inheritedSelectors
+            )
+          } yield result
+      } yield result
+    }
+    parsable.parse(fromUrl.baseUrl)
+  }
 }
