@@ -46,9 +46,9 @@ object CollectorStore extends StoreNg {
   )
 
   override protected def attributes(value: Instance): Seq[Attribute.Value[_]] =
-    Names.attributes(value.names)
+    Names.antiparser.attributes(value.names)
 
   // TODO take Inline descendants into account!
   override protected def content(value: Instance): Seq[Node] =
-    Names.content(value.names)
+    Names.antiparser.content(value.names)
 }

@@ -4,7 +4,7 @@ import java.net.URL
 import org.opentorah.util.Files
 import org.opentorah.xml.{Attribute, Parser}
 import zio.ZIO
-import scala.xml.Elem
+import scala.xml.Node
 
 abstract class Component(elementName: String) {
 
@@ -40,7 +40,7 @@ abstract class Component(elementName: String) {
       case inline => inlineAttributes(inline.asInstanceOf[Inline])
     }
 
-    override protected def content(value: Element): Seq[Elem] = value match {
+    override protected def content(value: Element): Seq[Node] = value match {
       case FromFile(_) => Seq.empty
       case inline => inlineContent(inline.asInstanceOf[Inline])
     }
@@ -52,7 +52,7 @@ abstract class Component(elementName: String) {
 
   protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]]
 
-  protected def inlineContent(value: Inline): Seq[Elem]
+  protected def inlineContent(value: Inline): Seq[Node]
 
   final type Creator[+R] = (
     /* inheritedSelectors: */ Seq[Selector],

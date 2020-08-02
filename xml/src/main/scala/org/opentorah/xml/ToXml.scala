@@ -2,6 +2,7 @@ package org.opentorah.xml
 
 import scala.xml.{Elem, Node}
 
+// TODO fold into Antiparser; move mkElement() here...
 trait ToXml[A] {
   final def toXml(value: Option[A]): Seq[Elem] = toXml(value.toSeq)
 

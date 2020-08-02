@@ -4,7 +4,7 @@ import java.net.URL
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Title}
 import org.opentorah.xml.{Attribute, Parser, PrettyPrinter}
-import scala.xml.Elem
+import scala.xml.Node
 
 class StoreComponent extends Component("store") {
 
@@ -48,13 +48,13 @@ class StoreComponent extends Component("store") {
   )
 
   override protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]] =
-    Names.attributes(value.names) ++ Seq(
+    Names.antiparser.attributes(value.names) ++ Seq(
       fromAttribute.withValue(value.from),
       Component.typeAttribute.withValue(value.className)
     )
 
-  override protected def inlineContent(value: Inline): Seq[Elem] =
-    Names.content(value.names) ++
+  override protected def inlineContent(value: Inline): Seq[Node] =
+    Names.antiparser.content(value.names) ++
     Title.parsable.toXml(value.title) ++
     Abstract.parsable.toXml(value.storeAbstract) ++
     Body.parsable.toXml(value.body) ++

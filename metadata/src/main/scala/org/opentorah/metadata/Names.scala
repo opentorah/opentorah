@@ -1,6 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Attribute, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, Parser}
 import org.opentorah.util.Collections
 import scala.xml.Elem
 import zio.ZIO
@@ -81,11 +81,10 @@ object Names {
     new Names(names)
   }
 
-  def attributes(value: Names): Seq[Attribute.Value[_]] =
-    Seq(defaultNameAttribute.withValue(value.getDefaultName))
-
-  def content(value: Names): Seq[Elem] =
-    if (value.getDefaultName.isDefined) Seq.empty else toXml(value)
+  val antiparser: Antiparser[Names] = Antiparser(
+    attributes = value => Seq(defaultNameAttribute.withValue(value.getDefaultName)),
+    content = value => if (value.getDefaultName.isDefined) Seq.empty else toXml(value)
+  )
 
   def toXml(value: Names): Seq[Elem] =
     Name.toXml(value.names)
