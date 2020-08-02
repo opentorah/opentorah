@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, ContentType, Element, Parser, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser, Xml}
 import scala.xml.{Elem, Node}
 
 final case class Ref(
@@ -17,7 +17,7 @@ object Ref extends Element.WithToXml[Ref]("ref") {
 
   override protected def contentType: ContentType = ContentType.Mixed
 
-  override protected def parser: Parser[Ref] = for {
+  override protected val parser: Parser[Ref] = for {
     target <- targetAttribute.required
     rendition <- renditionAttribute.optional
     text <- Element.allNodes
@@ -27,13 +27,13 @@ object Ref extends Element.WithToXml[Ref]("ref") {
     text
   )
 
-  override protected def attributes(value: Ref): Seq[Attribute.Value[_]] = Seq(
-    targetAttribute.withValue(value.target),
-    renditionAttribute.withValue(value.rendition)
+  override protected val antiparser: Antiparser[Ref] = Antiparser(
+    attributes = value => Seq(
+      targetAttribute.withValue(value.target),
+      renditionAttribute.withValue(value.rendition)
+    ),
+    content = _.text
   )
-
-  override protected def content(value: Ref): Seq[Node] =
-    value.text
 
   def toXml(
     target: Seq[String],

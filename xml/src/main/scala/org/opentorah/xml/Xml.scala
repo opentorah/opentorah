@@ -43,6 +43,7 @@ object Xml extends Model[Node] {
   override def asText(node: Node): Text    = node.asInstanceOf[Text]
   override def getText(text: Text): String = text.text
 
+  // TODO mkText - Antiparser?
   override def mkText(text: String, seed: Node): Text = mkText(text)
   def mkText(text: String): Text = new scala.xml.Text(text)
 

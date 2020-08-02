@@ -12,9 +12,9 @@ final class Antiparser[A] private(
     content compose f
   )
 
-  def mkElement(name: String, parsed: A): Xml.Element = Xml.mkElement(name,
-    attributes(parsed),
-    content(parsed)
+  def mkElement(name: String, value: A): Xml.Element = Xml.mkElement(name,
+    attributes(value),
+    content(value)
   )
 }
 

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, ContentType, Element, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser}
 import scala.xml.Node
 
 final case class Date(
@@ -26,11 +26,11 @@ object Date extends Element.WithToXml[Date]("date") {
     xml
   )
 
-  override protected def attributes(value: Date): Seq[Attribute.Value[_]] = Seq(
-    whenAttribute.withValue(value.when),
-    calendarAttribute.withValue(value.calendar)
+  override protected val antiparser: Antiparser[Date] = Antiparser(
+    attributes = value => Seq(
+      whenAttribute.withValue(value.when),
+      calendarAttribute.withValue(value.calendar)
+    ),
+    content = _.xml
   )
-
-  override protected def content(value: Date): Seq[Node] =
-    value.xml
 }

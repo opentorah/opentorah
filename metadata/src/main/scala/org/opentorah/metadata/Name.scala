@@ -1,7 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Attribute, ContentType, Element, Parser, Text}
-import scala.xml.Elem
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser, Text}
 
 final case class Name(name: String, languageSpec: LanguageSpec) {
   def satisfies(spec: LanguageSpec): Boolean = {
@@ -31,9 +30,9 @@ object Name extends Element.WithToXml[Name]("name") {
   def apply(name: String): Name =
     new Name(name, LanguageSpec.empty)
 
-  override protected def attributes(name: Name): Seq[Attribute.Value[_]] =
-    Seq(nAttribute.withValue(name.name)) ++
-    LanguageSpec.attributes(name.languageSpec)
-
-  override protected def content(value: Name): Seq[Elem] = Seq.empty
+  override protected val antiparser: Antiparser[Name] = Antiparser(
+    attributes = value =>
+      Seq(nAttribute.withValue(value.name)) ++
+      LanguageSpec.attributes(value.languageSpec) // TODO direct use of Antiparser.attributes.
+    )
 }

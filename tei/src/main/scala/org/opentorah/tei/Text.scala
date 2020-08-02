@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parser}
-import scala.xml.Elem
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parser}
 
 final case class Text(
   lang: Option[String],
@@ -12,7 +11,7 @@ object Text extends Element.WithToXml[Text]("text") {
 
   private val xmlLangAttribute: Attribute[String] = Attribute("xml:lang")
 
-  override protected def parser: Parser[Text] = for {
+  override protected val parser: Parser[Text] = for {
     lang <- xmlLangAttribute.optional
     body <- Body.parsable.required
   } yield new Text(
@@ -20,10 +19,8 @@ object Text extends Element.WithToXml[Text]("text") {
     body
   )
 
-  override protected def attributes(value: Text): Seq[Attribute.Value[_]] = Seq(
-    xmlLangAttribute.withValue(value.lang)
+  override protected val antiparser: Antiparser[Text] = Antiparser(
+    attributes = value => Seq(xmlLangAttribute.withValue(value.lang)),
+    content = value => Seq(Body.parsable.toXml(value.body))
   )
-
-  override protected def content(value: Text): Seq[Elem] =
-    Seq(Body.parsable.toXml(value.body))
 }

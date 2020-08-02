@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parser}
+import org.opentorah.xml.{Antiparser, Element, Parser}
 import scala.xml.Node
 
 final case class Creation(
@@ -18,8 +18,7 @@ object Creation extends Element.WithToXml[Creation]("creation") {
     xml
   )
 
-  override protected def attributes(value: Creation): Seq[Attribute.Value[_]] = Seq.empty
-
-  override protected def content(value: Creation): Seq[Node] =
-    Seq(Date.toXml(value.date)) ++ value.xml
+  override protected val antiparser: Antiparser[Creation] = Antiparser(
+    content = value => Seq(Date.toXml(value.date)) ++ value.xml
+  )
 }

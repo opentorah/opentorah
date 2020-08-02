@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parser}
-import scala.xml.Elem
+import org.opentorah.xml.{Antiparser, Element, Parser}
 
 final case class TeiHeader(
   fileDesc: FileDesc,
@@ -13,7 +12,7 @@ final case class TeiHeader(
 
 object TeiHeader extends Element.WithToXml[TeiHeader]("teiHeader") {
 
-  override protected def parser: Parser[TeiHeader] = for {
+  override protected val parser: Parser[TeiHeader] = for {
     fileDesc <- FileDesc.required
     encodingDesc <- EncodingDesc.parsable.optional
     profileDesc <- ProfileDesc.optional
@@ -27,14 +26,14 @@ object TeiHeader extends Element.WithToXml[TeiHeader]("teiHeader") {
     revisionDesc
   )
 
-  override protected def attributes(value: TeiHeader): Seq[Attribute.Value[_]] = Seq.empty
-
-  override protected def content(value: TeiHeader): Seq[Elem] =
-    Seq(FileDesc.toXml(value.fileDesc)) ++
-    EncodingDesc.parsable.toXml(value.encodingDesc) ++
-    ProfileDesc.toXml(value.profileDesc) ++
-    XenoData.parsable.toXml(value.xenoData) ++
-    RevisionDesc.parsable.toXml(value.revisionDesc)
+  override protected val antiparser: Antiparser[TeiHeader] = Antiparser(
+    content = value =>
+      Seq(FileDesc.toXml(value.fileDesc)) ++
+      EncodingDesc.parsable.toXml(value.encodingDesc) ++
+      ProfileDesc.toXml(value.profileDesc) ++
+      XenoData.parsable.toXml(value.xenoData) ++
+      RevisionDesc.parsable.toXml(value.revisionDesc)
+  )
 
   def apply(): TeiHeader = new TeiHeader(
     fileDesc = FileDesc(),

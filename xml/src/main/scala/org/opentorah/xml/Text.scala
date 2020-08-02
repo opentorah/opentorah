@@ -1,7 +1,5 @@
 package org.opentorah.xml
 
-import scala.xml.Node
-
 final class Text extends Requireable[String] {
   override def toString: String = s"element text"
 
@@ -18,10 +16,9 @@ object Text {
 
     override protected def parser: Parser[String] = Text().required
 
-    override protected def attributes(value: String): Seq[Attribute.Value[_]] = Seq.empty
-
-    override protected def content(value: String): Seq[Node] =
-      Seq(Xml.mkText(value))
+    override protected def antiparser: Antiparser[String] = Antiparser(
+      content = value => Seq(Xml.mkText(value))
+    )
   }
 
   def apply(): Text = new Text

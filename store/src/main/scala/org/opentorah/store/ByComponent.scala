@@ -2,7 +2,7 @@ package org.opentorah.store
 
 import java.net.URL
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Parser, PrettyPrinter, Text}
+import org.opentorah.xml.{Antiparser, Attribute, Parser, PrettyPrinter, Text}
 import zio.ZIO
 import scala.xml.Elem
 
@@ -100,9 +100,8 @@ class ByComponent extends Component("by") {
 
     override protected def parser: Parser[Seq[String]] = Text("file").all
 
-    override protected def attributes(value: Seq[String]): Seq[Attribute.Value[_]] = Seq.empty
-
-    override protected def content(value: Seq[String]): Seq[Elem] =
-      for (file <- value) yield <file>{file}</file>
+    override protected def antiparser: Antiparser[Seq[String]] = Antiparser(
+      content = value => for (file <- value) yield <file>{file}</file>
+    )
   }
 }

@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, ContentType, Element, Parser}
-import scala.xml.Elem
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser}
 
 final case class Pb(
   n: String,
@@ -20,7 +19,7 @@ object Pb extends Element.WithToXml[Pb]("pb") {
 
   override protected def contentType: ContentType = ContentType.Empty
 
-  override protected def parser: Parser[Pb] = for {
+  override protected val parser: Parser[Pb] = for {
     n <- nAttribute.required
     id <- Attribute.id.optional
     facs <- facsAttribute.optional
@@ -34,13 +33,13 @@ object Pb extends Element.WithToXml[Pb]("pb") {
     isEmpty
   )
 
-  override protected def attributes(value: Pb): Seq[Attribute.Value[_]] = Seq(
-    nAttribute.withValue(value.n),
-    Attribute.id.withValue(value.id),
-    facsAttribute.withValue(value.facs),
-    missingAttribute.withNonDefaultValue(value.isMissing),
-    emptyAttribute.withNonDefaultValue(value.isEmpty)
+  override protected val antiparser: Antiparser[Pb] = Antiparser(
+    attributes = value => Seq(
+      nAttribute.withValue(value.n),
+      Attribute.id.withValue(value.id),
+      facsAttribute.withValue(value.facs),
+      missingAttribute.withNonDefaultValue(value.isMissing),
+      emptyAttribute.withNonDefaultValue(value.isEmpty)
+    )
   )
-
-  override protected def content(value: Pb): Seq[Elem] = Seq.empty
 }

@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Namespace, Parser, PrettyPrinter, Xml}
-import scala.xml.{Elem, Node}
+import org.opentorah.xml.{Antiparser, Element, Namespace, Parser, PrettyPrinter, Xml}
+import scala.xml.Node
 
 final case class Tei(
   teiHeader: TeiHeader,
@@ -26,7 +26,7 @@ object Tei extends Element.WithToXml[Tei]("TEI") {
 
   type Transformer = Tei => Tei
 
-  override protected def parser: Parser[Tei] = for {
+  override protected val parser: Parser[Tei] = for {
     teiHeader <- TeiHeader.required
     text <- Text.required
   } yield new Tei(
@@ -34,13 +34,12 @@ object Tei extends Element.WithToXml[Tei]("TEI") {
     text
   )
 
-  override protected def attributes(value: Tei): Seq[Attribute.Value[_]] = Seq(
-    Namespace.Tei.xmlnsAttribute
-  )
-
-  override protected def content(value: Tei): Seq[Elem] = Seq(
-    Xml.removeNamespace(TeiHeader.toXml(value.teiHeader)),
-    Xml.removeNamespace(Text.toXml(value.text))
+  override protected val antiparser: Antiparser[Tei] = Antiparser(
+    attributes = _ => Seq(Namespace.Tei.xmlnsAttribute),
+    content = value => Seq(
+      Xml.removeNamespace(TeiHeader.toXml(value.teiHeader)),
+      Xml.removeNamespace(Text.toXml(value.text))
+    )
   )
 
   def apply(body: Seq[Node]): Tei = new Tei(

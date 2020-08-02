@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parser}
-import scala.xml.Elem
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parser}
 
 final case class Editor(
   role: Option[String],
@@ -20,10 +19,8 @@ object Editor extends Element.WithToXml[Editor]("editor") {
     persName
   )
 
-  override protected def attributes(value: Editor): Seq[Attribute.Value[_]] = Seq(
-    roleAttribute.withValue(value.role)
+  override protected val antiparser: Antiparser[Editor] = Antiparser(
+    attributes = value => Seq(roleAttribute.withValue(value.role)),
+    content = value => value.persName.toSeq.map(EntityReference.toXml)
   )
-
-  override protected def content(value: Editor): Seq[Elem] =
-    value.persName.toSeq.map(EntityReference.toXml)
 }

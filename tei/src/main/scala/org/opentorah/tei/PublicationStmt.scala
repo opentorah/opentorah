@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parser}
-import scala.xml.Elem
+import org.opentorah.xml.{Antiparser, Element, Parser}
 
 final case class PublicationStmt(
   publisher: Option[Publisher.Value],
@@ -10,7 +9,7 @@ final case class PublicationStmt(
 
 object PublicationStmt extends Element.WithToXml[PublicationStmt]("publicationStmt") {
 
-  override protected def parser: Parser[PublicationStmt] = for {
+  override protected val parser: Parser[PublicationStmt] = for {
     publisher <- Publisher.parsable.optional
     availability <- Availability.optional
   } yield new PublicationStmt(
@@ -18,11 +17,11 @@ object PublicationStmt extends Element.WithToXml[PublicationStmt]("publicationSt
     availability
   )
 
-  override protected def attributes(value: PublicationStmt): Seq[Attribute.Value[_]] = Seq.empty
-
-  override protected def content(value: PublicationStmt): Seq[Elem] =
-    Publisher.parsable.toXml(value.publisher) ++
-    Availability.toXml(value.availability)
+  override protected val antiparser: Antiparser[PublicationStmt] = Antiparser(
+    content = value =>
+      Publisher.parsable.toXml(value.publisher) ++
+      Availability.toXml(value.availability)
+  )
 
   def apply(): PublicationStmt = new PublicationStmt(
     publisher = None,

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parser}
+import org.opentorah.xml.{Antiparser, Element, Parser}
 import scala.xml.Elem
 
 final case class TitleStmt(
@@ -37,7 +37,7 @@ object TitleStmt extends Element.WithToXml[TitleStmt]("titleStmt") {
     respStmts = Seq.empty
   )
 
-  override protected def parser: Parser[TitleStmt] = for {
+  override protected val parser: Parser[TitleStmt] = for {
     titles <- Title.parsable.all
     authors <- Author.parsable.all
     editors <- Editor.all
@@ -55,14 +55,14 @@ object TitleStmt extends Element.WithToXml[TitleStmt]("titleStmt") {
     respStmts
   )
 
-  override protected def attributes(value: TitleStmt): Seq[Attribute.Value[_]] = Seq.empty
-
-  override protected def content(value: TitleStmt): Seq[Elem] =
-    Title.parsable.toXml(value.titles) ++
-    Author.parsable.toXml(value.authors) ++
-    Editor.toXml(value.editors) ++
-    Sponsor.parsable.toXml(value.sponsors) ++
-    Funder.parsable.toXml(value.funders) ++
-    Principal.parsable.toXml(value.principals) ++
-    RespStmt.parsable.toXml(value.respStmts)
+  override protected val antiparser: Antiparser[TitleStmt] = Antiparser(
+    content = value =>
+      Title.parsable.toXml(value.titles) ++
+      Author.parsable.toXml(value.authors) ++
+      Editor.toXml(value.editors) ++
+      Sponsor.parsable.toXml(value.sponsors) ++
+      Funder.parsable.toXml(value.funders) ++
+      Principal.parsable.toXml(value.principals) ++
+      RespStmt.parsable.toXml(value.respStmts)
+  )
 }

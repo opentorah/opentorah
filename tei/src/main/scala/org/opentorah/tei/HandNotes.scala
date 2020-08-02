@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parser}
-import scala.xml.Elem
+import org.opentorah.xml.{Antiparser, Element, Parser}
 
 final case class HandNotes(
   handNotes: Seq[HandNote.Value]
@@ -18,8 +17,7 @@ object HandNotes extends Element.WithToXml[HandNotes]("handNotes") {
     handNotes
   )
 
-  override protected def attributes(value: HandNotes): Seq[Attribute.Value[_]] = Seq.empty
-
-  override protected def content(value: HandNotes): Seq[Elem] =
-    HandNote.parsable.toXml(value.handNotes)
+  override protected val antiparser: Antiparser[HandNotes] = Antiparser(
+    content = value => HandNote.parsable.toXml(value.handNotes)
+  )
 }

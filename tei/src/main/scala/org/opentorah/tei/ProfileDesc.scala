@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Choice, Element, Parser}
-import scala.xml.Elem
+import org.opentorah.xml.{Antiparser, Choice, Element, Parser}
 
 final case class ProfileDesc(
   documentAbstract: Option[Abstract.Value],
@@ -46,17 +45,17 @@ object ProfileDesc extends Element.WithToXml[ProfileDesc]("profileDesc") {
     listTranspose
   )
 
-  override protected def attributes(value: ProfileDesc): Seq[Attribute.Value[_]] = Seq.empty
-
-  override protected def content(value: ProfileDesc): Seq[Elem] =
-    Abstract.parsable.toXml(value.documentAbstract) ++
-    Creation.toXml(value.creation) ++
-    LangUsage.toXml(value.langUsage) ++
-    TextClass.parsable.toXml(value.textClass) ++
-    CorrespDesc.parsable.toXml(value.correspDesc) ++
-    CalendarDesc.parsable.toXml(value.calendarDesc) ++
-    HandNotes.toXml(value.handNotes) ++
-    ListTranspose.parsable.toXml(value.listTranspose)
+  override protected val antiparser: Antiparser[ProfileDesc] = Antiparser(
+    content = value =>
+      Abstract.parsable.toXml(value.documentAbstract) ++
+      Creation.toXml(value.creation) ++
+      LangUsage.toXml(value.langUsage) ++
+      TextClass.parsable.toXml(value.textClass) ++
+      CorrespDesc.parsable.toXml(value.correspDesc) ++
+      CalendarDesc.parsable.toXml(value.calendarDesc) ++
+      HandNotes.toXml(value.handNotes) ++
+      ListTranspose.parsable.toXml(value.listTranspose)
+  )
 
   def apply(): ProfileDesc = new ProfileDesc(
     documentAbstract = None,

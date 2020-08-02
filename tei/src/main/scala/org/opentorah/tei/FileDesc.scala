@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parser}
-import scala.xml.Elem
+import org.opentorah.xml.{Antiparser, Element, Parser}
 
 // PublicationStmt and SourceDesc are mandatory (TEI Guidelines),
 // but I made them optional so that they can be removed from the editable pre-TEI files
@@ -36,16 +35,16 @@ object FileDesc extends Element.WithToXml[FileDesc]("fileDesc") {
     sourceDesc
   )
 
-  override protected def attributes(value: FileDesc): Seq[Attribute.Value[_]] = Seq.empty
-
-  override protected def content(value: FileDesc): Seq[Elem] =
-    Seq(TitleStmt.toXml(value.titleStmt)) ++
-    EditionStmt.parsable.toXml(value.editionStmt) ++
-    Extent.parsable.toXml(value.extent) ++
-    PublicationStmt.toXml(value.publicationStmt) ++
-    SeriesStmt.parsable.toXml(value.seriesStmt) ++
-    NotesStmt.parsable.toXml(value.notesStmt) ++
-    SourceDesc.parsable.toXml(value.sourceDesc)
+  override protected val antiparser: Antiparser[FileDesc] = Antiparser(
+    content = value =>
+      Seq(TitleStmt.toXml(value.titleStmt)) ++
+      EditionStmt.parsable.toXml(value.editionStmt) ++
+      Extent.parsable.toXml(value.extent) ++
+      PublicationStmt.toXml(value.publicationStmt) ++
+      SeriesStmt.parsable.toXml(value.seriesStmt) ++
+      NotesStmt.parsable.toXml(value.notesStmt) ++
+      SourceDesc.parsable.toXml(value.sourceDesc)
+  )
 
   def apply(): FileDesc = new FileDesc(
     titleStmt = TitleStmt(),

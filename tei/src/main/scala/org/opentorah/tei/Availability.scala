@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parser}
 import scala.xml.Node
 
 final case class Availability(
@@ -20,10 +20,8 @@ object Availability extends Element.WithToXml[Availability]("availability") {
     xml
   )
 
-  override protected def attributes(value: Availability): Seq[Attribute.Value[_]] = Seq(
-    Attribute("status").withValue(value.status)
+  override protected val antiparser: Antiparser[Availability] = Antiparser(
+    attributes = value => Seq(statusAttribute.withValue(value.status)),
+    content = _.xml
   )
-
-  override protected def content(value: Availability): Seq[Node] =
-    value.xml
 }

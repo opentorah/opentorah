@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parser}
-import scala.xml.Elem
+import org.opentorah.xml.{Antiparser, Element, Parser}
 
 final case class LangUsage(
   languages: Seq[Language]
@@ -15,8 +14,7 @@ object LangUsage extends Element.WithToXml[LangUsage]("langUsage") {
     languages
   )
 
-  override protected def attributes(value: LangUsage): Seq[Attribute.Value[_]] = Seq.empty
-
-  override protected def content(value: LangUsage): Seq[Elem] =
-    Language.toXml(value.languages)
+  override protected val antiparser: Antiparser[LangUsage] = Antiparser(
+    content = value => Language.toXml(value.languages)
+  )
 }

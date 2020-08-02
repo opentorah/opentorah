@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, ToXml, Xml}
-import scala.xml.Node
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, ToXml, Xml}
 
 final class EntityName private(
   val entityType: EntityType,
@@ -23,9 +22,8 @@ object EntityName extends ToXml[EntityName] {
 
   override protected def elementName(value: EntityName): String = value.entityType.nameElement
 
-  override protected def attributes(value: EntityName): Seq[Attribute.Value[_]] = Seq(
-    Attribute.id.withValue(value.id)
+  override protected val antiparser: Antiparser[EntityName] = Antiparser(
+    attributes = value => Seq(Attribute.id.withValue(value.id)),
+    content = value => Seq(Xml.mkText(value.name))
   )
-
-  override protected def content(value: EntityName): Seq[Node] = Seq(Xml.mkText(value.name))
 }
