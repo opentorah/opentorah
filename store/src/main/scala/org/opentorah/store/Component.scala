@@ -4,7 +4,6 @@ import java.net.URL
 import org.opentorah.util.Files
 import org.opentorah.xml.{Antiparser, Attribute, Parser}
 import zio.ZIO
-import scala.xml.Node
 
 abstract class Component(elementName: String) {
 
@@ -38,11 +37,11 @@ abstract class Component(elementName: String) {
     override protected def antiparser: Antiparser[Element] = Antiparser(
       attributes = {
         case FromFile(file) => Component.fileAttribute.toAntiparser.attributes(file)
-        case inline => inlineAttributes(inline.asInstanceOf[Inline])
+        case inline => inlineAntiparser.attributes(inline.asInstanceOf[Inline])
       },
       content = {
         case FromFile(_) => Seq.empty
-        case inline => inlineContent(inline.asInstanceOf[Inline])
+        case inline => inlineAntiparser.content(inline.asInstanceOf[Inline])
       }
     )
   }
@@ -51,11 +50,7 @@ abstract class Component(elementName: String) {
 
   def inlineParser(className: Option[String]): Parser[Inline]
 
-  // TODO merge into an Antiparser
-
-  protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]]
-
-  protected def inlineContent(value: Inline): Seq[Node]
+  protected def inlineAntiparser: Antiparser[Inline]
 
   final type Creator[+R] = (
     /* inheritedSelectors: */ Seq[Selector],

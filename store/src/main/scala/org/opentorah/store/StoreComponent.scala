@@ -3,8 +3,7 @@ package org.opentorah.store
 import java.net.URL
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Title}
-import org.opentorah.xml.{Attribute, Parser, PrettyPrinter}
-import scala.xml.Node
+import org.opentorah.xml.{Antiparser, Attribute, Parser, PrettyPrinter}
 
 class StoreComponent extends Component("store") {
 
@@ -47,19 +46,17 @@ class StoreComponent extends Component("store") {
     className
   )
 
-  override protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]] =
-    Names.antiparser.compose[Inline](_.names).attributes(value) ++
-    fromAttribute.toAntiparserOption.compose[Inline](_.from).attributes(value) ++
-    Component.typeAttribute.toAntiparserOption.compose[Inline](_.className).attributes(value)
-
-  override protected def inlineContent(value: Inline): Seq[Node] =
-    Names.antiparser.compose[Inline](_.names).content(value) ++
-    Title.parsable.elementAntiparserOption.compose[Inline](_.title).content(value) ++
-    Abstract.parsable.elementAntiparserOption.compose[Inline](_.storeAbstract).content(value) ++
-    Body.parsable.elementAntiparserOption.compose[Inline](_.body).content(value) ++
-    Selector.elementAntiparserSeq.compose[Inline](_.selectors).content(value) ++
-    Entities.parsable.elementAntiparserOption.compose[Inline](_.entities).content(value) ++
-    By.parsable.elementAntiparserOption.compose[Inline](_.by).content(value)
+  override protected val inlineAntiparser: Antiparser[Inline] = Antiparser(
+    Names.antiparser.compose(_.names),
+    fromAttribute.toAntiparserOption.compose(_.from),
+    Component.typeAttribute.toAntiparserOption.compose(_.className),
+    Title.parsable.elementAntiparserOption.compose(_.title),
+    Abstract.parsable.elementAntiparserOption.compose(_.storeAbstract),
+    Body.parsable.elementAntiparserOption.compose(_.body),
+    Selector.elementAntiparserSeq.compose(_.selectors),
+    Entities.parsable.elementAntiparserOption.compose(_.entities),
+    By.parsable.elementAntiparserOption.compose(_.by)
+  )
 
   class FromElement(
     inheritedSelectors: Seq[Selector],

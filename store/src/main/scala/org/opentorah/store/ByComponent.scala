@@ -4,7 +4,6 @@ import java.net.URL
 import org.opentorah.util.Files
 import org.opentorah.xml.{Antiparser, Attribute, Parser, PrettyPrinter, Text}
 import zio.ZIO
-import scala.xml.Node
 
 class ByComponent extends Component("by") {
 
@@ -37,14 +36,13 @@ class ByComponent extends Component("by") {
     className
   )
 
-  override protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]] =
-    selectorAttribute.toAntiparser.compose[Inline](_.selector).attributes(value) ++
-    directoryAttribute.toAntiparserOption.compose[Inline](_.directory).attributes(value) ++
-    listAttribute.toAntiparserOption.compose[Inline](_.list).attributes(value) ++
-    Component.typeAttribute.toAntiparserOption.compose[Inline](_.className).attributes(value)
-
-  override protected def inlineContent(value: Inline): Seq[Node] =
-    Store.parsable.elementAntiparserSeq.compose[Inline](_.stores).content(value)
+  override protected def inlineAntiparser: Antiparser[Inline] = Antiparser(
+    selectorAttribute.toAntiparser.compose(_.selector),
+    directoryAttribute.toAntiparserOption.compose(_.directory),
+    listAttribute.toAntiparserOption.compose(_.list),
+    Component.typeAttribute.toAntiparserOption.compose(_.className),
+    Store.parsable.elementAntiparserSeq.compose(_.stores)
+  )
 
   abstract class FromElement[+S <: Store](
     inheritedSelectors: Seq[Selector],
