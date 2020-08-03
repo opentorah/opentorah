@@ -27,7 +27,7 @@ object Redirect {
     override protected def elementName(value: Redirect): String = name
 
     override protected def antiparser: Antiparser[Redirect] = Antiparser(
-      fileAttribute.toAntiparser.premap[Redirect](_.file)
+      fileAttribute.toAntiparser.compose[Redirect](_.file)
     )
   }
 }

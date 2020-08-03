@@ -52,9 +52,9 @@ object Entities {
     )
 
     override protected val antiparser: Antiparser[Element] = Antiparser(
-      selectorAttribute.toAntiparser.premap(_.selector),
-      By.parsable.elementAntiparser.premap(_.by),
-      EntitiesList.elementAntiparserSeq.premap(_.lists)
+      selectorAttribute.toAntiparser.compose(_.selector),
+      By.parsable.elementAntiparser.compose(_.by),
+      EntitiesList.elementAntiparserSeq.compose(_.lists)
     )
   }
 

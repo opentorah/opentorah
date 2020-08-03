@@ -20,7 +20,7 @@ object Text extends Element.WithToXml[Text]("text") {
   )
 
   override protected val antiparser: Antiparser[Text] = Antiparser(
-    xmlLangAttribute.toAntiparserOption.premap[Text](_.lang),
-    Body.parsable.elementAntiparser.premap[Text](_.body)
+    xmlLangAttribute.toAntiparserOption.compose[Text](_.lang),
+    Body.parsable.elementAntiparser.compose[Text](_.body)
   )
 }

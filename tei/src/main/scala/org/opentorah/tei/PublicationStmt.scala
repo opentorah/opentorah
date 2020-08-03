@@ -18,9 +18,9 @@ object PublicationStmt extends Element.WithToXml[PublicationStmt]("publicationSt
   )
 
   override protected val antiparser: Antiparser[PublicationStmt] = Antiparser(
-    // TODO why do I need [T] for the premap() calls here?
-    Publisher.parsable.elementAntiparserOption.premap[PublicationStmt](_.publisher),
-    Availability.elementAntiparserOption.premap[PublicationStmt](_.availability)
+    // TODO why do I need [T] for the compose() calls here?
+    Publisher.parsable.elementAntiparserOption.compose[PublicationStmt](_.publisher),
+    Availability.elementAntiparserOption.compose[PublicationStmt](_.availability)
   )
 
   def apply(): PublicationStmt = new PublicationStmt(

@@ -21,8 +21,8 @@ object Availability extends Element.WithToXml[Availability]("availability") {
   )
 
   override protected val antiparser: Antiparser[Availability] = Antiparser(
-    // TODO why can't I remove [T] from premap() calls here?
-    statusAttribute.toAntiparserOption.premap[Availability](_.status),
-    Antiparser.xml.premap[Availability](_.xml)
+    // TODO why can't I remove [T] from compose() calls here?
+    statusAttribute.toAntiparserOption.compose[Availability](_.status),
+    Antiparser.xml.compose[Availability](_.xml)
   )
 }

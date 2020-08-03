@@ -37,15 +37,14 @@ class ByComponent extends Component("by") {
     className
   )
 
-  override protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]] = Seq(
-    selectorAttribute.withValue(value.selector),
-    directoryAttribute.withValue(value.directory),
-    listAttribute.withValue(value.list),
-    Component.typeAttribute.withValue(value.className)
-  )
+  override protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]] =
+    selectorAttribute.toAntiparser.compose[Inline](_.selector).attributes(value) ++
+    directoryAttribute.toAntiparserOption.compose[Inline](_.directory).attributes(value) ++
+    listAttribute.toAntiparserOption.compose[Inline](_.list).attributes(value) ++
+    Component.typeAttribute.toAntiparserOption.compose[Inline](_.className).attributes(value)
 
   override protected def inlineContent(value: Inline): Seq[Node] =
-    Store.parsable.elementAntiparserSeq.premap[Inline](_.stores).content(value)
+    Store.parsable.elementAntiparserSeq.compose[Inline](_.stores).content(value)
 
   abstract class FromElement[+S <: Store](
     inheritedSelectors: Seq[Selector],
@@ -101,7 +100,7 @@ class ByComponent extends Component("by") {
     override protected def parser: Parser[Seq[String]] = Text("file").all
 
     override protected def antiparser: Antiparser[Seq[String]] = Antiparser(
-      content = value => for (file <- value) yield <file>{file}</file>
+      Antiparser.xml.compose[Seq[String]](value => for (file <- value) yield <file>{file}</file>)
     )
   }
 }

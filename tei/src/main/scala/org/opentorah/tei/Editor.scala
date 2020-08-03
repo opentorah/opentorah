@@ -20,7 +20,7 @@ object Editor extends Element.WithToXml[Editor]("editor") {
   )
 
   override protected val antiparser: Antiparser[Editor] = Antiparser(
-    roleAttribute.toAntiparserOption.premap[Editor](_.role),
-    EntityReference.elementAntiparserOption.premap[Editor](_.persName)
+    roleAttribute.toAntiparserOption.compose[Editor](_.role),
+    EntityReference.elementAntiparserOption.compose[Editor](_.persName)
   )
 }

@@ -8,7 +8,6 @@ trait ToXml[A] {
 
   protected def antiparser: Antiparser[A]
 
-  // TODO remove
   final def toXml(value: A): Elem = ToXml.mkElement(
     elementName(value),
     antiparser.attributes(value),
@@ -41,7 +40,8 @@ object ToXml {
         current.attribute.name,
         current.valueToString.orNull,
         result
-      )},
+      )
+    },
     child = content
   )
 }

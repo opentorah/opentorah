@@ -21,7 +21,7 @@ abstract class ComponentNg(val elementName: String) {
 
     override protected def antiparser: Antiparser[Instance] = Antiparser(
       attributes = value =>
-        ComponentNg.typeAttribute.toAntiparser.premap[Instance](value => Util.getSingletonClassName(value.companion)).attributes(value) ++
+        ComponentNg.typeAttribute.toAntiparser.compose[Instance](value => Util.getSingletonClassName(value.companion)).attributes(value) ++
         attributes(value),
       content = ComponentNg.this.content
     )

@@ -18,7 +18,7 @@ object HandNotes extends Element.WithToXml[HandNotes]("handNotes") {
   )
 
   override protected val antiparser: Antiparser[HandNotes] = Antiparser(
-    // TODO why do I need [] in premap() here?
-    HandNote.parsable.elementAntiparserSeq.premap[HandNotes](_.handNotes)
+    // TODO why do I need [] in compose() here?
+    HandNote.parsable.elementAntiparserSeq.compose[HandNotes](_.handNotes)
   )
 }

@@ -37,7 +37,7 @@ abstract class Component(elementName: String) {
 
     override protected def antiparser: Antiparser[Element] = Antiparser(
       attributes = {
-        case FromFile(file) => Seq(Component.fileAttribute.withValue(file))
+        case FromFile(file) => Component.fileAttribute.toAntiparser.attributes(file)
         case inline => inlineAttributes(inline.asInstanceOf[Inline])
       },
       content = {
@@ -50,6 +50,8 @@ abstract class Component(elementName: String) {
   private def delegate(className: String): Option[Component] = None
 
   def inlineParser(className: Option[String]): Parser[Inline]
+
+  // TODO merge into an Antiparser
 
   protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]]
 

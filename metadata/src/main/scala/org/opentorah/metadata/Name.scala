@@ -31,8 +31,8 @@ object Name extends Element.WithToXml[Name]("name") {
     new Name(name, LanguageSpec.empty)
 
   override protected val antiparser: Antiparser[Name] = Antiparser(
-    // TODO why can't I remove [T] from premap() calls here?
-    nAttribute.toAntiparser.premap[Name](_.name),
-    LanguageSpec.antiparser.premap[Name](_.languageSpec)
+    // TODO why can't I remove [T] from compose() calls here?
+    nAttribute.toAntiparser.compose[Name](_.name),
+    LanguageSpec.antiparser.compose[Name](_.languageSpec)
   )
 }

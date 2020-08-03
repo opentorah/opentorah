@@ -28,9 +28,9 @@ object Ref extends Element.WithToXml[Ref]("ref") {
   )
 
   override protected val antiparser: Antiparser[Ref] = Antiparser(
-    targetAttribute.toAntiparser.premap(_.target),
-    renditionAttribute.toAntiparserOption.premap(_.rendition),
-    Antiparser.xml.premap(_.text)
+    targetAttribute.toAntiparser.compose(_.target),
+    renditionAttribute.toAntiparserOption.compose(_.rendition),
+    Antiparser.xml.compose(_.text)
   )
 
   def toXml(

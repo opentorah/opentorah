@@ -48,19 +48,18 @@ class StoreComponent extends Component("store") {
   )
 
   override protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]] =
-    Names.antiparser.attributes(value.names) ++ Seq(
-      fromAttribute.withValue(value.from),
-      Component.typeAttribute.withValue(value.className)
-    )
+    Names.antiparser.compose[Inline](_.names).attributes(value) ++
+    fromAttribute.toAntiparserOption.compose[Inline](_.from).attributes(value) ++
+    Component.typeAttribute.toAntiparserOption.compose[Inline](_.className).attributes(value)
 
   override protected def inlineContent(value: Inline): Seq[Node] =
-    Names.antiparser.premap[Inline](_.names).content(value) ++
-    Title.parsable.elementAntiparserOption.premap[Inline](_.title).content(value) ++
-    Abstract.parsable.elementAntiparserOption.premap[Inline](_.storeAbstract).content(value) ++
-    Body.parsable.elementAntiparserOption.premap[Inline](_.body).content(value) ++
-    Selector.elementAntiparserSeq.premap[Inline](_.selectors).content(value) ++
-    Entities.parsable.elementAntiparserOption.premap[Inline](_.entities).content(value) ++
-    By.parsable.elementAntiparserOption.premap[Inline](_.by).content(value)
+    Names.antiparser.compose[Inline](_.names).content(value) ++
+    Title.parsable.elementAntiparserOption.compose[Inline](_.title).content(value) ++
+    Abstract.parsable.elementAntiparserOption.compose[Inline](_.storeAbstract).content(value) ++
+    Body.parsable.elementAntiparserOption.compose[Inline](_.body).content(value) ++
+    Selector.elementAntiparserSeq.compose[Inline](_.selectors).content(value) ++
+    Entities.parsable.elementAntiparserOption.compose[Inline](_.entities).content(value) ++
+    By.parsable.elementAntiparserOption.compose[Inline](_.by).content(value)
 
   class FromElement(
     inheritedSelectors: Seq[Selector],

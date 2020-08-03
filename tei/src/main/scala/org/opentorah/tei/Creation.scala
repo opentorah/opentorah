@@ -19,7 +19,7 @@ object Creation extends Element.WithToXml[Creation]("creation") {
   )
 
   override protected val antiparser: Antiparser[Creation] = Antiparser(
-    Date.elementAntiparser.premap[Creation](_.date),
-    Antiparser.xml.premap[Creation](_.xml)
+    Date.elementAntiparser.compose[Creation](_.date),
+    Antiparser.xml.compose[Creation](_.xml)
   )
 }
