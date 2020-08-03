@@ -36,7 +36,7 @@ abstract class Component(elementName: String) {
 
     override protected def antiparser: Antiparser[Element] = Antiparser(
       attributes = {
-        case FromFile(file) => Component.fileAttribute.toAntiparser.attributes(file)
+        case FromFile(file) => Component.fileAttribute.toXml.attributes(file)
         case inline => inlineAntiparser.attributes(inline.asInstanceOf[Inline])
       },
       content = {

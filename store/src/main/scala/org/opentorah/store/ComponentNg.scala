@@ -14,14 +14,14 @@ abstract class ComponentNg(val elementName: String) {
     inheritedSelectors: Seq[Selector]
   ): Parser[Instance]
 
-  final def toXml(value: Instance): Elem = toXml.toXml(value)
+  final def toXml(value: Instance): Elem = toXml.toXmlElement(value)
 
   private val toXml: ToXml[Instance] = new ToXml[Instance] {
     override protected def elementName(value: Instance): String = ComponentNg.this.elementName
 
     override protected def antiparser: Antiparser[Instance] = Antiparser(
       attributes = value =>
-        ComponentNg.typeAttribute.toAntiparser.compose[Instance](value => Util.getSingletonClassName(value.companion)).attributes(value) ++
+        ComponentNg.typeAttribute.toXml.compose[Instance](value => Util.getSingletonClassName(value.companion)).attributes(value) ++
         attributes(value),
       content = ComponentNg.this.content
     )

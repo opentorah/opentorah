@@ -37,11 +37,11 @@ class ByComponent extends Component("by") {
   )
 
   override protected def inlineAntiparser: Antiparser[Inline] = Antiparser(
-    selectorAttribute.toAntiparser.compose(_.selector),
-    directoryAttribute.toAntiparserOption.compose(_.directory),
-    listAttribute.toAntiparserOption.compose(_.list),
-    Component.typeAttribute.toAntiparserOption.compose(_.className),
-    Store.parsable.elementAntiparserSeq.compose(_.stores)
+    selectorAttribute.toXml.compose(_.selector),
+    directoryAttribute.toXmlOption.compose(_.directory),
+    listAttribute.toXmlOption.compose(_.list),
+    Component.typeAttribute.toXmlOption.compose(_.className),
+    Store.parsable.toXmlSeq.compose(_.stores)
   )
 
   abstract class FromElement[+S <: Store](
@@ -72,7 +72,7 @@ class ByComponent extends Component("by") {
           val result: Seq[String] = Files.filesWithExtensions(Files.url2file(directory), "xml").sorted
           if (Files.isFile(list)) Files.write(
             file = Files.url2file(list),
-            content = PrettyPrinter.default.renderXml(filesList.toXml(result))
+            content = PrettyPrinter.default.renderXml(filesList.toXmlElement(result))
           )
           result
         }

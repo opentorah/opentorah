@@ -20,14 +20,14 @@ object Redirect {
 
   def toFile(elementName: String, value: Redirect): ToFile = new ToFile(
     fromUrl = value.fromUrl,
-    element = toXml(elementName).toXml(value)
+    element = toXml(elementName).toXmlElement(value)
   )
 
   private def toXml(name: String): ToXml[Redirect] = new ToXml[Redirect] {
     override protected def elementName(value: Redirect): String = name
 
     override protected def antiparser: Antiparser[Redirect] = Antiparser(
-      fileAttribute.toAntiparser.compose[Redirect](_.file)
+      fileAttribute.toXml.compose[Redirect](_.file)
     )
   }
 }

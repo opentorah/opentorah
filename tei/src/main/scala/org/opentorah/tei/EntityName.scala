@@ -22,7 +22,7 @@ object EntityName extends ToXml[EntityName] {
   override protected def elementName(value: EntityName): String = value.entityType.nameElement
 
   override protected val antiparser: Antiparser[EntityName] = Antiparser(
-    Attribute.id.toAntiparserOption.compose[EntityName](_.id),
+    Attribute.id.toXmlOption.compose[EntityName](_.id),
     Antiparser.xml.compose[EntityName](value => Seq(Xml.mkText(value.name)))
   )
 }

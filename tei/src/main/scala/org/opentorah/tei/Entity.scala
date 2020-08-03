@@ -40,9 +40,9 @@ object Entity extends Parsable[Entity] with ToXml[Entity] {
   override protected def elementName(value: Entity): String = value.entityType.element
 
   override protected val antiparser: Antiparser[Entity] = Antiparser(
-    Attribute.id.toAntiparserOption.compose(_.id),
-    roleAttribute.toAntiparserOption.compose(_.role),
-    EntityName.elementAntiparserSeq.compose(_.names),
+    Attribute.id.toXmlOption.compose(_.id),
+    roleAttribute.toXmlOption.compose(_.role),
+    EntityName.toXmlSeq.compose(_.names),
     Antiparser.xml.compose[Entity](_.content)
   )
 }

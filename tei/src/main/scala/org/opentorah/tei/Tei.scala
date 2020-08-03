@@ -37,8 +37,8 @@ object Tei extends Element.WithToXml[Tei]("TEI") {
   override protected val antiparser: Antiparser[Tei] = Antiparser(
     attributes = _ => Seq(Namespace.Tei.xmlnsAttribute),
     content = value => Seq(
-      Xml.removeNamespace(TeiHeader.toXml(value.teiHeader)),
-      Xml.removeNamespace(Text.toXml(value.text))
+      Xml.removeNamespace(TeiHeader.toXmlElement(value.teiHeader)),
+      Xml.removeNamespace(Text.toXmlElement(value.text))
     )
   )
 

@@ -34,10 +34,10 @@ object Pb extends Element.WithToXml[Pb]("pb") {
   )
 
   override protected val antiparser: Antiparser[Pb] = Antiparser(
-    nAttribute.toAntiparser.compose(_.n),
-    Attribute.id.toAntiparserOption.compose(_.id),
-    facsAttribute.toAntiparserOption.compose(_.facs),
-    missingAttribute.toAntiparserNonDefault.compose(_.isMissing),
-    emptyAttribute.toAntiparserNonDefault.compose(_.isEmpty)
+    nAttribute.toXml.compose(_.n),
+    Attribute.id.toXmlOption.compose(_.id),
+    facsAttribute.toXmlOption.compose(_.facs),
+    missingAttribute.toXmlNonDefault.compose(_.isMissing),
+    emptyAttribute.toXmlNonDefault.compose(_.isEmpty)
   )
 }

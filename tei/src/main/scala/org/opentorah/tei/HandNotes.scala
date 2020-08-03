@@ -19,6 +19,6 @@ object HandNotes extends Element.WithToXml[HandNotes]("handNotes") {
 
   override protected val antiparser: Antiparser[HandNotes] = Antiparser(
     // TODO why do I need [] in compose() here?
-    HandNote.parsable.elementAntiparserSeq.compose[HandNotes](_.handNotes)
+    HandNote.parsable.toXmlSeq.compose[HandNotes](_.handNotes)
   )
 }

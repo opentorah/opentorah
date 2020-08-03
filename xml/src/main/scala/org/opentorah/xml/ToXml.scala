@@ -8,22 +8,22 @@ trait ToXml[A] {
 
   protected def antiparser: Antiparser[A]
 
-  final def toXml(value: A): Elem = ToXml.mkElement(
+  final def toXmlElement(value: A): Elem = ToXml.mkElement(
     elementName(value),
     antiparser.attributes(value),
     antiparser.content(value)
   )
 
-  final val elementAntiparser: Antiparser[A] = Antiparser(
-    content = value => Seq(toXml(value))
+  final val toXml: Antiparser[A] = Antiparser(
+    content = value => Seq(toXmlElement(value))
   )
 
-  final val elementAntiparserOption: Antiparser[Option[A]] = Antiparser(
-    content = _.toSeq.map(toXml)
+  final val toXmlOption: Antiparser[Option[A]] = Antiparser(
+    content = _.toSeq.map(toXmlElement)
   )
 
-  final val elementAntiparserSeq: Antiparser[Seq[A]] = Antiparser(
-    content = _.map(toXml)
+  final val toXmlSeq: Antiparser[Seq[A]] = Antiparser(
+    content = _.map(toXmlElement)
   )
 }
 

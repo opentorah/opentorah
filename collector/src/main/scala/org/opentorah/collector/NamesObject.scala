@@ -19,7 +19,7 @@ final class NamesObject(site: Site) extends SimpleSiteObject(site) {
       <list xml:id={value.id} role={value.role.orNull}>
         <head>{value.head}</head>
         {for (entity <- value.entities) yield {
-        <l>{Ref.toXml(EntityObject.teiWrapperUrl(entity), EntityName.toXml(entity.names.head))}</l>
+        <l>{Ref.toXml(EntityObject.teiWrapperUrl(entity), EntityName.toXmlElement(entity.names.head))}</l>
       }}
       </list>
         .copy(label = value.entityType.listElement)

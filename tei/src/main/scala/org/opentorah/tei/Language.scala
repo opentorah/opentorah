@@ -26,8 +26,8 @@ object Language extends Element.WithToXml[Language]("language") {
   )
 
   override protected val antiparser: Antiparser[Language] = Antiparser(
-    identAttribute.toAntiparser.compose[Language](_.ident),
-    usageAttribute.toAntiparserOption.compose[Language](_.usage),
+    identAttribute.toXml.compose[Language](_.ident),
+    usageAttribute.toXmlOption.compose[Language](_.usage),
     Antiparser.xml.compose[Language](value => value.text.toSeq.map(Xml.mkText))
   )
 }

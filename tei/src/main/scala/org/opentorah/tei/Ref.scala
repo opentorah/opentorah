@@ -28,8 +28,8 @@ object Ref extends Element.WithToXml[Ref]("ref") {
   )
 
   override protected val antiparser: Antiparser[Ref] = Antiparser(
-    targetAttribute.toAntiparser.compose(_.target),
-    renditionAttribute.toAntiparserOption.compose(_.rendition),
+    targetAttribute.toXml.compose(_.target),
+    renditionAttribute.toXmlOption.compose(_.rendition),
     Antiparser.xml.compose(_.text)
   )
 
@@ -37,10 +37,10 @@ object Ref extends Element.WithToXml[Ref]("ref") {
     target: Seq[String],
     text: String,
     rendition: Option[String] = None
-  ): Elem = toXml(new Ref(Files.mkUrl(target), rendition, Xml.mkText(text)))
+  ): Elem = toXmlElement(new Ref(Files.mkUrl(target), rendition, Xml.mkText(text)))
 
   def toXml(
     target: Seq[String],
     text: Seq[Node]
-  ): Elem = toXml(new Ref(Files.mkUrl(target), rendition = None, text))
+  ): Elem = toXmlElement(new Ref(Files.mkUrl(target), rendition = None, text))
 }

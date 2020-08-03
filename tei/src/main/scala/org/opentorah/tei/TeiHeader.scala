@@ -27,11 +27,11 @@ object TeiHeader extends Element.WithToXml[TeiHeader]("teiHeader") {
   )
 
   override protected val antiparser: Antiparser[TeiHeader] = Antiparser(
-    FileDesc.elementAntiparser.compose(_.fileDesc),
-    EncodingDesc.parsable.elementAntiparserOption.compose(_.encodingDesc),
-    ProfileDesc.elementAntiparserOption.compose(_.profileDesc),
-    XenoData.parsable.elementAntiparserOption.compose(_.xenoData),
-    RevisionDesc.parsable.elementAntiparserOption.compose(_.revisionDesc)
+    FileDesc.toXml.compose(_.fileDesc),
+    EncodingDesc.parsable.toXmlOption.compose(_.encodingDesc),
+    ProfileDesc.toXmlOption.compose(_.profileDesc),
+    XenoData.parsable.toXmlOption.compose(_.xenoData),
+    RevisionDesc.parsable.toXmlOption.compose(_.revisionDesc)
   )
 
   def apply(): TeiHeader = new TeiHeader(

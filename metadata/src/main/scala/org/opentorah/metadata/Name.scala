@@ -32,7 +32,7 @@ object Name extends Element.WithToXml[Name]("name") {
 
   override protected val antiparser: Antiparser[Name] = Antiparser(
     // TODO why can't I remove [T] from compose() calls here?
-    nAttribute.toAntiparser.compose[Name](_.name),
+    nAttribute.toXml.compose[Name](_.name),
     LanguageSpec.antiparser.compose[Name](_.languageSpec)
   )
 }

@@ -48,14 +48,14 @@ class StoreComponent extends Component("store") {
 
   override protected val inlineAntiparser: Antiparser[Inline] = Antiparser(
     Names.antiparser.compose(_.names),
-    fromAttribute.toAntiparserOption.compose(_.from),
-    Component.typeAttribute.toAntiparserOption.compose(_.className),
-    Title.parsable.elementAntiparserOption.compose(_.title),
-    Abstract.parsable.elementAntiparserOption.compose(_.storeAbstract),
-    Body.parsable.elementAntiparserOption.compose(_.body),
-    Selector.elementAntiparserSeq.compose(_.selectors),
-    Entities.parsable.elementAntiparserOption.compose(_.entities),
-    By.parsable.elementAntiparserOption.compose(_.by)
+    fromAttribute.toXmlOption.compose(_.from),
+    Component.typeAttribute.toXmlOption.compose(_.className),
+    Title.parsable.toXmlOption.compose(_.title),
+    Abstract.parsable.toXmlOption.compose(_.storeAbstract),
+    Body.parsable.toXmlOption.compose(_.body),
+    Selector.toXmlSeq.compose(_.selectors),
+    Entities.parsable.toXmlOption.compose(_.entities),
+    By.parsable.toXmlOption.compose(_.by)
   )
 
   class FromElement(

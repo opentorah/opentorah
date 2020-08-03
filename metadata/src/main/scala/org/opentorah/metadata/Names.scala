@@ -88,5 +88,5 @@ object Names {
 
   // TODO remove (fold into the antiparser, of which there should be 2: with default name allowed and not...)
   def toXml(value: Names): Seq[Node] =
-    Name.elementAntiparserSeq.compose[Names](_.names).content(value)
+    Name.toXmlSeq.compose[Names](_.names).content(value)
 }

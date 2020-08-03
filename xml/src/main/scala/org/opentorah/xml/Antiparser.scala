@@ -18,13 +18,13 @@ object Antiparser {
 
   def apply[A](
     attributes: A => Seq[Attribute.Value[_]] = (_: A) => Seq.empty,
-    content: A => Seq[Node] = (_: A) => Seq.empty
+    content   : A => Seq[Node]               = (_: A) => Seq.empty
   ): Antiparser[A] = new Antiparser[A](
     attributes,
     content
   )
 
-  def apply[A](antiparsers: Antiparser[A]*): Antiparser[A] = new Antiparser[A](
+  def apply[A](antiparsers: Antiparser[A]*): Antiparser[A] = apply[A](
     attributes = Collections.concat(antiparsers.map(_.attributes)),
     content = Collections.concat(antiparsers.map(_.content))
   )

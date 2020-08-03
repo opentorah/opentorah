@@ -13,7 +13,7 @@ abstract class SiteObject(val site: Site) {
 
     override def content: String = {
       val elem: Elem = Xml.transform(
-        xml = Tei.toXml(teiTransformer(tei)),
+        xml = Tei.toXmlElement(teiTransformer(tei)),
         transformer = xmlTransformer
       )
       Tei.prettyPrinter.renderXml(elem)

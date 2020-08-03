@@ -14,12 +14,12 @@ final case class TitleStmt(
 ) {
   def references: Seq[EntityReference] = {
     val xml: Seq[Node] =
-      Title.parsable.elementAntiparserSeq.content(titles) ++
-      Author.parsable.elementAntiparserSeq.content(authors) ++
-      Sponsor.parsable.elementAntiparserSeq.content(sponsors) ++
-      Funder.parsable.elementAntiparserSeq.content(funders) ++
-      Principal.parsable.elementAntiparserSeq.content(principals) ++
-      RespStmt.parsable.elementAntiparserSeq.content(respStmts)
+      Title.parsable.toXmlSeq.content(titles) ++
+      Author.parsable.toXmlSeq.content(authors) ++
+      Sponsor.parsable.toXmlSeq.content(sponsors) ++
+      Funder.parsable.toXmlSeq.content(funders) ++
+      Principal.parsable.toXmlSeq.content(principals) ++
+      RespStmt.parsable.toXmlSeq.content(respStmts)
 
     EntityReference.from(xml) ++ editors.flatMap(_.persName.toSeq)
   }
@@ -55,12 +55,12 @@ object TitleStmt extends Element.WithToXml[TitleStmt]("titleStmt") {
   )
 
   override protected val antiparser: Antiparser[TitleStmt] = Antiparser(
-    Title.parsable.elementAntiparserSeq.compose(_.titles),
-    Author.parsable.elementAntiparserSeq.compose(_.authors),
-    Editor.elementAntiparserSeq.compose(_.editors),
-    Sponsor.parsable.elementAntiparserSeq.compose(_.sponsors),
-    Funder.parsable.elementAntiparserSeq.compose(_.funders),
-    Principal.parsable.elementAntiparserSeq.compose(_.principals),
-    RespStmt.parsable.elementAntiparserSeq.compose(_.respStmts)
+    Title.parsable.toXmlSeq.compose(_.titles),
+    Author.parsable.toXmlSeq.compose(_.authors),
+    Editor.toXmlSeq.compose(_.editors),
+    Sponsor.parsable.toXmlSeq.compose(_.sponsors),
+    Funder.parsable.toXmlSeq.compose(_.funders),
+    Principal.parsable.toXmlSeq.compose(_.principals),
+    RespStmt.parsable.toXmlSeq.compose(_.respStmts)
   )
 }

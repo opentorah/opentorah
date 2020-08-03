@@ -46,14 +46,14 @@ object ProfileDesc extends Element.WithToXml[ProfileDesc]("profileDesc") {
   )
 
   override protected val antiparser: Antiparser[ProfileDesc] = Antiparser(
-    Abstract.parsable.elementAntiparserOption.compose(_.documentAbstract),
-    Creation.elementAntiparserOption.compose(_.creation),
-    LangUsage.elementAntiparserOption.compose(_.langUsage),
-    TextClass.parsable.elementAntiparserOption.compose(_.textClass),
-    CorrespDesc.parsable.elementAntiparserOption.compose(_.correspDesc),
-    CalendarDesc.parsable.elementAntiparserOption.compose(_.calendarDesc),
-    HandNotes.elementAntiparserOption.compose(_.handNotes),
-    ListTranspose.parsable.elementAntiparserOption.compose(_.listTranspose)
+    Abstract.parsable.toXmlOption.compose(_.documentAbstract),
+    Creation.toXmlOption.compose(_.creation),
+    LangUsage.toXmlOption.compose(_.langUsage),
+    TextClass.parsable.toXmlOption.compose(_.textClass),
+    CorrespDesc.parsable.toXmlOption.compose(_.correspDesc),
+    CalendarDesc.parsable.toXmlOption.compose(_.calendarDesc),
+    HandNotes.toXmlOption.compose(_.handNotes),
+    ListTranspose.parsable.toXmlOption.compose(_.listTranspose)
   )
 
   def apply(): ProfileDesc = new ProfileDesc(

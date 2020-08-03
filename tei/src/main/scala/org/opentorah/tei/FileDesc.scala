@@ -36,13 +36,13 @@ object FileDesc extends Element.WithToXml[FileDesc]("fileDesc") {
   )
 
   override protected val antiparser: Antiparser[FileDesc] = Antiparser(
-    TitleStmt.elementAntiparser.compose(_.titleStmt),
-    EditionStmt.parsable.elementAntiparserOption.compose(_.editionStmt),
-    Extent.parsable.elementAntiparserOption.compose(_.extent),
-    PublicationStmt.elementAntiparserOption.compose(_.publicationStmt),
-    SeriesStmt.parsable.elementAntiparserOption.compose(_.seriesStmt),
-    NotesStmt.parsable.elementAntiparserOption.compose(_.notesStmt),
-    SourceDesc.parsable.elementAntiparserOption.compose(_.sourceDesc)
+    TitleStmt.toXml.compose(_.titleStmt),
+    EditionStmt.parsable.toXmlOption.compose(_.editionStmt),
+    Extent.parsable.toXmlOption.compose(_.extent),
+    PublicationStmt.toXmlOption.compose(_.publicationStmt),
+    SeriesStmt.parsable.toXmlOption.compose(_.seriesStmt),
+    NotesStmt.parsable.toXmlOption.compose(_.notesStmt),
+    SourceDesc.parsable.toXmlOption.compose(_.sourceDesc)
   )
 
   def apply(): FileDesc = new FileDesc(
