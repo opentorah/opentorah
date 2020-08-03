@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.xml.{Antiparser, Element, Parser}
-import scala.xml.Elem
+import scala.xml.Node
 
 final case class TitleStmt(
   titles: Seq[Title.Value],
@@ -13,14 +13,13 @@ final case class TitleStmt(
   respStmts: Seq[RespStmt.Value]
 ) {
   def references: Seq[EntityReference] = {
-    val xml: Seq[Elem] = Seq(
-      titles.map(Title.parsable.toXml) ++
-      authors.map(Author.parsable.toXml) ++
-      sponsors.map(Sponsor.parsable.toXml) ++
-      funders.map(Funder.parsable.toXml) ++
-      principals.map(Principal.parsable.toXml) ++
-      respStmts.map(RespStmt.parsable.toXml)
-    ).flatten
+    val xml: Seq[Node] =
+      Title.parsable.elementAntiparserSeq.content(titles) ++
+      Author.parsable.elementAntiparserSeq.content(authors) ++
+      Sponsor.parsable.elementAntiparserSeq.content(sponsors) ++
+      Funder.parsable.elementAntiparserSeq.content(funders) ++
+      Principal.parsable.elementAntiparserSeq.content(principals) ++
+      RespStmt.parsable.elementAntiparserSeq.content(respStmts)
 
     EntityReference.from(xml) ++ editors.flatMap(_.persName.toSeq)
   }

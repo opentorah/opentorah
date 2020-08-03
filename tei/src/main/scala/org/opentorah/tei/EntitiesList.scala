@@ -41,10 +41,8 @@ object EntitiesList extends Parsable[EntitiesList] with ToXml[EntitiesList] {
   override protected def elementName(value: EntitiesList): String = value.entityType.listElement
 
   override protected val antiparser: Antiparser[EntitiesList] = Antiparser(
-    attributes = value => Seq(
-      Attribute.id.withValue(value.id),
-      roleAttribute.withValue(value.role)
-    ),
-    content = value => Seq(<head>{value.head}</head>)
+    Attribute.id.toAntiparser.premap(_.id),
+    roleAttribute.toAntiparserOption.premap(_.role),
+    Antiparser.xml.premap(value => Seq(<head>{value.head}</head>))
   )
 }

@@ -7,19 +7,16 @@ final class Antiparser[A] private(
   val content: A => Seq[Node]
 ) {
 
+  // TODO rename 'compose'
   def premap[B](f: B => A): Antiparser[B] = new Antiparser[B](
     attributes compose f,
     content compose f
-  )
-
-  def mkElement(name: String, value: A): Xml.Element = Xml.mkElement(name,
-    attributes(value),
-    content(value)
   )
 }
 
 object Antiparser {
 
+  // TODO remove
   def apply[A](
     attributes: A => Seq[Attribute.Value[_]] = (_: A) => Seq.empty,
     content: A => Seq[Node] = (_: A) => Seq.empty
@@ -33,10 +30,10 @@ object Antiparser {
     content = concat(antiparsers.map(_.content))
   )
 
+  // TODO what is this in pointless notation?
+  def concat[A, B](fs: Seq[A => Seq[B]]): A => Seq[B] = a => fs.flatMap(f => f(a))
+
   val xml: Antiparser[Seq[Node]] = apply[Seq[Node]](
     content = (value: Seq[Node]) => value
   )
-
-  // TODO what is this in pointless notation?
-  def concat[A, B](fs: Seq[A => Seq[B]]): A => Seq[B] = a => fs.flatMap(f => f(a))
 }

@@ -19,11 +19,10 @@ object EntityName extends ToXml[EntityName] {
     } yield new EntityName(entityType, id, name)
   }
 
-
   override protected def elementName(value: EntityName): String = value.entityType.nameElement
 
   override protected val antiparser: Antiparser[EntityName] = Antiparser(
-    attributes = value => Seq(Attribute.id.withValue(value.id)),
-    content = value => Seq(Xml.mkText(value.name))
+    Attribute.id.toAntiparserOption.premap[EntityName](_.id),
+    Antiparser.xml.premap[EntityName](value => Seq(Xml.mkText(value.name)))
   )
 }

@@ -103,7 +103,7 @@ object CollectionObject {
     }),
 
     Table.Column("Расшифровка", "transcriber", { document: Document =>
-      val transcribers = document.tei.titleStmt.editors
+      val transcribers: Seq[Node] = document.tei.titleStmt.editors
         .filter(_.role.contains("transcriber")).flatMap(_.persName)
         .map(transcriber => Xml.removeNamespace(EntityReference.toXml(transcriber)))
       Transformers.multi(transcribers)

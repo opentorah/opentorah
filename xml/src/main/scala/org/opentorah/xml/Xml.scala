@@ -21,7 +21,8 @@ object Xml extends Model[Node] {
   }
 
   def removeNamespace(xml: Element): Element =
-    xml.copy(scope = scala.xml.TopScope, child = xml.child.map(removeNamespace))
+    xml.copy(scope = scala.xml.TopScope, child = removeNamespaceSeq(xml.child))
+  def removeNamespaceSeq(nodes: Seq[Node]): Seq[Node] = nodes.map(removeNamespace)
   def removeNamespace(node: Node): Node = node match {
     case e: Element => e.copy(scope = scala.xml.TopScope, child = e.child.map(removeNamespace))
     case n => n
@@ -43,7 +44,7 @@ object Xml extends Model[Node] {
   override def asText(node: Node): Text    = node.asInstanceOf[Text]
   override def getText(text: Text): String = text.text
 
-  // TODO mkText - Antiparser?
+  // TODO mkText - move into Antiparser
   override def mkText(text: String, seed: Node): Text = mkText(text)
   def mkText(text: String): Text = new scala.xml.Text(text)
 
@@ -89,15 +90,4 @@ object Xml extends Model[Node] {
   )
 
   override def getChildren(element: Element): Seq[Node] = element.child
-
-  def mkElement(name: String, attributes: Seq[Attribute.Value[_]], content: Seq[Node]): Element = <elem/>.copy(
-    label = name,
-    attributes = attributes.foldRight[scala.xml.MetaData](scala.xml.Null){
-      case (current, result) => new scala.xml.UnprefixedAttribute(
-        current.attribute.name,
-        current.valueToString.orNull,
-        result
-      )},
-      child = content
-    )
 }

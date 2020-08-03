@@ -2,7 +2,7 @@ package org.opentorah.store
 
 import java.net.URL
 import org.opentorah.util.Util
-import org.opentorah.xml.{Attribute, Element, Parser, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parser, ToXml}
 import scala.xml.{Elem, Node}
 
 abstract class ComponentNg(val elementName: String) {
@@ -14,11 +14,18 @@ abstract class ComponentNg(val elementName: String) {
     inheritedSelectors: Seq[Selector]
   ): Parser[Instance]
 
-  final def toXml(value: Instance): Elem = Xml.mkElement(
-    name = elementName,
-    attributes = Seq(ComponentNg.typeAttribute.withValue(Util.getSingletonClassName(value.companion))) ++ attributes(value),
-    content = content(value)
-  )
+  final def toXml(value: Instance): Elem = toXml.toXml(value)
+
+  private val toXml: ToXml[Instance] = new ToXml[Instance] {
+    override protected def elementName(value: Instance): String = ComponentNg.this.elementName
+
+    override protected def antiparser: Antiparser[Instance] = Antiparser(
+      attributes = value =>
+        ComponentNg.typeAttribute.toAntiparser.premap[Instance](value => Util.getSingletonClassName(value.companion)).attributes(value) ++
+        attributes(value),
+      content = ComponentNg.this.content
+    )
+  }
 
   protected def attributes(value: Instance): Seq[Attribute.Value[_]]
 

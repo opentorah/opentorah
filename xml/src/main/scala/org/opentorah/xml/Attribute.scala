@@ -28,16 +28,15 @@ abstract class Attribute[T](
 
   final def optionalOrDefault: Parser[T] = optional.map(_.getOrElse(default))
 
-  // TODO rename withValueOption
+  // TODO remove
   final def withValue(value: Option[T]): Attribute.Value[T] = new Attribute.Value[T](this, value)
 
+  // TODO remove
   final def withValue(value: T): Attribute.Value[T] = withValue(Some(value))
 
-  // TODO rename withNonDefaultValueOption
-  final def withNonDefaultValue(value: Option[T]): Attribute.Value[T] =
+  // TODO remove
+  private def withNonDefaultValue(value: Option[T]): Attribute.Value[T] =
     new Attribute.Value[T](this, if (value.contains(default)) None else value)
-
-  final def withNonDefaultValue(value: T): Attribute.Value[T] = withNonDefaultValue(Some(value))
 
   final def toAntiparser: Antiparser[T] = Antiparser(
     attributes = value => Seq(this.withValue(value))
@@ -48,7 +47,7 @@ abstract class Attribute[T](
   )
 
   final def toAntiparserNonDefault: Antiparser[T] = Antiparser(
-    attributes = value => Seq(this.withNonDefaultValue(value))
+    attributes = value => Seq(this.withNonDefaultValue(Some(value)))
   )
 
   final def toAntiparserNonDefaultOption: Antiparser[Option[T]] = Antiparser(

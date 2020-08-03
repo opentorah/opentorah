@@ -86,6 +86,7 @@ object Names {
     content = value => if (value.getDefaultName.isDefined) Seq.empty else toXml(value)
   )
 
+  // TODO remove (fold into the antiparser, of which there should be 2: with default name allowed and not...)
   def toXml(value: Names): Seq[Node] =
     Name.elementAntiparserSeq.premap[Names](_.names).content(value)
 }
