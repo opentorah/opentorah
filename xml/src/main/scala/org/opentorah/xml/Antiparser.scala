@@ -33,6 +33,10 @@ object Antiparser {
     content = concat(antiparsers.map(_.content))
   )
 
+  val xml: Antiparser[Seq[Node]] = apply[Seq[Node]](
+    content = (value: Seq[Node]) => value
+  )
+
   // TODO what is this in pointless notation?
   def concat[A, B](fs: Seq[A => Seq[B]]): A => Seq[B] = a => fs.flatMap(f => f(a))
 }

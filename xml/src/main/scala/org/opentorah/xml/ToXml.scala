@@ -13,4 +13,8 @@ trait ToXml[A] {
   protected def elementName(value: A): String
 
   protected def antiparser: Antiparser[A]
+
+  final def elementAntiparser: Antiparser[A] = Antiparser(
+    content = value => Seq(toXml(value))
+  )
 }

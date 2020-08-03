@@ -21,7 +21,7 @@ object Availability extends Element.WithToXml[Availability]("availability") {
   )
 
   override protected val antiparser: Antiparser[Availability] = Antiparser(
-    attributes = value => Seq(statusAttribute.withValue(value.status)),
-    content = _.xml
+    statusAttribute.toAntiparserOption.premap[Availability](_.status),
+    Antiparser.xml.premap[Availability](_.xml)
   )
 }

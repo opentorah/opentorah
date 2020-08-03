@@ -1,6 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Attribute, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, Parser}
 
 final case class LanguageSpec(
   language: Option[Language],
@@ -42,9 +42,10 @@ object LanguageSpec {
     flavour = flavour
   )
 
-  def attributes(value: LanguageSpec): Seq[Attribute.Value[_]] = Seq(
-    langAttribute.withValue(value.language.map(_.name)),
-    transliteratedAttribute.withNonDefaultValue(value.isTransliterated),
-    flavourAttribute.withValue(value.flavour)
+  // TODO inherit from ToXml?
+  val antiparser: Antiparser[LanguageSpec] = Antiparser(
+    langAttribute.toAntiparserOption.premap[LanguageSpec](_.language.map(_.name)),
+    transliteratedAttribute.toAntiparserNonDefaultOption.premap[LanguageSpec](_.isTransliterated),
+    flavourAttribute.toAntiparserOption.premap[LanguageSpec](_.flavour)
   )
 }

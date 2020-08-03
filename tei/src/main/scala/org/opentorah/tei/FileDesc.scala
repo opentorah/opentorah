@@ -37,7 +37,7 @@ object FileDesc extends Element.WithToXml[FileDesc]("fileDesc") {
 
   override protected val antiparser: Antiparser[FileDesc] = Antiparser(
     content = value =>
-      Seq(TitleStmt.toXml(value.titleStmt)) ++
+      TitleStmt.elementAntiparser.premap[FileDesc](_.titleStmt).content(value) ++
       EditionStmt.parsable.toXml(value.editionStmt) ++
       Extent.parsable.toXml(value.extent) ++
       PublicationStmt.toXml(value.publicationStmt) ++

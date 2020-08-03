@@ -27,10 +27,8 @@ object Date extends Element.WithToXml[Date]("date") {
   )
 
   override protected val antiparser: Antiparser[Date] = Antiparser(
-    attributes = value => Seq(
-      whenAttribute.withValue(value.when),
-      calendarAttribute.withValue(value.calendar)
-    ),
-    content = _.xml
+    whenAttribute.toAntiparser.premap[Date](_.when),
+    calendarAttribute.toAntiparserOption.premap[Date](_.calendar),
+    Antiparser.xml.premap[Date](_.xml)
   )
 }

@@ -31,8 +31,7 @@ object Name extends Element.WithToXml[Name]("name") {
     new Name(name, LanguageSpec.empty)
 
   override protected val antiparser: Antiparser[Name] = Antiparser(
-    attributes = value =>
-      Seq(nAttribute.withValue(value.name)) ++
-      LanguageSpec.attributes(value.languageSpec) // TODO direct use of Antiparser.attributes.
-    )
+    nAttribute.toAntiparser.premap[Name](_.name),
+    LanguageSpec.antiparser.premap[Name](_.languageSpec)
+  )
 }

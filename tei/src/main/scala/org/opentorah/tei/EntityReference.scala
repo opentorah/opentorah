@@ -49,11 +49,9 @@ object EntityReference extends ToXml[EntityReference] {
   override protected def elementName(value: EntityReference): String = value.entityType.nameElement
 
   override protected val antiparser: Antiparser[EntityReference] = Antiparser(
-    attributes = value => Seq(
-      refAttribute.withValue(value.ref),
-      Attribute.id.withValue(value.id),
-      roleAttribute.withValue(value.role)
-    ),
-    content = value => value.name
+    refAttribute.toAntiparserOption.premap[EntityReference](_.ref),
+    Attribute.id.toAntiparserOption.premap[EntityReference](_.id),
+    roleAttribute.toAntiparserOption.premap[EntityReference](_.role),
+    Antiparser.xml.premap[EntityReference](_.name)
   )
 }
