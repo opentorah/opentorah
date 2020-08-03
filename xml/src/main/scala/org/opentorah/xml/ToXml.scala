@@ -4,10 +4,8 @@ import scala.xml.{Elem, Node}
 
 // TODO fold into Antiparser; move mkElement() here...
 trait ToXml[A] {
-  final def toXml(value: Option[A]): Seq[Elem] = toXml(value.toSeq)
 
-  final def toXml(values: Seq[A]): Seq[Elem] = values.map(toXml)
-
+  // TODO remove
   final def toXml(value: A): Elem = antiparser.mkElement(elementName(value), value)
 
   protected def elementName(value: A): String
@@ -16,5 +14,13 @@ trait ToXml[A] {
 
   final def elementAntiparser: Antiparser[A] = Antiparser(
     content = value => Seq(toXml(value))
+  )
+
+  final def elementAntiparserOption: Antiparser[Option[A]] = Antiparser(
+    content = _.toSeq.map(toXml)
+  )
+
+  final def elementAntiparserSeq: Antiparser[Seq[A]] = Antiparser(
+    content = _.map(toXml)
   )
 }

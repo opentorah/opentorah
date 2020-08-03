@@ -2,7 +2,7 @@ package org.opentorah.metadata
 
 import org.opentorah.xml.{Antiparser, Attribute, Parser}
 import org.opentorah.util.Collections
-import scala.xml.Elem
+import scala.xml.Node
 import zio.ZIO
 
 final class Names(val names: Seq[Name]) extends LanguageString {
@@ -86,6 +86,6 @@ object Names {
     content = value => if (value.getDefaultName.isDefined) Seq.empty else toXml(value)
   )
 
-  def toXml(value: Names): Seq[Elem] =
-    Name.toXml(value.names)
+  def toXml(value: Names): Seq[Node] =
+    Name.elementAntiparserSeq.premap[Names](_.names).content(value)
 }

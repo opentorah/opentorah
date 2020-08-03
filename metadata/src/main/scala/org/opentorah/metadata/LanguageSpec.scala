@@ -44,8 +44,8 @@ object LanguageSpec {
 
   // TODO inherit from ToXml?
   val antiparser: Antiparser[LanguageSpec] = Antiparser(
-    langAttribute.toAntiparserOption.premap[LanguageSpec](_.language.map(_.name)),
-    transliteratedAttribute.toAntiparserNonDefaultOption.premap[LanguageSpec](_.isTransliterated),
-    flavourAttribute.toAntiparserOption.premap[LanguageSpec](_.flavour)
+    langAttribute.toAntiparserOption.premap(_.language.map(_.name)),
+    transliteratedAttribute.toAntiparserNonDefaultOption.premap(_.isTransliterated),
+    flavourAttribute.toAntiparserOption.premap(_.flavour)
   )
 }

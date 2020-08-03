@@ -54,13 +54,13 @@ class StoreComponent extends Component("store") {
     )
 
   override protected def inlineContent(value: Inline): Seq[Node] =
-    Names.antiparser.content(value.names) ++
-    Title.parsable.toXml(value.title) ++
-    Abstract.parsable.toXml(value.storeAbstract) ++
-    Body.parsable.toXml(value.body) ++
-    Selector.toXml(value.selectors) ++
-    Entities.parsable.toXml(value.entities) ++
-    By.parsable.toXml(value.by)
+    Names.antiparser.premap[Inline](_.names).content(value) ++
+    Title.parsable.elementAntiparserOption.premap[Inline](_.title).content(value) ++
+    Abstract.parsable.elementAntiparserOption.premap[Inline](_.storeAbstract).content(value) ++
+    Body.parsable.elementAntiparserOption.premap[Inline](_.body).content(value) ++
+    Selector.elementAntiparserSeq.premap[Inline](_.selectors).content(value) ++
+    Entities.parsable.elementAntiparserOption.premap[Inline](_.entities).content(value) ++
+    By.parsable.elementAntiparserOption.premap[Inline](_.by).content(value)
 
   class FromElement(
     inheritedSelectors: Seq[Selector],

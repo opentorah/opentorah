@@ -18,6 +18,7 @@ object HandNotes extends Element.WithToXml[HandNotes]("handNotes") {
   )
 
   override protected val antiparser: Antiparser[HandNotes] = Antiparser(
-    content = value => HandNote.parsable.toXml(value.handNotes)
+    // TODO why do I need [] in premap() here?
+    HandNote.parsable.elementAntiparserSeq.premap[HandNotes](_.handNotes)
   )
 }

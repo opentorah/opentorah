@@ -56,13 +56,12 @@ object TitleStmt extends Element.WithToXml[TitleStmt]("titleStmt") {
   )
 
   override protected val antiparser: Antiparser[TitleStmt] = Antiparser(
-    content = value =>
-      Title.parsable.toXml(value.titles) ++
-      Author.parsable.toXml(value.authors) ++
-      Editor.toXml(value.editors) ++
-      Sponsor.parsable.toXml(value.sponsors) ++
-      Funder.parsable.toXml(value.funders) ++
-      Principal.parsable.toXml(value.principals) ++
-      RespStmt.parsable.toXml(value.respStmts)
+    Title.parsable.elementAntiparserSeq.premap(_.titles),
+    Author.parsable.elementAntiparserSeq.premap(_.authors),
+    Editor.elementAntiparserSeq.premap(_.editors),
+    Sponsor.parsable.elementAntiparserSeq.premap(_.sponsors),
+    Funder.parsable.elementAntiparserSeq.premap(_.funders),
+    Principal.parsable.elementAntiparserSeq.premap(_.principals),
+    RespStmt.parsable.elementAntiparserSeq.premap(_.respStmts)
   )
 }

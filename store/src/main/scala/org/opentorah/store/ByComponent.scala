@@ -4,7 +4,7 @@ import java.net.URL
 import org.opentorah.util.Files
 import org.opentorah.xml.{Antiparser, Attribute, Parser, PrettyPrinter, Text}
 import zio.ZIO
-import scala.xml.Elem
+import scala.xml.Node
 
 class ByComponent extends Component("by") {
 
@@ -44,8 +44,8 @@ class ByComponent extends Component("by") {
     Component.typeAttribute.withValue(value.className)
   )
 
-  override protected def inlineContent(value: Inline): Seq[Elem] =
-    Store.parsable.toXml(value.stores)
+  override protected def inlineContent(value: Inline): Seq[Node] =
+    Store.parsable.elementAntiparserSeq.premap[Inline](_.stores).content(value)
 
   abstract class FromElement[+S <: Store](
     inheritedSelectors: Seq[Selector],

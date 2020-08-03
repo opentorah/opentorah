@@ -15,6 +15,6 @@ object LangUsage extends Element.WithToXml[LangUsage]("langUsage") {
   )
 
   override protected val antiparser: Antiparser[LangUsage] = Antiparser(
-    content = value => Language.toXml(value.languages)
+    Language.elementAntiparserSeq.premap[LangUsage](_.languages)
   )
 }
