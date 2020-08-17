@@ -1,6 +1,5 @@
 ---
 layout: home
-title: Digital Judaica Done Right
 ---
 
 There are a few ongoing projects:

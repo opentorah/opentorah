@@ -1,4 +1,4 @@
-title: "Open Torah Project"
+title: "the Open Torah Project"
 author: "Leonid Dubinsky"
 email: dub@opentorah.org
 
@@ -9,9 +9,13 @@ url: "http://www.opentorah.org" # the base hostname & protocol for your site, e.
 
 github_username:  dubinsky
 
+plugins:
+  - jekyll-avatar
+  - jekyll-feed
+  - jekyll-sitemap
+
 header_pages:
-  - index.md
-  - CHANGELOG.md
+  - tags.html
 
 markdown: kramdown
 theme: minima
