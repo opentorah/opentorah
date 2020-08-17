@@ -14,8 +14,8 @@ To support self-contained dynamic site we need to replicate some of the Jekyll's
 ## Project Setup ##
 
 - activated free Google Cloud Platform trial for `dub@opentorah.org` account (6/14/2020); 
-- created project `alter-rebbe` with id `alter-rebbe-2` (id `alter-rebbe` is taken by the previous incarnation;
-  maybe when a month passes and it gets deleted I’ll migrate to the old id);
+- created project `alter-rebbe` with id `alter-rebbe-2` (id `alter-rebbe` was taken by the previous incarnation,
+  and can't be reused even now, long after it was deleted :(;
 - organization `opentorah.org` was auto-created; 
 
 ```
