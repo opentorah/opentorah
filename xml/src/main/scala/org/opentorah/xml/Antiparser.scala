@@ -26,7 +26,7 @@ object Antiparser {
 
   def apply[A](antiparsers: Antiparser[A]*): Antiparser[A] = apply[A](
     attributes = Collections.concat(antiparsers.map(_.attributes)),
-    content = Collections.concat(antiparsers.map(_.content))
+    content    = Collections.concat(antiparsers.map(_.content   ))
   )
 
   val xml: Antiparser[Seq[Node]] = apply[Seq[Node]](

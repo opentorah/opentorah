@@ -32,7 +32,7 @@ final class Api(otherHost: String) {
       NotFound(s"Not found: $url")
     }
 
-    NewStaticFile
+    StaticFile
       .fromURL/*[ServiceTask]*/(url, blocker, Some(request))
       .getOrElseF(notFound)
       .timed.mapEffect { case (duration: Duration, response: Response[ServiceTask]) =>

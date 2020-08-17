@@ -6,9 +6,9 @@ import scala.sys.process._
 
 object Cutter {
 
-  val uncutDirectory: File = new File("/home/dub/Projects/opentorah/lvia1799/uncut")
+  val uncutDirectory: File = new File("/home/dub/OpenTorah/lvia1799/uncut")
 
-  val cutDirectory: File = new File("/home/dub/Projects/opentorah/lvia1799/cut")
+  val cutDirectory: File = new File("/home/dub/OpenTorah/lvia1799/cut")
 
   private val defaultOverlap: Int = 0
 
@@ -25,15 +25,18 @@ object Cutter {
 //  )
 
   private val lvia1799LeftOverlaps: Map[Int, Int] = Map(
-    6 -> 200, 8 -> 100, 9 -> 100, 12 -> 500, 28 -> 800, 61 -> 400, 71 -> 100, 72 -> 100, 74 -> 100, 75 -> 100, 77 -> 500,
-    82 -> 100, 85 -> 300, 97 -> 100, 104 -> 100, 106 -> 100, 107 -> 100, 108 -> 100
+      6 -> 200,   8 -> 100,   9 -> 100,  12 -> 500,  28 -> 800,  61 -> 400,  71 -> 100,  72 -> 100,  74 -> 100,
+     75 -> 100,  77 -> 500,  82 -> 100,  85 -> 300,  97 -> 100, 104 -> 100, 106 -> 100, 107 -> 100, 108 -> 100,
+    114 -> 100, 136 -> 100, 138 -> 100, 139 -> 100, 140 -> 100, 146 -> 100, 147 -> 100, 148 -> 100, 153 -> 100,
+    154 -> 100, 155 -> 100, 156 -> 100, 161 -> 100, 162 -> 100, 163 -> 100, 165 -> 100, 245 -> 200, 274 -> 200,
+    288 -> 200, 295 -> 400, 297 -> 400, 309 -> 300, 323 -> 400
   )
 
   private val lvia1799RightOverlaps: Map[Int, Int] = Map(
-    29 -> 400, 78 -> 200
+    29 -> 400, 46 -> 700, 78 -> 200, 392 -> 500
   )
 
-  def main(args: Array[String]): Unit = cut(111, 141)
+  def main(args: Array[String]): Unit = cut(392, 568)
 
   private val leftOverlaps: Map[Int, Int] = lvia1799LeftOverlaps
 
