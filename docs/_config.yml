@@ -5,9 +5,13 @@ email: dub@opentorah.org
 description: >- # this means to ignore newlines until "baseurl:"
   Digital Judaica Done Right :)
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://www.opentorah.org" # the base hostname & protocol for your site, e.g. http://example.com
 
+url: "http://www.opentorah.org" # the base hostname & protocol for your site, e.g. http://example.com
+timezone: America/New_York
 github_username:  dubinsky
+
+markdown: kramdown
+theme: minima
 
 plugins:
   - jekyll-avatar
@@ -17,14 +21,9 @@ plugins:
 header_pages:
   - tags.html
 
-markdown: kramdown
-theme: minima
-
 exclude:
   - build.gradle
   - build
   - Gemfile
   - Gemfile.lock
   - CNAME
-
-timezone: America/New_York
