@@ -1,7 +1,6 @@
 package org.opentorah.collector
 
-import org.opentorah.entity.{EntitiesList, EntityName}
-import org.opentorah.tei.Ref
+import org.opentorah.tei.{EntitiesList, EntityName, Ref}
 import org.opentorah.util.Files
 import scala.xml.{Elem, Node}
 
@@ -20,7 +19,7 @@ final class NamesObject(site: Site) extends SimpleSiteObject(site) {
       <list xml:id={value.id} role={value.role.orNull}>
         <head>{value.head}</head>
         {for (entity <- value.entities) yield {
-        <l>{Ref.toXml(EntityObject.teiWrapperUrl(entity), EntityName.toXml(entity.names.head))}</l>
+        <l>{Ref.toXml(EntityObject.teiWrapperUrl(entity), EntityName.toXmlElement(entity.names.head))}</l>
       }}
       </list>
         .copy(label = value.entityType.listElement)

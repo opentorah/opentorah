@@ -2,9 +2,8 @@ package org.opentorah.collector
 
 import java.io.File
 import java.net.URL
-import org.opentorah.entity.{Entity, EntityReference}
-import org.opentorah.store.{Store, WithPath}
-import org.opentorah.tei.Tei
+import org.opentorah.store.Store
+import org.opentorah.tei.{Entity, EntityReference, Tei}
 import org.opentorah.util.Files
 import org.opentorah.xml.{From, PrettyPrinter}
 import org.slf4j.{Logger, LoggerFactory}
@@ -41,7 +40,7 @@ object Main {
 
     logger.info("Pretty-printing store.")
     for (entityHolder <- store.entities.get.by.get.stores)
-      prettyPrint(entityHolder, Entity.toXml(entityHolder.entity.copy(id = None)), Tei.prettyPrinter)
+      prettyPrint(entityHolder, Entity.toXmlElement(entityHolder.entity.copy(id = None)), Tei.prettyPrinter)
     prettyPrint(store)
 
 
@@ -53,12 +52,12 @@ object Main {
   }
 
   private def prettyPrint(store: Store): Unit = {
-    prettyPrint(store, Store.parsable.toXml(store.asInstanceOf[Store.FromElement].element), Store.prettyPrinter)
+    prettyPrint(store, Store.parsable.toXmlElement(store.asInstanceOf[Store.FromElement].element), Store.prettyPrinter)
 
     store match {
       case collection: Collection =>
         for (by <- collection.by; document <- by.stores; by <- document.by; teiHolder <- by.stores)
-          prettyPrint(teiHolder, Tei.toXml(teiHolder.tei), Tei.prettyPrinter)
+          prettyPrint(teiHolder, Tei.toXmlElement(teiHolder.tei), Tei.prettyPrinter)
       case _ =>
         for (by <- store.by; store <- by.stores) prettyPrint(store)
     }

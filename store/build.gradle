@@ -12,6 +12,7 @@ configureLibrary(['Scala', 'Jewish', 'TEI'])
 
 dependencies {
   api project(':metadata')
+  api project(':tei')
 
   implementation project(':util')
 }

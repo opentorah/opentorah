@@ -2,9 +2,8 @@ package org.opentorah.store
 
 import java.net.URL
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, Parser}
 import zio.ZIO
-import scala.xml.Elem
 
 abstract class Component(elementName: String) {
 
@@ -35,24 +34,23 @@ abstract class Component(elementName: String) {
       } yield result
     } yield result
 
-    override protected def attributes(value: Element): Seq[Attribute.Value[_]] = value match {
-      case FromFile(file) => Seq(Component.fileAttribute.withValue(file))
-      case inline => inlineAttributes(inline.asInstanceOf[Inline])
-    }
-
-    override protected def content(value: Element): Seq[Elem] = value match {
-      case FromFile(_) => Seq.empty
-      case inline => inlineContent(inline.asInstanceOf[Inline])
-    }
+    override protected def antiparser: Antiparser[Element] = Antiparser(
+      attributes = {
+        case FromFile(file) => Component.fileAttribute.toXml.attributes(file)
+        case inline => inlineAntiparser.attributes(inline.asInstanceOf[Inline])
+      },
+      content = {
+        case FromFile(_) => Seq.empty
+        case inline => inlineAntiparser.content(inline.asInstanceOf[Inline])
+      }
+    )
   }
 
   private def delegate(className: String): Option[Component] = None
 
   def inlineParser(className: Option[String]): Parser[Inline]
 
-  protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]]
-
-  protected def inlineContent(value: Inline): Seq[Elem]
+  protected def inlineAntiparser: Antiparser[Inline]
 
   final type Creator[+R] = (
     /* inheritedSelectors: */ Seq[Selector],

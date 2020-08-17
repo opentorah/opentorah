@@ -1,11 +1,9 @@
 package org.opentorah.store
 
 import java.net.URL
-import org.opentorah.entity.{EntitiesList, Entity}
 import org.opentorah.metadata.Names
-import org.opentorah.xml.{Attribute, Parser}
-
-import scala.xml.Elem
+import org.opentorah.tei.{EntitiesList, Entity}
+import org.opentorah.xml.{Antiparser, Attribute, Parser}
 
 final class Entities(
   inheritedSelectors: Seq[Selector],
@@ -53,13 +51,11 @@ object Entities {
       lists
     )
 
-    override protected def attributes(value: Element): Seq[Attribute.Value[_]] = Seq(
-      selectorAttribute.withValue(value.selector)
+    override protected val antiparser: Antiparser[Element] = Antiparser(
+      selectorAttribute.toXml.compose(_.selector),
+      By.parsable.toXml.compose(_.by),
+      EntitiesList.toXmlSeq.compose(_.lists)
     )
-
-    override protected def content(value: Element): Seq[Elem] =
-      Seq(By.parsable.toXml(value.by)) ++
-      EntitiesList.toXml(value.lists)
   }
 
   final class EntitiesBy(

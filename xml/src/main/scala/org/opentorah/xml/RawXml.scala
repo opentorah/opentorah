@@ -14,9 +14,9 @@ class RawXml(elementName: String) {
 
     override protected def parser: Parser[Value] = Element.allNodes.map(new Value(_))
 
-    override protected def attributes(value: Value): Seq[Attribute.Value[_]] = Seq.empty
-
-    override protected def content(value: Value): Seq[Node] = value.xml
+    override protected def antiparser: Antiparser[Value] = Antiparser(
+      content = _.xml
+    )
   }
 }
 

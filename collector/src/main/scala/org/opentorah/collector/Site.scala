@@ -1,8 +1,8 @@
 package org.opentorah.collector
 
 import java.io.File
-import org.opentorah.entity.{Entity, EntityReference}
 import org.opentorah.store.{Entities, EntityHolder, Path, Store, WithPath}
+import org.opentorah.tei.{Entity, EntityReference}
 import org.opentorah.util.Files
 import scala.xml.Node
 

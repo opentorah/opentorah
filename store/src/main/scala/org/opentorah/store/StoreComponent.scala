@@ -3,12 +3,10 @@ package org.opentorah.store
 import java.net.URL
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Title}
-import org.opentorah.xml.{Attribute, Parser, PrettyPrinter}
-import scala.xml.Elem
+import org.opentorah.xml.{Antiparser, Attribute, Parser, PrettyPrinter}
 
 class StoreComponent extends Component("store") {
 
-  protected final val nAttribute: Attribute[String] = Attribute("n")
   protected final val fromAttribute: Attribute[String] = Attribute("from")
 
   final case class InlineClass(
@@ -48,20 +46,17 @@ class StoreComponent extends Component("store") {
     className
   )
 
-  override protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]] = Seq(
-    nAttribute.withValue(value.names.getDefaultName),
-    fromAttribute.withValue(value.from),
-    Component.typeAttribute.withValue(value.className)
+  override protected val inlineAntiparser: Antiparser[Inline] = Antiparser(
+    Names.antiparser.compose(_.names),
+    fromAttribute.toXmlOption.compose(_.from),
+    Component.typeAttribute.toXmlOption.compose(_.className),
+    Title.parsable.toXmlOption.compose(_.title),
+    Abstract.parsable.toXmlOption.compose(_.storeAbstract),
+    Body.parsable.toXmlOption.compose(_.body),
+    Selector.toXmlSeq.compose(_.selectors),
+    Entities.parsable.toXmlOption.compose(_.entities),
+    By.parsable.toXmlOption.compose(_.by)
   )
-
-  override protected def inlineContent(value: Inline): Seq[Elem] =
-    (if (value.names.getDefaultName.isDefined) Seq.empty else Names.toXml(value.names)) ++
-      Title.parsable.toXml(value.title) ++
-      Abstract.parsable.toXml(value.storeAbstract) ++
-      Body.parsable.toXml(value.body) ++
-      Selector.toXml(value.selectors) ++
-      Entities.parsable.toXml(value.entities) ++
-      By.parsable.toXml(value.by)
 
   class FromElement(
     inheritedSelectors: Seq[Selector],

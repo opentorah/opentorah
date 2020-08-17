@@ -30,12 +30,24 @@ abstract class Attribute[T](
 
   final def withValue(value: Option[T]): Attribute.Value[T] = new Attribute.Value[T](this, value)
 
-  final def withValue(value: T): Attribute.Value[T] = withValue(Some(value))
+  final def toXml: Antiparser[T] = Antiparser(
+    attributes = value => Seq(withValue(Some(value)))
+  )
 
-  final def withNonDefaultValue(value: Option[T]): Attribute.Value[T] =
+  final def toXmlOption: Antiparser[Option[T]] = Antiparser(
+    attributes = value => Seq(withValue(value))
+  )
+
+  final def toXmlNonDefault: Antiparser[T] = Antiparser(
+    attributes = value => Seq(withNonDefaultValue(Some(value)))
+  )
+
+  final def toXmlNonDefaultOption: Antiparser[Option[T]] = Antiparser(
+    attributes = value => Seq(this.withNonDefaultValue(value))
+  )
+
+  private def withNonDefaultValue(value: Option[T]): Attribute.Value[T] =
     new Attribute.Value[T](this, if (value.contains(default)) None else value)
-
-  final def withNonDefaultValue(value: T): Attribute.Value[T] = withNonDefaultValue(Some(value))
 
   // DOM
 

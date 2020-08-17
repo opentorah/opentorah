@@ -1,8 +1,8 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Attribute, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, Parser}
 import org.opentorah.util.Collections
-import scala.xml.Elem
+import scala.xml.Node
 import zio.ZIO
 
 final class Names(val names: Seq[Name]) extends LanguageString {
@@ -81,6 +81,12 @@ object Names {
     new Names(names)
   }
 
-  def toXml(value: Names): Seq[Elem] =
-    Name.toXml(value.names)
+  val antiparser: Antiparser[Names] = Antiparser(
+    attributes = value => Seq(defaultNameAttribute.withValue(value.getDefaultName)),
+    content = value => if (value.getDefaultName.isDefined) Seq.empty else toXml(value)
+  )
+
+  // TODO remove (fold into the antiparser, of which there should be 2: with default name allowed and not...)
+  def toXml(value: Names): Seq[Node] =
+    Name.toXmlSeq.compose[Names](_.names).content(value)
 }

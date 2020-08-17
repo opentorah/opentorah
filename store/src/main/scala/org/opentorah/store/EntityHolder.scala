@@ -1,7 +1,7 @@
 package org.opentorah.store
 
-import org.opentorah.entity.Entity
 import org.opentorah.metadata.{Name, Names}
+import org.opentorah.tei.Entity
 
 final class EntityHolder(
   inheritedSelectors: Seq[Selector],

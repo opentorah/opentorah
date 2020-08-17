@@ -16,6 +16,9 @@ object Collections {
   def unfoldSimple[A](start: A, next: A => A, take: A => Boolean): Seq[A] =
     unfoldInfiniteSimple(start, next).takeWhile(take).toList
 
+  // TODO what is this in pointless notation?
+  def concat[A, B](fs: Seq[A => Seq[B]]): A => Seq[B] = a => fs.flatMap(f => f(a))
+
   // Group consecutive elements with the same key - didn't find this in the standard library.
   def group[T, K](list: Seq[T], key: T => K): Seq[Seq[T]] = if (list.isEmpty) Nil else {
     val k = key(list.head)

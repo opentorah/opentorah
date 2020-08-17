@@ -2,9 +2,8 @@ package org.opentorah.store
 
 import java.net.URL
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Parser, PrettyPrinter, Text}
+import org.opentorah.xml.{Antiparser, Attribute, Parser, PrettyPrinter, Text}
 import zio.ZIO
-import scala.xml.Elem
 
 class ByComponent extends Component("by") {
 
@@ -37,15 +36,13 @@ class ByComponent extends Component("by") {
     className
   )
 
-  override protected def inlineAttributes(value: Inline): Seq[Attribute.Value[_]] = Seq(
-    selectorAttribute.withValue(value.selector),
-    directoryAttribute.withValue(value.directory),
-    listAttribute.withValue(value.list),
-    Component.typeAttribute.withValue(value.className)
+  override protected def inlineAntiparser: Antiparser[Inline] = Antiparser(
+    selectorAttribute.toXml.compose(_.selector),
+    directoryAttribute.toXmlOption.compose(_.directory),
+    listAttribute.toXmlOption.compose(_.list),
+    Component.typeAttribute.toXmlOption.compose(_.className),
+    Store.parsable.toXmlSeq.compose(_.stores)
   )
-
-  override protected def inlineContent(value: Inline): Seq[Elem] =
-    Store.parsable.toXml(value.stores)
 
   abstract class FromElement[+S <: Store](
     inheritedSelectors: Seq[Selector],
@@ -75,7 +72,7 @@ class ByComponent extends Component("by") {
           val result: Seq[String] = Files.filesWithExtensions(Files.url2file(directory), "xml").sorted
           if (Files.isFile(list)) Files.write(
             file = Files.url2file(list),
-            content = PrettyPrinter.default.renderXml(filesList.toXml(result))
+            content = PrettyPrinter.default.renderXml(filesList.toXmlElement(result))
           )
           result
         }
@@ -100,9 +97,8 @@ class ByComponent extends Component("by") {
 
     override protected def parser: Parser[Seq[String]] = Text("file").all
 
-    override protected def attributes(value: Seq[String]): Seq[Attribute.Value[_]] = Seq.empty
-
-    override protected def content(value: Seq[String]): Seq[Elem] =
-      for (file <- value) yield <file>{file}</file>
+    override protected def antiparser: Antiparser[Seq[String]] = Antiparser(
+      Antiparser.xml.compose[Seq[String]](value => for (file <- value) yield <file>{file}</file>)
+    )
   }
 }

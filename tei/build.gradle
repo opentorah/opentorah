@@ -1,0 +1,17 @@
+plugins {
+  id 'java-library'
+  id 'scala'
+  id 'com.github.maiflai.scalatest'
+  id 'maven-publish'
+  id 'com.jfrog.bintray'
+}
+
+description = 'Open Torah TEI Support'
+
+configureLibrary(['Scala', 'Jewish', 'TEI'])
+
+dependencies {
+  api project(':metadata')
+
+  implementation project(':util')
+}
