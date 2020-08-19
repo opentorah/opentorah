@@ -15,11 +15,11 @@ jobs:
         uses: actions/checkout@master
 
       - name: "Set up JDK 1.8"
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@master
         with:
           java-version: 1.8
 
-      - name: "Build with Gradle"
+      - name: "Build and test"
         run: ./gradlew --no-daemon build
 
 # TODO: deploy to GCP
@@ -27,7 +27,7 @@ jobs:
       - name: "Upload to Bintray"
         env:
           bintrayApiKey: ${{secrets.bintrayApiKey}}
-        run: ./gradlew bintrayUpload
+        run: ./gradlew --no-daemon bintrayUpload
 
 #      - name "Publish plugins"
 #        run: ./gradlew -Pgradle.publish.key=${{secrets.gradlePluginPortalKey}} -Pgradle.publish.secret=${{secrets.gradlePluginPortalSecret}} publishPlugins

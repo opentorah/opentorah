@@ -17,6 +17,14 @@ ext.configureLibrary = {
   final String orgName = 'Open Torah Project'
   final String orgUrl = 'http://www.opentorah.org'
 
+  final String bintrayApiKeyProperty = findProperty('bintrayApiKey')
+  if (bintrayApiKeyProperty == null) System.println("No bintrayApiKey property")
+  final String bintrayApiKeyEnvironment = System.getenv('bintrayApiKey')
+  if (bintrayApiKeyEnvironment == null) System.println("No bintrayApiKey in the environment")
+  final String bintrayApiKey = bintrayApiKeyProperty ?: bintrayApiKeyEnvironment
+  if (bintrayApiKey == null) System.println("No bintrayApiKey!")
+
+
 //  logger.lifecycle(
 //    "Configuring Bintray for project '$projectName':\n" +
 //    "  description=$projectDescription;\n" +
@@ -104,7 +112,7 @@ ext.configureLibrary = {
 
   bintray {
     user         = 'dubinsky'
-    key          = findProperty('bintrayApiKey') ?: System.getenv('bintrayApiKey')
+    key          = bintrayApiKey
     publications = ['bintrayMavenPublication']
     dryRun       = false
     publish      = true
