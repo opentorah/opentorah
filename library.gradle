@@ -17,21 +17,8 @@ ext.configureLibrary = {
   final String orgName = 'Open Torah Project'
   final String orgUrl = 'http://www.opentorah.org'
 
-  final String bintrayApiKeyProperty = findProperty('bintrayApiKey')
-  if (bintrayApiKeyProperty == null) System.println("No bintrayApiKey property")
-  final String bintrayApiKeyEnvironment = System.getenv('bintrayApiKey')
-  if (bintrayApiKeyEnvironment == null) System.println("No bintrayApiKey in the environment")
-  final String bintrayApiKey = bintrayApiKeyProperty ?: bintrayApiKeyEnvironment
-  if (bintrayApiKey == null) System.println("No bintrayApiKey!")
-
-
-//  logger.lifecycle(
-//    "Configuring Bintray for project '$projectName':\n" +
-//    "  description=$projectDescription;\n" +
-//    "  groupId    =$projectGroup;\n" +
-//    "  codeUrl    =$codeUrl;\n" +
-//    "  artifactId =$projectArtifact;\n"
-//  )
+  final String bintrayApiKey = findProperty('bintrayApiKey') ?: System.getenv('bintrayApiKey')
+  if (bintrayApiKey == null) project.logger.error("No bintrayApiKey!")
 
   // Because why not?
   jar {
