@@ -104,7 +104,7 @@ ext.configureLibrary = {
 
   bintray {
     user         = 'dubinsky'
-    key          = findProperty('bintrayApiKey')
+    key          = findProperty('bintrayApiKey') ?: System.getenv('bintrayApiKey')
     publications = ['bintrayMavenPublication']
     dryRun       = false
     publish      = true

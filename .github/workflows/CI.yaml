@@ -2,7 +2,8 @@ name: "CI"
 on:
   push:
     branches:
-      - '*'
+      - 'master'
+
 
 jobs:
   build:
@@ -11,7 +12,7 @@ jobs:
 
     steps:
       - name: "Check out the code"
-        uses: actions/checkout@v1
+        uses: actions/checkout@master
 
       - name: "Set up JDK 1.8"
         uses: actions/setup-java@v1
@@ -20,3 +21,13 @@ jobs:
 
       - name: "Build with Gradle"
         run: ./gradlew --no-daemon build
+
+# TODO: deploy to GCP
+
+      - name: "Upload to Bintray"
+        env:
+          bintrayApiKey: ${{secrets.bintrayApiKey}}
+        run: ./gradlew bintrayUpload
+
+#      - name "Publish plugins"
+#        run: ./gradlew -Pgradle.publish.key=${{secrets.gradlePluginPortalKey}} -Pgradle.publish.secret=${{secrets.gradlePluginPortalSecret}} publishPlugins
