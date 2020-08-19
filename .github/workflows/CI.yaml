@@ -2,7 +2,8 @@ name: "CI"
 on:
   push:
     branches:
-      - '*'
+      - 'master'
+
 
 jobs:
   build:
@@ -11,7 +12,7 @@ jobs:
 
     steps:
       - name: "Check out the code"
-        uses: actions/checkout@v1
+        uses: actions/checkout@master
 
       - name: "Set up JDK 1.8"
         uses: actions/setup-java@v1
@@ -21,8 +22,9 @@ jobs:
       - name: "Build with Gradle"
         run: ./gradlew --no-daemon build
 
-      - name: "Upload to Bintray"
-        run: ./gradlew -PbintrayApiKey=${{secrets.bintrayApiKey}} bintrayUpload
+#      - name: "Upload to Bintray"
+# TODO use findProperty | System.getEnv and package the secrets into env:
+#        run: ./gradlew -PbintrayApiKey=${{secrets.bintrayApiKey}} bintrayUpload
 
 #      - name "Publish plugins"
 #        run: ./gradlew -Pgradle.publish.key=${{secrets.gradlePluginPortalKey}} -Pgradle.publish.secret=${{secrets.gradlePluginPortalSecret}} publishPlugins
