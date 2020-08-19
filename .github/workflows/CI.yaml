@@ -22,9 +22,12 @@ jobs:
       - name: "Build with Gradle"
         run: ./gradlew --no-daemon build
 
-#      - name: "Upload to Bintray"
-# TODO use findProperty | System.getEnv and package the secrets into env:
-#        run: ./gradlew -PbintrayApiKey=${{secrets.bintrayApiKey}} bintrayUpload
+# TODO: deploy to GCP
+
+      - name: "Upload to Bintray"
+        env:
+          bintrayApiKey: ${{secrets.bintrayApiKey}}
+        run: ./gradlew bintrayUpload
 
 #      - name "Publish plugins"
 #        run: ./gradlew -Pgradle.publish.key=${{secrets.gradlePluginPortalKey}} -Pgradle.publish.secret=${{secrets.gradlePluginPortalSecret}} publishPlugins
