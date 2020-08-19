@@ -20,3 +20,9 @@ jobs:
 
       - name: "Build with Gradle"
         run: ./gradlew --no-daemon build
+
+      - name: "Upload to Bintray"
+        run: ./gradlew -PbintrayApiKey=${{secrets.bintrayApiKey}} bintrayUpload
+
+#      - name "Publish plugins"
+#        run: ./gradlew -Pgradle.publish.key=${{secrets.gradlePluginPortalKey}} -Pgradle.publish.secret=${{secrets.gradlePluginPortalSecret}} publishPlugins

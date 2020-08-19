@@ -4,7 +4,8 @@ layout: home
 
 There are a few ongoing projects:
 - digital edition of Rabbi Wichnin's [Chumash Questions](https://www.chumashquestions.org/) book;
-- [archive documents](https://www.alter-rebbe.org) of the arrests of the Alter Rebbe in 1798 and 1800;
+- [archive documents](https://www.alter-rebbe.org) from the early history of Chabad
+ (including the arrests of the Alter Rebbe in 1798 and 1800);
 - code that [generates](https://github.com/opentorah/opentorah/tree/master/collector) the above website;   
 - paper ([HTML](/dream/paper/html/index.html), [PDF](/dream/paper/pdf/dream.pdf),
   [EPUB](/dream/paper/epub2/dream.epub)) describing ideas (dating from 1991) for the dream environment for
