@@ -14,13 +14,15 @@ To support self-contained dynamic site we need to replicate some of the Jekyll's
 ## Project Setup ##
 
 - activated free Google Cloud Platform trial for `dub@opentorah.org` account (6/14/2020); 
+- logged into it;
 - created project `alter-rebbe` with id `alter-rebbe-2` (id `alter-rebbe` was taken by the previous incarnation,
   and can't be reused even now, long after it was deleted :(;
 - organization `opentorah.org` was auto-created; 
-
+- set `dub@opentorah.org` as a default account and `alter-rebbe-2` as a default project:
 ```
   $ gcloud auth login # to log into the dub@opentorah.org account.
-  $ gcloud projects create [PROJECT_ID]
+  $ gcloud projects create alter-rebbe-2
+  $ gcloud config set account dub@opentorah.org
   $ gcloud config set project alter-rebbe-2
 ```
 
@@ -186,6 +188,44 @@ and then:
 To set entry point variables and environment variables:
 ```
   $ docker run -e "NAME=VALUE" <image name> <arg1> <arg2> <arg3>
+```
+
+## Service Account ##
+
+Created service account `cloud-run-deploy` and its key:
+```
+  $ gcloud iam service-accounts create cloud-run-deploy
+  $ gcloud iam service-accounts keys create ./key.json --iam-account cloud-run-deploy@alter-rebbe-2.iam.gserviceaccount.com
+```
+
+For local use, added the key to `~/.gradle/gradle.properties` as a `gcloudServiceAccountKey_alter_rebbe_2` property,
+with a backslash after each line of the key except the last one, and with backslash-n replaced with backslash-backslash-n :)
+
+Granted the service account the roles for the Container Registry and Cloud Run
+(see https://cloud.google.com/run/docs/reference/iam/roles#gcloud):
+```
+  $ gcloud projects add-iam-policy-binding alter-rebbe-2 \
+    --member "serviceAccount:cloud-run-deploy@alter-rebbe-2.iam.gserviceaccount.com" --role "roles/storage.admin"
+  $ gcloud projects add-iam-policy-binding alter-rebbe-2 \
+    --member "serviceAccount:cloud-run-deploy@alter-rebbe-2.iam.gserviceaccount.com" --role "roles/run.admin"
+  $ gcloud iam service-accounts add-iam-policy-binding 161107830568-compute@developer.gserviceaccount.com \
+    --member="serviceAccount:cloud-run-deploy@alter-rebbe-2.iam.gserviceaccount.com" --role="roles/iam.serviceAccountUser"
+```
+
+Granted the user account the role needed for service account impersonation:
+```
+  $ gcloud projects add-iam-policy-binding alter-rebbe-2 \
+    --member "user:dub@opentorah.org" --role "roles/iam.serviceAccountTokenCreator"
+```
+
+Logged into the service account:
+```
+  $ gcloud auth activate-service-account --key-file=./key.json
+```
+
+To set it as a default account:
+```
+  $ gcloud config set account cloud-run-deploy@alter-rebbe-2.iam.gserviceaccount.com
 ```
 
 ### Logging ###
