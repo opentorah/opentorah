@@ -13,31 +13,36 @@ dependencies {
   implementation project(':util')
 }
 
-final String gcloudAccount = 'dub@opentorah.org'
 final String gcloudProject = 'alter-rebbe-2'
 final String gcloudService = 'collector'
-final String serviceImage  = "gcr.io/$gcloudProject/$gcloudService"
+final String mainClassName = 'org.opentorah.collector.Service'
 
-// 'gcloud auth print-access-token'.execute().text.trim()
-final String gcloudAccessToken =
-        findProperty('gcloudAccessToken_dub_opentorah_org') ?:
-       System.getenv('gcloudAccessToken_dub_opentorah_org')
-if (gcloudAccessToken == null) project.logger.error("No gcloud access token!")
+final String gcloudServiceAccountProperty = 'gcloudServiceAccountKey_' + gcloudProject.replace('-', '_')
+final String gcloudServiceAccountKey = findProperty(gcloudServiceAccountProperty) ?: System.getenv(gcloudServiceAccountProperty)
+if (gcloudServiceAccountKey == null) project.logger.error("No gcloud service account key!")
+
+final String serviceImage  = "gcr.io/$gcloudProject/$gcloudService"
 
 jib {
   to {
-    image = serviceImage
     auth {
-      username = 'oauth2accesstoken'
-      password = gcloudAccessToken
+      username = '_json_key'
+      password = gcloudServiceAccountKey
     }
+    image = serviceImage
   }
-  container { mainClass = 'org.opentorah.collector.Service' }
+  container {
+    mainClass = mainClassName
+  }
 }
 
 deploy.dependsOn('jib')
 deploy.doLast {
-  exec { commandLine 'gcloud', 'config', 'set', 'account', gcloudAccount }
-  exec { commandLine 'gcloud', 'config', 'set', 'project', gcloudProject }
-  exec { commandLine 'gcloud', 'run', 'deploy',  gcloudService, '--image', serviceImage }
+  exec {
+    standardInput new ByteArrayInputStream(gcloudServiceAccountKey.getBytes('UTF-8'))
+    commandLine 'gcloud', 'auth', 'activate-service-account', '--key-file', '-'
+  }
+  exec {
+    commandLine 'gcloud', 'run', 'deploy', gcloudService, '--image', serviceImage
+  }
 }

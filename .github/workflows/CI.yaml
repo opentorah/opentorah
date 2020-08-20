@@ -27,7 +27,16 @@ jobs:
           bintrayApiKey: ${{secrets.bintrayApiKey}}
         run: ./gradlew --no-daemon bintrayUpload
 
-      - name: "Deploy to Google Cloud Run"
+      - name: "Build and push image to Google Container Registry"
         env:
-          gcloudAccessToken_dub_opentorah_org: ${{secrets.gcloudAccessToken_dub_opentorah_org}}
+          gcloudServiceAccountKey_alter_rebbe_2: ${{secrets.gcloudServiceAccountKey_alter_rebbe_2}}
         run: ./gradlew --no-daemon jib
+
+      - name: "Setup gcloud CLI"
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          project_id: "alter-rebbe-2"
+          service_account_key: ${{secrets.gcloudServiceAccountKey_alter_rebbe_2}}
+
+      - name: "Deploy image to Cloud Run"
+        run: gcloud run deploy "collector" --image "gcr.io/alter-rebbe-2/collector"
