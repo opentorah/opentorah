@@ -18,7 +18,6 @@ ext.configureLibrary = {
   final String orgUrl = 'http://www.opentorah.org'
 
   final String bintrayApiKey = findProperty('bintrayApiKey') ?: System.getenv('bintrayApiKey')
-  if (bintrayApiKey == null) project.logger.error("No bintrayApiKey!")
 
   jar {
     // From https://github.com/GoogleContainerTools/jib/tree/master/examples/multi-module

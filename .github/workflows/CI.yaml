@@ -39,4 +39,9 @@ jobs:
           service_account_key: ${{secrets.gcloudServiceAccountKey_alter_rebbe_2}}
 
       - name: "Deploy image to Cloud Run"
-        run: gcloud run deploy "collector" --image "gcr.io/alter-rebbe-2/collector"
+        run: |
+          gcloud run deploy "collector" \
+          --image "gcr.io/alter-rebbe-2/collector" \
+          --allow-unauthenticated \
+          --platform managed \
+          --region us-east4

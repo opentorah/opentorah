@@ -132,7 +132,11 @@ for caching generated (and maybe even source) files.
 
 To deploy on the Cloud Run:
 ```
-  $ gcloud run deploy collector --image gcr.io/alter-rebbe-2/collector --allow-unauthenticated
+  $ gcloud run deploy collector \
+    --image gcr.io/alter-rebbe-2/collector \ 
+    --allow-unauthenticated \
+    --platform managed \
+    --region us-east4
 ```
 
 To set entry point variables and environment variables:
