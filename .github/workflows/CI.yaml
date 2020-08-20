@@ -33,7 +33,7 @@ jobs:
         run: ./gradlew --no-daemon jib
 
       - name: "Setup gcloud CLI"
-      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
           project_id: "alter-rebbe-2"
           service_account_key: ${{secrets.gcloudServiceAccountKey_alter_rebbe_2}}
