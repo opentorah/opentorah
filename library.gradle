@@ -20,8 +20,13 @@ ext.configureLibrary = {
   final String bintrayApiKey = findProperty('bintrayApiKey') ?: System.getenv('bintrayApiKey')
   if (bintrayApiKey == null) project.logger.error("No bintrayApiKey!")
 
-  // Because why not?
   jar {
+    // From https://github.com/GoogleContainerTools/jib/tree/master/examples/multi-module
+    //   Since this library is included as a jar in our jib projects, we want the jar to built reproducibly.
+    preserveFileTimestamps false
+    reproducibleFileOrder true
+
+    // Because why not?
     manifest {
       attributes(
         'Implementation-Title'  : projectDescription,

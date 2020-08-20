@@ -22,12 +22,12 @@ jobs:
       - name: "Build and test"
         run: ./gradlew --no-daemon build
 
-# TODO: deploy to GCP
-
       - name: "Upload to Bintray"
         env:
           bintrayApiKey: ${{secrets.bintrayApiKey}}
         run: ./gradlew --no-daemon bintrayUpload
 
-#      - name "Publish plugins"
-#        run: ./gradlew -Pgradle.publish.key=${{secrets.gradlePluginPortalKey}} -Pgradle.publish.secret=${{secrets.gradlePluginPortalSecret}} publishPlugins
+      - name: "Deploy to Google Cloud Run"
+        env:
+          gcloudAccessToken_dub_opentorah_org: ${{secrets.gcloudAccessToken_dub_opentorah_org}}
+        run: ./gradlew --no-daemon jib
