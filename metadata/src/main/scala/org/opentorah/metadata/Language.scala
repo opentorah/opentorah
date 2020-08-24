@@ -13,10 +13,14 @@ sealed class Language(code: String) extends Named {
 object Language extends NamedCompanion {
   override type Key = Language
 
-  override val values: Seq[Language] = Seq(English, Hebrew, Russian)
+  override val values: Seq[Language] = Seq(English, Russian, Polish, French, German, Lithuanian, Hebrew)
 
   case object English extends Language("en")
   case object Russian extends Language("ru")
+  case object Polish extends Language("pl")
+  case object French extends Language("fr")
+  case object German extends Language("de")
+  case object Lithuanian extends Language("lt")
 
   case object Hebrew extends Language("he") {
     val MAQAF: Char       = '־'

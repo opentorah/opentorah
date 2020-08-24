@@ -1,8 +1,3 @@
-// Configure Scala and service dependencies, leaving to the modules to apply JIB plugin and do this:
-//  jib {
-//    to { image = imageName }
-//    container { mainClass = mainClassName }
-//  }
 ext.configureService = {
   configureScala()
 
@@ -18,5 +13,45 @@ ext.configureService = {
 
     runtimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
     implementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
+  }
+}
+
+ext.configureJib = {
+  final String gcloudProject,
+  final String gcloudService,
+  final String gcloudRegion,
+  final String mainClassName
+  ->
+
+  final String gcloudServiceAccountProperty = 'gcloudServiceAccountKey_' + gcloudProject.replace('-', '_')
+  final String gcloudServiceAccountKey = findProperty(gcloudServiceAccountProperty) ?: System.getenv(gcloudServiceAccountProperty)
+  final String serviceImage  = "gcr.io/$gcloudProject/$gcloudService"
+
+  jib {
+    to {
+      auth {
+        username = '_json_key'
+        password = gcloudServiceAccountKey
+      }
+      image = serviceImage
+    }
+    container {
+      mainClass = mainClassName
+    }
+  }
+
+  deploy.dependsOn('jib')
+  deploy.doLast {
+    exec {
+      standardInput new ByteArrayInputStream(gcloudServiceAccountKey.getBytes('UTF-8'))
+      commandLine 'gcloud', 'auth', 'activate-service-account', '--key-file', '-'
+    }
+    exec { commandLine(
+      'gcloud', 'run', 'deploy', gcloudService,
+      '--image', serviceImage,
+      '--allow-unauthenticated',
+      '--platform', 'managed',
+      '--region', gcloudRegion
+    )}
   }
 }
