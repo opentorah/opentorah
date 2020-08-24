@@ -53,14 +53,15 @@ And (to fix unwanted directory nesting):
 ```
 Deleted `facsimile.alter-rebbe.org` bucket and removed CNAME record for it.
 
+Added `404.html` and set it as the error page in the website configuration of the bucket
+(default error page is in XML).
+
 Facsimiles displayed on the site come from that bucket;
 they can be retrieved by anyone who has the correct URL.
 
 To validate that facsimiles referenced from the site are in one-to-one correspondence with
 the files in the bucket, we probably need to use Google Cloud Storage client to retrieve
 (and cache) the list of them.
-
-We also might want to use Google's CDN for them (Firebase Hosting?).
 
 (I used BFG Repocleaner to remove facsimiles and their Git history from this repository
 once they moved out; current tool for things like that is `git-filter-repo`.)

@@ -20,10 +20,14 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
   )
 
   override protected def teiBody: Seq[Node] = {
-    val missingPages: Seq[String] = collection.value.documents
+    val pages: Seq[Page] = collection.value.documents
       .flatMap(document => document.pages(collection.value.pageType))
-      .filter(_.pb.isMissing)
-      .map(_.displayName)
+
+    def listMissing(flavour: String, isMissing: Page => Boolean): Seq[Elem] = {
+      val missing: Seq[String] = pages.filter(isMissing).map(_.displayName)
+      if (missing.isEmpty) Seq.empty
+      else Seq(<p>Отсутствуют фотографии {missing.length} {flavour} страниц: {missing.mkString(" ")}</p>)
+    }
 
     Hierarchy.storeHeader(collection.path, collection.value) ++
     Seq[Elem](CollectionObject.table(collection).toTei(
@@ -31,8 +35,8 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
           part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Xml) ++
           part.documents.map(Table.Data[Document]) }
     )) ++
-    (if (missingPages.isEmpty) Seq.empty
-     else Seq(<p>Отсутствуют фотографии {missingPages.length} страниц: {missingPages.mkString(" ")}</p>))
+      listMissing("пустых", page => page.pb.isMissing && page.pb.isEmpty) ++
+      listMissing("непустых", page => page.pb.isMissing && !page.pb.isEmpty)
   }
 }
 
@@ -98,7 +102,7 @@ object CollectionObject {
       for (page <- document.pages(collection.value.pageType)) yield Ref.toXml(
         target = DocumentObject.pageUrl(collection, document.name, page),
         text = page.displayName,
-        rendition = Some(Page.pageRendition(page.pb.isMissing))
+        rendition = Some(Page.pageRendition(page.pb.isMissing, page.pb.isEmpty))
       )
     }),
 
