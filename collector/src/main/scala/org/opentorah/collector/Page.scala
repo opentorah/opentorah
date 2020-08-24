@@ -67,5 +67,7 @@ object Page {
 
   def pageId(n: String): String = s"p$n"
 
-  def pageRendition(isMissing: Boolean): String = if (isMissing) "missing-page" else "page"
+  def pageRendition(isMissing: Boolean, isEmpty: Boolean): String =
+    if (!isMissing) "page" else
+    if (!isEmpty)  "missing-page" else "missing-empty-page"
 }

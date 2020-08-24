@@ -3,9 +3,10 @@
 Modules covered: `collector` and `collector-service`.
 
 ## [Unreleased]
+- separate lists of empty and non-empty pages;
 
 ## [0.7.53] - 2020-08-23 (`collector-service`)
-- tracking StaticFile fix
+- tracking StaticFile fix;
 
 ## [0.7.52] - 2020-07-03 (`collector-service`)
 - instructions for the `collector-service` setup;

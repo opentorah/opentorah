@@ -87,7 +87,10 @@ object Transformers {
     val pageId: String = Page.pageId(elem.attribute("n").get.text)
     <pb
       xml:id={pageId}
-      rendition={Page.pageRendition(elem.attribute("missing").map(_.text).contains("true"))}
+      rendition={Page.pageRendition(
+        isMissing = elem.attribute("missing").map(_.text).contains("true"),
+        isEmpty = elem.attribute("empty").map(_.text).contains("true")
+      )}
       role={Viewer.Facsimile.name}
       target={Files.mkUrl(Files.addPart(facsUrl, pageId))}
     />
