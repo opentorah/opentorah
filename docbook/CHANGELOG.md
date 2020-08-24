@@ -4,7 +4,7 @@ Modules covered: `docbook` and `fop`.
 
 ## [Unreleased]
 
-## [0.7.53] - 2020-07-
+## [0.7.53] - 2020-08-23
 - use XML literals instead of strings
 - pretty-printing DOM
 

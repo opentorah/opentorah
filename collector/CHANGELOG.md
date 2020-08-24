@@ -4,7 +4,7 @@ Modules covered: `collector` and `collector-service`.
 
 ## [Unreleased]
 
-## [0.7.53] - 2020-07-23 (`collector-service`)
+## [0.7.53] - 2020-08-23 (`collector-service`)
 - tracking StaticFile fix
 
 ## [0.7.52] - 2020-07-03 (`collector-service`)

@@ -32,6 +32,9 @@ jobs:
           gcloudServiceAccountKey_alter_rebbe_2: ${{secrets.gcloudServiceAccountKey_alter_rebbe_2}}
         run: ./gradlew --no-daemon jib
 
+      # I didn't find any Gradle gcloud plugin that I can use to run gcloud deploy,
+      # so I had to do it here; as a result, some parameters (project id, service name, region)
+      # had to be duplicated from the collector-service build Gradle file...
       - name: "Setup gcloud CLI"
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:

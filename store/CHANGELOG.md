@@ -1,13 +1,16 @@
 # Changelog
 
-Modules covered: `store`, `metadata`, `xml`, `util`, `texts`, `dream-paper` and `typesetting-paper`.
+Modules covered: `store`, `metadata`, `xml`, `tei`, `util`, `texts`, `dream-paper` and `typesetting-paper`.
 
 ## [Unreleased]
 
-## [0.1.53] - 2020-07-
+## [0.1.53] - 2020-08-23
 - texts metadata parsers ZIOfied a little
 - PrettyPrinter chunking cleanup
 - gathered standard XML namespaces in the Namespace object
+- abstracted pretty-printer over XML representation
+- moved TEI support into the `tei` module
+- introduced `Antiparser` AND USED IT THORUGHOUT
 
 ## [0.1.52] - 2020-07-14
 - added PrettyPrinter.alwaysStackElements

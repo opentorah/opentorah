@@ -1,7 +1,7 @@
 ext.configureLibrary = {
   final List<String> tags,
   final boolean addSlf4jImplementationForTests = true
-    ->
+  ->
 
   configureScala(addSlf4jImplementationForTests)
   configureMdoc()

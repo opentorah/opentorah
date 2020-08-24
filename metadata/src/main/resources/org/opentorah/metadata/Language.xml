@@ -17,4 +17,28 @@
         <name lang="ru" n="русский"/>
         <name lang="he" n="רוסית"/>
     </names>
+    <names>
+        <name lang="en" n="Lithuanian"/>
+        <name lang="en" n="lt"/>
+        <name lang="ru" n="литовский"/>
+        <name lang="he" n="ליטאי"/>
+    </names>
+    <names>
+        <name lang="en" n="Polish"/>
+        <name lang="en" n="pl"/>
+        <name lang="ru" n="польский"/>
+        <name lang="he" n="פולני"/>
+    </names>
+    <names>
+        <name lang="en" n="French"/>
+        <name lang="en" n="fr"/>
+        <name lang="ru" n="французский"/>
+        <name lang="he" n="צָרְפָתִית"/>
+    </names>
+    <names>
+        <name lang="en" n="German"/>
+        <name lang="en" n="de"/>
+        <name lang="ru" n="немецкий"/>
+        <name lang="he" n="גֶרמָנִיָת"/>
+    </names>
 </names>
