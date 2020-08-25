@@ -3,7 +3,7 @@ package org.opentorah.collector
 import java.net.URL
 import org.opentorah.metadata.{Name, Names}
 import org.opentorah.store.{By, Selector, Store, Urls}
-import org.opentorah.tei.Tei
+import org.opentorah.tei.{Page, Tei}
 import org.opentorah.xml.{Parser, Xml}
 import scala.xml.Node
 
@@ -40,7 +40,7 @@ final class Document(
     Xml.mkText(tei.creationDate.map(_.when).getOrElse(""))
 
   def author: Seq[Node] =
-    Transformers.multi(tei.titleStmt.authors.map(_.xml).flatMap(_.map(Xml.removeNamespace)))
+    Xml.multi(tei.titleStmt.authors.map(_.xml).flatMap(_.map(Xml.removeNamespace)))
 
   def addressee: Seq[Node] =
     tei.addressee.fold[Seq[Node]](Xml.mkText(""))(addressee =>

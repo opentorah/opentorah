@@ -1,7 +1,8 @@
 package org.opentorah.docbook.plugin
 
+import org.opentorah.docbook.DocBook
 import org.opentorah.mathjax.Configuration.DelimitersAndInput
-import org.opentorah.mathjax.MathML.DisplayAttribute
+import org.opentorah.mathjax.MathML.displayAttribute
 import org.opentorah.mathjax.{Configuration, Input, MathJax, MathML}
 import org.opentorah.xml.{Namespace, WarningFilter}
 import org.slf4j.{Logger, LoggerFactory}
@@ -44,7 +45,7 @@ final class MathFilter(
   }
 
   private def prefixMapping(namespace: Namespace)(content: => Unit): Unit = {
-    val prefix: String = namespace.prefix
+    val prefix: String = namespace.getPrefix.getOrElse("")
 
     super.startPrefixMapping(prefix, namespace.uri)
     content
@@ -66,11 +67,11 @@ final class MathFilter(
   override def startElement(uri: String, localName: String, qName: String, atts: Attributes): Unit = {
     flush()
 
-    val isMathMLMath: Boolean = Namespace.MathML.is(uri) && (MathML.math == localName)
+    val isMathMLMath: Boolean = (uri == MathML.namespace.uri) && (localName == MathML.math)
     val attributes: Attributes = if (!isMathMLMath) atts else {
       val result: AttributesImpl = new AttributesImpl(atts)
-      val isInline: Option[Boolean] = DisplayAttribute.get(Namespace.MathML, atts)
-      DisplayAttribute.setWithDefault(Namespace.MathML, checkInline(isInline), result)
+      val isInline: Option[Boolean] = displayAttribute.inNamespace(MathML.namespace).get(atts)
+      displayAttribute.inNamespace(MathML.namespace).withValue(checkInline(isInline)).set(result)
       result
     }
 
@@ -136,7 +137,7 @@ final class MathFilter(
     val input = delimiters.get.input
     val isInline: Option[Boolean] = checkInline(input.isInline)
     val attributes = new AttributesImpl
-    Input.Attribute.set(Namespace.MathML, input.withInline(isInline), attributes)
+    Input.attribute.inNamespace(MathML.namespace).withValue(input.withInline(isInline)).set(attributes)
 
     def mml(): Unit = {
       // Note: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,
@@ -144,18 +145,18 @@ final class MathFilter(
       //
       // Note: On Saxon 10 (but not 9!), XInclude namespace, if present on the `<article>`,
       // is added to the `<math>` element - but not its children.
-      prefixMapping(Namespace.MathML.default) {
-        prefixMapping(MathJax.Namespace) {
-          element(Namespace.MathML.default, MathML.math, atts = attributes) {
-            element(Namespace.MathML.default, MathML.mrow) {
-              element(Namespace.MathML.default, MathML.mi) {
+      prefixMapping(MathML.namespace.default) {
+        prefixMapping(MathJax.namespace) {
+          element(MathML.namespace.default, MathML.math, atts = attributes) {
+            element(MathML.namespace.default, MathML.mrow) {
+              element(MathML.namespace.default, MathML.mi) {
                 sendToParent(math)
               }}}}}
     }
 
     if (currentlyInEquationElement) {
       mml()
-    } else element(Namespace.DocBook, if (isInline.contains(true)) "inlineequation" else "informalequation") {
+    } else element(DocBook.namespace.default, if (isInline.contains(true)) "inlineequation" else "informalequation") {
       mml()
     }
 
@@ -169,8 +170,8 @@ final class MathFilter(
       else Some(MathFilter.inlineEquationElements.contains(currentElement))
 
     if (shouldBeInline.isDefined && isInline.isDefined && (shouldBeInline.get != isInline.get)) {
-      val should: String = DisplayAttribute.toString(shouldBeInline.get)
-      val is: String = DisplayAttribute.toString(isInline.get)
+      val should: String = displayAttribute.toString(shouldBeInline.get)
+      val is: String = displayAttribute.toString(isInline.get)
       warning(s"Display mode conflict: based on context, math should be '$should', but it is marked as '$is'")
     }
 

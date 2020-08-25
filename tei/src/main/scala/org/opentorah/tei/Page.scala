@@ -1,6 +1,4 @@
-package org.opentorah.collector
-
-import org.opentorah.tei.Pb
+package org.opentorah.tei
 
 sealed abstract class Page(val pb: Pb) {
   def base: String

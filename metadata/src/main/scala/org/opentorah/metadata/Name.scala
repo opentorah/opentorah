@@ -30,7 +30,7 @@ object Name extends Element.WithToXml[Name]("name") {
   def apply(name: String): Name =
     new Name(name, LanguageSpec.empty)
 
-  override protected val antiparser: Antiparser[Name] = Antiparser(
+  override protected val antiparser: Antiparser[Name] = Antiparser.concat(
     // TODO why can't I remove [T] from compose() calls here?
     nAttribute.toXml.compose[Name](_.name),
     LanguageSpec.antiparser.compose[Name](_.languageSpec)

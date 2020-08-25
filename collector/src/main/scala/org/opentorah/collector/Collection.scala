@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import java.net.URL
 import org.opentorah.store.{By, Selector, Store, Urls}
-import org.opentorah.tei.Title
+import org.opentorah.tei.{Page, Title}
 import org.opentorah.util.Collections
 import org.opentorah.xml.Parser
 import zio.ZIO

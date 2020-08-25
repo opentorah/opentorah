@@ -54,7 +54,7 @@ object TitleStmt extends Element.WithToXml[TitleStmt]("titleStmt") {
     respStmts
   )
 
-  override protected val antiparser: Antiparser[TitleStmt] = Antiparser(
+  override protected val antiparser: Antiparser[TitleStmt] = Tei.concat(
     Title.parsable.toXmlSeq.compose(_.titles),
     Author.parsable.toXmlSeq.compose(_.authors),
     Editor.toXmlSeq.compose(_.editors),

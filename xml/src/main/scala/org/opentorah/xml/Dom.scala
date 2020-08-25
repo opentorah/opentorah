@@ -1,7 +1,8 @@
 package org.opentorah.xml
 
-import org.w3c.dom.Node
+import org.w3c.dom.{Attr, NamedNodeMap, Node, NodeList}
 
+// Note: declareNamespace() and setAttributes() modify in-place.
 object Dom extends Model[Node] {
   override type Element = org.w3c.dom.Element
   override type Text = org.w3c.dom.CharacterData
@@ -17,19 +18,81 @@ object Dom extends Model[Node] {
   override def getName(element: Element): String = element.getLocalName
   override def getPrefix(element: Element): Option[String] = Option(element.getPrefix)
 
-  override def getAttributes(element: Element, parent: Option[Element]): Seq[Attribute.Value[String]] = {
-    val list: org.w3c.dom.NamedNodeMap = element.getAttributes
-    for (index <- 0 until list.getLength) yield {
-      val attribute: org.w3c.dom.Attr = list.item(index).asInstanceOf[org.w3c.dom.Attr]
-      Attribute(
-        name = attribute.getLocalName,
-        prefix = Option(attribute.getPrefix)
-      ).withValue(Option(attribute.getValue))
+  override def getNamespace(element: Element): Namespace = Namespace(
+    uri = element.getNamespaceURI,
+    prefix = element.getPrefix
+  )
+
+  override def getNamespaces(element: Element): Seq[Namespace] = {
+    val list: NamedNodeMap = element.getAttributes
+    for {
+      index <- 0 until list.getLength
+      attribute = list.item(index).asInstanceOf[Attr]
+      if attribute.getNamespaceURI == Namespace.Xmlns.uri
+      localName = attribute.getLocalName
+      prefix = attribute.getPrefix
+    } yield Namespace(
+      uri = Option(attribute.getValue),
+      prefix =
+        if (localName == Namespace.Xmlns.prefix) {
+          require(prefix == null)
+          None
+        } else {
+          require(prefix == Namespace.Xmlns.prefix)
+          require((localName != null) && localName.nonEmpty)
+          Some(localName)
+        }
+    )
+  }
+
+  def isNamespaceDeclared(namespace: Namespace, element: Element): Boolean =
+    namespace.attribute.get(element) == namespace.getUri
+
+  override def declareNamespace(namespace: Namespace, element: Element): Element = {
+    namespace.attributeValue.set(element)
+    element
+  }
+
+  override def getAttribute(attribute: Attribute[_], element: Element): Option[String] = {
+    val name: String = attribute.name
+    val namespace: Namespace = attribute.namespace
+    Option(
+      if (namespace.isDefault) element.getAttribute(name)
+      else element.getAttributeNS(namespace.getUri.orNull, name)
+    )
+  }
+
+  override def getAttributes(element: Element): Seq[Attribute.Value[String]] = {
+    val list: NamedNodeMap = element.getAttributes
+    for {
+      index <- 0 until list.getLength
+      attribute = list.item(index).asInstanceOf[Attr]
+      uri = attribute.getNamespaceURI
+      if uri != Namespace.Xmlns.uri
+      localName = attribute.getLocalName
+      prefix = attribute.getPrefix
+    } yield Attribute(
+      name = localName,
+      namespace = Namespace(uri = uri, prefix = prefix)
+    ).withValue(Option(attribute.getValue))
+  }
+
+  def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Unit = {
+    val name: String = attribute.name
+    val namespace: Namespace = attribute.namespace
+    val valueStr: String = attribute.toString(value)
+    if (namespace.isDefault) element.setAttribute(name, valueStr) else {
+      // declare the attribute's namespace if it is not declared - unless the attribute *is* a namespace declaration ;)
+      if (namespace != Namespace.Xmlns) namespace.ensureDeclared(element)
+
+      element.setAttributeNS(namespace.getUri.orNull, namespace.qName(name), valueStr)
     }
   }
 
+  // TODO setAttributes() - and add it to Model
+
   override def getChildren(element: Element): Seq[Node] = {
-    val list: org.w3c.dom.NodeList = element.getChildNodes
+    val list: NodeList = element.getChildNodes
     for (index <- 0 until list.getLength) yield list.item(index)
   }
 }

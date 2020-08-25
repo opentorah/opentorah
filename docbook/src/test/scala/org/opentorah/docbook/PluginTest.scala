@@ -1,6 +1,6 @@
 package org.opentorah.docbook
 
-import org.opentorah.xml.{Namespace, PrettyPrinter}
+import org.opentorah.xml.{Namespace, PrettyPrinter, XLink}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import scala.xml.Elem
@@ -48,7 +48,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
     substitutions = Map.empty,
     doctype = None,
     document =
-      <article xmlns={Namespace.DocBook.uri} version={Namespace.DocBook.version}>
+      <article xmlns={DocBook.namespace.uri} version={DocBook.version}>
         <info>
           <title>Test DocBook File</title>
         </info>
@@ -60,9 +60,9 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
   it should "resolve processing instructions and entity substitutions with DTD enabled" in test(
     name = "substitutions-with-DTD",
     substitutions = Map[String, String]("version" -> "\"v1.0.0\""),
-    doctype = Some(Namespace.DocBook.doctype),
+    doctype = Some(DocBook.doctype),
     document =
-      <article xmlns={Namespace.DocBook.uri} version={Namespace.DocBook.version} xmlns:xlink={Namespace.XLink.uri}>
+      <article xmlns={DocBook.namespace.uri} version={DocBook.version} xmlns:xlink={XLink.namespace.uri}>
         <para>Processing instruction: <?eval version ?>.</para>
         <para>Processing instruction with unknown substitution: <?eval version1 ?>.</para>
         <para>Unknown processing instruction:<?eval1 XXX ?>.</para>
@@ -82,7 +82,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
     substitutions = Map[String, String]("version" -> "\"v1.0.0\""),
     doctype = None,
     document =
-      <article xmlns={Namespace.DocBook.uri} version={Namespace.DocBook.version} xmlns:xlink={Namespace.XLink.uri}>
+      <article xmlns={DocBook.namespace.uri} version={DocBook.version} xmlns:xlink={XLink.namespace.uri}>
         <para>Processing instruction: <?eval version ?>.</para>
         <para>Processing instruction with unknown substitution: <?eval version1 ?>.</para>
         <para>Unknown processing instruction:<?eval1 XXX ?>.</para>
@@ -99,7 +99,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
       name = "substitutions-without-DTD-entity-substitutions",
       substitutions = Map[String, String]("version" -> "\"v1.0.0\""),
       document = PrettyPrinter.default.renderXml(
-        <article xmlns={Namespace.DocBook.uri} version={Namespace.DocBook.version} xmlns:xlink={Namespace.XLink.uri}>
+        <article xmlns={DocBook.namespace.uri} version={DocBook.version} xmlns:xlink={XLink.namespace.uri}>
           <para>Processing instruction: <?eval version ?>.</para>
           <para>Entity: &version;.</para>
           <para>Entity in an attribute:<link xlink:href="http://&version;">link!</link>.</para>

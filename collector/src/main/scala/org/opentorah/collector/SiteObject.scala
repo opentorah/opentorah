@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.Path
-import org.opentorah.tei.Tei
+import org.opentorah.tei.{EntityName, Ref, Tei}
 import org.opentorah.util.Files
 import org.opentorah.xml.Xml
 import scala.xml.Elem
@@ -34,10 +34,13 @@ abstract class SiteObject(val site: Site) {
   protected def teiUrl: Seq[String]
 
   protected def teiTransformer: Tei.Transformer =
-    Transformers.addPublicationStatement compose Transformers.addSourceDesc compose Transformers.addLanguage
+    Site.addPublicationStatement compose
+    Site.addSourceDesc compose
+    Tei.addLanguage
 
   protected def xmlTransformer: Xml.Transformer =
-    Transformers.refTransformer(site) compose Transformers.nameTransformer(site)
+    Ref.transformer(site.resolver(null)) compose
+    EntityName.transformer(site.resolver(null))
 
   protected def tei: Tei
 

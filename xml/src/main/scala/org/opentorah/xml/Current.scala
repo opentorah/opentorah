@@ -6,14 +6,21 @@ import zio.IO
 private[xml] final case class Current(
   from: Option[From],
   name: String,
-  attributes: Map[String, String],
+  attributes: Seq[Attribute.Value[String]],
   content: Content
 ) {
-  def takeAttribute(attribute: String): Current.Next[Option[String]] =
-    IO.succeed((copy(attributes = attributes - attribute), attributes.get(attribute)))
+  def takeAttribute(attribute: Attribute[_]): Current.Next[Option[String]] =
+    IO.succeed((
+      copy(attributes = attributes.filterNot(candidate => attribute == candidate.attribute)),
+      // TODO handle repeated attributes?
+      attributes.find(candidate => attribute == candidate.attribute).flatMap(_.value)
+    ))
 
-  def takeAllAttributes: Current.Next[Map[String, String]] =
-    IO.succeed((copy(attributes = Map.empty), attributes))
+  def takeAllAttributes: Current.Next[Seq[Attribute.Value[String]]] =
+    IO.succeed((
+      copy(attributes = Seq.empty),
+      attributes
+    ))
 
   def checkNoLeftovers: Result = for {
     _ <- Parser.check(attributes.isEmpty, s"Unparsed attributes: $attributes")
@@ -30,9 +37,7 @@ private[xml] object Current {
   } yield Current(
     from,
     name = element.label,
-    attributes = Xml.getNonXmlnsAttributes(element).map(attributeValue =>
-      attributeValue.attribute.prefixedName -> attributeValue.valueToString.get
-    ).toMap,
+    attributes = Xml.getAttributes(element),
     content
   )
 }

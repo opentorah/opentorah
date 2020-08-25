@@ -45,7 +45,7 @@ object ProfileDesc extends Element.WithToXml[ProfileDesc]("profileDesc") {
     listTranspose
   )
 
-  override protected val antiparser: Antiparser[ProfileDesc] = Antiparser(
+  override protected val antiparser: Antiparser[ProfileDesc] = Tei.concat(
     Abstract.parsable.toXmlOption.compose(_.documentAbstract),
     Creation.toXmlOption.compose(_.creation),
     LangUsage.toXmlOption.compose(_.langUsage),

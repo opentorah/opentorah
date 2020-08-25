@@ -1,5 +1,3 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.RawXml
-
-object TextClass extends RawXml("textClass")
+object TextClass extends TeiRawXml("textClass")

@@ -62,7 +62,7 @@ object Chapters {
 
   private val chapterParsable = new Element[WithNumber[Int]]("chapter") {
     override protected def parser: Parser[WithNumber[Int]] =
-      WithNumber.parse(Attribute.PositiveIntAttribute("length").required)
+      WithNumber.parse(new Attribute.PositiveIntAttribute("length").required)
   }
 
   val parser: Parser[Chapters] = for {

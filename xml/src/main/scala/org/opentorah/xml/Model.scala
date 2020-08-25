@@ -1,6 +1,7 @@
 package org.opentorah.xml
 
 // This abstracts over the XML model, allowing pretty-printing of both Scala XML and DOM.
+// TODO split out attributes-related stuff into a separate trait and make Model and Sax inherit from it.
 trait Model[N] {
   type Element <: N
   type Text <: N
@@ -23,6 +24,14 @@ trait Model[N] {
   def asElement(node: N): Element
   def getName(element: Element): String
   def getPrefix(element: Element): Option[String]
-  def getAttributes(element: Element, parent: Option[Element]): Seq[Attribute.Value[String]]
+
+  def getNamespace(element: Element): Namespace
+  def getNamespaces(element: Element): Seq[Namespace]
+  // TODO isNamespaceDeclared()
+  def declareNamespace(namespace: Namespace, element: Element): Element
+
+  def getAttribute(attribute: Attribute[_], element: Element): Option[String]
+  def getAttributes(element: Element): Seq[Attribute.Value[String]]
+
   def getChildren(element: Element): Seq[N]
 }

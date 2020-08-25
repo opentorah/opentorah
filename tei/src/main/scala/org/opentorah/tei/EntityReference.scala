@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, ToXml, UnionParsable}
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, ToXml, UnionParsable, Xml}
 import scala.xml.Node
 
 final case class EntityReference(
@@ -21,7 +21,7 @@ object EntityReference extends ToXml[EntityReference] {
     override protected def contentType: ContentType = ContentType.Mixed
 
     override protected def parser: Parser[EntityReference] = for {
-      id <- Attribute.id.optional
+      id <- Xml.idAttribute.optional
       role <- roleAttribute.optional
       ref <- refAttribute.optional
       _ <- typeAttribute.optional // We don't do anything with the type yet...
@@ -48,9 +48,9 @@ object EntityReference extends ToXml[EntityReference] {
 
   override protected def elementName(value: EntityReference): String = value.entityType.nameElement
 
-  override protected val antiparser: Antiparser[EntityReference] = Antiparser(
+  override protected val antiparser: Antiparser[EntityReference] = Antiparser.concat(
     refAttribute.toXmlOption.compose(_.ref),
-    Attribute.id.toXmlOption.compose(_.id),
+    Xml.idAttribute.toXmlOption.compose(_.id),
     roleAttribute.toXmlOption.compose(_.role),
     Antiparser.xml.compose(_.name)
   )

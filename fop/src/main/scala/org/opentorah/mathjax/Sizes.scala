@@ -5,7 +5,7 @@ import java.awt.geom.Point2D
 import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.properties.FixedLength
 import org.apache.xmlgraphics.image.loader.ImageSize
-import org.opentorah.xml.{Attribute, Namespace}
+import org.opentorah.xml.Attribute
 import org.w3c.dom.svg.SVGDocument
 
 /* Note:
@@ -66,10 +66,11 @@ final class Sizes private(
   )
 
   def setViewPortSizes(svgDocument: SVGDocument): Unit = {
-    def set(name: String, value: Float): Unit =
-      svgDocument.getRootElement.setAttribute(name, toPoints(value).toString + "pt")
-    set("width", width)
-    set("height", height)
+    def set(attribute: Attribute[String], value: Float): Unit =
+      attribute.withValue(toPoints(value).toString + "pt").set(svgDocument.getDocumentElement)
+
+    set(Sizes.widthAttribute, width)
+    set(Sizes.heightAttribute, height)
   }
 }
 
@@ -83,13 +84,12 @@ object Sizes {
   val batikExInEms: Float = 0.5f
 
   def apply(svgDocument: SVGDocument): Sizes = {
-    val viewBox: Array[Float] = svgDocument.getRootElement
-      .getAttribute("viewBox")
-      .split(" ")
-      .map(_.toFloat)
+    val viewBox: Array[Float] =
+      viewBoxAttribute.doGet(svgDocument.getDocumentElement)
+        .split(" ").map(_.toFloat)
 
     new Sizes(
-      fontSize = FontSizeAttribute.doGet(svgDocument),
+      fontSize = fontSizeAttribute.doGet(svgDocument.getDocumentElement),
       minX = viewBox(0),
       minY = viewBox(1),
       width = viewBox(2),
@@ -97,12 +97,14 @@ object Sizes {
     )
   }
 
+  val widthAttribute: Attribute[String] = Attribute("width")
+  val heightAttribute: Attribute[String] = Attribute("height")
+  val viewBoxAttribute: Attribute[String] = Attribute("viewBox")
+
   /**
     * Font size (in points) used for the output.
     */
   @SerialVersionUID(1L)
-  case object FontSizeAttribute extends Attribute.FloatAttribute("fontSize") {
-    override def namespace: Option[Namespace] = Some(MathJax.Namespace)
-    override def default: Float = 12.0f
-  }
+  val fontSizeAttribute: Attribute.FloatAttribute =
+    new Attribute.FloatAttribute("fontSize", MathJax.namespace, default = 12.0f)
 }

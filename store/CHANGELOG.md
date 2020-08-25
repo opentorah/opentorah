@@ -4,6 +4,10 @@ Modules covered: `store`, `metadata`, `xml`, `tei`, `util`, `texts`, `dream-pape
 
 ## [Unreleased]
 
+## [0.1.54] - 2020-
+- converting TEI to HTML;
+- XML Namespace, Dialect and Attribute cleanup;
+
 ## [0.1.53] - 2020-08-23
 - texts metadata parsers ZIOfied a little
 - PrettyPrinter chunking cleanup

@@ -1,5 +1,3 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.RawXml
-
-object EncodingDesc extends RawXml("encodingDesc")
+object EncodingDesc extends TeiRawXml("encodingDesc")

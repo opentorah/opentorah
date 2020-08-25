@@ -19,7 +19,7 @@ object Editor extends Element.WithToXml[Editor]("editor") {
     persName
   )
 
-  override protected val antiparser: Antiparser[Editor] = Antiparser(
+  override protected val antiparser: Antiparser[Editor] = Tei.concat(
     roleAttribute.toXmlOption.compose[Editor](_.role),
     EntityReference.toXmlOption.compose[Editor](_.persName)
   )

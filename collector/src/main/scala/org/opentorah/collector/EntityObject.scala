@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.{EntityHolder, Path, Store, WithPath}
-import org.opentorah.tei.{Entity, EntityReference, Ref}
+import org.opentorah.tei.{Entity, EntityReference, Ref, Tei}
 import org.opentorah.util.{Collections, Files}
 import scala.xml.{Elem, Node}
 
@@ -49,7 +49,7 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
         .filter(reference => (reference.path.length >=3) && reference.path.init.init.last.store.isInstanceOf[Collection])
         .groupBy(reference => reference.path.init.init).toSeq.sortBy(_._1)(Hierarchy.pathOrdering)
 
-    <p rendition="mentions">
+    <p xmlns={Tei.namespace.uri} rendition="mentions">
       {Ref.toXml(NamesObject.entityInTheListUrl(id), "[...]")}
       {if (fromEntities.isEmpty) Seq.empty else {
       <l>

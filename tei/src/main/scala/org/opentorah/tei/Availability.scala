@@ -20,7 +20,7 @@ object Availability extends Element.WithToXml[Availability]("availability") {
     xml
   )
 
-  override protected val antiparser: Antiparser[Availability] = Antiparser(
+  override protected val antiparser: Antiparser[Availability] = Tei.concat(
     // TODO why can't I remove [T] from compose() calls here?
     statusAttribute.toXmlOption.compose[Availability](_.status),
     Antiparser.xml.compose[Availability](_.xml)

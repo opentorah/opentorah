@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.{By, Path, Store, WithPath}
-import org.opentorah.tei.Ref
+import org.opentorah.tei.{Ref, Tei}
 import org.opentorah.xml.Xml
 import scala.xml.Node
 
@@ -17,11 +17,11 @@ final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
   )
 
   override protected def teiBody: Seq[Node] =
-    <head>{Ref.toXml(new HierarchyObject(site, Path.empty, site.store).teiWrapperFile.url, TreeIndexObject.title)}</head> ++
+    <head xmlns={Tei.namespace.uri}>{Ref.toXml(new HierarchyObject(site, Path.empty, site.store).teiWrapperFile.url, TreeIndexObject.title)}</head> ++
     listForStore(Path.empty, site.store)
 
   private def listForStore(path: Path, store: Store): Seq[Node] = store.by.toSeq.flatMap { by: By[_] =>
-    <list type="none">
+    <list xmlns={Tei.namespace.uri} type="none">
       <item><emph>{Hierarchy.getName(by.selector.names)}</emph></item>
       <item><list type="none">
           {by.stores.map(_.asInstanceOf[Store]).map { store => // TODO get rid of the cast!!!

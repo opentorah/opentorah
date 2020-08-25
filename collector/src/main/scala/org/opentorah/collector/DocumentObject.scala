@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.WithPath
-import org.opentorah.tei.{Body, Tei}
+import org.opentorah.tei.{Body, CalendarDesc, Page, Pb, Tei}
 import org.opentorah.util.Files
 import org.opentorah.xml.{PrettyPrinter, Xml}
 import scala.xml.{Elem, Node}
@@ -30,7 +30,7 @@ final class DocumentObject(
   }
 
   private def headerTei: Seq[Node] =
-    <p rendition="document-header">
+    <p xmlns={Tei.namespace.uri} rendition="document-header">
       <l>{document.description}</l>
       <l>Дата: {document.date}</l>
       <l>Кто: {document.author}</l>
@@ -48,13 +48,13 @@ final class DocumentObject(
     </div>
 
   override protected def teiTransformer: Tei => Tei =
-    Transformers.addPublicationStatement compose
-    Transformers.addSourceDesc compose
-    Transformers.addCalendarDesc compose
-    Transformers.addLanguage
+    Site.addPublicationStatement compose
+    Site.addSourceDesc compose
+    Tei.addCalendarDesc(new CalendarDesc.Value(<calendar xml:id="julian"><p>Julian calendar</p></calendar>)) compose
+    Tei.addLanguage
 
   override protected def xmlTransformer: Xml.Transformer =
-    super.xmlTransformer compose Transformers.pbTransformer(facsUrl)
+    super.xmlTransformer compose Pb.transformer(site.resolver(facsUrl))
 
   override protected def yaml: Seq[(String, String)] =
     Seq("facs" -> Files.mkUrl(facsUrl)) ++

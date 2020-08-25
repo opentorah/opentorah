@@ -1,5 +1,6 @@
 package org.opentorah.collector
 
+import org.opentorah.tei.Tei
 import scala.xml.Node
 
 final class NoRefsReport(site: Site) extends ReportObject(site) {
@@ -10,9 +11,9 @@ final class NoRefsReport(site: Site) extends ReportObject(site) {
 
   // TODO give a link to the ref:
   override protected def teiBody: Seq[Node] =
-    <head>{NoRefsReport.title}</head> ++
+    <head xmlns={Tei.namespace.uri}>{NoRefsReport.title}</head> ++
       (for (reference <- site.references.filter(_.value.ref.isEmpty)) yield
-        <l>{reference.value.name.map(_.text.trim).mkString(" ") + " в " +
+        <l xmlns={Tei.namespace.uri}>{reference.value.name.map(_.text.trim).mkString(" ") + " в " +
           Hierarchy.referenceCollectionName(reference) + ":" +
           Hierarchy.storeName(reference.path.last.store)}</l>)
 }

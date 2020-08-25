@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.{Language, Names}
 import org.opentorah.store.{Binding, Path, Store, WithPath}
-import org.opentorah.tei.{EntityReference, Ref}
+import org.opentorah.tei.{EntityReference, Ref, Tei}
 import org.opentorah.util.Files
 import org.opentorah.xml.{RawXml, Xml}
 import scala.xml.{Elem, Node}
@@ -24,8 +24,8 @@ object Hierarchy {
 
   def storeHeader(path: Path, store: Store): Seq[Node] =
     pathLinks(path) ++
-    <head>{storeTitle(path, store)}</head> ++
-    store.storeAbstract.map(value => Seq(<span>{value.xml}</span>)).getOrElse(Seq.empty) ++
+    <head xmlns={Tei.namespace.uri}>{storeTitle(path, store)}</head> ++
+    store.storeAbstract.map(value => Seq(<span xmlns={Tei.namespace.uri}>{value.xml}</span>)).getOrElse(Seq.empty) ++
     RawXml.getXml(store.body)
 
   private def pathLinks(pathRaw: Path): Seq[Elem] = {
@@ -36,7 +36,7 @@ object Hierarchy {
         target = urlPrefix(Path(ancestor)),
         text = getName(binding.store.names)
       )
-      <l>{getName(binding.selector.names)} {link ++ storeTitle(binding.store)}</l>
+      <l xmlns={Tei.namespace.uri}>{getName(binding.selector.names)} {link ++ storeTitle(binding.store)}</l>
     }
   }
 
@@ -66,7 +66,7 @@ object Hierarchy {
   // TODO eliminate
   def collectionXml(site: Site, collection: WithPath[Collection]): Elem =
   // TODO make a Ref serializer that takes SiteObject...
-    <item>{Ref.toXml(
+    <item xmlns={Tei.namespace.uri}>{Ref.toXml(
       target = new CollectionObject(site, collection).teiWrapperFile.url,
       text = fullName(collection.path) + Xml.toString(storeTitle(collection.value))
       )}<lb/>

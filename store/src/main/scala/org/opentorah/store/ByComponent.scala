@@ -36,7 +36,7 @@ class ByComponent extends Component("by") {
     className
   )
 
-  override protected def inlineAntiparser: Antiparser[Inline] = Antiparser(
+  override protected def inlineAntiparser: Antiparser[Inline] = Antiparser.concat(
     selectorAttribute.toXml.compose(_.selector),
     directoryAttribute.toXmlOption.compose(_.directory),
     listAttribute.toXmlOption.compose(_.list),
@@ -97,7 +97,7 @@ class ByComponent extends Component("by") {
 
     override protected def parser: Parser[Seq[String]] = Text("file").all
 
-    override protected def antiparser: Antiparser[Seq[String]] = Antiparser(
+    override protected def antiparser: Antiparser[Seq[String]] = Antiparser.concat( // TODO concat() and not apply()?
       Antiparser.xml.compose[Seq[String]](value => for (file <- value) yield <file>{file}</file>)
     )
   }
