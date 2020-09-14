@@ -1,6 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.{Selector, Store, Urls}
+import org.opentorah.tei.Page
 
 final class Manuscript(
   inheritedSelectors: Seq[Selector],

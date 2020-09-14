@@ -3,7 +3,7 @@ package org.opentorah.xml
 import org.opentorah.util.Strings
 import org.typelevel.paiges.Doc
 
-final class PrettyPrinter(
+final case class PrettyPrinter(
   width: Int = 120,
   indent: Int = 2,
   doNotStackElements: Set[String] = Set(),
@@ -72,7 +72,7 @@ object PrettyPrinter {
   ) {
 
     def renderXml(node: N.Element, doctype: Option[String]): String =
-      Namespace.Xml.header + "\n" +
+      Xml.header + "\n" +
       doctype.fold("")(doctype => doctype + "\n") +
       render(node) + "\n"
 
@@ -92,12 +92,16 @@ object PrettyPrinter {
       val label: String = N.getName(element)
       val name: String = N.getPrefix(element).fold("")(_ + ":") + label
 
-      val attributeValues: Seq[Attribute.Value[String]] = N.getAttributes(element, parent).filterNot(_.value.isEmpty)
+      val parentNamespaces: Seq[Namespace] = parent.fold[Seq[Namespace]](Seq.empty)(N.getNamespaces)
+      val attributeValues: Seq[Attribute.Value[String]] =
+        N.getNamespaces(element).filterNot(parentNamespaces.contains).map(_.attributeValue) ++
+        N.getAttributes(element).filterNot(_.value.isEmpty)
+
       val attributes: Doc =
         if (attributeValues.isEmpty) Doc.empty
         else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, attributeValues.map(attributeValue =>
-          Doc.text(attributeValue.attribute.prefixedName + "=") + Doc.lineOrEmpty +
-          Doc.text("\"" + attributeValue.value.get + "\"")
+          Doc.text(attributeValue.attribute.qName + "=") + Doc.lineOrEmpty +
+          Doc.text("\"" + attributeValue.valueToString.get + "\"")
         ))
 
       val nodes: Seq[N] = atomize(Seq.empty, N.getChildren(element))
@@ -214,7 +218,7 @@ object PrettyPrinter {
       parent: Option[N.Element],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
-    ): Doc = {
+    ): Doc =
       if (N.isElement(node)) {
         val element: N.Element = N.asElement(node)
         val result = fromElement(element, parent, canBreakLeft, canBreakRight)
@@ -223,7 +227,6 @@ object PrettyPrinter {
       }
       else if (N.isText(node)) Doc.text(N.getText(N.asText(node)))
       else Doc.paragraph(N.toString(node))
-    }
   }
 
   val default: PrettyPrinter = new PrettyPrinter

@@ -1,184 +1,174 @@
 package org.opentorah.xml
 
-import org.w3c.dom.{Document, Element => DomElement}
-import org.xml.sax.Attributes
-import org.xml.sax.helpers.AttributesImpl
 import zio.ZIO
 
-// Type-safe XML attribute get/set - for use in DOM and SAX inspired by
-//   net.sourceforge.jeuclid.context.Parameter and friends.
+// Type-safe XML attribute get/set - for use in DOM and SAX;
+// inspired by JEuclid's net.sourceforge.jeuclid.context.Parameter and friends.
 abstract class Attribute[T](
   val name: String,
-  val prefix: Option[String] = None
+  val namespace: Namespace,
+  val default: T,
+  val setDefault: Boolean
 ) extends Conversion[T] with Requireable[T] {
 
-  final def prefixedName: String = prefix.fold("")(prefix => s"$prefix:") + s"$name"
+  require((name != null) && !name.contains(":"))
+  require(name.nonEmpty || (namespace == Namespace.Xmlns))
+  
+  final override def equals(other: Any): Boolean = other match {
+    case that: Attribute[_] => (name == that.name) && (namespace.getUri == that.namespace.getUri)
+    case _ => false
+  }
 
-  final override def toString: String = s"attribute $name"
+  final override def toString: String = s"$qName"
 
-  def namespace: Option[Namespace] = None
+  final def qName: String = namespace.qName(name)
 
-  def default: T
+  final def inNamespace(namespace: Namespace): Attribute[T] =
+    if (this.namespace != namespace) this else withNamespace(Namespace.No)
 
-  // Scala XML
+  def withNamespace(namespace: Namespace): Attribute[T]
 
-  final override def optional: Parser[Option[T]] = Context.takeAttribute(name).flatMap { value =>
+  def getWithDefault(value: Option[T]): T = value.getOrElse(default)
+
+  def doGet(value: Option[T]): T = value.get
+
+  final def effectiveValue(value: Option[T]): Option[T] =
+    if (!setDefault) value.filterNot(_ == default)
+    else value.orElse(Some(default))
+
+  // Value
+
+  final def withValue(value: Option[T]): Attribute.Value[T] = new Attribute.Value[T](this, value)
+
+  final def withValue(value: T): Attribute.Value[T] = withValue(Option(value))
+
+  // Parser
+
+  final override def optional: Parser[Option[T]] = Context.takeAttribute(this).flatMap { value =>
     value.fold[Parser[Option[T]]](ZIO.none)(parseFromString(_).map(Some(_)))
   }
 
   final def optionalOrDefault: Parser[T] = optional.map(_.getOrElse(default))
 
-  final def withValue(value: Option[T]): Attribute.Value[T] = new Attribute.Value[T](this, value)
-
   final def toXml: Antiparser[T] = Antiparser(
-    attributes = value => Seq(withValue(Some(value)))
+    attributes = value => Seq(withValue(value))
   )
 
   final def toXmlOption: Antiparser[Option[T]] = Antiparser(
     attributes = value => Seq(withValue(value))
   )
 
-  final def toXmlNonDefault: Antiparser[T] = Antiparser(
-    attributes = value => Seq(withNonDefaultValue(Some(value)))
-  )
-
-  final def toXmlNonDefaultOption: Antiparser[Option[T]] = Antiparser(
-    attributes = value => Seq(this.withNonDefaultValue(value))
-  )
-
-  private def withNonDefaultValue(value: Option[T]): Attribute.Value[T] =
-    new Attribute.Value[T](this, if (value.contains(default)) None else value)
+  // Scala XML
+  final def get(element: scala.xml.Elem): Option[T] = get(Xml.getAttribute(this, element))
+  final def getWithDefault(element: scala.xml.Elem): T = getWithDefault(get(element))
+  final def doGet(element: scala.xml.Elem): T = doGet(get(element))
 
   // DOM
-
-  final def get(document: Document): Option[T] = {
-    val element: DomElement = document.getDocumentElement
-    val namespaceEffective = namespace
-    get(namespaceEffective.fold(element.getAttribute(name))(namespace => element.getAttributeNS(namespace.uri, name)))
-  }
-
-  final def doGet(document: Document): T = get(document).get
-
-  final def getWithDefault(document: Document): T = get(document).getOrElse(default)
-
-  final def set(value: T, document: Document): Unit = {
-    val element = document.getDocumentElement
-    val namespaceEffective = namespace.filterNot(_.is(element.getNamespaceURI))
-    namespaceEffective.fold(element.setAttribute(name, toString(value))){ namespace =>
-      // declare the attribute's namespace if it is not declared
-      namespace.ensureDeclared(element)
-
-      element.setAttributeNS(namespace.uri, namespace.qName(name), toString(value))
-    }
-  }
+  final def get(element: org.w3c.dom.Element): Option[T] = get(Dom.getAttribute(this, element))
+  final def getWithDefault(element: org.w3c.dom.Element): T = getWithDefault(get(element))
+  final def doGet(element: org.w3c.dom.Element): T = getWithDefault(get(element))
 
   // SAX
-
-  final def get(defaultNamespace: Namespace, attributes: Attributes): Option[T] = {
-    // Note: when attribute is in the default namespace, it needs to be retrieved accordingly.
-    // This is needed for the 'display' attribute (the only attribute this method is used for) of the included MathML -
-    // but somehow does not seem to break the inline MathML either :)
-    val namespaceEffective = namespace.filterNot(_.is(defaultNamespace))
-
-    get(attributes.getValue(
-      namespaceEffective.fold("")(_.uri),
-      name
-    ))
-  }
-
-  final def set(defaultNamespace: Namespace, value: T, attributes: AttributesImpl): Unit = {
-    // Note: when attribute is added with the default namespace, this is not detected and a new namespace
-    // with the same URI gets auto-declared - is this a bug or a feature?
-    // Work-around: set the attribute *without* the namespace when I know that it is the default one!
-    val namespaceEffective = namespace.filterNot(_.is(defaultNamespace))
-
-    /* Note: if namespace.ensureDeclared() *is* called, I get error parsing the resulting fo:
-      org.xml.sax.SAXParseException
-      The prefix "xmlns" cannot be bound to any namespace explicitly; neither can the namespace for "xmlns" be bound to any prefix explicitly.
-          at org.apache.xerces.parsers.AbstractSAXParser.parse(Unknown Source)
-          at org.apache.xerces.jaxp.SAXParserImpl$JAXPSAXParser.parse(Unknown Source)
-          at com.icl.saxon.IdentityTransformer.transform(IdentityTransformer.java:59)
-      If it is not - there is still somehow "mathjax" namespace declaration in the output of the MathReader...
-
-      if (!inDefaultNamespace) namespace.ensureDeclared(attributes)
-     */
-
-    Attribute.addAttribute(
-      uri = namespaceEffective.fold("")(_.uri),
-      localName = name,
-      qName = namespaceEffective.fold(name)(_.qName(name)),
-      value = toString(value),
-      attributes
-    )
-  }
-
-  def setWithDefault(defaultNamespace: Namespace, value: Option[T], attributes: AttributesImpl): Unit =
-    set(defaultNamespace, value.getOrElse(default), attributes)
-
-  // helpers
-
-  private def get(value: String): Option[T] =
-    Option(value).filter(_.nonEmpty).map(fromString)
+  final def get(attributes: org.xml.sax.Attributes): Option[T] = get(Sax.getAttribute(this, attributes))
+  final def getWithDefault(attributes: org.xml.sax.Attributes): T = getWithDefault(get(attributes))
+  final def doGet(attributes: org.xml.sax.Attributes): T = doGet(get(attributes))
 }
 
 object Attribute {
 
-  final class Value[A](
-    val attribute: Attribute[A],
-    val value: Option[A]
-  ) {
-    def valueToString: Option[String] = value.map(attribute.toString)
+  final class StringAttribute(
+    name: String,
+    namespace: Namespace = Namespace.No,
+    default: String = "",
+    setDefault: Boolean = false
+  ) extends Attribute[String](name, namespace, default, setDefault) with Conversion.StringConversion {
+
+    override def withNamespace(namespace: Namespace): StringAttribute =
+      new StringAttribute(name, namespace, default, setDefault)
   }
 
   def apply(
     name: String,
-    prefix: Option[String] = None
-  ): Attribute[String] = new Attribute[String](name, prefix) with Conversion.StringConversion {
-    override def default: String = ""
+    namespace: Namespace = Namespace.No,
+    default: String = "",
+    setDefault: Boolean = false
+  ): Attribute[String] = new StringAttribute(name, namespace, default, setDefault)
+
+  final class BooleanAttribute(
+    name: String,
+    namespace: Namespace = Namespace.No,
+    default: Boolean = false,
+    setDefault: Boolean = false
+  ) extends Attribute[Boolean](name, namespace, default, setDefault) with Conversion.BooleanConversion {
+
+    override def withNamespace(namespace: Namespace): BooleanAttribute =
+      new BooleanAttribute(name, namespace, default, setDefault)
+
+    def withSetDefault: BooleanAttribute =
+      new BooleanAttribute(name, namespace, default, true)
   }
 
-  final class BooleanAttribute(name: String) extends Attribute[Boolean](name) with Conversion.BooleanConversion {
-    override def default: Boolean = false
+  final class IntAttribute(
+    name: String,
+    namespace: Namespace = Namespace.No,
+    default: Int = 0,
+    setDefault: Boolean = false
+  ) extends Attribute[Int](name, namespace, default, setDefault) with Conversion.IntConversion {
+
+    override def withNamespace(namespace: Namespace): IntAttribute =
+      new IntAttribute(name, namespace, default, setDefault)
   }
 
-  object BooleanAttribute {
-    def apply(name: String): BooleanAttribute = new BooleanAttribute(name)
+  final class PositiveIntAttribute(
+    name: String,
+    namespace: Namespace = Namespace.No,
+    default: Int = 1,
+    setDefault: Boolean = false
+  ) extends Attribute[Int](name, namespace, default, setDefault) with Conversion.PositiveIntConversion {
+
+    override def withNamespace(namespace: Namespace): PositiveIntAttribute =
+      new PositiveIntAttribute(name, namespace, default, setDefault)
   }
 
-  final class IntAttribute(name: String) extends Attribute[Int](name) with Conversion.IntConversion {
-    override def default: Int = 0
+  final class FloatAttribute(
+    name: String,
+    namespace: Namespace = Namespace.No,
+    default: Float = 0.0f,
+    setDefault: Boolean = false
+  ) extends Attribute[Float](name, namespace, default, setDefault) with Conversion.FloatConversion {
+
+    override def withNamespace(namespace: Namespace): FloatAttribute =
+      new FloatAttribute(name, namespace, default, setDefault)
   }
 
-  object IntAttribute {
-    def apply(name: String): IntAttribute = new IntAttribute(name)
+  final class Value[T](
+    val attribute: Attribute[T],
+    val value: Option[T]
+  ) {
+    override def toString: String = s"""$attribute="${valueToString.orNull}""""
+
+    def effectiveValue: Option[T] = attribute.effectiveValue(value)
+
+    def valueToString: Option[String] = effectiveValue.map(attribute.toString)
+
+    // TODO add set(scala.xml.Elem)
+
+    def set(element: org.w3c.dom.Element): Unit =
+      effectiveValue.foreach(value => Dom.setAttribute(attribute, value, element))
+
+    def set(attributes: org.xml.sax.helpers.AttributesImpl): Unit =
+      effectiveValue.foreach(value => Sax.setAttribute(attribute, value, attributes))
   }
 
-  final class PositiveIntAttribute(name: String) extends Attribute[Int](name) with Conversion.PositiveIntConversion {
-    override def default: Int = 1
-  }
+  val allAttributes: Parser[Seq[Value[String]]] = Context.takeAllAttributes
 
-  object PositiveIntAttribute {
-    def apply(name: String): PositiveIntAttribute = new PositiveIntAttribute(name)
-  }
+  // Scala XML
+  def getAll(element: scala.xml.Elem): Seq[Attribute.Value[String]] = Xml.getAttributes(element)
+  def setAll(element: scala.xml.Elem, attributes: Seq[Attribute.Value[_]]): scala.xml.Elem = Xml.setAttributes(element, attributes)
 
-  abstract class FloatAttribute(name: String) extends Attribute[Float](name) with Conversion.FloatConversion
+  // DOM
+  def getAll(element: org.w3c.dom.Element): Seq[Attribute.Value[String]] = Dom.getAttributes(element)
 
-  val id: Attribute[String] = Attribute("xml:id")
-
-  val allAttributes: Parser[Map[String, String]] =
-    Context.takeAllAttributes
-
-  def addAttribute(
-    uri: String,
-    localName: String,
-    qName: String,
-    value: String,
-    attributes: AttributesImpl
-  ): Unit = attributes.addAttribute(
-    uri,
-    localName,
-    qName,
-    "CDATA",
-    value
-  )
+  // SAX
+  def getAll(attributes: org.xml.sax.Attributes): Seq[Attribute.Value[String]] = Sax.getAttributes(attributes)
 }

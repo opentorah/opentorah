@@ -5,6 +5,9 @@ import zio.ZIO
 trait Conversion[A] {
   def toString(value: A): String = value.toString
 
+  final def get(value: Option[String]): Option[A] =
+    value.filter(_.nonEmpty).map(fromString)
+
   def fromString(value: String): A
 
   def parseFromString(value: String): Parser[A] = for {

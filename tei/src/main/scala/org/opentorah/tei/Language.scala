@@ -11,7 +11,7 @@ final case class Language(
 object Language extends Element.WithToXml[Language]("language") {
 
   private val identAttribute: Attribute[String] = Attribute("ident")
-  private val usageAttribute: Attribute.PositiveIntAttribute = Attribute.PositiveIntAttribute("usage")
+  private val usageAttribute: Attribute.PositiveIntAttribute = new Attribute.PositiveIntAttribute("usage")
 
   override protected def contentType: ContentType = ContentType.Mixed
 
@@ -25,7 +25,7 @@ object Language extends Element.WithToXml[Language]("language") {
     text
   )
 
-  override protected val antiparser: Antiparser[Language] = Antiparser(
+  override protected val antiparser: Antiparser[Language] = Tei.concat(
     identAttribute.toXml.compose[Language](_.ident),
     usageAttribute.toXmlOption.compose[Language](_.usage),
     Antiparser.xml.compose[Language](value => value.text.toSeq.map(Xml.mkText))

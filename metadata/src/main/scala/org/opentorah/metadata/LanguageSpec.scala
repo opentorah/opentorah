@@ -29,7 +29,7 @@ object LanguageSpec {
     new LanguageSpec(language = Some(language), isTransliterated = Some(isTransliterated), flavour = Some(flavour))
 
   private val langAttribute: Attribute[String] = Attribute("lang")
-  private val transliteratedAttribute: Attribute.BooleanAttribute = Attribute.BooleanAttribute("transliterated")
+  private val transliteratedAttribute: Attribute.BooleanAttribute = new Attribute.BooleanAttribute("transliterated")
   private val flavourAttribute: Attribute[String] = Attribute("flavour")
 
   val parser: Parser[LanguageSpec] = for {
@@ -43,9 +43,9 @@ object LanguageSpec {
   )
 
   // TODO inherit from ToXml?
-  val antiparser: Antiparser[LanguageSpec] = Antiparser(
+  val antiparser: Antiparser[LanguageSpec] = Antiparser.concat(
     langAttribute.toXmlOption.compose(_.language.map(_.name)),
-    transliteratedAttribute.toXmlNonDefaultOption.compose(_.isTransliterated),
+    transliteratedAttribute.toXmlOption.compose(_.isTransliterated),
     flavourAttribute.toXmlOption.compose(_.flavour)
   )
 }

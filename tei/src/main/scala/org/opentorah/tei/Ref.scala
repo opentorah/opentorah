@@ -12,6 +12,7 @@ final case class Ref(
 
 object Ref extends Element.WithToXml[Ref]("ref") {
 
+  val roleAttribute: Attribute[String] = Attribute("role")
   val targetAttribute: Attribute[String] = Attribute("target")
   val renditionAttribute: Attribute[String] = Attribute("rendition")
 
@@ -27,7 +28,7 @@ object Ref extends Element.WithToXml[Ref]("ref") {
     text
   )
 
-  override protected val antiparser: Antiparser[Ref] = Antiparser(
+  override protected val antiparser: Antiparser[Ref] = Tei.concat(
     targetAttribute.toXml.compose(_.target),
     renditionAttribute.toXmlOption.compose(_.rendition),
     Antiparser.xml.compose(_.text)
@@ -43,4 +44,23 @@ object Ref extends Element.WithToXml[Ref]("ref") {
     target: Seq[String],
     text: Seq[Node]
   ): Elem = toXmlElement(new Ref(Files.mkUrl(target), rendition = None, text))
+
+  def transformer(resolver: TeiResolver): Xml.Transformer = elem => if (elem.label != elementName) elem else {
+    if (elem.child.forall(Xml.isWhitespace)) println(s"No reference text: $elem")
+    targetAttribute.get(elem).fold(throw new IllegalArgumentException(s"empty target: $elem")) { target =>
+      if (!target.startsWith("/")) elem else {
+        val (url, part) = Files.urlAndPart(target)
+        resolver.resolve(url).fold(elem) { resolved =>
+          val role: Option[String] = resolved.role
+          if (role.isEmpty) elem else {
+            Attribute.setAll(elem, Seq(
+              roleAttribute.withValue(role),
+              targetAttribute.withValue(Files.mkUrl(Files.addPart(resolved.url, part))),
+              renditionAttribute.withValue(renditionAttribute.get(elem))
+            ))
+          }
+        }
+      }
+    }
+  }
 }

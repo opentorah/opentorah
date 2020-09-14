@@ -21,16 +21,7 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
   private def check(xml: Elem, width: Int, expected: String): Unit =
     check(From.xml("test XML", xml), width, expected)
 
-//  private def print(from: From, width: Int): Unit = {
-//    println("                                                                                                                                   ".take(width-1) + "|")
-//    println("0         1         2         3         4         5         6         7         8         9         0         1         2         3")
-//    println("01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890")
-//    println(render(from, width))
-//  }
-
   "Chunking" should "work" in {
-//    print(From.resource(this, "print1"), 120)
-
     check(<a>X<b/> </a>, 120, expected =
     """|<a>X<b/></a>""")
 
@@ -120,31 +111,31 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
          |/>blah</creation>""")
 
     check(
-      <xsl:stylesheet xmlns:xsl={Namespace.Xsl.uri} version={Namespace.Xsl.version(false)}
-                      xmlns:db={Namespace.DocBook.uri}
+      <xsl:stylesheet xmlns:xsl={Xsl.namespace.uri} version={Xsl.version(false)}
+                      xmlns:db="http://docbook.org/ns/docbook"
                       exclude-result-prefixes="db">
         <!-- Customizations go here. -->
         <!-- dummy -->
       </xsl:stylesheet>,
       width = 120, expected =
-        """|<xsl:stylesheet version="1.0" exclude-result-prefixes="db" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:db=
-           |"http://docbook.org/ns/docbook">
-           |  <!-- Customizations go here. -->
-           |  <!-- dummy -->
-           |</xsl:stylesheet>""")
+        s"""|<xsl:stylesheet xmlns:db="http://docbook.org/ns/docbook" xmlns:xsl="${Xsl.namespace.uri}" version="1.0"
+            |exclude-result-prefixes="db">
+            |  <!-- Customizations go here. -->
+            |  <!-- dummy -->
+            |</xsl:stylesheet>""")
 
     check(
-      <xsl:stylesheet xmlns:xsl={Namespace.Xsl.uri} version={Namespace.Xsl.version(false)}
-                      xmlns:db={Namespace.DocBook.uri}
+      <xsl:stylesheet xmlns:xsl={Xsl.namespace.uri} version={Xsl.version(false)}
+                      xmlns:db="http://docbook.org/ns/docbook"
                       exclude-result-prefixes="db">
         <xsl:param value="x"/>
         <d:y xmlns:y="zzz"/>
       </xsl:stylesheet>,
       width = 120, expected =
-        """|<xsl:stylesheet version="1.0" exclude-result-prefixes="db" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:db=
-           |"http://docbook.org/ns/docbook">
-           |  <xsl:param value="x"/>
-           |  <d:y xmlns:y="zzz"/>
-           |</xsl:stylesheet>""")
+        s"""|<xsl:stylesheet xmlns:db="http://docbook.org/ns/docbook" xmlns:xsl="${Xsl.namespace.uri}" version="1.0"
+            |exclude-result-prefixes="db">
+            |  <xsl:param value="x"/>
+            |  <d:y xmlns:y="zzz"/>
+            |</xsl:stylesheet>""")
   }
 }

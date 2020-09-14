@@ -26,7 +26,7 @@ object Redirect {
   private def toXml(name: String): ToXml[Redirect] = new ToXml[Redirect] {
     override protected def elementName(value: Redirect): String = name
 
-    override protected def antiparser: Antiparser[Redirect] = Antiparser(
+    override protected def antiparser: Antiparser[Redirect] = Antiparser.concat(
       fileAttribute.toXml.compose[Redirect](_.file)
     )
   }

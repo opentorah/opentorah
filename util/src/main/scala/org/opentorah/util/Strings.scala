@@ -36,4 +36,7 @@ object Strings {
     f(sb)
     sb.toString
   }
+
+  def empty2none(string: String): Option[String] =
+    if (string == null || string.isEmpty) None else Some(string)
 }

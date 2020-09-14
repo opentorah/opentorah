@@ -1,14 +1,14 @@
 package org.opentorah.xml
 
-import java.io.{File, FileWriter, StringReader}
+import java.io.{File, FileWriter}
 import javax.xml.transform.dom.DOMResult
 import javax.xml.transform.sax.{SAXResult, SAXSource, SAXTransformerFactory}
 import javax.xml.transform.stream.{StreamResult, StreamSource}
-import javax.xml.transform.{ErrorListener, Result => TransformResult, Source, Transformer, TransformerException}
+import javax.xml.transform.{ErrorListener, Source, Transformer, TransformerException, Result => TransformResult}
 import org.slf4j.{Logger, LoggerFactory}
 import org.w3c.dom.Node
 import org.xml.sax.helpers.DefaultHandler
-import org.xml.sax.{ErrorHandler, InputSource, SAXParseException, XMLReader}
+import org.xml.sax.{ErrorHandler, InputSource, SAXParseException, XMLFilter, XMLReader}
 
 sealed abstract class Saxon(name: String) {
 
@@ -71,16 +71,16 @@ sealed abstract class Saxon(name: String) {
   )
 
   def parse(
-    input: String,
-    xmlReader: XMLReader
+    inputSource: InputSource,
+    filters: Seq[XMLFilter] = Seq.empty
   ): Node = {
     val result = new DOMResult
 
     transform(
       resolver = None,
       stylesheetFile = None,
-      inputSource = new InputSource(new StringReader(input)),
-      xmlReader,
+      inputSource = inputSource,
+      Xerces.getFilteredXMLReader(filters),
       result
     )
 

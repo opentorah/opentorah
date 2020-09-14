@@ -3,10 +3,14 @@ package org.opentorah.mathjax
 import java.io.{InputStream, StringBufferInputStream}
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory
 import org.apache.fop.util.UnclosableInputStream
-import org.opentorah.xml.Xerces
+import org.opentorah.xml.{Dialect, Namespace, Xerces}
 import org.w3c.dom.svg.SVGDocument
 
-object Svg {
+object Svg extends Dialect {
+
+  override val namespace: Namespace = Namespace(uri="http://www.w3.org/2000/svg", prefix="svg")
+
+  override val mimeType: String = "image/svg+xml"
 
   private lazy val svgFactory: SAXSVGDocumentFactory = {
     // org.apache.batik.dom.util.SAXDocumentFactory sets up a default SAXParserFactory

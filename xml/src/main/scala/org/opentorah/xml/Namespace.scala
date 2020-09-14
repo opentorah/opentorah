@@ -1,110 +1,139 @@
 package org.opentorah.xml
 
-import org.w3c.dom.{Document, Element => DomElement}
-import org.xml.sax.helpers.AttributesImpl
+import org.opentorah.util.Strings
 
-class Namespace(val uri: String, val prefix: String) {
+/* from https://www.w3.org/TR/xml-names/
 
-  final override def equals(other: Any): Boolean = other match {
-    case that: Namespace =>
-      val result: Boolean = this.is(that)
-      if (result) require(this.prefix == that.prefix)
-      result
+  The prefix xml is by definition bound to the namespace name http://www.w3.org/XML/1998/namespace.
+  It MAY, but need not, be declared, and MUST NOT be bound to any other namespace name.
+  Other prefixes MUST NOT be bound to this namespace name, and it MUST NOT be declared as the default namespace.
 
+  The prefix xmlns is used only to declare namespace bindings and is by definition bound to the namespace
+  name http://www.w3.org/2000/xmlns/. It MUST NOT be declared. Other prefixes MUST NOT be bound to this namespace name,
+  and it MUST NOT be declared as the default namespace. Element names MUST NOT have the prefix xmlns.
+
+  All other prefixes beginning with the three-letter sequence x, m, l, in any case combination, are reserved.
+  This means that:
+    users SHOULD NOT use them except as defined by later specifications
+    processors MUST NOT treat them as fatal errors.
+
+  If there is no default namespace declaration in scope, the namespace name has no value.
+  The namespace name for an unprefixed attribute name always has no value.
+*/
+sealed trait Namespace {
+
+  def getUri: Option[String]
+
+  def uri: String
+
+  def getPrefix: Option[String]
+
+  def qName(localName: String): String
+
+  override def toString: String = attributeValue.toString
+
+  override def equals(other: Any): Boolean = other match {
+    case that: Namespace => (this.getUri == that.getUri) && (this.getPrefix == that.getPrefix)
     case _ => false
   }
 
-  final def is(document: Document): Boolean = is(document.getDocumentElement.getNamespaceURI)
+  final def isDefault: Boolean = getPrefix.isEmpty
 
-  final def is(namespace: Namespace): Boolean = is(namespace.uri)
+  final def default: Namespace = if (isDefault) this else Namespace(prefix = None, uri = getUri)
 
-  final def is(namespaceUri: String): Boolean = namespaceUri == uri
+  // Note: empty string attribute name is used for default namespace attributes;
+  // it is processed specially by Namespace.Xmlns.qName()
+  final def attribute: Attribute[String] =
+    new Attribute.StringAttribute(getPrefix.getOrElse(""), Namespace.Xmlns)
 
-  final override def toString: String = s"""$xmlns="$uri""""
+  final def attributeValue: Attribute.Value[String] = attribute.withValue(getUri)
 
-  final def isDefault: Boolean = prefix == ""
+  // Scala XML
+  final def declare(element: scala.xml.Elem): scala.xml.Elem = Xml.declareNamespace(this, element)
 
-  final def isTop: Boolean = isDefault && (uri == "")
+  // DOM
+  final def ensureDeclared(element: org.w3c.dom.Element): Unit = if (!isDeclared(element)) declare(element)
+  final def isDeclared(element: org.w3c.dom.Element): Boolean = Dom.isNamespaceDeclared(this, element)
+  final def declare(element: org.w3c.dom.Element): Unit = Dom.declareNamespace(this, element)
 
-  final def qName(localName: String): String = if (isDefault) localName else prefix + ":" + localName
-
-  final lazy val default: Namespace = if (isDefault) this else new Namespace(uri, prefix = "")
-
-  def ensureDeclared(element: DomElement): Unit =
-    if (!isDeclared(element)) declare(element)
-
-  private def isDeclared(element: DomElement): Boolean =
-    element.getAttributeNS(Namespace.Xmlns.uri, prefix) == uri
-
-  private def declare(element: DomElement): Unit =
-    element.setAttributeNS(Namespace.Xmlns.uri, xmlns, uri)
-
-  final def ensureDeclared(attributes: AttributesImpl): Unit =
-    if (!isDeclared(attributes)) declare(attributes)
-
-  private def isDeclared(attributes: AttributesImpl): Boolean =
-    attributes.getValue(Namespace.Xmlns.uri, prefix) == uri
-
-  final def declare(attributes: AttributesImpl): Unit = Attribute.addAttribute(
-    uri = Namespace.Xmlns.uri,
-    localName = prefix,
-    qName = xmlns,
-    value = uri,
-    attributes
-  )
-
-  final def isXmlns: Boolean = prefix == Namespace.Xmlns.prefix
-
-  private def xmlns: String =
-    if (isDefault) Namespace.Xmlns.prefix else Namespace.Xmlns.qName(prefix)
-
-  final def xmlnsAttribute: Attribute.Value[String] =
-    Attribute(xmlns).withValue(Some(uri))
+  // SAX
+  final def ensureDeclared(attributes: org.xml.sax.helpers.AttributesImpl): Unit = if (!isDeclared(attributes)) declare(attributes)
+  final def isDeclared(attributes: org.xml.sax.helpers.AttributesImpl): Boolean = Sax.isNamespaceDeclared(this, attributes)
+  final def declare(attributes: org.xml.sax.helpers.AttributesImpl): Unit = Sax.declareNamespace(this, attributes)
 }
 
 object Namespace {
-  object Top extends Namespace(uri = "", prefix = "")
 
-  object Xmlns extends Namespace(uri = "http://www.w3.org/2000/xmlns/", prefix = "xmlns")
+  final class Prefixed(prefix: String, override val uri: String) extends Namespace {
+    require((prefix != null) && prefix.nonEmpty)
+    require((uri != null) && uri.nonEmpty)
 
-  object Xml extends Namespace(uri = "http://www.w3.org/XML/1998/namespace", prefix = "xml") {
-    val header: String   = """<?xml version="1.0" encoding="UTF-8"?>"""
-    val header16: String = """<?xml version="1.0" encoding="UTF-16"?>"""
+    override def getPrefix: Option[String] = Some(prefix)
+    override def getUri: Option[String] = Some(uri)
+    override def qName(localName: String): String = {
+      require(localName.nonEmpty)
+      prefix + ":" + localName
+    }
   }
 
-  object XInclude extends Namespace(uri = "http://www.w3.org/2001/XInclude", prefix = "xi")
+  final class Default(override val uri: String) extends Namespace {
+    require((uri != null) && uri.nonEmpty)
 
-  object XLink extends Namespace(uri = "http://www.w3.org/1999/xlink", prefix = "xlink")
-
-  object Xsl extends Namespace(uri = "http://www.w3.org/1999/XSL/Transform", prefix = "xsl") {
-    def version(usesDocBookXslt2: Boolean): String = if (usesDocBookXslt2) "2.0" else "1.0"
+    override def getPrefix: Option[String] = None
+    override def getUri: Option[String] = Some(uri)
+    override def qName(localName: String): String = {
+      require(localName.nonEmpty)
+      localName
+    }
   }
 
-  object Catalog extends Namespace(uri = "urn:oasis:names:tc:entity:xmlns:xml:catalog", prefix = "") {
-    val dtdId: String = "-//OASIS//DTD XML Catalogs V1.1//EN"
+  object Xmlns extends Namespace {
+    val prefix: String = "xmlns"
+    override def getPrefix: Option[String] = Some(prefix)
+    override def uri: String = "http://www.w3.org/2000/xmlns/"
+    override def getUri: Option[String] = Some(uri)
 
-    val dtdUri: String = "http://www.oasis-open.org/committees/entity/release/1.1/catalog.dtd"
-
-    val doctype: String = s"""<!DOCTYPE catalog PUBLIC "$dtdId" "$dtdUri">"""
+    // Note: empty string attribute name is used for default namespace attributes.
+    def qName(localName: String): String =
+      prefix + (if (localName.isEmpty) "" else ":" + localName)
   }
 
-  object MathML extends Namespace(uri = "http://www.w3.org/1998/Math/MathML", prefix = "mathml") {
-    val mimeType: String = "application/mathml+xml"
+  object No extends Namespace {
+    override def toString: String = "<No Namespace>"
+    override def getPrefix: Option[String] = None
+    override def getUri: Option[String] = None
+    override def uri: String = getUri.get
+
+    def qName(localName: String): String = {
+      require(localName.nonEmpty)
+      localName
+    }
   }
 
-  object Svg extends Namespace(uri="http://www.w3.org/2000/svg", prefix="") {
-    val mimeType: String = "image/svg+xml"
-  }
+  def apply(
+    prefix: Option[String],
+    uri: Option[String]
+  ): Namespace =
+    if (prefix.isEmpty && uri.isEmpty) No else
+    if (prefix.isEmpty && uri.isDefined) new Default(uri.get) else
+      new Prefixed(prefix.get, uri.get)
 
-  object DocBook extends Namespace(uri = "http://docbook.org/ns/docbook", prefix="") {
-    val dtdId: String = "-//OASIS//DTD DocBook XML V5.0//EN"
+  def apply(
+    prefix: String,
+    uri: String
+  ): Namespace = Namespace(
+    prefix = Option(prefix),
+    uri = Option(uri)
+  )
 
-    val dtdUri: String = "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd"
+  // Scala XML
+  def get(element: scala.xml.Elem): Namespace = Xml.getNamespace(element)
+  def getAll(element: scala.xml.Elem): Seq[Namespace] = Xml.getNamespaces(element)
 
-    val doctype: String = s"""<!DOCTYPE article PUBLIC "$dtdId" "$dtdUri">"""
+  // DOM
+  def get(element: org.w3c.dom.Element): Namespace = Dom.getNamespace(element)
+  def getAll(element: org.w3c.dom.Element): Seq[Namespace] = Dom.getNamespaces(element)
 
-    val version: String = "5.0"
-  }
-
-  object Tei extends Namespace(uri = "http://www.tei-c.org/ns/1.0", prefix="")
+  // SAX
+  def getAll(attributes: org.xml.sax.Attributes): Seq[Namespace] = Sax.getNamespaces(attributes)
 }

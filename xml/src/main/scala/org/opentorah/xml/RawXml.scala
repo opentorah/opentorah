@@ -2,7 +2,7 @@ package org.opentorah.xml
 
 import scala.xml.Node
 
-class RawXml(elementName: String) {
+class RawXml(elementName: String, namespace: Option[Namespace] = None) {
 
   final class Value(val xml: Seq[Node])
 
@@ -15,7 +15,8 @@ class RawXml(elementName: String) {
     override protected def parser: Parser[Value] = Element.allNodes.map(new Value(_))
 
     override protected def antiparser: Antiparser[Value] = Antiparser(
-      content = _.xml
+      content = _.xml,
+      namespace = namespace
     )
   }
 }

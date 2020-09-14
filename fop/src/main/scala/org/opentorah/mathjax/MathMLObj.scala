@@ -3,7 +3,7 @@ package org.opentorah.mathjax
 import java.awt.geom.Point2D
 import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.{FOEventHandler, FONode, PropertyList, XMLObj}
-import org.opentorah.xml.{AttributeInfo, Namespace}
+import org.opentorah.xml.Sax
 import org.xml.sax.{Attributes, Locator}
 
 final class MathMLObj(parent: FONode, mathJax: MathJax) extends MathMLObj.Obj(parent) {
@@ -29,11 +29,11 @@ final class MathMLObj(parent: FONode, mathJax: MathJax) extends MathMLObj.Obj(pa
     attlist: Attributes,
     propertyList: PropertyList
   ): Unit = {
-    super.processNode(elementName, locator, AttributeInfo.sort(attlist), propertyList)
+    super.processNode(elementName, locator, Sax.sortAttributes(attlist), propertyList)
 
     createBasicDocument()
 
-    Sizes.FontSizeAttribute.set(fontSize.get, getDOMDocument)
+    Sizes.fontSizeAttribute.withValue(fontSize).set(getDOMDocument.getDocumentElement)
   }
 
   // Note: It is tempting to typeset MathML to SVG right here to avoid duplicate conversions
@@ -65,8 +65,8 @@ final class MathMLObj(parent: FONode, mathJax: MathJax) extends MathMLObj.Obj(pa
 object MathMLObj {
   class Obj(parent: FONode) extends XMLObj(parent) {
 
-    override def getNamespaceURI: String = Namespace.MathML.uri
+    override def getNamespaceURI: String = MathML.namespace.uri
 
-    override def getNormalNamespacePrefix: String = Namespace.MathML.prefix
+    override def getNormalNamespacePrefix: String = MathML.namespace.getPrefix.getOrElse("")
   }
 }

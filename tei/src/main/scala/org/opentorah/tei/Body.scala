@@ -1,5 +1,3 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.RawXml
-
-object Body extends RawXml("body")
+object Body extends TeiRawXml("body")

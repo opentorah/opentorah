@@ -1,7 +1,7 @@
 package org.opentorah.xml
 
 import java.net.URL
-import zio.{IO, ZIO}
+import zio.ZIO
 import scala.xml.{Elem, Node}
 
 final private[xml] class Context {
@@ -40,10 +40,10 @@ private[xml] object Context {
   def nextElement(p: Elem => Boolean): Parser[Option[Elem]] =
     liftContentModifier(_.takeNextElement(p))
 
-  def takeAttribute(name: String): Parser[Option[String]] =
-    liftCurrentModifier(_.takeAttribute(name))
+  def takeAttribute(attribute: Attribute[_]): Parser[Option[String]] =
+    liftCurrentModifier(_.takeAttribute(attribute))
 
-  val takeAllAttributes: Parser[Map[String, String]] =
+  val takeAllAttributes: Parser[Seq[Attribute.Value[String]]] =
     liftCurrentModifier(_.takeAllAttributes)
 
   val takeCharacters: Parser[Option[String]] =

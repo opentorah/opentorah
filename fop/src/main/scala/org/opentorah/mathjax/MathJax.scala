@@ -3,9 +3,9 @@ package org.opentorah.mathjax
 import java.io.File
 import org.gradle.api.Project
 import org.opentorah.node.{J2V8, J2V8Distribution, Node, NodeDistribution}
-import org.opentorah.xml.{Namespace, PrettyPrinter}
+import org.opentorah.xml.Namespace
 import org.slf4j.{Logger, LoggerFactory}
-import org.w3c.dom.Document
+import org.w3c.dom.{Document, Element}
 import org.w3c.dom.svg.SVGDocument
 
 abstract class MathJax(
@@ -13,12 +13,14 @@ abstract class MathJax(
 ) {
 
   final def typeset(mathMLDocument: Document): SVGDocument = {
-    val input: Input = Input.Attribute.getWithDefault(mathMLDocument)
-    val math: String =
-      if (input == Input.MathML) MathJax.prettyPrinter.render(mathMLDocument.getDocumentElement)
-      else MathML.unwrap(mathMLDocument)
+    val element: Element = mathMLDocument.getDocumentElement
 
-    val fontSize: Float = Sizes.FontSizeAttribute.doGet(mathMLDocument)
+    val input: Input = Input.attribute.getWithDefault(element)
+    val math: String =
+      if (input == Input.MathML) MathML.prettyPrinter.render(element)
+      else MathML.unwrap(element)
+
+    val fontSize: Float = Sizes.fontSizeAttribute.doGet(element)
 
     val outputName: String = Output.Svg.name(isNode = false)
 
@@ -38,7 +40,7 @@ abstract class MathJax(
     val result: SVGDocument = Svg.fromString(svg)
 
     // set font size on the resulting SVG - it is needed for the sizes calculations:
-    Sizes.FontSizeAttribute.set(fontSize, result)
+    Sizes.fontSizeAttribute.withValue(fontSize).set(result.getDocumentElement)
 
     result
   }
@@ -55,13 +57,10 @@ object MathJax {
 
   val packageName: String = "mathjax-node"
 
-  object Namespace extends Namespace(
+  val namespace: Namespace = Namespace(
     uri = "http://opentorah.org/mathjax/ns/ext",
     prefix = "mathjax"
   )
-
-  private val prettyPrinter: PrettyPrinter = new PrettyPrinter(alwaysStackElements =
-    Set("math", "mrow", "mi"))
 
   private def optionsMap(math: String, inputName: String, outputName: String, ex: Int): Map[String, Any] = Map(
     "useFontCache"    -> true,       // use <defs> and <use> in svg output ('true' by default)?

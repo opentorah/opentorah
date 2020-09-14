@@ -46,7 +46,7 @@ class StoreComponent extends Component("store") {
     className
   )
 
-  override protected val inlineAntiparser: Antiparser[Inline] = Antiparser(
+  override protected val inlineAntiparser: Antiparser[Inline] = Antiparser.concat(
     Names.antiparser.compose(_.names),
     fromAttribute.toXmlOption.compose(_.from),
     Component.typeAttribute.toXmlOption.compose(_.className),

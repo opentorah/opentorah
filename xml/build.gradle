@@ -35,7 +35,11 @@ configureLibrary(['Scala', 'XML'])
 dependencies {
   implementation project(':util')
 
-  api "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
+  api ("org.scala-lang.modules:scala-xml_$scalaVersionMajor") {
+    version {
+      strictly "$scalaXmlVersion"
+    }
+  }
   api "dev.zio:zio_$scalaVersionMajor:$zioVersion"
 
   implementation "xerces:xercesImpl:$xercesVersion"
@@ -44,4 +48,6 @@ dependencies {
   compileOnly "org.xmlresolver:xmlresolver:$xmlresolverVersion"
   compileOnly "saxon:saxon:$saxon6Version" // Saxon 6 (XSLT 1.0)
   compileOnly "net.sf.saxon:Saxon-HE:$saxon10Version" // Saxon 10 (XSLT 2.0)
+
+  testImplementation "net.sf.saxon:Saxon-HE:$saxon10Version"
 }

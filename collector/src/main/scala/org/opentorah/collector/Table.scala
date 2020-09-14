@@ -1,10 +1,11 @@
 package org.opentorah.collector
 
+import org.opentorah.tei.Tei
 import scala.xml.{Elem, Node}
 
 final class Table[D](columns: Table.Column[D]*) {
   def toTei(rows: Seq[Table.Row[D]]): Elem =
-    <table rendition="collection-index">
+    <table xmlns={Tei.namespace.uri} rendition="collection-index">
       {<row>{columns.map(column => <cell rendition={column.cssClass}>{column.heading}</cell>)}</row>}
       {rows.map {
         case Table.Xml(nodes) =>

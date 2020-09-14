@@ -2,8 +2,9 @@ package org.opentorah.collector
 
 import java.io.File
 import org.opentorah.store.{Entities, EntityHolder, Path, Store, WithPath}
-import org.opentorah.tei.{Entity, EntityReference}
+import org.opentorah.tei.{Entity, EntityReference, Publisher, TeiResolver, SourceDesc, Tei}
 import org.opentorah.util.Files
+import org.slf4j.{Logger, LoggerFactory}
 import scala.xml.Node
 
 final class Site(val store: Store) {
@@ -55,12 +56,43 @@ final class Site(val store: Store) {
 
   def findByRef(fileName: String): Option[Entity] =  store.entities.get.findByRef(fileName)
 
-  def resolve(url: String): Option[SiteFile] =
+  private def resolve(url: String): Option[SiteFile] =
     if (!url.startsWith("/")) None
     else SiteObject.resolve(this, Files.removePart(url).substring(1).split("/"))
+
+  def resolver(facsUrl: Seq[String]): TeiResolver = new TeiResolver {
+
+    override def resolve(url: String): Option[TeiResolver.Resolved] =
+      Site.this.resolve(url).fold[Option[TeiResolver.Resolved]] {
+        Site.logger.warn(s"did not resolve: $url")
+        None
+      } { siteFile: SiteFile => Some(new TeiResolver.Resolved(
+        url = siteFile.url,
+        role = siteFile match {
+          case teiWrapperFile: TeiWrapperFile => Some(teiWrapperFile.viewer.name)
+          case _ => None
+        }
+      ))}
+
+    override def findByRef(ref: String): Option[TeiResolver.Resolved] =
+      Site.this.findByRef(ref).fold[Option[TeiResolver.Resolved]] {
+        Site.logger.warn(s"did not find reference: $ref")
+        None
+      } { entity: Entity => Some(new TeiResolver.Resolved(
+        url = EntityObject.teiWrapperUrl(entity),
+        role = Some(Viewer.Names.name)
+      ))}
+
+    override def facs: TeiResolver.Resolved = new TeiResolver.Resolved(
+      url = facsUrl,
+      role = Some(Viewer.Facsimile.name)
+    )
+  }
 }
 
 object Site {
+
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   val facsimileBucket: String = "http://facsimiles.alter-rebbe.org/facsimiles/"
 
@@ -139,4 +171,13 @@ object Site {
 
   private final def writeSiteFile(siteFile: SiteFile, directory: File): Unit =
     Files.write(Files.file(directory, siteFile.url), siteFile.content)
+
+  val addPublicationStatement: Tei.Transformer = Tei.addPublicationStatement(
+    publisher = new Publisher.Value(<ptr xmlns={Tei.namespace.uri} target="www.alter-rebbe.org"/>),
+    status = "free",
+    licenseName = "Creative Commons Attribution 4.0 International License",
+    licenseUrl = "http://creativecommons.org/licenses/by/4.0/"
+  )
+
+  val addSourceDesc: Tei.Transformer = Tei.addSourceDesc(new SourceDesc.Value(<p>Facsimile</p>))
 }

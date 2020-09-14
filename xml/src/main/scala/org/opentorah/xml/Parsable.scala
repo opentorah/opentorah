@@ -10,6 +10,7 @@ trait Parsable[A] extends Requireable[A] {
   def name2parser: Map[String, Parsable.ContentTypeAndParser[A]]
 
   final override val optional: Parser[Option[A]] = for {
+    // TODO take namespace into account!
     elementOpt <- Context.nextElement(element => name2parser.keySet.contains(element.label))
     result <- elementOpt.fold[Parser[Option[A]]](ZIO.none)(element =>
       nested(None, element, name2parser(element.label)).map(Some(_)))

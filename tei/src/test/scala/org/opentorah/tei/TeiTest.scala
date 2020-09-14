@@ -7,7 +7,9 @@ import org.scalatest.matchers.should.Matchers
 final class TeiTest extends AnyFlatSpec with Matchers {
 
   "Parsing" should "work" in {
-    val result: Tei = Parser.parseDo(Tei.parse(From.resource(Tei, "905")))
+//    println(Tei.prettyPrinter.renderXml(Parser.load(From.resource(Tei, "905"))))
+    val tei: Tei = Parser.parseDo(Tei.parse(From.resource(Tei, "905")))
+//    println(Tei.prettyPrinter.renderXml(Tei.toXmlElement(tei)))
   }
 
   "Entity parsing" should "work" in {

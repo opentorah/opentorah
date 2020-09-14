@@ -18,7 +18,7 @@ abstract class Element[A](
 
 object Element {
 
-  abstract class WithToXml[A](elementName: String) extends Element[A](elementName) with ToXml[A] {
+  abstract class WithToXml[A](override val elementName: String) extends Element[A](elementName) with ToXml[A] {
     final override protected def elementName(value: A): String = elementName
   }
 

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, ToXml, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Namespace, Parsable, Parser, ToXml, Xml}
 import scala.xml.Node
 
 final case class Entity private(
@@ -24,7 +24,7 @@ object Entity extends Parsable[Entity] with ToXml[Entity] {
   }.toMap
 
   private def parser(entityType: EntityType): Parser[Entity] = for {
-    id <- Attribute.id.optional
+    id <- Xml.idAttribute.optional
     role <- roleAttribute.optional
     names <- EntityName.parsable(entityType).all
     _ <- Parser.check(names.nonEmpty, s"No names in $id")
@@ -39,8 +39,8 @@ object Entity extends Parsable[Entity] with ToXml[Entity] {
 
   override protected def elementName(value: Entity): String = value.entityType.element
 
-  override protected val antiparser: Antiparser[Entity] = Antiparser(
-    Attribute.id.toXmlOption.compose(_.id),
+  override protected val antiparser: Antiparser[Entity] = Tei.concat(
+    Xml.idAttribute.toXmlOption.compose(_.id),
     roleAttribute.toXmlOption.compose(_.role),
     EntityName.toXmlSeq.compose(_.names),
     Antiparser.xml.compose[Entity](_.content)

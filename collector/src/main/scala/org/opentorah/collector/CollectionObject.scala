@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.WithPath
-import org.opentorah.tei.{EntityReference, Ref}
+import org.opentorah.tei.{EntityReference, Page, Ref}
 import org.opentorah.util.Files
 import org.opentorah.xml.Xml
 import scala.xml.{Elem, Node}
@@ -110,7 +110,7 @@ object CollectionObject {
       val transcribers: Seq[Node] = document.tei.titleStmt.editors
         .filter(_.role.contains("transcriber")).flatMap(_.persName)
         .map(transcriber => Xml.removeNamespace(EntityReference.toXmlElement(transcriber)))
-      Transformers.multi(transcribers)
+      Xml.multi(transcribers)
     })
   )
 }

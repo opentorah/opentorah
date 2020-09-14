@@ -39,15 +39,18 @@ object Input {
   /**
     * Type of the input: TeX, MathML, AsciiMath.
     */
-  @SerialVersionUID(1L)
-  case object Attribute extends Attribute[Input]("input") {
-    override def namespace: Option[Namespace] = Some(MathJax.Namespace)
+  final class InputAttribute(namespace: Namespace, setDefault: Boolean)
+    extends Attribute[Input]("input", namespace, default = Input.MathML, setDefault)
+  {
+    override def withNamespace(namespace: Namespace): InputAttribute =
+      new InputAttribute(namespace, setDefault)
 
     override def toString(value: Input): String = value.name
 
     override def fromString(value: String): Input =
       values.find(_.name == value).getOrElse(throw new IllegalArgumentException(s"Unknown input type: $value"))
-
-    override def default: Input = Input.MathML
   }
+
+  @SerialVersionUID(1L)
+  val attribute: InputAttribute = new InputAttribute(namespace = MathJax.namespace, setDefault = false)
 }

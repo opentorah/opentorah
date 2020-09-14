@@ -1,11 +1,13 @@
 package org.opentorah.docbook
 
+import java.io.StringReader
 import org.opentorah.docbook.plugin.MathFilter
-import org.opentorah.mathjax.{Configuration, MathJax}
-import org.opentorah.xml.{Namespace, PrettyPrinter, Saxon, Xerces, Xml}
+import org.opentorah.mathjax.{Configuration, MathJax, MathML}
+import org.opentorah.xml.{Saxon, XInclude, Xml}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.w3c.dom.{Document, Node}
+import org.xml.sax.InputSource
 
 class MathFilterTest extends AnyFlatSpecLike with Matchers {
 
@@ -13,23 +15,23 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
     // Serializer outputs UTF-16; xml namespace is made explicit; order of attributes and spacing are different -
     // but other than that, the document is the same.
     parse(
-     s"""|${Namespace.Xml.header16}
-         |<article xml:id="test-id" xmlns="${Namespace.DocBook.uri}" version="${Namespace.DocBook.version}" xmlns:xi="${Namespace.XInclude.uri}">
+     s"""|${Xml.header16}
+         |<article xml:id="test-id" xmlns="${DocBook.namespace.uri}" version="${DocBook.version}" xmlns:xi="${XInclude.namespace.uri}">
          |  <para>
          |    Wrapped display TeX:<informalequation>
-         |    <math xmlns="${Namespace.MathML.uri}"
-         |          xmlns:mathjax="${MathJax.Namespace.uri}" mathjax:input="TeX">
+         |    <math xmlns="${MathML.namespace.uri}"
+         |          xmlns:mathjax="${MathJax.namespace.uri}" mathjax:input="TeX">
          |      <mrow><mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi></mrow>
          |    </math></informalequation>
          |  </para>
          |</article>""".stripMargin
     ) shouldBe
-     s"""|${Namespace.Xml.header}
-         |<article version="${Namespace.DocBook.version}" xml:id="test-id" xmlns="${Namespace.DocBook.uri}" xmlns:xi="${Namespace.XInclude.uri}"
+     s"""|${Xml.header}
+         |<article xmlns="${DocBook.namespace.uri}" xmlns:xi="${XInclude.namespace.uri}" version="${DocBook.version}" xml:id="test-id"
          |>
          |  <para>Wrapped display TeX:<informalequation>
-         |    <math display="block" mathjax:input="TeX" xmlns="${Namespace.MathML.uri}" xmlns:mathjax=
-         |    "${MathJax.Namespace.uri}">
+         |    <math xmlns="${MathML.namespace.uri}" xmlns:mathjax="${MathJax.namespace.uri}" display="block"
+         |    mathjax:input="TeX">
          |      <mrow>
          |        <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |      </mrow>
@@ -41,17 +43,17 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
 
   it should "work for display TeX" in {
     parse(
-     s"""|${Namespace.Xml.header}
-         |<article xml:id="test-id" xmlns="${Namespace.DocBook.uri}" version="${Namespace.DocBook.version}" xmlns:xi="${Namespace.XInclude.uri}">
+     s"""|${Xml.header}
+         |<article xml:id="test-id" xmlns="${DocBook.namespace.uri}" version="${DocBook.version}" xmlns:xi="${XInclude.namespace.uri}">
          |  <para>Display TeX:$$$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$$$</para>
          |</article>""".stripMargin
     ) shouldBe
-     s"""|${Namespace.Xml.header}
-         |<article version="${Namespace.DocBook.version}" xml:id="test-id" xmlns="${Namespace.DocBook.uri}" xmlns:xi="${Namespace.XInclude.uri}"
+     s"""|${Xml.header}
+         |<article xmlns="${DocBook.namespace.uri}" xmlns:xi="${XInclude.namespace.uri}" version="${DocBook.version}" xml:id="test-id"
          |>
          |  <para>Display TeX:<informalequation>
-         |    <math mathjax:input="TeX" xmlns="${Namespace.MathML.uri}" xmlns:mathjax=
-         |    "${MathJax.Namespace.uri}">
+         |    <math xmlns="${MathML.namespace.uri}" xmlns:mathjax="${MathJax.namespace.uri}" mathjax:input=
+         |    "TeX">
          |      <mrow>
          |        <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |      </mrow>
@@ -63,18 +65,18 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
 
   it should "work for inline TeX" in {
     parse(
-     s"""|${Namespace.Xml.header}
-         |<article xml:id="test-id" xmlns="${Namespace.DocBook.uri}" version="${Namespace.DocBook.version}" xmlns:xi="${Namespace.XInclude.uri}">
+     s"""|${Xml.header}
+         |<article xml:id="test-id" xmlns="${DocBook.namespace.uri}" version="${DocBook.version}" xmlns:xi="${XInclude.namespace.uri}">
          |  <para>Inline TeX:$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$</para>
          |</article>
          |""".stripMargin
     ) shouldBe
-     s"""|${Namespace.Xml.header}
-         |<article version="${Namespace.DocBook.version}" xml:id="test-id" xmlns="${Namespace.DocBook.uri}" xmlns:xi="${Namespace.XInclude.uri}"
+     s"""|${Xml.header}
+         |<article xmlns="${DocBook.namespace.uri}" xmlns:xi="${XInclude.namespace.uri}" version="${DocBook.version}" xml:id="test-id"
          |>
          |  <para>Inline TeX:<inlineequation>
-         |    <math mathjax:input="inline-TeX" xmlns="${Namespace.MathML.uri}" xmlns:mathjax=
-         |    "${MathJax.Namespace.uri}">
+         |    <math xmlns="${MathML.namespace.uri}" xmlns:mathjax="${MathJax.namespace.uri}" mathjax:input=
+         |    "inline-TeX">
          |      <mrow>
          |        <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |      </mrow>
@@ -86,17 +88,17 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
 
   it should "work for equation display TeX" in {
     parse(
-     s"""|${Namespace.Xml.header16}
-         |<article xmlns="${Namespace.DocBook.uri}" version="${Namespace.DocBook.version}" xml:id="test-id" xmlns:xi="${Namespace.XInclude.uri}">
+     s"""|${Xml.header16}
+         |<article xmlns="${DocBook.namespace.uri}" version="${DocBook.version}" xml:id="test-id" xmlns:xi="${XInclude.namespace.uri}">
          |  <para>Explicit display TeX:<equation>$$$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$$$</equation></para>
          |</article>""".stripMargin
     ) shouldBe
-     s"""|${Namespace.Xml.header}
-         |<article version="${Namespace.DocBook.version}" xml:id="test-id" xmlns="${Namespace.DocBook.uri}" xmlns:xi="${Namespace.XInclude.uri}"
+     s"""|${Xml.header}
+         |<article xmlns="${DocBook.namespace.uri}" xmlns:xi="${XInclude.namespace.uri}" version="${DocBook.version}" xml:id="test-id"
          |>
          |  <para>Explicit display TeX:<equation>
-         |    <math mathjax:input="TeX" xmlns="${Namespace.MathML.uri}" xmlns:mathjax=
-         |    "${MathJax.Namespace.uri}">
+         |    <math xmlns="${MathML.namespace.uri}" xmlns:mathjax="${MathJax.namespace.uri}" mathjax:input=
+         |    "TeX">
          |      <mrow>
          |        <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
          |      </mrow>
@@ -106,20 +108,16 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
          |""".stripMargin
   }
 
-
-  private val prettyPrinter: PrettyPrinter = new PrettyPrinter(alwaysStackElements =
-    Set("article", "para", "equation", "informalequation", "inlineequation", "math", "mrow"))
-
   private def parse(string: String): String = {
     // Note: Saxon6 returns unmodifiable DOM that breaks toString() (which toString()?); using Saxon10.
     val node: Node = Saxon.Saxon10.parse(
-      input = string,
-      xmlReader = Xerces.getFilteredXMLReader(filters = Seq(
+      inputSource = new InputSource(new StringReader(string)),
+      filters = Seq(
         new MathFilter(Configuration())
 //        , new org.opentorah.xml.TracingFilter
-      ))
+      )
     )
-    val result = prettyPrinter.renderXml(node.asInstanceOf[Document].getDocumentElement)
+    val result = DocBook.prettyPrinter.renderXml(node.asInstanceOf[Document].getDocumentElement)
 //    println(result)
     result
   }

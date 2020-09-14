@@ -1,7 +1,8 @@
 package org.opentorah.docbook.section
 
 import Section.Parameters
-import org.opentorah.xml.Namespace
+import org.opentorah.docbook.DocBook
+import org.opentorah.xml.Xsl
 import scala.xml.{Elem, Node}
 
 trait Section {
@@ -13,8 +14,8 @@ trait Section {
   def nonOverridableParameters(values: NonOverridableParameters): Parameters
 
   final def customStylesheet: Elem =
-    <xsl:stylesheet xmlns:xsl={Namespace.Xsl.uri} version={Namespace.Xsl.version(usesDocBookXslt2)}
-      xmlns:db={Namespace.DocBook.uri}
+    <xsl:stylesheet xmlns:xsl={Xsl.namespace.uri} version={Xsl.version(usesDocBookXslt2)}
+      xmlns:db={DocBook.namespace.uri}
       exclude-result-prefixes="db">
       <!-- Customizations go here. -->
       {customStylesheetBody}

@@ -26,7 +26,7 @@ object TeiHeader extends Element.WithToXml[TeiHeader]("teiHeader") {
     revisionDesc
   )
 
-  override protected val antiparser: Antiparser[TeiHeader] = Antiparser(
+  override protected val antiparser: Antiparser[TeiHeader] = Tei.concat(
     FileDesc.toXml.compose(_.fileDesc),
     EncodingDesc.parsable.toXmlOption.compose(_.encodingDesc),
     ProfileDesc.toXmlOption.compose(_.profileDesc),

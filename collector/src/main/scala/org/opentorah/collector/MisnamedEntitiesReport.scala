@@ -1,5 +1,6 @@
 package org.opentorah.collector
 
+import org.opentorah.tei.Tei
 import org.opentorah.util.Files
 import scala.xml.Node
 
@@ -11,12 +12,12 @@ final class MisnamedEntitiesReport(site: Site) extends ReportObject(site) {
 
   // TODO give a link to the entity:
   override protected def teiBody: Seq[Node] =
-    <head>{MisnamedEntitiesReport.title}</head> ++
+    <head xmlns={Tei.namespace.uri}>{MisnamedEntitiesReport.title}</head> ++
     site.entities.flatMap { entity =>
       val id: String = entity.id.get
       val expectedId: String = Files.spacesToUnderscores(entity.name)
       if (id == expectedId) None
-      else Some(<l>{s"'$id' должен по идее называться '$expectedId'"}</l>)
+      else Some(<l xmlns={Tei.namespace.uri}>{s"'$id' должен по идее называться '$expectedId'"}</l>)
     }
 }
 
