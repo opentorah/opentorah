@@ -8,7 +8,7 @@ final class Table[D](columns: Table.Column[D]*) {
     <table xmlns={Tei.namespace.uri} rendition="collection-index">
       {<row>{columns.map(column => <cell rendition={column.cssClass}>{column.heading}</cell>)}</row>}
       {rows.map {
-        case Table.Xml(nodes) =>
+        case Table.Nodes(nodes) =>
           <row><cell cols={columns.length.toString}><span rendition="part-title">{nodes}</span></cell></row>
 
         case Table.Data(data) =>
@@ -28,5 +28,5 @@ object Table {
 
   final case class Data[D](data: D) extends Row[D]
 
-  final case class Xml(nodes: Seq[Node]) extends Row[Nothing]
+  final case class Nodes(nodes: Seq[Node]) extends Row[Nothing]
 }

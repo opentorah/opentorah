@@ -32,7 +32,7 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
     Hierarchy.storeHeader(collection.path, collection.value) ++
     Seq[Elem](CollectionObject.table(collection).toTei(
       collection.value.parts.flatMap { part =>
-          part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Xml) ++
+          part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Nodes) ++
           part.documents.map(Table.Data[Document]) }
     )) ++
       listMissing("пустых", page => page.pb.isMissing && page.pb.isEmpty) ++
