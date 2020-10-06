@@ -38,6 +38,8 @@ subprojects {
   apply from: '../paper.gradle'
   apply from: '../service.gradle'
 
+  // TODO there seem to be multiple versions of some dependencies; verify and force as needed:
+  // scala-xml, scala-library, slf4j-api, cats-kernel, cats-kernel-laws...
   configurations.all {
     resolutionStrategy {
       // v1.3.04 doesn't have org.w3c.dom.ElementTraversal that Xerces uses:

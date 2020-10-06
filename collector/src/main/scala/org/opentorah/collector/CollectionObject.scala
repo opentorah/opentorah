@@ -58,6 +58,8 @@ object CollectionObject {
 
   val teiDirectoryName: String = "tei"
 
+  val htmlDirectoryName: String = "html" // TEI documents converted to HTML
+
   def resolve(site: Site, parts: Seq[String]): Option[SiteFile] = if (parts.isEmpty) None else
     site.findCollectionByName(parts.head).flatMap { collection =>
       def resolveDocument(requiredExtension: String, f: DocumentObject => SiteFile): Option[SiteFile] =
@@ -68,6 +70,7 @@ object CollectionObject {
         case CollectionObject.documentsDirectoryName => resolveDocument("html", _.teiWrapperFile)
         case CollectionObject.teiDirectoryName       => resolveDocument("xml" , _.teiFile)
         case CollectionObject.facsDirectoryName      => resolveDocument("html", _.facsFile)
+        case CollectionObject.htmlDirectoryName      => resolveDocument("html", _.htmlFile)
 
         case file => if (parts.tail.tail.nonEmpty) None else {
           val (fileName: String, extension: Option[String]) = Files.nameAndExtension(file)

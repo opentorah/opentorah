@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.WithPath
-import org.opentorah.tei.{Body, CalendarDesc, Page, Pb, Tei}
+import org.opentorah.tei.{Body, CalendarDesc, Page, Pb, Tei, Tei2Html}
 import org.opentorah.util.Files
 import org.opentorah.xml.{PrettyPrinter, Xml}
 import scala.xml.{Elem, Node}
@@ -12,6 +12,8 @@ final class DocumentObject(
   document: Document,
   teiHolder: TeiHolder
 ) extends SiteObject(site) {
+
+  // TODO package extension with the directory name so that it is not repeated in the CollectionObject.resolve...
 
   override protected def teiUrl: Seq[String] = url(CollectionObject.teiDirectoryName, "xml")
 
@@ -55,6 +57,20 @@ final class DocumentObject(
 
   override protected def xmlTransformer: Xml.Transformer =
     super.xmlTransformer compose Pb.transformer(site.resolver(facsUrl))
+
+  // TODO eventually, this should move into SiteObject - and teiFile and teiWrapperFile go away
+  protected def htmlUrl: Seq[String] = url(CollectionObject.htmlDirectoryName, "html")
+  val htmlFile: SiteFile = new SiteFile {
+    override def url: Seq[String] = htmlUrl
+
+    override def content: String = {
+      val elem: Elem = Xml.transform(
+        xml = Tei.toXmlElement(teiTransformer(tei)),
+        transformer = Tei2Html.transform(site.resolver(facsUrl))
+      )
+      Tei.prettyPrinter.renderXml(elem)
+    }
+  }
 
   override protected def yaml: Seq[(String, String)] =
     Seq("facs" -> Files.mkUrl(facsUrl)) ++

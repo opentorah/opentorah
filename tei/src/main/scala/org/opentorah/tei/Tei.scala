@@ -34,8 +34,6 @@ object Tei extends Element.WithToXml[Tei]("TEI") with Dialect {
     clingyElements = Set("note", "lb", "sic", "corr")
   )
 
-  type Transformer = Tei => Tei
-
   override protected lazy val parser: Parser[Tei] = for {
     teiHeader <- TeiHeader.required
     text <- Text.required
@@ -59,6 +57,8 @@ object Tei extends Element.WithToXml[Tei]("TEI") with Dialect {
       new Body.Value(body)
     )
   )
+
+  type Transformer = Tei => Tei
 
   def addPublicationStatement(
     publisher: Publisher.Value,
