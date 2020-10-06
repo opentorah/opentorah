@@ -59,7 +59,7 @@ object Html {
         <nav class="site-nav">
           <div class="trigger">{
             for (link <- siteParameters.navigationLinks ++ pageParameters.navigationLinks)
-            yield <a class="page-link" href={link.url} target={link.target.orNull}>{link.title}</a>
+            yield <a class="page-link" href={link.url} target={link.target.map(_.name).orNull}>{link.title}</a>
           }</div>
         </nav>
       </div>
@@ -95,7 +95,7 @@ object Html {
       </div>
     </footer>
 
-  def social: Seq[Elem] = Seq.empty
+  def social: Seq[Elem] = Seq(<ul class="social-media-list"></ul>)
 
   def pageLayout(
     siteParameters: SiteParameters,

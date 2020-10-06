@@ -156,9 +156,8 @@ object Site {
     } {
       val documentObject = new DocumentObject(site, collection, document, teiHolder)
       writeSiteFile(documentObject.teiFile, directory)
-//      writeSiteFile(documentObject.teiWrapperFile, directory)
       writeSiteFileNg(documentObject.teiWrapperFile, directory, siteParameters)
-      writeSiteFile(documentObject.facsFile, directory)
+      writeSiteFileNg(documentObject.facsFile, directory, siteParameters)
       // TODO HTML files
       // writeSiteFile(documentObject.htmlFile, directory)
     }
@@ -176,9 +175,13 @@ object Site {
   private final def writeSiteFile(siteFile: SiteFile, directory: File): Unit =
     Files.write(Files.file(directory, siteFile.url), siteFile.content)
 
-  // TODO DOCTYPE; generalize for any SiteFile...
+  // TODO generalize for any SiteFile...
   private final def writeSiteFileNg(siteFile: SiteFile, directory: File, siteParameters: SiteParameters): Unit =
-    Files.write(Files.file(directory, siteFile.url), PrettyPrinter.default.render(siteFile.contentNg(siteParameters)))
+    Files.write(
+      Files.file(directory, siteFile.url),
+      "<!DOCTYPE html>\n" ++
+      prettyPrinter.render(siteFile.contentNg(siteParameters))
+    )
 
   val addPublicationStatement: Tei.Transformer = Tei.addPublicationStatement(
     publisher = new Publisher.Value(<ptr xmlns={Tei.namespace.uri} target="www.alter-rebbe.org"/>),
@@ -186,6 +189,8 @@ object Site {
     licenseName = "Creative Commons Attribution 4.0 International License",
     licenseUrl = "http://creativecommons.org/licenses/by/4.0/"
   )
+
+  private val prettyPrinter: PrettyPrinter = PrettyPrinter(alwaysStackElements = Set("nav", "header", "main", "div"))
 
   val addSourceDesc: Tei.Transformer = Tei.addSourceDesc(new SourceDesc.Value(<p>Facsimile</p>))
 }

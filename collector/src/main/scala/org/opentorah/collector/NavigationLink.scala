@@ -5,7 +5,7 @@ import org.opentorah.util.Files
 final class NavigationLink private(
   val url: String,
   val title: String,
-  val target: Option[String]
+  val target: Option[Viewer]
 )
 
 object NavigationLink {
@@ -13,7 +13,7 @@ object NavigationLink {
   def apply(
     url: String,
     title: String,
-    target: Option[String]
+    target: Option[Viewer]
   ): NavigationLink = new NavigationLink(
     url + ".html",
     title,
@@ -23,7 +23,7 @@ object NavigationLink {
   def apply(
     url: Seq[String],
     title: String,
-    target: Option[String]
+    target: Option[Viewer]
   ): NavigationLink = new NavigationLink(
     Files.mkUrl(url),
     title,

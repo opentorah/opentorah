@@ -55,10 +55,10 @@ object Main {
         faviconJpeg = "alter-rebbe",
         googleAnalyticsId = Some("UA-154490117-1"),
         navigationLinks = Seq(
-          NavigationLink("names", "Имена", Some("namesViewer")),
-          NavigationLink("collections", "Архивы", Some("collectionViewer")),
-          NavigationLink("help", "Помощь", Some("collectionViewer")),
-          NavigationLink("about", "О сайте", Some("collectionViewer"))
+          NavigationLink("names", "Имена", Some(Viewer.Names)),
+          NavigationLink("collections", "Архивы", Some(Viewer.Collection)),
+          NavigationLink("help", "Помощь", Some(Viewer.Collection)),
+          NavigationLink("about", "О сайте", Some(Viewer.Collection))
         ),
         footerCol3 =
           <p>

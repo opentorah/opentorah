@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.store.WithPath
 import org.opentorah.tei.{Body, CalendarDesc, Page, Pb, Tei, Tei2Html}
 import org.opentorah.util.Files
-import org.opentorah.xml.{PrettyPrinter, Xml}
+import org.opentorah.xml.Xml
 import scala.xml.{Elem, Node}
 
 final class DocumentObject(
@@ -72,24 +72,12 @@ final class DocumentObject(
     }
   }
 
-  override protected def yaml: Seq[(String, String)] =
-    Seq("facs" -> Files.mkUrl(facsUrl)) ++
-    (if (teiHolder.language.isDefined || document.languages.isEmpty) Seq.empty
-     else Seq("translations" -> document.languages.mkString("[", ", ", "]"))) ++
-    navigation
+  override protected def yaml: Seq[(String, String)] = ??? // TODO remove
 
-  private def navigation: Seq[(String, String)] = {
-    val (prev: Option[Document], next: Option[Document]) = collection.value.by.get.siblings(document)
-    Seq("documentCollection" -> Hierarchy.storeName(collection.value)) ++
-    prev.map(prev => Seq("prevDocument" -> prev.name)).getOrElse(Seq.empty) ++
-    Seq("thisDocument" -> document.name) ++
-    next.map(next => Seq("nextDocument" -> next.name)).getOrElse(Seq.empty)
-  }
-
-  private def commonNavigationLinks: Seq[NavigationLink] = {
+  private def navigation: Seq[NavigationLink] = {
     val (prev: Option[Document], next: Option[Document]) = collection.value.by.get.siblings(document)
 
-    Seq(NavigationLink("../index", s"[${Hierarchy.storeName(collection.value)}]", Some("collectionViewer"))) ++
+    Seq(NavigationLink("../index", s"[${Hierarchy.storeName(collection.value)}]", Some(Viewer.Collection))) ++
     prev.toSeq.map(prev => NavigationLink(prev.name, "⇦", None)) ++
     Seq(NavigationLink(document.name, document.name, None)) ++
     next.toSeq.map(next => NavigationLink(next.name, "⇨", None))
@@ -98,8 +86,8 @@ final class DocumentObject(
   override protected def pageParameters: PageParameters = new PageParameters(
     style = "main",
     navigationLinks =
-      commonNavigationLinks ++
-      Seq(NavigationLink(facsUrl, "⎙", Some("facsimileViewer"))) ++
+      navigation ++
+      Seq(NavigationLink(facsUrl, "⎙", Some(Viewer.Facsimile))) ++
       (if (teiHolder.language.isDefined || document.languages.isEmpty) Seq.empty
       else document.languages.map(lang => NavigationLink(s"${document.name}-$lang", s"[$lang]", None)))
   )
@@ -107,32 +95,38 @@ final class DocumentObject(
   def facsFile: SiteFile = new SiteFile {
     override def url: Seq[String] = facsUrl
 
-    override def content: String = {
-      // TODO do pages of the appropriate teiHolder!
-      val facsimilePages: Elem =
-        <div class={Viewer.Facsimile.name}>
-          {headerFacs}
-          <div class="facsimileScroller">
-            {for (page: Page <- document.pages(collection.value.pageType).filterNot(_.pb.isMissing)) yield {
-            val n: String = page.pb.n
-            val href: Seq[String] = DocumentObject.pageUrl(collection, document.name, page)
-            val facs: String = page.pb.facs
-              .getOrElse(Site.facsimileBucket + Hierarchy.fileName(collection.value) + "/" + n + ".jpg")
-            <a target={Viewer.Document.name} href={Files.mkUrl(href)}>
-              <figure>
-                <img xml:id={Page.pageId(n)} alt={s"facsimile for page $n"} src={facs}/>
-                <figcaption>{n}</figcaption>
-              </figure>
-            </a>
-          }}
-          </div>
+    // TODO do pages of the appropriate teiHolder!
+    private def facsimilePages: Elem =
+      <div class={Viewer.Facsimile.name}>
+        {headerFacs}
+        <div class="facsimileScroller">
+          {for (page: Page <- document.pages(collection.value.pageType).filterNot(_.pb.isMissing)) yield {
+          val n: String = page.pb.n
+          val href: Seq[String] = DocumentObject.pageUrl(collection, document.name, page)
+          val facs: String = page.pb.facs
+            .getOrElse(Site.facsimileBucket + Hierarchy.fileName(collection.value) + "/" + n + ".jpg")
+          <a target={Viewer.Document.name} href={Files.mkUrl(href)}>
+            <figure>
+              <img xml:id={Page.pageId(n)} alt={s"facsimile for page $n"} src={facs}/>
+              <figcaption>{n}</figcaption>
+            </figure>
+          </a>
+        }}
         </div>
+      </div>
 
-      SiteObject.withYaml(
-        yaml = Seq("transcript" -> Files.mkUrl(teiWrapperUrl)) ++ navigation,
-        content = Seq(PrettyPrinter.default.render(facsimilePages))
-      )
-    }
+    override def content: String = ???
+
+    final override def contentNg(siteParameters: SiteParameters): Elem = Html.defaultLayout(
+      siteParameters,
+      new PageParameters(
+        style = "main",
+        navigationLinks =
+          navigation ++
+          Seq(NavigationLink(teiWrapperUrl, "A", Some(Viewer.Document)))
+      ),
+      content = facsimilePages
+    )
   }
 }
 
