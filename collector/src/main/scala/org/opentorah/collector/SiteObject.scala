@@ -29,6 +29,12 @@ abstract class SiteObject(val site: Site) {
       yaml = Seq("target" -> viewer.name) ++ yaml,
       content = Seq(SiteObject.loadTei(Files.mkUrl(teiFile.url)))
     )
+
+    final override def contentNg(siteParameters: SiteParameters): Elem = Html.defaultLayout(
+      siteParameters,
+      pageParameters,
+      content = SiteObject.loadTeiNg(Files.mkUrl(teiFile.url))
+    )
   }
 
   protected def teiUrl: Seq[String]
@@ -49,12 +55,17 @@ abstract class SiteObject(val site: Site) {
   protected def teiWrapperUrl: Seq[String]
 
   protected def yaml: Seq[(String, String)] = Seq.empty
+
+  protected def pageParameters: PageParameters = ???
 }
 
 object SiteObject {
 
   def loadTei(tei: String): String =
     s"<script type='module'>import loadTei from '/js/tei.js'; loadTei('$tei');</script>"
+
+  def loadTeiNg(tei: String): Elem =
+    <script type='module'>{s"import loadTei from '/js/tei.js'; loadTei('$tei');"}</script>
 
   def resolve(site: Site, parts: Seq[String]): Option[SiteFile] = {
     if (parts.isEmpty) Some(new IndexObject(site).teiWrapperFile) else {

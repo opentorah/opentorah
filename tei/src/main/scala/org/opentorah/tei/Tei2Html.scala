@@ -24,24 +24,6 @@ object Tei2Html {
 
   type Transformer[S] = PartialFunction[(Elem, S), TransformResult[S]]
 
-  private def transformNodes[S](nodes: Seq[Node], state: S, transformer: Transformer[S]): (Seq[Node], S) =
-    transformNodes1[S](Seq.empty, nodes, state, transformer)
-
-  @scala.annotation.tailrec
-  private def transformNodes1[S](
-    result: Seq[Node],
-    nodes: Seq[Node],
-    state: S,
-    transformer: Transformer[S]
-  ): (Seq[Node], S) = nodes match {
-    case Seq() => (result, state)
-    case Seq(n, ns @ _*) =>
-      val (nTransformed, nextState) =
-        if (!Xml.isElement(n)) (n, state)
-        else transformElement(Xml.asElement(n), state, transformer)
-      transformNodes1(result :+ nTransformed, ns, nextState, transformer)
-  }
-
   private val classAttribute: Attribute[String] = Attribute("class")
 
   private def transformElement[S](element: Elem, state: S, transformer: Transformer[S]): (Elem, S) = {
@@ -59,8 +41,25 @@ object Tei2Html {
       (htmlElement, result.state)
     }
 
-    val (children, finalState) = transformNodes(Xml.getChildren(newElement), newState, transformer)
+    val (children, finalState) =
+      transformNodes[S](Seq.empty, Xml.getChildren(newElement), newState, transformer)
+
     (element.copy(child = children), finalState)
+  }
+
+  @scala.annotation.tailrec
+  private def transformNodes[S](
+    result: Seq[Node],
+    nodes: Seq[Node],
+    state: S,
+    transformer: Transformer[S]
+  ): (Seq[Node], S) = nodes match {
+    case Seq() => (result, state)
+    case Seq(n, ns @ _*) =>
+      val (nTransformed, nextState) =
+        if (!Xml.isElement(n)) (n, state)
+        else transformElement(Xml.asElement(n), state, transformer)
+      transformNodes(result :+ nTransformed, ns, nextState, transformer)
   }
 
   private val targetAttribute: Attribute[String] = Attribute("target")
@@ -197,28 +196,23 @@ object Tei2Html {
   private final class State(val resolver: TeiResolver, val notes: Seq[EndNote])
 
   def transform(resolver: TeiResolver): Xml.Transformer = element => {
-    val (result, finalState) = transformElement[State](
+    def t(element: Elem): (Elem, State) = transformElement[State](
       element,
       new State(resolver, Seq.empty),
       elementTransformer
     )
+
+    val (result, finalState) = t(element)
     <div xmlns={Xhtml.namespace.uri} class="html">
       {result}
-      <ol xmlns={Xhtml.namespace.uri} class="endnotes">
-        {for (note <- finalState.notes) yield {
-          val noteElement =
-            <li xmlns={Xhtml.namespace.uri} class="endnote" id={note.contentId}>
-              {note.content}
-              <a class="endnote-backlink" href={s"#${note.srcId}"}>{s"[${note.number}]"}</a>
-            </li>
-
-          transformElement(
-            noteElement,
-            new State(resolver, Seq.empty),
-            elementTransformer
-          )._1 // Ignore end-notes inside end-notes
-        }}
-      </ol>
+      <ol xmlns={Xhtml.namespace.uri} class="endnotes">{
+        for (note <- finalState.notes) yield t(
+          <li xmlns={Xhtml.namespace.uri} class="endnote" id={note.contentId}>
+            {note.content}
+            <a class="endnote-backlink" href={s"#${note.srcId}"}>{s"[${note.number}]"}</a>
+          </li>
+        )/* Ignore end-notes inside end-notes */._1
+      }</ol>
     </div>
   }
 }

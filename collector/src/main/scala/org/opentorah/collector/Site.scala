@@ -2,8 +2,9 @@ package org.opentorah.collector
 
 import java.io.File
 import org.opentorah.store.{Entities, EntityHolder, Path, Store, WithPath}
-import org.opentorah.tei.{Entity, EntityReference, Publisher, TeiResolver, SourceDesc, Tei}
+import org.opentorah.tei.{Entity, EntityReference, Publisher, SourceDesc, Tei, TeiResolver}
 import org.opentorah.util.Files
+import org.opentorah.xml.PrettyPrinter
 import org.slf4j.{Logger, LoggerFactory}
 import scala.xml.Node
 
@@ -128,7 +129,8 @@ object Site {
 
   def write(
     directory: File,
-    site: Site
+    site: Site,
+    siteParameters: SiteParameters
   ): Unit = {
     writeSiteObject(new IndexObject(site), directory)
     writeSiteObject(new TreeIndexObject(site), directory)
@@ -154,7 +156,8 @@ object Site {
     } {
       val documentObject = new DocumentObject(site, collection, document, teiHolder)
       writeSiteFile(documentObject.teiFile, directory)
-      writeSiteFile(documentObject.teiWrapperFile, directory)
+//      writeSiteFile(documentObject.teiWrapperFile, directory)
+      writeSiteFileNg(documentObject.teiWrapperFile, directory, siteParameters)
       writeSiteFile(documentObject.facsFile, directory)
       // TODO HTML files
       // writeSiteFile(documentObject.htmlFile, directory)
@@ -172,6 +175,10 @@ object Site {
 
   private final def writeSiteFile(siteFile: SiteFile, directory: File): Unit =
     Files.write(Files.file(directory, siteFile.url), siteFile.content)
+
+  // TODO DOCTYPE; generalize for any SiteFile...
+  private final def writeSiteFileNg(siteFile: SiteFile, directory: File, siteParameters: SiteParameters): Unit =
+    Files.write(Files.file(directory, siteFile.url), PrettyPrinter.default.render(siteFile.contentNg(siteParameters)))
 
   val addPublicationStatement: Tei.Transformer = Tei.addPublicationStatement(
     publisher = new Publisher.Value(<ptr xmlns={Tei.namespace.uri} target="www.alter-rebbe.org"/>),

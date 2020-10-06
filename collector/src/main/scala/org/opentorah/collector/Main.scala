@@ -47,7 +47,26 @@ object Main {
     logger.info("Writing site.")
     Site.write(
       siteRoot,
-      site
+      site,
+      new SiteParameters(
+        title = "Документы",
+        author = "www.alter-rebbe.org",
+        email = "dub@opentorah.org",
+        faviconJpeg = "alter-rebbe",
+        googleAnalyticsId = Some("UA-154490117-1"),
+        navigationLinks = Seq(
+          NavigationLink("names", "Имена", Some("namesViewer")),
+          NavigationLink("collections", "Архивы", Some("collectionViewer")),
+          NavigationLink("help", "Помощь", Some("collectionViewer")),
+          NavigationLink("about", "О сайте", Some("collectionViewer"))
+        ),
+        footerCol3 =
+          <p>
+            documents related to early Chabad history<br/>
+            🄯 <a href="http://www.opentorah.org/" target="collectionViewer">the Open Torah Project</a>
+            <a href="http://creativecommons.org/licenses/by/4.0/" target="collectionViewer">CC BY 4.0</a>
+          </p>
+      )
     )
   }
 

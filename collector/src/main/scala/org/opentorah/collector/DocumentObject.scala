@@ -86,6 +86,24 @@ final class DocumentObject(
     next.map(next => Seq("nextDocument" -> next.name)).getOrElse(Seq.empty)
   }
 
+  private def commonNavigationLinks: Seq[NavigationLink] = {
+    val (prev: Option[Document], next: Option[Document]) = collection.value.by.get.siblings(document)
+
+    Seq(NavigationLink("../index", s"[${Hierarchy.storeName(collection.value)}]", Some("collectionViewer"))) ++
+    prev.toSeq.map(prev => NavigationLink(prev.name, "⇦", None)) ++
+    Seq(NavigationLink(document.name, document.name, None)) ++
+    next.toSeq.map(next => NavigationLink(next.name, "⇨", None))
+  }
+
+  override protected def pageParameters: PageParameters = new PageParameters(
+    style = "main",
+    navigationLinks =
+      commonNavigationLinks ++
+      Seq(NavigationLink(facsUrl, "⎙", Some("facsimileViewer"))) ++
+      (if (teiHolder.language.isDefined || document.languages.isEmpty) Seq.empty
+      else document.languages.map(lang => NavigationLink(s"${document.name}-$lang", s"[$lang]", None)))
+  )
+
   def facsFile: SiteFile = new SiteFile {
     override def url: Seq[String] = facsUrl
 
