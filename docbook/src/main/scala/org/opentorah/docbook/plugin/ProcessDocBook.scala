@@ -42,6 +42,17 @@ final class ProcessDocBook(
     // Run Saxon.
     // Note: DocBook XSLT uses Saxon 6 XSLT 1.0 extensions and doesn't work on later Saxon versions
     // ("Don't know how to chunk with Saxonica").
+    // According to https://www.saxonica.com/html/documentation/extensions/instructions/output.html,
+    //   "Saxon 9.9 reintroduces saxon6:output (in the original Saxon 6.5.5 namespace,
+    //   which differs from the usual Saxon namespace, so here we use a different prefix)
+    //   so that the DocBook 1.0 stylesheets can now be executed with a modern Saxon release.
+    //   Note that the specification is not identical with the Saxon 6.5.5 original,
+    //   but it serves the purpose in supporting DocBook."
+    // I am not sure what I can do to set up DocBook XSLT 1 processing with Saxon 10
+    // (it didn't work out of the box for me), but I'd love to get rid of the Saxon 6, since it:
+    // - produces unmodifiable DOM (see Saxon) - unlike Saxon 10,
+    // - carries within it obsolete org.w3c.dom classes (Leve 2), which cause IDE to highlight
+    //   as errors uses of the (Level 3) method org.w3c.dom.Node.getTextContent()...
     val saxon: Saxon = if (!docBook2.usesDocBookXslt2) Saxon.Saxon6 else Saxon.Saxon10
     saxon.transform(
       resolver,

@@ -96,8 +96,7 @@ object Site {
 
   val facsimileBucket: String = "http://facsimiles.alter-rebbe.org/facsimiles/"
 
-  private val unpublishedCollections: Set[String] =
-    Set("lna208", "niab5", "niab19", "rnb203")
+  private val unpublishedCollections: Set[String] = Set("niab5", "niab19", "rnb203")
 
   // TODO with images on a separate website (facsimiles.alter-rebbe.org), this has to be re-worked...
   //  private def checkPages(): Unit = {
@@ -157,6 +156,8 @@ object Site {
       writeSiteFile(documentObject.teiFile, directory)
       writeSiteFile(documentObject.teiWrapperFile, directory)
       writeSiteFile(documentObject.facsFile, directory)
+      // TODO HTML files
+      // writeSiteFile(documentObject.htmlFile, directory)
     }
 
     Files.deleteFiles(new File(directory, ReportObject.directoryName))

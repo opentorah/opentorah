@@ -26,7 +26,7 @@ object Svg extends Dialect {
     // in plugin tests - on GitHub, but not locally (different version of the JDK?).
     // So, I bracket the invocation that triggers that code and restore whatever was there (if there was anything).
     // Also, since my MathJax support is not the only source of the SVG files that FOP can encounter,
-    // I provide a method that can be used to force this issue before FOP runs.
+    // I provide a method forceXerces() that can be used to force this issue before FOP runs.
     val propertyName: String = Xerces.saxParserFactoryProperty
     val original: String = System.getProperty(propertyName)
     System.setProperty(propertyName, Xerces.saxParserFactoryName)

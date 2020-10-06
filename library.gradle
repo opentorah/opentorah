@@ -34,6 +34,7 @@ ext.configureLibrary = {
     }
   }
 
+  // TODO it seems that this only affects the code JAR, but sources and JavaDoc JARs are misnamed?
   jar.archiveBaseName.set(projectArtifact)
 
   // Gradle plugin [publishing?] plugin, if it is applied, adds tasks publishPluginJar and

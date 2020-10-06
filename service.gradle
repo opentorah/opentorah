@@ -23,6 +23,7 @@ ext.configureJib = {
   final String mainClassName
   ->
 
+  // TODO look into `providers.credentials(org.gradle.api.credentials.PasswordCredentials, 'login')`...
   final String gcloudServiceAccountProperty = 'gcloudServiceAccountKey_' + gcloudProject.replace('-', '_')
   final String gcloudServiceAccountKey = findProperty(gcloudServiceAccountProperty) ?: System.getenv(gcloudServiceAccountProperty)
   final String serviceImage  = "gcr.io/$gcloudProject/$gcloudService"

@@ -109,7 +109,6 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
   }
 
   private def parse(string: String): String = {
-    // Note: Saxon6 returns unmodifiable DOM that breaks toString() (which toString()?); using Saxon10.
     val node: Node = Saxon.Saxon10.parse(
       inputSource = new InputSource(new StringReader(string)),
       filters = Seq(
