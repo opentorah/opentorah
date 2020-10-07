@@ -2,12 +2,15 @@ package org.opentorah.collector
 
 import java.io.File
 import org.opentorah.store.{Entities, EntityHolder, Path, Store, WithPath}
-import org.opentorah.tei.{Entity, EntityReference, Publisher, TeiResolver, SourceDesc, Tei}
+import org.opentorah.tei.{Entity, EntityReference, Publisher, SourceDesc, Tei, TeiResolver}
 import org.opentorah.util.Files
 import org.slf4j.{Logger, LoggerFactory}
 import scala.xml.Node
 
-final class Site(val store: Store) {
+final class Site(
+  val store: Store,
+  val siteParameters: SiteParameters
+) {
 
   private def withPath[R](values: Store => Seq[R]): Seq[WithPath[R]] =
     Site.withPath(Path.empty, values, store)
@@ -69,7 +72,7 @@ final class Site(val store: Store) {
       } { siteFile: SiteFile => Some(new TeiResolver.Resolved(
         url = siteFile.url,
         role = siteFile match {
-          case teiWrapperFile: TeiWrapperFile => Some(teiWrapperFile.viewer.name)
+          case htmlFile: HtmlFile => Some(htmlFile.viewer.name)
           case _ => None
         }
       ))}

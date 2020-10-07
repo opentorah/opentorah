@@ -1,5 +1,6 @@
 package org.opentorah.collector
 
+// TODO make Viewer mandatory for all SiteObjects
 sealed abstract class Viewer(val name: String)
 
 object Viewer {

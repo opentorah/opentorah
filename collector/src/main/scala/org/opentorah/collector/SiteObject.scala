@@ -20,14 +20,21 @@ abstract class SiteObject(val site: Site) {
     }
   }
 
-  final val teiWrapperFile: SiteFile = new TeiWrapperFile {
+  final val teiWrapperFile: SiteFile = new HtmlFile {
     override def viewer: Viewer = teiWrapperViewer
 
     override def url: Seq[String] = teiWrapperUrl
 
-    final def content: String = SiteObject.withYaml(
-      yaml = Seq("target" -> viewer.name) ++ yaml,
-      content = Seq(SiteObject.loadTei(Files.mkUrl(teiFile.url)))
+    override protected def siteParameters: SiteParameters = site.siteParameters
+
+    override protected def contentElement: Elem =
+      <script type='module'>import loadTei from '/js/tei.js'; loadTei('{Files.mkUrl(teiFile.url)}');</script>
+
+    override protected def pageParameters: PageParameters = new PageParameters(
+      target = Some(viewer),
+      style = teiWrapperStyle,
+      title = teiWrapperTitle,
+      navigationLinks = teiWrapperNavigationLinks
     )
   }
 
@@ -48,13 +55,15 @@ abstract class SiteObject(val site: Site) {
 
   protected def teiWrapperUrl: Seq[String]
 
-  protected def yaml: Seq[(String, String)] = Seq.empty
+  protected def teiWrapperStyle: String = "main"
+
+  // TODO some override it, some do not - ?!
+  protected def teiWrapperTitle: Option[String] = None
+
+  protected def teiWrapperNavigationLinks: Seq[NavigationLink] = Seq.empty
 }
 
 object SiteObject {
-
-  def loadTei(tei: String): String =
-    s"<script type='module'>import loadTei from '/js/tei.js'; loadTei('$tei');</script>"
 
   def resolve(site: Site, parts: Seq[String]): Option[SiteFile] = {
     if (parts.isEmpty) Some(new IndexObject(site).teiWrapperFile) else {
@@ -82,19 +91,4 @@ object SiteObject {
       }
     }
   }
-
-  def withYaml(
-    yaml: Seq[(String, String)],
-    content: Seq[String] = Seq.empty
-  ): String = {
-    val result: Seq[String] =
-      Seq("---") ++
-      (for ((name, value) <- ("layout" -> "default") +: yaml) yield name + ": " + quote(value)) ++
-      Seq("---") ++
-      Seq("") ++ content
-
-    result.mkString("", "\n", if (content.nonEmpty) "\n" else "")
-  }
-
-  private def quote(what: String): String = s"'$what'"
 }

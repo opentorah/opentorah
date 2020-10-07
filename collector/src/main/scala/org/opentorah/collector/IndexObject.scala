@@ -9,8 +9,6 @@ final class IndexObject(site: Site) extends SimpleSiteObject(site) {
 
   override protected def teiWrapperViewer: Viewer = Viewer.Collection
 
-  override protected def yaml: Seq[(String, String)] = Seq("windowName" -> teiWrapperViewer.name)
-
   override protected def teiBody: Seq[Node] = {
     <head xmlns={Tei.namespace.uri}>{IndexObject.title}</head> ++
     <list xmlns={Tei.namespace.uri} type="bulleted">
@@ -22,5 +20,5 @@ final class IndexObject(site: Site) extends SimpleSiteObject(site) {
 object IndexObject {
   val fileName: String = "index"
 
-  val title: String = "Дела"
+  private val title: String = "Дела"
 }

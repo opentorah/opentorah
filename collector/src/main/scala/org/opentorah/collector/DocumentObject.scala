@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.store.WithPath
 import org.opentorah.tei.{Body, CalendarDesc, Page, Pb, Tei, Tei2Html}
 import org.opentorah.util.Files
-import org.opentorah.xml.{PrettyPrinter, Xml}
+import org.opentorah.xml.Xml
 import scala.xml.{Elem, Node}
 
 final class DocumentObject(
@@ -60,7 +60,7 @@ final class DocumentObject(
 
   // TODO eventually, this should move into SiteObject - and teiFile and teiWrapperFile go away
   protected def htmlUrl: Seq[String] = url(CollectionObject.htmlDirectoryName, "html")
-  val htmlFile: SiteFile = new SiteFile {
+  val htmlFile: SiteFile = new SiteFile { // TODO HtmlFile...
     override def url: Seq[String] = htmlUrl
 
     override def content: String = {
@@ -72,49 +72,54 @@ final class DocumentObject(
     }
   }
 
-  override protected def yaml: Seq[(String, String)] =
-    Seq("facs" -> Files.mkUrl(facsUrl)) ++
+  override protected def teiWrapperNavigationLinks: Seq[NavigationLink] =
+    navigation ++
+    Seq(NavigationLink(facsUrl, "⎙", Some(Viewer.Facsimile))) ++
     (if (teiHolder.language.isDefined || document.languages.isEmpty) Seq.empty
-     else Seq("translations" -> document.languages.mkString("[", ", ", "]"))) ++
-    navigation
+    else document.languages.map(lang => NavigationLink(s"${document.name}-$lang", s"[$lang]", None)))
 
-  private def navigation: Seq[(String, String)] = {
-    val (prev: Option[Document], next: Option[Document]) = collection.value.by.get.siblings(document)
-    Seq("documentCollection" -> Hierarchy.storeName(collection.value)) ++
-    prev.map(prev => Seq("prevDocument" -> prev.name)).getOrElse(Seq.empty) ++
-    Seq("thisDocument" -> document.name) ++
-    next.map(next => Seq("nextDocument" -> next.name)).getOrElse(Seq.empty)
-  }
+  def facsFile: SiteFile = new HtmlFile {
+    override def viewer: Viewer = Viewer.Facsimile
 
-  def facsFile: SiteFile = new SiteFile {
+    override protected def siteParameters: SiteParameters = site.siteParameters
+
     override def url: Seq[String] = facsUrl
 
-    override def content: String = {
-      // TODO do pages of the appropriate teiHolder!
-      val facsimilePages: Elem =
-        <div class={Viewer.Facsimile.name}>
-          {headerFacs}
-          <div class="facsimileScroller">
-            {for (page: Page <- document.pages(collection.value.pageType).filterNot(_.pb.isMissing)) yield {
-            val n: String = page.pb.n
-            val href: Seq[String] = DocumentObject.pageUrl(collection, document.name, page)
-            val facs: String = page.pb.facs
-              .getOrElse(Site.facsimileBucket + Hierarchy.fileName(collection.value) + "/" + n + ".jpg")
-            <a target={Viewer.Document.name} href={Files.mkUrl(href)}>
-              <figure>
-                <img xml:id={Page.pageId(n)} alt={s"facsimile for page $n"} src={facs}/>
-                <figcaption>{n}</figcaption>
-              </figure>
-            </a>
-          }}
-          </div>
+    // TODO do pages of the appropriate teiHolder!
+    override protected def contentElement: Elem =
+      <div class={Viewer.Facsimile.name}>
+        {headerFacs}
+        <div class="facsimileScroller">
+          {for (page: Page <- document.pages(collection.value.pageType).filterNot(_.pb.isMissing)) yield {
+          val n: String = page.pb.n
+          val href: Seq[String] = DocumentObject.pageUrl(collection, document.name, page)
+          val facs: String = page.pb.facs
+            .getOrElse(Site.facsimileBucket + Hierarchy.fileName(collection.value) + "/" + n + ".jpg")
+          <a target={Viewer.Document.name} href={Files.mkUrl(href)}>
+            <figure>
+              <img xml:id={Page.pageId(n)} alt={s"facsimile for page $n"} src={facs}/>
+              <figcaption>{n}</figcaption>
+            </figure>
+          </a>
+        }}
         </div>
+      </div>
 
-      SiteObject.withYaml(
-        yaml = Seq("transcript" -> Files.mkUrl(teiWrapperUrl)) ++ navigation,
-        content = Seq(PrettyPrinter.default.render(facsimilePages))
-      )
-    }
+    override protected def pageParameters: PageParameters = new PageParameters(
+      style = "main",
+      navigationLinks =
+        navigation ++
+        Seq(NavigationLink(teiWrapperUrl, "A", Some(Viewer.Document)))
+    )
+  }
+
+  private def navigation: Seq[NavigationLink] = {
+    val (prev: Option[Document], next: Option[Document]) = collection.value.by.get.siblings(document)
+
+    Seq(CollectionObject.navigationLink(collection)) ++
+    prev.toSeq.map(prev => NavigationLink(prev.name, "⇦", None)) ++
+    Seq(NavigationLink(document.name, document.name, None)) ++
+    next.toSeq.map(next => NavigationLink(next.name, "⇨", None))
   }
 }
 
