@@ -11,10 +11,7 @@ final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
 
   override protected def teiWrapperViewer: Viewer = Viewer.Collection
 
-  override protected def yaml: Seq[(String, String)] = Seq(
-    "windowName" -> teiWrapperViewer.name,
-    "title" -> TreeIndexObject.title
-  )
+  override protected def teiWrapperTitle: Option[String] = Some(TreeIndexObject.title)
 
   override protected def teiBody: Seq[Node] =
     <head xmlns={Tei.namespace.uri}>{Ref.toXml(new HierarchyObject(site, Path.empty, site.store).teiWrapperFile.url, TreeIndexObject.title)}</head> ++
@@ -43,5 +40,5 @@ final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
 object TreeIndexObject {
   val fileName: String = "collections"
 
-  val title: String = "Архивы"
+  private val title: String = "Архивы"
 }

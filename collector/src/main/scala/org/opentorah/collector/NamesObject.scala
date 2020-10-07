@@ -10,6 +10,8 @@ final class NamesObject(site: Site) extends SimpleSiteObject(site) {
 
   override protected def teiWrapperViewer: Viewer = Viewer.Names
 
+  override protected def teiWrapperTitle: Option[String] = Some(NamesObject.title)
+
   override protected def teiBody: Seq[Node] = {
     val nonEmptyLists: Seq[EntitiesList] = site.store.entities.get.lists.filterNot(_.isEmpty)
     val listOfLists: Seq[Node] =
@@ -26,8 +28,6 @@ final class NamesObject(site: Site) extends SimpleSiteObject(site) {
 
     <head xmlns={Tei.namespace.uri}>{NamesObject.title}</head> ++ listOfLists ++ nonEmptyLists.flatMap(toXml)
   }
-
-  override protected def yaml: Seq[(String, String)] = Seq("title" -> NamesObject.title)
 }
 
 object NamesObject {

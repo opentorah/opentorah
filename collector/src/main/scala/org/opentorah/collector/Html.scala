@@ -35,7 +35,7 @@ object Html {
         {footer(siteParameters)}
       </body>
       {pageParameters.target.fold[Seq[Elem]](Seq.empty){ target =>
-        Seq(<script type="module">{s"""window.name = "$target"""}</script>)}}
+        Seq(<script type="module">window.name = "{target.name}"</script>)}}
     </html>
 
   // Only in production :)
@@ -55,7 +55,7 @@ object Html {
   def header(siteParameters: SiteParameters, pageParameters: PageParameters): Elem =
     <header class="site-header" role="banner">
       <div class="wrapper">
-        <a class="site-title" rel="author" target="collectionViewer" href="/">{siteParameters.title}</a>
+        <a class="site-title" rel="author" target={siteParameters.homeTarget.name} href="/">{siteParameters.title}</a>
         <nav class="site-nav">
           <div class="trigger">{
             for (link <- siteParameters.navigationLinks ++ pageParameters.navigationLinks)

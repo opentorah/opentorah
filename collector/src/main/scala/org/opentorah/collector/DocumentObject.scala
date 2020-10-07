@@ -60,7 +60,7 @@ final class DocumentObject(
 
   // TODO eventually, this should move into SiteObject - and teiFile and teiWrapperFile go away
   protected def htmlUrl: Seq[String] = url(CollectionObject.htmlDirectoryName, "html")
-  val htmlFile: SiteFile = new SiteFile {
+  val htmlFile: SiteFile = new SiteFile { // TODO HtmlFile...
     override def url: Seq[String] = htmlUrl
 
     override def content: String = {
@@ -72,31 +72,21 @@ final class DocumentObject(
     }
   }
 
-  override protected def yaml: Seq[(String, String)] = ??? // TODO remove
+  override protected def teiWrapperNavigationLinks: Seq[NavigationLink] =
+    navigation ++
+    Seq(NavigationLink(facsUrl, "⎙", Some(Viewer.Facsimile))) ++
+    (if (teiHolder.language.isDefined || document.languages.isEmpty) Seq.empty
+    else document.languages.map(lang => NavigationLink(s"${document.name}-$lang", s"[$lang]", None)))
 
-  private def navigation: Seq[NavigationLink] = {
-    val (prev: Option[Document], next: Option[Document]) = collection.value.by.get.siblings(document)
+  def facsFile: SiteFile = new HtmlFile {
+    override def viewer: Viewer = Viewer.Facsimile
 
-    Seq(NavigationLink("../index", s"[${Hierarchy.storeName(collection.value)}]", Some(Viewer.Collection))) ++
-    prev.toSeq.map(prev => NavigationLink(prev.name, "⇦", None)) ++
-    Seq(NavigationLink(document.name, document.name, None)) ++
-    next.toSeq.map(next => NavigationLink(next.name, "⇨", None))
-  }
+    override protected def siteParameters: SiteParameters = site.siteParameters
 
-  override protected def pageParameters: PageParameters = new PageParameters(
-    style = "main",
-    navigationLinks =
-      navigation ++
-      Seq(NavigationLink(facsUrl, "⎙", Some(Viewer.Facsimile))) ++
-      (if (teiHolder.language.isDefined || document.languages.isEmpty) Seq.empty
-      else document.languages.map(lang => NavigationLink(s"${document.name}-$lang", s"[$lang]", None)))
-  )
-
-  def facsFile: SiteFile = new SiteFile {
     override def url: Seq[String] = facsUrl
 
     // TODO do pages of the appropriate teiHolder!
-    private def facsimilePages: Elem =
+    override protected def contentElement: Elem =
       <div class={Viewer.Facsimile.name}>
         {headerFacs}
         <div class="facsimileScroller">
@@ -115,18 +105,21 @@ final class DocumentObject(
         </div>
       </div>
 
-    override def content: String = ???
-
-    final override def contentNg(siteParameters: SiteParameters): Elem = Html.defaultLayout(
-      siteParameters,
-      new PageParameters(
-        style = "main",
-        navigationLinks =
-          navigation ++
-          Seq(NavigationLink(teiWrapperUrl, "A", Some(Viewer.Document)))
-      ),
-      content = facsimilePages
+    override protected def pageParameters: PageParameters = new PageParameters(
+      style = "main",
+      navigationLinks =
+        navigation ++
+        Seq(NavigationLink(teiWrapperUrl, "A", Some(Viewer.Document)))
     )
+  }
+
+  private def navigation: Seq[NavigationLink] = {
+    val (prev: Option[Document], next: Option[Document]) = collection.value.by.get.siblings(document)
+
+    Seq(CollectionObject.navigationLink(collection)) ++
+    prev.toSeq.map(prev => NavigationLink(prev.name, "⇦", None)) ++
+    Seq(NavigationLink(document.name, document.name, None)) ++
+    next.toSeq.map(next => NavigationLink(next.name, "⇨", None))
   }
 }
 

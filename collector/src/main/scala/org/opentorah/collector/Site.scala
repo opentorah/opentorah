@@ -4,11 +4,13 @@ import java.io.File
 import org.opentorah.store.{Entities, EntityHolder, Path, Store, WithPath}
 import org.opentorah.tei.{Entity, EntityReference, Publisher, SourceDesc, Tei, TeiResolver}
 import org.opentorah.util.Files
-import org.opentorah.xml.PrettyPrinter
 import org.slf4j.{Logger, LoggerFactory}
 import scala.xml.Node
 
-final class Site(val store: Store) {
+final class Site(
+  val store: Store,
+  val siteParameters: SiteParameters
+) {
 
   private def withPath[R](values: Store => Seq[R]): Seq[WithPath[R]] =
     Site.withPath(Path.empty, values, store)
@@ -70,7 +72,7 @@ final class Site(val store: Store) {
       } { siteFile: SiteFile => Some(new TeiResolver.Resolved(
         url = siteFile.url,
         role = siteFile match {
-          case teiWrapperFile: TeiWrapperFile => Some(teiWrapperFile.viewer.name)
+          case htmlFile: HtmlFile => Some(htmlFile.viewer.name)
           case _ => None
         }
       ))}
@@ -129,8 +131,7 @@ object Site {
 
   def write(
     directory: File,
-    site: Site,
-    siteParameters: SiteParameters
+    site: Site
   ): Unit = {
     writeSiteObject(new IndexObject(site), directory)
     writeSiteObject(new TreeIndexObject(site), directory)
@@ -156,8 +157,8 @@ object Site {
     } {
       val documentObject = new DocumentObject(site, collection, document, teiHolder)
       writeSiteFile(documentObject.teiFile, directory)
-      writeSiteFileNg(documentObject.teiWrapperFile, directory, siteParameters)
-      writeSiteFileNg(documentObject.facsFile, directory, siteParameters)
+      writeSiteFile(documentObject.teiWrapperFile, directory)
+      writeSiteFile(documentObject.facsFile, directory)
       // TODO HTML files
       // writeSiteFile(documentObject.htmlFile, directory)
     }
@@ -175,22 +176,12 @@ object Site {
   private final def writeSiteFile(siteFile: SiteFile, directory: File): Unit =
     Files.write(Files.file(directory, siteFile.url), siteFile.content)
 
-  // TODO generalize for any SiteFile...
-  private final def writeSiteFileNg(siteFile: SiteFile, directory: File, siteParameters: SiteParameters): Unit =
-    Files.write(
-      Files.file(directory, siteFile.url),
-      "<!DOCTYPE html>\n" ++
-      prettyPrinter.render(siteFile.contentNg(siteParameters))
-    )
-
   val addPublicationStatement: Tei.Transformer = Tei.addPublicationStatement(
     publisher = new Publisher.Value(<ptr xmlns={Tei.namespace.uri} target="www.alter-rebbe.org"/>),
     status = "free",
     licenseName = "Creative Commons Attribution 4.0 International License",
     licenseUrl = "http://creativecommons.org/licenses/by/4.0/"
   )
-
-  private val prettyPrinter: PrettyPrinter = PrettyPrinter(alwaysStackElements = Set("nav", "header", "main", "div"))
 
   val addSourceDesc: Tei.Transformer = Tei.addSourceDesc(new SourceDesc.Value(<p>Facsimile</p>))
 }

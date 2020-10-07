@@ -31,7 +31,26 @@ object Main {
     logger.info("Reading store.")
 
     val store: Store = Store.read(fromUrl)
-    val site = new Site(store)
+    val site = new Site(store, new SiteParameters(
+      title = "Документы",
+      author = "www.alter-rebbe.org",
+      email = "dub@opentorah.org",
+      faviconJpeg = "alter-rebbe",
+      googleAnalyticsId = Some("UA-154490117-1"),
+      navigationLinks = Seq(
+        NavigationLink("/names", "Имена", Some(Viewer.Names)), // TODO doesn't show up in the Jekyll-generated pages (md)...
+        NavigationLink("/collections", "Архивы", Some(Viewer.Collection)), // TODO doesn't show up in the Jekyll-generated pages (md)...
+        NavigationLink("/help", "Помощь", Some(Viewer.Collection)),
+        NavigationLink("/about", "О сайте", Some(Viewer.Collection))
+      ),
+      footerCol3 =
+        <p>
+          documents related to early Chabad history<br/>
+          🄯 <a href="http://www.opentorah.org/" target={Viewer.Collection.name}>the Open Torah Project</a>
+          <a href="http://creativecommons.org/licenses/by/4.0/" target={Viewer.Collection.name}>CC BY 4.0</a>
+        </p>,
+      homeTarget = Viewer.Collection
+    ))
 
     logger.info("Checking store.")
     def findByRef(ref: String): Option[Entity] = store.entities.get.findByRef(ref)
@@ -47,26 +66,7 @@ object Main {
     logger.info("Writing site.")
     Site.write(
       siteRoot,
-      site,
-      new SiteParameters(
-        title = "Документы",
-        author = "www.alter-rebbe.org",
-        email = "dub@opentorah.org",
-        faviconJpeg = "alter-rebbe",
-        googleAnalyticsId = Some("UA-154490117-1"),
-        navigationLinks = Seq(
-          NavigationLink("names", "Имена", Some(Viewer.Names)),
-          NavigationLink("collections", "Архивы", Some(Viewer.Collection)),
-          NavigationLink("help", "Помощь", Some(Viewer.Collection)),
-          NavigationLink("about", "О сайте", Some(Viewer.Collection))
-        ),
-        footerCol3 =
-          <p>
-            documents related to early Chabad history<br/>
-            🄯 <a href="http://www.opentorah.org/" target="collectionViewer">the Open Torah Project</a>
-            <a href="http://creativecommons.org/licenses/by/4.0/" target="collectionViewer">CC BY 4.0</a>
-          </p>
-      )
+      site
     )
   }
 

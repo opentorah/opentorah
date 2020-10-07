@@ -2,6 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.util.Files
 
+// TODO take SiteObject as the parameter
 final class NavigationLink private(
   val url: String,
   val title: String,

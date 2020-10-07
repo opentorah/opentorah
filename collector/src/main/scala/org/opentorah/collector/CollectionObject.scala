@@ -14,10 +14,10 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
 
   override protected def teiWrapperViewer: Viewer = Viewer.Collection
 
-  override protected def yaml: Seq[(String, String)] = Seq(
-    "style" -> "wide",
-    "documentCollection" -> Hierarchy.storeName(collection.value)
-  )
+  override protected def teiWrapperStyle: String = "wide"
+
+  override protected def teiWrapperNavigationLinks: Seq[NavigationLink] =
+    Seq(CollectionObject.navigationLink(collection))
 
   override protected def teiBody: Seq[Node] = {
     val pages: Seq[Page] = collection.value.documents
@@ -59,6 +59,9 @@ object CollectionObject {
   val teiDirectoryName: String = "tei"
 
   val htmlDirectoryName: String = "html" // TEI documents converted to HTML
+
+  def navigationLink(collection: WithPath[Collection]): NavigationLink =
+    NavigationLink("../index", s"[${Hierarchy.storeName(collection.value)}]", Some(Viewer.Collection))
 
   def resolve(site: Site, parts: Seq[String]): Option[SiteFile] = if (parts.isEmpty) None else
     site.findCollectionByName(parts.head).flatMap { collection =>

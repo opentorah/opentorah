@@ -9,5 +9,6 @@ class SiteParameters(
   val faviconJpeg: String,
   val googleAnalyticsId: Option[String],
   val navigationLinks: Seq[NavigationLink],
-  val footerCol3: Elem
+  val footerCol3: Elem,
+  val homeTarget: Viewer
 )
