@@ -18,7 +18,7 @@ final class Tei2HtmlTest extends AnyFlatSpec with Matchers {
       )
     }
 
-    val result = Tei2Html.transform(resolver)(element)
+    val result = Tei2Html.transform(resolver, element)
     println(Xhtml.prettyPrinter.render(result))
     result
   }

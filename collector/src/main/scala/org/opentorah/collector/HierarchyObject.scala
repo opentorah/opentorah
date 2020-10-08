@@ -12,7 +12,7 @@ final class HierarchyObject(site: Site, path: Path, store: Store) extends Simple
 
   override protected def urlPrefix: Seq[String] = Hierarchy.urlPrefix(path)
 
-  override protected def teiWrapperViewer: Viewer = Viewer.Collection
+  override protected def viewer: Viewer = Viewer.Collection
 
   protected def teiBody: Seq[Node] = Hierarchy.storeHeader(path, store) ++ store.by.toSeq.flatMap { by: By[_] =>
     <p xmlns={Tei.namespace.uri}>

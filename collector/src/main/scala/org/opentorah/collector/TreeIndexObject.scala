@@ -9,9 +9,9 @@ final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
 
   override protected def fileName: String = TreeIndexObject.fileName
 
-  override protected def teiWrapperViewer: Viewer = Viewer.Collection
+  override protected def viewer: Viewer = Viewer.Collection
 
-  override protected def teiWrapperTitle: Option[String] = Some(TreeIndexObject.title)
+  override protected def title: Option[String] = Some(TreeIndexObject.title)
 
   override protected def teiBody: Seq[Node] =
     <head xmlns={Tei.namespace.uri}>{Ref.toXml(new HierarchyObject(site, Path.empty, site.store).teiWrapperFile.url, TreeIndexObject.title)}</head> ++

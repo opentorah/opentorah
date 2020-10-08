@@ -11,7 +11,7 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
 
   override protected def fileName: String = EntityObject.fileName(entity)
 
-  override protected def teiWrapperViewer: Viewer = Viewer.Names
+  override protected def viewer: Viewer = Viewer.Names
 
   override protected def teiBody: Seq[Node] = Seq(Entity.toXmlElement(entity.copy(content = entity.content :+ mentions)))
 

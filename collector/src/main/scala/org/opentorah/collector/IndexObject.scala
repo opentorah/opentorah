@@ -7,7 +7,7 @@ final class IndexObject(site: Site) extends SimpleSiteObject(site) {
 
   override protected def fileName: String = IndexObject.fileName
 
-  override protected def teiWrapperViewer: Viewer = Viewer.Collection
+  override protected def viewer: Viewer = Viewer.Collection
 
   override protected def teiBody: Seq[Node] = {
     <head xmlns={Tei.namespace.uri}>{IndexObject.title}</head> ++
