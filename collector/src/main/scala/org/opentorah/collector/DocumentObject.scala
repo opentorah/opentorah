@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.WithPath
-import org.opentorah.tei.{Body, CalendarDesc, Page, Tei}
+import org.opentorah.tei.{Body, CalendarDesc, Page, Tei, Tei2Html}
 import org.opentorah.util.Files
 import scala.xml.{Elem, Node}
 
@@ -29,10 +29,10 @@ final class DocumentObject(
 
   override protected def tei: Tei = {
     val tei = teiHolder.tei
-    tei.copy(text = tei.text.copy(body = new Body.Value(headerTei ++ tei.body.xml)))
+    tei.copy(text = tei.text.copy(body = new Body.Value(header ++ tei.body.xml)))
   }
 
-  private def headerTei: Seq[Node] = {
+  private def header: Seq[Node] = {
     // TODO here again it seems that the browser ignores the namespace when styling elements
     // that exist in HTML: when I use <p> instead of <ab>, and there is a <p> inside <abstract>,
     // background colour stops before it...
@@ -43,16 +43,6 @@ final class DocumentObject(
       <l>Кому: {document.addressee}</l>
     </ab>
   }
-
-  // TODO links are not live since they are targeting TEI :)
-  // Skip the header in facsimile altogether?
-  private def headerFacs: Seq[Node] =
-    <div class="document-header">
-      <span>{document.description}</span><br/>
-      <span>Дата: {document.date}</span><br/>
-      <span>Кто: {document.author}</span><br/>
-      <span>Кому: {document.addressee}</span>
-    </div>
 
   override protected def teiTransformer: Tei => Tei =
     Site.addPublicationStatement compose
@@ -74,27 +64,26 @@ final class DocumentObject(
     override def url: Seq[String] = facsUrl
 
     // TODO do pages of the appropriate teiHolder!
-    override protected def contentElement: Elem =
+    override protected def contentElement: Elem = Tei2Html.transform(site.resolver(facsUrl),
       <div class={Viewer.Facsimile.name}>
-        {headerFacs}
-        <div class="facsimileScroller">
-          {for (page: Page <- document.pages(collection.value.pageType).filterNot(_.pb.isMissing)) yield {
-          val n: String = page.pb.n
-          val href: Seq[String] = DocumentObject.pageUrl(collection, document.name, page)
-          val facs: String = page.pb.facs
-            .getOrElse(Site.facsimileBucket + Hierarchy.fileName(collection.value) + "/" + n + ".jpg")
-          <a target={Viewer.Document.name} href={Files.mkUrl(href)}>
-            <figure>
-              <img xml:id={Page.pageId(n)} alt={s"facsimile for page $n"} src={facs}/>
-              <figcaption>{n}</figcaption>
-            </figure>
-          </a>
-        }}
-        </div>
-      </div>
+        {header}
+        <div class="facsimileScroller">{
+          for (page: Page <- document.pages(collection.value.pageType).filterNot(_.pb.isMissing)) yield {
+            val n: String = page.pb.n
+            val href: Seq[String] = DocumentObject.pageUrl(collection, document.name, page)
+            val facs: String = page.pb.facs
+              .getOrElse(Site.facsimileBucket + Hierarchy.fileName(collection.value) + "/" + n + ".jpg")
+            <a target={Viewer.Document.name} href={Files.mkUrl(href)}>
+              <figure>
+                <img xml:id={Page.pageId(n)} alt={s"facsimile for page $n"} src={facs}/>
+                <figcaption>{n}</figcaption>
+              </figure>
+            </a>
+        }}</div>
+      </div>)
 
     override protected def pageParameters: PageParameters = new PageParameters(
-      style = "main",
+      style = "main-ng",
       navigationLinks =
         navigation ++
         Seq(NavigationLink(teiWrapperUrl, "A", Some(Viewer.Document)))

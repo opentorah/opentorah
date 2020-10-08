@@ -156,7 +156,6 @@ object Site {
       teiHolder: TeiHolder <- document.teiHolders
     } {
       val documentObject = new DocumentObject(site, collection, document, teiHolder)
-      writeSiteFile(documentObject.teiFile, directory)
       writeSiteFile(documentObject.htmlFile, directory)
       writeSiteFile(documentObject.facsFile, directory)
     }
