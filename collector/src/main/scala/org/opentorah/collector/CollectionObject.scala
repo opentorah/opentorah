@@ -69,7 +69,6 @@ object CollectionObject {
       if (parts.tail.isEmpty) Some(new CollectionObject(site, collection).teiWrapperFile)
       else parts.tail.head match {
         case CollectionObject.documentsDirectoryName => resolveDocument("html", _.teiWrapperFile)
-        case CollectionObject.teiDirectoryName       => resolveDocument("xml" , _.teiFile)
         case CollectionObject.facsDirectoryName      => resolveDocument("html", _.facsFile)
 
         case file => if (parts.tail.tail.nonEmpty) None else {
