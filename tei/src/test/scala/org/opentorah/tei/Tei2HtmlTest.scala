@@ -13,7 +13,7 @@ final class Tei2HtmlTest extends AnyFlatSpec with Matchers {
       override def resolve(url:  String): Option[TeiResolver.Resolved] = None
       override def findByRef(ref:  String): Option[TeiResolver.Resolved] = None
       override def facs: TeiResolver.Resolved = new TeiResolver.Resolved(
-        url = null,
+        url = Seq("facsimiles"),
         role = Some("facsViewer")
       )
     }
@@ -21,19 +21,6 @@ final class Tei2HtmlTest extends AnyFlatSpec with Matchers {
     val result = Tei2Html.transform(resolver, element)
     println(Xhtml.prettyPrinter.render(result))
     result
-  }
-
-  "tei2html" should "work" in {
-    val result = tei2html(
-        <pb
-        xmlns={Tei.namespace.uri}
-        xml:id="p002-1"
-        rendition="page"
-        role="facsimileViewer"
-        target="/collections/lvia1799-178/facs/002.html#p002-1"
-        />
-    )
-    Namespace.get(result) shouldBe Xhtml.namespace.default
   }
 
   "905" should "work" in {
