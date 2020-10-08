@@ -34,17 +34,15 @@ final class Document(
     tei.getAbstract
     // Ignoring the titles:          .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
     .getOrElse(Seq.empty)
-    .map(Xml.removeNamespace)
 
-  def date: Seq[Node] =
-    Xml.mkText(tei.creationDate.map(_.when).getOrElse(""))
+  def date: Seq[Node] = Xml.mkText(tei.creationDate.map(_.when).getOrElse(""))
 
-  def author: Seq[Node] =
-    Xml.multi(tei.titleStmt.authors.map(_.xml).flatMap(_.map(Xml.removeNamespace)))
+  def author: Seq[Node] = Xml.multi(tei.titleStmt.authors.flatMap(_.xml))
 
   def addressee: Seq[Node] =
     tei.addressee.fold[Seq[Node]](Xml.mkText(""))(addressee =>
-      <persName ref={addressee.ref.orNull}>{addressee.name}</persName>)
+      // TODO just transplant the addressee?
+      <persName xmlns={Tei.namespace.uri} ref={addressee.ref.orNull}>{addressee.name}</persName>)
 }
 
 object Document {

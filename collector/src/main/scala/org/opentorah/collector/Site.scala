@@ -157,10 +157,8 @@ object Site {
     } {
       val documentObject = new DocumentObject(site, collection, document, teiHolder)
       writeSiteFile(documentObject.teiFile, directory)
-      writeSiteFile(documentObject.teiWrapperFile, directory)
+      writeSiteFile(documentObject.htmlFile, directory)
       writeSiteFile(documentObject.facsFile, directory)
-      // TODO HTML files
-      // writeSiteFile(documentObject.htmlFile, directory)
     }
 
     Files.deleteFiles(new File(directory, ReportObject.directoryName))

@@ -6,10 +6,12 @@ import org.typelevel.paiges.Doc
 final case class PrettyPrinter(
   width: Int = 120,
   indent: Int = 2,
-  doNotStackElements: Set[String] = Set(),
-  alwaysStackElements: Set[String] = Set(),
-  nestElements: Set[String] = Set(),
-  clingyElements: Set[String] = Set()
+  doNotStackElements: Set[String] = Set.empty,
+  alwaysStackElements: Set[String] = Set.empty,
+  nestElements: Set[String] = Set.empty,
+  clingyElements: Set[String] = Set.empty,
+  allowEmptyElements: Boolean = true,
+  keepEmptyElements: Set[String] = Set.empty
 ) {
   // Note: making entry points generic in N and taking implicit N: Model[N] does not work,
   // since 'elem' parameter is of type Elem, but Xml: Model[Node];
@@ -54,7 +56,9 @@ final case class PrettyPrinter(
     doNotStackElements,
     alwaysStackElements,
     nestElements,
-    clingyElements
+    clingyElements,
+    allowEmptyElements,
+    keepEmptyElements
   )
 }
 
@@ -68,7 +72,9 @@ object PrettyPrinter {
     doNotStackElements: Set[String],
     alwaysStackElements: Set[String],
     nestElements: Set[String],
-    clingyElements: Set[String]
+    clingyElements: Set[String],
+    allowEmptyElements: Boolean,
+    keepEmptyElements: Set[String]
   ) {
 
     def renderXml(node: N.Element, doctype: Option[String]): String =
@@ -126,7 +132,10 @@ object PrettyPrinter {
         }
       }
 
-      if (children.isEmpty) Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text("/>") else {
+      if (children.isEmpty) {
+        Doc.text(s"<$name") + attributes + Doc.lineOrEmpty +
+          (if (allowEmptyElements || keepEmptyElements.contains(name)) Doc.text("/>") else Doc.text(s"></$name>"))
+      } else {
         val start: Doc = Doc.text(s"<$name") + attributes + Doc.lineOrEmpty + Doc.text(">")
         val end: Doc = Doc.text(s"</$name>")
 

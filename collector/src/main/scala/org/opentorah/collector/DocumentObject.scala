@@ -1,9 +1,8 @@
 package org.opentorah.collector
 
 import org.opentorah.store.WithPath
-import org.opentorah.tei.{Body, CalendarDesc, Page, Pb, Tei, Tei2Html}
+import org.opentorah.tei.{Body, CalendarDesc, Page, Tei}
 import org.opentorah.util.Files
-import org.opentorah.xml.Xml
 import scala.xml.{Elem, Node}
 
 final class DocumentObject(
@@ -19,9 +18,11 @@ final class DocumentObject(
 
   override protected def teiWrapperUrl: Seq[String] = url(CollectionObject.documentsDirectoryName, "html")
 
-  private def facsUrl: Seq[String] = url(CollectionObject.facsDirectoryName, "html")
+  override protected def htmlUrl: Seq[String] = url(CollectionObject.documentsDirectoryName, "html")
 
-  override protected def teiWrapperViewer: Viewer = Viewer.Document
+  override protected def facsUrl: Seq[String] = url(CollectionObject.facsDirectoryName, "html")
+
+  override protected def viewer: Viewer = Viewer.Document
 
   private def url(directoryName: String, extension: String): Seq[String] =
     CollectionObject.urlPrefix(collection) :+ directoryName :+ (teiHolder.name + "." + extension)
@@ -31,13 +32,17 @@ final class DocumentObject(
     tei.copy(text = tei.text.copy(body = new Body.Value(headerTei ++ tei.body.xml)))
   }
 
-  private def headerTei: Seq[Node] =
-    <p xmlns={Tei.namespace.uri} rendition="document-header">
+  private def headerTei: Seq[Node] = {
+    // TODO here again it seems that the browser ignores the namespace when styling elements
+    // that exist in HTML: when I use <p> instead of <ab>, and there is a <p> inside <abstract>,
+    // background colour stops before it...
+    <ab xmlns={Tei.namespace.uri} rendition="document-header">
       <l>{document.description}</l>
       <l>Дата: {document.date}</l>
       <l>Кто: {document.author}</l>
       <l>Кому: {document.addressee}</l>
-    </p>
+    </ab>
+  }
 
   // TODO links are not live since they are targeting TEI :)
   // Skip the header in facsimile altogether?
@@ -55,24 +60,7 @@ final class DocumentObject(
     Tei.addCalendarDesc(new CalendarDesc.Value(<calendar xml:id="julian"><p>Julian calendar</p></calendar>)) compose
     Tei.addLanguage
 
-  override protected def xmlTransformer: Xml.Transformer =
-    super.xmlTransformer compose Pb.transformer(site.resolver(facsUrl))
-
-  // TODO eventually, this should move into SiteObject - and teiFile and teiWrapperFile go away
-  protected def htmlUrl: Seq[String] = url(CollectionObject.htmlDirectoryName, "html")
-  val htmlFile: SiteFile = new SiteFile { // TODO HtmlFile...
-    override def url: Seq[String] = htmlUrl
-
-    override def content: String = {
-      val elem: Elem = Xml.transform(
-        xml = Tei.toXmlElement(teiTransformer(tei)),
-        transformer = Tei2Html.transform(site.resolver(facsUrl))
-      )
-      Tei.prettyPrinter.renderXml(elem)
-    }
-  }
-
-  override protected def teiWrapperNavigationLinks: Seq[NavigationLink] =
+  override protected def navigationLinks: Seq[NavigationLink] =
     navigation ++
     Seq(NavigationLink(facsUrl, "⎙", Some(Viewer.Facsimile))) ++
     (if (teiHolder.language.isDefined || document.languages.isEmpty) Seq.empty

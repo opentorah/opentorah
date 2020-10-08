@@ -8,9 +8,9 @@ final class NamesObject(site: Site) extends SimpleSiteObject(site) {
 
   override protected def fileName: String = NamesObject.fileName
 
-  override protected def teiWrapperViewer: Viewer = Viewer.Names
+  override protected def viewer: Viewer = Viewer.Names
 
-  override protected def teiWrapperTitle: Option[String] = Some(NamesObject.title)
+  override protected def title: Option[String] = Some(NamesObject.title)
 
   override protected def teiBody: Seq[Node] = {
     val nonEmptyLists: Seq[EntitiesList] = site.store.entities.get.lists.filterNot(_.isEmpty)

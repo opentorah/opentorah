@@ -44,11 +44,12 @@ object Main {
         NavigationLink("/about", "О сайте", Some(Viewer.Collection))
       ),
       footerCol3 =
-        <p>
+        // TODO when I use <p> instead of <span>, it gets styled by the TEI CSS - althought it is in the XHTML namespace?!
+        <span>
           documents related to early Chabad history<br/>
           🄯 <a href="http://www.opentorah.org/" target={Viewer.Collection.name}>the Open Torah Project</a>
           <a href="http://creativecommons.org/licenses/by/4.0/" target={Viewer.Collection.name}>CC BY 4.0</a>
-        </p>,
+        </span>,
       homeTarget = Viewer.Collection
     ))
 

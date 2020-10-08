@@ -13,7 +13,7 @@ final case class Pb(
 
 object Pb extends Element.WithToXml[Pb]("pb") {
 
-  private val nAttribute: Attribute[String] = Attribute("n")
+  val nAttribute: Attribute[String] = Attribute("n")
   private val missingAttribute: Attribute.BooleanAttribute = new Attribute.BooleanAttribute("missing")
   private val emptyAttribute: Attribute.BooleanAttribute = new Attribute.BooleanAttribute("empty")
   private val facsAttribute: Attribute[String] = Attribute("facs")

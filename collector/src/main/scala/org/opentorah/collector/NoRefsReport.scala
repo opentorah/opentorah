@@ -7,7 +7,7 @@ final class NoRefsReport(site: Site) extends ReportObject(site) {
 
   override protected def fileName: String = NoRefsReport.fileName
 
-  override protected def teiWrapperViewer: Viewer = Viewer.Names
+  override protected def viewer: Viewer = Viewer.Names
 
   // TODO give a link to the ref:
   override protected def teiBody: Seq[Node] =

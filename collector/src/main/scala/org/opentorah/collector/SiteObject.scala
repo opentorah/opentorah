@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.Path
-import org.opentorah.tei.{EntityName, Ref, Tei}
+import org.opentorah.tei.{EntityName, Pb, Ref, Tei, Tei2Html}
 import org.opentorah.util.Files
 import org.opentorah.xml.Xml
 import scala.xml.Elem
@@ -12,16 +12,22 @@ abstract class SiteObject(val site: Site) {
     override def url: Seq[String] = teiUrl
 
     override def content: String = {
+      val resolver = site.resolver(facsUrl)
       val elem: Elem = Xml.transform(
         xml = Tei.toXmlElement(teiTransformer(tei)),
-        transformer = xmlTransformer
+        transformer = Ref.transformer(resolver) compose EntityName.transformer(resolver) compose Pb.transformer(resolver)
       )
       Tei.prettyPrinter.renderXml(elem)
     }
   }
 
+  protected def teiTransformer: Tei.Transformer =
+    Site.addPublicationStatement compose Site.addSourceDesc compose Tei.addLanguage
+
+  protected def facsUrl: Seq[String] = null
+
   final val teiWrapperFile: SiteFile = new HtmlFile {
-    override def viewer: Viewer = teiWrapperViewer
+    override def viewer: Viewer = SiteObject.this.viewer
 
     override def url: Seq[String] = teiWrapperUrl
 
@@ -32,35 +38,49 @@ abstract class SiteObject(val site: Site) {
 
     override protected def pageParameters: PageParameters = new PageParameters(
       target = Some(viewer),
-      style = teiWrapperStyle,
-      title = teiWrapperTitle,
-      navigationLinks = teiWrapperNavigationLinks
+      style = if (isWide) "wide" else "main",
+      title = SiteObject.this.title,
+      navigationLinks = SiteObject.this.navigationLinks
+    )
+  }
+
+  // TODO eventually, teiFile and teiWrapperFile should go away...
+  val htmlFile: SiteFile = new HtmlFile {
+    override def viewer: Viewer = SiteObject.this.viewer
+
+    override def url: Seq[String] = htmlUrl
+
+    override protected def siteParameters: SiteParameters = site.siteParameters
+
+    override protected def contentElement: Elem = {
+      // TODO move into the HtmlFile
+      Tei2Html.transform(site.resolver(facsUrl), Tei.toXmlElement(teiTransformer(tei)))
+    }
+
+    override protected def pageParameters: PageParameters = new PageParameters(
+      target = Some(viewer),
+      style = if (isWide) "wide-ng" else "main-ng",
+      title = SiteObject.this.title,
+      navigationLinks = SiteObject.this.navigationLinks
     )
   }
 
   protected def teiUrl: Seq[String]
 
-  protected def teiTransformer: Tei.Transformer =
-    Site.addPublicationStatement compose
-    Site.addSourceDesc compose
-    Tei.addLanguage
+  protected def teiWrapperUrl: Seq[String]
 
-  protected def xmlTransformer: Xml.Transformer =
-    Ref.transformer(site.resolver(null)) compose
-    EntityName.transformer(site.resolver(null))
+  protected def htmlUrl: Seq[String] = ??? // TODO
 
   protected def tei: Tei
 
-  protected def teiWrapperViewer: Viewer
+  protected def viewer: Viewer
 
-  protected def teiWrapperUrl: Seq[String]
-
-  protected def teiWrapperStyle: String = "main"
+  protected def isWide: Boolean = false
 
   // TODO some override it, some do not - ?!
-  protected def teiWrapperTitle: Option[String] = None
+  protected def title: Option[String] = None
 
-  protected def teiWrapperNavigationLinks: Seq[NavigationLink] = Seq.empty
+  protected def navigationLinks: Seq[NavigationLink] = Seq.empty
 }
 
 object SiteObject {

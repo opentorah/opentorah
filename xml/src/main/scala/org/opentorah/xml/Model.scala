@@ -34,4 +34,6 @@ trait Model[N] {
   def getAttributes(element: Element): Seq[Attribute.Value[String]]
 
   def getChildren(element: Element): Seq[N]
+
+  final def isEmpty(element: Element): Boolean = getChildren(element).forall(isWhitespace)
 }

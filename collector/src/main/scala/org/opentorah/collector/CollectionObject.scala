@@ -12,11 +12,11 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
 
   override protected def fileName: String = CollectionObject.fileName
 
-  override protected def teiWrapperViewer: Viewer = Viewer.Collection
+  override protected def viewer: Viewer = Viewer.Collection
 
-  override protected def teiWrapperStyle: String = "wide"
+  override protected def isWide: Boolean = true
 
-  override protected def teiWrapperNavigationLinks: Seq[NavigationLink] =
+  override protected def navigationLinks: Seq[NavigationLink] =
     Seq(CollectionObject.navigationLink(collection))
 
   override protected def teiBody: Seq[Node] = {
@@ -54,11 +54,9 @@ object CollectionObject {
 
   val facsDirectoryName: String = "facs" // facsimile viewers
 
-  val documentsDirectoryName: String = "documents" // wrappers for TEI XML
+  val documentsDirectoryName: String = "documents" // TEI documents converted to HTML
 
   val teiDirectoryName: String = "tei"
-
-  val htmlDirectoryName: String = "html" // TEI documents converted to HTML
 
   def navigationLink(collection: WithPath[Collection]): NavigationLink =
     NavigationLink("../index", s"[${Hierarchy.storeName(collection.value)}]", Some(Viewer.Collection))
@@ -73,7 +71,6 @@ object CollectionObject {
         case CollectionObject.documentsDirectoryName => resolveDocument("html", _.teiWrapperFile)
         case CollectionObject.teiDirectoryName       => resolveDocument("xml" , _.teiFile)
         case CollectionObject.facsDirectoryName      => resolveDocument("html", _.facsFile)
-        case CollectionObject.htmlDirectoryName      => resolveDocument("html", _.htmlFile)
 
         case file => if (parts.tail.tail.nonEmpty) None else {
           val (fileName: String, extension: Option[String]) = Files.nameAndExtension(file)
