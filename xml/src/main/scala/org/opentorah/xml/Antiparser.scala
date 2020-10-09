@@ -44,6 +44,14 @@ object Antiparser {
     namespace  = namespace
   )
 
+  def concatWithNamespace[A](
+    namespace: Namespace,
+    antiparsers: Antiparser[A]*
+  ): Antiparser[A] = concat[A](
+    Some(namespace),
+    antiparsers
+  )
+
   val xml: Antiparser[Seq[Node]] = apply[Seq[Node]](
     content = (value: Seq[Node]) => value
   )

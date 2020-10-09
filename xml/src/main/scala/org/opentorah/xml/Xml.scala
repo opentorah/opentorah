@@ -85,14 +85,12 @@ object Xml extends Model[Node] {
     element.copy(scope = NamespaceBinding(namespace.getPrefix.orNull, namespace.getUri.get, element.scope))
 
   // TODO remove
-  def removeNamespace(element: Element): Element =
-    element.copy(scope = TopScope, child = element.child.map(removeNamespace))
-
-  // TODO remove
   def removeNamespace(node: Node): Node = node match {
     case element: Element => removeNamespace(element)
     case node => node
   }
+  private def removeNamespace(element: Element): Element =
+    element.copy(scope = TopScope, child = element.child.map(removeNamespace))
 
   override def getAttribute(attribute: Attribute[_], element: Element): Option[String] = {
     val name: String = attribute.name

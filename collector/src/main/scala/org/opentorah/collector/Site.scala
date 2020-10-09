@@ -133,22 +133,23 @@ object Site {
     directory: File,
     site: Site
   ): Unit = {
-    writeSiteObject(new IndexObject(site), directory)
-    writeSiteObject(new TreeIndexObject(site), directory)
-    writeSiteObject(new NamesObject(site), directory)
+    writeHtmlFile(new IndexObject(site), directory)
+    writeHtmlFile(new TreeIndexObject(site), directory)
+    writeHtmlFile(new NamesObject(site), directory)
 
     Files.deleteFiles(new File(directory, EntityObject.directoryName))
-    for (entity <- site.entities) writeSiteObject(new EntityObject(site, entity), directory)
+    for (entity <- site.entities) writeHtmlFile(new EntityObject(site, entity), directory)
 
     Files.deleteFiles(new File(directory, Hierarchy.directoryName))
     val stores: Seq[WithPath[Store]] = site.withPath[Store](values = {
       case _: Collection | _: Document | _: Entities | _: EntityHolder | _: TeiHolder => Seq.empty
       case store => Seq(store)
     })
-    for (store <- stores) writeSiteObject(new HierarchyObject(site, store.path, store.value), directory)
+    for (store <- stores) writeHtmlFile(new HierarchyObject(site, store.path, store.value), directory)
 
     Files.deleteFiles(new File(directory, CollectionObject.directoryName))
-    for (collection <- site.collections) writeSiteObject(new CollectionObject(site, collection), directory)
+    for (collection <- site.collections)
+      writeHtmlFile(new CollectionObject(site, collection), directory)
 
     for {
       collection <- site.collections
@@ -156,19 +157,17 @@ object Site {
       teiHolder: TeiHolder <- document.teiHolders
     } {
       val documentObject = new DocumentObject(site, collection, document, teiHolder)
-      writeSiteFile(documentObject.htmlFile, directory)
+      writeHtmlFile(documentObject, directory)
       writeSiteFile(documentObject.facsFile, directory)
     }
 
     Files.deleteFiles(new File(directory, ReportObject.directoryName))
-    writeSiteObject(new MisnamedEntitiesReport(site), directory)
-    writeSiteObject(new NoRefsReport(site), directory)
+    writeHtmlFile(new MisnamedEntitiesReport(site), directory)
+    writeHtmlFile(new NoRefsReport(site), directory)
   }
 
-  private def writeSiteObject(siteObject: SiteObject, directory: File): Unit = {
-    writeSiteFile(siteObject.teiFile, directory)
-    writeSiteFile(siteObject.teiWrapperFile, directory)
-  }
+  private final def writeHtmlFile(siteObject: SiteObject, directory: File): Unit =
+    writeSiteFile(siteObject.htmlFile, directory)
 
   private final def writeSiteFile(siteFile: SiteFile, directory: File): Unit =
     Files.write(Files.file(directory, siteFile.url), siteFile.content)

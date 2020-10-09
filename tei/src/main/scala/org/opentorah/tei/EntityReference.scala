@@ -48,7 +48,7 @@ object EntityReference extends ToXml[EntityReference] {
 
   override protected def elementName(value: EntityReference): String = value.entityType.nameElement
 
-  override protected val antiparser: Antiparser[EntityReference] = Antiparser.concat(
+  override protected val antiparser: Antiparser[EntityReference] = Antiparser.concatWithNamespace(Tei.namespace,
     refAttribute.toXmlOption.compose(_.ref),
     Xml.idAttribute.toXmlOption.compose(_.id),
     roleAttribute.toXmlOption.compose(_.role),

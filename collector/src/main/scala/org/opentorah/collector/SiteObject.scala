@@ -65,8 +65,10 @@ abstract class SiteObject(val site: Site) {
     )
   }
 
+  // TODO remove
   protected def teiUrl: Seq[String]
 
+  // TODO remove
   protected def teiWrapperUrl: Seq[String]
 
   protected def htmlUrl: Seq[String] = ??? // TODO

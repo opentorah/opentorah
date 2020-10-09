@@ -64,7 +64,7 @@ final class DocumentObject(
     override def url: Seq[String] = facsUrl
 
     // TODO do pages of the appropriate teiHolder!
-    override protected def contentElement: Elem = Tei2Html.transform(site.resolver(facsUrl),
+    override protected def contentElement: Elem = Tei2Html.transform(site.resolver(facsUrl), // TODO move into HtmlFile
       <div class={Viewer.Facsimile.name}>
         {header}
         <div class="facsimileScroller">{

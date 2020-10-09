@@ -11,6 +11,9 @@ abstract class SimpleSiteObject(site: Site) extends SiteObject(site) {
   final override protected def teiWrapperUrl: Seq[String] =
     urlPrefix :+ (fileName + ".html")
 
+  final override protected def htmlUrl: Seq[String] =
+    urlPrefix :+ (fileName + ".html")
+
   protected def urlPrefix: Seq[String] = Seq.empty
 
   protected def fileName: String
