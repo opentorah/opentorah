@@ -19,7 +19,7 @@ final class DocumentObject(
   override protected def viewer: Viewer = Viewer.Document
 
   private def url(directoryName: String): Seq[String] =
-    CollectionObject.urlPrefix(collection) :+ directoryName :+ (teiHolder.name + ".html")
+    CollectionObject.urlPrefix(collection) ++ Seq(directoryName, teiHolder.name + ".html")
 
   override protected def tei: Tei = {
     val tei = teiHolder.tei

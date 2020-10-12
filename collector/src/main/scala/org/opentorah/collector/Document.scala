@@ -3,7 +3,7 @@ package org.opentorah.collector
 import java.net.URL
 import org.opentorah.metadata.{Name, Names}
 import org.opentorah.store.{By, Selector, Store, Urls}
-import org.opentorah.tei.{Page, Tei}
+import org.opentorah.tei.{EntityReference, Page, Tei}
 import org.opentorah.xml.{Parser, Xml}
 import scala.xml.Node
 
@@ -40,9 +40,7 @@ final class Document(
   def author: Seq[Node] = Xml.multi(tei.titleStmt.authors.flatMap(_.xml))
 
   def addressee: Seq[Node] =
-    tei.addressee.fold[Seq[Node]](Xml.mkText(""))(addressee =>
-      // TODO just transplant the addressee?
-      <persName xmlns={Tei.namespace.uri} ref={addressee.ref.orNull}>{addressee.name}</persName>)
+    Seq(tei.addressee.fold[Node](Xml.mkText(""))(addressee => EntityReference.toXmlElement(addressee)))
 }
 
 object Document {

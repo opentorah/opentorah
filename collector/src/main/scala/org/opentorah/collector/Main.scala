@@ -38,8 +38,8 @@ object Main {
       faviconJpeg = "alter-rebbe",
       googleAnalyticsId = Some("UA-154490117-1"),
       navigationLinks = Seq(
-        NavigationLink("/names", "Имена", Some(Viewer.Names)), // TODO doesn't show up in the Jekyll-generated pages (md)...
-        NavigationLink("/collections", "Архивы", Some(Viewer.Collection)), // TODO doesn't show up in the Jekyll-generated pages (md)...
+        NavigationLink("/names", "Имена", Some(Viewer.Names)),
+        NavigationLink("/collections", "Архивы", Some(Viewer.Collection)),
         NavigationLink("/help", "Помощь", Some(Viewer.Collection)),
         NavigationLink("/about", "О сайте", Some(Viewer.Collection))
       ),
