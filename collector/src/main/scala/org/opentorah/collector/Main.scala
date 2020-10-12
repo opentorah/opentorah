@@ -50,7 +50,9 @@ object Main {
           🄯 <a href="http://www.opentorah.org/" target={Viewer.Collection.name}>the Open Torah Project</a>
           <a href="http://creativecommons.org/licenses/by/4.0/" target={Viewer.Collection.name}>CC BY 4.0</a>
         </span>,
-      homeTarget = Viewer.Collection
+      homeTarget = Viewer.Collection,
+      githubUsername = None, // Some("opentorah"),
+      twitterUsername = None
     ))
 
     logger.info("Checking store.")

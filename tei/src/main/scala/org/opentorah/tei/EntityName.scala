@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, ToXml, Xml}
+import org.opentorah.xml.{Antiparser, ContentType, Element, Parsable, Parser, ToXml, Xml}
 
 final class EntityName private(
   val entityType: EntityType,
@@ -22,24 +21,8 @@ object EntityName extends ToXml[EntityName] {
 
   override protected def elementName(value: EntityName): String = value.entityType.nameElement
 
-  override protected val antiparser: Antiparser[EntityName] = Antiparser.concat(
+  override protected val antiparser: Antiparser[EntityName] = Antiparser.concat( // TODO namespace?
     Xml.idAttribute.toXmlOption.compose[EntityName](_.id),
     Antiparser.xml.compose[EntityName](value => Seq(Xml.mkText(value.name)))
   )
-
-  private val targetAttribute: Attribute[String] = Attribute("target")
-  private val roleAttribute: Attribute[String] = Attribute("role")
-  private val refAttribute: Attribute[String] = Attribute("ref")
-
-  def transformer(resolver: TeiResolver): Xml.Transformer = elem =>
-    if (!EntityType.isName(elem.label)) elem else {
-      refAttribute.get(elem).fold(elem) { ref =>
-        resolver.findByRef(ref).fold(elem) { resolved =>
-          Attribute.setAll(elem, Seq(
-            roleAttribute.withValue(resolved.role.orNull),
-            targetAttribute.withValue(Files.mkUrl(resolved.url))
-          ))
-        }
-      }
-    }
 }

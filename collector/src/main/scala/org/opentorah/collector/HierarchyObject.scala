@@ -36,7 +36,7 @@ object HierarchyObject {
   val fileName: String = "index"
 
   def resolve(site: Site, path: Path, store: Store, parts: Seq[String]): Option[SiteFile] =
-    if (parts.isEmpty) Some(new HierarchyObject(site, path, store).teiWrapperFile) else {
+    if (parts.isEmpty) Some(new HierarchyObject(site, path, store).htmlFile) else {
       val head: String = parts.head
       SimpleSiteObject.resolve(Some(head), new HierarchyObject(site, path, store)) orElse {
         if (store.by.isEmpty) None else {
@@ -45,7 +45,7 @@ object HierarchyObject {
           if (selector.names.find(head).isEmpty) None else store match {
             case collection: Collection =>
               if (parts.tail.nonEmpty) None
-              else Some(new CollectionObject(site, WithPath(path, collection)).teiWrapperFile)
+              else Some(new CollectionObject(site, WithPath(path, collection)).htmlFile)
 
             case _ => if (parts.tail.isEmpty) None else {
               val storeName: String = Files.underscoresToSpaces(parts.tail.head)

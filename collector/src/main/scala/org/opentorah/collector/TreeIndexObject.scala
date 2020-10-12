@@ -11,10 +11,10 @@ final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
 
   override protected def viewer: Viewer = Viewer.Collection
 
-  override protected def title: Option[String] = Some(TreeIndexObject.title)
+  override def title: Option[String] = Some(TreeIndexObject.title)
 
   override protected def teiBody: Seq[Node] =
-    <head xmlns={Tei.namespace.uri}>{Ref.toXml(new HierarchyObject(site, Path.empty, site.store).teiWrapperFile.url, TreeIndexObject.title)}</head> ++
+    <head xmlns={Tei.namespace.uri}>{Ref.toXml(new HierarchyObject(site, Path.empty, site.store).htmlFile.url, TreeIndexObject.title)}</head> ++
     listForStore(Path.empty, site.store)
 
   private def listForStore(path: Path, store: Store): Seq[Node] = store.by.toSeq.flatMap { by: By[_] =>
@@ -28,7 +28,7 @@ final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
               if (isCollection) new CollectionObject(site, WithPath(path, store.asInstanceOf[Collection]))
               else new HierarchyObject(site, storePath, store)
             <item>
-              {Ref.toXml(siteObject.teiWrapperFile.url, Hierarchy.getName(store.names) + Xml.toString(Hierarchy.storeTitle(store)))}
+              {Ref.toXml(siteObject.htmlFile.url, Hierarchy.getName(store.names) + Xml.toString(Hierarchy.storeTitle(store)))}
               {if (isCollection) Seq.empty else listForStore(storePath, store)}
             </item>
         }}

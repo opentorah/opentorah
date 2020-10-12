@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.WithPath
-import org.opentorah.tei.{Body, CalendarDesc, Page, Tei, Tei2Html}
+import org.opentorah.tei.{Body, CalendarDesc, Page, Tei}
 import org.opentorah.util.Files
 import scala.xml.{Elem, Node}
 
@@ -14,24 +14,21 @@ final class DocumentObject(
 
   // TODO package extension with the directory name so that it is not repeated in the CollectionObject.resolve...
 
-  override protected def teiUrl: Seq[String] = url(CollectionObject.teiDirectoryName, "xml")
+  override protected def htmlUrl: Seq[String] = url(CollectionObject.documentsDirectoryName)
 
-  override protected def teiWrapperUrl: Seq[String] = url(CollectionObject.documentsDirectoryName, "html")
-
-  override protected def htmlUrl: Seq[String] = url(CollectionObject.documentsDirectoryName, "html")
-
-  override protected def facsUrl: Seq[String] = url(CollectionObject.facsDirectoryName, "html")
+  override def facsUrl: Seq[String] = url(CollectionObject.facsDirectoryName)
 
   override protected def viewer: Viewer = Viewer.Document
 
-  private def url(directoryName: String, extension: String): Seq[String] =
-    CollectionObject.urlPrefix(collection) :+ directoryName :+ (teiHolder.name + "." + extension)
+  private def url(directoryName: String): Seq[String] =
+    CollectionObject.urlPrefix(collection) :+ directoryName :+ (teiHolder.name + ".html")
 
   override protected def tei: Tei = {
     val tei = teiHolder.tei
     tei.copy(text = tei.text.copy(body = new Body.Value(header ++ tei.body.xml)))
   }
 
+  // TODO generalize and move into SiteObject
   private def header: Seq[Node] = {
     // TODO here again it seems that the browser ignores the namespace when styling elements
     // that exist in HTML: when I use <p> instead of <ab>, and there is a <p> inside <abstract>,
@@ -56,15 +53,16 @@ final class DocumentObject(
     (if (teiHolder.language.isDefined || document.languages.isEmpty) Seq.empty
     else document.languages.map(lang => NavigationLink(s"${document.name}-$lang", s"[$lang]", None)))
 
-  def facsFile: SiteFile = new HtmlFile {
-    override def viewer: Viewer = Viewer.Facsimile
+  // TODO generalize and move into SiteObject
+  def facsFile: SiteFile = new SiteFile {
+    override def siteObject: SiteObject = DocumentObject.this
 
-    override protected def siteParameters: SiteParameters = site.siteParameters
+    override def viewer: Viewer = Viewer.Facsimile
 
     override def url: Seq[String] = facsUrl
 
     // TODO do pages of the appropriate teiHolder!
-    override protected def contentElement: Elem = Tei2Html.transform(site.resolver(facsUrl),
+    override protected def contentElement: Elem =
       <div class={Viewer.Facsimile.name}>
         {header}
         <div class="facsimileScroller">{
@@ -80,14 +78,11 @@ final class DocumentObject(
               </figure>
             </a>
         }}</div>
-      </div>)
+      </div>
 
-    override protected def pageParameters: PageParameters = new PageParameters(
-      style = "main-ng",
-      navigationLinks =
-        navigation ++
-        Seq(NavigationLink(teiWrapperUrl, "A", Some(Viewer.Document)))
-    )
+    override protected def navigationLinks: Seq[NavigationLink] =
+      navigation ++
+      Seq(NavigationLink(htmlUrl, "A", Some(Viewer.Document)))
   }
 
   private def navigation: Seq[NavigationLink] = {
@@ -113,14 +108,13 @@ object DocumentObject {
   def resolve(
     site: Site,
     collection: WithPath[Collection],
-    parts: Seq[String],
-    requiredExtension: String
+    parts: Seq[String]
   ): Option[DocumentObject] = if (parts.isEmpty || parts.tail.nonEmpty) None else {
     val (fileName: String, extension: Option[String]) = Files.nameAndExtension(parts.head)
     // Document name can have dots (e.g., 273.2), so if it is referenced without the extension, we end up here -
     // and assume the required extension is implied, and the one found is part of the document name:
     val documentName: String =
-    if (extension.isDefined && !extension.contains(requiredExtension)) parts.head else fileName
+    if (extension.isDefined && !extension.contains("html")) parts.head else fileName
 
     collection.value.findDocumentByName(documentName).map { case (document, teiHolder) =>
       new DocumentObject(site, collection, document, teiHolder)

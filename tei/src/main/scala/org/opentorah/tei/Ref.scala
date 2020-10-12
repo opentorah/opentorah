@@ -34,6 +34,7 @@ object Ref extends Element.WithToXml[Ref]("ref") {
     Antiparser.xml.compose(_.text)
   )
 
+  // TODO remove rendition and Page.rendition
   def toXml(
     target: Seq[String],
     text: String,
@@ -44,23 +45,4 @@ object Ref extends Element.WithToXml[Ref]("ref") {
     target: Seq[String],
     text: Seq[Node]
   ): Elem = toXmlElement(new Ref(Files.mkUrl(target), rendition = None, text))
-
-  def transformer(resolver: TeiResolver): Xml.Transformer = elem => if (elem.label != elementName) elem else {
-    if (elem.child.forall(Xml.isWhitespace)) println(s"No reference text: $elem")
-    targetAttribute.get(elem).fold(throw new IllegalArgumentException(s"empty target: $elem")) { target =>
-      if (!target.startsWith("/")) elem else {
-        val (url, part) = Files.urlAndPart(target)
-        resolver.resolve(url).fold(elem) { resolved =>
-          val role: Option[String] = resolved.role
-          if (role.isEmpty) elem else {
-            Attribute.setAll(elem, Seq(
-              roleAttribute.withValue(role),
-              targetAttribute.withValue(Files.mkUrl(Files.addPart(resolved.url, part))),
-              renditionAttribute.withValue(renditionAttribute.get(elem))
-            ))
-          }
-        }
-      }
-    }
-  }
 }
