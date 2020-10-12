@@ -3,13 +3,7 @@ package org.opentorah.collector
 import org.opentorah.tei.Tei
 import scala.xml.Node
 
-// When TEI file and its wrapper are in the same directory.
 abstract class SimpleSiteObject(site: Site) extends SiteObject(site) {
-  final override protected def teiUrl: Seq[String] =
-    urlPrefix :+ (fileName + ".xml")
-
-  final override protected def teiWrapperUrl: Seq[String] =
-    urlPrefix :+ (fileName + ".html")
 
   final override protected def htmlUrl: Seq[String] =
     urlPrefix :+ (fileName + ".html")
@@ -26,8 +20,7 @@ abstract class SimpleSiteObject(site: Site) extends SiteObject(site) {
 object SimpleSiteObject {
 
   def resolve(extension: Option[String], k: => SimpleSiteObject): Option[SiteFile] = extension match {
-    case Some("html") | None => Some(k.teiWrapperFile)
-    case Some("xml") => Some(k.teiFile)
+    case Some("html") | None => Some(k.htmlFile)
     case _ => None
   }
 }

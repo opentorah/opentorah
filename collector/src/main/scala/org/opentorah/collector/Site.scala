@@ -72,7 +72,7 @@ final class Site(
       } { siteFile: SiteFile => Some(new TeiResolver.Resolved(
         url = siteFile.url,
         role = siteFile match {
-          case htmlFile: HtmlFile => Some(htmlFile.viewer.name)
+          case htmlFile: SiteFile => Some(htmlFile.viewer.name)
           case _ => None
         }
       ))}

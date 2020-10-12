@@ -1,6 +1,5 @@
 package org.opentorah.tei
 
-import org.opentorah.util.Files
 import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser, Xml}
 
 final case class Pb(
@@ -41,18 +40,4 @@ object Pb extends Element.WithToXml[Pb]("pb") {
     missingAttribute.toXml.compose(_.isMissing),
     emptyAttribute.toXml.compose(_.isEmpty)
   )
-
-  def transformer(resolver: TeiResolver): Xml.Transformer =
-    elem => if (elem.label != elementName) elem else {
-      val pageId: String = Page.pageId(nAttribute.doGet(elem))
-      <pb
-        xml:id={pageId}
-        rendition={Page.pageRendition(
-          isMissing = missingAttribute.getWithDefault(elem),
-          isEmpty = emptyAttribute.getWithDefault(elem)
-        )}
-        role={resolver.facs.role.orNull}
-        target={Files.mkUrl(Files.addPart(resolver.facs.url, pageId))}
-      />
-    }
 }

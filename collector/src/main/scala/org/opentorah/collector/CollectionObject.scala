@@ -14,7 +14,7 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
 
   override protected def viewer: Viewer = Viewer.Collection
 
-  override protected def isWide: Boolean = true
+  override def isWide: Boolean = true
 
   override protected def navigationLinks: Seq[NavigationLink] =
     Seq(CollectionObject.navigationLink(collection))
@@ -42,7 +42,6 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
 
 object CollectionObject {
 
-  // TODO aren't they all?
   val fileName: String = "index"
 
   // TODO eliminate
@@ -52,31 +51,29 @@ object CollectionObject {
   // Note: also hard-coded in 'index.xml'!
   val directoryName: String = "collections"
 
-  val facsDirectoryName: String = "facs" // facsimile viewers
-
   val documentsDirectoryName: String = "documents" // TEI documents converted to HTML
 
-  val teiDirectoryName: String = "tei"
+  val facsDirectoryName: String = "facs" // facsimile viewers
 
   def navigationLink(collection: WithPath[Collection]): NavigationLink =
     NavigationLink("../index", s"[${Hierarchy.storeName(collection.value)}]", Some(Viewer.Collection))
 
   def resolve(site: Site, parts: Seq[String]): Option[SiteFile] = if (parts.isEmpty) None else
     site.findCollectionByName(parts.head).flatMap { collection =>
-      def resolveDocument(requiredExtension: String, f: DocumentObject => SiteFile): Option[SiteFile] =
-        DocumentObject.resolve(site, collection, parts.tail.tail, requiredExtension).map(f)
+      def resolveDocument(f: DocumentObject => SiteFile): Option[SiteFile] =
+        DocumentObject.resolve(site, collection, parts.tail.tail).map(f)
 
-      if (parts.tail.isEmpty) Some(new CollectionObject(site, collection).teiWrapperFile)
+      if (parts.tail.isEmpty) Some(new CollectionObject(site, collection).htmlFile)
       else parts.tail.head match {
-        case CollectionObject.documentsDirectoryName => resolveDocument("html", _.teiWrapperFile)
-        case CollectionObject.facsDirectoryName      => resolveDocument("html", _.facsFile)
+        case CollectionObject.documentsDirectoryName => resolveDocument(_.htmlFile)
+        case CollectionObject.facsDirectoryName      => resolveDocument(_.facsFile)
 
         case file => if (parts.tail.tail.nonEmpty) None else {
           val (fileName: String, extension: Option[String]) = Files.nameAndExtension(file)
           if (fileName == CollectionObject.fileName)
             SimpleSiteObject.resolve(extension, new CollectionObject(site, collection))
           else
-            DocumentObject.resolve(site, collection, parts.tail, "html").map(_.teiWrapperFile)
+            DocumentObject.resolve(site, collection, parts.tail).map(_.htmlFile)
         }
       }
     }

@@ -67,7 +67,7 @@ object Hierarchy {
   def collectionXml(site: Site, collection: WithPath[Collection]): Elem =
   // TODO make a Ref serializer that takes SiteObject...
     <item xmlns={Tei.namespace.uri}>{Ref.toXml(
-      target = new CollectionObject(site, collection).teiWrapperFile.url,
+      target = new CollectionObject(site, collection).htmlFile.url,
       text = fullName(collection.path) + Xml.toString(storeTitle(collection.value))
       )}<lb/>
       <abstract>{collection.value.storeAbstract.get.xml}</abstract>
