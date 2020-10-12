@@ -4,9 +4,7 @@ import org.opentorah.util.Files
 import org.opentorah.xml.{Attribute, Namespace, Xhtml, Xml}
 import scala.xml.{Elem, Node}
 
-// TODO monodize/zioify threadding of EndNotes through the transformation?
-// TODO remove spurious XML namespace?
-// TODO do I need to re-base relative URLs in links and images?
+// TODO when transforming <TEI>, <titleStmt><title>TITLE</title></titleStmt> should become <html><head><title>TITLE</title></head></html>
 // TODO copy attributes:
 // - xml:id to id (why?);
 // - xml:lang to lang (why?);
@@ -14,7 +12,6 @@ import scala.xml.{Elem, Node}
 // TODO:
 // - transform tagsDecl?
 // - transform prefixDef?
-// TODO when transforming <TEI>, <titleStmt><title>TITLE</title></titleStmt> should become <html><head><title>TITLE</title></head></html>
 object Tei2Html {
 
   case class TransformResult[S](
@@ -178,8 +175,6 @@ object Tei2Html {
     val srcId: String = id.getOrElse(s"src_note_$number")
   }
 
-  // TODO switch away from ol/li to div/span/etc., with numbers (red) backlinks, and formatted in
-  // in sequence with padding between the notes.
   private final class State(val resolver: TeiResolver, val notes: Seq[EndNote])
 
   def transform(resolver: TeiResolver, element: Elem): Elem = {
@@ -192,14 +187,14 @@ object Tei2Html {
     val (result, finalState) = t(element)
     <div xmlns={Xhtml.namespace.uri} class="html">
       {result}
-      <ol xmlns={Xhtml.namespace.uri} class="endnotes">{
+      <div xmlns={Xhtml.namespace.uri} class="endnotes">{
         for (note <- finalState.notes) yield t(
-          <li xmlns={Xhtml.namespace.uri} class="endnote" id={note.contentId}>
+          <span xmlns={Xhtml.namespace.uri} class="endnote" id={note.contentId}>
+            <a class="endnote-backlink" href={s"#${note.srcId}"}>{note.number}.</a>
             {note.content}
-            <a class="endnote-backlink" href={s"#${note.srcId}"}>{s"[${note.number}]"}</a>
-          </li>
-        )/* Ignore end-notes inside end-notes */._1
-      }</ol>
+          </span>
+        )/* TODO do not ignore end-notes inside end-notes */._1
+      }</div>
     </div>
   }
 }

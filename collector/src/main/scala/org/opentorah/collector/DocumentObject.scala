@@ -12,8 +12,6 @@ final class DocumentObject(
   teiHolder: TeiHolder
 ) extends SiteObject(site) {
 
-  // TODO package extension with the directory name so that it is not repeated in the CollectionObject.resolve...
-
   override protected def htmlUrl: Seq[String] = url(CollectionObject.documentsDirectoryName)
 
   override def facsUrl: Seq[String] = url(CollectionObject.facsDirectoryName)
@@ -21,7 +19,7 @@ final class DocumentObject(
   override protected def viewer: Viewer = Viewer.Document
 
   private def url(directoryName: String): Seq[String] =
-    CollectionObject.urlPrefix(collection) :+ directoryName :+ (teiHolder.name + ".html")
+    CollectionObject.urlPrefix(collection) ++ Seq(directoryName, teiHolder.name + ".html")
 
   override protected def tei: Tei = {
     val tei = teiHolder.tei

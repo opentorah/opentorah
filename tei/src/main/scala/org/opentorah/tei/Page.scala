@@ -64,9 +64,4 @@ object Page {
   }
 
   def pageId(n: String): String = s"p$n"
-
-  // TODO remove when tei-ng is adjusted
-  def pageRendition(isMissing: Boolean, isEmpty: Boolean): String =
-    if (!isMissing) "page" else
-    if (!isEmpty)  "missing-page" else "missing-empty-page"
 }
