@@ -1,6 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser, Xml}
+import scala.xml.Elem
 
 final case class Pb(
   n: String,
@@ -8,7 +9,12 @@ final case class Pb(
   facs: Option[String],
   isMissing: Boolean = false,
   isEmpty: Boolean = false
-)
+) {
+  def addAttributes(element: Elem): Elem = Attribute.setAll(element, Attribute.getAll(element) ++ Seq(
+    Pb.missingAttribute.withValue(Some(isMissing)),
+    Pb.emptyAttribute.withValue(Some(isEmpty))
+  ))
+}
 
 object Pb extends Element.WithToXml[Pb]("pb") {
 

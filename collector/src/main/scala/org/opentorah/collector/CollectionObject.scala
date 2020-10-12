@@ -98,11 +98,10 @@ object CollectionObject {
     }),
 
     Table.Column("Страницы", "pages", { document: Document =>
-      for (page <- document.pages(collection.value.pageType)) yield Ref.toXml(
+      for (page <- document.pages(collection.value.pageType)) yield page.pb.addAttributes(Ref.toXml(
         target = DocumentObject.pageUrl(collection, document.name, page),
-        text = page.displayName,
-        rendition = Some(Page.pageRendition(page.pb.isMissing, page.pb.isEmpty))
-      )
+        text = page.displayName
+      ))
     }),
 
     Table.Column("Расшифровка", "transcriber", { document: Document =>

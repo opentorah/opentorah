@@ -34,7 +34,7 @@ object Entity extends Parsable[Entity] with ToXml[Entity] {
     entityType,
     role,
     names,
-    content = content.map(Xml.removeNamespace),
+    content,
   )
 
   override protected def elementName(value: Entity): String = value.entityType.element

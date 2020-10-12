@@ -12,8 +12,6 @@ final class DocumentObject(
   teiHolder: TeiHolder
 ) extends SiteObject(site) {
 
-  // TODO package extension with the directory name so that it is not repeated in the CollectionObject.resolve...
-
   override protected def htmlUrl: Seq[String] = url(CollectionObject.documentsDirectoryName)
 
   override def facsUrl: Seq[String] = url(CollectionObject.facsDirectoryName)
