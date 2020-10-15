@@ -10,7 +10,7 @@ import org.gradle.api.tasks.SourceSet
 import org.gradle.api.{Project, Task}
 import org.gradle.process.{ExecResult, JavaExecSpec}
 import org.slf4j.{Logger, LoggerFactory}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object Gradle {
 

@@ -9,7 +9,7 @@ import org.apache.xmlgraphics.util.MimeConstants
 import org.opentorah.util.Collections.mapValues
 import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.immutable.SortedMap
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object FopFonts {
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
