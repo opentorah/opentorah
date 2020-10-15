@@ -1,9 +1,9 @@
 package org.opentorah.collector
 
 import org.opentorah.store.Path
-import org.opentorah.tei.Tei
+import org.opentorah.tei.{Body, Tei}
 import org.opentorah.util.Files
-import scala.xml.Elem
+import scala.xml.{Elem, Node}
 
 abstract class SiteObject(val site: Site) {
 
@@ -16,15 +16,22 @@ abstract class SiteObject(val site: Site) {
 
     override protected def navigationLinks: Seq[NavigationLink] = SiteObject.this.navigationLinks
 
-    override protected def contentElement: Elem = Tei.toXmlElement(teiTransformer(tei))
+    override protected def contentElement: Elem = {
+      val result = tei
+      val withSummary = result.copy(text = result.text.copy(body = new Body.Value(headerSummary ++ result.body.xml)))
+      Tei.toXmlElement(teiTransformer(withSummary))
+    }
   }
 
   protected def htmlUrl: Seq[String]
 
   protected def tei: Tei
 
+  protected def headerSummary: Seq[Node] = Seq.empty
+
   protected def viewer: Viewer
 
+  // TODO generalize/conditionalize addCalendarDesc
   protected def teiTransformer: Tei.Transformer =
     Site.addPublicationStatement compose Site.addSourceDesc compose Tei.addLanguage
 
