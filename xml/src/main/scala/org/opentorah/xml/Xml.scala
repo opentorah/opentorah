@@ -118,7 +118,9 @@ object Xml extends Model {
       Attribute(
         name = attribute.key,
         namespace = namespace
-      ).optional.withValue(Option(attribute.value).map(getAttributeValueText))
+        // TODO Note: in Scala 2.13, Seq is in scala.collection.immutable, but Scala XML still returns scala.collection.Seq -
+        // hence the `value =>...`
+      ).optional.withValue(Option(attribute.value).map(value => getAttributeValueText(value)))
     }
 
   // TODO WTF?

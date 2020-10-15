@@ -10,7 +10,7 @@ object Collections {
   //  def unfoldInfinite[A, B](start: A)(f: A => (A, B)): Stream[B] =
   //    f(start) match { case (a, b) => b #:: unfoldInfinite(a)(f) }
 
-  def unfoldInfiniteSimple[A](start: A, next: A => A): Stream[A] =
+  def unfoldInfiniteSimple[A](start: A, next: A => A): LazyList[A] =
     start #:: unfoldInfiniteSimple(next(start), next)
 
   def unfoldSimple[A](start: A, next: A => A, take: A => Boolean): Seq[A] =

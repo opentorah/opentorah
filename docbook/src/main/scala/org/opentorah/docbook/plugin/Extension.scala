@@ -5,7 +5,7 @@ import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.opentorah.mathjax
 import org.opentorah.docbook.section.DocBook2
 import scala.beans.BeanProperty
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // Properties are annotated with @BeanProperty to make them visible to Gradle.
 class Extension(project: Project) {
