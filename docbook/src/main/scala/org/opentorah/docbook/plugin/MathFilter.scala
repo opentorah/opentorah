@@ -71,7 +71,7 @@ final class MathFilter(
     val attributes: Attributes = if (!isMathMLMath) atts else {
       val result: AttributesImpl = new AttributesImpl(atts)
       val isInline: Option[Boolean] = displayAttribute.inNamespace(MathML.namespace).get(atts)
-      displayAttribute.inNamespace(MathML.namespace).withValue(checkInline(isInline)).set(result)
+      displayAttribute.inNamespace(MathML.namespace).withOptionalValue(checkInline(isInline)).set(result)
       result
     }
 

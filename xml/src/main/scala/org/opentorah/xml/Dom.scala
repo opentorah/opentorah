@@ -74,7 +74,7 @@ object Dom extends Model[Node] {
     } yield Attribute(
       name = localName,
       namespace = Namespace(uri = uri, prefix = prefix)
-    ).withValue(Option(attribute.getValue))
+    ).withOptionalValue(Option(attribute.getValue))
   }
 
   def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Unit = {

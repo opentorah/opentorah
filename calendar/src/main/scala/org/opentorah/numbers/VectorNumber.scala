@@ -16,7 +16,7 @@ trait VectorNumber[S <: Numbers[S]] extends Number[S, S#Vector] { this: S#Vector
   final def *(n: Int): S#Vector = fromDigits(digits map (_ * n))
 
   /** Returns this Vector divided by the specified Int with up to length digits after the point. */
-  final def /(n: Int, length: Int): S#Vector = this*(BigRational(n).invert, length)
+  final def /(n: Int, length: Int): S#Vector = this.*(BigRational(n).invert, length)
 
   /** Returns this Vector multiplied by the specified [[BigRational]] with up to length digits after the point. */
   final def *(that: BigRational, length: Int): S#Vector =

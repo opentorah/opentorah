@@ -102,7 +102,7 @@ object Xml extends Model[Node] {
       Attribute(
         name = attribute.key,
         namespace = namespace
-      ).withValue(Option(attribute.value).map(getAttributeValueText))
+      ).withOptionalValue(Option(attribute.value).map(getAttributeValueText))
     }
 
   // TODO WTF?
