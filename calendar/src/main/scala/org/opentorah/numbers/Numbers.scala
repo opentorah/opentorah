@@ -101,7 +101,7 @@ trait Numbers[S <: Numbers[S]] { this: S =>
       forDigit: (/* digit: */ Int, /* digitRange: */ Int) => (Int, Int)
     ): Seq[Int] = transform(
       digits,
-      (digit: Int, position: Int, digitRange: Int) => forDigit(digit, digitRange),
+      (digit: Int, _ /* TODO position - unused! */: Int, digitRange: Int) => forDigit(digit, digitRange),
       (headDigit: Int) =>
         if (!isCanonical) headDigit
         else headRangeOpt.fold(headDigit){ headRange: Int => forDigit(headDigit,headRange)._2 }
@@ -135,7 +135,7 @@ trait Numbers[S <: Numbers[S]] { this: S =>
     forDigit: (Int, Int, Int) => (Int, Int),
     forHead: Int => Int
   ): Seq[Int] = {
-    val (headCarry: Int, newTail: Seq[Int]) = (digits.tail.zipWithIndex.foldRight(0, Seq.empty[Int])) {
+    val (headCarry: Int, newTail: Seq[Int]) = digits.tail.zipWithIndex.foldRight(0, Seq.empty[Int]) {
       case ((digit: Int, position: Int), (carry: Int, result: Seq[Int])) =>
         val (resultCarry, resultDigit) = forDigit(digit + carry, position, range(position))
         (resultCarry, resultDigit +: result)

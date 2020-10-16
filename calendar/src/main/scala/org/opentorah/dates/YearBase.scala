@@ -4,11 +4,13 @@ import org.opentorah.metadata.{LanguageSpec, LanguageString, Numbered}
 
 /**
   *
-  * @param number  of the Year
+  * @param yearNumber  number of the Year
   */
-abstract class YearBase[C <: Calendar[C]](number: Int)
-  extends Numbered[C#Year](number) with CalendarMember[C] with LanguageString
+abstract class YearBase[C <: Calendar[C]](yearNumber: Int)
+  extends CalendarMember[C] with Numbered[C#Year] with LanguageString
 { this: C#Year =>
+  override def number: Int = yearNumber
+
   def character: C#YearCharacter
 
   final def isLeap: Boolean = calendar.Year.isLeap(number)

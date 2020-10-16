@@ -8,7 +8,7 @@ package org.opentorah.numbers
   * @tparam S  type of the number system
   * @tparam N  type of the number: `S#Point` or `S#Vector`
   */
-trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with NumbersMember[S] { this: N =>
+trait Number[S <: Numbers[S], N <: Number[S, N]] extends NumbersMember[S] with Ordered[N] { this: N =>
 
   /** Companion object that was used to create the number. */
   def companion: NumberCompanion[S, N]

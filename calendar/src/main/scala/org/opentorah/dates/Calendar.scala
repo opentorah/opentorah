@@ -50,7 +50,7 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   final override object Vector extends VectorCompanionType with AbstractCalendarMember  {
     protected override def newNumber(digits: Seq[Int]): Vector =
-      new Digits(digits) with Vector with AbstractCalendarMember {
+      new Digits(digits) with TimeVectorBase[C] with AbstractCalendarMember {
         final override def companion: VectorCompanionType = Vector
       }
   }

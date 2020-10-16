@@ -1,6 +1,8 @@
 package org.opentorah.metadata
 
-abstract class Numbered[T <: Numbered[T]](val number: Int) extends Ordered[T] {
+trait Numbered[T <: Numbered[T]] extends Ordered[T] {
+
+  def number: Int
 
   final override def equals(other: Any): Boolean = other match {
     case that: Numbered[_] => number == that.number

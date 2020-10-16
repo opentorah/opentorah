@@ -18,7 +18,7 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final override object Vector extends VectorCompanion[Angles] with AngleCompanion[Rotation] with NumbersMemberType {
     protected override def newNumber(digits: Seq[Int]): Vector =
-      new Digits(digits) with Rotation with NumbersMemberType {
+      new Digits(digits) with RotationAngle with NumbersMemberType {
         final override def companion: VectorCompanionType = Vector
       }
   }
@@ -33,7 +33,7 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final override object Point extends PointCompanion[Angles] with AngleCompanion[Position] with NumbersMemberType {
     protected override def newNumber(digits: Seq[Int]): Point =
-      new Digits(digits) with Position with NumbersMemberType {
+      new Digits(digits) with PositionAngle with NumbersMemberType {
         final override def companion: PointCompanionType = Point
       }
   }
