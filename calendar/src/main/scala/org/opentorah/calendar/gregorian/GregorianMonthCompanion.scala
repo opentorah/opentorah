@@ -4,7 +4,7 @@ import org.opentorah.dates.MonthCompanion
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
 import Gregorian.Year
 
-abstract class GregorianMonthCompanion extends MonthCompanion[Gregorian] {
+abstract class GregorianMonthCompanion(calendar: Gregorian) extends MonthCompanion[Gregorian](calendar) {
   final override val Name: GregorianMonthCompanion.type = GregorianMonthCompanion
 
   private[opentorah] final override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Year.monthsInYear + 1

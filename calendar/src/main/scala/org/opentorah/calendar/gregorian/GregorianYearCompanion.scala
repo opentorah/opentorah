@@ -5,7 +5,7 @@ import org.opentorah.numbers.BigRational
 import Gregorian.{MonthNameAndLength, TimeVector, Year, YearCharacter}
 import Gregorian.Month.Name._
 
-abstract class GregorianYearCompanion extends YearCompanion[Gregorian] {
+abstract class GregorianYearCompanion(calendar: Gregorian) extends YearCompanion[Gregorian](calendar) {
   protected final override def characters: Seq[YearCharacter] =
     Seq(true, false)
 

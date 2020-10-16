@@ -6,10 +6,6 @@ import org.opentorah.times.{TimeVectorBase, Times}
 
 trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
-  trait AbstractCalendarMember extends CalendarMember[C] {
-    final override def numbers: C = Calendar.this
-  }
-
   type Year <: YearBase[C]
 
   type YearCharacter
@@ -40,7 +36,7 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   override type PointCompanionType <: MomentCompanion[C]
 
-  final val Moment: MomentCompanion[C] = Point
+  final lazy val Moment: MomentCompanion[C] = Point
 
   final override type Vector = TimeVectorBase[C]
 
@@ -48,9 +44,9 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   final override type VectorCompanionType = VectorCompanion[C]
 
-  final override object Vector extends VectorCompanionType with AbstractCalendarMember  {
+  final override lazy val Vector = new VectorCompanion[C](Calendar.this) with CalendarMember[C]  {
     protected override def newNumber(digits: Digits): Vector =
-      new TimeVectorBase[C](digits) with AbstractCalendarMember {
+      new TimeVectorBase[C](Calendar.this, digits) with CalendarMember[C] {
         final override def companion: VectorCompanionType = Vector
       }
   }

@@ -1,7 +1,9 @@
 package org.opentorah.numbers
 
-trait NumberCompanion[S <: Numbers[S], N <: Number[S, N]] extends NumbersMember[S] {
-  final val zero: N = apply(0)
+abstract class NumberCompanion[S <: Numbers[S], N <: Number[S, N]](numbers: S)
+  extends NumbersMember[S](numbers)
+{
+  final lazy val zero: N = apply(0)
 
   final def apply(digits: Int*): N = fromDigits(digits)
 

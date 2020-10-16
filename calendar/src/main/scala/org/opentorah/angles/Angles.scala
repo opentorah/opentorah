@@ -4,11 +4,7 @@ import org.opentorah.numbers.{Digit, Digits, DigitsDescriptor, NumbersMember, Pe
   PointCompanion, VectorCompanion}
 
 trait Angles extends PeriodicNumbers[Angles] {
-  trait AnglesMember extends NumbersMember[Angles] {
-    final override def numbers: Angles = Angles.this
-  }
-
-  final override type NumbersMemberType = AnglesMember
+  trait AnglesMember extends NumbersMember[Angles]
 
   final override type Vector = RotationAngle
 
@@ -16,9 +12,9 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final override type VectorCompanionType = VectorCompanion[Angles] with AngleCompanion[Rotation]
 
-  final override object Vector extends VectorCompanion[Angles] with AngleCompanion[Rotation] with NumbersMemberType {
+  final override lazy val Vector = new VectorCompanion[Angles](Angles.this) with AngleCompanion[Rotation] {
     protected override def newNumber(digits: Digits): Vector =
-      new RotationAngle(digits) with NumbersMemberType {
+      new RotationAngle(Angles.this, digits) {
         final override def companion: VectorCompanionType = Vector
       }
   }
@@ -31,9 +27,9 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final override type PointCompanionType = PointCompanion[Angles] with AngleCompanion[Position]
 
-  final override object Point extends PointCompanion[Angles] with AngleCompanion[Position] with NumbersMemberType {
+  final override lazy val Point = new PointCompanion[Angles](Angles.this) with AngleCompanion[Position] {
     protected override def newNumber(digits: Digits): Point =
-      new PositionAngle(digits) with NumbersMemberType {
+      new PositionAngle(Angles.this, digits) {
         final override def companion: PointCompanionType = Point
       }
   }

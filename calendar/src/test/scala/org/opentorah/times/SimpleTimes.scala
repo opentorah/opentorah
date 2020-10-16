@@ -1,22 +1,16 @@
 package org.opentorah.times
 
-import org.opentorah.numbers.{NumbersMember, PointCompanion, VectorCompanion}
+import org.opentorah.numbers.{PointCompanion, VectorCompanion}
 
 // For stand-alone testing of Times.
 class SimpleTimes extends Times[SimpleTimes] {
-  trait SimpleTimesMember extends NumbersMember[SimpleTimes] {
-    final override def numbers: SimpleTimes = SimpleTimes.this
-  }
-
-  final override type NumbersMemberType = SimpleTimesMember
-
   final override type Point = TimePointBase[SimpleTimes]
 
   final override type PointCompanionType = PointCompanion[SimpleTimes]
 
-  final override object Point extends PointCompanionType with NumbersMemberType {
+  final override lazy val Point = new PointCompanion[SimpleTimes](SimpleTimes.this) {
     protected override def newNumber(digits: Seq[Int]): Point =
-      new TimePointBase[SimpleTimes](digits) with NumbersMemberType {
+      new TimePointBase[SimpleTimes](SimpleTimes.this, digits) {
         final override def companion: PointCompanionType = Point
       }
   }
@@ -25,9 +19,9 @@ class SimpleTimes extends Times[SimpleTimes] {
 
   final override type VectorCompanionType = VectorCompanion[SimpleTimes]
 
-  final override object Vector extends VectorCompanionType with NumbersMemberType {
+  final override lazy val Vector = new VectorCompanion[SimpleTimes](SimpleTimes.this) {
     protected override def newNumber(digits: Seq[Int]): Vector =
-      new TimeVectorBase[SimpleTimes](digits) with NumbersMemberType {
+      new TimeVectorBase[SimpleTimes](SimpleTimes.this, digits) {
         final override def companion: VectorCompanionType = Vector
       }
   }

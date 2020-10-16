@@ -1,46 +1,40 @@
 package org.opentorah.calendar.jewish
 
 import org.opentorah.metadata.LanguageSpec
-import org.opentorah.dates.{Calendar, CalendarMember}
+import org.opentorah.dates.Calendar
 
 class Jewish private() extends Calendar[Jewish] {
-
-  trait JewishCalendarMember extends CalendarMember[Jewish] {
-    final override def numbers: Jewish = Jewish.this
-  }
-
-  final override type NumbersMemberType = JewishCalendarMember
 
   final override type Year = JewishYear
 
   final override type YearCharacter = (Boolean, Year.Kind)
 
-  final override object Year extends JewishYearCompanion with JewishCalendarMember {
+  final override lazy val Year = new JewishYearCompanion(Jewish.this) {
     protected override def newYear(number: Int): Year =
-      new JewishYear(number) with JewishCalendarMember
+      new JewishYear(Jewish.this, number)
   }
 
   final override type Month = JewishMonth
 
-  final override object Month extends JewishMonthCompanion with JewishCalendarMember {
+  final override lazy val Month = new JewishMonthCompanion(Jewish.this) {
     private[opentorah] override def apply(yearOpt: Option[Year], number: Int): Month =
-      new JewishMonth(yearOpt, number) with JewishCalendarMember
+      new JewishMonth(Jewish.this, yearOpt, number)
   }
 
   final override type Day = JewishDay
 
-  final override object Day extends JewishDayCompanion with JewishCalendarMember {
+  final override lazy val Day = new JewishDayCompanion(Jewish.this) {
     private[opentorah] override def apply(monthOpt: Option[Month], number: Int): Day =
-      new JewishDay(monthOpt, number) with JewishCalendarMember
+      new JewishDay(Jewish.this, monthOpt, number)
   }
 
   final override type Point = JewishMoment
 
   final override type PointCompanionType = JewishMomentCompanion
 
-  final override object Point extends JewishMomentCompanion with NumbersMemberType {
+  final override lazy val Point = new JewishMomentCompanion(Jewish.this) {
     protected override def newNumber(digits: Seq[Int]): Point =
-      new JewishMoment(digits) with NumbersMemberType {
+      new JewishMoment(Jewish.this, digits) {
         final override def companion: PointCompanionType = Point
       }
   }

@@ -24,7 +24,7 @@ trait Times[S <: Times[S]] extends NonPeriodicNumbers[S] { this: S =>
     override val values: Seq[Digit] = Seq(DAYS, HOURS, PARTS, MOMENTS)
   }
 
-  val week: S#Vector = Vector().days(7)
+  final lazy val week: S#Vector = Vector().days(7)
 }
 
 object Times {
