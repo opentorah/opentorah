@@ -11,8 +11,8 @@ final case class Pb(
   isEmpty: Boolean = false
 ) {
   def addAttributes(element: Elem): Elem = Attribute.setAll(element, Attribute.getAll(element) ++ Seq(
-    Pb.missingAttribute.withValue(Some(isMissing)),
-    Pb.emptyAttribute.withValue(Some(isEmpty))
+    Pb.missingAttribute.withOptionalValue(Some(isMissing)),
+    Pb.emptyAttribute.withOptionalValue(Some(isEmpty))
   ))
 }
 

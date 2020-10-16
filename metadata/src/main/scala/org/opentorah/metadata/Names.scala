@@ -82,7 +82,7 @@ object Names {
   }
 
   val antiparser: Antiparser[Names] = Antiparser(
-    attributes = value => Seq(defaultNameAttribute.withValue(value.getDefaultName)),
+    attributes = value => Seq(defaultNameAttribute.withOptionalValue(value.getDefaultName)),
     content = value => if (value.getDefaultName.isDefined) Seq.empty else toXml(value)
   )
 

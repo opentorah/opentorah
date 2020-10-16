@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.WithPath
-import org.opentorah.tei.{Body, CalendarDesc, Page, Tei}
+import org.opentorah.tei.{CalendarDesc, Page, Tei}
 import org.opentorah.util.Files
 import scala.xml.{Elem, Node}
 
@@ -21,23 +21,18 @@ final class DocumentObject(
   private def url(directoryName: String): Seq[String] =
     CollectionObject.urlPrefix(collection) ++ Seq(directoryName, teiHolder.name + ".html")
 
-  override protected def tei: Tei = {
-    val tei = teiHolder.tei
-    tei.copy(text = tei.text.copy(body = new Body.Value(header ++ tei.body.xml)))
-  }
+  override protected def tei: Tei = teiHolder.tei
 
-  // TODO generalize and move into SiteObject
-  private def header: Seq[Node] = {
+  override protected def headerSummary: Seq[Node] = Seq(
     // TODO here again it seems that the browser ignores the namespace when styling elements
     // that exist in HTML: when I use <p> instead of <ab>, and there is a <p> inside <abstract>,
     // background colour stops before it...
-    <ab xmlns={Tei.namespace.uri} rendition="document-header">
+    <div xmlns={Tei.namespace.uri} rendition="document-header">
       <l>{document.description}</l>
       <l>Дата: {document.date}</l>
       <l>Кто: {document.author}</l>
       <l>Кому: {document.addressee}</l>
-    </ab>
-  }
+    </div>)
 
   override protected def teiTransformer: Tei => Tei =
     Site.addPublicationStatement compose
@@ -62,7 +57,7 @@ final class DocumentObject(
     // TODO do pages of the appropriate teiHolder!
     override protected def contentElement: Elem =
       <div class={Viewer.Facsimile.name}>
-        {header}
+        {headerSummary}
         <div class="facsimileScroller">{
           for (page: Page <- document.pages(collection.value.pageType).filterNot(_.pb.isMissing)) yield {
             val n: String = page.pb.n
@@ -112,7 +107,7 @@ object DocumentObject {
     // Document name can have dots (e.g., 273.2), so if it is referenced without the extension, we end up here -
     // and assume the required extension is implied, and the one found is part of the document name:
     val documentName: String =
-    if (extension.isDefined && !extension.contains("html")) parts.head else fileName
+      if (extension.isDefined && !extension.contains("html")) parts.head else fileName
 
     collection.value.findDocumentByName(documentName).map { case (document, teiHolder) =>
       new DocumentObject(site, collection, document, teiHolder)

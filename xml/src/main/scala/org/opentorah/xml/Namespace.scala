@@ -46,7 +46,7 @@ sealed trait Namespace {
   final def attribute: Attribute[String] =
     new Attribute.StringAttribute(getPrefix.getOrElse(""), Namespace.Xmlns)
 
-  final def attributeValue: Attribute.Value[String] = attribute.withValue(getUri)
+  final def attributeValue: Attribute.Value[String] = attribute.withOptionalValue(getUri)
 
   // Scala XML
   final def declare(element: scala.xml.Elem): scala.xml.Elem = Xml.declareNamespace(this, element)

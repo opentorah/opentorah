@@ -38,9 +38,9 @@ abstract class Attribute[T](
 
   // Value
 
-  final def withValue(value: Option[T]): Attribute.Value[T] = new Attribute.Value[T](this, value)
+  final def withValue(value: T): Attribute.Value[T] = withOptionalValue(Option(value))
 
-  final def withValue(value: T): Attribute.Value[T] = withValue(Option(value))
+  final def withOptionalValue(value: Option[T]): Attribute.Value[T] = new Attribute.Value[T](this, value)
 
   // Parser
 
@@ -55,7 +55,7 @@ abstract class Attribute[T](
   )
 
   final def toXmlOption: Antiparser[Option[T]] = Antiparser(
-    attributes = value => Seq(withValue(value))
+    attributes = value => Seq(withOptionalValue(value))
   )
 
   // Scala XML

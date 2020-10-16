@@ -6,7 +6,7 @@ import scala.xml.{Elem, Node}
 final class Table[D](columns: Table.Column[D]*) {
   def toTei(rows: Seq[Table.Row[D]]): Elem =
     <table xmlns={Tei.namespace.uri} rendition="collection-index">
-      {<row>{columns.map(column => <cell rendition={column.cssClass}>{column.heading}</cell>)}</row>}
+      {<row role="label">{columns.map(column => <cell rendition={column.cssClass}>{column.heading}</cell>)}</row>}
       {rows.map {
         case Table.Nodes(nodes) =>
           <row><cell cols={columns.length.toString}><span rendition="part-title">{nodes}</span></cell></row>

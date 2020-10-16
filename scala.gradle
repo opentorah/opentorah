@@ -2,7 +2,13 @@ ext.configureScala = {
   final boolean addSlf4jImplementationForTests = true
   ->
   dependencies {
-    zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
+    // zinc
+    //   first version of zinc that ships for Scala 2.13 is 1.4.0, but doesn't seem to work for me...
+    //   previous version - 1.3.5 - doesn't work with Scala 2.13...
+    //   on the other hand, build works without any
+    //     zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
+    //   just fine ;)
+
     implementation "org.scala-lang:scala-library:$scalaVersion"
 
     compileOnly "org.slf4j:slf4j-api:$slf4jVersion"

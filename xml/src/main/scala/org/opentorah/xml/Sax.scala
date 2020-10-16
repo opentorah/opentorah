@@ -53,7 +53,7 @@ object Sax {
         uri = Strings.empty2none(attributes.getURI(index)),
         prefix = prefix
       )
-    ).withValue(Option(attributes.getValue(index)))
+    ).withOptionalValue(Option(attributes.getValue(index)))
 
   private def getPrefix(
     attributes: Attributes,

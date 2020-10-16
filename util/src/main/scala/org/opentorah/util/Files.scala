@@ -47,7 +47,7 @@ object Files {
   def read(file: File): Seq[String] = {
     val source = Source.fromFile(file)
     // Note: toList materializes the iterator before closing the source
-    val result = source.getLines.toList
+    val result = source.getLines().toList
     source.close
     result
   }
