@@ -5,7 +5,7 @@ import org.opentorah.numbers.Digits
 import org.opentorah.times.TimePointBase
 
 abstract class MomentBase[C <: Calendar[C]](calendar: C, digits: Digits)
-  extends TimePointBase[C](calendar, digits) with CalendarMember[C] with LanguageString
+  extends TimePointBase[C](calendar, digits) with LanguageString
 { this: C#Moment =>
 
   final def day: C#Day = calendar.Day(dayNumber)

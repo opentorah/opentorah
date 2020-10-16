@@ -8,7 +8,7 @@ import org.opentorah.numbers.NumbersMember
   * @param yearNumber  number of the Year
   */
 abstract class YearBase[C <: Calendar[C]](calendar: C, yearNumber: Int)
-  extends NumbersMember[C](calendar) with CalendarMember[C] with Numbered[C#Year] with LanguageString
+  extends NumbersMember[C](calendar) with Numbered[C#Year] with LanguageString
 { this: C#Year =>
   override def number: Int = yearNumber
 

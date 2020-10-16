@@ -6,9 +6,7 @@ import org.opentorah.numbers.NumbersMember
 /**
   *
   */
-abstract class MonthCompanion[C <: Calendar[C]](calendar: C)
-  extends NumbersMember[C](calendar) with CalendarMember[C]
-{
+abstract class MonthCompanion[C <: Calendar[C]](calendar: C) extends NumbersMember[C](calendar) {
   val Name: NamedCompanion
 
   final type Name = Name.Key

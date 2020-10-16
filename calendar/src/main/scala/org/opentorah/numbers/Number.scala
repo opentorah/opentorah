@@ -10,8 +10,11 @@ package org.opentorah.numbers
   *
   * @param digits  sequence of the digits comprising this number.
   */
+// TODO turn N from a type parameter into a type member;
+// deal with the `Ordered[N]`
 abstract class Number[S <: Numbers[S], N <: Number[S, N]](numbers: S, final val digits: Digits)
-  extends NumbersMember[S](numbers) with Ordered[N] { this: N =>
+  extends NumbersMember[S](numbers) with Ordered[N]
+{ this: N =>
 
   // at least the head digit is present
   require(digits.nonEmpty)

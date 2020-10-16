@@ -8,7 +8,7 @@ import org.opentorah.numbers.NumbersMember
   * @param monthNumber  number of the Month
   */
 abstract class MonthBase[C <: Calendar[C]] private[opentorah](calendar: C, private var yearOpt: Option[C#Year], monthNumber: Int)
-  extends NumbersMember[C](calendar) with CalendarMember[C] with Numbered[C#Month]
+  extends NumbersMember[C](calendar) with Numbered[C#Month]
 { this: C#Month =>
   require(0 < monthNumber)
 

@@ -6,9 +6,7 @@ import org.opentorah.util.Cache
 /**
   *
   */
-abstract class YearCompanion[C <: Calendar[C]](calendar: C)
-  extends NumbersMember[C](calendar) with CalendarMember[C]
-{
+abstract class YearCompanion[C <: Calendar[C]](calendar: C) extends NumbersMember[C](calendar) {
   private final val yearsCache: Cache[Int, C#Year] = new Cache[Int, C#Year] {
     override def calculate(number: Int): C#Year = newYear(number)
   }

@@ -10,14 +10,13 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final type Rotation = Vector
 
-  final override type VectorCompanionType = VectorCompanion[Angles] with AngleCompanion[Rotation]
-
-  final override lazy val Vector = new VectorCompanion[Angles](Angles.this) with AngleCompanion[Rotation] {
-    protected override def newNumber(digits: Digits): Vector =
-      new RotationAngle(Angles.this, digits) {
-        final override def companion: VectorCompanionType = Vector
-      }
-  }
+  final override lazy val Vector: VectorCompanion[Angles] with AngleCompanion[Rotation] =
+    new VectorCompanion[Angles](Angles.this) with AngleCompanion[Rotation] {
+      protected override def newNumber(digits: Digits): Vector =
+        new RotationAngle(Angles.this, digits) {
+          final override def companion: VectorCompanion[Angles] with AngleCompanion[Rotation] = Vector
+        }
+    }
 
   final val Rotation = Vector
 
@@ -25,14 +24,13 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final type Position = Point
 
-  final override type PointCompanionType = PointCompanion[Angles] with AngleCompanion[Position]
-
-  final override lazy val Point = new PointCompanion[Angles](Angles.this) with AngleCompanion[Position] {
-    protected override def newNumber(digits: Digits): Point =
-      new PositionAngle(Angles.this, digits) {
-        final override def companion: PointCompanionType = Point
-      }
-  }
+  final override lazy val Point: PointCompanion[Angles] with AngleCompanion[Position] =
+    new PointCompanion[Angles](Angles.this) with AngleCompanion[Position] {
+      protected override def newNumber(digits: Digits): Point =
+        new PositionAngle(Angles.this, digits) {
+          final override def companion: PointCompanion[Angles] with AngleCompanion[Position] = Point
+        }
+    }
 
   final val Position = Point
 

@@ -52,6 +52,8 @@ class RotationTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with 
     Rotation(721).canonical shouldBe Rotation(1)
     Rotation(-721).canonical shouldBe Rotation(-1).canonical
     -Rotation(360, 49, 59, 60).canonical shouldBe -Rotation(0, 50)
+
+    Rotation(30) > Rotation(15) shouldBe true
   }
 
   it should "canonicalize correctly" in {

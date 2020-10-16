@@ -30,12 +30,10 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override type Point = GregorianMoment
 
-  final override type PointCompanionType = GregorianMomentCompanion
-
-  final override lazy val Point = new GregorianMomentCompanion(Gregorian.this) {
+  final override lazy val Point: GregorianMomentCompanion = new GregorianMomentCompanion(Gregorian.this) {
     protected override def newNumber(digits: Seq[Int]): Point =
       new GregorianMoment(Gregorian.this, digits) {
-        final override def companion: PointCompanionType = Point
+        final override def companion: GregorianMomentCompanion = Point
       }
   }
 

@@ -34,7 +34,7 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   override type Point <: MomentBase[C]
 
-  override type PointCompanionType <: MomentCompanion[C]
+  override val Point: MomentCompanion[C]
 
   final lazy val Moment: MomentCompanion[C] = Point
 
@@ -42,12 +42,10 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   final type TimeVector = Vector
 
-  final override type VectorCompanionType = VectorCompanion[C]
-
-  final override lazy val Vector = new VectorCompanion[C](Calendar.this) with CalendarMember[C]  {
+  final override lazy val Vector: VectorCompanion[C] = new VectorCompanion[C](Calendar.this) {
     protected override def newNumber(digits: Digits): Vector =
-      new TimeVectorBase[C](Calendar.this, digits) with CalendarMember[C] {
-        final override def companion: VectorCompanionType = Vector
+      new TimeVectorBase[C](Calendar.this, digits) {
+        final override def companion: VectorCompanion[C] = Vector
       }
   }
 

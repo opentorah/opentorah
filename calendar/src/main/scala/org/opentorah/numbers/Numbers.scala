@@ -4,15 +4,11 @@ trait Numbers[S <: Numbers[S]] { this: S =>
 
   type Point <: PointNumber[S]
 
-  type PointCompanionType <: PointCompanion[S]
-
-  val Point: PointCompanionType
+  val Point: PointCompanion[S]
 
   type Vector <: VectorNumber[S]
 
-  type VectorCompanionType <: VectorCompanion[S]
-
-  val Vector: VectorCompanionType
+  val Vector: VectorCompanion[S]
 
   def headRangeOpt: Option[Int]
 

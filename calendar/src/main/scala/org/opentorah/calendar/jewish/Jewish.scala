@@ -30,12 +30,10 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override type Point = JewishMoment
 
-  final override type PointCompanionType = JewishMomentCompanion
-
-  final override lazy val Point = new JewishMomentCompanion(Jewish.this) {
+  final override lazy val Point: JewishMomentCompanion = new JewishMomentCompanion(Jewish.this) {
     protected override def newNumber(digits: Seq[Int]): Point =
       new JewishMoment(Jewish.this, digits) {
-        final override def companion: PointCompanionType = Point
+        final override def companion: JewishMomentCompanion = Point
       }
   }
 

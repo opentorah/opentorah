@@ -8,7 +8,7 @@ import org.opentorah.numbers.NumbersMember
   * @param dayNumber  number of the Day
   */
 abstract class DayBase[C <: Calendar[C]] private[opentorah](calendar: C, private var monthOpt: Option[C#Month], dayNumber: Int)
-  extends NumbersMember[C](calendar) with CalendarMember[C] with Numbered[C#Day] with LanguageString
+  extends NumbersMember[C](calendar) with Numbered[C#Day] with LanguageString
 { this: C#Day =>
   require(0 < dayNumber)
 
