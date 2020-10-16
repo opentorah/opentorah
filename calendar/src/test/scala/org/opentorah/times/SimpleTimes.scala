@@ -1,6 +1,6 @@
 package org.opentorah.times
 
-import org.opentorah.numbers.{Digits, NumbersMember, PointCompanion, VectorCompanion}
+import org.opentorah.numbers.{NumbersMember, PointCompanion, VectorCompanion}
 
 // For stand-alone testing of Times.
 class SimpleTimes extends Times[SimpleTimes] {
@@ -16,7 +16,7 @@ class SimpleTimes extends Times[SimpleTimes] {
 
   final override object Point extends PointCompanionType with NumbersMemberType {
     protected override def newNumber(digits: Seq[Int]): Point =
-      new Digits(digits) with Point with NumbersMemberType {
+      new TimePointBase[SimpleTimes](digits) with NumbersMemberType {
         final override def companion: PointCompanionType = Point
       }
   }
@@ -27,7 +27,7 @@ class SimpleTimes extends Times[SimpleTimes] {
 
   final override object Vector extends VectorCompanionType with NumbersMemberType {
     protected override def newNumber(digits: Seq[Int]): Vector =
-      new Digits(digits) with Vector with NumbersMemberType {
+      new TimeVectorBase[SimpleTimes](digits) with NumbersMemberType {
         final override def companion: VectorCompanionType = Vector
       }
   }

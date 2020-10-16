@@ -2,7 +2,6 @@ package org.opentorah.calendar.jewish
 
 import org.opentorah.metadata.LanguageSpec
 import org.opentorah.dates.{Calendar, CalendarMember}
-import org.opentorah.numbers.Digits
 
 class Jewish private() extends Calendar[Jewish] {
 
@@ -41,7 +40,7 @@ class Jewish private() extends Calendar[Jewish] {
 
   final override object Point extends JewishMomentCompanion with NumbersMemberType {
     protected override def newNumber(digits: Seq[Int]): Point =
-      new Digits(digits) with JewishMoment with NumbersMemberType {
+      new JewishMoment(digits) with NumbersMemberType {
         final override def companion: PointCompanionType = Point
       }
   }

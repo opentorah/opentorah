@@ -1,8 +1,8 @@
 package org.opentorah.times
 
-import org.opentorah.numbers.PointNumber
+import org.opentorah.numbers.{Digits, PointNumber}
 
-trait TimePointBase[S <: Times[S]]
-  extends PointNumber[S] with Time[S, S#Point]
+abstract class TimePointBase[S <: Times[S]](digits: Digits)
+  extends PointNumber[S](digits) with Time[S, S#Point]
 { this: S#Point =>
 }

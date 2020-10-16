@@ -7,14 +7,19 @@ package org.opentorah.numbers
   *
   * @tparam S  type of the number system
   * @tparam N  type of the number: `S#Point` or `S#Vector`
+  *
+  * @param digits  sequence of the digits comprising this number.
   */
-trait Number[S <: Numbers[S], N <: Number[S, N]] extends NumbersMember[S] with Ordered[N] { this: N =>
+abstract class Number[S <: Numbers[S], N <: Number[S, N]](final val digits: Digits)
+  extends NumbersMember[S] with Ordered[N] { this: N =>
+
+  // at least the head digit is present
+  require(digits.nonEmpty)
+  // no trailing 0s
+  require(!digits.tail.lastOption.contains(0))
 
   /** Companion object that was used to create the number. */
   def companion: NumberCompanion[S, N]
-
-  /** Returns sequence of the digits comprising this number. */
-  def digits: Seq[Int]
 
   /** Returns digit described by the [[Digit]] descriptor `digit`. */
   final def get(digit: Digit): Int = get(digit.position)
@@ -90,12 +95,12 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends NumbersMember[S] with O
 
   final override def hashCode: Int = digits.hashCode
 
-  protected final def fromDigits(digits: Seq[Int]): N = companion.fromDigits(digits)
+  protected final def fromDigits(digits: Digits): N = companion.fromDigits(digits)
 
-  protected final def add[N1 <: Number[S, N1]](that: N1): Seq[Int] = zipWith(that, _ + _)
+  protected final def add[N1 <: Number[S, N1]](that: N1): Digits = zipWith(that, _ + _)
 
   // used in PeriodicPoint, so neds to be less than 'protected'
-  private[numbers] final def subtract[N1 <: Number[S, N1]](that: N1): Seq[Int] = zipWith(that, _ - _)
+  private[numbers] final def subtract[N1 <: Number[S, N1]](that: N1): Digits = zipWith(that, _ - _)
 
   private final def isComparable(that: N): Boolean =
     (this.numbers == that.numbers) && (this.companion == that.companion)
@@ -103,6 +108,6 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends NumbersMember[S] with O
   private final def zipWith[N1 <: Number[S, N1]](
     that: N1,
     operation: (Int, Int) => Int
-  ): Seq[Int] =
+  ): Digits =
     this.digits.zipAll(that.digits, 0, 0).map(operation.tupled)
 }

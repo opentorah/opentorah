@@ -2,7 +2,6 @@ package org.opentorah.calendar.gregorian
 
 import org.opentorah.metadata.LanguageSpec
 import org.opentorah.dates.{Calendar, CalendarMember}
-import org.opentorah.numbers.Digits
 
 class Gregorian private() extends Calendar[Gregorian] {
 
@@ -41,7 +40,7 @@ class Gregorian private() extends Calendar[Gregorian] {
 
   final override object Point extends GregorianMomentCompanion with NumbersMemberType {
     protected override def newNumber(digits: Seq[Int]): Point =
-      new Digits(digits) with GregorianMoment with NumbersMemberType {
+      new GregorianMoment(digits) with NumbersMemberType {
         final override def companion: PointCompanionType = Point
       }
   }

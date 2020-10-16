@@ -1,5 +1,6 @@
 package org.opentorah.angles
 
-import org.opentorah.numbers.PointNumber
+import org.opentorah.numbers.{Digits, PointNumber}
 
-trait PositionAngle extends PointNumber[Angles] with Angle[PositionAngle]
+abstract class PositionAngle(digits: Digits)
+  extends PointNumber[Angles](digits) with Angle[PositionAngle]

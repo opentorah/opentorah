@@ -4,7 +4,8 @@ package org.opentorah.numbers
   *
   * @tparam S  type of the number system
   */
-trait VectorNumber[S <: Numbers[S]] extends Number[S, S#Vector] { this: S#Vector =>
+abstract class VectorNumber[S <: Numbers[S]](digits: Digits)
+  extends Number[S, S#Vector](digits) { this: S#Vector =>
 
   /** Returns Vector resulting from adding specified Vector to this one. */
   final def +(that: S#Vector): S#Vector = fromDigits(add(that))
