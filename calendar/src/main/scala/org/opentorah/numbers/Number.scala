@@ -10,10 +10,9 @@ package org.opentorah.numbers
   *
   * @param digits  sequence of the digits comprising this number.
   */
-// TODO turn N from a type parameter into a type member;
-// deal with the `Ordered[N]`
+// TODO turn N from a type parameter into a type member
 abstract class Number[S <: Numbers[S], N <: Number[S, N]](numbers: S, final val digits: Digits)
-  extends NumbersMember[S](numbers) with Ordered[N]
+  extends NumbersMember[S](numbers)
 { this: N =>
 
   // at least the head digit is present
@@ -85,10 +84,12 @@ abstract class Number[S <: Numbers[S], N <: Number[S, N]](numbers: S, final val 
   override def toString: String = toString(length)
 
   /** How does `this` number compare with `that`? */
-  final override def compare(that: N): Int = {
+  final def compare(that: N): Int = {
     require(isComparable(that))
     zipWith(that, _ compare _).find(_ != 0).getOrElse(0)
   }
+
+  val ordering: Ordering[N] = (x: N, y: N) => x.compare(y)
 
   /** Are the two numbers equal? */
   final override def equals(other: Any): Boolean = other.isInstanceOf[Number[_, _]] && {

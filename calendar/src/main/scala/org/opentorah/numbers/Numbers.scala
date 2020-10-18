@@ -1,6 +1,9 @@
 package org.opentorah.numbers
 
-trait Numbers[S <: Numbers[S]] { this: S =>
+import scala.language.implicitConversions
+
+trait Numbers[S <: Numbers[S]] {
+  this: S =>
 
   type Point <: PointNumber[S]
 
@@ -13,17 +16,17 @@ trait Numbers[S <: Numbers[S]] { this: S =>
   def headRangeOpt: Option[Int]
 
   /**
-    * Maximum number of digits after the dot.
-    *
-    * @return maximum number of digits after the dot
-    */
+   * Maximum number of digits after the dot.
+   *
+   * @return maximum number of digits after the dot
+   */
   def maxLength: Int
 
   /**
-    *
-    * @param position within the tail
-    * @return positive, even number
-    */
+   *
+   * @param position within the tail
+   * @return positive, even number
+   */
   def range(position: Int): Int
 
   private[numbers] final lazy val ranges: Seq[Int] = (0 until maxLength).map(range)
@@ -43,7 +46,7 @@ trait Numbers[S <: Numbers[S]] { this: S =>
     digits zip denominators.take(digits.length) map (Convertible[T].div _).tupled reduce Convertible[T].plus
 
   // this can probably be done with digit(i) = value*denominators(i).whole%denominator(i) - but will it be less precise?
-  private[numbers] final def from[T : Convertible](value: T, length: Int): Digits = {
+  private[numbers] final def from[T: Convertible](value: T, length: Int): Digits = {
     val (digits: Digits, lastReminder /*: T*/) =
       ranges.take(length).foldLeft((Seq.empty[Int], Convertible[T].abs(value))) {
         case ((acc: Digits, reminder /*: T*/), range: Int) =>
@@ -55,19 +58,19 @@ trait Numbers[S <: Numbers[S]] { this: S =>
   }
 
   /** Convert a number to String.
-    *
-    * If length specified is bugger than the number of digits after the point in the number,
-    * missing positions are assumed to have 0s; if the length is smaller, some digits will not
-    * be shown.
-    * Signs (like 'h' for hours or '°' for degrees) are inserted after digits.
-    * If no sign is configured for a position, ',' is used - except for the last digit,
-    * where no sign is appended in such a case.
-    *
-    * @param number  to convert to String
-    * @param length  desired number of digits after the point
-    * @tparam N      flavor of the number
-    * @return        String representation of the number
-    */
+   *
+   * If length specified is bugger than the number of digits after the point in the number,
+   * missing positions are assumed to have 0s; if the length is smaller, some digits will not
+   * be shown.
+   * Signs (like 'h' for hours or '°' for degrees) are inserted after digits.
+   * If no sign is configured for a position, ',' is used - except for the last digit,
+   * where no sign is appended in such a case.
+   *
+   * @param number to convert to String
+   * @param length desired number of digits after the point
+   * @tparam N flavor of the number
+   * @return String representation of the number
+   */
   private[numbers] final def toString[N <: Number[S, N]](number: N, length: Int): String = {
     val digits: Digits = number.digits.padTo(length+1, 0)
     val signs: Seq[String] = Digit.signs.take(length+1).padTo(length, ",").padTo(length+1, "")
@@ -89,7 +92,7 @@ trait Numbers[S <: Numbers[S]] { this: S =>
     )
   }
 
-  private[numbers] final def normalize(digits: Digits, isCanonical: Boolean): Digits =  {
+  private[numbers] final def normalize(digits: Digits, isCanonical: Boolean): Digits = {
     def t(
       digits: Digits,
       forDigit: (/* digit: */ Int, /* digitRange: */ Int) => (Int, Int)
@@ -98,7 +101,7 @@ trait Numbers[S <: Numbers[S]] { this: S =>
       (digit: Int, _ /* TODO position - unused! */: Int, digitRange: Int) => forDigit(digit, digitRange),
       (headDigit: Int) =>
         if (!isCanonical) headDigit
-        else headRangeOpt.fold(headDigit){ headRange: Int => forDigit(headDigit,headRange)._2 }
+        else headRangeOpt.fold(headDigit){ headRange: Int => forDigit(headDigit, headRange)._2 }
     )
 
     // fit all digits within their ranges
@@ -137,4 +140,14 @@ trait Numbers[S <: Numbers[S]] { this: S =>
 
     forHead(digits.head + headCarry) +: newTail
   }
+
+  // Ordering implicits (ignore bogus Idea warnings)
+
+  implicit val pointOrdering: Ordering[Point] = (x: Point, y: Point) => x.compare(y)
+
+  implicit def pointOrderingOps(lhs: Point): pointOrdering.Ops = pointOrdering.mkOrderingOps(lhs)
+
+  implicit val vectorOrdering: Ordering[Vector] = (x: Vector, y: Vector) => x.compare(y)
+
+  implicit def vectorOrderingOps(lhs: Vector): vectorOrdering.Ops = vectorOrdering.mkOrderingOps(lhs)
 }

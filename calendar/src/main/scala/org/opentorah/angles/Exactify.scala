@@ -12,6 +12,7 @@ final class Exactify(small: Rotation, mult: Int, round: Int, big: Rotation) {
     result
   }
 
+  @scala.annotation.tailrec
   private def find(interval: Interval, length: Int): (Interval, Int) =
     if (fits(interval)) (interval, length) else find(squeeze(interval, length+1), length+1)
 
@@ -47,6 +48,7 @@ final class Exactify(small: Rotation, mult: Int, round: Int, big: Rotation) {
     result
   }
 
+  @scala.annotation.tailrec
   def expand(interval: Interval, length: Int, toLength: Int): Interval =
     if (length == toLength) interval else expand(expand1(interval, length+1), length+1, toLength)
 
