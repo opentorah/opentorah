@@ -1,9 +1,11 @@
 package org.opentorah.dates
 
 import org.opentorah.metadata.{LanguageSpec, LanguageString}
+import org.opentorah.numbers.Digits
 import org.opentorah.times.TimePointBase
 
-trait MomentBase[C <: Calendar[C]] extends TimePointBase[C] with CalendarMember[C] with LanguageString
+abstract class MomentBase[C <: Calendar[C]](digits: Digits)
+  extends TimePointBase[C](digits) with CalendarMember[C] with LanguageString
 { this: C#Moment =>
 
   final def day: C#Day = calendar.Day(dayNumber)

@@ -1,15 +1,25 @@
 package org.opentorah.metadata
 
-abstract class Numbered[T <: Numbered[T]](val number: Int) extends Ordered[T] {
+trait Numbered {
+
+  def number: Int
+
+  type T
 
   final override def equals(other: Any): Boolean = other match {
-    case that: Numbered[_] => number == that.number
+    case that: Numbered => number == that.number
     case _ => false
   }
 
   final override def hashCode: Int = number
 
-  final override def compare(that: T): Int = this.number - that.number
-
   override def toString: String = number.toString
+}
+
+object Numbered {
+  import scala.language.implicitConversions
+
+  implicit def numberedOrdering[T <: Numbered]: Ordering[T] = (x: T, y: T ) => x.number - y.number
+
+  implicit def numberedOrderingOps[T <: Numbered](lhs: T): Ordering[T]#Ops = numberedOrdering.mkOrderingOps(lhs)
 }

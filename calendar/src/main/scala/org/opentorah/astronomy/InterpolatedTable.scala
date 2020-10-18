@@ -4,7 +4,10 @@ import org.opentorah.angles.Angles
 import Angles.Rotation
 import org.opentorah.numbers.{BigRational, Number}
 
-trait InterpolatedTable[N <: Number[Angles, N]] {
+abstract class InterpolatedTable[N <: Number[Angles, N]](implicit nOrdering: Ordering[N]) {
+
+  import nOrdering.mkOrderingOps
+
   val values: Map[N, Rotation]
 
   private lazy val sortedValues: Seq[(N, Rotation)] = values.toSeq.sortBy(_._1)

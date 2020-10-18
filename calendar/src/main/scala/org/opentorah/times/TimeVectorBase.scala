@@ -1,8 +1,8 @@
 package org.opentorah.times
 
-import org.opentorah.numbers.VectorNumber
+import org.opentorah.numbers.{Digits, VectorNumber}
 
-trait TimeVectorBase[S <: Times[S]]
-  extends VectorNumber[S] with Time[S, S#Vector]
+abstract class TimeVectorBase[S <: Times[S]](digits: Digits)
+  extends VectorNumber[S](digits) with Time[S, S#Vector]
 { this: S#Vector =>
 }

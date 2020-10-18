@@ -4,12 +4,17 @@ import org.opentorah.metadata.{LanguageSpec, Numbered}
 
 /**
   *
-  * @param number  of the Month
+  * @param monthNumber  number of the Month
   */
-abstract class MonthBase[C <: Calendar[C]] private[opentorah](private var yearOpt: Option[C#Year], number: Int)
-  extends Numbered[C#Month](number) with CalendarMember[C]
+abstract class MonthBase[C <: Calendar[C]] private[opentorah](private var yearOpt: Option[C#Year], monthNumber: Int)
+  extends CalendarMember[C] with Numbered
 { this: C#Month =>
-  require(0 < number)
+
+  type T = C#Month
+
+  require(0 < monthNumber)
+
+  override def number: Int = monthNumber
 
   final def year: C#Year = {
     if (yearOpt.isEmpty) {

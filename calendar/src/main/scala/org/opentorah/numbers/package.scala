@@ -24,4 +24,6 @@ package org.opentorah
   * but not for time intervals (`Vector`s)!
   */
 package object numbers {
+
+  type Digits = Seq[Int]
 }

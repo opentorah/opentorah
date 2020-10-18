@@ -5,7 +5,7 @@ import org.opentorah.metadata.NamedCompanion
 /**
   *
   */
-abstract class DayCompanion[C <: Calendar[C]] extends CalendarMember[C] {
+trait DayCompanion[C <: Calendar[C]] extends CalendarMember[C] {
   val Name: NamedCompanion
 
   final type Name = Name.Key

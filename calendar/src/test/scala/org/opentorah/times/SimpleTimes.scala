@@ -1,36 +1,32 @@
 package org.opentorah.times
 
-import org.opentorah.numbers.{Digits, NumbersMember, PointCompanion, VectorCompanion}
+import org.opentorah.numbers.{PointCompanion, VectorCompanion}
 
 // For stand-alone testing of Times.
 class SimpleTimes extends Times[SimpleTimes] {
-  trait SimpleTimesMember extends NumbersMember[SimpleTimes] {
-    final override def numbers: SimpleTimes = SimpleTimes.this
-  }
-
-  final override type NumbersMemberType = SimpleTimesMember
-
   final override type Point = TimePointBase[SimpleTimes]
 
-  final override type PointCompanionType = PointCompanion[SimpleTimes]
-
-  final override object Point extends PointCompanionType with NumbersMemberType {
-    protected override def newNumber(digits: Seq[Int]): Point =
-      new Digits(digits) with Point with NumbersMemberType {
-        final override def companion: PointCompanionType = Point
-      }
-  }
+  final override lazy val Point: PointCompanion[SimpleTimes] =
+    new PointCompanion[SimpleTimes] {
+      override val numbers: SimpleTimes = SimpleTimes.this
+      protected override def newNumber(digits: Seq[Int]): Point =
+        new TimePointBase[SimpleTimes](digits) {
+          override val numbers: SimpleTimes = SimpleTimes.this
+          final override def companion: PointCompanion[SimpleTimes] = Point
+        }
+    }
 
   final override type Vector = TimeVectorBase[SimpleTimes]
 
-  final override type VectorCompanionType = VectorCompanion[SimpleTimes]
-
-  final override object Vector extends VectorCompanionType with NumbersMemberType {
-    protected override def newNumber(digits: Seq[Int]): Vector =
-      new Digits(digits) with Vector with NumbersMemberType {
-        final override def companion: VectorCompanionType = Vector
-      }
-  }
+  final override lazy val Vector: VectorCompanion[SimpleTimes] =
+    new VectorCompanion[SimpleTimes] {
+      override val numbers: SimpleTimes = SimpleTimes.this
+      protected override def newNumber(digits: Seq[Int]): Vector =
+        new TimeVectorBase[SimpleTimes](digits) {
+          override val numbers: SimpleTimes = SimpleTimes.this
+          final override def companion: VectorCompanion[SimpleTimes] = Vector
+        }
+    }
 }
 
 object SimpleTimes extends SimpleTimes

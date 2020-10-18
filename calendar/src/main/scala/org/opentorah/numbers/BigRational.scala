@@ -90,7 +90,7 @@ object BigRational {
     apply(BigInt(values(0).trim), BigInt(values(1).trim))
   }
 
-  final def continuedFraction(value: BigRational, length: Int): Seq[Int] = {
+  final def continuedFraction(value: BigRational, length: Int): Digits = {
     require(length >= 1)
     val whole: Int = value.whole
     val fraction: BigRational = value.fraction

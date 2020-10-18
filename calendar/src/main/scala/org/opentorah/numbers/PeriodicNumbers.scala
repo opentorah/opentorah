@@ -7,7 +7,7 @@ trait PeriodicNumbers[S <: PeriodicNumbers[S]] extends Numbers[S] { this: S =>
 
   require(headRange % 2 == 0)
 
-  val period: S#Vector = Vector(headRange)
+  final lazy val period: S#Vector = Vector(headRange)
 
-  val halfPeriod: S#Vector = Vector(headRange/2)
+  final lazy val halfPeriod: S#Vector = Vector(headRange/2)
 }

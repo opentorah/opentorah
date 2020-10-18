@@ -1,48 +1,50 @@
 package org.opentorah.calendar.gregorian
 
 import org.opentorah.metadata.LanguageSpec
-import org.opentorah.dates.{Calendar, CalendarMember}
-import org.opentorah.numbers.Digits
+import org.opentorah.dates.Calendar
 
-class Gregorian private() extends Calendar[Gregorian] {
-
-  trait GregorianCalendarMember extends CalendarMember[Gregorian] {
-    final override def numbers: Gregorian = Gregorian.this
-  }
-
-  final override type NumbersMemberType = GregorianCalendarMember
+trait Gregorian extends Calendar[Gregorian] {
 
   final override type Year = GregorianYear
 
   final override type YearCharacter = Boolean
 
-  final override object Year extends GregorianYearCompanion with GregorianCalendarMember {
+  final override lazy val Year = new GregorianYearCompanion {
+    override val numbers: Gregorian = Gregorian.this
     protected override def newYear(number: Int): Year =
-      new GregorianYear(number) with GregorianCalendarMember
+      new GregorianYear(number) {
+        override val numbers: Gregorian = Gregorian.this
+      }
   }
 
   final override type Month = GregorianMonth
 
-  final override object Month extends GregorianMonthCompanion with GregorianCalendarMember {
+  final override lazy val Month = new GregorianMonthCompanion {
+    override val numbers: Gregorian = Gregorian.this
     private[opentorah] override def apply(yearOpt: Option[Year], number: Int): Month =
-      new GregorianMonth(yearOpt, number) with GregorianCalendarMember
+      new GregorianMonth(yearOpt, number) {
+        override val numbers: Gregorian = Gregorian.this
+      }
   }
 
   final override type Day = GregorianDay
 
-  final override object Day extends GregorianDayCompanion with GregorianCalendarMember {
+  final override lazy val Day = new GregorianDayCompanion {
+    override val numbers: Gregorian = Gregorian.this
     private[opentorah] override def apply(monthOpt: Option[Month], number: Int): Day =
-      new GregorianDay(monthOpt, number) with GregorianCalendarMember
+      new GregorianDay(monthOpt, number) {
+        override val numbers: Gregorian = Gregorian.this
+      }
   }
 
   final override type Point = GregorianMoment
 
-  final override type PointCompanionType = GregorianMomentCompanion
-
-  final override object Point extends GregorianMomentCompanion with NumbersMemberType {
+  final override lazy val Point: GregorianMomentCompanion = new GregorianMomentCompanion {
+    override val numbers: Gregorian = Gregorian.this
     protected override def newNumber(digits: Seq[Int]): Point =
-      new Digits(digits) with GregorianMoment with NumbersMemberType {
-        final override def companion: PointCompanionType = Point
+      new GregorianMoment(digits) {
+        override val numbers: Gregorian = Gregorian.this
+        final override def companion: GregorianMomentCompanion = Point
       }
   }
 

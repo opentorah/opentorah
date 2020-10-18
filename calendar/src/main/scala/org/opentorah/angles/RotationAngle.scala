@@ -1,5 +1,5 @@
 package org.opentorah.angles
 
-import org.opentorah.numbers.VectorNumber
+import org.opentorah.numbers.{Digits, VectorNumber}
 
-trait RotationAngle extends VectorNumber[Angles] with Angle[RotationAngle]
+abstract class RotationAngle(digits: Digits) extends VectorNumber[Angles](digits) with Angle[RotationAngle]

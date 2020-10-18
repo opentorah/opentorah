@@ -7,14 +7,21 @@ package org.opentorah.numbers
   *
   * @tparam S  type of the number system
   * @tparam N  type of the number: `S#Point` or `S#Vector`
+  *
+  * @param digits  sequence of the digits comprising this number.
   */
-trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with NumbersMember[S] { this: N =>
+// TODO turn N from a type parameter into a type member
+abstract class Number[S <: Numbers[S], N <: Number[S, N]](final val digits: Digits)
+  extends NumbersMember[S]
+{ this: N =>
+
+  // at least the head digit is present
+  require(digits.nonEmpty)
+  // no trailing 0s
+  require(!digits.tail.lastOption.contains(0))
 
   /** Companion object that was used to create the number. */
   def companion: NumberCompanion[S, N]
-
-  /** Returns sequence of the digits comprising this number. */
-  def digits: Seq[Int]
 
   /** Returns digit described by the [[Digit]] descriptor `digit`. */
   final def get(digit: Digit): Int = get(digit.position)
@@ -27,7 +34,7 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
 
   /** Returns this number with digit at `position` set to `value`. */
   final def set(position: Int, value: Int): N =
-    fromDigits(digits.padTo(position+1, 0).updated(position, value))
+    companion.fromDigits(digits.padTo(position+1, 0).updated(position, value))
 
   /** Returns number of digits after the `point`. */
   final def length: Int = digits.tail.length
@@ -45,10 +52,10 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
   final def isNegative: Boolean = signum < 0
 
   /** Returns absolute value of this number. */
-  final def abs: N = fromDigits(digits.map(math.abs))
+  final def abs: N = companion.fromDigits(digits.map(math.abs))
 
   /** Returns this number with the sign inverted. */
-  final def unary_- : N = fromDigits(digits.map(-_))
+  final def unary_- : N = companion.fromDigits(digits.map(-_))
 
   /** Returns Vector representing difference between `this` and `that` numbers (which must be both Points or both Vectors). */
   final def -(that: N): S#Vector = {
@@ -60,7 +67,7 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
   final def roundTo(digit: Digit): N = roundTo(digit.position)
 
   /** Returns this number rounded to the `position`. */
-  final def roundTo(length: Int): N = fromDigits(numbers.roundTo(digits, length))
+  final def roundTo(length: Int): N = companion.fromDigits(numbers.roundTo(digits, length))
 
   /** Converts this number to [[BigRational]]. */
   final def toRational: BigRational = to[BigRational]
@@ -77,7 +84,7 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
   override def toString: String = toString(length)
 
   /** How does `this` number compare with `that`? */
-  final override def compare(that: N): Int = {
+  final def compare(that: N): Int = {
     require(isComparable(that))
     zipWith(that, _ compare _).find(_ != 0).getOrElse(0)
   }
@@ -90,19 +97,17 @@ trait Number[S <: Numbers[S], N <: Number[S, N]] extends Ordered[N] with Numbers
 
   final override def hashCode: Int = digits.hashCode
 
-  protected final def fromDigits(digits: Seq[Int]): N = companion.fromDigits(digits)
+  protected final def add(that: Number[S, _]): Digits = zipWith(that, _ + _)
 
-  protected final def add[N1 <: Number[S, N1]](that: N1): Seq[Int] = zipWith(that, _ + _)
-
-  // used in PeriodicPoint, so neds to be less than 'protected'
-  private[numbers] final def subtract[N1 <: Number[S, N1]](that: N1): Seq[Int] = zipWith(that, _ - _)
+  // used in PeriodicPoint, so needs to be less than 'protected'
+  private[numbers] final def subtract(that: Number[S, _]): Digits = zipWith(that, _ - _)
 
   private final def isComparable(that: N): Boolean =
     (this.numbers == that.numbers) && (this.companion == that.companion)
 
-  private final def zipWith[N1 <: Number[S, N1]](
-    that: N1,
+  private final def zipWith(
+    that: Number[S, _],
     operation: (Int, Int) => Int
-  ): Seq[Int] =
+  ): Digits =
     this.digits.zipAll(that.digits, 0, 0).map(operation.tupled)
 }
