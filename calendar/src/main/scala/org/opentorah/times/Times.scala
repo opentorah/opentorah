@@ -15,6 +15,12 @@ trait Times[S <: Times[S]] extends NonPeriodicNumbers[S] { this: S =>
     case 2 => Times.momentsPerPart
   }
 
+  final override val Digit: DigitsDescriptor = Times.Digit
+
+  final lazy val week: S#Vector = Vector().days(7)
+}
+
+object Times {
   final object Digit extends DigitsDescriptor {
     object DAYS extends DigitBase("d")
     object HOURS extends DigitBase("h")
@@ -24,10 +30,6 @@ trait Times[S <: Times[S]] extends NonPeriodicNumbers[S] { this: S =>
     override val values: Seq[Digit] = Seq(DAYS, HOURS, PARTS, MOMENTS)
   }
 
-  final lazy val week: S#Vector = Vector().days(7)
-}
-
-object Times {
   final val hoursPerDay: Int = 24
   require(hoursPerDay % 2 == 0)
 

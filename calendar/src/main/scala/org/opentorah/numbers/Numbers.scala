@@ -1,7 +1,5 @@
 package org.opentorah.numbers
 
-import scala.language.implicitConversions
-
 trait Numbers[S <: Numbers[S]] {
   this: S =>
 
@@ -142,6 +140,8 @@ trait Numbers[S <: Numbers[S]] {
   }
 
   // Ordering implicits (ignore bogus Idea warnings)
+  // TODO clean up this and the ones in Numbered
+  import scala.language.implicitConversions
 
   implicit val pointOrdering: Ordering[Point] = (x: Point, y: Point) => x.compare(y)
 

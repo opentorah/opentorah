@@ -4,16 +4,16 @@ import org.opentorah.numbers.{Digit, Digits, DigitsDescriptor, NumbersMember, Pe
   PointCompanion, VectorCompanion}
 
 trait Angles extends PeriodicNumbers[Angles] {
-  trait AnglesMember extends NumbersMember[Angles]
-
   final override type Vector = RotationAngle
 
   final type Rotation = Vector
 
   final override lazy val Vector: VectorCompanion[Angles] with AngleCompanion[Rotation] =
-    new VectorCompanion[Angles](Angles.this) with AngleCompanion[Rotation] {
+    new VectorCompanion[Angles] with AngleCompanion[Rotation] {
+      override val numbers: Angles = Angles.this
       protected override def newNumber(digits: Digits): Vector =
-        new RotationAngle(Angles.this, digits) {
+        new RotationAngle(digits) {
+          override val numbers: Angles = Angles.this
           final override def companion: VectorCompanion[Angles] with AngleCompanion[Rotation] = Vector
         }
     }
@@ -25,9 +25,11 @@ trait Angles extends PeriodicNumbers[Angles] {
   final type Position = Point
 
   final override lazy val Point: PointCompanion[Angles] with AngleCompanion[Position] =
-    new PointCompanion[Angles](Angles.this) with AngleCompanion[Position] {
+    new PointCompanion[Angles] with AngleCompanion[Position] {
+      override val numbers: Angles = Angles.this
       protected override def newNumber(digits: Digits): Point =
-        new PositionAngle(Angles.this, digits) {
+        new PositionAngle(digits) {
+          override val numbers: Angles = Angles.this
           final override def companion: PointCompanion[Angles] with AngleCompanion[Position] = Point
         }
     }

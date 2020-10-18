@@ -1,12 +1,11 @@
 package org.opentorah.dates
 
-import org.opentorah.numbers.NumbersMember
 import org.opentorah.util.Cache
 
 /**
   *
   */
-abstract class YearCompanion[C <: Calendar[C]](calendar: C) extends NumbersMember[C](calendar) {
+trait YearCompanion[C <: Calendar[C]] extends CalendarMember[C] {
   private final val yearsCache: Cache[Int, C#Year] = new Cache[Int, C#Year] {
     override def calculate(number: Int): C#Year = newYear(number)
   }

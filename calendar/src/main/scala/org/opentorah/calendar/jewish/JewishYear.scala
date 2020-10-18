@@ -3,7 +3,7 @@ package org.opentorah.calendar.jewish
 import org.opentorah.dates.YearBase
 import Jewish.{Moment, Month, Year, YearCharacter}
 
-final class JewishYear(calendar: Jewish, number: Int) extends YearBase[Jewish](calendar, number) {
+abstract class JewishYear(number: Int) extends YearBase[Jewish](number) {
   require(0 <= number)
 
   def newMoon: Moment = month(1).newMoon

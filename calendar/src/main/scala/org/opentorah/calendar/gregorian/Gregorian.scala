@@ -3,36 +3,47 @@ package org.opentorah.calendar.gregorian
 import org.opentorah.metadata.LanguageSpec
 import org.opentorah.dates.Calendar
 
-class Gregorian private() extends Calendar[Gregorian] {
+trait Gregorian extends Calendar[Gregorian] {
 
   final override type Year = GregorianYear
 
   final override type YearCharacter = Boolean
 
-  final override lazy val Year = new GregorianYearCompanion(Gregorian.this) {
+  final override lazy val Year = new GregorianYearCompanion {
+    override val numbers: Gregorian = Gregorian.this
     protected override def newYear(number: Int): Year =
-      new GregorianYear(Gregorian.this, number)
+      new GregorianYear(number) {
+        override val numbers: Gregorian = Gregorian.this
+      }
   }
 
   final override type Month = GregorianMonth
 
-  final override lazy val Month = new GregorianMonthCompanion(Gregorian.this) {
+  final override lazy val Month = new GregorianMonthCompanion {
+    override val numbers: Gregorian = Gregorian.this
     private[opentorah] override def apply(yearOpt: Option[Year], number: Int): Month =
-      new GregorianMonth(Gregorian.this, yearOpt, number)
+      new GregorianMonth(yearOpt, number) {
+        override val numbers: Gregorian = Gregorian.this
+      }
   }
 
   final override type Day = GregorianDay
 
-  final override lazy val Day = new GregorianDayCompanion(Gregorian.this) {
+  final override lazy val Day = new GregorianDayCompanion {
+    override val numbers: Gregorian = Gregorian.this
     private[opentorah] override def apply(monthOpt: Option[Month], number: Int): Day =
-      new GregorianDay(Gregorian.this, monthOpt, number)
+      new GregorianDay(monthOpt, number) {
+        override val numbers: Gregorian = Gregorian.this
+      }
   }
 
   final override type Point = GregorianMoment
 
-  final override lazy val Point: GregorianMomentCompanion = new GregorianMomentCompanion(Gregorian.this) {
+  final override lazy val Point: GregorianMomentCompanion = new GregorianMomentCompanion {
+    override val numbers: Gregorian = Gregorian.this
     protected override def newNumber(digits: Seq[Int]): Point =
-      new GregorianMoment(Gregorian.this, digits) {
+      new GregorianMoment(digits) {
+        override val numbers: Gregorian = Gregorian.this
         final override def companion: GregorianMomentCompanion = Point
       }
   }

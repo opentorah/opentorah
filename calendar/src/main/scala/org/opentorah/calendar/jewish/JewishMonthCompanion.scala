@@ -3,7 +3,7 @@ package org.opentorah.calendar.jewish
 import org.opentorah.dates.MonthCompanion
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
 
-abstract class JewishMonthCompanion(calendar: Jewish) extends MonthCompanion[Jewish](calendar) {
+trait JewishMonthCompanion extends MonthCompanion[Jewish] { this: MonthCompanion[Jewish] =>
   final override val Name: JewishMonthCompanion.type = JewishMonthCompanion
 
   private[opentorah] final override def yearNumber(monthNumber: Int): Int = LeapYearsCycle.monthYear(monthNumber)

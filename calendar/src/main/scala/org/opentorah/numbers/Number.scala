@@ -11,8 +11,8 @@ package org.opentorah.numbers
   * @param digits  sequence of the digits comprising this number.
   */
 // TODO turn N from a type parameter into a type member
-abstract class Number[S <: Numbers[S], N <: Number[S, N]](numbers: S, final val digits: Digits)
-  extends NumbersMember[S](numbers)
+abstract class Number[S <: Numbers[S], N <: Number[S, N]](final val digits: Digits)
+  extends NumbersMember[S]
 { this: N =>
 
   // at least the head digit is present
@@ -34,7 +34,7 @@ abstract class Number[S <: Numbers[S], N <: Number[S, N]](numbers: S, final val 
 
   /** Returns this number with digit at `position` set to `value`. */
   final def set(position: Int, value: Int): N =
-    fromDigits(digits.padTo(position+1, 0).updated(position, value))
+    companion.fromDigits(digits.padTo(position+1, 0).updated(position, value))
 
   /** Returns number of digits after the `point`. */
   final def length: Int = digits.tail.length
@@ -52,10 +52,10 @@ abstract class Number[S <: Numbers[S], N <: Number[S, N]](numbers: S, final val 
   final def isNegative: Boolean = signum < 0
 
   /** Returns absolute value of this number. */
-  final def abs: N = fromDigits(digits.map(math.abs))
+  final def abs: N = companion.fromDigits(digits.map(math.abs))
 
   /** Returns this number with the sign inverted. */
-  final def unary_- : N = fromDigits(digits.map(-_))
+  final def unary_- : N = companion.fromDigits(digits.map(-_))
 
   /** Returns Vector representing difference between `this` and `that` numbers (which must be both Points or both Vectors). */
   final def -(that: N): S#Vector = {
@@ -67,7 +67,7 @@ abstract class Number[S <: Numbers[S], N <: Number[S, N]](numbers: S, final val 
   final def roundTo(digit: Digit): N = roundTo(digit.position)
 
   /** Returns this number rounded to the `position`. */
-  final def roundTo(length: Int): N = fromDigits(numbers.roundTo(digits, length))
+  final def roundTo(length: Int): N = companion.fromDigits(numbers.roundTo(digits, length))
 
   /** Converts this number to [[BigRational]]. */
   final def toRational: BigRational = to[BigRational]
@@ -89,8 +89,6 @@ abstract class Number[S <: Numbers[S], N <: Number[S, N]](numbers: S, final val 
     zipWith(that, _ compare _).find(_ != 0).getOrElse(0)
   }
 
-  val ordering: Ordering[N] = (x: N, y: N) => x.compare(y)
-
   /** Are the two numbers equal? */
   final override def equals(other: Any): Boolean = other.isInstanceOf[Number[_, _]] && {
     val that: N = other.asInstanceOf[N]
@@ -99,18 +97,16 @@ abstract class Number[S <: Numbers[S], N <: Number[S, N]](numbers: S, final val 
 
   final override def hashCode: Int = digits.hashCode
 
-  protected final def fromDigits(digits: Digits): N = companion.fromDigits(digits)
+  protected final def add(that: Number[S, _]): Digits = zipWith(that, _ + _)
 
-  protected final def add[N1 <: Number[S, N1]](that: N1): Digits = zipWith(that, _ + _)
-
-  // used in PeriodicPoint, so neds to be less than 'protected'
-  private[numbers] final def subtract[N1 <: Number[S, N1]](that: N1): Digits = zipWith(that, _ - _)
+  // used in PeriodicPoint, so needs to be less than 'protected'
+  private[numbers] final def subtract(that: Number[S, _]): Digits = zipWith(that, _ - _)
 
   private final def isComparable(that: N): Boolean =
     (this.numbers == that.numbers) && (this.companion == that.companion)
 
-  private final def zipWith[N1 <: Number[S, N1]](
-    that: N1,
+  private final def zipWith(
+    that: Number[S, _],
     operation: (Int, Int) => Int
   ): Digits =
     this.digits.zipAll(that.digits, 0, 0).map(operation.tupled)

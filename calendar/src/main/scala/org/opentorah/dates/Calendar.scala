@@ -42,9 +42,11 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   final type TimeVector = Vector
 
-  final override lazy val Vector: VectorCompanion[C] = new VectorCompanion[C](Calendar.this) {
+  final override lazy val Vector: VectorCompanion[C] = new VectorCompanion[C] with CalendarMember[C] {
+    override val numbers: C = Calendar.this
     protected override def newNumber(digits: Digits): Vector =
-      new TimeVectorBase[C](Calendar.this, digits) {
+      new TimeVectorBase[C](digits) with CalendarMember[C] {
+        override val numbers: C = Calendar.this
         final override def companion: VectorCompanion[C] = Vector
       }
   }

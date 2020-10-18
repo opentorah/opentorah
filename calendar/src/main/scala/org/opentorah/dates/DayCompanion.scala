@@ -1,12 +1,11 @@
 package org.opentorah.dates
 
 import org.opentorah.metadata.NamedCompanion
-import org.opentorah.numbers.NumbersMember
 
 /**
   *
   */
-abstract class DayCompanion[C <: Calendar[C]](calendar: C) extends NumbersMember[C](calendar) {
+trait DayCompanion[C <: Calendar[C]] extends CalendarMember[C] {
   val Name: NamedCompanion
 
   final type Name = Name.Key

@@ -1,15 +1,17 @@
 package org.opentorah.dates
 
 import org.opentorah.metadata.{LanguageSpec, LanguageString, Numbered}
-import org.opentorah.numbers.NumbersMember
 
 /**
   *
   * @param dayNumber  number of the Day
   */
-abstract class DayBase[C <: Calendar[C]] private[opentorah](calendar: C, private var monthOpt: Option[C#Month], dayNumber: Int)
-  extends NumbersMember[C](calendar) with Numbered[C#Day] with LanguageString
+abstract class DayBase[C <: Calendar[C]] private[opentorah](private var monthOpt: Option[C#Month], dayNumber: Int)
+  extends CalendarMember[C] with Numbered with LanguageString
 { this: C#Day =>
+
+  type T = C#Day
+
   require(0 < dayNumber)
 
   override def number: Int = dayNumber
@@ -50,8 +52,10 @@ abstract class DayBase[C <: Calendar[C]] private[opentorah](calendar: C, private
 
   final def monthAndDay: MonthAndDay[C] = new MonthAndDay[C](month.name, numberInMonth)
 
+  @scala.annotation.tailrec
   final def next(dayName: C#DayName): C#Day = if (is(dayName)) this else this.next.next(dayName)
 
+  @scala.annotation.tailrec
   final def prev(dayName: C#DayName): C#Day = if (is(dayName)) this else this.prev.prev(dayName)
 
   final def toMoment: C#Moment = calendar.Moment().days(number - 1)

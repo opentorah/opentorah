@@ -1,5 +1,5 @@
 package org.opentorah.numbers
 
-abstract class PointCompanion[S <: Numbers[S]](numbers: S) extends NumberCompanion[S, S#Point](numbers) {
+trait PointCompanion[S <: Numbers[S]] extends NumberCompanion[S, S#Point] {
   protected final override def isCanonical: Boolean = true
 }

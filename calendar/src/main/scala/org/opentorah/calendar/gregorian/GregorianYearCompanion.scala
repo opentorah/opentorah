@@ -5,7 +5,7 @@ import org.opentorah.numbers.BigRational
 import Gregorian.{MonthNameAndLength, TimeVector, Year, YearCharacter}
 import Gregorian.Month.Name._
 
-abstract class GregorianYearCompanion(calendar: Gregorian) extends YearCompanion[Gregorian](calendar) {
+trait GregorianYearCompanion extends YearCompanion[Gregorian] { this: YearCompanion[Gregorian] =>
   protected final override def characters: Seq[YearCharacter] =
     Seq(true, false)
 
@@ -49,7 +49,7 @@ abstract class GregorianYearCompanion(calendar: Gregorian) extends YearCompanion
   final def lengthInDays(yearNumber: Int): Int =
     if (Year.isLeap(yearNumber)) daysInNonLeapYear + 1 else daysInNonLeapYear
 
-  final val yearLength: TimeVector = TimeVector.fromRational(
+  final lazy val yearLength: TimeVector = TimeVector.fromRational(
     BigRational(365) +
     BigRational(1, 4) -
     BigRational(1, 100) +

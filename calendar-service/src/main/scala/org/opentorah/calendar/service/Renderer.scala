@@ -4,7 +4,7 @@ import org.opentorah.calendar.Calendars
 import org.opentorah.calendar.gregorian.Gregorian
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Season, Shemittah, SpecialDay, Sun, YearType}
 import org.opentorah.dates.{Calendar, DayBase, MonthBase, YearBase, YearsCycle}
-import org.opentorah.metadata.{Language, LanguageSpec, WithNames}
+import org.opentorah.metadata.{Language, LanguageSpec, Numbered, WithNames}
 import org.opentorah.schedule.rambam.RambamSchedule
 import org.opentorah.schedule.tanach.{Chitas, Schedule}
 import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
@@ -393,7 +393,7 @@ object Renderer {
       val festivalDays: Seq[(SpecialDay, Jewish.Day)] =
         SpecialDay.daysWithSpecialReadings(location == Location.HolyLand)
           .map(specialDay => specialDay -> specialDay.correctedDate(year))
-          .toSeq.sortBy(_._2)
+          .toSeq.sortBy(_._2)(Numbered.numberedOrdering[Jewish.Day])
 
       val festivals: Elem =
         <table>

@@ -4,7 +4,7 @@ import org.opentorah.dates.YearCompanion
 import Jewish.{Month, MonthNameAndLength, YearCharacter}
 import Month.Name._
 
-abstract class JewishYearCompanion(calendar: Jewish) extends YearCompanion[Jewish](calendar) {
+trait JewishYearCompanion extends YearCompanion[Jewish] { this: YearCompanion[Jewish] =>
   final type Kind = JewishYearCompanion.Kind
 
   final val Kind: JewishYearCompanion.Kind.type = JewishYearCompanion.Kind

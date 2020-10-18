@@ -4,7 +4,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import SimpleTimes.{Point, Vector}
-import SimpleTimes.Digit
+import Times.Digit
 import org.opentorah.numbers.BigRational
 
 final class SimpleTimesTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {

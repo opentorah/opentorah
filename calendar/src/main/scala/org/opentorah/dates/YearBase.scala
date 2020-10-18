@@ -1,15 +1,17 @@
 package org.opentorah.dates
 
 import org.opentorah.metadata.{LanguageSpec, LanguageString, Numbered}
-import org.opentorah.numbers.NumbersMember
 
 /**
   *
   * @param yearNumber  number of the Year
   */
-abstract class YearBase[C <: Calendar[C]](calendar: C, yearNumber: Int)
-  extends NumbersMember[C](calendar) with Numbered[C#Year] with LanguageString
+abstract class YearBase[C <: Calendar[C]](yearNumber: Int)
+  extends CalendarMember[C] with Numbered with LanguageString
 { this: C#Year =>
+
+  type T = C#Year
+
   override def number: Int = yearNumber
 
   def character: C#YearCharacter

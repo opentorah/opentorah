@@ -3,9 +3,7 @@ package org.opentorah.calendar.jewish
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
 import org.opentorah.dates.{Calendar, DayCompanion}
 
-abstract class JewishDayCompanion(calendar: Jewish)
-  extends DayCompanion[Jewish](calendar)
-{
+trait JewishDayCompanion extends DayCompanion[Jewish] {
   final override val Name: JewishDayCompanion.type = JewishDayCompanion
 
   final override def names: Seq[Name] = JewishDayCompanion.values
