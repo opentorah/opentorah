@@ -1,22 +1,20 @@
 package org.opentorah.angles
 
-import org.opentorah.numbers.{Digit, Digits, DigitsDescriptor, NumbersMember, PeriodicNumbers,
-  PointCompanion, VectorCompanion}
+import org.opentorah.numbers.{Digit, Digits, DigitsDescriptor, PeriodicNumbers, PointCompanion, VectorCompanion}
 
 trait Angles extends PeriodicNumbers[Angles] {
   final override type Vector = RotationAngle
 
   final type Rotation = Vector
 
-  final override lazy val Vector: VectorCompanion[Angles] with AngleCompanion[Rotation] =
-    new VectorCompanion[Angles] with AngleCompanion[Rotation] {
+  abstract class VectorCompanionType extends VectorCompanion[Angles] with AngleCompanion[Rotation]
+  final override lazy val Vector: VectorCompanionType = new VectorCompanionType {
+    override val numbers: Angles = Angles.this
+    protected override def newNumber(digits: Digits): Vector = new RotationAngle(digits) {
       override val numbers: Angles = Angles.this
-      protected override def newNumber(digits: Digits): Vector =
-        new RotationAngle(digits) {
-          override val numbers: Angles = Angles.this
-          final override def companion: VectorCompanion[Angles] with AngleCompanion[Rotation] = Vector
-        }
+      final override def companion: VectorCompanionType = Vector
     }
+  }
 
   final val Rotation = Vector
 
@@ -24,13 +22,13 @@ trait Angles extends PeriodicNumbers[Angles] {
 
   final type Position = Point
 
-  final override lazy val Point: PointCompanion[Angles] with AngleCompanion[Position] =
-    new PointCompanion[Angles] with AngleCompanion[Position] {
+  abstract class PointCompanionType extends PointCompanion[Angles] with AngleCompanion[Position]
+  final override lazy val Point: PointCompanionType = new PointCompanionType {
       override val numbers: Angles = Angles.this
       protected override def newNumber(digits: Digits): Point =
         new PositionAngle(digits) {
           override val numbers: Angles = Angles.this
-          final override def companion: PointCompanion[Angles] with AngleCompanion[Position] = Point
+          final override def companion: PointCompanionType = Point
         }
     }
 

@@ -5,24 +5,24 @@ import org.opentorah.numbers.Digits
 import org.opentorah.times.TimePointBase
 
 abstract class MomentBase[C <: Calendar[C]](digits: Digits)
-  extends TimePointBase[C](digits) with CalendarMember[C] with LanguageString
+  extends TimePointBase[C](digits) with LanguageString
 { this: C#Moment =>
 
-  final def day: C#Day = calendar.Day(dayNumber)
+  final def day: C#Day = numbers.Day(dayNumber)
 
   final def dayNumber: Int = days + 1
 
   final override def toLanguageString(implicit spec: LanguageSpec): String =
     day.toLanguageString +
-      " " + calendar.toString(time.hours) +
-      ":" + calendar.toString(time.minutes) +
-      "." + calendar.toString(time.partsWithoutMinutes) +
-      "." + calendar.toString(time.moments)
+      " " + numbers.toString(time.hours) +
+      ":" + numbers.toString(time.minutes) +
+      "." + numbers.toString(time.partsWithoutMinutes) +
+      "." + numbers.toString(time.moments)
 
   final def toSecondLanguageString(implicit spec: LanguageSpec): String =
     day.toLanguageString +
-      " " + calendar.toString(time.hours) +
-      ":" + calendar.toString(time.minutes) +
-      ":" + calendar.toString(time.seconds) +
-      "." + calendar.toString(time.milliseconds)
+      " " + numbers.toString(time.hours) +
+      ":" + numbers.toString(time.minutes) +
+      ":" + numbers.toString(time.seconds) +
+      "." + numbers.toString(time.milliseconds)
 }

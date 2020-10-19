@@ -16,16 +16,20 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   type Month <: MonthBase[C]
 
+  final class MonthNameAndLength(val name: Month.Name, val length: Int)
+
+  final class MonthDescriptor(val name: Month.Name, val length: Int, val daysBefore: Int)
+
+  final class MonthAndDay(val monthName: Month.Name, val numberInMonth: Int)
+
+  // TODO remove?
   final type MonthName = Month.Name
-
-  type MonthNameAndLength = MonthNameAndLengthBase[C]
-
-  type MonthDescriptor = MonthDescriptorBase[C]
 
   val Month: MonthCompanion[C]
 
   type Day <: DayBase[C]
 
+  // TODO remove?
   final type DayName = Day.Name
 
   val Day: DayCompanion[C]
@@ -42,10 +46,10 @@ trait Calendar[C <: Calendar[C]] extends Times[C] { this: C =>
 
   final type TimeVector = Vector
 
-  final override lazy val Vector: VectorCompanion[C] = new VectorCompanion[C] with CalendarMember[C] {
+  final override lazy val Vector: VectorCompanion[C] = new VectorCompanion[C] {
     override val numbers: C = Calendar.this
     protected override def newNumber(digits: Digits): Vector =
-      new TimeVectorBase[C](digits) with CalendarMember[C] {
+      new TimeVectorBase[C](digits) {
         override val numbers: C = Calendar.this
         final override def companion: VectorCompanion[C] = Vector
       }
