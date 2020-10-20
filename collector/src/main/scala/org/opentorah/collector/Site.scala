@@ -97,7 +97,7 @@ object Site {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  val facsimileBucket: String = "http://facsimiles.alter-rebbe.org/facsimiles/"
+  val facsimileBucket: String = "https://storage.googleapis.com/facsimiles.alter-rebbe.org/facsimiles/"
 
   private val unpublishedCollections: Set[String] = Set("niab5", "niab19", "rnb203")
 

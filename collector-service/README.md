@@ -59,6 +59,14 @@ Added `404.html` and set it as the error page in the website configuration of th
 Facsimiles displayed on the site come from that bucket;
 they can be retrieved by anyone who has the correct URL.
 
+Chrome [tightened the nuts on the mixed content](https://blog.chromium.org/2019/10/no-more-mixed-messages-about-https.html),
+so links to individual photograph in the facsimile page have to use HTTPS now.
+For the SSL certificate's common name to be correct, those links have to point to the photographs indirectly
+via `https://storage.googleapis.com/`. So, for example,
+`http://facsimiles.alter-rebbe.org/facsimiles/derzhavin6/390.jpg` becomes
+`https://storage.googleapis.com/facsimiles.alter-rebbe.org/facsimiles/derzhavin6/390.jpg`.
+Alternatively, I can configure an CDN for the facsimiles - but I do not see the need at this point.
+
 To validate that facsimiles referenced from the site are in one-to-one correspondence with
 the files in the bucket, we probably need to use Google Cloud Storage client to retrieve
 (and cache) the list of them.
