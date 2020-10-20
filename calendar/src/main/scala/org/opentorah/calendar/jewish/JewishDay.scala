@@ -2,9 +2,7 @@ package org.opentorah.calendar.jewish
 
 import org.opentorah.dates.DayBase
 
-abstract class JewishDay private[jewish](monthOpt: Option[Jewish.Month], number: Int)
-  extends DayBase[Jewish](monthOpt, number)
-{
+trait JewishDay extends DayBase[Jewish] {
   def isShabbos: Boolean = is(Jewish.Day.Name.Shabbos)
 
   def roshChodeshOf: Option[Jewish.Month.Name] =

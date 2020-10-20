@@ -2,29 +2,27 @@ package org.opentorah.calendar.gregorian
 
 import org.opentorah.dates.YearCompanion
 import org.opentorah.numbers.BigRational
-import Gregorian.{MonthNameAndLength, TimeVector, Year, YearCharacter}
+import Gregorian.{TimeVector, Year, YearCharacter}
 import Gregorian.Month.Name._
 
 trait GregorianYearCompanion extends YearCompanion[Gregorian] { this: YearCompanion[Gregorian] =>
   protected final override def characters: Seq[YearCharacter] =
     Seq(true, false)
 
-  protected final override def monthNamesAndLengths(isLeap: YearCharacter):
-    Seq[MonthNameAndLength] =
-  {
+  protected final override def monthNamesAndLengths(isLeap: YearCharacter): Seq[numbers.MonthNameAndLength] = {
     Seq(
-      createMonthNameAndLength(January  , 31),
-      createMonthNameAndLength(February , if (isLeap) 29 else 28),
-      createMonthNameAndLength(March    , 31),
-      createMonthNameAndLength(April    , 30),
-      createMonthNameAndLength(May      , 31),
-      createMonthNameAndLength(June     , 30),
-      createMonthNameAndLength(July     , 31),
-      createMonthNameAndLength(August   , 31),
-      createMonthNameAndLength(September, 30),
-      createMonthNameAndLength(October  , 31),
-      createMonthNameAndLength(November , 30),
-      createMonthNameAndLength(December , 31)
+      new numbers.MonthNameAndLength(January  , 31),
+      new numbers.MonthNameAndLength(February , if (isLeap) 29 else 28),
+      new numbers.MonthNameAndLength(March    , 31),
+      new numbers.MonthNameAndLength(April    , 30),
+      new numbers.MonthNameAndLength(May      , 31),
+      new numbers.MonthNameAndLength(June     , 30),
+      new numbers.MonthNameAndLength(July     , 31),
+      new numbers.MonthNameAndLength(August   , 31),
+      new numbers.MonthNameAndLength(September, 30),
+      new numbers.MonthNameAndLength(October  , 31),
+      new numbers.MonthNameAndLength(November , 30),
+      new numbers.MonthNameAndLength(December , 31)
     )
   }
 

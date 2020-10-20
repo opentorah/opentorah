@@ -21,9 +21,11 @@ trait Jewish extends Calendar[Jewish] {
 
   final override lazy val Month = new JewishMonthCompanion {
     override val numbers: Jewish = Jewish.this
-    private[opentorah] override def apply(yearOpt: Option[Year], number: Int): Month =
-      new JewishMonth(yearOpt, number) {
+    private[opentorah] override def apply(yearOption: Option[Year], monthNumber: Int): Month =
+      new JewishMonth {
         override val numbers: Jewish = Jewish.this
+        override protected var yearOpt: Option[Year] = yearOption
+        override def number: Int = monthNumber
       }
   }
 
@@ -31,9 +33,11 @@ trait Jewish extends Calendar[Jewish] {
 
   final override lazy val Day = new JewishDayCompanion {
     override val numbers: Jewish = Jewish.this
-    private[opentorah] override def apply(monthOpt: Option[Month], number: Int): Day =
-      new JewishDay(monthOpt, number) {
+    private[opentorah] override def apply(monthOption: Option[Month], dayNumber: Int): Day =
+      new JewishDay {
         override val numbers: Jewish = Jewish.this
+        override protected var monthOpt: Option[Month] = monthOption
+        override def number: Int = dayNumber
       }
   }
 

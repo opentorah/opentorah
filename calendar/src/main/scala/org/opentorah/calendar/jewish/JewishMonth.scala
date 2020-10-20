@@ -3,8 +3,6 @@ package org.opentorah.calendar.jewish
 import org.opentorah.dates.MonthBase
 import Jewish.Moment
 
-abstract class JewishMonth private[jewish](yearOpt: Option[Jewish#Year], number: Int)
-  extends MonthBase[Jewish](yearOpt, number)
-{
+trait JewishMonth extends MonthBase[Jewish] {
   def newMoon: Moment = Moon.newMoon(number)
 }

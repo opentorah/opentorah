@@ -1,24 +1,19 @@
 package org.opentorah.dates
 
 import org.opentorah.metadata.{LanguageSpec, Numbered}
+import org.opentorah.numbers.NumbersMember
 
-/**
-  *
-  * @param monthNumber  number of the Month
-  */
-abstract class MonthBase[C <: Calendar[C]] private[opentorah](private var yearOpt: Option[C#Year], monthNumber: Int)
-  extends CalendarMember[C] with Numbered
-{ this: C#Month =>
+trait MonthBase[C <: Calendar[C]] extends NumbersMember[C] with Numbered { this: C#Month =>
 
   type T = C#Month
 
-  require(0 < monthNumber)
+  protected var yearOpt: Option[C#Year]
 
-  override def number: Int = monthNumber
+  require(0 < number)
 
   final def year: C#Year = {
     if (yearOpt.isEmpty) {
-      yearOpt = Some(calendar.Year(calendar.Month.yearNumber(number)))
+      yearOpt = Some(numbers.Year(numbers.Month.yearNumber(number)))
     }
 
     yearOpt.get
@@ -28,11 +23,11 @@ abstract class MonthBase[C <: Calendar[C]] private[opentorah](private var yearOp
 
   final def prev: C#Month = this - 1
 
-  final def +(change: Int): C#Month = calendar.Month(number + change)
+  final def +(change: Int): C#Month = numbers.Month(number + change)
 
-  final def -(change: Int): C#Month = calendar.Month(number - change)
+  final def -(change: Int): C#Month = numbers.Month(number - change)
 
-  final def numberInYear: Int = calendar.Month.numberInYear(number)
+  final def numberInYear: Int = numbers.Month.numberInYear(number)
 
   final def firstDayNumber: Int = year.firstDayNumber + descriptor.daysBefore
 
@@ -42,7 +37,7 @@ abstract class MonthBase[C <: Calendar[C]] private[opentorah](private var yearOp
 
   final def days: Seq[C#Day] = (1 to length).map(day)
 
-  final def day(numberInMonth: Int): C#Day = calendar.Day.witNumberInMonth(this, numberInMonth)
+  final def day(numberInMonth: Int): C#Day = numbers.Day.witNumberInMonth(this, numberInMonth)
 
   final def name: C#MonthName = descriptor.name
 
@@ -50,5 +45,5 @@ abstract class MonthBase[C <: Calendar[C]] private[opentorah](private var yearOp
 
   private[this] def descriptor: C#MonthDescriptor = year.monthDescriptors(numberInYear - 1)
 
-  final def numberInYearToLanguageString(implicit spec: LanguageSpec): String = calendar.toString(numberInYear)
+  final def numberInYearToLanguageString(implicit spec: LanguageSpec): String = numbers.toString(numberInYear)
 }

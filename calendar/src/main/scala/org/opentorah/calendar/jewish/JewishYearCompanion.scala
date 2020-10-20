@@ -1,7 +1,7 @@
 package org.opentorah.calendar.jewish
 
 import org.opentorah.dates.YearCompanion
-import Jewish.{Month, MonthNameAndLength, YearCharacter}
+import Jewish.{Month, YearCharacter}
 import Month.Name._
 
 trait JewishYearCompanion extends YearCompanion[Jewish] { this: YearCompanion[Jewish] =>
@@ -13,26 +13,26 @@ trait JewishYearCompanion extends YearCompanion[Jewish] { this: YearCompanion[Je
     for (isLeap <- Seq(true, false); kind <- Kind.values) yield (isLeap, kind)
 
   // KH 8:5-6
-  protected final override def monthNamesAndLengths(character: YearCharacter): Seq[MonthNameAndLength] = {
+  protected final override def monthNamesAndLengths(character: YearCharacter): Seq[numbers.MonthNameAndLength] = {
     character match { case (isLeap: Boolean, kind: Kind) =>
       Seq(
-        createMonthNameAndLength(Tishrei   , 30),
-        createMonthNameAndLength(Marheshvan, if (kind == Kind.Full) 30 else 29),
-        createMonthNameAndLength(Kislev    , if (kind == Kind.Short) 29 else 30),
-        createMonthNameAndLength(Teves     , 29),
-        createMonthNameAndLength(Shvat     , 30)
+        new numbers.MonthNameAndLength(Tishrei   , 30),
+        new numbers.MonthNameAndLength(Marheshvan, if (kind == Kind.Full) 30 else 29),
+        new numbers.MonthNameAndLength(Kislev    , if (kind == Kind.Short) 29 else 30),
+        new numbers.MonthNameAndLength(Teves     , 29),
+        new numbers.MonthNameAndLength(Shvat     , 30)
       ) ++
         (if (!isLeap)
-          Seq(createMonthNameAndLength(Adar, 29))
+          Seq(new numbers.MonthNameAndLength(Adar, 29))
         else
-          Seq(createMonthNameAndLength(AdarI, 30), createMonthNameAndLength(AdarII, 29))) ++
+          Seq(new numbers.MonthNameAndLength(AdarI, 30), new numbers.MonthNameAndLength(AdarII, 29))) ++
         Seq(
-          createMonthNameAndLength(Nisan , 30),
-          createMonthNameAndLength(Iyar  , 29),
-          createMonthNameAndLength(Sivan , 30),
-          createMonthNameAndLength(Tammuz, 29),
-          createMonthNameAndLength(Av    , 30),
-          createMonthNameAndLength(Elul  , 29)
+          new numbers.MonthNameAndLength(Nisan , 30),
+          new numbers.MonthNameAndLength(Iyar  , 29),
+          new numbers.MonthNameAndLength(Sivan , 30),
+          new numbers.MonthNameAndLength(Tammuz, 29),
+          new numbers.MonthNameAndLength(Av    , 30),
+          new numbers.MonthNameAndLength(Elul  , 29)
         )
     }
   }

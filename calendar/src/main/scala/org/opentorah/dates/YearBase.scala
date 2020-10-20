@@ -1,13 +1,14 @@
 package org.opentorah.dates
 
 import org.opentorah.metadata.{LanguageSpec, LanguageString, Numbered}
+import org.opentorah.numbers.NumbersMember
 
 /**
   *
   * @param yearNumber  number of the Year
   */
 abstract class YearBase[C <: Calendar[C]](yearNumber: Int)
-  extends CalendarMember[C] with Numbered with LanguageString
+  extends NumbersMember[C] with Numbered with LanguageString
 { this: C#Year =>
 
   type T = C#Year
@@ -16,15 +17,15 @@ abstract class YearBase[C <: Calendar[C]](yearNumber: Int)
 
   def character: C#YearCharacter
 
-  final def isLeap: Boolean = calendar.Year.isLeap(number)
+  final def isLeap: Boolean = numbers.Year.isLeap(number)
 
   final def next: C#Year = this + 1
 
   final def prev: C#Year = this - 1
 
-  final def +(change: Int): C#Year = calendar.Year(number + change)
+  final def +(change: Int): C#Year = numbers.Year(number + change)
 
-  final def -(change: Int): C#Year = calendar.Year(number - change)
+  final def -(change: Int): C#Year = numbers.Year(number - change)
 
   final def firstDay: C#Day = firstMonth.firstDay
 
@@ -40,14 +41,14 @@ abstract class YearBase[C <: Calendar[C]](yearNumber: Int)
 
   final def lastMonth: C#Month = month(lengthInMonths)
 
-  final def firstMonthNumber: Int = calendar.Year.firstMonth(number)
+  final def firstMonthNumber: Int = numbers.Year.firstMonth(number)
 
-  final def lengthInMonths: Int = calendar.Year.lengthInMonths(number)
+  final def lengthInMonths: Int = numbers.Year.lengthInMonths(number)
 
   final def months: Seq[C#Month] = (1 to lengthInMonths).map(month)
 
   final def month(numberInYear: Int): C#Month =
-    calendar.Month.withNumberInYear(this, numberInYear)
+    numbers.Month.withNumberInYear(this, numberInYear)
 
   final def containsMonth(name: C#MonthName): Boolean =
     monthDescriptors.exists(_.name == name)
@@ -55,7 +56,7 @@ abstract class YearBase[C <: Calendar[C]](yearNumber: Int)
   final def month(name: C#MonthName): C#Month =
     month(monthDescriptors.indexWhere(_.name == name) + 1)
 
-  final def monthAndDay(when: MonthAndDay[C]): C#Day =
+  final def monthAndDay(when: C#MonthAndDay): C#Day =
     month(when.monthName).day(when.numberInMonth)
 
   private[opentorah] final def monthForDay(day: Int): C#Month = {
@@ -64,7 +65,7 @@ abstract class YearBase[C <: Calendar[C]](yearNumber: Int)
   }
 
   private[opentorah] final def monthDescriptors: Seq[C#MonthDescriptor] =
-    calendar.Year.monthDescriptors(character)
+    numbers.Year.monthDescriptors(character)
 
-  final override def toLanguageString(implicit spec: LanguageSpec): String = calendar.toString(number)
+  final override def toLanguageString(implicit spec: LanguageSpec): String = numbers.toString(number)
 }

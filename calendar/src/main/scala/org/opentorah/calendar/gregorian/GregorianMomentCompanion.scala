@@ -1,7 +1,7 @@
 package org.opentorah.calendar.gregorian
 
-import org.opentorah.dates.{CalendarMember, MomentCompanion}
+import org.opentorah.dates.MomentCompanion
 
-trait GregorianMomentCompanion extends MomentCompanion[Gregorian] with CalendarMember[Gregorian] {
+trait GregorianMomentCompanion extends MomentCompanion[Gregorian] {
   this: MomentCompanion[Gregorian] =>
 }
