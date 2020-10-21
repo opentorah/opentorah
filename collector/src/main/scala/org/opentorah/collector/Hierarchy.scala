@@ -25,7 +25,7 @@ object Hierarchy {
   def storeHeader(path: Path, store: Store): Seq[Node] =
     pathLinks(path) ++
     <head xmlns={Tei.namespace.uri}>{storeTitle(path, store)}</head> ++
-    store.storeAbstract.map(value => Seq(<span xmlns={Tei.namespace.uri}>{value.xml}</span>)).getOrElse(Seq.empty) ++
+    store.storeAbstract.map(value => Seq(<ab xmlns={Tei.namespace.uri}>{value.xml}</ab>)).getOrElse(Seq.empty) ++
     RawXml.getXml(store.body)
 
   private def pathLinks(pathRaw: Path): Seq[Elem] = {
