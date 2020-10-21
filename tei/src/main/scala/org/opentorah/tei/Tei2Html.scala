@@ -4,12 +4,11 @@ import org.opentorah.util.Files
 import org.opentorah.xml.{Attribute, Namespace, Xhtml, Xml}
 import scala.xml.{Elem, Node}
 
-// TODO when transforming <TEI>, <titleStmt><title>TITLE</title></titleStmt> should become <html><head><title>TITLE</title></head></html>
-// TODO copy attributes:
-// - xml:id to id (why?);
-// - xml:lang to lang (why?);
-// - rendition to class, removing the (leading?) '#' (or just use 'rendition' - TEI defines its own 'class'?);
-// TODO:
+// TODO
+// - when transforming <TEI>, <titleStmt><title>TITLE</title></titleStmt> should become <html><head><title>TITLE</title></head></html>
+// - copy xml:id to id (why?); what is the difference between xml:id and id?
+// - copy xml:lang to lang (why?);
+// - copy rendition to class, removing the (leading?) '#' (or just use 'rendition' - TEI defines its own 'class'?);
 // - transform tagsDecl?
 // - transform prefixDef?
 object Tei2Html {
@@ -72,27 +71,38 @@ object Tei2Html {
   private def elementTransformer(element: Elem, state: State): Option[TransformResult[State]] = element.label match {
 
     case label if EntityType.isName(label) =>
-      for {
-        ref <- refAttribute.get(element)
-        resolved <- state.resolver.findByRef(ref)
-      } yield TransformResult(
-        <a href={Files.mkUrl(resolved.url)} target={resolved.role.orNull}>{Xml.getChildren(element)}</a>,
+      val ref: Option[String] = refAttribute.get(element)
+      val (href: Option[String], role: Option[String]) =
+        ref.flatMap(ref => state.resolver.findByRef(ref)).map(resolved => (
+          Some(Files.mkUrl(resolved.url)),
+          resolved.role
+        )).getOrElse((ref, None))
+
+      Some(TransformResult(
+        <a href={href.orNull} target={role.orNull}>{Xml.getChildren(element)}</a>,
         Seq.empty,
         state
-      )
+      ))
 
     case Ref.elementName =>
       require(!Xml.isEmpty(element))
       val target = targetAttribute.doGet(element)
-      val resolved: Option[TeiResolver.Resolved] =
-        if (!target.startsWith("/")) None
-        else state.resolver.resolve(Files.urlAndPart(target)._1)
-      val (href: String, role: Option[String]) = resolved.map(resolved => (
-        Files.mkUrl(Files.addPart(resolved.url, Files.urlAndPart(target)._2)),
-        resolved.role
-      )).getOrElse((target, None))
+      val (href: String, role: Option[String]) =
+        state.resolver.resolve(target).map(resolved => (
+          Files.mkUrl(resolved.url),
+          resolved.role
+        )).getOrElse((target, None))
+
       Some(TransformResult(
         <a href={href} target={role.orNull}>{Xml.getChildren(element)}</a>,
+        Seq(targetAttribute),
+        state
+      ))
+
+    case "ptr" =>
+      val href = targetAttribute.doGet(element)
+      Some(TransformResult(
+        <a href={href}>{href}</a>,
         Seq(targetAttribute),
         state
       ))
@@ -108,26 +118,11 @@ object Tei2Html {
         state
       ))
 
-    case "ptr" =>
-      val href = targetAttribute.doGet(element)
-      Some(TransformResult(
-        <a href={href}>{href}</a>,
-        Seq(targetAttribute),
-        state
-      ))
-
     case "graphic" =>
       // TODO In TEI <graphic> can contain <desc>, but are treating it as empty.
       require(Xml.isEmpty(element))
       Some(TransformResult(
         <img src={urlAttribute.doGet(element)}/>,
-        Seq.empty,
-        state
-      ))
-
-    case "supplied" =>
-      Some(TransformResult(
-        <span>{Xml.mkText("[") +: Xml.getChildren(element) :+ Xml.mkText("]")}</span>,
         Seq.empty,
         state
       ))
@@ -190,7 +185,7 @@ object Tei2Html {
       <div xmlns={Xhtml.namespace.uri} class="endnotes">{
         for (note <- finalState.notes) yield t(
           <span xmlns={Xhtml.namespace.uri} class="endnote" id={note.contentId}>
-            <a class="endnote-backlink" href={s"#${note.srcId}"}>{note.number}.</a>
+            <a class="endnote-backlink" href={s"#${note.srcId}"}>{note.number}</a>
             {note.content}
           </span>
         )/* TODO do not ignore end-notes inside end-notes */._1

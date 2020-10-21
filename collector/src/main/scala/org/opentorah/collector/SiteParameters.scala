@@ -6,7 +6,7 @@ final class SiteParameters(
   val title: String,
   val author: String,
   val email: String,
-  val faviconJpeg: String,
+  val faviconJpg: String,
   val googleAnalyticsId: Option[String],
   val navigationLinks: Seq[NavigationLink],
   val footerCol3: Elem,

@@ -59,17 +59,13 @@ final class Site(
 
   def findByRef(fileName: String): Option[Entity] =  store.entities.get.findByRef(fileName)
 
-  private def resolve(url: String): Option[SiteFile] =
-    if (!url.startsWith("/")) None
-    else SiteObject.resolve(this, Files.removePart(url).substring(1).split("/"))
-
   def resolver(facsUrl: Seq[String]): TeiResolver = new TeiResolver {
 
-    override def resolve(url: String): Option[TeiResolver.Resolved] =
-      Site.this.resolve(url).fold[Option[TeiResolver.Resolved]] {
+    override def resolve(url: Seq[String]): Option[TeiResolver.Resolved] =
+      SiteObject.resolve(Site.this, url).fold[Option[TeiResolver.Resolved]] {
         Site.logger.warn(s"did not resolve: $url")
         None
-      } { siteFile: SiteFile => Some(new TeiResolver.Resolved(
+      } { siteFile: SiteFile => Some(TeiResolver.Resolved(
         url = siteFile.url,
         role = siteFile match {
           case htmlFile: SiteFile => Some(htmlFile.viewer.name)
@@ -78,15 +74,15 @@ final class Site(
       ))}
 
     override def findByRef(ref: String): Option[TeiResolver.Resolved] =
-      Site.this.findByRef(ref).fold[Option[TeiResolver.Resolved]] {
-        Site.logger.warn(s"did not find reference: $ref")
-        None
-      } { entity: Entity => Some(new TeiResolver.Resolved(
+      Site.this.findByRef(ref).map { entity: Entity => Some(TeiResolver.Resolved(
         url = EntityObject.teiWrapperUrl(entity),
         role = Some(Viewer.Names.name)
-      ))}
+      ))}.getOrElse {
+        Site.logger.warn(s"did not find reference: $ref")
+        None
+      }
 
-    override def facs: TeiResolver.Resolved = new TeiResolver.Resolved(
+    override def facs: TeiResolver.Resolved = TeiResolver.Resolved(
       url = facsUrl,
       role = Some(Viewer.Facsimile.name)
     )

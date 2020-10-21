@@ -10,9 +10,9 @@ final class Tei2HtmlTest extends AnyFlatSpec with Matchers {
   private def tei2html(element: Elem): Elem = {
 //    println(Xhtml.prettyPrinter.render(element))
     val resolver = new TeiResolver {
-      override def resolve(url:  String): Option[TeiResolver.Resolved] = None
+      override def resolve(url: Seq[String]): Option[TeiResolver.Resolved] = None
       override def findByRef(ref:  String): Option[TeiResolver.Resolved] = None
-      override def facs: TeiResolver.Resolved = new TeiResolver.Resolved(
+      override def facs: TeiResolver.Resolved = TeiResolver.Resolved(
         url = Seq("facsimiles"),
         role = Some("facsViewer")
       )
