@@ -81,30 +81,21 @@ object Tei2Html {
         state
       )
 
-      // TODO clean up the duplication
     case Ref.elementName =>
       require(!Xml.isEmpty(element))
       val target = targetAttribute.doGet(element)
-      if (!target.startsWith("/")) {
-        Some(TransformResult(
-          <a href={target}>
-            {Xml.getChildren(element)}
-          </a>,
-          Seq(targetAttribute),
-          state
-        ))
-      } else {
-        val (url, part) = Files.urlAndPart(target)
-        state.resolver.resolve(url).map { resolved =>
-          TransformResult(
-            <a href={Files.mkUrl(Files.addPart(resolved.url, part))} target={resolved.role.orNull}>
-              {Xml.getChildren(element)}
-            </a>,
-            Seq(targetAttribute),
-            state
-          )
-        }
-      }
+      val resolved: Option[TeiResolver.Resolved] =
+        if (!target.startsWith("/")) None
+        else state.resolver.resolve(Files.urlAndPart(target)._1)
+      val (href: String, role: Option[String]) = resolved.map(resolved => (
+        Files.mkUrl(Files.addPart(resolved.url, Files.urlAndPart(target)._2)),
+        resolved.role
+      )).getOrElse((target, None))
+      Some(TransformResult(
+        <a href={href} target={role.orNull}>{Xml.getChildren(element)}</a>,
+        Seq(targetAttribute),
+        state
+      ))
 
     case Pb.elementName =>
       val pageId: String = Page.pageId(Pb.nAttribute.doGet(element))
