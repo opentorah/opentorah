@@ -35,7 +35,7 @@ object Main {
       title = "Документы",
       author = "www.alter-rebbe.org",
       email = "dub@opentorah.org",
-      faviconJpeg = "alter-rebbe",
+      faviconJpg = "alter-rebbe",
       googleAnalyticsId = Some("UA-154490117-1"),
       navigationLinks = Seq(
         NavigationLink("/names", "Имена", Some(Viewer.Names)),

@@ -69,8 +69,6 @@ object Files {
 
   def urlAndPart(what: String): (String, Option[String]) = Strings.split(what, '#')
 
-  def removePart(from: String): String = urlAndPart(from)._1
-
   def addPart(url: Seq[String], part: Option[String]): Seq[String] =
     part.fold(url){ part => addPart(url, part) }
 

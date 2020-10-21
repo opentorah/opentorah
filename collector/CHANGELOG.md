@@ -3,12 +3,16 @@
 Modules covered: `collector` and `collector-service`.
 
 ## [Unreleased]
-- separate lists of empty and non-empty pages;
 
-## [0.7.53] - 2020-08-23 (`collector-service`)
+## [0.1.55]
+- converting TEI to HTML in code (no more CETEIcean);
+- generating HTML in code (no more Jekyll for the TEI files)
+- UI improvements;
+
+## [0.1.53] - 2020-08-23 (`collector-service`)
 - tracking StaticFile fix;
 
-## [0.7.52] - 2020-07-03 (`collector-service`)
+## [0.1.52] - 2020-07-03 (`collector-service`)
 - instructions for the `collector-service` setup;
 - logging using Logback to integrate with Cloud Run logging;
 - use structured logging (with request trace);

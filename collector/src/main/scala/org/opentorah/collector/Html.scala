@@ -20,7 +20,7 @@ object Html {
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <link rel="stylesheet" href={s"/assets/${pageParameters.style}.css"}/>
-        <link rel="icon" type="image/jpeg" href={s"/${siteParameters.faviconJpeg}.jpeg"}/>
+        <link rel="icon" type="image/jpeg" href={s"/${siteParameters.faviconJpg}.jpg"}/>
       </head>
       <body>
         {header(siteParameters, pageParameters)}

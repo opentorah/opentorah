@@ -3,6 +3,7 @@
 Modules covered: `calendar`, `calendar-service`, `schedule` and `calendar-paper`.
 
 ## [Unreleased]
+- preparing for the switch to Scala 2.13/3;
 
 ## [0.3.3] - 2020-05-31
 - simplified directory structure
