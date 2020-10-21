@@ -81,10 +81,19 @@ object Tei2Html {
         state
       )
 
+      // TODO clean up the duplication
     case Ref.elementName =>
       require(!Xml.isEmpty(element))
       val target = targetAttribute.doGet(element)
-      if (!target.startsWith("/")) None else {
+      if (!target.startsWith("/")) {
+        Some(TransformResult(
+          <a href={target}>
+            {Xml.getChildren(element)}
+          </a>,
+          Seq(targetAttribute),
+          state
+        ))
+      } else {
         val (url, part) = Files.urlAndPart(target)
         state.resolver.resolve(url).map { resolved =>
           TransformResult(
