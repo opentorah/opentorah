@@ -5,7 +5,7 @@ import scala.xml.Node
 
 abstract class SimpleSiteObject(site: Site) extends SiteObject(site) {
 
-  final override protected def htmlUrl: Seq[String] =
+  final override def htmlUrl: Seq[String] =
     urlPrefix :+ (fileName + ".html")
 
   protected def urlPrefix: Seq[String] = Seq.empty

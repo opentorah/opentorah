@@ -55,7 +55,7 @@ object SiteObject {
         case Hierarchy       .directoryName => HierarchyObject .resolve(site, Path.empty, site.store, tail)
         case CollectionObject.directoryName => CollectionObject.resolve(site, tail)
         case EntityObject    .directoryName => EntityObject    .resolve(site, tail)
-        case ReportObject    .directoryName => ReportObject    .resolve(site, tail)
+        case ReportsObject   .directoryName => ReportsObject   .resolve(site, tail)
 
         case file if parts.tail.isEmpty =>
           val (fileName: String, extension: Option[String]) = Files.nameAndExtension(file)
