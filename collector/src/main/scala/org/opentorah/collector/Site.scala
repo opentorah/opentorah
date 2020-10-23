@@ -157,7 +157,8 @@ object Site {
       writeSiteFile(documentObject.facsFile, directory)
     }
 
-    Files.deleteFiles(new File(directory, ReportObject.directoryName))
+    Files.deleteFiles(new File(directory, ReportsObject.directoryName))
+    writeHtmlFile(new ReportsObject(site), directory)
     writeHtmlFile(new MisnamedEntitiesReport(site), directory)
     writeHtmlFile(new NoRefsReport(site), directory)
   }

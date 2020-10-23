@@ -62,7 +62,6 @@ object Tei2Html {
       transformNodes(result :+ nTransformed, ns, nextState, transformer)
   }
 
-  private val refAttribute: Attribute[String] = Attribute("ref")
   private val targetAttribute: Attribute[String] = Attribute("target")
   private val urlAttribute: Attribute[String] = Attribute("url")
   private val placeAttribute: Attribute[String] = Attribute("place")
@@ -71,7 +70,7 @@ object Tei2Html {
   private def elementTransformer(element: Elem, state: State): Option[TransformResult[State]] = element.label match {
 
     case label if EntityType.isName(label) =>
-      val ref: Option[String] = refAttribute.get(element)
+      val ref: Option[String] = EntityName.refAttribute.get(element)
       val (href: Option[String], role: Option[String]) =
         ref.flatMap(ref => state.resolver.findByRef(ref)).map(resolved => (
           Some(Files.mkUrl(resolved.url)),

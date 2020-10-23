@@ -7,10 +7,6 @@ We are moving towards making the site dynamic, so that we can add:
 - search functionality;
 - ability to modify the site.
 
-To support self-contained dynamic site we need to replicate some of the Jekyll's functionality:
-- compile SCSS into CSS: compass/jsass?;
-- convert Markdown to HTML (blog, notes): flexmark-java or Laika (planet42.github.io/Laika).
-
 ## Project Setup ##
 
 - activated free Google Cloud Platform trial for `dub@opentorah.org` account (6/14/2020); 

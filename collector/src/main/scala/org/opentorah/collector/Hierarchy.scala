@@ -13,9 +13,10 @@ object Hierarchy {
 
   def urlPrefix(path: Path): Seq[String] = directoryName +: segments(path)
 
-  private def segments(path: Path): Seq[String] =
+  // TODO move to Path
+  def segments(path: Path): Seq[String] =
     path.path.flatMap(binding => Seq(binding.selector.names, binding.store.names))
-      .map(getName)
+      .map(getName) // TODO English for the hierarchy
       .map(Files.spacesToUnderscores)
 
   def fullName(path: Path): String = path.path.map { binding =>
