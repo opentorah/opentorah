@@ -1,6 +1,6 @@
 package org.opentorah.collector
 
-import org.opentorah.tei.Tei
+import org.opentorah.tei.{EntityName, Tei}
 import org.opentorah.util.Files
 import scala.xml.Node
 
@@ -17,7 +17,15 @@ final class MisnamedEntitiesReport(site: Site) extends ReportObject(site) {
       val id: String = entity.id.get
       val expectedId: String = Files.spacesToUnderscores(entity.name)
       if (id == expectedId) None
-      else Some(<l xmlns={Tei.namespace.uri}>{s"'$id' должен по идее называться '$expectedId'"}</l>)
+      else Some(
+        <l xmlns={Tei.namespace.uri}>
+        {EntityName.toXmlElement(new EntityName(
+          entityType = entity.entityType,
+          ref = Some(id),
+          name = id
+        ))}
+        {s"должен по идее называться '$expectedId'"}
+      </l>)
     }
 }
 
