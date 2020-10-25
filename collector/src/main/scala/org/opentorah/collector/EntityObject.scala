@@ -81,6 +81,7 @@ object EntityObject {
 
   private def fileName(entity: Entity): String = entity.id.get
 
+  // TODO eliminate
   def teiWrapperUrl(entity: Entity): Seq[String] = urlPrefix :+ (fileName(entity) + ".html")
 
   def resolve(site: Site, parts: Seq[String]): Option[SiteFile] =

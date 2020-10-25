@@ -38,6 +38,7 @@ abstract class SiteObject(val site: Site) {
   def isWide: Boolean = false
 
   // TODO some override it, some do not - ?!
+  // TODO use more uniformly - not just for pages, but for reports also.
   def title: Option[String] = None
 
   protected def navigationLinks: Seq[NavigationLink] = Seq.empty

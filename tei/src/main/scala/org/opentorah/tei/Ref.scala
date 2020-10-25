@@ -28,11 +28,13 @@ object Ref extends Element.WithToXml[Ref]("ref") {
     Antiparser.xml.compose(_.text)
   )
 
+  // TODO eliminate
   def toXml(
     target: Seq[String],
     text: String
   ): Elem = toXmlElement(new Ref(Files.mkUrl(target), Xml.mkText(text)))
 
+  // TODO eliminate
   def toXml(
     target: Seq[String],
     text: Seq[Node]

@@ -1,30 +1,31 @@
 package org.opentorah.collector
 
-import org.opentorah.tei.{EntityName, Tei}
-import scala.xml.Node
+import org.opentorah.store.WithPath
+import org.opentorah.tei.{EntityName, EntityReference, Tei}
+import scala.xml.Elem
 
-final class NoRefsReport(site: Site) extends ReportObject(site) {
+final class NoRefsReport(site: Site) extends ReportObject[WithPath[EntityReference]](site) {
 
   override protected def fileName: String = NoRefsReport.fileName
 
   override protected def viewer: Viewer = Viewer.Names
 
-  // TODO give a link to the ref:
-  override protected def teiBody: Seq[Node] =
-    <head xmlns={Tei.namespace.uri}>{NoRefsReport.title}</head> ++
-      (for (reference <- site.references.filter(_.value.ref.isEmpty)) yield {
-        // TODO call one method to get the ref?
-        val collectionName: String = Hierarchy.referenceCollectionName(reference)
-        val documentName: String = Hierarchy.storeName(reference.path.last.store)
-        val ref: String = s"/$collectionName/$documentName"
+  override def title: Option[String] = Some(NoRefsReport.title)
 
-        <l xmlns={Tei.namespace.uri}>
-          {EntityName.toXmlElement(new EntityName(
-          entityType = reference.value.entityType,
-          name = reference.value.name.map(_.text.trim).mkString(" ")
-        ))} в {ref}
-        </l>
-      })
+  override protected def lines: Seq[WithPath[EntityReference]] =
+    site.references.filter(_.value.ref.isEmpty)
+
+  override protected def lineToXml(reference: WithPath[EntityReference]): Elem = {
+    // TODO give a link to the ref:
+    // TODO call one method to get the ref?
+    val collectionName: String = Hierarchy.referenceCollectionName(reference)
+    val documentName: String = Hierarchy.storeName(reference.path.last.store)
+    val ref: String = s"/$collectionName/$documentName"
+
+    <l xmlns={Tei.namespace.uri}>
+      {EntityName.toXmlElement(EntityName.forReference(reference.value))} в {ref}
+    </l>
+  }
 }
 
 object NoRefsReport {
