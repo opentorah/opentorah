@@ -122,6 +122,12 @@ object Html {
 //      <span class="username">{username}</span>
 //    </a>
 
+  // TODO
+  // - make the header element present only if there is a title
+  // - apply (inline) this in the defaultLayout (and rename it)
+  // - remove the code that hand-adds the title (in reports and names)
+  // - go through the overrides of the title and see which should be removed - and which added
+  // - title extracted from TEI - maybe this is where it goes?
   def pageLayout(
     siteParameters: SiteParameters,
     pageParameters: PageParameters,

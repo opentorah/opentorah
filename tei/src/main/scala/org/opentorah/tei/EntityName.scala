@@ -2,11 +2,11 @@ package org.opentorah.tei
 
 import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, ToXml, Xml}
 
-final class EntityName(
-  val entityType: EntityType,
-  val id: Option[String] = None,
-  val ref: Option[String] = None,
-  val name: String
+final case class EntityName(
+  entityType: EntityType,
+  id: Option[String] = None,
+  ref: Option[String] = None,
+  name: String
 )
 
 object EntityName extends ToXml[EntityName] {
@@ -20,7 +20,7 @@ object EntityName extends ToXml[EntityName] {
       id <- Xml.idAttribute.optional
       ref <- refAttribute.optional
       name <- org.opentorah.xml.Text().required
-    } yield new EntityName(entityType, id, ref, name)
+    } yield EntityName(entityType, id, ref, name)
   }
 
   override protected def elementName(value: EntityName): String = value.entityType.nameElement
@@ -29,5 +29,17 @@ object EntityName extends ToXml[EntityName] {
     Xml.idAttribute.toXmlOption.compose[EntityName](_.id),
     refAttribute.toXmlOption.compose[EntityName](_.ref),
     Antiparser.xml.compose[EntityName](value => Seq(Xml.mkText(value.name)))
+  )
+
+  // TODO just the entity.entityName, like in the NamesObject?
+  def forEntity(entity: Entity): EntityName = EntityName(
+    entityType = entity.entityType,
+    ref = entity.id,
+    name = entity.id.getOrElse("")
+  )
+
+  def forReference(entityReference: EntityReference): EntityName = EntityName(
+    entityType = entityReference.entityType,
+    name = entityReference.name.map(_.text.trim).mkString(" ")
   )
 }
