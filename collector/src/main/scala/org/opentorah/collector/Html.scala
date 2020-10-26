@@ -7,9 +7,7 @@ object Html {
 
   // TODO SEO
   // TODO set 'lang' deeper than on the html element.
-
-  // Note: meta and link elements are closed to make Scala XML happy; I think this should work in the browsers :)
-  def defaultLayout(
+  def toHtml(
     siteParameters: SiteParameters,
     pageParameters: PageParameters,
     content: Elem
@@ -19,13 +17,21 @@ object Html {
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        {pageParameters.headTitle.toSeq.map(title => <title>{title}</title>)}
         <link rel="stylesheet" href={s"/assets/${pageParameters.style}.css"}/>
         <link rel="icon" type="image/jpeg" href={s"/${siteParameters.faviconJpg}.jpg"}/>
       </head>
       <body>
         {header(siteParameters, pageParameters)}
         <main class="page-content" aria-label="Content">
-          <div class="wrapper">{content}</div>
+          <div class="wrapper">
+            <article class="post">
+              {pageParameters.title.toSeq.map(title => <header class="post-header"><h1 class="post-title">{title}</h1></header>)}
+              <div class="post-content">
+                {content}
+              </div>
+            </article>
+          </div>
         </main>
         {footer(siteParameters)}
       </body>
@@ -37,7 +43,7 @@ object Html {
   private def optionToJs(value: Option[String]): String =
     value.fold("null")(value => s"'$value'")
 
-  def header(siteParameters: SiteParameters, pageParameters: PageParameters): Elem =
+  private def header(siteParameters: SiteParameters, pageParameters: PageParameters): Elem =
     <header class="site-header" role="banner">
       <div class="wrapper">
         <a class="site-title" rel="author" target={siteParameters.homeTarget.name} href="/">{siteParameters.title}</a>
@@ -52,17 +58,17 @@ object Html {
 
   // TODO doesn't seem to work - fix the CSS or remove?
   // To enable, add {navTrigger} <nav class="site-nav">
-  val navTrigger: Seq[Elem] = Seq(
-      <input type="checkbox" id="nav-trigger" class="nav-trigger"/>,
-      <label for="nav-trigger">
-        <span class="menu-icon">
-          <svg viewBox="0 0 18 15" width="18px" height="15px">
-            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
-          </svg>
-        </span>
-      </label>)
+//  private val navTrigger: Seq[Elem] = Seq(
+//      <input type="checkbox" id="nav-trigger" class="nav-trigger"/>,
+//      <label for="nav-trigger">
+//        <span class="menu-icon">
+//          <svg viewBox="0 0 18 15" width="18px" height="15px">
+//            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+//          </svg>
+//        </span>
+//      </label>)
 
-  def footer(siteParameters: SiteParameters): Elem =
+  private def footer(siteParameters: SiteParameters): Elem =
     <footer class="site-footer h-card">
       <data class="u-url" href="/"/>
 
@@ -75,34 +81,30 @@ object Html {
             </ul>
           </div>
           <div class="footer-col footer-col-2">
-            <ul class="social-media-list">{social(siteParameters.githubUsername, siteParameters.twitterUsername)}</ul>
+            <ul class="social-media-list">{
+              social(siteParameters.githubUsername, "github.com", "github") ++
+              social(siteParameters.twitterUsername, "www.twitter.com", "twitter")
+            }</ul>
           </div>
           <div class="footer-col footer-col-3">{siteParameters.footerCol3}</div>
         </div>
       </div>
     </footer>
 
-  def social(githubUsername: Option[String], twitterUsername: Option[String]): Seq[Elem] =
-    githubUsername.toSeq.map(githubUsername =>
-      <li>
-        <a href={s"https://github.com/$githubUsername"}>
-          <svg class="svg-icon">
-            <use xmlns:xlink={XLink.namespace.uri} xlink:href="/assets/minima-social-icons.svg#github"/>
-          </svg>
-          <span class="username">{githubUsername}</span>
-        </a>
-      </li>) ++
-    twitterUsername.toSeq.map(twitterUsername =>
-      <li>
-        <a href={s"https://www.twitter.com/$twitterUsername"}>
-          <svg class="svg-icon">
-            <use xmlns:xlink={XLink.namespace.uri} xlink:href="/assets/minima-social-icons.svg#twitter"/>
-          </svg>
-          <span class="username">{twitterUsername}</span>
-        </a>
-      </li>)
+  // TODO make opentorah Twitter account!
 
-//  private def iconTwitter(username: String): Elem =
+  private def social(username: Option[String], serviceUrl: String, iconPart: String): Seq[Elem] =
+    username.toSeq.map(username =>
+    <li>
+      <a href={s"https://$serviceUrl/$username"}>
+        <svg class="svg-icon">
+          <use xmlns:xlink={XLink.namespace.uri} xlink:href={s"/assets/minima-social-icons.svg#$iconPart"}/>
+        </svg>
+        <span class="username">{username}</span>
+      </a>
+    </li>)
+
+  //  private def iconTwitter(username: String): Elem =
 //    <a href={s"https://twitter.com/$username"}>
 //      <span class="icon icon--twitter">
 //        <svg viewBox="0 0 16 16" width="16px" height="16px">
@@ -121,28 +123,4 @@ object Html {
 //      </span>
 //      <span class="username">{username}</span>
 //    </a>
-
-  // TODO
-  // - make the header element present only if there is a title
-  // - apply (inline) this in the defaultLayout (and rename it)
-  // - remove the code that hand-adds the title (in reports and names)
-  // - go through the overrides of the title and see which should be removed - and which added
-  // - title extracted from TEI - maybe this is where it goes?
-  def pageLayout(
-    siteParameters: SiteParameters,
-    pageParameters: PageParameters,
-    content: Elem
-  ): Elem = defaultLayout(
-    siteParameters,
-    pageParameters,
-    <article class="post">
-      <header class="post-header">
-        <h1 class="post-title">{pageParameters.title.get}</h1>
-      </header>
-
-      <div class="post-content">
-        {content}
-      </div>
-    </article>
-  )
 }

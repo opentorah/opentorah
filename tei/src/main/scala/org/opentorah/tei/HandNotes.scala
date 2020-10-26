@@ -18,7 +18,7 @@ object HandNotes extends Element.WithToXml[HandNotes]("handNotes") {
   )
 
   override protected val antiparser: Antiparser[HandNotes] = Tei.concat(
-    // TODO why do I need [] in compose() here?
+    // TODO why do I need [HandNotes] in compose() here?
     HandNote.parsable.toXmlSeq.compose[HandNotes](_.handNotes)
   )
 }

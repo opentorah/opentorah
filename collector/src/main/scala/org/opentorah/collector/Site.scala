@@ -62,7 +62,7 @@ final class Site(
   def resolver(facsUrl: Seq[String]): TeiResolver = new TeiResolver {
 
     override def resolve(url: Seq[String]): Option[TeiResolver.Resolved] =
-      SiteObject.resolve(Site.this, url).fold[Option[TeiResolver.Resolved]] {
+      new RootSiteObject(Site.this).resolve(url).fold[Option[TeiResolver.Resolved]] {
         Site.logger.warn(s"did not resolve: $url")
         None
       } { siteFile: SiteFile => Some(TeiResolver.Resolved(
@@ -154,7 +154,7 @@ object Site {
     } {
       val documentObject = new DocumentObject(site, collection, document, teiHolder)
       writeHtmlFile(documentObject, directory)
-      writeSiteFile(documentObject.facsFile, directory)
+      writeSiteFile(documentObject, documentObject.facsFile, directory)
     }
 
     Files.deleteFiles(new File(directory, ReportsObject.directoryName))
@@ -164,10 +164,10 @@ object Site {
   }
 
   private final def writeHtmlFile(siteObject: SiteObject, directory: File): Unit =
-    writeSiteFile(siteObject.htmlFile, directory)
+    writeSiteFile(siteObject, siteObject.htmlFile, directory)
 
-  private final def writeSiteFile(siteFile: SiteFile, directory: File): Unit =
-    Files.write(Files.file(directory, siteFile.url), siteFile.content)
+  private final def writeSiteFile(siteObject: SiteObject, siteFile: SiteFile, directory: File): Unit =
+    Files.write(Files.file(directory, siteFile.url), siteObject.content(siteFile))
 
   val addPublicationStatement: Tei.Transformer = Tei.addPublicationStatement(
     publisher = new Publisher.Value(<ptr xmlns={Tei.namespace.uri} target="www.alter-rebbe.org"/>),

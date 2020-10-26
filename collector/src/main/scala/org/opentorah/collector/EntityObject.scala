@@ -9,7 +9,7 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
 
   override protected def urlPrefix: Seq[String] = EntityObject.urlPrefix
 
-  override protected def fileName: String = EntityObject.fileName(entity)
+  override def fileName: String = EntityObject.fileName(entity)
 
   override protected def viewer: Viewer = Viewer.Names
 
@@ -70,6 +70,8 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
       yield <l><emph>{Hierarchy.fullName(source)}:</emph>{sources(references)}</l>}
     </p>
   }
+
+  override def simpleSubObjects: Seq[SimpleSiteObject] = Seq.empty
 }
 
 object EntityObject {
@@ -83,10 +85,4 @@ object EntityObject {
 
   // TODO eliminate
   def teiWrapperUrl(entity: Entity): Seq[String] = urlPrefix :+ (fileName(entity) + ".html")
-
-  def resolve(site: Site, parts: Seq[String]): Option[SiteFile] =
-    if (parts.isEmpty || parts.tail.nonEmpty) None else {
-      val (fileName: String, extension: Option[String]) = Files.nameAndExtension(parts.head)
-      site.findByRef(fileName).flatMap(entity => SimpleSiteObject.resolve(extension, new EntityObject(site, entity)))
-    }
 }

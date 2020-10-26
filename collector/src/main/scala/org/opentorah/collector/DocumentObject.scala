@@ -48,14 +48,12 @@ final class DocumentObject(
 
   // TODO generalize and move into SiteObject
   def facsFile: SiteFile = new SiteFile {
-    override def siteObject: SiteObject = DocumentObject.this
-
     override def viewer: Viewer = Viewer.Facsimile
 
     override def url: Seq[String] = facsUrl
 
     // TODO do pages of the appropriate teiHolder!
-    override protected def contentElement: Elem =
+    override def contentElement: Elem =
       <div class={Viewer.Facsimile.name}>
         {headerSummary}
         <div class="facsimileScroller">{
@@ -73,7 +71,7 @@ final class DocumentObject(
         }}</div>
       </div>
 
-    override protected def navigationLinks: Seq[NavigationLink] =
+    override def navigationLinks: Seq[NavigationLink] =
       navigation ++
       Seq(NavigationLink(htmlUrl, "A", Some(Viewer.Document)))
   }
@@ -86,6 +84,8 @@ final class DocumentObject(
     Seq(NavigationLink(document.name, document.name, None)) ++
     next.toSeq.map(next => NavigationLink(next.name, "⇨", None))
   }
+
+  override def simpleSubObjects: Seq[SimpleSiteObject] = Seq.empty
 }
 
 object DocumentObject {

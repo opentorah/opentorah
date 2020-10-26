@@ -5,7 +5,6 @@ import org.opentorah.xml.{Attribute, Namespace, Xhtml, Xml}
 import scala.xml.{Elem, Node}
 
 // TODO
-// - when transforming <TEI>, <titleStmt><title>TITLE</title></titleStmt> should become <html><head><title>TITLE</title></head></html>
 // - copy xml:id to id (why?); what is the difference between xml:id and id?
 // - copy xml:lang to lang (why?);
 // - copy rendition to class, removing the (leading?) '#' (or just use 'rendition' - TEI defines its own 'class'?);
@@ -144,7 +143,7 @@ object Tei2Html {
     case "cell" =>
       Some(TransformResult(
         <td colspan={colsAttribute.get(element).orNull}>{Xml.getChildren(element)}</td>,
-        Seq.empty, // TODO Seq(colsAttribute)?
+        Seq.empty,
         state
       ))
 

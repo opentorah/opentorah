@@ -7,15 +7,17 @@ import scala.xml.Node
 
 final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
 
-  override protected def fileName: String = TreeIndexObject.fileName
+  override def fileName: String = "collections"
 
   override protected def viewer: Viewer = Viewer.Collection
 
-  override def title: Option[String] = Some(TreeIndexObject.title)
+  override def title: Option[String] = Some("Архивы")
 
-  override protected def teiBody: Seq[Node] =
-    <head xmlns={Tei.namespace.uri}>{Ref.toXml(new HierarchyObject(site, Path.empty, site.store).htmlFile.url, TreeIndexObject.title)}</head> ++
-    listForStore(Path.empty, site.store)
+  // TODO there is now no link from here to the root of the hierarchy:
+  //   Ref.toXml(new HierarchyObject(site, Path.empty, site.store).htmlFile.url, TreeIndexObject.title)
+  // add it somewhere - or wait until 'by' is merged with the 'collections'...
+  // Aslo, maybe add hierarchy links to the 'by' pages...
+  override protected def teiBody: Seq[Node] = listForStore(Path.empty, site.store)
 
   private def listForStore(path: Path, store: Store): Seq[Node] = store.by.toSeq.flatMap { by: By[_] =>
     <list xmlns={Tei.namespace.uri} type="none">
@@ -35,10 +37,6 @@ final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
       </list></item>
     </list>
   }
-}
 
-object TreeIndexObject {
-  val fileName: String = "collections"
-
-  private val title: String = "Архивы"
+  override def simpleSubObjects: Seq[SimpleSiteObject] = Seq.empty
 }

@@ -6,7 +6,7 @@ import scala.xml.{Elem, Node}
 
 final class NamesObject(site: Site) extends SimpleSiteObject(site) {
 
-  override protected def fileName: String = NamesObject.fileName
+  override def fileName: String = NamesObject.fileName
 
   override protected def viewer: Viewer = Viewer.Names
 
@@ -25,13 +25,22 @@ final class NamesObject(site: Site) extends SimpleSiteObject(site) {
       </list>
         .copy(label = value.entityType.listElement)
 
-    <head xmlns={Tei.namespace.uri}>{NamesObject.title}</head> ++ listOfLists ++ nonEmptyLists.flatMap(toXml)
+    listOfLists ++ nonEmptyLists.flatMap(toXml)
   }
+
+  def resolve(parts: Seq[String]): Option[SiteFile] =
+    if (parts.isEmpty || parts.tail.nonEmpty) None else {
+      val (fileName: String, extension: Option[String]) = Files.nameAndExtension(parts.head)
+      site.findByRef(fileName).flatMap(entity => SimpleSiteObject.resolve(extension, new EntityObject(site, entity)))
+    }
+
+  override def simpleSubObjects: Seq[SimpleSiteObject] = Seq.empty
 }
 
+// TODO eliminate
 object NamesObject {
 
-  val fileName: String = "names"
+  private val fileName: String = "names"
 
   val title: String = "Имена"
 

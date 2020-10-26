@@ -1,9 +1,10 @@
 package org.opentorah.collector
 
-class PageParameters(
+final class PageParameters(
   val lang: String = "en",
   val style: String,
-  val title: Option[String] = None,
-  val target: Option[Viewer] = None,
+  val headTitle: Option[String],
+  val title: Option[String],
+  val target: Option[Viewer],
   val navigationLinks: Seq[NavigationLink]
 )
