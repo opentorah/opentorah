@@ -6,11 +6,11 @@ import scala.xml.Elem
 
 final class MisnamedEntitiesReport(site: Site) extends ReportObject[Entity](site) {
 
-  override protected def fileName: String = MisnamedEntitiesReport.fileName
+  override def fileName: String = "misnamed-entities"
 
   override protected def viewer: Viewer = Viewer.Names
 
-  override def title: Option[String] = Some(MisnamedEntitiesReport.title)
+  override def title: Option[String] = Some("Неправильно названные файлы с именами")
 
   override protected def lines: Seq[Entity] = site.entities
     .filterNot(entity => entity.id.contains(getExpectedId(entity)))
@@ -22,11 +22,6 @@ final class MisnamedEntitiesReport(site: Site) extends ReportObject[Entity](site
     </l>
 
   private def getExpectedId(entity: Entity): String = Files.spacesToUnderscores(entity.name)
-}
 
-object MisnamedEntitiesReport {
-
-  val fileName: String = "misnamed-entities"
-
-  val title: String = "Неправильно названные файлы с именами"
+  override def simpleSubObjects: Seq[SimpleSiteObject] = Seq.empty
 }

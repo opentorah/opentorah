@@ -5,20 +5,17 @@ import scala.xml.Node
 
 final class IndexObject(site: Site) extends SimpleSiteObject(site) {
 
-  override protected def fileName: String = IndexObject.fileName
+  override def fileName: String = "index"
 
   override protected def viewer: Viewer = Viewer.Collection
 
+  override def title: Option[String] = Some("Дела")
+
   override protected def teiBody: Seq[Node] = {
-    <head xmlns={Tei.namespace.uri}>{IndexObject.title}</head> ++
     <list xmlns={Tei.namespace.uri} type="bulleted">
       {for (collection <- site.publishedCollections) yield Hierarchy.collectionXml(site, collection)}
     </list>
   }
-}
 
-object IndexObject {
-  val fileName: String = "index"
-
-  private val title: String = "Дела"
+  override def simpleSubObjects: Seq[SimpleSiteObject] = Seq.empty
 }

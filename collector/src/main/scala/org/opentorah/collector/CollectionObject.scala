@@ -10,7 +10,7 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
 
   override protected def urlPrefix: Seq[String] = CollectionObject.urlPrefix(collection)
 
-  override protected def fileName: String = CollectionObject.fileName
+  override def fileName: String = CollectionObject.fileName
 
   override protected def viewer: Viewer = Viewer.Collection
 
@@ -38,13 +38,14 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
       listMissing("пустых", page => page.pb.isMissing && page.pb.isEmpty) ++
       listMissing("непустых", page => page.pb.isMissing && !page.pb.isEmpty)
   }
+
+  override def simpleSubObjects: Seq[SimpleSiteObject] = Seq.empty
 }
 
 object CollectionObject {
 
   val fileName: String = "index"
 
-  // TODO eliminate
   def urlPrefix(collection: WithPath[Collection]): Seq[String] =
     Seq(CollectionObject.directoryName, Hierarchy.fileName(collection.value))
 
@@ -58,6 +59,7 @@ object CollectionObject {
   def navigationLink(collection: WithPath[Collection]): NavigationLink =
     NavigationLink("../index", s"[${Hierarchy.storeName(collection.value)}]", Some(Viewer.Collection))
 
+  // TODO move into CollectionsObject (together with its directory name)
   def resolve(site: Site, parts: Seq[String]): Option[SiteFile] = if (parts.isEmpty) None else
     site.findCollectionByName(parts.head).flatMap { collection =>
       def resolveDocument(f: DocumentObject => SiteFile): Option[SiteFile] =

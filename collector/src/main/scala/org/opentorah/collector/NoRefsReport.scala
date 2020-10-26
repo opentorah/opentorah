@@ -6,11 +6,11 @@ import scala.xml.Elem
 
 final class NoRefsReport(site: Site) extends ReportObject[WithPath[EntityReference]](site) {
 
-  override protected def fileName: String = NoRefsReport.fileName
+  override def fileName: String = "no-refs"
 
   override protected def viewer: Viewer = Viewer.Names
 
-  override def title: Option[String] = Some(NoRefsReport.title)
+  override def title: Option[String] = Some("Имена без атрибута /ref/")
 
   override protected def lines: Seq[WithPath[EntityReference]] =
     site.references.filter(_.value.ref.isEmpty)
@@ -26,11 +26,6 @@ final class NoRefsReport(site: Site) extends ReportObject[WithPath[EntityReferen
       {EntityName.toXmlElement(EntityName.forReference(reference.value))} в {ref}
     </l>
   }
-}
 
-object NoRefsReport {
-
-  val fileName: String = "no-refs"
-
-  val title: String = "Имена без атрибута /ref/"
+  override def simpleSubObjects: Seq[SimpleSiteObject] = Seq.empty
 }

@@ -18,7 +18,7 @@ object PublicationStmt extends Element.WithToXml[PublicationStmt]("publicationSt
   )
 
   override protected val antiparser: Antiparser[PublicationStmt] = Tei.concat(
-    // TODO why do I need [T] for the compose() calls here?
+    // TODO why do I need [PublicationStmt] for the compose() calls here?
     Publisher.parsable.toXmlOption.compose[PublicationStmt](_.publisher),
     Availability.toXmlOption.compose[PublicationStmt](_.availability)
   )

@@ -10,7 +10,7 @@ abstract class SimpleSiteObject(site: Site) extends SiteObject(site) {
 
   protected def urlPrefix: Seq[String] = Seq.empty
 
-  protected def fileName: String
+  def fileName: String
 
   final override protected def tei: Tei = Tei(teiBody)
 

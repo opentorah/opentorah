@@ -8,7 +8,7 @@ import scala.xml.Node
 
 final class HierarchyObject(site: Site, path: Path, store: Store) extends SimpleSiteObject(site) {
 
-  override protected def fileName: String = HierarchyObject.fileName
+  override def fileName: String = HierarchyObject.fileName
 
   override protected def urlPrefix: Seq[String] = Hierarchy.urlPrefix(path)
 
@@ -29,6 +29,8 @@ final class HierarchyObject(site: Site, path: Path, store: Store) extends Simple
       }}</list>
     </p>
   }
+
+  override def simpleSubObjects: Seq[SimpleSiteObject] = Seq.empty
 }
 
 object HierarchyObject {
