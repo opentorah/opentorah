@@ -14,6 +14,9 @@ dependencies {
   implementation project(':store')
   implementation project(':util')
 
+  implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+//  implementation "com.vladsch.flexmark:flexmark-util-ast:$flexmarkVersion"
+//  implementation "com.vladsch.flexmark:flexmark-util-data:$flexmarkVersion"
   implementation "ch.qos.logback:logback-classic:$logbackVersion"
 
   testImplementation "org.podval.tools:org.podval.tools.run:$podvalRunVersion"

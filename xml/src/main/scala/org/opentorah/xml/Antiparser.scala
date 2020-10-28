@@ -18,6 +18,7 @@ final class Antiparser[A] private(
 
 object Antiparser {
 
+  // TODO eliminate?
   def apply[A](
     attributes: A => Seq[Attribute.Value[_]] = (_: A) => Seq.empty,
     content   : A => Seq[Node]               = (_: A) => Seq.empty,
@@ -28,21 +29,9 @@ object Antiparser {
     namespace
   )
 
-  // Note this used to be called apply(),
-  // but when I added defaulted `namespace` parameter to the main apply(),
-  // compiler started getting confused...
   def concat[A](
     antiparsers: Antiparser[A]*
   ): Antiparser[A] = concat[A](None, antiparsers)
-
-  def concat[A](
-    namespace: Option[Namespace],
-    antiparsers: Seq[Antiparser[A]]
-  ): Antiparser[A] = apply[A](
-    attributes = Collections.concat(antiparsers.map(_.attributes)),
-    content    = Collections.concat(antiparsers.map(_.content   )),
-    namespace  = namespace
-  )
 
   def concatWithNamespace[A](
     namespace: Namespace,
@@ -50,6 +39,15 @@ object Antiparser {
   ): Antiparser[A] = concat[A](
     Some(namespace),
     antiparsers
+  )
+
+  private def concat[A](
+    namespace: Option[Namespace],
+    antiparsers: Seq[Antiparser[A]]
+  ): Antiparser[A] = apply[A](
+    attributes = Collections.concat(antiparsers.map(_.attributes)),
+    content    = Collections.concat(antiparsers.map(_.content   )),
+    namespace  = namespace
   )
 
   val xml: Antiparser[Seq[Node]] = apply[Seq[Node]](
