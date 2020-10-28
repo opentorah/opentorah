@@ -4,9 +4,16 @@ import org.opentorah.util.Files
 import org.opentorah.xml.{Attribute, Namespace, Xhtml, Xml}
 import scala.xml.{Elem, Node}
 
+// TODO introduce XXX -> Html converters (start with TEI):
+// - applies only to elements in a specified namespace
+// - prefixes the names of attributes that clash with HTML
+// - convert xml:id to id; if both are present - error;
+// - applies transformation that takes care of the linking and table elements
+
 // TODO
-// - split resolving from Tei->Html transform, so that Markdown can be transformed to Html and still resolved!
-// - do not add header fields to TEI that is transformed into HTML...
+// - split resolving from Tei->Html transform, so that Markdown can be transformed to Html and still resolved,
+//   - move resolver out of TEI (into Html)
+// - split notes handling into a separate pass; the rest of TEI -> HTML does not need state...
 // TODO
 // - copy xml:id to id (why?); what is the difference between xml:id and id?
 // - copy xml:lang to lang (why?);
@@ -49,23 +56,47 @@ object Tei2Html {
   private val placeAttribute: Attribute[String] = Attribute("place")
   private val colsAttribute: Attribute[String] = Attribute("cols")
 
+  private val teiAttributesSpecialForHtml: Set[Attribute[String]] = Set(
+    targetAttribute
+  )
+
+  private def addAttributes(
+    element: Elem,
+    htmlElement: Elem,
+    excludeAttributes: Seq[Attribute[String]],
+  ): Elem = Attribute.setAll(
+    // TODO
+    //  - drop 'target' attribute
+    //  - change xml:id attribute to just id
+    //  - add such a method to Html
+    // TODO do not copy to htmlElement attributes already set on it,
+    //  eliminate the excludeAttributes parameter
+    //  and add such a method to Attribute (addAll()?)
+    Xhtml.namespace.default.declare(htmlElement),
+    Seq(classAttribute.withValue(element.label)) ++
+      Attribute.getAll(htmlElement) ++
+      Attribute.getAll(element)
+        .filterNot(attributeWithValue => teiAttributesSpecialForHtml.contains(attributeWithValue.attribute))
+        .filterNot(attributeWithValue => excludeAttributes.contains(attributeWithValue.attribute))
+  )
+
   private def elementTransformer(element: Elem, state: State): (Elem, State) = {
     def toHtml(
       htmlElement: Elem,
       excludeAttributes: Seq[Attribute[String]] = Seq.empty,
-      newState: State = state
+      newState: State = state,
+      isEmpty: Boolean = false
     ): (Elem, State) = {
-      val result: Elem = Attribute.setAll(
-        Xhtml.namespace.default.declare(htmlElement),
-        Seq(classAttribute.withValue(element.label)) ++
-          Attribute.getAll(htmlElement) ++
-          Attribute.getAll(element)
-            .filterNot(attributeWithValue => excludeAttributes.contains(attributeWithValue.attribute))
-      )
+      val withAttributes: Elem = addAttributes(element, htmlElement, excludeAttributes)
+
+      val result: Elem =
+        if (isEmpty) {
+          require(Xml.isEmpty(element))
+          withAttributes
+        } else withAttributes.copy(child = Xml.getChildren(element))
+
       (result, newState)
     }
-
-    def withChildren(htmlElement: Elem): Elem = htmlElement.copy(child = Xml.getChildren(element))
 
     val result: (Elem, State) =
       if (Namespace.get(element) != Tei.namespace.default) (element, state)
@@ -77,6 +108,7 @@ object Tei2Html {
           (element.copy(label = "tei-body"), state)
 
         case label if EntityType.isName(label) =>
+          require(!Xml.isEmpty(element), element)
           val ref: Option[String] = EntityName.refAttribute.get(element)
           val (href: Option[String], role: Option[String]) =
             ref.flatMap(ref => state.resolver.findByRef(ref)).map(resolved => (
@@ -84,7 +116,7 @@ object Tei2Html {
               resolved.role
             )).getOrElse((ref, None))
 
-          toHtml(withChildren(<a href={href.orNull} target={role.orNull}/>))
+          toHtml(<a href={href.orNull} target={role.orNull}/>)
 
         case Ref.elementName =>
           require(!Xml.isEmpty(element))
@@ -96,41 +128,44 @@ object Tei2Html {
             )).getOrElse((target, None))
 
           toHtml(
-            withChildren(<a href={href} target={role.orNull}/>),
-            Seq(targetAttribute)
+            <a href={href} target={role.orNull}/>
           )
 
         case "ptr" =>
+          // TODO do not add text (href) to the ptr
           val href: String = targetAttribute.doGet(element)
           toHtml(
             <a href={href}>{href}</a>,
-            Seq(targetAttribute)
+            isEmpty = true
           )
 
         case Pb.elementName =>
+          // TODO make a separate pass adding ids to pbs, name references etc. - ensuring their uniqueness
           val pageId: String = Page.pageId(Pb.nAttribute.doGet(element))
-          require(Xml.isEmpty(element))
           toHtml(
             <a xml:id={pageId}
                href={Files.mkUrl(Files.addPart(state.resolver.facs.url, pageId))}
                target={state.resolver.facs.role.orNull}>⎙</a>,
-            Seq(Xml.idAttribute)
+            excludeAttributes = Seq(Xml.idAttribute),
+            isEmpty = true
           )
 
         case "graphic" =>
           // TODO In TEI <graphic> can contain <desc>, but are treating it as empty.
-          require(Xml.isEmpty(element))
-          toHtml(<img src={urlAttribute.doGet(element)}/>)
+          toHtml(
+            <img src={urlAttribute.doGet(element)}/>,
+            isEmpty = true
+          )
 
         case "table" =>
-          toHtml(withChildren(<table/>))
+          toHtml(<table/>)
 
         // TODO before the first row there can be <head>HEAD</head>; it becomes <caption>transform(HEAD)</caption>...
         case "row" =>
-          toHtml(withChildren(<tr/>))
+          toHtml(<tr/>)
 
         case "cell" =>
-          toHtml(withChildren(<td colspan={colsAttribute.get(element).orNull}/>))
+          toHtml(<td colspan={colsAttribute.get(element).orNull}/>)
 
         case "note" if placeAttribute.get(element).contains("end") =>
           val note: EndNote = new EndNote(
@@ -139,9 +174,12 @@ object Tei2Html {
             content = Xml.getChildren(element)
           )
 
-          toHtml(
-            <a id={note.srcId} href={s"#${note.contentId}"}><sup>{note.number}</sup></a>,
-            Seq(Xml.idAttribute),
+          (
+            addAttributes(
+              element,
+              <a id={note.srcId} href={s"#${note.contentId}"}><sup>{note.number}</sup></a>,
+              excludeAttributes = Seq(Xml.idAttribute)
+            ),
             new State(state.resolver, state.notes :+ note)
           )
 

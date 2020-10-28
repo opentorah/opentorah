@@ -47,6 +47,7 @@ abstract class SiteObject(val site: Site) {
   protected def viewer: Viewer
 
   // TODO generalize/conditionalize addCalendarDesc
+  // TODO do not add header fields to TEI that is transformed into HTML...
   protected def teiTransformer: Tei.Transformer =
     Site.addPublicationStatement compose Site.addSourceDesc compose Tei.addLanguage
 
