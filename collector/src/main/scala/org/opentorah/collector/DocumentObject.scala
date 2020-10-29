@@ -64,7 +64,7 @@ final class DocumentObject(
               .getOrElse(Site.facsimileBucket + Hierarchy.fileName(collection.value) + "/" + n + ".jpg")
             <a target={Viewer.Document.name} href={Files.mkUrl(href)}>
               <figure>
-                <img xml:id={Page.pageId(n)} alt={s"facsimile for page $n"} src={facs}/>
+                <img id={Page.pageId(n)} alt={s"facsimile for page $n"} src={facs}/>
                 <figcaption>{n}</figcaption>
               </figure>
             </a>

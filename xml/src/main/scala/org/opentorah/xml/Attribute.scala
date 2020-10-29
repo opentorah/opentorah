@@ -165,6 +165,13 @@ object Attribute {
   // Scala XML
   def getAll(element: scala.xml.Elem): Seq[Attribute.Value[String]] = Xml.getAttributes(element)
   def setAll(element: scala.xml.Elem, attributes: Seq[Attribute.Value[_]]): scala.xml.Elem = Xml.setAttributes(element, attributes)
+  def addAll(element: scala.xml.Elem, attributes: Seq[Attribute.Value[_]]): scala.xml.Elem = {
+    val existing: Seq[Attribute.Value[_]] = Attribute.getAll(element)
+    val toAdd: Seq[Attribute.Value[_]] = attributes
+      .filterNot(toAdd => existing.exists(existing => existing.attribute.name == toAdd.attribute.name))
+
+    Attribute.setAll(element, existing ++ toAdd)
+  }
 
   // DOM
   def getAll(element: org.w3c.dom.Element): Seq[Attribute.Value[String]] = Dom.getAttributes(element)

@@ -35,7 +35,7 @@ object Xml extends Model[Node] {
       result: Seq[Node],
       nodes: Seq[Node],
       state: S
-  ): (Seq[Node], S) = nodes match {
+    ): (Seq[Node], S) = nodes match {
       case Seq() => (result, state)
       case Seq(n, ns @ _*) =>
         val (nTransformed, nextState) =
