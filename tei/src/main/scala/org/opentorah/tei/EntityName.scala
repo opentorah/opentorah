@@ -25,7 +25,7 @@ object EntityName extends ToXml[EntityName] {
 
   override protected def elementName(value: EntityName): String = value.entityType.nameElement
 
-  override protected val antiparser: Antiparser[EntityName] = Antiparser.concatWithNamespace(Tei.namespace,
+  override protected val antiparser: Antiparser[EntityName] = Tei.concat(
     Xml.idAttribute.toXmlOption.compose[EntityName](_.id),
     refAttribute.toXmlOption.compose[EntityName](_.ref),
     Antiparser.xml.compose[EntityName](value => Seq(Xml.mkText(value.name)))

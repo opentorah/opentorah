@@ -2,8 +2,9 @@ package org.opentorah.collector
 
 import java.io.File
 import org.opentorah.store.{Entities, EntityHolder, Path, Store, WithPath}
-import org.opentorah.tei.{Entity, EntityReference, Publisher, SourceDesc, Tei, TeiResolver}
+import org.opentorah.tei.{Entity, EntityReference, Publisher, SourceDesc, Tei}
 import org.opentorah.util.Files
+import org.opentorah.xml.LinkResolver
 import org.slf4j.{Logger, LoggerFactory}
 import scala.xml.Node
 
@@ -59,13 +60,13 @@ final class Site(
 
   def findByRef(fileName: String): Option[Entity] =  store.entities.get.findByRef(fileName)
 
-  def resolver(facsUrl: Seq[String]): TeiResolver = new TeiResolver {
+  def resolver(facsUrl: Seq[String]): LinkResolver = new LinkResolver {
 
-    override def resolve(url: Seq[String]): Option[TeiResolver.Resolved] =
-      new RootSiteObject(Site.this).resolve(url).fold[Option[TeiResolver.Resolved]] {
+    override def resolve(url: Seq[String]): Option[LinkResolver.Resolved] =
+      new RootSiteObject(Site.this).resolve(url).fold[Option[LinkResolver.Resolved]] {
         Site.logger.warn(s"did not resolve: $url")
         None
-      } { siteFile: SiteFile => Some(TeiResolver.Resolved(
+      } { siteFile: SiteFile => Some(LinkResolver.Resolved(
         url = siteFile.url,
         role = siteFile match {
           case htmlFile: SiteFile => Some(htmlFile.viewer.name)
@@ -73,8 +74,8 @@ final class Site(
         }
       ))}
 
-    override def findByRef(ref: String): Option[TeiResolver.Resolved] =
-      Site.this.findByRef(ref).map { entity: Entity => Some(TeiResolver.Resolved(
+    override def findByRef(ref: String): Option[LinkResolver.Resolved] =
+      Site.this.findByRef(ref).map { entity: Entity => Some(LinkResolver.Resolved(
         url = EntityObject.teiWrapperUrl(entity),
         role = Some(Viewer.Names.name)
       ))}.getOrElse {
@@ -82,7 +83,7 @@ final class Site(
         None
       }
 
-    override def facs: TeiResolver.Resolved = TeiResolver.Resolved(
+    override def facs: LinkResolver.Resolved = LinkResolver.Resolved(
       url = facsUrl,
       role = Some(Viewer.Facsimile.name)
     )

@@ -5,7 +5,6 @@ package org.opentorah.xml
 trait Model[N] {
   type Element <: N
   type Text <: N
-  final type Transformer = Element => Element
 
   def isText(node: N): Boolean
   def asText(node: N): Text

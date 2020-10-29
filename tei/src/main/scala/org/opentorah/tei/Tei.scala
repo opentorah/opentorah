@@ -48,7 +48,7 @@ object Tei extends Element.WithToXml[Tei]("TEI") with Dialect {
   )
 
   def concat[A](antiparsers: Antiparser[A]*): Antiparser[A] =
-    Antiparser.concat(Some(Tei.namespace), antiparsers)
+    Antiparser.concatWithNamespace(Tei.namespace, antiparsers: _*)
 
   def apply(body: Seq[Node]): Tei = new Tei(
     teiHeader = TeiHeader(),

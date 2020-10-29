@@ -14,6 +14,8 @@ object Xml extends Model[Node] {
   val idAttribute: Attribute[String] = Attribute("id", namespace)
   val langAttribute: Attribute[String] = Attribute("lang", namespace)
 
+  type Transformer = Element => Element
+
   def transform(xml: Element, transformer: Transformer): Element = {
     val rule: RewriteRule = new RewriteRule {
       override def transform(node: Node): Seq[Node] = node match {
@@ -23,6 +25,28 @@ object Xml extends Model[Node] {
     }
 
     asElement(new RuleTransformer(rule).transform(xml).head)
+  }
+
+  type StateTransformer[S] = (Element, S) => (Element, S)
+
+  def transform[S](element: Element, state: S, transformer: StateTransformer[S]): (Element, S) = {
+    @scala.annotation.tailrec
+    def transformNodes(
+      result: Seq[Node],
+      nodes: Seq[Node],
+      state: S
+    ): (Seq[Node], S) = nodes match {
+      case Seq() => (result, state)
+      case Seq(n, ns @ _*) =>
+        val (nTransformed, nextState) =
+          if (!Xml.isElement(n)) (n, state)
+          else transform(Xml.asElement(n), state, transformer)
+        transformNodes(result :+ nTransformed, ns, nextState)
+    }
+
+    val (newElement, newState) = transformer(element, state)
+    val (children, finalState) = transformNodes(Seq.empty, Xml.getChildren(newElement), newState)
+    (newElement.copy(child = children), finalState)
   }
 
   def descendants(xml: Node, name: String): Seq[Element] =

@@ -14,7 +14,9 @@ ext.configureScala = {
     compileOnly "org.slf4j:slf4j-api:$slf4jVersion"
 
     testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
-    testRuntimeOnly "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"  // for scalatest reports
+    // for scalatest reports
+    testRuntimeOnly "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+    testRuntimeOnly "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
 
     testImplementation "org.scalacheck:scalacheck_$scalaVersionMajor:$scalacheckVersion"
     testImplementation "org.typelevel:discipline-scalatest_$scalaVersionMajor:$disciplineScalatestVersion"

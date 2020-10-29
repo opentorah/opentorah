@@ -116,7 +116,10 @@ object Namespace {
   ): Namespace =
     if (prefix.isEmpty && uri.isEmpty) No else
     if (prefix.isEmpty && uri.isDefined) new Default(uri.get) else
-      new Prefixed(prefix.get, uri.get)
+    if (uri.isDefined) new Prefixed(prefix.get, uri.get) else {
+      throw new IllegalArgumentException(s"prefix [${prefix.get}] without uri!")
+    }
+
 
   def apply(
     prefix: String,
