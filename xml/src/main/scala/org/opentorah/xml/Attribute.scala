@@ -151,7 +151,8 @@ object Attribute {
 
     def valueToString: Option[String] = effectiveValue.map(attribute.toString)
 
-    // TODO add set(scala.xml.Elem)
+    def set(element: scala.xml.Elem): scala.xml.Elem =
+      addAll(element, Seq(this))
 
     def set(element: org.w3c.dom.Element): Unit =
       effectiveValue.foreach(value => Dom.setAttribute(attribute, value, element))

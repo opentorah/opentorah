@@ -33,6 +33,7 @@ object Parser {
     result.provide(new Context)
   }
 
+  // TODO report error better: effect.tapCause(cause => console.putStrLn(cause.prettyPrint))
   private[xml] final def run[A](toRun: IO[Error, A]): A =
     Runtime.default.unsafeRun(toRun.mapError(error => throw new IllegalArgumentException(error)))
 
