@@ -1,6 +1,6 @@
 package org.opentorah.collector
 
-import org.opentorah.tei.{Body, Tei, Tei2Html}
+import org.opentorah.tei.{Body, Tei}
 import org.opentorah.xml.PrettyPrinter
 import scala.xml.{Elem, Node}
 
@@ -18,7 +18,7 @@ abstract class SiteObject(val site: Site) {
           title = title,
           navigationLinks = siteFile.navigationLinks
         ),
-        content = Tei2Html.transform(
+        content = Tei.toHtml(
           site.resolver(facsUrl),
           siteFile.contentElement
         )

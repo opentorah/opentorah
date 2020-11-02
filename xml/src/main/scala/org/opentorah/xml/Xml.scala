@@ -1,7 +1,8 @@
 package org.opentorah.xml
 
 import org.opentorah.util.Strings
-import scala.xml.transform.{RewriteRule, RuleTransformer}
+import zio.{Runtime, URIO, ZIO}
+
 import scala.xml.{MetaData, NamespaceBinding, Node, Null, SpecialNode, TopScope}
 
 object Xml extends Model[Node] {
@@ -14,39 +15,26 @@ object Xml extends Model[Node] {
   val idAttribute: Attribute[String] = Attribute("id", namespace)
   val langAttribute: Attribute[String] = Attribute("lang", namespace)
 
-  type Transformer = Element => Element
+  type Transform[S] = Element => URIO[S, Element]
 
-  def transform(xml: Element, transformer: Transformer): Element = {
-    val rule: RewriteRule = new RewriteRule {
-      override def transform(node: Node): Seq[Node] = node match {
-        case element: Element => transformer(element)
-        case other => other
-      }
-    }
+  def inNamespace[S](namespace: Namespace, transform: Transform[S]): Transform[S] = (element: Element) =>
+    if (Namespace.get(element) != namespace.default) URIO.succeed(element) else transform(element)
 
-    asElement(new RuleTransformer(rule).transform(xml).head)
-  }
+  def runTransform[S](element: Element, state: S, transform: Transform[S]): (Element, S) = {
+    def depthFirst: Transform[S] = // TODO simplify.
+      (element: Element) => transform(element).flatMap((newElement: Element) =>
+        ZIO.foreach(getChildren(newElement)) (node =>
+          if (!isElement(node)) ZIO.succeed(node) else depthFirst(asElement(node))
+        )
+          .map(children => newElement.copy(child = children))
+      )
 
-  type StateTransformer[S] = (Element, S) => (Element, S)
+    val result = for {
+      resultElement <- depthFirst(element)
+      resultState <- ZIO.access[S](identity)
+    } yield (resultElement, resultState)
 
-  def transform[S](element: Element, state: S, transformer: StateTransformer[S]): (Element, S) = {
-    @scala.annotation.tailrec
-    def transformNodes(
-      result: Seq[Node],
-      nodes: Seq[Node],
-      state: S
-    ): (Seq[Node], S) = nodes match {
-      case Seq() => (result, state)
-      case Seq(n, ns @ _*) =>
-        val (nTransformed, nextState) =
-          if (!Xml.isElement(n)) (n, state)
-          else transform(Xml.asElement(n), state, transformer)
-        transformNodes(result :+ nTransformed, ns, nextState)
-    }
-
-    val (newElement, newState) = transformer(element, state)
-    val (children, finalState) = transformNodes(Seq.empty, Xml.getChildren(newElement), newState)
-    (newElement.copy(child = children), finalState)
+    Runtime.default.unsafeRun(result.provide(state))
   }
 
   def descendants(xml: Node, name: String): Seq[Element] =

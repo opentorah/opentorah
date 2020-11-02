@@ -34,5 +34,6 @@ trait Model[N] {
 
   def getChildren(element: Element): Seq[N]
 
-  final def isEmpty(element: Element): Boolean = getChildren(element).forall(isWhitespace)
+  final def isEmpty(element: Element): Boolean = isEmpty(getChildren(element))
+  final def isEmpty(nodes: Seq[N]): Boolean = nodes.forall(isWhitespace)
 }

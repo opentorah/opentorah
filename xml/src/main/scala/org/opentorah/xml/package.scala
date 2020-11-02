@@ -4,7 +4,7 @@ import zio.{IO, ZIO}
 
 package object xml {
 
-  type Error = String
+  type Error = String // TODO use more specific type
 
   type Result = IO[Error, Unit]
 

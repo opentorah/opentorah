@@ -1,6 +1,8 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Dialect, Element, Namespace, Parser, PrettyPrinter}
+import org.opentorah.util.Files
+import org.opentorah.xml.{Antiparser, Attribute, Dialect, Element, Namespace, Parser, PrettyPrinter, ToHtml, Xml}
+import zio.{URIO, ZIO}
 import scala.xml.Node
 
 final case class Tei(
@@ -22,7 +24,7 @@ final case class Tei(
   /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
 }
 
-object Tei extends Element.WithToXml[Tei]("TEI") with Dialect {
+object Tei extends Element.WithToXml[Tei]("TEI") with Dialect with ToHtml {
 
   override val namespace: Namespace = Namespace(uri = "http://www.tei-c.org/ns/1.0", prefix="tei")
 
@@ -96,5 +98,72 @@ object Tei extends Element.WithToXml[Tei]("TEI") with Dialect {
           text = None
         ))))))
     ))
+  }
+
+  override protected def isEndNote(element: Xml.Element): Boolean =
+    (element.label == "note") && placeAttribute.get(element).contains("end")
+
+  private val targetAttribute: Attribute[String] = Attribute("target")
+  private val urlAttribute: Attribute[String] = Attribute("url")
+  private val placeAttribute: Attribute[String] = Attribute("place")
+  private val colsAttribute: Attribute[String] = Attribute("cols")
+
+  // TODO
+  // - copy rendition to class, removing the (leading?) '#' (or just use 'rendition')?;
+  // - transform tagsDecl?
+  // - transform prefixDef?
+  override protected def elementTransform(element: Xml.Element): URIO[State, Xml.Element] = {
+    val children: Seq[Node] = Xml.getChildren(element)
+
+    element.label match {
+      case label if EntityType.isName(label) =>
+        require(!Xml.isEmpty(children), element)
+        link(EntityName.refAttribute.get(element), _.resolver.findByRef(_), children)
+
+      case Ref.elementName =>
+        require(!Xml.isEmpty(children))
+        link(Some(targetAttribute.doGet(element)), _.resolver.resolve(_), children)
+
+      case "ptr" =>
+        // TODO resolve?
+        require(Xml.isEmpty(children))
+        ZIO.succeed(<a href={targetAttribute.doGet(element)}/>)
+
+      case Pb.elementName =>
+        require(Xml.isEmpty(children))
+        val pageId: String = Page.pageId(Pb.nAttribute.doGet(element))
+        for {
+          facs <- ZIO.access[State](_.resolver.facs)
+        } yield {
+          val href: String = Files.mkUrl(Files.addPart(facs.url, pageId)) // TODO unify with link and move Files... into resolver/d
+          val role: Option[String] = facs.role
+          // TODO feed pageId through State to obtain unique id
+          <a id={pageId} href={href} target={role.orNull}>⎙</a>
+        }
+
+      case "graphic" =>
+        require(Xml.isEmpty(children))
+        // Note: in TEI <graphic> can contain <desc>, but are treating it as empty.
+        ZIO.succeed(<img src={urlAttribute.doGet(element)}/>)
+
+      case "table" =>
+        ZIO.succeed(<table>{children}</table>)
+
+      // Note: before the first row there can be <head>HEAD</head>;
+      // it should become <caption>transform(HEAD)</caption>.
+      case "row" =>
+        ZIO.succeed(<tr>{children}</tr>)
+
+      case "cell" =>
+        ZIO.succeed(<td colspan={colsAttribute.get(element).orNull}>{children}</td>)
+
+      case "note" if placeAttribute.get(element).contains("end") =>
+        val id: Option[String] = Xml.idAttribute.get(element)
+        for {
+          note <- ZIO.access[State](_.addEndnote(id, children))
+        } yield <a id={note.srcId} href={s"#${note.contentId}"}><sup>{note.number}</sup></a>
+
+      case _ => ZIO.succeed(element)
+    }
   }
 }
