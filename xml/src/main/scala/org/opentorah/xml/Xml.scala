@@ -2,7 +2,6 @@ package org.opentorah.xml
 
 import org.opentorah.util.Strings
 import zio.{Runtime, URIO, ZIO}
-
 import scala.xml.{MetaData, NamespaceBinding, Node, Null, SpecialNode, TopScope}
 
 object Xml extends Model[Node] {
@@ -20,17 +19,18 @@ object Xml extends Model[Node] {
   def inNamespace[S](namespace: Namespace, transform: Transform[S]): Transform[S] = (element: Element) =>
     if (Namespace.get(element) != namespace.default) URIO.succeed(element) else transform(element)
 
-  def runTransform[S](element: Element, state: S, transform: Transform[S]): (Element, S) = {
-    def depthFirst: Transform[S] = // TODO simplify.
-      (element: Element) => transform(element).flatMap((newElement: Element) =>
-        ZIO.foreach(getChildren(newElement)) (node =>
-          if (!isElement(node)) ZIO.succeed(node) else depthFirst(asElement(node))
-        )
-          .map(children => newElement.copy(child = children))
-      )
+  private def transformNode[S](transform: Transform[S])(node: Node): URIO[S, Node] =
+    if (!isElement(node)) ZIO.succeed(node) else transform(asElement(node))
 
-    val result = for {
-      resultElement <- depthFirst(element)
+  // TODO can recursion here be simplified?
+  private def depthFirst[S](transform: Transform[S]): Transform[S] = (element: Element) => for {
+    newElement <- transform(element)
+    children <- ZIO.foreach(getChildren(newElement))(transformNode(depthFirst(transform)))
+  } yield newElement.copy(child = children)
+
+  def runTransform[S](transform: Transform[S], state: S, element: Element): (Element, S) = {
+    val result: URIO[S, (Element, S)] = for {
+      resultElement <- depthFirst(transform)(element)
       resultState <- ZIO.access[S](identity)
     } yield (resultElement, resultState)
 
@@ -39,6 +39,14 @@ object Xml extends Model[Node] {
 
   def descendants(xml: Node, name: String): Seq[Element] =
     xml.flatMap(_ \\ name).filter(isElement).map(asElement)
+
+  def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
+    case Nil => Nil
+    case n :: Nil => Seq(n)
+    case n :: ns if n.isInstanceOf[Element] => Seq(n, mkText(", ")) ++ multi(ns)
+    case n :: ns => Seq(n) ++ multi(ns)
+    case n => n
+  }
 
   override type Element = scala.xml.Elem
   // Note: some whitespace is packaged not in Text, but in a different subclass of Atom[String], so:
@@ -51,14 +59,6 @@ object Xml extends Model[Node] {
       case special: SpecialNode => Strings.sbToString(special.buildString)
       case node: Node => node.text
     }
-  }
-
-  def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
-    case Nil => Nil
-    case n :: Nil => Seq(n)
-    case n :: ns if n.isInstanceOf[Element] => Seq(n, mkText(", ")) ++ multi(ns)
-    case n :: ns => Seq(n) ++ multi(ns)
-    case n => n
   }
 
   override def isText(node: Node): Boolean = node.isInstanceOf[Text]
@@ -121,9 +121,11 @@ object Xml extends Model[Node] {
   private def getAttributeValueText(value: Seq[Node]): String =
     Strings.sbToString(scala.xml.Utility.sequenceToXML(value, TopScope, _, stripComments = true))
 
-  // TODO setAttribute() - and add it to Model
+  // TODO addAll() doesn't modify existing attributes; this should...
+  override protected def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Element =
+    addAttributes(Seq(attribute.withValue(value)), element)
 
-  def setAttributes(element: Element, attributes: Seq[Attribute.Value[_]]): Element =
+  override def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element =
     element.copy(attributes = attributes.foldRight[MetaData](Null)(
       (attributeValue, next) => toMetaData(attributeValue, next))
     )
@@ -148,7 +150,7 @@ object Xml extends Model[Node] {
     children: Seq[Node]
   ): Element = {
     val base: Element = namespace.fold(<elem/>)(_.default.declare(<elem/>))
-    setAttributes(base, attributes).copy(
+    setAttributes(attributes, base).copy(
       label = name,
       child = children
     )

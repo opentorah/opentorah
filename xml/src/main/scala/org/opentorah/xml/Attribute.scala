@@ -37,9 +37,7 @@ abstract class Attribute[T](
     else value.orElse(Some(default))
 
   // Value
-
   final def withValue(value: T): Attribute.Value[T] = withOptionalValue(Option(value))
-
   final def withOptionalValue(value: Option[T]): Attribute.Value[T] = new Attribute.Value[T](this, value)
 
   // Parser
@@ -66,7 +64,7 @@ abstract class Attribute[T](
   // DOM
   final def get(element: org.w3c.dom.Element): Option[T] = get(Dom.getAttribute(this, element))
   final def getWithDefault(element: org.w3c.dom.Element): T = getWithDefault(get(element))
-  final def doGet(element: org.w3c.dom.Element): T = getWithDefault(get(element))
+  final def doGet(element: org.w3c.dom.Element): T = doGet(get(element))
 
   // SAX
   final def get(attributes: org.xml.sax.Attributes): Option[T] = get(Sax.getAttribute(this, attributes))
@@ -151,32 +149,15 @@ object Attribute {
 
     def valueToString: Option[String] = effectiveValue.map(attribute.toString)
 
-    def set(element: scala.xml.Elem): scala.xml.Elem =
-      addAll(element, Seq(this))
+    def set(element: Xml.Element): Xml.Element = Xml.setAttribute(this, element)
 
-    def set(element: org.w3c.dom.Element): Unit =
-      effectiveValue.foreach(value => Dom.setAttribute(attribute, value, element))
+    def set(element: Dom.Element): Dom.Element = Dom.setAttribute(this, element)
 
+    // TODO maybe move this and Model.setAttribute() into a common ancestor of Model and Sax?
     def set(attributes: org.xml.sax.helpers.AttributesImpl): Unit =
       effectiveValue.foreach(value => Sax.setAttribute(attribute, value, attributes))
   }
 
+  // Parser TODO move into... Parser?
   val allAttributes: Parser[Seq[Value[String]]] = Context.takeAllAttributes
-
-  // Scala XML
-  def getAll(element: scala.xml.Elem): Seq[Attribute.Value[String]] = Xml.getAttributes(element)
-  def setAll(element: scala.xml.Elem, attributes: Seq[Attribute.Value[_]]): scala.xml.Elem = Xml.setAttributes(element, attributes)
-  def addAll(element: scala.xml.Elem, attributes: Seq[Attribute.Value[_]]): scala.xml.Elem = {
-    val existing: Seq[Attribute.Value[_]] = Attribute.getAll(element)
-    val toAdd: Seq[Attribute.Value[_]] = attributes
-      .filterNot(toAdd => existing.exists(existing => existing.attribute.name == toAdd.attribute.name))
-
-    Attribute.setAll(element, existing ++ toAdd)
-  }
-
-  // DOM
-  def getAll(element: org.w3c.dom.Element): Seq[Attribute.Value[String]] = Dom.getAttributes(element)
-
-  // SAX
-  def getAll(attributes: org.xml.sax.Attributes): Seq[Attribute.Value[String]] = Sax.getAttributes(attributes)
 }

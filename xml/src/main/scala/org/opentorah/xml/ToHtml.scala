@@ -1,6 +1,5 @@
 package org.opentorah.xml
 
-import org.opentorah.util.Files
 import zio.{URIO, ZIO}
 import scala.xml.Node
 
@@ -16,56 +15,70 @@ trait ToHtml {
     ref: Option[String],
     r: (State, String) => Option[LinkResolver.Resolved],
     children: Seq[Node]
-  ): URIO[State, Xml.Element] = for {
-    resolved <- ref.map(ref => ZIO.access[State](r(_, ref))).getOrElse(ZIO.none)
-  } yield {
-    val href: Option[String] = resolved.map(resolved => Files.mkUrl(resolved.url)).orElse(ref)
-    val role: Option[String] = resolved.flatMap(_.role)
-    <a href={href.orNull} target={role.orNull}>{children}</a>
-  }
+  ): URIO[State, Xml.Element] = ref.map(ref => ZIO.access[State](r(_, ref))).getOrElse(ZIO.none).map(resolved => a(
+    id = None,
+    href = resolved.map(_.urlAsString).orElse(ref),
+    target = resolved.flatMap(_.role),
+    children
+  ))
 
-  final class EndNote(val number: Int, val id: Option[String], val content: Seq[Node]) {
-    val contentId: String = s"_note_$number"
-    val srcId: String = id.getOrElse(s"src_note_$number")
+  final protected def a(
+    id: Option[String],
+    href: Option[String],
+    target: Option[String],
+    children: Seq[Node]
+  ): Xml.Element =
+    <a id={id.orNull} href={href.orNull} target={target.orNull}>{children}</a>
+
+  final class EndNote(number: Int, id: Option[String], val content: Seq[Node]) {
+    private def contentId: String = s"_note_$number"
+    private def srcId: String = id.getOrElse(s"src_note_$number")
+
+    def link: Xml.Element =
+      <a id={srcId} href={s"#$contentId"}><sup>{number}</sup></a>
+
+    def body: Xml.Element =
+      <span xmlns={Xhtml.namespace.uri} class="endnote" id={contentId}>
+        <a class="endnote-backlink" href={s"#$srcId"}>{number}</a>
+        {content}
+      </span>
   }
 
   // TODO add pre-existing ids as a set and take it into account when getting a new id (including for notes)
-  // TODO add state for nested section ids
+  // TODO add nested section ids
   final class State(val resolver: LinkResolver) {
     private var endNotes: Seq[EndNote] = Seq.empty
 
     // TODO get two ids, one for the actual content at the end
-    def addEndnote(id: Option[String], content: Seq[Node]): EndNote = {
-      val result = new EndNote(
+    def addEndNote(id: Option[String], content: Seq[Node]): Xml.Element = {
+      val note: EndNote = new EndNote(
         number = endNotes.length + 1,
         id,
         content
       )
-      endNotes = endNotes :+ result
-      result
+      endNotes = endNotes :+ note
+      note.link
     }
 
     def getEndNotes: Seq[EndNote] = endNotes
   }
 
   def toHtml(resolver: LinkResolver, element: Xml.Element): Xml.Element = {
-    val (result, finalState) = runTransform(element, resolver)
+    val (result, finalState) = runTransform(resolver, element)
     <div xmlns={Xhtml.namespace.uri} class="html">
       {result}
-      {runTransform(<div xmlns={Xhtml.namespace.uri} class="endnotes">{
-        for (note <- finalState.getEndNotes) yield
-          <span xmlns={Xhtml.namespace.uri} class="endnote" id={note.contentId}>
-            <a class="endnote-backlink" href={s"#${note.srcId}"}>{note.number}</a>
-            {note.content}
-          </span>
-        }</div>, resolver)/* TODO do not ignore end-notes inside end-notes */._1}
+      {runTransform(resolver,
+      <div xmlns={Xhtml.namespace.uri} class="endnotes">
+        {for (note <- finalState.getEndNotes) yield note.body}
+      </div>
+      )/* TODO do not ignore end-notes inside end-notes */._1}
     </div>
   }
 
-  private def runTransform(element: Xml.Element, resolver: LinkResolver): (Xml.Element, State) = Xml.runTransform(
-    element,
+  private def runTransform(resolver: LinkResolver, element: Xml.Element): (Xml.Element, State) = Xml.runTransform(
+    Xml.inNamespace[State](namespace, liftedElementTransform),
     new State(resolver),
-    Xml.inNamespace[State](namespace, liftedElementTransform)
+    element
   )
 
   private val htmlElementNames: Set[String] = Set("head", "body")
@@ -74,17 +87,17 @@ trait ToHtml {
     newElement <- elementTransform(element)
   } yield {
     val name: String = element.label
-    val attributes: Seq[Attribute.Value[String]] = Attribute.getAll(element)
-    if (newElement eq element) Attribute.setAll(
+    val attributes: Seq[Attribute.Value[String]] = Xml.getAttributes(element)
+    if (newElement eq element) Xml.setAttributes(
       element = if (htmlElementNames.contains(name)) element.copy(label = addPrefix(name)) else element,
       attributes = attributes.map(transformXmlAttribute)
-    ) else Attribute.addAll(
+    ) else Xml.addAttributes(
       element = Xhtml.namespace.default.declare(newElement),
       attributes = Xhtml.classAttribute.withValue(name) +: attributes.map(transformAttribute)
     )
   }
 
-  private val htmlAttributeNames: Set[String] = Set("class", "target", "href")
+  private val htmlAttributeNames: Set[String] = Set("class", "target", "lang")
 
   private def transformAttribute(attribute: Attribute.Value[String]): Attribute.Value[String] = {
     val result: Attribute.Value[String] = transformXmlAttribute(attribute)
@@ -95,10 +108,12 @@ trait ToHtml {
       result
   }
 
-  private def transformXmlAttribute(attribute: Attribute.Value[String]): Attribute.Value[String] =
+  private def transformXmlAttribute(attribute: Attribute.Value[String]): Attribute.Value[String] = {
+    // TODO xml:base? xml:space?
     if (attribute.attribute == Xml.idAttribute  ) Xhtml.idAttribute  .withOptionalValue(attribute.value) else
     if (attribute.attribute == Xml.langAttribute) Xhtml.langAttribute.withOptionalValue(attribute.value) else
       attribute
+  }
 
   private def addPrefix(name: String): String = s"${namespace.getPrefix.get}-$name"
 }

@@ -2,7 +2,7 @@ package org.opentorah.xml
 
 import org.w3c.dom.{Attr, NamedNodeMap, Node, NodeList}
 
-// Note: declareNamespace() and setAttributes() modify in-place.
+// Note: declareNamespace() and setAttribute[s]() modify in-place.
 object Dom extends Model[Node] {
   override type Element = org.w3c.dom.Element
   override type Text = org.w3c.dom.CharacterData
@@ -77,7 +77,7 @@ object Dom extends Model[Node] {
     ).withOptionalValue(Option(attribute.getValue))
   }
 
-  def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Unit = {
+  override protected def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Element = {
     val name: String = attribute.name
     val namespace: Namespace = attribute.namespace
     val valueStr: String = attribute.toString(value)
@@ -87,9 +87,11 @@ object Dom extends Model[Node] {
 
       element.setAttributeNS(namespace.getUri.orNull, namespace.qName(name), valueStr)
     }
+    element
   }
 
-  // TODO setAttributes() - and add it to Model
+  // TODO implement
+  override def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element = ???
 
   override def getChildren(element: Element): Seq[Node] = {
     val list: NodeList = element.getChildNodes
