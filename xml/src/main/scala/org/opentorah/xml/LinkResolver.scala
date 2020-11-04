@@ -21,5 +21,9 @@ object LinkResolver {
   final case class Resolved(
     url: Seq[String],
     role: Option[String]
-  )
+  ) {
+    def urlAsString: String = Files.mkUrl(url)
+
+    def urlWithPartAsString(part: String): String = Files.mkUrl(Files.addPart(url, part))
+  }
 }

@@ -42,7 +42,7 @@ final class DocumentObject(
 
   override protected def navigationLinks: Seq[NavigationLink] =
     navigation ++
-    Seq(NavigationLink(facsUrl, "⎙", Some(Viewer.Facsimile))) ++
+    Seq(NavigationLink(facsUrl, Tei.facsimileSymbol, Some(Viewer.Facsimile))) ++
     (if (teiHolder.language.isDefined || document.languages.isEmpty) Seq.empty
     else document.languages.map(lang => NavigationLink(s"${document.name}-$lang", s"[$lang]", None)))
 

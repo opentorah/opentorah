@@ -10,10 +10,10 @@ final case class Pb(
   isMissing: Boolean = false,
   isEmpty: Boolean = false
 ) {
-  def addAttributes(element: Elem): Elem = Attribute.setAll(element, Attribute.getAll(element) ++ Seq(
+  def addAttributes(element: Elem): Elem = Xml.setAttributes(Xml.getAttributes(element) ++ Seq(
     Pb.missingAttribute.withOptionalValue(Some(isMissing)),
     Pb.emptyAttribute.withOptionalValue(Some(isEmpty))
-  ))
+  ), element)
 }
 
 object Pb extends Element.WithToXml[Pb]("pb") {

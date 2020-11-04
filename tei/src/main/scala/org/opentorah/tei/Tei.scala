@@ -1,6 +1,5 @@
 package org.opentorah.tei
 
-import org.opentorah.util.Files
 import org.opentorah.xml.{Antiparser, Attribute, Dialect, Element, Namespace, Parser, PrettyPrinter, ToHtml, Xml}
 import zio.{URIO, ZIO}
 import scala.xml.Node
@@ -108,8 +107,11 @@ object Tei extends Element.WithToXml[Tei]("TEI") with Dialect with ToHtml {
   private val placeAttribute: Attribute[String] = Attribute("place")
   private val colsAttribute: Attribute[String] = Attribute("cols")
 
+  val facsimileSymbol: String = "⎙"
+
   // TODO
-  // - copy rendition to class, removing the (leading?) '#' (or just use 'rendition')?;
+  // - add values of the cssClass attribute to class?
+  // - style/rend/rendition?
   // - transform tagsDecl?
   // - transform prefixDef?
   override protected def elementTransform(element: Xml.Element): URIO[State, Xml.Element] = {
@@ -125,25 +127,24 @@ object Tei extends Element.WithToXml[Tei]("TEI") with Dialect with ToHtml {
         link(Some(targetAttribute.doGet(element)), _.resolver.resolve(_), children)
 
       case "ptr" =>
-        // TODO resolve?
         require(Xml.isEmpty(children))
-        ZIO.succeed(<a href={targetAttribute.doGet(element)}/>)
+        link(Some(targetAttribute.doGet(element)), _.resolver.resolve(_), Seq.empty)
 
+      // TODO feed pageId through State to obtain unique id
+      // TODO use - do not guess! - ids of the pbs in the facsimile viewer!
       case Pb.elementName =>
         require(Xml.isEmpty(children))
         val pageId: String = Page.pageId(Pb.nAttribute.doGet(element))
-        for {
-          facs <- ZIO.access[State](_.resolver.facs)
-        } yield {
-          val href: String = Files.mkUrl(Files.addPart(facs.url, pageId)) // TODO unify with link and move Files... into resolver/d
-          val role: Option[String] = facs.role
-          // TODO feed pageId through State to obtain unique id
-          <a id={pageId} href={href} target={role.orNull}>⎙</a>
-        }
+        ZIO.access[State](_.resolver.facs).map(resolved => a(
+          id = Some(pageId),
+          href = Some(resolved.urlWithPartAsString(pageId)),
+          target = resolved.role,
+          Seq(Xml.mkText(facsimileSymbol))
+        ))
 
       case "graphic" =>
-        require(Xml.isEmpty(children))
         // Note: in TEI <graphic> can contain <desc>, but are treating it as empty.
+        require(Xml.isEmpty(children))
         ZIO.succeed(<img src={urlAttribute.doGet(element)}/>)
 
       case "table" =>
@@ -157,13 +158,11 @@ object Tei extends Element.WithToXml[Tei]("TEI") with Dialect with ToHtml {
       case "cell" =>
         ZIO.succeed(<td colspan={colsAttribute.get(element).orNull}>{children}</td>)
 
-      case "note" if placeAttribute.get(element).contains("end") =>
-        val id: Option[String] = Xml.idAttribute.get(element)
-        for {
-          note <- ZIO.access[State](_.addEndnote(id, children))
-        } yield <a id={note.srcId} href={s"#${note.contentId}"}><sup>{note.number}</sup></a>
+      case _ if isEndNote(element) =>
+        ZIO.access[State](_.addEndNote(Xml.idAttribute.get(element), children))
 
-      case _ => ZIO.succeed(element)
+      case _ =>
+        ZIO.succeed(element)
     }
   }
 }
