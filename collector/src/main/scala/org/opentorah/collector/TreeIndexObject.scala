@@ -26,7 +26,7 @@ final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
           {by.stores.map(_.asInstanceOf[Store]).map { store => // TODO get rid of the cast!!!
             val isCollection: Boolean = store.isInstanceOf[Collection]
             val storePath: Path = path :+ by.selector.bind(store)
-            val siteObject: SiteObject =
+            val siteObject: SiteObjectWithFile =
               if (isCollection) new CollectionObject(site, WithPath(path, store.asInstanceOf[Collection]))
               else new HierarchyObject(site, storePath, store)
             <item>

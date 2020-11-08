@@ -24,7 +24,7 @@ layout: page
 Так как адекватность транскриптов оригиналам "объективна" и "очевидна", мы с радостью принимаем помощь независимо от
 идеологических склонностей предлагающих её: от духовных наследников арестованных, возбудителей дел, следователей - или
 просто интересующихся.
-Для желающих помочь имеется <a href="/contributing.html" target="collectionViewer">инструкция</a>.    
+Для желающих помочь имеется <a href="/notes/contributing.html" target="collectionViewer">инструкция</a>.    
 
 Новости сайта публикуются в [блоге OpenTorah.org](http://www.opentorah.org/tags/#alter-rebbe-org).
 
@@ -152,14 +152,14 @@ layout: page
 ## Colophon ##
 
 Documents are in a GitHub <a href="https://github.com/opentorah/alter-rebbe.org">
-      <svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg>
+      <svg class="svg-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/minima-social-icons.svg#github"></use></svg>
       <span class="username">repository</span>
     </a> <a href="https://github.com/opentorah/alter-rebbe.org/actions">
   <img src="https://github.com/opentorah/alter-rebbe.org/workflows/CI/badge.svg" alt="CI badge"/>
 </a>.
 
 Code that generates the site is in a GitHub <a href="https://github.com/opentorah/opentorah">
-      <svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg>
+      <svg class="svg-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/minima-social-icons.svg#github"></use></svg>
       <span class="username">repository</span>
     </a> <a href="https://github.com/opentorah/opentorah/actions">
   <img src="https://github.com/opentorah/opentorah/workflows/CI/badge.svg" alt="CI badge"/>

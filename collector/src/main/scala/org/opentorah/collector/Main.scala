@@ -19,7 +19,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val docs: File = new File(args(0))
     doIt(
-      fromUrl = From.file(new File(new File(docs, "store"), "store.xml")).url.get,
+      fromUrl = From.file(Files.file(docs, Seq("store", "store.xml"))).url.get, // TODO FIles.file2url?
       siteRoot = docs
     )
   }
@@ -40,8 +40,8 @@ object Main {
       navigationLinks = Seq(
         NavigationLink("/names", "Имена", Some(Viewer.Names)),
         NavigationLink("/collections", "Архивы", Some(Viewer.Collection)),
-        NavigationLink("/help", "Помощь", Some(Viewer.Collection)),
-        NavigationLink("/about", "О сайте", Some(Viewer.Collection))
+        NavigationLink("/notes/help", "Помощь", Some(Viewer.Collection)),
+        NavigationLink("/notes/about", "О сайте", Some(Viewer.Collection))
       ),
       footerCol3 =
         // TODO when I use <p> instead of <span>, it gets styled by the TEI CSS - althought it is in the XHTML namespace?!

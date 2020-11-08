@@ -1,6 +1,5 @@
 package org.opentorah.xml
 
-// TODO generalize into a Doctype trait?
 trait Dialect {
   def namespace: Namespace
 

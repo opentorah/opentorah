@@ -28,10 +28,6 @@ abstract class Attribute[T](
 
   def withNamespace(namespace: Namespace): Attribute[T]
 
-  def getWithDefault(value: Option[T]): T = value.getOrElse(default)
-
-  def doGet(value: Option[T]): T = value.get
-
   final def effectiveValue(value: Option[T]): Option[T] =
     if (!setDefault) value.filterNot(_ == default)
     else value.orElse(Some(default))
@@ -57,19 +53,19 @@ abstract class Attribute[T](
   )
 
   // Scala XML
-  final def get(element: scala.xml.Elem): Option[T] = get(Xml.getAttribute(this, element))
-  final def getWithDefault(element: scala.xml.Elem): T = getWithDefault(get(element))
-  final def doGet(element: scala.xml.Elem): T = doGet(get(element))
+  final def get(element: Xml.Element): Option[T] = Xml.getAttribute(this, element)
+  final def getWithDefault(element: Xml.Element): T = Xml.getAttributeWithDefault(this, element)
+  final def doGet(element: Xml.Element): T = Xml.doGetAttribute[T](this, element)
 
   // DOM
-  final def get(element: org.w3c.dom.Element): Option[T] = get(Dom.getAttribute(this, element))
-  final def getWithDefault(element: org.w3c.dom.Element): T = getWithDefault(get(element))
-  final def doGet(element: org.w3c.dom.Element): T = doGet(get(element))
+  final def get(element: Dom.Element): Option[T] = Dom.getAttribute(this, element)
+  final def getWithDefault(element: Dom.Element): T = Dom.getAttributeWithDefault(this, element)
+  final def doGet(element: Dom.Element): T = Dom.doGetAttribute[T](this, element)
 
   // SAX
-  final def get(attributes: org.xml.sax.Attributes): Option[T] = get(Sax.getAttribute(this, attributes))
-  final def getWithDefault(attributes: org.xml.sax.Attributes): T = getWithDefault(get(attributes))
-  final def doGet(attributes: org.xml.sax.Attributes): T = doGet(get(attributes))
+  final def get(attributes: Sax.PreElement): Option[T] = Sax.getAttribute(this, attributes)
+  final def getWithDefault(attributes: Sax.PreElement): T = Sax.getAttributeWithDefault(this, attributes)
+  final def doGet(attributes: Sax.PreElement): T = Sax.doGetAttribute[T](this, attributes)
 }
 
 object Attribute {
@@ -150,12 +146,8 @@ object Attribute {
     def valueToString: Option[String] = effectiveValue.map(attribute.toString)
 
     def set(element: Xml.Element): Xml.Element = Xml.setAttribute(this, element)
-
     def set(element: Dom.Element): Dom.Element = Dom.setAttribute(this, element)
-
-    // TODO maybe move this and Model.setAttribute() into a common ancestor of Model and Sax?
-    def set(attributes: org.xml.sax.helpers.AttributesImpl): Unit =
-      effectiveValue.foreach(value => Sax.setAttribute(attribute, value, attributes))
+    def set(element: Sax.Element): Sax.Element = Sax.setAttribute(this, element)
   }
 
   // Parser TODO move into... Parser?

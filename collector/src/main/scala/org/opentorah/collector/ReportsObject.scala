@@ -17,10 +17,10 @@ final class ReportsObject(site: Site) extends SimpleSiteObject(site) {
   override protected def teiBody: Seq[Node] = simpleSubObjects.map(line)
 
   private def line(report: SimpleSiteObject): Elem =
-    <l xmlns={Tei.namespace.uri}><ref target={Files.mkUrl(report.htmlUrl)}>{report.title.get}</ref></l>
+    <l xmlns={Tei.namespace.uri}><ref target={Files.mkUrl(report.url)}>{report.title.get}</ref></l>
 
   def resolve(parts: Seq[String]): Option[SiteFile] =
-    if (parts.isEmpty || (parts == Seq(fileName))) Some(new ReportsObject(site).htmlFile) else
+    if (parts.isEmpty || (parts == Seq(fileName))) Some(htmlFile) else
       if (parts.tail.nonEmpty) None else {
         val (fileName: String, extension: Option[String]) = Files.nameAndExtension(parts.head)
         simpleSubObjects

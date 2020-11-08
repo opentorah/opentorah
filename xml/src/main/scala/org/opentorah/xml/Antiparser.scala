@@ -18,7 +18,6 @@ final class Antiparser[A] private(
 
 object Antiparser {
 
-  // TODO eliminate?
   def apply[A](
     attributes: A => Seq[Attribute.Value[_]] = (_: A) => Seq.empty,
     content   : A => Seq[Node]               = (_: A) => Seq.empty,
@@ -33,15 +32,7 @@ object Antiparser {
     antiparsers: Antiparser[A]*
   ): Antiparser[A] = concat[A](None, antiparsers)
 
-  def concatWithNamespace[A](
-    namespace: Namespace,
-    antiparsers: Antiparser[A]*
-  ): Antiparser[A] = concat[A](
-    Some(namespace),
-    antiparsers
-  )
-
-  private def concat[A](
+  def concat[A](
     namespace: Option[Namespace],
     antiparsers: Seq[Antiparser[A]]
   ): Antiparser[A] = apply[A](

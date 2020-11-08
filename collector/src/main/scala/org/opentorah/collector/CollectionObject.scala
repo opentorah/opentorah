@@ -14,7 +14,7 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
 
   override protected def viewer: Viewer = Viewer.Collection
 
-  override def isWide: Boolean = true
+  override protected def style: String = "wide"
 
   override protected def navigationLinks: Seq[NavigationLink] =
     Seq(CollectionObject.navigationLink(collection))

@@ -1,6 +1,7 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, Dialect, Element, Namespace, Parser, PrettyPrinter, ToHtml, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, Dialect, Element, LinkResolver, Namespace, Parser, PrettyPrinter,
+  ToHtml, Xml}
 import zio.{URIO, ZIO}
 import scala.xml.Node
 
@@ -49,7 +50,7 @@ object Tei extends Element.WithToXml[Tei]("TEI") with Dialect with ToHtml {
   )
 
   def concat[A](antiparsers: Antiparser[A]*): Antiparser[A] =
-    Antiparser.concatWithNamespace(Tei.namespace, antiparsers: _*)
+    Antiparser.concat(Some(Tei.namespace), antiparsers)
 
   def apply(body: Seq[Node]): Tei = new Tei(
     teiHeader = TeiHeader(),
@@ -109,7 +110,8 @@ object Tei extends Element.WithToXml[Tei]("TEI") with Dialect with ToHtml {
 
   val facsimileSymbol: String = "⎙"
 
-  // TODO
+  def toHtml(resolver: LinkResolver, tei: Tei): Xml.Element = toHtml(resolver, toXmlElement(tei))
+
   // - add values of the cssClass attribute to class?
   // - style/rend/rendition?
   // - transform tagsDecl?

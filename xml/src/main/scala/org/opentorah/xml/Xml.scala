@@ -93,10 +93,13 @@ object Xml extends Model[Node] {
     get(Seq.empty, element.scope)
   }
 
+  // TODO implement
+  override def isNamespaceDeclared(namespace: Namespace, element: Element): Boolean = ???
+
   override def declareNamespace(namespace: Namespace, element: Element): Element =
     element.copy(scope = NamespaceBinding(namespace.getPrefix.orNull, namespace.getUri.get, element.scope))
 
-  override def getAttribute(attribute: Attribute[_], element: Element): Option[String] = {
+  override protected def getAttributeValueString(attribute: Attribute[_], element: Element): Option[String] = {
     val name: String = attribute.name
     val namespace: Namespace = attribute.namespace
     if (namespace.isDefault) element.attribute(name)

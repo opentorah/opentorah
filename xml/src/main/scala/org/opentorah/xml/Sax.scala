@@ -5,9 +5,15 @@ import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
 // Note: declareNamespace() and setAttribute() modify in-place.
-object Sax {
+object Sax extends PreModel {
 
-  def getNamespaces(attributes: Attributes): Seq[Namespace] =
+  override type PreElement = Attributes
+  override type Element = AttributesImpl
+
+  // TODO implement
+  override def getNamespace(element: PreElement): Namespace = ???
+
+  override def getNamespaces(attributes: PreElement): Seq[Namespace] =
     for {
       index <- 0 until attributes.getLength
       prefix = getPrefix(attributes, index)
@@ -23,10 +29,10 @@ object Sax {
       )
     }
 
-  def isNamespaceDeclared(namespace: Namespace, attributes: AttributesImpl): Boolean =
+  override def isNamespaceDeclared(namespace: Namespace, attributes: PreElement): Boolean =
     namespace.attribute.get(attributes) == namespace.getUri
 
-  def declareNamespace(namespace: Namespace, attributes: AttributesImpl): Unit =
+  override def declareNamespace(namespace: Namespace, attributes: Element): Element =
     namespace.attributeValue.set(attributes)
 
   /*
@@ -36,13 +42,13 @@ object Sax {
 
     Note: we ignore attribute `type` (attributes.getType(index)) and assume "CNAME".
    */
-  def getAttribute(attribute: Attribute[_], attributes: Attributes): Option[String] =
+  override protected def getAttributeValueString(attribute: Attribute[_], attributes: PreElement): Option[String] =
     Option(attributes.getValue(
       attribute.namespace.getUri.getOrElse(""),
       attribute.name
     ))
 
-  def getAttributes(attributes: Attributes): Seq[Attribute.Value[String]] =
+  override def getAttributes(attributes: PreElement): Seq[Attribute.Value[String]] =
     for {
       index <- 0 until attributes.getLength
       prefix = getPrefix(attributes, index)
@@ -56,7 +62,7 @@ object Sax {
     ).withOptionalValue(Option(attributes.getValue(index)))
 
   private def getPrefix(
-    attributes: Attributes,
+    attributes: PreElement,
     index: Int
   ): Option[String] = {
     // TODO if qName is empty - is there a requirement on localName?
@@ -84,7 +90,7 @@ object Sax {
 
   if (!inDefaultNamespace) namespace.ensureDeclared(attributes)
   */
-  def setAttribute[T](attribute: Attribute[T], value: T, attributes: AttributesImpl): Unit = {
+  override protected def setAttribute[T](attribute: Attribute[T], value: T, attributes: Element): Element = {
     val name: String = attribute.name
     val namespace: Namespace = attribute.namespace
     val valueStr: String = attribute.toString(value)
@@ -95,13 +101,18 @@ object Sax {
       "CDATA",
       valueStr
     )
+
+    attributes
   }
+
+  // TODO implement
+  override def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element = ???
 
   // Note: XMLObj.setAttributes() sets namespace on an attribute only if it already saw
   // the declarations of that namespace, so I am making sure that they are there (and in the beginning);
   // even then, XMLObj.setAttributes() sets un-prefixed qualified name for namespaced attributes -
   // but somehow they are detected correctly in MathJax.typeset()...
-  def sortAttributes(attributes: Attributes): AttributesImpl = {
+  def sortAttributes(attributes: PreElement): Element = {
     val nonXmlns: Seq[Attribute.Value[String]] = getAttributes(attributes)
     val usedNamespaces: Set[Namespace] = nonXmlns.map(_.attribute.namespace).toSet
     val declaredNamespaces: Set[Namespace] = getNamespaces(attributes).toSet
