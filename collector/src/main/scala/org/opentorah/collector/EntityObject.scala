@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.store.{EntityHolder, Path, Store, WithPath}
 import org.opentorah.tei.{Entity, EntityReference, Ref, Tei}
-import org.opentorah.util.{Collections, Files}
+import org.opentorah.util.Collections
 import scala.xml.{Elem, Node}
 
 final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(site) {

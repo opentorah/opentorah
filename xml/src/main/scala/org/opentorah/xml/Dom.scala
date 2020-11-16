@@ -45,7 +45,7 @@ object Dom extends Model[Node] {
     )
   }
 
-  def isNamespaceDeclared(namespace: Namespace, element: Element): Boolean =
+  override def isNamespaceDeclared(namespace: Namespace, element: Element): Boolean =
     namespace.attribute.get(element) == namespace.getUri
 
   override def declareNamespace(namespace: Namespace, element: Element): Element = {
@@ -53,7 +53,7 @@ object Dom extends Model[Node] {
     element
   }
 
-  override def getAttribute(attribute: Attribute[_], element: Element): Option[String] = {
+  override protected def getAttributeValueString(attribute: Attribute[_], element: Element): Option[String] = {
     val name: String = attribute.name
     val namespace: Namespace = attribute.namespace
     Option(

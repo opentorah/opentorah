@@ -134,6 +134,12 @@ object Site {
     writeHtmlFile(new TreeIndexObject(site), directory)
     writeHtmlFile(new NamesObject(site), directory)
 
+    Files.deleteFiles(new File(directory, NotesObject.directoryName))
+    for (note <- new NotesObject(site).noteFiles) Files.write(
+      file = Files.file(directory, Seq(NotesObject.directoryName, s"${note.name}.html")),
+      content = note.content
+    )
+
     Files.deleteFiles(new File(directory, EntityObject.directoryName))
     for (entity <- site.entities) writeHtmlFile(new EntityObject(site, entity), directory)
 
@@ -155,7 +161,7 @@ object Site {
     } {
       val documentObject = new DocumentObject(site, collection, document, teiHolder)
       writeHtmlFile(documentObject, directory)
-      writeSiteFile(documentObject, documentObject.facsFile, directory)
+      writeSiteFile(documentObject.facsFile, directory)
     }
 
     Files.deleteFiles(new File(directory, ReportsObject.directoryName))
@@ -164,11 +170,11 @@ object Site {
     writeHtmlFile(new NoRefsReport(site), directory)
   }
 
-  private final def writeHtmlFile(siteObject: SiteObject, directory: File): Unit =
-    writeSiteFile(siteObject, siteObject.htmlFile, directory)
+  private final def writeHtmlFile(siteObject: SiteObjectWithFile, directory: File): Unit =
+    writeSiteFile(siteObject.htmlFile, directory)
 
-  private final def writeSiteFile(siteObject: SiteObject, siteFile: SiteFile, directory: File): Unit =
-    Files.write(Files.file(directory, siteFile.url), siteObject.content(siteFile))
+  private final def writeSiteFile(siteFile: SiteFile, directory: File): Unit =
+    Files.write(Files.file(directory, siteFile.url), siteFile.content)
 
   val addPublicationStatement: Tei.Transformer = Tei.addPublicationStatement(
     publisher = new Publisher.Value(<ptr xmlns={Tei.namespace.uri} target="www.alter-rebbe.org"/>),

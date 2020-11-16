@@ -3,10 +3,9 @@ package org.opentorah.collector
 import org.opentorah.tei.Tei
 import scala.xml.Node
 
-abstract class SimpleSiteObject(site: Site) extends SiteObject(site) {
+abstract class SimpleSiteObject(site: Site) extends TeiSiteObject(site) {
 
-  final override def htmlUrl: Seq[String] =
-    urlPrefix :+ (fileName + ".html")
+  final override def url: Seq[String] = urlPrefix :+ (fileName + ".html")
 
   protected def urlPrefix: Seq[String] = Seq.empty
 

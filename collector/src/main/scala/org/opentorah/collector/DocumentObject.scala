@@ -10,9 +10,9 @@ final class DocumentObject(
   collection: WithPath[Collection],
   document: Document,
   teiHolder: TeiHolder
-) extends SiteObject(site) {
+) extends TeiSiteObject(site) {
 
-  override protected def htmlUrl: Seq[String] = url(CollectionObject.documentsDirectoryName)
+  override protected def url: Seq[String] = url(CollectionObject.documentsDirectoryName)
 
   override def facsUrl: Seq[String] = url(CollectionObject.facsDirectoryName)
 
@@ -53,8 +53,9 @@ final class DocumentObject(
     override def url: Seq[String] = facsUrl
 
     // TODO do pages of the appropriate teiHolder!
-    override def contentElement: Elem =
-      <div class={Viewer.Facsimile.name}>
+    override def titleAndContent: TitleAndContent = {
+      val contentElement: Elem =
+        <div class={Viewer.Facsimile.name}>
         {headerSummary}
         <div class="facsimileScroller">{
           for (page: Page <- document.pages(collection.value.pageType).filterNot(_.pb.isMissing)) yield {
@@ -71,9 +72,19 @@ final class DocumentObject(
         }}</div>
       </div>
 
+      new TitleAndContent(
+        title = None, // TODO
+        content = Tei.toHtml(site.resolver(facsUrl), contentElement)
+      )
+    }
+
     override def navigationLinks: Seq[NavigationLink] =
       navigation ++
-      Seq(NavigationLink(htmlUrl, "A", Some(Viewer.Document)))
+      Seq(NavigationLink(htmlFile.url, "A", Some(Viewer.Document)))
+
+    override protected def siteParameters: SiteParameters = site.siteParameters
+
+    override protected def style: String = "main"
   }
 
   private def navigation: Seq[NavigationLink] = {

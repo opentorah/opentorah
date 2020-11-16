@@ -6,7 +6,7 @@ pluginManagement {
   }
 
   plugins {
-    id 'com.github.ben-manes.versions' version '0.33.0'
+    id 'com.github.ben-manes.versions' version '0.35.0'
     id 'com.github.maiflai.scalatest' version '0.29'
     id 'com.jfrog.bintray' version '1.8.5'
     id 'com.google.cloud.tools.jib' version '2.6.0'

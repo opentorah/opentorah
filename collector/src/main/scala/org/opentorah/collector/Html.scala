@@ -7,6 +7,7 @@ object Html {
 
   // TODO SEO
   // TODO set 'lang' deeper than on the html element.
+  // TODO remove post-related stuff
   def toHtml(
     siteParameters: SiteParameters,
     pageParameters: PageParameters,
