@@ -15,7 +15,7 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
 
   private def check(from: From, width: Int, expected: String): Unit = {
     val result = render(from, width)
-    result shouldBe expected.stripMargin
+    result shouldBe expected.stripMargin + "\n"
   }
 
   private def check(xml: Elem, width: Int, expected: String): Unit =

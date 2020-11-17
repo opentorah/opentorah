@@ -1,6 +1,6 @@
 package org.opentorah.xml
 
-object Catalog extends Dialect {
+object Catalog extends Dialect with Doctype {
   override val namespace: Namespace = Namespace(uri = "urn:oasis:names:tc:entity:xmlns:xml:catalog", prefix = null)
 
   override val mimeType: String = "application/xml"
@@ -9,5 +9,5 @@ object Catalog extends Dialect {
 
   val dtdUri: String = "http://www.oasis-open.org/committees/entity/release/1.1/catalog.dtd"
 
-  val doctype: String = s"""<!DOCTYPE catalog PUBLIC "$dtdId" "$dtdUri">"""
+  override val doctype: String = s"""<!DOCTYPE catalog PUBLIC "$dtdId" "$dtdUri">"""
 }

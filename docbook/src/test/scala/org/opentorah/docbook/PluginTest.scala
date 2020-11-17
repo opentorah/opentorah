@@ -1,6 +1,6 @@
 package org.opentorah.docbook
 
-import org.opentorah.xml.{Namespace, PrettyPrinter, XLink}
+import org.opentorah.xml.{Doctype, PrettyPrinter, XLink}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import scala.xml.Elem
@@ -10,7 +10,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
   private def test(
     name: String,
     substitutions: Map[String, String],
-    doctype: Option[String],
+    doctype: Option[Doctype],
     document: Elem)(
     inIndexHtml: String*
   ): Unit = {
@@ -34,11 +34,11 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
     // Entity reference in the attribute value trips up IntelliJ's Scala XML parser:
     // it reports "No closing tag" and underlines XML literal around the entity reference in red.
     // In reality, everything works as intended:
-    PrettyPrinter.default.render(<e a="http://&version;"/>) shouldBe """<e a="http://&version;"/>"""
+    PrettyPrinter.default.render(<e a="http://&version;"/>) shouldBe """<e a="http://&version;"/>""" + "\n"
 
     // If the attribute value is enclosed in {}, making it dynamic, IntelliJ does not complain any longer -
     // but Scala XML encodes the entity reference, so nothing works:
-    PrettyPrinter.default.render(<e a={"http://&version;"}/>) shouldBe """<e a="http://&amp;version;"/>"""
+    PrettyPrinter.default.render(<e a={"http://&version;"}/>) shouldBe """<e a="http://&amp;version;"/>""" + "\n"
 
     // In the tests below, I am thus forced to forego the {} - and suffer redness from IntelliJ...
   }
@@ -60,7 +60,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
   it should "resolve processing instructions and entity substitutions with DTD enabled" in test(
     name = "substitutions-with-DTD",
     substitutions = Map[String, String]("version" -> "\"v1.0.0\""),
-    doctype = Some(DocBook.doctype),
+    doctype = Some(DocBook),
     document =
       <article xmlns={DocBook.namespace.uri} version={DocBook.version} xmlns:xlink={XLink.namespace.uri}>
         <para>Processing instruction: <?eval version ?>.</para>

@@ -13,110 +13,73 @@ final case class PrettyPrinter(
   allowEmptyElements: Boolean = true,
   keepEmptyElements: Set[String] = Set.empty
 ) {
-  // Note: making entry points generic in N and taking implicit N: Model[N] does not work,
-  // since 'elem' parameter is of type Elem, but Xml: Model[Node];
-  // it is cleaner to just provide Model-specific entry points...
+  def renderXml(element: Xml.Element): String = renderXml(element, doctype = None)
+  def renderXml(element: Xml.Element, doctype: Doctype): String = renderXml(element, doctype = Some(doctype))
+  def renderXml(element: Xml.Element, doctype: Option[Doctype]): String = render(Xml)(element, addXmlHeader = true, doctype)
+  def render(element: Xml.Element): String = render(element, doctype = None)
+  def render(element: Xml.Element, doctype: Doctype): String = render(element, doctype = Some(doctype))
+  def render(element: Xml.Element, doctype: Option[Doctype]): String = render(Xml)(element, addXmlHeader = false, doctype)
 
-  def renderXml(element: scala.xml.Elem, doctype: String): String =
-    renderXml(element, Some(doctype))
+  def renderXml(element: Dom.Element): String = renderXml(element, doctype = None)
+  def renderXml(element: Dom.Element, doctype: Doctype): String = renderXml(element, doctype = Some(doctype))
+  def renderXml(element: Dom.Element, doctype: Option[Doctype]): String = render(Dom)(element, addXmlHeader = true, doctype)
+  def render(element: Dom.Element): String = render(element, doctype = None)
+  def render(element: Dom.Element, doctype: Doctype): String = render(element, doctype = Some(doctype))
+  def render(element: Dom.Element, doctype: Option[Doctype]): String = render(Dom)(element, addXmlHeader = false, doctype)
 
-  def renderXml(element: scala.xml.Elem): String =
-    renderXml(element, None)
+  private def render(
+    model: Model,
+  )(
+    element: model.Element,
+    addXmlHeader: Boolean,
+    doctype: Option[Doctype]
+  ): String = {
+    val forModel: ForModel = new ForModel(model)
 
-  def renderXml(element: scala.xml.Elem, doctype: Option[String]): String = {
-    val run = mkRun(Xml)
-    run.renderXml(element.asInstanceOf[run.N.Element], doctype)
-  }
-
-  def render(element: scala.xml.Elem): String = {
-    val run = mkRun(Xml)
-    run.render(element.asInstanceOf[run.N.Element])
-  }
-
-
-  def renderXml(element: org.w3c.dom.Element, doctype: String): String =
-    renderXml(element, Some(doctype))
-
-  def renderXml(element: org.w3c.dom.Element): String =
-    renderXml(element, None)
-
-  private def renderXml(element: org.w3c.dom.Element, doctype: Option[String]): String = {
-    val run = mkRun(Dom)
-    run.renderXml(element.asInstanceOf[run.N.Element], doctype)
-  }
-
-  def render(element: org.w3c.dom.Element): String = {
-    val run = mkRun(Dom)
-    run.render(element.asInstanceOf[run.N.Element])
-  }
-
-  private def mkRun[N](N: Model[N]): PrettyPrinter.Run[N] = new PrettyPrinter.Run(N)(
-    width,
-    indent,
-    doNotStackElements,
-    alwaysStackElements,
-    nestElements,
-    clingyElements,
-    allowEmptyElements,
-    keepEmptyElements
-  )
-}
-
-object PrettyPrinter {
-
-  // Note: methods below all need access to N: Model[N], often - for the types of parameters, so parameter N
-  // must come first, and can not be implicit; it is cleaner to scope them in a class with N a constructor parameter.
-  private final class Run[N](val N: Model[N])(
-    width: Int,
-    indent: Int,
-    doNotStackElements: Set[String],
-    alwaysStackElements: Set[String],
-    nestElements: Set[String],
-    clingyElements: Set[String],
-    allowEmptyElements: Boolean,
-    keepEmptyElements: Set[String]
-  ) {
-
-    def renderXml(node: N.Element, doctype: Option[String]): String =
-      Xml.header + "\n" +
-      doctype.fold("")(doctype => doctype + "\n") +
-      render(node) + "\n"
-
-    def render(element: N.Element): String = fromElement(
-      element,
+    val result: String = forModel.fromElement(
+      element.asInstanceOf[forModel.model.Element], // yuck...
       parent = None,
       canBreakLeft = true,
       canBreakRight = true
     ).render(width)
 
-    private def fromElement(
-      element: N.Element,
-      parent: Option[N.Element],
+    (if (!addXmlHeader) "" else Xml.header + "\n") +
+    doctype.fold("")(doctype => doctype.doctype + "\n") +
+    result + "\n"
+  }
+
+  // Note: methods below all need access to model: Model, often - for the types of parameters, so parameter model
+  // must come first, and thus can not be implicit; it is cleaner to scope them in a class with model a constructor parameter.
+  private final class ForModel(val model: Model) {
+
+    def fromElement(
+      element: model.Element,
+      parent: Option[model.Element],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): Doc = {
-      val label: String = N.getName(element)
-      val name: String = N.getPrefix(element).fold("")(_ + ":") + label
+      val label: String = model.getName(element)
+      val name: String = model.getPrefix(element).fold("")(_ + ":") + label
 
-      val parentNamespaces: Seq[Namespace] = parent.fold[Seq[Namespace]](Seq.empty)(N.getNamespaces)
+      val parentNamespaces: Seq[Namespace] = parent.fold[Seq[Namespace]](Seq.empty)(model.getNamespaces)
       val attributeValues: Seq[Attribute.Value[String]] =
-        N.getNamespaces(element).filterNot(parentNamespaces.contains).map(_.attributeValue) ++
-        N.getAttributes(element).filterNot(_.value.isEmpty)
+        model.getNamespaces(element).filterNot(parentNamespaces.contains).map(_.attributeValue) ++
+        model.getAttributes(element).filterNot(_.value.isEmpty)
 
       val attributes: Doc =
         if (attributeValues.isEmpty) Doc.empty
         else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, attributeValues.map(attributeValue =>
           Doc.text(attributeValue.attribute.qName + "=") + Doc.lineOrEmpty +
-          Doc.text("\"" + attributeValue.valueToString.get + "\"")
+            Doc.text("\"" + attributeValue.valueToString.get + "\"")
         ))
 
-      val nodes: Seq[N] = atomize(Seq.empty, N.getChildren(element))
-      val whitespaceLeft: Boolean = nodes.headOption.exists(N.isWhitespace)
-      val whitespaceRight: Boolean = nodes.lastOption.exists(N.isWhitespace)
-      val charactersLeft: Boolean = nodes.headOption.exists(N.isCharacters)
-      val charactersRight: Boolean = nodes.lastOption.exists(N.isCharacters)
-      val chunks: Seq[Seq[N]] = chunkify(Seq.empty, Seq.empty, nodes)
-      val noText: Boolean = chunks.forall(_.forall(!N.isText(_)))
+      val nodes: model.Nodes = atomize(Seq.empty, model.getChildren(element))
+      val whitespaceLeft: Boolean = nodes.headOption.exists(model.isWhitespace)
+      val whitespaceRight: Boolean = nodes.lastOption.exists(model.isWhitespace)
+      val charactersLeft: Boolean = nodes.headOption.exists(model.isCharacters)
+      val charactersRight: Boolean = nodes.lastOption.exists(model.isCharacters)
+      val chunks: Seq[model.Nodes] = chunkify(Seq.empty, Seq.empty, nodes)
+      val noText: Boolean = chunks.forall(_.forall(!model.isText(_)))
 
       val children: Seq[Doc] = {
         val canBreakLeft1 = canBreakLeft || whitespaceLeft
@@ -146,8 +109,8 @@ object PrettyPrinter {
         if (stackElements) {
           // If this is clearly a bunch of elements - stack 'em with an indent:
           start +
-          Doc.cat(children.map(child => (Doc.hardLine + child).nested(indent))) +
-          Doc.hardLine + end
+            Doc.cat(children.map(child => (Doc.hardLine + child).nested(indent))) +
+            Doc.hardLine + end
         } else if (nestElements.contains(label)) {
           // If this is forced-nested element - nest it:
           Doc.intercalate(Doc.lineOrSpace, children).tightBracketBy(left = start, right = end, indent)
@@ -164,51 +127,53 @@ object PrettyPrinter {
     }
 
     @scala.annotation.tailrec
-    private def atomize(result: Seq[N], nodes: Seq[N]): Seq[N] = if (nodes.isEmpty) result else {
-      val (texts: Seq[N], tail: Seq[N]) = nodes.span(N.isText)
+    private def atomize(result: model.Nodes, nodes: model.Nodes): model.Nodes =
+      if (nodes.isEmpty) result else {
+        val (texts: model.Nodes, tail: model.Nodes) = nodes.span(model.isText)
 
-      val newResult: Seq[N] = if (texts.isEmpty) result else result ++
-        processText(Seq.empty, texts.head,
-          Strings.squashBigWhitespace(texts.map(N.asText).map(N.getText).mkString("")))
+        val newResult: model.Nodes = if (texts.isEmpty) result else result ++
+          processText(Seq.empty, texts.head,
+            Strings.squashBigWhitespace(texts.map(model.asText).map(model.getText).mkString("")))
 
-      if (tail.isEmpty) newResult
-      else atomize(newResult :+ tail.head, tail.tail)
-    }
+        if (tail.isEmpty) newResult
+        else atomize(newResult :+ tail.head, tail.tail)
+      }
 
     @scala.annotation.tailrec
-    private def processText(result: Seq[N.Text], seed: N, text: String): Seq[N.Text] = if (text.isEmpty) result else {
-      val (spaces: String, tail: String) = text.span(_ == ' ')
-      val newResult = if (spaces.isEmpty) result else result :+ N.mkText(" ", seed)
-      val (word: String, tail2: String) = tail.span(_ != ' ')
+    private def processText(result: Seq[model.Text], seed: model.Node, text: String): Seq[model.Text] =
+      if (text.isEmpty) result else {
+        val (spaces: String, tail: String) = text.span(_ == ' ')
+        val newResult = if (spaces.isEmpty) result else result :+ model.mkText(" ", seed)
+        val (word: String, tail2: String) = tail.span(_ != ' ')
 
-      if (word.isEmpty) newResult
-      else processText(newResult :+ N.mkText(word, seed), seed, tail2)
-    }
+        if (word.isEmpty) newResult
+        else processText(newResult :+ model.mkText(word, seed), seed, tail2)
+      }
 
     private def chunkify(
-      result: Seq[Seq[N]],
-      current: Seq[N],
-      nodes: Seq[N]
-    ): Seq[Seq[N]] = {
-      def cling(c: N, n: N): Boolean = N.isText(c) || N.isText(n) ||
-        (N.isElement(n) && clingyElements.contains(N.getName(N.asElement(n))))
+      result: Seq[model.Nodes],
+      current: model.Nodes,
+      nodes: model.Nodes
+    ): Seq[model.Nodes] = {
+      def cling(c: model.Node, n: model.Node): Boolean = model.isText(c) || model.isText(n) ||
+        (model.isElement(n) && clingyElements.contains(model.getName(model.asElement(n))))
 
-      def flush(nodes: Seq[N]): Seq[Seq[N]] = chunkify(result :+ current.reverse, Nil, nodes)
+      def flush(nodes: model.Nodes): Seq[model.Nodes] = chunkify(result :+ current.reverse, Nil, nodes)
 
       (current, nodes) match {
         case (Nil    , Nil    ) => result
-        case (c :: cs, Nil    ) => flush(Nil)
-        case (Nil    , n :: ns) if  N.isWhitespace(n) => chunkify(result, Nil, ns)
-        case (c :: cs, n :: ns) if  N.isWhitespace(n) => flush(ns)
-        case (Nil    , n :: ns) if !N.isWhitespace(n) => chunkify(result, n :: Nil, ns)
-        case (c :: cs, n :: ns) if !N.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns)
-        case (c :: cs, n :: ns) if !N.isWhitespace(n) && !cling(c, n) => flush(n :: ns)
+        case (_      , Nil    ) => flush(Nil)
+        case (Nil    , n :: ns) if  model.isWhitespace(n) => chunkify(result, Nil, ns)
+        case (_      , n :: ns) if  model.isWhitespace(n) => flush(ns)
+        case (Nil    , n :: ns) if !model.isWhitespace(n) => chunkify(result, n :: Nil, ns)
+        case (c :: cs, n :: ns) if !model.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns)
+        case (c :: _ , n :: ns) if !model.isWhitespace(n) && !cling(c, n) => flush(n :: ns)
       }
     }
 
     private def fromChunk(
-      nodes: Seq[N],
-      parent: Option[N.Element],
+      nodes: model.Nodes,
+      parent: Option[model.Element],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): Doc = {
@@ -223,30 +188,22 @@ object PrettyPrinter {
     }
 
     private def fromNode(
-      node: N,
-      parent: Option[N.Element],
+      node: model.Node,
+      parent: Option[model.Element],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): Doc =
-      if (N.isElement(node)) {
-        val element: N.Element = N.asElement(node)
+      if (model.isElement(node)) {
+        val element: model.Element = model.asElement(node)
         val result = fromElement(element, parent, canBreakLeft, canBreakRight)
         // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
-        if (canBreakRight && N.getName(element) == "lb") result + Doc.hardLine else result
+        if (canBreakRight && model.getName(element) == "lb") result + Doc.hardLine else result
       }
-      else if (N.isText(node)) Doc.text(N.getText(N.asText(node)))
-      else Doc.paragraph(N.toString(node))
+      else if (model.isText(node)) Doc.text(model.getText(model.asText(node)))
+      else Doc.paragraph(model.toString(node))
   }
+}
 
+object PrettyPrinter {
   val default: PrettyPrinter = new PrettyPrinter
-
-  // Note: to use LSSerializer instead of my DOM pretty-printing:
-  // add dependency:  implementation "xalan:serializer:$xalanVersion"
-  //
-  // def render(node: org.w3c.dom.Node): String = serializer.writeToString(node)
-  // private val serializer: org.apache.xml.serializer.dom3.LSSerializerImpl = {
-  //  val result = new org.apache.xml.serializer.dom3.LSSerializerImpl
-  //  result.setParameter("format-pretty-print", true)
-  //  result
-  //}
 }
