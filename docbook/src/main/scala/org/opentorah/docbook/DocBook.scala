@@ -1,8 +1,8 @@
 package org.opentorah.docbook
 
-import org.opentorah.xml.{Dialect, Namespace, PrettyPrinter}
+import org.opentorah.xml.{Dialect, Doctype, Namespace, PrettyPrinter}
 
-object DocBook extends Dialect {
+object DocBook extends Dialect with Doctype {
 
   override val namespace: Namespace = Namespace(uri = "http://docbook.org/ns/docbook", prefix="db")
 
@@ -12,7 +12,7 @@ object DocBook extends Dialect {
 
   val dtdUri: String = "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd"
 
-  val doctype: String = s"""<!DOCTYPE article PUBLIC "$dtdId" "$dtdUri">"""
+  override val doctype: String = s"""<!DOCTYPE article PUBLIC "$dtdId" "$dtdUri">"""
 
   val version: String = "5.0"
 

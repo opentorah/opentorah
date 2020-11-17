@@ -2,9 +2,14 @@ package org.opentorah.xml
 
 import org.opentorah.util.Strings
 import zio.{Runtime, URIO, ZIO}
-import scala.xml.{MetaData, NamespaceBinding, Node, Null, SpecialNode, TopScope}
+import scala.xml.{MetaData, NamespaceBinding, Null, SpecialNode, TopScope}
 
-object Xml extends Model[Node] {
+object Xml extends Model {
+
+  override type Node = scala.xml.Node
+  override type Element = scala.xml.Elem
+  // Note: some whitespace is packaged not in Text, but in a different subclass of Atom[String], so:
+  override type Text = scala.xml.Atom[_]
 
   val namespace: Namespace = Namespace(uri = "http://www.w3.org/XML/1998/namespace", prefix = "xml")
 
@@ -40,17 +45,13 @@ object Xml extends Model[Node] {
   def descendants(xml: Node, name: String): Seq[Element] =
     xml.flatMap(_ \\ name).filter(isElement).map(asElement)
 
-  def multi(nodes: Seq[Node]): Seq[Node] = nodes match {
+  def multi(nodes: Nodes): Nodes = nodes match {
     case Nil => Nil
     case n :: Nil => Seq(n)
     case n :: ns if n.isInstanceOf[Element] => Seq(n, mkText(", ")) ++ multi(ns)
     case n :: ns => Seq(n) ++ multi(ns)
     case n => n
   }
-
-  override type Element = scala.xml.Elem
-  // Note: some whitespace is packaged not in Text, but in a different subclass of Atom[String], so:
-  override type Text = scala.xml.Atom[_]
 
   override def toString(node: Node): String = Strings.squashWhitespace {
     node match {
@@ -121,7 +122,7 @@ object Xml extends Model[Node] {
     }
 
   // TODO WTF?
-  private def getAttributeValueText(value: Seq[Node]): String =
+  private def getAttributeValueText(value: Nodes): String =
     Strings.sbToString(scala.xml.Utility.sequenceToXML(value, TopScope, _, stripComments = true))
 
   // TODO addAll() doesn't modify existing attributes; this should...
@@ -144,7 +145,7 @@ object Xml extends Model[Node] {
     )
   }
 
-  override def getChildren(element: Element): Seq[Node] = element.child
+  override def getChildren(element: Element): Nodes = element.child
 
   def construct(
     name: String,

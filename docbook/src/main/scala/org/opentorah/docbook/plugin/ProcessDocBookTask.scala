@@ -13,7 +13,7 @@ import org.opentorah.mathjax
 import org.opentorah.mathjax.MathJax
 import org.opentorah.util.Collections.mapValues
 import org.opentorah.util.{Files, Gradle}
-import org.opentorah.xml.{Catalog, PrettyPrinter, Resolver, XInclude, Xml}
+import org.opentorah.xml.{Catalog, Doctype, PrettyPrinter, Resolver, XInclude, Xml}
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 import scala.xml.{Comment, Elem}
@@ -182,7 +182,7 @@ class ProcessDocBookTask extends DefaultTask {
     ProcessDocBookTask.write(
       file = layout.catalogFile,
       replace = true,
-      doctype = Some(Catalog.doctype),
+      doctype = Some(Catalog),
       elem = ProcessDocBookTask.xmlCatalog(
         xslt1 = Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout.docBookXslDirectory),
         xslt2 = Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout.docBookXslDirectory),
@@ -197,7 +197,7 @@ class ProcessDocBookTask extends DefaultTask {
     ProcessDocBookTask.write(
       file = layout.xmlFile(layout.catalogCustomFileName),
       replace = false,
-      doctype = Some(Catalog.doctype),
+      doctype = Some(Catalog),
       elem = ProcessDocBookTask.catalogCustomization
     )
 
@@ -214,7 +214,7 @@ class ProcessDocBookTask extends DefaultTask {
     for ((name: String, _ /*prefixed*/: Boolean) <- inputDocuments) ProcessDocBookTask.write(
       file = layout.inputFile(name),
       replace = false,
-      doctype = Some(DocBook.doctype),
+      doctype = Some(DocBook),
       elem = ProcessDocBookTask.defaultInputFile
     )
 
@@ -370,12 +370,12 @@ private object ProcessDocBookTask {
   def write(
     file: File,
     replace: Boolean,
-    doctype: Option[String] = None,
+    doctype: Option[Doctype] = None,
     elem: Elem
   ): Unit = Files.write(
     file,
     replace,
-    content = PrettyPrinter.default.renderXml(doctype = doctype, element = elem)
+    content = PrettyPrinter.default.renderXml(element = elem, doctype)
   )
 
   def xmlCatalog(

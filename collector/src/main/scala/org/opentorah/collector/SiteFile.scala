@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.Tei
-import org.opentorah.xml.PrettyPrinter
+import org.opentorah.xml.{PrettyPrinter, Xhtml}
 
 // TODO add backlink to the SiteObject?
 // TODO various indices and reports no longer have to be in TEI; rework them into HTML but apply resolver somehow?
@@ -10,19 +10,21 @@ trait SiteFile {
   final def content: String = {
     val titleAndContent: TitleAndContent = this.titleAndContent
 
-    "<!DOCTYPE html>\n" ++
-    SiteFile.prettyPrinter.render(Html.toHtml(
-      siteParameters,
-      pageParameters = new PageParameters(
-        target = Some(viewer),
-        style = style,
-        // TODO extract headTitle from title, then...
-        headTitle = None,
-        title = titleAndContent.title,
-        navigationLinks = navigationLinks
-      ),
-      content = titleAndContent.content
-    ))
+    SiteFile.prettyPrinter.render(
+      doctype = Xhtml,
+      element = Html.toHtml(
+        siteParameters,
+        pageParameters = new PageParameters(
+          target = Some(viewer),
+          style = style,
+          // TODO extract headTitle from title, then...
+          headTitle = None,
+          title = titleAndContent.title,
+          navigationLinks = navigationLinks
+        ),
+        content = titleAndContent.content
+      )
+    )
   }
 
   def url: Seq[String]
