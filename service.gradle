@@ -20,7 +20,8 @@ ext.configureJib = {
   final String gcloudProject,
   final String gcloudService,
   final String gcloudRegion,
-  final String mainClassName
+  final String mainClassName,
+  final int minInstances
   ->
 
   // TODO look into `providers.credentials(org.gradle.api.credentials.PasswordCredentials, 'login')`...
@@ -47,12 +48,15 @@ ext.configureJib = {
       standardInput new ByteArrayInputStream(gcloudServiceAccountKey.getBytes('UTF-8'))
       commandLine 'gcloud', 'auth', 'activate-service-account', '--key-file', '-'
     }
+    // --min-instances is in beta, so I have to use 'gcloud beta':
     exec { commandLine(
-      'gcloud', 'run', 'deploy', gcloudService,
+      'gcloud', 'beta',
+      'run', 'deploy', gcloudService,
       '--image', serviceImage,
       '--allow-unauthenticated',
       '--platform', 'managed',
-      '--region', gcloudRegion
+      '--region', gcloudRegion,
+      '--min-instances', minInstances,
     )}
   }
 }

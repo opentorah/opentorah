@@ -6,8 +6,11 @@ Modules covered: `collector` and `collector-service`.
 
 ## [0.1.55]
 - converting TEI to HTML in code (no more CETEIcean);
-- generating HTML in code (no more Jekyll for the TEI files)
+- generating HTML in code (no more Jekyll for the TEI files);
+- generating HTML from Markdown files (no more Jekyll for them);
+- generating CSS from SCSS at build time (no more Jekyll!);
 - UI improvements;
+- keep one instance of the service always warm (no more Cloud Scheduler);
 
 ## [0.1.53] - 2020-08-23 (`collector-service`)
 - tracking StaticFile fix;

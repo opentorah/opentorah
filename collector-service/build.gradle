@@ -17,5 +17,6 @@ configureJib(
   'alter-rebbe-2',
   'collector',
   'us-east4',
-  'org.opentorah.collector.Service'
+  'org.opentorah.collector.Service',
+  1
 )

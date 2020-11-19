@@ -12,7 +12,7 @@ We are moving towards making the site dynamic, so that we can add:
 - activated free Google Cloud Platform trial for `dub@opentorah.org` account (6/14/2020); 
 - logged into it;
 - created project `alter-rebbe` with id `alter-rebbe-2` (id `alter-rebbe` was taken by the previous incarnation,
-  and can't be reused even now, long after it was deleted :(;
+  and can't be reused even now, long after it was deleted :();
 - organization `opentorah.org` was auto-created; 
 - set `dub@opentorah.org` as a default account and `alter-rebbe-2` as a default project:
 ```
@@ -261,9 +261,12 @@ under the request's entry.
       --uri="https://app.alter-rebbe.org"
 ```
 
-
 Before the first job is created, service has to be initialized. I did it via Console
 (in the same region - us-east4 - my service is running). This created an empty App Engine
 application `alter-rebbe-2.appspot.com` and an empty bucket with the same name...
 
 gcloud does not require time zone, but the Console does...
+
+In October 2020, `--min-instances` option to gcloud run deploy became available (in beta);
+in November 2020, I switched to using it (I estimate under $10 a month for one kept-warm instance).
+If this works out, I won't need the CRON job anymore.
