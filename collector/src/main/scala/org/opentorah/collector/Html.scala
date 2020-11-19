@@ -99,7 +99,7 @@ object Html {
     <li>
       <a href={s"https://$serviceUrl/$username"}>
         <svg class="svg-icon">
-          <use xmlns:xlink={XLink.namespace.uri} xlink:href={s"/assets/minima-social-icons.svg#$iconPart"}/>
+          <use xmlns:xlink={XLink.namespace.uri} xlink:href={s"/assets/icons.svg#$iconPart"}/>
         </svg>
         <span class="username">{username}</span>
       </a>
