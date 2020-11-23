@@ -33,7 +33,7 @@ jobs:
         run: ./gradlew --no-daemon jib
 
       # I didn't find any Gradle gcloud plugin that I can use to run gcloud deploy, so I had to do it here,
-      # duplicating project id and service name from the collector Gradle build file :(
+      # duplicating project id, service name and region from the collector Gradle build file :(
 #      - name: "Set up gcloud CLI"
 #        uses: google-github-actions/setup-gcloud@master
 #        with:
@@ -48,4 +48,5 @@ jobs:
         with:
           service: "collector"
           image: "gcr.io/alter-rebbe-2/collector"
+          region: "us-east4"
           credentials: ${{secrets.gcloudServiceAccountKey_alter_rebbe_2}}
