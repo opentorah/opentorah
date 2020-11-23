@@ -20,6 +20,7 @@ object Service extends App {
 
   type ServiceTask[+A] = RIO[ServiceEnvironment, A]
 
+  // TODO figure it out from within the container:
   private val projectId: String = "alter-rebbe-2"
 
   val dsl: Http4sDsl[ServiceTask] = Http4sDsl[ServiceTask]
