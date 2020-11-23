@@ -20,13 +20,19 @@ object Service extends App {
 
   type ServiceTask[+A] = RIO[ServiceEnvironment, A]
 
-  // TODO figure it out from within the container:
+  // TODO HTTP GET from http://metadata.google.internal/computeMetadata/v1/project/project-id
+  // with `Metadata-Flavor: Google` header;
+  // or do I even need it for logging?
   private val projectId: String = "alter-rebbe-2"
 
   val dsl: Http4sDsl[ServiceTask] = Http4sDsl[ServiceTask]
   import dsl._
 
   override def run(args: List[String]): URIO[Service.ServiceEnvironment, zio.ExitCode] = {
+    // This is supposed to be set when running in Cloud Run
+    val serviceName: Option[String] = getEnv("K_SERVICE")
+    warning(s"serviceName=$serviceName")
+
     val storeUri: Uri = Uri.unsafeFromString(getParameter("STORE", "https://store.alter-rebbe.org"))
     run(ServiceRoutes.routes(storeUri))
   }
@@ -49,13 +55,15 @@ object Service extends App {
       .mapError(err => zio.console.putStrLn(s"Execution failed with: $err"))
       .exitCode
 
-  private def getParameter(name: String, defaultValue: String): String = scala.util.Properties.envOrNone(name).fold {
+  private def getParameter(name: String, defaultValue: String): String = getEnv(name).fold {
     notice(s"No value for '$name' in the environment; using default: '$defaultValue'")
     defaultValue
   }{ value =>
     notice(s"Value for '$name' from the environment: $value")
     value
   }
+
+  private def getEnv(name: String): Option[String] = Option(System.getenv(name))
 
   val blocker: Blocker = Blocker.liftExecutorService(Executors.newFixedThreadPool(2))
 
@@ -89,6 +97,7 @@ object Service extends App {
   private def notice (request: Request[ServiceTask], message: String): Unit = log(Some(request), message, "NOTICE" )
   private def notice (                               message: String): Unit = log(None         , message, "NOTICE" )
   private def warning(request: Request[ServiceTask], message: String): Unit = log(Some(request), message, "WARNING")
+  private def warning(                               message: String): Unit = log(None         , message, "WARNING")
 
   private val logger: Logger = LoggerFactory.getLogger("org.opentorah.collector.service.ServiceConfiguration")
 
