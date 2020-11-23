@@ -1,7 +1,5 @@
 # Changelog
 
-Modules covered: `collector` and `collector-service`.
-
 ## [Unreleased]
 
 ## [0.1.55]
@@ -9,6 +7,7 @@ Modules covered: `collector` and `collector-service`.
 - generating HTML in code (no more Jekyll for the TEI files);
 - generating HTML from Markdown files (no more Jekyll for them);
 - generating CSS from SCSS at build time (no more Jekyll!);
+- serving local files without Jekyll (which is no longer used for anything);
 - UI improvements;
 - keep one instance of the service always warm (no more Cloud Scheduler);
 

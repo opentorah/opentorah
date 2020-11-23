@@ -4,6 +4,7 @@ plugins {
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
   id 'com.jfrog.bintray'
+  id 'com.google.cloud.tools.jib'
 }
 
 description = 'Archive Collector'
@@ -21,4 +22,61 @@ dependencies {
   implementation "ch.qos.logback:logback-classic:$logbackVersion"
 
   testImplementation "org.podval.tools:org.podval.tools.run:$podvalRunVersion"
+}
+
+configureService()
+
+// TODO even unfolding jib {} here instead of calling configureJib() did not help IntelliJ Idea feel it
+// and make JIB builder available for Cloud Code | Cloud Run | Run Locally Run conficuration...
+//configureJib(
+//  'alter-rebbe-2',
+//  'collector',
+//  'us-east4',
+//  'org.opentorah.collector.Service',
+//  1
+//)
+
+final String gcloudProject = 'alter-rebbe-2'
+final String gcloudService = 'collector'
+final String serviceImage  = "gcr.io/$gcloudProject/$gcloudService"
+final String gcloudRegion  = 'us-east4'
+final String mainClassName = 'org.opentorah.collector.Service'
+final int minInstances     = 1
+
+// TODO look into `providers.credentials(org.gradle.api.credentials.PasswordCredentials, 'login')`...
+final String gcloudServiceAccountProperty = 'gcloudServiceAccountKey_' + gcloudProject.replace('-', '_')
+final String gcloudServiceAccountKey      = findProperty(gcloudServiceAccountProperty) ?: System.getenv(gcloudServiceAccountProperty)
+
+jib {
+  to {
+    auth {
+      username = '_json_key'
+      password = gcloudServiceAccountKey
+    }
+    image = serviceImage
+  }
+  container {
+    mainClass = mainClassName
+  }
+}
+
+deploy.dependsOn('jib')
+
+// TODO fd Gradle gcloud plugin and migrate GitHub Actions to it!
+deploy.doLast {
+  exec {
+    standardInput new ByteArrayInputStream(gcloudServiceAccountKey.getBytes('UTF-8'))
+    commandLine 'gcloud', 'auth', 'activate-service-account', '--key-file', '-'
+  }
+
+  // --min-instances is in beta, so I have to use 'gcloud beta':
+  exec { commandLine(
+    'gcloud', 'beta',
+    'run', 'deploy'  , gcloudService,
+    '--image'        , serviceImage,
+    '--platform'     , 'managed',
+    '--region'       , gcloudRegion,
+    '--min-instances', minInstances,
+    '--allow-unauthenticated'
+  )}
 }
