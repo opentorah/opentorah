@@ -34,17 +34,18 @@ jobs:
 
       # I didn't find any Gradle gcloud plugin that I can use to run gcloud deploy,
       # so I had to do it here; as a result, some parameters (project id, service name, region)
-      # had to be duplicated from the collector-service build Gradle file...
-      - name: "Setup gcloud CLI"
+      # had to be duplicated from the collector-service Gradle build file...
+      - name: "Set up gcloud CLI"
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
           project_id: "alter-rebbe-2"
           service_account_key: ${{secrets.gcloudServiceAccountKey_alter_rebbe_2}}
 
-      - name: "Deploy image to Cloud Run"
+      - name: "Deploy Cloud Run service"
         run: |
-          gcloud run deploy "collector" \
+          gcloud beta run deploy "collector" \
           --image "gcr.io/alter-rebbe-2/collector" \
           --allow-unauthenticated \
           --platform managed \
-          --region us-east4
+          --region us-east4 \
+          --min-instances 1

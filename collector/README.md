@@ -1,7 +1,7 @@
 ## Static / Dynamic ##
 
-Code in the `collector` module pre-generates the static store.alter-rebbe.org site,
-which is then further processed by Jekyll when published on GitHub Pages.
+Code in the `collector` module pre-generates the static store.alter-rebbe.org site
+published on GitHub Pages (Jekyll is no longer involved).
 
 We are moving towards making the site dynamic, so that we can add:  
 - search functionality;
@@ -10,44 +10,32 @@ We are moving towards making the site dynamic, so that we can add:
 ## Project Setup ##
 
 - activated free Google Cloud Platform trial for `dub@opentorah.org` account (6/14/2020); 
-- logged into it;
-- created project `alter-rebbe` with id `alter-rebbe-2` (id `alter-rebbe` was taken by the previous incarnation,
+- logged into it and created project `alter-rebbe` with id `alter-rebbe-2`
+  (id `alter-rebbe` was taken by the previous incarnation,
   and can't be reused even now, long after it was deleted :();
 - organization `opentorah.org` was auto-created; 
-- set `dub@opentorah.org` as a default account and `alter-rebbe-2` as a default project:
+
+To set `dub@opentorah.org` as a default account and `alter-rebbe-2` as a default project:
 ```
-  $ gcloud auth login # to log into the dub@opentorah.org account.
-  $ gcloud projects create alter-rebbe-2
+  $ gcloud auth login dub@opentorah.org
   $ gcloud config set account dub@opentorah.org
   $ gcloud config set project alter-rebbe-2
 ```
 
+To set Application Default Credentials that Cloud Code in the IDE needs:
+```
+  $ gcloud auth login --update-adc
+```
+
 ## Facsimiles ##
 
-- created bucket `facsimile.alter-rebbe.org`
-  (facsimiles.alter-rebbe.org was then taken by the previous incarnation) with:
+- created bucket `facsimiles.alter-rebbe.org` with:
   - standard storage type;
   - multi-region;
   - uniform access control;
 - made it public: in its `Permissions | Add members | New members allUsers`,
  `Select a role | Cloud Storage | Storage Object Viewer`;
-- added CNAME record for `facsimile.alter-rebbe.org` pointing to `c.storage.googleapis.com`;
-```
-  $ gsutil -m rsync -d -r <local copy> gs://facsimile.alter-rebbe.org
-```
-Deleted `facsimiles.alter-rebbe.org` bucket in the old project
-  in the dub@podval.org account - and the project itself.
-
-Created `facsimiles.alter-rebbe.org` bucket in the new project; made it public.
-```
-  $ gsutil -m copy -r gs://facsimile.alter-rebbe.org gs://facsimiles.alter-rebbe.org.
-```
-And (to fix unwanted directory nesting):
-```
-  $ gsutil -m mv gs://facsimiles.alter-rebbe.org/facsimile.alter-rebbe.org/facsimiles
-    gs://facsimiles.alter-rebbe.org/
-```
-Deleted `facsimile.alter-rebbe.org` bucket and removed CNAME record for it.
+- added CNAME record for `facsimiles.alter-rebbe.org` pointing to `c.storage.googleapis.com`;
 
 Added `404.html` and set it as the error page in the website configuration of the bucket
 (default error page is in XML).
@@ -55,7 +43,19 @@ Added `404.html` and set it as the error page in the website configuration of th
 Facsimiles displayed on the site come from that bucket;
 they can be retrieved by anyone who has the correct URL.
 
-Chrome [tightened the nuts on the mixed content](https://blog.chromium.org/2019/10/no-more-mixed-messages-about-https.html),
+To validate that facsimiles referenced from the site are in one-to-one correspondence with
+the files in the bucket, we probably need to use Google Cloud Storage client to retrieve
+(and cache) the list of them.
+
+To sync local copy of the bucket into it with `gsutil`:
+```
+  $ gsutil -m rsync -d -r <local copy> gs://facsimile.alter-rebbe.org
+```
+
+Note: Since `facsimiles.alter-rebbe.org` was then taken by the bucket in the previous incarnation of the project
+under dup@podval.org account, intermediate bucket was used to migrate the facsimiles into the new project's bucket.
+
+Note: Chrome [tightened the nuts on the mixed content](https://blog.chromium.org/2019/10/no-more-mixed-messages-about-https.html),
 so links to individual photograph in the facsimile page have to use HTTPS now.
 For the SSL certificate's common name to be correct, those links have to point to the photographs indirectly
 via `https://storage.googleapis.com/`. So, for example,
@@ -63,12 +63,8 @@ via `https://storage.googleapis.com/`. So, for example,
 `https://storage.googleapis.com/facsimiles.alter-rebbe.org/facsimiles/derzhavin6/390.jpg`.
 Alternatively, I can configure an CDN for the facsimiles - but I do not see the need at this point.
 
-To validate that facsimiles referenced from the site are in one-to-one correspondence with
-the files in the bucket, we probably need to use Google Cloud Storage client to retrieve
-(and cache) the list of them.
-
-(I used BFG Repocleaner to remove facsimiles and their Git history from this repository
-once they moved out; current tool for things like that is `git-filter-repo`.)
+Note: I used BFG Repocleaner to remove facsimiles and their Git history from this repository
+once they moved out; current tool for things like that is `git-filter-repo`.
    
 ### Image Processing Commands ###
 
@@ -130,18 +126,14 @@ I use [Cloud Run](https://cloud.google.com/run#key-features)
  $ gcloud config set run/region us-east4
 ```
 
-Memorystore/Redis turned out to be too expensive (Google charges for *provisioned* capacity),
-so the fact that Cloud Run probably can't talk to it even now (4/2020) isn't important :(
-I may end up using [Cloud Firestore](https://firebase.google.com/docs/firestore)
-for caching generated (and maybe even source) files.
-
-To deploy on the Cloud Run:
+To deploy on the Cloud Run (beta is required for the `--min-instances` option):
 ```
-  $ gcloud run deploy collector \
+  $ gcloud beta run deploy collector \
     --image gcr.io/alter-rebbe-2/collector \ 
     --allow-unauthenticated \
     --platform managed \
-    --region us-east4
+    --region us-east4 \
+    --min-instances 1
 ```
 
 To set entry point variables and environment variables:
@@ -174,9 +166,6 @@ I pointed `www.alter-rebbe.org` at the dynamic app, and configured it to proxy f
 
 I do not see the need to set up [Cloud Build](https://cloud.google.com/cloud-build),
 but if I do - it runs locally too!
-
-At my scale and using only Google Cloud, [Terraform](https://www.hashicorp.com/products/terraform) is
-not needed...
 
 ### Running in local Docker ###
 
