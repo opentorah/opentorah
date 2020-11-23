@@ -35,8 +35,7 @@ jobs:
       - name: "Deploy Cloud Run service"
         uses: google-github-actions/deploy-cloudrun@main
         with:
-#          service: "collector"
-#          image: "gcr.io/alter-rebbe-2/collector"
-#          region: "us-east4"
           metadata: "./collector/service.yaml"
           credentials: ${{secrets.gcloudServiceAccountKey_alter_rebbe_2}}
+          # why isn't region inherited nor picked up from service.yaml but defaults to us-central1 is not clear...
+          region: "us-east4"

@@ -1,0 +1,8 @@
+apiVersion: skaffold/v2beta9
+kind: Config
+build:
+  artifacts:
+    - image: "gcr.io/alter-rebbe-2/collector"
+      jib:
+        project: 'collector'
+
