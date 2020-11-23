@@ -36,7 +36,6 @@ subprojects {
   apply from: '../library.gradle'
   apply from: '../mdoc.gradle'
   apply from: '../paper.gradle'
-  apply from: '../service.gradle'
 
   // TODO there seem to be multiple versions of some dependencies; verify and force as needed:
   // scala-xml, scala-library, slf4j-api, cats-kernel, cats-kernel-laws...

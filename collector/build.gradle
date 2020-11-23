@@ -26,15 +26,8 @@ dependencies {
 
 configureService()
 
-// TODO even unfolding jib {} here instead of calling configureJib() did not help IntelliJ Idea feel it
-// and make JIB builder available for Cloud Code | Cloud Run | Run Locally Run conficuration...
-//configureJib(
-//  'alter-rebbe-2',
-//  'collector',
-//  'us-east4',
-//  'org.opentorah.collector.Service',
-//  1
-//)
+// TODO IntelliJ Idea does not make JIB builder available for
+//   Cloud Code | Cloud Run | Run Locally Run conficuration...
 
 final String gcloudProject = 'alter-rebbe-2'
 final String gcloudService = 'collector'
@@ -60,6 +53,10 @@ jib {
 
 deploy.dependsOn('jib')
 
+// I didn't find any Gradle gcloud plugin that I can use to run `gcloud run deploy`,
+// so here I call the locally installed gcloud,
+// and in the GitHub Workflow I use the `google-github-actions/deploy-cloudrun` action.
+// TODO find a way to make JIB use project id, service name and image name from the service.yaml...
 deploy.doLast {
   exec {
     standardInput new ByteArrayInputStream(gcloudServiceAccountKey.getBytes('UTF-8'))
@@ -67,6 +64,7 @@ deploy.doLast {
   }
 
   exec {
-    commandLine 'gcloud', 'run', 'deploy', gcloudService, '--image', serviceImage
+//    commandLine 'gcloud', 'run', 'deploy', gcloudService, '--image', serviceImage
+    commandLine 'gcloud', 'beta', 'run', 'services', 'replace', "$projectDir/service.yaml"
   }
 }
