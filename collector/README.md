@@ -126,7 +126,7 @@ I use [Cloud Run](https://cloud.google.com/run#key-features)
  $ gcloud config set run/region us-east4
 ```
 
-To deploy on the Cloud Run (beta is required for the `--min-instances` option):
+To deploy on the Cloud Run for the first time (beta is required for the `--min-instances` option):
 ```
   $ gcloud beta run deploy collector \
     --image gcr.io/alter-rebbe-2/collector \ 
@@ -134,6 +134,11 @@ To deploy on the Cloud Run (beta is required for the `--min-instances` option):
     --platform managed \
     --region us-east4 \
     --min-instances 1
+```
+
+To re-deploy inheriting parameters from the previous revision (image name is not inherited for some reason):
+```
+  $ gcloud run deploy collector --image gcr.io/alter-rebbe-2/collector 
 ```
 
 To set entry point variables and environment variables:
