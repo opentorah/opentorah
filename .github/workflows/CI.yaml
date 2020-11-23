@@ -44,6 +44,7 @@ jobs:
       - name: "Deploy Cloud Run service"
         run: |
           gcloud beta run deploy "collector" \
+          --quiet \
           --image "gcr.io/alter-rebbe-2/collector" \
           --allow-unauthenticated \
           --platform managed \
