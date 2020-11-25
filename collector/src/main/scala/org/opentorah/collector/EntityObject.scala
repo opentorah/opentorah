@@ -1,7 +1,6 @@
 package org.opentorah.collector
 
-import org.opentorah.store.{EntityHolder, Path, Store, WithPath}
-import org.opentorah.tei.{Entity, EntityReference, Ref, Tei}
+import org.opentorah.tei.{Entity, Ref, Tei}
 import org.opentorah.util.Collections
 import scala.xml.{Elem, Node}
 
@@ -17,37 +16,27 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
 
   private def mentions: Elem = {
 
-    def sources(references: Seq[WithPath[EntityReference]]): Seq[Elem] = {
+    // TODO handle references from Collection, hierarchy etc.
+    def sources(references: Seq[ReferenceWithSource]): Seq[Elem] = {
       val result: Seq[Option[Elem]] =
-      for (source <- Collections.removeConsecutiveDuplicates(references.map(_.path))) yield {
-        val sourceStore: Store = source.last.store
-        val url: Option[Seq[String]] = sourceStore match {
-          case teiHolder: TeiHolder => Some(DocumentObject.documentUrl(
-            WithPath(source.init.init, source.init.init.last.store.asInstanceOf[Collection]),
-            Hierarchy.fileName(teiHolder)))
-          case document: Document => Some(DocumentObject.documentUrl(
-            WithPath(source.init, source.init.last.store.asInstanceOf[Collection]),
-            Hierarchy.fileName(document)))
-          case collection: Collection => None // TODO Some(collectionUrl(collection)) when grouping is adjusted?
-          case _ => None
+        for (reference <- Collections.removeConsecutiveDuplicatesWith(references)(_.path)) yield reference match {
+          case fromDocument: ReferenceWithSource.FromDocument =>
+            Some(Ref.toXml(
+              fromDocument.shortPath,
+              fromDocument.documentName
+            ))
+
+          case _ =>
+            None
         }
-        url.map(url => Ref.toXml(url, Hierarchy.storeName(sourceStore)))
-      }
 
       result.flatten
     }
 
     val id: String = EntityObject.fileName(entity)
 
-    val (fromEntities: Seq[WithPath[EntityReference]], notFromEntities: Seq[WithPath[EntityReference]]) =
-      site.references
-      .filter(_.value.ref.contains(id))
-      .partition(_.path.last.store.isInstanceOf[EntityHolder])
-
-    val bySource: Seq[(Path, Seq[WithPath[EntityReference]])] =
-      notFromEntities
-        .filter(reference => (reference.path.length >=3) && reference.path.init.init.last.store.isInstanceOf[Collection])
-        .groupBy(reference => reference.path.init.init).toSeq.sortBy(_._1)(Hierarchy.pathOrdering)
+    val (fromEntities: Seq[ReferenceWithSource.FromEntity], fromDocuments: Seq[ReferenceWithSource.FromDocument]) =
+      site.references.toId(id)
 
     <p xmlns={Tei.namespace.uri} rendition="mentions">
       {Ref.toXml(NamesObject.entityInTheListUrl(id), "[...]")}
@@ -55,19 +44,16 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
       <l>
         <emph>{NamesObject.title}:</emph>
         {
-        val result = for (source <- Collections.removeConsecutiveDuplicates(fromEntities.map(_.path))) yield {
-          val entityHolder: EntityHolder = source.last.store.asInstanceOf[EntityHolder]
-          Ref.toXml(
-            target = EntityObject.teiWrapperUrl(entityHolder.entity),
-            text = Hierarchy.storeName(entityHolder)
-          )
-        }
+        val result = for (fromEntity <- Collections.removeConsecutiveDuplicatesWith(fromEntities)(_.path)) yield Ref.toXml(
+          target = fromEntity.path,
+          text = fromEntity.entityName
+        )
 
         result.init.map(elem => <span>{elem},</span>) :+ result.last
         }
       </l>}}
-      {for ((source, references) <- bySource)
-      yield <l><emph>{Hierarchy.fullName(source)}:</emph>{sources(references)}</l>}
+      {for (references <- fromDocuments.groupBy(_.path.init).toSeq.sortBy(_._1)(Hierarchy.pathOrdering).map(_._2))
+      yield <l><emph>{Hierarchy.fullName(references.head.path.init.init)}:</emph>{sources(references)}</l>}
     </p>
   }
 

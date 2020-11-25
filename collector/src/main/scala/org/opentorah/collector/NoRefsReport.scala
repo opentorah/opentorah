@@ -1,10 +1,9 @@
 package org.opentorah.collector
 
-import org.opentorah.store.WithPath
-import org.opentorah.tei.{EntityName, EntityReference, Tei}
+import org.opentorah.tei.{EntityName, Ref, Tei}
 import scala.xml.Elem
 
-final class NoRefsReport(site: Site) extends ReportObject[WithPath[EntityReference]](site) {
+final class NoRefsReport(site: Site) extends ReportObject[ReferenceWithSource.FromDocument](site) {
 
   override def fileName: String = "no-refs"
 
@@ -12,19 +11,18 @@ final class NoRefsReport(site: Site) extends ReportObject[WithPath[EntityReferen
 
   override def title: Option[String] = Some("Имена без атрибута /ref/")
 
-  override protected def lines: Seq[WithPath[EntityReference]] =
-    site.references.filter(_.value.ref.isEmpty)
+  override protected def lines: Seq[ReferenceWithSource.FromDocument] = site.references.noRef
 
-  override protected def lineToXml(reference: WithPath[EntityReference]): Elem = {
-    // TODO give a link to the ref:
-    // TODO call one method to get the ref?
-    val collectionName: String = Hierarchy.referenceCollectionName(reference)
-    val documentName: String = Hierarchy.storeName(reference.path.last.store)
-    val ref: String = s"/$collectionName/$documentName"
+  // TODO include all references, not just the ones from documents!
+  override protected def lineToXml(fromDocument: ReferenceWithSource.FromDocument): Elem = {
+    val reference: Elem = EntityName.toXmlElement(EntityName.forReference(fromDocument.reference))
 
-    <l xmlns={Tei.namespace.uri}>
-      {EntityName.toXmlElement(EntityName.forReference(reference.value))} в {ref}
-    </l>
+    val link: Elem = Ref.toXml(
+      target = fromDocument.shortPath,
+      text = fromDocument.collectionFileName + "/" + fromDocument.documentName
+    )
+
+    <l xmlns={Tei.namespace.uri}>{reference} в {link}</l>
   }
 
   override def simpleSubObjects: Seq[SimpleSiteObject] = Seq.empty

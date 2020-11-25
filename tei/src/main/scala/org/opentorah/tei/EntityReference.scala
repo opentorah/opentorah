@@ -9,7 +9,9 @@ final case class EntityReference(
   id: Option[String],
   role: Option[String],
   ref: Option[String]
-)
+) {
+  def text: String = name.map(_.text.trim).mkString(" ")
+}
 
 object EntityReference extends ToXml[EntityReference] {
 

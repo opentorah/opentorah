@@ -65,15 +65,18 @@ object Files {
 
   def fileInDirectory(url: URL, fileName: String): URL = new URL(url, fileName)
 
+  def getParent(url: URL): URL = new URL(url, "..")
+
   def isFile(url: URL): Boolean = url.getProtocol == "file"
 
   def urlAndPart(what: String): (String, Option[String]) = Strings.split(what, '#')
 
-  def addPart(url: Seq[String], part: Option[String]): Seq[String] =
-    part.fold(url){ part => addPart(url, part) }
+  def addPart(url: Seq[String], part: Option[String]): Seq[String] = part.fold(url)(addPart(url, _))
+  def addPart(url: Seq[String], part: String): Seq[String] = add(url, "#" + part)
+  def addExtension(url: Seq[String], extension: String): Seq[String] =  add(url, "." + extension)
 
-  def addPart(url: Seq[String], part: String): Seq[String] =
-    url.init :+ (url.last + "#" + part)
+  def add(url: Seq[String], what: String): Seq[String] =
+    url.init :+ (url.last + what)
 
   def mkUrl(segments: Seq[String]): String = segments.mkString("/", "/", "")
 

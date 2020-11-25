@@ -23,4 +23,22 @@ abstract class Store(
   def by: Option[By[Store]] = None
 }
 
-object Store extends StoreComponent
+object Store extends StoreComponent {
+
+  def withPath[R](
+    path: Path,
+    values: Store => Seq[R],
+    store: Store
+  ): Seq[WithPath[R]] = {
+    val fromStore: Seq[WithPath[R]] =
+      values(store).map(WithPath[R](path, _))
+
+    val fromEntities: Seq[WithPath[R]] = store.entities.toSeq.flatMap(entities =>
+      withPath[R](path :+ entities.selector.bind(entities), values, entities))
+
+    val fromBy: Seq[WithPath[R]] = store.by.toSeq.flatMap(by =>
+      by.stores.flatMap(store => withPath[R](path :+ by.selector.bind(store), values, store)))
+
+    fromEntities ++ fromStore ++ fromBy
+  }
+}

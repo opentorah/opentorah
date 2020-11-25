@@ -21,6 +21,3 @@ spec:
             memory: 256Mi
       containerConcurrency: 80
       timeoutSeconds: 300
-  traffic:
-  - latestRevision: true
-    percent: 100

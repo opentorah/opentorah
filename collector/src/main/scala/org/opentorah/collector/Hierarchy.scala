@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.{Language, Names}
 import org.opentorah.store.{Binding, Path, Store, WithPath}
-import org.opentorah.tei.{EntityReference, Ref, Tei}
+import org.opentorah.tei.{Ref, Tei}
 import org.opentorah.util.Files
 import org.opentorah.xml.{RawXml, Xml}
 import scala.xml.{Elem, Node}
@@ -22,6 +22,14 @@ object Hierarchy {
   def fullName(path: Path): String = path.path.map { binding =>
     getName(binding.selector.names) + " " + getName(binding.store.names)
   }.mkString(", ")
+
+  def fullName(path: Seq[String]): String = path
+    .zip(path.tail)
+    .zipWithIndex
+    .filter(_._2 % 2 == 0)
+    .map(_._1)
+    .map { case (selector, store) => s"$selector $store" }
+    .mkString(", ")
 
   def storeHeader(path: Path, store: Store): Seq[Node] =
     pathLinks(path) ++
@@ -57,14 +65,6 @@ object Hierarchy {
   }
 
   // TODO eliminate
-  def storeName(store: Store): String =
-    store.names.name
-
-  // TODO eliminate
-  def referenceCollectionName(reference: WithPath[EntityReference]): String =
-    storeName(reference.path.init.init.last.store)
-
-  // TODO eliminate
   def collectionXml(site: Site, collection: WithPath[Collection]): Elem =
   // TODO make a Ref serializer that takes SiteObject...
     <item xmlns={Tei.namespace.uri}>{Ref.toXml(
@@ -76,12 +76,10 @@ object Hierarchy {
 
   def getName(names: Names): String = names.doFind(Language.Russian.toSpec).name
 
+  // TODO move into Store
   def fileName(store: Store): String =
     Files.nameAndExtension(Files.pathAndName(store.urls.fromUrl.get.getPath)._2)._1
 
-  val pathOrdering: Ordering[Path] = (x: Path, y: Path) => Ordering.Iterable[Binding]((x: Binding, y: Binding) => {
-    val selectorCompare: Int = x.selector.names.name.toLowerCase compare y.selector.names.name.toLowerCase
-    if (selectorCompare != 0) selectorCompare
-    else x.store.names.name.toLowerCase compare y.store.names.name.toLowerCase
-  }).compare(x.path, y.path)
+  val pathOrdering: Ordering[Seq[String]] = (x: Seq[String], y: Seq[String]) =>
+    Ordering.Iterable[String]((x: String, y: String) => x.toLowerCase compare y.toLowerCase).compare(x, y)
 }
