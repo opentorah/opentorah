@@ -2,11 +2,10 @@ package org.opentorah.collector
 
 import java.io.File
 import org.opentorah.store.{Entities, EntityHolder, Path, Store, WithPath}
-import org.opentorah.tei.{Entity, EntityReference, Publisher, SourceDesc, Tei}
+import org.opentorah.tei.{Entity, Publisher, SourceDesc, Tei}
 import org.opentorah.util.Files
 import org.opentorah.xml.LinkResolver
 import org.slf4j.{Logger, LoggerFactory}
-import scala.xml.Node
 
 final class Site(
   val store: Store,
@@ -14,36 +13,9 @@ final class Site(
 ) {
 
   private def withPath[R](values: Store => Seq[R]): Seq[WithPath[R]] =
-    Site.withPath(Path.empty, values, store)
+    Store.withPath(Path.empty, values, store)
 
-  val references: Seq[WithPath[EntityReference]] = withPath[EntityReference](values = references(_))
-
-  private def references(store: Store): Seq[EntityReference] = store match {
-    case _: Entities =>
-      Seq.empty
-
-    case entityHolder: EntityHolder =>
-      EntityReference.from(entityHolder.entity.content)
-
-    case _: Document =>
-      Seq.empty
-
-    case teiHolder: TeiHolder =>
-      val lookInto: Seq[Node] =
-        teiHolder.tei.getAbstract.getOrElse(Seq.empty) ++
-        teiHolder.tei.correspDesc.map(_.xml).getOrElse(Seq.empty) ++
-        teiHolder.tei.body.xml
-
-      teiHolder.tei.titleStmt.references ++ EntityReference.from(lookInto)
-
-    case fromElement: Store.FromElement =>
-      val lookInto: Seq[Node] =
-        fromElement.title.map(_.xml).getOrElse(Seq.empty) ++
-        fromElement.storeAbstract.map(_.xml).getOrElse(Seq.empty) ++
-        fromElement.body.map(_.xml).getOrElse(Seq.empty)
-
-      EntityReference.from(lookInto)
-  }
+  val references: References = new References(store)
 
   private val collections: Seq[WithPath[Collection]] = withPath[Collection](values = {
     case collection: Collection => Seq(collection)
@@ -63,7 +35,7 @@ final class Site(
   def resolver(facsUrl: Seq[String]): LinkResolver = new LinkResolver {
 
     override def resolve(url: Seq[String]): Option[LinkResolver.Resolved] =
-      new RootSiteObject(Site.this).resolve(url).fold[Option[LinkResolver.Resolved]] {
+      rootSiteObject.resolve(url).fold[Option[LinkResolver.Resolved]] {
         Site.logger.warn(s"did not resolve: $url")
         None
       } { siteFile: SiteFile => Some(LinkResolver.Resolved(
@@ -88,6 +60,8 @@ final class Site(
       role = Some(Viewer.Facsimile.name)
     )
   }
+
+  private val rootSiteObject: RootSiteObject = new RootSiteObject(this)
 }
 
 object Site {
@@ -108,23 +82,6 @@ object Site {
   //    if (orphanImages.nonEmpty) throw new IllegalArgumentException(s"Orphan images: $orphanImages")
   //    if (missingImages.nonEmpty) throw new IllegalArgumentException(s"Missing images: $missingImages")
   //  }
-
-  private def withPath[R](
-    path: Path,
-    values: Store => Seq[R],
-    store: Store
-  ): Seq[WithPath[R]] = {
-    val fromStore: Seq[WithPath[R]] =
-      values(store).map(WithPath[R](path, _))
-
-    val fromEntities: Seq[WithPath[R]] = store.entities.toSeq.flatMap(entities =>
-      withPath[R](path :+ entities.selector.bind(entities), values, entities))
-
-    val fromBy: Seq[WithPath[R]] = store.by.toSeq.flatMap(by =>
-      by.stores.flatMap(store => withPath[R](path :+ by.selector.bind(store), values, store)))
-
-    fromEntities ++ fromStore ++ fromBy
-  }
 
   def write(
     directory: File,

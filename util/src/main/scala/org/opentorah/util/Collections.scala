@@ -33,15 +33,19 @@ object Collections {
     require(result.isEmpty, s"Duplicate $what: $result")
   }
 
-  def removeConsecutiveDuplicates[T](seq: Seq[T]): Seq[T] = removeConsecutiveDuplicates(Seq.empty, seq.toList)
+  def removeConsecutiveDuplicates[T](seq: Seq[T]): Seq[T] =
+    removeConsecutiveDuplicates[T, T](Seq.empty, seq.toList)(identity)
+
+  def removeConsecutiveDuplicatesWith[T, D](seq: Seq[T])(f: T => D): Seq[T] =
+    removeConsecutiveDuplicates[T, D](Seq.empty, seq.toList)(f)
 
   @scala.annotation.tailrec
-  private def removeConsecutiveDuplicates[T](result: Seq[T], seq: List[T]): Seq[T] = seq match {
+  private def removeConsecutiveDuplicates[T, D](result: Seq[T], seq: List[T])(f: T => D): Seq[T] = seq match {
     case x :: y :: xs =>
       removeConsecutiveDuplicates(
-        if (x == y) result else result :+ x,
+        if (f(x) == f(y)) result else result :+ x,
         y :: xs
-      )
+      )(f)
     case x :: Nil => result :+ x
     case Nil => result
   }

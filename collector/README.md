@@ -223,7 +223,7 @@ Granted the user account the role needed for service account impersonation:
 
 Logged into the service account:
 ```
-  $ gcloud auth activate-service-account --key-file=./key.json
+  $ gcloud auth activate-service-account --key-file=/home/dub/.gradle/gcloudServiceAccountKey-alter-rebbe-2.json
 ```
 
 To set it as a default account:

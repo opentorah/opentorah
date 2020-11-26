@@ -57,7 +57,7 @@ object CollectionObject {
   val facsDirectoryName: String = "facs" // facsimile viewers
 
   def navigationLink(collection: WithPath[Collection]): NavigationLink =
-    NavigationLink("../index", s"[${Hierarchy.storeName(collection.value)}]", Some(Viewer.Collection))
+    NavigationLink("../index", s"[${collection.value.names.name}]", Some(Viewer.Collection))
 
   // TODO move into CollectionsObject (together with its directory name)
   def resolve(site: Site, parts: Seq[String]): Option[SiteFile] = if (parts.isEmpty) None else

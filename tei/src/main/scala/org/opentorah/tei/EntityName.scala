@@ -40,6 +40,6 @@ object EntityName extends ToXml[EntityName] {
 
   def forReference(entityReference: EntityReference): EntityName = EntityName(
     entityType = entityReference.entityType,
-    name = entityReference.name.map(_.text.trim).mkString(" ")
+    name = entityReference.text
   )
 }

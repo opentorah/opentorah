@@ -19,7 +19,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val docs: File = new File(args(0))
     doIt(
-      fromUrl = From.file(Files.file(docs, Seq("store", "store.xml"))).url.get, // TODO FIles.file2url?
+      fromUrl = From.file(Files.file(docs, Seq("store", "store.xml"))).url.get, // TODO Files.file2url?
       siteRoot = docs
     )
   }
@@ -56,9 +56,8 @@ object Main {
     ))
 
     logger.info("Checking store.")
-    def findByRef(ref: String): Option[Entity] = store.entities.get.findByRef(ref)
-    val errors: Seq[String] = site.references.flatMap(reference => checkReference(reference.value, findByRef))
-    if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
+    site.references.check(store.entities.get.findByRef).foreach(errors =>
+      throw new IllegalArgumentException(errors.mkString("\n")))
 
     logger.info("Pretty-printing store.")
     for (entityHolder <- store.entities.get.by.get.stores)
@@ -90,16 +89,4 @@ object Main {
       file = Files.url2file(fromUrl),
       content = prettyPrinter.renderXml(toXml)
     )
-
-  private def checkReference(reference: EntityReference,  findByRef: String => Option[Entity]): Option[String] = {
-    val name = reference.name
-    reference.ref.fold[Option[String]](None) { ref =>
-      if (ref.contains(" ")) Some(s"""Value of the ref attribute contains spaces: ref="$ref" """) else {
-        findByRef(ref).fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${name.text}< """)) { named =>
-          if (named.entityType == reference.entityType) None
-          else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: $name [$ref]")
-        }
-      }
-    }
-  }
 }
