@@ -62,9 +62,6 @@ deploy.doLast {
   }
 
   exec {
-    // TODO services replace does NOT get me min-instances=1!
-//    commandLine 'gcloud', 'beta', 'run', 'services', 'replace', "$projectDir/service.yaml"
-
-    commandLine 'gcloud', 'run', 'deploy', gcloudService, '--image', serviceImage
+    commandLine 'gcloud', 'beta', 'run', 'services', 'replace', "$projectDir/service.yaml"
   }
 }

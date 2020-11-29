@@ -13,7 +13,7 @@ final class NoRefsReport(site: Site) extends ReportObject[ReferenceWithSource.Fr
 
   override protected def lines: Seq[ReferenceWithSource.FromDocument] = site.references.noRef
 
-  // TODO include all references, not just the ones from documents!
+  // TODO include all references, not just the ones from documents (общий/178, /1374/2213)
   override protected def lineToXml(fromDocument: ReferenceWithSource.FromDocument): Elem = {
     val reference: Elem = EntityName.toXmlElement(EntityName.forReference(fromDocument.reference))
 

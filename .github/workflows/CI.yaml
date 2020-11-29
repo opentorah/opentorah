@@ -35,25 +35,6 @@ jobs:
       - name: "Deploy Cloud Run service"
         uses: google-github-actions/deploy-cloudrun@main
         with:
-          metadata: "./collector/service.yaml"
           credentials: ${{secrets.gcloudServiceAccountKey_alter_rebbe_2}}
-          # why isn't the region inherited nor picked up from `service.yaml`
-          # but instead defaults to `us-central1` is not clear...
+          metadata: "./collector/service.yaml"
           region: "us-east4"
-
-      # TODO with service.yaml, new instance doesn't get created,
-      # and when used in Gradle build file, it doesn't honour min-instances;
-      # the old way requires parameter duplication - and setup action is now called something else...
-#      - name: "Setup gcloud CLI"
-#        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-#        with:
-#          project_id: "alter-rebbe-2"
-#          service_account_key: ${{secrets.gcloudServiceAccountKey_alter_rebbe_2}}
-#
-#      - name: "Deploy Cloud Run Service"
-#        run: |
-#          gcloud run deploy "collector" \
-#          --image "gcr.io/alter-rebbe-2/collector" \
-#          --allow-unauthenticated \
-#          --platform managed \
-#          --region us-east4

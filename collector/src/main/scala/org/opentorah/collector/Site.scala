@@ -15,7 +15,7 @@ final class Site(
   private def withPath[R](values: Store => Seq[R]): Seq[WithPath[R]] =
     Store.withPath(Path.empty, values, store)
 
-  val references: References = new References(store)
+  val references: References = References(store)
 
   private val collections: Seq[WithPath[Collection]] = withPath[Collection](values = {
     case collection: Collection => Seq(collection)

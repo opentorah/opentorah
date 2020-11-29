@@ -45,6 +45,7 @@ class Extension(project: Project) {
   val mathJax: MathJaxExtension =
     project.getObjects.newInstance(classOf[MathJaxExtension], project)
 
+  // TODO why is this here?
   def mathJax(action: Action[MathJaxExtension]): Unit = action.execute(mathJax)
 
   // Defaults

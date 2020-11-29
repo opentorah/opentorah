@@ -5,10 +5,7 @@ import org.opentorah.store.{By, Selector, Store}
 import org.opentorah.tei.{Entity, EntityReference}
 import org.opentorah.util.Files
 
-// TODO calculate and write into file when local; read from file when not.
-final class References(store: Store) {
-  private val references: Seq[ReferenceWithSource] = References.references(Seq.empty, store)
-
+final class References private(references: Seq[ReferenceWithSource]) {
   def check(findByRef: String => Option[Entity]): Seq[String] =
     references.flatMap(referenceWithSource =>
       References.checkReference(referenceWithSource.reference, findByRef))
@@ -25,6 +22,9 @@ final class References(store: Store) {
 }
 
 object References {
+
+  // TODO calculate and write into file when local; read from file when not.
+  def apply(store: Store): References = new References(references(Seq.empty, store))
 
   private def references(path: Seq[String], store: Store): Seq[ReferenceWithSource] =
     store.entities.toSeq.flatMap(entities => entities.by.get.stores.flatMap { entityHolder =>

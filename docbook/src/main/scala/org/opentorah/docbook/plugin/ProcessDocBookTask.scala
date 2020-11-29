@@ -18,7 +18,9 @@ import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 import scala.xml.{Comment, Elem}
 
-class ProcessDocBookTask extends DefaultTask {
+final class ProcessDocBookTask extends DefaultTask {
+  setDescription(s"Process DocBook")
+  setGroup("publishing")
 
   private val layout: Layout = Layout.forProject(getProject)
   private val logger: Logger = getProject.getLogger
