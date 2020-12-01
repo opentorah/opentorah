@@ -27,14 +27,7 @@ jobs:
           bintrayApiKey: ${{secrets.bintrayApiKey}}
         run: ./gradlew --no-daemon bintrayUpload
 
-      - name: "Build and push image to Google Container Registry"
+      - name: "Build and push container image to Google Container Registry and deploy Cloud Run service"
         env:
-          gcloudServiceAccountKey_alter_rebbe_2: ${{secrets.gcloudServiceAccountKey_alter_rebbe_2}}
-        run: ./gradlew --no-daemon jib
-
-      - name: "Deploy Cloud Run service"
-        uses: google-github-actions/deploy-cloudrun@main
-        with:
-          credentials: ${{secrets.gcloudServiceAccountKey_alter_rebbe_2}}
-          metadata: "./collector/service.yaml"
-          region: "us-east4"
+          gcloudServiceAccountKey: ${{secrets.gcloudServiceAccountKey}}
+        run: ./gradlew --no-daemon deploy
