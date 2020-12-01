@@ -18,7 +18,8 @@ import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 import scala.xml.{Comment, Elem}
 
-final class ProcessDocBookTask extends DefaultTask {
+// Note: Task class can not be final for Gradle to be able to decorate it.
+class ProcessDocBookTask extends DefaultTask {
   setDescription(s"Process DocBook")
   setGroup("publishing")
 
