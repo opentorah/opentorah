@@ -1,23 +1,23 @@
-apiVersion: serving.knative.dev/v1
-kind: Service
+apiVersion: "serving.knative.dev/v1"
+kind: "Service"
 metadata:
-  name: collector
-  labels:
-    cloud.googleapis.com/location: us-east4
+  name: "collector"
   annotations:
-    run.googleapis.com/launch-stage: BETA
-    autoscaling.knative.dev/maxScale: '1000'
-    autoscaling.knative.dev/minScale: '1'
+    run.googleapis.com/launch-stage: "BETA"
 spec:
   template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: "99"
+        autoscaling.knative.dev/minScale: "1"
     spec:
       containers:
-      - image: gcr.io/alter-rebbe-2/collector
+      - image: "gcr.io/alter-rebbe-2/collector"
         ports:
         - containerPort: 8080
         resources:
           limits:
-            cpu: 1000m
-            memory: 256Mi
+            cpu: "1000m"
+            memory: "256Mi"
       containerConcurrency: 80
       timeoutSeconds: 300

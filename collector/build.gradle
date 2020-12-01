@@ -5,6 +5,7 @@ plugins {
   id 'maven-publish'
   id 'com.jfrog.bintray'
   id 'com.google.cloud.tools.jib'
+  id 'org.podval.tools.cloudrun'
 }
 
 description = 'Archive Collector'
@@ -26,45 +27,8 @@ dependencies {
 }
 
 // TODO IntelliJ Idea does not make JIB builder available for
-//   Cloud Code | Cloud Run | Run Locally Run conficuration...
+//   Cloud Code | Cloud Run | Run Locally Run configuration...
 
-final String gcloudProject = 'alter-rebbe-2'
-final String gcloudService = 'collector'
-final String serviceImage  = "gcr.io/$gcloudProject/$gcloudService"
-final String mainClassName = 'org.opentorah.collector.Service'
-
-// TODO look into `providers.credentials(org.gradle.api.credentials.PasswordCredentials, 'login')`...
-final String gcloudServiceAccountProperty = 'gcloudServiceAccountKey_' + gcloudProject.replace('-', '_')
-final String gcloudServiceAccountKey      = findProperty(gcloudServiceAccountProperty) ?: System.getenv(gcloudServiceAccountProperty)
-
-jib {
-  to {
-    auth {
-      username = '_json_key'
-      password = gcloudServiceAccountKey
-    }
-    image = serviceImage
-  }
-  container {
-    mainClass = mainClassName
-  }
-}
-
-// I didn't find any Gradle gcloud plugin that I can use to run `gcloud run deploy`,
-// so here I call the locally installed gcloud,
-// and in the GitHub Workflow I use the `google-github-actions/deploy-cloudrun` action.
-// TODO find a way to make JIB use project id, service name and image name from the service.yaml...
-deploy.dependsOn('jib')
-deploy.doLast {
-  exec {
-    standardInput new ByteArrayInputStream(gcloudServiceAccountKey.getBytes('UTF-8'))
-    commandLine 'gcloud', 'auth', 'activate-service-account', '--key-file', '-'
-  }
-
-  exec {
-    // TODO services replace does NOT get me min-instances=1!
-//    commandLine 'gcloud', 'beta', 'run', 'services', 'replace', "$projectDir/service.yaml"
-
-    commandLine 'gcloud', 'run', 'deploy', gcloudService, '--image', serviceImage
-  }
-}
+jib.container.mainClass = 'org.opentorah.collector.Service'
+cloudRun.region = 'us-east4'
+deploy.dependsOn(cloudRunDeploy)

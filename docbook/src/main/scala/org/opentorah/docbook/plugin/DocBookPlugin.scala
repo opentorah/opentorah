@@ -13,8 +13,6 @@ final class DocBookPlugin extends Plugin[Project] {
     val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)
 
     val processDocBookTask: ProcessDocBookTask = project.getTasks.create("processDocBook", classOf[ProcessDocBookTask])
-    processDocBookTask.setDescription(s"Process DocBook")
-    processDocBookTask.setGroup("publishing")
     processDocBookTask.xslt1version.set(extension.xslt1version)
     processDocBookTask.xslt2version.set(extension.xslt2version)
     processDocBookTask.document.set(extension.document)
