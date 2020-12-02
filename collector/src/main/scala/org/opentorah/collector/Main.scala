@@ -3,7 +3,7 @@ package org.opentorah.collector
 import java.io.File
 import java.net.URL
 import org.opentorah.store.Store
-import org.opentorah.tei.{Entity, EntityReference, Tei}
+import org.opentorah.tei.{Entity, Tei}
 import org.opentorah.util.Files
 import org.opentorah.xml.{From, PrettyPrinter}
 import org.slf4j.{Logger, LoggerFactory}
@@ -56,14 +56,13 @@ object Main {
     ))
 
     logger.info("Checking store.")
-    site.references.check(store.entities.get.findByRef).foreach(errors =>
-      throw new IllegalArgumentException(errors.mkString("\n")))
+    val errors = site.references.check(store.entities.get.findByRef)
+    if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
 
     logger.info("Pretty-printing store.")
     for (entityHolder <- store.entities.get.by.get.stores)
       prettyPrint(entityHolder, Entity.toXmlElement(entityHolder.entity.copy(id = None)), Tei.prettyPrinter)
     prettyPrint(store)
-
 
     logger.info("Writing site.")
     Site.write(
