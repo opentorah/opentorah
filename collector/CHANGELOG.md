@@ -2,14 +2,16 @@
 
 ## [Unreleased]
 
-## [0.1.55]
+## [0.7.56] - 2020-12-06
 - converting TEI to HTML in code (no more CETEIcean);
 - generating HTML in code (no more Jekyll for the TEI files);
 - generating HTML from Markdown files (no more Jekyll for them);
 - generating CSS from SCSS at build time (no more Jekyll!);
+- folded `collector-service` into `collector`;  
 - serving local files without Jekyll (which is no longer used for anything);
 - UI improvements;
 - keep one instance of the service always warm (no more Cloud Scheduler);
+- using CloudRun Gradle plugin;
 
 ## [0.1.53] - 2020-08-23 (`collector-service`)
 - tracking StaticFile fix;
