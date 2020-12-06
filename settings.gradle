@@ -10,7 +10,7 @@ pluginManagement {
     id 'com.github.maiflai.scalatest' version '0.30'
     id 'com.jfrog.bintray' version '1.8.5'
     id 'com.google.cloud.tools.jib' version '2.7.0'
-    id 'org.podval.tools.cloudrun' version '0.1.2'
+    id 'org.podval.tools.cloudrun' version '0.1.3'
     id 'com.gradle.plugin-publish' version '0.12.0'
     id 'org.opentorah.docbook' version docBookPluginVersion
   }
