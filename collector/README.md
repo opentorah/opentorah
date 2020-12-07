@@ -89,6 +89,12 @@ To sync with the bucket:
   $ gsutil -m rsync -r -d <path-to-local-copy-of-the-bucket> gs://facsimiles.alter-rebbe.org
 ```
 
+## Store ##
+
+On 2020-12-06 started moving towards storing the store data in a Google Storage Bucket:
+- created `store.alter-rebbe.org` bucket;
+
+
 ## JIB ##
 
 Everything is Dockerized nowadays. To make docker work locally,
@@ -126,6 +132,10 @@ I use [Cloud Run](https://cloud.google.com/run#key-features)
  $ gcloud config set run/region us-east4
 ```
 
+In December 2020 I wrote Cloud Run Gradle plugin and now use it to deploy the service.
+Service configuration is in the `service.yaml` file.
+
+Historically:
 To deploy on the Cloud Run for the first time (beta is required for the `--min-instances` option):
 ```
   $ gcloud beta run deploy collector \
@@ -167,7 +177,7 @@ is in place; mine was there from the previous incarnation. I was getting “unex
 connection” while it was spinning and for a few minutes after it stopped; http 302-redirects to https.
 
 I pointed `www.alter-rebbe.org` at the dynamic app, and configured it to proxy for
-`store.alter-rebbe.org` on 19-07-2020.
+`store.alter-rebbe.org` on 2020-07-19.
 
 I do not see the need to set up [Cloud Build](https://cloud.google.com/cloud-build),
 but if I do - it runs locally too!
