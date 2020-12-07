@@ -93,6 +93,8 @@ To sync with the bucket:
 
 On 2020-12-06 started moving towards storing the store data in a Google Storage Bucket:
 - created `store.alter-rebbe.org` bucket;
+- made it public;
+- pointed CNAME record at it;
 
 
 ## JIB ##

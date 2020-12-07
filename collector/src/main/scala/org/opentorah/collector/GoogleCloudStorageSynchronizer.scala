@@ -4,17 +4,15 @@ import com.google.api.gax.paging.Page
 import com.google.auth.oauth2.ServiceAccountCredentials
 import com.google.cloud.WriteChannel
 import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Storage, StorageOptions}
-import com.google.common.hash.HashCode
-import org.opentorah.util.Strings
+import org.opentorah.util.{Files, Strings}
 import org.slf4j.{Logger, LoggerFactory}
-
 import java.io.File
 import java.net.URLConnection
 import java.nio.ByteBuffer
 import scala.annotation.tailrec
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 
-final class GoogleCloudStorageSynchronizer(
+final class GoogleCloudStorageSynchronizer private(
   serviceAccountKey: String,
   bucketName: String,
   bucketPrefix: String,
@@ -37,7 +35,9 @@ final class GoogleCloudStorageSynchronizer(
     .build()
     .getService
 
-  def sync(): Unit = {
+  private def sync(): Unit = {
+    log(s"Synchronizing $directoryPath to $bucketName/$bucketPrefix" + (if (dryRun) " (dry run)" else ""))
+
     log(s"Listing files in $directoryPath")
     val files: Map[String, File] = listDirectory(directoryPath)
     log(s"Found ${files.size} files")
@@ -144,7 +144,11 @@ final class GoogleCloudStorageSynchronizer(
     def listDirectories(result: List[File], directoriesToList: List[File]): List[File] = directoriesToList match {
       case Nil => result
       case current :: tail =>
-        val (directories: List[File], files: List[File]) = current.listFiles.toList.partition(_.isDirectory)
+        val gsignore = new File(current, ".gsignore")
+        val ignore: Set[String] = if (!gsignore.exists()) Set.empty else Files.read(gsignore).toSet + ".gsignore"
+        val (directories: List[File], files: List[File]) = current.listFiles.toList
+          .filterNot(file => ignore.contains(file.getName))
+          .partition(_.isDirectory)
         listDirectories(result ++ directories ++ files, tail ++ directories)
     }
 
@@ -193,11 +197,17 @@ final class GoogleCloudStorageSynchronizer(
 
 object GoogleCloudStorageSynchronizer {
 
-  def main(args: Array[String]): Unit = new GoogleCloudStorageSynchronizer(
-    serviceAccountKey = args(0),
-    bucketName = "store.alter-rebbe.org",
-    bucketPrefix = "",
-    directoryPath = args(1),
-    dryRun = false
+  def sync(
+    serviceAccountKey: String,
+    bucketName: String,
+    bucketPrefix: String,
+    directoryPath: String,
+    dryRun: Boolean
+  ): Unit = new GoogleCloudStorageSynchronizer(
+    serviceAccountKey,
+    bucketName,
+    bucketPrefix,
+    directoryPath,
+    dryRun
   ).sync()
 }

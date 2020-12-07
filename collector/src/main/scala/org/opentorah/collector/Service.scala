@@ -33,7 +33,7 @@ object Service extends App {
     val serviceName: Option[String] = getEnv("K_SERVICE")
     warning(s"serviceName=$serviceName")
 
-    val storeUri: Uri = Uri.unsafeFromString(getParameter("STORE", "https://store.alter-rebbe.org"))
+    val storeUri: Uri = Uri.unsafeFromString(getParameter("STORE", "http://store.alter-rebbe.org"))
     run(ServiceRoutes.routes(storeUri))
   }
 

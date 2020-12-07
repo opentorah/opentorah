@@ -1,9 +1,12 @@
 # Changelog
 
 ## [Unreleased]
-- GitHub repository alter-rebbe.org is no longer published as store.alter-rebbe.org;
-- service now uses URL http://opentorah.github.io/alter-rebbe.org/;
-- wrote synchronizer local directory -> Google Storage bucket;
+
+## [0.7.59] - 2020-12-07
+- synchronizing local directory to a Google Storage bucket;
+- use CRS32c to detect changes in uploaded files;
+- introduced `.gsignore` file to exclude files from the Google Store sync;
+- consolidated build functionality (verify/generate/upload site) in the Build object;
 
 ## [0.7.56] - 2020-12-06
 - converting TEI to HTML in code (no more CETEIcean);

@@ -4,8 +4,9 @@ import java.io.File
 import org.opentorah.store.{Entities, EntityHolder, Path, Store, WithPath}
 import org.opentorah.tei.{Entity, Publisher, SourceDesc, Tei}
 import org.opentorah.util.Files
-import org.opentorah.xml.LinkResolver
+import org.opentorah.xml.{LinkResolver, PrettyPrinter}
 import org.slf4j.{Logger, LoggerFactory}
+import scala.xml.Elem
 
 final class Site(
   val store: Store,
@@ -16,6 +17,8 @@ final class Site(
     Store.withPath(Path.empty, values, store)
 
   val references: References = References(store)
+
+  def checkReferences: Seq[String] = references.check(store.entities.get.findByRef)
 
   private val collections: Seq[WithPath[Collection]] = withPath[Collection](values = {
     case collection: Collection => Seq(collection)
@@ -62,6 +65,30 @@ final class Site(
   }
 
   private val rootSiteObject: RootSiteObject = new RootSiteObject(this)
+
+  def prettyPrintStore(): Unit = {
+    for (entityHolder <- store.entities.get.by.get.stores)
+      prettyPrint(entityHolder, Entity.toXmlElement(entityHolder.entity.copy(id = None)), Tei.prettyPrinter)
+    prettyPrint(store)
+  }
+
+  private def prettyPrint(store: Store): Unit = {
+    prettyPrint(store, Store.parsable.toXmlElement(store.asInstanceOf[Store.FromElement].element), Store.prettyPrinter)
+
+    store match {
+      case collection: Collection =>
+        for (by <- collection.by; document <- by.stores; by <- document.by; teiHolder <- by.stores)
+          prettyPrint(teiHolder, Tei.toXmlElement(teiHolder.tei), Tei.prettyPrinter)
+      case _ =>
+        for (by <- store.by; store <- by.stores) prettyPrint(store)
+    }
+  }
+
+  private def prettyPrint(store: Store, toXml: => Elem, prettyPrinter: PrettyPrinter): Unit =
+    for (fromUrl <- store.urls.fromUrl) if (Files.isFile(fromUrl)) Files.write(
+      file = Files.url2file(fromUrl),
+      content = prettyPrinter.renderXml(toXml)
+    )
 }
 
 object Site {
@@ -85,17 +112,29 @@ object Site {
 
   def write(
     directory: File,
-    site: Site
+    site: Site,
+    doWrite: Boolean
   ): Unit = {
+    def writeHtmlFile(siteObject: SiteObjectWithFile, directory: File): Unit =
+      writeSiteFile(siteObject.htmlFile, directory)
+
+    def writeSiteFile(siteFile: SiteFile, directory: File): Unit = {
+      val content: String = siteFile.content
+      if (doWrite) Files.write(Files.file(directory, siteFile.url), content)
+    }
+
     writeHtmlFile(new IndexObject(site), directory)
     writeHtmlFile(new TreeIndexObject(site), directory)
     writeHtmlFile(new NamesObject(site), directory)
 
     Files.deleteFiles(new File(directory, NotesObject.directoryName))
-    for (note <- new NotesObject(site).noteFiles) Files.write(
-      file = Files.file(directory, Seq(NotesObject.directoryName, s"${note.name}.html")),
-      content = note.content
-    )
+    for (note <- new NotesObject(site).noteFiles) {
+      val content: String = note.content
+      if (doWrite) Files.write(
+        file = Files.file(directory, Seq(NotesObject.directoryName, s"${note.name}.html")),
+        content
+      )
+    }
 
     Files.deleteFiles(new File(directory, EntityObject.directoryName))
     for (entity <- site.entities) writeHtmlFile(new EntityObject(site, entity), directory)
@@ -126,12 +165,6 @@ object Site {
     writeHtmlFile(new MisnamedEntitiesReport(site), directory)
     writeHtmlFile(new NoRefsReport(site), directory)
   }
-
-  private final def writeHtmlFile(siteObject: SiteObjectWithFile, directory: File): Unit =
-    writeSiteFile(siteObject.htmlFile, directory)
-
-  private final def writeSiteFile(siteFile: SiteFile, directory: File): Unit =
-    Files.write(Files.file(directory, siteFile.url), siteFile.content)
 
   val addPublicationStatement: Tei.Transformer = Tei.addPublicationStatement(
     publisher = new Publisher.Value(<ptr xmlns={Tei.namespace.uri} target="www.alter-rebbe.org"/>),
