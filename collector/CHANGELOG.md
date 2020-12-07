@@ -1,6 +1,9 @@
 # Changelog
 
 ## [Unreleased]
+- GitHub repository alter-rebbe.org is no longer published as store.alter-rebbe.org;
+- service now uses URL http://opentorah.github.io/alter-rebbe.org/;
+- wrote synchronizer local directory -> Google Storage bucket;
 
 ## [0.7.56] - 2020-12-06
 - converting TEI to HTML in code (no more CETEIcean);

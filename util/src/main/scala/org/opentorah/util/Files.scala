@@ -52,6 +52,8 @@ object Files {
     result
   }
 
+  def file2string(file: File): String = read(file).mkString("\n")
+
   def deleteFiles(directory: File): Unit = if (directory.exists()) {
     if (directory.isDirectory) for (file <- directory.listFiles()) deleteFiles(file)
     directory.delete()

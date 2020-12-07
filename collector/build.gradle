@@ -23,6 +23,10 @@ dependencies {
 //  implementation "com.vladsch.flexmark:flexmark-util-data:$flexmarkVersion"
   implementation "ch.qos.logback:logback-classic:$logbackVersion"
 
+  implementation "com.google.cloud:google-cloud-storage:$googleCloudStorageVersion" // https://github.com/googleapis/java-storage
+//  implementation "com.google.auth:google-auth-library-oauth2-http:$googleOauth2Version"
+//  implementation "com.google.api-client:google-api-client:$googleApiClientVersion"
+
   testImplementation "org.podval.tools:org.podval.tools.run:$podvalRunVersion"
 }
 

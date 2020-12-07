@@ -15,6 +15,9 @@ spec:
       - image: "gcr.io/alter-rebbe-2/collector"
         ports:
         - containerPort: 8080
+        env:
+          - name: "STORE"
+            value: "http://opentorah.github.io/alter-rebbe.org/"
         resources:
           limits:
             cpu: "1000m"
