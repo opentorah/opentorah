@@ -4,6 +4,7 @@ import com.google.api.gax.paging.Page
 import com.google.auth.oauth2.ServiceAccountCredentials
 import com.google.cloud.WriteChannel
 import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Storage, StorageOptions}
+import com.google.common.hash.Hashing
 import org.opentorah.util.{Files, Strings}
 import org.slf4j.{Logger, LoggerFactory}
 import java.io.File
@@ -12,6 +13,7 @@ import java.nio.ByteBuffer
 import scala.annotation.tailrec
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 
+// documentation: https://github.com/googleapis/java-storage
 final class GoogleCloudStorageSynchronizer private(
   serviceAccountKey: String,
   bucketName: String,
@@ -27,7 +29,6 @@ final class GoogleCloudStorageSynchronizer private(
 
   private val credentials: ServiceAccountCredentials = ServiceAccountCredentials
     .fromStream(Strings.string2stream(serviceAccountKey))
-    //      .createScoped(CloudRunScopes.all)
     .asInstanceOf[ServiceAccountCredentials]
 
   private val storage: Storage = StorageOptions.newBuilder()
@@ -83,7 +84,9 @@ final class GoogleCloudStorageSynchronizer private(
     val toUpdate: List[(Blob, File)] = existing
       .filter { case (_   , file) => !file.isDirectory }
       .filter { case (blob, file) => file.lastModified() > blob.getUpdateTime }
-      .filter { case (blob, file) => crc32c(file) != blob.getCrc32cToHexString }
+      .filter { case (blob, file) => blob.getCrc32cToHexString !=
+          Strings.bytes2hex(Hashing.crc32c.hashBytes(Files.readFile(file)).asBytes.reverse)
+      }
       .sortBy { case (blob, _   ) => blob.getName }
     log(s"Found ${toUpdate.length} blobs to update")
 
@@ -121,23 +124,11 @@ final class GoogleCloudStorageSynchronizer private(
     val blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, blobName))
       .setContentType(contentType)
       .build()
-    val content: Array[Byte] = readFile(file)
+    val content: Array[Byte] = Files.readFile(file)
     val writer: WriteChannel = storage.writer(blobInfo)
     writer.write(ByteBuffer.wrap(content, 0, content.length))
     writer.close()
   }
-
-  private def crc32c(file: File): String = {
-    val bytes: Array[Byte] = com.google.common.hash.Hashing.crc32c.hashBytes(readFile(file)).asBytes
-    val sb: StringBuilder = new StringBuilder(2 * bytes.length)
-    for (b: Byte <- bytes.reverse) sb.append(hexDigits((b >> 4) & 0xf)).append(hexDigits(b & 0xf))
-    sb.toString
-  }
-
-  private val hexDigits: Array[Char] = "0123456789abcdef".toCharArray
-
-  private def readFile(file: File): Array[Byte] =
-    java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(file.toURI))
 
   private def listDirectory(directoryPath: String): Map[String, File] = {
     @tailrec

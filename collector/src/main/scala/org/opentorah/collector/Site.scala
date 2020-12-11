@@ -6,19 +6,18 @@ import org.opentorah.tei.{Entity, Publisher, SourceDesc, Tei}
 import org.opentorah.util.Files
 import org.opentorah.xml.{LinkResolver, PrettyPrinter}
 import org.slf4j.{Logger, LoggerFactory}
+import java.net.URL
 import scala.xml.Elem
 
-final class Site(
-  val store: Store,
-  val siteParameters: SiteParameters
-) {
+final class Site(fromUrl: URL) {
+  val store: Store = Store.read(Files.fileInDirectory(Files.subdirectory(fromUrl, "store"), "store.xml"))
+
+  val siteParameters: SiteParameters = Site.mkSiteParameters
 
   private def withPath[R](values: Store => Seq[R]): Seq[WithPath[R]] =
     Store.withPath(Path.empty, values, store)
 
   val references: References = References(store)
-
-  def checkReferences: Seq[String] = references.check(store.entities.get.findByRef)
 
   private val collections: Seq[WithPath[Collection]] = withPath[Collection](values = {
     case collection: Collection => Seq(collection)
@@ -66,6 +65,60 @@ final class Site(
 
   private val rootSiteObject: RootSiteObject = new RootSiteObject(this)
 
+  def write(doWrite: Boolean): Unit = {
+    val directory: File = Files.url2file(fromUrl)
+
+    def writeHtmlFile(siteObject: SiteObjectWithFile, directory: File): Unit =
+      writeSiteFile(siteObject.htmlFile, directory)
+
+    def writeSiteFile(siteFile: SiteFile, directory: File): Unit = {
+      val content: String = siteFile.content
+      if (doWrite) Files.write(Files.file(directory, siteFile.url), content)
+    }
+
+    writeHtmlFile(new IndexObject(this), directory)
+    writeHtmlFile(new TreeIndexObject(this), directory)
+    writeHtmlFile(new NamesObject(this), directory)
+
+    Files.deleteFiles(new File(directory, NotesObject.directoryName))
+    for (note <- new NotesObject(this).noteFiles) {
+      val content: String = note.content
+      if (doWrite) Files.write(
+        file = Files.file(directory, Seq(NotesObject.directoryName, s"${note.name}.html")),
+        content
+      )
+    }
+
+    Files.deleteFiles(new File(directory, EntityObject.directoryName))
+    for (entity <- entities) writeHtmlFile(new EntityObject(this, entity), directory)
+
+    Files.deleteFiles(new File(directory, Hierarchy.directoryName))
+    val stores: Seq[WithPath[Store]] = withPath[Store](values = {
+      case _: Collection | _: Document | _: Entities | _: EntityHolder | _: TeiHolder => Seq.empty
+      case store => Seq(store)
+    })
+    for (store <- stores) writeHtmlFile(new HierarchyObject(this, store.path, store.value), directory)
+
+    Files.deleteFiles(new File(directory, CollectionObject.directoryName))
+    for (collection <- collections)
+      writeHtmlFile(new CollectionObject(this, collection), directory)
+
+    for {
+      collection <- collections
+      document <- collection.value.documents
+      teiHolder: TeiHolder <- document.teiHolders
+    } {
+      val documentObject = new DocumentObject(this, collection, document, teiHolder)
+      writeHtmlFile(documentObject, directory)
+      writeSiteFile(documentObject.facsFile, directory)
+    }
+
+    Files.deleteFiles(new File(directory, ReportsObject.directoryName))
+    writeHtmlFile(new ReportsObject(this), directory)
+    writeHtmlFile(new MisnamedEntitiesReport(this), directory)
+    writeHtmlFile(new NoRefsReport(this), directory)
+  }
+
   def prettyPrintStore(): Unit = {
     for (entityHolder <- store.entities.get.by.get.stores)
       prettyPrint(entityHolder, Entity.toXmlElement(entityHolder.entity.copy(id = None)), Tei.prettyPrinter)
@@ -110,61 +163,29 @@ object Site {
   //    if (missingImages.nonEmpty) throw new IllegalArgumentException(s"Missing images: $missingImages")
   //  }
 
-  def write(
-    directory: File,
-    site: Site,
-    doWrite: Boolean
-  ): Unit = {
-    def writeHtmlFile(siteObject: SiteObjectWithFile, directory: File): Unit =
-      writeSiteFile(siteObject.htmlFile, directory)
-
-    def writeSiteFile(siteFile: SiteFile, directory: File): Unit = {
-      val content: String = siteFile.content
-      if (doWrite) Files.write(Files.file(directory, siteFile.url), content)
-    }
-
-    writeHtmlFile(new IndexObject(site), directory)
-    writeHtmlFile(new TreeIndexObject(site), directory)
-    writeHtmlFile(new NamesObject(site), directory)
-
-    Files.deleteFiles(new File(directory, NotesObject.directoryName))
-    for (note <- new NotesObject(site).noteFiles) {
-      val content: String = note.content
-      if (doWrite) Files.write(
-        file = Files.file(directory, Seq(NotesObject.directoryName, s"${note.name}.html")),
-        content
-      )
-    }
-
-    Files.deleteFiles(new File(directory, EntityObject.directoryName))
-    for (entity <- site.entities) writeHtmlFile(new EntityObject(site, entity), directory)
-
-    Files.deleteFiles(new File(directory, Hierarchy.directoryName))
-    val stores: Seq[WithPath[Store]] = site.withPath[Store](values = {
-      case _: Collection | _: Document | _: Entities | _: EntityHolder | _: TeiHolder => Seq.empty
-      case store => Seq(store)
-    })
-    for (store <- stores) writeHtmlFile(new HierarchyObject(site, store.path, store.value), directory)
-
-    Files.deleteFiles(new File(directory, CollectionObject.directoryName))
-    for (collection <- site.collections)
-      writeHtmlFile(new CollectionObject(site, collection), directory)
-
-    for {
-      collection <- site.collections
-      document <- collection.value.documents
-      teiHolder: TeiHolder <- document.teiHolders
-    } {
-      val documentObject = new DocumentObject(site, collection, document, teiHolder)
-      writeHtmlFile(documentObject, directory)
-      writeSiteFile(documentObject.facsFile, directory)
-    }
-
-    Files.deleteFiles(new File(directory, ReportsObject.directoryName))
-    writeHtmlFile(new ReportsObject(site), directory)
-    writeHtmlFile(new MisnamedEntitiesReport(site), directory)
-    writeHtmlFile(new NoRefsReport(site), directory)
-  }
+  private def mkSiteParameters: SiteParameters = new SiteParameters(
+    title = "Документы",
+    author = "www.alter-rebbe.org",
+    email = "dub@opentorah.org",
+    faviconJpg = "alter-rebbe",
+    googleAnalyticsId = Some("UA-154490117-1"),
+    navigationLinks = Seq(
+      NavigationLink("/names", "Имена", Some(Viewer.Names)),
+      NavigationLink("/collections", "Архивы", Some(Viewer.Collection)),
+      NavigationLink("/notes/help", "Помощь", Some(Viewer.Collection)),
+      NavigationLink("/notes/about", "О сайте", Some(Viewer.Collection))
+    ),
+    footerCol3 =
+      // TODO when I use <p> instead of <span>, it gets styled by the TEI CSS - althought it is in the XHTML namespace?!
+      <span>
+        documents related to early Chabad history<br/>
+        🄯 <a href="http://www.opentorah.org/" target={Viewer.Collection.name}>the Open Torah Project</a>
+        <a href="http://creativecommons.org/licenses/by/4.0/" target={Viewer.Collection.name}>CC BY 4.0</a>
+      </span>,
+    homeTarget = Viewer.Collection,
+    githubUsername = None, // Some("opentorah"),
+    twitterUsername = None
+  )
 
   val addPublicationStatement: Tei.Transformer = Tei.addPublicationStatement(
     publisher = new Publisher.Value(<ptr xmlns={Tei.namespace.uri} target="www.alter-rebbe.org"/>),

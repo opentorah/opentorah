@@ -3,6 +3,7 @@ package org.opentorah.util
 import java.io.{BufferedWriter, File, FileWriter}
 import java.net.URL
 import org.slf4j.{Logger, LoggerFactory}
+import java.nio.file.Paths
 import scala.io.Source
 
 object Files {
@@ -54,12 +55,15 @@ object Files {
 
   def file2string(file: File): String = read(file).mkString("\n")
 
+  def readFile(file: File): Array[Byte] =
+    java.nio.file.Files.readAllBytes(Paths.get(file.toURI))
+
   def deleteFiles(directory: File): Unit = if (directory.exists()) {
     if (directory.isDirectory) for (file <- directory.listFiles()) deleteFiles(file)
     directory.delete()
   }
 
-  def url2file(url: URL): File = java.nio.file.Paths.get(url.toURI).toFile
+  def url2file(url: URL): File = Paths.get(url.toURI).toFile
 
   def file2url(file: File): URL = file.toURI.toURL
 
@@ -69,7 +73,9 @@ object Files {
 
   def getParent(url: URL): URL = new URL(url, "..")
 
+  // TODO rename isXXXUrl
   def isFile(url: URL): Boolean = url.getProtocol == "file"
+  def isJar(url: URL): Boolean = url.getProtocol == "jar"
 
   def urlAndPart(what: String): (String, Option[String]) = Strings.split(what, '#')
 

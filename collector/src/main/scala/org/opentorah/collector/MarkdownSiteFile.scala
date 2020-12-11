@@ -72,5 +72,6 @@ object MarkdownSiteFile {
   private lazy val renderer: HtmlRenderer = HtmlRenderer
     .builder(options)
     .extensions(Seq(TocExtension.create()).asJava)
+//    .escapeHtml(true)
     .build()
 }

@@ -1,7 +1,7 @@
 package org.opentorah.util
 
 import java.io.{ByteArrayInputStream, InputStream}
-import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 
 object Strings {
 
@@ -43,11 +43,17 @@ object Strings {
   def empty2none(string: String): Option[String] =
     if (string == null || string.isEmpty) None else Some(string)
 
-  def utf8: Charset = Charset.forName("UTF-8")
-
-  def string2stream(string: String): InputStream = new ByteArrayInputStream(string.getBytes(utf8))
+  def string2stream(string: String): InputStream = new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8))
 
   def drop(from: String, prefix: String): String =
     if (from.startsWith(prefix)) from.substring(prefix.length)
     else throw new IllegalArgumentException(s"String '$from' doesn't start with '$prefix'")
+
+  private val hexDigits: Array[Char] = "0123456789abcdef".toCharArray
+
+  def bytes2hex(bytes: Seq[Byte]): String = {
+    val sb: StringBuilder = new StringBuilder(2 * bytes.length)
+    for (b: Byte <- bytes) sb.append(hexDigits((b >> 4) & 0xf)).append(hexDigits(b & 0xf))
+    sb.toString
+  }
 }

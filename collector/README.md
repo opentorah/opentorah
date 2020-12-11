@@ -1,7 +1,6 @@
 ## Static / Dynamic ##
 
-Code in the `collector` module pre-generates the static store.alter-rebbe.org site
-published on GitHub Pages (Jekyll is no longer involved).
+Code in the `collector` module pre-generates the static store.alter-rebbe.org site and syncs it into the Google Cloud Storage bucket.
 
 We are moving towards making the site dynamic, so that we can add:  
 - search functionality;
@@ -118,7 +117,7 @@ I store my Docker image (`gcr.io/alter-rebbe-2/collector`) in the GCP's Containe
 I use [jib](https://github.com/GoogleContainerTools/jib) Gradle Plugin to
 build and push my Docker image:
 ```
-  $ ./gradlew :collector-service:jib
+  $ ./gradlew :collector:jib
 ```
 Image layers are in the `artifacts.alter-rebbe-2.appspot.com/containers/images` bucket that
 was auto-created (with fine-grained access control).
@@ -276,3 +275,7 @@ gcloud does not require time zone, but the Console does...
 In October 2020, `--min-instances` option to gcloud run deploy became available (in beta);
 in November 2020, I switched to using it (I estimate under $10 a month for one kept-warm instance).
 If this works out, I won't need the CRON job anymore.
+
+Another advantage of configuring property name instead of the key itself is: in CI environment,
+the key is normally supplied (via an environment variable) only to the steps that need it;
+by retrieving the key only when it is needed, we avoid...
