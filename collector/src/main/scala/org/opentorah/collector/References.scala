@@ -22,7 +22,6 @@ final class References private(references: Seq[ReferenceWithSource]) {
 
 object References extends Element.WithToXml[Seq[ReferenceWithSource]]("references") {
 
-  // TODO calculate and write into file when local; read from file when not.
   def apply(store: Store): References = {
     val references: Seq[ReferenceWithSource] = getReferences(Seq.empty, store)
 
@@ -131,9 +130,8 @@ object References extends Element.WithToXml[Seq[ReferenceWithSource]]("reference
     .filter(_.isInstanceOf[ReferenceWithSource.FromDocument])
     .map(_.asInstanceOf[ReferenceWithSource.FromDocument])
 
-    override protected def parser: Parser[Seq[ReferenceWithSource]] = ???
+  override protected def parser: Parser[Seq[ReferenceWithSource]] = ReferenceWithSource.parsable.all
 
-    override protected def antiparser: Antiparser[Seq[ReferenceWithSource]] = Antiparser.concat(
-      ???
-    )
+  override protected def antiparser: Antiparser[Seq[ReferenceWithSource]] =
+    Antiparser.xml.compose[Seq[ReferenceWithSource]](_.map(ReferenceWithSource.toXmlElement))
 }

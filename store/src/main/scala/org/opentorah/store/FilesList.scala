@@ -8,9 +8,8 @@ object FilesList extends Element.WithToXml[Seq[String]]("filesList") {
 
   override protected def parser: Parser[Seq[String]] = Text("file").all
 
-  override protected def antiparser: Antiparser[Seq[String]] = Antiparser.concat(
+  override protected def antiparser: Antiparser[Seq[String]] =
     Antiparser.xml.compose[Seq[String]](value => for (file <- value) yield <file>{file}</file>)
-  )
 
   def get(
     baseUrl: URL,

@@ -2,6 +2,8 @@ package org.opentorah.xml
 
 import scala.xml.Elem
 
+// TODO merge into Parsable
+// TODO split off a trait with abstract toXmlElement(); use it in References...
 trait ToXml[A] {
 
   protected def elementName(value: A): String

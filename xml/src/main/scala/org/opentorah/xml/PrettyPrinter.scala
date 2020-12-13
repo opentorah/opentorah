@@ -78,7 +78,7 @@ final case class PrettyPrinter(
       val whitespaceRight: Boolean = nodes.lastOption.exists(model.isWhitespace)
       val charactersLeft: Boolean = nodes.headOption.exists(model.isCharacters)
       val charactersRight: Boolean = nodes.lastOption.exists(model.isCharacters)
-      val chunks: Seq[model.Nodes] = chunkify(Seq.empty, Seq.empty, nodes)
+      val chunks: Seq[model.Nodes] = chunkify(Seq.empty, Seq.empty, nodes, flush = false)
       val noText: Boolean = chunks.forall(_.forall(!model.isText(_)))
 
       val children: Seq[Doc] = {
@@ -150,26 +150,25 @@ final case class PrettyPrinter(
         else processText(newResult :+ model.mkText(word, seed), seed, tail2)
       }
 
+    @scala.annotation.tailrec
     private def chunkify(
       result: Seq[model.Nodes],
       current: model.Nodes,
-      nodes: model.Nodes
-    ): Seq[model.Nodes] = {
-      def cling(c: model.Node, n: model.Node): Boolean = model.isText(c) || model.isText(n) ||
-        (model.isElement(n) && clingyElements.contains(model.getName(model.asElement(n))))
-
-      def flush(nodes: model.Nodes): Seq[model.Nodes] = chunkify(result :+ current.reverse, Nil, nodes)
-
-      (current, nodes) match {
+      nodes: model.Nodes,
+      flush: Boolean
+    ): Seq[model.Nodes] =
+      if (flush) chunkify(result :+ current.reverse, Nil, nodes, flush = false) else (current, nodes) match {
         case (Nil    , Nil    ) => result
-        case (_      , Nil    ) => flush(Nil)
-        case (Nil    , n :: ns) if  model.isWhitespace(n) => chunkify(result, Nil, ns)
-        case (_      , n :: ns) if  model.isWhitespace(n) => flush(ns)
-        case (Nil    , n :: ns) if !model.isWhitespace(n) => chunkify(result, n :: Nil, ns)
-        case (c :: cs, n :: ns) if !model.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns)
-        case (c :: _ , n :: ns) if !model.isWhitespace(n) && !cling(c, n) => flush(n :: ns)
+        case (_      , Nil    )                                           => chunkify(result, current     , Nil     , flush = true )
+        case (Nil    , n :: ns) if  model.isWhitespace(n)                 => chunkify(result, Nil         , ns      , flush = false)
+        case (_      , n :: ns) if  model.isWhitespace(n)                 => chunkify(result, current     , ns      , flush = true )
+        case (Nil    , n :: ns) if !model.isWhitespace(n)                 => chunkify(result, n :: Nil    , ns      , flush = false)
+        case (c :: cs, n :: ns) if !model.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns      , flush = false)
+        case (c :: _ , n :: ns) if !model.isWhitespace(n) && !cling(c, n) => chunkify(result, current     , n :: ns , flush = true )
       }
-    }
+
+    private def cling(c: model.Node, n: model.Node): Boolean = model.isText(c) || model.isText(n) ||
+      (model.isElement(n) && clingyElements.contains(model.getName(model.asElement(n))))
 
     private def fromChunk(
       nodes: model.Nodes,

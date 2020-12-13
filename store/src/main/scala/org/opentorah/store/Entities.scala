@@ -24,7 +24,12 @@ final class Entities(
     creator = new Entities.EntitiesBy(_, _, _)
   ))
 
-  val lists: Seq[EntitiesList] = element.lists.map(_.take(by.get.stores.map(_.entity)))
+  // TODO write a list with id (file name), entity type and role;
+  // add those to the EntityHolder;
+  // make EntitiesList contain and findByRef return EntityHolder;
+  // load Entity in the EntityHolder on demand.
+
+  lazy val lists: Seq[EntitiesList] = element.lists.map(_.take(by.get.stores.map(_.entity)))
 
   def findByRef(ref: String): Option[Entity] = by.get.stores.find(_.entity.id.get == ref).map(_.entity)
 }

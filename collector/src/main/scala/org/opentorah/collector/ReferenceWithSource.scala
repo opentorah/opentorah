@@ -2,11 +2,12 @@ package org.opentorah.collector
 
 import org.opentorah.tei.EntityReference
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Attribute, Element, Parsable, Parser, ToXml, UnionParsable}
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parsable, Parser}
 
-sealed class ReferenceWithSource(val path: Seq[String], val reference: EntityReference) {
-  def pathAsString: String = path.mkString("/")
-}
+import scala.xml.Elem
+
+// TODO generalize to hold unclears...
+sealed class ReferenceWithSource(val path: Seq[String], val reference: EntityReference)
 
 object ReferenceWithSource {
 
@@ -19,7 +20,7 @@ object ReferenceWithSource {
     entityName: String
   ) extends ReferenceWithSource(path, reference)
 
-  object FromEntity extends Element.WithToXml[FromEntity]("fromEntity") {
+  private object FromEntityElement extends Element.WithToXml[FromEntity]("fromEntity") {
     private val entityIdAttribute: Attribute[String] = Attribute("entityId")
     private val entityNameAttribute: Attribute[String] = Attribute("entityName")
 
@@ -36,7 +37,7 @@ object ReferenceWithSource {
     )
 
     override protected def antiparser: Antiparser[FromEntity] = Antiparser.concat(
-      pathAttribute.toXml.compose(_.pathAsString),
+      pathAttribute.toXml.compose(unsplitPath),
       EntityReference.toXml.compose(_.reference),
       entityIdAttribute.toXml.compose(_.entityId),
       entityNameAttribute.toXml.compose(_.entityName)
@@ -57,7 +58,7 @@ object ReferenceWithSource {
     )
   }
 
-  object FromDocument extends Element.WithToXml[FromDocument]("fromDocument") {
+  private object FromDocumentElement extends Element.WithToXml[FromDocument]("fromDocument") {
     private val collectionFileNameAttribute: Attribute[String] = Attribute("collectionFileName")
     private val collectionNameAttribute: Attribute[String] = Attribute("collectionName")
     private val documentNameAttribute: Attribute[String] = Attribute("documentName")
@@ -77,7 +78,7 @@ object ReferenceWithSource {
     )
 
     override protected def antiparser: Antiparser[FromDocument] = Antiparser.concat(
-      pathAttribute.toXml.compose(_.pathAsString),
+      pathAttribute.toXml.compose(unsplitPath),
       EntityReference.toXml.compose(_.reference),
       collectionFileNameAttribute.toXml.compose(_.collectionFileName),
       collectionNameAttribute.toXml.compose(_.collectionName),
@@ -90,7 +91,7 @@ object ReferenceWithSource {
     override val reference: EntityReference,
   ) extends ReferenceWithSource(path, reference)
 
-  object FromElement extends Element.WithToXml[FromElement]("fromElement") {
+  private object FromElementElement extends Element.WithToXml[FromElement]("fromElement") {
     override protected def parser: Parser[FromElement] = for {
       path <- pathAttribute.required
       reference <- EntityReference.parsable.required
@@ -101,17 +102,25 @@ object ReferenceWithSource {
 
     // TODO why do I have to specify the type for compose() here?
     override protected def antiparser: Antiparser[FromElement] = Antiparser.concat(
-      pathAttribute.toXml.compose[FromElement](_.pathAsString),
+      pathAttribute.toXml.compose[FromElement](unsplitPath),
       EntityReference.toXml.compose[FromElement](_.reference)
     )
   }
 
   private def splitPath(path: String): Seq[String] = path.split("/")
 
-  // TODO make UnionParsable accept parsables for subtypes - or make Parsable contravariant?
-  // but Parser can't be contravariant since it is ZIO[_, _, +]!
-  private val parsable: UnionParsable[ReferenceWithSource] = ???
-//  new UnionParsable[ReferenceWithSource](Seq(
-//    FromEntity: Parsable[ReferenceWithSource], FromDocument, FromElement
-//  ))
+  private def unsplitPath(referenceWithSource: ReferenceWithSource): String = referenceWithSource.path.mkString("/")
+
+  // TODO try making Parser, ToXml etc covariant? Generalize Union to handle subtypes?
+  final def toXmlElement(value: ReferenceWithSource): Elem = value match {
+    case value: FromEntity   => FromEntityElement.toXmlElement(value)
+    case value: FromDocument => FromDocumentElement.toXmlElement(value)
+    case value: FromElement  => FromElementElement.toXmlElement(value)
+  }
+
+  // TODO make Parsable covariant and reuse UnionParsable?
+  object parsable extends Parsable[ReferenceWithSource] {
+    override val name2parser: Map[String, Parsable.ContentTypeAndParser[ReferenceWithSource]] =
+      FromEntityElement.name2parser ++ FromDocumentElement.name2parser ++ FromElementElement.name2parser
+  }
 }

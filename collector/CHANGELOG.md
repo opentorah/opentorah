@@ -7,7 +7,7 @@
 - use CRS32c to detect changes in uploaded files;
 - introduced `.gsignore` file to exclude files from the Google Store sync;
 - consolidated build functionality (verify/generate/upload/serve site) in the Main object;
-- working on writing and reading References;
+- writing and reading References;
 - cleanup;
 
 ## [0.7.56] - 2020-12-06

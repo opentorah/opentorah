@@ -58,8 +58,6 @@ object Service extends App {
   val blocker: Blocker = Blocker.liftExecutorService(Executors.newFixedThreadPool(2))
 
   private def routes(siteUri: Uri): HttpRoutes[ServiceTask] = {
-    // TODO need to make FromUrl.load()s in the Store much lazier before uncommenting this;
-    // right now, it immediately loads all entity and TEI files!
 //    val site: Site = new Site(toUrl(siteUri))
 
     val dsl: Http4sDsl[ServiceTask] = Http4sDsl[ServiceTask]
