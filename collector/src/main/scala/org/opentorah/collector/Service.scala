@@ -1,16 +1,18 @@
 package org.opentorah.collector
 
-import cats.effect.{Blocker, ExitCode}
-import net.logstash.logback.argument.StructuredArguments
+import cats.effect.{Blocker, ContextShift, ExitCode, Sync}
+//import cats.implicits._
+//import fs2.io
 import java.net.URL
 import java.util.concurrent.Executors
+import net.logstash.logback.argument.StructuredArguments
 import org.http4s.{HttpRoutes, Request, Response, StaticFile, Status, Uri}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.util.CaseInsensitiveString
 import org.slf4j.{Logger, LoggerFactory}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 import zio.{App, RIO, URIO, ZEnv, ZIO}
 import zio.duration.Duration
 import zio.interop.catz._
@@ -28,47 +30,74 @@ object Service extends App {
   val dsl: Http4sDsl[ServiceTask] = Http4sDsl[ServiceTask]
   import dsl._
 
-  override def run(args: List[String]): URIO[Service.ServiceEnvironment, zio.ExitCode] = {
+  override def run(args: List[String]): URIO[ServiceEnvironment, zio.ExitCode] = {
+    val siteUri: String = args(0)
+    val port: Int = args(1).toInt
+
+    val executionContext: ExecutionContextExecutor = ExecutionContext.global
+
     // This is supposed to be set when running in Cloud Run
-    val serviceName: Option[String] = getEnv("K_SERVICE")
+    val serviceName: Option[String] = Option(System.getenv("K_SERVICE"))
     warning(s"serviceName=$serviceName")
 
-    val storeUri: Uri = Uri.unsafeFromString(getParameter("STORE", "http://store.alter-rebbe.org"))
-    run(ServiceRoutes.routes(storeUri))
-  }
-
-  def run(routes: HttpRoutes[ServiceTask]): URIO[ServiceEnvironment, zio.ExitCode] =
     ZIO.runtime[ServiceEnvironment].flatMap { implicit rts =>
-      BlazeServerBuilder[ServiceTask](executionContext = ExecutionContext.global)
-        .bindHttp(
-          // To be accessible when running in a docker container the server
-          // must bind to all IPs, not just 127.0.0.1:
-          host = "0.0.0.0",
-          port = getParameter("PORT", "4000").toInt
-        )
+      BlazeServerBuilder[ServiceTask](executionContext)
+        // To be accessible when running in a docker container the server
+        // must bind to all IPs, not just 127.0.0.1:
+        .bindHttp(port, "0.0.0.0")
         .withWebSockets(false)
-        .withHttpApp(routes.orNotFound)
+        .withHttpApp(routes(Uri.unsafeFromString(siteUri)).orNotFound)
         .serve
         .compile[ServiceTask, ServiceTask, ExitCode]
         .drain
     }
       .mapError(err => zio.console.putStrLn(s"Execution failed with: $err"))
       .exitCode
-
-  private def getParameter(name: String, defaultValue: String): String = getEnv(name).fold {
-    notice(s"No value for '$name' in the environment; using default: '$defaultValue'")
-    defaultValue
-  }{ value =>
-    notice(s"Value for '$name' from the environment: $value")
-    value
   }
-
-  private def getEnv(name: String): Option[String] = Option(System.getenv(name))
 
   val blocker: Blocker = Blocker.liftExecutorService(Executors.newFixedThreadPool(2))
 
-  def fromUri(uri: Uri, request: Request[ServiceTask]): ServiceTask[Response[ServiceTask]] =
-    X.fromUri(uri, request)
+  private def routes(siteUri: Uri): HttpRoutes[ServiceTask] = {
+//    val site: Site = new Site(toUrl(siteUri))
+
+    val dsl: Http4sDsl[ServiceTask] = Http4sDsl[ServiceTask]
+    import dsl._
+
+    HttpRoutes.of[ServiceTask] {
+      //      case GET -> Root / "hello" =>
+      //        Ok("hello!")
+
+      case request@GET -> _ =>
+        fromUrl(toUrl(siteUri.resolve(relativize(addIndex(request.uri)))), request)
+    }
+  }
+
+  private def addIndex(uri: Uri): Uri =
+    if (uri.path.endsWith("/")) uri.copy(path = uri.path + "index.html") else uri
+
+  private def relativize(uri: Uri): Uri =
+    if (uri.path.startsWith("/")) uri.copy(path = uri.path.substring(1)) else uri
+
+  private def toUrl(uri: Uri): URL = new URL(uri.toString)
+
+  def fromUrl(url: URL, request: Request[ServiceTask]): ServiceTask[Response[ServiceTask]] =
+    X.fromUrl(url, request)
+
+  private val defaultBufferSize: Int = 10240
+
+//  def getUrl[F[_]](url: URL)(implicit F: Sync[F], cs: ContextShift[F]): F[Option[fs2.Stream[F, Byte]]] = {
+//    blocker
+//      .delay(url.openConnection.getInputStream)
+//      .redeem(
+//        recover = {
+//          case _: java.io.FileNotFoundException => None
+//          case other => throw other
+//        },
+//        f = { inputStream =>
+//          Some(io.readInputStream[F](F.pure(inputStream), defaultBufferSize, blocker))
+//        }
+//      )
+//  }
 
   def log(
     url: URL,
@@ -77,6 +106,7 @@ object Service extends App {
     status: Status
   ): Unit = {
     val durationStr: String = formatDuration(duration)
+
     // TODO suppress URL encoding.
     val urlStr: String = url.toString
     if (status.isInstanceOf[NotFound.type])
@@ -94,19 +124,19 @@ object Service extends App {
   }
 
   private def info   (request: Request[ServiceTask], message: String): Unit = log(Some(request), message, "INFO"   )
-  private def notice (request: Request[ServiceTask], message: String): Unit = log(Some(request), message, "NOTICE" )
-  private def notice (                               message: String): Unit = log(None         , message, "NOTICE" )
+//  private def notice (request: Request[ServiceTask], message: String): Unit = log(Some(request), message, "NOTICE" )
+//  private def notice (                               message: String): Unit = log(None         , message, "NOTICE" )
   private def warning(request: Request[ServiceTask], message: String): Unit = log(Some(request), message, "WARNING")
   private def warning(                               message: String): Unit = log(None         , message, "WARNING")
 
-  private val logger: Logger = LoggerFactory.getLogger("org.opentorah.collector.service.ServiceConfiguration")
+  private val logger: Logger = LoggerFactory.getLogger("org.opentorah.collector.service.Service")
 
   private def log(request: Option[Request[ServiceTask]], message: String, severity: String): Unit = {
     val trace: String = request
-      .flatMap { _
+      .flatMap(_
         .headers.get(CaseInsensitiveString("X-Cloud-Trace-Context"))
         .map(_.value.split("/")(0))
-      }
+      )
       .getOrElse("no-trace")
 
     logger.info(
@@ -123,8 +153,7 @@ private object X {
   import Service.ServiceTask
   import Service.dsl._
 
-  def fromUri(uri: Uri, request: Request[ServiceTask]): ServiceTask[Response[ServiceTask]] = {
-    val url: URL = new URL(uri.toString)
+  def fromUrl(url: URL, request: Request[ServiceTask]): ServiceTask[Response[ServiceTask]] =
     StaticFile
       .fromURL[ServiceTask](url, Service.blocker, Some(request))
       .getOrElseF(NotFound(s"Not found: $url"))
@@ -133,5 +162,4 @@ private object X {
         Service.log(url, request, duration, response.status)
         response
     }
-  }
 }

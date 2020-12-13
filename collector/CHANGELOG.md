@@ -2,11 +2,13 @@
 
 ## [Unreleased]
 
-## [0.7.59] - 2020-12-07
+## [0.7.60] - 2020-12-13
 - synchronizing local directory to a Google Storage bucket;
 - use CRS32c to detect changes in uploaded files;
 - introduced `.gsignore` file to exclude files from the Google Store sync;
-- consolidated build functionality (verify/generate/upload site) in the Build object;
+- consolidated build functionality (verify/generate/upload/serve site) in the Main object;
+- writing and reading References;
+- cleanup;
 
 ## [0.7.56] - 2020-12-06
 - converting TEI to HTML in code (no more CETEIcean);

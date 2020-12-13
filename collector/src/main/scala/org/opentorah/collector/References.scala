@@ -1,15 +1,14 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.Names
-import org.opentorah.store.{By, Selector, Store}
+import org.opentorah.store.{By, Entities, EntityHolder, Selector, Store}
 import org.opentorah.tei.{Entity, EntityReference}
 import org.opentorah.util.Files
+import org.opentorah.xml.{Antiparser, Element, Parser, PrettyPrinter}
+import java.net.URL
+import scala.xml.Node
 
 final class References private(references: Seq[ReferenceWithSource]) {
-  def check(findByRef: String => Option[Entity]): Seq[String] =
-    references.flatMap(referenceWithSource =>
-      References.checkReference(referenceWithSource.reference, findByRef))
-
   def noRef: Seq[ReferenceWithSource.FromDocument] =
     References.fromDocument(references)
       .filter(_.reference.ref.isEmpty)
@@ -21,23 +20,45 @@ final class References private(references: Seq[ReferenceWithSource]) {
   }
 }
 
-object References {
+object References extends Element.WithToXml[Seq[ReferenceWithSource]]("references") {
 
-  // TODO calculate and write into file when local; read from file when not.
-  def apply(store: Store): References = new References(references(Seq.empty, store))
+  def apply(store: Store): References = {
+    val references: Seq[ReferenceWithSource] = getReferences(Seq.empty, store)
 
-  private def references(path: Seq[String], store: Store): Seq[ReferenceWithSource] =
-    store.entities.toSeq.flatMap(entities => entities.by.get.stores.flatMap { entityHolder =>
-      val entity: Entity = entityHolder.entity
-      val entityId: String = entity.id.get
-      EntityReference.from(entity.content).map(reference => ReferenceWithSource.FromEntity(
-        path = Files.addExtension(path :+ getName(entities.selector) :+ entityId, "html"),
-        reference,
-        entityId,
-        entity.name
-      ))
-    }) ++
-    fromStore(path, store.asInstanceOf[Store.FromElement])
+    val errors: Seq[String] = references.flatMap(referenceWithSource =>
+        References.checkReference(referenceWithSource.reference, store.entities.get.findByRef))
+
+    if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
+
+    new References(references)
+  }
+
+  private def getReferences(path: Seq[String], store: Store): Seq[ReferenceWithSource] = {
+    val entities: Entities = store.entities.get
+    val entitiesBy: By[EntityHolder] = entities.by.get
+    val referencesFile: URL = Files.fileInDirectory(entitiesBy.urls.baseUrl, "references-generated.xml")
+
+    if (!Files.isFile(referencesFile)) Parser.parseDo(parse(referencesFile)) else {
+      val references: Seq[ReferenceWithSource] = entitiesBy.stores.flatMap { entityHolder =>
+        val entity: Entity = entityHolder.entity
+        val entityId: String = entity.id.get
+        EntityReference.from(entity.content).map(reference => ReferenceWithSource.FromEntity(
+          path = Files.addExtension(path :+ getName(entities.selector) :+ entityId, "html"),
+          reference,
+          entityId,
+          entity.name
+        ))
+      } ++
+      fromStore(path, store.asInstanceOf[Store.FromElement])
+
+      Files.write(
+        file = Files.url2file(referencesFile),
+        content = PrettyPrinter.default.renderXml(toXmlElement(references))
+      )
+
+      references
+    }
+  }
 
   private def fromStore(path: Seq[String], store: Store.FromElement): Seq[ReferenceWithSource] = {
     val fromElement: Seq[ReferenceWithSource.FromElement] = getReferences(store)
@@ -90,7 +111,7 @@ object References {
   private def getName(names: Names): String = names.name
 
   private def checkReference(reference: EntityReference,  findByRef: String => Option[Entity]): Option[String] = {
-    val name = reference.name
+    val name: Seq[Node] = reference.name
     reference.ref.fold[Option[String]](None) { ref =>
       if (ref.contains(" ")) Some(s"""Value of the ref attribute contains spaces: ref="$ref" """) else {
         findByRef(ref).fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${name.text}< """)) { named =>
@@ -108,4 +129,9 @@ object References {
   private def fromDocument(references: Seq[ReferenceWithSource]): Seq[ReferenceWithSource.FromDocument] = references
     .filter(_.isInstanceOf[ReferenceWithSource.FromDocument])
     .map(_.asInstanceOf[ReferenceWithSource.FromDocument])
+
+  override protected def parser: Parser[Seq[ReferenceWithSource]] = ReferenceWithSource.parsable.all
+
+  override protected def antiparser: Antiparser[Seq[ReferenceWithSource]] =
+    Antiparser.xml.compose[Seq[ReferenceWithSource]](_.map(ReferenceWithSource.toXmlElement))
 }

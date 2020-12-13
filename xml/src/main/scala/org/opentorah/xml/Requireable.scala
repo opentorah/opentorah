@@ -1,6 +1,6 @@
 package org.opentorah.xml
 
-trait Requireable[T] {
+trait Requireable[+T] {
 
   def optional: Parser[Option[T]]
 

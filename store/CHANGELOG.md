@@ -4,7 +4,10 @@ Modules covered: `store`, `metadata`, `xml`, `tei`, `util`, `texts`, `dream-pape
 
 ## [Unreleased]
 
-## [0.1.55] - 2020-
+## [0.1.60] - 2020-12-13
+- made PrettyPrinter.chunkify() tail-recursive;
+
+## [0.1.56] - 2020-12-07
 - converting TEI to HTML;
 - XML Namespace and Dialect cleanup;
 - XML Attribute and Antiparser cleanup;

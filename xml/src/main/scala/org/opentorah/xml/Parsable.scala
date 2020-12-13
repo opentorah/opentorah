@@ -49,7 +49,7 @@ trait Parsable[A] extends Requireable[A] {
 }
 
 object Parsable {
-  final class ContentTypeAndParser[A](val contentType: ContentType, val parser: Parser[A])
+  final class ContentTypeAndParser[+A](val contentType: ContentType, val parser: Parser[A])
 
   final def annotate[A](parsable: Parsable[A]): Parsable[(Parsable[A], A)] = new Parsable[(Parsable[A], A)] {
     override def toString: Error = "annotated " + parsable.toString
@@ -67,7 +67,7 @@ object Parsable {
     override def toString: String = parsable.toString + s" with include [$attributeName]"
 
     override val name2parser: Map[String, ContentTypeAndParser[A]] =
-      (for { (elementName, contentTypeAndParser) <- parsable.name2parser }
+      for ((elementName, contentTypeAndParser) <- parsable.name2parser)
        yield (elementName, new ContentTypeAndParser[A](contentTypeAndParser.contentType,
         for {
           url <- Attribute(attributeName).optional
@@ -80,6 +80,6 @@ object Parsable {
             }.parse(from)
           } yield result}
         } yield result
-      ))).toMap
+      ))
   }
 }

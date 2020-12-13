@@ -23,9 +23,7 @@ dependencies {
 //  implementation "com.vladsch.flexmark:flexmark-util-data:$flexmarkVersion"
   implementation "ch.qos.logback:logback-classic:$logbackVersion"
 
-  implementation "com.google.cloud:google-cloud-storage:$googleCloudStorageVersion" // https://github.com/googleapis/java-storage
-//  implementation "com.google.auth:google-auth-library-oauth2-http:$googleOauth2Version"
-//  implementation "com.google.api-client:google-api-client:$googleApiClientVersion"
+  implementation "com.google.cloud:google-cloud-storage:$googleCloudStorageVersion"
 
   testImplementation "org.podval.tools:org.podval.tools.run:$podvalRunVersion"
 }
@@ -33,6 +31,6 @@ dependencies {
 // TODO IntelliJ Idea does not make JIB builder available for
 //   Cloud Code | Cloud Run | Run Locally Run configuration...
 
-jib.container.mainClass = 'org.opentorah.collector.Service'
+jib.container.mainClass = 'org.opentorah.collector.Main'
 cloudRun.region = 'us-east4'
 deploy.dependsOn(cloudRunDeploy)

@@ -66,8 +66,14 @@ object From {
 
   def resource(obj: AnyRef): From = resource(obj, Util.className(obj))
 
-  private def loadFromUrl(url: URL): IO[Error, Elem] =
+  private def loadFromUrl(url: URL): IO[Error, Elem] = {
+    if (!Files.isFile(url) && !Files.isJar(url)) {
+      // TODO log!
+      println(s"-- Loading $url")
+      val x = 0
+    }
     loadFromSource(new InputSource(url.openStream()))
+  }
 
   val useXerces: Boolean = true
 
