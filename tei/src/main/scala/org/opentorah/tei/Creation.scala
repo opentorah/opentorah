@@ -10,7 +10,7 @@ final case class Creation(
 
 object Creation extends Element.WithToXml[Creation]("creation") {
 
-  override protected def parser: Parser[Creation] = for {
+  override def parser: Parser[Creation] = for {
     date <- Date.required
     xml <- Element.allNodes
   } yield new Creation(

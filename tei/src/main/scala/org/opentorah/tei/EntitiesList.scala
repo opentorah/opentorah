@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Parsable, Parser, ToXml, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, ToXml, Xml}
 
 final case class EntitiesList(
   entityType: EntityType,
@@ -16,33 +16,36 @@ final case class EntitiesList(
   def isEmpty: Boolean = entities.isEmpty
 }
 
-object EntitiesList extends Parsable[EntitiesList] with ToXml[EntitiesList] {
+object EntitiesList {
   private val roleAttribute: Attribute[String] = Attribute("role")
 
   override def toString: String = "EntitiesList"
 
-  override val name2parser: Map[String, Parsable.ContentTypeAndParser[EntitiesList]] = EntityType.values.map { entity =>
-    entity.listElement -> new Parsable.ContentTypeAndParser[EntitiesList](ContentType.Elements, parser(entity))
-  }.toMap
-
-  private def parser(entityType: EntityType): Parser[EntitiesList] = for {
-    id <- Xml.idAttribute.required
-    role <- roleAttribute.optional
-    head <- org.opentorah.xml.Text("head").required
-  } yield EntitiesList(
-    entityType,
-    id,
-    role,
-    head,
-    Seq.empty
+  final val parsable: Parsable[EntitiesList] with ToXml[EntitiesList] = Parsable.union[EntitiesList](
+    _.entityType.listElement,
+    EntityType.values.map(mkParsable)
   )
 
+  private def mkParsable(entityType: EntityType): Element.WithToXml[EntitiesList] =
+    new Element.WithToXml[EntitiesList](entityType.listElement) {
+      override def contentType: ContentType = ContentType.Elements
 
-  override protected def elementName(value: EntitiesList): String = value.entityType.listElement
+      override def parser: Parser[EntitiesList] = for {
+        id <- Xml.idAttribute.required
+        role <- roleAttribute.optional
+        head <- org.opentorah.xml.Text("head").required
+      } yield EntitiesList(
+        entityType,
+        id,
+        role,
+        head,
+        Seq.empty
+      )
 
-  override protected val antiparser: Antiparser[EntitiesList] = Antiparser.concat(
-    Xml.idAttribute.toXml.compose(_.id),
-    roleAttribute.toXmlOption.compose(_.role),
-    Antiparser.xml.compose(value => Seq(<head>{value.head}</head>))
-  )
+      override protected val antiparser: Antiparser[EntitiesList] = Antiparser.concat(
+        Xml.idAttribute.toXml.compose(_.id),
+        roleAttribute.toXmlOption.compose(_.role),
+        Antiparser.xml.compose(value => Seq(<head>{value.head}</head>))
+      )
+    }
 }

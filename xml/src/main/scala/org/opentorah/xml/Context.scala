@@ -26,6 +26,15 @@ final private[xml] class Context {
   private def currentFromUrl: Option[URL] =
     stack.flatMap(_.from).head.url
 
+  private def currentFromUrls: FromUrls = {
+    val froms: Seq[Option[From]] = stack.map(_.from)
+    val baseUrl: URL = froms.flatten.head.url.get
+    if (froms.head.isEmpty) FromUrls.Nested(baseUrl) else FromUrls.Top(baseUrl, redirectedFrom = {
+      val (redirectedTo: Seq[Option[From]], tail: Seq[Option[From]]) = froms.span(_.get.isRedirect)
+      if (redirectedTo.isEmpty) Seq.empty else (redirectedTo.tail :+ tail.head).map(_.get.url.get)
+    })
+  }
+
   private def currentToString: String =
     stack.headOption.map(_.toString).getOrElse("")
 }
@@ -72,6 +81,9 @@ private[xml] object Context {
 
   def currentFromUrl: Parser[Option[URL]] =
     ZIO.access[Context](_.currentFromUrl)
+
+  def currentFromUrls: Parser[FromUrls] =
+    ZIO.access[Context](_.currentFromUrls)
 
   def nested[A](newCurrent: Current, parser: Parser[A]): Parser[A] =
     ZIO.access[Context](_.push(newCurrent)).bracket[Context, Error, A](

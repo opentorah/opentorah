@@ -10,9 +10,9 @@ class RawXml(elementName: String, namespace: Option[Namespace] = None) {
 
     override def toString: String = s"raw element ${RawXml.this.elementName}"
 
-    override protected def contentType: ContentType = ContentType.Mixed
+    override def contentType: ContentType = ContentType.Mixed
 
-    override protected def parser: Parser[Value] = Element.allNodes.map(new Value(_))
+    override def parser: Parser[Value] = Element.allNodes.map(new Value(_))
 
     override protected def antiparser: Antiparser[Value] = Antiparser(
       content = _.xml,

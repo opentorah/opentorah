@@ -8,7 +8,7 @@ final case class LangUsage(
 
 object LangUsage extends Element.WithToXml[LangUsage]("langUsage") {
 
-  override protected def parser: Parser[LangUsage] = for {
+  override def parser: Parser[LangUsage] = for {
     languages <- Language.all
   } yield new LangUsage(
     languages

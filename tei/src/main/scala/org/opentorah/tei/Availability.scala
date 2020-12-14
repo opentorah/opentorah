@@ -12,7 +12,7 @@ object Availability extends Element.WithToXml[Availability]("availability") {
 
   private val statusAttribute: Attribute[String] = Attribute("status")
 
-  override protected def parser: Parser[Availability] = for {
+  override def parser: Parser[Availability] = for {
     status <- statusAttribute.optional
     xml <- Element.allNodes
   } yield new Availability(

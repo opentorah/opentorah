@@ -63,7 +63,7 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
   }
 
   val torahParsable: Element[Torah] = new Element[Torah]("torah") {
-    override protected def parser: Parser[Torah] = for {
+    override def parser: Parser[Torah] = for {
       bookSpan <- spanParser.map(_.resolve)
       spans <- aliyahParsable(bookSpan).all
       result <- parseAliyot(bookSpan, spans, number = None)
@@ -71,12 +71,12 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
   }
 
   private def aliyahParsable(bookSpan: BookSpan): Element[Numbered] = new Element[Numbered]("aliyah") {
-    override protected def parser: Parser[WithNumber[SpanSemiResolved]] =
+    override def parser: Parser[WithNumber[SpanSemiResolved]] =
       WithNumber.parse(SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve))
   }
 
   val maftirParsable: Element[BookSpan] = new Element[BookSpan]("maftir") {
-    override protected def parser: Parser[BookSpan] = spanParser.map(_.resolve)
+    override def parser: Parser[BookSpan] = spanParser.map(_.resolve)
   }
 
   def inBook(book: Tanach.ChumashBook, span: Span): BookSpan = BookSpan(book, span)

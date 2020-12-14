@@ -121,7 +121,7 @@ final class Site(fromUrl: URL) {
 
   def prettyPrintStore(): Unit = {
     for (entityHolder <- store.entities.get.by.get.stores)
-      prettyPrint(entityHolder, Entity.toXmlElement(entityHolder.entity.copy(id = None)), Tei.prettyPrinter)
+      prettyPrint(entityHolder, Entity.parsable.toXmlElement(entityHolder.entity.copy(id = None)), Tei.prettyPrinter)
     prettyPrint(store)
   }
 

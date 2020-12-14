@@ -4,9 +4,8 @@ import org.opentorah.metadata.Names
 import org.opentorah.store.{By, Entities, EntityHolder, Selector, Store}
 import org.opentorah.tei.{Entity, EntityReference}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Element, Parser, PrettyPrinter}
+import org.opentorah.xml.{Antiparser, Element, Parser, PrettyPrinter, Xml}
 import java.net.URL
-import scala.xml.Node
 
 final class References private(references: Seq[ReferenceWithSource]) {
   def noRef: Seq[ReferenceWithSource.FromDocument] =
@@ -111,7 +110,7 @@ object References extends Element.WithToXml[Seq[ReferenceWithSource]]("reference
   private def getName(names: Names): String = names.name
 
   private def checkReference(reference: EntityReference,  findByRef: String => Option[Entity]): Option[String] = {
-    val name: Seq[Node] = reference.name
+    val name: Seq[Xml.Node] = reference.name
     reference.ref.fold[Option[String]](None) { ref =>
       if (ref.contains(" ")) Some(s"""Value of the ref attribute contains spaces: ref="$ref" """) else {
         findByRef(ref).fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${name.text}< """)) { named =>
@@ -130,8 +129,7 @@ object References extends Element.WithToXml[Seq[ReferenceWithSource]]("reference
     .filter(_.isInstanceOf[ReferenceWithSource.FromDocument])
     .map(_.asInstanceOf[ReferenceWithSource.FromDocument])
 
-  override protected def parser: Parser[Seq[ReferenceWithSource]] = ReferenceWithSource.parsable.all
+  override def parser: Parser[Seq[ReferenceWithSource]] = ReferenceWithSource.parsable.all
 
-  override protected def antiparser: Antiparser[Seq[ReferenceWithSource]] =
-    Antiparser.xml.compose[Seq[ReferenceWithSource]](_.map(ReferenceWithSource.toXmlElement))
+  override protected def antiparser: Antiparser[Seq[ReferenceWithSource]] = ReferenceWithSource.parsable.toXmlSeq
 }

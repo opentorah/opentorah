@@ -23,9 +23,9 @@ object Pb extends Element.WithToXml[Pb]("pb") {
   private val emptyAttribute: Attribute.BooleanAttribute = new Attribute.BooleanAttribute("empty")
   private val facsAttribute: Attribute[String] = Attribute("facs")
 
-  override protected def contentType: ContentType = ContentType.Empty
+  override def contentType: ContentType = ContentType.Empty
 
-  override protected val parser: Parser[Pb] = for {
+  override val parser: Parser[Pb] = for {
     n <- nAttribute.required
     id <- Xml.idAttribute.optional
     facs <- facsAttribute.optional

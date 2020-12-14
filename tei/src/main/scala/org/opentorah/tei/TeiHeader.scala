@@ -12,7 +12,7 @@ final case class TeiHeader(
 
 object TeiHeader extends Element.WithToXml[TeiHeader]("teiHeader") {
 
-  override protected val parser: Parser[TeiHeader] = for {
+  override val parser: Parser[TeiHeader] = for {
     fileDesc <- FileDesc.required
     encodingDesc <- EncodingDesc.parsable.optional
     profileDesc <- ProfileDesc.optional

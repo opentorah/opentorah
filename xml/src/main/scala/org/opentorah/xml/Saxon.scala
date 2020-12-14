@@ -111,14 +111,14 @@ sealed abstract class Saxon(name: String) {
     source: Source,
     result: TransformResult
   ): Unit = {
-    Saxon.logger.debug(
-      s"""Saxon.transform(
-         |  saxon = $this,
-         |  stylesheetFile = $stylesheetFile,
-         |  source = ${source.getSystemId},
-         |  result = ${result.getSystemId}
-         |)""".stripMargin
-    )
+//    Saxon.logger.debug(
+//      s"""Saxon.transform(
+//         |  saxon = $this,
+//         |  stylesheetFile = $stylesheetFile,
+//         |  source = ${source.getSystemId},
+//         |  result = ${result.getSystemId}
+//         |)""".stripMargin
+//    )
 
     val transformerFactory: SAXTransformerFactory = getTransformerFactory
 

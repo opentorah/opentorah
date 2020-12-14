@@ -13,9 +13,9 @@ object Language extends Element.WithToXml[Language]("language") {
   private val identAttribute: Attribute[String] = Attribute("ident")
   private val usageAttribute: Attribute.PositiveIntAttribute = new Attribute.PositiveIntAttribute("usage")
 
-  override protected def contentType: ContentType = ContentType.Mixed
+  override def contentType: ContentType = ContentType.Mixed
 
-  override protected def parser: Parser[Language] = for {
+  override def parser: Parser[Language] = for {
     ident <- identAttribute.required
     usage <- usageAttribute.optional
     text <- org.opentorah.xml.Text().optional

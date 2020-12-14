@@ -42,7 +42,6 @@ object LanguageSpec {
     flavour = flavour
   )
 
-  // TODO inherit from ToXml?
   val antiparser: Antiparser[LanguageSpec] = Antiparser.concat(
     langAttribute.toXmlOption.compose(_.language.map(_.name)),
     transliteratedAttribute.toXmlOption.compose(_.isTransliterated),

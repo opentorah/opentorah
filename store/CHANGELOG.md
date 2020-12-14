@@ -4,6 +4,12 @@ Modules covered: `store`, `metadata`, `xml`, `tei`, `util`, `texts`, `dream-pape
 
 ## [Unreleased]
 
+## [0.1.61] - 2020-12-14
+- ToXml and Parsable cleanup;
+- replaced Parsable.withInclude() with unlimited redirects via Element.canRedirect;
+- From.url(..., isRedirect) to mark redirects in Context;
+- Context.fromUrls; Store parsers do not have to keep track of the URLs (but still do);
+
 ## [0.1.60] - 2020-12-13
 - made PrettyPrinter.chunkify() tail-recursive;
 

@@ -10,7 +10,7 @@ object Metadata {
     elementParsable: Parsable[M]
   ): Parser[Seq[M]] = new Element[Seq[M]](rootElementName.getOrElse("metadata")) {
     private val typeName = from.name
-    override protected def parser: Parser[Seq[M]] = for {
+    override def parser: Parser[Seq[M]] = for {
       type_ <- Attribute("type").required
       _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
       result <- elementParsable.all
@@ -26,7 +26,7 @@ object Metadata {
       from = From.resource(obj, resourceName),
       rootElementName = Some("names"),
       elementParsable = new Element[Names]("names") {
-        override protected def parser: Parser[Names] = Names.withoutDefaultNameParser
+        override def parser: Parser[Names] = Names.withoutDefaultNameParser
       }
     )
 

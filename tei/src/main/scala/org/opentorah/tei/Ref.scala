@@ -13,9 +13,9 @@ object Ref extends Element.WithToXml[Ref]("ref") {
 
   private val targetAttribute: Attribute[String] = Attribute("target")
 
-  override protected def contentType: ContentType = ContentType.Mixed
+  override def contentType: ContentType = ContentType.Mixed
 
-  override protected val parser: Parser[Ref] = for {
+  override val parser: Parser[Ref] = for {
     target <- targetAttribute.required
     text <- Element.allNodes
   } yield new Ref(

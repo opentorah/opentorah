@@ -42,7 +42,7 @@ object PsalmsMetadata {
   } yield SpanSemiResolved.setImpliedTo(WithNumber.dropNumbers(numbered).map(_.semiResolve), chapters.full, chapters)
 
   private def spanParsable(name: String): Element[WithNumber[SpanParsed]] = new Element[WithNumber[SpanParsed]](name) {
-    override protected def contentType: ContentType = ContentType.Empty
-    override protected def parser: Parser[WithNumber[SpanParsed]] = WithNumber.parse(SpanParsed.parser)
+    override def contentType: ContentType = ContentType.Empty
+    override def parser: Parser[WithNumber[SpanParsed]] = WithNumber.parse(SpanParsed.parser)
   }
 }

@@ -15,7 +15,7 @@ final case class ProfileDesc(
 
 object ProfileDesc extends Element.WithToXml[ProfileDesc]("profileDesc") {
 
-  override protected val parser: Parser[ProfileDesc] = for {
+  override val parser: Parser[ProfileDesc] = for {
     values <- Choice(Seq(
       Abstract.parsable,
       Creation,

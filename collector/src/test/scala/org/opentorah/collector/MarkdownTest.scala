@@ -10,6 +10,6 @@ class MarkdownTest extends AnyFlatSpec with Matchers {
   "Markdown converter" should "work" in {
     val mdFile = Files.file(Run.getProjectRoot, Seq("collector", "src", "test", "resources", "about.md"))
     val html = MarkdownSiteFile.test(mdFile)
-    println(html);
+//    println(html)
   }
 }

@@ -86,6 +86,6 @@ object ChumashBookMetadata {
 
   private def weekParsable(book: Tanach.ChumashBook): Element[ParshaMetadata.Parsed] =
     new Element[ParshaMetadata.Parsed]("week") {
-      override protected def parser: Parser[ParshaMetadata.Parsed] = ParshaMetadata.parser(book)
+      override def parser: Parser[ParshaMetadata.Parsed] = ParshaMetadata.parser(book)
     }
 }

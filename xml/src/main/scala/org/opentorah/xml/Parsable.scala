@@ -1,19 +1,20 @@
 package org.opentorah.xml
 
-import java.net.URL
 import org.opentorah.util.Collections
+import java.net.URL
 import zio.ZIO
-import scala.xml.{Elem, Node}
 
 trait Parsable[A] extends Requireable[A] {
 
-  def name2parser: Map[String, Parsable.ContentTypeAndParser[A]]
+  def canParse(elementName: String): Option[ToParse[A]]
+
+  def mustParse(elementName: String): ToParse[A] = canParse(elementName).get
 
   final override val optional: Parser[Option[A]] = for {
     // TODO take namespace into account!
-    elementOpt <- Context.nextElement(element => name2parser.keySet.contains(element.label))
+    elementOpt <- Context.nextElement(element => canParse(element.label).isDefined)
     result <- elementOpt.fold[Parser[Option[A]]](ZIO.none)(element =>
-      nested(None, element, name2parser(element.label)).map(Some(_)))
+      nested(None, element, mustParse(element.label)).map(Some(_)))
   } yield result
 
   final def all: Parser[Seq[A]] = all(Seq.empty)
@@ -29,57 +30,36 @@ trait Parsable[A] extends Requireable[A] {
     _ <- Context.checkNoLeftovers
     nextElement <- from.load
     name = nextElement.label
-    result <- name2parser.get(name)
-      .fold[Parser[A]](ZIO.fail(s"$this required, but '$name' found"))(contentTypeAndParser =>
-        nested(Some(from), nextElement, contentTypeAndParser))
+    result <- canParse(name)
+      .fold[Parser[A]](ZIO.fail(s"$this required, but '$name' found"))(toParse =>
+        nested(Some(from), nextElement, toParse))
   } yield result
 
   private def nested(
     from: Option[From],
-    nextElement: Elem,
-    contextTypeAndParser: Parsable.ContentTypeAndParser[A]
+    nextElement: Xml.Element,
+    toParse: ToParse[A]
   ): Parser[A] = for {
-    newCurrent <- Current.open(from, nextElement, contextTypeAndParser.contentType)
-    result <- Context.nested(newCurrent, contextTypeAndParser.parser)
+    newCurrent <- Current.open(from, nextElement, toParse.contentType)
+    result <- Context.nested(newCurrent, toParse.parser)
   } yield result
-
-  final def descendants(xml: Node): Seq[A] =
-    for (xml <- name2parser.keys.toSeq.flatMap(Xml.descendants(xml, _)))
-    yield Parser.parseDo(parse(From.xml("descendants", xml)))
 }
 
 object Parsable {
-  final class ContentTypeAndParser[+A](val contentType: ContentType, val parser: Parser[A])
 
-  final def annotate[A](parsable: Parsable[A]): Parsable[(Parsable[A], A)] = new Parsable[(Parsable[A], A)] {
-    override def toString: Error = "annotated " + parsable.toString
+  private class Compound[A](elements: Seq[Element[A]]) extends Parsable[A] {
+      Collections.checkNoDuplicates(elements.map(_.elementName), "Parsable.union(elements.map(_.elementName))")
 
-    override val name2parser: Map[String, ContentTypeAndParser[(Parsable[A], A)]] =
-      Collections.mapValues(parsable.name2parser) { contentTypeAndParser: ContentTypeAndParser[A] =>
-        new Parsable.ContentTypeAndParser[(Parsable[A], A)](
-          contentTypeAndParser.contentType,
-          contentTypeAndParser.parser.map { result => parsable -> result }
-        )
-      }
-  }
+      override def canParse(elementName: String): Option[ToParse[A]] =
+        elements.find(_.elementName == elementName).map(_.mustParse(elementName))
+    }
 
-  def withInclude[A](parsable: Parsable[A], attributeName: String = "include"): Parsable[A] = new Parsable[A] {
-    override def toString: String = parsable.toString + s" with include [$attributeName]"
+  // TODO upgrade callers to full Parsablw with ToXml and eliminate:
+  final def unionWithoutToXml[A](elements: Seq[Element[A]]): Parsable[A] = new Compound[A](elements)
 
-    override val name2parser: Map[String, ContentTypeAndParser[A]] =
-      for ((elementName, contentTypeAndParser) <- parsable.name2parser)
-       yield (elementName, new ContentTypeAndParser[A](contentTypeAndParser.contentType,
-        for {
-          url <- Attribute(attributeName).optional
-          result <- url.fold(contentTypeAndParser.parser) { url: String => for {
-            currentFromUrl <- Context.currentFromUrl
-            from <- Parser.effect(From.url(currentFromUrl.fold(new URL(url))(new URL(_, url))))
-            result <- new Element[A](elementName) {
-              override protected def contentType: ContentType = contentTypeAndParser.contentType
-              override protected def parser: Parser[A] = contentTypeAndParser.parser
-            }.parse(from)
-          } yield result}
-        } yield result
-      ))
-  }
+  final def union[A](valueElementName: A => String, elements: Seq[Element.WithToXml[A]]): Parsable[A] with ToXml[A] =
+    new Compound[A](elements) with ToXml[A] {
+      override def toXmlElement(value: A): Xml.Element =
+        elements.find(_.elementName == valueElementName(value)).get.toXmlElement(value)
+    }
 }

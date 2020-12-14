@@ -91,21 +91,29 @@ final class GoogleCloudStorageSynchronizer private(
     log(s"Found ${toUpdate.length} blobs to update")
 
 
-    log(s"Deleting ${toDelete.length} blobs")
-    for (blob <- toDelete) run(s"Deleting blob ${blob.getName}", blob.delete())
-    log(s"Done deleting")
+    if (toDelete.nonEmpty) {
+      log(s"Deleting ${toDelete.length} blobs")
+      for (blob <- toDelete) run(s"Deleting blob ${blob.getName}", blob.delete())
+      log(s"Done deleting")
+    }
 
-    log(s"Creating ${toCreateDirectories.length} new directory blobs")
-    for (newDirectory <- toCreateDirectories) run(s"Creating new directory blob $newDirectory", createDirectoryBlob(newDirectory))
-    log(s"Done creating directory blobs")
+    if (toCreateDirectories.nonEmpty) {
+      log(s"Creating ${toCreateDirectories.length} new directory blobs")
+      for (newDirectory <- toCreateDirectories) run(s"Creating new directory blob $newDirectory", createDirectoryBlob(newDirectory))
+      log(s"Done creating directory blobs")
+    }
 
-    log(s"Uploading ${toUpload.length} files")
-    for ((name, file) <- toUpload) run(s"Uploading $file to $name", write(name, file))
-    log(s"Done uploading")
+    if (toUpload.nonEmpty) {
+      log(s"Uploading ${toUpload.length} files")
+      for ((name, file) <- toUpload) run(s"Uploading $file to $name", write(name, file))
+      log(s"Done uploading")
+    }
 
-    log(s"Updating ${toUpdate.length} blobs")
-    for ((blob, file) <- toUpdate) run(s"Updating ${blob.getName} from $file", write(blob.getName, file))
-    log(s"Done updating")
+    if (toUpdate.nonEmpty) {
+      log(s"Updating ${toUpdate.length} blobs")
+      for ((blob, file) <- toUpdate) run(s"Updating ${blob.getName} from $file", write(blob.getName, file))
+      log(s"Done updating")
+    }
   }
 
   private def run(message: String, action: => Unit): Unit =

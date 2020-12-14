@@ -11,7 +11,7 @@ object Editor extends Element.WithToXml[Editor]("editor") {
 
   private val roleAttribute: Attribute[String] = Attribute("role")
 
-  override protected def parser: Parser[Editor] = for {
+  override def parser: Parser[Editor] = for {
     role <- roleAttribute.optional
     persName <- EntityReference.personParsable.optional
   } yield new Editor(
@@ -21,6 +21,6 @@ object Editor extends Element.WithToXml[Editor]("editor") {
 
   override protected val antiparser: Antiparser[Editor] = Tei.concat(
     roleAttribute.toXmlOption.compose[Editor](_.role),
-    EntityReference.toXmlOption.compose[Editor](_.persName)
+    EntityReference.personParsable.toXmlOption.compose[Editor](_.persName)
   )
 }

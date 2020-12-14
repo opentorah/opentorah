@@ -13,9 +13,9 @@ final case class Name(name: String, languageSpec: LanguageSpec) {
 object Name extends Element.WithToXml[Name]("name") {
   private val nAttribute: Attribute[String] = Attribute("n")
 
-  override protected def contentType: ContentType = ContentType.Characters
+  override def contentType: ContentType = ContentType.Characters
 
-  override protected def parser: Parser[Name] = for {
+  override def parser: Parser[Name] = for {
     n <- nAttribute.optional
     characters <- Text().optional
     _ <- Parser.check(n.nonEmpty || characters.nonEmpty, "Both 'n' attribute and text are absent.")

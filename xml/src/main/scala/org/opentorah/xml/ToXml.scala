@@ -1,22 +1,6 @@
 package org.opentorah.xml
 
-import scala.xml.Elem
-
-// TODO merge into Parsable
-// TODO split off a trait with abstract toXmlElement(); use it in References...
 trait ToXml[A] {
-
-  protected def elementName(value: A): String
-
-  protected def antiparser: Antiparser[A]
-
-  final def toXmlElement(value: A): Elem = Xml.construct(
-    name = elementName(value),
-    namespace = antiparser.namespace,
-    attributes = antiparser.attributes(value),
-    children = antiparser.content(value)
-  )
-
   final val toXml: Antiparser[A] = Antiparser(
     content = value => Seq(toXmlElement(value))
   )
@@ -28,4 +12,6 @@ trait ToXml[A] {
   final val toXmlSeq: Antiparser[Seq[A]] = Antiparser(
     content = _.map(toXmlElement)
   )
+
+  def toXmlElement(value: A): Xml.Element
 }

@@ -9,7 +9,7 @@ final case class PublicationStmt(
 
 object PublicationStmt extends Element.WithToXml[PublicationStmt]("publicationStmt") {
 
-  override protected val parser: Parser[PublicationStmt] = for {
+  override val parser: Parser[PublicationStmt] = for {
     publisher <- Publisher.parsable.optional
     availability <- Availability.optional
   } yield new PublicationStmt(
