@@ -3,20 +3,20 @@ package org.opentorah.xml
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.xml.sax.InputSource
-import scala.xml.Elem
+import java.net.URL
 
 final class XmlTest extends AnyFlatSpec with Matchers {
 
   def parseOrError[A](parser: Parser[A]): Either[Error, A] =
     Parser.run(Parser.runnable(parser).either)
 
-  def loadResource(name: String): Elem = Parser.load(From.resource(Parser, name))
+  def loadResource(name: String): Xml.Element = Parser.load(From.resource(Parser, name))
 
   def parseResource(name: String): org.w3c.dom.Element =
     Saxon.Saxon10.parse(new InputSource(Parser.getClass.getResourceAsStream(name + ".xml")))
       .asInstanceOf[org.w3c.dom.Document].getDocumentElement
 
-  def firstElement(element: Elem): Elem =
+  def firstElement(element: Xml.Element): Xml.Element =
     Xml.getChildren(element).filter(Xml.isElement).map(Xml.asElement).head
 
   "text parsing" should "work" in {
@@ -24,6 +24,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
       new Element[Option[String]]("a") {
         override def contentType: ContentType = ContentType.Elements
         override def parser: Parser[Option[String]] = Text().optional
+        override def antiparser: Antiparser[Option[String]] = ???
       }
         .parse(From.xml("test", <s>
           <a>asdjkh</a>
@@ -34,6 +35,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
       new Element[String]("a") {
         override def contentType: ContentType = ContentType.Characters
         override def parser: Parser[String] = Text().required
+        override def antiparser: Antiparser[String] = ???
       }.parse(From.xml("test", <a>asdjkh</a>))
     ) shouldBe "asdjkh"
   }
@@ -42,18 +44,56 @@ final class XmlTest extends AnyFlatSpec with Matchers {
     loadResource("1")
   }
 
-  private val file2parsable: Element[String] = new Element[String]("x") {
-    override def canRedirect: Boolean = true
+  private final class X(
+    val fromUrl: FromUrl,
+    val name: String
+  )
+
+  private val nameParsable: Element[String] = new Element[String]("name") {
+    override def contentType: ContentType = ContentType.Characters
+    override def parser: Parser[String] = Text().required
+    override def antiparser: Antiparser[String] = ???
+  }
+
+  private val file2parsable: Element[X] = new Element[X]("x") {
     override def contentType: ContentType = ContentType.Elements
-    override def parser: Parser[String] = new Element[String]("name") {
-      override def contentType: ContentType = ContentType.Characters
-      override def parser: Parser[String] = Text().required
-    }.required
+    override def parser: Parser[X] = for {
+      urls <- Context.currentFromUrl
+      name <- nameParsable.required
+    } yield new X(
+      urls,
+      name
+    )
+
+    override def antiparser: Antiparser[X] = ???
   }
 
   "Redirect" should "work" in {
-    Parser.parseDo(file2parsable.parse(From.resource(Parser, "9"))) shouldBe "X"
-    Parser.parseDo(file2parsable.parse(From.resource(Parser, "1"))) shouldBe "X"
+    def resource(name: String) = From.resource(Parser, name)
+    val r1 = resource("1")
+    def checkUrl(url: URL, name: String): Unit = url.toString.endsWith(s"/$name.xml") shouldBe true
+
+    val direct: X = Parser.parseDo(file2parsable.parse(resource("9")))
+    direct.name shouldBe "X"
+    checkUrl(direct.fromUrl.url, "9")
+
+    val followed: X = Parser.parseDo(file2parsable.followRedirects.parse(r1))
+    followed.name shouldBe "X"
+    checkUrl(direct.fromUrl.url, "9")
+
+    val redirect = Parser.parseDo(file2parsable.orRedirect.parse(r1)).left.get
+    checkUrl(redirect.url, "2")
+
+    val redirected: X = Parser.parseDo(redirect.followRedirects)
+    redirected.name shouldBe "X"
+    checkUrl(direct.fromUrl.url, "9")
+
+    val withTrue = Parser.parseDo(file2parsable.withRedirect(true).parse(r1)).right.get
+    withTrue.name shouldBe "X"
+    checkUrl(direct.fromUrl.url, "9")
+
+    val withFalse = Parser.parseDo(file2parsable.withRedirect(false).parse(r1)).left.get
+    checkUrl(withFalse.url, "2")
   }
 
   "Attribute.get()" should "work" in {

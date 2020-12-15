@@ -6,7 +6,7 @@ final case class HandNotes(
   handNotes: Seq[HandNote.Value]
 )
 
-object HandNotes extends Element.WithToXml[HandNotes]("handNotes") {
+object HandNotes extends Element[HandNotes]("handNotes") {
   def apply(): HandNotes = new HandNotes(
     handNotes = Seq.empty
   )
@@ -17,8 +17,7 @@ object HandNotes extends Element.WithToXml[HandNotes]("handNotes") {
     handNotes
   )
 
-  override protected val antiparser: Antiparser[HandNotes] = Tei.concat(
-    // TODO why do I need [HandNotes] in compose() here?
-    HandNote.parsable.toXmlSeq.compose[HandNotes](_.handNotes)
+  override val antiparser: Antiparser[HandNotes] = Tei.concat(
+    HandNote.parsable.toXmlSeq.compose(_.handNotes)
   )
 }

@@ -1,14 +1,13 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Parser}
-import scala.xml.Node
+import org.opentorah.xml.{Antiparser, Element, Parser, Xml}
 
 final case class Creation(
   date: Date,
-  xml: Seq[Node]
+  xml: Seq[Xml.Node]
 )
 
-object Creation extends Element.WithToXml[Creation]("creation") {
+object Creation extends Element[Creation]("creation") {
 
   override def parser: Parser[Creation] = for {
     date <- Date.required
@@ -18,8 +17,8 @@ object Creation extends Element.WithToXml[Creation]("creation") {
     xml
   )
 
-  override protected val antiparser: Antiparser[Creation] = Tei.concat(
-    Date.toXml.compose[Creation](_.date),
-    Antiparser.xml.compose[Creation](_.xml)
+  override val antiparser: Antiparser[Creation] = Tei.concat(
+    Date.toXml.compose(_.date),
+    Antiparser.xml.compose(_.xml)
   )
 }

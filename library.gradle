@@ -35,7 +35,7 @@ ext.configureLibrary = {
   }
 
   // TODO it seems that this only affects the code JAR, but sources and JavaDoc JARs are misnamed;
-  // set project names in settings.gradle?
+  // set project names in settings.gradle - like in the CLoud Run plugin ;)
   jar.archiveBaseName.set(projectArtifact)
 
   // Gradle plugin [publishing?] plugin, if it is applied, adds tasks publishPluginJar and

@@ -4,11 +4,11 @@ import org.opentorah.xml.{Antiparser, Element, Parser, PrettyPrinter, Text}
 import java.net.URL
 import org.opentorah.util.Files
 
-object FilesList extends Element.WithToXml[Seq[String]]("filesList") {
+object FilesList extends Element[Seq[String]]("filesList") {
 
   override def parser: Parser[Seq[String]] = Text("file").all
 
-  override protected def antiparser: Antiparser[Seq[String]] =
+  override def antiparser: Antiparser[Seq[String]] =
     Antiparser.xml.compose[Seq[String]](value => for (file <- value) yield <file>{file}</file>)
 
   def get(
@@ -20,9 +20,9 @@ object FilesList extends Element.WithToXml[Seq[String]]("filesList") {
     val directory: URL = Files.subdirectory(baseUrl, directoryName)
     val list: URL = Files.fileInDirectory(baseUrl, listName.getOrElse(directoryName + "-list-generated.xml"))
 
-    val fileNames: Seq[String] = if (!Files.isFile(directory)) Parser.parseDo(parse(list)) else {
+    val fileNames: Seq[String] = if (!Files.isFileUrl(directory)) Parser.parseDo(parse(list)) else {
       val result: Seq[String] = Files.filesWithExtensions(Files.url2file(directory), extension).sorted
-      if (Files.isFile(list)) Files.write(
+      if (Files.isFileUrl(list)) Files.write(
         file = Files.url2file(list),
         content = PrettyPrinter.default.renderXml(toXmlElement(result))
       )

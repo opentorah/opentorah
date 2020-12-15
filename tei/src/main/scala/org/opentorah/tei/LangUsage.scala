@@ -6,7 +6,7 @@ final case class LangUsage(
   languages: Seq[Language]
 )
 
-object LangUsage extends Element.WithToXml[LangUsage]("langUsage") {
+object LangUsage extends Element[LangUsage]("langUsage") {
 
   override def parser: Parser[LangUsage] = for {
     languages <- Language.all
@@ -14,7 +14,7 @@ object LangUsage extends Element.WithToXml[LangUsage]("langUsage") {
     languages
   )
 
-  override protected val antiparser: Antiparser[LangUsage] = Tei.concat(
-    Language.toXmlSeq.compose[LangUsage](_.languages)
+  override val antiparser: Antiparser[LangUsage] = Tei.concat(
+    Language.toXmlSeq.compose(_.languages)
   )
 }

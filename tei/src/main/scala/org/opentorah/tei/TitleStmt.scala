@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Parser}
-import scala.xml.Node
+import org.opentorah.xml.{Antiparser, Element, Parser, Xml}
 
 final case class TitleStmt(
   titles: Seq[Title.Value],
@@ -13,7 +12,7 @@ final case class TitleStmt(
   respStmts: Seq[RespStmt.Value]
 ) {
   def references: Seq[EntityReference] = {
-    val xml: Seq[Node] =
+    val xml: Seq[Xml.Node] =
       Title.parsable.toXmlSeq.content(titles) ++
       Author.parsable.toXmlSeq.content(authors) ++
       Sponsor.parsable.toXmlSeq.content(sponsors) ++
@@ -25,7 +24,7 @@ final case class TitleStmt(
   }
 }
 
-object TitleStmt extends Element.WithToXml[TitleStmt]("titleStmt") {
+object TitleStmt extends Element[TitleStmt]("titleStmt") {
   def apply(): TitleStmt = new TitleStmt(
     titles = Seq.empty,
     authors = Seq.empty,
@@ -54,7 +53,7 @@ object TitleStmt extends Element.WithToXml[TitleStmt]("titleStmt") {
     respStmts
   )
 
-  override protected val antiparser: Antiparser[TitleStmt] = Tei.concat(
+  override val antiparser: Antiparser[TitleStmt] = Tei.concat(
     Title.parsable.toXmlSeq.compose(_.titles),
     Author.parsable.toXmlSeq.compose(_.authors),
     Editor.toXmlSeq.compose(_.editors),

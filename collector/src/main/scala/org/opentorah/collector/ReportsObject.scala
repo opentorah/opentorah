@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
-import scala.xml.{Elem, Node}
+import org.opentorah.xml.Xml
 
 final class ReportsObject(site: Site) extends SimpleSiteObject(site) {
 
@@ -14,9 +14,9 @@ final class ReportsObject(site: Site) extends SimpleSiteObject(site) {
 
   override def title: Option[String] = Some("Отчеты")
 
-  override protected def teiBody: Seq[Node] = simpleSubObjects.map(line)
+  override protected def teiBody: Seq[Xml.Node] = simpleSubObjects.map(line)
 
-  private def line(report: SimpleSiteObject): Elem =
+  private def line(report: SimpleSiteObject): Xml.Element =
     <l xmlns={Tei.namespace.uri}><ref target={Files.mkUrl(report.url)}>{report.title.get}</ref></l>
 
   def resolve(parts: Seq[String]): Option[SiteFile] =

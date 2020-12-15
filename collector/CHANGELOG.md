@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.1.62] - 2020-12-20
+- hybrid store/collector new generation;
+- selectors in metadata, not in the store file;
+
 ## [0.7.60] - 2020-12-13
 - synchronizing local directory to a Google Storage bucket;
 - use CRS32c to detect changes in uploaded files;

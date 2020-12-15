@@ -1,7 +1,6 @@
 package org.opentorah.collector
 
-import org.opentorah.xml.XLink
-import scala.xml.Elem
+import org.opentorah.xml.{XLink, Xml}
 
 object Html {
 
@@ -11,8 +10,8 @@ object Html {
   def toHtml(
     siteParameters: SiteParameters,
     pageParameters: PageParameters,
-    content: Elem
-  ): Elem =
+    content: Xml.Element
+  ): Xml.Element =
     <html lang={pageParameters.lang}>
       <head>
         <meta charset="utf-8"/>
@@ -44,7 +43,7 @@ object Html {
   private def optionToJs(value: Option[String]): String =
     value.fold("null")(value => s"'$value'")
 
-  private def header(siteParameters: SiteParameters, pageParameters: PageParameters): Elem =
+  private def header(siteParameters: SiteParameters, pageParameters: PageParameters): Xml.Element =
     <header class="site-header" role="banner">
       <div class="wrapper">
         <a class="site-title" rel="author" target={siteParameters.homeTarget.name} href="/">{siteParameters.title}</a>
@@ -69,7 +68,7 @@ object Html {
 //        </span>
 //      </label>)
 
-  private def footer(siteParameters: SiteParameters): Elem =
+  private def footer(siteParameters: SiteParameters): Xml.Element =
     <footer class="site-footer h-card">
       <data class="u-url" href="/"/>
 
@@ -94,7 +93,7 @@ object Html {
 
   // TODO make opentorah Twitter account!
 
-  private def social(username: Option[String], serviceUrl: String, iconPart: String): Seq[Elem] =
+  private def social(username: Option[String], serviceUrl: String, iconPart: String): Seq[Xml.Element] =
     username.toSeq.map(username =>
     <li>
       <a href={s"https://$serviceUrl/$username"}>

@@ -4,10 +4,9 @@ import java.io.File
 import org.opentorah.store.{Entities, EntityHolder, Path, Store, WithPath}
 import org.opentorah.tei.{Entity, Publisher, SourceDesc, Tei}
 import org.opentorah.util.Files
-import org.opentorah.xml.{LinkResolver, PrettyPrinter}
+import org.opentorah.xml.{LinkResolver, PrettyPrinter, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import java.net.URL
-import scala.xml.Elem
 
 final class Site(fromUrl: URL) {
   val store: Store = Store.read(Files.fileInDirectory(Files.subdirectory(fromUrl, "store"), "store.xml"))
@@ -121,7 +120,7 @@ final class Site(fromUrl: URL) {
 
   def prettyPrintStore(): Unit = {
     for (entityHolder <- store.entities.get.by.get.stores)
-      prettyPrint(entityHolder, Entity.parsable.toXmlElement(entityHolder.entity.copy(id = None)), Tei.prettyPrinter)
+      prettyPrint(entityHolder, Entity.toXmlElement(entityHolder.entity.copy(id = None)), Tei.prettyPrinter)
     prettyPrint(store)
   }
 
@@ -137,8 +136,8 @@ final class Site(fromUrl: URL) {
     }
   }
 
-  private def prettyPrint(store: Store, toXml: => Elem, prettyPrinter: PrettyPrinter): Unit =
-    for (fromUrl <- store.urls.fromUrl) if (Files.isFile(fromUrl)) Files.write(
+  private def prettyPrint(store: Store, toXml: => Xml.Element, prettyPrinter: PrettyPrinter): Unit =
+    for (fromUrl <- store.urls.fromUrl) if (Files.isFileUrl(fromUrl)) Files.write(
       file = Files.url2file(fromUrl),
       content = prettyPrinter.renderXml(toXml)
     )
@@ -163,6 +162,7 @@ object Site {
   //    if (missingImages.nonEmpty) throw new IllegalArgumentException(s"Missing images: $missingImages")
   //  }
 
+  // TODO in new generation, move into the RootStore XML file:
   private def mkSiteParameters: SiteParameters = new SiteParameters(
     title = "Документы",
     author = "www.alter-rebbe.org",

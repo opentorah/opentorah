@@ -2,13 +2,13 @@ package org.opentorah.collector
 
 import org.opentorah.tei.EntityReference
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Attribute, Element, Parsable, Parser, ToParse, ToXml, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parser, ToXml, Xml}
 
 // TODO generalize to hold unclears...
 
 sealed abstract class ReferenceWithSource(val path: Seq[String], val reference: EntityReference)
 
-object ReferenceWithSource {
+object ReferenceWithSource extends Element.Union[ReferenceWithSource] with ToXml[ReferenceWithSource] {
 
   private val pathAttribute: Attribute[String] = Attribute("path")
 
@@ -19,7 +19,7 @@ object ReferenceWithSource {
     entityName: String
   ) extends ReferenceWithSource(path, reference)
 
-  private object FromEntityElement extends Element.WithToXml[FromEntity]("fromEntity") {
+  object FromEntity extends Element[FromEntity]("fromEntity") {
     private val entityIdAttribute: Attribute[String] = Attribute("entityId")
     private val entityNameAttribute: Attribute[String] = Attribute("entityName")
 
@@ -27,7 +27,7 @@ object ReferenceWithSource {
       path <- pathAttribute.required
       entityId <- entityIdAttribute.required
       entityName <- entityNameAttribute.required
-      reference <- EntityReference.parsable.required
+      reference <- EntityReference.required
     } yield FromEntity(
       splitPath(path),
       reference,
@@ -35,9 +35,9 @@ object ReferenceWithSource {
       entityName
     )
 
-    override protected def antiparser: Antiparser[FromEntity] = Antiparser.concat(
+    override def antiparser: Antiparser[FromEntity] = Antiparser.concat(
       pathAttribute.toXml.compose(unsplitPath),
-      EntityReference.parsable.toXml.compose(_.reference),
+      EntityReference.toXml.compose(_.reference),
       entityIdAttribute.toXml.compose(_.entityId),
       entityNameAttribute.toXml.compose(_.entityName)
     )
@@ -57,7 +57,7 @@ object ReferenceWithSource {
     )
   }
 
-  private object FromDocumentElement extends Element.WithToXml[FromDocument]("fromDocument") {
+  object FromDocument extends Element[FromDocument]("fromDocument") {
     private val collectionFileNameAttribute: Attribute[String] = Attribute("collectionFileName")
     private val collectionNameAttribute: Attribute[String] = Attribute("collectionName")
     private val documentNameAttribute: Attribute[String] = Attribute("documentName")
@@ -67,7 +67,7 @@ object ReferenceWithSource {
       collectionFileName <- collectionFileNameAttribute.required
       collectionName <- collectionNameAttribute.required
       documentName <- documentNameAttribute.required
-      reference <- EntityReference.parsable.required
+      reference <- EntityReference.required
     } yield FromDocument(
       splitPath(path),
       reference,
@@ -75,10 +75,9 @@ object ReferenceWithSource {
       collectionName,
       documentName
     )
-
-    override protected def antiparser: Antiparser[FromDocument] = Antiparser.concat(
+    override def antiparser: Antiparser[FromDocument] = Antiparser.concat(
       pathAttribute.toXml.compose(unsplitPath),
-      EntityReference.parsable.toXml.compose(_.reference),
+      EntityReference.toXml.compose(_.reference),
       collectionFileNameAttribute.toXml.compose(_.collectionFileName),
       collectionNameAttribute.toXml.compose(_.collectionName),
       documentNameAttribute.toXml.compose(_.documentName)
@@ -90,19 +89,18 @@ object ReferenceWithSource {
     override val reference: EntityReference,
   ) extends ReferenceWithSource(path, reference)
 
-  private object FromElementElement extends Element.WithToXml[FromElement]("fromElement") {
+  object FromElement extends Element[FromElement]("fromElement") {
     override def parser: Parser[FromElement] = for {
       path <- pathAttribute.required
-      reference <- EntityReference.parsable.required
+      reference <- EntityReference.required
     } yield FromElement(
       splitPath(path),
       reference
     )
 
-    // TODO why do I have to specify the type for compose() here?
-    override protected def antiparser: Antiparser[FromElement] = Antiparser.concat(
-      pathAttribute.toXml.compose[FromElement](unsplitPath),
-      EntityReference.parsable.toXml.compose[FromElement](_.reference)
+    override def antiparser: Antiparser[FromElement] = Antiparser.concat(
+      pathAttribute.toXml.compose(unsplitPath),
+      EntityReference.toXml.compose(_.reference)
     )
   }
 
@@ -110,18 +108,12 @@ object ReferenceWithSource {
 
   private def unsplitPath(referenceWithSource: ReferenceWithSource): String = referenceWithSource.path.mkString("/")
 
-  // TODO abstract into Parsable.union...
-  final val parsable: Parsable[ReferenceWithSource] with ToXml[ReferenceWithSource] =
-    new Parsable[ReferenceWithSource] with ToXml[ReferenceWithSource] {
-      override def canParse(elementName: String): Option[ToParse[ReferenceWithSource]] =
-        Seq(FromEntityElement, FromDocumentElement, FromElementElement)
-          .find(_.elementName == elementName)
-          .map(_.mustParse(elementName))
+  override protected val elements: Seq[Element[_ <: ReferenceWithSource]] = Seq(FromEntity, FromDocument, FromElement)
 
-      override def toXmlElement(value: ReferenceWithSource): Xml.Element = value match {
-        case value: FromEntity   => FromEntityElement.toXmlElement(value)
-        case value: FromDocument => FromDocumentElement.toXmlElement(value)
-        case value: FromElement  => FromElementElement.toXmlElement(value)
-      }
-    }
+  // TODO extend Union from ToXml:
+  override def toXmlElement(value: ReferenceWithSource): Xml.Element = value match {
+    case value: FromEntity   => FromEntity  .toXmlElement(value)
+    case value: FromDocument => FromDocument.toXmlElement(value)
+    case value: FromElement  => FromElement .toXmlElement(value)
+  }
 }

@@ -13,7 +13,7 @@ final case class ProfileDesc(
   listTranspose: Option[ListTranspose.Value]
 )
 
-object ProfileDesc extends Element.WithToXml[ProfileDesc]("profileDesc") {
+object ProfileDesc extends Element[ProfileDesc]("profileDesc") {
 
   override val parser: Parser[ProfileDesc] = for {
     values <- Choice(Seq(
@@ -45,7 +45,7 @@ object ProfileDesc extends Element.WithToXml[ProfileDesc]("profileDesc") {
     listTranspose
   )
 
-  override protected val antiparser: Antiparser[ProfileDesc] = Tei.concat(
+  override val antiparser: Antiparser[ProfileDesc] = Tei.concat(
     Abstract.parsable.toXmlOption.compose(_.documentAbstract),
     Creation.toXmlOption.compose(_.creation),
     LangUsage.toXmlOption.compose(_.langUsage),

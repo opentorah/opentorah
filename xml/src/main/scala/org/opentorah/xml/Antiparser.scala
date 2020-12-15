@@ -1,11 +1,10 @@
 package org.opentorah.xml
 
 import org.opentorah.util.Collections
-import scala.xml.Node
 
 final class Antiparser[A] private(
   val attributes: A => Seq[Attribute.Value[_]],
-  val content: A => Seq[Node],
+  val content: A => Seq[Xml.Node],
   val namespace: Option[Namespace]
 ) {
 
@@ -20,7 +19,7 @@ object Antiparser {
 
   def apply[A](
     attributes: A => Seq[Attribute.Value[_]] = (_: A) => Seq.empty,
-    content   : A => Seq[Node]               = (_: A) => Seq.empty,
+    content   : A => Seq[Xml.Node]               = (_: A) => Seq.empty,
     namespace : Option[Namespace]            = None
   ): Antiparser[A] = new Antiparser[A](
     attributes,
@@ -32,7 +31,12 @@ object Antiparser {
     antiparsers: Antiparser[A]*
   ): Antiparser[A] = concat[A](None, antiparsers)
 
-  def concat[A](
+  def concatInNamespace[A](
+    namespace: Namespace,
+    antiparsers: Seq[Antiparser[A]]
+  ): Antiparser[A] = concat[A](Some(namespace), antiparsers)
+
+  private def concat[A](
     namespace: Option[Namespace],
     antiparsers: Seq[Antiparser[A]]
   ): Antiparser[A] = apply[A](
@@ -41,7 +45,7 @@ object Antiparser {
     namespace  = namespace
   )
 
-  val xml: Antiparser[Seq[Node]] = apply[Seq[Node]](
-    content = (value: Seq[Node]) => value
+  val xml: Antiparser[Seq[Xml.Node]] = apply[Seq[Xml.Node]](
+    content = (value: Seq[Xml.Node]) => value
   )
 }

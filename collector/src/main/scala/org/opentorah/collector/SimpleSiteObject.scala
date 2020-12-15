@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.Tei
-import scala.xml.Node
+import org.opentorah.xml.Xml
 
 abstract class SimpleSiteObject(site: Site) extends TeiSiteObject(site) {
 
@@ -13,7 +13,7 @@ abstract class SimpleSiteObject(site: Site) extends TeiSiteObject(site) {
 
   final override protected def tei: Tei = Tei(teiBody)
 
-  protected def teiBody: Seq[Node]
+  protected def teiBody: Seq[Xml.Node]
 }
 
 object SimpleSiteObject {

@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.WithNumber
-import org.opentorah.xml.{Attribute, Element, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parser}
 
 final class Chapters(chapters: Seq[Int]) {
   def length(chapter: Int): Int = chapters(chapter-1)
@@ -60,13 +60,17 @@ final class Chapters(chapters: Seq[Int]) {
 
 object Chapters {
 
-  private val chapterParsable = new Element[WithNumber[Int]]("chapter") {
+  object Chapter extends Element[WithNumber[Int]]("chapter") {
+    private val lengthAttribute: Attribute.PositiveIntAttribute = new Attribute.PositiveIntAttribute("length")
+
     override def parser: Parser[WithNumber[Int]] =
-      WithNumber.parse(new Attribute.PositiveIntAttribute("length").required)
+      WithNumber.parse(lengthAttribute.required)
+
+    override def antiparser: Antiparser[WithNumber[Int]] = ???
   }
 
   val parser: Parser[Chapters] = for {
-    chapters <- chapterParsable.all
+    chapters <- Chapter.all
     _ <- WithNumber.checkConsecutive(chapters, "chapter")
   } yield new Chapters(WithNumber.dropNumbers(chapters))
 }

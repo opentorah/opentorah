@@ -1,7 +1,6 @@
 package org.opentorah.xml
 
 import zio.{URIO, ZIO}
-import scala.xml.Node
 
 trait ToHtml {
 
@@ -14,7 +13,7 @@ trait ToHtml {
   final protected def link(
     ref: Option[String],
     r: (State, String) => Option[LinkResolver.Resolved],
-    children: Seq[Node]
+    children: Seq[Xml.Node]
   ): URIO[State, Xml.Element] = ref.map(ref => ZIO.access[State](r(_, ref))).getOrElse(ZIO.none).map(resolved => a(
     id = None,
     href = resolved.map(_.urlAsString).orElse(ref),
@@ -26,11 +25,11 @@ trait ToHtml {
     id: Option[String],
     href: Option[String],
     target: Option[String],
-    children: Seq[Node]
+    children: Seq[Xml.Node]
   ): Xml.Element =
     <a id={id.orNull} href={href.orNull} target={target.orNull}>{children}</a>
 
-  final class EndNote(number: Int, id: Option[String], val content: Seq[Node]) {
+  final class EndNote(number: Int, id: Option[String], val content: Seq[Xml.Node]) {
     private def contentId: String = s"_note_$number"
     private def srcId: String = id.getOrElse(s"src_note_$number")
 
@@ -50,7 +49,7 @@ trait ToHtml {
     private var endNotes: Seq[EndNote] = Seq.empty
 
     // TODO get two ids, one for the actual content at the end
-    def addEndNote(id: Option[String], content: Seq[Node]): Xml.Element = {
+    def addEndNote(id: Option[String], content: Seq[Xml.Node]): Xml.Element = {
       val note: EndNote = new EndNote(
         number = endNotes.length + 1,
         id,

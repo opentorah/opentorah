@@ -7,20 +7,20 @@ final case class Editor(
   persName: Option[EntityReference]
 )
 
-object Editor extends Element.WithToXml[Editor]("editor") {
+object Editor extends Element[Editor]("editor") {
 
   private val roleAttribute: Attribute[String] = Attribute("role")
 
   override def parser: Parser[Editor] = for {
     role <- roleAttribute.optional
-    persName <- EntityReference.personParsable.optional
+    persName <- EntityReference.Person.optional
   } yield new Editor(
     role,
     persName
   )
 
-  override protected val antiparser: Antiparser[Editor] = Tei.concat(
-    roleAttribute.toXmlOption.compose[Editor](_.role),
-    EntityReference.personParsable.toXmlOption.compose[Editor](_.persName)
+  override val antiparser: Antiparser[Editor] = Tei.concat(
+    roleAttribute.toXmlOption.compose(_.role),
+    EntityReference.Person.toXmlOption.compose(_.persName)
   )
 }

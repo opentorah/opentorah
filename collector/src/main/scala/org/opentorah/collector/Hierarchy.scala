@@ -5,7 +5,6 @@ import org.opentorah.store.{Binding, Path, Store, WithPath}
 import org.opentorah.tei.{Ref, Tei}
 import org.opentorah.util.Files
 import org.opentorah.xml.{RawXml, Xml}
-import scala.xml.{Elem, Node}
 
 object Hierarchy {
 
@@ -31,17 +30,17 @@ object Hierarchy {
     .map { case (selector, store) => s"$selector $store" }
     .mkString(", ")
 
-  def storeHeader(path: Path, store: Store): Seq[Node] =
+  def storeHeader(path: Path, store: Store): Seq[Xml.Node] =
     pathLinks(path) ++
     <head xmlns={Tei.namespace.uri}>{storeTitle(path, store)}</head> ++
     store.storeAbstract.map(value => Seq(<ab xmlns={Tei.namespace.uri}>{value.xml}</ab>)).getOrElse(Seq.empty) ++
     RawXml.getXml(store.body)
 
-  private def pathLinks(pathRaw: Path): Seq[Elem] = {
+  private def pathLinks(pathRaw: Path): Seq[Xml.Element] = {
     val path: Path = if (pathRaw.isEmpty) pathRaw else pathRaw.init
     for (ancestor <- path.path.inits.toSeq.reverse.tail) yield {
       val binding: Binding = ancestor.last
-      val link: Elem = Ref.toXml(
+      val link: Xml.Element = Ref.toXml(
         target = urlPrefix(Path(ancestor)),
         text = getName(binding.store.names)
       )
@@ -49,23 +48,23 @@ object Hierarchy {
     }
   }
 
-  private def storeTitle(path: Path, store: Store): Seq[Node] = {
-    val title: Seq[Node] = RawXml.getXml(store.title)
-    val titlePrefix: Seq[Node] = if (path.isEmpty) Seq.empty else Xml.mkText(
+  private def storeTitle(path: Path, store: Store): Seq[Xml.Node] = {
+    val title: Seq[Xml.Node] = RawXml.getXml(store.title)
+    val titlePrefix: Seq[Xml.Node] = if (path.isEmpty) Seq.empty else Xml.mkText(
       getName(path.last.selector.names) + " " + getName(store.names) + (if (title.isEmpty) "" else ": ")
     )
 
     titlePrefix ++ title
   }
 
-  def storeTitle(store: Store): Seq[Node] = {
-    val title: Seq[Node] = RawXml.getXml(store.title)
-    val titlePrefix: Seq[Node] = if (title.isEmpty) Seq.empty else Seq(Xml.mkText(": "))
+  def storeTitle(store: Store): Seq[Xml.Node] = {
+    val title: Seq[Xml.Node] = RawXml.getXml(store.title)
+    val titlePrefix: Seq[Xml.Node] = if (title.isEmpty) Seq.empty else Seq(Xml.mkText(": "))
     titlePrefix ++ title
   }
 
   // TODO eliminate
-  def collectionXml(site: Site, collection: WithPath[Collection]): Elem =
+  def collectionXml(site: Site, collection: WithPath[Collection]): Xml.Element =
   // TODO make a Ref serializer that takes SiteObject...
     <item xmlns={Tei.namespace.uri}>{Ref.toXml(
       target = new CollectionObject(site, collection).htmlFile.url,

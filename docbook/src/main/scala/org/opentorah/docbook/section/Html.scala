@@ -2,7 +2,7 @@ package org.opentorah.docbook.section
 
 import Section.Parameters
 import org.opentorah.util.Json
-import scala.xml.Node
+import org.opentorah.xml.Xml
 
 object Html extends DocBook2 {
   override def name: String = "html"
@@ -25,7 +25,7 @@ object Html extends DocBook2 {
 
   val mathJaxConfigurationParameterName: String = "mathjax.configuration"
 
-  override protected def mainStylesheetBody(values: NonOverridableParameters): Seq[Node] =
+  override protected def mainStylesheetBody(values: NonOverridableParameters): Seq[Xml.Node] =
     if (values.mathJaxConfiguration.isEmpty) Seq.empty else Seq(
       <!-- Add MathJax support -->,
       <xsl:template name="user.head.content">
@@ -36,5 +36,5 @@ object Html extends DocBook2 {
       </xsl:template>
     )
 
-  override protected def customStylesheetBody: Seq[Node] = Seq.empty
+  override protected def customStylesheetBody: Seq[Xml.Node] = Seq.empty
 }

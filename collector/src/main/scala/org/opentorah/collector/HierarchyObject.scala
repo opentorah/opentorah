@@ -4,7 +4,6 @@ import org.opentorah.store.{By, Path, Selector, Store, WithPath}
 import org.opentorah.tei.{Ref, Tei}
 import org.opentorah.util.Files
 import org.opentorah.xml.Xml
-import scala.xml.Node
 
 final class HierarchyObject(site: Site, path: Path, store: Store) extends SimpleSiteObject(site) {
 
@@ -14,7 +13,7 @@ final class HierarchyObject(site: Site, path: Path, store: Store) extends Simple
 
   override protected def viewer: Viewer = Viewer.Collection
 
-  protected def teiBody: Seq[Node] = Hierarchy.storeHeader(path, store) ++ store.by.toSeq.flatMap { by: By[_] =>
+  protected def teiBody: Seq[Xml.Node] = Hierarchy.storeHeader(path, store) ++ store.by.toSeq.flatMap { by: By[_] =>
     <p xmlns={Tei.namespace.uri}>
       <l>{Hierarchy.getName(by.selector.names)}:</l>
       <list type="bulleted">{by.stores.map(_.asInstanceOf[Store]).map { store => // TODO get rid of the cast!!!

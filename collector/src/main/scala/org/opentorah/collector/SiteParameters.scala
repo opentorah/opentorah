@@ -1,6 +1,6 @@
 package org.opentorah.collector
 
-import scala.xml.Elem
+import org.opentorah.xml.Xml
 
 final class SiteParameters(
   val title: String,
@@ -9,7 +9,7 @@ final class SiteParameters(
   val faviconJpg: String,
   val googleAnalyticsId: Option[String],
   val navigationLinks: Seq[NavigationLink],
-  val footerCol3: Elem,
+  val footerCol3: Xml.Element,
   val homeTarget: Viewer,
   val githubUsername: Option[String],
   val twitterUsername: Option[String]

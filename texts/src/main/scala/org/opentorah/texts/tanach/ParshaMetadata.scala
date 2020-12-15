@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{Metadata, Names, WithNumber}
 import org.opentorah.texts.tanach.Torah.Numbered
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, ContentType, Element, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser}
 
 final class ParshaMetadata(
   val parsha: Parsha,
@@ -80,16 +80,9 @@ object ParshaMetadata {
   def parser(book: Tanach.ChumashBook): Parser[Parsed] = for {
     names <- Names.withoutDefaultNameParser
     span <- semiResolvedParser
-    aliyot <- new Element[Torah.Numbered]("aliyah") {
-      override def contentType: ContentType = ContentType.Empty
-      override def parser: Parser[Numbered] = numberedParser
-    }.all
-    daysParsed <- new Element[DayParsed]("day") {
-      override def parser: Parser[DayParsed] = dayParser
-    }.all
-    maftir <- new Element[SpanSemiResolved]("maftir") {
-      override def parser: Parser[SpanSemiResolved] = semiResolvedParser
-    }.required
+    aliyot <- Aliyah.all
+    daysParsed <- Day.all
+    maftir <- Maftir.required
     parsha <- Metadata.find[Parsha](book.parshiot, names)
   } yield {
     val (days: Seq[DayParsed], daysCombined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
@@ -107,11 +100,26 @@ object ParshaMetadata {
   private def byCustom(days: Seq[DayParsed]): Custom.Sets[Seq[Torah.Numbered]] =
     Collections.mapValues(days.groupBy(_.custom))(days => days.map(_.span))
 
-  private def dayParser: Parser[DayParsed] = for {
-    span <- numberedParser
-    custom <- Attribute("custom").optional.map(_.fold[Set[Custom]](Set(Custom.Common))(Custom.parse))
-    isCombined <- new Attribute.BooleanAttribute("combined").optional.map(_.getOrElse(false))
-  } yield DayParsed(span, custom, isCombined)
+  private object Day extends Element[DayParsed]("day") {
+    override def parser: Parser[DayParsed] = for {
+      span <- numberedParser
+      custom <- Attribute("custom").optional.map(_.fold[Set[Custom]](Set(Custom.Common))(Custom.parse))
+      isCombined <- new Attribute.BooleanAttribute("combined").optional.map(_.getOrElse(false))
+    } yield DayParsed(span, custom, isCombined)
+
+    override def antiparser: Antiparser[DayParsed] = ???
+  }
+
+  object Aliyah extends Element[Torah.Numbered]("aliyah") {
+    override def contentType: ContentType = ContentType.Empty
+    override def parser: Parser[Numbered] = numberedParser
+    override def antiparser: Antiparser[Numbered] = ???
+  }
+
+  object Maftir extends Element[SpanSemiResolved]("maftir") {
+    override def parser: Parser[SpanSemiResolved] = semiResolvedParser
+    override def antiparser: Antiparser[SpanSemiResolved] = ???
+  }
 
   private def numberedParser: Parser[Torah.Numbered] = WithNumber.parse(semiResolvedParser)
 

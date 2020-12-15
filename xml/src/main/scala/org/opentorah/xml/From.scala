@@ -4,14 +4,14 @@ import java.io.{File, StringReader}
 import java.net.URL
 import org.opentorah.util.{Files, Util}
 import org.xml.sax.InputSource
-import scala.xml.{Elem, XML}
+import scala.xml.XML
 import zio.IO
 
 sealed abstract class From(val name: String) {
 
   def url: Option[URL]
 
-  def load: IO[Error, Elem]
+  def load: IO[Error, Xml.Element]
 
   def isRedirect: Boolean
 }
@@ -20,15 +20,15 @@ object From {
 
   private final class FromXml(
     name: String,
-    elem: Elem
+    elem: Xml.Element
   ) extends From(name) {
     override def isRedirect: Boolean = false
     override def toString: String = s"From.xml($name)"
     override def url: Option[URL] = None
-    override def load: IO[Error, Elem] = IO.succeed(elem)
+    override def load: IO[Error, Xml.Element] = IO.succeed(elem)
   }
 
-  def xml(name: String, elem: Elem): From = new FromXml(name, elem)
+  def xml(name: String, elem: Xml.Element): From = new FromXml(name, elem)
 
   private final class FromString(
     name: String,
@@ -37,7 +37,7 @@ object From {
     override def isRedirect: Boolean = false
     override def toString: String = s"From.string($name)"
     override def url: Option[URL] = None
-    override def load: IO[Error, Elem] = loadFromSource(new InputSource(new StringReader(string)))
+    override def load: IO[Error, Xml.Element] = loadFromSource(new InputSource(new StringReader(string)))
   }
 
   def string(name: String, string: String): From = new FromString(name, string)
@@ -47,14 +47,15 @@ object From {
   {
     override def toString: String = s"From.url($fromUrl, isRedirect=$isRedirect)"
     override def url: Option[URL] = Some(fromUrl)
-    override def load: IO[Error, Elem] = loadFromUrl(fromUrl)
+    override def load: IO[Error, Xml.Element] = loadFromUrl(fromUrl)
   }
 
-  def url(url: URL, isRedirect: Boolean = false): From = new FromUrl(url, isRedirect)
+  private[xml] def url(url: URL): From = new FromUrl(url, false)
 
-  def file(file: File): From = url(file.toURI.toURL)
+  private[xml] def redirect(url: URL): From = new FromUrl(url, true)
 
   def file(directory: File, fileName: String): From = file(new File(directory, fileName + ".xml"))
+  private def file(file: File): From = url(file.toURI.toURL)
 
   private final class FromResource(
     clazz: Class[_],
@@ -63,8 +64,8 @@ object From {
     override def isRedirect: Boolean = false
     override def toString: String = s"From.resource($clazz:$name.xml)"
     override def url: Option[URL] = Option(clazz.getResource(name + ".xml"))
-    override def load: IO[Error, Elem] =
-      url.fold[IO[Error, Elem]](IO.fail(s"Resource not found: $this"))(loadFromUrl)
+    override def load: IO[Error, Xml.Element] =
+      url.fold[IO[Error, Xml.Element]](IO.fail(s"Resource not found: $this"))(loadFromUrl)
   }
 
   def resource(obj: AnyRef, name: String): From = new FromResource(obj.getClass, name)
@@ -73,8 +74,8 @@ object From {
 
   def resource(obj: AnyRef): From = resource(obj, Util.className(obj))
 
-  private def loadFromUrl(url: URL): IO[Error, Elem] = {
-    if (!Files.isFile(url) && !Files.isJar(url)) {
+  private def loadFromUrl(url: URL): IO[Error, Xml.Element] = {
+    if (!Files.isFileUrl(url) && !Files.isJarUrl(url)) {
       // TODO log!
       println(s"-- Loading $url")
       val x = 0
@@ -84,6 +85,6 @@ object From {
 
   private val useXerces: Boolean = true
 
-  private def loadFromSource(source: InputSource): IO[Error, Elem] =
+  private def loadFromSource(source: InputSource): IO[Error, Xml.Element] =
     Parser.effect(XML.loadXML(source, if (useXerces) Xerces.getParser else XML.parser))
 }

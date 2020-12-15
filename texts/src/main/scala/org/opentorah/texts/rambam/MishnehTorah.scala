@@ -1,7 +1,7 @@
 package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Attribute, Element, From, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, Element, From, Parser}
 
 object MishnehTorah {
 
@@ -17,6 +17,26 @@ object MishnehTorah {
     final def book: Book = book_.get
 
     def chapters: Seq[Chapter]
+  }
+
+  object Part extends Element[Part]("part") {
+    private val nAttribute: Attribute.PositiveIntAttribute = new Attribute.PositiveIntAttribute("n")
+    private val chaptersAttribute = new Attribute.PositiveIntAttribute("chapters")
+
+    override def parser: Parser[Part] = for {
+      number <- nAttribute.required
+      numChapters <- chaptersAttribute.required
+      names <- Names.withoutDefaultNameParser
+      chapters <- NamedChapter.all
+    } yield {
+      if (chapters.isEmpty) new PartWithNumberedChapters(number, numChapters, names) else {
+        val result = new PartWithNamedChapters(number, numChapters, names, chapters)
+        chapters.foreach(_.setPart(result))
+        result
+      }
+    }
+
+    override def antiparser: Antiparser[Part] = ???
   }
 
   final class PartWithNumberedChapters(
@@ -56,48 +76,41 @@ object MishnehTorah {
     override def part: PartWithNamedChapters = part_.get
   }
 
+  object NamedChapter extends Element[NamedChapter]("chapter") {
+    override def parser: Parser[NamedChapter] = for {
+      names <- Names.withoutDefaultNameParser
+    } yield new NamedChapter(names)
+
+    override def antiparser: Antiparser[NamedChapter] = Names.antiparser.compose(_.names)
+  }
+
+  object Book extends Element[Book]("book") {
+    private val nAttribute: Attribute.IntAttribute = new Attribute.IntAttribute("n")
+
+    override def parser: Parser[Book] = for {
+      number <- nAttribute.required
+      names <- Names.withoutDefaultNameParser
+      parts <- Part.all
+      _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
+        s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
+    } yield {
+      val result = new Book(number, names, parts)
+      parts.foreach(_.setBook(result))
+      result
+    }
+
+    override def antiparser: Antiparser[Book] = ???
+  }
+
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
   lazy val books: Seq[Book] = {
     val result: Seq[Book] = Parser.parseDo(Metadata.load(
       from = From.resource(this),
-      elementParsable = new Element[Book]("book") {
-        override def parser: Parser[Book] = bookParser
-      }
+      fromXml = Book
     ))
 
     require(result.map(_.number) == (0 to 14))
 
     result
-  }
-
-  private def bookParser: Parser[Book] = for {
-    number <- new Attribute.IntAttribute("n").required
-    names <- Names.withoutDefaultNameParser
-    parts <- new Element[Part]("part") { override def parser: Parser[Part] = partParser }.all
-    _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
-      s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
-  } yield {
-    val result = new Book(number, names, parts)
-    parts.foreach(_.setBook(result))
-    result
-  }
-
-  private def partParser: Parser[Part] = for {
-    number <- new Attribute.PositiveIntAttribute("n").required
-    numChapters <- new Attribute.PositiveIntAttribute("chapters").required
-    names <- Names.withoutDefaultNameParser
-    chapters <- chapterParsable.all
-  } yield {
-    if (chapters.isEmpty) new PartWithNumberedChapters(number, numChapters, names) else {
-      val result = new PartWithNamedChapters(number, numChapters, names, chapters)
-      chapters.foreach(_.setPart(result))
-      result
-    }
-  }
-
-  object chapterParsable extends Element[NamedChapter]("chapter") {
-    override def parser: Parser[NamedChapter] = for {
-      names <- Names.withoutDefaultNameParser
-    } yield new NamedChapter(names)
   }
 }

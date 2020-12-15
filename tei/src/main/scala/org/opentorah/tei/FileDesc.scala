@@ -15,7 +15,7 @@ final case class FileDesc(
   sourceDesc: Option[SourceDesc.Value]
 )
 
-object FileDesc extends Element.WithToXml[FileDesc]("fileDesc") {
+object FileDesc extends Element[FileDesc]("fileDesc") {
 
   override def parser: Parser[FileDesc] = for {
     titleStmt <- TitleStmt.required
@@ -35,7 +35,7 @@ object FileDesc extends Element.WithToXml[FileDesc]("fileDesc") {
     sourceDesc
   )
 
-  override protected val antiparser: Antiparser[FileDesc] = Tei.concat(
+  override val antiparser: Antiparser[FileDesc] = Tei.concat(
     TitleStmt.toXml.compose(_.titleStmt),
     EditionStmt.parsable.toXmlOption.compose(_.editionStmt),
     Extent.parsable.toXmlOption.compose(_.extent),

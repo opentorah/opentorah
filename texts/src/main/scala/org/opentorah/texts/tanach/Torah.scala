@@ -1,7 +1,8 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{WithNames, WithNumber}
-import org.opentorah.xml.{Element, Parser}
+import org.opentorah.texts.tanach
+import org.opentorah.xml.{Antiparser, Element, Parser}
 
 // Other than on Simchas Torah, aliyot are from the same book.
 final case class Torah private(override val spans: Seq[Torah.BookSpan])
@@ -62,21 +63,26 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
     } yield Torah(spans.map(inBook(bookSpan.book, _)))
   }
 
-  val torahParsable: Element[Torah] = new Element[Torah]("torah") {
+  object torahParsable extends Element[Torah]("torah") {
     override def parser: Parser[Torah] = for {
       bookSpan <- spanParser.map(_.resolve)
-      spans <- aliyahParsable(bookSpan).all
+      spans <- new AliyahParsable(bookSpan).all
       result <- parseAliyot(bookSpan, spans, number = None)
     } yield result
+
+    override def antiparser: Antiparser[Torah] = ???
   }
 
-  private def aliyahParsable(bookSpan: BookSpan): Element[Numbered] = new Element[Numbered]("aliyah") {
+  private final class AliyahParsable(bookSpan: BookSpan) extends Element[Numbered]("aliyah") {
     override def parser: Parser[WithNumber[SpanSemiResolved]] =
       WithNumber.parse(SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve))
+
+    override def antiparser: Antiparser[Numbered] = ???
   }
 
-  val maftirParsable: Element[BookSpan] = new Element[BookSpan]("maftir") {
+  object Maftir extends Element[BookSpan]("maftir") {
     override def parser: Parser[BookSpan] = spanParser.map(_.resolve)
+    override def antiparser: Antiparser[tanach.Torah.BookSpan] = ???
   }
 
   def inBook(book: Tanach.ChumashBook, span: Span): BookSpan = BookSpan(book, span)

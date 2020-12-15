@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.tei.{EntitiesList, EntityName, Ref, Tei}
 import org.opentorah.util.Files
-import scala.xml.{Elem, Node}
+import org.opentorah.xml.Xml
 
 final class NamesObject(site: Site) extends SimpleSiteObject(site) {
 
@@ -12,16 +12,16 @@ final class NamesObject(site: Site) extends SimpleSiteObject(site) {
 
   override def title: Option[String] = Some(NamesObject.title)
 
-  override protected def teiBody: Seq[Node] = {
+  override protected def teiBody: Seq[Xml.Node] = {
     val nonEmptyLists: Seq[EntitiesList] = site.store.entities.get.lists.filterNot(_.isEmpty)
-    val listOfLists: Seq[Node] =
+    val listOfLists: Seq[Xml.Node] =
       <p xmlns={Tei.namespace.uri}>{for (list <- nonEmptyLists) yield
         <l>{Ref.toXml(NamesObject.entityInTheListUrl(list.id), list.head)}</l>}</p>
 
-    def toXml(value: EntitiesList): Elem =
+    def toXml(value: EntitiesList): Xml.Element =
       <list xmlns={Tei.namespace.uri} xml:id={value.id} role={value.role.orNull}>
         <head>{value.head}</head>
-        {for (entity <- value.entities) yield <l>{EntityName.parsable.toXmlElement(entity.entityName)}</l>}
+        {for (entity <- value.entities) yield <l>{EntityName.toXmlElement(entity.entityName)}</l>}
       </list>
         .copy(label = value.entityType.listElement)
 

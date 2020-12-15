@@ -1,9 +1,8 @@
 package org.opentorah.docbook
 
-import org.opentorah.xml.{Doctype, PrettyPrinter, XLink}
+import org.opentorah.xml.{Doctype, PrettyPrinter, XLink, Xml}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
-import scala.xml.Elem
 
 class PluginTest extends AnyFlatSpecLike with Matchers {
 
@@ -11,7 +10,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
     name: String,
     substitutions: Map[String, String],
     doctype: Option[Doctype],
-    document: Elem)(
+    document: Xml.Element)(
     inIndexHtml: String*
   ): Unit = {
     val project = PluginTestProject(

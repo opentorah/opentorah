@@ -4,7 +4,6 @@ import org.opentorah.store.WithPath
 import org.opentorah.tei.{EntityReference, Page, Ref}
 import org.opentorah.util.Files
 import org.opentorah.xml.Xml
-import scala.xml.{Elem, Node}
 
 final class CollectionObject(site: Site, collection: WithPath[Collection]) extends SimpleSiteObject(site) {
 
@@ -19,20 +18,20 @@ final class CollectionObject(site: Site, collection: WithPath[Collection]) exten
   override protected def navigationLinks: Seq[NavigationLink] =
     Seq(CollectionObject.navigationLink(collection))
 
-  override protected def teiBody: Seq[Node] = {
+  override protected def teiBody: Seq[Xml.Node] = {
     val pages: Seq[Page] = collection.value.documents
       .flatMap(document => document.pages(collection.value.pageType))
 
-    def listMissing(flavour: String, isMissing: Page => Boolean): Seq[Elem] = {
+    def listMissing(flavour: String, isMissing: Page => Boolean): Seq[Xml.Element] = {
       val missing: Seq[String] = pages.filter(isMissing).map(_.displayName)
       if (missing.isEmpty) Seq.empty
       else Seq(<p>Отсутствуют фотографии {missing.length} {flavour} страниц: {missing.mkString(" ")}</p>)
     }
 
     Hierarchy.storeHeader(collection.path, collection.value) ++
-    Seq[Elem](CollectionObject.table(collection).toTei(
+    Seq[Xml.Element](CollectionObject.table(collection).toTei(
       collection.value.parts.flatMap { part =>
-          part.title.fold[Seq[Node]](Seq.empty)(_.xml).map(Table.Nodes) ++
+          part.title.fold[Seq[Xml.Node]](Seq.empty)(_.xml).map(Table.Nodes) ++
           part.documents.map(Table.Data[Document]) }
     )) ++
       listMissing("пустых", page => page.pb.isMissing && page.pb.isEmpty) ++
@@ -87,7 +86,7 @@ object CollectionObject {
     Table.Column("Кому", "addressee", _.addressee),
 
     Table.Column("Язык", "language", { document: Document =>
-      val translations: Seq[Elem] =
+      val translations: Seq[Xml.Element] =
         for (teiHolder <- document.by.get.stores.filter(_.language.isDefined))
         yield Ref.toXml(DocumentObject.documentUrl(collection, teiHolder.name), teiHolder.language.get)
       val language: Option[String] = document.tei.languages.map(_.ident).headOption
@@ -107,9 +106,9 @@ object CollectionObject {
     }),
 
     Table.Column("Расшифровка", "transcriber", { document: Document =>
-      val transcribers: Seq[Node] = document.tei.titleStmt.editors
+      val transcribers: Seq[Xml.Node] = document.tei.titleStmt.editors
         .filter(_.role.contains("transcriber")).flatMap(_.persName)
-        .map(transcriber => EntityReference.parsable.toXmlElement(transcriber))
+        .map(transcriber => EntityReference.toXmlElement(transcriber))
       Xml.multi(transcribers)
     })
   )

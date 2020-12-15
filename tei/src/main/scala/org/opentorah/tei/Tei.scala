@@ -25,7 +25,7 @@ final case class Tei(
   /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
 }
 
-object Tei extends Element.WithToXml[Tei]("TEI") with Dialect with ToHtml {
+object Tei extends Element[Tei]("TEI") with Dialect with ToHtml {
 
   override val namespace: Namespace = Namespace(uri = "http://www.tei-c.org/ns/1.0", prefix="tei")
 
@@ -45,13 +45,13 @@ object Tei extends Element.WithToXml[Tei]("TEI") with Dialect with ToHtml {
     text
   )
 
-  override protected lazy val antiparser: Antiparser[Tei] = concat(
+  override lazy val antiparser: Antiparser[Tei] = concat(
     TeiHeader.toXml.compose(_.teiHeader),
     Text.toXml.compose(_.text)
   )
 
   def concat[A](antiparsers: Antiparser[A]*): Antiparser[A] =
-    Antiparser.concat(Some(Tei.namespace), antiparsers)
+    Antiparser.concatInNamespace(Tei.namespace, antiparsers)
 
   def apply(body: Seq[Xml.Node]): Tei = new Tei(
     teiHeader = TeiHeader(),

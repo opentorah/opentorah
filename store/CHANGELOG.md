@@ -4,6 +4,11 @@ Modules covered: `store`, `metadata`, `xml`, `tei`, `util`, `texts`, `dream-pape
 
 ## [Unreleased]
 
+## [0.1.62] - 2020-12-20
+- selectors in metadata, not in the store file;
+- xml.Element extends both FromXml and ToXml;
+- cleanup;
+
 ## [0.1.61] - 2020-12-14
 - ToXml and Parsable cleanup;
 - replaced Parsable.withInclude() with unlimited redirects via Element.canRedirect;

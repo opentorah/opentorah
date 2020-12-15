@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.tei.{Entity, EntityName, Tei}
 import org.opentorah.util.Files
-import scala.xml.Elem
+import org.opentorah.xml.Xml
 
 final class MisnamedEntitiesReport(site: Site) extends ReportObject[Entity](site) {
 
@@ -15,9 +15,9 @@ final class MisnamedEntitiesReport(site: Site) extends ReportObject[Entity](site
   override protected def lines: Seq[Entity] = site.entities
     .filterNot(entity => entity.id.contains(getExpectedId(entity)))
 
-  override protected def lineToXml(entity: Entity): Elem =
+  override protected def lineToXml(entity: Entity): Xml.Element =
     <l xmlns={Tei.namespace.uri}>
-      {EntityName.parsable.toXmlElement(EntityName.forEntity(entity))}
+      {EntityName.toXmlElement(EntityName.forEntity(entity))}
       {s"должен по идее называться '${getExpectedId(entity)}'"}
     </l>
 

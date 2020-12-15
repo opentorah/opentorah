@@ -1,15 +1,14 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser}
-import scala.xml.Node
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser, Xml}
 
 final case class Date(
   when: String,
   calendar: Option[String],
-  xml: Seq[Node]
+  xml: Seq[Xml.Node]
 )
 
-object Date extends Element.WithToXml[Date]("date") {
+object Date extends Element[Date]("date") {
 
   private val whenAttribute: Attribute[String] = Attribute("when")
   private val calendarAttribute: Attribute[String] = Attribute("calendar")
@@ -26,7 +25,7 @@ object Date extends Element.WithToXml[Date]("date") {
     xml
   )
 
-  override protected val antiparser: Antiparser[Date] = Tei.concat(
+  override val antiparser: Antiparser[Date] = Tei.concat(
     whenAttribute.toXml.compose(_.when),
     calendarAttribute.toXmlOption.compose(_.calendar),
     Antiparser.xml.compose(_.xml)

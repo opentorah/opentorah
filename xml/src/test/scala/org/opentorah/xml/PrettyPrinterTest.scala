@@ -2,7 +2,6 @@ package org.opentorah.xml
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import scala.xml.Elem
 
 final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
 
@@ -18,7 +17,7 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
     result shouldBe expected.stripMargin + "\n"
   }
 
-  private def check(xml: Elem, width: Int, expected: String): Unit =
+  private def check(xml: Xml.Element, width: Int, expected: String): Unit =
     check(From.xml("test XML", xml), width, expected)
 
   "Chunking" should "work" in {
