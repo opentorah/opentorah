@@ -15,7 +15,7 @@ final class TeiTest extends AnyFlatSpec with Matchers {
 
   "Entity parsing" should "work" in {
     val result: Entity = Parser.parseDo(
-      Entity.parse(From.resource(Tei, "Баал_Шем_Тов")))
+      Entity.parsable.parse(From.resource(Tei, "Баал_Шем_Тов")))
 
     result.role shouldBe Some("jew")
     result.name shouldBe "Израиль из Мезбича"
@@ -38,6 +38,6 @@ final class TeiTest extends AnyFlatSpec with Matchers {
   "905" should "work" in {
     val tei: Tei = Parser.parseDo(Tei.parse(From.resource(Tei, "905")))
     val html: Elem = tei2html(Tei.toXmlElement(tei))
-    println(Tei.prettyPrinter.render(html))
+    //println(Tei.prettyPrinter.render(html))
   }
 }

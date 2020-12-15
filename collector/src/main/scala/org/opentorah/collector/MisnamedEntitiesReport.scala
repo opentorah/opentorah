@@ -17,7 +17,7 @@ final class MisnamedEntitiesReport(site: Site) extends ReportObject[Entity](site
 
   override protected def lineToXml(entity: Entity): Elem =
     <l xmlns={Tei.namespace.uri}>
-      {EntityName.toXmlElement(EntityName.forEntity(entity))}
+      {EntityName.parsable.toXmlElement(EntityName.forEntity(entity))}
       {s"должен по идее называться '${getExpectedId(entity)}'"}
     </l>
 

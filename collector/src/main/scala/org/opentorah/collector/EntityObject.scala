@@ -12,7 +12,7 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
 
   override protected def viewer: Viewer = Viewer.Names
 
-  override protected def teiBody: Seq[Node] = Seq(Entity.toXmlElement(entity.copy(content = entity.content :+ mentions)))
+  override protected def teiBody: Seq[Node] = Seq(Entity.parsable.toXmlElement(entity.copy(content = entity.content :+ mentions)))
 
   private def mentions: Elem = {
 

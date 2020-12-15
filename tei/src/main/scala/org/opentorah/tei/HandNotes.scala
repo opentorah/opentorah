@@ -11,7 +11,7 @@ object HandNotes extends Element.WithToXml[HandNotes]("handNotes") {
     handNotes = Seq.empty
   )
 
-  override protected def parser: Parser[HandNotes] = for {
+  override def parser: Parser[HandNotes] = for {
     handNotes <- HandNote.parsable.all
   } yield new HandNotes(
     handNotes

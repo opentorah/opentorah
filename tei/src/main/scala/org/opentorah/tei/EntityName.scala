@@ -9,27 +9,40 @@ final case class EntityName(
   name: String
 )
 
-object EntityName extends ToXml[EntityName] {
+object EntityName {
 
   val refAttribute: Attribute[String] = Attribute("ref")
 
-  def parsable(entityType: EntityType): Parsable[EntityName] = new Element[EntityName](entityType.nameElement) {
-    override protected def contentType: ContentType = ContentType.Characters
+  private def parsable(entityType: EntityType): Element.WithToXml[EntityName] = new Element.WithToXml[EntityName](entityType.nameElement) {
+    override def contentType: ContentType = ContentType.Characters
 
-    override protected def parser: Parser[EntityName] = for {
+    override def parser: Parser[EntityName] = for {
       id <- Xml.idAttribute.optional
       ref <- refAttribute.optional
       name <- org.opentorah.xml.Text().required
     } yield EntityName(entityType, id, ref, name)
+
+    override protected def antiparser: Antiparser[EntityName] = Tei.concat(
+      Xml.idAttribute.toXmlOption.compose[EntityName](_.id),
+      refAttribute.toXmlOption.compose[EntityName](_.ref),
+      Antiparser.xml.compose[EntityName](value => Seq(Xml.mkText(value.name)))
+    )
   }
 
-  override protected def elementName(value: EntityName): String = value.entityType.nameElement
+  private val personParsable: Element.WithToXml[EntityName] = parsable(EntityType.Person)
+  private val organizationParsable: Element.WithToXml[EntityName] = parsable(EntityType.Organization)
+  private val placeParsable: Element.WithToXml[EntityName] = parsable(EntityType.Place)
 
-  override protected val antiparser: Antiparser[EntityName] = Tei.concat(
-    Xml.idAttribute.toXmlOption.compose[EntityName](_.id),
-    refAttribute.toXmlOption.compose[EntityName](_.ref),
-    Antiparser.xml.compose[EntityName](value => Seq(Xml.mkText(value.name)))
+  final val parsable: Parsable[EntityName] with ToXml[EntityName] = Parsable.union[EntityName](
+    _.entityType.nameElement,
+    Seq(personParsable, organizationParsable, placeParsable)
   )
+
+  def getParsable(entityType: EntityType): Element.WithToXml[EntityName] = entityType match {
+    case EntityType.Person       => personParsable
+    case EntityType.Organization => organizationParsable
+    case EntityType.Place        => placeParsable
+  }
 
   // TODO just the entity.entityName, like in the NamesObject?
   def forEntity(entity: Entity): EntityName = EntityName(

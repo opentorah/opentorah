@@ -23,7 +23,7 @@ abstract class Component(elementName: String) {
   def classOfInline: Class[_]
 
   object parsable extends org.opentorah.xml.Element.WithToXml[Element](elementName) {
-    override protected def parser: Parser[Element] = for {
+    override def parser: Parser[Element] = for {
       file <- Component.fileAttribute.optional
       result <- if (file.isDefined) ZIO.succeed(FromFile(file.get)) else  for {
         className <- Attribute("type").optional

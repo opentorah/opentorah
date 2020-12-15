@@ -22,8 +22,8 @@ final class XmlTest extends AnyFlatSpec with Matchers {
   "text parsing" should "work" in {
     parseOrError(
       new Element[Option[String]]("a") {
-        override protected def contentType: ContentType = ContentType.Elements
-        override protected def parser: Parser[Option[String]] = Text().optional
+        override def contentType: ContentType = ContentType.Elements
+        override def parser: Parser[Option[String]] = Text().optional
       }
         .parse(From.xml("test", <s>
           <a>asdjkh</a>
@@ -32,8 +32,8 @@ final class XmlTest extends AnyFlatSpec with Matchers {
 
     Parser.parseDo(
       new Element[String]("a") {
-        override protected def contentType: ContentType = ContentType.Characters
-        override protected def parser: Parser[String] = Text().required
+        override def contentType: ContentType = ContentType.Characters
+        override def parser: Parser[String] = Text().required
       }.parse(From.xml("test", <a>asdjkh</a>))
     ) shouldBe "asdjkh"
   }
@@ -42,21 +42,18 @@ final class XmlTest extends AnyFlatSpec with Matchers {
     loadResource("1")
   }
 
-  private val file2parsable: Parsable[String] =
-    new Element[String]("x") {
-      override protected def contentType: ContentType = ContentType.Elements
-      override protected def parser: Parser[String] = new Element[String]("name") {
-        override protected def contentType: ContentType = ContentType.Characters
-        override protected def parser: Parser[String] = Text().required
-      }.required
-    }
+  private val file2parsable: Element[String] = new Element[String]("x") {
+    override def canRedirect: Boolean = true
+    override def contentType: ContentType = ContentType.Elements
+    override def parser: Parser[String] = new Element[String]("name") {
+      override def contentType: ContentType = ContentType.Characters
+      override def parser: Parser[String] = Text().required
+    }.required
+  }
 
-  "Include" should "work" in {
-    Parser.parseDo(file2parsable
-      .parse(From.resource(Parser, "2"))) shouldBe "X"
-
-    Parser.parseDo(Parsable.withInclude(file2parsable, "to")
-      .parse(From.resource(Parser, "1"))) shouldBe "X"
+  "Redirect" should "work" in {
+    Parser.parseDo(file2parsable.parse(From.resource(Parser, "9"))) shouldBe "X"
+    Parser.parseDo(file2parsable.parse(From.resource(Parser, "1"))) shouldBe "X"
   }
 
   "Attribute.get()" should "work" in {

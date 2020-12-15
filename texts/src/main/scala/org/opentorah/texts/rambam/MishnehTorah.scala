@@ -61,7 +61,7 @@ object MishnehTorah {
     val result: Seq[Book] = Parser.parseDo(Metadata.load(
       from = From.resource(this),
       elementParsable = new Element[Book]("book") {
-        override protected def parser: Parser[Book] = bookParser
+        override def parser: Parser[Book] = bookParser
       }
     ))
 
@@ -73,7 +73,7 @@ object MishnehTorah {
   private def bookParser: Parser[Book] = for {
     number <- new Attribute.IntAttribute("n").required
     names <- Names.withoutDefaultNameParser
-    parts <- new Element[Part]("part") { override protected def parser: Parser[Part] = partParser }.all
+    parts <- new Element[Part]("part") { override def parser: Parser[Part] = partParser }.all
     _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
       s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
   } yield {
@@ -96,7 +96,7 @@ object MishnehTorah {
   }
 
   object chapterParsable extends Element[NamedChapter]("chapter") {
-    override protected def parser: Parser[NamedChapter] = for {
+    override def parser: Parser[NamedChapter] = for {
       names <- Names.withoutDefaultNameParser
     } yield new NamedChapter(names)
   }

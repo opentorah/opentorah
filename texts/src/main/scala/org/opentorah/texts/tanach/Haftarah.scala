@@ -29,7 +29,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
       from = From.resource(this),
       elementParsable = new Element[(String, Customs)]("week") {
         private val elementParser = Haftarah.parser(full = true)
-        override protected def parser: Parser[(String, Customs)] = for {
+        override def parser: Parser[(String, Customs)] = for {
           name <- Names.defaultNameAttribute.required
           result <- elementParser
         } yield (name, result)
@@ -45,7 +45,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
 
 
   def parsable(full: Boolean): Element[Customs] = new Element[Customs]("haftarah") {
-    override protected def parser: Parser[Customs] = Haftarah.parser(full)
+    override def parser: Parser[Customs] = Haftarah.parser(full)
   }
 
   private def parser(full: Boolean): Parser[Customs] = for {
@@ -53,7 +53,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
     parts <- partParsable(span).all
     parts <- if (parts.isEmpty) ZIO.none else partsParser(parts).map(Some(_))
     customsElements <- new Element[(Set[Custom], Haftarah)]("custom") {
-      override protected def parser: Parser[(Set[Custom], Haftarah)] = customParser(span)
+      override def parser: Parser[(Set[Custom], Haftarah)] = customParser(span)
     }.all
   } yield {
     val customs: Custom.Of[Haftarah] = Custom.Of(customsElements, full = false)
@@ -78,7 +78,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
 
   private def partParsable(ancestorSpan: BookSpanParsed): Element[WithNumber[BookSpan]] =
     new Element[WithNumber[BookSpan]]("part") {
-      override protected def parser: Parser[WithNumber[BookSpan]] =
+      override def parser: Parser[WithNumber[BookSpan]] =
         WithNumber.parse(spanParser.map(_.inheritFrom(ancestorSpan).resolve))
     }
 

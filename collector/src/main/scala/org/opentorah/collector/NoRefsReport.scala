@@ -15,7 +15,7 @@ final class NoRefsReport(site: Site) extends ReportObject[ReferenceWithSource.Fr
 
   // TODO include all references, not just the ones from documents (общий/178, /1374/2213)
   override protected def lineToXml(fromDocument: ReferenceWithSource.FromDocument): Elem = {
-    val reference: Elem = EntityName.toXmlElement(EntityName.forReference(fromDocument.reference))
+    val reference: Elem = EntityName.parsable.toXmlElement(EntityName.forReference(fromDocument.reference))
 
     val link: Elem = Ref.toXml(
       target = fromDocument.shortPath,

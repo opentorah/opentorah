@@ -9,7 +9,7 @@ final case class Text(
 
 object Text extends Element.WithToXml[Text]("text") {
 
-  override protected val parser: Parser[Text] = for {
+  override val parser: Parser[Text] = for {
     lang <- Xml.langAttribute.optional
     body <- Body.parsable.required
   } yield new Text(

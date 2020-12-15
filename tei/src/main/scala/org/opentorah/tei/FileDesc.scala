@@ -17,7 +17,7 @@ final case class FileDesc(
 
 object FileDesc extends Element.WithToXml[FileDesc]("fileDesc") {
 
-  override protected def parser: Parser[FileDesc] = for {
+  override def parser: Parser[FileDesc] = for {
     titleStmt <- TitleStmt.required
     editionStmt <- EditionStmt.parsable.optional
     extent <- Extent.parsable.optional

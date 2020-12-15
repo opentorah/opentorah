@@ -15,16 +15,31 @@ final class Choice(result: Map[Parsable[_], Seq[_]]) {
   }
 }
 
+// TODO clean up
 object Choice {
 
-  def apply(parsables: Seq[Parsable[_]]): Parser[Choice] = {
-    val parsable = new UnionParsable[(Parsable[_], _)](parsables.map { parsable =>
-      Parsable.annotate(parsable).asInstanceOf[Parsable[(Parsable[_], _)]]
-    })
+  def apply(parsables: Seq[Element.WithToXml[_]]): Parser[Choice] = {
+    val parsable: Parsable[(Parsable[_], _)] = new Parsable[(Parsable[_], _)] {
+      override def canParse(elementName: String): Option[ToParse[(Parsable[_], _)]] =
+        parsables.find(_.elementName == elementName).map(parsable => annotate(parsable).mustParse(elementName))
+    }
+
     val results: Parser[Map[Parsable[_], Seq[_]]] =
       parsable.all.map(parsable =>
         Collections.mapValues(parsable.groupBy(_._1))(_.map(_._2)))
 
     results.map(new Choice(_))
+  }
+
+  final def annotate[A](parsable: Parsable[A]): Parsable[(Parsable[A], A)] = new Parsable[(Parsable[A], A)] {
+    override def toString: Error = "annotated " + parsable.toString
+
+    override def canParse(elementName: String): Option[ToParse[(Parsable[A], A)]] =
+      parsable.canParse(elementName).map { toParse: ToParse[A] =>
+        new ToParse[(Parsable[A], A)] {
+          override def contentType: ContentType = toParse.contentType
+          override def parser: Parser[(Parsable[A], A)] = toParse.parser.map { result => parsable -> result }
+        }
+      }
   }
 }

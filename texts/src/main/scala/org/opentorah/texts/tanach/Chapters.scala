@@ -61,7 +61,7 @@ final class Chapters(chapters: Seq[Int]) {
 object Chapters {
 
   private val chapterParsable = new Element[WithNumber[Int]]("chapter") {
-    override protected def parser: Parser[WithNumber[Int]] =
+    override def parser: Parser[WithNumber[Int]] =
       WithNumber.parse(new Attribute.PositiveIntAttribute("length").required)
   }
 

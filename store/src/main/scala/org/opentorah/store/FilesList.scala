@@ -6,7 +6,7 @@ import org.opentorah.util.Files
 
 object FilesList extends Element.WithToXml[Seq[String]]("filesList") {
 
-  override protected def parser: Parser[Seq[String]] = Text("file").all
+  override def parser: Parser[Seq[String]] = Text("file").all
 
   override protected def antiparser: Antiparser[Seq[String]] =
     Antiparser.xml.compose[Seq[String]](value => for (file <- value) yield <file>{file}</file>)

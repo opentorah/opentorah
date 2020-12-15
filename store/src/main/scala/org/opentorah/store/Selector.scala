@@ -13,7 +13,7 @@ object Selector extends Element.WithToXml[Selector]("selector") {
 
   val predefinedSelectors: Seq[Selector] = Seq.empty
 
-  override protected val parser: Parser[Selector] = for {
+  override val parser: Parser[Selector] = for {
     names <- Names.withDefaultNameParser
   } yield new Selector(names)
 

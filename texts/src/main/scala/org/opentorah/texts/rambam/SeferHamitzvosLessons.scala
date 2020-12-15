@@ -1,7 +1,7 @@
 package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, UnionParsable}
+import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser}
 
 object SeferHamitzvosLessons {
 
@@ -38,10 +38,16 @@ object SeferHamitzvosLessons {
 
   private val numberedParser: Parser[Int] = new Attribute.PositiveIntAttribute("n").required
 
-  private val partParsable: Parsable[Part] = new UnionParsable[Part](Seq(
-    new Element[Part]("positive") { override protected def parser: Parser[Positive] = numberedParser.map(Positive) },
-    new Element[Part]("negative") { override protected def parser: Parser[Negative] = numberedParser.map(Negative) },
-    new Element[Part]("named") { override protected def parser: Parser[NamedPart] = Names.withoutDefaultNameParser.map(NamedPart) }
+  private val partParsable: Parsable[Part] = Parsable.unionWithoutToXml[Part](Seq(
+    new Element[Part]("positive") {
+      override def parser: Parser[Positive] = numberedParser.map(Positive)
+    },
+    new Element[Part]("negative") {
+      override def parser: Parser[Negative] = numberedParser.map(Negative)
+    },
+    new Element[Part]("named") {
+      override def parser: Parser[NamedPart] = Names.withoutDefaultNameParser.map(NamedPart)
+    }
   ))
 
   private val lessonParser: Parser[Lesson] = for {
@@ -53,7 +59,7 @@ object SeferHamitzvosLessons {
   lazy val lessons: Seq[Lesson] = Parser.parseDo(Metadata.load(
     from = From.resource(this),
     elementParsable = new Element[Lesson]("lesson") {
-      override protected def parser: Parser[Lesson] = lessonParser
+      override def parser: Parser[Lesson] = lessonParser
     }
   ))
 }

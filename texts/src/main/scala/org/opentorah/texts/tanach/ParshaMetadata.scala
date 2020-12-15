@@ -81,14 +81,14 @@ object ParshaMetadata {
     names <- Names.withoutDefaultNameParser
     span <- semiResolvedParser
     aliyot <- new Element[Torah.Numbered]("aliyah") {
-      override protected def contentType: ContentType = ContentType.Empty
-      override protected def parser: Parser[Numbered] = numberedParser
+      override def contentType: ContentType = ContentType.Empty
+      override def parser: Parser[Numbered] = numberedParser
     }.all
     daysParsed <- new Element[DayParsed]("day") {
-      override protected def parser: Parser[DayParsed] = dayParser
+      override def parser: Parser[DayParsed] = dayParser
     }.all
     maftir <- new Element[SpanSemiResolved]("maftir") {
-      override protected def parser: Parser[SpanSemiResolved] = semiResolvedParser
+      override def parser: Parser[SpanSemiResolved] = semiResolvedParser
     }.required
     parsha <- Metadata.find[Parsha](book.parshiot, names)
   } yield {

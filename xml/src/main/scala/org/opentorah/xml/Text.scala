@@ -12,9 +12,9 @@ object Text {
   class TextElement(elementName: String) extends Element.WithToXml[String](elementName) {
     override def toString: Error = s"text element $elementName"
 
-    override protected def contentType: ContentType = ContentType.Characters
+    override def contentType: ContentType = ContentType.Characters
 
-    override protected def parser: Parser[String] = Text().required
+    override def parser: Parser[String] = Text().required
 
     override protected def antiparser: Antiparser[String] = Antiparser(
       content = value => Seq(Xml.mkText(value))

@@ -53,9 +53,10 @@ object TanachMetadata {
   private def parse: Parser[Parsed] = for {
     metadatas <- Metadata.load(
       from = From.resource(Tanach),
-      elementParsable = Parsable.withInclude(new Element[TanachBookMetadata.Parsed]("book") {
-        override protected def parser: Parser[TanachBookMetadata.Parsed] = bookParser
-      })
+      elementParsable = new Element[TanachBookMetadata.Parsed]("book") {
+        override def canRedirect: Boolean = true
+        override def parser: Parser[TanachBookMetadata.Parsed] = bookParser
+      }
     )
 
     metadata <- Metadata.bind(

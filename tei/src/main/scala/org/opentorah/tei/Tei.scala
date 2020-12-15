@@ -1,9 +1,7 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, Dialect, Element, LinkResolver, Namespace, Parser, PrettyPrinter,
-  ToHtml, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, Dialect, Element, From, LinkResolver, Namespace, Parser, PrettyPrinter, ToHtml, Xml}
 import zio.{URIO, ZIO}
-import scala.xml.Node
 
 final case class Tei(
   teiHeader: TeiHeader,
@@ -11,11 +9,14 @@ final case class Tei(
 ) {
   def titleStmt: TitleStmt = teiHeader.fileDesc.titleStmt
   val correspDesc: Option[CorrespDesc.Value] = teiHeader.profileDesc.flatMap(_.correspDesc)
-  def getAbstract: Option[Seq[Node]] = teiHeader.profileDesc.flatMap(_.documentAbstract.map(_.xml))
+  def getAbstract: Option[Seq[Xml.Node]] = teiHeader.profileDesc.flatMap(_.documentAbstract.map(_.xml))
   def creationDate: Option[Date] = teiHeader.profileDesc.flatMap(_.creation.map(_.date))
   def languages: Seq[Language] = teiHeader.profileDesc.flatMap(_.langUsage).toSeq.flatMap(_.languages)
   val body: Body.Value = text.body
-  val pbs: Seq[Pb] = body.xml.flatMap(Pb.descendants)
+  val pbs: Seq[Pb] = body.xml.flatMap(node =>
+    Xml.descendants(node, Pb.elementName)
+      .map(descendant => Parser.parseDo(Pb.parse(From.xml("descendants", descendant))))
+  )
 
   def addressee: Option[EntityReference] =
     EntityReference.from(correspDesc.map(_.xml).getOrElse(Seq.empty))
@@ -36,7 +37,7 @@ object Tei extends Element.WithToXml[Tei]("TEI") with Dialect with ToHtml {
     clingyElements = Set("note", "lb", "sic", "corr")
   )
 
-  override protected lazy val parser: Parser[Tei] = for {
+  override lazy val parser: Parser[Tei] = for {
     teiHeader <- TeiHeader.required
     text <- Text.required
   } yield new Tei(
@@ -52,7 +53,7 @@ object Tei extends Element.WithToXml[Tei]("TEI") with Dialect with ToHtml {
   def concat[A](antiparsers: Antiparser[A]*): Antiparser[A] =
     Antiparser.concat(Some(Tei.namespace), antiparsers)
 
-  def apply(body: Seq[Node]): Tei = new Tei(
+  def apply(body: Seq[Xml.Node]): Tei = new Tei(
     teiHeader = TeiHeader(),
     text = new Text(
       lang = None,
@@ -117,7 +118,7 @@ object Tei extends Element.WithToXml[Tei]("TEI") with Dialect with ToHtml {
   // - transform tagsDecl?
   // - transform prefixDef?
   override protected def elementTransform(element: Xml.Element): URIO[State, Xml.Element] = {
-    val children: Seq[Node] = Xml.getChildren(element)
+    val children: Seq[Xml.Node] = Xml.getChildren(element)
 
     element.label match {
       case label if EntityType.isName(label) =>

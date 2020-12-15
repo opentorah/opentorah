@@ -73,6 +73,8 @@ object Files {
 
   def getParent(url: URL): URL = new URL(url, "..")
 
+  def subUrl(base: Option[URL], url: String): URL = base.fold(new URL(url))(new URL(_, url))
+
   // TODO rename isXXXUrl
   def isFile(url: URL): Boolean = url.getProtocol == "file"
   def isJar(url: URL): Boolean = url.getProtocol == "jar"

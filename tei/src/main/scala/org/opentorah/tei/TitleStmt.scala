@@ -36,7 +36,7 @@ object TitleStmt extends Element.WithToXml[TitleStmt]("titleStmt") {
     respStmts = Seq.empty
   )
 
-  override protected val parser: Parser[TitleStmt] = for {
+  override val parser: Parser[TitleStmt] = for {
     titles <- Title.parsable.all
     authors <- Author.parsable.all
     editors <- Editor.all
