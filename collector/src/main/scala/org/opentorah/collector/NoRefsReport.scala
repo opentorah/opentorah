@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.{EntityName, Ref, Tei}
-import scala.xml.Elem
+import org.opentorah.xml.Xml
 
 final class NoRefsReport(site: Site) extends ReportObject[ReferenceWithSource.FromDocument](site) {
 
@@ -14,10 +14,10 @@ final class NoRefsReport(site: Site) extends ReportObject[ReferenceWithSource.Fr
   override protected def lines: Seq[ReferenceWithSource.FromDocument] = site.references.noRef
 
   // TODO include all references, not just the ones from documents (общий/178, /1374/2213)
-  override protected def lineToXml(fromDocument: ReferenceWithSource.FromDocument): Elem = {
-    val reference: Elem = EntityName.parsable.toXmlElement(EntityName.forReference(fromDocument.reference))
+  override protected def lineToXml(fromDocument: ReferenceWithSource.FromDocument): Xml.Element = {
+    val reference: Xml.Element = EntityName.toXmlElement(EntityName.forReference(fromDocument.reference))
 
-    val link: Elem = Ref.toXml(
+    val link: Xml.Element = Ref.toXml(
       target = fromDocument.shortPath,
       text = fromDocument.collectionFileName + "/" + fromDocument.documentName
     )

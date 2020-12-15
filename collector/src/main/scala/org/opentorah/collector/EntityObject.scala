@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.tei.{Entity, Ref, Tei}
 import org.opentorah.util.Collections
-import scala.xml.{Elem, Node}
+import org.opentorah.xml.Xml
 
 final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(site) {
 
@@ -12,13 +12,14 @@ final class EntityObject(site: Site, entity: Entity) extends SimpleSiteObject(si
 
   override protected def viewer: Viewer = Viewer.Names
 
-  override protected def teiBody: Seq[Node] = Seq(Entity.parsable.toXmlElement(entity.copy(content = entity.content :+ mentions)))
+  override protected def teiBody: Seq[Xml.Node] =
+    Seq(Entity.toXmlElement(entity.copy(content = entity.content :+ mentions)))
 
-  private def mentions: Elem = {
+  private def mentions: Xml.Element = {
 
     // TODO handle references from Collection, hierarchy etc.
-    def sources(references: Seq[ReferenceWithSource]): Seq[Elem] = {
-      val result: Seq[Option[Elem]] =
+    def sources(references: Seq[ReferenceWithSource]): Seq[Xml.Element] = {
+      val result: Seq[Option[Xml.Element]] =
         for (reference <- Collections.removeConsecutiveDuplicatesWith(references)(_.path)) yield reference match {
           case fromDocument: ReferenceWithSource.FromDocument =>
             Some(Ref.toXml(

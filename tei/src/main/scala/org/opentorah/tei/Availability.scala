@@ -1,14 +1,13 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, Element, Parser}
-import scala.xml.Node
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parser, Xml}
 
 final case class Availability(
   status: Option[String],
-  xml: Seq[Node]
+  xml: Seq[Xml.Node]
 )
 
-object Availability extends Element.WithToXml[Availability]("availability") {
+object Availability extends Element[Availability]("availability") {
 
   private val statusAttribute: Attribute[String] = Attribute("status")
 
@@ -20,9 +19,8 @@ object Availability extends Element.WithToXml[Availability]("availability") {
     xml
   )
 
-  override protected val antiparser: Antiparser[Availability] = Tei.concat(
-    // TODO why can't I remove [T] from compose() calls here?
-    statusAttribute.toXmlOption.compose[Availability](_.status),
-    Antiparser.xml.compose[Availability](_.xml)
+  override val antiparser: Antiparser[Availability] = Tei.concat(
+    statusAttribute.toXmlOption.compose(_.status),
+    Antiparser.xml.compose(_.xml)
   )
 }

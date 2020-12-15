@@ -2,14 +2,13 @@ package org.opentorah.tei
 
 import org.opentorah.util.Files
 import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser, Xml}
-import scala.xml.{Elem, Node}
 
 final case class Ref(
   target: String,
-  text: Seq[Node]
+  text: Seq[Xml.Node]
 )
 
-object Ref extends Element.WithToXml[Ref]("ref") {
+object Ref extends Element[Ref]("ref") {
 
   private val targetAttribute: Attribute[String] = Attribute("target")
 
@@ -23,7 +22,7 @@ object Ref extends Element.WithToXml[Ref]("ref") {
     text
   )
 
-  override protected val antiparser: Antiparser[Ref] = Tei.concat(
+  override val antiparser: Antiparser[Ref] = Tei.concat(
     targetAttribute.toXml.compose(_.target),
     Antiparser.xml.compose(_.text)
   )
@@ -31,10 +30,10 @@ object Ref extends Element.WithToXml[Ref]("ref") {
   def toXml(
     target: Seq[String],
     text: String
-  ): Elem = toXmlElement(new Ref(Files.mkUrl(target), Xml.mkText(text)))
+  ): Xml.Element = toXmlElement(new Ref(Files.mkUrl(target), Xml.mkText(text)))
 
   def toXml(
     target: Seq[String],
-    text: Seq[Node]
-  ): Elem = toXmlElement(new Ref(Files.mkUrl(target), text))
+    text: Seq[Xml.Node]
+  ): Xml.Element = toXmlElement(new Ref(Files.mkUrl(target), text))
 }

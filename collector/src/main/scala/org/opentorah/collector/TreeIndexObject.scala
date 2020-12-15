@@ -3,7 +3,6 @@ package org.opentorah.collector
 import org.opentorah.store.{By, Path, Store, WithPath}
 import org.opentorah.tei.{Ref, Tei}
 import org.opentorah.xml.Xml
-import scala.xml.Node
 
 final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
 
@@ -17,9 +16,9 @@ final class TreeIndexObject(site: Site) extends SimpleSiteObject(site) {
   //   Ref.toXml(new HierarchyObject(site, Path.empty, site.store).htmlFile.url, TreeIndexObject.title)
   // add it somewhere - or wait until 'by' is merged with the 'collections'...
   // Aslo, maybe add hierarchy links to the 'by' pages...
-  override protected def teiBody: Seq[Node] = listForStore(Path.empty, site.store)
+  override protected def teiBody: Seq[Xml.Node] = listForStore(Path.empty, site.store)
 
-  private def listForStore(path: Path, store: Store): Seq[Node] = store.by.toSeq.flatMap { by: By[_] =>
+  private def listForStore(path: Path, store: Store): Seq[Xml.Node] = store.by.toSeq.flatMap { by: By[_] =>
     <list xmlns={Tei.namespace.uri} type="none">
       <item><emph>{Hierarchy.getName(by.selector.names)}</emph></item>
       <item><list type="none">

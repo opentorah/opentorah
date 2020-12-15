@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
 import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser, Xml}
-import scala.xml.Elem
 
 final case class Pb(
   n: String,
@@ -10,13 +9,13 @@ final case class Pb(
   isMissing: Boolean = false,
   isEmpty: Boolean = false
 ) {
-  def addAttributes(element: Elem): Elem = Xml.setAttributes(Xml.getAttributes(element) ++ Seq(
+  def addAttributes(element: Xml.Element): Xml.Element = Xml.setAttributes(Xml.getAttributes(element) ++ Seq(
     Pb.missingAttribute.withOptionalValue(Some(isMissing)),
     Pb.emptyAttribute.withOptionalValue(Some(isEmpty))
   ), element)
 }
 
-object Pb extends Element.WithToXml[Pb]("pb") {
+object Pb extends Element[Pb]("pb") {
 
   val nAttribute: Attribute[String] = Attribute("n")
   private val missingAttribute: Attribute.BooleanAttribute = new Attribute.BooleanAttribute("missing")
@@ -39,7 +38,7 @@ object Pb extends Element.WithToXml[Pb]("pb") {
     isEmpty
   )
 
-  override protected val antiparser: Antiparser[Pb] = Tei.concat(
+  override val antiparser: Antiparser[Pb] = Tei.concat(
     nAttribute.toXml.compose(_.n),
     Xml.idAttribute.toXmlOption.compose(_.id),
     facsAttribute.toXmlOption.compose(_.facs),

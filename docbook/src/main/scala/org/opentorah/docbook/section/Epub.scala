@@ -1,8 +1,8 @@
 package org.opentorah.docbook.section
 
 import Section.Parameters
+import org.opentorah.xml.Xml
 import java.io.File
-import scala.xml.Node
 
 trait Epub extends DocBook2 {
   final override protected def outputFileExtension: String = "epub"
@@ -20,9 +20,9 @@ trait Epub extends DocBook2 {
 
   override def usesCss: Boolean = false
 
-  final override protected def mainStylesheetBody(values: NonOverridableParameters): Seq[Node] = Seq.empty
+  final override protected def mainStylesheetBody(values: NonOverridableParameters): Seq[Xml.Node] = Seq.empty
 
-  final override protected def customStylesheetBody: Seq[Node] = Seq.empty
+  final override protected def customStylesheetBody: Seq[Xml.Node] = Seq.empty
 
   final override def postProcess(
     inputDirectory: File,

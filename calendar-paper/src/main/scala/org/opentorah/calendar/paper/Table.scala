@@ -24,7 +24,7 @@ final class Table[A](columns: Column[A]*) {
 
     val out: PrintStream = new PrintStream(new FileOutputStream(new File(directory, name + ".xml")))
     out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-    // TODO use my pretty-printer
+    // TODO use my pretty-printer and remove scala.xml imports
     out.print(new PrettyPrinter(80, 2).format(xml))
     out.println()
   }

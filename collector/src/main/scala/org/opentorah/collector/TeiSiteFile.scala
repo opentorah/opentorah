@@ -1,8 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.{Body, Tei}
-import org.opentorah.xml.LinkResolver
-import scala.xml.Node
+import org.opentorah.xml.{LinkResolver, Xml}
 
 trait TeiSiteFile extends SiteFile {
 
@@ -21,7 +20,7 @@ trait TeiSiteFile extends SiteFile {
 
   protected def tei: Tei
 
-  protected def headerSummary: Seq[Node]
+  protected def headerSummary: Seq[Xml.Node]
 
   protected def teiTransformer: Tei.Transformer
 

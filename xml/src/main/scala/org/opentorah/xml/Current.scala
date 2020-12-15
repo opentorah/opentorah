@@ -1,6 +1,5 @@
 package org.opentorah.xml
 
-import scala.xml.Elem
 import zio.IO
 
 private[xml] final case class Current(
@@ -31,13 +30,4 @@ private[xml] final case class Current(
 private[xml] object Current {
 
   type Next[A] = IO[Error, (Current, A)]
-
-  def open(from: Option[From], element: Elem, contentType: ContentType): IO[Error, Current] = for {
-    content <- Content.open(element.child, contentType)
-  } yield Current(
-    from,
-    name = element.label,
-    attributes = Xml.getAttributes(element),
-    content
-  )
 }

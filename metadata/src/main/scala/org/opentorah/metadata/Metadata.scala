@@ -1,34 +1,48 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Result}
+import org.opentorah.xml.{Antiparser, Attribute, Element, From, FromXml, Parser, Result}
+
+final class Metadata[M](
+  elementName: String,
+  typeName: String,
+  fromXml: FromXml[M]
+) extends Element[Seq[M]](elementName) {
+  override def parser: Parser[Seq[M]] = for {
+    type_ <- Attribute("type").required
+    _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
+    result <- fromXml.all
+  } yield result
+
+  override def antiparser: Antiparser[Seq[M]] = ???
+}
+
+// TODO submerge in Names
+object NamesMetadata extends Element[Names]("names") {
+  override def parser: Parser[Names] = Names.withoutDefaultNameParser
+  override def antiparser: Antiparser[Names] = Names.antiparser
+}
 
 object Metadata {
 
   def load[M](
     from: From,
-    rootElementName: Option[String] = None,
-    elementParsable: Parsable[M]
-  ): Parser[Seq[M]] = new Element[Seq[M]](rootElementName.getOrElse("metadata")) {
-    private val typeName = from.name
-    override def parser: Parser[Seq[M]] = for {
-      type_ <- Attribute("type").required
-      _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
-      result <- elementParsable.all
-    } yield result
-  }.parse(from)
+    fromXml: FromXml[M]
+  ): Parser[Seq[M]] = new Metadata[M](
+    elementName = "metadata",
+    typeName = from.name,
+    fromXml = fromXml
+  ).parse(from)
 
   def loadNames[K <: WithName](
     obj: AnyRef,
     resourceName: String,
     keys: Seq[K]
   ): Parser[Map[K, Names]] = for {
-    metadatas <- load(
-      from = From.resource(obj, resourceName),
-      rootElementName = Some("names"),
-      elementParsable = new Element[Names]("names") {
-        override def parser: Parser[Names] = Names.withoutDefaultNameParser
-      }
-    )
+    metadatas <- new Metadata[Names](
+      elementName = "names",
+      typeName = resourceName,
+      fromXml = NamesMetadata
+    ).parse(From.resource(obj, resourceName))
 
     result <- bind(
       keys,

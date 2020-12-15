@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, ToXml, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser, Xml}
 
 final case class Entity private(
   id: Option[String],
@@ -14,40 +14,34 @@ final case class Entity private(
   def entityName: EntityName = names.head.copy(ref = Some(id.get))
 }
 
-object Entity {
+object Entity extends EntityRelated[Entity](
+  elementName = _.element,
+  entityType = _.entityType
+) {
+  override def toString: String = "Entity"
+
+  override protected def contentType: ContentType = ContentType.Elements
 
   private val roleAttribute: Attribute[String] = Attribute("role")
 
-  override def toString: String = "Entity"
-
-  final val parsable: Parsable[Entity] with ToXml[Entity] = Parsable.union[Entity](
-    _.entityType.element,
-    EntityType.values.map(mkParsable)
+  override protected def parser(entityType: EntityType): Parser[Entity] = for {
+    id <- Xml.idAttribute.optional
+    role <- roleAttribute.optional
+    names <- EntityName.forEntityType(entityType).all
+    _ <- Parser.check(names.nonEmpty, s"No names in $id")
+    content <- Element.allNodes
+  } yield new Entity(
+    id,
+    entityType,
+    role,
+    names,
+    content,
   )
 
-  private def mkParsable(entityType: EntityType): Element.WithToXml[Entity] =
-    new Element.WithToXml[Entity](entityType.element) {
-      override def contentType: ContentType = ContentType.Elements
-
-      override def parser: Parser[Entity] = for {
-        id <- Xml.idAttribute.optional
-        role <- roleAttribute.optional
-        names <- EntityName.getParsable(entityType).all
-        _ <- Parser.check(names.nonEmpty, s"No names in $id")
-        content <- Element.allNodes
-      } yield new Entity(
-        id,
-        entityType,
-        role,
-        names,
-        content,
-      )
-
-      override protected val antiparser: Antiparser[Entity] = Tei.concat(
-        Xml.idAttribute.toXmlOption.compose(_.id),
-        roleAttribute.toXmlOption.compose(_.role),
-        EntityName.parsable.toXmlSeq.compose(_.names),
-        Antiparser.xml.compose[Entity](_.content)
-      )
-    }
+  override protected def antiparser(entityType: EntityType): Antiparser[Entity] = Tei.concat(
+    Xml.idAttribute.toXmlOption.compose(_.id),
+    roleAttribute.toXmlOption.compose(_.role),
+    EntityName.forEntityType(entityType).toXmlSeq.compose(_.names),
+    Antiparser.xml.compose(_.content)
+  )
 }

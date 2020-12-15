@@ -1,7 +1,6 @@
 package org.opentorah.xml
 
 import zio.{IO, Runtime, ZIO}
-import scala.xml.Elem
 
 object Parser {
 
@@ -37,5 +36,5 @@ object Parser {
   private[xml] final def run[A](toRun: IO[Error, A]): A =
     Runtime.default.unsafeRun(toRun.mapError(error => throw new IllegalArgumentException(error)))
 
-  final def load(from: From): Elem = Parser.run(from.load)
+  final def load(from: From): Xml.Element = Parser.run(from.load)
 }

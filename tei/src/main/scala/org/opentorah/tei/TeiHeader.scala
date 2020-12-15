@@ -10,7 +10,7 @@ final case class TeiHeader(
   revisionDesc: Option[RevisionDesc.Value]
 )
 
-object TeiHeader extends Element.WithToXml[TeiHeader]("teiHeader") {
+object TeiHeader extends Element[TeiHeader]("teiHeader") {
 
   override val parser: Parser[TeiHeader] = for {
     fileDesc <- FileDesc.required
@@ -26,7 +26,7 @@ object TeiHeader extends Element.WithToXml[TeiHeader]("teiHeader") {
     revisionDesc
   )
 
-  override protected val antiparser: Antiparser[TeiHeader] = Tei.concat(
+  override val antiparser: Antiparser[TeiHeader] = Tei.concat(
     FileDesc.toXml.compose(_.fileDesc),
     EncodingDesc.parsable.toXmlOption.compose(_.encodingDesc),
     ProfileDesc.toXmlOption.compose(_.profileDesc),

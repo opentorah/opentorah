@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.store.WithPath
 import org.opentorah.tei.{CalendarDesc, Page, Tei}
 import org.opentorah.util.Files
-import scala.xml.{Elem, Node}
+import org.opentorah.xml.Xml
 
 final class DocumentObject(
   site: Site,
@@ -23,7 +23,7 @@ final class DocumentObject(
 
   override protected def tei: Tei = teiHolder.tei
 
-  override protected def headerSummary: Seq[Node] = Seq(
+  override protected def headerSummary: Seq[Xml.Node] = Seq(
     // TODO here again it seems that the browser ignores the namespace when styling elements
     // that exist in HTML: when I use <p> instead of <ab>, and there is a <p> inside <abstract>,
     // background colour stops before it...
@@ -54,7 +54,7 @@ final class DocumentObject(
 
     // TODO do pages of the appropriate teiHolder!
     override def titleAndContent: TitleAndContent = {
-      val contentElement: Elem =
+      val contentElement: Xml.Element =
         <div class={Viewer.Facsimile.name}>
         {headerSummary}
         <div class="facsimileScroller">{

@@ -1,8 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.Tei
-import org.opentorah.xml.LinkResolver
-import scala.xml.Node
+import org.opentorah.xml.{LinkResolver, Xml}
 
 abstract class TeiSiteObject(site: Site) extends SiteObjectWithFile(site) {
 
@@ -13,7 +12,7 @@ abstract class TeiSiteObject(site: Site) extends SiteObjectWithFile(site) {
     final override protected def style: String = TeiSiteObject.this.style
     final override protected def title: Option[String] = TeiSiteObject.this.title
     final override protected def tei: Tei = TeiSiteObject.this.tei
-    final override protected def headerSummary: Seq[Node] = TeiSiteObject.this.headerSummary
+    final override protected def headerSummary: Seq[Xml.Node] = TeiSiteObject.this.headerSummary
     final override protected def teiTransformer: Tei.Transformer = TeiSiteObject.this.teiTransformer
 
     final override protected def siteParameters: SiteParameters = site.siteParameters
@@ -31,7 +30,7 @@ abstract class TeiSiteObject(site: Site) extends SiteObjectWithFile(site) {
 
   protected def tei: Tei
 
-  protected def headerSummary: Seq[Node] = Seq.empty
+  protected def headerSummary: Seq[Xml.Node] = Seq.empty
 
   // TODO generalize/conditionalize addCalendarDesc
   // TODO do not add header fields to TEI that is transformed into HTML...

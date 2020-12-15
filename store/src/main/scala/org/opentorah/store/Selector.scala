@@ -9,7 +9,7 @@ final class Selector(val names: Names) {
   def bind(store: Store): Binding = Binding(this, store)
 }
 
-object Selector extends Element.WithToXml[Selector]("selector") {
+object Selector extends Element[Selector]("selector") {
 
   val predefinedSelectors: Seq[Selector] = Seq.empty
 
@@ -17,7 +17,7 @@ object Selector extends Element.WithToXml[Selector]("selector") {
     names <- Names.withDefaultNameParser
   } yield new Selector(names)
 
-  override protected val antiparser: Antiparser[Selector] = Antiparser(
+  override val antiparser: Antiparser[Selector] = Antiparser(
     content = value => Names.toXml(value.names)
   )
 }

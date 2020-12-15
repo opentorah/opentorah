@@ -2,7 +2,6 @@ package org.opentorah.xml
 
 import java.net.URL
 import zio.ZIO
-import scala.xml.{Elem, Node}
 
 final private[xml] class Context {
 
@@ -23,17 +22,13 @@ final private[xml] class Context {
   private def isEmpty: Boolean =
     stack.isEmpty
 
-  private def currentFromUrl: Option[URL] =
+  private def currentBaseUrl: Option[URL] =
     stack.flatMap(_.from).head.url
 
-  private def currentFromUrls: FromUrls = {
-    val froms: Seq[Option[From]] = stack.map(_.from)
-    val baseUrl: URL = froms.flatten.head.url.get
-    if (froms.head.isEmpty) FromUrls.Nested(baseUrl) else FromUrls.Top(baseUrl, redirectedFrom = {
-      val (redirectedTo: Seq[Option[From]], tail: Seq[Option[From]]) = froms.span(_.get.isRedirect)
-      if (redirectedTo.isEmpty) Seq.empty else (redirectedTo.tail :+ tail.head).map(_.get.url.get)
-    })
-  }
+  private def currentFromUrl: FromUrl = new FromUrl(
+    url = currentBaseUrl.get,
+    inline = stack.head.from.isEmpty
+  )
 
   private def currentToString: String =
     stack.headOption.map(_.toString).getOrElse("")
@@ -46,7 +41,7 @@ private[xml] object Context {
   val elementName: Parser[String] =
     lift(_.name)
 
-  def nextElement(p: Elem => Boolean): Parser[Option[Elem]] =
+  def nextElement(p: Xml.Element => Boolean): Parser[Option[Xml.Element]] =
     liftContentModifier(_.takeNextElement(p))
 
   def takeAttribute(attribute: Attribute[_]): Parser[Option[String]] =
@@ -58,7 +53,7 @@ private[xml] object Context {
   val takeCharacters: Parser[Option[String]] =
     liftContentModifier(_.takeCharacters)
 
-  val allNodes: Parser[Seq[Node]] =
+  val allNodes: Parser[Seq[Xml.Node]] =
     liftContentModifier(_.takeAllNodes)
 
   private def lift[A](f: Current => A): Parser[A] =
@@ -79,17 +74,30 @@ private[xml] object Context {
     (current: Current) =>
       f(current.content).map { case (content, result) => (current.copy(content = content), result) }
 
-  def currentFromUrl: Parser[Option[URL]] =
+  def currentBaseUrl: Parser[Option[URL]] =
+    ZIO.access[Context](_.currentBaseUrl)
+
+  def currentFromUrl: Parser[FromUrl] =
     ZIO.access[Context](_.currentFromUrl)
 
-  def currentFromUrls: Parser[FromUrls] =
-    ZIO.access[Context](_.currentFromUrls)
-
-  def nested[A](newCurrent: Current, parser: Parser[A]): Parser[A] =
-    ZIO.access[Context](_.push(newCurrent)).bracket[Context, Error, A](
+  def nested[A](
+    from: Option[From],
+    nextElement: Xml.Element,
+    contentType: ContentType,
+    parser: Parser[A]
+  ): Parser[A] = for  {
+    content <- Content.open(nextElement.child, contentType)
+    newCurrent = Current(
+      from,
+      name = nextElement.label,
+      attributes = Xml.getAttributes(nextElement),
+      content
+    )
+    result <- ZIO.access[Context](_.push(newCurrent)).bracket[Context, Error, A](
       release = (_: Unit) => ZIO.access[Context](_.pop()),
       use = (_: Unit) => addErrorTrace(for { result <- parser; _ <- checkNoLeftovers } yield result)
     )
+  }  yield result
 
   private def addErrorTrace[A](parser: Parser[A]): Parser[A] = parser.flatMapError(error => for {
     contextStr <- ZIO.access[Context](_.currentToString)

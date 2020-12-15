@@ -1,7 +1,7 @@
 package org.opentorah.docbook.section
 
 import Section.Parameters
-import scala.xml.Node
+import org.opentorah.xml.Xml
 
 object Pdf extends DocBook2 {
   override def name: String = "pdf"
@@ -28,9 +28,9 @@ object Pdf extends DocBook2 {
 
   override def usesCss: Boolean = false
 
-  override protected def mainStylesheetBody(values: NonOverridableParameters): Seq[Node] = Seq.empty
+  override protected def mainStylesheetBody(values: NonOverridableParameters): Seq[Xml.Node] = Seq.empty
 
-  override protected def customStylesheetBody: Seq[Node] = Seq(
+  override protected def customStylesheetBody: Seq[Xml.Node] = Seq(
     <!-- Break before each section -->,
     <xsl:attribute-set name="section.title.level1.properties">
       <xsl:attribute name="break-before">page</xsl:attribute>

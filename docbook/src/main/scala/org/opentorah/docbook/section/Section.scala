@@ -2,8 +2,7 @@ package org.opentorah.docbook.section
 
 import Section.Parameters
 import org.opentorah.docbook.DocBook
-import org.opentorah.xml.Xsl
-import scala.xml.{Elem, Node}
+import org.opentorah.xml.{Xml, Xsl}
 
 trait Section {
 
@@ -13,7 +12,7 @@ trait Section {
 
   def nonOverridableParameters(values: NonOverridableParameters): Parameters
 
-  final def customStylesheet: Elem =
+  final def customStylesheet: Xml.Element =
     <xsl:stylesheet xmlns:xsl={Xsl.namespace.uri} version={Xsl.version(usesDocBookXslt2)}
       xmlns:db={DocBook.namespace.uri}
       exclude-result-prefixes="db">
@@ -21,7 +20,7 @@ trait Section {
       {customStylesheetBody}
     </xsl:stylesheet>
 
-  protected def customStylesheetBody: Seq[Node]
+  protected def customStylesheetBody: Seq[Xml.Node]
 
   def usesDocBookXslt2: Boolean = false
 }

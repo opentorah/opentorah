@@ -5,7 +5,6 @@ import org.opentorah.metadata.{Name, Names}
 import org.opentorah.store.{By, Selector, Store, Urls}
 import org.opentorah.tei.{EntityReference, Page, Tei}
 import org.opentorah.xml.{Parser, Xml}
-import scala.xml.Node
 
 final class Document(
   inheritedSelectors: Seq[Selector],
@@ -30,17 +29,17 @@ final class Document(
   def pages(pageType: Page.Type): Seq[Page] =
     for (pb <- tei.pbs) yield pageType(pb)
 
-  def description: Seq[Node] =
+  def description: Seq[Xml.Node] =
     tei.getAbstract
     // Ignoring the titles:          .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
     .getOrElse(Seq.empty)
 
-  def date: Seq[Node] = Xml.mkText(tei.creationDate.map(_.when).getOrElse(""))
+  def date: Seq[Xml.Node] = Xml.mkText(tei.creationDate.map(_.when).getOrElse(""))
 
-  def author: Seq[Node] = Xml.multi(tei.titleStmt.authors.flatMap(_.xml))
+  def author: Seq[Xml.Node] = Xml.multi(tei.titleStmt.authors.flatMap(_.xml))
 
-  def addressee: Seq[Node] =
-    Seq(tei.addressee.fold[Node](Xml.mkText(""))(addressee => EntityReference.parsable.toXmlElement(addressee)))
+  def addressee: Seq[Xml.Node] =
+    Seq(tei.addressee.fold[Xml.Node](Xml.mkText(""))(addressee => EntityReference.toXmlElement(addressee)))
 }
 
 object Document {

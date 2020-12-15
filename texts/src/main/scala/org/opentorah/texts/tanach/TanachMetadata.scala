@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import Tanach.TanachBook
 import org.opentorah.metadata.{Metadata, Names}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Element, From, Parsable, Parser}
+import org.opentorah.xml.{Antiparser, Element, From, Parser}
 import zio.IO
 
 object TanachMetadata {
@@ -53,10 +53,7 @@ object TanachMetadata {
   private def parse: Parser[Parsed] = for {
     metadatas <- Metadata.load(
       from = From.resource(Tanach),
-      elementParsable = new Element[TanachBookMetadata.Parsed]("book") {
-        override def canRedirect: Boolean = true
-        override def parser: Parser[TanachBookMetadata.Parsed] = bookParser
-      }
+      fromXml = Book.followRedirects
     )
 
     metadata <- Metadata.bind(
@@ -70,16 +67,20 @@ object TanachMetadata {
     metadata
   )
 
-  private def bookParser: Parser[TanachBookMetadata.Parsed] = for {
-    names <- Names.withDefaultNameParser
-    chapters <- Chapters.parser
-    book <- Metadata.find[TanachBook](Tanach.values, names)
-    result <- book match {
-      case book: Tanach.ChumashBook => ChumashBookMetadata.parser(book, names, chapters)
-      case book: Tanach.Psalms.type => PsalmsMetadata.parser(book, names, chapters)
-      case book: Tanach.NachBook => IO.succeed(new NachBookMetadata.Parsed(book, names, chapters))
-    }
-  } yield result
+  private object Book extends Element[TanachBookMetadata.Parsed]("book") {
+    override def parser: Parser[TanachBookMetadata.Parsed] = for {
+      names <- Names.withDefaultNameParser
+      chapters <- Chapters.parser
+      book <- Metadata.find[TanachBook](Tanach.values, names)
+      result <- book match {
+        case book: Tanach.ChumashBook => ChumashBookMetadata.parser(book, names, chapters)
+        case book: Tanach.Psalms.type => PsalmsMetadata.parser(book, names, chapters)
+        case book: Tanach.NachBook => IO.succeed(new NachBookMetadata.Parsed(book, names, chapters))
+      }
+    } yield result
+
+    override def antiparser: Antiparser[TanachBookMetadata.Parsed] = ???
+  }
 
   def forChumash(book: Tanach.ChumashBook): ChumashBookMetadata = forBook(book).asInstanceOf[ChumashBookMetadata]
 

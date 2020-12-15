@@ -7,7 +7,7 @@ final case class Text(
   body: Body.Value
 )
 
-object Text extends Element.WithToXml[Text]("text") {
+object Text extends Element[Text]("text") {
 
   override val parser: Parser[Text] = for {
     lang <- Xml.langAttribute.optional
@@ -17,8 +17,8 @@ object Text extends Element.WithToXml[Text]("text") {
     body
   )
 
-  override protected val antiparser: Antiparser[Text] = Tei.concat(
-    Xml.langAttribute.toXmlOption.compose[Text](_.lang),
-    Body.parsable.toXml.compose[Text](_.body)
+  override val antiparser: Antiparser[Text] = Tei.concat(
+    Xml.langAttribute.toXmlOption.compose(_.lang),
+    Body.parsable.toXml.compose(_.body)
   )
 }

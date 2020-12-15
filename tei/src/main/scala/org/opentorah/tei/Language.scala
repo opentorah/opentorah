@@ -8,7 +8,7 @@ final case class Language(
   text: Option[String]
 )
 
-object Language extends Element.WithToXml[Language]("language") {
+object Language extends Element[Language]("language") {
 
   private val identAttribute: Attribute[String] = Attribute("ident")
   private val usageAttribute: Attribute.PositiveIntAttribute = new Attribute.PositiveIntAttribute("usage")
@@ -25,9 +25,9 @@ object Language extends Element.WithToXml[Language]("language") {
     text
   )
 
-  override protected val antiparser: Antiparser[Language] = Tei.concat(
-    identAttribute.toXml.compose[Language](_.ident),
-    usageAttribute.toXmlOption.compose[Language](_.usage),
-    Antiparser.xml.compose[Language](value => value.text.toSeq.map(Xml.mkText))
+  override val antiparser: Antiparser[Language] = Tei.concat(
+    identAttribute.toXml.compose(_.ident),
+    usageAttribute.toXmlOption.compose(_.usage),
+    Antiparser.xml.compose(value => value.text.toSeq.map(Xml.mkText))
   )
 }

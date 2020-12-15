@@ -22,7 +22,7 @@ abstract class Component(elementName: String) {
 
   def classOfInline: Class[_]
 
-  object parsable extends org.opentorah.xml.Element.WithToXml[Element](elementName) {
+  object parsable extends org.opentorah.xml.Element[Element](elementName) {
     override def parser: Parser[Element] = for {
       file <- Component.fileAttribute.optional
       result <- if (file.isDefined) ZIO.succeed(FromFile(file.get)) else  for {
@@ -34,7 +34,7 @@ abstract class Component(elementName: String) {
       } yield result
     } yield result
 
-    override protected def antiparser: Antiparser[Element] = Antiparser(
+    override def antiparser: Antiparser[Element] = Antiparser(
       attributes = {
         case FromFile(file) => Component.fileAttribute.toXml.attributes(file)
         case inline => inlineAntiparser.attributes(inline.asInstanceOf[Inline])

@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.62] - 2020-12-20
+- calendar not using store;
+
 ## [0.1.56] - 2020-12-06
 - using CloudRun Gradle plugin;
 
@@ -17,4 +20,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [] 2020-04-28
 - centralized module setup (scala, library, service, mdoc, paper Gradle scripts)
- 

@@ -42,24 +42,24 @@ object Entities {
     lists: Seq[EntitiesList]
   )
 
-  object parsable extends org.opentorah.xml.Element.WithToXml[Element]("entities") {
+  object parsable extends org.opentorah.xml.Element[Element]("entities") {
 
     private val selectorAttribute: Attribute[String] = Attribute("selector")
 
     override def parser: Parser[Element] = for {
       selector <- selectorAttribute.required
       by <- By.parsable.required
-      lists <- EntitiesList.parsable.all
+      lists <- EntitiesList.all
     } yield Element(
       selector,
       by,
       lists
     )
 
-    override protected val antiparser: Antiparser[Element] = Antiparser.concat(
+    override val antiparser: Antiparser[Element] = Antiparser.concat(
       selectorAttribute.toXml.compose(_.selector),
       By.parsable.toXml.compose(_.by),
-      EntitiesList.parsable.toXmlSeq.compose(_.lists)
+      EntitiesList.toXmlSeq.compose(_.lists)
     )
   }
 
@@ -86,7 +86,7 @@ object Entities {
     fromUrl: URL,
     id: String,
   ): Parser[Entity] = for {
-    result <- Entity.parsable.parse(fromUrl)
+    result <- Entity.parse(fromUrl)
     _ <- Parser.check(result.id.isEmpty || result.id.contains(id),
       s"Incorrect id: ${result.id.get} instead of $id")
   } yield result.copy(

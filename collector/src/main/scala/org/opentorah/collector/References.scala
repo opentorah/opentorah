@@ -19,7 +19,7 @@ final class References private(references: Seq[ReferenceWithSource]) {
   }
 }
 
-object References extends Element.WithToXml[Seq[ReferenceWithSource]]("references") {
+object References extends Element[Seq[ReferenceWithSource]]("references") {
 
   def apply(store: Store): References = {
     val references: Seq[ReferenceWithSource] = getReferences(Seq.empty, store)
@@ -37,7 +37,7 @@ object References extends Element.WithToXml[Seq[ReferenceWithSource]]("reference
     val entitiesBy: By[EntityHolder] = entities.by.get
     val referencesFile: URL = Files.fileInDirectory(entitiesBy.urls.baseUrl, "references-generated.xml")
 
-    if (!Files.isFile(referencesFile)) Parser.parseDo(parse(referencesFile)) else {
+    if (!Files.isFileUrl(referencesFile)) Parser.parseDo(parse(referencesFile)) else {
       val references: Seq[ReferenceWithSource] = entitiesBy.stores.flatMap { entityHolder =>
         val entity: Entity = entityHolder.entity
         val entityId: String = entity.id.get
@@ -129,7 +129,7 @@ object References extends Element.WithToXml[Seq[ReferenceWithSource]]("reference
     .filter(_.isInstanceOf[ReferenceWithSource.FromDocument])
     .map(_.asInstanceOf[ReferenceWithSource.FromDocument])
 
-  override def parser: Parser[Seq[ReferenceWithSource]] = ReferenceWithSource.parsable.all
+  override def parser: Parser[Seq[ReferenceWithSource]] = ReferenceWithSource.all
 
-  override protected def antiparser: Antiparser[Seq[ReferenceWithSource]] = ReferenceWithSource.parsable.toXmlSeq
+  override def antiparser: Antiparser[Seq[ReferenceWithSource]] = ReferenceWithSource.toXmlSeq
 }

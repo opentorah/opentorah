@@ -75,9 +75,8 @@ object Files {
 
   def subUrl(base: Option[URL], url: String): URL = base.fold(new URL(url))(new URL(_, url))
 
-  // TODO rename isXXXUrl
-  def isFile(url: URL): Boolean = url.getProtocol == "file"
-  def isJar(url: URL): Boolean = url.getProtocol == "jar"
+  def isFileUrl(url: URL): Boolean = url.getProtocol == "file"
+  def isJarUrl(url: URL): Boolean = url.getProtocol == "jar"
 
   def urlAndPart(what: String): (String, Option[String]) = Strings.split(what, '#')
 

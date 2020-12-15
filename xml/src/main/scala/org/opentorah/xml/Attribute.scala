@@ -149,7 +149,4 @@ object Attribute {
     def set(element: Dom.Element): Dom.Element = Dom.setAttribute(this, element)
     def set(element: Sax.Element): Sax.Element = Sax.setAttribute(this, element)
   }
-
-  // Parser TODO move into... Parser?
-  val allAttributes: Parser[Seq[Value[String]]] = Context.takeAllAttributes
 }

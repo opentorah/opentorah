@@ -4,15 +4,14 @@ import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import org.apache.fop.apps.{FOUserAgent, FopFactory}
 import org.opentorah.mathjax.Svg
 import org.opentorah.util.Util
-import org.opentorah.xml.Saxon
+import org.opentorah.xml.{Saxon, Xml}
 import org.slf4j.{Logger, LoggerFactory}
-import scala.xml.Elem
 
 object Fop {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  val defaultConfigurationFile: Elem =
+  val defaultConfigurationFile: Xml.Element =
     <fop version="1.0">
       <renderers>
         <renderer mime="application/pdf">

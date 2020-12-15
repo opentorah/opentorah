@@ -9,14 +9,14 @@ final class Text extends Requireable[String] {
 
 object Text {
 
-  class TextElement(elementName: String) extends Element.WithToXml[String](elementName) {
+  final class TextElement(elementName: String) extends Element[String](elementName) {
     override def toString: Error = s"text element $elementName"
 
     override def contentType: ContentType = ContentType.Characters
 
     override def parser: Parser[String] = Text().required
 
-    override protected def antiparser: Antiparser[String] = Antiparser(
+    override def antiparser: Antiparser[String] = Antiparser(
       content = value => Seq(Xml.mkText(value))
     )
   }

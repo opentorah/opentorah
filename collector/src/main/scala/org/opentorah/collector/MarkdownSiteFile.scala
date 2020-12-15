@@ -6,10 +6,9 @@ import com.vladsch.flexmark.ext.toc.TocExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.{DataHolder, MutableDataSet}
-import org.opentorah.xml.From
+import org.opentorah.xml.{From, Xml}
 import zio.Runtime
 import scala.collection.JavaConverters.asJavaIterableConverter
-import scala.xml.Elem
 
 abstract class MarkdownSiteFile(val name: String, mdFile: File, override val url: Seq[String]) extends SiteFile {
 
@@ -41,7 +40,7 @@ object MarkdownSiteFile {
 
   private def parse(file: File): Node = parser.parseReader(new FileReader(file))
 
-  def render(ast: Node): Elem = {
+  def render(ast: Node): Xml.Element = {
     val html: String = renderer.render(ast)
     Runtime.default.unsafeRun(From.string("flexmark", s"<div>$html</div>").load)
   }
