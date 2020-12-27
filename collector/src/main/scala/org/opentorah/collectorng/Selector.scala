@@ -1,7 +1,7 @@
 package org.opentorah.collectorng
 
 import org.opentorah.metadata.{Metadata, Names}
-import org.opentorah.xml.{Antiparser, Element, From, Parser}
+import org.opentorah.xml.{Antiparser, Element, Parser}
 
 final class Selector(val names: Names) {
   override def toString: String = names.toString
@@ -23,8 +23,5 @@ object Selector extends Element[Selector]("selector") {
   def byName(name: String): Selector = values.find(_.names.hasName(name)).get
 
   // Note: this is lazy because Selector needs to be initialized when it is passed as a parameter to load:
-  private lazy val values: Seq[Selector] = Parser.parseDo(Metadata.load(
-    from = From.resource(Selector),
-    fromXml = this
-  ))
+  private lazy val values: Seq[Selector] = Metadata.loadResource(this, this)
 }

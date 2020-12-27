@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<names type="SpecialDay">
+<SpecialDay>
   <names>
     <name lang="en" transliterated="yes" n="Festival End"/>
     <name lang="he" n="סוף יום טוב"/>
@@ -197,4 +197,4 @@
      <name lang="he" n="תשע באב"/>
      <name lang="ru" transliterated="yes" n="Тиша беав"/>
   </names>
-</names>
+</SpecialDay>

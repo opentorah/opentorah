@@ -23,8 +23,6 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
 
   override protected def getBook(name: String): Tanach.ProphetsBook = Tanach.getProhetForName(name)
 
-  final def forParsha(parsha: Parsha): Customs = haftarah(parsha).map(_.from(parsha))
-
   object Week extends Element[(String, Customs)]("week") {
     private val elementParser = Haftarah.parser(full = true)
 
@@ -36,19 +34,12 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
     override def antiparser: Antiparser[(String, Haftarah.Customs)] = ???
   }
 
-  private lazy val haftarah: Map[Parsha, Customs] = Parser.parseDo(for {
-    metadatas <- Metadata.load(
-      from = From.resource(this),
-      fromXml = Week
-    )
-
-    result <- Metadata.bind(
-      keys = Parsha.values,
-      metadatas,
-      hasName = (metadata: (String, Customs), name: String) => metadata._1 == name
-    )
-  } yield Collections.mapValues(result.toMap)(_._2))
-
+  lazy val haftarah: Map[Parsha, Customs] = Collections.mapValues(Metadata.load(
+    from = From.resource(this),
+    fromXml = Week,
+    keys = Parsha.values,
+    hasName = (metadata: (String, Customs), name: String) => metadata._1 == name
+  ))(_._2)
 
   def parsable(full: Boolean): Element[Customs] = new Element[Customs]("haftarah") {
     override def parser: Parser[Customs] = Haftarah.parser(full)

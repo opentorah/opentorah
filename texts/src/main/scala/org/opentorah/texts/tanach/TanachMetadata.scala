@@ -46,26 +46,27 @@ object TanachMetadata {
     state match {
       case Parsed(_, _, _) =>
       case Resolved(_, _, _) =>
-      case Empty => process(Parser.parseDo(parse))
+      case Empty => process {
+        val metadata: Map[TanachBook, TanachBookMetadata.Parsed] = Parser.parseDo(for {
+          metadatas <- Metadata.load(
+            from = From.resource(Tanach),
+            fromXml = Book.followRedirects
+          )
+
+          metadata <- Metadata.bind(
+            keys = Tanach.values,
+            metadatas,
+            getKey = (metadata: TanachBookMetadata.Parsed) => metadata.book
+          )
+        } yield metadata)
+        Parsed(
+          Collections.mapValues(metadata)(_.names),
+          Collections.mapValues(metadata)(_.chapters),
+          metadata
+        )
+      }
     }
   }
-
-  private def parse: Parser[Parsed] = for {
-    metadatas <- Metadata.load(
-      from = From.resource(Tanach),
-      fromXml = Book.followRedirects
-    )
-
-    metadata <- Metadata.bind(
-      keys = Tanach.values,
-      metadatas,
-      getKey = (metadata: TanachBookMetadata.Parsed) => metadata.book
-    )
-  } yield Parsed(
-    Collections.mapValues(metadata)(_.names),
-    Collections.mapValues(metadata)(_.chapters),
-    metadata
-  )
 
   private object Book extends Element[TanachBookMetadata.Parsed]("book") {
     override def parser: Parser[TanachBookMetadata.Parsed] = for {

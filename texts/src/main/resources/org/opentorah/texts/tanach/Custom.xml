@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<names type="Custom">
+<Custom>
   <names>
     <name n="Common" lang="en"/>
     <name n="Общий" lang="ru"/>
@@ -95,4 +95,4 @@
     <name n="Шами" lang="ru"/>
     <name n="שאמי" lang="he"/>
   </names>
-</names>
+</Custom>

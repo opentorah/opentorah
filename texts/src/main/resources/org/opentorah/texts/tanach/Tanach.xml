@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metadata type="Tanach">
+<Tanach>
     <book file="Genesis.xml"/>
     <book file="Exodus.xml"/>
     <book file="Leviticus.xml"/>
@@ -767,4 +767,4 @@
       <chapter n="35" length="27"/>
       <chapter n="36" length="23"/>
     </book>
-</metadata>
+</Tanach>

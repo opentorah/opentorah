@@ -1,10 +1,13 @@
 package org.opentorah.metadata
 
 import org.opentorah.util.Util
-import org.opentorah.xml.Parser
+import org.opentorah.xml.From
 
 trait NamedCompanion {
-  type Key <: Named
+  // TODO try pushing
+  //     final override def names: Names = toNames(this)
+  // into the base class of the Key...
+  type Key <: WithName with WithNames
 
   def values: Seq[Key]
 
@@ -14,13 +17,16 @@ trait NamedCompanion {
   // - public so that it can be accessed from the Key type if it isn't defined
   //   within the object derived from NamedCompanion;
   // - not final so that it can be overridden in Tanach, for instance.
-  lazy val toNames: Map[Key, Names] = Parser.parseDo(Metadata.loadNames(
-    obj = this,
-    resourceName,
-    keys = values
-  ))
+  lazy val toNames: Map[Key, Names] = Metadata.load(
+    from = From.resource(this, resourceName),
+    fromXml = Names.NamesMetadata,
+    keys = values,
+    hasName = (metadata: Names, name: String) => metadata.hasName(name)
+  )
 
   protected def resourceName: String = what
+
+  private def what: String = Util.className(this)
 
   final def forDefaultName(name: String): Option[Key] = values.find(_.name == name)
 
@@ -49,6 +55,4 @@ trait NamedCompanion {
   final def distance(from: Key, to: Key): Int = indexOf(to) - indexOf(from)
 
   final val ordering: Ordering[Key] = (x: Key, y: Key) => distance(x, y)
-
-  private def what: String = Util.className(this)
 }

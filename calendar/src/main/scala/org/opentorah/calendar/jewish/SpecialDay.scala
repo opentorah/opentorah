@@ -1,9 +1,8 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.metadata.{Metadata, Names, WithName, WithNames}
+import org.opentorah.metadata.{NamedCompanion, Names, WithName, WithNames}
 import Jewish.{Day, Year}
 import Jewish.Month.Name._
-import org.opentorah.xml.Parser
 
 sealed trait SpecialDay extends WithNames {
   def date(year: Year): Day
@@ -11,7 +10,9 @@ sealed trait SpecialDay extends WithNames {
   protected def correctDate(date: Day): Day = date
 }
 
-object SpecialDay {
+object SpecialDay extends NamedCompanion {
+
+  type Key = LoadNames
 
   sealed class LoadNames(override val name: String) extends WithName with WithNames {
     final override def names: Names = toNames(this)
@@ -313,7 +314,7 @@ object SpecialDay {
   def daysWithSpecialReadings(inHolyLand: Boolean): Set[SpecialDay] =
     festivals(inHolyLand) ++ daysWithSpecialReadingsNotFestivals
 
-  private val loadNames: Seq[LoadNames] = Seq(
+  val values: Seq[LoadNames] = Seq(
     FestivalEnd, IntermediateShabbos, RoshChodesh, ErevRoshChodesh, Fast,
     RoshHashanah1, FastOfGedalia, YomKippur, Succos1,
     SuccosIntermediate, SheminiAtzeres, SimchasTorah, SheminiAtzeresAndSimchasTorahInHolyLand,
@@ -322,10 +323,4 @@ object SpecialDay {
     FastOfEster, Purim, ShushanPurim, Pesach1, PesachIntermediate, Pesach7, Pesach8,
     Omer, LagBaOmer, Shavuos1, FastOfTammuz, TishaBeAv
   )
-
-  private val toNames: Map[WithName, Names] = Parser.parseDo(Metadata.loadNames(
-    obj = this,
-    resourceName = "SpecialDay",
-    keys = loadNames
-  ))
 }

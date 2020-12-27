@@ -28,7 +28,7 @@
 
   When not specified explicitly, custom follows its parent custom as described in Custom.scala.
 -->
-<metadata type="Haftarah">
+<Haftarah>
     <week n="Bereishis" book="Isaiah" fromChapter="42">
         <custom n="Ashkenaz" fromVerse="5" toChapter="43" toVerse="10"/>
         <custom n="Sefard, Frankfurt" fromVerse="5" toChapter="42" toVerse="21"/>
@@ -293,4 +293,4 @@
             <part n="2" fromChapter="6" fromVerse="27"/> <!-- reused in Pesach1 -->
         </custom>
     </week>
-</metadata>
+</Haftarah>

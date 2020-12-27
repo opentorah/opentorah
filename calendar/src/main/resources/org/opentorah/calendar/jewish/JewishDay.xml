@@ -1,4 +1,5 @@
-<names type="JewishDay">
+<?xml version="1.0" encoding="UTF-8"?>
+<JewishDay>
     <names>
         <name lang="he" n="ראשון"/>
         <name lang="en" transliterated="yes" n="Rishon"/>
@@ -43,4 +44,4 @@
         <name lang="en" transliterated="no" n="Sabbath"/>
         <name lang="ru" n="суббота"/>
     </names>
-</names>
+</JewishDay>

@@ -1,7 +1,7 @@
 package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Antiparser, Attribute, Element, From, Parser, ToXml, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parser, ToXml, Xml}
 
 object SeferHamitzvosLessons {
 
@@ -77,8 +77,5 @@ object SeferHamitzvosLessons {
   }
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
-  lazy val lessons: Seq[Lesson] = Parser.parseDo(Metadata.load(
-    from = From.resource(this),
-    fromXml = Lesson
-  ))
+  lazy val lessons: Seq[Lesson] = Metadata.loadResource(this, Lesson)
 }
