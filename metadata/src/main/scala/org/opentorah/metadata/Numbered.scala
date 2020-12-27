@@ -21,5 +21,5 @@ object Numbered {
 
   implicit def numberedOrdering[T <: Numbered]: Ordering[T] = (x: T, y: T ) => x.number - y.number
 
-  implicit def numberedOrderingOps[T <: Numbered](lhs: T): Ordering[T]#Ops = numberedOrdering.mkOrderingOps(lhs)
+  implicit def numberedOrderingOps[T <: Numbered](lhs: T): Ordering[T]#OrderingOps = numberedOrdering.mkOrderingOps(lhs)
 }
