@@ -15,7 +15,7 @@ import org.opentorah.util.Collections.mapValues
 import org.opentorah.util.{Files, Gradle}
 import org.opentorah.xml.{Catalog, Doctype, PrettyPrinter, Resolver, XInclude, Xml}
 import scala.beans.BeanProperty
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.xml.Comment
 
 // Note: Task class can not be final for Gradle to be able to decorate it.
