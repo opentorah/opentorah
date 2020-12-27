@@ -57,9 +57,9 @@ object Entities {
     )
 
     override val antiparser: Antiparser[Element] = Antiparser.concat(
-      selectorAttribute.toXml.compose(_.selector),
-      By.parsable.toXml.compose(_.by),
-      EntitiesList.toXmlSeq.compose(_.lists)
+      selectorAttribute.toXml(_.selector),
+      By.parsable.toXml(_.by),
+      EntitiesList.toXmlSeq(_.lists)
     )
   }
 

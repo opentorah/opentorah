@@ -3,7 +3,6 @@ package org.opentorah.collector
 import org.opentorah.tei.Tei
 import org.opentorah.xml.{PrettyPrinter, Xhtml}
 
-// TODO add backlink to the SiteObject?
 // TODO various indices and reports no longer have to be in TEI; rework them into HTML but apply resolver somehow?
 trait SiteFile {
 

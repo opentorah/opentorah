@@ -18,6 +18,6 @@ object HandNotes extends Element[HandNotes]("handNotes") {
   )
 
   override val antiparser: Antiparser[HandNotes] = Tei.concat(
-    HandNote.parsable.toXmlSeq.compose(_.handNotes)
+    HandNote.parsable.toXmlSeq(_.handNotes)
   )
 }

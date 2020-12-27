@@ -79,14 +79,7 @@ final class Site(fromUrl: URL) {
     writeHtmlFile(new TreeIndexObject(this), directory)
     writeHtmlFile(new NamesObject(this), directory)
 
-    Files.deleteFiles(new File(directory, NotesObject.directoryName))
-    for (note <- new NotesObject(this).noteFiles) {
-      val content: String = note.content
-      if (doWrite) Files.write(
-        file = Files.file(directory, Seq(NotesObject.directoryName, s"${note.name}.html")),
-        content
-      )
-    }
+    // TODO notes are written by the New Generation code
 
     Files.deleteFiles(new File(directory, EntityObject.directoryName))
     for (entity <- entities) writeHtmlFile(new EntityObject(this, entity), directory)
@@ -162,7 +155,6 @@ object Site {
   //    if (missingImages.nonEmpty) throw new IllegalArgumentException(s"Missing images: $missingImages")
   //  }
 
-  // TODO in new generation, move into the RootStore XML file:
   private def mkSiteParameters: SiteParameters = new SiteParameters(
     title = "Документы",
     author = "www.alter-rebbe.org",
@@ -176,7 +168,7 @@ object Site {
       NavigationLink("/notes/about", "О сайте", Some(Viewer.Collection))
     ),
     footerCol3 =
-      // TODO when I use <p> instead of <span>, it gets styled by the TEI CSS - althought it is in the XHTML namespace?!
+      // TODO when I use <p> instead of <span>, it gets styled by the TEI CSS - although it is in the XHTML namespace?!
       <span>
         documents related to early Chabad history<br/>
         🄯 <a href="http://www.opentorah.org/" target={Viewer.Collection.name}>the Open Torah Project</a>

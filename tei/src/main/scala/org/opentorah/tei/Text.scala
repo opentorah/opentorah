@@ -18,7 +18,7 @@ object Text extends Element[Text]("text") {
   )
 
   override val antiparser: Antiparser[Text] = Tei.concat(
-    Xml.langAttribute.toXmlOption.compose(_.lang),
-    Body.parsable.toXml.compose(_.body)
+    Xml.langAttribute.toXmlOption(_.lang),
+    Body.parsable.toXml(_.body)
   )
 }

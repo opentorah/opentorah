@@ -1,6 +1,7 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, Dialect, Element, From, LinkResolver, Namespace, Parser, PrettyPrinter, ToHtml, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, Dialect, Element, From, LinkResolver, Namespace, Parser, PrettyPrinter,
+  ToHtml, Xml}
 import zio.{URIO, ZIO}
 
 final case class Tei(
@@ -8,19 +9,25 @@ final case class Tei(
   text: Text
 ) {
   def titleStmt: TitleStmt = teiHeader.fileDesc.titleStmt
-  val correspDesc: Option[CorrespDesc.Value] = teiHeader.profileDesc.flatMap(_.correspDesc)
-  def getAbstract: Option[Seq[Xml.Node]] = teiHeader.profileDesc.flatMap(_.documentAbstract.map(_.xml))
+  def getAbstract: Option[Abstract.Value] = teiHeader.profileDesc.flatMap(_.documentAbstract)
+  def getAbstractXml: Option[Seq[Xml.Node]] = getAbstract.map(_.xml)
   def creationDate: Option[Date] = teiHeader.profileDesc.flatMap(_.creation.map(_.date))
   def languages: Seq[Language] = teiHeader.profileDesc.flatMap(_.langUsage).toSeq.flatMap(_.languages)
-  val body: Body.Value = text.body
-  val pbs: Seq[Pb] = body.xml.flatMap(node =>
-    Xml.descendants(node, Pb.elementName)
-      .map(descendant => Parser.parseDo(Pb.parse(From.xml("descendants", descendant))))
-  )
+  def editors: Seq[Editor] = titleStmt.editors
+  def authors: Seq[Author.Value] = titleStmt.authors
 
   def addressee: Option[EntityReference] =
     EntityReference.from(correspDesc.map(_.xml).getOrElse(Seq.empty))
       .find(name => (name.entityType == EntityType.Person) && name.role.contains("addressee"))
+
+  def pbs: Seq[Pb] = body.xml.flatMap(node =>
+    Xml.descendants(node, Pb.elementName)
+      .map(descendant => Parser.parseDo(Pb.parse(From.xml("descendants", descendant))))
+  )
+
+  // TODO not vals!
+  val correspDesc: Option[CorrespDesc.Value] = teiHeader.profileDesc.flatMap(_.correspDesc)
+  val body: Body.Value = text.body
 
   /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
 }
@@ -46,8 +53,8 @@ object Tei extends Element[Tei]("TEI") with Dialect with ToHtml {
   )
 
   override lazy val antiparser: Antiparser[Tei] = concat(
-    TeiHeader.toXml.compose(_.teiHeader),
-    Text.toXml.compose(_.text)
+    TeiHeader.toXml(_.teiHeader),
+    Text.toXml(_.text)
   )
 
   def concat[A](antiparsers: Antiparser[A]*): Antiparser[A] =

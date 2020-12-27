@@ -1,32 +1,38 @@
 package org.opentorah.collectorng
 
-import org.opentorah.xml.{Antiparser, Attribute, Element, FromUrl, Parser, ToXml, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, Element, FromUrl, Parser, Xml}
 
-// TODO ByHierarchy
-final class HierarchyBy(
+final class ByHierarchy(
   override val fromUrl: FromUrl,
   override val selector: Selector,
   val stores: Seq[Store]
-) extends By {
-  override protected def resolveStore(url: Seq[String]): Option[SiteFile] = None // TODO
+) extends By with FromUrl.With {
+
+  // TODO move into Site
+  def collections(prefix: Store.Path): Seq[Store.Path] = stores.flatMap {
+    case collection: Collection => Seq(prefix ++ Seq(this, collection))
+    case store: Hierarchy => store.by.toSeq.flatMap(_.collections(prefix ++ Seq(this, store)))
+    case _ => Seq.empty
+  }
+
+  override def findByName(name: String): Option[Store] = Store.findByName(name, stores)
 }
 
-object HierarchyBy extends Element[HierarchyBy]("by") {
-  private val selectorAttribute: Attribute[String] = Attribute("selector")
+object ByHierarchy extends Element[ByHierarchy]("by") {
 
-  override def parser: Parser[HierarchyBy] = for {
+  override def parser: Parser[ByHierarchy] = for {
     fromUrl <- currentFromUrl
-    selector <- selectorAttribute.required
+    selector <- By.selector
     stores <- storeParsable.followRedirects.all
-  } yield new HierarchyBy(
+  } yield new ByHierarchy(
     fromUrl,
-    Selector.byName(selector),
+    selector,
     stores
   )
 
-  override def antiparser: Antiparser[HierarchyBy] = Antiparser.concat(
-    selectorAttribute.toXml.compose(_.selector.name),
-    storeParsable.toXmlSeq.compose(_.stores)
+  override def antiparser: Antiparser[ByHierarchy] = Antiparser.concat(
+    By.selectorToXml,
+    storeParsable.toXmlSeq(_.stores)
   )
 
   // TODO I am using existing store XML files, so I re-use 'type' attribute to determine that this is a collection - for now.
@@ -40,11 +46,11 @@ object HierarchyBy extends Element[HierarchyBy]("by") {
   private val storeParsable: Element[Store] = new Element[Store]("store") {
     override def parser: Parser[Store] = for {
       typeOpt <- typeAttribute.optional
-      result <- if (typeOpt.isEmpty) HierarchyStore.parser else Collection.parser
+      result <- if (typeOpt.isEmpty) Hierarchy.parser else Collection.parser
     } yield result
 
     override def toXmlElement(value: Store): Xml.Element = value match {
-      case value: HierarchyStore => HierarchyStore.toXmlElement(value)
+      case value: Hierarchy => Hierarchy.toXmlElement(value)
       case value: Collection     => Collection    .toXmlElement(value)
     }
 

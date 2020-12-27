@@ -30,7 +30,7 @@ final class Document(
     for (pb <- tei.pbs) yield pageType(pb)
 
   def description: Seq[Xml.Node] =
-    tei.getAbstract
+    tei.getAbstractXml
     // Ignoring the titles:          .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
     .getOrElse(Seq.empty)
 

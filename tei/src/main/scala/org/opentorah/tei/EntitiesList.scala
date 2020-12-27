@@ -2,6 +2,7 @@ package org.opentorah.tei
 
 import org.opentorah.xml.{Antiparser, Attribute, ContentType, Parser, Xml}
 
+// TODO remove
 final case class EntitiesList(
   entityType: EntityType,
   id: String,
@@ -39,8 +40,8 @@ object EntitiesList extends EntityRelated[EntitiesList](
   )
 
   override protected def antiparser(entityType: EntityType): Antiparser[EntitiesList] = Antiparser.concat(
-    Xml.idAttribute.toXml.compose(_.id),
-    roleAttribute.toXmlOption.compose(_.role),
-    Antiparser.xml.compose(value => Seq(<head>{value.head}</head>))
+    Xml.idAttribute.toXml(_.id),
+    roleAttribute.toXmlOption(_.role),
+    Antiparser.xml(value => Seq(<head>{value.head}</head>))
   )
 }

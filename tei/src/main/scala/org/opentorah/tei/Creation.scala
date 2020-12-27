@@ -18,7 +18,7 @@ object Creation extends Element[Creation]("creation") {
   )
 
   override val antiparser: Antiparser[Creation] = Tei.concat(
-    Date.toXml.compose(_.date),
-    Antiparser.xml.compose(_.xml)
+    Date.toXml(_.date),
+    Antiparser.xml(_.xml)
   )
 }

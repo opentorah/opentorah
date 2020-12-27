@@ -45,4 +45,6 @@ trait FromXml[A] extends Requireable[A] {
       .map(_.nested(Some(from), nextElement))
       .getOrElse(ZIO.fail(s"$this required, but '$name' found"))
   } yield result
+
+  final def currentFromUrl: Parser[FromUrl] = Context.currentFromUrl
 }

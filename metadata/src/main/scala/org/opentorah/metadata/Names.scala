@@ -41,6 +41,8 @@ final class Names(val names: Seq[Name]) extends LanguageString {
 }
 
 object Names {
+  def apply(name: String): Names = new Names(Seq(Name(name)))
+
   def checkDisjoint(nameses: Seq[Names]): Unit = {
     for {
       one <- nameses
@@ -50,7 +52,7 @@ object Names {
     }
   }
 
-  // If I ever figure out how work with Custom using Cats typeclasses, something similar
+  // If I ever figure out how to work with Custom using Cats typeclasses, something similar
   // should work here too :)
   def combine(one: Names, other: Names, combiner: (LanguageSpec, String, String) => String): Names = {
     val specs: Set[LanguageSpec] = one.names.map(_.languageSpec).toSet ++ other.names.map(_.languageSpec)
@@ -80,14 +82,16 @@ object Names {
     new Names(names)
   }
 
-  val antiparser: Antiparser[Names] = Antiparser(
+  private val antiparser: Antiparser[Names] = Antiparser(
     attributes = value => Seq(defaultNameAttribute.withOptionalValue(value.getDefaultName)),
     content = value => if (value.getDefaultName.isDefined) Seq.empty else toXml(value)
   )
 
+  def antiparser[B](f: B => Names): Antiparser[B] = antiparser.compose(f)
+
   // TODO remove (fold into the antiparser, of which there should be 2: with default name allowed and not...)
   def toXml(value: Names): Seq[Xml.Node] =
-    Name.toXmlSeq.compose[Names](_.names).content(value)
+    Name.toXmlSeq[Names](_.names).content(value)
 
   object NamesMetadata extends Element[Names]("names") {
     override def parser: Parser[Names] = Names.withoutDefaultNameParser

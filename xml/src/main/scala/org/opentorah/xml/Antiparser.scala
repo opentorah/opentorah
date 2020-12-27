@@ -45,7 +45,10 @@ object Antiparser {
     namespace  = namespace
   )
 
-  val xml: Antiparser[Seq[Xml.Node]] = apply[Seq[Xml.Node]](
+  // TODO eliminate?
+  private val xml: Antiparser[Seq[Xml.Node]] = apply[Seq[Xml.Node]](
     content = (value: Seq[Xml.Node]) => value
   )
+
+  def xml[B](f: B => Seq[Xml.Node]): Antiparser[B] = xml.compose(f)
 }

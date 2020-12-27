@@ -50,12 +50,12 @@ object From {
     override def load: IO[Error, Xml.Element] = loadFromUrl(fromUrl)
   }
 
-  private[xml] def url(url: URL): From = new FromUrl(url, false)
+  def url(url: URL): From = new FromUrl(url, false)
 
   private[xml] def redirect(url: URL): From = new FromUrl(url, true)
 
   def file(directory: File, fileName: String): From = file(new File(directory, fileName + ".xml"))
-  private def file(file: File): From = url(file.toURI.toURL)
+  def file(file: File): From = url(file.toURI.toURL)
 
   private final class FromResource(
     clazz: Class[_],

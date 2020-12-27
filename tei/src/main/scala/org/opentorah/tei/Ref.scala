@@ -23,8 +23,8 @@ object Ref extends Element[Ref]("ref") {
   )
 
   override val antiparser: Antiparser[Ref] = Tei.concat(
-    targetAttribute.toXml.compose(_.target),
-    Antiparser.xml.compose(_.text)
+    targetAttribute.toXml(_.target),
+    Antiparser.xml(_.text)
   )
 
   def toXml(

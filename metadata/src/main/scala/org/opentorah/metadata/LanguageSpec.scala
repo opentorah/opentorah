@@ -43,8 +43,8 @@ object LanguageSpec {
   )
 
   val antiparser: Antiparser[LanguageSpec] = Antiparser.concat(
-    langAttribute.toXmlOption.compose(_.language.map(_.name)),
-    transliteratedAttribute.toXmlOption.compose(_.isTransliterated),
-    flavourAttribute.toXmlOption.compose(_.flavour)
+    langAttribute.toXmlOption(_.language.map(_.name)),
+    transliteratedAttribute.toXmlOption(_.isTransliterated),
+    flavourAttribute.toXmlOption(_.flavour)
   )
 }

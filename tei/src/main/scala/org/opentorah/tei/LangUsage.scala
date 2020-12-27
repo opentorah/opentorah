@@ -15,6 +15,6 @@ object LangUsage extends Element[LangUsage]("langUsage") {
   )
 
   override val antiparser: Antiparser[LangUsage] = Tei.concat(
-    Language.toXmlSeq.compose(_.languages)
+    Language.toXmlSeq(_.languages)
   )
 }

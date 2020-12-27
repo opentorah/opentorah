@@ -18,8 +18,8 @@ object PublicationStmt extends Element[PublicationStmt]("publicationStmt") {
   )
 
   override val antiparser: Antiparser[PublicationStmt] = Tei.concat(
-    Publisher.parsable.toXmlOption.compose(_.publisher),
-    Availability.toXmlOption.compose(_.availability)
+    Publisher.parsable.toXmlOption(_.publisher),
+    Availability.toXmlOption(_.availability)
   )
 
   def apply(): PublicationStmt = new PublicationStmt(

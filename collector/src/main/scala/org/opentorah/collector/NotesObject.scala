@@ -4,7 +4,6 @@ import java.net.URL
 import org.opentorah.store.FilesList
 import org.opentorah.util.Files
 
-// TODO add objects for every Markdown file?
 final class NotesObject(site: Site) extends SiteObject(site) {
 
   private val (fileNames: Seq[String], fileInDirectory: (String => URL)) = FilesList.get(
@@ -29,8 +28,6 @@ final class NotesObject(site: Site) extends SiteObject(site) {
     override protected def style: String = "main"
     override protected def siteParameters: SiteParameters = site.siteParameters
   }
-
-  def noteFiles: Seq[MarkdownSiteFile] = fileNames.map(mkNoteFile)
 }
 
 object NotesObject {

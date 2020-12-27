@@ -15,8 +15,6 @@ abstract class Element[A](val elementName: String) extends FromXml[A] with ToXml
   private[xml] final override def canParse(elementName: String): Option[CanParse[A]] =
     if (elementName != this.elementName) None else Some(new CanParse[A](contentType, parser))
 
-  final def currentFromUrl: Parser[FromUrl] = Context.currentFromUrl
-
   private def handleRedirect[B](
     noRedirect: Parser[A] => Parser[B],
     redirected: URL => Parser[B]

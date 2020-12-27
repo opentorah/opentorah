@@ -26,8 +26,8 @@ object Language extends Element[Language]("language") {
   )
 
   override val antiparser: Antiparser[Language] = Tei.concat(
-    identAttribute.toXml.compose(_.ident),
-    usageAttribute.toXmlOption.compose(_.usage),
-    Antiparser.xml.compose(value => value.text.toSeq.map(Xml.mkText))
+    identAttribute.toXml(_.ident),
+    usageAttribute.toXmlOption(_.usage),
+    Antiparser.xml(value => value.text.toSeq.map(Xml.mkText)) // TODO xml2string?
   )
 }
