@@ -36,11 +36,11 @@ class ByComponent extends Component("by") {
   )
 
   override protected def inlineAntiparser: Antiparser[Inline] = Antiparser.concat(
-    selectorAttribute.toXml.compose(_.selector),
-    directoryAttribute.toXmlOption.compose(_.directory),
-    listAttribute.toXmlOption.compose(_.list),
-    Component.typeAttribute.toXmlOption.compose(_.className),
-    Store.parsable.toXmlSeq.compose(_.stores)
+    selectorAttribute.toXml(_.selector),
+    directoryAttribute.toXmlOption(_.directory),
+    listAttribute.toXmlOption(_.list),
+    Component.typeAttribute.toXmlOption(_.className),
+    Store.parsable.toXmlSeq(_.stores)
   )
 
   abstract class FromElement[+S <: Store](

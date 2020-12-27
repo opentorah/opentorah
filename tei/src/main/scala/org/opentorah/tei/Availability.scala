@@ -20,7 +20,7 @@ object Availability extends Element[Availability]("availability") {
   )
 
   override val antiparser: Antiparser[Availability] = Tei.concat(
-    statusAttribute.toXmlOption.compose(_.status),
-    Antiparser.xml.compose(_.xml)
+    statusAttribute.toXmlOption(_.status),
+    Antiparser.xml(_.xml)
   )
 }

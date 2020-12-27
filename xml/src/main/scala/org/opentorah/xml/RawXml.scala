@@ -2,7 +2,9 @@ package org.opentorah.xml
 
 class RawXml(elementName: String, namespace: Option[Namespace] = None) {
 
-  final class Value(val xml: Seq[Xml.Node])
+  final class Value(val xml: Seq[Xml.Node]) {
+    def xml2string: String = Xml.toString(xml)
+  }
 
   object parsable extends Element[Value](elementName) {
 

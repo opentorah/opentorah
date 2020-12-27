@@ -52,8 +52,16 @@ object Main {
     doPrettyPrint: Boolean,
     doWrite: Boolean
   ): Unit = {
+    val baseUrl = new File(siteRootPath).toURI.toURL
+
     info("Reading store.")
-    val site: Site = new Site(new File(siteRootPath).toURI.toURL)
+    val site: Site = new Site(baseUrl)
+
+    info("Reading New Generation Site.")
+    val siteNg: org.opentorah.collectorng.Site = org.opentorah.collectorng.Site.read(baseUrl)
+
+    info("Writing New Generation Site.")
+    siteNg.writeLists()
 
     if (doPrettyPrint) {
       info("Pretty-printing store.")
@@ -62,5 +70,6 @@ object Main {
 
     info(if (doWrite) "Verifying and writing site." else "Verifying site.")
     site.write(doWrite)
+    if (doWrite) siteNg.writeStaticFiles()
   }
 }

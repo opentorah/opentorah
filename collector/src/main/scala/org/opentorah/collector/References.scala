@@ -100,7 +100,7 @@ object References extends Element[Seq[ReferenceWithSource]]("references") {
 
   private def getReferences(teiHolder: TeiHolder): Seq[EntityReference] =
     teiHolder.tei.titleStmt.references /* TODO unfold */ ++ EntityReference.from(
-    teiHolder.tei.getAbstract.getOrElse(Seq.empty) ++
+    teiHolder.tei.getAbstractXml.getOrElse(Seq.empty) ++
     teiHolder.tei.correspDesc.map(_.xml).getOrElse(Seq.empty) ++
     teiHolder.tei.body.xml
   )

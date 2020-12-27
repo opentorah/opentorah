@@ -39,7 +39,7 @@ object SeferHamitzvosLessons {
   object NamedPart extends Element[NamedPart]("named") {
     override def parser: Parser[NamedPart] = Names.withoutDefaultNameParser.map(apply)
 
-    override def antiparser: Antiparser[NamedPart] = Names.antiparser.compose(_.names)
+    override def antiparser: Antiparser[NamedPart] = Names.antiparser(_.names)
   }
 
   sealed abstract class Commandment(val number: Int) extends Part
@@ -57,7 +57,7 @@ object SeferHamitzvosLessons {
 
     override def parser: Parser[Positive] = nAttribute.required.map(apply)
 
-    override def antiparser: Antiparser[Positive] = nAttribute.toXml.compose(_.number)
+    override def antiparser: Antiparser[Positive] = nAttribute.toXml(_.number)
   }
 
   final case class Negative(override val number: Int) extends Commandment(number) {
@@ -73,7 +73,7 @@ object SeferHamitzvosLessons {
 
     override def parser: Parser[Negative] = nAttribute.required.map(apply)
 
-    override def antiparser: Antiparser[Negative] = nAttribute.toXml.compose(_.number)
+    override def antiparser: Antiparser[Negative] = nAttribute.toXml(_.number)
   }
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841

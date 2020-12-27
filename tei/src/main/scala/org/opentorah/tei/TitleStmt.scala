@@ -54,12 +54,12 @@ object TitleStmt extends Element[TitleStmt]("titleStmt") {
   )
 
   override val antiparser: Antiparser[TitleStmt] = Tei.concat(
-    Title.parsable.toXmlSeq.compose(_.titles),
-    Author.parsable.toXmlSeq.compose(_.authors),
-    Editor.toXmlSeq.compose(_.editors),
-    Sponsor.parsable.toXmlSeq.compose(_.sponsors),
-    Funder.parsable.toXmlSeq.compose(_.funders),
-    Principal.parsable.toXmlSeq.compose(_.principals),
-    RespStmt.parsable.toXmlSeq.compose(_.respStmts)
+    Title.parsable.toXmlSeq(_.titles),
+    Author.parsable.toXmlSeq(_.authors),
+    Editor.toXmlSeq(_.editors),
+    Sponsor.parsable.toXmlSeq(_.sponsors),
+    Funder.parsable.toXmlSeq(_.funders),
+    Principal.parsable.toXmlSeq(_.principals),
+    RespStmt.parsable.toXmlSeq(_.respStmts)
   )
 }

@@ -1,25 +1,32 @@
 package org.opentorah.collectorng
 
-import org.opentorah.metadata.{Metadata, Names}
-import org.opentorah.xml.{Antiparser, Element, Parser}
+import org.opentorah.metadata.{Metadata, Names, WithNames}
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parser}
 
-final class Selector(val names: Names) {
-  override def toString: String = names.toString
-  def resolves(url: Seq[String]): Boolean = names.hasName(url.head)
+final class Selector(
+  val names: Names,
+  val title: Option[String]
+) extends WithNames {
   def name: String = names.name
 }
 
 object Selector extends Element[Selector]("selector") {
 
+  private val titleAttribute: Attribute[String] = Attribute("title")
+
   override val parser: Parser[Selector] = for {
     names <- Names.withDefaultNameParser
-  } yield new Selector(names)
-
-  override val antiparser: Antiparser[Selector] = Antiparser(
-    content = value => Names.toXml(value.names)
+    title <- titleAttribute.optional
+  } yield new Selector(
+    names,
+    title
   )
 
-  // TODO ZIOify
+  override val antiparser: Antiparser[Selector] = Antiparser.concat(
+    Names.antiparser(_.names), // TODO verify that this works!
+    titleAttribute.toXmlOption(_.title)
+  )
+
   def byName(name: String): Selector = values.find(_.names.hasName(name)).get
 
   // Note: this is lazy because Selector needs to be initialized when it is passed as a parameter to load:

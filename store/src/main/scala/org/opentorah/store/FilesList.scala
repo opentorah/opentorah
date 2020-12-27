@@ -9,7 +9,7 @@ object FilesList extends Element[Seq[String]]("filesList") {
   override def parser: Parser[Seq[String]] = Text("file").all
 
   override def antiparser: Antiparser[Seq[String]] =
-    Antiparser.xml.compose[Seq[String]](value => for (file <- value) yield <file>{file}</file>)
+    Antiparser.xml[Seq[String]](value => for (file <- value) yield <file>{file}</file>)
 
   def get(
     baseUrl: URL,

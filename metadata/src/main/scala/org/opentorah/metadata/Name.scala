@@ -31,7 +31,7 @@ object Name extends Element[Name]("name") {
     new Name(name, LanguageSpec.empty)
 
   override val antiparser: Antiparser[Name] = Antiparser.concat(
-    nAttribute.toXml.compose(_.name),
-    LanguageSpec.antiparser.compose(_.languageSpec)
+    nAttribute.toXml(_.name),
+    LanguageSpec.antiparser.compose(_.languageSpec)  // TODO eliminate compose()
   )
 }

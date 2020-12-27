@@ -39,9 +39,9 @@ object Entity extends EntityRelated[Entity](
   )
 
   override protected def antiparser(entityType: EntityType): Antiparser[Entity] = Tei.concat(
-    Xml.idAttribute.toXmlOption.compose(_.id),
-    roleAttribute.toXmlOption.compose(_.role),
-    EntityName.forEntityType(entityType).toXmlSeq.compose(_.names),
-    Antiparser.xml.compose(_.content)
+    Xml.idAttribute.toXmlOption(_.id),
+    roleAttribute.toXmlOption(_.role),
+    EntityName.forEntityType(entityType).toXmlSeq(_.names),
+    Antiparser.xml(_.content)
   )
 }

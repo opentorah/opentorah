@@ -57,6 +57,10 @@ subprojects {
   task deploy
   deploy.description('Publish containers and re-deploy services')
   deploy.group('publishing')
+
+  tasks.withType(ScalaCompile) {
+    targetCompatibility = "1.8"
+  }
 }
 
 idea {

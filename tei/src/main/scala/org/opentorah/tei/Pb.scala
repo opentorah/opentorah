@@ -39,10 +39,10 @@ object Pb extends Element[Pb]("pb") {
   )
 
   override val antiparser: Antiparser[Pb] = Tei.concat(
-    nAttribute.toXml.compose(_.n),
-    Xml.idAttribute.toXmlOption.compose(_.id),
-    facsAttribute.toXmlOption.compose(_.facs),
-    missingAttribute.toXml.compose(_.isMissing),
-    emptyAttribute.toXml.compose(_.isEmpty)
+    nAttribute.toXml(_.n),
+    Xml.idAttribute.toXmlOption(_.id),
+    facsAttribute.toXmlOption(_.facs),
+    missingAttribute.toXml(_.isMissing),
+    emptyAttribute.toXml(_.isEmpty)
   )
 }

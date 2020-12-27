@@ -26,6 +26,11 @@ dependencies {
   implementation "com.google.cloud:google-cloud-storage:$googleCloudStorageVersion"
 
   testImplementation "org.podval.tools:org.podval.tools.run:$podvalRunVersion"
+
+  // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
+  // and since I am not at the point of using anything other than Caffeine,
+  // I'll use it directly.
+  implementation "com.github.ben-manes.caffeine:caffeine:$caffeineVersion"
 }
 
 // TODO IntelliJ Idea does not make JIB builder available for

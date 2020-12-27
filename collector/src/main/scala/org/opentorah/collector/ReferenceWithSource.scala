@@ -36,10 +36,10 @@ object ReferenceWithSource extends Element.Union[ReferenceWithSource] with ToXml
     )
 
     override def antiparser: Antiparser[FromEntity] = Antiparser.concat(
-      pathAttribute.toXml.compose(unsplitPath),
-      EntityReference.toXml.compose(_.reference),
-      entityIdAttribute.toXml.compose(_.entityId),
-      entityNameAttribute.toXml.compose(_.entityName)
+      pathAttribute.toXml(unsplitPath),
+      EntityReference.toXml(_.reference),
+      entityIdAttribute.toXml(_.entityId),
+      entityNameAttribute.toXml(_.entityName)
     )
   }
 
@@ -76,11 +76,11 @@ object ReferenceWithSource extends Element.Union[ReferenceWithSource] with ToXml
       documentName
     )
     override def antiparser: Antiparser[FromDocument] = Antiparser.concat(
-      pathAttribute.toXml.compose(unsplitPath),
-      EntityReference.toXml.compose(_.reference),
-      collectionFileNameAttribute.toXml.compose(_.collectionFileName),
-      collectionNameAttribute.toXml.compose(_.collectionName),
-      documentNameAttribute.toXml.compose(_.documentName)
+      pathAttribute.toXml(unsplitPath),
+      EntityReference.toXml(_.reference),
+      collectionFileNameAttribute.toXml(_.collectionFileName),
+      collectionNameAttribute.toXml(_.collectionName),
+      documentNameAttribute.toXml(_.documentName)
     )
   }
 
@@ -99,8 +99,8 @@ object ReferenceWithSource extends Element.Union[ReferenceWithSource] with ToXml
     )
 
     override def antiparser: Antiparser[FromElement] = Antiparser.concat(
-      pathAttribute.toXml.compose(unsplitPath),
-      EntityReference.toXml.compose(_.reference)
+      pathAttribute.toXml(unsplitPath),
+      EntityReference.toXml(_.reference)
     )
   }
 

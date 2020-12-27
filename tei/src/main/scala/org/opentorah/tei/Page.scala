@@ -1,5 +1,6 @@
 package org.opentorah.tei
 
+// TODO move into collector
 sealed abstract class Page(val pb: Pb) {
   def base: String
   def displayName: String
@@ -32,7 +33,7 @@ object Page {
       if (numberOfDigits < numberOfDigitsInName) // LVIA2 has 4-digit page numbers!
         throw new IllegalArgumentException()
       val s: String = base.drop(numberOfDigits)
-      if (!s.isEmpty && (s != "a"))
+      if (s.nonEmpty && (s != "a"))
         throw new IllegalArgumentException(s"Illegal page name: $s [$n]")
 
       new Manuscript(base, back, pb)
@@ -50,7 +51,7 @@ object Page {
   object Book extends Type {
     override def apply(pb: Pb): Page = {
       val n = pb.n
-      if (!n.dropWhile(_.isDigit).isEmpty)
+      if (n.dropWhile(_.isDigit).nonEmpty)
         throw new IllegalArgumentException()
       new Book(pb)
     }

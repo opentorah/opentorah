@@ -37,10 +37,10 @@ object EntityReference extends EntityRelated[EntityReference](
   )
 
   override protected def antiparser(entityType: EntityType): Antiparser[EntityReference] = Tei.concat(
-    refAttribute.toXmlOption.compose(_.ref),
-    Xml.idAttribute.toXmlOption.compose(_.id),
-    roleAttribute.toXmlOption.compose(_.role),
-    Antiparser.xml.compose(_.name)
+    refAttribute.toXmlOption(_.ref),
+    Xml.idAttribute.toXmlOption(_.id),
+    roleAttribute.toXmlOption(_.role),
+    Antiparser.xml(_.name)
   )
 
   final def from(xml: Seq[Xml.Node]): Seq[EntityReference] =

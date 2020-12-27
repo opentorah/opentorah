@@ -81,7 +81,7 @@ object MishnehTorah {
       names <- Names.withoutDefaultNameParser
     } yield new NamedChapter(names)
 
-    override def antiparser: Antiparser[NamedChapter] = Names.antiparser.compose(_.names)
+    override def antiparser: Antiparser[NamedChapter] = Names.antiparser(_.names)
   }
 
   object Book extends Element[Book]("book") {

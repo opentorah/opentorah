@@ -30,9 +30,9 @@ object EntityName extends EntityRelated[EntityName](
   )
 
   override protected def antiparser(entityType: EntityType): Antiparser[EntityName] = Tei.concat(
-    Xml.idAttribute.toXmlOption.compose(_.id),
-    refAttribute.toXmlOption.compose(_.ref),
-    Antiparser.xml.compose(value => Seq(Xml.mkText(value.name)))
+    Xml.idAttribute.toXmlOption(_.id),
+    refAttribute.toXmlOption(_.ref),
+    Antiparser.xml(value => Seq(Xml.mkText(value.name)))
   )
 
   // TODO just the entity.entityName, like in the NamesObject?

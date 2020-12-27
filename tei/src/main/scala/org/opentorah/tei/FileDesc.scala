@@ -36,13 +36,13 @@ object FileDesc extends Element[FileDesc]("fileDesc") {
   )
 
   override val antiparser: Antiparser[FileDesc] = Tei.concat(
-    TitleStmt.toXml.compose(_.titleStmt),
-    EditionStmt.parsable.toXmlOption.compose(_.editionStmt),
-    Extent.parsable.toXmlOption.compose(_.extent),
-    PublicationStmt.toXmlOption.compose(_.publicationStmt),
-    SeriesStmt.parsable.toXmlOption.compose(_.seriesStmt),
-    NotesStmt.parsable.toXmlOption.compose(_.notesStmt),
-    SourceDesc.parsable.toXmlOption.compose(_.sourceDesc)
+    TitleStmt.toXml(_.titleStmt),
+    EditionStmt.parsable.toXmlOption(_.editionStmt),
+    Extent.parsable.toXmlOption(_.extent),
+    PublicationStmt.toXmlOption(_.publicationStmt),
+    SeriesStmt.parsable.toXmlOption(_.seriesStmt),
+    NotesStmt.parsable.toXmlOption(_.notesStmt),
+    SourceDesc.parsable.toXmlOption(_.sourceDesc)
   )
 
   def apply(): FileDesc = new FileDesc(

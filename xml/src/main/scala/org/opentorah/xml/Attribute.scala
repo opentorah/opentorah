@@ -44,13 +44,19 @@ abstract class Attribute[T](
 
   final def optionalOrDefault: Parser[T] = optional.map(_.getOrElse(default))
 
+  // TODO eliminate 3 occurrences where this is used?
   final def toXml: Antiparser[T] = Antiparser(
     attributes = value => Seq(withValue(value))
   )
 
-  final def toXmlOption: Antiparser[Option[T]] = Antiparser(
+  final def toXml[B](f: B => T): Antiparser[B] = toXml.compose(f)
+
+  // TODO eliminate
+  private final def toXmlOption: Antiparser[Option[T]] = Antiparser(
     attributes = value => Seq(withOptionalValue(value))
   )
+
+  final def toXmlOption[B](f: B => Option[T]): Antiparser[B] = toXmlOption.compose(f)
 
   // Scala XML
   final def get(element: Xml.Element): Option[T] = Xml.getAttribute(this, element)

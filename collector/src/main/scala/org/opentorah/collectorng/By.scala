@@ -1,12 +1,19 @@
 package org.opentorah.collectorng
 
-import org.opentorah.xml.FromUrl
+import org.opentorah.metadata.Names
+import org.opentorah.xml.{Antiparser, Attribute, Parser}
 
-trait By extends FromUrl.With {
+trait By extends Store {
+
   def selector: Selector
 
-  def resolve(url: Seq[String]): Option[SiteFile] =
-    if (selector.resolves(url)) resolveStore(url.tail) else None
+  final override def names: Names = selector.names
+}
 
-  protected def resolveStore(url: Seq[String]): Option[SiteFile]
+object By {
+  private val selectorAttribute: Attribute[String] = Attribute("selector")
+
+  val selector: Parser[Selector] = selectorAttribute.required.map(Selector.byName)
+
+  def selectorToXml[T <: By]: Antiparser[T] = selectorAttribute.toXml(_.selector.name)
 }

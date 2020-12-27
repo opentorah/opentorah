@@ -46,14 +46,14 @@ object ProfileDesc extends Element[ProfileDesc]("profileDesc") {
   )
 
   override val antiparser: Antiparser[ProfileDesc] = Tei.concat(
-    Abstract.parsable.toXmlOption.compose(_.documentAbstract),
-    Creation.toXmlOption.compose(_.creation),
-    LangUsage.toXmlOption.compose(_.langUsage),
-    TextClass.parsable.toXmlOption.compose(_.textClass),
-    CorrespDesc.parsable.toXmlOption.compose(_.correspDesc),
-    CalendarDesc.parsable.toXmlOption.compose(_.calendarDesc),
-    HandNotes.toXmlOption.compose(_.handNotes),
-    ListTranspose.parsable.toXmlOption.compose(_.listTranspose)
+    Abstract.parsable.toXmlOption(_.documentAbstract),
+    Creation.toXmlOption(_.creation),
+    LangUsage.toXmlOption(_.langUsage),
+    TextClass.parsable.toXmlOption(_.textClass),
+    CorrespDesc.parsable.toXmlOption(_.correspDesc),
+    CalendarDesc.parsable.toXmlOption(_.calendarDesc),
+    HandNotes.toXmlOption(_.handNotes),
+    ListTranspose.parsable.toXmlOption(_.listTranspose)
   )
 
   def apply(): ProfileDesc = new ProfileDesc(

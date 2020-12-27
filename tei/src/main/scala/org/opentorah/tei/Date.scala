@@ -26,8 +26,8 @@ object Date extends Element[Date]("date") {
   )
 
   override val antiparser: Antiparser[Date] = Tei.concat(
-    whenAttribute.toXml.compose(_.when),
-    calendarAttribute.toXmlOption.compose(_.calendar),
-    Antiparser.xml.compose(_.xml)
+    whenAttribute.toXml(_.when),
+    calendarAttribute.toXmlOption(_.calendar),
+    Antiparser.xml(_.xml)
   )
 }

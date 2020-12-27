@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Selector>
-  <selector>
+  <selector title="Имена">
     <name n="names" lang="en"/>
     <name n="имена" lang="ru"/>
   </selector>
@@ -9,10 +9,14 @@
     <name n="имя" lang="ru"/>
   </selector>
   <selector>
+    <name n="note" lang="en"/>
+    <name n="заметка" lang="ru"/>
+  </selector>
+  <selector>
     <name n="книга" lang="ru"/>
     <name n="book" lang="en"/>
   </selector>
-  <selector>
+  <selector title="Архивы">
     <name n="архив" lang="ru"/>
     <name n="archive" lang="en"/>
   </selector>
@@ -22,6 +26,7 @@
   </selector>
   <selector>
     <name n="разряд" lang="ru"/>
+    <name n="category" lang="en"/>
   </selector>
   <selector>
     <name n="отдел" lang="ru"/>
@@ -54,6 +59,13 @@
   <selector>
     <name n="document" lang="en"/>
     <name n="документ" lang="ru"/>
+  </selector>
+  <selector>
+    <name n="facsimile" lang="en"/>
+    <name n="факсимиле" lang="ru"/>
+  </selector>
+  <selector>
+    <name n="tei" lang="en"/>
   </selector>
   <selector>
     <name n="language" lang="en"/>
