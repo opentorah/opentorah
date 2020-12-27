@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metadata type="Selector">
+<Selector>
   <selector>
     <name n="names" lang="en"/>
     <name n="имена" lang="ru"/>
@@ -63,4 +63,4 @@
     <name n="page" lang="en"/>
     <name n="страница" lang="ru"/>
   </selector>
-</metadata>
+</Selector>

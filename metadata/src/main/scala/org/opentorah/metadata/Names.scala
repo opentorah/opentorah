@@ -1,6 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Antiparser, Attribute, Parser, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parser, Xml}
 import org.opentorah.util.Collections
 import zio.ZIO
 
@@ -88,4 +88,9 @@ object Names {
   // TODO remove (fold into the antiparser, of which there should be 2: with default name allowed and not...)
   def toXml(value: Names): Seq[Xml.Node] =
     Name.toXmlSeq.compose[Names](_.names).content(value)
+
+  object NamesMetadata extends Element[Names]("names") {
+    override def parser: Parser[Names] = Names.withoutDefaultNameParser
+    override def antiparser: Antiparser[Names] = Names.antiparser
+  }
 }

@@ -1,4 +1,5 @@
-<names type="Language">
+<?xml version="1.0" encoding="UTF-8"?>
+<Language>
     <names>
         <name lang="en" n="English"/>
         <name lang="en" n="en"/>
@@ -41,4 +42,4 @@
         <name lang="ru" n="немецкий"/>
         <name lang="he" n="גֶרמָנִיָת"/>
     </names>
-</names>
+</Language>

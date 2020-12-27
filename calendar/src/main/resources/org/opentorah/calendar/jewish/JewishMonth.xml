@@ -1,4 +1,5 @@
-<names type="JewishMonth">
+<?xml version="1.0" encoding="UTF-8"?>
+<JewishMonth>
     <names>
         <name lang="he" n="תִּשׁרִי"/>
         <name lang="en" transliterated="yes" n="Tishrei"/>
@@ -69,4 +70,4 @@
         <name lang="en" transliterated="yes" n="Adar II"/>
         <name lang="ru" transliterated="yes" n="Адар II"/>
     </names>
-</names>
+</JewishMonth>

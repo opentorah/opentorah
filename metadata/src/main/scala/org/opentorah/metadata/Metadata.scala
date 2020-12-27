@@ -1,66 +1,48 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Antiparser, Attribute, Element, From, FromXml, Parser, Result}
+import org.opentorah.xml.{Antiparser, Element, From, FromXml, Parser, Result}
 
 final class Metadata[M](
   elementName: String,
-  typeName: String,
   fromXml: FromXml[M]
 ) extends Element[Seq[M]](elementName) {
-  override def parser: Parser[Seq[M]] = for {
-    type_ <- Attribute("type").required
-    _ <- Parser.check(type_ == typeName, s"Wrong metadata type: $type_ instead of $typeName")
-    result <- fromXml.all
-  } yield result
-
+  override def parser: Parser[Seq[M]] = fromXml.all
   override def antiparser: Antiparser[Seq[M]] = ???
 }
 
-// TODO submerge in Names
-object NamesMetadata extends Element[Names]("names") {
-  override def parser: Parser[Names] = Names.withoutDefaultNameParser
-  override def antiparser: Antiparser[Names] = Names.antiparser
-}
-
 object Metadata {
+
+  def load[K <: WithName, M](
+    from: From,
+    fromXml: FromXml[M],
+    keys: Seq[K],
+    hasName: (M, String) => Boolean
+  ): Map[K, M] = Parser.parseDo(for {
+    metadatas <- load[M](from, fromXml)
+
+    result <- bind(
+      keys,
+      getName = (key: WithName) => key.name,
+      metadatas,
+      hasName
+    )
+  } yield result.toMap)
+
+  def loadResource[M](
+    obj: AnyRef,
+    fromXml: FromXml[M]
+  ): Seq[M] = Parser.parseDo(Metadata.load(
+    from = From.resource(obj),
+    fromXml
+  ))
 
   def load[M](
     from: From,
     fromXml: FromXml[M]
   ): Parser[Seq[M]] = new Metadata[M](
-    elementName = "metadata",
-    typeName = from.name,
+    elementName = from.name,
     fromXml = fromXml
   ).parse(from)
-
-  def loadNames[K <: WithName](
-    obj: AnyRef,
-    resourceName: String,
-    keys: Seq[K]
-  ): Parser[Map[K, Names]] = for {
-    metadatas <- new Metadata[Names](
-      elementName = "names",
-      typeName = resourceName,
-      fromXml = NamesMetadata
-    ).parse(From.resource(obj, resourceName))
-
-    result <- bind(
-      keys,
-      metadatas,
-      hasName = (metadata: Names, name: String) => metadata.hasName(name)
-    )
-  } yield result.toMap
-
-  def bind[K <: WithName, M](
-    keys: Seq[K],
-    metadatas: Seq[M],
-    hasName: (M, String) => Boolean
-  ): Parser[Seq[(K, M)]] = bind(
-    keys,
-    getName = (key: WithName) => key.name,
-    metadatas,
-    hasName
-  )
 
   private def bind[K, M](
     keys: Seq[K],

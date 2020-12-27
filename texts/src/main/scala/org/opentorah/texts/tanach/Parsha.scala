@@ -25,6 +25,8 @@ sealed trait Parsha extends Named {
   final def maftir: Torah.Maftir = metadata.maftir
 
   final def combines: Boolean = Parsha.combinable.contains(this)
+
+  final def haftarah: Haftarah.Customs = Haftarah.haftarah(this).map(_.from(this))
 }
 
 object Parsha extends NamedCompanion {

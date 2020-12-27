@@ -1,4 +1,5 @@
-<names type="GregorianDay">
+<?xml version="1.0" encoding="UTF-8"?>
+<GregorianDay>
     <names>
       <name lang="en" n="Sunday"/>
       <name lang="ru" n="воскресенье"/>
@@ -34,4 +35,4 @@
       <name lang="ru" n="суббота"/>
       <name lang="he" n="שבת"/>
     </names>
-</names>
+</GregorianDay>

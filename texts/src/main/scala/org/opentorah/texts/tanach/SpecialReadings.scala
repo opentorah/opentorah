@@ -3,7 +3,6 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.WithNames
 import org.opentorah.xml.{From, FromXml, Parser, Xml}
 import Torah.{Fragment, Maftir}
-import org.opentorah.texts.tanach
 
 /* All the special readings and their rules are here.
  Readings are annotated with their reason.
@@ -338,7 +337,7 @@ object SpecialReadings {
 
     override val maftir: Maftir = Succos.korbanot.head
 
-    override protected def haftarah: tanach.Haftarah.Customs = parseHaftarah(
+    override protected def haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Zechariah" toChapter="14" toVerse="21">
         <custom n="Common" fromChapter="14" fromVerse="1"/>
         <custom n="Teiman" fromChapter="13" fromVerse="9"/>
@@ -352,7 +351,7 @@ object SpecialReadings {
 
     override protected def maftir: Maftir = Succos1.maftir
 
-    override protected def haftarah: tanach.Haftarah.Customs = parseHaftarah(
+    override protected def haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="I Kings">
         <custom n="Common" fromChapter="8" fromVerse="2" toVerse="21"/>
         <custom n="Italki" fromChapter="7" fromVerse="51" toChapter="8" toVerse="15"/>
@@ -433,7 +432,7 @@ object SpecialReadings {
 
     private def maftir: Maftir = SheminiAtzeres.maftir
 
-    private def haftarah: Haftarah.Customs = Haftarah.forParsha(Parsha.VezosHaberachah)
+    private def haftarah: Haftarah.Customs = Parsha.VezosHaberachah.haftarah
   }
 
 
@@ -923,7 +922,7 @@ object SpecialReadings {
       val customs: Custom.Of[Reading.ReadingCustom] = reading.liftR {
         case (custom: Custom, readingCustom: Reading.ReadingCustom) =>
           if (custom != Custom.Chabad) readingCustom
-          else readingCustom.addHaftarah(Haftarah.forParsha(Parsha.Re_eh).doFind(Custom.Chabad))
+          else readingCustom.addHaftarah(Parsha.Re_eh.haftarah.doFind(Custom.Chabad))
       }
       new Reading(customs.customs)
     }

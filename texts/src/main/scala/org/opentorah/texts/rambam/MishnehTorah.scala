@@ -1,7 +1,7 @@
 package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Antiparser, Attribute, Element, From, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parser}
 
 object MishnehTorah {
 
@@ -104,13 +104,8 @@ object MishnehTorah {
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
   lazy val books: Seq[Book] = {
-    val result: Seq[Book] = Parser.parseDo(Metadata.load(
-      from = From.resource(this),
-      fromXml = Book
-    ))
-
+    val result: Seq[Book] = Metadata.loadResource(this, Book)
     require(result.map(_.number) == (0 to 14))
-
     result
   }
 }
