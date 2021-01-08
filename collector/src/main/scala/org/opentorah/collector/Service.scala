@@ -27,12 +27,22 @@ object Service extends App {
   // or do I even need it for logging?
   private val projectId: String = "alter-rebbe-2"
 
+  val bucketName: String = "store.alter-rebbe.org"
+
   val dsl: Http4sDsl[ServiceTask] = Http4sDsl[ServiceTask]
   import dsl._
 
+  LoggerFactory.getILoggerFactory.asInstanceOf[ch.qos.logback.classic.LoggerContext]
+    .getLogger(Logger.ROOT_LOGGER_NAME).setLevel(ch.qos.logback.classic.Level.INFO)
+
   override def run(args: List[String]): URIO[ServiceEnvironment, zio.ExitCode] = {
-    val siteUri: String = args(0)
-    val port: Int = args(1).toInt
+    val siteUri: String = if (args.nonEmpty) {
+      val result = args.head
+      info(s"siteUri argument supplied: $result")
+      result
+    } else getParameter("STORE", s"http://$bucketName/")
+
+    val port: Int = getParameter("PORT", "4000").toInt
 
     val executionContext: ExecutionContextExecutor = ExecutionContext.global
 
@@ -53,6 +63,14 @@ object Service extends App {
     }
       .mapError(err => zio.console.putStrLn(s"Execution failed with: $err"))
       .exitCode
+  }
+
+  private def getParameter(name: String, defaultValue: String): String =Option(System.getenv(name)).fold {
+    info(s"No value for '$name' in the environment; using default: '$defaultValue'")
+    defaultValue
+  }{ value =>
+    info(s"Value    for '$name' in the environment: $value")
+    value
   }
 
   val blocker: Blocker = Blocker.liftExecutorService(Executors.newFixedThreadPool(2))
@@ -124,6 +142,7 @@ object Service extends App {
   }
 
   private def info   (request: Request[ServiceTask], message: String): Unit = log(Some(request), message, "INFO"   )
+  private def info   (                               message: String): Unit = log(None         , message, "INFO"   )
 //  private def notice (request: Request[ServiceTask], message: String): Unit = log(Some(request), message, "NOTICE" )
 //  private def notice (                               message: String): Unit = log(None         , message, "NOTICE" )
   private def warning(request: Request[ServiceTask], message: String): Unit = log(Some(request), message, "WARNING")
