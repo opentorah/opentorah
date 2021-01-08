@@ -23,8 +23,6 @@ dependencies {
 //  implementation "com.vladsch.flexmark:flexmark-util-data:$flexmarkVersion"
   implementation "ch.qos.logback:logback-classic:$logbackVersion"
 
-  implementation "com.google.cloud:google-cloud-storage:$googleCloudStorageVersion"
-
   testImplementation "org.podval.tools:org.podval.tools.run:$podvalRunVersion"
 
   // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
@@ -36,6 +34,6 @@ dependencies {
 // TODO IntelliJ Idea does not make JIB builder available for
 //   Cloud Code | Cloud Run | Run Locally Run configuration...
 
-jib.container.mainClass = 'org.opentorah.collector.Main'
+jib.container.mainClass = 'org.opentorah.collector.Service'
 cloudRun.region = 'us-east4'
 deploy.dependsOn(cloudRunDeploy)

@@ -31,6 +31,7 @@ ext.configureScala = {
 
   tasks.withType(ScalaCompile) {
     scalaCompileOptions.with {
+      targetCompatibility = '1.8'
       additionalParameters = ['-feature']
     }
   }
