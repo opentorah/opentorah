@@ -4,6 +4,11 @@ import zio.{IO, Runtime, ZIO}
 
 object Parser {
 
+  private[xml] def required[T](parser: Parser[Option[T]], what: AnyRef): Parser[T] = for {
+    result <- parser
+    _ <- check(result.isDefined, s"Required $what is missing")
+  } yield result.get
+
   def collectAll[A](parsers: Seq[Parser[A]]): Parser[Seq[A]] = for {
     runs <- ZIO.foreach(parsers)(_.either)
     errors: Seq[Error] = runs.flatMap(_.left.toOption)

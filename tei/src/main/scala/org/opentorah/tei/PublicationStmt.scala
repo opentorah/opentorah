@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Parser}
+import org.opentorah.xml.{Antiparser, Element, Parsable, Parser}
 
 final case class PublicationStmt(
   publisher: Option[Publisher.Value],
@@ -9,20 +9,22 @@ final case class PublicationStmt(
 
 object PublicationStmt extends Element[PublicationStmt]("publicationStmt") {
 
-  override val parser: Parser[PublicationStmt] = for {
-    publisher <- Publisher.parsable.optional
-    availability <- Availability.optional
-  } yield new PublicationStmt(
-    publisher,
-    availability
-  )
+  override def contentParsable: Parsable[PublicationStmt] = new Parsable[PublicationStmt] {
+    override val parser: Parser[PublicationStmt] = for {
+      publisher <- Publisher.element.optional()
+      availability <- Availability.optional()
+    } yield new PublicationStmt(
+      publisher,
+      availability
+    )
 
-  override val antiparser: Antiparser[PublicationStmt] = Tei.concat(
-    Publisher.parsable.toXmlOption(_.publisher),
-    Availability.toXmlOption(_.availability)
-  )
+    override val antiparser: Antiparser[PublicationStmt] = Tei.concat(
+      Publisher.element.optional(_.publisher),
+      Availability.optional(_.availability)
+    )
+  }
 
-  def apply(): PublicationStmt = new PublicationStmt(
+  def empty: PublicationStmt = new PublicationStmt(
     publisher = None,
     availability = None
   )

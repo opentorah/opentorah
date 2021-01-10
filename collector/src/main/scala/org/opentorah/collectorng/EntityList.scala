@@ -2,7 +2,7 @@ package org.opentorah.collectorng
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{EntityRelated, EntityType, Title}
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, FromUrl, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, FromUrl, Parsable, Parser}
 
 final class EntityList(
   override val fromUrl: FromUrl,
@@ -20,24 +20,26 @@ object EntityList extends EntityRelated[EntityList](
 ) {
   override protected def contentType: ContentType = ContentType.Elements
 
-  private val roleAttribute: Attribute[String] = Attribute("role")
+  private val roleAttribute: Attribute.Optional[String] = Attribute("role").optional
 
-  override def parser(entityType: EntityType): Parser[EntityList] = for {
-    fromUrl <- currentFromUrl
-    names <- Names.withDefaultNameParser
-    role <- roleAttribute.optional
-    title <- Title.parsable.required
-  } yield new EntityList(
-    fromUrl,
-    names,
-    entityType,
-    role,
-    title
-  )
+  override protected def parsable(entityType: EntityType): Parsable[EntityList] = new Parsable[EntityList] {
+    override def parser: Parser[EntityList] = for {
+      fromUrl <- Element.currentFromUrl
+      names <- Names.withDefaultNameParsable()
+      role <- roleAttribute()
+      title <- Title.element.required()
+    } yield new EntityList(
+      fromUrl,
+      names,
+      entityType,
+      role,
+      title
+    )
 
-  override def antiparser(entityType: EntityType): Antiparser[EntityList] = Antiparser.concat(
-    Names.antiparser(_.names),
-    roleAttribute.toXmlOption(_.role),
-    Title.parsable.toXml(_.title),
-  )
+    override def antiparser: Antiparser[EntityList] = Antiparser.concat(
+      Names.withDefaultNameParsable(_.names),
+      roleAttribute(_.role),
+      Title.element.required(_.title),
+    )
+  }
 }

@@ -1,10 +1,9 @@
 package org.opentorah.collectorng
 
-import org.opentorah.collectorng.Site.viewer
 import org.opentorah.metadata.{Language, Names}
 import org.opentorah.tei.{Page, SourceDesc, Tei, TeiRawXml, Title}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Attribute, Element, FromUrl, LinkResolver, Parser, PrettyPrinter, Xhtml, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, Element, FromUrl, LinkResolver, Parsable, Parser, PrettyPrinter, Xhtml, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import java.io.File
 import java.net.URL
@@ -58,10 +57,11 @@ final class Site(
 
   private lazy val navigationLinks: Seq[Html.NavigationLink] = pages.map { url =>
     val path: Store.Path = resolve(url).get
+    val htmlContent: HtmlContent = path.last.asInstanceOf[HtmlContent]
     new Html.NavigationLink(
       Files.mkUrl(staticUrl(path)), // TODO when non-static - url
-      Site.title(path.last).getOrElse("NO TITLE"),
-      Site.viewer(path.last)
+      htmlContent.htmlTitle.getOrElse("NO TITLE"),
+      htmlContent.viewer
     )
   }
 
@@ -70,84 +70,42 @@ final class Site(
   //  - hierarchy root
   //  - hierarchy - at "by"
 
+  // TODO return content type also.
   def content(path: Store.Path): String = path.last match {
-    // TODO except for the TeiFacet, everything is htmlContent;
-    // return content type also.
-    case note: Note => htmlContent(path.last, byNote.getFile(note.name).html)
-    case collectionAlias: CollectionAlias => collectionIndexContent(collectionAlias.collection)
-    case collection     : Collection      => collectionIndexContent(collection)
+    case teiFacet: Document.TeiFacet =>
+      Site.prettyPrinter.render(teiFacet.content(this))
 
-    case documentFacet: Document.Facet => documentFacet.facet match {
-      case facet: Collection.TeiFacet =>
-        Site.prettyPrinter.render(Tei.toXmlElement(facet.collection.getFile(documentFacet.document.name)))
-      case facet: Collection.FacsFacet =>
-        Site.prettyPrinter.render(facsContent(facet.collection, documentFacet.document))
-      case facet: Collection.HtmlFacet => ???
-        Site.prettyPrinter.render(htmlContent(facet.collection, documentFacet.document))
-    }
-
-    case hierarchy: Hierarchy => ???
-    case entity: Entity => ???
-    case by: By => ???
-    case store: Store => ???
+    case htmlContent: HtmlContent =>
+      // TODO add - and use - resolver parameter!
+      Site.prettyPrinter.render(doctype = Xhtml, element = Html.toHtml(
+        lang = htmlContent.lang.getOrElse("ru"),
+        viewer = htmlContent.viewer,
+        title = htmlContent.htmlTitle,
+        style = if (htmlContent.isWide) "wide" else "main",
+        favicon,
+        googleAnalyticsId,
+        content = htmlContent.content(this),
+        header = Html.header(
+          this.title.xml,
+          this.navigationLinks ++ htmlContent.navigationLinks
+        ),
+        footer = Html.footer(
+          author = siteUrl,
+          email,
+          githubUsername,
+          twitterUsername,
+          footer.xml
+        )
+      ))
   }
 
-  private def facsContent(collection: Collection, document: Document): Xml.Element = {
-    <div class={Html.Viewer.Facsimile.name}>
-      {headerSummary(collection)}
-      <div class="facsimileScroller">{
-        for (page: Page <- document.pages(collection.pageType).filterNot(_.pb.isMissing)) yield {
-          val n: String = page.pb.n
-          <a target={Html.Viewer.Document.name} href={Files.mkUrl(pageUrl(collection, document, page))}>
-            <figure>
-              <img
-                id={Page.pageId(n)}
-                alt={s"facsimile for page $n"}
-                src={page.pb.facs.getOrElse(facsimilesUrl + collectionUrl(collection) + "/" + n + ".jpg")}
-              />
-              <figcaption>{n}</figcaption>
-            </figure>
-          </a>
-        }}</div>
-    </div>
-  }
+  def headerSummary(collection: Collection): Seq[Xml.Node] = ??? // TODO
 
-  private def htmlContent(collection: Collection, document: Document): Xml.Element = ???
+  // TODO move into Collection
+  def collectionUrl(collection: Collection): Seq[String] = ???
 
-  private def headerSummary(collection: Collection): Seq[Xml.Node] = ??? // TODO
-
-  private def collectionIndexContent(collection: Collection): String = {
-    val path: Store.Path = collection2path(collection)
-    collection.indexContent(path)
-  }
-
-  private def htmlContent(store: Store, content: Xml.Element): String = {
-    val html: Xml.Element = Html.toHtml(
-      Site.lang  (store),
-      Site.viewer(store),
-      Site.title (store),
-      Site.style (store),
-      favicon,
-      googleAnalyticsId,
-      content,
-      Html.header(
-        this.title.xml,
-        this.navigationLinks ++ Site.navigationLinks(store)
-      ),
-      Html.footer(
-        author = siteUrl,
-        email,
-        githubUsername,
-        twitterUsername,
-        footer.xml
-      )
-    )
-    // TODO in the old generation, links were (?) resolved and targets added - probably more than once ;)
-    Site.prettyPrinter.render(doctype = Xhtml, element = html)
-  }
-
-  private def collectionUrl(collection: Collection): Seq[String] = ???
-  private def pageUrl(collection: Collection, document: Document, page: Page): Seq[String] = ???
+  // TODO move into Collection
+  def pageUrl(collection: Collection, document: Document, page: Page): Seq[String] = ???
 
   def writeLists(): Unit = {
     // Write lists
@@ -166,12 +124,11 @@ final class Site(
     case _: ByEntityList => Seq(byEntity.directory + ".html")
     case _: ByHierarchy if path.length == 1 => Seq("collections.html")
 
-    case documentFacet: Document.Facet =>
-      val facetDirectory: String = documentFacet.facet match {
-        case _: Collection.HtmlFacet => "documents"
-        case _: Collection.FacsFacet => "facs"
-      }
-      Seq(staticCollectionsRoot, documentFacet.facet.collection.alias.get, facetDirectory, documentFacet.withExtension)
+    case htmlFacet: Document.HtmlFacet =>
+      Seq(staticCollectionsRoot, htmlFacet.collection.alias.get, "documents", htmlFacet.withExtension)
+
+    case facsFacet: Document.FacsFacet =>
+      Seq(staticCollectionsRoot, facsFacet.collection.alias.get, "facs", facsFacet.withExtension)
 
     case _ => path.map (_.names.doFind (Language.English.toSpec).name)
   }
@@ -216,10 +173,16 @@ final class Site(
       Site.this.resolve(url).fold[Option[LinkResolver.Resolved]] {
         logger.warn(s"did not resolve: $url")
         None
-      } { path: Store.Path => Some(LinkResolver.Resolved(
-        url = staticUrl(path),
-        role = Some(viewer(path.last).name)
-      ))}
+      } { path: Store.Path =>
+        val viewer: Html.Viewer = path.last match {
+          case htmlContent: HtmlContent => htmlContent.viewer
+          case _ => Html.Viewer.default
+        }
+        Some(LinkResolver.Resolved(
+          url = staticUrl(path),
+          role = Some(viewer.name)
+        ))
+      }
 
     override def findByRef(ref: String): Option[LinkResolver.Resolved] =
       byEntity.findByName(ref).map { entity: Entity => Some(LinkResolver.Resolved(
@@ -247,41 +210,6 @@ object Site extends Element[Site]("site") {
     Parser.parseDo(Site.parse(Files.fileInDirectory(directory, "storeng.xml")))
   }
 
-  // TODO Option[Html.Viewer]!
-  private def viewer(store: Store): Html.Viewer = store match {
-    case _: Collection           => Html.Viewer.Collection
-    case _: Collection.HtmlFacet => Html.Viewer.Document
-    case _: Collection.FacsFacet => Html.Viewer.Facsimile
-    case _: ByEntityList         => Html.Viewer.Names
-    case _: ByEntity             => Html.Viewer.Names
-    case _: Entity               => Html.Viewer.Names
-    case _                       => Html.Viewer.default
-  }
-
-  private def style(store: Store): String = store match {
-    case _: Collection => "wide"
-    case _             => "main"
-  }
-
-  private def lang(store: Store): String = store match {
-    case document: Document.Facet if document.facet.isInstanceOf[Collection.HtmlFacet] => document.document.lang
-    case _ => "ru"
-  }
-
-  private def navigationLinks(store: Store): Seq[Html.NavigationLink] = store match {
-    case _ => Seq.empty
-  }
-
-  private def title(store: Store): Option[String] = store match {
-    case hierarchy: Hierarchy => hierarchy.title.map(_.xml2string)
-    case collection: Collection => collection.title.map(_.xml2string)
-    // TODO document
-    case note: Note => note.title
-    case by: By => by.selector.title
-    //    case store => Some(store.names.doFind(Language.Russian.toSpec).name)
-    case _ => None
-  }
-
   private val prettyPrinter: PrettyPrinter = Tei.prettyPrinter.copy(
     alwaysStackElements = Tei.prettyPrinter.alwaysStackElements ++ Set("nav", "header", "main", "div"),
     // Note: empty elements are mis-processed by the browser (next element gets inserted inside the empty one!),
@@ -292,84 +220,85 @@ object Site extends Element[Site]("site") {
     keepEmptyElements = Set("br", "meta", "link", "img", "data")
   )
 
-  private val siteUrlAttribute: Attribute[String] = Attribute("siteUrl")
-  private val facsimilesUrlAttribute: Attribute[String] = Attribute("facsimilesUrl")
-  private val faviconAttribute: Attribute[String] = Attribute("favicon")
-  private val licenseNameAttribute: Attribute[String] = Attribute("licenseName")
-  private val licenseUrlAttribute: Attribute[String] = Attribute("licenseUrl")
-  private val googleAnalyticsIdAttribute: Attribute[String] = Attribute("googleAnalyticsId")
-  private val emailAttribute: Attribute[String] = Attribute("email")
-  private val githubUsernameAttribute: Attribute[String] = Attribute("githubUsername")
-  private val twitterUsernameAttribute: Attribute[String] = Attribute("twitterUsername")
+  private val siteUrlAttribute: Attribute.Required[String] = Attribute("siteUrl").required
+  private val facsimilesUrlAttribute: Attribute.Required[String] = Attribute("facsimilesUrl").required
+  private val faviconAttribute: Attribute.Required[String] = Attribute("favicon").required
+  private val licenseNameAttribute: Attribute.Required[String] = Attribute("licenseName").required
+  private val licenseUrlAttribute: Attribute.Required[String] = Attribute("licenseUrl").required
+  private val googleAnalyticsIdAttribute: Attribute.Optional[String] = Attribute("googleAnalyticsId").optional
+  private val emailAttribute: Attribute.Required[String] = Attribute("email").required
+  private val githubUsernameAttribute: Attribute.Optional[String] = Attribute("githubUsername").optional
+  private val twitterUsernameAttribute: Attribute.Optional[String] = Attribute("twitterUsername").optional
 
   object Page extends Element[String]("page") {
-    private val urlAttribute: Attribute[String] = Attribute("url")
-    override def parser: Parser[String] = urlAttribute.required
-    override def antiparser: Antiparser[String] = urlAttribute.toXml
+    private val urlAttribute: Attribute.Required[String] = Attribute("url").required
+    override def contentParsable: Parsable[String] = urlAttribute
   }
 
   object Footer extends TeiRawXml("footer")
 
-  override def parser: Parser[Site] = for {
-    fromUrl <- currentFromUrl
-    names <- Names.withDefaultNameParser
-    title <- Title.parsable.required
-    siteUrl <- siteUrlAttribute.required
-    facsimilesUrl <- facsimilesUrlAttribute.required
-    favicon <- faviconAttribute.required
-    sourceDesc <- SourceDesc.parsable.required
-    navigationLinks <- Page.all
-    licenseName <- licenseNameAttribute.required
-    licenseUrl <- licenseUrlAttribute.required
-    googleAnalyticsId <- googleAnalyticsIdAttribute.optional
-    email <- emailAttribute.required
-    githubUsername <- githubUsernameAttribute.optional
-    twitterUsername <- twitterUsernameAttribute.optional
-    footer <- Footer.parsable.required
-    byEntity <- ByEntity.required
-    byEntityList <- ByEntityList.required
-    byNote <- ByNote.required
-    by <- ByHierarchy.followRedirects.required
-  } yield new Site(
-    fromUrl,
-    names,
-    title,
-    siteUrl,
-    facsimilesUrl,
-    favicon,
-    sourceDesc,
-    navigationLinks,
-    licenseName,
-    licenseUrl,
-    googleAnalyticsId,
-    email,
-    githubUsername,
-    twitterUsername,
-    footer,
-    byEntity,
-    byEntityList,
-    byNote,
-    by
-  )
+  override def contentParsable: Parsable[Site] = new Parsable[Site] {
+    override def parser: Parser[Site] = for {
+      fromUrl <- Element.currentFromUrl
+      names <- Names.withDefaultNameParsable()
+      title <- Title.element.required()
+      siteUrl <- siteUrlAttribute()
+      facsimilesUrl <- facsimilesUrlAttribute()
+      favicon <- faviconAttribute()
+      sourceDesc <- SourceDesc.element.required()
+      navigationLinks <- Page.seq()
+      licenseName <- licenseNameAttribute()
+      licenseUrl <- licenseUrlAttribute()
+      googleAnalyticsId <- googleAnalyticsIdAttribute()
+      email <- emailAttribute()
+      githubUsername <- githubUsernameAttribute()
+      twitterUsername <- twitterUsernameAttribute()
+      footer <- Footer.element.required()
+      byEntity <- ByEntity.required()
+      byEntityList <- ByEntityList.required()
+      byNote <- ByNote.required()
+      by <- ByHierarchy.followRedirects.required()
+    } yield new Site(
+      fromUrl,
+      names,
+      title,
+      siteUrl,
+      facsimilesUrl,
+      favicon,
+      sourceDesc,
+      navigationLinks,
+      licenseName,
+      licenseUrl,
+      googleAnalyticsId,
+      email,
+      githubUsername,
+      twitterUsername,
+      footer,
+      byEntity,
+      byEntityList,
+      byNote,
+      by
+    )
 
-  override def antiparser: Antiparser[Site] = Antiparser.concat[Site](
-    Names.antiparser(_.names),
-    Title.parsable.toXml(_.title),
-    siteUrlAttribute.toXml(_.siteUrl),
-    facsimilesUrlAttribute.toXml(_.facsimilesUrl),
-    faviconAttribute.toXml(_.favicon),
-    SourceDesc.parsable.toXml(_.sourceDesc),
-    Page.toXmlSeq(_.pages),
-    licenseNameAttribute.toXml(_.licenseName),
-    licenseUrlAttribute.toXml(_.licenseUrl),
-    googleAnalyticsIdAttribute.toXmlOption(_.googleAnalyticsId),
-    emailAttribute.toXml(_.email),
-    githubUsernameAttribute.toXmlOption(_.githubUsername),
-    twitterUsernameAttribute.toXmlOption(_.twitterUsername),
-    Footer.parsable.toXml(_.footer),
-    ByEntity.toXml(_.byEntity),
-    ByEntityList.toXml(_.byEntityList),
-    ByNote.toXml(_.byNote),
-    ByHierarchy.toXml(_.by)
-  )
+    override def antiparser: Antiparser[Site] = Antiparser.concat[Site](
+      Names.withDefaultNameParsable(_.names),
+      Title.element.required(_.title),
+      siteUrlAttribute(_.siteUrl),
+      facsimilesUrlAttribute(_.facsimilesUrl),
+      faviconAttribute(_.favicon),
+      SourceDesc.element.required(_.sourceDesc),
+      Page.seq(_.pages),
+      licenseNameAttribute(_.licenseName),
+      licenseUrlAttribute(_.licenseUrl),
+      googleAnalyticsIdAttribute(_.googleAnalyticsId),
+      emailAttribute(_.email),
+      githubUsernameAttribute(_.githubUsername),
+      twitterUsernameAttribute(_.twitterUsername),
+      Footer.element.required(_.footer),
+      ByEntity.required(_.byEntity),
+      ByEntityList.required(_.byEntityList),
+      ByNote.required(_.byNote),
+      ByHierarchy.required(_.by)
+    )
+  }
 }

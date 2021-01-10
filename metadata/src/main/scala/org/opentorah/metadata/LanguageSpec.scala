@@ -1,6 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Antiparser, Attribute, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, Parsable, Parser}
 
 final case class LanguageSpec(
   language: Option[Language],
@@ -16,7 +16,7 @@ final case class LanguageSpec(
   def dropLanguage: LanguageSpec = copy(language = None)
 }
 
-object LanguageSpec {
+object LanguageSpec extends Parsable[LanguageSpec] {
   val empty: LanguageSpec = LanguageSpec(None, None, None)
 
   def apply(language: Language): LanguageSpec =
@@ -28,23 +28,23 @@ object LanguageSpec {
   def apply(language: Language, isTransliterated: Boolean, flavour: String): LanguageSpec =
     new LanguageSpec(language = Some(language), isTransliterated = Some(isTransliterated), flavour = Some(flavour))
 
-  private val langAttribute: Attribute[String] = Attribute("lang")
-  private val transliteratedAttribute: Attribute.BooleanAttribute = new Attribute.BooleanAttribute("transliterated")
-  private val flavourAttribute: Attribute[String] = Attribute("flavour")
+  private val langAttribute: Attribute.Optional[String] = Attribute("lang").optional
+  private val transliteratedAttribute: Attribute.Optional[Boolean] = new Attribute.BooleanAttribute("transliterated").optional
+  private val flavourAttribute: Attribute.Optional[String] = Attribute("flavour").optional
 
-  val parser: Parser[LanguageSpec] = for {
-    lang <- langAttribute.optional
-    isTransliterated <- transliteratedAttribute.optional
-    flavour <- flavourAttribute.optional
+  override protected val parser: Parser[LanguageSpec] = for {
+    lang <- langAttribute()
+    isTransliterated <- transliteratedAttribute()
+    flavour <- flavourAttribute()
   } yield LanguageSpec(
     language = lang.map(Language.getForDefaultName),
     isTransliterated = isTransliterated,
     flavour = flavour
   )
 
-  val antiparser: Antiparser[LanguageSpec] = Antiparser.concat(
-    langAttribute.toXmlOption(_.language.map(_.name)),
-    transliteratedAttribute.toXmlOption(_.isTransliterated),
-    flavourAttribute.toXmlOption(_.flavour)
+  override val antiparser: Antiparser[LanguageSpec] = Antiparser.concat(
+    langAttribute(_.language.map(_.name)),
+    transliteratedAttribute(_.isTransliterated),
+    flavourAttribute(_.flavour)
   )
 }

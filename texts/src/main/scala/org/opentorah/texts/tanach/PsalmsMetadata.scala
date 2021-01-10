@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Names, WithNumber}
-import org.opentorah.xml.{Antiparser, ContentType, Element, Parser}
+import org.opentorah.xml.{Antiparser, ContentType, Element, Parsable, Parser}
 import zio.ZIO
 
 final class PsalmsMetadata(
@@ -37,13 +37,16 @@ object PsalmsMetadata {
   } yield new Parsed(book, names, chapters, days, weekDays, books)
 
   private def spansParser(chapters: Chapters, name: String, number: Int): Parser[Seq[Span]] = for {
-    numbered <- new SpanParsable(name).all
+    numbered <- new SpanParsable(name).seq()
     _ <- WithNumber.checkNumber(numbered, number, name)
   } yield SpanSemiResolved.setImpliedTo(WithNumber.dropNumbers(numbered).map(_.semiResolve), chapters.full, chapters)
 
   private final class SpanParsable(name: String) extends Element[WithNumber[SpanParsed]](name) {
     override def contentType: ContentType = ContentType.Empty
-    override def parser: Parser[WithNumber[SpanParsed]] = WithNumber.parse(SpanParsed.parser)
-    override def antiparser: Antiparser[WithNumber[SpanParsed]] = ???
+
+    override def contentParsable: Parsable[WithNumber[SpanParsed]] = new Parsable[WithNumber[SpanParsed]] {
+      override def parser: Parser[WithNumber[SpanParsed]] = WithNumber.parse(SpanParsed.parser)
+      override def antiparser: Antiparser[WithNumber[SpanParsed]] = ???
+    }
   }
 }

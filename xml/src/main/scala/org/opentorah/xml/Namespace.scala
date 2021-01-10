@@ -43,10 +43,10 @@ sealed trait Namespace {
 
   // Note: empty string attribute name is used for default namespace attributes;
   // it is processed specially by Namespace.Xmlns.qName()
-  final def attribute: Attribute[String] =
-    new Attribute.StringAttribute(getPrefix.getOrElse(""), Namespace.Xmlns)
+  final def attribute: Attribute.Optional[String] =
+    new Attribute.StringAttribute(getPrefix.getOrElse(""), Namespace.Xmlns).optional
 
-  final def attributeValue: Attribute.Value[String] = attribute.withOptionalValue(getUri)
+  final def attributeValue: Attribute.Value[String] = attribute.withValue(getUri)
 
   // Scala XML
   final def declare(element: scala.xml.Elem): scala.xml.Elem = Xml.declareNamespace(this, element)

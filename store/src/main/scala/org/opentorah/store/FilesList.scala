@@ -1,15 +1,12 @@
 package org.opentorah.store
 
-import org.opentorah.xml.{Antiparser, Element, Parser, PrettyPrinter, Text}
+import org.opentorah.xml.{Element, Parsable, Parser, PrettyPrinter, Text}
 import java.net.URL
 import org.opentorah.util.Files
 
 object FilesList extends Element[Seq[String]]("filesList") {
 
-  override def parser: Parser[Seq[String]] = Text("file").all
-
-  override def antiparser: Antiparser[Seq[String]] =
-    Antiparser.xml[Seq[String]](value => for (file <- value) yield <file>{file}</file>)
+  override def contentParsable: Parsable[Seq[String]] = Text("file").seq
 
   def get(
     baseUrl: URL,
@@ -24,7 +21,7 @@ object FilesList extends Element[Seq[String]]("filesList") {
       val result: Seq[String] = Files.filesWithExtensions(Files.url2file(directory), extension).sorted
       if (Files.isFileUrl(list)) Files.write(
         file = Files.url2file(list),
-        content = PrettyPrinter.default.renderXml(toXmlElement(result))
+        content = PrettyPrinter.default.renderXml(required.xml(result))
       )
       result
     }

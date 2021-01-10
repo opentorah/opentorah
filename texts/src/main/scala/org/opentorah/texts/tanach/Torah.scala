@@ -1,8 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{WithNames, WithNumber}
-import org.opentorah.texts.tanach
-import org.opentorah.xml.{Antiparser, Element, Parser}
+import org.opentorah.xml.{Antiparser, Element, Parsable, Parser}
 
 // Other than on Simchas Torah, aliyot are from the same book.
 final case class Torah private(override val spans: Seq[Torah.BookSpan])
@@ -64,25 +63,31 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
   }
 
   object torahParsable extends Element[Torah]("torah") {
-    override def parser: Parser[Torah] = for {
-      bookSpan <- spanParser.map(_.resolve)
-      spans <- new AliyahParsable(bookSpan).all
-      result <- parseAliyot(bookSpan, spans, number = None)
-    } yield result
+    override def contentParsable: Parsable[Torah] = new Parsable[Torah] {
+      override def parser: Parser[Torah] = for {
+        bookSpan <- spanParser.map(_.resolve)
+        spans <- new AliyahParsable(bookSpan).seq()
+        result <- parseAliyot(bookSpan, spans, number = None)
+      } yield result
 
-    override def antiparser: Antiparser[Torah] = ???
+      override def antiparser: Antiparser[Torah] = ???
+    }
   }
 
   private final class AliyahParsable(bookSpan: BookSpan) extends Element[Numbered]("aliyah") {
-    override def parser: Parser[WithNumber[SpanSemiResolved]] =
-      WithNumber.parse(SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve))
+    override def contentParsable: Parsable[Numbered] = new Parsable[Numbered] {
+      override def parser: Parser[WithNumber[SpanSemiResolved]] =
+        WithNumber.parse(SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve))
 
-    override def antiparser: Antiparser[Numbered] = ???
+      override def antiparser: Antiparser[Numbered] = ???
+    }
   }
 
   object Maftir extends Element[BookSpan]("maftir") {
-    override def parser: Parser[BookSpan] = spanParser.map(_.resolve)
-    override def antiparser: Antiparser[tanach.Torah.BookSpan] = ???
+    override def contentParsable: Parsable[BookSpan] = new Parsable[BookSpan] {
+      override def parser: Parser[BookSpan] = spanParser.map(_.resolve)
+      override def antiparser: Antiparser[BookSpan] = ???
+    }
   }
 
   def inBook(book: Tanach.ChumashBook, span: Span): BookSpan = BookSpan(book, span)

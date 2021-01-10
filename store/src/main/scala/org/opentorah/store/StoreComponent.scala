@@ -7,7 +7,7 @@ import org.opentorah.xml.{Antiparser, Attribute, Parser, PrettyPrinter}
 
 class StoreComponent extends Component("store") {
 
-  protected final val fromAttribute: Attribute[String] = Attribute("from")
+  protected final val fromAttribute: Attribute.Optional[String] = Attribute("from").optional
 
   final case class InlineClass(
     names: Names,
@@ -26,14 +26,14 @@ class StoreComponent extends Component("store") {
   override def classOfInline: Class[InlineClass] = classOf[InlineClass]
 
   override def inlineParser(className: Option[String]): Parser[Inline] = for {
-    names <- Names.withDefaultNameParser
-    from <- fromAttribute.optional
-    title <- Title.parsable.optional
-    storeAbstract <- Abstract.parsable.optional
-    body <- Body.parsable.optional
-    selectors <- Selector.all
-    entities <- Entities.parsable.optional
-    by <- By.parsable.optional
+    names <- Names.withDefaultNameParsable()
+    from <- fromAttribute()
+    title <- Title.element.optional()
+    storeAbstract <- Abstract.element.optional()
+    body <- Body.element.optional()
+    selectors <- Selector.seq()
+    entities <- Entities.parsable.optional()
+    by <- By.parsable.optional()
   } yield InlineClass(
     names,
     from,
@@ -47,15 +47,15 @@ class StoreComponent extends Component("store") {
   )
 
   override protected val inlineAntiparser: Antiparser[Inline] = Antiparser.concat(
-    Names.antiparser(_.names),
-    fromAttribute.toXmlOption(_.from),
-    Component.typeAttribute.toXmlOption(_.className),
-    Title.parsable.toXmlOption(_.title),
-    Abstract.parsable.toXmlOption(_.storeAbstract),
-    Body.parsable.toXmlOption(_.body),
-    Selector.toXmlSeq(_.selectors),
-    Entities.parsable.toXmlOption(_.entities),
-    By.parsable.toXmlOption(_.by)
+    Names.withDefaultNameParsable(_.names),
+    fromAttribute(_.from),
+    Component.typeAttribute(_.className),
+    Title.element.optional(_.title),
+    Abstract.element.optional(_.storeAbstract),
+    Body.element.optional(_.body),
+    Selector.seq(_.selectors),
+    Entities.parsable.optional(_.entities),
+    By.parsable.optional(_.by)
   )
 
   class FromElement(

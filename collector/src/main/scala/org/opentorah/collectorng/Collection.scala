@@ -3,7 +3,7 @@ package org.opentorah.collectorng
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, EntityReference, Page, Tei, Title}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Element, FromUrl, Parser, Xml}
+import org.opentorah.xml.{Antiparser, Element, Elements, FromUrl, Parsable, Parser, Xml}
 import java.net.URL
 
 final class Collection(
@@ -15,7 +15,7 @@ final class Collection(
   val body: Option[Body.Value],
   override val directory: String,
   val parts: Seq[CollectionPart]
-) extends Directory[Tei, Document](directory, "xml", Document) with Store {
+) extends Directory[Tei, Document](directory, "xml", Document) with Store with HtmlContent {
 
   def pageType: Page.Type = ??? // TODO
 
@@ -41,7 +41,14 @@ final class Collection(
 
   def indexContent(path: Store.Path): String = ???
 
-  private def teiBody: Seq[Xml.Node] = {
+  override def viewer: Html.Viewer = Html.Viewer.Collection
+  override def isWide: Boolean = true
+  override def htmlTitle: Option[String] = title.map(_.xml2string)
+  override def navigationLinks: Seq[Html.NavigationLink] = Seq.empty
+  override def lang: Option[String] = None
+
+  override def content(site: Site): Xml.Element = {
+    val title: Option[String] = this.title.map(_.xml2string)
     val pages: Seq[Page] = ??? // TODO directoryEntries.flatMap(document => document.pages(collection.pageType))
 
     def listMissing(flavour: String, isMissing: Page => Boolean): Seq[Xml.Element] = {
@@ -50,7 +57,9 @@ final class Collection(
       else Seq(<p>Отсутствуют фотографии {missing.length} {flavour} страниц: {missing.mkString(" ")}</p>)
     }
 
-// TODO    Hierarchy.storeHeader(collection.path, collection) ++
+    val content: Seq[Xml.Node] =
+      //     val path: Store.Path = collection2path(collection)
+// TODO    Hierarchy.storeHeader(path, collection) ++
       Seq[Xml.Element](Collection.table(this).toTei(
         collectionDocuments.parts.flatMap { part =>
           part.title.fold[Seq[Xml.Node]](Seq.empty)(_.xml).map(Table.Nodes) ++
@@ -58,6 +67,8 @@ final class Collection(
       )) ++
       listMissing("пустых", page => page.pb.isMissing && page.pb.isEmpty) ++
       listMissing("непустых", page => page.pb.isMissing && !page.pb.isEmpty)
+
+    ???
   }
 }
 
@@ -78,12 +89,12 @@ object Collection extends Element[Collection]("store") {
   }
 
   sealed abstract class Facet(val collection: Collection) extends By {
-    final override def findByName(name: String): Option[Document.Facet] = Store
-      .checkExtension(name, extension)
+    final override def findByName(name: String): Option[Document.Facet[_]] = // TODO more precise type?
+      Store.checkExtension(name, extension)
       .flatMap(collection.find)
       .map(of)
 
-    final def of(document: Document): Document.Facet = new Document.Facet(document, this)
+    protected def of(document: Document): Document.Facet[_]
 
     def extension: String
   }
@@ -91,16 +102,19 @@ object Collection extends Element[Collection]("store") {
   final class TeiFacet(collection: Collection) extends Facet(collection) {
     override def selector: Selector = Selector.byName("tei")
     override def extension: String = "xml"
+    override protected def of(document: Document): Document.TeiFacet = new Document.TeiFacet(document, this)
   }
 
   final class HtmlFacet(collection: Collection) extends Facet(collection) {
     override def selector: Selector = Selector.byName("document")
     override def extension: String = "html"
+    override protected def of(document: Document): Document.HtmlFacet = new Document.HtmlFacet(document, this)
   }
 
   final class FacsFacet(collection: Collection) extends Facet(collection) {
     override def selector: Selector = Selector.byName("facsimile")
     override def extension: String = "html"
+    override protected def of(document: Document): Document.FacsFacet = new Document.FacsFacet(document, this)
   }
 
   def table(collection: Collection): Table[Document] = new Table[Document](
@@ -108,7 +122,7 @@ object Collection extends Element[Collection]("store") {
     Table.Column("Дата", "date", document => Xml.mkText(document.date.getOrElse(""))),
     Table.Column("Кто", "author", document => Xml.multi(document.authors.flatMap(_.xml))),
     Table.Column("Кому", "addressee", document =>
-      Seq(document.addressee.fold[Xml.Node](Xml.mkText(""))(addressee => EntityReference.toXmlElement(addressee)))),
+      Seq(document.addressee.fold[Xml.Node](Xml.mkText(""))(addressee => EntityReference.required.xml(addressee)))),
 
     // TODO
 //    Table.Column("Язык", "language", { document: Document =>
@@ -134,42 +148,49 @@ object Collection extends Element[Collection]("store") {
     Table.Column("Расшифровка", "transcriber", { document: Document =>
       val transcribers: Seq[Xml.Node] = document.editors
         .filter(_.role.contains("transcriber")).flatMap(_.persName)
-        .map(transcriber => EntityReference.toXmlElement(transcriber))
+        .map(transcriber => EntityReference.required.xml(transcriber))
       Xml.multi(transcribers)
     })
   )
 
-  override def parser: Parser[Collection] = for {
-    fromUrl <- currentFromUrl
-    names <- Names.withDefaultNameParser
-    title <- Title.parsable.optional
-    storeAbstract <- Abstract.parsable.optional
-    body <- Body.parsable.optional
-    // TODO when new generation rules and files are modified, stop parsing (and delete) ByDocument,
-    // and start parsing 'alias', 'directory' and 'parts' directly
-    byDocument <- ByDocument.required
-//    alias <- aliasAttribute.optional
-//    directory <- Store.directoryAttribute.optional
-//    parts <- Part.all
-  } yield new Collection(
-    fromUrl,
-    names,
-    alias = Some(Files.fileName(fromUrl.url)),
-    title,
-    storeAbstract,
-    body,
-    byDocument.directory, //directory.getOrElse("tei"),
-    byDocument.parts //parts
-  )
+  override def contentParsable: Parsable[Collection] = new Parsable[Collection] {
+    private val namesParsable: Parsable[Names] = Names.withDefaultNameParsable
+    private val titleElement: Elements.Optional[Title.Value] = Title.element.optional
+    private val abstractElement: Elements.Optional[Abstract.Value] = Abstract.element.optional
+    private val bodyElement: Elements.Optional[Body.Value] = Body.element.optional
 
-  override def antiparser: Antiparser[Collection] = Antiparser.concat(
-    Names.antiparser(_.names),
-    Title.parsable.toXmlOption(_.title),
-    Abstract.parsable.toXmlOption(_.storeAbstract),
-    Body.parsable.toXmlOption(_.body),
-    Directory.directoryToXml,
-    CollectionPart.toXmlSeq(_.parts)
-  )
+    override def parser: Parser[Collection] = for {
+      fromUrl <- Element.currentFromUrl
+      names <- namesParsable()
+      title <- titleElement()
+      storeAbstract <- abstractElement()
+      body <- bodyElement()
+      // TODO when new generation rules and files are modified, stop parsing (and delete) ByDocument,
+      // and start parsing 'alias', 'directory' and 'parts' directly
+      byDocument <- ByDocument.required()
+      //    alias <- aliasAttribute.optional
+      //    directory <- Store.directoryAttribute.optional
+      //    parts <- Part.all
+    } yield new Collection(
+      fromUrl,
+      names,
+      alias = Some(Files.fileName(fromUrl.url)),
+      title,
+      storeAbstract,
+      body,
+      byDocument.directory, //directory.getOrElse("tei"),
+      byDocument.parts //parts
+    )
+
+    override def antiparser: Antiparser[Collection] = Antiparser.concat(
+      namesParsable(_.names),
+      titleElement(_.title),
+      abstractElement(_.storeAbstract),
+      bodyElement(_.body),
+      Directory.directoryAttribute(_.directory),
+      CollectionPart.seq(_.parts)
+    )
+  }
 
   // TODO remove when...
   final class ByDocument(
@@ -177,14 +198,17 @@ object Collection extends Element[Collection]("store") {
     val parts: Seq[CollectionPart]
   )
   object ByDocument extends Element[ByDocument]("by") {
-    override def parser: Parser[ByDocument] = for {
-      _ /*selector*/ <- By.selector
-      directory <- Directory.directory
-      parts <- CollectionPart.all
-    } yield new ByDocument(
-      directory,
-      parts
-    )
-    override def antiparser: Antiparser[ByDocument] = ???
+    override def contentParsable: Parsable[ByDocument] = new Parsable[ByDocument] {
+      override def parser: Parser[ByDocument] = for {
+        _ /*selector*/ <- By.selector
+        directory <- Directory.directoryAttribute()
+        parts <- CollectionPart.seq()
+      } yield new ByDocument(
+        directory,
+        parts
+      )
+
+      override def antiparser: Antiparser[ByDocument] = ???
+    }
   }
 }

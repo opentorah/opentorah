@@ -101,7 +101,7 @@ object Service extends App {
   def fromUrl(url: URL, request: Request[ServiceTask]): ServiceTask[Response[ServiceTask]] =
     X.fromUrl(url, request)
 
-  private val defaultBufferSize: Int = 10240
+//  private val defaultBufferSize: Int = 10240
 
 //  def getUrl[F[_]](url: URL)(implicit F: Sync[F], cs: ContextShift[F]): F[Option[fs2.Stream[F, Byte]]] = {
 //    blocker

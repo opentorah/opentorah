@@ -4,7 +4,7 @@ import org.opentorah.metadata.Names
 import org.opentorah.store.{By, Entities, EntityHolder, Selector, Store}
 import org.opentorah.tei.{Entity, EntityReference}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Element, Parser, PrettyPrinter, Xml}
+import org.opentorah.xml.{Element, Parsable, Parser, PrettyPrinter, Xml}
 import java.net.URL
 
 final class References private(references: Seq[ReferenceWithSource]) {
@@ -52,7 +52,7 @@ object References extends Element[Seq[ReferenceWithSource]]("references") {
 
       Files.write(
         file = Files.url2file(referencesFile),
-        content = PrettyPrinter.default.renderXml(toXmlElement(references))
+        content = PrettyPrinter.default.renderXml(required.xml(references))
       )
 
       references
@@ -129,7 +129,5 @@ object References extends Element[Seq[ReferenceWithSource]]("references") {
     .filter(_.isInstanceOf[ReferenceWithSource.FromDocument])
     .map(_.asInstanceOf[ReferenceWithSource.FromDocument])
 
-  override def parser: Parser[Seq[ReferenceWithSource]] = ReferenceWithSource.all
-
-  override def antiparser: Antiparser[Seq[ReferenceWithSource]] = ReferenceWithSource.toXmlSeq
+  override def contentParsable: Parsable[Seq[ReferenceWithSource]] = ReferenceWithSource.seq
 }

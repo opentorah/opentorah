@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, From, Parser, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, From, Parsable, Parser, Xml}
 
 final case class EntityReference(
   entityType: EntityType,
@@ -18,30 +18,33 @@ object EntityReference extends EntityRelated[EntityReference](
 ) {
   override protected def contentType: ContentType = ContentType.Mixed
 
-  private val roleAttribute: Attribute[String] = Attribute("role")
-  private val refAttribute: Attribute[String] = Attribute("ref")
-  private val typeAttribute: Attribute[String] = Attribute("type")
+  private val idAttribute: Attribute.Optional[String] = Xml.idAttribute.optional
+  private val roleAttribute: Attribute.Optional[String] = Attribute("role").optional
+  private val refAttribute: Attribute.Optional[String] = Attribute("ref").optional
+  private val typeAttribute: Attribute.Optional[String] = Attribute("type").optional
 
-  override protected def parser(entityType: EntityType): Parser[EntityReference] = for {
-    id <- Xml.idAttribute.optional
-    role <- roleAttribute.optional
-    ref <- refAttribute.optional
-    _ <- typeAttribute.optional // We don't do anything with the type yet...
-    name <- Element.allNodes
-  } yield new EntityReference(
-    entityType,
-    name,
-    id,
-    role,
-    ref
-  )
+  override protected def parsable(entityType: EntityType): Parsable[EntityReference] = new Parsable[EntityReference] {
+    override protected def parser: Parser[EntityReference] = for {
+      id <- idAttribute()
+      role <- roleAttribute()
+      ref <- refAttribute()
+      _ <- typeAttribute() // We don't do anything with the type yet...
+      name <- Element.nodes()
+    } yield new EntityReference(
+      entityType,
+      name,
+      id,
+      role,
+      ref
+    )
 
-  override protected def antiparser(entityType: EntityType): Antiparser[EntityReference] = Tei.concat(
-    refAttribute.toXmlOption(_.ref),
-    Xml.idAttribute.toXmlOption(_.id),
-    roleAttribute.toXmlOption(_.role),
-    Antiparser.xml(_.name)
-  )
+    override def antiparser: Antiparser[EntityReference] = Tei.concat(
+      refAttribute(_.ref),
+      idAttribute(_.id),
+      roleAttribute(_.role),
+      Element.nodes(_.name)
+    )
+  }
 
   final def from(xml: Seq[Xml.Node]): Seq[EntityReference] =
     EntityType.values.flatMap(entityType => xml.flatMap(node =>

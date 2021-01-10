@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
 
 final case class Entity private(
   id: Option[String],
@@ -22,26 +22,31 @@ object Entity extends EntityRelated[Entity](
 
   override protected def contentType: ContentType = ContentType.Elements
 
-  private val roleAttribute: Attribute[String] = Attribute("role")
+  private val idAttribute: Attribute.Optional[String] = Xml.idAttribute.optional
+  private val roleAttribute: Attribute.Optional[String] = Attribute("role").optional
 
-  override protected def parser(entityType: EntityType): Parser[Entity] = for {
-    id <- Xml.idAttribute.optional
-    role <- roleAttribute.optional
-    names <- EntityName.forEntityType(entityType).all
-    _ <- Parser.check(names.nonEmpty, s"No names in $id")
-    content <- Element.allNodes
-  } yield new Entity(
-    id,
-    entityType,
-    role,
-    names,
-    content,
-  )
+  override protected def parsable(entityType: EntityType): Parsable[Entity] = new Parsable[Entity] {
+    private val namesParsable: Parsable[Seq[EntityName]] = EntityName.forEntityType(entityType).seq
 
-  override protected def antiparser(entityType: EntityType): Antiparser[Entity] = Tei.concat(
-    Xml.idAttribute.toXmlOption(_.id),
-    roleAttribute.toXmlOption(_.role),
-    EntityName.forEntityType(entityType).toXmlSeq(_.names),
-    Antiparser.xml(_.content)
-  )
+    override protected def parser: Parser[Entity] = for {
+      id <- idAttribute()
+      role <- roleAttribute()
+      names <- namesParsable()
+      _ <- Parser.check(names.nonEmpty, s"No names in $id")
+      content <- Element.nodes()
+    } yield new Entity(
+      id,
+      entityType,
+      role,
+      names,
+      content,
+    )
+
+    override def antiparser: Antiparser[Entity] = Tei.concat(
+      idAttribute(_.id),
+      roleAttribute(_.role),
+      namesParsable(_.names),
+      Element.nodes(_.content)
+    )
+  }
 }

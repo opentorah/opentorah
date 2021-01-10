@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{Metadata, Names, WithNumber}
 import org.opentorah.texts.tanach.Torah.Numbered
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser}
 
 final class ParshaMetadata(
   val parsha: Parsha,
@@ -78,11 +78,11 @@ object ParshaMetadata {
   )
 
   def parser(book: Tanach.ChumashBook): Parser[Parsed] = for {
-    names <- Names.withoutDefaultNameParser
+    names <- Names.withoutDefaultNameParsable()
     span <- semiResolvedParser
-    aliyot <- Aliyah.all
-    daysParsed <- Day.all
-    maftir <- Maftir.required
+    aliyot <- Aliyah.seq()
+    daysParsed <- Day.seq()
+    maftir <- Maftir.required()
     parsha <- Metadata.find[Parsha](book.parshiot, names)
   } yield {
     val (days: Seq[DayParsed], daysCombined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
@@ -101,24 +101,31 @@ object ParshaMetadata {
     Collections.mapValues(days.groupBy(_.custom))(days => days.map(_.span))
 
   private object Day extends Element[DayParsed]("day") {
-    override def parser: Parser[DayParsed] = for {
-      span <- numberedParser
-      custom <- Attribute("custom").optional.map(_.fold[Set[Custom]](Set(Custom.Common))(Custom.parse))
-      isCombined <- new Attribute.BooleanAttribute("combined").optional.map(_.getOrElse(false))
-    } yield DayParsed(span, custom, isCombined)
+    override def contentParsable: Parsable[DayParsed] = new Parsable[DayParsed] {
+      override def parser: Parser[DayParsed] = for {
+        span <- numberedParser
+        custom <- Attribute("custom").optional().map(_.fold[Set[Custom]](Set(Custom.Common))(Custom.parse))
+        isCombined <- new Attribute.BooleanAttribute("combined").optional().map(_.getOrElse(false))
+      } yield DayParsed(span, custom, isCombined)
 
-    override def antiparser: Antiparser[DayParsed] = ???
+      override def antiparser: Antiparser[DayParsed] = ???
+    }
   }
 
   object Aliyah extends Element[Torah.Numbered]("aliyah") {
     override def contentType: ContentType = ContentType.Empty
-    override def parser: Parser[Numbered] = numberedParser
-    override def antiparser: Antiparser[Numbered] = ???
+
+    override def contentParsable: Parsable[Numbered] = new Parsable[Numbered] {
+      override def parser: Parser[Numbered] = numberedParser
+      override def antiparser: Antiparser[Numbered] = ???
+    }
   }
 
   object Maftir extends Element[SpanSemiResolved]("maftir") {
-    override def parser: Parser[SpanSemiResolved] = semiResolvedParser
-    override def antiparser: Antiparser[SpanSemiResolved] = ???
+    override def contentParsable: Parsable[SpanSemiResolved] = new Parsable[SpanSemiResolved] {
+      override def parser: Parser[SpanSemiResolved] = semiResolvedParser
+      override def antiparser: Antiparser[SpanSemiResolved] = ???
+    }
   }
 
   private def numberedParser: Parser[Torah.Numbered] = WithNumber.parse(semiResolvedParser)

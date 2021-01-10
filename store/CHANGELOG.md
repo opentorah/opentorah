@@ -3,6 +3,8 @@
 Modules covered: `store`, `metadata`, `xml`, `tei`, `util`, `texts`, `dream-paper` and `typesetting-paper`.
 
 ## [Unreleased]
+- Attribute.Parsable and ensuing cleanup;
+- everything is a Parsable now ;)
 
 ## [0.1.62] - 2020-12-20
 - selectors in metadata, not in the store file;

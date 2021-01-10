@@ -113,17 +113,17 @@ final class Site(fromUrl: URL) {
 
   def prettyPrintStore(): Unit = {
     for (entityHolder <- store.entities.get.by.get.stores)
-      prettyPrint(entityHolder, Entity.toXmlElement(entityHolder.entity.copy(id = None)), Tei.prettyPrinter)
+      prettyPrint(entityHolder, Entity.required.xml(entityHolder.entity.copy(id = None)), Tei.prettyPrinter)
     prettyPrint(store)
   }
 
   private def prettyPrint(store: Store): Unit = {
-    prettyPrint(store, Store.parsable.toXmlElement(store.asInstanceOf[Store.FromElement].element), Store.prettyPrinter)
+    prettyPrint(store, Store.parsable.required.xml(store.asInstanceOf[Store.FromElement].element), Store.prettyPrinter)
 
     store match {
       case collection: Collection =>
         for (by <- collection.by; document <- by.stores; by <- document.by; teiHolder <- by.stores)
-          prettyPrint(teiHolder, Tei.toXmlElement(teiHolder.tei), Tei.prettyPrinter)
+          prettyPrint(teiHolder, Tei.required.xml(teiHolder.tei), Tei.prettyPrinter)
       case _ =>
         for (by <- store.by; store <- by.stores) prettyPrint(store)
     }

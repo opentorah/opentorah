@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Parser}
+import org.opentorah.xml.{Antiparser, Element, Parsable, Parser}
 
 final case class LangUsage(
   languages: Seq[Language]
@@ -8,13 +8,16 @@ final case class LangUsage(
 
 object LangUsage extends Element[LangUsage]("langUsage") {
 
-  override def parser: Parser[LangUsage] = for {
-    languages <- Language.all
-  } yield new LangUsage(
-    languages
-  )
+  override def contentParsable: Parsable[LangUsage] = new Parsable[LangUsage] {
 
-  override val antiparser: Antiparser[LangUsage] = Tei.concat(
-    Language.toXmlSeq(_.languages)
-  )
+    override def parser: Parser[LangUsage] = for {
+      languages <- Language.seq()
+    } yield new LangUsage(
+      languages
+    )
+
+    override val antiparser: Antiparser[LangUsage] = Tei.concat(
+      Language.seq(_.languages)
+    )
+  }
 }

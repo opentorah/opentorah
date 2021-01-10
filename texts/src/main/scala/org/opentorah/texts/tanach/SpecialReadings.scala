@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.WithNames
-import org.opentorah.xml.{From, FromXml, Parser, Xml}
+import org.opentorah.xml.{Elements, From, Parser, Xml}
 import Torah.{Fragment, Maftir}
 
 /* All the special readings and their rules are here.
@@ -19,9 +19,9 @@ object SpecialReadings {
   private def parseMaftir(element: Xml.Element): Maftir = parse(Torah.Maftir, "Maftir", element)
 
   private def parseHaftarah(element: Xml.Element, full: Boolean = true): Haftarah.Customs =
-    parse(Haftarah.parsable(full), "Haftarah", element)
+    parse(Haftarah.element(full), "Haftarah", element)
 
-  private def parse[R](fromXml: FromXml[R], what: String, element: Xml.Element): R =
+  private def parse[R](fromXml: Elements[R], what: String, element: Xml.Element): R =
     Parser.parseDo(fromXml.parse(From.xml(what, element)))
 
   private def fromDay(withNames: WithNames, torah: Torah): Torah = torah.fromWithNumbers(withNames)

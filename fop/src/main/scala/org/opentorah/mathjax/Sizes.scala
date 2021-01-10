@@ -66,7 +66,7 @@ final class Sizes private(
   )
 
   def setViewPortSizes(svgDocument: SVGDocument): Unit = {
-    def set(attribute: Attribute[String], value: Float): Unit =
+    def set(attribute: Attribute.Required[String], value: Float): Unit =
       attribute.withValue(toPoints(value).toString + "pt").set(svgDocument.getDocumentElement)
 
     set(Sizes.widthAttribute, width)
@@ -84,12 +84,10 @@ object Sizes {
   val batikExInEms: Float = 0.5f
 
   def apply(svgDocument: SVGDocument): Sizes = {
-    val viewBox: Array[Float] =
-      viewBoxAttribute.doGet(svgDocument.getDocumentElement)
-        .split(" ").map(_.toFloat)
+    val viewBox: Array[Float] = viewBoxAttribute.get(svgDocument.getDocumentElement).split(" ").map(_.toFloat)
 
     new Sizes(
-      fontSize = fontSizeAttribute.doGet(svgDocument.getDocumentElement),
+      fontSize = fontSizeAttribute.required.get(svgDocument.getDocumentElement),
       minX = viewBox(0),
       minY = viewBox(1),
       width = viewBox(2),
@@ -97,14 +95,14 @@ object Sizes {
     )
   }
 
-  val widthAttribute: Attribute[String] = Attribute("width")
-  val heightAttribute: Attribute[String] = Attribute("height")
-  val viewBoxAttribute: Attribute[String] = Attribute("viewBox")
+  private val widthAttribute: Attribute.Required[String] = Attribute("width").required
+  private val heightAttribute: Attribute.Required[String] = Attribute("height").required
+  private val viewBoxAttribute: Attribute.Required[String] = Attribute("viewBox").required
 
   /**
     * Font size (in points) used for the output.
     */
   @SerialVersionUID(1L)
   val fontSizeAttribute: Attribute.FloatAttribute =
-    new Attribute.FloatAttribute("fontSize", MathJax.namespace, default = 12.0f)
+    new Attribute.FloatAttribute("fontSize", namespace = MathJax.namespace, default = 12.0f)
 }

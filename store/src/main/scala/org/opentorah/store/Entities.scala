@@ -3,7 +3,7 @@ package org.opentorah.store
 import java.net.URL
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{EntitiesList, Entity}
-import org.opentorah.xml.{Antiparser, Attribute, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, Parsable, Parser}
 
 final class Entities(
   inheritedSelectors: Seq[Selector],
@@ -44,23 +44,25 @@ object Entities {
 
   object parsable extends org.opentorah.xml.Element[Element]("entities") {
 
-    private val selectorAttribute: Attribute[String] = Attribute("selector")
+    private val selectorAttribute: Attribute.Required[String] = Attribute("selector").required
 
-    override def parser: Parser[Element] = for {
-      selector <- selectorAttribute.required
-      by <- By.parsable.required
-      lists <- EntitiesList.all
-    } yield Element(
-      selector,
-      by,
-      lists
-    )
+    override def contentParsable: Parsable[Element] = new Parsable[Element] {
+      override def parser: Parser[Element] = for {
+        selector <- selectorAttribute()
+        by <- By.parsable.required()
+        lists <- EntitiesList.seq()
+      } yield Element(
+        selector,
+        by,
+        lists
+      )
 
-    override val antiparser: Antiparser[Element] = Antiparser.concat(
-      selectorAttribute.toXml(_.selector),
-      By.parsable.toXml(_.by),
-      EntitiesList.toXmlSeq(_.lists)
-    )
+      override val antiparser: Antiparser[Element] = Antiparser.concat(
+        selectorAttribute(_.selector),
+        By.parsable.required(_.by),
+        EntitiesList.seq(_.lists)
+      )
+    }
   }
 
   final class EntitiesBy(

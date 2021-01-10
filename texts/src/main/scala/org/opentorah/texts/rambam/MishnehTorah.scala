@@ -1,7 +1,7 @@
 package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Antiparser, Attribute, Element, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parsable, Parser}
 
 object MishnehTorah {
 
@@ -20,23 +20,25 @@ object MishnehTorah {
   }
 
   object Part extends Element[Part]("part") {
-    private val nAttribute: Attribute.PositiveIntAttribute = new Attribute.PositiveIntAttribute("n")
-    private val chaptersAttribute = new Attribute.PositiveIntAttribute("chapters")
+    private val nAttribute: Attribute.Required[Int] = new Attribute.PositiveIntAttribute("n").required
+    private val chaptersAttribute: Attribute.Required[Int] = new Attribute.PositiveIntAttribute("chapters").required
 
-    override def parser: Parser[Part] = for {
-      number <- nAttribute.required
-      numChapters <- chaptersAttribute.required
-      names <- Names.withoutDefaultNameParser
-      chapters <- NamedChapter.all
-    } yield {
-      if (chapters.isEmpty) new PartWithNumberedChapters(number, numChapters, names) else {
-        val result = new PartWithNamedChapters(number, numChapters, names, chapters)
-        chapters.foreach(_.setPart(result))
-        result
+    override def contentParsable: Parsable[Part] = new Parsable[Part] {
+      override def parser: Parser[Part] = for {
+        number <- nAttribute()
+        numChapters <- chaptersAttribute()
+        names <- Names.withoutDefaultNameParsable()
+        chapters <- NamedChapter.seq()
+      } yield {
+        if (chapters.isEmpty) new PartWithNumberedChapters(number, numChapters, names) else {
+          val result = new PartWithNamedChapters(number, numChapters, names, chapters)
+          chapters.foreach(_.setPart(result))
+          result
+        }
       }
-    }
 
-    override def antiparser: Antiparser[Part] = ???
+      override def antiparser: Antiparser[Part] = ???
+    }
   }
 
   final class PartWithNumberedChapters(
@@ -77,29 +79,33 @@ object MishnehTorah {
   }
 
   object NamedChapter extends Element[NamedChapter]("chapter") {
-    override def parser: Parser[NamedChapter] = for {
-      names <- Names.withoutDefaultNameParser
-    } yield new NamedChapter(names)
+    override def contentParsable: Parsable[NamedChapter] = new Parsable[NamedChapter] {
+      override def parser: Parser[NamedChapter] = for {
+        names <- Names.withoutDefaultNameParsable()
+      } yield new NamedChapter(names)
 
-    override def antiparser: Antiparser[NamedChapter] = Names.antiparser(_.names)
+      override def antiparser: Antiparser[NamedChapter] = Names.withoutDefaultNameParsable(_.names)
+    }
   }
 
   object Book extends Element[Book]("book") {
-    private val nAttribute: Attribute.IntAttribute = new Attribute.IntAttribute("n")
+    private val nAttribute: Attribute.Required[Int] = new Attribute.IntAttribute("n").required
 
-    override def parser: Parser[Book] = for {
-      number <- nAttribute.required
-      names <- Names.withoutDefaultNameParser
-      parts <- Part.all
-      _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
-        s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
-    } yield {
-      val result = new Book(number, names, parts)
-      parts.foreach(_.setBook(result))
-      result
+    override def contentParsable: Parsable[Book] = new Parsable[Book] {
+      override def parser: Parser[Book] = for {
+        number <- nAttribute()
+        names <- Names.withoutDefaultNameParsable()
+        parts <- Part.seq()
+        _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
+          s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
+      } yield {
+        val result = new Book(number, names, parts)
+        parts.foreach(_.setBook(result))
+        result
+      }
+
+      override def antiparser: Antiparser[Book] = ???
     }
-
-    override def antiparser: Antiparser[Book] = ???
   }
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841

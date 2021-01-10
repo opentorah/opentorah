@@ -7,9 +7,8 @@ import zio.ZIO
 abstract class Attribute[T](
   val name: String,
   val namespace: Namespace,
-  val default: T,
-  val setDefault: Boolean
-) extends Conversion[T] with Requireable[T] {
+  val default: T
+) extends Conversion[T] {
 
   require((name != null) && !name.contains(":"))
   require(name.nonEmpty || (namespace == Namespace.Xmlns))
@@ -23,131 +22,24 @@ abstract class Attribute[T](
 
   final def qName: String = namespace.qName(name)
 
-  final def inNamespace(namespace: Namespace): Attribute[T] =
-    if (this.namespace != namespace) this else withNamespace(Namespace.No)
-
-  def withNamespace(namespace: Namespace): Attribute[T]
-
-  final def effectiveValue(value: Option[T]): Option[T] =
-    if (!setDefault) value.filterNot(_ == default)
-    else value.orElse(Some(default))
-
-  // Value
-  final def withValue(value: T): Attribute.Value[T] = withOptionalValue(Option(value))
-  final def withOptionalValue(value: Option[T]): Attribute.Value[T] = new Attribute.Value[T](this, value)
-
-  // Parser
-
-  final override def optional: Parser[Option[T]] = Context.takeAttribute(this).flatMap { value =>
-    value.fold[Parser[Option[T]]](ZIO.none)(parseFromString(_).map(Some(_)))
-  }
-
-  final def optionalOrDefault: Parser[T] = optional.map(_.getOrElse(default))
-
-  // TODO eliminate 3 occurrences where this is used?
-  final def toXml: Antiparser[T] = Antiparser(
-    attributes = value => Seq(withValue(value))
-  )
-
-  final def toXml[B](f: B => T): Antiparser[B] = toXml.compose(f)
-
-  // TODO eliminate
-  private final def toXmlOption: Antiparser[Option[T]] = Antiparser(
-    attributes = value => Seq(withOptionalValue(value))
-  )
-
-  final def toXmlOption[B](f: B => Option[T]): Antiparser[B] = toXmlOption.compose(f)
-
-  // Scala XML
-  final def get(element: Xml.Element): Option[T] = Xml.getAttribute(this, element)
-  final def getWithDefault(element: Xml.Element): T = Xml.getAttributeWithDefault(this, element)
-  final def doGet(element: Xml.Element): T = Xml.doGetAttribute[T](this, element)
-
-  // DOM
-  final def get(element: Dom.Element): Option[T] = Dom.getAttribute(this, element)
-  final def getWithDefault(element: Dom.Element): T = Dom.getAttributeWithDefault(this, element)
-  final def doGet(element: Dom.Element): T = Dom.doGetAttribute[T](this, element)
-
-  // SAX
-  final def get(attributes: Sax.PreElement): Option[T] = Sax.getAttribute(this, attributes)
-  final def getWithDefault(attributes: Sax.PreElement): T = Sax.getAttributeWithDefault(this, attributes)
-  final def doGet(attributes: Sax.PreElement): T = Sax.doGetAttribute[T](this, attributes)
+  final def optional           : Attribute.Optional [T] = new Attribute.Optional [T](this, setDefault = false)
+  final def optionalSetDefault : Attribute.Optional [T] = new Attribute.Optional [T](this, setDefault = true )
+  final def orDefault          : Attribute.OrDefault[T] = new Attribute.OrDefault[T](this, setDefault = false)
+  final def orDefaultSetDefault: Attribute.OrDefault[T] = new Attribute.OrDefault[T](this, setDefault = true )
+  final def required           : Attribute.Required [T] = new Attribute.Required [T](this)
 }
 
 object Attribute {
 
-  final class StringAttribute(
-    name: String,
-    namespace: Namespace = Namespace.No,
-    default: String = "",
-    setDefault: Boolean = false
-  ) extends Attribute[String](name, namespace, default, setDefault) with Conversion.StringConversion {
-
-    override def withNamespace(namespace: Namespace): StringAttribute =
-      new StringAttribute(name, namespace, default, setDefault)
-  }
-
-  def apply(
-    name: String,
-    namespace: Namespace = Namespace.No,
-    default: String = "",
-    setDefault: Boolean = false
-  ): Attribute[String] = new StringAttribute(name, namespace, default, setDefault)
-
-  final class BooleanAttribute(
-    name: String,
-    namespace: Namespace = Namespace.No,
-    default: Boolean = false,
-    setDefault: Boolean = false
-  ) extends Attribute[Boolean](name, namespace, default, setDefault) with Conversion.BooleanConversion {
-
-    override def withNamespace(namespace: Namespace): BooleanAttribute =
-      new BooleanAttribute(name, namespace, default, setDefault)
-
-    def withSetDefault: BooleanAttribute =
-      new BooleanAttribute(name, namespace, default, true)
-  }
-
-  final class IntAttribute(
-    name: String,
-    namespace: Namespace = Namespace.No,
-    default: Int = 0,
-    setDefault: Boolean = false
-  ) extends Attribute[Int](name, namespace, default, setDefault) with Conversion.IntConversion {
-
-    override def withNamespace(namespace: Namespace): IntAttribute =
-      new IntAttribute(name, namespace, default, setDefault)
-  }
-
-  final class PositiveIntAttribute(
-    name: String,
-    namespace: Namespace = Namespace.No,
-    default: Int = 1,
-    setDefault: Boolean = false
-  ) extends Attribute[Int](name, namespace, default, setDefault) with Conversion.PositiveIntConversion {
-
-    override def withNamespace(namespace: Namespace): PositiveIntAttribute =
-      new PositiveIntAttribute(name, namespace, default, setDefault)
-  }
-
-  final class FloatAttribute(
-    name: String,
-    namespace: Namespace = Namespace.No,
-    default: Float = 0.0f,
-    setDefault: Boolean = false
-  ) extends Attribute[Float](name, namespace, default, setDefault) with Conversion.FloatConversion {
-
-    override def withNamespace(namespace: Namespace): FloatAttribute =
-      new FloatAttribute(name, namespace, default, setDefault)
-  }
-
   final class Value[T](
-    val attribute: Attribute[T],
+    val attributeParsable: Parsable[T, _],
     val value: Option[T]
   ) {
+    def attribute: Attribute[T] = attributeParsable.attribute
+
     override def toString: String = s"""$attribute="${valueToString.orNull}""""
 
-    def effectiveValue: Option[T] = attribute.effectiveValue(value)
+    def effectiveValue: Option[T] = attributeParsable.effectiveValue(value)
 
     def valueToString: Option[String] = effectiveValue.map(attribute.toString)
 
@@ -155,4 +47,90 @@ object Attribute {
     def set(element: Dom.Element): Dom.Element = Dom.setAttribute(this, element)
     def set(element: Sax.Element): Sax.Element = Sax.setAttribute(this, element)
   }
+
+  sealed abstract class Parsable[T, A](val attribute: Attribute[T]) extends org.opentorah.xml.Parsable[A] {
+    final override def antiparser: Antiparser[A] = Antiparser(
+      attributes = value => Seq(withValue(value))
+    )
+
+    def withValue(value: A): Value[T]
+
+    def effectiveValue(value: Option[T]): Option[T]
+
+    def get(element: Xml.Element): A
+    def get(element: Dom.Element): A
+    def get(attributes: Sax.PreElement): A
+  }
+
+  private def optionalParser[T](attribute: Attribute[T]): Parser[Option[T]] =
+    Context.takeAttribute(attribute).flatMap { value =>
+      value.fold[Parser[Option[T]]](ZIO.none)(attribute.parseFromString(_).map(Some(_)))
+    }
+
+  final class Optional[T](attribute: Attribute[T], setDefault: Boolean) extends Parsable[T, Option[T]](attribute) {
+    override protected def parser: Parser[Option[T]] = optionalParser(attribute)
+    override def withValue(value: Option[T]): Value[T] = new Attribute.Value[T](this, value)
+    override def effectiveValue(value: Option[T]): Option[T] =
+      if (!setDefault) value.filterNot(_ == attribute.default)
+      else value.orElse(Some(attribute.default))
+    override def get(element   : Xml.Element   ): Option[T] = Xml.getAttribute(attribute, element   )
+    override def get(element   : Dom.Element   ): Option[T] = Dom.getAttribute(attribute, element   )
+    override def get(attributes: Sax.PreElement): Option[T] = Sax.getAttribute(attribute, attributes)
+  }
+
+  final class OrDefault[T](attribute: Attribute[T], setDefault: Boolean) extends Parsable[T, T](attribute) {
+    override protected def parser: Parser[T] = optionalParser(attribute).map(_.getOrElse(attribute.default))
+    override def withValue(value: T): Attribute.Value[T] = new Attribute.Value[T](this, Option(value))
+    override def effectiveValue(value: Option[T]): Option[T] =
+      if (!setDefault) value.filterNot(_ == attribute.default)
+      else value.orElse(Some(attribute.default))
+    override def get(element   : Xml.Element   ): T = Xml.getAttributeWithDefault(attribute, element   )
+    override def get(element   : Dom.Element   ): T = Dom.getAttributeWithDefault(attribute, element   )
+    override def get(attributes: Sax.PreElement): T = Sax.getAttributeWithDefault(attribute, attributes)
+  }
+
+  final class Required[T](attribute: Attribute[T]) extends Parsable[T, T](attribute) {
+    override protected def parser: Parser[T] = Parser.required(optionalParser(attribute), attribute)
+    override def withValue(value: T): Attribute.Value[T] = new Attribute.Value[T](this, Option(value))
+    override def effectiveValue(value: Option[T]): Option[T] = value.orElse(Some(attribute.default))
+    override def get(element   : Xml.Element   ): T = Xml.doGetAttribute[T](attribute, element   )
+    override def get(element   : Dom.Element   ): T = Dom.doGetAttribute[T](attribute, element   )
+    override def get(attributes: Sax.PreElement): T = Sax.doGetAttribute[T](attribute, attributes)
+  }
+
+  final class StringAttribute(
+    name: String,
+    namespace: Namespace = Namespace.No,
+    default: String = ""
+  ) extends Attribute[String](name, namespace, default) with Conversion.StringConversion
+
+  def apply(
+    name: String,
+    namespace: Namespace = Namespace.No,
+    default: String = ""
+  ): Attribute[String] = new StringAttribute(name, namespace, default)
+
+  final class BooleanAttribute(
+    name: String,
+    namespace: Namespace = Namespace.No,
+    default: Boolean = false
+  ) extends Attribute[Boolean](name, namespace, default) with Conversion.BooleanConversion
+
+  final class IntAttribute(
+    name: String,
+    namespace: Namespace = Namespace.No,
+    default: Int = 0
+  ) extends Attribute[Int](name, namespace, default) with Conversion.IntConversion
+
+  final class PositiveIntAttribute(
+    name: String,
+    namespace: Namespace = Namespace.No,
+    default: Int = 1
+  ) extends Attribute[Int](name, namespace, default) with Conversion.PositiveIntConversion
+
+  final class FloatAttribute(
+    name: String,
+    namespace: Namespace = Namespace.No,
+    default: Float = 0.0f
+  ) extends Attribute[Float](name, namespace, default) with Conversion.FloatConversion
 }

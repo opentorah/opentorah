@@ -59,7 +59,7 @@ object Sax extends PreModel {
         uri = Strings.empty2none(attributes.getURI(index)),
         prefix = prefix
       )
-    ).withOptionalValue(Option(attributes.getValue(index)))
+    ).optional.withValue(Option(attributes.getValue(index)))
 
   private def getPrefix(
     attributes: PreElement,

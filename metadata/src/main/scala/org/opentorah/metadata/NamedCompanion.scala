@@ -19,7 +19,7 @@ trait NamedCompanion {
   // - not final so that it can be overridden in Tanach, for instance.
   lazy val toNames: Map[Key, Names] = Metadata.load(
     from = From.resource(this, resourceName),
-    fromXml = Names.NamesMetadata,
+    content = Names.NamesMetadata,
     keys = values,
     hasName = (metadata: Names, name: String) => metadata.hasName(name)
   )

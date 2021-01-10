@@ -11,9 +11,9 @@ trait By extends Store {
 }
 
 object By {
-  private val selectorAttribute: Attribute[String] = Attribute("selector")
+  private val selectorAttribute: Attribute.Required[String] = Attribute("selector").required
 
-  val selector: Parser[Selector] = selectorAttribute.required.map(Selector.byName)
+  val selector: Parser[Selector] = selectorAttribute().map(Selector.byName)
 
-  def selectorToXml[T <: By]: Antiparser[T] = selectorAttribute.toXml(_.selector.name)
+  def selectorToXml[T <: By]: Antiparser[T] = selectorAttribute(_.selector.name)
 }

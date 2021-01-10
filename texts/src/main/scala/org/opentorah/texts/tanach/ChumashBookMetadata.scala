@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Metadata, Names}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Antiparser, Element, Parser}
+import org.opentorah.xml.{Antiparser, Element, Parsable, Parser}
 
 final class ChumashBookMetadata(
   book: Tanach.ChumashBook,
@@ -77,7 +77,7 @@ object ChumashBookMetadata {
   }
 
   def parser(book: Tanach.ChumashBook, names: Names, chapters: Chapters): Parser[Parsed] = for {
-    weeks <- new WeekParsable(book).all
+    weeks <- new WeekParsable(book).seq()
     _ <- Parser.check(names.getDefaultName.isDefined,
       "Only default name is allowed for a Chumash book")
     _ <- Parser.check(weeks.head.names.hasName(names.getDefaultName.get),
@@ -87,7 +87,9 @@ object ChumashBookMetadata {
   private final class WeekParsable(book: Tanach.ChumashBook)
     extends Element[ParshaMetadata.Parsed]("week")
   {
-    override def parser: Parser[ParshaMetadata.Parsed] = ParshaMetadata.parser(book)
-    override def antiparser: Antiparser[ParshaMetadata.Parsed] = ???
+    override def contentParsable: Parsable[ParshaMetadata.Parsed] = new Parsable[ParshaMetadata.Parsed] {
+      override def parser: Parser[ParshaMetadata.Parsed] = ParshaMetadata.parser(book)
+      override def antiparser: Antiparser[ParshaMetadata.Parsed] = ???
+    }
   }
 }

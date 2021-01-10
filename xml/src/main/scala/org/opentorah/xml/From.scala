@@ -78,7 +78,6 @@ object From {
     if (!Files.isFileUrl(url) && !Files.isJarUrl(url)) {
       // TODO log!
       println(s"-- Loading $url")
-      val x = 0
     }
     loadFromSource(new InputSource(url.openStream()))
   }

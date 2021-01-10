@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
 
 final case class Pb(
   n: String,
@@ -10,39 +10,42 @@ final case class Pb(
   isEmpty: Boolean = false
 ) {
   def addAttributes(element: Xml.Element): Xml.Element = Xml.setAttributes(Xml.getAttributes(element) ++ Seq(
-    Pb.missingAttribute.withOptionalValue(Some(isMissing)),
-    Pb.emptyAttribute.withOptionalValue(Some(isEmpty))
+    Pb.missingAttribute.withValue(isMissing),
+    Pb.emptyAttribute.withValue(isEmpty)
   ), element)
 }
 
 object Pb extends Element[Pb]("pb") {
 
-  val nAttribute: Attribute[String] = Attribute("n")
-  private val missingAttribute: Attribute.BooleanAttribute = new Attribute.BooleanAttribute("missing")
-  private val emptyAttribute: Attribute.BooleanAttribute = new Attribute.BooleanAttribute("empty")
-  private val facsAttribute: Attribute[String] = Attribute("facs")
+  val nAttribute: Attribute.Required[String] = Attribute("n").required
+  private val idAttribute: Attribute.Optional[String] = Xml.idAttribute.optional
+  private val missingAttribute: Attribute.OrDefault[Boolean] = new Attribute.BooleanAttribute("missing").orDefault
+  private val emptyAttribute: Attribute.OrDefault[Boolean] = new Attribute.BooleanAttribute("empty").orDefault
+  private val facsAttribute: Attribute.Optional[String] = Attribute("facs").optional
 
   override def contentType: ContentType = ContentType.Empty
 
-  override val parser: Parser[Pb] = for {
-    n <- nAttribute.required
-    id <- Xml.idAttribute.optional
-    facs <- facsAttribute.optional
-    isMissing <- missingAttribute.optionalOrDefault
-    isEmpty <- emptyAttribute.optionalOrDefault
-  } yield new Pb(
-    n,
-    id,
-    facs,
-    isMissing,
-    isEmpty
-  )
+  override def contentParsable: Parsable[Pb] = new Parsable[Pb] {
+    override val parser: Parser[Pb] = for {
+      n <- nAttribute()
+      id <- idAttribute()
+      facs <- facsAttribute()
+      isMissing <- missingAttribute()
+      isEmpty <- emptyAttribute()
+    } yield new Pb(
+      n,
+      id,
+      facs,
+      isMissing,
+      isEmpty
+    )
 
-  override val antiparser: Antiparser[Pb] = Tei.concat(
-    nAttribute.toXml(_.n),
-    Xml.idAttribute.toXmlOption(_.id),
-    facsAttribute.toXmlOption(_.facs),
-    missingAttribute.toXml(_.isMissing),
-    emptyAttribute.toXml(_.isEmpty)
-  )
+    override val antiparser: Antiparser[Pb] = Tei.concat(
+      nAttribute(_.n),
+      idAttribute(_.id),
+      facsAttribute(_.facs),
+      missingAttribute(_.isMissing),
+      emptyAttribute(_.isEmpty)
+    )
+  }
 }

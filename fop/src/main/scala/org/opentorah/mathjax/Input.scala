@@ -39,12 +39,7 @@ object Input {
   /**
     * Type of the input: TeX, MathML, AsciiMath.
     */
-  final class InputAttribute(namespace: Namespace, setDefault: Boolean)
-    extends Attribute[Input]("input", namespace, default = Input.MathML, setDefault)
-  {
-    override def withNamespace(namespace: Namespace): InputAttribute =
-      new InputAttribute(namespace, setDefault)
-
+  final class InputAttribute extends Attribute[Input]("input", namespace = MathJax.namespace, default = Input.MathML) {
     override def toString(value: Input): String = value.name
 
     override def fromString(value: String): Input =
@@ -52,5 +47,5 @@ object Input {
   }
 
   @SerialVersionUID(1L)
-  val attribute: InputAttribute = new InputAttribute(namespace = MathJax.namespace, setDefault = false)
+  val attribute: InputAttribute = new InputAttribute
 }

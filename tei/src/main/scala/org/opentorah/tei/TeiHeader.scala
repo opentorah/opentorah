@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Parser}
+import org.opentorah.xml.{Antiparser, Element, Parsable, Parser}
 
 final case class TeiHeader(
   fileDesc: FileDesc,
@@ -12,30 +12,32 @@ final case class TeiHeader(
 
 object TeiHeader extends Element[TeiHeader]("teiHeader") {
 
-  override val parser: Parser[TeiHeader] = for {
-    fileDesc <- FileDesc.required
-    encodingDesc <- EncodingDesc.parsable.optional
-    profileDesc <- ProfileDesc.optional
-    xenoData <- XenoData.parsable.optional
-    revisionDesc <- RevisionDesc.parsable.optional
-  } yield new TeiHeader(
-    fileDesc,
-    encodingDesc,
-    profileDesc,
-    xenoData,
-    revisionDesc
-  )
+  override def contentParsable: Parsable[TeiHeader] = new Parsable[TeiHeader] {
+    override val parser: Parser[TeiHeader] = for {
+      fileDesc <- FileDesc.required()
+      encodingDesc <- EncodingDesc.element.optional()
+      profileDesc <- ProfileDesc.optional()
+      xenoData <- XenoData.element.optional()
+      revisionDesc <- RevisionDesc.element.optional()
+    } yield new TeiHeader(
+      fileDesc,
+      encodingDesc,
+      profileDesc,
+      xenoData,
+      revisionDesc
+    )
 
-  override val antiparser: Antiparser[TeiHeader] = Tei.concat(
-    FileDesc.toXml(_.fileDesc),
-    EncodingDesc.parsable.toXmlOption(_.encodingDesc),
-    ProfileDesc.toXmlOption(_.profileDesc),
-    XenoData.parsable.toXmlOption(_.xenoData),
-    RevisionDesc.parsable.toXmlOption(_.revisionDesc)
-  )
+    override val antiparser: Antiparser[TeiHeader] = Tei.concat(
+      FileDesc.required(_.fileDesc),
+      EncodingDesc.element.optional(_.encodingDesc),
+      ProfileDesc.optional(_.profileDesc),
+      XenoData.element.optional(_.xenoData),
+      RevisionDesc.element.optional(_.revisionDesc)
+    )
+  }
 
-  def apply(): TeiHeader = new TeiHeader(
-    fileDesc = FileDesc(),
+  def empty: TeiHeader = new TeiHeader(
+    fileDesc = FileDesc.empty,
     encodingDesc = None,
     profileDesc = None,
     xenoData = None,

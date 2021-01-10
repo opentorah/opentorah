@@ -15,12 +15,12 @@ abstract class MathJax(
   final def typeset(mathMLDocument: Document): SVGDocument = {
     val element: Element = mathMLDocument.getDocumentElement
 
-    val input: Input = Input.attribute.getWithDefault(element)
+    val input: Input = Input.attribute.orDefault.get(element)
     val math: String =
       if (input == Input.MathML) MathML.prettyPrinter.render(element)
       else MathML.unwrap(element)
 
-    val fontSize: Float = Sizes.fontSizeAttribute.doGet(element)
+    val fontSize: Float = Sizes.fontSizeAttribute.required.get(element)
 
     val outputName: String = Output.Svg.name(isNode = false)
 
@@ -40,7 +40,7 @@ abstract class MathJax(
     val result: SVGDocument = Svg.fromString(svg)
 
     // set font size on the resulting SVG - it is needed for the sizes calculations:
-    Sizes.fontSizeAttribute.withValue(fontSize).set(result.getDocumentElement)
+    Sizes.fontSizeAttribute.required.withValue(fontSize).set(result.getDocumentElement)
 
     result
   }

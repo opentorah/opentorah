@@ -36,7 +36,7 @@ final class TeiTest extends AnyFlatSpec with Matchers {
 
   "905" should "work" in {
     val tei: Tei = Parser.parseDo(Tei.parse(From.resource(Tei, "905")))
-    val html: Xml.Element = tei2html(Tei.toXmlElement(tei))
+    val html: Xml.Element = tei2html(Tei.required.xml(tei))
     //println(Tei.prettyPrinter.render(html))
   }
 }

@@ -1,7 +1,7 @@
 package org.opentorah.collectorng
 
-import org.opentorah.tei.{Entity => TeiEntity, EntityType}
-import org.opentorah.xml.{Antiparser, Attribute, Parser}
+import org.opentorah.tei.{EntityType, Entity => TeiEntity}
+import org.opentorah.xml.{Antiparser, Attribute, Parsable, Parser}
 
 final class Entity(
   override val name: String,
@@ -19,26 +19,28 @@ object Entity extends Directory.EntryMaker[TeiEntity, Entity]("entity") {
     entity.names.head.name
   )
 
-  private val entityTypeAttribute: Attribute[String] = Attribute("type")
-  private val roleAttribute: Attribute[String] = Attribute("role")
-  private val mainNameAttribute: Attribute[String] = Attribute("name")
+  private val entityTypeAttribute: Attribute.Required[String] = Attribute("type").required
+  private val roleAttribute: Attribute.Optional[String] = Attribute("role").optional
+  private val mainNameAttribute: Attribute.Required[String] = Attribute("name").required
 
-  override def parser: Parser[Entity] = for {
-    name <- Directory.fileName
-    entityType <- entityTypeAttribute.required.map(value => EntityType.values.find(_.element == value).get)
-    role <- roleAttribute.optional
-    mainName <- mainNameAttribute.required
-  } yield new Entity(
-    name,
-    entityType,
-    role,
-    mainName
-  )
+  override def contentParsable: Parsable[Entity] = new Parsable[Entity] {
+    override def parser: Parser[Entity] = for {
+      name <- Directory.fileNameAttribute()
+      entityType <- entityTypeAttribute().map(value => EntityType.values.find(_.element == value).get)
+      role <- roleAttribute()
+      mainName <- mainNameAttribute()
+    } yield new Entity(
+      name,
+      entityType,
+      role,
+      mainName
+    )
 
-  override def antiparser: Antiparser[Entity] = Antiparser.concat(
-    Directory.fileNameToXml,
-    entityTypeAttribute.toXml(_.entityType.element),
-    roleAttribute.toXmlOption(_.role),
-    mainNameAttribute.toXml(_.mainName)
-  )
+    override def antiparser: Antiparser[Entity] = Antiparser.concat(
+      Directory.fileNameAttribute(_.name),
+      entityTypeAttribute(_.entityType.element),
+      roleAttribute(_.role),
+      mainNameAttribute(_.mainName)
+    )
+  }
 }

@@ -39,7 +39,7 @@ final class Document(
   def author: Seq[Xml.Node] = Xml.multi(tei.titleStmt.authors.flatMap(_.xml))
 
   def addressee: Seq[Xml.Node] =
-    Seq(tei.addressee.fold[Xml.Node](Xml.mkText(""))(addressee => EntityReference.toXmlElement(addressee)))
+    Seq(tei.addressee.fold[Xml.Node](Xml.mkText(""))(addressee => EntityReference.required.xml(addressee)))
 }
 
 object Document {
